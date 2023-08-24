@@ -1,0 +1,4 @@
+[flake8]
+
+max-line-length = 119
+extend-exclude = thirdparty,parsetab.py,old,devicemodels,SDTTool,dmway/plugins/tsorage/tsorage_pb2.py

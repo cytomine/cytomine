@@ -1,21 +1,29 @@
 from pims.formats.utils.histogram import DefaultHistogramReader
 from pims.formats.utils.abstract import AbstractParser, AbstractReader, AbstractFormat, CachedDataPath
 from pims.cache import cached_property
+from struct import Struct
 from pims.formats.utils.structures.metadata import ImageMetadata
 from pims.formats.utils.engines.tifffile import TifffileChecker
 
 
-
 import logging
 logging.basicConfig(level=logging.DEBUG)
-
+logger = logging.getLogger("pims.format.vsi")
 
 class CZIChecker(TifffileChecker):
 
+    MAGIC_WORD = b'ZISRAWFILE'
+
     @classmethod
     def match(cls, pathlike: CachedDataPath) -> bool:
-            return True
-
+        try:
+            buf = cls.get_signature(pathlike)
+            magic_word_unpacker = Struct("10s")
+            (magic_word,) = magic_word_unpacker.unpack(buf[0:10])
+            logger.debug(f"CZI magic word found {magic_word}")
+            return magic_word == CZIChecker.MAGIC_WORD
+        except RuntimeError:
+            return False
 
 class CZIParser(AbstractParser):
 

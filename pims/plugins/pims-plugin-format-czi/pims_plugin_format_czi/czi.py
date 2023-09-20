@@ -1,14 +1,33 @@
+from functools import lru_cache
+import numpy as np
+from pylibCZIrw import czi
+from struct import Struct
+
 from pims.formats.utils.histogram import DefaultHistogramReader
 from pims.formats.utils.abstract import AbstractParser, AbstractReader, AbstractFormat, CachedDataPath
 from pims.cache import cached_property
-from struct import Struct
-from pims.formats.utils.structures.metadata import ImageMetadata
+from pims.formats.utils.structures.metadata import ImageChannel, ImageMetadata
 from pims.formats.utils.engines.tifffile import TifffileChecker
+from pims.utils.dtypes import dtype_to_bits
 
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger("pims.format.vsi")
+logger = logging.getLogger("pims.format.czi")
+
+
+@lru_cache
+def read_czifile(path, silent_fail=True):
+    logger.debug(f"Read CZI file {path}")
+    czi_file = czi.CziReader(str(path))
+    return czi_file
+
+
+def cached_czi_file(format: AbstractFormat):
+    return format.get_cached(
+        '_czi', read_czifile, format.path.resolve(), silent_fail=True
+    )
+
 
 class CZIChecker(TifffileChecker):
 
@@ -25,6 +44,17 @@ class CZIChecker(TifffileChecker):
         except RuntimeError:
             return False
 
+# Map the pixel format of image into Numpy types
+PixelFormatToNPType = {
+    "Gray8": np.uint8,
+    "Gray16": np.uint16,
+    "Gray32Float": np.float32,
+    # This is a 24 bit int but how should we do, the pixel type is still 8bit ?
+    "Bgr24": np.uint8,
+    "Bgr48": np.uint16,
+    "Bgr96Float": np.float32
+    }
+
 class CZIParser(AbstractParser):
 
     def parse_main_metadata(self) -> ImageMetadata:
@@ -36,6 +66,25 @@ class CZIParser(AbstractParser):
         Returns the ImageMetadata object.
         """
         imd = ImageMetadata()
+        czi_file, _ = cached_czi_file(self.format)
+        imd.width = czi_file.total_bounding_rectangle.w
+        imd.height = czi_file.total_bounding_rectangle.h
+        imd.n_concrete_channels = czi_file.CZI_DIMS['C'] + 1
+        imd.n_samples = 1
+        if imd.n_concrete_channels == 1:
+            imd.set_channel(ImageChannel(
+                    index=0,
+                    suggested_name="G"))
+        else:
+            names = ['B', 'G', 'R', 'A']
+            for cc_idx in range(imd.n_concrete_channels):
+                imd.set_channel(ImageChannel(
+                    index=cc_idx,
+                    suggested_name=names[cc_idx]))
+        imd.depth = czi_file.CZI_DIMS['Z']
+        imd.duration = czi_file.CZI_DIMS['T']
+        imd.pixel_type = np.dtype(PixelFormatToNPType[czi_file.pixel_types[0]])
+        imd.significant_bits = dtype_to_bits(imd.pixel_type)
         return imd
 
     def parse_known_metadata(self):
@@ -78,6 +127,12 @@ class CZIParser(AbstractParser):
 class CZIReader(AbstractReader):
 
     def read_thumb(self, out_width, out_height, precomputed=None, c=None, z=None, t=None):
+        _ ,file = cached_czi_file(self.format)
+        for img in file.attachment_directory:
+            if img.name == "Thumbnail":
+                thumbnail = img
+                # Here we need to return bit array of the actual thumbnail right ? 
+                return thumbnail.content_guid.bytes
         return True
 
     def read_window(self, region, out_width, out_height, c=None, z=None, t=None):

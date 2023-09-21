@@ -2,6 +2,9 @@ from functools import lru_cache
 import numpy as np
 from pylibCZIrw import czi
 from struct import Struct
+import czifile
+from PIL import Image as PILImage
+from io import BytesIO
 
 from pims.formats.utils.histogram import DefaultHistogramReader
 from pims.formats.utils.abstract import AbstractParser, AbstractReader, AbstractFormat, CachedDataPath
@@ -20,7 +23,8 @@ logger = logging.getLogger("pims.format.czi")
 def read_czifile(path, silent_fail=True):
     logger.debug(f"Read CZI file {path}")
     czi_file = czi.CziReader(str(path))
-    return czi_file
+    czi_file_for_thumbnails = czifile.CziFile(str(path))
+    return czi_file, czi_file_for_thumbnails
 
 
 def cached_czi_file(format: AbstractFormat):
@@ -53,6 +57,13 @@ PixelFormatToNPType = {
     "Bgr24": np.uint8,
     "Bgr48": np.uint16,
     "Bgr96Float": np.float32
+    }
+
+PixelFormatToPIL = {
+    "Gray8": "L",
+    "Gray16": "L",
+    "Bgr24": "RGB",
+    "Bgr48": "RGB"
     }
 
 class DictObj:
@@ -122,8 +133,8 @@ class CZIParser(AbstractParser):
         the unit. Ex: imd.physical_size_x = 0.25*UNIT_REGISTRY("micrometers")
         """
         imd = ImageMetadata()
-        czi_file, czi_file_for_thumbnails = cached_czi_file(self.format)
-        for img in czi_file_for_thumbnails.attachments():
+        czi_file = cached_czi_file(self.format)
+        for img in czi_file.attachments():
             if img.attachment_entry.name == "Thumbnail":
                 imd.associated_thumb.width = 10
                 imd.associated_thumb.height = 10
@@ -159,7 +170,7 @@ class CZIParser(AbstractParser):
         -> store.set(key, value)
         """
         imd = super().parse_raw_metadata()
-        czi_file = cached_czi_file(self.format)
+        czi_file, _ = cached_czi_file(self.format)
         all_metadata = czi_file.metadata
         #all_metadata_dict_obj = DictObj(all_metadata)
         all_metadata_dict_flat = self._flattendict(all_metadata)
@@ -175,13 +186,45 @@ class CZIParser(AbstractParser):
 class CZIReader(AbstractReader):
 
     def read_thumb(self, out_width, out_height, precomputed=None, c=None, z=None, t=None):
-        _ ,file = cached_czi_file(self.format)
-        for img in file.attachment_directory:
-            if img.name == "Thumbnail":
+        czi_file1 ,czi_file = cached_czi_file(self.format)
+        for img in czi_file.attachments():
+            if img.attachment_entry.name == "Thumbnail":
                 thumbnail = img
-                # Here we need to return bit array of the actual thumbnail right ? 
-                return thumbnail.content_guid.bytes
+                data = thumbnail.data()
+                image_data = BytesIO(data)
+                image = PILImage.open(image_data).convert(PixelFormatToPIL[czi_file1.pixel_types[0]])
+                return image
+
         return True
+
+    def read_label(self, out_width, out_height):
+<<<<<<< HEAD
+        czi_file1 ,czi_file = cached_czi_file(self.format)
+        for img in czi_file.attachments():
+=======
+        czi_file_reader = cached_czi_file(self.format)
+        for img in czi_file_reader.attachments():
+>>>>>>> 43169ad (fix)
+                img.save()
+                if img.attachment_entry.name == "Label":
+                    label = img
+                    data_raw = label.data(raw=True)
+                    image_data = BytesIO(data_raw)
+                    czi_embedded = czifile.CziFile(image_data)
+                    czi_embedded_asarray = czi_embedded.asarray()
+<<<<<<< HEAD
+                    image = PILImage.fromarray(czi_embedded_asarray[0], mode=PixelFormatToPIL[czi_file1.pixel_types[0]])
+=======
+                    image = PILImage.fromarray(czi_embedded_asarray[0], mode=PixelFormatToPIL[czi_file_reader.pixel_type])
+>>>>>>> 43169ad (fix)
+                    return image
+                    # for img in czi_embedded.attachments():
+                    #     if img.attachment_entry.name == "Thumbnail":
+                    #             thumbnail = img
+                    #             data = thumbnail.data()
+                    #             image_data = BytesIO(data)
+                    #             image = PILImage.open(image_data).convert(PixelFormatToPIL[czi_file1.pixel_types[0]])
+                    #             return image
 
     def read_window(self, region, out_width, out_height, c=None, z=None, t=None):
         return True

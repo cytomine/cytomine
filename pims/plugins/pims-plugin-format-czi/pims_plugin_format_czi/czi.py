@@ -55,8 +55,32 @@ PixelFormatToNPType = {
     "Bgr96Float": np.float32
     }
 
+class DictObj:
+    """Create an object based on a dictionary
+    """
+    # based upon: https://joelmccune.com/python-dictionary-as-object/
+
+    def __init__(self, in_dict: dict):
+        assert isinstance(in_dict, dict)
+        for key, val in in_dict.items():
+            if isinstance(val, (list, tuple)):
+                setattr(self, key, [DictObj(x) if isinstance(x, dict) else x for x in val])
+            else:
+                setattr(self, key, DictObj(val) if isinstance(val, dict) else val)
+
+            
 class CZIParser(AbstractParser):
 
+    def _flattendict(self, d, parentkey='', sep='_'):
+        items = []
+        for k, v in d.items():
+            newkey = parentkey + sep + k if parentkey else k
+            if isinstance(v, dict):
+                items.extend(self._flattendict(v, newkey, sep=sep).items())
+            else:
+                items.append((newkey, v))
+        return dict(items)
+    
     def parse_main_metadata(self) -> ImageMetadata:
         """
         File data necessary for PIMS to work (e.g. image size, pixel type, etc.).
@@ -97,7 +121,25 @@ class CZIParser(AbstractParser):
         Note that for the physical_size_{dimension} property, it is needed to specify
         the unit. Ex: imd.physical_size_x = 0.25*UNIT_REGISTRY("micrometers")
         """
-        imd = super().parse_known_metadata()
+        imd = ImageMetadata()
+        czi_file, czi_file_for_thumbnails = cached_czi_file(self.format)
+        for img in czi_file_for_thumbnails.attachments():
+            if img.attachment_entry.name == "Thumbnail":
+                imd.associated_thumb.width = 10
+                imd.associated_thumb.height = 10
+                imd.associated_thumb.n_channels = 2
+            if img.attachment_entry.name == "Label":
+                imd.associated_label.width = 10
+                imd.associated_label.height = 10
+                imd.associated_label.n_channels = 2
+        all_metadata = czi_file.metadata
+        all_metadata_dict_obj = DictObj(all_metadata)
+        pixel_size_x = float(all_metadata_dict_obj.ImageDocument.Metadata.ImageScaling.ImagePixelSize.split(',')[0])
+        pixel_size_y = float(all_metadata_dict_obj.ImageDocument.Metadata.ImageScaling.ImagePixelSize.split(',')[1])
+        imd.physical_size_x = czi_file.total_bounding_rectangle.w * pixel_size_x
+        imd.physical_size_y = czi_file.total_bounding_rectangle.h * pixel_size_y
+        imd.objective.calibrated_magnification = all_metadata_dict_obj.ImageDocument.Metadata.Scaling.AutoScaling.CameraAdapterMagnification
+        imd.acquisition_datetime = all_metadata_dict_obj.ImageDocument.Metadata.Information.Image.AcquisitionDateAndTime
         return imd
 
     def parse_raw_metadata(self):
@@ -117,6 +159,12 @@ class CZIParser(AbstractParser):
         -> store.set(key, value)
         """
         imd = super().parse_raw_metadata()
+        czi_file = cached_czi_file(self.format)
+        all_metadata = czi_file.metadata
+        #all_metadata_dict_obj = DictObj(all_metadata)
+        all_metadata_dict_flat = self._flattendict(all_metadata)
+        for k, v in all_metadata_dict_flat.items():
+            imd.set(k, v, namespace="CZI")
         return imd
     """
     Other parser methods can be used, e.g. 'PyramidChecker' to fill a Pyramid

@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import argparse
 import czifile
+import numpy as np
+from PIL import Image as PILImage
 from pylibCZIrw import czi
 from pyvips import Image as VIPSImage
 from pyvips import BandFormat
@@ -15,6 +17,16 @@ pixel_types_to_vips_band_type = {
     'Bgr48': BandFormat.USHORT,
     'Rgb48': BandFormat.USHORT,
     'Gray16': BandFormat.USHORT,
+    }
+
+
+pixel_types_to_numpy_dtype = {
+    'Bgr24': np.uint8,
+    'Rgb24': np.uint8,
+    'Gray8': np.uint8,
+    'Bgr48': np.uint16,
+    'Rgb48': np.uint16,
+    'Gray16': np.uint16,
     }
 
 
@@ -50,6 +62,7 @@ if __name__ == '__main__':
     args_parser.add_argument("--zoom", default=1)
     args_parser.add_argument("--scene", default=None)
     args_parser.add_argument("--c", default=0)
+    args_parser.add_argument("--vips", action='store_true', default=False)
 
     args = args_parser.parse_args()
 
@@ -85,18 +98,22 @@ if __name__ == '__main__':
             roi = None
         data = czi_reader.read(scene=args.scene, roi=roi, zoom=float(args.zoom))
         print(data.shape)
-        image = VIPSImage.new_from_memory(
-            data.copy(order="C"),
-            data.shape[0], data.shape[1],
-            data.shape[2],
-            format=pixel_types_to_vips_band_type[czi_reader.pixel_types[args.c]],
-            )
         if roi is not None:
             name = f"output-{args.roi.replace(',', '-')}-{args.zoom}.png"
         else:
             name = f"output-{args.zoom}.png"
         print("Saving", name)
-        image.write_to_file(name)
+        if args.vips:
+            image = VIPSImage.new_from_memory(
+                data.copy(order="C"),
+                data.shape[0], data.shape[1],
+                data.shape[2],
+                format=pixel_types_to_vips_band_type[czi_reader.pixel_types[args.c]],
+                )
+            image.write_to_file(name)
+        else:
+            image = PILImage.fromarray(data.astype(pixel_types_to_numpy_dtype[czi_reader.pixel_types[args.c]]))
+            image.save(name)
 
     if args.metadata:
         pretty_print("Metadata", czi_reader.metadata)

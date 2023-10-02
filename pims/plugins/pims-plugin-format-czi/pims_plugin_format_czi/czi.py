@@ -5,14 +5,16 @@ from struct import Struct
 import czifile
 from PIL import Image as PILImage
 from io import BytesIO
+from typing import Callable, List, Optional, Union
 
+from pims_plugin_format_vsi.utils.area import ImageArea
 from pims.formats.utils.histogram import DefaultHistogramReader
 from pims.formats.utils.abstract import AbstractParser, AbstractReader, AbstractFormat, CachedDataPath
 from pims.cache import cached_property
 from pims.formats.utils.structures.metadata import ImageChannel, ImageMetadata
+from pims.formats.utils.structures.pyramid import Pyramid
 from pims.formats.utils.engines.tifffile import TifffileChecker
 from pims.utils.dtypes import dtype_to_bits
-
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -172,7 +174,6 @@ class CZIParser(AbstractParser):
         imd = super().parse_raw_metadata()
         czi_file, _ = cached_czi_file(self.format)
         all_metadata = czi_file.metadata
-        #all_metadata_dict_obj = DictObj(all_metadata)
         all_metadata_dict_flat = self._flattendict(all_metadata)
         for k, v in all_metadata_dict_flat.items():
             imd.set(k, v, namespace="CZI")
@@ -226,11 +227,53 @@ class CZIReader(AbstractReader):
                     #             image = PILImage.open(image_data).convert(PixelFormatToPIL[czi_file1.pixel_types[0]])
                     #             return image
 
+    def create_pyramid(self):
+        """
+        """
+        logger.debug(f"Creating pyramid")
+        pyramid = Pyramid()
+        czi_file, _ = cached_vsi_file(self.format)
+        all_metadata = czi_file.metadata
+        all_metadata_dict_obj = DictObj(all_metadata)
+        pixel_size_x = float(all_metadata_dict_obj.ImageDocument.Metadata.ImageScaling.ImagePixelSize.split(',')[0])
+        pixel_size_y = float(all_metadata_dict_obj.ImageDocument.Metadata.ImageScaling.ImagePixelSize.split(',')[1])
+        nb_levels = all_metadata_dict_obj.ImageDocument.Metadata.Information.Image.Dimensions.S.Scenes.Scene.PyramidInfo.PyramidLayersCount
+        width, height = pixel_size_x, pixel_size_y
+        logger.debug(f"Add level 0 of size {(width, height)}")
+        pyramid.insert_tier(width, height, (256,256))
+        for level in range(1, nb_levels):
+            # Stick to the way the pyramid tier are created in PIMS to avoid any difference between level calculation
+            width, height = round(width / 2), round(height / 2)
+            logger.debug(f"Add level {level} of size {(width, height)}")
+            pyramid.insert_tier(width, height, (256,256))
+        return pyramid
+
+    def _mapzoom(self, level, nb_level):
+        return (nb_level - level)/ nb_level
+    
+    def _mapcoords(self, coord, level, up_left_bounding_box):
+        return int(2*coord*level + up_left_bounding_box)
+
     def read_window(self, region, out_width, out_height, c=None, z=None, t=None):
-        return True
+        czi_file = cached_czi_file(self.format)
+        self.format.pyramid = czi_file.pyramid
+        tier = self.format.pyramid.most_appropriate_tier(
+            region, (out_width, out_height)
+        )
+        region = region.scale_to_tier(tier)
+        area = ImageArea.from_region(region)
+        x_pos = self._mapcoords(area.coord[0], tier.level, czi_file.file_reader.total_bounding_box['X'][0])
+        y_pos = self._mapcoords(area.coord[1], tier.level, czi_file.file_reader.total_bounding_box['Y'][0])
+        roi = (x_pos, y_pos, int(area.size[0]), int(area.size[1]))
+        zoom = self._mapzoom(tier.level, czi_file.pyramid.n_levels)
+        data = czi_file.file_reader.read(roi=roi, zoom=zoom)
+        window = PILImage.fromarray(data.astype(PixelFormatToNPType[czi_file.pixel_type]))
+        return window
 
     def read_tile(self, tile, c=None, z=None, t=None):
-        return True
+        area = tile 
+        Image = czi_file.file_reader.read(roi=area, zoom=1)
+        return Image
 
 
 class CZIFormat(AbstractFormat):

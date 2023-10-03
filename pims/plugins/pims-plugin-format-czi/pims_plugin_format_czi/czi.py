@@ -7,7 +7,9 @@ from PIL import Image as PILImage
 from io import BytesIO
 from typing import Callable, List, Optional, Union
 
-from pims_plugin_format_vsi.utils.area import ImageArea
+
+from pims_plugin_format_czi.czi_parser.czi_parser import CZIfile
+from pims_plugin_format_czi.utils.area import ImageArea
 from pims.formats.utils.histogram import DefaultHistogramReader
 from pims.formats.utils.abstract import AbstractParser, AbstractReader, AbstractFormat, CachedDataPath
 from pims.cache import cached_property
@@ -24,9 +26,8 @@ logger = logging.getLogger("pims.format.czi")
 @lru_cache
 def read_czifile(path, silent_fail=True):
     logger.debug(f"Read CZI file {path}")
-    czi_file = czi.CziReader(str(path))
-    czi_file_for_thumbnails = czifile.CziFile(str(path))
-    return czi_file, czi_file_for_thumbnails
+    czi_file = CZIfile(str(path))
+    return czi_file
 
 
 def cached_czi_file(format: AbstractFormat):
@@ -50,16 +51,17 @@ class CZIChecker(TifffileChecker):
         except RuntimeError:
             return False
 
+
 # Map the pixel format of image into Numpy types
 PixelFormatToNPType = {
     "Gray8": np.uint8,
     "Gray16": np.uint16,
     "Gray32Float": np.float32,
-    # This is a 24 bit int but how should we do, the pixel type is still 8bit ?
     "Bgr24": np.uint8,
     "Bgr48": np.uint16,
     "Bgr96Float": np.float32
     }
+
 
 PixelFormatToPIL = {
     "Gray8": "L",
@@ -68,20 +70,7 @@ PixelFormatToPIL = {
     "Bgr48": "RGB"
     }
 
-class DictObj:
-    """Create an object based on a dictionary
-    """
-    # based upon: https://joelmccune.com/python-dictionary-as-object/
-
-    def __init__(self, in_dict: dict):
-        assert isinstance(in_dict, dict)
-        for key, val in in_dict.items():
-            if isinstance(val, (list, tuple)):
-                setattr(self, key, [DictObj(x) if isinstance(x, dict) else x for x in val])
-            else:
-                setattr(self, key, DictObj(val) if isinstance(val, dict) else val)
-
-            
+         
 class CZIParser(AbstractParser):
 
     def _flattendict(self, d, parentkey='', sep='_'):
@@ -102,11 +91,12 @@ class CZIParser(AbstractParser):
 
         Returns the ImageMetadata object.
         """
+        
         imd = ImageMetadata()
-        czi_file, _ = cached_czi_file(self.format)
-        imd.width = czi_file.total_bounding_rectangle.w
-        imd.height = czi_file.total_bounding_rectangle.h
-        imd.n_concrete_channels = czi_file.CZI_DIMS['C'] + 1
+        czi_file  = cached_czi_file(self.format)
+        imd.width = czi_file.width
+        imd.height = czi_file.height
+        imd.n_concrete_channels = czi_file.n_concrete_channels
         imd.n_samples = 1
         if imd.n_concrete_channels == 1:
             imd.set_channel(ImageChannel(
@@ -118,10 +108,12 @@ class CZIParser(AbstractParser):
                 imd.set_channel(ImageChannel(
                     index=cc_idx,
                     suggested_name=names[cc_idx]))
-        imd.depth = czi_file.CZI_DIMS['Z']
-        imd.duration = czi_file.CZI_DIMS['T']
-        imd.pixel_type = np.dtype(PixelFormatToNPType[czi_file.pixel_types[0]])
+        imd.depth = czi_file.depth
+        imd.duration = czi_file.duration
+        
+        imd.pixel_type = np.dtype(PixelFormatToNPType[czi_file.pixel_type])
         imd.significant_bits = dtype_to_bits(imd.pixel_type)
+
         return imd
 
     def parse_known_metadata(self):
@@ -145,14 +137,12 @@ class CZIParser(AbstractParser):
                 imd.associated_label.width = 10
                 imd.associated_label.height = 10
                 imd.associated_label.n_channels = 2
-        all_metadata = czi_file.metadata
-        all_metadata_dict_obj = DictObj(all_metadata)
-        pixel_size_x = float(all_metadata_dict_obj.ImageDocument.Metadata.ImageScaling.ImagePixelSize.split(',')[0])
-        pixel_size_y = float(all_metadata_dict_obj.ImageDocument.Metadata.ImageScaling.ImagePixelSize.split(',')[1])
-        imd.physical_size_x = czi_file.total_bounding_rectangle.w * pixel_size_x
-        imd.physical_size_y = czi_file.total_bounding_rectangle.h * pixel_size_y
-        imd.objective.calibrated_magnification = all_metadata_dict_obj.ImageDocument.Metadata.Scaling.AutoScaling.CameraAdapterMagnification
-        imd.acquisition_datetime = all_metadata_dict_obj.ImageDocument.Metadata.Information.Image.AcquisitionDateAndTime
+
+        imd.physical_size_x = czi_file.width * czi_file.pixel_size[0]
+        imd.physical_size_y = czi_file.height * czi_file.pixel_size[1]
+        
+        imd.objective.calibrated_magnification = czi_file.calibrated_magnification
+        imd.acquisition_datetime = czi_file.acquisition_datetime
         return imd
 
     def parse_raw_metadata(self):
@@ -172,8 +162,8 @@ class CZIParser(AbstractParser):
         -> store.set(key, value)
         """
         imd = super().parse_raw_metadata()
-        czi_file, _ = cached_czi_file(self.format)
-        all_metadata = czi_file.metadata
+        czi_file = cached_czi_file(self.format)
+        all_metadata = czi_file.raw_metadata
         all_metadata_dict_flat = self._flattendict(all_metadata)
         for k, v in all_metadata_dict_flat.items():
             imd.set(k, v, namespace="CZI")
@@ -187,37 +177,27 @@ class CZIParser(AbstractParser):
 class CZIReader(AbstractReader):
 
     def read_thumb(self, out_width, out_height, precomputed=None, c=None, z=None, t=None):
-        czi_file1 ,czi_file = cached_czi_file(self.format)
+        czi_file = cached_czi_file(self.format)
         for img in czi_file.attachments():
             if img.attachment_entry.name == "Thumbnail":
                 thumbnail = img
                 data = thumbnail.data()
                 image_data = BytesIO(data)
-                image = PILImage.open(image_data).convert(PixelFormatToPIL[czi_file1.pixel_types[0]])
+                image = PILImage.open(image_data).convert(PixelFormatToPIL[czi_file.pixel_type])
                 return image
 
         return True
 
     def read_label(self, out_width, out_height):
-<<<<<<< HEAD
-        czi_file1 ,czi_file = cached_czi_file(self.format)
-        for img in czi_file.attachments():
-=======
         czi_file_reader = cached_czi_file(self.format)
         for img in czi_file_reader.attachments():
->>>>>>> 43169ad (fix)
-                img.save()
                 if img.attachment_entry.name == "Label":
                     label = img
                     data_raw = label.data(raw=True)
                     image_data = BytesIO(data_raw)
                     czi_embedded = czifile.CziFile(image_data)
                     czi_embedded_asarray = czi_embedded.asarray()
-<<<<<<< HEAD
-                    image = PILImage.fromarray(czi_embedded_asarray[0], mode=PixelFormatToPIL[czi_file1.pixel_types[0]])
-=======
                     image = PILImage.fromarray(czi_embedded_asarray[0], mode=PixelFormatToPIL[czi_file_reader.pixel_type])
->>>>>>> 43169ad (fix)
                     return image
                     # for img in czi_embedded.attachments():
                     #     if img.attachment_entry.name == "Thumbnail":
@@ -227,26 +207,6 @@ class CZIReader(AbstractReader):
                     #             image = PILImage.open(image_data).convert(PixelFormatToPIL[czi_file1.pixel_types[0]])
                     #             return image
 
-    def create_pyramid(self):
-        """
-        """
-        logger.debug(f"Creating pyramid")
-        pyramid = Pyramid()
-        czi_file, _ = cached_vsi_file(self.format)
-        all_metadata = czi_file.metadata
-        all_metadata_dict_obj = DictObj(all_metadata)
-        pixel_size_x = float(all_metadata_dict_obj.ImageDocument.Metadata.ImageScaling.ImagePixelSize.split(',')[0])
-        pixel_size_y = float(all_metadata_dict_obj.ImageDocument.Metadata.ImageScaling.ImagePixelSize.split(',')[1])
-        nb_levels = all_metadata_dict_obj.ImageDocument.Metadata.Information.Image.Dimensions.S.Scenes.Scene.PyramidInfo.PyramidLayersCount
-        width, height = pixel_size_x, pixel_size_y
-        logger.debug(f"Add level 0 of size {(width, height)}")
-        pyramid.insert_tier(width, height, (256,256))
-        for level in range(1, nb_levels):
-            # Stick to the way the pyramid tier are created in PIMS to avoid any difference between level calculation
-            width, height = round(width / 2), round(height / 2)
-            logger.debug(f"Add level {level} of size {(width, height)}")
-            pyramid.insert_tier(width, height, (256,256))
-        return pyramid
 
     def _mapzoom(self, level, nb_level):
         return (nb_level - level)/ nb_level

@@ -231,9 +231,16 @@ class CZIReader(AbstractReader):
         return window
 
     def read_tile(self, tile, c=None, z=None, t=None):
-        area = tile 
-        Image = czi_file.file_reader.read(roi=area, zoom=1)
-        return Image
+        czi_file = cached_czi_file(self.format)
+        self.format.pyramid = czi_file.pyramid
+        tier = tile.tier
+        zoom = self._mapzoom(tier.level, czi_file.pyramid.n_levels)    
+        x_pos = self._mapcoords(tile.tx, tier.level, czi_file.file_reader.total_bounding_box['X'][0])
+        y_pos = self._mapcoords(tile.ty, tier.level, czi_file.file_reader.total_bounding_box['Y'][0])
+        roi=(x_pos, y_pos, tile.height, tile.width)
+        data = czi_file.file_reader.read(roi=roi, zoom=zoom)
+        image = PILImage.fromarray(data.astype(PixelFormatToNPType[czi_file.pixel_type]))
+        return image
 
 
 class CZIFormat(AbstractFormat):

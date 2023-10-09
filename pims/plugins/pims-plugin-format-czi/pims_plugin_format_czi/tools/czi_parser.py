@@ -58,6 +58,7 @@ if __name__ == '__main__':
     args_parser.add_argument("--custom", action='store_true', default=False)
     args_parser.add_argument("--attachment", default=None)
     args_parser.add_argument("--save", action='store_true', default=False)
+    args_parser.add_argument("--raw", action='store_true', default=False)
     args_parser.add_argument("--roi", default=None)
     args_parser.add_argument("--zoom", default=1)
     args_parser.add_argument("--scene", default=None)
@@ -89,7 +90,26 @@ if __name__ == '__main__':
         for a in czi_file.attachments():
             if args.attachment == a.attachment_entry.name:
                 print("Saving", a.attachment_entry.name)
-                a.save()
+                if args.raw or a.attachment_entry.content_file_type != "CZI":
+                    a.save()
+                else:
+                    data = a.data()
+                    print(data)
+                    print(data.shape)
+                    print(data.dtype)
+                    if args.vips:
+                        image = VIPSImage.new_from_memory(
+                            data.copy(order="C"),
+                            data.shape[0], data.shape[1],
+                            data.shape[2],
+                            format=pixel_types_to_vips_band_type[czi_reader.pixel_types[args.c]],
+                            )
+                        image.write_to_file(name)
+                    else:
+                        array = data.asarray()
+                        raw = array[0][0]
+                        image = PILImage.fromarray(raw)
+                        image.save(f"{a.attachment_entry.name}.png")
 
     if args.save:
         if args.roi is not None:

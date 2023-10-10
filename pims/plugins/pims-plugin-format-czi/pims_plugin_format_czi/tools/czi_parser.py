@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import czifile
+from io import BytesIO
 import numpy as np
 from PIL import Image as PILImage
 from pylibCZIrw import czi
@@ -27,6 +28,18 @@ pixel_types_to_numpy_dtype = {
     'Bgr48': np.uint16,
     'Rgb48': np.uint16,
     'Gray16': np.uint16,
+    }
+
+
+numpy_to_vips_band_type = {
+    np.dtype(np.int8): BandFormat.CHAR,
+    np.dtype(np.uint8): BandFormat.UCHAR,
+    np.dtype(np.int16): BandFormat.SHORT,
+    np.dtype(np.uint16): BandFormat.USHORT,
+    np.dtype(np.int32): BandFormat.INT,
+    np.dtype(np.uint32): BandFormat.UINT,
+    np.dtype(np.float32): BandFormat.FLOAT,
+    np.dtype(np.float64): BandFormat.DOUBLE,
     }
 
 
@@ -64,6 +77,7 @@ if __name__ == '__main__':
     args_parser.add_argument("--scene", default=None)
     args_parser.add_argument("--c", default=0)
     args_parser.add_argument("--vips", action='store_true', default=False)
+    args_parser.add_argument("--format", default='tif')
 
     args = args_parser.parse_args()
 
@@ -86,54 +100,58 @@ if __name__ == '__main__':
         print(f"  {a.attachment_entry.name}: {a.attachment_entry.content_file_type}")
         if args.attachment == a.attachment_entry.name:
             a.save()
-    if args.attachment is not None:
-        for a in czi_file.attachments():
-            if args.attachment == a.attachment_entry.name:
-                print("Saving", a.attachment_entry.name)
-                if args.raw or a.attachment_entry.content_file_type != "CZI":
-                    a.save()
-                else:
-                    data = a.data()
-                    print(data)
-                    print(data.shape)
-                    print(data.dtype)
-                    if args.vips:
-                        image = VIPSImage.new_from_memory(
-                            data.copy(order="C"),
-                            data.shape[0], data.shape[1],
-                            data.shape[2],
-                            format=pixel_types_to_vips_band_type[czi_reader.pixel_types[args.c]],
-                            )
-                        image.write_to_file(name)
-                    else:
-                        array = data.asarray()
-                        raw = array[0][0]
-                        image = PILImage.fromarray(raw)
-                        image.save(f"{a.attachment_entry.name}.png")
-
     if args.save:
-        if args.roi is not None:
-            roi = tuple(int(v) for v in args.roi.split(','))
+        if args.attachment is not None:
+            for a in czi_file.attachments():
+                if args.attachment == a.attachment_entry.name:
+                    if args.raw or a.attachment_entry.content_file_type != "CZI":
+                        print("Saving", a.attachment_entry.name, "as", a.attachment_entry.filename)
+                        a.save()
+                    else:
+                        name = f"{a.attachment_entry.name}.{args.format}"
+                        print("Saving", a.attachment_entry.name, "as", name)
+                        raw_data = a.data(raw=True)
+                        image_data = BytesIO(raw_data)
+                        czi_embedded = czifile.CziFile(image_data)
+                        data = czi_embedded.asarray()
+                        data = data[args.c]
+                        if args.vips:
+                            image = VIPSImage.new_from_memory(
+                                data,
+                                data.shape[1], data.shape[0],
+                                data.shape[2],
+                                format=numpy_to_vips_band_type[data.dtype],
+                                )
+                            image.write_to_file(name)
+                        else:
+                            if data.shape[2] == 3:
+                                mode = "RGB"
+                            else:
+                                mode = "L"
+                            image = PILImage.fromarray(data, mode)
+                            image.save(name)
         else:
-            roi = None
-        data = czi_reader.read(scene=args.scene, roi=roi, zoom=float(args.zoom))
-        print(data.shape)
-        if roi is not None:
-            name = f"output-{args.roi.replace(',', '-')}-{args.zoom}.png"
-        else:
-            name = f"output-{args.zoom}.png"
-        print("Saving", name)
-        if args.vips:
-            image = VIPSImage.new_from_memory(
-                data.copy(order="C"),
-                data.shape[0], data.shape[1],
-                data.shape[2],
-                format=pixel_types_to_vips_band_type[czi_reader.pixel_types[args.c]],
-                )
-            image.write_to_file(name)
-        else:
-            image = PILImage.fromarray(data.astype(pixel_types_to_numpy_dtype[czi_reader.pixel_types[args.c]]))
-            image.save(name)
+            if args.roi is not None:
+                roi = tuple(int(v) for v in args.roi.split(','))
+            else:
+                roi = None
+            data = czi_reader.read(scene=args.scene, roi=roi, zoom=float(args.zoom))
+            if roi is not None:
+                name = f"output-{args.roi.replace(',', '-')}-{args.zoom}.{args.format}"
+            else:
+                name = f"output-{args.zoom}.{args.format}"
+            print("Saving", name)
+            if args.vips:
+                image = VIPSImage.new_from_memory(
+                    data.copy(order="C"),
+                    data.shape[1], data.shape[0],
+                    data.shape[2],
+                    format=pixel_types_to_vips_band_type[czi_reader.pixel_types[args.c]],
+                    )
+                image.write_to_file(name)
+            else:
+                image = PILImage.fromarray(data.astype(pixel_types_to_numpy_dtype[czi_reader.pixel_types[args.c]]))
+                image.save(name)
 
     if args.metadata:
         pretty_print("Metadata", czi_reader.metadata)

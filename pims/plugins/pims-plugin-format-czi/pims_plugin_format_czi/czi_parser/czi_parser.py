@@ -52,6 +52,13 @@ class CZIfile():
         self._raw_metadata = self._czi_file_reader.metadata
         self._metadata_dict_obj = DictObj(self._raw_metadata)
 
+        if hasattr(self._metadata_dict_obj.ImageDocument.Metadata, 'ImageScaling'):
+            physical_pixel_size = self._metadata_dict_obj.ImageDocument.Metadata.ImageScaling.ImagePixelSize
+            self._pixel_size_x = float(physical_pixel_size.split(',')[0])
+            self._pixel_size_y = float(physical_pixel_size.split(',')[1])
+        else: 
+            self._pixel_size_x = None
+            self._pixel_size_y = None
 
         if self._metadata_dict_obj.ImageDocument.Metadata.Scaling is not None:
             self._calibrated_magnification = self._metadata_dict_obj.ImageDocument.Metadata.Scaling.AutoScaling.CameraAdapterMagnification
@@ -153,7 +160,17 @@ class CZIfile():
         """
         
         return (self._width, self._height)
-    
+
+
+    @property
+    def physical_pixel_size(self) -> (float, float):
+        """
+        Return the Pixel Physical size
+        """
+        
+        return (self._pixel_size_x, self._pixel_size_y)
+
+
     @property
     def acquisition_datetime(self) -> float:
         """

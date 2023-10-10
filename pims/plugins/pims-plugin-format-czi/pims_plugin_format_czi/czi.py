@@ -44,10 +44,11 @@ class CZIChecker(TifffileChecker):
     def match(cls, pathlike: CachedDataPath) -> bool:
         try:
             buf = cls.get_signature(pathlike)
-            magic_word_unpacker = Struct("10s")
-            (magic_word,) = magic_word_unpacker.unpack(buf[0:10])
-            logger.debug(f"CZI magic word found {magic_word}")
-            return magic_word == CZIChecker.MAGIC_WORD
+            if len(buf) >= 10:
+                magic_word_unpacker = Struct("10s")
+                (magic_word,) = magic_word_unpacker.unpack(buf[0:10])
+                logger.debug(f"CZI magic word found {magic_word}")
+                return magic_word == CZIChecker.MAGIC_WORD
         except RuntimeError:
             return False
 

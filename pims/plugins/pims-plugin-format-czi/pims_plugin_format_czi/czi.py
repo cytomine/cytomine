@@ -6,7 +6,8 @@ import czifile
 from PIL import Image as PILImage
 from io import BytesIO
 from typing import Callable, List, Optional, Union
-
+from pyvips import Image as VIPSImage
+from pyvips import BandFormat
 
 from pims_plugin_format_czi.czi_parser.czi_parser import CZIfile
 from pims_plugin_format_czi.utils.area import ImageArea
@@ -51,6 +52,18 @@ class CZIChecker(TifffileChecker):
                 return magic_word == CZIChecker.MAGIC_WORD
         except RuntimeError:
             return False
+
+
+numpy_to_vips_band_type = {
+    np.dtype(np.int8): BandFormat.CHAR,
+    np.dtype(np.uint8): BandFormat.UCHAR,
+    np.dtype(np.int16): BandFormat.SHORT,
+    np.dtype(np.uint16): BandFormat.USHORT,
+    np.dtype(np.int32): BandFormat.INT,
+    np.dtype(np.uint32): BandFormat.UINT,
+    np.dtype(np.float32): BandFormat.FLOAT,
+    np.dtype(np.float64): BandFormat.DOUBLE,
+    }
 
 
 # Map the pixel format of image into Numpy types
@@ -197,23 +210,22 @@ class CZIReader(AbstractReader):
                     data_raw = label.data(raw=True)
                     image_data = BytesIO(data_raw)
                     czi_embedded = czifile.CziFile(image_data)
-                    czi_embedded_asarray = czi_embedded.asarray()
-                    image = PILImage.fromarray(czi_embedded_asarray[0], mode=PixelFormatToPIL[czi_file_reader.pixel_type])
+                    data = czi_embedded.asarray()
+                    data = data[0]
+                    image = VIPSImage.new_from_memory(
+                                data,
+                                data.shape[1], data.shape[0],
+                                data.shape[2],
+                                format=numpy_to_vips_band_type[data.dtype]
+                                )
                     return image
-                    # for img in czi_embedded.attachments():
-                    #     if img.attachment_entry.name == "Thumbnail":
-                    #             thumbnail = img
-                    #             data = thumbnail.data()
-                    #             image_data = BytesIO(data)
-                    #             image = PILImage.open(image_data).convert(PixelFormatToPIL[czi_file1.pixel_types[0]])
-                    #             return image
 
 
     def _mapzoom(self, level, nb_level):
         return (nb_level - level)/ nb_level
     
     def _mapcoords(self, coord, level, up_left_bounding_box):
-        return int(2*coord*level + up_left_bounding_box)
+        return int(coord*level + up_left_bounding_box)
 
     def read_window(self, region, out_width, out_height, c=None, z=None, t=None):
         czi_file = cached_czi_file(self.format)

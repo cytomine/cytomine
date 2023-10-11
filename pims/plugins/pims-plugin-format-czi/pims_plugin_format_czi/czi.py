@@ -1,11 +1,9 @@
 from functools import lru_cache
 import numpy as np
-from pylibCZIrw import czi
 from struct import Struct
 import czifile
 from PIL import Image as PILImage
 from io import BytesIO
-from typing import Callable, List, Optional, Union
 from pyvips import Image as VIPSImage
 from pyvips import BandFormat
 
@@ -66,25 +64,6 @@ numpy_to_vips_band_type = {
     }
 
 
-# Map the pixel format of image into Numpy types
-PixelFormatToNPType = {
-    "Gray8": np.uint8,
-    "Gray16": np.uint16,
-    "Gray32Float": np.float32,
-    "Bgr24": np.uint8,
-    "Bgr48": np.uint16,
-    "Bgr96Float": np.float32
-    }
-
-
-PixelFormatToPIL = {
-    "Gray8": "L",
-    "Gray16": "L",
-    "Bgr24": "RGB",
-    "Bgr48": "RGB"
-    }
-
-         
 class CZIParser(AbstractParser):
 
     def _flattendict(self, d, parentkey='', sep='_'):
@@ -125,7 +104,7 @@ class CZIParser(AbstractParser):
         imd.depth = czi_file.depth
         imd.duration = czi_file.duration
         
-        imd.pixel_type = np.dtype(PixelFormatToNPType[czi_file.pixel_type])
+        imd.pixel_type = np.dtype(czi_file.PixelFormatToNPType[czi_file.pixel_type])
         imd.significant_bits = dtype_to_bits(imd.pixel_type)
 
         return imd
@@ -202,7 +181,7 @@ class CZIReader(AbstractReader):
                 thumbnail = img
                 data = thumbnail.data()
                 image_data = BytesIO(data)
-                image = PILImage.open(image_data).convert(PixelFormatToPIL[czi_file.pixel_type])
+                image = PILImage.open(image_data).convert(czi_file.PixelFormatToPIL[czi_file.pixel_type])
                 return image
 
         return True
@@ -225,38 +204,19 @@ class CZIReader(AbstractReader):
                                 )
                     return image
 
-
-    def _mapzoom(self, level, nb_level):
-        return 2**(nb_level - level)/ 2**nb_level
-    
-    def _mapcoords(self, coord, level, up_left_bounding_box):
-        return int(coord*(2**level) + up_left_bounding_box)
-
     def read_window(self, region, out_width, out_height, c=None, z=None, t=None):
         czi_file = cached_czi_file(self.format)
         tier = self.format.pyramid.most_appropriate_tier(
             region, (out_width, out_height)
         )
         region = region.scale_to_tier(tier)
-        x_pos = self._mapcoords(region.left, tier.level, czi_file.file_reader.total_bounding_box['X'][0])
-        y_pos = self._mapcoords(region.top, tier.level, czi_file.file_reader.total_bounding_box['Y'][0])
-        roi = (x_pos, y_pos, int(region.width * 2**tier.level), int(region.height*2**tier.level))
-        zoom = self._mapzoom(tier.level, czi_file.pyramid.n_levels)
-        data = czi_file.file_reader.read(roi=roi, zoom=zoom)
-        window = PILImage.fromarray(data.astype(PixelFormatToNPType[czi_file.pixel_type]))
-        return window
+        return czi_file.read_area(region.left, region.top, region.width, region.height, tier.level)
 
     def read_tile(self, tile, c=None, z=None, t=None):
         czi_file = cached_czi_file(self.format)
-        tier = tile.tier
-        tile_size = (256, 256)
-        zoom = self._mapzoom(tier.level, czi_file.pyramid.n_levels)    
-        x_pos = self._mapcoords(tile.tx**tile_size[0], tier.level, czi_file.file_reader.total_bounding_box['X'][0])
-        y_pos = self._mapcoords(tile.ty**tile_size[1], tier.level, czi_file.file_reader.total_bounding_box['Y'][0])
-        roi=(x_pos, y_pos, tile.height, tile.width)
-        data = czi_file.file_reader.read(roi=roi, zoom=zoom)
-        image = PILImage.fromarray(data.astype(PixelFormatToNPType[czi_file.pixel_type]))
-        return image
+        x = tile.tx * czi_file.tile_size[0]
+        y = tile.ty * czi_file.tile_size[1]
+        return czi_file.read_area(x, y, czi_file.tile_size, tile.tier.level)
 
 
 class CZIFormat(AbstractFormat):

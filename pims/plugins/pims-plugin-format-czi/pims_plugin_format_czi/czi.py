@@ -227,23 +227,20 @@ class CZIReader(AbstractReader):
 
 
     def _mapzoom(self, level, nb_level):
-        return (nb_level - level)/ nb_level
+        return 2**(nb_level - level)/ 2**nb_level
     
     def _mapcoords(self, coord, level, up_left_bounding_box):
         return int(coord*(2**level) + up_left_bounding_box)
 
     def read_window(self, region, out_width, out_height, c=None, z=None, t=None):
         czi_file = cached_czi_file(self.format)
-        self.format.pyramid = czi_file.pyramid
         tier = self.format.pyramid.most_appropriate_tier(
             region, (out_width, out_height)
         )
-        tile_size = (256, 256)
         region = region.scale_to_tier(tier)
-        area = ImageArea.from_region(region)
-        x_pos = self._mapcoords(area.coord[0]*tile_size[0], tier.level, czi_file.file_reader.total_bounding_box['X'][0])
-        y_pos = self._mapcoords(area.coord[1]*tile_size[1], tier.level, czi_file.file_reader.total_bounding_box['Y'][0])
-        roi = (x_pos, y_pos, int(area.size[0]), int(area.size[1]))
+        x_pos = self._mapcoords(region.left, tier.level, czi_file.file_reader.total_bounding_box['X'][0])
+        y_pos = self._mapcoords(region.top, tier.level, czi_file.file_reader.total_bounding_box['Y'][0])
+        roi = (x_pos, y_pos, int(region.width * 2**tier.level), int(region.height*2**tier.level))
         zoom = self._mapzoom(tier.level, czi_file.pyramid.n_levels)
         data = czi_file.file_reader.read(roi=roi, zoom=zoom)
         window = PILImage.fromarray(data.astype(PixelFormatToNPType[czi_file.pixel_type]))
@@ -251,7 +248,6 @@ class CZIReader(AbstractReader):
 
     def read_tile(self, tile, c=None, z=None, t=None):
         czi_file = cached_czi_file(self.format)
-        self.format.pyramid = czi_file.pyramid
         tier = tile.tier
         tile_size = (256, 256)
         zoom = self._mapzoom(tier.level, czi_file.pyramid.n_levels)    

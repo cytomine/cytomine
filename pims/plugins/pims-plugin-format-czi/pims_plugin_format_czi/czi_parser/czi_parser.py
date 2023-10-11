@@ -1,13 +1,27 @@
 import czifile
+from io import BytesIO
 import logging
 from math import ceil, log2
 import numpy as np
 from PIL import Image as PILImage
-from pylibCZIrw import czi
-
 from pims.formats.utils.structures.pyramid import Pyramid
+from pylibCZIrw import czi
+from pyvips import Image as VIPSImage
+from pyvips import BandFormat
+
 
 logger = logging.getLogger("pims.format.czi")
+
+numpy_to_vips_band_type = {
+    np.dtype(np.int8): BandFormat.CHAR,
+    np.dtype(np.uint8): BandFormat.UCHAR,
+    np.dtype(np.int16): BandFormat.SHORT,
+    np.dtype(np.uint16): BandFormat.USHORT,
+    np.dtype(np.int32): BandFormat.INT,
+    np.dtype(np.uint32): BandFormat.UINT,
+    np.dtype(np.float32): BandFormat.FLOAT,
+    np.dtype(np.float64): BandFormat.DOUBLE,
+    }
 
 
 class DictObj:
@@ -21,6 +35,67 @@ class DictObj:
                 setattr(self, key, [DictObj(x) if isinstance(x, dict) else x for x in val])
             else:
                 setattr(self, key, DictObj(val) if isinstance(val, dict) else val)
+
+
+class CZIAttachment:
+
+    def __init__(self, attachment):
+        self.attachment = attachment
+
+
+class CZIVIPSAttachment(CZIAttachment):
+
+    def __init__(self, attachment):
+        super().__init__(attachment)
+        raw_data = attachment.data(raw=True)
+        self._image = VIPSImage.new_from_buffer(raw_data, options="")
+
+    @property
+    def width(self):
+        return self._image.width
+
+    @property
+    def height(self):
+        return self._image.height
+
+    @property
+    def n_components(self):
+        return self._image.bands
+
+    def read(self) -> VIPSImage:
+        return self._image
+
+
+class CZINAtiveAttachment(CZIAttachment):
+
+    def __init__(self, attachment):
+        super().__init__(attachment)
+        raw_data = attachment.data(raw=True)
+        image_data = BytesIO(raw_data)
+        self._czi = czifile.CziFile(image_data)
+
+    @property
+    def width(self):
+        return self._czi.shape[2]
+
+    @property
+    def height(self):
+        return self._czi.shape[1]
+
+    @property
+    def n_components(self):
+        return self._czi.shape[0]
+
+    def read(self) -> VIPSImage:
+        data = self._czi.asarray()
+        data = data[0]
+        image = VIPSImage.new_from_memory(
+            data,
+            data.shape[1], data.shape[0],
+            data.shape[2],
+            format=numpy_to_vips_band_type[data.dtype],
+            )
+        return image
 
 
 class CZIfile():
@@ -45,7 +120,12 @@ class CZIfile():
     def __init__(self, path):
 
         self._czi_file_reader = czi.CziReader(path)
-        self._thumbnails_reader = czifile.CziFile(path)
+        self._attachment_reader = czifile.CziFile(path)
+
+        self._thumbnail = None
+        self._overview = None
+        self._label = None
+        self._macro = None
 
         bounding_box = self._czi_file_reader.total_bounding_box
         self._width = bounding_box['X'][1] - bounding_box['X'][0]
@@ -65,7 +145,6 @@ class CZIfile():
             self._duration = 1
 
         self._pixel_type = self._czi_file_reader.pixel_types[0]
-        self._attachments = self._thumbnails_reader.attachments()
 
         self._raw_metadata = self._czi_file_reader.metadata
         self._metadata_dict_obj = DictObj(self._raw_metadata)
@@ -82,24 +161,10 @@ class CZIfile():
             self._calibrated_magnification = self._metadata_dict_obj.ImageDocument.Metadata.Scaling.AutoScaling.CameraAdapterMagnification
             self._acquisition_datetime = self._metadata_dict_obj.ImageDocument.Metadata.Information.Image.AcquisitionDateAndTime
 
+        self._analyze_images()
+
         self._tile_size = (256, 256)
         self._pyramid = self._create_pyramid()
-
-    @property
-    def file_reader(self) -> float:
-        """
-        Return the CZI file obtained from pylibCZIrw lib
-        """
-
-        return self._czi_file_reader
-
-    @property
-    def file_thumbnails_reader(self) -> float:
-        """
-        Return the CZI file obtained from czifile lib
-        """
-
-        return self._thumbnails_reader
 
     @property
     def width(self) -> float:
@@ -148,13 +213,6 @@ class CZIfile():
         """
 
         return self._pixel_type
-
-    def attachments(self):
-        """
-        Return the file attachments
-        """
-
-        return self._thumbnails_reader.attachments()
 
     @property
     def raw_metadata(self) -> dict:
@@ -247,13 +305,61 @@ class CZIfile():
         """
 
         scale = 2 ** level
-        box = self.file_reader.total_bounding_box
+        box = self._czi_file_reader.total_bounding_box
         x_pos = x * scale + box['X'][0]
         y_pos = y * scale + box['Y'][0]
         roi = (x_pos, y_pos, width * scale, height * scale)
 
         zoom = (2 ** (self.pyramid.n_levels - level)) / (2 ** self.pyramid.n_levels)
 
-        data = self.file_reader.read(roi=roi, zoom=zoom)
+        data = self._czi_file_reader.read(roi=roi, zoom=zoom)
         image = PILImage.fromarray(data.astype(self.PixelFormatToNPType[self.pixel_type]))
         return image
+
+    def _analyze_images(self) -> None:
+        for img in self._attachment_reader.attachments():
+            if img.attachment_entry.name == "Thumbnail":
+                self._thumbnail = self.image_from_attachment(img)
+            elif img.attachment_entry.name == "SlideOverview":
+                self._overview = self.image_from_attachment(img)
+            elif img.attachment_entry.name == "Label":
+                self._label = self.image_from_attachment(img)
+            elif img.attachment_entry.name == "Macro":
+                self._macro = self.image_from_attachment(img)
+
+    def image_from_attachment(self, attachment) -> CZIAttachment:
+        if attachment.attachment_entry.content_file_type != "CZI":
+            image = CZIVIPSAttachment(attachment)
+        else:
+            image = CZINAtiveAttachment(attachment)
+        return image
+
+    @property
+    def label_image(self):
+        """
+        Return the label image handler, if a label image has been identified
+        """
+
+        return self._label
+
+    @property
+    def macro_image(self):
+        """
+        Return the macro image handler, if a macro image has been identified
+        """
+
+        return self._macro
+
+    @property
+    def overview_image(self):
+        """
+        Return the overview image handler, if a overview image has been identified
+        """
+        return self._overview
+
+    @property
+    def thumbnail_image(self):
+        """
+        Return the thumbnail image handler, if a overview image has been identified
+        """
+        return self._thumbnail

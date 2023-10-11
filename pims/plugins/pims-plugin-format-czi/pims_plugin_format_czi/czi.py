@@ -1,14 +1,9 @@
 from functools import lru_cache
 import numpy as np
 from struct import Struct
-import czifile
-from PIL import Image as PILImage
-from io import BytesIO
-from pyvips import Image as VIPSImage
 from pyvips import BandFormat
 
 from pims_plugin_format_czi.czi_parser.czi_parser import CZIfile
-from pims_plugin_format_czi.utils.area import ImageArea
 from pims.formats.utils.histogram import DefaultHistogramReader
 from pims.formats.utils.abstract import AbstractParser, AbstractReader, AbstractFormat, CachedDataPath
 from pims.cache import cached_property
@@ -75,7 +70,7 @@ class CZIParser(AbstractParser):
             else:
                 items.append((newkey, v))
         return dict(items)
-    
+
     def parse_main_metadata(self) -> ImageMetadata:
         """
         File data necessary for PIMS to work (e.g. image size, pixel type, etc.).
@@ -84,9 +79,9 @@ class CZIParser(AbstractParser):
 
         Returns the ImageMetadata object.
         """
-        
+
         imd = ImageMetadata()
-        czi_file  = cached_czi_file(self.format)
+        czi_file = cached_czi_file(self.format)
         imd.width = czi_file.width
         imd.height = czi_file.height
         imd.n_concrete_channels = czi_file.n_concrete_channels
@@ -103,7 +98,7 @@ class CZIParser(AbstractParser):
                     suggested_name=names[cc_idx]))
         imd.depth = czi_file.depth
         imd.duration = czi_file.duration
-        
+
         imd.pixel_type = np.dtype(czi_file.PixelFormatToNPType[czi_file.pixel_type])
         imd.significant_bits = dtype_to_bits(imd.pixel_type)
 
@@ -121,20 +116,19 @@ class CZIParser(AbstractParser):
         """
         imd = ImageMetadata()
         czi_file = cached_czi_file(self.format)
-        for img in czi_file.attachments():
-            if img.attachment_entry.name == "Thumbnail":
-                imd.associated_thumb.width = 10
-                imd.associated_thumb.height = 10
-                imd.associated_thumb.n_channels = 2
-            if img.attachment_entry.name == "Label":
-                imd.associated_label.width = 10
-                imd.associated_label.height = 10
-                imd.associated_label.n_channels = 2
+        if czi_file.thumbnail_image is not None:
+            imd.associated_thumb.width = czi_file.thumbnail_image.width
+            imd.associated_thumb.height = czi_file.thumbnail_image.height
+            imd.associated_thumb.n_channels = czi_file.thumbnail_image.n_components
+        if czi_file.label_image is not None:
+            imd.associated_label.width = czi_file.label_image.width
+            imd.associated_label.height = czi_file.label_image.height
+            imd.associated_label.n_channels = czi_file.label_image.n_components
 
         if czi_file.physical_pixel_size is not None:
             imd.physical_size_x = czi_file.physical_pixel_size[0]
             imd.physical_size_y = czi_file.physical_pixel_size[1]
-        
+
         imd.objective.calibrated_magnification = czi_file.calibrated_magnification
         imd.acquisition_datetime = czi_file.acquisition_datetime
         return imd
@@ -176,33 +170,11 @@ class CZIReader(AbstractReader):
 
     def read_thumb(self, out_width, out_height, precomputed=None, c=None, z=None, t=None):
         czi_file = cached_czi_file(self.format)
-        for img in czi_file.attachments():
-            if img.attachment_entry.name == "Thumbnail":
-                thumbnail = img
-                data = thumbnail.data()
-                image_data = BytesIO(data)
-                image = PILImage.open(image_data).convert(czi_file.PixelFormatToPIL[czi_file.pixel_type])
-                return image
-
-        return True
+        return czi_file.thumbnail_image.read()
 
     def read_label(self, out_width, out_height):
-        czi_file_reader = cached_czi_file(self.format)
-        for img in czi_file_reader.attachments():
-                if img.attachment_entry.name == "Label":
-                    label = img
-                    data_raw = label.data(raw=True)
-                    image_data = BytesIO(data_raw)
-                    czi_embedded = czifile.CziFile(image_data)
-                    data = czi_embedded.asarray()
-                    data = data[0]
-                    image = VIPSImage.new_from_memory(
-                                data,
-                                data.shape[1], data.shape[0],
-                                data.shape[2],
-                                format=numpy_to_vips_band_type[data.dtype]
-                                )
-                    return image
+        czi_file = cached_czi_file(self.format)
+        return czi_file.label_image.read()
 
     def read_window(self, region, out_width, out_height, c=None, z=None, t=None):
         czi_file = cached_czi_file(self.format)

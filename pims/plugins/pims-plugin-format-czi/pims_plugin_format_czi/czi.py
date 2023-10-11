@@ -183,10 +183,14 @@ class CZIParser(AbstractParser):
         for k, v in all_metadata_dict_flat.items():
             imd.set(k, v, namespace="CZI")
         return imd
-    """
-    Other parser methods can be used, e.g. 'PyramidChecker' to fill a Pyramid
-    object if the image file is a pyramid, to fill the acquisition date if needed, etc.
-    """
+
+    def parse_pyramid(self) -> Pyramid:
+        """
+        Return the pyramid for the main image
+        """
+
+        czi_file = cached_czi_file(self.format)
+        return czi_file.pyramid
 
 
 class CZIReader(AbstractReader):

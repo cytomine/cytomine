@@ -35,7 +35,6 @@ class CZIfile():
         "Bgr96Float": np.float32
         }
 
-
     PixelFormatToPIL = {
         "Gray8": "L",
         "Gray16": "L",
@@ -48,12 +47,22 @@ class CZIfile():
         self._czi_file_reader = czi.CziReader(path)
         self._thumbnails_reader = czifile.CziFile(path)
 
-        self._width = self._czi_file_reader.total_bounding_rectangle.w
-        self._height = self._czi_file_reader.total_bounding_rectangle.h
+        bounding_box = self._czi_file_reader.total_bounding_box
+        self._width = bounding_box['X'][1] - bounding_box['X'][0]
+        self._height = bounding_box['X'][1] - bounding_box['X'][0]
 
-        self._n_concrete_channels = self._czi_file_reader.CZI_DIMS['C'] + 1
-        self._depth = self._czi_file_reader.CZI_DIMS['Z']
-        self._duration = self._czi_file_reader.CZI_DIMS['T']
+        if 'C' in bounding_box:
+            self._n_concrete_channels = bounding_box['C'][1] - bounding_box['C'][0]
+        else:
+            self._n_concrete_channels = 1
+        if 'Z' in bounding_box:
+            self._depth = bounding_box['Z'][1] - bounding_box['Z'][0]
+        else:
+            self._depth = 1
+        if 'T' in bounding_box:
+            self._duration = bounding_box['T'][1] - bounding_box['T'][0]
+        else:
+            self._duration = 1
 
         self._pixel_type = self._czi_file_reader.pixel_types[0]
         self._attachments = self._thumbnails_reader.attachments()

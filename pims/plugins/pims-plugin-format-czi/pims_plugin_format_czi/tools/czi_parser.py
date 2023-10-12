@@ -69,6 +69,7 @@ if __name__ == '__main__':
     args_parser.add_argument("file", nargs=1, default=None)
     args_parser.add_argument("--metadata", action='store_true', default=False)
     args_parser.add_argument("--custom", action='store_true', default=False)
+    args_parser.add_argument("--verbose", action='store_true', default=False)
     args_parser.add_argument("--attachment", default=None)
     args_parser.add_argument("--save", action='store_true', default=False)
     args_parser.add_argument("--raw", action='store_true', default=False)
@@ -98,39 +99,40 @@ if __name__ == '__main__':
     czi_file = czifile.CziFile(args.file[0])
     for a in czi_file.attachments():
         print(f"  {a.attachment_entry.name}: {a.attachment_entry.content_file_type}")
-        if args.attachment == a.attachment_entry.name:
-            a.save()
-    if args.save:
         if args.attachment is not None:
             for a in czi_file.attachments():
                 if args.attachment == a.attachment_entry.name:
                     if args.raw or a.attachment_entry.content_file_type != "CZI":
-                        print("Saving", a.attachment_entry.name, "as", a.attachment_entry.filename)
-                        a.save()
+                        if args.save:
+                            print("Saving", a.attachment_entry.name, "as", a.attachment_entry.filename)
+                            a.save()
                     else:
-                        name = f"{a.attachment_entry.name}.{args.format}"
-                        print("Saving", a.attachment_entry.name, "as", name)
                         raw_data = a.data(raw=True)
                         image_data = BytesIO(raw_data)
                         czi_embedded = czifile.CziFile(image_data)
-                        data = czi_embedded.asarray()
-                        data = data[args.c]
-                        if args.vips:
-                            image = VIPSImage.new_from_memory(
-                                data,
-                                data.shape[1], data.shape[0],
-                                data.shape[2],
-                                format=numpy_to_vips_band_type[data.dtype],
-                                )
-                            image.write_to_file(name)
-                        else:
-                            if data.shape[2] == 3:
-                                mode = "RGB"
+                        if args.verbose:
+                            print(czi_embedded)
+                        if args.save:
+                            name = f"{a.attachment_entry.name}.{args.format}"
+                            print("Saving", a.attachment_entry.name, "as", name)
+                            data = czi_embedded.asarray()
+                            data = data[args.c]
+                            if args.vips:
+                                image = VIPSImage.new_from_memory(
+                                    data,
+                                    data.shape[1], data.shape[0],
+                                    data.shape[2],
+                                    format=numpy_to_vips_band_type[data.dtype],
+                                    )
+                                image.write_to_file(name)
                             else:
-                                mode = "L"
-                            image = PILImage.fromarray(data, mode)
-                            image.save(name)
-        else:
+                                if data.shape[2] == 3:
+                                    mode = "RGB"
+                                else:
+                                    mode = "L"
+                                image = PILImage.fromarray(data, mode)
+                                image.save(name)
+        elif args.save:
             if args.roi is not None:
                 roi = tuple(int(v) for v in args.roi.split(','))
             else:

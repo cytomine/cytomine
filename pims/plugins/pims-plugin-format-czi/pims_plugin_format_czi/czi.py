@@ -176,6 +176,13 @@ class CZIReader(AbstractReader):
         czi_file = cached_czi_file(self.format)
         return czi_file.label_image.read()
 
+    def read_macro(self, out_width, out_height):
+        czi_file = cached_czi_file(self.format)
+        if czi_file.macro_image is not None:
+            return czi_file.macro_image.read()
+        else:
+            return czi_file.overview_image.read()
+
     def read_window(self, region, out_width, out_height, c=None, z=None, t=None):
         czi_file = cached_czi_file(self.format)
         tier = self.format.pyramid.most_appropriate_tier(

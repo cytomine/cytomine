@@ -10,6 +10,7 @@ from pims.cache import cached_property
 from pims.formats.utils.structures.metadata import ImageChannel, ImageMetadata
 from pims.formats.utils.structures.pyramid import Pyramid
 from pims.formats.utils.engines.tifffile import TifffileChecker
+from pims.utils.color import infer_channel_color
 from pims.utils.dtypes import dtype_to_bits
 
 import logging
@@ -91,16 +92,38 @@ class CZIParser(AbstractParser):
         imd.depth = czi_file.depth
         imd.duration = czi_file.duration
 
-        if imd.n_concrete_channels == 1:
-            imd.set_channel(ImageChannel(
-                    index=0,
-                    suggested_name="G"))
-        else:
-            names = ['B', 'G', 'R', 'A']
-            for cc_idx in range(imd.n_concrete_channels):
+        for cc_idx in range(imd.n_concrete_channels):
+            colors = [infer_channel_color(
+                None,
+                cc_idx,
+                imd.n_concrete_channels
+            )] * imd.n_samples
+
+            if imd.n_samples == 3 and colors[0] is None:
+                colors = [
+                    infer_channel_color(None, i, 3)
+                    for i in range(imd.n_samples)
+                ]
+
+            names = [czi_file.channel_name(cc_idx)] * imd.n_samples
+            if names[0] is None:
+                if imd.n_samples == 1 and 2 <= imd.n_concrete_channels <= 3:
+                    names = ['RGB'[cc_idx]]
+                elif imd.n_samples == 3:
+                    names = ['R', 'G', 'B']
+            # emission = czi_file.emission_wavelength(cc_idx)
+            # excitation = czi_file.excitation_wavelength(cc_idx)
+
+            for s in range(imd.n_samples):
                 imd.set_channel(ImageChannel(
-                    index=cc_idx,
-                    suggested_name=names[cc_idx]))
+                    index=cc_idx * imd.n_samples + s,
+                    suggested_name=names[s],
+                    color=colors[s],
+                    # emission_wavelength=emission,
+                    # excitation_wavelength=excitation
+
+                ))
+
         return imd
 
     def parse_known_metadata(self):

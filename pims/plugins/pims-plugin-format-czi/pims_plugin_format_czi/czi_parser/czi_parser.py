@@ -8,6 +8,7 @@ from pims.formats.utils.structures.pyramid import Pyramid
 from pylibCZIrw import czi
 from pyvips import Image as VIPSImage
 from pyvips import BandFormat
+from typing import Optional
 
 
 logger = logging.getLogger("pims.format.czi")
@@ -172,6 +173,8 @@ class CZIfile():
             self._calibrated_magnification = self._metadata_dict_obj.ImageDocument.Metadata.Scaling.AutoScaling.CameraAdapterMagnification
             self._acquisition_datetime = self._metadata_dict_obj.ImageDocument.Metadata.Information.Image.AcquisitionDateAndTime
 
+        self._channel_names = [None for _ in range(self._n_concrete_channels)]
+
         self._analyze_images()
 
         self._tile_size = (256, 256)
@@ -192,6 +195,16 @@ class CZIfile():
         """
 
         return self._height
+
+    def channel_name(self, index: int) -> Optional[str]:
+        """
+        Return the name of the channel, if known
+        """
+
+        if index < self._n_concrete_channels:
+            return self._channel_names[index]
+        else:
+            return None
 
     @property
     def n_concrete_channels(self) -> float:

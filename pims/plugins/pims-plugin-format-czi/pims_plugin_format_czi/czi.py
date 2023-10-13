@@ -84,8 +84,13 @@ class CZIParser(AbstractParser):
         czi_file = cached_czi_file(self.format)
         imd.width = czi_file.width
         imd.height = czi_file.height
+        imd.pixel_type = np.dtype(czi_file.pixel_type)
+        imd.n_samples = czi_file.num_components
+        imd.significant_bits = dtype_to_bits(imd.pixel_type)
         imd.n_concrete_channels = czi_file.n_concrete_channels
-        imd.n_samples = 1
+        imd.depth = czi_file.depth
+        imd.duration = czi_file.duration
+
         if imd.n_concrete_channels == 1:
             imd.set_channel(ImageChannel(
                     index=0,
@@ -96,12 +101,6 @@ class CZIParser(AbstractParser):
                 imd.set_channel(ImageChannel(
                     index=cc_idx,
                     suggested_name=names[cc_idx]))
-        imd.depth = czi_file.depth
-        imd.duration = czi_file.duration
-
-        imd.pixel_type = np.dtype(czi_file.PixelFormatToNPType[czi_file.pixel_type])
-        imd.significant_bits = dtype_to_bits(imd.pixel_type)
-
         return imd
 
     def parse_known_metadata(self):

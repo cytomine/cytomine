@@ -110,6 +110,15 @@ class CZIfile():
         "Bgr96Float": np.float32
         }
 
+    PixelFormatToNumComponents = {
+        "Gray8": 1,
+        "Gray16": 1,
+        "Gray32Float": 1,
+        "Bgr24": 3,
+        "Bgr48": 3,
+        "Bgr96Float": 3
+        }
+
     PixelFormatToPIL = {
         "Gray8": "L",
         "Gray16": "L",
@@ -144,7 +153,9 @@ class CZIfile():
         else:
             self._duration = 1
 
-        self._pixel_type = self._czi_file_reader.pixel_types[0]
+        pixel_type = self._czi_file_reader.pixel_types[0]
+        self._pixel_type = self.PixelFormatToNPType[pixel_type]
+        self._num_components = self.PixelFormatToNumComponents[pixel_type]
 
         self._raw_metadata = self._czi_file_reader.metadata
         self._metadata_dict_obj = DictObj(self._raw_metadata)
@@ -213,6 +224,14 @@ class CZIfile():
         """
 
         return self._pixel_type
+
+    @property
+    def num_components(self) -> float:
+        """
+        Return the number of components per pixel
+        """
+
+        return self._num_components
 
     @property
     def raw_metadata(self) -> dict:
@@ -313,7 +332,7 @@ class CZIfile():
         zoom = (2 ** (self.pyramid.n_levels - level)) / (2 ** self.pyramid.n_levels)
 
         data = self._czi_file_reader.read(roi=roi, zoom=zoom)
-        image = PILImage.fromarray(data.astype(self.PixelFormatToNPType[self.pixel_type]))
+        image = PILImage.fromarray(data.astype(self._pixel_type))
         return image
 
     def _analyze_images(self) -> None:

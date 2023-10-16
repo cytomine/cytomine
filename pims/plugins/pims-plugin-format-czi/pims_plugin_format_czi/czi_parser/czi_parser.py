@@ -210,11 +210,33 @@ class CZIfile():
             self._calibrated_magnification = 0
 
         if hasattr(metadata.Information, 'Image'):
+            if (hasattr(metadata.Information.Image, 'Dimensions') and
+                    hasattr(metadata.Information.Image.Dimensions, 'Channels')):
+                dimensions = metadata.Information.Image.Dimensions.Channels
+                self._channel_names = []
+                channels = dimensions.Channel
+                if channels is None:
+                    channels = []
+                elif not isinstance(channels, list):
+                    channels = [channels]
+                for channel in channels:
+                    if hasattr(channel, '@Name'):
+                        name = getattr(channel, '@Name')
+                    elif hasattr(channel, 'Fluor'):
+                        name = getattr(channel, 'Fluor')
+                    elif hasattr(channel, '@Id'):
+                        name = getattr(channel, '@id')
+                    else:
+                        name = None
+                    self._channel_names.append(name)
+            else:
+                self._channel_names = [None for _ in range(self._n_concrete_channels)]
             if hasattr(metadata.Information.Image, 'AcquisitionDateAndTime'):
                 self._acquisition_datetime = metadata.Information.Image.AcquisitionDateAndTime
             else:
                 self._acquisition_datetime = 0
         else:
+            self._channel_names = [None for _ in range(self._n_concrete_channels)]
             self._acquisition_datetime = 0
 
         if hasattr(metadata.Information, 'Instrument'):
@@ -226,8 +248,6 @@ class CZIfile():
                 self._device_model = "Zeiss Microscope"
         else:
             self._device_model = "Zeiss Microscope"
-
-        self._channel_names = [None for _ in range(self._n_concrete_channels)]
 
         self._analyze_images()
 

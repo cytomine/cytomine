@@ -183,13 +183,47 @@ class CZIfile():
             physical_pixel_size = self._metadata_dict_obj.ImageDocument.Metadata.ImageScaling.ImagePixelSize
             self._pixel_size_x = float(physical_pixel_size.split(',')[0])
             self._pixel_size_y = float(physical_pixel_size.split(',')[1])
+        elif hasattr(self._metadata_dict_obj.ImageDocument.Metadata, 'Scaling'):
+            if hasattr(self._metadata_dict_obj.ImageDocument.Metadata.Scaling, 'AutoScaling'):
+                physical_pixel_size = self._metadata_dict_obj.ImageDocument.Metadata.Scaling.AutoScaling.CameraPixelDistance
+                self._pixel_size_x = float(physical_pixel_size.split(',')[0])
+                self._pixel_size_y = float(physical_pixel_size.split(',')[1])
+            else:
+                self._pixel_size_x = 0
+                self._pixel_size_y = 0
         else:
-            self._pixel_size_x = None
-            self._pixel_size_y = None
+            self._pixel_size_x = 0
+            self._pixel_size_y = 0
 
-        if self._metadata_dict_obj.ImageDocument.Metadata.Scaling is not None:
-            self._calibrated_magnification = self._metadata_dict_obj.ImageDocument.Metadata.Scaling.AutoScaling.CameraAdapterMagnification
-            self._acquisition_datetime = self._metadata_dict_obj.ImageDocument.Metadata.Information.Image.AcquisitionDateAndTime
+        if hasattr(self._metadata_dict_obj.ImageDocument.Metadata.Information, 'Instrument'):
+            calibrated_magnification = 0
+            nominal_magnification = 0
+            if hasattr(self._metadata_dict_obj.ImageDocument.Metadata.Information.Instrument, 'Objectives'):
+                if hasattr(self._metadata_dict_obj.ImageDocument.Metadata.Information.Instrument.Objectives.Objective, 'CalibratedMagnification'):
+                    calibrated_magnification = float(self._metadata_dict_obj.ImageDocument.Metadata.Information.Instrument.Objectives.Objective.CalibratedMagnification)
+                if hasattr(self._metadata_dict_obj.ImageDocument.Metadata.Information.Instrument.Objectives.Objective, 'NominalMagnification'):
+                    nominal_magnification = float(self._metadata_dict_obj.ImageDocument.Metadata.Information.Instrument.Objectives.Objective.NominalMagnification)
+                self._calibrated_magnification = max(calibrated_magnification, nominal_magnification)
+        else:
+            self._calibrated_magnification = 0
+
+        if hasattr(self._metadata_dict_obj.ImageDocument.Metadata.Information, 'Image'):
+            if hasattr(self._metadata_dict_obj.ImageDocument.Metadata.Information.Image, 'AcquisitionDateAndTime'):
+                self._acquisition_datetime = self._metadata_dict_obj.ImageDocument.Metadata.Information.Image.AcquisitionDateAndTime
+            else:
+                self._acquisition_datetime = 0
+        else:
+            self._acquisition_datetime = 0
+
+        if hasattr(self._metadata_dict_obj.ImageDocument.Metadata.Information, 'Instrument'):
+            if hasattr(self._metadata_dict_obj.ImageDocument.Metadata.Information.Instrument, 'Microscopes'):
+                self._device_model = getattr(self._metadata_dict_obj.ImageDocument.Metadata.Information.Instrument.Microscopes.Microscope, '@Name')
+            elif hasattr(self._metadata_dict_obj.ImageDocument.Metadata.Information.Instrument, 'Objectives'):
+                self._device_model = getattr(self._metadata_dict_obj.ImageDocument.Metadata.Information.Instrument.Objectives.Objective, '@Name')
+            else:
+                self._device_model = "Zeiss Microscope"
+        else:
+            self._device_model = "Zeiss Microscope"
 
         self._channel_names = [None for _ in range(self._n_concrete_channels)]
 
@@ -319,6 +353,14 @@ class CZIfile():
         """
 
         return self._calibrated_magnification
+
+    @property
+    def device_model(self) -> str:
+        """
+        Return the sed microscope model
+        """
+
+        return self._device_model
 
     def _create_pyramid(self):
         """

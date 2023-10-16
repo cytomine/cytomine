@@ -13,6 +13,7 @@ from pims.cache import cached_property
 from pims.formats.utils.structures.metadata import ImageChannel, ImageMetadata
 from pims.formats.utils.structures.pyramid import Pyramid
 from pims.formats.utils.engines.tifffile import TifffileChecker
+from pims.utils import UNIT_REGISTRY
 from pims.utils.color import infer_channel_color
 from pims.utils.dtypes import dtype_to_bits
 from pims.utils.vips import bandjoin, fix_rgb_interpretation
@@ -118,6 +119,14 @@ class CZIParser(AbstractParser):
 
         return imd
 
+    @staticmethod
+    def _parse_physical_size(physical_size):
+        """
+        Convert the pixel size into physical size, CZI documentations tells that  is usually um
+        """
+        physical_quantity = UNIT_REGISTRY.Quantity('micrometer')
+        return physical_size * physical_quantity
+
     def parse_known_metadata(self):
         """
         File data used in Cytomine but not necessary for PIMS (e.g. physical_size,
@@ -138,13 +147,18 @@ class CZIParser(AbstractParser):
             imd.associated_label.width = czi_file.label_image.width
             imd.associated_label.height = czi_file.label_image.height
             imd.associated_label.n_channels = czi_file.label_image.n_components
-
+        if czi_file.macro_image is not None:
+            imd.associated_macro.width = czi_file.macro_image.width
+            imd.associated_macro.height = czi_file.macro_image.height
+            imd.associated_macro.n_channels = czi_file.macro_image.n_components
         if czi_file.physical_pixel_size is not None:
-            imd.physical_size_x = czi_file.physical_pixel_size[0]
-            imd.physical_size_y = czi_file.physical_pixel_size[1]
+            imd.physical_size_x = self._parse_physical_size(czi_file.physical_pixel_size[0])
+            imd.physical_size_y = self._parse_physical_size(czi_file.physical_pixel_size[1])
 
         imd.objective.calibrated_magnification = czi_file.calibrated_magnification
+        imd.objective.nominal_magnification = czi_file.calibrated_magnification
         imd.acquisition_datetime = czi_file.acquisition_datetime
+        imd.microscope.model = czi_file.device_model
         return imd
 
     def parse_raw_metadata(self):
@@ -242,6 +256,13 @@ class CZIReader(AbstractReader):
     def read_label(self, out_width, out_height):
         czi_file = cached_czi_file(self.format)
         return czi_file.label_image.read()
+
+    def read_macro(self, out_width, out_height):
+        czi_file = cached_czi_file(self.format)
+        if czi_file.macro_image is not None:
+            return czi_file.macro_image.read()
+        else:
+            return czi_file.overview_image.read()
 
     def read_window(self, region, out_width, out_height, c=None, z=None, t=None):
         czi_file = cached_czi_file(self.format)

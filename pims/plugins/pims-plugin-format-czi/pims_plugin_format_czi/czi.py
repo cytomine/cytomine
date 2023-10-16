@@ -207,6 +207,10 @@ class CZIReader(AbstractReader):
         """
 
         bands = []
+        if z is None:
+            z = 0
+        if t is None:
+            t = 0
         # Get the list of channels and samples to read
         cc_idxs, s_idxs = self._concrete_channel_indexes(c)
         # Aggregate the samples to read per concrete channel to not read multiple times the same image

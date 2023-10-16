@@ -155,16 +155,22 @@ class CZIfile():
 
         if 'C' in bounding_box:
             self._n_concrete_channels = bounding_box['C'][1] - bounding_box['C'][0]
+            self._start_channels = bounding_box['C'][0]
         else:
             self._n_concrete_channels = 1
+            self._start_channels = 0
         if 'Z' in bounding_box:
             self._depth = bounding_box['Z'][1] - bounding_box['Z'][0]
+            self._start_depth = bounding_box['Z'][0]
         else:
             self._depth = 1
+            self._start_depth = 0
         if 'T' in bounding_box:
             self._duration = bounding_box['T'][1] - bounding_box['T'][0]
+            self._start_duration = bounding_box['T'][0]
         else:
             self._duration = 1
+            self._start_duration = 0
 
         pixel_type = self._czi_file_reader.pixel_types[0]
         self._pixel_type = self.PixelFormatToNPType[pixel_type]
@@ -356,7 +362,8 @@ class CZIfile():
 
         zoom = (2 ** (self.pyramid.n_levels - level)) / (2 ** self.pyramid.n_levels)
 
-        data = self._czi_file_reader.read(roi=roi, zoom=zoom)
+        plane = {"C": self._start_channels + c, "Z": self._start_depth + z, "T": self._start_duration + t}
+        data = self._czi_file_reader.read(roi=roi, zoom=zoom, plane=plane)
         image = VIPSImage.new_from_memory(
             np.ascontiguousarray(data),
             width,

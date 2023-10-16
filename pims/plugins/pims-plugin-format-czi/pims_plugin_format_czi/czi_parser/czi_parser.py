@@ -3,7 +3,6 @@ from io import BytesIO
 import logging
 from math import ceil, log2
 import numpy as np
-from PIL import Image as PILImage
 from pims.formats.utils.structures.pyramid import Pyramid
 from pylibCZIrw import czi
 from pyvips import Image as VIPSImage
@@ -108,7 +107,7 @@ class CZIfile():
         "Gray32Float": np.float32,
         "Bgr24": np.uint8,
         "Bgr48": np.uint16,
-        "Bgr96Float": np.float32
+        "Bgr96Float": np.float32,
         }
 
     PixelFormatToNumComponents = {
@@ -117,14 +116,27 @@ class CZIfile():
         "Gray32Float": 1,
         "Bgr24": 3,
         "Bgr48": 3,
-        "Bgr96Float": 3
+        "Bgr96Float": 3,
         }
 
     PixelFormatToPIL = {
         "Gray8": "L",
         "Gray16": "L",
+        "Gray32Float": "L",
         "Bgr24": "RGB",
-        "Bgr48": "RGB"
+        "Bgr48": "RGB",
+        "Bgr96Float": "RGB",
+        }
+
+    numpy_to_vips_band_type = {
+        np.int8: BandFormat.CHAR,
+        np.uint8: BandFormat.UCHAR,
+        np.int16: BandFormat.SHORT,
+        np.uint16: BandFormat.USHORT,
+        np.int32: BandFormat.INT,
+        np.uint32: BandFormat.UINT,
+        np.float32: BandFormat.FLOAT,
+        np.float64: BandFormat.DOUBLE,
         }
 
     def __init__(self, path):
@@ -331,7 +343,7 @@ class CZIfile():
 
         return self._pyramid
 
-    def read_area(self, x: int, y: int, width: int, height: int, level: int) -> PILImage:
+    def read_area(self, x: int, y: int, width: int, height: int, level: int) -> VIPSImage:
         """
         Return the image of the given area at the requested zoom level.
         """
@@ -345,7 +357,13 @@ class CZIfile():
         zoom = (2 ** (self.pyramid.n_levels - level)) / (2 ** self.pyramid.n_levels)
 
         data = self._czi_file_reader.read(roi=roi, zoom=zoom)
-        image = PILImage.fromarray(data.astype(self._pixel_type))
+        image = VIPSImage.new_from_memory(
+            np.ascontiguousarray(data),
+            width,
+            height,
+            self.num_components,
+            format=self.numpy_to_vips_band_type[self.pixel_type]
+            )
         return image
 
     def _analyze_images(self) -> None:

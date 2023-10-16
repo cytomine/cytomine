@@ -145,7 +145,7 @@ if __name__ == '__main__':
             print("Saving", name)
             if args.vips:
                 image = VIPSImage.new_from_memory(
-                    data.copy(order="C"),
+                    np.ascontiguousarray(data),
                     data.shape[1], data.shape[0],
                     data.shape[2],
                     format=pixel_types_to_vips_band_type[czi_reader.pixel_types[args.c]],

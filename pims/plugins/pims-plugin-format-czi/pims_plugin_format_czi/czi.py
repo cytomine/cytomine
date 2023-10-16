@@ -282,7 +282,7 @@ class CZIReader(AbstractReader):
         x = tile.tx * czi_file.tile_size[0]
         y = tile.ty * czi_file.tile_size[1]
         return self._multichannel_read(
-            lambda c, z, t: czi_file.read_area(x, y, czi_file.tile_size, tile.tier.level, c, z, t), c, z, t)
+            lambda c, z, t: czi_file.read_area(x, y, *czi_file.tile_size, tile.tier.level, c, z, t), c, z, t)
 
 
 class CZIFormat(AbstractFormat):

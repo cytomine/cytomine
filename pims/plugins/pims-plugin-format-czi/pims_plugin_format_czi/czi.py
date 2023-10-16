@@ -251,7 +251,11 @@ class CZIReader(AbstractReader):
 
     def read_thumb(self, out_width, out_height, precomputed=None, c=None, z=None, t=None):
         czi_file = cached_czi_file(self.format)
-        return czi_file.thumbnail_image.read()
+        if precomputed and czi_file.thumbnail_image is not None:
+            return czi_file.thumbnail_image.read()
+        else:
+            return self._multichannel_read(
+                lambda c, z, t: czi_file.read_area(0, 0, out_width, out_height, 0, c, z, t), c, z, t)
 
     def read_label(self, out_width, out_height):
         czi_file = cached_czi_file(self.format)

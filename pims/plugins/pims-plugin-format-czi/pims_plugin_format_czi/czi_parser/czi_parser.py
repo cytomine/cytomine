@@ -179,13 +179,15 @@ class CZIfile():
         self._raw_metadata = self._czi_file_reader.metadata
         self._metadata_dict_obj = DictObj(self._raw_metadata)
 
-        if hasattr(self._metadata_dict_obj.ImageDocument.Metadata, 'ImageScaling'):
-            physical_pixel_size = self._metadata_dict_obj.ImageDocument.Metadata.ImageScaling.ImagePixelSize
+        metadata = self._metadata_dict_obj.ImageDocument.Metadata
+
+        if hasattr(metadata, 'ImageScaling'):
+            physical_pixel_size = metadata.ImageScaling.ImagePixelSize
             self._pixel_size_x = float(physical_pixel_size.split(',')[0])
             self._pixel_size_y = float(physical_pixel_size.split(',')[1])
-        elif hasattr(self._metadata_dict_obj.ImageDocument.Metadata, 'Scaling'):
-            if hasattr(self._metadata_dict_obj.ImageDocument.Metadata.Scaling, 'AutoScaling'):
-                physical_pixel_size = self._metadata_dict_obj.ImageDocument.Metadata.Scaling.AutoScaling.CameraPixelDistance
+        elif hasattr(metadata, 'Scaling'):
+            if hasattr(metadata.Scaling, 'AutoScaling'):
+                physical_pixel_size = metadata.Scaling.AutoScaling.CameraPixelDistance
                 self._pixel_size_x = float(physical_pixel_size.split(',')[0])
                 self._pixel_size_y = float(physical_pixel_size.split(',')[1])
             else:
@@ -195,31 +197,31 @@ class CZIfile():
             self._pixel_size_x = 0
             self._pixel_size_y = 0
 
-        if hasattr(self._metadata_dict_obj.ImageDocument.Metadata.Information, 'Instrument'):
+        if hasattr(metadata, 'Instrument'):
             calibrated_magnification = 0
             nominal_magnification = 0
-            if hasattr(self._metadata_dict_obj.ImageDocument.Metadata.Information.Instrument, 'Objectives'):
-                if hasattr(self._metadata_dict_obj.ImageDocument.Metadata.Information.Instrument.Objectives.Objective, 'CalibratedMagnification'):
-                    calibrated_magnification = float(self._metadata_dict_obj.ImageDocument.Metadata.Information.Instrument.Objectives.Objective.CalibratedMagnification)
-                if hasattr(self._metadata_dict_obj.ImageDocument.Metadata.Information.Instrument.Objectives.Objective, 'NominalMagnification'):
-                    nominal_magnification = float(self._metadata_dict_obj.ImageDocument.Metadata.Information.Instrument.Objectives.Objective.NominalMagnification)
+            if hasattr(metadata.Information.Instrument, 'Objectives'):
+                if hasattr(metadata.Information.Instrument.Objectives.Objective, 'CalibratedMagnification'):
+                    calibrated_magnification = float(metadata.Information.Instrument.Objectives.Objective.CalibratedMagnification)
+                if hasattr(metadata.Information.Instrument.Objectives.Objective, 'NominalMagnification'):
+                    nominal_magnification = float(metadata.Information.Instrument.Objectives.Objective.NominalMagnification)
                 self._calibrated_magnification = max(calibrated_magnification, nominal_magnification)
         else:
             self._calibrated_magnification = 0
 
-        if hasattr(self._metadata_dict_obj.ImageDocument.Metadata.Information, 'Image'):
-            if hasattr(self._metadata_dict_obj.ImageDocument.Metadata.Information.Image, 'AcquisitionDateAndTime'):
-                self._acquisition_datetime = self._metadata_dict_obj.ImageDocument.Metadata.Information.Image.AcquisitionDateAndTime
+        if hasattr(metadata.Information, 'Image'):
+            if hasattr(metadata.Information.Image, 'AcquisitionDateAndTime'):
+                self._acquisition_datetime = metadata.Information.Image.AcquisitionDateAndTime
             else:
                 self._acquisition_datetime = 0
         else:
             self._acquisition_datetime = 0
 
-        if hasattr(self._metadata_dict_obj.ImageDocument.Metadata.Information, 'Instrument'):
-            if hasattr(self._metadata_dict_obj.ImageDocument.Metadata.Information.Instrument, 'Microscopes'):
-                self._device_model = getattr(self._metadata_dict_obj.ImageDocument.Metadata.Information.Instrument.Microscopes.Microscope, '@Name')
-            elif hasattr(self._metadata_dict_obj.ImageDocument.Metadata.Information.Instrument, 'Objectives'):
-                self._device_model = getattr(self._metadata_dict_obj.ImageDocument.Metadata.Information.Instrument.Objectives.Objective, '@Name')
+        if hasattr(metadata.Information, 'Instrument'):
+            if hasattr(metadata.Information.Instrument, 'Microscopes'):
+                self._device_model = getattr(metadata.Information.Instrument.Microscopes.Microscope, '@Name')
+            elif hasattr(metadata.Information.Instrument, 'Objectives'):
+                self._device_model = getattr(metadata.Information.Instrument.Objectives.Objective, '@Name')
             else:
                 self._device_model = "Zeiss Microscope"
         else:

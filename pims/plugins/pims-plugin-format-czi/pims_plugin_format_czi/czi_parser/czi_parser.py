@@ -343,7 +343,7 @@ class CZIfile():
 
         return self._pyramid
 
-    def read_area(self, x: int, y: int, width: int, height: int, level: int) -> VIPSImage:
+    def read_area(self, x: int, y: int, width: int, height: int, level: int, c, z, t) -> VIPSImage:
         """
         Return the image of the given area at the requested zoom level.
         """

@@ -1,7 +1,10 @@
+from collections import OrderedDict
 from functools import lru_cache
 import numpy as np
+from operator import itemgetter
+from pyvips import Image as VIPSImage
 from struct import Struct
-from pyvips import BandFormat
+from typing import Callable, List, Optional, Union
 
 from pims_plugin_format_czi.czi_parser.czi_parser import CZIfile
 from pims.formats.utils.histogram import DefaultHistogramReader
@@ -12,6 +15,7 @@ from pims.formats.utils.structures.pyramid import Pyramid
 from pims.formats.utils.engines.tifffile import TifffileChecker
 from pims.utils.color import infer_channel_color
 from pims.utils.dtypes import dtype_to_bits
+from pims.utils.vips import bandjoin, fix_rgb_interpretation
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -46,18 +50,6 @@ class CZIChecker(TifffileChecker):
                 return magic_word == CZIChecker.MAGIC_WORD
         except RuntimeError:
             return False
-
-
-numpy_to_vips_band_type = {
-    np.dtype(np.int8): BandFormat.CHAR,
-    np.dtype(np.uint8): BandFormat.UCHAR,
-    np.dtype(np.int16): BandFormat.SHORT,
-    np.dtype(np.uint16): BandFormat.USHORT,
-    np.dtype(np.int32): BandFormat.INT,
-    np.dtype(np.uint32): BandFormat.UINT,
-    np.dtype(np.float32): BandFormat.FLOAT,
-    np.dtype(np.float64): BandFormat.DOUBLE,
-    }
 
 
 class CZIParser(AbstractParser):
@@ -190,6 +182,55 @@ class CZIParser(AbstractParser):
 
 class CZIReader(AbstractReader):
 
+    @staticmethod
+    def _extract_channels(im: VIPSImage, c: Optional[Union[int, List[int]]]) -> VIPSImage:
+        if c is None or im.bands == len(c):
+            return im
+        elif type(c) is int or len(c) == 1:
+            if len(c) == 1:
+                c = c[0]
+            return im.extract_band(c)
+        else:
+            channels = list(itemgetter(*c)(im))
+            im = channels[0].bandjoin(channels[1:])
+            return im
+
+    def _multichannel_read(
+            self,
+            read_func: Callable[[int, Optional[int], Optional[int]], VIPSImage],
+            c: Optional[Union[int, List[int]]] = None,
+            z: Optional[int] = None,
+            t: Optional[int] = None):
+        """
+        Internal method to perform a multi channel image composition. The actual image reading is performed by the
+        given read_func callable parameter.
+        """
+
+        bands = []
+        # Get the list of channels and samples to read
+        cc_idxs, s_idxs = self._concrete_channel_indexes(c)
+        # Aggregate the samples to read per concrete channel to not read multiple times the same image
+        channels = OrderedDict()
+        for cc_idx, s_idx in zip(cc_idxs, s_idxs):
+            if cc_idx in channels:
+                channels[cc_idx].append(s_idx)
+            else:
+                channels[cc_idx] = [s_idx]
+        for channel, samples in channels.items():
+            # Read the requested channel
+            im = read_func(channel, z, t)
+            if im.hasalpha():
+                im = im.flatten()
+            # If needed, extract the required samples from the image
+            im = self._extract_channels(im, samples)
+            bands.append(im)
+        # If we have multiple channels, join them to create a single image
+        result = bandjoin(bands)
+        # Assign a proprer RGB color space if applicable
+        if c == [0, 1, 2]:
+            result = fix_rgb_interpretation(result)
+        return result
+
     def read_thumb(self, out_width, out_height, precomputed=None, c=None, z=None, t=None):
         czi_file = cached_czi_file(self.format)
         return czi_file.thumbnail_image.read()
@@ -204,13 +245,15 @@ class CZIReader(AbstractReader):
             region, (out_width, out_height)
         )
         region = region.scale_to_tier(tier)
-        return czi_file.read_area(region.left, region.top, region.width, region.height, tier.level)
+        return self._multichannel_read(
+            lambda c, z, t: czi_file.read_area(region.left, region.top, region.width, region.height, tier.level, c, z, t), c, z, t)
 
     def read_tile(self, tile, c=None, z=None, t=None):
         czi_file = cached_czi_file(self.format)
         x = tile.tx * czi_file.tile_size[0]
         y = tile.ty * czi_file.tile_size[1]
-        return czi_file.read_area(x, y, czi_file.tile_size, tile.tier.level)
+        return self._multichannel_read(
+            lambda c, z, t: czi_file.read_area(x, y, czi_file.tile_size, tile.tier.level, c, z, t), c, z, t)
 
 
 class CZIFormat(AbstractFormat):

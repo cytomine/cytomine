@@ -4,6 +4,7 @@ import logging
 from math import ceil, log2
 import numpy as np
 from pims.formats.utils.structures.pyramid import Pyramid
+from pims.utils import UNIT_REGISTRY
 from pylibCZIrw import czi
 from pyvips import Image as VIPSImage
 from pyvips import BandFormat
@@ -149,6 +150,23 @@ class CZIfile():
         self._label = None
         self._macro = None
 
+        self._pixel_size_x = None
+        self._pixel_size_y = None
+        self._depth = 1
+        self._start_depth = 0
+        self._depth_scale = None
+        self._depth_unit = None
+        self._duration = 1
+        self._start_duration = 1
+        self._duration_scale = None
+        self._duration_unit = None
+        self._frame_rate = None
+        self._frame_rate_unit = None
+        self._n_concrete_channels = 1
+        self._start_concrete_channels = 0
+        self._num_components = None
+        self._component_type = None
+
         bounding_box = self._czi_file_reader.total_bounding_box
         self._width = bounding_box['X'][1] - bounding_box['X'][0]
         self._height = bounding_box['X'][1] - bounding_box['X'][0]
@@ -201,36 +219,49 @@ class CZIfile():
             calibrated_magnification = 0
             nominal_magnification = 0
             if hasattr(metadata.Information.Instrument, 'Objectives'):
-                if hasattr(metadata.Information.Instrument.Objectives.Objective, 'CalibratedMagnification'):
-                    calibrated_magnification = float(metadata.Information.Instrument.Objectives.Objective.CalibratedMagnification)
+                objective = metadata.Information.Instrument.Objectives.Objective
+                if hasattr(objective, 'CalibratedMagnification'):
+                    calibrated_magnification = float(objective.CalibratedMagnification)
                 if hasattr(metadata.Information.Instrument.Objectives.Objective, 'NominalMagnification'):
-                    nominal_magnification = float(metadata.Information.Instrument.Objectives.Objective.NominalMagnification)
+                    nominal_magnification = float(objective.NominalMagnification)
                 self._calibrated_magnification = max(calibrated_magnification, nominal_magnification)
         else:
             self._calibrated_magnification = 0
 
         if hasattr(metadata.Information, 'Image'):
-            if (hasattr(metadata.Information.Image, 'Dimensions') and
-                    hasattr(metadata.Information.Image.Dimensions, 'Channels')):
-                dimensions = metadata.Information.Image.Dimensions.Channels
-                self._channel_names = []
-                channels = dimensions.Channel
-                if channels is None:
-                    channels = []
-                elif not isinstance(channels, list):
-                    channels = [channels]
-                for channel in channels:
-                    if hasattr(channel, '@Name'):
-                        name = getattr(channel, '@Name')
-                    elif hasattr(channel, 'Fluor'):
-                        name = getattr(channel, 'Fluor')
-                    elif hasattr(channel, '@Id'):
-                        name = getattr(channel, '@id')
-                    else:
-                        name = None
-                    self._channel_names.append(name)
-            else:
-                self._channel_names = [None for _ in range(self._n_concrete_channels)]
+            if hasattr(metadata.Information.Image, 'Dimensions'):
+                dimensions = metadata.Information.Image.Dimensions
+                if hasattr(dimensions, 'Channels'):
+                    self._channel_names = []
+                    channels = dimensions.Channels.Channel
+                    if channels is None:
+                        channels = []
+                    elif not isinstance(channels, list):
+                        channels = [channels]
+                    for channel in channels:
+                        if hasattr(channel, '@Name'):
+                            name = getattr(channel, '@Name')
+                        elif hasattr(channel, 'Fluor'):
+                            name = getattr(channel, 'Fluor')
+                        elif hasattr(channel, '@Id'):
+                            name = getattr(channel, '@id')
+                        else:
+                            name = None
+                        self._channel_names.append(name)
+                else:
+                    self._channel_names = [None for _ in range(self._n_concrete_channels)]
+                if hasattr(dimensions, 'T') and hasattr(dimensions.T, 'Positions'):
+                    positions = dimensions.T.Positions
+                    if hasattr(positions, 'Interval') and hasattr(positions.Interval, 'Increment'):
+                        self._duration_scale = float(positions.Interval.Increment)
+                        self._duration_unit = UNIT_REGISTRY.Quantity('s')
+                if hasattr(dimensions, 'Z') and hasattr(dimensions.Z, 'Positions'):
+                    positions = dimensions.Z.Positions
+                    if hasattr(positions, 'Interval') and hasattr(positions.Interval, 'Increment'):
+                        self._duration_scale = float(positions.Interval.Increment)
+                        self._duration_unit = UNIT_REGISTRY.Quantity('m')
+                else:
+                    self._channel_names = [None for _ in range(self._n_concrete_channels)]
             if hasattr(metadata.Information.Image, 'AcquisitionDateAndTime'):
                 self._acquisition_datetime = metadata.Information.Image.AcquisitionDateAndTime
             else:
@@ -297,12 +328,48 @@ class CZIfile():
         return self._depth
 
     @property
+    def depth_scale(self) -> Optional[float]:
+        """
+        Return the physical scale of the depth (z) dimension
+        """
+
+        scale = self._depth_scale
+        if self._depth_unit is not None:
+            scale *= self._depth_unit
+        return scale
+
+    @property
     def duration(self) -> float:
         """
         Return the Image acquisition duration
         """
 
         return self._duration
+
+    @property
+    def duration_scale(self) -> Optional[float]:
+        """
+        Return the physical scale of the time dimension
+        """
+
+        scale = self._duration_scale
+        if self._duration_unit is not None:
+            scale *= self._duration_unit
+        return scale
+
+    @property
+    def frame_rate(self) -> Optional[float]:
+        """
+        Return the frame rate of the time dimension
+        """
+
+        if self._duration_scale is not None and self._duration_scale != 0:
+            frame_rate = 1.0 / self._duration_scale
+            if self._duration_unit is not None:
+                frame_rate /= self._duration_unit
+        else:
+            frame_rate = None
+        return frame_rate
 
     @property
     def pixel_type(self) -> float:

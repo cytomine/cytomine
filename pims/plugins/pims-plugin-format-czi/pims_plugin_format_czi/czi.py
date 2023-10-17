@@ -155,10 +155,14 @@ class CZIParser(AbstractParser):
             imd.physical_size_x = self._parse_physical_size(czi_file.physical_pixel_size[0])
             imd.physical_size_y = self._parse_physical_size(czi_file.physical_pixel_size[1])
 
+        imd.frame_rate = czi_file.frame_rate
+        imd.physical_size_z = czi_file.depth_scale
+
         imd.objective.calibrated_magnification = czi_file.calibrated_magnification
         imd.objective.nominal_magnification = czi_file.calibrated_magnification
         imd.acquisition_datetime = czi_file.acquisition_datetime
         imd.microscope.model = czi_file.device_model
+
         return imd
 
     def parse_raw_metadata(self):
@@ -275,7 +279,8 @@ class CZIReader(AbstractReader):
         )
         region = region.scale_to_tier(tier)
         return self._multichannel_read(
-            lambda c, z, t: czi_file.read_area(region.left, region.top, region.width, region.height, tier.level, c, z, t), c, z, t)
+            lambda c, z, t: czi_file.read_area(
+                region.left, region.top, region.width, region.height, tier.level, c, z, t), c, z, t)
 
     def read_tile(self, tile, c=None, z=None, t=None):
         czi_file = cached_czi_file(self.format)

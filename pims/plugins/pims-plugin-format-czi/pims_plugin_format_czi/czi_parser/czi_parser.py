@@ -208,6 +208,12 @@ class CZIfile():
                 physical_pixel_size = metadata.Scaling.AutoScaling.CameraPixelDistance
                 self._pixel_size_x = float(physical_pixel_size.split(',')[0])
                 self._pixel_size_y = float(physical_pixel_size.split(',')[1])
+            elif hasattr(metadata.Scaling, 'Items') and hasattr(metadata.Scaling.Items, 'Pixel'):
+                for pixel in metadata.Scaling.Items.Pixel:
+                    if getattr(pixel, '@Id') == 'X':
+                        self._pixel_size_x = float(pixel.Value)
+                    elif getattr(pixel, '@Id') == 'Y':
+                        self._pixel_size_y = float(pixel.Value)
             else:
                 self._pixel_size_x = 0
                 self._pixel_size_y = 0
@@ -254,12 +260,12 @@ class CZIfile():
                     positions = dimensions.T.Positions
                     if hasattr(positions, 'Interval') and hasattr(positions.Interval, 'Increment'):
                         self._duration_scale = float(positions.Interval.Increment)
-                        self._duration_unit = UNIT_REGISTRY.Quantity('s')
+                        self._duration_unit = UNIT_REGISTRY.Quantity('second')
                 if hasattr(dimensions, 'Z') and hasattr(dimensions.Z, 'Positions'):
                     positions = dimensions.Z.Positions
                     if hasattr(positions, 'Interval') and hasattr(positions.Interval, 'Increment'):
-                        self._duration_scale = float(positions.Interval.Increment)
-                        self._duration_unit = UNIT_REGISTRY.Quantity('m')
+                        self._depth_scale = float(positions.Interval.Increment)
+                        self._depth_unit = UNIT_REGISTRY.Quantity('micrometer')
                 else:
                     self._channel_names = [None for _ in range(self._n_concrete_channels)]
             if hasattr(metadata.Information.Image, 'AcquisitionDateAndTime'):
@@ -363,10 +369,11 @@ class CZIfile():
         Return the frame rate of the time dimension
         """
 
-        if self._duration_scale is not None and self._duration_scale != 0:
-            frame_rate = 1.0 / self._duration_scale
+        if self._duration_scale is not None and self._duration_scale > 0:
+            duration = self._duration_scale
             if self._duration_unit is not None:
-                frame_rate /= self._duration_unit
+                duration = self._duration_unit
+            frame_rate = 1 / duration
         else:
             frame_rate = None
         return frame_rate

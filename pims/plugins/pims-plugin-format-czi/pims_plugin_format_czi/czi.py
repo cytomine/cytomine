@@ -105,16 +105,16 @@ class CZIParser(AbstractParser):
                     names = ['RGB'[cc_idx]]
                 elif imd.n_samples == 3:
                     names = ['R', 'G', 'B']
-            # emission = czi_file.emission_wavelength(cc_idx)
-            # excitation = czi_file.excitation_wavelength(cc_idx)
+            emission = czi_file.channel_emission_wavelength(cc_idx)
+            excitation = czi_file.channel_excitation_wavelength(cc_idx)
 
             for s in range(imd.n_samples):
                 imd.set_channel(ImageChannel(
                     index=cc_idx * imd.n_samples + s,
                     suggested_name=names[s],
                     color=colors[s],
-                    # emission_wavelength=emission,
-                    # excitation_wavelength=excitation
+                    emission_wavelength=emission,
+                    excitation_wavelength=excitation
 
                 ))
 

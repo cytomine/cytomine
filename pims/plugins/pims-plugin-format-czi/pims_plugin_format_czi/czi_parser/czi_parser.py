@@ -239,6 +239,8 @@ class CZIfile():
                 dimensions = metadata.Information.Image.Dimensions
                 if hasattr(dimensions, 'Channels'):
                     self._channel_names = []
+                    self._emission_wavelengths = []
+                    self._excitation_wavelengths = []
                     channels = dimensions.Channels.Channel
                     if channels is None:
                         channels = []
@@ -254,8 +256,24 @@ class CZIfile():
                         else:
                             name = None
                         self._channel_names.append(name)
+                        if hasattr(channel, 'DetectionWavelength'):
+                            excitation_wavelength = getattr(channel, 'DetectionWavelength')
+                            if excitation_wavelength is not None:
+                                excitation_wavelength = float(excitation_wavelength)
+                        else:
+                            excitation_wavelength = None
+                        self._excitation_wavelengths.append(excitation_wavelength)
+                        if hasattr(channel, 'IlluminationWavelength'): 
+                            emission_wavelength = getattr(channel, 'IlluminationWavelength')
+                            if emission_wavelength is not None:
+                                emission_wavelength = float(emission_wavelength)
+                        else:
+                            emission_wavelength = None
+                        self._emission_wavelengths.append(emission_wavelength)
                 else:
                     self._channel_names = [None for _ in range(self._n_concrete_channels)]
+                    self._emission_wavelengths = [None for _ in range(self._n_concrete_channels)]
+                    self._excitation_wavelengths = [None for _ in range(self._n_concrete_channels)]
                 if hasattr(dimensions, 'T') and hasattr(dimensions.T, 'Positions'):
                     positions = dimensions.T.Positions
                     if hasattr(positions, 'Interval') and hasattr(positions.Interval, 'Increment'):
@@ -314,6 +332,26 @@ class CZIfile():
 
         if index < self._n_concrete_channels:
             return self._channel_names[index]
+        else:
+            return None
+
+    def channel_excitation_wavelength(self, index: int) -> Optional[float]:
+        """
+        Return the excitation wavelength of the channel, if known
+        """
+
+        if index < self._n_concrete_channels:
+            return self._excitation_wavelengths[index]
+        else:
+            return None
+
+    def channel_emission_wavelength(self, index: int) -> Optional[float]:
+        """
+        Return the emission wavelength of the channel, if known
+        """
+
+        if index < self._n_concrete_channels:
+            return self._emission_wavelengths[index]
         else:
             return None
 

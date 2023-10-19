@@ -496,7 +496,16 @@ class CZIfile():
         box = self._czi_file_reader.total_bounding_box
         x_pos = x * scale + box['X'][0]
         y_pos = y * scale + box['Y'][0]
-        roi = (x_pos, y_pos, width * scale, height * scale)
+        scaled_width = width * scale
+        scaled_height = height * scale
+        # Crop the ROI if we are outside of the composited image
+        if x_pos + scaled_width > box['X'][1]:
+            scaled_width = box['X'][1] - x_pos
+            width = int(scaled_width / scale)
+        if y_pos + scaled_height > box['Y'][1]:
+            scaled_height = box['Y'][1] - y_pos
+            height = int(scaled_height / scale)
+        roi = (x_pos, y_pos, scaled_width, scaled_height)
 
         zoom = (2 ** (self.pyramid.n_levels - level)) / (2 ** self.pyramid.n_levels)
 

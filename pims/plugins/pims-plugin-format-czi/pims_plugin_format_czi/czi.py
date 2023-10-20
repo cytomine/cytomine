@@ -84,6 +84,7 @@ class CZIParser(AbstractParser):
         imd.n_concrete_channels = czi_file.n_concrete_channels
         imd.depth = czi_file.depth
         imd.duration = czi_file.duration
+        imd.frame_rate = czi_file.frame_rate
 
         for cc_idx in range(imd.n_concrete_channels):
             colors = [infer_channel_color(
@@ -104,16 +105,16 @@ class CZIParser(AbstractParser):
                     names = ['RGB'[cc_idx]]
                 elif imd.n_samples == 3:
                     names = ['R', 'G', 'B']
-            # emission = czi_file.emission_wavelength(cc_idx)
-            # excitation = czi_file.excitation_wavelength(cc_idx)
+            emission = czi_file.channel_emission_wavelength(cc_idx)
+            excitation = czi_file.channel_excitation_wavelength(cc_idx)
 
             for s in range(imd.n_samples):
                 imd.set_channel(ImageChannel(
                     index=cc_idx * imd.n_samples + s,
                     suggested_name=names[s],
                     color=colors[s],
-                    # emission_wavelength=emission,
-                    # excitation_wavelength=excitation
+                    emission_wavelength=emission,
+                    excitation_wavelength=excitation
 
                 ))
 
@@ -155,7 +156,6 @@ class CZIParser(AbstractParser):
             imd.physical_size_x = self._parse_physical_size(czi_file.physical_pixel_size[0])
             imd.physical_size_y = self._parse_physical_size(czi_file.physical_pixel_size[1])
 
-        imd.frame_rate = czi_file.frame_rate
         imd.physical_size_z = czi_file.depth_scale
 
         imd.objective.calibrated_magnification = czi_file.calibrated_magnification

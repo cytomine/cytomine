@@ -221,7 +221,7 @@ class CZIfile():
             self._pixel_size_x = 0
             self._pixel_size_y = 0
 
-        if hasattr(metadata, 'Instrument'):
+        if hasattr(metadata.Information, 'Instrument'):
             calibrated_magnification = 0
             nominal_magnification = 0
             if hasattr(metadata.Information.Instrument, 'Objectives'):

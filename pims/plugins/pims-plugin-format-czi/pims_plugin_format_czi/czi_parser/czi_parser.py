@@ -169,7 +169,7 @@ class CZIfile():
 
         bounding_box = self._czi_file_reader.total_bounding_box
         self._width = bounding_box['X'][1] - bounding_box['X'][0]
-        self._height = bounding_box['X'][1] - bounding_box['X'][0]
+        self._height = bounding_box['Y'][1] - bounding_box['Y'][0]
 
         if 'C' in bounding_box:
             self._n_concrete_channels = bounding_box['C'][1] - bounding_box['C'][0]

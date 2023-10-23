@@ -10,9 +10,11 @@ from pims_plugin_format_czi.czi_parser.czi_parser import CZIfile
 from pims.formats.utils.histogram import DefaultHistogramReader
 from pims.formats.utils.abstract import AbstractParser, AbstractReader, AbstractFormat, CachedDataPath
 from pims.cache import cached_property
-from pims.formats.utils.structures.metadata import ImageChannel, ImageMetadata
+from pims.formats.utils.structures.metadata import ImageChannel, ImageMetadata, MetadataStore
 from pims.formats.utils.structures.pyramid import Pyramid
 from pims.formats.utils.engines.tifffile import TifffileChecker
+from pims.processing.adapters import RawImagePixels
+from pims.processing.region import Region, Tile
 from pims.utils import UNIT_REGISTRY
 from pims.utils.color import infer_channel_color
 from pims.utils.dtypes import dtype_to_bits
@@ -128,7 +130,7 @@ class CZIParser(AbstractParser):
         physical_quantity = UNIT_REGISTRY.Quantity('micrometer')
         return physical_size * physical_quantity
 
-    def parse_known_metadata(self):
+    def parse_known_metadata(self) -> ImageMetadata:
         """
         File data used in Cytomine but not necessary for PIMS (e.g. physical_size,
         magnification, ...)
@@ -165,7 +167,7 @@ class CZIParser(AbstractParser):
 
         return imd
 
-    def parse_raw_metadata(self):
+    def parse_raw_metadata(self) -> MetadataStore:
         """
         Additional information that is not useful either for PIMS or Cytomine.
         Information used when the URL "http://localhost/image/{filepath}/metadata"
@@ -253,7 +255,10 @@ class CZIReader(AbstractReader):
             result = fix_rgb_interpretation(result)
         return result
 
-    def read_thumb(self, out_width, out_height, precomputed=None, c=None, z=None, t=None):
+    def read_thumb(
+        self, out_width: int, out_height: int, precomputed: bool = None,
+        c: Optional[Union[int, List[int]]] = None, z: Optional[int] = None, t: Optional[int] = None
+    ) -> RawImagePixels:
         czi_file = cached_czi_file(self.format)
         if precomputed and czi_file.thumbnail_image is not None:
             return czi_file.thumbnail_image.read()
@@ -261,18 +266,21 @@ class CZIReader(AbstractReader):
             return self._multichannel_read(
                 lambda c, z, t: czi_file.read_area(0, 0, out_width, out_height, 0, c, z, t), c, z, t)
 
-    def read_label(self, out_width, out_height):
+    def read_label(self, out_width: int, out_height: int) -> RawImagePixels:
         czi_file = cached_czi_file(self.format)
         return czi_file.label_image.read()
 
-    def read_macro(self, out_width, out_height):
+    def read_macro(self, out_width: int, out_height: int, c: Optional[Union[int, List[int]]] = None) -> RawImagePixels:
         czi_file = cached_czi_file(self.format)
         if czi_file.macro_image is not None:
             return czi_file.macro_image.read()
         else:
             return czi_file.overview_image.read()
 
-    def read_window(self, region, out_width, out_height, c=None, z=None, t=None):
+    def read_window(
+        self, region: Region, out_width: int, out_height: int,
+        c: Optional[Union[int, List[int]]] = None, z: Optional[int] = None, t: Optional[int] = None
+    ) -> RawImagePixels:
         czi_file = cached_czi_file(self.format)
         tier = self.format.pyramid.most_appropriate_tier(
             region, (out_width, out_height)
@@ -282,7 +290,10 @@ class CZIReader(AbstractReader):
             lambda c, z, t: czi_file.read_area(
                 region.left, region.top, region.width, region.height, tier.level, c, z, t), c, z, t)
 
-    def read_tile(self, tile, c=None, z=None, t=None):
+    def read_tile(
+        self, tile: Tile,
+        c: Optional[Union[int, List[int]]] = None, z: Optional[int] = None, t: Optional[int] = None
+    ) -> RawImagePixels:
         czi_file = cached_czi_file(self.format)
         x = tile.tx * czi_file.tile_size[0]
         y = tile.ty * czi_file.tile_size[1]
@@ -301,17 +312,13 @@ class CZIFormat(AbstractFormat):
         self._enabled = True
 
     @classmethod
-    def get_name(cls):
+    def get_name(cls) -> str:
         return "Zeiss CZI"
 
     @classmethod
-    def get_remarks(cls):
-        return "A set of .CZI files packed in archive directory."
-
-    @classmethod
-    def is_spatial(cls):
+    def is_spatial(cls) -> bool:
         return True
 
     @cached_property
-    def need_conversion(self):
+    def need_conversion(self) -> bool:
         return False

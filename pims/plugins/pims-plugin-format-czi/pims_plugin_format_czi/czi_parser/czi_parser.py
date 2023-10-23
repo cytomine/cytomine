@@ -39,12 +39,50 @@ class DictObj:
 
 
 class CZIAttachment:
+    """
+    Base class to describe a CZI attachment (Not only images are supported).
+    """
 
     def __init__(self, attachment):
         self.attachment = attachment
 
+    @property
+    def width(self) -> int:
+        """
+        Returns the width of the image
+        """
+
+        raise NotImplementedError()
+
+    @property
+    def height(self) -> int:
+        """
+        Returns the height of the image
+        """
+
+        raise NotImplementedError()
+
+    @property
+    def n_components(self) -> int:
+        """
+        Returns the number of components per pixels
+        """
+
+        raise NotImplementedError()
+
+    def read(self) -> VIPSImage:
+        """
+        Read the whole image and returns it as VIPS image instance
+        """
+
+        raise NotImplementedError()
+
 
 class CZIVIPSAttachment(CZIAttachment):
+    """
+    Class that contains a simple attachment image, (e.g. a JPEG or PNG image)
+    This class will use a VIPS image to manage the attachment.
+    """
 
     def __init__(self, attachment):
         super().__init__(attachment)
@@ -52,15 +90,15 @@ class CZIVIPSAttachment(CZIAttachment):
         self._image = VIPSImage.new_from_buffer(raw_data, options="")
 
     @property
-    def width(self):
+    def width(self) -> int:
         return self._image.width
 
     @property
-    def height(self):
+    def height(self) -> int:
         return self._image.height
 
     @property
-    def n_components(self):
+    def n_components(self) -> int:
         return self._image.bands
 
     def read(self) -> VIPSImage:
@@ -68,6 +106,11 @@ class CZIVIPSAttachment(CZIAttachment):
 
 
 class CZINAtiveAttachment(CZIAttachment):
+    """
+    Class that contains an attachment image stored as an embedded CZI image.
+    This class will use a czifile image to manage the attachment as ibpyczirw
+    does not support in memory images.
+    """
 
     def __init__(self, attachment):
         super().__init__(attachment)
@@ -76,15 +119,15 @@ class CZINAtiveAttachment(CZIAttachment):
         self._czi = czifile.CziFile(image_data)
 
     @property
-    def width(self):
+    def width(self) -> int:
         return self._czi.shape[2]
 
     @property
-    def height(self):
+    def height(self) -> int:
         return self._czi.shape[1]
 
     @property
-    def n_components(self):
+    def n_components(self) -> int:
         return self._czi.shape[0]
 
     def read(self) -> VIPSImage:
@@ -100,6 +143,9 @@ class CZINAtiveAttachment(CZIAttachment):
 
 
 class CZIfile():
+    """
+    Main class to provide high level management of CZI images
+    """
 
     # Map the pixel format of image into Numpy types
     PixelFormatToNPType = {
@@ -111,6 +157,7 @@ class CZIfile():
         "Bgr96Float": np.float32,
         }
 
+    # Map the number of components per pixels
     PixelFormatToNumComponents = {
         "Gray8": 1,
         "Gray16": 1,
@@ -120,6 +167,7 @@ class CZIfile():
         "Bgr96Float": 3,
         }
 
+    # Map the pixel format of image into PIL format
     PixelFormatToPIL = {
         "Gray8": "L",
         "Gray16": "L",
@@ -129,6 +177,7 @@ class CZIfile():
         "Bgr96Float": "RGB",
         }
 
+    # Map the pixel format of image into VIPS format
     numpy_to_vips_band_type = {
         np.int8: BandFormat.CHAR,
         np.uint8: BandFormat.UCHAR,
@@ -142,6 +191,9 @@ class CZIfile():
 
     def __init__(self, path):
 
+        # We have two embedded CZI file handlers, one for the main image, based on libpyczirw
+        # And another one based on czi file, to manage attachments as libpyczirw does not
+        # expose an API for them
         self._czi_file_reader = czi.CziReader(path)
         self._attachment_reader = czifile.CziFile(path)
 
@@ -167,10 +219,13 @@ class CZIfile():
         self._num_components = None
         self._component_type = None
 
+        # Calculate the dimensions of the main image, using the bounding box of the CZI file
+        # The bounding box contains the limit of the image in all the dimension, not only =X and Y
         bounding_box = self._czi_file_reader.total_bounding_box
         self._width = bounding_box['X'][1] - bounding_box['X'][0]
         self._height = bounding_box['Y'][1] - bounding_box['Y'][0]
 
+        # Check the existence and number of extra dimensions and channels.
         if 'C' in bounding_box:
             self._n_concrete_channels = bounding_box['C'][1] - bounding_box['C'][0]
             self._start_channels = bounding_box['C'][0]
@@ -199,6 +254,9 @@ class CZIfile():
 
         metadata = self._metadata_dict_obj.ImageDocument.Metadata
 
+        # Extract the image information from the metadata
+        # As the CZI metadata are not normalized, we have to check several metadata names
+        # to find the actual values.
         if hasattr(metadata, 'ImageScaling'):
             physical_pixel_size = metadata.ImageScaling.ImagePixelSize
             self._pixel_size_x = float(physical_pixel_size.split(',')[0])
@@ -263,7 +321,7 @@ class CZIfile():
                         else:
                             excitation_wavelength = None
                         self._excitation_wavelengths.append(excitation_wavelength)
-                        if hasattr(channel, 'IlluminationWavelength'): 
+                        if hasattr(channel, 'IlluminationWavelength'):
                             emission_wavelength = getattr(channel, 'IlluminationWavelength')
                             if emission_wavelength is not None:
                                 emission_wavelength = float(emission_wavelength)
@@ -304,8 +362,11 @@ class CZIfile():
         else:
             self._device_model = "Zeiss Microscope"
 
+        # Check the existance of associated images, like thumbnail, macro, ...
         self._analyze_images()
 
+        # Build the pyramid object using a default tile size of 256x256
+        # The library does not expose the configuration of the mosaic or subblocks.
         self._tile_size = (256, 256)
         self._pyramid = self._create_pyramid()
 
@@ -496,9 +557,11 @@ class CZIfile():
 
         return self._device_model
 
-    def _create_pyramid(self):
+    def _create_pyramid(self) -> Pyramid:
         """
+        Create a normalized pyramid covering the whole image
         """
+
         logger.debug("Creating pyramid")
         pyramid = Pyramid()
         pixel_size_x = self.pixel_size[0]
@@ -530,8 +593,11 @@ class CZIfile():
         Return the image of the given area at the requested zoom level.
         """
 
+        # When reading a CZI image, the area must always be in the global coordinates
+        # the zoom factor is only to scale down the image, not applied on the coordinates
         scale = 2 ** level
         box = self._czi_file_reader.total_bounding_box
+        # Calculate the area to read in the high resolution coordinates
         x_pos = x * scale + box['X'][0]
         y_pos = y * scale + box['Y'][0]
         scaled_width = width * scale
@@ -545,10 +611,15 @@ class CZIfile():
             height = int(scaled_height / scale)
         roi = (x_pos, y_pos, scaled_width, scaled_height)
 
+        # Calculate the zoom factor from the level
         zoom = (2 ** (self.pyramid.n_levels - level)) / (2 ** self.pyramid.n_levels)
 
+        # Add the extra dimension coordinates
         plane = {"C": self._start_channels + c, "Z": self._start_depth + z, "T": self._start_duration + t}
         data = self._czi_file_reader.read(roi=roi, zoom=zoom, plane=plane)
+        # convert the raw image into a VIPS image
+        # as the data array is not a continuous area in memory, we must convert it before
+        # sending it to VIPS
         image = VIPSImage.new_from_memory(
             np.ascontiguousarray(data),
             width,
@@ -559,7 +630,12 @@ class CZIfile():
         return image
 
     def _analyze_images(self) -> None:
+        """
+        Detect the attachment and create the attachment instance associated
+        """
+
         for img in self._attachment_reader.attachments():
+            # The type of the attachment can only be guessed using the attachment name
             if img.attachment_entry.name == "Thumbnail":
                 self._thumbnail = self.image_from_attachment(img)
             elif img.attachment_entry.name == "SlideOverview":
@@ -570,6 +646,10 @@ class CZIfile():
                 self._macro = self.image_from_attachment(img)
 
     def image_from_attachment(self, attachment) -> CZIAttachment:
+        """
+        Create an attachment instance object based on the attachment type
+        """
+
         if attachment.attachment_entry.content_file_type != "CZI":
             image = CZIVIPSAttachment(attachment)
         else:

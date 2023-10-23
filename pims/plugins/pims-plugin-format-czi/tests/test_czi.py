@@ -7,12 +7,10 @@ from tests.utils.formats import thumb_test, resized_test, mask_test
 from tests.utils.formats import crop_test, crop_null_annot_test
 
 from pims.formats import FORMATS  # noqa: F401
-from pims.files.archive import Archive
 from pims.files.file import EXTRACTED_DIR, HISTOGRAM_STEM, ORIGINAL_STEM, PROCESSED_DIR  # noqa: F401
 from pims.files.file import SPATIAL_STEM, UPLOAD_DIR_PREFIX,  Path  # noqa: F401
 
 from pims.importer.importer import FileImporter
-import pytest
 
 
 def get_image(path, image):
@@ -20,15 +18,15 @@ def get_image(path, image):
     # If image does not exist locally -> download image
     if not os.path.exists(path):
         os.mkdir("/data/pims/upload_test_czi")
-    
+
     if not os.path.exists(filepath):
         try:
-            url = f"https://data.cytomine.coop/open/uliege/{image}" #OAC
+            url = f"https://data.cytomine.coop/open/uliege/{image}"  # OAC
             urllib.request.urlretrieve(url, filepath)
         except Exception as e:
             print("Could not download image")
             print(e)
-    
+
     if not os.path.exists(os.path.join(path, "processed")):
         try:
             fi = FileImporter(f"/mnt/c/Users/yba/pims/Root/upload_test_czi/{image}")
@@ -52,7 +50,6 @@ def get_image(path, image):
             print(e)
 
 
-
 def test_czi_exists(image_path_czi):
     # Test if the file exists, either locally either with the OAC
     get_image(image_path_czi[0], image_path_czi[1])
@@ -64,7 +61,7 @@ def test_czi_info(client, image_path_czi):
     assert response.status_code == 200
     assert "czi" in response.json()['image']['original_format'].lower()
     assert response.json()['image']['width'] == 52061
-    assert response.json()['image']['height'] == 52061
+    assert response.json()['image']['height'] == 45504
     assert response.json()['image']['depth'] == 1
     assert response.json()['image']['duration'] == 1
     assert response.json()['image']['physical_size_x'] == 4.4
@@ -72,7 +69,7 @@ def test_czi_info(client, image_path_czi):
     assert response.json()['image']['n_channels'] == 3
     assert response.json()['image']['n_concrete_channels'] == 1
     assert response.json()['image']['n_samples'] == 3
-    assert response.json()['image']['are_rgb_planes'] == True
+    assert response.json()['image']['are_rgb_planes'] is True
     assert response.json()['image']['pixel_type'] == "uint8"
     assert response.json()['image']['significant_bits'] == 8
 

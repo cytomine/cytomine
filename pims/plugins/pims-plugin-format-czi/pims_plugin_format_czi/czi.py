@@ -63,6 +63,11 @@ class CZIParser(AbstractParser):
             newkey = parentkey + sep + k if parentkey else k
             if isinstance(v, dict):
                 items.extend(self._flattendict(v, newkey, sep=sep).items())
+            elif isinstance(v, list):
+                for i in range(len(v)):
+                    new_list_key = newkey + '_' + str(i)
+                    if isinstance(v[i], dict):
+                        items.extend(self._flattendict(v[i], new_list_key, sep=sep).items())
             else:
                 items.append((newkey, v))
         return dict(items)

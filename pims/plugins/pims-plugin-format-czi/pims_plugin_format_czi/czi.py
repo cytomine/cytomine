@@ -6,7 +6,7 @@ from pyvips import Image as VIPSImage
 from struct import Struct
 from typing import Callable, List, Optional, Union
 
-from pims_plugin_format_czi.czi_parser.czi_parser import CZIfile
+from pims_plugin_format_czi.czi_parser.czi_file import CZIFile
 from pims.formats.utils.histogram import DefaultHistogramReader
 from pims.formats.utils.abstract import AbstractParser, AbstractReader, AbstractFormat, CachedDataPath
 from pims.cache import cached_property
@@ -28,7 +28,7 @@ logger = logging.getLogger("pims.format.czi")
 @lru_cache
 def read_czifile(path, silent_fail=True):
     logger.debug(f"Read CZI file {path}")
-    czi_file = CZIfile(str(path))
+    czi_file = CZIFile(str(path))
     return czi_file
 
 

@@ -142,7 +142,7 @@ class CZINAtiveAttachment(CZIAttachment):
         return image
 
 
-class CZIfile():
+class CZIFile():
     """
     Main class to provide high level management of CZI images
     """

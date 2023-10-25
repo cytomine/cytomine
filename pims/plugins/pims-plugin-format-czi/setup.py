@@ -22,10 +22,8 @@ NAME = 'pims-plugin-format-czi'
 REQUIRES_PYTHON = '>=3.8.0'
 
 # What packages are required for this module to be executed?
-REQUIRED = [
-    'pims',
-    'tifftools'
-]
+with open('requirements.txt', 'r') as f:
+    REQUIRED = f.read().splitlines()
 
 DEPENDENCY_LINKS = []
 

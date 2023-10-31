@@ -295,16 +295,16 @@ class CZIFile():
         if hasattr(metadata.Information, 'Image'):
             if hasattr(metadata.Information.Image, 'Dimensions'):
                 dimensions = metadata.Information.Image.Dimensions
+                self._channel_names = [None for _ in range(self._n_concrete_channels)]
+                self._emission_wavelengths = [None for _ in range(self._n_concrete_channels)]
+                self._excitation_wavelengths = [None for _ in range(self._n_concrete_channels)]
                 if hasattr(dimensions, 'Channels'):
-                    self._channel_names = []
-                    self._emission_wavelengths = []
-                    self._excitation_wavelengths = []
                     channels = dimensions.Channels.Channel
                     if channels is None:
                         channels = []
                     elif not isinstance(channels, list):
                         channels = [channels]
-                    for channel in channels:
+                    for index, channel in enumerate(channels):
                         if hasattr(channel, '@Name'):
                             name = getattr(channel, '@Name')
                         elif hasattr(channel, 'Fluor'):
@@ -313,25 +313,19 @@ class CZIFile():
                             name = getattr(channel, '@id')
                         else:
                             name = None
-                        self._channel_names.append(name)
-                        if hasattr(channel, 'DetectionWavelength'):
-                            excitation_wavelength = getattr(channel, 'DetectionWavelength')
+                        self._channel_names[index] = name
+                        if hasattr(channel, 'ExcitationWavelength'):
+                            excitation_wavelength = getattr(channel, 'ExcitationWavelength')
                             if excitation_wavelength is not None:
-                                excitation_wavelength = float(excitation_wavelength)
-                        else:
-                            excitation_wavelength = None
-                        self._excitation_wavelengths.append(excitation_wavelength)
-                        if hasattr(channel, 'IlluminationWavelength'):
-                            emission_wavelength = getattr(channel, 'IlluminationWavelength')
+                                if isinstance(excitation_wavelength, str):
+                                    excitation_wavelength = float(excitation_wavelength) * UNIT_REGISTRY.Quantity('nm')
+                                    self._excitation_wavelengths[index] = excitation_wavelength
+                        if hasattr(channel, 'EmissionWavelength'):
+                            emission_wavelength = getattr(channel, 'EmissionWavelength')
                             if emission_wavelength is not None:
-                                emission_wavelength = float(emission_wavelength)
-                        else:
-                            emission_wavelength = None
-                        self._emission_wavelengths.append(emission_wavelength)
-                else:
-                    self._channel_names = [None for _ in range(self._n_concrete_channels)]
-                    self._emission_wavelengths = [None for _ in range(self._n_concrete_channels)]
-                    self._excitation_wavelengths = [None for _ in range(self._n_concrete_channels)]
+                                if isinstance(excitation_wavelength, str):
+                                    emission_wavelength = float(emission_wavelength) * UNIT_REGISTRY.Quantity('nm')
+                                    self._emission_wavelengths[index] = emission_wavelength
                 if hasattr(dimensions, 'T') and hasattr(dimensions.T, 'Positions'):
                     positions = dimensions.T.Positions
                     if hasattr(positions, 'Interval') and hasattr(positions.Interval, 'Increment'):
@@ -349,14 +343,17 @@ class CZIFile():
             else:
                 self._acquisition_datetime = 0
         else:
-            self._channel_names = [None for _ in range(self._n_concrete_channels)]
             self._acquisition_datetime = 0
 
         if hasattr(metadata.Information, 'Instrument'):
             if hasattr(metadata.Information.Instrument, 'Microscopes'):
-                self._device_model = getattr(metadata.Information.Instrument.Microscopes.Microscope, '@Name')
+                if hasattr(metadata.Information.Instrument.Microscopes.Microscope, '@Name'):
+                    self._device_model = getattr(metadata.Information.Instrument.Microscopes.Microscope, '@Name')
+                elif hasattr(metadata.Information.Instrument.Microscopes.Microscope, 'System'):
+                    self._device_model = getattr(metadata.Information.Instrument.Microscopes.Microscope, 'System')
             elif hasattr(metadata.Information.Instrument, 'Objectives'):
-                self._device_model = getattr(metadata.Information.Instrument.Objectives.Objective, '@Name')
+                if hasattr(metadata.Information.Instrument.Objectives.Objective, '@Name'):
+                    self._device_model = getattr(metadata.Information.Instrument.Objectives.Objective, '@Name')
             else:
                 self._device_model = "Zeiss Microscope"
         else:

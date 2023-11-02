@@ -613,7 +613,7 @@ class CZIFile():
 
         # Add the extra dimension coordinates
         plane = {"C": self._start_channels + c, "Z": self._start_depth + z, "T": self._start_duration + t}
-        data = self._czi_file_reader.read(roi=roi, zoom=zoom, plane=plane)
+        data = self._czi_file_reader.read(roi=roi, zoom=zoom, plane=plane, background_pixel=(1, 1, 1))
         # convert the raw image into a VIPS image
         # as the data array is not a continuous area in memory, we must convert it before
         # sending it to VIPS

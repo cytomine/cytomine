@@ -137,7 +137,7 @@ if __name__ == '__main__':
             roi = tuple(int(v) for v in args.roi.split(','))
         else:
             roi = None
-        data = czi_reader.read(scene=args.scene, roi=roi, zoom=float(args.zoom))
+        data = czi_reader.read(scene=args.scene, roi=roi, zoom=float(args.zoom), background_pixel=(1, 1, 1))
         if roi is not None:
             name = f"output-{args.roi.replace(',', '-')}-{args.zoom}.{args.format}"
         else:

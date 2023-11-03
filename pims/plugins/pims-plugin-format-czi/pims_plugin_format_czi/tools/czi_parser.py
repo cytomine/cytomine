@@ -152,7 +152,12 @@ if __name__ == '__main__':
                 )
             image.write_to_file(name)
         else:
-            image = PILImage.fromarray(data.astype(pixel_types_to_numpy_dtype[czi_reader.pixel_types[args.c]]))
+            if data.shape[2] == 3:
+                mode = "RGB"
+            else:
+                mode = "L"
+                data = data[:, :, 0]
+            image = PILImage.fromarray(data.astype(pixel_types_to_numpy_dtype[czi_reader.pixel_types[args.c]]), mode)
             image.save(name)
 
     if args.metadata:

@@ -1,9 +1,10 @@
-package io.github.ya_b.registry.client.image;
+package be.cytomine.registry.client.image;
 
-import io.github.ya_b.registry.client.constant.Constants;
-import io.github.ya_b.registry.client.image.registry.ManifestHttp;
-import io.github.ya_b.registry.client.image.tar.ManifestFile;
-import io.github.ya_b.registry.client.name.Reference;
+
+import be.cytomine.registry.client.constant.Constants;
+import be.cytomine.registry.client.image.registry.ManifestHttp;
+import be.cytomine.registry.client.image.tar.ManifestFile;
+import be.cytomine.registry.client.name.Reference;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

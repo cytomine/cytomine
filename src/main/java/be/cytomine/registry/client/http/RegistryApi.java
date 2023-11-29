@@ -1,14 +1,14 @@
-package io.github.ya_b.registry.client.http;
+package be.cytomine.registry.client.http;
 
-import io.github.ya_b.registry.client.exception.HttpCodeErrorException;
-import io.github.ya_b.registry.client.exception.RegistryException;
-import io.github.ya_b.registry.client.http.auth.Authenticator;
-import io.github.ya_b.registry.client.http.resp.CatalogResp;
-import io.github.ya_b.registry.client.http.resp.TagsResp;
-import io.github.ya_b.registry.client.image.ImageMediaType;
-import io.github.ya_b.registry.client.image.registry.ManifestHttp;
-import io.github.ya_b.registry.client.name.Reference;
-import io.github.ya_b.registry.client.utils.JsonUtil;
+import be.cytomine.registry.client.exception.HttpCodeErrorException;
+import be.cytomine.registry.client.exception.RegistryException;
+import be.cytomine.registry.client.http.auth.Authenticator;
+import be.cytomine.registry.client.http.resp.CatalogResp;
+import be.cytomine.registry.client.http.resp.TagsResp;
+import be.cytomine.registry.client.image.ImageMediaType;
+import be.cytomine.registry.client.image.registry.ManifestHttp;
+import be.cytomine.registry.client.name.Reference;
+import be.cytomine.registry.client.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Headers;
 import okhttp3.MediaType;

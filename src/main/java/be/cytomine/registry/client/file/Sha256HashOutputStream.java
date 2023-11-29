@@ -1,4 +1,4 @@
-package io.github.ya_b.registry.client.file;
+package be.cytomine.registry.client.file;
 
 import java.io.IOException;
 import java.io.OutputStream;

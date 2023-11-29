@@ -1,4 +1,4 @@
-package io.github.ya_b.registry.client.image;
+package be.cytomine.registry.client.image;
 
 public enum Format {
     OCI,

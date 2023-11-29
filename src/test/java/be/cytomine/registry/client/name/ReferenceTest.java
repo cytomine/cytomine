@@ -1,6 +1,6 @@
-package io.github.ya_b.registry.client.name;
+package be.cytomine.registry.client.name;
 
-import io.github.ya_b.registry.client.constant.Constants;
+import be.cytomine.registry.client.constant.Constants;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

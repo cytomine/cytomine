@@ -1,4 +1,4 @@
-package io.github.ya_b.registry.client.constant;
+package be.cytomine.registry.client.constant;
 
 public class FileConstant {
     public static final String MANIFEST = "manifest.json";

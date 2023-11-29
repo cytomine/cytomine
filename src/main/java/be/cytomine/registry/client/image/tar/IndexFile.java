@@ -1,7 +1,7 @@
-package io.github.ya_b.registry.client.image.tar;
+package be.cytomine.registry.client.image.tar;
 
+import be.cytomine.registry.client.image.ImageMediaType;
 import com.google.gson.annotations.SerializedName;
-import io.github.ya_b.registry.client.image.ImageMediaType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

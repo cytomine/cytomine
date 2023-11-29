@@ -1,4 +1,4 @@
-package io.github.ya_b.registry.client.utils;
+package be.cytomine.registry.client.utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;

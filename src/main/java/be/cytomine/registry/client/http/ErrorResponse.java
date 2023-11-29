@@ -1,4 +1,4 @@
-package io.github.ya_b.registry.client.http;
+package be.cytomine.registry.client.http;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

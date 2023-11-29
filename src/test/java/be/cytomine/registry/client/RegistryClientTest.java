@@ -1,10 +1,10 @@
-package io.github.ya_b.registry.client;
+package be.cytomine.registry.client;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
-import io.github.ya_b.registry.client.http.resp.CatalogResp;
-import io.github.ya_b.registry.client.utils.JsonUtil;
+import be.cytomine.registry.client.http.resp.CatalogResp;
+import be.cytomine.registry.client.utils.JsonUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;

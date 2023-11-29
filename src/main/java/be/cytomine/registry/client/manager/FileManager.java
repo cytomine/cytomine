@@ -1,20 +1,20 @@
-package io.github.ya_b.registry.client.manager;
+package be.cytomine.registry.client.manager;
 
+import be.cytomine.registry.client.constant.Constants;
+import be.cytomine.registry.client.constant.FileConstant;
+import be.cytomine.registry.client.exception.FormatNotSupportException;
+import be.cytomine.registry.client.exception.TarFileErrException;
+import be.cytomine.registry.client.file.FileUtils;
+import be.cytomine.registry.client.image.Blob;
+import be.cytomine.registry.client.image.Context;
+import be.cytomine.registry.client.image.Format;
+import be.cytomine.registry.client.image.registry.ManifestHttp;
+import be.cytomine.registry.client.image.tar.IndexFile;
+import be.cytomine.registry.client.image.tar.ManifestFile;
+import be.cytomine.registry.client.name.Reference;
+import be.cytomine.registry.client.utils.IOUtils;
+import be.cytomine.registry.client.utils.JsonUtil;
 import com.google.gson.reflect.TypeToken;
-import io.github.ya_b.registry.client.constant.Constants;
-import io.github.ya_b.registry.client.constant.FileConstant;
-import io.github.ya_b.registry.client.exception.FormatNotSupportException;
-import io.github.ya_b.registry.client.exception.TarFileErrException;
-import io.github.ya_b.registry.client.file.FileUtils;
-import io.github.ya_b.registry.client.image.Blob;
-import io.github.ya_b.registry.client.image.Context;
-import io.github.ya_b.registry.client.image.Format;
-import io.github.ya_b.registry.client.image.registry.ManifestHttp;
-import io.github.ya_b.registry.client.image.tar.IndexFile;
-import io.github.ya_b.registry.client.image.tar.ManifestFile;
-import io.github.ya_b.registry.client.name.Reference;
-import io.github.ya_b.registry.client.utils.IOUtils;
-import io.github.ya_b.registry.client.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
@@ -35,8 +35,8 @@ import java.util.stream.Collectors;
 public class FileManager {
 
     public Context load(InputStream is) throws IOException {
-        Path dst = Files.createTempDirectory(UUID.randomUUID().toString());
-        List<Blob> extractFiles = FileUtils.extractTar(is, dst);
+        Path dst = Files.createTempDirectory(UUID.randomUUID().toString()); // create a random directory
+        List<Blob> extractFiles = FileUtils.extractTar(is, dst); // list of blobs from a tar
         Format format = imageType(extractFiles);
         if (Format.DOCKER.equals(format)) {
             extractFiles = gzTarItem(extractFiles);

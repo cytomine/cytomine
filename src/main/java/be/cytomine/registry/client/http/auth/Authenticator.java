@@ -1,10 +1,11 @@
-package io.github.ya_b.registry.client.http.auth;
+package be.cytomine.registry.client.http.auth;
 
-import io.github.ya_b.registry.client.exception.RegistryException;
-import io.github.ya_b.registry.client.http.HttpClient;
-import io.github.ya_b.registry.client.http.HttpHeaders;
-import io.github.ya_b.registry.client.name.Reference;
-import io.github.ya_b.registry.client.utils.JsonUtil;
+
+import be.cytomine.registry.client.exception.RegistryException;
+import be.cytomine.registry.client.http.HttpClient;
+import be.cytomine.registry.client.http.HttpHeaders;
+import be.cytomine.registry.client.name.Reference;
+import be.cytomine.registry.client.utils.JsonUtil;
 import kotlin.Pair;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

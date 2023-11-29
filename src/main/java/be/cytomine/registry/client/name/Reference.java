@@ -1,8 +1,9 @@
-package io.github.ya_b.registry.client.name;
+package be.cytomine.registry.client.name;
 
-import io.github.ya_b.registry.client.constant.Constants;
-import io.github.ya_b.registry.client.http.HttpClient;
-import io.github.ya_b.registry.client.manager.RegistryManager;
+
+import be.cytomine.registry.client.constant.Constants;
+import be.cytomine.registry.client.http.HttpClient;
+import be.cytomine.registry.client.manager.RegistryManager;
 import lombok.Data;
 
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package io.github.ya_b.registry.client.http.resp;
+package be.cytomine.registry.client.http.resp;
 
 import lombok.Data;
 

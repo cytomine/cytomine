@@ -1,7 +1,8 @@
-package io.github.ya_b.registry.client.file;
+package be.cytomine.registry.client.file;
 
-import io.github.ya_b.registry.client.constant.Constants;
-import io.github.ya_b.registry.client.image.Blob;
+
+import be.cytomine.registry.client.constant.Constants;
+import be.cytomine.registry.client.image.Blob;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;

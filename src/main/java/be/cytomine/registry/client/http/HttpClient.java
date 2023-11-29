@@ -1,6 +1,6 @@
-package io.github.ya_b.registry.client.http;
+package be.cytomine.registry.client.http;
 
-import io.github.ya_b.registry.client.constant.Constants;
+import be.cytomine.registry.client.constant.Constants;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 

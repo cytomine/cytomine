@@ -1,9 +1,9 @@
-package io.github.ya_b.registry.client.manager;
+package be.cytomine.registry.client.manager;
 
-import io.github.ya_b.registry.client.http.auth.Authenticator;
-import io.github.ya_b.registry.client.http.auth.Scope;
-import io.github.ya_b.registry.client.image.Context;
-import io.github.ya_b.registry.client.name.Reference;
+import be.cytomine.registry.client.http.auth.Authenticator;
+import be.cytomine.registry.client.http.auth.Scope;
+import be.cytomine.registry.client.image.Context;
+import be.cytomine.registry.client.name.Reference;
 import kotlin.Pair;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

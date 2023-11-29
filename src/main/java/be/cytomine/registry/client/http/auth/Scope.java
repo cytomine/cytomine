@@ -1,4 +1,4 @@
-package io.github.ya_b.registry.client.http.auth;
+package be.cytomine.registry.client.http.auth;
 
 public enum Scope {
     NONE(""),

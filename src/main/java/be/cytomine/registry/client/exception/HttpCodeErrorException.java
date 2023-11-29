@@ -1,4 +1,4 @@
-package io.github.ya_b.registry.client.exception;
+package be.cytomine.registry.client.exception;
 
 public class HttpCodeErrorException extends RegistryException {
 

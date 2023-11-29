@@ -1,14 +1,15 @@
-package io.github.ya_b.registry.client.manager;
+package be.cytomine.registry.client.manager;
 
-import io.github.ya_b.registry.client.constant.Constants;
-import io.github.ya_b.registry.client.constant.FileConstant;
-import io.github.ya_b.registry.client.exception.RegistryException;
-import io.github.ya_b.registry.client.http.RegistryApi;
-import io.github.ya_b.registry.client.http.resp.CatalogResp;
-import io.github.ya_b.registry.client.image.Blob;
-import io.github.ya_b.registry.client.image.Context;
-import io.github.ya_b.registry.client.image.registry.ManifestHttp;
-import io.github.ya_b.registry.client.name.Reference;
+
+import be.cytomine.registry.client.constant.Constants;
+import be.cytomine.registry.client.constant.FileConstant;
+import be.cytomine.registry.client.exception.RegistryException;
+import be.cytomine.registry.client.http.RegistryApi;
+import be.cytomine.registry.client.http.resp.CatalogResp;
+import be.cytomine.registry.client.image.Blob;
+import be.cytomine.registry.client.image.Context;
+import be.cytomine.registry.client.image.registry.ManifestHttp;
+import be.cytomine.registry.client.name.Reference;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.net.ssl.SSLException;
@@ -118,5 +119,11 @@ public class RegistryManager {
             log.warn("getSchema", e);
         }
         throw new RuntimeException("No response from the registry Server.");
+    }
+
+
+    public int getVersion() throws IOException {
+        return api.base(String.format("%s://%s", Constants.SCHEMA_HTTP, "localhost:5000/v2/"));
+
     }
 }

@@ -1,4 +1,4 @@
-package io.github.ya_b.registry.client.http;
+package be.cytomine.registry.client.http;
 
 public class HttpHeaders {
     public static final String ACCEPT = "Accept";

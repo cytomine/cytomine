@@ -1,6 +1,6 @@
-package io.github.ya_b.registry.client.image.registry;
+package be.cytomine.registry.client.image.registry;
 
-import io.github.ya_b.registry.client.image.ImageMediaType;
+import be.cytomine.registry.client.image.ImageMediaType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

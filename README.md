@@ -23,6 +23,6 @@ maven
 <dependency>
   <groupId>io.github.ya-b</groupId>
   <artifactId>registry-client</artifactId>
-  <version>0.1.3</version>
+  <version>1.0.0</version>
 </dependency>
 ```

@@ -8,11 +8,11 @@ plugins {
     id 'signing'
 }
 
-group 'io.github.ya-b'
-version '0.1.3'
+group 'be.cytomine'
+version '1.0.0'
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 repositories {
     mavenCentral()
@@ -62,7 +62,7 @@ publishing {
             pom {
                 name = 'registry-client'
                 description = 'A java client for docker registry api v2'
-                url = 'https://github.com/ya-b/registry-client.git'
+                url = 'https://github.com/cytomine/registry-client.git'
                 licenses {
                     license {
                         name = 'The Apache License, Version 2.0'
@@ -75,11 +75,16 @@ publishing {
                         name = 'yangbo'
                         email = 'ya-b@outlook.com'
                     }
+                    developer {
+                        id = 'cytomine'
+                        name = 'cytominedev'
+                        email = 'dev@cytomine.com'
+                    }
                 }
                 scm {
-                    url = 'https://github.com/ya-b/registry-client.git'
-                    connection = 'scm:git:https://github.com/ya-b/registry-client.git'
-                    developerConnection = 'scm:git:https://github.com/ya-b/registry-client.git'
+                    url = 'https://github.com/cytomine/registry-client.git'
+                    connection = 'scm:git:https://github.com/cytomine/registry-client.git'
+                    developerConnection = 'scm:git:https://github.com/cytomine/registry-client.git'
                 }
             }
 

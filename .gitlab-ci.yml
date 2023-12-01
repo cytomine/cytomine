@@ -9,6 +9,7 @@ stages:
 - publish
 
 variables:
+  GPG_KEYRING_PATH: /gpg/keyring
   GRADLE_USER_HOME: /cache/.gradle
   GRADLE_VERSION: 7.5.1
   GRADLE_IMAGE: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/gradle:${GRADLE_VERSION}-jdk17-alpine
@@ -42,13 +43,13 @@ make-version-name:
 
 .make-gradle-properties:
   before_script:
-    - mkdir -p $GRADLE_USER_HOME 
-    - touch $GRADLE_USER_HOME/gradle.properties
-    - echo "signing.keyId=${OSSRH_GPG_KEY_ID}" >> $GRADLE_USER_HOME/gradle.properties
-    - echo "signing.password=${OSSRH_GPG_KEY_PASSPHRASE}" >> $GRADLE_USER_HOME/gradle.properties
-    # ??? - echo "signing.secretKeyRingFile=${GPG_KEYRING}" >> $GRADLE_USER_HOME/gradle.properties
-    - echo "ossrhUsername=${OSSRH_USERNAME}" >> $GRADLE_USER_HOME/gradle.properties
-    - echo "ossrhPassword=${OSSRH_PASSWORD}" >> $GRADLE_USER_HOME/gradle.properties
+    - mkdir -p {$GRADLE_USER_HOME} 
+    - touch ${GRADLE_USER_HOME}/gradle.properties
+    - echo "signing.keyId=${OSSRH_GPG_KEY_ID}" >> ${GRADLE_USER_HOME}/gradle.properties
+    - echo "signing.password=${OSSRH_GPG_KEY_PASSPHRASE}" >> ${GRADLE_USER_HOME}/gradle.properties
+    - echo "signing.secretKeyRingFile=${GPG_KEYRING_PATH}" >> ${GRADLE_USER_HOME}/gradle.properties
+    - echo "ossrhUsername=${OSSRH_USERNAME}" >> ${GRADLE_USER_HOME}/gradle.properties
+    - echo "ossrhPassword=${OSSRH_PASSWORD}" >> ${GRADLE_USER_HOME}/gradle.properties
 
 junit-tests:
   extends: .make-gradle-properties
@@ -76,8 +77,18 @@ build-jar:
 publish:
   extends: .make-gradle-properties
   stage: publish
+  needs:
+    - job: make-gpg-keyring
+      artifacts: true
   image: ${GRADLE_IMAGE}
   rules:
     - if: $CI_COMMIT_TAG
   script:
-    - echo "TODO"
+    - apk update && apk add gpg gpg-agent
+    - gpg --import ${OSSRH_GPG_PUBKEY}
+    - gpg --pinentry-mode loopback --passphrase ${OSSRH_GPG_PASSPHRASE} --import ${OSSRH_GPG_PRIVKEY}
+    - gpg --pinentry-mode loopback --passphrase ${OSSRH_GPG_PASSPHRASE} --export-secret-key ${OSSRH_GPG_KEY_CODE} > ${GPG_KEYRING_PATH}
+    - gradle publishToComCytomine
+    - gradle findComCytomineStagingRepository closeComCytomineStagingRepository
+    - gradle findComCytomineStagingRepository releaseComCytomineStagingRepository
+    

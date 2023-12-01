@@ -17,7 +17,7 @@ default:
 
 cache:
   paths:
-    - $GRADLE_USER_HOME
+    - $GRADLE_USER_HOME  # will store gradle properties
 
 workflow:
   rules:
@@ -42,8 +42,10 @@ make-version-name:
     reports:
       dotenv: .env
 
-.gradle-properties-before-script:
-  before_script:
+make-gradle-properties:
+  stage: prepare
+  script:
+    - mkdir -p $GRADLE_USER_HOME 
     - touch $GRADLE_USER_HOME/gradle.properties
     - echo "signing.keyId=${OSSRH_GPG_KEY_ID}" >> $GRADLE_USER_HOME/gradle.properties
     - echo "signing.password=${OSSRH_GPG_KEY_PASSPHRASE}" >> $GRADLE_USER_HOME/gradle.properties
@@ -52,7 +54,8 @@ make-version-name:
     - echo "ossrhUsername=${OSSRH_PASSWORD}" >> $GRADLE_USER_HOME/gradle.properties
 
 junit-tests:
-  extends: .gradle-properties-before-script
+  needs:
+    - job: make-gradle-properties
   stage: test
   image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/gradle:8.5-jdk17-alpine
   script: 
@@ -62,7 +65,8 @@ junit-tests:
       junit: build/test-results/test/**/TEST-*.xml
 
 build-jar:
-  extends: .gradle-properties-before-script
+  needs:
+    - job: make-gradle-properties
   stage: build
   image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/gradle:8.5-jdk17-alpine
   script: 
@@ -75,7 +79,8 @@ build-jar:
       - build/libs/registry-client-*.jar
 
 publish:
-  extends: .gradle-properties-before-script
+  needs:
+    - job: make-gradle-properties
   stage: publish
   image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/gradle:8.5-jdk17-alpine
   rules:

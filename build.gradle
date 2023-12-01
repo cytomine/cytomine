@@ -3,9 +3,10 @@ plugins {
     id 'io.freefair.lombok' version '6.6.1'
     id 'maven-publish'
     id 'signing'
+    id "io.github.gradle-nexus.publish-plugin" version "2.0.0-rc-1"
 }
 
-group 'be.cytomine'
+group 'com.cytomine'
 version 'x.x.x'
 
 sourceCompatibility = JavaVersion.VERSION_17
@@ -93,19 +94,18 @@ publishing {
 
         }
     }
+}
+
+nexusPublishing {
     repositories {
-        maven {
-            def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-            def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-            credentials {
-                username ossrhUsername
-                password ossrhPassword
-            }
+        create("comcytomine") {
+            nexusUrl = uri("https://s01.oss.sonatype.org/service/local/")
+            snapshotRepositoryUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+            username = ossrhUsername
+            password = ossrhPassword
         }
     }
 }
-
 
 signing {
     sign publishing.publications.mavenJava

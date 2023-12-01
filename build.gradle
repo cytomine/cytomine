@@ -7,7 +7,7 @@ plugins {
 }
 
 group 'com.cytomine'
-version 'x.x.x'
+version '1.1.1'
 
 sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
@@ -90,10 +90,22 @@ publishing {
                     }
                 }
             }
-
-
         }
     }
+
+//    repositories {
+//        maven {
+//            url gitlabRepoUrl
+//            name "GitLab"
+//            credentials(HttpHeaderCredentials) {
+//                name = gitlabTokenName
+//                value = gitLabPrivateToken
+//            }
+//            authentication {
+//                header(HttpHeaderAuthentication)
+//            }
+//        }
+//    }
 }
 
 nexusPublishing {

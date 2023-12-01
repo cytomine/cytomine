@@ -82,9 +82,6 @@ build-jar:
 publish:
   extends: .make-gradle-properties
   stage: publish
-  needs:
-    - job: make-gpg-keyring
-      artifacts: true
   image: ${GRADLE_IMAGE}
   rules:
     - if: $CI_COMMIT_TAG

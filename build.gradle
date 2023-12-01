@@ -1,6 +1,3 @@
-import java.nio.charset.StandardCharsets
-import java.util.stream.Collectors
-
 plugins {
     id 'java-library'
     id 'io.freefair.lombok' version '6.6.1'
@@ -8,7 +5,7 @@ plugins {
     id 'signing'
 }
 
-group 'be.cytomine'
+group 'com.cytomine'
 version '1.0.0'
 
 sourceCompatibility = JavaVersion.VERSION_17
@@ -43,13 +40,12 @@ javadoc {
         options.addBooleanOption('html5', true)
     }
     options.encoding = "UTF-8"
-    failOnError = false
 }
 
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifactId project.name
+            artifactId = "registry-client"
             from components.java
             versionMapping {
                 usage('java-api') {
@@ -59,16 +55,27 @@ publishing {
                     fromResolutionResult()
                 }
             }
+
             pom {
                 name = 'registry-client'
-                description = 'A java client for docker registry api v2'
-                url = 'https://github.com/cytomine/registry-client.git'
+                packaging = 'jar'
+                // optionally artifactId can be defined here
+                description = 'A Java client for connecting to the API of a Docker registry v2.'
+                url = 'http://github.com/cytomine/registry-client'
+
+                scm {
+                    url = 'https://github.com/cytomine/registry-client.git'
+                    connection = 'scm:git:https://github.com/cytomine/registry-client.git'
+                    developerConnection = 'scm:git:https://github.com/cytomine/registry-client.git'
+                }
+
                 licenses {
                     license {
                         name = 'The Apache License, Version 2.0'
                         url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
                     }
                 }
+
                 developers {
                     developer {
                         id = 'ya-b'
@@ -81,12 +88,8 @@ publishing {
                         email = 'dev@cytomine.com'
                     }
                 }
-                scm {
-                    url = 'https://github.com/cytomine/registry-client.git'
-                    connection = 'scm:git:https://github.com/cytomine/registry-client.git'
-                    developerConnection = 'scm:git:https://github.com/cytomine/registry-client.git'
-                }
             }
+
 
         }
     }
@@ -96,14 +99,16 @@ publishing {
             def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
             url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
             credentials {
-                username System.getenv("SONATYPE_USERNAME")
-                password System.getenv("SONATYPE_PASSWORD")
+                username ossrhUsername
+                password ossrhPassword
             }
         }
     }
-    signing {
-        sign publishing.publications.mavenJava
-    }
+}
+
+
+signing {
+    sign publishing.publications.mavenJava
 }
 
 static def updateReadMeVersion(String ver) {
@@ -114,4 +119,7 @@ static def updateReadMeVersion(String ver) {
         file.write(newContent)
     }
 }
-updateReadMeVersion(version)
+
+tasks.register("updateReadMeVersion") {
+    updateReadMeVersion(version)
+}

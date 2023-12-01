@@ -50,7 +50,7 @@ make-version-name:
     - echo "signing.password=${OSSRH_GPG_KEY_PASSPHRASE}" >> $GRADLE_USER_HOME/gradle.properties
     # ??? - echo "signing.secretKeyRingFile=${GPG_KEYRING}" >> $GRADLE_USER_HOME/gradle.properties
     - echo "ossrhUsername=${OSSRH_USERNAME}" >> $GRADLE_USER_HOME/gradle.properties
-    - echo "ossrhUsername=${OSSRH_PASSWORD}" >> $GRADLE_USER_HOME/gradle.properties
+    - echo "ossrhPassword=${OSSRH_PASSWORD}" >> $GRADLE_USER_HOME/gradle.properties
 
 junit-tests:
   extends: .make-gradle-properties

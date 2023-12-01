@@ -45,11 +45,16 @@ make-version-name:
   before_script:
     - mkdir -p {$GRADLE_USER_HOME} 
     - touch ${GRADLE_USER_HOME}/gradle.properties
+    # MavenCentral
     - echo "signing.keyId=${OSSRH_GPG_KEY_ID}" >> ${GRADLE_USER_HOME}/gradle.properties
     - echo "signing.password=${OSSRH_GPG_KEY_PASSPHRASE}" >> ${GRADLE_USER_HOME}/gradle.properties
     - echo "signing.secretKeyRingFile=${GPG_KEYRING_PATH}" >> ${GRADLE_USER_HOME}/gradle.properties
     - echo "ossrhUsername=${OSSRH_USERNAME}" >> ${GRADLE_USER_HOME}/gradle.properties
     - echo "ossrhPassword=${OSSRH_PASSWORD}" >> ${GRADLE_USER_HOME}/gradle.properties
+    # Gitlab
+    - echo "gitLabPrivateToken=${CI_JOB_TOKEN}" >> ${GRADLE_USER_HOME}/gradle.properties
+    - echo "gitlabTokenName=Job-Token" >> ${GRADLE_USER_HOME}/gradle.properties
+    - echo "gitlabRepoUrl=${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/maven" >> ${GRADLE_USER_HOME}/gradle.properties
 
 junit-tests:
   extends: .make-gradle-properties

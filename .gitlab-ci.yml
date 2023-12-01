@@ -31,7 +31,7 @@ make-version-name:
   script:
     - | # If no tag has been pushed ($CI_COMMIT_TAG is empty), name it as SNAPSHOT
       if [ -z ${CI_COMMIT_TAG} ]; then
-        echo "CM_VERSION=${CI_COMMIT_SHORT_SHA}-$(date '+%d%m%Y-%H%M%S')-SNAPSHOT" > .env
+        echo "CM_VERSION=${CI_COMMIT_SHORT_SHA}-$(date '+%Y%m%d-%H%M%S')-SNAPSHOT" > .env
       else
         # Else use the tag
         echo "CM_VERSION=${CI_COMMIT_TAG}" > .env
@@ -42,7 +42,7 @@ make-version-name:
       dotenv: .env
 
 junit-tests:
-  stage: build
+  stage: test
   image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/gradle:8.5-jdk17-alpine
   script: 
     - gradle test
@@ -54,7 +54,7 @@ build-jar:
   stage: build
   image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/gradle:8.5-jdk17-alpine
   script: 
-    - sed -i -- "s/version 'x.x.x'/version '${CM_VERSION}'/g" gradle.build
+    - sed -i -- "s/version 'x.x.x'/version '${CM_VERSION}'/g" build.gradle
     - gradle clean build
   artifacts:
     when: on_success
@@ -65,5 +65,7 @@ build-jar:
 publish:
   stage: publish
   image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/gradle:8.5-jdk17-alpine
+  rules:
+    - $CI_COMMIT_TAG
   script:
     - echo "TODO"

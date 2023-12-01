@@ -1,0 +1,69 @@
+# Secrets should never be versioned.
+include:
+  - template: Security/Secret-Detection.gitlab-ci.yml
+
+stages:
+- prepare
+- test
+- build
+- publish
+
+
+default:
+  tags:
+    - docker
+
+cache:
+  paths:
+     - .gradle/wrapper
+     - .gradle/caches
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: never
+    - when: always
+
+make-version-name:
+  stage: prepare
+  # regex check does not work with /bin/sh because of parenthesis so we need /bin/bash here
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/bash:5.2.15-alpine3.16
+  script:
+    - | # If no tag has been pushed ($CI_COMMIT_TAG is empty), name it as SNAPSHOT
+      if [ -z ${CI_COMMIT_TAG} ]; then
+        echo "CM_VERSION=${CI_COMMIT_SHORT_SHA}-$(date '+%d%m%Y-%H%M%S')-SNAPSHOT" > .env
+      else
+        # Else use the tag
+        echo "CM_VERSION=${CI_COMMIT_TAG}" > .env
+      fi
+    - cat .env
+  artifacts:
+    reports:
+      dotenv: .env
+
+junit-tests:
+  stage: build
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/gradle:8.5-jdk17-alpine
+  script: 
+    - gradle test
+  artifacts:
+    reports:
+      junit: build/test-results/test/**/TEST-*.xml
+
+build-jar:
+  stage: build
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/gradle:8.5-jdk17-alpine
+  script: 
+    - sed -i -- "s/version 'x.x.x'/version '${CM_VERSION}'/g" gradle.build
+    - gradle clean build
+  artifacts:
+    when: on_success
+    expire_in: "30 days"
+    paths:
+      - build/libs/registry-client-*.jar
+
+publish:
+  stage: publish
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/gradle:8.5-jdk17-alpine
+  script:
+    - echo "TODO"

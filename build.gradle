@@ -5,8 +5,8 @@ plugins {
     id 'signing'
 }
 
-group 'com.cytomine'
-version '1.0.0'
+group 'be.cytomine'
+version 'x.x.x'
 
 sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17

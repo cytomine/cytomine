@@ -1,4 +1,4 @@
-package be.cytomine.registry.client.http;
+package com.cytomine.registry.client.http;
 
 public class HttpHeaders {
     public static final String ACCEPT = "Accept";

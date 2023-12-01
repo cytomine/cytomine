@@ -1,8 +1,8 @@
-package be.cytomine.registry.client.file;
+package com.cytomine.registry.client.file;
 
 
-import be.cytomine.registry.client.constant.Constants;
-import be.cytomine.registry.client.image.Blob;
+import com.cytomine.registry.client.constant.Constants;
+import com.cytomine.registry.client.image.Blob;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;

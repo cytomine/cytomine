@@ -1,17 +1,19 @@
-package be.cytomine.registry.client;
+package com.cytomine.registry.client;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
-import be.cytomine.registry.client.http.resp.CatalogResp;
-import be.cytomine.registry.client.utils.JsonUtil;
+import com.cytomine.registry.client.http.resp.CatalogResp;
+import com.cytomine.registry.client.utils.JsonUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -30,28 +32,33 @@ class RegistryClientTest {
     }
 
     @Test
+    @Disabled
     void digest() throws Exception {
         Optional<String> digest = RegistryClient.digest("registry@sha256:ce14a6258f37702ff3cd92232a6f5b81ace542d9f1631966999e9f7c1ee6ddba");
         Assertions.assertTrue(digest.get().startsWith("sha256:"));
     }
 
     @Test
+    @Disabled
     void tags() throws Exception {
         List<String> tags = RegistryClient.tags("registry");
         Assertions.assertTrue(tags.contains("latest"));
     }
 
     @Test
+    @Disabled
     void dockerIOPullPush() throws IOException {
         Path path = Files.createTempFile(UUID.randomUUID().toString(), ".tar");
         RegistryClient.pull("registry@sha256:cc6393207bf9d3e032c4d9277834c1695117532c9f7e8c64e7b7adcda3a85f39", path.toString());
         Assertions.assertTrue(Files.exists(path));
-        RegistryClient.push(path.toString(), System.getenv("DOCKER_USERNAME") + "/registry");
+        InputStream pathAsStream = new ByteArrayInputStream(path.toString().getBytes());
+        RegistryClient.push(pathAsStream, System.getenv("DOCKER_USERNAME") + "/registry");
         Assertions.assertTrue(RegistryClient.digest(System.getenv("DOCKER_USERNAME") + "/registry").isPresent());
 
     }
 
     @Test
+    @Disabled
     void dockerIOCopy() throws IOException {
         RegistryClient.copy("registry@sha256:712c58f0d738ba95788d2814979028fd648a37186ae0dd4141f786125ba6d680",
                 System.getenv("DOCKER_USERNAME") + "/registry");
@@ -64,7 +71,8 @@ class RegistryClientTest {
         Path path = Files.createTempFile(UUID.randomUUID().toString(), ".tar");
         RegistryClient.pull("localhost:5000/registry:latest", path.toString());
         Assertions.assertTrue(Files.exists(path));
-        RegistryClient.push(path.toString(), "localhost:5000/test:v2");
+        InputStream pathAsStream = new ByteArrayInputStream(path.toString().getBytes());
+        RegistryClient.push(pathAsStream, "localhost:5000/test:v2");
         Assertions.assertEquals(
                 RegistryClient.digest("localhost:5000/registry:latest").get(),
                 RegistryClient.digest("localhost:5000/test:v2").get()

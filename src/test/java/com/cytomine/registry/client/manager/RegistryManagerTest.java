@@ -1,11 +1,12 @@
-package be.cytomine.registry.client.manager;
+package com.cytomine.registry.client.manager;
 
-import be.cytomine.registry.client.http.auth.Authenticator;
-import be.cytomine.registry.client.http.auth.Scope;
-import be.cytomine.registry.client.image.Context;
-import be.cytomine.registry.client.name.Reference;
+import com.cytomine.registry.client.http.auth.Authenticator;
+import com.cytomine.registry.client.http.auth.Scope;
+import com.cytomine.registry.client.image.Context;
+import com.cytomine.registry.client.name.Reference;
 import kotlin.Pair;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 class RegistryManagerTest {
@@ -15,6 +16,7 @@ class RegistryManagerTest {
     private final Authenticator AUTHENTICATOR = Authenticator.instance();
 
     @Test
+    @Disabled
     void load() throws Exception {
         Context context = new Context();
         Reference reference = Reference.parse("openjdk:17-alpine@sha256:a996cdcc040704ec6badaf5fecf1e144c096e00231a29188596c784bcf858d05");

@@ -1,14 +1,14 @@
-package be.cytomine.registry.client.http;
+package com.cytomine.registry.client.http;
 
-import be.cytomine.registry.client.exception.HttpCodeErrorException;
-import be.cytomine.registry.client.exception.RegistryException;
-import be.cytomine.registry.client.http.auth.Authenticator;
-import be.cytomine.registry.client.http.resp.CatalogResp;
-import be.cytomine.registry.client.http.resp.TagsResp;
-import be.cytomine.registry.client.image.ImageMediaType;
-import be.cytomine.registry.client.image.registry.ManifestHttp;
-import be.cytomine.registry.client.name.Reference;
-import be.cytomine.registry.client.utils.JsonUtil;
+import com.cytomine.registry.client.exception.HttpCodeErrorException;
+import com.cytomine.registry.client.exception.RegistryException;
+import com.cytomine.registry.client.http.auth.Authenticator;
+import com.cytomine.registry.client.http.resp.CatalogResp;
+import com.cytomine.registry.client.http.resp.TagsResp;
+import com.cytomine.registry.client.image.ImageMediaType;
+import com.cytomine.registry.client.image.registry.ManifestHttp;
+import com.cytomine.registry.client.name.Reference;
+import com.cytomine.registry.client.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Headers;
 import okhttp3.MediaType;

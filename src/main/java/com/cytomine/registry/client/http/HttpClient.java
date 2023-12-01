@@ -1,6 +1,6 @@
-package be.cytomine.registry.client.http;
+package com.cytomine.registry.client.http;
 
-import be.cytomine.registry.client.constant.Constants;
+import com.cytomine.registry.client.constant.Constants;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 

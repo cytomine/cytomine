@@ -1,4 +1,4 @@
-package be.cytomine.registry.client.http.auth;
+package com.cytomine.registry.client.http.auth;
 
 public enum Scope {
     NONE(""),

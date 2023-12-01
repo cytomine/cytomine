@@ -1,4 +1,4 @@
-package be.cytomine.registry.client.constant;
+package com.cytomine.registry.client.constant;
 
 public class FileConstant {
     public static final String MANIFEST = "manifest.json";

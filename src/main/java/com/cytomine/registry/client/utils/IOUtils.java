@@ -1,4 +1,4 @@
-package be.cytomine.registry.client.utils;
+package com.cytomine.registry.client.utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;

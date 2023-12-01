@@ -1,4 +1,4 @@
-package be.cytomine.registry.client.file;
+package com.cytomine.registry.client.file;
 
 import java.io.IOException;
 import java.io.OutputStream;

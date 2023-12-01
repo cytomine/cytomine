@@ -1,4 +1,4 @@
-package be.cytomine.registry.client.constant;
+package com.cytomine.registry.client.constant;
 
 public class Constants {
     public static final Integer SCHEMA_V_2 = 2;

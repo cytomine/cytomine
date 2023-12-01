@@ -1,17 +1,15 @@
-package be.cytomine.registry.client;
+package com.cytomine.registry.client;
 
-import be.cytomine.registry.client.http.auth.Authenticator;
-import be.cytomine.registry.client.http.auth.Credential;
-import be.cytomine.registry.client.http.auth.Scope;
-import be.cytomine.registry.client.http.resp.CatalogResp;
-import be.cytomine.registry.client.image.Context;
-import be.cytomine.registry.client.manager.FileManager;
-import be.cytomine.registry.client.manager.RegistryManager;
-import be.cytomine.registry.client.name.Reference;
-import jakarta.persistence.criteria.CriteriaBuilder;
+import com.cytomine.registry.client.http.auth.Authenticator;
+import com.cytomine.registry.client.http.auth.Credential;
+import com.cytomine.registry.client.http.auth.Scope;
+import com.cytomine.registry.client.http.resp.CatalogResp;
+import com.cytomine.registry.client.image.Context;
+import com.cytomine.registry.client.manager.FileManager;
+import com.cytomine.registry.client.manager.RegistryManager;
+import com.cytomine.registry.client.name.Reference;
 import kotlin.Pair;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.io.*;
 import java.nio.file.Files;

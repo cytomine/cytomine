@@ -1,9 +1,9 @@
-package be.cytomine.registry.client.name;
+package com.cytomine.registry.client.name;
 
 
-import be.cytomine.registry.client.constant.Constants;
-import be.cytomine.registry.client.http.HttpClient;
-import be.cytomine.registry.client.manager.RegistryManager;
+import com.cytomine.registry.client.constant.Constants;
+import com.cytomine.registry.client.http.HttpClient;
+import com.cytomine.registry.client.manager.RegistryManager;
 import lombok.Data;
 
 import java.util.ArrayList;

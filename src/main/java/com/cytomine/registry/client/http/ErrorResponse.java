@@ -1,4 +1,4 @@
-package be.cytomine.registry.client.http;
+package com.cytomine.registry.client.http;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

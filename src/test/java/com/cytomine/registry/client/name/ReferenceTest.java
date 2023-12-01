@@ -1,6 +1,6 @@
-package be.cytomine.registry.client.name;
+package com.cytomine.registry.client.name;
 
-import be.cytomine.registry.client.constant.Constants;
+import com.cytomine.registry.client.constant.Constants;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

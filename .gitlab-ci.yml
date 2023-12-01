@@ -10,14 +10,12 @@ stages:
 
 variables:
   GRADLE_USER_HOME: /cache/.gradle
+  GRADLE_VERSION: 7.5.1
+  GRADLE_IMAGE: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/gradle:${GRADLE_VERSION}-jdk17-alpine
 
 default:
   tags:
     - docker
-
-cache:
-  paths:
-    - $GRADLE_USER_HOME  # will store gradle properties
 
 workflow:
   rules:
@@ -55,7 +53,7 @@ make-version-name:
 junit-tests:
   extends: .make-gradle-properties
   stage: test
-  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/gradle:8.5-jdk17-alpine
+  image: ${GRADLE_IMAGE}
   script: 
     - gradle test
   artifacts:
@@ -65,7 +63,7 @@ junit-tests:
 build-jar:
   extends: .make-gradle-properties
   stage: build
-  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/gradle:8.5-jdk17-alpine
+  image: ${GRADLE_IMAGE}
   script: 
     - sed -i -- "s/version 'x.x.x'/version '${CM_VERSION}'/g" build.gradle
     - gradle clean build
@@ -78,8 +76,8 @@ build-jar:
 publish:
   extends: .make-gradle-properties
   stage: publish
-  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/gradle:8.5-jdk17-alpine
+  image: ${GRADLE_IMAGE}
   rules:
-    - if: $CI_COMMIT_TAG
+    - if: ${CI_COMMIT_TAG}
   script:
     - echo "TODO"

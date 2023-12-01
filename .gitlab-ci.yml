@@ -44,12 +44,12 @@ make-version-name:
 
 .gradle-properties-before-script:
   before_script:
-    - touch gradle.properties
-    - echo "signing.keyId=${OSSRH_GPG_KEY_ID}" >> gradle.properties
-    - echo "signing.password=${OSSRH_GPG_KEY_PASSPHRASE}" >> gradle.properties
-    # ??? - echo "signing.secretKeyRingFile=${GPG_KEYRING}" >> gradle.properties
-    - echo "ossrhUsername=${OSSRH_USERNAME}" >> gradle.properties
-    - echo "ossrhUsername=${OSSRH_PASSWORD}" >> gradle.properties
+    - touch $GRADLE_USER_HOME/gradle.properties
+    - echo "signing.keyId=${OSSRH_GPG_KEY_ID}" >> $GRADLE_USER_HOME/gradle.properties
+    - echo "signing.password=${OSSRH_GPG_KEY_PASSPHRASE}" >> $GRADLE_USER_HOME/gradle.properties
+    # ??? - echo "signing.secretKeyRingFile=${GPG_KEYRING}" >> $GRADLE_USER_HOME/gradle.properties
+    - echo "ossrhUsername=${OSSRH_USERNAME}" >> $GRADLE_USER_HOME/gradle.properties
+    - echo "ossrhUsername=${OSSRH_PASSWORD}" >> $GRADLE_USER_HOME/gradle.properties
 
 junit-tests:
   extends: .gradle-properties-before-script

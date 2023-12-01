@@ -42,9 +42,8 @@ make-version-name:
     reports:
       dotenv: .env
 
-make-gradle-properties:
-  stage: prepare
-  script:
+.make-gradle-properties:
+  before_script:
     - mkdir -p $GRADLE_USER_HOME 
     - touch $GRADLE_USER_HOME/gradle.properties
     - echo "signing.keyId=${OSSRH_GPG_KEY_ID}" >> $GRADLE_USER_HOME/gradle.properties
@@ -54,8 +53,7 @@ make-gradle-properties:
     - echo "ossrhUsername=${OSSRH_PASSWORD}" >> $GRADLE_USER_HOME/gradle.properties
 
 junit-tests:
-  needs:
-    - job: make-gradle-properties
+  extends: .make-gradle-properties
   stage: test
   image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/gradle:8.5-jdk17-alpine
   script: 
@@ -65,8 +63,7 @@ junit-tests:
       junit: build/test-results/test/**/TEST-*.xml
 
 build-jar:
-  needs:
-    - job: make-gradle-properties
+  extends: .make-gradle-properties
   stage: build
   image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/gradle:8.5-jdk17-alpine
   script: 
@@ -79,8 +76,7 @@ build-jar:
       - build/libs/registry-client-*.jar
 
 publish:
-  needs:
-    - job: make-gradle-properties
+  extends: .make-gradle-properties
   stage: publish
   image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/gradle:8.5-jdk17-alpine
   rules:

@@ -9,7 +9,8 @@ stages:
 - publish
 
 variables:
-  GPG_KEYRING_PATH: /gpg/keyring
+  GPG_KEYRING_DIR: /gpg
+  GPG_KEYRING_PATH: ${GPG_KEYRING_DIR}/keyring
   GRADLE_USER_HOME: /cache/.gradle
   GRADLE_VERSION: 7.5.1
   GRADLE_IMAGE: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/gradle:${GRADLE_VERSION}-jdk17-alpine
@@ -44,6 +45,7 @@ make-version-name:
 .make-gradle-properties:
   before_script:
     - mkdir -p ${GRADLE_USER_HOME} 
+    - mkdir -p ${GPG_KEYRING_DIR}
     - touch ${GRADLE_USER_HOME}/gradle.properties
     # MavenCentral
     - echo "signing.keyId=${OSSRH_GPG_KEY_ID}" >> ${GRADLE_USER_HOME}/gradle.properties

@@ -48,8 +48,8 @@ make-version-name:
     - mkdir -p ${GPG_KEYRING_DIR}
     - touch ${GRADLE_USER_HOME}/gradle.properties
     # MavenCentral
-    - export GPG_KEY_CODE=$(echo -n "${OSSRH_GPG_KEY_ID}" | tail -c 8)
-    - echo "signing.keyId=${GPG_KEY_CODE}" >> ${GRADLE_USER_HOME}/gradle.properties
+    - export GPG_KEY_ID=$(echo -n "${OSSRH_GPG_KEY_CODE}" | tail -c 8)
+    - echo "signing.keyId=${GPG_KEY_ID}" >> ${GRADLE_USER_HOME}/gradle.properties
     - echo "signing.password=${OSSRH_GPG_KEY_PASSPHRASE}" >> ${GRADLE_USER_HOME}/gradle.properties
     - echo "signing.secretKeyRingFile=${GPG_KEYRING_PATH}" >> ${GRADLE_USER_HOME}/gradle.properties
     - echo "ossrhUsername=${OSSRH_USERNAME}" >> ${GRADLE_USER_HOME}/gradle.properties

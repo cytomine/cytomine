@@ -43,7 +43,7 @@ make-version-name:
 
 .make-gradle-properties:
   before_script:
-    - mkdir -p {$GRADLE_USER_HOME} 
+    - mkdir -p ${GRADLE_USER_HOME} 
     - touch ${GRADLE_USER_HOME}/gradle.properties
     # MavenCentral
     - echo "signing.keyId=${OSSRH_GPG_KEY_ID}" >> ${GRADLE_USER_HOME}/gradle.properties

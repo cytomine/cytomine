@@ -94,10 +94,10 @@ publish:
   script:
     - apk update && apk add gpg gpg-agent
     - gpg --import ${OSSRH_GPG_PUBKEY}
-    - gpg --pinentry-mode loopback --passphrase ${OSSRH_GPG_PASSPHRASE} --import ${OSSRH_GPG_PRIVKEY}
-    - gpg --pinentry-mode loopback --passphrase ${OSSRH_GPG_PASSPHRASE} --export-secret-key ${OSSRH_GPG_KEY_CODE} > ${GPG_KEYRING_PATH}
+    - gpg --pinentry-mode loopback --passphrase ${OSSRH_GPG_KEY_PASSPHRASE} --import ${OSSRH_GPG_PRIVKEY}
+    - gpg --pinentry-mode loopback --passphrase ${OSSRH_GPG_KEY_PASSPHRASE} --export-secret-key ${OSSRH_GPG_KEY_CODE} > ${GPG_KEYRING_PATH}
     - sed -i -- "s/version 'x.x.x'/version '${CM_VERSION}'/g" build.gradle
     - gradle publishToComCytomine
     - gradle findComCytomineStagingRepository closeComCytomineStagingRepository
     - gradle findComCytomineStagingRepository releaseComCytomineStagingRepository
-    
+

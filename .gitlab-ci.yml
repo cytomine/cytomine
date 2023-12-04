@@ -57,6 +57,7 @@ make-version-name:
     - echo "gitLabPrivateToken=${CI_JOB_TOKEN}" >> ${GRADLE_USER_HOME}/gradle.properties
     - echo "gitlabTokenName=Job-Token" >> ${GRADLE_USER_HOME}/gradle.properties
     - echo "gitlabRepoUrl=${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/maven" >> ${GRADLE_USER_HOME}/gradle.properties
+    - cat ${GRADLE_USER_HOME}/gradle.properties
 
 junit-tests:
   extends: .make-gradle-properties

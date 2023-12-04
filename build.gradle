@@ -7,7 +7,7 @@ plugins {
 }
 
 group 'com.cytomine'
-version '1.1.1'
+version 'x.x.x'
 
 sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17

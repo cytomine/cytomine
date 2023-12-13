@@ -1,4 +1,4 @@
-package be.cytomine.registry.client.http.auth;
+package com.cytomine.registry.client.http.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

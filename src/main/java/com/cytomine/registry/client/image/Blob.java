@@ -1,4 +1,4 @@
-package be.cytomine.registry.client.image;
+package com.cytomine.registry.client.image;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

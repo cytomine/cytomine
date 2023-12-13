@@ -1,4 +1,4 @@
-package be.cytomine.registry.client.utils;
+package com.cytomine.registry.client.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

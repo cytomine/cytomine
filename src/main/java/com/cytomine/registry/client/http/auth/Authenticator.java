@@ -1,11 +1,14 @@
-package be.cytomine.registry.client.http.auth;
+package com.cytomine.registry.client.http.auth;
 
 
-import be.cytomine.registry.client.exception.RegistryException;
-import be.cytomine.registry.client.http.HttpClient;
-import be.cytomine.registry.client.http.HttpHeaders;
-import be.cytomine.registry.client.name.Reference;
-import be.cytomine.registry.client.utils.JsonUtil;
+import com.cytomine.registry.client.exception.RegistryException;
+import com.cytomine.registry.client.http.auth.Credential;
+import com.cytomine.registry.client.http.auth.Scope;
+import com.cytomine.registry.client.http.HttpClient;
+import com.cytomine.registry.client.http.HttpHeaders;
+import com.cytomine.registry.client.name.Reference;
+import com.cytomine.registry.client.utils.JsonUtil;
+import com.cytomine.registry.client.http.auth.DockerAuthResp;
 import kotlin.Pair;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

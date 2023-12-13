@@ -114,4 +114,12 @@ static def updateReadMeVersion(String ver) {
         file.write(newContent)
     }
 }
+sourceSets {
+    test {
+        resources {
+            srcDirs = ['src/test/resources'] // Add additional resource directories
+        }
+    }
+}
+
 updateReadMeVersion(version)

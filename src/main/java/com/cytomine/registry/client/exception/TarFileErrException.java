@@ -1,4 +1,4 @@
-package be.cytomine.registry.client.exception;
+package com.cytomine.registry.client.exception;
 
 public class TarFileErrException extends RegistryException {
 

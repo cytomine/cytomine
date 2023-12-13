@@ -1,10 +1,10 @@
-package be.cytomine.registry.client.image;
+package com.cytomine.registry.client.image;
 
 
-import be.cytomine.registry.client.constant.Constants;
-import be.cytomine.registry.client.image.registry.ManifestHttp;
-import be.cytomine.registry.client.image.tar.ManifestFile;
-import be.cytomine.registry.client.name.Reference;
+import com.cytomine.registry.client.constant.Constants;
+import com.cytomine.registry.client.image.registry.ManifestHttp;
+import com.cytomine.registry.client.image.tar.ManifestFile;
+import com.cytomine.registry.client.name.Reference;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

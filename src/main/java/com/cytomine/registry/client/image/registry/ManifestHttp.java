@@ -1,6 +1,6 @@
-package be.cytomine.registry.client.image.registry;
+package com.cytomine.registry.client.image.registry;
 
-import be.cytomine.registry.client.image.ImageMediaType;
+import com.cytomine.registry.client.image.ImageMediaType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

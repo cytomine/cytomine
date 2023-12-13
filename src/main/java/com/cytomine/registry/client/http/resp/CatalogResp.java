@@ -1,4 +1,4 @@
-package be.cytomine.registry.client.http.resp;
+package com.cytomine.registry.client.http.resp;
 
 import lombok.Data;
 

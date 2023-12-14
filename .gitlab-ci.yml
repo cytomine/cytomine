@@ -29,12 +29,7 @@ make-version-name:
   stage: prepare
   # regex check does not work with /bin/sh because of parenthesis so we need /bin/bash here
   image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/bash:5.2.15-alpine3.16
-  services:
-    - alias: registry
-      name: registry:latest
-  variables:
-    REGISTRY_STORAGE_DELETE_ENABLED: 'true'
-    REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: '/data'
+
 
 
   script:
@@ -72,6 +67,12 @@ junit-tests:
   extends: .make-gradle-properties
   stage: test
   image: ${GRADLE_IMAGE}
+  services:
+    - alias: registry
+      name: registry:latest
+  variables:
+    REGISTRY_STORAGE_DELETE_ENABLED: 'true'
+    REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: '/data'
   script: 
     - gradle test
   artifacts:

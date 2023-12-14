@@ -32,9 +32,9 @@ make-version-name:
   services:
     - alias: registry
       name: registry:latest
-      variables:
-        REGISTRY_STORAGE_DELETE_ENABLED: 'true'
-        REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: '/data'
+  variables:
+    REGISTRY_STORAGE_DELETE_ENABLED: 'true'
+    REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: '/data'
 
 
   script:

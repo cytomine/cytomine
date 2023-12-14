@@ -1,0 +1,107 @@
+# Secrets should never be versioned.
+include:
+  - template: Security/Secret-Detection.gitlab-ci.yml
+
+stages:
+- prepare
+- test
+- build
+- publish
+
+variables:
+  GPG_KEYRING_DIR: /gpg
+  GPG_KEYRING_PATH: ${GPG_KEYRING_DIR}/keyring
+  GRADLE_USER_HOME: /.gradle
+  GRADLE_VERSION: 7.5.1
+  GRADLE_IMAGE: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/gradle:${GRADLE_VERSION}-jdk17-alpine
+
+default:
+  tags:
+    - docker
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: never
+    - when: always
+
+make-version-name:
+  stage: prepare
+  # regex check does not work with /bin/sh because of parenthesis so we need /bin/bash here
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/bash:5.2.15-alpine3.16
+  script:
+    - | # If no tag has been pushed ($CI_COMMIT_TAG is empty), name it as SNAPSHOT
+      if [ -z ${CI_COMMIT_TAG} ]; then
+        echo "CM_VERSION=${CI_COMMIT_SHORT_SHA}-$(date '+%Y%m%d-%H%M%S')-SNAPSHOT" > .env
+      else
+        # Else use the tag
+        echo "CM_VERSION=${CI_COMMIT_TAG}" > .env
+      fi
+    - cat .env
+  artifacts:
+    reports:
+      dotenv: .env
+
+.make-gradle-properties:
+  before_script:
+    - mkdir -p ${GRADLE_USER_HOME} 
+    - mkdir -p ${GPG_KEYRING_DIR}
+    - touch ${GRADLE_USER_HOME}/gradle.properties
+    # MavenCentral
+    - export GPG_KEY_ID="$(echo ${OSSRH_GPG_KEY_CODE} | tr -d '[:space:]\n' | rev | cut -c 1-8 | rev)"
+    - echo "signing.keyId=${GPG_KEY_ID}" >> ${GRADLE_USER_HOME}/gradle.properties
+    - echo "signing.password=${OSSRH_GPG_KEY_PASSPHRASE}" >> ${GRADLE_USER_HOME}/gradle.properties
+    - echo "signing.secretKeyRingFile=${GPG_KEYRING_PATH}" >> ${GRADLE_USER_HOME}/gradle.properties
+    - echo "ossrhUsername=${OSSRH_USERNAME}" >> ${GRADLE_USER_HOME}/gradle.properties
+    - echo "ossrhPassword=${OSSRH_PASSWORD}" >> ${GRADLE_USER_HOME}/gradle.properties
+    # Gitlab
+    - echo "gitLabPrivateToken=${CI_JOB_TOKEN}" >> ${GRADLE_USER_HOME}/gradle.properties
+    - echo "gitlabTokenName=Job-Token" >> ${GRADLE_USER_HOME}/gradle.properties
+    - echo "gitlabRepoUrl=${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/maven" >> ${GRADLE_USER_HOME}/gradle.properties
+    - cat ${GRADLE_USER_HOME}/gradle.properties
+
+junit-tests:
+  extends: .make-gradle-properties
+  stage: test
+  image: ${GRADLE_IMAGE}
+  script: 
+    - gradle test
+  artifacts:
+    reports:
+      junit: build/test-results/test/**/TEST-*.xml
+
+build-jar:
+  extends: .make-gradle-properties
+  stage: build
+  image: ${GRADLE_IMAGE}
+  needs:
+    - job: make-version-name
+      artifacts: true
+  script: 
+    - sed -i -- "s/version 'x.x.x'/version '${CM_VERSION}'/g" build.gradle
+    - gradle clean build
+  artifacts:
+    when: on_success
+    expire_in: "30 days"
+    paths:
+      - build/libs/registry-client-*.jar
+
+publish:
+  extends: .make-gradle-properties
+  stage: publish
+  image: ${GRADLE_IMAGE}
+  needs:
+    - job: make-version-name
+      artifacts: true
+  rules:
+    - if: $CI_COMMIT_TAG
+  script:
+    - apk update && apk add gpg gpg-agent
+    - gpg --import ${OSSRH_GPG_PUBKEY}
+    - gpg --pinentry-mode loopback --passphrase ${OSSRH_GPG_KEY_PASSPHRASE} --import ${OSSRH_GPG_PRIVKEY}
+    - gpg --pinentry-mode loopback --passphrase ${OSSRH_GPG_KEY_PASSPHRASE} --export-secret-key ${OSSRH_GPG_KEY_CODE} > ${GPG_KEYRING_PATH}
+    - sed -i -- "s/version 'x.x.x'/version '${CM_VERSION}'/g" build.gradle
+    - gradle publishToComCytomine
+    - gradle findComCytomineStagingRepository closeComCytomineStagingRepository
+    - gradle findComCytomineStagingRepository releaseComCytomineStagingRepository
+

@@ -73,7 +73,8 @@ junit-tests:
   variables:
     REGISTRY_STORAGE_DELETE_ENABLED: 'true'
     REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: '/data'
-  script: 
+  script:
+    - docker run -d --name registry -p 5000:5000 registry:latest
     - gradle test
   artifacts:
     reports:

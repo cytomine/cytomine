@@ -37,7 +37,7 @@ class RegistryManagerTest {
         Context context = new Context();
         Reference reference = Reference.prepareReference("postomine:1.3");
         REGISTRY_OPERATE.load(context, reference);
-        Assertions.assertEquals("sha256:d3609e2c4880d389bcb6b14d112b2040200f4947e44fec5c01f2ae79bee26e6f", context.getConfig().getDigest());
-        Assertions.assertEquals(7, context.getLayers().size());
+        Assertions.assertEquals("sha256:96b4c4806b2878c9e51a8036106b374834f28067a61331c47924a083054a0059", context.getConfig().getDigest());
+        Assertions.assertEquals(2, context.getLayers().size());
     }
 }

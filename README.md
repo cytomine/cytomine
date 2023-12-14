@@ -27,6 +27,6 @@ maven
 <dependency>
     <groupId>com.cytomine</groupId>
     <artifactId>registry-client</artifactId>
-    <version>1.1.2</version>
+    <version>1.0.0</version>
 </dependency>
 ```

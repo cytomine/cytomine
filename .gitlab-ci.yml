@@ -32,7 +32,7 @@ make-version-name:
   services:
     - alias: registry
       name: registry:latest
-      environment:
+      variables:
         REGISTRY_STORAGE_DELETE_ENABLED: true
         REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: /data
 

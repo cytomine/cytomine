@@ -126,6 +126,7 @@ public class FileManager {
         config.setName(config.getDigest().replace(Constants.SHA256_PREFIX, "") + FileConstant.EXTENSION_TAR_GZ);
         layers.forEach(layer ->
                 layer.setName(layer.getDigest().replace(Constants.SHA256_PREFIX, "") + FileConstant.EXTENSION_TAR_GZ));
+
         return new Context(Reference.parse(manifestFiles.get(0).getRepoTags().get(0)), config, layers);
     }
 

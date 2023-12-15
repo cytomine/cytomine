@@ -1,30 +1,34 @@
+import java.nio.charset.StandardCharsets
+import java.util.stream.Collectors
+
 plugins {
     id 'java-library'
     id 'io.freefair.lombok' version '6.6.1'
     id 'maven-publish'
     id 'signing'
-    id "io.github.gradle-nexus.publish-plugin" version "2.0.0-rc-1"
 }
 
 group 'com.cytomine'
-version 'x.x.x'
+version '1.0.0'
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    implementation 'net.jodah:expiringmap:0.5.11'
+    implementation 'net.jodah:expiringmap:0.5.10'
     implementation 'com.google.code.gson:gson:2.10.1'
-    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.10.0'
     implementation 'org.apache.commons:commons-compress:1.25.0'
     implementation 'org.slf4j:slf4j-api:2.0.9'
-    testImplementation 'ch.qos.logback:logback-classic:1.4.13'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.1'
+    testImplementation 'ch.qos.logback:logback-classic:1.4.14'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 }
 
 test {
@@ -39,14 +43,18 @@ java {
 javadoc {
     if(JavaVersion.current().isJava9Compatible()) {
         options.addBooleanOption('html5', true)
+        options.addStringOption('Xdoclint:none', '-quiet')
+        options.addBooleanOption('quiet', true)
+        options.addBooleanOption('warnings', false)
     }
     options.encoding = "UTF-8"
+    failOnError = false
 }
 
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifactId = "registry-client"
+            artifactId project.name
             from components.java
             versionMapping {
                 usage('java-api') {
@@ -56,27 +64,16 @@ publishing {
                     fromResolutionResult()
                 }
             }
-
             pom {
                 name = 'registry-client'
-                packaging = 'jar'
-                // optionally artifactId can be defined here
-                description = 'A Java client for connecting to the API of a Docker registry v2.'
-                url = 'http://github.com/cytomine/registry-client'
-
-                scm {
-                    url = 'https://github.com/cytomine/registry-client.git'
-                    connection = 'scm:git:https://github.com/cytomine/registry-client.git'
-                    developerConnection = 'scm:git:https://github.com/cytomine/registry-client.git'
-                }
-
+                description = 'A java client for docker registry api v2'
+                url = 'https://github.com/cytomine/registry-client.git'
                 licenses {
                     license {
                         name = 'The Apache License, Version 2.0'
                         url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
                     }
                 }
-
                 developers {
                     developer {
                         id = 'ya-b'
@@ -89,38 +86,29 @@ publishing {
                         email = 'dev@cytomine.com'
                     }
                 }
+                scm {
+                    url = 'https://github.com/cytomine/registry-client.git'
+                    connection = 'scm:git:https://github.com/cytomine/registry-client.git'
+                    developerConnection = 'scm:git:https://github.com/cytomine/registry-client.git'
+                }
+            }
+
+        }
+    }
+    repositories {
+        maven {
+            def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            credentials {
+                username System.getenv("SONATYPE_USERNAME")
+                password System.getenv("SONATYPE_PASSWORD")
             }
         }
     }
-
-//    repositories {
-//        maven {
-//            url gitlabRepoUrl
-//            name "GitLab"
-//            credentials(HttpHeaderCredentials) {
-//                name = gitlabTokenName
-//                value = gitLabPrivateToken
-//            }
-//            authentication {
-//                header(HttpHeaderAuthentication)
-//            }
-//        }
-//    }
-}
-
-nexusPublishing {
-    repositories {
-        create("comcytomine") {
-            nexusUrl = uri("https://s01.oss.sonatype.org/service/local/")
-            snapshotRepositoryUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-            username = ossrhUsername
-            password = ossrhPassword
-        }
+    signing {
+        sign publishing.publications.mavenJava
     }
-}
-
-signing {
-    sign publishing.publications.mavenJava
 }
 
 static def updateReadMeVersion(String ver) {
@@ -131,7 +119,17 @@ static def updateReadMeVersion(String ver) {
         file.write(newContent)
     }
 }
+sourceSets {
+    test {
+        resources {
+            srcDirs = ['src/test/resources'] // Add additional resource directories
+        }
+    }
+}
 
-// tasks.register("updateReadMeVersion") {
-//     updateReadMeVersion(version)
-// }
+//signing {
+//    useGpgCmd()
+//    sign publishing.publications.mavenJava
+//}
+
+updateReadMeVersion(version)

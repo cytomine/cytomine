@@ -1,5 +1,6 @@
 package com.cytomine.registry.client.http;
 
+
 import com.cytomine.registry.client.exception.HttpCodeErrorException;
 import com.cytomine.registry.client.exception.RegistryException;
 import com.cytomine.registry.client.http.auth.Authenticator;

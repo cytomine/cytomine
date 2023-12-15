@@ -1,6 +1,7 @@
 package com.cytomine.registry.client.manager;
 
 
+import com.cytomine.registry.client.config.Configurer;
 import com.cytomine.registry.client.constant.Constants;
 import com.cytomine.registry.client.constant.FileConstant;
 import com.cytomine.registry.client.exception.RegistryException;
@@ -24,6 +25,7 @@ import java.util.Optional;
 public class RegistryManager {
 
     private final RegistryApi api = new RegistryApi();
+    private final Configurer configurer = Configurer.instance();
 
     public void load(Context context, Reference reference) throws IOException {
         context.setReference(reference);
@@ -103,6 +105,7 @@ public class RegistryManager {
     }
 
     public String getSchema(String endpoint) {
+       // TODO : replace this with the config coming from the appengine registry handler
         try {
             api.base(String.format("%s://%s", Constants.SCHEMA_HTTPS, endpoint));
             return Constants.SCHEMA_HTTPS;
@@ -121,9 +124,12 @@ public class RegistryManager {
         throw new RuntimeException("No response from the registry Server.");
     }
 
+    public String getSchema() {
+        return Configurer.schema();
+    }
 
-    public int getVersion() throws IOException {
-        return api.base(String.format("%s://%s", Constants.SCHEMA_HTTP, "localhost:5000/v2/"));
+    public int getVersion(String endpoint) throws IOException {
+        return api.base(String.format("%s://%s", Constants.SCHEMA_HTTP, endpoint));
 
     }
 }

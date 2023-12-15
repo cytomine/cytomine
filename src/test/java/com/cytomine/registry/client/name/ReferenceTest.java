@@ -13,7 +13,7 @@ class ReferenceTest {
     {
         Configurer configurer = Configurer.instance();
         Configurer.schema("http");
-        Configurer.host("localhost");
+        Configurer.host("registry");
         Configurer.port("5000");
     }
 

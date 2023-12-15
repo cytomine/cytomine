@@ -80,7 +80,7 @@ class RegistryClientTest {
     @Test
     void registryCatalog() {
         Assertions.assertDoesNotThrow(() -> {
-            CatalogResp catalogResp = RegistryClient.catalog("http://localhost:5000", 10, "test");
+            CatalogResp catalogResp = RegistryClient.catalog("http://registry:5000", 10, "test");
             System.out.println(JsonUtil.toJson(catalogResp));
             Assertions.assertNotNull(catalogResp);
         });

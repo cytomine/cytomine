@@ -26,7 +26,7 @@ class RegistryClientTest {
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
         Logger logger = loggerContext.getLogger("ROOT");
         logger.setLevel(Level.DEBUG);
-        RegistryClient.config("http" , "localhost" , "5000");
+        RegistryClient.config("http" , "registry" , "5000");
         ClassLoader classLoader = RegistryClientTest.class.getClassLoader();
         RegistryClient.push(classLoader.getResourceAsStream("postomine.tar"), "postomine:1.3");
     }

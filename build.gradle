@@ -44,10 +44,8 @@ javadoc {
     if(JavaVersion.current().isJava9Compatible()) {
         options.addBooleanOption('html5', true)
         options.addStringOption('Xdoclint:none', '-quiet')
-        options.addStringOption('ignore', 'missing')
         options.addBooleanOption('quiet', true)
         options.addBooleanOption('warnings', false)
-        options.addBooleanOption('hide', true)
     }
     options.encoding = "UTF-8"
     failOnError = false

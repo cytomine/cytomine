@@ -2,8 +2,6 @@
 
 ### Usage：
 ```java
-RegistryClient.authBasic("localhost:5000", "admin", "123456");
-
 RegistryClient.config("http" , "localhost" , "5000");
 
 RegistryClient.authenticate("user" , "password");
@@ -27,6 +25,6 @@ maven
 <dependency>
     <groupId>com.cytomine</groupId>
     <artifactId>registry-client</artifactId>
-    <version>1.0.0</version>
+    <version>2.0.0</version>
 </dependency>
 ```

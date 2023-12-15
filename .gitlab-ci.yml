@@ -86,6 +86,12 @@ build-jar:
   needs:
     - job: make-version-name
       artifacts: true
+  services:
+    - alias: registry
+      name: registry:latest
+  variables:
+    REGISTRY_STORAGE_DELETE_ENABLED: 'true'
+    REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: '/data'
   script: 
     - sed -i -- "s/version 'x.x.x'/version '${CM_VERSION}'/g" build.gradle
     - gradle clean build

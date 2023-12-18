@@ -93,7 +93,7 @@ build-jar:
     REGISTRY_STORAGE_DELETE_ENABLED: 'true'
     REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: '/data'
   script: 
-    - sed -i -- "s/version 'x.x.x'/version '${CM_VERSION}'/g" build.gradle
+    - sed -i -- "s/version '0.0.0'/version '${CM_VERSION}'/g" build.gradle
     - gradle clean build
   artifacts:
     when: on_success
@@ -115,7 +115,7 @@ publish:
     - gpg --import ${OSSRH_GPG_PUBKEY}
     - gpg --pinentry-mode loopback --passphrase ${OSSRH_GPG_KEY_PASSPHRASE} --import ${OSSRH_GPG_PRIVKEY}
     - gpg --pinentry-mode loopback --passphrase ${OSSRH_GPG_KEY_PASSPHRASE} --export-secret-key ${OSSRH_GPG_KEY_CODE} > ${GPG_KEYRING_PATH}
-    - sed -i -- "s/version 'x.x.x'/version '${CM_VERSION}'/g" build.gradle
+    - sed -i -- "s/version '0.0.0'/version '${CM_VERSION}'/g" build.gradle
     - gradle publishToComCytomine
     - gradle findComCytomineStagingRepository closeComCytomineStagingRepository
     - gradle findComCytomineStagingRepository releaseComCytomineStagingRepository

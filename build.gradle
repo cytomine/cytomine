@@ -1,15 +1,13 @@
-import java.nio.charset.StandardCharsets
-import java.util.stream.Collectors
-
 plugins {
     id 'java-library'
     id 'io.freefair.lombok' version '6.6.1'
     id 'maven-publish'
     id 'signing'
+    id "io.github.gradle-nexus.publish-plugin" version "2.0.0-rc-1"
 }
 
 group 'com.cytomine'
-version '1.0.0'
+version '0.0.0'  // do NOT change this, this will be automatically changed by CI
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
@@ -54,7 +52,7 @@ javadoc {
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifactId project.name
+            artifactId = "registry-client"
             from components.java
             versionMapping {
                 usage('java-api') {
@@ -64,16 +62,27 @@ publishing {
                     fromResolutionResult()
                 }
             }
+
             pom {
                 name = 'registry-client'
-                description = 'A java client for docker registry api v2'
-                url = 'https://github.com/cytomine/registry-client.git'
+                packaging = 'jar'
+                // optionally artifactId can be defined here
+                description = 'A Java client for connecting to the API of a Docker registry v2.'
+                url = 'http://github.com/cytomine/registry-client'
+
+                scm {
+                    url = 'https://github.com/cytomine/registry-client.git'
+                    connection = 'scm:git:https://github.com/cytomine/registry-client.git'
+                    developerConnection = 'scm:git:https://github.com/cytomine/registry-client.git'
+                }
+
                 licenses {
                     license {
                         name = 'The Apache License, Version 2.0'
                         url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
                     }
                 }
+
                 developers {
                     developer {
                         id = 'ya-b'
@@ -86,29 +95,38 @@ publishing {
                         email = 'dev@cytomine.com'
                     }
                 }
-                scm {
-                    url = 'https://github.com/cytomine/registry-client.git'
-                    connection = 'scm:git:https://github.com/cytomine/registry-client.git'
-                    developerConnection = 'scm:git:https://github.com/cytomine/registry-client.git'
-                }
             }
+        }
+    }
 
-        }
-    }
+//    repositories {
+//        maven {
+//            url gitlabRepoUrl
+//            name "GitLab"
+//            credentials(HttpHeaderCredentials) {
+//                name = gitlabTokenName
+//                value = gitLabPrivateToken
+//            }
+//            authentication {
+//                header(HttpHeaderAuthentication)
+//            }
+//        }
+//    }
+}
+
+nexusPublishing {
     repositories {
-        maven {
-            def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-            def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-            credentials {
-                username System.getenv("SONATYPE_USERNAME")
-                password System.getenv("SONATYPE_PASSWORD")
-            }
+        create("comcytomine") {
+            nexusUrl = uri("https://s01.oss.sonatype.org/service/local/")
+            snapshotRepositoryUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+            username = ossrhUsername
+            password = ossrhPassword
         }
     }
-    signing {
-        sign publishing.publications.mavenJava
-    }
+}
+
+signing {
+    sign publishing.publications.mavenJava
 }
 
 static def updateReadMeVersion(String ver) {
@@ -119,17 +137,7 @@ static def updateReadMeVersion(String ver) {
         file.write(newContent)
     }
 }
-sourceSets {
-    test {
-        resources {
-            srcDirs = ['src/test/resources'] // Add additional resource directories
-        }
-    }
-}
 
-//signing {
-//    useGpgCmd()
-//    sign publishing.publications.mavenJava
-//}
-
-updateReadMeVersion(version)
+// tasks.register("updateReadMeVersion") {
+//     updateReadMeVersion(version)
+// }

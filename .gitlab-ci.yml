@@ -19,19 +19,11 @@ default:
   tags:
     - docker
 
-workflow:
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      when: never
-    - when: always
 
 make-version-name:
   stage: prepare
   # regex check does not work with /bin/sh because of parenthesis so we need /bin/bash here
   image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/bash:5.2.15-alpine3.16
-
-
-
   script:
     - | # If no tag has been pushed ($CI_COMMIT_TAG is empty), name it as SNAPSHOT
       if [ -z ${CI_COMMIT_TAG} ]; then
@@ -45,9 +37,10 @@ make-version-name:
     reports:
       dotenv: .env
 
+
 .make-gradle-properties:
   before_script:
-    - mkdir -p ${GRADLE_USER_HOME} 
+    - mkdir -p ${GRADLE_USER_HOME}
     - mkdir -p ${GPG_KEYRING_DIR}
     - touch ${GRADLE_USER_HOME}/gradle.properties
     # MavenCentral
@@ -62,6 +55,7 @@ make-version-name:
     - echo "gitlabTokenName=Job-Token" >> ${GRADLE_USER_HOME}/gradle.properties
     - echo "gitlabRepoUrl=${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/maven" >> ${GRADLE_USER_HOME}/gradle.properties
     - cat ${GRADLE_USER_HOME}/gradle.properties
+
 
 junit-tests:
   extends: .make-gradle-properties
@@ -79,6 +73,7 @@ junit-tests:
     reports:
       junit: build/test-results/test/**/TEST-*.xml
 
+
 build-jar:
   extends: .make-gradle-properties
   stage: build
@@ -92,7 +87,7 @@ build-jar:
   variables:
     REGISTRY_STORAGE_DELETE_ENABLED: 'true'
     REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: '/data'
-  script: 
+  script:
     - sed -i -- "s/version '0.0.0'/version '${CM_VERSION}'/g" build.gradle
     - gradle clean build
   artifacts:
@@ -100,6 +95,7 @@ build-jar:
     expire_in: "30 days"
     paths:
       - build/libs/registry-client-*.jar
+
 
 publish:
   extends: .make-gradle-properties

@@ -103,15 +103,15 @@ class CZIParser(AbstractParser):
             if imd.n_samples == 3 and colors[0] is None:
                 colors = [
                     infer_channel_color(None, i, 3)
-                    for i in range(imd.n_samples)
+                    for i in range(imd.n_samples - 1, -1, -1)
                 ]
 
             names = [czi_file.channel_name(cc_idx)] * imd.n_samples
             if names[0] is None:
                 if imd.n_samples == 1 and 2 <= imd.n_concrete_channels <= 3:
-                    names = ['RGB'[cc_idx]]
+                    names = ['BGR'[cc_idx]]
                 elif imd.n_samples == 3:
-                    names = ['R', 'G', 'B']
+                    names = ['B', 'G', 'R']
             emission = czi_file.channel_emission_wavelength(cc_idx)
             excitation = czi_file.channel_excitation_wavelength(cc_idx)
 

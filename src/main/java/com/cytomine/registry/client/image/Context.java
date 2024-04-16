@@ -45,7 +45,7 @@ public class Context {
         manifest.setSchemaVersion(Constants.SCHEMA_V_2);
         manifest.setMediaType(ImageMediaType.MANIFEST_V2);
         manifest.setConfig(new ManifestHttp.BlobDTO(ImageMediaType.CONFIG, getConfig().getSize(), getConfig().getDigest()));
-        manifest.setLayers(getLayers().stream().map(blob -> new ManifestHttp.BlobDTO(ImageMediaType.CONFIG, blob.getSize(),
+        manifest.setLayers(getLayers().stream().map(blob -> new ManifestHttp.BlobDTO(ImageMediaType.LAYER, blob.getSize(),
                 blob.getDigest())).collect(Collectors.toList()));
         return manifest;
     }

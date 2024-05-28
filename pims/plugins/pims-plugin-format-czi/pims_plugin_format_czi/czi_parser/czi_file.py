@@ -651,7 +651,8 @@ class CZIFile():
             format=self.numpy_to_vips_band_type[self.pixel_type]
             )
         if self._gamma is not None:
-            image = image.linear(self._gamma, 0)
+            original_format = image.format
+            image = image.gamma(exponent=1/self._gamma).cast(original_format)
         return image
 
     def _analyze_images(self) -> None:

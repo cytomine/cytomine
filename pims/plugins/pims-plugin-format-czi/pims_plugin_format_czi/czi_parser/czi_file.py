@@ -8,7 +8,8 @@ from pims.utils import UNIT_REGISTRY
 from pylibCZIrw import czi
 from pyvips import Image as VIPSImage
 from pyvips import BandFormat
-from typing import Optional
+
+from typing import Any, Iterable, Optional
 
 
 logger = logging.getLogger("pims.format.czi")
@@ -22,7 +23,25 @@ numpy_to_vips_band_type = {
     np.dtype(np.uint32): BandFormat.UINT,
     np.dtype(np.float32): BandFormat.FLOAT,
     np.dtype(np.float64): BandFormat.DOUBLE,
-    }
+}
+
+
+def has_deep_attr(data: dict, attrs: Iterable[str]):
+    curr_data = data
+    for attr_name in attrs:
+        if not hasattr(curr_data, attr_name):
+            return False
+        curr_data = getattr(curr_data, attr_name)
+    return True
+
+
+def get_deep_attr(data: Any, attrs: Iterable[str], default: Any=None):
+    if not has_deep_attr(data, attrs):
+        return default
+    curr_data = data
+    for attr_name in attrs:
+        curr_data = getattr(curr_data, attr_name)
+    return curr_data
 
 
 class DictObj:
@@ -359,6 +378,13 @@ class CZIFile():
         else:
             self._device_model = "Zeiss Microscope"
 
+        # extract single gamma leyer
+        gamma_attribute = ('DisplaySetting', 'Channels', 'Channel', 'Gamma')
+        if has_deep_attr(metadata, gamma_attribute):
+            self._gamma = float(get_deep_attr(metadata, gamma_attribute))
+        else:
+            self._gamma = None
+
         # Check the existance of associated images, like thumbnail, macro, ...
         self._analyze_images()
 
@@ -624,6 +650,9 @@ class CZIFile():
             self.num_components,
             format=self.numpy_to_vips_band_type[self.pixel_type]
             )
+        if self._gamma is not None:
+            original_format = image.format
+            image = image.gamma(exponent=1/self._gamma).cast(original_format)
         return image
 
     def _analyze_images(self) -> None:

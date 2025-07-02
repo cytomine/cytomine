@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cbir
+data:
+  API_BASE_PATH: "/cbir"
+  HOST: "redis.{{ .Release.Namespace }}.svc.cluster.local"
+  PORT: "{{ .Values.redis.port }}"

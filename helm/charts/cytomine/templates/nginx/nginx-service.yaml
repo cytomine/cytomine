@@ -1,0 +1,13 @@
+{{ if .Values.nginx.deploy }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+spec:
+  selector:
+    app: nginx
+  ports:
+    - name: http
+      port: {{ .Values.nginx.port }}
+      protocol: TCP
+{{ end }}

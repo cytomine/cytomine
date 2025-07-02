@@ -1,0 +1,13 @@
+{{ if .Values.core.deploy }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: core
+spec:
+  selector:
+    app: core
+  ports:
+    - name: http
+      port: {{ .Values.core.port }}
+      protocol: TCP
+{{ end }}

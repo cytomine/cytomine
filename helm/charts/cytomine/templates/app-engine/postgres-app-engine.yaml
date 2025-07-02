@@ -1,0 +1,69 @@
+{{- $storageClassName := .Values.postgresql.storageClassName | required ".Values.postgresql.storageClassName is required." -}}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres-app-engine
+  annotations:
+  labels:
+    role: postgres-app-engine
+    app: postgres-app-engine
+    component: {{ .Release.Name }}-app-engine-postgres
+    release: {{ .Release.Name }}
+spec:
+  replicas: 1
+  serviceName: postgres-app-engine
+  selector:
+    matchLabels:
+      app: postgres-app-engine
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        role: postgres-app-engine
+        app: postgres-app-engine
+        release: {{ .Release.Name }}
+    spec:
+      volumes:
+        - name: temp
+          emptyDir: {}
+        - name: postgres-app-engine-secret
+          secret:
+            secretName: postgres-app-engine-secret
+      containers:
+        - name: postgres
+          image: "{{ .Values.images.postgresql_app_engine }}"
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          volumeMounts:
+            - name: postgres-app-engine-storage
+              mountPath: "/var/lib/postgresql/data"
+              subPath: data
+            - name: postgres-app-engine-storage
+              mountPath: "/var/lib/postgresql"
+            - name: temp
+              mountPath: /var/run
+            - name: temp
+              mountPath: /tmp
+          env:
+          - name: POSTGRES_USER
+            value: appengine
+          - name: POSTGRES_DB
+            value: appengine
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: postgres-app-engine-secret
+                key: password
+          ports:
+            - name: postgres
+              containerPort: {{ .Values.postgresql.port }}
+              protocol: TCP
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-app-engine-storage
+      spec:
+        storageClassName: {{ $storageClassName }}
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: {{ .Values.postgresStorage }}

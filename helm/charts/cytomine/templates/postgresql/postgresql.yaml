@@ -1,0 +1,104 @@
+{{ if .Values.postgresql.deploy }}
+{{- $storageClassName := .Values.postgresql.storageClassName | required ".Values.postgresql.storageClassName is required." -}}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgis
+  annotations:
+    kube-score/ignore: pod-probes,container-security-context-user-group-id
+  labels:
+    role: postgresql
+    app: {{ include "cytomine.name" . }}
+    component: {{ .Release.Name }}-postgis
+    release: {{ .Release.Name }}
+spec:
+  replicas: 1
+  serviceName: postgis
+  selector:
+    matchLabels:
+      app: postgis
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        role: postgresql
+        app: postgis
+        release: {{ .Release.Name }}
+    spec:
+      securityContext:
+        runAsUser: 999
+      serviceAccountName: {{ include "cytomine.serviceAccountName" . }}
+      {{- with .Values.global.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: temp
+          emptyDir: {}
+      containers:
+        - name: postgis
+          image: "{{ .Values.images.postgresql }}"
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: "/var/lib/postgresql/data"
+              subPath: data
+            - name: postgres-storage
+              mountPath: "/var/lib/postgresql"
+            - name: temp
+              mountPath: /var/run
+            - name: temp
+              mountPath: /tmp
+          env:
+          - name: POSTGRES_USER
+            value: {{ .Values.postgresql.user }}
+          - name: POSTGRES_DB
+            value: {{ .Values.postgresql.database }}
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: postgres-core-secret
+                key: password
+          ports:
+            - name: postgres
+              containerPort: {{ .Values.postgresql.port }}
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.postgresql.resources | nindent 12 }}
+          securityContext:
+            allowPrivilegeEscalation: {{ .Values.containerSecurity.allowPrivilegeEscalation }}
+            privileged: {{ .Values.containerSecurity.privileged }}
+            readOnlyRootFilesystem: {{ .Values.containerSecurity.readOnlyRootFilesystem }}
+      initContainers:
+        - name: postgis-init
+          image: alpine:3.18
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          securityContext:
+            readOnlyRootFilesystem: {{ .Values.containerSecurity.readOnlyRootFilesystem }}
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: "/var/lib/postgresql/"
+          command:
+            - /bin/sh
+            - -c
+            - >
+              set -x;
+              mkdir -p /var/lib/postgresql/data;
+              chown -R 999 /var/lib/postgresql/data && chmod og-rwx /var/lib/postgresql/data;
+          resources:
+            {{- toYaml .Values.postgresql.resources | nindent 12 }}
+      {{- with .Values.global.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-storage
+      spec:
+        storageClassName: {{ $storageClassName }}
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: {{ .Values.postgresStorage }}
+{{ end }}

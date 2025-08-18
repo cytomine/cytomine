@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  pull_request:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -57,5 +58,3 @@ jobs:
           push: true
           tags: cytomine/${{ matrix.image }}
           labels: latest
-          allow: network.host
-          network: host

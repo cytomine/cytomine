@@ -121,6 +121,6 @@ class ImageRetrieval:
         outputs = run_inference(model, inputs)
 
         labels, distances = self.indexer.search(outputs, nrt_neigh)
-        filenames = [self.store.get(str(l)) or "" for l in labels]
+        filenames = [self.store.get(str(label)) or "" for label in labels]
 
         return list(zip(filenames, distances))

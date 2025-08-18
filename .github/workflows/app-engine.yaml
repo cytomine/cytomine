@@ -6,7 +6,7 @@ on:
       - main
     paths:
       - "app-engine/**"
-      # - ".github/**"
+      - ".github/**"
   push:
     branches:
       - main

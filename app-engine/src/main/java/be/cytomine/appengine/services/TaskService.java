@@ -127,7 +127,8 @@ public class TaskService {
                     log.info("UploadTask: Descriptor file read into memory");
                     try {
                         log.info("UploadTask: validating descriptor file...");
-                        descriptorFileAsJson = new ObjectMapper(new YAMLFactory()).readTree(descriptorFileYmlContent);
+                        descriptorFileAsJson = new ObjectMapper(
+                            new YAMLFactory()).readTree(descriptorFileYmlContent);
                         taskValidationService.validateDescriptorFile(descriptorFileAsJson);
                         taskValidationService.checkIsNotDuplicate(descriptorFileAsJson);
                         log.info("UploadTask: Descriptor file validated");
@@ -168,7 +169,8 @@ public class TaskService {
                             fileStorageHandler.deleteStorage(storage);
                             log.info("UploadTask: storage deleted");
                         } catch (FileStorageException ex) {
-                            log.error("UploadTask: file storage service is failing [{}]", ex.getMessage());
+                            log.error("UploadTask: file storage service is failing [{}]",
+                                ex.getMessage());
                             AppEngineError error = ErrorBuilder
                                 .build(ErrorCode.REGISTRY_PUSHING_TASK_IMAGE_FAILED);
                             throw new TaskServiceException(error);
@@ -178,25 +180,31 @@ public class TaskService {
 
             }
         } catch (IOException e) {
-            log.error("UploadTask: Failed to extract files from archive: " + imageRegistryCompliantName, e);
-            throw new BundleArchiveException(ErrorBuilder.build(ErrorCode.INTERNAL_DESCRIPTOR_EXTRACTION_FAILED));
+            log.error("UploadTask: Failed to extract files from archive: "
+                + imageRegistryCompliantName, e);
+            throw new BundleArchiveException(
+                ErrorBuilder.build(ErrorCode.INTERNAL_DESCRIPTOR_EXTRACTION_FAILED));
         } catch (ValidationException e) {
             log.error("UploadTask: task already exists");
             throw e;
         } catch (Exception e) {
             log.error("UploadTask: Unknown bundle archive format");
-            AppEngineError error = ErrorBuilder.build(ErrorCode.INTERNAL_UNKNOWN_BUNDLE_ARCHIVE_FORAMT);
+            AppEngineError error = ErrorBuilder.build(
+                ErrorCode.INTERNAL_UNKNOWN_BUNDLE_ARCHIVE_FORAMT);
             throw new BundleArchiveException(error);
         }
 
         if (!descriptorFile) {
-            log.error("UploadTask: Descriptor file not found in archive: " + imageRegistryCompliantName);
-            throw new BundleArchiveException(ErrorBuilder.build(ErrorCode.INTERNAL_DESCRIPTOR_NOT_IN_DEFAULT_LOCATION));
+            log.error("UploadTask: Descriptor file not found in archive: "
+                + imageRegistryCompliantName);
+            throw new BundleArchiveException(ErrorBuilder.build(
+                ErrorCode.INTERNAL_DESCRIPTOR_NOT_IN_DEFAULT_LOCATION));
         }
 
         if (!dockerImageFile) {
             log.error("UploadTask: Docker image not found in archive");
-            throw new BundleArchiveException(ErrorBuilder.build(ErrorCode.INTERNAL_DOCKER_IMAGE_TAR_NOT_FOUND));
+            throw new BundleArchiveException(
+                ErrorBuilder.build(ErrorCode.INTERNAL_DOCKER_IMAGE_TAR_NOT_FOUND));
         }
 
         try {
@@ -212,7 +220,8 @@ public class TaskService {
             fileStorageHandler.saveStorageData(
                 storage,
                 new StorageData(
-                    new StorageStringEntry(descriptorFileYmlContent, "descriptor.yml", StorageDataType.FILE))
+                    new StorageStringEntry(descriptorFileYmlContent, "descriptor.yml",
+                StorageDataType.FILE))
             );
             log.info("UploadTask: descriptor.yml is stored in storage");
         } catch (FileStorageException e) {
@@ -685,7 +694,6 @@ public class TaskService {
             = new JakartaServletFileUpload<>(factory);
 
         try {
-            // Get an iterator for the multipart parts. This avoids parsing the whole request at once.
             FileItemInputIterator iter = upload.getItemIterator(request);
 
             // Check if there's at least one part in the request
@@ -702,7 +710,8 @@ public class TaskService {
 
             // Validate that the first part is indeed a file and not a simple form field
             if (item.isFormField()) {
-                log.warn("UploadTask streaming: Expected a file but the first part is a form field: {}",
+                log.warn("UploadTask streaming: "
+                    + "Expected a file but the first part is a form field: {}",
                     item.getFieldName());
                 AppEngineError error = ErrorBuilder.build(
                     ErrorCode.INTERNAL_NO_FILE_BUT_FORM_FIELD

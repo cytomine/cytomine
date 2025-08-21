@@ -1,6 +1,5 @@
 package be.cytomine.appengine.handlers.storage.impl;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -12,7 +11,6 @@ import java.nio.file.StandardCopyOption;
 import java.util.Comparator;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import be.cytomine.appengine.handlers.StorageStringEntry;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,6 +22,7 @@ import be.cytomine.appengine.handlers.StorageData;
 import be.cytomine.appengine.handlers.StorageDataEntry;
 import be.cytomine.appengine.handlers.StorageDataType;
 import be.cytomine.appengine.handlers.StorageHandler;
+import be.cytomine.appengine.handlers.StorageStringEntry;
 
 @Data
 @AllArgsConstructor
@@ -72,15 +71,14 @@ public class FileSystemStorageHandler implements StorageHandler {
         }
     }
 
-    private static String getIdentifier(String storageId)
-    {
+    private static String getIdentifier(String storageId) {
         String identifier = "";
-        if(storageId.startsWith("task-") && storageId.endsWith("-def")) { // task storage
+        if (storageId.startsWith("task-") && storageId.endsWith("-def")) { // task storage
             identifier = storageId.replace("task-", "");
-            identifier = identifier.replace("-def" , "");
-        } else if(storageId.startsWith("task-run-inputs-")) { // inputs
+            identifier = identifier.replace("-def", "");
+        } else if (storageId.startsWith("task-run-inputs-")) { // inputs
             identifier = storageId.replace("task-run-inputs-", "");
-        } else if(storageId.startsWith("task-run-outputs-")) { // outputs
+        } else if (storageId.startsWith("task-run-outputs-")) { // outputs
             identifier = storageId.replace("task-run-outputs-", "");
         }
         return identifier;

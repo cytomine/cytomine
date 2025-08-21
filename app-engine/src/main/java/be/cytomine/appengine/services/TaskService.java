@@ -1,11 +1,8 @@
 package be.cytomine.appengine.services;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -18,10 +15,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 
-import be.cytomine.appengine.dto.responses.errors.details.ParameterError;
-import be.cytomine.appengine.exceptions.ProvisioningException;
-import be.cytomine.appengine.handlers.StorageDataType;
-import be.cytomine.appengine.handlers.StorageStringEntry;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -48,7 +41,6 @@ import be.cytomine.appengine.dto.inputs.task.TaskInputFactory;
 import be.cytomine.appengine.dto.inputs.task.TaskOutput;
 import be.cytomine.appengine.dto.inputs.task.TaskOutputFactory;
 import be.cytomine.appengine.dto.inputs.task.TaskRun;
-import be.cytomine.appengine.dto.misc.TaskIdentifiers;
 import be.cytomine.appengine.dto.responses.errors.AppEngineError;
 import be.cytomine.appengine.dto.responses.errors.ErrorBuilder;
 import be.cytomine.appengine.dto.responses.errors.ErrorCode;
@@ -61,7 +53,9 @@ import be.cytomine.appengine.exceptions.TaskServiceException;
 import be.cytomine.appengine.exceptions.ValidationException;
 import be.cytomine.appengine.handlers.RegistryHandler;
 import be.cytomine.appengine.handlers.StorageData;
+import be.cytomine.appengine.handlers.StorageDataType;
 import be.cytomine.appengine.handlers.StorageHandler;
+import be.cytomine.appengine.handlers.StorageStringEntry;
 import be.cytomine.appengine.models.CheckTime;
 import be.cytomine.appengine.models.Match;
 import be.cytomine.appengine.models.task.Author;
@@ -103,8 +97,7 @@ public class TaskService {
 
     @Transactional
     public Optional<TaskDescription> uploadTask(HttpServletRequest request)
-        throws BundleArchiveException, TaskServiceException, ValidationException
-    {
+        throws BundleArchiveException, TaskServiceException, ValidationException {
 
         // prepare for streaming
         log.info("UploadTask: preparing streaming...");
@@ -117,94 +110,94 @@ public class TaskService {
         Storage storage = new Storage(storageIdentifier);
         String imageRegistryCompliantName = null;
         log.info("UploadTask: building archive...");
-            log.info("UploadTask: extracting descriptor and Docker image from archive...");
+        log.info("UploadTask: extracting descriptor and Docker image from archive...");
 
 
-            boolean descriptorFile = true;
-            boolean dockerImageFile = true;
+        boolean descriptorFile = true;
+        boolean dockerImageFile = true;
 
-            try (ZipArchiveInputStream zais = new ZipArchiveInputStream(inputStream)) {
-                ZipEntry entry;
+        try (ZipArchiveInputStream zais = new ZipArchiveInputStream(inputStream)) {
+            ZipEntry entry;
 
-                while ((entry = zais.getNextZipEntry()) != null) {
-                    String entryName = entry.getName();
+            while ((entry = zais.getNextZipEntry()) != null) {
+                String entryName = entry.getName();
 
-                    if (entryName.toLowerCase().matches("descriptor\\.(yml|yaml)")) {
-                        descriptorFileYmlContent = IOUtils.toString(zais, StandardCharsets.UTF_8);
-                        log.info("UploadTask: Descriptor file read into memory");
-                        try {
-                            log.info("UploadTask: validating descriptor file...");
-                            descriptorFileAsJson = new ObjectMapper(new YAMLFactory()).readTree(descriptorFileYmlContent);
-                            taskValidationService.validateDescriptorFile(descriptorFileAsJson);
-                            taskValidationService.checkIsNotDuplicate(descriptorFileAsJson);
-                            log.info("UploadTask: Descriptor file validated");
-                        } catch (ValidationException e) {
-                            log.info("UploadTask: Descriptor file not valid");
-                            if (imageRegistryCompliantName == null) {
-                                throw e;
-                            } else {
-                                try {
-                                    log.info("UploadTask: deleting image registry...");
-                                    registryHandler.deleteImage(imageRegistryCompliantName);
-                                    log.info("UploadTask: image deleted");
-                                } catch (RegistryException ex) {
-                                    log.debug("UploadTask: failed to delete image from registry");
-                                }
-                            }
-                        }
-                        log.info("UploadTask: Descriptor file extracted");
-                    }
-
-                    if (entryName.endsWith(".tar")) {
-                        String fullName = entryName
-                            .substring(0, entryName.length() - 4);
-                        String namespace = fullName
-                            .substring(0, fullName.indexOf("-"))
-                            .replace('.' , '/');
-                        String version = fullName
-                            .substring(fullName.indexOf('-') + 1);
-                        imageRegistryCompliantName = namespace + ":" + version;
-                        try {
-                            log.info("UploadTask: pushing docker image to registry...");
-                            registryHandler.pushImage(zais, imageRegistryCompliantName);
-                            log.info("UploadTask: Docker image pushed");
-                        } catch (RegistryException e) {
+                if (entryName.toLowerCase().matches("descriptor\\.(yml|yaml)")) {
+                    descriptorFileYmlContent = IOUtils.toString(zais, StandardCharsets.UTF_8);
+                    log.info("UploadTask: Descriptor file read into memory");
+                    try {
+                        log.info("UploadTask: validating descriptor file...");
+                        descriptorFileAsJson = new ObjectMapper(new YAMLFactory()).readTree(descriptorFileYmlContent);
+                        taskValidationService.validateDescriptorFile(descriptorFileAsJson);
+                        taskValidationService.checkIsNotDuplicate(descriptorFileAsJson);
+                        log.info("UploadTask: Descriptor file validated");
+                    } catch (ValidationException e) {
+                        log.info("UploadTask: Descriptor file not valid");
+                        if (imageRegistryCompliantName == null) {
+                            throw e;
+                        } else {
                             try {
-                                log.debug("UploadTask: failed to push image to registry");
-                                log.debug("UploadTask: attempting to delete storage...");
-                                fileStorageHandler.deleteStorage(storage);
-                                log.info("UploadTask: storage deleted");
-                            } catch (FileStorageException ex) {
-                                log.error("UploadTask: file storage service is failing [{}]", ex.getMessage());
-                                AppEngineError error = ErrorBuilder
-                                    .build(ErrorCode.REGISTRY_PUSHING_TASK_IMAGE_FAILED);
-                                throw new TaskServiceException(error);
+                                log.info("UploadTask: deleting image registry...");
+                                registryHandler.deleteImage(imageRegistryCompliantName);
+                                log.info("UploadTask: image deleted");
+                            } catch (RegistryException ex) {
+                                log.debug("UploadTask: failed to delete image from registry");
                             }
                         }
                     }
-
+                    log.info("UploadTask: Descriptor file extracted");
                 }
-            } catch (IOException e) {
-                log.error("UploadTask: Failed to extract files from archive: " + imageRegistryCompliantName, e);
-                throw new BundleArchiveException(ErrorBuilder.build(ErrorCode.INTERNAL_DESCRIPTOR_EXTRACTION_FAILED)); // pick a general error
-            } catch (ValidationException e) {
-                log.error("UploadTask: task already exists");
-                throw e;
-            } catch (Exception e) {
-                log.error("UploadTask: Unknown bundle archive format");
-                AppEngineError error = ErrorBuilder.build(ErrorCode.INTERNAL_UNKNOWN_BUNDLE_ARCHIVE_FORAMT);
-                throw new BundleArchiveException(error);
-            }
 
-            if (!descriptorFile) {
-                log.error("UploadTask: Descriptor file not found in archive: " + imageRegistryCompliantName);
-                throw new BundleArchiveException(ErrorBuilder.build(ErrorCode.INTERNAL_DESCRIPTOR_NOT_IN_DEFAULT_LOCATION));
-            }
+                if (entryName.endsWith(".tar")) {
+                    String fullName = entryName
+                        .substring(0, entryName.length() - 4);
+                    String namespace = fullName
+                        .substring(0, fullName.indexOf("-"))
+                        .replace('.', '/');
+                    String version = fullName
+                        .substring(fullName.indexOf('-') + 1);
+                    imageRegistryCompliantName = namespace + ":" + version;
+                    try {
+                        log.info("UploadTask: pushing docker image to registry...");
+                        registryHandler.pushImage(zais, imageRegistryCompliantName);
+                        log.info("UploadTask: Docker image pushed");
+                    } catch (RegistryException e) {
+                        try {
+                            log.debug("UploadTask: failed to push image to registry");
+                            log.debug("UploadTask: attempting to delete storage...");
+                            fileStorageHandler.deleteStorage(storage);
+                            log.info("UploadTask: storage deleted");
+                        } catch (FileStorageException ex) {
+                            log.error("UploadTask: file storage service is failing [{}]", ex.getMessage());
+                            AppEngineError error = ErrorBuilder
+                                .build(ErrorCode.REGISTRY_PUSHING_TASK_IMAGE_FAILED);
+                            throw new TaskServiceException(error);
+                        }
+                    }
+                }
 
-            if (!dockerImageFile) {
-                log.error("UploadTask: Docker image not found in archive");
-                throw new BundleArchiveException(ErrorBuilder.build(ErrorCode.INTERNAL_DOCKER_IMAGE_TAR_NOT_FOUND));
             }
+        } catch (IOException e) {
+            log.error("UploadTask: Failed to extract files from archive: " + imageRegistryCompliantName, e);
+            throw new BundleArchiveException(ErrorBuilder.build(ErrorCode.INTERNAL_DESCRIPTOR_EXTRACTION_FAILED));
+        } catch (ValidationException e) {
+            log.error("UploadTask: task already exists");
+            throw e;
+        } catch (Exception e) {
+            log.error("UploadTask: Unknown bundle archive format");
+            AppEngineError error = ErrorBuilder.build(ErrorCode.INTERNAL_UNKNOWN_BUNDLE_ARCHIVE_FORAMT);
+            throw new BundleArchiveException(error);
+        }
+
+        if (!descriptorFile) {
+            log.error("UploadTask: Descriptor file not found in archive: " + imageRegistryCompliantName);
+            throw new BundleArchiveException(ErrorBuilder.build(ErrorCode.INTERNAL_DESCRIPTOR_NOT_IN_DEFAULT_LOCATION));
+        }
+
+        if (!dockerImageFile) {
+            log.error("UploadTask: Docker image not found in archive");
+            throw new BundleArchiveException(ErrorBuilder.build(ErrorCode.INTERNAL_DOCKER_IMAGE_TAR_NOT_FOUND));
+        }
 
         try {
             fileStorageHandler.createStorage(storage);
@@ -218,7 +211,8 @@ public class TaskService {
         try {
             fileStorageHandler.saveStorageData(
                 storage,
-                new StorageData(new StorageStringEntry(descriptorFileYmlContent, "descriptor.yml", StorageDataType.FILE))
+                new StorageData(
+                    new StorageStringEntry(descriptorFileYmlContent, "descriptor.yml", StorageDataType.FILE))
             );
             log.info("UploadTask: descriptor.yml is stored in storage");
         } catch (FileStorageException e) {
@@ -677,8 +671,7 @@ public class TaskService {
     }
 
     public InputStream prepareStream(HttpServletRequest request)
-        throws TaskServiceException
-    {
+        throws TaskServiceException {
         log.info("UploadTask streaming: streaming...");
         if (!JakartaServletFileUpload.isMultipartContent(request)) {
             log.info("UploadTask streaming: not multipart");
@@ -688,7 +681,8 @@ public class TaskService {
         }
 
         FileItemFactory<DiskFileItem> factory = DiskFileItemFactory.builder().get();
-        JakartaServletFileUpload<DiskFileItem, FileItemFactory<DiskFileItem>> upload = new JakartaServletFileUpload<>(factory);
+        JakartaServletFileUpload<DiskFileItem, FileItemFactory<DiskFileItem>> upload
+            = new JakartaServletFileUpload<>(factory);
 
         try {
             // Get an iterator for the multipart parts. This avoids parsing the whole request at once.
@@ -708,7 +702,8 @@ public class TaskService {
 
             // Validate that the first part is indeed a file and not a simple form field
             if (item.isFormField()) {
-                log.warn("UploadTask streaming: Expected a file but the first part is a form field: {}", item.getFieldName());
+                log.warn("UploadTask streaming: Expected a file but the first part is a form field: {}",
+                    item.getFieldName());
                 AppEngineError error = ErrorBuilder.build(
                     ErrorCode.INTERNAL_NO_FILE_BUT_FORM_FIELD
                 );

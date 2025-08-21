@@ -160,7 +160,7 @@ public class FileSystemStorageHandler implements StorageHandler {
                 } else {
                     entry = current;
                 }
-                if (Files.isRegularFile(path)) {
+                if (Files.isRegularFile(path) || Files.isSymbolicLink(path)) {
                     entry.setData(path.toFile());
                     String fromStorageId = path
                         .toString()
@@ -183,6 +183,8 @@ public class FileSystemStorageHandler implements StorageHandler {
                         .substring(current.getStorageId().length() + 1);
                     if (!subTreeFileName.equalsIgnoreCase(filename)) {
                         entry.setName(subTreeFileName);
+                    } else {
+                        entry.setName(subTreeFileName + "/");
                     }
                     emptyFile.getEntryList().add(entry);
                 }

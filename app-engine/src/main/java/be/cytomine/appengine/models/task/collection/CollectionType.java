@@ -15,8 +15,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import be.cytomine.appengine.models.task.wsi.WsiType;
-import be.cytomine.appengine.repositories.collection.ReferencePersistenceRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -64,8 +62,10 @@ import be.cytomine.appengine.models.task.integer.IntegerPersistence;
 import be.cytomine.appengine.models.task.number.NumberPersistence;
 import be.cytomine.appengine.models.task.string.StringPersistence;
 import be.cytomine.appengine.models.task.wsi.WsiPersistence;
+import be.cytomine.appengine.models.task.wsi.WsiType;
 import be.cytomine.appengine.repositories.bool.BooleanPersistenceRepository;
 import be.cytomine.appengine.repositories.collection.CollectionPersistenceRepository;
+import be.cytomine.appengine.repositories.collection.ReferencePersistenceRepository;
 import be.cytomine.appengine.repositories.datetime.DateTimePersistenceRepository;
 import be.cytomine.appengine.repositories.enumeration.EnumerationPersistenceRepository;
 import be.cytomine.appengine.repositories.geometry.GeometryPersistenceRepository;
@@ -805,7 +805,7 @@ public class CollectionType extends Type {
                     return getGeometryPersistence(node, runId, parameterName);
                 case "DateTimeType":
                     return getDateTimePersistence(node, runId, parameterName);
-                case "FileType" , "ImageType" , "WsiType":
+                case "FileType", "ImageType", "WsiType":
                     return getReferencePersistence(node, runId, parameterName);
                 default:
                     return null;
@@ -902,15 +902,15 @@ public class CollectionType extends Type {
     }
 
     private static ReferencePersistence getReferencePersistence(
-            JsonNode node,
-            UUID runId,
-            String parameterName) {
+        JsonNode node,
+        UUID runId,
+        String parameterName) {
 
         ReferencePersistenceRepository referencePersistenceRepository = AppEngineApplicationContext.getBean(
-                ReferencePersistenceRepository.class);
+            ReferencePersistenceRepository.class);
 
         ReferencePersistence referencePersistence = referencePersistenceRepository.findReferencePersistenceByParameterNameAndRunIdAndParameterType(
-                parameterName, runId, ParameterType.INPUT
+            parameterName, runId, ParameterType.INPUT
         );
         if (referencePersistence == null) {
             referencePersistence = new ReferencePersistence();
@@ -1390,7 +1390,7 @@ public class CollectionType extends Type {
         }
 
         if (!(currentType instanceof ImageType)
-                && !(currentType instanceof GeometryType)
+            && !(currentType instanceof GeometryType)
             && !(currentType instanceof FileType)) {
             provisionedParameter.set("value", provision.get("value"));
         }

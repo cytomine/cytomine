@@ -12,7 +12,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -20,15 +29,6 @@ import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import be.cytomine.appengine.dto.handlers.scheduler.CollectionSymlink;
-import be.cytomine.appengine.dto.handlers.scheduler.Symlink;
-import be.cytomine.appengine.models.task.Checksum;
-import be.cytomine.appengine.models.task.collection.ReferencePersistence;
-import be.cytomine.appengine.models.task.file.FileType;
-import be.cytomine.appengine.models.task.image.ImageType;
-import be.cytomine.appengine.models.task.wsi.WsiType;
-import be.cytomine.appengine.repositories.ChecksumRepository;
-import be.cytomine.appengine.utils.FileHelper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -50,7 +50,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import be.cytomine.appengine.dto.handlers.filestorage.Storage;
+import be.cytomine.appengine.dto.handlers.scheduler.CollectionSymlink;
 import be.cytomine.appengine.dto.handlers.scheduler.Schedule;
+import be.cytomine.appengine.dto.handlers.scheduler.Symlink;
 import be.cytomine.appengine.dto.inputs.task.GenericParameterCollectionItemProvision;
 import be.cytomine.appengine.dto.inputs.task.GenericParameterProvision;
 import be.cytomine.appengine.dto.inputs.task.Resource;
@@ -74,6 +76,7 @@ import be.cytomine.appengine.handlers.StorageDataType;
 import be.cytomine.appengine.handlers.StorageHandler;
 import be.cytomine.appengine.models.CheckTime;
 import be.cytomine.appengine.models.Match;
+import be.cytomine.appengine.models.task.Checksum;
 import be.cytomine.appengine.models.task.Parameter;
 import be.cytomine.appengine.models.task.ParameterType;
 import be.cytomine.appengine.models.task.Run;
@@ -82,11 +85,16 @@ import be.cytomine.appengine.models.task.Type;
 import be.cytomine.appengine.models.task.TypePersistence;
 import be.cytomine.appengine.models.task.collection.CollectionPersistence;
 import be.cytomine.appengine.models.task.collection.CollectionType;
+import be.cytomine.appengine.models.task.collection.ReferencePersistence;
+import be.cytomine.appengine.models.task.file.FileType;
+import be.cytomine.appengine.models.task.image.ImageType;
+import be.cytomine.appengine.models.task.wsi.WsiType;
+import be.cytomine.appengine.repositories.ChecksumRepository;
 import be.cytomine.appengine.repositories.RunRepository;
 import be.cytomine.appengine.repositories.TypePersistenceRepository;
 import be.cytomine.appengine.repositories.collection.CollectionPersistenceRepository;
 import be.cytomine.appengine.states.TaskRunState;
-
+import be.cytomine.appengine.utils.FileHelper;
 
 
 @Slf4j
@@ -322,7 +330,8 @@ public class TaskProvisioningService {
                 .mapToStorageFileData(provision, run);
             for (StorageDataEntry current : inputProvisionFileData.getEntryList()) {
                 String filename = current.getName();
-                if (!"descriptor.yml".equalsIgnoreCase(filename) && current.getStorageDataType() != StorageDataType.DIRECTORY) {
+                if (!"descriptor.yml".equalsIgnoreCase(filename)
+                    && current.getStorageDataType() != StorageDataType.DIRECTORY) {
                     setChecksumCRC32(runStorage.getIdStorage(), calculateFileCRC32(current.getData()), filename);
                 }
             }
@@ -342,7 +351,9 @@ public class TaskProvisioningService {
 
     public long calculateFileCRC32(File file) throws IOException {
         java.util.zip.Checksum crc32 = new CRC32();
-        if (Objects.isNull(file)) return 0;
+        if (Objects.isNull(file)) {
+            return 0;
+        }
         // Use try-with-resources to ensure the input stream is closed automatically
         // BufferedInputStream is used for efficient reading in chunks
         try (InputStream is = new BufferedInputStream(new FileInputStream(file))) {
@@ -519,16 +530,14 @@ public class TaskProvisioningService {
 
     }
 
-    public long getChecksumCRC32(String identifier, String name) throws FileStorageException
-    {
+    public long getChecksumCRC32(String identifier, String name) {
 
         String reference = identifier + "-" + name;
         Checksum crc32 = checksumRepository.findByReference(reference);
         return crc32.getChecksumCRC32();
     }
 
-    public void setChecksumCRC32(String identifier, long checksumCRC32, String name)
-    {
+    public void setChecksumCRC32(String identifier, long checksumCRC32, String name) {
         String reference = identifier + "-" + name;
         Checksum crc32 = new Checksum(UUID.randomUUID(), reference, checksumCRC32);
         checksumRepository.save(crc32);
@@ -605,8 +614,8 @@ public class TaskProvisioningService {
                             filePath.toFile(),
                             outputName);
                         // calculate CRC32 for all storage data entry and save it in the database
-                        log.info("Posting Outputs Archive: calculating CRC32 checksum for zip entry {}"
-                            , ze.getName());
+                        log.info("Posting Outputs Archive: calculating CRC32 checksum for zip entry {}",
+                            ze.getName());
                         calculateCRC32Checksum(run, contentsOfZip, parameterZipEntryStorageData);
                         break;
                     }
@@ -617,7 +626,10 @@ public class TaskProvisioningService {
                             partialParameterZipEntryStorageData = new StorageData(ze.getName());
                             contentsOfZip.add(partialParameterZipEntryStorageData);
                             log.info("Posting Outputs Archive: creating directory {} in storage...", ze.getName());
-                            Path directoryPath = Path.of(basePath, "/", "task-run-outputs-" + run.getId(), ze.getName());
+                            Path directoryPath = Path.of(
+                                basePath,
+                                "/",
+                                "task-run-outputs-" + run.getId(), ze.getName());
                             log.info("Posting Outputs Archive: created");
                             Files.createDirectories(directoryPath);
                         } else {
@@ -632,8 +644,8 @@ public class TaskProvisioningService {
                                 filePath.toFile(),
                                 ze.getName());
                             // calculate CRC32 for all storage data entry and save it in the database
-                            log.info("Posting Outputs Archive: calculating CRC32 checksum for zip entry {}"
-                                , ze.getName());
+                            log.info("Posting Outputs Archive: calculating CRC32 checksum for zip entry {}",
+                                ze.getName());
                             calculateCRC32Checksum(run, contentsOfZip, partialParameterZipEntryStorageData);
                         }
 
@@ -740,9 +752,14 @@ public class TaskProvisioningService {
                             .forEach(path -> {
                                 try {
                                     Files.delete(path);
-                                } catch (IOException ignored) {}
+                                } catch (IOException ignored) {
+                                    log.info("Posting Outputs Archive: ignored exception while deleting file {}", path);
+                                }
                             });
-                    } catch (IOException ignored) {}
+                    } catch (IOException ignored) {
+                        log.info("Posting Outputs Archive: ignored exception while deleting files in directory {}",
+                            basePath);
+                    }
                     break;
                 }
                 // saving to the database does not care about the type
@@ -770,13 +787,15 @@ public class TaskProvisioningService {
         }
     }
 
-    private void calculateCRC32Checksum(Run run, List<StorageData> contentsOfZip,
-                                        StorageData partialParameterZipEntryStorageData)
-        throws ProvisioningException
-    {
+    private void calculateCRC32Checksum(
+        Run run,
+        List<StorageData> contentsOfZip,
+        StorageData partialParameterZipEntryStorageData
+    ) throws ProvisioningException {
         for (StorageDataEntry current : partialParameterZipEntryStorageData.getEntryList()) {
             try {
-                setChecksumCRC32("task-run-outputs-" + run.getId(), calculateFileCRC32(current.getData()), current.getName());
+                setChecksumCRC32("task-run-outputs-" + run.getId(),
+                    calculateFileCRC32(current.getData()), current.getName());
             } catch (IOException e) {
                 AppEngineError error = ErrorBuilder.build(ErrorCode.INTERNAL_CRC32_CALC_FAILED);
                 throw new ProvisioningException(error);
@@ -1001,8 +1020,7 @@ public class TaskProvisioningService {
     public StateAction updateRunState(
         String runId,
         State state
-    ) throws SchedulingException, ProvisioningException, FileStorageException
-    {
+    ) throws SchedulingException, ProvisioningException, FileStorageException {
         log.info("Update State: validating Run...");
         Run run = getRunIfValid(runId);
 
@@ -1059,26 +1077,28 @@ public class TaskProvisioningService {
         // todo : set the symlinks for any collection or item passed as a reference
         // list all outputs of the task
         Set<Parameter> inputs = run
-                .getTask()
-                .getParameters()
-                .stream()
-                .filter(parameter -> parameter.getParameterType().equals(ParameterType.INPUT))
-                .collect(Collectors.toSet());
+            .getTask()
+            .getParameters()
+            .stream()
+            .filter(parameter -> parameter.getParameterType().equals(ParameterType.INPUT))
+            .collect(Collectors.toSet());
         // loop input parameters
         List<Symlink> links = new ArrayList<>();
         for (Parameter parameter : inputs) {
             if (parameter.getType() instanceof CollectionType) {
-                // if referenced fetch the paths from the database
+                // if referenced, fetch the paths from the database
                 CollectionPersistence collectionPersistence = collectionPersistenceRepository
-                        .findCollectionPersistenceByParameterNameAndRunId(parameter.getName(), run.getId());
+                    .findCollectionPersistenceByParameterNameAndRunId(parameter.getName(), run.getId());
                 if (collectionPersistence.isReferenced()) {
 
                     CollectionSymlink collectionSymlink = new CollectionSymlink();
                     collectionSymlink.setParameterName(parameter.getName());
                     collectionSymlink.setSymlinks(new HashMap<>());
-                    for (TypePersistence ref : collectionPersistence.getItems()){
+                    for (TypePersistence ref : collectionPersistence.getItems()) {
                         ReferencePersistence referencePersistence = (ReferencePersistence) ref;
-                        collectionSymlink.getSymlinks().put(referencePersistence.getCollectionIndex(), referencePersistence.getValue());
+                        collectionSymlink
+                            .getSymlinks()
+                            .put(referencePersistence.getCollectionIndex(), referencePersistence.getValue());
 
                     }
                     links.add(collectionSymlink);
@@ -1218,8 +1238,7 @@ public class TaskProvisioningService {
         return createStateAction(run, TaskRunState.PROVISIONED);
     }
 
-    private StateAction updateToFinished(Run run) throws ProvisioningException, FileStorageException
-    {
+    private StateAction updateToFinished(Run run) throws ProvisioningException, FileStorageException {
         // check the status of Run it should be Queueing
         log.info("Provisioning: processing outputs...");
         if (!run.getState().equals(TaskRunState.QUEUING)) {
@@ -1251,7 +1270,7 @@ public class TaskProvisioningService {
             } catch (TypeValidationException e) {
                 log.info(
                     "Provisioning: "
-                        + "output provision is invalid value validation failed"
+                    + "output provision is invalid value validation failed"
                 );
                 ParameterError parameterError = new ParameterError(parameter.getName());
                 AppEngineError error = ErrorBuilder.build(e.getErrorCode(), parameterError);
@@ -1263,11 +1282,13 @@ public class TaskProvisioningService {
             saveOutput(run, parameter, provisionFileData);
 
             // calculate CRC32 for all storage data entry and save it in the database
-            log.info("Provisioning: calculating CRC32 checksum for zip entry {}"
-                , parameter.getName());
+            log.info("Provisioning: calculating CRC32 checksum for zip entry {}",
+                parameter.getName());
             for (StorageDataEntry current : provisionFileData.getEntryList()) {
                 try {
-                    setChecksumCRC32("task-run-outputs-" + run.getId(), calculateFileCRC32(current.getData()), current.getName());
+                    setChecksumCRC32(
+                        "task-run-outputs-" + run.getId(),
+                        calculateFileCRC32(current.getData()), current.getName());
                 } catch (IOException e) {
                     AppEngineError error = ErrorBuilder.build(ErrorCode.INTERNAL_CRC32_CALC_FAILED);
                     throw new ProvisioningException(error);
@@ -1403,8 +1424,7 @@ public class TaskProvisioningService {
 
     public Path prepareStreaming(
         String runId, String parameterName
-    ) throws IOException
-    {
+    ) throws IOException {
         log.info("provisioning streaming: preparing...");
         Storage runStorage = new Storage("task-run-inputs-" + runId);
         Path filePath = Paths.get(basePath, runStorage.getIdStorage(), parameterName);
@@ -1416,16 +1436,22 @@ public class TaskProvisioningService {
         String runId,
         String parameterName,
         String[] indexesArray
-    ) throws IOException
-    {
+    ) throws IOException {
         log.info("provisioning collection item streaming: preparing...");
         Storage runStorage = new Storage("task-run-inputs-" + runId);
-        Path filePath = Paths.get(basePath, runStorage.getIdStorage(), parameterName + "/" + String.join("/", indexesArray));
+        Path filePath = Paths.get(
+            basePath,
+            runStorage.getIdStorage(),
+            parameterName + "/" + String.join("/",
+            indexesArray));
         Files.createDirectories(filePath.getParent());
         String[] arrayYmlPosition = Arrays.stream(indexesArray)
             .limit(indexesArray.length - 1)
             .toArray(String[]::new);
-        String arrayYmlFilePath = parameterName + "/" + (arrayYmlPosition.length > 0 ? String.join("/", arrayYmlPosition) + "/" : "") + "array.yml";
+        String arrayYmlFilePath = parameterName
+            + "/"
+            + (arrayYmlPosition.length > 0 ? String.join("/", arrayYmlPosition) + "/" : "")
+            + "array.yml";
         Path arrayYmlPath = Paths.get(basePath, runStorage.getIdStorage(), "/" + arrayYmlFilePath);
         if (Files.exists(arrayYmlPath)) {
             // update the array.yml metadata file
@@ -1455,8 +1481,7 @@ public class TaskProvisioningService {
     }
 
     public File streamToStorage(String parameterName, HttpServletRequest request, Path filePath)
-        throws ProvisioningException
-    {
+        throws ProvisioningException {
         log.info("provisioning streaming: streaming...");
         if (!JakartaServletFileUpload.isMultipartContent(request)) {
             log.info("provisioning streaming: not multipart");
@@ -1468,7 +1493,8 @@ public class TaskProvisioningService {
         }
 
         FileItemFactory<DiskFileItem> factory = DiskFileItemFactory.builder().get();
-        JakartaServletFileUpload<DiskFileItem, FileItemFactory<DiskFileItem>> upload = new JakartaServletFileUpload<>(factory);
+        JakartaServletFileUpload<DiskFileItem, FileItemFactory<DiskFileItem>> upload =
+            new JakartaServletFileUpload<>(factory);
         File uploadedFile = new File(filePath.toAbsolutePath().toString());
         ;
         try {
@@ -1490,7 +1516,8 @@ public class TaskProvisioningService {
 
             // Validate that the first part is indeed a file and not a simple form field
             if (item.isFormField()) {
-                log.warn("provisioning streaming: Expected a file but the first part is a form field: {}", item.getFieldName());
+                log.warn("provisioning streaming: Expected a file but the first part is a form field: {}",
+                    item.getFieldName());
                 AppEngineError error = ErrorBuilder.build(
                     ErrorCode.INTERNAL_NO_FILE_BUT_FORM_FIELD,
                     new ParameterError(parameterName)
@@ -1517,8 +1544,7 @@ public class TaskProvisioningService {
     }
 
     public InputStream prepareStream(HttpServletRequest request)
-        throws ProvisioningException
-    {
+        throws ProvisioningException {
         log.info("provisioning streaming: streaming...");
         if (!JakartaServletFileUpload.isMultipartContent(request)) {
             log.info("provisioning streaming: not multipart");
@@ -1529,7 +1555,8 @@ public class TaskProvisioningService {
         }
 
         FileItemFactory<DiskFileItem> factory = DiskFileItemFactory.builder().get();
-        JakartaServletFileUpload<DiskFileItem, FileItemFactory<DiskFileItem>> upload = new JakartaServletFileUpload<>(factory);
+        JakartaServletFileUpload<DiskFileItem, FileItemFactory<DiskFileItem>> upload =
+            new JakartaServletFileUpload<>(factory);
 
         InputStream uploadedStream;
         try {
@@ -1550,7 +1577,8 @@ public class TaskProvisioningService {
 
             // Validate that the first part is indeed a file and not a simple form field
             if (item.isFormField()) {
-                log.warn("provisioning streaming: Expected a file but the first part is a form field: {}", item.getFieldName());
+                log.warn("provisioning streaming: Expected a file but the first part is a form field: {}",
+                    item.getFieldName());
                 AppEngineError error = ErrorBuilder.build(
                     ErrorCode.INTERNAL_NO_FILE_BUT_FORM_FIELD
                 );
@@ -1558,7 +1586,7 @@ public class TaskProvisioningService {
             }
 
             // --- Stream the file content directly to the target File ---
-           uploadedStream = item.getInputStream();
+            uploadedStream = item.getInputStream();
 
         } catch (Exception e) {
             log.warn("provisioning streaming: failed to stream input file {}", e.getMessage());

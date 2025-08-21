@@ -15,6 +15,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import be.cytomine.appengine.models.task.wsi.WsiType;
+import be.cytomine.appengine.repositories.collection.ReferencePersistenceRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -97,12 +99,16 @@ public class CollectionType extends Type {
     @Transient
     private Type parentType;
 
+    @Transient
+    private boolean referenced;
+
     public CollectionType(CollectionType copy) {
         this.subType = copy.getSubType();
         this.maxSize = copy.getMaxSize();
         this.minSize = copy.getMinSize();
         this.parentType = copy.getParentType();
         this.trackingType = copy.getTrackingType();
+        this.referenced = copy.isReferenced();
     }
 
     public void validateFeatureCollection(String json, GeometryType geometryType)
@@ -429,6 +435,10 @@ public class CollectionType extends Type {
             // validate subtype
             if (map.get("value") != null) {
                 trackingType.validate(map.get("value"));
+                referenced = map.get("value") instanceof String
+                        && (trackingType instanceof FileType
+                        || trackingType instanceof ImageType
+                        || trackingType instanceof WsiType);
                 trackingType = parentType;
             }
 
@@ -768,6 +778,7 @@ public class CollectionType extends Type {
                 persistedProvision.setParameterType(ParameterType.INPUT);
                 persistedProvision.setParameterName(parameterName);
                 persistedProvision.setProvisioned(true);
+                persistedProvision.setReferenced(referenced); // to later one tell if this is using refs
                 persistedProvision.setRunId(runId);
             }
             List<TypePersistence> items = new ArrayList<>();
@@ -794,6 +805,8 @@ public class CollectionType extends Type {
                     return getGeometryPersistence(node, runId, parameterName);
                 case "DateTimeType":
                     return getDateTimePersistence(node, runId, parameterName);
+                case "FileType" , "ImageType" , "WsiType":
+                    return getReferencePersistence(node, runId, parameterName);
                 default:
                     return null;
             }
@@ -886,6 +899,31 @@ public class CollectionType extends Type {
             stringPersistence.setValue(node.asText());
         }
         return stringPersistence;
+    }
+
+    private static ReferencePersistence getReferencePersistence(
+            JsonNode node,
+            UUID runId,
+            String parameterName) {
+
+        ReferencePersistenceRepository referencePersistenceRepository = AppEngineApplicationContext.getBean(
+                ReferencePersistenceRepository.class);
+
+        ReferencePersistence referencePersistence = referencePersistenceRepository.findReferencePersistenceByParameterNameAndRunIdAndParameterType(
+                parameterName, runId, ParameterType.INPUT
+        );
+        if (referencePersistence == null) {
+            referencePersistence = new ReferencePersistence();
+            referencePersistence.setParameterType(ParameterType.INPUT);
+            referencePersistence.setParameterName(parameterName);
+            referencePersistence.setRunId(runId);
+            referencePersistence.setValueType(ValueType.REFERENCE);
+            referencePersistence.setValue(node.asText());
+            referencePersistence.setCollectionIndex(parameterName.substring(parameterName.indexOf("[")));
+        } else {
+            referencePersistence.setValue(node.asText());
+        }
+        return referencePersistence;
     }
 
     private static NumberPersistence getNumberPersistence(
@@ -1255,6 +1293,10 @@ public class CollectionType extends Type {
             name = provision.get("param_name").asText();
         }
 
+        if (referenced) {
+            return new StorageData(true);
+        }
+
         // if provision is full collection
         return mapNode("/" + name, provision.get("value"),
             new StorageData(), run);
@@ -1342,8 +1384,13 @@ public class CollectionType extends Type {
         } else {
             provisionedParameter.put("index", provision.get("index").asText());
         }
+
+        if (referenced && (currentType instanceof FileType || currentType instanceof ImageType || currentType instanceof WsiType)) {
+            provisionedParameter.set("value", provision.get("value"));
+        }
+
         if (!(currentType instanceof ImageType)
-            && !(currentType instanceof GeometryType)
+                && !(currentType instanceof GeometryType)
             && !(currentType instanceof FileType)) {
             provisionedParameter.set("value", provision.get("value"));
         }

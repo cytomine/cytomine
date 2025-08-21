@@ -193,7 +193,8 @@ public class KubernetesScheduler implements SchedulerHandler {
                             + "/"
                             + collectionSymlink.getParameterName()
                             + " && ");
-                    for (Map.Entry<String, String> entry : collectionSymlink.getSymlinks().entrySet()) {
+                    for (Map.Entry<String, String> entry :
+                        collectionSymlink.getSymlinks().entrySet()) {
                         createSymlinks
                             .append("ln -s ")
                             .append(entry.getValue())
@@ -251,7 +252,8 @@ public class KubernetesScheduler implements SchedulerHandler {
 
         String clusterOutputCommand = wait + and + zipOutputs + and + sendOutputs;
         String updateAPIRequestJson = " '{ \"desired\" : \"FINISHED\" }' ";
-        String requestToUpdateRunStateToFinished = "curl -X POST -H 'Content-Type: application/json' -d";
+        String requestToUpdateRunStateToFinished
+            = "curl -X POST -H 'Content-Type: application/json' -d";
         requestToUpdateRunStateToFinished += updateAPIRequestJson;
         requestToUpdateRunStateToFinished += url + "/" + "state-actions";
         String localOutputCommand = wait + and + requestToUpdateRunStateToFinished;

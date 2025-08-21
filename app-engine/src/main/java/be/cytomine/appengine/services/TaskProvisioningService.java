@@ -332,7 +332,9 @@ public class TaskProvisioningService {
                 String filename = current.getName();
                 if (!"descriptor.yml".equalsIgnoreCase(filename)
                     && current.getStorageDataType() != StorageDataType.DIRECTORY) {
-                    setChecksumCRC32(runStorage.getIdStorage(), calculateFileCRC32(current.getData()), filename);
+                    setChecksumCRC32(
+                        runStorage.getIdStorage(),
+                        calculateFileCRC32(current.getData()), filename);
                 }
             }
             if (inputProvisionFileData.isReferenced()) {
@@ -515,7 +517,8 @@ public class TaskProvisioningService {
                     zipEntry.setMethod(ZipEntry.STORED);
                     zipEntry.setSize(current.getData().length());
                     zipEntry.setCompressedSize(current.getData().length());
-                    zipEntry.setCrc(getChecksumCRC32("task-run-" + io + "-" + run.getId(), current.getName()));
+                    zipEntry.setCrc(
+                        getChecksumCRC32("task-run-" + io + "-" + run.getId(), current.getName()));
                     zipOut.putNextEntry(zipEntry);
                     Files.copy(current.getData().toPath(), zipOut);
                 }
@@ -605,8 +608,13 @@ public class TaskProvisioningService {
                         remainingOutputs.remove(i);
                         StorageData parameterZipEntryStorageData;
                         String outputName = currentOutput.getName(); //
-                        Path filePath = Path.of(basePath, "/", "task-run-outputs-" + run.getId(), outputName);
-                        log.info("Posting Outputs Archive: storing {} in storage...", currentOutput);
+                        Path filePath = Path.of(
+                            basePath,
+                            "/",
+                            "task-run-outputs-" + run.getId(),
+                            outputName);
+                        log.info("Posting Outputs Archive: storing {} in storage...",
+                            currentOutput);
                         Files.createDirectories(filePath.getParent());
                         Files.copy(zais, filePath, StandardCopyOption.REPLACE_EXISTING);
                         log.info("Posting Outputs Archive: stored ");
@@ -614,7 +622,8 @@ public class TaskProvisioningService {
                             filePath.toFile(),
                             outputName);
                         // calculate CRC32 for all storage data entry and save it in the database
-                        log.info("Posting Outputs Archive: calculating CRC32 checksum for zip entry {}",
+                        log.info("Posting Outputs Archive: "
+                            + "calculating CRC32 checksum for zip entry {}",
                             ze.getName());
                         calculateCRC32Checksum(run, contentsOfZip, parameterZipEntryStorageData);
                         break;
@@ -625,7 +634,9 @@ public class TaskProvisioningService {
                         if (ze.isDirectory()) {
                             partialParameterZipEntryStorageData = new StorageData(ze.getName());
                             contentsOfZip.add(partialParameterZipEntryStorageData);
-                            log.info("Posting Outputs Archive: creating directory {} in storage...", ze.getName());
+                            log.info("Posting Outputs Archive: "
+                                + "creating directory {} in storage...",
+                                ze.getName());
                             Path directoryPath = Path.of(
                                 basePath,
                                 "/",
@@ -633,20 +644,28 @@ public class TaskProvisioningService {
                             log.info("Posting Outputs Archive: created");
                             Files.createDirectories(directoryPath);
                         } else {
-                            Path filePath = Path.of(basePath, "/", "task-run-outputs-" + run.getId(), ze
+                            Path filePath = Path.of(
+                                basePath,
+                                "/",
+                                "task-run-outputs-" + run.getId(),
+                                ze
                                 .getName()
                                 .replace("/", ""));
                             Files.createDirectories(filePath);
-                            log.info("Posting Outputs Archive: storing {} in storage...", ze.getName());
+                            log.info("Posting Outputs Archive: storing {} in storage...",
+                                ze.getName());
                             Files.copy(zais, filePath, StandardCopyOption.REPLACE_EXISTING);
                             log.info("Posting Outputs Archive: stored ");
                             partialParameterZipEntryStorageData = new StorageData(
                                 filePath.toFile(),
                                 ze.getName());
-                            // calculate CRC32 for all storage data entry and save it in the database
-                            log.info("Posting Outputs Archive: calculating CRC32 checksum for zip entry {}",
+                            log.info("Posting Outputs Archive: "
+                                + "calculating CRC32 checksum for zip entry {}",
                                 ze.getName());
-                            calculateCRC32Checksum(run, contentsOfZip, partialParameterZipEntryStorageData);
+                            calculateCRC32Checksum(
+                                run,
+                                contentsOfZip,
+                                partialParameterZipEntryStorageData);
                         }
 
                         break;
@@ -746,18 +765,23 @@ public class TaskProvisioningService {
                     multipleErrors.add(error);
                     run.setState(TaskRunState.FAILED);
                     runRepository.saveAndFlush(run);
-                    log.info("Posting Outputs Archive: updated Run state to FAILED because of invalid output");
-                    try (Stream<Path> paths = Files.walk(Paths.get(basePath, "/", "task-run-outputs-" + run.getId()))) {
+                    log.info("Posting Outputs Archive: "
+                        + "updated Run state to FAILED because of invalid output");
+                    try (Stream<Path> paths = Files.walk(
+                        Paths.get(basePath, "/", "task-run-outputs-" + run.getId()))) {
                         paths.sorted(Comparator.reverseOrder()) // Delete children before parent
                             .forEach(path -> {
                                 try {
                                     Files.delete(path);
                                 } catch (IOException ignored) {
-                                    log.info("Posting Outputs Archive: ignored exception while deleting file {}", path);
+                                    log.info("Posting Outputs Archive: "
+                                        + "ignored exception while deleting file {}",
+                                        path);
                                 }
                             });
                     } catch (IOException ignored) {
-                        log.info("Posting Outputs Archive: ignored exception while deleting files in directory {}",
+                        log.info("Posting Outputs Archive: "
+                            + "ignored exception while deleting files in directory {}",
                             basePath);
                     }
                     break;
@@ -1088,7 +1112,9 @@ public class TaskProvisioningService {
             if (parameter.getType() instanceof CollectionType) {
                 // if referenced, fetch the paths from the database
                 CollectionPersistence collectionPersistence = collectionPersistenceRepository
-                    .findCollectionPersistenceByParameterNameAndRunId(parameter.getName(), run.getId());
+                    .findCollectionPersistenceByParameterNameAndRunId(
+                    parameter.getName(),
+                    run.getId());
                 if (collectionPersistence.isReferenced()) {
 
                     CollectionSymlink collectionSymlink = new CollectionSymlink();
@@ -1098,7 +1124,10 @@ public class TaskProvisioningService {
                         ReferencePersistence referencePersistence = (ReferencePersistence) ref;
                         collectionSymlink
                             .getSymlinks()
-                            .put(referencePersistence.getCollectionIndex(), referencePersistence.getValue());
+                            .put(
+                            referencePersistence.getCollectionIndex(),
+                            referencePersistence.getValue()
+                            );
 
                     }
                     links.add(collectionSymlink);
@@ -1238,7 +1267,8 @@ public class TaskProvisioningService {
         return createStateAction(run, TaskRunState.PROVISIONED);
     }
 
-    private StateAction updateToFinished(Run run) throws ProvisioningException, FileStorageException {
+    private StateAction updateToFinished(Run run)
+        throws ProvisioningException, FileStorageException {
         // check the status of Run it should be Queueing
         log.info("Provisioning: processing outputs...");
         if (!run.getState().equals(TaskRunState.QUEUING)) {
@@ -1259,7 +1289,9 @@ public class TaskProvisioningService {
                 new StorageData(parameter.getName(), "task-run-outputs-" + run.getId())
             );
             if (provisionFileData == null || provisionFileData.getEntryList().isEmpty()) {
-                AppEngineError error = ErrorBuilder.build(ErrorCode.INTERNAL_MISSING_OUTPUT_FILE_FOR_PARAMETER);
+                AppEngineError error = ErrorBuilder.build(
+                    ErrorCode.INTERNAL_MISSING_OUTPUT_FILE_FOR_PARAMETER
+                );
                 throw new ProvisioningException(error);
             }
 
@@ -1463,7 +1495,10 @@ public class TaskProvisioningService {
             Files.writeString(arrayYmlPath, newContent, Charset.defaultCharset());
             // update CRC32 checksum for it
             long updatedChecksum = calculateFileCRC32(arrayYmlPath.toFile());
-            Checksum checksum = checksumRepository.findByReference(runStorage.getIdStorage() + "-" + arrayYmlFilePath);
+            Checksum checksum = checksumRepository.findByReference(
+                runStorage.getIdStorage()
+                + "-"
+                + arrayYmlFilePath);
             checksum.setChecksumCRC32(updatedChecksum);
             checksumRepository.saveAndFlush(checksum);
         } else {
@@ -1498,7 +1533,6 @@ public class TaskProvisioningService {
         File uploadedFile = new File(filePath.toAbsolutePath().toString());
         ;
         try {
-            // Get an iterator for the multipart parts. This avoids parsing the whole request at once.
             FileItemInputIterator iter = upload.getItemIterator(request);
 
             // Check if there's at least one part in the request
@@ -1516,7 +1550,8 @@ public class TaskProvisioningService {
 
             // Validate that the first part is indeed a file and not a simple form field
             if (item.isFormField()) {
-                log.warn("provisioning streaming: Expected a file but the first part is a form field: {}",
+                log.warn("provisioning streaming: "
+                    + "Expected a file but the first part is a form field: {}",
                     item.getFieldName());
                 AppEngineError error = ErrorBuilder.build(
                     ErrorCode.INTERNAL_NO_FILE_BUT_FORM_FIELD,
@@ -1528,7 +1563,7 @@ public class TaskProvisioningService {
             // --- Stream the file content directly to the target File ---
             try (InputStream uploadedStream = item.getInputStream();
                 FileOutputStream fos = new FileOutputStream(uploadedFile)) {
-                IOUtils.copyLarge(uploadedStream, fos); // Efficiently copy bytes from input to output
+                IOUtils.copyLarge(uploadedStream, fos);
                 log.info("provisioning streaming: file successfully streamed and saved ");
             }
 
@@ -1560,7 +1595,6 @@ public class TaskProvisioningService {
 
         InputStream uploadedStream;
         try {
-            // Get an iterator for the multipart parts. This avoids parsing the whole request at once.
             FileItemInputIterator iter = upload.getItemIterator(request);
 
             // Check if there's at least one part in the request
@@ -1577,7 +1611,8 @@ public class TaskProvisioningService {
 
             // Validate that the first part is indeed a file and not a simple form field
             if (item.isFormField()) {
-                log.warn("provisioning streaming: Expected a file but the first part is a form field: {}",
+                log.warn("provisioning streaming: "
+                    + "Expected a file but the first part is a form field: {}",
                     item.getFieldName());
                 AppEngineError error = ErrorBuilder.build(
                     ErrorCode.INTERNAL_NO_FILE_BUT_FORM_FIELD

@@ -419,7 +419,10 @@ public class TaskRunController {
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE); // Or "application/zip"
         response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"outputs-" + runId + ".zip\"");
 
-        taskRunService.retrieveIOZipArchive(runId, ParameterType.OUTPUT,response.getOutputStream());
+        taskRunService.retrieveIOZipArchive(
+            runId,
+            ParameterType.OUTPUT,
+            response.getOutputStream());
         response.flushBuffer();
 
         log.info("/task-runs/{run_id}/outputs.zip GET Ended");

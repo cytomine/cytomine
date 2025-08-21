@@ -1,10 +1,10 @@
 package be.cytomine.appengine.dto.handlers.scheduler;
 
-import lombok.Data;
-
 import java.util.Map;
+
+import lombok.Data;
 
 @Data
 public class Symlink {
-    private Map<String, String> Symlinks; // "{parameterName}[index] : {path}
+    private Map<String, String> symlinks;
 }

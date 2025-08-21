@@ -5,7 +5,6 @@ from typing import List, Tuple
 
 import faiss
 import numpy as np
-import torch
 
 
 class Indexer:

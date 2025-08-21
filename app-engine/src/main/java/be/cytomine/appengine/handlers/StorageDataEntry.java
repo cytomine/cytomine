@@ -48,7 +48,12 @@ public class StorageDataEntry {
         this.storageId = storageId;
     }
 
-    public StorageDataEntry(File data, String parameterName, String storageId, StorageDataType storageDataType) {
+    public StorageDataEntry(
+        File data,
+        String parameterName,
+        String storageId,
+        StorageDataType storageDataType
+    ) {
         this.data = data;
         this.name = parameterName;
         this.storageId = storageId;

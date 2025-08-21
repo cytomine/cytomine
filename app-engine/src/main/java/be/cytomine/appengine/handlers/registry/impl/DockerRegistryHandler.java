@@ -54,7 +54,8 @@ public class DockerRegistryHandler implements RegistryHandler {
             RegistryClient.delete(imageName);
         } catch (IOException e) {
             log.error("Error reading image data from file: {}", imageName, e);
-            throw new RegistryException("Docker Registry Handler: failed to delete image from registry");
+            throw new RegistryException("Docker Registry Handler: "
+                + "failed to delete image from registry");
         }
     }
 }

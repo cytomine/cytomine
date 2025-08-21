@@ -323,7 +323,9 @@ public class TaskRunController {
 
         // Set response headers for a file download
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE); // Or "application/zip"
-        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"inputs-" + runId + ".zip\"");
+        response.setHeader(
+            HttpHeaders.CONTENT_DISPOSITION,
+            "attachment; filename=\"inputs-" + runId + ".zip\"");
 
         taskRunService.retrieveIOZipArchive(runId, ParameterType.INPUT, response.getOutputStream());
         response.flushBuffer();
@@ -417,7 +419,9 @@ public class TaskRunController {
 
         // Set response headers for a file download
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE); // Or "application/zip"
-        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"outputs-" + runId + ".zip\"");
+        response.setHeader(
+            HttpHeaders.CONTENT_DISPOSITION,
+            "attachment; filename=\"outputs-" + runId + ".zip\"");
 
         taskRunService.retrieveIOZipArchive(
             runId,

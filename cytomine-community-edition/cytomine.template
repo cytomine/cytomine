@@ -8,7 +8,7 @@ global:
       # must consist only of lowercase alphanumeric characters, hyphens, and underscores as well as start with a letter or number
       NAME: cytomine-ce
       # Where are the data stored. Warning, images can be heavy.
-      PROJECT_DATA_PATH: ./data
+      PROJECT_DATA_PATH: /home/siddig-hamed/migration/cytomine/cytomine-community-edition/data
       # URL scheme can be either 'http' or 'https'.
       SCHEME: http
       # External port to listen to. Customize if for example port 80 is already taken by a reverse proxy on the server
@@ -18,6 +18,7 @@ global:
       WEIGHT_PATH: ./data/weight
       # Path to the directory where image dataset folders (if any) are stored for importing large numbers of images.
       DATASET_PATH: ./data/dataset
+      REF_STORAGE_BASE_PATH: /home/siddig-hamed/data/datasets
 
   urls_with_scheme:
     constant:
@@ -53,15 +54,15 @@ global:
   app-engine:
     constant:
       # The URL of the compute cluster
-      SCHEDULER_MASTER_URL: changeme
+      SCHEDULER_MASTER_URL: https://10.28.51.130:16443
       # The token provided by the compute cluster
-      SCHEDULER_OAUTH_TOKEN: changeme
+      SCHEDULER_OAUTH_TOKEN: eyJhbGciOiJSUzI1NiIsImtpZCI6IjhLS0lpckVOZjhIM0VOUTA2bHZsMGFSUWVSa000UFpJWFNOZjlBT1I3cmcifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6ImFwcGVuZ2luZS1zYS10b2tlbiIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJhcHBlbmdpbmUtc2EiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiIwODVkZjEwNS1iYWIxLTRmOTItYjc2My04NjA1MGI4OWIwY2YiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6ZGVmYXVsdDphcHBlbmdpbmUtc2EifQ.Dh1NQXPg54jZstneXxHg8Rta2CR_AcAgZd7rNV9gVxYUAIFFfmCLfgMpjW3IOwJZ03Ers8hR4pWlEGy3BidvFsJo1s5SXn8pENb6lvH1CvM_fDDp1QqWEDn6qsoBMVtw3e2ujAFrFzboCdGnRNVlzYrpmaOlz6BEGi6YUlU02jIoOmsTLOe5bADtoSBF0ZDhdY1IuKbg_-U9eM_DxjwTv6A3hMFdBfKfQnusuz8dueUbQ-jDUh40xX2s3topQOIbeSeTf8o6UNfrR8HbbOWDPoAZH4E-IUKXyeNlTutFEHh0mjtHJqpSq3xVENUeLKdISZJu1rFCQlZVHJSnDDhDsg
       # The username should be admin
       SCHEDULER_USERNAME: admin
       # possible values [local,cluster] local is default
       SCHEDULER_RUN_MODE: local
       # app engine storage directory in host
-      RUN_STORAGE_BASE_PATH: ./data/app-engine
+      RUN_STORAGE_BASE_PATH: /home/siddig-hamed/migration/cytomine/cytomine-community-edition/data/app-engine
 
 
 # -------------------------------------------------- #
@@ -300,6 +301,8 @@ services:
     app-engine:
       constant:
         API_PREFIX: /app-engine/
+        RUN_STORAGE_BASE_PATH: /home/siddig-hamed/migration/cytomine/cytomine-community-edition/data/app-engine
+        STORAGE_BASE_PATH: /home/siddig-hamed/migration/cytomine/cytomine-community-edition/data/app-engine
       global:
         DB_HOST: aaa_services_uri.POSTGIS
         DB_PORT: postgres.PORT
@@ -307,10 +310,10 @@ services:
         DB_USERNAME: postgres-appengine.USER
         DB_PASSWORD: postgres-appengine.PASS
         REGISTRY_HOST: aaa_services_uri.REGISTRY
-        STORAGE_BASE_PATH: container_paths.APPENGINE_FILE_STORAGE
         SCHEDULER_MASTER_URL: app-engine.SCHEDULER_MASTER_URL
         SCHEDULER_OAUTH_TOKEN: app-engine.SCHEDULER_OAUTH_TOKEN
         SCHEDULER_USERNAME: app-engine.SCHEDULER_USERNAME
+        REF_STORAGE_BASE_PATH: aaa_config.REF_STORAGE_BASE_PATH
 
     cbir:
       global:

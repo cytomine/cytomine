@@ -12,15 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -28,14 +20,19 @@ import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import be.cytomine.appengine.dto.handlers.scheduler.CollectionSymlink;
+import be.cytomine.appengine.dto.handlers.scheduler.Symlink;
 import be.cytomine.appengine.models.task.Checksum;
+import be.cytomine.appengine.models.task.collection.ReferencePersistence;
+import be.cytomine.appengine.models.task.file.FileType;
+import be.cytomine.appengine.models.task.image.ImageType;
+import be.cytomine.appengine.models.task.wsi.WsiType;
 import be.cytomine.appengine.repositories.ChecksumRepository;
 import be.cytomine.appengine.utils.FileHelper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -51,7 +48,6 @@ import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import be.cytomine.appengine.dto.handlers.filestorage.Storage;
 import be.cytomine.appengine.dto.handlers.scheduler.Schedule;
@@ -330,7 +326,9 @@ public class TaskProvisioningService {
                     setChecksumCRC32(runStorage.getIdStorage(), calculateFileCRC32(current.getData()), filename);
                 }
             }
-
+            if (inputProvisionFileData.isReferenced()) {
+                return;
+            }
             fileStorageHandler.saveStorageData(runStorage, inputProvisionFileData);
         } catch (FileStorageException | IOException e) {
             AppEngineError error = ErrorBuilder.buildParamRelatedError(
@@ -344,6 +342,7 @@ public class TaskProvisioningService {
 
     public long calculateFileCRC32(File file) throws IOException {
         java.util.zip.Checksum crc32 = new CRC32();
+        if (Objects.isNull(file)) return 0;
         // Use try-with-resources to ensure the input stream is closed automatically
         // BufferedInputStream is used for efficient reading in chunks
         try (InputStream is = new BufferedInputStream(new FileInputStream(file))) {
@@ -1057,6 +1056,49 @@ public class TaskProvisioningService {
         log.info("Running Task: contacting scheduler...");
         Schedule schedule = new Schedule();
         schedule.setRun(run);
+        // todo : set the symlinks for any collection or item passed as a reference
+        // list all outputs of the task
+        Set<Parameter> inputs = run
+                .getTask()
+                .getParameters()
+                .stream()
+                .filter(parameter -> parameter.getParameterType().equals(ParameterType.INPUT))
+                .collect(Collectors.toSet());
+        // loop input parameters
+        List<Symlink> links = new ArrayList<>();
+        for (Parameter parameter : inputs) {
+            if (parameter.getType() instanceof CollectionType) {
+                // if referenced fetch the paths from the database
+                CollectionPersistence collectionPersistence = collectionPersistenceRepository
+                        .findCollectionPersistenceByParameterNameAndRunId(parameter.getName(), run.getId());
+                if (collectionPersistence.isReferenced()) {
+
+                    CollectionSymlink collectionSymlink = new CollectionSymlink();
+                    collectionSymlink.setParameterName(parameter.getName());
+                    collectionSymlink.setSymlinks(new HashMap<>());
+                    for (TypePersistence ref : collectionPersistence.getItems()){
+                        ReferencePersistence referencePersistence = (ReferencePersistence) ref;
+                        collectionSymlink.getSymlinks().put(referencePersistence.getCollectionIndex(), referencePersistence.getValue());
+
+                    }
+                    links.add(collectionSymlink);
+                }
+            }
+            if (parameter.getType() instanceof FileType fileType) {
+                // todo: handle file refs
+
+            }
+            if (parameter.getType() instanceof ImageType imageType) {
+                // todo: handle image refs
+            }
+            if (parameter.getType() instanceof WsiType wsiType) {
+                // todo: handle wsi image refs
+            }
+        }
+
+
+        // populate schedule object
+        schedule.setLinks(links);
         schedulerHandler.schedule(schedule);
         log.info("Running Task: scheduling done");
 

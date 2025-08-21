@@ -49,8 +49,7 @@ public class DockerRegistryHandler implements RegistryHandler {
     }
 
     @Override
-    public void deleteImage(String imageName) throws RegistryException
-    {
+    public void deleteImage(String imageName) throws RegistryException {
         try {
             RegistryClient.delete(imageName);
         } catch (IOException e) {

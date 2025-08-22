@@ -119,7 +119,7 @@ public class ApiClient {
     }
 
     public ResponseEntity<String> checkHealth() {
-        return get("http://localhost:" + port + "/actuator/health", String.class);
+        return get("http://localhost:" + port + "/ping", String.class);
     }
 
     public TaskDescription uploadTask(File task) {

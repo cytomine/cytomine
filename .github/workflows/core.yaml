@@ -5,9 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "core/src/main/resources/**"
-      - "core/src/test/resources/**"
-      - "core/src/**/*.java"
+      - "core/**"
       - ".github/**"
   push:
     branches:

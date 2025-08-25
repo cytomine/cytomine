@@ -5,8 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "cytomine-installer/**/*.py"
-      - "cytomine-installer/tests/**"
+      - "cytomine-installer/**"
       - ".github/**"
   push:
     branches:

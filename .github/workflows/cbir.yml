@@ -5,8 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "cbir/**/*.py"
-      - "cbir/tests/**"
+      - "cbir/**"
       - ".github/**"
   push:
     branches:

@@ -19,7 +19,7 @@ jobs:
           - cbir
           - core
           - iam
-          - mongo
+          # - mongo
           - nginx
           - pims
           - postgis

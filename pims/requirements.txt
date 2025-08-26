@@ -177,7 +177,7 @@ python-dotenv==1.0.1
     #   uvicorn
 python-gdcm==3.0.21
     # via cytomine-pims (setup.py)
-python-multipart==0.0.9
+python-multipart==0.0.18
     # via cytomine-pims (setup.py)
 pytz==2022.7.1
     # via celery

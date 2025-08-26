@@ -314,11 +314,9 @@ export default {
   },
   watch: {
     currentPage() {
-      console.log('watch, fetchPage');
       this.fetchPage();
     },
     collection(newCollection, oldCollection) {
-      console.log('watch collection');
       if (oldCollection && newCollection.track !== oldCollection.track) {
         this.initialize();
       } else {
@@ -326,13 +324,11 @@ export default {
       }
     },
     visible() {
-      console.log('watch visible');
       if (this.pendingReload) {
         this.fetchPage();
       }
     },
     activeSlices() {
-      console.log('watch activeSlices');
       this.findPage();
     }
   },

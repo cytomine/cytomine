@@ -251,7 +251,7 @@ websockets==10.4
     # via uvicorn
 zarr==2.14.2
     # via cytomine-pims (setup.py)
-zipp==3.15.0
+zipp==3.19.1
     # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:

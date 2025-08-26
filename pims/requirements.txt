@@ -71,7 +71,7 @@ fastapi-utils==0.7.0
     # via cytomine-pims (setup.py)
 fasteners==0.18
     # via zarr
-fonttools==4.38.0
+fonttools==4.43.0
     # via matplotlib
 future==0.18.3
     # via cytomine-python-client

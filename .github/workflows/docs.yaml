@@ -64,12 +64,12 @@ jobs:
       - name: SSH deploy
         uses: appleboy/scp-action@v1
         with:
-          host: ${{ secrets.REMOTE_HOST }}
-          username: ${{ secrets.REMOTE_USER }}
-          password: ${{ secrets.REMOTE_PASSWORD }}
-          proxy_host: ${{ secrets.REMOTE_PROXY }}
-          proxy_username: ${{ secrets.REMOTE_USER }}
-          proxy_password: ${{ secrets.REMOTE_PASSWORD }}
+          host: ${{ secrets.DOCS_REMOTE_HOST }}
+          username: ${{ secrets.DOCS_REMOTE_USER }}
+          password: ${{ secrets.DOCS_REMOTE_PASSWORD }}
+          proxy_host: ${{ secrets.DOCS_REMOTE_PROXY }}
+          proxy_username: ${{ secrets.DOCS_REMOTE_USER }}
+          proxy_password: ${{ secrets.DOCS_REMOTE_PASSWORD }}
           source: "src/.vuepress/dist/*"
           strip_components: 3
-          target: ${{ secrets.TARGET_NEXT_PATH }}
+          target: ${{ secrets.DOCS_TARGET_NEXT_PATH }}

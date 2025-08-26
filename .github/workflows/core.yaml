@@ -4,11 +4,6 @@ on:
   pull_request:
     branches:
       - main
-    paths:
-      - "core/src/main/resources/**"
-      - "core/src/test/resources/**"
-      - "core/src/**/*.java"
-      - ".github/**"
   push:
     branches:
       - main

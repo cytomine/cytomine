@@ -1,13 +1,12 @@
-# List ARGs here for better readability.
-ARG ENTRYPOINT_SCRIPTS_VERSION=1.4.0
 ARG KEYCLOAK_VERSION=24.0.2
+ARG PROXY_CACHE=registry.cytomine.org/docker
 ARG UBI_VERSION=9.3-1610
 ARG IMAGE_VERSION
 ARG IMAGE_REVISION
 
 #######################################################################################
 ## Stage: IAM build
-FROM quay.io/keycloak/keycloak:${KEYCLOAK_VERSION} AS builder
+FROM ${PROXY_CACHE}/keycloak/keycloak:${KEYCLOAK_VERSION} AS builder
 
 # Enable health and metrics support
 ENV KC_HEALTH_ENABLED=true
@@ -24,54 +23,39 @@ WORKDIR /opt/keycloak
 RUN /opt/keycloak/bin/kc.sh build
 
 #######################################################################################
-## Stage: entrypoint script. Use a multi-stage because COPY --from cannot interpolate variables
-FROM cytomine/entrypoint-scripts:${ENTRYPOINT_SCRIPTS_VERSION} AS entrypoint-scripts
-
-#######################################################################################
 ## Stage: Cytomine IAM dev external tools build
-FROM registry.access.redhat.com/ubi9:${UBI_VERSION} AS dev-tools-builder
+FROM ${PROXY_CACHE}/redhat/ubi9:${UBI_VERSION} AS dev-tools-builder
 RUN mkdir -p /mnt/rootfs
 RUN dnf install --installroot /mnt/rootfs findutils gettext openssh-server rsync --releasever 9 --setopt install_weak_deps=false --nodocs -y && \
     dnf --installroot /mnt/rootfs clean all && \
     rpm --root /mnt/rootfs -e --nodeps setup
 
-# startup scripts
-RUN mkdir /docker-entrypoint-cytomine.d/
-COPY --from=entrypoint-scripts --chmod=774 /envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
-#COPY --from=entrypoint-scripts --chmod=774 /setup-ssh-dev-env.sh /docker-entrypoint-cytomine.d/1-start-ssh-dev-env.sh
-
 #######################################################################################
 ## Stage: Cytomine IAM development image
-FROM quay.io/keycloak/keycloak:${KEYCLOAK_VERSION} AS dev-server
+FROM ${PROXY_CACHE}/keycloak/keycloak:${KEYCLOAK_VERSION} AS dev-server
 
 COPY --from=builder /opt/keycloak/ /opt/keycloak/
 COPY --from=dev-tools-builder /mnt/rootfs /
-COPY --from=dev-tools-builder /docker-entrypoint-cytomine.d/ /docker-entrypoint-cytomine.d/
-COPY --from=entrypoint-scripts --chmod=774 /cytomine-entrypoint.sh /usr/local/bin/
 
 RUN mkdir /opt/keycloak/data/import
 COPY docker/kc_config.json /opt/keycloak/data/import
 
 ENV KC_DB=postgres
 ENV KC_HOSTNAME_DEBUG=true
-ENTRYPOINT ["cytomine-entrypoint.sh", "/opt/keycloak/bin/kc.sh"]
+ENTRYPOINT ["/opt/keycloak/bin/kc.sh"]
 CMD ["start-dev", "--import-realm"]
 
 #######################################################################################
 ## Stage: Cytomine IAM external tools build
-FROM registry.access.redhat.com/ubi9:${UBI_VERSION} AS prod-tools-builder
+FROM ${PROXY_CACHE}/redhat/ubi9:${UBI_VERSION} AS prod-tools-builder
 RUN mkdir -p /mnt/rootfs
 RUN dnf install --installroot /mnt/rootfs findutils gettext --releasever 9 --setopt install_weak_deps=false --nodocs -y && \
     dnf --installroot /mnt/rootfs clean all && \
     rpm --root /mnt/rootfs -e --nodeps setup
 
-# startup scripts
-RUN mkdir /docker-entrypoint-cytomine.d/
-COPY --from=entrypoint-scripts --chmod=774 /envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
-
 #######################################################################################
 ## Stage: Cytomine IAM image
-FROM quay.io/keycloak/keycloak:${KEYCLOAK_VERSION} AS ci
+FROM ${PROXY_CACHE}/keycloak/keycloak:${KEYCLOAK_VERSION} AS ci
 
 ARG ENTRYPOINT_SCRIPTS_VERSION
 ARG KEYCLOAK_VERSION
@@ -91,18 +75,16 @@ LABEL org.opencontainers.image.authors="dev@cytomine.com" \
 
 COPY --from=builder /opt/keycloak/ /opt/keycloak/
 COPY --from=prod-tools-builder /mnt/rootfs /
-COPY --from=prod-tools-builder /docker-entrypoint-cytomine.d/ /docker-entrypoint-cytomine.d/
-COPY --from=entrypoint-scripts --chmod=774 /cytomine-entrypoint.sh /usr/local/bin/
 
 RUN mkdir /opt/keycloak/data/import
 COPY docker/kc_config.json /opt/keycloak/data/import
 
-ENTRYPOINT ["cytomine-entrypoint.sh", "/opt/keycloak/bin/kc.sh"]
+ENTRYPOINT ["/opt/keycloak/bin/kc.sh"]
 CMD ["start-dev" , "--import-realm" , "--http-port=8100"]
 
 #######################################################################################
 ## Stage: Cytomine IAM image
-FROM quay.io/keycloak/keycloak:${KEYCLOAK_VERSION} AS production
+FROM ${PROXY_CACHE}/keycloak/keycloak:${KEYCLOAK_VERSION} AS production
 
 ARG ENTRYPOINT_SCRIPTS_VERSION
 ARG KEYCLOAK_VERSION
@@ -123,13 +105,11 @@ LABEL org.opencontainers.image.authors="dev@cytomine.com" \
 
 COPY --from=builder /opt/keycloak/ /opt/keycloak/
 COPY --from=prod-tools-builder /mnt/rootfs /
-COPY --from=prod-tools-builder /docker-entrypoint-cytomine.d/ /docker-entrypoint-cytomine.d/
-COPY --from=entrypoint-scripts --chmod=774 /cytomine-entrypoint.sh /usr/local/bin/
 
 RUN mkdir /opt/keycloak/data/import
 COPY docker/kc_config.json /opt/keycloak/data/import
 
 ENV KC_DB=postgres
 
-ENTRYPOINT ["cytomine-entrypoint.sh", "/opt/keycloak/bin/kc.sh"]
+ENTRYPOINT ["/opt/keycloak/bin/kc.sh"]
 CMD ["start" , "--import-realm"]

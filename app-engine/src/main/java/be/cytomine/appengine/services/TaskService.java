@@ -150,37 +150,21 @@ public class TaskService {
         }
         log.info("UploadTask: image pushed to registry");
 
-        // save task info
+        JsonNode descriptor = uploadTaskArchive.getDescriptorFileAsJson();
         Task task = new Task();
         task.setIdentifier(taskIdentifiers.getLocalTaskIdentifier());
         task.setStorageReference(taskIdentifiers.getStorageIdentifier());
         task.setImageName(taskIdentifiers.getImageRegistryCompliantName());
-        task.setName(uploadTaskArchive.getDescriptorFileAsJson().get("name").textValue());
-        task.setNameShort(uploadTaskArchive
-            .getDescriptorFileAsJson()
-            .get("name_short")
-            .textValue());
-        task.setDescriptorFile(
-            uploadTaskArchive.getDescriptorFileAsJson().get("namespace").textValue());
-        task.setNamespace(uploadTaskArchive.getDescriptorFileAsJson().get("namespace").textValue());
-        task.setVersion(uploadTaskArchive.getDescriptorFileAsJson().get("version").textValue());
-        task.setInputFolder(
-            uploadTaskArchive
-            .getDescriptorFileAsJson()
-            .get("configuration")
-            .get("input_folder")
-            .textValue());
-        task.setOutputFolder(
-            uploadTaskArchive
-            .getDescriptorFileAsJson()
-            .get("configuration")
-            .get("output_folder")
-            .textValue());
+        task.setName(descriptor.get("name").textValue());
+        task.setNameShort(descriptor.get("name_short").textValue());
+        task.setDescriptorFile(descriptor.get("namespace").textValue());
+        task.setNamespace(descriptor.get("namespace").textValue());
+        task.setVersion(descriptor.get("version").textValue());
+        task.setDescription(descriptor.path("description").asText());
+        task.setInputFolder(descriptor.get("configuration").get("input_folder").textValue());
+        task.setOutputFolder(descriptor.get("configuration").get("output_folder").textValue());
 
-        // resources
-        JsonNode resources =
-            uploadTaskArchive.getDescriptorFileAsJson().get("configuration").get("resources");
-
+        JsonNode resources = descriptor.get("configuration").get("resources");
         if (!Objects.nonNull(resources)) {
             task.setRam(defaultRam);
             task.setCpus(defaultCpus);

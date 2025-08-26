@@ -4,10 +4,6 @@ on:
   pull_request:
     branches:
       - main
-    paths:
-      - "cbir/**/*.py"
-      - "cbir/tests/**"
-      - ".github/**"
   push:
     branches:
       - main
@@ -29,7 +25,6 @@ env:
 
 jobs:
   lint:
-    if: false # Disable lint job by default, enable it manually if needed
     runs-on: self-hosted
 
     steps:

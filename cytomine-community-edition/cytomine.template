@@ -8,7 +8,7 @@ global:
       # must consist only of lowercase alphanumeric characters, hyphens, and underscores as well as start with a letter or number
       NAME: cytomine-ce
       # Where are the data stored. Warning, images can be heavy.
-      PROJECT_DATA_PATH: ./data
+      PROJECT_DATA_PATH: <absolute-path-To-data>
       # URL scheme can be either 'http' or 'https'.
       SCHEME: http
       # External port to listen to. Customize if for example port 80 is already taken by a reverse proxy on the server
@@ -18,6 +18,7 @@ global:
       WEIGHT_PATH: ./data/weight
       # Path to the directory where image dataset folders (if any) are stored for importing large numbers of images.
       DATASET_PATH: ./data/dataset
+      REF_STORAGE_BASE_PATH: <absolute-path-To-dataset>
 
   urls_with_scheme:
     constant:
@@ -58,6 +59,11 @@ global:
       SCHEDULER_OAUTH_TOKEN: changeme
       # The username should be admin
       SCHEDULER_USERNAME: admin
+      # possible values [local,cluster] local is default
+      SCHEDULER_RUN_MODE: local
+      # app engine storage directory in host
+      RUN_STORAGE_BASE_PATH: <absolute-path-To-appengine-storage>
+
 
 # -------------------------------------------------- #
 # Only update variables below if you know what you are doing
@@ -295,6 +301,8 @@ services:
     app-engine:
       constant:
         API_PREFIX: /app-engine/
+        RUN_STORAGE_BASE_PATH: <absolute-path-To-appengine-storage>
+        STORAGE_BASE_PATH: <absolute-path-To-appengine-storage>
       global:
         DB_HOST: aaa_services_uri.POSTGIS
         DB_PORT: postgres.PORT
@@ -302,10 +310,10 @@ services:
         DB_USERNAME: postgres-appengine.USER
         DB_PASSWORD: postgres-appengine.PASS
         REGISTRY_HOST: aaa_services_uri.REGISTRY
-        STORAGE_BASE_PATH: container_paths.APPENGINE_FILE_STORAGE
         SCHEDULER_MASTER_URL: app-engine.SCHEDULER_MASTER_URL
         SCHEDULER_OAUTH_TOKEN: app-engine.SCHEDULER_OAUTH_TOKEN
         SCHEDULER_USERNAME: app-engine.SCHEDULER_USERNAME
+        REF_STORAGE_BASE_PATH: aaa_config.REF_STORAGE_BASE_PATH
 
     cbir:
       global:

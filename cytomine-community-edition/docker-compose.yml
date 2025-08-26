@@ -13,6 +13,8 @@ services:
 
   postgis:
     image: cytomine/postgis:latest
+    ports:
+      - "5432:5432"
     build:
       context: ../postgis
     restart: unless-stopped
@@ -91,7 +93,8 @@ services:
     depends_on:
       - registry
     volumes:
-      - ${AAA_CONFIG_PROJECT_DATA_PATH}/app-engine:/data
+      - ${AAA_CONFIG_PROJECT_DATA_PATH}/app-engine:${AAA_CONFIG_PROJECT_DATA_PATH}/app-engine
+      - ${AAA_CONFIG_REF_STORAGE_BASE_PATH}:${AAA_CONFIG_REF_STORAGE_BASE_PATH}
     networks:
       cytomine-network:
         ipv4_address: 172.18.0.9

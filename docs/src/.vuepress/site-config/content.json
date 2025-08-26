@@ -1,0 +1,55 @@
+{
+  "title": "Cytomine Documentation",
+  "description": "Official Cytomine Community documentation",
+  "email": "uliege@cytomine.org",
+  "icon": "/images/cytomine-org-icon.png",
+  "logo": "/images/cytomine-uliege-logo.png",
+  "footer": "Made by ULiège Cytomine R&D team.",
+  "team": "Cytomine ULiège R&D",
+  "repositories": {
+    "cytomine": "https://github.com/cytomine"
+  },
+  "style": {
+    "accentColor": "#3eaf7c"
+  },
+  "servers": {
+    "demo": "https://demo.cytomine.be"
+  },
+  "socials": {
+    "github": "https://github.com/cytomine",
+    "imagesc": "https://forum.image.sc/tag/cytomine",
+    "twitter": "https://twitter.com/cytomine_uliege"
+  },
+  "urls": {
+    "docRepo": "https://github.com/cytomine/cytomine",
+    "docUrl": "https://doc.uliege.cytomine.org",
+    "githubDiscussions": "https://github.com/orgs/cytomine/discussions",
+    "siteUrl": "https://uliege.cytomine.org"
+  },
+  "homePage": {
+    "actionText": "Quick Start →",
+    "actionLink": "/user-guide/getting-started",
+    "title": "Cytomine Documentation portal",
+    "tagline": "<p style=\"text-align: justify !important; margin-top:2rem; font-size: 1.2rem;\">Cytomine software is a web platform for collaborative analysis of very large bio-medical images and semi-automatic processing of large image collections using machine learning algorithms.  The software provides a very fast access to high-resolution images allowing users to annotate regions of interest and add semantic information to images and to annotations. Additionally, users have the possibility to run algorithms for semi-automated image analysis and share all their work with teammates using synchro- or asynchronous tools.\n</p>",
+    "image": "/images/cytomine-uliege-scheme.png",
+    "imageAlt": "Cytomine ULiège R&D overview",
+    "targets": [
+      {
+        "title": "For imaging scientists and biomedical researchers",
+        "details": "We are extending the official Cytomine version for cutting-edge imaging modalities (beyond histology incl. 2D+c+z+t, hyperspectral data, spatial proteomics, imaging mass spectrometry, ...) and their combination using Image Groups and Annotation Links for multimodal studies."
+      },
+      {
+        "title": "For data and computer scientists",
+        "details": "We are improving the Cytomine software execution architecture to support multiple types of algorithms and execution environments, and to perform benchmarking (see <a href=\"https://neubias-wg5.github.io/\">Biaflows project</a>). We are also extending Cytomine internal data models and its RESTful API to support various types of data import/export."
+      },
+      {
+        "title": "For bioimage analysts and pathologists",
+        "details": "We are developing novel AI algorithms to ease bioimage analysts and pathologists to analyze their data including interactive annotation tools and algorithms for various quantification tasks (cell counting, tumor delineation, content-based image retrieval,...). See <a href=\"https://uliege.cytomine.org/#featured\">ULiège R&D publications</a>."
+      },
+      {
+        "title": "For other (non-biomedical) researchers",
+        "details": "Through collaborations, our team is applying and extending some Cytomine features on large image sets from other fields such as digital collections of works of art, industrial quality control, remote sensing, ..."
+      }
+    ]
+  }
+}

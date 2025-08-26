@@ -1,0 +1,15 @@
+# VuePress files
+docs/.vuepress/.temp/
+docs/.vuepress/.cache/
+docs/.vuepress/dist/
+
+# Node
+node_modules
+
+# Log files
+*.log
+
+# IDE
+.vscode
+.idea
+*.iml

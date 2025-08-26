@@ -1,0 +1,21 @@
+{
+  "name": "docs",
+  "version": "0.1.0",
+  "description": "Cytomine documentation portal",
+  "scripts": {
+    "dev": "vuepress dev src",
+    "build": "vuepress build src"
+  },
+  "devDependencies": {
+    "@vuepress/plugin-back-to-top": "^1.9.10",
+    "@vuepress/plugin-medium-zoom": "^1.9.10",
+    "@vuepress/plugin-nprogress": "^1.9.10",
+    "@vuepress/theme-vue": "^1.9.10",
+    "rapidoc": "^9.3.8",
+    "vuepress": "1.9.10",
+    "vuepress-plugin-clean-urls": "^1.1.2",
+    "vuepress-plugin-dehydrate": "^1.1.5",
+    "vuepress-plugin-redirect-frontmatter": "^1.0.0",
+    "vuepress-plugin-serve": "^2.0.4"
+  }
+}

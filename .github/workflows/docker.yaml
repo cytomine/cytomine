@@ -11,11 +11,10 @@ concurrency:
 
 jobs:
   build-push:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     strategy:
       fail-fast: true
-      max-parallel: 1
       matrix:
         image:
           - app-engine

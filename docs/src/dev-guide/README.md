@@ -69,13 +69,40 @@ A `Collection` is a representation of a collection of models. It has methods to 
 
 In this first script, we would like to **count the number of annotations that are associated to a given ontology term in all projects we have access to and that have `P` as first letter in their name**.
 
-<code-group>
-<code-block title="Python">
+```python
+from cytomine import Cytomine
+from cytomine.models import *
 
-<<< @/code-snippets/first-script-example/count_annotations.py
+# Replace with actual values or -better- use args.
+host = 'https://mycytomine.com'
+public_key = 'AAA'
+private_key = 'ZZZ'
+id_term = 0
 
-</code-block>
-</code-group>
+# Connect to Cytomine
+with Cytomine(host, public_key, private_key) as cytomine:
+    # Get all the available projects you have access to
+    projects = ProjectCollection().fetch()
+
+    # Instantiate a new list
+    projects_with_p = ProjectCollection()
+
+    # Filter the projects
+    for project in projects:
+        if project.name.startswith("P"):
+            projects_with_p.append(project)
+
+    # Get the term
+    term = Term().fetch(id_term)
+
+    # Count annotations having that term in filtered projects
+    count = 0
+    for project in projects_with_p:
+        annotations = AnnotationCollection(project=project.id, term=term.id).fetch()
+        count += len(annotations)
+
+    print("There are {} annotations with term {}".format(count, term.name))
+```
 
 ## What can I do next ?
 

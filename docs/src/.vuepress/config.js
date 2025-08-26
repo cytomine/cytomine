@@ -97,7 +97,6 @@ module.exports = {
         // remove scripts
         noScript: [
           // support glob patterns
-          "foo/*.html",
           "**/static.html",
         ],
       },

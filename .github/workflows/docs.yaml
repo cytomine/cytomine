@@ -1,0 +1,76 @@
+name: Docs
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "docs/**"
+  push:
+    branches:
+      - main
+    paths:
+      - "docs/**"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: ./docs
+
+jobs:
+  build-docs:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ vars.NODE_VERSION }}
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build Documentation
+        run: npm run build
+
+      - name: Upload Docs Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-artifacts
+          path: docs/src/.vuepress/dist/**
+          retention-days: 1
+
+  deploy-docs:
+    runs-on: self-hosted
+    needs:
+      - build-docs
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Download Docs Artifacts
+        uses: actions/download-artifact@v5
+        with:
+          name: docs-artifacts
+          path: docs-artifacts
+
+      - name: SSH deploy
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.DOCS_REMOTE_HOST }}
+          username: ${{ secrets.DOCS_REMOTE_USER }}
+          password: ${{ secrets.DOCS_REMOTE_PASSWORD }}
+          proxy_host: ${{ secrets.DOCS_REMOTE_PROXY }}
+          proxy_username: ${{ secrets.DOCS_REMOTE_USER }}
+          proxy_password: ${{ secrets.DOCS_REMOTE_PASSWORD }}
+          source: "docs-artifacts/*"
+          strip_components: 1
+          target: ${{ secrets.DOCS_TARGET_NEXT_PATH }}
+          overwrite: true

@@ -7,7 +7,7 @@
     "dev": "vuepress dev src",
     "serve": "vuepress serve src"
   },
-  "devDependencies": {
+  "dependencies": {
     "@vuepress/plugin-back-to-top": "^1.9.10",
     "@vuepress/plugin-medium-zoom": "^1.9.10",
     "@vuepress/plugin-nprogress": "^1.9.10",

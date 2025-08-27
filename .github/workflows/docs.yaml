@@ -61,9 +61,6 @@ jobs:
           name: docs-artifacts
           path: docs-artifacts
 
-      - name: Debug
-        run: ls -la
-
       - name: SSH deploy
         uses: appleboy/scp-action@v1
         with:
@@ -74,5 +71,6 @@ jobs:
           proxy_username: ${{ secrets.DOCS_REMOTE_USER }}
           proxy_password: ${{ secrets.DOCS_REMOTE_PASSWORD }}
           source: "docs-artifacts/*"
+          strip_components: 1
           target: ${{ secrets.DOCS_TARGET_NEXT_PATH }}
           overwrite: true

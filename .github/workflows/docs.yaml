@@ -31,7 +31,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 14.21.3
+          node-version: ${{ vars.NODE_VERSION }}
 
       - name: Install Dependencies
         run: npm ci

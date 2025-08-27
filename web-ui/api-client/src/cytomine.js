@@ -131,7 +131,7 @@ export default class Cytomine {
       params.project = project;
     }
 
-    let {data} = await this.api.get(`${this._host}/custom-ui/config.json`, {params});
+    let {data} = await this.api.get('custom-ui/config.json', {params});
     return data;
   }
 

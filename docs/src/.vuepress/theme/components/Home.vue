@@ -45,9 +45,6 @@ export default {
         text: this.data.actionText,
       };
     },
-    editions() {
-      return this.$cytomine.editions;
-    },
   },
 };
 </script>

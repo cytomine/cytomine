@@ -36,7 +36,7 @@
     "targets": [
       {
         "title": "For imaging scientists and biomedical researchers",
-        "details": "We are extending the official Cytomine version for cutting-edge imaging modalities (beyond histology incl. 2D+c+z+t, hyperspectral data, spatial proteomics, imaging mass spectrometry, ...) and their combination using Image Groups and Annotation Links for multimodal studies."
+        "details": "We are developing the Cytomine software for cutting-edge imaging modalities (beyond histology incl. 2D+c+z+t, hyperspectral data, spatial proteomics, imaging mass spectrometry, ...) and their combination using Image Groups and Annotation Links for multimodal studies."
       },
       {
         "title": "For data and computer scientists",

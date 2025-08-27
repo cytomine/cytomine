@@ -131,7 +131,7 @@ packaging==23.0
     #   scikit-image
 pathvalidate==2.5.2
     # via cytomine-pims (setup.py)
-pillow==9.4.0
+pillow==10.3.0
     # via
     #   cytomine-pims (setup.py)
     #   imageio

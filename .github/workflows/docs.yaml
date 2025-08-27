@@ -61,6 +61,9 @@ jobs:
           name: docs-artifacts
           path: docs-artifacts
 
+      - name: Debug
+        run: ls -la docs-artifacts
+
       - name: SSH deploy
         uses: appleboy/scp-action@v1
         with:

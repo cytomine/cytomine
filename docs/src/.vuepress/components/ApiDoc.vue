@@ -45,27 +45,12 @@ export default {
       isLoaded: false,
     };
   },
-  computed: {
-    version() {
-      return this.$cytomine.editions[0].version;
-    }
-  },
   mounted() {
     if (!customElements.get("rapi-doc")) {
       const script = document.createElement("script");
       script.type = "module";
       script.src = "https://unpkg.com/rapidoc/dist/rapidoc-min.js";
-      script.onload = () => {
-        this.isLoaded = true;
-        this.$nextTick(() => {
-          const el = this.$refs.thedoc;
-          if (el) {
-            el.addEventListener("before-render", (e) => {
-              e.detail.spec.info.version = "Cytomine Community Edition " + this.version;
-            });
-          }
-        });
-      };
+      script.onload = () => this.isLoaded = true;
       document.head.appendChild(script);
     } else {
       this.isLoaded = true;

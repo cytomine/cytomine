@@ -3,8 +3,39 @@ name = "sam"
 version = "0.1.0"
 description = "Segment Anything Models"
 readme = "README.md"
-requires-python = ">=3.10"
-dependencies = []
 authors = [
   { name = "Thibaud Vanmechelen", email = "thibaud.vanmechelen@student.uliege.be" },
+]
+requires-python = ">=3.10"
+dependencies = [
+  "fastapi[standard]>=0.116.1",
+  "geojson>=3.2.0",
+  "httpx>=0.28.1",
+  "numpy>=2.1.2",
+  "pillow>=11.0.0",
+  "pydantic>=2.10.6",
+  "pydantic-settings>=2.8.1",
+  "sam2>=1.1.0",
+  "torch==2.6.0",
+  "torchvision==0.21.0",
+]
+
+[dependency-groups]
+dev = [
+  "mypy>=1.17.1",
+  "pytest>=8.4.1",
+  "ruff>=0.12.10",
+]
+
+[[tool.uv.index]]
+name = "pytorch-cu118"
+url = "https://download.pytorch.org/whl/cu118"
+explicit = true
+
+[tool.uv.sources]
+torch = [
+  { index = "pytorch-cu118", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+]
+torchvision = [
+  { index = "pytorch-cu118", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
 ]

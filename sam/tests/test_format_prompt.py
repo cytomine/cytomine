@@ -3,7 +3,7 @@
 import pytest
 import numpy as np
 
-from src.utils.format_prompt import format_box_prompt, format_point_prompt
+from app.utils.format_prompt import format_box_prompt, format_point_prompt
 
 
 def test_format_point_prompt_valid() -> None:

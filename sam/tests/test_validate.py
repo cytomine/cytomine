@@ -4,7 +4,7 @@ import re
 import pytest
 from fastapi import HTTPException
 
-from src.api.models.validate import validate_box_feature, validate_point_feature
+from app.api.models.validate import validate_box_feature, validate_point_feature
 
 
 def test_valid_box() -> None:

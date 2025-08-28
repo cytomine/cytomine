@@ -13,19 +13,19 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from cytomine import Cytomine
 from cytomine.models import ImageInstance
 
-from src.config import Settings, get_settings
+from app.config import Settings, get_settings
 
-from src.api.models.model import SegmentationRequest, SmartSegmentationRequest
-from src.api.models.validate import validate_box_feature, validate_point_feature
+from app.api.models.model import SegmentationRequest, SmartSegmentationRequest
+from app.api.models.validate import validate_box_feature, validate_point_feature
 
-from src.utils.convert_geojson import mask_to_geojson
-from src.utils.window import load_cytomine_window_image
-from src.utils.align_prompts import align_box_prompt, align_point_prompt
-from src.utils.format_prompt import format_point_prompt, format_box_prompt
-from src.utils.postprocess import post_process_segmentation_mask
-from src.utils.extract_img import get_roi_around_annotation
+from app.utils.convert_geojson import mask_to_geojson
+from app.utils.window import load_cytomine_window_image
+from app.utils.align_prompts import align_box_prompt, align_point_prompt
+from app.utils.format_prompt import format_point_prompt, format_box_prompt
+from app.utils.postprocess import post_process_segmentation_mask
+from app.utils.extract_img import get_roi_around_annotation
 
-from src.utils.annotations import (
+from app.utils.annotations import (
     fetch_included_annotations,
     get_annotation_by_id,
     get_bbox_from_annotation,

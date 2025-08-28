@@ -10,7 +10,7 @@ from shapely.geometry import Point, Polygon, LineString, LinearRing, box, shape
 from cytomine import Cytomine
 from cytomine.models import AnnotationCollection, Annotation
 
-from src.config import Settings
+from app.config import Settings
 
 
 def filter_point_annotations_within_polygon(

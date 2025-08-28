@@ -4,7 +4,7 @@ import torch
 from box import Box
 from pydantic_settings import BaseSettings
 
-from src.utils.box_config import load_config
+from app.utils.box_config import load_config
 
 
 class Settings(BaseSettings):

@@ -1,6 +1,7 @@
 package be.cytomine.appengine.controllers;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,7 +46,10 @@ public class TaskController {
         HttpServletRequest request
     ) throws TaskServiceException, ValidationException, BundleArchiveException {
         log.info("Task Upload POST");
-        Optional<TaskDescription> taskDescription = taskService.uploadTask(request);
+        // prepare for streaming
+        log.info("UploadTask: preparing streaming...");
+        InputStream inputStream = taskService.prepareStream(request);
+        Optional<TaskDescription> taskDescription = taskService.uploadTask(inputStream);
         log.info("Task Upload POST Ended");
         return ResponseEntity.ok(taskDescription);
     }

@@ -54,8 +54,13 @@ scheduler:
     cpus: 1
     ram: 4Gi
   helper-containers-resources:
-    cpu: 200m
-    ram: 200Mi
+    cpu: 1
+    ram: 1Gi
+  run:
+    mode: ${SCHEDULER_RUN_MODE:local} # possible values [local,cluster]
+    storage-base-path: ${RUN_STORAGE_BASE_PATH:/home/siddig-hamed/data} # directory in host
+  datasets-path: ${REF_STORAGE_BASE_PATH:/data/datasets} # directory in host contains bigpicture datasets
+
 registry-client:
   authenticated: false
   user: user #ignored

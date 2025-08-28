@@ -3,6 +3,7 @@ __pycache__/
 
 # Environments
 .env
+.venv
 
 # IDE
 .vscode/

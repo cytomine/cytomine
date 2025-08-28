@@ -1,0 +1,17 @@
+# Python cache
+__pycache__/
+
+# Environments
+.env
+
+# IDE
+.vscode/
+
+# Ruff
+.ruff_cache
+
+# mypy
+.mypy_cache
+
+# uv
+.python-version

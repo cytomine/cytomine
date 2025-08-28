@@ -1,0 +1,10 @@
+[project]
+name = "sam"
+version = "0.1.0"
+description = "Segment Anything Models"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+authors = [
+  { name = "Thibaud Vanmechelen", email = "thibaud.vanmechelen@student.uliege.be" },
+]

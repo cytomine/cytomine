@@ -1,0 +1,11 @@
+fastapi[standard]>=0.116.1
+geojson>=3.2.0
+httpx>=0.28.1
+numpy>=2.1.2
+pillow>=11.0.0
+pydantic>=2.10.6
+pydantic-settings>=2.8.1
+python-box>=7.3.2
+sam2>=1.1.0
+torch==2.6.0
+torchvision==0.21.0

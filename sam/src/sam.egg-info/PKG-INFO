@@ -1,0 +1,20 @@
+Metadata-Version: 2.4
+Name: sam
+Version: 0.1.0
+Summary: Segment Anything Models
+Author-email: Thibaud Vanmechelen <thibaud.vanmechelen@student.uliege.be>
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: fastapi[standard]>=0.116.1
+Requires-Dist: geojson>=3.2.0
+Requires-Dist: httpx>=0.28.1
+Requires-Dist: numpy>=2.1.2
+Requires-Dist: pillow>=11.0.0
+Requires-Dist: pydantic>=2.10.6
+Requires-Dist: pydantic-settings>=2.8.1
+Requires-Dist: python-box>=7.3.2
+Requires-Dist: sam2>=1.1.0
+Requires-Dist: torch==2.6.0
+Requires-Dist: torchvision==0.21.0
+
+# SAM

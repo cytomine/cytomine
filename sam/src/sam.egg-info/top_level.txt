@@ -1,6 +1,0 @@
-__init__
-api
-app
-config
-download_weights
-utils

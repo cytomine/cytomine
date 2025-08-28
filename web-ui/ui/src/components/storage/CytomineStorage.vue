@@ -13,208 +13,156 @@
  limitations under the License.-->
 
 <template>
-  <div class="storage-wrapper content-wrapper">
-    <div class="panel">
-      <p class="panel-heading">
-        {{ $t("upload") }}
-      </p>
-      <div class="panel-block" v-if="newUploadError">
-        <b-message type="is-danger" has-icon icon-size="is-small">
-          {{ $t("error-cannot-upload") }}
-        </b-message>
-      </div>
-      <div class="panel-block" v-else>
-        <b-message type="is-info" has-icon icon-size="is-small">
-          <h2>{{ $t("important-notes") }}</h2>
-          <ul class="small-text">
-            <!--          <li>{{$t('max-size-upload-info')}}</li>-->
-            <li>
-              {{ $t("allowed-formats-upload-info") }}
-              <template v-if="formatInfos.length">
-                <span v-for="(format, index) in formatInfos" :key="format.id">
-                  {{ format.name
-                  }}<v-popover v-if="format.remarks">
-                    <i class="fas fa-info-circle"></i>
-                    <template #popover>
-                      <p>{{ format.remarks }}</p>
-                    </template> </v-popover
-                  ><template v-if="index < formatInfos.length - 1">, </template>
-                </span>
-              </template>
-            </li>
-            <li>
-              {{
-                $t("drag-drop-upload-info", { labelButton: $t("add-files") })
-              }}
-            </li>
-            <li>{{ $t("link-to-project-upload-info") }}</li>
-          </ul>
-        </b-message>
-
-        <div class="columns">
-          <div class="column is-one-quarter has-text-right">
-            <strong>{{ $t("storage") }}</strong>
-          </div>
-          <div class="column is-half">
-            <cytomine-multiselect
-              v-model="selectedStorage"
-              :options="storages"
-              label="extendedName"
-              track-by="id"
-              :allow-empty="false"
-            >
-              <template #option="{ option }">
-                {{ option.extendedName }}
-                <template v-if="currentAccount.isDeveloper">
-                  ({{ $t("id") }}: {{ option.id }})
+<div class="storage-wrapper content-wrapper">
+  <div class="panel">
+    <p class="panel-heading">
+      {{ $t('upload') }}
+    </p>
+    <div class="panel-block" v-if="newUploadError">
+      <b-message type="is-danger" has-icon icon-size="is-small">
+        {{ $t('error-cannot-upload') }}
+      </b-message>
+    </div>
+    <div class="panel-block" v-else>
+      <b-message type="is-info" has-icon icon-size="is-small">
+        <h2>{{$t('important-notes')}}</h2>
+        <ul class="small-text">
+<!--          <li>{{$t('max-size-upload-info')}}</li>-->
+          <li>
+            {{$t('allowed-formats-upload-info')}}
+            <template v-if="formatInfos.length">
+            <span v-for="(format, index) in formatInfos" :key="format.id">
+              {{format.name}}<v-popover v-if="format.remarks">
+                <i class="fas fa-info-circle"></i>
+                <template #popover>
+                  <p>{{format.remarks}}</p>
                 </template>
+              </v-popover><template v-if="index < formatInfos.length - 1">, </template>
+            </span>
+            </template>
+          </li>
+          <li>{{$t('drag-drop-upload-info', {labelButton: $t('add-files')})}}</li>
+          <li>{{$t('link-to-project-upload-info')}}</li>
+
+        </ul>
+      </b-message>
+
+      <div class="columns">
+        <div class="column is-one-quarter has-text-right">
+          <strong>{{$t('storage')}}</strong>
+        </div>
+        <div class="column is-half">
+          <cytomine-multiselect v-model="selectedStorage" :options="storages" label="extendedName" track-by="id" :allow-empty="false">
+            <template #option="{option}">
+              {{option.extendedName}}
+              <template v-if="currentAccount.isDeveloper">
+                 ({{$t('id')}}: {{option.id}})
               </template>
-            </cytomine-multiselect>
-          </div>
+            </template>
+          </cytomine-multiselect>
         </div>
+      </div>
 
-        <div class="columns">
-          <div class="column is-one-quarter has-text-right">
-            <strong>{{ $t("link-with-project") }}</strong>
-          </div>
-          <div class="column is-half">
-            <cytomine-multiselect
-              v-model="selectedProjects"
-              :options="projects"
-              label="name"
-              track-by="id"
-              :multiple="true"
-              :close-on-select="true"
-            />
-          </div>
+      <div class="columns">
+        <div class="column is-one-quarter has-text-right">
+          <strong>{{$t('link-with-project')}}</strong>
         </div>
+        <div class="column is-half">
+          <cytomine-multiselect
+            v-model="selectedProjects"
+            :options="projects"
+            label="name"
+            track-by="id"
+            :multiple="true"
+            :close-on-select="true"
+          />
+        </div>
+      </div>
 
-        <div class="columns">
-          <div class="column is-one-quarter has-text-right">
-            <strong>{{ $t("files") }}</strong>
-          </div>
-          <div class="column is-half">
-            <table
-              v-if="dropFiles.length > 0"
-              class="table is-fullwidth upload-table"
-            >
-              <tbody>
-                <tr v-for="(wrapper, idx) in dropFiles" :key="idx">
-                  <td>{{ wrapper.file.name }}</td>
-                  <td>{{ filesize(wrapper.file.size) }}</td>
-                  <template v-if="wrapper.uploadedFile === null">
-                    <td>
-                      <progress
-                        class="progress is-info"
-                        :value="wrapper.progress"
-                        max="100"
-                      >
-                        {{ wrapper.progress }}%
-                      </progress>
-                    </td>
-                    <td>
-                      <div class="field is-grouped">
-                        <p class="control">
-                          <button
-                            class="button is-link"
-                            @click="startUpload(wrapper)"
-                          >
-                            {{ $t("button-start") }}
-                          </button>
-                        </p>
-                        <p class="control">
-                          <button class="button" @click="cancelUpload(idx)">
-                            {{ $t("button-cancel") }}
-                          </button>
-                        </p>
-                      </div>
-                    </td>
-                  </template>
-                  <template v-else>
-                    <td>
-                      <uploaded-file-status
-                        v-if="wrapper.uploadedFile"
-                        :file="wrapper.uploadedFile"
-                      />
-                      <span v-else class="tag is-danger">
-                        {{ $t("upload-error") }}
-                      </span>
-                    </td>
-                    <td>
+      <div class="columns">
+        <div class="column is-one-quarter has-text-right">
+          <strong>{{$t('files')}}</strong>
+        </div>
+        <div class="column is-half">
+          <table v-if="dropFiles.length > 0" class="table is-fullwidth upload-table">
+            <tbody>
+              <tr v-for="(wrapper, idx) in dropFiles" :key="idx">
+                <td>{{wrapper.file.name}}</td>
+                <td>{{filesize(wrapper.file.size)}}</td>
+                <template v-if="wrapper.uploadedFile === null">
+                  <td>
+                    <progress class="progress is-info" :value="wrapper.progress" max="100">
+                      {{wrapper.progress}}%
+                    </progress>
+                  </td>
+                  <td>
+                    <div class="field is-grouped">
                       <p class="control">
-                        <button class="button" @click="cancelUpload(idx)">
-                          {{ $t("button-hide") }}
+                        <button class="button is-link" @click="startUpload(wrapper)">
+                          {{$t('button-start')}}
                         </button>
                       </p>
-                    </td>
-                  </template>
-                </tr>
-              </tbody>
-            </table>
-            <em v-else class="first-child-like has-text-grey">{{
-              $t("no-file")
-            }}</em>
-          </div>
+                      <p class="control">
+                        <button class="button" @click="cancelUpload(idx)">
+                          {{$t('button-cancel')}}
+                        </button>
+                      </p>
+                    </div>
+                  </td>
+                </template>
+                <template v-else>
+                  <td>
+                    <uploaded-file-status v-if="wrapper.uploadedFile" :file="wrapper.uploadedFile" />
+                    <span v-else class="tag is-danger">
+                      {{$t('upload-error')}}
+                    </span>
+                  </td>
+                  <td>
+                    <p class="control">
+                      <button class="button" @click="cancelUpload(idx)">{{$t('button-hide')}}</button>
+                    </p>
+                  </td>
+                </template>
+              </tr>
+            </tbody>
+          </table>
+          <em v-else class="first-child-like has-text-grey">{{$t('no-file')}}</em>
         </div>
+      </div>
 
-        <div class="columns">
-          <div class="column is-half flex-column is-offset-one-quarter">
-            <progress
-              v-if="ongoingUpload"
-              class="progress is-success"
-              :value="overallProgress"
-              max="100"
-            >
-              {{ overallProgress }}%
-            </progress>
+      <div class="columns">
+        <div class="column is-half flex-column is-offset-one-quarter">
+          <progress v-if="ongoingUpload" class="progress is-success" :value="overallProgress" max="100">
+            {{overallProgress}}%
+          </progress>
 
-            <div class="buttons">
-              <b-upload
-                :value="plainFiles"
-                type="is-link"
-                multiple
-                drag-drop
-                @input="filesChange"
-              >
-                <a class="button is-success">{{ $t("add-files") }}</a>
-              </b-upload>
-              <button
-                class="button is-link"
-                @click="startAll()"
-                :disabled="!filesPendingUpload"
-              >
-                {{ $t("start-upload") }}
-              </button>
-              <button
-                class="button"
-                @click="cancelAll()"
-                :disabled="!filesPendingUpload && !ongoingUpload"
-              >
-                {{ $t("cancel-upload") }}
-              </button>
-              <button
-                class="button"
-                @click="hideFinished()"
-                v-if="filesFinishedUpload"
-              >
-                {{ $t("hide-successful-upload") }}
-              </button>
-            </div>
+          <div class="buttons">
+            <b-upload :value="plainFiles" type="is-link" multiple drag-drop @input="filesChange">
+              <a class="button is-success">{{$t('add-files')}}</a>
+            </b-upload>
+            <button class="button is-link" @click="startAll()" :disabled="!filesPendingUpload">
+              {{$t('start-upload')}}
+            </button>
+            <button class="button" @click="cancelAll()" :disabled="!filesPendingUpload && !ongoingUpload">
+              {{$t('cancel-upload')}}
+            </button>
+            <button class="button" @click="hideFinished()" v-if="filesFinishedUpload">
+              {{$t('hide-successful-upload')}}
+            </button>
           </div>
         </div>
       </div>
-    </div>
 
-    <list-uploaded-files
-      :tableRefreshInterval="tableRefreshInterval"
-      :revision.sync="revision"
-    ></list-uploaded-files>
+    </div>
   </div>
+
+  <list-uploaded-files :tableRefreshInterval="tableRefreshInterval" :revision.sync="revision"></list-uploaded-files>
+</div>
 </template>
 
 <script>
-import axios from "axios";
-import filesize from "filesize";
+import axios from 'axios';
+import filesize from 'filesize';
 
 import {
   Cytomine,
@@ -223,21 +171,21 @@ import {
   UploadedFile,
   UploadedFileStatus,
   User,
-} from "cytomine-client";
+} from 'cytomine-client';
 
-import { get } from "@/utils/store-helpers";
-import constants from "@/utils/constants.js";
+import {get} from '@/utils/store-helpers';
+import constants from '@/utils/constants.js';
 
-import CytomineMultiselect from "@/components/form/CytomineMultiselect";
-import ListUploadedFiles from "@/components/storage/ListUploadedFiles";
-import UploadedFileStatusComponent from "@/components/storage/UploadedFileStatus";
+import CytomineMultiselect from '@/components/form/CytomineMultiselect';
+import ListUploadedFiles from '@/components/storage/ListUploadedFiles';
+import UploadedFileStatusComponent from '@/components/storage/UploadedFileStatus';
 
 export default {
-  name: "cytomine-storage",
+  name: 'cytomine-storage',
   components: {
     ListUploadedFiles,
     CytomineMultiselect,
-    "uploaded-file-status": UploadedFileStatusComponent,
+    'uploaded-file-status': UploadedFileStatusComponent,
   },
   data() {
     return {
@@ -253,40 +201,37 @@ export default {
 
       dropFiles: [],
 
-      signature: "",
-      signatureDate: "",
+      signature: '',
+      signatureDate: '',
       primaryKey: null,
 
-      revision: 0,
+      revision: 0
     };
   },
   computed: {
-    currentUser: get("currentUser/user"),
-    currentAccount: get("currentUser/account"),
-    shortTermToken: get("currentUser/shortTermToken"),
+    currentUser: get('currentUser/user'),
+    currentAccount: get('currentUser/account'),
+    shortTermToken: get('currentUser/shortTermToken'),
     finishedStatus() {
-      return [UploadedFileStatus.CONVERTED, UploadedFileStatus.DEPLOYED];
+      return [
+        UploadedFileStatus.CONVERTED,
+        UploadedFileStatus.DEPLOYED
+      ];
     },
     ongoingUpload() {
-      return this.dropFiles.some((wrapper) => wrapper.uploading);
+      return this.dropFiles.some(wrapper => wrapper.uploading);
     },
     filesPendingUpload() {
-      return this.dropFiles.some(
-        (wrapper) => !wrapper.uploading && wrapper.uploadedFile === null
-      );
+      return this.dropFiles.some(wrapper => !wrapper.uploading && wrapper.uploadedFile === null);
     },
     filesFinishedUpload() {
-      return this.dropFiles.some(
-        (wrapper) =>
-          !wrapper.uploading &&
-          wrapper.uploadedFile !== null &&
-          this.finishedStatus.includes(wrapper.uploadedFile.status)
-      );
+      return this.dropFiles.some(wrapper => !wrapper.uploading && wrapper.uploadedFile !== null
+        && this.finishedStatus.includes(wrapper.uploadedFile.status));
     },
     overallProgress() {
       let nbUploads = 0;
       let totalProgress = 0;
-      this.dropFiles.forEach((wrapper) => {
+      this.dropFiles.forEach(wrapper => {
         if (wrapper.uploading) {
           nbUploads++;
           totalProgress += wrapper.progress;
@@ -299,14 +244,12 @@ export default {
     },
     queryString() {
       return new URLSearchParams({
-        idStorage: this.selectedStorage ? this.selectedStorage.id : null,
-        idProject: this.selectedProjects
-          ? this.selectedProjects.map((project) => project.id).join(",")
-          : null,
+        idStorage: (this.selectedStorage) ? this.selectedStorage.id : null,
+        idProject: (this.selectedProjects) ? this.selectedProjects.map(project => project.id).join(',') : null
       }).toString();
     },
     plainFiles() {
-      return this.dropFiles.map((wrapper) => wrapper.file);
+      return this.dropFiles.map(wrapper => wrapper.file);
     },
   },
   watch: {
@@ -317,28 +260,26 @@ export default {
         this.signature = await Cytomine.instance.fetchSignature({
           uri: this.uri,
           queryString: this.queryString,
-          method: "POST",
-          date: this.signatureDate,
+          method: 'POST',
+          date: this.signatureDate
         });
       } catch (error) {
         this.newUploadError = true;
       }
-    },
+    }
   },
   methods: {
     async fetchStorages() {
       try {
         this.storages = (await StorageCollection.fetchAll()).array;
-        this.storages.forEach((v) => {
+        this.storages.forEach(v => {
           v.extendedName = v.name;
           if (this.currentAccount.isDeveloper) {
-            v.extendedName += " " + this.$t("id") + ": " + v.id;
+            v.extendedName += ' ' + this.$t('id') + ': ' + v.id;
           }
         });
 
-        this.selectedStorage = this.storages.find(
-          (storage) => storage.user === this.currentUser.id
-        );
+        this.selectedStorage = this.storages.find(storage => storage.user === this.currentUser.id);
       } catch (error) {
         console.log(error);
         this.newUploadError = true;
@@ -353,9 +294,7 @@ export default {
     },
     async fetchFormatInfos() {
       try {
-        this.formatInfos = (
-          await Cytomine.instance.api.get("imageserver/format.json")
-        ).data.collection;
+        this.formatInfos = (await Cytomine.instance.api.get('imageserver/format.json')).data.collection;
       } catch (error) {
         console.log(error);
       }
@@ -369,32 +308,30 @@ export default {
         UploadedFileStatus.CONVERTING,
         UploadedFileStatus.DEPLOYING,
         50,
-        60,
+        60
       ];
 
       let unfinishedConversions = false;
       let statusChange = false;
 
       try {
-        await Promise.all(
-          this.dropFiles.map(async (wrapper) => {
-            if (wrapper.uploadedFile) {
-              let oldStatus = wrapper.uploadedFile.status;
-              if (!pendingStatus.includes(oldStatus)) {
-                return;
-              }
-
-              await wrapper.uploadedFile.fetch();
-              let status = wrapper.uploadedFile.status;
-              if (status !== oldStatus) {
-                statusChange = true;
-              }
-              if (pendingStatus.includes(status)) {
-                unfinishedConversions = true;
-              }
+        await Promise.all(this.dropFiles.map(async wrapper => {
+          if (wrapper.uploadedFile) {
+            let oldStatus = wrapper.uploadedFile.status;
+            if (!pendingStatus.includes(oldStatus)) {
+              return;
             }
-          })
-        );
+
+            await wrapper.uploadedFile.fetch();
+            let status = wrapper.uploadedFile.status;
+            if (status !== oldStatus) {
+              statusChange = true;
+            }
+            if (pendingStatus.includes(status)) {
+              unfinishedConversions = true;
+            }
+          }
+        }));
       } catch (error) {
         console.log(error);
         return;
@@ -406,15 +343,12 @@ export default {
 
       if (unfinishedConversions) {
         clearTimeout(this.timeoutRefreshSessionUploads);
-        this.timeoutRefreshSessionUploads = setTimeout(
-          this.refreshStatusSessionUploads,
-          constants.ONGOING_UPLOAD_REFRESH_INTERVAL
-        );
+        this.timeoutRefreshSessionUploads = setTimeout(this.refreshStatusSessionUploads, constants.ONGOING_UPLOAD_REFRESH_INTERVAL);
       }
     },
 
     filesChange(files) {
-      files.forEach((file) => {
+      files.forEach(file => {
         if (!file.processed) {
           file.processed = true;
           this.dropFiles.push({
@@ -422,13 +356,13 @@ export default {
             uploading: false,
             progress: 0,
             uploadedFile: null, // null if upload not finished, false if upload failed, UploadedFile instance if upload successful
-            cancelToken: null,
+            cancelToken: null
           });
         }
       });
     },
     filesize(size) {
-      return size ? filesize(size, { base: 10 }) : null;
+      return (size) ? filesize(size, {base: 10}) : null;
     },
 
     startUpload(fileWrapper) {
@@ -437,40 +371,36 @@ export default {
       }
 
       let formData = new FormData();
-      formData.append("files[]", fileWrapper.file);
+      formData.append('files[]', fileWrapper.file);
       fileWrapper.cancelToken = axios.CancelToken.source();
       fileWrapper.uploading = true;
-      axios
-        .post(this.uri + "?" + this.queryString, formData, {
+      axios.post(
+        this.uri + '?' + this.queryString,
+        formData,
+        {
           headers: {
-            authorization: `CYTOMINE ${this.primaryKey}:${this.signature}`, // TODO IAM
-            dateFull: this.signatureDate, // will replace actual date value, so that signature is valid
-            "content-type-full": "null", // will erase actual content-type value, so that signature is valid
+            'authorization': `CYTOMINE ${this.primaryKey}:${this.signature}`, // TODO IAM
+            'dateFull': this.signatureDate, // will replace actual date value, so that signature is valid
+            'content-type-full': 'null' // will erase actual content-type value, so that signature is valid
           },
-          onUploadProgress: (progress) => {
-            fileWrapper.progress = Math.floor(
-              (progress.loaded * 100) / progress.total
-            );
+          onUploadProgress: progress => {
+            fileWrapper.progress = Math.floor((progress.loaded * 100) / progress.total);
           },
-          cancelToken: fileWrapper.cancelToken.token,
-        })
-        .then((response) => {
-          fileWrapper.uploadedFile = new UploadedFile(
-            response.data[0].uploadedFile
-          );
-          this.refreshStatusSessionUploads();
-          this.revision++;
-        })
-        .catch((error) => {
-          if (!axios.isCancel(error)) {
-            console.log(error);
-            fileWrapper.uploadedFile = false;
-          }
-        })
-        .finally(() => (fileWrapper.uploading = false));
+          cancelToken: fileWrapper.cancelToken.token
+        }
+      ).then(response => {
+        fileWrapper.uploadedFile = new UploadedFile(response.data[0].uploadedFile);
+        this.refreshStatusSessionUploads();
+        this.revision++;
+      }).catch(error => {
+        if (!axios.isCancel(error)) {
+          console.log(error);
+          fileWrapper.uploadedFile = false;
+        }
+      }).finally(() => fileWrapper.uploading = false);
     },
     startAll() {
-      this.dropFiles.forEach((wrapper) => this.startUpload(wrapper));
+      this.dropFiles.forEach(wrapper => this.startUpload(wrapper));
     },
 
     cancelUpload(index) {
@@ -497,10 +427,7 @@ export default {
       let idx = 0;
       for (let i = 0; i < nbFiles; i++) {
         let uploadedFile = this.dropFiles[idx].uploadedFile;
-        if (
-          uploadedFile !== null &&
-          this.finishedStatus.includes(uploadedFile.status)
-        ) {
+        if (uploadedFile !== null && this.finishedStatus.includes(uploadedFile.status)) {
           this.cancelUpload(idx);
         } else {
           idx++;
@@ -542,7 +469,7 @@ export default {
   font-size: 0.9em;
 }
 
-.upload-table {
+.upload-table  {
   position: relative;
   bottom: 0.4em;
 }

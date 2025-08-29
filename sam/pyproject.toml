@@ -11,7 +11,6 @@ dependencies = [
   "cytomine-python-client>=3.1.0",
   "fastapi[standard]>=0.116.1",
   "geojson>=3.2.0",
-  "httpx>=0.28.1",
   "matplotlib>=3.10.5",
   "numpy>=2.1.2",
   "opencv-python-headless>=4.11.0.86",
@@ -27,6 +26,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+  "httpx>=0.28.1",
   "mypy>=1.17.1",
   "pytest>=8.4.1",
   "ruff>=0.12.10",

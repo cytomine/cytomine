@@ -1946,7 +1946,6 @@ dependencies = [
     { name = "cytomine-python-client" },
     { name = "fastapi", extra = ["standard"] },
     { name = "geojson" },
-    { name = "httpx" },
     { name = "matplotlib" },
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "numpy", version = "2.3.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
@@ -1965,6 +1964,7 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "httpx" },
     { name = "mypy" },
     { name = "pytest" },
     { name = "ruff" },
@@ -1975,7 +1975,6 @@ requires-dist = [
     { name = "cytomine-python-client", specifier = ">=3.1.0" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.116.1" },
     { name = "geojson", specifier = ">=3.2.0" },
-    { name = "httpx", specifier = ">=0.28.1" },
     { name = "matplotlib", specifier = ">=3.10.5" },
     { name = "numpy", specifier = ">=2.1.2" },
     { name = "opencv-python-headless", specifier = ">=4.11.0.86" },
@@ -1993,6 +1992,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "httpx", specifier = ">=0.28.1" },
     { name = "mypy", specifier = ">=1.17.1" },
     { name = "pytest", specifier = ">=8.4.1" },
     { name = "ruff", specifier = ">=0.12.10" },

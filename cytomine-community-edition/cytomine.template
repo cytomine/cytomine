@@ -49,6 +49,7 @@ global:
       APPENGINE: app-engine:8080
       REGISTRY: registry
       IAM: iam:8100
+      SAM: sam:8000
 
   app-engine:
     constant:
@@ -316,3 +317,7 @@ services:
         PORT: redis.PORT
       constant:
         API_BASE_PATH: /cbir
+    
+    sam:
+      constant:
+        API_BASE_PATH: /sam

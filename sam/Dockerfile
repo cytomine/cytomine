@@ -16,7 +16,16 @@ RUN apt-get update \
 COPY pyproject.toml uv.lock /app/
 COPY app configs /app/
 
-RUN uv sync --locked
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync
+
+
+FROM base AS dev-server
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends --no-install-suggests openssh-server rsync
 
 
 FROM ${PROXY_CACHE}/python:${PYTHON_VERSION}-slim AS production

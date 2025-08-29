@@ -234,12 +234,11 @@ def run_segmentation_pipeline(
 
     # Extract corresponding part of the image
     with Cytomine(
-        settings.keys["host"],
-        settings.keys["public_key"],
-        settings.keys["private_key"],
+        settings.CYTOMINE_HOST,
+        settings.CYTOMINE_PUBLIC_KEY,
+        settings.CYTOMINE_PRIVATE_KEY,
         verbose=False,
     ):
-
         img = ImageInstance().fetch(image_id)
         img_height = img.height
 
@@ -260,11 +259,17 @@ def run_segmentation_pipeline(
             max_size = ANNOTATION_MAX_SIZE
 
         cropped_img = load_cytomine_window_image(
-            img, x, y, annot_width, annot_height, max_size
+            img,
+            x,
+            y,
+            annot_width,
+            annot_height,
+            max_size,
         )
         if cropped_img is None:
             raise HTTPException(
-                status_code=500, detail="Failed to load image from Cytomine."
+                status_code=500,
+                detail="Failed to load image from Cytomine.",
             )
 
     # Align prompt referential
@@ -272,7 +277,12 @@ def run_segmentation_pipeline(
 
     if point_prompt is not None:
         point_prompt = align_point_prompt(
-            point_prompt, x, y, img_height, scale_x, scale_y
+            point_prompt,
+            x,
+            y,
+            img_height,
+            scale_x,
+            scale_y,
         )
 
     # Predict and post process
@@ -295,7 +305,6 @@ def run_segmentation_pipeline(
     # Format output
     if max_size is None:
         geojson_mask = mask_to_geojson(output_mask, img_height, x, y)
-
     else:
         geojson_mask = mask_to_geojson(
             mask=output_mask,

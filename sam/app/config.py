@@ -1,10 +1,7 @@
 """Environment parameters"""
 
 import torch
-from box import Box
 from pydantic_settings import BaseSettings
-
-from app.utils.box_config import load_config
 
 
 class Settings(BaseSettings):
@@ -19,7 +16,10 @@ class Settings(BaseSettings):
     CONFIG: str = "./configs/sam2.1/sam2.1_hiera_b+.yaml"
     DEVICE: torch.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    keys: Box = load_config("./keys.toml")
+    # Cytomine client
+    CYTOMINE_HOST: str
+    CYTOMINE_PUBLIC_KEY: str
+    CYTOMINE_PRIVATE_KEY: str
 
 
 def get_settings() -> Settings:

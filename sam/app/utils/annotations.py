@@ -57,9 +57,9 @@ def fetch_included_annotations(
         (List[Dict[str, Any]]): Returns the point prompts formatted as GeoJSON.
     """
     with Cytomine(
-        settings.keys["host"],
-        settings.keys["public_key"],
-        settings.keys["private_key"],
+        settings.CYTOMINE_HOST,
+        settings.CYTOMINE_PUBLIC_KEY,
+        settings.CYTOMINE_PRIVATE_KEY,
         verbose=False,
     ):
 
@@ -133,9 +133,9 @@ def get_annotation_by_id(annotation_id: int, settings: Settings) -> Annotation:
         (Annotation): Returns the annotation.
     """
     with Cytomine(
-        settings.keys["host"],
-        settings.keys["public_key"],
-        settings.keys["private_key"],
+        settings.CYTOMINE_HOST,
+        settings.CYTOMINE_PUBLIC_KEY,
+        settings.CYTOMINE_PRIVATE_KEY,
         verbose=False,
     ):
 
@@ -183,9 +183,9 @@ def update_annotation_location(
     new_location_wkt = shapely_geometry.wkt
 
     with Cytomine(
-        settings.keys["host"],
-        settings.keys["public_key"],
-        settings.keys["private_key"],
+        settings.CYTOMINE_HOST,
+        settings.CYTOMINE_PUBLIC_KEY,
+        settings.CYTOMINE_PRIVATE_KEY,
         verbose=False,
     ):
 

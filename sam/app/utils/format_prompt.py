@@ -1,6 +1,7 @@
 """Module to format prompt from the GeoJSON format to SAM format."""
 
-from typing import List, Dict, Any, Union, Tuple
+from typing import Any, Dict, List, Tuple, Union
+
 import numpy as np
 
 

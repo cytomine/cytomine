@@ -3,6 +3,7 @@
 from box import Box
 from tomli import load
 
+
 def load_config(config_path : str) -> Box:
     """
     Loads a config file in toml format.

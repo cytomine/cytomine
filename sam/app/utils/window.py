@@ -4,9 +4,8 @@ import os
 import tempfile
 from typing import Union
 
-import numpy as np
 import matplotlib.pyplot as plt
-
+import numpy as np
 from cytomine.models.image import ImageInstance
 
 

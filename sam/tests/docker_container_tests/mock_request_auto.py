@@ -1,7 +1,7 @@
 """Module to test docker container for the API."""
 import json
-import httpx
 
+import httpx
 
 URL = "http://localhost:6000/api/autonomous_prediction"
 

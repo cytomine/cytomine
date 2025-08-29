@@ -1,6 +1,7 @@
 """Module to test the validate.py file"""
 
 import re
+
 import pytest
 from fastapi import HTTPException
 

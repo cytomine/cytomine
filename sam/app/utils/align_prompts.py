@@ -45,7 +45,7 @@ def align_point_prompt(
         y_tl: int,
         img_height: int,
         scale_x: float,
-        scale_y: float
+scale_y: float
     ) -> np.ndarray:
     """
     Function to align the point prompts with the extracted window (the coordinates of

@@ -1,6 +1,6 @@
 """Module to convert a binary mask to a GeoJSON object."""
 
-from typing import Union, List, cast
+from typing import List, Union, cast
 
 import cv2
 import geojson

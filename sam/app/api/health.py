@@ -1,6 +1,7 @@
 """Health Check Module"""
 
 from fastapi import APIRouter
+
 from app import __version__
 
 router = APIRouter()

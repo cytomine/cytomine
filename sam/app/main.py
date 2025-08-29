@@ -4,12 +4,11 @@ from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
-
 from sam2.build_sam import build_sam2
 from sam2.sam2_image_predictor import SAM2ImagePredictor
 
 from app import __version__
-from app.api import prediction, health
+from app.api import health, prediction
 from app.config import Settings, get_settings
 from app.download_weights import download_weights
 

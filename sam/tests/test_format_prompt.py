@@ -1,7 +1,7 @@
 """Module to test the format_prompt.py file"""
 
-import pytest
 import numpy as np
+import pytest
 
 from app.utils.format_prompt import format_box_prompt, format_point_prompt
 

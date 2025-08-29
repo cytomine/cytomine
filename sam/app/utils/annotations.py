@@ -1,14 +1,12 @@
 """Module to handle the smart fetching of the point annotations."""
 
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
 import geojson
-
-from shapely import wkt
-from shapely.geometry import Point, Polygon, LineString, LinearRing, box, shape
-
 from cytomine import Cytomine
-from cytomine.models import AnnotationCollection, Annotation
+from cytomine.models import Annotation, AnnotationCollection
+from shapely import wkt
+from shapely.geometry import LinearRing, LineString, Point, Polygon, box, shape
 
 from app.config import Settings
 

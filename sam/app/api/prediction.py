@@ -1,38 +1,31 @@
 """Prediction API"""
 
-from typing import Dict, Any, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import geojson
 import numpy as np
-
-from shapely.geometry import shape
-
-from fastapi.responses import JSONResponse
-from fastapi import APIRouter, Depends, HTTPException, Request
-
 from cytomine import Cytomine
 from cytomine.models import ImageInstance
-
-from app.config import Settings, get_settings
+from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi.responses import JSONResponse
+from shapely.geometry import shape
 
 from app.api.models.model import SegmentationRequest, SmartSegmentationRequest
 from app.api.models.validate import validate_box_feature, validate_point_feature
-
-from app.utils.convert_geojson import mask_to_geojson
-from app.utils.window import load_cytomine_window_image
+from app.config import Settings, get_settings
 from app.utils.align_prompts import align_box_prompt, align_point_prompt
-from app.utils.format_prompt import format_point_prompt, format_box_prompt
-from app.utils.postprocess import post_process_segmentation_mask
-from app.utils.extract_img import get_roi_around_annotation
-
 from app.utils.annotations import (
     fetch_included_annotations,
     get_annotation_by_id,
     get_bbox_from_annotation,
+    is_invalid_annotation,
     update_annotation_location,
-    is_invalid_annotation
 )
-
+from app.utils.convert_geojson import mask_to_geojson
+from app.utils.extract_img import get_roi_around_annotation
+from app.utils.format_prompt import format_box_prompt, format_point_prompt
+from app.utils.postprocess import post_process_segmentation_mask
+from app.utils.window import load_cytomine_window_image
 
 MAX_DIM = 8000
 

@@ -27,6 +27,12 @@ FROM base AS dev-server
 RUN apt-get update \
     && apt-get install -y --no-install-recommends --no-install-suggests openssh-server rsync
 
+WORKDIR /app
+ENV PATH="/app/.venv/bin:$PATH"
+ENV PYTHONPATH=/app
+
+CMD ["fastapi", "dev", "main.py"]
+
 
 FROM ${PROXY_CACHE}/python:${PYTHON_VERSION}-slim AS production
 

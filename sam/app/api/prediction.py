@@ -11,7 +11,7 @@ from fastapi.responses import JSONResponse
 from shapely.geometry import shape
 
 from app.schemas.annotation import SegmentationRequest, SmartSegmentationRequest
-from app.api.models.validate import validate_box_feature, validate_point_feature
+from app.api.utils.validate import validate_box_feature, validate_point_feature
 from app.config import Settings, get_settings
 from app.utils.align_prompts import align_box_prompt, align_point_prompt
 from app.utils.annotations import (

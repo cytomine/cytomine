@@ -12,9 +12,9 @@ from app.config import Settings
 
 
 def filter_point_annotations_within_polygon(
-        box_: Polygon,
-        annotations: List[Dict[str, Any]]
-    ) -> List[Dict[str, Any]]:
+    box_: Polygon,
+    annotations: List[Dict[str, Any]],
+) -> List[Dict[str, Any]]:
     """
     Function to filter an array of annotations to only keep the point annotations that
     are inside of the box polygon.
@@ -27,18 +27,19 @@ def filter_point_annotations_within_polygon(
         (List[Dict[str, Any]]): Returns the point inside the box.
     """
     return [
-        ann for ann in annotations
+        ann
+        for ann in annotations
         if isinstance(ann["geometry"], Point) and box_.contains(ann["geometry"])
     ]
 
 
 def fetch_included_annotations(
-        image_id: int,
-        user_id: int,
-        box_: Polygon,
-        settings: Settings,
-        delete_annotations: bool = True
-    ) -> List[Dict[str, Any]]:
+    image_id: int,
+    user_id: int,
+    box_: Polygon,
+    settings: Settings,
+    delete_annotations: bool = True,
+) -> List[Dict[str, Any]]:
     """
     Function to fetch the user annotations that are included in the geometry.
     The fetched annotations are only point annotations that are included in the
@@ -55,8 +56,12 @@ def fetch_included_annotations(
     Returns:
         (List[Dict[str, Any]]): Returns the point prompts formatted as GeoJSON.
     """
-    with Cytomine(settings.keys['host'], settings.keys['public_key'],
-                  settings.keys['private_key'], verbose = False):
+    with Cytomine(
+        settings.keys["host"],
+        settings.keys["public_key"],
+        settings.keys["private_key"],
+        verbose=False,
+    ):
 
         annotations = AnnotationCollection()
         annotations.image = image_id
@@ -70,12 +75,13 @@ def fetch_included_annotations(
         annotation_list = []
         for annotation in annotations:
             annotation_geometry = wkt.loads(annotation.location)
-            annotation_list.append({
-                "id": annotation.id,
-                "geometry": annotation_geometry
-            })
+            annotation_list.append(
+                {"id": annotation.id, "geometry": annotation_geometry}
+            )
 
-        filtered_annotation_list = filter_point_annotations_within_polygon(box_, annotation_list)
+        filtered_annotation_list = filter_point_annotations_within_polygon(
+            box_, annotation_list
+        )
         annotation_id_list = [ann["id"] for ann in filtered_annotation_list]
 
         if delete_annotations:
@@ -86,7 +92,9 @@ def fetch_included_annotations(
     return annotations_to_geojson_features(filtered_annotation_list)
 
 
-def annotations_to_geojson_features(annotations: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def annotations_to_geojson_features(
+    annotations: List[Dict[str, Any]],
+) -> List[Dict[str, Any]]:
     """
     Function to convert the annotations to the GeoJSON format.
 
@@ -102,16 +110,13 @@ def annotations_to_geojson_features(annotations: List[Dict[str, Any]]) -> List[D
         geom = ann["geometry"]
 
         if isinstance(geom, Point):
-            features.append({
-                "type": "Feature",
-                "geometry": {
-                    "type": "Point",
-                    "coordinates": [geom.x, geom.y]
-                },
-                "properties": {
-                    "label": 1
+            features.append(
+                {
+                    "type": "Feature",
+                    "geometry": {"type": "Point", "coordinates": [geom.x, geom.y]},
+                    "properties": {"label": 1},
                 }
-            })
+            )
 
     return features
 
@@ -127,8 +132,12 @@ def get_annotation_by_id(annotation_id: int, settings: Settings) -> Annotation:
     Returns:
         (Annotation): Returns the annotation.
     """
-    with Cytomine(settings.keys['host'], settings.keys['public_key'],
-                  settings.keys['private_key'], verbose = False):
+    with Cytomine(
+        settings.keys["host"],
+        settings.keys["public_key"],
+        settings.keys["private_key"],
+        verbose=False,
+    ):
 
         annotation = Annotation()
         annotation.id = annotation_id
@@ -155,10 +164,10 @@ def get_bbox_from_annotation(location: str) -> Polygon:
 
 
 def update_annotation_location(
-        annotation_id: int,
-        new_location: geojson.Feature,
-        settings: Settings
-    ) -> bool:
+    annotation_id: int,
+    new_location: geojson.Feature,
+    settings: Settings,
+) -> bool:
     """
     Function to update the location of an annotation.
 
@@ -173,8 +182,12 @@ def update_annotation_location(
     shapely_geometry = shape(new_location.geometry)
     new_location_wkt = shapely_geometry.wkt
 
-    with Cytomine(settings.keys['host'], settings.keys['public_key'],
-                  settings.keys['private_key'], verbose = False):
+    with Cytomine(
+        settings.keys["host"],
+        settings.keys["public_key"],
+        settings.keys["private_key"],
+        verbose=False,
+    ):
 
         annotation = Annotation()
         annotation.id = annotation_id
@@ -193,7 +206,7 @@ def update_annotation_location(
 def is_invalid_annotation(ann: Annotation) -> bool:
     """
     Function to tell if an annotation is invalid to process or
-    not. 
+    not.
 
     Points are invalid to process because they do not have a bounding
     box, any other annotation with no area or no perimeter is also
@@ -207,7 +220,13 @@ def is_invalid_annotation(ann: Annotation) -> bool:
     """
     geom = wkt.loads(ann.location)
 
-    if isinstance(geom, Point) or isinstance(geom, LineString) or isinstance(geom, LinearRing) or ann.area == 0.0 or ann.perimeter == 0.0:
+    if (
+        isinstance(geom, Point)
+        or isinstance(geom, LineString)
+        or isinstance(geom, LinearRing)
+        or ann.area == 0.0
+        or ann.perimeter == 0.0
+    ):
         return True
 
     return False

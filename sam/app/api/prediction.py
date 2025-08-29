@@ -1,6 +1,6 @@
 """Prediction API"""
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Annotated, Any, Dict, List, Optional, Union
 
 import geojson
 import numpy as np
@@ -27,7 +27,6 @@ from app.utils.format_prompt import format_box_prompt, format_point_prompt
 from app.utils.postprocess import post_process_segmentation_mask
 from app.utils.window import load_cytomine_window_image
 
-
 ANNOTATION_MAX_SIZE = get_settings().ANNOTATION_MAX_SIZE
 
 
@@ -38,7 +37,7 @@ router = APIRouter()
 async def predict(
     request: Request,
     segmentation_input: SegmentationRequest,
-    settings: Settings = Depends(get_settings),
+    settings: Annotated[Settings, Depends(get_settings)],
 ) -> JSONResponse:
     """
     Function to handle the segmentation request.
@@ -73,12 +72,12 @@ async def predict(
 async def smart_predict(
     request: Request,
     segmentation_input: SmartSegmentationRequest,
-    settings: Settings = Depends(get_settings),
+    settings: Annotated[Settings, Depends(get_settings)],
 ) -> JSONResponse:
     """
-    Function to handle the segmentation request, but here the core does not need to provide
-    the point prompts, the point prompts are inferred from the point annotations of the user
-    that are located inside the geometry (Box), on the same WSI.
+    Handle the segmentation request, but here the core does not need to provide
+    the point prompts, the point prompts are inferred from the point annotations
+    of the user that are located inside the geometry (Box), on the same WSI.
 
     Args:
         (request: Request): the HTTP request.
@@ -118,7 +117,9 @@ async def smart_predict(
 
 @router.post("/autonomous_prediction")
 async def autonomous_predict(
-    request: Request, annotation_id: int, settings: Settings = Depends(get_settings)
+    request: Request,
+    annotation_id: int,
+    settings: Annotated[Settings, Depends(get_settings)],
 ) -> JSONResponse:
     """
     Function to handle the segmentation request, but here the API only needs the
@@ -139,7 +140,10 @@ async def autonomous_predict(
         if is_invalid_annotation(annotation):
             raise HTTPException(
                 status_code=400,
-                detail="The annotation can not be a Point, LineString, LinearRing, or have perimeter/area = 0.0 !",
+                detail=(
+                    "The annotation can not be a Point, LineString, LinearRing, "
+                    "or have perimeter/area = 0.0 !"
+                ),
             )
 
         user_id = annotation.user
@@ -199,11 +203,14 @@ def run_segmentation_pipeline(
         (request: Request): the HTTP request.
         (image_id: int): the id of the image to segment.
         (geometry: Dict[str, Any]): the box geometry for this image.
-        (points: Optional[List[Dict[str, Any]]]): the additional (optional) point prompts.
+        (points: Optional[List[Dict[str, Any]]]): the additional point prompts.
         (settings: Settings): the settings.
-        (is_shapely_box: bool): boolean that tells if the geometry is already a box from shapely.
-                                This is a 'trick' to reuse the same code for the autonomous request,
-                                because it uses shapely boxes, and those do not need to be validated
+        (is_shapely_box: bool): boolean that tells if the geometry is
+                                already a box from shapely.
+                                This is a 'trick' to reuse the same code
+                                for the autonomous request,
+                                because it uses shapely boxes,
+                                and those do not need to be validated
                                 or formatted.
 
     Returns:

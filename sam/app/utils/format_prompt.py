@@ -5,8 +5,9 @@ from typing import Any, Dict, List, Tuple, Union
 import numpy as np
 
 
-def format_point_prompt(points_data: List[Dict[str, Any]]
-                        ) -> Tuple[Union[np.ndarray, None], Union[np.ndarray, None]]:
+def format_point_prompt(
+    points_data: List[Dict[str, Any]],
+) -> Tuple[Union[np.ndarray, None], Union[np.ndarray, None]]:
     """
     Function to format the point prompts from the GeoJSON format to the SAM format.
 
@@ -24,12 +25,11 @@ def format_point_prompt(points_data: List[Dict[str, Any]]
     try:
         point_coords = np.array(
             [list(map(int, pt["geometry"]["coordinates"])) for pt in points_data],
-            dtype = np.int32
+            dtype=np.int32,
         )
 
         point_labels = np.array(
-            [int(pt["properties"]["label"]) for pt in points_data],
-            dtype = np.int32
+            [int(pt["properties"]["label"]) for pt in points_data], dtype=np.int32
         )
 
         return point_coords, point_labels
@@ -46,19 +46,21 @@ def format_box_prompt(box: Dict[str, Any]) -> np.ndarray:
         (box: Dict[str, Any]): the box prompt.
 
     Returns:
-        (np.ndarray): Returns the formatted box prompt in format [x_min, y_min, x_max, y_max].
+        (np.ndarray): the formatted box prompt in format [x_min, y_min, x_max, y_max].
     """
     try:
         coordinates = box["geometry"]["coordinates"]
 
-        coords = np.array(coordinates[0][:4], dtype = np.int32) # to ignore the closing point
+        coords = np.array(
+            coordinates[0][:4], dtype=np.int32
+        )  # to ignore the closing point
 
         x_min = np.min(coords[:, 0])
         y_min = np.min(coords[:, 1])
         x_max = np.max(coords[:, 0])
         y_max = np.max(coords[:, 1])
 
-        return np.array([x_min, y_min, x_max, y_max], dtype = np.int32)
+        return np.array([x_min, y_min, x_max, y_max], dtype=np.int32)
 
     except Exception as e:
         raise ValueError(f"Invalid box format: {e}") from e

@@ -12,7 +12,7 @@ MAX_SIZE = 1024
 
 def get_localisation_of_annotation(box: np.ndarray) -> Tuple[int, int, int, int]:
     """
-    Function to get the position of the annotation with the top left corner, width and height.
+    Get the position of the annotation with the top left corner, width and height.
 
     Args:
         (box: np.ndarray): the box prompt in format [x_min, y_min, x_max, y_max].
@@ -27,10 +27,15 @@ def get_localisation_of_annotation(box: np.ndarray) -> Tuple[int, int, int, int]
     width = floor(box[2] - box[0])
     height = floor(box[3] - box[1])
 
-    return width, height, floor(box[0]), floor(box[3]) # bottom left referential here
+    return width, height, floor(box[0]), floor(box[3])  # bottom left referential here
 
 
-def get_annotation_size(img_width: int, img_height: int, width: int, height: int) -> int:
+def get_annotation_size(
+    img_width: int,
+    img_height: int,
+    width: int,
+    height: int,
+) -> int:
     """
     Function to get the size of the annotation to get considering the zoom-out factor.
 
@@ -48,7 +53,9 @@ def get_annotation_size(img_width: int, img_height: int, width: int, height: int
     return min(floor(annotation_size * ZOOM_OUT_FACTOR), img_width, img_height)
 
 
-def get_roi_around_annotation(img : ImageInstance, box: np.ndarray) -> Tuple[int, int, int, int]:
+def get_roi_around_annotation(
+    img: ImageInstance, box: np.ndarray
+) -> Tuple[int, int, int, int]:
     """
     Function to get the position of the annotation to extract with the top left corner,
     width and height.
@@ -56,7 +63,7 @@ def get_roi_around_annotation(img : ImageInstance, box: np.ndarray) -> Tuple[int
     With this function, the zoom-out factor has been taken into account.
 
     Args:
-        (img : ImageInstance): the image instance from which the patch will be extracted.
+        (img : ImageInstance): the image from which the patch will be extracted.
         (box: np.ndarray): the box prompt in format [x_min, y_min, x_max, y_max].
 
     Returns:
@@ -67,7 +74,12 @@ def get_roi_around_annotation(img : ImageInstance, box: np.ndarray) -> Tuple[int
             - (int): height.
     """
     annotation_width, annotation_height, x, y = get_localisation_of_annotation(box)
-    size = get_annotation_size(img.width, img.height, annotation_width, annotation_height)
+    size = get_annotation_size(
+        img.width,
+        img.height,
+        annotation_width,
+        annotation_height,
+    )
 
     h = (size - annotation_width) / 2
     v = (size - annotation_height) / 2

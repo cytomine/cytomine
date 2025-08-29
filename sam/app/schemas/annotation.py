@@ -31,16 +31,19 @@ class SegmentationRequest(BaseModel):
             ]
         }
     """
+
     image_id: int
     geometry: Dict[str, Any]
-    points: Optional[List[Dict[str, Any]]] = None  # List of GeoJSON Feature that correspond to points.
+    # List of GeoJSON Feature that correspond to points.
+    points: Optional[List[Dict[str, Any]]] = None
 
 
 class SmartSegmentationRequest(BaseModel):
     """
-    Class to represent the request for segmentation, but here the core does not need to provide the point prompts,
-    the point prompts are inferred from the point annotations of the user that are located inside the geometry (Box),
-    on the same WSI.
+    Class to represent the request for segmentation,
+    but here the core does not need to provide the point prompts,
+    the point prompts are inferred from the point annotations of the user
+    that are located inside the geometry (Box), on the same WSI.
     Example:
         {
             "image_id": 42,
@@ -55,6 +58,7 @@ class SmartSegmentationRequest(BaseModel):
             }
         }
     """
+
     image_id: int
     user_id: int
     geometry: Dict[str, Any]

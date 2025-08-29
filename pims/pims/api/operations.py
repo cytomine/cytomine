@@ -424,8 +424,9 @@ def connexion_to_core(
         expected_sig = sign_token(private_key, parse_request_token(request))
 
         if expected_sig != signature:
-            warnings.warn("Signature was: %s"%(signature))
-            warnings.warn("But expected signature was: %s"%(expected_sig))
+            warnings.warn(f"Keys: {cyto_keys}")
+            warnings.warn(f"Signature was: {signature}")
+            warnings.warn(f"But expected signature was: {expected_sig}")
             raise AuthenticationException("Authentication to Cytomine failed")
 
         c.set_credentials(public_key, private_key)

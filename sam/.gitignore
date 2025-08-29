@@ -3,6 +3,10 @@ __pycache__/
 
 # Environments
 .env
+.env.local
+.env.dev
+.env.test
+.env.prod
 .venv
 
 # IDE

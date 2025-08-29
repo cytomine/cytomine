@@ -8,7 +8,7 @@ from sam2.build_sam import build_sam2
 from sam2.sam2_image_predictor import SAM2ImagePredictor
 
 from app import __version__
-from app.api import prediction, server
+from app.api import annotation, server
 from app.config import Settings, get_settings
 from app.download_weights import download_weights
 
@@ -45,5 +45,5 @@ app = FastAPI(
         "url": "https://www.apache.org/licenses/LICENSE-2.0.html",
     },
 )
-app.include_router(prediction.router, prefix=get_settings().API_BASE_PATH)
+app.include_router(annotation.router, prefix=get_settings().API_BASE_PATH)
 app.include_router(server.router)

@@ -1,11 +1,19 @@
 """Environment parameters"""
 
+import logging
+import os
+from functools import lru_cache
+
 import torch
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+logger = logging.getLogger("sam.app")
 
 
 class Settings(BaseSettings):
     """Configurable settings."""
+
+    model_config = SettingsConfigDict(extra="ignore")
 
     API_BASE_PATH: str = "/api"
 
@@ -22,11 +30,8 @@ class Settings(BaseSettings):
     CYTOMINE_PRIVATE_KEY: str
 
 
-def get_settings() -> Settings:
-    """
-    Get the settings.
-
-    Returns:
-        (Settings): The environment settings.
-    """
-    return Settings()
+@lru_cache()
+def get_settings():
+    env_file = os.getenv("CONFIG_FILE", ".env")
+    logger.info(f"Loading config from {env_file}")
+    return Settings(_env_file=env_file)

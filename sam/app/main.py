@@ -15,11 +15,13 @@ from app.download_weights import download_weights
 
 def load_predictor(settings: Settings) -> SAM2ImagePredictor:
     """Load the weights of the model and creates a new predictor instance."""
-    sam2_model = build_sam2(
-        settings.config, settings.checkpoint, device=settings.device
+    model = build_sam2(
+        settings.CONFIG,
+        settings.CHECKPOINT,
+        device=settings.DEVICE,
     )
 
-    return SAM2ImagePredictor(sam2_model)
+    return SAM2ImagePredictor(model)
 
 
 @asynccontextmanager

@@ -15,10 +15,9 @@ class Settings(BaseSettings):
     ANNOTATION_MAX_SIZE: int = 8000
 
     # Deep learning model
-    device: torch.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-    config: str = "./configs/sam2.1/sam2.1_hiera_b+.yaml"
-    checkpoint: str = "./weights/weights.pt"
+    CHECKPOINT: str = "./weights/weights.pt"
+    CONFIG: str = "./configs/sam2.1/sam2.1_hiera_b+.yaml"
+    DEVICE: torch.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     keys: Box = load_config("./keys.toml")
 

@@ -10,9 +10,9 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse
 from shapely.geometry import shape
 
-from app.schemas.annotation import SegmentationRequest, SmartSegmentationRequest
 from app.api.utils.validate import validate_box_feature, validate_point_feature
 from app.config import Settings, get_settings
+from app.schemas.annotation import SegmentationRequest, SmartSegmentationRequest
 from app.utils.align_prompts import align_box_prompt, align_point_prompt
 from app.utils.annotations import (
     fetch_included_annotations,
@@ -27,7 +27,8 @@ from app.utils.format_prompt import format_box_prompt, format_point_prompt
 from app.utils.postprocess import post_process_segmentation_mask
 from app.utils.window import load_cytomine_window_image
 
-MAX_DIM = 8000
+
+ANNOTATION_MAX_SIZE = get_settings().ANNOTATION_MAX_SIZE
 
 
 router = APIRouter()
@@ -241,15 +242,15 @@ def run_segmentation_pipeline(
         scale_y = 1.0
         max_size = None
 
-        if annot_width > MAX_DIM:  # annot_width == annot_height
+        if annot_width > ANNOTATION_MAX_SIZE:  # annot_width == annot_height
             # if a dim is greater than 20000, img.window might return an error
-            # handle this situation by constraining the max_size to MAX_DIM
-            scale = annot_width / MAX_DIM
+            # handle this situation by constraining the max_size to ANNOTATION_MAX_SIZE
+            scale = annot_width / ANNOTATION_MAX_SIZE
 
             scale_x /= scale
             scale_y /= scale
 
-            max_size = MAX_DIM
+            max_size = ANNOTATION_MAX_SIZE
 
         cropped_img = load_cytomine_window_image(
             img, x, y, annot_width, annot_height, max_size

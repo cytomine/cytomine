@@ -10,13 +10,15 @@ from app.utils.box_config import load_config
 class Settings(BaseSettings):
     """Configurable settings."""
 
+    API_BASE_PATH: str = "/api"
+
+    ANNOTATION_MAX_SIZE: int = 8000
+
     # Deep learning model
     device: torch.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     config: str = "./configs/sam2.1/sam2.1_hiera_b+.yaml"
     checkpoint: str = "./weights/weights.pt"
-
-    API_BASE_PATH: str = "/api"
 
     keys: Box = load_config("./keys.toml")
 

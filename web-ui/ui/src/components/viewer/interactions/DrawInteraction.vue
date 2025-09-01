@@ -37,7 +37,7 @@ import {get} from '@/utils/store-helpers';
 import Polygon, {fromCircle as polygonFromCircle} from 'ol/geom/Polygon';
 import WKT from 'ol/format/WKT';
 
-import {Annotation, AnnotationType} from 'cytomine-client';
+import {Annotation, AnnotationType, Cytomine} from 'cytomine-client';
 import {Action} from '@/utils/annotation-utils.js';
 import {updateAnnotationLinkProperties} from '@/utils/annotation-utils';
 
@@ -94,6 +94,7 @@ export default {
         case 'line':
         case 'freehand-line':
           return 'LineString';
+        case 'magic-wand':
         case 'rectangle':
         case 'circle':
           return 'Circle';
@@ -112,27 +113,27 @@ export default {
       return this.activeTool === 'freehand-polygon' || this.activeTool === 'freehand-line' || this.drawCorrection;
     },
     drawGeometryFunction() {
-      if (this.activeTool === 'rectangle') {
-        return (coordinates, geometry) => {
-          let rotatedCoords = this.rotateCoords(coordinates, this.rotation);
-
-          let [firstCorner, thirdCorner] = rotatedCoords;
-          let secondCorner = [thirdCorner[0], firstCorner[1]];
-          let fourthCorner = [firstCorner[0], thirdCorner[1]];
-
-          let rotatedBoxCoordinates = [firstCorner, secondCorner, thirdCorner, fourthCorner, firstCorner];
-          let boxCoordinates = [this.rotateCoords(rotatedBoxCoordinates, -this.rotation)];
-
-          if (geometry) {
-            geometry.setCoordinates(boxCoordinates);
-          } else {
-            geometry = new Polygon(boxCoordinates);
-          }
-          return geometry;
-        };
-      } else {
-        return null;
+      if (!['magic-wand', 'rectangle'].includes(this.activeTool)) {
+        return;
       }
+
+      return (coordinates, geometry) => {
+        let rotatedCoords = this.rotateCoords(coordinates, this.rotation);
+
+        let [firstCorner, thirdCorner] = rotatedCoords;
+        let secondCorner = [thirdCorner[0], firstCorner[1]];
+        let fourthCorner = [firstCorner[0], thirdCorner[1]];
+
+        let rotatedBoxCoordinates = [firstCorner, secondCorner, thirdCorner, fourthCorner, firstCorner];
+        let boxCoordinates = [this.rotateCoords(rotatedBoxCoordinates, -this.rotation)];
+
+        if (geometry) {
+          geometry.setCoordinates(boxCoordinates);
+        } else {
+          geometry = new Polygon(boxCoordinates);
+        }
+        return geometry;
+      };
     },
     layers() {
       return this.imageWrapper.layers.selectedLayers || [];
@@ -200,6 +201,17 @@ export default {
         } catch (err) {
           console.log(err);
           this.$notify({type: 'error', text: this.$t('notif-error-annotation-creation')});
+        }
+
+        if (this.activeTool === 'magic-wand') {
+          try {
+            const annotationId = annot.id;
+            await Cytomine.instance.api.post(`annotation/${annotationId}/sam`);
+            this.$notify({type: 'success', text: 'Successful SAM Processing !'});
+          } catch (error) {
+            console.error(error);
+            this.$notify({type: 'error', text: 'Error in SAM Processing.'});
+          }
         }
       });
     },

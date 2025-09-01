@@ -390,7 +390,7 @@ public class CustomUIControllerTests {
                 "      \"ADMIN_PROJECT\":true,\n" +
                 "      \"CONTRIBUTOR_PROJECT\":true\n" +
                 "   },\n" +
-                "   \"project-tools-magic\":{\n" +
+                "   \"project-tools-magic-wand\":{\n" +
                 "      \"ADMIN_PROJECT\":true,\n" +
                 "      \"CONTRIBUTOR_PROJECT\":true\n" +
                 "   },\n" +

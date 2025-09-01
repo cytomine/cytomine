@@ -8,7 +8,7 @@ router = APIRouter(tags=["server"])
 
 
 @router.get("/", response_model=HealthResponse)
-async def health_check() -> dict:
+async def health_check() -> HealthResponse:
     return HealthResponse(
         version=__version__,
         status="healthy",

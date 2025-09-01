@@ -45,5 +45,8 @@ torchvision = [
   { index = "pytorch-cu118", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
 ]
 
+[tool.mypy]
+ignore_missing_imports = true
+
 [tool.setuptools.packages]
 find = { include = ["app"] }

@@ -75,6 +75,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
     private final AnnotationListingBuilder annotationListingBuilder;
 
     private final RestTemplate restTemplate;
+
     @Value("${application.internalProxyURL}")
     private String internalProxyURL;
 

@@ -24,7 +24,9 @@ public class AppStoreService {
 
     public File downloadTask(InstallRequest request)
         throws IOException {
-
+        log.info("Download Task: downloading ... {}:{}",
+            request.getAppStoreNamespace(),
+            request.getAppStoreVersion());
         RestTemplate restTemplate = new RestTemplate();
         Path tempPath = Path.of("bundle-" + UUID.randomUUID() + ".zip");
         restTemplate.execute(
@@ -40,6 +42,7 @@ public class AppStoreService {
                 request.getAppNamespace(),
                 request.getAppVersion()
         );
+        log.info("Download Task: downloaded");
         return tempPath.toFile();
     }
 }

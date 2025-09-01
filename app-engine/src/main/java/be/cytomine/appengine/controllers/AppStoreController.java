@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Optional;
 
+import be.cytomine.appengine.exceptions.AppStoreServiceException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,6 @@ import be.cytomine.appengine.services.TaskService;
 public class AppStoreController {
 
     private final AppStoreService appStoreService;
-    private final TaskService taskService;
 
     @PostMapping("tasks/{scheme}/{host}/{namespace}/{version}")
     public ResponseEntity<?> install(
@@ -35,13 +35,15 @@ public class AppStoreController {
         @PathVariable String namespace,
         @PathVariable String version,
         @PathVariable String scheme)
-        throws IOException, TaskServiceException, ValidationException, BundleArchiveException {
-        log.info("Task install POST");
+            throws IOException,
+            TaskServiceException,
+            ValidationException,
+            BundleArchiveException,
+            AppStoreServiceException {
+        log.info("tasks/{scheme}/{host}/{namespace}/{version} POST");
         InstallRequest request = new InstallRequest(scheme, host, namespace, version);
-        File file = appStoreService.downloadTask(request);
-        assert file != null;
-        Optional<TaskDescription> description = taskService.uploadTask(new FileInputStream(file));
-        log.info("Task install POST end");
+        Optional<TaskDescription> description = appStoreService.install(request);
+        log.info("tasks/{scheme}/{host}/{namespace}/{version} POST end");
         return ResponseEntity.ok(description);
     }
 }

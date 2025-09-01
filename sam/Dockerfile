@@ -44,12 +44,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgl1 libglib2.0-0 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-COPY pyproject.toml uv.lock /app/
-COPY app configs /app/
+COPY ./pyproject.toml ./uv.lock /app/
+COPY ./app/ ./configs/ /app/
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     uv sync --frozen --no-install-project
+
+LABEL org.opencontainers.image.authors="uliege@cytomine.org" \
+      org.opencontainers.image.url="https://uliege.cytomine.org/" \
+      org.opencontainers.image.documentation="https://doc.uliege.cytomine.org/" \
+      org.opencontainers.image.source="https://github.com/cytomine/cytomine" \
+      org.opencontainers.image.vendor="Cytomine ULiège"
 
 CMD ["fastapi", "run", "app/main.py"]

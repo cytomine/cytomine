@@ -44,3 +44,6 @@ torch = [
 torchvision = [
   { index = "pytorch-cu118", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
 ]
+
+[tool.setuptools.packages]
+find = { include = ["app"] }

@@ -16,10 +16,13 @@ __pycache__/
 .vscode/
 
 # Ruff
-.ruff_cache
+.ruff_cache/
 
 # mypy
-.mypy_cache
+.mypy_cache/
 
 # uv
 .python-version
+
+# pytest
+.pytest_cache/

@@ -60,7 +60,6 @@ def mask_to_geojson(mask: np.ndarray,
 
     if len(polygons) == 1:
         geometry = geojson.Polygon([polygons[0]])
-
     else:
         geometry = geojson.MultiPolygon([[poly] for poly in polygons])
 

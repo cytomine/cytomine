@@ -33,7 +33,6 @@ def format_point_prompt(
         )
 
         return point_coords, point_labels
-
     except Exception as e:
         raise ValueError(f"Invalid point data format: {e}") from e
 
@@ -51,9 +50,8 @@ def format_box_prompt(box: Dict[str, Any]) -> np.ndarray:
     try:
         coordinates = box["geometry"]["coordinates"]
 
-        coords = np.array(
-            coordinates[0][:4], dtype=np.int32
-        )  # to ignore the closing point
+        # to ignore the closing point
+        coords = np.array(coordinates[0][:4], dtype=np.int32)
 
         x_min = np.min(coords[:, 0])
         y_min = np.min(coords[:, 1])
@@ -61,6 +59,5 @@ def format_box_prompt(box: Dict[str, Any]) -> np.ndarray:
         y_max = np.max(coords[:, 1])
 
         return np.array([x_min, y_min, x_max, y_max], dtype=np.int32)
-
     except Exception as e:
         raise ValueError(f"Invalid box format: {e}") from e

@@ -13,7 +13,7 @@ def post_process_segmentation_mask(
 ) -> np.ndarray:
     """
     Postprocesses the mask by performing an opening followed by a closing,
-    and optionally, a blur, and finally, 
+    and optionally, a blur, and finally,
     filters the resulting mask to keep elements above 10% of the max component in area.
 
     Args:

@@ -140,7 +140,10 @@ async def autonomous_predict(
         bbox = get_bbox_from_annotation(annotation.location)
 
         points = fetch_included_annotations(
-            image_id=image_id, user_id=user_id, box_=bbox, settings=settings
+            image_id=image_id,
+            user_id=user_id,
+            box_=bbox,
+            settings=settings,
         )
 
         result = run_segmentation_pipeline(
@@ -151,7 +154,6 @@ async def autonomous_predict(
             settings=settings,
             is_shapely_box=True,
         )
-
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
 
@@ -165,12 +167,13 @@ async def autonomous_predict(
 
         if is_update_ok is False:
             raise HTTPException(
-                status_code=400, detail="Failed to update annotation location."
+                status_code=400,
+                detail="Failed to update annotation location.",
             )
-
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
 
     return JSONResponse(
-        status_code=200, content={"message": "Change completed successfully."}
+        status_code=200,
+        content={"message": "Change completed successfully."},
     )

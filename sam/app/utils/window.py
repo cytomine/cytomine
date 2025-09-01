@@ -9,13 +9,14 @@ import numpy as np
 from cytomine.models.image import ImageInstance
 
 
-def load_cytomine_window_image(obj: ImageInstance,
-                               x: int,
-                               y: int,
-                               w: int,
-                               h: int,
-                               max_size: Union[int, None] = None
-    ) -> Union[np.ndarray, None]:
+def load_cytomine_window_image(
+    obj: ImageInstance,
+    x: int,
+    y: int,
+    w: int,
+    h: int,
+    max_size: Union[int, None] = None,
+) -> Union[np.ndarray, None]:
     """
     Function to download the cropped part of the original WSI.
 
@@ -25,7 +26,7 @@ def load_cytomine_window_image(obj: ImageInstance,
         (y: int): the offset along the y-axis.
         (w: int): the width of the cropped part.
         (h: int): the height of the cropped part.
-        (max_size: Union[int, None]): Optional max size for 
+        (max_size: Union[int, None]): Optional max size for
                          resizing window (resizes output image).
 
     Returns:
@@ -35,13 +36,11 @@ def load_cytomine_window_image(obj: ImageInstance,
         tmp_path = os.path.join(tmpdir, "window.jpg")
 
         if max_size is None:
-            obj.window(x, y, w, h, dest_pattern = tmp_path)
-
+            obj.window(x, y, w, h, dest_pattern=tmp_path)
         else:
-            obj.window(x, y, w, h, dest_pattern = tmp_path, max_size = max_size)
+            obj.window(x, y, w, h, dest_pattern=tmp_path, max_size=max_size)
 
         try:
             return plt.imread(tmp_path).copy()
-
         except Exception as _:
             return None

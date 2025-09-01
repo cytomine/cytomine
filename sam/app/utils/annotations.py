@@ -62,7 +62,6 @@ def fetch_included_annotations(
         settings.CYTOMINE_PRIVATE_KEY,
         verbose=False,
     ):
-
         annotations = AnnotationCollection()
         annotations.image = image_id
         annotations.user = user_id
@@ -138,7 +137,6 @@ def get_annotation_by_id(annotation_id: int, settings: Settings) -> Annotation:
         settings.CYTOMINE_PRIVATE_KEY,
         verbose=False,
     ):
-
         annotation = Annotation()
         annotation.id = annotation_id
 
@@ -188,7 +186,6 @@ def update_annotation_location(
         settings.CYTOMINE_PRIVATE_KEY,
         verbose=False,
     ):
-
         annotation = Annotation()
         annotation.id = annotation_id
 

@@ -36,6 +36,12 @@ CMD ["fastapi", "dev", "main.py"]
 
 FROM ${PROXY_CACHE}/python:${PYTHON_VERSION}-slim AS production
 
+ENV PATH="/app/.venv/bin:$PATH" \
+    PYTHONPATH=/app \
+    PYTHONUNBUFFERED=1 \
+    UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy
+
 COPY --from=ghcr.io/astral-sh/uv:0.8.13 /uv /uvx /bin/
 
 WORKDIR /app
@@ -44,13 +50,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgl1 libglib2.0-0 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-COPY ./pyproject.toml ./uv.lock /app/
-COPY ./app/ ./configs/ /app/
-
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     uv sync --frozen --no-install-project
+
+COPY ./pyproject.toml ./uv.lock ./
+COPY ./app/ ./app/
+COPY ./configs/ ./configs/
+
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync
 
 LABEL org.opencontainers.image.authors="uliege@cytomine.org" \
       org.opencontainers.image.url="https://uliege.cytomine.org/" \

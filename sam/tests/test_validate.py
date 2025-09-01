@@ -9,7 +9,6 @@ from app.api.utils.validate import validate_box_feature, validate_point_feature
 
 
 def test_valid_box() -> None:
-    """Test function"""
     feature = {
         "type": "Feature",
         "geometry": {
@@ -22,7 +21,6 @@ def test_valid_box() -> None:
 
 
 def test_box_invalid_type() -> None:
-    """Test function"""
     feature = {"type": "Invalid", "geometry": {}}
 
     with pytest.raises(HTTPException, match="Geometry must be a GeoJSON Feature"):
@@ -30,7 +28,6 @@ def test_box_invalid_type() -> None:
 
 
 def test_box_not_polygon() -> None:
-    """Test function"""
     feature = {"type": "Feature", "geometry": {"type": "Point"}}
 
     with pytest.raises(HTTPException, match="Geometry must be a Polygon"):
@@ -38,7 +35,6 @@ def test_box_not_polygon() -> None:
 
 
 def test_box_missing_coordinates() -> None:
-    """Test function"""
     feature = {"type": "Feature", "geometry": {"type": "Polygon", "coordinates": []}}
 
     with pytest.raises(HTTPException, match="Polygon must have coordinates"):
@@ -46,7 +42,6 @@ def test_box_missing_coordinates() -> None:
 
 
 def test_box_not_closed() -> None:
-    """Test function"""
     feature = {
         "type": "Feature",
         "geometry": {
@@ -60,7 +55,6 @@ def test_box_not_closed() -> None:
 
 
 def test_box_open_shape() -> None:
-    """Test function"""
     feature = {
         "type": "Feature",
         "geometry": {
@@ -74,7 +68,6 @@ def test_box_open_shape() -> None:
 
 
 def test_box_not_axis_aligned() -> None:
-    """Test function"""
     feature = {
         "type": "Feature",
         "geometry": {
@@ -88,7 +81,6 @@ def test_box_not_axis_aligned() -> None:
 
 
 def test_box_incorrect_rectangle() -> None:
-    """Test function"""
     feature = {
         "type": "Feature",
         "geometry": {
@@ -113,7 +105,6 @@ def test_box_incorrect_rectangle() -> None:
 
 
 def test_valid_point() -> None:
-    """Test function"""
     feature = {
         "type": "Feature",
         "geometry": {"type": "Point", "coordinates": [1, 2]},
@@ -124,7 +115,6 @@ def test_valid_point() -> None:
 
 
 def test_point_invalid_type() -> None:
-    """Test function"""
     feature = {"type": "Invalid", "geometry": {}}
 
     with pytest.raises(HTTPException, match="Point must be a GeoJSON Feature"):
@@ -132,7 +122,6 @@ def test_point_invalid_type() -> None:
 
 
 def test_point_wrong_geometry() -> None:
-    """Test function"""
     feature = {"type": "Feature", "geometry": {"type": "Polygon"}}
 
     with pytest.raises(HTTPException, match="Point geometry must be of type Point"):
@@ -140,7 +129,6 @@ def test_point_wrong_geometry() -> None:
 
 
 def test_point_wrong_coords() -> None:
-    """Test function"""
     feature = {
         "type": "Feature",
         "geometry": {"type": "Point", "coordinates": [1]},
@@ -152,7 +140,6 @@ def test_point_wrong_coords() -> None:
 
 
 def test_point_missing_label() -> None:
-    """Test function"""
     feature = {
         "type": "Feature",
         "geometry": {"type": "Point", "coordinates": [1, 2]},
@@ -164,7 +151,6 @@ def test_point_missing_label() -> None:
 
 
 def test_point_invalid_label() -> None:
-    """Test function"""
     feature = {
         "type": "Feature",
         "geometry": {"type": "Point", "coordinates": [1, 2]},

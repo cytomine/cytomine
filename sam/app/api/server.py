@@ -7,7 +7,7 @@ from app.schemas.server import HealthResponse
 router = APIRouter(tags=["server"])
 
 
-@router.get("/", response_model=HealthResponse)
+@router.get("/")
 async def health_check() -> HealthResponse:
     return HealthResponse(
         version=__version__,

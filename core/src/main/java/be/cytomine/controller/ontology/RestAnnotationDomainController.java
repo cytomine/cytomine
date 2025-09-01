@@ -410,7 +410,6 @@ public class RestAnnotationDomainController extends RestCytomineController {
     @PostMapping("/annotation/{id}/sam")
     public ResponseEntity<JsonObject> processAnnotationWithSam(@PathVariable Long id) {
         AnnotationDomain annotation = AnnotationDomain.getAnnotationDomain(entityManager, id);
-
         if (!annotation.isUserAnnotation()) {
             throw new WrongArgumentException("Only user annotations can be processed with SAM.");
         }
@@ -423,22 +422,17 @@ public class RestAnnotationDomainController extends RestCytomineController {
             .toUri();
 
         try {
-            log.debug("Refine annotation {} with url {}", annotation.getId(), url);
             ResponseEntity<String> samResponse = restTemplate.postForEntity(url, null, String.class);
-            log.debug("Success annotation {}", annotation.getId());
 
             JsonObject json = new JsonObject();
             json.put("message", samResponse.getBody());
 
             return ResponseEntity.status(samResponse.getStatusCode()).body(json);
-
         } catch (HttpStatusCodeException e) {
-            log.debug("Failed refine annotation {}", e.getLocalizedMessage());
             JsonObject json = new JsonObject();
             json.put("message", e.getResponseBodyAsString());
 
             return ResponseEntity.status(e.getStatusCode()).body(json);
-
         } catch (Exception e) {
             JsonObject json = new JsonObject();
             json.put("message", "Failed to call SAM server: " + e.getMessage());

@@ -321,3 +321,7 @@ services:
     sam:
       constant:
         API_BASE_PATH: /sam
+      global:
+        CYTOMINE_PUBLIC_KEY: keys.IMAGE_SERVER_PUBLIC
+        CYTOMINE_PRIVATE_KEY: keys.IMAGE_SERVER_PRIVATE
+        CYTOMINE_HOST: urls_with_scheme.INTERNAL_PROXY

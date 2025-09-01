@@ -25,9 +25,9 @@ class Settings(BaseSettings):
     DEVICE: torch.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # Cytomine client
-    CYTOMINE_HOST: str = ""
-    CYTOMINE_PUBLIC_KEY: str = ""
-    CYTOMINE_PRIVATE_KEY: str = ""
+    CYTOMINE_HOST: str
+    CYTOMINE_PUBLIC_KEY: str
+    CYTOMINE_PRIVATE_KEY: str
 
 
 @lru_cache()

@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Segment Anything Models"
 readme = "README.md"
 authors = [
-  { name = "Thibaud Vanmechelen", email = "thibaud.vanmechelen@student.uliege.be" },
+  { name = "Cytomine ULiège", email = "uliege@cytomine.org" },
 ]
 requires-python = ">=3.10"
 dependencies = [

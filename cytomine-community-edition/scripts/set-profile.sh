@@ -6,13 +6,13 @@ for arg in "$@"; do
     echo "Usage: $0 [service1 service2 ...]"
     echo "Configure development environment by setting services in dev mode."
     echo "To disable a service, use '~service-name'"
-    echo "Service short names: 'ae', 'core', 'iam', 'ims', 'ui'"
+    echo "Service short names: 'ae', 'cbir', 'core', 'iam', 'ims', 'sam', 'ui'"
     exit 0
   fi
 done
 
 # Define array of valid service short names
-valid_services=('ae' 'cbir' 'core' 'iam' 'ims' 'ui')
+valid_services=('ae' 'cbir' 'core' 'iam' 'ims' 'sam' 'ui')
 
 # Function to check if a service is valid
 is_valid_service() {

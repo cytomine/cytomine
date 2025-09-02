@@ -27,7 +27,7 @@ module.exports = {
 
   adminGuide: [
     {
-      title: "Community Edition (CE)",
+      title: "Cytomine",
       collapsable: true,
       children: [
         ["/admin-guide/ce/installation", "Installation"],

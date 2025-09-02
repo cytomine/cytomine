@@ -6,7 +6,7 @@ redirectFrom:
   - /admin-guide/ce/ce-install
 ---
 
-# Install Community Edition
+# Install Cytomine
 
 ::: tip
 If you experiment any issues, please describe your problem precisely [in our ticket system on Github.](https://github.com/cytomine/cytomine/issues)

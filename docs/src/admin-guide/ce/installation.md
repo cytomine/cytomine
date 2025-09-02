@@ -115,3 +115,7 @@ sudo docker compose down
 ```
 
 The server will be stopped, but the data, including databases and images, will be preserved.
+
+## What's Next?
+
+For additional setup options, see the [Configuration](./configuration.md) section.

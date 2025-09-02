@@ -31,6 +31,7 @@ module.exports = {
       collapsable: true,
       children: [
         ["/admin-guide/ce/installation", "Installation"],
+        ["/admin-guide/ce/configuration", "Configuration"],
         ["/admin-guide/ce/upgrade", "Upgrade"],
         ["/admin-guide/ce/backup", "Backup and restore"],
         ["/admin-guide/ce/troubleshooting", "Troubleshooting"],

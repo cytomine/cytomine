@@ -14,7 +14,23 @@ If you experiment any issues, please describe your problem precisely [in our tic
 
 ## Prerequisites
 
-A cluster must be installed and running before proceeding with the installation. See [Clusters](/admin-guide/clusters/).
+### Hardware
+
+Cytomine is a set of multithreaded tools. A minimum of **8 CPU cores** is required. The number of required cores is proportional to the expected activity. The more you want to support active users, the more you need cores. For a server-setup configuration, we recommend to use at least **16 cores**.
+
+Regarding memory, a minimum of **8 GB** is required, but we recommend at least **16 GB**.
+
+Cytomine installation requires about **15GB**. You need to provide enough space to store your images (depends on their size). If database backup is enabled, extra-space has to be provided.
+
+### Software
+
+- A **Linux** operating system like [Ubuntu](https://ubuntu.com/), [Debian](https://www.debian.org/), etc.
+- [Docker](https://www.docker.com/)
+- [Docker Compose](https://docs.docker.com/compose/)
+
+### Runing App in Cytomine
+
+To be able to execute apps in Cytomine, a cluster must be installed and running before proceeding with the installation. See [Clusters](/admin-guide/clusters/).
 
 ## Installation
 

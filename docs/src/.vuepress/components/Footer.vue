@@ -9,7 +9,7 @@ export default {
   name: "Footer",
   computed: {
     footer() {
-      return this.$cytomine.homePage.footer || this.$cytomine.footer;
+      return this.$cytomine.footer;
     },
   },
 };

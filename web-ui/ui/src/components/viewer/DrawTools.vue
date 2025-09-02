@@ -187,6 +187,18 @@
           <icon-polygon-free-hand />
         </span>
       </button>
+
+      <button
+        v-if="isToolDisplayed('magic-wand')"
+        :disabled="disabledDraw"
+        :title="disabledDrawMessage"
+        v-tooltip="$t('magic-wand')"
+        class="button"
+        :class="{'is-selected': activeTool === 'magic-wand'}"
+        @click="activateTool('magic-wand')"
+      >
+        <span class="icon is-small"><i class="fas fa-magic"></i></span>
+      </button>
     </div>
   </template>
 

@@ -24,6 +24,7 @@ jobs:
           - nginx
           - pims
           - postgis
+          - sam
           - web-ui
           - mongo
 

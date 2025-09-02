@@ -30,14 +30,13 @@ module.exports = {
       title: "Community Edition (CE)",
       collapsable: true,
       children: [
-        ["/admin-guide/ce/", "Introduction"],
         ["/admin-guide/ce/requirements", "Requirements"],
-        ["/admin-guide/ce/architecture", "Architecture"],
         ["/admin-guide/ce/installation", "Installation"],
         ["/admin-guide/ce/upgrade", "Upgrade"],
         ["/admin-guide/ce/backup", "Backup and restore"],
         ["/admin-guide/ce/troubleshooting", "Troubleshooting"],
         ["/admin-guide/ce/uninstallation", "Uninstallation"],
+        ["/admin-guide/ce/architecture", "Architecture"],
       ],
     },
     {

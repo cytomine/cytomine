@@ -37,7 +37,7 @@ See [detailed usage documentation](https://doc.uliege.cytomine.org/dev-guide/cli
 Three parameters are required to connect:
 * `HOST`: The full URL of Cytomine core (e.g. “http://demo.cytomine.be”).
 * `PUBLIC_KEY`: Your cytomine public key.
-* `PRIVATE_KEY`: Your cytomine private key. 
+* `PRIVATE_KEY`: Your cytomine private key.
 
 First, the connection object has to be initialised.
 
@@ -65,7 +65,7 @@ for project in projects:
 
 ### Other examples
 
-* [Scripts in examples directory](https://github.com/cytomine/Cytomine-python-client/tree/main/examples)
+* [Scripts in examples directory](https://github.com/cytomine/cytomine/tree/main/clients/python/examples)
 * [Documentation by examples](https://doc.uliege.cytomine.org/dev-guide/clients/python/examples)
 
 ## License

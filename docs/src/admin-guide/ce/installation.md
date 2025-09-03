@@ -41,7 +41,7 @@ This installation procedure is intended for desktop or laptop computers running 
 1. Clone the repository on your computer:
 
    ```bash
-   git clone --branch CE2025.2 https://github.com/cytomine/cytomine.git
+   git clone --branch 2025.1 https://github.com/cytomine/cytomine.git
    ```
 
 2. Go into the cloned folder:

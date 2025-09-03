@@ -421,12 +421,7 @@ def connexion_to_core(
         cyto_keys = c.get(f"userkey/{public_key}/keys.json")
         private_key = cyto_keys["privateKey"]
 
-        expected_sig = sign_token(private_key, parse_request_token(request))
-
-        if expected_sig != signature:
-            warnings.warn(f"Keys: {cyto_keys}")
-            warnings.warn(f"Signature was: {signature}")
-            warnings.warn(f"But expected signature was: {expected_sig}")
+        if sign_token(private_key, parse_request_token(request)) != signature:
             raise AuthenticationException("Authentication to Cytomine failed")
 
         c.set_credentials(public_key, private_key)

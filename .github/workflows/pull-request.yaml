@@ -15,16 +15,18 @@ jobs:
       fail-fast: true
       matrix:
         image:
-          - app-engine
-          - cbir
-          - core
-          - iam
-          # - mongo
-          - nginx
-          - pims
-          - postgis
-          - sam
-          - web-ui
+          - name: app-engine
+          - name: cbir
+          - name: core
+          - name: iam
+          # - name: mongo
+          - name: nginx
+          - name: pims
+          - name: postgis
+          - name: sam
+          - name: web-ui
+          - name: python-client
+            path: clients/python
 
     steps:
       - name: Checkout repository
@@ -43,9 +45,9 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
-          context: ./${{ matrix.image }}
-          file: ./${{ matrix.image }}/Dockerfile
+          context: ./${{ matrix.image.path || matrix.image.name }}
+          file: ./${{ matrix.image.path || matrix.image.name }}/Dockerfile
           push: true
-          tags: registry.cytomine.org/cytomine/${{ matrix.image }}
+          tags: registry.cytomine.org/cytomine/${{ matrix.image.name }}
           allow: network.host
           network: host

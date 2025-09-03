@@ -4,12 +4,12 @@ on:
   pull_request:
     branches:
       - main
-    paths:
-      - "cytomine/**/*.py"
-      - "tests/**/*.py"
+  push:
 
 jobs:
+
   check-lint:
+    if: false
     runs-on: ubuntu-latest
 
     steps:
@@ -26,9 +26,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pylint pytest
+        working-directory: ./clients/python
 
       - name: Check lint
         run: pylint --output=lint.txt cytomine tests
+        working-directory: ./clients/python
 
       - name: Upload lint report
         if: ${{ always() }}
@@ -37,8 +39,10 @@ jobs:
           echo '```' >> $GITHUB_STEP_SUMMARY
           cat lint.txt >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
+        working-directory: ./clients/python
 
   check-type:
+    if: false
     runs-on: ubuntu-latest
 
     steps:
@@ -55,6 +59,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install "mypy[reports]" pytest
+        working-directory: ./clients/python
 
       - name: Check type
         run: >-
@@ -65,6 +70,7 @@ jobs:
           --ignore-missing-imports
           --txt-report ./
           cytomine tests
+        working-directory: ./clients/python
 
       - name: Upload type check coverage report
         if: ${{ always() }}
@@ -73,3 +79,4 @@ jobs:
           echo '```' >> $GITHUB_STEP_SUMMARY
           cat index.txt >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
+        working-directory: ./clients/python

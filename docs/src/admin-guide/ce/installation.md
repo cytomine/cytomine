@@ -47,7 +47,7 @@ This installation procedure is intended for desktop or laptop computers running 
 2. Go into the cloned folder:
 
    ```bash
-   cd cytomine
+   cd cytomine/cytomine-community-edition/
    ```
 
 3. Edit the `cytomine.template` file to configure default values such as URLs or SMTP settings.

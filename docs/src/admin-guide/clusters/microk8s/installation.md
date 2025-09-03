@@ -111,9 +111,9 @@ If you encounter issues with the GPU addon, refer to the [official documentation
 
 ## Add registry
 
-Before installing the Community Edition, you will have to set up a configuration file to allow MicroK8s to communicate with the private registry.
+Before installing the Cytomine, you will have to set up a configuration file to allow MicroK8s to communicate with the private registry.
 
-1. Get the IP address of the registry container, which is by default `172.18.0.10` in the [docker-compose.yml](https://github.com/cytomine/Cytomine-community-edition/blob/main/docker-compose.yml) from the community edition repository.
+1. Get the IP address of the registry container, which is by default `172.18.0.10` in the [docker-compose.yml](https://github.com/cytomine/cytomine/blob/main/cytomine-community-edition/docker-compose.yml#L106) from the community edition folder.
 
 2. Create the directory and configuration file:
 
@@ -147,9 +147,9 @@ MicroK8s is now ready for use by Cytomine.
 
 ## Cytomine Configuration
 
-You can now proceed with the installation of the [Cytomine Community Edition](/admin-guide/ce/installation#installation).
+You can now proceed with the installation of [Cytomine](/admin-guide/ce/installation#installation).
 
-In the Cytomine Community Edition, you will have to provide two configurations for the App Engine in the `cytomine.template` file, namely `SCHEDULER_MASTER_URL` and `SCHEDULER_OAUTH_TOKEN`, which can be obtained by the following commands:
+In Cytomine, you will have to provide two configurations for the App Engine in the `cytomine.template` file, namely `SCHEDULER_MASTER_URL` and `SCHEDULER_OAUTH_TOKEN`, which can be obtained by the following commands:
 
 1. For the MicroK8s `SCHEDULER_MASTER_URL`: `microk8s.config | grep server`
 2. For the `SCHEDULER_OAUTH_TOKEN`: `microk8s kubectl create token default`

@@ -32,4 +32,4 @@ Cytomine consists of a collection of services, each running in its own Docker co
 - [App Engine](https://github.com/cytomine/cytomine/tree/main/app-engine). This service is an execution system that allows developers to integrate their own algorithms or applications within the Cytomine platform. It is developed using the [Spring Boot](https://spring.io/projects/spring-boot) framework.
 - The external clients API libraries (currently [Python](https://github.com/cytomine/Cytomine-python-client/)). As Cytomine is a RESTful platform, it is possible to interact with a Cytomine instance with HTTP(S) requests and without using a graphical interface. Clients are libraries developed to help you to integrate interactions with Cytomine in your scripts or your applications.
 
-![Cytomine Community Edition 2025.1](/images/admin-guide/ce/cytomine-2025.1-overview.svg)
+![Cytomine 2025.1](/images/admin-guide/ce/cytomine-2025.1-overview.svg)

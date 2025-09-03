@@ -14,8 +14,6 @@
 # * See the License for the specific language governing permissions and
 # * limitations under the License.
 
-# pylint: disable=import-outside-toplevel
-
 import base64
 import functools
 import hashlib

@@ -27,7 +27,8 @@ jobs:
           - name: sam
           - name: web-ui
           - name: mongo
-
+          - name: python-client
+            path: clients/python
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -52,8 +53,8 @@ jobs:
         id: push
         uses: docker/build-push-action@v6
         with:
-          context: ./${{ matrix.image.name }}
-          file: ./${{ matrix.image.name }}/Dockerfile
+          context: ./${{ matrix.image.path || matrix.image.name }}
+          file: ./${{ matrix.image.path || matrix.image.name }}/Dockerfile
           push: true
           tags: cytomine/${{ matrix.image.name }}
           labels: latest

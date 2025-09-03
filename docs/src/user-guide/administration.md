@@ -31,9 +31,12 @@ The admin panel is organised into several sections, each with specific managemen
 
 ## Users
 
-This panel, contains the list of all the accounts on your Cytomine instance with their role (User, Guest, Admin or SuperAdmin).
+This panel is for managing user accounts within Cytomine.
 
 ![The general user management panel](/images/user-guide/administration/admin-users.png)
 
-For each user, you can edit its information, lock the user (it will not be able to connect on Cytomine unless you unlock it) and display some details.
-In the details, you can be connected as the selected user on Cytomine, see its projects, annotations and so on.
+In this panel, you are able to:
+
+- Create, view, edit, or delete user accounts.
+- Reset user passwords, set temporary passwords, and manage other credentials.
+- Assign roles to users to control their access to different resources.

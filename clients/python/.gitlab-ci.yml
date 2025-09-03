@@ -1,0 +1,64 @@
+stages:
+  - lint
+  - test
+  - publish
+
+variables:
+  SEMVER_REGEX: /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/
+
+workflow:
+  rules:
+    - if: '$CI_MERGE_REQUEST_ID'
+      when: always
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: always
+    - if: '$CI_COMMIT_BRANCH == "production"'
+      when: always
+    - if: '$CI_COMMIT_TAG && $CI_COMMIT_TAG =~ $SEMVER_REGEX'
+      when: always
+    - when: never
+
+lint-python:
+  stage: lint
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/python:${PYTHON_VERSION}
+  parallel:
+    matrix:
+      - PYTHON_VERSION: ["3.8", "3.9"]
+  before_script:
+    - python3 -m pip install --upgrade pip
+    - pip install -r requirements.txt
+    - pip install pylint pytest
+  script:
+    - pylint --output=lint.txt cytomine tests
+  artifacts:
+    paths:
+      - ./lint.txt
+    when: always
+
+unit-tests:
+  stage: test
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/python:${PYTHON_VERSION}
+  parallel:
+    matrix:
+      - PYTHON_VERSION: ["3.8", "3.9"]
+  before_script:
+    - python3 -m pip install --upgrade pip
+    - pip install -r requirements.txt
+    - pip install pytest
+  script:
+    - pytest tests/test_pattern_matching.py --junit-xml=./reports/pytest-unit.xml
+  artifacts:
+    reports:
+      junit: ./reports/pytest-unit.xml
+    when: always
+
+publish-python-package:
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/python:3.8-slim-bullseye
+  stage: publish
+  rules:
+    - if: $CI_COMMIT_TAG && $CI_COMMIT_TAG =~ $SEMVER_REGEX
+  before_script:
+    - pip install twine
+    - python setup.py sdist
+  script:
+    - twine upload dist/cytomine-python-client-${CI_COMMIT_TAG}.tar.gz

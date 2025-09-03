@@ -1,4 +1,6 @@
-FROM python:3-alpine
+ARG PROXY_CACHE=registry.cytomine.org/docker
+
+FROM ${PROXY_CACHE}/python:3-alpine
 
 RUN apk add geos
 

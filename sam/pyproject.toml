@@ -20,7 +20,7 @@ dependencies = [
   "python-box>=7.3.2",
   "sam2>=1.1.0",
   "shapely>=2.1.1",
-  "torch==2.6.0",
+  "torch==2.8.0",
   "torchvision==0.21.0",
 ]
 

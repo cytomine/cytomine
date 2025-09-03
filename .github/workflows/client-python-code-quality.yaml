@@ -4,9 +4,7 @@ on:
   pull_request:
     branches:
       - main
-    paths:
-      - "cytomine/**/*.py"
-      - "tests/**/*.py"
+  push:
 
 jobs:
   check-lint:
@@ -24,11 +22,11 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r clients/python/requirements.txt
           pip install pylint pytest
 
       - name: Check lint
-        run: pylint --output=lint.txt cytomine tests
+        run: pylint --output=lint.txt clients/python/cytomine clients/python/tests
 
       - name: Upload lint report
         if: ${{ always() }}
@@ -53,7 +51,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r clients/python/requirements.txt
           pip install "mypy[reports]" pytest
 
       - name: Check type
@@ -64,7 +62,7 @@ jobs:
           --disallow-untyped-defs
           --ignore-missing-imports
           --txt-report ./
-          cytomine tests
+          clients/python/cytomine clients/python/tests
 
       - name: Upload type check coverage report
         if: ${{ always() }}

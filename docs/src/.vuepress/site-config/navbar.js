@@ -33,7 +33,6 @@ module.exports = (content) => [
         items: [
           {text: "Installation", link: "/admin-guide/ce/installation"},
           {text: "Configuration", link: "/admin-guide/ce/configuration"},
-          {text: "Upgrade", link: "/admin-guide/ce/upgrade"},
           {text: "Backup", link: "/admin-guide/ce/backup"},
           {text: "Troubleshooting", link: "/admin-guide/ce/troubleshooting"},
           {text: "Uninstallation", link: "/admin-guide/ce/uninstallation"},

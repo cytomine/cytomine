@@ -1,0 +1,17 @@
+services:
+
+  sam:
+    image: sam:dev-latest
+    build:
+      context: ${REPO_PATH}/sam
+      dockerfile: ${REPO_PATH}/sam/Dockerfile
+      target: dev-server
+    ports:
+      - ${DEV_SAM_PORT:-8000}:8000
+    command: ["/bin/bash"]
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+    volumes:
+      - ${REPO_PATH}/sam:/app
+    env_file: ${ROOT_PATH}/envs/sam.env

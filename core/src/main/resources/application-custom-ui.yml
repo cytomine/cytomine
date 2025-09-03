@@ -185,7 +185,7 @@ application:
       project-tools-freehand-polygon:
         ADMIN_PROJECT: true
         CONTRIBUTOR_PROJECT: true
-      project-tools-magic:
+      project-tools-magic-wand:
         ADMIN_PROJECT: true
         CONTRIBUTOR_PROJECT: true
       project-tools-freehand:

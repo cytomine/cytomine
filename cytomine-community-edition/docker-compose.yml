@@ -144,6 +144,19 @@ services:
       cytomine-network:
         ipv4_address: 172.18.0.13
 
+  sam:
+    image: cytomine/sam:latest
+    build:
+      context: ../sam
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - core
+      - web_ui
+    networks:
+      cytomine-network:
+        ipv4_address: 172.18.0.14
+
 networks:
   cytomine-network:
     driver: bridge

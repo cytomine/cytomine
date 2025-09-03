@@ -35,7 +35,6 @@ module.exports = {
         ["/admin-guide/ce/backup", "Backup and restore"],
         ["/admin-guide/ce/troubleshooting", "Troubleshooting"],
         ["/admin-guide/ce/uninstallation", "Uninstallation"],
-        ["/admin-guide/ce/architecture", "Architecture"],
       ],
     },
     {

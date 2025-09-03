@@ -23,7 +23,7 @@
   "urls": {
     "docRepo": "https://github.com/cytomine/cytomine",
     "docUrl": "https://doc.uliege.cytomine.org",
-    "githubDiscussions": "https://github.com/orgs/cytomine/discussions",
+    "githubDiscussions": "https://github.com/cytomine/cytomine/discussions",
     "siteUrl": "https://uliege.cytomine.org"
   },
   "homePage": {

@@ -41,11 +41,7 @@ import be.cytomine.appengine.utils.ArchiveUtils;
 import be.cytomine.appengine.utils.TaskUtils;
 import be.cytomine.appengine.utils.TestTaskBuilder;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -117,7 +113,7 @@ public class TaskServiceTest {
         request.setContent(multipartBody);
         request.setCharacterEncoding("UTF-8");
 
-        Optional<TaskDescription> result = taskService.uploadTask(request);
+        Optional<TaskDescription> result = taskService.uploadTask(request.getInputStream());
 
         assertTrue(result.isPresent());
         verify(storageHandler, times(1)).createStorage(any(Storage.class));
@@ -173,7 +169,7 @@ public class TaskServiceTest {
             TaskServiceException.class,
             () -> taskService.retrieveYmlDescriptor(namespace, version)
         );
-        assertTrue(exception.getCause() instanceof FileStorageException);
+        assertInstanceOf(FileStorageException.class, exception.getCause());
         verify(taskRepository, times(1)).findByNamespaceAndVersion(namespace, version);
         verify(storageHandler, times(1)).readStorageData(any(StorageData.class));
     }
@@ -220,7 +216,7 @@ public class TaskServiceTest {
             TaskServiceException.class,
             () -> taskService.retrieveYmlDescriptor(task.getIdentifier().toString())
         );
-        assertTrue(exception.getCause() instanceof FileStorageException);
+        assertInstanceOf(FileStorageException.class, exception.getCause());
         verify(taskRepository, times(1)).findById(task.getIdentifier());
         verify(storageHandler, times(1)).readStorageData(any(StorageData.class));
     }
@@ -279,7 +275,7 @@ public class TaskServiceTest {
 
         List<TaskDescription> result = taskService.retrieveTaskDescriptions();
 
-        assertTrue(tasks.size() == result.size());
+        assertEquals(tasks.size(), result.size());
         verify(taskRepository, times(1)).findAll();
     }
 
@@ -290,7 +286,7 @@ public class TaskServiceTest {
 
         List<TaskDescription> result = taskService.retrieveTaskDescriptions();
 
-        assertTrue(result.size() == 0);
+        assertEquals(0, result.size());
         verify(taskRepository, times(1)).findAll();
     }
 

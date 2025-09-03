@@ -31,6 +31,12 @@ The admin panel is organised into several sections, each with specific managemen
 
 ## Users
 
+::: tip
+You have to change the realm to be able to manage the users within Cytomine.
+
+To change the realm, click on the drop-down menu on the upper-left corner and select `cytomine` instead of `Keycloak`.
+:::
+
 This panel is for managing user accounts within Cytomine.
 
 ![KeyCloak user page](/images/user-guide/administration/admin-users.png)

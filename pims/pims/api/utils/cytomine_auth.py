@@ -54,7 +54,10 @@ def parse_request_token(request: Request):
     query_string = request.url.query
     query_string = "?" + query_string if query_string is not None else ""
 
-    client_url_path = lreplace(request.url.path, get_settings().api_base_path, "")
+    if "nginx" in get_settings().internal_url_core:
+        client_url_path = lreplace(request.url.path, get_settings().api_base_path, "")
+    else:
+        client_url_path = request.url.path
 
     message = "{}\n{}\n{}\n{}\n{}{}".format(
         request.method, md5, content_type,

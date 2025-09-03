@@ -55,9 +55,22 @@ router = APIRouter(prefix=get_settings().api_base_path)
 
 cytomine_logger = logging.getLogger("pims.cytomine")
 
+FILE_ROOT_PATH = get_settings().root
 DATASET_PATH = get_settings().dataset_path
 WRITING_PATH = get_settings().writing_path
 INTERNAL_URL_CORE = get_settings().internal_url_core
+
+
+def is_already_imported(image_path: Path, data_path: Path) -> bool:
+    """Check if an image was already imported."""
+
+    for upload_dir in data_path.iterdir():
+        if not upload_dir.is_dir():
+            continue
+        for candidate in upload_dir.iterdir():
+            if candidate.is_symlink() and candidate.resolve() == image_path.resolve():
+                return True
+    return False
 
 
 @router.post("/import", tags=["Import"])
@@ -147,12 +160,8 @@ def import_dataset(
                     response["valid_datasets"][dataset_name]["project_created"] = True
 
             image_paths = [p for p in Path(dataset_path).recursive_iterdir() if p.is_file()]
-
-            existing_files = UploadedFileCollection().fetch_with_filter("storage", storage_id)
-            existing_filenames = {uf.originalFilename for uf in existing_files}
-
             for image_path in image_paths:
-                if image_path.name in existing_filenames:
+                if is_already_imported(image_path, Path(FILE_ROOT_PATH)):
                     response["valid_datasets"][dataset_name]["skipped_files"].append(image_path.name)
                     continue
 

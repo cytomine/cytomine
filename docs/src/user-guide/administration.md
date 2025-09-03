@@ -13,7 +13,7 @@ where `your-cytomine-instance.org` is the URL of your Cytomine instance.
 
 The URL will lead to the following page:
 
-![KeyCloak admin page](/images/user-guide/administration/admin-login.png)
+![KeyCloak login page](/images/user-guide/administration/admin-login.png)
 
 To retrieve the admin password, run the following command in the `cytomine-community-edition` folder:
 
@@ -27,13 +27,13 @@ Use the retrieved password with the `admin` username to access the admin panel.
 
 The admin panel is organised into several sections, each with specific management capabilities.
 
-![The dashboard of all the Cytomine platform](/images/user-guide/administration/admin-dashboard.png)
+![KeyCloak dashboard page](/images/user-guide/administration/admin-dashboard.png)
 
 ## Users
 
 This panel is for managing user accounts within Cytomine.
 
-![The general user management panel](/images/user-guide/administration/admin-users.png)
+![KeyCloak user page](/images/user-guide/administration/admin-users.png)
 
 In this panel, you are able to:
 

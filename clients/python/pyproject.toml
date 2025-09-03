@@ -31,6 +31,9 @@ homepage = "https://uliege.cytomine.org/"
 documentation = "https://doc.uliege.cytomine.org/"
 repository = "https://github.com/cytomine/cytomine"
 
+[tool.mypy]
+ignore_missing_imports = true
+
 [tool.setuptools.packages.find]
 include = [
   "cytomine",

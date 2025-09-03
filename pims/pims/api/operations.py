@@ -11,6 +11,7 @@
 #  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  * See the License for the specific language governing permissions and
 #  * limitations under the License.
+
 import logging
 import os
 import traceback
@@ -20,7 +21,11 @@ from typing import Optional
 
 from cytomine import Cytomine
 from cytomine.models import (
-    Project, ProjectCollection, Storage, UploadedFile
+    Project,
+    ProjectCollection,
+    Storage,
+    UploadedFile,
+    UploadedFileCollection,
 )
 from fastapi import APIRouter, BackgroundTasks, Depends, Query
 from starlette.requests import Request
@@ -99,7 +104,11 @@ def import_dataset(
 
     response = {
         "valid_datasets": {
-            os.path.basename(dataset_path): {"uploaded_files": [], "failed_files": []}
+            os.path.basename(dataset_path): {
+                "uploaded_files": [],
+                "failed_files": [],
+                "skipped_files": [],
+            }
             for dataset_path in valid_datasets
         },
         "invalid_datasets": invalid_datasets,
@@ -138,7 +147,15 @@ def import_dataset(
                     response["valid_datasets"][dataset_name]["project_created"] = True
 
             image_paths = [p for p in Path(dataset_path).recursive_iterdir() if p.is_file()]
+
+            existing_files = UploadedFileCollection().fetch_with_filter("storage", storage_id)
+            existing_filenames = {uf.originalFilename for uf in existing_files}
+
             for image_path in image_paths:
+                if image_path.name in existing_filenames:
+                    response["valid_datasets"][dataset_name]["skipped_files"].append(image_path.name)
+                    continue
+
                 tmp_path = Path(WRITING_PATH, image_path.name)
                 tmp_path.symlink_to(image_path, target_is_directory=image_path.is_dir())
 

@@ -11,5 +11,6 @@ public enum ValueType {
     IMAGE,
     WSI,
     FILE,
-    ARRAY
+    ARRAY,
+    REFERENCE
 }

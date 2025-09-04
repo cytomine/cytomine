@@ -30,7 +30,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--import-uri",
-        default="/import",
+        default="import",
         help="The Cytomine private key",
     )
     params, _ = parser.parse_known_args(sys.argv[1:])

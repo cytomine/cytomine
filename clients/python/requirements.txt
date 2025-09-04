@@ -14,7 +14,7 @@ idna==3.2
     # via requests
 msgpack==1.0.2
     # via cachecontrol
-requests==2.27.1
+requests==2.32.4
     # via
     #   cachecontrol
     #   cytomine-python-client (setup.py)

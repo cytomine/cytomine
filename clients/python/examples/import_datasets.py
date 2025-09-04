@@ -28,6 +28,11 @@ if __name__ == "__main__":
         "--private_key",
         help="The Cytomine private key",
     )
+    parser.add_argument(
+        "--import-uri",
+        default="import",
+        help="The Cytomine private key",
+    )
     params, _ = parser.parse_known_args(sys.argv[1:])
 
     with Cytomine(
@@ -46,6 +51,7 @@ if __name__ == "__main__":
         response = cytomine.import_datasets(
             storage.id,
             create_project=True,  # Create a project based on folder name
+            import_uri=params.import_uri
         )
 
         print(response)

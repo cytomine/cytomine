@@ -3,6 +3,7 @@ package be.cytomine.appengine.dto.handlers.scheduler;
 import java.util.Map;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper=false)

@@ -21,7 +21,12 @@ from argparse import ArgumentParser
 from shapely import wkt
 
 from cytomine import Cytomine
-from cytomine.models import *
+from cytomine.models import (
+    AnnotationCollection,
+    ImageInstanceCollection,
+    Project,
+    TermCollection,
+)
 
 __author__ = "Rubens Ulysse <urubens@uliege.be>"
 

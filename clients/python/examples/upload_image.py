@@ -20,7 +20,7 @@ import sys
 from argparse import ArgumentParser
 
 from cytomine import Cytomine
-from cytomine.models import Project, StorageCollection, UploadedFile
+from cytomine.models import Project, StorageCollection
 
 logging.basicConfig()
 logger = logging.getLogger("cytomine.client")

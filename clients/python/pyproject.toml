@@ -1,0 +1,43 @@
+[project]
+name = "cytomine-python-client"
+version = "3.1.0"
+description = "Python client to interact with Cytomine."
+authors = [{ name = "Cytomine ULiège", email = "uliege@cytomine.org" }]
+readme = "README.md"
+requires-python = ">=3.8"
+license = "Apache-2.0"
+classifiers = [
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.8",
+  "Operating System :: OS Independent",
+]
+dependencies = [
+  "cachecontrol>=0.12.10",
+  "requests>=2.27.1",
+  "requests-toolbelt>=0.9.1",
+  "shapely>=1.7.1",
+  "urllib3>=1.26.19",
+]
+
+[dependency-groups]
+dev = [
+  "mypy>=1.14.1",
+  "pytest>=8.3.5",
+  "ruff>=0.12.11",
+]
+
+[project.urls]
+homepage = "https://uliege.cytomine.org/"
+documentation = "https://doc.uliege.cytomine.org/"
+repository = "https://github.com/cytomine/cytomine"
+
+[tool.mypy]
+ignore_missing_imports = true
+
+[tool.setuptools.packages.find]
+include = [
+  "cytomine",
+  "cytomine.models",
+  "cytomine.models._utilities",
+  "cytomine.utilities",
+]

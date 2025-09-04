@@ -8,6 +8,6 @@ COPY . /app
 
 WORKDIR /app
 
-RUN pip install --no-cache-dir -r requirements.txt .
+RUN pip install --no-cache-dir .
 
-ENTRYPOINT ["python","examples/import_datasets.py"]
+ENTRYPOINT ["python", "examples/import_datasets.py"]

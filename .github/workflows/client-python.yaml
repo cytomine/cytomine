@@ -1,0 +1,48 @@
+name: Client Python
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: ./clients/python
+
+jobs:
+  lint:
+    runs-on: self-hosted
+
+    steps:
+      - name: Set up the repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: ${{ vars.UV_VERSION }}
+
+      - name: Lint
+        run: uv run ruff check
+
+  type-check:
+    runs-on: self-hosted
+
+    steps:
+      - name: Set up the repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: ${{ vars.UV_VERSION }}
+
+      - name: Check type
+        run: uv run mypy cytomine tests

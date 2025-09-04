@@ -18,7 +18,6 @@ import logging
 import sys
 from argparse import ArgumentParser
 
-from shapely.geometry import Point, box
 
 from cytomine import Cytomine
 from cytomine.models import AnnotationCollection

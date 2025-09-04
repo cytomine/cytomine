@@ -981,9 +981,9 @@ class Cytomine:
     def import_datasets(
         self,
         storage_id: int,
+        import_uri: str,
         dataset_names: Optional[str] = None,
         create_project: bool = False,
-        import_uri: str,
     ) -> Dict[str, str]:
         """Import datasets from a given path."""
 

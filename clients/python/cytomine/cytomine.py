@@ -983,13 +983,14 @@ class Cytomine:
         storage_id: int,
         dataset_names: Optional[str] = None,
         create_project: bool = False,
+        import_uri: str,
     ) -> Dict[str, str]:
         """Import datasets from a given path."""
 
         upload_host = self._base_url(with_base_path=False)
 
         response = self._session.post(
-            f"{upload_host}/import",
+            f"{upload_host}/{import_uri}",
             auth=CytomineAuth(
                 self._public_key,
                 self._private_key,

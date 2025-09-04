@@ -51,7 +51,7 @@ if __name__ == "__main__":
         response = cytomine.import_datasets(
             storage.id,
             create_project=True,  # Create a project based on folder name
-            uri=params.import_uri
+            import_uri=params.import_uri
         )
 
         print(response)

@@ -230,7 +230,7 @@ typing-extensions==4.12.1
     #   uvicorn
 typing-inspect==0.9.0
     # via cytomine-pims (setup.py)
-urllib3==1.26.14
+urllib3==2.5.0
     # via
     #   cytomine-python-client
     #   requests

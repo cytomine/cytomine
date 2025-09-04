@@ -981,6 +981,7 @@ class Cytomine:
     def import_datasets(
         self,
         storage_id: int,
+        import_uri: str,
         dataset_names: Optional[str] = None,
         create_project: bool = False,
     ) -> Dict[str, str]:
@@ -989,7 +990,7 @@ class Cytomine:
         upload_host = self._base_url(with_base_path=False)
 
         response = self._session.post(
-            f"{upload_host}/import",
+            f"{upload_host}/{import_uri}",
             auth=CytomineAuth(
                 self._public_key,
                 self._private_key,

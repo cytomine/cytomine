@@ -6,9 +6,9 @@ services:
     volumes:
       - ./data/mongo:/data/db
     environment:
-      - MONGO_INITDB_ROOT_PASSWORD=XA6qLuY975MhDovDL4NNLjoN4UwHL9ZdrcUlCkOAOsQ=
-      - MONGO_INITDB_ROOT_USERNAME=mongoadmin
-      - MONGO_INIT_DATABASE=cytomine
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD:-password}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME:-admin}
+      - MONGO_INIT_DATABASE=${MONGO_DB:-cytomine}
     networks:
       - cytomine-network
 
@@ -18,15 +18,15 @@ services:
     volumes:
       - ./data/postgis/data:/var/lib/postgresql/data
     environment:
-      - APPENGINE_DB=appengine
-      - APPENGINE_PASSWORD=3tiLfjdvN99MPoTrpPUJ6dt0+hWca+7qIEE7w025Aig=
-      - APPENGINE_USER=appengine
-      - IAM_DB=iam
-      - IAM_PASSWORD=v1zBy3I0aYlOLcvFS6vS6cjERe5sGT8ahA67AP4Aq5o=
-      - IAM_USER=iam
-      - POSTGRES_DB=docker
-      - POSTGRES_PASSWORD=5+KNVWO6YF2bvHLuJ9Eu6Kh2sKYOzTcmmv0Boz/ZZ3Q=
-      - POSTGRES_USER=docker
+      - APPENGINE_DB=${APP_ENGINE_DB:-appengine}
+      - APPENGINE_PASSWORD=${APP_ENGINE_PASSWORD:-password}
+      - APPENGINE_USER=${APP_ENGINE_USER:-appengine}
+      - IAM_DB=${IAM_DB:-iam}
+      - IAM_PASSWORD=${IAM_PASSWORD:-password}
+      - IAM_USER=${IAM_USER:-iam}
+      - POSTGRES_DB=${POSTGRES_DB:-cytomine}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-password}
+      - POSTGRES_USER=${POSTGRES_USER:-cytomine}
     networks:
       - cytomine-network
 
@@ -134,13 +134,13 @@ services:
     environment:
       - API_PREFIX=/app-engine/
       - DB_HOST=postgis
-      - DB_NAME=appengine
-      - DB_PASSWORD=3tiLfjdvN99MPoTrpPUJ6dt0+hWca+7qIEE7w025Aig=
+      - DB_NAME=${APP_ENGINE_DB:-appengine}
+      - DB_PASSWORD=${APP_ENGINE_PASSWORD:-password}
       - DB_PORT=5432
-      - DB_USERNAME=appengine
+      - DB_USERNAME=${APP_ENGINE_USER:-appengine}
       - REGISTRY_HOST=registry
-      - SCHEDULER_MASTER_URL=changeme
-      - SCHEDULER_OAUTH_TOKEN=changeme
+      - SCHEDULER_MASTER_URL=${APP_ENGINE_SCHEDULER_MASTER_URL:-changeme}
+      - SCHEDULER_OAUTH_TOKEN=${APP_ENGINE_SCHEDULER_OAUTH_TOKEN:-changeme}
       - SCHEDULER_USERNAME=admin
       - STORAGE_BASE_PATH=/data
     networks:
@@ -166,16 +166,16 @@ services:
       - JAVAMELODY_PATH=/javamelody-core
       - JAVAMELODY_USER=admin
       - JWT_SECRET=d0K3EqpNgHn1huF_N1kXw.s4P1Wq;V3'W_UL4pY.EEDC+~wnmKQy3F+_3+gUGZJmnMGUl73.R+bOcQa8lv6lpG5VB~AI_3wMWtAP^TVY5xffO7PPKus_tP5~v6s8kH7Q7'CjqPqXL.D4plG3NJGKumP0IyoWulSwWvYpWx9SQ1D+mQZVvCbIWuM~N;M16~clqB_MRecEXXb~CRfw;ydav~her+s6+'WItURgb2rKkPSAc93kuySIjEYNa_;8zIJ0
-      - MONGO_DB_NAME=cytomine
+      - MONGO_DB_NAME=${MONGO_DB:-cytomine}
       - MONGO_HOST=mongo
-      - MONGO_PASS=XA6qLuY975MhDovDL4NNLjoN4UwHL9ZdrcUlCkOAOsQ=
+      - MONGO_PASS=${MONGO_PASSWORD:-password}
       - MONGO_PORT=27017
-      - MONGO_USER=mongoadmin
-      - POSTGIS_DB_NAME=docker
+      - MONGO_USER=${MONGO_USERNAME:-admin}
+      - POSTGIS_DB_NAME=${POSTGRES_DB:-cytomine}
       - POSTGIS_HOST=postgis
-      - POSTGIS_PASS=5+KNVWO6YF2bvHLuJ9Eu6Kh2sKYOzTcmmv0Boz/ZZ3Q=
+      - POSTGIS_PASS=${POSTGRES_PASSWORD:-cytomine}
       - POSTGIS_PORT=5432
-      - POSTGIS_USER=docker
+      - POSTGIS_USER=${POSTGRES_USER:-cytomine}
       - STORAGE_PATH=/data/images
       - SUPER_ADMIN_PRIVATE_KEY=944ee44b-e327-451d-80c0-9507448a472f
       - SUPER_ADMIN_PUBLIC_KEY=4162d546-129b-48bd-9098-610cd4c50f33

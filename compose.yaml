@@ -101,11 +101,11 @@ services:
       - postgis
     environment:
       - KC_ADMIN_EMAIL=mail@mail.com
-      - KC_DB_PASSWORD=v1zBy3I0aYlOLcvFS6vS6cjERe5sGT8ahA67AP4Aq5o=
-      - KC_DB_URL_DATABASE=iam
+      - KC_DB_PASSWORD=${IAM_PASSWORD:-password}
+      - KC_DB_URL_DATABASE=${IAM_DB:-iam}
       - KC_DB_URL_HOST=postgis
       - KC_DB_URL_PORT=5432
-      - KC_DB_USERNAME=iam
+      - KC_DB_USERNAME=${IAM_USER:-iam}
       - KC_FEATURES=token-exchange
       - KC_HOSTNAME=127.0.0.1
       - KC_HOSTNAME_ADMIN=127.0.0.1
@@ -171,11 +171,11 @@ services:
       - MONGO_PASS=${MONGO_PASSWORD:-password}
       - MONGO_PORT=27017
       - MONGO_USER=${MONGO_USERNAME:-admin}
-      - POSTGIS_DB_NAME=${POSTGRES_DB:-cytomine}
+      - POSTGIS_DB_NAME=${POSTGRES_DB:-docker}
       - POSTGIS_HOST=postgis
-      - POSTGIS_PASS=${POSTGRES_PASSWORD:-cytomine}
+      - POSTGIS_PASS=${POSTGRES_PASSWORD:-password}
       - POSTGIS_PORT=5432
-      - POSTGIS_USER=${POSTGRES_USER:-cytomine}
+      - POSTGIS_USER=${POSTGRES_USER:-docker}
       - STORAGE_PATH=/data/images
       - SUPER_ADMIN_PRIVATE_KEY=944ee44b-e327-451d-80c0-9507448a472f
       - SUPER_ADMIN_PUBLIC_KEY=4162d546-129b-48bd-9098-610cd4c50f33

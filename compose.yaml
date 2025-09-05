@@ -62,7 +62,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime
     environment:
-      - VERSIONS_CYTOMINE_COMMERCIAL=CE2025.1
+      - VERSIONS_CYTOMINE_COMMERCIAL=${CYTOMINE_VERSION:-2025.1}
     networks:
       - cytomine-network
 
@@ -75,7 +75,7 @@ services:
       - ./data/dataset:/dataset
       - ./data/images:/data/images
     environment:
-      - API_BASE_PATH=/ims
+      - API_BASE_PATH=${IMS_API_BASE_PATH:-/ims}
       - CACHE_ENABLED=true
       - CACHE_URL=redis://pims-cache:6379
       - CYTOMINE_PRIVATE_KEY=d70607f5-c478-403c-be11-3dbc1716d1cf
@@ -132,7 +132,7 @@ services:
     volumes:
       - ./data/app-engine:/data
     environment:
-      - API_PREFIX=/app-engine/
+      - API_PREFIX=${APP_ENGINE_API_BASE_PATH:-/app-engine/}
       - DB_HOST=postgis
       - DB_NAME=${APP_ENGINE_DB:-appengine}
       - DB_PASSWORD=${APP_ENGINE_PASSWORD:-password}
@@ -156,7 +156,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime
     environment:
-      - ADMIN_PASSWORD=passord
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-password}
       - ADMIN_PRIVATE_KEY=1f77ce7b-e9ba-4393-bb53-12a702cc2741
       - ADMIN_PUBLIC_KEY=838b0935-05a7-4ea9-bd48-71497468e4c9
       - IMAGE_SERVER_PRIVATE_KEY=d70607f5-c478-403c-be11-3dbc1716d1cf
@@ -191,7 +191,7 @@ services:
       - ./data/cbir:/data/cbir
       - ./data/weight:/weights
     environment:
-      - API_BASE_PATH=/cbir
+      - API_BASE_PATH=${CBIR_API_BASE_PATH:-/cbir}
       - DATA_PATH=/data/cbir
       - DB=0
       - EXTRACTOR=resnet
@@ -204,7 +204,7 @@ services:
     image: cytomine/sam:latest
     restart: unless-stopped
     environment:
-      - API_BASE_PATH=/sam
+      - API_BASE_PATH=${SAM_API_BASE_PATH:-/sam}
       - CYTOMINE_HOST=http://nginx
       - CYTOMINE_PRIVATE_KEY=d70607f5-c478-403c-be11-3dbc1716d1cf
       - CYTOMINE_PUBLIC_KEY=9a8b8369-2446-44cb-b0af-604a74e1dcdb
@@ -222,21 +222,21 @@ services:
       - pims
       - web-ui
     environment:
-      - IMAGES_CORE=cytomine/core:5.1.0
-      - IMAGES_MONGO=cytomine/mongo:1.0.0
-      - IMAGES_NGINX=cytomine/nginx:3.0.2-dev
-      - IMAGES_PIMS=cytomine/pims-ce-package:ce-1.0.0
+      - IMAGES_CORE=cytomine/core:${CORE_TAG:-latest}
+      - IMAGES_MONGO=cytomine/mongo:${MONGO_TAG:-latest}
+      - IMAGES_NGINX=cytomine/nginx:${NGINX_TAG:-latest}
+      - IMAGES_PIMS=cytomine/pims:${PIMS_TAG:-latest}
       - IMAGES_PIMS_CACHE=redis:7.2
-      - IMAGES_POSTGIS=cytomine/postgis:1.5.3-ci
-      - IMAGES_WEB_UI=cytomine/web-ui:3.1.0
+      - IMAGES_POSTGIS=cytomine/postgis:${POSTGIS_TAG:-latest}
+      - IMAGES_WEB_UI=cytomine/web-ui:${WEB_UI_TAG:-latest}
       - INTERNAL_URLS_APPENGINE=app-engine:8080
       - INTERNAL_URLS_CORE=core:8080
       - INTERNAL_URLS_IAM=iam:8100
       - INTERNAL_URLS_IMS=pims:5000
       - INTERNAL_URLS_WEB_UI=web-ui
       - URLS_INTERNAL_PROXY=nginx
-      - URLS_SCHEME=http
-      - VERSIONS_CYTOMINE_COMMERCIAL=CE2025.1
+      - URLS_SCHEME=${URLS_SCHEME:-http}
+      - VERSIONS_CYTOMINE_COMMERCIAL=${CYTOMINE_VERSION:-2025.1}
     networks:
       - cytomine-network
 

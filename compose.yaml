@@ -234,11 +234,8 @@ services:
       IMAGES_POSTGIS: cytomine/postgis:${POSTGIS_TAG:-latest}
       IMAGES_WEB_UI: cytomine/web-ui:${WEB_UI_TAG:-latest}
       INTERNAL_URLS_APPENGINE: app-engine:8080
-      INTERNAL_URLS_CORE: core:8080
       INTERNAL_URLS_IAM: iam:8100
-      INTERNAL_URLS_IMS: pims:5000
       INTERNAL_URLS_WEB_UI: web-ui
-      URLS_INTERNAL_PROXY: nginx
       URLS_SCHEME: ${URLS_SCHEME:-http}
     networks:
       - cytomine-network

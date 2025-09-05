@@ -7,7 +7,7 @@ services:
     image: cytomine/mongo:latest
     restart: unless-stopped
     volumes:
-      - ./data/mongo:/data/db
+      - ${DATA_PATH:-./data}/mongo:/data/db
     environment:
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-password}
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME:-admin}
@@ -19,7 +19,7 @@ services:
     image: cytomine/postgis:latest
     restart: unless-stopped
     volumes:
-      - ./data/postgis/data:/var/lib/postgresql/data
+      - ${DATA_PATH:-./data}/postgis/data:/var/lib/postgresql/data
     environment:
       APPENGINE_DB: ${APP_ENGINE_DB:-appengine}
       APPENGINE_PASSWORD: ${APP_ENGINE_PASSWORD:-password}
@@ -37,7 +37,7 @@ services:
     image: registry:2.8.3
     restart: unless-stopped
     volumes:
-      - ./data/registry:/data
+      - ${DATA_PATH:-./data}/registry:/data
     environment:
       REGISTRY_STORAGE_DELETE_ENABLED: true
     networks:
@@ -49,7 +49,7 @@ services:
     command: --port 6380
     restart: unless-stopped
     volumes:
-      - ./data/redis:/data
+      - ${DATA_PATH:-./data}/redis:/data
     networks:
       - cytomine-network
 
@@ -75,8 +75,8 @@ services:
     depends_on:
       - pims-cache
     volumes:
-      - ./data/dataset:/dataset
-      - ./data/images:/data/images
+      - ${DATA_PATH:-./data}/dataset:/dataset
+      - ${DATA_PATH:-./data}/images:/data/images
     environment:
       API_BASE_PATH: ${IMS_API_BASE_PATH:-/ims}
       CACHE_ENABLED: true
@@ -133,7 +133,7 @@ services:
       - postgis
       - registry
     volumes:
-      - ./data/app-engine:/data
+      - ${DATA_PATH:-./data}/app-engine:/data
     environment:
       API_PREFIX: ${APP_ENGINE_API_BASE_PATH:-/app-engine/}
       DB_HOST: postgis
@@ -191,8 +191,8 @@ services:
     depends_on:
       - redis
     volumes:
-      - ./data/cbir:/data/cbir
-      - ./data/weight:/weights
+      - ${DATA_PATH:-./data}/cbir:/data/cbir
+      - ${DATA_PATH:-./data}/weight:/weights
     environment:
       API_BASE_PATH: ${CBIR_API_BASE_PATH:-/cbir}
       DATA_PATH: /data/cbir

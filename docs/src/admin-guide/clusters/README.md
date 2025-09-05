@@ -4,10 +4,6 @@ title: Clusters
 
 # {{ $frontmatter.title }}
 
-::: warning
-The compute clusters are only for the Community Edition!
-:::
-
 A compute cluster is a system that enables the distribution and execution of computational tasks across multiple machines or nodes.
 It allows the efficient execution of Cytomine Tasks and Apps.
 

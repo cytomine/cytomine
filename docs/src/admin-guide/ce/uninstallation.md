@@ -1,5 +1,5 @@
 ---
-title: Uninstall Cytomine Community Edition
+title: Uninstall Cytomine
 ---
 
 # {{$frontmatter.title}}

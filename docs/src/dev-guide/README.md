@@ -20,7 +20,7 @@ These API endpoints let Cytomine users and external tools interact with Cytomine
 - Create new graphical interfaces for dedicated purposes
 - Etc.
 
-![The Cytomine HTTP API](/api/cytomine-rest-api-simple.svg)
+![The Cytomine HTTP API](/images/dev-guide/api/cytomine-rest-api-simple.svg)
 
 The [Cytomine HTTP API](/dev-guide/api/reference.md) structures and specifies all the endpoints for the whole application. All the endpoints are secured. It means that you need to be authenticated (with some HTTP mechanisms) so that the Cytomine server accept to treat your request. You keep the rights you have in the graphical interface: if you don't have the rights to perform some actions in the graphical interface, you don't have them by using the API neither. The graphical interface actually relies on the HTTP API.
 

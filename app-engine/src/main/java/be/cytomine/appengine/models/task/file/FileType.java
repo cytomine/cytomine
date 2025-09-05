@@ -1,6 +1,7 @@
 package be.cytomine.appengine.models.task.file;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
 
@@ -68,8 +69,13 @@ public class FileType extends Type {
 
     @Override
     public void validate(Object valueObject) throws TypeValidationException {
-        if (!(valueObject instanceof File)) {
+        if (!(valueObject instanceof File) && !(valueObject instanceof String)) {
             throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_TYPE_ERROR);
+        }
+        if (valueObject instanceof String reference) {
+            if (!Paths.get(reference).isAbsolute() || !new File(reference).isFile()) {
+                throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_TYPE_ERROR);
+            }
         }
     }
 

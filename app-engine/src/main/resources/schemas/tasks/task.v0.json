@@ -444,7 +444,8 @@
                 {"$ref": "#/$defs/io/type_specs/geometry"},
                 {"$ref": "#/$defs/io/type_specs/image"},
                 {"$ref": "#/$defs/io/type_specs/array"},
-                {"$ref": "#/$defs/io/type_specs/file"}
+                {"$ref": "#/$defs/io/type_specs/file"},
+                {"$ref": "#/$defs/io/type_specs/wsi"}
               ]
             }
           }

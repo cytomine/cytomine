@@ -1,3 +1,6 @@
+x-version-env: &version-env
+  VERSIONS_CYTOMINE_COMMERCIAL: ${CYTOMINE_VERSION:-2025.1}
+
 services:
 
   mongo:
@@ -62,7 +65,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime
     environment:
-      - VERSIONS_CYTOMINE_COMMERCIAL=${CYTOMINE_VERSION:-2025.1}
+      <<: [*version-env]
     networks:
       - cytomine-network
 
@@ -222,21 +225,21 @@ services:
       - pims
       - web-ui
     environment:
-      - IMAGES_CORE=cytomine/core:${CORE_TAG:-latest}
-      - IMAGES_MONGO=cytomine/mongo:${MONGO_TAG:-latest}
-      - IMAGES_NGINX=cytomine/nginx:${NGINX_TAG:-latest}
-      - IMAGES_PIMS=cytomine/pims:${PIMS_TAG:-latest}
-      - IMAGES_PIMS_CACHE=redis:7.2
-      - IMAGES_POSTGIS=cytomine/postgis:${POSTGIS_TAG:-latest}
-      - IMAGES_WEB_UI=cytomine/web-ui:${WEB_UI_TAG:-latest}
-      - INTERNAL_URLS_APPENGINE=app-engine:8080
-      - INTERNAL_URLS_CORE=core:8080
-      - INTERNAL_URLS_IAM=iam:8100
-      - INTERNAL_URLS_IMS=pims:5000
-      - INTERNAL_URLS_WEB_UI=web-ui
-      - URLS_INTERNAL_PROXY=nginx
-      - URLS_SCHEME=${URLS_SCHEME:-http}
-      - VERSIONS_CYTOMINE_COMMERCIAL=${CYTOMINE_VERSION:-2025.1}
+      <<: [*version-env]
+      IMAGES_CORE: cytomine/core:${CORE_TAG:-latest}
+      IMAGES_MONGO: cytomine/mongo:${MONGO_TAG:-latest}
+      IMAGES_NGINX: cytomine/nginx:${NGINX_TAG:-latest}
+      IMAGES_PIMS: cytomine/pims:${PIMS_TAG:-latest}
+      IMAGES_PIMS_CACHE: redis:7.2
+      IMAGES_POSTGIS: cytomine/postgis:${POSTGIS_TAG:-latest}
+      IMAGES_WEB_UI: cytomine/web-ui:${WEB_UI_TAG:-latest}
+      INTERNAL_URLS_APPENGINE: app-engine:8080
+      INTERNAL_URLS_CORE: core:8080
+      INTERNAL_URLS_IAM: iam:8100
+      INTERNAL_URLS_IMS: pims:5000
+      INTERNAL_URLS_WEB_UI: web-ui
+      URLS_INTERNAL_PROXY: nginx
+      URLS_SCHEME: ${URLS_SCHEME:-http}
     networks:
       - cytomine-network
 

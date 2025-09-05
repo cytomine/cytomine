@@ -24,9 +24,9 @@ services:
       - IAM_DB=${IAM_DB:-iam}
       - IAM_PASSWORD=${IAM_PASSWORD:-password}
       - IAM_USER=${IAM_USER:-iam}
-      - POSTGRES_DB=${POSTGRES_DB:-cytomine}
+      - POSTGRES_DB=${POSTGRES_DB:-docker}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-password}
-      - POSTGRES_USER=${POSTGRES_USER:-cytomine}
+      - POSTGRES_USER=${POSTGRES_USER:-docker}
     networks:
       - cytomine-network
 

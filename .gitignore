@@ -15,3 +15,6 @@ build/
 # Env files
 .direnv
 .env
+
+# Cytomine data
+data/

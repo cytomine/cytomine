@@ -93,7 +93,7 @@ services:
       PENDING_PATH: /tmp/uploaded
       ROOT: /data/images
       TASK_QUEUE_ENABLED: false
-      WEB_CONCURRENCY: 8
+      WEB_CONCURRENCY: ${WEB_CONCURRENCY:-8}
     networks:
       - cytomine-network
 
@@ -197,7 +197,7 @@ services:
       API_BASE_PATH: ${CBIR_API_BASE_PATH:-/cbir}
       DATA_PATH: /data/cbir
       DB: 0
-      EXTRACTOR: resnet
+      EXTRACTOR: ${CBIR_EXTRACTOR:-resnet}
       HOST: redis
       PORT: 6380
     networks:

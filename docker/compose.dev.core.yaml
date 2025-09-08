@@ -1,0 +1,30 @@
+services:
+
+  core:
+    image: cytomine/core:dev-latest
+    build:
+      context: ./core
+      target: dev-server
+    ports:
+      - "${DEV_CORE_PORT:-8080}:8080"
+      - "${DEV_SSH_CORE_PORT:-10022}:22"
+    command: ["/bin/sh"]
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./core:/app
+      - /etc/localtime:/etc/localtime
+      # gradle cache for faster build
+      - ./cache/core/.gradle:/.gradle
+      # IntelliJ builds (to avoid file permission issues)
+      - ./cache/core/build:/build
+    environment:
+      GRADLE_USER_HOME: /.gradle
+
+  postgis:
+    ports:
+      - "${DEV_POSTGIS_PORT:-5432}:5432"
+
+  mongo:
+    ports:
+      - "${DEV_MONGO_PORT:-27017}:27017"

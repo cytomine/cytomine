@@ -6,6 +6,8 @@ This repository provides the necessary files and instructions to build and launc
 
 ## Installation
 
+For detailed instructions and additional information, please refer to the [Cytomine installation documentation](https://doc.uliege.cytomine.org/admin-guide/ce/installation)
+
 ### Prerequisites
 
 - A **Linux** operating system like [Ubuntu](https://ubuntu.com/), [Debian](https://www.debian.org/), etc.

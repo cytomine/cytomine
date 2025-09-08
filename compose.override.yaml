@@ -1,52 +1,52 @@
 services:
 
   mongo:
-    image: cytomine/mongo:${MONGO_TAG:-latest}
+    image: cytomine/mongo:latest
     build:
       context: ./mongo/
 
   postgis:
-    image: cytomine/postgis:${POSTGIS_TAG:-latest}
+    image: cytomine/postgis:latest
     build:
       context: ./postgis/
 
   web-ui:
-    image: cytomine/web-ui:${WEB_UI_TAG:-latest}
+    image: cytomine/web-ui:latest
     build:
       context: ./web-ui/
 
   pims:
-    image: cytomine/pims:${PIMS_TAG:-latest}
+    image: cytomine/pims:latest
     build:
       context: ./pims/
 
   iam:
-    image: cytomine/iam:${IAM_TAG:-latest}
+    image: cytomine/iam:latest
     build:
       context: ./iam/
       target: ci
 
   app-engine:
-    image: cytomine/app-engine:${APP_ENGINE_TAG:-latest}
+    image: cytomine/app-engine:latest
     build:
       context: ./app-engine/
 
   core:
-    image: cytomine/core:${CORE_TAG:-latest}
+    image: cytomine/core:latest
     build:
       context: ./core/
 
   cbir:
-    image: cytomine/cbir:${CBIR_TAG:-latest}
+    image: cytomine/cbir:latest
     build:
       context: ./cbir/
 
   sam:
-    image: cytomine/sam:${SAM_TAG:-latest}
+    image: cytomine/sam:latest
     build:
       context: ./sam/
 
   nginx:
-    image: cytomine/nginx:${NGINX_TAG:-latest}
+    image: cytomine/nginx:latest
     build:
       context: ./nginx/

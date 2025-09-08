@@ -1,5 +1,5 @@
 x-version-env: &version-env
-  VERSIONS_CYTOMINE_COMMERCIAL: ${CYTOMINE_VERSION:-2025.1}
+  VERSIONS_CYTOMINE_COMMERCIAL: 2025.1
 
 services:
 
@@ -9,9 +9,9 @@ services:
     volumes:
       - ${DATA_PATH:-./data}/mongo:/data/db
     environment:
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-password}
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME:-admin}
-      MONGO_INIT_DATABASE: ${MONGO_DB:-cytomine}
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INIT_DATABASE: cytomine
     networks:
       - cytomine-network
 
@@ -21,15 +21,15 @@ services:
     volumes:
       - ${DATA_PATH:-./data}/postgis/data:/var/lib/postgresql/data
     environment:
-      APPENGINE_DB: ${APP_ENGINE_DB:-appengine}
-      APPENGINE_PASSWORD: ${APP_ENGINE_PASSWORD:-password}
-      APPENGINE_USER: ${APP_ENGINE_USER:-appengine}
-      IAM_DB: ${IAM_DB:-iam}
-      IAM_PASSWORD: ${IAM_PASSWORD:-password}
-      IAM_USER: ${IAM_USER:-iam}
-      POSTGRES_DB: ${POSTGRES_DB:-docker}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
-      POSTGRES_USER: ${POSTGRES_USER:-docker}
+      APPENGINE_DB: appengine
+      APPENGINE_PASSWORD: password
+      APPENGINE_USER: appengine
+      IAM_DB: iam
+      IAM_PASSWORD: password
+      IAM_USER: iam
+      POSTGRES_DB: docker
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: docker
     networks:
       - cytomine-network
 
@@ -104,11 +104,11 @@ services:
       - postgis
     environment:
       KC_ADMIN_EMAIL: mail@mail.com
-      KC_DB_PASSWORD: ${IAM_PASSWORD:-password}
-      KC_DB_URL_DATABASE: ${IAM_DB:-iam}
+      KC_DB_PASSWORD: password
+      KC_DB_URL_DATABASE: iam
       KC_DB_URL_HOST: postgis
       KC_DB_URL_PORT: 5432
-      KC_DB_USERNAME: ${IAM_USER:-iam}
+      KC_DB_USERNAME: iam
       KC_FEATURES: token-exchange
       KC_HOSTNAME: 127.0.0.1
       KC_HOSTNAME_ADMIN: 127.0.0.1
@@ -137,10 +137,10 @@ services:
     environment:
       API_PREFIX: ${APP_ENGINE_API_BASE_PATH:-/app-engine/}
       DB_HOST: postgis
-      DB_NAME: ${APP_ENGINE_DB:-appengine}
-      DB_PASSWORD: ${APP_ENGINE_PASSWORD:-password}
+      DB_NAME: appengine
+      DB_PASSWORD: password
       DB_PORT: 5432
-      DB_USERNAME: ${APP_ENGINE_USER:-appengine}
+      DB_USERNAME: appengine
       REGISTRY_HOST: registry
       SCHEDULER_MASTER_URL: ${APP_ENGINE_SCHEDULER_MASTER_URL:-changeme}
       SCHEDULER_OAUTH_TOKEN: ${APP_ENGINE_SCHEDULER_OAUTH_TOKEN:-changeme}
@@ -159,7 +159,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime
     environment:
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-password}
+      ADMIN_PASSWORD: password
       ADMIN_PRIVATE_KEY: 1f77ce7b-e9ba-4393-bb53-12a702cc2741
       ADMIN_PUBLIC_KEY: 838b0935-05a7-4ea9-bd48-71497468e4c9
       IMAGE_SERVER_PRIVATE_KEY: d70607f5-c478-403c-be11-3dbc1716d1cf
@@ -169,16 +169,16 @@ services:
       JAVAMELODY_PATH: /javamelody-core
       JAVAMELODY_USER: admin
       JWT_SECRET: d0K3EqpNgHn1huF_N1kXw.s4P1Wq;V3'W_UL4pY.EEDC+~wnmKQy3F+_3+gUGZJmnMGUl73.R+bOcQa8lv6lpG5VB~AI_3wMWtAP^TVY5xffO7PPKus_tP5~v6s8kH7Q7'CjqPqXL.D4plG3NJGKumP0IyoWulSwWvYpWx9SQ1D+mQZVvCbIWuM~N;M16~clqB_MRecEXXb~CRfw;ydav~her+s6+'WItURgb2rKkPSAc93kuySIjEYNa_;8zIJ0
-      MONGO_DB_NAME: ${MONGO_DB:-cytomine}
+      MONGO_DB_NAME: cytomine
       MONGO_HOST: mongo
-      MONGO_PASS: ${MONGO_PASSWORD:-password}
+      MONGO_PASS: password
       MONGO_PORT: 27017
-      MONGO_USER: ${MONGO_USERNAME:-admin}
-      POSTGIS_DB_NAME: ${POSTGRES_DB:-docker}
+      MONGO_USER: admin
+      POSTGIS_DB_NAME: docker
       POSTGIS_HOST: postgis
-      POSTGIS_PASS: ${POSTGRES_PASSWORD:-password}
+      POSTGIS_PASS: password
       POSTGIS_PORT: 5432
-      POSTGIS_USER: ${POSTGRES_USER:-docker}
+      POSTGIS_USER: docker
       STORAGE_PATH: /data/images
       SUPER_ADMIN_PRIVATE_KEY: 944ee44b-e327-451d-80c0-9507448a472f
       SUPER_ADMIN_PUBLIC_KEY: 4162d546-129b-48bd-9098-610cd4c50f33
@@ -226,13 +226,13 @@ services:
       - web-ui
     environment:
       <<: [*version-env]
-      IMAGES_CORE: cytomine/core:${CORE_TAG:-latest}
-      IMAGES_MONGO: cytomine/mongo:${MONGO_TAG:-latest}
-      IMAGES_NGINX: cytomine/nginx:${NGINX_TAG:-latest}
-      IMAGES_PIMS: cytomine/pims:${PIMS_TAG:-latest}
+      IMAGES_CORE: cytomine/core:latest
+      IMAGES_MONGO: cytomine/mongo:latest
+      IMAGES_NGINX: cytomine/nginx:latest
+      IMAGES_PIMS: cytomine/pims:latest
       IMAGES_PIMS_CACHE: redis:7.2
-      IMAGES_POSTGIS: cytomine/postgis:${POSTGIS_TAG:-latest}
-      IMAGES_WEB_UI: cytomine/web-ui:${WEB_UI_TAG:-latest}
+      IMAGES_POSTGIS: cytomine/postgis:latest
+      IMAGES_WEB_UI: cytomine/web-ui:latest
       INTERNAL_URLS_APPENGINE: app-engine:8080
       INTERNAL_URLS_IAM: iam:8100
       INTERNAL_URLS_WEB_UI: web-ui

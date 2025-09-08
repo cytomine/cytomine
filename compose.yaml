@@ -126,9 +126,6 @@ services:
       DB_PORT: 5432
       DB_USERNAME: appengine
       REGISTRY_HOST: registry
-      SCHEDULER_MASTER_URL: ${APP_ENGINE_SCHEDULER_MASTER_URL:-changeme}
-      SCHEDULER_OAUTH_TOKEN: ${APP_ENGINE_SCHEDULER_OAUTH_TOKEN:-changeme}
-      SCHEDULER_USERNAME: admin
       STORAGE_BASE_PATH: /data
 
   core:

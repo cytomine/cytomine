@@ -12,8 +12,6 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: password
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INIT_DATABASE: cytomine
-    networks:
-      - cytomine-network
 
   postgis:
     image: cytomine/postgis:latest
@@ -30,8 +28,6 @@ services:
       POSTGRES_DB: docker
       POSTGRES_PASSWORD: password
       POSTGRES_USER: docker
-    networks:
-      - cytomine-network
 
   registry:
     image: registry:2.8.3
@@ -40,9 +36,6 @@ services:
       - ${DATA_PATH:-./data}/registry:/data
     environment:
       REGISTRY_STORAGE_DELETE_ENABLED: true
-    networks:
-      cytomine-network:
-        ipv4_address: 172.18.0.100
 
   redis:
     image: redis:7.2
@@ -50,14 +43,10 @@ services:
     restart: unless-stopped
     volumes:
       - ${DATA_PATH:-./data}/redis:/data
-    networks:
-      - cytomine-network
 
   pims-cache:
     image: redis:7.2
     restart: unless-stopped
-    networks:
-      - cytomine-network
 
   web-ui:
     image: cytomine/web-ui:latest
@@ -66,8 +55,6 @@ services:
       - /etc/localtime:/etc/localtime
     environment:
       <<: [*version-env]
-    networks:
-      - cytomine-network
 
   pims:
     image: cytomine/pims:latest
@@ -94,8 +81,6 @@ services:
       ROOT: /data/images
       TASK_QUEUE_ENABLED: false
       WEB_CONCURRENCY: ${WEB_CONCURRENCY:-8}
-    networks:
-      - cytomine-network
 
   iam:
     image: cytomine/iam:latest
@@ -123,8 +108,6 @@ services:
       KC_SMTP_USER: user
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: YMjl7YGabNbQmjVOONxo9AYSiJyvioTnbsMyBwT8/Jg=
-    networks:
-      - cytomine-network
 
   app-engine:
     image: cytomine/app-engine:latest
@@ -134,6 +117,7 @@ services:
       - registry
     volumes:
       - ${DATA_PATH:-./data}/app-engine:/data
+      - ./.kube/config:/root/.kube/config:ro
     environment:
       API_PREFIX: ${APP_ENGINE_API_BASE_PATH:-/app-engine/}
       DB_HOST: postgis
@@ -146,8 +130,6 @@ services:
       SCHEDULER_OAUTH_TOKEN: ${APP_ENGINE_SCHEDULER_OAUTH_TOKEN:-changeme}
       SCHEDULER_USERNAME: admin
       STORAGE_BASE_PATH: /data
-    networks:
-      - cytomine-network
 
   core:
     image: cytomine/core:latest
@@ -182,8 +164,6 @@ services:
       STORAGE_PATH: /data/images
       SUPER_ADMIN_PRIVATE_KEY: 944ee44b-e327-451d-80c0-9507448a472f
       SUPER_ADMIN_PUBLIC_KEY: 4162d546-129b-48bd-9098-610cd4c50f33
-    networks:
-      - cytomine-network
 
   cbir:
     image: cytomine/cbir:latest
@@ -200,8 +180,6 @@ services:
       EXTRACTOR: ${CBIR_EXTRACTOR:-resnet}
       HOST: redis
       PORT: 6380
-    networks:
-      - cytomine-network
 
   sam:
     image: cytomine/sam:latest
@@ -211,8 +189,6 @@ services:
       CYTOMINE_HOST: http://nginx
       CYTOMINE_PRIVATE_KEY: d70607f5-c478-403c-be11-3dbc1716d1cf
       CYTOMINE_PUBLIC_KEY: 9a8b8369-2446-44cb-b0af-604a74e1dcdb
-    networks:
-      - cytomine-network
 
   nginx:
     image: cytomine/nginx:latest
@@ -237,13 +213,3 @@ services:
       INTERNAL_URLS_IAM: iam:8100
       INTERNAL_URLS_WEB_UI: web-ui
       URLS_SCHEME: ${URLS_SCHEME:-http}
-    networks:
-      - cytomine-network
-
-networks:
-  cytomine-network:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.18.0.0/16

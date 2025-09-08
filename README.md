@@ -2,45 +2,49 @@
 
 Cytomine is an open-source platform for collaborative analysis of large-scale imaging data.
 
-This repository provides the necessary files and instructions to build and launch the Cytomine product using Docker.
+This repository provides the necessary files and instructions to build and launch the Cytomine product using Docker Compose.
 
-## How to Launch Cytomine
+## Installation
+
+### Prerequisites
+
+- A **Linux** operating system like [Ubuntu](https://ubuntu.com/), [Debian](https://www.debian.org/), etc.
+- [Docker Engine](https://docs.docker.com/get-docker/) (v20.10+ recommended)
+- [Docker Compose](https://docs.docker.com/compose/) (v2.0+ recommended)
+
+### Installation
+
+> By default, the docker compose is configured to pull images directly from DockerHub.
+
+Run the following command to start the services:
+
+```bash
+docker compose up -d
+```
+
+Once all services are running, the application will be accessible at [http://127.0.0.1](http://127.0.0.1).
 
 ### Build the Docker Images
 
 To build all required Docker images for Cytomine, run:
 
 ```sh
-make build
+docker compose build
 ```
 
-### Start the Cytomine platform
+### Stop and delete the data from Cytomine
 
-To deploy the Cytomine platform, run:
+To stop Cytomine and remove its volumes, run:
 
 ```sh
-make start
+docker compose down -v
 ```
 
-### Stop the Cytomine platform
-
-To stop the Cytomine platform, run:
+To delete the data and databases, run:
 
 ```sh
-make stop
+sudo rm -rf ./data
 ```
-
-### Stop and delete the data from the Cytomine platform
-
-To stop the Cytomine platform, run:
-
-```sh
-make clean
-```
-
-It completely removes all Cytomine containers, networks, volumes, and data. It also deletes generated configuration files, such as `.env`, `cytomine.yml`, and `docker-compose.override.yml` files.
-
-> This command need the sudo permissions to delete the created data
 
 ## How to use the Cytomine dev environment
 
@@ -77,3 +81,7 @@ To stop the development environment, use the `stop-dev` command in the Makefile:
 ```bash
 make stop-dev
 ```
+
+## License
+
+[Apache 2.0](https://github.com/cytomine/cytomine/blob/main/LICENSE).

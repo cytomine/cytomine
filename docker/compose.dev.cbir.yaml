@@ -1,0 +1,16 @@
+services:
+
+  cbir:
+    image: cytomine/cbir:dev-latest
+    build:
+      context: ./cbir
+      target: dev-server
+    ports:
+      - "${DEV_CBIR_PORT:-6000}:6000"
+      - "${DEV_SSH_CBIR_PORT:-10025}:22"
+    command: ["/bin/bash"]
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+    volumes:
+      - ./cbir:/app

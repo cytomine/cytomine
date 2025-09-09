@@ -1,0 +1,14 @@
+services:
+
+  sam:
+    image: cytomine/sam:dev-latest
+    build:
+      context: ./sam
+      target: dev-server
+    ports:
+      - "${DEV_SAM_PORT:-8000}:8000"
+    command: ["/bin/bash"]
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./sam:/app

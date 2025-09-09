@@ -17,4 +17,5 @@ build/
 .env
 
 # Cytomine data
+cache/
 data/

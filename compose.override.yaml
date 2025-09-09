@@ -1,0 +1,52 @@
+services:
+
+  mongo:
+    image: cytomine/mongo:latest
+    build:
+      context: ./mongo/
+
+  postgis:
+    image: cytomine/postgis:latest
+    build:
+      context: ./postgis/
+
+  web-ui:
+    image: cytomine/web-ui:latest
+    build:
+      context: ./web-ui/
+
+  pims:
+    image: cytomine/pims:latest
+    build:
+      context: ./pims/
+
+  iam:
+    image: cytomine/iam:latest
+    build:
+      context: ./iam/
+      target: ci
+
+  app-engine:
+    image: cytomine/app-engine:latest
+    build:
+      context: ./app-engine/
+
+  core:
+    image: cytomine/core:latest
+    build:
+      context: ./core/
+
+  cbir:
+    image: cytomine/cbir:latest
+    build:
+      context: ./cbir/
+
+  sam:
+    image: cytomine/sam:latest
+    build:
+      context: ./sam/
+
+  nginx:
+    image: cytomine/nginx:latest
+    build:
+      context: ./nginx/

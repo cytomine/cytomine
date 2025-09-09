@@ -18,14 +18,14 @@ import logging
 import sys
 from argparse import ArgumentParser
 
+from cytomine import Cytomine
+from cytomine.models import User, UserCollection
+
 logging.basicConfig()
 logger = logging.getLogger("cytomine.client")
 logger.setLevel(logging.INFO)
 
 if __name__ == '__main__':
-    from cytomine import Cytomine
-    from cytomine.models.user import *
-
     parser = ArgumentParser(prog="Cytomine Python client example")
 
     # Cytomine

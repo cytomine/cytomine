@@ -16,3 +16,5 @@
 
 
 from .cytomine import Cytomine
+
+__all__ = ["Cytomine"]

@@ -19,6 +19,10 @@ services:
     environment:
       GRADLE_USER_HOME: /.gradle
 
+  postgis:
+    ports:
+      - "${DEV_POSTGIS_PORT:-5432}:5432"
+
   registry:
     ports:
       - "${DEV_REGISTRY_PORT:-5051}:5000"

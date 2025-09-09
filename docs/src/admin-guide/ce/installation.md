@@ -51,11 +51,26 @@ This installation procedure is intended for desktop or laptop computers running 
    wget https://raw.githubusercontent.com/cytomine/cytomine/main/compose.yaml
    ```
 
+   ::: tip If the App Engine is enabled
+
+   Generate the config file from microk8s
+
+   ```bash
+   mkdir .kube
+   microk8s.config > .kube/config
+   ```
+   :::
+
 3. Launch cytomine:
 
    ```bash
    sudo docker compose up -d
    ```
+
+   ::: tip If the App Engine is enabled
+
+   Configure MicroK8s to be able to use the Cytomine registry, see [MicroK8s configuration](/admin-guide/clusters/microk8s/configuration.md).
+   :::
 
 4. Once all services are up and running, Cytomine is ready to be used:
 

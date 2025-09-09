@@ -10,14 +10,11 @@ This section describes the installation procedure for MicroK8s.
 
 Before installing MicroK8s, the following requirements are needed:
 
-- A Linux machine
-- A user account with sudo privileges
-- Snap package manager installed
-  - To install it, refer to the [Snap installation guide](https://snapcraft.io/docs/installing-snapd).
+- A **Linux** operating system like [Ubuntu](https://ubuntu.com/), [Debian](https://www.debian.org/), etc.
+- [Snap package manager](https://snapcraft.io/docs/installing-snapd) installed.
+- A user account with sudo privileges.
 
 ## Installation
-
-Using Snap:
 
 ```bash
 sudo snap install microk8s --classic
@@ -108,52 +105,3 @@ Deployed NVIDIA GPU operator
 ```
 
 If you encounter issues with the GPU addon, refer to the [official documentation](https://microk8s.io/docs/addon-gpu) for further guidance.
-
-## Add registry
-
-Before installing the Community Edition, you will have to set up a configuration file to allow MicroK8s to communicate with the private registry.
-
-1. Get the IP address of the registry container, which is by default `172.18.0.10` in the [docker-compose.yml](https://github.com/cytomine/Cytomine-community-edition/blob/main/docker-compose.yml) from the community edition repository.
-
-2. Create the directory and configuration file:
-
-   - `mkdir -p /var/snap/microk8s/current/args/certs.d/172.18.0.10:5000`
-   - `touch /var/snap/microk8s/current/args/certs.d/172.18.0.10:5000/hosts.toml`
-
-   > Normally, sudo privileges are not required.
-
-3. Add the following lines inside the `hosts.toml` file:
-
-   ```toml
-   server = "http://172.18.0.10:5000"
-
-   [host."http://172.18.0.10:5000"]
-   capabilities = ["pull", "resolve"]
-   ```
-
-4. Restart MicroK8s to have the new configuration loaded:
-
-   ```bash
-   microk8s stop
-   ```
-
-   ```bash
-   microk8s start
-   ```
-
-> More information are available at the [_How to work with a private registry_](https://microk8s.io/docs/registry-private) section of the official documentation of MicroK8s.
-
-MicroK8s is now ready for use by Cytomine.
-
-## Cytomine Configuration
-
-You can now proceed with the installation of the [Cytomine Community Edition](/admin-guide/ce/installation#installation).
-
-In the Cytomine Community Edition, you will have to provide two configurations for the App Engine in the `cytomine.template` file, namely `SCHEDULER_MASTER_URL` and `SCHEDULER_OAUTH_TOKEN`, which can be obtained by the following commands:
-
-1. For the MicroK8s `SCHEDULER_MASTER_URL`: `microk8s.config | grep server`
-2. For the `SCHEDULER_OAUTH_TOKEN`: `microk8s kubectl create token default`
-
-::: warning
-:warning: Be aware that each time the MicroK8s cluster is restarted, the previous tokens are not valid anymore!
-:::

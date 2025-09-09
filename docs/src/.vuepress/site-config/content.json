@@ -23,11 +23,11 @@
   "urls": {
     "docRepo": "https://github.com/cytomine/cytomine",
     "docUrl": "https://doc.uliege.cytomine.org",
-    "githubDiscussions": "https://github.com/orgs/cytomine/discussions",
+    "githubDiscussions": "https://github.com/cytomine/cytomine/discussions",
     "siteUrl": "https://uliege.cytomine.org"
   },
   "homePage": {
-    "actionText": "Quick Start →",
+    "actionText": "Get Started",
     "actionLink": "/user-guide/getting-started",
     "title": "Cytomine Documentation portal",
     "tagline": "<p style=\"text-align: justify !important; margin-top:2rem; font-size: 1.2rem;\">Cytomine software is a web platform for collaborative analysis of very large bio-medical images and semi-automatic processing of large image collections using machine learning algorithms.  The software provides a very fast access to high-resolution images allowing users to annotate regions of interest and add semantic information to images and to annotations. Additionally, users have the possibility to run algorithms for semi-automated image analysis and share all their work with teammates using synchro- or asynchronous tools.\n</p>",

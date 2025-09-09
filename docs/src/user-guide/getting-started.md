@@ -48,7 +48,7 @@ and change your password.
 
 ![Password panel](/images/user-guide/getting-started/password.png)
 
-You will see some connection keys. They will be explained in the [Data Science guide](/dev-guide/README.md) of this documentation.
+You will see some connection keys. They will be explained in the [Developer Guide](/dev-guide/README.md).
 
 ## Upload an image
 

@@ -1,5 +1,5 @@
 ---
-title: Uninstall Cytomine Community Edition
+title: Uninstall Cytomine
 ---
 
 # {{$frontmatter.title}}
@@ -14,17 +14,17 @@ The following procedure will remove **all** Cytomine software, **including datab
 
 Before uninstalling Cytomine, please consider to [back up your data](backup.md), especially if you plan to reuse it in another Cytomine instance or a different application. Ensure that your backup is stored safely by relocating it to a secure location.
 
-## Step 1 - Stop and delete the Cytomine system Docker containers
+## Step 1 - Stop and delete the Cytomine Docker containers
 
-First, navigate to the `Cytomine-community-edition` folder, which is the directory where Cytomine was installed. For this example, we will assume that this folder is located in your home directory.
+Navigate to the `cytomine` directory, which contains the Cytomine Docker Compose file. In this example, the directory is assumed to be located in the home directory.
 
-In this `Cytomine-community-edition` folder, you must first stop all the Docker containers by running the following command:
+Within the `cytomine` directory, stop all running Docker containers by executing the following command:
 
 ```bash
 sudo docker compose stop
 ```
 
-Note that at this stage, your data and images are still intact, allowing you to revert the uninstallation and restore your Cytomine instance by running the following command:
+At this stage, your data and images remain intact, allowing you to revert the uninstallation and restore your Cytomine instance by running the following command:
 
 ```bash
 sudo docker compose up -d
@@ -47,13 +47,17 @@ sudo docker compose down -v
 sudo rm -rf ./data/*
 ```
 
-## Step 3 - Delete your Cytomine Community Edition folder
+## Step 3 - Delete your Cytomine folder
 
-If you have followed the installation procedure, all the configuration files for your Cytomine instance are located in the `Cytomine-community-edition` folder, which you can now delete.
+If you have followed the installation procedure, all the configuration files for your Cytomine instance are stored in the `cytomine` folder, which you can now delete.
+
+```bash
+rm -rf cytomine
+```
 
 ## Step 4 - Delete the Cytomine Docker images
 
-You can now delete the Docker images that were downloaded from DockerHub during the installation process.
+You can now delete the Docker images that were downloaded from Docker Hub during the installation process.
 
 ```bash
 sudo docker image prune

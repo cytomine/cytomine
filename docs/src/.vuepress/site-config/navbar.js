@@ -31,7 +31,11 @@ module.exports = (content) => [
       {
         text: "Cytomine",
         items: [
-          {text: "Community Edition (CE)", link: "/admin-guide/ce/"},
+          {text: "Installation", link: "/admin-guide/ce/installation"},
+          {text: "Configuration", link: "/admin-guide/ce/configuration"},
+          {text: "Backup", link: "/admin-guide/ce/backup"},
+          {text: "Troubleshooting", link: "/admin-guide/ce/troubleshooting"},
+          {text: "Uninstallation", link: "/admin-guide/ce/uninstallation"},
         ],
       },
       {

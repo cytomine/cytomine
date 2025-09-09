@@ -6,7 +6,7 @@ redirectFrom:
   - /admin-guide/ce/ce-install
 ---
 
-# Install Cytomine
+# Installation Guide
 
 ::: tip
 If you experiment any issues, please describe your problem precisely [in our ticket system on Github.](https://github.com/cytomine/cytomine/issues)

@@ -30,7 +30,7 @@ module.exports = {
       title: "Cytomine",
       collapsable: true,
       children: [
-        ["/admin-guide/ce/installation", "Installation"],
+        ["/admin-guide/ce/installation", "Installation Guide"],
         ["/admin-guide/ce/configuration", "Configuration"],
         ["/admin-guide/ce/backup", "Backup and restore"],
         ["/admin-guide/ce/troubleshooting", "Troubleshooting"],

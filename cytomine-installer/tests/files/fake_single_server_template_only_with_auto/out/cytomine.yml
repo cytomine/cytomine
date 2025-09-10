@@ -1,4 +1,0 @@
-global:
-  ns1:
-    auto:
-      VAR1: "arandomuuid"

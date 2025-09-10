@@ -4,7 +4,7 @@ ARG PYTHON_VERSION=3.10
 # Base Stage
 FROM ${PROXY_CACHE}/python:${PYTHON_VERSION}-slim-bullseye AS base
 
-COPY --from=ghcr.io/astral-sh/uv:0.8.16 /uv /uvx /bin/
+COPY --from=ghcr.io/astral-sh/uv:0.8.13 /uv /uvx /bin/
 
 WORKDIR /app
 
@@ -43,7 +43,7 @@ ENV PATH="/app/.venv/bin:$PATH" \
     UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy
 
-COPY --from=registry.cytomine.org/github/ghcr.io/astral-sh/uv:0.8.16 /uv /uvx /bin/
+COPY --from=registry.cytomine.org/github/ghcr.io/astral-sh/uv:0.8.13 /uv /uvx /bin/
 
 WORKDIR /app
 

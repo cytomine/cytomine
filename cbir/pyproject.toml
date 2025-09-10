@@ -38,3 +38,6 @@ explicit = true
 [tool.uv.sources]
 torch = [{ index = "pytorch-cpu" }]
 torchvision = [{ index = "pytorch-cpu" }]
+
+[tool.mypy]
+ignore_missing_imports = true

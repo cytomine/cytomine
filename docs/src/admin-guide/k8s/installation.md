@@ -4,6 +4,10 @@
 If you experiment any issues, please describe your problem precisely [in our ticket system on Github.](https://github.com/cytomine/cytomine-helm/issues)
 :::
 
+::: danger
+This Helm chart is under active development and may be unstable. Use it at your own risk!
+:::
+
 ## Prerequisites
 
 - Git

@@ -38,6 +38,13 @@ module.exports = {
       ],
     },
     {
+      title: "Cytomine on K8s",
+      collapsable: true,
+      children: [
+        ["/admin-guide/k8s/installation", "Installation Guide"],
+      ],
+    },
+    {
       title: "Compute Clusters",
       collapsable: true,
       children: [

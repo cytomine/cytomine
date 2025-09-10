@@ -2,11 +2,11 @@
 title: Troubleshooting
 ---
 
-# Troubleshooting Community Edition
+# Troubleshooting Cytomine
 
 ## "_Network error during installation_"
 
-If a previous installation of the community edition exists, network-related errors may occur during the installation of the new version.
+If a previous installation of Cytomine exists, network-related errors may occur during the installation of the new version.
 
 ```bash
 Cytomine-community-edition/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion

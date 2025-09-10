@@ -27,14 +27,11 @@ module.exports = {
 
   adminGuide: [
     {
-      title: "Community Edition (CE)",
+      title: "Cytomine",
       collapsable: true,
       children: [
-        ["/admin-guide/ce/", "Introduction"],
-        ["/admin-guide/ce/requirements", "Requirements"],
-        ["/admin-guide/ce/architecture", "Architecture"],
-        ["/admin-guide/ce/installation", "Installation"],
-        ["/admin-guide/ce/upgrade", "Upgrade"],
+        ["/admin-guide/ce/installation", "Installation Guide"],
+        ["/admin-guide/ce/configuration", "Configuration"],
         ["/admin-guide/ce/backup", "Backup and restore"],
         ["/admin-guide/ce/troubleshooting", "Troubleshooting"],
         ["/admin-guide/ce/uninstallation", "Uninstallation"],
@@ -51,6 +48,7 @@ module.exports = {
           children: [
             ["/admin-guide/clusters/microk8s/", "Introduction"],
             ["/admin-guide/clusters/microk8s/installation", "Installation"],
+            ["/admin-guide/clusters/microk8s/configuration", "Configuration"],
             ["/admin-guide/clusters/microk8s/troubleshooting", "Troubleshooting"],
             ["/admin-guide/clusters/microk8s/uninstallation", "Uninstallation"],
           ],

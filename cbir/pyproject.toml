@@ -38,7 +38,7 @@ torchvision = {version = "^0.18.0+cu118", source = "torch-gpu"}
 uvicorn = {extras = ["standard"], version = "^0.24.0.post1"}
 
 [tool.poetry.group.dev.dependencies]
-black = "^23.10.1"
+black = "^24.3.0"
 codespell = "^2.2.6"
 coverage = "^7.3.2"
 isort = "^5.12.0"

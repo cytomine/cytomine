@@ -1,3 +1,0 @@
-services:
-  ims:
-    image: cytomine/ims:v1.2

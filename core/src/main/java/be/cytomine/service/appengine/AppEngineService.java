@@ -25,14 +25,14 @@ import be.cytomine.controller.JsonResponseEntity;
 @Service
 public class AppEngineService {
 
-    @Value("${application.internalProxyURL}")
-    private String internalProxyUrl;
+    @Value("${application.appEngine.apiUrl}")
+    private String apiUrl;
 
     @Value("${application.appEngine.apiBasePath}")
     private String apiBasePath;
 
     private String buildFullUrl(String uri) {
-        return internalProxyUrl + apiBasePath + uri;
+        return apiUrl + apiBasePath + uri;
     }
 
     public ResponseEntity<String> get(String uri) {

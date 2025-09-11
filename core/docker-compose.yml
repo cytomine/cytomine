@@ -11,7 +11,7 @@ services:
 
   mongo:
     container_name: mongo
-    image: mongo
+    image: cytomine/mongo:latest
     ports:
       - "27017:27017"
     environment:

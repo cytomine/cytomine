@@ -39,6 +39,12 @@ module.exports = (content) => [
         ],
       },
       {
+        text: "Cytomine on K8s",
+        items: [
+          {text: "Installation", link: "/admin-guide/k8s/installation"},
+        ],
+      },
+      {
         text: "Compute Clusters",
         items: [
           {text: "MicroK8s", link: "/admin-guide/clusters/microk8s/"},

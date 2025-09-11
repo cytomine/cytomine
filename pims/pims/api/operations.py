@@ -145,8 +145,8 @@ def import_dataset(
             raise CytomineProblem(f"Storage {storage_id} not found")
 
         # Filter out existing datasets
-        projects = ProjectCollection().fetch()
-        project_names = {project.name: project for project in projects}
+        current_projects = ProjectCollection().fetch()
+        project_names = {project.name: project for project in current_projects}
 
         for dataset_path in valid_datasets:
             dataset_name = os.path.basename(dataset_path)
@@ -159,7 +159,8 @@ def import_dataset(
                     project = Project(name=dataset_name).save()
                     response["valid_datasets"][dataset_name]["project_created"] = True
 
-            image_paths = [p for p in Path(dataset_path).recursive_iterdir() if p.is_file()]
+            image_directory = Path(dataset_path) / "IMAGES"
+            image_paths = list(image_directory.iterdir())
             for image_path in image_paths:
                 if is_already_imported(image_path, Path(FILE_ROOT_PATH)):
                     response["valid_datasets"][dataset_name]["skipped_files"].append(image_path.name)
@@ -180,6 +181,8 @@ def import_dataset(
                     status=UploadedFile.UPLOADED,
                 )
 
+                projects = ProjectCollection()
+                projects.append(project)
                 cytomine_listener = CytomineListener(
                     cytomine_auth,
                     uploadedFile,
@@ -306,10 +309,6 @@ async def import_direct_chunks(
                 "images": []
             }], status_code=200
         )
-
-
-def import_(filepath, body):
-    pass
 
 
 @router.get('/file/{filepath:path}/export', tags=['Export'])

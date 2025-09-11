@@ -40,7 +40,7 @@ class Store:
             Optional[str]: The value for the given key, or None if it does not exist.
         """
         value = self.redis.get(f"{self.prefix}:{key}")
-        return value.decode("UTF-8") if value is not None else None
+        return value.decode("UTF-8") if value is not None else None  # type: ignore
 
     def set(self, key: str, value: str) -> None:
         """

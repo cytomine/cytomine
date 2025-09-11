@@ -1,4 +1,0 @@
-services:
-  service1:
-    env_file: envs/service1.env
-

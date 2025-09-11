@@ -1,0 +1,212 @@
+x-version-env: &version-env
+  VERSIONS_CYTOMINE_COMMERCIAL: 2025.1
+
+services:
+
+  mongo:
+    image: cytomine/mongo:latest
+    restart: unless-stopped
+    volumes:
+      - ${DATA_PATH:-./data}/mongo:/data/db
+    environment:
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INIT_DATABASE: cytomine
+
+  postgis:
+    image: cytomine/postgis:latest
+    restart: unless-stopped
+    volumes:
+      - ${DATA_PATH:-./data}/postgis/data:/var/lib/postgresql/data
+    environment:
+      APPENGINE_DB: appengine
+      APPENGINE_PASSWORD: password
+      APPENGINE_USER: appengine
+      IAM_DB: iam
+      IAM_PASSWORD: password
+      IAM_USER: iam
+      POSTGRES_DB: docker
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: docker
+
+  registry:
+    image: registry:2.8.3
+    restart: unless-stopped
+    volumes:
+      - ${DATA_PATH:-./data}/registry:/data
+    environment:
+      REGISTRY_STORAGE_DELETE_ENABLED: true
+
+  redis:
+    image: redis:7.2
+    command: --port 6380
+    restart: unless-stopped
+    volumes:
+      - ${DATA_PATH:-./data}/redis:/data
+
+  pims-cache:
+    image: redis:7.2
+    restart: unless-stopped
+
+  web-ui:
+    image: cytomine/web-ui:latest
+    restart: unless-stopped
+    volumes:
+      - /etc/localtime:/etc/localtime
+    environment:
+      <<: [*version-env]
+
+  pims:
+    image: cytomine/pims:latest
+    restart: unless-stopped
+    depends_on:
+      - pims-cache
+    volumes:
+      - ${DATA_PATH:-./data}/dataset:/dataset
+      - ${DATA_PATH:-./data}/images:/data/images
+    environment:
+      API_BASE_PATH: ${IMS_API_BASE_PATH:-/ims}
+      CACHE_ENABLED: true
+      CACHE_URL: redis://pims-cache:6379
+      CYTOMINE_PRIVATE_KEY: d70607f5-c478-403c-be11-3dbc1716d1cf
+      CYTOMINE_PUBLIC_KEY: 9a8b8369-2446-44cb-b0af-604a74e1dcdb
+      DATASET_PATH: /dataset
+      DEFAULT_ANNOTATION_ORIGIN: LEFT_TOP
+      DEFAULT_IMAGE_SIZE_SAFETY_MODE: SAFE_REJECT
+      INTERNAL_URL_CORE: http://nginx
+      LOG_CONFIG_FILE: /app/logging.yml
+      MAX_REQUESTS: 100000
+      OUTPUT_SIZE_LIMIT: 10000
+      PENDING_PATH: /tmp/uploaded
+      ROOT: /data/images
+      TASK_QUEUE_ENABLED: false
+      WEB_CONCURRENCY: ${WEB_CONCURRENCY:-8}
+
+  iam:
+    image: cytomine/iam:latest
+    restart: unless-stopped
+    depends_on:
+      - postgis
+    environment:
+      KC_ADMIN_EMAIL: mail@mail.com
+      KC_DB_PASSWORD: password
+      KC_DB_URL_DATABASE: iam
+      KC_DB_URL_HOST: postgis
+      KC_DB_URL_PORT: 5432
+      KC_DB_USERNAME: iam
+      KC_FEATURES: token-exchange
+      KC_HOSTNAME: 127.0.0.1
+      KC_HOSTNAME_ADMIN: 127.0.0.1
+      KC_HOSTNAME_STRICT_BACKCHANNEL: true
+      KC_HOSTNAME_STRICT_HTTPS: false
+      KC_HTTP_RELATIVE_PATH: /iam
+      KC_PROXY_HEADERS: xforwarded
+      KC_SMTP_FROM: mail@mail.com
+      KC_SMTP_HOST: mail.smtp
+      KC_SMTP_PASS: password
+      KC_SMTP_PORT: 587
+      KC_SMTP_USER: user
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: YMjl7YGabNbQmjVOONxo9AYSiJyvioTnbsMyBwT8/Jg=
+
+  app-engine:
+    image: cytomine/app-engine:latest
+    restart: unless-stopped
+    depends_on:
+      - postgis
+      - registry
+    volumes:
+      - ${DATA_PATH:-./data}/app-engine:/data
+      - ./.kube/config:/root/.kube/config:ro
+    environment:
+      API_PREFIX: ${APP_ENGINE_API_BASE_PATH:-/app-engine/}
+      DB_HOST: postgis
+      DB_NAME: appengine
+      DB_PASSWORD: password
+      DB_PORT: 5432
+      DB_USERNAME: appengine
+      REGISTRY_HOST: registry
+      STORAGE_BASE_PATH: /data
+
+  core:
+    image: cytomine/core:latest
+    restart: unless-stopped
+    depends_on:
+      - iam
+      - mongo
+      - postgis
+    volumes:
+      - /etc/localtime:/etc/localtime
+    environment:
+      ADMIN_PASSWORD: password
+      ADMIN_PRIVATE_KEY: 1f77ce7b-e9ba-4393-bb53-12a702cc2741
+      ADMIN_PUBLIC_KEY: 838b0935-05a7-4ea9-bd48-71497468e4c9
+      IMAGE_SERVER_PRIVATE_KEY: d70607f5-c478-403c-be11-3dbc1716d1cf
+      IMAGE_SERVER_PUBLIC_KEY: 9a8b8369-2446-44cb-b0af-604a74e1dcdb
+      INTERNAL_PROXY_URL: http://nginx
+      JAVAMELODY_PASS: x6wp8Lg7K1fxr/7oa5gQD/NF7hqirE15g0P1STj5hCs
+      JAVAMELODY_PATH: /javamelody-core
+      JAVAMELODY_USER: admin
+      JWT_SECRET: d0K3EqpNgHn1huF_N1kXw.s4P1Wq;V3'W_UL4pY.EEDC+~wnmKQy3F+_3+gUGZJmnMGUl73.R+bOcQa8lv6lpG5VB~AI_3wMWtAP^TVY5xffO7PPKus_tP5~v6s8kH7Q7'CjqPqXL.D4plG3NJGKumP0IyoWulSwWvYpWx9SQ1D+mQZVvCbIWuM~N;M16~clqB_MRecEXXb~CRfw;ydav~her+s6+'WItURgb2rKkPSAc93kuySIjEYNa_;8zIJ0
+      MONGO_DB_NAME: cytomine
+      MONGO_HOST: mongo
+      MONGO_PASS: password
+      MONGO_PORT: 27017
+      MONGO_USER: admin
+      POSTGIS_DB_NAME: docker
+      POSTGIS_HOST: postgis
+      POSTGIS_PASS: password
+      POSTGIS_PORT: 5432
+      POSTGIS_USER: docker
+      STORAGE_PATH: /data/images
+      SUPER_ADMIN_PRIVATE_KEY: 944ee44b-e327-451d-80c0-9507448a472f
+      SUPER_ADMIN_PUBLIC_KEY: 4162d546-129b-48bd-9098-610cd4c50f33
+
+  cbir:
+    image: cytomine/cbir:latest
+    restart: unless-stopped
+    depends_on:
+      - redis
+    volumes:
+      - ${DATA_PATH:-./data}/cbir:/data/cbir
+      - ${DATA_PATH:-./data}/weight:/weights
+    environment:
+      API_BASE_PATH: ${CBIR_API_BASE_PATH:-/cbir}
+      DATA_PATH: /data/cbir
+      DB: 0
+      EXTRACTOR: ${CBIR_EXTRACTOR:-resnet}
+      HOST: redis
+      PORT: 6380
+
+  sam:
+    image: cytomine/sam:latest
+    restart: unless-stopped
+    environment:
+      API_BASE_PATH: ${SAM_API_BASE_PATH:-/sam}
+      CYTOMINE_HOST: http://nginx
+      CYTOMINE_PRIVATE_KEY: d70607f5-c478-403c-be11-3dbc1716d1cf
+      CYTOMINE_PUBLIC_KEY: 9a8b8369-2446-44cb-b0af-604a74e1dcdb
+
+  nginx:
+    image: cytomine/nginx:latest
+    restart: unless-stopped
+    ports:
+      - 80:80
+    depends_on:
+      - core
+      - iam
+      - pims
+      - web-ui
+    environment:
+      <<: [*version-env]
+      IMAGES_CORE: cytomine/core:latest
+      IMAGES_MONGO: cytomine/mongo:latest
+      IMAGES_NGINX: cytomine/nginx:latest
+      IMAGES_PIMS: cytomine/pims:latest
+      IMAGES_PIMS_CACHE: redis:7.2
+      IMAGES_POSTGIS: cytomine/postgis:latest
+      IMAGES_WEB_UI: cytomine/web-ui:latest
+      INTERNAL_URLS_APPENGINE: app-engine:8080
+      INTERNAL_URLS_IAM: iam:8100
+      INTERNAL_URLS_WEB_UI: web-ui
+      URLS_SCHEME: ${URLS_SCHEME:-http}

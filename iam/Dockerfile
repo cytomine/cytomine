@@ -43,7 +43,7 @@ COPY docker/kc_config.json /opt/keycloak/data/import
 ENV KC_DB=postgres
 ENV KC_HOSTNAME_DEBUG=true
 ENTRYPOINT ["/opt/keycloak/bin/kc.sh"]
-CMD ["start-dev", "--import-realm"]
+CMD ["start-dev", "--import-realm" , "--http-port=8100"]
 
 #######################################################################################
 ## Stage: Cytomine IAM external tools build

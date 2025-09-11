@@ -18,7 +18,6 @@ services:
       MONGO_INITDB_ROOT_USERNAME: mongoadmin
       MONGO_INITDB_ROOT_PASSWORD: password
       MONGO_INITDB_DATABASE: cytomine
-    network_mode: host
 
 #  core:
 #    container_name: dev-core

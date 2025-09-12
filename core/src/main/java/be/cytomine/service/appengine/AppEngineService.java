@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -16,8 +17,6 @@ import java.io.OutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
-
-import static java.lang.String.format;
 
 @Slf4j
 @Service
@@ -58,14 +57,12 @@ public class AppEngineService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(contentType);
         HttpEntity<B> request = new HttpEntity<>(body, headers);
-
-        ResponseEntity<String> result = restTemplate.exchange(buildFullUrl(uri), method, request, String.class);
-        if (result.getStatusCode().is5xxServerError()) {
-            log.error(format("Error on HTTP call %s", result));
-            throw new RuntimeException("Error");
+        try {
+            ResponseEntity<String> result = restTemplate.exchange(buildFullUrl(uri), method, request, String.class);
+            return result.getBody();
+        } catch (RestClientException e) {
+            return "";
         }
-
-        return result.getBody();
     }
 
     public <B> String post(String uri, B body, MediaType contentType) {

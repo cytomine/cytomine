@@ -1,5 +1,6 @@
 package be.cytomine.service.appengine;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -20,6 +21,7 @@ import static java.lang.String.format;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class AppEngineService {
 
     @Value("${application.appEngine.apiUrl}")
@@ -32,7 +34,7 @@ public class AppEngineService {
         return apiUrl + apiBasePath + uri;
     }
 
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
 
     public String get(String uri) {
         return restTemplate.exchange(buildFullUrl(uri), HttpMethod.GET, null, String.class).getBody();
@@ -56,8 +58,9 @@ public class AppEngineService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(contentType);
         HttpEntity<B> request = new HttpEntity<>(body, headers);
+
         ResponseEntity<String> result = restTemplate.exchange(buildFullUrl(uri), method, request, String.class);
-        if (result.getStatusCode().is5xxServerError() || result.getStatusCode().is4xxClientError()) {
+        if (result.getStatusCode().is5xxServerError()) {
             log.error(format("Error on HTTP call %s", result));
             throw new RuntimeException("Error");
         }

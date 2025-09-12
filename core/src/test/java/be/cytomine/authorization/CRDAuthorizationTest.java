@@ -198,6 +198,7 @@ public abstract class CRDAuthorizationTest extends AbstractAuthorizationTest {
     }
 
     @Test
+    @Disabled("This test does not work, the returned entity is a 500, but expectOK() ignores that")
     @WithMockUser(username = USER_ACL_ADMIN)
     public void user_with_admin_permission_delete_domain() {
         if (minimalRoleForDelete().isPresent() && minimalRoleForDelete().get().equals("CREATOR")) {

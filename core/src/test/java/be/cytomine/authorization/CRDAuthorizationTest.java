@@ -16,12 +16,12 @@ package be.cytomine.authorization;
 * limitations under the License.
 */
 
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.test.context.support.WithMockUser;
 
-import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 

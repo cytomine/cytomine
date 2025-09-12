@@ -1,45 +1,5 @@
 package be.cytomine.service.appengine;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URI;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.util.StreamUtils;
-import org.springframework.web.client.ResponseExtractor;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.util.UriComponentsBuilder;
-
 import be.cytomine.domain.annotation.AnnotationLayer;
 import be.cytomine.domain.appengine.TaskRun;
 import be.cytomine.domain.appengine.TaskRunLayer;
@@ -63,6 +23,40 @@ import be.cytomine.service.ontology.UserAnnotationService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.service.utils.GeometryService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.util.StreamUtils;
+import org.springframework.web.client.ResponseExtractor;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 
 import static org.springframework.security.acls.domain.BasePermission.READ;
 
@@ -95,26 +89,21 @@ public class TaskRunService {
 
     private final TaskRunLayerRepository taskRunLayerRepository;
 
-    public ResponseEntity<String> addTaskRun(Long projectId, String uri, JsonNode body) {
+    public String addTaskRun(Long projectId, String uri, JsonNode body) {
         Project project = projectService.get(projectId);
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
         securityACLService.check(project, READ);
         securityACLService.checkIsNotReadOnly(project);
 
-        ResponseEntity<String> response = appEngineService.post(uri, null, MediaType.APPLICATION_JSON);
-        if (response.getStatusCode() != HttpStatus.OK) {
-            return response;
-        }
+        String response = appEngineService.post(uri, null, MediaType.APPLICATION_JSON);
 
-        UUID taskId = null;
+        UUID taskId;
         try {
-            JsonNode jsonResponse = new ObjectMapper().readTree(response.getBody());
+            JsonNode jsonResponse = new ObjectMapper().readTree(response);
             taskId = UUID.fromString(jsonResponse.path("id").asText());
         } catch (Exception e) {
-            return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Error parsing JSON response");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error parsing JSON response");
         }
         ImageInstance image = imageInstanceService.get(body.get("image").asLong());
 
@@ -138,7 +127,8 @@ public class TaskRunService {
         securityACLService.check(project, READ);
 
         List<TaskRun> taskRuns = taskRunRepository.findAllByProjectId(projectId);
-        List<TaskRunDetail> taskRunDetails = taskRuns.stream()
+
+        return taskRuns.stream()
             .map(taskRun -> new TaskRunDetail(
                 taskRun.getProject().getId(),
                 taskRun.getUser().getId(),
@@ -146,8 +136,6 @@ public class TaskRunService {
                 taskRun.getTaskRunId().toString()
             ))
             .toList();
-
-        return taskRunDetails;
     }
 
     private void checkTaskRun(Long projectId, UUID taskRunId) {
@@ -182,10 +170,7 @@ public class TaskRunService {
             if (provision.get("type").get("id").asText().equals("array") && provision.get("value").isArray()) {
                 int index = 0;
                 ArrayNode valueListNode = mapper.createArrayNode();
-                boolean subTypeIsGeometry = false;
-                if (provision.get("type").get("subType").get("id").asText().equals("geometry")) {
-                    subTypeIsGeometry = true;
-                }
+                boolean subTypeIsGeometry = provision.get("type").get("subType").get("id").asText().equals("geometry");
                 for (JsonNode element : provision.get("value")) {
                     ObjectNode itemJsonObject = mapper.createObjectNode();
                     itemJsonObject.put("index", index);
@@ -209,7 +194,7 @@ public class TaskRunService {
         return requestBody;
     }
 
-    public ResponseEntity<String> batchProvisionTaskRun(List<JsonNode> requestBody, Long projectId, UUID taskRunId) {
+    public String batchProvisionTaskRun(List<JsonNode> requestBody, Long projectId, UUID taskRunId) {
         checkTaskRun(projectId, taskRunId);
         List<JsonNode> body = processProvisions(requestBody);
         return appEngineService.put("task-runs/" + taskRunId + "/input-provisions", body, MediaType.APPLICATION_JSON);
@@ -230,11 +215,11 @@ public class TaskRunService {
         }
     }
 
-    public ResponseEntity<String> provisionTaskRun(JsonNode json, Long projectId, UUID taskRunId, String parameterName) {
+    public String provisionTaskRun(JsonNode json, Long projectId, UUID taskRunId, String parameterName) {
         checkTaskRun(projectId, taskRunId);
 
-        String uri = "task-runs/" + taskRunId.toString() + "/input-provisions/" + parameterName;
-        String arrayTypeUri = "task-runs/" + taskRunId.toString() + "/input-provisions/" + parameterName + "/indexes";
+        String uri = "task-runs/" + taskRunId + "/input-provisions/" + parameterName;
+        String arrayTypeUri = "task-runs/" + taskRunId + "/input-provisions/" + parameterName + "/indexes";
         ObjectMapper mapper = new ObjectMapper();
 
         if (json.get("type").isObject() && json.get("type").get("id").asText().equals("array")) {
@@ -247,7 +232,7 @@ public class TaskRunService {
                     Long annotationId = itemsArray[i];
                     MultiValueMap<String, Object> body = prepareImage(annotationId);
 
-                    ResponseEntity<String> response = provisionCollectionItem(arrayTypeUri, i, body);
+                    String response = provisionCollectionItem(arrayTypeUri, i, body);
                     if (response != null) return response;
                 }
             }
@@ -259,7 +244,7 @@ public class TaskRunService {
                     MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
                     body.add("file", new FileSystemResource(wsi));
 
-                    ResponseEntity<String> response = provisionCollectionItem(arrayTypeUri, i, body);
+                    String response = provisionCollectionItem(arrayTypeUri, i, body);
 
                     wsi.delete();
 
@@ -293,7 +278,7 @@ public class TaskRunService {
             Long id = value.get("id").asLong();
             File wsi = null;
 
-            MultiValueMap<String, Object> body = null;
+            MultiValueMap<String, Object> body;
             if (type.equals("annotation")) {
                 body = prepareImage(id);
             } else if (type.equals("image")) {
@@ -305,7 +290,7 @@ public class TaskRunService {
                 throw new IllegalArgumentException("Unsupported type: " + type);
             }
 
-            ResponseEntity<String> response = appEngineService.put(uri, body, MediaType.MULTIPART_FORM_DATA);
+            String response = appEngineService.put(uri, body, MediaType.MULTIPART_FORM_DATA);
 
             if (wsi != null) {
                 wsi.delete();
@@ -321,7 +306,7 @@ public class TaskRunService {
             MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
             body.add("file", new FileSystemResource(wsi));
 
-            ResponseEntity<String> response = appEngineService.put(uri, body, MediaType.MULTIPART_FORM_DATA);
+            String response = appEngineService.put(uri, body, MediaType.MULTIPART_FORM_DATA);
 
             wsi.delete();
 
@@ -340,17 +325,14 @@ public class TaskRunService {
         return appEngineService.put(uri, provision, MediaType.APPLICATION_JSON);
     }
 
-    private ResponseEntity<String> provisionCollectionItem(String arrayTypeUri, int i,
+    private String provisionCollectionItem(String arrayTypeUri, int i,
                                                            MultiValueMap<String, Object> body)
     {
         Map<String, String> params = new HashMap<>();
         params.put("value", String.valueOf(i));
 
-        ResponseEntity<String> response = appEngineService.putWithParams(arrayTypeUri, body, MediaType.MULTIPART_FORM_DATA, params);
-        if (response.getStatusCode() != HttpStatus.OK) {
-            return response;
-        }
-        return null;
+        return appEngineService.putWithParams(arrayTypeUri, body, MediaType.MULTIPART_FORM_DATA, params);
+
     }
 
     private MultiValueMap<String, Object> prepareImage(Long annotationId) {
@@ -401,7 +383,7 @@ public class TaskRunService {
         return downloadFile(uri, filePath.toFile());
     }
 
-    public ResponseEntity<String> provisionBinaryData(MultipartFile file, Long projectId, UUID taskRunId, String parameterName) {
+    public String provisionBinaryData(MultipartFile file, Long projectId, UUID taskRunId, String parameterName) {
         checkTaskRun(projectId, taskRunId);
 
         String uri = "task-runs/" + taskRunId + "/input-provisions/" + parameterName;
@@ -412,35 +394,36 @@ public class TaskRunService {
         return appEngineService.put(uri, body, MediaType.MULTIPART_FORM_DATA);
     }
 
-    public ResponseEntity<String> getTaskRun(Long projectId, UUID taskRunId) {
+    public String getTaskRun(Long projectId, UUID taskRunId) {
         checkTaskRun(projectId, taskRunId);
         return appEngineService.get("task-runs/" + taskRunId);
     }
 
-    public ResponseEntity<String> postStateAction(JsonNode body, Long projectId, UUID taskRunId) {
+    public String postStateAction(JsonNode body, Long projectId, UUID taskRunId) {
         checkTaskRun(projectId, taskRunId);
         return appEngineService.post("task-runs/" + taskRunId + "/state-actions", body, MediaType.APPLICATION_JSON);
     }
 
-    public ResponseEntity<String> getOutputs(Long projectId, UUID taskRunId) {
+    public String getOutputs(Long projectId, UUID taskRunId) {
         checkTaskRun(projectId, taskRunId);
 
-        ResponseEntity<String> response = appEngineService.get("task-runs/" + taskRunId + "/outputs");
+        String response = appEngineService.get("task-runs/" + taskRunId + "/outputs");
         Optional<TaskRun> taskRun = taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId);
         if (taskRun.isEmpty()) {
             throw new ObjectNotFoundException("TaskRun", taskRunId);
         }
 
-        List<TaskRunValue> outputs = new ArrayList<>();
+        List<TaskRunValue> outputs;
         try {
-            outputs = new ObjectMapper().readValue(response.getBody(), new TypeReference<List<TaskRunValue>>() {});
+            outputs = new ObjectMapper().readValue(response, new TypeReference<>() {
+            });
         } catch (JsonProcessingException e) {
             throw new ObjectNotFoundException("Outputs from", taskRunId);
         }
 
         List<String> geometries = outputs
             .stream()
-            .map(output -> output.getValue())
+                .map(TaskRunValue::getValue)
             .filter(value -> value instanceof String geometry && geometryService.isGeometry(geometry))
             .map(value -> (String) value)
             .toList();
@@ -498,7 +481,7 @@ public class TaskRunService {
         return response;
     }
 
-    public ResponseEntity<String> getInputs(Long projectId, UUID taskRunId) {
+    public String getInputs(Long projectId, UUID taskRunId) {
         checkTaskRun(projectId, taskRunId);
         return appEngineService.get("task-runs/" + taskRunId + "/inputs");
     }

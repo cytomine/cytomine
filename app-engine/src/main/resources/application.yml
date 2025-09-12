@@ -57,7 +57,7 @@ scheduler:
   run:
     mode: ${SCHEDULER_RUN_MODE:local} # possible values [local,cluster]
     storage-base-path: ${RUN_STORAGE_BASE_PATH:/data} # directory in host
-
+  datasets-path: ${REF_STORAGE_BASE_PATH:/data/datasets} # directory in host contains bigpicture datasets
 registry-client:
   authenticated: false
   user: user #ignored

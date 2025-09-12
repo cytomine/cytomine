@@ -118,6 +118,8 @@ services:
     volumes:
       - ${DATA_PATH:-./data}/app-engine:/data
       - ./.kube/config:/root/.kube/config:ro
+      - /path/to/app-engine:/path/to/app-engine # volume A PLEASE CHANGE
+      - /path/to/datasets:/path/to/datasets # volume B PLEASE CHANGE
     environment:
       API_PREFIX: ${APP_ENGINE_API_BASE_PATH:-/app-engine/}
       DB_HOST: postgis
@@ -126,7 +128,11 @@ services:
       DB_PORT: 5432
       DB_USERNAME: appengine
       REGISTRY_HOST: registry
-      STORAGE_BASE_PATH: /data
+      STORAGE_BASE_PATH: /path/to/app-engine # Must be an absolute path PLEASE CHANGE
+      RUN_STORAGE_BASE_PATH: /path/to/app-engine # MUST be an absolute path PLEASE CHANGE
+      PROJECT_DATA_PATH: /path/to/cytomine/data # MUST be an absolute path and match volume A PLEASE CHANGE
+      REF_STORAGE_BASE_PATH: /path/to/datasets # MUST be an absolute match volume B PLEASE CHANGE
+      SCHEDULER_RUN_MODE: local # values: local, cluster
 
   core:
     image: cytomine/core:latest

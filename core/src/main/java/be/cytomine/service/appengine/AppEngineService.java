@@ -2,10 +2,7 @@ package be.cytomine.service.appengine;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.client.RestTemplate;
@@ -18,6 +15,8 @@ import java.io.OutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
+
+import static java.lang.String.format;
 
 @Slf4j
 @Service
@@ -57,7 +56,13 @@ public class AppEngineService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(contentType);
         HttpEntity<B> request = new HttpEntity<>(body, headers);
-        return restTemplate.exchange(buildFullUrl(uri), method, request, String.class).getBody();
+        ResponseEntity<String> result = restTemplate.exchange(buildFullUrl(uri), method, request, String.class);
+        if (result.getStatusCode().is5xxServerError() || result.getStatusCode().is4xxClientError()) {
+            log.error(format("Error on HTTP call %s", result));
+            throw new RuntimeException("Error");
+        }
+
+        return result.getBody();
     }
 
     public <B> String post(String uri, B body, MediaType contentType) {

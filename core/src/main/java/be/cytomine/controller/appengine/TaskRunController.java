@@ -1,31 +1,18 @@
 package be.cytomine.controller.appengine;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.List;
-import java.util.UUID;
-
+import be.cytomine.service.appengine.TaskRunService;
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import be.cytomine.service.appengine.TaskRunService;
+import java.io.*;
+import java.util.List;
+import java.util.UUID;
 
 @ConditionalOnExpression("${application.appEngine.enabled: false}")
 @RequiredArgsConstructor
@@ -36,7 +23,7 @@ public class TaskRunController {
     private final TaskRunService taskRunService;
 
     @PostMapping("/project/{project}/tasks/{task}/runs")
-    public ResponseEntity<String> add(
+    public String add(
         @PathVariable Long project,
         @PathVariable UUID task,
         @RequestBody JsonNode body
@@ -45,7 +32,7 @@ public class TaskRunController {
     }
 
     @PostMapping("/project/{project}/tasks/{namespace}/{version}/runs")
-    public ResponseEntity<String> add(
+    public String add(
         @PathVariable Long project,
         @PathVariable String namespace,
         @PathVariable String version,
@@ -56,7 +43,7 @@ public class TaskRunController {
     }
 
     @GetMapping("/project/{project}/task-runs/{task}")
-    public ResponseEntity<String> get(
+    public String get(
         @PathVariable Long project,
         @PathVariable UUID task
     ) {
@@ -64,7 +51,7 @@ public class TaskRunController {
     }
 
     @PutMapping("/project/{project}/task-runs/{task}/input-provisions")
-    public ResponseEntity<String> batchProvision(
+    public String batchProvision(
         @PathVariable Long project,
         @PathVariable UUID task,
         @RequestBody List<JsonNode> body
@@ -76,7 +63,7 @@ public class TaskRunController {
         value = "/project/{project}/task-runs/{task}/input-provisions/{parameter_name}",
         consumes = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<String> provision(
+    public String provision(
         @PathVariable Long project,
         @PathVariable UUID task,
         @PathVariable("parameter_name") String parameterName,
@@ -89,7 +76,7 @@ public class TaskRunController {
         value = "/project/{project}/task-runs/{task}/input-provisions/{parameter_name}",
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    public ResponseEntity<String> provision(
+    public String provision(
             @PathVariable Long project,
             @PathVariable UUID task,
             @PathVariable("parameter_name") String parameterName,
@@ -99,7 +86,7 @@ public class TaskRunController {
     }
 
     @PostMapping("/project/{project}/task-runs/{task}/state-actions")
-    public ResponseEntity<String> stateAction(
+    public String stateAction(
         @PathVariable Long project,
         @PathVariable UUID task,
         @RequestBody JsonNode body
@@ -108,7 +95,7 @@ public class TaskRunController {
     }
 
     @GetMapping("/project/{project}/task-runs/{task}/inputs")
-    public ResponseEntity<String> getInputs(
+    public String getInputs(
         @PathVariable Long project,
         @PathVariable UUID task
     ) {
@@ -141,7 +128,7 @@ public class TaskRunController {
     }
 
     @GetMapping("/project/{project}/task-runs/{task}/outputs")
-    public ResponseEntity<String> getOutputs(
+    public String getOutputs(
         @PathVariable Long project,
         @PathVariable UUID task
     ) {

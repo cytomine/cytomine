@@ -43,7 +43,7 @@ public class AppEngineService {
         Path filePath = Paths.get("downloaded_" + System.currentTimeMillis() + ".tmp");
         File targetFile = filePath.toFile();
 
-        new RestTemplate().execute(buildFullUrl(uri), HttpMethod.GET, null, response -> {
+        restTemplate.execute(buildFullUrl(uri), HttpMethod.GET, null, response -> {
             try (InputStream in = response.getBody(); OutputStream out = new FileOutputStream(targetFile)) {
                 StreamUtils.copy(in, out);
                 return null;
@@ -61,7 +61,7 @@ public class AppEngineService {
             ResponseEntity<String> result = restTemplate.exchange(buildFullUrl(uri), method, request, String.class);
             return result.getBody();
         } catch (RestClientException e) {
-            return "";
+            throw new RestClientException("Internal error");
         }
     }
 
@@ -84,6 +84,6 @@ public class AppEngineService {
 
         HttpEntity<B> requestEntity = new HttpEntity<>(body, headers);
 
-        return new RestTemplate().exchange(buildFullUrl(finalUrl), HttpMethod.PUT, requestEntity, String.class).getBody();
+        return restTemplate.exchange(buildFullUrl(finalUrl), HttpMethod.PUT, requestEntity, String.class).getBody();
     }
 }

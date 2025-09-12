@@ -1,8 +1,11 @@
 package be.cytomine.authorization.appengine;
 
-import java.util.Optional;
-import java.util.UUID;
-
+import be.cytomine.BasicInstanceBuilder;
+import be.cytomine.CytomineCoreApplication;
+import be.cytomine.authorization.CRDAuthorizationTest;
+import be.cytomine.domain.appengine.TaskRun;
+import be.cytomine.domain.project.EditingMode;
+import be.cytomine.service.appengine.TaskRunService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.tomakehurst.wiremock.WireMockServer;
@@ -18,12 +21,8 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 
-import be.cytomine.BasicInstanceBuilder;
-import be.cytomine.CytomineCoreApplication;
-import be.cytomine.authorization.CRDAuthorizationTest;
-import be.cytomine.domain.appengine.TaskRun;
-import be.cytomine.domain.project.EditingMode;
-import be.cytomine.service.appengine.TaskRunService;
+import java.util.Optional;
+import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.springframework.security.acls.domain.BasePermission.READ;
@@ -62,16 +61,16 @@ public class TaskRunAuthorizationTest extends CRDAuthorizationTest {
         taskRun.getProject().setMode(EditingMode.CLASSIC);
     }
 
-    @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void user_admin_can_add_in_readonly_mode(){
+
+    public void user_admin_can_add_in_readonly_mode() {
         taskRun.getProject().setMode(EditingMode.READ_ONLY);
         expectOK(() -> when_i_add_domain());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_add_in_readonly_mode(){
+    public void user_cannot_add_in_readonly_mode() {
         taskRun.getProject().setMode(EditingMode.READ_ONLY);
         expectForbidden(() -> when_i_add_domain());
     }

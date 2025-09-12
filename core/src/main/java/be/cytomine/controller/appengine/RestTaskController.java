@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
@@ -30,14 +29,14 @@ public class RestTaskController extends RestCytomineController {
     private AppEngineService appEngineService;
 
     @GetMapping("/tasks/{id}")
-    public ResponseEntity<String> descriptionById(
+    public String descriptionById(
             @PathVariable String id
     ) {
         return appEngineService.get("tasks/" + id);
     }
 
     @GetMapping("/tasks/{namespace}/{version}")
-    public ResponseEntity<String> description(
+    public String description(
             @PathVariable String namespace,
             @PathVariable String version
     ) {
@@ -45,12 +44,12 @@ public class RestTaskController extends RestCytomineController {
     }
 
     @GetMapping("/tasks")
-    public ResponseEntity<String> list() {
+    public String list() {
         return appEngineService.get("tasks");
     }
 
     @PostMapping("/tasks")
-    public ResponseEntity<String> upload(
+    public String upload(
             @RequestParam("task") MultipartFile task
     ) throws IOException {
         String name = UUID.randomUUID().toString();
@@ -63,14 +62,14 @@ public class RestTaskController extends RestCytomineController {
     }
 
     @GetMapping("/tasks/{id}/inputs")
-    public ResponseEntity<String> inputsById(
+    public String inputsById(
             @PathVariable UUID id
     ) {
         return appEngineService.get("tasks/" + id + "/inputs");
     }
-    
+
     @GetMapping("/tasks/{namespace}/{version}/inputs")
-    public ResponseEntity<String> inputs(
+    public String inputs(
             @PathVariable String namespace,
             @PathVariable String version
     ) {
@@ -78,14 +77,14 @@ public class RestTaskController extends RestCytomineController {
     }
 
     @GetMapping("/tasks/{id}/outputs")
-    public ResponseEntity<String> outputsById(
+    public String outputsById(
             @PathVariable UUID id
     ) {
         return appEngineService.get("tasks/" + id + "/outputs");
     }
 
     @GetMapping("/tasks/{namespace}/{version}/outputs")
-    public ResponseEntity<String> outputs(
+    public String outputs(
             @PathVariable String namespace,
             @PathVariable String version
     ) {
@@ -93,14 +92,14 @@ public class RestTaskController extends RestCytomineController {
     }
 
     @GetMapping("/tasks/{id}/descriptor.yml")
-    public ResponseEntity<String> descriptorById(
+    public String descriptorById(
             @PathVariable UUID id
     ) {
         return appEngineService.get("tasks/" + id + "/descriptor.yml");
     }
 
     @GetMapping("/tasks/{namespace}/{version}/descriptor.yml")
-    public ResponseEntity<String> descriptor(
+    public String descriptor(
             @PathVariable String namespace,
             @PathVariable String version
     ) {

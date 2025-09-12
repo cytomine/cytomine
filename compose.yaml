@@ -62,7 +62,7 @@ services:
     depends_on:
       - pims-cache
     volumes:
-      - ${DATA_PATH:-./data}/dataset:/dataset
+      - ${IMPORT_PATH:-./data/dataset}:/dataset
       - ${DATA_PATH:-./data}/images:/data/images
     environment:
       API_BASE_PATH: ${IMS_API_BASE_PATH:-/ims}

@@ -132,6 +132,7 @@ application:
   appEngine:
     enabled: ${APPENGINE_ENABLED:true}
     apiBasePath: ${APPENGINE_API_BASE_PATH:/app-engine/v1/}
+    apiUrl: ${APPENGINE_API_URL:http://localhost}
 
 jwt:
   auth:

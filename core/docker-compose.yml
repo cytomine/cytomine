@@ -7,7 +7,7 @@ services:
     environment:
       - POSTGRES_NAME=docker
       - POSTGRES_USER=docker
-      - POSTGRES_PASSWORD=docker
+      - POSTGRES_PASSWORD=password
 
   mongo:
     container_name: mongo
@@ -16,7 +16,7 @@ services:
       - "27017:27017"
     environment:
       - MONGO_INITDB_ROOT_USERNAME=mongoadmin
-      - MONGO_INITDB_ROOT_PASSWORD=secret
+      - MONGO_INITDB_ROOT_PASSWORD=password
       - MONGO_INITDB_DATABASE=cytomine
 
   core:

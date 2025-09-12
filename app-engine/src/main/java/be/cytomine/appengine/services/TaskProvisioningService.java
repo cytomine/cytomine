@@ -607,7 +607,7 @@ public class TaskProvisioningService {
                     if (currentOutput.getName().equals(ze.getName())) { // assuming it's a file
                         remainingOutputs.remove(i);
                         StorageData parameterZipEntryStorageData;
-                        String outputName = currentOutput.getName(); //
+                        String outputName = currentOutput.getName();
                         Path filePath = Path.of(
                             basePath,
                             "/",

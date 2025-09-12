@@ -148,8 +148,9 @@ def import_dataset(
         current_projects = ProjectCollection().fetch()
         project_names = {project.name: project for project in current_projects}
 
-        for dataset_path in valid_datasets:
-            dataset_name = os.path.basename(dataset_path)
+        for dataset_root in valid_datasets:
+            dataset_path = [d for d in Path(dataset_root).iterdir() if d.is_dir()].pop()
+            dataset_name = os.path.basename(dataset_root)
 
             if create_project:
                 if dataset_name in project_names:
@@ -159,8 +160,13 @@ def import_dataset(
                     project = Project(name=dataset_name).save()
                     response["valid_datasets"][dataset_name]["project_created"] = True
 
-            image_directory = Path(dataset_path) / "IMAGES"
-            image_paths = list(image_directory.iterdir())
+            try:
+                image_directory = Path(dataset_path) / "IMAGES"
+                image_paths = list(image_directory.iterdir())
+            except:
+                image_directory = Path(dataset_path) / "images"
+                image_paths = list(image_directory.iterdir())
+
             for image_path in image_paths:
                 if is_already_imported(image_path, Path(FILE_ROOT_PATH)):
                     response["valid_datasets"][dataset_name]["skipped_files"].append(image_path.name)

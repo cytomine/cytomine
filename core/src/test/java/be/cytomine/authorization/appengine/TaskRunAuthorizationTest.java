@@ -1,8 +1,11 @@
 package be.cytomine.authorization.appengine;
 
-import java.util.Optional;
-import java.util.UUID;
-
+import be.cytomine.BasicInstanceBuilder;
+import be.cytomine.CytomineCoreApplication;
+import be.cytomine.authorization.CRDAuthorizationTest;
+import be.cytomine.domain.appengine.TaskRun;
+import be.cytomine.domain.project.EditingMode;
+import be.cytomine.service.appengine.TaskRunService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.tomakehurst.wiremock.WireMockServer;
@@ -14,16 +17,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 
-import be.cytomine.BasicInstanceBuilder;
-import be.cytomine.CytomineCoreApplication;
-import be.cytomine.authorization.CRDAuthorizationTest;
-import be.cytomine.domain.appengine.TaskRun;
-import be.cytomine.domain.project.EditingMode;
-import be.cytomine.service.appengine.TaskRunService;
+import java.util.Optional;
+import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.springframework.security.acls.domain.BasePermission.READ;
@@ -64,14 +64,14 @@ public class TaskRunAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void user_admin_can_add_in_readonly_mode(){
+    public void user_admin_can_add_in_readonly_mode() {
         taskRun.getProject().setMode(EditingMode.READ_ONLY);
         expectOK(() -> when_i_add_domain());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_add_in_readonly_mode(){
+    public void user_cannot_add_in_readonly_mode() {
         taskRun.getProject().setMode(EditingMode.READ_ONLY);
         expectForbidden(() -> when_i_add_domain());
     }
@@ -135,7 +135,10 @@ public class TaskRunAuthorizationTest extends CRDAuthorizationTest {
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode body = objectMapper.createObjectNode().put("image", taskRun.getImage().getId());
 
-        taskRunService.addTaskRun(taskRun.getProject().getId(), "/tasks/" + taskId + "/runs", body);
+        ResponseEntity<String> stringResponseEntity = taskRunService.addTaskRun(taskRun.getProject().getId(), "/tasks/" + taskId + "/runs", body);
+        if (!stringResponseEntity.getStatusCode().is2xxSuccessful()) {
+            throw (new RuntimeException(stringResponseEntity.toString()));
+        }
     }
 
     @Override

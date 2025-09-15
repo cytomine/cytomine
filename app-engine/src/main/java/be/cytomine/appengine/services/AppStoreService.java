@@ -63,18 +63,18 @@ public class AppStoreService {
         log.info("saving app store {}", appStore);
         if (Objects.isNull(appStore.getName()) || appStore.getName().isBlank()) {
             AppEngineError error = ErrorBuilder.build(
-                    ErrorCode.INTERNAL_INVALID_STORE_DATA);
+                ErrorCode.INTERNAL_INVALID_STORE_DATA);
             throw new ValidationException(error);
         }
         if (Objects.isNull(appStore.getHost()) || appStore.getHost().isBlank()) {
             AppEngineError error = ErrorBuilder.build(
-                    ErrorCode.INTERNAL_INVALID_STORE_DATA);
+                ErrorCode.INTERNAL_INVALID_STORE_DATA);
             throw new ValidationException(error);
         }
         Optional<AppStore> store = appStoreRepository.findByNameAndHost(appStore.getName(), appStore.getHost());
         if(store.isPresent()) {
             AppEngineError error = ErrorBuilder.build(
-                    ErrorCode.INTERNAL_INVALID_STORE_ALREADY_EXISTS);
+                ErrorCode.INTERNAL_INVALID_STORE_ALREADY_EXISTS);
             throw new ValidationException(error);
         }
         log.info("saved");

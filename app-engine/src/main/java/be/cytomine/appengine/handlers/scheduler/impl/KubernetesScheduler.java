@@ -73,30 +73,27 @@ public class KubernetesScheduler implements SchedulerHandler {
         log.info("Schedule: create task pod...");
 
         // Define helper container resources
-        ResourceRequirementsBuilder helperContainersResourcesBuilder =
-            new ResourceRequirements()
-                .toBuilder()
-                .addToRequests("cpu", new Quantity(helperContainerCpu))
-                .addToRequests("memory", new Quantity(helperContainerRam))
-                .addToLimits("cpu", new Quantity(helperContainerCpu))
-                .addToLimits("memory", new Quantity(helperContainerRam));
+        ResourceRequirementsBuilder helperContainersResourcesBuilder = new ResourceRequirements()
+            .toBuilder()
+            .addToRequests("cpu", new Quantity(helperContainerCpu))
+            .addToRequests("memory", new Quantity(helperContainerRam))
+            .addToLimits("cpu", new Quantity(helperContainerCpu))
+            .addToLimits("memory", new Quantity(helperContainerRam));
 
         ResourceRequirements helperContainersResources = helperContainersResourcesBuilder.build();
 
         // Define task resources for the task
-        ResourceRequirementsBuilder taskResourcesBuilder =
-            new ResourceRequirements()
-                .toBuilder()
-                .addToRequests("cpu", new Quantity(Integer.toString(task.getCpus())))
-                .addToRequests("memory", new Quantity(task.getRam()))
-                .addToLimits("cpu", new Quantity(Integer.toString(task.getCpus())))
-                .addToLimits("memory", new Quantity(task.getRam()));
+        ResourceRequirementsBuilder taskResourcesBuilder = new ResourceRequirements()
+            .toBuilder()
+            .addToRequests("cpu", new Quantity(Integer.toString(task.getCpus())))
+            .addToRequests("memory", new Quantity(task.getRam()))
+            .addToLimits("cpu", new Quantity(Integer.toString(task.getCpus())))
+            .addToLimits("memory", new Quantity(task.getRam()));
 
         if (task.getGpus() > 0) {
-            taskResourcesBuilder =
-                taskResourcesBuilder
-                    .addToRequests("nvidia.com/gpu", new Quantity(Integer.toString(task.getGpus())))
-                    .addToLimits("nvidia.com/gpu", new Quantity(Integer.toString(task.getGpus())));
+            taskResourcesBuilder = taskResourcesBuilder
+                .addToRequests("nvidia.com/gpu", new Quantity(Integer.toString(task.getGpus())))
+                .addToLimits("nvidia.com/gpu", new Quantity(Integer.toString(task.getGpus())));
         }
 
         ResourceRequirements taskResources = taskResourcesBuilder.build();
@@ -187,14 +184,15 @@ public class KubernetesScheduler implements SchedulerHandler {
             .withMountPath(task.getOutputFolder())
             .endVolumeMount()
 
-            .withEnv(new EnvVarBuilder()
-                .withName("POD_NAME")
-                .withNewValueFrom()
-                .withNewFieldRef()
-                .withFieldPath("metadata.name")
-                .endFieldRef()
-                .endValueFrom()
-                .build())
+            .withEnv(
+                new EnvVarBuilder()
+                    .withName("POD_NAME")
+                    .withNewValueFrom()
+                    .withNewFieldRef()
+                    .withFieldPath("metadata.name")
+                    .endFieldRef()
+                    .endValueFrom()
+                    .build())
 
             .build();
 

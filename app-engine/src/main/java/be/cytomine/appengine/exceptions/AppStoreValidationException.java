@@ -2,11 +2,12 @@ package be.cytomine.appengine.exceptions;
 
 import java.util.Set;
 
+import com.networknt.schema.ValidationMessage;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import be.cytomine.appengine.dto.responses.errors.AppEngineError;
-import com.networknt.schema.ValidationMessage;
+
 
 @Getter
 @EqualsAndHashCode(callSuper = false)

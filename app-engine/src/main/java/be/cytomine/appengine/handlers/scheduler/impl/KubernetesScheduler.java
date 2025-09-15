@@ -53,8 +53,24 @@ public class KubernetesScheduler implements SchedulerHandler {
 
     private PodInformer podInformer;
 
-    @Value("${scheduler.advertised-url}${app-engine.api_prefix}"
-        + "${app-engine.api_version}/task-runs/")
+    @Value("${scheduler.advertised-url}")
+    private String advertisedUrl;
+    
+    @Value("${app-engine.api_prefix}")
+    private String apiPrefix;
+    
+    @Value("${app-engine.api_version}")
+    private String apiVersion;
+    
+    @PostConstruct
+    public void buildTaskRunsUrl() {
+        baseUrl = UriComponentsBuilder
+            .fromUriString(advertisedUrl)
+            .path(apiPrefix)
+            .path(apiVersion)
+            .path("/task-runs/")
+            .toUriString();
+    }
     private String baseUrl;
 
     @Override

@@ -41,13 +41,13 @@ public class AppStoreService {
     public void makeDefault(UUID id) throws AppStoreNotFoundException {
         log.info("make default {}", id);
         Optional<AppStore> defaultStore = appStoreRepository.findByDefaultStoreIsTrue();
-        if(defaultStore.isPresent()) {
+        if (defaultStore.isPresent()) {
             AppStore store = defaultStore.get();
             store.setDefaultStore(false);
             appStoreRepository.saveAndFlush(store);
         }
         Optional<AppStore> appStore = appStoreRepository.findById(id);
-        if(appStore.isPresent()) {
+        if (appStore.isPresent()) {
             AppStore store = appStore.get();
             store.setDefaultStore(true);
             appStoreRepository.saveAndFlush(store);

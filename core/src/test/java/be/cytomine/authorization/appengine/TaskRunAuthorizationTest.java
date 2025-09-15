@@ -62,7 +62,6 @@ public class TaskRunAuthorizationTest extends CRDAuthorizationTest {
     }
 
     @WithMockUser(username = USER_ACL_ADMIN)
-
     public void user_admin_can_add_in_readonly_mode() {
         taskRun.getProject().setMode(EditingMode.READ_ONLY);
         expectOK(() -> when_i_add_domain());

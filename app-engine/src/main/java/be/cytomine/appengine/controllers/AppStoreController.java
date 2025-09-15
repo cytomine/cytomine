@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import be.cytomine.appengine.models.store.AppStore;
@@ -47,10 +48,18 @@ class AppStoreController {
 
     @PutMapping("/{id}/default")
     public ResponseEntity<?> put(@PathVariable String id) throws AppStoreNotFoundException {
-        log.info("Store PUT");
+        log.info("Store PUT default");
         appStoreService.makeDefault(UUID.fromString(id));
-        log.info("Store PUT Ended");
+        log.info("Store PUT default Ended");
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/default")
+    public ResponseEntity<?> findDefault() throws AppStoreNotFoundException {
+        log.info("Store Get default");
+        Optional<AppStore> store = appStoreService.findDefault();
+        log.info("Store Get default Ended");
+        return ResponseEntity.ok(store);
     }
     
 }

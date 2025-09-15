@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import be.cytomine.appengine.dto.handlers.scheduler.Schedule;
 import be.cytomine.appengine.exceptions.SchedulingException;
@@ -55,13 +56,13 @@ public class KubernetesScheduler implements SchedulerHandler {
 
     @Value("${scheduler.advertised-url}")
     private String advertisedUrl;
-    
+
     @Value("${app-engine.api_prefix}")
     private String apiPrefix;
-    
+
     @Value("${app-engine.api_version}")
     private String apiVersion;
-    
+
     @PostConstruct
     public void buildTaskRunsUrl() {
         baseUrl = UriComponentsBuilder

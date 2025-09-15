@@ -30,7 +30,7 @@ class AppStoreController {
     private final AppStoreService appStoreService;
 
     @PostMapping
-    public ResponseEntity<?> post(@RequestBody AppStore appStore) throws ValidationException {
+    public ResponseEntity<AppStore> post(@RequestBody AppStore appStore) throws ValidationException {
         log.info("Store POST");
         AppStore store = appStoreService.save(appStore);
         log.info("Store POST Ended");
@@ -38,7 +38,7 @@ class AppStoreController {
     }
 
     @GetMapping
-    public ResponseEntity<?> get() throws ValidationException {
+    public ResponseEntity<List<AppStore>> get() throws ValidationException {
         log.info("Store GET");
         List<AppStore> store = appStoreService.list();
         log.info("Store GET Ended");
@@ -62,7 +62,7 @@ class AppStoreController {
     }
 
     @GetMapping("/default")
-    public ResponseEntity<?> findDefault() throws AppStoreNotFoundException {
+    public ResponseEntity<Optional<AppStore>> findDefault() throws AppStoreNotFoundException {
         log.info("Store Get default");
         Optional<AppStore> store = appStoreService.findDefault();
         log.info("Store Get default Ended");

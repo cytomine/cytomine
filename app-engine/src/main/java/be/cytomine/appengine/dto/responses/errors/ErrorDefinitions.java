@@ -78,6 +78,9 @@ public class ErrorDefinitions {
         codes.put(ErrorCode.INTERNAL_NULL_PROVISION, new MessageCode("APPE-internal-null-provision", "provision object is null"));
         codes.put(ErrorCode.INTERNAL_UNKNOWN_SUBTYPE, new MessageCode("APPE-internal-unknown-subtype", "collection subtype unknown"));
         codes.put(ErrorCode.INTERNAL_INVALID_METADATA, new MessageCode("APPE-internal-invalid-metadata", "collection array.yml is malformed"));
+        codes.put(ErrorCode.INTERNAL_INVALID_STORE_DATA, new MessageCode("APPE-internal-invalid-store-data", "invalid store data"));
+        codes.put(ErrorCode.INTERNAL_INVALID_STORE_NOT_FOUND, new MessageCode("APPE-internal-store", "store not found"));
+        codes.put(ErrorCode.INTERNAL_INVALID_STORE_ALREADY_EXISTS, new MessageCode("APPE-internal-store-exists", "store already exists"));
     }
 
     public static MessageCode fromCode(ErrorCode code) {

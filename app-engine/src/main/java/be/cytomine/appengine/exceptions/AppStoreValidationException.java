@@ -1,9 +1,9 @@
 package be.cytomine.appengine.exceptions;
 
+import java.util.Set;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-
-import java.util.Set;
 
 import be.cytomine.appengine.dto.responses.errors.AppEngineError;
 import com.networknt.schema.ValidationMessage;
@@ -44,7 +44,10 @@ public class AppStoreValidationException extends Exception {
         this.error = error;
     }
 
-    public AppStoreValidationException(String message, boolean internalError, boolean integrityViolated) {
+    public AppStoreValidationException(
+        String message,
+        boolean internalError,
+        boolean integrityViolated) {
         super(message);
         this.internalError = internalError;
         this.integrityViolated = integrityViolated;

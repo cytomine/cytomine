@@ -53,6 +53,7 @@ scheduler:
   helper-containers-resources:
     cpu: 200m
     ram: 200Mi
+  advertised-url: ${SCHEDULER_ADVERTISED_URL}
 registry-client:
   authenticated: false
   user: user #ignored

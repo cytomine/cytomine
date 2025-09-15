@@ -50,7 +50,7 @@ public class KubernetesScheduler implements SchedulerHandler {
 
     private PodInformer podInformer;
 
-    @Value("${scheduler.advertised.url}")
+    @Value("${scheduler.advertised-url}")
     private String appEngineUrl;
 
     private String baseUrl;

@@ -6,11 +6,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
 import be.cytomine.appengine.handlers.RegistryHandler;
-import be.cytomine.appengine.handlers.SchedulerHandler;
 import be.cytomine.appengine.handlers.StorageHandler;
 import be.cytomine.appengine.handlers.registry.impl.DefaultRegistryHandler;
 import be.cytomine.appengine.handlers.registry.impl.DockerRegistryHandler;
-import be.cytomine.appengine.handlers.scheduler.impl.KubernetesScheduler;
 import be.cytomine.appengine.handlers.storage.impl.FileSystemStorageHandler;
 
 @Configuration
@@ -63,11 +61,5 @@ public class ImplementationConfig {
             );
         }
         return new DefaultRegistryHandler();
-    }
-
-    @Bean
-    @Primary
-    public SchedulerHandler loadSchedulerHandler() throws Exception {
-        return new KubernetesScheduler();
     }
 }

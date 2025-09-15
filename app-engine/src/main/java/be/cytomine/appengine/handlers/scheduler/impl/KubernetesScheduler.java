@@ -12,8 +12,8 @@ import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 
@@ -22,22 +22,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
+@RequiredArgsConstructor
 public class KubernetesScheduler implements SchedulerHandler {
 
-    @Autowired
-    private Environment environment;
+    private final Environment environment;
 
-    @Autowired
-    private KubernetesClient kubernetesClient;
+    private final KubernetesClient kubernetesClient;
 
-    @Autowired
-    private RunRepository runRepository;
-
-    @Value("${app-engine.api_prefix}")
-    private String apiPrefix;
-
-    @Value("${app-engine.api_version}")
-    private String apiVersion;
+    private final RunRepository runRepository;
 
     @Value("${registry-client.host}")
     private String registryHost;
@@ -50,22 +42,8 @@ public class KubernetesScheduler implements SchedulerHandler {
 
     private PodInformer podInformer;
 
-    @Value("${scheduler.advertised-url}")
-    private String appEngineUrl;
-
+    @Value("${scheduler.advertised-url}${app-engine.api_prefix}${app-engine.api_version}/task-runs/")
     private String baseUrl;
-
-    private String baseInputPath;
-
-    private String baseOutputPath;
-
-
-    @PostConstruct
-    private void initUrl() throws SchedulingException {
-        this.baseUrl = appEngineUrl + apiPrefix + apiVersion + "/task-runs/";
-        this.baseInputPath = "/tmp/app-engine/task-run-inputs-";
-        this.baseOutputPath = "/tmp/app-engine/task-run-outputs-";
-    }
 
     @Override
     public Schedule schedule(Schedule schedule) throws SchedulingException {
@@ -210,6 +188,8 @@ public class KubernetesScheduler implements SchedulerHandler {
             .build();
 
         // Defining the pod image to run
+        String baseInputPath = "/tmp/app-engine/task-run-inputs-";
+        String baseOutputPath = "/tmp/app-engine/task-run-outputs-";
         PodBuilder podBuilder = new PodBuilder()
             .withNewMetadata()
             .withName(podName)

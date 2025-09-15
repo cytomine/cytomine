@@ -30,7 +30,8 @@ class AppStoreController {
     private final AppStoreService appStoreService;
 
     @PostMapping
-    public ResponseEntity<AppStore> post(@RequestBody AppStore appStore) throws ValidationException {
+    public ResponseEntity<AppStore> post(@RequestBody AppStore appStore)
+        throws ValidationException {
         log.info("Store POST");
         AppStore store = appStoreService.save(appStore);
         log.info("Store POST Ended");

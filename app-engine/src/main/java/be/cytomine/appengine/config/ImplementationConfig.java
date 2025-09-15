@@ -1,14 +1,15 @@
 package be.cytomine.appengine.config;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+
 import be.cytomine.appengine.handlers.RegistryHandler;
 import be.cytomine.appengine.handlers.StorageHandler;
 import be.cytomine.appengine.handlers.registry.impl.DefaultRegistryHandler;
 import be.cytomine.appengine.handlers.registry.impl.DockerRegistryHandler;
 import be.cytomine.appengine.handlers.storage.impl.FileSystemStorageHandler;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 
 @Configuration
 public class ImplementationConfig {

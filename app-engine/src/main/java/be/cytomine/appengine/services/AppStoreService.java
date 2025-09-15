@@ -39,7 +39,7 @@ public class AppStoreService {
 
     @Transactional
     public void makeDefault(UUID id) throws AppStoreNotFoundException {
-        log.info("make default {}", id);
+        log.info("Setting store [{}] as default", id);
         Optional<AppStore> defaultStore = appStoreRepository.findByDefaultStoreIsTrue();
         if (defaultStore.isPresent()) {
             AppStore store = defaultStore.get();
@@ -47,8 +47,9 @@ public class AppStoreService {
             appStoreRepository.saveAndFlush(store);
         }
         Optional<AppStore> appStore = appStoreRepository.findById(id);
+        AppStore store;
         if (appStore.isPresent()) {
-            AppStore store = appStore.get();
+            store = appStore.get();
             store.setDefaultStore(true);
             appStoreRepository.saveAndFlush(store);
         } else {
@@ -56,7 +57,7 @@ public class AppStoreService {
                 ErrorCode.INTERNAL_INVALID_STORE_NOT_FOUND);
             throw new AppStoreNotFoundException(error);
         }
-        log.info("now default {}", id);
+        log.info("Successfully set store [{}] '{}' as default", id, store.getName());
     }
 
     public AppStore save(AppStore appStore) throws ValidationException {
@@ -79,7 +80,7 @@ public class AppStoreService {
                 ErrorCode.INTERNAL_INVALID_STORE_ALREADY_EXISTS);
             throw new ValidationException(error);
         }
-        log.info("saved");
+        log.info("App store [{}] saved", appStore.getName());
         appStore.setDefaultStore(false);
         return appStoreRepository.save(appStore);
     }

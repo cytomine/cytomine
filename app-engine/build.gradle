@@ -108,6 +108,9 @@ dependencies {
     // Image processing
     implementation 'org.apache.commons:commons-imaging:1.0.0-alpha5'
     implementation 'org.dcm4che:dcm4che-core:5.31.0'
+
+    testImplementation "org.testcontainers:testcontainers:1.21.3"
+    testImplementation "org.testcontainers:postgresql:1.21.3"
 }
 
 tasks.named('test') {

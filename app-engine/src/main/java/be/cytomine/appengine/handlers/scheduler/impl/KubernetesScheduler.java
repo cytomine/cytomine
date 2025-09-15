@@ -1,5 +1,6 @@
 package be.cytomine.appengine.handlers.scheduler.impl;
 
+import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -55,7 +56,7 @@ public class KubernetesScheduler implements SchedulerHandler {
 
     @Value("${scheduler.advertised-url}${app-engine.api_prefix}"
         + "${app-engine.api_version}/task-runs/")
-    private String baseUrl;
+    private URL baseUrl;
 
     @Override
     public Schedule schedule(Schedule schedule) throws SchedulingException {

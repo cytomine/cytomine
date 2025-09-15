@@ -127,6 +127,7 @@ services:
       DB_USERNAME: appengine
       REGISTRY_HOST: registry
       STORAGE_BASE_PATH: /data
+      SCHEDULER_ADVERTISED_URL: 172.17.0.1
 
   core:
     image: cytomine/core:latest

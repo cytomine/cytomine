@@ -16,11 +16,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+@Service
 @Slf4j
 @RequiredArgsConstructor
 public class KubernetesScheduler implements SchedulerHandler {

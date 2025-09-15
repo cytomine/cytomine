@@ -53,7 +53,7 @@ scheduler:
   helper-containers-resources:
     cpu: 200m
     ram: 200Mi
-  advertised-url: ${SCHEDULER_ADVERTISED_URL}
+  advertised-url: ${SCHEDULER_ADVERTISED_URL} # The URL of the app engine, to be requested from the running tasks
 registry-client:
   authenticated: false
   user: user #ignored

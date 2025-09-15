@@ -13,8 +13,8 @@ import org.springframework.stereotype.Service;
 import be.cytomine.appengine.dto.responses.errors.AppEngineError;
 import be.cytomine.appengine.dto.responses.errors.ErrorBuilder;
 import be.cytomine.appengine.dto.responses.errors.ErrorCode;
-import be.cytomine.appengine.exceptions.ValidationException;
 import be.cytomine.appengine.exceptions.AppStoreNotFoundException;
+import be.cytomine.appengine.exceptions.ValidationException;
 import be.cytomine.appengine.models.store.AppStore;
 import be.cytomine.appengine.repositories.AppStoreRepository;
 
@@ -53,7 +53,7 @@ public class AppStoreService {
             appStoreRepository.saveAndFlush(store);
         } else {
             AppEngineError error = ErrorBuilder.build(
-                    ErrorCode.INTERNAL_INVALID_STORE_NOT_FOUND);
+                ErrorCode.INTERNAL_INVALID_STORE_NOT_FOUND);
             throw new AppStoreNotFoundException(error);
         }
         log.info("now default {}", id);

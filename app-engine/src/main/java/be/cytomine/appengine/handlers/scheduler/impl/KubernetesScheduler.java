@@ -72,7 +72,7 @@ public class KubernetesScheduler implements SchedulerHandler {
             .path("/task-runs/")
             .toUriString();
     }
-    
+
     private String baseUrl;
 
     @Override

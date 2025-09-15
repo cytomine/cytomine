@@ -71,7 +71,9 @@ public class AppStoreService {
                 ErrorCode.INTERNAL_INVALID_STORE_DATA);
             throw new ValidationException(error);
         }
-        Optional<AppStore> store = appStoreRepository.findByNameAndHost(appStore.getName(), appStore.getHost());
+        Optional<AppStore> store = appStoreRepository.findByNameAndHost(
+            appStore.getName(),
+            appStore.getHost());
         if(store.isPresent()) {
             AppEngineError error = ErrorBuilder.build(
                 ErrorCode.INTERNAL_INVALID_STORE_ALREADY_EXISTS);

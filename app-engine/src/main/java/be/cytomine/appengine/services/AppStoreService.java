@@ -74,7 +74,7 @@ public class AppStoreService {
         Optional<AppStore> store = appStoreRepository.findByNameAndHost(
             appStore.getName(),
             appStore.getHost());
-        if(store.isPresent()) {
+        if (store.isPresent()) {
             AppEngineError error = ErrorBuilder.build(
                 ErrorCode.INTERNAL_INVALID_STORE_ALREADY_EXISTS);
             throw new ValidationException(error);

@@ -1,29 +1,5 @@
 package be.cytomine.appengine.handlers.scheduler.impl;
 
-import java.io.File;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
-import io.fabric8.kubernetes.api.model.Container;
-import io.fabric8.kubernetes.api.model.ContainerBuilder;
-import io.fabric8.kubernetes.api.model.EnvVarBuilder;
-import io.fabric8.kubernetes.api.model.HostPathVolumeSourceBuilder;
-import io.fabric8.kubernetes.api.model.PodBuilder;
-import io.fabric8.kubernetes.api.model.Quantity;
-import io.fabric8.kubernetes.api.model.ResourceRequirements;
-import io.fabric8.kubernetes.api.model.ResourceRequirementsBuilder;
-import io.fabric8.kubernetes.api.model.VolumeBuilder;
-import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.KubernetesClientException;
-import jakarta.annotation.PostConstruct;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
-
 import be.cytomine.appengine.dto.handlers.scheduler.Schedule;
 import be.cytomine.appengine.exceptions.SchedulingException;
 import be.cytomine.appengine.handlers.SchedulerHandler;
@@ -32,6 +8,18 @@ import be.cytomine.appengine.models.task.Run;
 import be.cytomine.appengine.models.task.Task;
 import be.cytomine.appengine.repositories.RunRepository;
 import be.cytomine.appengine.states.TaskRunState;
+import io.fabric8.kubernetes.api.model.*;
+import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClientException;
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 public class KubernetesScheduler implements SchedulerHandler {
@@ -54,9 +42,6 @@ public class KubernetesScheduler implements SchedulerHandler {
     @Value("${registry-client.host}")
     private String registryHost;
 
-    @Value("${registry-client.port}")
-    private String registryPort;
-
     @Value("${scheduler.helper-containers-resources.ram}")
     private String helperContainerRam;
 
@@ -65,45 +50,19 @@ public class KubernetesScheduler implements SchedulerHandler {
 
     private PodInformer podInformer;
 
+    @Value("${scheduler.advertised.url}")
+    private String appEngineUrl;
+
     private String baseUrl;
 
     private String baseInputPath;
 
     private String baseOutputPath;
 
-    private boolean isInDocker() {
-        return new File("/.dockerenv").exists();
-    }
-
-    private String getHostAddress() throws SchedulingException {
-        if (!isInDocker()) {
-            return "172.17.0.1";
-        }
-
-        try {
-            return InetAddress.getLocalHost().getHostAddress();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-            throw new SchedulingException("Failed to get the hostname the app engine");
-        }
-    }
-
-    private String getRegistryAddress() throws SchedulingException {
-        try {
-            InetAddress address = InetAddress.getByName(registryHost);
-            return address.getHostAddress() + ":" + registryPort;
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-            throw new SchedulingException("Failed to get the hostname of the registry");
-        }
-    }
 
     @PostConstruct
     private void initUrl() throws SchedulingException {
-        String port = environment.getProperty("server.port");
-        String hostAddress = "http://" + getHostAddress();
-
-        this.baseUrl = hostAddress + ":" + port + apiPrefix + apiVersion + "/task-runs/";
+        this.baseUrl = appEngineUrl + apiPrefix + apiVersion + "/task-runs/";
         this.baseInputPath = "/tmp/app-engine/task-run-inputs-";
         this.baseOutputPath = "/tmp/app-engine/task-run-outputs-";
     }
@@ -119,7 +78,7 @@ public class KubernetesScheduler implements SchedulerHandler {
 
         Task task = run.getTask();
         String podName = task.getName().toLowerCase().replaceAll("[^a-zA-Z0-9]", "") + "-" + runId;
-        String imageName = getRegistryAddress() + "/" + task.getImageName();
+        String imageName = registryHost + "/" + task.getImageName();
         String runSecret = String.valueOf(run.getSecret());
 
         log.info("Schedule: create task pod...");
@@ -127,22 +86,22 @@ public class KubernetesScheduler implements SchedulerHandler {
         // Define helper container resources
         ResourceRequirementsBuilder helperContainersResourcesBuilder =
             new ResourceRequirements()
-            .toBuilder()
-            .addToRequests("cpu", new Quantity(helperContainerCpu))
-            .addToRequests("memory", new Quantity(helperContainerRam))
-            .addToLimits("cpu", new Quantity(helperContainerCpu))
-            .addToLimits("memory", new Quantity(helperContainerRam));
+                .toBuilder()
+                .addToRequests("cpu", new Quantity(helperContainerCpu))
+                .addToRequests("memory", new Quantity(helperContainerRam))
+                .addToLimits("cpu", new Quantity(helperContainerCpu))
+                .addToLimits("memory", new Quantity(helperContainerRam));
 
         ResourceRequirements helperContainersResources = helperContainersResourcesBuilder.build();
 
         // Define task resources for the task
         ResourceRequirementsBuilder taskResourcesBuilder =
             new ResourceRequirements()
-            .toBuilder()
-            .addToRequests("cpu", new Quantity(Integer.toString(task.getCpus())))
-            .addToRequests("memory", new Quantity(task.getRam()))
-            .addToLimits("cpu", new Quantity(Integer.toString(task.getCpus())))
-            .addToLimits("memory", new Quantity(task.getRam()));
+                .toBuilder()
+                .addToRequests("cpu", new Quantity(Integer.toString(task.getCpus())))
+                .addToRequests("memory", new Quantity(task.getRam()))
+                .addToLimits("cpu", new Quantity(Integer.toString(task.getCpus())))
+                .addToLimits("memory", new Quantity(task.getRam()));
 
         if (task.getGpus() > 0) {
             taskResourcesBuilder =
@@ -240,13 +199,13 @@ public class KubernetesScheduler implements SchedulerHandler {
             .endVolumeMount()
 
             .withEnv(new EnvVarBuilder()
-            .withName("POD_NAME")
-            .withNewValueFrom()
-            .withNewFieldRef()
-            .withFieldPath("metadata.name")
-            .endFieldRef()
-            .endValueFrom()
-            .build())
+                .withName("POD_NAME")
+                .withNewValueFrom()
+                .withNewFieldRef()
+                .withFieldPath("metadata.name")
+                .endFieldRef()
+                .endValueFrom()
+                .build())
 
             .build();
 
@@ -278,16 +237,16 @@ public class KubernetesScheduler implements SchedulerHandler {
 
             // Mount volumes from the scheduler file system
             .addToVolumes(new VolumeBuilder()
-            .withName("inputs")
-            .withHostPath(
-                new HostPathVolumeSourceBuilder().withPath(baseInputPath + runId).build())
-            .build())
+                .withName("inputs")
+                .withHostPath(
+                    new HostPathVolumeSourceBuilder().withPath(baseInputPath + runId).build())
+                .build())
             .addToVolumes(new VolumeBuilder()
-            .withName("outputs")
-            .withHostPath(
-                new HostPathVolumeSourceBuilder().withPath(baseOutputPath + runId)
-            .build())
-            .build())
+                .withName("outputs")
+                .withHostPath(
+                    new HostPathVolumeSourceBuilder().withPath(baseOutputPath + runId)
+                        .build())
+                .build())
 
             // Never restart the pod
             .withRestartPolicy("Never")

@@ -128,12 +128,15 @@ services:
       DB_PORT: 5432
       DB_USERNAME: appengine
       REGISTRY_HOST: registry
+      SCHEDULER_ADVERTISED_URL: 172.16.238.10
       STORAGE_BASE_PATH: /path/to/app-engine # Must be an absolute path PLEASE CHANGE
       RUN_STORAGE_BASE_PATH: /path/to/app-engine # MUST be an absolute path PLEASE CHANGE
       PROJECT_DATA_PATH: /path/to/cytomine/data # MUST be an absolute path and match volume A PLEASE CHANGE
       REF_STORAGE_BASE_PATH: /path/to/datasets # MUST be an absolute match volume B PLEASE CHANGE
       SCHEDULER_RUN_MODE: local # values: local, cluster
-
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.10
   core:
     image: cytomine/core:latest
     restart: unless-stopped
@@ -217,3 +220,9 @@ services:
       INTERNAL_URLS_IAM: iam:8100
       INTERNAL_URLS_WEB_UI: web-ui
       URLS_SCHEME: ${URLS_SCHEME:-http}
+networks:
+  host_network:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.238.0/24

@@ -24,10 +24,12 @@ import io.fabric8.kubernetes.api.model.VolumeBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import be.cytomine.appengine.dto.handlers.scheduler.CollectionSymlink;
 import be.cytomine.appengine.dto.handlers.scheduler.Schedule;
@@ -40,29 +42,19 @@ import be.cytomine.appengine.models.task.Task;
 import be.cytomine.appengine.repositories.RunRepository;
 import be.cytomine.appengine.states.TaskRunState;
 
+@Service
 @Slf4j
+@RequiredArgsConstructor
 public class KubernetesScheduler implements SchedulerHandler {
 
-    @Autowired
-    private Environment environment;
+    private final Environment environment;
 
-    @Autowired
-    private KubernetesClient kubernetesClient;
+    private final KubernetesClient kubernetesClient;
 
-    @Autowired
-    private RunRepository runRepository;
-
-    @Value("${app-engine.api_prefix}")
-    private String apiPrefix;
-
-    @Value("${app-engine.api_version}")
-    private String apiVersion;
+    private final RunRepository runRepository;
 
     @Value("${registry-client.host}")
     private String registryHost;
-
-    @Value("${registry-client.port}")
-    private String registryPort;
 
     @Value("${scheduler.helper-containers-resources.ram}")
     private String helperContainerRam;
@@ -84,45 +76,29 @@ public class KubernetesScheduler implements SchedulerHandler {
 
     private PodInformer podInformer;
 
-    private String baseUrl;
+    @Value("${scheduler.advertised-url}")
+    private String advertisedUrl;
+
+    @Value("${app-engine.api_prefix}")
+    private String apiPrefix;
+
+    @Value("${app-engine.api_version}")
+    private String apiVersion;
 
     private String baseInputPath;
 
     private String baseOutputPath;
 
-    private boolean isInDocker() {
-        return new File("/.dockerenv").exists();
-    }
-
-    private String getHostAddress() throws SchedulingException {
-        if (!isInDocker()) {
-            return "172.17.0.1";
-        }
-
-        try {
-            return InetAddress.getLocalHost().getHostAddress();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-            throw new SchedulingException("Failed to get the hostname the app engine");
-        }
-    }
-
-    private String getRegistryAddress() throws SchedulingException {
-        try {
-            InetAddress address = InetAddress.getByName(registryHost);
-            return address.getHostAddress() + ":" + registryPort;
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-            throw new SchedulingException("Failed to get the hostname of the registry");
-        }
-    }
+    private String baseUrl;
 
     @PostConstruct
-    private void initUrl() throws SchedulingException {
-        String port = environment.getProperty("server.port");
-        String hostAddress = "http://" + getHostAddress();
-
-        this.baseUrl = hostAddress + ":" + port + apiPrefix + apiVersion + "/task-runs/";
+    public void buildTaskRunsUrl() {
+        baseUrl = UriComponentsBuilder
+            .fromUriString(advertisedUrl)
+            .path(apiPrefix)
+            .path(apiVersion)
+            .path("/task-runs/")
+            .toUriString();
         String basePath = "";
         if (runMode.equalsIgnoreCase("local")) {
             basePath =  runModeStorageBasePath;
@@ -149,8 +125,7 @@ public class KubernetesScheduler implements SchedulerHandler {
         log.info("Schedule: create task pod...");
 
         // Define helper container resources
-        ResourceRequirementsBuilder helperContainersResourcesBuilder =
-            new ResourceRequirements()
+        ResourceRequirementsBuilder helperContainersResourcesBuilder = new ResourceRequirements()
             .toBuilder()
             .addToRequests("cpu", new Quantity(helperContainerCpu))
             .addToRequests("memory", new Quantity(helperContainerRam))
@@ -160,8 +135,7 @@ public class KubernetesScheduler implements SchedulerHandler {
         ResourceRequirements helperContainersResources = helperContainersResourcesBuilder.build();
 
         // Define task resources for the task
-        ResourceRequirementsBuilder taskResourcesBuilder =
-            new ResourceRequirements()
+        ResourceRequirementsBuilder taskResourcesBuilder = new ResourceRequirements()
             .toBuilder()
             .addToRequests("cpu", new Quantity(Integer.toString(task.getCpus())))
             .addToRequests("memory", new Quantity(task.getRam()))
@@ -169,10 +143,9 @@ public class KubernetesScheduler implements SchedulerHandler {
             .addToLimits("memory", new Quantity(task.getRam()));
 
         if (task.getGpus() > 0) {
-            taskResourcesBuilder =
-                taskResourcesBuilder
-                    .addToRequests("nvidia.com/gpu", new Quantity(Integer.toString(task.getGpus())))
-                    .addToLimits("nvidia.com/gpu", new Quantity(Integer.toString(task.getGpus())));
+            taskResourcesBuilder = taskResourcesBuilder
+                .addToRequests("nvidia.com/gpu", new Quantity(Integer.toString(task.getGpus())))
+                .addToLimits("nvidia.com/gpu", new Quantity(Integer.toString(task.getGpus())));
         }
 
 
@@ -280,14 +253,15 @@ public class KubernetesScheduler implements SchedulerHandler {
             .withMountPath(task.getOutputFolder())
             .endVolumeMount()
 
-            .withEnv(new EnvVarBuilder()
-            .withName("POD_NAME")
-            .withNewValueFrom()
-            .withNewFieldRef()
-            .withFieldPath("metadata.name")
-            .endFieldRef()
-            .endValueFrom()
-            .build())
+            .withEnv(
+                new EnvVarBuilder()
+                    .withName("POD_NAME")
+                    .withNewValueFrom()
+                    .withNewFieldRef()
+                    .withFieldPath("metadata.name")
+                    .endFieldRef()
+                    .endValueFrom()
+                    .build())
 
             .build();
 
@@ -314,7 +288,7 @@ public class KubernetesScheduler implements SchedulerHandler {
         boolean isClusterMode = this.runMode.equalsIgnoreCase("cluster");
         // Defining the pod image to run
         String podName = task.getName().toLowerCase().replaceAll("[^a-zA-Z0-9]", "") + "-" + runId;
-        String imageName = getRegistryAddress() + "/" + task.getImageName();
+        String imageName = registryHost + "/" + task.getImageName();
 
         PodBuilder podBuilder = new PodBuilder()
             .withNewMetadata()

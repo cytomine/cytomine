@@ -152,7 +152,7 @@ services:
       DB_PORT: 5432
       DB_USERNAME: appengine
       REGISTRY_HOST: registry
-      SCHEDULER_ADVERTISED_URL: 172.16.238.10
+      SCHEDULER_ADVERTISED_URL: 172.16.238.18
       STORAGE_BASE_PATH: /path/to/app-engine # Must be an absolute path PLEASE CHANGE
       RUN_STORAGE_BASE_PATH: /path/to/app-engine # MUST be an absolute path PLEASE CHANGE
       PROJECT_DATA_PATH: /path/to/cytomine/data # MUST be an absolute path and match volume A PLEASE CHANGE

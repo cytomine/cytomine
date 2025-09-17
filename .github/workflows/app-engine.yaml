@@ -90,7 +90,7 @@ jobs:
       - name: Validate OpenAPI specifications
         uses: addnab/docker-run-action@v3
         with:
-          image: redocly/cli:1.10.6
+          image: registry.cytomine.org/docker/redocly/cli:1.10.6
           run: 'redocly lint ${{ env.OPENAPI_PATH }}'
           options: -v ${{ github.workspace }}/app-engine:/app-engine -w /app-engine
         env:

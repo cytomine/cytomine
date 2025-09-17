@@ -69,7 +69,7 @@ jobs:
 
     services:
       redis:
-        image: redis:${{ vars.REDIS_VERSION }}
+        image: registry.cytomine.org/docker/redis:${{ vars.REDIS_VERSION }}
         ports:
           - 6379:6379
 

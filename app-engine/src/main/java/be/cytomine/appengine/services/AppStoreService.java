@@ -11,7 +11,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-import be.cytomine.appengine.dto.appstore.InstallRequest;
 import be.cytomine.appengine.dto.inputs.task.TaskDescription;
 import be.cytomine.appengine.exceptions.AppStoreServiceException;
 import be.cytomine.appengine.exceptions.BundleArchiveException;

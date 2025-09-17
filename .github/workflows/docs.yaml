@@ -74,3 +74,4 @@ jobs:
           strip_components: 1
           target: ${{ github.ref_name == 'main' && secrets.DOCS_TARGET_PROD_PATH || secrets.DOCS_TARGET_NEXT_PATH }}
           overwrite: true
+          capture_stdout: true

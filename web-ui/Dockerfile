@@ -33,7 +33,7 @@ FROM ${PROXY_CACHE}/node:${NODE_VERSION}-bookworm-slim AS dev-server
 
 WORKDIR /app
 
-COPY ./ui/scripts/configuration.json ./configuration.json
+COPY ./ui/scripts/configuration.json ./ui/public/configuration.json
 
 CMD ["npm", "run", "serve", "-w", "ui"]
 

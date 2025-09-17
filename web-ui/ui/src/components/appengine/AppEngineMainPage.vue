@@ -1,21 +1,29 @@
 <template>
   <div class="content-wrapper">
     <b-loading v-if="loading" :is-full-page="false" :active="loading" />
-    <div v-else-if="appEngineEnabled" class="panel">
-      <p class="panel-heading">
-        {{$t('app-engine.tasks.name')}}
-        <UploadAppButton btnFunc="upload" @taskUploadSuccess="handleTaskUploadSuccess" />
-      </p>
-      <section class="panel-block">
-        <section id="lower-section-flex">
-        <AppCard v-for="app in applications" :key="app.id" :appData="app" />
+    <div v-else-if="appEngineEnabled">
+      <div class="panel">
+        <p class="panel-heading">
+          {{ $t('app-engine.tasks.name') }}
+          <UploadAppButton btnFunc="upload" @taskUploadSuccess="handleTaskUploadSuccess" />
+        </p>
+        <section class="panel-block">
+          <section id="lower-section-flex">
+            <AppCard v-for="app in applications" :key="app.id" :appData="app" />
+          </section>
         </section>
-      </section>
+      </div>
+
+      <div class="panel">
+        <p class="panel-heading">{{ $t('app-store') }}</p>
+        <section class="panel-block">
+          <AppStoreBrowser />
+        </section>
+      </div>
     </div>
+
     <div v-else>
-      <b-message
-        :title="$t('appengine-not-enabled-title')"
-        type="is-info">
+      <b-message :title="$t('appengine-not-enabled-title')" type="is-info">
         {{ $t('appengine-not-enabled-description') }}
       </b-message>
     </div>
@@ -23,6 +31,7 @@
 </template>
 
 <script>
+import AppStoreBrowser from '@/components/appengine/app-store/AppStoreBrowser.vue';
 import UploadAppButton from './UploadAppButton.vue';
 import AppCard from './AppCard.vue';
 import Task from '@/utils/appengine/task';
@@ -31,8 +40,9 @@ import constants from '@/utils/constants.js';
 export default {
   name: 'AppEngineMainPage',
   components: {
+    AppCard,
+    AppStoreBrowser,
     UploadAppButton,
-    AppCard
   },
   data() {
     return {
@@ -59,7 +69,6 @@ export default {
 </script>
 
 <style scoped>
-
 .panel-block {
   padding-top: 0.8em;
 }
@@ -85,7 +94,6 @@ export default {
 
 #lower-section-flex {
   display: flex;
-  /* justify-content: center; */
   flex-direction: row;
   gap: 1%;
   flex-wrap: wrap;

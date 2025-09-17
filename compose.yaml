@@ -150,6 +150,7 @@ services:
       REGISTRY_HOST: registry
       STORAGE_BASE_PATH: /data
       SCHEDULER_ADVERTISED_URL: 172.16.238.10
+      SCHEDULER_USE_HOST_NETWORK: false
     networks:
       host_network:
         ipv4_address: 172.16.238.10

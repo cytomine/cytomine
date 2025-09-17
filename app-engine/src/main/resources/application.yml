@@ -54,6 +54,7 @@ scheduler:
     cpu: 200m
     ram: 200Mi
   advertised-url: ${SCHEDULER_ADVERTISED_URL} # The URL of the app engine, to be requested from the running tasks
+  use-host-network: ${SCHEDULER_USE_HOST_NETWORK}
 registry-client:
   authenticated: false
   user: user #ignored

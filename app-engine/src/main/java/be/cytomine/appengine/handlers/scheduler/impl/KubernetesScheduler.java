@@ -82,6 +82,9 @@ public class KubernetesScheduler implements SchedulerHandler {
     @Value("${app-engine.api_version}")
     private String apiVersion;
 
+    @Value("${scheduler.use-host-network}")
+    private boolean useHostNetwork;
+
     private String baseInputPath;
 
     private String baseOutputPath;
@@ -294,7 +297,9 @@ public class KubernetesScheduler implements SchedulerHandler {
             .withLabels(labels)
             .endMetadata()
             .withNewSpec()
-            .withHostNetwork(true)
+
+            .withHostNetwork(useHostNetwork)
+
             .addNewInitContainerLike(permissionContainer)
             .and()
             .withRestartPolicy("Never")

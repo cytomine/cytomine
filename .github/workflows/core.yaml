@@ -20,7 +20,7 @@ jobs:
     runs-on: self-hosted
     services:
       mongodb:
-        image: cytomine/mongo:${{ vars.MONGO_VERSION }}
+        image: registry.cytomine.org/docker/cytomine/mongo:${{ vars.MONGO_VERSION }}
         env:
           MONGO_INITDB_DATABASE: cytomine
           MONGO_INITDB_ROOT_USERNAME: mongoadmin
@@ -29,7 +29,7 @@ jobs:
           - 27017:27017
 
       postgres:
-        image: cytomine/postgis:${{ vars.POSTGIS_VERSION }}
+        image: registry.cytomine.org/docker/cytomine/postgis:${{ vars.POSTGIS_VERSION }}
         env:
           POSTGRES_NAME: docker
           POSTGRES_USER: docker

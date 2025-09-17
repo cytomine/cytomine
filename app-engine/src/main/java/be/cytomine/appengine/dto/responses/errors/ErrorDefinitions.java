@@ -85,6 +85,7 @@ public class ErrorDefinitions {
         codes.put(ErrorCode.INTERNAL_NO_FILE_PARTS_FOUND, new MessageCode("APPE-internal-no-file-parts", "payload does not contain file parts"));
         codes.put(ErrorCode.INTERNAL_NO_FILE_BUT_FORM_FIELD, new MessageCode("APPE-internal-no-file-but-form-field", "payload does not contain file but form field"));
         codes.put(ErrorCode.INTERNAL_CRC32_CALC_FAILED, new MessageCode("APPE-internal-checksum-failure", "failed to calculate CRC32 checksum for zip entries"));
+        codes.put(ErrorCode.APPSTORE_DOWNLOAD_FAILED, new MessageCode("APPE-appstore-download-failure", "failed to download task/app from configured appstore"));
     }
 
 

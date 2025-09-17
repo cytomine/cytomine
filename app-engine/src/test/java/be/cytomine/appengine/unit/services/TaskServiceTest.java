@@ -117,7 +117,7 @@ public class TaskServiceTest {
         request.setContent(multipartBody);
         request.setCharacterEncoding("UTF-8");
 
-        Optional<TaskDescription> result = taskService.uploadTask(request);
+        Optional<TaskDescription> result = taskService.uploadTask(request.getInputStream());
 
         assertTrue(result.isPresent());
         verify(storageHandler, times(1)).createStorage(any(Storage.class));

@@ -33,10 +33,6 @@
 </template>
 
 <script>
-// to be used in the future: adding pop-out to show info when clicking more...
-// import AppCardInfo from './AppCardInfo.vue';
-
-
 export default {
   name: 'AppCard',
   props: {
@@ -45,9 +41,6 @@ export default {
       required: true,
     },
   },
-  components: {
-    // AppCardInfo
-  }
 };
 </script>
 

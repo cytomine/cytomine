@@ -96,12 +96,10 @@ public class TaskService {
     private int defaultCpus;
 
     @Transactional
-    public Optional<TaskDescription> uploadTask(HttpServletRequest request)
+    public Optional<TaskDescription> uploadTask(InputStream inputStream)
         throws BundleArchiveException, TaskServiceException, ValidationException {
 
         // prepare for streaming
-        log.info("UploadTask: preparing streaming...");
-        InputStream inputStream = prepareStream(request);
         String descriptorFileYmlContent = "";
         JsonNode descriptorFileAsJson = null;
         log.info("UploadTask: Task identifiers generated ");

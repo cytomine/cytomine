@@ -11,6 +11,7 @@ import be.cytomine.appengine.dto.responses.errors.AppEngineError;
 import be.cytomine.appengine.dto.responses.errors.ErrorBuilder;
 import be.cytomine.appengine.dto.responses.errors.ErrorCode;
 import be.cytomine.appengine.exceptions.AppStoreAlreadyExistsException;
+import be.cytomine.appengine.exceptions.AppStoreServiceException;
 import be.cytomine.appengine.exceptions.AppStoreNotFoundException;
 import be.cytomine.appengine.exceptions.AppStoreValidationException;
 
@@ -36,6 +37,13 @@ public class AppStoreApiExceptionHandler {
     public final ResponseEntity<AppEngineError> handleAppStoreExistsException(Exception e) {
         AppEngineError error = ErrorBuilder.build(ErrorCode.INTERNAL_INVALID_STORE_NOT_FOUND);
         log.info("bad request 400 error [{}]", e.getMessage());
+        return new ResponseEntity<AppEngineError>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({ AppStoreServiceException.class })
+    public final ResponseEntity<AppEngineError> handleException(Exception e) {
+        AppEngineError error = ErrorBuilder.build(ErrorCode.APPSTORE_DOWNLOAD_FAILED);
+        log.info("bad request 400 error: {}", error.getMessage());
         return new ResponseEntity<AppEngineError>(error, HttpStatus.BAD_REQUEST);
     }
 

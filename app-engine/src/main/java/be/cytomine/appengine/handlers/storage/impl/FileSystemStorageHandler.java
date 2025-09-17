@@ -22,6 +22,7 @@ import be.cytomine.appengine.handlers.StorageData;
 import be.cytomine.appengine.handlers.StorageDataEntry;
 import be.cytomine.appengine.handlers.StorageDataType;
 import be.cytomine.appengine.handlers.StorageHandler;
+import be.cytomine.appengine.handlers.StorageStringEntry;
 
 @Data
 @AllArgsConstructor
@@ -48,9 +49,14 @@ public class FileSystemStorageHandler implements StorageHandler {
                     Path filePath = Paths.get(basePath, storageId, filename);
                     Files.createDirectories(filePath.getParent());
 
-                    try (InputStream inputStream = new FileInputStream(current.getData())) {
-                        Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+                    if (current instanceof StorageStringEntry currentString) {
+                        Files.writeString(filePath, currentString.getDataAsString());
+                    } else {
+                        try (InputStream inputStream = new FileInputStream(current.getData())) {
+                            Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+                        }
                     }
+
                 } catch (IOException e) {
                     String error = "Failed to create file " + filename;
                     error += " in storage " + storageId + ": " + e.getMessage();
@@ -63,6 +69,19 @@ public class FileSystemStorageHandler implements StorageHandler {
                 createStorage(modifiedStorage);
             }
         }
+    }
+
+    private static String getIdentifier(String storageId) {
+        String identifier = "";
+        if (storageId.startsWith("task-") && storageId.endsWith("-def")) { // task storage
+            identifier = storageId.replace("task-", "");
+            identifier = identifier.replace("-def", "");
+        } else if (storageId.startsWith("task-run-inputs-")) { // inputs
+            identifier = storageId.replace("task-run-inputs-", "");
+        } else if (storageId.startsWith("task-run-outputs-")) { // outputs
+            identifier = storageId.replace("task-run-outputs-", "");
+        }
+        return identifier;
     }
 
     @Override
@@ -139,7 +158,7 @@ public class FileSystemStorageHandler implements StorageHandler {
                 } else {
                     entry = current;
                 }
-                if (Files.isRegularFile(path)) {
+                if (Files.isRegularFile(path) || Files.isSymbolicLink(path)) {
                     entry.setData(path.toFile());
                     String fromStorageId = path
                         .toString()
@@ -162,6 +181,8 @@ public class FileSystemStorageHandler implements StorageHandler {
                         .substring(current.getStorageId().length() + 1);
                     if (!subTreeFileName.equalsIgnoreCase(filename)) {
                         entry.setName(subTreeFileName);
+                    } else {
+                        entry.setName(subTreeFileName + "/");
                     }
                     emptyFile.getEntryList().add(entry);
                 }

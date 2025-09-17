@@ -14,7 +14,7 @@ services:
       MONGO_INIT_DATABASE: cytomine
     networks:
       host_network:
-
+        ipv4_address: 172.16.238.2
   postgis:
     image: cytomine/postgis:latest
     restart: unless-stopped
@@ -32,7 +32,7 @@ services:
       POSTGRES_USER: docker
     networks:
       host_network:
-
+        ipv4_address: 172.16.238.3
   registry:
     image: registry:2.8.3
     restart: unless-stopped
@@ -42,6 +42,7 @@ services:
       REGISTRY_STORAGE_DELETE_ENABLED: true
     networks:
       host_network:
+        ipv4_address: 172.16.238.4
 
   redis:
     image: redis:7.2
@@ -51,12 +52,14 @@ services:
       - ${DATA_PATH:-./data}/redis:/data
     networks:
       host_network:
+        ipv4_address: 172.16.238.5
 
   pims-cache:
     image: redis:7.2
     restart: unless-stopped
     networks:
       host_network:
+        ipv4_address: 172.16.238.6
 
   web-ui:
     image: cytomine/web-ui:latest
@@ -67,6 +70,7 @@ services:
       <<: [*version-env]
     networks:
       host_network:
+        ipv4_address: 172.16.238.7
 
   pims:
     image: cytomine/pims:latest
@@ -95,7 +99,7 @@ services:
       WEB_CONCURRENCY: ${WEB_CONCURRENCY:-8}
     networks:
       host_network:
-
+        ipv4_address: 172.16.238.8
   iam:
     image: cytomine/iam:latest
     restart: unless-stopped
@@ -124,6 +128,7 @@ services:
       KEYCLOAK_ADMIN_PASSWORD: YMjl7YGabNbQmjVOONxo9AYSiJyvioTnbsMyBwT8/Jg=
     networks:
       host_network:
+        ipv4_address: 172.16.238.9
 
   app-engine:
     image: cytomine/app-engine:latest
@@ -183,7 +188,7 @@ services:
       SUPER_ADMIN_PUBLIC_KEY: 4162d546-129b-48bd-9098-610cd4c50f33
     networks:
       host_network:
-
+        ipv4_address: 172.16.238.11
   cbir:
     image: cytomine/cbir:latest
     restart: unless-stopped
@@ -201,6 +206,7 @@ services:
       PORT: 6380
     networks:
       host_network:
+        ipv4_address: 172.16.238.12
 
   sam:
     image: cytomine/sam:latest
@@ -212,6 +218,7 @@ services:
       CYTOMINE_PUBLIC_KEY: 9a8b8369-2446-44cb-b0af-604a74e1dcdb
     networks:
       host_network:
+        ipv4_address: 172.16.238.13
 
   nginx:
     image: cytomine/nginx:latest
@@ -238,9 +245,11 @@ services:
       URLS_SCHEME: ${URLS_SCHEME:-http}
     networks:
       host_network:
+        ipv4_address: 172.16.238.14
 
 networks:
   host_network:
+    driver: bridge
     ipam:
       driver: default
       config:

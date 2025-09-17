@@ -33,7 +33,7 @@ FROM ${PROXY_CACHE}/node:${NODE_VERSION}-bookworm-slim AS dev-server
 
 WORKDIR /app
 
-COPY ./ui/scripts/configuration.json /app/ui/public/configuration.json
+COPY ./ui/scripts/configuration.json ./configuration.json
 
 CMD ["npm", "run", "serve", "-w", "ui"]
 
@@ -59,7 +59,7 @@ LABEL org.opencontainers.image.authors="uliege@cytomine.org" \
 WORKDIR /app
 
 COPY ./ui/docker/configs/nginx.conf /etc/nginx/nginx.conf
-COPY ./ui/scripts/configuration.json /app/ui/public/configuration.json
+COPY ./ui/scripts/configuration.json ./configuration.json
 
 COPY --from=frontend-builder /app/ui/dist /app
 

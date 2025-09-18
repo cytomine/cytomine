@@ -9,7 +9,8 @@ public class HasPostgres {
     @Bean
     public PostgreSQLContainer postgreSQLContainer() {
         return new PostgreSQLContainer("postgres:14")
-                .withUsername("appengine")
-                .withDatabaseName("appengine");
+            .withUsername("appengine")
+            .withDatabaseName("appengine")
+            .withPassword("password");
     }
 }

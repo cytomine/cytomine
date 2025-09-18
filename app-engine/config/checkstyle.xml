@@ -332,7 +332,7 @@
                 name="customImportOrderRules"
                 value="STANDARD_JAVA_PACKAGE###THIRD_PARTY_PACKAGE###SPECIAL_IMPORTS###STATIC"
             />
-            <property name="specialImportsRegExp" value="^be\.cytomine\..*" />
+            <property name="specialImportsRegExp" value="^be\.cytomine\.appengine\..*" />
             <property name="tokens" value="IMPORT, STATIC_IMPORT, PACKAGE_DEF" />
         </module>
         <module name="MethodParamPad">

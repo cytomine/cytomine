@@ -301,7 +301,7 @@
                 value="GenericWhitespace ''{0}'' is not preceded with whitespace." />
         </module>
         <module name="Indentation">
-            <property name="forceStrictCondition" value="false" />
+            <property name="forceStrictCondition" value="true" />
         </module>
         <!-- Suppression for block code until we find a way to detect them properly
          until https://github.com/checkstyle/checkstyle/issues/15769 -->

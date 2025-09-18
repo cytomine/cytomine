@@ -49,6 +49,38 @@ This section outlines the procedure for importing datasets, which are formatted 
 The installation guide is available in the [sdafs repository](https://github.com/NBISweden/sdafs?tab=readme-ov-file#sdafs).
 :::
 
+- The structure of the imported directory should follows:
+
+```
+root
+|--- {DATASET_UUID}
+|    |--- DATASET_{IDENTIFIER}
+|         |--- METADATA+
+|         |    |--- dataset.xml
+|         |    |--- policy.xml
+|         |    |--- image.xml
+|         |    |--- annotation.xml
+|         |    |--- observation.xml
+|         |    |--- observer.xml
+|         |    |--- sample.xml
+|         |    |--- staining.xml
+|         |
+|         |--- IMAGES
+|         |    |--- IMAGE_{IDENTIFIER}*
+|         |    |    |--- *.dcm files of an Image
+|         |    |--- IMAGE_{IDENTIFIER}*
+|         |    |    |--- *.dcm files of an Image
+|         |
+|         |--- ANNOTATIONS+
+|         |    |--- *.geojson
+```
+
+- **+** The `METADATA` and `ANNOTATIONS` directories are optional.
+
+::: tip
+If you’re working with `sdafs`, the directories are already organised in the structure shown above.
+:::
+
 ### [Optional] Configuration
 
 ::: tip

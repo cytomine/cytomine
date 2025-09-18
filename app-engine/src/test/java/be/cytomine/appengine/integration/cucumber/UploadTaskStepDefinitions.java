@@ -105,7 +105,7 @@ public class UploadTaskStepDefinitions {
     @Given("Registry service is up and running")
     public void registry_service_is_up_and_running() throws IOException {
         try {
-            io.github.ya_b.registry.client.RegistryClient.delete("registry:5000/img@sha256" +
+            RegistryClient.delete("registry:5000/img@sha256" +
                 ":d53ef00848a227ce64ce71cd7cceb7184fd1f116e0202289b26a576cf87dc4cb");
         } catch (IOException ignored) {
         }

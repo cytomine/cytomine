@@ -114,30 +114,30 @@ public class CollectionType extends Type {
     public void validateFeatureCollection(String json, GeometryType geometryType)
         throws TypeValidationException {
         ObjectMapper objectMapper = new ObjectMapper();
-    
+
         JsonNode rootNode = null;
         try {
             rootNode = objectMapper.readTree(json);
         } catch (JsonProcessingException e) {
             throw new TypeValidationException(ErrorCode.INTERNAL_INVALID_FEATURE_COLLECTION);
         }
-    
+
         // Validate "type"
         if (!rootNode.has("type") || !rootNode.get("type").asText().equals("FeatureCollection")) {
             throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_INVALID_GEOJSON);
         }
-    
+
         // Validate "features" array
         if (!rootNode.has("features") || !rootNode.get("features").isArray()) {
             throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_INVALID_GEOJSON);
         }
-    
+
         // validate against constraints
         int size = rootNode.get("features").size();
         if (size < minSize || size > maxSize) {
             throw new TypeValidationException(ErrorCode.INTERNAL_INVALID_COLLECTION_DIMENSIONS);
         }
-    
+
         // Validate each feature
         for (JsonNode feature : rootNode.get("features")) {
             if (!feature.has("type") || !feature.get("type").asText().equals("Feature")) {
@@ -409,7 +409,7 @@ public class CollectionType extends Type {
             }
         } else {
             Map<String, Object> map = null;
-            if (obj instanceof LinkedHashMap) {
+            if (obj instanceof Map) {
                 map = (LinkedHashMap<String, Object>) obj;
             }
             assert map != null;

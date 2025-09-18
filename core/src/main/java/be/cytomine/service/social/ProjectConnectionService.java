@@ -18,7 +18,6 @@ package be.cytomine.service.social;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -260,10 +259,12 @@ public class ProjectConnectionService {
         List aggregation = connections.getMappedResults();
 
         List<Long> continuousConnections = new ArrayList<>();
-        // don't understand why sometime it is LinkedHashMap and sometimes PersistentConnection :-/
-        if (!aggregation.isEmpty() && aggregation.get(0) instanceof LinkedHashMap) {
+        // don't understand why sometimes it is LinkedHashMap and sometimes PersistentConnection :-/
+        if (!aggregation.isEmpty() && aggregation.get(0) instanceof Map) {
             continuousConnections = (List<Long>)aggregation.stream().map(x ->
-                    x instanceof LinkedHashMap ? be.cytomine.utils.DateUtils.computeDateInMillis((Date)((LinkedHashMap) x).get("created")) :
+                x instanceof Map ?
+                    be.cytomine.utils.DateUtils.computeDateInMillis((Date) ((Map) x).get("created"
+                    )) :
                             be.cytomine.utils.DateUtils.computeDateInMillis((Date)((PersistentConnection) x).getCreated())).collect(Collectors.toList());
         }
 

@@ -321,12 +321,8 @@ public class UploadTaskStepDefinitions {
 
         // and registry
         CatalogResp response = RegistryClient.catalog("http://" + registry, 2, "");
-        boolean repoFound = false;
         String imageName = uploaded.getNamespace().replace(".", "/");
-        for (String repository : response.getRepositories()) {
-            repoFound = repository.equalsIgnoreCase(imageName);
-            break;
-        }
+        response.getRepositories().contains(imageName);
     }
 
     // invalid task bundle tests

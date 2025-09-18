@@ -110,6 +110,7 @@ dependencies {
     // Image processing
     implementation 'org.apache.commons:commons-imaging:1.0.0-alpha5'
     implementation 'org.dcm4che:dcm4che-core:5.31.0'
+    testImplementation 'com.google.cloud.tools:jib-core:0.27.3'
 }
 
 tasks.named('test') {

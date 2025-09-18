@@ -17,7 +17,7 @@
       <div class="panel">
         <p class="panel-heading">{{ $t('app-store') }}</p>
         <section class="panel-block">
-          <AppStoreBrowser />
+          <AppStoreList />
         </section>
       </div>
     </div>
@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import AppStoreBrowser from '@/components/appengine/app-store/AppStoreBrowser.vue';
+import AppStoreList from '@/components/appengine/app-store/AppStoreList.vue';
 import UploadAppButton from './UploadAppButton.vue';
 import AppCard from './AppCard.vue';
 import Task from '@/utils/appengine/task';
@@ -41,7 +41,7 @@ export default {
   name: 'AppEngineMainPage',
   components: {
     AppCard,
-    AppStoreBrowser,
+    AppStoreList,
     UploadAppButton,
   },
   data() {

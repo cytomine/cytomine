@@ -6,6 +6,6 @@
 
 <script>
 export default {
-  name: 'AppStoreBrowser',
+  name: 'AppStoreList',
 };
 </script>

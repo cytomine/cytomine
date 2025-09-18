@@ -1,6 +1,6 @@
 <template>
   <div class="card">
-    <router-link :to="`/appengine/${appData.namespace}/${appData.version}`">
+    <router-link :to="`/app-engine/${appData.namespace}/${appData.version}`">
       <div class="card-image img-rounded">
         <figure class="image is-animated is-5by3">
           <img

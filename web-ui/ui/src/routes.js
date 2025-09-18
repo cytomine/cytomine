@@ -16,6 +16,7 @@
 import VueRouter from 'vue-router';
 
 // Import Components
+import AppPage from './components/appengine/AppPage.vue';
 import GlobalDashboard from './components/GlobalDashboard.vue';
 import ListProjects from './components/project/ListProjects.vue';
 import CytomineStorage from './components/storage/CytomineStorage.vue';
@@ -34,7 +35,6 @@ import CytomineProject from './components/project/CytomineProject.vue';
 import ProjectHome from './components/project/ProjectHome.vue';
 import MemberActivityDetails from './components/project/activity/MemberActivityDetails.vue';
 import AdminPanel from './components/admin/AdminPanel.vue';
-import AppEngineMainPage from './components/appengine/AppEngineMainPage.vue';
 import AppInfoPage from './components/appengine/AppInfoPage.vue';
 import UserActivity from './components/user/UserActivity.vue';
 import PageNotFound from './components/PageNotFound.vue';
@@ -137,15 +137,15 @@ const routes = [
   },
   // AppEngine 
   {
-    path: '/appengine',
-    component: AppEngineMainPage
+    path: '/app-engine',
+    component: AppPage,
   },
   {
-    path: '/appengine/:id',
+    path: '/app-engine/:id',
     component: AppInfoPage,
   },
   {
-    path: '/appengine/:namespace/:version',
+    path: '/app-engine/:namespace/:version',
     component: AppInfoPage,
   },
 

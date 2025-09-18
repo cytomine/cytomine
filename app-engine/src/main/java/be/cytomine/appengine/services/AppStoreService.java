@@ -11,32 +11,35 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-import be.cytomine.appengine.dto.inputs.task.TaskDescription;
-import be.cytomine.appengine.exceptions.AppStoreServiceException;
-import be.cytomine.appengine.exceptions.BundleArchiveException;
-import be.cytomine.appengine.exceptions.TaskServiceException;
 import jakarta.transaction.Transactional;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.appengine.dto.inputs.task.TaskDescription;
 import be.cytomine.appengine.dto.responses.errors.AppEngineError;
 import be.cytomine.appengine.dto.responses.errors.ErrorBuilder;
 import be.cytomine.appengine.dto.responses.errors.ErrorCode;
 import be.cytomine.appengine.exceptions.AppStoreNotFoundException;
+import be.cytomine.appengine.exceptions.AppStoreServiceException;
+import be.cytomine.appengine.exceptions.BundleArchiveException;
 import be.cytomine.appengine.exceptions.ValidationException;
+import be.cytomine.appengine.exceptions.TaskServiceException;
 import be.cytomine.appengine.models.store.AppStore;
 import be.cytomine.appengine.repositories.AppStoreRepository;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
+@Data
 public class AppStoreService {
 
     private final AppStoreRepository appStoreRepository;
     private final TaskService taskService;
+    private final RestTemplate restTemplate;
 
     public Optional<AppStore> findDefault() {
         return appStoreRepository.findByDefaultStoreIsTrue();
@@ -124,7 +127,7 @@ public class AppStoreService {
     }
 
     public File downloadTask(String namespace, String version)
-        throws IOException, RestClientException {
+            throws IOException, RestClientException, AppStoreServiceException {
         log.info("Download Task: downloading ... {}:{}",
             namespace,
             version);
@@ -132,8 +135,12 @@ public class AppStoreService {
         AppStore appStore = new AppStore();
         if (storeOptional.isPresent()) {
             appStore = storeOptional.get();
+        } else {
+            AppEngineError error = ErrorBuilder
+                    .build(ErrorCode.APPSTORE_NO_DEFAULT_STORE);
+            throw new AppStoreServiceException(error);
         }
-        RestTemplate restTemplate = new RestTemplate();
+
         Path tempPath = Path.of("bundle-" + UUID.randomUUID() + ".zip");
         restTemplate.execute(
             appStore.getHost() + "/api/v1/tasks/{namespace}/{version}/bundle.zip",

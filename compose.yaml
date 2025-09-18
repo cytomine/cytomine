@@ -149,7 +149,7 @@ services:
       DB_PASSWORD: password
       DB_PORT: 5432
       DB_USERNAME: appengine
-      REGISTRY_HOST: registry
+      REGISTRY_URL: registry:5000
       STORAGE_BASE_PATH: /path/to/app-engine # Must be an absolute path PLEASE CHANGE
       RUN_STORAGE_BASE_PATH: /path/to/app-engine # MUST be an absolute path PLEASE CHANGE
       PROJECT_DATA_PATH: /path/to/cytomine/data # MUST be an absolute path and match volume A PLEASE CHANGE

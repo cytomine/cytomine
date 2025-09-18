@@ -1,15 +1,22 @@
 package be.cytomine.appengine;
 
+
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
-import be.cytomine.appengine.config.HasPostgres;
 
-@Import(HasPostgres.class)
+@Testcontainers
 @SpringBootTest
 class AppEngineApplicationTests {
+
+    @Container
+    @ServiceConnection
+    static PostgreSQLContainer<?> postgres =
+        new PostgreSQLContainer<>("postgres:16-alpine").withConnectTimeoutSeconds(60);
+
     @Test
-    void contextLoads() {
+     void contextLoads() {
     }
 }

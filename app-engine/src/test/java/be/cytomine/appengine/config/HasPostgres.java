@@ -1,16 +1,14 @@
 package be.cytomine.appengine.config;
 
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
+import net.bytebuddy.utility.dispatcher.JavaDispatcher;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
 
-@TestConfiguration
-public class HasPostgres {
-    @Bean
-    public PostgreSQLContainer postgreSQLContainer() {
-        return new PostgreSQLContainer("postgres:14")
-            .withUsername("appengine")
-            .withDatabaseName("appengine")
-            .withPassword("password");
-    }
+public interface HasPostgres {
+    @Container
+    PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer("postgres:14")
+        .withUsername("appengine")
+        .withDatabaseName("appengine")
+        .withPassword("password");
+
 }

@@ -16,6 +16,36 @@ package be.cytomine.service.social;
 * limitations under the License.
 */
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Accumulators;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.time.DateUtils;
+import org.bson.Document;
+import org.bson.conversions.Bson;
+import org.bson.json.JsonWriterSettings;
+import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.stereotype.Service;
+
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.domain.social.PersistentConnection;
@@ -35,35 +65,22 @@ import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.database.SequenceService;
 import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.utils.JsonObject;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Accumulators;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.time.DateUtils;
-import org.bson.Document;
-import org.bson.conversions.Bson;
-import org.bson.json.JsonWriterSettings;
 
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.*;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.stereotype.Service;
-
-import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
-
-import static com.mongodb.client.model.Aggregates.*;
-import static com.mongodb.client.model.Filters.*;
+import static com.mongodb.client.model.Aggregates.group;
+import static com.mongodb.client.model.Aggregates.limit;
+import static com.mongodb.client.model.Aggregates.match;
+import static com.mongodb.client.model.Aggregates.skip;
+import static com.mongodb.client.model.Aggregates.sort;
+import static com.mongodb.client.model.Filters.and;
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.gte;
+import static com.mongodb.client.model.Filters.in;
+import static com.mongodb.client.model.Filters.lte;
 import static com.mongodb.client.model.Sorts.ascending;
 import static com.mongodb.client.model.Sorts.descending;
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
-import static com.mongodb.client.model.Projections.include;
-import static org.springframework.security.acls.domain.BasePermission.*;
+import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
+import static org.springframework.security.acls.domain.BasePermission.READ;
+import static org.springframework.security.acls.domain.BasePermission.WRITE;
 
 @Slf4j
 @Service
@@ -195,7 +212,8 @@ public class ProjectConnectionService {
 
         AggregationResults queryResults = persistentProjectConnectionRepository.retrieve(project.getId(), sortProperty, (sortDirection.equals("desc")? -1 : 1));
         List aggregation = queryResults.getMappedResults();
-        List<Long> connected = (List<Long>) aggregation.stream().map(x -> x instanceof LinkedHashMap ? (Long)((LinkedHashMap)x).get("user") : (Long)((PersistentProjectConnection)x).getUser()).distinct().collect(Collectors.toList());
+        List<Long> connected = (List<Long>) aggregation.stream().map(x -> x instanceof Map ?
+            (Long) ((Map) x).get("user") : (Long) ((PersistentProjectConnection) x).getUser()).distinct().collect(Collectors.toList());
 
         List<Long> unconnectedIds =  new ArrayList<>(userIds);
         unconnectedIds.removeAll(connected);

@@ -6,47 +6,13 @@ This repository provides the necessary files and instructions to build and launc
 
 ## Installation
 
-For detailed instructions and additional information, please refer to the [Cytomine installation documentation](https://doc.uliege.cytomine.org/admin-guide/ce/installation).
+### Local Installation
 
-### Prerequisites
+For installation procedure, please refer to the [local installation documentation](https://doc.uliege.cytomine.org/admin-guide/ce/installation).
 
-- A **Linux** operating system like [Ubuntu](https://ubuntu.com/), [Debian](https://www.debian.org/), etc.
-- [Docker Engine](https://docs.docker.com/get-docker/) (v20.10+ recommended)
-- [Docker Compose](https://docs.docker.com/compose/) (v2.0+ recommended)
+### Kubernetes Installation
 
-### Installation
-
-> By default, the docker compose is configured to pull images directly from DockerHub.
-
-Run the following command to start the services:
-
-```bash
-docker compose up -d
-```
-
-Once all services are running, the application will be accessible at [http://127.0.0.1](http://127.0.0.1).
-
-### Build the Docker Images
-
-To build all required Docker images for Cytomine, run:
-
-```sh
-docker compose build
-```
-
-### Stop and delete the data from Cytomine
-
-To stop Cytomine and remove its volumes, run:
-
-```sh
-docker compose down -v
-```
-
-To delete the data and databases, run:
-
-```sh
-sudo rm -rf ./data
-```
+For installing Cytomine on Kubernetes, please refer to the [Kubernetes installation documentation](https://doc.uliege.cytomine.org/admin-guide/k8s/installation).
 
 ## License
 

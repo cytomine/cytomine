@@ -74,10 +74,11 @@ dependencies {
     implementation 'org.hibernate:hibernate-spatial:6.3.2.Final'
 
     // Jackson
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.16.0'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.19.0'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.19.0'
     // TODO : fix CVE-2022-41854, Score 6.5 medium vulnerability -> risk of denial of service
     // TODO : fix CVE-2022-1471, Score 9.8 high vulnerability -> remote code execution
-    implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.16.0'
+    implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.19.0'
 
     // Jakarta
     implementation 'jakarta.persistence:jakarta.persistence-api:3.1.0'

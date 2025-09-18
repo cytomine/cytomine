@@ -17,7 +17,7 @@
               />
               <b-menu-item
                 tag="router-link"
-                to="/app-engine"
+                to="/app-engine/store"
                 icon="store"
                 label="App Store"
                 :active="activeTab === 'store'"
@@ -51,7 +51,7 @@ export default {
   name: 'AppSidebar',
   data() {
     return {
-      activeTab: 'dashboard',
+      activeTab: 'apps',
     };
   },
   methods: {

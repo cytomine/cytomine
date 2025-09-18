@@ -1,6 +1,8 @@
 import VueRouter from 'vue-router';
 
 import AppConfiguration from '@/components/appengine/AppConfiguration.vue';
+import AppLocalList from '@/components/appengine/AppLocalList.vue';
+import AppStoreList from '@/components/appengine/AppStoreList.vue';
 import AppPage from '@/components/appengine/AppPage.vue';
 import GlobalDashboard from './components/GlobalDashboard.vue';
 import ListProjects from './components/project/ListProjects.vue';
@@ -119,24 +121,27 @@ const routes = [
     path: '/admin',
     component: AdminPanel
   },
-  // AppEngine 
   {
     path: '/app-engine',
     component: AppPage,
     children: [
       {
+        path: '',
+        component: AppLocalList,
+      },
+      {
         path: 'configuration',
         component: AppConfiguration,
       },
+      {
+        path: 'store',
+        component: AppStoreList,
+      },
+      {
+        path: ':namespace/:version',
+        component: AppInfoPage,
+      },
     ],
-  },
-  {
-    path: '/app-engine/:id',
-    component: AppInfoPage,
-  },
-  {
-    path: '/app-engine/:namespace/:version',
-    component: AppInfoPage,
   },
 
   // redirections for old URLS

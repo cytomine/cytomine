@@ -19,8 +19,8 @@ java {
 }
 
 checkstyle {
-   toolVersion = '10.21.2'
-   configFile = file("${rootProject.projectDir}/checkstyle.xml")
+    toolVersion = '10.21.2'
+    configFile = file("${rootProject.projectDir}/checkstyle.xml")
 }
 
 configurations {
@@ -101,7 +101,7 @@ dependencies {
     testImplementation 'org.junit.vintage:junit-vintage-engine:5.7.2'
 
     // registry client
-    implementation 'com.cytomine:registry-client:3.0.0'
+    implementation 'io.github.ya-b:registry-client:0.1.6'
 
     // liquibase
     liquibaseRuntime 'info.picocli:picocli:4.7.5'

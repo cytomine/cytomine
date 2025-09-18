@@ -5,8 +5,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Objects;
 
-import com.cytomine.registry.client.RegistryClient;
-import com.cytomine.registry.client.http.resp.CatalogResp;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,6 +14,8 @@ import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import io.github.ya_b.registry.client.RegistryClient;
+import io.github.ya_b.registry.client.http.resp.CatalogResp;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -105,7 +105,7 @@ public class UploadTaskStepDefinitions {
     @Given("Registry service is up and running")
     public void registry_service_is_up_and_running() throws IOException {
         try {
-            RegistryClient.delete("registry:5000/img@sha256" +
+            io.github.ya_b.registry.client.RegistryClient.delete("registry:5000/img@sha256" +
                 ":d53ef00848a227ce64ce71cd7cceb7184fd1f116e0202289b26a576cf87dc4cb");
         } catch (IOException ignored) {
         }

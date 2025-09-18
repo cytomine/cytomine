@@ -78,7 +78,15 @@ public class ErrorDefinitions {
         codes.put(ErrorCode.INTERNAL_NULL_PROVISION, new MessageCode("APPE-internal-null-provision", "provision object is null"));
         codes.put(ErrorCode.INTERNAL_UNKNOWN_SUBTYPE, new MessageCode("APPE-internal-unknown-subtype", "collection subtype unknown"));
         codes.put(ErrorCode.INTERNAL_INVALID_METADATA, new MessageCode("APPE-internal-invalid-metadata", "collection array.yml is malformed"));
+        codes.put(ErrorCode.INTERNAL_INVALID_STORE_DATA, new MessageCode("APPE-internal-invalid-store-data", "invalid store data"));
+        codes.put(ErrorCode.INTERNAL_INVALID_STORE_NOT_FOUND, new MessageCode("APPE-internal-store", "store not found"));
+        codes.put(ErrorCode.INTERNAL_INVALID_STORE_ALREADY_EXISTS, new MessageCode("APPE-internal-store-exists", "store already exists"));
+        codes.put(ErrorCode.INTERNAL_NOT_MULTIPART, new MessageCode("APPE-internal-not-multipart", "payload is not multipart"));
+        codes.put(ErrorCode.INTERNAL_NO_FILE_PARTS_FOUND, new MessageCode("APPE-internal-no-file-parts", "payload does not contain file parts"));
+        codes.put(ErrorCode.INTERNAL_NO_FILE_BUT_FORM_FIELD, new MessageCode("APPE-internal-no-file-but-form-field", "payload does not contain file but form field"));
+        codes.put(ErrorCode.INTERNAL_CRC32_CALC_FAILED, new MessageCode("APPE-internal-checksum-failure", "failed to calculate CRC32 checksum for zip entries"));
     }
+
 
     public static MessageCode fromCode(ErrorCode code) {
         if (!codes.containsKey(code)) {

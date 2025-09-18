@@ -32,6 +32,8 @@ public class CollectionPersistence extends TypePersistence {
     @Column(columnDefinition = "json")
     private String compactValue;
 
+    private boolean referenced;
+
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "collection_id")
     private List<TypePersistence> items;

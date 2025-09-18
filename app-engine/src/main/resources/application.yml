@@ -8,6 +8,7 @@ spring:
       max-file-size: 15GB
       max-request-size: 15GB
       location: /tmp/appengine/uploads
+      enabled: false
   datasource:
     password: ${DB_PASSWORD:password}
     url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:appengine}
@@ -51,9 +52,14 @@ scheduler:
     cpus: 1
     ram: 4Gi
   helper-containers-resources:
-    cpu: 200m
-    ram: 200Mi
+    cpu: 1
+    ram: 1Gi
+  run:
+    mode: ${SCHEDULER_RUN_MODE:local} # possible values [local,cluster]
+    storage-base-path: ${RUN_STORAGE_BASE_PATH:/data} # directory in host
+  datasets-path: ${REF_STORAGE_BASE_PATH:/data/datasets} # directory in host contains bigpicture datasets
   advertised-url: ${SCHEDULER_ADVERTISED_URL} # The URL of the app engine, to be requested from the running tasks
+  use-host-network: ${SCHEDULER_USE_HOST_NETWORK}
 registry-client:
   authenticated: false
   user: user #ignored

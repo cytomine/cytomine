@@ -2,8 +2,8 @@ import VueRouter from 'vue-router';
 
 import AppConfiguration from '@/components/appengine/AppConfiguration.vue';
 import AppLocalList from '@/components/appengine/AppLocalList.vue';
-import AppStoreList from '@/components/appengine/AppStoreList.vue';
 import AppPage from '@/components/appengine/AppPage.vue';
+import AppStoreList from '@/components/appengine/AppStoreList.vue';
 import GlobalDashboard from './components/GlobalDashboard.vue';
 import ListProjects from './components/project/ListProjects.vue';
 import CytomineStorage from './components/storage/CytomineStorage.vue';
@@ -126,7 +126,7 @@ const routes = [
     component: AppPage,
     children: [
       {
-        path: '',
+        path: '/',
         component: AppLocalList,
       },
       {

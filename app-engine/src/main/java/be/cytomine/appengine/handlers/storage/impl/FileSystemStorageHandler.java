@@ -15,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import be.cytomine.appengine.dto.handlers.filestorage.Storage;
 import be.cytomine.appengine.exceptions.FileStorageException;
@@ -27,6 +28,7 @@ import be.cytomine.appengine.handlers.StorageStringEntry;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Component
 public class FileSystemStorageHandler implements StorageHandler {
 
     @Value("${storage.base-path}")

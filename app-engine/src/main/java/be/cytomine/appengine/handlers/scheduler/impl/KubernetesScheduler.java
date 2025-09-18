@@ -50,8 +50,8 @@ public class KubernetesScheduler implements SchedulerHandler {
 
     private final RunRepository runRepository;
 
-    @Value("${registry-client.host}")
-    private String registryHost;
+    @Value("${registry.url}")
+    private String registryUrl;
 
     @Value("${scheduler.helper-containers-resources.ram}")
     private String helperContainerRam;
@@ -289,7 +289,7 @@ public class KubernetesScheduler implements SchedulerHandler {
         boolean isClusterMode = this.runMode.equalsIgnoreCase("cluster");
         // Defining the pod image to run
         String podName = task.getName().toLowerCase().replaceAll("[^a-zA-Z0-9]", "") + "-" + runId;
-        String imageName = registryHost + "/" + task.getImageName();
+        String imageName = registryUrl + "/" + task.getImageName();
 
         PodBuilder podBuilder = new PodBuilder()
             .withNewMetadata()

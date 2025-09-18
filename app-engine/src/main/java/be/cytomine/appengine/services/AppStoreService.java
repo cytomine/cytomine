@@ -15,9 +15,10 @@ import jakarta.transaction.Transactional;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.stereotype.Service;
+
 
 import be.cytomine.appengine.dto.inputs.task.TaskDescription;
 import be.cytomine.appengine.dto.responses.errors.AppEngineError;
@@ -26,8 +27,8 @@ import be.cytomine.appengine.dto.responses.errors.ErrorCode;
 import be.cytomine.appengine.exceptions.AppStoreNotFoundException;
 import be.cytomine.appengine.exceptions.AppStoreServiceException;
 import be.cytomine.appengine.exceptions.BundleArchiveException;
-import be.cytomine.appengine.exceptions.ValidationException;
 import be.cytomine.appengine.exceptions.TaskServiceException;
+import be.cytomine.appengine.exceptions.ValidationException;
 import be.cytomine.appengine.models.store.AppStore;
 import be.cytomine.appengine.repositories.AppStoreRepository;
 
@@ -106,8 +107,7 @@ public class AppStoreService {
         TaskServiceException,
         ValidationException,
         BundleArchiveException,
-        AppStoreServiceException
-    {
+        AppStoreServiceException {
         log.info("Install Task: installing ... {}:{}",
             namespace,
             version);

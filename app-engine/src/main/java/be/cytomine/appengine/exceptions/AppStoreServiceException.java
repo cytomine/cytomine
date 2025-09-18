@@ -1,8 +1,9 @@
 package be.cytomine.appengine.exceptions;
 
-import be.cytomine.appengine.dto.responses.errors.AppEngineError;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import be.cytomine.appengine.dto.responses.errors.AppEngineError;
 
 @Data
 @EqualsAndHashCode(callSuper = false)

@@ -111,7 +111,7 @@ public abstract class ModelService<T extends CytomineDomain> {
             entityManager.persist(newObject);
             entityManager.flush();
         } catch (OptimisticLockException e) {
-            log.error("CANNOT SAVE OBJECT");
+            log.error(String.format("CANNOT SAVE OBJECT %s", e));
             newObject = entityManager.merge(newObject);
         } catch (Exception e) {
             throw new WrongArgumentException("Cannot persist object:" + e);

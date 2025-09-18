@@ -61,6 +61,7 @@ public class AppEngineService {
             ResponseEntity<String> result = restTemplate.exchange(buildFullUrl(uri), method, request, String.class);
             return result.getBody();
         } catch (RestClientException e) {
+            log.error("Internal server error [{}]", e.getMessage(), e);
             throw new RestClientException("Internal error");
         }
     }

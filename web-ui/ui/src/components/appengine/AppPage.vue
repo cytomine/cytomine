@@ -1,36 +1,42 @@
 <template>
-  <div class="content-wrapper">
-    <b-loading v-if="loading" :is-full-page="false" :active="loading" />
-    <div v-else-if="appEngineEnabled">
-      <div class="panel">
-        <p class="panel-heading">
-          {{ $t('app-engine.tasks.name') }}
-          <UploadAppButton btnFunc="upload" @taskUploadSuccess="handleTaskUploadSuccess" />
-        </p>
-        <section class="panel-block">
-          <section id="lower-section-flex">
-            <AppCard v-for="app in applications" :key="app.id" :appData="app" />
+  <b-loading v-if="loading" :is-full-page="false" :active="loading" />
+
+  <div class="app-container" v-else-if="appEngineEnabled">
+    <AppSidebar />
+
+    <div class="app-content">
+      <div class="content-wrapper">
+        <div class="panel">
+          <p class="panel-heading">
+            {{ $t('app-engine.tasks.name') }}
+            <UploadAppButton btnFunc="upload" @taskUploadSuccess="handleTaskUploadSuccess" />
+          </p>
+          <section class="panel-block">
+            <section id="lower-section-flex">
+              <AppCard v-for="app in applications" :key="app.id" :appData="app" />
+            </section>
           </section>
-        </section>
-      </div>
+        </div>
 
-      <div class="panel">
-        <p class="panel-heading">{{ $t('app-store') }}</p>
-        <section class="panel-block">
-          <AppStoreList />
-        </section>
+        <div class="panel">
+          <p class="panel-heading">{{ $t('app-store') }}</p>
+          <section class="panel-block">
+            <AppStoreList />
+          </section>
+        </div>
       </div>
     </div>
+  </div>
 
-    <div v-else>
-      <b-message :title="$t('appengine-not-enabled-title')" type="is-info">
-        {{ $t('appengine-not-enabled-description') }}
-      </b-message>
-    </div>
+  <div v-else>
+    <b-message :title="$t('appengine-not-enabled-title')" type="is-info">
+      {{ $t('appengine-not-enabled-description') }}
+    </b-message>
   </div>
 </template>
 
 <script>
+import AppSidebar from '@/components/appengine/AppSidebar.vue';
 import AppStoreList from '@/components/appengine/app-store/AppStoreList.vue';
 import UploadAppButton from './UploadAppButton.vue';
 import AppCard from './AppCard.vue';
@@ -41,6 +47,7 @@ export default {
   name: 'AppPage',
   components: {
     AppCard,
+    AppSidebar,
     AppStoreList,
     UploadAppButton,
   },
@@ -69,6 +76,21 @@ export default {
 </script>
 
 <style scoped>
+.app-container {
+  display: flex;
+  height: 100%;
+  flex: 1;
+  background: #d4d4d4;
+  overflow-y: auto;
+  position: relative;
+}
+
+.app-content {
+  flex: 1;
+  position: relative;
+  overflow-y: auto;
+}
+
 .panel-block {
   padding-top: 0.8em;
 }

@@ -1,6 +1,7 @@
 import VueRouter from 'vue-router';
 
-import AppPage from './components/appengine/AppPage.vue';
+import AppConfiguration from '@/components/appengine/AppConfiguration.vue';
+import AppPage from '@/components/appengine/AppPage.vue';
 import GlobalDashboard from './components/GlobalDashboard.vue';
 import ListProjects from './components/project/ListProjects.vue';
 import CytomineStorage from './components/storage/CytomineStorage.vue';
@@ -122,6 +123,12 @@ const routes = [
   {
     path: '/app-engine',
     component: AppPage,
+    children: [
+      {
+        path: 'configuration',
+        component: AppConfiguration,
+      },
+    ],
   },
   {
     path: '/app-engine/:id',

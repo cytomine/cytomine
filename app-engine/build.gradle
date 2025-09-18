@@ -110,7 +110,6 @@ dependencies {
     // Image processing
     implementation 'org.apache.commons:commons-imaging:1.0.0-alpha5'
     implementation 'org.dcm4che:dcm4che-core:5.31.0'
-    implementation 'com.amihaiemil.web:docker-java-api:0.0.13'
 }
 
 tasks.named('test') {

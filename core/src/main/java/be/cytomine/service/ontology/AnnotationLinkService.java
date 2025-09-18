@@ -74,7 +74,8 @@ public class AnnotationLinkService extends ModelService {
     }
 
     public Optional<AnnotationLink> find(AnnotationGroup group, AnnotationDomain annotation) {
-        Optional<AnnotationLink> annotationLink = annotationLinkRepository.findByAnnotationIdentAndGroup(annotation.getId(), group);
+        Optional<AnnotationLink> annotationLink =
+            annotationLinkRepository.findByAnnotationIdentAndGroup(annotation.getId(), group);
         annotationLink.ifPresent(link -> securityACLService.check(link.container(), READ));
         return annotationLink;
     }
@@ -97,7 +98,8 @@ public class AnnotationLinkService extends ModelService {
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
 
-        AnnotationDomain annotation = AnnotationDomain.getAnnotationDomain(entityManager, json.getJSONAttrLong("annotationIdent"));
+        AnnotationDomain annotation = AnnotationDomain.getAnnotationDomain(entityManager,
+            json.getJSONAttrLong("annotationIdent"));
         securityACLService.check(annotation.getProject(), READ);
         securityACLService.checkIsNotReadOnly(annotation.getProject());
 
@@ -113,7 +115,8 @@ public class AnnotationLinkService extends ModelService {
     }
 
     @Override
-    public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
+    public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task,
+                                  boolean printMessage) {
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
         securityACLService.check(domain.container(), READ);
@@ -121,14 +124,16 @@ public class AnnotationLinkService extends ModelService {
         return executeCommand(new DeleteCommand(currentUser, transaction), domain, null);
     }
 
-    public CommandResponse addAnnotationLink(String annotationClassName, Long annotationIdent, Long groupId, Long imageId, Transaction transaction) {
+    public CommandResponse addAnnotationLink(String annotationClassName, Long annotationIdent,
+                                             Long groupId, Long imageId, Transaction transaction) {
         JsonObject jsonObject = JsonObject.of(
-                "annotationClassName", annotationClassName,
-                "annotationIdent", annotationIdent,
-                "group", groupId,
-                "image", imageId
+            "annotationClassName", annotationClassName,
+            "annotationIdent", annotationIdent,
+            "group", groupId,
+            "image", imageId
         );
 
-        return executeCommand(new AddCommand(currentUserService.getCurrentUser(), transaction), null, jsonObject);
+        return executeCommand(new AddCommand(currentUserService.getCurrentUser(), transaction),
+            null, jsonObject);
     }
 }

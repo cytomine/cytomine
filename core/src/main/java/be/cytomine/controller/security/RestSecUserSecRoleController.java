@@ -1,5 +1,21 @@
 package be.cytomine.controller.security;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.security.SecRole;
 import be.cytomine.domain.security.SecUserSecRole;
@@ -10,13 +26,6 @@ import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.security.SecUserSecRoleService;
 import be.cytomine.utils.JsonObject;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 // TODO IAM: remove?
@@ -30,39 +39,40 @@ public class RestSecUserSecRoleController extends RestCytomineController {
 
     private final UserRepository userRepository;
 
-    private  final SecRoleRepository secRoleRepository;
+    private final SecRoleRepository secRoleRepository;
 
     private final CurrentRoleService currentRoleService;
 
     @GetMapping("/user/{user}/role.json")
     public ResponseEntity<String> list(
-            @PathVariable("user") Long userId,
-            @RequestParam(defaultValue = "false") Boolean highest)
-    {
+        @PathVariable("user") Long userId,
+        @RequestParam(defaultValue = "false") Boolean highest) {
         log.debug("REST request to list roles for user {}", userId);
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ObjectNotFoundException("User", userId));
-        return responseSuccess(highest ? List.of(secUserSecRoleService.getHighest(user)) : secUserSecRoleService.list(user));
+            .orElseThrow(() -> new ObjectNotFoundException("User", userId));
+        return responseSuccess(highest ? List.of(secUserSecRoleService.getHighest(user)) :
+            secUserSecRoleService.list(user));
     }
 
     @GetMapping("/user/{user}/role/{role}.json")
     public ResponseEntity<String> get(
-            @PathVariable("user") Long userId,
-            @PathVariable("role") Long roleId
+        @PathVariable("user") Long userId,
+        @PathVariable("role") Long roleId
     ) {
         log.debug("REST request to list roles for user {}", userId);
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ObjectNotFoundException("User", userId));
+            .orElseThrow(() -> new ObjectNotFoundException("User", userId));
         SecRole role = secRoleRepository.findById(roleId)
-                .orElseThrow(() -> new ObjectNotFoundException("SecRole", roleId));
+            .orElseThrow(() -> new ObjectNotFoundException("SecRole", roleId));
         return responseSuccess(secUserSecRoleService.find(user, role)
-                .orElseThrow(() -> new ObjectNotFoundException("SecUserSecRole", JsonObject.of("user", user.getId(),"role", role.getId()).toJsonString())));
+            .orElseThrow(() -> new ObjectNotFoundException("SecUserSecRole", JsonObject.of("user"
+                , user.getId(), "role", role.getId()).toJsonString())));
     }
 
     @PostMapping("/user/{user}/role.json")
     public ResponseEntity<String> add(
-            @PathVariable("user") Long userId,
-            @RequestBody JsonObject json
+        @PathVariable("user") Long userId,
+        @RequestBody JsonObject json
     ) {
         log.debug("REST add role for {}", json.toJsonString());
         return responseSuccess(secUserSecRoleService.add(json));
@@ -70,31 +80,31 @@ public class RestSecUserSecRoleController extends RestCytomineController {
 
     @DeleteMapping("/user/{user}/role/{role}.json")
     public ResponseEntity<String> delete(
-            @PathVariable("user") Long userId,
-            @PathVariable("role") Long roleId
+        @PathVariable("user") Long userId,
+        @PathVariable("role") Long roleId
     ) {
         log.debug("REST request to list roles for user {} role {}", userId, roleId);
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ObjectNotFoundException("User", userId));
+            .orElseThrow(() -> new ObjectNotFoundException("User", userId));
         SecRole role = secRoleRepository.findById(roleId)
-                .orElseThrow(() -> new ObjectNotFoundException("SecRole", roleId));
+            .orElseThrow(() -> new ObjectNotFoundException("SecRole", roleId));
         SecUserSecRole secSecUserSecRole = secUserSecRoleService.find(user, role)
-                .orElseThrow(() -> new ObjectNotFoundException("SecUserSecRole", JsonObject.of("user", user.getId(), "role", role.getId()).toJsonString()));
+            .orElseThrow(() -> new ObjectNotFoundException("SecUserSecRole", JsonObject.of("user"
+                , user.getId(), "role", role.getId()).toJsonString()));
         return delete(secUserSecRoleService, secSecUserSecRole.toJsonObject(), null);
     }
 
 
-
     @PutMapping("/user/{user}/role/{role}/define.json")
     public ResponseEntity<String> define(
-            @PathVariable("user") Long userId,
-            @PathVariable("role") Long roleId
+        @PathVariable("user") Long userId,
+        @PathVariable("role") Long roleId
     ) {
         log.debug("REST define role {} for user {}", roleId, userId);
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ObjectNotFoundException("User", userId));
+            .orElseThrow(() -> new ObjectNotFoundException("User", userId));
         SecRole role = secRoleRepository.findById(roleId)
-                .orElseThrow(() -> new ObjectNotFoundException("SecRole", roleId));
+            .orElseThrow(() -> new ObjectNotFoundException("SecRole", roleId));
         secUserSecRoleService.define(user, role);
         return responseSuccess(new ArrayList(currentRoleService.findCurrentRole(user)));
     }

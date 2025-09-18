@@ -16,9 +16,15 @@ package be.cytomine.controller.security;
  * limitations under the License.
  */
 
-import be.cytomine.CytomineCoreApplication;
-import be.cytomine.repository.security.UserRepository;
-import be.cytomine.utils.AuthenticationSuccessListener;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.nimbusds.jose.Algorithm;
 import com.nimbusds.jose.JOSEException;
@@ -38,17 +44,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.*;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.security.oauth2.jwt.Jwt;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
+import be.cytomine.CytomineCoreApplication;
+import be.cytomine.repository.security.UserRepository;
+import be.cytomine.utils.AuthenticationSuccessListener;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
@@ -59,38 +65,32 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class Oauth2ResourceServerTests {
 
-    @Autowired
-    private MockMvc allProtectedMockMvc;
-
+    private static final WireMockServer wireMockServer = new WireMockServer(8888);
+    private static final String KEY_ID = "some random string";
+    private static RSAKey rsaKey;
     @Autowired
     AuthenticationSuccessListener authenticationSuccessListener;
-
     @Autowired
     ApplicationEventPublisher applicationEventPublisher;
-
+    @Autowired
+    private MockMvc allProtectedMockMvc;
     @Autowired
     private UserRepository userRepository;
 
-    private static final WireMockServer wireMockServer = new WireMockServer(8888);
-
-    private static RSAKey rsaKey;
-
-    private static final String KEY_ID = "some random string";
-
     public static void configureWireMock(WireMockServer wireMockServer) throws JOSEException {
         rsaKey = new RSAKeyGenerator(2048)
-                .keyUse(KeyUse.SIGNATURE)
-                .algorithm(new Algorithm("RS256"))
-                .keyID(KEY_ID)
-                .generate();
+            .keyUse(KeyUse.SIGNATURE)
+            .algorithm(new Algorithm("RS256"))
+            .keyID(KEY_ID)
+            .generate();
 
         RSAKey rsaPublicJWK = rsaKey.toPublicJWK();
         String jwkResponse = String.format("{\"keys\": [%s]}", rsaPublicJWK.toJSONString());
 
         wireMockServer.stubFor(com.github.tomakehurst.wiremock.client.WireMock.get(urlMatching("/"))
-                .willReturn(aResponse()
-                        .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                        .withBody(jwkResponse)));
+            .willReturn(aResponse()
+                .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                .withBody(jwkResponse)));
 
 
     }
@@ -112,30 +112,30 @@ public class Oauth2ResourceServerTests {
     @Test
     public void whenNoTokenProvided_thenUnauthorized() throws Exception {
         allProtectedMockMvc.perform(get("/api/project/45.json"))
-                .andExpect(status().isUnauthorized());
+            .andExpect(status().isUnauthorized());
     }
 
     @Test
     public void whenInvalidTokenProvided_thenUnauthorized() throws Exception {
         allProtectedMockMvc.perform(get("/api/project/45.json")
-                        .header("Authorization", "Bearer invalid-token"))
-                .andExpect(status().isUnauthorized());
+                .header("Authorization", "Bearer invalid-token"))
+            .andExpect(status().isUnauthorized());
     }
 
     @Test
     public void whenValidTokenProvided_thenNotFoundAsOk() throws Exception {
         // get a valid cytomine access token using password grant from iam microservice
         allProtectedMockMvc.perform(get("/api/project/45.json")
-                        .header("Authorization", "Bearer " + getSignedNotExpiredJwt()))
-                .andExpect(status().isNotFound());
+                .header("Authorization", "Bearer " + getSignedNotExpiredJwt()))
+            .andExpect(status().isNotFound());
     }
 
     @Test
     public void whenExpiredTokenProvided_thenUnauthorized() throws Exception {
         // get a valid cytomine access token using password grant from iam microservice
         allProtectedMockMvc.perform(get("/api/project/45.json")
-                        .header("Authorization", "Bearer " + getSignedExpiredJwt()))
-                .andExpect(status().isUnauthorized());
+                .header("Authorization", "Bearer " + getSignedExpiredJwt()))
+            .andExpect(status().isUnauthorized());
     }
 
 
@@ -161,7 +161,8 @@ public class Oauth2ResourceServerTests {
         List<GrantedAuthority> authorities = new ArrayList<>();
         GrantedAuthority userRole = new SimpleGrantedAuthority("ROLE_USER");
         authorities.add(userRole);
-        JwtAuthenticationToken jwtAuthenticationToken = new JwtAuthenticationToken(jwt, authorities);
+        JwtAuthenticationToken jwtAuthenticationToken = new JwtAuthenticationToken(jwt,
+            authorities);
         applicationEventPublisher.publishEvent(new AuthenticationSuccessEvent(jwtAuthenticationToken));
 
         // assert a user with this sub is created
@@ -184,21 +185,21 @@ public class Oauth2ResourceServerTests {
         Map<String, Object> resource = new HashMap<>();
         List<String> resourceRoles = List.of("ADMIN");
         resource.put("roles", resourceRoles);
-        resourceAccessClaim.put("core" , resource);
+        resourceAccessClaim.put("core", resource);
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-                .expirationTime(new Date(new Date().getTime() + 60 * 1000))
-                .issuer("http://localhost:8888/")
-                .expirationTime(Date.from(expiresAt))
-                .issueTime(Date.from(issuedAt))
-                .claim("iss", "http://localhost:8888/")
-                .claim("sub", UUID.randomUUID())
-                .claim("name", "Some User")
-                .claim("preferred_username", "test_user_from_token")
-                .claim("resource_access" , resourceAccessClaim)
-                .build();
+            .expirationTime(new Date(new Date().getTime() + 60 * 1000))
+            .issuer("http://localhost:8888/")
+            .expirationTime(Date.from(expiresAt))
+            .issueTime(Date.from(issuedAt))
+            .claim("iss", "http://localhost:8888/")
+            .claim("sub", UUID.randomUUID())
+            .claim("name", "Some User")
+            .claim("preferred_username", "test_user_from_token")
+            .claim("resource_access", resourceAccessClaim)
+            .build();
         SignedJWT signedJWT = new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.RS256)
-                .keyID(rsaKey.getKeyID())
-                .build(), claimsSet);
+            .keyID(rsaKey.getKeyID())
+            .build(), claimsSet);
         signedJWT.sign(signer);
         return signedJWT.serialize();
     }

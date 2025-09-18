@@ -9,7 +9,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import be.cytomine.domain.appengine.TaskRun;
 
-public interface TaskRunRepository extends JpaRepository<TaskRun, Long>, JpaSpecificationExecutor<TaskRun> {
+public interface TaskRunRepository extends JpaRepository<TaskRun, Long>,
+    JpaSpecificationExecutor<TaskRun> {
     Optional<TaskRun> findByProjectIdAndTaskRunId(Long projectId, UUID taskRunId);
 
     List<TaskRun> findAllByProjectId(Long projectId);

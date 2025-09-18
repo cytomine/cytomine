@@ -1,32 +1,44 @@
 package be.cytomine.domain.acl;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import org.hibernate.annotations.Immutable;
-
-import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import org.hibernate.annotations.Immutable;
+
 
 @Entity(name = "AclObjectIdentity")
-@Table(name = "acl_object_identity", uniqueConstraints = @UniqueConstraint(name = "uk_acl_object_identity", columnNames = {
-        "object_id_class", "object_id_identity" }))
+@Table(name = "acl_object_identity", uniqueConstraints = @UniqueConstraint(name =
+    "uk_acl_object_identity", columnNames = {
+    "object_id_class", "object_id_identity"}))
 @Immutable
 public class AclObjectIdentity implements Serializable {
 
@@ -41,21 +53,25 @@ public class AclObjectIdentity implements Serializable {
     private Long objectId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "object_id_class", referencedColumnName = "id", nullable = false, unique = false, insertable = true, updatable = true)
+    @JoinColumn(name = "object_id_class", referencedColumnName = "id", nullable = false, unique =
+        false, insertable = true, updatable = true)
     private AclClass objectIdClass;
 
     @Column(name = "entries_inheriting", nullable = false, unique = false)
     private Boolean entriesInheriting;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_object", referencedColumnName = "id", nullable = true, unique = false, insertable = true, updatable = true)
+    @JoinColumn(name = "parent_object", referencedColumnName = "id", nullable = true, unique =
+        false, insertable = true, updatable = true)
     private AclObjectIdentity parentObject;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_sid", referencedColumnName = "id", nullable = true, unique = false, insertable = true, updatable = true)
+    @JoinColumn(name = "owner_sid", referencedColumnName = "id", nullable = true, unique = false,
+        insertable = true, updatable = true)
     private AclSid ownerSid;
 
-    @OneToMany(targetEntity = AclEntry.class, fetch = FetchType.LAZY, mappedBy = "aclObjectIdentity", cascade = CascadeType.REMOVE)
+    @OneToMany(targetEntity = AclEntry.class, fetch = FetchType.LAZY, mappedBy =
+        "aclObjectIdentity", cascade = CascadeType.REMOVE)
     private Set<AclEntry> aclEntries = new HashSet<AclEntry>();
 
     public AclObjectIdentity() {

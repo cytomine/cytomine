@@ -21,7 +21,10 @@ import be.cytomine.service.ontology.AnnotationGroupService;
 import be.cytomine.utils.JsonObject;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -56,17 +59,17 @@ public class AnnotationGroupResourceTests {
     public void add_valid_annotation_group() throws Exception {
         AnnotationGroup annotationGroup = builder.given_a_not_persisted_annotation_group();
         restAnnotationGroupControllerMockMvc.perform(post("/api/annotationgroup.json")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(annotationGroup.toJSON()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.printMessage").value(true))
-                .andExpect(jsonPath("$.callback").exists())
-                .andExpect(jsonPath("$.callback.annotationgroupID").exists())
-                .andExpect(jsonPath("$.callback.method").value("be.cytomine.AddAnnotationGroupCommand"))
-                .andExpect(jsonPath("$.message").exists())
-                .andExpect(jsonPath("$.command").exists())
-                .andExpect(jsonPath("$.annotationgroup.id").exists())
-                .andExpect(jsonPath("$.annotationgroup.imageGroup").exists());
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(annotationGroup.toJSON()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.printMessage").value(true))
+            .andExpect(jsonPath("$.callback").exists())
+            .andExpect(jsonPath("$.callback.annotationgroupID").exists())
+            .andExpect(jsonPath("$.callback.method").value("be.cytomine.AddAnnotationGroupCommand"))
+            .andExpect(jsonPath("$.message").exists())
+            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.annotationgroup.id").exists())
+            .andExpect(jsonPath("$.annotationgroup.imageGroup").exists());
     }
 
     @Test
@@ -76,51 +79,57 @@ public class AnnotationGroupResourceTests {
         JsonObject jsonObject = annotationGroup.toJsonObject();
         String type = UUID.randomUUID().toString();
         jsonObject.put("type", type);
-        restAnnotationGroupControllerMockMvc.perform(put("/api/annotationgroup/{id}.json", annotationGroup.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonObject.toJsonString()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.printMessage").value(true))
-                .andExpect(jsonPath("$.callback").exists())
-                .andExpect(jsonPath("$.callback.annotationgroupID").exists())
-                .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditAnnotationGroupCommand"))
-                .andExpect(jsonPath("$.message").exists())
-                .andExpect(jsonPath("$.command").exists())
-                .andExpect(jsonPath("$.annotationgroup.id").exists())
-                .andExpect(jsonPath("$.annotationgroup.type").value(type));
+        restAnnotationGroupControllerMockMvc.perform(put("/api/annotationgroup/{id}.json",
+                annotationGroup.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonObject.toJsonString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.printMessage").value(true))
+            .andExpect(jsonPath("$.callback").exists())
+            .andExpect(jsonPath("$.callback.annotationgroupID").exists())
+            .andExpect(jsonPath("$.callback.method").value("be.cytomine" +
+                ".EditAnnotationGroupCommand"))
+            .andExpect(jsonPath("$.message").exists())
+            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.annotationgroup.id").exists())
+            .andExpect(jsonPath("$.annotationgroup.type").value(type));
     }
 
     @Test
     @Transactional
     public void delete_annotation_group() throws Exception {
         AnnotationGroup annotationGroup = builder.given_an_annotation_group();
-        restAnnotationGroupControllerMockMvc.perform(delete("/api/annotationgroup/{id}.json", annotationGroup.getId()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.printMessage").value(true))
-                .andExpect(jsonPath("$.callback").exists())
-                .andExpect(jsonPath("$.callback.annotationgroupID").exists())
-                .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteAnnotationGroupCommand"))
-                .andExpect(jsonPath("$.message").exists())
-                .andExpect(jsonPath("$.command").exists())
-                .andExpect(jsonPath("$.annotationgroup.id").exists());
+        restAnnotationGroupControllerMockMvc.perform(delete("/api/annotationgroup/{id}.json",
+                annotationGroup.getId()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.printMessage").value(true))
+            .andExpect(jsonPath("$.callback").exists())
+            .andExpect(jsonPath("$.callback.annotationgroupID").exists())
+            .andExpect(jsonPath("$.callback.method").value("be.cytomine" +
+                ".DeleteAnnotationGroupCommand"))
+            .andExpect(jsonPath("$.message").exists())
+            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.annotationgroup.id").exists());
     }
 
     @Test
     @Transactional
     public void list_annotation_group_by_project() throws Exception {
         AnnotationGroup annotationGroup = builder.given_an_annotation_group();
-        restAnnotationGroupControllerMockMvc.perform(get("/api/project/{id}/annotationgroup.json", annotationGroup.getProject().getId()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.collection[?(@.id==" + annotationGroup.getId() + ")]").exists());
+        restAnnotationGroupControllerMockMvc.perform(get("/api/project/{id}/annotationgroup.json"
+                , annotationGroup.getProject().getId()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.collection[?(@.id==" + annotationGroup.getId() + ")]").exists());
     }
 
     @Test
     @Transactional
     public void list_annotation_group_by_image_group() throws Exception {
         AnnotationGroup annotationGroup = builder.given_an_annotation_group();
-        restAnnotationGroupControllerMockMvc.perform(get("/api/imagegroup/{id}/annotationgroup.json", annotationGroup.getImageGroup().getId()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.collection[?(@.id==" + annotationGroup.getId() + ")]").exists());
+        restAnnotationGroupControllerMockMvc.perform(get("/api/imagegroup/{id}/annotationgroup" +
+                ".json", annotationGroup.getImageGroup().getId()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.collection[?(@.id==" + annotationGroup.getId() + ")]").exists());
     }
 
     @Test
@@ -129,16 +138,20 @@ public class AnnotationGroupResourceTests {
         Project project = builder.given_a_project();
         ImageGroup imageGroup = builder.given_an_imagegroup(project);
         AnnotationGroup annotationGroup = builder.given_an_annotation_group(project, imageGroup);
-        AnnotationGroup annotationGroupToMerge = builder.given_an_annotation_group(project, imageGroup);
-        restAnnotationGroupControllerMockMvc.perform(post("/api/annotationgroup/{id}/annotationgroup/{mergedId}/merge.json", annotationGroup.getId(), annotationGroupToMerge.getId()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.printMessage").value(true))
-                .andExpect(jsonPath("$.callback").exists())
-                .andExpect(jsonPath("$.callback.annotationgroupID").exists())
-                .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditAnnotationGroupCommand"))
-                .andExpect(jsonPath("$.message").exists())
-                .andExpect(jsonPath("$.command").exists())
-                .andExpect(jsonPath("$.annotationgroup.id").exists())
-                .andExpect(jsonPath("$.annotationgroup.id").value(annotationGroup.getId()));
+        AnnotationGroup annotationGroupToMerge = builder.given_an_annotation_group(project,
+            imageGroup);
+        restAnnotationGroupControllerMockMvc.perform(post("/api/annotationgroup/{id" +
+                    "}/annotationgroup/{mergedId}/merge.json", annotationGroup.getId(),
+                annotationGroupToMerge.getId()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.printMessage").value(true))
+            .andExpect(jsonPath("$.callback").exists())
+            .andExpect(jsonPath("$.callback.annotationgroupID").exists())
+            .andExpect(jsonPath("$.callback.method").value("be.cytomine" +
+                ".EditAnnotationGroupCommand"))
+            .andExpect(jsonPath("$.message").exists())
+            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.annotationgroup.id").exists())
+            .andExpect(jsonPath("$.annotationgroup.id").value(annotationGroup.getId()));
     }
 }

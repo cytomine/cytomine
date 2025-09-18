@@ -6,7 +6,14 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import be.cytomine.controller.RestCytomineController;
@@ -31,10 +38,11 @@ public class RestAttachedFileController extends RestCytomineController {
 
     @GetMapping("/domain/{domainClassName}/{domainIdent}/attachedfile.json")
     public ResponseEntity<String> listByDomain(
-            @PathVariable String domainClassName,
-            @PathVariable Long domainIdent
-    )  {
-        log.debug("REST request to list attached file for domain {} {}", domainClassName, domainIdent);
+        @PathVariable String domainClassName,
+        @PathVariable Long domainIdent
+    ) {
+        log.debug("REST request to list attached file for domain {} {}", domainClassName,
+            domainIdent);
 
         return responseSuccess(attachedFileService.findAllByDomain(domainClassName, domainIdent));
     }
@@ -43,39 +51,40 @@ public class RestAttachedFileController extends RestCytomineController {
     public ResponseEntity<String> show(@PathVariable Long id) {
         log.debug("REST request to show attached file {}", id);
         return responseSuccess(attachedFileService.findById(id)
-                .orElseThrow(() -> new ObjectNotFoundException("AttachedFile", id)));
+            .orElseThrow(() -> new ObjectNotFoundException("AttachedFile", id)));
     }
 
     @GetMapping(value = {"/attachedfile/{id}/download.json", "/attachedfile/{id}/download"})
     public void download(@PathVariable Long id) throws IOException {
         log.debug("REST request to download attached file {}", id);
         AttachedFile attachedFile = attachedFileService.findById(id)
-                .orElseThrow(() -> new ObjectNotFoundException("AttachedFile", id));
+            .orElseThrow(() -> new ObjectNotFoundException("AttachedFile", id));
         responseFile(attachedFile.getFilename(), attachedFile.getData());
     }
 
     @RequestMapping(value = "/attachedfile.json", method = {RequestMethod.PUT, RequestMethod.POST})
     public ResponseEntity<String> upload(
-        @RequestParam(required = false)  Long domainIdent,
-        @RequestParam(required = false)  String domainClassName,
-        @RequestParam(required = false)  String filename,
-        @RequestParam(required = false)  String key,
+        @RequestParam(required = false) Long domainIdent,
+        @RequestParam(required = false) String domainClassName,
+        @RequestParam(required = false) String filename,
+        @RequestParam(required = false) String key,
         @RequestPart("files[]") List<MultipartFile> files
-        ) throws ClassNotFoundException, IOException {
+    ) throws ClassNotFoundException, IOException {
         log.debug("REST request to upload attached file");
 
         MultipartFile f = files.get(0);
 
-        if(filename==null) {
+        if (filename == null) {
             filename = f.getOriginalFilename();
             if (filename.contains("/")) {
                 String[] parts = filename.split("/");
-                filename = parts[parts.length-1];
+                filename = parts[parts.length - 1];
             }
         }
         log.info("Upload {} for domain {} {}", filename, domainClassName, domainIdent);
         log.info("File size = {}", f.getSize());
-        AttachedFile attachedFile = attachedFileService.create(filename,f.getBytes(),key,domainIdent,domainClassName);
+        AttachedFile attachedFile = attachedFileService.create(filename, f.getBytes(), key,
+            domainIdent, domainClassName);
         return responseSuccess(attachedFile);
     }
 

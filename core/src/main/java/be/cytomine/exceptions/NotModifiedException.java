@@ -1,9 +1,7 @@
 package be.cytomine.exceptions;
 
-import be.cytomine.domain.CytomineDomain;
-import be.cytomine.utils.JsonObject;
-
 import java.util.Map;
+
 /*
  * Copyright (c) 2009-2022. Authors: see NOTICE file.
  *

@@ -82,7 +82,8 @@ public class AnnotationGroupServiceTests {
     void add_valid_annotation_group_with_success() {
         AnnotationGroup annotationGroup = builder.given_a_not_persisted_annotation_group();
 
-        CommandResponse commandResponse = annotationGroupService.add(annotationGroup.toJsonObject());
+        CommandResponse commandResponse =
+            annotationGroupService.add(annotationGroup.toJsonObject());
 
         AssertionsForClassTypes.assertThat(commandResponse).isNotNull();
         AssertionsForClassTypes.assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -92,7 +93,9 @@ public class AnnotationGroupServiceTests {
     @Test
     void add_annotation_group_with_null_project_fails() {
         AnnotationGroup annotationGroup = builder.given_an_annotation_group();
-        Assertions.assertThrows(ObjectNotFoundException.class, () -> annotationGroupService.add(annotationGroup.toJsonObject().withChange("project", null)));
+        Assertions.assertThrows(ObjectNotFoundException.class,
+            () -> annotationGroupService.add(annotationGroup.toJsonObject().withChange("project",
+                null)));
     }
 
     @Test
@@ -110,7 +113,8 @@ public class AnnotationGroupServiceTests {
         assertThat(commandResponse.getStatus()).isEqualTo(200);
         AssertionsForClassTypes.assertThat(annotationGroupService.find(commandResponse.getObject().getId())).isPresent();
 
-        AnnotationGroup updated = annotationGroupService.find(commandResponse.getObject().getId()).get();
+        AnnotationGroup updated =
+            annotationGroupService.find(commandResponse.getObject().getId()).get();
         assertThat(updated.getProject()).isEqualTo(project2);
     }
 
@@ -118,7 +122,8 @@ public class AnnotationGroupServiceTests {
     void delete_annotation_group_with_success() {
         AnnotationGroup annotationGroup = builder.given_an_annotation_group();
 
-        CommandResponse commandResponse = annotationGroupService.delete(annotationGroup, null, null, true);
+        CommandResponse commandResponse = annotationGroupService.delete(annotationGroup, null,
+            null, true);
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -130,9 +135,11 @@ public class AnnotationGroupServiceTests {
         Project project = builder.given_a_project();
         ImageGroup imageGroup = builder.given_an_imagegroup(project);
         AnnotationGroup annotationGroup = builder.given_an_annotation_group(project, imageGroup);
-        AnnotationGroup annotationGroupToMerge = builder.given_an_annotation_group(project, imageGroup);
+        AnnotationGroup annotationGroupToMerge = builder.given_an_annotation_group(project,
+            imageGroup);
 
-        CommandResponse commandResponse = annotationGroupService.merge(annotationGroup.getId(), annotationGroupToMerge.getId());
+        CommandResponse commandResponse = annotationGroupService.merge(annotationGroup.getId(),
+            annotationGroupToMerge.getId());
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
         AssertionsForClassTypes.assertThat(annotationGroupService.find(annotationGroupToMerge.getId()).isEmpty());

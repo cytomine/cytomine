@@ -1,34 +1,73 @@
 package be.cytomine.service.security;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import jakarta.persistence.Query;
+import jakarta.persistence.Tuple;
+import jakarta.persistence.TupleElement;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.time.DateUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ReflectionUtils;
 
 import be.cytomine.domain.CytomineDomain;
-import be.cytomine.domain.command.*;
+import be.cytomine.domain.command.AddCommand;
+import be.cytomine.domain.command.Command;
+import be.cytomine.domain.command.DeleteCommand;
+import be.cytomine.domain.command.EditCommand;
+import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.server.Storage;
-import be.cytomine.domain.ontology.*;
+import be.cytomine.domain.ontology.AnnotationTerm;
+import be.cytomine.domain.ontology.Ontology;
+import be.cytomine.domain.ontology.ReviewedAnnotation;
+import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.project.ProjectDefaultLayer;
 import be.cytomine.domain.project.ProjectRepresentativeUser;
-import be.cytomine.domain.security.*;
+import be.cytomine.domain.security.SecUserSecRole;
+import be.cytomine.domain.security.User;
 import be.cytomine.domain.social.LastConnection;
 import be.cytomine.dto.NamedCytomineDomain;
 import be.cytomine.dto.auth.AuthInformation;
-import be.cytomine.exceptions.*;
+import be.cytomine.exceptions.AlreadyExistException;
+import be.cytomine.exceptions.ConstraintException;
+import be.cytomine.exceptions.CytomineMethodNotYetImplementedException;
+import be.cytomine.exceptions.ObjectNotFoundException;
+import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.command.CommandHistoryRepository;
 import be.cytomine.repository.command.CommandRepository;
 import be.cytomine.repository.command.RedoStackItemRepository;
@@ -37,11 +76,18 @@ import be.cytomine.repository.image.ImageInstanceRepository;
 import be.cytomine.repository.image.NestedImageInstanceRepository;
 import be.cytomine.repository.image.UploadedFileRepository;
 import be.cytomine.repository.image.server.StorageRepository;
-import be.cytomine.repository.ontology.*;
+import be.cytomine.repository.ontology.AnnotationIndexRepository;
+import be.cytomine.repository.ontology.AnnotationTermRepository;
+import be.cytomine.repository.ontology.OntologyRepository;
+import be.cytomine.repository.ontology.ReviewedAnnotationRepository;
+import be.cytomine.repository.ontology.UserAnnotationRepository;
 import be.cytomine.repository.project.ProjectDefaultLayerRepository;
 import be.cytomine.repository.project.ProjectRepository;
 import be.cytomine.repository.project.ProjectRepresentativeUserRepository;
-import be.cytomine.repository.security.*;
+import be.cytomine.repository.security.AclRepository;
+import be.cytomine.repository.security.SecRoleRepository;
+import be.cytomine.repository.security.SecUserSecRoleRepository;
+import be.cytomine.repository.security.UserRepository;
 import be.cytomine.repositorynosql.social.AnnotationActionRepository;
 import be.cytomine.repositorynosql.social.LastConnectionRepository;
 import be.cytomine.repositorynosql.social.PersistentImageConsultationRepository;
@@ -52,7 +98,10 @@ import be.cytomine.service.ModelService;
 import be.cytomine.service.PermissionService;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.image.server.StorageService;
-import be.cytomine.service.ontology.*;
+import be.cytomine.service.ontology.AnnotationTermService;
+import be.cytomine.service.ontology.OntologyService;
+import be.cytomine.service.ontology.ReviewedAnnotationService;
+import be.cytomine.service.ontology.UserAnnotationService;
 import be.cytomine.service.project.ProjectDefaultLayerService;
 import be.cytomine.service.project.ProjectRepresentativeUserService;
 import be.cytomine.service.project.ProjectService;
@@ -60,24 +109,16 @@ import be.cytomine.service.search.UserSearchExtension;
 import be.cytomine.service.social.ImageConsultationService;
 import be.cytomine.service.social.ProjectConnectionService;
 import be.cytomine.service.social.UserPositionService;
-import be.cytomine.utils.*;
+import be.cytomine.utils.CommandResponse;
+import be.cytomine.utils.JsonObject;
+import be.cytomine.utils.PageUtils;
+import be.cytomine.utils.SQLUtils;
+import be.cytomine.utils.Task;
 import be.cytomine.utils.filters.SearchParameterEntry;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.time.DateUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.*;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ReflectionUtils;
 
-import jakarta.persistence.Query;
-import jakarta.persistence.Tuple;
-import jakarta.persistence.TupleElement;
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import static org.springframework.security.acls.domain.BasePermission.*;
+import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
+import static org.springframework.security.acls.domain.BasePermission.READ;
+import static org.springframework.security.acls.domain.BasePermission.WRITE;
 
 @Slf4j
 @Service
@@ -259,7 +300,9 @@ public class UserService extends ModelService {
     }
 
     // TODO 2024.2
-    public Page<Map<String, Object>> list(List<SearchParameterEntry> searchParameters, String sortColumn, String sortDirection, Long max, Long offset) {
+    public Page<Map<String, Object>> list(List<SearchParameterEntry> searchParameters,
+                                          String sortColumn, String sortDirection, Long max,
+                                          Long offset) {
 
         securityACLService.checkGuest(currentUserService.getCurrentUser());
 
@@ -274,11 +317,12 @@ public class UserService extends ModelService {
             throw new CytomineMethodNotYetImplementedException("User list sorted by " + sortColumn + "is not implemented");
         }
 
-        Optional<SearchParameterEntry> multiSearch = searchParameters.stream().filter(x -> x.getProperty().equals("fullName")).findFirst();
+        Optional<SearchParameterEntry> multiSearch =
+            searchParameters.stream().filter(x -> x.getProperty().equals("fullName")).findFirst();
 
         String select = "SELECT u.* ";
         String from = "FROM sec_user u ";
-        String where = "WHERE true " ;
+        String where = "WHERE true ";
         String search = "";
         String groupBy = "";
         String sort;
@@ -287,7 +331,7 @@ public class UserService extends ModelService {
 
         if (multiSearch.isPresent()) {
             String value = ((String) multiSearch.get().getValue()).toLowerCase();
-            value = "%"+value+"%";
+            value = "%" + value + "%";
             where += " and (u.name ILIKE :name OR u.username ILIKE :name) ";
             mapParams.put("name", value);
         }
@@ -321,7 +365,8 @@ public class UserService extends ModelService {
                 result.put(alias, value);
             }
 
-            JsonObject object = User.getDataFromDomain(new User().buildDomainFromJson(result, getEntityManager()));
+            JsonObject object = User.getDataFromDomain(new User().buildDomainFromJson(result,
+                getEntityManager()));
             results.add(object);
         }
         request = "SELECT COUNT(DISTINCT U.id) " + from + where + search;
@@ -334,23 +379,30 @@ public class UserService extends ModelService {
         return PageUtils.buildPageFromPageResults(results, max, offset, count);
     }
 
-    public Page<JsonObject> listUsersExtendedByProject(Project project, UserSearchExtension userSearchExtension, List<SearchParameterEntry> searchParameters, String sortColumn, String sortDirection, Long max, Long offset) {
+    public Page<JsonObject> listUsersExtendedByProject(Project project,
+                                                       UserSearchExtension userSearchExtension,
+                                                       List<SearchParameterEntry> searchParameters, String sortColumn, String sortDirection, Long max, Long offset) {
 
-        if (ReflectionUtils.findField(User.class, sortColumn) == null && !(List.of("projectRole", "fullName", "lastImageName", "lastConnection", "frequency").contains(sortColumn))) {
+        if (ReflectionUtils.findField(User.class, sortColumn) == null && !(List.of("projectRole",
+            "fullName", "lastImageName", "lastConnection", "frequency").contains(sortColumn))) {
             throw new CytomineMethodNotYetImplementedException("User list sorted by " + sortColumn + "is not implemented");
         }
         if (sortColumn.equals("lastImageName") && !userSearchExtension.isWithLastImage()) {
-            throw new WrongArgumentException("Cannot sort on lastImageName without argument withLastImage");
+            throw new WrongArgumentException("Cannot sort on lastImageName without argument " +
+                "withLastImage");
         }
         if (sortColumn.equals("lastConnection") && !userSearchExtension.isWithLastConnection()) {
-            throw new WrongArgumentException("Cannot sort on lastConnection without argument withLastConnection");
+            throw new WrongArgumentException("Cannot sort on lastConnection without argument " +
+                "withLastConnection");
         }
         if (sortColumn.equals("frequency") && !userSearchExtension.isWithNumberConnections()) {
-            throw new WrongArgumentException("Cannot sort on frequency without argument withNumberConnections");
+            throw new WrongArgumentException("Cannot sort on frequency without argument " +
+                "withNumberConnections");
         }
 
         if (userSearchExtension == null || userSearchExtension.noExtension()) {
-            return listUsersByProject(project, searchParameters, sortColumn, sortDirection, max, offset);
+            return listUsersByProject(project, searchParameters, sortColumn, sortDirection, max,
+                offset);
         } else {
             List<JsonObject> results = new ArrayList<>();
             Page<JsonObject> users;
@@ -365,32 +417,47 @@ public class UserService extends ModelService {
 
             List<Long> userIds;
 
-            if (ReflectionUtils.findField(User.class, sortColumn) != null || sortColumn.equals("projectRole")) {
-                users = this.listUsersByProject(project, searchParameters, sortColumn, sortDirection, max, offset);
+            if (ReflectionUtils.findField(User.class, sortColumn) != null || sortColumn.equals(
+                "projectRole")) {
+                users = this.listUsersByProject(project, searchParameters, sortColumn,
+                    sortDirection, max, offset);
                 usersFetched = true;
             } else {
                 users = this.listUsersByProject(project, searchParameters, "id", "asc", 0L, 0L);
             }
             userIds = users.stream().map(x -> (Long) x.get("id")).collect(Collectors.toList());
-            Map<Long, JsonObject> userMap = users.stream().collect(Collectors.toMap(JsonObject::getId, Function.identity()));
+            Map<Long, JsonObject> userMap =
+                users.stream().collect(Collectors.toMap(JsonObject::getId, Function.identity()));
 
             switch (sortColumn) {
                 case "lastImageName":
-                    images = imageConsultationService.lastImageOfGivenUsersByProject(project, userIds, "name", sortDirection, max, offset);
-                    results = images.stream().map(x -> JsonObject.of("id", x.get("user"), "lastImage", x.get("image"))).collect(Collectors.toList());
-                    userIds = results.stream().map(x -> (Long) x.get("id")).collect(Collectors.toList());
+                    images = imageConsultationService.lastImageOfGivenUsersByProject(project,
+                        userIds, "name", sortDirection, max, offset);
+                    results = images.stream().map(x -> JsonObject.of("id", x.get("user"),
+                        "lastImage", x.get("image"))).collect(Collectors.toList());
+                    userIds =
+                        results.stream().map(x -> (Long) x.get("id")).collect(Collectors.toList());
                     consultationsFetched = true;
                     break;
                 case "lastConnection":
-                    connections = projectConnectionService.lastConnectionOfGivenUsersInProject(project, userIds, "created", sortDirection, max, offset);
-                    results = connections.stream().map(x -> JsonObject.of("id", x.get("user"), "lastConnection", (x.get("created")!=null? ((Date)x.get("created")).getTime() : null))).collect(Collectors.toList());
-                    userIds = results.stream().map(x -> (Long) x.get("id")).collect(Collectors.toList());
+                    connections =
+                        projectConnectionService.lastConnectionOfGivenUsersInProject(project,
+                            userIds, "created", sortDirection, max, offset);
+                    results = connections.stream().map(x -> JsonObject.of("id", x.get("user"),
+                        "lastConnection", (x.get("created") != null ?
+                            ((Date) x.get("created")).getTime() : null))).collect(Collectors.toList());
+                    userIds =
+                        results.stream().map(x -> (Long) x.get("id")).collect(Collectors.toList());
                     connectionsFetched = true;
                     break;
                 case "frequency":
-                    frequencies = projectConnectionService.numberOfConnectionsOfGivenByProject(project, userIds, "frequency", sortDirection, max, offset);
-                    results = frequencies.stream().map(x -> JsonObject.of("id", x.get("user"), "numberConnections", x.getJSONAttrInteger("frequency", 0))).collect(Collectors.toList());
-                    userIds = results.stream().map(x -> (Long) x.get("id")).collect(Collectors.toList());
+                    frequencies =
+                        projectConnectionService.numberOfConnectionsOfGivenByProject(project,
+                            userIds, "frequency", sortDirection, max, offset);
+                    results = frequencies.stream().map(x -> JsonObject.of("id", x.get("user"),
+                        "numberConnections", x.getJSONAttrInteger("frequency", 0))).collect(Collectors.toList());
+                    userIds =
+                        results.stream().map(x -> (Long) x.get("id")).collect(Collectors.toList());
                     frequenciessFetched = true;
                     break;
             }
@@ -402,51 +469,73 @@ public class UserService extends ModelService {
                 }
             }
             if (!consultationsFetched && userSearchExtension.isWithLastImage()) {
-                images = imageConsultationService.lastImageOfUsersByProject(project, userIds, "id", "asc", 0L, 0L);
-                Map<Long, JsonObject> imagesMap = images.stream().collect(Collectors.toMap(x -> x.getJSONAttrLong("user"), Function.identity()));
+                images = imageConsultationService.lastImageOfUsersByProject(project, userIds, "id"
+                    , "asc", 0L, 0L);
+                Map<Long, JsonObject> imagesMap =
+                    images.stream().collect(Collectors.toMap(x -> x.getJSONAttrLong("user"),
+                        Function.identity()));
                 for (JsonObject entry : results) {
-                    Optional<Map<String, Object>> image = Optional.ofNullable(imagesMap.get(entry.getId()));
+                    Optional<Map<String, Object>> image =
+                        Optional.ofNullable(imagesMap.get(entry.getId()));
                     entry.put("lastImage", image.map(x -> x.get("image")).orElse(null));
                 }
                 consultationsFetched = true;
             }
             if (!connectionsFetched && userSearchExtension.isWithLastConnection()) {
-                connections = projectConnectionService.lastConnectionInProject(project, userIds, "id", "asc", 0L, 0L);
-                Map<Long, JsonObject> connectionsMap = connections.stream().collect(Collectors.toMap(x -> x.getJSONAttrLong("user"), Function.identity()));
+                connections = projectConnectionService.lastConnectionInProject(project, userIds,
+                    "id", "asc", 0L, 0L);
+                Map<Long, JsonObject> connectionsMap =
+                    connections.stream().collect(Collectors.toMap(x -> x.getJSONAttrLong("user"),
+                        Function.identity()));
                 for (JsonObject user : results) {
-                    Optional<Map<String, Object>> connection = Optional.ofNullable(connectionsMap.get(user.getId()));
-                    user.put("lastConnection", connection.map(x -> (x.get("created")!=null ? ((Date)x.get("created")).getTime() : null)).orElse(null));
+                    Optional<Map<String, Object>> connection =
+                        Optional.ofNullable(connectionsMap.get(user.getId()));
+                    user.put("lastConnection", connection.map(x -> (x.get("created") != null ?
+                        ((Date) x.get("created")).getTime() : null)).orElse(null));
                 }
                 connectionsFetched = true;
             }
             if (!frequenciessFetched && userSearchExtension.isWithNumberConnections()) {
-                frequencies = projectConnectionService.numberOfConnectionsByProjectAndUser(project, userIds, "id", "asc", 0L, 0L);
-                Map<Long, JsonObject> frequencyMap = frequencies.stream().collect(Collectors.toMap(x -> x.getJSONAttrLong("user"), Function.identity()));
+                frequencies =
+                    projectConnectionService.numberOfConnectionsByProjectAndUser(project, userIds
+                        , "id", "asc", 0L, 0L);
+                Map<Long, JsonObject> frequencyMap =
+                    frequencies.stream().collect(Collectors.toMap(x -> x.getJSONAttrLong("user"),
+                        Function.identity()));
                 for (JsonObject user : results) {
-                    Optional<JsonObject> frequency = Optional.ofNullable(frequencyMap.get(user.getId()));
-                    user.put("numberConnections", frequency.map(x -> x.getJSONAttrInteger("frequency",0)).orElse(null));
+                    Optional<JsonObject> frequency =
+                        Optional.ofNullable(frequencyMap.get(user.getId()));
+                    user.put("numberConnections", frequency.map(x -> x.getJSONAttrInteger(
+                        "frequency", 0)).orElse(null));
                 }
                 frequenciessFetched = true;
             }
-            return PageUtils.buildPageFromPageResults(results, max, offset, (long)results.size());
+            return PageUtils.buildPageFromPageResults(results, max, offset, (long) results.size());
         }
 
     }
 
-    public Page<JsonObject> listUsersByProject(Project project, List<SearchParameterEntry> searchParameters, String sortColumn, String sortDirection, Long max, Long offset) {
+    public Page<JsonObject> listUsersByProject(Project project,
+                                               List<SearchParameterEntry> searchParameters,
+                                               String sortColumn, String sortDirection, Long max,
+                                               Long offset) {
         securityACLService.check(project, READ);
         // migration from grails: parameter boolean withProjectRole is always true
-        Optional<SearchParameterEntry> onlineUserSearch = searchParameters.stream().filter(x -> x.getProperty().equals("status") && x.getValue().equals("online")).findFirst();
-        Optional<SearchParameterEntry> multiSearch = searchParameters.stream().filter(x -> x.getProperty().equals("fullName")).findFirst();
-        Optional<SearchParameterEntry> projectRoleSearch = searchParameters.stream().filter(x -> x.getProperty().equals("projectRole")).findFirst();
+        Optional<SearchParameterEntry> onlineUserSearch =
+            searchParameters.stream().filter(x -> x.getProperty().equals("status") && x.getValue().equals("online")).findFirst();
+        Optional<SearchParameterEntry> multiSearch =
+            searchParameters.stream().filter(x -> x.getProperty().equals("fullName")).findFirst();
+        Optional<SearchParameterEntry> projectRoleSearch =
+            searchParameters.stream().filter(x -> x.getProperty().equals("projectRole")).findFirst();
 
         String select = "select distinct user ";
-        String from = "from ProjectRepresentativeUser r right outer join r.user user ON (r.project.id = " + project.getId() + "), " +
-                "AclObjectIdentity as aclObjectId, AclEntry as aclEntry, AclSid as aclSid ";
+        String from = "from ProjectRepresentativeUser r right outer join r.user user ON (r" +
+            ".project.id = " + project.getId() + "), " +
+            "AclObjectIdentity as aclObjectId, AclEntry as aclEntry, AclSid as aclSid ";
         String where = "where aclObjectId.objectId = " + project.getId() + " " +
-                "and aclEntry.aclObjectIdentity = aclObjectId " +
-                "and aclEntry.sid = aclSid " +
-                "and aclSid.sid = user.username ";
+            "and aclEntry.aclObjectIdentity = aclObjectId " +
+            "and aclEntry.sid = aclSid " +
+            "and aclSid.sid = user.username ";
         String groupBy = "";
         String order = "";
         String having = "";
@@ -465,18 +554,23 @@ public class UserService extends ModelService {
 
 
         if (projectRoleSearch.isPresent()) {
-            List<String> roles = (projectRoleSearch.get().getValue() instanceof String) ? List.of((String) projectRoleSearch.get().getValue()) : (List<String>) projectRoleSearch.get().getValue();
+            List<String> roles = (projectRoleSearch.get().getValue() instanceof String) ?
+                List.of((String) projectRoleSearch.get().getValue()) :
+                (List<String>) projectRoleSearch.get().getValue();
             having += " HAVING MAX(CASE WHEN r.id IS NOT NULL THEN 'representative' " +
-                    "WHEN aclEntry.mask = 16 THEN 'manager' " +
-                    "ELSE 'contributor' END) IN (" + roles.stream().map(x -> "'" + x + "'").collect(Collectors.joining(",")) + ")";
+                "WHEN aclEntry.mask = 16 THEN 'manager' " +
+                "ELSE 'contributor' END) IN (" + roles.stream().map(x -> "'" + x + "'").collect(Collectors.joining(",")) + ")";
         }
 
         //works because 'contributor' < 'manager' < 'representative'
         select += ", MAX( CASE WHEN r.id IS NOT NULL THEN 'representative'\n" +
-                "     WHEN aclEntry.mask = 16 THEN 'manager'\n" +
-                "     ELSE 'contributor'\n" +
-                " END) as role ";
-        groupBy = "GROUP BY user.id , user.accountExpired , user.accountLocked, user.created, user.enabled, user.origin, user.password, user.passwordExpired, user.privateKey, user.publicKey, user.updated, user.username, user.version,user.email,user.firstname,user.isDeveloper,user.language,user.lastname,user.creator,user.name,user.reference";
+            "     WHEN aclEntry.mask = 16 THEN 'manager'\n" +
+            "     ELSE 'contributor'\n" +
+            " END) as role ";
+        groupBy = "GROUP BY user.id , user.accountExpired , user.accountLocked, user.created, " +
+            "user.enabled, user.origin, user.password, user.passwordExpired, user.privateKey, " +
+            "user.publicKey, user.updated, user.username, user.version,user.email,user.firstname," +
+            "user.isDeveloper,user.language,user.lastname,user.creator,user.name,user.reference";
 
         if (sortColumn.equals("projectRole")) {
             sortColumn = "role";
@@ -491,10 +585,10 @@ public class UserService extends ModelService {
 
         Query query = getEntityManager().createQuery(request, Object[].class);
 
-        if (max>0) {
+        if (max > 0) {
             query.setMaxResults(max.intValue());
         }
-        if (offset>0) {
+        if (offset > 0) {
             query.setFirstResult(offset.intValue());
         }
 
@@ -518,7 +612,8 @@ public class UserService extends ModelService {
 //                String alias = SQLUtils.toCamelCase(element.getAlias());
 //                result.put(alias, value);
 //            }
-//            JsonObject object = Project.getDataFromDomain(new User().buildDomainFromJson(result, getEntityManager()));
+//            JsonObject object = Project.getDataFromDomain(new User().buildDomainFromJson
+//            (result, getEntityManager()));
 //            object.put("role", result.get("role"));
 //            results.add(object);
 //        }
@@ -544,7 +639,7 @@ public class UserService extends ModelService {
     }
 
     public Optional<User> findCreator(Project project) {
-        securityACLService.check(project,READ);
+        securityACLService.check(project, READ);
         return aclRepository.listCreators(project.getId()).stream().findFirst();
     }
 
@@ -576,6 +671,7 @@ public class UserService extends ModelService {
     public List<User> listAll(Project project) {
         return new ArrayList<>(listUsers(project));
     }
+
     /**
      * List all layers from a project
      * Each user has its own layer
@@ -592,13 +688,15 @@ public class UserService extends ModelService {
 
         List<JsonObject> layersFormatted = new ArrayList<>();
 
-        if (permissionService.hasACLPermission(project, ADMINISTRATION, currentRoleService.isAdminByNow(currentUser))
-                || (!project.isHideAdminsLayers() && !project.isHideUsersLayers())) {
+        if (permissionService.hasACLPermission(project, ADMINISTRATION,
+            currentRoleService.isAdminByNow(currentUser))
+            || (!project.isHideAdminsLayers() && !project.isHideUsersLayers())) {
             layersFormatted.addAll(humanUsersFormatted);
         } else if (project.isHideAdminsLayers() && !project.isHideUsersLayers()) {
-            Set<Long> humanAdminsIds = humanAdmins.stream().map(CytomineDomain::getId).collect(Collectors.toSet());
+            Set<Long> humanAdminsIds =
+                humanAdmins.stream().map(CytomineDomain::getId).collect(Collectors.toSet());
             layersFormatted.addAll(humanUsersFormatted.stream()
-                    .filter(x -> !humanAdminsIds.contains(x.getJSONAttrLong("id"))).toList());
+                .filter(x -> !humanAdminsIds.contains(x.getJSONAttrLong("id"))).toList());
         } else if (!project.isHideAdminsLayers()) {
             layersFormatted.addAll(humanAdmins.stream().map(User::toJsonObject).toList());
         }
@@ -612,8 +710,9 @@ public class UserService extends ModelService {
 
     public List<JsonObject> getAllOnlineUserWithTheirPositions(Project project) {
 //        //Get all project user online
-        List<Long> usersId = this.getAllFriendsUsersOnline(currentUserService.getCurrentUser(), project).stream().map(CytomineDomain::getId)
-                    .collect(Collectors.toList());
+        List<Long> usersId = this.getAllFriendsUsersOnline(currentUserService.getCurrentUser(),
+                project).stream().map(CytomineDomain::getId)
+            .collect(Collectors.toList());
         List<JsonObject> usersWithPosition = userPositionService.findUsersPositions(project);
         usersId.removeAll(usersWithPosition.stream().map(JsonObject::getId).toList());
 
@@ -625,34 +724,42 @@ public class UserService extends ModelService {
     }
 
 
-
     public JsonObject getResumeActivities(Project project, User user) {
-        securityACLService.checkIsSameUserOrAdminContainer(project,user, currentUserService.getCurrentUser());
+        securityACLService.checkIsSameUserOrAdminContainer(project, user,
+            currentUserService.getCurrentUser());
         JsonObject jsonObject = new JsonObject();
 
         jsonObject.put("firstConnection", persistentProjectConnectionRepository
-                .findAllByUserAndProject(user.getId(), project.getId(), PageRequest.of(0, 1, Sort.by(Sort.Direction.ASC, "created"))).stream().findFirst().map(x -> x.getCreated()).orElse(null));
+            .findAllByUserAndProject(user.getId(), project.getId(), PageRequest.of(0, 1,
+                Sort.by(Sort.Direction.ASC, "created"))).stream().findFirst().map(x -> x.getCreated()).orElse(null));
         jsonObject.put("lastConnection", persistentProjectConnectionRepository
-                .findAllByUserAndProject(user.getId(), project.getId(), PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "created"))).stream().findFirst().map(x -> x.getCreated()).orElse(null));
+            .findAllByUserAndProject(user.getId(), project.getId(), PageRequest.of(0, 1,
+                Sort.by(Sort.Direction.DESC, "created"))).stream().findFirst().map(x -> x.getCreated()).orElse(null));
 
         jsonObject.put("totalAnnotations", userAnnotationService.count(user, project));
-        jsonObject.put("totalConnections", persistentProjectConnectionRepository.countAllByProjectAndUser(project.getId(), user.getId()));
-        jsonObject.put("totalConsultations", persistentImageConsultationRepository.countByProjectAndUser(project.getId(), user.getId()));
-        jsonObject.put("totalAnnotationSelections", annotationActionRepository.countByProjectAndUserAndAction(project.getId(), user.getId(), "select"));
+        jsonObject.put("totalConnections",
+            persistentProjectConnectionRepository.countAllByProjectAndUser(project.getId(),
+                user.getId()));
+        jsonObject.put("totalConsultations",
+            persistentImageConsultationRepository.countByProjectAndUser(project.getId(),
+                user.getId()));
+        jsonObject.put("totalAnnotationSelections",
+            annotationActionRepository.countByProjectAndUserAndAction(project.getId(),
+                user.getId(), "select"));
 
         return jsonObject;
     }
 
-    public String fillEmptyUserIds(String users, Long project){
+    public String fillEmptyUserIds(String users, Long project) {
         if (users == null || users.isEmpty()) {
             users = getUsersIdsFromProject(project);
         }
         return users;
     }
 
-    public String getUsersIdsFromProject(Long project){
+    public String getUsersIdsFromProject(Long project) {
         String users = "";
-        for (User user: listUsers(projectService.get(project))) {
+        for (User user : listUsers(projectService.get(project))) {
             users += user.getId() + ",";
         }
         return users;
@@ -660,15 +767,23 @@ public class UserService extends ModelService {
 
     public List<JsonObject> getUsersWithLastActivities(Project project) {
         List<JsonObject> results = new ArrayList<>();
-        List<User> users = listUsers(project).stream().sorted(Comparator.comparing(CytomineDomain::getId)).toList();
+        List<User> users =
+            listUsers(project).stream().sorted(Comparator.comparing(CytomineDomain::getId)).toList();
 
 
-        Map<Long, JsonObject> connections = projectConnectionService.lastConnectionInProject(project, null, "user", "asc", 0L, 0L)
-                .stream().collect(Collectors.toMap(x -> x.getJSONAttrLong("user"), Function.identity()));
-        Map<Long, JsonObject> frequencies = projectConnectionService.numberOfConnectionsByProjectAndUser(project, null, "user", "asc", 0L, 0L)
-                .stream().collect(Collectors.toMap(x -> x.getJSONAttrLong("user"), Function.identity()));
-        Map<Long, JsonObject> images = imageConsultationService.lastImageOfUsersByProject(project, null, "user", "asc", 0L, 0L)
-                .stream().collect(Collectors.toMap(x -> x.getJSONAttrLong("user"), Function.identity()));
+        Map<Long, JsonObject> connections =
+            projectConnectionService.lastConnectionInProject(project, null, "user", "asc", 0L, 0L)
+                .stream().collect(Collectors.toMap(x -> x.getJSONAttrLong("user"),
+                    Function.identity()));
+        Map<Long, JsonObject> frequencies =
+            projectConnectionService.numberOfConnectionsByProjectAndUser(project, null, "user",
+                    "asc", 0L, 0L)
+                .stream().collect(Collectors.toMap(x -> x.getJSONAttrLong("user"),
+                    Function.identity()));
+        Map<Long, JsonObject> images = imageConsultationService.lastImageOfUsersByProject(project
+                , null, "user", "asc", 0L, 0L)
+            .stream().collect(Collectors.toMap(x -> x.getJSONAttrLong("user"),
+                Function.identity()));
 
         for (User user : users) {
             if (user != null) {
@@ -681,10 +796,11 @@ public class UserService extends ModelService {
                 jsonObject.put("username", user.getUsername());
                 jsonObject.put("name", user.getName());
                 jsonObject.put("fullName", user.getFullName());
-                jsonObject.put("lastImageId", (image!=null? image.get("image") : null));
-                jsonObject.put("lastImageName", (image!=null? image.get("imageName") : null));
-                jsonObject.put("lastConnection", (connection!=null? connection.get("created") : null));
-                jsonObject.put("frequency", (frequency!=null? frequency.get("frequency") : 0));
+                jsonObject.put("lastImageId", (image != null ? image.get("image") : null));
+                jsonObject.put("lastImageName", (image != null ? image.get("imageName") : null));
+                jsonObject.put("lastConnection", (connection != null ? connection.get("created")
+                    : null));
+                jsonObject.put("frequency", (frequency != null ? frequency.get("frequency") : 0));
                 results.add(jsonObject);
             }
 
@@ -700,8 +816,10 @@ public class UserService extends ModelService {
         //get date with -X secondes
         Date xSecondAgo = DateUtils.addSeconds(new Date(), -300);
         // TODO: could be improve regarding performance...
-        List<LastConnection> connections = lastConnectionRepository.findAllByCreatedAfter(xSecondAgo);
-        List<Long> userIds = connections.stream().map(LastConnection::getUser).distinct().collect(Collectors.toList());
+        List<LastConnection> connections =
+            lastConnectionRepository.findAllByCreatedAfter(xSecondAgo);
+        List<Long> userIds =
+            connections.stream().map(LastConnection::getUser).distinct().collect(Collectors.toList());
         return userRepository.findAllByIdIn(userIds);
     }
 
@@ -713,8 +831,10 @@ public class UserService extends ModelService {
         //get date with -X secondes
         Date xSecondAgo = DateUtils.addSeconds(new Date(), -300);
         // TODO: could be improve regarding performance...
-        List<LastConnection> connections = lastConnectionRepository.findAllByProjectAndCreatedAfter(project.getId(), xSecondAgo);
-        List<Long> userIds = connections.stream().map(LastConnection::getUser).distinct().collect(Collectors.toList());
+        List<LastConnection> connections =
+            lastConnectionRepository.findAllByProjectAndCreatedAfter(project.getId(), xSecondAgo);
+        List<Long> userIds =
+            connections.stream().map(LastConnection::getUser).distinct().collect(Collectors.toList());
         return userIds;
     }
 
@@ -741,9 +861,9 @@ public class UserService extends ModelService {
         securityACLService.checkIsSameUser(user, currentUserService.getCurrentUser());
         List<User> friends = getAllFriendsUsers(user);
         List<User> friendsOnline = getAllOnlineUsers().stream()
-                .distinct()
-                .filter(friends::contains)
-                .collect(Collectors.toList());
+            .distinct()
+            .filter(friends::contains)
+            .collect(Collectors.toList());
         return friendsOnline;
     }
 
@@ -768,7 +888,8 @@ public class UserService extends ModelService {
      * @param json New domain data
      * @return Response structure (created domain data,..)
      */
-    // TODO IAM: refactor. ADMIN ROLE can create IAM account (and create the underlying Cytomine user to the cache)
+    // TODO IAM: refactor. ADMIN ROLE can create IAM account (and create the underlying Cytomine
+    //  user to the cache)
     public CommandResponse add(JsonObject json) {
         synchronized (this.getClass()) {
             User currentUser = currentUserService.getCurrentUser();
@@ -790,8 +911,10 @@ public class UserService extends ModelService {
      * @param jsonNewData New domain datas
      * @return Response structure (new domain data, old domain data..)
      */
-    // TODO IAM: refactor. ADMIN ROLE can update an IAM account (and update the underlying Cytomine user to the cache)
-    public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
+    // TODO IAM: refactor. ADMIN ROLE can update an IAM account (and update the underlying
+    //  Cytomine user to the cache)
+    public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData,
+                                  Transaction transaction) {
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.checkIsCreator((User) domain, currentUser);
         return executeCommand(new EditCommand(currentUser, null), domain, jsonNewData);
@@ -806,8 +929,10 @@ public class UserService extends ModelService {
      * @param printMessage Flag if client will print or not confirm message
      * @return Response structure (code, old domain,..)
      */
-    // TODO IAM: refactor. ADMIN ROLE can delete IAM account (and delete the underlying Cytomine user from the cache)
-    public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
+    // TODO IAM: refactor. ADMIN ROLE can delete IAM account (and delete the underlying Cytomine
+    //  user from the cache)
+    public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task,
+                                  boolean printMessage) {
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.checkAdmin(currentUser);
         securityACLService.checkIsSameUser((User) domain, currentUser);
@@ -834,10 +959,11 @@ public class UserService extends ModelService {
     // TODO IAM: refactor: the unique constraint must be on IAM reference
     public void checkDoNotAlreadyExist(CytomineDomain domain) {
         User user = (User) domain;
-        if (user.getUsername()==null) {
+        if (user.getUsername() == null) {
             throw new WrongArgumentException("Username is not set");
         }
-        Optional<User> userWithSameUsername = userRepository.findByUsernameLikeIgnoreCase(user.getUsername());
+        Optional<User> userWithSameUsername =
+            userRepository.findByUsernameLikeIgnoreCase(user.getUsername());
         if (userWithSameUsername.isPresent() && !Objects.equals(userWithSameUsername.get().getId(), user.getId())) {
             throw new AlreadyExistException("User " + user.getUsername() + " already exist!");
         }
@@ -864,9 +990,11 @@ public class UserService extends ModelService {
                 permissionService.addPermission(project, user.getUsername(), READ);
                 if (project.getOntology() != null) {
                     log.info("addUserToProject ontology=" + project.getOntology() + " user=" + user + " ADMIN=" + admin);
-                    permissionService.addPermission(project.getOntology(), user.getUsername(), READ);
+                    permissionService.addPermission(project.getOntology(), user.getUsername(),
+                        READ);
                     if (admin) {
-                        permissionService.addPermission(project.getOntology(), user.getUsername(), ADMINISTRATION);
+                        permissionService.addPermission(project.getOntology(), user.getUsername()
+                            , ADMINISTRATION);
                     }
                 }
             }
@@ -901,25 +1029,30 @@ public class UserService extends ModelService {
                 removeOntologyRightIfNecessary(project, (User) user, admin);
             }
             // if no representative, add current user as a representative
-            boolean hasLostAccessToProject = (!permissionService.hasACLPermission(project, user.getUsername(), READ) && !permissionService.hasACLPermission(project, user.getUsername(), READ));
-            boolean isLastRepresentative = projectRepresentativeUserService.listByProject(project).size() == 1 &&
+            boolean hasLostAccessToProject = (!permissionService.hasACLPermission(project,
+                user.getUsername(), READ) && !permissionService.hasACLPermission(project,
+                user.getUsername(), READ));
+            boolean isLastRepresentative =
+                projectRepresentativeUserService.listByProject(project).size() == 1 &&
                     projectRepresentativeUserService.listByProject(project).get(0).getUser().getId().equals(user.getId());
             if (hasLostAccessToProject && isLastRepresentative) {
                 if (!securityACLService.getProjectList(currentUserService.getCurrentUser(), null).contains(project)) {
                     // if current user is not in project (= SUPERADMIN), add to the project
                     addUserToProject(currentUserService.getCurrentUser(), project, true);
                 }
-                log.info("add current user " + currentUserService.getCurrentUsername() + " as representative for project " + project.getId());
+                log.info("add current user " + currentUserService.getCurrentUsername() + " as " +
+                    "representative for project " + project.getId());
                 ProjectRepresentativeUser pru = new ProjectRepresentativeUser();
                 pru.setProject(project);
                 pru.setUser((User) currentUserService.getCurrentUser());
                 projectRepresentativeUserService.add(pru.toJsonObject());
 
                 projectRepresentativeUserService.find(project, (User) user)
-                        .ifPresent(x -> projectRepresentativeUserService.delete(x, null, null, false));
+                    .ifPresent(x -> projectRepresentativeUserService.delete(x, null, null, false));
 
             }
-            log.info("deleteUserFromProject " + permissionService.hasACLPermission(project, user.getUsername(), ADMINISTRATION));
+            log.info("deleteUserFromProject " + permissionService.hasACLPermission(project,
+                user.getUsername(), ADMINISTRATION));
         }
     }
 
@@ -932,12 +1065,16 @@ public class UserService extends ModelService {
         if (otherProjects.isEmpty()) {
             //user has no other project with this ontology, remove the right!
             permissionService.deletePermission(project.getOntology(), user.getUsername(), READ);
-            permissionService.deletePermission(project.getOntology(), user.getUsername(), ADMINISTRATION);
+            permissionService.deletePermission(project.getOntology(), user.getUsername(),
+                ADMINISTRATION);
         } else if (admin) {
-            List<Long> managedProjectList = projectService.listByAdmin(user).stream().map(NamedCytomineDomain::getId).toList();
-            List<Long> otherProjectsIds = otherProjects.stream().map(CytomineDomain::getId).toList();
+            List<Long> managedProjectList =
+                projectService.listByAdmin(user).stream().map(NamedCytomineDomain::getId).toList();
+            List<Long> otherProjectsIds =
+                otherProjects.stream().map(CytomineDomain::getId).toList();
             if (managedProjectList.stream().noneMatch(otherProjectsIds::contains)) {
-                permissionService.deletePermission(project.getOntology(), user.getUsername(), ADMINISTRATION);
+                permissionService.deletePermission(project.getOntology(), user.getUsername(),
+                    ADMINISTRATION);
             }
         }
 
@@ -952,7 +1089,8 @@ public class UserService extends ModelService {
     }
 
     public void deleteUserFromStorage(User user, Storage storage) {
-        securityACLService.checkIsSameUserOrAdminContainer(storage, user, currentUserService.getCurrentUser());
+        securityACLService.checkIsSameUserOrAdminContainer(storage, user,
+            currentUserService.getCurrentUser());
 
         if (user == storage.getUser()) {
             throw new WrongArgumentException("The storage owner cannot be deleted.");
@@ -983,7 +1121,8 @@ public class UserService extends ModelService {
         secSecUserSecRole.setSecUser(user);
         secSecUserSecRole.setSecRole(secRoleRepository.getUser());
 
-        if (secSecUserSecRoleRepository.findBySecUserAndSecRole(secSecUserSecRole.getSecUser(), secSecUserSecRole.getSecRole()).isEmpty()) {
+        if (secSecUserSecRoleRepository.findBySecUserAndSecRole(secSecUserSecRole.getSecUser(),
+            secSecUserSecRole.getSecRole()).isEmpty()) {
             secSecUserSecRoleRepository.save(secSecUserSecRole);
         }
 
@@ -993,7 +1132,7 @@ public class UserService extends ModelService {
     @Override
     public CytomineDomain retrieve(JsonObject json) {
         return userRepository.findById(json.getJSONAttrLong("id"))
-                .orElseThrow(() -> new ObjectNotFoundException("User", json.toJsonString()));
+            .orElseThrow(() -> new ObjectNotFoundException("User", json.toJsonString()));
     }
 
 
@@ -1018,7 +1157,8 @@ public class UserService extends ModelService {
 
     public void deleteDependentAnnotationTerm(User user, Transaction transaction, Task task) {
         if (user instanceof User) {
-            for (AnnotationTerm annotationTerm : annotationTermRepository.findAllByUser((User) user)) {
+            for (AnnotationTerm annotationTerm :
+                annotationTermRepository.findAllByUser((User) user)) {
                 annotationTermService.delete(annotationTerm, transaction, task, false);
             }
         }
@@ -1042,14 +1182,16 @@ public class UserService extends ModelService {
 
     public void deleteDependentReviewedAnnotation(User user, Transaction transaction, Task task) {
         if (user instanceof User) {
-            for (ReviewedAnnotation reviewedAnnotation : reviewedAnnotationRepository.findAllByUser((User) user)) {
+            for (ReviewedAnnotation reviewedAnnotation :
+                reviewedAnnotationRepository.findAllByUser((User) user)) {
                 reviewedAnnotationService.delete(reviewedAnnotation, transaction, null, false);
             }
         }
     }
 
     public void deleteDependentSecUserSecRole(User user, Transaction transaction, Task task) {
-        for (SecUserSecRole secSecUserSecRole : secSecUserSecRoleRepository.findAllBySecUser(user)) {
+        for (SecUserSecRole secSecUserSecRole :
+            secSecUserSecRoleRepository.findAllBySecUser(user)) {
             secSecUserSecRoleService.delete(secSecUserSecRole, transaction, null, false);
         }
     }
@@ -1060,7 +1202,8 @@ public class UserService extends ModelService {
 
     public void deleteDependentUserAnnotation(User user, Transaction transaction, Task task) {
         if (user instanceof User) {
-            for (UserAnnotation userAnnotation : userAnnotationRepository.findAllByUser((User) user)) {
+            for (UserAnnotation userAnnotation :
+                userAnnotationRepository.findAllByUser((User) user)) {
                 userAnnotationService.delete(userAnnotation, transaction, null, false);
             }
         }
@@ -1075,7 +1218,8 @@ public class UserService extends ModelService {
     public void deleteDependentStorage(User user, Transaction transaction, Task task) {
         for (Storage storage : storageRepository.findAllByUser(user)) {
             if (uploadedFileRepository.countByStorage(storage) > 0) {
-                throw new ConstraintException("Storage contains data, cannot delete user. Remove or assign storage to an another user first");
+                throw new ConstraintException("Storage contains data, cannot delete user. Remove " +
+                    "or assign storage to an another user first");
             } else {
                 storageService.delete(storage, transaction, null, false);
             }
@@ -1089,7 +1233,8 @@ public class UserService extends ModelService {
         }
     }
 
-    public void deleteDependentHasManySharedAnnotation(User user, Transaction transaction, Task task) {
+    public void deleteDependentHasManySharedAnnotation(User user, Transaction transaction,
+                                                       Task task) {
         if (user instanceof User) {
             //TODO:: implement cascade deleteting/update for shared annotation
             throw new CytomineMethodNotYetImplementedException("todo");
@@ -1106,16 +1251,20 @@ public class UserService extends ModelService {
 
     public void deleteDependentProjectDefaultLayer(User user, Transaction transaction, Task task) {
         if (user instanceof User) {
-            for (ProjectDefaultLayer projectDefaultLayer : projectDefaultLayerRepository.findAllByUser(user)) {
+            for (ProjectDefaultLayer projectDefaultLayer :
+                projectDefaultLayerRepository.findAllByUser(user)) {
                 projectDefaultLayerService.delete(projectDefaultLayer, transaction, null, false);
             }
         }
     }
 
-    public void deleteDependentProjectRepresentativeUser(User user, Transaction transaction, Task task) {
+    public void deleteDependentProjectRepresentativeUser(User user, Transaction transaction,
+                                                         Task task) {
         if (user instanceof User) {
-            for (ProjectRepresentativeUser projectRepresentativeUser : projectRepresentativeUserRepository.findAllByUser(user)) {
-                projectRepresentativeUserService.delete(projectRepresentativeUser, transaction, null, false);
+            for (ProjectRepresentativeUser projectRepresentativeUser :
+                projectRepresentativeUserRepository.findAllByUser(user)) {
+                projectRepresentativeUserService.delete(projectRepresentativeUser, transaction,
+                    null, false);
             }
         }
     }

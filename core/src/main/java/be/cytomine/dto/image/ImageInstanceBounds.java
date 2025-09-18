@@ -68,7 +68,8 @@ public class ImageInstanceBounds extends AbstractBounds {
 
         updateMinMax(countImageAnnotations, imageInstance.getCountImageAnnotations());
         updateMinMax(countImageJobAnnotations, imageInstance.getCountImageJobAnnotations());
-        updateMinMax(countImageReviewedAnnotations, imageInstance.getCountImageReviewedAnnotations());
+        updateMinMax(countImageReviewedAnnotations,
+            imageInstance.getCountImageReviewedAnnotations());
 
         updateMinMax(width, abstractImage.getWidth());
         updateMinMax(height, abstractImage.getHeight());

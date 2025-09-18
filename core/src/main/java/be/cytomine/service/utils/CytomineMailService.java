@@ -1,36 +1,32 @@
 package be.cytomine.service.utils;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import be.cytomine.config.properties.ApplicationProperties;
-//import be.cytomine.config.properties.NotificationProperties;
-import be.cytomine.exceptions.MiddlewareException;
-import be.cytomine.utils.StringUtils;
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+
+import jakarta.mail.MessagingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-//import org.springframework.mail.javamail.JavaMailSender;
-//import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
-import java.io.File;
-import java.util.*;
+import be.cytomine.config.properties.ApplicationProperties;
 
 @Slf4j
 @Service
@@ -38,26 +34,28 @@ public class CytomineMailService {
 
     static final String NO_REPLY_EMAIL = "no-reply@cytomine.com";
 
-//    @Autowired
+    //    @Autowired
 //    JavaMailSender sender;
-
+    @Value("${spring.mail.host}")
+    public String smtpHost;
     @Autowired
     ApplicationProperties applicationProperties;
 
-    @Value("${spring.mail.host}")
-    public String smtpHost;
-
-
-    public void send(String from, String[] to, String[] cc, String[] bcc, String subject, String message) throws MessagingException {
+    public void send(String from, String[] to, String[] cc, String[] bcc, String subject,
+                     String message) throws MessagingException {
         send(from, to, cc, bcc, subject, message, new HashMap<>());
     }
 
-    public void send(String from, String[] to, String[] cc, String[] bcc, String subject, String message, Map<String,File> attachment) throws MessagingException {
-//        NotificationProperties notificationConfiguration = applicationProperties.getNotification();
+    public void send(String from, String[] to, String[] cc, String[] bcc, String subject,
+                     String message, Map<String, File> attachment) throws MessagingException {
+//        NotificationProperties notificationConfiguration = applicationProperties
+//        .getNotification();
 //        String defaultEmail = notificationConfiguration.getEmail();
 //
-//        // Force all e-mail to be issued from the one passed in the configuration to avoid such Exception:
-//        // "SMTPSendFailedException: 550 5.7.60 SMTP; Client does not have permissions to send as this sender"
+//        // Force all e-mail to be issued from the one passed in the configuration to avoid such
+//        Exception:
+//        // "SMTPSendFailedException: 550 5.7.60 SMTP; Client does not have permissions to send
+//        as this sender"
 //        from = defaultEmail;
 //
 //        if (StringUtils.isBlank(from)) {

@@ -18,7 +18,7 @@ public class SequenceService {
     /**
      * Get a new id number
      */
-    public Long generateID()  {
+    public Long generateID() {
         try {
             Query query = entityManager.createNativeQuery("select nextval('" + SEQ_NAME + "');");
             return (Long) query.getSingleResult();

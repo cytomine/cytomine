@@ -27,13 +27,11 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 @Transactional
 public class ImageGroupImageInstanceAuthorizationTest extends CRDAuthorizationTest {
 
-    private ImageGroupImageInstance igii = null;
-
     @Autowired
     BasicInstanceBuilder builder;
-
     @Autowired
     ImageGroupImageInstanceService imageGroupImageInstanceService;
+    private ImageGroupImageInstance igii = null;
 
     @BeforeEach
     public void before() throws Exception {

@@ -1,20 +1,32 @@
 package be.cytomine.service.image;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import java.util.List;
+
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
+import org.assertj.core.api.AssertionsForClassTypes;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
@@ -28,20 +40,7 @@ import be.cytomine.service.CommandService;
 import be.cytomine.service.command.TransactionService;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
-import org.assertj.core.api.AssertionsForClassTypes;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.test.context.support.WithMockUser;
 
-import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
-
-import java.util.List;
-
-import static org.assertj.core.api.AssertionsForClassTypes.fail;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 
@@ -75,7 +74,8 @@ public class NestedImageInstanceServiceTests {
         NestedImageInstance nestedImageInstance1 = builder.given_a_nested_image_instance();
         NestedImageInstance nestedImageInstance2 = builder.given_a_nested_image_instance();
 
-        List<NestedImageInstance> list = nestedImageInstanceService.list(nestedImageInstance1.getParent());
+        List<NestedImageInstance> list =
+            nestedImageInstanceService.list(nestedImageInstance1.getParent());
 
         assertThat(list).contains(nestedImageInstance1);
         assertThat(list).doesNotContain(nestedImageInstance2);
@@ -106,47 +106,56 @@ public class NestedImageInstanceServiceTests {
 
     @Test
     void add_valid_nested_image_instance_with_success() {
-        NestedImageInstance nestedImageInstance = builder.given_a_not_persisted_nested_image_instance();
+        NestedImageInstance nestedImageInstance =
+            builder.given_a_not_persisted_nested_image_instance();
 
-        CommandResponse commandResponse = nestedImageInstanceService.add(nestedImageInstance.toJsonObject());
+        CommandResponse commandResponse =
+            nestedImageInstanceService.add(nestedImageInstance.toJsonObject());
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
         AssertionsForClassTypes.assertThat(nestedImageInstanceService.find(commandResponse.getObject().getId())).isPresent();
-        NestedImageInstance created = nestedImageInstanceService.find(commandResponse.getObject().getId()).get();
+        NestedImageInstance created =
+            nestedImageInstanceService.find(commandResponse.getObject().getId()).get();
     }
-
 
 
     @Test
     void add_already_existing_nested_image_instance_fails() {
         NestedImageInstance nestedImageInstance = builder.given_a_nested_image_instance();
         Assertions.assertThrows(AlreadyExistException.class, () -> {
-            nestedImageInstanceService.add(nestedImageInstance.toJsonObject().withChange("id", null));
+            nestedImageInstanceService.add(nestedImageInstance.toJsonObject().withChange("id",
+                null));
         });
     }
 
     @Test
     void add_valid_nested_image_instance_with_unexsting_abstract_image_fails() {
-        NestedImageInstance nestedImageInstance = builder.given_a_not_persisted_nested_image_instance();
+        NestedImageInstance nestedImageInstance =
+            builder.given_a_not_persisted_nested_image_instance();
         Assertions.assertThrows(WrongArgumentException.class, () -> {
-            nestedImageInstanceService.add(nestedImageInstance.toJsonObject().withChange("baseImage", null));
+            nestedImageInstanceService.add(nestedImageInstance.toJsonObject().withChange(
+                "baseImage", null));
         });
     }
 
     @Test
     void add_valid_nested_image_instance_with_unexsting_parent_fails() {
-        NestedImageInstance nestedImageInstance = builder.given_a_not_persisted_nested_image_instance();
+        NestedImageInstance nestedImageInstance =
+            builder.given_a_not_persisted_nested_image_instance();
         Assertions.assertThrows(WrongArgumentException.class, () -> {
-            nestedImageInstanceService.add(nestedImageInstance.toJsonObject().withChange("parent", null));
+            nestedImageInstanceService.add(nestedImageInstance.toJsonObject().withChange("parent"
+                , null));
         });
     }
 
     @Test
     void add_valid_nested_image_instance_with_unexsting_project_fails() {
-        NestedImageInstance nestedImageInstance = builder.given_a_not_persisted_nested_image_instance();
+        NestedImageInstance nestedImageInstance =
+            builder.given_a_not_persisted_nested_image_instance();
         Assertions.assertThrows(ObjectNotFoundException.class, () -> {
-            nestedImageInstanceService.add(nestedImageInstance.toJsonObject().withChange("project", null));
+            nestedImageInstanceService.add(nestedImageInstance.toJsonObject().withChange("project"
+                , null));
         });
     }
 
@@ -155,7 +164,8 @@ public class NestedImageInstanceServiceTests {
         Project project1 = builder.given_a_project();
         Project project2 = builder.given_a_project();
 
-        NestedImageInstance nestedImageInstance = builder.given_a_not_persisted_nested_image_instance();
+        NestedImageInstance nestedImageInstance =
+            builder.given_a_not_persisted_nested_image_instance();
         nestedImageInstance.setProject(project1);
         nestedImageInstance = builder.persistAndReturn(nestedImageInstance);
 
@@ -166,7 +176,8 @@ public class NestedImageInstanceServiceTests {
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
         AssertionsForClassTypes.assertThat(nestedImageInstanceService.find(commandResponse.getObject().getId())).isPresent();
-        NestedImageInstance updated = nestedImageInstanceService.find(commandResponse.getObject().getId()).get();
+        NestedImageInstance updated =
+            nestedImageInstanceService.find(commandResponse.getObject().getId()).get();
 
         assertThat(updated.getProject().getId()).isEqualTo(project2.getId());
     }
@@ -175,7 +186,8 @@ public class NestedImageInstanceServiceTests {
     void delete_nested_image_instance_with_success() {
         NestedImageInstance nestedImageInstance = builder.given_a_nested_image_instance();
 
-        CommandResponse commandResponse = nestedImageInstanceService.delete(nestedImageInstance, null, null, true);
+        CommandResponse commandResponse = nestedImageInstanceService.delete(nestedImageInstance,
+            null, null, true);
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);

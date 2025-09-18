@@ -25,20 +25,6 @@ public class AnnotationGroup extends CytomineDomain {
 
     String type;
 
-    public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
-        AnnotationGroup annotationGroup = this;
-
-        annotationGroup.id = json.getJSONAttrLong("id", null);
-        annotationGroup.created = json.getJSONAttrDate("created");
-        annotationGroup.updated = json.getJSONAttrDate("updated");
-
-        annotationGroup.project = (Project) json.getJSONAttrDomain(entityManager, "project", new Project(), true);
-        annotationGroup.imageGroup = (ImageGroup) json.getJSONAttrDomain(entityManager, "imageGroup", new ImageGroup(), true);
-        annotationGroup.type = json.getJSONAttrStr("type", "SAME_OBJECT");
-
-        return annotationGroup;
-    }
-
     public static JsonObject getDataFromDomain(CytomineDomain domain) {
         JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
         AnnotationGroup annotationGroup = (AnnotationGroup) domain;
@@ -48,6 +34,22 @@ public class AnnotationGroup extends CytomineDomain {
         returnArray.put("type", annotationGroup.getType());
 
         return returnArray;
+    }
+
+    public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
+        AnnotationGroup annotationGroup = this;
+
+        annotationGroup.id = json.getJSONAttrLong("id", null);
+        annotationGroup.created = json.getJSONAttrDate("created");
+        annotationGroup.updated = json.getJSONAttrDate("updated");
+
+        annotationGroup.project = (Project) json.getJSONAttrDomain(entityManager, "project",
+            new Project(), true);
+        annotationGroup.imageGroup = (ImageGroup) json.getJSONAttrDomain(entityManager,
+            "imageGroup", new ImageGroup(), true);
+        annotationGroup.type = json.getJSONAttrStr("type", "SAME_OBJECT");
+
+        return annotationGroup;
     }
 
     @Override

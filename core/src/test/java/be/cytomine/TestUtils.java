@@ -16,12 +16,14 @@ package be.cytomine;
  * limitations under the License.
  */
 
-import be.cytomine.domain.image.ImageInstance;
-import be.cytomine.domain.ontology.AnnotationDomain;
-import be.cytomine.domain.ontology.Term;
-import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
-import be.cytomine.utils.StringUtils;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.util.stream.Collectors;
+
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -29,8 +31,12 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.test.web.servlet.MvcResult;
 
-import java.io.*;
-import java.util.stream.Collectors;
+import be.cytomine.domain.image.ImageInstance;
+import be.cytomine.domain.ontology.AnnotationDomain;
+import be.cytomine.domain.ontology.Term;
+import be.cytomine.domain.project.Project;
+import be.cytomine.domain.security.User;
+import be.cytomine.utils.StringUtils;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -51,7 +57,12 @@ public class TestUtils {
         return classLoader.getResourceAsStream(fileName);
     }
 
-    public static void checkSpreadsheetAnnotationResult(String delimiter, MvcResult result, AnnotationDomain annotationDomain, Project project, ImageInstance imageInstance, User user, Term term, String cropPath, String serverUrl) throws UnsupportedEncodingException {
+    public static void checkSpreadsheetAnnotationResult(String delimiter, MvcResult result,
+                                                        AnnotationDomain annotationDomain,
+                                                        Project project,
+                                                        ImageInstance imageInstance, User user,
+                                                        Term term, String cropPath,
+                                                        String serverUrl) throws UnsupportedEncodingException {
         String[] rows = result.getResponse().getContentAsString().split("\n");
         String[] userAnnotationResult = rows[1].split(delimiter);
         assertThat(userAnnotationResult[0]).isEqualTo(annotationDomain.getId().toString());
@@ -64,10 +75,15 @@ public class TestUtils {
         assertThat(userAnnotationResult[7]).isEqualTo(user.getUsername());
         assertThat(userAnnotationResult[8]).isEqualTo(term.getName());
         assertThat(userAnnotationResult[9]).isEqualTo(serverUrl + "/api/" + cropPath + "/" + annotationDomain.getId() + "/crop.png");
-        assertThat(userAnnotationResult[10].replace("\r", "")).isEqualTo(serverUrl + "/#/project/" + project.getId() + "/image/" + imageInstance.getId() + "/annotation/" + annotationDomain.getId());
+        assertThat(userAnnotationResult[10].replace("\r", "")).isEqualTo(serverUrl + "/#/project" +
+            "/" + project.getId() + "/image/" + imageInstance.getId() + "/annotation/" + annotationDomain.getId());
     }
 
-    public static void checkSpreadsheetXLSAnnotationResult(MvcResult result, AnnotationDomain annotationDomain, Project project, ImageInstance imageInstance, User user, Term term, String cropPath, String serverUrl) throws IOException {
+    public static void checkSpreadsheetXLSAnnotationResult(MvcResult result,
+                                                           AnnotationDomain annotationDomain,
+                                                           Project project,
+                                                           ImageInstance imageInstance, User user
+        , Term term, String cropPath, String serverUrl) throws IOException {
         byte[] spreadsheetData = result.getResponse().getContentAsByteArray();
         ByteArrayInputStream inputStream = new ByteArrayInputStream(spreadsheetData);
         Workbook workbook = null;
@@ -82,17 +98,18 @@ public class TestUtils {
             cells[i] = row.getCell(i);
         }
 
-        assertThat((long)cells[0].getNumericCellValue()).isEqualTo(annotationDomain.getId());
+        assertThat((long) cells[0].getNumericCellValue()).isEqualTo(annotationDomain.getId());
         assertThat(cells[1].getStringCellValue()).isEqualTo(StringUtils.decimalFormatter(annotationDomain.getArea()));
         assertThat(cells[2].getStringCellValue()).isEqualTo(StringUtils.decimalFormatter(annotationDomain.getPerimeter()));
         assertThat(cells[3].getStringCellValue()).isEqualTo(StringUtils.decimalFormatter(annotationDomain.getCentroid().getX()));
         assertThat(cells[4].getStringCellValue()).isEqualTo(StringUtils.decimalFormatter(annotationDomain.getCentroid().getY()));
-        assertThat((long)cells[5].getNumericCellValue()).isEqualTo(imageInstance.getId());
+        assertThat((long) cells[5].getNumericCellValue()).isEqualTo(imageInstance.getId());
         assertThat(cells[6].getStringCellValue()).isEqualTo(imageInstance.getBlindInstanceFilename());
         assertThat(cells[7].getStringCellValue()).isEqualTo(user.getUsername());
         assertThat(cells[8].getStringCellValue()).isEqualTo(term.getName());
         assertThat(cells[9].getStringCellValue()).isEqualTo(serverUrl + "/api/" + cropPath + "/" + annotationDomain.getId() + "/crop.png");
-        assertThat(cells[10].getStringCellValue().replace("\r", "")).isEqualTo(serverUrl + "/#/project/" + project.getId() + "/image/" + imageInstance.getId() + "/annotation/" + annotationDomain.getId());
+        assertThat(cells[10].getStringCellValue().replace("\r", "")).isEqualTo(serverUrl +
+            "/#/project/" + project.getId() + "/image/" + imageInstance.getId() + "/annotation/" + annotationDomain.getId());
 
         workbook.close();
 

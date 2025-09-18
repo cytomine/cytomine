@@ -1,32 +1,43 @@
 package be.cytomine.service.database;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import be.cytomine.domain.security.*;
-import be.cytomine.repository.security.SecRoleRepository;
-import be.cytomine.repository.security.SecUserSecRoleRepository;
-import be.cytomine.repository.security.UserRepository;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import be.cytomine.domain.security.SecRole;
+import be.cytomine.domain.security.SecUserSecRole;
+import be.cytomine.domain.security.User;
+import be.cytomine.repository.security.SecRoleRepository;
+import be.cytomine.repository.security.SecUserSecRoleRepository;
+import be.cytomine.repository.security.UserRepository;
 
-import static be.cytomine.repository.security.SecRoleRepository.*;
+import static be.cytomine.repository.security.SecRoleRepository.ROLE_ADMIN;
+import static be.cytomine.repository.security.SecRoleRepository.ROLE_GUEST;
+import static be.cytomine.repository.security.SecRoleRepository.ROLE_SUPER_ADMIN;
+import static be.cytomine.repository.security.SecRoleRepository.ROLE_USER;
 
 @Service
 @Slf4j
@@ -51,16 +62,6 @@ public class BootstrapTestsDataService {
     public static final String USER_NO_ACL = "ACL_USER_NO_ACL";
 
     public static final String CREATOR = "CREATOR";
-
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    SecRoleRepository secRoleRepository;
-
-    @Autowired
-    SecUserSecRoleRepository secSecUserSecRoleRepository;
-
     public static final Map<String, List<String>> ROLES = new HashMap<>();
 
     static {
@@ -76,24 +77,35 @@ public class BootstrapTestsDataService {
         ROLES.put(GUEST, List.of(ROLE_GUEST));
     }
 
+    @Autowired
+    UserRepository userRepository;
+    @Autowired
+    SecRoleRepository secRoleRepository;
+    @Autowired
+    SecUserSecRoleRepository secSecUserSecRoleRepository;
 
     public User createUserForTests(String login) {
-        Optional<User> alreadyExistingUser = userRepository.findByUsernameLikeIgnoreCase(login.toLowerCase());
+        Optional<User> alreadyExistingUser =
+            userRepository.findByUsernameLikeIgnoreCase(login.toLowerCase());
         if (!ROLES.containsKey(login)) {
-            throw new RuntimeException("Cannot execute test because user has not authority defined");
+            throw new RuntimeException("Cannot execute test because user has not authority " +
+                "defined");
         }
         List<String> authoritiesConstants = ROLES.get(login);
 
         if (alreadyExistingUser.isPresent()) {
-            Set<SecRole> allRoleByUser = secSecUserSecRoleRepository.findAllRoleByUser(alreadyExistingUser.get());
+            Set<SecRole> allRoleByUser =
+                secSecUserSecRoleRepository.findAllRoleByUser(alreadyExistingUser.get());
             for (String authoritiesConstant : authoritiesConstants) {
                 if (!allRoleByUser.stream().anyMatch(x -> x.getAuthority().equals(authoritiesConstant))) {
-                    throw new RuntimeException("Cannot execute test because already existing user " + login + "  has not same roles: not present - " + authoritiesConstant);
+                    throw new RuntimeException("Cannot execute test because already existing user" +
+                        " " + login + "  has not same roles: not present - " + authoritiesConstant);
                 }
             }
             for (SecRole secRole : allRoleByUser) {
                 if (!authoritiesConstants.stream().anyMatch(x -> x.equals(secRole.getAuthority()))) {
-                    throw new RuntimeException("Cannot execute test because already existing user " + login + " has not same roles: should not be there - " + secRole.getAuthority());
+                    throw new RuntimeException("Cannot execute test because already existing user" +
+                        " " + login + " has not same roles: should not be there - " + secRole.getAuthority());
                 }
             }
             return alreadyExistingUser.get();

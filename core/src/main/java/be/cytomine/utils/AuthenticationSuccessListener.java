@@ -1,5 +1,17 @@
 package be.cytomine.utils;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
+import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.stereotype.Component;
+
 import be.cytomine.domain.security.SecUserSecRole;
 import be.cytomine.domain.security.User;
 import be.cytomine.repository.security.SecRoleRepository;
@@ -7,23 +19,14 @@ import be.cytomine.repository.security.SecUserSecRoleRepository;
 import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.image.server.StorageService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
-import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.stereotype.Component;
-
-import java.util.*;
 
 @Component
 public class AuthenticationSuccessListener implements ApplicationListener<AuthenticationSuccessEvent> {
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     SecUserSecRoleRepository secSecUserSecRoleRepository;
-
+    @Autowired
+    private UserRepository userRepository;
     @Autowired
     private SecRoleRepository secRoleRepository;
 
@@ -32,6 +35,17 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
 
     @Autowired
     private CurrentRoleService currentRoleService;
+
+    private static Set<String> extractRolesFromAuthentication(JwtAuthenticationToken jwtAuthenticationToken) {
+        Set<String> rolesFromAuthentication = new HashSet<>();
+        jwtAuthenticationToken.getAuthorities().forEach((authority) -> {
+            if (authority.getAuthority().equals("ROLE_USER") || authority.getAuthority().equals(
+                "ROLE_ADMIN") || authority.getAuthority().equals("ROLE_GUEST")) {
+                rolesFromAuthentication.add(authority.getAuthority());
+            }
+        });
+        return rolesFromAuthentication;
+    }
 
     @Override
     public void onApplicationEvent(AuthenticationSuccessEvent event) {
@@ -42,7 +56,8 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
     }
 
     private void saveUserOfToken(JwtAuthenticationToken jwtAuthenticationToken) {
-        Set<String> rolesFromAuthentication = extractRolesFromAuthentication(jwtAuthenticationToken);
+        Set<String> rolesFromAuthentication =
+            extractRolesFromAuthentication(jwtAuthenticationToken);
         Map<String, Object> tokenAttributes = jwtAuthenticationToken.getTokenAttributes();
         UUID sub = UUID.fromString(tokenAttributes.get("sub").toString());
         Optional<User> userByReference = userRepository.findByReference(sub.toString());
@@ -69,7 +84,7 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
             // activate admin session for user
             savedUser = userRepository.findByReference(sub.toString()).orElse(null);
             if (currentRoleService.hasCurrentUserAdminRole(savedUser)) {
-                currentRoleService.activeAdminSession(savedUser,jwtAuthenticationToken);
+                currentRoleService.activeAdminSession(savedUser, jwtAuthenticationToken);
             }
 
 
@@ -78,19 +93,9 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
             User user = userByReference.get();
 
             if (currentRoleService.hasCurrentUserAdminRole(user)) {
-                currentRoleService.activeAdminSession(user,jwtAuthenticationToken);
+                currentRoleService.activeAdminSession(user, jwtAuthenticationToken);
             }
         }
-    }
-
-    private static Set<String> extractRolesFromAuthentication(JwtAuthenticationToken jwtAuthenticationToken) {
-        Set<String> rolesFromAuthentication = new HashSet<>();
-        jwtAuthenticationToken.getAuthorities().forEach((authority) -> {
-            if (authority.getAuthority().equals("ROLE_USER") || authority.getAuthority().equals("ROLE_ADMIN") || authority.getAuthority().equals("ROLE_GUEST")) {
-                rolesFromAuthentication.add(authority.getAuthority());
-            }
-        });
-        return rolesFromAuthentication;
     }
 
     @Override

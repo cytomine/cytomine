@@ -1,24 +1,25 @@
 package be.cytomine.repository;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import jakarta.persistence.EntityManager;
 import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
+
+import jakarta.persistence.EntityManager;
 
 public class UserAnnotationListing extends AnnotationListing {
 
@@ -116,7 +117,8 @@ public class UserAnnotationListing extends AnnotationListing {
 
     /**
      * Generate SQL string for FROM
-     * FROM depends on data to print (if image name is aksed, need to join with imageinstance+abstractimage,...)
+     * FROM depends on data to print (if image name is aksed, need to join with
+     * imageinstance+abstractimage,...)
      */
     String getFrom() {
         String from = "FROM user_annotation a ";
@@ -124,12 +126,14 @@ public class UserAnnotationListing extends AnnotationListing {
 
 
         if (tags != null) {
-            from += " LEFT OUTER JOIN tag_domain_association tda ON a.id = tda.domain_ident AND tda.domain_class_name = '" + getDomainClass() + "' ";
+            from += " LEFT OUTER JOIN tag_domain_association tda ON a.id = tda.domain_ident AND " +
+                "tda.domain_class_name = '" + getDomainClass() + "' ";
         }
         if (multipleTerm) {
             from += "LEFT OUTER JOIN annotation_term at ON a.id = at.user_annotation_id ";
             from += "LEFT OUTER JOIN annotation_term at2 ON a.id = at2.user_annotation_id ";
-            where += "AND at.id <> at2.id AND at.term_id <> at2.term_id AND at.deleted IS NULL AND at2.deleted IS NULL ";
+            where += "AND at.id <> at2.id AND at.term_id <> at2.term_id AND at.deleted IS NULL " +
+                "AND at2.deleted IS NULL ";
             /*from = "$from, annotation_term at, annotation_term at2 "
             where = "$where" +
                     "AND a.id = at.user_annotation_id\n" +
@@ -140,7 +144,9 @@ public class UserAnnotationListing extends AnnotationListing {
                     " AND at2.deleted IS NULL\n"*/
 
         } else if (noTerm && !(term != null || terms != null)) {
-            from += "LEFT JOIN (SELECT * from annotation_term x " + (users != null ? "where x.deleted IS NULL AND x.user_id IN (" + joinValues(users) + ")" : "") + " ) at ON a.id = at.user_annotation_id ";
+            from += "LEFT JOIN (SELECT * from annotation_term x " + (users != null ? "where x" +
+                ".deleted IS NULL AND x.user_id IN (" + joinValues(users) + ")" : "") + " ) at ON" +
+                " a.id = at.user_annotation_id ";
             where = where + " AND (at.id IS NULL OR at.deleted IS NOT NULL) \n";
         } else if (columnsToPrint.contains("term")) {
             from += "LEFT OUTER JOIN annotation_term at ON a.id = at.user_annotation_id ";
@@ -159,12 +165,15 @@ public class UserAnnotationListing extends AnnotationListing {
         }
 
         if (columnsToPrint.contains("imageGroup")) {
-            from += "LEFT JOIN (SELECT * FROM image_group_image_instance WHERE deleted IS NULL) ig ON a.image_id = ig.image_id ";
+            from += "LEFT JOIN (SELECT * FROM image_group_image_instance WHERE deleted IS NULL) " +
+                "ig ON a.image_id = ig.image_id ";
         }
 
         if (columnsToPrint.contains("group") || annotationGroup != null || annotationGroups != null) {
-            from += "LEFT OUTER JOIN (SELECT * FROM annotation_link WHERE deleted IS NULL) al1 ON al1.annotation_ident = a.id ";
-            from += "LEFT OUTER JOIN (SELECT * FROM annotation_link WHERE deleted IS NULL) al ON al.group_id = al1.group_id ";
+            from += "LEFT OUTER JOIN (SELECT * FROM annotation_link WHERE deleted IS NULL) al1 ON" +
+                " al1.annotation_ident = a.id ";
+            from += "LEFT OUTER JOIN (SELECT * FROM annotation_link WHERE deleted IS NULL) al ON " +
+                "al.group_id = al1.group_id ";
         }
 
         if (columnsToPrint.contains("user")) {
@@ -172,11 +181,13 @@ public class UserAnnotationListing extends AnnotationListing {
         }
 
         if (columnsToPrint.contains("image") || tracks != null || track != null) {
-            from += "INNER JOIN image_instance ii ON a.image_id = ii.id INNER JOIN abstract_image ai ON ii.base_image_id = ai.id ";
+            from += "INNER JOIN image_instance ii ON a.image_id = ii.id INNER JOIN abstract_image" +
+                " ai ON ii.base_image_id = ai.id ";
         }
 
         if (columnsToPrint.contains("slice") || tracks != null || track != null) {
-            from += "INNER JOIN slice_instance si ON a.slice_id = si.id INNER JOIN abstract_slice asl ON si.base_slice_id = asl.id ";
+            from += "INNER JOIN slice_instance si ON a.slice_id = si.id INNER JOIN abstract_slice" +
+                " asl ON si.base_slice_id = asl.id ";
         }
 
         return from + "\n" + where;

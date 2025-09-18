@@ -41,7 +41,8 @@ public class Annotation extends CytomineDomain {
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
         Annotation annotation = this;
         annotation.id = json.getJSONAttrLong("id", null);
-        annotation.annotationLayer = (AnnotationLayer) json.getJSONAttrDomain(entityManager, "annotationLayer", new AnnotationLayer(), true);
+        annotation.annotationLayer = (AnnotationLayer) json.getJSONAttrDomain(entityManager,
+            "annotationLayer", new AnnotationLayer(), true);
         annotation.created = json.getJSONAttrDate("created");
         annotation.updated = json.getJSONAttrDate("updated");
 

@@ -1,16 +1,17 @@
 package be.cytomine.authorization.appengine;
 
-import be.cytomine.BasicInstanceBuilder;
-import be.cytomine.CytomineCoreApplication;
-import be.cytomine.authorization.CRDAuthorizationTest;
-import be.cytomine.domain.appengine.TaskRun;
-import be.cytomine.domain.project.EditingMode;
-import be.cytomine.service.appengine.TaskRunService;
+import java.util.Optional;
+import java.util.UUID;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,10 +19,17 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-import java.util.UUID;
+import be.cytomine.BasicInstanceBuilder;
+import be.cytomine.CytomineCoreApplication;
+import be.cytomine.authorization.CRDAuthorizationTest;
+import be.cytomine.domain.appengine.TaskRun;
+import be.cytomine.domain.project.EditingMode;
+import be.cytomine.service.appengine.TaskRunService;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.springframework.security.acls.domain.BasePermission.READ;
 
 @AutoConfigureMockMvc
@@ -29,14 +37,11 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 @Transactional
 public class TaskRunAuthorizationTest extends CRDAuthorizationTest {
 
+    private static WireMockServer wireMockServer = new WireMockServer(8888);
     @Autowired
     private BasicInstanceBuilder builder;
-
     @Autowired
     private TaskRunService taskRunService;
-
-    private static WireMockServer wireMockServer = new WireMockServer(8888);
-
     private TaskRun taskRun = null;
 
     @BeforeAll
@@ -61,14 +66,14 @@ public class TaskRunAuthorizationTest extends CRDAuthorizationTest {
     @Disabled("This test does not work, the returned entity is a 500, but expectOK() ignores that")
     @WithMockUser(username = USER_ACL_ADMIN)
 
-    public void user_admin_can_add_in_readonly_mode(){
+    public void user_admin_can_add_in_readonly_mode() {
         taskRun.getProject().setMode(EditingMode.READ_ONLY);
         expectOK(() -> when_i_add_domain());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_add_in_readonly_mode(){
+    public void user_cannot_add_in_readonly_mode() {
         taskRun.getProject().setMode(EditingMode.READ_ONLY);
         expectForbidden(() -> when_i_add_domain());
     }
@@ -103,30 +108,30 @@ public class TaskRunAuthorizationTest extends CRDAuthorizationTest {
         UUID taskId = taskRun.getTaskRunId();
 
         String mockResponse = "{\n" +
-                "  \"task\": {\n" +
-                "    \"name\": \"string\",\n" +
-                "    \"namespace\": \"string\",\n" +
-                "    \"version\": \"string\",\n" +
-                "    \"description\": \"string\",\n" +
-                "    \"authors\": [\n" +
-                "      {\n" +
-                "        \"first_name\": \"string\",\n" +
-                "        \"last_name\": \"string\",\n" +
-                "        \"organization\": \"string\",\n" +
-                "        \"email\": \"string\",\n" +
-                "        \"is_contact\": true\n" +
-                "      }\n" +
-                "    ]\n" +
-                "  },\n" +
-                "  \"id\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\n" +
-                "  \"state\": \"created\"\n" +
-                "}";
+            "  \"task\": {\n" +
+            "    \"name\": \"string\",\n" +
+            "    \"namespace\": \"string\",\n" +
+            "    \"version\": \"string\",\n" +
+            "    \"description\": \"string\",\n" +
+            "    \"authors\": [\n" +
+            "      {\n" +
+            "        \"first_name\": \"string\",\n" +
+            "        \"last_name\": \"string\",\n" +
+            "        \"organization\": \"string\",\n" +
+            "        \"email\": \"string\",\n" +
+            "        \"is_contact\": true\n" +
+            "      }\n" +
+            "    ]\n" +
+            "  },\n" +
+            "  \"id\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\n" +
+            "  \"state\": \"created\"\n" +
+            "}";
 
         configureFor("localhost", 8888);
         stubFor(WireMock.post(urlEqualTo("/api/v1/tasks/" + taskId + "/runs"))
-                .willReturn(
-                        aResponse().withBody(mockResponse)
-                )
+            .willReturn(
+                aResponse().withBody(mockResponse)
+            )
         );
 
         ObjectMapper objectMapper = new ObjectMapper();

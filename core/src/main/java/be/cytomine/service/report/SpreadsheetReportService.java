@@ -1,35 +1,34 @@
 package be.cytomine.service.report;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
-
-import be.cytomine.exceptions.ServerException;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.springframework.stereotype.Service;
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
+
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.springframework.stereotype.Service;
+
+import be.cytomine.exceptions.ServerException;
 
 @Service
 @Slf4j
@@ -38,14 +37,14 @@ public class SpreadsheetReportService {
     /**
      * Write a spreadsheet report (xls)
      *
-     * @param  dataArray
+     * @param dataArray
      * @return Spreadsheet byte array report encoded in base 64
      */
     public byte[] writeSpreadsheet(Object[][] dataArray) throws ServerException {
         log.info(String.format("Generating spread sheet with delimiter: '%s'", ";"));
         CSVFormat format = CSVFormat.EXCEL.withDelimiter(';');
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        try (CSVPrinter csvPrinter = new CSVPrinter(new OutputStreamWriter(output), format)){
+        try (CSVPrinter csvPrinter = new CSVPrinter(new OutputStreamWriter(output), format)) {
 
             for (Object[] row : dataArray) {
                 csvPrinter.printRecord(row);
@@ -56,7 +55,8 @@ public class SpreadsheetReportService {
             return output.toByteArray();
         } catch (IOException e) {
             log.error("Failed to generate spread sheet. Error: %s".format(e.getMessage()));
-            throw new ServerException(String.format("Cannot generate spread sheet with params: format=%s. Error: %s",format, e.getMessage()));
+            throw new ServerException(String.format("Cannot generate spread sheet with params: " +
+                "format=%s. Error: %s", format, e.getMessage()));
         }
     }
 
@@ -64,7 +64,7 @@ public class SpreadsheetReportService {
     /**
      * Write a spreadsheet report (xls)
      *
-     * @param  dataArray
+     * @param dataArray
      * @return Spreadsheet byte array report encoded in base 64
      */
     public byte[] writeSpreadsheetXLS(Object[][] dataArray) throws ServerException {
@@ -99,7 +99,8 @@ public class SpreadsheetReportService {
             return output.toByteArray();
         } catch (IOException e) {
             log.error("Failed to generate spreadsheet. Error: %s".format(e.getMessage()));
-            throw new ServerException(String.format("Cannot generate spreadsheet. Error: %s", e.getMessage()));
+            throw new ServerException(String.format("Cannot generate spreadsheet. Error: %s",
+                e.getMessage()));
         }
 
     }

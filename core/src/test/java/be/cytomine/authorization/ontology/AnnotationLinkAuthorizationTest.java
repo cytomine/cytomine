@@ -27,13 +27,11 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 @Transactional
 public class AnnotationLinkAuthorizationTest extends CRDAuthorizationTest {
 
-    private AnnotationLink annotationLink = null;
-
     @Autowired
     BasicInstanceBuilder builder;
-
     @Autowired
     AnnotationLinkService annotationLinkService;
+    private AnnotationLink annotationLink = null;
 
     @BeforeEach
     public void before() throws Exception {
@@ -56,7 +54,7 @@ public class AnnotationLinkAuthorizationTest extends CRDAuthorizationTest {
         annotation.setProject(annotationLink.getImage().getProject());
 
         annotationLinkService.add(builder.given_a_not_persisted_annotation_link(
-                annotation, annotationLink.getGroup(), annotation.getImage()
+            annotation, annotationLink.getGroup(), annotation.getImage()
         ).toJsonObject());
     }
 
@@ -109,7 +107,7 @@ public class AnnotationLinkAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void user_admin_can_add_in_readonly_mode(){
+    public void user_admin_can_add_in_readonly_mode() {
         annotationLink.getImage().getProject().setMode(EditingMode.READ_ONLY);
         expectOK(() -> when_i_add_domain());
     }
@@ -119,9 +117,15 @@ public class AnnotationLinkAuthorizationTest extends CRDAuthorizationTest {
     public void admin_can_update_annotation_group_in_restricted_project() {
         AnnotationLink annotationLink = builder.given_an_annotation_link();
         annotationLink.getImage().getProject().setMode(EditingMode.RESTRICTED);
-        expectOK (() -> { when_i_get_domain(); });
-        expectOK (() -> { when_i_add_domain(); });
-        expectOK (() -> { when_i_delete_domain(); });
+        expectOK(() -> {
+            when_i_get_domain();
+        });
+        expectOK(() -> {
+            when_i_add_domain();
+        });
+        expectOK(() -> {
+            when_i_delete_domain();
+        });
     }
 
     @Test
@@ -129,14 +133,20 @@ public class AnnotationLinkAuthorizationTest extends CRDAuthorizationTest {
     public void user_can_update_annotation_group_in_classic_project() {
         AnnotationLink annotationLink = builder.given_an_annotation_link();
         annotationLink.getImage().getProject().setMode(EditingMode.CLASSIC);
-        expectOK (() -> { when_i_get_domain(); });
-        expectOK (() -> { when_i_add_domain(); });
-        expectOK (() -> { when_i_delete_domain(); });
+        expectOK(() -> {
+            when_i_get_domain();
+        });
+        expectOK(() -> {
+            when_i_add_domain();
+        });
+        expectOK(() -> {
+            when_i_delete_domain();
+        });
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void user_admin_can_delete_in_readonly_mode(){
+    public void user_admin_can_delete_in_readonly_mode() {
         annotationLink.getImage().getProject().setMode(EditingMode.READ_ONLY);
         expectOK(() -> when_i_delete_domain());
     }

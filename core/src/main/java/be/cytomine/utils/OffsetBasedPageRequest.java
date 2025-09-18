@@ -1,37 +1,33 @@
 package be.cytomine.utils;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 import java.io.Serializable;
 import java.util.Optional;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+
 public class OffsetBasedPageRequest implements Pageable, Serializable {
 
     private static final long serialVersionUID = -25822477129613575L;
-
+    private final Sort sort;
     private int limit;
     private long offset;
-    private final Sort sort;
 
     /**
      * Creates a new {@link OffsetBasedPageRequest} with sort parameters applied.
@@ -61,7 +57,8 @@ public class OffsetBasedPageRequest implements Pageable, Serializable {
      * @param direction  the direction of the {@link Sort} to be specified, can be {@literal null}.
      * @param properties the properties to sort by, must not be {@literal null} or empty.
      */
-    public OffsetBasedPageRequest(int offset, int limit, Sort.Direction direction, String... properties) {
+    public OffsetBasedPageRequest(int offset, int limit, Sort.Direction direction,
+                                  String... properties) {
         this(offset, limit, Sort.by(direction, properties));
     }
 
@@ -87,7 +84,7 @@ public class OffsetBasedPageRequest implements Pageable, Serializable {
 
     @Override
     public int getPageNumber() {
-        return (int)offset / limit;
+        return (int) offset / limit;
     }
 
     @Override
@@ -116,7 +113,8 @@ public class OffsetBasedPageRequest implements Pageable, Serializable {
     }
 
     public OffsetBasedPageRequest previous() {
-        return hasPrevious() ? new OffsetBasedPageRequest(getOffset() - getPageSize(), getPageSize(), getSort()) : this;
+        return hasPrevious() ? new OffsetBasedPageRequest(getOffset() - getPageSize(),
+            getPageSize(), getSort()) : this;
     }
 
 

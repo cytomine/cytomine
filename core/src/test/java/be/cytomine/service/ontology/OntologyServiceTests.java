@@ -1,20 +1,20 @@
 package be.cytomine.service.ontology;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 import java.util.List;
 import java.util.UUID;
@@ -50,9 +50,14 @@ import be.cytomine.service.project.ProjectService;
 import be.cytomine.utils.CommandResponse;
 
 import static be.cytomine.service.search.RetrievalService.CBIR_API_BASE_PATH;
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.matching;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.springframework.security.acls.domain.BasePermission.*;
+import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
+import static org.springframework.security.acls.domain.BasePermission.READ;
+import static org.springframework.security.acls.domain.BasePermission.WRITE;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
@@ -60,34 +65,25 @@ import static org.springframework.security.acls.domain.BasePermission.*;
 @Transactional
 public class OntologyServiceTests {
 
+    private static WireMockServer wireMockServer;
     @Autowired
     OntologyService ontologyService;
-
     @Autowired
     OntologyRepository ontologyRepository;
-
     @Autowired
     BasicInstanceBuilder builder;
-
     @Autowired
     CommandService commandService;
-
     @Autowired
     TransactionService transactionService;
-
     @Autowired
     RelationTermRepository relationTermRepository;
-
     @Autowired
     TermRepository termRepository;
-
     @Autowired
     PermissionService permissionService;
-
     @Autowired
     ProjectService projectService;
-
-    private static WireMockServer wireMockServer;
 
     private static void setupStub() {
         /* Simulate call to CBIR */
@@ -212,7 +208,8 @@ public class OntologyServiceTests {
     void edit_valid_ontology_with_success() {
         Ontology ontology = builder.given_an_ontology();
 
-        CommandResponse commandResponse = ontologyService.update(ontology, ontology.toJsonObject().withChange("name", "NEW NAME"));
+        CommandResponse commandResponse = ontologyService.update(ontology,
+            ontology.toJsonObject().withChange("name", "NEW NAME"));
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -291,7 +288,8 @@ public class OntologyServiceTests {
         Term term2 = builder.given_a_term(ontology);
         RelationTerm relationTerm = builder.given_a_relation_term(term1, term2);
 
-        CommandResponse commandResponse = ontologyService.delete(ontology, transactionService.start(), null, true);
+        CommandResponse commandResponse = ontologyService.delete(ontology,
+            transactionService.start(), null, true);
 
         assertThat(ontologyService.find(ontology.getId()).isEmpty());
         assertThat(relationTermRepository.findById(relationTerm.getId())).isEmpty();
@@ -337,18 +335,23 @@ public class OntologyServiceTests {
         permissionService.addPermission(project, userAdminInProject.getUsername(), ADMINISTRATION);
         permissionService.addPermission(project, userNotAdminInProject.getUsername(), WRITE);
 
-        ontologyService.determineRightsForUsers(ontology, List.of(userAdminInProject, userNotAdminInProject, userNotInProject));
+        ontologyService.determineRightsForUsers(ontology, List.of(userAdminInProject,
+            userNotAdminInProject, userNotInProject));
 
-        assertThat(permissionService.hasACLPermission(ontology, userAdminInProject.getUsername(), ADMINISTRATION)).isTrue();
+        assertThat(permissionService.hasACLPermission(ontology, userAdminInProject.getUsername(),
+            ADMINISTRATION)).isTrue();
 
-        assertThat(permissionService.hasACLPermission(ontology, userNotAdminInProject.getUsername(), ADMINISTRATION)).isFalse();
-        assertThat(permissionService.hasACLPermission(ontology, userNotAdminInProject.getUsername(), READ)).isTrue();
+        assertThat(permissionService.hasACLPermission(ontology,
+            userNotAdminInProject.getUsername(), ADMINISTRATION)).isFalse();
+        assertThat(permissionService.hasACLPermission(ontology,
+            userNotAdminInProject.getUsername(), READ)).isTrue();
 
-        assertThat(permissionService.hasACLPermission(ontology, userNotInProject.getUsername(), ADMINISTRATION)).isFalse();
-        assertThat(permissionService.hasACLPermission(ontology, userNotInProject.getUsername(), READ)).isFalse();
+        assertThat(permissionService.hasACLPermission(ontology, userNotInProject.getUsername(),
+            ADMINISTRATION)).isFalse();
+        assertThat(permissionService.hasACLPermission(ontology, userNotInProject.getUsername(),
+            READ)).isFalse();
 
     }
-
 
 
     @Test
@@ -368,7 +371,7 @@ public class OntologyServiceTests {
         Project project = BasicInstanceBuilder.given_a_not_persisted_project();
         project.setOntology(ontology);
         commandResponse = projectService.add(project.toJsonObject());
-        project = (Project)commandResponse.getObject() ;
+        project = (Project) commandResponse.getObject();
 
         assertThat(ontology.getUser().getUsername()).isEqualTo("user");
         assertThat(permissionService.hasACLPermission(ontology, "user", ADMINISTRATION)).isTrue();
@@ -378,7 +381,7 @@ public class OntologyServiceTests {
 
         // change project ontology
         commandResponse = projectService.update(project, project.toJsonObject()
-                .withChange("ontology", null));
+            .withChange("ontology", null));
 
         // check that use still keep its rights to access ontology
         assertThat(ontology.getUser().getUsername()).isEqualTo("user");

@@ -1,21 +1,27 @@
 package be.cytomine.controller.ontology;
 
+import java.util.Map;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.ontology.Track;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.ontology.AnnotationDomainRepository;
-import be.cytomine.repository.ontology.OntologyRepository;
 import be.cytomine.repository.project.ProjectRepository;
 import be.cytomine.service.ontology.AnnotationTrackService;
 import be.cytomine.service.ontology.TrackService;
 import be.cytomine.utils.JsonObject;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -33,46 +39,48 @@ public class RestAnnotationTrackController extends RestCytomineController {
 
     @GetMapping("/track/{id}/annotationtrack.json")
     public ResponseEntity<String> listByTrack(
-            @PathVariable Long id
+        @PathVariable Long id
     ) {
         log.debug("REST request to list annotationTracks for track {}", id);
         return responseSuccess(annotationTrackService.list(trackService.find(id)
-                .orElseThrow(() -> new ObjectNotFoundException("Track", id))));
+            .orElseThrow(() -> new ObjectNotFoundException("Track", id))));
     }
 
     @GetMapping("/annotation/{id}/annotationtrack.json")
     public ResponseEntity<String> listByAnnotation(
-            @PathVariable Long id
+        @PathVariable Long id
     ) {
         log.debug("REST request to list annotationTracks for annotation {}", id);
         return responseSuccess(annotationTrackService.list(annotationDomainRepository.findById(id)
-                .orElseThrow(() -> new ObjectNotFoundException("Annotation", id))));
+            .orElseThrow(() -> new ObjectNotFoundException("Annotation", id))));
     }
 
 
     @GetMapping("/annotationtrack/{annotation}/{track}.json")
     public ResponseEntity<String> show(
-            @PathVariable(value = "annotation") Long annotationId,
-            @PathVariable(value = "track") Long trackId
-            ) {
+        @PathVariable(value = "annotation") Long annotationId,
+        @PathVariable(value = "track") Long trackId
+    ) {
         log.debug("REST request to get AnnotationTrack : {} {}", annotationId, trackId);
         AnnotationDomain annotationDomain = annotationDomainRepository.findById(annotationId)
-                .orElseThrow(() -> new ObjectNotFoundException("Annotation", annotationId));
+            .orElseThrow(() -> new ObjectNotFoundException("Annotation", annotationId));
         Track track = trackService.find(trackId)
-                .orElseThrow(() -> new ObjectNotFoundException("Track", trackId));
+            .orElseThrow(() -> new ObjectNotFoundException("Track", trackId));
 
         return annotationTrackService.find(annotationDomain, track)
-                .map(this::responseSuccess)
-                .orElseGet(() -> responseNotFound("AnnotationTrack", Map.of("annotation", annotationId, "track", trackId)));
+            .map(this::responseSuccess)
+            .orElseGet(() -> responseNotFound("AnnotationTrack", Map.of("annotation",
+                annotationId, "track", trackId)));
     }
 
     @DeleteMapping("/annotationtrack/{annotation}/{track}.json")
     public ResponseEntity<String> delete(
-            @PathVariable(value = "annotation") Long annotationId,
-            @PathVariable(value = "track") Long trackId
+        @PathVariable(value = "annotation") Long annotationId,
+        @PathVariable(value = "track") Long trackId
     ) {
         log.debug("REST request to get AnnotationTrack : {} {}", annotationId, trackId);
-        return delete(annotationTrackService, JsonObject.of("annotationIdent", annotationId, "track", trackId), null);
+        return delete(annotationTrackService, JsonObject.of("annotationIdent", annotationId,
+            "track", trackId), null);
     }
 
     @PostMapping("/annotationtrack.json")

@@ -1,28 +1,23 @@
 package be.cytomine.authorization.ontology;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import be.cytomine.BasicInstanceBuilder;
-import be.cytomine.CytomineCoreApplication;
-import be.cytomine.authorization.CRUDAuthorizationTest;
-import be.cytomine.domain.ontology.Track;
-import be.cytomine.service.PermissionService;
-import be.cytomine.service.ontology.TrackService;
-import be.cytomine.service.security.SecurityACLService;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +28,13 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import be.cytomine.BasicInstanceBuilder;
+import be.cytomine.CytomineCoreApplication;
+import be.cytomine.authorization.CRUDAuthorizationTest;
+import be.cytomine.domain.ontology.Track;
+import be.cytomine.service.PermissionService;
+import be.cytomine.service.ontology.TrackService;
+import be.cytomine.service.security.SecurityACLService;
 
 @AutoConfigureMockMvc
 @SpringBootTest(classes = CytomineCoreApplication.class)
@@ -41,19 +42,15 @@ import java.util.Optional;
 public class TrackAuthorizationTest extends CRUDAuthorizationTest {
 
 
-    private Track track = null;
-
     @Autowired
     TrackService trackService;
-
     @Autowired
     BasicInstanceBuilder builder;
-
     @Autowired
     SecurityACLService securityACLService;
-
     @Autowired
     PermissionService permissionService;
+    private Track track = null;
 
     @BeforeEach
     public void before() throws Exception {
@@ -67,12 +64,14 @@ public class TrackAuthorizationTest extends CRUDAuthorizationTest {
     @Test
     @WithMockUser(username = SUPERADMIN)
     public void admin_can_list_tracks() {
-        expectOK (() -> { trackService.list(track.getProject()); });
+        expectOK(() -> {
+            trackService.list(track.getProject());
+        });
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_list_tracks(){
+    public void user_cannot_list_tracks() {
         expectOK(() -> {
             trackService.list(track.getProject());
         });

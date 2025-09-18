@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 import be.cytomine.domain.annotation.AnnotationLayer;
 
 @Repository
-public interface AnnotationLayerRepository extends JpaRepository<AnnotationLayer, Long> {}
+public interface AnnotationLayerRepository extends JpaRepository<AnnotationLayer, Long> {
+}

@@ -1,5 +1,17 @@
 package be.cytomine.controller.image.group;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.image.group.ImageGroup;
 import be.cytomine.domain.project.Project;
@@ -8,10 +20,6 @@ import be.cytomine.service.image.group.ImageGroupImageInstanceService;
 import be.cytomine.service.image.group.ImageGroupService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.utils.JsonObject;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
@@ -29,7 +37,7 @@ public class RestImageGroupController extends RestCytomineController {
     public ResponseEntity<String> listByProject(@PathVariable Long id) {
         log.debug("REST request to list an imagegroup for project: {}", id);
         Project project = projectService.find(id)
-                .orElseThrow(() -> new ObjectNotFoundException("Project", id));
+            .orElseThrow(() -> new ObjectNotFoundException("Project", id));
 
         return responseSuccess(imageGroupService.list(project));
     }
@@ -44,7 +52,9 @@ public class RestImageGroupController extends RestCytomineController {
     public ResponseEntity<String> show(@PathVariable Long id) {
         log.debug("REST request to get imagegroup: " + id);
 
-        ImageGroup group = imageGroupService.find(id).orElseThrow(() -> new ObjectNotFoundException("ImageGroup", id));
+        ImageGroup group =
+            imageGroupService.find(id).orElseThrow(() -> new ObjectNotFoundException("ImageGroup"
+                , id));
         group.setImages(imageGroupImageInstanceService.buildImageInstances(group));
 
         return responseSuccess(group);

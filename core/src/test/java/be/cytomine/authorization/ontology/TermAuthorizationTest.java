@@ -1,28 +1,23 @@
 package be.cytomine.authorization.ontology;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import be.cytomine.BasicInstanceBuilder;
-import be.cytomine.CytomineCoreApplication;
-import be.cytomine.authorization.CRUDAuthorizationTest;
-import be.cytomine.domain.ontology.Term;
-import be.cytomine.service.PermissionService;
-import be.cytomine.service.ontology.TermService;
-import be.cytomine.service.security.SecurityACLService;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,15 +28,13 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.persistence.EntityManager;
-
-import java.util.Optional;
-
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import be.cytomine.BasicInstanceBuilder;
+import be.cytomine.CytomineCoreApplication;
+import be.cytomine.authorization.CRUDAuthorizationTest;
+import be.cytomine.domain.ontology.Term;
+import be.cytomine.service.PermissionService;
+import be.cytomine.service.ontology.TermService;
+import be.cytomine.service.security.SecurityACLService;
 
 @AutoConfigureMockMvc
 @SpringBootTest(classes = CytomineCoreApplication.class)
@@ -49,19 +42,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 public class TermAuthorizationTest extends CRUDAuthorizationTest {
 
 
-    private Term term = null;
-
     @Autowired
     TermService termService;
-
     @Autowired
     BasicInstanceBuilder builder;
-
     @Autowired
     SecurityACLService securityACLService;
-
     @Autowired
     PermissionService permissionService;
+    private Term term = null;
 
     @BeforeEach
     public void before() throws Exception {
@@ -75,12 +64,14 @@ public class TermAuthorizationTest extends CRUDAuthorizationTest {
     @Test
     @WithMockUser(username = SUPERADMIN)
     public void admin_can_list_terms() {
-        expectOK (() -> { termService.list(); });
+        expectOK(() -> {
+            termService.list();
+        });
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_list_terms(){
+    public void user_cannot_list_terms() {
         expectForbidden(() -> {
             termService.list();
         });

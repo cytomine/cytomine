@@ -36,32 +36,22 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class AnnotationLayerServiceTest {
 
+    private static Annotation mockAnnotation;
+    private static AnnotationLayer mockAnnotationLayer;
+    private static ImageInstance mockImage;
+    private static TaskRun mockTaskRun;
+    private static TaskRunLayer mockTaskRunLayer;
+    private static String name;
     @Mock
     private AnnotationRepository annotationRepository;
-
     @Mock
     private AnnotationLayerRepository annotationLayerRepository;
-
     @Mock
     private TaskRunLayerRepository taskRunLayerRepository;
-
     @Mock
     private TaskRunLayerService taskRunLayerService;
-
     @InjectMocks
     private AnnotationLayerService annotationLayerService;
-
-    private static Annotation mockAnnotation;
-
-    private static AnnotationLayer mockAnnotationLayer;
-
-    private static ImageInstance mockImage;
-
-    private static TaskRun mockTaskRun;
-
-    private static TaskRunLayer mockTaskRunLayer;
-
-    private static String name;
 
     @BeforeAll
     public static void setUp() {
@@ -92,7 +82,7 @@ public class AnnotationLayerServiceTest {
         when(annotationLayerRepository.saveAndFlush(any(AnnotationLayer.class))).thenReturn(mockAnnotationLayer);
 
         AnnotationLayer result = annotationLayerService.createAnnotationLayer(name);
-    
+
         assertNotNull(result);
         assertEquals(mockAnnotationLayer.getId(), result.getId());
         assertEquals(mockAnnotationLayer.getName(), result.getName());
@@ -128,7 +118,8 @@ public class AnnotationLayerServiceTest {
         List<TaskRunLayer> mockTaskRunLayers = List.of(mockTaskRunLayer, mockTaskRunLayer);
         when(taskRunLayerRepository.findAllByImageId(mockImage.getId())).thenReturn(mockTaskRunLayers);
 
-        List<AnnotationLayer> results = annotationLayerService.findByTaskRunLayer(mockImage.getId());
+        List<AnnotationLayer> results =
+            annotationLayerService.findByTaskRunLayer(mockImage.getId());
 
         assertFalse(results.isEmpty());
         assertEquals(mockTaskRunLayers.size(), results.size());
@@ -148,7 +139,8 @@ public class AnnotationLayerServiceTest {
         when(taskRunLayerRepository.findByAnnotationLayerId(mockAnnotationLayer.getId())).thenReturn(Optional.of(mockTaskRunLayer));
         when(taskRunLayerService.convertToDTO(mockTaskRunLayer)).thenReturn(expected);
 
-        TaskRunLayerValue result = annotationLayerService.findTaskRunLayer(mockAnnotationLayer.getId());
+        TaskRunLayerValue result =
+            annotationLayerService.findTaskRunLayer(mockAnnotationLayer.getId());
 
         assertNotNull(result);
         assertEquals(result, expected);
@@ -161,7 +153,8 @@ public class AnnotationLayerServiceTest {
     public void findTaskRunLayerShouldReturnNull() {
         when(taskRunLayerRepository.findByAnnotationLayerId(mockAnnotationLayer.getId())).thenReturn(Optional.empty());
 
-        TaskRunLayerValue result = annotationLayerService.findTaskRunLayer(mockAnnotationLayer.getId());
+        TaskRunLayerValue result =
+            annotationLayerService.findTaskRunLayer(mockAnnotationLayer.getId());
 
         assertNull(result);
 
@@ -173,7 +166,8 @@ public class AnnotationLayerServiceTest {
         List<Annotation> mockAnnotations = List.of(mockAnnotation, mockAnnotation);
         when(annotationRepository.findAllByAnnotationLayer(mockAnnotationLayer)).thenReturn(mockAnnotations);
 
-        List<Annotation> results = annotationLayerService.findAnnotationsByLayer(mockAnnotationLayer);
+        List<Annotation> results =
+            annotationLayerService.findAnnotationsByLayer(mockAnnotationLayer);
 
         assertFalse(results.isEmpty());
         assertEquals(mockAnnotations.size(), results.size());

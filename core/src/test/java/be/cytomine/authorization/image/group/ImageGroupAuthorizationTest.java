@@ -109,7 +109,7 @@ public class ImageGroupAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void user_admin_can_add_in_readonly_mode(){
+    public void user_admin_can_add_in_readonly_mode() {
         imageGroup.getProject().setMode(EditingMode.READ_ONLY);
         expectOK(() -> when_i_add_domain());
     }

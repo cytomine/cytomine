@@ -20,7 +20,7 @@ java {
 
 checkstyle {
    toolVersion = '10.21.2'
-   configFile = file("${rootProject.projectDir}/app-engine/config/checkstyle.xml")
+   configFile = file("${rootProject.projectDir}/checkstyle.xml")
 }
 
 configurations {

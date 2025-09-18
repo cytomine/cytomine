@@ -26,17 +26,13 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class AnnotationServiceTest {
 
+    private static Annotation mockAnnotation;
+    private static AnnotationLayer mockAnnotationLayer;
+    private static String mockGeometry;
     @Mock
     private AnnotationRepository annotationRepository;
-
     @InjectMocks
     private AnnotationService annotationService;
-
-    private static Annotation mockAnnotation;
-
-    private static AnnotationLayer mockAnnotationLayer;
-
-    private static String mockGeometry;
 
     @BeforeAll
     public static void setUp() {
@@ -52,9 +48,9 @@ public class AnnotationServiceTest {
     @Test
     public void createAnnotationShouldReturnAnnotation() {
         when(annotationRepository.saveAndFlush(any(Annotation.class))).thenReturn(mockAnnotation);
-    
+
         Annotation result = annotationService.createAnnotation(mockAnnotationLayer, mockGeometry);
-    
+
         assertNotNull(result);
         assertEquals(mockAnnotation.getId(), result.getId());
         assertEquals(mockAnnotation.getAnnotationLayer(), result.getAnnotationLayer());

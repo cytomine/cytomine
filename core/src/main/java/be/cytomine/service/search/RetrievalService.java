@@ -10,7 +10,12 @@ import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -101,7 +106,8 @@ public class RetrievalService {
         parameters.setMaxSize(256);
 
         try {
-            ResponseEntity<byte[]> response = imageServerService.crop(annotation, parameters, null, null);
+            ResponseEntity<byte[]> response = imageServerService.crop(annotation, parameters,
+                null, null);
             return response.getBody();
         } catch (Exception e) {
             return null;
@@ -113,7 +119,7 @@ public class RetrievalService {
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
         byte[] image = Objects.requireNonNull(getImageAnnotation(annotation));
-        ByteArrayResource resource =  new ByteArrayResource(image) {
+        ByteArrayResource resource = new ByteArrayResource(image) {
             @Override
             public String getFilename() {
                 return annotation.getId().toString();
@@ -160,7 +166,8 @@ public class RetrievalService {
         );
     }
 
-    private List<List<Object>> processSimilarities(List<List<Object>> similarities, double maxDistance) {
+    private List<List<Object>> processSimilarities(List<List<Object>> similarities,
+                                                   double maxDistance) {
         List<List<Object>> percentages = new ArrayList<>();
 
         for (List<Object> entry : similarities) {
@@ -174,7 +181,8 @@ public class RetrievalService {
         return percentages;
     }
 
-    public ResponseEntity<SearchResponse> retrieveSimilarImages(AnnotationDomain annotation, Long nrt_neigh) {
+    public ResponseEntity<SearchResponse> retrieveSimilarImages(AnnotationDomain annotation,
+                                                                Long nrt_neigh) {
         String url = UriComponentsBuilder
             .fromHttpUrl(getInternalCbirURL())
             .path("/search")
@@ -206,7 +214,8 @@ public class RetrievalService {
             .mapToDouble(d -> (Double) d.get(1))
             .max()
             .orElse(1.0);
-        searchResponse.setSimilarities(processSimilarities(searchResponse.getSimilarities(), maxDistance));
+        searchResponse.setSimilarities(processSimilarities(searchResponse.getSimilarities(),
+            maxDistance));
 
         return ResponseEntity.ok(searchResponse);
     }

@@ -14,8 +14,8 @@ import be.cytomine.domain.annotation.Annotation;
 import be.cytomine.domain.annotation.AnnotationLayer;
 import be.cytomine.domain.appengine.TaskRunLayer;
 
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.everyItem;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -39,7 +39,8 @@ public class AnnotationLayerResourceTest {
     public void getAnnotationLayersByImageShouldReturnAnnotationLayers() throws Exception {
         TaskRunLayer taskRunLayer = builder.given_a_persisted_task_run_layer();
 
-        mockMvc.perform(get("/api/image-instances/{id}/annotation-layers", taskRunLayer.getImage().getId()))
+        mockMvc.perform(get("/api/image-instances/{id}/annotation-layers",
+                taskRunLayer.getImage().getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.length()").value(1))
             .andExpect(jsonPath("$[0].id").value(taskRunLayer.getAnnotationLayer().getId()));
@@ -62,7 +63,8 @@ public class AnnotationLayerResourceTest {
             .andExpect(jsonPath("$[0].id").value(first.getId()))
             .andExpect(jsonPath("$[1].id").value(second.getId()))
             .andExpect(jsonPath("$[2].id").value(third.getId()))
-            .andExpect(jsonPath("$[*].annotationLayer.id", everyItem(is(Integer.valueOf(annotationLayer.getId().toString())))));
+            .andExpect(jsonPath("$[*].annotationLayer.id",
+                everyItem(is(Integer.valueOf(annotationLayer.getId().toString())))));
     }
 
     @Test
@@ -75,7 +77,8 @@ public class AnnotationLayerResourceTest {
     public void findTaskRunLayerShouldReturnTaskRunLayer() throws Exception {
         TaskRunLayer taskRunLayer = builder.given_a_persisted_task_run_layer();
 
-        mockMvc.perform(get("/api/annotation-layers/{id}/task-run-layer", taskRunLayer.getAnnotationLayer().getId()))
+        mockMvc.perform(get("/api/annotation-layers/{id}/task-run-layer",
+                taskRunLayer.getAnnotationLayer().getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.annotationLayer").value(taskRunLayer.getAnnotationLayer().getId()))
             .andExpect(jsonPath("$.taskRun").value(taskRunLayer.getTaskRun().getId()))

@@ -1,28 +1,22 @@
 package be.cytomine.service.appengine;
 
-import be.cytomine.domain.annotation.AnnotationLayer;
-import be.cytomine.domain.appengine.TaskRun;
-import be.cytomine.domain.appengine.TaskRunLayer;
-import be.cytomine.domain.image.ImageInstance;
-import be.cytomine.domain.ontology.AnnotationDomain;
-import be.cytomine.domain.ontology.UserAnnotation;
-import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
-import be.cytomine.dto.appengine.task.TaskRunDetail;
-import be.cytomine.dto.appengine.task.TaskRunValue;
-import be.cytomine.dto.image.CropParameter;
-import be.cytomine.exceptions.ObjectNotFoundException;
-import be.cytomine.repository.appengine.TaskRunLayerRepository;
-import be.cytomine.repository.appengine.TaskRunRepository;
-import be.cytomine.service.CurrentUserService;
-import be.cytomine.service.annotation.AnnotationLayerService;
-import be.cytomine.service.annotation.AnnotationService;
-import be.cytomine.service.image.ImageInstanceService;
-import be.cytomine.service.middleware.ImageServerService;
-import be.cytomine.service.ontology.UserAnnotationService;
-import be.cytomine.service.project.ProjectService;
-import be.cytomine.service.security.SecurityACLService;
-import be.cytomine.service.utils.GeometryService;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -47,16 +41,29 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URI;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
+import be.cytomine.domain.annotation.AnnotationLayer;
+import be.cytomine.domain.appengine.TaskRun;
+import be.cytomine.domain.appengine.TaskRunLayer;
+import be.cytomine.domain.image.ImageInstance;
+import be.cytomine.domain.ontology.AnnotationDomain;
+import be.cytomine.domain.ontology.UserAnnotation;
+import be.cytomine.domain.project.Project;
+import be.cytomine.domain.security.User;
+import be.cytomine.dto.appengine.task.TaskRunDetail;
+import be.cytomine.dto.appengine.task.TaskRunValue;
+import be.cytomine.dto.image.CropParameter;
+import be.cytomine.exceptions.ObjectNotFoundException;
+import be.cytomine.repository.appengine.TaskRunLayerRepository;
+import be.cytomine.repository.appengine.TaskRunRepository;
+import be.cytomine.service.CurrentUserService;
+import be.cytomine.service.annotation.AnnotationLayerService;
+import be.cytomine.service.annotation.AnnotationService;
+import be.cytomine.service.image.ImageInstanceService;
+import be.cytomine.service.middleware.ImageServerService;
+import be.cytomine.service.ontology.UserAnnotationService;
+import be.cytomine.service.project.ProjectService;
+import be.cytomine.service.security.SecurityACLService;
+import be.cytomine.service.utils.GeometryService;
 
 import static org.springframework.security.acls.domain.BasePermission.READ;
 
@@ -103,7 +110,8 @@ public class TaskRunService {
             JsonNode jsonResponse = new ObjectMapper().readTree(response);
             taskId = UUID.fromString(jsonResponse.path("id").asText());
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error parsing JSON response");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error parsing " +
+                "JSON response");
         }
         ImageInstance image = imageInstanceService.get(body.get("image").asLong());
 
@@ -114,7 +122,8 @@ public class TaskRunService {
         taskRun.setImage(image);
         taskRunRepository.save(taskRun);
 
-        // We return the App engine response. Should we include information from Cytomine (project ID, user ID, created, ... ?)
+        // We return the App engine response. Should we include information from Cytomine
+        // (project ID, user ID, created, ... ?)
         return response;
     }
 
@@ -139,7 +148,8 @@ public class TaskRunService {
     }
 
     private void checkTaskRun(Long projectId, UUID taskRunId) {
-        Optional<TaskRun> taskRun = taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId);
+        Optional<TaskRun> taskRun = taskRunRepository.findByProjectIdAndTaskRunId(projectId,
+            taskRunId);
         if (taskRun.isEmpty()) {
             throw new ObjectNotFoundException("TaskRun", taskRunId);
         }
@@ -164,13 +174,15 @@ public class TaskRunService {
             if (provision.get("type").get("id").asText().equals("geometry")) {
                 Long annotationId = provision.get("value").asLong();
                 UserAnnotation annotation = userAnnotationService.get(annotationId);
-                processedProvision.put("value", geometryService.WKTToGeoJSON(annotation.getWktLocation()));
+                processedProvision.put("value",
+                    geometryService.WKTToGeoJSON(annotation.getWktLocation()));
             }
 
             if (provision.get("type").get("id").asText().equals("array") && provision.get("value").isArray()) {
                 int index = 0;
                 ArrayNode valueListNode = mapper.createArrayNode();
-                boolean subTypeIsGeometry = provision.get("type").get("subType").get("id").asText().equals("geometry");
+                boolean subTypeIsGeometry =
+                    provision.get("type").get("subType").get("id").asText().equals("geometry");
                 for (JsonNode element : provision.get("value")) {
                     ObjectNode itemJsonObject = mapper.createObjectNode();
                     itemJsonObject.put("index", index);
@@ -178,7 +190,8 @@ public class TaskRunService {
                     if (subTypeIsGeometry) {
                         Long annotationId = element.asLong();
                         UserAnnotation annotation = userAnnotationService.get(annotationId);
-                        itemJsonObject.put("value", geometryService.WKTToGeoJSON(annotation.getWktLocation()));
+                        itemJsonObject.put("value",
+                            geometryService.WKTToGeoJSON(annotation.getWktLocation()));
                     } else {
                         itemJsonObject.set("value", element);
                     }
@@ -194,10 +207,12 @@ public class TaskRunService {
         return requestBody;
     }
 
-    public String batchProvisionTaskRun(List<JsonNode> requestBody, Long projectId, UUID taskRunId) {
+    public String batchProvisionTaskRun(List<JsonNode> requestBody, Long projectId,
+                                        UUID taskRunId) {
         checkTaskRun(projectId, taskRunId);
         List<JsonNode> body = processProvisions(requestBody);
-        return appEngineService.put("task-runs/" + taskRunId + "/input-provisions", body, MediaType.APPLICATION_JSON);
+        return appEngineService.put("task-runs/" + taskRunId + "/input-provisions", body,
+            MediaType.APPLICATION_JSON);
     }
 
     private byte[] getImageAnnotation(AnnotationDomain annotation) {
@@ -208,18 +223,21 @@ public class TaskRunService {
         parameters.setLocation(annotation.getWktLocation());
 
         try {
-            ResponseEntity<byte[]> response = imageServerService.crop(annotation, parameters, null, null);
+            ResponseEntity<byte[]> response = imageServerService.crop(annotation, parameters,
+                null, null);
             return response.getBody();
         } catch (Exception e) {
             return null;
         }
     }
 
-    public String provisionTaskRun(JsonNode json, Long projectId, UUID taskRunId, String parameterName) {
+    public String provisionTaskRun(JsonNode json, Long projectId, UUID taskRunId,
+                                   String parameterName) {
         checkTaskRun(projectId, taskRunId);
 
         String uri = "task-runs/" + taskRunId + "/input-provisions/" + parameterName;
-        String arrayTypeUri = "task-runs/" + taskRunId + "/input-provisions/" + parameterName + "/indexes";
+        String arrayTypeUri = "task-runs/" + taskRunId + "/input-provisions/" + parameterName +
+            "/indexes";
         ObjectMapper mapper = new ObjectMapper();
 
         if (json.get("type").isObject() && json.get("type").get("id").asText().equals("array")) {
@@ -265,7 +283,8 @@ public class TaskRunService {
 
                     ObjectNode itemJsonObject = mapper.createObjectNode();
                     itemJsonObject.put("index", i);
-                    itemJsonObject.put("value", geometryService.WKTToGeoJSON(annotation.getWktLocation()));
+                    itemJsonObject.put("value",
+                        geometryService.WKTToGeoJSON(annotation.getWktLocation()));
 
                     valueListNode.add(itemJsonObject);
                 }
@@ -326,12 +345,12 @@ public class TaskRunService {
     }
 
     private String provisionCollectionItem(String arrayTypeUri, int i,
-                                                           MultiValueMap<String, Object> body)
-    {
+                                           MultiValueMap<String, Object> body) {
         Map<String, String> params = new HashMap<>();
         params.put("value", String.valueOf(i));
 
-        return appEngineService.putWithParams(arrayTypeUri, body, MediaType.MULTIPART_FORM_DATA, params);
+        return appEngineService.putWithParams(arrayTypeUri, body, MediaType.MULTIPART_FORM_DATA,
+            params);
 
     }
 
@@ -383,7 +402,8 @@ public class TaskRunService {
         return downloadFile(uri, filePath.toFile());
     }
 
-    public String provisionBinaryData(MultipartFile file, Long projectId, UUID taskRunId, String parameterName) {
+    public String provisionBinaryData(MultipartFile file, Long projectId, UUID taskRunId,
+                                      String parameterName) {
         checkTaskRun(projectId, taskRunId);
 
         String uri = "task-runs/" + taskRunId + "/input-provisions/" + parameterName;
@@ -401,14 +421,16 @@ public class TaskRunService {
 
     public String postStateAction(JsonNode body, Long projectId, UUID taskRunId) {
         checkTaskRun(projectId, taskRunId);
-        return appEngineService.post("task-runs/" + taskRunId + "/state-actions", body, MediaType.APPLICATION_JSON);
+        return appEngineService.post("task-runs/" + taskRunId + "/state-actions", body,
+            MediaType.APPLICATION_JSON);
     }
 
     public String getOutputs(Long projectId, UUID taskRunId) {
         checkTaskRun(projectId, taskRunId);
 
         String response = appEngineService.get("task-runs/" + taskRunId + "/outputs");
-        Optional<TaskRun> taskRun = taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId);
+        Optional<TaskRun> taskRun = taskRunRepository.findByProjectIdAndTaskRunId(projectId,
+            taskRunId);
         if (taskRun.isEmpty()) {
             throw new ObjectNotFoundException("TaskRun", taskRunId);
         }
@@ -423,7 +445,7 @@ public class TaskRunService {
 
         List<String> geometries = outputs
             .stream()
-                .map(TaskRunValue::getValue)
+            .map(TaskRunValue::getValue)
             .filter(value -> value instanceof String geometry && geometryService.isGeometry(geometry))
             .map(value -> (String) value)
             .toList();
@@ -436,7 +458,8 @@ public class TaskRunService {
         if (!geometries.isEmpty()) {
             annotationLayer = annotationLayerService.createAnnotationLayer(layerName);
             for (String geometry : geometries) {
-                annotationService.createAnnotation(annotationLayer, geometryService.GeoJSONToWKT(geometry));
+                annotationService.createAnnotation(annotationLayer,
+                    geometryService.GeoJSONToWKT(geometry));
             }
 
 
@@ -447,9 +470,9 @@ public class TaskRunService {
         }
 
         List<TaskRunValue> geoArrayValues = outputs
-                .stream()
-                .filter(output -> output.getType().equals("ARRAY"))
-                .toList();
+            .stream()
+            .filter(output -> output.getType().equals("ARRAY"))
+            .toList();
 
         if (!geoArrayValues.isEmpty()) {
 
@@ -458,13 +481,15 @@ public class TaskRunService {
             }
 
             for (TaskRunValue arrayValue : geoArrayValues) {
-                    JsonNode items = new ObjectMapper().convertValue(arrayValue.getValue(), JsonNode.class);
-                    for (JsonNode item : items) {
-                        if (geometryService.isGeometry(item.get("value").asText())) {
-                            updated = true;
-                            annotationService.createAnnotation(annotationLayer, geometryService.GeoJSONToWKT(item.get("value").asText()));
-                        }
+                JsonNode items = new ObjectMapper().convertValue(arrayValue.getValue(),
+                    JsonNode.class);
+                for (JsonNode item : items) {
+                    if (geometryService.isGeometry(item.get("value").asText())) {
+                        updated = true;
+                        annotationService.createAnnotation(annotationLayer,
+                            geometryService.GeoJSONToWKT(item.get("value").asText()));
                     }
+                }
             }
 
             taskRunLayer.setAnnotationLayer(annotationLayer);
@@ -486,7 +511,8 @@ public class TaskRunService {
         return appEngineService.get("task-runs/" + taskRunId + "/inputs");
     }
 
-    public File getTaskRunIOParameter(Long projectId, UUID taskRunId, String parameterName, String type) {
+    public File getTaskRunIOParameter(Long projectId, UUID taskRunId, String parameterName,
+                                      String type) {
         checkTaskRun(projectId, taskRunId);
         return appEngineService.getStreamedFile("task-runs/" + taskRunId + "/" + type + "/" + parameterName);
     }

@@ -1,37 +1,23 @@
 package be.cytomine.utils;
 
-import be.cytomine.dto.image.BoundariesCropParameter;
+import java.util.ArrayList;
+import java.util.List;
 
-/*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
-
-import be.cytomine.exceptions.WrongArgumentException;
-
-import org.locationtech.jts.geom.*;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LinearRing;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import be.cytomine.dto.image.BoundariesCropParameter;
+import be.cytomine.exceptions.WrongArgumentException;
 
 public class GeometryUtils {
 
     public static Geometry createBoundingBox(String bbox) throws ParseException {
-        if(bbox.startsWith("POLYGON")) {
+        if (bbox.startsWith("POLYGON")) {
             return new WKTReader().read(bbox);
         }
         String[] coordinates = bbox.split(",");
@@ -39,7 +25,7 @@ public class GeometryUtils {
         double minY = Double.parseDouble(coordinates[1]);
         double maxX = Double.parseDouble(coordinates[2]);
         double maxY = Double.parseDouble(coordinates[3]);
-        return GeometryUtils.createBoundingBox(minX, maxX, minY , maxY);
+        return GeometryUtils.createBoundingBox(minX, maxX, minY, maxY);
     }
 
     public static Geometry createBoundingBox(double minX, double maxX, double minY, double maxY) {
@@ -58,16 +44,16 @@ public class GeometryUtils {
         if (geometry.getNumPoints() > 1) {
             Envelope env = geometry.getEnvelopeInternal();
             BoundariesCropParameter cropParameter = new BoundariesCropParameter();
-            cropParameter.setTopLeftX((int)Math.round(env.getMinX()));
-            cropParameter.setTopLeftY((int)Math.round(env.getMaxY()));
-            cropParameter.setWidth((int)env.getWidth());
-            cropParameter.setHeight((int)env.getHeight());
+            cropParameter.setTopLeftX((int) Math.round(env.getMinX()));
+            cropParameter.setTopLeftY((int) Math.round(env.getMaxY()));
+            cropParameter.setWidth((int) env.getWidth());
+            cropParameter.setHeight((int) env.getHeight());
             return cropParameter;
         } else if (geometry.getNumPoints() == 1) {
             Envelope env = geometry.getEnvelopeInternal();
             BoundariesCropParameter cropParameter = new BoundariesCropParameter();
-            cropParameter.setTopLeftX((int)Math.round(env.getMinX() - 50));
-            cropParameter.setTopLeftY((int)Math.round(env.getMaxY() + 50));
+            cropParameter.setTopLeftX((int) Math.round(env.getMinX() - 50));
+            cropParameter.setTopLeftY((int) Math.round(env.getMaxY() + 50));
             cropParameter.setWidth(100);
             cropParameter.setHeight(100);
             return cropParameter;
@@ -78,31 +64,40 @@ public class GeometryUtils {
 
     /**
      * Fill polygon to complete empty space inside polygon/mulypolygon
+     *
      * @param polygon A polygon or multipolygon wkt polygon
      * @return A polygon or multipolygon filled points
      */
     public static String fillPolygon(String polygon) {
-        if (polygon.startsWith("POLYGON")) return "POLYGON(" + getFirstPolygonLocation(polygon) + ")";
-        else if (polygon.startsWith("MULTIPOLYGON")) return "MULTIPOLYGON(" + getFirstPolygonLocationForEachItem(polygon) + ")";
+        if (polygon.startsWith("POLYGON"))
+            return "POLYGON(" + getFirstPolygonLocation(polygon) + ")";
+        else if (polygon.startsWith("MULTIPOLYGON"))
+            return "MULTIPOLYGON(" + getFirstPolygonLocationForEachItem(polygon) + ")";
         else throw new WrongArgumentException("Form cannot be filled:" + polygon);
     }
 
     /**
      * Fill all polygon inside a Multipolygon WKT polygon
+     *
      * @param form Multipolygon WKT polygon
      * @return Multipolygon with all its polygon filled
      */
     private static String getFirstPolygonLocationForEachItem(String form) {
-        //e.g: "MULTIPOLYGON (((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2)) , ((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2)) , ((6 3,9 2,9 4,6 3)))";
+        //e.g: "MULTIPOLYGON (((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2)) , ((1 1,5 1,5 5,1 5,1
+        // 1),(2 2,2 3,3 3,3 2,2 2)) , ((6 3,9 2,9 4,6 3)))";
         String workingForm = form.replaceAll("\\) ", ")");
-        //"MULTIPOLYGON(((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2)),((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2)),((6 3,9 2,9 4,6 3)))";
+        //"MULTIPOLYGON(((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2)),((1 1,5 1,5 5,1 5,1 1),(2
+        // 2,2 3,3 3,3 2,2 2)),((6 3,9 2,9 4,6 3)))";
         workingForm = workingForm.replaceAll(" \\(", "(");
         workingForm = workingForm.replace("MULTIPOLYGON(", "");
-        //"((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2)),((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2)),((6 3,9 2,9 4,6 3)))";
+        //"((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2)),((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,
+        // 2 2)),((6 3,9 2,9 4,6 3)))";
         workingForm = workingForm.substring(0, workingForm.length() - 1);
-        //"((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2)),((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2)),((6 3,9 2,9 4,6 3))";
+        //"((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2)),((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,
+        // 2 2)),((6 3,9 2,9 4,6 3))";
         String[] polygons = workingForm.split("\\)\\)\\,\\(\\(");
-        //"[ ((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2] [1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2] [6 3,9 2,9 4,6 3)) ]";
+        //"[ ((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2] [1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,
+        // 2 2] [6 3,9 2,9 4,6 3)) ]";
         List<String> fixedPolygon = new ArrayList<String>();
         for (int i = 0; i < polygons.length; i++) {
             if (i == 0) {
@@ -112,7 +107,8 @@ public class GeometryUtils {
             } else {
                 fixedPolygon.add("((" + polygons[i] + "))");
             }
-            //"[ ((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2))] [((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2))] [((6 3,9 2,9 4,6 3)) ]";
+            //"[ ((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2))] [((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,
+            // 3 3,3 2,2 2))] [((6 3,9 2,9 4,6 3)) ]";
         }
 
         List<String> filledPolygon = new ArrayList<String>();
@@ -128,6 +124,7 @@ public class GeometryUtils {
 
     /**
      * Fill a polygon
+     *
      * @param polygon Polygon as wkt
      * @return Polygon filled points
      */

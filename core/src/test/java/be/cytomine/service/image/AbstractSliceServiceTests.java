@@ -1,32 +1,23 @@
 package be.cytomine.service.image;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import be.cytomine.BasicInstanceBuilder;
-import be.cytomine.CytomineCoreApplication;
-import be.cytomine.domain.image.*;
-import be.cytomine.exceptions.AlreadyExistException;
-import be.cytomine.exceptions.CytomineException;
-import be.cytomine.exceptions.WrongArgumentException;
-import be.cytomine.repository.image.UploadedFileRepository;
-import be.cytomine.service.CommandService;
-import be.cytomine.service.command.TransactionService;
-import be.cytomine.utils.CommandResponse;
-import be.cytomine.utils.JsonObject;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -35,10 +26,21 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 
-import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
+import be.cytomine.BasicInstanceBuilder;
+import be.cytomine.CytomineCoreApplication;
+import be.cytomine.domain.image.AbstractImage;
+import be.cytomine.domain.image.AbstractSlice;
+import be.cytomine.domain.image.SliceInstance;
+import be.cytomine.domain.image.UploadedFile;
+import be.cytomine.exceptions.AlreadyExistException;
+import be.cytomine.exceptions.CytomineException;
+import be.cytomine.exceptions.WrongArgumentException;
+import be.cytomine.repository.image.UploadedFileRepository;
+import be.cytomine.service.CommandService;
+import be.cytomine.service.command.TransactionService;
+import be.cytomine.utils.CommandResponse;
+import be.cytomine.utils.JsonObject;
 
-import static org.assertj.core.api.AssertionsForClassTypes.fail;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 
@@ -118,16 +120,16 @@ public class AbstractSliceServiceTests {
         builder.persistAndReturn(abstractSlice2);
 
 
-        assertThat(abstractSliceService.find(abstractSlice1.getImage(), 1,2,3)).isPresent();
-        assertThat(abstractSliceService.find(abstractSlice1.getImage(), 1,2,4)).isPresent();
-        assertThat(abstractSliceService.find(abstractSlice1.getImage(), 2,2,3)).isEmpty();
+        assertThat(abstractSliceService.find(abstractSlice1.getImage(), 1, 2, 3)).isPresent();
+        assertThat(abstractSliceService.find(abstractSlice1.getImage(), 1, 2, 4)).isPresent();
+        assertThat(abstractSliceService.find(abstractSlice1.getImage(), 2, 2, 3)).isEmpty();
     }
 
     @Test
     void find_abstract_slice_image_uploaded() {
         AbstractSlice abstractSlice1 = builder.given_an_abstract_slice();
         assertThat(abstractSliceService.findImageUploaded(abstractSlice1.getId()))
-                .isEqualTo(abstractSlice1.getUploadedFile().getUser());
+            .isEqualTo(abstractSlice1.getUploadedFile().getUser());
     }
 
 
@@ -157,7 +159,8 @@ public class AbstractSliceServiceTests {
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
         AssertionsForClassTypes.assertThat(abstractSliceService.find(commandResponse.getObject().getId())).isPresent();
-        AbstractSlice created = abstractSliceService.find(commandResponse.getObject().getId()).get();
+        AbstractSlice created =
+            abstractSliceService.find(commandResponse.getObject().getId()).get();
     }
 
     @Test
@@ -193,7 +196,8 @@ public class AbstractSliceServiceTests {
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
         AssertionsForClassTypes.assertThat(abstractSliceService.find(commandResponse.getObject().getId())).isPresent();
-        AbstractSlice updated = abstractSliceService.find(commandResponse.getObject().getId()).get();
+        AbstractSlice updated =
+            abstractSliceService.find(commandResponse.getObject().getId()).get();
 
         assertThat(updated.getChannel()).isEqualTo(2);
         assertThat(updated.getZStack()).isEqualTo(20);
@@ -204,7 +208,8 @@ public class AbstractSliceServiceTests {
     void delete_abstract_slice_with_success() {
         AbstractSlice abstractSlice = builder.given_an_abstract_slice();
 
-        CommandResponse commandResponse = abstractSliceService.delete(abstractSlice, null, null, true);
+        CommandResponse commandResponse = abstractSliceService.delete(abstractSlice, null, null,
+            true);
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -215,10 +220,9 @@ public class AbstractSliceServiceTests {
     void delete_abstract_slice_with_dependencies_with_success() {
         SliceInstance sliceInstance = builder.given_a_slice_instance();
         Assertions.assertThrows(CytomineException.class, () -> {
-            abstractSliceService.delete(sliceInstance.getBaseSlice(), null,  null, false);
+            abstractSliceService.delete(sliceInstance.getBaseSlice(), null, null, false);
         });
     }
-
 
 
 }

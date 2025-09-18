@@ -37,19 +37,15 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 public class AnnotationGroupService extends ModelService {
 
     @Autowired
+    AnnotationLinkRepository annotationLinkRepository;
+    @Autowired
     private CurrentUserService currentUserService;
-
     @Autowired
     private SecurityACLService securityACLService;
-
     @Autowired
     private TransactionService transactionService;
-
     @Autowired
     private AnnotationGroupRepository annotationGroupRepository;
-
-    @Autowired
-    AnnotationLinkRepository annotationLinkRepository;
 
     @Override
     public Class currentDomain() {
@@ -96,7 +92,8 @@ public class AnnotationGroupService extends ModelService {
     }
 
     @Override
-    public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
+    public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData,
+                                  Transaction transaction) {
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
         securityACLService.check(domain.container(), READ);
@@ -105,7 +102,8 @@ public class AnnotationGroupService extends ModelService {
     }
 
     @Override
-    public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
+    public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task,
+                                  boolean printMessage) {
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
         securityACLService.check(domain.container(), READ);
@@ -118,15 +116,18 @@ public class AnnotationGroupService extends ModelService {
         AnnotationGroup agToMerge = get(mergedId);
 
         if (ag == null || agToMerge == null) {
-            throw new ObjectNotFoundException("AnnotationGroup {} not found.", ag == null ? id : mergedId);
+            throw new ObjectNotFoundException("AnnotationGroup {} not found.", ag == null ? id :
+                mergedId);
         }
         if (ag.getProject() != agToMerge.getProject() || ag.getImageGroup() != agToMerge.getImageGroup() || !ag.getType().equals(agToMerge.getType())) {
-            throw new InvalidRequestException("Annotation groups " + id + " and " + mergedId + " are incompatible to be merged.");
+            throw new InvalidRequestException("Annotation groups " + id + " and " + mergedId + " " +
+                "are incompatible to be merged.");
         }
 
         annotationLinkRepository.setMergedAnnotationGroup(ag, agToMerge);
         annotationGroupRepository.delete(agToMerge);
 
-        return executeCommand(new EditCommand(currentUserService.getCurrentUser(), null), ag, AnnotationGroup.getDataFromDomain(ag));
+        return executeCommand(new EditCommand(currentUserService.getCurrentUser(), null), ag,
+            AnnotationGroup.getDataFromDomain(ag));
     }
 }

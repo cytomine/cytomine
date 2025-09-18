@@ -51,12 +51,19 @@ public class AnnotationLinkServiceTests {
     @Test
     void list_annotation_link_by_annotation_group() {
         Project project = builder.given_a_project();
-        AnnotationGroup annotationGroup = builder.given_an_annotation_group(project, builder.given_an_imagegroup(project));
+        AnnotationGroup annotationGroup = builder.given_an_annotation_group(project,
+            builder.given_an_imagegroup(project));
         ImageInstance image = builder.given_an_image_instance(project);
 
-        AnnotationLink annotationLink1 = builder.given_an_annotation_link(builder.given_a_user_annotation(project), annotationGroup, image);
-        AnnotationLink annotationLink2 = builder.given_an_annotation_link(builder.given_a_user_annotation(project), annotationGroup, image);
-        AnnotationLink annotationLink3 = builder.given_an_annotation_link(builder.given_a_user_annotation(project), annotationGroup, image);
+        AnnotationLink annotationLink1 =
+            builder.given_an_annotation_link(builder.given_a_user_annotation(project),
+                annotationGroup, image);
+        AnnotationLink annotationLink2 =
+            builder.given_an_annotation_link(builder.given_a_user_annotation(project),
+                annotationGroup, image);
+        AnnotationLink annotationLink3 =
+            builder.given_an_annotation_link(builder.given_a_user_annotation(project),
+                annotationGroup, image);
         AnnotationLink annotationLink4 = builder.given_an_annotation_link();
 
         AssertionsForInterfaceTypes.assertThat(annotationLinkService.list(annotationGroup)).containsExactly(annotationLink1, annotationLink2, annotationLink3);
@@ -78,7 +85,8 @@ public class AnnotationLinkServiceTests {
     void delete_annotation_link_with_success() {
         AnnotationLink annotationLink = builder.given_an_annotation_link();
 
-        CommandResponse commandResponse = annotationLinkService.delete(annotationLink, null, null, true);
+        CommandResponse commandResponse = annotationLinkService.delete(annotationLink, null, null
+            , true);
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);

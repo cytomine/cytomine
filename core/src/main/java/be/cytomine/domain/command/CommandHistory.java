@@ -1,6 +1,11 @@
 package be.cytomine.domain.command;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -60,17 +65,18 @@ public class CommandHistory extends CytomineDomain {
         this.setMessage(redoStackItem.getCommand().getActionMessage());
     }
 
-    public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
-        throw new RuntimeException("Not supported");
-    }
-
     public static JsonObject getDataFromDomain(CytomineDomain domain) {
         JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
-        CommandHistory commandHistory = (CommandHistory)domain;
-        returnArray.put("command", commandHistory.getCommand()!=null? commandHistory.getCommand().toJsonObject() : null);
+        CommandHistory commandHistory = (CommandHistory) domain;
+        returnArray.put("command", commandHistory.getCommand() != null ?
+            commandHistory.getCommand().toJsonObject() : null);
         returnArray.put("prefixAction", commandHistory.prefixAction);
         returnArray.put("user", commandHistory.user);
         return returnArray;
+    }
+
+    public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
+        throw new RuntimeException("Not supported");
     }
 
     @Override

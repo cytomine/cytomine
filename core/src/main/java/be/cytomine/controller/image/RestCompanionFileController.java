@@ -1,5 +1,20 @@
 package be.cytomine.controller.image;
 
+import java.io.IOException;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.gateway.mvc.ProxyExchange;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.CompanionFile;
@@ -11,14 +26,6 @@ import be.cytomine.service.image.CompanionFileService;
 import be.cytomine.service.image.UploadedFileService;
 import be.cytomine.service.middleware.ImageServerService;
 import be.cytomine.utils.JsonObject;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.gateway.mvc.ProxyExchange;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.view.RedirectView;
-
-import java.io.IOException;
 
 @RestController
 @RequestMapping("/api")
@@ -38,32 +45,32 @@ public class RestCompanionFileController extends RestCytomineController {
 
     @GetMapping("/abstractimage/{id}/companionfile.json")
     public ResponseEntity<String> listByAbstractImage(
-            @PathVariable Long id
+        @PathVariable Long id
     ) {
         log.debug("REST request to list companion file for abstract image {}", id);
         AbstractImage abstractImage = abstractImageRepository.findById(id)
-                .orElseThrow(() -> new ObjectNotFoundException("AbstractImage", id));
+            .orElseThrow(() -> new ObjectNotFoundException("AbstractImage", id));
         return responseSuccess(companionFileService.list(abstractImage));
     }
 
     @GetMapping("/uploadedfile/{id}/companionfile.json")
     public ResponseEntity<String> listByUploadedFile(
-            @PathVariable Long id
+        @PathVariable Long id
     ) {
         log.debug("REST request to list companion file for uploaded file {}", id);
         UploadedFile uploadedFile = uploadedFileService.find(id)
-                .orElseThrow(() -> new ObjectNotFoundException("UploadedFile", id));
+            .orElseThrow(() -> new ObjectNotFoundException("UploadedFile", id));
         return responseSuccess(companionFileService.list(uploadedFile));
     }
 
     @GetMapping("/companionfile/{id}.json")
     public ResponseEntity<String> show(
-            @PathVariable Long id
+        @PathVariable Long id
     ) {
         log.debug("REST request to get companionfile {}", id);
         return companionFileService.find(id)
-                .map(this::responseSuccess)
-                .orElseThrow(() -> new ObjectNotFoundException("AbstractImage", id));
+            .map(this::responseSuccess)
+            .orElseThrow(() -> new ObjectNotFoundException("AbstractImage", id));
     }
 
     @PostMapping("/companionfile.json")
@@ -89,7 +96,7 @@ public class RestCompanionFileController extends RestCytomineController {
     public ResponseEntity<byte[]> download(@PathVariable Long id, ProxyExchange<byte[]> proxy) throws IOException {
         log.debug("REST request to download companionfile");
         CompanionFile companionFile = companionFileService.find(id)
-                .orElseThrow(() -> new ObjectNotFoundException("CompanionFile", id));
+            .orElseThrow(() -> new ObjectNotFoundException("CompanionFile", id));
         // TODO: in abstract image, there is no check fos download auth!?
         return imageServerService.download(companionFile, proxy);
     }
@@ -99,8 +106,8 @@ public class RestCompanionFileController extends RestCytomineController {
     public ResponseEntity<String> showUploaderOfImage(@PathVariable Long id) {
         log.debug("REST request to show companionfile uploader");
         CompanionFile companionFile = companionFileService.find(id)
-                .orElseThrow(() -> new ObjectNotFoundException("CompanionFile", id));
-        if (companionFile.getUploadedFile() !=null && companionFile.getUploadedFile().getUser()!=null) {
+            .orElseThrow(() -> new ObjectNotFoundException("CompanionFile", id));
+        if (companionFile.getUploadedFile() != null && companionFile.getUploadedFile().getUser() != null) {
             return responseSuccess(companionFile.getUploadedFile().getUser());
         } else {
             return responseNotFound("CompanionFile", "User", id);

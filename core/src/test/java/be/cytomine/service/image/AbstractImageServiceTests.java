@@ -1,24 +1,42 @@
 package be.cytomine.service.image;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
+import org.assertj.core.api.AssertionsForClassTypes;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
-import be.cytomine.domain.image.*;
+import be.cytomine.domain.image.AbstractImage;
+import be.cytomine.domain.image.ImageInstance;
+import be.cytomine.domain.image.UploadedFile;
 import be.cytomine.domain.image.server.Storage;
 import be.cytomine.domain.meta.AttachedFile;
 import be.cytomine.domain.project.Project;
@@ -32,23 +50,7 @@ import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.filters.SearchOperation;
 import be.cytomine.utils.filters.SearchParameterEntry;
-import org.assertj.core.api.AssertionsForClassTypes;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.test.context.support.WithMockUser;
 
-import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
-import static org.assertj.core.api.AssertionsForClassTypes.fail;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 
@@ -91,25 +93,32 @@ public class AbstractImageServiceTests {
         builder.persistAndReturn(abstractImage2);
 
         Page<AbstractImage> images = null;
-        images = abstractImageService.list(null, new ArrayList<>(List.of(new SearchParameterEntry("originalFilename", SearchOperation.ilike, "kara"))), Pageable.unpaged());
+        images = abstractImageService.list(null,
+            new ArrayList<>(List.of(new SearchParameterEntry("originalFilename",
+                SearchOperation.ilike, "kara"))), Pageable.unpaged());
         assertThat(images.getContent()).contains(abstractImage1);
         assertThat(images.getContent()).doesNotContain(abstractImage2);
 
-        images = abstractImageService.list(null, new ArrayList<>(List.of(new SearchParameterEntry("width", SearchOperation.gte, 1024))), Pageable.unpaged());
+        images = abstractImageService.list(null,
+            new ArrayList<>(List.of(new SearchParameterEntry("width", SearchOperation.gte, 1024))), Pageable.unpaged());
         assertThat(images.getContent()).contains(abstractImage2);
         assertThat(images.getContent()).doesNotContain(abstractImage1);
 
-        images = abstractImageService.list(null, new ArrayList<>(List.of(new SearchParameterEntry("width", SearchOperation.in, List.of(2048)))), Pageable.unpaged());
+        images = abstractImageService.list(null,
+            new ArrayList<>(List.of(new SearchParameterEntry("width", SearchOperation.in,
+                List.of(2048)))), Pageable.unpaged());
         assertThat(images.getContent()).contains(abstractImage2);
         assertThat(images.getContent()).doesNotContain(abstractImage1);
 
-        images = abstractImageService.list(null, new ArrayList<>(List.of(new SearchParameterEntry("uploadedFile", SearchOperation.in, List.of(abstractImage2.getUploadedFile().getId())))), Pageable.unpaged());
+        images = abstractImageService.list(null,
+            new ArrayList<>(List.of(new SearchParameterEntry("uploadedFile", SearchOperation.in,
+                List.of(abstractImage2.getUploadedFile().getId())))), Pageable.unpaged());
         assertThat(images.getContent()).contains(abstractImage2);
         assertThat(images.getContent()).doesNotContain(abstractImage1);
 
         images = abstractImageService.list(null, new ArrayList<>(
-                List.of(new SearchParameterEntry("width", SearchOperation.lte, 800),
-                        new SearchParameterEntry("originalFilename", SearchOperation.ilike, "kara"))
+            List.of(new SearchParameterEntry("width", SearchOperation.lte, 800),
+                new SearchParameterEntry("originalFilename", SearchOperation.ilike, "kara"))
         ), Pageable.unpaged());
         assertThat(images.getContent()).contains(abstractImage1);
         assertThat(images.getContent()).doesNotContain(abstractImage2);
@@ -128,9 +137,11 @@ public class AbstractImageServiceTests {
         Page<AbstractImage> images = null;
         images = abstractImageService.list(project, new ArrayList<>(), Pageable.unpaged());
         assertThat(images.getContent()).contains(abstractImageInProject);
-        assertThat(images.getContent().stream().filter(x -> Objects.equals(x.getId(), abstractImageInProject.getId())).findFirst().get().getInProject()).isTrue();
+        assertThat(images.getContent().stream().filter(x -> Objects.equals(x.getId(),
+            abstractImageInProject.getId())).findFirst().get().getInProject()).isTrue();
         assertThat(images.getContent()).contains(abstractImageNotInProject);
-        assertThat(images.getContent().stream().filter(x -> Objects.equals(x.getId(), abstractImageNotInProject.getId())).findFirst().get().getInProject()).isFalse();
+        assertThat(images.getContent().stream().filter(x -> Objects.equals(x.getId(),
+            abstractImageNotInProject.getId())).findFirst().get().getInProject()).isFalse();
     }
 
     @Test
@@ -151,7 +162,9 @@ public class AbstractImageServiceTests {
         builder.persistAndReturn(abstractImageFromAnotherStorage);
 
         Page<AbstractImage> images = null;
-        images = abstractImageService.list(null, new ArrayList<>(List.of(new SearchParameterEntry("originalFilename", SearchOperation.ilike, "match"))), Pageable.unpaged());
+        images = abstractImageService.list(null,
+            new ArrayList<>(List.of(new SearchParameterEntry("originalFilename",
+                SearchOperation.ilike, "match"))), Pageable.unpaged());
         assertThat(images.getContent()).contains(abstractImageFromUserStorage);
         assertThat(images.getContent()).doesNotContain(abstractImageFromAnotherStorage);
     }
@@ -214,7 +227,8 @@ public class AbstractImageServiceTests {
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
         AssertionsForClassTypes.assertThat(abstractImageService.find(commandResponse.getObject().getId())).isPresent();
-        AbstractImage created = abstractImageService.find(commandResponse.getObject().getId()).get();
+        AbstractImage created =
+            abstractImageService.find(commandResponse.getObject().getId()).get();
     }
 
     @Test
@@ -281,7 +295,8 @@ public class AbstractImageServiceTests {
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
         AssertionsForClassTypes.assertThat(abstractImageService.find(commandResponse.getObject().getId())).isPresent();
-        AbstractImage updated = abstractImageService.find(commandResponse.getObject().getId()).get();
+        AbstractImage updated =
+            abstractImageService.find(commandResponse.getObject().getId()).get();
 
         assertThat(updated.getHeight()).isEqualTo(90000);
         assertThat(updated.getWidth()).isEqualTo(9000);
@@ -305,7 +320,8 @@ public class AbstractImageServiceTests {
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
         AssertionsForClassTypes.assertThat(abstractImageService.find(commandResponse.getObject().getId())).isPresent();
-        AbstractImage updated = abstractImageService.find(commandResponse.getObject().getId()).get();
+        AbstractImage updated =
+            abstractImageService.find(commandResponse.getObject().getId()).get();
         entityManager.refresh(abstractImage);
 
         assertThat(updated.getPhysicalSizeX()).isEqualTo(2.5);
@@ -344,7 +360,8 @@ public class AbstractImageServiceTests {
     void delete_abstract_image_with_success() {
         AbstractImage abstractImage = builder.given_an_abstract_image();
 
-        CommandResponse commandResponse = abstractImageService.delete(abstractImage, null, null, true);
+        CommandResponse commandResponse = abstractImageService.delete(abstractImage, null, null,
+            true);
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -359,7 +376,8 @@ public class AbstractImageServiceTests {
 
         assertThat(entityManager.find(AttachedFile.class, attachedFile.getId())).isNotNull();
 
-        CommandResponse commandResponse = abstractImageService.delete(abstractImage, null, null, true);
+        CommandResponse commandResponse = abstractImageService.delete(abstractImage, null, null,
+            true);
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -370,7 +388,8 @@ public class AbstractImageServiceTests {
     @Test
     void delete_abstract_image_with_image_in_project_is_refused() {
         AbstractImage abstractImage = builder.given_an_abstract_image();
-        ImageInstance imageInstance = builder.given_an_image_instance(abstractImage, builder.given_a_project());
+        ImageInstance imageInstance = builder.given_an_image_instance(abstractImage,
+            builder.given_a_project());
         Assertions.assertThrows(ForbiddenException.class, () -> {
             abstractImageService.delete(abstractImage, null, null, true);
         });

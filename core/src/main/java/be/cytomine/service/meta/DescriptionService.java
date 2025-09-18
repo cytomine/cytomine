@@ -16,8 +16,21 @@ package be.cytomine.service.meta;
  * limitations under the License.
  */
 
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
+import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import be.cytomine.domain.CytomineDomain;
-import be.cytomine.domain.command.*;
+import be.cytomine.domain.command.AddCommand;
+import be.cytomine.domain.command.Command;
+import be.cytomine.domain.command.DeleteCommand;
+import be.cytomine.domain.command.EditCommand;
+import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.meta.Description;
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.security.User;
@@ -31,16 +44,8 @@ import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.Task;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-import jakarta.transaction.Transactional;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
-import static org.springframework.security.acls.domain.BasePermission.*;
+import static org.springframework.security.acls.domain.BasePermission.READ;
 
 @Slf4j
 @Service
@@ -76,8 +81,9 @@ public class DescriptionService extends ModelService {
 
 
     public Optional<Description> findByDomain(CytomineDomain domain) {
-        securityACLService.check(domain.container() ,READ);
-        return descriptionRepository.findByDomainIdentAndDomainClassName(domain.getId(), domain.getClass().getName());
+        securityACLService.check(domain.container(), READ);
+        return descriptionRepository.findByDomainIdentAndDomainClassName(domain.getId(),
+            domain.getClass().getName());
     }
 
     /**
@@ -86,86 +92,102 @@ public class DescriptionService extends ModelService {
     public Optional<Description> findByDomain(String domainClassName, Long domainIdent) {
         if (domainClassName.contains("AnnotationDomain")) {
             AnnotationDomain annotation = annotationDomainRepository.findById(domainIdent)
-                    .orElseThrow(() -> new ObjectNotFoundException("AnnotationDomain", domainIdent));
+                .orElseThrow(() -> new ObjectNotFoundException("AnnotationDomain", domainIdent));
             domainClassName = annotation.getClass().getName();
         }
         securityACLService.check(domainIdent, domainClassName, READ);
-        return descriptionRepository.findByDomainIdentAndDomainClassName(domainIdent, domainClassName);
+        return descriptionRepository.findByDomainIdentAndDomainClassName(domainIdent,
+            domainClassName);
     }
 
     public CommandResponse add(JsonObject jsonObject) {
         User currentUser = currentUserService.getCurrentUser();
         //Get the associated domain
-        CytomineDomain domain = getCytomineDomain(jsonObject.getJSONAttrStr("domainClassName"), jsonObject.getJSONAttrLong("domainIdent"));
+        CytomineDomain domain = getCytomineDomain(jsonObject.getJSONAttrStr("domainClassName"),
+            jsonObject.getJSONAttrLong("domainIdent"));
         //TODO when is getting into this?
-        if(jsonObject.getJSONAttrStr("domainClassName").contains("AnnotationDomain")) {
+        if (jsonObject.getJSONAttrStr("domainClassName").contains("AnnotationDomain")) {
             //I am adding this in case this is used, to check a min of ROLE_USER
             securityACLService.checkUser(currentUser);
-            AnnotationDomain annotation = annotationDomainRepository.findById(jsonObject.getJSONAttrLong("domainIdent"))
-                    .orElseThrow(() -> new ObjectNotFoundException("AnnotationDomain", jsonObject.getJSONAttrLong("domainIdent")));
+            AnnotationDomain annotation =
+                annotationDomainRepository.findById(jsonObject.getJSONAttrLong("domainIdent"))
+                    .orElseThrow(() -> new ObjectNotFoundException("AnnotationDomain",
+                        jsonObject.getJSONAttrLong("domainIdent")));
             jsonObject.put("domainClassName", annotation.getClass().getName());
-            securityACLService.check(jsonObject.getJSONAttrLong("domainIdent"), annotation.getClass().getName(), READ);
-            securityACLService.checkFullOrRestrictedForOwner(jsonObject.getJSONAttrLong("domainIdent"), annotation.getClass().getName(), "user");
-        }else{
-            securityACLService.checkUserAccessRightsForMeta( domain,  currentUser);
+            securityACLService.check(jsonObject.getJSONAttrLong("domainIdent"),
+                annotation.getClass().getName(), READ);
+            securityACLService.checkFullOrRestrictedForOwner(jsonObject.getJSONAttrLong(
+                "domainIdent"), annotation.getClass().getName(), "user");
+        } else {
+            securityACLService.checkUserAccessRightsForMeta(domain, currentUser);
         }
-        Command command = new AddCommand(currentUser,null);
-        return executeCommand(command,null, jsonObject);
+        Command command = new AddCommand(currentUser, null);
+        return executeCommand(command, null, jsonObject);
     }
 
     @Override
-    public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
+    public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData,
+                                  Transaction transaction) {
         User currentUser = currentUserService.getCurrentUser();
-        CytomineDomain parentDomain = getCytomineDomain(((Description) domain).getDomainClassName(), ((Description) domain).getDomainIdent());
+        CytomineDomain parentDomain =
+            getCytomineDomain(((Description) domain).getDomainClassName(),
+                ((Description) domain).getDomainIdent());
         securityACLService.checkUserAccessRightsForMeta(parentDomain, currentUser);
-        return executeCommand(new EditCommand(currentUser, transaction), domain,jsonNewData);
+        return executeCommand(new EditCommand(currentUser, transaction), domain, jsonNewData);
     }
 
     @Override
-    public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
+    public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task,
+                                  boolean printMessage) {
         User currentUser = currentUserService.getCurrentUser();
-        CytomineDomain parentDomain = getCytomineDomain(((Description) domain).getDomainClassName(), ((Description) domain).getDomainIdent());
+        CytomineDomain parentDomain =
+            getCytomineDomain(((Description) domain).getDomainClassName(),
+                ((Description) domain).getDomainIdent());
         securityACLService.checkUserAccessRightsForMeta(parentDomain, currentUser);
         Command c = new DeleteCommand(currentUser, transaction);
-        return executeCommand(c,domain, null);
+        return executeCommand(c, domain, null);
     }
 
 
     @Override
     public List<Object> getStringParamsI18n(CytomineDomain domain) {
-        return List.of(((Description)domain).getDomainIdent(), ((Description)domain).getDomainClassName());
+        return List.of(((Description) domain).getDomainIdent(),
+            ((Description) domain).getDomainClassName());
     }
 
 
     /**
      * Retrieve domain thanks to a JSON object
+     *
      * @return domain retrieve thanks to json
      */
     public CytomineDomain retrieve(JsonObject json) {
 
         CytomineDomain domain = null;
         try {
-            domain = (CytomineDomain) getEntityManager().find(Class.forName(json.getJSONAttrStr("domainClassName")), json.getJSONAttrLong("domainIdent"));
+            domain = (CytomineDomain) getEntityManager().find(Class.forName(json.getJSONAttrStr(
+                "domainClassName")), json.getJSONAttrLong("domainIdent"));
             Description description = null;
-            if (domain!=null) {
+            if (domain != null) {
                 description = findByDomain(domain).orElse(null);
             }
-            if (description!=null) {
+            if (description != null) {
                 return description;
             } else {
-                throw new ObjectNotFoundException("Description not found for domain "+json.getJSONAttrStr("domainClassName") +" " + json.getJSONAttrLong("domainIdent"));
+                throw new ObjectNotFoundException("Description not found for domain " + json.getJSONAttrStr("domainClassName") + " " + json.getJSONAttrLong("domainIdent"));
             }
         } catch (ClassNotFoundException e) {
-            throw new ObjectNotFoundException("Description not found for domain "+json.getJSONAttrStr("domainClassName") +" " + json.getJSONAttrLong("domainIdent"));
+            throw new ObjectNotFoundException("Description not found for domain " + json.getJSONAttrStr("domainClassName") + " " + json.getJSONAttrLong("domainIdent"));
         }
     }
 
 
     @Override
     public void checkDoNotAlreadyExist(CytomineDomain domain) {
-        Optional<Description> description = descriptionRepository.findByDomainIdentAndDomainClassName(((Description)domain).getDomainIdent(), ((Description)domain).getDomainClassName());
+        Optional<Description> description =
+            descriptionRepository.findByDomainIdentAndDomainClassName(((Description) domain).getDomainIdent(), ((Description) domain).getDomainClassName());
         if (description.isPresent() && !Objects.equals(description.get().getId(), domain.getId())) {
-            throw new AlreadyExistException("Description already exists for " +((Description)domain).getDomainClassName() + " " + ((Description)domain).getDomainIdent());
+            throw new AlreadyExistException("Description already exists for " + ((Description) domain).getDomainClassName() + " " + ((Description) domain).getDomainIdent());
         }
     }
 

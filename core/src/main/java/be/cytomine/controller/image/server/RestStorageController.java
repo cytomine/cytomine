@@ -1,15 +1,24 @@
 package be.cytomine.controller.image.server;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.image.server.StorageService;
 import be.cytomine.service.utils.TaskService;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.Task;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
@@ -29,20 +38,21 @@ public class RestStorageController extends RestCytomineController {
      */
     @GetMapping("/storage.json")
     public ResponseEntity<String> list(
-            @RequestParam(defaultValue = "false", required = false) Boolean all
+        @RequestParam(defaultValue = "false", required = false) Boolean all
     ) {
         log.debug("REST request to list storages: all? {}", all);
-        return responseSuccess(all ? storageService.list() : storageService.list(currentUserService.getCurrentUser(), null));
+        return responseSuccess(all ? storageService.list() :
+            storageService.list(currentUserService.getCurrentUser(), null));
     }
 
     @GetMapping("/storage/{id}.json")
     public ResponseEntity<String> show(
-            @PathVariable Long id
+        @PathVariable Long id
     ) {
         log.debug("REST request to get Storage : {}", id);
         return storageService.find(id)
-                .map(this::responseSuccess)
-                .orElseGet(() -> responseNotFound("Storage", id));
+            .map(this::responseSuccess)
+            .orElseGet(() -> responseNotFound("Storage", id));
     }
 
 
@@ -59,7 +69,8 @@ public class RestStorageController extends RestCytomineController {
     }
 
     @DeleteMapping("/storage/{id}.json")
-    public ResponseEntity<String> delete(@PathVariable String id, @RequestParam(required = false) Long task) {
+    public ResponseEntity<String> delete(@PathVariable String id,
+                                         @RequestParam(required = false) Long task) {
         log.debug("REST request to delete Storage : " + id);
         Task existingTask = taskService.get(task);
         return delete(storageService, JsonObject.of("id", id), existingTask);

@@ -1,18 +1,30 @@
 package be.cytomine.controller.appengine;
 
-import be.cytomine.service.appengine.TaskRunService;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.List;
+import java.util.UUID;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
-import java.util.List;
-import java.util.UUID;
+import be.cytomine.service.appengine.TaskRunService;
 
 @ConditionalOnExpression("${application.appEngine.enabled: false}")
 @RequiredArgsConstructor
@@ -77,10 +89,10 @@ public class TaskRunController {
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     public String provision(
-            @PathVariable Long project,
-            @PathVariable UUID task,
-            @PathVariable("parameter_name") String parameterName,
-            @RequestParam MultipartFile file
+        @PathVariable Long project,
+        @PathVariable UUID task,
+        @PathVariable("parameter_name") String parameterName,
+        @RequestParam MultipartFile file
     ) {
         return taskRunService.provisionBinaryData(file, project, task, parameterName);
     }
@@ -104,17 +116,18 @@ public class TaskRunController {
 
     @GetMapping("/project/{project}/task-runs/{task}/input/{parameter_name}")
     public void getTaskRunInputParameter(
-            @PathVariable Long project,
-            @PathVariable UUID task,
-            @PathVariable("parameter_name") String parameterName,
-            HttpServletResponse response
+        @PathVariable Long project,
+        @PathVariable UUID task,
+        @PathVariable("parameter_name") String parameterName,
+        HttpServletResponse response
     ) {
         File file = taskRunService.getTaskRunIOParameter(project, task, parameterName, "input");
         try (InputStream is = new FileInputStream(file);
              OutputStream os = response.getOutputStream()) {
 
             response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-            response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + parameterName + "\"");
+            response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
+                "attachment; filename=\"" + parameterName + "\"");
             response.setHeader(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
             response.setHeader(HttpHeaders.PRAGMA, "no-cache");
             response.setHeader(HttpHeaders.EXPIRES, "0");
@@ -137,17 +150,18 @@ public class TaskRunController {
 
     @GetMapping("/project/{project}/task-runs/{task}/output/{parameter_name}")
     public void getTaskRunOutputParameter(
-            @PathVariable Long project,
-            @PathVariable UUID task,
-            @PathVariable("parameter_name") String parameterName,
-            HttpServletResponse response
+        @PathVariable Long project,
+        @PathVariable UUID task,
+        @PathVariable("parameter_name") String parameterName,
+        HttpServletResponse response
     ) {
         File file = taskRunService.getTaskRunIOParameter(project, task, parameterName, "output");
         try (InputStream is = new FileInputStream(file);
              OutputStream os = response.getOutputStream()) {
 
             response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-            response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + parameterName + "\"");
+            response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
+                "attachment; filename=\"" + parameterName + "\"");
             response.setHeader(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
             response.setHeader(HttpHeaders.PRAGMA, "no-cache");
             response.setHeader(HttpHeaders.EXPIRES, "0");

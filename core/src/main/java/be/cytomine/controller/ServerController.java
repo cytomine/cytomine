@@ -1,5 +1,24 @@
 package be.cytomine.controller;
 
+import java.io.IOException;
+import java.util.Date;
+import java.util.stream.Stream;
+
+import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.NonTransientDataAccessException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestContextHolder;
+
 import be.cytomine.config.properties.ApplicationProperties;
 import be.cytomine.domain.security.User;
 import be.cytomine.domain.social.LastConnection;
@@ -9,21 +28,6 @@ import be.cytomine.repositorynosql.social.PersistentConnectionRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.database.SequenceService;
 import be.cytomine.utils.JsonObject;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.NonTransientDataAccessException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.RequestContextHolder;
-
-import jakarta.servlet.http.HttpSession;
-import java.io.IOException;
-import java.util.Date;
-import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("")
@@ -41,7 +45,20 @@ public class ServerController extends RestCytomineController {
 
     private final LastConnectionRepository lastConnectionRepository;
 
-    @RequestMapping(value = {"/server/ping.json", "/server/ping"}, method = {RequestMethod.GET, RequestMethod.POST}) // without.json is deprecated
+    public static boolean isAuthenticated() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication != null &&
+            getAuthorities(authentication).noneMatch("ROLE_ANONYMOUS"::equals);
+    }
+
+    private static Stream<String> getAuthorities(Authentication authentication) {
+        return authentication.getAuthorities().stream()
+            .map(GrantedAuthority::getAuthority);
+    }
+
+    @RequestMapping(value = {"/server/ping.json", "/server/ping"}, method = {RequestMethod.GET,
+        RequestMethod.POST})
+    // without.json is deprecated
     public ResponseEntity<String> ping(HttpSession session) throws IOException {
         log.debug("REST request to ping");
         JsonObject json = super.mergeQueryParamsAndBodyParams();
@@ -55,7 +72,8 @@ public class ServerController extends RestCytomineController {
 //        if (isAuthenticated()) {
 //            User user = currentUserService.getCurrentUser();
 //            response.put("user", user.getId());
-////            response.put("shortTermToken", tokenProvider.createToken(SecurityContextHolder.getContext().getAuthentication(), TokenType.SHORT_TERM));
+////            response.put("shortTermToken", tokenProvider.createToken(SecurityContextHolder
+//        .getContext().getAuthentication(), TokenType.SHORT_TERM));
 //
 ////            if (!user.getEnabled()) {
 ////                log.info("Disabled user. Invalidation of its sessions");
@@ -68,17 +86,6 @@ public class ServerController extends RestCytomineController {
 //            addLastConnection(user, idProject);
 //        }
         return JsonResponseEntity.status(HttpStatus.OK).body(response.toJsonString());
-    }
-
-    public static boolean isAuthenticated() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication != null &&
-                getAuthorities(authentication).noneMatch("ROLE_ANONYMOUS"::equals);
-    }
-
-    private static Stream<String> getAuthorities(Authentication authentication) {
-        return authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority);
     }
 
     void addLastConnection(User user, Long idProject) {
@@ -97,7 +104,8 @@ public class ServerController extends RestCytomineController {
             connectionPersist.setProject(idProject);
             connectionPersist.setCreated(new Date());
             connectionPersist.setSession(RequestContextHolder.currentRequestAttributes().getSessionId());
-            persistentConnectionRepository.insert(connectionPersist); //don't use save (stateless collection)
+            persistentConnectionRepository.insert(connectionPersist); //don't use save (stateless
+            // collection)
         } catch (NonTransientDataAccessException e) {
             log.error(e.getMessage());
         }

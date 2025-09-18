@@ -1,7 +1,5 @@
 package be.cytomine.service.middleware;
 
-import be.cytomine.CytomineCoreApplication;
-import be.cytomine.service.appengine.AppEngineService;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterAll;
@@ -13,7 +11,14 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import be.cytomine.CytomineCoreApplication;
+import be.cytomine.service.appengine.AppEngineService;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
@@ -22,11 +27,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 public class AppEngineServiceTests {
 
+    private static final WireMockServer wireMockServer = new WireMockServer(8888);
     @Autowired
     private AppEngineService appEngineService;
-
-    private static final WireMockServer wireMockServer = new WireMockServer(8888);
-
     @Value("${application.appEngine.apiBasePath}")
     private String apiBasePath;
 

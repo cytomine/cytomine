@@ -36,21 +36,6 @@ public class AnnotationLink extends CytomineDomain {
     @JoinColumn(name = "image_id", nullable = false)
     ImageInstance image;
 
-    public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
-        AnnotationLink annotationLink = this;
-
-        annotationLink.id = json.getJSONAttrLong("id", null);
-        annotationLink.created = json.getJSONAttrDate("created");
-        annotationLink.updated = json.getJSONAttrDate("updated");
-
-        annotationLink.annotationClassName = json.getJSONAttrStr("annotationClassName", true);
-        annotationLink.annotationIdent = json.getJSONAttrLong("annotationIdent", null);
-        annotationLink.group = (AnnotationGroup) json.getJSONAttrDomain(entityManager, "group", new AnnotationGroup(), true);
-        annotationLink.image = (ImageInstance) json.getJSONAttrDomain(entityManager, "image", new ImageInstance(), true);
-
-        return annotationLink;
-    }
-
     public static JsonObject getDataFromDomain(CytomineDomain domain) {
         JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
         AnnotationLink annotationLink = (AnnotationLink) domain;
@@ -61,6 +46,23 @@ public class AnnotationLink extends CytomineDomain {
         returnArray.put("image", annotationLink.getImage().getId());
 
         return returnArray;
+    }
+
+    public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
+        AnnotationLink annotationLink = this;
+
+        annotationLink.id = json.getJSONAttrLong("id", null);
+        annotationLink.created = json.getJSONAttrDate("created");
+        annotationLink.updated = json.getJSONAttrDate("updated");
+
+        annotationLink.annotationClassName = json.getJSONAttrStr("annotationClassName", true);
+        annotationLink.annotationIdent = json.getJSONAttrLong("annotationIdent", null);
+        annotationLink.group = (AnnotationGroup) json.getJSONAttrDomain(entityManager, "group",
+            new AnnotationGroup(), true);
+        annotationLink.image = (ImageInstance) json.getJSONAttrDomain(entityManager, "image",
+            new ImageInstance(), true);
+
+        return annotationLink;
     }
 
     @Override

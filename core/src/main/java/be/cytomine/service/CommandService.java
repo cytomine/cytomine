@@ -1,22 +1,42 @@
 package be.cytomine.service;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import be.cytomine.domain.command.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Service;
+
+import be.cytomine.domain.command.AddCommand;
+import be.cytomine.domain.command.Command;
+import be.cytomine.domain.command.CommandHistory;
+import be.cytomine.domain.command.DeleteCommand;
+import be.cytomine.domain.command.EditCommand;
+import be.cytomine.domain.command.RedoStackItem;
+import be.cytomine.domain.command.Transaction;
+import be.cytomine.domain.command.UndoStackItem;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.CytomineException;
 import be.cytomine.exceptions.ObjectNotFoundException;
@@ -25,47 +45,28 @@ import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Service;
-
-import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
 @Transactional
 public class CommandService {
-    @Autowired
-    ApplicationContext applicationContext;
-
-    @Autowired
-    EntityManager entityManager;
-
-    @Autowired
-    CommandRepository commandRepository;
-
-    @Autowired
-    CurrentUserService currentUserService;
-
-    @Autowired
-    ResponseService responseService;
-
-    @Autowired
-    BeanFactory beanFactory;
-
-    @Autowired
-    SecurityACLService securityACLService;
-
     static final int SUCCESS_ADD_CODE = 200;
     static final int SUCCESS_EDIT_CODE = 200;
     static final int SUCCESS_DELETE_CODE = 200;
+    @Autowired
+    ApplicationContext applicationContext;
+    @Autowired
+    EntityManager entityManager;
+    @Autowired
+    CommandRepository commandRepository;
+    @Autowired
+    CurrentUserService currentUserService;
+    @Autowired
+    ResponseService responseService;
+    @Autowired
+    BeanFactory beanFactory;
+    @Autowired
+    SecurityACLService securityACLService;
 
     CommandResponse processCommand(Command c, ModelService service) throws CytomineException {
         if (c instanceof AddCommand) {
@@ -91,7 +92,8 @@ public class CommandService {
         CommandResponse result = c.execute(service);
         if (result.getStatus() == successCode) {
             if ((service instanceof ProjectService && c instanceof DeleteCommand)) {
-                c.setProject(null); // project has been deleted in this command, so we cannot link the command to the deleted project
+                c.setProject(null); // project has been deleted in this command, so we cannot
+                // link the command to the deleted project
             }
 
             entityManager.persist(c);
@@ -119,8 +121,9 @@ public class CommandService {
     public List<CommandResponse> undo(Long commandId) {
         User user = currentUserService.getCurrentUser();
         Optional<UndoStackItem> lastUndoStackItem;
-        if (commandId!=null) {
-            lastUndoStackItem = commandRepository.findLastUndoStackItem(user, commandRepository.getById(commandId));
+        if (commandId != null) {
+            lastUndoStackItem = commandRepository.findLastUndoStackItem(user,
+                commandRepository.getById(commandId));
         } else {
             lastUndoStackItem = commandRepository.findLastUndoStackItem(user);
         }
@@ -128,7 +131,8 @@ public class CommandService {
         if (lastUndoStackItem.isEmpty()) {
             //There is no command, so nothing to undo
             CommandResponse commandResponse = new CommandResponse();
-            commandResponse.setData(responseService.createResponseData(true, "be.cytomine.UndoCommand", null, true));
+            commandResponse.setData(responseService.createResponseData(true, "be.cytomine" +
+                ".UndoCommand", null, true));
             commandResponse.setStatus(200);
             return List.of(commandResponse);
         } else {
@@ -138,20 +142,24 @@ public class CommandService {
     }
 
     private ModelService loadCorrespondingModelService(Command command) {
-        if (command.getServiceName()==null || command.getServiceName().length()<1 ) {
-            throw new RuntimeException("Bean definition name " + command.getServiceName() + " is null or blank");
+        if (command.getServiceName() == null || command.getServiceName().length() < 1) {
+            throw new RuntimeException("Bean definition name " + command.getServiceName() + " is " +
+                "null or blank");
         }
-        return (ModelService)beanFactory.getBean(Character.toLowerCase(command.getServiceName().charAt(0)) + command.getServiceName().substring(1));
+        return (ModelService) beanFactory.getBean(Character.toLowerCase(command.getServiceName().charAt(0)) + command.getServiceName().substring(1));
     }
 
     private CommandResponse performUndo(Command command) {
         ModelService modelService = loadCorrespondingModelService(command);
         if (command instanceof AddCommand) {
-            return modelService.destroy(JsonObject.toJsonObject(command.getData()), command.isPrintMessage());
+            return modelService.destroy(JsonObject.toJsonObject(command.getData()),
+                command.isPrintMessage());
         } else if (command instanceof EditCommand) {
-            return modelService.edit(JsonObject.toJsonObject(command.getData()).extractProperty("previous" + ((EditCommand) command).domainName()), command.isPrintMessage());
+            return modelService.edit(JsonObject.toJsonObject(command.getData()).extractProperty(
+                "previous" + ((EditCommand) command).domainName()), command.isPrintMessage());
         } else if (command instanceof DeleteCommand) {
-            return modelService.create(JsonObject.toJsonObject(command.getData()), command.isPrintMessage());
+            return modelService.create(JsonObject.toJsonObject(command.getData()),
+                command.isPrintMessage());
         }
         throw new RuntimeException("not yet implemented");
     }
@@ -160,10 +168,10 @@ public class CommandService {
         CommandResponse result;
         List<CommandResponse> results = new ArrayList<>();
 
-        Transaction transaction =  undoItem.getTransaction();
+        Transaction transaction = undoItem.getTransaction();
         log.debug("FirstUndoStack=" + undoItem);
 
-        if (transaction==null) {
+        if (transaction == null) {
             log.debug("Transaction not in progress");
             //Not Transaction, no other command must be deleted
             result = performUndo(undoItem.getCommand());
@@ -173,12 +181,15 @@ public class CommandService {
         } else {
             log.debug("Transaction in progress");
             //Its a transaction, many other command will be deleted
-            List<UndoStackItem> undoStacks = commandRepository.findAllUndoOrderByCreatedDesc(user, transaction);
+            List<UndoStackItem> undoStacks = commandRepository.findAllUndoOrderByCreatedDesc(user
+                , transaction);
             for (UndoStackItem undoStack : undoStacks) {
                 //browse all command and undo it while its the same transaction
-                if(undoStack.getCommand().isRefuseUndo()) {
-                    //responseError(new ObjectNotFoundException("You cannot delete your last operation!")) //undo delete project is not possible
-                    throw new ObjectNotFoundException("You cannot delete your last operation!"); //undo delete project is not possible
+                if (undoStack.getCommand().isRefuseUndo()) {
+                    //responseError(new ObjectNotFoundException("You cannot delete your last
+                    // operation!")) //undo delete project is not possible
+                    throw new ObjectNotFoundException("You cannot delete your last operation!");
+                    //undo delete project is not possible
                 }
                 result = performUndo(undoStack.getCommand());
                 log.info("Undo stack transaction: " + result);
@@ -197,8 +208,9 @@ public class CommandService {
     public List<CommandResponse> redo(Long commandId) {
         User user = currentUserService.getCurrentUser();
         Optional<RedoStackItem> lastRedoStackItem;
-        if (commandId!=null) {
-            lastRedoStackItem = commandRepository.findLastRedoStackItem(user, commandRepository.getById(commandId));
+        if (commandId != null) {
+            lastRedoStackItem = commandRepository.findLastRedoStackItem(user,
+                commandRepository.getById(commandId));
         } else {
             lastRedoStackItem = commandRepository.findLastRedoStackItem(user);
         }
@@ -206,7 +218,8 @@ public class CommandService {
         if (lastRedoStackItem.isEmpty()) {
             //There is no command, so nothing to undo
             CommandResponse commandResponse = new CommandResponse();
-            commandResponse.setData(responseService.createResponseData(true, "be.cytomine.RedoCommand", null, true));
+            commandResponse.setData(responseService.createResponseData(true, "be.cytomine" +
+                ".RedoCommand", null, true));
             commandResponse.setStatus(200);
             return List.of(commandResponse);
         } else {
@@ -218,11 +231,14 @@ public class CommandService {
     private CommandResponse performRedo(Command command) {
         ModelService modelService = loadCorrespondingModelService(command);
         if (command instanceof AddCommand) {
-            return modelService.create(JsonObject.toJsonObject(command.getData()), command.isPrintMessage());
+            return modelService.create(JsonObject.toJsonObject(command.getData()),
+                command.isPrintMessage());
         } else if (command instanceof EditCommand) {
-            return modelService.edit(JsonObject.toJsonObject(command.getData()).extractProperty("new" + ((EditCommand) command).domainName()), command.isPrintMessage());
+            return modelService.edit(JsonObject.toJsonObject(command.getData()).extractProperty(
+                "new" + ((EditCommand) command).domainName()), command.isPrintMessage());
         } else if (command instanceof DeleteCommand) {
-            return modelService.destroy(JsonObject.toJsonObject(command.getData()), command.isPrintMessage());
+            return modelService.destroy(JsonObject.toJsonObject(command.getData()),
+                command.isPrintMessage());
         }
         throw new RuntimeException("not yet implemented");
     }
@@ -231,10 +247,10 @@ public class CommandService {
         CommandResponse result;
         List<CommandResponse> results = new ArrayList<>();
 
-        Transaction transaction =  redoItem.getTransaction();
+        Transaction transaction = redoItem.getTransaction();
         log.debug("LastRedoStack=" + redoItem);
 
-        if (transaction==null) {
+        if (transaction == null) {
             log.debug("Transaction not in progress");
             //Not Transaction, no other command must be deleted
             result = performRedo(redoItem.getCommand());
@@ -244,7 +260,8 @@ public class CommandService {
         } else {
             log.debug("Transaction in progress");
             //Its a transaction, many other command will be deleted
-            List<RedoStackItem> redoStacks = commandRepository.findAllRedoOrderByCreatedDesc(user, transaction);
+            List<RedoStackItem> redoStacks = commandRepository.findAllRedoOrderByCreatedDesc(user
+                , transaction);
             for (RedoStackItem redoStack : redoStacks) {
                 //Redo each command from the same transaction
                 result = performRedo(redoStack.getCommand());
@@ -257,6 +274,7 @@ public class CommandService {
 
     /**
      * Move an undo stack item to redo stack
+     *
      * @param firstUndoStack Undo stack item to move
      */
     private void moveToRedoStack(UndoStackItem firstUndoStack) {
@@ -275,6 +293,7 @@ public class CommandService {
 
     /**
      * Move redo item to the undo stack
+     *
      * @param lastRedoStack redo item to move
      */
     private void moveToUndoStack(RedoStackItem lastRedoStack) {
@@ -294,16 +313,19 @@ public class CommandService {
     public List<Command> list(String domain, Class commandClass, Long afterThan) {
         securityACLService.checkAdmin(currentUserService.getCurrentUser());
         List<Command> commands = new ArrayList<>();
-        if(domain!=null) {
-            String serviceName = domain.substring(0, 1).toUpperCase() + domain.substring(1) + "Service";
+        if (domain != null) {
+            String serviceName = domain.substring(0, 1).toUpperCase() + domain.substring(1) +
+                "Service";
 
-            if(afterThan!=null){
-                commands = commandRepository.findAllByServiceNameAndCreatedGreaterThan(serviceName, new Date(afterThan));
+            if (afterThan != null) {
+                commands =
+                    commandRepository.findAllByServiceNameAndCreatedGreaterThan(serviceName,
+                        new Date(afterThan));
             } else {
                 commands = commandRepository.findAllByServiceName(serviceName);
             }
         } else {
-            commands =  commandRepository.findAll();
+            commands = commandRepository.findAll();
         }
         return commands.stream().filter(x -> x.getClass().equals(commandClass)).toList();
     }

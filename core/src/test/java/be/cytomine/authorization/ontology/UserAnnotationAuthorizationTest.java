@@ -49,31 +49,31 @@ import static be.cytomine.service.search.RetrievalService.CBIR_API_BASE_PATH;
 @Transactional
 public class UserAnnotationAuthorizationTest extends CRUDAuthorizationTest {
 
+    private static WireMockServer wireMockServer;
     @Autowired
     private BasicInstanceBuilder builder;
-
     @Autowired
     private UserAnnotationService userAnnotationService;
-
     private UserAnnotation userAnnotation = null;
-
-    private static WireMockServer wireMockServer;
 
     private static void setupStub() {
         /* Simulate call to PIMS */
-        wireMockServer.stubFor(WireMock.post(WireMock.urlPathMatching(IMS_API_BASE_PATH + "/image/.*/annotation/drawing"))
+        wireMockServer.stubFor(WireMock.post(WireMock.urlPathMatching(IMS_API_BASE_PATH + "/image" +
+                "/.*/annotation/drawing"))
             .withRequestBody(WireMock.matching(".*"))
             .willReturn(WireMock.aResponse().withBody(UUID.randomUUID().toString().getBytes()))
         );
 
         /* Simulate call to CBIR */
-        wireMockServer.stubFor(WireMock.post(WireMock.urlPathEqualTo(CBIR_API_BASE_PATH + "/images"))
+        wireMockServer.stubFor(WireMock.post(WireMock.urlPathEqualTo(CBIR_API_BASE_PATH +
+                "/images"))
             .withQueryParam("storage", WireMock.matching(".*"))
             .withQueryParam("index", WireMock.equalTo("annotation"))
             .willReturn(WireMock.aResponse().withBody(UUID.randomUUID().toString()))
         );
 
-        wireMockServer.stubFor(WireMock.delete(WireMock.urlPathMatching(CBIR_API_BASE_PATH + "/images/.*"))
+        wireMockServer.stubFor(WireMock.delete(WireMock.urlPathMatching(CBIR_API_BASE_PATH +
+                "/images/.*"))
             .withQueryParam("storage", WireMock.matching(".*"))
             .withQueryParam("index", WireMock.equalTo("annotation"))
             .willReturn(WireMock.aResponse().withBody(UUID.randomUUID().toString()))
@@ -163,7 +163,8 @@ public class UserAnnotationAuthorizationTest extends CRUDAuthorizationTest {
 
     @Override
     protected void when_i_add_domain() {
-        UserAnnotation annotation = builder.given_a_not_persisted_user_annotation(this.userAnnotation.getProject());
+        UserAnnotation annotation =
+            builder.given_a_not_persisted_user_annotation(this.userAnnotation.getProject());
         userAnnotationService.add(annotation.toJsonObject());
     }
 
@@ -174,7 +175,8 @@ public class UserAnnotationAuthorizationTest extends CRUDAuthorizationTest {
 
     @Override
     protected void when_i_delete_domain() {
-        UserAnnotation annotation = builder.persistAndReturn(builder.given_a_not_persisted_user_annotation(this.userAnnotation.getProject()));
+        UserAnnotation annotation =
+            builder.persistAndReturn(builder.given_a_not_persisted_user_annotation(this.userAnnotation.getProject()));
         userAnnotationService.delete(annotation, null, null, true);
     }
 

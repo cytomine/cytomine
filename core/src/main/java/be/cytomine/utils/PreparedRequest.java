@@ -1,6 +1,12 @@
 package be.cytomine.utils;
 
-import be.cytomine.exceptions.ServerException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.LinkedHashMap;
+import java.util.stream.Collectors;
+
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.NotImplementedException;
@@ -11,13 +17,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.LinkedHashMap;
-import java.util.stream.Collectors;
+import be.cytomine.exceptions.ServerException;
 
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
@@ -49,7 +49,7 @@ public class PreparedRequest {
         path = "";
     }
 
-    public void setUrl(String url){
+    public void setUrl(String url) {
         URI uri = null;
         try {
             uri = new URI(url);
@@ -81,7 +81,7 @@ public class PreparedRequest {
             // whereas pims supports both '/' and '%2F'. Therefore, we revert the
             // encoding of the `/` to support routing through an Apache proxy.
             // see issue cm/rnd/cytomine/core/core-ce#84
-            fragment = URLEncoder.encode(fragment , StandardCharsets.UTF_8).replace("%2F", "/");
+            fragment = URLEncoder.encode(fragment, StandardCharsets.UTF_8).replace("%2F", "/");
         }
         fragment = org.apache.commons.lang3.StringUtils.strip(fragment, "/");
         this.path += "/" + fragment;
@@ -89,15 +89,16 @@ public class PreparedRequest {
 
     public String getQuery() {
         return this.queryParameters.entrySet()
-                .stream()
-                .filter(e -> e.getValue() != null && !e.getValue().toString().isEmpty())
-                .map(e -> e.getKey() + "=" + e.getValue())
-                .collect(Collectors.joining("&"));
+            .stream()
+            .filter(e -> e.getValue() != null && !e.getValue().toString().isEmpty())
+            .map(e -> e.getKey() + "=" + e.getValue())
+            .collect(Collectors.joining("&"));
     }
 
     public URI getURI() {
         try {
-            return new URI(this.scheme, null, this.host, this.port, this.path, this.getQuery(), null);
+            return new URI(this.scheme, null, this.host, this.port, this.path, this.getQuery(),
+                null);
         } catch (URISyntaxException e) {
             throw new ServerException(e.getMessage(), e.getCause());
         }
@@ -105,7 +106,7 @@ public class PreparedRequest {
 
     public void setJsonBody(JsonObject body) {
         this.body = JsonObject.toJsonString(
-                body.entrySet()
+            body.entrySet()
                 .stream()
                 .filter(e -> e.getValue() != null && !e.getValue().toString().isEmpty())
                 .collect(Collectors.toMap(x -> x.getKey(), x -> x.getValue()))
@@ -130,17 +131,16 @@ public class PreparedRequest {
                 HttpEntity<?> request = new HttpEntity<>(this.body, this.headers);
                 return new RestTemplate().exchange(this.getURI(), this.method, request, returnType);
             }
-        }
-        else {
+        } else {
             if (method.equals(GET)) {
                 return proxy.headers(this.headers)
-                        .uri(this.getURI())
-                        .get();
+                    .uri(this.getURI())
+                    .get();
             } else if (method.equals(POST)) {
                 return proxy.headers(this.headers)
-                        .uri(this.getURI())
-                        .body(this.body)
-                        .post();
+                    .uri(this.getURI())
+                    .body(this.body)
+                    .post();
             }
         }
         throw new NotImplementedException("toResponseEntity is not implemented for method: " + method);

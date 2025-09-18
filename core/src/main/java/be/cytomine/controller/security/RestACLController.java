@@ -29,20 +29,20 @@ public class RestACLController extends RestCytomineController {
 
     @GetMapping("/domain/{domainClassName}/{domainIdent}/user/{user}")
     public ResponseEntity<String> getPermission(
-            @PathVariable String domainClassName,
-            @PathVariable String domainIdent,
-            @PathVariable String user
+        @PathVariable String domainClassName,
+        @PathVariable String domainIdent,
+        @PathVariable String user
     ) {
         log.debug("REST request to get permission : {} {} {}", domainClassName, domainIdent, user);
 
         try {
-            if(domainClassName!=null && domainIdent!=null && user!=null) {
+            if (domainClassName != null && domainIdent != null && user != null) {
                 User secUser = entityManager.find(User.class, Long.parseLong(user));
-                return responseSuccess(aclAuthService.get(Long.parseLong(domainIdent),secUser));
+                return responseSuccess(aclAuthService.get(Long.parseLong(domainIdent), secUser));
             } else {
-                throw new ObjectNotFoundException("Request not valid: domainClassName="+ domainClassName + ", domainIdent= " + domainIdent + ", user=" + user);
+                throw new ObjectNotFoundException("Request not valid: domainClassName=" + domainClassName + ", domainIdent= " + domainIdent + ", user=" + user);
             }
-        } catch(CytomineException e) {
+        } catch (CytomineException e) {
             return ResponseEntity.status(e.code).contentType(MediaType.APPLICATION_JSON).body(JsonObject.of("success", false, "errors", e.msg).toJsonString());
         }
     }

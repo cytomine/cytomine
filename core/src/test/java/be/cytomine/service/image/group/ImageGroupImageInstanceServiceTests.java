@@ -44,8 +44,10 @@ public class ImageGroupImageInstanceServiceTests {
     @Test
     void find_imagegroup_imageinstance_with_success() {
         ImageGroupImageInstance igii = builder.given_an_imagegroup_imageinstance();
-        AssertionsForClassTypes.assertThat(imageGroupImageInstanceService.find(igii.getGroup(), igii.getImage()).isPresent());
-        assertThat(igii).isEqualTo(imageGroupImageInstanceService.find(igii.getGroup(), igii.getImage()).get());
+        AssertionsForClassTypes.assertThat(imageGroupImageInstanceService.find(igii.getGroup(),
+            igii.getImage()).isPresent());
+        assertThat(igii).isEqualTo(imageGroupImageInstanceService.find(igii.getGroup(),
+            igii.getImage()).get());
     }
 
     @Test
@@ -93,23 +95,29 @@ public class ImageGroupImageInstanceServiceTests {
     @Test
     void add_imagegroup_imageinstance_with_wrong_group_fails() {
         ImageGroupImageInstance igii = builder.given_an_imagegroup_imageinstance();
-        Assertions.assertThrows(WrongArgumentException.class, () -> imageGroupImageInstanceService.add(igii.toJsonObject().withChange("group", builder.given_an_imagegroup().getId())));
+        Assertions.assertThrows(WrongArgumentException.class,
+            () -> imageGroupImageInstanceService.add(igii.toJsonObject().withChange("group",
+                builder.given_an_imagegroup().getId())));
     }
 
     @Test
     void add_imagegroup_imageinstance_with_wrong_image_fails() {
         ImageGroupImageInstance igii = builder.given_an_imagegroup_imageinstance();
-        Assertions.assertThrows(WrongArgumentException.class, () -> imageGroupImageInstanceService.add(igii.toJsonObject().withChange("image", builder.given_an_image_instance().getId())));
+        Assertions.assertThrows(WrongArgumentException.class,
+            () -> imageGroupImageInstanceService.add(igii.toJsonObject().withChange("image",
+                builder.given_an_image_instance().getId())));
     }
 
     @Test
     void delete_imagegroup_imageinstance_with_success() {
         ImageGroupImageInstance igii = builder.given_an_imagegroup_imageinstance();
 
-        CommandResponse commandResponse = imageGroupImageInstanceService.delete(igii, null, null, true);
+        CommandResponse commandResponse = imageGroupImageInstanceService.delete(igii, null, null,
+            true);
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
-        AssertionsForClassTypes.assertThat(imageGroupImageInstanceService.find(igii.getGroup(), igii.getImage()).isEmpty());
+        AssertionsForClassTypes.assertThat(imageGroupImageInstanceService.find(igii.getGroup(),
+            igii.getImage()).isEmpty());
     }
 }

@@ -2,7 +2,8 @@ package be.cytomine.controller.ontology;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import jakarta.persistence.EntityManager;
@@ -13,7 +14,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.mvc.ProxyExchange;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -21,14 +29,14 @@ import org.springframework.web.util.UriComponentsBuilder;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.image.ImageInstance;
-import be.cytomine.domain.ontology.*;
+import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.security.User;
 import be.cytomine.dto.annotation.SimplifiedAnnotation;
 import be.cytomine.dto.image.CropParameter;
 import be.cytomine.exceptions.CytomineMethodNotYetImplementedException;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.exceptions.WrongArgumentException;
-import be.cytomine.repository.*;
+import be.cytomine.repository.AnnotationListing;
 import be.cytomine.service.AnnotationListingService;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.middleware.ImageServerService;
@@ -55,7 +63,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
     private final UserService userService;
 
     private final EntityManager entityManager;
-    
+
     private final ParamsService paramsService;
 
     private final RestUserAnnotationController restUserAnnotationController;
@@ -79,7 +87,8 @@ public class RestAnnotationDomainController extends RestCytomineController {
     @Value("${application.internalProxyURL}")
     private String internalProxyURL;
 
-    @RequestMapping(value = { "/annotation/search.json"}, method = {RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(value = {"/annotation/search.json"}, method = {RequestMethod.GET,
+        RequestMethod.POST})
     public ResponseEntity<String> searchSpecified() throws IOException {
         return search();
     }
@@ -87,71 +96,77 @@ public class RestAnnotationDomainController extends RestCytomineController {
     @RequestMapping(value = {"/annotation.json"}, method = {RequestMethod.GET})
     public ResponseEntity<String> search() throws IOException {
         JsonObject params = mergeQueryParamsAndBodyParams();
-        AnnotationListing annotationListing = annotationListingBuilder.buildAnnotationListing(params);
+        AnnotationListing annotationListing =
+            annotationListingBuilder.buildAnnotationListing(params);
         List annotations = annotationListingService.listGeneric(annotationListing);
 //        if (annotationListing instanceof AlgoAnnotationListing) {
 //            //if algo, we look for user_annotation JOIN algo_annotation_term  too
 //            params.put("suggestedTerm", params.get("term"));
 //            params.remove("term");
 //            params.remove("usersForTermAlgo");
-//            annotationListing = annotationListingBuilder.buildAnnotationListing(new UserAnnotationListing(entityManager), params);
+//            annotationListing = annotationListingBuilder.buildAnnotationListing(new
+//            UserAnnotationListing(entityManager), params);
 //            annotations.addAll(annotationListingService.listGeneric(annotationListing));
 //        }
 
-        return responseSuccess(annotations, params.getJSONAttrLong("offset", 0L),params.getJSONAttrLong("max", 0L));
+        return responseSuccess(annotations, params.getJSONAttrLong("offset", 0L),
+            params.getJSONAttrLong("max", 0L));
     }
 
-    @RequestMapping(value = {"/project/{project}/annotation/download"}, method = {RequestMethod.GET})
+    @RequestMapping(value = {"/project/{project}/annotation/download"}, method =
+        {RequestMethod.GET})
     public void download(
-            @PathVariable Long project,
-            @RequestParam String format,
-            @RequestParam(required = false) String users,
-            @RequestParam(required = false) String reviewUsers,
-            @RequestParam(defaultValue = "false") Boolean reviewed,
-            @RequestParam(required = false) String terms,
-            @RequestParam(required = false) String images,
-            @RequestParam(required = false) Long beforeThan,
-            @RequestParam(required = false) Long afterThan
+        @PathVariable Long project,
+        @RequestParam String format,
+        @RequestParam(required = false) String users,
+        @RequestParam(required = false) String reviewUsers,
+        @RequestParam(defaultValue = "false") Boolean reviewed,
+        @RequestParam(required = false) String terms,
+        @RequestParam(required = false) String images,
+        @RequestParam(required = false) Long beforeThan,
+        @RequestParam(required = false) Long afterThan
     ) throws IOException {
-        if(reviewed) {
-            restReviewedAnnotationController.downloadDocumentByProject(project, format, terms, reviewUsers, images, beforeThan, afterThan);
-        }
-        else {
-            restUserAnnotationController.downloadDocumentByProject(project, format, terms, users, images, beforeThan, afterThan);
+        if (reviewed) {
+            restReviewedAnnotationController.downloadDocumentByProject(project, format, terms,
+                reviewUsers, images, beforeThan, afterThan);
+        } else {
+            restUserAnnotationController.downloadDocumentByProject(project, format, terms, users,
+                images, beforeThan, afterThan);
         }
     }
 
-    @RequestMapping(value = "/annotation/{id}/crop.{format}", method = {RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(value = "/annotation/{id}/crop.{format}", method = {RequestMethod.GET,
+        RequestMethod.POST})
     public ResponseEntity<byte[]> crop(
-            @PathVariable Long id,
-            @PathVariable String format,
-            @RequestParam(required = false) Integer maxSize,
-            @RequestParam(required = false) String geometry,
-            @RequestParam(required = false) String location,
-            @RequestParam(required = false) String boundaries,
-            @RequestParam(defaultValue = "false") Boolean complete,
-            @RequestParam(required = false) Integer zoom,
-            @RequestParam(required = false) Double increaseArea,
-            @RequestParam(required = false) Boolean safe,
-            @RequestParam(required = false) Boolean square,
-            @RequestParam(required = false) String type,
-            @RequestParam(required = false) Boolean draw,
-            @RequestParam(required = false) Boolean mask,
-            @RequestParam(required = false) Boolean alphaMask,
-            @RequestParam(required = false) Boolean drawScaleBar,
-            @RequestParam(required = false) Double resolution,
-            @RequestParam(required = false) Double magnification,
-            @RequestParam(required = false) String colormap,
-            @RequestParam(required = false) Boolean inverse,
-            @RequestParam(required = false) Double contrast,
-            @RequestParam(required = false) Double gamma,
-            @RequestParam(required = false) String bits,
-            @RequestParam(required = false) Integer alpha,
-            @RequestParam(required = false) Integer thickness,
-            @RequestParam(required = false) String color,
-            @RequestParam(required = false) Integer jpegQuality,
+        @PathVariable Long id,
+        @PathVariable String format,
+        @RequestParam(required = false) Integer maxSize,
+        @RequestParam(required = false) String geometry,
+        @RequestParam(required = false) String location,
+        @RequestParam(required = false) String boundaries,
+        @RequestParam(defaultValue = "false") Boolean complete,
+        @RequestParam(required = false) Integer zoom,
+        @RequestParam(required = false) Double increaseArea,
+        @RequestParam(required = false) Boolean safe,
+        @RequestParam(required = false) Boolean square,
+        @RequestParam(required = false) String type,
+        @RequestParam(required = false) Boolean draw,
+        @RequestParam(required = false) Boolean mask,
+        @RequestParam(required = false) Boolean alphaMask,
+        @RequestParam(required = false) Boolean drawScaleBar,
+        @RequestParam(required = false) Double resolution,
+        @RequestParam(required = false) Double magnification,
+        @RequestParam(required = false) String colormap,
+        @RequestParam(required = false) Boolean inverse,
+        @RequestParam(required = false) Double contrast,
+        @RequestParam(required = false) Double gamma,
+        @RequestParam(required = false) String bits,
+        @RequestParam(required = false) Integer alpha,
+        @RequestParam(required = false) Integer thickness,
+        @RequestParam(required = false) String color,
+        @RequestParam(required = false) Integer jpegQuality,
 
-            ProxyExchange<byte[]> proxy
+        ProxyExchange<byte[]> proxy
     ) throws IOException, ParseException {
         log.debug("REST request to get crop for annotation domain");
         AnnotationDomain annotation = AnnotationDomain.getAnnotationDomain(entityManager, id);
@@ -180,8 +195,8 @@ public class RestAnnotationDomainController extends RestCytomineController {
         cropParameter.setThickness(thickness);
         cropParameter.setColor(color);
         cropParameter.setJpegQuality(jpegQuality);
-        cropParameter.setMaxBits(bits!=null && bits.equals("max"));
-        cropParameter.setBits(bits!=null && !bits.equals("max") ? Integer.parseInt(bits): null);
+        cropParameter.setMaxBits(bits != null && bits.equals("max"));
+        cropParameter.setBits(bits != null && !bits.equals("max") ? Integer.parseInt(bits) : null);
         cropParameter.setFormat(format);
         String etag = getRequestETag();
         return imageServerService.crop(annotation, cropParameter, etag, proxy);
@@ -189,46 +204,51 @@ public class RestAnnotationDomainController extends RestCytomineController {
 
     @GetMapping("/imageinstance/{image}/annotation/included.json")
     public ResponseEntity<String> listIncludedAnnotation(
-            @PathVariable(name="image") Long imageId
+        @PathVariable(name = "image") Long imageId
     ) throws IOException {
         JsonObject jsonObject = mergeQueryParamsAndBodyParams();
         jsonObject.put("image", imageId);
         return responseSuccess(getIncludedAnnotation(
-                jsonObject,
-                paramsService.getPropertyGroupToShow(jsonObject)
+            jsonObject,
+            paramsService.getPropertyGroupToShow(jsonObject)
         ));
     }
 
-    private List getIncludedAnnotation(JsonObject params, List<String> propertiesToShow){
+    private List getIncludedAnnotation(JsonObject params, List<String> propertiesToShow) {
 
         ImageInstance image = imageInstanceService.find(params.getJSONAttrLong("image"))
-                .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", params.getJSONAttrStr("image")));
+            .orElseThrow(() -> new ObjectNotFoundException("ImageInstance",
+                params.getJSONAttrStr("image")));
 
         //get area
         String geometry = params.getJSONAttrStr("geometry");
         AnnotationDomain annotation = null;
-        if(geometry==null) {
-            annotation = AnnotationDomain.getAnnotationDomain(entityManager, params.getJSONAttrLong("annotation"));
+        if (geometry == null) {
+            annotation = AnnotationDomain.getAnnotationDomain(entityManager,
+                params.getJSONAttrLong("annotation"));
             geometry = annotation.getLocation().toText();
         }
 
         //get user
         Long idUser = params.getJSONAttrLong("user");
         User user = null;
-        if (idUser!=0) {
+        if (idUser != 0) {
             user = userService.find(params.getJSONAttrLong("user")).orElse(null);
         }
 
         //get term
-        List<Long> terms = paramsService.getParamsTermList(params.getJSONAttrStr("terms"),image.getProject());
+        List<Long> terms = paramsService.getParamsTermList(params.getJSONAttrStr("terms"),
+            image.getProject());
 
         List response;
-        if(user==null) {
+        if (user == null) {
             //goto reviewed
-            response = reviewedAnnotationService.listIncluded(image,geometry,terms,annotation,propertiesToShow);
+            response = reviewedAnnotationService.listIncluded(image, geometry, terms, annotation,
+                propertiesToShow);
         } else {
             //goto user annotation
-            response = userAnnotationService.listIncluded(image,geometry,user,terms,annotation,propertiesToShow);
+            response = userAnnotationService.listIncluded(image, geometry, user, terms,
+                annotation, propertiesToShow);
         }
         return response;
     }
@@ -236,7 +256,8 @@ public class RestAnnotationDomainController extends RestCytomineController {
     /**
      * Read a specific annotation
      * It's better to avoid the user of this method if we know the correct type of an annotation id
-     * Annotation x => annotation/x.json is slower than userannotation/x.json or algoannotation/x.json
+     * Annotation x => annotation/x.json is slower than userannotation/x.json or algoannotation/x
+     * .json
      */
     @RequestMapping(value = "/annotation/{id}.json", method = {RequestMethod.GET})
     public ResponseEntity<String> show(@PathVariable Long id) throws IOException {
@@ -246,7 +267,8 @@ public class RestAnnotationDomainController extends RestCytomineController {
         } else if (annotation.isReviewedAnnotation()) {
             return restReviewedAnnotationController.show(id);
         } else {
-            throw new CytomineMethodNotYetImplementedException("ROI annotation not yet implemented");
+            throw new CytomineMethodNotYetImplementedException("ROI annotation not yet " +
+                "implemented");
         }
     }
 
@@ -261,7 +283,8 @@ public class RestAnnotationDomainController extends RestCytomineController {
                                       @RequestParam(required = false) Long maxPoint
     ) throws IOException {
         log.debug("REST request to create new annotation(s)");
-        ResponseEntity<String> response = restUserAnnotationController.add(json, minPoint, maxPoint);
+        ResponseEntity<String> response = restUserAnnotationController.add(json, minPoint,
+            maxPoint);
         log.debug("REST request to create new annotation(s) finished");
         return response;
     }
@@ -272,9 +295,9 @@ public class RestAnnotationDomainController extends RestCytomineController {
      */
     @RequestMapping(value = "/annotation/{id}.json", method = {RequestMethod.PUT})
     public ResponseEntity<String> update(
-            @PathVariable Long id,
-            @RequestParam(required = false, defaultValue = "false") Boolean fill,
-            @RequestBody JsonObject jsonObject
+        @PathVariable Long id,
+        @RequestParam(required = false, defaultValue = "false") Boolean fill,
+        @RequestBody JsonObject jsonObject
 
     ) throws IOException {
         if (fill) {
@@ -286,7 +309,8 @@ public class RestAnnotationDomainController extends RestCytomineController {
             } else if (annotation.isReviewedAnnotation()) {
                 return restReviewedAnnotationController.edit(id.toString(), jsonObject);
             } else {
-                throw new CytomineMethodNotYetImplementedException("ROI annotation not yet implemented");
+                throw new CytomineMethodNotYetImplementedException("ROI annotation not yet " +
+                    "implemented");
             }
         }
     }
@@ -297,7 +321,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
      */
     @RequestMapping(value = "/annotation/{id}.json", method = {RequestMethod.DELETE})
     public ResponseEntity<String> delete(
-            @PathVariable Long id
+        @PathVariable Long id
     ) throws IOException {
         AnnotationDomain annotation = AnnotationDomain.getAnnotationDomain(entityManager, id);
         if (annotation.isUserAnnotation()) {
@@ -305,19 +329,21 @@ public class RestAnnotationDomainController extends RestCytomineController {
         } else if (annotation.isReviewedAnnotation()) {
             return restReviewedAnnotationController.delete(id.toString());
         } else {
-            throw new CytomineMethodNotYetImplementedException("ROI annotation not yet implemented");
+            throw new CytomineMethodNotYetImplementedException("ROI annotation not yet " +
+                "implemented");
         }
     }
 
     @RequestMapping(value = "/annotation/{id}/simplify.json", method = {RequestMethod.PUT})
     public ResponseEntity<String> simplify(
-            @PathVariable Long id,
-            @RequestParam(required = false) Long minPoint,
-            @RequestParam(required = false) Long maxPoint
+        @PathVariable Long id,
+        @RequestParam(required = false) Long minPoint,
+        @RequestParam(required = false) Long maxPoint
 
-    )  {
+    ) {
         AnnotationDomain annotation = AnnotationDomain.getAnnotationDomain(entityManager, id);
-        SimplifiedAnnotation simplifiedAnnotation = simplifyGeometryService.simplifyPolygon(annotation.getLocation(), minPoint, maxPoint);
+        SimplifiedAnnotation simplifiedAnnotation =
+            simplifyGeometryService.simplifyPolygon(annotation.getLocation(), minPoint, maxPoint);
         annotation.setLocation(simplifiedAnnotation.getNewAnnotation());
         annotation.setGeometryCompression(simplifiedAnnotation.getRate());
         userAnnotationService.saveDomain(annotation);
@@ -326,33 +352,37 @@ public class RestAnnotationDomainController extends RestCytomineController {
 
     @RequestMapping(value = "/simplify.json", method = {RequestMethod.PUT})
     public ResponseEntity<String> retrieveSimplify(
-            @RequestBody JsonObject jsonObject,
-            @RequestParam(required = false) Long minPoint,
-            @RequestParam(required = false) Long maxPoint
+        @RequestBody JsonObject jsonObject,
+        @RequestParam(required = false) Long minPoint,
+        @RequestParam(required = false) Long maxPoint
 
-    )  {
-        SimplifiedAnnotation simplifiedAnnotation = simplifyGeometryService.simplifyPolygon(jsonObject.getJSONAttrStr("wkt"), minPoint, maxPoint);
-        return responseSuccess(JsonObject.of("wkt", simplifiedAnnotation.getNewAnnotation().toText()));
+    ) {
+        SimplifiedAnnotation simplifiedAnnotation =
+            simplifyGeometryService.simplifyPolygon(jsonObject.getJSONAttrStr("wkt"), minPoint,
+                maxPoint);
+        return responseSuccess(JsonObject.of("wkt",
+            simplifiedAnnotation.getNewAnnotation().toText()));
     }
 
     /**
      * Fill an annotation.
      * Remove empty space in the polygon
      */
-    @RequestMapping(value = "/annotation/{id}/fill.json", method = {RequestMethod.POST}) // TODO: should be PUT
+    @RequestMapping(value = "/annotation/{id}/fill.json", method = {RequestMethod.POST})
+    // TODO: should be PUT
     public ResponseEntity<String> fillAnnotation(
-            @PathVariable Long id
+        @PathVariable Long id
     ) throws IOException {
         AnnotationDomain annotation = AnnotationDomain.getAnnotationDomain(entityManager, id);
 
         //Is the first polygon always the big 'boundary' polygon?
         String newGeom = GeometryUtils.fillPolygon(annotation.getLocation().toText());
         JsonObject jsonObject = annotation.toJsonObject()
-                .withChange("location", newGeom);
+            .withChange("location", newGeom);
 
         if (annotation.isUserAnnotation()) {
             return responseSuccess(userAnnotationService.update(annotation, jsonObject));
-        } else  {
+        } else {
             return responseSuccess(reviewedAnnotationService.update(annotation, jsonObject));
         }
     }
@@ -363,7 +393,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
      */
     @PostMapping("/annotationcorrection.json")
     public ResponseEntity<String> addCorrection(
-            @RequestBody JsonObject jsonObject
+        @RequestBody JsonObject jsonObject
     ) throws ParseException {
         String location = jsonObject.getJSONAttrStr("location");
         List<Long> layers = jsonObject.getJSONAttrListLong("layers");
@@ -382,18 +412,20 @@ public class RestAnnotationDomainController extends RestCytomineController {
 
             //if review mode, priority is done to reviewed annotation correction
             if (jsonObject.getJSONAttrBoolean("review", false)) {
-                idsReviewedAnnotation = genericAnnotationService.findAnnotationThatTouch(location, layers, image, "reviewed_annotation")
-                        .stream().map(CytomineDomain::getId).collect(Collectors.toList());
+                idsReviewedAnnotation = genericAnnotationService.findAnnotationThatTouch(location
+                        , layers, image, "reviewed_annotation")
+                    .stream().map(CytomineDomain::getId).collect(Collectors.toList());
             }
 
             //there is no reviewed intersect annotation or user is not in review mode
             if (idsReviewedAnnotation.isEmpty()) {
-                idsUserAnnotation = genericAnnotationService.findAnnotationThatTouch(location, layers, image, "user_annotation")
-                        .stream().map(CytomineDomain::getId).collect(Collectors.toList());
+                idsUserAnnotation = genericAnnotationService.findAnnotationThatTouch(location,
+                        layers, image, "user_annotation")
+                    .stream().map(CytomineDomain::getId).collect(Collectors.toList());
             }
         }
-        log.info("idsReviewedAnnotation="+idsReviewedAnnotation);
-        log.info("idsUserAnnotation="+idsUserAnnotation);
+        log.info("idsReviewedAnnotation=" + idsReviewedAnnotation);
+        log.info("idsUserAnnotation=" + idsUserAnnotation);
 
         //there is no user/reviewed intersect
         if (idsUserAnnotation.isEmpty() && idsReviewedAnnotation.isEmpty()) {
@@ -422,7 +454,8 @@ public class RestAnnotationDomainController extends RestCytomineController {
             .toUri();
 
         try {
-            ResponseEntity<String> samResponse = restTemplate.postForEntity(url, null, String.class);
+            ResponseEntity<String> samResponse = restTemplate.postForEntity(url, null,
+                String.class);
 
             JsonObject json = new JsonObject();
             json.put("message", samResponse.getBody());

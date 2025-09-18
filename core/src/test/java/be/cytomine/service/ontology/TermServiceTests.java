@@ -1,24 +1,37 @@
 package be.cytomine.service.ontology;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
-import be.cytomine.domain.ontology.*;
+import be.cytomine.domain.ontology.AnnotationTerm;
+import be.cytomine.domain.ontology.Ontology;
+import be.cytomine.domain.ontology.RelationTerm;
+import be.cytomine.domain.ontology.ReviewedAnnotation;
+import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.project.Project;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.ConstraintException;
@@ -28,15 +41,6 @@ import be.cytomine.repository.ontology.TermRepository;
 import be.cytomine.service.CommandService;
 import be.cytomine.service.command.TransactionService;
 import be.cytomine.utils.CommandResponse;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.test.context.support.WithMockUser;
-
-import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -224,7 +228,8 @@ public class TermServiceTests {
     void edit_valid_term_with_success() {
         Term term = builder.given_a_term();
 
-        CommandResponse commandResponse = termService.update(term, term.toJsonObject().withChange("name", "NEW NAME").withChange("color", "NEW COLOR"));
+        CommandResponse commandResponse = termService.update(term,
+            term.toJsonObject().withChange("name", "NEW NAME").withChange("color", "NEW COLOR"));
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -268,7 +273,8 @@ public class TermServiceTests {
     @Test
     void delete_term_with_dependencies_with_success() {
         Term term = builder.given_a_term();
-        RelationTerm relationTerm = builder.given_a_relation_term(term, builder.given_a_term(term.getOntology()));
+        RelationTerm relationTerm = builder.given_a_relation_term(term,
+            builder.given_a_term(term.getOntology()));
 
         CommandResponse commandResponse = termService.delete(term, null, null, true);
 
@@ -326,8 +332,10 @@ public class TermServiceTests {
     @Test
     void undo_redo_term_deletion_restore_dependencies() {
         Term term = builder.given_a_term();
-        RelationTerm relationTerm = builder.given_a_relation_term(term, builder.given_a_term(term.getOntology()));
-        CommandResponse commandResponse = termService.delete(term, transactionService.start(), null, true);
+        RelationTerm relationTerm = builder.given_a_relation_term(term,
+            builder.given_a_term(term.getOntology()));
+        CommandResponse commandResponse = termService.delete(term, transactionService.start(),
+            null, true);
 
         assertThat(termService.find(term.getId()).isEmpty());
         assertThat(relationTermRepository.findById(relationTerm.getId())).isEmpty();

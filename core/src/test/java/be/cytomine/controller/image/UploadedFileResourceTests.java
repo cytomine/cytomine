@@ -1,28 +1,33 @@
 package be.cytomine.controller.image;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import be.cytomine.BasicInstanceBuilder;
-import be.cytomine.CytomineCoreApplication;
-import be.cytomine.domain.image.*;
-import be.cytomine.repository.image.UploadedFileRepository;
-import be.cytomine.utils.JsonObject;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 import com.github.tomakehurst.wiremock.WireMockServer;
-import org.junit.jupiter.api.*;
+import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -32,18 +37,18 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import jakarta.transaction.Transactional;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import be.cytomine.BasicInstanceBuilder;
+import be.cytomine.CytomineCoreApplication;
+import be.cytomine.domain.image.UploadedFile;
+import be.cytomine.repository.image.UploadedFileRepository;
+import be.cytomine.utils.JsonObject;
 
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
@@ -61,16 +66,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 public class UploadedFileResourceTests {
 
+    private static WireMockServer wireMockServer = new WireMockServer(8888);
     @Autowired
     private BasicInstanceBuilder builder;
-
     @Autowired
     private MockMvc restUploadedFileControllerMockMvc;
-
     @Autowired
     private UploadedFileRepository uploadedFileRepository;
-
-    private static WireMockServer wireMockServer = new WireMockServer(8888);
 
     @BeforeAll
     public static void beforeAll() {
@@ -81,7 +83,8 @@ public class UploadedFileResourceTests {
     public static void afterAll() {
         try {
             wireMockServer.stop();
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
     }
 
     @Test
@@ -90,8 +93,8 @@ public class UploadedFileResourceTests {
         UploadedFile uploadedFile = builder.given_a_uploaded_file();
 
         restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile.json"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.collection[?(@.id=="+uploadedFile.getId()+")]").exists());
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.collection[?(@.id==" + uploadedFile.getId() + ")]").exists());
     }
 
     @Test
@@ -99,8 +102,9 @@ public class UploadedFileResourceTests {
     public void list_uploaded_hirerachical_tree() throws Exception {
         UploadedFile uploadedFile = builder.given_a_uploaded_file();
 
-        restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile.json").param("root", uploadedFile.getId().toString()))
-                .andExpect(status().isOk());
+        restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile.json").param("root",
+                uploadedFile.getId().toString()))
+            .andExpect(status().isOk());
     }
 
     @Test
@@ -110,18 +114,17 @@ public class UploadedFileResourceTests {
         uploadedFile.setOriginalFilename("abracadabra");
 
         restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile.json")
-                        .param("onlyRootsWithDetails", "true")
-                        .param("originalFilename[equals]", "abracadabra"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.collection[?(@.id=="+uploadedFile.getId()+")]").exists());
+                .param("onlyRootsWithDetails", "true")
+                .param("originalFilename[equals]", "abracadabra"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.collection[?(@.id==" + uploadedFile.getId() + ")]").exists());
 
         restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile.json")
-                        .param("onlyRootsWithDetails", "true")
-                        .param("originalFilename[equals]", "notFound"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.collection[?(@.id=="+uploadedFile.getId()+")]").doesNotExist());
+                .param("onlyRootsWithDetails", "true")
+                .param("originalFilename[equals]", "notFound"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.collection[?(@.id==" + uploadedFile.getId() + ")]").doesNotExist());
     }
-
 
 
     @Test
@@ -133,78 +136,84 @@ public class UploadedFileResourceTests {
         UploadedFile image3 = builder.given_a_uploaded_file();
 
         restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile.json")
-                        .param("offset", "0")
-                        .param("max", "0")
-                )
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.collection", hasSize(greaterThanOrEqualTo(3)))) // default sorting must be created desc
-                .andExpect(jsonPath("$.collection[0].id").value(image3.getId()))
-                .andExpect(jsonPath("$.collection[1].id").value(image2.getId()))
-                .andExpect(jsonPath("$.collection[2].id").value(image1.getId()))
-                .andExpect(jsonPath("$.offset").value(0))
-                .andExpect(jsonPath("$.perPage", greaterThanOrEqualTo(3)))
-                .andExpect(jsonPath("$.size", greaterThanOrEqualTo(3)))
-                .andExpect(jsonPath("$.totalPages").value(1));
+                .param("offset", "0")
+                .param("max", "0")
+            )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.collection", hasSize(greaterThanOrEqualTo(3)))) // default
+            // sorting must be created desc
+            .andExpect(jsonPath("$.collection[0].id").value(image3.getId()))
+            .andExpect(jsonPath("$.collection[1].id").value(image2.getId()))
+            .andExpect(jsonPath("$.collection[2].id").value(image1.getId()))
+            .andExpect(jsonPath("$.offset").value(0))
+            .andExpect(jsonPath("$.perPage", greaterThanOrEqualTo(3)))
+            .andExpect(jsonPath("$.size", greaterThanOrEqualTo(3)))
+            .andExpect(jsonPath("$.totalPages").value(1));
 
 
         restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile.json")
-                        .param("offset", "0")
-                        .param("max", "1")
-                )
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.collection", hasSize(equalTo(1)))) // default sorting must be created desc
-                .andExpect(jsonPath("$.collection[0].id").value(image3.getId()))
-                .andExpect(jsonPath("$.offset").value(0))
-                .andExpect(jsonPath("$.perPage").value(1))
-                .andExpect(jsonPath("$.size", greaterThanOrEqualTo(3)))
-                .andExpect(jsonPath("$.totalPages", greaterThanOrEqualTo(3)));
+                .param("offset", "0")
+                .param("max", "1")
+            )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.collection", hasSize(equalTo(1)))) // default sorting must be
+            // created desc
+            .andExpect(jsonPath("$.collection[0].id").value(image3.getId()))
+            .andExpect(jsonPath("$.offset").value(0))
+            .andExpect(jsonPath("$.perPage").value(1))
+            .andExpect(jsonPath("$.size", greaterThanOrEqualTo(3)))
+            .andExpect(jsonPath("$.totalPages", greaterThanOrEqualTo(3)));
 
 
         restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile.json")
-                        .param("offset", "1")
-                        .param("max", "1")
-                )
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.collection", hasSize(equalTo(1)))) // default sorting must be created desc
-                .andExpect(jsonPath("$.collection[0].id").value(image2.getId()))
-                .andExpect(jsonPath("$.offset").value(1))
-                .andExpect(jsonPath("$.perPage").value(1))
-                .andExpect(jsonPath("$.size", greaterThanOrEqualTo(3)))
-                .andExpect(jsonPath("$.totalPages", greaterThanOrEqualTo(3)));
+                .param("offset", "1")
+                .param("max", "1")
+            )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.collection", hasSize(equalTo(1)))) // default sorting must be
+            // created desc
+            .andExpect(jsonPath("$.collection[0].id").value(image2.getId()))
+            .andExpect(jsonPath("$.offset").value(1))
+            .andExpect(jsonPath("$.perPage").value(1))
+            .andExpect(jsonPath("$.size", greaterThanOrEqualTo(3)))
+            .andExpect(jsonPath("$.totalPages", greaterThanOrEqualTo(3)));
 
         restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile.json")
-                        .param("offset", "1")
-                        .param("max", "0"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.collection", hasSize(greaterThanOrEqualTo(2)))) // default sorting must be created desc
-                .andExpect(jsonPath("$.collection[0].id").value(image2.getId()))
-                .andExpect(jsonPath("$.collection[1].id").value(image1.getId()))
-                .andExpect(jsonPath("$.offset").value(1))
-                .andExpect(jsonPath("$.size", greaterThanOrEqualTo(3)))
-                .andExpect(jsonPath("$.totalPages").value(1));
-
-
-        restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile.json")
-                        .param("offset", "0")
-                        .param("max", "500"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.collection", hasSize(greaterThanOrEqualTo(3)))) // default sorting must be created desc
-                .andExpect(jsonPath("$.collection[0].id").value(image3.getId()))
-                .andExpect(jsonPath("$.collection[1].id").value(image2.getId()))
-                .andExpect(jsonPath("$.collection[2].id").value(image1.getId()))
-                .andExpect(jsonPath("$.offset").value(0))
-                .andExpect(jsonPath("$.totalPages").value(1));
+                .param("offset", "1")
+                .param("max", "0"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.collection", hasSize(greaterThanOrEqualTo(2)))) // default
+            // sorting must be created desc
+            .andExpect(jsonPath("$.collection[0].id").value(image2.getId()))
+            .andExpect(jsonPath("$.collection[1].id").value(image1.getId()))
+            .andExpect(jsonPath("$.offset").value(1))
+            .andExpect(jsonPath("$.size", greaterThanOrEqualTo(3)))
+            .andExpect(jsonPath("$.totalPages").value(1));
 
 
         restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile.json")
-                        .param("offset", "500")
-                        .param("max", "0"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.collection", hasSize(equalTo(0)))) // default sorting must be created desc
-                .andExpect(jsonPath("$.offset").value(500))
-                .andExpect(jsonPath("$.perPage").value(0))
-                .andExpect(jsonPath("$.size").value(greaterThanOrEqualTo(3)))
-                .andExpect(jsonPath("$.totalPages").value(1));
+                .param("offset", "0")
+                .param("max", "500"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.collection", hasSize(greaterThanOrEqualTo(3)))) // default
+            // sorting must be created desc
+            .andExpect(jsonPath("$.collection[0].id").value(image3.getId()))
+            .andExpect(jsonPath("$.collection[1].id").value(image2.getId()))
+            .andExpect(jsonPath("$.collection[2].id").value(image1.getId()))
+            .andExpect(jsonPath("$.offset").value(0))
+            .andExpect(jsonPath("$.totalPages").value(1));
+
+
+        restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile.json")
+                .param("offset", "500")
+                .param("max", "0"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.collection", hasSize(equalTo(0)))) // default sorting must be
+            // created desc
+            .andExpect(jsonPath("$.offset").value(500))
+            .andExpect(jsonPath("$.perPage").value(0))
+            .andExpect(jsonPath("$.size").value(greaterThanOrEqualTo(3)))
+            .andExpect(jsonPath("$.totalPages").value(1));
     }
 
     List<Long> retrieveIds(MvcResult mvcResult) throws UnsupportedEncodingException {
@@ -235,130 +244,132 @@ public class UploadedFileResourceTests {
         MvcResult mvcResult;
         List<Long> ids;
         mvcResult = restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile.json")
-                        .param("onlyRootsWithDetails", "true")
-                        .param("sort", "created")
-                        .param("order", "asc"))
-                .andExpect(status().isOk()).andReturn();
+                .param("onlyRootsWithDetails", "true")
+                .param("sort", "created")
+                .param("order", "asc"))
+            .andExpect(status().isOk()).andReturn();
         ids = retrieveIds(mvcResult);
         Long first = ids.get(0);
-        Long last = ids.get(ids.size()-1);
+        Long last = ids.get(ids.size() - 1);
 
         mvcResult = restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile.json")
-                        .param("onlyRootsWithDetails", "true")
-                        .param("sort", "created")
-                        .param("order", "desc"))
-                .andExpect(status().isOk()).andReturn();
+                .param("onlyRootsWithDetails", "true")
+                .param("sort", "created")
+                .param("order", "desc"))
+            .andExpect(status().isOk()).andReturn();
         ids = retrieveIds(mvcResult);
         assertThat(ids.get(0)).isEqualTo(last);
-        assertThat(ids.get(ids.size()-1)).isEqualTo(first);
+        assertThat(ids.get(ids.size() - 1)).isEqualTo(first);
 
 
         mvcResult = restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile.json")
-                        .param("onlyRootsWithDetails", "true")
-                        .param("sort", "originalFilename")
-                        .param("order", "desc"))
-                .andExpect(status().isOk()).andReturn();
+                .param("onlyRootsWithDetails", "true")
+                .param("sort", "originalFilename")
+                .param("order", "desc"))
+            .andExpect(status().isOk()).andReturn();
         ids = retrieveIds(mvcResult);
         first = ids.get(0);
-        last = ids.get(ids.size()-1);
+        last = ids.get(ids.size() - 1);
 
         mvcResult = restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile.json")
-                        .param("onlyRootsWithDetails", "true")
-                        .param("sort", "originalFilename")
-                        .param("order", "asc"))
-                .andExpect(status().isOk()).andReturn();
+                .param("onlyRootsWithDetails", "true")
+                .param("sort", "originalFilename")
+                .param("order", "asc"))
+            .andExpect(status().isOk()).andReturn();
         ids = retrieveIds(mvcResult);
         assertThat(ids.get(0)).isEqualTo(last);
-        assertThat(ids.get(ids.size()-1)).isEqualTo(first);
+        assertThat(ids.get(ids.size() - 1)).isEqualTo(first);
 
         mvcResult = restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile.json")
-                        .param("onlyRootsWithDetails", "true")
-                        .param("sort", "size")
-                        .param("order", "asc"))
-                .andExpect(status().isOk()).andReturn();
+                .param("onlyRootsWithDetails", "true")
+                .param("sort", "size")
+                .param("order", "asc"))
+            .andExpect(status().isOk()).andReturn();
         ids = retrieveIds(mvcResult);
         first = ids.get(0);
-        last = ids.get(ids.size()-1);
+        last = ids.get(ids.size() - 1);
 
         mvcResult = restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile.json")
-                        .param("onlyRootsWithDetails", "true")
-                        .param("sort", "size")
-                        .param("order", "desc"))
-                .andExpect(status().isOk()).andReturn();
+                .param("onlyRootsWithDetails", "true")
+                .param("sort", "size")
+                .param("order", "desc"))
+            .andExpect(status().isOk()).andReturn();
         ids = retrieveIds(mvcResult);
         assertThat(ids.get(0)).isEqualTo(last);
-        assertThat(ids.get(ids.size()-1)).isEqualTo(first);
+        assertThat(ids.get(ids.size() - 1)).isEqualTo(first);
 
 
         mvcResult = restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile.json")
-                        .param("onlyRootsWithDetails", "true")
-                        .param("sort", "contentType")
-                        .param("order", "asc"))
-                .andExpect(status().isOk()).andReturn();
+                .param("onlyRootsWithDetails", "true")
+                .param("sort", "contentType")
+                .param("order", "asc"))
+            .andExpect(status().isOk()).andReturn();
         ids = retrieveIds(mvcResult);
         first = ids.get(0);
-        last = ids.get(ids.size()-1);
+        last = ids.get(ids.size() - 1);
 
         mvcResult = restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile.json")
-                        .param("onlyRootsWithDetails", "true")
-                        .param("sort", "contentType")
-                        .param("order", "desc"))
-                .andExpect(status().isOk()).andReturn();
+                .param("onlyRootsWithDetails", "true")
+                .param("sort", "contentType")
+                .param("order", "desc"))
+            .andExpect(status().isOk()).andReturn();
         ids = retrieveIds(mvcResult);
         assertThat(ids.get(0)).isEqualTo(last);
-        assertThat(ids.get(ids.size()-1)).isEqualTo(first);
+        assertThat(ids.get(ids.size() - 1)).isEqualTo(first);
 
 
         mvcResult = restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile.json")
-                        .param("onlyRootsWithDetails", "true")
-                        .param("sort", "globalSize")
-                        .param("order", "asc"))
-                .andExpect(status().isOk()).andReturn();
+                .param("onlyRootsWithDetails", "true")
+                .param("sort", "globalSize")
+                .param("order", "asc"))
+            .andExpect(status().isOk()).andReturn();
         ids = retrieveIds(mvcResult);
-        uploadedFiles = ids.stream().map(x -> uploadedFileRepository.getById(x)).collect(Collectors.toList());
-        assertThat(uploadedFiles.get(0).getSize()).isLessThan(uploadedFiles.get(uploadedFiles.size()-1).getSize());
+        uploadedFiles =
+            ids.stream().map(x -> uploadedFileRepository.getById(x)).collect(Collectors.toList());
+        assertThat(uploadedFiles.get(0).getSize()).isLessThan(uploadedFiles.get(uploadedFiles.size() - 1).getSize());
 
         mvcResult = restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile.json")
-                        .param("onlyRootsWithDetails", "true")
-                        .param("sort", "globalSize")
-                        .param("order", "desc"))
-                .andExpect(status().isOk()).andReturn();
+                .param("onlyRootsWithDetails", "true")
+                .param("sort", "globalSize")
+                .param("order", "desc"))
+            .andExpect(status().isOk()).andReturn();
         ids = retrieveIds(mvcResult);
-        uploadedFiles = ids.stream().map(x -> uploadedFileRepository.getById(x)).collect(Collectors.toList());
-        assertThat(uploadedFiles.get(0).getSize()).isGreaterThan(uploadedFiles.get(uploadedFiles.size()-1).getSize());
+        uploadedFiles =
+            ids.stream().map(x -> uploadedFileRepository.getById(x)).collect(Collectors.toList());
+        assertThat(uploadedFiles.get(0).getSize()).isGreaterThan(uploadedFiles.get(uploadedFiles.size() - 1).getSize());
 
 
         mvcResult = restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile.json")
-                        .param("onlyRootsWithDetails", "true")
-                        .param("sort", "status")
-                        .param("order", "asc"))
-                .andExpect(status().isOk()).andReturn();
+                .param("onlyRootsWithDetails", "true")
+                .param("sort", "status")
+                .param("order", "asc"))
+            .andExpect(status().isOk()).andReturn();
         ids = retrieveIds(mvcResult);
         first = ids.get(0);
 
 
         mvcResult = restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile.json")
-                        .param("onlyRootsWithDetails", "true")
-                        .param("sort", "status")
-                        .param("order", "desc"))
-                .andExpect(status().isOk()).andReturn();
+                .param("onlyRootsWithDetails", "true")
+                .param("sort", "status")
+                .param("order", "desc"))
+            .andExpect(status().isOk()).andReturn();
         ids = retrieveIds(mvcResult);
         assertThat(ids.get(0)).isNotEqualTo(last);
 
         mvcResult = restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile.json")
-                        .param("onlyRootsWithDetails", "true")
-                        .param("sort", "parentFilename")
-                        .param("order", "asc"))
-                .andExpect(status().isOk()).andReturn();
+                .param("onlyRootsWithDetails", "true")
+                .param("sort", "parentFilename")
+                .param("order", "asc"))
+            .andExpect(status().isOk()).andReturn();
         ids = retrieveIds(mvcResult);
         first = ids.get(0);
 
 
         mvcResult = restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile.json")
-                        .param("onlyRootsWithDetails", "true")
-                        .param("sort", "parentFilename")
-                        .param("order", "desc"))
-                .andExpect(status().isOk()).andReturn();
+                .param("onlyRootsWithDetails", "true")
+                .param("sort", "parentFilename")
+                .param("order", "desc"))
+            .andExpect(status().isOk()).andReturn();
         ids = retrieveIds(mvcResult);
         assertThat(ids.get(0)).isNotEqualTo(first);
 
@@ -369,30 +380,30 @@ public class UploadedFileResourceTests {
     @Transactional
     public void get_an_uploaded_file() throws Exception {
         UploadedFile image = builder.given_a_uploaded_file();
-        
+
 
         restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile/{id}.json", image.getId()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(image.getId().intValue()))
-                .andExpect(jsonPath("$.class").value("be.cytomine.domain.image.UploadedFile"))
-                .andExpect(jsonPath("$.created").exists())
-                .andExpect(jsonPath("$.projects").hasJsonPath())
-                .andExpect(jsonPath("$.storage").hasJsonPath())
-                .andExpect(jsonPath("$.path").hasJsonPath())
-                .andExpect(jsonPath("$.filename").hasJsonPath())
-                .andExpect(jsonPath("$.size").hasJsonPath())
-                .andExpect(jsonPath("$.user").hasJsonPath())
-                .andExpect(jsonPath("$.contentType").hasJsonPath())
-                .andExpect(jsonPath("$.originalFilename").hasJsonPath())
-                .andExpect(jsonPath("$.status").hasJsonPath());
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(image.getId().intValue()))
+            .andExpect(jsonPath("$.class").value("be.cytomine.domain.image.UploadedFile"))
+            .andExpect(jsonPath("$.created").exists())
+            .andExpect(jsonPath("$.projects").hasJsonPath())
+            .andExpect(jsonPath("$.storage").hasJsonPath())
+            .andExpect(jsonPath("$.path").hasJsonPath())
+            .andExpect(jsonPath("$.filename").hasJsonPath())
+            .andExpect(jsonPath("$.size").hasJsonPath())
+            .andExpect(jsonPath("$.user").hasJsonPath())
+            .andExpect(jsonPath("$.contentType").hasJsonPath())
+            .andExpect(jsonPath("$.originalFilename").hasJsonPath())
+            .andExpect(jsonPath("$.status").hasJsonPath());
     }
 
     @Test
     @Transactional
     public void get_an_uploaded_file_not_exist() throws Exception {
         restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile/{id}.json", 0))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.errors.message").exists());
+            .andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.errors.message").exists());
     }
 
 
@@ -401,15 +412,15 @@ public class UploadedFileResourceTests {
     public void add_valid_uploaded_file() throws Exception {
         UploadedFile uploadedFile = builder.given_a_not_persisted_uploaded_file();
         restUploadedFileControllerMockMvc.perform(post("/api/uploadedfile.json")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(uploadedFile.toJSON()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.printMessage").value(true))
-                .andExpect(jsonPath("$.callback").exists())
-                .andExpect(jsonPath("$.callback.uploadedfileID").exists())
-                .andExpect(jsonPath("$.message").exists())
-                .andExpect(jsonPath("$.command").exists())
-                .andExpect(jsonPath("$.uploadedfile.id").exists());
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(uploadedFile.toJSON()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.printMessage").value(true))
+            .andExpect(jsonPath("$.callback").exists())
+            .andExpect(jsonPath("$.callback.uploadedfileID").exists())
+            .andExpect(jsonPath("$.message").exists())
+            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.uploadedfile.id").exists());
 
     }
 
@@ -419,18 +430,19 @@ public class UploadedFileResourceTests {
         UploadedFile uploadedFile = builder.given_a_uploaded_file();
         JsonObject jsonObject = uploadedFile.toJsonObject();
         jsonObject.put("filename", "new");
-        restUploadedFileControllerMockMvc.perform(put("/api/uploadedfile/{id}.json", uploadedFile.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonObject.toJsonString()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.printMessage").value(true))
-                .andExpect(jsonPath("$.callback").exists())
-                .andExpect(jsonPath("$.callback.uploadedfileID").exists())
-                .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditUploadedFileCommand"))
-                .andExpect(jsonPath("$.message").exists())
-                .andExpect(jsonPath("$.command").exists())
-                .andExpect(jsonPath("$.uploadedfile.id").exists())
-                .andExpect(jsonPath("$.uploadedfile.filename").value("new"));
+        restUploadedFileControllerMockMvc.perform(put("/api/uploadedfile/{id}.json",
+                uploadedFile.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonObject.toJsonString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.printMessage").value(true))
+            .andExpect(jsonPath("$.callback").exists())
+            .andExpect(jsonPath("$.callback.uploadedfileID").exists())
+            .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditUploadedFileCommand"))
+            .andExpect(jsonPath("$.message").exists())
+            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.uploadedfile.id").exists())
+            .andExpect(jsonPath("$.uploadedfile.filename").value("new"));
 
 
     }
@@ -440,15 +452,16 @@ public class UploadedFileResourceTests {
     @Transactional
     public void delete_uploaded_file() throws Exception {
         UploadedFile uploadedFile = builder.given_a_uploaded_file();
-        restUploadedFileControllerMockMvc.perform(delete("/api/uploadedfile/{id}.json", uploadedFile.getId()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.printMessage").value(true))
-                .andExpect(jsonPath("$.callback").exists())
-                .andExpect(jsonPath("$.callback.uploadedfileID").exists())
-                .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteUploadedFileCommand"))
-                .andExpect(jsonPath("$.message").exists())
-                .andExpect(jsonPath("$.command").exists())
-                .andExpect(jsonPath("$.uploadedfile.id").exists());
+        restUploadedFileControllerMockMvc.perform(delete("/api/uploadedfile/{id}.json",
+                uploadedFile.getId()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.printMessage").value(true))
+            .andExpect(jsonPath("$.callback").exists())
+            .andExpect(jsonPath("$.callback.uploadedfileID").exists())
+            .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteUploadedFileCommand"))
+            .andExpect(jsonPath("$.message").exists())
+            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.uploadedfile.id").exists());
 
 
     }
@@ -463,15 +476,16 @@ public class UploadedFileResourceTests {
 
         byte[] mockResponse = UUID.randomUUID().toString().getBytes();
         configureFor("localhost", 8888);
-        stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/file/" + URLEncoder.encode(uploadedFile.getPath(), StandardCharsets.UTF_8).replace("%2F", "/")+"/export?filename=" + URLEncoder.encode(uploadedFile.getOriginalFilename(), StandardCharsets.UTF_8)))
-                .willReturn(
-                        aResponse().withBody(mockResponse)
-                )
+        stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/file/" + URLEncoder.encode(uploadedFile.getPath(), StandardCharsets.UTF_8).replace("%2F", "/") + "/export?filename=" + URLEncoder.encode(uploadedFile.getOriginalFilename(), StandardCharsets.UTF_8)))
+            .willReturn(
+                aResponse().withBody(mockResponse)
+            )
         );
 
-        MvcResult mvcResult = restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile/{id}/download", uploadedFile.getId()))
-                .andExpect(status().isOk())
-                .andReturn();
+        MvcResult mvcResult = restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile" +
+                "/{id}/download", uploadedFile.getId()))
+            .andExpect(status().isOk())
+            .andReturn();
         assertThat(mvcResult.getResponse().getContentAsByteArray()).isEqualTo(mockResponse);
     }
 }

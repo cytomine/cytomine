@@ -9,7 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import be.cytomine.domain.CytomineDomain;
-import be.cytomine.domain.command.*;
+import be.cytomine.domain.command.AddCommand;
+import be.cytomine.domain.command.DeleteCommand;
+import be.cytomine.domain.command.EditCommand;
+import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.image.group.ImageGroup;
 import be.cytomine.domain.ontology.AnnotationGroup;
 import be.cytomine.domain.project.Project;
@@ -69,7 +72,8 @@ public class ImageGroupService extends ModelService {
 
     @Override
     public List<Object> getStringParamsI18n(CytomineDomain domain) {
-        return List.of(domain.getId(), ((ImageGroup) domain).getName(), ((ImageGroup) domain).getProject().getName());
+        return List.of(domain.getId(), ((ImageGroup) domain).getName(),
+            ((ImageGroup) domain).getProject().getName());
     }
 
     public Optional<ImageGroup> find(Long id) {
@@ -103,7 +107,8 @@ public class ImageGroupService extends ModelService {
     }
 
     @Override
-    public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
+    public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData,
+                                  Transaction transaction) {
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
         securityACLService.check(domain.container(), READ);
@@ -112,7 +117,8 @@ public class ImageGroupService extends ModelService {
     }
 
     @Override
-    public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
+    public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task,
+                                  boolean printMessage) {
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
         securityACLService.check(domain.container(), READ);
@@ -123,7 +129,8 @@ public class ImageGroupService extends ModelService {
     protected void beforeDelete(CytomineDomain domain) {
         ImageGroup imageGroup = (ImageGroup) domain;
 
-        List<AnnotationGroup> annotationGroups = annotationGroupRepository.findAllByImageGroup(imageGroup);
+        List<AnnotationGroup> annotationGroups =
+            annotationGroupRepository.findAllByImageGroup(imageGroup);
         for (AnnotationGroup annotationGroup : annotationGroups) {
             annotationLinkRepository.deleteAllByGroup(annotationGroup);
         }

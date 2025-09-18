@@ -29,19 +29,6 @@ public class ImageGroup extends CytomineDomain {
     @Transient
     private List<Object> images;
 
-    public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
-        ImageGroup imageGroup = this;
-
-        imageGroup.id = json.getJSONAttrLong("id", null);
-        imageGroup.created = json.getJSONAttrDate("created");
-        imageGroup.updated = json.getJSONAttrDate("updated");
-
-        imageGroup.name = json.getJSONAttrStr("name", null);
-        imageGroup.project = (Project) json.getJSONAttrDomain(entityManager, "project", new Project(), true);
-
-        return imageGroup;
-    }
-
     public static JsonObject getDataFromDomain(CytomineDomain domain) {
         JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
         ImageGroup imageGroup = (ImageGroup) domain;
@@ -54,6 +41,20 @@ public class ImageGroup extends CytomineDomain {
         returnArray.put("numberOfImages", images.size());
 
         return returnArray;
+    }
+
+    public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
+        ImageGroup imageGroup = this;
+
+        imageGroup.id = json.getJSONAttrLong("id", null);
+        imageGroup.created = json.getJSONAttrDate("created");
+        imageGroup.updated = json.getJSONAttrDate("updated");
+
+        imageGroup.name = json.getJSONAttrStr("name", null);
+        imageGroup.project = (Project) json.getJSONAttrDomain(entityManager, "project",
+            new Project(), true);
+
+        return imageGroup;
     }
 
     @Override

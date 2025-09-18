@@ -1,5 +1,18 @@
 package be.cytomine.controller.meta;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.meta.Configuration;
 import be.cytomine.exceptions.ObjectNotFoundException;
@@ -9,13 +22,6 @@ import be.cytomine.service.meta.ConfigurationService;
 import be.cytomine.service.utils.TaskService;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.Task;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
@@ -44,12 +50,12 @@ public class RestConfigurationController extends RestCytomineController {
 
     @GetMapping("/configuration/key/{key}.json")
     public ResponseEntity<String> show(
-            @PathVariable String key
+        @PathVariable String key
     ) {
         log.debug("REST request to get Configuration : {}", key);
         return configurationService.findByKey(key)
-                .map(this::responseSuccess)
-                .orElseGet(() -> responseNotFound("Configuration", key));
+            .map(this::responseSuccess)
+            .orElseGet(() -> responseNotFound("Configuration", key));
     }
 
     @PostMapping("/configuration.json")
@@ -63,7 +69,7 @@ public class RestConfigurationController extends RestCytomineController {
         log.debug("REST request to edit Configuration : " + key);
         try {
             Configuration configuration = configurationService.findByKey(key)
-                    .orElseThrow(() -> new ObjectNotFoundException("Configuration", key));
+                .orElseThrow(() -> new ObjectNotFoundException("Configuration", key));
             json.put("id", configuration.getId());
             return update(configurationService, json);
         } catch (ObjectNotFoundException ex) {
@@ -72,12 +78,14 @@ public class RestConfigurationController extends RestCytomineController {
     }
 
     @DeleteMapping("/configuration/key/{key}.json")
-    public ResponseEntity<String> delete(@PathVariable String key, @RequestParam(required = false) Long task) {
+    public ResponseEntity<String> delete(@PathVariable String key,
+                                         @RequestParam(required = false) Long task) {
         log.debug("REST request to delete Configuration : " + key);
         Task existingTask = taskService.get(task);
         Configuration configuration = configurationService.findByKey(key)
-                .orElseThrow(() -> new ObjectNotFoundException("Configuration", key));
-        return delete(configurationService, JsonObject.of("id", configuration.getId()), existingTask);
+            .orElseThrow(() -> new ObjectNotFoundException("Configuration", key));
+        return delete(configurationService, JsonObject.of("id", configuration.getId()),
+            existingTask);
     }
 
 }

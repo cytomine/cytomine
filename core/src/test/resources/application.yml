@@ -111,7 +111,7 @@ application:
 
   customUI:
     global:
-      dashboard: ["ALL"]
+      dashboard: [ "ALL" ]
       search: [ "ROLE_ADMIN" ]
       project: [ "ALL" ]
       ontology: [ "ROLE_ADMIN" ]
@@ -119,8 +119,8 @@ application:
       activity: [ "ALL" ]
       admin: [ "ROLE_ADMIN" ]
       help: [ "ALL" ]
-      feedback: ["ROLE_USER","ROLE_ADMIN"]
-      explore: ["ROLE_USER","ROLE_ADMIN"]
+      feedback: [ "ROLE_USER","ROLE_ADMIN" ]
+      explore: [ "ROLE_USER","ROLE_ADMIN" ]
 
     project:
       project-images-tab:

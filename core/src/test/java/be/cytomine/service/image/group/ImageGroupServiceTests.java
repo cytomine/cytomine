@@ -57,7 +57,8 @@ public class ImageGroupServiceTests {
         ImageGroup imageGroup3 = builder.given_an_imagegroup(project);
         ImageGroup imageGroup4 = builder.given_an_imagegroup();
 
-        assertThat(imageGroupService.list(project)).containsExactly(imageGroup1, imageGroup2, imageGroup3);
+        assertThat(imageGroupService.list(project)).containsExactly(imageGroup1, imageGroup2,
+            imageGroup3);
         assertThat(imageGroupService.list(project)).doesNotContain(imageGroup4);
     }
 

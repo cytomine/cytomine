@@ -44,6 +44,6 @@ services:
       - POSTGIS_PASS=docker
       - POSTGIS_PORT=5432
       - POSTGIS_USER=docker
-    command: ["/bin/sh"]
+    command: [ "/bin/sh" ]
     stdin_open: true
     tty: true

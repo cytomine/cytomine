@@ -1,20 +1,34 @@
 package be.cytomine.domain.image;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import java.io.Serializable;
+import java.util.Set;
+
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PreUpdate;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.Type;
 
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.image.server.Storage;
@@ -22,14 +36,6 @@ import be.cytomine.domain.security.User;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.LTreeType;
 import be.cytomine.utils.LongArrayToBytesConverter;
-import lombok.Getter;
-import lombok.Setter;
-
-import jakarta.persistence.*;
-import org.hibernate.annotations.Type;
-
-import java.io.Serializable;
-import java.util.Set;
 
 @Entity
 @Getter
@@ -68,16 +74,40 @@ public class UploadedFile extends CytomineDomain implements Serializable {
     @Type(LTreeType.class)
     private String lTree;
 
+    public static JsonObject getDataFromDomain(CytomineDomain domain) {
+        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
+        UploadedFile uploadedFile = (UploadedFile) domain;
+        returnArray.put("user", (uploadedFile.getUser() != null ? uploadedFile.getUser().getId()
+            : null));
+        returnArray.put("parent", (uploadedFile.getParent() != null ?
+            uploadedFile.getParent().getId() : null));
+        returnArray.put("storage", (uploadedFile.getStorage() != null ?
+            uploadedFile.getStorage().getId() : null));
+        returnArray.put("originalFilename", uploadedFile.getOriginalFilename());
+        returnArray.put("filename", uploadedFile.getFilename());
+        returnArray.put("ext", uploadedFile.getExt());
+        returnArray.put("contentType", uploadedFile.getContentType());
+        returnArray.put("size", uploadedFile.getSize());
+        returnArray.put("path", uploadedFile.getPath());
+        returnArray.put("isArchive", uploadedFile.isArchive());
+        returnArray.put("status", uploadedFile.getStatus());
+        returnArray.put("statusText", uploadedFile.getStatusText());
+        returnArray.put("projects", uploadedFile.getProjects());
+        return returnArray;
+    }
+
     @Override
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
         UploadedFile uploadedFile = this;
-        uploadedFile.id = json.getJSONAttrLong("id",null);
+        uploadedFile.id = json.getJSONAttrLong("id", null);
         uploadedFile.created = json.getJSONAttrDate("created");
         uploadedFile.updated = json.getJSONAttrDate("updated");
         uploadedFile.user = (User) json.getJSONAttrDomain(entityManager, "user", new User(), true);
 
-        uploadedFile.parent = (UploadedFile)json.getJSONAttrDomain(entityManager, "parent", new UploadedFile(), false);
-        uploadedFile.storage = (Storage)json.getJSONAttrDomain(entityManager, "storage", new Storage(), true);
+        uploadedFile.parent = (UploadedFile) json.getJSONAttrDomain(entityManager, "parent",
+            new UploadedFile(), false);
+        uploadedFile.storage = (Storage) json.getJSONAttrDomain(entityManager, "storage",
+            new Storage(), true);
 
         uploadedFile.filename = json.getJSONAttrStr("filename");
         uploadedFile.originalFilename = json.getJSONAttrStr("originalFilename");
@@ -85,28 +115,10 @@ public class UploadedFile extends CytomineDomain implements Serializable {
         uploadedFile.contentType = json.getJSONAttrStr("contentType");
         uploadedFile.size = json.getJSONAttrLong("size", 0L);
         uploadedFile.status = json.getJSONAttrInteger("status", 0);
-        uploadedFile.projects = json.isMissing("projects") ? null : json.getJSONAttrListLong("projects").toArray(new Long[0]);
+        uploadedFile.projects = json.isMissing("projects") ? null : json.getJSONAttrListLong(
+            "projects").toArray(new Long[0]);
 
         return uploadedFile;
-    }
-
-    public static JsonObject getDataFromDomain(CytomineDomain domain) {
-        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
-        UploadedFile uploadedFile = (UploadedFile)domain;
-        returnArray.put("user", (uploadedFile.getUser()!=null ? uploadedFile.getUser().getId() : null));
-        returnArray.put("parent", (uploadedFile.getParent()!=null ? uploadedFile.getParent().getId() : null));
-        returnArray.put("storage", (uploadedFile.getStorage()!=null ? uploadedFile.getStorage().getId() : null));
-        returnArray.put("originalFilename", uploadedFile.getOriginalFilename());
-        returnArray.put("filename", uploadedFile.getFilename());
-        returnArray.put("ext", uploadedFile.getExt());
-        returnArray.put("contentType",uploadedFile.getContentType());
-        returnArray.put("size",uploadedFile.getSize());
-        returnArray.put("path",uploadedFile.getPath());
-        returnArray.put("isArchive",uploadedFile.isArchive());
-        returnArray.put("status",uploadedFile.getStatus());
-        returnArray.put("statusText",uploadedFile.getStatusText());
-        returnArray.put("projects", uploadedFile.getProjects());
-        return returnArray;
     }
 
     String getStatusText() {
@@ -128,7 +140,7 @@ public class UploadedFile extends CytomineDomain implements Serializable {
     }
 
     public void updateLtree() {
-        lTree = parent != null ? parent.getLTree()+"." : "";
+        lTree = parent != null ? parent.getLTree() + "." : "";
         lTree += id;
     }
 

@@ -1,45 +1,43 @@
 package be.cytomine.service.database;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import be.cytomine.config.properties.ApplicationProperties;
+import java.util.List;
+import java.util.UUID;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import be.cytomine.domain.image.Mime;
 import be.cytomine.domain.meta.Configuration;
 import be.cytomine.domain.meta.ConfigurationReadingRole;
 import be.cytomine.domain.processing.ImageFilter;
-import be.cytomine.domain.security.*;
+import be.cytomine.domain.security.SecUserSecRole;
+import be.cytomine.domain.security.User;
 import be.cytomine.repository.image.MimeRepository;
 import be.cytomine.repository.meta.ConfigurationRepository;
 import be.cytomine.repository.ontology.RelationRepository;
 import be.cytomine.repository.processing.ImageFilterRepository;
 import be.cytomine.repository.security.SecRoleRepository;
-import be.cytomine.repository.security.UserRepository;
 import be.cytomine.repository.security.SecUserSecRoleRepository;
+import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.image.server.StorageService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import jakarta.persistence.EntityManager;
-
-import java.util.List;
-import java.util.UUID;
 
 @Service
 @Slf4j
@@ -104,7 +102,7 @@ public class BootstrapUtilsService {
 
     public void createFilter(String name, String method, Boolean available) {
         ImageFilter filter = imageFilterRepository.findByName(name)
-                .orElseGet(ImageFilter::new);
+            .orElseGet(ImageFilter::new);
         filter.setName(name);
         filter.setMethod(method);
         filter.setAvailable(available);
@@ -120,7 +118,8 @@ public class BootstrapUtilsService {
         }
     }
 
-    public void createConfigurations(String key, String value, ConfigurationReadingRole readingRole){
+    public void createConfigurations(String key, String value,
+                                     ConfigurationReadingRole readingRole) {
         Configuration configuration = new Configuration();
         configuration.setKey(key);
         configuration.setValue(value);

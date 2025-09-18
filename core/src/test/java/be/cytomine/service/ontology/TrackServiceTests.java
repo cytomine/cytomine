@@ -1,20 +1,29 @@
 package be.cytomine.service.ontology;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import jakarta.transaction.Transactional;
+import org.apache.commons.lang3.time.DateUtils;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
@@ -26,15 +35,6 @@ import be.cytomine.repository.ontology.TrackRepository;
 import be.cytomine.service.CommandService;
 import be.cytomine.service.command.TransactionService;
 import be.cytomine.utils.CommandResponse;
-import org.apache.commons.lang3.time.DateUtils;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.test.context.support.WithMockUser;
-
-import jakarta.transaction.Transactional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -101,9 +101,9 @@ public class TrackServiceTests {
     void count_by_project() {
         Track track = builder.given_a_track();
         assertThat(trackService.countByProject(track.getProject(), null, null))
-                .isEqualTo(1);
+            .isEqualTo(1);
         assertThat(trackService.countByProject(builder.given_a_project(), null, null))
-                .isEqualTo(0);
+            .isEqualTo(0);
     }
 
     @Test
@@ -111,22 +111,22 @@ public class TrackServiceTests {
         Track track = builder.given_a_track();
 
         assertThat(trackService.countByProject(
-                track.getProject(),
-                        DateUtils.addDays(track.getCreated(),-30),
-                        DateUtils.addDays(track.getCreated(),30)))
-                .isEqualTo(1);
+            track.getProject(),
+            DateUtils.addDays(track.getCreated(), -30),
+            DateUtils.addDays(track.getCreated(), 30)))
+            .isEqualTo(1);
 
         assertThat(trackService.countByProject(
-                track.getProject(),
-                        DateUtils.addDays(track.getCreated(),-30),
-                        DateUtils.addDays(track.getCreated(),-15)))
-                .isEqualTo(0);
+            track.getProject(),
+            DateUtils.addDays(track.getCreated(), -30),
+            DateUtils.addDays(track.getCreated(), -15)))
+            .isEqualTo(0);
 
         assertThat(trackService.countByProject(
-                track.getProject(),
-                        DateUtils.addDays(track.getCreated(),15),
-                        DateUtils.addDays(track.getCreated(),30)))
-                .isEqualTo(0);
+            track.getProject(),
+            DateUtils.addDays(track.getCreated(), 15),
+            DateUtils.addDays(track.getCreated(), 30)))
+            .isEqualTo(0);
     }
 
 
@@ -161,7 +161,8 @@ public class TrackServiceTests {
     void edit_valid_track_with_success() {
         Track track = builder.given_a_track();
 
-        CommandResponse commandResponse = trackService.update(track, track.toJsonObject().withChange("name", "NEW NAME").withChange("color", "NEW COLOR"));
+        CommandResponse commandResponse = trackService.update(track,
+            track.toJsonObject().withChange("name", "NEW NAME").withChange("color", "NEW COLOR"));
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -205,7 +206,8 @@ public class TrackServiceTests {
     @Test
     void delete_track_with_dependencies_with_success() {
         AnnotationTrack annotationTrack = builder.given_a_annotation_track();
-        CommandResponse commandResponse = trackService.delete(annotationTrack.getTrack(), null, null, true);
+        CommandResponse commandResponse = trackService.delete(annotationTrack.getTrack(), null,
+            null, true);
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);

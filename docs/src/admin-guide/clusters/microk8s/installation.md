@@ -105,3 +105,7 @@ Deployed NVIDIA GPU operator
 ```
 
 If you encounter issues with the GPU addon, refer to the [official documentation](https://microk8s.io/docs/addon-gpu) for further guidance.
+
+## What's Next?
+
+Configure MicroK8s to ensure proper operations with Cytomine. Detailed instructions are provided in the [Configuration](./configuration.md) section.

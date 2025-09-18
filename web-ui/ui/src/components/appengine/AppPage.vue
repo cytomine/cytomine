@@ -38,7 +38,7 @@ import Task from '@/utils/appengine/task';
 import constants from '@/utils/constants.js';
 
 export default {
-  name: 'AppEngineMainPage',
+  name: 'AppPage',
   components: {
     AppCard,
     AppStoreList,

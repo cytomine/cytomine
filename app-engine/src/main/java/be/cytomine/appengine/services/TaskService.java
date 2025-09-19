@@ -1,8 +1,11 @@
 package be.cytomine.appengine.services;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -96,12 +99,10 @@ public class TaskService {
     private int defaultCpus;
 
     @Transactional
-    public Optional<TaskDescription> uploadTask(HttpServletRequest request)
+    public Optional<TaskDescription> uploadTask(InputStream inputStream)
         throws BundleArchiveException, TaskServiceException, ValidationException {
 
         // prepare for streaming
-        log.info("UploadTask: preparing streaming...");
-        InputStream inputStream = prepareStream(request);
         String descriptorFileYmlContent = "";
         JsonNode descriptorFileAsJson = null;
         log.info("UploadTask: Task identifiers generated ");
@@ -115,7 +116,7 @@ public class TaskService {
 
         boolean descriptorFile = true;
         boolean dockerImageFile = true;
-
+        File logoTempFile = null;
         try (ZipArchiveInputStream zais = new ZipArchiveInputStream(inputStream)) {
             ZipEntry entry;
 
@@ -177,6 +178,16 @@ public class TaskService {
                         }
                     }
                 }
+                // extract logo
+                if (entry.getName().toLowerCase().matches("logo\\.(png)")) {
+                    logoTempFile = Files.createTempFile("logo-", ".png").toFile();
+                    logoTempFile.deleteOnExit();
+
+                    try (FileOutputStream fos = new FileOutputStream(logoTempFile)) {
+                        zais.transferTo(fos);
+                    }
+                    log.info("UploadTask: logo extracted");
+                }
 
             }
         } catch (IOException e) {
@@ -224,6 +235,13 @@ public class TaskService {
                 StorageDataType.FILE))
             );
             log.info("UploadTask: descriptor.yml is stored in storage");
+            if (Objects.nonNull(logoTempFile)) {
+                fileStorageHandler.saveStorageData(
+                        storage,
+                        new StorageData(logoTempFile, "logo.png")
+                );
+                log.info("UploadTask: logo.png is stored in storage");
+            }
         } catch (FileStorageException e) {
             try {
                 log.info("UploadTask: failed to store descriptor.yml");
@@ -732,5 +750,24 @@ public class TaskService {
             );
             throw new TaskServiceException(error);
         }
+    }
+
+    public StorageData retrieveLogo(String namespace, String version)
+            throws TaskServiceException, TaskNotFoundException {
+        log.info("Storage : retrieving logo...");
+        Task task = taskRepository.findByNamespaceAndVersion(namespace, version);
+        if (task == null) {
+            throw new TaskNotFoundException("task " + namespace + ":" + version + " not found");
+        }
+
+        StorageData file = new StorageData("logo.png", task.getStorageReference());
+        try {
+            file = fileStorageHandler.readStorageData(file);
+        } catch (FileStorageException ex) {
+            log.debug("Storage: failed to get logo from storage [{}]", ex.getMessage());
+            AppEngineError error = ErrorBuilder.build(ErrorCode.INTERNAL_LOGO_NOT_FOUND);
+            throw new TaskServiceException(error);
+        }
+        return file;
     }
 }

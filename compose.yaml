@@ -36,9 +36,6 @@ services:
       - ${DATA_PATH:-./data}/registry:/data
     environment:
       REGISTRY_STORAGE_DELETE_ENABLED: true
-    # networks:
-    #   host_network:
-    #     ipv4_address: 172.16.238.4
 
   redis:
     image: redis:7.2
@@ -46,16 +43,10 @@ services:
     restart: unless-stopped
     volumes:
       - ${DATA_PATH:-./data}/redis:/data
-    # networks:
-    #   host_network:
-    #     ipv4_address: 172.16.238.5
 
   pims-cache:
     image: redis:7.2
     restart: unless-stopped
-    # networks:
-    #   host_network:
-    #     ipv4_address: 172.16.238.6
 
   web-ui:
     image: cytomine/web-ui:latest
@@ -64,9 +55,6 @@ services:
       - /etc/localtime:/etc/localtime
     environment:
       <<: [*version-env]
-    # networks:
-    #   host_network:
-    #     ipv4_address: 172.16.238.7
 
   pims:
     image: cytomine/pims:latest
@@ -93,9 +81,6 @@ services:
       ROOT: /data/images
       TASK_QUEUE_ENABLED: false
       WEB_CONCURRENCY: ${WEB_CONCURRENCY:-8}
-    # networks:
-    #   host_network:
-    #     ipv4_address: 172.16.238.8
 
   iam:
     image: cytomine/iam:latest
@@ -123,9 +108,6 @@ services:
       KC_SMTP_USER: user
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: YMjl7YGabNbQmjVOONxo9AYSiJyvioTnbsMyBwT8/Jg=
-    # networks:
-    #   host_network:
-    #     ipv4_address: 172.16.238.9
 
   app-engine:
     image: cytomine/app-engine:latest
@@ -133,6 +115,7 @@ services:
     depends_on:
       - postgis
       - registry
+      - k3s
     volumes:
       - ${DATA_PATH:-./data}/app-engine:/data
       - ./.kube/shared/k3s-config:/root/.kube/config:ro
@@ -153,7 +136,7 @@ services:
       SCHEDULER_RUN_MODE: local # values: local, cluster
       SCHEDULER_ADVERTISED_URL: 172.16.238.10
       SCHEDULER_USE_HOST_NETWORK: true
-    network_mode: host
+      KUBERNETES_MASTER: https://k3s:6443/
 
   core:
     image: cytomine/core:latest

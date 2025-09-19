@@ -119,8 +119,8 @@ nexusPublishing {
         create("comcytomine") {
             nexusUrl = uri("https://s01.oss.sonatype.org/service/local/")
             snapshotRepositoryUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-            username = ossrhUsername
-            password = ossrhPassword
+            username = project.findProperty("ossrhUsername") ?: System.getenv("MAVEN_USERNAME")
+            password = project.findProperty("ossrhPassword") ?: System.getenv("MAVEN_PASSWORD")
         }
     }
 }

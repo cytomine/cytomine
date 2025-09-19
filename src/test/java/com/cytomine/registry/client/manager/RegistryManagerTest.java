@@ -31,7 +31,7 @@ class RegistryManagerTest {
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
         Logger logger = loggerContext.getLogger("ROOT");
         logger.setLevel(Level.DEBUG);
-        RegistryClient.config("http" , "registry" , "5000");
+        RegistryClient.config("http://registry:5000");
 
     }
 

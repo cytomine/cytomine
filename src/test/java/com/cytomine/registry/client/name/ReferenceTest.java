@@ -12,9 +12,7 @@ class ReferenceTest {
     static void init()
     {
         Configurer configurer = Configurer.instance();
-        Configurer.schema("http");
-        Configurer.host("registry");
-        Configurer.port("5000");
+        Configurer.url("http:registry:5000");
     }
 
     @Test

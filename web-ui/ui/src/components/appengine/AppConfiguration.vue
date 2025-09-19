@@ -1,7 +1,7 @@
 <template>
   <div class="content-wrapper">
     <div class="panel">
-      <p class="panel-heading">Configuration</p>
+      <p class="panel-heading">{{ $t('configuration') }}</p>
       <section class="panel-block">
         <b-table :data="data">
           <template #default="{ row: store }">

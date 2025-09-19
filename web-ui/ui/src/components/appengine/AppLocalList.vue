@@ -60,19 +60,6 @@ export default {
   align-items: center;
 }
 
-#upper-section-flex {
-  display: flex;
-  flex-direction: row;
-  /* Aligns items to the edges */
-  justify-content: space-between;
-  /* Aligns items vertically */
-  align-items: center;
-}
-
-#upper-section-flex>* {
-  padding: 1em;
-}
-
 #lower-section-flex {
   display: flex;
   flex-direction: row;

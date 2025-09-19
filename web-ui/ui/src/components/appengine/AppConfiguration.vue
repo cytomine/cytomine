@@ -1,6 +1,11 @@
 <template>
-  <div>
-    <h1 class="title">App Configuration</h1>
+  <div class="content-wrapper">
+    <div class="panel">
+      <p class="panel-heading">Configuration</p>
+      <section class="panel-block">
+        App Store List
+      </section>
+    </div>
   </div>
 </template>
 

@@ -7,7 +7,7 @@
           class="is-link"
           icon-pack="fa"
           icon-left="angle-left"
-          @click="$router.push('/app-engine')"
+          @click="$router.push('/apps')"
           :label="$t('go-back')"
         />
       </p>

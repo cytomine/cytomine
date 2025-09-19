@@ -122,7 +122,7 @@ const routes = [
     component: AdminPanel
   },
   {
-    path: '/app-engine',
+    path: '/apps',
     component: AppPage,
     children: [
       {

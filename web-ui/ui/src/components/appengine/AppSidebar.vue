@@ -1,131 +1,165 @@
 <template>
-  <div class="sidebar-wrapper">
-    <nav class="sidebar">
-      <h1 class="sidebar-title">{{ $t('app-engine.applications') }}</h1>
+  <div class="sidebar-container">
+    <div class="sidebar-wrapper" :class="{ expanded: expanded }" ref="sidebar">
+      <nav class="sidebar">
+        <h1 class="sidebar-title">{{ $t('app-engine.applications') }}</h1>
 
-      <div class="sidebar-content">
-        <div class="sidebar-main-tabs">
-          <b-menu>
-            <b-menu-list>
-              <b-menu-item
-                tag="router-link"
-                to="/app-engine"
-                icon="code"
-                label="My Apps"
-                :active="activeTab === 'apps'"
-                @click="setActiveTab('apps')"
-              />
-              <b-menu-item
-                tag="router-link"
-                to="/app-engine/store"
-                icon="store"
-                label="App Store"
-                :active="activeTab === 'store'"
-                @click="setActiveTab('store')"
-              />
-            </b-menu-list>
-          </b-menu>
-        </div>
+        <ul>
+          <router-link tag="li" to="/apps" exact>
+            <a>
+              <i class="fas fa-code"></i>
+              {{ $t('app-engine.tasks.name') }}
+            </a>
+          </router-link>
+          <router-link tag="li" to="/apps/store">
+            <a>
+              <i class="fas fa-store"></i>
+              {{ $t('app-store') }}
+            </a>
+          </router-link>
+        </ul>
+        <ul class="bottom-menu">
+          <router-link tag="li" to="/apps/configuration">
+            <a>
+              <i class="fas fa-cogs"></i>
+              {{ $t('configuration') }}
+            </a>
+          </router-link>
+        </ul>
+      </nav>
+    </div>
 
-        <div class="sidebar-bottom">
-          <b-menu>
-            <b-menu-list>
-              <b-menu-item 
-                tag="router-link"
-                to="/app-engine/configuration"
-                icon="cog" 
-                label="Configuration"
-                :active="activeTab === 'configuration'"
-                @click="setActiveTab('configuration')"
-              />
-            </b-menu-list>
-          </b-menu>
-        </div>
-      </div>
-    </nav>
+    <div class="arrow-sidebar" :class="{ expanded: expanded }" @click="expanded = !expanded">
+      <i class="fas fa-chevron-right"></i>
+    </div>
   </div>
 </template>
 
 <script>
+import {sync} from '@/utils/store-helpers';
+
 export default {
   name: 'AppSidebar',
-  data() {
-    return {
-      activeTab: 'apps',
-    };
+  computed: {
+    expanded: sync('currentUser/expandedSidebar'),
   },
-  methods: {
-    setActiveTab(tab) {
-      this.activeTab = tab;
-      this.$emit('tab-changed', tab);
-    }
-  }
 };
 </script>
 
-<style scoped>
-.sidebar-wrapper {
+<style lang="scss" scoped>
+$background: #444;
+$activeBackground: #4f4f4f;
+$hoverBackground: #82aad8;
+$color: #ccc;
+$activeColor: #eee;
+$hoverColor: white;
+$arrowBackground: #484848;
+$border: #383838;
+$arrowColor: #888;
+
+.sidebar-container {
+  display: flex;
   height: 100%;
-  width: 250px;
-  background-color: #363636;
-  color: #fff;
-  position: relative;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
 }
 
 .sidebar {
+  width: 16rem;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  height: 100%;
-  padding: 1rem;
+  position: relative;
 }
 
 .sidebar-title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #fff;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #4a4a4a;
+  padding: 0.8em 0em 0.8em;
+  width: 14.5rem !important;
+  line-height: 1.8rem;
   text-align: center;
+  color: $background;
+  font-size: 1rem;
+  margin: 0;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-align: center;
+  font-weight: 600;
 }
 
-.sidebar-content {
+.sidebar-wrapper {
   display: flex;
-  flex-direction: column;
   height: 100%;
-  justify-content: space-between;
+  background: $background;
+  overflow: hidden;
+  transition: width .2s linear;
+  width: 4rem;
 }
 
-.sidebar-main-tabs {
-  flex-grow: 1;
+.sidebar-wrapper.expanded {
+  width: 16rem;
 }
 
-.sidebar-bottom {
-  margin-top: auto;
-  padding-top: 1rem;
-  border-top: 1px solid #4a4a4a;
+.sidebar-wrapper.expanded .sidebar-title {
+  color: $activeColor !important;
 }
 
-:deep(.menu-list a) {
-  color: #dbdbdb !important;
-  border-radius: 4px;
-  padding: 0.75rem 1rem;
-  margin-bottom: 0.5rem;
-  transition: all 0.3s ease;
+ul {
+  width: 100%;
 }
 
-:deep(.menu-list a:hover) {
-  background-color: #4a4a4a !important;
-  color: #fff !important;
+li {
+  height: 3.5rem;
 }
 
-:deep(.menu-list a.is-active) {
-  background-color: #3273dc !important;
-  color: #fff !important;
+.bottom-menu {
+  position: absolute;
+  bottom: 0;
+  left: 0;
 }
 
-:deep(.menu-list .icon) {
-  margin-right: 0.5rem;
+a {
+  position: relative;
+  display: block;
+  font-size: 0.85rem;
+  height: 100%;
+  font-weight: 600;
+  color: $color;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
+.fas {
+  font-size: 1.25rem;
+  width: 4rem;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+li a:hover {
+  color: $hoverColor;
+  background: $hoverBackground !important;
+}
+
+li.is-active a {
+  box-shadow: inset 5px 0 0 $hoverBackground;
+  color: $activeColor;
+  background: $activeBackground;
+}
+
+.arrow-sidebar {
+  width: 1.5rem;
+  border-left: 1px solid $border;
+  background: $arrowBackground;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+}
+
+.arrow-sidebar i {
+  color: $arrowColor;
+  transition: transform 0.2s ease;
+}
+
+.arrow-sidebar.expanded i {
+  transform: rotate(180deg);
 }
 </style>

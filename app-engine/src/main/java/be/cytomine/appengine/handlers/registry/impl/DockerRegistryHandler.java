@@ -3,27 +3,41 @@ package be.cytomine.appengine.handlers.registry.impl;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Optional;
 
 import com.cytomine.registry.client.RegistryClient;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import be.cytomine.appengine.exceptions.RegistryException;
 import be.cytomine.appengine.handlers.RegistryHandler;
 
+@Component
 @Slf4j
 public class DockerRegistryHandler implements RegistryHandler {
+
+    @Value("${registry.url}")
+    private String registryHost;
+
+    @Value("${registry.user}")
+    private Optional<String> registryUsername = Optional.empty();
+
+    @Value("${registry.password}")
+    private Optional<String> registryPassword = Optional.empty();
 
     public DockerRegistryHandler(
         String registryHost,
         String registryPort,
         String registryScheme,
-        boolean authenticated,
-        String registryUsername,
-        String registryPassword
+        Optional<String> registryUsername,
+        Optional<String> registryPassword
     ) throws IOException {
         RegistryClient.config(registryScheme, registryHost, registryPort);
-        if (authenticated) {
-            RegistryClient.authenticate(registryUsername, registryPassword);
+        if (registryUsername.filter(e -> !e.isBlank()).isPresent()) {
+            RegistryClient.authenticate(registryUsername.get(),
+                registryPassword.orElseThrow(() -> new IllegalArgumentException("Username was "
+                    + "provided for registry but not password")));
         }
 
         log.info("Docker Registry Handler: initialised");

@@ -81,6 +81,16 @@ This installation procedure is intended for desktop or laptop computers running 
 Once authenticated, it is recommended to update the default administrator password to a more secure one.
 :::
 
+## Upgrade Cytomine
+
+To upgrade Cytomine to the latest version:
+
+```bash
+sudo docker compose pull
+```
+
+This command will pull the latest images of each services in Cytomine.
+
 ## Stop Cytomine
 
 To stop your Cytomine instance:

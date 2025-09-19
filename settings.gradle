@@ -1,1 +1,1 @@
-include("core", "app-engine")
+include("core", "app-engine", "registry-client")

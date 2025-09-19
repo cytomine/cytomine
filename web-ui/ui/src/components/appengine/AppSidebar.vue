@@ -100,7 +100,6 @@ $arrowColor: #888;
 .sidebar-container {
   display: flex;
   height: 100%;
-  width: 16rem;
 }
 
 .sidebar-title {

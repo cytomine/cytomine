@@ -42,7 +42,7 @@ describe('AppCard.vue', () => {
 
   it('The component should use the correct router link', () => {
     const link = wrapper.findComponent({name: 'RouterLink'});
-    expect(link.props('to')).toBe(`/app-engine/${mockAppData.namespace}/${mockAppData.version}`);
+    expect(link.props('to')).toBe(`/apps/${mockAppData.namespace}/${mockAppData.version}`);
   });
 
   it('should fallback to placeholder image if imageUrl is not provided', async () => {

@@ -245,9 +245,32 @@ public class TaskController {
         ValidationException,
         BundleArchiveException,
         AppStoreServiceException {
-        log.info("tasks/{scheme}/{host}/{namespace}/{version} POST");
+        log.info("tasks/{namespace}/{version} POST");
         Optional<TaskDescription> description = appStoreService.install(namespace, version);
-        log.info("tasks/{scheme}/{host}/{namespace}/{version} POST end");
+        log.info("tasks/{namespace}/{version} POST end");
         return ResponseEntity.ok(description);
+    }
+
+    @GetMapping(value = "tasks/{namespace}/{version}/logo")
+    @ResponseStatus(code = HttpStatus.OK)
+    public ResponseEntity<?> findLogoOfTaskByNamespaceAndVersion(
+            @PathVariable String namespace,
+            @PathVariable String version
+    ) throws TaskServiceException, TaskNotFoundException {
+        log.info("tasks/{namespace}/{version}/logo.png GET");
+        StorageData data = taskService.retrieveLogo(namespace, version);
+        File file = data.peek().getData();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(
+                HttpHeaders.CONTENT_DISPOSITION,
+                "attachment; filename=\"" + file.getName() + "\""
+        );
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+
+        log.info("tasks/{namespace}/{version}/logo.png GET Ended");
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(new FileSystemResource(file));
     }
 }

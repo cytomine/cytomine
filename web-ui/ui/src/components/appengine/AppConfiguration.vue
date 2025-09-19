@@ -1,7 +1,10 @@
 <template>
   <div class="content-wrapper">
     <div class="panel">
-      <p class="panel-heading">{{ $t('configuration') }}</p>
+      <div class="panel-heading">
+        {{ $t('configuration') }}
+        <button class="button is-link" @click="showModal = true">{{ $t('add-store') }}</button>
+      </div>
       <section class="panel-block">
         <b-table :data="data">
           <template #default="{ row: store }">
@@ -35,16 +38,24 @@
         </b-table>
       </section>
     </div>
+
+    <AppStoreAddModal :active.sync="showModal" @add-store="handleAdd($event)" />
   </div>
 </template>
 
 <script>
 import axios from 'axios';
 
+import AppStoreAddModal from '@/components/appengine/AppStoreAddModal.vue';
+
 export default {
   name: 'AppConfiguration',
+  components: {
+    AppStoreAddModal,
+  },
   data() {
     return {
+      showModal: false,
       data: [
         {
           id: 1,
@@ -68,6 +79,9 @@ export default {
       } catch (error) {
         console.error(error);
       }
+    },
+    handleAdd(store) {
+      this.data.push(store);
     },
     handleDelete(store) {
       this.$buefy.dialog.confirm({
@@ -94,5 +108,11 @@ export default {
 
 .fas.fa-times-circle {
   color: red;
+}
+
+.panel-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 </style>

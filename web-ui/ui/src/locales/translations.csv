@@ -19,6 +19,7 @@ add-images-to-image-group,Add images to image group,Ajouter des images au groupe
 add-inputs,Add inputs,Ajouter des entrées,Añadir entradas,Invoeren toevoegen
 add-members-to-project,Add members to project,Ajouter des membres au projet,Agregar miembros al proyecto,Voeg projectleden toe
 add-new-comment,Add new comment,Ajouter un nouveau commentaire,Añadir nuevo comentario,Voeg een nieuwe commentaar toe
+add-store,Add Store,Ajouter un magasin,Añadir tienda,Winkel toevoegen
 add-term,Add a term,Nouveau terme,Agregar un término,Nieuwe term
 add-to-image-group,Add image to image group,Ajouter l'image à un groupe d'images,Agregar imagen al grupo de imágenes,Afbeelding toevoegen aan afbeeldingsgroep
 add-track,Add a track,Ajouter une trace,,Track toevoegen
@@ -280,6 +281,7 @@ date,Date,Date,Fecha,Datum
 day,Day,Jour,Día,Dag
 default-annotation-layers,Default annotation layers,Calques chargés par défaut,Capas de anotación predeterminadas,Lagen worden standaard geladen
 default-property,Default property,Propriété par défaut,Propiedad por defecto,Default eigenschap
+default-store,Default store,Magasin par défaut,Tienda predeterminada,Standaardwinkel
 default-value,Default value,Valeur par défaut,Valor por defecto,Eigenschap door uitsluiting
 delete-data,Delete data,Supprimer les données,Borrar datos,Verwijder data
 delete,Delete,Supprimer,Eliminar,verwijderen
@@ -412,6 +414,7 @@ hide-managers-layers,Hide managers layers,Cacher les calques des responsables,Oc
 hide-successful-upload,Hide successful uploads,Cacher les uploads réussis,Ocultar cargas exitosas,Succesvolle uploads verbergen
 hierarchical-drag-drop-term,Terms can be organized hierarchically using Drag & Drop,Les termes peuvent être organisés de manière hiérarchique en utilisant le drag and drop,,Termen kunnen hiërarchisch worden georganiseerd door middel van Drag & Drop
 histogram-scale,Histogram scale,Echelle des histogrammes,,Schaal van histogrammen
+hostname,Hostname,Nom de domaine,Nombre de dominio,Hostnaam
 hour,Hour,Heure,Hora,Uur
 hue,Hue,Teinte,Tono,Tint
 huge,Huge,Très grand,Enorme,Erg groot
@@ -737,6 +740,7 @@ notif-unexpected-error,Unexpected error,Une erreur inattendue s'est produite,Se 
 notif-warn-ontology-tree-order-not-persisted,The order of children in the ontology tree is not persisted in database,L'ordre des enfants dans l'arborescence n'est pas sauvegardée dans la base de données,La jerarquía de términos dentro de la ontología no se mantiene en la base de datos.,De volgorde van de kinderen in de stamboom wordt niet opgeslagen in de database
 notify-error-empty-list,The list is empty,La liste est vide,La lista está vacía,De lijst is leeg
 notify-error-not-enough-item,Not enough items provided,Pas assez d'éléments fournis,No se han proporcionado suficientes elementos,Niet genoeg items verstrekt
+notify-success-app-store-addition,App store added successfully,Magasin d'applications ajouté avec succès,Tienda de aplicaciones añadida con éxito,App store succesvol toegevoegd
 notify-success-create-array-inputs,The array was successfully provisioned,Le tableau a été approvisionné avec succès,La matriz se aprovisionó correctamente,De array is succesvol ingericht
 notify-success-task-upload,The task has been successfully uploaded,La tâche a été chargée avec succès,La tarea se ha cargado con éxito,De taak is succesvol geüpload
 number-annotation-creations,Number of annotation creations,Nombre d'annotations créées,Número de anotaciones creadas,Aantal aangemaakte annotaties

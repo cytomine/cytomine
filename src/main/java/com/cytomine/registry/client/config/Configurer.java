@@ -29,14 +29,19 @@ public class Configurer {
         return configurer.url = url;
     }
 
+    public static String url() {
+        return configurer.url;
+    }
+
     public static void authenticate(String userName, String password) {
         configurer.authenticated = true;
         configurer.userName = userName;
         configurer.password = password;
-        AUTHENTICATOR.basic(url, new Credential(configurer.userName, configurer.password));
+        AUTHENTICATOR.basic(configurer.url, new Credential(configurer.userName,
+            configurer.password));
     }
 
     public static boolean authenticated() {
-       return configurer.authenticated;
+        return configurer.authenticated;
     }
 }

@@ -124,10 +124,6 @@ public class RegistryManager {
         throw new RuntimeException("No response from the registry Server.");
     }
 
-    public String getSchema() {
-        return Configurer.schema();
-    }
-
     public int getVersion(String endpoint) throws IOException {
         return api.base(String.format("%s://%s", Constants.SCHEMA_HTTP, endpoint));
 

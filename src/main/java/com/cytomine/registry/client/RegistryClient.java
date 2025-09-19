@@ -32,7 +32,6 @@ public class RegistryClient {
         AUTHENTICATOR.basic(endpoint, new Credential(username, password));
     }
 
-
     public static void authDockerHub(String username, String password) {
         AUTHENTICATOR.docker(new Credential(username, password));
     }

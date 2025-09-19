@@ -6,7 +6,7 @@
         <button class="button is-link" @click="showModal = true">{{ $t('add-store') }}</button>
       </div>
       <section class="panel-block">
-        <b-table :data="data">
+        <b-table :data="stores">
           <template #default="{ row: store }">
             <b-table-column label="ID" width="40">
               {{ store.id }}
@@ -56,20 +56,7 @@ export default {
   data() {
     return {
       showModal: false,
-      data: [
-        {
-          id: 1,
-          name: 'Cytomine Store',
-          host: 'https://store.cytomine.org',
-          default: true,
-        },
-        {
-          id: 2,
-          name: 'BIGPICTURE Store',
-          host: 'https://store.bigpicture.org',
-          default: false,
-        },
-      ],
+      stores: [],
     };
   },
   async created() {
@@ -77,18 +64,33 @@ export default {
   },
   methods: {
     async fetchStores() {
-      let data = await Cytomine.instance.api.get('/stores');
-      console.log(data);
+      try {
+        this.stores = (await Cytomine.instance.api.get('/stores')).data;
+      } catch (error) {
+        console.error('Failed to fetch stores:', error);
+      }
+    },
+    async addStore(store) {
+      try {
+        return (await Cytomine.instance.api.post('/stores', store)).data;
+      } catch (error) {
+        console.error('Failed to add store:', error);
+      }
     },
     async deleteStore(store) {
       try {
         await Cytomine.instance.api.delete(`/stores/${store.id}`);
+
+        this.stores = this.stores.filter(s => s.id !== store.id);
+
+        this.$notify({type: 'success', text: this.$t('notify-success-app-store-deletion')});
       } catch (error) {
-        console.error(error);
+        console.error('Failed to delete store:', error);
       }
     },
-    handleAdd(store) {
-      this.data.push(store);
+    async handleAdd(storeData) {
+      const createdStore = await this.addStore(storeData);
+      this.stores.push(createdStore);
     },
     handleDelete(store) {
       this.$buefy.dialog.confirm({

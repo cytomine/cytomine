@@ -741,6 +741,7 @@ notif-warn-ontology-tree-order-not-persisted,The order of children in the ontolo
 notify-error-empty-list,The list is empty,La liste est vide,La lista está vacía,De lijst is leeg
 notify-error-not-enough-item,Not enough items provided,Pas assez d'éléments fournis,No se han proporcionado suficientes elementos,Niet genoeg items verstrekt
 notify-success-app-store-addition,App store added successfully,Magasin d'applications ajouté avec succès,Tienda de aplicaciones añadida con éxito,App store succesvol toegevoegd
+notify-success-app-store-deletion,App store deleted successfully,Magasin d'applications supprimé avec succès,Tienda de aplicaciones eliminada con éxito,App store succesvol verwijderd
 notify-success-create-array-inputs,The array was successfully provisioned,Le tableau a été approvisionné avec succès,La matriz se aprovisionó correctamente,De array is succesvol ingericht
 notify-success-task-upload,The task has been successfully uploaded,La tâche a été chargée avec succès,La tarea se ha cargado con éxito,De taak is succesvol geüpload
 number-annotation-creations,Number of annotation creations,Nombre d'annotations créées,Número de anotaciones creadas,Aantal aangemaakte annotaties

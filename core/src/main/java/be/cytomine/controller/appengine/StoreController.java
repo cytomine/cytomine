@@ -31,7 +31,7 @@ public class StoreController {
         return appEngineService.post("stores", store, MediaType.APPLICATION_JSON);
     }
 
-    @DeleteMapping("/stores")
+    @DeleteMapping("/stores/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id) {
         appEngineService.delete("stores/" + id);
         return ResponseEntity.noContent().build();

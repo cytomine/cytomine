@@ -5,8 +5,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Objects;
 
-import com.cytomine.registry.client.RegistryClient;
-import com.cytomine.registry.client.http.resp.CatalogResp;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,6 +14,8 @@ import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import io.github.ya_b.registry.client.RegistryClient;
+import io.github.ya_b.registry.client.http.resp.CatalogResp;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -321,12 +321,8 @@ public class UploadTaskStepDefinitions {
 
         // and registry
         CatalogResp response = RegistryClient.catalog("http://" + registry, 2, "");
-        boolean repoFound = false;
         String imageName = uploaded.getNamespace().replace(".", "/");
-        for (String repository : response.getRepositories()) {
-            repoFound = repository.equalsIgnoreCase(imageName);
-            break;
-        }
+        response.getRepositories().contains(imageName);
     }
 
     // invalid task bundle tests

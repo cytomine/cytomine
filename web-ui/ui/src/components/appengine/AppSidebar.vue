@@ -29,9 +29,9 @@
       </nav>
     </div>
 
-    <div class="arrow-sidebar" :class="{ expanded: expanded }" @click="expanded = !expanded">
+    <button class="arrow-sidebar" :class="{ expanded: expanded }" @click="expanded = !expanded">
       <i class="fas fa-chevron-right"></i>
-    </div>
+    </button>
   </div>
 </template>
 
@@ -57,9 +57,36 @@ $arrowBackground: #484848;
 $border: #383838;
 $arrowColor: #888;
 
-.sidebar-container {
+.arrow-sidebar {
+  width: 1.5rem;
+  border: none;
+  border-left: 1px solid $border;
+  background: $arrowBackground;
+  justify-content: center;
   display: flex;
-  height: 100%;
+  align-items: center;
+}
+
+.arrow-sidebar i {
+  color: $arrowColor;
+  transition: transform 0.2s ease;
+}
+
+.arrow-sidebar.expanded i {
+  transform: rotate(180deg);
+}
+
+.bottom-menu {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.fas {
+  font-size: 1.25rem;
+  width: 4rem;
+  text-align: center;
+  flex-shrink: 0;
 }
 
 .sidebar {
@@ -68,6 +95,11 @@ $arrowColor: #888;
   display: flex;
   flex-direction: column;
   position: relative;
+}
+
+.sidebar-container {
+  display: flex;
+  height: 100%;
 }
 
 .sidebar-title {
@@ -101,20 +133,6 @@ $arrowColor: #888;
   color: $activeColor !important;
 }
 
-ul {
-  width: 100%;
-}
-
-li {
-  height: 3.5rem;
-}
-
-.bottom-menu {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-}
-
 a {
   position: relative;
   display: block;
@@ -127,11 +145,8 @@ a {
   align-items: center;
 }
 
-.fas {
-  font-size: 1.25rem;
-  width: 4rem;
-  text-align: center;
-  flex-shrink: 0;
+li {
+  height: 3.5rem;
 }
 
 li a:hover {
@@ -145,21 +160,7 @@ li.is-active a {
   background: $activeBackground;
 }
 
-.arrow-sidebar {
-  width: 1.5rem;
-  border-left: 1px solid $border;
-  background: $arrowBackground;
-  justify-content: center;
-  display: flex;
-  align-items: center;
-}
-
-.arrow-sidebar i {
-  color: $arrowColor;
-  transition: transform 0.2s ease;
-}
-
-.arrow-sidebar.expanded i {
-  transform: rotate(180deg);
+ul {
+  width: 100%;
 }
 </style>

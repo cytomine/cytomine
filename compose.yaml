@@ -129,13 +129,13 @@ services:
       DB_PASSWORD: password
       DB_PORT: 5432
       DB_USERNAME: appengine
-      REGISTRY_URL: registry:5000
+      REGISTRY_URL: http://registry:5000
       STORAGE_BASE_PATH: /path/to/app-engine # Must be an absolute path PLEASE CHANGE
       RUN_STORAGE_BASE_PATH: /path/to/app-engine # MUST be an absolute path PLEASE CHANGE
       PROJECT_DATA_PATH: /path/to/cytomine/data # MUST be an absolute path and match volume A PLEASE CHANGE
       REF_STORAGE_BASE_PATH: /path/to/datasets # MUST be an absolute match volume B PLEASE CHANGE
       SCHEDULER_RUN_MODE: local # values: local, cluster
-      SCHEDULER_ADVERTISED_URL: 172.16.238.10
+      SCHEDULER_ADVERTISED_URL: http://app-engine
       SCHEDULER_USE_HOST_NETWORK: true
       KUBERNETES_MASTER: https://k3s:6443/
 
@@ -251,23 +251,23 @@ services:
     # - 80:80
     # - 443:443
 
-  k3s-agent:
-    image: "rancher/k3s:v1.30.14-rc3-k3s3"
-    tmpfs:
-    - /run
-    - /var/run
-    ulimits:
-      nproc: 65535
-      nofile:
-        soft: 65535
-        hard: 65535
-    privileged: true
-    restart: always
-    environment:
-    - K3S_URL=https://k3s:6443
-    - K3S_TOKEN=65535-65535-65535 # plain text secret!
-    volumes:
-    - k3s-agent:/var/lib/rancher/k3s
+#  k3s-agent:
+#    image: "rancher/k3s:v1.30.14-rc3-k3s3"
+#    tmpfs:
+#    - /run
+#    - /var/run
+#    ulimits:
+#      nproc: 65535
+#      nofile:
+#        soft: 65535
+#        hard: 65535
+#    privileged: true
+#    restart: always
+#    environment:
+#    - K3S_URL=https://k3s:6443
+#    - K3S_TOKEN=65535-65535-65535 # plain text secret!
+#    volumes:
+#    - k3s-agent:/var/lib/rancher/k3s
 
 volumes:
   k3s-server: {}

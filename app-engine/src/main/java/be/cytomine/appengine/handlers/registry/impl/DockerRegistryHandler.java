@@ -29,8 +29,9 @@ public class DockerRegistryHandler implements RegistryHandler {
 
     @PostConstruct
     void init() throws IOException {
+        RegistryClient.config(registryHost);
         if (registryUsername.filter(e -> !e.isBlank()).isPresent()) {
-            RegistryClient.authBasic(registryHost, registryUsername.get(),
+            RegistryClient.authenticate(registryUsername.get(),
                 registryPassword.orElseThrow(() -> new IllegalArgumentException("Username was "
                     + "provided for registry but not password")));
         }

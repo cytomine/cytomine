@@ -83,7 +83,7 @@ $arrowColor: #888;
 }
 
 .fas {
-  font-size: 1.25rem;
+  font-size: 1rem;
   width: 4rem;
   text-align: center;
   flex-shrink: 0;
@@ -100,6 +100,7 @@ $arrowColor: #888;
 .sidebar-container {
   display: flex;
   height: 100%;
+  width: 16rem;
 }
 
 .sidebar-title {

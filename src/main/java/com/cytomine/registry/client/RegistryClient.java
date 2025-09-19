@@ -53,10 +53,8 @@ public class RegistryClient {
         Configurer.authenticate(user, password);
     }
 
-    public static void config(String scheme, String host, String port) throws IOException {
-        Configurer.schema(scheme);
-        Configurer.host(host);
-        Configurer.port(port);
+    public static void config(String url) throws IOException {
+        Configurer.url(url);
     }
 
 

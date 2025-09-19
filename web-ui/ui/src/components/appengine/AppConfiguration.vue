@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import {Cytomine} from 'cytomine-client';
 
 import AppStoreAddModal from '@/components/appengine/AppStoreAddModal.vue';
 
@@ -72,10 +72,17 @@ export default {
       ],
     };
   },
+  async created() {
+    await this.fetchStores();
+  },
   methods: {
+    async fetchStores() {
+      let data = await Cytomine.instance.api.get('/stores');
+      console.log(data);
+    },
     async deleteStore(store) {
       try {
-        axios.delete(`/app-engine/v1/stores/${store.id}`);
+        await Cytomine.instance.api.delete(`/stores/${store.id}`);
       } catch (error) {
         console.error(error);
       }

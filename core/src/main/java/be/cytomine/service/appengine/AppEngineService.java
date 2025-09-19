@@ -39,6 +39,10 @@ public class AppEngineService {
         return restTemplate.exchange(buildFullUrl(uri), HttpMethod.GET, null, String.class).getBody();
     }
 
+    public void delete(String uri) {
+        restTemplate.exchange(buildFullUrl(uri), HttpMethod.DELETE, null, Void.class);
+    }
+
     public File getStreamedFile(String uri) {
         Path filePath = Paths.get("downloaded_" + System.currentTimeMillis() + ".tmp");
         File targetFile = filePath.toFile();

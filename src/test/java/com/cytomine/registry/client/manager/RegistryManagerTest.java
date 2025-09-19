@@ -21,10 +21,6 @@ class RegistryManagerTest {
 
     private final RegistryManager REGISTRY_OPERATE = new RegistryManager();
 
-    private final Authenticator AUTHENTICATOR = Authenticator.instance();
-
-
-    String host ;
     @BeforeAll
     static void init() throws IOException {
         // environment variables

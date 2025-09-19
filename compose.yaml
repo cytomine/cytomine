@@ -100,6 +100,7 @@ services:
       KC_HOSTNAME_STRICT_BACKCHANNEL: true
       KC_HOSTNAME_STRICT_HTTPS: false
       KC_HTTP_RELATIVE_PATH: /iam
+      KC_ENABLE_HTTP: true
       KC_PROXY_HEADERS: xforwarded
       KC_SMTP_FROM: mail@mail.com
       KC_SMTP_HOST: mail.smtp

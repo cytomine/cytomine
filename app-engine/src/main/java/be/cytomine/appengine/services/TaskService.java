@@ -69,6 +69,8 @@ import be.cytomine.appengine.repositories.TaskRepository;
 import be.cytomine.appengine.states.TaskRunState;
 import be.cytomine.appengine.utils.ArchiveUtils;
 
+import static java.lang.String.format;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -188,7 +190,7 @@ public class TaskService {
             log.error("UploadTask: task already exists");
             throw e;
         } catch (Exception e) {
-            log.error("UploadTask: Unknown bundle archive format");
+            log.error(format("UploadTask: Unknown bundle archive format %s",e));
             AppEngineError error = ErrorBuilder.build(
                 ErrorCode.INTERNAL_UNKNOWN_BUNDLE_ARCHIVE_FORAMT);
             throw new BundleArchiveException(error);

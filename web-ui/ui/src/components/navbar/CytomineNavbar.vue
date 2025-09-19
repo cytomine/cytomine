@@ -43,7 +43,7 @@
         <i class="fas fa-hashtag"></i>
         {{ $t('ontologies') }}
       </router-link>
-      <router-link v-if="appEngineEnabled" to="/appengine" class="navbar-item">
+      <router-link v-if="appEngineEnabled" to="/apps" class="navbar-item">
         <i class="fas fa-code"></i>
         {{ $t('app-engine.applications') }}
       </router-link>

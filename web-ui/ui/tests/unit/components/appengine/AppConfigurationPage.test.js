@@ -1,0 +1,103 @@
+import {shallowMount, createLocalVue} from '@vue/test-utils';
+import Buefy from 'buefy';
+
+import AppConfigurationPage from '@/components/appengine/AppConfigurationPage.vue';
+import AppStoreAddModal from '@/components/appengine/AppStoreAddModal.vue';
+import {Cytomine} from 'cytomine-client';
+import {flushPromises} from '../../../utils';
+
+const localVue = createLocalVue();
+localVue.use(Buefy);
+
+const mockNotify = jest.fn();
+const mockDialog = {confirm: jest.fn()};
+
+jest.mock('cytomine-client', () => ({
+  Cytomine: {
+    instance: {
+      api: {
+        get: jest.fn(),
+        post: jest.fn(),
+        delete: jest.fn(),
+      },
+    },
+  },
+}));
+
+describe('AppConfigurationPage.vue', () => {
+  const createWrapper = (options = {}) => {
+    const defaultOptions = {
+      localVue,
+      mocks: {
+        $notify: mockNotify,
+        $buefy: {dialog: mockDialog},
+        $t: (key) => key,
+      },
+      stubs: {
+        AppStoreAddModal,
+      },
+      ...options,
+    };
+
+    return shallowMount(AppConfigurationPage, {
+      ...defaultOptions,
+      ...options,
+    });
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should fetch stores on created hook', async () => {
+    const storesData = [{id: 1, name: 'Store1', host: 'http://example.com', default: true}];
+    Cytomine.instance.api.get.mockResolvedValue({data: storesData});
+
+    const wrapper = createWrapper();
+    await flushPromises();
+
+    expect(Cytomine.instance.api.get).toHaveBeenCalledWith('/stores');
+    expect(wrapper.vm.stores).toEqual(storesData);
+  });
+
+  it('should add a store correctly', async () => {
+    const newStore = {id: 2, name: 'Store2', host: 'http://host2.com', default: false};
+    Cytomine.instance.api.post.mockResolvedValue({data: newStore});
+
+    const wrapper = createWrapper();
+    await wrapper.vm.handleAdd(newStore);
+
+    expect(Cytomine.instance.api.post).toHaveBeenCalledWith('/stores', newStore);
+    expect(wrapper.vm.stores).toContainEqual(newStore);
+  });
+
+  it('should delete a store correctly', async () => {
+    const store = {id: 3, name: 'Store3', host: 'http://host3.com', default: false};
+    const wrapper = createWrapper({
+      data() {
+        return {stores: [store]};
+      }
+    });
+
+    Cytomine.instance.api.delete.mockResolvedValue({});
+    mockDialog.confirm.mockImplementation(({onConfirm}) => onConfirm());
+
+    await wrapper.vm.handleDelete(store);
+    await flushPromises();
+
+    expect(Cytomine.instance.api.delete).toHaveBeenCalledWith(`/stores/${store.id}`);
+    expect(wrapper.vm.stores).not.toContainEqual(store);
+    expect(mockNotify).toHaveBeenCalledWith({
+      type: 'success',
+      text: 'notify-success-app-store-deletion',
+    });
+  });
+
+  it('should open the add modal', () => {
+    const wrapper = createWrapper();
+    expect(wrapper.vm.showModal).toBe(false);
+
+    wrapper.setData({showModal: true});
+    expect(wrapper.vm.showModal).toBe(true);
+  });
+});

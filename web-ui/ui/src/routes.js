@@ -1,6 +1,7 @@
 import VueRouter from 'vue-router';
 
 import AppConfigurationPage from '@/components/appengine/AppConfigurationPage.vue';
+import AppInfoPage from './components/appengine/AppInfoPage.vue';
 import AppLayout from '@/components/appengine/AppLayout.vue';
 import AppLocalPage from '@/components/appengine/AppLocalPage.vue';
 import AppStorePage from '@/components/appengine/AppStorePage.vue';
@@ -22,7 +23,6 @@ import CytomineProject from './components/project/CytomineProject.vue';
 import ProjectHome from './components/project/ProjectHome.vue';
 import MemberActivityDetails from './components/project/activity/MemberActivityDetails.vue';
 import AdminPanel from './components/admin/AdminPanel.vue';
-import AppInfoPage from './components/appengine/AppInfoPage.vue';
 import UserActivity from './components/user/UserActivity.vue';
 import PageNotFound from './components/PageNotFound.vue';
 

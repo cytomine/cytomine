@@ -50,8 +50,8 @@ public class KubernetesScheduler implements SchedulerHandler {
 
     private final RunRepository runRepository;
 
-    @Value("${registry.url}")
-    private String registryUrl;
+    @Value("${scheduler.registry-advertised-url}")
+    private String registryAdvertisedUrl;
 
     @Value("${scheduler.helper-containers-resources.ram}")
     private String helperContainerRam;
@@ -102,7 +102,7 @@ public class KubernetesScheduler implements SchedulerHandler {
 
         String basePath = "";
         if (runMode.equalsIgnoreCase("local")) {
-            basePath =  runModeStorageBasePath;
+            basePath = runModeStorageBasePath;
         }
         if (runMode.equalsIgnoreCase("cluster")) {
             basePath = "/tmp/app-engine";
@@ -148,7 +148,6 @@ public class KubernetesScheduler implements SchedulerHandler {
                 .addToRequests("nvidia.com/gpu", new Quantity(Integer.toString(task.getGpus())))
                 .addToLimits("nvidia.com/gpu", new Quantity(Integer.toString(task.getGpus())));
         }
-
 
 
         String url = baseUrl + runId;
@@ -220,7 +219,8 @@ public class KubernetesScheduler implements SchedulerHandler {
         String zipOutputs = "cd " + task.getOutputFolder() + and + "-0 zip -r outputs.zip .";
         String wait = "export TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token); ";
         wait += "while ! curl -vk -H \"Authorization: Bearer $TOKEN\" ";
-        wait += "https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT_HTTPS}/api/v1/namespaces/default/pods/${POD_NAME}/status ";
+        wait += "https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT_HTTPS}/api/v1" +
+            "/namespaces/default/pods/${POD_NAME}/status ";
         wait += "| jq '.status | .containerStatuses[] | select(.name == \"task\") | .state ";
         wait += "| keys[0]' | grep -q -F \"terminated\"; do sleep 2; done";
 
@@ -289,7 +289,7 @@ public class KubernetesScheduler implements SchedulerHandler {
         boolean isClusterMode = this.runMode.equalsIgnoreCase("cluster");
         // Defining the pod image to run
         String podName = task.getName().toLowerCase().replaceAll("[^a-zA-Z0-9]", "") + "-" + runId;
-        String imageName = registryUrl + "/" + task.getImageName();
+        String imageName = registryAdvertisedUrl + "/" + task.getImageName();
 
         PodBuilder podBuilder = new PodBuilder()
             .withNewMetadata()

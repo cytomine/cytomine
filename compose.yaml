@@ -135,7 +135,8 @@ services:
       PROJECT_DATA_PATH: /path/to/cytomine/data # MUST be an absolute path and match volume A PLEASE CHANGE
       REF_STORAGE_BASE_PATH: /path/to/datasets # MUST be an absolute match volume B PLEASE CHANGE
       SCHEDULER_RUN_MODE: local # values: local, cluster
-      SCHEDULER_ADVERTISED_URL: http://app-engine
+      SCHEDULER_ADVERTISED_URL: http://0.0.0.0/app-engine
+      SCHEDULER_REGISTRY_ADVERTISED_URL: 0.0.0.0/registry
       SCHEDULER_USE_HOST_NETWORK: true
       KUBERNETES_MASTER: https://k3s:6443/
 
@@ -221,6 +222,7 @@ services:
       INTERNAL_URLS_APPENGINE: app-engine:8080
       INTERNAL_URLS_IAM: iam:8100
       INTERNAL_URLS_WEB_UI: web-ui
+      INTERNAL_URLS_REGISTRY: registry:5000
       URLS_SCHEME: ${URLS_SCHEME:-http}
 
   # https://github.com/k3s-io/k3s/blob/3854eb56d4b8a183a1f8261aebd372111378a00f/docker-compose.yml
@@ -244,6 +246,7 @@ services:
 #    - K3S_URL=https://k3s:6443/
     volumes:
     - k3s-server:/var/lib/rancher/k3s
+    - ./k3s/registries.yml:/etc/rancher/k3s/registries.yaml:ro
     # This is just so that we get the kubeconfig file out
     - .kube/shared:/output/
     ports:

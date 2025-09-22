@@ -1,0 +1,9 @@
+mirrors:
+  "*":
+    endpoint:
+      - "http://0.0.0.0"
+configs:
+  "docker.io":
+  "*":
+    tls:
+      insecure_skip_verify: true

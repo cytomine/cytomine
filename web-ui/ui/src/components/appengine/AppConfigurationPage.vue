@@ -6,7 +6,7 @@
         <button class="button is-link" @click="showModal = true">{{ $t('add-store') }}</button>
       </div>
       <section class="panel-block">
-        <b-table :data="stores">
+        <b-table :data="stores" v-if="stores.length > 0">
           <template #default="{ row: store }">
             <b-table-column label="ID" width="40">
               {{ store.id }}
@@ -36,6 +36,10 @@
             </b-table-column>
           </template>
         </b-table>
+
+        <p v-else class="has-text-centered">
+          {{ $t('no-app-store-registered') }}
+        </p>
       </section>
     </div>
 

@@ -191,7 +191,6 @@ describe('AppLocalPage.vue', () => {
 
       expect(appCards).toHaveLength(0);
       expect(wrapper.vm.applications).toEqual([]);
-      expect(wrapper.find('#lower-section-flex').exists()).toBe(true);
     });
 
     it('should handle null applications response', async () => {

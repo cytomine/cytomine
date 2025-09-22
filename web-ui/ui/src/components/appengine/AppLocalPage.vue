@@ -11,10 +11,8 @@
         {{ $t('app-engine.tasks.name') }}
         <UploadAppButton btnFunc="upload" @taskUploadSuccess="handleTaskUpload" />
       </p>
-      <section class="panel-block">
-        <section id="lower-section-flex">
-          <AppCard v-for="app in applications" :key="app.id" :appData="app" />
-        </section>
+      <section class="panel-block lower-section-flex">
+        <AppCard v-for="app in applications" :key="app.id" :appData="app" />
       </section>
     </div>
   </div>
@@ -61,6 +59,19 @@ export default {
 </script>
 
 <style scoped>
+.lower-section-flex {
+  display: flex;
+  flex-direction: row;
+  gap: 1%;
+  flex-wrap: wrap;
+  flex-basis: 30%;
+}
+
+.lower-section-flex>* {
+  flex-basis: 20%;
+  margin: 1em;
+}
+
 .panel-block {
   padding-top: 0.8em;
 }
@@ -69,18 +80,5 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-#lower-section-flex {
-  display: flex;
-  flex-direction: row;
-  gap: 1%;
-  flex-wrap: wrap;
-  flex-basis: 30%;
-}
-
-#lower-section-flex>* {
-  flex-basis: 20%;
-  margin: 1em;
 }
 </style>

@@ -253,24 +253,25 @@ services:
     - 6443:6443
     # - 80:80
     # - 443:443
+    # network_mode: host
 
-#  k3s-agent:
-#    image: "rancher/k3s:v1.30.14-rc3-k3s3"
-#    tmpfs:
-#    - /run
-#    - /var/run
-#    ulimits:
-#      nproc: 65535
-#      nofile:
-#        soft: 65535
-#        hard: 65535
-#    privileged: true
-#    restart: always
-#    environment:
-#    - K3S_URL=https://k3s:6443
-#    - K3S_TOKEN=65535-65535-65535 # plain text secret!
-#    volumes:
-#    - k3s-agent:/var/lib/rancher/k3s
+  # k3s-agent:
+  #   image: "rancher/k3s:v1.30.14-rc3-k3s3"
+  #   tmpfs:
+  #   - /run
+  #   - /var/run
+  #   ulimits:
+  #     nproc: 65535
+  #     nofile:
+  #       soft: 65535
+  #       hard: 65535
+  #   privileged: true
+  #   restart: always
+  #   environment:
+  #   - K3S_URL=https://k3s:6443
+  #   - K3S_TOKEN=65535-65535-65535 # plain text secret!
+  #   volumes:
+  #   - k3s-agent:/var/lib/rancher/k3s
 
 volumes:
   k3s-server: {}

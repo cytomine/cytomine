@@ -110,9 +110,9 @@ http {
             proxy_pass http://$tmpsamhost;
         }
 
-        location /registry {
+        location ~ ^/registry/(.*) {
             set $tmpregistryhost "$INTERNAL_URLS_REGISTRY";
-            proxy_pass http://$tmpregistryhost;
+            proxy_pass http://$tmpregistryhost/$request_uri;
         }
 
         # also the registry
@@ -189,15 +189,15 @@ http {
           alias /www/;
         }
 
-        location /registry {
+        location ~ ^/registry/(.*) {
             set $tmpregistryhost "$INTERNAL_URLS_REGISTRY";
-            proxy_pass http://$tmpregistryhost/registry;
+            proxy_pass http://$tmpregistryhost/$request_uri;
         }
 
         # also the registry
         location /v2 {
             set $tmpregistryhost "$INTERNAL_URLS_REGISTRY";
-            proxy_pass http://$tmpregistryhost/v2;
+            proxy_pass http://$tmpregistryhost;
         }
 
         proxy_intercept_errors on;

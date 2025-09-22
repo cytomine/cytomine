@@ -11,6 +11,6 @@
 
 <script>
 export default {
-  name: 'AppStoreList',
+  name: 'AppStorePage',
 };
 </script>

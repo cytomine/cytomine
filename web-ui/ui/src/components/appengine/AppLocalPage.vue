@@ -22,7 +22,7 @@ import UploadAppButton from '@/components/appengine/UploadAppButton.vue';
 import Task from '@/utils/appengine/task';
 
 export default {
-  name: 'AppLocalList',
+  name: 'AppLocalPage',
   components: {
     AppCard,
     UploadAppButton,

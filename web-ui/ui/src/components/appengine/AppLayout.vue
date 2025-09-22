@@ -19,7 +19,7 @@ import AppSidebar from '@/components/appengine/AppSidebar.vue';
 import constants from '@/utils/constants.js';
 
 export default {
-  name: 'AppPage',
+  name: 'AppLayout',
   components: {
     AppSidebar,
   },

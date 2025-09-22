@@ -49,7 +49,7 @@ import {Cytomine} from 'cytomine-client';
 import AppStoreAddModal from '@/components/appengine/AppStoreAddModal.vue';
 
 export default {
-  name: 'AppConfiguration',
+  name: 'AppConfigurationPage',
   components: {
     AppStoreAddModal,
   },

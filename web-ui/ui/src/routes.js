@@ -1,9 +1,9 @@
 import VueRouter from 'vue-router';
 
-import AppConfiguration from '@/components/appengine/AppConfiguration.vue';
-import AppLocalList from '@/components/appengine/AppLocalList.vue';
-import AppPage from '@/components/appengine/AppPage.vue';
-import AppStoreList from '@/components/appengine/AppStoreList.vue';
+import AppConfigurationPage from '@/components/appengine/AppConfigurationPage.vue';
+import AppLayout from '@/components/appengine/AppLayout.vue';
+import AppLocalPage from '@/components/appengine/AppLocalPage.vue';
+import AppStorePage from '@/components/appengine/AppStorePage.vue';
 import GlobalDashboard from './components/GlobalDashboard.vue';
 import ListProjects from './components/project/ListProjects.vue';
 import CytomineStorage from './components/storage/CytomineStorage.vue';
@@ -123,19 +123,19 @@ const routes = [
   },
   {
     path: '/apps',
-    component: AppPage,
+    component: AppLayout,
     children: [
       {
         path: '/',
-        component: AppLocalList,
+        component: AppLocalPage,
       },
       {
         path: 'configuration',
-        component: AppConfiguration,
+        component: AppConfigurationPage,
       },
       {
         path: 'store',
-        component: AppStoreList,
+        component: AppStorePage,
       },
       {
         path: ':namespace/:version',

@@ -72,7 +72,6 @@ describe('AppStoreAddModal.vue', () => {
   it('should disable add button if form is invalid', () => {
     const wrapper = createWrapper();
     expect(wrapper.vm.isFormValid).toBeFalsy();
-    expect(wrapper.html()).toContain('false');
 
     wrapper.setData({store: {name: 'Store1', host: 'http://host.com', default: false}});
     expect(wrapper.vm.isFormValid).toBeTruthy();

@@ -26,7 +26,7 @@ jest.mock('cytomine-client', () => ({
 
 describe('AppConfigurationPage.vue', () => {
   const createWrapper = (options = {}) => {
-    const defaultOptions = {
+    return shallowMount(AppConfigurationPage, {
       localVue,
       mocks: {
         $notify: mockNotify,
@@ -36,11 +36,6 @@ describe('AppConfigurationPage.vue', () => {
       stubs: {
         AppStoreAddModal,
       },
-      ...options,
-    };
-
-    return shallowMount(AppConfigurationPage, {
-      ...defaultOptions,
       ...options,
     });
   };

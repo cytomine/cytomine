@@ -21,7 +21,7 @@ describe('AppLayout.vue', () => {
   let router;
 
   const createWrapper = (options = {}) => {
-    const defaultOptions = {
+    return shallowMount(AppLayout, {
       localVue,
       router,
       components: {
@@ -30,11 +30,7 @@ describe('AppLayout.vue', () => {
       },
       mocks: {
         $t: (key) => key,
-      }
-    };
-
-    return shallowMount(AppLayout, {
-      ...defaultOptions,
+      },
       ...options,
     });
   };

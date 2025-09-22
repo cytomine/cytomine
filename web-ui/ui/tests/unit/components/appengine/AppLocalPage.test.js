@@ -18,7 +18,7 @@ const localVue = createLocalVue();
 
 describe('AppLocalPage.vue', () => {
   const createWrapper = (options = {}) => {
-    const defaultOptions = {
+    return shallowMount(AppLocalPage, {
       localVue,
       components: {
         AppCard,
@@ -28,10 +28,6 @@ describe('AppLocalPage.vue', () => {
       mocks: {
         $t: (key) => key,
       },
-    };
-
-    return shallowMount(AppLocalPage, {
-      ...defaultOptions,
       ...options,
     });
   };

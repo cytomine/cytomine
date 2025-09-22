@@ -189,6 +189,17 @@ http {
           alias /www/;
         }
 
+        location /registry {
+            set $tmpregistryhost "$INTERNAL_URLS_REGISTRY";
+            proxy_pass http://$tmpregistryhost/registry;
+        }
+
+        # also the registry
+        location /v2 {
+            set $tmpregistryhost "$INTERNAL_URLS_REGISTRY";
+            proxy_pass http://$tmpregistryhost/v2;
+        }
+
         proxy_intercept_errors on;
         error_page 404 = /cytomine-page-not-found;
         location /cytomine-page-not-found {

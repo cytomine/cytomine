@@ -18,12 +18,9 @@ const localVue = createLocalVue();
 localVue.use(VueRouter);
 
 describe('AppLayout.vue', () => {
-  let router;
-
   const createWrapper = (options = {}) => {
     return shallowMount(AppLayout, {
       localVue,
-      router,
       components: {
         AppSidebar,
         'b-message': BMessage,
@@ -34,15 +31,6 @@ describe('AppLayout.vue', () => {
       ...options,
     });
   };
-
-  beforeEach(() => {
-    router = new VueRouter({
-      routes: [
-        {path: '/', component: {template: '<div>Home</div>'}},
-        {path: '/test', component: {template: '<div>Test</div>'}},
-      ],
-    });
-  });
 
   describe('When app engine is enabled', () => {
     it('should render the layout', () => {
@@ -62,16 +50,13 @@ describe('AppLayout.vue', () => {
   });
 
   describe('When app engine is disabled', () => {
-    const createDisabledWrapper = (options = {}) => {
-      return createWrapper({
-        data() {
-          return {
-            appEngineEnabled: false,
-          };
-        },
-        ...options,
-      });
-    };
+    const createDisabledWrapper = () => createWrapper({
+      data() {
+        return {
+          appEngineEnabled: false,
+        };
+      },
+    });
 
     it('should render the disabled message', () => {
       const wrapper = createDisabledWrapper();

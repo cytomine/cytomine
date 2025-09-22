@@ -60,16 +60,21 @@ export default {
   data() {
     return {
       showModal: false,
-      stores: [],
     };
   },
   async created() {
     await this.fetchStores();
   },
+  computed: {
+    stores() {
+      return this.$store.getters['appStores/stores'];
+    },
+  },
   methods: {
     async fetchStores() {
       try {
-        this.stores = (await Cytomine.instance.api.get('/stores')).data;
+        const stores = (await Cytomine.instance.api.get('/stores')).data;
+        this.$store.commit('appStores/set', stores);
       } catch (error) {
         console.error('Failed to fetch stores:', error);
       }
@@ -85,7 +90,7 @@ export default {
       try {
         await Cytomine.instance.api.delete(`/stores/${store.id}`);
 
-        this.stores = this.stores.filter(s => s.id !== store.id);
+        this.$store.commit('appStores/delete', store);
 
         this.$notify({type: 'success', text: this.$t('notify-success-app-store-deletion')});
       } catch (error) {
@@ -94,7 +99,7 @@ export default {
     },
     async handleAdd(storeData) {
       const createdStore = await this.addStore(storeData);
-      this.stores.push(createdStore);
+      this.$store.commit('appStores/add', createdStore);
     },
     handleDelete(store) {
       this.$buefy.dialog.confirm({

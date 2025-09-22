@@ -1,13 +1,16 @@
 import {shallowMount, createLocalVue} from '@vue/test-utils';
 import Buefy from 'buefy';
+import Vuex from 'vuex';
 
 import AppConfigurationPage from '@/components/appengine/AppConfigurationPage.vue';
 import AppStoreAddModal from '@/components/appengine/AppStoreAddModal.vue';
+import store from '@/store/store';
 import {Cytomine} from 'cytomine-client';
 import {flushPromises} from '../../../utils';
 
 const localVue = createLocalVue();
 localVue.use(Buefy);
+localVue.use(Vuex);
 
 const mockNotify = jest.fn();
 const mockDialog = {confirm: jest.fn()};
@@ -25,9 +28,10 @@ jest.mock('cytomine-client', () => ({
 }));
 
 describe('AppConfigurationPage.vue', () => {
-  const createWrapper = (options = {}) => {
+  const createWrapper = () => {
     return shallowMount(AppConfigurationPage, {
       localVue,
+      store,
       mocks: {
         $notify: mockNotify,
         $buefy: {dialog: mockDialog},
@@ -36,7 +40,6 @@ describe('AppConfigurationPage.vue', () => {
       stubs: {
         AppStoreAddModal,
       },
-      ...options,
     });
   };
 
@@ -68,11 +71,7 @@ describe('AppConfigurationPage.vue', () => {
 
   it('should delete a store correctly', async () => {
     const store = {id: 3, name: 'Store3', host: 'http://host3.com', default: false};
-    const wrapper = createWrapper({
-      data() {
-        return {stores: [store]};
-      }
-    });
+    const wrapper = createWrapper();
 
     Cytomine.instance.api.delete.mockResolvedValue({});
     mockDialog.confirm.mockImplementation(({onConfirm}) => onConfirm());

@@ -35,7 +35,7 @@ COPY --from=builder /opt/keycloak/ /opt/keycloak/
 COPY --from=dev-tools-builder /mnt/rootfs /
 
 RUN mkdir /opt/keycloak/data/import
-COPY docker/kc_config.json /opt/keycloak/data/import
+COPY kc_config.json /opt/keycloak/data/import
 
 ENV KC_HTTP_RELATIVE_PATH=/iam
 
@@ -73,7 +73,7 @@ COPY --from=builder /opt/keycloak/ /opt/keycloak/
 COPY --from=prod-tools-builder /mnt/rootfs /
 
 RUN mkdir /opt/keycloak/data/import
-COPY docker/kc_config.json /opt/keycloak/data/import
+COPY kc_config.json /opt/keycloak/data/import
 
 ENV KC_HTTP_PORT=8100
 

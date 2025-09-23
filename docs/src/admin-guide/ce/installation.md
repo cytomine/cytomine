@@ -30,7 +30,7 @@ Cytomine installation requires about **15GB**. You need to provide enough space 
 
 ### Running App in Cytomine
 
-To be able to execute apps in Cytomine, a cluster must be installed and running before proceeding with the installation. See [Clusters](/admin-guide/clusters/).
+To be able to execute apps in Cytomine, a cluster must be installed and running before proceeding with the installation, refer to [MicroK8s installation guide](/admin-guide/clusters/microk8s/installation).
 
 ## Installation
 
@@ -51,15 +51,12 @@ This installation procedure is intended for desktop or laptop computers running 
    wget https://raw.githubusercontent.com/cytomine/cytomine/main/compose.yaml
    ```
 
-   ::: tip If the App Engine is enabled
-
-   Generate the config file from microk8s
+3. Generate the config file from MicroK8s:
 
    ```bash
    mkdir .kube
    microk8s.config > .kube/config
    ```
-   :::
 
 3. Launch cytomine:
 
@@ -67,19 +64,10 @@ This installation procedure is intended for desktop or laptop computers running 
    sudo docker compose up -d
    ```
 
-   ::: tip If the App Engine is enabled
-
-   Configure MicroK8s to be able to use the Cytomine registry, see [MicroK8s configuration](/admin-guide/clusters/microk8s/configuration.md).
-   :::
-
 4. Once all services are up and running, Cytomine is ready to be used:
 
    - If you have kept the default values your Cytomine is now available on <http://127.0.0.1/>.
-   - A default admin account is created with the password `password`
-
-::: tip
-Once authenticated, it is recommended to update the default administrator password to a more secure one.
-:::
+   - A default `admin` account is created with the password `password`
 
 ## Upgrade Cytomine
 

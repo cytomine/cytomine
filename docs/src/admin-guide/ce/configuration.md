@@ -55,7 +55,7 @@ The installation guide is available in the [sdafs repository](https://github.com
 root
 |--- {DATASET_UUID}
 |    |--- DATASET_{IDENTIFIER}
-|         |--- METADATA+
+|         |--- METADATA
 |         |    |--- dataset.xml
 |         |    |--- policy.xml
 |         |    |--- image.xml
@@ -66,16 +66,16 @@ root
 |         |    |--- staining.xml
 |         |
 |         |--- IMAGES
-|         |    |--- IMAGE_{IDENTIFIER}*
+|         |    |--- IMAGE_{IDENTIFIER}
 |         |    |    |--- *.dcm files of an Image
-|         |    |--- IMAGE_{IDENTIFIER}*
+|         |    |--- IMAGE_{IDENTIFIER}
 |         |    |    |--- *.dcm files of an Image
 |         |
-|         |--- ANNOTATIONS+
+|         |--- ANNOTATIONS
 |         |    |--- *.geojson
 ```
 
-- **+** The `METADATA` and `ANNOTATIONS` directories are optional.
+- The `METADATA` and `ANNOTATIONS` directories are optional.
 
 ::: tip
 If you’re working with `sdafs`, the directories are already organised in the structure shown above.

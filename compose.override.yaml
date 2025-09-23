@@ -24,7 +24,6 @@ services:
     image: cytomine/iam:latest
     build:
       context: ./iam/
-      target: ci
 
   app-engine:
     image: cytomine/app-engine:latest

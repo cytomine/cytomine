@@ -91,33 +91,9 @@ public class TaskServiceTest {
     public void uploadTaskShouldUploadTaskBundle() throws Exception {
         // Load test ZIP file from resources
         ClassPathResource resource = TestTaskBuilder.buildCustomImageLocationTask();
-        byte[] fileBytes = resource.getInputStream().readAllBytes();
+        InputStream inputStream = resource.getInputStream();
 
-        // Create boundary and multipart payload manually
-        String boundary = "----WebKitFormBoundary7MA4YWxkTrZu0gW";
-        String CRLF = "\r\n";
-        ByteArrayOutputStream payload = new ByteArrayOutputStream();
-        DataOutputStream writer = new DataOutputStream(payload);
-
-        // Multipart body
-        writer.writeBytes("--" + boundary + CRLF);
-        writer.writeBytes("Content-Disposition: form-data; name=\"file\"; filename=\"test_custom_image_location_task.zip\"" + CRLF);
-        writer.writeBytes("Content-Type: application/zip" + CRLF);
-        writer.writeBytes(CRLF);
-        writer.write(fileBytes);
-        writer.writeBytes(CRLF);
-        writer.writeBytes("--" + boundary + "--" + CRLF);
-
-        byte[] multipartBody = payload.toByteArray();
-
-        // Mock HttpServletRequest
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setContentType("multipart/form-data; boundary=" + boundary);
-        request.setMethod("POST");
-        request.setContent(multipartBody);
-        request.setCharacterEncoding("UTF-8");
-
-        Optional<TaskDescription> result = taskService.uploadTask(request);
+        Optional<TaskDescription> result = taskService.uploadTask(inputStream);
 
         assertTrue(result.isPresent());
         verify(storageHandler, times(1)).createStorage(any(Storage.class));

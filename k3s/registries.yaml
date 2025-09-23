@@ -1,10 +1,10 @@
 mirrors:
-  0.0.0.0:80:
+  172.16.238.4:5000:
     endpoint:
-      - "http://0.0.0.0:80"
+      - "http://172.16.238.4:5000"
 
 configs:
   "docker.io":
-  "0.0.0.0:80":
+  "172.16.238.4:5000":
     tls:
       insecure_skip_verify: true

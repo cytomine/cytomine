@@ -12,7 +12,9 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: password
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INIT_DATABASE: cytomine
-
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.2
   postgis:
     image: cytomine/postgis:latest
     restart: unless-stopped
@@ -28,6 +30,9 @@ services:
       POSTGRES_DB: docker
       POSTGRES_PASSWORD: password
       POSTGRES_USER: docker
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.3
 
   registry:
     image: registry:2.8.3
@@ -36,6 +41,9 @@ services:
       - ${DATA_PATH:-./data}/registry:/data
     environment:
       REGISTRY_STORAGE_DELETE_ENABLED: true
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.4
 
   redis:
     image: redis:7.2
@@ -43,10 +51,16 @@ services:
     restart: unless-stopped
     volumes:
       - ${DATA_PATH:-./data}/redis:/data
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.5
 
   pims-cache:
     image: redis:7.2
     restart: unless-stopped
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.6
 
   web-ui:
     image: cytomine/web-ui:latest
@@ -55,6 +69,9 @@ services:
       - /etc/localtime:/etc/localtime
     environment:
       <<: [*version-env]
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.7
 
   pims:
     image: cytomine/pims:latest
@@ -81,6 +98,9 @@ services:
       ROOT: /data/images
       TASK_QUEUE_ENABLED: false
       WEB_CONCURRENCY: ${WEB_CONCURRENCY:-8}
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.8
 
   iam:
     image: cytomine/iam:latest
@@ -109,6 +129,9 @@ services:
       KC_SMTP_USER: user
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: YMjl7YGabNbQmjVOONxo9AYSiJyvioTnbsMyBwT8/Jg=
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.9
 
   app-engine:
     image: cytomine/app-engine:latest
@@ -136,9 +159,12 @@ services:
       REF_STORAGE_BASE_PATH: /path/to/datasets # MUST be an absolute match volume B PLEASE CHANGE
       SCHEDULER_RUN_MODE: local # values: local, cluster
       SCHEDULER_ADVERTISED_URL: http://0.0.0.0/app-engine
-      SCHEDULER_REGISTRY_ADVERTISED_URL: 0.0.0.0:80/registry
+      SCHEDULER_REGISTRY_ADVERTISED_URL: 172.16.238.4:5000
       SCHEDULER_USE_HOST_NETWORK: true
       KUBERNETES_MASTER: https://k3s:6443/
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.10
 
   core:
     image: cytomine/core:latest
@@ -174,6 +200,9 @@ services:
       STORAGE_PATH: /data/images
       SUPER_ADMIN_PRIVATE_KEY: 944ee44b-e327-451d-80c0-9507448a472f
       SUPER_ADMIN_PUBLIC_KEY: 4162d546-129b-48bd-9098-610cd4c50f33
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.11
 
   cbir:
     image: cytomine/cbir:latest
@@ -190,6 +219,9 @@ services:
       EXTRACTOR: ${CBIR_EXTRACTOR:-resnet}
       HOST: redis
       PORT: 6380
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.12
 
   sam:
     image: cytomine/sam:latest
@@ -199,6 +231,9 @@ services:
       CYTOMINE_HOST: http://nginx
       CYTOMINE_PRIVATE_KEY: d70607f5-c478-403c-be11-3dbc1716d1cf
       CYTOMINE_PUBLIC_KEY: 9a8b8369-2446-44cb-b0af-604a74e1dcdb
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.13
 
   nginx:
     image: cytomine/nginx:latest
@@ -224,6 +259,9 @@ services:
       INTERNAL_URLS_WEB_UI: web-ui
       INTERNAL_URLS_REGISTRY: registry:5000
       URLS_SCHEME: ${URLS_SCHEME:-http}
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.14
 
   # https://github.com/k3s-io/k3s/blob/3854eb56d4b8a183a1f8261aebd372111378a00f/docker-compose.yml
   k3s:
@@ -243,7 +281,6 @@ services:
     - K3S_TOKEN=65535-65535-65535 # plain text secret!
     - K3S_KUBECONFIG_OUTPUT=/output/k3s-config
     - K3S_KUBECONFIG_MODE=666
-#    - K3S_URL=https://k3s:6443/
     volumes:
     - k3s-server:/var/lib/rancher/k3s
     - ./k3s/registries.yaml:/etc/rancher/k3s/registries.yaml:ro
@@ -254,6 +291,9 @@ services:
     # - 80:80
     # - 443:443
     # network_mode: host
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.15
 
   # k3s-agent:
   #   image: "rancher/k3s:v1.30.14-rc3-k3s3"
@@ -276,3 +316,12 @@ services:
 volumes:
   k3s-server: {}
   k3s-agent: {}
+
+
+networks:
+  host_network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.238.0/24

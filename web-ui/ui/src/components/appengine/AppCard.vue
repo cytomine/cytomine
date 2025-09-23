@@ -1,6 +1,6 @@
 <template>
   <div class="card">
-    <router-link :to="`/appengine/${appData.namespace}/${appData.version}`">
+    <router-link :to="`/apps/${appData.namespace}/${appData.version}`">
       <div class="card-image img-rounded">
         <figure class="image is-animated is-5by3">
           <img
@@ -33,10 +33,6 @@
 </template>
 
 <script>
-// to be used in the future: adding pop-out to show info when clicking more...
-// import AppCardInfo from './AppCardInfo.vue';
-
-
 export default {
   name: 'AppCard',
   props: {
@@ -45,9 +41,6 @@ export default {
       required: true,
     },
   },
-  components: {
-    // AppCardInfo
-  }
 };
 </script>
 

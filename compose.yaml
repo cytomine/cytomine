@@ -143,8 +143,8 @@ services:
     volumes:
       - ${DATA_PATH:-./data}/app-engine:/data
       - ./.kube/shared/k3s-config:/root/.kube/config:ro
-      - /path/to/app-engine:/path/to/app-engine # volume A PLEASE CHANGE
-      - /path/to/datasets:/path/to/datasets # volume B PLEASE CHANGE
+      - ${DATA_PATH:-./data}/app-engine-shared-inputs:/app-engine-shared-inputs:rw
+      - ${DATA_PATH:-./data}/app-engine-shared-datasets:/app-engine-shared-datasets:rw
     environment:
       API_PREFIX: ${APP_ENGINE_API_BASE_PATH:-/app-engine/}
       DB_HOST: postgis
@@ -153,10 +153,9 @@ services:
       DB_PORT: 5432
       DB_USERNAME: appengine
       REGISTRY_URL: http://registry:5000
-      STORAGE_BASE_PATH: /path/to/app-engine # Must be an absolute path PLEASE CHANGE
-      RUN_STORAGE_BASE_PATH: /path/to/app-engine # MUST be an absolute path PLEASE CHANGE
-      PROJECT_DATA_PATH: /path/to/cytomine/data # MUST be an absolute path and match volume A PLEASE CHANGE
-      REF_STORAGE_BASE_PATH: /path/to/datasets # MUST be an absolute match volume B PLEASE CHANGE
+      STORAGE_BASE_PATH: /app-engine # Must be an absolute path PLEASE CHANGE
+      RUN_STORAGE_BASE_PATH: /app-engine-shared-inputs # MUST be an absolute path PLEASE CHANGE
+      REF_STORAGE_BASE_PATH: /app-engine-shared-datasets # MUST be an absolute match volume B PLEASE CHANGE
       SCHEDULER_RUN_MODE: local # values: local, cluster
       SCHEDULER_ADVERTISED_URL: http://0.0.0.0/app-engine
       SCHEDULER_REGISTRY_ADVERTISED_URL: 172.16.238.4:5000
@@ -285,6 +284,8 @@ services:
     - k3s-server:/var/lib/rancher/k3s
     - ./k3s/registries.yaml:/etc/rancher/k3s/registries.yaml:ro
     - ./k3s/serviceaccounts.yaml://var/lib/rancher/k3s/server/manifests/serviceaccounts.yaml:ro
+    - ${DATA_PATH:-./data}/app-engine-shared-inputs:/app-engine-shared-inputs:ro
+    - ${DATA_PATH:-./data}/app-engine-shared-datasets:/app-engine-shared-datasets:ro
     # This is just so that we get the kubeconfig file out
     - .kube/shared:/output/
     ports:

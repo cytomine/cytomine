@@ -2,7 +2,6 @@ package be.cytomine.appengine.handlers.scheduler.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -117,8 +116,7 @@ public class KubernetesScheduler implements SchedulerHandler {
 
         Run run = schedule.getRun();
         String runId = run.getId().toString();
-        Map<String, String> labels = new HashMap<>();
-        labels.put("runId", runId);
+
 
         Task task = run.getTask();
         String runSecret = String.valueOf(run.getSecret());
@@ -294,11 +292,12 @@ public class KubernetesScheduler implements SchedulerHandler {
         PodBuilder podBuilder = new PodBuilder()
             .withNewMetadata()
             .withName(podName)
-            .withLabels(labels)
+            .withLabels(Map.of("runId", runId, "app", "task"))
             .endMetadata()
             .withNewSpec()
 
             .withHostNetwork(useHostNetwork)
+            .withServiceAccountName("app-engine")
 
             .addNewInitContainerLike(permissionContainer)
             .and()

@@ -1137,6 +1137,7 @@ you-have-validated-image-on,You have validated this image on {date},Vous avez va
 z-resolution,Z resolution,Résolution Z,,Z-resolutie
 zip-upload-info,A ZIP file containing multiple image is allowed (except for VMS and MRXS),Il est possible d'uploader un ZIP contenant plusieurs images (à l'exception des images VMS et MRXS).,Se permite que un archivo ZIP contanga múltiples imágenes (excepto para VMS y MRXS),Het is mogelijk om een ??ZIP met meerdere afbeeldingen te uploaden (met uitzondering van VMS- en MRXS-afbeeldingen).
 app-engine.name,App Engine,App Engine,App Engine,App Engine
+app-engine.tasks.installed,Installed Tasks,Tâches installées,Tareas instaladas,Geïnstalleerde taken
 app-engine.tasks.name,Tasks,Tâches,Tareas,Taken
 app-engine.task.name,Task,Tâche,Tarea,Taak
 app-engine.applications,Applications,Applications,Aplicaciones,Toepassingen

@@ -8,7 +8,7 @@
 
     <div v-else class="panel">
       <p class="panel-heading">
-        {{ $t('app-engine.tasks.name') }}
+        {{ $t('app-engine.tasks.installed') }}
         <UploadAppButton btnFunc="upload" @taskUploadSuccess="handleTaskUpload" />
       </p>
       <section class="panel-block lower-section-flex">

@@ -8,7 +8,7 @@
           <router-link tag="li" to="/apps" exact>
             <a>
               <i class="fas fa-code"></i>
-              {{ $t('app-engine.tasks.name') }}
+              {{ $t('app-engine.tasks.installed') }}
             </a>
           </router-link>
           <router-link tag="li" to="/apps/store">

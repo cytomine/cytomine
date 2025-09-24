@@ -99,6 +99,34 @@ public class AppStoreService {
         return appStoreRepository.save(appStore);
     }
 
+    public TaskDescription getTask(String namespace, String version)
+            throws IOException, RestClientException, AppStoreServiceException {
+        log.info("Get Task: {}:{}", namespace, version);
+        Optional<AppStore> storeOptional = findDefault();
+        AppStore appStore = new AppStore();
+        if (storeOptional.isPresent()) {
+            appStore = storeOptional.get();
+        } else {
+            AppEngineError error = ErrorBuilder.build(ErrorCode.APPSTORE_NO_DEFAULT_STORE);
+            throw new AppStoreServiceException(error);
+        }
+
+        Path tempPath = Path.of("bundle-" + UUID.randomUUID() + ".zip");
+        restTemplate.execute(
+            appStore.getHost() + "/api/v1/tasks/{namespace}/{version}/bundle.zip",
+            org.springframework.http.HttpMethod.GET,
+            null,
+            clientHttpResponse -> {
+                Files.copy(clientHttpResponse.getBody(), tempPath);
+                return null;
+            },
+            namespace,
+            version
+        );
+        log.info("Download Task: downloaded");
+        return tempPath.toFile();
+    }
+
     public Optional<TaskDescription> install(String namespace, String version)
         throws FileNotFoundException,
         TaskServiceException,

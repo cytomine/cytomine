@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import be.cytomine.appengine.dto.inputs.task.TaskDescription;
 import be.cytomine.appengine.exceptions.AppStoreNotFoundException;
 import be.cytomine.appengine.exceptions.ValidationException;
 import be.cytomine.appengine.models.store.AppStore;
@@ -69,5 +70,15 @@ class AppStoreController {
         log.info("Store Get default Ended");
         return ResponseEntity.ok(store);
     }
-    
+
+    @GetMapping("/tasks/{namespace}/{version}")
+    public ResponseEntity<Optional<AppStore>> getTask(
+        @PathVariable String namespace,
+        @PathVariable String version
+    ) {
+        log.info("GET /tasks/%s/%s", namespace, version);
+        TaskDescription task = appStoreService.getTask(namespace, version);
+        log.info("Store Get default Ended");
+        return ResponseEntity.ok(task);
+    }
 }

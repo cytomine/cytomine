@@ -69,5 +69,5 @@ class AppStoreController {
         log.info("Store Get default Ended");
         return ResponseEntity.ok(store);
     }
-
+    
 }

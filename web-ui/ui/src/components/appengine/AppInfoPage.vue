@@ -7,7 +7,7 @@
           class="is-link"
           icon-pack="fa"
           icon-left="angle-left"
-          @click="$router.push('/apps')"
+          @click="$router.push(task.host !== null ? '/apps/store' : '/apps')"
           :label="$t('go-back')"
         />
       </p>

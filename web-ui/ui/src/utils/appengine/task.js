@@ -24,7 +24,8 @@ export default class Task extends Model {
   }
 
   static async fetchNamespaceVersion(namespace, version, host = null) {
-    return await Cytomine.instance.api.get(`${this.callbackIdentifier}/${namespace}/${version}`, {params: {host}});
+    let {data} = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${namespace}/${version}`, {params: {host}});
+    return data;
   }
 
   static async uploadTask(compressedTask) {

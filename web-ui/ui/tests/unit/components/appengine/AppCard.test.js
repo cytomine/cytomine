@@ -18,13 +18,16 @@ describe('AppCard.vue', () => {
     description: 'This is a test app description.'
   };
 
-  const createWrapper = (options = {}) => shallowMount(AppCard, {
-    localVue,
-    propsData: {
-      app: mockApp,
+  const createWrapper = (options = {}) => shallowMount(
+    AppCard,
+    {
+      localVue,
+      propsData: {
+        app: mockApp,
+      },
+      ...options,
     },
-    ...options,
-  });
+  );
 
   it('should render the app information', () => {
     const wrapper = createWrapper();

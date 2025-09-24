@@ -17,8 +17,9 @@ const BLoading = {
 const localVue = createLocalVue();
 
 describe('AppLocalPage.vue', () => {
-  const createWrapper = (options = {}) => {
-    return shallowMount(AppLocalPage, {
+  const createWrapper = (options = {}) => shallowMount(
+    AppLocalPage,
+    {
       localVue,
       components: {
         AppCard,
@@ -29,8 +30,8 @@ describe('AppLocalPage.vue', () => {
         $t: (key) => key,
       },
       ...options,
-    });
-  };
+    },
+  );
 
   const mockApplications = [
     {id: 1, name: 'App 1', version: '1.0.0'},
@@ -131,7 +132,7 @@ describe('AppLocalPage.vue', () => {
       const appCards = wrapper.findAllComponents(AppCard);
 
       appCards.wrappers.forEach((cardWrapper, index) => {
-        expect(cardWrapper.props('appData')).toEqual(mockApplications[index]);
+        expect(cardWrapper.props('app')).toEqual(mockApplications[index]);
       });
     });
   });

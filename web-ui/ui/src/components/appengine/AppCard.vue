@@ -26,7 +26,7 @@
           <b-button class="card-footer-item" v-if="installable" @click.prevent="handleInstall">
             {{ $t('install') }}
           </b-button>
-          <a href="#" class="card-footer-item">More</a>
+          <a href="#" class="card-footer-item">{{ $t('button-more') }}</a>
         </footer>
       </div>
     </router-link>

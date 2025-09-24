@@ -1,23 +1,14 @@
 package com.cytomine.registry.client.http;
 
-<<<<<<< HEAD
 import java.io.IOException;
 import java.io.InputStream;
 
-=======
->>>>>>> origin/main
 import lombok.AllArgsConstructor;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okio.BufferedSink;
 import org.jetbrains.annotations.Nullable;
 
-<<<<<<< HEAD
-=======
-import java.io.IOException;
-import java.io.InputStream;
-
->>>>>>> origin/main
 @AllArgsConstructor
 public class InputStreamRequestBody extends RequestBody {
     private InputStream inputStream;

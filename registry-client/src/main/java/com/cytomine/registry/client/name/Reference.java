@@ -1,26 +1,16 @@
 package com.cytomine.registry.client.name;
 
 
-<<<<<<< HEAD
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-=======
->>>>>>> origin/main
 import com.cytomine.registry.client.config.Configurer;
 import com.cytomine.registry.client.constant.Constants;
 import com.cytomine.registry.client.http.HttpClient;
 import com.cytomine.registry.client.manager.RegistryManager;
 import lombok.Data;
 
-<<<<<<< HEAD
-=======
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
->>>>>>> origin/main
 @Data
 public class Reference {
     private static final int DIGEST_LENGTH = 71;
@@ -40,11 +30,7 @@ public class Reference {
         } else {
             host = Constants.ENDPOINT_DEFAULT;
         }
-<<<<<<< HEAD
         t.endpoint = Configurer.url();
-=======
-        t.endpoint = String.format("%s://%s", REGISTRY_MANAGER.getSchema(), host);
->>>>>>> origin/main
         String last = list.get(list.size() - 1);
         if (last.contains(Constants.AT)) {
             int atIndex = last.lastIndexOf(Constants.AT);
@@ -72,11 +58,7 @@ public class Reference {
     public static Reference prepareReference(String image) // only image without endpoint part
     {
         Reference t = new Reference();
-<<<<<<< HEAD
         t.endpoint = Configurer.url();
-=======
-        t.endpoint = String.format("%s://%s", REGISTRY_MANAGER.getSchema(), Configurer.host() + ":" + Configurer.port());
->>>>>>> origin/main
         if (image.contains(Constants.AT)) {
             int atIndex = image.lastIndexOf(Constants.AT);
             t.digest = image.substring(atIndex + 1);
@@ -88,11 +70,7 @@ public class Reference {
         if (image.contains(Constants.COLON)) {
             int colonIndex = image.indexOf(Constants.COLON);
             t.tag = image.substring(colonIndex + 1);
-<<<<<<< HEAD
             t.name = image.substring(0, image.indexOf(Constants.COLON));
-=======
-            t.name = image.substring(0 , image.indexOf(Constants.COLON));
->>>>>>> origin/main
         } else {
             t.tag = Constants.TAG_LATEST;
             t.name = image;

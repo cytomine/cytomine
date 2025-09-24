@@ -3,7 +3,7 @@
     <div class="panel">
       <p class="panel-heading">{{ $t('app-store') }}</p>
       <section class="panel-block lower-section-flex">
-        <AppCard v-for="app in applications" :key="app.id" :appData="app" />
+        <AppCard v-for="app in applications" :key="app.id" :appData="app" :installable="true" />
       </section>
     </div>
   </div>

@@ -3,10 +3,8 @@
     <router-link :to="`/apps/${appData.namespace}/${appData.version}`">
       <div class="card-image img-rounded">
         <figure class="image is-animated is-5by3">
-          <img
-            :src="appData.imageUrl || 'https://bulma.io/assets/images/placeholders/1280x960.png'"
-            alt="Placeholder image"
-          >
+          <img :src="appData.imageUrl || 'https://bulma.io/assets/images/placeholders/1280x960.png'"
+            alt="Placeholder image">
         </figure>
       </div>
       <div class="card-content">
@@ -25,6 +23,9 @@
         </div>
 
         <footer class="card-footer">
+          <b-button class="card-footer-item" type="is-ghost" v-if="installable" @click="handleInstall">
+            {{ $t('install') }}
+          </b-button>
           <a href="#" class="card-footer-item">More</a>
         </footer>
       </div>
@@ -36,9 +37,12 @@
 export default {
   name: 'AppCard',
   props: {
-    appData: {
-      type: Object,
-      required: true,
+    appData: {type: Object, required: true},
+    installable: {type: Boolean, default: false},
+  },
+  methods: {
+    handleInstall() {
+      
     },
   },
 };

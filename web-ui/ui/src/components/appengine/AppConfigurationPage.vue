@@ -23,7 +23,7 @@
             </b-table-column>
 
             <b-table-column label="Default" width="40" centered>
-              <i class="fas fa-check-square" v-if="store.default"></i>
+              <i class="fas fa-check-square" v-if="store.defaultStore"></i>
               <i class="fas fa-times-circle" v-else></i>
             </b-table-column>
 
@@ -97,9 +97,25 @@ export default {
         console.error('Failed to delete store:', error);
       }
     },
+    async setDefaultStore(id) {
+      try {
+        await Cytomine.instance.api.put(`/stores/${id}/default`);
+      } catch (error) {
+        console.error('Failed to set default store:', error);
+      }
+    },
     async handleAdd(storeData) {
-      const createdStore = await this.addStore(storeData);
-      this.$store.commit('appStores/add', createdStore);
+      try {
+        const createdStore = await this.addStore(storeData);
+        if (storeData.defaultStore === true) {
+          await this.setDefaultStore(createdStore.id);
+          createdStore.defaultStore = true;
+        }
+
+        this.$store.commit('appStores/add', createdStore);
+      } catch (error) {
+        console.error('Failed to add store:', error);
+      }
     },
     handleDelete(store) {
       this.$buefy.dialog.confirm({

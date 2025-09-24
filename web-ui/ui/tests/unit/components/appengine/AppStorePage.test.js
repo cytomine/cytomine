@@ -61,8 +61,8 @@ describe('AppStorePage.vue', () => {
     }));
 
     const expectedApplications = [];
-    wrapper.vm.stores.forEach(() => {
-      expectedApplications.push(...tasks);
+    wrapper.vm.stores.forEach((store) => {
+      tasks.forEach(task => expectedApplications.push({...task, host: store.host}));
     });
 
     Cytomine.instance.api.get.mock.calls.forEach((call, i) => {

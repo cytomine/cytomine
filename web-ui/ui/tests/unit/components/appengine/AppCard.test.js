@@ -51,7 +51,11 @@ describe('AppCard.vue', () => {
     const wrapper = createWrapper();
     const link = wrapper.findComponent({name: 'RouterLink'});
 
-    expect(link.props('to')).toBe(`/apps/${mockApp.namespace}/${mockApp.version}`);
+    const expected = {
+      path: `/apps/${mockApp.namespace}/${mockApp.version}`,
+      query: {host: undefined},
+    };
+    expect(link.props('to')).toStrictEqual(expected);
   });
 
   it('should fallback to placeholder image when imageUrl is not provided', () => {

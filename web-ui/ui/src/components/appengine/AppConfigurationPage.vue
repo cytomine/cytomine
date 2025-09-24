@@ -8,22 +8,22 @@
       <section class="panel-block">
         <b-table :data="stores" v-if="stores.length > 0">
           <template #default="{ row: store }">
-            <b-table-column label="ID" width="40">
+            <b-table-column :label="$t('id')" width="40">
               {{ store.id }}
             </b-table-column>
 
-            <b-table-column label="Name" width="40">
+            <b-table-column :label="$t('name')" width="40">
               {{ store.name }}
             </b-table-column>
 
-            <b-table-column label="Host" width="40">
+            <b-table-column :label="$t('hostname')" width="40">
               <a :href="store.host" rel="noopener" target="_blank">
                 {{ store.host }}
               </a>
             </b-table-column>
 
-            <b-table-column label="Default" width="40" centered>
-              <i class="fas fa-check-square" v-if="store.default"></i>
+            <b-table-column :label="$t('default-store')" width="40" centered>
+              <i class="fas fa-check-square" v-if="store.defaultStore"></i>
               <i class="fas fa-times-circle" v-else></i>
             </b-table-column>
 
@@ -97,9 +97,25 @@ export default {
         console.error('Failed to delete store:', error);
       }
     },
+    async setDefaultStore(id) {
+      try {
+        await Cytomine.instance.api.put(`/stores/${id}/default`);
+      } catch (error) {
+        console.error('Failed to set default store:', error);
+      }
+    },
     async handleAdd(storeData) {
-      const createdStore = await this.addStore(storeData);
-      this.$store.commit('appStores/add', createdStore);
+      try {
+        const createdStore = await this.addStore(storeData);
+        if (storeData.defaultStore === true) {
+          await this.setDefaultStore(createdStore.id);
+          createdStore.defaultStore = true;
+        }
+
+        this.$store.commit('appStores/add', createdStore);
+      } catch (error) {
+        console.error('Failed to add store:', error);
+      }
     },
     handleDelete(store) {
       this.$buefy.dialog.confirm({

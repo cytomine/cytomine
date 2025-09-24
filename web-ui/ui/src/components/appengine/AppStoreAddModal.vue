@@ -10,8 +10,8 @@
       </b-field>
 
       <b-field :label="$t('default-store')">
-        <b-switch v-model="store.default" class="switch">
-          <template v-if="store.default">{{ $t('yes') }}</template>
+        <b-switch v-model="store.defaultStore" class="switch">
+          <template v-if="store.defaultStore">{{ $t('yes') }}</template>
           <template v-else>{{ $t('no') }}</template>
         </b-switch>
       </b-field>
@@ -44,7 +44,7 @@ export default {
       store: {
         name: '',
         host: '',
-        default: false,
+        defaultStore: false,
       },
     };
   },
@@ -58,7 +58,7 @@ export default {
       this.store = {
         name: '',
         host: '',
-        default: false,
+        defaultStore: false,
       };
     },
     add() {

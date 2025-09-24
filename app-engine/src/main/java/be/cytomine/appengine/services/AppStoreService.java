@@ -79,13 +79,11 @@ public class AppStoreService {
     public AppStore save(AppStore appStore) throws ValidationException {
         log.info("saving app store {}", appStore);
         if (Objects.isNull(appStore.getName()) || appStore.getName().isBlank()) {
-            AppEngineError error = ErrorBuilder.build(
-                ErrorCode.INTERNAL_INVALID_STORE_DATA);
+            AppEngineError error = ErrorBuilder.build(ErrorCode.INTERNAL_INVALID_STORE_DATA);
             throw new ValidationException(error);
         }
         if (Objects.isNull(appStore.getHost()) || appStore.getHost().isBlank()) {
-            AppEngineError error = ErrorBuilder.build(
-                ErrorCode.INTERNAL_INVALID_STORE_DATA);
+            AppEngineError error = ErrorBuilder.build(ErrorCode.INTERNAL_INVALID_STORE_DATA);
             throw new ValidationException(error);
         }
         Optional<AppStore> store = appStoreRepository.findByNameAndHost(
@@ -107,15 +105,12 @@ public class AppStoreService {
         ValidationException,
         BundleArchiveException,
         AppStoreServiceException {
-        log.info("Install Task: installing ... {}:{}",
-            namespace,
-            version);
+        log.info("Install Task: installing ... {}:{}", namespace, version);
         File file = null;
         try {
             file = downloadTask(namespace, version);
         } catch (IOException | RestClientException e) {
-            AppEngineError error = ErrorBuilder
-                .build(ErrorCode.APPSTORE_DOWNLOAD_FAILED);
+            AppEngineError error = ErrorBuilder.build(ErrorCode.APPSTORE_DOWNLOAD_FAILED);
             throw new AppStoreServiceException(error);
         }
         assert file != null;
@@ -127,16 +122,13 @@ public class AppStoreService {
 
     public File downloadTask(String namespace, String version)
             throws IOException, RestClientException, AppStoreServiceException {
-        log.info("Download Task: downloading ... {}:{}",
-            namespace,
-            version);
+        log.info("Download Task: downloading ... {}:{}", namespace, version);
         Optional<AppStore> storeOptional = findDefault();
         AppStore appStore = new AppStore();
         if (storeOptional.isPresent()) {
             appStore = storeOptional.get();
         } else {
-            AppEngineError error = ErrorBuilder
-                    .build(ErrorCode.APPSTORE_NO_DEFAULT_STORE);
+            AppEngineError error = ErrorBuilder.build(ErrorCode.APPSTORE_NO_DEFAULT_STORE);
             throw new AppStoreServiceException(error);
         }
 

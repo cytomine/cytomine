@@ -12,7 +12,7 @@
         <UploadAppButton btnFunc="upload" @taskUploadSuccess="handleTaskUpload" />
       </p>
       <section class="panel-block lower-section-flex">
-        <AppCard v-for="app in applications" :key="app.id" :appData="app" />
+        <AppCard v-for="app in applications" :key="app.id" :app="app" />
       </section>
     </div>
   </div>

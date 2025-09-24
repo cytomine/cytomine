@@ -1,11 +1,11 @@
 package com.cytomine.registry.client.image.registry;
 
+import java.util.List;
+
 import com.cytomine.registry.client.image.ImageMediaType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @NoArgsConstructor
 @Data

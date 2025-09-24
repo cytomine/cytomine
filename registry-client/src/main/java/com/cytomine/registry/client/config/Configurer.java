@@ -5,15 +5,14 @@ import com.cytomine.registry.client.http.auth.Authenticator;
 import com.cytomine.registry.client.http.auth.Credential;
 
 public class Configurer {
+    private static final Authenticator AUTHENTICATOR = Authenticator.instance();
+    private static Configurer configurer;
     private String scheme;
     private String host;
     private String port;
     private String userName;
     private String password;
     private boolean authenticated;
-    private static Configurer configurer;
-
-    private static final Authenticator AUTHENTICATOR = Authenticator.instance();
 
     private Configurer() {
     }
@@ -55,11 +54,12 @@ public class Configurer {
         configurer.authenticated = true;
         configurer.userName = userName;
         configurer.password = password;
-        String endpoint = String.format("%s://%s:%s" , configurer.scheme , configurer.host , configurer.port);
+        String endpoint = String.format("%s://%s:%s", configurer.scheme, configurer.host,
+            configurer.port);
         AUTHENTICATOR.basic(endpoint, new Credential(configurer.userName, configurer.password));
     }
 
     public static boolean authenticated() {
-       return configurer.authenticated;
+        return configurer.authenticated;
     }
 }

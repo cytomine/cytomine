@@ -1,10 +1,10 @@
 package com.cytomine.registry.client.image;
 
+import java.io.InputStream;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.io.InputStream;
 
 @Data
 @NoArgsConstructor

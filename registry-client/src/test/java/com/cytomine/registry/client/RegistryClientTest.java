@@ -1,9 +1,18 @@
 package com.cytomine.registry.client;
 
+import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
-import com.cytomine.registry.client.config.Configurer;
 import com.cytomine.registry.client.http.resp.CatalogResp;
 import com.cytomine.registry.client.utils.JsonUtil;
 import org.junit.jupiter.api.Assertions;
@@ -12,13 +21,6 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
 class RegistryClientTest {
 
     @BeforeAll
@@ -26,7 +28,7 @@ class RegistryClientTest {
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
         Logger logger = loggerContext.getLogger("ROOT");
         logger.setLevel(Level.DEBUG);
-        RegistryClient.config("http" , "registry" , "5000");
+        RegistryClient.config("http", "registry", "5000");
         ClassLoader classLoader = RegistryClientTest.class.getClassLoader();
         RegistryClient.push(classLoader.getResourceAsStream("postomine.tar"), "postomine:1.3");
     }
@@ -47,20 +49,24 @@ class RegistryClientTest {
     @Disabled
     void dockerIOPullPush() throws IOException {
         Path path = Files.createTempFile(UUID.randomUUID().toString(), ".tar");
-        RegistryClient.pull("registry@sha256:cc6393207bf9d3e032c4d9277834c1695117532c9f7e8c64e7b7adcda3a85f39", path.toString());
+        RegistryClient.pull("registry@sha256" +
+            ":cc6393207bf9d3e032c4d9277834c1695117532c9f7e8c64e7b7adcda3a85f39", path.toString());
         Assertions.assertTrue(Files.exists(path));
         InputStream stream = new ByteArrayInputStream(path.toString().getBytes());
         RegistryClient.push(stream, System.getenv("DOCKER_USERNAME") + "/registry");
-        Assertions.assertTrue(RegistryClient.digest(System.getenv("DOCKER_USERNAME") + "/registry").isPresent());
+        Assertions.assertTrue(RegistryClient.digest(System.getenv("DOCKER_USERNAME") + "/registry"
+        ).isPresent());
 
     }
 
     @Test
     @Disabled
     void dockerIOCopy() throws IOException {
-        RegistryClient.copy("registry@sha256:712c58f0d738ba95788d2814979028fd648a37186ae0dd4141f786125ba6d680",
-                System.getenv("DOCKER_USERNAME") + "/registry");
-        Assertions.assertTrue(RegistryClient.digest(System.getenv("DOCKER_USERNAME") + "/registry").isPresent());
+        RegistryClient.copy("registry@sha256" +
+                ":712c58f0d738ba95788d2814979028fd648a37186ae0dd4141f786125ba6d680",
+            System.getenv("DOCKER_USERNAME") + "/registry");
+        Assertions.assertTrue(RegistryClient.digest(System.getenv("DOCKER_USERNAME") + "/registry"
+        ).isPresent());
     }
 
     @Test
@@ -71,8 +77,8 @@ class RegistryClientTest {
         InputStream stream = new FileInputStream(path.toString());
         RegistryClient.push(stream, "postomine:1.4");
         Assertions.assertEquals(
-                RegistryClient.digest("postomine:1.3").get(),
-                RegistryClient.digest("postomine:1.4").get()
+            RegistryClient.digest("postomine:1.3").get(),
+            RegistryClient.digest("postomine:1.4").get()
         );
         Files.delete(path);
     }

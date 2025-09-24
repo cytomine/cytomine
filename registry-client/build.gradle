@@ -39,7 +39,7 @@ java {
 }
 
 javadoc {
-    if(JavaVersion.current().isJava9Compatible()) {
+    if (JavaVersion.current().isJava9Compatible()) {
         options.addBooleanOption('html5', true)
         options.addStringOption('Xdoclint:none', '-quiet')
         options.addBooleanOption('quiet', true)
@@ -98,20 +98,6 @@ publishing {
             }
         }
     }
-
-//    repositories {
-//        maven {
-//            url gitlabRepoUrl
-//            name "GitLab"
-//            credentials(HttpHeaderCredentials) {
-//                name = gitlabTokenName
-//                value = gitLabPrivateToken
-//            }
-//            authentication {
-//                header(HttpHeaderAuthentication)
-//            }
-//        }
-//    }
 }
 
 nexusPublishing {
@@ -137,7 +123,3 @@ static def updateReadMeVersion(String ver) {
         file.write(newContent)
     }
 }
-
-// tasks.register("updateReadMeVersion") {
-//     updateReadMeVersion(version)
-// }

@@ -1,8 +1,8 @@
 package com.cytomine.registry.client.http.resp;
 
-import lombok.Data;
-
 import java.util.List;
+
+import lombok.Data;
 
 @Data
 public class TagsResp {

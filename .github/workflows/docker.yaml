@@ -18,7 +18,7 @@ jobs:
       matrix:
         image:
           - name: app-engine
-            path: .
+            path: ./
             dockerfile_path: app-engine
           - name: cbir
           - name: core

@@ -54,4 +54,3 @@ static def updateReadMeVersion(String ver) {
         file.write(newContent)
     }
 }
-

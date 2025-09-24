@@ -142,7 +142,7 @@ services:
       - k3s
     volumes:
       - ${DATA_PATH:-./data}/app-engine:/data
-      - ./.kube/shared/k3s-config:/root/.kube/config:ro
+      - ${PWD}/.kube/shared/k3s-config:/root/.kube/config:ro
       - ${DATA_PATH:-./data}/app-engine-shared-inputs:/app-engine-shared-inputs:rw
       - ${DATA_PATH:-./data}/app-engine-shared-datasets:/app-engine-shared-datasets:rw
     environment:

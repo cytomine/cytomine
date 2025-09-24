@@ -3,10 +3,17 @@ include:
   - template: Security/Secret-Detection.gitlab-ci.yml
 
 stages:
+<<<<<<< HEAD
   - prepare
   - test
   - build
   - publish
+=======
+- prepare
+- test
+- build
+- publish
+>>>>>>> origin/main
 
 variables:
   GPG_KEYRING_DIR: /gpg

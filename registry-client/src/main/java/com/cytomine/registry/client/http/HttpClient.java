@@ -1,9 +1,17 @@
 package com.cytomine.registry.client.http;
 
+<<<<<<< HEAD
+=======
+import com.cytomine.registry.client.constant.Constants;
+import lombok.extern.slf4j.Slf4j;
+import okhttp3.*;
+
+>>>>>>> origin/main
 import java.io.IOException;
 import java.util.Objects;
 import java.util.UUID;
 
+<<<<<<< HEAD
 import com.cytomine.registry.client.constant.Constants;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Headers;
@@ -12,6 +20,8 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+=======
+>>>>>>> origin/main
 @Slf4j
 public class HttpClient {
 
@@ -26,6 +36,7 @@ public class HttpClient {
 
 
     private static final OkHttpClient okHttpClient = new OkHttpClient.Builder()
+<<<<<<< HEAD
         .followRedirects(true)
         .followSslRedirects(true)
         .addInterceptor(chain -> {
@@ -44,6 +55,24 @@ public class HttpClient {
         Request.Builder requestBuilder = new Request.Builder()
             .method(method, requestBody)
             .url(Objects.requireNonNull(url));
+=======
+            .followRedirects(true)
+            .followSslRedirects(true)
+            .addInterceptor(chain -> {
+                Request request = chain.request();
+                String requestId = UUID.randomUUID().toString();
+                log.debug(String.format("requestId: %s, %s : %s", requestId, request.method(), request.url()));
+                Response response = chain.proceed(request);
+                log.debug(String.format("requestId: %s, resp: %s", requestId, response.code()));
+                return response;
+            })
+            .build();
+
+    public static Response execute(String method, String url, Headers headers, RequestBody requestBody) throws IOException {
+        Request.Builder requestBuilder = new Request.Builder()
+                .method(method, requestBody)
+                .url(Objects.requireNonNull(url));
+>>>>>>> origin/main
         if (headers != null) {
             headers.forEach(p -> requestBuilder.addHeader(p.getFirst(), p.getSecond()));
         }

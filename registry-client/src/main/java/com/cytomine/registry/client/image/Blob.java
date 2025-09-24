@@ -1,11 +1,19 @@
 package com.cytomine.registry.client.image;
 
+<<<<<<< HEAD
 import java.io.InputStream;
 
+=======
+>>>>>>> origin/main
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+<<<<<<< HEAD
+=======
+import java.io.InputStream;
+
+>>>>>>> origin/main
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

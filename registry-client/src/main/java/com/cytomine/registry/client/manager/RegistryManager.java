@@ -1,6 +1,7 @@
 package com.cytomine.registry.client.manager;
 
 
+<<<<<<< HEAD
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -9,6 +10,8 @@ import java.util.Objects;
 import java.util.Optional;
 import javax.net.ssl.SSLException;
 
+=======
+>>>>>>> origin/main
 import com.cytomine.registry.client.config.Configurer;
 import com.cytomine.registry.client.constant.Constants;
 import com.cytomine.registry.client.constant.FileConstant;
@@ -21,6 +24,17 @@ import com.cytomine.registry.client.image.registry.ManifestHttp;
 import com.cytomine.registry.client.name.Reference;
 import lombok.extern.slf4j.Slf4j;
 
+<<<<<<< HEAD
+=======
+import javax.net.ssl.SSLException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
+>>>>>>> origin/main
 @Slf4j
 public class RegistryManager {
 
@@ -34,6 +48,7 @@ public class RegistryManager {
             throw new RegistryException("not support");
         }
         ManifestHttp.BlobDTO configInfo = manifestHttp.get().getConfig();
+<<<<<<< HEAD
         String configName =
             configInfo.getDigest().replace(Constants.SHA256_PREFIX, "") + FileConstant.EXTENSION_JSON;
         context.setConfig(new Blob(configName, configInfo.getSize(), configInfo.getDigest(),
@@ -44,6 +59,15 @@ public class RegistryManager {
                 blob.getDigest().replace(Constants.SHA256_PREFIX, "") + FileConstant.EXTENSION_TAR_GZ;
             layers.add(new Blob(layerName, blob.getSize(), blob.getDigest(),
                 () -> api.getBlob(reference, blob.getDigest(), context.getToken())));
+=======
+        String configName = configInfo.getDigest().replace(Constants.SHA256_PREFIX, "") + FileConstant.EXTENSION_JSON;
+        context.setConfig(new Blob(configName, configInfo.getSize(), configInfo.getDigest(),
+                () -> api.getBlob(reference, configInfo.getDigest(), context.getToken())));
+        List<Blob> layers = new ArrayList<>();
+        for (ManifestHttp.BlobDTO blob : manifestHttp.get().getLayers()) {
+            String layerName = blob.getDigest().replace(Constants.SHA256_PREFIX, "") + FileConstant.EXTENSION_TAR_GZ;
+            layers.add(new Blob(layerName, blob.getSize(), blob.getDigest(), () -> api.getBlob(reference, blob.getDigest(), context.getToken())));
+>>>>>>> origin/main
         }
         context.setLayers(layers);
     }
@@ -55,8 +79,12 @@ public class RegistryManager {
             if (!api.isBlobExists(reference, blob.getDigest(), context.getToken())) {
                 String uploadUrl = api.startPush(reference, context.getToken());
                 try (InputStream is = blob.getContent().get()) {
+<<<<<<< HEAD
                     api.uploadBlob(uploadUrl, blob.getDigest(), is, blob.getSize(),
                         context.getToken());
+=======
+                    api.uploadBlob(uploadUrl, blob.getDigest(), is, blob.getSize(), context.getToken());
+>>>>>>> origin/main
                 }
                 if (!api.isBlobExists(reference, blob.getDigest(), context.getToken())) {
                     throw new RegistryException("upload blob failed");
@@ -64,8 +92,12 @@ public class RegistryManager {
             }
         }
         ManifestHttp manifestHttp = context.manifestHttp();
+<<<<<<< HEAD
         api.uploadManifest(reference, manifestHttp, manifestHttp.getMediaType(),
             context.getToken());
+=======
+        api.uploadManifest(reference, manifestHttp, manifestHttp.getMediaType(), context.getToken());
+>>>>>>> origin/main
     }
 
     public Optional<String> digest(Context context, Reference reference) throws IOException {
@@ -90,12 +122,19 @@ public class RegistryManager {
         blobList.add(context.getConfig());
         for (Blob blob : blobList) {
             if (!api.isBlobExists(dstReference, blob.getDigest(), context.getToken())) {
+<<<<<<< HEAD
                 Optional<String> uploadUrl = api.mountBlob(dstReference, blob.getDigest(),
                     context.getReference().getName(), context.getToken());
                 if (uploadUrl.isPresent()) {
                     try (InputStream is = blob.getContent().get()) {
                         api.uploadBlob(uploadUrl.get(), blob.getDigest(), is, blob.getSize(),
                             context.getToken());
+=======
+                Optional<String> uploadUrl = api.mountBlob(dstReference, blob.getDigest(), context.getReference().getName(), context.getToken());
+                if (uploadUrl.isPresent()) {
+                    try (InputStream is = blob.getContent().get()) {
+                        api.uploadBlob(uploadUrl.get(), blob.getDigest(), is, blob.getSize(), context.getToken());
+>>>>>>> origin/main
                     }
                 }
                 if (!api.isBlobExists(dstReference, blob.getDigest(), context.getToken())) {
@@ -104,8 +143,12 @@ public class RegistryManager {
             }
         }
         ManifestHttp manifestHttp = context.manifestHttp();
+<<<<<<< HEAD
         api.uploadManifest(dstReference, manifestHttp, manifestHttp.getMediaType(),
             context.getToken());
+=======
+        api.uploadManifest(dstReference, manifestHttp, manifestHttp.getMediaType(), context.getToken());
+>>>>>>> origin/main
     }
 
     public CatalogResp catalog(Context context, Integer count, String last) throws IOException {
@@ -113,7 +156,11 @@ public class RegistryManager {
     }
 
     public String getSchema(String endpoint) {
+<<<<<<< HEAD
         // TODO : replace this with the config coming from the appengine registry handler
+=======
+       // TODO : replace this with the config coming from the appengine registry handler
+>>>>>>> origin/main
         try {
             api.base(String.format("%s://%s", Constants.SCHEMA_HTTPS, endpoint));
             return Constants.SCHEMA_HTTPS;
@@ -132,6 +179,13 @@ public class RegistryManager {
         throw new RuntimeException("No response from the registry Server.");
     }
 
+<<<<<<< HEAD
+=======
+    public String getSchema() {
+        return Configurer.schema();
+    }
+
+>>>>>>> origin/main
     public int getVersion(String endpoint) throws IOException {
         return api.base(String.format("%s://%s", Constants.SCHEMA_HTTP, endpoint));
 

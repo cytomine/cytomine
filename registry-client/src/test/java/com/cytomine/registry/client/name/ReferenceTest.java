@@ -9,9 +9,18 @@ import org.junit.jupiter.api.Test;
 class ReferenceTest {
 
     @BeforeAll
+<<<<<<< HEAD
     static void init() {
         Configurer configurer = Configurer.instance();
         Configurer.url("http:registry:5000");
+=======
+    static void init()
+    {
+        Configurer configurer = Configurer.instance();
+        Configurer.schema("http");
+        Configurer.host("registry");
+        Configurer.port("5000");
+>>>>>>> origin/main
     }
 
     @Test
@@ -34,6 +43,7 @@ class ReferenceTest {
 
     @Test
     void parse2() {
+<<<<<<< HEAD
         Reference reference = Reference.parse("test/test:v1@sha256" +
             ":b8604a3fe8543c9e6afc29550de05b36cd162a97aa9b2833864ea8a5be11f3e2");
         Assertions.assertEquals("http://" + Constants.ENDPOINT_DEFAULT, reference.getEndpoint());
@@ -42,6 +52,13 @@ class ReferenceTest {
         Assertions.assertEquals("sha256" +
             ":b8604a3fe8543c9e6afc29550de05b36cd162a97aa9b2833864ea8a5be11f3e2",
             reference.getDigest());
+=======
+        Reference reference = Reference.parse("test/test:v1@sha256:b8604a3fe8543c9e6afc29550de05b36cd162a97aa9b2833864ea8a5be11f3e2");
+        Assertions.assertEquals("http://" + Constants.ENDPOINT_DEFAULT, reference.getEndpoint());
+        Assertions.assertEquals("test/test", reference.getName());
+        Assertions.assertEquals("v1", reference.getTag());
+        Assertions.assertEquals("sha256:b8604a3fe8543c9e6afc29550de05b36cd162a97aa9b2833864ea8a5be11f3e2", reference.getDigest());
+>>>>>>> origin/main
     }
 
     @Test
@@ -55,6 +72,7 @@ class ReferenceTest {
 
     @Test
     void parse4() {
+<<<<<<< HEAD
         Reference reference = Reference.parse("test/test@sha256" +
             ":b8604a3fe8543c9e6afc29550de05b36cd162a97aa9b2833864ea8a5be11f3e2");
         Assertions.assertEquals("http://" + Constants.ENDPOINT_DEFAULT, reference.getEndpoint());
@@ -63,13 +81,27 @@ class ReferenceTest {
         Assertions.assertEquals("sha256" +
             ":b8604a3fe8543c9e6afc29550de05b36cd162a97aa9b2833864ea8a5be11f3e2",
             reference.getDigest());
+=======
+        Reference reference = Reference.parse("test/test@sha256:b8604a3fe8543c9e6afc29550de05b36cd162a97aa9b2833864ea8a5be11f3e2");
+        Assertions.assertEquals("http://" + Constants.ENDPOINT_DEFAULT, reference.getEndpoint());
+        Assertions.assertEquals("test/test", reference.getName());
+        Assertions.assertEquals("latest", reference.getTag());
+        Assertions.assertEquals("sha256:b8604a3fe8543c9e6afc29550de05b36cd162a97aa9b2833864ea8a5be11f3e2", reference.getDigest());
+>>>>>>> origin/main
     }
 
     @Test
     void parse5() {
+<<<<<<< HEAD
         Assertions.assertThrows(IllegalArgumentException.class, () -> Reference.parse("test/test" +
             ":v1@b8604a3fe8543c9e6afc29550de05b36cd162a97aa9b2833864ea8a5be11f3e2"));
         Assertions.assertThrows(IllegalArgumentException.class, () -> Reference.parse("test/test" +
             ":v1@sha256"));
     }
 }
+=======
+        Assertions.assertThrows(IllegalArgumentException.class, () -> Reference.parse("test/test:v1@b8604a3fe8543c9e6afc29550de05b36cd162a97aa9b2833864ea8a5be11f3e2"));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> Reference.parse("test/test:v1@sha256"));
+    }
+}
+>>>>>>> origin/main

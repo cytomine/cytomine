@@ -1,7 +1,10 @@
 # A java client for docker registry api v2
 
 ### Usage：
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/main
 ```java
 RegistryClient.config("http" , "localhost" , "5000");
 
@@ -21,13 +24,21 @@ RegistryClient.delete("test@sha256:b8604a3fe8543c9e6afc29550de05b36cd162a97aa9b2
 
 List<String> tags = RegistryClient.tags("registry");
 ```
+<<<<<<< HEAD
 
 maven
 
+=======
+maven
+>>>>>>> origin/main
 ```xml
 <dependency>
     <groupId>com.cytomine</groupId>
     <artifactId>registry-client</artifactId>
     <version>2.0.0</version>
 </dependency>
+<<<<<<< HEAD
 ```
+=======
+```
+>>>>>>> origin/main

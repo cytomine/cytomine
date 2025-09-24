@@ -1,5 +1,6 @@
 package com.cytomine.registry.client.manager;
 
+<<<<<<< HEAD
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,6 +17,8 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+=======
+>>>>>>> origin/main
 import com.cytomine.registry.client.constant.Constants;
 import com.cytomine.registry.client.constant.FileConstant;
 import com.cytomine.registry.client.exception.FormatNotSupportException;
@@ -35,12 +38,31 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 
+<<<<<<< HEAD
+=======
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+>>>>>>> origin/main
 @Slf4j
 public class FileManager {
 
     public Context load(InputStream is) throws IOException {
+<<<<<<< HEAD
         Path dst = Files.createTempDirectory(UUID.randomUUID().toString()); // create a random
         // directory
+=======
+        Path dst = Files.createTempDirectory(UUID.randomUUID().toString()); // create a random directory
+>>>>>>> origin/main
         List<Blob> extractFiles = FileUtils.extractTar(is, dst); // list of blobs from a tar
         Format format = imageType(extractFiles);
         if (Format.DOCKER.equals(format)) {
@@ -55,8 +77,12 @@ public class FileManager {
     public void save(Context context, OutputStream os) throws IOException {
         try (TarArchiveOutputStream tos = new TarArchiveOutputStream(os)) {
             TarArchiveEntry manifestEntry = new TarArchiveEntry(FileConstant.MANIFEST);
+<<<<<<< HEAD
             byte[] manifestContent =
                 JsonUtil.toJson(Collections.singletonList(context.manifestFile())).getBytes(StandardCharsets.UTF_8);
+=======
+            byte[] manifestContent = JsonUtil.toJson(Collections.singletonList(context.manifestFile())).getBytes(StandardCharsets.UTF_8);
+>>>>>>> origin/main
             manifestEntry.setSize(manifestContent.length);
             tos.putArchiveEntry(manifestEntry);
             tos.write(manifestContent);
@@ -92,12 +118,17 @@ public class FileManager {
 
     private Context readIndex(List<Blob> files, Path dir) throws IOException {
         Function<String, Blob> findBlob = name -> files.stream()
+<<<<<<< HEAD
             .filter(p -> Objects.equals(Paths.get(p.getName()), Paths.get(name))).findFirst().orElse(null);
+=======
+                .filter(p -> Objects.equals(Paths.get(p.getName()), Paths.get(name))).findFirst().orElse(null);
+>>>>>>> origin/main
         Blob index = findBlob.apply(FileConstant.INDEX);
         assert index != null;
         String indexContent = IOUtils.readString(index.getContent().get(), StandardCharsets.UTF_8);
         IndexFile indexFile = JsonUtil.fromJson(indexContent, IndexFile.class);
         assert indexFile.getManifests().size() > 0;
+<<<<<<< HEAD
         Path manifestPath = Paths.get(Constants.PATH_BLOBS,
             FileUtils.replacePathChar(indexFile.getManifests().get(0).getDigest()));
         String manifestContent = IOUtils.readString(dir.resolve(manifestPath),
@@ -110,17 +141,32 @@ public class FileManager {
                 FileUtils.replacePathChar(layer.getDigest())).toString())
             .map(findBlob)
             .collect(Collectors.toList());
+=======
+        Path manifestPath = Paths.get(Constants.PATH_BLOBS, FileUtils.replacePathChar(indexFile.getManifests().get(0).getDigest()));
+        String manifestContent = IOUtils.readString(dir.resolve(manifestPath), StandardCharsets.UTF_8);
+        ManifestHttp manifestHttp = JsonUtil.fromJson(manifestContent, ManifestHttp.class);
+        Blob config = findBlob.apply(Paths.get(Constants.PATH_BLOBS, FileUtils.replacePathChar(manifestHttp.getConfig().getDigest())).toString());
+        List<Blob> layers = manifestHttp.getLayers().stream()
+                .map(layer -> Paths.get(Constants.PATH_BLOBS, FileUtils.replacePathChar(layer.getDigest())).toString())
+                .map(findBlob)
+                .collect(Collectors.toList());
+>>>>>>> origin/main
         if (config == null || layers.stream().anyMatch(Objects::isNull)) {
             throw new TarFileErrException("file missing");
         }
         config.setName(config.getDigest().replace(Constants.SHA256_PREFIX, "") + FileConstant.EXTENSION_TAR_GZ);
         layers.forEach(layer ->
+<<<<<<< HEAD
             layer.setName(layer.getDigest().replace(Constants.SHA256_PREFIX, "") + FileConstant.EXTENSION_TAR_GZ));
+=======
+                layer.setName(layer.getDigest().replace(Constants.SHA256_PREFIX, "") + FileConstant.EXTENSION_TAR_GZ));
+>>>>>>> origin/main
         return new Context(Reference.parse(indexFile.getManifests().get(0).getAnnotations().getImageRefName()), config, layers);
     }
 
     private Context readManifest(List<Blob> files, Path dir) throws IOException {
         Function<String, Blob> findBlob = name -> files.stream()
+<<<<<<< HEAD
             .filter(p -> Objects.equals(Paths.get(p.getName()), Paths.get(name))).findFirst().orElse(null);
         Blob manifest = findBlob.apply(FileConstant.MANIFEST);
         assert manifest != null;
@@ -134,15 +180,32 @@ public class FileManager {
         Blob config = findBlob.apply(manifestFile.getConfig());
         List<Blob> layers =
             manifestFiles.get(0).getLayers().stream().map(findBlob).collect(Collectors.toList());
+=======
+                .filter(p -> Objects.equals(Paths.get(p.getName()), Paths.get(name))).findFirst().orElse(null);
+        Blob manifest = findBlob.apply(FileConstant.MANIFEST);
+        assert manifest != null;
+        String manifestContent = IOUtils.readString(manifest.getContent().get(), StandardCharsets.UTF_8);
+        List<ManifestFile> manifestFiles = JsonUtil.fromJson(manifestContent, new TypeToken<List<ManifestFile>>() {});
+        if (manifestFiles.size() == 0) throw new TarFileErrException("manifest.json error");
+        ManifestFile manifestFile = manifestFiles.get(0);
+        Blob config = findBlob.apply(manifestFile.getConfig());
+        List<Blob> layers = manifestFiles.get(0).getLayers().stream().map(findBlob).collect(Collectors.toList());
+>>>>>>> origin/main
         if (config == null || layers.stream().anyMatch(Objects::isNull)) {
             throw new TarFileErrException("file missing");
         }
         config.setName(config.getDigest().replace(Constants.SHA256_PREFIX, "") + FileConstant.EXTENSION_TAR_GZ);
         layers.forEach(layer ->
+<<<<<<< HEAD
             layer.setName(layer.getDigest().replace(Constants.SHA256_PREFIX, "") + FileConstant.EXTENSION_TAR_GZ));
 
         return new Context(Reference.parse(manifestFiles.get(0).getRepoTags().get(0)), config,
             layers);
+=======
+                layer.setName(layer.getDigest().replace(Constants.SHA256_PREFIX, "") + FileConstant.EXTENSION_TAR_GZ));
+
+        return new Context(Reference.parse(manifestFiles.get(0).getRepoTags().get(0)), config, layers);
+>>>>>>> origin/main
     }
 
     private Format imageType(List<Blob> extractFiles) throws FormatNotSupportException {

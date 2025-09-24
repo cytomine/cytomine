@@ -1,6 +1,7 @@
 package com.cytomine.registry.client;
 
 
+<<<<<<< HEAD
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,6 +13,9 @@ import java.util.Optional;
 
 import com.cytomine.registry.client.config.Configurer;
 import com.cytomine.registry.client.http.auth.Authenticator;
+=======
+import com.cytomine.registry.client.config.Configurer;
+>>>>>>> origin/main
 import com.cytomine.registry.client.http.auth.Credential;
 import com.cytomine.registry.client.http.auth.Scope;
 import com.cytomine.registry.client.http.resp.CatalogResp;
@@ -19,9 +23,22 @@ import com.cytomine.registry.client.image.Context;
 import com.cytomine.registry.client.manager.FileManager;
 import com.cytomine.registry.client.manager.RegistryManager;
 import com.cytomine.registry.client.name.Reference;
+<<<<<<< HEAD
 import kotlin.Pair;
 import lombok.extern.slf4j.Slf4j;
 
+=======
+import com.cytomine.registry.client.http.auth.Authenticator;
+import kotlin.Pair;
+import lombok.extern.slf4j.Slf4j;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
+
+>>>>>>> origin/main
 @Slf4j
 public class RegistryClient {
 
@@ -35,6 +52,10 @@ public class RegistryClient {
         AUTHENTICATOR.basic(endpoint, new Credential(username, password));
     }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/main
     public static void authDockerHub(String username, String password) {
         AUTHENTICATOR.docker(new Credential(username, password));
     }
@@ -55,14 +76,25 @@ public class RegistryClient {
         Configurer.authenticate(user, password);
     }
 
+<<<<<<< HEAD
     public static void config(String url) throws IOException {
         Configurer.url(url);
+=======
+    public static void config(String scheme, String host, String port) throws IOException {
+        Configurer.schema(scheme);
+        Configurer.host(host);
+        Configurer.port(port);
+>>>>>>> origin/main
     }
 
 
     public static void pull(String image, String filePath) throws IOException {
+<<<<<<< HEAD
         try (OutputStream os =
                  new BufferedOutputStream(Files.newOutputStream(Paths.get(filePath)))) {
+=======
+        try (OutputStream os = new BufferedOutputStream(Files.newOutputStream(Paths.get(filePath)))) {
+>>>>>>> origin/main
             pull(image, os);
         }
     }
@@ -110,8 +142,12 @@ public class RegistryClient {
         Reference dstReference = Reference.prepareReference(dst);
         if (srcReference.getEndpoint().endsWith(Authenticator.DOCKER_DOMAIN) && dstReference.getEndpoint().endsWith(Authenticator.DOCKER_DOMAIN)) {
             if (Configurer.authenticated())
+<<<<<<< HEAD
                 context.setToken(AUTHENTICATOR.getToken(new Pair<>(Scope.PULL, srcReference),
                     new Pair<>(Scope.PULL_PUSH, dstReference)));
+=======
+                context.setToken(AUTHENTICATOR.getToken(new Pair<>(Scope.PULL, srcReference), new Pair<>(Scope.PULL_PUSH, dstReference)));
+>>>>>>> origin/main
             REGISTRY_OPERATE.load(context, srcReference);
         } else {
             if (Configurer.authenticated())

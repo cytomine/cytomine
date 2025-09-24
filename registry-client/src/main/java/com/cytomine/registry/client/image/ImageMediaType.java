@@ -28,6 +28,10 @@ public enum ImageMediaType {
     LAYER_OCI("application/vnd.oci.image.layer.v1.tar+gzip");
 
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/main
     private String value;
 
     ImageMediaType(String value) {
@@ -38,4 +42,8 @@ public enum ImageMediaType {
     public String toString() {
         return value;
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> origin/main

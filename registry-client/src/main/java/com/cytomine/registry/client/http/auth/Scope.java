@@ -4,8 +4,12 @@ public enum Scope {
     NONE(""),
     PULL("pull"),
     PULL_PUSH("pull,push"),
+<<<<<<< HEAD
     DELETE("delete"),
     ;
+=======
+    DELETE("delete"),;
+>>>>>>> origin/main
 
     private String scope;
 

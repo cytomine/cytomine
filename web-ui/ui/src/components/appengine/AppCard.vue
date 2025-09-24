@@ -23,7 +23,7 @@
         </div>
 
         <footer class="card-footer">
-          <b-button class="card-footer-item" type="is-ghost" v-if="installable" @click.prevent="handleInstall">
+          <b-button class="card-footer-item" v-if="installable" @click.prevent="handleInstall">
             {{ $t('install') }}
           </b-button>
           <a href="#" class="card-footer-item">More</a>
@@ -67,6 +67,15 @@ export default {
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
   border-radius: 10px;
   transition: .2s ease-out;
+}
+
+.card-footer button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  margin: 0;
+  border: none;
 }
 
 .rounded {

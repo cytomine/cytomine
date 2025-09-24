@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
 
-import io.github.ya_b.registry.client.RegistryClient;
+import com.cytomine.registry.client.RegistryClient;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,8 +29,9 @@ public class DockerRegistryHandler implements RegistryHandler {
 
     @PostConstruct
     void init() throws IOException {
+        RegistryClient.config(registryHost);
         if (registryUsername.filter(e -> !e.isBlank()).isPresent()) {
-            RegistryClient.authBasic(registryHost, registryUsername.get(),
+            RegistryClient.authenticate(registryUsername.get(),
                 registryPassword.orElseThrow(() -> new IllegalArgumentException("Username was "
                     + "provided for registry but not password")));
         }
@@ -42,7 +43,8 @@ public class DockerRegistryHandler implements RegistryHandler {
     public void pushImage(InputStream imageInputStream, String imageName) throws RegistryException {
         log.info("Docker Registry Handler: pushing image...");
         try {
-            RegistryClient.push(String.valueOf(imageInputStream), imageName);
+
+            RegistryClient.push(imageInputStream, imageName);
             log.info("Docker Registry Handler: image pushed");
         } catch (FileNotFoundException e) {
             log.error("Image data file not found: {}", imageName, e);

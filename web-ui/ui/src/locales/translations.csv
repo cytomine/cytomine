@@ -740,8 +740,10 @@ notif-success-user-update,User successfully updated,L'utilisateur a bien été m
 notif-success-welcome-message-update,Welcome message successfully updated,Le message de bienvenue a bien été mis à jour,Mensaje de bienvenida actualizado con éxito,Het welkomstbericht is bijgewerkt
 notif-unexpected-error,Unexpected error,Une erreur inattendue s'est produite,Se ha producido un error inesperado,Er is een onverwachte fout opgetreden
 notif-warn-ontology-tree-order-not-persisted,The order of children in the ontology tree is not persisted in database,L'ordre des enfants dans l'arborescence n'est pas sauvegardée dans la base de données,La jerarquía de términos dentro de la ontología no se mantiene en la base de datos.,De volgorde van de kinderen in de stamboom wordt niet opgeslagen in de database
+notify-error-app-installation,Failed to install the app,Échec de l'installation de l'application,Error al instalar la aplicación,Installatie van de app mislukt
 notify-error-empty-list,The list is empty,La liste est vide,La lista está vacía,De lijst is leeg
 notify-error-not-enough-item,Not enough items provided,Pas assez d'éléments fournis,No se han proporcionado suficientes elementos,Niet genoeg items verstrekt
+notify-success-app-installation,App installed successfully,Application installée avec succès,Aplicación instalada con éxito,App succesvol geïnstalleerd
 notify-success-app-store-addition,App store added successfully,Magasin d'applications ajouté avec succès,Tienda de aplicaciones añadida con éxito,App store succesvol toegevoegd
 notify-success-app-store-deletion,App store deleted successfully,Magasin d'applications supprimé avec succès,Tienda de aplicaciones eliminada con éxito,App store succesvol verwijderd
 notify-success-create-array-inputs,The array was successfully provisioned,Le tableau a été approvisionné avec succès,La matriz se aprovisionó correctamente,De array is succesvol ingericht

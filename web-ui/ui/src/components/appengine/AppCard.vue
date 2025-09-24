@@ -1,29 +1,29 @@
 <template>
   <div class="card">
-    <router-link :to="`/apps/${appData.namespace}/${appData.version}`">
+    <router-link :to="`/apps/${app.namespace}/${app.version}`">
       <div class="card-image img-rounded">
         <figure class="image is-animated is-5by3">
-          <img :src="appData.imageUrl || 'https://bulma.io/assets/images/placeholders/1280x960.png'"
+          <img :src="app.imageUrl || 'https://bulma.io/assets/images/placeholders/1280x960.png'"
             alt="Placeholder image">
         </figure>
       </div>
       <div class="card-content">
         <div class="media">
           <div class="media-content">
-            <p class="title is-4 less-bottom">{{ appData.name }}</p>
-            <time datetime="">{{ appData.date }}</time>
+            <p class="title is-4 less-bottom">{{ app.name }}</p>
+            <time datetime="">{{ app.date }}</time>
           </div>
           <div class="media-right">
-            <p class="subtitle is-6">{{ appData.version }}</p>
+            <p class="subtitle is-6">{{ app.version }}</p>
           </div>
         </div>
 
         <div class="content">
-          {{ appData.description }}
+          {{ app.description }}
         </div>
 
         <footer class="card-footer">
-          <b-button class="card-footer-item" type="is-ghost" v-if="installable" @click="handleInstall">
+          <b-button class="card-footer-item" type="is-ghost" v-if="installable" @click.prevent="handleInstall">
             {{ $t('install') }}
           </b-button>
           <a href="#" class="card-footer-item">More</a>
@@ -34,15 +34,25 @@
 </template>
 
 <script>
+import {Cytomine} from 'cytomine-client';
+
 export default {
   name: 'AppCard',
   props: {
-    appData: {type: Object, required: true},
+    app: {type: Object, required: true},
     installable: {type: Boolean, default: false},
   },
   methods: {
-    handleInstall() {
-      
+    async handleInstall() {
+      try {
+        const uri = `${this.app.namespace}/${this.app.version}`;
+        await Cytomine.instance.api.post(`/app-engine/tasks/${uri}/install`);
+
+        this.$notify({type: 'success', text: this.$t('notify-success-app-installation')});
+      } catch (error) {
+        console.error('Failed to install app:', error);
+        this.$notify({type: 'error', text: this.$t('notify-error-app-installation')});
+      }
     },
   },
 };

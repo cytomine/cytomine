@@ -25,12 +25,18 @@ export default {
   },
   async created() {
     this.stores.forEach(async (store) => {
-      const data = (await Cytomine.instance.api.get('/stores/tasks', {
+      const {data} = await Cytomine.instance.api.get('/stores/tasks', {
         params: {host: encodeURIComponent(store.host)},
-      })).data;
+      });
+
+      const tasks = data.map(task => ({
+        ...task,
+        host: store.host,
+      }));
+
       this.applications = [
         ...this.applications,
-        ...data,
+        ...tasks,
       ];
     });
   },

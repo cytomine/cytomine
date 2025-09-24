@@ -87,17 +87,13 @@ export default {
     };
   },
   async created() {
-    const taskNamespace = this.$route.params.namespace;
-    const taskVersion = this.$route.params.version;
-
-    if (this.$route.query.fromStore === true) {
-      console.log('test');
-    } else {
-      this.task = await Task.fetchNamespaceVersion(taskNamespace, taskVersion);
-    }
-
+    this.task = await Task.fetchNamespaceVersion(
+      this.$route.params.namespace,
+      this.$route.params.version,
+      this.$route.query.host,
+    );
     this.loading = false;
-  }
+  },
 };
 </script>
 

@@ -23,8 +23,8 @@ export default class Task extends Model {
     return data.map(props => new Task(props));
   }
 
-  static async fetchNamespaceVersion(namespace, version) {
-    return await Task.fetch(`${namespace}/${version}`);
+  static async fetchNamespaceVersion(namespace, version, host = null) {
+    return await Cytomine.instance.api.get(`${this.callbackIdentifier}/${namespace}/${version}`, {params: {host}});
   }
 
   static async uploadTask(compressedTask) {

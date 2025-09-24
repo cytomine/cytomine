@@ -1,6 +1,6 @@
 <template>
   <div class="card">
-    <router-link :to="{ path: `/apps/${app.namespace}/${app.version}`, query: { fromStore: installable } }">
+    <router-link :to="{ path: `/apps/${app.namespace}/${app.version}`, query: { host: app.host } }">
       <div class="card-image img-rounded">
         <figure class="image is-animated is-5by3">
           <img :src="app.imageUrl || 'https://bulma.io/assets/images/placeholders/1280x960.png'"

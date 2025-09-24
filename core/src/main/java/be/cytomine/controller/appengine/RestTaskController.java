@@ -43,6 +43,15 @@ public class RestTaskController extends RestCytomineController {
         return appEngineService.get("tasks/" + namespace + "/" + version);
     }
 
+    @PostMapping("/tasks/{namespace}/{version}/install")
+    public String install(
+        @PathVariable String namespace,
+        @PathVariable String version
+    ) {
+        String uri = "tasks/" + namespace + "/" + version + "/install";
+        return appEngineService.post(uri, null, null);
+    }
+
     @GetMapping("/tasks")
     public String list() {
         return appEngineService.get("tasks");

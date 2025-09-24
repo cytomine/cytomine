@@ -9,7 +9,7 @@ describe('AppCard.vue', () => {
   localVue.use(Buefy);
   localVue.use(VueRouter);
 
-  const mockAppData = {
+  const mockApp = {
     namespace: 'my-app',
     version: '1.0.0',
     imageUrl: 'https://example.com/image.png',
@@ -18,35 +18,48 @@ describe('AppCard.vue', () => {
     description: 'This is a test app description.'
   };
 
-  let wrapper;
-
-  beforeEach(() => {
-    wrapper = shallowMount(AppCard, {
+  const createWrapper = (options = {}) => shallowMount(
+    AppCard,
+    {
       localVue,
       propsData: {
-        appData: mockAppData,
+        app: mockApp,
+      },
+      mocks: {
+        $t: (key) => key,
+      },
+      ...options,
+    },
+  );
+
+  it('should render the app information', () => {
+    const wrapper = createWrapper();
+
+    expect(wrapper.text()).toContain(mockApp.name);
+    expect(wrapper.text()).toContain(mockApp.date);
+    expect(wrapper.text()).toContain(mockApp.version);
+    expect(wrapper.text()).toContain(mockApp.description);
+  });
+
+  it('should render the correct image URL', () => {
+    const wrapper = createWrapper();
+
+    expect(wrapper.find('img').attributes('src')).toBe(mockApp.imageUrl);
+  });
+
+  it('should use the correct router link', () => {
+    const wrapper = createWrapper();
+    const link = wrapper.findComponent({name: 'RouterLink'});
+
+    expect(link.props('to')).toBe(`/apps/${mockApp.namespace}/${mockApp.version}`);
+  });
+
+  it('should fallback to placeholder image when imageUrl is not provided', () => {
+    const wrapper = createWrapper({
+      propsData: {
+        app: {...mockApp, imageUrl: ''},
       }
     });
-  });
-
-  it('The component should render the app information', () => {
-    expect(wrapper.text()).toContain(mockAppData.name);
-    expect(wrapper.text()).toContain(mockAppData.date);
-    expect(wrapper.text()).toContain(mockAppData.version);
-    expect(wrapper.text()).toContain(mockAppData.description);
-  });
-
-  it('The component should render the correct image URL', () => {
-    expect(wrapper.find('img').attributes('src')).toBe(mockAppData.imageUrl);
-  });
-
-  it('The component should use the correct router link', () => {
-    const link = wrapper.findComponent({name: 'RouterLink'});
-    expect(link.props('to')).toBe(`/appengine/${mockAppData.namespace}/${mockAppData.version}`);
-  });
-
-  it('should fallback to placeholder image if imageUrl is not provided', async () => {
-    await wrapper.setProps({appData: {...mockAppData, imageUrl: ''}});
 
     const expected = 'https://bulma.io/assets/images/placeholders/1280x960.png';
     expect(wrapper.find('img').attributes('src')).toBe(expected);

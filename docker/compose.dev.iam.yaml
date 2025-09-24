@@ -6,7 +6,7 @@ services:
       context: ./iam
       target: dev-server
     ports:
-      - "${DEV_IAM_PORT:-8100}:8080"
+      - "${DEV_IAM_PORT:-8100}:8100"
       - "${DEV_SSH_IAM_PORT:-10025}:22"
     stdin_open: true
     tty: true

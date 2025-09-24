@@ -18,6 +18,8 @@ jobs:
       matrix:
         image:
           - name: app-engine
+            path: .
+            dockerfile_path: app-engine
           - name: cbir
           - name: core
           - name: iam
@@ -54,7 +56,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ./${{ matrix.image.path || matrix.image.name }}
-          file: ./${{ matrix.image.path || matrix.image.name }}/Dockerfile
+          file: ./${{ matrix.image.dockerfile_path || matrix.image.path || matrix.image.name }}/Dockerfile
           push: true
           tags: cytomine/${{ matrix.image.name }}
           labels: latest

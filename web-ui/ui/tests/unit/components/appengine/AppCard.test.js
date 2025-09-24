@@ -25,6 +25,9 @@ describe('AppCard.vue', () => {
       propsData: {
         app: mockApp,
       },
+      mocks: {
+        $t: (key) => key,
+      },
       ...options,
     },
   );

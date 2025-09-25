@@ -178,17 +178,6 @@ http {
           alias /www/;
         }
 
-        location ~ ^/registry/(.*) {
-            set $tmpregistryhost "$INTERNAL_URLS_REGISTRY";
-            proxy_pass http://$tmpregistryhost/$request_uri;
-        }
-
-        # also the registry
-        location /v2 {
-            set $tmpregistryhost "$INTERNAL_URLS_REGISTRY";
-            proxy_pass http://$tmpregistryhost;
-        }
-
         proxy_intercept_errors on;
         error_page 404 = /cytomine-page-not-found;
         location /cytomine-page-not-found {

@@ -34,9 +34,7 @@ public class RestTaskController extends RestCytomineController {
     private final RestTemplate restTemplate;
 
     @GetMapping("/tasks/{id}")
-    public String descriptionById(
-            @PathVariable String id
-    ) {
+    public String descriptionById(@PathVariable String id) {
         return appEngineService.get("tasks/" + id);
     }
 
@@ -46,6 +44,7 @@ public class RestTaskController extends RestCytomineController {
             @PathVariable String version,
             @RequestParam(required = false) String host
     ) {
+        log.info("GET /tasks/{}/{}?host={}", namespace, version, host);
         if (host != null) {
             String url = UriComponentsBuilder
                 .fromUriString(UriUtils.decode(host, StandardCharsets.UTF_8))

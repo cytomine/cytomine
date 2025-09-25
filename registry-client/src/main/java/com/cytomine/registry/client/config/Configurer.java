@@ -6,11 +6,11 @@ import com.cytomine.registry.client.http.auth.Credential;
 
 public class Configurer {
     private static final Authenticator AUTHENTICATOR = Authenticator.instance();
+    private static Configurer configurer;
     private String url;
     private String userName;
     private String password;
     private boolean authenticated;
-    private static Configurer configurer;
 
     private Configurer() {
     }

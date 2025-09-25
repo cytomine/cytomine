@@ -1,7 +1,17 @@
 package com.cytomine.registry.client;
 
 
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
+
 import com.cytomine.registry.client.config.Configurer;
+import com.cytomine.registry.client.http.auth.Authenticator;
 import com.cytomine.registry.client.http.auth.Credential;
 import com.cytomine.registry.client.http.auth.Scope;
 import com.cytomine.registry.client.http.resp.CatalogResp;
@@ -9,15 +19,8 @@ import com.cytomine.registry.client.image.Context;
 import com.cytomine.registry.client.manager.FileManager;
 import com.cytomine.registry.client.manager.RegistryManager;
 import com.cytomine.registry.client.name.Reference;
-import com.cytomine.registry.client.http.auth.Authenticator;
 import kotlin.Pair;
 import lombok.extern.slf4j.Slf4j;
-
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 public class RegistryClient {
@@ -58,7 +61,8 @@ public class RegistryClient {
 
 
     public static void pull(String image, String filePath) throws IOException {
-        try (OutputStream os = new BufferedOutputStream(Files.newOutputStream(Paths.get(filePath)))) {
+        try (OutputStream os =
+                 new BufferedOutputStream(Files.newOutputStream(Paths.get(filePath)))) {
             pull(image, os);
         }
     }
@@ -106,7 +110,8 @@ public class RegistryClient {
         Reference dstReference = Reference.prepareReference(dst);
         if (srcReference.getEndpoint().endsWith(Authenticator.DOCKER_DOMAIN) && dstReference.getEndpoint().endsWith(Authenticator.DOCKER_DOMAIN)) {
             if (Configurer.authenticated())
-                context.setToken(AUTHENTICATOR.getToken(new Pair<>(Scope.PULL, srcReference), new Pair<>(Scope.PULL_PUSH, dstReference)));
+                context.setToken(AUTHENTICATOR.getToken(new Pair<>(Scope.PULL, srcReference),
+                    new Pair<>(Scope.PULL_PUSH, dstReference)));
             REGISTRY_OPERATE.load(context, srcReference);
         } else {
             if (Configurer.authenticated())

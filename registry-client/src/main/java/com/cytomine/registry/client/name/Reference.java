@@ -1,15 +1,15 @@
 package com.cytomine.registry.client.name;
 
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import com.cytomine.registry.client.config.Configurer;
 import com.cytomine.registry.client.constant.Constants;
 import com.cytomine.registry.client.http.HttpClient;
 import com.cytomine.registry.client.manager.RegistryManager;
 import lombok.Data;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 @Data
 public class Reference {
@@ -70,7 +70,7 @@ public class Reference {
         if (image.contains(Constants.COLON)) {
             int colonIndex = image.indexOf(Constants.COLON);
             t.tag = image.substring(colonIndex + 1);
-            t.name = image.substring(0 , image.indexOf(Constants.COLON));
+            t.name = image.substring(0, image.indexOf(Constants.COLON));
         } else {
             t.tag = Constants.TAG_LATEST;
             t.name = image;

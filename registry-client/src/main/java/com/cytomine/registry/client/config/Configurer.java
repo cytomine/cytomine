@@ -5,13 +5,12 @@ import com.cytomine.registry.client.http.auth.Authenticator;
 import com.cytomine.registry.client.http.auth.Credential;
 
 public class Configurer {
+    private static final Authenticator AUTHENTICATOR = Authenticator.instance();
     private String url;
     private String userName;
     private String password;
     private boolean authenticated;
     private static Configurer configurer;
-
-    private static final Authenticator AUTHENTICATOR = Authenticator.instance();
 
     private Configurer() {
     }

@@ -43,7 +43,6 @@ public class DockerRegistryHandler implements RegistryHandler {
     public void pushImage(InputStream imageInputStream, String imageName) throws RegistryException {
         log.info("Docker Registry Handler: pushing image...");
         try {
-
             RegistryClient.push(imageInputStream, imageName);
             log.info("Docker Registry Handler: image pushed");
         } catch (FileNotFoundException e) {

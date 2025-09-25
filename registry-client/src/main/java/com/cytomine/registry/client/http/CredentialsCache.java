@@ -1,10 +1,10 @@
 package com.cytomine.registry.client.http;
 
-import okhttp3.Credentials;
-
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+
+import okhttp3.Credentials;
 
 public class CredentialsCache {
     private final static Map<String, String> CACHE = new ConcurrentHashMap<>();

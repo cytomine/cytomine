@@ -58,7 +58,7 @@ public class TaskRunController {
         @PathVariable("param_name") String parameterName,
         @RequestBody JsonNode provision
     ) throws ProvisioningException {
-        log.info("/task-runs/%s/input-provisions/%s JSON PUT", runId, parameterName);
+        log.info("/task-runs/{}/input-provisions/{} JSON PUT", runId, parameterName);
         JsonNode provisioned = taskRunService.provisionRunParameter(
             runId,
             parameterName,

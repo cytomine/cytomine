@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -53,9 +54,6 @@ public class RestTaskController extends RestCytomineController {
             .map(url ->
                 restTemplate.exchange(url, HttpMethod.GET, null, String.class).getBody())
             .orElseGet(() -> appEngineService.get("tasks/" + namespace + "/" + version));
-    }
-
-        return appEngineService.get("tasks/" + namespace + "/" + version);
     }
 
     @PostMapping("/tasks/{namespace}/{version}/install")

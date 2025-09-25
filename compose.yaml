@@ -284,9 +284,6 @@ services:
     - .kube/shared:/output/
     ports:
     - 6443:6443
-    # - 80:80
-    # - 443:443
-    # network_mode: host
     networks:
       host_network:
         ipv4_address: 172.16.238.15

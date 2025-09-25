@@ -72,8 +72,6 @@ import be.cytomine.appengine.repositories.TaskRepository;
 import be.cytomine.appengine.states.TaskRunState;
 import be.cytomine.appengine.utils.ArchiveUtils;
 
-import static java.lang.String.format;
-
 @Slf4j
 @RequiredArgsConstructor
 @Service

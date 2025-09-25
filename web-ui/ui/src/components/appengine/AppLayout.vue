@@ -17,6 +17,7 @@
 <script>
 import AppSidebar from '@/components/appengine/AppSidebar.vue';
 import constants from '@/utils/constants.js';
+import {Cytomine} from 'cytomine-client';
 
 export default {
   name: 'AppLayout',
@@ -28,6 +29,23 @@ export default {
       appEngineEnabled: constants.APPENGINE_ENABLED
     };
   },
+  async created() {
+    if (!this.appEngineEnabled) {
+      return;
+    }
+
+    await this.fetchStores();
+  },
+  methods: {
+    async fetchStores() {
+      try {
+        const stores = (await Cytomine.instance.api.get('/stores')).data;
+        this.$store.commit('appStores/set', stores);
+      } catch (error) {
+        console.error('Failed to fetch stores:', error);
+      }
+    },
+  }
 };
 </script>
 

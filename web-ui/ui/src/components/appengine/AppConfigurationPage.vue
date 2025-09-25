@@ -62,23 +62,12 @@ export default {
       showModal: false,
     };
   },
-  async created() {
-    await this.fetchStores();
-  },
   computed: {
     stores() {
       return this.$store.getters['appStores/stores'];
     },
   },
   methods: {
-    async fetchStores() {
-      try {
-        const stores = (await Cytomine.instance.api.get('/stores')).data;
-        this.$store.commit('appStores/set', stores);
-      } catch (error) {
-        console.error('Failed to fetch stores:', error);
-      }
-    },
     async addStore(store) {
       try {
         return (await Cytomine.instance.api.post('/stores', store)).data;

@@ -20,17 +20,17 @@ jobs:
           - name: app-engine
             context: '.'
             dockerfile_path: app-engine
-          - name: cbir
-          - name: core
-          - name: iam
-          - name: nginx
-          - name: pims
-          - name: postgis
-          - name: sam
-          - name: web-ui
-          - name: mongo
-          - name: python-client
-            path: clients/python
+    #          - name: cbir
+    #          - name: core
+    #          - name: iam
+    #          - name: nginx
+    #          - name: pims
+    #          - name: postgis
+    #          - name: sam
+    #          - name: web-ui
+    #          - name: mongo
+    #          - name: python-client
+    #            path: clients/python
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -55,7 +55,7 @@ jobs:
         id: push
         uses: docker/build-push-action@v6
         with:
-          context: ${{ matrix.image.context || format('./{0}', matrix.image.name) }}
+          context: . #${{ matrix.image.context || format('./{0}', matrix.image.name) }}
           file: ./${{ matrix.image.dockerfile_path || matrix.image.path || matrix.image.name }}/Dockerfile
           push: true
           tags: cytomine/${{ matrix.image.name }}

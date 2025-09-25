@@ -201,7 +201,7 @@ public class TaskService {
             log.error("UploadTask: task already exists");
             throw e;
         } catch (Exception e) {
-            log.error(format("UploadTask: Unknown bundle archive format %s",e));
+            log.error(format("UploadTask: Unknown bundle archive format %s", e));
             AppEngineError error = ErrorBuilder.build(
                 ErrorCode.INTERNAL_UNKNOWN_BUNDLE_ARCHIVE_FORAMT);
             throw new BundleArchiveException(error);

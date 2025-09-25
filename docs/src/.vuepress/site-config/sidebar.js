@@ -44,24 +44,6 @@ module.exports = {
         ["/admin-guide/k8s/installation", "Installation Guide"],
       ],
     },
-    {
-      title: "Compute Clusters",
-      collapsable: true,
-      children: [
-        ["/admin-guide/clusters/", "Introduction"],
-        {
-          title: "MicroK8s",
-          collapsable: true,
-          children: [
-            ["/admin-guide/clusters/microk8s/", "Introduction"],
-            ["/admin-guide/clusters/microk8s/installation", "Installation"],
-            ["/admin-guide/clusters/microk8s/configuration", "Configuration"],
-            ["/admin-guide/clusters/microk8s/troubleshooting", "Troubleshooting"],
-            ["/admin-guide/clusters/microk8s/uninstallation", "Uninstallation"],
-          ],
-        },
-      ],
-    },
   ],
 
   devGuide: [

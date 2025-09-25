@@ -30,7 +30,16 @@ Cytomine installation requires about **15GB**. You need to provide enough space 
 
 ### Running App in Cytomine
 
-To be able to execute apps in Cytomine, a cluster must be installed and running before proceeding with the installation, refer to [MicroK8s installation guide](/admin-guide/clusters/microk8s/installation).
+::: warning
+In previous versions, MicroK8s was required for the installation. This is no longer the case.
+
+Cytomine now uses K3s, which is deployed automatically via Docker Compose. No manual installation or configuration is required anymore.
+
+If you previously installed MicroK8s only for Cytomine, you can safely remove it using the following command:
+```bash
+sudo snap remove microk8s
+```
+:::
 
 ## Installation
 
@@ -49,13 +58,6 @@ This installation procedure is intended for desktop or laptop computers running 
 
    ```bash
    wget https://raw.githubusercontent.com/cytomine/cytomine/main/compose.yaml
-   ```
-
-3. Generate the config file from MicroK8s:
-
-   ```bash
-   mkdir .kube
-   microk8s.config > .kube/config
    ```
 
 3. Launch cytomine:
@@ -78,6 +80,15 @@ sudo docker compose pull
 ```
 
 This command will pull the latest images of each services in Cytomine.
+
+::: warning
+If the deployment does not work correctly after pulling the latest images, it is possible that the `compose.yaml` file has been updated.
+
+To ensure you are using the latest version, re-fetch the `compose.yaml` file with the following command:
+```bash
+wget -O compose.yaml https://raw.githubusercontent.com/cytomine/cytomine/main/compose.yaml
+```
+:::
 
 ## Stop Cytomine
 

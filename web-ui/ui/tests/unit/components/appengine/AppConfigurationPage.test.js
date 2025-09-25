@@ -19,9 +19,9 @@ jest.mock('cytomine-client', () => ({
   Cytomine: {
     instance: {
       api: {
-        get: jest.fn(),
-        post: jest.fn(),
         delete: jest.fn(),
+        post: jest.fn(),
+        put: jest.fn(),
       },
     },
   },
@@ -45,17 +45,6 @@ describe('AppConfigurationPage.vue', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-  });
-
-  it('should fetch stores on created hook', async () => {
-    const storesData = [{id: 1, name: 'Store1', host: 'http://example.com', default: true}];
-    Cytomine.instance.api.get.mockResolvedValue({data: storesData});
-
-    const wrapper = createWrapper();
-    await flushPromises();
-
-    expect(Cytomine.instance.api.get).toHaveBeenCalledWith('/stores');
-    expect(wrapper.vm.stores).toEqual(storesData);
   });
 
   it('should add a store correctly', async () => {

@@ -3,9 +3,22 @@ import VueRouter from 'vue-router';
 
 import AppLayout from '@/components/appengine/AppLayout.vue';
 import AppSidebar from '@/components/appengine/AppSidebar.vue';
+import store from '@/store/store';
+import {Cytomine} from 'cytomine-client';
+import {flushPromises} from '../../../utils';
 
 jest.mock('@/utils/constants.js', () => ({
   APPENGINE_ENABLED: true,
+}));
+
+jest.mock('cytomine-client', () => ({
+  Cytomine: {
+    instance: {
+      api: {
+        get: jest.fn().mockResolvedValue({data: []}),
+      },
+    },
+  },
 }));
 
 const BMessage = {
@@ -21,6 +34,7 @@ describe('AppLayout.vue', () => {
   const createWrapper = (options = {}) => {
     return shallowMount(AppLayout, {
       localVue,
+      store,
       components: {
         AppSidebar,
         'b-message': BMessage,
@@ -46,6 +60,16 @@ describe('AppLayout.vue', () => {
       const wrapper = createWrapper();
 
       expect(wrapper.findComponent(BMessage).exists()).toBe(false);
+    });
+
+    it('should fetch stores on created hook', async () => {
+      const storesData = [{id: 1, name: 'Store1', host: 'http://example.com', default: true}];
+      Cytomine.instance.api.get.mockResolvedValue({data: storesData});
+
+      createWrapper();
+      await flushPromises();
+
+      expect(Cytomine.instance.api.get).toHaveBeenCalledWith('/stores');
     });
   });
 

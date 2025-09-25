@@ -58,7 +58,9 @@ scheduler:
     storage-base-path: ${RUN_STORAGE_BASE_PATH:/data} # directory in host
   datasets-path: ${REF_STORAGE_BASE_PATH:/data/datasets} # directory in host contains bigpicture datasets
   advertised-url: ${SCHEDULER_ADVERTISED_URL} # The URL of the app engine, to be requested from the running tasks
+  registry-advertised-url: ${SCHEDULER_REGISTRY_ADVERTISED_URL}
   use-host-network: ${SCHEDULER_USE_HOST_NETWORK}
+  tasks-namespace: ${SCHEDULER_TASKS_NAMESPACE}
 logging:
   level:
     root: ERROR

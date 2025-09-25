@@ -24,36 +24,36 @@ import be.cytomine.service.appengine.AppEngineService;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/stores")
 public class StoreController {
 
     private final AppEngineService appEngineService;
 
     private final RestTemplate restTemplate;
 
-    @GetMapping("/stores")
+    @GetMapping
     public String get() {
         return appEngineService.get("stores");
     }
 
-    @PostMapping("/stores")
+    @PostMapping
     public String post(@RequestBody AppStore store) {
         return appEngineService.post("stores", store, MediaType.APPLICATION_JSON);
     }
 
-    @DeleteMapping("/stores/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id) {
         appEngineService.delete("stores/" + id);
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/stores/{id}/default")
+    @PutMapping("/{id}/default")
     public ResponseEntity<Void> setDefaultStore(@PathVariable String id) {
         appEngineService.put("stores/" + id + "/default", null, null);
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/stores/tasks")
+    @GetMapping("/tasks")
     public String getStoreTasks(@RequestParam String host) {
         String url = UriComponentsBuilder
                 .fromUriString(UriUtils.decode(host, StandardCharsets.UTF_8))

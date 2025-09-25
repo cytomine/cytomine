@@ -160,6 +160,7 @@ services:
     networks:
       host_network:
         ipv4_address: 172.16.238.10
+
   core:
     image: cytomine/core:latest
     restart: unless-stopped
@@ -170,9 +171,6 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime
     environment:
-      ADMIN_PASSWORD: password
-      ADMIN_PRIVATE_KEY: 1f77ce7b-e9ba-4393-bb53-12a702cc2741
-      ADMIN_PUBLIC_KEY: 838b0935-05a7-4ea9-bd48-71497468e4c9
       IMAGE_SERVER_PRIVATE_KEY: d70607f5-c478-403c-be11-3dbc1716d1cf
       IMAGE_SERVER_PUBLIC_KEY: 9a8b8369-2446-44cb-b0af-604a74e1dcdb
       INTERNAL_PROXY_URL: http://nginx
@@ -192,11 +190,10 @@ services:
       POSTGIS_PORT: 5432
       POSTGIS_USER: docker
       STORAGE_PATH: /data/images
-      SUPER_ADMIN_PRIVATE_KEY: 944ee44b-e327-451d-80c0-9507448a472f
-      SUPER_ADMIN_PUBLIC_KEY: 4162d546-129b-48bd-9098-610cd4c50f33
     networks:
       host_network:
         ipv4_address: 172.16.238.11
+
   cbir:
     image: cytomine/cbir:latest
     restart: unless-stopped

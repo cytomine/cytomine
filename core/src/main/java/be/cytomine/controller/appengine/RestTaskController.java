@@ -42,17 +42,18 @@ public class RestTaskController extends RestCytomineController {
     public String description(
             @PathVariable String namespace,
             @PathVariable String version,
-            @RequestParam(required = false) String host
+        @RequestParam(required = false, name = "host") Optional<String> maybeHost
     ) {
-        log.info("GET /tasks/{}/{}?host={}", namespace, version, host);
-        if (host != null) {
-            String url = UriComponentsBuilder
+        log.info("GET /tasks/{}/{}?host={}", namespace, version, maybeHost);
+        return maybeHost
+            .map(host -> UriComponentsBuilder
                 .fromUriString(UriUtils.decode(host, StandardCharsets.UTF_8))
                 .pathSegment("api", "v1", "tasks", namespace, version)
-                .toUriString();
-
-            return restTemplate.exchange(url, HttpMethod.GET, null, String.class).getBody();
-        }
+                .toUriString())
+            .map(url ->
+                restTemplate.exchange(url, HttpMethod.GET, null, String.class).getBody())
+            .orElseGet(() -> appEngineService.get("tasks/" + namespace + "/" + version));
+    }
 
         return appEngineService.get("tasks/" + namespace + "/" + version);
     }

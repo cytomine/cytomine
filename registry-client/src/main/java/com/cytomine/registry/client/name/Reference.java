@@ -30,7 +30,7 @@ public class Reference {
         } else {
             host = Constants.ENDPOINT_DEFAULT;
         }
-        t.endpoint = String.format("%s://%s", REGISTRY_MANAGER.getSchema(), host);
+        t.endpoint = Configurer.url();
         String last = list.get(list.size() - 1);
         if (last.contains(Constants.AT)) {
             int atIndex = last.lastIndexOf(Constants.AT);
@@ -58,8 +58,7 @@ public class Reference {
     public static Reference prepareReference(String image) // only image without endpoint part
     {
         Reference t = new Reference();
-        t.endpoint = String.format("%s://%s", REGISTRY_MANAGER.getSchema(), Configurer.host() +
-            ":" + Configurer.port());
+        t.endpoint = Configurer.url();
         if (image.contains(Constants.AT)) {
             int atIndex = image.lastIndexOf(Constants.AT);
             t.digest = image.substring(atIndex + 1);

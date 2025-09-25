@@ -11,9 +11,7 @@ class ReferenceTest {
     @BeforeAll
     static void init() {
         Configurer configurer = Configurer.instance();
-        Configurer.schema("http");
-        Configurer.host("registry");
-        Configurer.port("5000");
+        Configurer.url("http:registry:5000");
     }
 
     @Test
@@ -42,7 +40,7 @@ class ReferenceTest {
         Assertions.assertEquals("test/test", reference.getName());
         Assertions.assertEquals("v1", reference.getTag());
         Assertions.assertEquals("sha256" +
-                ":b8604a3fe8543c9e6afc29550de05b36cd162a97aa9b2833864ea8a5be11f3e2",
+            ":b8604a3fe8543c9e6afc29550de05b36cd162a97aa9b2833864ea8a5be11f3e2",
             reference.getDigest());
     }
 
@@ -63,7 +61,7 @@ class ReferenceTest {
         Assertions.assertEquals("test/test", reference.getName());
         Assertions.assertEquals("latest", reference.getTag());
         Assertions.assertEquals("sha256" +
-                ":b8604a3fe8543c9e6afc29550de05b36cd162a97aa9b2833864ea8a5be11f3e2",
+            ":b8604a3fe8543c9e6afc29550de05b36cd162a97aa9b2833864ea8a5be11f3e2",
             reference.getDigest());
     }
 

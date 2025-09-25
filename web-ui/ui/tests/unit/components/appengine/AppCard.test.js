@@ -4,6 +4,16 @@ import VueRouter from 'vue-router';
 
 import AppCard from '@/components/appengine/AppCard';
 
+jest.mock('cytomine-client', () => ({
+  Cytomine: {
+    instance: {
+      api: {
+        post: jest.fn(),
+      },
+    },
+  },
+}));
+
 describe('AppCard.vue', () => {
   const localVue = createLocalVue();
   localVue.use(Buefy);

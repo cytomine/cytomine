@@ -3,6 +3,16 @@ import Buefy from 'buefy';
 
 import AppEngineSideBar from '@/components/appengine/sidebar/AppEngineSidebar.vue';
 
+jest.mock('cytomine-client', () => ({
+  Cytomine: {
+    instance: {
+      api: {
+        get: jest.fn(),
+      },
+    },
+  },
+}));
+
 jest.mock('@/utils/image-utils', () => ({
   isWebPSupported: jest.fn(() => true)
 }));

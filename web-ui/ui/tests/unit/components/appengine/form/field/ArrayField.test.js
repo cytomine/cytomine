@@ -4,6 +4,16 @@ import Buefy from 'buefy';
 import ArrayField from '@/components/appengine/forms/fields/ArrayField';
 import ArrayModal from '@/components/appengine/forms/fields/array/ArrayModal';
 
+jest.mock('cytomine-client', () => ({
+  Cytomine: {
+    instance: {
+      api: {
+        get: jest.fn(),
+      },
+    },
+  },
+}));
+
 jest.mock('@/utils/image-utils', () => ({
   isWebPSupported: jest.fn(() => true)
 }));

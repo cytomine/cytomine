@@ -291,28 +291,9 @@ services:
       host_network:
         ipv4_address: 172.16.238.15
 
-  # k3s-agent:
-  #   image: "rancher/k3s:v1.30.14-rc3-k3s3"
-  #   tmpfs:
-  #   - /run
-  #   - /var/run
-  #   ulimits:
-  #     nproc: 65535
-  #     nofile:
-  #       soft: 65535
-  #       hard: 65535
-  #   privileged: true
-  #   restart: always
-  #   environment:
-  #   - K3S_URL=https://k3s:6443
-  #   - K3S_TOKEN=65535-65535-65535 # plain text secret!
-  #   volumes:
-  #   - k3s-agent:/var/lib/rancher/k3s
-
 volumes:
   k3s-server: {}
   k3s-agent: {}
-
 
 networks:
   host_network:

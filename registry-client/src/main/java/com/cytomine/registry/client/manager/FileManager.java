@@ -128,7 +128,7 @@ public class FileManager {
             StandardCharsets.UTF_8);
         List<ManifestFile> manifestFiles = JsonUtil.fromJson(manifestContent,
             new TypeToken<List<ManifestFile>>() {
-            });
+        });
         if (manifestFiles.size() == 0) throw new TarFileErrException("manifest.json error");
         ManifestFile manifestFile = manifestFiles.get(0);
         Blob config = findBlob.apply(manifestFile.getConfig());

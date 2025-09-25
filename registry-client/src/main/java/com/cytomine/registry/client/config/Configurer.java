@@ -7,9 +7,7 @@ import com.cytomine.registry.client.http.auth.Credential;
 public class Configurer {
     private static final Authenticator AUTHENTICATOR = Authenticator.instance();
     private static Configurer configurer;
-    private String scheme;
-    private String host;
-    private String port;
+    private String url;
     private String userName;
     private String password;
     private boolean authenticated;
@@ -26,37 +24,20 @@ public class Configurer {
         }
     }
 
-    public static void schema(String schema) {
-        configurer.scheme = schema;
+    public static String url(String url) {
+        return configurer.url = url;
     }
 
-    public static String schema() {
-        return configurer.scheme;
-    }
-
-    public static String host(String host) {
-        return configurer.host = host;
-    }
-
-    public static String host() {
-        return configurer.host;
-    }
-
-    public static String port(String port) {
-        return configurer.port = port;
-    }
-
-    public static String port() {
-        return configurer.port;
+    public static String url() {
+        return configurer.url;
     }
 
     public static void authenticate(String userName, String password) {
         configurer.authenticated = true;
         configurer.userName = userName;
         configurer.password = password;
-        String endpoint = String.format("%s://%s:%s", configurer.scheme, configurer.host,
-            configurer.port);
-        AUTHENTICATOR.basic(endpoint, new Credential(configurer.userName, configurer.password));
+        AUTHENTICATOR.basic(configurer.url, new Credential(configurer.userName,
+            configurer.password));
     }
 
     public static boolean authenticated() {

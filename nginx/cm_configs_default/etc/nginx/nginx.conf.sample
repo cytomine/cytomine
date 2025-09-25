@@ -110,17 +110,6 @@ http {
             proxy_pass http://$tmpsamhost;
         }
 
-        location ~ ^/registry/(.*) {
-            set $tmpregistryhost "$INTERNAL_URLS_REGISTRY";
-            proxy_pass http://$tmpregistryhost/$request_uri;
-        }
-
-        # also the registry
-        location /v2 {
-            set $tmpregistryhost "$INTERNAL_URLS_REGISTRY";
-            proxy_pass http://$tmpregistryhost;
-        }
-
         # Internal communication to CORE from other internal micro-services.
         # Base path convention: "/api" + special endpoints that should be moved under "/api" base path in the future.
         location ~ /(api|ws|server/ping|session/admin|custom-ui) {

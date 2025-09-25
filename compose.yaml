@@ -251,7 +251,6 @@ services:
       INTERNAL_URLS_APPENGINE: app-engine:8080
       INTERNAL_URLS_IAM: iam:8100
       INTERNAL_URLS_WEB_UI: web-ui
-      INTERNAL_URLS_REGISTRY: registry:5000
       URLS_SCHEME: ${URLS_SCHEME:-http}
     networks:
       host_network:

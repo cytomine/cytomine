@@ -6,6 +6,16 @@ import UploadAppButton from '@/components/appengine/UploadAppButton.vue';
 import Task from '@/utils/appengine/task';
 import {flushPromises} from '../../../utils';
 
+jest.mock('cytomine-client', () => ({
+  Cytomine: {
+    instance: {
+      api: {
+        get: jest.fn(),
+      },
+    },
+  },
+}));
+
 jest.mock('@/utils/appengine/task');
 
 const BLoading = {

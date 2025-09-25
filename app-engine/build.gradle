@@ -103,7 +103,7 @@ dependencies {
     testImplementation 'org.junit.vintage:junit-vintage-engine:5.7.2'
 
     // registry client
-    implementation 'io.github.ya-b:registry-client:0.1.6'
+    implementation project(':registry-client')
 
     // liquibase
     liquibaseRuntime 'info.picocli:picocli:4.7.5'

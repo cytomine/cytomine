@@ -19,10 +19,13 @@ RUN mkdir -p /opt/gradle/.gradle
 ENV GRADLE_USER_HOME=/opt/gradle/.gradle
 
 WORKDIR /app
-COPY ../src /app/src
-COPY ../build.gradle /app/build.gradle
+COPY ./app-engine/src /app/app-engine/src
+COPY ./app-engine/build.gradle /app/app-engine/build.gradle
 
-RUN gradle clean compileJava --no-daemon --console=verbose
+COPY ./registry-client /app/registry-client
+COPY ./settings.gradle /app/settings.gradle
+
+RUN gradle :app-engine:clean :app-engine:compileJava --no-daemon --console=verbose
 
 #######################################################################################
 ## Stage: building the jar file
@@ -32,15 +35,17 @@ ENV GRADLE_USER_HOME=/opt/gradle/.gradle
 COPY --from=deps-downloader /opt/gradle/.gradle /opt/gradle/.gradle
 
 WORKDIR /app
-COPY ../src /app/src
-COPY ../build.gradle /app/build.gradle
+COPY ./registry-client /app/registry-client
+COPY ./app-engine/src /app/app-engine/src
+COPY ./app-engine/build.gradle /app/app-engine/build.gradle
+COPY ./settings.gradle /app/settings.gradle
 
 ARG APP_ENGINE_VERSION
 ENV APP_ENGINE_VERSION=$APP_ENGINE_VERSION
 
-RUN sed -i -- "s/version: ce-0.0.0/version: ${APP_ENGINE_VERSION}/g" /app/src/main/resources/application.yml  && \
-    sed -i -- "s/version = 'ce-0.0.0-SNAPSHOT'/version = '${APP_ENGINE_VERSION}'/g" /app/build.gradle  && \
-    gradle bootJar --console=verbose
+RUN sed -i -- "s/version: ce-0.0.0/version: ${APP_ENGINE_VERSION}/g" /app/app-engine/src/main/resources/application.yml  && \
+    sed -i -- "s/version = 'ce-0.0.0-SNAPSHOT'/version = '${APP_ENGINE_VERSION}'/g" /app/app-engine/build.gradle  && \
+    gradle :app-engine:bootJar --console=verbose
 
 #######################################################################################
 ## Stage: entrypoint script. Use a multi-stage because COPY --from cannot interpolate variables
@@ -92,7 +97,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV LANG=C.UTF-8
 
 # base librairies and configuration
-COPY --from=jar-builder /app/build/libs/cytomine-app-engine.jar /app/cytomine-app-engine.jar
+COPY --from=jar-builder /app/app-engine/build/libs/cytomine-app-engine.jar /app/cytomine-app-engine.jar
 
 # entrypoint scripts
 RUN mkdir /docker-entrypoint-cytomine.d/

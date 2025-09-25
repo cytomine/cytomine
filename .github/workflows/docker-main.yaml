@@ -1,7 +1,9 @@
-name: PR
+name: Docker
 
 on:
-  pull_request:
+  push:
+    branches:
+      - main
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -9,7 +11,7 @@ concurrency:
 
 jobs:
   build-push:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     strategy:
       fail-fast: true
@@ -21,21 +23,26 @@ jobs:
           - name: cbir
           - name: core
           - name: iam
-          # - name: mongo
           - name: nginx
           - name: pims
           - name: postgis
           - name: sam
           - name: web-ui
+          - name: mongo
           - name: python-client
             path: clients/python
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Log in to Cytomine registry
         uses: docker/login-action@v3
@@ -45,11 +52,13 @@ jobs:
           password: ${{ secrets.REGISTRY_TOKEN }}
 
       - name: Build and push Docker image
+        id: push
         uses: docker/build-push-action@v6
         with:
-          context: ${{ matrix.image.context || format('./{0}', matrix.image.name) }}
-          file: ./${{ matrix.image.path || matrix.image.name }}/Dockerfile
+          context: ${{ matrix.image.context || matrix.image.name }}
+          file: ./${{ matrix.image.file || matrix.image.context || matrix.image.name }}/Dockerfile
           push: true
-          tags: registry.cytomine.org/cytomine/${{ matrix.image.name }}
+          tags: cytomine/${{ matrix.image.name }}
+          labels: latest
           allow: network.host
           network: host

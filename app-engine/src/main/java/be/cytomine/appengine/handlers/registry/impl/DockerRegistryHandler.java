@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
 
-import io.github.ya_b.registry.client.RegistryClient;
+import com.cytomine.registry.client.RegistryClient;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,7 +42,7 @@ public class DockerRegistryHandler implements RegistryHandler {
     public void pushImage(InputStream imageInputStream, String imageName) throws RegistryException {
         log.info("Docker Registry Handler: pushing image...");
         try {
-            RegistryClient.push(String.valueOf(imageInputStream), imageName);
+            RegistryClient.push(imageInputStream, imageName);
             log.info("Docker Registry Handler: image pushed");
         } catch (FileNotFoundException e) {
             log.error("Image data file not found: {}", imageName, e);

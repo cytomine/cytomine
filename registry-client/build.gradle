@@ -1,9 +1,6 @@
 plugins {
     id 'java-library'
-    id 'io.freefair.lombok' version '6.6.1'
-    id 'maven-publish'
-    id 'signing'
-    id "io.github.gradle-nexus.publish-plugin" version "2.0.0-rc-1"
+    id 'io.freefair.lombok' version '9.0.0-rc2'
 }
 
 group 'com.cytomine'
@@ -47,72 +44,6 @@ javadoc {
     }
     options.encoding = "UTF-8"
     failOnError = false
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            artifactId = "registry-client"
-            from components.java
-            versionMapping {
-                usage('java-api') {
-                    fromResolutionOf('runtimeClasspath')
-                }
-                usage('java-runtime') {
-                    fromResolutionResult()
-                }
-            }
-
-            pom {
-                name = 'registry-client'
-                packaging = 'jar'
-                // optionally artifactId can be defined here
-                description = 'A Java client for connecting to the API of a Docker registry v2.'
-                url = 'http://github.com/cytomine/registry-client'
-
-                scm {
-                    url = 'https://github.com/cytomine/registry-client.git'
-                    connection = 'scm:git:https://github.com/cytomine/registry-client.git'
-                    developerConnection = 'scm:git:https://github.com/cytomine/registry-client.git'
-                }
-
-                licenses {
-                    license {
-                        name = 'The Apache License, Version 2.0'
-                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
-                }
-
-                developers {
-                    developer {
-                        id = 'ya-b'
-                        name = 'yangbo'
-                        email = 'ya-b@outlook.com'
-                    }
-                    developer {
-                        id = 'cytomine'
-                        name = 'cytominedev'
-                        email = 'dev@cytomine.com'
-                    }
-                }
-            }
-        }
-    }
-}
-
-nexusPublishing {
-    repositories {
-        create("comcytomine") {
-            nexusUrl = uri("https://s01.oss.sonatype.org/service/local/")
-            snapshotRepositoryUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-            username = ossrhUsername
-            password = ossrhPassword
-        }
-    }
-}
-
-signing {
-    sign publishing.publications.mavenJava
 }
 
 static def updateReadMeVersion(String ver) {

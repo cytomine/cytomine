@@ -80,7 +80,7 @@ public class TaskRunController {
         @PathVariable("param_name") String parameterName,
         HttpServletRequest request
     ) throws IOException, ProvisioningException {
-        log.info("/task-runs/%s/input-provisions/%s JSON POST", runId, parameterName);
+        log.info("/task-runs/{}/input-provisions/{} JSON POST", runId, parameterName);
         // find the path for the storage
         Path filePath = taskRunService.prepareStreaming(
             runId,

@@ -19,7 +19,7 @@ jobs:
         image:
           - name: app-engine
             context: '.'
-            dockerfile_path: app-engine
+            file: app-engine
           - name: cbir
           - name: core
           - name: iam
@@ -30,7 +30,7 @@ jobs:
           - name: web-ui
           - name: mongo
           - name: python-client
-            path: clients/python
+            context: clients/python
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

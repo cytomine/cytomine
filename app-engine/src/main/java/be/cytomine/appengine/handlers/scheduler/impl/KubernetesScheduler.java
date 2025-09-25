@@ -84,6 +84,9 @@ public class KubernetesScheduler implements SchedulerHandler {
     @Value("${scheduler.use-host-network}")
     private boolean useHostNetwork;
 
+    @Value("${scheduler.tasks-namespace}")
+    private String tasksNamespace;
+
     private String baseInputPath;
 
     private String baseOutputPath;
@@ -218,7 +221,7 @@ public class KubernetesScheduler implements SchedulerHandler {
         String wait = "export TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token); ";
         wait += "while ! curl -vk -H \"Authorization: Bearer $TOKEN\" ";
         wait += "https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT_HTTPS}/api/v1"
-            + "/namespaces/default/pods/${POD_NAME}/status ";
+            + "/namespaces/" + tasksNamespace + "/pods/${POD_NAME}/status ";
         wait += "| jq '.status | .containerStatuses[] | select(.name == \"task\") | .state ";
         wait += "| keys[0]' | grep -q -F \"terminated\"; do sleep 2; done";
 
@@ -292,6 +295,7 @@ public class KubernetesScheduler implements SchedulerHandler {
         PodBuilder podBuilder = new PodBuilder()
             .withNewMetadata()
             .withName(podName)
+            .withNamespace(tasksNamespace)
             .withLabels(Map.of("runId", runId, "app", "task"))
             .endMetadata()
             .withNewSpec()
@@ -390,7 +394,7 @@ public class KubernetesScheduler implements SchedulerHandler {
         try {
             kubernetesClient
                 .pods()
-                .inNamespace("default")
+                .inNamespace(tasksNamespace)
                 .resource(podBuilder.build())
                 .create();
         } catch (KubernetesClientException e) {
@@ -412,7 +416,7 @@ public class KubernetesScheduler implements SchedulerHandler {
         try {
             kubernetesClient
                 .pods()
-                .inNamespace("default")
+                .inNamespace(tasksNamespace)
                 .list();
         } catch (KubernetesClientException e) {
             throw new SchedulingException("Scheduler is not alive");
@@ -430,7 +434,7 @@ public class KubernetesScheduler implements SchedulerHandler {
         log.info("Monitor: add informer to the cluster");
         kubernetesClient
             .pods()
-            .inNamespace("default")
+            .inNamespace(tasksNamespace)
             .inform(podInformer)
             .run();
         log.info("Monitor: informer added");

@@ -160,6 +160,7 @@ services:
       SCHEDULER_ADVERTISED_URL: http://172.16.238.10:8080
       SCHEDULER_REGISTRY_ADVERTISED_URL: 172.16.238.4:5000
       SCHEDULER_USE_HOST_NETWORK: true
+      SCHEDULER_TASKS_NAMESPACE: app-engine-tasks
       KUBERNETES_MASTER: https://k3s:6443/
     networks:
       host_network:

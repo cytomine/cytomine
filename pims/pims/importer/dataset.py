@@ -58,7 +58,7 @@ class DatasetImporter:
 
         return valid_datasets, invalid_datasets
 
-    def import_dataset(
+    def import_images(
         self,
         root: Path,
         create_project: Optional[bool],
@@ -171,7 +171,7 @@ class DatasetImporter:
 
             for dataset_root in datasets:
                 dataset_name = os.path.basename(dataset_root)
-                valid_datasets[dataset_name] = self.import_dataset(
+                valid_datasets[dataset_name] = self.import_images(
                     dataset_root,
                     create_project,
                     project_names,

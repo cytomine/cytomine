@@ -6,6 +6,16 @@ import ArrayModal from '@/components/appengine/forms/fields/array/ArrayModal';
 import BooleanField from '@/components/appengine/forms/fields/BooleanField';
 import CytomineModal from '@/components/utils/CytomineModal';
 
+jest.mock('cytomine-client', () => ({
+  Cytomine: {
+    instance: {
+      api: {
+        get: jest.fn(),
+      },
+    },
+  },
+}));
+
 jest.mock('@/utils/image-utils', () => ({
   isWebPSupported: jest.fn(() => true)
 }));

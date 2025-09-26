@@ -650,26 +650,22 @@ public class ProjectService extends ModelService {
             boolean deleteTerms = jsonNewData.getJSONAttrBoolean("forceOntologyUpdate", false);
             long associatedTermsCount;
             long userAssociatedTermsCount = 0L;
-            long algoAssociatedTermsCount = 0L;
             long reviewedAssociatedTermsCount = 0L;
             if(!deleteTerms) {
                 userAssociatedTermsCount += annotationTermService.list(project).size();
             }
-            algoAssociatedTermsCount += 0;
             reviewedAssociatedTermsCount += reviewedAnnotationService.countByProjectAndWithTerms(project);
-            associatedTermsCount = userAssociatedTermsCount + algoAssociatedTermsCount + reviewedAssociatedTermsCount;
+            associatedTermsCount = userAssociatedTermsCount + reviewedAssociatedTermsCount;
 
             if(associatedTermsCount > 0){
                 String message = "This project has " + associatedTermsCount + " associated terms: ";
                 if(!deleteTerms) {
                     message += userAssociatedTermsCount + " from project members, ";
                 }
-                message += algoAssociatedTermsCount + " from jobs and ";
                 message += reviewedAssociatedTermsCount + " reviewed. ";
                 message += "The ontology cannot be updated.";
                 throw new ForbiddenException(message, Map.of(
                         "userAssociatedTermsCount", userAssociatedTermsCount,
-                        "algoAssociatedTermsCount", algoAssociatedTermsCount,
                         "reviewedAssociatedTermsCount", reviewedAssociatedTermsCount));
             }
             if(deleteTerms) {
@@ -876,7 +872,6 @@ public class ProjectService extends ModelService {
     protected void beforeUpdate(CytomineDomain domain) {
         Project project = (Project)domain;
         project.setCountAnnotations(annotationDomainRepository.countAllUserAnnotationAndProject(domain.getId()));
-//        project.setCountJobAnnotations(annotationDomainRepository.countAllAlgoAnnotationAndProject(domain.getId()));
         project.setCountReviewedAnnotations(annotationDomainRepository.countAllReviewedAnnotationAndProject(domain.getId()));
         project.setCountImages(imageInstanceRepository.countAllByProject(project));
     }

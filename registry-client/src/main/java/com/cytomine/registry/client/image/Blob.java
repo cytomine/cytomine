@@ -1,0 +1,19 @@
+package com.cytomine.registry.client.image;
+
+import java.io.InputStream;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Blob {
+
+    // manifest.json中的名字。tar entry.name
+    private String name;
+    private Long size;
+    private String digest;
+    private Supplier<InputStream> content;
+}

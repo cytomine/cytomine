@@ -58,7 +58,7 @@ public class TaskRunController {
         @PathVariable("param_name") String parameterName,
         @RequestBody JsonNode provision
     ) throws ProvisioningException {
-        log.info("/task-runs/{run_id}/input-provisions/{param_name} JSON PUT");
+        log.info("/task-runs/{}/input-provisions/{} JSON PUT", runId, parameterName);
         JsonNode provisioned = taskRunService.provisionRunParameter(
             runId,
             parameterName,
@@ -80,7 +80,7 @@ public class TaskRunController {
         @PathVariable("param_name") String parameterName,
         HttpServletRequest request
     ) throws IOException, ProvisioningException {
-        log.info("/task-runs/{run_id}/input-provisions/{param_name} File POST");
+        log.info("/task-runs/{}/input-provisions/{} JSON POST", runId, parameterName);
         // find the path for the storage
         Path filePath = taskRunService.prepareStreaming(
             runId,

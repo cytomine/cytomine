@@ -40,7 +40,6 @@ It is possible to retrieve a list of resources with the same domain using a `GET
 | Storage \| Uploaded file          | Manage uploaded files in a storage                        |
 | Annotation                        | Manage annotations regardless its type                    |
 | Annotation \| User annot.         | Manage annotations created by human users                 |
-| Annotation \| Algo annot.         | Manage annotations created by jobs                        |
 | Annotation \| Reviewed annot.     | Manage reviewed annotations validated by human users      |
 | Annotation \| Annotation index    | Manage annotation indexes                                 |
 | Annotation \| Associated term     | Manage terms associated to annotations                    |

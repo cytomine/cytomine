@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.util.Optional;
 
 import com.cytomine.registry.client.RegistryClient;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -26,14 +27,9 @@ public class DockerRegistryHandler implements RegistryHandler {
     @Value("${registry.password}")
     private Optional<String> registryPassword = Optional.empty();
 
-    public DockerRegistryHandler(
-        String registryHost,
-        String registryPort,
-        String registryScheme,
-        Optional<String> registryUsername,
-        Optional<String> registryPassword
-    ) throws IOException {
-        RegistryClient.config(registryScheme, registryHost, registryPort);
+    @PostConstruct
+    void init() throws IOException {
+        RegistryClient.config(registryHost);
         if (registryUsername.filter(e -> !e.isBlank()).isPresent()) {
             RegistryClient.authenticate(registryUsername.get(),
                 registryPassword.orElseThrow(() -> new IllegalArgumentException("Username was "

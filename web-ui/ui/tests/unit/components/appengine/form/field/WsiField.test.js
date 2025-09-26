@@ -3,6 +3,16 @@ import Buefy from 'buefy';
 
 import WsiField from '@/components/appengine/forms/fields/WsiField';
 
+jest.mock('cytomine-client', () => ({
+  Cytomine: {
+    instance: {
+      api: {
+        get: jest.fn(),
+      },
+    },
+  },
+}));
+
 jest.mock('@/utils/image-utils', () => ({
   isWebPSupported: jest.fn(() => true),
 }));

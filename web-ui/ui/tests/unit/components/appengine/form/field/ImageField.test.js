@@ -3,6 +3,16 @@ import Buefy from 'buefy';
 
 import ImageField from '@/components/appengine/forms/fields/ImageField';
 
+jest.mock('cytomine-client', () => ({
+  Cytomine: {
+    instance: {
+      api: {
+        get: jest.fn(),
+      },
+    },
+  },
+}));
+
 jest.mock('@/utils/image-utils', () => ({
   isWebPSupported: jest.fn(() => true)
 }));

@@ -1,0 +1,56 @@
+plugins {
+    id 'java-library'
+    id 'io.freefair.lombok' version '9.0.0-rc2'
+}
+
+group 'com.cytomine'
+version '0.0.0'  // do NOT change this, this will be automatically changed by CI
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'net.jodah:expiringmap:0.5.10'
+    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'com.squareup.okhttp3:okhttp:4.10.0'
+    implementation 'org.apache.commons:commons-compress:1.25.0'
+    implementation 'org.slf4j:slf4j-api:2.0.9'
+    testImplementation 'ch.qos.logback:logback-classic:1.4.14'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+javadoc {
+    if (JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
+        options.addStringOption('Xdoclint:none', '-quiet')
+        options.addBooleanOption('quiet', true)
+        options.addBooleanOption('warnings', false)
+    }
+    options.encoding = "UTF-8"
+    failOnError = false
+}
+
+static def updateReadMeVersion(String ver) {
+    var file = new File("README.md")
+    var content = new String(file.readBytes())
+    var newContent = content.replaceAll("<version>\\d+\\.\\d+\\.\\d+</version>", "<version>$ver</version>")
+    if (newContent != content) {
+        file.write(newContent)
+    }
+}

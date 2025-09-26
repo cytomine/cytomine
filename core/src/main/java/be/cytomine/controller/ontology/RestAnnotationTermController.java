@@ -5,7 +5,6 @@ import be.cytomine.domain.ontology.*;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.ontology.AnnotationDomainRepository;
-import be.cytomine.repository.ontology.TermRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.ontology.*;
 import be.cytomine.service.security.UserService;
@@ -29,8 +28,6 @@ public class RestAnnotationTermController extends RestCytomineController {
 
     private final AnnotationTermService annotationTermService;
 
-    private final TermRepository termRepository;
-
     private final AnnotationDomainRepository annotationDomainRepository;
 
     private final UserAnnotationService userAnnotationService;
@@ -45,7 +42,6 @@ public class RestAnnotationTermController extends RestCytomineController {
 
     private final CurrentUserService currentUserService;
 
-
     @GetMapping("/annotation/{idAnnotation}/term.json")
     public ResponseEntity<String> listByAnnotation(
             @PathVariable Long idAnnotation,
@@ -57,8 +53,6 @@ public class RestAnnotationTermController extends RestCytomineController {
                 .orElseThrow(() -> new ObjectNotFoundException("Annotation", idAnnotation));
         if (idUser==null && annotation.isUserAnnotation()) {
             results.addAll(annotationTermService.list((UserAnnotation)annotation));
-//        } else if(idUser==null && annotation.isAlgoAnnotation()) {
-//            results.addAll(algoAnnotationTermService.list((AlgoAnnotation)annotation));
         } else if(idUser==null && annotation.isReviewedAnnotation()) {
             results.addAll(reviewedAnnotationService.listTerms((ReviewedAnnotation)annotation));
         } else if(idUser!=null) {
@@ -99,26 +93,15 @@ public class RestAnnotationTermController extends RestCytomineController {
         if (idUser!=null) {
             User user = userService.find(idUser)
                     .orElseThrow(() -> new ObjectNotFoundException("User", idUser));
-            //user is set, get a specific annotation-term link from user
-//            if (userService.getCurrentUser().isAlgo()) {
-//                return responseSuccess(algoAnnotationTermService.find(annotation, term, (UserJob) user)
-//                        .orElseThrow(() -> new ObjectNotFoundException("AlgoAnnotationTerm", annotation + "-"+term+"-"+idUser)));
-//            } else {
-                return responseSuccess(annotationTermService.find(annotation, term, user)
-                        .orElseThrow(() -> new ObjectNotFoundException("AnnotationTerm", annotation + "-"+term+"-"+idUser)));
-//            }
+
+            return responseSuccess(annotationTermService.find(annotation, term, user)
+                .orElseThrow(() -> new ObjectNotFoundException("AnnotationTerm", annotation + "-" + term + "-" + idUser)));
         } else {
-            //user is not set, we will get the annotation-term from all user
-//            if(userService.getCurrentUser().isAlgo()) {
-//                return responseSuccess(algoAnnotationTermService.find(annotation, term, null)
-//                        .orElseThrow(() -> new ObjectNotFoundException("AlgoAnnotationTerm", annotation + "-"+term+"-null")));
-//            } else {
-                return responseSuccess(annotationTermService.find(annotation, term, null)
-                        .orElseThrow(() -> new ObjectNotFoundException("AnnotationTerm", annotation + "-"+term+"-null")));
-//            }
+            // user is not set, we will get the annotation-term from all user
+            return responseSuccess(annotationTermService.find(annotation, term, null)
+                .orElseThrow(() -> new ObjectNotFoundException("AnnotationTerm", annotation + "-" + term + "-null")));
         }
     }
-
 
     /**
      * Add a new annotation with two terms
@@ -127,7 +110,7 @@ public class RestAnnotationTermController extends RestCytomineController {
     public ResponseEntity<String> add(@RequestBody JsonObject json) {
         log.debug("REST request to save annotation term : " + json);
 
-        //Get annotation, it can be a userAnnotation, an algoAnnotation or a Reviewed
+        // Get annotation, it can be a user annotation or a reviewed annotation
         AnnotationDomain annotation =
                 annotationDomainRepository.findById(json.get("annotationIdent")!=null ? json.getJSONAttrLong("annotationIdent") : json.getJSONAttrLong("userannotation"))
                 .orElseThrow(() -> new ObjectNotFoundException("Annotation", "annotationIdent="+json.getJSONAttrStr("annotationIdent","null") + "-userannotation="+json.getJSONAttrStr("userannotation","null")));

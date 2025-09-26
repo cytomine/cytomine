@@ -465,9 +465,6 @@ export default class Project extends Model {
       case AnnotationType.USER:
         uri = 'userannotation';
         break;
-      case AnnotationType.ALGO:
-        uri = 'algoannotation';
-        break;
       case AnnotationType.REVIEWED:
         uri = 'reviewedannotation';
         break;
@@ -504,9 +501,6 @@ export default class Project extends Model {
     switch (annotationType) {
       case AnnotationType.USER:
         uri = 'annotationevolution';
-        break;
-      case AnnotationType.ALGO:
-        uri = 'algoannotationevolution';
         break;
       case AnnotationType.REVIEWED:
         uri = 'reviewedannotationevolution';

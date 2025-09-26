@@ -56,7 +56,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    // compileOnly("org.springframework.boot:spring-boot-devtools")
 
     implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.0.87'
     implementation group: 'org.apache.commons', name: 'commons-compress', version: '1.24.0'

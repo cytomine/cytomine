@@ -70,6 +70,8 @@ def import_dataset(
     Import datasets from a predefined folder without moving the data.
     """
 
+    cytomine_logger.info(f"{request.method} {request.url.path}?{request.url.query}")
+
     if not storage_id:
         raise BadRequestException(detail="'storage_id' parameter is missing.")
 

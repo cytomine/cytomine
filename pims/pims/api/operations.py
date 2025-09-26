@@ -41,6 +41,7 @@ from pims.files.file import Path
 from pims.importer.dataset import DatasetImporter
 from pims.importer.importer import run_import
 from pims.importer.listeners import CytomineListener
+from pims.schemas.auth import ApiCredentials, CytomineAuth
 from pims.tasks.queue import Task, send_task
 from pims.utils.iterables import ensure_list
 from pims.utils.strings import unique_name_generator
@@ -69,25 +70,26 @@ def import_datasets(
 
     cytomine_logger.info(f"{request.method} {request.url.path}?{request.url.query}")
 
-    public_key, signature = parse_authorization_header(request.headers)
-    token = parse_request_token(request)
-    cytomine_auth = (
-        INTERNAL_URL_CORE,
-        config.cytomine_public_key,
-        config.cytomine_private_key,
+    cytomine_auth = CytomineAuth(
+        host=INTERNAL_URL_CORE,
+        public_key=config.cytomine_public_key,
+        private_key=config.cytomine_private_key,
     )
 
-    print(f"{public_key}:{signature}")
-    print(f"{INTERNAL_URL_CORE}:{config.cytomine_public_key}:{config.cytomine_private_key}")
+    public_key, signature = parse_authorization_header(request.headers)
+    token = parse_request_token(request)
+    api_credentials = ApiCredentials(
+        public_key=public_key,
+        token=token,
+        signature=signature,
+    )
 
     response = importer.import_dataset(
         storage_id,
         dataset_names,
         create_project,
         cytomine_auth,
-        public_key,
-        signature,
-        token,
+        api_credentials
     )
 
     return response

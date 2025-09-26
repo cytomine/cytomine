@@ -10,16 +10,13 @@ from cytomine.models import (
 )
 
 from pims.api.exceptions import AuthenticationException, CytomineProblem
-from pims.api.utils.cytomine_auth import (
-    parse_authorization_header,
-    parse_request_token,
-    sign_token,
-)
+from pims.api.utils.cytomine_auth import sign_token
 from pims.config import get_settings
 from pims.files.file import Path
 from pims.importer.importer import run_import
 from pims.importer.listeners import CytomineListener
 from pims.importer.utils import check_dataset_structure, is_already_imported
+from pims.schemas.auth import ApiCredentials, CytomineAuth
 
 log = logging.getLogger("pims.app")
 
@@ -31,15 +28,13 @@ FILE_ROOT_PATH = Path(get_settings().root)
 class DatasetImporter:
     def import_dataset(
         self,
-        storage_id,
-        dataset_names,
-        create_project,
-        cytomine_auth,
-        public_key,
-        signature,
-        token,
+        storage_id: str,
+        dataset_names: str,
+        create_project: bool,
+        cytomine_auth: CytomineAuth,
+        credentials: ApiCredentials,
     ):
-        Path(WRITING_PATH).mkdir(parents=True, exist_ok=True)
+        WRITING_PATH.mkdir(parents=True, exist_ok=True)
 
         # Dataset discovery
         valid_datasets = []
@@ -73,17 +68,17 @@ class DatasetImporter:
             "invalid_datasets": invalid_datasets,
         }
 
-        with Cytomine(*cytomine_auth, configure_logging=False) as c:
+        with Cytomine(**cytomine_auth.model_dump(), configure_logging=False) as c:
             if not c.current_user:
                 raise AuthenticationException("PIMS authentication to Cytomine failed.")
 
-            cyto_keys = c.get(f"userkey/{public_key}/keys.json")
+            cyto_keys = c.get(f"userkey/{credentials.public_key}/keys.json")
             private_key = cyto_keys["privateKey"]
 
-            if sign_token(private_key, token) != signature:
+            if sign_token(private_key, credentials.token) != credentials.signature:
                 raise AuthenticationException("Authentication to Cytomine failed")
 
-            c.set_credentials(public_key, private_key)
+            c.set_credentials(credentials.public_key, private_key)
             user = c.current_user
 
             storage = Storage().fetch(storage_id)

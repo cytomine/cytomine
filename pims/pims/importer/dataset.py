@@ -80,7 +80,7 @@ class DatasetImporter:
                 result.project_created = False
             else:
                 project = Project(name=dataset_name).save()
-                result.project_created = False
+                result.project_created = True
 
         image_directory = Path(dataset_path) / "IMAGES"
         if not image_directory.exists():

@@ -3,7 +3,6 @@ import Model from './model.js';
 
 /** Enum providing the annotation types handled in Cytomine */
 export const AnnotationType = Object.freeze({
-  ALGO: 'AlgoAnnotation',
   USER: 'UserAnnotation',
   REVIEWED: 'ReviewedAnnotation',
   ROI: 'RoiAnnotation'

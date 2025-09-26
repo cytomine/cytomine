@@ -23,8 +23,7 @@ from pims.importer.utils import check_dataset_structure, is_already_imported
 
 log = logging.getLogger("pims.app")
 
-DATASET_PATH = get_settings().dataset_path
-PENDING_PATH = Path(get_settings().pending_path)
+DATASET_PATH = Path(get_settings().dataset_path)
 WRITING_PATH = Path(get_settings().writing_path)
 FILE_ROOT_PATH = Path(get_settings().root)
 
@@ -167,3 +166,5 @@ class DatasetImporter:
                                 "error": str(e),
                             }
                         )
+
+        return response

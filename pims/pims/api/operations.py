@@ -69,10 +69,26 @@ def import_datasets(
 
     cytomine_logger.info(f"{request.method} {request.url.path}?{request.url.query}")
 
-    if not storage_id:
-        raise BadRequestException(detail="'storage_id' parameter is missing.")
+    public_key, signature = parse_authorization_header(request.headers)
+    token = parse_request_token(request)
+    cytomine_auth = (
+        INTERNAL_URL_CORE,
+        config.cytomine_public_key,
+        config.cytomine_private_key,
+    )
 
-    response = importer.import_dataset(dataset_names, create_project, config)
+    print(f"{public_key}:{signature}")
+    print(f"{INTERNAL_URL_CORE}:{config.cytomine_public_key}:{config.cytomine_private_key}")
+
+    response = importer.import_dataset(
+        storage_id,
+        dataset_names,
+        create_project,
+        cytomine_auth,
+        public_key,
+        signature,
+        token,
+    )
 
     return response
 

@@ -10,8 +10,11 @@ from cytomine.models import (
 )
 
 from pims.api.exceptions import AuthenticationException, CytomineProblem
-from pims.api.operations import INTERNAL_URL_CORE
-from pims.api.utils.cytomine_auth import parse_authorization_header, parse_request_token, sign_token
+from pims.api.utils.cytomine_auth import (
+    parse_authorization_header,
+    parse_request_token,
+    sign_token,
+)
 from pims.config import get_settings
 from pims.files.file import Path
 from pims.importer.importer import run_import
@@ -27,7 +30,16 @@ FILE_ROOT_PATH = Path(get_settings().root)
 
 
 class DatasetImporter:
-    def import_dataset(dataset_names, create_project, config):
+    def import_dataset(
+        self,
+        storage_id,
+        dataset_names,
+        create_project,
+        cytomine_auth,
+        public_key,
+        signature,
+        token,
+    ):
         Path(WRITING_PATH).mkdir(parents=True, exist_ok=True)
 
         # Dataset discovery
@@ -50,13 +62,6 @@ class DatasetImporter:
             else:
                 invalid_datasets[dataset_path] = missing
 
-        public_key, signature = parse_authorization_header(request.headers)
-        cytomine_auth = (
-            INTERNAL_URL_CORE,
-            config.cytomine_public_key,
-            config.cytomine_private_key,
-        )
-
         response = {
             "valid_datasets": {
                 os.path.basename(dataset_path): {
@@ -76,7 +81,7 @@ class DatasetImporter:
             cyto_keys = c.get(f"userkey/{public_key}/keys.json")
             private_key = cyto_keys["privateKey"]
 
-            if sign_token(private_key, parse_request_token(request)) != signature:
+            if sign_token(private_key, token) != signature:
                 raise AuthenticationException("Authentication to Cytomine failed")
 
             c.set_credentials(public_key, private_key)

@@ -3,7 +3,7 @@ import os
 import traceback
 import warnings
 from distutils.util import strtobool
-from typing import Optional
+from typing import Annotated, Optional
 
 from cytomine import Cytomine
 from cytomine.models import (
@@ -17,19 +17,28 @@ from starlette.requests import Request
 from starlette.responses import FileResponse, JSONResponse, Response
 
 from pims.api.exceptions import (
-    AuthenticationException, BadRequestException, CytomineProblem, check_representation_existence
+    AuthenticationException,
+    BadRequestException,
+    CytomineProblem,
+    check_representation_existence,
 )
 from pims.api.utils.cytomine_auth import (
     parse_authorization_header,
-    parse_request_token, sign_token
+    parse_request_token,
+    sign_token,
 )
-from pims.api.utils.dataset import check_dataset_structure
+from pims.api.utils.deps import get_dataset_importer
 from pims.api.utils.multipart import FastSinglePartParser
-from pims.api.utils.parameter import filepath_parameter, imagepath_parameter, sanitize_filename
+from pims.api.utils.parameter import (
+    filepath_parameter,
+    imagepath_parameter,
+    sanitize_filename,
+)
 from pims.api.utils.response import serialize_cytomine_model
 from pims.config import Settings, get_settings
 from pims.files.archive import make_zip_archive
 from pims.files.file import Path
+from pims.importer.dataset import DatasetImporter
 from pims.importer.importer import run_import
 from pims.importer.listeners import CytomineListener
 from pims.tasks.queue import Task, send_task
@@ -41,26 +50,14 @@ router = APIRouter(prefix=get_settings().api_base_path)
 cytomine_logger = logging.getLogger("pims.cytomine")
 
 FILE_ROOT_PATH = get_settings().root
-DATASET_PATH = get_settings().dataset_path
 WRITING_PATH = get_settings().writing_path
 INTERNAL_URL_CORE = get_settings().internal_url_core
 
 
-def is_already_imported(image_path: Path, data_path: Path) -> bool:
-    """Check if an image was already imported."""
-
-    for upload_dir in data_path.iterdir():
-        if not upload_dir.is_dir():
-            continue
-        for candidate in upload_dir.iterdir():
-            if candidate.is_symlink() and candidate.resolve() == image_path.resolve():
-                return True
-    return False
-
-
 @router.post("/import", tags=["Import"])
-def import_dataset(
+def import_datasets(
     request: Request,
+    importer: Annotated[DatasetImporter, Depends(get_dataset_importer)],
     storage_id: int = Query(..., description="The storage where to import the datasets"),
     dataset_names: str = Query(None, description="Comma-separated list of dataset names to import"),
     create_project: bool = Query(False, description="Create a project for each dataset"),
@@ -75,124 +72,7 @@ def import_dataset(
     if not storage_id:
         raise BadRequestException(detail="'storage_id' parameter is missing.")
 
-    Path(WRITING_PATH).mkdir(parents=True, exist_ok=True)
-
-    # Dataset discovery
-    valid_datasets = []
-    invalid_datasets = {}
-
-    dataset_paths = dataset_names.split(",") if dataset_names else os.listdir(DATASET_PATH)
-    for dataset in dataset_paths:
-        dataset_path = os.path.join(DATASET_PATH, dataset)
-
-        if not os.path.isdir(dataset_path):
-            continue
-
-        is_valid, missing = check_dataset_structure(dataset_path)
-
-        if is_valid:
-            valid_datasets.append(dataset_path)
-        else:
-            invalid_datasets[dataset_path] = missing
-
-    public_key, signature = parse_authorization_header(request.headers)
-    cytomine_auth = (
-        INTERNAL_URL_CORE,
-        config.cytomine_public_key,
-        config.cytomine_private_key
-    )
-
-    response = {
-        "valid_datasets": {
-            os.path.basename(dataset_path): {
-                "uploaded_files": [],
-                "failed_files": [],
-                "skipped_files": [],
-            }
-            for dataset_path in valid_datasets
-        },
-        "invalid_datasets": invalid_datasets,
-    }
-
-    with Cytomine(*cytomine_auth, configure_logging=False) as c:
-        if not c.current_user:
-            raise AuthenticationException("PIMS authentication to Cytomine failed.")
-
-        cyto_keys = c.get(f"userkey/{public_key}/keys.json")
-        private_key = cyto_keys["privateKey"]
-
-        if sign_token(private_key, parse_request_token(request)) != signature:
-            raise AuthenticationException("Authentication to Cytomine failed")
-
-        c.set_credentials(public_key, private_key)
-        user = c.current_user
-
-        storage = Storage().fetch(storage_id)
-        if not storage:
-            raise CytomineProblem(f"Storage {storage_id} not found")
-
-        # Filter out existing datasets
-        current_projects = ProjectCollection().fetch()
-        project_names = {project.name: project for project in current_projects}
-
-        for dataset_root in valid_datasets:
-            dataset_path = [d for d in Path(dataset_root).iterdir() if d.is_dir()].pop()
-            dataset_name = os.path.basename(dataset_root)
-
-            if create_project:
-                if dataset_name in project_names:
-                    project = project_names[dataset_name]
-                    response["valid_datasets"][dataset_name]["project_created"] = False
-                else:
-                    project = Project(name=dataset_name).save()
-                    response["valid_datasets"][dataset_name]["project_created"] = True
-
-            image_directory = Path(dataset_path) / "IMAGES"
-            if not image_directory.exists():
-                image_directory = Path(dataset_path) / "images"
-            image_paths = list(image_directory.iterdir())
-
-            for image_path in image_paths:
-                if is_already_imported(image_path, Path(FILE_ROOT_PATH)):
-                    response["valid_datasets"][dataset_name]["skipped_files"].append(image_path.name)
-                    continue
-
-                tmp_path = Path(WRITING_PATH, image_path.name)
-                tmp_path.symlink_to(image_path, target_is_directory=image_path.is_dir())
-
-                uploadedFile = UploadedFile(
-                    original_filename=image_path.name,
-                    filename=str(tmp_path),
-                    size=image_path.size,
-                    ext="",
-                    content_type="",
-                    id_projects=[project.id] if create_project else [],
-                    id_storage=storage_id,
-                    id_user=user.id,
-                    status=UploadedFile.UPLOADED,
-                )
-
-                projects = ProjectCollection()
-                projects.append(project)
-                cytomine_listener = CytomineListener(
-                    cytomine_auth,
-                    uploadedFile,
-                    projects=projects,
-                    user_properties=iter([]),
-                )
-
-                try:
-                    run_import(
-                        tmp_path,
-                        image_path.name,
-                        extra_listeners=[cytomine_listener],
-                    )
-                    response["valid_datasets"][dataset_name]["uploaded_files"].append(image_path.name)
-                except Exception as e:
-                    response["valid_datasets"][dataset_name]["failed_files"].append({
-                        "file": image_path.name,
-                        "error": str(e),
-                    })
+    response = importer.import_dataset(dataset_names, create_project, config)
 
     return response
 

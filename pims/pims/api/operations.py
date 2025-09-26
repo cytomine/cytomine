@@ -42,6 +42,7 @@ from pims.importer.dataset import DatasetImporter
 from pims.importer.importer import run_import
 from pims.importer.listeners import CytomineListener
 from pims.schemas.auth import ApiCredentials, CytomineAuth
+from pims.schemas.operations import ImportResponse
 from pims.tasks.queue import Task, send_task
 from pims.utils.iterables import ensure_list
 from pims.utils.strings import unique_name_generator
@@ -58,12 +59,10 @@ INTERNAL_URL_CORE = get_settings().internal_url_core
 @router.post("/import", tags=["Import"])
 def import_datasets(
     request: Request,
+    config: Annotated[Settings, Depends(get_settings)],
     importer: Annotated[DatasetImporter, Depends(get_dataset_importer)],
-    storage_id: int = Query(..., description="The storage where to import the datasets"),
-    dataset_names: str = Query(None, description="Comma-separated list of dataset names to import"),
     create_project: bool = Query(False, description="Create a project for each dataset"),
-    config: Settings = Depends(get_settings),
-) -> JSONResponse:
+) -> ImportResponse:
     """
     Import datasets from a predefined folder without moving the data.
     """
@@ -84,15 +83,11 @@ def import_datasets(
         signature=signature,
     )
 
-    response = importer.import_dataset(
-        storage_id,
-        dataset_names,
-        create_project,
+    return importer.import_datasets(
         cytomine_auth,
-        api_credentials
+        api_credentials,
+        create_project,
     )
-
-    return response
 
 @router.post('/upload', tags=['Import'])
 async def import_direct_chunks(

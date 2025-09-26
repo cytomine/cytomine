@@ -12,7 +12,6 @@ export default class AnnotationCollection extends Collection {
     this.showWKT = null;
     this.showGIS = null;
     this.showTerm = null;
-    this.showAlgo = null;
     this.showUser = null;
     this.showImage = null;
     this.showSlice = null;
@@ -30,16 +29,13 @@ export default class AnnotationCollection extends Collection {
 
     this.user = null;
     this.users = null;
-    this.includeAlgo = null;
 
     this.kmeans = null;
 
     this.term = null;
     this.terms = null;
     this.suggestedTerm = null;
-    this.userForTermAlgo = null;
     this.noTerm = null;
-    this.noAlgoTerm = null;
     this.multipleTerm = null;
 
     this.bbox = null;

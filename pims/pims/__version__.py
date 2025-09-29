@@ -21,7 +21,7 @@
 __title__ = 'pims'
 __description__ = 'Cytomine Python Image Server'
 __url__ = 'https://doc.uliege.cytomine.org'
-__version__ = "0.0.0"
+__version__ = "1.4.0"
 __api_version__ = "0.0.0"
 __license__ = 'Apache 2.0'
 __copyright__ = 'Copyright 2020-2021 ULiège Cytomine R&D team'

@@ -1,3 +1,4 @@
 enabled,name,resolution_order
 1,pims-plugin-format-openslide,2
 1,pims-plugin-format-dicom,3
+1,pims-plugin-format-czi,4

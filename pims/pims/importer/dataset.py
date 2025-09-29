@@ -86,6 +86,7 @@ class DatasetImporter:
         dataset_name = os.path.basename(root)
 
         if create_project:
+            logger.info(f"Create or get project '{dataset_name}'")
             if dataset_name in project_names:
                 project = project_names[dataset_name]
                 result.project_created = False
@@ -100,6 +101,7 @@ class DatasetImporter:
 
         for image_path in image_paths:
             if is_already_imported(image_path, Path(FILE_ROOT_PATH)):
+                logger.debug(f"'{image_path}' already imported !")
                 result.skipped_files.append(image_path.name)
                 continue
 

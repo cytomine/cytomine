@@ -1,0 +1,3 @@
+[submodule "pims/resources/bigpicture_metaflex"]
+	path = pims/resources/bigpicture_metaflex
+	url = https://github.com/imi-bigpicture/bigpicture-metaflex.git

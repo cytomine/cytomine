@@ -97,6 +97,7 @@ kombu==5.2.4
     # via celery
 lazy-loader==0.1
     # via scikit-image
+lxml==6.0.2
 matplotlib==3.7.1
     # via cytomine-pims (setup.py)
 msgpack==1.0.4

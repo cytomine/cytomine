@@ -20,11 +20,15 @@ dependencies = [
   "orjson==3.10.3",
   "pathvalidate==2.5.2",
   "pillow==10.3.0",
+  "pims-plugin-format-czi",
+  "pims-plugin-format-dicom",
+  "pims-plugin-format-openslide",
   "pint==0.20.1",
   "pydantic==2.7.3",
   "pydantic-extra-types==2.8.0",
   "pydantic-settings==2.3.1",
-  "pydicom==2.3.1",
+  "pydicom==3.0.1",
+  "pylibjpeg>=2.1.0",
   "python-multipart==0.0.18",
   "pyvips==2.2.3",
   "pyyaml==6.0.3",
@@ -44,3 +48,15 @@ dev = [
   "pytest>=8.4.2",
   "ruff>=0.13.2",
 ]
+
+[tool.uv.workspace]
+members = [
+  "plugins/pims-plugin-format-dicom",
+  "plugins/pims-plugin-format-czi",
+  "plugins/pims-plugin-format-openslide",
+]
+
+[tool.uv.sources]
+pims-plugin-format-dicom = { workspace = true }
+pims-plugin-format-czi = { workspace = true }
+pims-plugin-format-openslide = { workspace = true }

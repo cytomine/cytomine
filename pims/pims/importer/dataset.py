@@ -101,7 +101,7 @@ class DatasetImporter:
 
         for image_path in image_paths:
             if is_already_imported(image_path, Path(FILE_ROOT_PATH)):
-                logger.debug(f"'{image_path}' already imported !")
+                logger.debug(f"'{image_path}' already imported!")
                 result.skipped_files.append(image_path.name)
                 continue
 
@@ -145,6 +145,10 @@ class DatasetImporter:
                 )
 
         return result
+
+    def import_metadata() -> None:
+        # Validate metadata
+        ...
 
     def import_datasets(
         self,

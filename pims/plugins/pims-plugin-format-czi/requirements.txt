@@ -1,3 +1,0 @@
-czifile==2019.7.2
-pylibCZIrw==3.5.2
-tifftools

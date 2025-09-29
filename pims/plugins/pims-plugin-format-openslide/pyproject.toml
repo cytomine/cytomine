@@ -2,7 +2,7 @@
 name = "pims-plugin-format-openslide"
 version = "1.0.0"
 description = "Openslide plugin for PIMS"
-authors = [{ name = "Cytomine ULiège", email = "uliege@cytomine.org" }]
+authors = [{ name = "Ulysse Rubens", email = "uliege@cytomine.org" }]
 readme = "README.md"
 requires-python = ">=3.10"
 license = "Apache-2.0"

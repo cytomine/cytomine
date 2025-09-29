@@ -1,3 +1,0 @@
-pre-commit
-pylint
-flake8

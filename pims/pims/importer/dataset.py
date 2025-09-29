@@ -17,6 +17,7 @@ from pims.config import get_settings
 from pims.files.file import Path
 from pims.importer.importer import run_import
 from pims.importer.listeners import CytomineListener
+from pims.importer.metadata import MetadataValidator
 from pims.schemas.auth import ApiCredentials, CytomineAuth
 from pims.schemas.operations import ImportResponse, ImportResult
 
@@ -146,9 +147,17 @@ class DatasetImporter:
 
         return result
 
-    def import_metadata() -> None:
-        # Validate metadata
-        ...
+    def import_metadata(self, root) -> None:
+        dataset_path = [d for d in Path(root).iterdir() if d.is_dir()].pop()
+        dataset_name = os.path.basename(root)
+        metadata_path = dataset_path / "METADATA"
+
+        validator = MetadataValidator()
+        valid = validator.validate(metadata_path)
+        if not valid:
+            logging.error(f"'{dataset_name}' Metadata failed to validate.")
+        else:
+            logging.info(f"'{dataset_name}' Metadata validated successfully.")
 
     def import_datasets(
         self,
@@ -195,6 +204,8 @@ class DatasetImporter:
                     c.current_user,
                     cytomine_auth,
                 )
+
+                self.import_metadata(dataset_root)
 
         return ImportResponse(
             valid_datasets=valid_datasets,

@@ -22,14 +22,9 @@ from pims.schemas.operations import ImportResponse, ImportResult
 
 logger = logging.getLogger("pims.app")
 
-DATASET_PATH = Path(get_settings().dataset_path)
+DATASET_ROOT = Path(get_settings().dataset_path)
 WRITING_PATH = Path(get_settings().writing_path)
 FILE_ROOT_PATH = Path(get_settings().root)
-
-
-REQUIRED_DIRECTORIES = {
-    "IMAGES",
-}
 
 
 class DatasetImporter:
@@ -37,24 +32,40 @@ class DatasetImporter:
         self.storage_id = storage_id
         self.dataset_names = dataset_names
 
-    def filter_dataset(self, dataset_paths) -> tuple[list[str], dict[str, list[str]]]:
+    def _check_dataset_structure(self, root: str) -> None:
+        dataset_directory = [entry for entry in os.scandir(root) if entry.is_dir()]
+        if len(dataset_directory) != 1:
+            raise ValueError(f"Expected 1 directory, found {len(dataset_directory)}")
+
+        dataset_path = dataset_directory.pop()
+        has_images = any(
+            entry.name.upper() == "IMAGES" and entry.is_dir()
+            for entry in os.scandir(dataset_path)
+        )
+
+        if not has_images:
+            raise ValueError(f"IMAGES directory not found in {dataset_path.path}")
+
+    def _is_valid_dataset(self, dataset_path: str) -> bool:
+        try:
+            if not os.path.isdir(dataset_path):
+                return False
+            self._check_dataset_structure(dataset_path)
+            return True
+        except ValueError:
+            return False
+
+    def filter_dataset(self, dataset_paths) -> tuple[list[str], list[str]]:
         valid_datasets = []
-        invalid_datasets = {}
+        invalid_datasets = []
 
         for dataset in dataset_paths:
-            dataset_path = os.path.join(DATASET_PATH, dataset)
-            name = os.path.basename(dataset_path)
+            dataset_path = os.path.join(DATASET_ROOT, dataset)
 
-            if not os.path.isdir(dataset_path):
-                invalid_datasets[name] = "Not a directory"
-                continue
-
-            missing = check_dataset_structure(dataset_path)
-
-            if len(missing) == 0:
+            if self._is_valid_dataset(dataset_path):
                 valid_datasets.append(dataset_path)
             else:
-                invalid_datasets[name] = "Expected " + ", ".join(missing)
+                invalid_datasets.append(dataset)
 
         return valid_datasets, invalid_datasets
 
@@ -144,7 +155,7 @@ class DatasetImporter:
         dataset_paths = (
             self.dataset_names.split(",")
             if self.dataset_names
-            else os.listdir(DATASET_PATH)
+            else os.listdir(DATASET_ROOT)
         )
         datasets, invalid_datasets = self.filter_dataset(dataset_paths)
 
@@ -191,29 +202,9 @@ def is_already_imported(image_path: Path, data_path: Path) -> bool:
     for upload_dir in data_path.iterdir():
         if not upload_dir.is_dir():
             continue
+
         for candidate in upload_dir.iterdir():
             if candidate.is_symlink() and candidate.resolve() == image_path.resolve():
                 return True
 
     return False
-
-
-def check_dataset_structure(dataset_root: str) -> bool:
-    """
-    Check if the dataset is well structured
-    Return (is_valid, missing_directories) for the given dataset path.
-    """
-    dataset_directory = [entry for entry in os.scandir(dataset_root) if entry.is_dir()]
-    if len(dataset_directory) != 1:
-        return [f"exactly 1 UUID directory, found {len(dataset_directory)}"]
-
-    dataset_path = dataset_directory.pop()
-    actual_directories = {
-        entry.name.upper() for entry in os.scandir(dataset_path) if entry.is_dir()
-    }
-
-    return [
-        required
-        for required in REQUIRED_DIRECTORIES
-        if required not in actual_directories
-    ]

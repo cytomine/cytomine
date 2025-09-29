@@ -11,4 +11,4 @@ class ImportResult(BaseModel):
 
 class ImportResponse(BaseModel):
     valid_datasets: dict[str, ImportResult]
-    invalid_datasets: dict[str, str]
+    invalid_datasets: list[str]

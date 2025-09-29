@@ -19,8 +19,8 @@ java {
 }
 
 checkstyle {
-   toolVersion = '10.21.2'
-   configFile = file("${rootProject.projectDir}/app-engine/config/checkstyle.xml")
+    toolVersion = '10.21.2'
+    configFile = file("${rootProject.projectDir}/checkstyle.xml")
 }
 
 configurations {
@@ -62,7 +62,8 @@ dependencies {
     implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.0.87'
     implementation group: 'org.apache.commons', name: 'commons-compress', version: '1.24.0'
     implementation group: 'org.apache.tika', name: 'tika-core', version: '2.9.1'
-
+    implementation 'org.apache.commons:commons-fileupload2-jakarta-servlet6:2.0.0-M4'
+    implementation 'commons-io:commons-io:2.15.1'
     // Geometry
     implementation 'org.locationtech.jts:jts-core:1.19.0'
     implementation 'org.locationtech.jts.io:jts-io-common:1.19.0'
@@ -80,12 +81,15 @@ dependencies {
 
     // Jakarta
     implementation 'jakarta.persistence:jakarta.persistence-api:3.1.0'
+    implementation 'jakarta.servlet:jakarta.servlet-api:6.1.0'
 
     // PostgreSQL
     runtimeOnly 'org.postgresql:postgresql'
 
     // Kubernetes
     implementation 'io.fabric8:kubernetes-client:6.10.0'
+    implementation 'org.bouncycastle:bcprov-jdk15on:1.59'
+    implementation 'org.bouncycastle:bcpkix-jdk15on:1.59'
 
     // Test dependencies
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -99,7 +103,7 @@ dependencies {
     testImplementation 'org.junit.vintage:junit-vintage-engine:5.7.2'
 
     // registry client
-    implementation 'com.cytomine:registry-client:3.0.0'
+    implementation project(':registry-client')
 
     // liquibase
     liquibaseRuntime 'info.picocli:picocli:4.7.5'
@@ -108,6 +112,7 @@ dependencies {
     // Image processing
     implementation 'org.apache.commons:commons-imaging:1.0.0-alpha5'
     implementation 'org.dcm4che:dcm4che-core:5.31.0'
+    testImplementation 'com.google.cloud.tools:jib-core:0.27.3'
 }
 
 tasks.named('test') {

@@ -1,3 +1,0 @@
-services:
-  core:
-    image: cytomine/$NS1_MYBOOL

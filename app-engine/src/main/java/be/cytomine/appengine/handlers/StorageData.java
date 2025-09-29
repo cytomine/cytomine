@@ -11,6 +11,7 @@ import lombok.Data;
 @Data
 public class StorageData {
     List<StorageDataEntry> entryList;
+    boolean referenced;
 
     public StorageData(StorageData other) {
         if (other != null && other.getEntryList() != null) {
@@ -53,6 +54,11 @@ public class StorageData {
 
     public StorageData() {
         entryList = new LinkedList<>();
+    }
+
+    public StorageData(boolean referenced) {
+        this.referenced = referenced;
+        this.entryList = new LinkedList<>();
     }
 
     public StorageDataEntry peek() {

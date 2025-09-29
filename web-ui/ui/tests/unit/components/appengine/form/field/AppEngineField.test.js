@@ -2,6 +2,16 @@ import {createLocalVue, shallowMount} from '@vue/test-utils';
 
 import AppEngineField from '@/components/appengine/forms/fields/AppEngineField.vue';
 
+jest.mock('cytomine-client', () => ({
+  Cytomine: {
+    instance: {
+      api: {
+        get: jest.fn(),
+      },
+    },
+  },
+}));
+
 jest.mock('@/utils/image-utils', () => ({
   isWebPSupported: jest.fn(() => true)
 }));
@@ -43,7 +53,7 @@ describe('AppEngineField.vue', () => {
         IntegerField: true,
         NumberField: true,
         StringField: true,
-        WsiField: true
+        WsiField: true,
       },
     });
   });

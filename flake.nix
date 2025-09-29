@@ -16,7 +16,6 @@
             postgresql
             kustomize
             kubernetes-helm
-            gradle
           ];
           shellHook = ''
             export KUBECONFIG=./.kube/config

@@ -1,9 +1,12 @@
 package be.cytomine.appengine.controllers;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.FileSystemResource;
@@ -15,15 +18,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import be.cytomine.appengine.dto.inputs.task.TaskDescription;
 import be.cytomine.appengine.dto.inputs.task.TaskRun;
 import be.cytomine.appengine.dto.responses.errors.ErrorBuilder;
 import be.cytomine.appengine.dto.responses.errors.ErrorCode;
+import be.cytomine.appengine.exceptions.AppStoreServiceException;
 import be.cytomine.appengine.exceptions.BundleArchiveException;
 import be.cytomine.appengine.exceptions.RunTaskServiceException;
 import be.cytomine.appengine.exceptions.TaskNotFoundException;
@@ -31,6 +33,7 @@ import be.cytomine.appengine.exceptions.TaskServiceException;
 import be.cytomine.appengine.exceptions.ValidationException;
 import be.cytomine.appengine.handlers.StorageData;
 import be.cytomine.appengine.models.task.Task;
+import be.cytomine.appengine.services.AppStoreService;
 import be.cytomine.appengine.services.TaskService;
 
 @Slf4j
@@ -40,13 +43,17 @@ import be.cytomine.appengine.services.TaskService;
 public class TaskController {
 
     private final TaskService taskService;
+    private final AppStoreService appStoreService;
 
     @PostMapping(path = "tasks")
     public ResponseEntity<?> upload(
-        @RequestParam MultipartFile task
+        HttpServletRequest request
     ) throws TaskServiceException, ValidationException, BundleArchiveException {
         log.info("Task Upload POST");
-        Optional<TaskDescription> taskDescription = taskService.uploadTask(task);
+        // prepare for streaming
+        log.info("UploadTask: preparing streaming...");
+        InputStream inputStream = taskService.prepareStream(request);
+        Optional<TaskDescription> taskDescription = taskService.uploadTask(inputStream);
         log.info("Task Upload POST Ended");
         return ResponseEntity.ok(taskDescription);
     }
@@ -227,5 +234,43 @@ public class TaskController {
         TaskRun taskRun = taskService.createRunForTask(id);
         log.info("tasks/{id}/runs POST Ended");
         return ResponseEntity.ok(taskRun);
+    }
+
+    @PostMapping("tasks/{namespace}/{version}/install")
+    public ResponseEntity<?> install(
+        @PathVariable String namespace,
+        @PathVariable String version)
+        throws IOException,
+        TaskServiceException,
+        ValidationException,
+        BundleArchiveException,
+        AppStoreServiceException {
+        log.info("tasks/{namespace}/{version} POST");
+        Optional<TaskDescription> description = appStoreService.install(namespace, version);
+        log.info("tasks/{namespace}/{version} POST end");
+        return ResponseEntity.ok(description);
+    }
+
+    @GetMapping(value = "tasks/{namespace}/{version}/logo")
+    @ResponseStatus(code = HttpStatus.OK)
+    public ResponseEntity<?> findLogoOfTaskByNamespaceAndVersion(
+            @PathVariable String namespace,
+            @PathVariable String version
+    ) throws TaskServiceException, TaskNotFoundException {
+        log.info("tasks/{namespace}/{version}/logo.png GET");
+        StorageData data = taskService.retrieveLogo(namespace, version);
+        File file = data.peek().getData();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(
+                HttpHeaders.CONTENT_DISPOSITION,
+                "attachment; filename=\"" + file.getName() + "\""
+        );
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+
+        log.info("tasks/{namespace}/{version}/logo.png GET Ended");
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(new FileSystemResource(file));
     }
 }

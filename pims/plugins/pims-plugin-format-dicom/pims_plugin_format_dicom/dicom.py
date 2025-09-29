@@ -135,18 +135,20 @@ class WSIDicomParser(AbstractParser):
         return imd
 
     def parse_known_metadata(self):
-        wsidicom_object = cached_wsi_dicom_file(self.format)
-        levels = wsidicom_object.levels
+        wsi = cached_wsi_dicom_file(self.format)
+        metadata = dictify(wsi.levels.groups[0].datasets[0])
 
-        metadata = dictify(wsidicom_object.levels.groups[0].datasets[0])
         imd = super().parse_known_metadata()
-        imd.physical_size_x = wsidicom_object.levels.groups[0].mpp.width * UNIT_REGISTRY("micrometers")
-        imd.physical_size_y = wsidicom_object.levels.groups[0].mpp.height * UNIT_REGISTRY("micrometers")
+        mpp = wsi.levels.groups[0].mpp
+        imd.physical_size_x = mpp.width * UNIT_REGISTRY("micrometers")
+        imd.physical_size_y = mpp.height * UNIT_REGISTRY("micrometers")
 
-        imd.physical_size_z = self.parse_physical_size(
-            metadata['Shared Functional Groups Sequence'][0]['Pixel Measures Sequence'][0]['Spacing Between Slices'])
+        pixel_measures = metadata['Shared Functional Groups Sequence'][0]['Pixel Measures Sequence'][0]
+        imd.physical_size_z = self.parse_physical_size(pixel_measures.get('Spacing Between Slices', None))
+
         if 'Acquisition DateTime' in metadata:
             imd.acquisition_datetime = self.parse_acquisition_date(metadata['Acquisition DateTime'])
+
         return imd
 
     def parse_raw_metadata(self):

@@ -16,8 +16,6 @@ tags:
     description: Manage user position records on images
   - name: Annotation
     description: Manage all annotations type
-  - name: Annotation | Algo annotation
-    description: Manage annotations created by jobs
   - name: Annotation | Reviewed annotation
     description: Manage reviewed annotations validated by human users
   - name: Annotation | User annotation
@@ -663,116 +661,6 @@ paths:
         "404":
           $ref: "#/components/responses/not-found"
 
-  /api/algoannotation/{id}/crop.{format}:
-    get:
-      tags:
-        - Annotation | Algo annotation
-      description: Get an algo annotation crop
-      parameters:
-        - $ref: "#/components/parameters/path-annotation-id"
-        - $ref: "#/components/parameters/path-image-response-format"
-        - name: type
-          in: query
-          description:
-            Type of crop. Allowed values are 'crop' (default behavior if
-            not set), 'draw' (the shape is drawn in the crop), 'mask' (annotation binary
-            mask), 'alphaMask (part of crop outside annotation is transparent, requires
-            png format)
-          required: false
-          schema:
-            type: string
-        - name: draw
-          in: query
-          description: Equivalent to set type='draw'
-          required: false
-          schema:
-            type: boolean
-        - name: mask
-          in: query
-          description: Equivalent to set type='mask'
-          required: false
-          schema:
-            type: boolean
-        - name: alphaMask
-          in: query
-          description: Equivalent to set type='alphaMask'
-          required: false
-          schema:
-            type: boolean
-        - name: maxSize
-          in: query
-          description: Maximum crop size in width and height
-          required: false
-          schema:
-            type: integer
-            format: int32
-        - name: zoom
-          in: query
-          description:
-            Zoom level in which crop is extracted. Ignored if maxSize is
-            set.
-          required: false
-          schema:
-            type: integer
-            format: int32
-        - name: increaseArea
-          in: query
-          description:
-            Increase crop area by multiplying original crop size by this
-            factor.
-          required: false
-          schema:
-            type: number
-        - name: complete
-          in: query
-          description: Do not simplify the annotation shape.
-          required: false
-          schema:
-            type: boolean
-        - name: colormap
-          in: query
-          description: The absolute path of a colormap file
-          required: false
-          schema:
-            type: string
-        - name: inverse
-          in: query
-          description: True if colors have to be inversed
-          required: false
-          schema:
-            type: integer
-            format: int32
-        - name: contrast
-          in: query
-          description: Multiply pixels by contrast
-          required: false
-          schema:
-            type: number
-        - name: gamma
-          in: query
-          description: Apply gamma correction
-          required: false
-          schema:
-            type: number
-        - name: bits
-          in: query
-          description: Output bit depth per channel
-          required: false
-          schema:
-            type: integer
-            format: int32
-      responses:
-        "200":
-          $ref: "#/components/responses/image"
-        "400":
-          $ref: "#/components/responses/bad-request"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/not-found"
-
   /api/abstractslice/{id}/thumb.{format}:
     post:
       tags:
@@ -909,425 +797,12 @@ paths:
         "404":
           $ref: "#/components/responses/not-found"
 
-  /api/algoannotation.json:
-    post:
-      tags:
-        - Annotation | Algo annotation
-      description: Add algo annotation(s)
-      parameters:
-        - name: "POST JSON: project"
-          in: path
-          description: The project id where this annotation belongs
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: "POST JSON: image"
-          in: query
-          description: The image instance id where this annotation belongs
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: "POST JSON: location"
-          in: query
-          description: The WKT geometrical description of the annotation
-          required: true
-          schema:
-            type: string
-        - name: "POST JSON: term"
-          in: query
-          description: Term id to associate with this annotation
-          required: false
-          schema:
-            type: integer
-            format: int64
-        - name: "POST JSON: minPoint"
-          in: query
-          description: Minimum number of point that constitute the annotation
-          required: false
-          schema:
-            type: integer
-            format: int32
-        - name: "POST JSON: maxPoint"
-          in: query
-          description: Maximum number of point that constitute the annotation
-          required: false
-          schema:
-            type: integer
-            format: int32
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/AlgoAnnotation"
-          description: ""
-        "400":
-          $ref: "#/components/responses/bad-request"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/not-found"
-        "409":
-          $ref: "#/components/responses/conflict"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              "$ref": "#/components/schemas/AlgoAnnotation"
-    get:
-      tags:
-        - Annotation | Algo annotation
-      description: Search algo annotations in a project
-      parameters:
-        - $ref: "#/components/parameters/pagination-max"
-        - $ref: "#/components/parameters/pagination-offset"
-      responses:
-        "200":
-          description: "[annotation listing]"
-        "400":
-          $ref: "#/components/responses/bad-request"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/not-found"
-
-  /api/algoannotation/{id}.json:
-    get:
-      tags:
-        - Annotation | Algo annotation
-      description: Get an algo annotation
-      parameters:
-        - $ref: "#/components/parameters/path-annotation-id"
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/AlgoAnnotation"
-          description: ""
-        "400":
-          $ref: "#/components/responses/bad-request"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/not-found"
-    put:
-      tags:
-        - Annotation | Algo annotation
-      description: Update an algo annotation
-      parameters:
-        - $ref: "#/components/parameters/path-annotation-id"
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/AlgoAnnotation"
-          description: ""
-        "400":
-          $ref: "#/components/responses/bad-request"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/not-found"
-        "409":
-          $ref: "#/components/responses/conflict"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              "$ref": "#/components/schemas/AlgoAnnotation"
-    delete:
-      tags:
-        - Annotation | Algo annotation
-      description: Delete an algo annotation
-      parameters:
-        - $ref: "#/components/parameters/path-annotation-id"
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/AlgoAnnotation"
-          description: ""
-        "400":
-          $ref: "#/components/responses/bad-request"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/not-found"
-
-  /api/algoannotation/{id}/alphamask.{format}:
-    get:
-      tags:
-        - Annotation | Algo annotation
-      description: Get an algo annotation alpha mask
-      parameters:
-        - $ref: "#/components/parameters/path-annotation-id"
-        - $ref: "#/components/parameters/path-image-response-format"
-        - name: maxSize
-          in: query
-          description: Maximum crop size in width and height
-          required: false
-          schema:
-            type: integer
-            format: int32
-        - name: zoom
-          in: query
-          description:
-            Zoom level in which crop is extracted. Ignored if maxSize is
-            set.
-          required: false
-          schema:
-            type: integer
-            format: int32
-        - name: increaseArea
-          in: query
-          description:
-            Increase crop area by multiplying original crop size by this
-            factor.
-          required: false
-          schema:
-            type: number
-        - name: complete
-          in: query
-          description: Do not simplify the annotation shape.
-          required: false
-          schema:
-            type: boolean
-        - name: colormap
-          in: query
-          description: The absolute path of a colormap file
-          required: false
-          schema:
-            type: string
-        - name: inverse
-          in: query
-          description: True if colors have to be inversed
-          required: false
-          schema:
-            type: integer
-            format: int32
-        - name: contrast
-          in: query
-          description: Multiply pixels by contrast
-          required: false
-          schema:
-            type: number
-        - name: gamma
-          in: query
-          description: Apply gamma correction
-          required: false
-          schema:
-            type: number
-        - name: bits
-          in: query
-          description: Output bit depth per channel
-          required: false
-          schema:
-            type: integer
-            format: int32
-      responses:
-        "200":
-          $ref: "#/components/responses/image"
-        "400":
-          $ref: "#/components/responses/bad-request"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/not-found"
-
-  /api/algoannotation/{id}/comment.json:
-    post:
-      tags:
-        - Annotation | Comment
-      description: Comment an algo annotation
-      parameters:
-        - $ref: "#/components/parameters/path-annotation-id"
-      responses:
-        "200":
-          description: ""
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SharedAnnotation"
-        "400":
-          $ref: "#/components/responses/bad-request"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/not-found"
-        "409":
-          $ref: "#/components/responses/conflict"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              "$ref": "#/components/schemas/SharedAnnotation"
-    get:
-      tags:
-        - Annotation | Comment
-      description: List comments for an algo annotation
-      parameters:
-        - $ref: "#/components/parameters/path-annotation-id"
-        - $ref: "#/components/parameters/pagination-max"
-        - $ref: "#/components/parameters/pagination-offset"
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SharedAnnotationCollection"
-          description: ""
-        "400":
-          $ref: "#/components/responses/bad-request"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/not-found"
-
-  /api/algoannotation/{annotation}/comment/{id}.json:
-    get:
-      tags:
-        - Annotation | Comment
-      description: Get an algo annotation comment
-      parameters:
-        - name: annotation
-          in: path
-          description: The annotation id
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: id
-          in: path
-          description: The comment id
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/SharedAnnotation"
-          description: ""
-        "400":
-          $ref: "#/components/responses/bad-request"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/not-found"
-
-  /api/algoannotation/{id}/mask.{format}:
-    get:
-      tags:
-        - Annotation | Algo annotation
-      description: Get an algo annotation mask
-      parameters:
-        - $ref: "#/components/parameters/path-annotation-id"
-        - $ref: "#/components/parameters/path-image-response-format"
-        - name: maxSize
-          in: query
-          description: Maximum crop size in width and height
-          required: false
-          schema:
-            type: integer
-            format: int32
-        - name: zoom
-          in: query
-          description:
-            Zoom level in which crop is extracted. Ignored if maxSize is
-            set.
-          required: false
-          schema:
-            type: integer
-            format: int32
-        - name: increaseArea
-          in: query
-          description:
-            Increase crop area by multiplying original crop size by this
-            factor.
-          required: false
-          schema:
-            type: number
-        - name: complete
-          in: query
-          description: Do not simplify the annotation shape.
-          required: false
-          schema:
-            type: boolean
-        - name: colormap
-          in: query
-          description: The absolute path of a colormap file
-          required: false
-          schema:
-            type: string
-        - name: inverse
-          in: query
-          description: True if colors have to be inversed
-          required: false
-          schema:
-            type: integer
-            format: int32
-        - name: contrast
-          in: query
-          description: Multiply pixels by contrast
-          required: false
-          schema:
-            type: number
-        - name: gamma
-          in: query
-          description: Apply gamma correction
-          required: false
-          schema:
-            type: number
-        - name: bits
-          in: query
-          description: Output bit depth per channel
-          required: false
-          schema:
-            type: integer
-            format: int32
-      responses:
-        "200":
-          $ref: "#/components/responses/image"
-        "400":
-          $ref: "#/components/responses/bad-request"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/not-found"
-
   /api/annotation.json:
     post:
       tags:
         - Annotation
       summary: Add an annotation
-      description: If current user is algo, an algo annotation will be created. Otherwise, an user annotation
+      description: Create a user annotation
       parameters: []
       responses:
         "200":
@@ -1759,7 +1234,7 @@ paths:
             format: int64
         - name: clearForAll
           in: query
-          description: Delete term for all users (no algo)
+          description: Delete term for all users
           required: true
           schema:
             type: boolean
@@ -1971,18 +1446,6 @@ paths:
           required: true
           schema:
             type: boolean
-        - name: showAlgo
-          in: query
-          description: "(Optional) If true, show the algo details (job,...). This may slow down the request."
-          required: true
-          schema:
-            type: boolean
-        - name: hideAlgo
-          in: query
-          description: "(Optional) If true, hide the algo details (job,...). This may slow down the request."
-          required: true
-          schema:
-            type: boolean
         - name: showuser
           in: query
           description: "(Optional) If true, show the annotation user details (username,...). This may slow down the request."
@@ -2078,12 +1541,6 @@ paths:
         - name: noTerm
           in: query
           description: "(Optional) Also get annotation with no term"
-          required: true
-          schema:
-            type: boolean
-        - name: noAlgoTerm
-          in: query
-          description: "(Optional) Only get annotation with no term from a job"
           required: true
           schema:
             type: boolean
@@ -2214,20 +1671,6 @@ paths:
         - name: userForTerm
           in: query
           description: "(Optional) Get only user annotation link with a term added by this user id"
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: userForTermAlgo
-          in: query
-          description: "(Optional) Get only user annotation link with a term added by this job id"
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: jobForTermAlgo
-          in: query
-          description: "(Optional) Get only annotation link with a term added by this job id"
           required: true
           schema:
             type: integer
@@ -3561,7 +3004,7 @@ paths:
             format: int64
         - name: user
           in: query
-          description: "The annotation user id (may be an algo) "
+          description: "The annotation user id"
           required: true
           schema:
             type: integer
@@ -3616,7 +3059,7 @@ paths:
             format: int64
         - name: user
           in: query
-          description: "The annotation user id (may be an algo) "
+          description: "The annotation user id"
           required: true
           schema:
             type: integer
@@ -4800,106 +4243,6 @@ paths:
         "404":
           $ref: "#/components/responses/not-found"
 
-  /api/project/{project}/algoannotation/count.json:
-    get:
-      tags:
-        - Annotation | Algo annotation
-      description: Get algo annotation count in the project
-      parameters:
-        - $ref: "#/components/parameters/path-filter-project-id"
-        - name: startDate
-          in: query
-          description: Only count the annotations created after this date
-          required: false
-          schema:
-            type: string
-            format: timestamp
-        - name: endDate
-          in: query
-          description: Only count the annotations created before this date
-          required: false
-          schema:
-            type: string
-            format: timestamp
-      responses:
-        "200":
-          description: ""
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AnnotationCount"
-        "400":
-          $ref: "#/components/responses/bad-request"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/not-found"
-
-  /api/project/{id}/algoannotation/download:
-    get:
-      tags:
-        - Annotation | Algo annotation
-      description: Download an algo annotation report for the project
-      parameters:
-        - $ref: "#/components/parameters/path-project-id"
-        - name: terms
-          in: query
-          description: "The annotation terms id (if empty: all terms)"
-          required: true
-          schema:
-            type: array
-            items:
-              type: string
-        - name: users
-          in: query
-          description: "The annotation users id (if empty: all users)"
-          required: true
-          schema:
-            type: array
-            items:
-              type: string
-        - name: images
-          in: query
-          description: "The annotation images id (if empty: all images)"
-          required: true
-          schema:
-            type: array
-            items:
-              type: string
-        - name: afterThan
-          in: query
-          description: "(Optional) Annotations created before this date will not be returned"
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: beforeThan
-          in: query
-          description: "(Optional) Annotations created after this date will not be returned"
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: format
-          in: query
-          description: The report format (pdf, xls,...)
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          description: file
-        "400":
-          $ref: "#/components/responses/bad-request"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/not-found"
-
   /api/project/{id}/annotation/download:
     get:
       tags:
@@ -4925,8 +4268,7 @@ paths:
           in: query
           description: |
             'The annotation users id (if empty: all users). If reviewed flag
-            is false then if first user is software, get algo annotation otherwise if
-            first user is human, get user annotation. '
+            is false then if first user is human, get user annotation.'
           required: true
           schema:
             type: array
@@ -10402,160 +9744,7 @@ components:
         - zStack
         - time
         - channelName
-    AlgoAnnotation:
-      description: ""
-      type: object
-      properties:
-        area:
-          type: number
-          description: The annotation area
-          readOnly: true
-        areaUnit:
-          type: integer
-          description: The unit used for area (pixels²=1,micron²=3)
-          format: int32
-          readOnly: true
-        centroid:
-          type: object
-          description: X,Y coord of the annotation centroid
-          readOnly: true
-        class:
-          $ref: "#/components/schemas/attribute-class"
-        countReviewedAnnotations:
-          type: integer
-          description: The number of reviewed annotations for this annotation
-          format: int32
-          readOnly: true
-        created:
-          $ref: "#/components/schemas/attribute-created"
-        cropURL:
-          type: string
-          description: URL to get the annotation crop
-          readOnly: true
-        deleted:
-          $ref: "#/components/schemas/attribute-deleted"
-        geometryCompression:
-          type: number
-          description:
-            The geometry compression rate used to simplify the annotation
-            (during creation)
-        id:
-          $ref: "#/components/schemas/attribute-id"
-        image:
-          type: integer
-          description: The image on which the annotation is drawn
-          format: int64
-        imageURL:
-          type: string
-          description: URL to go to the image
-          readOnly: true
-        location:
-          type: string
-          description: The annotation geometry (shape) in WKT
-        nbComments:
-          type: integer
-          description: The number of comments added by a user on this annotation
-          format: int64
-          readOnly: true
-        perimeter:
-          type: number
-          description: The annotation perimeter
-          readOnly: true
-        perimeterUnit:
-          type: integer
-          description: The unit used for perimeter (pixels=0,mm=2,)
-          format: int32
-          readOnly: true
-        project:
-          type: integer
-          description: The project in which the annotation is drawn
-          format: int64
-        reviewed:
-          type: boolean
-          description: True if annotation has at least one review
-          readOnly: true
-        slice:
-          type: integer
-          description: The slice on which the annotation is drawn
-          format: int64
-        smallCropURL:
-          type: string
-          description: URL to get a small annotation crop (<256px)
-          readOnly: true
-        term:
-          type: array
-          description: List of term id mapped with this annotation
-          default: "[]"
-          items:
-            type: string
-        updated:
-          $ref: "#/components/schemas/attribute-updated"
-        url:
-          type: string
-          description: URL to go to the annotation on the image
-          readOnly: true
-        user:
-          type: integer
-          description: The user job that add this annotation
-          format: int64
-      required:
-        - image
-        - location
-        - project
-        - slice
-        - user
-    AlgoAnnotationTerm:
-      description:
-        "Term added to an annotation by a job. Annotation can be: -algo
-        annotation (create by a job) or -user annotation (create by a real user)"
-      type: object
-      properties:
-        class:
-          $ref: "#/components/schemas/attribute-class"
-        id:
-          $ref: "#/components/schemas/attribute-id"
-        created:
-          $ref: "#/components/schemas/attribute-created"
-        updated:
-          $ref: "#/components/schemas/attribute-updated"
-        deleted:
-          $ref: "#/components/schemas/attribute-deleted"
-        annotationIdent:
-          type: integer
-          description: The annotation id
-          format: int64
-        annotationClassName:
-          type: string
-          description: The annotation class type (user or algo)
-        annotation:
-          type: object
-        term:
-          type: integer
-          description: The term id
-          format: int64
-        expectedTerm:
-          type: integer
-          description: The real term id, the term added by the user previously
-          format: int64
-        rate:
-          type: number
-          description: The reliability of the prediction
-        user:
-          type: integer
-          description: The user job id
-          format: int64
-        project:
-          type: integer
-          description: The project id
-          format: int64
-      required:
-        - annotationIdent
-        - annotationClassName
-        - term
-        - expectedTerm
-        - rate
-        - user
-        - project
+
     AnnotationFilter:
       description: Define a set of filter for annotation listing
       type: object
@@ -11834,8 +11023,8 @@ components:
         - term2
     ReviewedAnnotation:
       description:
-        A reviewed annotation is an user/algo-annotation validated by a
-        user. When a user validate an user/algoannotation, we copy all data from the
+        A reviewed annotation is an user annotation validated by a
+        user. When a user validate an user annotation, we copy all data from the
         validated annotation to create the review annotation
       type: object
       properties:
@@ -11887,7 +11076,7 @@ components:
           readOnly: true
         parentClassName:
           type: string
-          description: Annotation type that has been reviewed (algo/user)
+          description: Annotation type that has been reviewed
         parentIdent:
           type: integer
           description: Annotation id that has been reviewed
@@ -12023,10 +11212,6 @@ components:
         origin:
           type: string
           description: The way this user was created.
-        algo:
-          type: boolean
-          description: If true, user is a userjob
-          readOnly: true
         accountExpired:
           type: boolean
           description: If true, account is expired
@@ -12126,7 +11311,6 @@ components:
           description: The commented annotation class name
           enum:
             - "be.cytomine.ontology.userAnnotation"
-            - "be.cytomine.ontology.AlgoAnnotation"
         receivers:
           type: array
           description: The comment receiver ids
@@ -12477,10 +11661,6 @@ components:
         origin:
           type: string
           description: The way this user was created.
-        algo:
-          type: boolean
-          description: If true, user is a userjob
-          readOnly: true
         firstname:
           type: string
           description: The firstname of the user
@@ -12640,12 +11820,11 @@ components:
         idExpectedTerm:
           type: integer
           description:
-            "(If params showAlgo=true) the expected term (real term add
-            by user previously)"
+            "The expected term (real term add by user previously)"
           format: int64
         idTerm:
           type: integer
-          description: "(If params showAlgo=true) the predicted term for the annotation"
+          description: "The predicted term for the annotation"
           format: int64
         image:
           type: integer

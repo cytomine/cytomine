@@ -66,7 +66,7 @@ public class GenericAnnotationService {
      * @param location WKT Location that must touch result annotation
      * @param idImage Annotation image
      * @param layers Annotation Users
-     * @param table Table that store annotation (user, algo, reviewed)
+     * @param table Table that store annotation (user, reviewed)
      * @return List of annotation id from idImage and idUser that touch location
      */
     public List<AnnotationDomain> findAnnotationThatTouch(String location, List<Long> layers, long idImage, String table) {

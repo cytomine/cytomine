@@ -177,7 +177,7 @@ public abstract class AnnotationDomain extends CytomineDomain implements Seriali
     }
 
     /**
-     * Get user/algo/reviewed annotation with id
+     * Get user/reviewed annotation with id
      * Check the correct type and return it
      * @param id Annotation id
      * @return Annotation

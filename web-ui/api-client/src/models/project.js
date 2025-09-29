@@ -262,7 +262,7 @@ export default class Project extends Model {
       throw new Error('Cannot fetch UI configuration of a project with no ID.');
     }
 
-    let {data} = await Cytomine.instance.api.get(`${Cytomine.instance.host}/custom-ui/project/${this.id}.json`);
+    let {data} = await Cytomine.instance.api.get(`custom-ui/project/${this.id}.json`);
     return data;
   }
 
@@ -277,7 +277,7 @@ export default class Project extends Model {
       throw new Error('Cannot save UI configuration of a project with no ID.');
     }
 
-    let {data} = await Cytomine.instance.api.post(`${Cytomine.instance.host}/custom-ui/project/${this.id}.json`, config);
+    let {data} = await Cytomine.instance.api.post(`custom-ui/project/${this.id}.json`, config);
     return data;
   }
 
@@ -465,9 +465,6 @@ export default class Project extends Model {
       case AnnotationType.USER:
         uri = 'userannotation';
         break;
-      case AnnotationType.ALGO:
-        uri = 'algoannotation';
-        break;
       case AnnotationType.REVIEWED:
         uri = 'reviewedannotation';
         break;
@@ -504,9 +501,6 @@ export default class Project extends Model {
     switch (annotationType) {
       case AnnotationType.USER:
         uri = 'annotationevolution';
-        break;
-      case AnnotationType.ALGO:
-        uri = 'algoannotationevolution';
         break;
       case AnnotationType.REVIEWED:
         uri = 'reviewedannotationevolution';

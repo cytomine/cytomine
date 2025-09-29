@@ -19,6 +19,7 @@ add-images-to-image-group,Add images to image group,Ajouter des images au groupe
 add-inputs,Add inputs,Ajouter des entrées,Añadir entradas,Invoeren toevoegen
 add-members-to-project,Add members to project,Ajouter des membres au projet,Agregar miembros al proyecto,Voeg projectleden toe
 add-new-comment,Add new comment,Ajouter un nouveau commentaire,Añadir nuevo comentario,Voeg een nieuwe commentaar toe
+add-store,Add Store,Ajouter un magasin,Añadir tienda,Winkel toevoegen
 add-term,Add a term,Nouveau terme,Agregar un término,Nieuwe term
 add-to-image-group,Add image to image group,Ajouter l'image à un groupe d'images,Agregar imagen al grupo de imágenes,Afbeelding toevoegen aan afbeeldingsgroep
 add-track,Add a track,Ajouter une trace,,Track toevoegen
@@ -65,6 +66,7 @@ annotations,Annotations,Annotations,Anotaciones,Annotaties
 annotations-vs-contributors-chart-info-message,This chart presents the number of annotation created by each project member during the selected period,Ce graphique présente le nombre d'annotations créées par chaque membre durant la période sélectionnée,Este gráfico representa el número de anotaciones creadas por cada miembro del proyecto durante el período seleccionado,Deze grafiek toont het aantal annotaties dat door elk lid tijdens de geselecteerde periode is gemaakt
 annotations-vs-terms-chart-info-message,This chart presents the number of manual annotation associated to each term. Only annotations created during the selected period are taken into account.,Ce graphique présente le nombre d'annotations manuelles associées à chaque terme. Seules les annotations créées durant la période sélectionnée sont prises en compte.,Este cuadro presenta el número de anotaciones manuales asociadas a cada término. Solo se tienen en cuenta las anotaciones creadas durante el período seleccionado.,"Dit diagram toont het aantal handmatige annotaties dat aan elke term is gekoppeld. Alleen annotaties die tijdens de geselecteerde periode zijn gemaakt, worden in aanmerking genomen."
 api-keys,API keys,Clés API,Claves API,API-sleutels
+app-store,App Store,App Store,App Store,App Store
 appengine-not-enabled-title,App Engine is not enabled,App Engine n'est pas activé,App Engine no está habilitado,App Engine is niet ingeschakeld
 appengine-not-enabled-description,"App Engine is not enabled on your Cytomine instance. Either contact an administrator, or contact sales@cytomine.com for requesting an upgrade of your instance.",App Engine n'est pas activé sur votre instance Cytomine. Contactez un administrateur ou envoyez un e-mail à sales@cytomine.com pour demander une mise à niveau de votre instance.,App Engine no está habilitado en su instancia de Cytomine. Póngase en contacto con un administrador o envíe un correo a sales@cytomine.com para solicitar una actualización de su instancia.,App Engine is niet ingeschakeld op uw Cytomine-instantie. Neem contact op met een beheerder of stuur een e-mail naar sales@cytomine.com om een upgrade van uw instantie aan te vragen.
 area,Area,Aire,Zona,Gebied
@@ -213,6 +215,7 @@ confirm-deletion-attached-file,Do you really want to delete attached file {filen
 confirm-deletion-annotation-link,Are you sure you want to delete the links of this annotation?,Êtes-vous sûr de vouloir supprimer les liens de cette annotation ?,¿Está seguro de que desea eliminar los enlaces de esta anotación?,Weet u zeker dat u de links van deze annotatie wilt verwijderen?
 confirm-deletion-file,Are you sure you want to delete this file?,Êtes-vous sûr de vouloir supprimer ce fichier ?,¿Está seguro de que desea eliminar este archivo?,Bent u zeker dat u dit file wilt verwijderen?
 confirm-deletion-ontology,Are you sure you want to delete ontology {name}?,Êtes-vous sûr de vouloir supprimer l'ontologie {name} ?,¿Está seguro de que desea eliminar la ontología {name}?,Bent u zeker dat u de ontologie {name} wilt verwijderen?
+confirm-deletion-store,Are you sure you want to delete this store?,Êtes-vous sûr de vouloir supprimer ce magasin ?,¿Está seguro de que desea eliminar esta tienda?,Bent u zeker dat u deze winkel wilt verwijderen?
 confirm-deletion-term,Are you sure you want to delete term {name}?,Êtes-vous sûr de vouloir supprimer le terme {name} ?,¿Seguro que quiere eliminar el término {name}?,Bent u zeker dat u de term {name} wilt verwijderen?
 confirm-deletion-track,Are you sure you want to delete track {name}?,Etes-vous certain de vouloir supprimer la trace {name} ?,,Bent u zeker dat u de {name}-tracering wilt verwijderen?
 confirm-ontology-change-delete-user-terms,Some members of this project have associated terms to annotations ({count} associations). <br> Are you sure you want to delete those associations to change the ontology?,Des membres du projet ont associé des termes à des annotations ({count} associations). Êtes-vous sûr de vouloir supprimer ces associations ?,Algunos miembros de este proyecto tienen términos asociados a anotaciones ({count} asociaciones). <br> ¿Está seguro de que desea eliminar esas asociaciones para cambiar la ontología?,Projectleden hebben termen gekoppeld aan annotaties ({count} associaties). Weet u zeker dat u deze koppelingen wilt verwijderen?
@@ -278,6 +281,7 @@ date,Date,Date,Fecha,Datum
 day,Day,Jour,Día,Dag
 default-annotation-layers,Default annotation layers,Calques chargés par défaut,Capas de anotación predeterminadas,Lagen worden standaard geladen
 default-property,Default property,Propriété par défaut,Propiedad por defecto,Default eigenschap
+default-store,Default store,Magasin par défaut,Tienda predeterminada,Standaardwinkel
 default-value,Default value,Valeur par défaut,Valor por defecto,Eigenschap door uitsluiting
 delete-data,Delete data,Supprimer les données,Borrar datos,Verwijder data
 delete,Delete,Supprimer,Eliminar,verwijderen
@@ -358,6 +362,7 @@ failed,Failed,Échoué,Fallido,Failed
 failed-fetch-current-stats,Failed to fetch current statistics,Une erreur a eu lieu lors du chargement des statistiques sur l'activité en cours,Error al recuperar las estadísticas actuales,Er is een fout opgetreden bij het laden van statistieken over de huidige activiteit
 failed-fetch-profile,Failed to fetch image profile,Une erreur a empêché le chargement du profil,,Door een fout kon het profiel niet worden geladen
 failed-fetch-recent-projects,Failed to fetch recent projects,Erreur lors du chargement des projets récents,Error al buscar proyectos recientes,Fout bij het laden van recente projecten
+failed-fetch-tasks,Failed to fetch the tasks, Échec de la récupération des tâches, Error al obtener las tareas, Kan de taken niet ophalen
 failed-fetch-total-counts,Failed to fetch the total counts,Une erreur a eu lieu lors du chargement des statistiques,No se pudo obtener el recuento total,Er is een fout opgetreden tijdens het laden van statistieken
 failed-to-retrieve-credentials,Failed to retrieve credentials information,Une erreur a eu lieu lors du chargement des informations d'indentification,Error al obtener la información de credenciales,Kan inloggegevens niet ophalen
 failed-to-retrieve-api-keys,Failed to retrieve API keys,Une erreur a eu lieu lors du chargement des clés API,Error al obtener las claves API,Kan API-sleutels niet ophalen
@@ -410,6 +415,7 @@ hide-managers-layers,Hide managers layers,Cacher les calques des responsables,Oc
 hide-successful-upload,Hide successful uploads,Cacher les uploads réussis,Ocultar cargas exitosas,Succesvolle uploads verbergen
 hierarchical-drag-drop-term,Terms can be organized hierarchically using Drag & Drop,Les termes peuvent être organisés de manière hiérarchique en utilisant le drag and drop,,Termen kunnen hiërarchisch worden georganiseerd door middel van Drag & Drop
 histogram-scale,Histogram scale,Echelle des histogrammes,,Schaal van histogrammen
+hostname,Hostname,Nom de domaine,Nombre de dominio,Hostnaam
 hour,Hour,Heure,Hora,Uur
 hue,Hue,Teinte,Tono,Tint
 huge,Huge,Très grand,Enorme,Erg groot
@@ -446,6 +452,7 @@ indeterminate,Indeterminate,Inconnu,Indeterminado,Onbekend
 info-keyword-stop-preview-description,Add the keyword {keyword} where you want to delimit the preview text.,Insérez le mot-clé {keyword} à l'endroit où vous désirez que le texte de prévisualisation s'arrête.,Agregue la palabra clave {keyword} donde desea delimitar el texto de vista previa.,Voeg het trefwoord {keyword} in waar u de voorbeeldtekst wilt laten eindigen.
 information,Information,Information,Información,Informatie
 inspect-button,Inspect,Inspecter,,Inspecteren
+install,Install,Installer,Instalar,Installeren
 insufficient-permission,You don't have the permission to view this page,Vous n'avez pas la permission de consulter cette page,No tiene permiso para ver esta página,U heeft geen toestemming om deze pagina te bekijken
 intensities-manipulation,Intensities adjustment,Ajustement des intensités,,Aanpassing van intensiteiten
 invalid-password,Invalid password,Mot de passe incorrect,Contraseña inválida,Fout wachtwoord
@@ -492,6 +499,7 @@ log-being-collected,Execution log is being collected,Le log d'exécution est en 
 logarithmic,Logarithmic,Logarithmic,,Logaritmisch
 login,Log in,Authentification,Iniciar sesión,Log in
 logout,Logout,Se déconnecter,Cerrar sesión,Afmelden
+magic-wand,Magic Wand,Baguette magique,Varita mágica,Toverstok
 magnification,Magnification,Grossissement,Aumento,Vergroting
 managed-projects,Managed projects,Projets supervisés,Proyectos administrados,Begeleide projecten
 manager-icon-label,You are a manager of this project,Vous êtes un responsable du projet,Usted es asministrador de este proyecto,U bent projectleider
@@ -532,6 +540,7 @@ no-account-yet,Don't have an account yet ? {registerLink},Pas encore de compte ?
 no,No,Non,No,Neen
 no-annotation-comments,No comment for this annotation so far,Aucun commentaire pour cette annotation,No hay comentarios para esta anotación hasta ahora,Geen opmerkingen voor deze annotatie
 no-annotation,No annotation,Aucune annotation,Sin anotaciones,Geen annotatie
+no-app-store-registered,No app store are registered, Aucun magasin d’applications n’est enregistré, No hay tiendas de aplicaciones registradas, Er zijn geen app-winkels geregistreerd
 no-attached-file,No attached file,Aucun fichier joint,Ningún archivo adjunto,Geen file bijgevoegd
 no-default-property,No default property,Pas de propriété par défaut,Sin propiedad predeterminada,Geen defaulteigenschap
 no-description,No description,Pas de description,Sin descripción,Geen beschrijving
@@ -732,8 +741,12 @@ notif-success-user-update,User successfully updated,L'utilisateur a bien été m
 notif-success-welcome-message-update,Welcome message successfully updated,Le message de bienvenue a bien été mis à jour,Mensaje de bienvenida actualizado con éxito,Het welkomstbericht is bijgewerkt
 notif-unexpected-error,Unexpected error,Une erreur inattendue s'est produite,Se ha producido un error inesperado,Er is een onverwachte fout opgetreden
 notif-warn-ontology-tree-order-not-persisted,The order of children in the ontology tree is not persisted in database,L'ordre des enfants dans l'arborescence n'est pas sauvegardée dans la base de données,La jerarquía de términos dentro de la ontología no se mantiene en la base de datos.,De volgorde van de kinderen in de stamboom wordt niet opgeslagen in de database
+notify-error-app-installation,Failed to install the app,Échec de l'installation de l'application,Error al instalar la aplicación,Installatie van de app mislukt
 notify-error-empty-list,The list is empty,La liste est vide,La lista está vacía,De lijst is leeg
 notify-error-not-enough-item,Not enough items provided,Pas assez d'éléments fournis,No se han proporcionado suficientes elementos,Niet genoeg items verstrekt
+notify-success-app-installation,App installed successfully,Application installée avec succès,Aplicación instalada con éxito,App succesvol geïnstalleerd
+notify-success-app-store-addition,App store added successfully,Magasin d'applications ajouté avec succès,Tienda de aplicaciones añadida con éxito,App store succesvol toegevoegd
+notify-success-app-store-deletion,App store deleted successfully,Magasin d'applications supprimé avec succès,Tienda de aplicaciones eliminada con éxito,App store succesvol verwijderd
 notify-success-create-array-inputs,The array was successfully provisioned,Le tableau a été approvisionné avec succès,La matriz se aprovisionó correctamente,De array is succesvol ingericht
 notify-success-task-upload,The task has been successfully uploaded,La tâche a été chargée avec succès,La tarea se ha cargado con éxito,De taak is succesvol geüpload
 number-annotation-creations,Number of annotation creations,Nombre d'annotations créées,Número de anotaciones creadas,Aantal aangemaakte annotaties
@@ -1127,6 +1140,7 @@ you-have-validated-image-on,You have validated this image on {date},Vous avez va
 z-resolution,Z resolution,Résolution Z,,Z-resolutie
 zip-upload-info,A ZIP file containing multiple image is allowed (except for VMS and MRXS),Il est possible d'uploader un ZIP contenant plusieurs images (à l'exception des images VMS et MRXS).,Se permite que un archivo ZIP contanga múltiples imágenes (excepto para VMS y MRXS),Het is mogelijk om een ??ZIP met meerdere afbeeldingen te uploaden (met uitzondering van VMS- en MRXS-afbeeldingen).
 app-engine.name,App Engine,App Engine,App Engine,App Engine
+app-engine.tasks.installed,Installed Tasks,Tâches installées,Tareas instaladas,Geïnstalleerde taken
 app-engine.tasks.name,Tasks,Tâches,Tareas,Taken
 app-engine.task.name,Task,Tâche,Tarea,Taak
 app-engine.applications,Applications,Applications,Aplicaciones,Toepassingen

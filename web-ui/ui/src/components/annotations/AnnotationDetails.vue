@@ -461,7 +461,6 @@ export default {
     async addTerm(idTerm) {
       if (idTerm) {
         try {
-          // TODO: fix issue with AlgoAnnotation https://github.com/cytomine/Cytomine-core/issues/1139
           await new AnnotationTerm({annotation: this.annotation.id, term: idTerm}).save();
           this.$emit('updateTerms');
           this.showTermSelector = false;
@@ -480,7 +479,6 @@ export default {
       }
 
       try {
-        // TODO fix issue with AlgoAnnotationTerm: https://github.com/cytomine/Cytomine-core/issues/1138
         await AnnotationTerm.delete(this.annotation.id, idTerm, Number(idUser));
         this.$emit('updateTerms');
       } catch (error) {

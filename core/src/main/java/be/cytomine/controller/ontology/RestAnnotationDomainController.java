@@ -1,6 +1,7 @@
 package be.cytomine.controller.ontology;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -8,9 +9,14 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.io.ParseException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.mvc.ProxyExchange;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.CytomineDomain;
@@ -20,7 +26,6 @@ import be.cytomine.domain.security.User;
 import be.cytomine.dto.annotation.SimplifiedAnnotation;
 import be.cytomine.dto.image.CropParameter;
 import be.cytomine.exceptions.CytomineMethodNotYetImplementedException;
-import be.cytomine.exceptions.InvalidRequestException;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.*;
@@ -69,6 +74,11 @@ public class RestAnnotationDomainController extends RestCytomineController {
 
     private final AnnotationListingBuilder annotationListingBuilder;
 
+    private final RestTemplate restTemplate;
+
+    @Value("${application.internalProxyURL}")
+    private String internalProxyURL;
+
     @RequestMapping(value = { "/annotation/search.json"}, method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<String> searchSpecified() throws IOException {
         return search();
@@ -79,14 +89,6 @@ public class RestAnnotationDomainController extends RestCytomineController {
         JsonObject params = mergeQueryParamsAndBodyParams();
         AnnotationListing annotationListing = annotationListingBuilder.buildAnnotationListing(params);
         List annotations = annotationListingService.listGeneric(annotationListing);
-//        if (annotationListing instanceof AlgoAnnotationListing) {
-//            //if algo, we look for user_annotation JOIN algo_annotation_term  too
-//            params.put("suggestedTerm", params.get("term"));
-//            params.remove("term");
-//            params.remove("usersForTermAlgo");
-//            annotationListing = annotationListingBuilder.buildAnnotationListing(new UserAnnotationListing(entityManager), params);
-//            annotations.addAll(annotationListingService.listGeneric(annotationListing));
-//        }
 
         return responseSuccess(annotations, params.getJSONAttrLong("offset", 0L),params.getJSONAttrLong("max", 0L));
     }
@@ -226,7 +228,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
     /**
      * Read a specific annotation
      * It's better to avoid the user of this method if we know the correct type of an annotation id
-     * Annotation x => annotation/x.json is slower than userannotation/x.json or algoannotation/x.json
+     * Annotation x => annotation/x.json is slower than userannotation/x.json
      */
     @RequestMapping(value = "/annotation/{id}.json", method = {RequestMethod.GET})
     public ResponseEntity<String> show(@PathVariable Long id) throws IOException {
@@ -394,6 +396,40 @@ public class RestAnnotationDomainController extends RestCytomineController {
             return responseSuccess(reviewedAnnotationService.doCorrectReviewedAnnotation(idsReviewedAnnotation, location, remove));
         } else {
             return responseSuccess(userAnnotationService.doCorrectUserAnnotation(idsUserAnnotation, location, remove));
+        }
+    }
+
+    @PostMapping("/annotation/{id}/sam")
+    public ResponseEntity<JsonObject> processAnnotationWithSam(@PathVariable Long id) {
+        AnnotationDomain annotation = AnnotationDomain.getAnnotationDomain(entityManager, id);
+        if (!annotation.isUserAnnotation()) {
+            throw new WrongArgumentException("Only user annotations can be processed with SAM.");
+        }
+
+        URI url = UriComponentsBuilder
+            .fromHttpUrl(this.internalProxyURL)
+            .path("/sam/autonomous_prediction")
+            .queryParam("annotation_id", id)
+            .build()
+            .toUri();
+
+        try {
+            ResponseEntity<String> samResponse = restTemplate.postForEntity(url, null, String.class);
+
+            JsonObject json = new JsonObject();
+            json.put("message", samResponse.getBody());
+
+            return ResponseEntity.status(samResponse.getStatusCode()).body(json);
+        } catch (HttpStatusCodeException e) {
+            JsonObject json = new JsonObject();
+            json.put("message", e.getResponseBodyAsString());
+
+            return ResponseEntity.status(e.getStatusCode()).body(json);
+        } catch (Exception e) {
+            JsonObject json = new JsonObject();
+            json.put("message", "Failed to call SAM server: " + e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(json);
         }
     }
 }

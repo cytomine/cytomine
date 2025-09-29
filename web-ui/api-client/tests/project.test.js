@@ -166,11 +166,6 @@ describe('Project', () => {
       expect(result).toBeInstanceOf(Array);
     });
 
-    it('Fetch evolution of annotation', async () => {
-      let result = await project.fetchAnnotationActionsEvolution({startDate: new Date().getTime(), annotationType: AnnotationType.ALGO});
-      expect(result).toBeInstanceOf(Array);
-    });
-
     it('Fetch number of connections', async () => {
       let result = await project.fetchNbConnections({startDate: new Date().getTime()});
       expect(typeof result).toBe('number');

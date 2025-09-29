@@ -151,13 +151,16 @@ class DatasetImporter:
         dataset_path = [d for d in Path(root).iterdir() if d.is_dir()].pop()
         dataset_name = os.path.basename(root)
         metadata_path = dataset_path / "METADATA"
+        if not metadata_path.exists():
+            logger.info("Metadata folder not found, no validation will be performed")
+            return
 
         validator = MetadataValidator()
         valid = validator.validate(metadata_path)
         if not valid:
-            logging.error(f"'{dataset_name}' Metadata failed to validate.")
+            logger.error(f"'{dataset_name}' Metadata failed to validate.")
         else:
-            logging.info(f"'{dataset_name}' Metadata validated successfully.")
+            logger.info(f"'{dataset_name}' Metadata validated successfully.")
 
     def import_datasets(
         self,

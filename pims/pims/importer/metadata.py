@@ -22,7 +22,7 @@ class XMLValidator:
         tree = etree.parse(schema_path)
         self.schema = etree.XMLSchema(tree)
 
-    def validate(self, xml_path) -> bool:
+    def validate(self, xml_path: Path) -> bool:
         try:
             xml_doc = etree.parse(xml_path)
             return self.schema.validate(xml_doc)
@@ -31,31 +31,22 @@ class XMLValidator:
             return False
 
 
-class Validator:
-    def __init__(self, schema_root: str) -> None:
-        self.schema_root = Path(schema_root)
-
-    def validate(self, file_path: Path, structure: MetadataStructure) -> bool:
-        schema = self.schema_root / f"BP.{structure.value}.xsd"
-        if not schema.exists():
-            logger.error(f"Schema file not found: {schema}")
-            return False
-
-        validator = XMLValidator(schema)
-        document_path = file_path / f"{structure.value}.xml"
-        return validator.validate(document_path)
-
-
 class MetadataValidator:
-    def __init__(self) -> None:
-        self.validator = Validator(self.schema_root)
-
     @property
     def schema_root(self) -> Path:
         return resources.files("resources") / "bigpicture_metaflex" / "src"
 
     def validate(self, file_path: Path) -> bool:
-        return all(
-            self.validator.validate(file_path, structure)
-            for structure in MetadataStructure
-        )
+        for structure in MetadataStructure:
+            schema_path = self.schema_root / f"BP.{structure.value}.xsd"
+            if not schema_path.exists():
+                logger.error(f"Schema file not found: {schema_path}")
+                return False
+
+            validator = XMLValidator(schema_path)
+            document_path = file_path / f"{structure.value}.xml"
+            if not validator.validate(document_path):
+                logger.error(f"Document file not valid: {document_path}")
+                return False
+
+        return True

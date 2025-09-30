@@ -1,5 +1,4 @@
 # All args are listed here at the top for readability
-ARG GUNICORN_VERSION=22.0.0
 ARG OPENJPEG_URL=https://github.com/uclouvain/openjpeg/archive
 ARG OPENJPEG_VERSION=2.5.2
 ARG PIMS_REVISION
@@ -7,8 +6,6 @@ ARG PIMS_VERSION
 ARG PLUGIN_CSV=scripts/plugin-list.csv
 ARG PROXY_CACHE=registry.cytomine.org/docker
 ARG PY_VERSION=3.10
-ARG SETUPTOOLS_VERSION=80.9.0
-ARG UBUNTU_VERSION=22.04
 ARG VIPS_URL=https://github.com/libvips/libvips/releases/download
 ARG VIPS_VERSION=8.15.2
 
@@ -16,23 +13,23 @@ ARG VIPS_VERSION=8.15.2
 ## Stage: Pims
 FROM ${PROXY_CACHE}/python:${PY_VERSION}-bookworm AS base-pims
 
-ARG GUNICORN_VERSION
 ARG OPENJPEG_URL
 ARG OPENJPEG_VERSION
 ARG PIMS_REVISION
 ARG PIMS_VERSION
 ARG PLUGIN_CSV
-ARG SETUPTOOLS_VERSION
-ARG UBUNTU_VERSION
 ARG VIPS_URL
 ARG VIPS_VERSION
 
 ENV DEBIAN_FRONTEND=noninteractive \
     LANG=C.UTF-8 \
     MODULE_NAME="pims.application" \
+    PATH="/app/.venv/bin:$PATH" \
     PLUGIN_INSTALL_PATH=/app/plugins \
     PORT=5000 \
-    PYTHONPATH="/app:$PYTHONPATH"
+    PYTHONPATH="/app:$PYTHONPATH" \
+    UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy
 
 RUN apt-get update && \
     apt-get -y install --no-install-recommends --no-install-suggests \
@@ -48,6 +45,8 @@ RUN apt-get update && \
         libvips-dev \
         libvips42 \
         libwebp-dev
+
+COPY --from=registry.cytomine.org/github/ghcr.io/astral-sh/uv:0.8.13 /uv /uvx /bin/
 
 # Download plugins
 WORKDIR /app
@@ -69,17 +68,10 @@ RUN python plugins.py \
 # Cleaning. Cannot be done before as plugin prerequisites could use apt-get.
 RUN rm -rf /var/lib/apt/lists/*
 
-# Install python requirements
-COPY ./requirements.txt /app/requirements.txt
-RUN pip install --upgrade pip && \
-    pip install --no-cache-dir gunicorn==${GUNICORN_VERSION} && \
-    pip install --no-cache-dir setuptools==${SETUPTOOLS_VERSION} && \
-    pip install --no-cache-dir -r requirements.txt && \
-    python plugins.py \
-        --plugin_csv /app/plugins.csv \
-        --install_path ${PLUGIN_INSTALL_PATH} \
-        --method install && \
-    rm -f /app/plugins.csv
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --frozen --no-install-project
 
 # Add default config
 COPY ./pims-config.env /app/pims-config.env
@@ -94,16 +86,23 @@ RUN chmod +x /start-reload.sh
 
 COPY ./pims /app/pims
 
+COPY ./pyproject.toml ./uv.lock ./
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync
+
+RUN python plugins.py \
+    --plugin_csv /app/plugins.csv \
+    --install_path ${PLUGIN_INSTALL_PATH} \
+    --method install && \
+    rm -f /app/plugins.csv
+
 LABEL org.opencontainers.image.authors='uliege@cytomine.org' \
       org.opencontainers.image.url='https://uliege.cytomine.org/' \
       org.opencontainers.image.documentation='https://doc.uliege.cytomine.org/' \
-      org.opencontainers.image.source='https://github.com/cytomine/Cytomine-pims' \
+      org.opencontainers.image.source='https://github.com/cytomine/cytomine/tree/main/pims' \
       org.opencontainers.image.vendor='Cytomine ULiege' \
-      org.opencontainers.image.deps.gunicorn.version=${GUNICORN_VERSION} \
       org.opencontainers.image.deps.openjpeg.url=${OPENJPEG_URL} \
       org.opencontainers.image.deps.openjpeg.version=${OPENJPEG_VERSION} \
-      org.opencontainers.image.deps.setuptools.version=${SETUPTOOLS_VERSION} \
-      org.opencontainers.image.deps.ubuntu.version=${UBUNTU_VERSION} \
       org.opencontainers.image.deps.vips.url=${VIPS_URL} \
       org.opencontainers.image.deps.vips.version=${VIPS_VERSION} \
       org.opencontainers.image.plugin.csv=${PLUGIN_CSV} \

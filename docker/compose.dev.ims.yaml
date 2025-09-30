@@ -13,6 +13,7 @@ services:
     tty: true
     volumes:
       - ./pims:/app
+      - /app/.venv
     environment:
       WEB_CONCURRENCY: 1 # only one process in dev
 

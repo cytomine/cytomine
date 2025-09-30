@@ -75,12 +75,6 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     uv sync --frozen --no-install-project
 
-RUN python plugins.py \
-    --plugin_csv /app/plugins.csv \
-    --install_path ${PLUGIN_INSTALL_PATH} \
-    --method install && \
-    rm -f /app/plugins.csv
-
 # Add default config
 COPY ./pims-config.env /app/pims-config.env
 COPY ./logging-prod.yml /app/logging.yml
@@ -92,11 +86,17 @@ RUN chmod +x /start.sh
 COPY ./docker/start-reload.sh /start-reload.sh
 RUN chmod +x /start-reload.sh
 
+COPY ./pims /app/pims
+
 COPY ./pyproject.toml ./uv.lock ./
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync
 
-COPY ./pims /app/pims
+RUN python plugins.py \
+    --plugin_csv /app/plugins.csv \
+    --install_path ${PLUGIN_INSTALL_PATH} \
+    --method install && \
+    rm -f /app/plugins.csv
 
 LABEL org.opencontainers.image.authors='uliege@cytomine.org' \
       org.opencontainers.image.url='https://uliege.cytomine.org/' \

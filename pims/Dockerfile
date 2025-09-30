@@ -6,7 +6,6 @@ ARG PIMS_VERSION
 ARG PLUGIN_CSV=scripts/plugin-list.csv
 ARG PROXY_CACHE=registry.cytomine.org/docker
 ARG PY_VERSION=3.10
-ARG SETUPTOOLS_VERSION=80.9.0
 ARG VIPS_URL=https://github.com/libvips/libvips/releases/download
 ARG VIPS_VERSION=8.15.2
 
@@ -19,7 +18,6 @@ ARG OPENJPEG_VERSION
 ARG PIMS_REVISION
 ARG PIMS_VERSION
 ARG PLUGIN_CSV
-ARG SETUPTOOLS_VERSION
 ARG VIPS_URL
 ARG VIPS_VERSION
 
@@ -105,7 +103,6 @@ LABEL org.opencontainers.image.authors='uliege@cytomine.org' \
       org.opencontainers.image.vendor='Cytomine ULiege' \
       org.opencontainers.image.deps.openjpeg.url=${OPENJPEG_URL} \
       org.opencontainers.image.deps.openjpeg.version=${OPENJPEG_VERSION} \
-      org.opencontainers.image.deps.setuptools.version=${SETUPTOOLS_VERSION} \
       org.opencontainers.image.deps.vips.url=${VIPS_URL} \
       org.opencontainers.image.deps.vips.version=${VIPS_VERSION} \
       org.opencontainers.image.plugin.csv=${PLUGIN_CSV} \

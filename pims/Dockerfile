@@ -85,6 +85,7 @@ COPY ./docker/start-reload.sh /start-reload.sh
 RUN chmod +x /start-reload.sh
 
 COPY ./pims /app/pims
+COPY ./resources/ ./resources/
 
 COPY ./pyproject.toml ./uv.lock ./
 RUN --mount=type=cache,target=/root/.cache/uv \

@@ -24,12 +24,12 @@ ARG VIPS_VERSION
 ENV DEBIAN_FRONTEND=noninteractive \
     LANG=C.UTF-8 \
     MODULE_NAME="pims.application" \
-    PATH="/app/.venv/bin:$PATH" \
     PLUGIN_INSTALL_PATH=/app/plugins \
     PORT=5000 \
     PYTHONPATH="/app:$PYTHONPATH" \
     UV_COMPILE_BYTECODE=1 \
-    UV_LINK_MODE=copy
+    UV_LINK_MODE=copy \
+    UV_PROJECT_ENVIRONMENT=/usr/local
 
 RUN apt-get update && \
     apt-get -y install --no-install-recommends --no-install-suggests \

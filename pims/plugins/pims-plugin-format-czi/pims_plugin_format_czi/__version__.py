@@ -12,13 +12,11 @@
 #  * See the License for the specific language governing permissions and
 #  * limitations under the License.
 
-VERSION = (0, 0, 0)
-
 __title__ = 'pims-plugin-format-czi'
 __description__ = 'CZI plugin for PIMS'
 __plugin__ = 'czi'
 __url__ = 'https://doc.cytomine.org'
-__version__ = '.'.join(map(str, VERSION))
+__version__ = '1.0.3'
 __license__ = 'Proprietary Cytomine Corporation'
 __copyright__ = 'Copyright 2020-2022 ULiège Cytomine R&D team'
 __author__ = 'LD YBA'

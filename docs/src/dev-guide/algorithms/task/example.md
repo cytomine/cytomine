@@ -106,6 +106,8 @@ authors:
 configuration:
   input_folder: /inputs
   output_folder: /outputs
+  image:
+    file: /com.cytomine.dummy.example-0.1.0.tar
 
 inputs:
   size:
@@ -126,16 +128,16 @@ outputs:
 
 The final step is to create the task bundle, which consists of the Docker image in a tar archive format and the descriptor file in yaml format.
 
-To save the Docker image as an archive:
+To save the Docker image as an archive, make sure the name matches `configuration.image.file` in descriptor:
 
 ```bash
-sudo docker save cytomineuliege/example:0.1.0 -o image.tar
+sudo docker save cytomineuliege/example:0.1.0 -o com.cytomine.dummy.example-0.1.0.tar
 ```
 
 To create the task bundle:
 
 ```bash
-zip com.cytomine.dummy.example-0.1.0.zip image.tar descriptor.yml
+zip com.cytomine.dummy.example-0.1.0.zip descriptor.yml com.cytomine.dummy.example-0.1.0.tar
 ```
 
 At the end of the compression, a zip archive named `com.cytomine.dummy.example-0.1.0.zip` should be generated in the current directory with the Docker image archive and the descriptor.

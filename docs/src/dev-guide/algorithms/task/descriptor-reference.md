@@ -299,35 +299,24 @@ All configuration properties are under a `configuration` object.
 | **Default**  | `"/outputs"` |
 | **Format**   | `path`       |
 
-### `configuration.image`
+#### `configuration.image.file`
 
-**Description**: information about where the Docker image can be found and in which format
+**Description**: The absolute path to the Docker image archive relative to the [Task archive bundle](/dev-guide/algorithms/task/#how-to-create-a-task) root.
+_It should be in the root directory_
 
-_Default behavior if unspecified_: App Engine looks for an `image.tar` file at the root of the [Task archive bundle](/dev-guide/algorithms/task/#how-to-create-a-task).
-
-|              |          |
-| ------------ | -------- |
-| **Type**     | `object` |
-| **Required** | `false`  |
+|              |                              |
+| ------------ |------------------------------|
+| **Type**     | `string`                     |
+| **Required** | `true`                       |
+| **Format**   | `/{namespace}-{version}.tar` |
 
 Example:
 
 ```yaml
 configuration:
   image:
-    file: /directory/image.tar
+    file: /some.task-1.0.0.tar
 ```
-
-#### `configuration.image.file`
-
-**Description**: The absolute path to the Docker image archive relative to the [Task archive bundle](/dev-guide/algorithms/task/#how-to-create-a-task) root.
-
-|              |                |
-| ------------ | -------------- |
-| **Type**     | `string`       |
-| **Required** | `false`        |
-| **Default**  | `"/image.tar"` |
-| **Format**   | `path`         |
 
 ### `configuration.resources.ram`
 

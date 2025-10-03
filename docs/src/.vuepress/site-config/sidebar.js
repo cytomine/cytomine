@@ -76,7 +76,14 @@ module.exports = {
             ["/dev-guide/algorithms/task/task-docker-image", "Task Docker image"],
             ["/dev-guide/algorithms/task/task-io", "Task I/O"],
             ["/dev-guide/algorithms/task/descriptor-reference", "Task descriptor reference"],
-            ["/dev-guide/algorithms/task/example", "Example"],
+            {
+                title: "Examples",
+                collapsable: false,
+                children: [
+                    ["/dev-guide/algorithms/task/examples/complete-walkthrough-example", "Complete Walkthrough Example"],
+                    ["/dev-guide/algorithms/task/examples/others", "Others"],
+                ],
+            }
           ],
         },
       ],

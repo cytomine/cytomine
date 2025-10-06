@@ -16,7 +16,7 @@ The Task descriptor is a YAML file that documents in a declarative way what the 
 
 Additionally, it provides general information about the Task, such as its name, author, and identification details.
 
-The structure of the Task is dictated by a JSON schema available at <a href="https://cytomine.com/schemas/appengine/task.latest.json">https://cytomine.com/schemas/appengine/task.latest.json</a>.
+The structure of the Task is dictated by a JSON schema available at [Descriptor Schema](https://github.com/cytomine/cytomine/blob/main/app-engine/src/main/resources/schemas/tasks/task.v0.json).
 
 ## Table of content
 

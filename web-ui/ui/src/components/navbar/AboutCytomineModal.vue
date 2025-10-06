@@ -10,6 +10,15 @@
         <dt>{{ $t('description') }}</dt>
         <dd>{{ $t('cytomine-description') }}</dd>
 
+        <dt>{{ $t('funding') }}</dt>
+        <dd>
+          <i18n path="cytomine-funding">
+            <a place="link" href="https://uliege.cytomine.org/#fundings" target="_blank">
+              https://uliege.cytomine.org/#fundings
+            </a>
+          </i18n>
+        </dd>
+
         <dt>{{ $t('website') }}</dt>
         <dd>
           <i18n path="cytomine-website-info">

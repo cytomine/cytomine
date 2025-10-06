@@ -268,6 +268,7 @@ currently,Currently,Actuellement,Actualmente,Momenteel
 currently-visible-annotations-with,Currently visible annotations with,Annotations actuellement visibles avec,,Momenteel zichtbaar annotatie met
 custom-ui,Custom UI,Personnalisation de l'interface,Personalizada interfaz,Custom interface (UI)
 cytomine-description,A web platform for collaborative analysis of very large bio-medical images.,Une plateforme web pour l'analyse collaborative d'images biomédicales de très grande taille.,Una plataforma web para el análisis colaborativo de imágenes biomédicas muy grandes.,Een webplatform voor gezamenlijke analyse van zeer grote biomedische beelden.
+cytomine-funding,"Cytomine is developed by the University of Liège and was funded by various grants, see our webpage {link}.","Cytomine est développé par l'Université de Liège et a été financé par diverses subventions, consultez notre page {link}.","Cytomine fue desarrollado por la Universidad de Lieja y fue financiado por varias subvenciones, vea nuestra página {link}.","Cytomine wordt ontwikkeld door de Universiteit van Luik en is gefinancierd door verschillende subsidies, bekijk onze webpagina {link}."
 cytomine-website-info,You can find more information on the website of the Cytomine project located at {websiteLink}.,Vous trouverez davantage d'information sur le site web du projet Cytomine : {websiteLink}.,Puede encontrar más información en el sitio web del proyecto Cytomine ubicado en {websiteLink}.,Meer informatie vindt u op de website van het Cytomine-project: {websiteLink}.
 dashboard,Dashboard,Tableau de bord,Panel principal,Dashboard
 data-last-updated-on,Data refreshed at {time},Données mises à jours à {time},Datos actualizados a las {time},Gegevens geupdated om {time}
@@ -389,6 +390,7 @@ freehand-line,Freehand line,Ligne à main levée,Mano alzada,Lijn uit de vrije h
 freehand-polygon,Freehand polygon,Polygone à main levée,Polígono a mano alzada,veelhoek uit de vrije hand
 from-file,From,Fichier parent,Archivo padre,Van file
 from,From,Depuis,Desde,Van
+funding,Funding,Financement,Financiación,Financiering
 gamma,Gamma,Gamma,Gama,Gamma
 general,General,Général,General,Algemeen
 geometry-info,"Geometry information (area, length)","Mesures (aire, périmètre, longueur)","Información de geometría (área, longitud)","Metingen (oppervlakte, omtrek, lengte)"

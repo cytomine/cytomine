@@ -687,7 +687,6 @@ notif-error-user-lock,Failed to lock the user,Une erreur a empêché de verrouil
 notif-error-user-unlock,Failed to unlock the user,Une erreur a empêché de déverrouiler l'utilisateur,Error al desbloquear el usuario,Door een fout kon de user niet worden ontgrendeld
 notif-error-user-update,Failed to update the user,Une erreur a empêché la modification de l'utilisateur,Error al actualizar al usuario,Een fout verhinderde de wijziging van de user
 notif-error-validate-review,Failed to validate the image,Une erreur a empêché la validation de l'image,Error al validar la imagen,Een fout verhinderde de review van de afbeelding
-notif-error-welcome-message-update,Failed to update the welcome message,Une erreur a empêché de mettre à jour le message de bienvenue,Error al actualizar el mensaje de bienvenida,Door een fout kon het welkomstbericht niet worden bijgewerkt
 notif-success-add-image,Image {imageName} was successfully added to project {projectName},L'image {imageName} a été ajoutée au projet {projectName},La imagen {imageName} se agregó correctamente al proyecto {projectName},De afbeelding {imageName} is toegevoegd aan het project {projectName}
 notif-success-add-project-members,The selected users were correctly added as project members,Les utilisateurs sélectionnés ont été ajoutés au projet,Los usuarios seleccionados se agregaron correctamente al proyecto,De geselecteerde gebruikers zijn toegevoegd aan het project
 notif-success-add-tag-domain-association,The selected tags were correctly associated,Les tags sélectionnés ont été associés,Las etiquetas seleccionadas se asociaron correctamente,De geselecteerde tags zijn gekoppeld
@@ -733,7 +732,6 @@ notif-success-track-update,The track was successfully updated,La trace a bien é
 notif-success-user-creation,User successfully created,L'utilisateur a bien été créé,Usuario creado con éxito,De user is succesvol aangemaakt
 notif-success-user-details-saved,User details correctly updated,Profil mis à jour avec succès,Los detalles del usuario se han actualizado correctamente,Profiel succesvol updated
 notif-success-user-update,User successfully updated,L'utilisateur a bien été modifié,Usuario actualizado con éxito,User succesvol gewijzigd
-notif-success-welcome-message-update,Welcome message successfully updated,Le message de bienvenue a bien été mis à jour,Mensaje de bienvenida actualizado con éxito,Het welkomstbericht is bijgewerkt
 notif-unexpected-error,Unexpected error,Une erreur inattendue s'est produite,Se ha producido un error inesperado,Er is een onverwachte fout opgetreden
 notif-warn-ontology-tree-order-not-persisted,The order of children in the ontology tree is not persisted in database,L'ordre des enfants dans l'arborescence n'est pas sauvegardée dans la base de données,La jerarquía de términos dentro de la ontología no se mantiene en la base de datos.,De volgorde van de kinderen in de stamboom wordt niet opgeslagen in de database
 notify-error-app-installation,Failed to install the app,Échec de l'installation de l'application,Error al instalar la aplicación,Installatie van de app mislukt

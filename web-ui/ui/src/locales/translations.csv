@@ -46,7 +46,6 @@ already-in-this-image-group,Already in this image group,Déjà dans ce groupe d'
 and-count-others,- | and one other | and {count} others,- | et un autre | et {count} autres,- | y otro | y {cuenta} otros,- | en nog een | en {tel} anderen
 already-linked,Already linked,Déjà lié,Ya vinculado,Reeds gekoppeld
 annotated-images-vs-contributor,Annotated images VS. contributor,Images annotées VS. contributeur,Imágenes anotadas por colaborador,Geannoteerde afbeeldingen VS. bijdrager
-analyses,Analyses,Analyses,Análisis,Analyses
 annotated-images-vs-contributors-chart-info-message,This chart presents the number of images annotated by each project member. Only annotations created during the selected period are taken into account.,ce graphique présente le nombre d'images annotées par chaque membre. Seules les annotations créées durant la période sélectionnée sont prises en compte.,Este gráfico presenta el número de imágenes anotadas por cada miembro del proyecto. Solo se tienen en cuenta las anotaciones creadas durante el período seleccionado.,"deze grafiek toont het aantal afbeeldingen dat door elk lid is geannoteerd. Alleen annotaties die tijdens de geselecteerde periode zijn gemaakt, worden in aanmerking genomen."
 annotated-images-vs-term,Annotated images VS. term,Images annotées VS. terme,Imágenes anotadas por término,Geannoteerde afbeeldingen VS. term
 annotated-images-vs-terms-chart-info-message,This chart presents for each term the number of images having at least one user annotation associated with this term. Only annotations created during the selected period are taken into account.,"Ce graphique présente, pour chaque terme, le nombre d'images ayant au moins une annotation associée à ce terme. Seules les annotations créées durant la période sélectionnée sont prises en compte.",Este cuadro presenta el número de imágenes que tienen al menos una anotación de usuario asociada con cada término. Solo se tienen en cuenta las anotaciones creadas durante el período seleccionado.,"Deze grafiek geeft voor elke term het aantal afbeeldingen weer met ten minste één annotatie die aan deze term is gekoppeld. Alleen annotaties die tijdens de geselecteerde periode zijn gemaakt, worden in aanmerking genomen."
@@ -75,7 +74,6 @@ associated-by,associated by {username},associé par {username},asociado por {use
 at,at,au,en,bij
 attached-files,Attached files,Fichiers joints,Archivos adjuntos,Bijlagen files
 average,Average,Moyenne,Promedio,Gemiddeld
-back-to-login,Back to login form,Retour au formulaire d'authentification,Volver al formulario de inicio de sesión,Terug naar authenticatieformulier
 barchart-click-label-to-toggle-visibility,Click on a label at the top of the chart to toggle the visibility of this data in the chart,Cliquez sur un label au-dessus du graphique pour afficher/masquer les données associées à ce label dans le graphique,Haga clic en una etiqueta en la parte superior del gráfico para mostrar/ocultar estos datos,Klik op een label boven de grafiek om de gegevens die bij dit label horen in de grafiek weer te geven/te verbergen
 barchart-hover-mouse-for-details,Hover the mouse over a bar to display details related to this bar,Passez la souris sur une barre pour afficher les détails relatifs à cette barre,Pase el ratón sobre una barra para mostrar los detalles relacionados con esta barra,Plaats de muisaanwijzer op een balk om details over die balk te bekijken
 black,Black,Noir,Negro,Zwart
@@ -129,7 +127,6 @@ button-kill,Kill,Arrêter,Abortar,Stoppen
 button-less,Less,Moins,Menos,Minder
 button-load-more,Load more,Plus,Cargar más,Meer loaden knop
 button-lock,Lock,Verrouiller,Bloquear,blokkeren
-button-login,Log in,Se connecter,Iniciar sesión,Inloggen
 button-manage-members,Manage members,Gestion des membres,Administrar miembros,Leden managen
 button-metadata,Metadata,Métadonnées,Metadatos,Metagegevens
 button-more-info,More information,Plus d'informations,Más información,Meer informatie
@@ -145,7 +142,6 @@ button-previous-image,Previous image,Image précédente,Imagen anterior,Vorige a
 button-previous-image-in-group,Previous image in group,Image précédente dans le groupe,imagen anterior en grupo,Vorige afbeelding in groep
 button-properties,Properties,Propriétés,Propiedades,Eigenschappen
 button-refresh,Refresh,Rafraîchir,Actualizar,Refresh
-button-register,Register,S'inscrire,Registrarse,Register
 button-reject-all,Reject all,Tout rejeter,Rechazar todo,Alles weigeren
 button-remove-selected-members,Remove selected members,Retirer les membres sélectionnés,Eliminar miembros seleccionados,Verwijder geselecteerde leden
 button-remove,Remove,Supprimer,Eliminar,Verwijderen
@@ -376,9 +372,6 @@ firstname,First name,Prénom,Nombre,Voornaam
 fluorescence-spectra,Fluorescence spectra,Spectre de fluorescence,Espectros de fluorescencia,Fluorescentie spectra
 follow-user,Follow a user,Suivi d'utilisateur,Seguir a un usuario,User opvolging
 followers,Followers,Suiveurs,,Volgers
-forgot-credentials,Forgot your {username} or your {password}?,Vous avez oublié votre {username} ou votre {password} ?,¿Olvidó su {username} o su {password}?,{Usersnaam} of {wachtwoord} vergeten?
-forgot-password,Forgot password,Mot de passe oublié,Olvidó su contraseña,Wachtwoord vergeten
-forgot-username,Forgot username,Nom d'utilisateur oublié,Olvidó su nombre de usuario,Usersnaam vergeten
 format,Format,Format,Formato,Formaat
 forum-image-sc,Image.sc forum,forum Image.sc,Foro de imagen.sc,Image.sc-forum
 frame-per-second,f/s,f/s,,f/s
@@ -395,7 +388,6 @@ gamma,Gamma,Gamma,Gama,Gamma
 general,General,Général,General,Algemeen
 geometry-info,"Geometry information (area, length)","Mesures (aire, périmètre, longueur)","Información de geometría (área, longitud)","Metingen (oppervlakte, omtrek, lengte)"
 github-repository,GitHub repository,répertoire GitHub,Repositorio de GitHub,GitHub-gids
-github,Github,Github,Github,Github
 global-size,Global size,Taille globale,Tamaño global,Totale grootte
 go-back,Go back,Page Précédente,Página anterior,Vorige pagina
 green,Green,Vert,Verde,Groen
@@ -415,7 +407,7 @@ hostname,Hostname,Nom de domaine,Nombre de dominio,Hostnaam
 hour,Hour,Heure,Hora,Uur
 hue,Hue,Teinte,Tono,Tint
 huge,Huge,Très grand,Enorme,Erg groot
-id,ID,ID,,ID
+id,ID,ID,ID,ID
 image-channels,Channels,Canaux,,Channels
 image,Image,Image,Imagen,Afbeelding
 image-consultations-info-message,An image consultation is recorded each time a user opens an image in Cytomine,Une consultation d'image est enregistrée à chaque ouverture d'image dans Cytomine,Se registra una consulta de imagen cada vez que un usuario abre una imagen en Cytomine,"Elke keer dat een afbeelding in Cytomine wordt geopend, wordt een beeldconsultatie opgeslagen"
@@ -493,7 +485,6 @@ listdomain,List of Cytomine domains,Liste de domaines Cytomine,Lista de dominios
 live,Live,Live,En Vivo,Live
 log-being-collected,Execution log is being collected,Le log d'exécution est en train d'être collecté,Se está recopilando el registro de ejecución.,Het uitvoeringslogboek wordt verzameld
 logarithmic,Logarithmic,Logarithmic,,Logaritmisch
-login,Log in,Authentification,Iniciar sesión,Log in
 logout,Logout,Se déconnecter,Cerrar sesión,Afmelden
 magic-wand,Magic Wand,Baguette magique,Varita mágica,Toverstok
 magnification,Magnification,Grossissement,Aumento,Vergroting

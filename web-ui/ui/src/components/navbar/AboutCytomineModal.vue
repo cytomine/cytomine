@@ -1,6 +1,8 @@
 <template>
   <cytomine-modal-card :title="$t('about-cytomine')" @close="$parent.close()">
     <template>
+      <img class="logo" src="@/assets/logo.svg">
+
       <dl>
         <dt>{{ $t('version') }}</dt>
         <dd>{{ version || '?' }}</dd>
@@ -67,6 +69,12 @@ export default {
 </script>
 
 <style scoped>
+.logo {
+  display: block;
+  margin: 0 auto;
+  max-height: 10rem;
+}
+
 .modal-card,
 .modal-card-body {
   width: 50vw;

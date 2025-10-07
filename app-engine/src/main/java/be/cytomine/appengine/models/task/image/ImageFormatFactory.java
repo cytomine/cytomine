@@ -3,6 +3,7 @@ package be.cytomine.appengine.models.task.image;
 import java.util.HashMap;
 import java.util.Map;
 
+import be.cytomine.appengine.models.task.formats.DicomFormat;
 import be.cytomine.appengine.models.task.formats.FileFormat;
 import be.cytomine.appengine.models.task.formats.GenericFormat;
 import be.cytomine.appengine.models.task.formats.JpegFormat;
@@ -13,6 +14,7 @@ public class ImageFormatFactory {
     private static final Map<String, FileFormat> formats = new HashMap<>();
 
     static {
+        formats.put("DICOM", new DicomFormat());
         formats.put("JPEG", new JpegFormat());
         formats.put("PNG", new PngFormat());
         formats.put("TIFF", new TiffFormat());

@@ -86,10 +86,16 @@ To upgrade Cytomine to the latest version:
    git pull
    ```
 
-2. Fetch the latest images of each services in Cytomine.
+2. Fetch the latest images of each services in Cytomine:
 
    ```bash
    sudo docker compose pull
+   ```
+
+3. Restart cytomine with the latest version:
+
+   ```bash
+   sudo docker compose up -d
    ```
 
 ## Stop Cytomine

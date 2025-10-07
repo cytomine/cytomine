@@ -88,6 +88,11 @@ To ensure you are using the latest version, re-fetch the `compose.yaml` file wit
 ```bash
 wget -O compose.yaml https://raw.githubusercontent.com/cytomine/cytomine/main/compose.yaml
 ```
+
+An issue may arise with K3s configuration file, you will have to remove the configuration file:
+```bash
+rm -rf .kube
+```
 :::
 
 ## Stop Cytomine

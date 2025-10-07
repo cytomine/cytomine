@@ -35,7 +35,7 @@ Creating the `tar` archive for a Task with namespace `com.my.task` and version `
 2. save the Docker image as a `tar` archive:
 
    ```bash
-   docker save com/my/task:1.0.0 -o image.tar
+   docker save com/my/task:1.0.0 -o com.my.task-1.0.0.tar
    ```
 
 ::: warning
@@ -58,7 +58,7 @@ Because the Task implementation is independent from Cytomine and the App Engine,
 3. Load the Docker image from the `tar` archive:
 
    ```bash
-   docker load -i image.tar
+   docker load -i com.my.task-1.0.0.tar
    ```
 
 4. Execute the Task image as a container, mounting the input and output directories:

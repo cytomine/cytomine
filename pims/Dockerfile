@@ -5,7 +5,7 @@ ARG PIMS_REVISION
 ARG PIMS_VERSION
 ARG PLUGIN_CSV=scripts/plugin-list.csv
 ARG PROXY_CACHE=registry.cytomine.org/docker
-ARG PY_VERSION=3.10
+ARG PY_VERSION=3.11
 ARG VIPS_URL=https://github.com/libvips/libvips/releases/download
 ARG VIPS_VERSION=8.15.2
 

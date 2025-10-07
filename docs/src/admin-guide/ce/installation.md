@@ -27,6 +27,7 @@ Cytomine installation requires about **15GB**. You need to provide enough space 
 - A **Linux** operating system like [Ubuntu](https://ubuntu.com/), [Debian](https://www.debian.org/), etc.
 - [Docker Engine](https://docs.docker.com/get-docker/) (v20.10+ recommended)
 - [Docker Compose](https://docs.docker.com/compose/) (v2.0+ recommended)
+- [Git](https://git-scm.com/) (v2.0+ recommended)
 
 ### Running App in Cytomine
 
@@ -47,17 +48,16 @@ This installation procedure is intended for desktop or laptop computers running 
 
 > It is expected to have `root` permissions (sudo privileges in Debian/Ubuntu).
 
-1. Create a folder for hosting the files:
+1. Clone the cytomine repository:
 
    ```bash
-   mkdir cytomine
-   cd cytomine
+   git clone https://github.com/cytomine/cytomine.git
    ```
 
-2. Download the Docker Compose file on your computer:
+2. Go into the cloned folder:
 
    ```bash
-   wget https://raw.githubusercontent.com/cytomine/cytomine/main/compose.yaml
+   cd cytomine
    ```
 
 3. Launch cytomine:
@@ -71,29 +71,26 @@ This installation procedure is intended for desktop or laptop computers running 
    - If you have kept the default values your Cytomine is now available on <http://127.0.0.1/>.
    - A default `admin` account is created with the password `password`
 
+::: tip
+If you encounter any issues during installation, refer to the [troubleshooting](./troubleshooting.md) section first.
+:::
+
 ## Upgrade Cytomine
 
 To upgrade Cytomine to the latest version:
 
-```bash
-sudo docker compose pull
-```
+1. Fetch the latest changes in the cytomine repository:
 
-This command will pull the latest images of each services in Cytomine.
+   ```bash
+   cd cytomine
+   git pull
+   ```
 
-::: warning
-If the deployment does not work correctly after pulling the latest images, it is possible that the `compose.yaml` file has been updated.
+2. Fetch the latest images of each services in Cytomine.
 
-To ensure you are using the latest version, re-fetch the `compose.yaml` file with the following command:
-```bash
-wget -O compose.yaml https://raw.githubusercontent.com/cytomine/cytomine/main/compose.yaml
-```
-
-An issue may arise with K3s configuration file, you will have to remove the configuration file:
-```bash
-rm -rf .kube
-```
-:::
+   ```bash
+   sudo docker compose pull
+   ```
 
 ## Stop Cytomine
 

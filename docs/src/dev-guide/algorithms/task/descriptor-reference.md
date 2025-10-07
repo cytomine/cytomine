@@ -93,7 +93,7 @@ The structure of the Task is dictated by a JSON schema available at [Descriptor 
     - [`{IMG}.type.max_width`](#img-type-max-width)
     - [`{IMG}.type.max_height`](#img-type-max-height)
     - [`{IMG}.type.formats`](#img-type-formats)
-  - [Type `wsi`](#type-wsi)
+  - [Type `wsi` (deprecated)](#type-wsi-deprecated)
     - [`{WSI}.type.id`](#wsi-type-id)
     - [`{WSI}.type.max_file_size`](#wsi-type-max-file-size)
     - [`{WSI}.type.max_width`](#wsi-type-max-width)
@@ -1051,7 +1051,7 @@ inputs:
 | **Required** | `false`                   |
 | **Default**  | `['png', 'jpeg', 'tiff']` |
 
-### Type `wsi`
+### Type `wsi` (deprecated)
 
 **Description**: Type for an whole slide image parameter.
 

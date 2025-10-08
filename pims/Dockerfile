@@ -5,9 +5,9 @@ ARG PIMS_REVISION
 ARG PIMS_VERSION
 ARG PLUGIN_CSV=scripts/plugin-list.csv
 ARG PROXY_CACHE=registry.cytomine.org/docker
-ARG PY_VERSION=3.10
+ARG PY_VERSION=3.11
 ARG VIPS_URL=https://github.com/libvips/libvips/releases/download
-ARG VIPS_VERSION=8.15.2
+ARG VIPS_VERSION=8.17.2
 
 #######################################################################################
 ## Stage: Pims
@@ -42,11 +42,34 @@ RUN apt-get update && \
         liborc-dev \
         libpng-dev \
         libtiff-dev \
-        libvips-dev \
-        libvips42 \
-        libwebp-dev
+        libwebp-dev \
+        ninja-build
 
 COPY --from=registry.cytomine.org/github/ghcr.io/astral-sh/uv:0.8.13 /uv /uvx /bin/
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        ca-certificates \
+        curl \
+        git \
+        openssl \
+    && update-ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+RUN curl -v https://github.com
+RUN openssl s_client -connect github.com:443
+
+ARG VIPS_VERSION=8.17.2
+ARG VIPS_URL=https://github.com/libvips/libvips/releases/download
+RUN pip install --no-cache-dir meson
+RUN cd /usr/local/src && \
+    wget ${VIPS_URL}/v${VIPS_VERSION}/vips-${VIPS_VERSION}.tar.xz && \
+    tar -xvf vips-${VIPS_VERSION}.tar.xz && \
+    rm -rf vips-${VIPS_VERSION}.tar.xz && \
+    cd vips-${VIPS_VERSION} && \
+    meson build --libdir lib -Dintrospection=disabled --buildtype release && \
+    cd build && \
+    ninja && \
+    ninja install && \
+    ldconfig
 
 # Download plugins
 WORKDIR /app

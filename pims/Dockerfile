@@ -54,6 +54,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         openssl \
     && update-ca-certificates \
     && rm -rf /var/lib/apt/lists/*
+RUN curl -v https://github.com
+RUN openssl s_client -connect github.com:443
 
 ARG VIPS_VERSION=8.17.2
 ARG VIPS_URL=https://github.com/libvips/libvips/releases/download

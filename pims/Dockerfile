@@ -47,6 +47,14 @@ RUN apt-get update && \
 
 COPY --from=registry.cytomine.org/github/ghcr.io/astral-sh/uv:0.8.13 /uv /uvx /bin/
 
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        ca-certificates \
+        curl \
+        git \
+        openssl \
+    && update-ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
 ARG VIPS_VERSION=8.17.2
 ARG VIPS_URL=https://github.com/libvips/libvips/releases/download
 RUN pip install --no-cache-dir meson

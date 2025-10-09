@@ -1,0 +1,11 @@
+*.pyc
+__pycache__
+.pytest_cache
+.coverage
+
+.project
+.pydevproject
+.settings
+
+*.egg
+*.egg-info

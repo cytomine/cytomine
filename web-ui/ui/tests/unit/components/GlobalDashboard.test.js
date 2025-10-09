@@ -3,18 +3,13 @@ import Buefy from 'buefy';
 import VTooltip from 'v-tooltip';
 
 import GlobalDashboard from '@/components/GlobalDashboard';
-import {Configuration, ImageInstanceCollection, ProjectCollection} from 'cytomine-client';
+import {ImageInstanceCollection, ProjectCollection} from 'cytomine-client';
 
 jest.mock('@/utils/image-utils', () => ({
   isWebPSupported: jest.fn(() => true)
 }));
 
 jest.mock('cytomine-client', () => ({
-  Configuration: {
-    fetch: jest.fn().mockResolvedValue({
-      value: 'Welcome to the dashboard!'
-    })
-  },
   ImageInstanceCollection: {
     fetchLastOpened: jest.fn().mockResolvedValue([
       {id: 1, project: 1}
@@ -73,12 +68,6 @@ describe('GlobalDashboard.vue', () => {
     expect(headers.at(2).text()).toBe('last-opened-image');
 
     expect(wrapper.vm.loading).toBe(false);
-  });
-
-  it('The component should render the welcome message correctly', () => {
-    expect(Configuration.fetch).toHaveBeenCalled();
-    expect(wrapper.vm.welcomeMessage).toBe('Welcome to the dashboard!');
-    expect(wrapper.find('.box').text()).toContain('Welcome to the dashboard!');
   });
 
   it('The component should fetch projects and compute statistics', () => {

@@ -16,7 +16,7 @@ The Task descriptor is a YAML file that documents in a declarative way what the 
 
 Additionally, it provides general information about the Task, such as its name, author, and identification details.
 
-The structure of the Task is dictated by a JSON schema available at <a href="https://cytomine.com/schemas/appengine/task.latest.json">https://cytomine.com/schemas/appengine/task.latest.json</a>.
+The structure of the Task is dictated by a JSON schema available at [Descriptor Schema](https://github.com/cytomine/cytomine/blob/main/app-engine/src/main/resources/schemas/tasks/task.v0.json).
 
 ## Table of content
 
@@ -93,7 +93,7 @@ The structure of the Task is dictated by a JSON schema available at <a href="htt
     - [`{IMG}.type.max_width`](#img-type-max-width)
     - [`{IMG}.type.max_height`](#img-type-max-height)
     - [`{IMG}.type.formats`](#img-type-formats)
-  - [Type `wsi`](#type-wsi)
+  - [Type `wsi` (deprecated)](#type-wsi-deprecated)
     - [`{WSI}.type.id`](#wsi-type-id)
     - [`{WSI}.type.max_file_size`](#wsi-type-max-file-size)
     - [`{WSI}.type.max_width`](#wsi-type-max-width)
@@ -299,35 +299,24 @@ All configuration properties are under a `configuration` object.
 | **Default**  | `"/outputs"` |
 | **Format**   | `path`       |
 
-### `configuration.image`
+#### `configuration.image.file`
 
-**Description**: information about where the Docker image can be found and in which format
+**Description**: The absolute path to the Docker image archive relative to the [Task archive bundle](/dev-guide/algorithms/task/#how-to-create-a-task) root.
+_It should be in the root directory_
 
-_Default behavior if unspecified_: App Engine looks for an `image.tar` file at the root of the [Task archive bundle](/dev-guide/algorithms/task/#how-to-create-a-task).
-
-|              |          |
-| ------------ | -------- |
-| **Type**     | `object` |
-| **Required** | `false`  |
+|              |                              |
+| ------------ |------------------------------|
+| **Type**     | `string`                     |
+| **Required** | `true`                       |
+| **Format**   | `/{namespace}-{version}.tar` |
 
 Example:
 
 ```yaml
 configuration:
   image:
-    file: /directory/image.tar
+    file: /some.task-1.0.0.tar
 ```
-
-#### `configuration.image.file`
-
-**Description**: The absolute path to the Docker image archive relative to the [Task archive bundle](/dev-guide/algorithms/task/#how-to-create-a-task) root.
-
-|              |                |
-| ------------ | -------------- |
-| **Type**     | `string`       |
-| **Required** | `false`        |
-| **Default**  | `"/image.tar"` |
-| **Format**   | `path`         |
 
 ### `configuration.resources.ram`
 
@@ -1062,7 +1051,7 @@ inputs:
 | **Required** | `false`                   |
 | **Default**  | `['png', 'jpeg', 'tiff']` |
 
-### Type `wsi`
+### Type `wsi` (deprecated)
 
 **Description**: Type for an whole slide image parameter.
 

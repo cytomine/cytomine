@@ -2,14 +2,12 @@
   <div>
     <h3 class="subtitle">{{ $t('app-engine.ae-run-task') }}</h3>
     <section class="fields">
-      <!-- INPUTS -->
       <app-engine-field
         v-for="input in taskInputs"
         v-model="inputs[input.name].value"
         :key="input.id"
         :parameter="input"
       />
-      <!-- TODO outputs when relevant -->
     </section>
     <section>
       <b-field class="buttons" grouped>
@@ -167,8 +165,5 @@ export default {
 
 .fields {
   padding-top: 6px;
-  max-height: 85px;
-  overflow-x: hidden;
-  overflow-y: auto;
 }
 </style>

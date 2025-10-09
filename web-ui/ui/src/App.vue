@@ -142,7 +142,7 @@ export default {
 
       if (token !== null) {
         this.$store.commit('currentUser/setShortTermToken', token);
-        config.headers.common['Authorization'] = `Bearer ${token}`;
+        config.headers['Authorization'] = `Bearer ${token}`;
       }
       return config;
     };

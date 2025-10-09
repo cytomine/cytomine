@@ -80,7 +80,7 @@ def install_python_plugins(plugins, install_path):
         print(f"Install {plugin['name']}")
 
         path = os.path.join(install_path, plugin["name"])
-        command = f"pip install --no-cache-dir -e ."
+        command = "uv pip install --no-cache --system -e ."
         output = subprocess.run(command, shell=True, check=True, cwd=path)
         print(output.stdout)
         print(output.stderr)

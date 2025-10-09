@@ -27,10 +27,20 @@ Cytomine installation requires about **15GB**. You need to provide enough space 
 - A **Linux** operating system like [Ubuntu](https://ubuntu.com/), [Debian](https://www.debian.org/), etc.
 - [Docker Engine](https://docs.docker.com/get-docker/) (v20.10+ recommended)
 - [Docker Compose](https://docs.docker.com/compose/) (v2.0+ recommended)
+- [Git](https://git-scm.com/) (v2.0+ recommended)
 
 ### Running App in Cytomine
 
-To be able to execute apps in Cytomine, a cluster must be installed and running before proceeding with the installation. See [Clusters](/admin-guide/clusters/).
+::: warning
+In previous versions, MicroK8s was required for the installation. This is no longer the case.
+
+Cytomine now uses K3s, which is deployed automatically via Docker Compose. No manual installation or configuration is required anymore.
+
+If you previously installed MicroK8s only for Cytomine, you can safely remove it using the following command:
+```bash
+sudo snap remove microk8s
+```
+:::
 
 ## Installation
 
@@ -38,28 +48,17 @@ This installation procedure is intended for desktop or laptop computers running 
 
 > It is expected to have `root` permissions (sudo privileges in Debian/Ubuntu).
 
-1. Create a folder for hosting the files:
+1. Clone the cytomine repository:
 
    ```bash
-   mkdir cytomine
+   git clone https://github.com/cytomine/cytomine.git
+   ```
+
+2. Go into the cloned folder:
+
+   ```bash
    cd cytomine
    ```
-
-2. Download the Docker Compose file on your computer:
-
-   ```bash
-   wget https://raw.githubusercontent.com/cytomine/cytomine/main/compose.yaml
-   ```
-
-   ::: tip If the App Engine is enabled
-
-   Generate the config file from microk8s
-
-   ```bash
-   mkdir .kube
-   microk8s.config > .kube/config
-   ```
-   :::
 
 3. Launch cytomine:
 
@@ -67,19 +66,37 @@ This installation procedure is intended for desktop or laptop computers running 
    sudo docker compose up -d
    ```
 
-   ::: tip If the App Engine is enabled
-
-   Configure MicroK8s to be able to use the Cytomine registry, see [MicroK8s configuration](/admin-guide/clusters/microk8s/configuration.md).
-   :::
-
 4. Once all services are up and running, Cytomine is ready to be used:
 
    - If you have kept the default values your Cytomine is now available on <http://127.0.0.1/>.
-   - A default admin account is created with the password `password`
+   - A default `admin` account is created with the password `password`
 
 ::: tip
-Once authenticated, it is recommended to update the default administrator password to a more secure one.
+If you encounter any issues during installation, refer to the [troubleshooting](./troubleshooting.md) section first.
 :::
+
+## Upgrade Cytomine
+
+To upgrade Cytomine to the latest version:
+
+1. Fetch the latest changes in the cytomine repository:
+
+   ```bash
+   cd cytomine
+   git pull
+   ```
+
+2. Fetch the latest images of each services in Cytomine:
+
+   ```bash
+   sudo docker compose pull
+   ```
+
+3. Restart cytomine with the latest version:
+
+   ```bash
+   sudo docker compose up -d
+   ```
 
 ## Stop Cytomine
 

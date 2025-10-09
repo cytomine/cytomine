@@ -1,62 +1,71 @@
 package be.cytomine.appengine.handlers.registry.impl;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Optional;
 
 import com.cytomine.registry.client.RegistryClient;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-import be.cytomine.appengine.dto.handlers.registry.DockerImage;
 import be.cytomine.appengine.exceptions.RegistryException;
 import be.cytomine.appengine.handlers.RegistryHandler;
 
+@Component
 @Slf4j
 public class DockerRegistryHandler implements RegistryHandler {
 
-    public DockerRegistryHandler(
-        String registryHost,
-        String registryPort,
-        String registryScheme,
-        boolean authenticated,
-        String registryUsername,
-        String registryPassword
-    ) throws IOException {
-        RegistryClient.config(registryScheme, registryHost, registryPort);
-        if (authenticated) {
-            RegistryClient.authenticate(registryUsername, registryPassword);
+    @Value("${registry.url}")
+    private String registryHost;
+
+    @Value("${registry.user}")
+    private Optional<String> registryUsername = Optional.empty();
+
+    @Value("${registry.password}")
+    private Optional<String> registryPassword = Optional.empty();
+
+    @PostConstruct
+    void init() throws IOException {
+        RegistryClient.config(registryHost);
+        if (registryUsername.filter(e -> !e.isBlank()).isPresent()) {
+            RegistryClient.authenticate(registryUsername.get(),
+                registryPassword.orElseThrow(() -> new IllegalArgumentException("Username was "
+                    + "provided for registry but not password")));
         }
 
         log.info("Docker Registry Handler: initialised");
     }
 
     @Override
-    public boolean checkImage(DockerImage image) throws RegistryException {
-        return false;
-    }
-
-    @Override
-    public void pushImage(DockerImage image) throws RegistryException {
+    public void pushImage(InputStream imageInputStream, String imageName) throws RegistryException {
         log.info("Docker Registry Handler: pushing image...");
-
-        String imageName = image.getImageName();
-        File imageData = image.getImageData();
-
-        try (InputStream inputStream = new FileInputStream(imageData)) {
-            RegistryClient.push(inputStream, imageName);
+        try {
+            RegistryClient.push(imageInputStream, imageName);
             log.info("Docker Registry Handler: image pushed");
         } catch (FileNotFoundException e) {
-            log.error("Image data file not found: {}", imageData.getAbsolutePath(), e);
+            log.error("Image data file not found: {}", imageName, e);
             throw new RegistryException("Docker Registry Handler: image data file not found");
         } catch (IOException e) {
-            log.error("Error reading image data from file: {}", imageData.getAbsolutePath(), e);
+            log.error("Error reading image data from file: {}", imageName, e);
             throw new RegistryException("Docker Registry Handler: failed to read image data");
         } catch (Exception e) {
             log.error("Failed to push image: {}", imageName, e);
             String message = "Docker Registry Handler: failed to push the image to registry";
             throw new RegistryException(message);
+        }
+    }
+
+    @Override
+    public void deleteImage(String imageName) throws RegistryException {
+        try {
+            RegistryClient.delete(imageName);
+        } catch (IOException e) {
+            log.error("Error reading image data from file: {}", imageName, e);
+            throw new RegistryException("Docker Registry Handler: "
+                + "failed to delete image from registry");
         }
     }
 }

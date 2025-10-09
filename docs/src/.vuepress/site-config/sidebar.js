@@ -44,24 +44,6 @@ module.exports = {
         ["/admin-guide/k8s/installation", "Installation Guide"],
       ],
     },
-    {
-      title: "Compute Clusters",
-      collapsable: true,
-      children: [
-        ["/admin-guide/clusters/", "Introduction"],
-        {
-          title: "MicroK8s",
-          collapsable: true,
-          children: [
-            ["/admin-guide/clusters/microk8s/", "Introduction"],
-            ["/admin-guide/clusters/microk8s/installation", "Installation"],
-            ["/admin-guide/clusters/microk8s/configuration", "Configuration"],
-            ["/admin-guide/clusters/microk8s/troubleshooting", "Troubleshooting"],
-            ["/admin-guide/clusters/microk8s/uninstallation", "Uninstallation"],
-          ],
-        },
-      ],
-    },
   ],
 
   devGuide: [
@@ -94,7 +76,14 @@ module.exports = {
             ["/dev-guide/algorithms/task/task-docker-image", "Task Docker image"],
             ["/dev-guide/algorithms/task/task-io", "Task I/O"],
             ["/dev-guide/algorithms/task/descriptor-reference", "Task descriptor reference"],
-            ["/dev-guide/algorithms/task/example", "Example"],
+            {
+                title: "Examples",
+                collapsable: false,
+                children: [
+                    ["/dev-guide/algorithms/task/examples/complete-walkthrough-example", "Complete Walkthrough Example"],
+                    ["/dev-guide/algorithms/task/examples/others", "Others"],
+                ],
+            }
           ],
         },
       ],

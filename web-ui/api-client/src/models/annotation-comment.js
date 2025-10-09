@@ -54,7 +54,7 @@ export default class AnnotationComment extends DomainModel {
       throw new Error('The object must be fetched or saved.');
     }
 
-    if (obj.type !== AnnotationType.USER && obj.type !== AnnotationType.ALGO) {
+    if (obj.type !== AnnotationType.USER) {
       throw new Error('Comment functionality not available for this type of annotation.');
     }
 

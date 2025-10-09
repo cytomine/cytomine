@@ -89,14 +89,6 @@ public class RestAnnotationDomainController extends RestCytomineController {
         JsonObject params = mergeQueryParamsAndBodyParams();
         AnnotationListing annotationListing = annotationListingBuilder.buildAnnotationListing(params);
         List annotations = annotationListingService.listGeneric(annotationListing);
-//        if (annotationListing instanceof AlgoAnnotationListing) {
-//            //if algo, we look for user_annotation JOIN algo_annotation_term  too
-//            params.put("suggestedTerm", params.get("term"));
-//            params.remove("term");
-//            params.remove("usersForTermAlgo");
-//            annotationListing = annotationListingBuilder.buildAnnotationListing(new UserAnnotationListing(entityManager), params);
-//            annotations.addAll(annotationListingService.listGeneric(annotationListing));
-//        }
 
         return responseSuccess(annotations, params.getJSONAttrLong("offset", 0L),params.getJSONAttrLong("max", 0L));
     }
@@ -236,7 +228,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
     /**
      * Read a specific annotation
      * It's better to avoid the user of this method if we know the correct type of an annotation id
-     * Annotation x => annotation/x.json is slower than userannotation/x.json or algoannotation/x.json
+     * Annotation x => annotation/x.json is slower than userannotation/x.json
      */
     @RequestMapping(value = "/annotation/{id}.json", method = {RequestMethod.GET})
     public ResponseEntity<String> show(@PathVariable Long id) throws IOException {

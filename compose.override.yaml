@@ -24,12 +24,12 @@ services:
     image: cytomine/iam:latest
     build:
       context: ./iam/
-      target: ci
 
   app-engine:
     image: cytomine/app-engine:latest
     build:
-      context: ./app-engine/
+      context: ./
+      dockerfile: ./app-engine/Dockerfile
 
   core:
     image: cytomine/core:latest

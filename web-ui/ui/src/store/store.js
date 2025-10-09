@@ -17,6 +17,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
+import appStores from './modules/app-stores.js';
 import currentUser from './modules/current-user.js';
 import currentProject from './modules/current-project.js';
 import ontologies from './modules/ontologies.js';
@@ -26,6 +27,7 @@ Vue.use(Vuex);
 let store = new Vuex.Store({
   actions: {
     logout({state, commit}) {
+      commit('appStores/reset');
       commit('currentUser/resetState');
       commit('currentProject/resetState');
       commit('ontologies/resetState');
@@ -36,6 +38,7 @@ let store = new Vuex.Store({
     }
   },
   modules: {
+    appStores,
     currentUser,
     currentProject,
     ontologies,

@@ -5,6 +5,16 @@ import TaskIoForm from '@/components/appengine/forms/TaskIoForm.vue';
 import AppEngineField from '@/components/appengine/forms/fields/AppEngineField';
 import Task from '@/utils/appengine/task';
 
+jest.mock('cytomine-client', () => ({
+  Cytomine: {
+    instance: {
+      api: {
+        get: jest.fn(),
+      },
+    },
+  },
+}));
+
 jest.mock('@/utils/appengine/task');
 
 jest.mock('@/utils/image-utils', () => ({

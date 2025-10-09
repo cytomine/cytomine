@@ -1,9 +1,15 @@
 package be.cytomine.appengine.unit.services;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import be.cytomine.appengine.utils.DescriptorHelper;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,13 +18,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.mock.web.MockHttpServletRequest;
 
 import be.cytomine.appengine.dto.handlers.filestorage.Storage;
-import be.cytomine.appengine.dto.handlers.registry.DockerImage;
 import be.cytomine.appengine.dto.inputs.task.TaskDescription;
 import be.cytomine.appengine.dto.inputs.task.TaskRun;
-import be.cytomine.appengine.dto.inputs.task.UploadTaskArchive;
 import be.cytomine.appengine.exceptions.FileStorageException;
 import be.cytomine.appengine.exceptions.RunTaskServiceException;
 import be.cytomine.appengine.exceptions.TaskNotFoundException;
@@ -73,28 +77,28 @@ public class TaskServiceTest {
 
     private static Task task;
 
-    private static UploadTaskArchive uploadTaskArchive;
+    private static JsonNode descriptorFileAsJson;
 
     @BeforeAll
     public static void setUp() throws Exception {
         task = TaskUtils.createTestTask(false);
-        uploadTaskArchive = TaskUtils.createTestUploadTaskArchive();
+        File descriptorFile = new ClassPathResource("artifacts/descriptor.yml").getFile();
+        descriptorFileAsJson = DescriptorHelper.parseDescriptor(descriptorFile);
     }
 
     @DisplayName("Successfully upload a task bundle")
     @Test
     public void uploadTaskShouldUploadTaskBundle() throws Exception {
+        // Load test ZIP file from resources
         ClassPathResource resource = TestTaskBuilder.buildCustomImageLocationTask();
-        MockMultipartFile testAppBundle = new MockMultipartFile("test_custom_image_location_task.zip", resource.getInputStream());
+        InputStream inputStream = resource.getInputStream();
 
-        when(archiveUtils.readArchive(testAppBundle)).thenReturn(uploadTaskArchive);
-        Optional<TaskDescription> result = taskService.uploadTask(testAppBundle);
+        Optional<TaskDescription> result = taskService.uploadTask(inputStream);
 
         assertTrue(result.isPresent());
-        verify(archiveUtils, times(1)).readArchive(testAppBundle);
         verify(storageHandler, times(1)).createStorage(any(Storage.class));
         verify(storageHandler, times(1)).saveStorageData(any(Storage.class), any(StorageData.class));
-        verify(registryHandler, times(1)).pushImage(any(DockerImage.class));
+        verify(registryHandler, times(1)).pushImage(any(InputStream.class), any(String.class));
         verify(taskRepository, times(1)).save(any(Task.class));
     }
 

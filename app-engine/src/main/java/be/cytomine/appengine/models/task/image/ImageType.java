@@ -2,6 +2,7 @@ package be.cytomine.appengine.models.task.image;
 
 import java.awt.Dimension;
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
 
@@ -141,11 +142,19 @@ public class ImageType extends Type {
 
     @Override
     public void validate(Object valueObject) throws TypeValidationException {
-        if (!(valueObject instanceof File)) {
+        if (!(valueObject instanceof File) && !(valueObject instanceof String)) {
             throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_TYPE_ERROR);
         }
 
-        File file = (File) valueObject;
+        File file;
+        if (valueObject instanceof String reference) {
+            if (!Paths.get(reference).isAbsolute() || !new File(reference).isFile()) {
+                throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_TYPE_ERROR);
+            }
+            file = new File(reference);
+        } else {
+            file = (File) valueObject;
+        }
 
         validateImageFormat(file);
 

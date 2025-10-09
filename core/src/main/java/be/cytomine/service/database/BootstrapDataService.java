@@ -1,56 +1,29 @@
 package be.cytomine.service.database;
 
-/*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+import java.util.List;
+import java.util.Map;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import be.cytomine.config.properties.ApplicationProperties;
 import be.cytomine.domain.meta.ConfigurationReadingRole;
 import be.cytomine.domain.processing.ImageFilter;
-import be.cytomine.domain.security.User;
-import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.processing.ImageFilterRepository;
-import be.cytomine.repository.security.UserRepository;
-import be.cytomine.service.utils.Dataset;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import jakarta.transaction.Transactional;
-import java.util.List;
-import java.util.Map;
 
 import static be.cytomine.domain.ontology.RelationTerm.PARENT;
 
-@Service
+@RequiredArgsConstructor
 @Transactional
+@Service
 public class BootstrapDataService {
 
-    @Autowired
-    BootstrapUtilsService bootstrapUtilsService;
+    private final BootstrapUtilsService bootstrapUtilsService;
 
-    @Autowired
-    Dataset dataset;
+    private final ApplicationProperties applicationProperties;
 
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    ApplicationProperties applicationProperties;
-
-    @Autowired
-    ImageFilterRepository imageFilterRepository;
+    private final ImageFilterRepository imageFilterRepository;
 
     public void initData() {
 
@@ -76,7 +49,6 @@ public class BootstrapDataService {
 
         bootstrapUtilsService.createRelation(PARENT);
 
-        bootstrapUtilsService.createConfigurations("WELCOME", "<p>Welcome to the Cytomine software.</p><p>This software is supported by the <a href='https://cytomine.coop'>Cytomine company</a></p>", ConfigurationReadingRole.ALL);
         bootstrapUtilsService.createConfigurations("admin_email", applicationProperties.getAdminEmail(), ConfigurationReadingRole.ADMIN);
     }
 
@@ -116,15 +88,6 @@ public class BootstrapDataService {
         for (Map<String, Object> filter : filters) {
             bootstrapUtilsService.createFilter((String)filter.get("name"), (String)filter.get("method"), (Boolean)filter.get("available"));
         }
-    }
-
-    /**  Deprecated API keys. Will be removed in a future release **/
-    private void changeUserKeys(String username, String privateKey, String publicKey) {
-        User user = userRepository.findByUsernameLikeIgnoreCase(username)
-                .orElseThrow(() -> new ObjectNotFoundException(username + " user does not exists, cannot set its keys"));
-        user.setPrivateKey(privateKey);
-        user.setPublicKey(publicKey);
-        userRepository.save(user);
     }
 
     public void updateImageFilters() {

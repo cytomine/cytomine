@@ -29,7 +29,7 @@ jobs:
 
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -49,7 +49,7 @@ jobs:
 
     steps:
       - name: Set up the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -69,13 +69,13 @@ jobs:
 
     services:
       redis:
-        image: redis:${{ vars.REDIS_VERSION }}
+        image: registry.cytomine.org/docker/redis:${{ vars.REDIS_VERSION }}
         ports:
           - 6379:6379
 
     steps:
       - name: Set up the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
         uses: actions/setup-python@v6

@@ -46,7 +46,6 @@ already-in-this-image-group,Already in this image group,Déjà dans ce groupe d'
 and-count-others,- | and one other | and {count} others,- | et un autre | et {count} autres,- | y otro | y {cuenta} otros,- | en nog een | en {tel} anderen
 already-linked,Already linked,Déjà lié,Ya vinculado,Reeds gekoppeld
 annotated-images-vs-contributor,Annotated images VS. contributor,Images annotées VS. contributeur,Imágenes anotadas por colaborador,Geannoteerde afbeeldingen VS. bijdrager
-analyses,Analyses,Analyses,Análisis,Analyses
 annotated-images-vs-contributors-chart-info-message,This chart presents the number of images annotated by each project member. Only annotations created during the selected period are taken into account.,ce graphique présente le nombre d'images annotées par chaque membre. Seules les annotations créées durant la période sélectionnée sont prises en compte.,Este gráfico presenta el número de imágenes anotadas por cada miembro del proyecto. Solo se tienen en cuenta las anotaciones creadas durante el período seleccionado.,"deze grafiek toont het aantal afbeeldingen dat door elk lid is geannoteerd. Alleen annotaties die tijdens de geselecteerde periode zijn gemaakt, worden in aanmerking genomen."
 annotated-images-vs-term,Annotated images VS. term,Images annotées VS. terme,Imágenes anotadas por término,Geannoteerde afbeeldingen VS. term
 annotated-images-vs-terms-chart-info-message,This chart presents for each term the number of images having at least one user annotation associated with this term. Only annotations created during the selected period are taken into account.,"Ce graphique présente, pour chaque terme, le nombre d'images ayant au moins une annotation associée à ce terme. Seules les annotations créées durant la période sélectionnée sont prises en compte.",Este cuadro presenta el número de imágenes que tienen al menos una anotación de usuario asociada con cada término. Solo se tienen en cuenta las anotaciones creadas durante el período seleccionado.,"Deze grafiek geeft voor elke term het aantal afbeeldingen weer met ten minste één annotatie die aan deze term is gekoppeld. Alleen annotaties die tijdens de geselecteerde periode zijn gemaakt, worden in aanmerking genomen."
@@ -75,7 +74,6 @@ associated-by,associated by {username},associé par {username},asociado por {use
 at,at,au,en,bij
 attached-files,Attached files,Fichiers joints,Archivos adjuntos,Bijlagen files
 average,Average,Moyenne,Promedio,Gemiddeld
-back-to-login,Back to login form,Retour au formulaire d'authentification,Volver al formulario de inicio de sesión,Terug naar authenticatieformulier
 barchart-click-label-to-toggle-visibility,Click on a label at the top of the chart to toggle the visibility of this data in the chart,Cliquez sur un label au-dessus du graphique pour afficher/masquer les données associées à ce label dans le graphique,Haga clic en una etiqueta en la parte superior del gráfico para mostrar/ocultar estos datos,Klik op een label boven de grafiek om de gegevens die bij dit label horen in de grafiek weer te geven/te verbergen
 barchart-hover-mouse-for-details,Hover the mouse over a bar to display details related to this bar,Passez la souris sur une barre pour afficher les détails relatifs à cette barre,Pase el ratón sobre una barra para mostrar los detalles relacionados con esta barra,Plaats de muisaanwijzer op een balk om details over die balk te bekijken
 black,Black,Noir,Negro,Zwart
@@ -129,7 +127,6 @@ button-kill,Kill,Arrêter,Abortar,Stoppen
 button-less,Less,Moins,Menos,Minder
 button-load-more,Load more,Plus,Cargar más,Meer loaden knop
 button-lock,Lock,Verrouiller,Bloquear,blokkeren
-button-login,Log in,Se connecter,Iniciar sesión,Inloggen
 button-manage-members,Manage members,Gestion des membres,Administrar miembros,Leden managen
 button-metadata,Metadata,Métadonnées,Metadatos,Metagegevens
 button-more-info,More information,Plus d'informations,Más información,Meer informatie
@@ -145,7 +142,6 @@ button-previous-image,Previous image,Image précédente,Imagen anterior,Vorige a
 button-previous-image-in-group,Previous image in group,Image précédente dans le groupe,imagen anterior en grupo,Vorige afbeelding in groep
 button-properties,Properties,Propriétés,Propiedades,Eigenschappen
 button-refresh,Refresh,Rafraîchir,Actualizar,Refresh
-button-register,Register,S'inscrire,Registrarse,Register
 button-reject-all,Reject all,Tout rejeter,Rechazar todo,Alles weigeren
 button-remove-selected-members,Remove selected members,Retirer les membres sélectionnés,Eliminar miembros seleccionados,Verwijder geselecteerde leden
 button-remove,Remove,Supprimer,Eliminar,Verwijderen
@@ -267,14 +263,10 @@ currently-visible-annotations-for-track,Currently visible annotations for track,
 currently,Currently,Actuellement,Actualmente,Momenteel
 currently-visible-annotations-with,Currently visible annotations with,Annotations actuellement visibles avec,,Momenteel zichtbaar annotatie met
 custom-ui,Custom UI,Personnalisation de l'interface,Personalizada interfaz,Custom interface (UI)
-cytomine-company,Cytomine company,Société Cytomine,Compañía de Cytomine,Cytomine bedrijf
-cytomine-company-info,"For service requests (e.g. installation, hosting, maintenance, trainings, specific software developments, slide scanning), please contact the {websiteCompanyLink}.","Pour des services (e.g. installation, hébergement, maintenance, formations, développements logiciels spécifiques, slide scanning), contactez la {websiteCompanyLink}.","Para solicitudes de servicio (por ejemplo, instalación, hospedaje, mantenimiento, capacitación, desarrollo de software específico, escaneo de diapositivas), comuníquese con {websiteCompanyLink}.","Voor serviceaanvragen (bijv. installatie, hosting, onderhoud, trainingen, specifieke softwareontwikkelingen, dia's scannen), kunt u contact opnemen met de {websiteCompanyLink}."
-cytomine-sponsors-info,Cytomine Community Edition is developed by the University of Liège and was previously funded by research grants of the Wallonia.,Cytomine Community Edition est développé par l'Université de Liège et a été subventionné par des conventions de recherche de la Région Wallone.,Cytomine Community Edition es desarrollado por la Universidad de Lieja y anteriormente fue financiado mediante becas de investigación de Valonia.,Cytomine Community Edition werd ontwikkeld door de Universiteit van Luik en wordt gesubsidieerd door onderzoeksovereenkomsten van het Waalse Gewest.
-cytomine-org-info,You can find more information on the website of the Cytomine project ({websiteOrgLink}).,Vous trouverez davantage d'information sur le site web du projet Cytomine ({websiteOrgLink}).,Puede encontrar más información en el sitio web del proyecto Cytomine ({websiteOrgLink}).,U kunt meer informatie vinden op de website van het Cytomine-project ({websiteOrgLink}).
+cytomine-description,A web platform for collaborative analysis of very large bio-medical images.,Une plateforme web pour l'analyse collaborative d'images biomédicales de très grande taille.,Una plataforma web para el análisis colaborativo de imágenes biomédicas muy grandes.,Een webplatform voor gezamenlijke analyse van zeer grote biomedische beelden.
+cytomine-funding,"Cytomine is developed by the University of Liège and was funded by various grants, see our webpage {link}.","Cytomine est développé par l'Université de Liège et a été financé par diverses subventions, consultez notre page {link}.","Cytomine fue desarrollado por la Universidad de Lieja y fue financiado por varias subvenciones, vea nuestra página {link}.","Cytomine wordt ontwikkeld door de Universiteit van Luik en is gefinancierd door verschillende subsidies, bekijk onze webpagina {link}."
 cytomine-website-info,You can find more information on the website of the Cytomine project located at {websiteLink}.,Vous trouverez davantage d'information sur le site web du projet Cytomine : {websiteLink}.,Puede encontrar más información en el sitio web del proyecto Cytomine ubicado en {websiteLink}.,Meer informatie vindt u op de website van het Cytomine-project: {websiteLink}.
-cytomine-uliege-info,Research and development of this experimental version is supported by the {websiteULiegeLink}.,La recherche et développement de cette version expérimentale sont fournis par l'{websiteULiegeLink}.,La investigación y el desarrollo de esta versión experimental cuentan con el apoyo de {websiteULiegeLink}.,Onderzoek en ontwikkeling van deze experimentele versie wordt ondersteund door de {websiteULiegeLink}.
 dashboard,Dashboard,Tableau de bord,Panel principal,Dashboard
-cytomine-uliege-team,Cytomine team at the University of Liège,équipe Cytomine à l'Université de Liège,Equipo de Cytomine en la Universidad de Lieja,Cytomine-team aan de Universiteit van Luik
 data-last-updated-on,Data refreshed at {time},Données mises à jours à {time},Datos actualizados a las {time},Gegevens geupdated om {time}
 data,Data,Données,Datos,Data
 date,Date,Date,Fecha,Datum
@@ -380,9 +372,6 @@ firstname,First name,Prénom,Nombre,Voornaam
 fluorescence-spectra,Fluorescence spectra,Spectre de fluorescence,Espectros de fluorescencia,Fluorescentie spectra
 follow-user,Follow a user,Suivi d'utilisateur,Seguir a un usuario,User opvolging
 followers,Followers,Suiveurs,,Volgers
-forgot-credentials,Forgot your {username} or your {password}?,Vous avez oublié votre {username} ou votre {password} ?,¿Olvidó su {username} o su {password}?,{Usersnaam} of {wachtwoord} vergeten?
-forgot-password,Forgot password,Mot de passe oublié,Olvidó su contraseña,Wachtwoord vergeten
-forgot-username,Forgot username,Nom d'utilisateur oublié,Olvidó su nombre de usuario,Usersnaam vergeten
 format,Format,Format,Formato,Formaat
 forum-image-sc,Image.sc forum,forum Image.sc,Foro de imagen.sc,Image.sc-forum
 frame-per-second,f/s,f/s,,f/s
@@ -394,11 +383,11 @@ freehand-line,Freehand line,Ligne à main levée,Mano alzada,Lijn uit de vrije h
 freehand-polygon,Freehand polygon,Polygone à main levée,Polígono a mano alzada,veelhoek uit de vrije hand
 from-file,From,Fichier parent,Archivo padre,Van file
 from,From,Depuis,Desde,Van
+funding,Funding,Financement,Financiación,Financiering
 gamma,Gamma,Gamma,Gama,Gamma
 general,General,Général,General,Algemeen
 geometry-info,"Geometry information (area, length)","Mesures (aire, périmètre, longueur)","Información de geometría (área, longitud)","Metingen (oppervlakte, omtrek, lengte)"
 github-repository,GitHub repository,répertoire GitHub,Repositorio de GitHub,GitHub-gids
-github,Github,Github,Github,Github
 global-size,Global size,Taille globale,Tamaño global,Totale grootte
 go-back,Go back,Page Précédente,Página anterior,Vorige pagina
 green,Green,Vert,Verde,Groen
@@ -406,7 +395,6 @@ group-linked-annotations,Group linked annotations,Grouper les annotations liées
 guest,Guest,Invité,Invitado,Gast
 height,Height,Hauteur,Altura,Hoogte
 help,Help,Aide,Ayuda,Hulp
-here,here,ici,aquí,hier
 hide-by-default,Hide layer by default,Caché par défaut,Ocultar capa por defecto,Default verborgen
 hide-contributors-layers-explanation,"If you check ""Hide contributos layers"", a ""simple"" contributor will not be able to see the layers of other contributors. Project managers will still be able to see all layers.","Si cette case est cochée, un ""simple"" contributeur ne pourra pas voir les calques des autres contributeurs du projet. Les responsables du projet seront quant à eux toujours en mesure de visualiser tous les calques.","Si marca &quot;Ocultar capas de colaboradores&quot;, un colaborador &quot;simple&quot; no podrá ver las capas de otros colaboradores. Los administradores del proyecto aún podrán ver todas las capas.","Als dit vakje is aangevinkt, kan een ""eenvoudige"" bijdrager de lagen van de andere bijdragers van het project niet zien. Projectmanagers kunnen nog steeds alle lagen bekijken."
 hide-contributors-layers,Hide contributors layers,Cacher les calques des contributeurs,Ocultar capas de colaboradores,Verberg bijdragerlagen
@@ -419,7 +407,7 @@ hostname,Hostname,Nom de domaine,Nombre de dominio,Hostnaam
 hour,Hour,Heure,Hora,Uur
 hue,Hue,Teinte,Tono,Tint
 huge,Huge,Très grand,Enorme,Erg groot
-id,ID,ID,,ID
+id,ID,ID,ID,ID
 image-channels,Channels,Canaux,,Channels
 image,Image,Image,Imagen,Afbeelding
 image-consultations-info-message,An image consultation is recorded each time a user opens an image in Cytomine,Une consultation d'image est enregistrée à chaque ouverture d'image dans Cytomine,Se registra una consulta de imagen cada vez que un usuario abre una imagen en Cytomine,"Elke keer dat een afbeelding in Cytomine wordt geopend, wordt een beeldconsultatie opgeslagen"
@@ -497,7 +485,6 @@ listdomain,List of Cytomine domains,Liste de domaines Cytomine,Lista de dominios
 live,Live,Live,En Vivo,Live
 log-being-collected,Execution log is being collected,Le log d'exécution est en train d'être collecté,Se está recopilando el registro de ejecución.,Het uitvoeringslogboek wordt verzameld
 logarithmic,Logarithmic,Logarithmic,,Logaritmisch
-login,Log in,Authentification,Iniciar sesión,Log in
 logout,Logout,Se déconnecter,Cerrar sesión,Afmelden
 magic-wand,Magic Wand,Baguette magique,Varita mágica,Toverstok
 magnification,Magnification,Grossissement,Aumento,Vergroting
@@ -691,7 +678,6 @@ notif-error-user-lock,Failed to lock the user,Une erreur a empêché de verrouil
 notif-error-user-unlock,Failed to unlock the user,Une erreur a empêché de déverrouiler l'utilisateur,Error al desbloquear el usuario,Door een fout kon de user niet worden ontgrendeld
 notif-error-user-update,Failed to update the user,Une erreur a empêché la modification de l'utilisateur,Error al actualizar al usuario,Een fout verhinderde de wijziging van de user
 notif-error-validate-review,Failed to validate the image,Une erreur a empêché la validation de l'image,Error al validar la imagen,Een fout verhinderde de review van de afbeelding
-notif-error-welcome-message-update,Failed to update the welcome message,Une erreur a empêché de mettre à jour le message de bienvenue,Error al actualizar el mensaje de bienvenida,Door een fout kon het welkomstbericht niet worden bijgewerkt
 notif-success-add-image,Image {imageName} was successfully added to project {projectName},L'image {imageName} a été ajoutée au projet {projectName},La imagen {imageName} se agregó correctamente al proyecto {projectName},De afbeelding {imageName} is toegevoegd aan het project {projectName}
 notif-success-add-project-members,The selected users were correctly added as project members,Les utilisateurs sélectionnés ont été ajoutés au projet,Los usuarios seleccionados se agregaron correctamente al proyecto,De geselecteerde gebruikers zijn toegevoegd aan het project
 notif-success-add-tag-domain-association,The selected tags were correctly associated,Les tags sélectionnés ont été associés,Las etiquetas seleccionadas se asociaron correctamente,De geselecteerde tags zijn gekoppeld
@@ -715,7 +701,6 @@ notif-success-key-copied,Key copied to clipboard,Clé copiée dans le presse-pap
 notif-success-image-group-link-creation,Image {imageName} was successfully added to an image group,L'image {imageName} a été ajoutée à un groupe d'images,La imagen {imageName} se agregó correctamente a un grupo de imágenes,Afbeelding {imageName} is toegevoegd aan een afbeeldingsgroep
 notif-success-keys-regenerated,API keys correctly updated,Clés API mises à jour avec succès,Claves API actualizadas correctamente,API-sleutels zijn bijgewerkt
 notif-success-image-group-link-deletion,Image {imageName} was successfully removed from its image group,L'image {imageName} a été retirée de son groupe d'images,La imagen {imageName} se eliminó correctamente de su grupo de imágenes,Afbeelding {imageName} is verwijderd uit de afbeeldingsgroep
-notif-success-login,Welcome on Cytomine,Bienvenue sur Cytomine,Bienvenido a Cytomine,Welkom bij Cytomine
 notif-success-image-group-rename,Image group {imageName} was successfully renamed,Le groupe d'images {imageName} a été renommé avec succès,El grupo de imágenes {imageName} se renombró correctamente,Afbeeldingsgroep {imageName} is hernoemd
 notif-success-magnification-update,Magnification of image {imageName} was correctly updated,Le grossissement de l'image {imageName} a bien été mis à jour,El nivel de aumento de la imagen {imageName} se actualizó correctamente,Vergroting van de afbeelding {imageName} succesvol bijgewerkt
 notif-success-new-comment,Your comment was successfully send by email,Votre commentaire a bien été envoyé par e-mail,Su comentario fue enviado con éxito por correo electrónico.,Uw commentaar is per e-mail verzonden
@@ -738,7 +723,6 @@ notif-success-track-update,The track was successfully updated,La trace a bien é
 notif-success-user-creation,User successfully created,L'utilisateur a bien été créé,Usuario creado con éxito,De user is succesvol aangemaakt
 notif-success-user-details-saved,User details correctly updated,Profil mis à jour avec succès,Los detalles del usuario se han actualizado correctamente,Profiel succesvol updated
 notif-success-user-update,User successfully updated,L'utilisateur a bien été modifié,Usuario actualizado con éxito,User succesvol gewijzigd
-notif-success-welcome-message-update,Welcome message successfully updated,Le message de bienvenue a bien été mis à jour,Mensaje de bienvenida actualizado con éxito,Het welkomstbericht is bijgewerkt
 notif-unexpected-error,Unexpected error,Une erreur inattendue s'est produite,Se ha producido un error inesperado,Er is een onverwachte fout opgetreden
 notif-warn-ontology-tree-order-not-persisted,The order of children in the ontology tree is not persisted in database,L'ordre des enfants dans l'arborescence n'est pas sauvegardée dans la base de données,La jerarquía de términos dentro de la ontología no se mantiene en la base de datos.,De volgorde van de kinderen in de stamboom wordt niet opgeslagen in de database
 notify-error-app-installation,Failed to install the app,Échec de l'installation de l'application,Error al instalar la aplicación,Installatie van de app mislukt
@@ -1037,7 +1021,7 @@ slide-preview-not-available,No slide preview,Aperçu de la lame non disponible,S
 slide-preview,Slide preview,Aperçu de la lame,Vista previa de cristal,Slide preview
 slide-preview-of,Slide preview of {filename},Aperçu de la lame {filename},Vista previa de cristal de {filename},Slide-voorbeeld van {filename}
 small,Small,Petit,Pequeña,Small
-source-code-info,Cytomine is an open-source software. The licenses are Apache 2.0 and LGPL 2.1. The source code is available on our {githubLink}.,Cytomine est un logiciel open-source. Il est distribué sous les licences Apache2 et LGPL 2.1. Le code source est disponible sur notre {githubLink}.,Cytomine es un software de código abierto distribuido bajo las licencias Apache2 y LGPL 2.1. El código fuente está disponible en nuestro {githubLink}.,Cytomine is open source-software. Het wordt gedistribueerd onder de Apache2- en LGPL 2.1-licenties. De broncode is beschikbaar op onze {githubLink}.
+source-code-info,"Cytomine is an open-source software licensed under Apache 2.0, with its source code available on our {link}.","Cytomine est un logiciel open-source sous licence Apache 2.0, dont le code source est disponible sur notre {link}.","Cytomine es un software de código abierto con licencia Apache 2.0, cuyo código fuente está disponible en nuestro {link}.","Cytomine is open-source software met een Apache 2.0-licentie, waarvan de broncode beschikbaar is op onze {link}."
 source,Source,Source,Origen,Bron
 source-code,Source code,Code source,Código fuente,Source code
 spatial-projection,Spatial projection,Projection spatiale,Proyección espacial,Ruimtelijke projectie

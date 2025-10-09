@@ -1,24 +1,8 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
 <div class="content-wrapper">
   <b-loading :is-full-page="false" :active.sync="loading" />
 
   <template v-if="!loading">
-    <div v-if="welcomeMessage" class="box" v-html="welcomeMessage"></div>
-
     <div class="columns">
       <div class="column is-two-thirds">
         <div class="box">
@@ -135,9 +119,7 @@ import {get} from '@/utils/store-helpers';
 import ListImagesPreview from '@/components/image/ListImagesPreview';
 import ImagePreview from '@/components/image/ImagePreview';
 
-import {ImageInstanceCollection, ProjectCollection, Configuration} from 'cytomine-client';
-
-import constants from '@/utils/constants.js';
+import {ImageInstanceCollection, ProjectCollection} from 'cytomine-client';
 
 export default {
   name: 'global-dashboard',
@@ -158,7 +140,6 @@ export default {
       recentImages: [],
       nbUserAnnots: null,
       nbReviewed: null,
-      welcomeMessage: null,
       loading: true
     };
   },
@@ -218,13 +199,6 @@ export default {
     async fetchRecentImages() {
       this.recentImages = await ImageInstanceCollection.fetchLastOpened({max: 1});
     },
-    async fetchWelcomeMessage() {
-      try {
-        this.welcomeMessage = (await Configuration.fetch(constants.CONFIG_KEY_WELCOME)).value;
-      } catch (error) {
-        // no welcome message defined
-      }
-    }
   },
   async created() {
     await Promise.all([
@@ -233,7 +207,6 @@ export default {
       this.fetchNbReviewedAnnots(),
       this.fetchRecentProjectsId(),
       this.fetchRecentImages(),
-      this.fetchWelcomeMessage()
     ].map(p => p.catch(e => console.log(e)))); // ignore errors (handled in template) and ensure all promises finish, even if some errors occur in the process
     this.loading = false;
   }

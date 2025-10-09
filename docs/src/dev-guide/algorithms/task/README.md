@@ -20,5 +20,5 @@ In order to upload a Task on Cytomine, it must be bundled as a `zip` archive con
 1. Write your Task descriptor based on the [Task descriptor reference](/dev-guide/algorithms/task/descriptor-reference)
 1. Implement your Task in such a way that the script or program running the Task can be containerised
 1. Create a Dockerfile to build the [Task container image](/dev-guide/algorithms/task/task-docker-image)
-1. [Build and save the Docker image](/dev-guide/algorithms/task/task-docker-image#how-to-bundle-the-task-image) as a `tar` archive
+1. [Build and save the Docker image](/dev-guide/algorithms/task/task-docker-image#how-to-bundle-the-task-image) as a `tar` archive, the name of the archive should be formatted following `{namespace}-{version}.tar` and matching `configuration.image.file` in descriptor 
 1. Bundle the saved Docker image and the Task descriptor into a `zip` archive

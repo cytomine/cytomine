@@ -237,8 +237,6 @@ Examples:
 
 Image files are provided in the input folder as such, only their original name (as it was when the image file was uploaded) has been replaced with the parameter name (and extension has been removed).
 
-Only supported formats are `png`, `jpeg` and `tiff` (RGB planar), see [Task descriptor reference](/dev-guide/algorithms/task/descriptor-reference#img-type-formats) for further restrictions of the supported image formats for an image parameter.
-
 ## `array`
 
 An array parameter is represented by a directory containing comprising several files:

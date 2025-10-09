@@ -9,10 +9,10 @@
 
       <div class="buttons">
         <b-button @click="selectAnnotation = true">
-          <i class="fas fa-draw-polygon"/>
+          <i class="fas fa-draw-polygon" />
         </b-button>
         <b-button @click="selectImage = true">
-          <i class="fas fa-image"/>
+          <i class="fas fa-image" />
         </b-button>
       </div>
 
@@ -23,17 +23,13 @@
 
     <div class="info">
       <b-tooltip :label="parameter.description" type="is-primary" position="is-right">
-        <b-icon pack="fas" icon="info-circle"/>
+        <b-icon pack="fas" icon="info-circle" />
       </b-tooltip>
     </div>
 
-    <annotation-selection :active.sync="selectAnnotation" @select-annotation="selectInput($event, 'annotation')"/>
+    <annotation-selection :active.sync="selectAnnotation" @select-annotation="selectInput($event, 'annotation')" />
 
-    <image-selection
-      :active.sync="selectImage"
-      :formats="['JPEG', 'PNG', 'PLANARTIFF']"
-      @select-image="selectInput($event, 'image')"
-    />
+    <image-selection :active.sync="selectImage" @select-image="selectInput($event, 'image')" />
   </div>
 </template>
 

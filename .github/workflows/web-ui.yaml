@@ -24,10 +24,10 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Set up the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up NodeJS
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: ${{ vars.NODE_VERSION }}
 
@@ -41,10 +41,10 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Set up the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up NodeJS
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: ${{ vars.NODE_VERSION }}
 

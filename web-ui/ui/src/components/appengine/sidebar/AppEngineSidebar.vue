@@ -233,9 +233,29 @@ $border: #383838;
 .whole-sidebar {
   background-color: white;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-//
+.executor, .runs {
+  flex: 0 0 50%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+
+  .card-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 1.5rem;
+    min-height: 0;
+  }
+}
+
 .runs {
   height: 50%;
 }

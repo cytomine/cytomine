@@ -1,4 +1,4 @@
-# Cytomine Platform
+# Cytomine
 
 Cytomine is an open-source platform for collaborative analysis of large-scale imaging data.
 

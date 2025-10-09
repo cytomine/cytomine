@@ -45,7 +45,6 @@ export default {
   },
   props: {
     active: {type: Boolean, required: true},
-    formats: {type: Array, required: false, default: null},
   },
   data() {
     return {
@@ -80,10 +79,6 @@ export default {
         filterKey: 'project',
         filterValue: this.project.id,
       })).array;
-
-      if (this.formats) {
-        this.images = this.images.filter(image => this.formats.includes(image.contentType));
-      }
     }
   },
 };

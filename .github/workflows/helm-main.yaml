@@ -9,6 +9,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+defaults:
+  run:
+    working-directory: ./helm
+
 jobs:
   build-push:
     runs-on: ubuntu-latest
@@ -18,7 +22,7 @@ jobs:
 
       - name: Get version
         run: |
-          echo "CHART_VERSION=$(cat ./helm/charts/cytomine/Chart.yaml | grep "version:" | sed -E 's/^version: (.*)$/\1/g')" >> $GITHUB_ENV
+          echo "CHART_VERSION=$(cat ./charts/cytomine/Chart.yaml | grep "version:" | sed -E 's/^version: (.*)$/\1/g')" >> $GITHUB_ENV
 
       - name: Install Helm
         uses: azure/setup-helm@v4

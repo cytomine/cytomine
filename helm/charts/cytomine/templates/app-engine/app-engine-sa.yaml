@@ -1,0 +1,66 @@
+{{- $storageClassName := .Values.app_engine.tasks_namespace | required ".Values.app_engine.tasks_namespace is required." -}}
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: app-engine
+  namespace: {{ .Values.app_engine.tasks_namespace }}
+
+---
+apiVersion: v1
+kind: Secret
+type: kubernetes.io/service-account-token
+metadata:
+  name: app-engine
+  namespace: {{ .Values.app_engine.tasks_namespace }}
+  annotations:
+    kubernetes.io/service-account.name: app-engine
+
+---
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: app-engine
+  namespace: {{ .Release.Namespace }}
+
+---
+apiVersion: v1
+kind: Secret
+type: kubernetes.io/service-account-token
+metadata:
+  name: app-engine
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    kubernetes.io/service-account.name: app-engine
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role # we need to restrict that by namespace (Role not ClusterRole)
+metadata:
+  name: pod-starter-for-{{ .Values.app_engine.tasks_namespace }}
+  namespace: {{ .Values.app_engine.tasks_namespace }}
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["pods"]
+  verbs: ["post","get", "watch", "list"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pod-starter-app-engine-{{ .Values.app_engine.tasks_namespace }}
+  namespace: {{ .Values.app_engine.tasks_namespace }}
+subjects:
+- kind: ServiceAccount
+  name: app-engine
+  apiGroup: ""
+  namespace: {{ .Values.app_engine.tasks_namespace }}
+- kind: ServiceAccount
+  name: app-engine
+  apiGroup: ""
+  namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: Role #this must be Role or ClusterRole
+  name: pod-starter-for-{{ .Values.app_engine.tasks_namespace }} # this must match the name of the Role or ClusterRole you wish to bind to
+  apiGroup: ""

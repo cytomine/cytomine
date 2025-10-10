@@ -1,0 +1,73 @@
+{{ if .Values.web_ui.deploy }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-ui
+  annotations:
+    kube-score/ignore: pod-probes,container-security-context-user-group-id
+  labels:
+    role: web-ui
+    app: {{ include "cytomine.name" . }}
+    component: {{ .Release.Name }}-web-ui
+    release: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.web_ui.replicas }}
+  selector:
+    matchLabels:
+      app: web-ui
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        role: web-ui
+        app: web-ui
+        release: {{ .Release.Name }}
+      annotations:
+        checksum/config: "{{ include (print $.Template.BasePath "/web_ui/web_ui-config.yaml") . | sha256sum }}"
+    spec:
+      # securityContext:
+      #   runAsUser: {{ .Values.containerSecurity.userID }}
+      #   fsGroup: {{ .Values.containerSecurity.fsgroupID }}
+      serviceAccountName: {{ include "cytomine.serviceAccountName" . }}
+      {{- with .Values.global.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+      - name: web-ui-config
+        configMap:
+          name: web-ui-config
+      - name: web-ui-localtime
+        configMap:
+          name: localtime
+      containers:
+        - name: web-ui
+          image: "{{ .Values.images.web_ui }}"
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          env:
+          - name: URL_CORE
+            value: {{ include "core.url" . }}
+          - name: CYTOMINE_COMMERCIAL_VERSION
+            value: {{ .Values.web_ui.commercial_version }}
+          - name: APPENGINE_ENABLED
+            value: "true"
+          volumeMounts:
+            - name: web-ui-localtime
+              mountPath: /etc/localtime
+              subPath: Europe
+            - name: web-ui-config
+              mountPath: /app/configuration.json
+              subPath: configuration.json
+            - name: web-ui-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+          ports:
+            - name: http
+              containerPort: {{ .Values.web_ui.port }}
+          resources:
+            {{- toYaml .Values.web_ui.resources | nindent 12 }}
+      {{- with .Values.global.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{ end }}

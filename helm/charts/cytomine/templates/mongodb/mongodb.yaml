@@ -1,0 +1,82 @@
+{{ if .Values.mongodb.deploy }}
+{{- $storageClassName := .Values.mongodb.storageClassName | required ".Values.mongodb.storageClassName is required." -}}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb
+  annotations:
+    kube-score/ignore: pod-probes,container-security-context-user-group-id
+  labels:
+    role: mongodb
+    app: {{ include "cytomine.name" . }}
+    component: {{ .Release.Name }}-mongodb
+    release: {{ .Release.Name }}
+spec:
+  replicas: 1
+  serviceName: mongodb
+  selector:
+    matchLabels:
+      app: mongodb
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        role: mongodb
+        app: mongodb
+        release: {{ .Release.Name }}
+    spec:
+      serviceAccountName: {{ include "cytomine.serviceAccountName" . }}
+      {{- with .Values.global.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: temp
+          emptyDir: {}
+      securityContext:
+        runAsUser: {{ .Values.containerSecurity.userID }}
+        fsGroup: {{ .Values.containerSecurity.fsgroupID }}
+      containers:
+        - name: mongodb
+          image: "{{ .Values.images.mongodb }}"
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          volumeMounts:
+            - name: mongodb-storage
+              mountPath: "/data/db"
+            - name: temp
+              mountPath: "/tmp"
+          ports:
+            - name: mongodb
+              containerPort: 27017
+              protocol: TCP
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: {{ .Values.mongodb.username }}
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: password
+            - name: MONGO_INIT_DATABASE
+              value: {{ .Values.mongodb.database }}
+          securityContext:
+            allowPrivilegeEscalation: {{ .Values.containerSecurity.allowPrivilegeEscalation }}
+            privileged: {{ .Values.containerSecurity.privileged }}
+            readOnlyRootFilesystem: {{ .Values.containerSecurity.readOnlyRootFilesystem }}
+          resources:
+            {{- toYaml .Values.mongodb.resources | nindent 12 }}
+      {{- with .Values.global.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  volumeClaimTemplates:
+    - metadata:
+        name: mongodb-storage
+      spec:
+        storageClassName: {{ $storageClassName }}
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: {{ .Values.mongodbStorage }}
+{{ end }}

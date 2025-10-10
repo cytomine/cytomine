@@ -1,0 +1,33 @@
+name: Docker push Helm package
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Get version
+        run: |
+          echo "CHART_VERSION=$(cat ./charts/cytomine/Chart.yaml | grep "version:" | sed -E 's/^version: (.*)$/\1/g')" >> $GITHUB_ENV
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+
+      - name: Helm package
+        run: helm package ./charts/cytomine
+
+      - name: Helm login
+        run: helm registry login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }} registry-1.docker.io
+
+      - name: Helm push
+        run: helm push cytomine-helm-${{ env.CHART_VERSION }}.tgz oci://registry-1.docker.io/cytomine

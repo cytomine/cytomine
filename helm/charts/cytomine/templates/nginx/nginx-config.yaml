@@ -1,0 +1,29 @@
+{{ if .Values.nginx.deploy }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+data:
+  nginx.conf.sample: |-
+    {{ (tpl (.Files.Get "configs/nginx.conf.sample") . ) | nindent 4 }}
+  cors_params: |-
+    {{ (tpl (.Files.Get "configs/cors_params") . ) | nindent 4 }}
+{{ end }}
+---
+{{ if .Values.nginx.deploy }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-global-config
+data:
+    INTERNAL_URLS_CORE: core:{{ .Values.core.port }}
+    INTERNAL_URLS_IMS: pims:{{ .Values.pims.port }}
+    INTERNAL_URLS_IMS2: pims:{{ .Values.pims.port }}
+    INTERNAL_URLS_IMS3: pims:{{ .Values.pims.port }}
+    INTERNAL_URLS_WEB_UI: web-ui:{{ .Values.web_ui.port }}
+    UPLOAD_PATH: /tmp/uploaded
+    URLS_CORE: {{ .Values.global.domainName }}
+    URLS_IMAGE_SERVER: {{ include "pims.hostname" .}}
+    URLS_UPLOAD: {{ include "upload.hostname" . }}
+    NGINX_PORT: "{{ .Values.nginx.port }}"
+{{ end }}

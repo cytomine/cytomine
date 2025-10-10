@@ -1,0 +1,14 @@
+{{ if .Values.postgresql.deploy }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgis
+spec:
+  clusterIP: None
+  selector:
+    app: postgis
+  ports:
+    - name: postgresql
+      port: {{ .Values.postgresql.port }}
+      protocol: TCP
+{{ end }}

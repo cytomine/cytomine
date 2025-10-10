@@ -1,0 +1,47 @@
+{{ if .Values.pims.deploy }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pims-config
+data:
+    API_BASE_PATH: "/ims"
+    DEFAULT_ANNOTATION_ORIGIN: LEFT_TOP
+    DEFAULT_IMAGE_SIZE_SAFETY_MODE: SAFE_REJECT
+    LOG_CONFIG_FILE: /app/logging.yml
+    MAX_REQUESTS: "0"
+    OUTPUT_SIZE_LIMIT: "10000"
+    WEB_CONCURRENCY: "1"
+    MAX_WORKERS: "1"
+    MPLCONFIGDIR: "/tmp"
+    cache_enabled: "True"
+    task_queue_enabled: "False"
+    TASK_QUEUE_ENABLED: "False"
+    PENDING_PATH: /tmp/uploaded
+    PIMS_URL: pims.{{ .Release.Namespace }}.svc.cluster.local
+    cache_url: redis://pims-cache.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.pims_cache.port }}
+    ROOT: /data/images
+    # INTERNAL_URL_CORE: http://core.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.core.port }}
+    INTERNAL_URL_CORE: {{ include "core.url" . }}
+    DEBUG: 'true'
+{{ end }}
+---
+{{ if .Values.pims.deploy }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pims-logging
+data:
+  logging.yml: |-
+    {{ .Files.Get "configs/logging.yml" | nindent 4 }}
+{{ end }}
+---
+{{ if .Values.pims.deploy }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: pims-secret
+type: Opaque
+stringData:
+  public_key: {{ .Values.pims.public_key }}
+  private_key: {{ .Values.pims.private_key }}
+{{ end }}

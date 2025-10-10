@@ -1,0 +1,72 @@
+{{- if .Values.pims.datasetImportFolder }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: pims-import
+  labels:
+    app: pims-import
+spec:
+  schedule: "@hourly"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          # putting multiple containers for psql commands for the sake of clarity
+          - name: private-key-fetcher
+            image: postgres:14
+            imagePullPolicy: IfNotPresent
+            command: ["/bin/sh", "-c"]
+            args: ["psql --no-align --quiet --tuples-only -U $(POSTGIS_USER) -h $(POSTGIS_HOST) -o /data/private_key -c \"SELECT private_key from sec_user where username = 'admin'\""]
+            env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                    name: postgres-core-secret
+                    key: password
+            - name: POSTGIS_HOST
+              value: postgis-0.postgis.{{ .Release.Namespace }}.svc.cluster.local
+            - name: POSTGIS_PORT
+              value: "5432"
+            - name: POSTGIS_USER
+              value: "{{ .Values.postgresql.user }}"
+            volumeMounts:
+            - name: data
+              mountPath: /data
+          - name: public-key-fetcher
+            image: postgres:14
+            imagePullPolicy: IfNotPresent
+            command: ["/bin/sh", "-c"]
+            args: ["psql --no-align --quiet --tuples-only -U $(POSTGIS_USER) -h $(POSTGIS_HOST) -o /data/public_key -c \"SELECT public_key from sec_user where username = 'admin'\""]
+            env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                    name: postgres-core-secret
+                    key: password
+            - name: POSTGIS_HOST
+              value: postgis-0.postgis.{{ .Release.Namespace }}.svc.cluster.local
+            - name: POSTGIS_PORT
+              value: "5432"
+            - name: POSTGIS_USER
+              value: "docker"
+            volumeMounts:
+            - name: data
+              mountPath: /data
+          - name: import-call
+            image: cytomine/python-client:latest
+            imagePullPolicy: Always
+            command: ["/bin/sh", "-c"]
+            # we cannot currently differenciate urls in this helpers, so we call from outside.
+            args: [ "python examples/import_datasets.py --host=https://{{ .Values.global.domainName }} --public_key=$$(cat /data/public_key) --private_key=$$(cat /data/private_key) --import-uri=ims/import"]
+            volumeMounts:
+            - name: data
+              mountPath: /data
+          volumes:
+          - emptyDir: {}
+            name: data
+          restartPolicy: Never
+      backoffLimit: 1
+{{- end }}

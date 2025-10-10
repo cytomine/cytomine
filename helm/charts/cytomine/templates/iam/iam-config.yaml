@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: iam
+data:
+  KEYCLOAK_ADMIN: admin
+  KC_PROXY_HEADERS: xforwarded
+  KC_HTTP_RELATIVE_PATH: /iam
+  KC_HTTP_ENABLED: "true"
+  KC_HTTP_PORT: "{{ .Values.iam.port }}"
+  KC_HOSTNAME_STRICT: "false"
+  KC_HOSTNAME_STRICT_HTTPS: "false"
+  KC_HOSTNAME_STRICT_BACKCHANNEL: "true"
+  KC_FEATURES: token-exchange
+  KC_DB_USERNAME: iam
+  KC_DB_URL_DATABASE: iam
+  KC_DB_URL_HOST: postgres-iam-0.postgres-iam.{{ .Release.Namespace }}.svc.cluster.local
+  KC_DB_URL_PORT: "5432"
+  KC_HOSTNAME: "{{ .Values.global.domainName }}"
+  # KC_HOSTNAME_ADMIN: aaa_config.CYTOMINE_HOST
+  # KC_ADMIN_EMAIL: cytomine@uliege.be
+  # KC_SMTP_HOST: smtp.HOST
+  # KC_SMTP_PORT: smtp.PORT
+  # KC_SMTP_USER: smtp.USER
+  # KC_SMTP_PASS: smtp.PASS
+  # KC_SMTP_FROM: smtp.FROM
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: iam-config-json
+data:
+  config.json: |-
+    {{ (tpl (.Files.Get "configs/iam/config.json.sample") . ) | nindent 4 }}

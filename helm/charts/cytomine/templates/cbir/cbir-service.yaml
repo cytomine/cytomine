@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cbir
+spec:
+  selector:
+    app: cbir
+  ports:
+    - name: http
+      port: {{ .Values.cbir.port }}
+      protocol: TCP

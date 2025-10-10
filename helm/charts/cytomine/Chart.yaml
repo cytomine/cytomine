@@ -1,0 +1,21 @@
+apiVersion: v2
+name: cytomine-helm
+version: 0.1.0
+description: A Helm chart for deploying Cytomine
+type: application
+keywords:
+  - bioimage-analysis
+  - collaborative-analysis
+  - cytomine
+  - digital-pathology
+  - image-annotation
+  - whole-slide-imaging
+home: https://uliege.cytomine.org/
+sources:
+  - https://github.com/cytomine/cytomine
+  - https://github.com/cytomine/cytomine-helm
+maintainers:
+  - name: Cytomine ULiège
+    email: uliege@cytomine.org
+icon: https://raw.githubusercontent.com/cytomine/cytomine/main/docs/src/.vuepress/public/images/cytomine-org-icon.svg
+appVersion: "2025.1"

@@ -1,0 +1,15 @@
+{{ if .Values.mongodb.deploy }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb
+spec:
+  clusterIP: None
+  selector:
+    app: mongodb
+  ports:
+    - name: mongodb
+      port: {{ .Values.mongodb.port }}
+    - name: management
+      port: {{ .Values.mongodb.statusPort }}
+{{ end }}

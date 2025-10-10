@@ -1,0 +1,69 @@
+{{- $storageClassName := .Values.postgresql.storageClassName | required ".Values.postgresql.storageClassName is required." -}}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres-iam
+  annotations:
+  labels:
+    role: postgres-iam
+    app: {{ include "cytomine.name" . }}
+    component: {{ .Release.Name }}-iam-postgres
+    release: {{ .Release.Name }}
+spec:
+  replicas: 1
+  serviceName: postgres-iam
+  selector:
+    matchLabels:
+      app: postgres-iam
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        role: postgres-iam
+        app: postgres-iam
+        release: {{ .Release.Name }}
+    spec:
+      volumes:
+        - name: temp
+          emptyDir: {}
+        - name: postgres-iam-secret
+          secret:
+            secretName: postgres-iam-secret
+      containers:
+        - name: postgres
+          image: "{{ .Values.images.postgresql_iam }}"
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          volumeMounts:
+            - name: postgres-iam-storage
+              mountPath: "/var/lib/postgresql/data"
+              subPath: data
+            - name: postgres-iam-storage
+              mountPath: "/var/lib/postgresql"
+            - name: temp
+              mountPath: /var/run
+            - name: temp
+              mountPath: /tmp
+          env:
+          - name: POSTGRES_USER
+            value: iam
+          - name: POSTGRES_DB
+            value: iam
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: postgres-iam-secret
+                key: password
+          ports:
+            - name: postgres
+              containerPort: {{ .Values.postgresql.port }}
+              protocol: TCP
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-iam-storage
+      spec:
+        storageClassName: {{ $storageClassName }}
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: {{ .Values.postgresStorage }}

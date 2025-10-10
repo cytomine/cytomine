@@ -1,0 +1,14 @@
+{{ if .Values.pims.deploy }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: pims
+spec:
+  clusterIP: None
+  selector:
+    app: pims
+  ports:
+    - name: http
+      port: {{ .Values.pims.port }}
+      protocol: TCP
+{{ end }}

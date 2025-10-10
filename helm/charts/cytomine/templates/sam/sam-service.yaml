@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: sam
+spec:
+  selector:
+    app: sam
+  ports:
+    - name: http
+      port: {{ .Values.sam.port }}
+      protocol: TCP

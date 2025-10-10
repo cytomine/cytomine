@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-engine
+  labels:
+    app: app-engine
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-engine
+  template:
+    metadata:
+      labels:
+        app: app-engine
+      annotations:
+        checksum/config: "{{ include (print $.Template.BasePath "/app-engine/app-engine-config.yaml") . | sha256sum }}"
+    spec:
+      containers:
+      - name: app-engine
+        image: "{{ .Values.images.app_engine }}"
+        ports:
+        - containerPort: {{ .Values.app_engine.port }}
+        envFrom:
+        - configMapRef:
+            name: app-engine
+        env:
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-app-engine-secret
+              key: password
+        - name: SCHEDULER_MASTER_URL
+          value: "https://kubernetes.default.svc"
+        - name: SCHEDULER_OAUTH_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: app-engine
+              key: token
+      serviceAccountName: app-engine
+      automountServiceAccountToken: true

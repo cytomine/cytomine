@@ -1,0 +1,19 @@
+.DS_Store
+# Common backup files
+*.swp
+*.bak
+*.tmp
+*.orig
+*~
+# Various IDEs
+.project
+.idea/
+*.tmproj
+.vscode/
+
+# temp files for use when developing
+temp/
+
+# encryption keys
+configs/software_router/ssh_key*
+

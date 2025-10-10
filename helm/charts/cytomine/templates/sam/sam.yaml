@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sam
+  labels:
+    app: sam
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sam
+  template:
+    metadata:
+      labels:
+        app: sam
+      annotations:
+        checksum/config: "{{ include (print $.Template.BasePath "/sam/sam-config.yaml") . | sha256sum }}"
+    spec:
+        containers:
+        -   name: sam
+            image: "{{ .Values.images.sam }}"
+            ports:
+            - containerPort: {{ .Values.sam.port }}
+            envFrom:
+            - configMapRef:
+                name: sam
+            volumeMounts:
+            - name: config
+              mountPath: /config
+            command: ["/bin/sh", "-c"]
+            args: [ "CYTOMINE_PUBLIC_KEY=$$(cat /config/public_key) CYTOMINE_PRIVATE_KEY=$$(cat /config/private_key)  fastapi run app/main.py"]
+        initContainers:
+            - name: private-key-fetcher
+              image: postgres:14
+              imagePullPolicy: IfNotPresent
+              command: ["/bin/sh", "-c"]
+              args: ["psql --no-align --quiet --tuples-only -U $(POSTGIS_USER) -h $(POSTGIS_HOST) -o /config/private_key -c \"SELECT private_key from sec_user where username = 'admin'\""]
+              env:
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgres-core-secret
+                      key: password
+                - name: POSTGIS_HOST
+                  value: postgis-0.postgis.{{ .Release.Namespace }}.svc.cluster.local
+                - name: POSTGIS_PORT
+                  value: "5432"
+                - name: POSTGIS_USER
+                  value: "{{ .Values.postgresql.user }}"
+              volumeMounts:
+                - name: config
+                  mountPath: /config
+            - name: public-key-fetcher
+              image: postgres:14
+              imagePullPolicy: IfNotPresent
+              command: ["/bin/sh", "-c"]
+              args: ["psql --no-align --quiet --tuples-only -U $(POSTGIS_USER) -h $(POSTGIS_HOST) -o /config/public_key -c \"SELECT public_key from sec_user where username = 'admin'\""]
+              env:
+              - name: PGPASSWORD
+                valueFrom:
+                  secretKeyRef:
+                      name: postgres-core-secret
+                      key: password
+              - name: POSTGIS_HOST
+                value: postgis-0.postgis.{{ .Release.Namespace }}.svc.cluster.local
+              - name: POSTGIS_PORT
+                value: "5432"
+              - name: POSTGIS_USER
+                value: "docker"
+              volumeMounts:
+              - name: config
+                mountPath: /config
+        volumes:
+            - emptyDir: {}
+              name: config

@@ -1,0 +1,13 @@
+{{ if .Values.pims_cache.deploy }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: pims-cache
+spec:
+  selector:
+    app: pims-cache
+  ports:
+    - name: pims-cache
+      port: {{ .Values.pims_cache.port }}
+      protocol: TCP
+{{ end }}

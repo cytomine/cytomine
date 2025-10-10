@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cbir
+  labels:
+    app: cbir
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cbir
+  template:
+    metadata:
+      labels:
+        app: cbir
+      annotations:
+        checksum/config: "{{ include (print $.Template.BasePath "/cbir/cbir-config.yaml") . | sha256sum }}"
+    spec:
+      containers:
+      - name: cbir
+        image: "{{ .Values.images.cbir }}"
+        ports:
+        - containerPort: {{ .Values.cbir.port }}
+        envFrom:
+          - configMapRef:
+              name: cbir
+        volumeMounts:
+          - name: data
+            mountPath: /data/
+      volumes:
+      - name: data
+        emptyDir: {}

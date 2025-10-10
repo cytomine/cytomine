@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: iam
+  labels:
+    app: iam
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: iam
+  template:
+    metadata:
+      labels:
+        app: iam
+      annotations:
+        checksum/config: "{{ include (print $.Template.BasePath "/iam/iam-config.yaml") . | sha256sum }}"
+    spec:
+      volumes:
+      - name: keystore
+        emptyDir: {}
+      - name: import-config
+        configMap:
+          name: iam-config-json
+          items:
+          - key: "config.json"
+            path: "config.json"
+      initContainers:
+      - name: certificates-provider
+        image: eclipse-temurin:8u462-b08-jdk-ubi9-minimal
+        command: ['sh', '-c', 'keytool -genkeypair -alias localhost -keyalg RSA -keysize 2048 -validity 365 -keystore /keystore/server.keystore -dname "cn=Server Administrator,o=Acme,c=GB" -keypass password -storepass password']
+        volumeMounts:
+        - name: keystore
+          mountPath: "/keystore"
+      containers:
+      - name: iam
+        image: "{{ .Values.images.iam }}"
+        ports:
+        - containerPort: {{ .Values.iam.port }}
+        command:
+        - "/opt/keycloak/bin/kc.sh"
+        - "start"
+        - "--import-realm"
+        envFrom:
+        - configMapRef:
+            name: iam
+        env:
+        - name: KC_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-iam-secret
+              key: password
+        - name: KEYCLOAK_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: admin-iam-secret
+              key: password
+        - name: KC_KEYSTORE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: admin-iam-secret
+              key: password
+        volumeMounts:
+        - name: keystore
+          mountPath: "/opt/keycloak/conf/server.keystore"
+          subPath: "server.keystore"
+        - name: import-config
+          mountPath: "/opt/keycloak/data/import/config.json"
+          subPath: "config.json"

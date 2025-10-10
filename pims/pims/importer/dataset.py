@@ -18,6 +18,7 @@ from pims.files.file import Path
 from pims.importer.importer import run_import
 from pims.importer.listeners import CytomineListener
 from pims.importer.metadata import MetadataValidator
+from pims.importer.ontology import OntologyImporter
 from pims.schemas.auth import ApiCredentials, CytomineAuth
 from pims.schemas.operations import ImportResponse, ImportResult
 
@@ -32,43 +33,6 @@ class DatasetImporter:
     def __init__(self, storage_id: str, dataset_names: str) -> None:
         self.storage_id = storage_id
         self.dataset_names = dataset_names
-
-    def _check_dataset_structure(self, root: str) -> None:
-        dataset_directory = [entry for entry in os.scandir(root) if entry.is_dir()]
-        if len(dataset_directory) != 1:
-            raise ValueError(f"Expected 1 directory, found {len(dataset_directory)}")
-
-        dataset_path = dataset_directory.pop()
-        has_images = any(
-            entry.name.upper() == "IMAGES" and entry.is_dir()
-            for entry in os.scandir(dataset_path)
-        )
-
-        if not has_images:
-            raise ValueError(f"IMAGES directory not found in {dataset_path.path}")
-
-    def _is_valid_dataset(self, dataset_path: str) -> bool:
-        try:
-            if not os.path.isdir(dataset_path):
-                return False
-            self._check_dataset_structure(dataset_path)
-            return True
-        except ValueError:
-            return False
-
-    def filter_dataset(self, dataset_paths) -> tuple[list[str], list[str]]:
-        valid_datasets = []
-        invalid_datasets = []
-
-        for dataset in dataset_paths:
-            dataset_path = os.path.join(DATASET_ROOT, dataset)
-
-            if self._is_valid_dataset(dataset_path):
-                valid_datasets.append(dataset_path)
-            else:
-                invalid_datasets.append(dataset)
-
-        return valid_datasets, invalid_datasets
 
     def import_images(
         self,
@@ -162,6 +126,11 @@ class DatasetImporter:
         else:
             logger.info(f"'{dataset_name}' Metadata validated successfully.")
 
+    def import_ontology(self, root_path: Path) -> None:
+        importer = OntologyImporter(root_path)
+        ontology = importer.load()
+        print(f"ONTOLOGY {ontology}")
+
     def import_datasets(
         self,
         cytomine_auth: CytomineAuth,
@@ -175,7 +144,7 @@ class DatasetImporter:
             if self.dataset_names
             else os.listdir(DATASET_ROOT)
         )
-        datasets, invalid_datasets = self.filter_dataset(dataset_paths)
+        datasets = [os.path.join(DATASET_ROOT, dataset) for dataset in dataset_paths]
 
         valid_datasets = {}
 
@@ -209,10 +178,11 @@ class DatasetImporter:
                 )
 
                 self.import_metadata(dataset_root)
+                self.import_ontology(Path(dataset_root))
 
         return ImportResponse(
             valid_datasets=valid_datasets,
-            invalid_datasets=invalid_datasets,
+            invalid_datasets=[],
         )
 
 

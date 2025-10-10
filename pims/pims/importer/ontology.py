@@ -7,8 +7,8 @@ from cytomine.models import Ontology, OntologyCollection, Term
 
 
 class OntologyImporter:
-    def __init__(self, ontology_path: Path) -> None:
-        self.ontology_path = ontology_path
+    def __init__(self, base_path: Path) -> None:
+        self.base_path = base_path
 
     def get_ontology(self, name: str) -> Optional[Ontology]:
         ontologies = OntologyCollection().fetch()
@@ -16,14 +16,15 @@ class OntologyImporter:
         return next(matched, None)
 
     def load(self) -> Ontology:
-        tree = etree.parse(self.ontology_path)
+        ontology_xml_path = self.base_path / "METADATA" / "ontology.xml"
+        tree = etree.parse(ontology_xml_path)
         root = tree.getroot()
 
         ontology_xml = root.find(".//ONTOLOGY")
         ontology_name = ontology_xml.get("alias")
         file = root.find(".//FILE")
 
-        file_path = self.ontology_path / file.get("filename")
+        file_path = self.base_path / "ONTOLOGIES" / file.get("filename")
         with open(file_path, "r") as fp:
             ontology_data = json.load(fp)
 

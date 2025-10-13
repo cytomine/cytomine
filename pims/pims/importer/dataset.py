@@ -266,4 +266,4 @@ def run_import_datasets(
             parser.discover()
 
             for child in parser.children:
-                OntologyImporter(bucket / child).load()
+                OntologyImporter(bucket / child).run()

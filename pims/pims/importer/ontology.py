@@ -18,7 +18,7 @@ class OntologyImporter:
         matched = (ontology for ontology in ontologies if ontology.name == name)
         return next(matched, None)
 
-    def load(self) -> Ontology:
+    def run(self) -> Ontology:
         ontology_xml_path = self.base_path / "METADATA" / "ontology.xml"
         tree = etree.parse(ontology_xml_path)
         root = tree.getroot()

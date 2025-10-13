@@ -29,7 +29,14 @@ spec:
           - name: check-config-needed
             image: "{{ .Values.images.iam }}"
             command: ["/bin/sh", "-c"]
-            args: ["/opt/keycloak/bin/kcadm.sh get realms/cytomine --server http://localhost:8080/iam --config /opt/keycloak-auth/kcadm.config"]
+            args: ["/opt/keycloak/bin/kcadm.sh get realms/cytomine --server http://iam.{{ .Release.Namespace}}.svc.cluster.local:{{ .Values.iam.port }}/iam --config /opt/keycloak-auth/kcadm.config"]
+            volumeMounts:
+            - name: kc-auth
+              mountPath: "/opt/keycloak-auth"
+          - name: create-realm
+            image: "{{ .Values.images.iam }}"
+            command: ["/bin/sh", "-c"]
+            args: ["/opt/keycloak/bin/kcadm.sh create realms --server http://iam.{{ .Release.Namespace}}.svc.cluster.local:{{ .Values.iam.port }}/iam --config /opt/keycloak-auth/kcadm.config -s realm=cytomine -s enabled=true"]
             volumeMounts:
             - name: kc-auth
               mountPath: "/opt/keycloak-auth"

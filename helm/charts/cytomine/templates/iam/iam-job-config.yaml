@@ -13,3 +13,28 @@ spec:
       template:
         spec:
           containers:
+          - name: login
+            image: "{{ .Values.images.iam }}"
+            command: ["/bin/sh", "-c"]
+            args: ["/opt/keycloak/bin/kcadm.sh config credentials --server http://iam.{{ .Release.Namespace}}.svc.cluster.local:{{ .Values.iam.port }}/iam --realm master --user admin --password $(KEYCLOAK_ADMIN_PASSWORD) --config /opt/keycloak-auth/kcadm.config && true"]
+            volumeMounts:
+            - name: kc-auth
+              mountPath: "/opt/keycloak-auth"
+            env:
+            - name: KEYCLOAK_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: admin-iam-secret
+                  key: password
+          - name: check-config-needed
+            image: "{{ .Values.images.iam }}"
+            command: ["/bin/sh", "-c"]
+            args: ["/opt/keycloak/bin/kcadm.sh get realms/cytomine --server http://localhost:8080/iam --config /opt/keycloak-auth/kcadm.config"]
+            volumeMounts:
+            - name: kc-auth
+              mountPath: "/opt/keycloak-auth"
+          volumes:
+          - emptyDir: {}
+            name: kc-auth
+          restartPolicy: Never
+      backoffLimit: 1

@@ -40,7 +40,6 @@ spec:
         command:
         - "/opt/keycloak/bin/kc.sh"
         - "start"
-        - "--import-realm"
         envFrom:
         - configMapRef:
             name: iam

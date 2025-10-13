@@ -69,12 +69,6 @@ def import_datasets(
 
     cytomine_logger.info(f"{request.method} {request.url.path}?{request.url.query}")
 
-    run_import_datasets()
-    return {
-        "valid_datasets": {},
-        "invalid_datasets": [],
-    }
-
     cytomine_auth = CytomineAuth(
         host=INTERNAL_URL_CORE,
         public_key=config.cytomine_public_key,
@@ -88,6 +82,12 @@ def import_datasets(
         token=token,
         signature=signature,
     )
+
+    run_import_datasets(cytomine_auth, api_credentials)
+    return {
+        "valid_datasets": {},
+        "invalid_datasets": [],
+    }
 
     return importer.import_datasets(
         cytomine_auth,

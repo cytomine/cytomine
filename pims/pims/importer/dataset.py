@@ -18,6 +18,7 @@ from pims.api.utils.cytomine_auth import sign_token
 from pims.config import get_settings
 from pims.files.file import Path
 from pims.importer.importer import run_import
+from pims.importer.ontology import OntologyImporter
 from pims.importer.listeners import CytomineListener
 from pims.importer.metadata import MetadataValidator
 from pims.importer.ontology import OntologyImporter
@@ -242,12 +243,27 @@ def is_already_imported(image_path: Path, data_path: Path) -> bool:
     return False
 
 
-def run_import_datasets() -> None:
+def run_import_datasets(
+    cytomine_auth: CytomineAuth,
+    credentials: ApiCredentials,
+) -> None:
     buckets = (Path(entry.path) for entry in os.scandir(DATASET_ROOT) if entry.is_dir())
 
-    for bucket in buckets:
-        parser = BucketParser(bucket)
-        parser.discover()
+    with Cytomine(**cytomine_auth.model_dump(), configure_logging=False) as c:
+        if not c.current_user:
+            raise AuthenticationException("PIMS authentication to Cytomine failed.")
 
-        print(parser.parent)
-        print(parser.children)
+        cyto_keys = c.get(f"userkey/{credentials.public_key}/keys.json")
+        private_key = cyto_keys["privateKey"]
+
+        if sign_token(private_key, credentials.token) != credentials.signature:
+            raise AuthenticationException("Authentication to Cytomine failed")
+
+        c.set_credentials(credentials.public_key, private_key)
+
+        for bucket in buckets:
+            parser = BucketParser(bucket)
+            parser.discover()
+
+            for child in parser.children:
+                OntologyImporter(bucket / child).load()

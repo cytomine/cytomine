@@ -1,9 +1,12 @@
 import json
+import logging
 from typing import Optional
 from lxml import etree
 from pathlib import Path
 
 from cytomine.models import Ontology, OntologyCollection, Term
+
+logger = logging.getLogger("pims.app")
 
 
 class OntologyImporter:
@@ -24,12 +27,13 @@ class OntologyImporter:
         ontology_name = ontology_xml.get("alias")
         file = root.find(".//FILE")
 
-        file_path = self.base_path / "ONTOLOGIES" / file.get("filename")
+        file_path = self.base_path / file.get("filename")
         with open(file_path, "r") as fp:
             ontology_data = json.load(fp)
 
         ontology = self.get_ontology(ontology_name)
         if ontology is not None:
+            logger.info(f"{ontology.name} already exists!")
             return ontology
 
         ontology = Ontology(ontology_name).save()

@@ -59,9 +59,11 @@ INTERNAL_URL_CORE = get_settings().internal_url_core
 @router.post("/import", tags=["Import"])
 def import_datasets(
     request: Request,
+
     config: Annotated[Settings, Depends(get_settings)],
     importer: Annotated[DatasetImporter, Depends(get_dataset_importer)],
     create_project: bool = Query(False, description="Create a project for each dataset"),
+    storage_id: int = Query(..., description="The storage where to import the datasets"),
 ) -> ImportResponse:
     """
     Import datasets from a predefined folder without moving the data.
@@ -83,7 +85,7 @@ def import_datasets(
         signature=signature,
     )
 
-    run_import_datasets(cytomine_auth, api_credentials)
+    run_import_datasets(cytomine_auth, api_credentials, storage_id)
     return {
         "valid_datasets": {},
         "invalid_datasets": [],

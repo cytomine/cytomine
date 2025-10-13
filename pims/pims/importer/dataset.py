@@ -19,6 +19,7 @@ from pims.config import get_settings
 from pims.files.file import Path
 from pims.importer.importer import run_import
 from pims.importer.ontology import OntologyImporter
+from pims.importer.image import ImageImporter
 from pims.importer.listeners import CytomineListener
 from pims.importer.metadata import MetadataValidator
 from pims.importer.ontology import OntologyImporter
@@ -246,6 +247,7 @@ def is_already_imported(image_path: Path, data_path: Path) -> bool:
 def run_import_datasets(
     cytomine_auth: CytomineAuth,
     credentials: ApiCredentials,
+    storage_id: str,
 ) -> None:
     buckets = (Path(entry.path) for entry in os.scandir(DATASET_ROOT) if entry.is_dir())
 
@@ -261,9 +263,20 @@ def run_import_datasets(
 
         c.set_credentials(credentials.public_key, private_key)
 
+        storage = Storage().fetch(storage_id)
+        if not storage:
+            raise CytomineProblem(f"Storage {storage_id} not found")
+
         for bucket in buckets:
             parser = BucketParser(bucket)
             parser.discover()
+
+            ImageImporter(
+                bucket / parser.parent,
+                cytomine_auth,
+                c.current_user,
+                storage_id,
+            ).run()
 
             for child in parser.children:
                 OntologyImporter(bucket / child).run()

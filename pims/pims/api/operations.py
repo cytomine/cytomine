@@ -38,7 +38,7 @@ from pims.api.utils.response import serialize_cytomine_model
 from pims.config import Settings, get_settings
 from pims.files.archive import make_zip_archive
 from pims.files.file import Path
-from pims.importer.dataset import DatasetImporter
+from pims.importer.dataset import DatasetImporter, run_import_datasets
 from pims.importer.importer import run_import
 from pims.importer.listeners import CytomineListener
 from pims.schemas.auth import ApiCredentials, CytomineAuth
@@ -68,6 +68,12 @@ def import_datasets(
     """
 
     cytomine_logger.info(f"{request.method} {request.url.path}?{request.url.query}")
+
+    run_import_datasets()
+    return {
+        "valid_datasets": {},
+        "invalid_datasets": [],
+    }
 
     cytomine_auth = CytomineAuth(
         host=INTERNAL_URL_CORE,

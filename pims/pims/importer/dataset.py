@@ -1,5 +1,7 @@
 import logging
 import os
+from collections import defaultdict
+from lxml import etree
 from typing import Optional
 
 from cytomine import Cytomine
@@ -27,6 +29,46 @@ logger = logging.getLogger("pims.app")
 DATASET_ROOT = Path(get_settings().dataset_path)
 WRITING_PATH = Path(get_settings().writing_path)
 FILE_ROOT_PATH = Path(get_settings().root)
+
+
+class BucketParser:
+    def __init__(self, root: Path):
+        self.root = root  # Root path of the dataset
+        self.datasets = {}  # Path to main dataset and complementary datasets
+        # Relation between the main dataset and complementary dataset, parent -> [children]
+        self.dependency = defaultdict(list)
+
+    @property
+    def parent(self):
+        return next(iter(self.dependency.keys()))
+
+    @property
+    def children(self):
+        return next(iter(self.dependency.values()))
+
+    def discover(self):
+        for child in self.root.iterdir():
+            if not child.is_dir():
+                logger.warning(f"'{child}' is not a folder!")
+                logger.warning(f"Skipping '{child}' ...")
+                continue
+
+            metadata_dataset_path = child / "METADATA" / "dataset.xml"
+            if not metadata_dataset_path.exists():
+                logger.warning(f"'{metadata_dataset_path}' does not exist!")
+                logger.warning(f"Skipping '{child}' ...")
+                continue
+
+            tree = etree.parse(metadata_dataset_path)
+            root = tree.getroot()
+
+            dataset = root.find(".//DATASET")
+            dataset_name = dataset.get("alias")
+            self.datasets[dataset_name] = child
+
+            complement = root.find(".//COMPLEMENTS_DATASET_REF")
+            if complement is not None:
+                self.dependency[complement.get("alias")].append(dataset_name)
 
 
 class DatasetImporter:
@@ -198,3 +240,14 @@ def is_already_imported(image_path: Path, data_path: Path) -> bool:
                 return True
 
     return False
+
+
+def run_import_datasets() -> None:
+    buckets = (Path(entry.path) for entry in os.scandir(DATASET_ROOT) if entry.is_dir())
+
+    for bucket in buckets:
+        parser = BucketParser(bucket)
+        parser.discover()
+
+        print(parser.parent)
+        print(parser.children)

@@ -6,6 +6,7 @@ from typing import Optional
 
 from cytomine import Cytomine
 from cytomine.models import (
+    ImageInstanceCollection,
     Project,
     ProjectCollection,
     Storage,
@@ -17,6 +18,7 @@ from pims.api.exceptions import AuthenticationException, CytomineProblem
 from pims.api.utils.cytomine_auth import sign_token
 from pims.config import get_settings
 from pims.files.file import Path
+from pims.importer.annotation import AnnotationImporter
 from pims.importer.importer import run_import
 from pims.importer.ontology import OntologyImporter
 from pims.importer.image import ImageImporter
@@ -282,12 +284,18 @@ def run_import_datasets(
             parser = BucketParser(bucket)
             parser.discover()
 
+            project = get_project(parser.parent, projects)
+
             ImageImporter(
                 bucket / parser.parent,
                 cytomine_auth,
                 c.current_user,
                 storage_id,
-            ).run(projects=[get_project(parser.parent, projects)])
+            ).run(projects=[project])
+
+            images = ImageInstanceCollection().fetch_with_filter("project", project.id)
 
             for child in parser.children:
-                OntologyImporter(bucket / child).run()
+                child_path = bucket / child
+                OntologyImporter(child_path).run()
+                AnnotationImporter(child_path, images).run()

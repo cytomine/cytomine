@@ -1,6 +1,5 @@
 # Cytomine
 
-
 <div align="center">
   <img alt="Cytomine" src="https://raw.githubusercontent.com/cytomine/cytomine/main/docs/src/.vuepress/public/images/cytomine-uliege-logo.png">
 </div>

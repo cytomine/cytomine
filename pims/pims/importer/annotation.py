@@ -6,17 +6,29 @@ from pathlib import Path
 from shapely.geometry import shape
 from shapely import wkt
 
-from cytomine.models import Annotation, ImageInstanceCollection
+from cytomine.models import (
+    Annotation,
+    AnnotationTerm,
+    ImageInstanceCollection,
+    OntologyCollection,
+    TermCollection,
+)
 
 
 logger = logging.getLogger("pims.app")
 
 
 class AnnotationImporter:
-    def __init__(self, base_path: Path, images: ImageInstanceCollection):
+    def __init__(
+        self,
+        base_path: Path,
+        images: ImageInstanceCollection,
+        ontologies: OntologyCollection,
+    ):
         self.base_path = base_path
         self.annotations = {}
         self.images = images
+        self.ontologies = ontologies
 
     def get_annotations(self):
         dataset_xml_path = self.base_path / "METADATA" / "dataset.xml"
@@ -42,11 +54,25 @@ class AnnotationImporter:
         image_name = self.annotations[alias].find(".//IMAGE_REF").get("alias")
         image = get_image(image_name, self.images)
         if image is None:
+            logger.warning(f"Image {image_name} doesn't exist!")
             return
 
+        ontology_name = self.annotations[alias].find(".//ONTOLOGY_REF").get("alias")
+        ontology = get_ontology(ontology_name, self.ontologies)
+        if ontology is None:
+            logger.warning(f"Ontology {ontology_name} doesn't exist!")
+            return
+
+        terms = TermCollection().fetch_with_filter("ontology", ontology.id)
         annotations = self.load(annotation_path)
         for annotation in annotations:
-            Annotation(location=annotation.get("wkt"), id_image=image.id).save()
+            annot = Annotation(location=annotation.get("wkt"), id_image=image.id).save()
+
+            properties = annotation.get("properties")
+            term_name = properties.get("path_class_name")
+            term = get_term(term_name, terms)
+            if term:
+                AnnotationTerm(id_annotation=annot.id, id_term=term.id).save()
 
     def run(self):
         logger.info("[START] Import annotations...")
@@ -66,6 +92,22 @@ def get_image(name: str, images: ImageInstanceCollection):
     for image in images:
         if image.instanceFilename == name:
             return image
+
+    return None
+
+
+def get_ontology(name: str, ontologies: OntologyCollection):
+    for ontology in ontologies:
+        if ontology.name == name:
+            return ontology
+
+    return None
+
+
+def get_term(name: str, terms: TermCollection):
+    for term in terms:
+        if term.name == name:
+            return term
 
     return None
 

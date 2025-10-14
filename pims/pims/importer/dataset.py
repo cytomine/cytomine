@@ -7,6 +7,7 @@ from typing import Optional
 from cytomine import Cytomine
 from cytomine.models import (
     ImageInstanceCollection,
+    OntologyCollection,
     Project,
     ProjectCollection,
     Storage,
@@ -294,8 +295,11 @@ def run_import_datasets(
             ).run(projects=[project])
 
             images = ImageInstanceCollection().fetch_with_filter("project", project.id)
+            ontologies = OntologyCollection().fetch()
 
             for child in parser.children:
                 child_path = bucket / child
-                OntologyImporter(child_path).run()
-                AnnotationImporter(child_path, images).run()
+                ontology = OntologyImporter(child_path).run()
+                ontologies.append(ontology)
+
+                AnnotationImporter(child_path, images, ontologies).run()

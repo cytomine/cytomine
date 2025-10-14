@@ -88,7 +88,7 @@ Which will start the app engine, core, and web-ui in development mode.
 
 > Development mode means it comes with hot reload for the selected service
 
-### Start contributing
+### Develop, build, and test
 
 We follow the [Conventional Commit](https://www.conventionalcommits.org/en/v1.0.0/) standard.
 

@@ -12,11 +12,11 @@ spec:
     spec:
       template:
         spec:
-          containers:
+          initContainers: # initContainers run in sequence, not containers
           - name: login
             image: "{{ .Values.images.iam }}"
             command: ["/bin/sh", "-c"]
-            args: ["/opt/keycloak/bin/kcadm.sh config credentials --server http://iam.{{ .Release.Namespace}}.svc.cluster.local:{{ .Values.iam.port }}/iam --realm master --user admin --password $(KEYCLOAK_ADMIN_PASSWORD) --config /opt/keycloak-auth/kcadm.config && true"]
+            args: ["/opt/keycloak/bin/kcadm.sh config credentials --server http://iam.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.iam.port }}/iam --realm master --user admin --password $(KEYCLOAK_ADMIN_PASSWORD) --config /opt/keycloak-auth/kcadm.config && true"]
             volumeMounts:
             - name: kc-auth
               mountPath: "/opt/keycloak-auth"
@@ -26,20 +26,50 @@ spec:
                 secretKeyRef:
                   name: admin-iam-secret
                   key: password
-          - name: check-config-needed
-            image: "{{ .Values.images.iam }}"
-            command: ["/bin/sh", "-c"]
-            args: ["/opt/keycloak/bin/kcadm.sh get realms/cytomine --server http://iam.{{ .Release.Namespace}}.svc.cluster.local:{{ .Values.iam.port }}/iam --config /opt/keycloak-auth/kcadm.config"]
-            volumeMounts:
-            - name: kc-auth
-              mountPath: "/opt/keycloak-auth"
           - name: create-realm
             image: "{{ .Values.images.iam }}"
             command: ["/bin/sh", "-c"]
-            args: ["/opt/keycloak/bin/kcadm.sh create realms --server http://iam.{{ .Release.Namespace}}.svc.cluster.local:{{ .Values.iam.port }}/iam --config /opt/keycloak-auth/kcadm.config -s realm=cytomine -s enabled=true"]
+            args: ["/opt/keycloak/bin/kcadm.sh create realms --server http://iam.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.iam.port }}/iam --config /opt/keycloak-auth/kcadm.config -s realm=cytomine -s enabled=true -o || true"]
             volumeMounts:
             - name: kc-auth
               mountPath: "/opt/keycloak-auth"
+          - name: create-user
+            image: "{{ .Values.images.iam }}"
+            command: ["/bin/sh", "-c"]
+            args: ["/opt/keycloak/bin/kcadm.sh create users --realm cytomine --server http://iam.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.iam.port }}/iam --config /opt/keycloak-auth/kcadm.config -s username=admin -s password=$(CYTOMINE_USER) -o || true"]
+            volumeMounts:
+            - name: kc-auth
+              mountPath: "/opt/keycloak-auth"
+            env:
+            - name: CYTOMINE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: cytomine-admin-iam-secret
+                  key: password
+          - name: login-as-cytomine
+            image: "{{ .Values.images.iam }}"
+            command: ["/bin/sh", "-c"]
+            args: ["/opt/keycloak/bin/kcadm.sh config credentials --server http://iam.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.iam.port }}/iam --realm cytomine --user admin --password $(CYTOMINE_USER) --config /opt/keycloak-auth/kcadm.config || true"]
+            volumeMounts:
+            - name: kc-auth
+              mountPath: "/opt/keycloak-auth"
+            env:
+            - name: CYTOMINE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: cytomine-admin-iam-secret
+                  key: password
+          - name: create-client
+            image: "{{ .Values.images.iam }}"
+            command: ["/bin/sh", "-c"]
+            args: ["/opt/keycloak/bin/kcadm.sh create clients --realm cytomine --server http://iam.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.iam.port }}/iam --config /opt/keycloak-auth/kcadm.config -s clientId=core -s 'redirectUris=[\"https://{{ .Values.global.domainName }}/*\"]' -o || true"]
+            volumeMounts:
+            - name: kc-auth
+              mountPath: "/opt/keycloak-auth"
+          containers:
+          - name: job-done
+            image: busybox
+            command: ['sh', '-c', 'echo "jobs done"']
           volumes:
           - emptyDir: {}
             name: kc-auth

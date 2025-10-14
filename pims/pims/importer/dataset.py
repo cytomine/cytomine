@@ -302,4 +302,8 @@ def run_import_datasets(
                 ontology = OntologyImporter(child_path).run()
                 ontologies.append(ontology)
 
+                if project.ontology is None:
+                    project.ontology = ontology.id
+                    project.update()
+
                 AnnotationImporter(child_path, images, ontologies).run()

@@ -11,7 +11,7 @@ Please take a moment to read our [Code of Conduct](https://doc.uliege.cytomine.o
 
 If you are new to *pull requests* (often called "PR") or unsure how to submit one, take a moment to read GitHub's [Using Pull Requests](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests) guide.
 
-If you are not familiar with forks, take a moment to read GitHub's [Fork a repository](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo) guide.
+If you are not familiar with *forks*, take a moment to read GitHub's [Fork a repository](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo) guide.
 
 ## Start contributing
 
@@ -67,6 +67,8 @@ Our development environment runs in containers to keep a consistent environment 
 ```
 make start-dev <key-service-1> <key-service-2> ...
 ```
+
+This command will start Cytomine with the specified service(s) in development mode. Once all services are up and running, Cytomine will be available at <http://127.0.0.1/>.
 
 The available services are:
 

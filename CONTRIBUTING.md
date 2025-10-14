@@ -15,7 +15,7 @@ If you are not familiar with *forks*, take a moment to read GitHub's [Fork a rep
 
 ## Start contributing
 
-We label issues that are suitable for first-time contributors as `good first issue`. These typically do not require extensive experience with Cytomine or familiarity with the codebase.
+We label issues that are suitable for first-time contributors as [`good first issue`](https://github.com/cytomine/cytomine/issues?q=is%3Aissue%20state%3Aopen%20label%3A%22good%20first%20issue%22). These typically do not require extensive experience with Cytomine or familiarity with the codebase.
 
 You do not need our permission to start working on an issue labeled as suitable for community contribution. However, it's a good idea to indicate in the **issue** itself that you are working on it to avoid duplicate efforts.
 

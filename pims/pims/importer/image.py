@@ -1,11 +1,9 @@
 import logging
 from lxml import etree
 from pathlib import Path
+from typing import List
 
-from cytomine.models import (
-    ProjectCollection,
-    UploadedFile,
-)
+from cytomine.models import UploadedFile
 
 from pims.config import get_settings
 from pims.importer.importer import run_import
@@ -34,7 +32,7 @@ class ImageImporter:
         images = [image.get("alias") for image in images]
         return images
 
-    def import_image(self, alias: str, projects):
+    def import_image(self, alias: str, projects: List[str]):
         image_path = self.base_path / "IMAGES" / alias
         if is_already_imported(image_path, Path(FILE_ROOT_PATH)):
             logger.info(f"'{image_path}' already imported!")

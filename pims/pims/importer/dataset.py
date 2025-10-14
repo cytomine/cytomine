@@ -244,6 +244,14 @@ def is_already_imported(image_path: Path, data_path: Path) -> bool:
     return False
 
 
+def get_projects(key: str, projects: dict[str, Project]) -> list[str]:
+    if key in projects:
+        return [projects[key].id]
+
+    project = Project(name=key).save()
+    return [project.id]
+
+
 def run_import_datasets(
     cytomine_auth: CytomineAuth,
     credentials: ApiCredentials,
@@ -267,6 +275,9 @@ def run_import_datasets(
         if not storage:
             raise CytomineProblem(f"Storage {storage_id} not found")
 
+        project_collection = ProjectCollection().fetch()
+        projects = {project.name: project for project in project_collection}
+
         for bucket in buckets:
             parser = BucketParser(bucket)
             parser.discover()
@@ -276,7 +287,7 @@ def run_import_datasets(
                 cytomine_auth,
                 c.current_user,
                 storage_id,
-            ).run()
+            ).run(projects=get_projects(parser.parent, projects))
 
             for child in parser.children:
                 OntologyImporter(bucket / child).run()

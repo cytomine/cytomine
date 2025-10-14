@@ -1,0 +1,13 @@
+{{ if .Values.web_ui.deploy }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-ui
+spec:
+  selector:
+    app: web-ui
+  ports:
+    - name: http
+      port: {{ .Values.web_ui.port }}
+      protocol: TCP
+{{ end }}

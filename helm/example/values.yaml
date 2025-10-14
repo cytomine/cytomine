@@ -1,0 +1,15 @@
+global:
+  domainName: 'cytomine.local'
+
+postgresql:
+  storageClassName: 'any'
+pims:
+  imageStorage:
+    storageClassName: 'any'
+  tempImageStorage:
+    storageClassName: 'any'
+  datasetImportFolder: '/data/dataset'
+mongodb:
+  storageClassName: 'any'
+
+

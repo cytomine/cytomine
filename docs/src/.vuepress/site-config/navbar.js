@@ -94,7 +94,6 @@ module.exports = (content) => [
         text: "Discussions",
         items: [
           {text: "Image.sc", link: content.socials.imagesc},
-          {text: "GitHub", link: content.urls.githubDiscussions},
         ],
       },
     ],

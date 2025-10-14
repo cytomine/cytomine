@@ -19,8 +19,8 @@ export default {
     links() {
       return [
         {
-          link: this.$cytomine.urls.githubDiscussions,
-          text: "Ask Cytomine community on Github",
+          link: this.$cytomine.urls.githubIssue,
+          text: "Ask in our ticket system on Github",
         },
         {
           link: this.$cytomine.socials.imagesc,

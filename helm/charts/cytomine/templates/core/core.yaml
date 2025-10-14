@@ -1,0 +1,122 @@
+{{ if .Values.core.deploy }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: core
+  annotations:
+    kube-score/ignore: pod-probes,container-security-context-user-group-id
+  labels:
+    role: core
+    app: core
+    component: {{ .Release.Name }}-core
+    release: {{ .Release.Name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: core
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        role: core
+        app: core
+        release: {{ .Release.Name }}
+      annotations:
+        checksum/config: "{{ include (print $.Template.BasePath "/core/core-config.yaml") . | sha256sum }}"
+    spec:
+      securityContext:
+        runAsUser: {{ .Values.containerSecurity.userID }}
+        fsGroup: {{ .Values.containerSecurity.fsgroupID }}
+      serviceAccountName: {{ include "cytomine.serviceAccountName" . }}
+      {{- with .Values.global.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+      - name: core-config
+        secret:
+          secretName: core-config
+      - name: core-localtime
+        configMap:
+          name: localtime
+      - name: temp
+        emptyDir: {}
+      containers:
+        - name: core
+          image: "{{ .Values.images.core }}"
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          env:
+            - name: POSTGIS_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-core-secret
+                  key: password
+          envFrom:
+            - configMapRef:
+                name: core-env
+            - secretRef:
+                name: core-secret
+          volumeMounts:
+            - name: core-config
+              mountPath:  /cm_configs/app/application.yml.sample
+              subPath: application.yml.sample
+            - name: core-config
+              mountPath:  /cm_configs/app/logback.xml
+              subPath: logback.xml
+            - name: core-localtime
+              mountPath: /etc/localtime
+              subPath: Europe
+            - name: temp
+              mountPath: /tmp
+            - name: temp
+              mountPath: /app
+            - name: temp
+              mountPath: /javamelody-core
+          ports:
+            - name: http
+              containerPort: {{ .Values.core.port }}
+          resources:
+            {{- toYaml .Values.core.resources | nindent 12 }}
+          securityContext:
+            allowPrivilegeEscalation: {{ .Values.containerSecurity.allowPrivilegeEscalation }}
+            privileged: {{ .Values.containerSecurity.privileged }}
+            readOnlyRootFilesystem: {{ .Values.containerSecurity.readOnlyRootFilesystem }}
+          livenessProbe:
+            httpGet:
+              path: /server/ping
+              port: 8080
+            initialDelaySeconds: 600
+            failureThreshold: 30
+            timeoutSeconds: 8
+          readinessProbe:
+            httpGet:
+              path: /server/ping
+              port: 8080
+            initialDelaySeconds: 10
+            failureThreshold: 4
+            timeoutSeconds: 5
+      initContainers:
+        - name: core-init
+          image: "{{ .Values.images.core }}"
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          securityContext:
+            allowPrivilegeEscalation: {{ .Values.containerSecurity.allowPrivilegeEscalation }}
+            privileged: {{ .Values.containerSecurity.privileged }}
+            readOnlyRootFilesystem: {{ .Values.containerSecurity.readOnlyRootFilesystem }}
+          command:
+            - /bin/bash
+            - -c
+            - >
+              set -x;
+              cp -r /app/* /fix/;
+          volumeMounts:
+            - name: temp
+              mountPath: /fix/
+          resources:
+            {{- toYaml .Values.core.resources | nindent 12 }}
+      {{- with .Values.global.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{ end }}

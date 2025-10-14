@@ -64,7 +64,7 @@ You are now ready to start contributing to Cytomine.
 
 Our development environment runs in containers to keep a consistent environment across different setups. Each service run in its own container, and to set up the development environment for a specific service, you can use the Makefile:
 
-```
+```bash
 make start-dev <key-service-1> <key-service-2> ...
 ```
 
@@ -84,13 +84,13 @@ The available services are:
 
 For instance, if you want to work with the web-ui, to setup the development server:
 
-```
+```bash
 make start-dev ui
 ```
 
 You can also work across several service in development mode:
 
-```
+```bash
 make start-dev ae core ui
 ```
 
@@ -132,6 +132,6 @@ We follow the [Conventional Commit](https://www.conventionalcommits.org/en/v1.0.
 
     Our team will review your PR and approve it once it passes all CI pipelines. Feedback may be provided if changes are needed.
 
-6. Merge and celebrate
+    After approval and passing CI, your contribution will be merged.
 
-    After approval and passing CI, your contribution will be merged. Thank you for helping make Cytomine even better!
+Thank you for helping make Cytomine even better!

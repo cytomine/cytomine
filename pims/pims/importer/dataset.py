@@ -244,12 +244,12 @@ def is_already_imported(image_path: Path, data_path: Path) -> bool:
     return False
 
 
-def get_projects(key: str, projects: dict[str, Project]) -> list[str]:
+def get_project(key: str, projects: dict[str, Project]) -> Project:
     if key in projects:
-        return [projects[key].id]
+        return projects[key]
 
     project = Project(name=key).save()
-    return [project.id]
+    return project
 
 
 def run_import_datasets(
@@ -287,7 +287,7 @@ def run_import_datasets(
                 cytomine_auth,
                 c.current_user,
                 storage_id,
-            ).run(projects=get_projects(parser.parent, projects))
+            ).run(projects=[get_project(parser.parent, projects)])
 
             for child in parser.children:
                 OntologyImporter(bucket / child).run()

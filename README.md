@@ -1,5 +1,10 @@
 # Cytomine
 
+
+<div align="center">
+  <img alt="Cytomine" src="https://raw.githubusercontent.com/cytomine/cytomine/main/docs/src/.vuepress/public/images/cytomine-uliege-logo.png">
+</div>
+
 Cytomine is an open-source platform for collaborative analysis of large-scale imaging data.
 
 This repository provides the necessary files and instructions to build and launch the Cytomine product using Docker Compose.

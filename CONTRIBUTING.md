@@ -87,3 +87,39 @@ make start-dev ae core ui
 Which will start the app engine, core, and web-ui in development mode.
 
 > Development mode means it comes with hot reload for the selected service
+
+### Start contributing
+
+We follow the [Conventional Commit](https://www.conventionalcommits.org/en/v1.0.0/) standard.
+
+1. Create a branch on your fork
+
+    ```bash
+    git checkout -b feature/my-feature
+    ```
+
+2. Write some code
+
+    Implement your feature, fix, or improvement following the project guidelines.
+
+3. Push your code
+
+    ```bash
+    git add .
+    git commit -m "feat: add my new feature"
+    git push origin feature/my-feature
+    ```
+
+4. Create a pull request
+
+    Open a pull request targeting the main branch of [cytomine/cytomine](https://github.com/cytomine/cytomine). Make sure to describe your changes clearly.
+
+    > **Note**: When we merge your PR, we squash all commits into a single commit. The final commit message will be the title of your pull request.
+
+5. Code review and CI
+
+    Our team will review your PR and approve it once it passes all CI checks. Feedback may be provided if changes are needed.
+
+6. Merge and celebrate
+
+    After approval and passing CI, your contribution will be merged. Thank you for helping make Cytomine even better!

@@ -13,6 +13,14 @@ If you are new to *pull requests* (often called "PR") or unsure how to submit on
 
 If you are not familiar with forks, take a moment to read GitHub's [Fork a repository](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo) guide.
 
+## Start contributing
+
+We label issues that are suitable for first-time contributors as `good first issue`. These typically do not require extensive experience with Cytomine or familiarity with the codebase.
+
+You do not need our permission to start working on an issue labeled as suitable for community contribution. However, it's a good idea to indicate in the **issue** itself that you are working on it to avoid duplicate efforts.
+
+:warning: Please do not open pull requests for new features without prior discussion.
+
 ## Setup the development environment
 
 ### Prerequisites

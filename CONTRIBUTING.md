@@ -30,6 +30,24 @@ If you are not familiar with forks, take a moment to read GitHub's [Fork a repos
 
 3. Under "**Owner**", select the dropdown menu and click an owner for the forked repository.
 
-    > By default, it is your personal account that is set as owner. 
+    > :bulb: By default, it is your personal account that is set as owner. 
 
 4. Click on **Create fork**.
+
+### Setup the environment
+
+1. Clone the forked repository.
+
+    ```bash
+    git clone --recurse-submodules https://github.com/<owner>/cytomine.git
+    ```
+
+    Where **owner** is the one you selected in the [Fork the repository](#fork-the-repository) section.
+
+2. Build the Docker images.
+
+    ```bash
+    docker compose build
+    ```
+
+You are now ready to start contributing to Cytomine.

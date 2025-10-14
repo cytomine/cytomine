@@ -95,7 +95,7 @@ We follow the [Conventional Commit](https://www.conventionalcommits.org/en/v1.0.
 1. Create a branch on your fork
 
     ```bash
-    git checkout -b feature/my-feature
+    git checkout -b feature/my-feature main
     ```
 
 2. Write some code

@@ -1,7 +1,3 @@
----
-sidebar: auto
----
-
 # How to contribute
 
 If you are new, start by exploring issues labeled [good first issue](https://github.com/cytomine/cytomine/issues?q=is%3Aissue%20state%3Aopen%20label%3A%22good%20first%20issue%22) in the cytomine repository.

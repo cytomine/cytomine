@@ -118,7 +118,9 @@ We follow the [Conventional Commit](https://www.conventionalcommits.org/en/v1.0.
 
 5. Code review and CI
 
-    Our team will review your PR and approve it once it passes all CI checks. Feedback may be provided if changes are needed.
+    When you open a pull request, Cytomine triggers several CI pipelines to validate your changes.
+
+    Our team will review your PR and approve it once it passes all CI pipelines. Feedback may be provided if changes are needed.
 
 6. Merge and celebrate
 

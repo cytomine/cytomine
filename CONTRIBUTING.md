@@ -110,7 +110,7 @@ We follow the [Conventional Commit](https://www.conventionalcommits.org/en/v1.0.
 
 2. Write some code
 
-    Implement your feature, fix, or improvement following the project guidelines.
+    Implement your feature, fix, or improve following the project guidelines.
 
 3. Push your code
 
@@ -122,9 +122,17 @@ We follow the [Conventional Commit](https://www.conventionalcommits.org/en/v1.0.
 
 4. Create a pull request
 
-    Open a pull request targeting the main branch of [cytomine/cytomine](https://github.com/cytomine/cytomine). Make sure to describe your changes clearly.
+    On GitHub, navigate to your forked repository and change the branch to the created branch `feature/my-feature`. Then select the **Contribute** dropdown menu on the right and click on **Open pull request** button.
 
-    > **Note**: When we merge your PR, we squash all commits into a single commit. The final commit message will be the title of your pull request.
+    Make sure to describe your changes clearly in the pull request. Be sure to include references to relevant issues in the pull request description (e.g., closes #XXX) so that they are automatically closed when the PR is merged.
+
+    > **Note**: When we merge your PR, we squash all commits into a single commit. The final commit message will be the title of your pull request, so it should follow the **conventional commit** standard.
+
+    An example of a pull request title:
+
+    ```
+    docs: fix typo in installation guide
+    ```
 
 5. Code review and CI
 
@@ -132,6 +140,8 @@ We follow the [Conventional Commit](https://www.conventionalcommits.org/en/v1.0.
 
     Our team will review your PR and approve it once it passes all CI pipelines. Feedback may be provided if changes are needed.
 
-    After approval and passing CI, your contribution will be merged.
+    > :warning: It is the responsability of the contributor to ensure that all the CI checks pass!
+
+    After the approval and passing CI, your contribution will be merged.
 
 Thank you for helping make Cytomine even better!

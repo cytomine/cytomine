@@ -26,10 +26,10 @@ If you are not familiar with forks, take a moment to read GitHub's [Fork a repos
 
 1. On GitHub, navigate to the [cytomine/cytomine](https://github.com/cytomine/cytomine) repository.
 
-2. In the top-right corner of the page, click Fork.
+2. In the top-right corner of the page, click on **Fork**.
 
-3. Under "Owner", select the dropdown menu and click an owner for the forked repository.
+3. Under "**Owner**", select the dropdown menu and click an owner for the forked repository.
 
     > By default, it is your personal account that is set as owner. 
 
-4. Click Create fork.
+4. Click on **Create fork**.

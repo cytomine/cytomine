@@ -51,3 +51,39 @@ If you are not familiar with forks, take a moment to read GitHub's [Fork a repos
     ```
 
 You are now ready to start contributing to Cytomine.
+
+### Working with containers
+
+Our development environment runs in containers to keep a consistent environment across different setups. Each service run in its own container, and to set up the development environment for a specific service, you can use the Makefile:
+
+```
+make start-dev <key-service-1> <key-service-2> ...
+```
+
+The available services are:
+
+| Service       | Key Service |
+|---------------|-------------|
+| app-engine    | ae          |
+| cbir          | cbir        |
+| core          | core        |
+| iam           | iam         |
+| pims          | ims         |
+| sam           | sam         |
+| web-ui        | ui          |
+
+For instance, if you want to work with the web-ui, to setup the development server:
+
+```
+make start-dev ui
+```
+
+You can also work across several service in development mode:
+
+```
+make start-dev ae core ui
+```
+
+Which will start the app engine, core, and web-ui in development mode.
+
+> Development mode means it comes with hot reload for the selected service

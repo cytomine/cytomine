@@ -110,7 +110,7 @@ We follow the [Conventional Commit](https://www.conventionalcommits.org/en/v1.0.
 
 2. Write some code
 
-    Implement your feature, fix, or improve following the project guidelines.
+    Implement your feature, fix, or improvement following the project guidelines.
 
 3. Push your code
 

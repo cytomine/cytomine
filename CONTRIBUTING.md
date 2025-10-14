@@ -10,3 +10,26 @@ Please take a moment to read our [Code of Conduct](https://doc.uliege.cytomine.o
 ## Understand the basics
 
 If you are new to *pull requests* (often called "PR") or unsure how to submit one, take a moment to read GitHub's [Using Pull Requests](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests) guide.
+
+If you are not familiar with forks, take a moment to read GitHub's [Fork a repository](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo) guide.
+
+## Setup the development environment
+
+### Prerequisites
+
+- A **Linux** operating system like [Ubuntu](https://ubuntu.com/), [Debian](https://www.debian.org/), etc.
+- [Docker Engine](https://docs.docker.com/get-docker/) (v20.10+ recommended)
+- [Docker Compose](https://docs.docker.com/compose/) (v2.0+ recommended)
+- [Git](https://git-scm.com/) (v2.0+ recommended)
+
+### Fork the repository
+
+1. On GitHub, navigate to the [cytomine/cytomine](https://github.com/cytomine/cytomine) repository.
+
+2. In the top-right corner of the page, click Fork.
+
+3. Under "Owner", select the dropdown menu and click an owner for the forked repository.
+
+    > By default, it is your personal account that is set as owner. 
+
+4. Click Create fork.

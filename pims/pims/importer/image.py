@@ -65,7 +65,7 @@ class ImageImporter:
                 image_path.name,
                 extra_listeners=[cytomine_listener],
             )
-        except Exception as e:
+        except Exception:
             pass
 
     def run(self, projects=[]) -> None:

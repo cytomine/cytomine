@@ -25,7 +25,6 @@ from pims.importer.ontology import OntologyImporter
 from pims.importer.image import ImageImporter
 from pims.importer.listeners import CytomineListener
 from pims.importer.metadata import MetadataValidator
-from pims.importer.ontology import OntologyImporter
 from pims.schemas.auth import ApiCredentials, CytomineAuth
 from pims.schemas.operations import ImportResponse, ImportResult
 

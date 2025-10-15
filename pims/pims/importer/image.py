@@ -8,6 +8,7 @@ from cytomine.models import UploadedFile
 from pims.config import get_settings
 from pims.importer.importer import run_import
 from pims.importer.listeners import CytomineListener
+from pims.schemas.operations import ImageImportResult, ImageImportSummary
 
 logger = logging.getLogger("pims.app")
 
@@ -31,11 +32,15 @@ class ImageImporter:
         images = root.findall(".//IMAGE_REF")
         return [image.get("alias") for image in images]
 
-    def import_image(self, alias: str, projects: List[str]) -> None:
+    def import_image(self, alias: str, projects: List[str]) -> ImageImportResult:
         image_path = self.base_path / "IMAGES" / alias
         if is_already_imported(image_path, Path(FILE_ROOT_PATH)):
             logger.info(f"'{image_path}' already imported!")
-            return
+            return ImageImportResult(
+                name=image_path.name,
+                success=True,
+                message="Already imported",
+            )
 
         tmp_path = Path(WRITING_PATH, image_path.name)
         tmp_path.symlink_to(image_path, target_is_directory=image_path.is_dir())
@@ -65,14 +70,24 @@ class ImageImporter:
                 image_path.name,
                 extra_listeners=[cytomine_listener],
             )
+
+            return ImageImportResult(name=image_path.name, success=True)
         except Exception as e:
             logger.error(f"Failed to import '{image_path.name}': {e}")
+            return ImageImportResult(name=image_path.name, success=False, message=e)
 
-    def run(self, projects=[]) -> None:
+    def run(self, projects=[]) -> ImageImportSummary:
         logger.info("[START] Import images...")
-        for image in self.get_images():
-            self.import_image(image, projects)
+        results = [self.import_image(image, projects) for image in self.get_images()]
+        successful = sum(1 for r in results if r.success)
         logger.info("[END] Import images...")
+
+        return ImageImportSummary(
+            total=len(results),
+            successful=successful,
+            failed=len(results) - successful,
+            results=results,
+        )
 
 
 def is_already_imported(image_path: Path, data_path: Path) -> bool:

@@ -83,11 +83,7 @@ def import_datasets(
         signature=signature,
     )
 
-    run_import_datasets(cytomine_auth, api_credentials, storage_id)
-    return {
-        "valid_datasets": {},
-        "invalid_datasets": [],
-    }
+    return run_import_datasets(cytomine_auth, api_credentials, storage_id)
 
 
 @router.post('/upload', tags=['Import'])

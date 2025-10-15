@@ -1,5 +1,18 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import List, Optional
+
+
+class ImageImportResult(BaseModel):
+    name: str
+    success: bool
+    message: Optional[str] = None
+
+
+class ImageImportSummary(BaseModel):
+    total: int
+    successful: int
+    failed: int
+    results: List[ImageImportResult]
 
 
 class ImportResult(BaseModel):
@@ -10,5 +23,4 @@ class ImportResult(BaseModel):
 
 
 class ImportResponse(BaseModel):
-    valid_datasets: dict[str, ImportResult]
-    invalid_datasets: list[str]
+    image_summary: ImageImportSummary

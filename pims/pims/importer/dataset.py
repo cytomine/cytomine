@@ -22,6 +22,7 @@ from pims.importer.image import ImageImporter
 from pims.importer.metadata import MetadataValidator
 from pims.importer.utils import get_project
 from pims.schemas.auth import ApiCredentials, CytomineAuth
+from pims.schemas.operations import ImportResponse
 
 logger = logging.getLogger("pims.app")
 
@@ -73,7 +74,7 @@ def run_import_datasets(
     cytomine_auth: CytomineAuth,
     credentials: ApiCredentials,
     storage_id: str,
-) -> None:
+) -> ImportResponse:
     buckets = (Path(entry.path) for entry in os.scandir(DATASET_ROOT) if entry.is_dir())
 
     with Cytomine(**cytomine_auth.model_dump(), configure_logging=False) as c:
@@ -105,7 +106,7 @@ def run_import_datasets(
 
             project = get_project(parser.parent, projects)
 
-            ImageImporter(
+            image_summary = ImageImporter(
                 bucket / parser.parent,
                 cytomine_auth,
                 c.current_user,
@@ -125,3 +126,7 @@ def run_import_datasets(
                     project.update()
 
                 AnnotationImporter(child_path, images, ontologies).run()
+
+        return ImportResponse(
+            image_summary=image_summary,
+        )

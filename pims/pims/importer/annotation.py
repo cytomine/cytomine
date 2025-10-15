@@ -17,6 +17,7 @@ from cytomine.models import (
 
 from pims.importer.utils import get_image, get_ontology, get_term
 from pims.schemas.annotation import WktAnnotation
+from pims.schemas.operations import ImportResult, ImportSummary
 
 logger = logging.getLogger("pims.app")
 
@@ -48,23 +49,31 @@ class AnnotationImporter:
 
             return geojson_to_wkt(geometry)
         except (json.JSONDecodeError, FileNotFoundError):
-            logger.warning(f"'{annotation_path}' is not a valid geometry")
+            logger.debug(f"'{annotation_path}' is not a valid geometry")
             return []
 
-    def import_annotation(self, alias: str) -> None:
+    def import_annotation(self, alias: str) -> ImportResult:
         file = self.annotations[alias].find(".//FILE")
         annotation_path = self.base_path / file.get("filename")
         image_name = self.annotations[alias].find(".//IMAGE_REF").get("alias")
         image = get_image(image_name, self.images)
         if image is None:
-            logger.warning(f"Image {image_name} doesn't exist!")
-            return
+            logger.debug(f"Image {image_name} does not exist!")
+            return ImportResult(
+                name=alias,
+                success=False,
+                message=f"Image {image_name} does not exist",
+            )
 
         ontology_name = self.annotations[alias].find(".//ONTOLOGY_REF").get("alias")
         ontology = get_ontology(ontology_name, self.ontologies)
         if ontology is None:
-            logger.warning(f"Ontology {ontology_name} doesn't exist!")
-            return
+            logger.debug(f"Ontology {ontology_name} does not exist!")
+            return ImportResult(
+                name=alias,
+                success=False,
+                message=f"Ontology {ontology_name} does not exist",
+            )
 
         terms = TermCollection().fetch_with_filter("ontology", ontology.id)
         annotations = self.load(annotation_path)
@@ -76,7 +85,9 @@ class AnnotationImporter:
             if term:
                 AnnotationTerm(id_annotation=annot.id, id_term=term.id).save()
 
-    def run(self):
+        return ImportResult(name=alias, success=True)
+
+    def run(self) -> ImportSummary:
         logger.info("[START] Import annotations...")
         annotation_xml_path = self.base_path / "METADATA" / "annotation.xml"
         tree = etree.parse(annotation_xml_path)
@@ -84,11 +95,16 @@ class AnnotationImporter:
 
         annotations = root.findall("ANNOTATION")
         self.annotations = {annot.get("alias"): annot for annot in annotations}
-
-        for annotation in self.get_annotations():
-            self.import_annotation(annotation)
+        results = [self.import_annotation(annot) for annot in self.get_annotations()]
+        successful = sum(1 for r in results if r.success)
         logger.info("[END] Import annotations...")
 
+        return ImportSummary(
+            total=len(results),
+            successful=successful,
+            failed=len(results) - successful,
+            results=results,
+        )
 
 def feature_to_wkt(feature: dict) -> WktAnnotation:
     return WktAnnotation(

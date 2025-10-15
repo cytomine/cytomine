@@ -8,7 +8,7 @@ from cytomine.models import UploadedFile
 from pims.config import get_settings
 from pims.importer.importer import run_import
 from pims.importer.listeners import CytomineListener
-from pims.schemas.operations import ImageImportResult, ImageImportSummary
+from pims.schemas.operations import ImportResult, ImportSummary
 
 logger = logging.getLogger("pims.app")
 
@@ -32,11 +32,11 @@ class ImageImporter:
         images = root.findall(".//IMAGE_REF")
         return [image.get("alias") for image in images]
 
-    def import_image(self, alias: str, projects: List[str]) -> ImageImportResult:
+    def import_image(self, alias: str, projects: List[str]) -> ImportResult:
         image_path = self.base_path / "IMAGES" / alias
         if is_already_imported(image_path, Path(FILE_ROOT_PATH)):
             logger.info(f"'{image_path}' already imported!")
-            return ImageImportResult(
+            return ImportResult(
                 name=image_path.name,
                 success=True,
                 message="Already imported",
@@ -71,18 +71,18 @@ class ImageImporter:
                 extra_listeners=[cytomine_listener],
             )
 
-            return ImageImportResult(name=image_path.name, success=True)
+            return ImportResult(name=image_path.name, success=True)
         except Exception as e:
             logger.error(f"Failed to import '{image_path.name}': {e}")
-            return ImageImportResult(name=image_path.name, success=False, message=e)
+            return ImportResult(name=image_path.name, success=False, message=e)
 
-    def run(self, projects=[]) -> ImageImportSummary:
+    def run(self, projects=[]) -> ImportSummary:
         logger.info("[START] Import images...")
         results = [self.import_image(image, projects) for image in self.get_images()]
         successful = sum(1 for r in results if r.success)
         logger.info("[END] Import images...")
 
-        return ImageImportSummary(
+        return ImportSummary(
             total=len(results),
             successful=successful,
             failed=len(results) - successful,

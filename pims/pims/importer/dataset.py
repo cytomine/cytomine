@@ -96,6 +96,7 @@ def run_import_datasets(
         project_collection = ProjectCollection().fetch()
         projects = {project.name: project for project in project_collection}
 
+        annotation_summary = {}
         for bucket in buckets:
             parser = BucketParser(bucket)
             parser.discover()
@@ -125,8 +126,10 @@ def run_import_datasets(
                     project.ontology = ontology.id
                     project.update()
 
-                AnnotationImporter(child_path, images, ontologies).run()
+                result = AnnotationImporter(child_path, images, ontologies).run()
+                annotation_summary[child] = result
 
         return ImportResponse(
             image_summary=image_summary,
+            annotation_summary=annotation_summary,
         )

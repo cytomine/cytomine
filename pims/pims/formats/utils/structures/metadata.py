@@ -37,9 +37,9 @@ class MetadataType(Enum):
     DECIMAL = float
     JSON = dict
     LIST = list
+    DATETIME = datetime
     DATE = date
     TIME = time
-    DATETIME = datetime
     STRING = str
     UNKNOWN = type(None)
 

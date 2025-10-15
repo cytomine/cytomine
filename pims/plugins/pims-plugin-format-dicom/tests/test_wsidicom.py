@@ -103,7 +103,7 @@ def test_wsidicom_exists(image_path_wsidicom):
 	# Test if the file exists, either locally either with the OAC
 	path, filename = image_path_wsidicom
 	get_image(path, filename)
-	assert os.path.exists(os.path.join(path,filename)) == True
+	assert os.path.exists(os.path.join(path,filename))
 
 def test_wsidicom_info(client, image_path_wsidicom):
     path, filename = image_path_wsidicom

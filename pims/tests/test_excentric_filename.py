@@ -33,14 +33,14 @@ def get_image(path, filename, root):
         except Exception as e:
             print("Could not download image")
             print(e)
-    print(os.path.exists(filepath))
+
     if not os.path.exists(filepath):
-        # os.mkdir(path)
         image_path = f"/tmp/images/{filename}"
         pims_root = root
         importer_path = "/app/pims/importer/import_local_images.py"  # pims folder should be in root folder
-        import_img = subprocess.run(
-            ["python3", importer_path, "--path", image_path], stdout=subprocess.PIPE
+        subprocess.run(
+            ["python3", importer_path, "--path", image_path],
+            stdout=subprocess.PIPE,
         )
 
         subdirs = os.listdir(pims_root)
@@ -54,10 +54,6 @@ def get_image(path, filename, root):
         if os.path.exists(path):
             os.unlink(path)
 
-        print(path, root)
-        print(os.path.exists(upload_dir))  # existe
-        print(os.path.exists(path))  # n'existe pas
-        print(os.path.exists(root))  # existe
         os.symlink(upload_dir, path)
 
 # TODO investigate
@@ -65,7 +61,7 @@ def get_image(path, filename, root):
 def test_exists(image_path_excentric_filename, root):
     path, filename = image_path_excentric_filename
     get_image(path, filename, root)
-    assert os.path.exists(os.path.join(path, filename)) == True
+    assert os.path.exists(os.path.join(path, filename))
 
 # TODO investigate
 @pytest.mark.skip(reason="currently failing without apparent reason")

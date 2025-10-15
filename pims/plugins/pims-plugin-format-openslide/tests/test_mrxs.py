@@ -83,7 +83,7 @@ def test_mrxs_exists(image_path_mrxs):
     # Test if the file exists, either locally either with the OAC
     path, filename = image_path_mrxs
     get_image(path, filename)
-    assert os.path.exists(os.path.join(path,filename)) == True
+    assert os.path.exists(os.path.join(path,filename))
     
 def test_format_exists(client):
     response = client.get('/formats')

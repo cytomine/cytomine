@@ -19,7 +19,7 @@ T = TypeVar('T')
 
 
 def split_tuple(tuple_: Any, index: int) -> Any:
-    if type(tuple_) == tuple:
+    if isinstance(tuple_, tuple):
         return tuple_[index]
     else:
         return tuple_

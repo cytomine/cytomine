@@ -13,7 +13,6 @@ keywords:
 home: https://uliege.cytomine.org/
 sources:
   - https://github.com/cytomine/cytomine
-  - https://github.com/cytomine/cytomine-helm
 maintainers:
   - name: Cytomine ULiège
     email: uliege@cytomine.org

@@ -65,8 +65,8 @@ class ImageImporter:
                 image_path.name,
                 extra_listeners=[cytomine_listener],
             )
-        except Exception:
-            pass
+        except Exception as e:
+            logger.error(f"Failed to import '{image_path.name}': {e}")
 
     def run(self, projects=[]) -> None:
         logger.info("[START] Import images...")

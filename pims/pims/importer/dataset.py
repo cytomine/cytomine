@@ -52,7 +52,13 @@ class BucketParser:
                 logger.warning(f"Skipping '{child}' ...")
                 continue
 
-            metadata_dataset_path = child / "METADATA" / "dataset.xml"
+            metadata_path = child / "METADATA"
+            if not metadata_path.exists():
+                logger.warning(f"'{metadata_path}' does not exist!")
+                logger.warning(f"Skipping '{child}' ...")
+                continue
+
+            metadata_dataset_path = metadata_path / "dataset.xml"
             if not metadata_dataset_path.exists():
                 logger.warning(f"'{metadata_dataset_path}' does not exist!")
                 logger.warning(f"Skipping '{child}' ...")
@@ -101,14 +107,20 @@ def run_import_datasets(
             parser = BucketParser(bucket)
             parser.discover()
 
-            validator = MetadataValidator()
-            if validator.validate(bucket / parser.parent / "METADATA"):
-                logger.info(f"'{parser.parent}' metadata validated successfully.")
+            try:
+                parent_dataset = parser.parent
+            except Exception:
+                logger.warning(f"Skipping {bucket} ...")
+                continue
 
-            project = get_project(parser.parent, projects)
+            validator = MetadataValidator()
+            if validator.validate(bucket / parent_dataset / "METADATA"):
+                logger.info(f"'{parent_dataset}' metadata validated successfully.")
+
+            project = get_project(parent_dataset, projects)
 
             image_summary = ImageImporter(
-                bucket / parser.parent,
+                bucket / parent_dataset,
                 cytomine_auth,
                 c.current_user,
                 storage_id,

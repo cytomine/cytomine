@@ -67,6 +67,9 @@ def import_datasets(
     Import datasets from a predefined folder without moving the data.
     """
 
+    if not os.path.exists(WRITING_PATH):
+        os.makedirs(WRITING_PATH)
+
     cytomine_logger.info(f"{request.method} {request.url.path}?{request.url.query}")
 
     cytomine_auth = CytomineAuth(

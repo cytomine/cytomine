@@ -34,8 +34,16 @@ class ImageImporter:
 
     def import_image(self, alias: str, projects: List[str]) -> ImportResult:
         image_path = self.base_path / "IMAGES" / alias
+        if not image_path.exists():
+            logger.warning(f"'{image_path}' does not exist!")
+            return ImportResult(
+                name=image_path.name,
+                success=False,
+                message="Image does not exist",
+            )
+
         if is_already_imported(image_path, Path(FILE_ROOT_PATH)):
-            logger.info(f"'{image_path}' already imported!")
+            logger.warning(f"'{image_path}' already imported!")
             return ImportResult(
                 name=image_path.name,
                 success=True,

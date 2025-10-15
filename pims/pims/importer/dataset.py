@@ -285,9 +285,7 @@ def run_import_datasets(
 
             validator = MetadataValidator()
             if validator.validate(bucket / parser.parent / "METADATA"):
-                logger.info(f"'{parser.parent}' Metadata validated successfully.")
-            else:
-                logger.error(f"'{parser.parent}' Metadata failed to validate.")
+                logger.info(f"'{parser.parent}' metadata validated successfully.")
 
             project = get_project(parser.parent, projects)
 

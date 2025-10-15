@@ -46,19 +46,19 @@ spec:
               mountPath: "/opt/keycloak-conf/config.json"
               subPath: "config.json"
 
-          # - name: login-as-cytomine
-          #   image: "{{ .Values.images.iam }}"
-          #   command: ["/bin/sh", "-c"]
-          #   args: ["/opt/keycloak/bin/kcadm.sh config credentials --server http://iam.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.iam.port }}/iam --realm cytomine --user admin --password $(CYTOMINE_USER) --config /opt/keycloak-auth/kcadm.config || true"]
-          #   volumeMounts:
-          #   - name: kc-auth
-          #     mountPath: "/opt/keycloak-auth"
-          #   env:
-          #   - name: CYTOMINE_USER
-          #     valueFrom:
-          #       secretKeyRef:
-          #         name: cytomine-admin-iam-secret
-          #         key: password
+          - name: add-password
+            image: "{{ .Values.images.iam }}"
+            command: ["/bin/sh", "-c"]
+            args: ["/opt/keycloak/bin/kcadm.sh set-password --server https://{{ .Values.global.domainName }}/iam -r cytomine --username admin --new-password $(CYTOMINE_USER) --config /opt/keycloak-auth/kcadm.config || true"]
+            volumeMounts:
+            - name: kc-auth
+              mountPath: "/opt/keycloak-auth"
+            env:
+            - name: CYTOMINE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: cytomine-admin-iam-secret
+                  key: password
 
           - name: create-client
             image: "{{ .Values.images.iam }}"

@@ -79,19 +79,12 @@ kind: ConfigMap
 metadata:
   name: iam-user-config
 data:
-{{- $secretObj := (lookup "v1" "Secret" .Release.Namespace "cytomine-admin-iam-secret") }}
-{{- $secretData := (get $secretObj "data") }}
-{{- $secret := (get $secretData "password") }}
   config.json: |-
     {
       "username": "admin",
       "enabled": true,
       "emailVerified": true,
-      "credentials": [
-        {
-          "type": "password",
-          "value": "{{ $secret  }}",
-          "temporary": false
-        }
-      ]
+      "email": "admin@cytomine.org",
+      "firstName": "Admin",
+      "lastName": "Admin"
     }

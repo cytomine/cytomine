@@ -1,10 +1,9 @@
-import os, io
+import os
+import io
 import pytest
 from datetime import datetime
 from PIL import Image
-from fastapi import APIRouter
 import urllib.request
-from pims.formats import FORMATS
 from pims.importer.importer import FileImporter
 from pims.files.file import (ORIGINAL_STEM, Path, SPATIAL_STEM, HISTOGRAM_STEM)
 from pims.api.utils.models import HistogramType

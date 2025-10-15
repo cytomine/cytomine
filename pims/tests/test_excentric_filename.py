@@ -28,7 +28,7 @@ def get_image(path, filename, root):
 
     if not os.path.exists(f"/tmp/images/{filename}"):
         try:
-            url = f"https://data.cytomine.coop/open/tests/Test%20special%20char%20%25(_!.tiff"
+            url = "https://data.cytomine.coop/open/tests/Test%20special%20char%20%25(_!.tiff"
             urllib.request.urlretrieve(url, f"/tmp/images/{filename}")
         except Exception as e:
             print("Could not download image")
@@ -38,7 +38,7 @@ def get_image(path, filename, root):
         # os.mkdir(path)
         image_path = f"/tmp/images/{filename}"
         pims_root = root
-        importer_path = f"/app/pims/importer/import_local_images.py"  # pims folder should be in root folder
+        importer_path = "/app/pims/importer/import_local_images.py"  # pims folder should be in root folder
         import_img = subprocess.run(
             ["python3", importer_path, "--path", image_path], stdout=subprocess.PIPE
         )

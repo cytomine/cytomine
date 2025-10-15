@@ -1,17 +1,16 @@
 from PIL import Image
-import os, json
+import os
+import json
 import urllib.request
-from fastapi import APIRouter
-from pims.formats import FORMATS
 import io
 from pims.importer.importer import FileImporter
-from utils.formats import info_test, thumb_test, resized_test, mask_test, crop_test, crop_null_annot_test, histogram_perimage_test
+from utils.formats import thumb_test, resized_test, mask_test, crop_test, crop_null_annot_test, histogram_perimage_test
 from pims.formats.utils.factories import FormatFactory
 from pims.api.utils.models import HistogramType
 from pims.processing.histograms.utils import build_histogram_file
 from pims.files.file import (
-    EXTRACTED_DIR, HISTOGRAM_STEM, ORIGINAL_STEM, PROCESSED_DIR, Path,
-    SPATIAL_STEM, UPLOAD_DIR_PREFIX
+    HISTOGRAM_STEM, ORIGINAL_STEM, Path,
+    SPATIAL_STEM
 )
 import pytest 
 
@@ -79,7 +78,7 @@ def test_ndpi_exists(image_path_ndpi):
 	assert os.path.exists(os.path.join(path, filename)) == True
 	
 def test_format_exists(client):
-    response = client.get(f'/formats')
+    response = client.get('/formats')
     assert "ndpi" in json.dumps(response.json()).lower()
 
 def test_ndpi_info(client, image_path_ndpi):

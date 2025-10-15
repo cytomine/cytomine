@@ -16,7 +16,7 @@ from cytomine import Cytomine
 
 # Quick hack to avoid circular imports
 try:
-    pass
+    from pims.application import app as _  # noqa
 except:  # noqa
     pass
 # ----

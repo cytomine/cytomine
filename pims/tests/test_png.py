@@ -79,7 +79,7 @@ def get_image(path, filename):
 def test_png_exists(image_path_png):
     path, filename = image_path_png
     get_image(path, filename)
-    assert os.path.exists(os.path.join(path, filename)) == True
+    assert os.path.exists(os.path.join(path, filename))
     
 def test_png_info(client, image_path_png):
     _, filename = image_path_png

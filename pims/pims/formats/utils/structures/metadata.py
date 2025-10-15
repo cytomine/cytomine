@@ -37,9 +37,9 @@ class MetadataType(Enum):
     DECIMAL = float
     JSON = dict
     LIST = list
+    DATETIME = datetime
     DATE = date
     TIME = time
-    DATETIME = datetime
     STRING = str
     UNKNOWN = type(None)
 
@@ -94,7 +94,7 @@ class Metadata:
         Try to infer the metadata type from the metadata value.
         """
         for mt in MetadataType:
-            if type(self._value) == mt.python_type:
+            if isinstance(self._value, mt.python_type):
                 return mt
         return MetadataType.UNKNOWN
 
@@ -200,7 +200,7 @@ class MetadataStore:
         return self.flatten().values()
 
     def __contains__(self, o: object) -> bool:
-        if type(o) == Metadata:
+        if isinstance(o, Metadata):
             return self.get(o.namespaced_key) is not None
         return o in self._namedstores
 

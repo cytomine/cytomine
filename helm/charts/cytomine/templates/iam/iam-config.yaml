@@ -29,7 +29,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: iam-config-json
+  name: iam-client-config
 data:
   config.json: |-
     {
@@ -73,3 +73,24 @@ data:
       "optionalClientScopes" : [ "address", "phone", "offline_access", "microprofile-jwt" ]
     }
 
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: iam-user-config
+data:
+{{- $secretObj := (lookup "v1" "Secret" .Release.Namespace "cytomine-admin-iam-secret") }}
+{{- $secretData := (get $secretObj "data") }}
+{{- $secret := (get $secretData "password") }}
+  config.json: |-
+    {
+      "username": "admin",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "{{ $secret  }}",
+          "temporary": false
+        }
+      ]
+    }

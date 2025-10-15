@@ -78,7 +78,7 @@ def get_image(path, filename):
 def test_jpeg_exists(image_path_jpeg):
     path, filename = image_path_jpeg
     get_image(path, filename)
-    assert os.path.exists(os.path.join(path, filename)) == True
+    assert os.path.exists(os.path.join(path, filename))
     
 def test_jpeg_info(client, image_path_jpeg):
     _, filename = image_path_jpeg

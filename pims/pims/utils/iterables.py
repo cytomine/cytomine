@@ -19,7 +19,7 @@ T = TypeVar('T')
 
 
 def split_tuple(tuple_: Any, index: int) -> Any:
-    if type(tuple_) == tuple:
+    if isinstance(tuple_, tuple):
         return tuple_[index]
     else:
         return tuple_
@@ -104,7 +104,7 @@ def check_array_size(
             raise BadRequestException(detail=f"{name} is unset while it is not allowed.")
         return
 
-    if not len(iterable) in allowed:
+    if len(iterable) not in allowed:
         name = 'A parameter' if not name else name
         allowed_str = ', '.join([str(i) for i in set(allowed)])
         raise BadRequestException(

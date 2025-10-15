@@ -12,7 +12,7 @@ class ServerInfo(BaseModel):
     settings: ReadableSettings
 
 
-@router.get("/info", response_model=ServerInfo, tags=["Server"])
+@router.get("/info", tags=["Server"])
 async def show_status() -> ServerInfo:
     """
     PIMS Server status.

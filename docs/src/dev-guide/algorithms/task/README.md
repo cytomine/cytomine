@@ -22,3 +22,23 @@ In order to upload a Task on Cytomine, it must be bundled as a `zip` archive con
 1. Create a Dockerfile to build the [Task container image](/dev-guide/algorithms/task/task-docker-image)
 1. [Build and save the Docker image](/dev-guide/algorithms/task/task-docker-image#how-to-bundle-the-task-image) as a `tar` archive, the name of the archive should be formatted following `{namespace}-{version}.tar` and matching `configuration.image.file` in descriptor 
 1. Bundle the saved Docker image and the Task descriptor into a `zip` archive
+
+## Run
+
+To run a task in the app-engine it creates a context for the execution to manage inputs provisioning, outputs generation, the `Run` has different states tracking the flow of execution.
+
+| STATE        |       DESCRIPTION                                                                    |
+| -------------| ------------------------------------------------------------------------------------ |
+| CREATED      |      Created but not all inputs provisioned                                          |
+| PROVISIONED  |      Ready to be executed, all inputs have been provisioned                          |
+| QUEUING      |      Submitting the task to the execution environment                                |
+| QUEUED       |      Evaluated successfully by execution environment                                 |
+| RUNNING      |      Task running in the execution environment                                       |
+| FAILED       |      An error occurred and stopped the process of executing the task (terminal state)|
+| PENDING      |      Pending execution on the execution environment                                  |
+| FINISHED     |      Task successfully executed and outputs available (terminal state)               |
+
+## Storage
+
+The app-engine controls provisioning of inputs to tasks and outputs back to consumers like `core` in Cytomine, every `Run` has its separate storage 
+that containts the provisioned inputs and the generated outputs, and tasks metadata files like descriptors or logos.

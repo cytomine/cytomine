@@ -37,9 +37,8 @@ FILE_ROOT_PATH = Path(get_settings().root)
 
 class BucketParser:
     def __init__(self, root: Path):
-        self.root = root  # Root path of the dataset
-        self.datasets = {}  # Path to main dataset and complementary datasets
-        # Relation between the main dataset and complementary dataset, parent -> [children]
+        self.root = root
+        self.datasets = {}
         self.dependency = defaultdict(list)
 
     @property
@@ -283,6 +282,12 @@ def run_import_datasets(
         for bucket in buckets:
             parser = BucketParser(bucket)
             parser.discover()
+
+            validator = MetadataValidator()
+            if validator.validate(bucket / parser.parent / "METADATA"):
+                logger.info(f"'{parser.parent}' Metadata validated successfully.")
+            else:
+                logger.error(f"'{parser.parent}' Metadata failed to validate.")
 
             project = get_project(parser.parent, projects)
 

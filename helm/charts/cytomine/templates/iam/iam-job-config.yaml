@@ -38,7 +38,7 @@ spec:
           - name: create-user
             image: "{{ .Values.images.iam }}"
             command: ["/bin/sh", "-c"]
-            args: ["/opt/keycloak/bin/kcadm.sh create users --realm cytomine --server https://{{ .Values.global.domainName }}/iam --config /opt/keycloak-auth/kcadm.config -f /opt/keycloak-conf/config.json -o || true"]
+            args: ["/opt/keycloak/bin/kcadm.sh create users -r cytomine --server https://{{ .Values.global.domainName }}/iam --config /opt/keycloak-auth/kcadm.config -f /opt/keycloak-conf/config.json -o || true"]
             volumeMounts:
             - name: kc-auth
               mountPath: "/opt/keycloak-auth"
@@ -63,7 +63,7 @@ spec:
           - name: create-client
             image: "{{ .Values.images.iam }}"
             command: ["/bin/sh", "-c"]
-            args: ["/opt/keycloak/bin/kcadm.sh create clients --realm cytomine --server https://{{ .Values.global.domainName }}/iam --config /opt/keycloak-auth/kcadm.config -f /opt/keycloak-conf/config.json -o || true"]
+            args: ["/opt/keycloak/bin/kcadm.sh create clients -r cytomine --server https://{{ .Values.global.domainName }}/iam --config /opt/keycloak-auth/kcadm.config -f /opt/keycloak-conf/config.json -o || true"]
             volumeMounts:
             - name: kc-auth
               mountPath: "/opt/keycloak-auth"

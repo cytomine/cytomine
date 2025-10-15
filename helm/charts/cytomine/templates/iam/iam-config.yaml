@@ -86,6 +86,7 @@ data:
     {
       "username": "admin",
       "enabled": true,
+      "emailVerified": true,
       "credentials": [
         {
           "type": "password",

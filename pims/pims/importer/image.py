@@ -23,7 +23,7 @@ class ImageImporter:
         self.user = user
         self.storage_id = storage_id
 
-    def get_images(self):
+    def get_images(self) -> None:
         dataset_xml_path = self.base_path / "METADATA" / "dataset.xml"
         tree = etree.parse(dataset_xml_path)
         root = tree.getroot()
@@ -31,7 +31,7 @@ class ImageImporter:
         images = root.findall(".//IMAGE_REF")
         return [image.get("alias") for image in images]
 
-    def import_image(self, alias: str, projects: List[str]):
+    def import_image(self, alias: str, projects: List[str]) -> None:
         image_path = self.base_path / "IMAGES" / alias
         if is_already_imported(image_path, Path(FILE_ROOT_PATH)):
             logger.info(f"'{image_path}' already imported!")

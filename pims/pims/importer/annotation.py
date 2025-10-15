@@ -5,6 +5,7 @@ from lxml import etree
 from pathlib import Path
 from shapely.geometry import shape
 from shapely import wkt
+from typing import List
 
 from cytomine.models import (
     Annotation,
@@ -14,6 +15,8 @@ from cytomine.models import (
     TermCollection,
 )
 
+from pims.importer.utils import get_image, get_ontology, get_term
+from pims.schemas.annotation import WktAnnotation
 
 logger = logging.getLogger("pims.app")
 
@@ -24,13 +27,13 @@ class AnnotationImporter:
         base_path: Path,
         images: ImageInstanceCollection,
         ontologies: OntologyCollection,
-    ):
+    ) -> None:
         self.base_path = base_path
         self.annotations = {}
         self.images = images
         self.ontologies = ontologies
 
-    def get_annotations(self):
+    def get_annotations(self) -> List[str]:
         dataset_xml_path = self.base_path / "METADATA" / "dataset.xml"
         tree = etree.parse(dataset_xml_path)
         root = tree.getroot()
@@ -38,7 +41,7 @@ class AnnotationImporter:
         annotations = root.findall(".//ANNOTATION_REF")
         return [annot.get("alias") for annot in annotations]
 
-    def load(self, annotation_path: Path):
+    def load(self, annotation_path: Path) -> List[WktAnnotation]:
         try:
             with open(self.base_path / annotation_path, "r") as fp:
                 geometry = geojson.load(fp)
@@ -66,10 +69,9 @@ class AnnotationImporter:
         terms = TermCollection().fetch_with_filter("ontology", ontology.id)
         annotations = self.load(annotation_path)
         for annotation in annotations:
-            annot = Annotation(location=annotation.get("wkt"), id_image=image.id).save()
+            annot = Annotation(location=annotation.wkt, id_image=image.id).save()
 
-            properties = annotation.get("properties")
-            term_name = properties.get("path_class_name")
+            term_name = annotation.properties.get("path_class_name")
             term = get_term(term_name, terms)
             if term:
                 AnnotationTerm(id_annotation=annot.id, id_term=term.id).save()
@@ -88,46 +90,20 @@ class AnnotationImporter:
         logger.info("[END] Import annotations...")
 
 
-def get_image(name: str, images: ImageInstanceCollection):
-    for image in images:
-        if image.instanceFilename == name:
-            return image
-
-    return None
-
-
-def get_ontology(name: str, ontologies: OntologyCollection):
-    for ontology in ontologies:
-        if ontology.name == name:
-            return ontology
-
-    return None
+def feature_to_wkt(feature: dict) -> WktAnnotation:
+    return WktAnnotation(
+        wkt=wkt.dumps(shape(feature["geometry"])),
+        properties=feature.get("properties", {}),
+    )
 
 
-def get_term(name: str, terms: TermCollection):
-    for term in terms:
-        if term.name == name:
-            return term
+def geojson_to_wkt(geojson) -> List[WktAnnotation]:
+    geojson_type = geojson.get("type")
 
-    return None
+    if geojson_type == "FeatureCollection":
+        return [feature_to_wkt(f) for f in geojson.get("features", [])]
 
+    if geojson_type == "Feature":
+        return [feature_to_wkt(geojson)]
 
-def geojson_to_wkt(geojson):
-    if geojson.get("type") == "FeatureCollection":
-        results = []
-        for feature in geojson.get("features", []):
-            geom = shape(feature["geometry"])
-            results.append(
-                {
-                    "wkt": wkt.dumps(geom),
-                    "properties": feature.get("properties", {}),
-                }
-            )
-        return results
-
-    if geojson.get("type") == "Feature":
-        geom = shape(geojson["geometry"])
-        return [{"wkt": wkt.dumps(geom), "properties": geojson.get("properties", {})}]
-
-    geom = shape(geojson)
-    return [{"wkt": wkt.dumps(geom), "properties": {}}]
+    return [WktAnnotation(wkt=wkt.dumps(shape(geojson)), properties={})]

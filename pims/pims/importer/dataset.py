@@ -2,12 +2,12 @@ import logging
 import os
 from collections import defaultdict
 from lxml import etree
+from typing import List
 
 from cytomine import Cytomine
 from cytomine.models import (
     ImageInstanceCollection,
     OntologyCollection,
-    Project,
     ProjectCollection,
     Storage,
 )
@@ -20,6 +20,7 @@ from pims.importer.annotation import AnnotationImporter
 from pims.importer.ontology import OntologyImporter
 from pims.importer.image import ImageImporter
 from pims.importer.metadata import MetadataValidator
+from pims.importer.utils import get_project
 from pims.schemas.auth import ApiCredentials, CytomineAuth
 
 logger = logging.getLogger("pims.app")
@@ -30,20 +31,20 @@ FILE_ROOT_PATH = Path(get_settings().root)
 
 
 class BucketParser:
-    def __init__(self, root: Path):
+    def __init__(self, root: Path) -> None:
         self.root = root
         self.datasets = {}
         self.dependency = defaultdict(list)
 
     @property
-    def parent(self):
+    def parent(self) -> str:
         return next(iter(self.dependency.keys()))
 
     @property
-    def children(self):
+    def children(self) -> List[str]:
         return next(iter(self.dependency.values()))
 
-    def discover(self):
+    def discover(self) -> None:
         for child in self.root.iterdir():
             if not child.is_dir():
                 logger.warning(f"'{child}' is not a folder!")
@@ -66,14 +67,6 @@ class BucketParser:
             complement = root.find(".//COMPLEMENTS_DATASET_REF")
             if complement is not None:
                 self.dependency[complement.get("alias")].append(dataset_name)
-
-
-def get_project(key: str, projects: dict[str, Project]) -> Project:
-    if key in projects:
-        return projects[key]
-
-    project = Project(name=key).save()
-    return project
 
 
 def run_import_datasets(

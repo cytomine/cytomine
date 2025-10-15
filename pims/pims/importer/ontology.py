@@ -14,9 +14,7 @@ class OntologyImporter:
         self.base_path = base_path
 
     def get_ontology(self, name: str) -> Optional[Ontology]:
-        ontologies = OntologyCollection().fetch()
-        matched = (ontology for ontology in ontologies if ontology.name == name)
-        return next(matched, None)
+        return next((o for o in OntologyCollection().fetch() if o.name == name), None)
 
     def run(self) -> Ontology:
         ontology_xml_path = self.base_path / "METADATA" / "ontology.xml"

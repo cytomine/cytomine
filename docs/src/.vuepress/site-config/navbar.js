@@ -82,6 +82,7 @@ module.exports = (content) => [
         text: "Cytomine project",
         items: [
           {text: "Code of Conduct", link: "/community/code-of-conduct"},
+          {text: "How to contribute", link: "/community/how-to-contribute"},
         ],
       },
       {

@@ -27,7 +27,6 @@ from pims.api.utils.cytomine_auth import (
     parse_request_token,
     sign_token,
 )
-from pims.api.utils.deps import get_dataset_importer
 from pims.api.utils.multipart import FastSinglePartParser
 from pims.api.utils.parameter import (
     filepath_parameter,
@@ -38,7 +37,7 @@ from pims.api.utils.response import serialize_cytomine_model
 from pims.config import Settings, get_settings
 from pims.files.archive import make_zip_archive
 from pims.files.file import Path
-from pims.importer.dataset import DatasetImporter, run_import_datasets
+from pims.importer.dataset import run_import_datasets
 from pims.importer.importer import run_import
 from pims.importer.listeners import CytomineListener
 from pims.schemas.auth import ApiCredentials, CytomineAuth
@@ -60,7 +59,6 @@ INTERNAL_URL_CORE = get_settings().internal_url_core
 def import_datasets(
     request: Request,
     config: Annotated[Settings, Depends(get_settings)],
-    importer: Annotated[DatasetImporter, Depends(get_dataset_importer)],
     create_project: bool = Query(False, description="Create a project for each dataset"),
     storage_id: int = Query(..., description="The storage where to import the datasets"),
     dataset_names: str = Query(None, description="Comma-separated list of dataset names to import"),
@@ -91,11 +89,6 @@ def import_datasets(
         "invalid_datasets": [],
     }
 
-    return importer.import_datasets(
-        cytomine_auth,
-        api_credentials,
-        create_project,
-    )
 
 @router.post('/upload', tags=['Import'])
 async def import_direct_chunks(

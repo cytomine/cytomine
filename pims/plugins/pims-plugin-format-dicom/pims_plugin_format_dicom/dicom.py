@@ -153,7 +153,6 @@ class WSIDicomParser(AbstractParser):
 
     def parse_raw_metadata(self):
         wsidicom_object = cached_wsi_dicom_file(self.format)
-        levels = wsidicom_object.levels
         store = super().parse_raw_metadata()
         ds = wsidicom_object.levels.groups[0].datasets[0]
         data_elmts = recurse_if_SQ(ds)

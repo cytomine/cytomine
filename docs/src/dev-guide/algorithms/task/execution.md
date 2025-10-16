@@ -31,9 +31,9 @@ App-engine schedules tasks to run in a configured kubernetes cluster, when Cytom
 
 ### Local Mode
 
-In this mode the app-engine shares data with the task scheduled in k3s using volumes to optimize data sharing speed, the task reads and writes directly from app-engine storage shared directory.
+In this mode the app-engine shares data with the task scheduled in k3s using volumes to optimize data sharing speed, the task reads and writes directly from app-engine [storage](/dev-guide/algorithms/task/#storage).
 
-To enable this mode make these entries in the docker compose yaml file :
+To enable this mode make these entries in the docker compose yaml file in [`cytomine/compose.yml`](https://github.com/cytomine/cytomine/blob/main/compose.yaml):
 
 ::: warning
 Make sure all four paths matching otherwise the data sharing fails.
@@ -131,16 +131,88 @@ Currently dataset referening only works in `local mode`
 :::
 
 Tasks can process large datasets of images or files but provisioning them one by one or sending them over the wire is extremely slow and I/O intensive so using references optimizing input provisioning, to handle a dataset app-engine supports `array` data type to create arrays of other types, given the dataset is in a directory in the same machine it can be accessed by app-engine and also the task running in `k3s` by sharing the data using volumes.
-
-App-engine creates symbolic links from the dataset items to reference them in both storage and the running task, to set it up do the following:
+::: warning
+**Not** to be confused with app-engine [storage](/dev-guide/algorithms/task/#storage), The dataset is simply a directory of images somewhere in the machine and it is not used by app-engine except for referencing
+:::
+Given that there is a dataset of files or images in a directory somewhere in the machine app-engine creates symbolic links from the dataset items to reference them in both **storage** and the **running task**, to set it up do the following:
 ::: warning
 Make sure all three paths matching otherwise the data sharing fails because the symbolic links require matching absolute paths.
 :::
 1. In app-engine define a mount bind to the absolute path of dataset directory, make sure both host and container paths are absolute and matching.
 2. In k3s define a mount bind to the absolute path of dataset directory, make sure both host and container paths are absolute and matching.
 3. In app-engine set `REF_STORAGE_BASE_PATH` to the absolute path of dataset directory
+4. **local mode** is set as descriped above.
 
 #### Example
+
+```yml
+app-engine:
+    image: cytomine/app-engine:latest
+    restart: unless-stopped
+    depends_on:
+      - postgis
+      - registry
+      - k3s
+    volumes:
+      - ${DATA_PATH:-./data}/app-engine:/data
+      - ${PWD}/.kube/shared:/root/.kube:ro
+      - /home/some-user/cytomine/data/app-engine:/home/some-user/cytomine/data/app-engine 
+      - /home/some-user/dataset:/home/some-user/dataset:rw #<------ 1
+    environment:
+      API_PREFIX: ${APP_ENGINE_API_BASE_PATH:-/app-engine/}
+      DB_HOST: postgis
+      DB_NAME: appengine
+      DB_PASSWORD: password
+      DB_PORT: 5432
+      DB_USERNAME: appengine
+      REGISTRY_URL: http://registry:5000
+      STORAGE_BASE_PATH: /home/some-user/cytomine/data/app-engine 
+      RUN_STORAGE_BASE_PATH: /home/some-user/cytomine/data/app-engine
+      REF_STORAGE_BASE_PATH: /home/some-user/dataset #<------ 2
+      SCHEDULER_RUN_MODE: local # values: local, cluster
+      SCHEDULER_ADVERTISED_URL: http://172.16.238.10:8080
+      SCHEDULER_REGISTRY_ADVERTISED_URL: 172.16.238.4:5000
+      SCHEDULER_USE_HOST_NETWORK: true
+      SCHEDULER_TASKS_NAMESPACE: app-engine-tasks
+      KUBERNETES_MASTER: https://k3s:6443/
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.10
+```
+
+For k3s :
+```yml
+k3s:
+    image: "rancher/k3s:v1.30.14-rc3-k3s3"
+    command: server
+    tmpfs:
+      - /run
+      - /var/run
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 65535
+        hard: 65535
+    privileged: true
+    restart: always
+    environment:
+      - K3S_TOKEN=65535-65535-65535 # plain text secret!
+      - K3S_KUBECONFIG_OUTPUT=/output/config
+      - K3S_KUBECONFIG_MODE=666
+    volumes:
+      - k3s-server:/var/lib/rancher/k3s
+      - ./k3s/registries.yaml:/etc/rancher/k3s/registries.yaml:ro
+      - ./k3s/serviceaccounts.yaml://var/lib/rancher/k3s/server/manifests/serviceaccounts.yaml:ro
+      - /home/some-user/cytomine/data/app-engine:/home/some-user/cytomine/data/app-engine
+      - /home/some-user/dataset:/home/some-user/dataset:ro #<------ 3
+      # This is just so that we get the kubeconfig file out
+      - .kube/shared:/output/
+    ports:
+      - 6443:6443
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.15
+```
 
 To provision an input of type `array` and subtype `image` just pass the absolute path of the array items as the following:
 

@@ -128,7 +128,7 @@ def not_raises(expected_exc):
     try:
         yield
 
-    except expected_exc as err:
+    except expected_exc:
         raise AssertionError(
             f"Did raise exception {repr(expected_exc)} when it should not!"
         )

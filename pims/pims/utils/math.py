@@ -37,8 +37,8 @@ def get_rationed_resizing(
     other_resized : int
         Other resized length according ratio.
     """
-    ratio = resized if type(resized) == float else resized / length
-    resized = resized if type(resized) == int else round(ratio * length)
+    ratio = resized if isinstance(resized, float) else resized / length
+    resized = resized if isinstance(resized, int) else round(ratio * length)
     other_resized = round(ratio * other_length)
     return resized, other_resized
 

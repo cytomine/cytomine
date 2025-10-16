@@ -348,7 +348,7 @@ async def show_plane_histogram(
     tags=api_tags, response_model=PlaneHistogramInfoCollection,
     response_class=FastJsonResponse
 )
-async def show_plane_histogram(
+async def show_plane_histogram_bounds(
     z_slices: Annotated[int, Field(ge=0)],
     timepoints: Annotated[int, Field(ge=0)],
     path: Path = Depends(imagepath_parameter),

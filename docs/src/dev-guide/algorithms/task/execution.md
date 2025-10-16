@@ -36,7 +36,7 @@ In this mode the app-engine shares data with the task scheduled in k3s using vol
 To enable this mode make these entries in the docker compose yaml file in [`cytomine/compose.yml`](https://github.com/cytomine/cytomine/blob/main/compose.yaml):
 
 ::: warning
-Make sure all four paths are the same otherwise the data sharing fails.
+Make sure all four paths are the same otherwise the data sharing fails. the variable AE_DATA_PATH should be an absolute path to the needed data and written in the .env file
 :::
 
 1. The environment variable `SCHEDULER_RUN_MODE` has two possible values `local` or `cluster`, make sure to set it to `local`.

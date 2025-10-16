@@ -222,11 +222,11 @@ To provision an input of type `array` and subtype `image` just pass the absolute
     "value": [
     {
         "index": 0,
-        "value": "/home/user/data/datasets/dataset_1/iamge__4er5tgf4.tif"
+        "value": "/home/some-user/dataset/iamge__4er5tgf4.tif" // <------ has to be in the volume above
     },
     {
         "index": 1,
-        "value": "/home/user/data/datasets/dataset_1/image__3c61911a.tif"
+        "value": "/home/some-user/dataset/image__3c61911a.tif" // <------ has to be in the volume above
     }
 ]
 }

@@ -106,7 +106,7 @@ k3s:
       - k3s-server:/var/lib/rancher/k3s
       - ./k3s/registries.yaml:/etc/rancher/k3s/registries.yaml:ro
       - ./k3s/serviceaccounts.yaml://var/lib/rancher/k3s/server/manifests/serviceaccounts.yaml:ro
-      - /home/some-user/cytomine/data/app-engine:/home/some-user/cytomine/data/app-engine #<------ 4
+      - ${AE_DATA_PATH:-./data}/app-engine-shared-inputs:/app-engine-shared-inputs:rw
       - ${DATA_PATH:-./data}/app-engine-shared-datasets:/app-engine-shared-datasets:ro
       # This is just so that we get the kubeconfig file out
       - .kube/shared:/output/
@@ -153,8 +153,8 @@ app-engine:
     volumes:
       - ${DATA_PATH:-./data}/app-engine:/data
       - ${PWD}/.kube/shared:/root/.kube:ro
-      - /home/some-user/cytomine/data/app-engine:/home/some-user/cytomine/data/app-engine 
-      - /home/some-user/dataset:/home/some-user/dataset:rw #<------ 1
+      - ${AE_DATA_PATH:-./data}/app-engine-shared-inputs:/app-engine-shared-inputs:rw
+      - ${DATASET_PATH:-./data}/app-engine-shared-datasets:/app-engine-shared-datasets:ro
     environment:
       API_PREFIX: ${APP_ENGINE_API_BASE_PATH:-/app-engine/}
       DB_HOST: postgis
@@ -163,9 +163,9 @@ app-engine:
       DB_PORT: 5432
       DB_USERNAME: appengine
       REGISTRY_URL: http://registry:5000
-      STORAGE_BASE_PATH: /home/some-user/cytomine/data/app-engine 
-      RUN_STORAGE_BASE_PATH: /home/some-user/cytomine/data/app-engine
-      REF_STORAGE_BASE_PATH: /home/some-user/dataset #<------ 2
+      STORAGE_BASE_PATH: /app-engine-shared-inputs
+      RUN_STORAGE_BASE_PATH: /app-engine-shared-inputs
+      REF_STORAGE_BASE_PATH: /app-engine-shared-datasets
       SCHEDULER_RUN_MODE: local # values: local, cluster
       SCHEDULER_ADVERTISED_URL: http://172.16.238.10:8080
       SCHEDULER_REGISTRY_ADVERTISED_URL: 172.16.238.4:5000
@@ -200,8 +200,8 @@ k3s:
       - k3s-server:/var/lib/rancher/k3s
       - ./k3s/registries.yaml:/etc/rancher/k3s/registries.yaml:ro
       - ./k3s/serviceaccounts.yaml://var/lib/rancher/k3s/server/manifests/serviceaccounts.yaml:ro
-      - /home/some-user/cytomine/data/app-engine:/home/some-user/cytomine/data/app-engine
-      - /home/some-user/dataset:/home/some-user/dataset:ro #<------ 3
+      - ${AE_DATA_PATH:-./data}/app-engine-shared-inputs:/app-engine-shared-inputs:rw
+      - ${DATASET_PATH:-./data}/app-engine-shared-datasets:/app-engine-shared-datasets:ro
       # This is just so that we get the kubeconfig file out
       - .kube/shared:/output/
     ports:

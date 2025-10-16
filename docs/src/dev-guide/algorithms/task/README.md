@@ -41,7 +41,7 @@ To run a task in the app-engine it creates a context for the execution to manage
 ## Storage
 
 The app-engine controls provisioning of inputs to tasks and outputs back to consumers like `core` in Cytomine, every `Run` has its separate storage 
-that containts the provisioned inputs and the generated outputs, and tasks metadata files like descriptors or logos. Data is represented in storage following the definitions of parameter data types as defined in [Task I/O](/dev-guide/algorithms/task/task-io)
+that contains the provisioned inputs and the generated outputs, and tasks metadata files like descriptors or logos. Data is represented in storage following the definitions of parameter data types as defined in [Task I/O](/dev-guide/algorithms/task/task-io)
 
 The task run directories can be accessed by tasks running in [local mode](/dev-guide/algorithms/task/execution#local-mode) mode by mounting them as volumes.
 

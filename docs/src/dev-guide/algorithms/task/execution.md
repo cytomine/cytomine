@@ -59,7 +59,7 @@ app-engine:
     volumes:
       - ${DATA_PATH:-./data}/app-engine:/data
       - ${PWD}/.kube/shared:/root/.kube:ro
-      - /home/some-user/cytomine/data/app-engine:/home/some-user/cytomine/data/app-engine #<------ 1
+      - ${AE_DATA_PATH:-./data}/app-engine-shared-inputs:/app-engine-shared-inputs:rw
       - ${DATA_PATH:-./data}/app-engine-shared-datasets:/app-engine-shared-datasets:rw
     environment:
       API_PREFIX: ${APP_ENGINE_API_BASE_PATH:-/app-engine/}
@@ -69,8 +69,8 @@ app-engine:
       DB_PORT: 5432
       DB_USERNAME: appengine
       REGISTRY_URL: http://registry:5000
-      STORAGE_BASE_PATH: /home/some-user/cytomine/data/app-engine #<------ 2
-      RUN_STORAGE_BASE_PATH: /home/some-user/cytomine/data/app-engine #<------ 3
+      STORAGE_BASE_PATH: /app-engine-shared-inputs
+      RUN_STORAGE_BASE_PATH: /app-engine-shared-inputs
       REF_STORAGE_BASE_PATH: /app-engine-shared-datasets
       SCHEDULER_RUN_MODE: local # values: local, cluster
       SCHEDULER_ADVERTISED_URL: http://172.16.238.10:8080
@@ -124,7 +124,7 @@ When deploying on multiple machines app-engine and task might run on different n
 ## Datasets Referencing
 
 ::: warning
-Currently dataset referening only works in `local mode`
+Currently dataset referencing only works in `local mode`
 :::
 
 Tasks can process large datasets of images or files but provisioning them one by one or sending them over the wire is extremely slow and I/O intensive so using references optimizing input provisioning, to handle a dataset app-engine supports `array` data type to create arrays of other types, given the dataset is in a directory in the same machine it can be accessed by app-engine and also the task running in `k3s` by sharing the data using volumes.

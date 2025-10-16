@@ -109,7 +109,7 @@ k3s:
       - k3s-server:/var/lib/rancher/k3s
       - ./k3s/registries.yaml:/etc/rancher/k3s/registries.yaml:ro
       - ./k3s/serviceaccounts.yaml://var/lib/rancher/k3s/server/manifests/serviceaccounts.yaml:ro
-      - /home/some-user/cytomine/data/app-engine:/home/some-user/cytomine/data/app-engine #<------ 4
+      - ${AE_DATA_PATH:-./data}/app-engine-shared-inputs:/app-engine-shared-inputs:rw
       - ${DATA_PATH:-./data}/app-engine-shared-datasets:/app-engine-shared-datasets:ro
       # This is just so that we get the kubeconfig file out
       - .kube/shared:/output/

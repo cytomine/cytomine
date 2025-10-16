@@ -38,9 +38,6 @@ To enable this mode make these entries in the docker compose yaml file in [`cyto
 ::: warning
 Make sure all four paths are the same otherwise the data sharing fails.
 :::
-::: danger
-Since this needs absolute paths to work properly it is not automatically configured out of the box, make sure to make these changes before setting `local mode` 
-:::
 
 1. The environment variable `SCHEDULER_RUN_MODE` has two possible values `local` or `cluster`, make sure to set it to `local`.
 2. In app-engine make sure `STORAGE_BASE_PATH` and `RUN_STORAGE_BASE_PATH` both point to the absolute path of app-engine directory within cytomine data directory

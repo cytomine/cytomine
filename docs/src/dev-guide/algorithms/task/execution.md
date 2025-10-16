@@ -156,8 +156,8 @@ app-engine:
     volumes:
       - ${DATA_PATH:-./data}/app-engine:/data
       - ${PWD}/.kube/shared:/root/.kube:ro
-      - /home/some-user/cytomine/data/app-engine:/home/some-user/cytomine/data/app-engine 
-      - /home/some-user/dataset:/home/some-user/dataset:rw #<------ 1
+      - ${AE_DATA_PATH:-./data}/app-engine-shared-inputs:/app-engine-shared-inputs:rw
+      - ${DATASET_PATH:-./data}/app-engine-shared-datasets:/app-engine-shared-datasets:ro
     environment:
       API_PREFIX: ${APP_ENGINE_API_BASE_PATH:-/app-engine/}
       DB_HOST: postgis

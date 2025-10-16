@@ -62,7 +62,7 @@ app-engine:
     volumes:
       - ${DATA_PATH:-./data}/app-engine:/data
       - ${PWD}/.kube/shared:/root/.kube:ro
-      - /home/some-user/cytomine/data/app-engine:/home/some-user/cytomine/data/app-engine #<------ 1
+      - ${AE_DATA_PATH:-./data}/app-engine-shared-inputs:/app-engine-shared-inputs:rw
       - ${DATA_PATH:-./data}/app-engine-shared-datasets:/app-engine-shared-datasets:rw
     environment:
       API_PREFIX: ${APP_ENGINE_API_BASE_PATH:-/app-engine/}

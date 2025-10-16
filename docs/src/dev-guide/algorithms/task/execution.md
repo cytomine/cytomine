@@ -219,11 +219,11 @@ To provision an input of type `array` and subtype `image` just pass the absolute
     "value": [
     {
         "index": 0,
-        "value": "/home/some-user/dataset/iamge__4er5tgf4.tif" // <------ has to be in the volume above
+        "value": "/home/some-user/dataset/iamge__4er5tgf4.tif" // <------ it should match DATASET_PATH variable
     },
     {
         "index": 1,
-        "value": "/home/some-user/dataset/image__3c61911a.tif" // <------ has to be in the volume above
+        "value": "/home/some-user/dataset/image__3c61911a.tif" // <------ it should match DATASET_PATH variable
     }
 ]
 }

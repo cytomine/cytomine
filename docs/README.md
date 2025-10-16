@@ -4,9 +4,15 @@ The documentation site is built using VuePress v1.
 
 ## Requirements
 
-- Node v14.21.3
+- [Node](https://nodejs.org/) (v20.19.4+ recommended)
 
 ## Usage
+
+Install prerequisite packages for the documentation portal:
+
+```bash
+npm install
+```
 
 To run the development server with live reload locally, run
 
@@ -14,7 +20,7 @@ To run the development server with live reload locally, run
 npm run dev
 ```
 
-The website is available at <http://localhost:8080>
+The website will be available at <http://localhost:8080>
 
 ## Generate the documentation
 

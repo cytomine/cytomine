@@ -127,7 +127,7 @@ When deploying on multiple machines app-engine and task might run on different n
 ## Datasets Referencing
 
 ::: warning
-Currently dataset referening only works in `local mode`
+Currently dataset referencing only works in `local mode`
 :::
 
 Tasks can process large datasets of images or files but provisioning them one by one or sending them over the wire is extremely slow and I/O intensive so using references optimizing input provisioning, to handle a dataset app-engine supports `array` data type to create arrays of other types, given the dataset is in a directory in the same machine it can be accessed by app-engine and also the task running in `k3s` by sharing the data using volumes.

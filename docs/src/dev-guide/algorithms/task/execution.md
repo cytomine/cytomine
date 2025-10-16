@@ -72,8 +72,8 @@ app-engine:
       DB_PORT: 5432
       DB_USERNAME: appengine
       REGISTRY_URL: http://registry:5000
-      STORAGE_BASE_PATH: /home/some-user/cytomine/data/app-engine #<------ 2
-      RUN_STORAGE_BASE_PATH: /home/some-user/cytomine/data/app-engine #<------ 3
+      STORAGE_BASE_PATH: /app-engine-shared-inputs
+      RUN_STORAGE_BASE_PATH: /app-engine-shared-inputs
       REF_STORAGE_BASE_PATH: /app-engine-shared-datasets
       SCHEDULER_RUN_MODE: local # values: local, cluster
       SCHEDULER_ADVERTISED_URL: http://172.16.238.10:8080

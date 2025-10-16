@@ -36,7 +36,7 @@ In this mode the app-engine shares data with the task scheduled in k3s using vol
 To enable this mode make these entries in the docker compose yaml file in [`cytomine/compose.yml`](https://github.com/cytomine/cytomine/blob/main/compose.yaml):
 
 ::: warning
-Make sure all four paths matching otherwise the data sharing fails.
+Make sure all four paths are the same otherwise the data sharing fails.
 :::
 ::: danger
 Since this needs absolute paths to work properly it is not automatically configured out of the box, make sure to make these changes before setting `local mode` 
@@ -136,7 +136,7 @@ Tasks can process large datasets of images or files but provisioning them one by
 :::
 Given that there is a dataset of files or images in a directory somewhere in the machine app-engine creates symbolic links from the dataset items to reference them in both **storage** and the **running task**, to set it up do the following:
 ::: warning
-Make sure all three paths matching otherwise the data sharing fails because the symbolic links require matching absolute paths.
+Make sure all three paths are the same otherwise the data sharing fails because the symbolic links require matching absolute paths.
 :::
 1. In app-engine define a mount bind to the absolute path of dataset directory, make sure both host and container paths are absolute and matching.
 2. In k3s define a mount bind to the absolute path of dataset directory, make sure both host and container paths are absolute and matching.

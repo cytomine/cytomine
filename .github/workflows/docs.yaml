@@ -61,6 +61,27 @@ jobs:
           name: docs-artifacts
           path: docs-artifacts
 
+      - name: Get target path
+        id: deploy_target
+        run: |
+          if [ "${{ github.event_name }}" = "push" ] && [ "${{ github.ref_name }}" = "main" ]; then
+            echo "target=${{ secrets.DOCS_TARGET_PROD_PATH }}" >> $GITHUB_OUTPUT
+          else
+            echo "target=${{ secrets.DOCS_TARGET_PATH }}/pr-${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create target directory on remote
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DOCS_REMOTE_HOST }}
+          username: ${{ secrets.DOCS_REMOTE_USER }}
+          password: ${{ secrets.DOCS_REMOTE_PASSWORD }}
+          proxy_host: ${{ secrets.DOCS_REMOTE_PROXY }}
+          proxy_username: ${{ secrets.DOCS_REMOTE_USER }}
+          proxy_password: ${{ secrets.DOCS_REMOTE_PASSWORD }}
+          script: |
+            mkdir -p ${{ steps.deploy_target.outputs.target }}
+
       - name: SSH deploy
         uses: appleboy/scp-action@v1
         with:
@@ -72,5 +93,5 @@ jobs:
           proxy_password: ${{ secrets.DOCS_REMOTE_PASSWORD }}
           source: "docs-artifacts/*"
           strip_components: 1
-          target: ${{ github.ref_name == 'main' && secrets.DOCS_TARGET_PROD_PATH || secrets.DOCS_TARGET_NEXT_PATH }}
+          target: ${{ steps.deploy_target.outputs.target }}
           overwrite: true

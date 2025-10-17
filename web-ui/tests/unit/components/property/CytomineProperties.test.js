@@ -4,7 +4,7 @@ import Buefy from 'buefy';
 import CytomineProperties from '@/components/property/CytomineProperties';
 import {Property} from '@/api';
 
-jest.mock('cytomine-client', () => {
+jest.mock('@/api', () => {
   return {
     Property: jest.fn().mockImplementation(() => {
       return {

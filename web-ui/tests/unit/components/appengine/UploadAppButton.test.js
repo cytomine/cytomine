@@ -3,7 +3,7 @@ import {shallowMount} from '@vue/test-utils';
 import UploadAppButton from '@/components/appengine/UploadAppButton';
 import Task from '@/utils/appengine/task';
 
-jest.mock('cytomine-client', () => ({
+jest.mock('@/api', () => ({
   Cytomine: {
     instance: {
       api: {

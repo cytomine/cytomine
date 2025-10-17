@@ -4,7 +4,7 @@ import VueRouter from 'vue-router';
 
 import AppCard from '@/components/appengine/AppCard';
 
-jest.mock('cytomine-client', () => ({
+jest.mock('@/api', () => ({
   Cytomine: {
     instance: {
       api: {

@@ -7,7 +7,7 @@ import AnnotationPreview from '@/components/annotations/AnnotationPreview';
 import SimilarAnnotation from '@/components/annotations/SimilarAnnotation';
 import {Annotation} from '@/api';
 
-jest.mock('cytomine-client', () => ({
+jest.mock('@/api', () => ({
   Annotation: {
     fetch: jest.fn(),
   },

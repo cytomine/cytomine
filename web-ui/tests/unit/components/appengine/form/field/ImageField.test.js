@@ -3,7 +3,7 @@ import Buefy from 'buefy';
 
 import ImageField from '@/components/appengine/forms/fields/ImageField';
 
-jest.mock('cytomine-client', () => ({
+jest.mock('@/api', () => ({
   Cytomine: {
     instance: {
       api: {

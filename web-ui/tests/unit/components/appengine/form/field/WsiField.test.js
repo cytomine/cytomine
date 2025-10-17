@@ -3,7 +3,7 @@ import Buefy from 'buefy';
 
 import WsiField from '@/components/appengine/forms/fields/WsiField';
 
-jest.mock('cytomine-client', () => ({
+jest.mock('@/api', () => ({
   Cytomine: {
     instance: {
       api: {

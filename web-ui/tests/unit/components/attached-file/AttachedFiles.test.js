@@ -4,7 +4,7 @@ import Buefy from 'buefy';
 import attachedFiles from '@/components/attached-file/AttachedFiles';
 import {AttachedFileCollection} from '@/api';
 
-jest.mock('cytomine-client', () => ({
+jest.mock('@/api', () => ({
   Cytomine: {
     instance: {host: 'https://test.cytomine.com'}
   },

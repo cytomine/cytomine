@@ -4,7 +4,7 @@ import Buefy from 'buefy';
 import ArrayField from '@/components/appengine/forms/fields/ArrayField';
 import ArrayModal from '@/components/appengine/forms/fields/array/ArrayModal';
 
-jest.mock('cytomine-client', () => ({
+jest.mock('@/api', () => ({
   Cytomine: {
     instance: {
       api: {

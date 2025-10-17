@@ -6,7 +6,7 @@ import ActivityLogs from '@/components/utils/ActivityLogs';
 import ActivityLogsItem from '@/components/utils/ActivityLogsItem';
 import {Project} from '@/api';
 
-jest.mock('cytomine-client', () => ({
+jest.mock('@/api', () => ({
   Project: {
     fetchCommandHistory: jest.fn()
   }

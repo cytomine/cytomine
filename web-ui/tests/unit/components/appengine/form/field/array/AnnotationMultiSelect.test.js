@@ -4,7 +4,7 @@ import Buefy from 'buefy';
 import AnnotationMultiSelect from '@/components/appengine/forms/fields/array/AnnotationMultiSelect';
 import SelectableAnnotation from '@/components/annotations/SelectableAnnotation';
 
-jest.mock('cytomine-client', () => ({
+jest.mock('@/api', () => ({
   AnnotationCollection: jest.fn().mockImplementation(() => ({
     fetchAll: jest.fn().mockResolvedValue({
       array: [

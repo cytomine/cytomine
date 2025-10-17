@@ -8,7 +8,7 @@ jest.mock('@/utils/image-utils', () => ({
   isWebPSupported: jest.fn(() => true)
 }));
 
-jest.mock('cytomine-client', () => ({
+jest.mock('@/api', () => ({
   ImageInstanceCollection: {
     fetchAll: jest.fn().mockResolvedValue({
       array: [

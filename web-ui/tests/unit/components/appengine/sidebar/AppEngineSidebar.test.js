@@ -3,7 +3,7 @@ import Buefy from 'buefy';
 
 import AppEngineSideBar from '@/components/appengine/sidebar/AppEngineSidebar.vue';
 
-jest.mock('cytomine-client', () => ({
+jest.mock('@/api', () => ({
   Cytomine: {
     instance: {
       api: {

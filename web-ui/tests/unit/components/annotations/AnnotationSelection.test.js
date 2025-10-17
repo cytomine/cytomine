@@ -4,7 +4,7 @@ import Buefy from 'buefy';
 import AnnotationSelection from '@/components/annotations/AnnotationSelection';
 import CytomineModal from '@/components/utils/CytomineModal';
 
-jest.mock('cytomine-client', () => ({
+jest.mock('@/api', () => ({
   AnnotationCollection: jest.fn().mockImplementation(() => ({
     fetchAll: jest.fn().mockResolvedValue({
       array: [

@@ -6,7 +6,7 @@ import UploadAppButton from '@/components/appengine/UploadAppButton.vue';
 import Task from '@/utils/appengine/task';
 import {flushPromises} from '../../../utils';
 
-jest.mock('cytomine-client', () => ({
+jest.mock('@/api', () => ({
   Cytomine: {
     instance: {
       api: {

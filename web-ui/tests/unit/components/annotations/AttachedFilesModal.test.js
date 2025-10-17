@@ -5,7 +5,7 @@ import VeeValidate from 'vee-validate';
 import AttachedFileModal from '@/components/attached-file/AttachedFileModal';
 import CytomineModalCard from '@/components/utils/CytomineModalCard.vue';
 
-jest.mock('cytomine-client', () => ({
+jest.mock('@/api', () => ({
   AttachedFile: jest.fn().mockImplementation(() => ({
     save: jest.fn().mockResolvedValue({id: 1, filename: 'mockFile.pdf'}),
   })),

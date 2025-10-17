@@ -4,7 +4,7 @@ import Vuex from 'vuex';
 
 import CytomineDescription from '@/components/description/CytomineDescription';
 
-jest.mock('cytomine-client', () => ({
+jest.mock('@/api', () => ({
   Description: {
     fetch: jest.fn()
   }

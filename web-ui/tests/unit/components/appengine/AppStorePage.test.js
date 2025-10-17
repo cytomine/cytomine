@@ -6,7 +6,7 @@ import AppStorePage from '@/components/appengine/AppStorePage';
 import {Cytomine} from '@/api';
 import {flushPromises} from '../../../utils';
 
-jest.mock('cytomine-client', () => ({
+jest.mock('@/api', () => ({
   Cytomine: {
     instance: {
       api: {

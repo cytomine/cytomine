@@ -5,7 +5,7 @@ import {Cytomine} from '@/api';
 
 import MetadataPanel from '@/components/viewer/panels/MetadataPanel';
 
-jest.mock('cytomine-client', () => ({
+jest.mock('@/api', () => ({
   Cytomine: {
     instance: {
       api: {

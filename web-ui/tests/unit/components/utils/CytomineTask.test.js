@@ -4,7 +4,7 @@ import CytomineTask from '@/components/utils/CytomineTask';
 import {Task} from '@/api';
 
 
-jest.mock('cytomine-client', () => ({
+jest.mock('@/api', () => ({
   Task: {
     fetch: jest.fn()
   }

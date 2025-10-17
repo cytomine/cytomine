@@ -3,7 +3,7 @@ import Buefy from 'buefy';
 
 import GeometryField from '@/components/appengine/forms/fields/GeometryField';
 
-jest.mock('cytomine-client', () => ({
+jest.mock('@/api', () => ({
   Cytomine: {
     instance: {
       api: {

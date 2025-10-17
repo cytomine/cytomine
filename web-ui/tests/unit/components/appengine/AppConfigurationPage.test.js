@@ -15,7 +15,7 @@ localVue.use(Vuex);
 const mockNotify = jest.fn();
 const mockDialog = {confirm: jest.fn()};
 
-jest.mock('cytomine-client', () => ({
+jest.mock('@/api', () => ({
   Cytomine: {
     instance: {
       api: {

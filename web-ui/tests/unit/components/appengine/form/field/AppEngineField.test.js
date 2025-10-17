@@ -2,7 +2,7 @@ import {createLocalVue, shallowMount} from '@vue/test-utils';
 
 import AppEngineField from '@/components/appengine/forms/fields/AppEngineField.vue';
 
-jest.mock('cytomine-client', () => ({
+jest.mock('@/api', () => ({
   Cytomine: {
     instance: {
       api: {

@@ -11,7 +11,7 @@ jest.mock('@/utils/constants.js', () => ({
   APPENGINE_ENABLED: true,
 }));
 
-jest.mock('cytomine-client', () => ({
+jest.mock('@/api', () => ({
   Cytomine: {
     instance: {
       api: {

@@ -22,7 +22,7 @@ from pims.importer.image import ImageImporter
 from pims.importer.metadata import MetadataValidator
 from pims.importer.utils import get_project
 from pims.schemas.auth import ApiCredentials, CytomineAuth
-from pims.schemas.operations import ImportResponse
+from pims.schemas.operations import ImportResponse, ImportSummary
 
 logger = logging.getLogger("pims.app")
 
@@ -103,6 +103,7 @@ def run_import_datasets(
         projects = {project.name: project for project in project_collection}
 
         annotation_summary = {}
+        image_summary = ImportSummary()
         for bucket in buckets:
             parser = BucketParser(bucket)
             parser.discover()

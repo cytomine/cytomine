@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Optional
 
 
@@ -9,10 +9,10 @@ class ImportResult(BaseModel):
 
 
 class ImportSummary(BaseModel):
-    total: int
-    successful: int
-    failed: int
-    results: List[ImportResult]
+    total: int = 0
+    successful: int = 0
+    failed: int = 0
+    results: List[ImportResult] = Field(default_factory=list)
 
 
 class ImportResponse(BaseModel):

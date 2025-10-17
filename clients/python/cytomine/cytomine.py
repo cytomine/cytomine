@@ -983,7 +983,6 @@ class Cytomine:
         storage_id: int,
         import_uri: str,
         dataset_names: Optional[str] = None,
-        create_project: bool = False,
     ) -> Dict[str, str]:
         """Import datasets from a given path."""
 
@@ -998,11 +997,7 @@ class Cytomine:
                 "",
             ),
             headers=self._headers(content_type="text/plain"),
-            params={
-                "storage_id": storage_id,
-                "dataset_names": dataset_names,
-                "create_project": create_project,
-            },
+            params={"storage_id": storage_id},
         )
 
         if response.status_code != requests.codes.ok:

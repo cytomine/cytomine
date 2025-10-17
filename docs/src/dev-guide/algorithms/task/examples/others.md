@@ -20,7 +20,11 @@ These are tasks to showcase different parameter types used by the app engine. To
 8. [Integer Identity task](https://github.com/cytomine/dummy-tasks/tree/main/identity%20integer)
 9. [Number Identity task](https://github.com/cytomine/dummy-tasks/tree/main/identity%20number)
 10. [String Identity task](https://github.com/cytomine/dummy-tasks/tree/main/identity%20string)
-11. [WSI Identity task](https://github.com/cytomine/dummy-tasks/tree/main/identity%20WSI)
+
+## Our Tasks
+These are tasks created/bundled by Cytomine developers to run in Cytomine. 
+
+[Stardist task](https://github.com/cytomine/task-stardist)
 
 
 ## Third-party Tasks

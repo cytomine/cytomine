@@ -91,11 +91,6 @@ export default {
           });
 
           await Promise.all(promises);
-
-          // Notify that provisioning has ended
-          if (promises.length > 1) {
-            await Task.notifyProvisioningEnd(this.projectId, taskRun.id);
-          }
         } else {
           await Task.batchProvisionTask(this.projectId, taskRun.id, this.getInputProvisions());
         }
@@ -156,11 +151,11 @@ export default {
 <style scoped>
 .buttons {
   display: flex;
-  justify-content: flex-end; /* Right-align the buttons */
+  justify-content: flex-end;
 }
 
 .button {
-  margin-left: 5px; /* Add spacing between buttons */
+  margin-left: 5px;
 }
 
 .fields {

@@ -59,11 +59,6 @@ export default class Task extends Model {
     return data;
   }
 
-  static async notifyProvisioningEnd(project, runId) {
-    let {data} = await Cytomine.instance.api.post(`/app-engine/project/${project}/task-runs/${runId}/state-actions`, {'desired': 'PROVISIONED'});
-    return data;
-  }
-
   // Step-3 Run/Execute the Provisioned Task
   static async runTask(project, runId) {
     let {data} = await Cytomine.instance.api.post(`/app-engine/project/${project}/task-runs/${runId}/state-actions`, {'desired': 'RUNNING'});

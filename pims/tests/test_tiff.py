@@ -79,7 +79,7 @@ def test_tiff_exists(image_path_tiff):
     # Test if the file exists, either locally either with the OAC
     path, filename = image_path_tiff
     get_image(path, filename)
-    assert os.path.exists(os.path.join(path, filename)) == True
+    assert os.path.exists(os.path.join(path, filename))
 
 def test_tiff_info(client, image_path_tiff):
     _, filename = image_path_tiff 

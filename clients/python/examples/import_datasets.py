@@ -48,10 +48,6 @@ if __name__ == "__main__":
         if not storage:
             raise ValueError("Storage not found")
 
-        response = cytomine.import_datasets(
-            storage.id,
-            create_project=True,  # Create a project based on folder name
-            import_uri=params.import_uri
-        )
+        response = cytomine.import_datasets(storage.id, import_uri=params.import_uri)
 
         print(response)

@@ -436,6 +436,7 @@ dependencies = [
     { name = "cytomine-python-client" },
     { name = "fastapi" },
     { name = "fastapi-utils" },
+    { name = "geojson" },
     { name = "gunicorn" },
     { name = "importlib-metadata" },
     { name = "lxml" },
@@ -479,6 +480,7 @@ requires-dist = [
     { name = "cytomine-python-client", specifier = "==3.0.0" },
     { name = "fastapi", specifier = "==0.110.3" },
     { name = "fastapi-utils", specifier = "==0.7.0" },
+    { name = "geojson", specifier = ">=3.2.0" },
     { name = "gunicorn", specifier = "==22.0.0" },
     { name = "importlib-metadata", specifier = "==6.0.0" },
     { name = "lxml", specifier = "==6.0.2" },
@@ -643,6 +645,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/a7/b2/4140c69c6a66432916b26158687e821ba631a4c9273c474343badf84d3ba/future-1.0.0.tar.gz", hash = "sha256:bd2968309307861edae1458a4f8a4f3598c03be43b97521076aebf5d94c07b05", size = 1228490, upload-time = "2024-02-21T11:52:38.461Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/da/71/ae30dadffc90b9006d77af76b393cb9dfbfc9629f339fc1574a1c52e6806/future-1.0.0-py3-none-any.whl", hash = "sha256:929292d34f5872e70396626ef385ec22355a1fae8ad29e1a734c3e43f9fbc216", size = 491326, upload-time = "2024-02-21T11:52:35.956Z" },
+]
+
+[[package]]
+name = "geojson"
+version = "3.2.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/85/5a/33e761df75c732fcea94aaf01f993d823138581d10c91133da58bc231e63/geojson-3.2.0.tar.gz", hash = "sha256:b860baba1e8c6f71f8f5f6e3949a694daccf40820fa8f138b3f712bd85804903", size = 24574, upload-time = "2024-12-21T19:35:29.835Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/18/67/a7fa2d650602731c90e0a86279841b4586e14228199e8c09165ba4863e29/geojson-3.2.0-py3-none-any.whl", hash = "sha256:69d14156469e13c79479672eafae7b37e2dcd19bdfd77b53f74fa8fe29910b52", size = 15040, upload-time = "2024-12-21T19:37:02.149Z" },
 ]
 
 [[package]]

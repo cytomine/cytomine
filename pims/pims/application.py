@@ -1,26 +1,12 @@
-#  * Copyright (c) 2020-2021. Authors: see NOTICE file.
-#  *
-#  * Licensed under the Apache License, Version 2.0 (the "License");
-#  * you may not use this file except in compliance with the License.
-#  * You may obtain a copy of the License at
-#  *
-#  *      http://www.apache.org/licenses/LICENSE-2.0
-#  *
-#  * Unless required by applicable law or agreed to in writing, software
-#  * distributed under the License is distributed on an "AS IS" BASIS,
-#  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  * See the License for the specific language governing permissions and
-#  * limitations under the License.
-
 import logging
 import sys
 
-from . import __api_version__, __version__
+from . import __version__
 from .cache.redis import shutdown_cache, manage_cache
 
 logger = logging.getLogger("pims.app")
 logger.info("PIMS initialization...")
-logger.info("PIMS version: {} ; api version: {}".format(__version__, __api_version__))
+logger.info("PIMS version: %s", __version__)
 
 from pims.fastapi_tweaks import apply_fastapi_tweaks
 
@@ -47,7 +33,7 @@ app = FastAPI(
                 "While this API is intended to be internal, a lot of the "
                 "following specification can be ported to the "
                 "external (public) Cytomine API.",
-    version=__api_version__,
+    version=__version__,
     docs_url=None,
     redoc_url=f"{get_settings().api_base_path}/docs",
 )
@@ -80,13 +66,13 @@ async def startup():
 
     # Caching
     if not get_settings().cache_enabled:
-        logger.warning(f"Cache is disabled by configuration.")
+        logger.warning("Cache is disabled by configuration.")
     else:
         try:
-            logger.info(f" Try to reach cache ... ")
+            logger.info("Try to reach cache ... ")
             await startup_cache(__version__)
             await manage_cache()
-            logger.info(f"Cache is ready!")
+            logger.info("Cache is ready!")
         except ConnectionError:
             sys.exit(
                 f"Impossible to connect to cache \"{get_settings().cache_url}\" "

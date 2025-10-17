@@ -179,9 +179,9 @@ class TifffileParser(AbstractParser):
         """
         if not unit or physical_size is None:
             return None
-        if type(physical_size) == tuple and len(physical_size) == 1:
+        if isinstance(physical_size, tuple) and len(physical_size) == 1:
             rational = (physical_size[0], 1)
-        elif type(physical_size) != tuple:
+        elif not isinstance(physical_size, tuple):
             rational = (physical_size, 1)
         else:
             rational = physical_size

@@ -83,9 +83,10 @@ module.exports = {
                     ["/dev-guide/algorithms/task/examples/complete-walkthrough-example", "Complete Walkthrough Example"],
                     ["/dev-guide/algorithms/task/examples/others", "Others"],
                 ],
-            }
+            },
           ],
         },
+        ["/dev-guide/algorithms/task/execution", "Task Execution"],
       ],
     },
     {

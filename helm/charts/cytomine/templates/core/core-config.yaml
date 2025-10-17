@@ -187,24 +187,3 @@ data:
   APPENGINE_API_URL: http://app-engine.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.app_engine.port }}
   APPENGINE_API_BASE_PATH: /app-engine/v1/
 {{ end }}
----
-{{ if .Values.core.deploy }}
-apiVersion: v1
-kind: Secret
-metadata:
-  name: core-secret
-type: Opaque
-stringData:
-  ADMIN_PASSWORD: {{ .Values.core.admin_password }}
-  ADMIN_PRIVATE_KEY: {{ .Values.core.admin_private_key }}
-  ADMIN_PUBLIC_KEY: {{ .Values.core.admin_public_key }}
-  JWT_SECRET: {{ .Values.core.jwt_secret }}
-  SUPER_ADMIN_PRIVATE_KEY: {{ .Values.core.super_admin_private_key }}
-  SUPER_ADMIN_PUBLIC_KEY: {{ .Values.core.super_admin_public_key }}
-  IMAGE_SERVER_PRIVATE_KEY: {{ .Values.core.image_server_private_key }}
-  IMAGE_SERVER_PUBLIC_KEY: {{ .Values.core.image_server_public_key }}
-  SMTP_PASSWORD: {{ .Values.core.smtp_password }}
-  JAVAMELODY_PASS: {{ .Values.core.javamelody_password }}
-  POSTGIS_PASS:  {{ .Values.core.postgis_password }}
-  MONGO_PASS: {{ .Values.mongodb.password }}
-{{ end }}

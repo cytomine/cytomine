@@ -32,10 +32,12 @@ describe('Ontology', () => {
       expect(clone.children).not.toBe(fetchedOntology.children);
       expect(clone.children).toEqual(fetchedOntology.children);
 
-      if (fetchedOntology.children.length > 0) {
-        expect(clone.children.get(0)).not.toBe(fetchedOntology.children.get(0));
-        expect(clone.children.get(0)).toEqual(fetchedOntology.children.get(0));
+      if (fetchedOntology.children.length === 0) {
+        return;
       }
+
+      expect(clone.children.get(0)).not.toBe(fetchedOntology.children.get(0));
+      expect(clone.children.get(0)).toEqual(fetchedOntology.children.get(0));
     });
   });
 

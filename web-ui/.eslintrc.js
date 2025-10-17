@@ -32,5 +32,8 @@ module.exports = {
     }],
     'space-infix-ops': ['error'],
     'space-in-parens': ['error'],
+    'jest/expect-expect': 'off',
+    'jest/no-commented-out-tests': 'off',
+    'jest/no-disabled-tests': 'off',
   },
 };

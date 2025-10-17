@@ -170,10 +170,13 @@ describe('Property', () => {
         listId.forEach(id => {
           expect(id).toEqual(annotation.id);
         });
-        properties.forEach(prop => {
-          if (prop.domainIdent === annotation.id && prop.domainClassName === annotation.class) {
-            expect(listValues).toContain(prop.value);
-          }
+
+        const matchingProps = properties.filter(
+          prop => prop.domainIdent === annotation.id && prop.domainClassName === annotation.class
+        );
+
+        matchingProps.forEach(prop => {
+          expect(listValues).toContain(prop.value);
         });
       });
     });

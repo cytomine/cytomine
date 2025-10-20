@@ -1,9 +1,11 @@
 package be.cytomine.appengine.services;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
@@ -102,14 +104,11 @@ public class TaskService {
     public Optional<TaskDescription> uploadTask(InputStream inputStream)
         throws BundleArchiveException, TaskServiceException, ValidationException {
 
-        // prepare for streaming
-        String descriptorFileYmlContent = "";
-        JsonNode descriptorFileAsJson = null;
         log.info("UploadTask: Task identifiers generated ");
         UUID taskLocalIdentifier = UUID.randomUUID();
         String storageIdentifier = "task-" + taskLocalIdentifier + "-def";
         Storage storage = new Storage(storageIdentifier);
-        String imageRegistryCompliantName = null;
+
         log.info("UploadTask: building archive...");
         log.info("UploadTask: extracting descriptor and Docker image from archive...");
 
@@ -120,20 +119,22 @@ public class TaskService {
         try (ZipArchiveInputStream zais = new ZipArchiveInputStream(inputStream)) {
             ZipEntry entry;
 
-            while ((entry = zais.getNextZipEntry()) != null) {
-                String entryName = entry.getName();
+            var stream = new BufferedReader(new InputStreamReader(zais)).lines();
 
-                if (entryName.toLowerCase().matches("descriptor\\.(yml|yaml)")) {
-                    descriptorFileYmlContent = IOUtils.toString(zais, StandardCharsets.UTF_8);
-                    log.info("UploadTask: Descriptor file read into memory");
+            Optional<String> maybeDescriptor =
+                stream.filter((String str) -> str.toLowerCase().matches(
+                    "descriptor\\.(yml|yaml)")).findFirst().map(descriptor -> {
                     try {
+                        String descriptorFileYmlContent = IOUtils.toString(zais,
+                            StandardCharsets.UTF_8);
+                        log.info("UploadTask: Descriptor file read into memory");
                         log.info("UploadTask: validating descriptor file...");
-                        descriptorFileAsJson = new ObjectMapper(
+                        JsonNode descriptorFileAsJson = new ObjectMapper(
                             new YAMLFactory()).readTree(descriptorFileYmlContent);
                         taskValidationService.validateDescriptorFile(descriptorFileAsJson);
                         taskValidationService.checkIsNotDuplicate(descriptorFileAsJson);
                         log.info("UploadTask: Descriptor file validated");
-                    } catch (ValidationException e) {
+                    } catch (ValidationException | IOException e) {
                         log.info("UploadTask: Descriptor file not valid");
                         if (imageRegistryCompliantName == null) {
                             throw e;
@@ -148,7 +149,11 @@ public class TaskService {
                         }
                     }
                     log.info("UploadTask: Descriptor file extracted");
-                }
+                });
+
+            while ((entry = zais.getNextZipEntry()) != null) {
+                String entryName = entry.getName();
+
 
                 if (entryName.endsWith(".tar")) {
                     String fullName = entryName

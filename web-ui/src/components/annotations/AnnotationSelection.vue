@@ -38,7 +38,6 @@
 
 <script>
 import {AnnotationCollection} from '@/api';
-
 import {get} from '@/utils/store-helpers';
 
 import CytomineModal from '@/components/utils/CytomineModal';

@@ -15,6 +15,13 @@
             @update:selected="selectedAnnotation = $event"
           />
         </div>
+
+        <b-pagination
+          :total="nbAnnotations"
+          :current.sync="currentPage"
+          :per-page="nbPerPage"
+          size="is-small"
+        />
       </template>
 
       <template #footer>
@@ -31,7 +38,6 @@
 
 <script>
 import {AnnotationCollection} from '@/api';
-
 import {get} from '@/utils/store-helpers';
 
 import CytomineModal from '@/components/utils/CytomineModal';
@@ -45,6 +51,9 @@ export default {
   data() {
     return {
       annotations: [],
+      nbAnnotations: 0,
+      nbPerPage: 15,
+      currentPage: 1,
       loading: true,
       selectedAnnotation: null,
     };
@@ -55,6 +64,15 @@ export default {
   },
   computed: {
     project: get('currentProject/project'),
+    collection() {
+      return new AnnotationCollection({
+        project: this.project.id,
+        image: this.imageIds,
+        terms: this.terms.map(term => term.id),
+        showWKT: true,
+        max: this.nbPerPage,
+      });
+    },
     imagesWrapper() {
       return this.$store.getters['currentProject/currentViewer'].images;
     },
@@ -77,9 +95,19 @@ export default {
     },
     terms() {
       return this.$store.getters['currentProject/terms'] || [{id: 0, name: this.$t('no-term')}];
-    }
+    },
+  },
+  watch: {
+    currentPage() {
+      this.fetchAnnotationsPage();
+    },
   },
   methods: {
+    addAnnotationHandler(annotation) {
+      if (this.imageIds.includes(annotation.image)) {
+        this.fetchAnnotationsPage();
+      }
+    },
     cancelAnnotation() {
       this.selectedAnnotation = null;
       this.$emit('update:active', false);
@@ -95,25 +123,45 @@ export default {
 
       this.selectedAnnotation = null;
     },
-    async fetchAnnotations() {
-      let annotations = await new AnnotationCollection({
-        project: this.project.id,
-        image: this.imageIds,
-        terms: this.terms.map(term => term.id),
-        showWKT: true,
-      }).fetchAll();
-
-      this.annotations = annotations.array;
-    }
+    async fetchAnnotationsPage() {
+      try {
+        let data = await this.collection.fetchPage(this.currentPage - 1);
+        this.annotations = data.array;
+        this.nbAnnotations = data.totalNbItems;
+      } catch (error) {
+        console.log(error);
+        this.nbAnnotations = 0;
+      }
+      this.loading = false;
+    },
   },
   async created() {
-    await this.fetchAnnotations();
+    await this.fetchAnnotationsPage();
     this.loading = false;
-  }
+  },
+  async mounted() {
+    this.$eventBus.$on('addAnnotation', this.addAnnotationHandler);
+  },
+  async beforeDestroy() {
+    this.$eventBus.$off('addAnnotation', this.addAnnotationHandler);
+  },
 };
 </script>
 
 <style scoped>
+::v-deep(.pagination-list li) {
+  margin: 0;
+}
+
+::v-deep(.pagination li::marker) {
+  content: none;
+}
+
+::v-deep ul.pagination-list {
+  justify-content: flex-end;
+  margin: auto;
+}
+
 .annotation-content {
   display: flex;
   flex-wrap: wrap;

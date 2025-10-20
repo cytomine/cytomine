@@ -1,12 +1,11 @@
-import {createLocalVue, mount} from '@vue/test-utils';
-import Buefy from 'buefy';
+import {shallowMount} from '@vue/test-utils';
 
 import AnnotationSelection from '@/components/annotations/AnnotationSelection';
 import CytomineModal from '@/components/utils/CytomineModal';
 
 jest.mock('@/api', () => ({
   AnnotationCollection: jest.fn().mockImplementation(() => ({
-    fetchAll: jest.fn().mockResolvedValue({
+    fetchPage: jest.fn().mockResolvedValue({
       array: [
         {id: 1, name: 'Annotation 1'},
         {id: 2, name: 'Annotation 2'},
@@ -16,21 +15,14 @@ jest.mock('@/api', () => ({
 }));
 
 describe('AnnotationSelection.vue', () => {
-  let localVue;
-  let wrapper;
-
   const mockAnnotations = [
     {id: 1, name: 'Annotation 1'},
     {id: 2, name: 'Annotation 2'},
   ];
   const mockImages = [{imageInstance: {id: 1}}];
 
-  beforeEach(() => {
-    localVue = createLocalVue();
-    localVue.use(Buefy);
-
-    wrapper = mount(AnnotationSelection, {
-      localVue,
+  const createWrapper = () => {
+    return shallowMount(AnnotationSelection, {
       propsData: {
         active: true,
       },
@@ -44,13 +36,18 @@ describe('AnnotationSelection.vue', () => {
         ]
       },
       mocks: {
-        $t: (message) => message,
+        $eventBus: {
+          $on: jest.fn(),
+          $off: jest.fn(),
+          $emit: jest.fn(),
+        },
         $store: {
           getters: {
             'currentProject/currentViewer': {images: mockImages},
             'currentProject/terms': [{id: 1, name: 'Term 1'}],
           },
         },
+        $t: (message) => message,
       },
       data() {
         return {
@@ -60,17 +57,23 @@ describe('AnnotationSelection.vue', () => {
       },
       stubs: {
         AnnotationPreview: true,
+        'b-loading': true,
+        'b-pagination': true,
       },
     });
-  });
+  };
 
   it('The component should be rendered correctly', () => {
+    const wrapper = createWrapper();
+
     expect(wrapper.exists()).toBe(true);
     expect(wrapper.findComponent(CytomineModal).exists()).toBe(true);
     expect(wrapper.find('.annotation-content').exists()).toBe(true);
   });
 
   it('The component should render the loading when the data is fetched', async () => {
+    const wrapper = createWrapper();
+
     await wrapper.setData({loading: true});
 
     expect(wrapper.exists()).toBe(true);
@@ -79,6 +82,8 @@ describe('AnnotationSelection.vue', () => {
   });
 
   it('Selecting an annotation should emit the select-annotation event', async () => {
+    const wrapper = createWrapper();
+
     wrapper.setData({selectedAnnotation: mockAnnotations[0]});
     await wrapper.vm.selectAnnotation();
 
@@ -87,6 +92,8 @@ describe('AnnotationSelection.vue', () => {
   });
 
   it('Clicking on cancel annotation should reset selectedAnnotation', async () => {
+    const wrapper = createWrapper();
+
     wrapper.setData({selectedAnnotation: mockAnnotations[0]});
 
     expect(wrapper.vm.selectedAnnotation).toBe(mockAnnotations[0]);

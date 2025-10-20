@@ -124,16 +124,6 @@ export default {
 
       this.selectedAnnotation = null;
     },
-    async fetchAnnotations() {
-      let annotations = await new AnnotationCollection({
-        project: this.project.id,
-        image: this.imageIds,
-        terms: this.terms.map(term => term.id),
-        showWKT: true,
-      }).fetchAll();
-
-      this.annotations = annotations.array;
-    },
     async fetchAnnotationsPage() {
       try {
         let data = await this.collection.fetchPage(this.currentPage - 1);

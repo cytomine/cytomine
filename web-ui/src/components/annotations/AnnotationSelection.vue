@@ -150,12 +150,17 @@ export default {
 </script>
 
 <style scoped>
+::v-deep(.pagination-list li) {
+  margin: 0;
+}
+
 ::v-deep(.pagination li::marker) {
   content: none;
 }
 
 ::v-deep ul.pagination-list {
   justify-content: flex-end;
+  margin: auto;
 }
 
 .annotation-content {

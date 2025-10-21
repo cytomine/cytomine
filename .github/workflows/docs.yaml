@@ -95,3 +95,11 @@ jobs:
           strip_components: 1
           target: ${{ steps.deploy_target.outputs.target }}
           overwrite: true
+
+      - name: Add preview link
+        if: github.event_name == 'pull_request'
+        uses: peter-evans/create-or-update-comment@v5
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            The preview link is available at http://pr-${{ github.event.pull_request.number }}.doc.uliege.cytomine.org

@@ -10,22 +10,16 @@ FROM ${PROXY_CACHE}/node:${NODE_VERSION}-alpine AS frontend-builder
 
 WORKDIR /app
 
-COPY ./lerna.json /app/lerna.json
 COPY ./package.json /app/package.json
 COPY ./package-lock.json /app/package-lock.json
 
-COPY ./ui/src /app/ui/src
-COPY ./ui/public /app/ui/public
-COPY ./ui/scripts /app/ui/scripts
-COPY ./ui/package.json /app/ui/package.json
-COPY ./ui/babel.config.js /app/ui/babel.config.js
-COPY ./ui/.eslintrc.js /app/ui/.eslintrc.js
+COPY ./src /app/src
+COPY ./public /app/public
+COPY ./scripts /app/scripts
+COPY ./babel.config.js /app/babel.config.js
+COPY ./.eslintrc.js /app/.eslintrc.js
 
-COPY ./api-client/src /app/api-client/src
-COPY ./api-client/package.json /app/api-client/package.json
-COPY ./api-client/webpack.config.js /app/api-client/webpack.config.js
-
-RUN npm install && npm run build -w ui
+RUN npm install && npm run build
 
 #######################################################################################
 ## Stage: dev image (with hot swap)
@@ -33,9 +27,9 @@ FROM ${PROXY_CACHE}/node:${NODE_VERSION}-bookworm-slim AS dev-server
 
 WORKDIR /app
 
-COPY ./ui/scripts/configuration.json ./ui/public/configuration.json
+COPY ./scripts/configuration.json ./public/configuration.json
 
-CMD ["npm", "run", "serve", "-w", "ui"]
+CMD ["npm", "run", "serve"]
 
 #######################################################################################
 ## Stage: building nginx image serving the front-end
@@ -58,9 +52,9 @@ LABEL org.opencontainers.image.authors="uliege@cytomine.org" \
 
 WORKDIR /app
 
-COPY ./ui/docker/configs/nginx.conf /etc/nginx/nginx.conf
-COPY ./ui/scripts/configuration.json ./configuration.json
+COPY ./nginx.conf /etc/nginx/nginx.conf
+COPY ./scripts/configuration.json ./configuration.json
 
-COPY --from=frontend-builder /app/ui/dist /app
+COPY --from=frontend-builder /app/dist /app
 
 CMD ["nginx", "-g", "daemon off;"]

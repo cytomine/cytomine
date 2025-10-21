@@ -19,10 +19,23 @@ defaults:
   run:
     working-directory: ./pims
 
-env:
-  PYTHON_VERSION: "3.10"
-
 jobs:
+  lint:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v5
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: ${{ vars.PYTHON_VERSION }}
+          version: ${{ vars.UV_VERSION }}
+
+      - name: Lint
+        run: uv run ruff check
+
   tests:
     runs-on: self-hosted
 
@@ -39,14 +52,10 @@ jobs:
             libvips42 \
             libpng-dev
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-
       - name: Install uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
         with:
+          python-version: ${{ vars.PYTHON_VERSION }}
           version: ${{ vars.UV_VERSION }}
 
       - name: Run tests

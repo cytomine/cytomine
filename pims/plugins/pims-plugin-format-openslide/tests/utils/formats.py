@@ -1,15 +1,4 @@
-from PIL import Image
-import os
-import urllib.request
-from fastapi import APIRouter
-from pims.formats import FORMATS
-import io
-from pims.importer.importer import FileImporter
 
-from pims.files.file import (
-    EXTRACTED_DIR, HISTOGRAM_STEM, ORIGINAL_STEM, PROCESSED_DIR, Path,
-    SPATIAL_STEM, UPLOAD_DIR_PREFIX
-)
 
 
 def info_test(client, image, slug):

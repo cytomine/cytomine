@@ -89,7 +89,7 @@ class PNGParser(VipsParser):
         physical_size: Optional[str], unit: Optional[str], inverse: bool
     ) -> Optional[Quantity]:
         supported_units = {1: "meter", 2: "inch"}
-        if type(unit) == str:
+        if isinstance(unit, str):
             supported_units = {"meters": "meter", "inches": "inch"}
         if physical_size is not None and unit in supported_units.keys():
             physical_size = parse_float(physical_size)

@@ -543,7 +543,7 @@ def run_import(
     pending_file = Path(filepath)
 
     if extra_listeners is not None:
-        if not type(extra_listeners) is list:
+        if type(extra_listeners) is not list:
             extra_listeners = list(extra_listeners)
     else:
         extra_listeners = []

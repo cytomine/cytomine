@@ -52,6 +52,11 @@ spec:
                 secretKeyRef:
                   name: postgres-core-secret
                   key: password
+            - name: MONGO_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: password
           envFrom:
             - configMapRef:
                 name: core-env

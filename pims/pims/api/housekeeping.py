@@ -1,16 +1,3 @@
-#  * Copyright (c) 2020-2021. Authors: see NOTICE file.
-#  *
-#  * Licensed under the Apache License, Version 2.0 (the "License");
-#  * you may not use this file except in compliance with the License.
-#  * You may obtain a copy of the License at
-#  *
-#  *      http://www.apache.org/licenses/LICENSE-2.0
-#  *
-#  * Unless required by applicable law or agreed to in writing, software
-#  * distributed under the License is distributed on an "AS IS" BASIS,
-#  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  * See the License for the specific language governing permissions and
-#  * limitations under the License.
 from typing import Optional
 
 from fastapi import APIRouter
@@ -76,8 +63,9 @@ def _serialize_usage(path):
 
 
 @router.get(
-    '/directory/{directorypath:path}/disk-usage', response_model=DiskUsage,
-    tags=api_tags, response_class=FastJsonResponse
+    '/directory/{directorypath:path}/disk-usage',
+    tags=api_tags,
+    response_class=FastJsonResponse,
 )
 async def show_path_usage(
     directorypath: str,
@@ -94,8 +82,9 @@ async def show_path_usage(
 
 
 @router.get(
-    '/disk-usage', response_model=DiskUsage, tags=api_tags,
-    response_class=FastJsonResponse
+    '/disk-usage',
+    tags=api_tags,
+    response_class=FastJsonResponse,
 )
 async def show_disk_usage() -> DiskUsage:
     """

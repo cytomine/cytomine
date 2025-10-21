@@ -290,7 +290,7 @@ public class TaskRunService {
                 throw new IllegalArgumentException("Unsupported type: " + type);
             }
 
-            String response = appEngineService.put(uri, body, MediaType.MULTIPART_FORM_DATA);
+            String response = appEngineService.post(uri, body, MediaType.MULTIPART_FORM_DATA);
 
             if (wsi != null) {
                 wsi.delete();

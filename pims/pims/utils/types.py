@@ -45,7 +45,7 @@ def parse_boolean(value: Any, raise_exc: bool = False) -> Union[bool, None]:
 
 
 def parse_float(value: Any, raise_exc: bool = False) -> Union[float, None]:
-    if type(value) == str:
+    if isinstance(value, str):
         value = value.replace(",", ".")
     try:
         return float(value)

@@ -169,7 +169,7 @@ data:
   JAVAMELODY_PATH: /javamelody-core
   JAVAMELODY_USER: admin
   MONGO_DB_NAME: {{ include "cytomine.name" . }}
-  MONGO_HOST: mongodb
+  MONGO_HOST: mongodb.{{ .Release.Namespace }}.svc.cluster.local
   MONGO_PORT: "{{ .Values.mongodb.port }}"
   MONGO_USER: {{ .Values.mongodb.username }}
   POSTGIS_DB_NAME: {{ .Values.postgresql.user }}

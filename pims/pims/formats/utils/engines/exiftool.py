@@ -56,12 +56,12 @@ def read_raw_metadata(path: Path) -> dict:
     result = subprocess.run(args, capture_output=True)
     if result.returncode == 0:
         metadata = json.loads(result.stdout)
-        if type(metadata) == list and len(metadata) > 0:
+        if isinstance(metadata, list) and len(metadata) > 0:
             metadata = metadata[0]
-        if type(metadata) != dict:
+        if not isinstance(metadata, dict):
             return dict()
         return {
-            k.replace(":", "."): v.strip() if type(v) == str else v
+            k.replace(":", "."): v.strip() if isinstance(v, str) else v
             for k, v in metadata.items()
             if is_valid_key(k) and bytes_info not in str(v)
         }

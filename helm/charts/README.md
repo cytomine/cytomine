@@ -1,7 +1,6 @@
-Cytomine Helm Chart
-===================
+# Cytomine Helm Chart
 
-These helm charts will install a Cytomine system on a kubernetes host and it is built on the Cytomine Community Edition repo - https://github.com/cytomine/Cytomine-community-edition
+These helm charts will install a Cytomine system on a kubernetes cluster.
 
 - [Cytomine Helm Chart](#cytomine-helm-chart)
   - [Development environment](#development-environment)
@@ -127,5 +126,3 @@ Helm is a package manager for kubernetes. It allows us to configure, install and
 uninstall the entire system much easier than using kubernetes to deploy all the
 individual parts. Instructions for installing helm can be found
 [here](https://helm.sh/docs/intro/install).
-
-

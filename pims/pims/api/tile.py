@@ -83,7 +83,7 @@ async def show_tile_with_body(
 
 
 @router.post('/image/{filepath:path}/normalized-tile{extension:path}', tags=norm_tile_tags)
-async def show_tile_with_body(
+async def show_normalized_tile_with_body(
     request: Request, response: Response,
     body: TileRequest,
     path: Path = Depends(imagepath_parameter),

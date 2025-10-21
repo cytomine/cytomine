@@ -25,9 +25,19 @@ class XMLValidator:
     def validate(self, xml_path: Path) -> bool:
         try:
             xml_doc = etree.parse(xml_path)
-            return self.schema.validate(xml_doc)
+            is_valid = self.schema.validate(xml_doc)
+
+            if not is_valid:
+                for error in self.schema.error_log:
+                    message = f"Validation error at line {error.line}: {error.message}"
+                    logger.error(message)
+
+            return is_valid
+        except etree.XMLSyntaxError as e:
+            logger.error(f"XML syntax error: {e}")
+            return False
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(f"Unexpected error during validation: {e}")
             return False
 
 

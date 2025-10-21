@@ -75,7 +75,7 @@ class SafelyCopiable:
                     result, var,
                     copy.deepcopy(getattr(self, var), memo)  # noqa
                 )
-            except AttributeError as e:
+            except AttributeError:
                 pass
 
         # Return updated instance

@@ -11,12 +11,10 @@
 #  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  * See the License for the specific language governing permissions and
 #  * limitations under the License.
-from collections import defaultdict
 from pims.formats.utils.structures.pyramid import Pyramid, PyramidTier, normalized_pyramid
 from pims.processing.region import Region
 from unittest import TestCase
 
-from pims.api.utils.output_parameter import safeguard_output_dimensions
 
 def test_pyramid_tier():
     tier = PyramidTier(1000, 2000, 256, Pyramid())

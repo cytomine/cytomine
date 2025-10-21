@@ -94,7 +94,7 @@ export default {
       return this.layers.map(layer => layer.id);
     },
     terms() {
-      return this.$store.getters['currentProject/terms'] || [{id: 0, name: this.$t('no-term')}];
+      return this.$store.getters['currentProject/terms'] || [];
     },
   },
   watch: {

@@ -26,11 +26,10 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.fileupload2.core.*;
 import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletFileUpload;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
-import java.nio.file.Files;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -74,74 +73,44 @@ public class TaskService {
         log.info("UploadTask: building archive...");
         log.info("UploadTask: extracting descriptor and Docker image from archive...");
 
-        boolean descriptorFile = true;
-        boolean dockerImageFile = true;
-        File logoTempFile = null;
         try (ZipArchiveInputStream zais = new ZipArchiveInputStream(inputStream)) {
             ZipEntry entry;
 
             HashMap<String, ZipArchiveInputStream> files = new HashMap<>();
+
             while ((entry = zais.getNextZipEntry()) != null) {
                 files.put(entry.getName(), zais);
             }
 
-            Optional<JsonNode> maybeDescriptor = getDescriptorContent(files);
-            Optional<Map.Entry<String, ZipArchiveInputStream>> tarArchive = getImage(files);
+            JsonNode maybeDescriptor = getDescriptorContent(files).orElseThrow(() -> {
+                log.error("UploadTask: Descriptor file not found in archive");
+                return new BundleArchiveException(ErrorBuilder.build(
+                        ErrorCode.INTERNAL_DESCRIPTOR_NOT_IN_DEFAULT_LOCATION));
+            });
+            Map.Entry<String, ZipArchiveInputStream> tarArchive = getImage(files).orElseThrow(()->{log.error("UploadTask: Docker image not found in archive");
+                return new BundleArchiveException(
+                        ErrorBuilder.build(ErrorCode.INTERNAL_DOCKER_IMAGE_TAR_NOT_FOUND));});
             Optional<Map.Entry<String, ZipArchiveInputStream>> logo = getLogo(files);
 
-            while ((entry = zais.getNextZipEntry()) != null) {
-                String entryName = entry.getName();
+            fileStorageHandler.createStorage(storage);
+            log.info("UploadTask: Storage is created for task");
 
-                // extract logo
-                if (entry.getName()
-                        .toLowerCase()
-                        .matches("logo\\.(png)")) {
-                    logoTempFile = Files.createTempFile("logo-", ".png")
-                            .toFile();
-                    logoTempFile.deleteOnExit();
-
-                    try (FileOutputStream fos = new FileOutputStream(logoTempFile)) {
-                        zais.transferTo(fos);
-                    }
-                    log.info("UploadTask: logo extracted");
-                }
-
-            }
         } catch (IOException e) {
-            log.error("UploadTask: Failed to extract files from archive: "
-                    + imageRegistryCompliantName, e);
+            log.error("UploadTask: Failed to extract files from archive: ", e);
             throw new BundleArchiveException(
                     ErrorBuilder.build(ErrorCode.INTERNAL_DESCRIPTOR_EXTRACTION_FAILED));
         } catch (ValidationException e) {
-            log.error("UploadTask: task already exists");
+            log.error("Error creating storage or uploading");
             throw e;
+        } catch (FileStorageException e) {
+            log.error("UploadTask: failed to create storage [{}]", e.getMessage());
+            AppEngineError error = ErrorBuilder.build(ErrorCode.STORAGE_CREATING_STORAGE_FAILED);
+            throw new TaskServiceException(error);
         } catch (Exception e) {
             log.error("UploadTask: Unknown bundle archive format {}", e);
             AppEngineError error = ErrorBuilder.build(
                     ErrorCode.INTERNAL_UNKNOWN_BUNDLE_ARCHIVE_FORAMT);
             throw new BundleArchiveException(error);
-        }
-
-        if (!descriptorFile) {
-            log.error("UploadTask: Descriptor file not found in archive: "
-                    + imageRegistryCompliantName);
-            throw new BundleArchiveException(ErrorBuilder.build(
-                    ErrorCode.INTERNAL_DESCRIPTOR_NOT_IN_DEFAULT_LOCATION));
-        }
-
-        if (!dockerImageFile) {
-            log.error("UploadTask: Docker image not found in archive");
-            throw new BundleArchiveException(
-                    ErrorBuilder.build(ErrorCode.INTERNAL_DOCKER_IMAGE_TAR_NOT_FOUND));
-        }
-
-        try {
-            fileStorageHandler.createStorage(storage);
-            log.info("UploadTask: Storage is created for task");
-        } catch (FileStorageException e) {
-            log.error("UploadTask: failed to create storage [{}]", e.getMessage());
-            AppEngineError error = ErrorBuilder.build(ErrorCode.STORAGE_CREATING_STORAGE_FAILED);
-            throw new TaskServiceException(error);
         }
 
         try {

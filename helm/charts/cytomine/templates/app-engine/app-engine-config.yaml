@@ -5,7 +5,7 @@ metadata:
 data:
   DB_USERNAME: appengine
   DB_NAME: appengine
-  DB_HOST: postgres-app-engine-0.postgres-app-engine.{{ .Release.Namespace }}.svc.cluster.local
+  DB_HOST: postgres-app-engine.{{ .Release.Namespace }}.svc.cluster.local
   DB_PORT: "5432"
   API_PREFIX: /app-engine/
   REGISTRY_URL: http://registry.container-registry.svc.cluster.local:5000

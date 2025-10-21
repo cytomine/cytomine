@@ -173,7 +173,7 @@ data:
   MONGO_PORT: "{{ .Values.mongodb.port }}"
   MONGO_USER: {{ .Values.mongodb.username }}
   POSTGIS_DB_NAME: {{ .Values.postgresql.user }}
-  POSTGIS_HOST: postgis-0.postgis.{{ .Release.Namespace }}.svc.cluster.local
+  POSTGIS_HOST: postgis.{{ .Release.Namespace }}.svc.cluster.local
   POSTGIS_PORT: "{{ .Values.postgresql.port }}"
   POSTGIS_USER: {{ .Values.postgresql.user }}
   SMTP_HOST: {{ .Values.smtpHost }}

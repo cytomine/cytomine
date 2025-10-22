@@ -361,12 +361,14 @@ export default {
     this.$eventBus.$on('deleteAnnotation', this.deleteAnnotationEventHandler);
     this.$eventBus.$on('reloadAnnotations', this.reloadAnnotationsHandler);
     this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
+    this.$eventBus.$on('annotation-layers:refresh', this.fetchLayers);
   },
   beforeDestroy() {
     this.$eventBus.$off('addAnnotation', this.addAnnotationEventHandler);
     this.$eventBus.$off('deleteAnnotation', this.deleteAnnotationEventHandler);
     this.$eventBus.$off('reloadAnnotations', this.reloadAnnotationsHandler);
     this.$eventBus.$off('shortkeyEvent', this.shortkeyHandler);
+    this.$eventBus.$off('annotation-layers:refresh', this.fetchLayers);
   }
 };
 </script>

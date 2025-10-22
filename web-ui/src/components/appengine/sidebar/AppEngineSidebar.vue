@@ -108,6 +108,10 @@ export default {
           if (taskRun.state === 'FINISHED' || taskRun.state === 'FAILED') {
             taskRun.outputs = await taskRun.fetchOutputs();
 
+            if (taskRun.outputs.some(output => output.type === 'GEOMETRY')) {
+              this.$eventBus.$emit('annotation-layers:refresh');
+            }
+
             let binaryOutputs = this.filterBinaryType(task, 'output');
             if (binaryOutputs.length > 0) {
               for (let output of binaryOutputs) {

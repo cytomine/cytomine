@@ -28,15 +28,11 @@ public class AnnotationLayerService {
     private final TaskRunLayerService taskRunLayerService;
 
     public AnnotationLayer createAnnotationLayer(String name) {
-        Optional<AnnotationLayer> existing = annotationLayerRepository.findByName(name);
-        if (existing.isPresent()) {
-            return existing.get();
-        }
-
-        AnnotationLayer annotationLayer = new AnnotationLayer();
-        annotationLayer.setName(name);
-
-        return annotationLayerRepository.saveAndFlush(annotationLayer);
+        return annotationLayerRepository.findByName(name).orElseGet(()->{
+            AnnotationLayer annotationLayer = new AnnotationLayer();
+            annotationLayer.setName(name);
+            return annotationLayerRepository.saveAndFlush(annotationLayer);
+        });
     }
 
     public Optional<AnnotationLayer> find(Long id) {

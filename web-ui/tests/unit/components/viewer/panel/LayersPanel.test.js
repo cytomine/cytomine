@@ -99,7 +99,10 @@ describe('LayersPanel.vue', () => {
       stubs: {
         'b-checkbox': true,
         'b-field': true,
-        'b-message': true,
+        'b-message': {
+          props: ['type', 'hasIcon', 'iconSize', 'size'],
+          template: '<div class="b-message-stub"><slot /></div>',
+        },
         'b-select': {
           props: ['placeholder', 'value'],
           template: '<select><option disabled>{{ placeholder }}</option></select>',
@@ -116,6 +119,7 @@ describe('LayersPanel.vue', () => {
     expect(wrapper.text()).toContain('button-add');
     expect(wrapper.text()).toContain('layers-opacity');
     expect(wrapper.text()).not.toContain('no-selected-layers');
+    expect(wrapper.text()).not.toContain('unexpected-error-info-message');
   });
 
   it('should render no layers message when selectedLayers is empty', () => {
@@ -128,5 +132,14 @@ describe('LayersPanel.vue', () => {
 
     expect(wrapper.text()).toContain('no-selected-layers');
     expect(wrapper.vm.selectedLayers).toEqual([]);
+  });
+
+  it('should render error message when error is true', async () => {
+    const wrapper = createWrapper();
+    wrapper.vm.error = true;
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.error).toBe(true);
+    expect(wrapper.text()).toContain('unexpected-error-info-message');
   });
 });

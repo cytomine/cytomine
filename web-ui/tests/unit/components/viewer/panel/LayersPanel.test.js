@@ -65,7 +65,24 @@ describe('LayersPanel.vue', () => {
     fetchUserLayers: jest.fn(() => ({array: []})),
   };
 
-  const createWrapper = () => {
+  const createWrapper = (options = {}) => {
+    const {imageWrapper = mockImageWrapper} = options;
+
+    const defaultStore = {
+      commit: jest.fn(),
+      getters: {
+        'currentProject/canEditLayer': () => () => true,
+        'currentProject/project': mockProject,
+        'currentProject/currentViewer': {images: [imageWrapper]},
+        'currentProject/imageModule': jest.fn(() => 'mock-module/'),
+      },
+      state: {
+        currentProject: {
+          project: mockProject,
+        },
+      },
+    };
+
     return shallowMount(LayersPanel, {
       propsData: {
         index: '0',
@@ -76,20 +93,7 @@ describe('LayersPanel.vue', () => {
           $off: jest.fn(),
         },
         $notify: mockNotify,
-        $store: {
-          commit: jest.fn(),
-          getters: {
-            'currentProject/canEditLayer': () => () => true,
-            'currentProject/project': mockProject,
-            'currentProject/currentViewer': {images: [mockImageWrapper]},
-            'currentProject/imageModule': jest.fn(() => 'mock-module/'),
-          },
-          state: {
-            currentProject: {
-              project: mockProject,
-            },
-          },
-        },
+        $store: defaultStore,
         $t: (key) => key,
       },
       stubs: {
@@ -112,5 +116,17 @@ describe('LayersPanel.vue', () => {
     expect(wrapper.text()).toContain('button-add');
     expect(wrapper.text()).toContain('layers-opacity');
     expect(wrapper.text()).not.toContain('no-selected-layers');
+  });
+
+  it('should render no layers message when selectedLayers is empty', () => {
+    const wrapper = createWrapper({
+      imageWrapper: {
+        ...mockImageWrapper,
+        layers: {selectedLayers: []},
+      },
+    });
+
+    expect(wrapper.text()).toContain('no-selected-layers');
+    expect(wrapper.vm.selectedLayers).toEqual([]);
   });
 });

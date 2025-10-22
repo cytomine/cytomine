@@ -47,6 +47,7 @@ public class TaskValidationService {
     }
 
     public void validateDescriptorFile(JsonNode descriptorFileAsJson) throws ValidationException {
+        System.out.println(descriptorFileAsJson.toPrettyString());
         Set<ValidationMessage> errors = getDescriptorJsonSchemaV7()
             .validate(descriptorFileAsJson);
         // prepare an error list just in case

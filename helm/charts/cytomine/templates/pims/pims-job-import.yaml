@@ -27,7 +27,7 @@ spec:
                     name: postgres-core-secret
                     key: password
             - name: POSTGIS_HOST
-              value: postgis-0.postgis.{{ .Release.Namespace }}.svc.cluster.local
+              value: postgis.{{ .Release.Namespace }}.svc.cluster.local
             - name: POSTGIS_PORT
               value: "5432"
             - name: POSTGIS_USER
@@ -47,7 +47,7 @@ spec:
                     name: postgres-core-secret
                     key: password
             - name: POSTGIS_HOST
-              value: postgis-0.postgis.{{ .Release.Namespace }}.svc.cluster.local
+              value: postgis.{{ .Release.Namespace }}.svc.cluster.local
             - name: POSTGIS_PORT
               value: "5432"
             - name: POSTGIS_USER

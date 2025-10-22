@@ -50,7 +50,7 @@ describe('LayersPanel.vue', () => {
       selectedLayers: [{id: 10, fullName: 'User A'}],
     },
     review: {
-      reviewMode: 'double',
+      reviewMode: false,
     },
     images: [],
   };
@@ -79,7 +79,7 @@ describe('LayersPanel.vue', () => {
         $store: {
           commit: jest.fn(),
           getters: {
-            'currentProject/canEditLayer': {},
+            'currentProject/canEditLayer': () => () => true,
             'currentProject/project': mockProject,
             'currentProject/currentViewer': {images: [mockImageWrapper]},
             'currentProject/imageModule': jest.fn(() => 'mock-module/'),

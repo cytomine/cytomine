@@ -96,7 +96,10 @@ describe('LayersPanel.vue', () => {
         'b-checkbox': true,
         'b-field': true,
         'b-message': true,
-        'b-select': true,
+        'b-select': {
+          props: ['placeholder', 'value'],
+          template: '<select><option disabled>{{ placeholder }}</option></select>',
+        },
       },
     });
   };

@@ -16,7 +16,7 @@ import be.cytomine.utils.JsonObject;
 public class AnnotationLayer extends CytomineDomain {
 
     @NotBlank
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false)
     private String name;
 
     public static JsonObject getDataFromDomain(CytomineDomain domain) {

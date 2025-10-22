@@ -415,8 +415,7 @@ public class TaskRunService {
 
         List<TaskRunValue> outputs;
         try {
-            outputs = new ObjectMapper().readValue(response, new TypeReference<>() {
-            });
+            outputs = new ObjectMapper().readValue(response, new TypeReference<>() {});
         } catch (JsonProcessingException e) {
             throw new ObjectNotFoundException("Outputs from", taskRunId);
         }
@@ -429,20 +428,22 @@ public class TaskRunService {
             .toList();
 
         String layerName = "task-run-" + taskRunId;
-        AnnotationLayer annotationLayer = null;
-        TaskRunLayer taskRunLayer = new TaskRunLayer();
+        AnnotationLayer annotationLayer = annotationLayerService.createAnnotationLayer(layerName);
+        TaskRunLayer taskRunLayer = taskRunLayerRepository
+                .findByTaskRunAndImage(taskRun.get(), taskRun.get().getImage())
+                .orElseGet(() -> {
+                    TaskRunLayer newLayer = new TaskRunLayer();
+                    newLayer.setAnnotationLayer(annotationLayer);
+                    newLayer.setTaskRun(taskRun.get());
+                    newLayer.setImage(taskRun.get().getImage());
+                    return newLayer;
+                });
         boolean updated = false;
 
         if (!geometries.isEmpty()) {
-            annotationLayer = annotationLayerService.createAnnotationLayer(layerName);
             for (String geometry : geometries) {
                 annotationService.createAnnotation(annotationLayer, geometryService.GeoJSONToWKT(geometry));
             }
-
-
-            taskRunLayer.setAnnotationLayer(annotationLayer);
-            taskRunLayer.setTaskRun(taskRun.get());
-            taskRunLayer.setImage(taskRun.get().getImage());
             updated = true;
         }
 
@@ -452,11 +453,6 @@ public class TaskRunService {
                 .toList();
 
         if (!geoArrayValues.isEmpty()) {
-
-            if (annotationLayer == null) {
-                annotationLayer = annotationLayerService.createAnnotationLayer(layerName);
-            }
-
             for (TaskRunValue arrayValue : geoArrayValues) {
                     JsonNode items = new ObjectMapper().convertValue(arrayValue.getValue(), JsonNode.class);
                     for (JsonNode item : items) {
@@ -466,17 +462,11 @@ public class TaskRunService {
                         }
                     }
             }
-
-            taskRunLayer.setAnnotationLayer(annotationLayer);
-            taskRunLayer.setTaskRun(taskRun.get());
-            taskRunLayer.setImage(taskRun.get().getImage());
-
         }
 
         if (updated) {
             taskRunLayerRepository.saveAndFlush(taskRunLayer);
         }
-
 
         return response;
     }

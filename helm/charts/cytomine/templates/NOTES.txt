@@ -1,10 +1,12 @@
 Domain is {{ required ".Values.global.domainName is required!" .Values.global.domainName }}
-
+{{- $secretObj := (lookup "v1" "Secret" .Release.Namespace "cytomine-admin-iam-secret") }}
+{{- $secretData := (get $secretObj "data") }}
+{{- $secret := (get $secretData "password") | b64dec }}
 Cytomine is being deployed at {{ .Values.global.domainName }}.
 
 Admin credentials are:
     username: admin
-    password: {{ .Values.core.admin_password }}
+    password: {{ $secret }}
 
 It takes a few minutes for it to fully deploy, so please be patient. This usually takes about 5 minutes, and if the site isn't reachable in 10 minutes,
 something has likely gone wrong.

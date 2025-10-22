@@ -151,6 +151,8 @@ core:
 pims:
   deploy: true
   port: 5000
+  public_key: ca9020d0-76fe-4f05-8371-6cbe885c2b29
+  private_key: db087410-c2bd-4fa9-8aca-a9ad98226657
   resources:
     requests:
       memory: "4Gi"

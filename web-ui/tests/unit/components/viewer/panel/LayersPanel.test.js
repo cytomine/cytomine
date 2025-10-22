@@ -111,5 +111,6 @@ describe('LayersPanel.vue', () => {
     expect(wrapper.text()).toContain('select-layer');
     expect(wrapper.text()).toContain('button-add');
     expect(wrapper.text()).toContain('layers-opacity');
+    expect(wrapper.text()).not.toContain('no-selected-layers');
   });
 });

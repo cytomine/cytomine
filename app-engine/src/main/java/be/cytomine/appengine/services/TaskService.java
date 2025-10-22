@@ -121,21 +121,24 @@ public class TaskService {
 
             AbstractMap.SimpleEntry<String, JsonNode> descriptorFileEntry =
                 getDescriptorContent(files).orElseThrow(() -> {
-                log.error("UploadTask: Descriptor file not found in archive");
-                return new BundleArchiveException(ErrorBuilder.build(
-                    ErrorCode.INTERNAL_DESCRIPTOR_NOT_IN_DEFAULT_LOCATION));
-            });
+                    log.error("UploadTask: Descriptor file not found in archive");
+                    return new BundleArchiveException(ErrorBuilder.build(
+                        ErrorCode.INTERNAL_DESCRIPTOR_NOT_IN_DEFAULT_LOCATION));
+                });
             JsonNode descriptorFileAsJson = descriptorFileEntry.getValue();
             Map.Entry<String, ZipArchiveInputStream> tarArchive =
                 getImage(files).orElseThrow(() -> {
                     log.error("UploadTask: Docker image not found in archive");
-                return new BundleArchiveException(
-                    ErrorBuilder.build(ErrorCode.INTERNAL_DOCKER_IMAGE_TAR_NOT_FOUND));
+                    return new BundleArchiveException(
+                        ErrorBuilder.build(ErrorCode.INTERNAL_DOCKER_IMAGE_TAR_NOT_FOUND));
                 });
             String imageRegistryCompliantName = tarArchive.getKey();
             Optional<Map.Entry<String, ZipArchiveInputStream>> maybeLogo = getLogo(files);
             taskValidationService.validateDescriptorFile(descriptorFileAsJson);
             taskValidationService.checkIsNotDuplicate(descriptorFileAsJson);
+
+            registryHandler.pushImage(tarArchive.getValue(), imageRegistryCompliantName);
+
             fileStorageHandler.createStorage(storage);
             log.info("UploadTask: Storage is created for task");
             fileStorageHandler.saveStorageData(
@@ -146,9 +149,9 @@ public class TaskService {
             );
             log.info("UploadTask: descriptor.yml is stored in storage");
             maybeLogo.ifPresent(logo -> {
-                File logoTempFile = null;
+
                 try {
-                    logoTempFile = Files.createTempFile("logo-", ".png").toFile();
+                    File logoTempFile = Files.createTempFile("logo-", ".png").toFile();
 
                     logoTempFile.deleteOnExit();
 
@@ -156,16 +159,14 @@ public class TaskService {
                         zais.transferTo(fos);
                     }
 
-                    if (Objects.nonNull(logoTempFile)) {
-                        fileStorageHandler.saveStorageData(
+
+                    fileStorageHandler.saveStorageData(
                         storage,
                         new StorageData(logoTempFile, "logo.png")
-                        );
-                        log.info("UploadTask: logo.png is stored in storage");
-                    }
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                } catch (FileStorageException e) {
+                    );
+                    log.info("UploadTask: logo.png is stored in storage");
+
+                } catch (IOException | FileStorageException e) {
                     throw new RuntimeException(e);
                 }
             });
@@ -249,7 +250,7 @@ public class TaskService {
         } catch (BundleArchiveException e) {
             throw e;
         } catch (Exception e) {
-            log.error("UploadTask: Unknown bundle archive format {}", e);
+            log.error("UploadTask: Unknown bundle archive format {}", e.getMessage());
             AppEngineError error = ErrorBuilder.build(
                 ErrorCode.INTERNAL_UNKNOWN_BUNDLE_ARCHIVE_FORAMT);
             throw new BundleArchiveException(error);
@@ -268,14 +269,12 @@ public class TaskService {
                 try {
                     JsonNode descriptorFileAsJson = new ObjectMapper(
                         new YAMLFactory()).readTree(archiveFile.getValue());
-                    taskValidationService.validateDescriptorFile(descriptorFileAsJson);
-                    taskValidationService.checkIsNotDuplicate(descriptorFileAsJson);
-
-                    return Optional.of(new AbstractMap.SimpleEntry(archiveFile.getValue(),
-                        descriptorFileAsJson));
-                } catch (ValidationException | IOException e) {
+                    return Optional.of(
+                        new AbstractMap.SimpleEntry<>(archiveFile.getKey(),
+                            descriptorFileAsJson));
+                } catch (IOException e) {
                     log.info("UploadTask: Descriptor file not valid");
-                    return Optional.empty();
+                    throw new RuntimeException();
                 }
             });
     }

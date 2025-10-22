@@ -28,10 +28,11 @@ public class AnnotationLayerService {
     private final TaskRunLayerService taskRunLayerService;
 
     public AnnotationLayer createAnnotationLayer(String name) {
-        AnnotationLayer annotationLayer = new AnnotationLayer();
-        annotationLayer.setName(name);
-
-        return annotationLayerRepository.saveAndFlush(annotationLayer);
+        return annotationLayerRepository.findByName(name).orElseGet(()->{
+            AnnotationLayer annotationLayer = new AnnotationLayer();
+            annotationLayer.setName(name);
+            return annotationLayerRepository.saveAndFlush(annotationLayer);
+        });
     }
 
     public Optional<AnnotationLayer> find(Long id) {

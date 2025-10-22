@@ -1,20 +1,25 @@
 package be.cytomine.appengine.services;
 
-import be.cytomine.appengine.dto.handlers.filestorage.Storage;
-import be.cytomine.appengine.dto.inputs.task.*;
-import be.cytomine.appengine.dto.responses.errors.AppEngineError;
-import be.cytomine.appengine.dto.responses.errors.ErrorBuilder;
-import be.cytomine.appengine.dto.responses.errors.ErrorCode;
-import be.cytomine.appengine.exceptions.*;
-import be.cytomine.appengine.handlers.*;
-import be.cytomine.appengine.models.CheckTime;
-import be.cytomine.appengine.models.Match;
-import be.cytomine.appengine.models.task.ParameterType;
-import be.cytomine.appengine.models.task.*;
-import be.cytomine.appengine.repositories.RunRepository;
-import be.cytomine.appengine.repositories.TaskRepository;
-import be.cytomine.appengine.states.TaskRunState;
-import be.cytomine.appengine.utils.ArchiveUtils;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.time.LocalDateTime;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -23,17 +28,49 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
-import org.apache.commons.fileupload2.core.*;
+import org.apache.commons.fileupload2.core.DiskFileItem;
+import org.apache.commons.fileupload2.core.DiskFileItemFactory;
+import org.apache.commons.fileupload2.core.FileItemFactory;
+import org.apache.commons.fileupload2.core.FileItemInput;
+import org.apache.commons.fileupload2.core.FileItemInputIterator;
 import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletFileUpload;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
+import be.cytomine.appengine.dto.handlers.filestorage.Storage;
+import be.cytomine.appengine.dto.inputs.task.TaskAuthor;
+import be.cytomine.appengine.dto.inputs.task.TaskDescription;
+import be.cytomine.appengine.dto.inputs.task.TaskInput;
+import be.cytomine.appengine.dto.inputs.task.TaskInputFactory;
+import be.cytomine.appengine.dto.inputs.task.TaskOutput;
+import be.cytomine.appengine.dto.inputs.task.TaskOutputFactory;
+import be.cytomine.appengine.dto.inputs.task.TaskRun;
+import be.cytomine.appengine.dto.responses.errors.AppEngineError;
+import be.cytomine.appengine.dto.responses.errors.ErrorBuilder;
+import be.cytomine.appengine.dto.responses.errors.ErrorCode;
+import be.cytomine.appengine.exceptions.BundleArchiveException;
+import be.cytomine.appengine.exceptions.FileStorageException;
+import be.cytomine.appengine.exceptions.RunTaskServiceException;
+import be.cytomine.appengine.exceptions.TaskNotFoundException;
+import be.cytomine.appengine.exceptions.TaskServiceException;
+import be.cytomine.appengine.exceptions.ValidationException;
+import be.cytomine.appengine.handlers.RegistryHandler;
+import be.cytomine.appengine.handlers.StorageData;
+import be.cytomine.appengine.handlers.StorageDataType;
+import be.cytomine.appengine.handlers.StorageHandler;
+import be.cytomine.appengine.handlers.StorageStringEntry;
+import be.cytomine.appengine.models.CheckTime;
+import be.cytomine.appengine.models.Match;
+import be.cytomine.appengine.models.task.Author;
+import be.cytomine.appengine.models.task.Parameter;
+import be.cytomine.appengine.models.task.ParameterType;
+import be.cytomine.appengine.models.task.Run;
+import be.cytomine.appengine.models.task.Task;
+import be.cytomine.appengine.models.task.TypeFactory;
+import be.cytomine.appengine.repositories.RunRepository;
+import be.cytomine.appengine.repositories.TaskRepository;
+import be.cytomine.appengine.states.TaskRunState;
+import be.cytomine.appengine.utils.ArchiveUtils;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -63,7 +100,7 @@ public class TaskService {
 
     @Transactional
     public Optional<TaskDescription> uploadTask(InputStream inputStream)
-            throws BundleArchiveException, TaskServiceException, ValidationException {
+        throws BundleArchiveException, TaskServiceException, ValidationException {
 
         log.info("UploadTask: Task identifiers generated ");
         UUID taskLocalIdentifier = UUID.randomUUID();
@@ -82,172 +119,197 @@ public class TaskService {
                 files.put(entry.getName(), zais);
             }
 
-            JsonNode maybeDescriptor = getDescriptorContent(files).orElseThrow(() -> {
+            AbstractMap.SimpleEntry<String, JsonNode> descriptorFileEntry =
+                getDescriptorContent(files).orElseThrow(() -> {
                 log.error("UploadTask: Descriptor file not found in archive");
                 return new BundleArchiveException(ErrorBuilder.build(
-                        ErrorCode.INTERNAL_DESCRIPTOR_NOT_IN_DEFAULT_LOCATION));
+                    ErrorCode.INTERNAL_DESCRIPTOR_NOT_IN_DEFAULT_LOCATION));
             });
-            Map.Entry<String, ZipArchiveInputStream> tarArchive = getImage(files).orElseThrow(()->{log.error("UploadTask: Docker image not found in archive");
+            JsonNode descriptorFileAsJson = descriptorFileEntry.getValue();
+            Map.Entry<String, ZipArchiveInputStream> tarArchive =
+                getImage(files).orElseThrow(() -> {
+                    log.error("UploadTask: Docker image not found in archive");
                 return new BundleArchiveException(
-                        ErrorBuilder.build(ErrorCode.INTERNAL_DOCKER_IMAGE_TAR_NOT_FOUND));});
-            Optional<Map.Entry<String, ZipArchiveInputStream>> logo = getLogo(files);
-
+                    ErrorBuilder.build(ErrorCode.INTERNAL_DOCKER_IMAGE_TAR_NOT_FOUND));
+                });
+            String imageRegistryCompliantName = tarArchive.getKey();
+            Optional<Map.Entry<String, ZipArchiveInputStream>> maybeLogo = getLogo(files);
+            taskValidationService.validateDescriptorFile(descriptorFileAsJson);
+            taskValidationService.checkIsNotDuplicate(descriptorFileAsJson);
             fileStorageHandler.createStorage(storage);
             log.info("UploadTask: Storage is created for task");
+            fileStorageHandler.saveStorageData(
+                storage,
+                new StorageData(
+                    new StorageStringEntry(descriptorFileEntry.getKey(), "descriptor.yml",
+                        StorageDataType.FILE))
+            );
+            log.info("UploadTask: descriptor.yml is stored in storage");
+            maybeLogo.ifPresent(logo -> {
+                File logoTempFile = null;
+                try {
+                    logoTempFile = Files.createTempFile("logo-", ".png").toFile();
 
+                    logoTempFile.deleteOnExit();
+
+                    try (FileOutputStream fos = new FileOutputStream(logoTempFile)) {
+                        zais.transferTo(fos);
+                    }
+
+                    if (Objects.nonNull(logoTempFile)) {
+                        fileStorageHandler.saveStorageData(
+                        storage,
+                        new StorageData(logoTempFile, "logo.png")
+                        );
+                        log.info("UploadTask: logo.png is stored in storage");
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                } catch (FileStorageException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+
+            // save task info
+            Task task = new Task();
+            task.setIdentifier(taskLocalIdentifier);
+            task.setStorageReference(storageIdentifier);
+            task.setImageName(imageRegistryCompliantName);
+            task.setName(descriptorFileAsJson.get("name")
+                .textValue());
+            task.setNameShort(descriptorFileAsJson
+                .get("name_short")
+                .textValue());
+            task.setDescriptorFile(
+                descriptorFileAsJson.get("namespace")
+                    .textValue());
+            task.setNamespace(descriptorFileAsJson.get("namespace")
+                .textValue());
+            task.setVersion(descriptorFileAsJson.get("version")
+                .textValue());
+            task.setInputFolder(
+                descriptorFileAsJson
+                    .get("configuration")
+                    .get("input_folder")
+                    .textValue());
+            task.setOutputFolder(
+                descriptorFileAsJson
+                    .get("configuration")
+                    .get("output_folder")
+                    .textValue());
+
+            // resources
+            JsonNode resources =
+                descriptorFileAsJson.get("configuration")
+                    .get("resources");
+
+            if (!Objects.nonNull(resources)) {
+                task.setRam(defaultRam);
+                task.setCpus(defaultCpus);
+            } else {
+                task.setRam(resources.path("ram")
+                    .asText(defaultRam));
+                task.setCpus(resources.path("cpus")
+                    .asInt(defaultCpus));
+                task.setGpus(resources.path("gpus")
+                    .asInt(0));
+            }
+
+            task.setAuthors(getAuthors(descriptorFileAsJson));
+            task.setParameters(getParameters(descriptorFileAsJson));
+            task.setMatches(getMatches(descriptorFileAsJson, task.getParameters()));
+
+            log.info("UploadTask: saving task...");
+            taskRepository.save(task);
+            log.info("UploadTask: task saved");
+
+            return Optional.of(makeTaskDescription(task));
         } catch (IOException e) {
             log.error("UploadTask: Failed to extract files from archive: ", e);
             throw new BundleArchiveException(
-                    ErrorBuilder.build(ErrorCode.INTERNAL_DESCRIPTOR_EXTRACTION_FAILED));
+                ErrorBuilder.build(ErrorCode.INTERNAL_DESCRIPTOR_EXTRACTION_FAILED));
         } catch (ValidationException e) {
             log.error("Error creating storage or uploading");
             throw e;
         } catch (FileStorageException e) {
             log.error("UploadTask: failed to create storage [{}]", e.getMessage());
             AppEngineError error = ErrorBuilder.build(ErrorCode.STORAGE_CREATING_STORAGE_FAILED);
-            throw new TaskServiceException(error);
-        } catch (Exception e) {
-            log.error("UploadTask: Unknown bundle archive format {}", e);
-            AppEngineError error = ErrorBuilder.build(
-                    ErrorCode.INTERNAL_UNKNOWN_BUNDLE_ARCHIVE_FORAMT);
-            throw new BundleArchiveException(error);
-        }
-
-        try {
-            fileStorageHandler.saveStorageData(
-                    storage,
-                    new StorageData(
-                            new StorageStringEntry(descriptorFileYmlContent, "descriptor.yml",
-                                    StorageDataType.FILE))
-            );
-            log.info("UploadTask: descriptor.yml is stored in storage");
-            if (Objects.nonNull(logoTempFile)) {
-                fileStorageHandler.saveStorageData(
-                        storage,
-                        new StorageData(logoTempFile, "logo.png")
-                );
-                log.info("UploadTask: logo.png is stored in storage");
-            }
-        } catch (FileStorageException e) {
             try {
-                log.info("UploadTask: failed to store descriptor.yml");
                 log.info("UploadTask: attempting deleting storage...");
                 fileStorageHandler.deleteStorage(storage);
                 log.info("UploadTask: storage deleted");
             } catch (FileStorageException ex) {
                 log.error("UploadTask: file storage service is failing [{}]", ex.getMessage());
-                AppEngineError error = ErrorBuilder
-                        .build(ErrorCode.STORAGE_STORING_TASK_DEFINITION_FAILED);
-                throw new TaskServiceException(error);
+                AppEngineError error2 = ErrorBuilder
+                    .build(ErrorCode.STORAGE_STORING_TASK_DEFINITION_FAILED);
+                throw new TaskServiceException(error2);
             }
             return Optional.empty();
+
+        } catch (BundleArchiveException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("UploadTask: Unknown bundle archive format {}", e);
+            AppEngineError error = ErrorBuilder.build(
+                ErrorCode.INTERNAL_UNKNOWN_BUNDLE_ARCHIVE_FORAMT);
+            throw new BundleArchiveException(error);
         }
-        // save task info
-        Task task = new Task();
-        task.setIdentifier(taskLocalIdentifier);
-        task.setStorageReference(storageIdentifier);
-        task.setImageName(imageRegistryCompliantName);
-        task.setName(descriptorFileAsJson.get("name")
-                .textValue());
-        task.setNameShort(descriptorFileAsJson
-                .get("name_short")
-                .textValue());
-        task.setDescriptorFile(
-                descriptorFileAsJson.get("namespace")
-                        .textValue());
-        task.setNamespace(descriptorFileAsJson.get("namespace")
-                .textValue());
-        task.setVersion(descriptorFileAsJson.get("version")
-                .textValue());
-        task.setInputFolder(
-                descriptorFileAsJson
-                        .get("configuration")
-                        .get("input_folder")
-                        .textValue());
-        task.setOutputFolder(
-                descriptorFileAsJson
-                        .get("configuration")
-                        .get("output_folder")
-                        .textValue());
-
-        // resources
-        JsonNode resources =
-                descriptorFileAsJson.get("configuration")
-                        .get("resources");
-
-        if (!Objects.nonNull(resources)) {
-            task.setRam(defaultRam);
-            task.setCpus(defaultCpus);
-        } else {
-            task.setRam(resources.path("ram")
-                    .asText(defaultRam));
-            task.setCpus(resources.path("cpus")
-                    .asInt(defaultCpus));
-            task.setGpus(resources.path("gpus")
-                    .asInt(0));
-        }
-
-        task.setAuthors(getAuthors(descriptorFileAsJson));
-        task.setParameters(getParameters(descriptorFileAsJson));
-        task.setMatches(getMatches(descriptorFileAsJson, task.getParameters()));
-
-        log.info("UploadTask: saving task...");
-        taskRepository.save(task);
-        log.info("UploadTask: task saved");
-
-        return Optional.of(makeTaskDescription(task));
     }
 
-    protected Optional<JsonNode> getDescriptorContent(HashMap<String, ZipArchiveInputStream> files) {
+    protected Optional<AbstractMap.SimpleEntry<String, JsonNode>> getDescriptorContent(HashMap<String,
+        ZipArchiveInputStream> files) {
         return files.entrySet()
-                .stream()
-                .filter(entry -> entry.getKey()
-                        .toLowerCase()
-                        .matches("descriptor\\.(yml|yaml)"))
-                .findFirst()
-                .map(archiveFile -> {
-                    try {
-                        JsonNode descriptorFileAsJson = new ObjectMapper(
-                                new YAMLFactory()).readTree(archiveFile.getValue());
-                        taskValidationService.validateDescriptorFile(descriptorFileAsJson);
-                        taskValidationService.checkIsNotDuplicate(descriptorFileAsJson);
+            .stream()
+            .filter(entry -> entry.getKey()
+                .toLowerCase()
+                .matches("descriptor\\.(yml|yaml)"))
+            .findFirst()
+            .flatMap(archiveFile -> {
+                try {
+                    JsonNode descriptorFileAsJson = new ObjectMapper(
+                        new YAMLFactory()).readTree(archiveFile.getValue());
+                    taskValidationService.validateDescriptorFile(descriptorFileAsJson);
+                    taskValidationService.checkIsNotDuplicate(descriptorFileAsJson);
 
-                        return descriptorFileAsJson;
-                    } catch (ValidationException | IOException e) {
-                        log.info("UploadTask: Descriptor file not valid");
-                        return null;
-                    }
-                });
+                    return Optional.of(new AbstractMap.SimpleEntry(archiveFile.getValue(),
+                        descriptorFileAsJson));
+                } catch (ValidationException | IOException e) {
+                    log.info("UploadTask: Descriptor file not valid");
+                    return Optional.empty();
+                }
+            });
     }
 
-    protected Optional<Map.Entry<String, ZipArchiveInputStream>> getImage(HashMap<String, ZipArchiveInputStream> files) {
+    protected Optional<Map.Entry<String, ZipArchiveInputStream>> getImage(HashMap<String,
+        ZipArchiveInputStream> files) {
         return files.entrySet()
-                .stream()
-                .filter(entry -> entry.getKey()
-                        .endsWith(".tar"))
-                .findFirst()
-                .map(entry -> {
-                    String entryName = entry.getKey();
-                    String fullName = entryName
-                            .substring(0, entryName.length() - 4);
-                    String namespace = fullName
-                            .substring(0, fullName.indexOf("-"))
-                            .replace('.', '/');
-                    String version = fullName
-                            .substring(fullName.indexOf('-') + 1);
-                    String imageRegistryCompliantName = namespace + ":" + version;
-                    return new AbstractMap.SimpleEntry<>(imageRegistryCompliantName, entry.getValue());
+            .stream()
+            .filter(entry -> entry.getKey()
+                .endsWith(".tar"))
+            .findFirst()
+            .map(entry -> {
+                String entryName = entry.getKey();
+                String fullName = entryName
+                    .substring(0, entryName.length() - 4);
+                String namespace = fullName
+                    .substring(0, fullName.indexOf("-"))
+                    .replace('.', '/');
+                String version = fullName
+                    .substring(fullName.indexOf('-') + 1);
+                String imageRegistryCompliantName = namespace + ":" + version;
+                return new AbstractMap.SimpleEntry<>(imageRegistryCompliantName, entry.getValue());
 
-                });
+            });
     }
 
-    protected Optional<Map.Entry<String, ZipArchiveInputStream>> getLogo(HashMap<String, ZipArchiveInputStream> files) {
+    protected Optional<Map.Entry<String, ZipArchiveInputStream>> getLogo(HashMap<String,
+        ZipArchiveInputStream> files) {
         return files.entrySet()
-                .stream()
-                .filter(entry -> entry.getKey()
-                        .toLowerCase()
-                        .matches("logo\\.(png)"))
-                .findFirst();
+            .stream()
+            .filter(entry -> entry.getKey()
+                .toLowerCase()
+                .matches("logo\\.(png)"))
+            .findFirst();
     }
 
     private List<Match> getMatches(JsonNode descriptor, Set<Parameter> parameters) {
@@ -267,32 +329,32 @@ public class TaskService {
     }
 
     private void processDependencies(
-            JsonNode node,
-            Set<Parameter> parameters,
-            List<Match> matches) {
+        JsonNode node,
+        Set<Parameter> parameters,
+        List<Match> matches) {
         if (node != null && node.isObject()) {
             Iterator<String> fieldNames = node.fieldNames();
             while (fieldNames.hasNext()) {
                 String key = fieldNames.next();
                 JsonNode value = node.get(key);
                 parameters.stream()
-                        .filter(parameter -> parameter.getName()
-                                .equals(key))
-                        .findFirst()
-                        .ifPresent(parameter -> processParameterDependencies(
-                                parameter,
-                                value,
-                                parameters,
-                                matches));
+                    .filter(parameter -> parameter.getName()
+                        .equals(key))
+                    .findFirst()
+                    .ifPresent(parameter -> processParameterDependencies(
+                        parameter,
+                        value,
+                        parameters,
+                        matches));
             }
         }
     }
 
     private void processParameterDependencies(
-            Parameter param,
-            JsonNode value,
-            Set<Parameter> parameters,
-            List<Match> matches) {
+        Parameter param,
+        JsonNode value,
+        Set<Parameter> parameters,
+        List<Match> matches) {
         JsonNode dependencies = value.get("dependencies");
         if (dependencies != null && dependencies.isObject()) {
             JsonNode matching = dependencies.get("matching");
@@ -308,37 +370,37 @@ public class TaskService {
                     String matchingName = text.substring(slashIndex + 1);
 
                     parameters.stream()
-                            .filter(p -> p.getName()
-                                    .equals(matchingName) && p.getParameterType()
-                                    .equals(ParameterType.from(matchingType)))
-                            .findFirst()
-                            .ifPresent(other -> {
-                                // set check time relative to execution
-                                CheckTime when = CheckTime.UNDEFINED;
-                                boolean bothInputs = param
-                                        .getParameterType()
-                                        .equals(ParameterType.INPUT)
-                                        && matchingType.equalsIgnoreCase("inputs");
-                                if (bothInputs) {
-                                    when = CheckTime.BEFORE_EXECUTION;
-                                }
-                                boolean bothOutputs = param
-                                        .getParameterType()
-                                        .equals(ParameterType.OUTPUT)
-                                        && matchingType.equalsIgnoreCase("outputs");
-                                boolean crossMatch = (param
-                                        .getParameterType()
-                                        .equals(ParameterType.INPUT)
-                                        && matchingType.equalsIgnoreCase("outputs"))
-                                        || param.getParameterType()
-                                        .equals(ParameterType.OUTPUT)
-                                        && matchingType.equalsIgnoreCase("inputs");
-                                if (bothOutputs || crossMatch) {
-                                    when = CheckTime.AFTER_EXECUTION;
-                                }
+                        .filter(p -> p.getName()
+                            .equals(matchingName) && p.getParameterType()
+                            .equals(ParameterType.from(matchingType)))
+                        .findFirst()
+                        .ifPresent(other -> {
+                            // set check time relative to execution
+                            CheckTime when = CheckTime.UNDEFINED;
+                            boolean bothInputs = param
+                                .getParameterType()
+                                .equals(ParameterType.INPUT)
+                                && matchingType.equalsIgnoreCase("inputs");
+                            if (bothInputs) {
+                                when = CheckTime.BEFORE_EXECUTION;
+                            }
+                            boolean bothOutputs = param
+                                .getParameterType()
+                                .equals(ParameterType.OUTPUT)
+                                && matchingType.equalsIgnoreCase("outputs");
+                            boolean crossMatch = (param
+                                .getParameterType()
+                                .equals(ParameterType.INPUT)
+                                && matchingType.equalsIgnoreCase("outputs"))
+                                || param.getParameterType()
+                                .equals(ParameterType.OUTPUT)
+                                && matchingType.equalsIgnoreCase("inputs");
+                            if (bothOutputs || crossMatch) {
+                                when = CheckTime.AFTER_EXECUTION;
+                            }
 
-                                matches.add(new Match(param, other, when));
-                            });
+                            matches.add(new Match(param, other, when));
+                        });
 
                 }
             }
@@ -366,9 +428,9 @@ public class TaskService {
                 Parameter input = new Parameter();
                 input.setName(inputKey);
                 input.setDisplayName(inputValue.get("display_name")
-                        .textValue());
+                    .textValue());
                 input.setDescription(inputValue.get("description")
-                        .textValue());
+                    .textValue());
                 // use type factory to generate the correct type
                 input.setType(TypeFactory.createType(inputValue, charset));
                 input.setParameterType(ParameterType.INPUT);
@@ -384,7 +446,7 @@ public class TaskService {
                             break;
                         case NUMBER:
                             input.setDefaultValue(defaultNode.numberValue()
-                                    .toString());
+                                .toString());
                             break;
                         default:
                             input.setDefaultValue(defaultNode.toString());
@@ -406,9 +468,9 @@ public class TaskService {
             Parameter output = new Parameter();
             output.setName(outputKey);
             output.setDisplayName(outputValue.get("display_name")
-                    .textValue());
+                .textValue());
             output.setDescription(outputValue.get("description")
-                    .textValue());
+                .textValue());
             output.setParameterType(ParameterType.OUTPUT);
             // use type factory to generate the correct type
             output.setType(TypeFactory.createType(outputValue, charset));
@@ -417,14 +479,14 @@ public class TaskService {
             if (dependencies != null && dependencies.isObject()) {
                 JsonNode derivedFrom = dependencies.get("derived_from");
                 String inputName = derivedFrom.textValue()
-                        .substring("inputs/".length());
+                    .substring("inputs/".length());
                 parameters.stream()
-                        .filter(parameter -> parameter.getName()
-                                .equals(inputName)
-                                && parameter.getParameterType()
-                                .equals(ParameterType.INPUT))
-                        .findFirst()
-                        .ifPresent(output::setDerivedFrom);
+                    .filter(parameter -> parameter.getName()
+                        .equals(inputName)
+                        && parameter.getParameterType()
+                        .equals(ParameterType.INPUT))
+                    .findFirst()
+                    .ifPresent(output::setDerivedFrom);
             }
 
             parameters.add(output);
@@ -442,15 +504,15 @@ public class TaskService {
             for (JsonNode author : authorNode) {
                 Author a = new Author();
                 a.setFirstName(author.get("first_name")
-                        .textValue());
+                    .textValue());
                 a.setLastName(author.get("last_name")
-                        .textValue());
+                    .textValue());
                 a.setOrganization(author.get("organization")
-                        .textValue());
+                    .textValue());
                 a.setEmail(author.get("email")
-                        .textValue());
+                    .textValue());
                 a.setContact(author.get("is_contact")
-                        .asBoolean());
+                    .asBoolean());
                 authors.add(a);
             }
         }
@@ -459,7 +521,7 @@ public class TaskService {
     }
 
     public StorageData retrieveYmlDescriptor(String namespace, String version)
-            throws TaskServiceException, TaskNotFoundException {
+        throws TaskServiceException, TaskNotFoundException {
         log.info("Storage : retrieving descriptor.yml...");
         Task task = taskRepository.findByNamespaceAndVersion(namespace, version);
         if (task == null) {
@@ -477,14 +539,14 @@ public class TaskService {
     }
 
     public StorageData retrieveYmlDescriptor(String id)
-            throws TaskServiceException, TaskNotFoundException {
+        throws TaskServiceException, TaskNotFoundException {
         log.info("Storage : retrieving descriptor.yml...");
         Optional<Task> task = taskRepository.findById(UUID.fromString(id));
         if (task.isEmpty()) {
             throw new TaskNotFoundException("task not found");
         }
         StorageData file = new StorageData("descriptor.yml", task.get()
-                .getStorageReference());
+            .getStorageReference());
         try {
             file = fileStorageHandler.readStorageData(file);
         } catch (FileStorageException ex) {
@@ -516,21 +578,21 @@ public class TaskService {
 
     public TaskDescription makeTaskDescription(Task task) {
         TaskDescription taskDescription =
-                new TaskDescription(
-                        task.getIdentifier(),
-                        task.getName(),
-                        task.getNamespace(),
-                        task.getVersion(),
-                        task.getDescription());
+            new TaskDescription(
+                task.getIdentifier(),
+                task.getName(),
+                task.getNamespace(),
+                task.getVersion(),
+                task.getDescription());
         Set<TaskAuthor> descriptionAuthors = new HashSet<>();
         for (Author author : task.getAuthors()) {
             TaskAuthor taskAuthor =
-                    new TaskAuthor(
-                            author.getFirstName(),
-                            author.getLastName(),
-                            author.getOrganization(),
-                            author.getEmail(),
-                            author.isContact());
+                new TaskAuthor(
+                    author.getFirstName(),
+                    author.getLastName(),
+                    author.getOrganization(),
+                    author.getEmail(),
+                    author.isContact());
             descriptionAuthors.add(taskAuthor);
         }
         taskDescription.setAuthors(descriptionAuthors);
@@ -540,22 +602,22 @@ public class TaskService {
     public List<TaskInput> makeTaskInputs(Task task) {
         List<TaskInput> inputs = new ArrayList<>();
         task
-                .getParameters()
-                .stream()
-                .filter(parameter -> parameter.getParameterType()
-                        .equals(ParameterType.INPUT))
-                .forEach(parameter -> inputs.add(TaskInputFactory.createTaskInput(parameter)));
+            .getParameters()
+            .stream()
+            .filter(parameter -> parameter.getParameterType()
+                .equals(ParameterType.INPUT))
+            .forEach(parameter -> inputs.add(TaskInputFactory.createTaskInput(parameter)));
         return inputs;
     }
 
     public List<TaskOutput> makeTaskOutputs(Task task) {
         List<TaskOutput> outputs = new ArrayList<>();
         task
-                .getParameters()
-                .stream()
-                .filter(parameter -> parameter.getParameterType()
-                        .equals(ParameterType.OUTPUT))
-                .forEach(parameter -> outputs.add(TaskOutputFactory.createTaskOutput(parameter)));
+            .getParameters()
+            .stream()
+            .filter(parameter -> parameter.getParameterType()
+                .equals(ParameterType.OUTPUT))
+            .forEach(parameter -> outputs.add(TaskOutputFactory.createTaskOutput(parameter)));
 
         return outputs;
     }
@@ -583,7 +645,7 @@ public class TaskService {
 
     @Transactional
     public TaskRun createRunForTask(String namespace, String version)
-            throws RunTaskServiceException {
+        throws RunTaskServiceException {
         log.info("tasks/{namespace}/{version}/runs: creating run...");
         // find associated task
         log.info("tasks/{namespace}/{version}/runs: retrieving associated task...");
@@ -593,18 +655,18 @@ public class TaskService {
         UUID taskRunID = UUID.randomUUID();
         if (task == null) {
             throw new RunTaskServiceException(
-                    "task {" + namespace + ":" + version + "} not found to associate with this run");
+                "task {" + namespace + ":" + version + "} not found to associate with this run");
         }
         Set<Parameter> taskInputParameters = task
-                .getParameters()
-                .stream()
-                .filter(parameter -> parameter.getParameterType()
-                        .equals(ParameterType.INPUT))
-                .collect(Collectors.toSet());
+            .getParameters()
+            .stream()
+            .filter(parameter -> parameter.getParameterType()
+                .equals(ParameterType.INPUT))
+            .collect(Collectors.toSet());
 
         if (taskInputParameters.isEmpty()) {
             throw new RunTaskServiceException("task {"
-                    + namespace + ":" + version + "} has no inputs");
+                + namespace + ":" + version + "} has no inputs");
         }
         log.info("tasks/{namespace}/{version}/runs: retrieved task...");
         Run run = new Run(taskRunID, TaskRunState.CREATED, task, String.valueOf(UUID.randomUUID()));
@@ -626,14 +688,14 @@ public class TaskService {
         UUID taskRunID = UUID.randomUUID();
         if (task.isEmpty()) {
             throw new RunTaskServiceException(
-                    "task {" + taskId + "} not found to associate with this run");
+                "task {" + taskId + "} not found to associate with this run");
         }
         Set<Parameter> taskInputParameters = task.get()
-                .getParameters()
-                .stream()
-                .filter(parameter -> parameter.getParameterType()
-                        .equals(ParameterType.INPUT))
-                .collect(Collectors.toSet());
+            .getParameters()
+            .stream()
+            .filter(parameter -> parameter.getParameterType()
+                .equals(ParameterType.INPUT))
+            .collect(Collectors.toSet());
 
         if (taskInputParameters.isEmpty()) {
             throw new RunTaskServiceException("task {" + taskId + "} has no inputs");
@@ -660,25 +722,25 @@ public class TaskService {
             log.info("tasks/{namespace}/{version}/runs: Storage is created for task");
         } catch (FileStorageException e) {
             log.error("tasks/{namespace}/{version}/runs: failed to create storage [{}]",
-                    e.getMessage());
+                e.getMessage());
             throw new RunTaskServiceException(e);
         }
     }
 
     public InputStream prepareStream(HttpServletRequest request)
-            throws TaskServiceException {
+        throws TaskServiceException {
         log.info("UploadTask streaming: streaming...");
         if (!JakartaServletFileUpload.isMultipartContent(request)) {
             log.info("UploadTask streaming: not multipart");
             AppEngineError error = ErrorBuilder.build(
-                    ErrorCode.INTERNAL_NOT_MULTIPART);
+                ErrorCode.INTERNAL_NOT_MULTIPART);
             throw new TaskServiceException(error);
         }
 
         FileItemFactory<DiskFileItem> factory = DiskFileItemFactory.builder()
-                .get();
+            .get();
         JakartaServletFileUpload<DiskFileItem, FileItemFactory<DiskFileItem>> upload
-                = new JakartaServletFileUpload<>(factory);
+            = new JakartaServletFileUpload<>(factory);
 
         try {
             FileItemInputIterator iter = upload.getItemIterator(request);
@@ -687,7 +749,7 @@ public class TaskService {
             if (!iter.hasNext()) {
                 log.info("UploadTask streaming: No file parts found in the request body");
                 AppEngineError error = ErrorBuilder.build(
-                        ErrorCode.INTERNAL_NO_FILE_PARTS_FOUND
+                    ErrorCode.INTERNAL_NO_FILE_PARTS_FOUND
                 );
                 throw new TaskServiceException(error);
             }
@@ -698,10 +760,10 @@ public class TaskService {
             // Validate that the first part is indeed a file and not a simple form field
             if (item.isFormField()) {
                 log.warn("UploadTask streaming: "
-                                + "Expected a file but the first part is a form field: {}",
-                        item.getFieldName());
+                        + "Expected a file but the first part is a form field: {}",
+                    item.getFieldName());
                 AppEngineError error = ErrorBuilder.build(
-                        ErrorCode.INTERNAL_NO_FILE_BUT_FORM_FIELD
+                    ErrorCode.INTERNAL_NO_FILE_BUT_FORM_FIELD
                 );
                 throw new TaskServiceException(error);
             }
@@ -715,14 +777,14 @@ public class TaskService {
             e.printStackTrace();
             log.warn("provisioning streaming: failed to stream input file {}", e.getMessage());
             AppEngineError error = ErrorBuilder.build(
-                    ErrorCode.INTERNAL_SERVER_ERROR
+                ErrorCode.INTERNAL_SERVER_ERROR
             );
             throw new TaskServiceException(error);
         }
     }
 
     public StorageData retrieveLogo(String namespace, String version)
-            throws TaskServiceException, TaskNotFoundException {
+        throws TaskServiceException, TaskNotFoundException {
         log.info("Storage : retrieving logo...");
         Task task = taskRepository.findByNamespaceAndVersion(namespace, version);
         if (task == null) {

@@ -4,7 +4,7 @@ title: References
 
 # {{ $frontmatter.title }}
 
-This section provides a list of Cytomine tasks.
+This section provides a list of examples of Cytomine tasks.
 
 ## Dummy Tasks
 
@@ -21,14 +21,8 @@ These are tasks to showcase different parameter types used by the app engine. To
 9. [Number Identity task](https://github.com/cytomine/dummy-tasks/tree/main/identity%20number)
 10. [String Identity task](https://github.com/cytomine/dummy-tasks/tree/main/identity%20string)
 
-## Our Tasks
-These are tasks created/bundled by Cytomine developers to run in Cytomine. 
-
-[Stardist task](https://github.com/cytomine/task-stardist)
-
-
-## Third-party Tasks
-
-These are tasks created by third-party developers to run in Cytomine.
+## Other Tasks
+Here is a list of more concrete applications integrating different types of algorithms and models for various image recognition workflows.
 
 1. [VALIS experiment](https://github.com/maxime915/app_engine_valis_experiment)
+2. [Stardist task](https://github.com/cytomine/task-stardist)

@@ -20,21 +20,17 @@
       <div class="panel-block">
         <section class="media">
           <figure class="media-left">
-            <p class="image logo">
+            <div class="image logo">
               <img :src="task.imageUrl || 'https://bulma.io/assets/images/placeholders/1280x960.png'">
-            </p>
+            </div>
           </figure>
           <div class="media-content app-content">
             <div class="content">
-              <p>
-                <strong class="app-title">{{ task.name }}</strong>
-                <br>
-                <span v-if="task.authors && task.authors.length > 0">
-                  <small v-for="(author, index) in task.authors" :key="index">
-                    {{ `- ${author.first_name} ${author.last_name}` || $t('app-engine.no-authors') }}
-                  </small>
-                </span>
-              </p>
+              <strong class="app-title">{{ task.name }}</strong>
+              <br>
+              <small v-for="(author, index) in task.authors" :key="index">
+                {{ `- ${author.first_name} ${author.last_name}` }}
+              </small>
             </div>
           </div>
         </section>
@@ -63,8 +59,7 @@
                   {{ $t("description") }}
                 </p>
                 <a class="card-header-icon">
-                  <b-icon :icon="props.open ? 'menu-down' : 'menu-up'">
-                  </b-icon>
+                  <b-icon :icon="props.open ? 'menu-down' : 'menu-up'" />
                 </a>
               </div>
             </template>

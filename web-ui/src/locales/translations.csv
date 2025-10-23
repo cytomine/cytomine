@@ -1128,7 +1128,6 @@ app-engine.tasks.installed,Installed Tasks,Tâches installées,Tareas instaladas
 app-engine.tasks.name,Tasks,Tâches,Tareas,Taken
 app-engine.task.name,Task,Tâche,Tarea,Taak
 app-engine.applications,Applications,Applications,Aplicaciones,Toepassingen
-app-engine.no-authors,No Authors,Aucun auteur,Sin autores,Keine Autoren
 app-engine.execute-a-task,Run a task,Lancer une tâche,Ejecutor de tareas,Applicatie-uitvoerder
 app-engine.previous-task-runs,Previous task runs,Tâches exécutées précédemment,,
 app-engine.ae-current-status,Current Status,Statut actuel,Estado actual,Huidige status

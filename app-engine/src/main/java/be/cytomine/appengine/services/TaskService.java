@@ -120,7 +120,6 @@ public class TaskService {
                 files.put(entry.getName(), zais.readAllBytes());
             }
 
-
             AbstractMap.SimpleEntry<String, JsonNode> descriptorFileEntry =
                 getDescriptorContent(files).orElseThrow(() -> {
                     log.error("UploadTask: Descriptor file not found in archive");

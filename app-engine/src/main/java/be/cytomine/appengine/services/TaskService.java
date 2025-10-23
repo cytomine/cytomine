@@ -100,9 +100,8 @@ public class TaskService {
     private int defaultCpus;
 
     @Transactional
-    public Optional<TaskDescription> uploadTask(
-        InputStream inputStream) throws BundleArchiveException, TaskServiceException,
-        ValidationException {
+    public Optional<TaskDescription> uploadTask(InputStream inputStream)
+        throws BundleArchiveException, TaskServiceException, ValidationException {
 
         log.info("UploadTask: Task identifiers generated ");
         UUID taskLocalIdentifier = UUID.randomUUID();
@@ -143,9 +142,9 @@ public class TaskService {
 
             fileStorageHandler.createStorage(storage);
             log.info("UploadTask: Storage is created for task");
-            fileStorageHandler.saveStorageData(storage,
-                new StorageData(new StorageStringEntry(descriptorFileEntry.getKey(),
-                    "descriptor" + ".yml", StorageDataType.FILE)));
+            fileStorageHandler.saveStorageData(storage, new StorageData(
+                new StorageStringEntry(descriptorFileEntry.getKey(), "descriptor" + ".yml",
+                    StorageDataType.FILE)));
             log.info("UploadTask: descriptor.yml is stored in storage");
             maybeLogo.ifPresent(logo -> {
 
@@ -159,8 +158,8 @@ public class TaskService {
                     }
 
 
-                    fileStorageHandler.saveStorageData(storage, new StorageData(logoTempFile,
-                        "logo.png"));
+                    fileStorageHandler.saveStorageData(storage,
+                        new StorageData(logoTempFile, "logo.png"));
                     log.info("UploadTask: logo.png is stored in storage");
 
                 } catch (IOException | FileStorageException e) {
@@ -238,36 +237,46 @@ public class TaskService {
 
     protected Optional<AbstractMap.SimpleEntry<String, JsonNode>> getDescriptorContent(
         HashMap<String, byte[]> files) {
-        return files.entrySet().stream().filter(entry -> entry.getKey().toLowerCase().matches(
-            "descriptor\\.(yml|yaml)")).findFirst().flatMap(archiveFile -> {
-            try {
-                JsonNode descriptorFileAsJson =
-                    new ObjectMapper(new YAMLFactory()).readTree(archiveFile.getValue());
-                return Optional.of(new AbstractMap.SimpleEntry<>(archiveFile.getKey(),
-                    descriptorFileAsJson));
-            } catch (IOException e) {
-                log.info("UploadTask: Descriptor file not valid");
-                throw new RuntimeException();
-            }
-        });
+        return files.entrySet()
+                   .stream()
+                   .filter(entry -> entry.getKey().toLowerCase().matches("descriptor\\.(yml|yaml)"))
+                   .findFirst()
+                   .flatMap(archiveFile -> {
+                       try {
+                           JsonNode descriptorFileAsJson =
+                               new ObjectMapper(new YAMLFactory()).readTree(archiveFile.getValue());
+                           return Optional.of(new AbstractMap.SimpleEntry<>(archiveFile.getKey(),
+                               descriptorFileAsJson));
+                       } catch (IOException e) {
+                           log.info("UploadTask: Descriptor file not valid");
+                           throw new RuntimeException();
+                       }
+                   });
     }
 
     protected Optional<Map.Entry<String, byte[]>> getImage(HashMap<String, byte[]> files) {
-        return files.entrySet().stream().filter(
-            entry -> entry.getKey().endsWith(".tar")).findFirst().map(entry -> {
-            String entryName = entry.getKey();
-            String fullName = entryName.substring(0, entryName.length() - 4);
-            String namespace = fullName.substring(0, fullName.indexOf("-")).replace('.', '/');
-            String version = fullName.substring(fullName.indexOf('-') + 1);
-            String imageRegistryCompliantName = namespace + ":" + version;
-            return new AbstractMap.SimpleEntry<>(imageRegistryCompliantName, entry.getValue());
+        return files.entrySet()
+                   .stream()
+                   .filter(entry -> entry.getKey().endsWith(".tar"))
+                   .findFirst()
+                   .map(entry -> {
+                       String entryName = entry.getKey();
+                       String fullName = entryName.substring(0, entryName.length() - 4);
+                       String namespace =
+                           fullName.substring(0, fullName.indexOf("-")).replace('.', '/');
+                       String version = fullName.substring(fullName.indexOf('-') + 1);
+                       String imageRegistryCompliantName = namespace + ":" + version;
+                       return new AbstractMap.SimpleEntry<>(imageRegistryCompliantName,
+                           entry.getValue());
 
-        });
+                   });
     }
 
     protected Optional<Map.Entry<String, byte[]>> getLogo(HashMap<String, byte[]> files) {
-        return files.entrySet().stream().filter(entry -> entry.getKey().toLowerCase().matches(
-            "logo\\.(png)")).findFirst();
+        return files.entrySet()
+                   .stream()
+                   .filter(entry -> entry.getKey().toLowerCase().matches("logo\\.(png)"))
+                   .findFirst();
     }
 
     private List<Match> getMatches(JsonNode descriptor, Set<Parameter> parameters) {
@@ -293,10 +302,12 @@ public class TaskService {
             while (fieldNames.hasNext()) {
                 String key = fieldNames.next();
                 JsonNode value = node.get(key);
-                parameters.stream().filter(
-                    parameter -> parameter.getName().equals(key)).findFirst().ifPresent(
-                    parameter -> processParameterDependencies(parameter, value, parameters,
-                        matches));
+                parameters.stream()
+                    .filter(parameter -> parameter.getName().equals(key))
+                    .findFirst()
+                    .ifPresent(
+                        parameter -> processParameterDependencies(parameter, value, parameters,
+                            matches));
             }
         }
     }
@@ -313,35 +324,38 @@ public class TaskService {
                     if (slashIndex == -1) {
                         continue; // skip unexpected format
                     }
-
                     String matchingType = text.substring(0, slashIndex);
                     String matchingName = text.substring(slashIndex + 1);
 
-                    parameters.stream().filter(
-                        p -> p.getName().equals(matchingName) && p.getParameterType().equals(
-                            ParameterType.from(matchingType))).findFirst().ifPresent(other -> {
-                        // set check time relative to execution
-                        CheckTime when = CheckTime.UNDEFINED;
-                        boolean bothInputs =
-                            param.getParameterType().equals(
-                                ParameterType.INPUT) && matchingType.equalsIgnoreCase("inputs");
-                        if (bothInputs) {
-                            when = CheckTime.BEFORE_EXECUTION;
-                        }
-                        boolean bothOutputs =
-                            param.getParameterType().equals(
-                                ParameterType.OUTPUT) && matchingType.equalsIgnoreCase("outputs");
-                        boolean crossMatch =
-                            (param.getParameterType().equals(
-                                ParameterType.INPUT) && matchingType.equalsIgnoreCase(
-                                "outputs")) || param.getParameterType().equals(
-                                ParameterType.OUTPUT) && matchingType.equalsIgnoreCase("inputs");
-                        if (bothOutputs || crossMatch) {
-                            when = CheckTime.AFTER_EXECUTION;
-                        }
+                    parameters.stream()
+                        .filter(p -> p.getName().equals(matchingName) && p.getParameterType()
+                                                                             .equals(
+                                                                                 ParameterType.from(
+                                                                                     matchingType)))
+                        .findFirst()
+                        .ifPresent(other -> {
+                            // set check time relative to execution
+                            CheckTime when = CheckTime.UNDEFINED;
+                            boolean bothInputs =
+                                param.getParameterType().equals(ParameterType.INPUT)
+                                    && matchingType.equalsIgnoreCase("inputs");
+                            if (bothInputs) {
+                                when = CheckTime.BEFORE_EXECUTION;
+                            }
+                            boolean bothOutputs =
+                                param.getParameterType().equals(ParameterType.OUTPUT)
+                                    && matchingType.equalsIgnoreCase("outputs");
+                            boolean crossMatch =
+                                (param.getParameterType().equals(ParameterType.INPUT)
+                                     && matchingType.equalsIgnoreCase("outputs"))
+                                    || param.getParameterType().equals(ParameterType.OUTPUT)
+                                           && matchingType.equalsIgnoreCase("inputs");
+                            if (bothOutputs || crossMatch) {
+                                when = CheckTime.AFTER_EXECUTION;
+                            }
 
-                        matches.add(new Match(param, other, when));
-                    });
+                            matches.add(new Match(param, other, when));
+                        });
 
                 }
             }
@@ -415,9 +429,12 @@ public class TaskService {
             if (dependencies != null && dependencies.isObject()) {
                 JsonNode derivedFrom = dependencies.get("derived_from");
                 String inputName = derivedFrom.textValue().substring("inputs/".length());
-                parameters.stream().filter(parameter -> parameter.getName().equals(
-                    inputName) && parameter.getParameterType().equals(
-                    ParameterType.INPUT)).findFirst().ifPresent(output::setDerivedFrom);
+                parameters.stream()
+                    .filter(parameter -> parameter.getName().equals(inputName)
+                                             && parameter.getParameterType()
+                                                    .equals(ParameterType.INPUT))
+                    .findFirst()
+                    .ifPresent(output::setDerivedFrom);
             }
 
             parameters.add(output);
@@ -446,9 +463,8 @@ public class TaskService {
         return authors;
     }
 
-    public StorageData retrieveYmlDescriptor(String namespace,
-                                             String version) throws TaskServiceException,
-        TaskNotFoundException {
+    public StorageData retrieveYmlDescriptor(String namespace, String version)
+        throws TaskServiceException, TaskNotFoundException {
         log.info("Storage : retrieving descriptor.yml...");
         Task task = taskRepository.findByNamespaceAndVersion(namespace, version);
         if (task == null) {
@@ -465,8 +481,8 @@ public class TaskService {
         return file;
     }
 
-    public StorageData retrieveYmlDescriptor(String id) throws TaskServiceException,
-        TaskNotFoundException {
+    public StorageData retrieveYmlDescriptor(String id)
+        throws TaskServiceException, TaskNotFoundException {
         log.info("Storage : retrieving descriptor.yml...");
         Optional<Task> task = taskRepository.findById(UUID.fromString(id));
         if (task.isEmpty()) {
@@ -503,8 +519,9 @@ public class TaskService {
     }
 
     public TaskDescription makeTaskDescription(Task task) {
-        TaskDescription taskDescription = new TaskDescription(task.getIdentifier(),
-            task.getName(), task.getNamespace(), task.getVersion(), task.getDescription());
+        TaskDescription taskDescription =
+            new TaskDescription(task.getIdentifier(), task.getName(), task.getNamespace(),
+                task.getVersion(), task.getDescription());
         Set<TaskAuthor> descriptionAuthors = new HashSet<>();
         for (Author author : task.getAuthors()) {
             TaskAuthor taskAuthor = new TaskAuthor(author.getFirstName(), author.getLastName(),
@@ -517,17 +534,19 @@ public class TaskService {
 
     public List<TaskInput> makeTaskInputs(Task task) {
         List<TaskInput> inputs = new ArrayList<>();
-        task.getParameters().stream().filter(
-            parameter -> parameter.getParameterType().equals(ParameterType.INPUT)).forEach(
-            parameter -> inputs.add(TaskInputFactory.createTaskInput(parameter)));
+        task.getParameters()
+            .stream()
+            .filter(parameter -> parameter.getParameterType().equals(ParameterType.INPUT))
+            .forEach(parameter -> inputs.add(TaskInputFactory.createTaskInput(parameter)));
         return inputs;
     }
 
     public List<TaskOutput> makeTaskOutputs(Task task) {
         List<TaskOutput> outputs = new ArrayList<>();
-        task.getParameters().stream().filter(
-            parameter -> parameter.getParameterType().equals(ParameterType.OUTPUT)).forEach(
-            parameter -> outputs.add(TaskOutputFactory.createTaskOutput(parameter)));
+        task.getParameters()
+            .stream()
+            .filter(parameter -> parameter.getParameterType().equals(ParameterType.OUTPUT))
+            .forEach(parameter -> outputs.add(TaskOutputFactory.createTaskOutput(parameter)));
 
         return outputs;
     }
@@ -554,8 +573,8 @@ public class TaskService {
     }
 
     @Transactional
-    public TaskRun createRunForTask(String namespace,
-                                    String version) throws RunTaskServiceException {
+    public TaskRun createRunForTask(String namespace, String version)
+        throws RunTaskServiceException {
         log.info("tasks/{namespace}/{version}/runs: creating run...");
         // find associated task
         log.info("tasks/{namespace}/{version}/runs: retrieving associated task...");
@@ -564,17 +583,19 @@ public class TaskService {
         // update task to have a new task run
         UUID taskRunID = UUID.randomUUID();
         if (task == null) {
-            throw new RunTaskServiceException("task {" + namespace + ":" + version + "} not " +
-                "found" + " to associate with this run");
+            throw new RunTaskServiceException(
+                "task {" + namespace + ":" + version + "} not found to associate with this run");
         }
-        Set<Parameter> taskInputParameters =
-            task.getParameters().stream().filter(
-                parameter -> parameter.getParameterType().equals(ParameterType.INPUT)).collect(
-                Collectors.toSet());
+        Set<Parameter> taskInputParameters = task.getParameters()
+                                                 .stream()
+                                                 .filter(parameter -> parameter.getParameterType()
+                                                                          .equals(
+                                                                              ParameterType.INPUT))
+                                                 .collect(Collectors.toSet());
 
         if (taskInputParameters.isEmpty()) {
             throw new RunTaskServiceException(
-                "task {" + namespace + ":" + version + "} has no " + "inputs");
+                "task {" + namespace + ":" + version + "} has no inputs");
         }
         log.info("tasks/{namespace}/{version}/runs: retrieved task...");
         Run run = new Run(taskRunID, TaskRunState.CREATED, task, String.valueOf(UUID.randomUUID()));
@@ -595,13 +616,16 @@ public class TaskService {
         // update task to have a new task run
         UUID taskRunID = UUID.randomUUID();
         if (task.isEmpty()) {
-            throw new RunTaskServiceException("task {" + taskId + "} not found to associate with "
-                + "this run");
+            throw new RunTaskServiceException(
+                "task {" + taskId + "} not found to associate with this run");
         }
-        Set<Parameter> taskInputParameters =
-            task.get().getParameters().stream().filter(
-                parameter -> parameter.getParameterType().equals(ParameterType.INPUT)).collect(
-                Collectors.toSet());
+        Set<Parameter> taskInputParameters = task.get()
+                                                 .getParameters()
+                                                 .stream()
+                                                 .filter(parameter -> parameter.getParameterType()
+                                                                          .equals(
+                                                                              ParameterType.INPUT))
+                                                 .collect(Collectors.toSet());
 
         if (taskInputParameters.isEmpty()) {
             throw new RunTaskServiceException("task {" + taskId + "} has no inputs");
@@ -660,8 +684,9 @@ public class TaskService {
 
             // Validate that the first part is indeed a file and not a simple form field
             if (item.isFormField()) {
-                log.warn("UploadTask streaming: " + "Expected a file but the first part is a " +
-                    "form" + " field: {}", item.getFieldName());
+                log.warn(
+                    "UploadTask streaming: Expected a file but the first part is a form field: {}",
+                    item.getFieldName());
                 AppEngineError error =
                     ErrorBuilder.build(ErrorCode.INTERNAL_NO_FILE_BUT_FORM_FIELD);
                 throw new TaskServiceException(error);
@@ -680,8 +705,8 @@ public class TaskService {
         }
     }
 
-    public StorageData retrieveLogo(String namespace, String version) throws TaskServiceException
-        , TaskNotFoundException {
+    public StorageData retrieveLogo(String namespace, String version)
+        throws TaskServiceException, TaskNotFoundException {
         log.info("Storage : retrieving logo...");
         Task task = taskRepository.findByNamespaceAndVersion(namespace, version);
         if (task == null) {

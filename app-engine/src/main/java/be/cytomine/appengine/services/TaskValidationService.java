@@ -3,9 +3,8 @@ package be.cytomine.appengine.services;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -46,41 +45,37 @@ public class TaskValidationService {
         }
     }
 
-    public void validateDescriptorFile(JsonNode descriptorFileAsJson) throws ValidationException {
-        System.out.println(descriptorFileAsJson.toPrettyString());
-        Set<ValidationMessage> errors = getDescriptorJsonSchemaV7()
-            .validate(descriptorFileAsJson);
-        // prepare an error list just in case
-        List<AppEngineError> multipleErrors = new ArrayList<>();
-        for (ValidationMessage message : errors) {
-            AppEngineError error = buildErrorFromValidationMessage(message);
-            multipleErrors.add(error);
-        }
-
-        if (!multipleErrors.isEmpty()) {
-            AppEngineError error = ErrorBuilder.buildSchemaValidationError(multipleErrors);
-            throw new ValidationException(error);
-        }
-    }
-
     @NotNull
     private static AppEngineError buildErrorFromValidationMessage(ValidationMessage message) {
         String parameterPathInSchema = message
-            .getMessage()
-            .substring(0, message.getMessage().indexOf(':'))
-            .replace("$.", "");
+                                           .getMessage()
+                                           .substring(0, message.getMessage().indexOf(':'))
+                                           .replace("$.", "");
         ParameterError parameterError = new ParameterError(parameterPathInSchema);
         String formattedMessage = message
-            .getMessage()
-            .replace("$.", "")
-            .replace(":", "")
-            .replace(".", " ");
+                                      .getMessage()
+                                      .replace("$.", "")
+                                      .replace(":", "")
+                                      .replace(".", " ");
         AppEngineError error = ErrorBuilder.buildWithMessage(
             ErrorCode.INTERNAL_PARAMETER_SCHEMA_VALIDATION_ERROR,
             formattedMessage,
             parameterError
         );
         return error;
+    }
+
+    public void validateDescriptorFile(JsonNode descriptorFileAsJson) throws ValidationException {
+        List<AppEngineError> errors =
+            getDescriptorJsonSchemaV7()
+                .validate(descriptorFileAsJson)
+                .stream()
+                .map(TaskValidationService::buildErrorFromValidationMessage)
+                .collect(Collectors.toList());
+        if (!errors.isEmpty()) {
+            AppEngineError error = ErrorBuilder.buildSchemaValidationError(errors);
+            throw new ValidationException(error);
+        }
     }
 
     private static JsonSchema getDescriptorJsonSchemaV7() throws ValidationException {

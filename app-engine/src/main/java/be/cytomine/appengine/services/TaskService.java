@@ -1,5 +1,6 @@
 package be.cytomine.appengine.services;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -113,11 +114,12 @@ public class TaskService {
         try (ZipArchiveInputStream zais = new ZipArchiveInputStream(inputStream)) {
             ZipEntry entry;
 
-            HashMap<String, ZipArchiveInputStream> files = new HashMap<>();
+            HashMap<String, byte[]> files = new HashMap<>();
 
             while ((entry = zais.getNextZipEntry()) != null) {
-                files.put(entry.getName(), zais);
+                files.put(entry.getName(), zais.readAllBytes());
             }
+
 
             AbstractMap.SimpleEntry<String, JsonNode> descriptorFileEntry =
                 getDescriptorContent(files).orElseThrow(() -> {
@@ -126,18 +128,19 @@ public class TaskService {
                         ErrorCode.INTERNAL_DESCRIPTOR_NOT_IN_DEFAULT_LOCATION));
                 });
             JsonNode descriptorFileAsJson = descriptorFileEntry.getValue();
-            Map.Entry<String, ZipArchiveInputStream> tarArchive =
+            Map.Entry<String, byte[]> tarArchive =
                 getImage(files).orElseThrow(() -> {
                     log.error("UploadTask: Docker image not found in archive");
                     return new BundleArchiveException(
                         ErrorBuilder.build(ErrorCode.INTERNAL_DOCKER_IMAGE_TAR_NOT_FOUND));
                 });
             String imageRegistryCompliantName = tarArchive.getKey();
-            Optional<Map.Entry<String, ZipArchiveInputStream>> maybeLogo = getLogo(files);
+            Optional<Map.Entry<String, byte[]>> maybeLogo = getLogo(files);
             taskValidationService.validateDescriptorFile(descriptorFileAsJson);
             taskValidationService.checkIsNotDuplicate(descriptorFileAsJson);
 
-            registryHandler.pushImage(tarArchive.getValue(), imageRegistryCompliantName);
+            registryHandler.pushImage(new ByteArrayInputStream(tarArchive.getValue()),
+                imageRegistryCompliantName);
 
             fileStorageHandler.createStorage(storage);
             log.info("UploadTask: Storage is created for task");
@@ -258,7 +261,7 @@ public class TaskService {
     }
 
     protected Optional<AbstractMap.SimpleEntry<String, JsonNode>> getDescriptorContent(HashMap<String,
-        ZipArchiveInputStream> files) {
+        byte[]> files) {
         return files.entrySet()
             .stream()
             .filter(entry -> entry.getKey()
@@ -279,8 +282,8 @@ public class TaskService {
             });
     }
 
-    protected Optional<Map.Entry<String, ZipArchiveInputStream>> getImage(HashMap<String,
-        ZipArchiveInputStream> files) {
+    protected Optional<Map.Entry<String, byte[]>> getImage(HashMap<String,
+        byte[]> files) {
         return files.entrySet()
             .stream()
             .filter(entry -> entry.getKey()
@@ -301,8 +304,8 @@ public class TaskService {
             });
     }
 
-    protected Optional<Map.Entry<String, ZipArchiveInputStream>> getLogo(HashMap<String,
-        ZipArchiveInputStream> files) {
+    protected Optional<Map.Entry<String, byte[]>> getLogo(HashMap<String,
+        byte[]> files) {
         return files.entrySet()
             .stream()
             .filter(entry -> entry.getKey()

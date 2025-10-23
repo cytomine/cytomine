@@ -2,15 +2,21 @@
   <div class="content-wrapper">
     <b-loading v-if="loading" :is-full-page="false" :active="loading" />
     <div v-else class="panel">
-      <p class="panel-heading">
+      <div class="panel-heading">
         <b-button
-          class="is-link"
           icon-pack="fa"
           icon-left="angle-left"
           @click="$router.push(task.host !== null ? '/apps/store' : '/apps')"
           :label="$t('go-back')"
         />
-      </p>
+        <b-button
+          class="is-link"
+          icon-pack="fa"
+          icon-left="download"
+          @click="handleInstall"
+          :label="$t('install')"
+        />
+      </div>
       <div class="panel-block">
         <section class="media">
           <figure class="media-left">
@@ -76,6 +82,7 @@
 </template>
 
 <script>
+import {installApp} from '@/utils/app';
 import Task from '@/utils/appengine/task';
 
 export default {
@@ -85,6 +92,11 @@ export default {
       task: null,
       loading: true,
     };
+  },
+  methods: {
+    async handleInstall() {
+      installApp(this.task, this.$notify, this.$t.bind(this));
+    },
   },
   async created() {
     this.task = await Task.fetchNamespaceVersion(
@@ -128,12 +140,16 @@ img {
   font-size: 1.9rem;
 }
 
+.panel-heading {
+  display: flex;
+  justify-content: space-between;
+}
+
 .update-btn {
   margin: 3%;
   size: 2rem;
 }
 
-/*  ----- Metadata Section (Date + Ver...) ----- */
 .metadata {
   margin-top: 5%;
 }

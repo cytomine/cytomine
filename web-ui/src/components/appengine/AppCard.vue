@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import {Cytomine} from '@/api';
+import {installApp} from '@/utils/app';
 
 export default {
   name: 'AppCard',
@@ -44,15 +44,7 @@ export default {
   },
   methods: {
     async handleInstall() {
-      try {
-        const uri = `${this.app.namespace}/${this.app.version}`;
-        await Cytomine.instance.api.post(`/app-engine/tasks/${uri}/install`);
-
-        this.$notify({type: 'success', text: this.$t('notify-success-app-installation')});
-      } catch (error) {
-        console.error('Failed to install app:', error);
-        this.$notify({type: 'error', text: this.$t('notify-error-app-installation')});
-      }
+      installApp(this.app, this.$notify, this.$t.bind(this));
     },
   },
 };

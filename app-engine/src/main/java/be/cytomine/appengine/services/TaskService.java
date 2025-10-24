@@ -111,10 +111,11 @@ public class TaskService {
         try (ZipArchiveInputStream zais = new ZipArchiveInputStream(inputStream)) {
             ZipEntry entry;
 
-            HashMap<String, byte[]> files = new HashMap<>();
+            HashMap<String, InputStream> files = new HashMap<>();
 
             while ((entry = zais.getNextZipEntry()) != null) {
-                files.put(entry.getName(), zais.readAllBytes());
+                var stream = new ByteArrayInputStream(zais.readAllBytes());
+                files.put(entry.getName(), stream);
             }
 
             AbstractMap.SimpleEntry<String, JsonNode> descriptorFileEntry =
@@ -124,18 +125,17 @@ public class TaskService {
                         ErrorBuilder.build(ErrorCode.INTERNAL_DESCRIPTOR_NOT_IN_DEFAULT_LOCATION));
                 });
             JsonNode descriptorFileAsJson = descriptorFileEntry.getValue();
-            Map.Entry<String, byte[]> tarArchive = getImage(files).orElseThrow(() -> {
+            Map.Entry<String, InputStream> tarArchive = getImage(files).orElseThrow(() -> {
                 log.error("UploadTask: Docker image not found in archive");
                 return new BundleArchiveException(
                     ErrorBuilder.build(ErrorCode.INTERNAL_DOCKER_IMAGE_TAR_NOT_FOUND));
             });
             String imageRegistryCompliantName = tarArchive.getKey();
-            Optional<Map.Entry<String, byte[]>> maybeLogo = getLogo(files);
+            Optional<Map.Entry<String, InputStream>> maybeLogo = getLogo(files);
             taskValidationService.validateDescriptorFile(descriptorFileAsJson);
             taskValidationService.checkIsNotDuplicate(descriptorFileAsJson);
 
-            registryHandler.pushImage(new ByteArrayInputStream(tarArchive.getValue()),
-                imageRegistryCompliantName);
+            registryHandler.pushImage(tarArchive.getValue(), imageRegistryCompliantName);
 
             fileStorageHandler.createStorage(storage);
             log.info("UploadTask: Storage is created for task");
@@ -205,7 +205,7 @@ public class TaskService {
             throw new BundleArchiveException(
                 ErrorBuilder.build(ErrorCode.INTERNAL_DESCRIPTOR_EXTRACTION_FAILED));
         } catch (ValidationException e) {
-            log.error("Error creating storage or uploading");
+            log.error("Error validating {}", e.getMessage());
             throw e;
         } catch (FileStorageException e) {
             log.error("UploadTask: failed to create storage [{}]", e.getMessage());
@@ -233,7 +233,7 @@ public class TaskService {
     }
 
     protected Optional<AbstractMap.SimpleEntry<String, JsonNode>> getDescriptorContent(
-        HashMap<String, byte[]> files) {
+        HashMap<String, InputStream> files) {
         return files.entrySet()
                    .stream()
                    .filter(entry -> entry.getKey().toLowerCase().matches("descriptor\\.(yml|yaml)"))
@@ -251,7 +251,8 @@ public class TaskService {
                    });
     }
 
-    protected Optional<Map.Entry<String, byte[]>> getImage(HashMap<String, byte[]> files) {
+    protected Optional<Map.Entry<String, InputStream>> getImage(
+        HashMap<String, InputStream> files) {
         return files.entrySet()
                    .stream()
                    .filter(entry -> entry.getKey().endsWith(".tar"))
@@ -269,7 +270,7 @@ public class TaskService {
                    });
     }
 
-    protected Optional<Map.Entry<String, byte[]>> getLogo(HashMap<String, byte[]> files) {
+    protected Optional<Map.Entry<String, InputStream>> getLogo(HashMap<String, InputStream> files) {
         return files.entrySet()
                    .stream()
                    .filter(entry -> entry.getKey().toLowerCase().matches("logo\\.(png)"))

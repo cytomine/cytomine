@@ -34,14 +34,3 @@ data:
   logging.yml: |-
     {{ .Files.Get "configs/logging.yml" | nindent 4 }}
 {{ end }}
----
-{{ if .Values.pims.deploy }}
-apiVersion: v1
-kind: Secret
-metadata:
-  name: pims-secret
-type: Opaque
-stringData:
-  public_key: {{ .Values.pims.public_key }}
-  private_key: {{ .Values.pims.private_key }}
-{{ end }}

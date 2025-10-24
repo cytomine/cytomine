@@ -46,7 +46,7 @@ public class TaskValidationService {
     }
 
     @NotNull
-    private static AppEngineError buildErrorFromValidationMessage(ValidationMessage message) {
+    private AppEngineError buildErrorFromValidationMessage(ValidationMessage message) {
         String parameterPathInSchema = message
                                            .getMessage()
                                            .substring(0, message.getMessage().indexOf(':'))
@@ -57,12 +57,11 @@ public class TaskValidationService {
                                       .replace("$.", "")
                                       .replace(":", "")
                                       .replace(".", " ");
-        AppEngineError error = ErrorBuilder.buildWithMessage(
+        return ErrorBuilder.buildWithMessage(
             ErrorCode.INTERNAL_PARAMETER_SCHEMA_VALIDATION_ERROR,
             formattedMessage,
             parameterError
         );
-        return error;
     }
 
     public void validateDescriptorFile(JsonNode descriptorFileAsJson) throws ValidationException {
@@ -70,7 +69,7 @@ public class TaskValidationService {
             getDescriptorJsonSchemaV7()
                 .validate(descriptorFileAsJson)
                 .stream()
-                .map(TaskValidationService::buildErrorFromValidationMessage)
+                .map(this::buildErrorFromValidationMessage)
                 .collect(Collectors.toList());
         if (!errors.isEmpty()) {
             AppEngineError error = ErrorBuilder.buildSchemaValidationError(errors);

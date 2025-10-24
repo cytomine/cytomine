@@ -4,7 +4,6 @@ export const UploadStatus = {
   PENDING: 'pending',
   UPLOADING: 'uploading',
   COMPLETED: 'completed',
-  ERROR: 'errorr',
   CANCELLED: 'cancelled',
 };
 

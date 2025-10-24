@@ -15,7 +15,7 @@
         </b-upload>
       </b-field>
 
-      <div v-if="selectedFiles.length > 0">
+      <div class="container" v-if="selectedFiles.length > 0">
         <div class="columns">
           <div class="column">
             <strong class="is-size-4">
@@ -29,9 +29,11 @@
           </div>
         </div>
 
-        <div v-for="file in selectedFiles" :key="file.name">
-          <FileUploadItem ref="fileUploadChildren" :file="file" @file:remove="handleRemoveFile"
-            @task-upload:success="handleTaskUploaded" />
+        <div class="file-list">
+          <div v-for="file in selectedFiles" :key="file.name">
+            <FileUploadItem ref="fileUploadChildren" :file="file" @file:remove="handleRemoveFile"
+              @task-upload:success="handleTaskUploaded" />
+          </div>
         </div>
       </div>
     </section>
@@ -81,6 +83,12 @@ export default {
 </script>
 
 <style scoped>
+.file-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
 .upload-icon {
   margin-bottom: 1rem;
 }

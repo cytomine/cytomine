@@ -1,12 +1,12 @@
 <template>
   <div class="box">
-    <div class="columns is-vcentered is-gapless">
+    <div class="columns is-vcentered">
       <div class="column is-narrow has-text-centered">
         <b-icon icon="file-archive" size="is-large" />
       </div>
 
       <div class="column">
-        <div class="columns is-vcentered is-gapless">
+        <div class="columns is-vcentered mb-0">
           <div class="column">
             <div class="has-text-weight-semibold">{{ file.name }}</div>
             <div class="has-text-grey">{{ formattedFileSize }}</div>
@@ -26,11 +26,11 @@
         :max="100" show-value />
     </div>
 
-    <div class="column">
-      <b-button v-if="isPending" type="is-info" size="is-medium" @click="handleTaskUpload">
+    <div class="column is-narrow">
+      <b-button v-if="isPending" type="is-info" @click="handleTaskUpload">
         {{ $t('upload') }}
       </b-button>
-      <b-button v-if="isUploading" type="is-primary" size="is-medium" @click="handleCancelUpload">
+      <b-button v-if="isUploading" type="is-primary" @click="handleCancelUpload">
         {{ $t('button-cancel') }}
       </b-button>
       <strong v-if="isCancelled" class="has-text-danger">{{ $t('upload-cancelled') }}</strong>
@@ -113,3 +113,13 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.box {
+  padding: 1rem;
+}
+
+.box .columns:not(:last-child) {
+  margin-bottom: 0 !important;
+}
+</style>

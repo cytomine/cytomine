@@ -31,8 +31,12 @@
 
         <div class="file-list">
           <div v-for="file in selectedFiles" :key="file.name">
-            <FileUploadItem ref="fileUploadChildren" :file="file" @file:remove="handleRemoveFile"
-              @task-upload:success="handleTaskUploaded" />
+            <FileUploadItem
+              ref="fileUploadChildren"
+              :file="file"
+              @file:remove="handleRemoveFile"
+              @task-upload:success="handleTaskUploaded"
+            />
           </div>
         </div>
       </div>

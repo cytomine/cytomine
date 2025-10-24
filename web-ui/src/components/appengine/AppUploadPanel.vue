@@ -3,8 +3,8 @@
     <p class="panel-heading">{{ $t('app-engine.task.upload') }}</p>
 
     <section class="panel-block">
-      <b-field class="file is-centered">
-        <b-upload v-model="selectedFiles" multiple drag-drop accept=".zip">
+      <b-field class="file is-centered container">
+        <b-upload v-model="selectedFiles" multiple drag-drop accept=".zip" expanded>
           <section class="section">
             <div class="content has-text-centered">
               <b-icon class="upload-icon" icon="upload" size="is-large" />
@@ -16,7 +16,7 @@
       </b-field>
 
       <div class="container" v-if="selectedFiles.length > 0">
-        <div class="columns">
+        <div class="columns is-vcentered">
           <div class="column">
             <strong class="is-size-4">
               {{ $t('files') }} ({{ selectedFiles.length }})
@@ -83,6 +83,15 @@ export default {
 </script>
 
 <style scoped>
+.file {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.file-label {
+  justify-content: center;
+}
+
 .file-list {
   display: flex;
   flex-direction: column;

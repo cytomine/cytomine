@@ -1,40 +1,38 @@
 <template>
   <div class="box">
-    <div class="columns is-vcentered">
+    <div class="columns">
       <div class="column is-narrow has-text-centered">
         <b-icon icon="file-archive" size="is-large" />
       </div>
 
       <div class="column">
-        <div class="columns is-vcentered mb-0">
-          <div class="column">
-            <div class="has-text-weight-semibold">{{ file.name }}</div>
-            <div class="has-text-grey">{{ formattedFileSize }}</div>
-          </div>
+        <div class="upload-text">
+          <div class="has-text-weight-semibold">{{ file.name }}</div>
+          <div class="has-text-grey">{{ formattedFileSize }}</div>
+        </div>
 
-          <div class="column is-narrow has-text-right">
-            <b-icon v-if="isCompleted" icon="check-circle" size="is-medium" />
-            <b-icon v-if="isCancelled" icon="exclamation-circle" size="is-medium" />
-            <b-button icon-left="times" @click="$emit('file:remove', file)" />
-          </div>
+        <div class="progress" v-if="isUploading || isCompleted">
+          <b-progress :type="isCompleted ? 'is-success' : 'is-info'" :value="this.uploadFile.progress" format="percent"
+            :max="100" show-value />
+        </div>
+
+        <div class="upload-cta">
+          <b-button v-if="isPending" type="is-info" @click="handleTaskUpload">
+            {{ $t('upload') }}
+          </b-button>
+          <b-button v-if="isUploading" type="is-primary" @click="handleCancelUpload">
+            {{ $t('button-cancel') }}
+          </b-button>
+          <strong v-if="isCancelled" class="has-text-danger">{{ $t('upload-cancelled') }}</strong>
+          <strong v-if="isCompleted" class="has-text-success">{{ $t('upload-completed') }}</strong>
         </div>
       </div>
-    </div>
 
-    <div v-if="isUploading || isCompleted">
-      <b-progress :type="isCompleted ? 'is-success' : 'is-info'" :value="this.uploadFile.progress" format="percent"
-        :max="100" show-value />
-    </div>
-
-    <div class="column is-narrow">
-      <b-button v-if="isPending" type="is-info" @click="handleTaskUpload">
-        {{ $t('upload') }}
-      </b-button>
-      <b-button v-if="isUploading" type="is-primary" @click="handleCancelUpload">
-        {{ $t('button-cancel') }}
-      </b-button>
-      <strong v-if="isCancelled" class="has-text-danger">{{ $t('upload-cancelled') }}</strong>
-      <strong v-if="isCompleted" class="has-text-success">{{ $t('upload-completed') }}</strong>
+      <div class="column is-narrow has-text-right icon-actions">
+        <b-icon v-if="isCompleted" icon="check-circle" size="is-medium" />
+        <b-icon v-if="isCancelled" icon="exclamation-circle" size="is-medium" />
+        <b-button icon-left="times" @click="$emit('file:remove', file)" />
+      </div>
     </div>
   </div>
 </template>
@@ -121,5 +119,19 @@ export default {
 
 .box .columns:not(:last-child) {
   margin-bottom: 0 !important;
+}
+
+.icon-actions {
+  display: inline-flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.progress {
+  margin-bottom: 1rem;
+}
+
+.upload-text {
+  margin-bottom: 1rem;
 }
 </style>

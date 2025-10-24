@@ -24,7 +24,19 @@
         </b-field>
 
         <div v-if="selectedFiles.length > 0">
-          <strong class="is-size-4">{{ $t('files') }} ({{ selectedFiles.length }})</strong>
+          <div class="columns">
+            <div class="column">
+              <strong class="is-size-4">
+                {{ $t('files') }} ({{ selectedFiles.length }})
+              </strong>
+            </div>
+            <div class="column has-text-right">
+              <b-button type="is-link" size="is-medium">
+                {{ $t('upload-all') }}
+              </b-button>
+            </div>
+          </div>
+
           <div v-for="file in selectedFiles" :key="file.name">
             <FileUploadItem :file="file" @file:remove="handleRemoveFile" />
           </div>

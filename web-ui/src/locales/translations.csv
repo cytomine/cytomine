@@ -1073,6 +1073,8 @@ update-user,Update user,Modifier un utilisateur,Actualizar usuario,Wijzig een us
 updated,Updated,Mis à jour,Actualizado,Updated
 upload-error,Upload error,Erreur d'upload,Error al cargar,upload fout
 upload,Upload,Upload,Subir,Uploaden
+upload-placeholder,Drop zip files here or click to browse, Déposez les fichiers zip ici ou cliquez pour parcourir, Suelte los archivos zip aquí o haga clic para explorar, Plaats zipbestanden hier of klik om te bladeren
+upload-support,Supports multiple file selection, Prend en charge la sélection de plusieurs fichiers, Admite la selección de varios archivos, Ondersteunt het selecteren van meerdere bestanden
 uploaded-images,Images uploaded,Images téléversées,,Geüploade afbeeldingen
 uploaded,Uploaded,Téléchargé,Subido,Geüpload
 use-existing-image-group,Use existing image group,Utiliser un groupe d'images existant,Usar grupo de imágenes existente,Gebruik bestaande afbeeldingsgroep
@@ -1127,6 +1129,7 @@ app-engine.name,App Engine,App Engine,App Engine,App Engine
 app-engine.tasks.installed,Installed Tasks,Tâches installées,Tareas instaladas,Geïnstalleerde taken
 app-engine.tasks.name,Tasks,Tâches,Tareas,Taken
 app-engine.task.name,Task,Tâche,Tarea,Taak
+app-engine.task.upload,Upload tasks,Téléverser des tâches,Cargar tareas,Taken uploaden
 app-engine.applications,Applications,Applications,Aplicaciones,Toepassingen
 app-engine.execute-a-task,Run a task,Lancer une tâche,Ejecutor de tareas,Applicatie-uitvoerder
 app-engine.previous-task-runs,Previous task runs,Tâches exécutées précédemment,,

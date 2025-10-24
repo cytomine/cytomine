@@ -7,10 +7,28 @@
     </b-message>
 
     <div v-else class="panel">
-      <p class="panel-heading">
-        {{ $t('app-engine.tasks.installed') }}
-        <UploadAppButton btnFunc="upload" @taskUploadSuccess="handleTaskUpload" />
-      </p>
+      <p class="panel-heading">{{ $t('app-engine.task.upload') }}</p>
+      <UploadAppButton btnFunc="upload" @taskUploadSuccess="handleTaskUpload" />
+
+      <section class="panel-block">
+        <b-field class="file is-centered">
+          <b-upload v-model="selectedFiles" multiple drag-drop accept=".zip">
+            <section class="section">
+              <div class="content has-text-centered">
+                <b-icon class="upload-icon" icon="upload" size="is-large" />
+                <p class="file-label">{{ $t('upload-placeholder') }}</p>
+                <span class="help">{{ $t('upload-support') }}</span>
+              </div>
+            </section>
+          </b-upload>
+        </b-field>
+
+        <div v-for="file in selectedFiles" :key="file.name">
+          {{ file.name }}
+        </div>
+      </section>
+
+      <p class="panel-heading">{{ $t('app-engine.tasks.installed') }}</p>
       <section class="panel-block lower-section-flex">
         <AppCard v-for="app in applications" :key="app.id" :app="app" />
       </section>
@@ -32,6 +50,7 @@ export default {
   data() {
     return {
       applications: [],
+      selectedFiles: [],
       error: '',
       loading: true,
     };
@@ -80,5 +99,9 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.upload-icon {
+  margin-bottom: 1rem;
 }
 </style>

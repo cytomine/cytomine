@@ -1,7 +1,6 @@
 package be.cytomine.appengine.services;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -121,17 +120,16 @@ public class TaskService {
             while ((entry = zais.getNextZipEntry()) != null) {
                 try (PipedInputStream in = new PipedInputStream()) {
                     BufferedInputStream br = new BufferedInputStream(in);
+
                     Thread thread = Thread.ofVirtual().start(() -> {
-                        try {
-                            BufferedOutputStream byteArrayOutputStream =
-                                new BufferedOutputStream(new PipedOutputStream(in));
-                            zais.transferTo(byteArrayOutputStream);
+                        try (PipedOutputStream out = new PipedOutputStream(in)) {
+                            zais.transferTo(out);
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
                     });
-                    thread.join();
 
+                    thread.join();
                     files.put(entry.getName(), br);
                 }
             }

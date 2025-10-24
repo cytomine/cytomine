@@ -115,8 +115,9 @@ public class TaskService {
 
             while ((entry = zais.getNextZipEntry()) != null) {
                 PipedInputStream in = new PipedInputStream();
-                PipedOutputStream byteArrayOutputStream = new PipedOutputStream(in);
-                zais.transferTo(byteArrayOutputStream);
+                try (PipedOutputStream byteArrayOutputStream = new PipedOutputStream(in)) {
+                    zais.transferTo(byteArrayOutputStream);
+                }
                 files.put(entry.getName(), in);
             }
 

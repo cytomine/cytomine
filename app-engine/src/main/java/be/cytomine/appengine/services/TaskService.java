@@ -1,10 +1,11 @@
 package be.cytomine.appengine.services;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.util.AbstractMap;
@@ -110,32 +111,34 @@ public class TaskService {
 
         try (ZipArchiveInputStream zais = new ZipArchiveInputStream(inputStream)) {
             ZipEntry entry;
-
-            HashMap<String, InputStream> files = new HashMap<>();
+            HashMap<String, PipedInputStream> files = new HashMap<>();
 
             while ((entry = zais.getNextZipEntry()) != null) {
-                var stream = new ByteArrayInputStream(zais.readAllBytes());
-                files.put(entry.getName(), stream);
+                PipedInputStream in = new PipedInputStream();
+                PipedOutputStream byteArrayOutputStream = new PipedOutputStream(in);
+                zais.transferTo(byteArrayOutputStream);
+                files.put(entry.getName(), in);
             }
 
-            AbstractMap.SimpleEntry<String, JsonNode> descriptorFileEntry =
+            Map.Entry<String, JsonNode> descriptorFileEntry =
                 getDescriptorContent(files).orElseThrow(() -> {
                     log.error("UploadTask: Descriptor file not found in archive");
                     return new BundleArchiveException(
                         ErrorBuilder.build(ErrorCode.INTERNAL_DESCRIPTOR_NOT_IN_DEFAULT_LOCATION));
                 });
             JsonNode descriptorFileAsJson = descriptorFileEntry.getValue();
-            Map.Entry<String, InputStream> tarArchive = getImage(files).orElseThrow(() -> {
+            Map.Entry<String, PipedInputStream> tarArchive = getImage(files).orElseThrow(() -> {
                 log.error("UploadTask: Docker image not found in archive");
                 return new BundleArchiveException(
                     ErrorBuilder.build(ErrorCode.INTERNAL_DOCKER_IMAGE_TAR_NOT_FOUND));
             });
             String imageRegistryCompliantName = tarArchive.getKey();
-            Optional<Map.Entry<String, InputStream>> maybeLogo = getLogo(files);
+            Optional<Map.Entry<String, PipedInputStream>> maybeLogo = getLogo(files);
             taskValidationService.validateDescriptorFile(descriptorFileAsJson);
             taskValidationService.checkIsNotDuplicate(descriptorFileAsJson);
 
-            registryHandler.pushImage(tarArchive.getValue(), imageRegistryCompliantName);
+            registryHandler.pushImage(tarArchive.getValue(),
+                imageRegistryCompliantName);
 
             fileStorageHandler.createStorage(storage);
             log.info("UploadTask: Storage is created for task");
@@ -233,7 +236,7 @@ public class TaskService {
     }
 
     protected Optional<AbstractMap.SimpleEntry<String, JsonNode>> getDescriptorContent(
-        HashMap<String, InputStream> files) {
+        HashMap<String, PipedInputStream> files) {
         return files.entrySet()
                    .stream()
                    .filter(entry -> entry.getKey().toLowerCase().matches("descriptor\\.(yml|yaml)"))
@@ -241,7 +244,8 @@ public class TaskService {
                    .flatMap(archiveFile -> {
                        try {
                            JsonNode descriptorFileAsJson =
-                               new ObjectMapper(new YAMLFactory()).readTree(archiveFile.getValue());
+                               new ObjectMapper(new YAMLFactory()).readTree(
+                                   archiveFile.getValue());
                            return Optional.of(new AbstractMap.SimpleEntry<>(archiveFile.getKey(),
                                descriptorFileAsJson));
                        } catch (IOException e) {
@@ -251,8 +255,8 @@ public class TaskService {
                    });
     }
 
-    protected Optional<Map.Entry<String, InputStream>> getImage(
-        HashMap<String, InputStream> files) {
+    protected Optional<Map.Entry<String, PipedInputStream>> getImage(
+        HashMap<String, PipedInputStream> files) {
         return files.entrySet()
                    .stream()
                    .filter(entry -> entry.getKey().endsWith(".tar"))
@@ -270,7 +274,8 @@ public class TaskService {
                    });
     }
 
-    protected Optional<Map.Entry<String, InputStream>> getLogo(HashMap<String, InputStream> files) {
+    protected Optional<Map.Entry<String, PipedInputStream>> getLogo(
+        HashMap<String, PipedInputStream> files) {
         return files.entrySet()
                    .stream()
                    .filter(entry -> entry.getKey().toLowerCase().matches("logo\\.(png)"))

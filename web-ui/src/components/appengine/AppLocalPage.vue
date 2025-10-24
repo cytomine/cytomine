@@ -15,8 +15,8 @@
 </template>
 
 <script>
-import AppListPanel from '@/components/appengine/AppListPanel.vue';
-import AppUploadPanel from '@/components/appengine/AppUploadPanel.vue';
+import AppListPanel from '@/components/appengine/panels/AppListPanel.vue';
+import AppUploadPanel from '@/components/appengine/panels/AppUploadPanel.vue';
 import Task from '@/utils/appengine/task';
 
 export default {

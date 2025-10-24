@@ -20,13 +20,17 @@
     </div>
 
     <div class="column">
-      <b-button type="is-primary" size="is-medium">{{ $t('upload') }}</b-button>
+      <b-button type="is-primary" size="is-medium" @click="handleTaskUpload">
+        {{ $t('upload') }}
+      </b-button>
     </div>
   </div>
 </template>
 
 <script>
 import filesize from 'filesize';
+
+import Task from '@/utils/appengine/task';
 
 export default {
   name: 'FileUploadItem',
@@ -36,6 +40,20 @@ export default {
   computed: {
     formattedFileSize() {
       return this.file.size ? filesize(this.file.size, {base: 10}) : this.$t('unknown');
+    },
+  },
+  methods: {
+    async handleTaskUpload() {
+      const formData = new FormData();
+      formData.append('task', this.file);
+
+      try {
+        const task = await Task.uploadTask(formData);
+        this.$emit('task-upload:success', task);
+      } catch (error) {
+        console.error(error);
+        this.$emit('task-upload:error');
+      }
     },
   },
 };

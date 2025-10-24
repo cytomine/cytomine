@@ -38,7 +38,7 @@
           </div>
 
           <div v-for="file in selectedFiles" :key="file.name">
-            <FileUploadItem :file="file" @file:remove="handleRemoveFile" />
+            <FileUploadItem :file="file" @file:remove="handleRemoveFile" @task-upload:success="handleTaskUpload" />
           </div>
         </div>
       </section>
@@ -85,6 +85,7 @@ export default {
     async handleTaskUpload() {
       try {
         this.applications = await Task.fetchAll();
+        this.$notify({type: 'success', text: this.$t('notify-success-task-upload')});
       } catch (error) {
         console.error('Error fetching tasks after upload:', error);
         this.error = error.message;

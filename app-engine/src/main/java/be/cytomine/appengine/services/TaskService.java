@@ -1,10 +1,13 @@
 package be.cytomine.appengine.services;
 
-import java.io.ByteArrayInputStream;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.util.AbstractMap;
@@ -18,6 +21,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 
@@ -87,6 +91,8 @@ public class TaskService {
 
     private final TaskValidationService taskValidationService;
 
+    private final Executor executor;
+
     @Value("${storage.input.charset}")
     private String charset;
 
@@ -110,31 +116,44 @@ public class TaskService {
 
         try (ZipArchiveInputStream zais = new ZipArchiveInputStream(inputStream)) {
             ZipEntry entry;
-
-            HashMap<String, byte[]> files = new HashMap<>();
+            HashMap<String, BufferedInputStream> files = new HashMap<>();
 
             while ((entry = zais.getNextZipEntry()) != null) {
-                files.put(entry.getName(), zais.readAllBytes());
+                try (PipedInputStream in = new PipedInputStream()) {
+                    BufferedInputStream br = new BufferedInputStream(in);
+                    Thread thread = Thread.ofVirtual().start(() -> {
+                        try {
+                            BufferedOutputStream byteArrayOutputStream =
+                                new BufferedOutputStream(new PipedOutputStream(in));
+                            zais.transferTo(byteArrayOutputStream);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                    thread.join();
+
+                    files.put(entry.getName(), br);
+                }
             }
 
-            AbstractMap.SimpleEntry<String, JsonNode> descriptorFileEntry =
+            Map.Entry<String, JsonNode> descriptorFileEntry =
                 getDescriptorContent(files).orElseThrow(() -> {
                     log.error("UploadTask: Descriptor file not found in archive");
                     return new BundleArchiveException(
                         ErrorBuilder.build(ErrorCode.INTERNAL_DESCRIPTOR_NOT_IN_DEFAULT_LOCATION));
                 });
             JsonNode descriptorFileAsJson = descriptorFileEntry.getValue();
-            Map.Entry<String, byte[]> tarArchive = getImage(files).orElseThrow(() -> {
+            Map.Entry<String, BufferedInputStream> tarArchive = getImage(files).orElseThrow(() -> {
                 log.error("UploadTask: Docker image not found in archive");
                 return new BundleArchiveException(
                     ErrorBuilder.build(ErrorCode.INTERNAL_DOCKER_IMAGE_TAR_NOT_FOUND));
             });
             String imageRegistryCompliantName = tarArchive.getKey();
-            Optional<Map.Entry<String, byte[]>> maybeLogo = getLogo(files);
+            Optional<Map.Entry<String, BufferedInputStream>> maybeLogo = getLogo(files);
             taskValidationService.validateDescriptorFile(descriptorFileAsJson);
             taskValidationService.checkIsNotDuplicate(descriptorFileAsJson);
 
-            registryHandler.pushImage(new ByteArrayInputStream(tarArchive.getValue()),
+            registryHandler.pushImage(tarArchive.getValue(),
                 imageRegistryCompliantName);
 
             fileStorageHandler.createStorage(storage);
@@ -205,7 +224,7 @@ public class TaskService {
             throw new BundleArchiveException(
                 ErrorBuilder.build(ErrorCode.INTERNAL_DESCRIPTOR_EXTRACTION_FAILED));
         } catch (ValidationException e) {
-            log.error("Error creating storage or uploading");
+            log.error("Error validating {}", e.getMessage());
             throw e;
         } catch (FileStorageException e) {
             log.error("UploadTask: failed to create storage [{}]", e.getMessage());
@@ -233,7 +252,7 @@ public class TaskService {
     }
 
     protected Optional<AbstractMap.SimpleEntry<String, JsonNode>> getDescriptorContent(
-        HashMap<String, byte[]> files) {
+        HashMap<String, BufferedInputStream> files) {
         return files.entrySet()
                    .stream()
                    .filter(entry -> entry.getKey().toLowerCase().matches("descriptor\\.(yml|yaml)"))
@@ -241,7 +260,8 @@ public class TaskService {
                    .flatMap(archiveFile -> {
                        try {
                            JsonNode descriptorFileAsJson =
-                               new ObjectMapper(new YAMLFactory()).readTree(archiveFile.getValue());
+                               new ObjectMapper(new YAMLFactory()).readTree(
+                                   archiveFile.getValue());
                            return Optional.of(new AbstractMap.SimpleEntry<>(archiveFile.getKey(),
                                descriptorFileAsJson));
                        } catch (IOException e) {
@@ -251,7 +271,8 @@ public class TaskService {
                    });
     }
 
-    protected Optional<Map.Entry<String, byte[]>> getImage(HashMap<String, byte[]> files) {
+    protected Optional<Map.Entry<String, BufferedInputStream>> getImage(
+        HashMap<String, BufferedInputStream> files) {
         return files.entrySet()
                    .stream()
                    .filter(entry -> entry.getKey().endsWith(".tar"))
@@ -269,7 +290,8 @@ public class TaskService {
                    });
     }
 
-    protected Optional<Map.Entry<String, byte[]>> getLogo(HashMap<String, byte[]> files) {
+    protected Optional<Map.Entry<String, BufferedInputStream>> getLogo(
+        HashMap<String, BufferedInputStream> files) {
         return files.entrySet()
                    .stream()
                    .filter(entry -> entry.getKey().toLowerCase().matches("logo\\.(png)"))

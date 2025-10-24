@@ -51,9 +51,12 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 import AppCard from '@/components/appengine/AppCard.vue';
 import FileUploadItem from '@/components/appengine/FileUploadItem.vue';
 import Task from '@/utils/appengine/task';
+import {UploadStatus} from '@/utils/app';
 
 export default {
   name: 'AppLocalPage',
@@ -64,10 +67,26 @@ export default {
   data() {
     return {
       applications: [],
-      selectedFiles: [],
+      uploadFiles: [],
       error: '',
       loading: true,
     };
+  },
+  computed: {
+    selectedFiles: {
+      get() {
+        return this.uploadFiles;
+      },
+      set(files) {
+        this.uploadFiles = files.map(file => ({
+          data: file,
+          name: file.name,
+          size: file.size,
+          progress: 0,
+          status: UploadStatus.PENDING,
+        }));
+      }
+    }
   },
   async created() {
     try {

@@ -35,7 +35,7 @@ import Task from '@/utils/appengine/task';
 export default {
   name: 'FileUploadItem',
   props: {
-    file: {type: File, required: true},
+    file: {type: Object, required: true},
   },
   computed: {
     formattedFileSize() {
@@ -45,7 +45,7 @@ export default {
   methods: {
     async handleTaskUpload() {
       const formData = new FormData();
-      formData.append('task', this.file);
+      formData.append('task', this.file.data);
 
       try {
         const response = await Task.uploadTask(formData);

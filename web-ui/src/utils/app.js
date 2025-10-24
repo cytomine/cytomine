@@ -1,5 +1,13 @@
 import {Cytomine} from '@/api';
 
+export const UploadStatus = {
+  PENDING: 'pending',
+  UPLOADING: 'uploading',
+  COMPLETED: 'completed',
+  ERROR: 'errorr',
+  CANCELLED: 'cancelled',
+};
+
 export async function installApp(app, notify, t) {
   try {
     const uri = `${app.namespace}/${app.version}`;

@@ -1,7 +1,6 @@
 import {shallowMount} from '@vue/test-utils';
 
 import AppLocalPage from '@/components/appengine/AppLocalPage.vue';
-import UploadAppButton from '@/components/appengine/UploadAppButton.vue';
 import Task from '@/utils/appengine/task';
 import {flushPromises} from '../../../utils';
 
@@ -23,12 +22,11 @@ describe('AppLocalPage.vue', () => {
   const createWrapper = (options = {}) => shallowMount(
     AppLocalPage,
     {
-      components: {
-        UploadAppButton,
-        'b-loading': BLoading,
-      },
       mocks: {
         $t: (key) => key,
+      },
+      stubs: {
+        'b-loading': BLoading,
       },
       ...options,
     },

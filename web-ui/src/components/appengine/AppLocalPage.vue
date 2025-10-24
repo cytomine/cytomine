@@ -30,14 +30,15 @@
               </strong>
             </div>
             <div class="column has-text-right">
-              <b-button type="is-link" size="is-medium">
+              <b-button type="is-link" size="is-medium" @click="handleUploadAll">
                 {{ $t('upload-all') }}
               </b-button>
             </div>
           </div>
 
           <div v-for="file in selectedFiles" :key="file.name">
-            <FileUploadItem :file="file" @file:remove="handleRemoveFile" @task-upload:success="handleTaskUploaded" />
+            <FileUploadItem ref="fileUploadChildren" :file="file" @file:remove="handleRemoveFile"
+              @task-upload:success="handleTaskUploaded" />
           </div>
         </div>
       </section>
@@ -85,7 +86,24 @@ export default {
     },
     handleRemoveFile(file) {
       this.selectedFiles = this.selectedFiles.filter(f => f.name !== file.name);
-    }
+    },
+    async handleUploadAll() {
+      if (!this.$refs.fileUploadChildren) {
+        return;
+      }
+
+      try {
+        await Promise.all(
+          this.$refs.fileUploadChildren.map(child => child.handleTaskUpload())
+        );
+      } catch (error) {
+        console.error(error);
+        this.$notify({
+          type: 'error',
+          text: error.message,
+        });
+      }
+    },
   },
 };
 </script>

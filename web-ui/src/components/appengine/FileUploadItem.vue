@@ -23,11 +23,11 @@
 
     <div v-if="isUploading || isCompleted">
       <b-progress :type="isCompleted ? 'is-success' : 'is-info'" :value="this.uploadFile.progress" format="percent"
-        max="100" show-value />
+        :max="100" show-value />
     </div>
 
     <div class="column">
-      <b-button v-if="isPending" type="is-primary" size="is-medium" @click="handleTaskUpload">
+      <b-button v-if="isPending" type="is-info" size="is-medium" @click="handleTaskUpload">
         {{ $t('upload') }}
       </b-button>
       <b-button v-if="isUploading" type="is-primary" size="is-medium" @click="handleCancelUpload">

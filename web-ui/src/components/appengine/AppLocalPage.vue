@@ -6,63 +6,28 @@
       {{ $t('failed-fetch-tasks') }}
     </b-message>
 
-    <div v-else class="panel">
-      <p class="panel-heading">{{ $t('app-engine.task.upload') }}</p>
+    <div v-else>
+      <AppUploadPanel />
 
-      <section class="panel-block">
-        <b-field class="file is-centered">
-          <b-upload v-model="selectedFiles" multiple drag-drop accept=".zip">
-            <section class="section">
-              <div class="content has-text-centered">
-                <b-icon class="upload-icon" icon="upload" size="is-large" />
-                <p class="file-label">{{ $t('upload-placeholder') }}</p>
-                <span class="help">{{ $t('upload-support') }}</span>
-              </div>
-            </section>
-          </b-upload>
-        </b-field>
-
-        <div v-if="selectedFiles.length > 0">
-          <div class="columns">
-            <div class="column">
-              <strong class="is-size-4">
-                {{ $t('files') }} ({{ selectedFiles.length }})
-              </strong>
-            </div>
-            <div class="column has-text-right">
-              <b-button type="is-link" size="is-medium" @click="handleUploadAll">
-                {{ $t('upload-all') }}
-              </b-button>
-            </div>
-          </div>
-
-          <div v-for="file in selectedFiles" :key="file.name">
-            <FileUploadItem ref="fileUploadChildren" :file="file" @file:remove="handleRemoveFile"
-              @task-upload:success="handleTaskUploaded" />
-          </div>
-        </div>
-      </section>
+      <AppListPanel :applications="applications" />
     </div>
-
-    <AppListPanel :applications="applications" />
   </div>
 </template>
 
 <script>
 import AppListPanel from '@/components/appengine/AppListPanel.vue';
-import FileUploadItem from '@/components/appengine/FileUploadItem.vue';
+import AppUploadPanel from '@/components/appengine/AppUploadPanel.vue';
 import Task from '@/utils/appengine/task';
 
 export default {
   name: 'AppLocalPage',
   components: {
     AppListPanel,
-    FileUploadItem,
+    AppUploadPanel,
   },
   data() {
     return {
       applications: [],
-      selectedFiles: [],
       error: '',
       loading: true,
     };
@@ -76,47 +41,5 @@ export default {
       this.loading = false;
     }
   },
-  methods: {
-    handleTaskUploaded(task) {
-      this.applications.push(task);
-      this.$notify({type: 'success', text: this.$t('notify-success-task-upload')});
-    },
-    handleRemoveFile(file) {
-      this.selectedFiles = this.selectedFiles.filter(f => f.name !== file.name);
-    },
-    async handleUploadAll() {
-      if (!this.$refs.fileUploadChildren) {
-        return;
-      }
-
-      try {
-        await Promise.all(
-          this.$refs.fileUploadChildren.map(child => child.handleTaskUpload())
-        );
-      } catch (error) {
-        console.error(error);
-        this.$notify({
-          type: 'error',
-          text: error.message,
-        });
-      }
-    },
-  },
 };
 </script>
-
-<style scoped>
-.panel-block {
-  padding-top: 0.8em;
-}
-
-.panel-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.upload-icon {
-  margin-bottom: 1rem;
-}
-</style>

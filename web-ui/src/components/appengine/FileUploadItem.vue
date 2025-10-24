@@ -48,8 +48,8 @@ export default {
       formData.append('task', this.file);
 
       try {
-        const task = await Task.uploadTask(formData);
-        this.$emit('task-upload:success', task);
+        const response = await Task.uploadTask(formData);
+        this.$emit('task-upload:success', response.data);
       } catch (error) {
         console.error(error);
         this.$emit('task-upload:error');

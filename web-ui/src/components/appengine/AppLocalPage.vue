@@ -8,7 +8,6 @@
 
     <div v-else class="panel">
       <p class="panel-heading">{{ $t('app-engine.task.upload') }}</p>
-      <UploadAppButton btnFunc="upload" @taskUploadSuccess="handleTaskUpload" />
 
       <section class="panel-block">
         <b-field class="file is-centered">
@@ -38,7 +37,7 @@
           </div>
 
           <div v-for="file in selectedFiles" :key="file.name">
-            <FileUploadItem :file="file" @file:remove="handleRemoveFile" @task-upload:success="handleTaskUpload" />
+            <FileUploadItem :file="file" @file:remove="handleRemoveFile" @task-upload:success="handleTaskUploaded" />
           </div>
         </div>
       </section>
@@ -54,7 +53,6 @@
 <script>
 import AppCard from '@/components/appengine/AppCard.vue';
 import FileUploadItem from '@/components/appengine/FileUploadItem.vue';
-import UploadAppButton from '@/components/appengine/UploadAppButton.vue';
 import Task from '@/utils/appengine/task';
 
 export default {
@@ -62,7 +60,6 @@ export default {
   components: {
     AppCard,
     FileUploadItem,
-    UploadAppButton,
   },
   data() {
     return {
@@ -82,14 +79,9 @@ export default {
     }
   },
   methods: {
-    async handleTaskUpload() {
-      try {
-        this.applications = await Task.fetchAll();
-        this.$notify({type: 'success', text: this.$t('notify-success-task-upload')});
-      } catch (error) {
-        console.error('Error fetching tasks after upload:', error);
-        this.error = error.message;
-      }
+    handleTaskUploaded(task) {
+      this.applications.push(task);
+      this.$notify({type: 'success', text: this.$t('notify-success-task-upload')});
     },
     handleRemoveFile(file) {
       this.selectedFiles = this.selectedFiles.filter(f => f.name !== file.name);

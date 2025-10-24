@@ -1,5 +1,7 @@
 package be.cytomine.appengine.services;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -19,6 +21,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 
@@ -88,6 +91,8 @@ public class TaskService {
 
     private final TaskValidationService taskValidationService;
 
+    private final Executor executor;
+
     @Value("${storage.input.charset}")
     private String charset;
 
@@ -111,14 +116,24 @@ public class TaskService {
 
         try (ZipArchiveInputStream zais = new ZipArchiveInputStream(inputStream)) {
             ZipEntry entry;
-            HashMap<String, PipedInputStream> files = new HashMap<>();
+            HashMap<String, BufferedInputStream> files = new HashMap<>();
 
             while ((entry = zais.getNextZipEntry()) != null) {
-                PipedInputStream in = new PipedInputStream();
-                try (PipedOutputStream byteArrayOutputStream = new PipedOutputStream(in)) {
-                    zais.transferTo(byteArrayOutputStream);
+                try (PipedInputStream in = new PipedInputStream()) {
+                    BufferedInputStream br = new BufferedInputStream(in);
+                    Thread thread = Thread.ofVirtual().start(() -> {
+                        try {
+                            BufferedOutputStream byteArrayOutputStream =
+                                new BufferedOutputStream(new PipedOutputStream(in));
+                            zais.transferTo(byteArrayOutputStream);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                    thread.join();
+
+                    files.put(entry.getName(), br);
                 }
-                files.put(entry.getName(), in);
             }
 
             Map.Entry<String, JsonNode> descriptorFileEntry =
@@ -128,13 +143,13 @@ public class TaskService {
                         ErrorBuilder.build(ErrorCode.INTERNAL_DESCRIPTOR_NOT_IN_DEFAULT_LOCATION));
                 });
             JsonNode descriptorFileAsJson = descriptorFileEntry.getValue();
-            Map.Entry<String, PipedInputStream> tarArchive = getImage(files).orElseThrow(() -> {
+            Map.Entry<String, BufferedInputStream> tarArchive = getImage(files).orElseThrow(() -> {
                 log.error("UploadTask: Docker image not found in archive");
                 return new BundleArchiveException(
                     ErrorBuilder.build(ErrorCode.INTERNAL_DOCKER_IMAGE_TAR_NOT_FOUND));
             });
             String imageRegistryCompliantName = tarArchive.getKey();
-            Optional<Map.Entry<String, PipedInputStream>> maybeLogo = getLogo(files);
+            Optional<Map.Entry<String, BufferedInputStream>> maybeLogo = getLogo(files);
             taskValidationService.validateDescriptorFile(descriptorFileAsJson);
             taskValidationService.checkIsNotDuplicate(descriptorFileAsJson);
 
@@ -237,7 +252,7 @@ public class TaskService {
     }
 
     protected Optional<AbstractMap.SimpleEntry<String, JsonNode>> getDescriptorContent(
-        HashMap<String, PipedInputStream> files) {
+        HashMap<String, BufferedInputStream> files) {
         return files.entrySet()
                    .stream()
                    .filter(entry -> entry.getKey().toLowerCase().matches("descriptor\\.(yml|yaml)"))
@@ -256,8 +271,8 @@ public class TaskService {
                    });
     }
 
-    protected Optional<Map.Entry<String, PipedInputStream>> getImage(
-        HashMap<String, PipedInputStream> files) {
+    protected Optional<Map.Entry<String, BufferedInputStream>> getImage(
+        HashMap<String, BufferedInputStream> files) {
         return files.entrySet()
                    .stream()
                    .filter(entry -> entry.getKey().endsWith(".tar"))
@@ -275,8 +290,8 @@ public class TaskService {
                    });
     }
 
-    protected Optional<Map.Entry<String, PipedInputStream>> getLogo(
-        HashMap<String, PipedInputStream> files) {
+    protected Optional<Map.Entry<String, BufferedInputStream>> getLogo(
+        HashMap<String, BufferedInputStream> files) {
         return files.entrySet()
                    .stream()
                    .filter(entry -> entry.getKey().toLowerCase().matches("logo\\.(png)"))

@@ -23,8 +23,11 @@
           </b-upload>
         </b-field>
 
-        <div v-for="file in selectedFiles" :key="file.name">
-          {{ file.name }}
+        <div v-if="selectedFiles.length > 0">
+          <strong class="is-size-4">{{ $t('files') }} ({{ selectedFiles.length }})</strong>
+          <div v-for="file in selectedFiles" :key="file.name">
+            <FileUploadItem :file="file" @file:remove="handleRemoveFile" />
+          </div>
         </div>
       </section>
 
@@ -38,6 +41,7 @@
 
 <script>
 import AppCard from '@/components/appengine/AppCard.vue';
+import FileUploadItem from '@/components/appengine/FileUploadItem.vue';
 import UploadAppButton from '@/components/appengine/UploadAppButton.vue';
 import Task from '@/utils/appengine/task';
 
@@ -45,6 +49,7 @@ export default {
   name: 'AppLocalPage',
   components: {
     AppCard,
+    FileUploadItem,
     UploadAppButton,
   },
   data() {
@@ -73,6 +78,9 @@ export default {
         this.error = error.message;
       }
     },
+    handleRemoveFile(file) {
+      this.selectedFiles = this.selectedFiles.filter(f => f.name !== file.name);
+    }
   },
 };
 </script>

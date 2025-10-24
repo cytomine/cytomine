@@ -3,8 +3,9 @@ import json
 import logging
 from lxml import etree
 from pathlib import Path
-from shapely.geometry import shape
 from shapely import wkt
+from shapely.geometry import shape
+from shapely.ops import transform
 from typing import List
 
 from cytomine.models import (
@@ -42,12 +43,12 @@ class AnnotationImporter:
         annotations = root.findall(".//ANNOTATION_REF")
         return [annot.get("alias") for annot in annotations]
 
-    def load(self, annotation_path: Path) -> List[WktAnnotation]:
+    def load(self, annotation_path: Path, image_height: int) -> List[WktAnnotation]:
         try:
             with open(self.base_path / annotation_path, "r") as fp:
                 geometry = geojson.load(fp)
 
-            return geojson_to_wkt(geometry)
+            return geojson_to_wkt(geometry, image_height)
         except (json.JSONDecodeError, FileNotFoundError):
             logger.debug(f"'{annotation_path}' is not a valid geometry")
             return []
@@ -76,7 +77,7 @@ class AnnotationImporter:
             )
 
         terms = TermCollection().fetch_with_filter("ontology", ontology.id)
-        annotations = self.load(annotation_path)
+        annotations = self.load(annotation_path, image.height)
         for annotation in annotations:
             annot = Annotation(location=annotation.wkt, id_image=image.id).save()
 
@@ -106,20 +107,24 @@ class AnnotationImporter:
             results=results,
         )
 
-def feature_to_wkt(feature: dict) -> WktAnnotation:
+
+def feature_to_wkt(feature: dict, image_height: int) -> WktAnnotation:
+    geometry = shape(feature["geometry"])
+    flipped_geometry = transform(lambda x, y: (x, image_height - y), geometry)
+
     return WktAnnotation(
-        wkt=wkt.dumps(shape(feature["geometry"])),
+        wkt=wkt.dumps(flipped_geometry),
         properties=feature.get("properties", {}),
     )
 
 
-def geojson_to_wkt(geojson) -> List[WktAnnotation]:
+def geojson_to_wkt(geojson: dict, image_height: int) -> List[WktAnnotation]:
     geojson_type = geojson.get("type")
 
     if geojson_type == "FeatureCollection":
-        return [feature_to_wkt(f) for f in geojson.get("features", [])]
+        return [feature_to_wkt(f, image_height) for f in geojson.get("features", [])]
 
     if geojson_type == "Feature":
-        return [feature_to_wkt(geojson)]
+        return [feature_to_wkt(geojson, image_height)]
 
     return [WktAnnotation(wkt=wkt.dumps(shape(geojson)), properties={})]

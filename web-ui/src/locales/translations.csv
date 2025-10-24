@@ -1073,11 +1073,12 @@ update-user,Update user,Modifier un utilisateur,Actualizar usuario,Wijzig een us
 updated,Updated,Mis à jour,Actualizado,Updated
 upload-error,Upload error,Erreur d'upload,Error al cargar,upload fout
 upload,Upload,Upload,Subir,Uploaden
-upload-all, Upload all, Tout téléverser, Subir todo, Alles uploaden
+upload-all,Upload all,Tout téléverser,Subir todo,Alles uploaden
+upload-cancelled,Upload cancelled,Téléversement annulé,Subida cancelada,Upload geannuleerd
+upload-completed,Upload completed,Téléversement terminé,Subida completada,Upload voltooid
 upload-placeholder,Drop zip files here or click to browse, Déposez les fichiers zip ici ou cliquez pour parcourir, Suelte los archivos zip aquí o haga clic para explorar, Plaats zipbestanden hier of klik om te bladeren
 upload-support,Supports multiple file selection, Prend en charge la sélection de plusieurs fichiers, Admite la selección de varios archivos, Ondersteunt het selecteren van meerdere bestanden
 uploaded-images,Images uploaded,Images téléversées,,Geüploade afbeeldingen
-uploaded,Uploaded,Téléchargé,Subido,Geüpload
 use-existing-image-group,Use existing image group,Utiliser un groupe d'images existant,Usar grupo de imágenes existente,Gebruik bestaande afbeeldingsgroep
 use-existing-ontology,Use existing ontology,Utiliser une ontologie existante,Usar ontología existente,Gebruik een bestaande ontologie
 used-in-project-no-access,Used in projects that you are not allowed to see,Utilisée dans des projets auxquels vous n'avez pas accès,Usado en proyectos que no puedes ver,Wordt gebruikt in projecten waartoe u geen toegang heeft

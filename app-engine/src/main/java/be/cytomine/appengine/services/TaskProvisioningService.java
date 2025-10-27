@@ -34,6 +34,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -120,6 +121,7 @@ public class TaskProvisioningService {
     @Value("${storage.base-path}")
     private String basePath;
 
+    @Transactional
     public JsonNode provisionRunParameter(
         String runId,
         String name,

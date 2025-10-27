@@ -26,7 +26,9 @@ describe('AppLocalPage.vue', () => {
         $t: (key) => key,
       },
       stubs: {
+        'b-icon': true,
         'b-loading': BLoading,
+        'b-message': true,
       },
       ...options,
     },

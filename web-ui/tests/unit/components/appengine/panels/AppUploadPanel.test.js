@@ -23,6 +23,9 @@ describe('AppUploadPanel.vue', () => {
       stubs: {
         FileUploadItem: true,
         'b-button': true,
+        'b-field': true,
+        'b-icon': true,
+        'b-upload': true,
       },
       ...options,
     },

@@ -67,7 +67,6 @@ describe('FileUploadItem.vue', () => {
         },
       });
 
-      console.log(wrapper.html());
       expect(wrapper.text()).not.toContain('button-cancel');
       expect(wrapper.text()).toContain('upload-cancelled');
       expect(wrapper.text()).not.toContain('upload-completed');

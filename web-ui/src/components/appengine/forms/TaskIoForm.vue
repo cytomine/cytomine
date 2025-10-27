@@ -75,7 +75,7 @@ export default {
         );
 
         if (this.hasBinaryData) {
-          let promises = this.getInputProvisions().map(async (provision) => {
+          for (const provision of this.getInputProvisions()) {
             let body = provision;
             if (provision.type === 'file') {
               body = new FormData();
@@ -88,9 +88,7 @@ export default {
               provision.param_name,
               body,
             );
-          });
-
-          await Promise.all(promises);
+          }
         } else {
           await Task.batchProvisionTask(this.projectId, taskRun.id, this.getInputProvisions());
         }

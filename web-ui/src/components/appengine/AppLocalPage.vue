@@ -7,7 +7,7 @@
     </b-message>
 
     <div v-else>
-      <AppUploadPanel />
+      <AppUploadPanel @task-upload:success="handleTaskUploaded" />
 
       <AppListPanel :applications="applications" />
     </div>
@@ -41,5 +41,10 @@ export default {
       this.loading = false;
     }
   },
+  methods: {
+    handleTaskUploaded(task) {
+      this.applications.push(task);
+    },
+  }
 };
 </script>

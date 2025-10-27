@@ -59,7 +59,7 @@ export default {
   },
   methods: {
     handleTaskUploaded(task) {
-      this.applications.push(task);
+      this.$emit('task-upload:success', task);
       this.$notify({type: 'success', text: this.$t('notify-success-task-upload')});
     },
     handleRemoveFile(file) {

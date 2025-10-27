@@ -40,7 +40,7 @@ jobs:
         run: npm run build
 
       - name: Upload Docs Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: docs-artifacts
           path: docs/src/.vuepress/dist/**

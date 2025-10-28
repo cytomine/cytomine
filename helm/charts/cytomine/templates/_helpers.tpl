@@ -13,6 +13,10 @@
 {{- printf "%s/server" (include "core.url" .) }}
 {{- end }}
 
+{{/* IAM url */}}
+{{- define "iam.url" -}}
+http://iam.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.iam.port }}
+{{- end -}}
 
 {{/*
 Expand the name of the chart.

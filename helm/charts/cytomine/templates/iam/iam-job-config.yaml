@@ -10,10 +10,40 @@ spec:
   template:
     spec:
       initContainers: # initContainers run in sequence, not containers
+      - name: wait-for-iam
+        image: "{{ .Values.images.iam }}"
+        command: ['sh', '-c']
+        args:
+          - >
+            echo "Waiting for IAM service to be ready...";
+            ATTEMPT=1;
+            until /opt/keycloak/bin/kcadm.sh config credentials \
+              --server {{ include "iam.url" . }}/iam \
+              --realm master --user admin \
+              --password "$KEYCLOAK_ADMIN_PASSWORD" 2>/dev/null; do
+              echo "Attempt $ATTEMPT: IAM not ready yet, retrying in 10 seconds...";
+              ATTEMPT=$((ATTEMPT + 1));
+              sleep 10;
+            done;
+            echo "IAM is ready! Proceeding with configuration..."
+        env:
+        - name: KEYCLOAK_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: admin-iam-secret
+              key: password
+
       - name: login
         image: "{{ .Values.images.iam }}"
         command: ["/bin/sh", "-c"]
-        args: ["/opt/keycloak/bin/kcadm.sh config credentials --server https://{{ .Values.global.domainName }}/iam --realm master --user admin --password $(KEYCLOAK_ADMIN_PASSWORD) --config /opt/keycloak-auth/kcadm.config"]
+        args:
+          - >
+            /opt/keycloak/bin/kcadm.sh config credentials
+            --server http://iam.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.iam.port }}/iam
+            --realm master
+            --user admin
+            --password $(KEYCLOAK_ADMIN_PASSWORD)
+            --config /opt/keycloak-auth/kcadm.config
         volumeMounts:
         - name: kc-auth
           mountPath: "/opt/keycloak-auth"
@@ -27,7 +57,11 @@ spec:
       - name: create-realm
         image: "{{ .Values.images.iam }}"
         command: ["/bin/sh", "-c"]
-        args: ["/opt/keycloak/bin/kcadm.sh create realms --server https://{{ .Values.global.domainName }}/iam --config /opt/keycloak-auth/kcadm.config -s realm=cytomine -s enabled=true -o || true"]
+        args:
+          - >
+            /opt/keycloak/bin/kcadm.sh create realms
+            --server http://iam.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.iam.port }}/iam
+            --config /opt/keycloak-auth/kcadm.config -s realm=cytomine -s enabled=true -o || true
         volumeMounts:
         - name: kc-auth
           mountPath: "/opt/keycloak-auth"
@@ -35,7 +69,11 @@ spec:
       - name: create-user
         image: "{{ .Values.images.iam }}"
         command: ["/bin/sh", "-c"]
-        args: ["/opt/keycloak/bin/kcadm.sh create users -r cytomine --server https://{{ .Values.global.domainName }}/iam --config /opt/keycloak-auth/kcadm.config -f /opt/keycloak-conf/config.json -o || true"]
+        args:
+          - >
+            /opt/keycloak/bin/kcadm.sh create users -r cytomine
+            --server http://iam.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.iam.port }}/iam
+            --config /opt/keycloak-auth/kcadm.config -f /opt/keycloak-conf/config.json -o || true
         volumeMounts:
         - name: kc-auth
           mountPath: "/opt/keycloak-auth"
@@ -46,7 +84,13 @@ spec:
       - name: set-password
         image: "{{ .Values.images.iam }}"
         command: ["/bin/sh", "-c"]
-        args: ["/opt/keycloak/bin/kcadm.sh set-password --server https://{{ .Values.global.domainName }}/iam -r cytomine --username admin --new-password $(CYTOMINE_USER) --config /opt/keycloak-auth/kcadm.config"]
+        args:
+          - >
+            /opt/keycloak/bin/kcadm.sh set-password
+            --server http://iam.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.iam.port }}/iam -r cytomine
+            --username admin
+            --new-password $(CYTOMINE_USER)
+            --config /opt/keycloak-auth/kcadm.config
         volumeMounts:
         - name: kc-auth
           mountPath: "/opt/keycloak-auth"
@@ -60,7 +104,11 @@ spec:
       - name: create-client
         image: "{{ .Values.images.iam }}"
         command: ["/bin/sh", "-c"]
-        args: ["/opt/keycloak/bin/kcadm.sh create clients -r cytomine --server https://{{ .Values.global.domainName }}/iam --config /opt/keycloak-auth/kcadm.config -f /opt/keycloak-conf/config.json -o || true"]
+        args:
+          - >
+            /opt/keycloak/bin/kcadm.sh create clients -r cytomine
+            --server http://iam.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.iam.port }}/iam
+            --config /opt/keycloak-auth/kcadm.config -f /opt/keycloak-conf/config.json -o || true
         volumeMounts:
         - name: kc-auth
           mountPath: "/opt/keycloak-auth"
@@ -71,7 +119,13 @@ spec:
       - name: check-job-done
         image: "{{ .Values.images.iam }}"
         command: ["/bin/sh", "-c"]
-        args: ["/opt/keycloak/bin/kcadm.sh config credentials --server https://{{ .Values.global.domainName }}/iam --realm cytomine --user admin --password $(CYTOMINE_USER)"]
+        args: 
+          - >
+            /opt/keycloak/bin/kcadm.sh config credentials
+            --server http://iam.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.iam.port }}/iam
+            --realm cytomine
+            --user admin
+            --password $(CYTOMINE_USER)
         env:
         - name: CYTOMINE_USER
           valueFrom:

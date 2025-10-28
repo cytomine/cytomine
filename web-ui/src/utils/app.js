@@ -1,10 +1,11 @@
 import {Cytomine} from '@/api';
 
 export const UploadStatus = {
+  CANCELLED: 'cancelled',
+  COMPLETED: 'completed',
+  ERROR: 'error',
   PENDING: 'pending',
   UPLOADING: 'uploading',
-  COMPLETED: 'completed',
-  CANCELLED: 'cancelled',
 };
 
 export async function installApp(app, notify, t) {

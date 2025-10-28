@@ -67,17 +67,5 @@ public class Task extends BaseEntity {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Match> matches;
 
-    public Task(
-        UUID identifier,
-        String namespace,
-        String version,
-        String descriptorFile,
-        String storageReference
-    ) {
-        this.identifier = identifier;
-        this.namespace = namespace;
-        this.version = version;
-        this.descriptorFile = descriptorFile;
-        this.storageReference = storageReference;
-    }
+
 }

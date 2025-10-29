@@ -13,8 +13,8 @@
 {{- printf "%s/server" (include "core.url" .) }}
 {{- end }}
 
-{{/* IAM url */}}
-{{- define "iam.url" -}}
+{{/* IAM internal url */}}
+{{- define "iam.internalUrl" -}}
 http://iam.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.iam.port }}
 {{- end -}}
 

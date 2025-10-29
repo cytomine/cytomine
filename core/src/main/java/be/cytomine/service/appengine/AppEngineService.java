@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
-import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -64,9 +64,8 @@ public class AppEngineService {
         try {
             ResponseEntity<String> result = restTemplate.exchange(buildFullUrl(uri), method, request, String.class);
             return result.getBody();
-        } catch (RestClientException e) {
-            log.error("Internal server error [{}]", e.getMessage(), e);
-            throw new RestClientException("Internal error");
+        } catch (HttpStatusCodeException e) {
+            return e.getResponseBodyAsString();
         }
     }
 

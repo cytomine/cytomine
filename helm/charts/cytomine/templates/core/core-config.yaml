@@ -160,7 +160,7 @@ kind: ConfigMap
 metadata:
   name: core-env
 data:
-  ADMIN_EMAIL: info@cytomine.coop
+  ADMIN_EMAIL: admin@cytomine.org
   INSTANCE_HOST_PHONE_NUMBER: None
   INSTANCE_HOST_SUPPORT_MAIL: None
   REVERSE_PROXY_URL: "{{ include "core.url" . }}"

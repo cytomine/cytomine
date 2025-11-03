@@ -1,25 +1,22 @@
 <template>
   <div>
-    <b-loading class="small" :active="loading" :is-full-page="false"/>
+    <b-loading class="small" :active="loading" :is-full-page="false" />
 
-    <template v-if="!loading">
-      <div class="annotation-content">
-        <selectable-annotation
-          v-for="annotation in annotations"
-          :key="annotation.id"
-          :annotation="annotation"
-          :images="images"
-          :is-selected="selectedAnnotations.includes(annotation)"
-          @update:selected="updateSelection($event)"
-        />
-      </div>
-    </template>
+    <div v-if="!loading" class="annotation-content">
+      <selectable-annotation
+        v-for="annotation in annotations"
+        :key="annotation.id"
+        :annotation="annotation"
+        :images="images"
+        :is-selected="selectedAnnotationIds.includes(annotation.id)"
+        @update:selected="updateSelection($event)"
+      />
+    </div>
   </div>
 </template>
 
 <script>
 import {AnnotationCollection} from '@/api';
-
 import {get} from '@/utils/store-helpers';
 import SelectableAnnotation from '@/components/annotations/SelectableAnnotation';
 
@@ -30,9 +27,9 @@ export default {
   },
   data() {
     return {
-      annotations: [],
       loading: true,
-      selectedAnnotations: [],
+      annotations: [],
+      selectedAnnotationIds: [],
     };
   },
   computed: {
@@ -48,26 +45,26 @@ export default {
     },
   },
   methods: {
-    updateSelection(annotation) {
-      if (this.selectedAnnotations.includes(annotation)) {
-        this.selectedAnnotations = this.selectedAnnotations.filter(item => item !== annotation);
+    updateSelection(annotationId) {
+      if (this.selectedAnnotationIds.includes(annotationId)) {
+        this.selectedAnnotationIds = this.selectedAnnotationIds.filter(id => id !== annotationId);
       } else {
-        this.selectedAnnotations.push(annotation);
+        this.selectedAnnotationIds.push(annotationId);
       }
     },
     async fetchAnnotations() {
-      let annotations = await new AnnotationCollection({
+      const response = await new AnnotationCollection({
         project: this.project.id,
         image: this.imageIds,
         showWKT: true,
       }).fetchAll();
 
-      this.annotations = annotations.array;
+      this.annotations = response.array;
     },
   },
   watch: {
-    selectedAnnotations(annotations) {
-      this.$emit('input', annotations.map(annotation => annotation.id));
+    selectedAnnotationIds(annotationIds) {
+      this.$emit('input', annotationIds);
     }
   },
   async created() {
@@ -81,5 +78,6 @@ export default {
 .annotation-content {
   display: flex;
   flex-wrap: wrap;
+  gap: 0.5rem;
 }
 </style>

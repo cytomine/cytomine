@@ -68,7 +68,28 @@ spec:
                 name: sam
                 port:
                   number: {{ .Values.sam.port }}
-          - path: /ims/(formats|image/upload|import|upload)
+          - path: /ims/formats
+            pathType: Prefix
+            backend:
+              service:
+                name: pims
+                port:
+                  number: {{ .Values.pims.port }}
+          - path: /ims/image/upload
+            pathType: Prefix
+            backend:
+              service:
+                name: pims
+                port:
+                  number: {{ .Values.pims.port }}
+          - path: /ims/import
+            pathType: Prefix
+            backend:
+              service:
+                name: pims
+                port:
+                  number: {{ .Values.pims.port }}
+          - path: /ims/upload
             pathType: Prefix
             backend:
               service:

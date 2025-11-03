@@ -3,29 +3,29 @@ import Buefy from 'buefy';
 
 import AnnotationMultiSelect from '@/components/appengine/forms/fields/array/AnnotationMultiSelect';
 import SelectableAnnotation from '@/components/annotations/SelectableAnnotation';
+import {flushPromises} from '../../../../../../utils';
+
+const mockedAnnotations = [
+  {id: 1, name: 'Annotation 1'},
+  {id: 2, name: 'Annotation 2'},
+];
 
 jest.mock('@/api', () => ({
   AnnotationCollection: jest.fn().mockImplementation(() => ({
     fetchAll: jest.fn().mockResolvedValue({
-      array: [
-        {id: 1, name: 'Annotation 1'},
-        {id: 2, name: 'Annotation 2'},
-      ]
+      array: mockedAnnotations,
     }),
   })),
 }));
 
 describe('AnnotationMultiSelect.vue', () => {
-  let localVue;
-  let wrapper;
+  const localVue = createLocalVue();
+  localVue.use(Buefy);
 
   const mockImages = [{imageInstance: {id: 1}}];
 
-  beforeEach(() => {
-    localVue = createLocalVue();
-    localVue.use(Buefy);
-
-    wrapper = mount(AnnotationMultiSelect, {
+  const createWrapper = () => {
+    return mount(AnnotationMultiSelect, {
       localVue,
       computed: {
         project: () => ({
@@ -39,41 +39,36 @@ describe('AnnotationMultiSelect.vue', () => {
           },
         },
       },
-      data() {
-        return {
-          loading: false,
-          selectedAnnotations: [],
-        };
-      },
       stubs: {
         AnnotationPreview: true,
       },
     });
-  });
+  };
 
-  it('The component should be rendered correctly', () => {
-    expect(wrapper.exists()).toBe(true);
-    expect(wrapper.findComponent(SelectableAnnotation).exists()).toBe(true);
-    expect(wrapper.find('.annotation-content').exists()).toBe(true);
-  });
+  it('should render the loading when the data is fetched', () => {
+    const wrapper = createWrapper();
 
-  it('The component should render the loading when the data is fetched', async () => {
-    await wrapper.setData({loading: true});
-
-    expect(wrapper.exists()).toBe(true);
+    expect(wrapper.vm.loading).toBe(true);
     expect(wrapper.findComponent(SelectableAnnotation).exists()).toBe(false);
-    expect(wrapper.find('.annotation-content').exists()).toBe(false);
   });
 
-  it('The component should emit an input event when selecting annotations', async () => {
-    const newAnnotations = [
-      {id: 42, name: 'Annotation A'},
-      {id: 1337, name: 'Annotation B'}
-    ];
+  it('should render the data when the annotations are fetched', async () => {
+    const wrapper = createWrapper();
+    await flushPromises();
 
-    await wrapper.setData({selectedAnnotations: newAnnotations});
+    expect(wrapper.vm.loading).toBe(false);
+    const components = wrapper.findAllComponents(SelectableAnnotation);
+    expect(components.exists()).toBe(true);
+    expect(components.length).toBe(mockedAnnotations.length);
+  });
+
+  it('should emit an input event when selecting annotations', async () => {
+    const wrapper = createWrapper();
+
+    const selectedAnnotationIds = [42, 1337];
+    await wrapper.setData({selectedAnnotationIds: selectedAnnotationIds});
 
     expect(wrapper.emitted().input).toBeTruthy();
-    expect(wrapper.emitted().input[0]).toEqual([[42, 1337]]);
+    expect(wrapper.emitted().input[0]).toEqual([selectedAnnotationIds]);
   });
 });

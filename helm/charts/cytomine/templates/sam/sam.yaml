@@ -24,9 +24,6 @@ spec:
             envFrom:
             - configMapRef:
                 name: sam
-            volumeMounts:
-            - name: config
-              mountPath: /config
             command: ["/bin/sh", "-c"]
             args: [ "fastapi run app/main.py"]
             env:

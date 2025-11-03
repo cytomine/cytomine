@@ -100,9 +100,8 @@ export default {
     selectedComplexField() {
       switch (this.type.id) {
         case 'geometry':
-        case 'image':
           return AnnotationMultiSelect;
-        case 'wsi':
+        case 'image':
           return ImageMultiSelect;
         default:
           return null;

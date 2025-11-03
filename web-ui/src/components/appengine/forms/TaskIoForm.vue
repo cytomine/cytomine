@@ -19,9 +19,11 @@
 </template>
 
 <script>
-import Task from '@/utils/appengine/task';
-import AppEngineField from '@/components/appengine/forms/fields/AppEngineField';
 import Vue from 'vue';
+
+import AppEngineField from '@/components/appengine/forms/fields/AppEngineField';
+import Task from '@/utils/appengine/task';
+import {hasBinaryType} from '@/utils/app';
 
 export default {
   name: 'task-io-form',
@@ -137,7 +139,7 @@ export default {
 
       for (let input of this.taskInputs) {
         setDefaultValue(input);
-        if (['file', 'image', 'wsi'].includes(input.type.id)) {
+        if (hasBinaryType(input)) {
           this.hasBinaryData = true;
         }
       }

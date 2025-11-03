@@ -52,7 +52,7 @@ import AnnotationMultiSelect from '@/components/appengine/forms/fields/array/Ann
 import BooleanField from '@/components/appengine/forms/fields/BooleanField';
 import CytomineModal from '@/components/utils/CytomineModal';
 import EnumerationField from '@/components/appengine/forms/fields/EnumerationField';
-import ImageMultiSelect from '@/components/appengine/forms/fields/array/ImageMultiSelect';
+import ImageArrayField from '@/components/appengine/forms/fields/array/ImageArrayField';
 import IntegerField from '@/components/appengine/forms/fields/IntegerField';
 import NumberField from '@/components/appengine/forms/fields/NumberField';
 import StringField from '@/components/appengine/forms/fields/StringField';
@@ -102,7 +102,7 @@ export default {
         case 'geometry':
           return AnnotationMultiSelect;
         case 'image':
-          return ImageMultiSelect;
+          return ImageArrayField;
         default:
           return null;
       }

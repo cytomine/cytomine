@@ -86,5 +86,11 @@ data:
       "emailVerified": true,
       "email": "admin@cytomine.org",
       "firstName": "Admin",
-      "lastName": "Admin"
+      "lastName": "Admin",
+      "clientRoles" : {
+        "core" : [ "ADMIN" ],
+        "realm-management" : [ "view-realm", "realm-admin", "view-authorization", "query-groups", "manage-identity-providers", "manage-events", "query-realms", "view-events", "query-clients" ],
+        "broker" : [ "read-token" ],
+        "account" : [ "view-applications", "view-groups", "manage-consent", "manage-account", "view-consent", "view-profile", "manage-account-links", "delete-account" ]
+      }
     }

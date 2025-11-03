@@ -2,24 +2,21 @@
   <div>
     <b-loading class="small" :active="loading" :is-full-page="false"/>
 
-    <template v-if="!loading">
-      <div class="image-content">
-        <selectable-image
-          v-for="image in images"
-          :key="image.id"
-          :image="image"
-          :is-selected="selectedImages.includes(image.id)"
-          @update:selected="updateSelection($event)"
-        />
-      </div>
-    </template>
+    <div v-if="!loading" class="image-content">
+      <selectable-image
+        v-for="image in images"
+        :key="image.id"
+        :image="image"
+        :is-selected="selectedImages.includes(image.id)"
+        @update:selected="updateSelection($event)"
+      />
+    </div>
   </div>
 </template>
 
 <script>
-import {ImageInstanceCollection} from '@/api';
-
 import SelectableImage from '@/components/image/SelectableImage';
+import {ImageInstanceCollection} from '@/api';
 import {get} from '@/utils/store-helpers';
 
 export default {

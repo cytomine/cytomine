@@ -37,7 +37,6 @@ import be.cytomine.appengine.dto.inputs.task.types.image.ImageTypeConstraint;
 import be.cytomine.appengine.dto.inputs.task.types.integer.IntegerTypeConstraint;
 import be.cytomine.appengine.dto.inputs.task.types.number.NumberTypeConstraint;
 import be.cytomine.appengine.dto.inputs.task.types.string.StringTypeConstraint;
-import be.cytomine.appengine.dto.inputs.task.types.wsi.WsiTypeConstraint;
 import be.cytomine.appengine.exceptions.FileStorageException;
 import be.cytomine.appengine.handlers.StorageData;
 import be.cytomine.appengine.handlers.StorageDataType;
@@ -57,8 +56,6 @@ import be.cytomine.appengine.models.task.number.NumberPersistence;
 import be.cytomine.appengine.models.task.number.NumberType;
 import be.cytomine.appengine.models.task.string.StringPersistence;
 import be.cytomine.appengine.models.task.string.StringType;
-import be.cytomine.appengine.models.task.wsi.WsiPersistence;
-import be.cytomine.appengine.models.task.wsi.WsiType;
 import be.cytomine.appengine.repositories.TypePersistenceRepository;
 import be.cytomine.appengine.repositories.bool.BooleanPersistenceRepository;
 import be.cytomine.appengine.repositories.collection.CollectionPersistenceRepository;
@@ -70,7 +67,6 @@ import be.cytomine.appengine.repositories.image.ImagePersistenceRepository;
 import be.cytomine.appengine.repositories.integer.IntegerPersistenceRepository;
 import be.cytomine.appengine.repositories.number.NumberPersistenceRepository;
 import be.cytomine.appengine.repositories.string.StringPersistenceRepository;
-import be.cytomine.appengine.repositories.wsi.WsiPersistenceRepository;
 import be.cytomine.appengine.repositories.RunRepository;
 import be.cytomine.appengine.repositories.TaskRepository;
 import be.cytomine.appengine.states.TaskRunState;
@@ -123,9 +119,6 @@ public class ProvisionTaskStepDefinitions {
 
     @Autowired
     private ImagePersistenceRepository imageProvisionRepository;
-
-    @Autowired
-    private WsiPersistenceRepository wsiPersistenceRepository;
 
     @Autowired
     private FilePersistenceRepository filePersistenceRepository;
@@ -305,11 +298,6 @@ public class ProvisionTaskStepDefinitions {
                 provision = new ImagePersistence();
                 provision.setValueType(ValueType.IMAGE);
                 ((ImagePersistence) provision).setValue(initialValue.getBytes());
-                break;
-            case "wsi":
-                provision = new WsiPersistence();
-                provision.setValueType(ValueType.WSI);
-                ((WsiPersistence) provision).setValue(initialValue.getBytes());
                 break;
             case "file":
                 provision = new FilePersistence();
@@ -640,9 +628,6 @@ public class ProvisionTaskStepDefinitions {
             case "image":
                 provision = imageProvisionRepository.findImagePersistenceByParameterNameAndRunIdAndParameterType(parameterName, persistedRun.getId(), ParameterType.INPUT);
                 break;
-            case "wsi":
-                provision = wsiPersistenceRepository.findWsiPersistenceByParameterNameAndRunIdAndParameterType(parameterName, persistedRun.getId(), ParameterType.INPUT);
-                break;
             case "file":
                 provision = filePersistenceRepository.findFilePersistenceByParameterNameAndRunIdAndParameterType(parameterName, persistedRun.getId(), ParameterType.INPUT);
                 break;
@@ -732,8 +717,7 @@ public class ProvisionTaskStepDefinitions {
             "integer", t -> Arrays.stream(IntegerTypeConstraint.values()).anyMatch(((IntegerType) t)::hasConstraint),
             "number", t -> Arrays.stream(NumberTypeConstraint.values()).anyMatch(((NumberType) t)::hasConstraint),
             "string", t -> Arrays.stream(StringTypeConstraint.values()).anyMatch(((StringType) t)::hasConstraint),
-            "image", t -> Arrays.stream(ImageTypeConstraint.values()).anyMatch(((ImageType) t)::hasConstraint),
-            "wsi", t -> Arrays.stream(WsiTypeConstraint.values()).anyMatch(((WsiType) t)::hasConstraint)
+            "image", t -> Arrays.stream(ImageTypeConstraint.values()).anyMatch(((ImageType) t)::hasConstraint)
         );
 
         Type type = input.getType();

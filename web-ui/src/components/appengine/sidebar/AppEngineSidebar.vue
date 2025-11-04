@@ -172,7 +172,7 @@ export default {
       return task;
     },
     filterBinaryType(task, type) {
-      let binaryType = ['file', 'image', 'wsi'];
+      let binaryType = ['file', 'image'];
 
       if (type === 'input') {
         return task.inputs.filter(input => binaryType.includes(input.type.id));

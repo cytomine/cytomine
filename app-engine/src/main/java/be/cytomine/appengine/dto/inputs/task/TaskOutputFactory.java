@@ -10,7 +10,6 @@ import be.cytomine.appengine.dto.inputs.task.types.image.TaskParameterImageType;
 import be.cytomine.appengine.dto.inputs.task.types.integer.TaskParameterIntegerType;
 import be.cytomine.appengine.dto.inputs.task.types.number.TaskParameterNumberType;
 import be.cytomine.appengine.dto.inputs.task.types.string.TaskParameterStringType;
-import be.cytomine.appengine.dto.inputs.task.types.wsi.TaskParameterWsiType;
 import be.cytomine.appengine.models.task.Parameter;
 import be.cytomine.appengine.models.task.bool.BooleanType;
 import be.cytomine.appengine.models.task.collection.CollectionType;
@@ -22,7 +21,6 @@ import be.cytomine.appengine.models.task.image.ImageType;
 import be.cytomine.appengine.models.task.integer.IntegerType;
 import be.cytomine.appengine.models.task.number.NumberType;
 import be.cytomine.appengine.models.task.string.StringType;
-import be.cytomine.appengine.models.task.wsi.WsiType;
 
 public class TaskOutputFactory {
 
@@ -74,11 +72,6 @@ public class TaskOutputFactory {
             );
         } else if (output.getType() instanceof ImageType type) {
             taskParameterType = new TaskParameterImageType(
-                type.getId(),
-                type.getFormats()
-            );
-        } else if (output.getType() instanceof WsiType type) {
-            taskParameterType = new TaskParameterWsiType(
                 type.getId(),
                 type.getFormats()
             );

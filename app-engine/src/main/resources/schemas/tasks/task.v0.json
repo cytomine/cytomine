@@ -378,44 +378,13 @@
                   "minItems": 1,
                   "items": {
                     "type": "string",
-                    "enum": ["png", "jpeg", "tiff"]
+                    "enum": ["dicom", "jpeg", "png", "tiff", "wsidicom"]
                   }
                 },
                 "max_width": {
                   "type": "integer"
                 },
                 "max_height": {
-                  "type": "integer"
-                }
-              }
-            }
-          ]
-        },
-        "wsi": {
-          "oneOf": [
-            {
-              "const": "wsi"
-            },
-            {
-              "type": "object",
-              "required": ["id"],
-              "properties": {
-                "id": {"const": "wsi"},
-                "formats": {
-                  "type": "array",
-                  "minItems": 1,
-                  "items": {
-                    "type": "string",
-                    "enum": ["dicom", "wsidicom"]
-                  }
-                },
-                "max_file_size": {
-                  "$ref": "#/$defs/types/memory"
-                },
-                "max_height": {
-                  "type": "integer"
-                },
-                "max_width": {
                   "type": "integer"
                 }
               }
@@ -444,8 +413,7 @@
                 {"$ref": "#/$defs/io/type_specs/geometry"},
                 {"$ref": "#/$defs/io/type_specs/image"},
                 {"$ref": "#/$defs/io/type_specs/array"},
-                {"$ref": "#/$defs/io/type_specs/file"},
-                {"$ref": "#/$defs/io/type_specs/wsi"}
+                {"$ref": "#/$defs/io/type_specs/file"}
               ]
             }
           }
@@ -551,17 +519,6 @@
           },
           "unevaluatedProperties": true
         },
-        "wsi": {
-          "type": "object",
-          "allOf": [
-            {"$ref": "#/$defs/io/base_parameter"}
-          ],
-          "required": ["type"],
-          "properties": {
-            "type": {"$ref": "#/$defs/io/type_specs/wsi"}
-          },
-          "unevaluatedProperties": true
-        },
         "array": {
           "type": "object",
           "allOf": [
@@ -636,9 +593,6 @@
                 "$ref": "#/$defs/io/typed_parameter/image"
               },
               {
-                "$ref": "#/$defs/io/typed_parameter/wsi"
-              },
-              {
                 "$ref": "#/$defs/io/typed_parameter/array"
               }
             ]
@@ -665,7 +619,6 @@
               {"$ref": "#/$defs/io/typed_parameter/geometry"},
               {"$ref": "#/$defs/io/typed_parameter/file"},
               {"$ref": "#/$defs/io/typed_parameter/image"},
-              {"$ref": "#/$defs/io/typed_parameter/wsi"},
               {"$ref": "#/$defs/io/typed_parameter/array"}
             ]
           },

@@ -9,7 +9,6 @@ public enum ValueType {
     DATETIME,
     GEOMETRY,
     IMAGE,
-    WSI,
     FILE,
     ARRAY,
     REFERENCE

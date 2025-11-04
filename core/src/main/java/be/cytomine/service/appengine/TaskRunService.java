@@ -236,23 +236,7 @@ public class TaskRunService {
                     if (response != null) return response;
                 }
             }
-            if (subtype.equals("wsi")) {
-                for (int i = 0; i < itemsArray.length; i++) {
-                    Long imageId = itemsArray[i];
-                    File wsi = downloadWsi(imageId);
 
-                    MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-                    body.add("file", new FileSystemResource(wsi));
-
-                    String response = provisionCollectionItem(arrayTypeUri, i, body);
-
-                    wsi.delete();
-
-                    if (response != null) {
-                        return response;
-                    }
-                }
-            }
             if (subtype.equals("geometry")) {
                 ObjectNode provision = json.deepCopy();
                 provision.remove("type");
@@ -295,20 +279,6 @@ public class TaskRunService {
             if (wsi != null) {
                 wsi.delete();
             }
-
-            return response;
-        }
-
-        if (json.get("type").get("id").asText().equals("wsi")) {
-            Long imageId = json.get("value").asLong();
-            File wsi = downloadWsi(imageId);
-
-            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-            body.add("file", new FileSystemResource(wsi));
-
-            String response = appEngineService.put(uri, body, MediaType.MULTIPART_FORM_DATA);
-
-            wsi.delete();
 
             return response;
         }

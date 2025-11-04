@@ -89,14 +89,12 @@ import be.cytomine.appengine.models.task.collection.CollectionType;
 import be.cytomine.appengine.models.task.collection.ReferencePersistence;
 import be.cytomine.appengine.models.task.file.FileType;
 import be.cytomine.appengine.models.task.image.ImageType;
-import be.cytomine.appengine.models.task.wsi.WsiType;
 import be.cytomine.appengine.repositories.ChecksumRepository;
 import be.cytomine.appengine.repositories.RunRepository;
 import be.cytomine.appengine.repositories.TypePersistenceRepository;
 import be.cytomine.appengine.repositories.collection.CollectionPersistenceRepository;
 import be.cytomine.appengine.states.TaskRunState;
 import be.cytomine.appengine.utils.FileHelper;
-
 
 @Slf4j
 @RequiredArgsConstructor
@@ -1141,9 +1139,6 @@ public class TaskProvisioningService {
             }
             if (parameter.getType() instanceof ImageType imageType) {
                 // todo: handle image refs
-            }
-            if (parameter.getType() instanceof WsiType wsiType) {
-                // todo: handle wsi image refs
             }
         }
 

@@ -228,7 +228,7 @@ public class ApiClient {
         throws JsonProcessingException
     {
 
-        if (type.equals("image") || type.equals("wsi") || type.equals("file")) {
+        if (type.equals("image") || type.equals("file")) {
 
             MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
             ByteArrayResource fileResource = new ByteArrayResource(value.getBytes()) {
@@ -309,7 +309,7 @@ public class ApiClient {
         throws JsonProcessingException
     {
         HttpEntity<Object> entity = null;
-        if (type.equals("image") || type.equals("wsi") || type.equals("file")) {
+        if (type.equals("image") || type.equals("file")) {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 

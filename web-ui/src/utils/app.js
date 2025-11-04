@@ -8,6 +8,8 @@ export const UploadStatus = {
   UPLOADING: 'uploading',
 };
 
+export const BINARY_TYPES = ['file', 'image'];
+
 export async function installApp(app, notify, t) {
   try {
     const uri = `${app.namespace}/${app.version}`;
@@ -20,4 +22,9 @@ export async function installApp(app, notify, t) {
     notify({type: 'error', text: t('notify-error-app-installation')});
     return false;
   }
+}
+
+export async function hasBinaryType(input) {
+  const typeId = input.type.id === 'array' ? input.type.subType.id : input.type.id;
+  return BINARY_TYPES.includes(typeId);
 }

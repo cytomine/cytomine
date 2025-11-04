@@ -61,8 +61,6 @@ import be.cytomine.appengine.models.task.image.ImageType;
 import be.cytomine.appengine.models.task.integer.IntegerPersistence;
 import be.cytomine.appengine.models.task.number.NumberPersistence;
 import be.cytomine.appengine.models.task.string.StringPersistence;
-import be.cytomine.appengine.models.task.wsi.WsiPersistence;
-import be.cytomine.appengine.models.task.wsi.WsiType;
 import be.cytomine.appengine.repositories.bool.BooleanPersistenceRepository;
 import be.cytomine.appengine.repositories.collection.CollectionPersistenceRepository;
 import be.cytomine.appengine.repositories.collection.ReferencePersistenceRepository;
@@ -273,9 +271,7 @@ public class CollectionType extends Type {
                         value = FileHelper.read(entry.getData(), getStorageCharset());
                         item.put("value", Instant.parse(value));
                         break;
-                    case "FileType",
-                         "ImageType",
-                         "WsiType":
+                    case "FileType", "ImageType":
                         item.put("value", entry.getData());
                         break;
                     default:
@@ -437,8 +433,7 @@ public class CollectionType extends Type {
                 trackingType.validate(map.get("value"));
                 referenced = map.get("value") instanceof String
                         && (trackingType instanceof FileType
-                        || trackingType instanceof ImageType
-                        || trackingType instanceof WsiType);
+                        || trackingType instanceof ImageType);
                 trackingType = parentType;
             }
 
@@ -674,25 +669,8 @@ public class CollectionType extends Type {
                         }
                         collectionRepo.saveAndFlush(persistedProvision);
                         break;
-                    case "WsiType":
-                        WsiPersistence wsiPersistence = new WsiPersistence();
-                        wsiPersistence.setParameterType(ParameterType.INPUT);
-                        collectionItemParameterName = transform(provision.get("index").textValue());
-                        wsiPersistence.setParameterName(collectionItemParameterName);
-                        wsiPersistence.setProvisioned(true);
-                        wsiPersistence.setRunId(runId);
-                        wsiPersistence.setValueType(ValueType.WSI);
-                        wsiPersistence.setCollectionIndex(collectionItemParameterName.substring(collectionItemParameterName.indexOf("[")));
-                        persistedProvision.getItems().add(wsiPersistence);
-                        persistedProvision.setSize(persistedProvision.getItems().size());
-                        // make collection provisioned
-                        if (persistedProvision.getItems().size() >= parentType.minSize
-                            && persistedProvision.getItems().size() <= parentType.maxSize) {
-                            persistedProvision.setProvisioned(true);
-                        }
-                        collectionRepo.saveAndFlush(persistedProvision);
+                    default:
                         break;
-                    default: break;
                 }
             }
         }
@@ -805,7 +783,7 @@ public class CollectionType extends Type {
                     return getGeometryPersistence(node, runId, parameterName);
                 case "DateTimeType":
                     return getDateTimePersistence(node, runId, parameterName);
-                case "FileType", "ImageType", "WsiType":
+                case "FileType", "ImageType":
                     return getReferencePersistence(node, runId, parameterName);
                 default:
                     return null;
@@ -1117,8 +1095,7 @@ public class CollectionType extends Type {
                 CollectionPersistence parentCollection = (CollectionPersistence) parameterNameToTypePersistence.get(parentName);
                 String entryValue = null;
                 if (!(leafType.equals("FileType")
-                    || leafType.equals("ImageType")
-                    || leafType.equals("WsiType"))) {
+                    || leafType.equals("ImageType"))) {
 
                     entryValue = FileHelper.read(entry.getData(), getStorageCharset());
                 }
@@ -1249,18 +1226,6 @@ public class CollectionType extends Type {
 
                         parentCollection.getItems().add(imagePersistence);
                         break;
-                    case "WsiType":
-                        WsiPersistence wsiPersistence = new WsiPersistence();
-                        wsiPersistence.setParameterType(ParameterType.OUTPUT);
-                        wsiPersistence.setRunId(run.getId());
-                        wsiPersistence.setParameterName(String.join("", nameParts));
-                        wsiPersistence.setCollectionIndex(Arrays.stream(nameParts, 1, nameParts.length).collect(
-                            Collectors.joining()));
-                        wsiPersistence.setValue(null);
-                        wsiPersistence.setValueType(ValueType.WSI);
-
-                        parentCollection.getItems().add(wsiPersistence);
-                        break;
                     case "DateTimeType":
                         DateTimePersistence datetimePersistence = new DateTimePersistence();
                         datetimePersistence.setParameterType(ParameterType.OUTPUT);
@@ -1337,8 +1302,7 @@ public class CollectionType extends Type {
 
             StorageDataEntry itemFileEntry = null;
             if (leafType.equalsIgnoreCase("FileType")
-                || leafType.equalsIgnoreCase("ImageType")
-                || leafType.equalsIgnoreCase("WsiType")) {
+                || leafType.equalsIgnoreCase("ImageType")) {
 
                 itemFileEntry = new StorageDataEntry(new File(value.asText()), path, StorageDataType.FILE);
             } else {
@@ -1385,7 +1349,7 @@ public class CollectionType extends Type {
             provisionedParameter.put("index", provision.get("index").asText());
         }
 
-        if (referenced && (currentType instanceof FileType || currentType instanceof ImageType || currentType instanceof WsiType)) {
+        if (referenced && (currentType instanceof FileType || currentType instanceof ImageType)) {
             provisionedParameter.set("value", provision.get("value"));
         }
 
@@ -1446,8 +1410,7 @@ public class CollectionType extends Type {
                 }
                 String entryValue = null;
                 if (!(leafType.equals("FileType")
-                    || leafType.equals("ImageType")
-                    || leafType.equals("WsiType"))) {
+                    || leafType.equals("ImageType"))) {
                     entryValue = FileHelper.read(entry.getData(), getStorageCharset());
                 }
 
@@ -1519,10 +1482,6 @@ public class CollectionType extends Type {
                     case "ImageType":
                         collectionItemValue.setValue(null);
                         collectionItemValue.setType(ValueType.IMAGE);
-                        break;
-                    case "WsiType":
-                        collectionItemValue.setValue(null);
-                        collectionItemValue.setType(ValueType.WSI);
                         break;
                     default:
                         throw new ProvisioningException("unknown leaf type: " + leafType);
@@ -1622,8 +1581,6 @@ public class CollectionType extends Type {
             collectionItemValue.setType(ValueType.IMAGE);
         } else if (typePersistence instanceof FilePersistence) {
             collectionItemValue.setType(ValueType.FILE);
-        } else if (typePersistence instanceof WsiPersistence) {
-            collectionItemValue.setType(ValueType.WSI);
         } else {
             throw new ProvisioningException(ErrorCode.INTERNAL_UNKNOWN_SUBTYPE);
         }

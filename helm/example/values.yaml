@@ -11,5 +11,6 @@ pims:
   datasetImportFolder: '/data/dataset'
 mongodb:
   storageClassName: 'any'
-
+app_engine:
+  tasks_namespace: cytomine-local-tasks
 

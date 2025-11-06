@@ -471,6 +471,7 @@ public class CollectionType extends Type {
                         persistedProvision.setParameterType(ParameterType.INPUT);
                         persistedProvision.setParameterName(indexes[i]);
                         persistedProvision.setValueType(ValueType.ARRAY);
+                        persistedProvision.setProvisioned(true);
                         persistedProvision.setItems(new ArrayList<>());
                         persistedProvision = collectionRepo.save(persistedProvision);
                     }

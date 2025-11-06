@@ -1,0 +1,9 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: ingress-nginx
+  namespace: kube-system
+spec:
+  repo: https://github.com/kubernetes/ingress-nginx/tree/main/charts/ingress-nginx
+  targetNamespace: ingress
+  createNamespace: true

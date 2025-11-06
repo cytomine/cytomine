@@ -40,4 +40,4 @@ if [ -f /sys/fs/cgroup/cgroup.controllers ]; then
   echo "[$(date -Iseconds)] [CgroupV2 Fix] Done"
 fi
 
-/bin/k3s server --disable=traefik --disable=metrics
+/bin/k3s server --disable=traefik

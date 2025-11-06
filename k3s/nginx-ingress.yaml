@@ -1,3 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ingress
+---
 apiVersion: helm.cattle.io/v1
 kind: HelmChart
 metadata:
@@ -7,3 +12,5 @@ spec:
   repo: https://github.com/kubernetes/ingress-nginx/tree/main/charts/ingress-nginx
   targetNamespace: ingress
   createNamespace: true
+  valuesContent: |-
+    service:

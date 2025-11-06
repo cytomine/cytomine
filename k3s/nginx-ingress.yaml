@@ -9,8 +9,16 @@ metadata:
   name: ingress-nginx
   namespace: kube-system
 spec:
-  repo: https://github.com/kubernetes/ingress-nginx/tree/main/charts/ingress-nginx
+  repo: https://kubernetes.github.io/ingress-nginx
+  chart: ingress-nginx
   targetNamespace: ingress
   createNamespace: true
   valuesContent: |-
-    service:
+      hostPort:
+        enabled: true
+  #   fullnameOverride: ingress-nginx
+  #   controller:
+  #     kind: DaemonSet
+  #     hostNetwork: true
+  #     service:
+  #       enabled: true

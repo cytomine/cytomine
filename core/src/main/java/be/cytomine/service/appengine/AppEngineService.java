@@ -91,4 +91,20 @@ public class AppEngineService {
 
         return restTemplate.exchange(buildFullUrl(finalUrl), HttpMethod.PUT, requestEntity, String.class).getBody();
     }
+
+    public <B> String postWithParams(String uri, B body, MediaType contentType, Map<String, String> queryParams) {
+        log.debug(">>>>>>>>>>>>>>>>> " + apiUrl + apiBasePath + uri);
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(apiUrl + apiBasePath + uri);
+        if (queryParams != null) {
+            queryParams.forEach(builder::queryParam);
+        }
+        String finalUrl = builder.toUriString();
+        log.debug(">>>>>>>>>>>>>>>>> " + finalUrl);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(contentType);
+
+        HttpEntity<B> requestEntity = new HttpEntity<>(body, headers);
+
+        return restTemplate.exchange(finalUrl, HttpMethod.POST, requestEntity, String.class).getBody();
+    }
 }

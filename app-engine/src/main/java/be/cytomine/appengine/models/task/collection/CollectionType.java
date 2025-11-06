@@ -663,9 +663,11 @@ public class CollectionType extends Type {
                         persistedProvision.getItems().add(imagePersistence);
                         persistedProvision.setSize(persistedProvision.getItems().size());
                         // make collection provisioned
-                        if (persistedProvision.getItems().size() >= parentType.minSize
-                            && persistedProvision.getItems().size() <= parentType.maxSize) {
-                            persistedProvision.setProvisioned(true);
+                        if (Objects.nonNull(parentType.maxSize) && Objects.nonNull(parentType.minSize)) {
+                            if (persistedProvision.getItems().size() >= parentType.minSize
+                                && persistedProvision.getItems().size() <= parentType.maxSize) {
+                                persistedProvision.setProvisioned(true);
+                            }
                         }
                         collectionRepo.saveAndFlush(persistedProvision);
                         break;

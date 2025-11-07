@@ -126,6 +126,8 @@ application:
 
   internalProxyURL: ${INTERNAL_PROXY_URL:http://localhost}
 
+  pimsURL: ${PIMS_URL}
+
   samUrl: ${SAM_URL}
 
   annotation:

@@ -183,6 +183,7 @@ data:
   URL_CORE: core.{{ .Release.Namespace }}.svc.cluster.local
   INTERNAL_PROXY_URL: "{{ include "core.url" . }}"
   IAM_URL: http://iam.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.iam.port }}
+  PIMS_URL: http://pims.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.pims.port }}
   SAM_URL: http://sam.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.sam.port }}
   SERVER_URL: "{{ include "core.url" . }}"
   APPENGINE_ENABLED: "true"

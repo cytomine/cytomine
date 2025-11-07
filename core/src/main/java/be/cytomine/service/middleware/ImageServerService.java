@@ -54,8 +54,8 @@ public class ImageServerService {
     // Internal communication to image server must use this base path as a convention.
     public static final String IMS_API_BASE_PATH = "/ims";
 
-    @Value("${application.internalProxyURL}")
-    String internalProxyURL;
+    @Value("${application.pimsURL}")
+    String pimsURL;
 
     @Autowired
     private ImageInstanceService imageInstanceService;
@@ -69,7 +69,7 @@ public class ImageServerService {
     }
 
     public String internalImageServerURL() {
-        return this.internalProxyURL + IMS_API_BASE_PATH;
+        return this.pimsURL + IMS_API_BASE_PATH;
     }
 
     public StorageStats storageSpace() throws IOException {
@@ -340,7 +340,7 @@ public class ImageServerService {
                 request.addQueryParameter("colormaps", "!DEFAULT");
             }
         }
-        
+
         request.getHeaders().add(org.springframework.http.HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         request.getHeaders().add(org.springframework.http.HttpHeaders.ACCEPT, formatToMediaType(params.getFormat()));
         if (etag != null) {
@@ -665,7 +665,7 @@ public class ImageServerService {
             return "crop";
         }
     }
-    
+
     private static String formatToMediaType(String format) {
         return formatToMediaType(format, MediaType.IMAGE_JPEG_VALUE);
     }

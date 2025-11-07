@@ -10,14 +10,14 @@ spring:
           keycloak:
             client-id: core
             authorization-grant-type: authorization_code
-            redirect-uri: ${INTERNAL_PROXY_URL:http://nginx}/iam/realms/cytomine
+            redirect-uri: ${IAM_URL}/iam/realms/cytomine
             scope:
               - openid
         provider:
           keycloak:
             user-name-attribute: preferred_username
-            authorization-uri: ${INTERNAL_PROXY_URL:http://nginx}/iam/realms/cytomine/protocol/openid-connect/auth
-            token-uri: ${INTERNAL_PROXY_URL:http://nginx}/iam/realms/cytomine/protocol/openid-connect/token
+            authorization-uri: ${IAM_URL}/iam/realms/cytomine/protocol/openid-connect/auth
+            token-uri: ${IAM_URL}/iam/realms/cytomine/protocol/openid-connect/token
             jwk-set-uri: http://localhost:8888/
       resourceserver:
         jwt:

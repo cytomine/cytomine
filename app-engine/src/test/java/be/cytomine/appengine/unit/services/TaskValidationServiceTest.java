@@ -1,9 +1,7 @@
 package be.cytomine.appengine.unit.services;
 
 import java.io.File;
-import java.nio.file.Files;
 
-import be.cytomine.appengine.utils.DescriptorHelper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.BeforeAll;
@@ -13,13 +11,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.ClassPathResource;
 
 import be.cytomine.appengine.exceptions.ValidationException;
 import be.cytomine.appengine.models.task.Task;
 import be.cytomine.appengine.repositories.TaskRepository;
 import be.cytomine.appengine.services.TaskValidationService;
+import be.cytomine.appengine.utils.DescriptorHelper;
 import be.cytomine.appengine.utils.TaskUtils;
-import org.springframework.core.io.ClassPathResource;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -95,6 +94,6 @@ public class TaskValidationServiceTest {
             ValidationException.class,
             () -> taskValidationService.validateDescriptorFile(node)
         );
-        assertEquals("schema validation failed for descriptor.yml", exception.getMessage());
+        assertEquals("Schema validation failed for the descriptor file", exception.getMessage());
     }
 }

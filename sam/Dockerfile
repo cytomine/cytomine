@@ -3,6 +3,12 @@ ARG PYTHON_VERSION=3.10
 
 FROM ${PROXY_CACHE}/python:${PYTHON_VERSION}-slim-bullseye AS base
 
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    UV_PROJECT_ENVIRONMENT=/usr/local
+
 COPY --from=ghcr.io/astral-sh/uv:0.8.13 /uv /uvx /bin/
 
 WORKDIR /app
@@ -31,7 +37,7 @@ WORKDIR /app
 ENV PATH="/app/.venv/bin:$PATH"
 ENV PYTHONPATH=/app
 
-CMD ["fastapi", "dev", "main.py"]
+CMD ["fastapi", "dev", "app/main.py"]
 
 
 FROM ${PROXY_CACHE}/python:${PYTHON_VERSION}-slim AS production

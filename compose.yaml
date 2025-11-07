@@ -181,6 +181,7 @@ services:
       IAM_URL: http://nginx
       PIMS_URL: http://nginx
       APPENGINE_API_URL: http://nginx
+      SAM_URL: http://nginx
       JAVAMELODY_PASS: x6wp8Lg7K1fxr/7oa5gQD/NF7hqirE15g0P1STj5hCs
       JAVAMELODY_PATH: /javamelody-core
       JAVAMELODY_USER: admin

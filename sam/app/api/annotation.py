@@ -8,7 +8,6 @@ from fastapi.responses import JSONResponse
 from app.annotations.segmentation import run_segmentation_pipeline
 from app.config import Settings, get_settings
 from app.utils.annotations import (
-    fetch_included_annotations,
     get_annotation_by_id,
     get_bbox_from_annotation,
     is_invalid_annotation,
@@ -49,25 +48,15 @@ async def autonomous_predict(
                 ),
             )
 
-        user_id = annotation.user
         image_id = annotation.image
 
         bbox = get_bbox_from_annotation(annotation.location)
-
-        points = fetch_included_annotations(
-            image_id=image_id,
-            user_id=user_id,
-            box_=bbox,
-            settings=settings,
-        )
 
         result = run_segmentation_pipeline(
             request=request,
             image_id=image_id,
             geometry={"box": bbox},
-            points=points if points else None,
             settings=settings,
-            is_shapely_box=True,
         )
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e)) from e

@@ -66,6 +66,10 @@ public class ApplicationProperties {
 
     private String internalProxyURL;
 
+    @NotNull
+    @NotBlank
+    private String pimsURL;
+
     private Annotation annotation;
 
     public Annotation getAnnotation() {

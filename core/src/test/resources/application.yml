@@ -90,7 +90,7 @@ application:
   instanceHostSupportMail: instanceHostSupportMail@email.com
   instanceHostPhoneNumber: 0999999999
   defaultLanguage: ENGLISH
-  pimsURL: ${PIMS_URL}
+  pimsURL: http://localhost:8888
 
   appEngine:
     enabled: ${APPENGINE_ENABLED:true}

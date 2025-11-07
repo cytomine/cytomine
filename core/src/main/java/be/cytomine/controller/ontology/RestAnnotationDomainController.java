@@ -76,8 +76,8 @@ public class RestAnnotationDomainController extends RestCytomineController {
 
     private final RestTemplate restTemplate;
 
-    @Value("${application.internalProxyURL}")
-    private String internalProxyURL;
+    @Value("${application.samUrl}")
+    private String samUrl;
 
     @RequestMapping(value = { "/annotation/search.json"}, method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<String> searchSpecified() throws IOException {
@@ -407,7 +407,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
         }
 
         URI url = UriComponentsBuilder
-            .fromHttpUrl(this.internalProxyURL)
+            .fromHttpUrl(this.samUrl)
             .path("/sam/autonomous_prediction")
             .queryParam("annotation_id", id)
             .build()
@@ -421,15 +421,11 @@ public class RestAnnotationDomainController extends RestCytomineController {
 
             return ResponseEntity.status(samResponse.getStatusCode()).body(json);
         } catch (HttpStatusCodeException e) {
-            JsonObject json = new JsonObject();
-            json.put("message", e.getResponseBodyAsString());
-
-            return ResponseEntity.status(e.getStatusCode()).body(json);
+            log.error("Failed to process annotation {} with SAM", id, e);
+            throw new RuntimeException("Failed to refine annotation with SAM");
         } catch (Exception e) {
-            JsonObject json = new JsonObject();
-            json.put("message", "Failed to call SAM server: " + e.getMessage());
-
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(json);
+            log.error("Failed to call SAM server:", e);
+            throw new RuntimeException("Failed to call SAM server");
         }
     }
 }

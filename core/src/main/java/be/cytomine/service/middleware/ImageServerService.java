@@ -1,22 +1,49 @@
 package be.cytomine.service.middleware;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import be.cytomine.domain.image.*;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKTReader;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.gateway.mvc.ProxyExchange;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
+import be.cytomine.domain.image.AbstractImage;
+import be.cytomine.domain.image.AbstractSlice;
+import be.cytomine.domain.image.CompanionFile;
+import be.cytomine.domain.image.ImageInstance;
+import be.cytomine.domain.image.SliceInstance;
+import be.cytomine.domain.image.UploadedFile;
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.dto.StorageStats;
 import be.cytomine.dto.image.CropParameter;
@@ -30,22 +57,6 @@ import be.cytomine.service.utils.SimplifyGeometryService;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.PreparedRequest;
 import be.cytomine.utils.StringUtils;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.io.ParseException;
-import org.locationtech.jts.io.WKTReader;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.gateway.mvc.ProxyExchange;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-
-import jakarta.transaction.Transactional;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.*;
 
 @Slf4j
 @Service
@@ -54,8 +65,8 @@ public class ImageServerService {
     // Internal communication to image server must use this base path as a convention.
     public static final String IMS_API_BASE_PATH = "/ims";
 
-    @Value("${application.internalProxyURL}")
-    String internalProxyURL;
+    @Value("${application.pimsURL}")
+    String pimsURL;
 
     @Autowired
     private ImageInstanceService imageInstanceService;
@@ -69,7 +80,7 @@ public class ImageServerService {
     }
 
     public String internalImageServerURL() {
-        return this.internalProxyURL + IMS_API_BASE_PATH;
+        return this.pimsURL + IMS_API_BASE_PATH;
     }
 
     public StorageStats storageSpace() throws IOException {
@@ -81,44 +92,59 @@ public class ImageServerService {
         return JsonObject.toObject(request.toObject(String.class), StorageStats.class);
     }
 
-    public List<Map<String, Object>> formats() {
-        PreparedRequest request = new PreparedRequest();
-        request.setMethod(HttpMethod.GET);
-        request.setUrl(this.internalImageServerURL());
-        request.addPathFragment("formats");
-
-        JsonObject jsonObject = JsonObject.toJsonObject(request.toObject(String.class));
-        return ((List<Map<String,Object>>)jsonObject.get("items")).stream().map(StringUtils::keysToCamelCase).toList();
+    private static String retrieveCropFormat(CropParameter cropParameter) {
+        String format;
+        if (cropParameter.getDraw() != null && cropParameter.getDraw()) {
+            format = checkFormat(cropParameter.getFormat(), List.of("jpg", "png", "webp"));
+        } else if (cropParameter.getMask() != null && cropParameter.getMask()) {
+            format = checkFormat(cropParameter.getFormat(), List.of("jpg", "png", "webp"));
+        } else if (cropParameter.getAlphaMask() != null && cropParameter.getAlphaMask()) {
+            format = checkFormat(cropParameter.getFormat(), List.of("png", "webp"));
+        } else {
+            format = checkFormat(cropParameter.getFormat(), List.of("jpg", "png", "webp"));
+        }
+        return format;
     }
 
-    public ResponseEntity<byte[]> download(UploadedFile uploadedFile, ProxyExchange<byte[]> proxy) throws IOException {
-        PreparedRequest request = new PreparedRequest();
-        request.setMethod(HttpMethod.GET);
-        request.setUrl(this.internalImageServerURL());
-        request.addPathFragment("file");
-        request.addPathFragment(uploadedFile.getPath(), true);
-        request.addPathFragment("export");
-        request.addQueryParameter("filename", uploadedFile.getOriginalFilename());
-        request.getHeaders().add(org.springframework.http.HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-
-        return request.toResponseEntity(proxy, byte[].class);
+    private static String getCropUri(CropParameter cropParameter) {
+        if (cropParameter.getDraw() != null && cropParameter.getDraw()) {
+            return "/annotation/drawing";
+        } else if (cropParameter.getMask() != null && cropParameter.getMask()) {
+            return "/annotation/mask";
+        } else if (cropParameter.getAlphaMask() != null && cropParameter.getAlphaMask()) {
+            return "/annotation/crop";
+        } else {
+            return "/annotation/crop";
+        }
     }
 
-    public ResponseEntity<byte[]> download(AbstractImage abstractImage, ProxyExchange<byte[]> proxy) throws IOException {
-        PreparedRequest request = new PreparedRequest();
-        request.setMethod(HttpMethod.GET);
-        request.setUrl(this.internalImageServerURL());
-        request.addPathFragment("image");
-        request.addPathFragment(abstractImage.getPath(), true);
-        request.addPathFragment("export");
-        request.addQueryParameter("filename", abstractImage.getOriginalFilename());
-        request.getHeaders().add(org.springframework.http.HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-
-        return request.toResponseEntity(proxy, byte[].class);
+    private static String checkType(WindowParameter params) {
+        if ((params.getDraw() != null && params.getDraw()) || (params.getType() != null
+                                                                   && params.getType()
+                                                                          .equals("draw")))
+            return "draw";
+        else if ((params.getMask() != null && params.getMask()) || (params.getType() != null
+                                                                        && params.getType()
+                                                                               .equals("mask")))
+            return "mask";
+        else if ((params.getAlphaMask() != null && params.getAlphaMask()) || (
+            params.getType() != null && (params.getType().equals("alphaMask") || params.getType()
+                                                                                     .equals(
+                                                                                         "alphamask")))) {
+            return "alphaMask";
+        } else {
+            return "crop";
+        }
     }
 
-    public ResponseEntity<byte[]> download(CompanionFile companionFile, ProxyExchange<byte[]> proxy) throws IOException {
-        return download(companionFile.getUploadedFile(), proxy);
+    private static String checkFormat(String format, List<String> accepted) {
+        if (accepted == null) {
+            accepted = List.of("jpg");
+        }
+        if (format == null) {
+            throw new WrongArgumentException("Format must be specified");
+        }
+        return (!accepted.contains(format)) ? accepted.get(0) : format;
     }
 
     public Map<String, Object> properties(AbstractImage image) throws IOException {
@@ -132,16 +158,13 @@ public class ImageServerService {
         return JsonObject.toMap(request.toObject(String.class));
     }
 
-    public List<Map<String, Object>> rawProperties(AbstractImage image) throws IOException {
-        PreparedRequest request = new PreparedRequest();
-        request.setMethod(HttpMethod.GET);
-        request.setUrl(this.internalImageServerURL());
-        request.addPathFragment("image");
-        request.addPathFragment(image.getPath(), true);
-        request.addPathFragment("metadata");
-
-        return JsonObject.toJsonObject(request.toObject(String.class))
-                .getJSONAttrListMap("items").stream().map(StringUtils::keysToCamelCase).toList();
+    private static Map<String, Object> renameChannelHistogramKeys(Map<String, Object> hist) {
+        Object channel = hist.get("concreteChannel");
+        Object apparentChannel = hist.get("channel");
+        hist.put("channel", channel);
+        hist.put("apparentChannel", apparentChannel);
+        hist.remove("concreteChannel");
+        return hist;
     }
 
     public List<Map<String, Object>> rawProperties(ImageInstance image) throws IOException {
@@ -181,6 +204,71 @@ public class ImageServerService {
         return StringUtils.keysToCamelCase(json);
     }
 
+    public List<Map<String, Object>> formats() {
+        PreparedRequest request = new PreparedRequest();
+        request.setMethod(HttpMethod.GET);
+        request.setUrl(this.internalImageServerURL());
+        request.addPathFragment("formats");
+
+        JsonObject jsonObject = JsonObject.toJsonObject(request.toObject(String.class));
+        return ((List<Map<String, Object>>) jsonObject.get("items")).stream()
+                   .map(StringUtils::keysToCamelCase)
+                   .toList();
+    }
+
+    public ResponseEntity<byte[]> download(UploadedFile uploadedFile, ProxyExchange<byte[]> proxy)
+        throws IOException {
+        PreparedRequest request = new PreparedRequest();
+        request.setMethod(HttpMethod.GET);
+        request.setUrl(this.internalImageServerURL());
+        request.addPathFragment("file");
+        request.addPathFragment(uploadedFile.getPath(), true);
+        request.addPathFragment("export");
+        request.addQueryParameter("filename", uploadedFile.getOriginalFilename());
+        request.getHeaders()
+            .add(org.springframework.http.HttpHeaders.CONTENT_TYPE,
+                MediaType.APPLICATION_JSON_VALUE);
+
+        return request.toResponseEntity(proxy, byte[].class);
+    }
+
+    public ResponseEntity<byte[]> download(AbstractImage abstractImage, ProxyExchange<byte[]> proxy)
+        throws IOException {
+        PreparedRequest request = new PreparedRequest();
+        request.setMethod(HttpMethod.GET);
+        request.setUrl(this.internalImageServerURL());
+        request.addPathFragment("image");
+        request.addPathFragment(abstractImage.getPath(), true);
+        request.addPathFragment("export");
+        request.addQueryParameter("filename", abstractImage.getOriginalFilename());
+        request.getHeaders()
+            .add(org.springframework.http.HttpHeaders.CONTENT_TYPE,
+                MediaType.APPLICATION_JSON_VALUE);
+
+        return request.toResponseEntity(proxy, byte[].class);
+    }
+
+    public ResponseEntity<byte[]> download(CompanionFile companionFile, ProxyExchange<byte[]> proxy)
+        throws IOException {
+        return download(companionFile.getUploadedFile(), proxy);
+    }
+
+    public List<Map<String, Object>> rawProperties(AbstractImage image) throws IOException {
+        PreparedRequest request = new PreparedRequest();
+        request.setMethod(HttpMethod.GET);
+        request.setUrl(this.internalImageServerURL());
+        request.addPathFragment("image");
+        request.addPathFragment(image.getPath(), true);
+        request.addPathFragment("metadata");
+
+        return JsonObject.toJsonObject(request.toObject(String.class))
+                   .getJSONAttrListMap("items").stream().map(StringUtils::keysToCamelCase).toList();
+    }
+
+    public List<String> associated(ImageInstance image) throws IOException {
+        return associated(image.getBaseImage());
+    }
+
     public List<Map<String, Object>> channelHistograms(AbstractImage image, int nBins) {
         PreparedRequest request = new PreparedRequest();
         request.setMethod(HttpMethod.GET);
@@ -193,9 +281,10 @@ public class ImageServerService {
 
         Map<String, Object> json = JsonObject.toMap(request.toObject(String.class));
         List<Map<String, Object>> items = (List<Map<String, Object>>) json.get("items");
-        return items.stream().map(x -> renameChannelHistogramKeys(StringUtils.keysToCamelCase(x))).toList();
+        return items.stream()
+                   .map(x -> renameChannelHistogramKeys(StringUtils.keysToCamelCase(x)))
+                   .toList();
     }
-
 
     public List<Map<String, Object>> channelHistogramBounds(AbstractImage image) {
         PreparedRequest request = new PreparedRequest();
@@ -209,11 +298,13 @@ public class ImageServerService {
 
         Map<String, Object> json = JsonObject.toMap(request.toObject(String.class));
         List<Map<String, Object>> items = (List<Map<String, Object>>) json.get("items");
-        return items.stream().map(x -> renameChannelHistogramKeys(StringUtils.keysToCamelCase(x))).toList();
+        return items.stream()
+                   .map(x -> renameChannelHistogramKeys(StringUtils.keysToCamelCase(x)))
+                   .toList();
     }
 
-
-    public List<Map<String, Object>> planeHistograms(AbstractSlice slice, int nBins, boolean allChannels) {
+    public List<Map<String, Object>> planeHistograms(AbstractSlice slice, int nBins,
+                                                     boolean allChannels) {
         PreparedRequest request = new PreparedRequest();
         request.setMethod(HttpMethod.GET);
         request.setUrl(this.internalImageServerURL());
@@ -232,11 +323,13 @@ public class ImageServerService {
 
         Map<String, Object> json = JsonObject.toMap(request.toObject(String.class));
         List<Map<String, Object>> items = (List<Map<String, Object>>) json.get("items");
-        return items.stream().map(x -> renameChannelHistogramKeys(StringUtils.keysToCamelCase(x))).toList();
+        return items.stream()
+                   .map(x -> renameChannelHistogramKeys(StringUtils.keysToCamelCase(x)))
+                   .toList();
     }
 
-
-    public List<Map<String, Object>> planeHistogramBounds(AbstractSlice slice, boolean allChannels) {
+    public List<Map<String, Object>> planeHistogramBounds(AbstractSlice slice,
+                                                          boolean allChannels) {
         PreparedRequest request = new PreparedRequest();
         request.setMethod(HttpMethod.GET);
         request.setUrl(this.internalImageServerURL());
@@ -255,7 +348,9 @@ public class ImageServerService {
 
         Map<String, Object> json = JsonObject.toMap(request.toObject(String.class));
         List<Map<String, Object>> items = (List<Map<String, Object>>) json.get("items");
-        return items.stream().map(x -> renameChannelHistogramKeys(StringUtils.keysToCamelCase(x))).toList();
+        return items.stream()
+                   .map(x -> renameChannelHistogramKeys(StringUtils.keysToCamelCase(x)))
+                   .toList();
     }
 
     public List<String> associated(AbstractImage image) throws IOException {
@@ -268,18 +363,16 @@ public class ImageServerService {
         request.addPathFragment("associated");
 
         return JsonObject.toJsonObject(request.toObject(String.class))
-                .getJSONAttrListMap("items").stream().map(x -> (String)x.get("name")).toList();
+                   .getJSONAttrListMap("items").stream().map(x -> (String) x.get("name")).toList();
     }
 
-    public List<String> associated(ImageInstance image) throws IOException {
-        return associated(image.getBaseImage());
-    }
-
-    public ResponseEntity<byte[]> label(ImageInstance image, LabelParameter params, String etag, ProxyExchange<byte[]> proxy) {
+    public ResponseEntity<byte[]> label(ImageInstance image, LabelParameter params, String etag,
+                                        ProxyExchange<byte[]> proxy) {
         return label(image.getBaseImage(), params, etag, proxy);
     }
 
-    public ResponseEntity<byte[]> label(AbstractImage image, LabelParameter params, String etag, ProxyExchange<byte[]> proxy) {
+    public ResponseEntity<byte[]> label(AbstractImage image, LabelParameter params, String etag,
+                                        ProxyExchange<byte[]> proxy) {
         PreparedRequest request = new PreparedRequest();
         request.setMethod(HttpMethod.GET);
         request.setUrl(this.internalImageServerURL());
@@ -289,8 +382,12 @@ public class ImageServerService {
         request.addPathFragment(params.getLabel().toLowerCase());
         request.addQueryParameter("length", params.getMaxSize());
 
-        request.getHeaders().add(org.springframework.http.HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-        request.getHeaders().add(org.springframework.http.HttpHeaders.ACCEPT, formatToMediaType(params.getFormat()));
+        request.getHeaders()
+            .add(org.springframework.http.HttpHeaders.CONTENT_TYPE,
+                MediaType.APPLICATION_JSON_VALUE);
+        request.getHeaders()
+            .add(org.springframework.http.HttpHeaders.ACCEPT,
+                formatToMediaType(params.getFormat()));
         if (etag != null) {
             request.getHeaders().add(org.springframework.http.HttpHeaders.IF_NONE_MATCH, etag);
         }
@@ -298,15 +395,18 @@ public class ImageServerService {
         return request.toResponseEntity(proxy, byte[].class);
     }
 
-    public ResponseEntity<byte[]> thumb(ImageInstance image, ImageParameter params, String etag, ProxyExchange<byte[]> proxy)  {
+    public ResponseEntity<byte[]> thumb(ImageInstance image, ImageParameter params, String etag,
+                                        ProxyExchange<byte[]> proxy) {
         return thumb(imageInstanceService.getReferenceSlice(image), params, etag, proxy);
     }
 
-    public ResponseEntity<byte[]> thumb(SliceInstance slice, ImageParameter params, String etag, ProxyExchange<byte[]> proxy)  {
+    public ResponseEntity<byte[]> thumb(SliceInstance slice, ImageParameter params, String etag,
+                                        ProxyExchange<byte[]> proxy) {
         return thumb(slice.getBaseSlice(), params, etag, proxy);
     }
 
-    public ResponseEntity<byte[]> thumb(AbstractSlice slice, ImageParameter params, String etag, ProxyExchange<byte[]> proxy) {
+    public ResponseEntity<byte[]> thumb(AbstractSlice slice, ImageParameter params, String etag,
+                                        ProxyExchange<byte[]> proxy) {
         PreparedRequest request = new PreparedRequest();
         request.setMethod(HttpMethod.GET);
         request.setUrl(this.internalImageServerURL());
@@ -314,7 +414,7 @@ public class ImageServerService {
         request.addPathFragment(slice.getPath(), true);
         request.addPathFragment((params.getBits() != null) ? "resized" : "thumb");
 
-        if (slice.getImage().getChannels()!=null && slice.getImage().getChannels() > 1) {
+        if (slice.getImage().getChannels() != null && slice.getImage().getChannels() > 1) {
             request.addQueryParameter("channels", slice.getChannel());
             // Ensure that if the slice is RGB, the 3 intrinsic channels are used
         }
@@ -324,36 +424,43 @@ public class ImageServerService {
         request.addQueryParameter("length", params.getMaxSize());
         request.addQueryParameter("gammas", params.getGamma());
         if (params.getColormap() != null) {
-            request.addQueryParameter("colormaps", Arrays.stream(params.getColormap().split(",")).toList());
+            request.addQueryParameter("colormaps",
+                Arrays.stream(params.getColormap().split(",")).toList());
         }
         if (params.getBits() != null) {
             request.addQueryParameter("bits", params.getMaxBits() ? "AUTO" : params.getBits());
         }
         if (params.getInverse() != null && params.getInverse()) {
             if (params.getColormap() != null) {
-                request.addQueryParameter("colormaps", Arrays.stream(params.getColormap().split(","))
+                request.addQueryParameter("colormaps",
+                    Arrays.stream(params.getColormap().split(","))
                         .map(ImageServerService::invertColormap)
                         .toList()
                 );
-            }
-            else {
+            } else {
                 request.addQueryParameter("colormaps", "!DEFAULT");
             }
         }
-        
-        request.getHeaders().add(org.springframework.http.HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-        request.getHeaders().add(org.springframework.http.HttpHeaders.ACCEPT, formatToMediaType(params.getFormat()));
+
+        request.getHeaders()
+            .add(org.springframework.http.HttpHeaders.CONTENT_TYPE,
+                MediaType.APPLICATION_JSON_VALUE);
+        request.getHeaders()
+            .add(org.springframework.http.HttpHeaders.ACCEPT,
+                formatToMediaType(params.getFormat()));
         if (etag != null) {
             request.getHeaders().add(org.springframework.http.HttpHeaders.IF_NONE_MATCH, etag);
         }
         return request.toResponseEntity(proxy, byte[].class);
     }
 
-    public ResponseEntity<byte[]> normalizedTile(SliceInstance slice, TileParameters params, String etag, ProxyExchange<byte[]> proxy)  {
+    public ResponseEntity<byte[]> normalizedTile(SliceInstance slice, TileParameters params,
+                                                 String etag, ProxyExchange<byte[]> proxy) {
         return normalizedTile(slice.getBaseSlice(), params, etag, proxy);
     }
 
-    public ResponseEntity<byte[]> normalizedTile(AbstractSlice slice, TileParameters params, String etag, ProxyExchange<byte[]> proxy) {
+    public ResponseEntity<byte[]> normalizedTile(AbstractSlice slice, TileParameters params,
+                                                 String etag, ProxyExchange<byte[]> proxy) {
         PreparedRequest request = new PreparedRequest();
         request.setMethod(HttpMethod.GET);
         request.setUrl(this.internalImageServerURL());
@@ -370,14 +477,15 @@ public class ImageServerService {
 
         if (params.getChannels() != null) {
             request.addQueryParameter("channels", params.getChannels());
-        }
-        else if (slice.getImage().getChannels() != null && slice.getImage().getChannels() > 1) {
+        } else if (slice.getImage().getChannels() != null && slice.getImage().getChannels() > 1) {
             request.addQueryParameter("channels", slice.getChannel());
             // Ensure that if the slice is RGB, the 3 intrinsic channels are used
         }
 
-        request.addQueryParameter("z_slices", params.getZSlices() != null ? params.getZSlices() : slice.getZStack());
-        request.addQueryParameter("timepoints", params.getTimepoints() != null ? params.getTimepoints() : slice.getTime());
+        request.addQueryParameter("z_slices",
+            params.getZSlices() != null ? params.getZSlices() : slice.getZStack());
+        request.addQueryParameter("timepoints",
+            params.getTimepoints() != null ? params.getTimepoints() : slice.getTime());
 
         request.addQueryParameter("gammas", params.getGammas());
         request.addQueryParameter("colormaps", params.getColormaps());
@@ -385,8 +493,12 @@ public class ImageServerService {
         request.addQueryParameter("max_intensities", params.getMaxIntensities());
         request.addQueryParameter("filters", params.getFilters());
 
-        request.getHeaders().add(org.springframework.http.HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-        request.getHeaders().add(org.springframework.http.HttpHeaders.ACCEPT, formatToMediaType(params.getFormat()));
+        request.getHeaders()
+            .add(org.springframework.http.HttpHeaders.CONTENT_TYPE,
+                MediaType.APPLICATION_JSON_VALUE);
+        request.getHeaders()
+            .add(org.springframework.http.HttpHeaders.ACCEPT,
+                formatToMediaType(params.getFormat()));
         if (etag != null) {
             request.getHeaders().add(org.springframework.http.HttpHeaders.IF_NONE_MATCH, etag);
         }
@@ -394,17 +506,46 @@ public class ImageServerService {
         return request.toResponseEntity(proxy, byte[].class);
     }
 
-
-    public ResponseEntity<byte[]> crop(AnnotationDomain annotation, CropParameter params, String etag, ProxyExchange<byte[]> proxy) throws UnsupportedEncodingException, ParseException {
+    public ResponseEntity<byte[]> crop(AnnotationDomain annotation, CropParameter params,
+                                       String etag, ProxyExchange<byte[]> proxy)
+        throws UnsupportedEncodingException, ParseException {
         params.setLocation(annotation.getWktLocation());
         return crop(annotation.getSlice().getBaseSlice(), params, etag, proxy);
     }
 
-    public ResponseEntity<byte[]> crop(SliceInstance slice, CropParameter params, String etag, ProxyExchange<byte[]> proxy) throws UnsupportedEncodingException, ParseException {
+    private static String retrieveWindowFormat(WindowParameter params) {
+        String format;
+        if (checkType(params).equals("alphamask")) {
+            format = checkFormat(params.getFormat(), List.of("png", "webp"));
+        } else {
+            format = checkFormat(params.getFormat(), List.of("png", "jpg", "webp"));
+        }
+        return format;
+    }
+
+    public ResponseEntity<byte[]> crop(SliceInstance slice, CropParameter params, String etag,
+                                       ProxyExchange<byte[]> proxy)
+        throws UnsupportedEncodingException, ParseException {
         return crop(slice.getBaseSlice(), params, etag, proxy);
     }
 
-    public ResponseEntity<byte[]> crop(AbstractSlice slice, CropParameter params, String etag, ProxyExchange<byte[]> proxy) throws UnsupportedEncodingException, ParseException {
+    private static String formatToMediaType(String format) {
+        return formatToMediaType(format, MediaType.IMAGE_JPEG_VALUE);
+    }
+
+    private static String formatToMediaType(String format, String defaultMediaType) {
+        return switch (format) {
+            case "json" -> MediaType.APPLICATION_JSON_VALUE;
+            case "png" -> MediaType.IMAGE_PNG_VALUE;
+            case "webp" -> "image/webp";
+            case "jpg" -> MediaType.IMAGE_JPEG_VALUE;
+            default -> defaultMediaType;
+        };
+    }
+
+    public ResponseEntity<byte[]> crop(AbstractSlice slice, CropParameter params, String etag,
+                                       ProxyExchange<byte[]> proxy)
+        throws UnsupportedEncodingException, ParseException {
         PreparedRequest request = new PreparedRequest();
         request.setMethod(HttpMethod.POST);
         request.setUrl(this.internalImageServerURL());
@@ -415,7 +556,7 @@ public class ImageServerService {
         JsonObject body = new JsonObject();
 
         // CZT
-        if (slice.getImage().getChannels()!=null && slice.getImage().getChannels() > 1) {
+        if (slice.getImage().getChannels() != null && slice.getImage().getChannels() > 1) {
             body.put("channels", slice.getChannel());
             // Ensure that if the slice is RGB, the 3 intrinsic channels are used
         }
@@ -435,11 +576,10 @@ public class ImageServerService {
         if (params.getInverse() != null && params.getInverse()) {
             if (params.getColormap() != null) {
                 body.put("colormaps", Arrays.stream(params.getColormap().split(","))
-                        .map(ImageServerService::invertColormap)
-                        .toList()
+                                          .map(ImageServerService::invertColormap)
+                                          .toList()
                 );
-            }
-            else {
+            } else {
                 body.put("colormaps", "!DEFAULT");
             }
         }
@@ -452,18 +592,19 @@ public class ImageServerService {
 
         // Annotations
         Object geometry = params.getGeometry();
-        if (geometry!=null && geometry instanceof String) {
-            geometry = new WKTReader().read((String)geometry);
+        if (geometry != null && geometry instanceof String) {
+            geometry = new WKTReader().read((String) geometry);
         }
 
-        if (StringUtils.isBlank(params.getGeometry()) && StringUtils.isNotBlank(params.getLocation())) {
+        if (StringUtils.isBlank(params.getGeometry()) && StringUtils.isNotBlank(
+            params.getLocation())) {
             geometry = new WKTReader().read(params.getLocation());
         }
         String wkt = null;
-        if (params.getComplete()!=null && params.getComplete() && geometry!=null) {
-            wkt = simplifyGeometryService.reduceGeometryPrecision((Geometry)geometry).toText();
-        } else if (geometry!=null) {
-            wkt = simplifyGeometryService.simplifyPolygonForCrop((Geometry)geometry).toText();
+        if (params.getComplete() != null && params.getComplete() && geometry != null) {
+            wkt = simplifyGeometryService.reduceGeometryPrecision((Geometry) geometry).toText();
+        } else if (geometry != null) {
+            wkt = simplifyGeometryService.simplifyPolygonForCrop((Geometry) geometry).toText();
         }
 
         ArrayList<Map<String, Object>> annotations = new ArrayList<>();
@@ -485,7 +626,8 @@ public class ImageServerService {
                 annot.put("fill_color", "#fff");
             });
         } else if (params.getAlphaMask() != null && params.getAlphaMask()) {
-            body.put("background_transparency", params.getAlpha() != null ? params.getAlpha() : 100);
+            body.put("background_transparency",
+                params.getAlpha() != null ? params.getAlpha() : 100);
         } else {
             body.put("background_transparency", 0);
         }
@@ -493,9 +635,12 @@ public class ImageServerService {
         request.setJsonBody(body);
 
         request.getHeaders().add("X-Annotation-Origin", "LEFT_BOTTOM");
-        request.getHeaders().add(org.springframework.http.HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+        request.getHeaders()
+            .add(org.springframework.http.HttpHeaders.CONTENT_TYPE,
+                MediaType.APPLICATION_JSON_VALUE);
         String format = retrieveCropFormat(params);
-        request.getHeaders().add(org.springframework.http.HttpHeaders.ACCEPT, formatToMediaType(format));
+        request.getHeaders()
+            .add(org.springframework.http.HttpHeaders.ACCEPT, formatToMediaType(format));
         if (etag != null) {
             request.getHeaders().add(org.springframework.http.HttpHeaders.IF_NONE_MATCH, etag);
         }
@@ -506,34 +651,9 @@ public class ImageServerService {
         return request.toResponseEntity(proxy, byte[].class);
     }
 
-    private static String retrieveCropFormat(CropParameter cropParameter) {
-        String format;
-        if (cropParameter.getDraw()!=null && cropParameter.getDraw()) {
-            format = checkFormat(cropParameter.getFormat(), List.of("jpg", "png", "webp"));
-        } else if (cropParameter.getMask()!=null && cropParameter.getMask()) {
-            format = checkFormat(cropParameter.getFormat(), List.of("jpg", "png", "webp"));
-        } else if (cropParameter.getAlphaMask()!=null && cropParameter.getAlphaMask()) {
-            format = checkFormat(cropParameter.getFormat(), List.of("png", "webp"));
-        } else {
-            format = checkFormat(cropParameter.getFormat(), List.of("jpg", "png", "webp"));
-        }
-        return format;
-    }
-
-    private static String getCropUri(CropParameter cropParameter)  {
-        if (cropParameter.getDraw()!=null && cropParameter.getDraw()) {
-            return "/annotation/drawing";
-        } else if (cropParameter.getMask()!=null && cropParameter.getMask()) {
-            return "/annotation/mask";
-        } else if (cropParameter.getAlphaMask()!=null && cropParameter.getAlphaMask()) {
-            return  "/annotation/crop";
-        } else {
-            return "/annotation/crop";
-        }
-    }
-
-
-    public ResponseEntity<byte[]> window(AbstractSlice slice, WindowParameter params, String etag, ProxyExchange<byte[]> proxy) throws UnsupportedEncodingException, ParseException {
+    public ResponseEntity<byte[]> window(AbstractSlice slice, WindowParameter params, String etag,
+                                         ProxyExchange<byte[]> proxy)
+        throws UnsupportedEncodingException, ParseException {
         PreparedRequest request = new PreparedRequest();
         request.setMethod(HttpMethod.POST);
         request.setUrl(this.internalImageServerURL());
@@ -551,7 +671,7 @@ public class ImageServerService {
         body.put("region", region);
 
         // CZT
-        if (slice.getImage().getChannels()!=null && slice.getImage().getChannels() > 1) {
+        if (slice.getImage().getChannels() != null && slice.getImage().getChannels() > 1) {
             body.put("channels", slice.getChannel());
             // Ensure that if the slice is RGB, the 3 intrinsic channels are used
         }
@@ -570,11 +690,10 @@ public class ImageServerService {
         if (params.getInverse() != null && params.getInverse()) {
             if (params.getColormap() != null) {
                 body.put("colormaps", Arrays.stream(params.getColormap().split(","))
-                        .map(ImageServerService::invertColormap)
-                        .toList()
+                                          .map(ImageServerService::invertColormap)
+                                          .toList()
                 );
-            }
-            else {
+            } else {
                 body.put("colormaps", "!DEFAULT");
             }
         }
@@ -586,21 +705,25 @@ public class ImageServerService {
         }
 
         if (params.getGeometries() != null) {
-            String strokeColor = params.getColor() != null ? params.getColor().replace("0x", "#") : "black";
+            String strokeColor =
+                params.getColor() != null ? params.getColor().replace("0x", "#") : "black";
             Integer strokeWidth = params.getThickness() != null ? params.getThickness() : 1;
             String annotationType = checkType(params);
 
 
-            List<Map<String, Object>> geometries =  params.getGeometries();
+            List<Map<String, Object>> geometries = params.getGeometries();
             List<Map<String, Object>> annotations = new ArrayList<>();
             for (Map<String, Object> geometry : geometries) {
                 String wkt = null;
-                if (params.getComplete()!=null && params.getComplete() && geometry!=null) {
-                    wkt = simplifyGeometryService.reduceGeometryPrecision((Geometry)geometry).toText();
-                } else if (geometry!=null) {
-                    wkt = simplifyGeometryService.simplifyPolygonForCrop((Geometry)geometry).toText();
+                if (params.getComplete() != null && params.getComplete() && geometry != null) {
+                    wkt = simplifyGeometryService.reduceGeometryPrecision((Geometry) geometry)
+                              .toText();
+                } else if (geometry != null) {
+                    wkt = simplifyGeometryService.simplifyPolygonForCrop((Geometry) geometry)
+                              .toText();
                 }
-                Map<String, Object> annot = new LinkedHashMap<>(wkt!=null? Map.of("geometry", wkt) : Map.of());
+                Map<String, Object> annot =
+                    new LinkedHashMap<>(wkt != null ? Map.of("geometry", wkt) : Map.of());
 
                 if (annotationType.equals("draw")) {
                     annot.put("stroke_color", strokeColor);
@@ -617,7 +740,8 @@ public class ImageServerService {
                 case "mask" -> annotationStyle.put("mode", "MASK");
                 case "alphaMask", "alphamask" -> {
                     annotationStyle.put("mode", "CROP");
-                    annotationStyle.put("background_transparency", params.getAlpha() != null ? params.getAlpha() : 100);
+                    annotationStyle.put("background_transparency",
+                        params.getAlpha() != null ? params.getAlpha() : 100);
                 }
                 default -> {
                     annotationStyle.put("mode", "CROP");
@@ -631,9 +755,12 @@ public class ImageServerService {
         request.setJsonBody(body);
 
         request.getHeaders().add("X-Annotation-Origin", "LEFT_BOTTOM");
-        request.getHeaders().add(org.springframework.http.HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+        request.getHeaders()
+            .add(org.springframework.http.HttpHeaders.CONTENT_TYPE,
+                MediaType.APPLICATION_JSON_VALUE);
         String format = retrieveWindowFormat(params);
-        request.getHeaders().add(org.springframework.http.HttpHeaders.ACCEPT, formatToMediaType(format));
+        request.getHeaders()
+            .add(org.springframework.http.HttpHeaders.ACCEPT, formatToMediaType(format));
         if (etag != null) {
             request.getHeaders().add(org.springframework.http.HttpHeaders.IF_NONE_MATCH, etag);
         }
@@ -642,62 +769,6 @@ public class ImageServerService {
         }
 
         return request.toResponseEntity(proxy, byte[].class);
-    }
-
-    private static String retrieveWindowFormat(WindowParameter params) {
-        String format;
-        if (checkType(params).equals("alphamask")) {
-            format = checkFormat(params.getFormat(), List.of("png", "webp"));
-        } else {
-            format = checkFormat(params.getFormat(), List.of("png", "jpg", "webp"));
-        }
-        return format;
-    }
-
-    private static String checkType(WindowParameter params) {
-        if ((params.getDraw()!=null && params.getDraw()) || (params.getType()!=null && params.getType().equals("draw")))
-            return "draw";
-        else if ((params.getMask()!=null && params.getMask()) || (params.getType()!=null && params.getType().equals("mask")))
-            return "mask";
-        else if ((params.getAlphaMask()!=null && params.getAlphaMask()) || (params.getType()!=null && (params.getType().equals("alphaMask") || params.getType().equals("alphamask")))) {
-            return "alphaMask";
-        } else {
-            return "crop";
-        }
-    }
-    
-    private static String formatToMediaType(String format) {
-        return formatToMediaType(format, MediaType.IMAGE_JPEG_VALUE);
-    }
-
-    private static String formatToMediaType(String format, String defaultMediaType) {
-        return switch (format) {
-            case "json" -> MediaType.APPLICATION_JSON_VALUE;
-            case "png" -> MediaType.IMAGE_PNG_VALUE;
-            case "webp" -> "image/webp";
-            case "jpg" -> MediaType.IMAGE_JPEG_VALUE;
-            default -> defaultMediaType;
-        };
-    }
-
-    private static String checkFormat(String format, List<String> accepted) {
-        if (accepted==null) {
-            accepted = List.of("jpg");
-        }
-        if (format==null) {
-            throw new WrongArgumentException("Format must be specified");
-        }
-        return (!accepted.contains(format)) ? accepted.get(0) : format;
-    }
-
-
-    private static Map<String, Object> renameChannelHistogramKeys(Map<String, Object> hist) {
-        Object channel = hist.get("concreteChannel");
-        Object apparentChannel = hist.get("channel");
-        hist.put("channel",channel);
-        hist.put("apparentChannel", apparentChannel);
-        hist.remove("concreteChannel");
-        return hist;
     }
 
     private static String invertColormap(String colormap) {

@@ -29,12 +29,13 @@
           </b-button>
           <strong v-if="status.isCancelled" class="has-text-danger">{{ $t('upload-cancelled') }}</strong>
           <strong v-if="status.isCompleted" class="has-text-success">{{ $t('upload-completed') }}</strong>
+          <UploadErrorMessage v-if="status.isError" :error="error"/>
         </div>
       </div>
 
       <div class="column is-narrow has-text-right icon-actions">
         <b-icon v-if="status.isCompleted" icon="check-circle" size="is-medium" />
-        <b-icon v-if="status.isCancelled" icon="exclamation-circle" size="is-medium" />
+        <b-icon v-if="status.isCancelled" type="is-danger" icon="exclamation-circle" size="is-medium" />
         <b-button icon-left="times" @click="$emit('file:remove', file)" />
       </div>
     </div>
@@ -47,15 +48,20 @@ import filesize from 'filesize';
 
 import {Cytomine} from '@/api';
 import {UploadStatus} from '@/utils/app';
+import UploadErrorMessage from '@/components/appengine/UploadErrorMessage.vue';
 
 export default {
   name: 'FileUploadItem',
+  components: {
+    UploadErrorMessage,
+  },
   props: {
     file: {type: File, required: true},
   },
   data() {
     return {
       cancelSource: null,
+      error: null,
       uploadFile: {
         data: this.file,
         name: this.file.name,
@@ -71,6 +77,7 @@ export default {
       return {
         isCancelled: status === UploadStatus.CANCELLED,
         isCompleted: status === UploadStatus.COMPLETED,
+        isError: status === UploadStatus.ERROR,
         isPending: status === UploadStatus.PENDING,
         isUploading: status === UploadStatus.UPLOADING,
       };
@@ -88,7 +95,7 @@ export default {
 
       this.uploadFile.status = UploadStatus.UPLOADING;
       try {
-        const response = await Cytomine.instance.api.post(
+        const data = (await Cytomine.instance.api.post(
           'app-engine/tasks',
           formData,
           {
@@ -97,9 +104,16 @@ export default {
             },
             cancelToken: this.cancelSource.token,
           }
-        );
+        )).data;
+
+        if (data.message) {
+          this.uploadFile.status = UploadStatus.ERROR;
+          this.error = data;
+          return;
+        }
+
         this.uploadFile.status = UploadStatus.COMPLETED;
-        this.$emit('task-upload:success', response.data);
+        this.$emit('task-upload:success', data);
       } catch (error) {
         console.error(error);
         this.$emit('task-upload:error');

@@ -16,7 +16,7 @@ public class ErrorDefinitions {
         codes.put(ErrorCode.INTERNAL_DOCKER_IMAGE_MANIFEST_MISSING, new MessageCode("APPE-internal-bundle-image-validation-error", "image is not invalid manifest is missing"));
         codes.put(ErrorCode.INTERNAL_DOCKER_IMAGE_TAR_NOT_FOUND, new MessageCode("APPE-internal-bundle-validation-error", "image not found in configured place in descriptor and not in the root directory"));
         codes.put(ErrorCode.INTERNAL_GENERIC_BATCH_ERROR, new MessageCode("APPE-internal-batch-request-error", "Error(s) occurred during a handling of a batch request."));
-        codes.put(ErrorCode.INTERNAL_INVALID_BUNDLE_FORMAT, new MessageCode("APPE-internal-bundle-validation-error", "invalid bundle format"));
+        codes.put(ErrorCode.INTERNAL_INVALID_BUNDLE_FORMAT, new MessageCode("APPE-internal-bundle-validation-error", "Invalid bundle format"));
         codes.put(ErrorCode.INTERNAL_INVALID_OUTPUT, new MessageCode("APPE-internal-task_run-invalid-output-archive", "invalid outputs in archive"));
         codes.put(ErrorCode.INTERNAL_INVALID_TASK_RUN_STATE, new MessageCode("APPE-internal-task-run-state-error", "run is in invalid state"));
         codes.put(ErrorCode.INTERNAL_JSON_PROCESSING_ERROR, new MessageCode("APPE-internal-task-run-state-error", "unable to process json"));
@@ -49,7 +49,7 @@ public class ErrorDefinitions {
         codes.put(ErrorCode.INTERNAL_PARAMETER_UNSUPPORTED_GEOMETRY_TYPE, new MessageCode("APPE-internal-request-validation-error", "unsupported geometry type"));
         codes.put(ErrorCode.INTERNAL_PARAMETER_VALIDATION_ERROR, new MessageCode("APPE-internal-request-validation-error", "value does not match defined constraint."));
         codes.put(ErrorCode.INTERNAL_PROVISIONS_NOT_FOUND, new MessageCode("APPE-internal-task-run-provisions-not-found", "provisions not found"));
-        codes.put(ErrorCode.INTERNAL_SCHEMA_VALIDATION_ERROR, new MessageCode("APPE-internal-bundle-schema-validation-error", "schema validation failed for descriptor.yml"));
+        codes.put(ErrorCode.INTERNAL_SCHEMA_VALIDATION_ERROR, new MessageCode("APPE-internal-bundle-schema-validation-error", "Schema validation failed for the descriptor file"));
         codes.put(ErrorCode.INTERNAL_SERVER_ERROR, new MessageCode("APPE-internal-server-error", "Server error."));
         codes.put(ErrorCode.INTERNAL_UNKNOWN_BUNDLE_ARCHIVE_FORAMT, new MessageCode("APPE-internal-bundle-validation-error", "unknown task bundle archive format"));
         codes.put(ErrorCode.INTERNAL_UNKNOWN_IMAGE_ARCHIVE_FORMAT, new MessageCode("APPE-internal-image-validation-error", "unknown image archive format"));

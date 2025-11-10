@@ -8,7 +8,7 @@
         {{ props.row.type }}
       </b-table-column>
       <b-table-column
-        v-if="!['FILE', 'IMAGE', 'WSI'].includes(props.row.type)"
+        v-if="!['FILE', 'IMAGE'].includes(props.row.type)"
         field="value"
         :label="$t('app-engine.parameter.value')"
       >

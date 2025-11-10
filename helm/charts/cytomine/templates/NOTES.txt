@@ -2,9 +2,10 @@ Domain is {{ required ".Values.global.domainName is required!" .Values.global.do
 
 Cytomine is being deployed at {{ .Values.global.domainName }}.
 
-Admin credentials are:
-    username: admin
-    password: {{ .Values.core.admin_password }}
+For login in cytomine use admin and password from:
+
+`kubectl -n {{ .Release.Namespace }} get secrets cytomine-admin-iam-secret -o json | jq -r .data.password | base64 -d -`
+
 
 It takes a few minutes for it to fully deploy, so please be patient. This usually takes about 5 minutes, and if the site isn't reachable in 10 minutes,
 something has likely gone wrong.

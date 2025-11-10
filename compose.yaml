@@ -178,7 +178,10 @@ services:
       IMAGE_SERVER_PRIVATE_KEY: d70607f5-c478-403c-be11-3dbc1716d1cf
       IMAGE_SERVER_PUBLIC_KEY: 9a8b8369-2446-44cb-b0af-604a74e1dcdb
       INTERNAL_PROXY_URL: http://nginx
+      IAM_URL: http://nginx
+      PIMS_URL: http://nginx
       APPENGINE_API_URL: http://nginx
+      SAM_URL: http://nginx
       JAVAMELODY_PASS: x6wp8Lg7K1fxr/7oa5gQD/NF7hqirE15g0P1STj5hCs
       JAVAMELODY_PATH: /javamelody-core
       JAVAMELODY_USER: admin

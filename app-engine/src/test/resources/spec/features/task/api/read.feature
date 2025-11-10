@@ -40,7 +40,6 @@ Feature: [URS00002-TASK] Read task information
       | Task 5  | com.cytomine.dummy.identity.string             | 1.0.0        | acde070d-8c4c-4f0d-9d8a-162843c10333 | task-acde070d-8c4c-4f0d-9d8a-162843c10333-def |
       | Task 6  | com.cytomine.dummy.identity.geometry           | 1.0.0        | acde070d-8c4c-4f0d-9d8a-162843c10333 | task-acde070d-8c4c-4f0d-9d8a-162843c10333-def |
       | Task 7  | com.cytomine.dummy.identity.image              | 1.0.0        | acde070d-8c4c-4f0d-9d8a-162843c10333 | task-acde070d-8c4c-4f0d-9d8a-162843c10333-def |
-      | Task 8  | com.cytomine.dummy.identity.wsi                | 1.0.0        | acde070d-8c4c-4f0d-9d8a-162843c10333 | task-acde070d-8c4c-4f0d-9d8a-162843c10333-def |
       | Task 9  | com.cytomine.dummy.identity.file               | 1.0.0        | acde070d-8c4c-4f0d-9d8a-162843c10333 | task-acde070d-8c4c-4f0d-9d8a-162843c10333-def |
       | Task 10 | com.cytomine.dummy.identity.datetime           | 1.0.0        | acde070d-8c4c-4f0d-9d8a-162843c10333 | task-acde070d-8c4c-4f0d-9d8a-162843c10333-def |
       | Task 11 | com.cytomine.dummy.identity.integer.collection | 0.1.0        | acde070d-8c4c-4f0d-9d8a-162843c10333 | task-acde070d-8c4c-4f0d-9d8a-162843c10333-def |
@@ -80,10 +79,9 @@ Feature: [URS00002-TASK] Read task information
       | Task 5  | com.cytomine.dummy.identity.string             | 1.0.0        |
       | Task 6  | com.cytomine.dummy.identity.geometry           | 1.0.0        |
       | Task 7  | com.cytomine.dummy.identity.image              | 1.0.0        |
-      | Task 8  | com.cytomine.dummy.identity.wsi                | 1.0.0        |
-      | Task 9  | com.cytomine.dummy.identity.file               | 1.0.0        |
-      | Task 10 | com.cytomine.dummy.identity.datetime           | 1.0.0        |
-      | Task 11 | com.cytomine.dummy.identity.integer.collection | 0.1.0        |
+      | Task 8  | com.cytomine.dummy.identity.file               | 1.0.0        |
+      | Task 9  | com.cytomine.dummy.identity.datetime           | 1.0.0        |
+      | Task 10 | com.cytomine.dummy.identity.integer.collection | 0.1.0        |
 
 
   Scenario Outline: successful fetch of a task description using id
@@ -120,10 +118,9 @@ Feature: [URS00002-TASK] Read task information
       | Task 5  | com.cytomine.dummy.identity.string             | 1.0.0        |
       | Task 6  | com.cytomine.dummy.identity.geometry           | 1.0.0        |
       | Task 7  | com.cytomine.dummy.identity.image              | 1.0.0        |
-      | Task 8  | com.cytomine.dummy.identity.wsi                | 1.0.0        |
-      | Task 9  | com.cytomine.dummy.identity.file               | 1.0.0        |
-      | Task 10 | com.cytomine.dummy.identity.datetime           | 1.0.0        |
-      | Task 11 | com.cytomine.dummy.identity.integer.collection | 0.1.0        |
+      | Task 8  | com.cytomine.dummy.identity.file               | 1.0.0        |
+      | Task 9  | com.cytomine.dummy.identity.datetime           | 1.0.0        |
+      | Task 10 | com.cytomine.dummy.identity.integer.collection | 0.1.0        |
 
 
   Scenario Outline: successful fetch of a task's inputs using id
@@ -160,10 +157,9 @@ Feature: [URS00002-TASK] Read task information
       | Task 5  | com.cytomine.dummy.identity.string             | 1.0.0        |
       | Task 6  | com.cytomine.dummy.identity.geometry           | 1.0.0        |
       | Task 7  | com.cytomine.dummy.identity.image              | 1.0.0        |
-      | Task 8  | com.cytomine.dummy.identity.wsi                | 1.0.0        |
-      | Task 9  | com.cytomine.dummy.identity.file               | 1.0.0        |
-      | Task 10 | com.cytomine.dummy.identity.datetime           | 1.0.0        |
-      | Task 11 | com.cytomine.dummy.identity.integer.collection | 0.1.0        |
+      | Task 8  | com.cytomine.dummy.identity.file               | 1.0.0        |
+      | Task 9  | com.cytomine.dummy.identity.datetime           | 1.0.0        |
+      | Task 10 | com.cytomine.dummy.identity.integer.collection | 0.1.0        |
 
 
   Scenario Outline: successful fetch of a task's outputs with id

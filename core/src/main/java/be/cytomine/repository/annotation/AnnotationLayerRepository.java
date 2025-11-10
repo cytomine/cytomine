@@ -1,9 +1,13 @@
 package be.cytomine.repository.annotation;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import be.cytomine.domain.annotation.AnnotationLayer;
 
 @Repository
-public interface AnnotationLayerRepository extends JpaRepository<AnnotationLayer, Long> {}
+public interface AnnotationLayerRepository extends JpaRepository<AnnotationLayer, Long> {
+    Optional<AnnotationLayer> findByName(String name);
+}

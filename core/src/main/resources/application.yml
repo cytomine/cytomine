@@ -22,20 +22,20 @@ spring:
           keycloak:
             client-id: core
             authorization-grant-type: authorization_code
-            redirect-uri: ${INTERNAL_PROXY_URL:http://nginx}/iam/realms/cytomine
+            redirect-uri: ${IAM_URL}/iam/realms/cytomine
             scope:
               - openid
         provider:
           keycloak:
             user-name-attribute: preferred_username
-            authorization-uri: ${INTERNAL_PROXY_URL:http://nginx}/iam/realms/cytomine/protocol/openid-connect/auth
-            token-uri: ${INTERNAL_PROXY_URL:http://nginx}/iam/realms/cytomine/protocol/openid-connect/token
-            jwk-set-uri: ${INTERNAL_PROXY_URL:http://nginx}/iam/realms/cytomine/.well-known/openid-configuration
+            authorization-uri: ${IAM_URL}/iam/realms/cytomine/protocol/openid-connect/auth
+            token-uri: ${IAM_URL}/iam/realms/cytomine/protocol/openid-connect/token
+            jwk-set-uri: ${IAM_URL}/iam/realms/cytomine/.well-known/openid-configuration
       resourceserver:
         jwt:
           issuer-uri: ${SERVER_URL:http://127.0.0.1}/iam/realms/cytomine
           jws-algorithms: RS256
-          jwk-set-uri: ${INTERNAL_PROXY_URL:http://nginx}/iam/realms/cytomine/protocol/openid-connect/certs
+          jwk-set-uri: ${IAM_URL}/iam/realms/cytomine/protocol/openid-connect/certs
 
 
   datasource:
@@ -125,6 +125,10 @@ application:
       token-validity-in-seconds-for-short-term: ${TOKEN_VALIDITY_IN_SECONDS_SHORT_TERM:300}
 
   internalProxyURL: ${INTERNAL_PROXY_URL:http://localhost}
+
+  pimsURL: ${PIMS_URL}
+
+  samUrl: ${SAM_URL}
 
   annotation:
     maxNumberOfPoint: ${ANNOTATION_MAX_POINTS:200}

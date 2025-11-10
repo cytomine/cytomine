@@ -53,7 +53,6 @@ describe('AppEngineField.vue', () => {
         IntegerField: true,
         NumberField: true,
         StringField: true,
-        WsiField: true,
       },
     });
   });

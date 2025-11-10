@@ -60,7 +60,7 @@ spec:
       - name: create-client
         image: "{{ .Values.images.iam }}"
         command: ["/bin/sh", "-c"]
-        args: ["/opt/keycloak/bin/kcadm.sh create clients -r cytomine --server http://iam.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.iam.port }}/iam --config /opt/keycloak-auth/kcadm.config -f /opt/keycloak-conf/config.json -o || true && /opt/keycloak/bin/kcadm.sh get clients -r cytomine --server https://{{ .Values.global.domainName }}/iam --config /opt/keycloak-auth/kcadm.config -q clientId=core --fields=id | tr -d '\n][{} \"' | cut -f2 -d':' > /opt/keycloak-auth/client-core-id && cat /opt/keycloak-auth/client-core-id"]
+        args: ["/opt/keycloak/bin/kcadm.sh create clients -r cytomine --server http://iam.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.iam.port }}/iam --config /opt/keycloak-auth/kcadm.config -f /opt/keycloak-conf/config.json -o || true && /opt/keycloak/bin/kcadm.sh get clients -r cytomine --server http://iam.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.iam.port }}/iam --config /opt/keycloak-auth/kcadm.config -q clientId=core --fields=id | tr -d '\n][{} \"' | cut -f2 -d':' > /opt/keycloak-auth/client-core-id && cat /opt/keycloak-auth/client-core-id"]
         volumeMounts:
         - name: kc-auth
           mountPath: "/opt/keycloak-auth"

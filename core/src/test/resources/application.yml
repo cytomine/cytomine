@@ -91,9 +91,7 @@ application:
   instanceHostPhoneNumber: 0999999999
   defaultLanguage: ENGLISH
   pimsURL: http://localhost:8888
-
-  samUrl: http://localhost:8888
-
+  samURL: http://localhost:8888
   cbirURL: http://localhost:8888
 
   appEngine:

@@ -125,9 +125,7 @@ application:
       token-validity-in-seconds-for-short-term: ${TOKEN_VALIDITY_IN_SECONDS_SHORT_TERM:300}
 
   pimsURL: ${PIMS_URL}
-
-  samUrl: ${SAM_URL}
-
+  samURL: ${SAM_URL}
   cbirURL: ${CBIR_URL}
 
   annotation:

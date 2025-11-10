@@ -44,7 +44,7 @@ public class RetrievalService {
 
     private final RestTemplate restTemplate;
 
-    @Value("${application.cbirUrl}")
+    @Value("${application.cbirURL}")
     private String cbirUrl;
 
     public String getInternalCbirURL() {

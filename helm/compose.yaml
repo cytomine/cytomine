@@ -23,8 +23,10 @@ services:
       - ../k3s/registries.yaml:/etc/rancher/k3s/registries.yaml:ro
       - ../k3s/serviceaccounts.yaml:/var/lib/rancher/k3s/server/manifests/serviceaccounts.yaml:ro
       - ../k3s/nginx-ingress.yaml:/var/lib/rancher/k3s/server/manifests/nginx-ingress.yaml:ro
+      - ../k3s/cytomine-local-ns.yaml:/var/lib/rancher/k3s/server/manifests/cytomine-local-ns.yaml:ro
       # This is just so that we get the kubeconfig file out
       - ../.kube/shared:/output/
+      - ../data/dataset:/data/dataset
     ports:
       - 6443:6443
     networks:

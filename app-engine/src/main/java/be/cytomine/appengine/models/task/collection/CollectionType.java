@@ -397,8 +397,10 @@ public class CollectionType extends Type {
             List<?> list = (List<?>) obj;
             assert trackingType instanceof CollectionType;
             CollectionType currentType = (CollectionType) trackingType;
-            if (list.size() < currentType.getMinSize() || list.size() > currentType.getMaxSize()) {
-                throw new TypeValidationException(ErrorCode.INTERNAL_INVALID_COLLECTION_DIMENSIONS);
+            if (Objects.nonNull(currentType.getMinSize()) && Objects.nonNull(currentType.getMaxSize())) {
+                if (list.size() < currentType.getMinSize() || list.size() > currentType.getMaxSize()) {
+                    throw new TypeValidationException(ErrorCode.INTERNAL_INVALID_COLLECTION_DIMENSIONS);
+                }
             }
             for (Object o : list) {
                 validateNode(o);

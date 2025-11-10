@@ -90,7 +90,9 @@ application:
   instanceHostSupportMail: instanceHostSupportMail@email.com
   instanceHostPhoneNumber: 0999999999
   defaultLanguage: ENGLISH
+  pimsURL: http://localhost:8888
 
+  samUrl: http://localhost:8888
   appEngine:
     enabled: ${APPENGINE_ENABLED:true}
     apiBasePath: ${APPENGINE_API_BASE_PATH:/appengine/v1/}

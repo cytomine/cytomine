@@ -93,6 +93,9 @@ application:
   pimsURL: http://localhost:8888
 
   samUrl: http://localhost:8888
+
+  cbirURL: http://localhost:8888
+
   appEngine:
     enabled: ${APPENGINE_ENABLED:true}
     apiBasePath: ${APPENGINE_API_BASE_PATH:/appengine/v1/}
@@ -107,7 +110,6 @@ application:
       token-validity-in-seconds-for-remember-me: ${TOKEN_VALIDITY_IN_SECONDS_REMEMBER_ME:2592000}
       token-validity-in-seconds-for-short-term: ${TOKEN_VALIDITY_IN_SECONDS_SHORT_TERM:300}
 
-  internalProxyURL: http://localhost:8888
   annotation:
     maxNumberOfPoint: 200
 

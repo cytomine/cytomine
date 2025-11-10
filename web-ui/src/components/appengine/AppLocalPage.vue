@@ -6,28 +6,24 @@
       {{ $t('failed-fetch-tasks') }}
     </b-message>
 
-    <div v-else class="panel">
-      <p class="panel-heading">
-        {{ $t('app-engine.tasks.installed') }}
-        <UploadAppButton btnFunc="upload" @taskUploadSuccess="handleTaskUpload" />
-      </p>
-      <section class="panel-block lower-section-flex">
-        <AppCard v-for="app in applications" :key="app.id" :app="app" />
-      </section>
+    <div v-else>
+      <AppUploadPanel @task-upload:success="handleTaskUploaded" />
+
+      <AppListPanel :applications="applications" />
     </div>
   </div>
 </template>
 
 <script>
-import AppCard from '@/components/appengine/AppCard.vue';
-import UploadAppButton from '@/components/appengine/UploadAppButton.vue';
+import AppListPanel from '@/components/appengine/panels/AppListPanel.vue';
+import AppUploadPanel from '@/components/appengine/panels/AppUploadPanel.vue';
 import Task from '@/utils/appengine/task';
 
 export default {
   name: 'AppLocalPage',
   components: {
-    AppCard,
-    UploadAppButton,
+    AppListPanel,
+    AppUploadPanel,
   },
   data() {
     return {
@@ -46,39 +42,9 @@ export default {
     }
   },
   methods: {
-    async handleTaskUpload() {
-      try {
-        this.applications = await Task.fetchAll();
-      } catch (error) {
-        console.error('Error fetching tasks after upload:', error);
-        this.error = error.message;
-      }
+    handleTaskUploaded(task) {
+      this.applications.push(task);
     },
-  },
+  }
 };
 </script>
-
-<style scoped>
-.lower-section-flex {
-  display: flex;
-  flex-direction: row;
-  gap: 1%;
-  flex-wrap: wrap;
-  flex-basis: 30%;
-}
-
-.lower-section-flex>* {
-  flex-basis: 20%;
-  margin: 1em;
-}
-
-.panel-block {
-  padding-top: 0.8em;
-}
-
-.panel-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-</style>

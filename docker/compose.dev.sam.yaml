@@ -7,7 +7,7 @@ services:
       target: dev-server
     ports:
       - "${DEV_SAM_PORT:-8000}:8000"
-    command: ["/bin/bash"]
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     stdin_open: true
     tty: true
     volumes:

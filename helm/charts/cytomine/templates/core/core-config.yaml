@@ -160,7 +160,7 @@ kind: ConfigMap
 metadata:
   name: core-env
 data:
-  ADMIN_EMAIL: info@cytomine.coop
+  ADMIN_EMAIL: admin@cytomine.org
   INSTANCE_HOST_PHONE_NUMBER: None
   INSTANCE_HOST_SUPPORT_MAIL: None
   REVERSE_PROXY_URL: "{{ include "core.url" . }}"
@@ -169,11 +169,11 @@ data:
   JAVAMELODY_PATH: /javamelody-core
   JAVAMELODY_USER: admin
   MONGO_DB_NAME: {{ include "cytomine.name" . }}
-  MONGO_HOST: mongodb
+  MONGO_HOST: mongodb.{{ .Release.Namespace }}.svc.cluster.local
   MONGO_PORT: "{{ .Values.mongodb.port }}"
   MONGO_USER: {{ .Values.mongodb.username }}
   POSTGIS_DB_NAME: {{ .Values.postgresql.user }}
-  POSTGIS_HOST: postgis-0.postgis.{{ .Release.Namespace }}.svc.cluster.local
+  POSTGIS_HOST: postgis.{{ .Release.Namespace }}.svc.cluster.local
   POSTGIS_PORT: "{{ .Values.postgresql.port }}"
   POSTGIS_USER: {{ .Values.postgresql.user }}
   SMTP_HOST: {{ .Values.smtpHost }}
@@ -182,6 +182,9 @@ data:
   STORAGE_PATH: /data/images
   URL_CORE: core.{{ .Release.Namespace }}.svc.cluster.local
   INTERNAL_PROXY_URL: "{{ include "core.url" . }}"
+  IAM_URL: http://iam.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.iam.port }}
+  PIMS_URL: http://pims.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.pims.port }}
+  SAM_URL: http://sam.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.sam.port }}
   SERVER_URL: "{{ include "core.url" . }}"
   APPENGINE_ENABLED: "true"
   APPENGINE_API_URL: http://app-engine.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.app_engine.port }}

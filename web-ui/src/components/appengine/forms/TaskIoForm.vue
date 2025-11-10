@@ -19,9 +19,11 @@
 </template>
 
 <script>
-import Task from '@/utils/appengine/task';
-import AppEngineField from '@/components/appengine/forms/fields/AppEngineField';
 import Vue from 'vue';
+
+import AppEngineField from '@/components/appengine/forms/fields/AppEngineField';
+import Task from '@/utils/appengine/task';
+import {hasBinaryType} from '@/utils/app';
 
 export default {
   name: 'task-io-form',
@@ -75,7 +77,7 @@ export default {
         );
 
         if (this.hasBinaryData) {
-          let promises = this.getInputProvisions().map(async (provision) => {
+          for (const provision of this.getInputProvisions()) {
             let body = provision;
             if (provision.type === 'file') {
               body = new FormData();
@@ -88,9 +90,7 @@ export default {
               provision.param_name,
               body,
             );
-          });
-
-          await Promise.all(promises);
+          }
         } else {
           await Task.batchProvisionTask(this.projectId, taskRun.id, this.getInputProvisions());
         }
@@ -139,7 +139,7 @@ export default {
 
       for (let input of this.taskInputs) {
         setDefaultValue(input);
-        if (['file', 'image', 'wsi'].includes(input.type.id)) {
+        if (hasBinaryType(input)) {
           this.hasBinaryData = true;
         }
       }

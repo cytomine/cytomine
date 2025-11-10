@@ -14,7 +14,6 @@ import be.cytomine.appengine.dto.inputs.task.types.image.ImageTypeConstraint;
 import be.cytomine.appengine.dto.inputs.task.types.integer.IntegerTypeConstraint;
 import be.cytomine.appengine.dto.inputs.task.types.number.NumberTypeConstraint;
 import be.cytomine.appengine.dto.inputs.task.types.string.StringTypeConstraint;
-import be.cytomine.appengine.dto.inputs.task.types.wsi.WsiTypeConstraint;
 import be.cytomine.appengine.models.task.bool.BooleanType;
 import be.cytomine.appengine.models.task.collection.CollectionType;
 import be.cytomine.appengine.models.task.datetime.DateTimeType;
@@ -25,7 +24,6 @@ import be.cytomine.appengine.models.task.image.ImageType;
 import be.cytomine.appengine.models.task.integer.IntegerType;
 import be.cytomine.appengine.models.task.number.NumberType;
 import be.cytomine.appengine.models.task.string.StringType;
-import be.cytomine.appengine.models.task.wsi.WsiType;
 
 public class TypeFactory {
 
@@ -51,7 +49,6 @@ public class TypeFactory {
             case "datetime" -> createDateTimeType(typeNode, typeId, charset);
             case "geometry" -> createGeometryType(typeId, charset);
             case "image" -> createImageType(typeNode, typeId, charset);
-            case "wsi" -> createWsiType(typeNode, typeId, charset);
             case "file" -> createFileType(typeNode, typeId, charset);
             case "array" -> createCollectionType(typeNode, typeId, charset);
             default -> new Type();
@@ -210,21 +207,6 @@ public class TypeFactory {
             .filter(typeNode::has)
             .forEach(key -> {
                 type.setConstraint(ImageTypeConstraint.getConstraint(key), typeNode.get(key));
-            });
-
-        return type;
-    }
-
-    @NotNull
-    private static WsiType createWsiType(JsonNode typeNode, String typeId, String charset) {
-        WsiType type = new WsiType();
-        type.setId(typeId);
-        type.setCharset(charset);
-        Arrays.stream(WsiTypeConstraint.values())
-            .map(WsiTypeConstraint::getStringKey)
-            .filter(typeNode::has)
-            .forEach(key -> {
-                type.setConstraint(WsiTypeConstraint.getConstraint(key), typeNode.get(key));
             });
 
         return type;

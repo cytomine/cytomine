@@ -1,10 +1,9 @@
-import os, io
+import os
+import io
 import pytest
 from datetime import datetime
 from PIL import Image
-from fastapi import APIRouter
 import urllib.request
-from pims.formats import FORMATS
 from pims.importer.importer import FileImporter
 from pims.files.file import (ORIGINAL_STEM, Path, SPATIAL_STEM, HISTOGRAM_STEM)
 from pims.api.utils.models import HistogramType
@@ -104,7 +103,7 @@ def test_wsidicom_exists(image_path_wsidicom):
 	# Test if the file exists, either locally either with the OAC
 	path, filename = image_path_wsidicom
 	get_image(path, filename)
-	assert os.path.exists(os.path.join(path,filename)) == True
+	assert os.path.exists(os.path.join(path,filename))
 
 def test_wsidicom_info(client, image_path_wsidicom):
     path, filename = image_path_wsidicom

@@ -83,7 +83,6 @@ postgresql:
   port: 5432
   user: docker
   database: docker
-  password: eLh32rq69rGqoETtIW1yuSl3gA18uR39i0hMZ4C8zoE=
   resources:
     requests:
       memory: "512Mi"
@@ -102,7 +101,6 @@ mongodb:
   port: 27017
   statusPort: 28017
   username: mongoadmin
-  password: password123
   database: cytomine
   resources:
     requests:
@@ -138,18 +136,7 @@ redis:
 core:
   deploy: true
   port: 8080
-  admin_password: OA9M4A382GFDNAKLmu5a/I1L0yQsXe/pmmxMelm2jwQ=
-  admin_private_key: ba04b7c3-2188-45c4-ac2e-8a0bfd98afee
-  admin_public_key: 1bc0d049-fbfe-4c7d-a320-4e034a5feb90
-  jwt_secret: OLSE'XpvGZckJEH;nYh4Gg9rv_HY'9RAKvy7aPzxFoVNCem8QZQsGyKdqZTrYq9U1wO+bEc;F8nnRE3J4tDUK85ts^1Uc8BOzY8Q2K.v_W'RL;8fedA;VVDIZri0OjKu__tcjdM+Pa3+^^C6hcNrtRF5N^gW~w0WoWn;iNfzyGuhwu4ETMOEjpCXVMStofMQyBQrXSd1LgDtL_RC3bFK3+dJ9x_ie8J5r5oVaEpo2TOer27l85'+FCp056Ah3NNn
-  super_admin_private_key: 1d27e61f-a86c-4239-ad28-9398c79e1225
-  super_admin_public_key: 653e466e-435f-4ff5-a501-90adeeff8c5c
-  image_server_private_key: db087410-c2bd-4fa9-8aca-a9ad98226657
-  image_server_public_key: ca9020d0-76fe-4f05-8371-6cbe885c2b29
-  javamelody_password: iAWYk+Nc48XZToZ/z91R1hzhtoTgqJgxnq8mDa+I6Uo=
-  smtp_password: password
   server_id: 69308206-ed7c-454b-90b3-5639377ccd2f
-  postgis_password: eLh32rq69rGqoETtIW1yuSl3gA18uR39i0hMZ4C8zoE=
   resources:
     requests:
       memory: "2Gi"
@@ -164,8 +151,6 @@ core:
 pims:
   deploy: true
   port: 5000
-  public_key: ca9020d0-76fe-4f05-8371-6cbe885c2b29
-  private_key: db087410-c2bd-4fa9-8aca-a9ad98226657
   resources:
     requests:
       memory: "4Gi"

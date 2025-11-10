@@ -4,6 +4,7 @@ import be.cytomine.service.appengine.TaskRunService;
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -14,6 +15,7 @@ import java.io.*;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @ConditionalOnExpression("${application.appEngine.enabled: false}")
 @RequiredArgsConstructor
 @RequestMapping("/api/app-engine")
@@ -132,6 +134,7 @@ public class TaskRunController {
         @PathVariable Long project,
         @PathVariable UUID task
     ) {
+        log.info("GET /project/{}/task-runs/{}/outputs", project, task);
         return taskRunService.getOutputs(project, task);
     }
 

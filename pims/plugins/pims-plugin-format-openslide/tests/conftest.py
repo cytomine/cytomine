@@ -13,9 +13,7 @@
 #  * limitations under the License.
 
 import os
-import shutil
 from contextlib import contextmanager
-from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -70,7 +68,7 @@ def not_raises(expected_exc):
     try:
         yield
 
-    except expected_exc as err:
+    except expected_exc:
         raise AssertionError(
             "Did raise exception {0} when it should not!".format(
                 repr(expected_exc)

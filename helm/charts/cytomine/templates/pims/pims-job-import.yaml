@@ -19,7 +19,7 @@ spec:
             image: postgres:14
             imagePullPolicy: IfNotPresent
             command: ["/bin/sh", "-c"]
-            args: ["psql --no-align --quiet --tuples-only -U $(POSTGIS_USER) -h $(POSTGIS_HOST) -o /data/private_key -c \"SELECT private_key from sec_user where username = 'admin'\""]
+            args: ["psql --no-align --quiet --tuples-only -U $(POSTGIS_USER) -h $(POSTGIS_HOST) -o /data/private_key -c \"SELECT private_key from sec_user where username = 'admin'\" && cat /data/private_key"]
             env:
             - name: PGPASSWORD
               valueFrom:
@@ -27,7 +27,7 @@ spec:
                     name: postgres-core-secret
                     key: password
             - name: POSTGIS_HOST
-              value: postgis-0.postgis.{{ .Release.Namespace }}.svc.cluster.local
+              value: postgis.{{ .Release.Namespace }}.svc.cluster.local
             - name: POSTGIS_PORT
               value: "5432"
             - name: POSTGIS_USER
@@ -39,7 +39,7 @@ spec:
             image: postgres:14
             imagePullPolicy: IfNotPresent
             command: ["/bin/sh", "-c"]
-            args: ["psql --no-align --quiet --tuples-only -U $(POSTGIS_USER) -h $(POSTGIS_HOST) -o /data/public_key -c \"SELECT public_key from sec_user where username = 'admin'\""]
+            args: ["psql --no-align --quiet --tuples-only -U $(POSTGIS_USER) -h $(POSTGIS_HOST) -o /data/public_key -c \"SELECT public_key from sec_user where username = 'admin'\" && cat /data/public_key"]
             env:
             - name: PGPASSWORD
               valueFrom:
@@ -47,7 +47,7 @@ spec:
                     name: postgres-core-secret
                     key: password
             - name: POSTGIS_HOST
-              value: postgis-0.postgis.{{ .Release.Namespace }}.svc.cluster.local
+              value: postgis.{{ .Release.Namespace }}.svc.cluster.local
             - name: POSTGIS_PORT
               value: "5432"
             - name: POSTGIS_USER

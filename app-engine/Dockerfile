@@ -2,9 +2,9 @@
 ARG APP_ENGINE_VERSION
 ARG APP_ENGINE_REVISION
 ARG ENTRYPOINT_SCRIPTS_VERSION=1.4.0
+ARG JAVA_VERSION=17-jre
 ARG GRADLE_VERSION=7.6.4-jdk17-alpine
 ARG GRADLE_DEV_VERSION=7.6.4-jdk17-jammy
-ARG OPENJDK_VERSION=17-slim-bullseye
 ARG PROXY_CACHE=registry.cytomine.org/docker
 
 #######################################################################################
@@ -74,22 +74,23 @@ ENTRYPOINT ["cytomine-entrypoint.sh"]
 
 #######################################################################################
 ## Stage: Cytomine core image
-FROM ${PROXY_CACHE}/openjdk:${OPENJDK_VERSION} AS production
+FROM ${PROXY_CACHE}/eclipse-temurin:${JAVA_VERSION} AS production
 
 ARG APP_ENGINE_VERSION
 ARG APP_ENGINE_REVISION
 ARG ENTRYPOINT_SCRIPTS_VERSION
+ARG JAVA_VERSION
 ARG GRADLE_VERSION
-ARG OPENJDK_VERSION
 
-LABEL org.opencontainers.image.authors="dev@cytomine.com" \
+LABEL org.opencontainers.image.authors="uliege@cytomine.org" \
       org.opencontainers.image.url="https://uliege.cytomine.org/" \
       org.opencontainers.image.documentation="https://doc.cytomine.com/" \
-      org.opencontainers.image.source="https://github.com/cytomine/Cytomine-app-engine" \
+      org.opencontainers.image.source="https://github.com/cytomine/cytomine/tree/main/app-engine" \
       org.opencontainers.image.vendor="Cytomine ULiege" \
       org.opencontainers.image.version="${APP_ENGINE_VERSION}" \
       org.opencontainers.image.revision="${APP_ENGINE_REVISION}" \
-      org.opencontainers.image.deps.openjdk.version="${OPENJDK_VERSION}" \
+      org.opencontainers.image.deps.java.distribution="eclipse-temurin" \
+      org.opencontainers.image.deps.java.version="${JAVA_VERSION}" \
       org.opencontainers.image.deps.gradle.version="${GRADLE_VERSION}" \
       org.opencontainers.image.deps.entrypoint.scripts.version="${ENTRYPOINT_SCRIPTS_VERSION}"
 

@@ -5,8 +5,6 @@ metadata:
   name: core
   annotations:
     cert-manager.io/issuer: letsencrypt
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      chunked_transfer_encoding off;
     nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
     nginx.ingress.kubernetes.io/cors-allow-headers: DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,dateFull,content-type-full,content-MD5
     nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, DELETE, OPTIONS"
@@ -18,15 +16,10 @@ metadata:
     nginx.ingress.kubernetes.io/use-regex: "true"
 
     # https://stackoverflow.com/a/73548785
-    # It seems that we are using k8s official nginx image.
-    # not sure, though
     nginx.org/client-max-body-size: "0"
-
     nginx.org/proxy-connect-timeout: 3600s
     nginx.org/proxy-read-timeout: 3600s
     nginx.org/proxy-send-timeout: 3600s
-    nginx.org/server-snippets: |
-      chunked_transfer_encoding off;
 spec:
   ingressClassName: public
   rules:
@@ -68,7 +61,28 @@ spec:
                 name: sam
                 port:
                   number: {{ .Values.sam.port }}
-          - path: /ims/(formats|image/upload|import|upload)
+          - path: /ims/formats
+            pathType: Prefix
+            backend:
+              service:
+                name: pims
+                port:
+                  number: {{ .Values.pims.port }}
+          - path: /ims/image/upload
+            pathType: Prefix
+            backend:
+              service:
+                name: pims
+                port:
+                  number: {{ .Values.pims.port }}
+          - path: /ims/import
+            pathType: Prefix
+            backend:
+              service:
+                name: pims
+                port:
+                  number: {{ .Values.pims.port }}
+          - path: /ims/upload
             pathType: Prefix
             backend:
               service:

@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Set up NodeJS
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ vars.NODE_VERSION }}
 
@@ -44,7 +44,7 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Set up NodeJS
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ vars.NODE_VERSION }}
 
@@ -56,16 +56,16 @@ jobs:
 
       - name: Upload test coverage
         if: ${{ always() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: coverage
-          path: ./ui/coverage
+          path: ./web-ui/coverage
           retention-days: 7
 
       - name: Upload test report
         if: ${{ always() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: test-report.html
-          path: ./ui/reports/test-report.html
+          path: ./web-ui/reports/test-report.html
           retention-days: 7

@@ -29,7 +29,7 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Set up Node.js
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ vars.NODE_VERSION }}
 
@@ -40,7 +40,7 @@ jobs:
         run: npm run build
 
       - name: Upload Docs Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: docs-artifacts
           path: docs/src/.vuepress/dist/**
@@ -56,10 +56,31 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Download Docs Artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: docs-artifacts
           path: docs-artifacts
+
+      - name: Get target path
+        id: deploy_target
+        run: |
+          if [ "${{ github.event_name }}" = "push" ] && [ "${{ github.ref_name }}" = "main" ]; then
+            echo "target=${{ secrets.DOCS_TARGET_PROD_PATH }}" >> $GITHUB_OUTPUT
+          else
+            echo "target=${{ secrets.DOCS_TARGET_PATH }}/pr-${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create target directory on remote
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DOCS_REMOTE_HOST }}
+          username: ${{ secrets.DOCS_REMOTE_USER }}
+          password: ${{ secrets.DOCS_REMOTE_PASSWORD }}
+          proxy_host: ${{ secrets.DOCS_REMOTE_PROXY }}
+          proxy_username: ${{ secrets.DOCS_REMOTE_USER }}
+          proxy_password: ${{ secrets.DOCS_REMOTE_PASSWORD }}
+          script: |
+            mkdir -p ${{ steps.deploy_target.outputs.target }}
 
       - name: SSH deploy
         uses: appleboy/scp-action@v1
@@ -72,5 +93,13 @@ jobs:
           proxy_password: ${{ secrets.DOCS_REMOTE_PASSWORD }}
           source: "docs-artifacts/*"
           strip_components: 1
-          target: ${{ github.ref_name == 'main' && secrets.DOCS_TARGET_PROD_PATH || secrets.DOCS_TARGET_NEXT_PATH }}
+          target: ${{ steps.deploy_target.outputs.target }}
           overwrite: true
+
+      - name: Add preview link
+        if: github.event_name == 'pull_request'
+        uses: peter-evans/create-or-update-comment@v5
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            The preview link is available at http://pr-${{ github.event.pull_request.number }}.doc.uliege.cytomine.org

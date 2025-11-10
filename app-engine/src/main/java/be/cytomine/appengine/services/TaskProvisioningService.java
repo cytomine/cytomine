@@ -34,6 +34,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -88,14 +89,12 @@ import be.cytomine.appengine.models.task.collection.CollectionType;
 import be.cytomine.appengine.models.task.collection.ReferencePersistence;
 import be.cytomine.appengine.models.task.file.FileType;
 import be.cytomine.appengine.models.task.image.ImageType;
-import be.cytomine.appengine.models.task.wsi.WsiType;
 import be.cytomine.appengine.repositories.ChecksumRepository;
 import be.cytomine.appengine.repositories.RunRepository;
 import be.cytomine.appengine.repositories.TypePersistenceRepository;
 import be.cytomine.appengine.repositories.collection.CollectionPersistenceRepository;
 import be.cytomine.appengine.states.TaskRunState;
 import be.cytomine.appengine.utils.FileHelper;
-
 
 @Slf4j
 @RequiredArgsConstructor
@@ -120,6 +119,7 @@ public class TaskProvisioningService {
     @Value("${storage.base-path}")
     private String basePath;
 
+    @Transactional
     public JsonNode provisionRunParameter(
         String runId,
         String name,
@@ -1139,9 +1139,6 @@ public class TaskProvisioningService {
             }
             if (parameter.getType() instanceof ImageType imageType) {
                 // todo: handle image refs
-            }
-            if (parameter.getType() instanceof WsiType wsiType) {
-                // todo: handle wsi image refs
             }
         }
 

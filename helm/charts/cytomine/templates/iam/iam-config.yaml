@@ -14,7 +14,7 @@ data:
   KC_FEATURES: token-exchange
   KC_DB_USERNAME: iam
   KC_DB_URL_DATABASE: iam
-  KC_DB_URL_HOST: postgres-iam-0.postgres-iam.{{ .Release.Namespace }}.svc.cluster.local
+  KC_DB_URL_HOST: postgres-iam.{{ .Release.Namespace }}.svc.cluster.local
   KC_DB_URL_PORT: "5432"
   KC_HOSTNAME: "{{ .Values.global.domainName }}"
   # KC_HOSTNAME_ADMIN: aaa_config.CYTOMINE_HOST
@@ -29,7 +29,62 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: iam-config-json
+  name: iam-client-config
 data:
   config.json: |-
-    {{ (tpl (.Files.Get "configs/iam/config.json.sample") . ) | nindent 4 }}
+    {
+      "clientId" : "core",
+      "name" : "Cytomine Core",
+      "description" : "This is the default client for cytomine.",
+      "rootUrl" : "https://{{ .Values.global.domainName }}",
+      "adminUrl" : "https://{{ .Values.global.domainName }}",
+      "baseUrl" : "https://{{ .Values.global.domainName }}",
+      "surrogateAuthRequired" : false,
+      "enabled" : true,
+      "alwaysDisplayInConsole" : false,
+      "clientAuthenticatorType" : "client-secret",
+      "defaultRoles" : [ "USER" ],
+      "redirectUris" : [ "https://{{ .Values.global.domainName }}/*" ],
+      "webOrigins" : [ "*" ],
+      "notBefore" : 0,
+      "bearerOnly" : false,
+      "consentRequired" : false,
+      "standardFlowEnabled" : true,
+      "implicitFlowEnabled" : false,
+      "directAccessGrantsEnabled" : true,
+      "serviceAccountsEnabled" : false,
+      "publicClient" : true,
+      "frontchannelLogout" : true,
+      "protocol" : "openid-connect",
+      "attributes" : {
+        "realm_client" : "false",
+        "oidc.ciba.grant.enabled" : "false",
+        "backchannel.logout.session.required" : "true",
+        "login_theme" : "keycloak",
+        "post.logout.redirect.uris" : "https://{{ .Values.global.domainName }}/*",
+        "display.on.consent.screen" : "false",
+        "oauth2.device.authorization.grant.enabled" : "false",
+        "backchannel.logout.revoke.offline.tokens" : "false"
+      },
+      "authenticationFlowBindingOverrides" : { },
+      "fullScopeAllowed" : true,
+      "nodeReRegistrationTimeout" : -1,
+      "defaultClientScopes" : [ "web-origins", "acr", "roles", "profile", "basic", "email" ],
+      "optionalClientScopes" : [ "address", "phone", "offline_access", "microprofile-jwt" ]
+    }
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: iam-user-config
+data:
+  config.json: |-
+    {
+      "username": "admin",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "admin@cytomine.org",
+      "firstName": "Admin",
+      "lastName": "Admin"
+    }

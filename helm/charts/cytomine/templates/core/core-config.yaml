@@ -160,7 +160,7 @@ kind: ConfigMap
 metadata:
   name: core-env
 data:
-  ADMIN_EMAIL: info@cytomine.coop
+  ADMIN_EMAIL: admin@cytomine.org
   INSTANCE_HOST_PHONE_NUMBER: None
   INSTANCE_HOST_SUPPORT_MAIL: None
   REVERSE_PROXY_URL: "{{ include "core.url" . }}"
@@ -169,11 +169,11 @@ data:
   JAVAMELODY_PATH: /javamelody-core
   JAVAMELODY_USER: admin
   MONGO_DB_NAME: {{ include "cytomine.name" . }}
-  MONGO_HOST: mongodb
+  MONGO_HOST: mongodb.{{ .Release.Namespace }}.svc.cluster.local
   MONGO_PORT: "{{ .Values.mongodb.port }}"
   MONGO_USER: {{ .Values.mongodb.username }}
   POSTGIS_DB_NAME: {{ .Values.postgresql.user }}
-  POSTGIS_HOST: postgis-0.postgis.{{ .Release.Namespace }}.svc.cluster.local
+  POSTGIS_HOST: postgis.{{ .Release.Namespace }}.svc.cluster.local
   POSTGIS_PORT: "{{ .Values.postgresql.port }}"
   POSTGIS_USER: {{ .Values.postgresql.user }}
   SMTP_HOST: {{ .Values.smtpHost }}
@@ -182,29 +182,11 @@ data:
   STORAGE_PATH: /data/images
   URL_CORE: core.{{ .Release.Namespace }}.svc.cluster.local
   INTERNAL_PROXY_URL: "{{ include "core.url" . }}"
+  IAM_URL: http://iam.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.iam.port }}
+  PIMS_URL: http://pims.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.pims.port }}
+  SAM_URL: http://sam.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.sam.port }}
   SERVER_URL: "{{ include "core.url" . }}"
   APPENGINE_ENABLED: "true"
   APPENGINE_API_URL: http://app-engine.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.app_engine.port }}
   APPENGINE_API_BASE_PATH: /app-engine/v1/
-{{ end }}
----
-{{ if .Values.core.deploy }}
-apiVersion: v1
-kind: Secret
-metadata:
-  name: core-secret
-type: Opaque
-stringData:
-  ADMIN_PASSWORD: {{ .Values.core.admin_password }}
-  ADMIN_PRIVATE_KEY: {{ .Values.core.admin_private_key }}
-  ADMIN_PUBLIC_KEY: {{ .Values.core.admin_public_key }}
-  JWT_SECRET: {{ .Values.core.jwt_secret }}
-  SUPER_ADMIN_PRIVATE_KEY: {{ .Values.core.super_admin_private_key }}
-  SUPER_ADMIN_PUBLIC_KEY: {{ .Values.core.super_admin_public_key }}
-  IMAGE_SERVER_PRIVATE_KEY: {{ .Values.core.image_server_private_key }}
-  IMAGE_SERVER_PUBLIC_KEY: {{ .Values.core.image_server_public_key }}
-  SMTP_PASSWORD: {{ .Values.core.smtp_password }}
-  JAVAMELODY_PASS: {{ .Values.core.javamelody_password }}
-  POSTGIS_PASS:  {{ .Values.core.postgis_password }}
-  MONGO_PASS: {{ .Values.mongodb.password }}
 {{ end }}

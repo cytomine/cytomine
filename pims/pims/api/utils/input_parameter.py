@@ -63,13 +63,13 @@ def parse_region(
         check_level_validity(in_image.pyramid, tier_idx)
         ref_tier = in_image.pyramid.get_tier_at_level(tier_idx)
 
-    if type(top) == float:
+    if isinstance(top, float):
         top *= ref_tier.height
-    if type(left) == float:
+    if isinstance(left, float):
         left *= ref_tier.width
-    if type(width) == float:
+    if isinstance(width, float):
         width *= ref_tier.width
-    if type(height) == float:
+    if isinstance(height, float):
         height *= ref_tier.height
 
     downsample = (ref_tier.width_factor, ref_tier.height_factor)

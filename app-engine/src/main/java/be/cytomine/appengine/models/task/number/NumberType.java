@@ -117,10 +117,11 @@ public class NumberType extends Type {
         if (valueObject == null) {
             return;
         }
-
         Double value = null;
         if (valueObject instanceof Double) {
             value = (Double) valueObject;
+        } else if (valueObject instanceof Integer) {
+            value = ((Integer) valueObject).doubleValue();
         } else if (valueObject instanceof String) {
             value = parseDouble((String) valueObject);
         } else {

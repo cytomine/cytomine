@@ -1,4 +1,6 @@
 import io
+from typing import Annotated
+
 import numpy as np
 from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import JSONResponse
@@ -13,10 +15,10 @@ router = APIRouter(prefix="/annotations")
 @router.post("/refine")
 async def refine(
     request: Request,
-    annotation_crop: UploadFile = File(...),
-    image_height: int = Form(..., gt=0),
-    image_width: int = Form(..., gt=0),
-    location: str = Form(...),
+    annotation_crop: Annotated[UploadFile, File(...)],
+    image_height: Annotated[int, Form(..., gt=0)],
+    image_width: Annotated[int, Form(..., gt=0)],
+    location: Annotated[str, Form(...)],
 ) -> JSONResponse:
     if not has_positive_area(location):
         raise HTTPException(

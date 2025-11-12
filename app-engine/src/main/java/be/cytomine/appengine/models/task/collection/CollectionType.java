@@ -397,8 +397,10 @@ public class CollectionType extends Type {
             List<?> list = (List<?>) obj;
             assert trackingType instanceof CollectionType;
             CollectionType currentType = (CollectionType) trackingType;
-            if (list.size() < currentType.getMinSize() || list.size() > currentType.getMaxSize()) {
-                throw new TypeValidationException(ErrorCode.INTERNAL_INVALID_COLLECTION_DIMENSIONS);
+            if (Objects.nonNull(currentType.getMinSize()) && Objects.nonNull(currentType.getMaxSize())) {
+                if (list.size() < currentType.getMinSize() || list.size() > currentType.getMaxSize()) {
+                    throw new TypeValidationException(ErrorCode.INTERNAL_INVALID_COLLECTION_DIMENSIONS);
+                }
             }
             for (Object o : list) {
                 validateNode(o);
@@ -471,6 +473,7 @@ public class CollectionType extends Type {
                         persistedProvision.setParameterType(ParameterType.INPUT);
                         persistedProvision.setParameterName(indexes[i]);
                         persistedProvision.setValueType(ValueType.ARRAY);
+                        persistedProvision.setProvisioned(true);
                         persistedProvision.setItems(new ArrayList<>());
                         persistedProvision = collectionRepo.save(persistedProvision);
                     }
@@ -663,9 +666,11 @@ public class CollectionType extends Type {
                         persistedProvision.getItems().add(imagePersistence);
                         persistedProvision.setSize(persistedProvision.getItems().size());
                         // make collection provisioned
-                        if (persistedProvision.getItems().size() >= parentType.minSize
-                            && persistedProvision.getItems().size() <= parentType.maxSize) {
-                            persistedProvision.setProvisioned(true);
+                        if (Objects.nonNull(parentType.maxSize) && Objects.nonNull(parentType.minSize)) {
+                            if (persistedProvision.getItems().size() >= parentType.minSize
+                                && persistedProvision.getItems().size() <= parentType.maxSize) {
+                                persistedProvision.setProvisioned(true);
+                            }
                         }
                         collectionRepo.saveAndFlush(persistedProvision);
                         break;

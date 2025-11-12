@@ -55,7 +55,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
     private final UserService userService;
 
     private final EntityManager entityManager;
-    
+
     private final ParamsService paramsService;
 
     private final RestUserAnnotationController restUserAnnotationController;
@@ -76,7 +76,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
 
     private final RestTemplate restTemplate;
 
-    @Value("${application.samUrl}")
+    @Value("${application.samURL}")
     private String samUrl;
 
     @RequestMapping(value = { "/annotation/search.json"}, method = {RequestMethod.GET, RequestMethod.POST})

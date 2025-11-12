@@ -19,7 +19,7 @@ def get_roi_around_annotation(
     image_width: int,
     box: np.ndarray,
     crop_size: int,
-) -> Tuple[int, int, int, int]:
+) -> Tuple[int, int]:
     """
     Function to get the position of the annotation to extract with the top left corner,
     width and height.
@@ -34,8 +34,6 @@ def get_roi_around_annotation(
         Tuple of:
             - (int): x of top left corner.
             - (int): y of top left corner.
-            - (int): width.
-            - (int): height.
     """
     annotation_width = box[2] - box[0]
     annotation_height = box[3] - box[1]

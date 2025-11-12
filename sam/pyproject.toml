@@ -10,7 +10,6 @@ requires-python = ">=3.10"
 dependencies = [
   "fastapi[standard]>=0.116.1",
   "geojson>=3.2.0",
-  "matplotlib>=3.10.5",
   "numpy>=2.1.2",
   "opencv-python-headless>=4.11.0.86",
   "pillow>=11.0.0",

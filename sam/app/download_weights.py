@@ -7,10 +7,10 @@ WEIGHTS = {
 
 
 def download_weights():
-    os.makedirs("weights", exist_ok=True)
+    os.makedirs("/weights", exist_ok=True)
 
     for filename, url in WEIGHTS.items():
-        destination = os.path.join("weights", filename)
+        destination = os.path.join("/weights", filename)
 
         if not os.path.exists(destination):
             print(f"Downloading {filename}...")

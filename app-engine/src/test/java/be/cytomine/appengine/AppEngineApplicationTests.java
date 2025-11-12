@@ -4,10 +4,12 @@ package be.cytomine.appengine;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.k3s.K3sContainer;
-import org.testcontainers.utility.DockerImageName;
+
+import be.cytomine.appengine.config.K3sConfiguration;
 
 @SpringBootTest(
     properties = {
@@ -15,6 +17,8 @@ import org.testcontainers.utility.DockerImageName;
         "spring.datasource.url=jdbc:tc:postgresql:14:///appengine"
     }
 )
+@ActiveProfiles("test")
+@Import(K3sConfiguration.class)
 class AppEngineApplicationTests {
 
     @Container
@@ -23,12 +27,7 @@ class AppEngineApplicationTests {
         new PostgreSQLContainer<>("postgres:16-alpine").withPassword("appengine").withUsername(
             "appengine").withConnectTimeoutSeconds(60);
 
-    @Container
-    @ServiceConnection
-    static K3sContainer k3s =
-        new K3sContainer(DockerImageName.parse("rancher/k3s:v1.30.14-rc3-k3s3"));
-
     @Test
-     void contextLoads() {
+    void contextLoads() {
     }
 }

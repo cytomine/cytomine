@@ -227,6 +227,7 @@ services:
       - ${DATA_PATH:-./data}/weights:/weights
     environment:
       API_BASE_PATH: ${SAM_API_BASE_PATH:-/sam}
+      WEIGHTS_PATH: /weights
     networks:
       host_network:
         ipv4_address: 172.16.238.13

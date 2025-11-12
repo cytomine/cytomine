@@ -16,9 +16,3 @@ spec:
   valuesContent: |-
       hostPort:
         enabled: true
-  #   fullnameOverride: ingress-nginx
-  #   controller:
-  #     kind: DaemonSet
-  #     hostNetwork: true
-  #     service:
-  #       enabled: true

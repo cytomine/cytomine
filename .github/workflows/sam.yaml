@@ -64,7 +64,3 @@ jobs:
 
       - name: Run tests
         run: uv run pytest
-        env:
-          CYTOMINE_HOST: "cytomine.host"
-          CYTOMINE_PUBLIC_KEY: "public-key"
-          CYTOMINE_PRIVATE_KEY: "private-key"

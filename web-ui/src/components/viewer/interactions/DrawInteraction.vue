@@ -206,8 +206,12 @@ export default {
         if (this.activeTool === 'magic-wand') {
           try {
             const annotationId = annot.id;
-            await Cytomine.instance.api.post(`annotations/${annotationId}/refine`);
-            this.$emit('reloadAnnotations', {idImage: this.image.id});
+            const annotation = (await Cytomine.instance.api.post(`annotations/${annotationId}/refine`)).data;
+
+            this.$store.commit(this.imageModule + 'addAction', {annotation, type: Action.UPDATE});
+
+            this.$eventBus.$emit('editAnnotation', annotation);
+            this.$eventBus.$emit('reloadAnnotationCrop', annotation);
             this.$notify({type: 'success', text: 'Successful SAM Processing !'});
           } catch (error) {
             console.error(error);

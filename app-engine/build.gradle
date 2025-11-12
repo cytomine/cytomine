@@ -119,6 +119,7 @@ dependencies {
     testImplementation "org.testcontainers:junit-jupiter"
     testImplementation 'com.google.cloud.tools:jib-core:0.27.3'
     testImplementation "org.testcontainers:postgresql"
+    testImplementation "org.testcontainers:testcontainers-k3s:2.0.1"
 }
 
 tasks.named('test') {
@@ -152,16 +153,16 @@ tasks.register('cucumber') {
 }
 
 // liquibase activities
-liquibase {
-    activities {
-        main {
-            changelogFile 'src/test/resources/master-changelog.yml'
-            url 'jdbc:postgresql://localhost:5432/appengine'
-            username 'appengine'
-            password 'password'
-            referenceUrl 'jdbc:postgresql://localhost:5432/appengine'
-            referenceUsername 'appengine'
-            referencePassword 'password'
-        }
-    }
-}
+//liquibase {
+//    activities {
+//        main {
+//            changelogFile 'src/test/resources/master-changelog.yml'
+//            url 'jdbc:postgresql://localhost:5432/appengine'
+//            username 'appengine'
+//            password 'password'
+//            referenceUrl 'jdbc:postgresql://localhost:5432/appengine'
+//            referenceUsername 'appengine'
+//            referencePassword 'password'
+//        }
+//    }
+//}

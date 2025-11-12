@@ -21,7 +21,13 @@ public class FileUtils {
 
     public static List<Blob> extractTar(InputStream is, Path dst) throws IOException {
         List<Blob> blobs = new ArrayList<>();
-        try (TarArchiveInputStream tarArchiveIs = new TarArchiveInputStream(is)) {
+        TarArchiveInputStream tarArchiveIs = new TarArchiveInputStream(is) {
+            @Override
+            public void close() throws IOException {
+                // Do not close the underlying InputStream because it managed upstream.
+            }
+        };
+        try {
             TarArchiveEntry entry = null;
             while ((entry = tarArchiveIs.getNextTarEntry()) != null) {
                 if (entry.isDirectory()) continue;
@@ -39,6 +45,8 @@ public class FileUtils {
                     Constants.SHA256_PREFIX + sha256HashOutputStream.hash(),
                     () -> Files.newInputStream(itemPath)));
             }
+        } finally {
+            tarArchiveIs.close();
         }
         return blobs;
     }

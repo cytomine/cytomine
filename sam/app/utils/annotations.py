@@ -1,61 +1,10 @@
-"""Module to handle the smart fetching of the point annotations."""
+from typing import List, Union, cast
 
-from typing import Any, Dict, List
-
+import cv2
 import geojson
-from cytomine import Cytomine
-from cytomine.models import Annotation
+import numpy as np
 from shapely import wkt
-from shapely.geometry import LinearRing, LineString, Point, Polygon, box, shape
-
-from app.config import Settings
-
-
-def filter_point_annotations_within_polygon(
-    box_: Polygon,
-    annotations: List[Dict[str, Any]],
-) -> List[Dict[str, Any]]:
-    """
-    Function to filter an array of annotations to only keep the point annotations that
-    are inside of the box polygon.
-
-    Args:
-        (box: Polygon): the box in which the points are kept.
-        (annotations: List[Dict[str, Any]]): the annotations to filter.
-
-    Returns:
-        (List[Dict[str, Any]]): Returns the point inside the box.
-    """
-    return [
-        ann
-        for ann in annotations
-        if isinstance(ann["geometry"], Point) and box_.contains(ann["geometry"])
-    ]
-
-
-def get_annotation_by_id(annotation_id: int, settings: Settings) -> Annotation:
-    """
-    Function to get an annotation by its id.
-
-    Args:
-        (annotation_id: int): the id of the annotation to fetch.
-        (settings: Settings): the settings.
-
-    Returns:
-        (Annotation): Returns the annotation.
-    """
-    with Cytomine(
-        settings.CYTOMINE_HOST,
-        settings.CYTOMINE_PUBLIC_KEY,
-        settings.CYTOMINE_PRIVATE_KEY,
-        verbose=False,
-    ):
-        annotation = Annotation()
-        annotation.id = annotation_id
-
-        annotation.fetch()
-
-    return annotation
+from shapely.geometry import Polygon, box
 
 
 def get_bbox_from_annotation(location: str) -> Polygon:
@@ -74,69 +23,70 @@ def get_bbox_from_annotation(location: str) -> Polygon:
     return bbox
 
 
-def update_annotation_location(
-    annotation_id: int,
-    new_location: geojson.Feature,
-    settings: Settings,
-) -> bool:
+def has_positive_area(location: str) -> bool:
+    """Returns True if geometry has area > 0."""
+    geometry = wkt.loads(location)
+    return geometry.area > 0
+
+
+def mask_to_polygon(
+    mask: np.ndarray,
+    image_height: int,
+    offset_x: int,
+    offset_y: int,
+    scale_x: float = 1.0,
+    scale_y: float = 1.0,
+) -> Union[geojson.Feature, None]:
     """
-    Function to update the location of an annotation.
+    Function to convert the mask to a GeoJSON taking into account the offset due
+    to the manipulation of WSIs.
 
     Args:
-        (annotation_id: int): the id of the annotation to fetch.
-        (new_location: geojson.Feature): the new location.
-        (settings: Settings): the settings.
+        (mask: np.ndarray): the mask.
+        (image_height: int): the height of the image.
+        (offset_x: int): the offset along the x-axis.
+        (offset_y: int): the offset along the y-axis.
+        (scale_x: float): the scaling factor to apply to x coordinates.
+        (scale_y: float): the scaling factor to apply to y coordinates.
 
     Returns:
-        (bool): Returns the status of the update (True = ok).
+        (geojson.Feature, or None): Returns the structure as a GeoJSON.
     """
-    shapely_geometry = shape(new_location.geometry)
-    new_location_wkt = shapely_geometry.wkt
+    mask = (mask > 0).astype(np.uint8)
+    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    with Cytomine(
-        settings.CYTOMINE_HOST,
-        settings.CYTOMINE_PUBLIC_KEY,
-        settings.CYTOMINE_PRIVATE_KEY,
-        verbose=False,
-    ):
-        annotation = Annotation()
-        annotation.id = annotation_id
+    if not contours:
+        return None
 
-        annotation.fetch()
+    polygons: List[List[List[float]]] = []
+    for contour in contours:
+        if len(contour) >= 3:  # because the polygon must at least have 3 points
+            coords = contour.squeeze().astype(np.float32)
 
-        annotation.location = new_location_wkt
-        update_status = annotation.update()
+            if coords.ndim != 2:
+                continue
 
-        if update_status is False:
-            return False
+            coords[:, 0] /= scale_x
+            coords[:, 1] /= scale_y
 
-        return True
+            coords = coords + np.array([offset_x, offset_y])
+            coords[:, 1] = image_height - coords[:, 1]
 
+            coords_list = cast(List[List[float]], coords.tolist())
 
-def is_invalid_annotation(ann: Annotation) -> bool:
-    """
-    Function to tell if an annotation is invalid to process or
-    not.
+            if coords_list[0] != coords_list[-1]:
+                coords_list.append(coords_list[0])
 
-    Points are invalid to process because they do not have a bounding
-    box, any other annotation with no area or no perimeter is also
-    invalid.
+            polygons.append(coords_list)
 
-    Args:
-        (ann: Annotation): the annotation to process.
+    if not polygons:
+        return None
 
-    Returns:
-        (bool): Returns a boolean telling if the annotation is invalid.
-    """
-    geom = wkt.loads(ann.location)
+    if len(polygons) == 1:
+        geometry = geojson.Polygon([polygons[0]])
+    else:
+        geometry = geojson.MultiPolygon([[poly] for poly in polygons])
 
-    if (
-        isinstance(geom, Point)
-        or isinstance(geom, LineString)
-        or isinstance(geom, LinearRing)
-        or ann.area == 0.0
-        or ann.perimeter == 0.0
-    ):
-        return True
+    feature = geojson.Feature(geometry=geometry, properties={})
 
-    return False
+    return feature

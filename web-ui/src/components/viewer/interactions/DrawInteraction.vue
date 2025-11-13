@@ -208,8 +208,6 @@ export default {
             const annotationId = annot.id;
             const annotation = (await Cytomine.instance.api.post(`annotations/${annotationId}/refine`)).data;
 
-            this.$store.commit(this.imageModule + 'addAction', {annotation, type: Action.UPDATE});
-
             this.$eventBus.$emit('editAnnotation', annotation);
             this.$eventBus.$emit('reloadAnnotationCrop', annotation);
             this.$notify({type: 'success', text: 'Successful SAM Processing !'});

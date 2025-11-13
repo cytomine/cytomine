@@ -106,7 +106,8 @@ public abstract class ModelService<T extends CytomineDomain> {
             if (newObject.getId() != null && !entityManager.contains(newObject)) {
                 log.debug("object detached");
                 // entity is detached, merge it in the session
-                newObject = entityManager.merge(newObject);
+                newObject.setId(null);
+
             }
             entityManager.persist(newObject);
             entityManager.flush();
@@ -209,7 +210,7 @@ public abstract class ModelService<T extends CytomineDomain> {
 
     public CommandResponse add(JsonObject jsonObject, Transaction transaction, Task task) {
         throw new CytomineMethodNotYetImplementedException("No add method implemented with " +
-            "transaction/task");
+                                                               "transaction/task");
     }
 
     public abstract Class currentDomain();
@@ -264,10 +265,13 @@ public abstract class ModelService<T extends CytomineDomain> {
     public CommandResponse edit(JsonObject json, boolean printMessage) {
         //Rebuilt previous state of object that was previoulsy edited
         try {
-            return edit(fillDomainWithData(((CytomineDomain) currentDomain().getDeclaredConstructor().newInstance()), json), printMessage);
+            return edit(fillDomainWithData(
+                    ((CytomineDomain) currentDomain().getDeclaredConstructor().newInstance()),
+                    json),
+                printMessage);
         } catch (Exception e) {
             throw new ObjectNotFoundException("Cannot create instance of object: " + json + " " +
-                "Exception " + e);
+                                                  "Exception " + e);
         }
     }
 
@@ -335,7 +339,7 @@ public abstract class ModelService<T extends CytomineDomain> {
 
         if (domain == null) {
             throw new ObjectNotFoundException(currentDomain() + " " + json.get("id") + " not " +
-                "found");
+                                                  "found");
         }
         CytomineDomain container = domain.container();
         if (container != null) {
@@ -380,7 +384,8 @@ public abstract class ModelService<T extends CytomineDomain> {
     }
 
     public List<Object> getStringParamsI18n(CytomineDomain domain) {
-        throw new ServerException("getStringParamsI18n must be implemented for " + this.getClass().toString());
+        throw new ServerException(
+            "getStringParamsI18n must be implemented for " + this.getClass().toString());
     }
 
     /**
@@ -410,7 +415,7 @@ public abstract class ModelService<T extends CytomineDomain> {
             return update(domain, jsonNewData, transaction);
         } else {
             throw new CytomineMethodNotYetImplementedException("No update method implemented with" +
-                " task");
+                                                                   " task");
         }
     }
 
@@ -472,7 +477,7 @@ public abstract class ModelService<T extends CytomineDomain> {
     public CytomineDomain getCytomineDomain(String domainClassName, Long domainIdent) {
         try {
             return (CytomineDomain) getEntityManager()
-                .find(Class.forName(domainClassName), domainIdent);
+                                        .find(Class.forName(domainClassName), domainIdent);
         } catch (ClassNotFoundException e) {
             throw new ObjectNotFoundException(domainClassName, domainIdent);
         }
@@ -516,7 +521,10 @@ public abstract class ModelService<T extends CytomineDomain> {
         JsonObject response = new JsonObject();
 
         List<JsonObject> succeeded =
-            result.stream().filter(x -> x.getJSONAttrInteger("status") >= 200 && x.getJSONAttrInteger("status") <= 300).toList();
+            result.stream()
+                .filter(x -> x.getJSONAttrInteger("status") >= 200
+                                 && x.getJSONAttrInteger("status") <= 300)
+                .toList();
 
         if (succeeded.size() == result.size()) {
             String[] split = currentDomain().toString().toLowerCase().split("\\.");
@@ -531,7 +539,18 @@ public abstract class ModelService<T extends CytomineDomain> {
         } else {
             String[] split = currentDomain().toString().toLowerCase().split("\\.");
             response.put("data", JsonObject.of("success", false, "message", "Only part of the " +
-                "entries (" + split[split.length - 1] + "s " + succeeded.stream().map(x -> x.getJSONAttrStr("domain")).collect(Collectors.joining(",")), "errors", errors));
+                                                                                "entries (" + split[
+                                                                                                  split.length
+                                                                                                      - 1]
+                                                                                + "s "
+                                                                                + succeeded.stream()
+                                                                                      .map(
+                                                                                          x -> x.getJSONAttrStr(
+                                                                                              "domain"))
+                                                                                      .collect(
+                                                                                          Collectors.joining(
+                                                                                              ",")),
+                "errors", errors));
             response.put("status", 206);
         }
         return response;

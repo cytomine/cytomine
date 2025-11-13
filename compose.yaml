@@ -208,7 +208,7 @@ services:
       - redis
     volumes:
       - ${DATA_PATH:-./data}/cbir:/data/cbir
-      - ${DATA_PATH:-./data}/weight:/weights
+      - ${DATA_PATH:-./data}/weights:/weights
     environment:
       API_BASE_PATH: ${CBIR_API_BASE_PATH:-/cbir}
       DATA_PATH: /data/cbir
@@ -223,11 +223,11 @@ services:
   sam:
     image: cytomine/sam:latest
     restart: unless-stopped
+    volumes:
+      - ${DATA_PATH:-./data}/weights:/weights
     environment:
       API_BASE_PATH: ${SAM_API_BASE_PATH:-/sam}
-      CYTOMINE_HOST: http://nginx
-      CYTOMINE_PRIVATE_KEY: d70607f5-c478-403c-be11-3dbc1716d1cf
-      CYTOMINE_PUBLIC_KEY: 9a8b8369-2446-44cb-b0af-604a74e1dcdb
+      WEIGHTS_PATH: /weights
     networks:
       host_network:
         ipv4_address: 172.16.238.13

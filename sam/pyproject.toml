@@ -8,16 +8,13 @@ authors = [
 ]
 requires-python = ">=3.10"
 dependencies = [
-  "cytomine-python-client>=3.1.0",
   "fastapi[standard]>=0.116.1",
   "geojson>=3.2.0",
-  "matplotlib>=3.10.5",
   "numpy>=2.1.2",
   "opencv-python-headless>=4.11.0.86",
   "pillow>=11.0.0",
   "pydantic>=2.10.6",
   "pydantic-settings>=2.8.1",
-  "python-box>=7.3.2",
   "sam2>=1.1.0",
   "shapely>=2.1.1",
   "torch==2.8.0",

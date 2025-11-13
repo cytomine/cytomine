@@ -1,0 +1,46 @@
+services:
+  # https://github.com/k3s-io/k3s/blob/3854eb56d4b8a183a1f8261aebd372111378a00f/docker-compose.yml
+  k3s:
+    image: "rancher/k3s:v1.30.14-rc3-k3s3"
+    entrypoint: /entrypoint
+    tmpfs:
+      - /run
+      - /var/run
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 65535
+        hard: 65535
+    privileged: true
+    restart: always
+    environment:
+      - K3S_TOKEN=65535-65535-65535 # plain text secret!
+      - K3S_KUBECONFIG_OUTPUT=/output/config
+      - K3S_KUBECONFIG_MODE=666S
+    volumes:
+      - ../k3s/entrypoint.sh:/entrypoint:ro
+      - k3s-server:/var/lib/rancher/k3s
+      - ../k3s/registries.yaml:/etc/rancher/k3s/registries.yaml:ro
+      - ../k3s/serviceaccounts.yaml:/var/lib/rancher/k3s/server/manifests/serviceaccounts.yaml:ro
+      - ../k3s/nginx-ingress.yaml:/var/lib/rancher/k3s/server/manifests/nginx-ingress.yaml:ro
+      - ../k3s/cytomine-local-ns.yaml:/var/lib/rancher/k3s/server/manifests/cytomine-local-ns.yaml:ro
+      # This is just so that we get the kubeconfig file out
+      - ../.kube/shared:/output/
+      - ../data/dataset:/data/dataset
+    ports:
+      - 6443:6443
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.15
+
+volumes:
+  k3s-server: {}
+  k3s-agent: {}
+
+networks:
+  host_network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.238.0/24

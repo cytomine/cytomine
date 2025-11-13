@@ -223,7 +223,7 @@ public class TaskRunService {
         ObjectMapper mapper = new ObjectMapper();
 
         if (json.get("type").isObject() && json.get("type").get("id").asText().equals("array")) {
-            String subtype = json.get("type").get("subtype").get("id").asText();
+            String subtype = json.get("type").get("subType").get("id").asText();
 
             Long[] itemsArray = mapper.convertValue(json.get("value"), Long[].class);
 
@@ -301,7 +301,7 @@ public class TaskRunService {
         Map<String, String> params = new HashMap<>();
         params.put("value", String.valueOf(i));
 
-        return appEngineService.putWithParams(arrayTypeUri, body, MediaType.MULTIPART_FORM_DATA, params);
+        return appEngineService.postWithParams(arrayTypeUri, body, MediaType.MULTIPART_FORM_DATA, params);
 
     }
 

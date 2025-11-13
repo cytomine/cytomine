@@ -64,8 +64,6 @@ public class ApplicationProperties {
 
     private String defaultLanguage;
 
-    private String internalProxyURL;
-
     private Annotation annotation;
 
     public Annotation getAnnotation() {

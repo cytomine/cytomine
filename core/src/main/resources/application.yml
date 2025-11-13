@@ -124,11 +124,9 @@ application:
       token-validity-in-seconds-for-remember-me: ${TOKEN_VALIDITY_IN_SECONDS_REMEMBER_ME:2592000}
       token-validity-in-seconds-for-short-term: ${TOKEN_VALIDITY_IN_SECONDS_SHORT_TERM:300}
 
-  internalProxyURL: ${INTERNAL_PROXY_URL:http://localhost}
-
   pimsURL: ${PIMS_URL}
-
-  samUrl: ${SAM_URL}
+  samURL: ${SAM_URL}
+  cbirURL: ${CBIR_URL}
 
   annotation:
     maxNumberOfPoint: ${ANNOTATION_MAX_POINTS:200}

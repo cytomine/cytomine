@@ -26,14 +26,3 @@ spec:
                 name: sam
             command: ["/bin/sh", "-c"]
             args: [ "fastapi run app/main.py"]
-            env:
-              - name: CYTOMINE_PUBLIC_KEY
-                valueFrom:
-                  secretKeyRef:
-                    name: core-secret
-                    key: ADMIN_PUBLIC_KEY
-              - name: CYTOMINE_PRIVATE_KEY
-                valueFrom:
-                  secretKeyRef:
-                    name: core-secret
-                    key: ADMIN_PRIVATE_KEY

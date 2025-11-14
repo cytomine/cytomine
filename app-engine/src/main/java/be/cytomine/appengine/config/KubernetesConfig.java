@@ -9,15 +9,15 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class KubernetesConfig {
-
+    //    @Profile("!test")
     @Bean
     public KubernetesClient kubernetesClient() {
         Config configurations = new ConfigBuilder()
-            .withTrustCerts(true)
-            .build();
+                                    .withTrustCerts(true)
+                                    .build();
 
         return new KubernetesClientBuilder()
-            .withConfig(configurations)
-            .build();
+                   .withConfig(configurations)
+                   .build();
     }
 }

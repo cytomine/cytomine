@@ -202,6 +202,11 @@ web_ui:
 
 iam:
   port: 8080
+  # expects a .clientId key in the secret
+  lsaaiClientIdSecretName:
+  # expects a .clientSecret key in the secret
+  lsaaiClientSecretSecretName:
+  lsaaiEndpoint:
 
 cbir:
   port: 6000 # https://github.com/cytomine/cytomine/blob/8e5a14bf70b22e9f96a253d6402f793e8a37ce3e/cbir/Dockerfile#L37

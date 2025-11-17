@@ -67,6 +67,7 @@ spec:
         - name: iam-client-config
           mountPath: "/opt/keycloak-conf/config.json"
           subPath: "config.json"
+
       - name: create-client-roles-admin
         image: "{{ .Values.images.iam }}"
         command: ["/bin/sh", "-c"]
@@ -74,6 +75,7 @@ spec:
         volumeMounts:
         - name: kc-auth
           mountPath: "/opt/keycloak-auth"
+
       - name: create-client-roles-guest
         image: "{{ .Values.images.iam }}"
         command: ["/bin/sh", "-c"]
@@ -81,6 +83,7 @@ spec:
         volumeMounts:
         - name: kc-auth
           mountPath: "/opt/keycloak-auth"
+
       - name: create-client-roles-user
         image: "{{ .Values.images.iam }}"
         command: ["/bin/sh", "-c"]
@@ -88,6 +91,7 @@ spec:
         volumeMounts:
         - name: kc-auth
           mountPath: "/opt/keycloak-auth"
+
       - name: add-roles-user
         image: "{{ .Values.images.iam }}"
         command: ["/bin/sh", "-c"]
@@ -95,6 +99,26 @@ spec:
         volumeMounts:
         - name: kc-auth
           mountPath: "/opt/keycloak-auth"
+{{ if and (.Values.iam.lsaaiClientIdSecretName) (and .Values.iam.lsaaiClientSecretSecretName .Values.iam.lsaaiEndpoint) }}
+      - name: add-provider-lsaai
+        image: "{{ .Values.images.iam }}"
+        command: ["/bin/sh", "-c"]
+        args: ["/opt/keycloak/bin/kcadm.sh create identity-provider/instances -r cytomine --server {{ include "cytomine.iamInternalUrl" . }} --config /opt/keycloak-auth/kcadm.config -s providerId=oidc -s config.name=LSAAI -s config.authorizationUrl={{- .Values.iam.lsaaiEndpoint }} -s config.clientId=$(LSAAI_CLIENT_ID) -s config.clientSecret=$(LSAAI_CLIENT_SECRET)"]
+        volumeMounts:
+        - name: kc-auth
+          mountPath: "/opt/keycloak-auth"
+        env:
+        - name: LSAAI_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.iam.lsaaiClientSecretSecretName }}
+              key: clientSecret
+        - name: LSAAI_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.iam.lsaaiClientIdSecretName }}
+              key: clientId
+{{ end }}
       containers:
       - name: check-job-done
         image: "{{ .Values.images.iam }}"

@@ -103,7 +103,7 @@ spec:
       - name: add-provider-lsaai
         image: "{{ .Values.images.iam }}"
         command: ["/bin/sh", "-c"]
-        args: ["/opt/keycloak/bin/kcadm.sh create identity-provider/instances -r cytomine --server {{ include "cytomine.iamInternalUrl" . }} --config /opt/keycloak-auth/kcadm.config -s providerId=oidc -s config.name=LSAAI -s config.authorizationUrl={{- .Values.iam.lsaaiEndpoint }} -s config.clientId=$(LSAAI_CLIENT_ID) -s config.clientSecret=$(LSAAI_CLIENT_SECRET)"]
+        args: ["/opt/keycloak/bin/kcadm.sh create identity-provider/import-config -r cytomine --server {{ include "cytomine.iamInternalUrl" . }} --config /opt/keycloak-auth/kcadm.config -s providerId=oidc -s config.name=LSAAI -s config.authorizationUrl={{- .Values.iam.lsaaiEndpoint }} -s config.clientSecret=$(LSAAI_CLIENT_SECRET) -s config.clientId=$(LSAAI_CLIENT_ID)"]
         volumeMounts:
         - name: kc-auth
           mountPath: "/opt/keycloak-auth"

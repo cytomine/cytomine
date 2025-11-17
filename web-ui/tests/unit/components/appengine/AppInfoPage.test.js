@@ -48,6 +48,9 @@ describe('AppInfoPage.vue', () => {
       stubs: {
         'b-button': true,
         'b-collapse': true,
+        'b-dropdown': true,
+        'b-dropdown-item': true,
+        'b-icon': true,
         'b-loading': true,
       },
     });

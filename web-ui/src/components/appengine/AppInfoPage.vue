@@ -6,7 +6,7 @@
         <b-button
           icon-pack="fa"
           icon-left="angle-left"
-          @click="$router.push(task.host !== null ? '/apps/store' : '/apps')"
+          @click="$router.push(task.host !== undefined ? '/apps/store' : '/apps')"
           :label="$t('go-back')"
         />
         <div class="panel-actions">
@@ -17,7 +17,12 @@
             @click="handleInstall"
             :label="$t('install')"
           />
-          <b-dropdown aria-role="list" class="is-pulled-right" position="is-bottom-left">
+          <b-dropdown
+            v-if="task.host === undefined"
+            aria-role="list"
+            class="is-pulled-right"
+            position="is-bottom-left"
+          >
             <template #trigger>
               <b-icon icon="ellipsis-v" />
             </template>
@@ -102,7 +107,7 @@ export default {
   },
   methods: {
     async handleInstall() {
-      installApp(this.task, this.$notify, this.$t.bind(this));
+      await installApp(this.task, this.$notify, this.$t.bind(this));
     },
     handleDelete() {
       this.$buefy.dialog.confirm({
@@ -111,7 +116,10 @@ export default {
         type: 'is-danger',
         confirmText: this.$t('button-confirm'),
         cancelText: this.$t('button-cancel'),
-        onConfirm: () => deleteApp(this.task, this.$notify, this.$t.bind(this)),
+        onConfirm: async () => {
+          await deleteApp(this.task, this.$notify, this.$t.bind(this));
+          this.$router.push('/apps');
+        },
       });
     }
   },
@@ -121,6 +129,7 @@ export default {
       this.$route.params.version,
       this.$route.query.host,
     );
+    this.task.host = this.$route.query.host;
     this.loading = false;
   },
 };

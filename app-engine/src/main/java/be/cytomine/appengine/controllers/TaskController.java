@@ -14,6 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -92,6 +93,24 @@ public class TaskController {
         );
         log.info("tasks/{namespace}/{version} GET Ended");
         return taskDescription.<ResponseEntity<?>>map(ResponseEntity::ok)
+            .orElseGet(() -> new ResponseEntity<>(
+                ErrorBuilder.build(ErrorCode.INTERNAL_TASK_NOT_FOUND),
+                HttpStatus.NOT_FOUND
+            ));
+    }
+
+    @DeleteMapping(value = "tasks/{namespace}/{version}")
+    @ResponseStatus(code = HttpStatus.OK)
+    public ResponseEntity<?> deleteTaskByNamespaceAndVersion(
+        @PathVariable String namespace,
+        @PathVariable String version
+    ) {
+        log.info("DELETE /tasks/{}/{}", namespace, version);
+        return taskService.findByNamespaceAndVersion(namespace, version)
+            .map(task -> {
+                taskService.deleteByNamespaceAndVersion(namespace, version);
+                return ResponseEntity.noContent().build();
+            })
             .orElseGet(() -> new ResponseEntity<>(
                 ErrorBuilder.build(ErrorCode.INTERNAL_TASK_NOT_FOUND),
                 HttpStatus.NOT_FOUND

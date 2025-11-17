@@ -70,7 +70,6 @@ import be.cytomine.appengine.models.task.TypeFactory;
 import be.cytomine.appengine.repositories.RunRepository;
 import be.cytomine.appengine.repositories.TaskRepository;
 import be.cytomine.appengine.states.TaskRunState;
-import be.cytomine.appengine.utils.ArchiveUtils;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -87,8 +86,6 @@ public class TaskService {
 
     private final TaskValidationService taskValidationService;
 
-    private final ArchiveUtils archiveUtils;
-
     @Value("${storage.input.charset}")
     private String charset;
 
@@ -97,6 +94,10 @@ public class TaskService {
 
     @Value("${scheduler.task-resources.cpus}")
     private int defaultCpus;
+
+    public void deleteByNamespaceAndVersion(String namespace, String version) {
+        taskRepository.deleteByNamespaceAndVersion(namespace, version);
+    }
 
     @Transactional
     public Optional<TaskDescription> uploadTask(InputStream inputStream)

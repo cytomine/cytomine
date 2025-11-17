@@ -206,6 +206,7 @@ iam:
   lsaaiClientIdSecretName:
   # expects a .clientSecret key in the secret
   lsaaiClientSecretSecretName:
+  # the URL of the LSAAI instance
   lsaaiEndpoint:
 
 cbir:

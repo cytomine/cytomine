@@ -9,13 +9,25 @@
           @click="$router.push(task.host !== null ? '/apps/store' : '/apps')"
           :label="$t('go-back')"
         />
-        <b-button
-          class="is-link"
-          icon-pack="fa"
-          icon-left="download"
-          @click="handleInstall"
-          :label="$t('install')"
-        />
+        <div class="panel-actions">
+          <b-button
+            class="is-link"
+            icon-pack="fa"
+            icon-left="download"
+            @click="handleInstall"
+            :label="$t('install')"
+          />
+          <b-dropdown aria-role="list" class="is-pulled-right" position="is-bottom-left">
+            <template #trigger>
+              <b-icon icon="ellipsis-v" />
+            </template>
+
+            <b-dropdown-item aria-role="listitem" class="has-text-danger" @click="handleDelete">
+              <b-icon icon="trash" class="has-text-danger" />
+              <span>{{ $t('button-delete') }}</span>
+            </b-dropdown-item>
+          </b-dropdown>
+        </div>
       </div>
       <div class="panel-block">
         <section class="media">
@@ -77,7 +89,7 @@
 </template>
 
 <script>
-import {installApp} from '@/utils/app';
+import {deleteApp, installApp} from '@/utils/app';
 import Task from '@/utils/appengine/task';
 
 export default {
@@ -92,6 +104,16 @@ export default {
     async handleInstall() {
       installApp(this.task, this.$notify, this.$t.bind(this));
     },
+    handleDelete() {
+      this.$buefy.dialog.confirm({
+        title: this.$t('delete-task'),
+        message: this.$t('delete-task-message'),
+        type: 'is-danger',
+        confirmText: this.$t('button-confirm'),
+        cancelText: this.$t('button-cancel'),
+        onConfirm: () => deleteApp(this.task, this.$notify, this.$t.bind(this)),
+      });
+    }
   },
   async created() {
     this.task = await Task.fetchNamespaceVersion(
@@ -138,6 +160,12 @@ img {
 .panel-heading {
   display: flex;
   justify-content: space-between;
+}
+
+.panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .update-btn {

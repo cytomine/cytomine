@@ -95,6 +95,7 @@ public class TaskService {
     @Value("${scheduler.task-resources.cpus}")
     private int defaultCpus;
 
+    @Transactional
     public void deleteByNamespaceAndVersion(String namespace, String version) {
         taskRepository.deleteByNamespaceAndVersion(namespace, version);
     }

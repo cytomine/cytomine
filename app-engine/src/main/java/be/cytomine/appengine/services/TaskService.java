@@ -96,11 +96,6 @@ public class TaskService {
     private int defaultCpus;
 
     @Transactional
-    public void deleteByNamespaceAndVersion(String namespace, String version) {
-        taskRepository.deleteByNamespaceAndVersion(namespace, version);
-    }
-
-    @Transactional
     public Optional<TaskDescription> uploadTask(InputStream inputStream)
         throws BundleArchiveException, TaskServiceException, ValidationException {
 

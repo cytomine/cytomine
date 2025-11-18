@@ -16,9 +16,14 @@ if __name__ == "__main__":
     parser = ArgumentParser(description="Example to import datasets into Cytomine")
 
     parser.add_argument(
-        "--host",
+        "--cytomine_core_host",
         default="demo.cytomine.be",
-        help="The Cytomine host",
+        help="The Cytomine core host",
+    )
+    parser.add_argument(
+        "--cytomine_pims_host",
+        default="demo.cytomine.be",
+        help="The Cytomine pims host",
     )
     parser.add_argument(
         "--public_key",
@@ -36,7 +41,7 @@ if __name__ == "__main__":
     params, _ = parser.parse_known_args(sys.argv[1:])
 
     with Cytomine(
-        host=params.host,
+        host=params.cytomine_core_host
         public_key=params.public_key,
         private_key=params.private_key,
     ) as cytomine:

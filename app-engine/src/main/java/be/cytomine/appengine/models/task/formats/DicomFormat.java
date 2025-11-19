@@ -51,7 +51,7 @@ public class DicomFormat implements FileFormat {
         return true;
     }
 
-    public void validateZipWithDicomEntries(File file) throws TypeValidationException
+    public void validateZippedWSIDicom(File file) throws TypeValidationException
     {
         try (ZipFile zipFile = new ZipFile(file)) {
             Enumeration<? extends ZipEntry> zipEntries = zipFile.entries();

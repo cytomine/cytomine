@@ -171,7 +171,7 @@ public class ImageType extends Type {
         ZipFormat zipFormat = new ZipFormat();
         if (zipFormat.checkSignature(file)) {
             DicomFormat dicomFormat = new DicomFormat();
-            dicomFormat.validateZipWithDicomEntries(file);
+            dicomFormat.validateZippedWSIDicom(file);
 
         } else {
             validateImageFormat(file);

@@ -54,6 +54,6 @@ if __name__ == "__main__":
         if not storage:
             raise ValueError("Storage not found")
 
-        response = cytomine.import_datasets(storage.id, pims_url=urljoin(params.cytomine_pims_host,params.import_uri))
+        response = cytomine.import_datasets(storage.id, pims_url= urljoin(params.cytomine_pims_host, params.import_uri))
 
         print(response)

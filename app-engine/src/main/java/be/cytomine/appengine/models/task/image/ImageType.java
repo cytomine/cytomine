@@ -1,11 +1,23 @@
 package be.cytomine.appengine.models.task.image;
 
 import java.awt.Dimension;
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.UUID;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
+import be.cytomine.appengine.models.task.formats.DicomFormat;
+import be.cytomine.appengine.models.task.formats.ZipFormat;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -32,6 +44,8 @@ import be.cytomine.appengine.models.task.formats.FileFormat;
 import be.cytomine.appengine.repositories.image.ImagePersistenceRepository;
 import be.cytomine.appengine.utils.AppEngineApplicationContext;
 import be.cytomine.appengine.utils.units.Unit;
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
+import org.apache.commons.text.diff.EditScript;
 
 @SuppressWarnings("checkstyle:LineLength")
 @Data
@@ -156,16 +170,41 @@ public class ImageType extends Type {
             file = (File) valueObject;
         }
 
-        validateImageFormat(file);
+        ZipFormat zipFormat = new ZipFormat();
+        if (zipFormat.checkSignature(file)) {
+            try (ZipFile zipFile = new ZipFile(file)) {
+                Enumeration<? extends ZipEntry> zipEntries = zipFile.entries();
+                while (zipEntries.hasMoreElements()) {
+                    ZipEntry zipEntry = zipEntries.nextElement();
+                    try (InputStream inputStream = new BufferedInputStream(zipFile.getInputStream(zipEntry))) {
 
-        validateImageDimension(file);
+                        byte[] headerBytes ;
+                        DicomFormat dicomFormat = new DicomFormat();
+                        int magicBytes = 4;
+                        int magicByteOffset = 128;
+                        headerBytes = inputStream.readNBytes(magicByteOffset + magicBytes);
+                        if (!dicomFormat.checkSignature(Arrays.copyOfRange(headerBytes, headerBytes.length - magicBytes, headerBytes.length))) {
+                            throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_INVALID_IMAGE_FORMAT);
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_TYPE_ERROR);
+            }
 
-        validateImageSize(file);
+        } else {
+            validateImageFormat(file);
 
-        /* Additional specific type validation */
-        if (!format.validate(file)) {
-            throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_INVALID_IMAGE);
+            validateImageDimension(file);
+
+            validateImageSize(file);
+
+            /* Additional specific type validation */
+            if (!format.validate(file)) {
+                throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_INVALID_IMAGE);
+            }
         }
+
     }
 
     @Override

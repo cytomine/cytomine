@@ -1,6 +1,6 @@
 [project]
 name = "cytomine-python-client"
-version = "3.1.0"
+version = "3.1.1"
 description = "Python client to interact with Cytomine."
 authors = [{ name = "Cytomine ULiège", email = "uliege@cytomine.org" }]
 readme = "README.md"

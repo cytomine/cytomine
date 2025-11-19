@@ -3,8 +3,6 @@ package be.cytomine.appengine.models.task.image;
 import java.awt.Dimension;
 import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Paths;
@@ -14,10 +12,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
 
-import be.cytomine.appengine.models.task.formats.DicomFormat;
-import be.cytomine.appengine.models.task.formats.ZipFormat;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -40,12 +35,13 @@ import be.cytomine.appengine.models.task.Run;
 import be.cytomine.appengine.models.task.Type;
 import be.cytomine.appengine.models.task.TypePersistence;
 import be.cytomine.appengine.models.task.ValueType;
+import be.cytomine.appengine.models.task.formats.DicomFormat;
 import be.cytomine.appengine.models.task.formats.FileFormat;
+import be.cytomine.appengine.models.task.formats.ZipFormat;
 import be.cytomine.appengine.repositories.image.ImagePersistenceRepository;
 import be.cytomine.appengine.utils.AppEngineApplicationContext;
 import be.cytomine.appengine.utils.units.Unit;
-import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
-import org.apache.commons.text.diff.EditScript;
+
 
 @SuppressWarnings("checkstyle:LineLength")
 @Data
@@ -178,7 +174,7 @@ public class ImageType extends Type {
                     ZipEntry zipEntry = zipEntries.nextElement();
                     try (InputStream inputStream = new BufferedInputStream(zipFile.getInputStream(zipEntry))) {
 
-                        byte[] headerBytes ;
+                        byte[] headerBytes;
                         DicomFormat dicomFormat = new DicomFormat();
                         int magicBytes = 4;
                         int magicByteOffset = 128;

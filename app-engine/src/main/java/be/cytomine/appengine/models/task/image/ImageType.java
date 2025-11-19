@@ -150,6 +150,8 @@ public class ImageType extends Type {
         }
     }
 
+
+
     @Override
     public void validate(Object valueObject) throws TypeValidationException {
         if (!(valueObject instanceof File) && !(valueObject instanceof String)) {
@@ -168,25 +170,8 @@ public class ImageType extends Type {
 
         ZipFormat zipFormat = new ZipFormat();
         if (zipFormat.checkSignature(file)) {
-            try (ZipFile zipFile = new ZipFile(file)) {
-                Enumeration<? extends ZipEntry> zipEntries = zipFile.entries();
-                while (zipEntries.hasMoreElements()) {
-                    ZipEntry zipEntry = zipEntries.nextElement();
-                    try (InputStream inputStream = new BufferedInputStream(zipFile.getInputStream(zipEntry))) {
-
-                        byte[] headerBytes;
-                        DicomFormat dicomFormat = new DicomFormat();
-                        int magicBytes = 4;
-                        int magicByteOffset = 128;
-                        headerBytes = inputStream.readNBytes(magicByteOffset + magicBytes);
-                        if (!dicomFormat.checkSignature(Arrays.copyOfRange(headerBytes, headerBytes.length - magicBytes, headerBytes.length))) {
-                            throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_INVALID_IMAGE_FORMAT);
-                        }
-                    }
-                }
-            } catch (IOException e) {
-                throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_TYPE_ERROR);
-            }
+            DicomFormat dicomFormat = new DicomFormat();
+            dicomFormat.validateZipWithDicomEntries(file);
 
         } else {
             validateImageFormat(file);

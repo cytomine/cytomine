@@ -30,6 +30,13 @@ public class DicomFormat implements FileFormat {
         }
     }
 
+    public boolean checkSignature(byte[] fileSignature) {
+        if (fileSignature.length < SIGNATURE.length) {
+            return false;
+        }
+        return fileSignature.length == SIGNATURE.length && Arrays.equals(fileSignature, SIGNATURE);
+    }
+
     @Override
     public boolean validate(File file) {
         return true;

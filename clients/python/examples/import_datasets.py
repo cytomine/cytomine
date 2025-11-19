@@ -4,6 +4,7 @@ import logging
 import sys
 from argparse import ArgumentParser
 
+from urllib.parse import urljoin
 from cytomine import Cytomine
 from cytomine.models import StorageCollection
 
@@ -53,6 +54,6 @@ if __name__ == "__main__":
         if not storage:
             raise ValueError("Storage not found")
 
-        response = cytomine.import_datasets(storage.id, pims_url=f"{params.cytomine_pims_host}/{params.import_uri}")
+        response = cytomine.import_datasets(storage.id, pims_url=urljoin(params.cytomine_pims_host,params.import_uri))
 
         print(response)

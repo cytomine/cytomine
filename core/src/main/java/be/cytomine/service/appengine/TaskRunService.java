@@ -98,10 +98,9 @@ public class TaskRunService {
 
         String response = appEngineService.post(uri, null, MediaType.APPLICATION_JSON);
 
-        UUID taskId;
+        JsonNode jsonResponse;
         try {
-            JsonNode jsonResponse = new ObjectMapper().readTree(response);
-            taskId = UUID.fromString(jsonResponse.path("id").asText());
+            jsonResponse = new ObjectMapper().readTree(response);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error parsing JSON response");
         }
@@ -110,7 +109,9 @@ public class TaskRunService {
         TaskRun taskRun = new TaskRun();
         taskRun.setUser(currentUser);
         taskRun.setProject(project);
-        taskRun.setTaskRunId(taskId);
+        taskRun.setTaskName(jsonResponse.path("task").path("name").asText());
+        taskRun.setTaskVersion(jsonResponse.path("task").path("version").asText());
+        taskRun.setTaskRunId(UUID.fromString(jsonResponse.path("id").asText()));
         taskRun.setImage(image);
         taskRunRepository.save(taskRun);
 
@@ -378,10 +379,8 @@ public class TaskRunService {
         checkTaskRun(projectId, taskRunId);
 
         String response = appEngineService.get("task-runs/" + taskRunId + "/outputs");
-        Optional<TaskRun> taskRun = taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId);
-        if (taskRun.isEmpty()) {
-            throw new ObjectNotFoundException("TaskRun", taskRunId);
-        }
+        TaskRun taskRun = taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId)
+                .orElseThrow(() -> new ObjectNotFoundException("TaskRun", taskRunId));
 
         List<TaskRunValue> outputs;
         try {
@@ -397,15 +396,15 @@ public class TaskRunService {
             .map(value -> (String) value)
             .toList();
 
-        String layerName = "task-run-" + taskRunId;
+        String layerName = annotationLayerService.createLayerName(taskRun.getTaskName(), taskRun.getTaskVersion());
         AnnotationLayer annotationLayer = annotationLayerService.createAnnotationLayer(layerName);
         TaskRunLayer taskRunLayer = taskRunLayerRepository
-                .findByTaskRunAndImage(taskRun.get(), taskRun.get().getImage())
+                .findByTaskRunAndImage(taskRun, taskRun.getImage())
                 .orElseGet(() -> {
                     TaskRunLayer newLayer = new TaskRunLayer();
                     newLayer.setAnnotationLayer(annotationLayer);
-                    newLayer.setTaskRun(taskRun.get());
-                    newLayer.setImage(taskRun.get().getImage());
+                    newLayer.setTaskRun(taskRun);
+                    newLayer.setImage(taskRun.getImage());
                     return newLayer;
                 });
         boolean updated = false;

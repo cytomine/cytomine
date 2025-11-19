@@ -34,12 +34,22 @@ public class TaskRun extends CytomineDomain {
     @Convert(converter = UUIDConverter.class)
     private UUID taskRunId;
 
+    @NotNull
+    @Column(nullable = false)
+    private String taskName;
+
+    @NotNull
+    @Column(nullable = false)
+    private String taskVersion;
+
     public static JsonObject getDataFromDomain(CytomineDomain domain) {
         JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
         TaskRun taskRun = (TaskRun) domain;
         returnArray.put("taskRunId", taskRun.getTaskRunId().toString());
         returnArray.put("project", taskRun.getProjectId());
         returnArray.put("user", taskRun.getUserId());
+        returnArray.put("taskName", taskRun.getTaskName());
+        returnArray.put("taskVersion", taskRun.getVersion());
         return returnArray;
     }
 

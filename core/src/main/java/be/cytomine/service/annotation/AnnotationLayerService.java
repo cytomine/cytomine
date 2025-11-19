@@ -1,5 +1,9 @@
 package be.cytomine.service.annotation;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +30,14 @@ public class AnnotationLayerService {
     private final TaskRunLayerRepository taskRunLayerRepository;
 
     private final TaskRunLayerService taskRunLayerService;
+
+    public String createLayerName(String taskName, String taskVersion) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String layerName = taskName + " (" + taskVersion + ") - ";
+        layerName += LocalDateTime.ofInstant(Instant.now(), ZoneId.systemDefault()).format(formatter);
+
+        return layerName;
+    }
 
     public AnnotationLayer createAnnotationLayer(String name) {
         return annotationLayerRepository.findByName(name).orElseGet(()->{

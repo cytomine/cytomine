@@ -397,7 +397,7 @@ public class TaskRunService {
             .map(value -> (String) value)
             .toList();
 
-        String layerName = annotationLayerService.createLayerName(taskRun.getTaskName(), taskRun.getTaskVersion());
+        String layerName = annotationLayerService.createLayerName(taskRun.getTaskName(), taskRun.getTaskVersion(), taskRun.getCreated());
         AnnotationLayer annotationLayer = annotationLayerService.createAnnotationLayer(layerName);
         TaskRunLayer taskRunLayer = taskRunLayerRepository
                 .findByTaskRunAndImage(taskRun, taskRun.getImage())

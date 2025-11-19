@@ -1,9 +1,11 @@
 package be.cytomine.service.annotation;
 
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,12 +33,10 @@ public class AnnotationLayerService {
 
     private final TaskRunLayerService taskRunLayerService;
 
-    public String createLayerName(String taskName, String taskVersion) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String layerName = taskName + " (" + taskVersion + ") - ";
-        layerName += LocalDateTime.ofInstant(Instant.now(), ZoneId.systemDefault()).format(formatter);
-
-        return layerName;
+    public String createLayerName(String taskName, String taskVersion, Date created) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String createdTime = sdf.format(created);
+        return taskName + " (" + taskVersion + ") - " + createdTime;
     }
 
     public AnnotationLayer createAnnotationLayer(String name) {

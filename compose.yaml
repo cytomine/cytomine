@@ -37,7 +37,7 @@ services:
     image: registry:2.8.3
     restart: unless-stopped
     volumes:
-      - ${DATA_PATH:-./data}/registry:/data
+      - ${DATA_PATH:-./data}/registry:/var/lib/registry
     environment:
       REGISTRY_STORAGE_DELETE_ENABLED: true
     networks:
@@ -142,7 +142,7 @@ services:
     volumes:
       - ${DATA_PATH:-./data}/app-engine:/data
       - ${PWD}/.kube/shared:/root/.kube:ro
-      - ${DATA_PATH:-./data}/app-engine-shared-inputs:/app-engine-shared-inputs:rw
+      - /home/siddig-hamed/egress_recordings/cytomine/data/app-engine:/home/siddig-hamed/egress_recordings/cytomine/data/app-engine:rw
       - ${DATA_PATH:-./data}/app-engine-shared-datasets:/app-engine-shared-datasets:rw
     environment:
       API_PREFIX: ${APP_ENGINE_API_BASE_PATH:-/app-engine/}
@@ -152,8 +152,8 @@ services:
       DB_PORT: 5432
       DB_USERNAME: appengine
       REGISTRY_URL: http://registry:5000
-      STORAGE_BASE_PATH: /app-engine-shared-inputs
-      RUN_STORAGE_BASE_PATH: /app-engine-shared-inputs
+      STORAGE_BASE_PATH: /home/siddig-hamed/egress_recordings/cytomine/data/app-engine
+      RUN_STORAGE_BASE_PATH: /home/siddig-hamed/egress_recordings/cytomine/data/app-engine
       REF_STORAGE_BASE_PATH: /app-engine-shared-datasets
       SCHEDULER_RUN_MODE: local # values: local, cluster
       SCHEDULER_ADVERTISED_URL: http://172.16.238.10:8080
@@ -281,7 +281,7 @@ services:
       - k3s-server:/var/lib/rancher/k3s
       - ./k3s/registries.yaml:/etc/rancher/k3s/registries.yaml:ro
       - ./k3s/serviceaccounts.yaml://var/lib/rancher/k3s/server/manifests/serviceaccounts.yaml:ro
-      - ${DATA_PATH:-./data}/app-engine-shared-inputs:/app-engine-shared-inputs:rw
+      - /home/siddig-hamed/egress_recordings/cytomine/data/app-engine:/home/siddig-hamed/egress_recordings/cytomine/data/app-engine:rw
       - ${DATA_PATH:-./data}/app-engine-shared-datasets:/app-engine-shared-datasets:ro
       # This is just so that we get the kubeconfig file out
       - .kube/shared:/output/

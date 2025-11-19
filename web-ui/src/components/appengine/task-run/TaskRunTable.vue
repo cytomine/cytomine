@@ -10,22 +10,22 @@
   >
     <template #default="props">
       <b-table-column :label="$t('app-engine.task-run.state.title')">
-        <task-run-state-icon :state="props.row.state"/>
+        <task-run-state-icon :state="props.row.state" />
       </b-table-column>
 
       <b-table-column :label="$t('app-engine.task.name')">
-        {{ props.row.task.name }} ({{ props.row.task.version }})
+        {{ formatTaskName(props.row) }}
       </b-table-column>
     </template>
 
     <template #detail="props">
       <section v-if="props.row.inputs">
         <h5 class="subtitle">{{ $t('app-engine.inputs.title') }}</h5>
-        <task-run-parameters-table :parameters="props.row.inputs"/>
+        <task-run-parameters-table :parameters="props.row.inputs" />
       </section>
       <section v-if="props.row.outputs" class="output-section">
         <h5 class="subtitle">{{ $t('app-engine.outputs.title') }}</h5>
-        <task-run-parameters-table :parameters="props.row.outputs"/>
+        <task-run-parameters-table :parameters="props.row.outputs" />
       </section>
     </template>
 
@@ -49,6 +49,14 @@ export default {
     return {
       currentPage: 1,
     };
+  },
+  methods: {
+    formattedTime(timestamp) {
+      return (new Date(timestamp)).toLocaleString();
+    },
+    formatTaskName(row) {
+      return `${row.task.name} (${row.task.version}) - ${this.formattedTime(row.created_at)}`;
+    },
   },
 };
 </script>

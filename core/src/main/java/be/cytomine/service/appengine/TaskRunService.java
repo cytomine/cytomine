@@ -134,7 +134,8 @@ public class TaskRunService {
                 taskRun.getProject().getId(),
                 taskRun.getUser().getId(),
                 taskRun.getImage().getId(),
-                taskRun.getTaskRunId().toString()
+                taskRun.getTaskRunId().toString(),
+                taskRun.getCreated()
             ))
             .toList();
     }

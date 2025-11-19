@@ -16,6 +16,8 @@
             postgresql
             kustomize
             kubernetes-helm
+            python3
+            uv
           ];
           shellHook = ''
             export KUBECONFIG=./.kube/config

@@ -41,7 +41,7 @@ if __name__ == "__main__":
     params, _ = parser.parse_known_args(sys.argv[1:])
 
     with Cytomine(
-        host=params.cytomine_core_host
+        host=params.cytomine_core_host,
         public_key=params.public_key,
         private_key=params.private_key,
     ) as cytomine:
@@ -53,6 +53,6 @@ if __name__ == "__main__":
         if not storage:
             raise ValueError("Storage not found")
 
-        response = cytomine.import_datasets(storage.id, import_uri=params.import_uri)
+        response = cytomine.import_datasets(storage.id, pims_url=f"{params.cytomine_pims_host}/{params.import_uri}")
 
         print(response)

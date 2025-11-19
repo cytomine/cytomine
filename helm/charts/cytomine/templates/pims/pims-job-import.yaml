@@ -60,7 +60,7 @@ spec:
             imagePullPolicy: Always
             command: ["/bin/sh", "-c"]
             # we cannot currently differenciate urls in this helpers, so we call from outside.
-            args: [ "python examples/import_datasets.py --host=https://{{ .Values.global.domainName }} --public_key=$$(cat /data/public_key) --private_key=$$(cat /data/private_key) --import-uri=ims/import"]
+            args: [ "python examples/import_datasets.py --cytomine_core_host=http://core.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.core.port }} --cytomine_pims_host=http://pims.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.pims.port }} --public_key=$$(cat /data/public_key) --private_key=$$(cat /data/private_key) --import-uri=ims/import"]
             volumeMounts:
             - name: data
               mountPath: /data

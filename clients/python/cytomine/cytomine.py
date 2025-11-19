@@ -981,19 +981,19 @@ class Cytomine:
     def import_datasets(
         self,
         storage_id: int,
-        import_uri: str,
+        pims_url: str,
         dataset_names: Optional[str] = None,
     ) -> Dict[str, str]:
         """Import datasets from a given path."""
 
-        upload_host = self._base_url(with_base_path=False)
+        core_url = self._base_url(with_base_path=False)
 
         response = self._session.post(
-            f"{upload_host}/{import_uri}",
+            pims_url,
             auth=CytomineAuth(
                 self._public_key,
                 self._private_key,
-                upload_host,
+                core_url,
                 "",
             ),
             headers=self._headers(content_type="text/plain"),

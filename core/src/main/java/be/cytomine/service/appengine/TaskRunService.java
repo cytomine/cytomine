@@ -9,6 +9,7 @@ import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.dto.appengine.task.TaskRunDetail;
+import be.cytomine.dto.appengine.task.TaskRunResponse;
 import be.cytomine.dto.appengine.task.TaskRunValue;
 import be.cytomine.dto.image.CropParameter;
 import be.cytomine.exceptions.ObjectNotFoundException;
@@ -98,11 +99,10 @@ public class TaskRunService {
 
         String response = appEngineService.post(uri, null, MediaType.APPLICATION_JSON);
 
-        UUID taskId;
+        TaskRunResponse taskRunResponse;
         try {
-            JsonNode jsonResponse = new ObjectMapper().readTree(response);
-            taskId = UUID.fromString(jsonResponse.path("id").asText());
-        } catch (Exception e) {
+            taskRunResponse = new ObjectMapper().readValue(response, TaskRunResponse.class);
+        } catch (JsonProcessingException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error parsing JSON response");
         }
         ImageInstance image = imageInstanceService.get(body.get("image").asLong());
@@ -110,7 +110,7 @@ public class TaskRunService {
         TaskRun taskRun = new TaskRun();
         taskRun.setUser(currentUser);
         taskRun.setProject(project);
-        taskRun.setTaskRunId(taskId);
+        taskRun.setTaskRunId(taskRunResponse.id());
         taskRun.setImage(image);
         taskRunRepository.save(taskRun);
 
@@ -133,7 +133,8 @@ public class TaskRunService {
                 taskRun.getProject().getId(),
                 taskRun.getUser().getId(),
                 taskRun.getImage().getId(),
-                taskRun.getTaskRunId().toString()
+                taskRun.getTaskRunId().toString(),
+                taskRun.getCreated()
             ))
             .toList();
     }
@@ -378,10 +379,8 @@ public class TaskRunService {
         checkTaskRun(projectId, taskRunId);
 
         String response = appEngineService.get("task-runs/" + taskRunId + "/outputs");
-        Optional<TaskRun> taskRun = taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId);
-        if (taskRun.isEmpty()) {
-            throw new ObjectNotFoundException("TaskRun", taskRunId);
-        }
+        TaskRun taskRun = taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId)
+                .orElseThrow(() -> new ObjectNotFoundException("TaskRun", taskRunId));
 
         List<TaskRunValue> outputs;
         try {
@@ -397,15 +396,23 @@ public class TaskRunService {
             .map(value -> (String) value)
             .toList();
 
-        String layerName = "task-run-" + taskRunId;
+        String taskRunData = appEngineService.get("task-runs/" + taskRunId);
+        TaskRunResponse taskRunResponse;
+        try {
+            taskRunResponse = new ObjectMapper().readValue(taskRunData, TaskRunResponse.class);
+        } catch(JsonProcessingException e) {
+            throw new ObjectNotFoundException("Task run", taskRunId);
+        }
+
+        String layerName = annotationLayerService.createLayerName(taskRunResponse.task().name(), taskRunResponse.task().version(), taskRun.getCreated());
         AnnotationLayer annotationLayer = annotationLayerService.createAnnotationLayer(layerName);
         TaskRunLayer taskRunLayer = taskRunLayerRepository
-                .findByTaskRunAndImage(taskRun.get(), taskRun.get().getImage())
+                .findByTaskRunAndImage(taskRun, taskRun.getImage())
                 .orElseGet(() -> {
                     TaskRunLayer newLayer = new TaskRunLayer();
                     newLayer.setAnnotationLayer(annotationLayer);
-                    newLayer.setTaskRun(taskRun.get());
-                    newLayer.setImage(taskRun.get().getImage());
+                    newLayer.setTaskRun(taskRun);
+                    newLayer.setImage(taskRun.getImage());
                     return newLayer;
                 });
         boolean updated = false;

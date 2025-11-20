@@ -11,11 +11,12 @@ import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import be.cytomine.appengine.dto.responses.errors.ErrorCode;
-import be.cytomine.appengine.exceptions.TypeValidationException;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
 import org.dcm4che3.io.DicomInputStream;
+
+import be.cytomine.appengine.dto.responses.errors.ErrorCode;
+import be.cytomine.appengine.exceptions.TypeValidationException;
 
 public class DicomFormat implements FileFormat {
 
@@ -25,6 +26,7 @@ public class DicomFormat implements FileFormat {
 
     @Override
     public boolean checkSignature(File file) {
+
         if (file.length() < SIGNATURE.length) {
             return false;
         }
@@ -51,8 +53,7 @@ public class DicomFormat implements FileFormat {
         return true;
     }
 
-    public void validateZippedWSIDicom(File file) throws TypeValidationException
-    {
+    public void validateZippedWSIDicom(File file) throws TypeValidationException {
         try (ZipFile zipFile = new ZipFile(file)) {
             Enumeration<? extends ZipEntry> zipEntries = zipFile.entries();
             while (zipEntries.hasMoreElements()) {
@@ -65,15 +66,17 @@ public class DicomFormat implements FileFormat {
     }
 
     private void validateDicomHeader(ZipFile zipFile, ZipEntry zipEntry)
-        throws IOException, TypeValidationException
-    {
+        throws IOException, TypeValidationException {
         try (InputStream inputStream = new BufferedInputStream(zipFile.getInputStream(zipEntry))) {
-            byte[] headerBytes = inputStream.readNBytes(DICOM_MAGIC_BYTE_OFFSET + DICOM_MAGIC_BYTES_LENGTH);
-            byte[] magicBytes = Arrays.copyOfRange(headerBytes, headerBytes.length - DICOM_MAGIC_BYTES_LENGTH, headerBytes.length);
+            byte[] headerBytes = inputStream.readNBytes(
+                DICOM_MAGIC_BYTE_OFFSET + DICOM_MAGIC_BYTES_LENGTH);
+            byte[] magicBytes = Arrays.copyOfRange(headerBytes,
+                headerBytes.length - DICOM_MAGIC_BYTES_LENGTH, headerBytes.length);
 
             DicomFormat dicomFormat = new DicomFormat();
             if (!dicomFormat.checkSignature(magicBytes)) {
-                throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_INVALID_IMAGE_FORMAT);
+                throw new TypeValidationException(
+                    ErrorCode.INTERNAL_PARAMETER_INVALID_IMAGE_FORMAT);
             }
         }
     }

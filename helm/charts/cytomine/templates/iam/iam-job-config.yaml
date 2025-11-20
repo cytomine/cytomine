@@ -100,10 +100,25 @@ spec:
         - name: kc-auth
           mountPath: "/opt/keycloak-auth"
 {{ if and (.Values.iam.lsaaiClientIdSecretName) (and .Values.iam.lsaaiClientSecretSecretName .Values.iam.lsaaiEndpoint) }}
-      - name: add-provider-lsaai
+      # https://stackoverflow.com/a/75794013
+      - name: fetch-lsaai-config
+        image: "curlimages/curl"
+        command: ["/bin/sh", "-c"]
+        args: ["curl {{ .Values.iam.lsaaiEndpoint }} > /opt/keycloak-auth/lsaai.json && chmod 777 /opt/keycloak-auth/lsaai.json"]
+        volumeMounts:
+        - name: kc-auth
+          mountPath: "/opt/keycloak-auth"
+      - name: add-provider-lsaai-import-config
         image: "{{ .Values.images.iam }}"
         command: ["/bin/sh", "-c"]
-        args: ["/opt/keycloak/bin/kcadm.sh create identity-provider/import-config -r cytomine --server {{ include "cytomine.iamInternalUrl" . }} --config /opt/keycloak-auth/kcadm.config -s providerId=oidc -s config.name=LSAAI -s config.authorizationUrl={{- .Values.iam.lsaaiEndpoint }} -s config.clientSecret=$(LSAAI_CLIENT_SECRET) -s config.clientId=$(LSAAI_CLIENT_ID)"]
+        args: ["/opt/keycloak/bin/kcadm.sh create identity-provider/import-config -r cytomine --server {{ include "cytomine.iamInternalUrl" . }} --config /opt/keycloak-auth/kcadm.config -s providerId=oidc -s fromUrl={{ .Values.iam.lsaaiEndpoint }}"]
+        volumeMounts:
+        - name: kc-auth
+          mountPath: "/opt/keycloak-auth"
+      - name: add-provider-lsaai-provider
+        image: "{{ .Values.images.iam }}"
+        command: ["/bin/sh", "-c"]
+        args: ["/opt/keycloak/bin/kcadm.sh create identity-provider/instances -r cytomine --server {{ include "cytomine.iamInternalUrl" . }} --config /opt/keycloak-auth/kcadm.config -s alias=lsaai -s providerId=oidc -s config=$(cat /opt/keycloak-auth/lsaai.json)"]
         volumeMounts:
         - name: kc-auth
           mountPath: "/opt/keycloak-auth"

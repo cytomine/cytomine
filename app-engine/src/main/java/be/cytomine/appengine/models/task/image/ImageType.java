@@ -1,17 +1,10 @@
 package be.cytomine.appengine.models.task.image;
 
 import java.awt.Dimension;
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.UUID;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

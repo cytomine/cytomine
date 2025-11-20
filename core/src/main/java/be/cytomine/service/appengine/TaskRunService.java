@@ -110,7 +110,7 @@ public class TaskRunService {
         TaskRun taskRun = new TaskRun();
         taskRun.setUser(currentUser);
         taskRun.setProject(project);
-        taskRun.setTaskRunId(UUID.fromString(taskRunResponse.id()));
+        taskRun.setTaskRunId(taskRunResponse.id());
         taskRun.setImage(image);
         taskRunRepository.save(taskRun);
 

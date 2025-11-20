@@ -1,10 +1,12 @@
 package be.cytomine.dto.appengine.task;
 
+import java.util.UUID;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record TaskRunResponse(
-    String id,
+    UUID id,
     String state,
     TaskDescription task
 ) {}

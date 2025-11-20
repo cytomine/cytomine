@@ -9,6 +9,7 @@ import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.dto.appengine.task.TaskRunDetail;
+import be.cytomine.dto.appengine.task.TaskRunOutputResponse;
 import be.cytomine.dto.appengine.task.TaskRunResponse;
 import be.cytomine.dto.appengine.task.TaskRunValue;
 import be.cytomine.dto.image.CropParameter;
@@ -90,18 +91,20 @@ public class TaskRunService {
 
     private final TaskRunLayerRepository taskRunLayerRepository;
 
-    public String addTaskRun(Long projectId, String uri, JsonNode body) {
+    private final ObjectMapper mapper;
+
+    public String addTaskRun(Long projectId, String taskId, JsonNode body) {
         Project project = projectService.get(projectId);
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
         securityACLService.check(project, READ);
         securityACLService.checkIsNotReadOnly(project);
 
-        String response = appEngineService.post(uri, null, MediaType.APPLICATION_JSON);
+        String appEngineResponse = appEngineService.post("/tasks/" + taskId + "/runs", null, MediaType.APPLICATION_JSON);
 
         TaskRunResponse taskRunResponse;
         try {
-            taskRunResponse = new ObjectMapper().readValue(response, TaskRunResponse.class);
+            taskRunResponse = mapper.readValue(appEngineResponse, TaskRunResponse.class);
         } catch (JsonProcessingException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error parsing JSON response");
         }
@@ -112,10 +115,50 @@ public class TaskRunService {
         taskRun.setProject(project);
         taskRun.setTaskRunId(taskRunResponse.id());
         taskRun.setImage(image);
-        taskRunRepository.save(taskRun);
+        taskRun = taskRunRepository.saveAndFlush(taskRun);
+
+        List<TaskRunOutputResponse> taskRunOutputResponse;
+        String taskOutputsResponse = appEngineService.get("/tasks/" + taskId + "/outputs");
+        try {
+            taskRunOutputResponse = mapper.readValue(taskOutputsResponse, new TypeReference<>() {});
+        } catch (JsonProcessingException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error parsing JSON response");
+        }
+
+        boolean hasGeometry = false;
+        for (TaskRunOutputResponse taskRunOutput : taskRunOutputResponse) {
+            JsonNode typeNode = taskRunOutput.type();
+            JsonNode nodeId = typeNode.get("id");
+
+            if (nodeId.isTextual()) {
+                if ("geometry".equals(nodeId.asText())) {
+                    hasGeometry = true;
+                    break;
+                }
+
+                if ("array".equals(nodeId.asText())) {
+                    JsonNode subTypeNode = typeNode.get("subType");
+                    JsonNode subTypeId = subTypeNode.get("id");
+                    if ("geometry".equals(subTypeId.asText())) {
+                        hasGeometry = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (hasGeometry) {
+            String layerName = annotationLayerService.createLayerName(taskRunResponse.task().name(), taskRunResponse.task().version(), taskRun.getCreated());
+            AnnotationLayer annotationLayer = annotationLayerService.createAnnotationLayer(layerName);
+            TaskRunLayer newLayer = new TaskRunLayer();
+            newLayer.setAnnotationLayer(annotationLayer);
+            newLayer.setTaskRun(taskRun);
+            newLayer.setImage(taskRun.getImage());
+            taskRunLayerRepository.save(newLayer);
+        }
 
         // We return the App engine response. Should we include information from Cytomine (project ID, user ID, created, ... ?)
-        return response;
+        return appEngineResponse;
     }
 
     public List<TaskRunDetail> getTaskRuns(Long projectId) {

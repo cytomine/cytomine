@@ -99,10 +99,10 @@ public class TaskRunService {
 
         String response = appEngineService.post(uri, null, MediaType.APPLICATION_JSON);
 
-        JsonNode jsonResponse;
+        TaskRunResponse taskRunResponse;
         try {
-            jsonResponse = new ObjectMapper().readTree(response);
-        } catch (Exception e) {
+            taskRunResponse = new ObjectMapper().readValue(response, TaskRunResponse.class);
+        } catch (JsonProcessingException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error parsing JSON response");
         }
         ImageInstance image = imageInstanceService.get(body.get("image").asLong());
@@ -110,9 +110,7 @@ public class TaskRunService {
         TaskRun taskRun = new TaskRun();
         taskRun.setUser(currentUser);
         taskRun.setProject(project);
-        taskRun.setTaskName(jsonResponse.path("task").path("name").asText());
-        taskRun.setTaskVersion(jsonResponse.path("task").path("version").asText());
-        taskRun.setTaskRunId(UUID.fromString(jsonResponse.path("id").asText()));
+        taskRun.setTaskRunId(UUID.fromString(taskRunResponse.id()));
         taskRun.setImage(image);
         taskRunRepository.save(taskRun);
 

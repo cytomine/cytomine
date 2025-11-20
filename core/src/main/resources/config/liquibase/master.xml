@@ -48,6 +48,4 @@
 
     <include file="/config/liquibase/changelog/2025-03-28-geometry.xml" relativeToChangelogFile="false"/>
 
-    <include file="/config/liquibase/changelog/2025-11-19-add-task-run-column.sql" relativeToChangelogFile="false"/>
-
 </databaseChangeLog>

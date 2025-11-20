@@ -37,7 +37,7 @@ services:
     image: registry:2.8.3
     restart: unless-stopped
     volumes:
-      - ${DATA_PATH:-./data}/registry:/data
+      - ${DATA_PATH:-./data}/registry:/var/lib/registry
     environment:
       REGISTRY_STORAGE_DELETE_ENABLED: true
     networks:

@@ -9,6 +9,7 @@ import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.dto.appengine.task.TaskRunDetail;
+import be.cytomine.dto.appengine.task.TaskRunResponse;
 import be.cytomine.dto.appengine.task.TaskRunValue;
 import be.cytomine.dto.image.CropParameter;
 import be.cytomine.exceptions.ObjectNotFoundException;
@@ -397,7 +398,15 @@ public class TaskRunService {
             .map(value -> (String) value)
             .toList();
 
-        String layerName = annotationLayerService.createLayerName(taskRun.getTaskName(), taskRun.getTaskVersion(), taskRun.getCreated());
+        String taskRunData = appEngineService.get("task-runs/" + taskRunId);
+        TaskRunResponse taskRunResponse;
+        try {
+            taskRunResponse = new ObjectMapper().readValue(taskRunData, TaskRunResponse.class);
+        } catch(JsonProcessingException e) {
+            throw new ObjectNotFoundException("Task run", taskRunId);
+        }
+
+        String layerName = annotationLayerService.createLayerName(taskRunResponse.task().name(), taskRunResponse.task().version(), taskRun.getCreated());
         AnnotationLayer annotationLayer = annotationLayerService.createAnnotationLayer(layerName);
         TaskRunLayer taskRunLayer = taskRunLayerRepository
                 .findByTaskRunAndImage(taskRun, taskRun.getImage())

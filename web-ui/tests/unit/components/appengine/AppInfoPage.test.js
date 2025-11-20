@@ -46,8 +46,14 @@ describe('AppInfoPage.vue', () => {
         $t: (key) => key,
       },
       stubs: {
-        'b-button': true,
+        'b-button': {
+          props: ['label', 'iconPack', 'iconLeft'],
+          template: '<button>{{ label }}</button>',
+        },
         'b-collapse': true,
+        'b-dropdown': true,
+        'b-dropdown-item': true,
+        'b-icon': true,
         'b-loading': true,
       },
     });
@@ -76,6 +82,15 @@ describe('AppInfoPage.vue', () => {
     expect(wrapper.text()).toContain(mockTask.date);
     expect(wrapper.text()).toContain(mockTask.version);
     expect(wrapper.text()).toContain(mockTask.description);
+  });
+
+  it('should render action buttons', async () => {
+    const wrapper = createWrapper();
+    await flushPromises();
+
+    expect(wrapper.text()).toContain('go-back');
+    expect(wrapper.text()).toContain('install');
+    expect(wrapper.text()).toContain('button-delete');
   });
 
   it('should render no description when description is missing', async () => {

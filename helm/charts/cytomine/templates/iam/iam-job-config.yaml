@@ -174,6 +174,17 @@ spec:
               name: {{ .Values.iam.lsaaiClientIdSecretName }}
               key: clientId
 
+      - name: add-provider-lsaai-mapper
+        image: "{{ .Values.images.iam }}"
+        command: ["/bin/sh", "-c"]
+        args: ["/opt/keycloak/bin/kcadm.sh create identity-provider/instances/lsaai/mappers -r cytomine --server {{ include "cytomine.iamInternalUrl" . }} --config /opt/keycloak-auth/kcadm.config -s identityProviderAlias=lsaai -s identityProviderMapper=oidc-hardcoded-role-idp-mapper -s name=lsaai-mapper -s config.role=core.ADMIN -s config.syncMode=INHERIT || true"]
+        volumeMounts:
+        - name: kc-auth
+          mountPath: "/opt/keycloak-auth"
+        securityContext:
+          runAsUser: 1000
+          runAsGroup: 3000
+
 {{ end }}
       containers:
       - name: check-job-done

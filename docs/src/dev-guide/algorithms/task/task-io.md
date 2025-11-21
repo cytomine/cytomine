@@ -238,16 +238,19 @@ Examples:
 Image files are provided in the input folder with their parameter name (the original filename is replaced and the extension is
 removed).
 
-For directory-based image formats like WSI DICOM:
+For directory-based image formats like **WSI DICOM**:
 
 - Images must be zipped when provided through the provisioning API
-- Images are automatically unzipped when used in the task
 - This approach works well for image parameters or small arrays of images provisioned from Cytomine
 
 In storage, directory-based images can be represented as either:
 
 - A single zip archive file (for image parameters or small arrays)
 - A directory containing multiple files (for referenced datasets)
+
+::: tip
+Tasks should unzip image parameters or small image arrays before processing them. Referenced datasets are already unzipped.
+:::
 
 ## `array`
 

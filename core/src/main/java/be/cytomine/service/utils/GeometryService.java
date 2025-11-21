@@ -3,6 +3,7 @@ package be.cytomine.service.utils;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
+import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.ParseException;
@@ -46,6 +47,17 @@ public class GeometryService {
     public static Envelope getBounds(String wkt) {
         Geometry geometry = parseWKT(wkt);
         return geometry.getEnvelopeInternal();
+    }
+
+    public static Geometry addOffset(String geom, Integer xOffset, Integer yOffset) {
+        Geometry geometry = parseWKT(geom);
+
+        geometry.apply((Coordinate c) -> {
+            c.x += xOffset;
+            c.y += yOffset;
+        });
+        geometry.geometryChanged();
+        return geometry;
     }
 
     public Boolean isGeometry(String input) {

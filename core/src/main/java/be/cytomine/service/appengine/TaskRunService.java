@@ -34,6 +34,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpMethod;
@@ -155,6 +156,8 @@ public class TaskRunService {
             newLayer.setAnnotationLayer(annotationLayer);
             newLayer.setTaskRun(taskRun);
             newLayer.setImage(taskRun.getImage());
+            newLayer.setXOffset(0);
+            newLayer.setYOffset(0);
             taskRunLayerRepository.saveAndFlush(newLayer);
         }
 
@@ -478,20 +481,12 @@ public class TaskRunService {
         AnnotationLayer annotationLayer = annotationLayerService.createAnnotationLayer(layerName);
         TaskRunLayer taskRunLayer = taskRunLayerRepository
                 .findByTaskRunAndImage(taskRun, taskRun.getImage())
-                .orElseGet(() -> {
-                    TaskRunLayer newLayer = new TaskRunLayer();
-                    newLayer.setAnnotationLayer(annotationLayer);
-                    newLayer.setTaskRun(taskRun);
-                    newLayer.setImage(taskRun.getImage());
-                    return newLayer;
-                });
-        boolean updated = false;
+                .orElseThrow(() -> new ObjectNotFoundException("Task run", taskRunId));
 
-        if (!geometries.isEmpty()) {
-            for (String geometry : geometries) {
-                annotationService.createAnnotation(annotationLayer, geometryService.GeoJSONToWKT(geometry));
-            }
-            updated = true;
+        for (String geometry : geometries) {
+            String wktGeometry = geometryService.GeoJSONToWKT(geometry);
+            Geometry parsedGeometry = GeometryService.addOffset(wktGeometry, taskRunLayer.getXOffset(), taskRunLayer.getYOffset());
+            annotationService.createAnnotation(annotationLayer, parsedGeometry.toString());
         }
 
         List<TaskRunValue> geoArrayValues = outputs
@@ -504,15 +499,12 @@ public class TaskRunService {
                     JsonNode items = new ObjectMapper().convertValue(arrayValue.getValue(), JsonNode.class);
                     for (JsonNode item : items) {
                         if (geometryService.isGeometry(item.get("value").asText())) {
-                            updated = true;
-                            annotationService.createAnnotation(annotationLayer, geometryService.GeoJSONToWKT(item.get("value").asText()));
+                            String wktGeometry = geometryService.GeoJSONToWKT(item.get("value").asText());
+                            Geometry parsedGeometry = GeometryService.addOffset(wktGeometry, taskRunLayer.getXOffset(), taskRunLayer.getYOffset());
+                            annotationService.createAnnotation(annotationLayer, parsedGeometry.toString());
                         }
                     }
             }
-        }
-
-        if (updated) {
-            taskRunLayerRepository.saveAndFlush(taskRunLayer);
         }
 
         return response;

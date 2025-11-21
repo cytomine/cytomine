@@ -3,6 +3,7 @@ package be.cytomine.service.utils;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
+import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
@@ -40,6 +41,11 @@ public class GeometryService {
         } catch (ParseException ignored) {
             return null;
         }
+    }
+
+    public static Envelope getBounds(String wkt) {
+        Geometry geometry = parseWKT(wkt);
+        return geometry.getEnvelopeInternal();
     }
 
     public Boolean isGeometry(String input) {

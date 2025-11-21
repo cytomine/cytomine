@@ -33,6 +33,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.locationtech.jts.geom.Envelope;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpMethod;
@@ -154,7 +155,7 @@ public class TaskRunService {
             newLayer.setAnnotationLayer(annotationLayer);
             newLayer.setTaskRun(taskRun);
             newLayer.setImage(taskRun.getImage());
-            taskRunLayerRepository.save(newLayer);
+            taskRunLayerRepository.saveAndFlush(newLayer);
         }
 
         // We return the App engine response. Should we include information from Cytomine (project ID, user ID, created, ... ?)
@@ -319,6 +320,21 @@ public class TaskRunService {
 
             MultiValueMap<String, Object> body;
             if (type.equals("annotation")) {
+                UserAnnotation annotation = userAnnotationService.get(id);
+                Envelope bounds = GeometryService.getBounds(annotation.getWktLocation());
+
+                TaskRun taskRun = taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId)
+                    .orElseThrow(() -> new ObjectNotFoundException("TaskRun", taskRunId));
+
+                Optional<TaskRunLayer> optionalTaskRunLayer = taskRunLayerRepository
+                    .findByTaskRunAndImage(taskRun, taskRun.getImage());
+                if (optionalTaskRunLayer.isPresent()) {
+                    TaskRunLayer taskRunLayer = optionalTaskRunLayer.get();
+                    taskRunLayer.setXOffset((int) bounds.getMinX());
+                    taskRunLayer.setYOffset((int) bounds.getMinY());
+                    taskRunLayerRepository.saveAndFlush(taskRunLayer);
+                }
+
                 body = prepareImage(id);
             } else if (type.equals("image")) {
                 wsi = downloadWsi(id);

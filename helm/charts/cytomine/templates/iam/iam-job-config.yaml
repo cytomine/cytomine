@@ -173,6 +173,7 @@ spec:
             secretKeyRef:
               name: {{ .Values.iam.lsaaiClientIdSecretName }}
               key: clientId
+
 {{ end }}
       containers:
       - name: check-job-done

@@ -253,9 +253,20 @@ public class TaskRunService {
 
         try {
             ResponseEntity<byte[]> response = imageServerService.crop(annotation, parameters, null, null);
-            return response.getBody();
+
+            if (!response.getStatusCode().is2xxSuccessful()) {
+                throw new RuntimeException("Image server returned error status: " + response.getStatusCode());
+            }
+
+            byte[] imageData = response.getBody();
+            if (imageData == null || imageData.length == 0) {
+                throw new RuntimeException("Image server returned empty response for annotation " + annotation.getId());
+            }
+
+            return imageData;
         } catch (Exception e) {
-            return null;
+            log.error("Failed to get annotation crop for annotation {}", annotation.getId(), e);
+            throw new RuntimeException("Unable to process annotation: " + e.getMessage(), e);
         }
     }
 
@@ -351,10 +362,10 @@ public class TaskRunService {
 
     private MultiValueMap<String, Object> prepareImage(Long annotationId) {
         UserAnnotation annotation = userAnnotationService.get(annotationId);
+        byte[] imageData = getImageAnnotation(annotation);
 
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("file", new ByteArrayResource(
-            Objects.requireNonNull(getImageAnnotation(annotation))) {
+        body.add("file", new ByteArrayResource(imageData) {
             @Override
             public String getFilename() {
                 return annotationId + ".png";

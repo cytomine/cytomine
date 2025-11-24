@@ -36,11 +36,4 @@ public class K3sConfiguration {
         return k3sContainer;
     }
 
-//    @Profile("test")
-//    @Bean
-//    public KubernetesClient kubernetesClient() {
-//        String kubeConfigYaml = k3s.getKubeConfigYaml();
-//        Config config = Config.fromKubeconfig(kubeConfigYaml);
-//        return new DefaultKubernetesClient(config);
-//    }
 }

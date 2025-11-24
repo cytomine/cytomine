@@ -56,6 +56,12 @@ public class RestTaskController extends RestCytomineController {
             .orElseGet(() -> appEngineService.get("tasks/" + namespace + "/" + version));
     }
 
+    @DeleteMapping("/tasks/{namespace}/{version}")
+    public void deleteTask(@PathVariable String namespace, @PathVariable String version) {
+        log.info("DELETE /tasks/{}/{}", namespace, version);
+        appEngineService.delete("tasks/" + namespace + "/" + version);
+    }
+
     @PostMapping("/tasks/{namespace}/{version}/install")
     public String install(
         @PathVariable String namespace,

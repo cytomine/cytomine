@@ -15,7 +15,6 @@ import be.cytomine.dto.appengine.task.TaskRunValue;
 import be.cytomine.dto.appengine.task.type.CollectionType;
 import be.cytomine.dto.appengine.task.type.GeometryType;
 import be.cytomine.dto.appengine.task.type.TaskParameterType;
-import be.cytomine.dto.appengine.task.type.TaskParameterTypeMixin;
 import be.cytomine.dto.image.CropParameter;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.appengine.TaskRunLayerRepository;

@@ -243,14 +243,8 @@ For directory-based image formats like **WSI DICOM**:
 - Images must be zipped when provided through the provisioning API
 - This approach works well for image parameters or small arrays of images provisioned from Cytomine
 
-In storage, directory-based images can be represented as either:
+In storage, directory-based images can be represented as a directory containing multiple files (for referenced datasets)
 
-- A single zip archive file (for image parameters or small arrays)
-- A directory containing multiple files (for referenced datasets)
-
-::: tip
-Tasks should unzip image parameters or small image arrays before processing them. Referenced datasets are already unzipped.
-:::
 
 ## `array`
 

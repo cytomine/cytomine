@@ -12,6 +12,10 @@ import be.cytomine.dto.appengine.task.TaskRunDetail;
 import be.cytomine.dto.appengine.task.TaskRunOutputResponse;
 import be.cytomine.dto.appengine.task.TaskRunResponse;
 import be.cytomine.dto.appengine.task.TaskRunValue;
+import be.cytomine.dto.appengine.task.type.CollectionType;
+import be.cytomine.dto.appengine.task.type.GeometryType;
+import be.cytomine.dto.appengine.task.type.TaskParameterType;
+import be.cytomine.dto.appengine.task.type.TaskParameterTypeMixin;
 import be.cytomine.dto.image.CropParameter;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.appengine.TaskRunLayerRepository;
@@ -93,14 +97,15 @@ public class TaskRunService {
 
     private final TaskRunLayerRepository taskRunLayerRepository;
 
-    private final ObjectMapper mapper;
-
     public String addTaskRun(Long projectId, String taskId, JsonNode body) {
         Project project = projectService.get(projectId);
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
         securityACLService.check(project, READ);
         securityACLService.checkIsNotReadOnly(project);
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.addMixIn(TaskParameterType.class, TaskParameterTypeMixin.class);
 
         String appEngineResponse = appEngineService.post("/tasks/" + taskId + "/runs", null, MediaType.APPLICATION_JSON);
 
@@ -129,23 +134,16 @@ public class TaskRunService {
 
         boolean hasGeometry = false;
         for (TaskRunOutputResponse taskRunOutput : taskRunOutputResponse) {
-            JsonNode typeNode = taskRunOutput.type();
-            JsonNode nodeId = typeNode.get("id");
+            TaskParameterType type = taskRunOutput.type();
 
-            if (nodeId.isTextual()) {
-                if ("geometry".equals(nodeId.asText())) {
-                    hasGeometry = true;
-                    break;
-                }
+            if (type instanceof GeometryType) {
+                hasGeometry = true;
+                break;
+            }
 
-                if ("array".equals(nodeId.asText())) {
-                    JsonNode subTypeNode = typeNode.get("subType");
-                    JsonNode subTypeId = subTypeNode.get("id");
-                    if ("geometry".equals(subTypeId.asText())) {
-                        hasGeometry = true;
-                        break;
-                    }
-                }
+            if (type instanceof CollectionType array && array.subType() instanceof GeometryType) {
+                hasGeometry = true;
+                break;
             }
         }
 

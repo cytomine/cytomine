@@ -2,9 +2,15 @@ package be.cytomine.appengine.models.task.image;
 
 import java.awt.Dimension;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.UUID;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -143,7 +149,48 @@ public class ImageType extends Type {
         }
     }
 
+    public static void unzip(File zipFile) throws IOException, TypeValidationException {
+        Path targetDir = zipFile.toPath();
 
+        Path tempSourcePath = targetDir.resolveSibling(targetDir.getFileName().toString() + ".tmp");
+
+        try {
+            Files.move(targetDir, tempSourcePath, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_TYPE_ERROR);
+        }
+
+        Files.createDirectories(targetDir);
+
+        try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(tempSourcePath))) {
+            ZipEntry zipEntry = zis.getNextEntry();
+
+            while (zipEntry != null) {
+                // WARNING: No Zip Slip Protection is active here.
+                Path newPath = targetDir.resolve(zipEntry.getName());
+
+                if (zipEntry.isDirectory()) {
+                    Files.createDirectories(newPath);
+                } else {
+                    if (newPath.getParent() != null && !Files.exists(newPath.getParent())) {
+                        Files.createDirectories(newPath.getParent());
+                    }
+                    Files.copy(zis, newPath, StandardCopyOption.REPLACE_EXISTING);
+                }
+                zipEntry = zis.getNextEntry();
+            }
+        } catch (IOException e) {
+            // Re-throw exception indicating failure but allowing cleanup if necessary
+            throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_TYPE_ERROR);
+        }
+
+        try {
+            Files.delete(tempSourcePath);
+        } catch (IOException e) {
+            throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_TYPE_ERROR);
+        }
+
+    }
 
     @Override
     public void validate(Object valueObject) throws TypeValidationException {
@@ -165,7 +212,13 @@ public class ImageType extends Type {
         if (zipFormat.checkSignature(file)) {
             DicomFormat dicomFormat = new DicomFormat();
             dicomFormat.validateZippedWSIDicom(file);
-
+            // unzip if validation is successful
+            try {
+                unzip(file);
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_TYPE_ERROR);
+            }
         } else {
             validateImageFormat(file);
 

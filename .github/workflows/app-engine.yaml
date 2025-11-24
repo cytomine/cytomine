@@ -25,7 +25,7 @@ jobs:
 
     steps:
       - name: Set up the repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Set up JDK ${{ vars.JAVA_VERSION }}
         uses: actions/setup-java@v5
@@ -54,7 +54,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Set up node
         uses: actions/setup-node@v6
@@ -85,7 +85,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Validate OpenAPI specifications
         uses: addnab/docker-run-action@v3
@@ -101,7 +101,7 @@ jobs:
 
     steps:
       - name: Set up the repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Set up JDK ${{ vars.JAVA_VERSION }}
         uses: actions/setup-java@v5

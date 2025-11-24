@@ -1,6 +1,7 @@
 package be.cytomine.controller.ontology;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -8,11 +9,18 @@ import java.util.stream.Collectors;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.geojson.GeoJsonReader;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.mvc.ProxyExchange;
-import org.springframework.http.HttpStatus;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
@@ -29,6 +37,7 @@ import be.cytomine.exceptions.CytomineMethodNotYetImplementedException;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.*;
+import be.cytomine.repository.ontology.AnnotationDomainRepository;
 import be.cytomine.service.AnnotationListingService;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.middleware.ImageServerService;
@@ -73,6 +82,8 @@ public class RestAnnotationDomainController extends RestCytomineController {
     private final SimplifyGeometryService simplifyGeometryService;
 
     private final AnnotationListingBuilder annotationListingBuilder;
+
+    private final AnnotationDomainRepository annotationDomainRepository;
 
     private final RestTemplate restTemplate;
 
@@ -399,33 +410,64 @@ public class RestAnnotationDomainController extends RestCytomineController {
         }
     }
 
-    @PostMapping("/annotation/{id}/sam")
-    public ResponseEntity<JsonObject> processAnnotationWithSam(@PathVariable Long id) {
+    @PostMapping("/annotations/{id}/refine")
+    public ResponseEntity<String> processAnnotationWithSam(@PathVariable Long id) throws UnsupportedEncodingException, ParseException {
+        log.info("POST /annotations/{}/refine", id);
         AnnotationDomain annotation = AnnotationDomain.getAnnotationDomain(entityManager, id);
         if (!annotation.isUserAnnotation()) {
             throw new WrongArgumentException("Only user annotations can be processed with SAM.");
         }
 
+        CropParameter cropParameter = new CropParameter();
+        cropParameter.setFormat("jpg");
+        cropParameter.setIncreaseArea(2.0);
+        cropParameter.setLocation(annotation.getLocation().toString());
+        cropParameter.setDraw(true);
+        cropParameter.setSquare(true);
+        ResponseEntity<byte[]> response = imageServerService.crop(annotation, cropParameter, null, null);
+        ByteArrayResource resource =  new ByteArrayResource(response.getBody()) {
+            @Override
+            public String getFilename() {
+                return annotation.getId().toString() + ".jpg";
+            }
+        };
+
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("annotation_crop", resource);
+        body.add("image_width", annotation.getImage().getBaseImage().getWidth());
+        body.add("image_height", annotation.getImage().getBaseImage().getHeight());
+        body.add("location", annotation.getLocation().toString());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
         URI url = UriComponentsBuilder
             .fromHttpUrl(this.samUrl)
-            .path("/sam/autonomous_prediction")
-            .queryParam("annotation_id", id)
+            .path("/sam/annotations/refine")
             .build()
             .toUri();
 
         try {
-            ResponseEntity<String> samResponse = restTemplate.postForEntity(url, null, String.class);
+            ResponseEntity<String> samResponse = restTemplate.postForEntity(url, requestEntity, String.class);
 
-            JsonObject json = new JsonObject();
-            json.put("message", samResponse.getBody());
+            GeoJsonReader reader = new GeoJsonReader();
+            Geometry geometry = reader.read(samResponse.getBody());
+            geometry.setSRID(0);
 
-            return ResponseEntity.status(samResponse.getStatusCode()).body(json);
+            annotation.setLocation(geometry);
+            annotation.setWktLocation(geometry.toText());
+
+            annotationDomainRepository.saveAndFlush(annotation);
+
+            return ResponseEntity.ok(annotation.toJSON());
         } catch (HttpStatusCodeException e) {
             log.error("Failed to process annotation {} with SAM", id, e);
             throw new RuntimeException("Failed to refine annotation with SAM");
-        } catch (Exception e) {
-            log.error("Failed to call SAM server:", e);
-            throw new RuntimeException("Failed to call SAM server");
+        } catch (ParseException e) {
+            log.error("Failed to parse refined annotation {}", id, e);
+            throw new RuntimeException("Failed to parse annotation geometry");
         }
     }
 }

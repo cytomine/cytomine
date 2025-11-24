@@ -34,6 +34,7 @@ spec:
         command:
         - "/opt/keycloak/bin/kc.sh"
         - "start"
+        - "--log-level=DEBUG"
         envFrom:
         - configMapRef:
             name: iam

@@ -20,14 +20,10 @@ class Settings(BaseSettings):
     ANNOTATION_MAX_SIZE: int = 8000
 
     # Deep learning model
-    CHECKPOINT: str = "./weights/weights.pt"
+    WEIGHTS_PATH: str = "./weights"
+    CHECKPOINT: str = "weights.pt"
     CONFIG: str = "./configs/sam2.1/sam2.1_hiera_b+.yaml"
     DEVICE: torch.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-    # Cytomine client
-    CYTOMINE_HOST: str
-    CYTOMINE_PUBLIC_KEY: str
-    CYTOMINE_PRIVATE_KEY: str
 
 
 @lru_cache()

@@ -1,7 +1,7 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.4.4'
-    id 'io.spring.dependency-management' version '1.1.3'
+    id 'org.springframework.boot' version '4.0.0'
+    id 'io.spring.dependency-management' version '1.1.7'
     id 'jacoco'
     id 'org.liquibase.gradle' version '2.2.0'
     id 'checkstyle'
@@ -68,19 +68,17 @@ dependencies {
     implementation 'org.locationtech.jts.io:jts-io-common:1.19.0'
 
     // Hibernate
-    implementation 'io.hypersistence:hypersistence-utils-hibernate-60:3.5.2'
-    implementation 'org.hibernate:hibernate-core:6.3.2.Final'
-    implementation 'org.hibernate:hibernate-spatial:6.3.2.Final'
+    // implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.12.0'
+    implementation 'org.hibernate:hibernate-core:7.1.8.Final'
+    implementation 'org.hibernate:hibernate-spatial:7.1.8.Final'
 
     // Jackson
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.18.3'
-    // TODO : fix CVE-2022-41854, Score 6.5 medium vulnerability -> risk of denial of service
-    // TODO : fix CVE-2022-1471, Score 9.8 high vulnerability -> remote code execution
-    implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.17.2'
+    implementation 'com.fasterxml.jackson.core:jackson-core'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'
 
     // Jakarta
-    implementation 'jakarta.persistence:jakarta.persistence-api:3.1.0'
-    implementation 'jakarta.servlet:jakarta.servlet-api:6.1.0'
+    implementation 'jakarta.persistence:jakarta.persistence-api'
+    implementation 'jakarta.servlet:jakarta.servlet-api'
 
     // PostgreSQL
     runtimeOnly 'org.postgresql:postgresql'
@@ -116,11 +114,11 @@ dependencies {
 
     //testImplementation "org.testcontainers:testcontainers"
     testImplementation "org.springframework.boot:spring-boot-testcontainers"
-    testImplementation "org.testcontainers:junit-jupiter"
+    testImplementation "org.testcontainers:testcontainers-junit-jupiter"
     testImplementation 'com.google.cloud.tools:jib-core:0.27.3'
-    testImplementation "org.testcontainers:postgresql"
-    testImplementation "org.testcontainers:testcontainers:1.19.8"
-    testImplementation "org.testcontainers:testcontainers-k3s:2.0.1"
+    testImplementation "org.testcontainers:testcontainers-postgresql"
+    testImplementation "org.testcontainers:testcontainers"
+    testImplementation "org.testcontainers:testcontainers-k3s"
 
 }
 

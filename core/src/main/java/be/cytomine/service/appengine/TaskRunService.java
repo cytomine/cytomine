@@ -97,6 +97,8 @@ public class TaskRunService {
 
     private final TaskRunLayerRepository taskRunLayerRepository;
 
+    private final ObjectMapper objectMapper;
+
     public String addTaskRun(Long projectId, String taskId, JsonNode body) {
         Project project = projectService.get(projectId);
         User currentUser = currentUserService.getCurrentUser();
@@ -104,14 +106,11 @@ public class TaskRunService {
         securityACLService.check(project, READ);
         securityACLService.checkIsNotReadOnly(project);
 
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.addMixIn(TaskParameterType.class, TaskParameterTypeMixin.class);
-
         String appEngineResponse = appEngineService.post("/tasks/" + taskId + "/runs", null, MediaType.APPLICATION_JSON);
 
         TaskRunResponse taskRunResponse;
         try {
-            taskRunResponse = mapper.readValue(appEngineResponse, TaskRunResponse.class);
+            taskRunResponse = objectMapper.readValue(appEngineResponse, TaskRunResponse.class);
         } catch (JsonProcessingException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error parsing JSON response");
         }
@@ -127,7 +126,7 @@ public class TaskRunService {
         List<TaskRunOutputResponse> taskRunOutputResponse;
         String taskOutputsResponse = appEngineService.get("/tasks/" + taskId + "/outputs");
         try {
-            taskRunOutputResponse = mapper.readValue(taskOutputsResponse, new TypeReference<>() {});
+            taskRunOutputResponse = objectMapper.readValue(taskOutputsResponse, new TypeReference<>() {});
         } catch (JsonProcessingException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error parsing JSON response");
         }

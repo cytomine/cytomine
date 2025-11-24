@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class KubernetesConfig {
-    //    @Profile("!test")
     @Bean
     public KubernetesClient kubernetesClient() {
         Config configurations = new ConfigBuilder()

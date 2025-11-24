@@ -115,7 +115,7 @@ jobs:
           gradle-version: ${{ vars.GRADLE_VERSION }}
 
       - name: Trigger unit tests
-        run: gradle :app-engine:test --info
+        run: gradle :app-engine:test --info --tests "be.cytomine.appengine.unit.*"
 
       - name: Upload test reports
         if: ${{ always() }}

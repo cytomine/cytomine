@@ -79,3 +79,6 @@ Simple function that returns 'http' or 'https' depending on wheather
 {{- end }}
 {{- end }}
 
+{{- define "cytomine.iamInternalUrl" -}}
+http://iam.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.iam.port }}/iam
+{{- end }}

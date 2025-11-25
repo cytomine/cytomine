@@ -1,5 +1,7 @@
 package be.cytomine.service.annotation;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +28,12 @@ public class AnnotationLayerService {
     private final TaskRunLayerRepository taskRunLayerRepository;
 
     private final TaskRunLayerService taskRunLayerService;
+
+    public String createLayerName(String taskName, String taskVersion, Date created) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String createdTime = sdf.format(created);
+        return taskName + " (" + taskVersion + ") - " + createdTime;
+    }
 
     public AnnotationLayer createAnnotationLayer(String name) {
         return annotationLayerRepository.findByName(name).orElseGet(()->{

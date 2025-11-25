@@ -37,7 +37,7 @@ services:
     image: registry:2.8.3
     restart: unless-stopped
     volumes:
-      - ${DATA_PATH:-./data}/registry:/data
+      - ${DATA_PATH:-./data}/registry:/var/lib/registry
     environment:
       REGISTRY_STORAGE_DELETE_ENABLED: true
     networks:
@@ -177,9 +177,9 @@ services:
     environment:
       IMAGE_SERVER_PRIVATE_KEY: d70607f5-c478-403c-be11-3dbc1716d1cf
       IMAGE_SERVER_PUBLIC_KEY: 9a8b8369-2446-44cb-b0af-604a74e1dcdb
-      INTERNAL_PROXY_URL: http://nginx
       IAM_URL: http://nginx
       PIMS_URL: http://nginx
+      CBIR_URL: http://nginx
       APPENGINE_API_URL: http://nginx
       SAM_URL: http://nginx
       JAVAMELODY_PASS: x6wp8Lg7K1fxr/7oa5gQD/NF7hqirE15g0P1STj5hCs
@@ -208,7 +208,7 @@ services:
       - redis
     volumes:
       - ${DATA_PATH:-./data}/cbir:/data/cbir
-      - ${DATA_PATH:-./data}/weight:/weights
+      - ${DATA_PATH:-./data}/weights:/weights
     environment:
       API_BASE_PATH: ${CBIR_API_BASE_PATH:-/cbir}
       DATA_PATH: /data/cbir
@@ -223,11 +223,11 @@ services:
   sam:
     image: cytomine/sam:latest
     restart: unless-stopped
+    volumes:
+      - ${DATA_PATH:-./data}/weights:/weights
     environment:
       API_BASE_PATH: ${SAM_API_BASE_PATH:-/sam}
-      CYTOMINE_HOST: http://nginx
-      CYTOMINE_PRIVATE_KEY: d70607f5-c478-403c-be11-3dbc1716d1cf
-      CYTOMINE_PUBLIC_KEY: 9a8b8369-2446-44cb-b0af-604a74e1dcdb
+      WEIGHTS_PATH: /weights
     networks:
       host_network:
         ipv4_address: 172.16.238.13

@@ -76,7 +76,7 @@ spec:
                   key: IMAGE_SERVER_PRIVATE_KEY
             {{- if .Values.pims.datasetImportFolder }}
             - name: DATASET_PATH
-              value: {{.Values.pims.datasetImportFolder }}
+              value: {{ .Values.pims.datasetImportFolder }}
             {{- end }}
           volumeMounts:
             - name: images
@@ -135,7 +135,7 @@ spec:
       spec:
         storageClassName: {{ $imageStorageClassName }}
         accessModes:
-          - ReadWriteMany
+          - ReadWriteOnce
         resources:
           requests:
             storage: {{ .Values.imageStorage }}
@@ -144,7 +144,7 @@ spec:
       spec:
         storageClassName: {{ $tempImageStorageClassName }}
         accessModes:
-          - ReadWriteMany
+          - ReadWriteOnce
         resources:
           requests:
             storage: {{ .Values.tempImageStorage }}

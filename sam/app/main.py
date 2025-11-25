@@ -1,5 +1,6 @@
 """Segment Anything API"""
 
+import os
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
@@ -17,7 +18,7 @@ def load_predictor(settings: Settings) -> SAM2ImagePredictor:
     """Load the weights of the model and creates a new predictor instance."""
     model = build_sam2(
         settings.CONFIG,
-        settings.CHECKPOINT,
+        os.path.join(settings.WEIGHTS_PATH, settings.CHECKPOINT),
         device=settings.DEVICE,
     )
 

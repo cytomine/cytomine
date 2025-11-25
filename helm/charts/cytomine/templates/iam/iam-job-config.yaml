@@ -13,7 +13,7 @@ spec:
       - name: login
         image: "{{ .Values.images.iam }}"
         command: ["/bin/sh", "-c"]
-        args: ["/opt/keycloak/bin/kcadm.sh config credentials --server https://{{ .Values.global.domainName }}/iam --realm master --user admin --password $(KEYCLOAK_ADMIN_PASSWORD) --config /opt/keycloak-auth/kcadm.config"]
+        args: ["/opt/keycloak/bin/kcadm.sh config credentials --server {{ include "cytomine.iamInternalUrl" . }} --realm master --user admin --password $(KEYCLOAK_ADMIN_PASSWORD) --config /opt/keycloak-auth/kcadm.config"]
         volumeMounts:
         - name: kc-auth
           mountPath: "/opt/keycloak-auth"
@@ -23,30 +23,39 @@ spec:
             secretKeyRef:
               name: admin-iam-secret
               key: password
+        securityContext:
+          runAsUser: 1000
+          runAsGroup: 3000
 
       - name: create-realm
         image: "{{ .Values.images.iam }}"
         command: ["/bin/sh", "-c"]
-        args: ["/opt/keycloak/bin/kcadm.sh create realms --server https://{{ .Values.global.domainName }}/iam --config /opt/keycloak-auth/kcadm.config -s realm=cytomine -s enabled=true -o || true"]
+        args: ["/opt/keycloak/bin/kcadm.sh create realms --server {{ include "cytomine.iamInternalUrl" . }} --config /opt/keycloak-auth/kcadm.config -s realm=cytomine -s enabled=true -o || true"]
         volumeMounts:
         - name: kc-auth
           mountPath: "/opt/keycloak-auth"
+        securityContext:
+          runAsUser: 1000
+          runAsGroup: 3000
 
       - name: create-user
         image: "{{ .Values.images.iam }}"
         command: ["/bin/sh", "-c"]
-        args: ["/opt/keycloak/bin/kcadm.sh create users -r cytomine --server https://{{ .Values.global.domainName }}/iam --config /opt/keycloak-auth/kcadm.config -f /opt/keycloak-conf/config.json -o || true"]
+        args: ["/opt/keycloak/bin/kcadm.sh create users -r cytomine --server {{ include "cytomine.iamInternalUrl" . }} --config /opt/keycloak-auth/kcadm.config -f /opt/keycloak-conf/config.json -o || true"]
         volumeMounts:
         - name: kc-auth
           mountPath: "/opt/keycloak-auth"
         - name: iam-user-config
           mountPath: "/opt/keycloak-conf/config.json"
           subPath: "config.json"
+        securityContext:
+          runAsUser: 1000
+          runAsGroup: 3000
 
       - name: set-password
         image: "{{ .Values.images.iam }}"
         command: ["/bin/sh", "-c"]
-        args: ["/opt/keycloak/bin/kcadm.sh set-password --server https://{{ .Values.global.domainName }}/iam -r cytomine --username admin --new-password $(CYTOMINE_USER_PASSWORD) --config /opt/keycloak-auth/kcadm.config"]
+        args: ["/opt/keycloak/bin/kcadm.sh set-password --server {{ include "cytomine.iamInternalUrl" . }} -r cytomine --username admin --new-password $(CYTOMINE_USER_PASSWORD) --config /opt/keycloak-auth/kcadm.config"]
         volumeMounts:
         - name: kc-auth
           mountPath: "/opt/keycloak-auth"
@@ -56,50 +65,132 @@ spec:
             secretKeyRef:
               name: cytomine-admin-iam-secret
               key: password
+        securityContext:
+          runAsUser: 1000
+          runAsGroup: 3000
 
       - name: create-client
         image: "{{ .Values.images.iam }}"
         command: ["/bin/sh", "-c"]
-        args: ["/opt/keycloak/bin/kcadm.sh create clients -r cytomine --server https://{{ .Values.global.domainName }}/iam --config /opt/keycloak-auth/kcadm.config -f /opt/keycloak-conf/config.json -o || true && /opt/keycloak/bin/kcadm.sh get clients -r cytomine --server https://{{ .Values.global.domainName }}/iam --config /opt/keycloak-auth/kcadm.config -q clientId=core --fields=id | tr -d '\n][{} \"' | cut -f2 -d':' > /opt/keycloak-auth/client-core-id && cat /opt/keycloak-auth/client-core-id"]
+        args: ["/opt/keycloak/bin/kcadm.sh create clients -r cytomine --server {{ include "cytomine.iamInternalUrl" . }} --config /opt/keycloak-auth/kcadm.config -f /opt/keycloak-conf/config.json -o || true && /opt/keycloak/bin/kcadm.sh get clients -r cytomine --server {{ include "cytomine.iamInternalUrl" . }} --config /opt/keycloak-auth/kcadm.config -q clientId=core --fields=id | tr -d '\n][{} \"' | cut -f2 -d':' > /opt/keycloak-auth/client-core-id && cat /opt/keycloak-auth/client-core-id"]
         volumeMounts:
         - name: kc-auth
           mountPath: "/opt/keycloak-auth"
         - name: iam-client-config
           mountPath: "/opt/keycloak-conf/config.json"
           subPath: "config.json"
+        securityContext:
+          runAsUser: 1000
+          runAsGroup: 3000
+
       - name: create-client-roles-admin
         image: "{{ .Values.images.iam }}"
         command: ["/bin/sh", "-c"]
-        args: ["/opt/keycloak/bin/kcadm.sh create clients/$(cat /opt/keycloak-auth/client-core-id)/roles -r cytomine --server https://{{ .Values.global.domainName }}/iam --config /opt/keycloak-auth/kcadm.config -o -s name=ADMIN || true"]
+        args: ["/opt/keycloak/bin/kcadm.sh create clients/$(cat /opt/keycloak-auth/client-core-id)/roles -r cytomine --server {{ include "cytomine.iamInternalUrl" . }} --config /opt/keycloak-auth/kcadm.config -o -s name=ADMIN || true"]
         volumeMounts:
         - name: kc-auth
           mountPath: "/opt/keycloak-auth"
+        securityContext:
+          runAsUser: 1000
+          runAsGroup: 3000
+
       - name: create-client-roles-guest
         image: "{{ .Values.images.iam }}"
         command: ["/bin/sh", "-c"]
-        args: ["/opt/keycloak/bin/kcadm.sh create clients/$(cat /opt/keycloak-auth/client-core-id)/roles -r cytomine --server https://{{ .Values.global.domainName }}/iam --config /opt/keycloak-auth/kcadm.config -o -s name=GUEST || true"]
+        args: ["/opt/keycloak/bin/kcadm.sh create clients/$(cat /opt/keycloak-auth/client-core-id)/roles -r cytomine --server {{ include "cytomine.iamInternalUrl" . }} --config /opt/keycloak-auth/kcadm.config -o -s name=GUEST || true"]
         volumeMounts:
         - name: kc-auth
           mountPath: "/opt/keycloak-auth"
+        securityContext:
+          runAsUser: 1000
+          runAsGroup: 3000
+
       - name: create-client-roles-user
         image: "{{ .Values.images.iam }}"
         command: ["/bin/sh", "-c"]
-        args: ["/opt/keycloak/bin/kcadm.sh create clients/$(cat /opt/keycloak-auth/client-core-id)/roles -r cytomine --server https://{{ .Values.global.domainName }}/iam --config /opt/keycloak-auth/kcadm.config -o -s name=USER || true"]
+        args: ["/opt/keycloak/bin/kcadm.sh create clients/$(cat /opt/keycloak-auth/client-core-id)/roles -r cytomine --server {{ include "cytomine.iamInternalUrl" . }} --config /opt/keycloak-auth/kcadm.config -o -s name=USER || true"]
         volumeMounts:
         - name: kc-auth
           mountPath: "/opt/keycloak-auth"
+        securityContext:
+          runAsUser: 1000
+          runAsGroup: 3000
+
       - name: add-roles-user
         image: "{{ .Values.images.iam }}"
         command: ["/bin/sh", "-c"]
-        args: ["/opt/keycloak/bin/kcadm.sh add-roles -r cytomine --server https://{{ .Values.global.domainName }}/iam --config /opt/keycloak-auth/kcadm.config  --uusername admin --cclientid core --rolename ADMIN || true"]
+        args: ["/opt/keycloak/bin/kcadm.sh add-roles -r cytomine --server {{ include "cytomine.iamInternalUrl" . }} --config /opt/keycloak-auth/kcadm.config  --uusername admin --cclientid core --rolename ADMIN || true"]
         volumeMounts:
         - name: kc-auth
           mountPath: "/opt/keycloak-auth"
+        securityContext:
+          runAsUser: 1000
+          runAsGroup: 3000
+
+{{ if and (.Values.iam.lsaaiClientIdSecretName) (and .Values.iam.lsaaiClientSecretSecretName .Values.iam.lsaaiEndpoint) }}
+      # https://stackoverflow.com/a/75794013
+      - name: fetch-auth-config
+        image: "curlimages/curl"
+        command: ["/bin/sh", "-c"]
+        args: ["cat /opt/keycloak-auth/kcadm.config | grep token | sed -E 's/(token)|\"|:| |,//g' > /opt/keycloak-auth/token"]
+        volumeMounts:
+        - name: kc-auth
+          mountPath: "/opt/keycloak-auth"
+        securityContext:
+          runAsUser: 1000
+          runAsGroup: 3000
+
+      - name: import-lsaai-config
+        image: "curlimages/curl"
+        command: ["/bin/sh", "-c"]
+        args: ["AUTH=$(cat /opt/keycloak-auth/token) && curl -s -X POST -H \"Authorization: bearer $AUTH\" -H 'content-type: application/json' {{ include "cytomine.iamInternalUrl" . }}/admin/realms/cytomine/identity-provider/import-config -d '{\"fromUrl\":\"'{{ .Values.iam.lsaaiEndpoint }}'\",\"providerId\":\"oidc\"}' > /opt/keycloak-auth/import-config.json && cat /opt/keycloak-auth/import-config.json"]
+        volumeMounts:
+        - name: kc-auth
+          mountPath: "/opt/keycloak-auth"
+        securityContext:
+          runAsUser: 1000
+          runAsGroup: 3000
+
+
+      - name: add-provider-lsaai-instance
+        image: "{{ .Values.images.iam }}"
+        command: ["/bin/sh", "-c"]
+        args: ["JSON=$(cat /opt/keycloak-auth/import-config.json) && /opt/keycloak/bin/kcadm.sh create identity-provider/instances -r cytomine --server {{ include "cytomine.iamInternalUrl" . }} --config /opt/keycloak-auth/kcadm.config -s providerId=oidc -s alias=lsaai -s enabled=true -s displayName=lsaai -s config=$JSON -s config.clientId=$(LSAAI_CLIENT_ID) -s config.clientSecret=$(LSAAI_CLIENT_SECRET) || true"]
+        volumeMounts:
+        - name: kc-auth
+          mountPath: "/opt/keycloak-auth"
+        securityContext:
+          runAsUser: 1000
+          runAsGroup: 3000
+        env:
+        - name: LSAAI_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.iam.lsaaiClientSecretSecretName }}
+              key: clientSecret
+        - name: LSAAI_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.iam.lsaaiClientIdSecretName }}
+              key: clientId
+
+      - name: add-provider-lsaai-mapper
+        image: "{{ .Values.images.iam }}"
+        command: ["/bin/sh", "-c"]
+        args: ["/opt/keycloak/bin/kcadm.sh create identity-provider/instances/lsaai/mappers -r cytomine --server {{ include "cytomine.iamInternalUrl" . }} --config /opt/keycloak-auth/kcadm.config -s identityProviderAlias=lsaai -s identityProviderMapper=oidc-hardcoded-role-idp-mapper -s name=lsaai-mapper -s config.role=core.ADMIN -s config.syncMode=INHERIT || true"]
+        volumeMounts:
+        - name: kc-auth
+          mountPath: "/opt/keycloak-auth"
+        securityContext:
+          runAsUser: 1000
+          runAsGroup: 3000
+
+{{ end }}
       containers:
       - name: check-job-done
         image: "{{ .Values.images.iam }}"
         command: ["/bin/sh", "-c"]
-        args: ["/opt/keycloak/bin/kcadm.sh config credentials --server https://{{ .Values.global.domainName }}/iam --realm cytomine --user admin --password $(CYTOMINE_USER)"]
+        args: ["/opt/keycloak/bin/kcadm.sh config credentials --server {{ include "cytomine.iamInternalUrl" . }} --realm cytomine --user admin --password $(CYTOMINE_USER)"]
         env:
         - name: CYTOMINE_USER
           valueFrom:
@@ -122,4 +213,8 @@ spec:
           - key: "config.json"
             path: "config.json"
       restartPolicy: Never
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 3000
+
 

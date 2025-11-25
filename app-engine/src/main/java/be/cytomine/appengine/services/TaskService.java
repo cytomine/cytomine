@@ -70,7 +70,6 @@ import be.cytomine.appengine.models.task.TypeFactory;
 import be.cytomine.appengine.repositories.RunRepository;
 import be.cytomine.appengine.repositories.TaskRepository;
 import be.cytomine.appengine.states.TaskRunState;
-import be.cytomine.appengine.utils.ArchiveUtils;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -86,8 +85,6 @@ public class TaskService {
     private final RegistryHandler registryHandler;
 
     private final TaskValidationService taskValidationService;
-
-    private final ArchiveUtils archiveUtils;
 
     @Value("${storage.input.charset}")
     private String charset;
@@ -641,7 +638,8 @@ public class TaskService {
                 + namespace + ":" + version + "} has no inputs");
         }
         log.info("tasks/{namespace}/{version}/runs: retrieved task...");
-        Run run = new Run(taskRunID, TaskRunState.CREATED, task, String.valueOf(UUID.randomUUID()));
+        Run run = new Run(taskRunID, TaskRunState.CREATED, task, LocalDateTime.now());
+        run.setSecret(String.valueOf(UUID.randomUUID()));
         runRepository.saveAndFlush(run);
         // create a storage for the inputs and outputs
         createRunStorages(taskRunID);

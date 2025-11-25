@@ -21,7 +21,7 @@ metadata:
     nginx.org/proxy-read-timeout: 3600s
     nginx.org/proxy-send-timeout: 3600s
 spec:
-  ingressClassName: public
+  ingressClassName: {{ .Values.ingress.className }}
   rules:
     - host: {{ .Values.global.domainName }}
       http:

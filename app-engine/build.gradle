@@ -47,7 +47,11 @@ ext {
 springBoot {
     mainClass = "be.cytomine.appengine.AppEngineApplication"
 }
-
+test {
+    filter {
+        excludeTestsMatching "be.cytomine.appengine.integration.*"
+    }
+}
 dependencies {
     // Lombok
     implementation "org.mapstruct:mapstruct:${mapstructVersion}", "org.projectlombok:lombok:${lombokVersion}"

@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -368,6 +369,36 @@ public class TaskProvisioningService {
             }
         }
         return crc32.getValue(); // Return the final CRC32 value
+    }
+
+    public long calculateDirectoryCRC32(File directory) throws IOException {
+        Path directoryPath = directory.toPath();
+        java.util.zip.Checksum  finalCrc = new CRC32();
+
+        if (!Files.isDirectory(directoryPath)) {
+            throw new IllegalArgumentException("Path must be a directory: " + directory);
+        }
+
+        try (var walk = Files.walk(directoryPath)) {
+            walk.filter(Files::isRegularFile)
+                .sorted(Comparator.naturalOrder())
+                .forEach(filePath -> {
+                    try {
+                        long fileCrc = calculateFileCRC32(filePath.toFile());
+
+                        byte[] pathBytes = filePath.toString().getBytes(StandardCharsets.UTF_8);
+                        byte[] crcBytes = Long.toString(fileCrc).getBytes(StandardCharsets.UTF_8);
+
+                        finalCrc.update(pathBytes, 0, pathBytes.length);
+                        finalCrc.update(crcBytes, 0, crcBytes.length);
+
+                    } catch (IOException e) {
+                        throw new RuntimeException("Error processing file: " + filePath, e);
+                    }
+                });
+        }
+
+        return finalCrc.getValue();
     }
 
     public Parameter getParameter(String parameterName, ParameterType parameterType, Run run) {
@@ -948,6 +979,44 @@ public class TaskProvisioningService {
         }
 
         log.info("Get IO file from storage: done");
+        if (data.peek().getStorageDataType().equals(StorageDataType.DIRECTORY)) {
+            // this is a directory-based parameter that must be zipped
+            log.info("Get IO file from storage: zipping...");
+            File tempFile = null;
+            try {
+                tempFile = Files.createTempFile(parameterName, null).toFile();
+                FileOutputStream fos = new FileOutputStream(tempFile);
+                ZipOutputStream zipOut = new ZipOutputStream(fos);
+
+                for (StorageDataEntry current : data.getEntryList()) {
+                    String entryName;
+                    if (current.getStorageDataType().equals(StorageDataType.FILE)) {
+                        entryName = current.getName();
+                    } else {
+                        entryName = current.getName() + "/";
+                    }
+
+                    if (current.getStorageDataType().equals(StorageDataType.FILE)) {
+                        ZipEntry zipEntry = new ZipEntry(entryName);
+                        zipOut.putNextEntry(zipEntry);
+                        Files.copy(current.getData().toPath(), zipOut);
+                    }
+
+                    zipOut.closeEntry();
+                }
+                zipOut.close();
+                return tempFile;
+            } catch (IOException e) {
+                AppEngineError error = ErrorBuilder.buildParamRelatedError(
+                    ErrorCode.INTERNAL_DIRECTORY_ZIPPING_FAILURE,
+                    parameterName,
+                    e.getMessage()
+                );
+                throw new ProvisioningException(error);
+            }
+
+
+        }
         return data.peek().getData();
     }
 

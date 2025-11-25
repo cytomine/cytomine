@@ -3,8 +3,8 @@ ARG APP_ENGINE_VERSION
 ARG APP_ENGINE_REVISION
 ARG ENTRYPOINT_SCRIPTS_VERSION=1.4.0
 ARG JAVA_VERSION=17-jre
-ARG GRADLE_VERSION=7.6.4-jdk17-alpine
-ARG GRADLE_DEV_VERSION=7.6.4-jdk17-jammy
+ARG GRADLE_VERSION=8.14-jdk21-alpine
+ARG GRADLE_DEV_VERSION=8.14-jdk21-jammy
 ARG PROXY_CACHE=registry.cytomine.org/docker
 
 #######################################################################################

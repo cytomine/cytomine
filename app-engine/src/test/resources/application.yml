@@ -48,7 +48,7 @@ scheduler:
   impl: default # possible values [default]
   registry-advertised-url: http://registry:5000
   datasets-path: /dataset
-  advertised-url: http://0.0.0.0/8080
+  advertised-url: http://0.0.0.0:8080
   use-host-network: true
   tasks-namespace: tasks
   task-resources:

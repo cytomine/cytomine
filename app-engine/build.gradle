@@ -112,7 +112,6 @@ dependencies {
     implementation 'org.apache.commons:commons-imaging:1.0.0-alpha5'
     implementation 'org.dcm4che:dcm4che-core:5.31.0'
 
-    //testImplementation "org.testcontainers:testcontainers"
     testImplementation "org.springframework.boot:spring-boot-testcontainers"
     testImplementation "org.testcontainers:testcontainers-junit-jupiter"
     testImplementation 'com.google.cloud.tools:jib-core:0.27.3'

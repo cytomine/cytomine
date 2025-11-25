@@ -10,9 +10,9 @@ spring:
       location: /tmp/appengine/uploads
       enabled: false
   datasource:
-    password: ${DB_PASSWORD:password}
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:appengine}
-    username: ${DB_USERNAME:appengine}
+    password: ${DB_PASSWORD}
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT:5432}/${DB_NAME}
+    username: ${DB_USERNAME}
   hibernate:
     ddl-auto: drop-create
     show-sql: true

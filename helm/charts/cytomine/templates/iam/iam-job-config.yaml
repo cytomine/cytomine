@@ -155,7 +155,7 @@ spec:
       - name: add-provider-lsaai-instance
         image: "{{ .Values.images.iam }}"
         command: ["/bin/sh", "-c"]
-        args: ["JSON=$(cat /opt/keycloak-auth/import-config.json) && /opt/keycloak/bin/kcadm.sh create identity-provider/instances -r cytomine --server {{ include "cytomine.iamInternalUrl" . }} --config /opt/keycloak-auth/kcadm.config -s providerId=oidc -s alias=lsaai -s enabled=true -s displayName=lsaai -s config=$JSON -s config.clientId=$(LSAAI_CLIENT_ID) -s config.clientSecret=$(LSAAI_CLIENT_SECRET) || true"]
+        args: ["JSON=$(cat /opt/keycloak-auth/import-config.json) && /opt/keycloak/bin/kcadm.sh create identity-provider/instances -r cytomine --server {{ include "cytomine.iamInternalUrl" . }} --config /opt/keycloak-auth/kcadm.config -s providerId=oidc -s alias=oidc -s enabled=true -s displayName=oidc -s config=$JSON -s config.clientId=$(LSAAI_CLIENT_ID) -s config.clientSecret=$(LSAAI_CLIENT_SECRET) || true"]
         volumeMounts:
         - name: kc-auth
           mountPath: "/opt/keycloak-auth"
@@ -177,7 +177,7 @@ spec:
       - name: add-provider-lsaai-mapper
         image: "{{ .Values.images.iam }}"
         command: ["/bin/sh", "-c"]
-        args: ["/opt/keycloak/bin/kcadm.sh create identity-provider/instances/lsaai/mappers -r cytomine --server {{ include "cytomine.iamInternalUrl" . }} --config /opt/keycloak-auth/kcadm.config -s identityProviderAlias=lsaai -s identityProviderMapper=oidc-hardcoded-role-idp-mapper -s name=lsaai-mapper -s config.role=core.ADMIN -s config.syncMode=INHERIT || true"]
+        args: ["/opt/keycloak/bin/kcadm.sh create identity-provider/instances/oidc/mappers -r cytomine --server {{ include "cytomine.iamInternalUrl" . }} --config /opt/keycloak-auth/kcadm.config -s identityProviderAlias=oidc -s identityProviderMapper=oidc-hardcoded-role-idp-mapper -s name=oidc-mapper -s config.role=core.ADMIN -s config.syncMode=INHERIT || true"]
         volumeMounts:
         - name: kc-auth
           mountPath: "/opt/keycloak-auth"

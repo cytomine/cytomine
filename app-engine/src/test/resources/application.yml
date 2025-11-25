@@ -2,17 +2,16 @@
 spring:
   profiles:
     active: test
-
+  datasource:
+    password:
+    url:
+    username:
   servlet:
     multipart:
       max-file-size: 15GB
       max-request-size: 15GB
       location: /tmp/appengine/uploads
       enabled: false
-  datasource:
-    password: ${DB_PASSWORD:password}
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:appengine}
-    username: ${DB_USERNAME:appengine}
   hibernate:
     ddl-auto: drop-create
     show-sql: true
@@ -43,8 +42,15 @@ storage:
     charset: UTF_8 # possible values [UTF_8,US_ASCII,ISO_8859_1,UTF_16LE,UTF_16BE,UTF_16] and UTF_8 is default
 registry:
   url: ${REGISTRY_URL:http://registry:5000}
+  user: user
+  password: password
 scheduler:
   impl: default # possible values [default]
+  registry-advertised-url: http://registry:5000
+  datasets-path: /dataset
+  advertised-url: http://0.0.0.0:8080
+  use-host-network: true
+  tasks-namespace: tasks
   task-resources:
     cpus: 1
     ram: 4Gi

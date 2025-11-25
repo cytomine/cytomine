@@ -30,7 +30,7 @@ public class TaskRunController {
         @PathVariable UUID task,
         @RequestBody JsonNode body
     ) {
-        return taskRunService.addTaskRun(project, "tasks/" + task + "/runs", body);
+        return taskRunService.addTaskRun(project, task.toString(), body);
     }
 
     @PostMapping("/project/{project}/tasks/{namespace}/{version}/runs")
@@ -40,8 +40,7 @@ public class TaskRunController {
         @PathVariable String version,
         @RequestBody JsonNode body
     ) {
-        String uri = "tasks/" + namespace + "/" + version + "/runs";
-        return taskRunService.addTaskRun(project, uri, body);
+        return taskRunService.addTaskRun(project, namespace + "/" + version, body);
     }
 
     @GetMapping("/project/{project}/task-runs/{task}")

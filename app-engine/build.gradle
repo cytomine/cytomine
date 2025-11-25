@@ -151,18 +151,3 @@ tasks.register('cucumber') {
         }
     }
 }
-
-// liquibase activities
-//liquibase {
-//    activities {
-//        main {
-//            changelogFile 'src/test/resources/master-changelog.yml'
-//            url 'jdbc:postgresql://localhost:5432/appengine'
-//            username 'appengine'
-//            password 'password'
-//            referenceUrl 'jdbc:postgresql://localhost:5432/appengine'
-//            referenceUsername 'appengine'
-//            referencePassword 'password'
-//        }
-//    }
-//}

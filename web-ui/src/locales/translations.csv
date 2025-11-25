@@ -287,6 +287,8 @@ delete-tag-confirmation-message,Do you really want to delete tag {tagName}? <br>
 delete-image-group-link,Remove image from its image group,Retirer l'image de son groupe d'images,Eliminar imagen de su grupo de imágenes,Afbeelding uit de afbeeldingsgroep verwijderen
 delete-tag,Delete tag,Supprimer le tag,Eliminar etiqueta,Tag verwijderen
 delete-image-group-link-confirmation-message,Do you really want to remove image {imageName} from its image group? <br> All related annotation links be deleted! This operation will not be recoverable with undo button!,Êtes-vous sûr de vouloir retirer l'image {imageName} de son groupe d'images ? <br> Cette action ne pourra être annulée,¿Realmente desea eliminar la imagen {imageName} de su grupo de imágenes? <br> ¡Se eliminarán todos los enlaces de anotaciones relacionados! ¡Esta operación no será recuperable con el botón de deshacer!,Weet u zeker dat u afbeelding {imageName} uit de afbeeldingsgroep wilt verwijderen? <br> Alle gerelateerde annotatielinks worden verwijderd! Deze bewerking kan niet worden hersteld met de knop Ongedaan maken!
+delete-task,Delete task,Supprimer la tâche,Eliminar tarea,Taak verwijderen
+delete-task-message,This will remove the app and all its data,Cela supprimera l'application et toutes ses données,Esto eliminará la aplicación y todos sus datos,Dit verwijdert de app en al zijn gegevens
 deployed,Deployed,Déployé,Desplegado,Ingezet
 deploying,Deploying,Déploiement en cours,,Implementatie bezig
 deprecated,Deprecated,Déprécié,Obsoleto,Verouderd
@@ -726,9 +728,11 @@ notif-success-user-details-saved,User details correctly updated,Profil mis à jo
 notif-success-user-update,User successfully updated,L'utilisateur a bien été modifié,Usuario actualizado con éxito,User succesvol gewijzigd
 notif-unexpected-error,Unexpected error,Une erreur inattendue s'est produite,Se ha producido un error inesperado,Er is een onverwachte fout opgetreden
 notif-warn-ontology-tree-order-not-persisted,The order of children in the ontology tree is not persisted in database,L'ordre des enfants dans l'arborescence n'est pas sauvegardée dans la base de données,La jerarquía de términos dentro de la ontología no se mantiene en la base de datos.,De volgorde van de kinderen in de stamboom wordt niet opgeslagen in de database
+notify-error-app-deletion,Failed to delete the app,Échec de la suppression de l'application,Error al eliminar la aplicación,Kan de app niet verwijderen
 notify-error-app-installation,Failed to install the app,Échec de l'installation de l'application,Error al instalar la aplicación,Installatie van de app mislukt
 notify-error-empty-list,The list is empty,La liste est vide,La lista está vacía,De lijst is leeg
 notify-error-not-enough-item,Not enough items provided,Pas assez d'éléments fournis,No se han proporcionado suficientes elementos,Niet genoeg items verstrekt
+notify-success-app-deletion,App deleted successfully,Application supprimée avec succès,Aplicación eliminada con éxito,App succesvol verwijderd
 notify-success-app-installation,App installed successfully,Application installée avec succès,Aplicación instalada con éxito,App succesvol geïnstalleerd
 notify-success-app-store-addition,App store added successfully,Magasin d'applications ajouté avec succès,Tienda de aplicaciones añadida con éxito,App store succesvol toegevoegd
 notify-success-app-store-deletion,App store deleted successfully,Magasin d'applications supprimé avec succès,Tienda de aplicaciones eliminada con éxito,App store succesvol verwijderd

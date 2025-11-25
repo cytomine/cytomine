@@ -100,6 +100,24 @@ public class TaskRunResourceTests {
             )
         );
 
+        mockResponseMap = Map.of(
+            "id", taskRun.getTaskRunId().toString(),
+            "name", "test name",
+            "display_name", "test display name",
+            "description", "test description",
+            "optional", false,
+            "type", Map.of("id", "string"),
+            "derived_from", ""
+        );
+
+        mockResponse = objectMapper.writeValueAsString(List.of(mockResponseMap));
+
+        stubFor(WireMock.get(urlEqualTo(apiBasePath + "tasks/" + taskId + "/outputs"))
+            .willReturn(
+                aResponse().withBody(mockResponse).withHeader("Content-Type", "application/json")
+            )
+        );
+
         mockMvc.perform(post("/api/app-engine/project/" + taskRun.getProject().getId() + "/tasks/"+ taskId + "/runs")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(queryBody))

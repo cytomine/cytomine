@@ -141,6 +141,8 @@ export default {
     },
     async fetchTaskRuns() {
       let taskRuns = await TaskRun.fetchByProject(this.currentProjectId);
+      taskRuns.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
       this.trackedTaskRuns = await Promise.all(
         taskRuns.map(async ({project, taskRunId}) => {
           let taskRun = await Task.fetchTaskRunStatus(this.currentProjectId, taskRunId);

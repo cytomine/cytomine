@@ -18,4 +18,7 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
     @Transactional
     @Query("DELETE FROM Task")
     void deleteAllTasks();
+
+    @Transactional
+    void deleteByNamespaceAndVersion(String namespace, String version);
 }

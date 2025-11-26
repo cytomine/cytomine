@@ -16,17 +16,28 @@ package be.cytomine.service.database;
 * limitations under the License.
 */
 
-import be.cytomine.domain.security.*;
-import be.cytomine.repository.security.SecRoleRepository;
-import be.cytomine.repository.security.SecUserSecRoleRepository;
-import be.cytomine.repository.security.UserRepository;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import be.cytomine.domain.security.SecRole;
+import be.cytomine.domain.security.SecUserSecRole;
+import be.cytomine.domain.security.User;
+import be.cytomine.repository.security.SecRoleRepository;
+import be.cytomine.repository.security.SecUserSecRoleRepository;
+import be.cytomine.repository.security.UserRepository;
 
-import static be.cytomine.repository.security.SecRoleRepository.*;
+import static be.cytomine.repository.security.SecRoleRepository.ROLE_ADMIN;
+import static be.cytomine.repository.security.SecRoleRepository.ROLE_GUEST;
+import static be.cytomine.repository.security.SecRoleRepository.ROLE_SUPER_ADMIN;
+import static be.cytomine.repository.security.SecRoleRepository.ROLE_USER;
 
 @Service
 @Slf4j

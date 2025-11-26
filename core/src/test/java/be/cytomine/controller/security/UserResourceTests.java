@@ -355,14 +355,15 @@ public class UserResourceTests {
                                               .param("sortDirection", "desc")
             )
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.collection[?(@.username=='" + simpleUser.getUsername() +
-                                    "')].name").value(simpleUser.getName()))
-            .andExpect(jsonPath(
-                "$.collection[?(@.username=='" + projectUser.getUsername() + "')].name").value(
-                projectUser.getName()))
             .andExpect(jsonPath(
                 "$.collection[?(@.username=='" + simpleUser.getUsername() + "')].name").value(
-                simpleUser.getName()));
+                "firstname lastname"))
+            .andExpect(jsonPath(
+                "$.collection[?(@.username=='" + projectUser.getUsername() + "')].name").value(
+                "firstname lastname"))
+            .andExpect(jsonPath(
+                "$.collection[?(@.username=='" + simpleUser.getUsername() + "')].name").value(
+                "firstname lastname"));
     }
 
     @Test

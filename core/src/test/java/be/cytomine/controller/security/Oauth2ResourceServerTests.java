@@ -161,7 +161,7 @@ public class Oauth2ResourceServerTests {
         headers.put("alg", "RS256");
         Map<String, Object> claims = new HashMap<>();
         claims.put("sub", sub);
-        claims.put("name", UUID.randomUUID().toString());
+        claims.put("name", "Some User");
         claims.put("preferred_username", "test_user_from_token");
         Jwt jwt = new Jwt(tokenString, issuedAt, expiresAt, headers, claims);
         List<GrantedAuthority> authorities = new ArrayList<>();
@@ -198,8 +198,8 @@ public class Oauth2ResourceServerTests {
                 .issueTime(Date.from(issuedAt))
                 .claim("iss", "http://localhost:8888/")
                 .claim("sub", UUID.randomUUID())
-                                     .claim("name", UUID.randomUUID().toString())
-                .claim("preferred_username", "test_user_from_token")
+                                     .claim("name", "Some User")
+                                     .claim("preferred_username", UUID.randomUUID().toString())
                 .claim("resource_access" , resourceAccessClaim)
                 .build();
         SignedJWT signedJWT = new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.RS256)

@@ -555,7 +555,7 @@ public class AbstractImageResourceTests {
                 .issueTime(Date.from(issuedAt))
                 .claim("iss", "http://localhost:8888/")
                 .claim("sub", UUID.randomUUID())
-                                     .claim("name", UUID.randomUUID().toString())
+                                     .claim("name", "Some User")
                 .claim("preferred_username", "superadmin")
                 .claim("resource_access" , resourceAccessClaim)
                 .build();

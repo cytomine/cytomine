@@ -204,8 +204,9 @@ public class BasicInstanceBuilder {
     }
 
     public static User given_a_not_persisted_user() {
+        //User user2 = new User();
         User user = new User();
-        user.setName(UUID.randomUUID().toString());
+        user.setName("firstname lastname");
         user.setReference(UUID.randomUUID().toString());
         user.setUsername(randomString());
         user.generateKeys();

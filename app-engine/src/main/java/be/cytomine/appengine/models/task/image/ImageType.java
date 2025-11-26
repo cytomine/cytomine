@@ -35,8 +35,8 @@ import be.cytomine.appengine.models.task.Run;
 import be.cytomine.appengine.models.task.Type;
 import be.cytomine.appengine.models.task.TypePersistence;
 import be.cytomine.appengine.models.task.ValueType;
-import be.cytomine.appengine.models.task.formats.DicomFormat;
 import be.cytomine.appengine.models.task.formats.FileFormat;
+import be.cytomine.appengine.models.task.formats.WSIDicomFormat;
 import be.cytomine.appengine.models.task.formats.ZipFormat;
 import be.cytomine.appengine.repositories.image.ImagePersistenceRepository;
 import be.cytomine.appengine.utils.AppEngineApplicationContext;
@@ -111,7 +111,6 @@ public class ImageType extends Type {
             .filter(checker -> checker.checkSignature(file))
             .findFirst()
             .orElse(null);
-
         if (this.format == null) {
             throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_INVALID_IMAGE_FORMAT);
         }
@@ -214,7 +213,7 @@ public class ImageType extends Type {
 
         ZipFormat zipFormat = new ZipFormat();
         if (zipFormat.checkSignature(file)) {
-            DicomFormat dicomFormat = new DicomFormat();
+            WSIDicomFormat dicomFormat = new WSIDicomFormat();
             dicomFormat.validateZippedWSIDicom(file);
             // unzip if validation is successful
             try {
@@ -225,10 +224,11 @@ public class ImageType extends Type {
             }
         } else {
             validateImageFormat(file);
-
-            validateImageDimension(file);
-
-            validateImageSize(file);
+            // don't validate the size nor the dimension for wsidicom images
+            if (!(format instanceof WSIDicomFormat)) {
+                validateImageDimension(file);
+                validateImageSize(file);
+            }
 
             /* Additional specific type validation */
             if (!format.validate(file)) {
@@ -238,7 +238,7 @@ public class ImageType extends Type {
 
     }
 
-    public static File getFileIfStructureIsValid(StorageData currentOutputStorageData)
+    public File getDirectoryIfStructureIsValid(StorageData currentOutputStorageData)
         throws TypeValidationException {
         // validate file structure
         File outputFile = currentOutputStorageData.peek().getData();
@@ -249,6 +249,8 @@ public class ImageType extends Type {
                 + currentOutputStorageData.peek().getStorageId()
                 + "/"
                 + currentOutputStorageData.peek().getName());
+            // here we assume the format is always wsidicom until other directory-based formats are supported
+            format = new WSIDicomFormat();
         } else {
 
             if (!outputFile.exists()) {
@@ -282,7 +284,7 @@ public class ImageType extends Type {
         throws TypeValidationException {
 
         // validate file structure
-        File outputFile = getFileIfStructureIsValid(currentOutputStorageData);
+        File outputFile = getDirectoryIfStructureIsValid(currentOutputStorageData);
 
         validate(outputFile);
 

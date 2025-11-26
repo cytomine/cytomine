@@ -20,6 +20,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Transient;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.beans.factory.annotation.Value;
 
 import be.cytomine.appengine.dto.inputs.task.types.image.ImageTypeConstraint;
 import be.cytomine.appengine.dto.inputs.task.types.image.ImageValue;
@@ -41,7 +42,6 @@ import be.cytomine.appengine.repositories.image.ImagePersistenceRepository;
 import be.cytomine.appengine.utils.AppEngineApplicationContext;
 import be.cytomine.appengine.utils.units.Unit;
 
-
 @SuppressWarnings("checkstyle:LineLength")
 @Data
 @Entity
@@ -62,6 +62,10 @@ public class ImageType extends Type {
 
     @Transient
     private FileFormat format;
+
+    @Transient
+    @Value("${storage.base-path}")
+    private static String storageBasePath;
 
     public void setConstraint(ImageTypeConstraint constraint, JsonNode value) {
         switch (constraint) {
@@ -232,6 +236,42 @@ public class ImageType extends Type {
             }
         }
 
+    }
+
+    public static File getFileIfStructureIsValid(StorageData currentOutputStorageData)
+        throws TypeValidationException {
+        // validate file structure
+        File outputFile = currentOutputStorageData.peek().getData();
+        // if this is a directory-based image like wsi dicom
+        if (currentOutputStorageData.peek().getStorageDataType().equals(StorageDataType.DIRECTORY)) {
+            outputFile = new File(storageBasePath
+                + "/"
+                + currentOutputStorageData.peek().getStorageId()
+                + "/"
+                + currentOutputStorageData.peek().getName());
+        } else {
+
+            if (!outputFile.exists()) {
+                throw new TypeValidationException(
+                    ErrorCode.INTERNAL_MISSING_OUTPUT_FILE_FOR_PARAMETER
+                );
+            }
+
+            if (outputFile.isDirectory()) {
+                throw new TypeValidationException(
+                    ErrorCode.INTERNAL_OUTPUT_FILE_FOR_PARAMETER_IS_DIRECTORY
+                );
+            }
+
+            if (currentOutputStorageData.getEntryList().size() > 1) {
+                throw new TypeValidationException(
+                    ErrorCode.INTERNAL_EXTRA_OUTPUT_FILES_FOR_PARAMETER
+                );
+            }
+
+        }
+
+        return outputFile;
     }
 
     @Override

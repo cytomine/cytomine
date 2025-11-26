@@ -185,11 +185,6 @@ public class BasicInstanceBuilder {
         return user;
     }
 
-
-
-
-
-
     public void addRole(User user, String authority) {
         SecUserSecRole secSecUserSecRole = new SecUserSecRole();
         secSecUserSecRole.setSecUser(user);
@@ -200,7 +195,8 @@ public class BasicInstanceBuilder {
     }
 
     public User given_superadmin() {
-        return (User)userRepository.findByUsernameLikeIgnoreCase("superadmin").orElseThrow(() -> new ObjectNotFoundException("superadmin not in db"));
+        return userRepository.findByUsernameLikeIgnoreCase("superadmin")
+                   .orElseThrow(() -> new ObjectNotFoundException("superadmin not in db"));
     }
 
     public static User given_a_not_persisted_user() {

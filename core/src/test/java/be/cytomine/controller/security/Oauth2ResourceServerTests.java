@@ -199,7 +199,7 @@ public class Oauth2ResourceServerTests {
                 .claim("iss", "http://localhost:8888/")
                 .claim("sub", UUID.randomUUID())
                                      .claim("name", "Some User")
-                                     .claim("preferred_username", UUID.randomUUID().toString())
+                                     .claim("preferred_username", "test_user_from_token")
                 .claim("resource_access" , resourceAccessClaim)
                 .build();
         SignedJWT signedJWT = new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.RS256)

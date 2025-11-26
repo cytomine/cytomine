@@ -18,7 +18,6 @@ package be.cytomine.authorization.ontology;
 
 import java.util.Date;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -101,8 +100,7 @@ public class ReviewedAnnotationAuthorizationTest extends CRUDAuthorizationTest {
         annotation.setImage(this.reviewedAnnotation.getImage());
         annotation.setProject(this.reviewedAnnotation.getProject());
         annotation.getImage().setReviewStart(new Date());
-        annotation.getImage()
-            .setReviewUser(builder.given_a_user(UUID.randomUUID().toString())); // someone else
+        annotation.getImage().setReviewUser(builder.given_superadmin()); // someone else
         Assertions.assertThrows(WrongArgumentException.class, () -> {
             reviewedAnnotationService.reviewAnnotation(annotation.getId(), null);
         });
@@ -116,8 +114,7 @@ public class ReviewedAnnotationAuthorizationTest extends CRUDAuthorizationTest {
         reviewedAnnotation.setImage(this.reviewedAnnotation.getImage());
         reviewedAnnotation.setProject(this.reviewedAnnotation.getProject());
         reviewedAnnotation.getImage().setReviewStart(new Date());
-        reviewedAnnotation.getImage()
-            .setReviewUser(builder.given_a_user(UUID.randomUUID().toString()));
+        reviewedAnnotation.getImage().setReviewUser(builder.given_superadmin());
         reviewedAnnotation.setReviewUser(userRepository.findByUsernameLikeIgnoreCase(CREATOR).get());
         expectOK (() -> {
             reviewedAnnotationService.update(reviewedAnnotation, reviewedAnnotation.toJsonObject(), null);
@@ -132,8 +129,7 @@ public class ReviewedAnnotationAuthorizationTest extends CRUDAuthorizationTest {
         reviewedAnnotation.setImage(this.reviewedAnnotation.getImage());
         reviewedAnnotation.setProject(this.reviewedAnnotation.getProject());
         reviewedAnnotation.getImage().setReviewStart(new Date());
-        reviewedAnnotation.getImage()
-            .setReviewUser(builder.given_a_user(UUID.randomUUID().toString()));
+        reviewedAnnotation.getImage().setReviewUser(builder.given_superadmin());
         reviewedAnnotation.setReviewUser(userRepository.findByUsernameLikeIgnoreCase(CREATOR).get());
         expectOK (() -> {
             reviewedAnnotationService.delete(reviewedAnnotation, null, null, false);

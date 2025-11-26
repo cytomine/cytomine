@@ -111,7 +111,7 @@ public class BootstrapTestsDataService {
         }
 
         User user = new User();
-        user.setUsername(UUID.randomUUID().toString());
+        user.setUsername(login);
         user.setName("firstname lastname");
         user.setReference(UUID.randomUUID().toString());
         user.generateKeys();

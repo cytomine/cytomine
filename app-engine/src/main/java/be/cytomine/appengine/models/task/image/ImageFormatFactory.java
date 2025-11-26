@@ -18,6 +18,7 @@ public class ImageFormatFactory {
         formats.put("JPEG", new JpegFormat());
         formats.put("PNG", new PngFormat());
         formats.put("TIFF", new TiffFormat());
+        formats.put("WSIDICOM", new GenericFormat());
     }
 
     public static FileFormat getFormat(String format) {

@@ -7,7 +7,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -53,19 +52,7 @@ public class DicomFormat implements FileFormat {
         return true;
     }
 
-    public void validateZippedWSIDicom(File file) throws TypeValidationException {
-        try (ZipFile zipFile = new ZipFile(file)) {
-            Enumeration<? extends ZipEntry> zipEntries = zipFile.entries();
-            while (zipEntries.hasMoreElements()) {
-                ZipEntry zipEntry = zipEntries.nextElement();
-                validateDicomHeader(zipFile, zipEntry);
-            }
-        } catch (IOException e) {
-            throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_TYPE_ERROR);
-        }
-    }
-
-    private void validateDicomHeader(ZipFile zipFile, ZipEntry zipEntry)
+    public void validateDicomHeader(ZipFile zipFile, ZipEntry zipEntry)
         throws IOException, TypeValidationException {
         try (InputStream inputStream = new BufferedInputStream(zipFile.getInputStream(zipEntry))) {
             byte[] headerBytes = inputStream.readNBytes(

@@ -8,8 +8,6 @@
 #
 # kubectl -n <NAMESPACE> create secret generic <SECRET-NAME> --from-literal=password="$(pwgen 64 1)"
 
-
-
 #
 # Globals
 #
@@ -210,7 +208,7 @@ iam:
   lsaaiEndpoint:
 
 cbir:
-  port: 6000 # https://github.com/cytomine/cytomine/blob/8e5a14bf70b22e9f96a253d6402f793e8a37ce3e/cbir/Dockerfile#L37
+  port: 6000  # https://github.com/cytomine/cytomine/blob/8e5a14bf70b22e9f96a253d6402f793e8a37ce3e/cbir/Dockerfile#L37
 
 app_engine:
   port: 8080
@@ -240,4 +238,3 @@ containerSecurity:
   userID: 20000
   groupID: 20000
   fsgroupID: 20000
-

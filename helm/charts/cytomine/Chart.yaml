@@ -1,6 +1,6 @@
 apiVersion: v2
 name: cytomine-helm
-version: 0.1.1
+version: 0.1.0
 description: A Helm chart for deploying Cytomine
 type: application
 keywords:
@@ -14,7 +14,7 @@ home: https://uliege.cytomine.org/
 sources:
   - https://github.com/cytomine/cytomine
 maintainers:
-  - name: Cytomine ULiège
+  - name: cytomine
     email: uliege@cytomine.org
 icon: https://raw.githubusercontent.com/cytomine/cytomine/main/docs/src/.vuepress/public/images/cytomine-org-icon.svg
 appVersion: "2025.1"

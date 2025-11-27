@@ -83,6 +83,9 @@ spring:
           starttls:
             enable: ${SMTP_STARTTLS:true}
 
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+
 server:
   port: ${PORT:8080}
 

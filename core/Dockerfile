@@ -1,8 +1,8 @@
 # List ARGs here for better readability.
 ARG CORE_VERSION
 ARG CORE_REVISION
-ARG JAVA_VERSION=17-jre
-ARG GRADLE_VERSION=7.6-jdk17
+ARG JAVA_VERSION=21-jre
+ARG GRADLE_VERSION=8.14-jdk21
 ARG PROXY_CACHE=registry.cytomine.org/docker
 
 #######################################################################################

@@ -16,13 +16,13 @@ package be.cytomine.utils;
 * limitations under the License.
 */
 
-import be.cytomine.domain.CytomineDomain;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
+
+import be.cytomine.domain.CytomineDomain;
 
 public class DateUtils {
 
@@ -39,7 +39,11 @@ public class DateUtils {
 
     public static String getLocaleDate(Date date){
         DateFormat DFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, Locale.getDefault());
-        return DFormat.format(date);
+        return DFormat.format(date).replaceAll(
+            // This char appears in the Date string but cannot end up in the PDF with
+            // our current police used.
+            // https://stackoverflow.com/q/77225936
+            " ", " ");
     }
 
     public static String getSimpleFormatLocaleDate(Date date){

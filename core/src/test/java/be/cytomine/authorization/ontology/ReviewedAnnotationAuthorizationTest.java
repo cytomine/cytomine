@@ -16,20 +16,9 @@ package be.cytomine.authorization.ontology;
 * limitations under the License.
 */
 
-import be.cytomine.BasicInstanceBuilder;
-import be.cytomine.CytomineCoreApplication;
-import be.cytomine.authorization.CRUDAuthorizationTest;
-import be.cytomine.domain.ontology.ReviewedAnnotation;
-import be.cytomine.domain.ontology.UserAnnotation;
-import be.cytomine.domain.project.EditingMode;
-import be.cytomine.domain.project.Project;
-import be.cytomine.exceptions.CytomineMethodNotYetImplementedException;
-import be.cytomine.exceptions.WrongArgumentException;
-import be.cytomine.service.PermissionService;
-import be.cytomine.service.ontology.ReviewedAnnotationService;
-import be.cytomine.service.security.SecurityACLService;
-import be.cytomine.utils.JsonObject;
-import org.locationtech.jts.io.ParseException;
+import java.util.Date;
+import java.util.Optional;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,8 +30,17 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.Optional;
+import be.cytomine.BasicInstanceBuilder;
+import be.cytomine.CytomineCoreApplication;
+import be.cytomine.authorization.CRUDAuthorizationTest;
+import be.cytomine.domain.ontology.ReviewedAnnotation;
+import be.cytomine.domain.ontology.UserAnnotation;
+import be.cytomine.domain.project.EditingMode;
+import be.cytomine.exceptions.WrongArgumentException;
+import be.cytomine.service.PermissionService;
+import be.cytomine.service.ontology.ReviewedAnnotationService;
+import be.cytomine.service.security.SecurityACLService;
+import be.cytomine.utils.JsonObject;
 
 @AutoConfigureMockMvc
 @SpringBootTest(classes = CytomineCoreApplication.class)
@@ -102,7 +100,7 @@ public class ReviewedAnnotationAuthorizationTest extends CRUDAuthorizationTest {
         annotation.setImage(this.reviewedAnnotation.getImage());
         annotation.setProject(this.reviewedAnnotation.getProject());
         annotation.getImage().setReviewStart(new Date());
-        annotation.getImage().setReviewUser(builder.given_a_user(SUPERADMIN)); // someone else
+        annotation.getImage().setReviewUser(builder.given_superadmin()); // someone else
         Assertions.assertThrows(WrongArgumentException.class, () -> {
             reviewedAnnotationService.reviewAnnotation(annotation.getId(), null);
         });
@@ -116,7 +114,7 @@ public class ReviewedAnnotationAuthorizationTest extends CRUDAuthorizationTest {
         reviewedAnnotation.setImage(this.reviewedAnnotation.getImage());
         reviewedAnnotation.setProject(this.reviewedAnnotation.getProject());
         reviewedAnnotation.getImage().setReviewStart(new Date());
-        reviewedAnnotation.getImage().setReviewUser(builder.given_a_user(USER_ACL_ADMIN));
+        reviewedAnnotation.getImage().setReviewUser(builder.given_superadmin());
         reviewedAnnotation.setReviewUser(userRepository.findByUsernameLikeIgnoreCase(CREATOR).get());
         expectOK (() -> {
             reviewedAnnotationService.update(reviewedAnnotation, reviewedAnnotation.toJsonObject(), null);
@@ -131,7 +129,7 @@ public class ReviewedAnnotationAuthorizationTest extends CRUDAuthorizationTest {
         reviewedAnnotation.setImage(this.reviewedAnnotation.getImage());
         reviewedAnnotation.setProject(this.reviewedAnnotation.getProject());
         reviewedAnnotation.getImage().setReviewStart(new Date());
-        reviewedAnnotation.getImage().setReviewUser(builder.given_a_user(USER_ACL_ADMIN));
+        reviewedAnnotation.getImage().setReviewUser(builder.given_superadmin());
         reviewedAnnotation.setReviewUser(userRepository.findByUsernameLikeIgnoreCase(CREATOR).get());
         expectOK (() -> {
             reviewedAnnotationService.delete(reviewedAnnotation, null, null, false);

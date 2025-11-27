@@ -106,10 +106,10 @@ This step should be done before the `docker compose up -d` command in the Cytomi
 Using the Cytomine python client, you can import the datasets with the following command:
 
 ```bash
-python import_datasets.py --host <cytomine-host> --private_key <private-key> --public_key <public-key>
+python import_datasets.py --cytomine_core_host <cytomine-core-host> --cytomine_pims_host <cytomine-pims-host> --private_key <private-key> --public_key <public-key>
 ```
 
-where `<cytomine-host>` is your Cytomine host, `<public-key>` and `<private-key>` are your public and private keys.
+where `<cytomine-core-host>` and `<cytomine-pims-host>` is your Cytomine host, `<public-key>` and `<private-key>` are your public and private keys.
 
 ::: danger
 Several factors can slow down the importation:

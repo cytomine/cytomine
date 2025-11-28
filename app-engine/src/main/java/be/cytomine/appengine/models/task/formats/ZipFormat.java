@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 public class ZipFormat implements FileFormat {
-    // , , ,
+
     public static final byte[] SIGNATURE = { (byte) 0x50, (byte) 0x4B, (byte) 0x03, (byte) 0x04};
 
     @Override

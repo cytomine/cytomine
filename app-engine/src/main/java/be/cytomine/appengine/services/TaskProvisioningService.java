@@ -985,26 +985,25 @@ public class TaskProvisioningService {
             File tempFile = null;
             try {
                 tempFile = Files.createTempFile(parameterName, null).toFile();
-                FileOutputStream fos = new FileOutputStream(tempFile);
-                ZipOutputStream zipOut = new ZipOutputStream(fos);
+                try (FileOutputStream fos = new FileOutputStream(tempFile);
+                    ZipOutputStream zipOut = new ZipOutputStream(fos)) {
+                    for (StorageDataEntry current : data.getEntryList()) {
+                        String entryName;
+                        if (current.getStorageDataType().equals(StorageDataType.FILE)) {
+                            entryName = current.getName();
+                        } else {
+                            entryName = current.getName() + "/";
+                        }
 
-                for (StorageDataEntry current : data.getEntryList()) {
-                    String entryName;
-                    if (current.getStorageDataType().equals(StorageDataType.FILE)) {
-                        entryName = current.getName();
-                    } else {
-                        entryName = current.getName() + "/";
+                        if (current.getStorageDataType().equals(StorageDataType.FILE)) {
+                            ZipEntry zipEntry = new ZipEntry(entryName);
+                            zipOut.putNextEntry(zipEntry);
+                            Files.copy(current.getData().toPath(), zipOut);
+                        }
+
+                        zipOut.closeEntry();
                     }
-
-                    if (current.getStorageDataType().equals(StorageDataType.FILE)) {
-                        ZipEntry zipEntry = new ZipEntry(entryName);
-                        zipOut.putNextEntry(zipEntry);
-                        Files.copy(current.getData().toPath(), zipOut);
-                    }
-
-                    zipOut.closeEntry();
                 }
-                zipOut.close();
                 return tempFile;
             } catch (IOException e) {
                 AppEngineError error = ErrorBuilder.buildParamRelatedError(

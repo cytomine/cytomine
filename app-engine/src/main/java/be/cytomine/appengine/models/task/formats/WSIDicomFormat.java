@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -16,12 +17,16 @@ public class WSIDicomFormat implements FileFormat {
 
     @Override
     public boolean checkSignature(File directory) {
-        boolean isValid = true;
         File[] dicoms = directory.listFiles();
-        for (File dicom : dicoms) {
-            isValid = dicomFormat.checkSignature(dicom);
+        if (Objects.isNull(dicoms) || dicoms.length == 0) {
+            return false;
         }
-        return isValid;
+        for (File dicom : dicoms) {
+            if (dicom.isDirectory() || !dicomFormat.checkSignature(dicom)) {
+                return false;
+            }
+        }
+        return true;
     }
 
 

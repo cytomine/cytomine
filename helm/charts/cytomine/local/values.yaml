@@ -2,15 +2,15 @@ global:
   domainName: 'cytomine.local'
 
 postgresql:
-  storageClassName:
+  storageClassName: 'local-path'
 pims:
   imageStorage:
-    storageClassName:
+    storageClassName: 'local-path'
   tempImageStorage:
-    storageClassName:
+    storageClassName: 'local-path'
   datasetImportFolder: '/data/dataset'
 mongodb:
-  storageClassName:
+  storageClassName: 'local-path'
 app_engine:
   tasks_namespace:
 

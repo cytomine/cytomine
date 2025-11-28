@@ -1,5 +1,5 @@
 {{ if .Values.postgresql.deploy }}
-{{- $storageClassName := .Values.postgresql.storageClassName | required ".Values.postgresql.storageClassName is required." -}}
+
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -35,6 +35,10 @@ spec:
       volumes:
         - name: temp
           emptyDir: {}
+        {{ if not .Values.postgresql.storageClassName -}}
+        - emptyDir: {}
+          name: postgres-storage
+        {{ end }}
       containers:
         - name: postgis
           image: "{{ .Values.images.postgresql }}"
@@ -91,14 +95,16 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+  {{ if .Values.postgresql.storageClassName -}}
   volumeClaimTemplates:
     - metadata:
         name: postgres-storage
       spec:
-        storageClassName: {{ $storageClassName }}
+        storageClassName: {{ .Values.postgresql.storageClassName }}
         accessModes:
           - ReadWriteOnce
         resources:
           requests:
             storage: {{ .Values.postgresStorage }}
+  {{ end }}
 {{ end }}

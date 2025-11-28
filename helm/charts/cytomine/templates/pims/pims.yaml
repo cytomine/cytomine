@@ -1,6 +1,4 @@
 {{ if .Values.pims.deploy }}
-{{- $imageStorageClassName := .Values.pims.imageStorage.storageClassName | required ".Values.pims.imageStorage.storageClassName is required." -}}
-{{- $tempImageStorageClassName := .Values.pims.tempImageStorage.storageClassName | required ".Values.pims.tempImageStorage.storageClassName is required." -}}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -47,6 +45,14 @@ spec:
             path: {{ .Values.pims.datasetImportFolder }} # directory location on host
             type: {{ .Values.pims.datasetImportFolderFailIfAbsent | ternary "Directory" "DirectoryOrCreate" | quote  }} # this field is optional
         {{- end }}
+        {{ if not .Values.pims.imageStorage.storageClassName -}}
+        - emptyDir: {}
+          name: images
+        {{ end }}
+        {{ if not .Values.pims.imageStorage.tempImageStorage -}}
+        - emptyDir: {}
+          name: images-temp
+        {{ end }}
       containers:
         - name: pims
           image: "{{ .Values.images.pims }}"
@@ -109,22 +115,26 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
   volumeClaimTemplates:
+    {{ if .Values.pims.imageStorage.storageClassName -}}
     - metadata:
         name: images
       spec:
-        storageClassName: {{ $imageStorageClassName }}
+        storageClassName: {{ .Values.pims.imageStorage.storageClassName }}
         accessModes:
           - ReadWriteOnce
         resources:
           requests:
             storage: {{ .Values.imageStorage }}
+    {{ end }}
+    {{ if .Values.pims.tempImageStorage.storageClassName -}}
     - metadata:
         name: images-temp
       spec:
-        storageClassName: {{ $tempImageStorageClassName }}
+        storageClassName: {{ .Values.pims.tempImageStorage.storageClassName }}
         accessModes:
           - ReadWriteOnce
         resources:
           requests:
             storage: {{ .Values.tempImageStorage }}
+    {{ end }}
 {{ end }}

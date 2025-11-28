@@ -91,7 +91,7 @@ public class ErrorDefinitions {
         codes.put(ErrorCode.INTERNAL_PARAMETER_TYPE_ERROR_NO_MOVE, new MessageCode("APPE-internal-zip-not-moved", "failed to renamed zip archive"));
         codes.put(ErrorCode.INTERNAL_PARAMETER_TYPE_ERROR_NO_UNZIP, new MessageCode("APPE-internal-zip-not-unzipped", "failed to write unzipped content"));
         codes.put(ErrorCode.INTERNAL_PARAMETER_TYPE_ERROR_NO_DELETE, new MessageCode("APPE-internal-zip-not-deleted", "failed to delete zip archive"));
-
+        codes.put(ErrorCode.INTERNAL_PARAMETER_BASELINE_IMAGE_FAILED, new MessageCode("APPE-internal-no-baseline", "failed to extract baseline image"));
     }
 
     public static MessageCode fromCode(ErrorCode code) {

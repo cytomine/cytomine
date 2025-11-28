@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
@@ -120,8 +121,9 @@ public class ImageType extends Type {
         if (maxWidth == null && maxHeight == null) {
             return;
         }
+        File toValidate = getBaselineImage(file);
 
-        Dimension dimension = format.getDimensions(file);
+        Dimension dimension = format.getDimensions(toValidate);
         if (dimension == null) {
             throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_INVALID_IMAGE_DIMENSION);
         }
@@ -135,10 +137,30 @@ public class ImageType extends Type {
         }
     }
 
+    private File getBaselineImage(File file) throws TypeValidationException {
+        File toValidate;
+        if (format instanceof WSIDicomFormat) {
+            try {
+                toValidate = Files.walk(file.toPath())
+                    .filter(Files::isRegularFile)
+                    .max(Comparator.comparingLong(p -> p.toFile().length()))
+                    .map(Path::toFile)
+                    .orElse(null);
+            } catch (IOException e) {
+                throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_BASELINE_IMAGE_FAILED);
+            }
+        } else {
+            toValidate = file;
+        }
+        return toValidate;
+    }
+
     private void validateImageSize(File file) throws TypeValidationException {
         if (maxFileSize == null) {
             return;
         }
+
+        File toValidate = getBaselineImage(file);
 
         if (!Unit.isValid(maxFileSize)) {
             throw new TypeValidationException(
@@ -147,7 +169,7 @@ public class ImageType extends Type {
         }
 
         Unit unit = new Unit(maxFileSize);
-        if (file.length() > unit.getBytes()) {
+        if (toValidate.length() > unit.getBytes()) {
             throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_INVALID_IMAGE_SIZE);
         }
     }
@@ -223,11 +245,8 @@ public class ImageType extends Type {
             }
         } else {
             validateImageFormat(file);
-            // don't validate the size nor the dimension for wsidicom images
-            if (!(format instanceof WSIDicomFormat)) {
-                validateImageDimension(file);
-                validateImageSize(file);
-            }
+            validateImageDimension(file);
+            validateImageSize(file);
 
             /* Additional specific type validation */
             if (!format.validate(file)) {

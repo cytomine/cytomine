@@ -235,7 +235,16 @@ Examples:
 
 ## `image`
 
-Image files are provided in the input folder as such, only their original name (as it was when the image file was uploaded) has been replaced with the parameter name (and extension has been removed).
+Image files are provided in the input folder with their parameter name (the original filename is replaced and the extension is
+removed).
+
+For directory-based image formats like **WSI DICOM**:
+
+- Images must be zipped when provided through the provisioning API
+- This approach works well for image parameters or small arrays of images provisioned from Cytomine
+
+In storage, directory-based images can be represented as a directory containing multiple files (for referenced datasets)
+
 
 ## `array`
 

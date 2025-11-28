@@ -1,6 +1,4 @@
 {{ if .Values.pims.deploy }}
-{{- $imageStorageClassName := .Values.pims.imageStorage.storageClassName | required ".Values.pims.imageStorage.storageClassName is required." -}}
-{{- $tempImageStorageClassName := .Values.pims.tempImageStorage.storageClassName | required ".Values.pims.tempImageStorage.storageClassName is required." -}}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -47,6 +45,14 @@ spec:
             path: {{ .Values.pims.datasetImportFolder }} # directory location on host
             type: {{ .Values.pims.datasetImportFolderFailIfAbsent | ternary "Directory" "DirectoryOrCreate" | quote  }} # this field is optional
         {{- end }}
+        {{ if not .Values.pims.imageStorage.storageClassName -}}
+        - emptyDir: {}
+          name: images
+        {{ end }}
+        {{ if not .Values.pims.imageStorage.tempImageStorage -}}
+        - emptyDir: {}
+          name: images-temp
+        {{ end }}
       containers:
         - name: pims
           image: "{{ .Values.images.pims }}"
@@ -90,8 +96,6 @@ spec:
               subPath: logging.yml
             - name: temp
               mountPath: /tmp
-            - name: temp
-              mountPath: /app
             {{- if .Values.pims.datasetImportFolder }}
             - mountPath: "/data/dataset"
               name: import-folder
@@ -106,46 +110,31 @@ spec:
             readOnlyRootFilesystem: {{ .Values.containerSecurity.readOnlyRootFilesystem }}
           resources:
             {{- toYaml .Values.pims.resources | nindent 12 }}
-      initContainers:
-        - name: pims-init
-          image: "{{ .Values.images.pims }}"
-          imagePullPolicy: {{ .Values.images.pullPolicy }}
-          securityContext:
-            allowPrivilegeEscalation: {{ .Values.containerSecurity.allowPrivilegeEscalation }}
-            privileged: {{ .Values.containerSecurity.privileged }}
-            readOnlyRootFilesystem: {{ .Values.containerSecurity.readOnlyRootFilesystem }}
-          command:
-            - /bin/bash
-            - -c
-            - >
-              set -x;
-              cp -r /app/* /fix/;
-          volumeMounts:
-            - name: temp
-              mountPath: /fix/
-          resources:
-            {{- toYaml .Values.pims.resources | nindent 12 }}
       {{- with .Values.global.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
   volumeClaimTemplates:
+    {{ if .Values.pims.imageStorage.storageClassName -}}
     - metadata:
         name: images
       spec:
-        storageClassName: {{ $imageStorageClassName }}
+        storageClassName: {{ .Values.pims.imageStorage.storageClassName }}
         accessModes:
           - ReadWriteOnce
         resources:
           requests:
             storage: {{ .Values.imageStorage }}
+    {{ end }}
+    {{ if .Values.pims.tempImageStorage.storageClassName -}}
     - metadata:
         name: images-temp
       spec:
-        storageClassName: {{ $tempImageStorageClassName }}
+        storageClassName: {{ .Values.pims.tempImageStorage.storageClassName }}
         accessModes:
           - ReadWriteOnce
         resources:
           requests:
             storage: {{ .Values.tempImageStorage }}
+    {{ end }}
 {{ end }}

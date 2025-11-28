@@ -13,4 +13,4 @@ data:
   SCHEDULER_REGISTRY_ADVERTISED_URL: localhost:32000
   SCHEDULER_USE_HOST_NETWORK: "false"
   SCHEDULER_RUN_MODE: "cluster"
-  SCHEDULER_TASKS_NAMESPACE: {{ .Values.app_engine.tasks_namespace }}
+  SCHEDULER_TASKS_NAMESPACE: {{ include "cytomine.appEngineTasksNamespace" . }}

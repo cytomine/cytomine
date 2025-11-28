@@ -10,12 +10,13 @@
       in {
         devShell = pkgs.mkShell {
           buildInputs = with pkgs;[
-            openssl
+            chart-testing
             fluxcd
             kubectl
-            postgresql
-            kustomize
             kubernetes-helm
+            kustomize
+            openssl
+            postgresql
             python3
             uv
           ];

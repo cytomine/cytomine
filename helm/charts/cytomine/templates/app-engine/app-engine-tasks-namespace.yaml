@@ -1,4 +1,4 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: {{ .Values.app_engine.tasks_namespace }}
+  name: {{ include "cytomine.appEngineTasksNamespace" . }}

@@ -215,7 +215,6 @@ public class ImageType extends Type {
         if (zipFormat.checkSignature(file)) {
             WSIDicomFormat dicomFormat = new WSIDicomFormat();
             dicomFormat.validateZippedWSIDicom(file);
-            // unzip if validation is successful
             try {
                 unzip(file);
             } catch (IOException e) {

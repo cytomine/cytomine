@@ -48,4 +48,7 @@
 
     <include file="/config/liquibase/changelog/2025-03-28-geometry.xml" relativeToChangelogFile="false"/>
 
+    <include file="/config/liquibase/changelog/2025-11-26-username-unique.sql"
+             relativeToChangelogFile="false" />
+
 </databaseChangeLog>

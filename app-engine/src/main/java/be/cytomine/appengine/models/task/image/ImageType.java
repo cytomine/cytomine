@@ -160,7 +160,7 @@ public class ImageType extends Type {
         try {
             Files.move(targetDir, tempSourcePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_TYPE_ERROR);
+            throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_TYPE_ERROR_NO_MOVE);
         }
 
         Files.createDirectories(targetDir);
@@ -184,13 +184,13 @@ public class ImageType extends Type {
             }
         } catch (IOException e) {
             // Re-throw exception indicating failure but allowing cleanup if necessary
-            throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_TYPE_ERROR);
+            throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_TYPE_ERROR_NO_UNZIP);
         }
 
         try {
             Files.delete(tempSourcePath);
         } catch (IOException e) {
-            throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_TYPE_ERROR);
+            throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_TYPE_ERROR_NO_DELETE);
         }
 
     }

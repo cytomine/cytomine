@@ -28,6 +28,7 @@ import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.image.server.StorageService;
 import be.cytomine.service.ontology.OntologyService;
+import be.cytomine.service.project.ProjectMemberService;
 import be.cytomine.service.project.ProjectRepresentativeUserService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.report.ReportService;
@@ -46,6 +47,8 @@ import static org.springframework.security.acls.domain.BasePermission.ADMINISTRA
 public class RestUserController extends RestCytomineController {
 
     private final UserService userService;
+
+    private final ProjectMemberService projectMemberService;
 
     private final ProjectService projectService;
 
@@ -277,7 +280,7 @@ public class RestUserController extends RestCytomineController {
                 .orElseThrow(() -> new ObjectNotFoundException("User", userId));
         Project project = projectService.find(projectId)
                 .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
-        userService.addUserToProject(user, project, false);
+        projectMemberService.addUserToProject(user, project, false);
         return responseSuccess(JsonObject.of("data", JsonObject.of("message", "OK")).toJsonString());
     }
 
@@ -308,7 +311,7 @@ public class RestUserController extends RestCytomineController {
 
         for (User user : users) {
             try {
-                userService.addUserToProject(user, project, false);
+                projectMemberService.addUserToProject(user, project, false);
             } catch(Exception e) {
                 errors.add(user.getId().toString());
             }
@@ -341,7 +344,7 @@ public class RestUserController extends RestCytomineController {
                 .orElseThrow(() -> new ObjectNotFoundException("User", userId));
         Project project = projectService.find(projectId)
                 .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
-        userService.deleteUserFromProject(user, project, false);
+        projectMemberService.deleteUserFromProject(user, project, false);
         return responseSuccess(JsonObject.of("data", JsonObject.of("message", "OK")).toJsonString());
     }
 
@@ -372,7 +375,7 @@ public class RestUserController extends RestCytomineController {
 
         for (User user : users) {
             try {
-                userService.deleteUserFromProject(user, project, false);
+                projectMemberService.deleteUserFromProject(user, project, false);
             } catch(Exception e) {
                 errors.add(user.getId().toString());
             }
@@ -405,7 +408,7 @@ public class RestUserController extends RestCytomineController {
                 .orElseThrow(() -> new ObjectNotFoundException("User", userId));
         Project project = projectService.find(projectId)
                 .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
-        userService.addUserToProject(user, project, true);
+        projectMemberService.addUserToProject(user, project, true);
         return responseSuccess(JsonObject.of("data", JsonObject.of("message", "OK")).toJsonString());
     }
 
@@ -419,7 +422,7 @@ public class RestUserController extends RestCytomineController {
         if (!Objects.equals(currentUserService.getCurrentUser().getId(), user.getId())) {
             securityACLService.check(project,ADMINISTRATION);
         }
-        userService.deleteUserFromProject(user, project, true);
+        projectMemberService.deleteUserFromProject(user, project, true);
         return responseSuccess(JsonObject.of("data", JsonObject.of("message", "OK")).toJsonString());
     }
 

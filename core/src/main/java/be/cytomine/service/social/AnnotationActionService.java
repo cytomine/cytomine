@@ -38,8 +38,6 @@ import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 import java.util.*;
 
-import static com.mongodb.client.model.Sorts.ascending;
-import static com.mongodb.client.model.Sorts.descending;
 import static org.springframework.security.acls.domain.BasePermission.READ;
 
 @Slf4j
@@ -47,7 +45,6 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 @Transactional
 public class AnnotationActionService {
 
-    public static final String DATABASE_NAME = "cytomine";
     @Autowired
     CurrentUserService currentUserService;
 

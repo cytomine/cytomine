@@ -68,6 +68,7 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -78,7 +79,6 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static be.cytomine.service.social.ImageConsultationService.DATABASE_NAME;
 import static com.mongodb.client.model.Aggregates.*;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.gte;
@@ -156,6 +156,9 @@ public class ProjectService extends ModelService {
     @Autowired
     private RetrievalService retrievalService;
 
+    @Value("${spring.data.mongodb.database}")
+    private String mongoDatabaseName;
+
     public Project get(Long id) {
         return find(id).orElse(null);
     }
@@ -206,7 +209,7 @@ public class ProjectService extends ModelService {
         requests.add(sort(descending("date")));
         requests.add(limit(max.intValue()));
 
-        MongoCollection<Document> persistentImageConsultation = mongoClient.getDatabase(DATABASE_NAME).getCollection("persistentProjectConnection");
+        MongoCollection<Document> persistentImageConsultation = mongoClient.getDatabase(mongoDatabaseName).getCollection("persistentProjectConnection");
 
         List<Document> results = persistentImageConsultation.aggregate(requests)
                 .into(new ArrayList<>());
@@ -798,7 +801,7 @@ public class ProjectService extends ModelService {
         List<Bson> requests = new ArrayList<>();
         requests.add(match(gte("created", xSecondAgo)));
         requests.add(group("$project"));
-        MongoCollection<Document> persistentImageConsultation = mongoClient.getDatabase(DATABASE_NAME).getCollection("persistentProjectConnection");
+        MongoCollection<Document> persistentImageConsultation = mongoClient.getDatabase(mongoDatabaseName).getCollection("persistentProjectConnection");
         List<Document> results = persistentImageConsultation.aggregate(requests)
                 .into(new ArrayList<>());
         return results.stream().map(x -> x.getLong("_id")).collect(Collectors.toList());
@@ -811,7 +814,7 @@ public class ProjectService extends ModelService {
         requests.add(group(Document.parse("{project: '$project', user: '$user'}")));
         requests.add(group("$_id.project", Accumulators.sum("users", 1)));
 
-        MongoCollection<Document> persistentImageConsultation = mongoClient.getDatabase(DATABASE_NAME).getCollection("persistentProjectConnection");
+        MongoCollection<Document> persistentImageConsultation = mongoClient.getDatabase(mongoDatabaseName).getCollection("persistentProjectConnection");
         List<Document> results = persistentImageConsultation.aggregate(requests)
                 .into(new ArrayList<>());
 

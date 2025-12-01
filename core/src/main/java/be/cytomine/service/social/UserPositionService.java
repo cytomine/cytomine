@@ -43,6 +43,7 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -71,7 +72,7 @@ import static org.springframework.security.acls.domain.BasePermission.WRITE;
 public class UserPositionService {
 
     static final int USER_UNFOLLOWING_DELAY = 10;
-    public static final String DATABASE_NAME = "cytomine";
+
     @Autowired
     CurrentUserService currentUserService;
 
@@ -120,20 +121,14 @@ public class UserPositionService {
     @Autowired
     SequenceService sequenceService;
 
-//
-//    public LastUserPosition add(User user, SliceInstance sliceInstance) {
-//
-//    }
-//
-//    public LastUserPosition add(User user, ImageInstance imageInstance) {
-//
-//    }
-
     // usersTracked key -> "trackedUserId/imageId"
     public static Map<String, List<User>> broadcasters = new ConcurrentHashMap<>();
 
     // usersTracking key -> "followerId/imageId"
     public static Map<String, Boolean> followers = new ConcurrentHashMap<>();
+
+    @Value("${spring.data.mongodb.database}")
+    private String mongoDatabaseName;
 
     public PersistentUserPosition add(
             Date created,
@@ -252,7 +247,7 @@ public class UserPositionService {
         request.add(group("$user"));
 
 
-        MongoCollection<Document> persistentProjectConnection = mongoClient.getDatabase(DATABASE_NAME).getCollection("lastUserPosition");
+        MongoCollection<Document> persistentProjectConnection = mongoClient.getDatabase(mongoDatabaseName).getCollection("lastUserPosition");
 
         List<Document> results = persistentProjectConnection.aggregate(request)
                 .into(new ArrayList<>());
@@ -340,7 +335,7 @@ public class UserPositionService {
                 Accumulators.sum("frequency", 1), Accumulators.first("image", "$image")));
 
 
-        MongoCollection<Document> persistentUserPosition = mongoClient.getDatabase(DATABASE_NAME).getCollection("persistentUserPosition");
+        MongoCollection<Document> persistentUserPosition = mongoClient.getDatabase(mongoDatabaseName).getCollection("persistentUserPosition");
 
         List<Document> results = persistentUserPosition.aggregate(request)
                 .into(new ArrayList<>());
@@ -374,7 +369,7 @@ public class UserPositionService {
         request.add(group(Document.parse("{user: '$_id.user'}"),
                 Accumulators.push("position", Document.parse("{id: '$_id.image',slice: '$_id.slice', image: '$image', filename: '$imageName', originalFilename: '$imageName', date: '$date'}"))));
 
-        MongoCollection<Document> persistentUserPosition = mongoClient.getDatabase(DATABASE_NAME).getCollection("lastUserPosition");
+        MongoCollection<Document> persistentUserPosition = mongoClient.getDatabase(mongoDatabaseName).getCollection("lastUserPosition");
 
         List<Document> results = persistentUserPosition.aggregate(request)
                 .into(new ArrayList<>());

@@ -45,6 +45,7 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -68,7 +69,6 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 @Transactional
 public class ImageConsultationService {
 
-    public static final String DATABASE_NAME = "cytomine";
     @Autowired
     CurrentUserService currentUserService;
 
@@ -119,6 +119,9 @@ public class ImageConsultationService {
 
     @Autowired
     ImageInstanceService imageInstanceService;
+
+    @Value("${spring.data.mongodb.database}")
+    private String mongoDatabaseName;
 
     public PersistentImageConsultation add(User user, Long imageId, String session, String mode, Date created) {
         System.out.println(currentUserService.getCurrentUser());
@@ -241,7 +244,7 @@ public class ImageConsultationService {
         requests.add(group("$image", Accumulators.max("date", "$created"), Accumulators.first("time", "$time"), Accumulators.first("countCreatedAnnotations", "$countCreatedAnnotations")));
         requests.add(sort(descending("date")));
 
-        MongoCollection<Document> persistentImageConsultation = mongoClient.getDatabase(DATABASE_NAME).getCollection("persistentImageConsultation");
+        MongoCollection<Document> persistentImageConsultation = mongoClient.getDatabase(mongoDatabaseName).getCollection("persistentImageConsultation");
 
         List<Document> results = persistentImageConsultation.aggregate(requests)
                 .into(new ArrayList<>());
@@ -306,7 +309,7 @@ public class ImageConsultationService {
             requests.add(limit(max.intValue()));
         }
 
-        MongoCollection<Document> persistentImageConsultation = mongoClient.getDatabase(DATABASE_NAME).getCollection("persistentImageConsultation");
+        MongoCollection<Document> persistentImageConsultation = mongoClient.getDatabase(mongoDatabaseName).getCollection("persistentImageConsultation");
 
         List<Document> results = persistentImageConsultation.aggregate(requests)
                 .into(new ArrayList<>());
@@ -392,7 +395,7 @@ public class ImageConsultationService {
         requests.add(match(eq("user", userId)));
         requests.add(sort(descending("created")));
 
-        MongoCollection<Document> persistentImageConsultation = mongoClient.getDatabase(DATABASE_NAME).getCollection("persistentImageConsultation");
+        MongoCollection<Document> persistentImageConsultation = mongoClient.getDatabase(mongoDatabaseName).getCollection("persistentImageConsultation");
 
         List<Document> results = persistentImageConsultation.aggregate(requests)
                 .into(new ArrayList<>());
@@ -440,7 +443,7 @@ public class ImageConsultationService {
 
         List<JsonObject> data = new ArrayList<>();
 
-        MongoCollection<Document> persistentImageConsultation = mongoClient.getDatabase(DATABASE_NAME).getCollection("persistentImageConsultation");
+        MongoCollection<Document> persistentImageConsultation = mongoClient.getDatabase(mongoDatabaseName).getCollection("persistentImageConsultation");
 
         List<Document> results = persistentImageConsultation.aggregate(requests)
                 .into(new ArrayList<>());
@@ -508,7 +511,7 @@ public class ImageConsultationService {
 
         List<JsonObject> data = new ArrayList<>();
 
-        MongoCollection<Document> persistentImageConsultation = mongoClient.getDatabase(DATABASE_NAME).getCollection("persistentImageConsultation");
+        MongoCollection<Document> persistentImageConsultation = mongoClient.getDatabase(mongoDatabaseName).getCollection("persistentImageConsultation");
 
 
         List<Document> results = persistentImageConsultation.aggregate(requests)

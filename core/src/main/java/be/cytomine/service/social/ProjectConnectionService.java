@@ -46,6 +46,7 @@ import org.bson.json.JsonWriterSettings;
 
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -62,7 +63,6 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static com.mongodb.client.model.Projections.include;
 import static org.springframework.security.acls.domain.BasePermission.*;
 
 @Slf4j
@@ -70,7 +70,6 @@ import static org.springframework.security.acls.domain.BasePermission.*;
 @Transactional
 public class ProjectConnectionService {
 
-    public static final String DATABASE_NAME = "cytomine";
     @Autowired
     CurrentUserService currentUserService;
 
@@ -115,6 +114,9 @@ public class ProjectConnectionService {
 
     @Autowired
     private SessionFactory sessionFactory;
+
+    @Value("${spring.data.mongodb.database}")
+    private String mongoDatabaseName;
 
     public PersistentProjectConnection add(User user, Project project, String session, String os, String browser, String browserVersion) {
         return add(user, project, session, os, browser, browserVersion, new Date());
@@ -173,7 +175,7 @@ public class ProjectConnectionService {
             requests.add(limit(max.intValue()));
         }
 
-        MongoCollection<Document> persistentProjectConnection = mongoClient.getDatabase(DATABASE_NAME).getCollection("persistentProjectConnection");
+        MongoCollection<Document> persistentProjectConnection = mongoClient.getDatabase(mongoDatabaseName).getCollection("persistentProjectConnection");
 
         List<Document> results = persistentProjectConnection.aggregate(requests)
                 .into(new ArrayList<>());
@@ -332,7 +334,7 @@ public class ProjectConnectionService {
                 requests.add(limit(max.intValue()));
             }
 
-            MongoCollection<Document> persistentProjectConnection = mongoClient.getDatabase(DATABASE_NAME).getCollection("persistentProjectConnection");
+            MongoCollection<Document> persistentProjectConnection = mongoClient.getDatabase(mongoDatabaseName).getCollection("persistentProjectConnection");
 
             List<Document> results = persistentProjectConnection.aggregate(requests)
                     .into(new ArrayList<>());
@@ -347,7 +349,7 @@ public class ProjectConnectionService {
     public List<JsonObject>  numberOfConnectionsOfGivenByProject(Project project, List<Long> userIds, String sortProperty, String sortDirection, Long max, Long offset){
         List<JsonObject> results = new ArrayList<>();
 
-        MongoCollection<Document> persistentProjectConnection = mongoClient.getDatabase(DATABASE_NAME).getCollection("persistentProjectConnection");
+        MongoCollection<Document> persistentProjectConnection = mongoClient.getDatabase(mongoDatabaseName).getCollection("persistentProjectConnection");
         List<Document> requestResults = persistentProjectConnection.
                 aggregate(List.of(Document.parse("{$match: {project: "+project.getId()+"}}"),Document.parse("{$group: {_id : '$user', created : {$max :'$created'}}}"), Document.parse("{$sort: {"+sortProperty+": "+(sortDirection.equals("desc")? -1 : 1)+"}}")))
                 .into(new ArrayList<>());
@@ -423,7 +425,7 @@ public class ProjectConnectionService {
 
         List<Bson> requests = List.of(match, projection1, projection2, group);
 
-        MongoCollection<Document> persistentProjectConnection = mongoClient.getDatabase(DATABASE_NAME).getCollection("persistentProjectConnection");
+        MongoCollection<Document> persistentProjectConnection = mongoClient.getDatabase(mongoDatabaseName).getCollection("persistentProjectConnection");
 
         List<Document> results = persistentProjectConnection.aggregate(requests)
                 .into(new ArrayList<>());
@@ -521,7 +523,7 @@ public class ProjectConnectionService {
         requests.addAll(matchs);
         requests.addAll(List.of(projection1, projection2, group));
 
-        MongoCollection<Document> persistentProjectConnection = mongoClient.getDatabase(DATABASE_NAME).getCollection("persistentProjectConnection");
+        MongoCollection<Document> persistentProjectConnection = mongoClient.getDatabase(mongoDatabaseName).getCollection("persistentProjectConnection");
 
         List<Document> results = persistentProjectConnection.aggregate(requests)
                 .into(new ArrayList<>());
@@ -610,7 +612,7 @@ public class ProjectConnectionService {
         requests.addAll(matchs);
         requests.addAll(List.of(projection1, projection2, group));
 
-        MongoCollection<Document> persistentProjectConnection = mongoClient.getDatabase(DATABASE_NAME).getCollection("persistentProjectConnection");
+        MongoCollection<Document> persistentProjectConnection = mongoClient.getDatabase(mongoDatabaseName).getCollection("persistentProjectConnection");
 
         List<Document> results = persistentProjectConnection.aggregate(requests)
                 .into(new ArrayList<>());

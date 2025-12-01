@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import be.cytomine.appengine.models.task.formats.WSIDicomFormat;
+import be.cytomine.appengine.models.task.formats.ZipFormat;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -33,6 +35,8 @@ public class ImageFormatTest {
         images.put("PNG", loadImage("src/test/resources/artifacts/images/image.png"));
         images.put("JPEG", loadImage("src/test/resources/artifacts/images/image.jpg"));
         images.put("TIFF", loadImage("src/test/resources/artifacts/images/image.tif"));
+        images.put("ZIP", loadImage("src/test/resources/artifacts/images/image.zip"));
+        images.put("WSIDICOM", loadImage("src/test/resources/artifacts/images/image"));
     }
 
     @AfterAll
@@ -48,7 +52,9 @@ public class ImageFormatTest {
         return Stream.of(
             Arguments.of(new PngFormat(), "PNG"),
             Arguments.of(new JpegFormat(), "JPEG"),
-            Arguments.of(new TiffFormat(), "TIFF")
+            Arguments.of(new TiffFormat(), "TIFF"),
+            Arguments.of(new ZipFormat(), "ZIP"),
+            Arguments.of(new WSIDicomFormat(), "WSIDICOM")
         );
     }
 
@@ -62,6 +68,9 @@ public class ImageFormatTest {
     @ParameterizedTest
     @MethodSource("streamImageFormat")
     public void testGetDimensions(FileFormat format, String formatKey) {
+        if (formatKey.equalsIgnoreCase("ZIP")) {
+            return;
+        }
         File image = images.get(formatKey);
         Dimension dimension = format.getDimensions(image);
 
@@ -80,6 +89,9 @@ public class ImageFormatTest {
     @ParameterizedTest
     @MethodSource("streamImageFormat")
     public void testValidate(FileFormat format, String formatKey) {
+        if (formatKey.equalsIgnoreCase("ZIP")) {
+            return;
+        }
         File image = images.get(formatKey);
         Assertions.assertTrue(format.validate(image), "Validation should return true.");
     }

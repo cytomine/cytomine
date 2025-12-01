@@ -38,17 +38,14 @@ import be.cytomine.utils.JsonObject;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Accumulators;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.json.JsonWriterSettings;
-
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.*;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.stereotype.Service;
 
@@ -66,54 +63,36 @@ import java.util.stream.Collectors;
 import static org.springframework.security.acls.domain.BasePermission.*;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 @Transactional
 public class ProjectConnectionService {
 
-    @Autowired
-    CurrentUserService currentUserService;
+    private final CurrentUserService currentUserService;
 
-    @Autowired
-    ProjectRepository projectRepository;
+    private final ProjectRepository projectRepository;
 
-    @Autowired
-    SecurityACLService securityACLService;
+    private final SecurityACLService securityACLService;
 
-    @Autowired
-    ProjectConnectionRepository projectConnectionRepository;
+    private final ProjectConnectionRepository projectConnectionRepository;
 
-    @Autowired
-    UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    MongoClient mongoClient;
+    private final MongoClient mongoClient;
 
-    @Autowired
-    PersistentProjectConnectionRepository persistentProjectConnectionRepository;
+    private final PersistentProjectConnectionRepository persistentProjectConnectionRepository;
 
-    @Autowired
-    AnnotationListingService annotationListingService;
+    private final AnnotationListingService annotationListingService;
 
-    @Autowired
-    LastConnectionRepository lastConnectionRepository;
+    private final LastConnectionRepository lastConnectionRepository;
 
-    @Autowired
-    EntityManager entityManager;
+    private final EntityManager entityManager;
 
-    @Autowired
-    MongoTemplate mongoTemplate;
+    private final SequenceService sequenceService;
 
-    @Autowired
-    SequenceService sequenceService;
+    private final ImageConsultationService imageConsultationService;
 
-    @Autowired
-    ImageConsultationService imageConsultationService;
-
-    @Autowired
-    PersistentImageConsultationRepository persistentImageConsultationRepository;
-
-    @Autowired
-    private SessionFactory sessionFactory;
+    private final PersistentImageConsultationRepository persistentImageConsultationRepository;
 
     @Value("${spring.data.mongodb.database}")
     private String mongoDatabaseName;

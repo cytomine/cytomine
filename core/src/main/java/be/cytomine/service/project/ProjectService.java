@@ -908,4 +908,11 @@ public class ProjectService extends ModelService {
     public CytomineDomain createFromJSON(JsonObject json) {
         return new Project().buildDomainFromJson(json, getEntityManager());
     }
+
+    public String getUserIdsFromProject(Long projectId) {
+        return userRepository.findAllUsersByProjectId(projectId)
+                .stream()
+                .map(user -> user.getId().toString())
+                .collect(Collectors.joining(","));
+    }
 }

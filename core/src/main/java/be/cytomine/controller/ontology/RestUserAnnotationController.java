@@ -109,7 +109,9 @@ public class RestUserAnnotationController extends RestCytomineController {
     ) throws IOException {
         Project project = projectService.find(idProject)
                 .orElseThrow(() -> new ObjectNotFoundException("Project", idProject));
-        users = userService.fillEmptyUserIds(users, idProject);
+        if (users == null || users.isEmpty()) {
+            users = projectService.getUserIdsFromProject(project.getId());
+        }
         terms = termService.fillEmptyTermIds(terms, project);
         JsonObject params = mergeQueryParamsAndBodyParams();
         byte[] report = annotationListingBuilder.buildAnnotationReport(idProject, users, params, terms, format);

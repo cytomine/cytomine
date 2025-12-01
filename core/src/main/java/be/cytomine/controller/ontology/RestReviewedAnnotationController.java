@@ -29,7 +29,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 import static org.springframework.web.bind.annotation.RequestMethod.*;
@@ -269,7 +268,9 @@ public class RestReviewedAnnotationController extends RestCytomineController {
     ) throws IOException {
         Project project = projectService.find(idProject)
                 .orElseThrow(() -> new ObjectNotFoundException("Project", idProject));
-        reviewUsers = userService.fillEmptyUserIds(reviewUsers, idProject);
+        if (reviewUsers == null || reviewUsers.isEmpty()) {
+            reviewUsers = projectService.getUserIdsFromProject(project.getId());
+        }
         terms = termService.fillEmptyTermIds(terms, project);
         JsonObject params = mergeQueryParamsAndBodyParams();
         params.put("reviewed", true);

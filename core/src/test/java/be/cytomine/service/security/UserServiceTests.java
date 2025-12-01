@@ -807,21 +807,6 @@ public class UserServiceTests {
     }
 
     @Test
-    void list_all_users_id_of_a_project() {
-        Project project = builder.given_a_project();
-        User user1 = builder.given_a_user("Paul");
-        User user2 = builder.given_a_user("Bob");
-
-        builder.addUserToProject(project, user1.getUsername());
-        builder.addUserToProject(project, user2.getUsername());
-
-        String userIds = userService.getUsersIdsFromProject(project.getId());
-        String expectedUserIds = user1.getId() + "," + user2.getId() + ",";
-
-        assertThat(expectedUserIds).isEqualTo(userIds);
-    }
-
-    @Test
     void list_online_user_for_project_wit_their_activities() {
         User userOnline = builder.given_default_user();
 
@@ -896,24 +881,6 @@ public class UserServiceTests {
         assertThat(data.getJSONAttrInteger("totalConsultations")).isEqualTo(1);
         assertThat(data.getJSONAttrInteger("totalAnnotationSelections")).isEqualTo(0);
 
-    }
-
-    @Test
-    void fill_not_empty_users_ids_from_project_works(){
-        User user = builder.given_a_user();
-        Project project = builder.given_a_project_with_user(user);
-        String users = userService.fillEmptyUserIds(user.getId().toString(), project.getId());
-        assertThat(users).isEqualTo(user.getId().toString());
-    }
-
-    @Test
-    void fill_empty_users_ids_from_project_works(){
-        User user1 = builder.given_a_user();
-        User user2 = builder.given_a_user();
-        Project project = builder.given_a_project_with_user(user1);
-        builder.addUserToProject(project, user2.getUsername());
-        String users = userService.fillEmptyUserIds("", project.getId());
-        assertThat(users).isEqualTo(user1.getId().toString() + "," + user2.getId().toString() + ",");
     }
 
 // TODO: IAM Account

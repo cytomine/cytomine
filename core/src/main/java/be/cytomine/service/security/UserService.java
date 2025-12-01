@@ -643,21 +643,6 @@ public class UserService extends ModelService {
         return jsonObject;
     }
 
-    public String fillEmptyUserIds(String users, Long project){
-        if (users == null || users.isEmpty()) {
-            users = getUsersIdsFromProject(project);
-        }
-        return users;
-    }
-
-    public String getUsersIdsFromProject(Long project){
-        String users = "";
-        for (User user: listUsers(projectService.get(project))) {
-            users += user.getId() + ",";
-        }
-        return users;
-    }
-
     public List<JsonObject> getUsersWithLastActivities(Project project) {
         List<JsonObject> results = new ArrayList<>();
         List<User> users = listUsers(project).stream().sorted(Comparator.comparing(CytomineDomain::getId)).toList();

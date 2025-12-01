@@ -990,7 +990,7 @@ public class ProjectServiceTests {
         builder.addUserToProject(project, user2.getUsername());
 
         String userIds = projectService.getUserIdsFromProject(project.getId());
-        String expectedUserIds = user1.getId() + "," + user2.getId() + ",";
+        String expectedUserIds = user1.getId() + "," + user2.getId();
 
         assertThat(expectedUserIds).isEqualTo(userIds);
     }

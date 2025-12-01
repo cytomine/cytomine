@@ -50,12 +50,12 @@ import be.cytomine.utils.filters.SearchParameterProcessed;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Accumulators;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.hibernate.Session;
 import org.hibernate.query.NativeQuery;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -77,56 +77,80 @@ import static com.mongodb.client.model.Sorts.descending;
 import static org.springframework.security.acls.domain.BasePermission.READ;
 
 @Slf4j
-@RequiredArgsConstructor
 @Service
 @Transactional
 public class ImageInstanceService extends ModelService {
 
     private static List<String> ABSTRACT_IMAGE_COLUMNS_FOR_SEARCH = List.of("width", "height");
 
-    private final EntityManager entityManager;
+    @Autowired
+    private EntityManager entityManager;
 
-    private final CurrentUserService currentUserService;
+    @Autowired
+    private CurrentUserService currentUserService;
 
-    private final CurrentRoleService currentRoleService;
+    @Autowired
+    private CurrentRoleService currentRoleService;
 
-    private final SecurityACLService securityACLService;
+    @Autowired
+    private SecurityACLService securityACLService;
 
-    private final ImageInstanceRepository imageInstanceRepository;
+    @Autowired
+    private ImageInstanceRepository imageInstanceRepository;
 
-    private final AbstractSliceRepository abstractSliceRepository;
+    @Autowired
+    private AbstractSliceRepository abstractSliceRepository;
 
-    private final SliceInstanceService sliceInstanceService;
+    @Autowired
+    private SliceInstanceService sliceInstanceService;
 
-    private final NestedImageInstanceRepository nestedImageInstanceRepository;
+    @Autowired
+    private NestedImageInstanceRepository nestedImageInstanceRepository;
 
-    private final SliceInstanceRepository sliceInstanceRepository;
+    @Autowired
+    private SliceInstanceRepository sliceInstanceRepository;
 
-    private final SliceCoordinatesService sliceCoordinatesService;
+    @Autowired
+    private SliceCoordinatesService sliceCoordinatesService;
 
-    private final UserAnnotationRepository userAnnotationRepository;
+    @Autowired
+    private UserAnnotationRepository userAnnotationRepository;
 
-    private final ReviewedAnnotationRepository reviewedAnnotationRepository;
+    @Autowired
+    private ReviewedAnnotationRepository reviewedAnnotationRepository;
 
-    private final UserAnnotationService userAnnotationService;
+    @Autowired
+    private UserAnnotationService userAnnotationService;
 
-    private final ReviewedAnnotationService reviewedAnnotationService;
+    @Autowired
+    private ReviewedAnnotationService reviewedAnnotationService;
 
-    private final AnnotationActionRepository annotationActionRepository;
+    @Autowired
+    private AnnotationActionRepository annotationActionRepository;
 
-    private final PersistentUserPositionRepository persistentUserPositionRepository;
+    @Autowired
+    private PersistentUserPositionRepository persistentUserPositionRepository;
 
-    private final LastUserPositionRepository lastUserPositionRepository;
+    @Autowired
+    private LastUserPositionRepository lastUserPositionRepository;
 
-    private final PersistentImageConsultationRepository persistentImageConsultationRepository;
+    @Autowired
+    private PersistentImageConsultationRepository persistentImageConsultationRepository;
 
-    private final PropertyService propertyService;
+    @Autowired
+    PropertyService propertyService;
 
-    private final PropertyRepository propertyRepository;
+    @Autowired
+    PropertyRepository propertyRepository;
 
-    private final TrackService trackService;
+    @Autowired
+    AnnotationTrackRepository annotationTrackRepository;
 
-    private final MongoClient mongoClient;
+    @Autowired
+    TrackService trackService;
+
+    @Autowired
+    MongoClient mongoClient;
 
     @Value("${spring.data.mongodb.database}")
     private String mongoDatabaseName;

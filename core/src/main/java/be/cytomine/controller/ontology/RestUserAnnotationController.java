@@ -102,19 +102,17 @@ public class RestUserAnnotationController extends RestCytomineController {
             @PathVariable Long idProject,
             @RequestParam String format,
             @RequestParam String terms,
-            @RequestParam String users,
+            @RequestParam Optional<String> users,
             @RequestParam String images,
             @RequestParam(required = false) Long beforeThan,
             @RequestParam(required = false) Long afterThan
     ) throws IOException {
         Project project = projectService.find(idProject)
                 .orElseThrow(() -> new ObjectNotFoundException("Project", idProject));
-        if (users == null || users.isEmpty()) {
-            users = projectService.getUserIdsFromProject(project.getId());
-        }
+        String userIds = users.orElseGet(() -> projectService.getUserIdsFromProject(project.getId()));
         terms = termService.fillEmptyTermIds(terms, project);
         JsonObject params = mergeQueryParamsAndBodyParams();
-        byte[] report = annotationListingBuilder.buildAnnotationReport(idProject, users, params, terms, format);
+        byte[] report = annotationListingBuilder.buildAnnotationReport(idProject, userIds, params, terms, format);
         responseReportFile(reportService.getAnnotationReportFileName(format, idProject), report, format);
     }
 

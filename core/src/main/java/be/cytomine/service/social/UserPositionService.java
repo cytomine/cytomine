@@ -24,13 +24,8 @@ import be.cytomine.domain.security.User;
 import be.cytomine.domain.social.LastUserPosition;
 import be.cytomine.domain.social.PersistentUserPosition;
 import be.cytomine.dto.image.AreaDTO;
-import be.cytomine.repository.project.ProjectRepository;
-import be.cytomine.repository.security.UserRepository;
 import be.cytomine.repositorynosql.social.*;
-import be.cytomine.service.AnnotationListingService;
-import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.database.SequenceService;
-import be.cytomine.service.security.UserService;
 import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.utils.JsonObject;
 import com.mongodb.client.MongoClient;
@@ -38,11 +33,11 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Accumulators;
 import com.mongodb.client.model.Projections;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -53,7 +48,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorator;
 
-import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -67,59 +61,26 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 import static org.springframework.security.acls.domain.BasePermission.WRITE;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 @Transactional
 public class UserPositionService {
 
     static final int USER_UNFOLLOWING_DELAY = 10;
 
-    @Autowired
-    CurrentUserService currentUserService;
+    private final SecurityACLService securityACLService;
 
-    @Autowired
-    UserService userService;
+    private final MongoClient mongoClient;
 
-    @Autowired
-    ProjectRepository projectRepository;
+    private final MongoTemplate mongoTemplate;
 
-    @Autowired
-    SecurityACLService securityACLService;
+    private final WebSocketUserPositionHandler webSocketUserPositionHandler;
 
-    @Autowired
-    ProjectConnectionRepository projectConnectionRepository;
+    private final PersistentUserPositionRepository persistentUserPositionRepository;
 
-    @Autowired
-    UserRepository userRepository;
+    private final LastUserPositionRepository lastUserPositionRepository;
 
-    @Autowired
-    MongoClient mongoClient;
-
-    @Autowired
-    PersistentProjectConnectionRepository persistentProjectConnectionRepository;
-
-    @Autowired
-    AnnotationListingService annotationListingService;
-
-    @Autowired
-    LastConnectionRepository lastConnectionRepository;
-
-    @Autowired
-    EntityManager entityManager;
-
-    @Autowired
-    MongoTemplate mongoTemplate;
-
-    @Autowired
-    WebSocketUserPositionHandler webSocketUserPositionHandler;
-
-    @Autowired
-    PersistentUserPositionRepository persistentUserPositionRepository;
-
-    @Autowired
-    LastUserPositionRepository lastUserPositionRepository;
-
-    @Autowired
-    SequenceService sequenceService;
+    private final SequenceService sequenceService;
 
     // usersTracked key -> "trackedUserId/imageId"
     public static Map<String, List<User>> broadcasters = new ConcurrentHashMap<>();

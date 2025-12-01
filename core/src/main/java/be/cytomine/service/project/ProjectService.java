@@ -63,11 +63,12 @@ import jakarta.persistence.Query;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.TupleElement;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -78,7 +79,6 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static be.cytomine.service.social.ImageConsultationService.DATABASE_NAME;
 import static com.mongodb.client.model.Aggregates.*;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.gte;
@@ -86,75 +86,57 @@ import static com.mongodb.client.model.Sorts.descending;
 import static org.springframework.security.acls.domain.BasePermission.*;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 @Transactional
 public class ProjectService extends ModelService {
 
-    @Autowired
-    private CommandHistoryRepository commandHistoryRepository;
+    private final CommandHistoryRepository commandHistoryRepository;
 
-    @Autowired
-    private CurrentUserService currentUserService;
+    private final CurrentUserService currentUserService;
 
-    @Autowired
-    private ProjectRepository projectRepository;
+    private final ProjectRepository projectRepository;
 
-    @Autowired
-    private SecurityACLService securityACLService;
+    private final SecurityACLService securityACLService;
 
-    @Autowired
-    private TaskService taskService;
+    private final TaskService taskService;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
-    private AnnotationTermService annotationTermService;
+    private final AnnotationTermService annotationTermService;
 
-    @Autowired
-    private ReviewedAnnotationService reviewedAnnotationService;
+    private final ReviewedAnnotationService reviewedAnnotationService;
 
-    @Autowired
-    private OntologyService ontologyService;
+    private final OntologyService ontologyService;
 
-    @Autowired
-    private PermissionService permissionService;
+    private final PermissionService permissionService;
 
-    @Autowired
-    private ProjectRepresentativeUserService projectRepresentativeUserService;
+    private final ProjectRepresentativeUserService projectRepresentativeUserService;
 
-    @Autowired
-    private AnnotationDomainRepository annotationDomainRepository;
+    private final AnnotationDomainRepository annotationDomainRepository;
 
-    @Autowired
-    private ImageInstanceRepository imageInstanceRepository;
+    private final ImageInstanceRepository imageInstanceRepository;
 
-    @Autowired
-    private CommandRepository commandRepository;
+    private final CommandRepository commandRepository;
 
-    @Autowired
-    private ImageInstanceService imageInstanceService;
+    private final ImageInstanceService imageInstanceService;
 
-    @Autowired
-    private UndoStackItemRepository undoStackItemRepository;
+    private final UndoStackItemRepository undoStackItemRepository;
 
-    @Autowired
-    private RedoStackItemRepository redoStackItemRepository;
+    private final RedoStackItemRepository redoStackItemRepository;
 
-    @Autowired
-    MongoClient mongoClient;
+    private final MongoClient mongoClient;
 
-    @Autowired
-    private CurrentRoleService currentRoleService;
+    private final CurrentRoleService currentRoleService;
 
-    @Autowired
-    private ProjectRepresentativeUserRepository projectRepresentativeUserRepository;
+    private final ProjectRepresentativeUserRepository projectRepresentativeUserRepository;
 
-    @Autowired
-    private RetrievalService retrievalService;
+    private final RetrievalService retrievalService;
+
+    @Value("${spring.data.mongodb.database}")
+    private String mongoDatabaseName;
 
     public Project get(Long id) {
         return find(id).orElse(null);
@@ -206,7 +188,7 @@ public class ProjectService extends ModelService {
         requests.add(sort(descending("date")));
         requests.add(limit(max.intValue()));
 
-        MongoCollection<Document> persistentImageConsultation = mongoClient.getDatabase(DATABASE_NAME).getCollection("persistentProjectConnection");
+        MongoCollection<Document> persistentImageConsultation = mongoClient.getDatabase(mongoDatabaseName).getCollection("persistentProjectConnection");
 
         List<Document> results = persistentImageConsultation.aggregate(requests)
                 .into(new ArrayList<>());
@@ -798,7 +780,7 @@ public class ProjectService extends ModelService {
         List<Bson> requests = new ArrayList<>();
         requests.add(match(gte("created", xSecondAgo)));
         requests.add(group("$project"));
-        MongoCollection<Document> persistentImageConsultation = mongoClient.getDatabase(DATABASE_NAME).getCollection("persistentProjectConnection");
+        MongoCollection<Document> persistentImageConsultation = mongoClient.getDatabase(mongoDatabaseName).getCollection("persistentProjectConnection");
         List<Document> results = persistentImageConsultation.aggregate(requests)
                 .into(new ArrayList<>());
         return results.stream().map(x -> x.getLong("_id")).collect(Collectors.toList());
@@ -811,7 +793,7 @@ public class ProjectService extends ModelService {
         requests.add(group(Document.parse("{project: '$project', user: '$user'}")));
         requests.add(group("$_id.project", Accumulators.sum("users", 1)));
 
-        MongoCollection<Document> persistentImageConsultation = mongoClient.getDatabase(DATABASE_NAME).getCollection("persistentProjectConnection");
+        MongoCollection<Document> persistentImageConsultation = mongoClient.getDatabase(mongoDatabaseName).getCollection("persistentProjectConnection");
         List<Document> results = persistentImageConsultation.aggregate(requests)
                 .into(new ArrayList<>());
 

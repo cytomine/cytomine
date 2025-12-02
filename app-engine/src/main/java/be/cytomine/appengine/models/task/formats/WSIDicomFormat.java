@@ -19,10 +19,14 @@ public class WSIDicomFormat implements FileFormat {
     public boolean checkSignature(File directory) {
         File[] dicoms = directory.listFiles();
         if (Objects.isNull(dicoms) || dicoms.length == 0) {
+            System.out.println("dicoms " + dicoms);
             return false;
         }
         for (File dicom : dicoms) {
             if (dicom.isDirectory() || !dicomFormat.checkSignature(dicom)) {
+                System.out.println(dicom.getName() + " is dir = "
+                    + dicom.isDirectory()
+                    + " valid signature = " + dicomFormat.checkSignature(dicom));
                 return false;
             }
         }

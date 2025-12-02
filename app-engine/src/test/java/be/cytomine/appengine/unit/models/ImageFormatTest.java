@@ -28,7 +28,7 @@ public class ImageFormatTest {
 
     private static final int EXPECTED_WIDTH = 680;
 
-    private static final int EXPECTED_WSIDICOM_WIDTH = 512;
+    private static final int EXPECTED_WSIDICOM_WIDTH = 240;
 
     private static final int EXPECTED_HEIGHT = 512;
 

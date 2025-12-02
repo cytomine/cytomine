@@ -56,6 +56,7 @@ import org.bson.conversions.Bson;
 import org.hibernate.Session;
 import org.hibernate.query.NativeQuery;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
@@ -69,7 +70,6 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static be.cytomine.service.social.ImageConsultationService.DATABASE_NAME;
 import static com.mongodb.client.model.Aggregates.*;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Sorts.ascending;
@@ -151,6 +151,9 @@ public class ImageInstanceService extends ModelService {
 
     @Autowired
     MongoClient mongoClient;
+
+    @Value("${spring.data.mongodb.database}")
+    private String mongoDatabaseName;
 
     @Override
     public Class currentDomain() {
@@ -744,7 +747,7 @@ public class ImageInstanceService extends ModelService {
         requests.add(group("$image", Accumulators.max("created", "$created"), Accumulators.first("user", "$user")));
         requests.add(sort(ascending("_id")));
 
-        MongoCollection<Document> persistentImageConsultation = mongoClient.getDatabase(DATABASE_NAME).getCollection("persistentImageConsultation");
+        MongoCollection<Document> persistentImageConsultation = mongoClient.getDatabase(mongoDatabaseName).getCollection("persistentImageConsultation");
 
         List<Document> results = persistentImageConsultation.aggregate(requests)
                 .into(new ArrayList<>());

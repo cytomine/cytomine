@@ -192,7 +192,7 @@ public class WebSocketUserPositionHandler extends CytomineWebSocketHandler {
         super.sendWebSocketMessage(session, position);
     }
 
-    public List<String> getSessionsUserIds(ConcurrentWebSocketSessionDecorator[] sessions){
+    public static List<String> getSessionsUserIds(ConcurrentWebSocketSessionDecorator[] sessions) {
         List<String> userIds = new ArrayList<>();
         for(ConcurrentWebSocketSessionDecorator s : sessions){
             String userId = getSessionUserId(s);
@@ -203,7 +203,7 @@ public class WebSocketUserPositionHandler extends CytomineWebSocketHandler {
         return userIds;
     }
 
-    private String getSessionUserId(ConcurrentWebSocketSessionDecorator session){
+    private static String getSessionUserId(ConcurrentWebSocketSessionDecorator session) {
         String userId = "";
         loop:
         for(Map.Entry<String, ConcurrentWebSocketSessionDecorator[]> entry : WebSocketUserPositionHandler.sessions.entrySet()){

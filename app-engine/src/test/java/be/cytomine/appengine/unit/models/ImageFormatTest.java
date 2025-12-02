@@ -30,6 +30,8 @@ public class ImageFormatTest {
 
     private static final int EXPECTED_WSIDICOM_WIDTH = 240;
 
+    private static final int EXPECTED_WSIDICOM_HEIGHT = 240;
+
     private static final int EXPECTED_HEIGHT = 512;
 
     private static Map<String, File> images;
@@ -98,7 +100,7 @@ public class ImageFormatTest {
             );
 
             Assertions.assertEquals(
-                EXPECTED_HEIGHT,
+                EXPECTED_WSIDICOM_HEIGHT,
                 dimension.getHeight(),
                 "Height should be " + EXPECTED_HEIGHT + " pixels."
             );

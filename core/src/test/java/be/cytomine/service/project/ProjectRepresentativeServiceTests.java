@@ -49,6 +49,9 @@ import static org.springframework.security.acls.domain.BasePermission.ADMINISTRA
 public class ProjectRepresentativeServiceTests {
 
     @Autowired
+    ProjectMemberService projectMemberService;
+
+    @Autowired
     ProjectRepresentativeUserService projectRepresentativeUserService;
 
     @Autowired
@@ -185,7 +188,7 @@ public class ProjectRepresentativeServiceTests {
         assertThat(projectRepresentativeUserService.listByProject(projectRepresentativeUser.getProject())).hasSize(1);
 
 
-        userService.deleteUserFromProject(projectRepresentativeUser.getUser(), projectRepresentativeUser.getProject(), true);
+        projectMemberService.deleteUserFromProject(projectRepresentativeUser.getUser(), projectRepresentativeUser.getProject(), true);
 
         assertThat(projectRepresentativeUserService.listByProject(projectRepresentativeUser.getProject())).hasSize(1);
         assertThat(projectRepresentativeUserService.find(projectRepresentativeUser.getProject(), projectRepresentativeUser.getUser())).isEmpty();

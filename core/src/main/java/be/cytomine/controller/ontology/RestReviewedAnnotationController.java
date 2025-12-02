@@ -14,7 +14,6 @@ import be.cytomine.service.ontology.ReviewedAnnotationService;
 import be.cytomine.service.ontology.TermService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.report.ReportService;
-import be.cytomine.service.security.UserService;
 import be.cytomine.service.utils.ParamsService;
 import be.cytomine.service.utils.TaskService;
 import be.cytomine.utils.AnnotationListingBuilder;
@@ -29,7 +28,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 import static org.springframework.web.bind.annotation.RequestMethod.*;
@@ -57,8 +55,6 @@ public class RestReviewedAnnotationController extends RestCytomineController {
     private final ImageInstanceService imageInstanceService;
 
     private final TaskService taskService;
-
-    private final UserService userService;
 
     private final TermService termService;
 
@@ -262,18 +258,19 @@ public class RestReviewedAnnotationController extends RestCytomineController {
             @PathVariable Long idProject,
             @RequestParam String format,
             @RequestParam String terms,
-            @RequestParam String reviewUsers,
+            @RequestParam Optional<String> reviewUsers,
             @RequestParam String images,
             @RequestParam(required = false) Long beforeThan,
             @RequestParam(required = false) Long afterThan
     ) throws IOException {
         Project project = projectService.find(idProject)
                 .orElseThrow(() -> new ObjectNotFoundException("Project", idProject));
-        reviewUsers = userService.fillEmptyUserIds(reviewUsers, idProject);
+        String users = reviewUsers.filter(s -> !s.isBlank())
+                .orElseGet(() -> projectService.getUserIdsFromProject(project.getId()));
         terms = termService.fillEmptyTermIds(terms, project);
         JsonObject params = mergeQueryParamsAndBodyParams();
         params.put("reviewed", true);
-        byte[] report = annotationListingBuilder.buildAnnotationReport(idProject, reviewUsers, params, terms, format);
+        byte[] report = annotationListingBuilder.buildAnnotationReport(idProject, users, params, terms, format);
         responseReportFile(reportService.getAnnotationReportFileName(format, idProject), report, format);
     }
 

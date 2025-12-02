@@ -26,7 +26,6 @@ import be.cytomine.domain.project.ProjectDefaultLayer;
 import be.cytomine.domain.project.ProjectRepresentativeUser;
 import be.cytomine.domain.security.*;
 import be.cytomine.domain.social.LastConnection;
-import be.cytomine.dto.NamedCytomineDomain;
 import be.cytomine.dto.auth.AuthInformation;
 import be.cytomine.exceptions.*;
 import be.cytomine.repository.command.CommandHistoryRepository;
@@ -55,7 +54,6 @@ import be.cytomine.service.image.server.StorageService;
 import be.cytomine.service.ontology.*;
 import be.cytomine.service.project.ProjectDefaultLayerService;
 import be.cytomine.service.project.ProjectRepresentativeUserService;
-import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.search.UserSearchExtension;
 import be.cytomine.service.social.ImageConsultationService;
 import be.cytomine.service.social.ProjectConnectionService;
@@ -102,9 +100,6 @@ public class UserService extends ModelService {
 
     @Autowired
     private PermissionService permissionService;
-
-    @Autowired
-    private ProjectService projectService;
 
     @Autowired
     private ImageConsultationService imageConsultationService;
@@ -643,21 +638,6 @@ public class UserService extends ModelService {
         return jsonObject;
     }
 
-    public String fillEmptyUserIds(String users, Long project){
-        if (users == null || users.isEmpty()) {
-            users = getUsersIdsFromProject(project);
-        }
-        return users;
-    }
-
-    public String getUsersIdsFromProject(Long project){
-        String users = "";
-        for (User user: listUsers(projectService.get(project))) {
-            users += user.getId() + ",";
-        }
-        return users;
-    }
-
     public List<JsonObject> getUsersWithLastActivities(Project project) {
         List<JsonObject> results = new ArrayList<>();
         List<User> users = listUsers(project).stream().sorted(Comparator.comparing(CytomineDomain::getId)).toList();
@@ -842,107 +822,6 @@ public class UserService extends ModelService {
             throw new AlreadyExistException("User " + user.getUsername() + " already exist!");
         }
     }
-
-
-    /**
-     * Add a user in project user or admin list
-     *
-     * @param user    User to add in project
-     * @param project Project that will be accessed by user
-     * @param admin   Flaf if user will become a simple user or a project manager
-     * @return Response structure
-     */
-    public void addUserToProject(User user, Project project, boolean admin) {
-        securityACLService.check(project, ADMINISTRATION);
-        log.info("service.addUserToProject");
-        if (project != null) {
-            log.info("addUserToProject project=" + project + " user=" + user + " ADMIN=" + admin);
-            synchronized (this.getClass()) {
-                if (admin) {
-                    permissionService.addPermission(project, user.getUsername(), ADMINISTRATION);
-                }
-                permissionService.addPermission(project, user.getUsername(), READ);
-                if (project.getOntology() != null) {
-                    log.info("addUserToProject ontology=" + project.getOntology() + " user=" + user + " ADMIN=" + admin);
-                    permissionService.addPermission(project.getOntology(), user.getUsername(), READ);
-                    if (admin) {
-                        permissionService.addPermission(project.getOntology(), user.getUsername(), ADMINISTRATION);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Delete a user from a project user or admin list
-     *
-     * @param user    User to remove from project
-     * @param project Project that will not longer be accessed by user
-     * @param admin   Flaf if user will become a simple user or a project manager
-     * @return Response structure
-     */
-    public void deleteUserFromProject(User user, Project project, boolean admin) {
-        if (!Objects.equals(currentUserService.getCurrentUser().getId(), user.getId())) {
-            securityACLService.check(project, ADMINISTRATION);
-        }
-        if (project != null) {
-            log.info("deleteUserFromProject project=" + project.getId() + " username=" + user.getUsername() + " ADMIN=" + admin);
-
-            log.info("deleteUserFromProject BEFORE ADMINISTRATION=" + permissionService.hasACLPermission(project, user.getUsername(), ADMINISTRATION));
-            log.info("deleteUserFromProject BEFORE READ=" + permissionService.hasACLPermission(project, user.getUsername(), READ));
-            if (admin) {
-                permissionService.deletePermission(project, user.getUsername(), ADMINISTRATION);
-            } else {
-                permissionService.deletePermission(project, user.getUsername(), READ);
-            }
-            log.info("deleteUserFromProject AFTER ADMINISTRATION=" + permissionService.hasACLPermission(project, user.getUsername(), ADMINISTRATION));
-            log.info("deleteUserFromProject AFTER READ=" + permissionService.hasACLPermission(project, user.getUsername(), READ));
-            if (!permissionService.hasACLPermission(project, user.getUsername(), READ) && project.getOntology() != null) {
-                removeOntologyRightIfNecessary(project, (User) user, admin);
-            }
-            // if no representative, add current user as a representative
-            boolean hasLostAccessToProject = (!permissionService.hasACLPermission(project, user.getUsername(), READ) && !permissionService.hasACLPermission(project, user.getUsername(), READ));
-            boolean isLastRepresentative = projectRepresentativeUserService.listByProject(project).size() == 1 &&
-                    projectRepresentativeUserService.listByProject(project).get(0).getUser().getId().equals(user.getId());
-            if (hasLostAccessToProject && isLastRepresentative) {
-                if (!securityACLService.getProjectList(currentUserService.getCurrentUser(), null).contains(project)) {
-                    // if current user is not in project (= SUPERADMIN), add to the project
-                    addUserToProject(currentUserService.getCurrentUser(), project, true);
-                }
-                log.info("add current user " + currentUserService.getCurrentUsername() + " as representative for project " + project.getId());
-                ProjectRepresentativeUser pru = new ProjectRepresentativeUser();
-                pru.setProject(project);
-                pru.setUser((User) currentUserService.getCurrentUser());
-                projectRepresentativeUserService.add(pru.toJsonObject());
-
-                projectRepresentativeUserService.find(project, (User) user)
-                        .ifPresent(x -> projectRepresentativeUserService.delete(x, null, null, false));
-
-            }
-            log.info("deleteUserFromProject " + permissionService.hasACLPermission(project, user.getUsername(), ADMINISTRATION));
-        }
-    }
-
-    private void removeOntologyRightIfNecessary(Project project, User user, boolean admin) {
-        //we remove the right ONLY if user has no other project with this ontology
-        List<Project> projects = securityACLService.getProjectList(user, project.getOntology());
-        List<Project> otherProjects = new ArrayList<>(projects);
-        otherProjects.remove(project);
-
-        if (otherProjects.isEmpty()) {
-            //user has no other project with this ontology, remove the right!
-            permissionService.deletePermission(project.getOntology(), user.getUsername(), READ);
-            permissionService.deletePermission(project.getOntology(), user.getUsername(), ADMINISTRATION);
-        } else if (admin) {
-            List<Long> managedProjectList = projectService.listByAdmin(user).stream().map(NamedCytomineDomain::getId).toList();
-            List<Long> otherProjectsIds = otherProjects.stream().map(CytomineDomain::getId).toList();
-            if (managedProjectList.stream().noneMatch(otherProjectsIds::contains)) {
-                permissionService.deletePermission(project.getOntology(), user.getUsername(), ADMINISTRATION);
-            }
-        }
-
-    }
-
 
     public void addUserToStorage(User user, Storage storage) {
         securityACLService.check(storage, ADMINISTRATION);

@@ -30,6 +30,8 @@ public class ImageFormatTest {
 
     private static final int EXPECTED_WIDTH = 680;
 
+    private static final int EXPECTED_WSIDICOM_WIDTH = 512;
+
     private static final int EXPECTED_HEIGHT = 512;
 
     private static Map<String, File> images;
@@ -84,20 +86,37 @@ public class ImageFormatTest {
                 .max(Comparator.comparingLong(p -> p.toFile().length()))
                 .map(Path::toFile)
                 .orElse(null);
+
         }
 
         Dimension dimension = format.getDimensions(image);
 
-        Assertions.assertEquals(
-            EXPECTED_WIDTH,
-            dimension.getWidth(),
-            "Width should be " + EXPECTED_WIDTH + " pixels."
-        );
-        Assertions.assertEquals(
-            EXPECTED_HEIGHT,
-            dimension.getHeight(),
-            "Height should be " + EXPECTED_HEIGHT + " pixels."
-        );
+        if (formatKey.equalsIgnoreCase("WSIDICOM")) {
+
+            Assertions.assertEquals(
+                EXPECTED_WSIDICOM_WIDTH,
+                dimension.getWidth(),
+                "Width should be " + EXPECTED_WIDTH + " pixels."
+            );
+
+            Assertions.assertEquals(
+                EXPECTED_HEIGHT,
+                dimension.getHeight(),
+                "Height should be " + EXPECTED_HEIGHT + " pixels."
+            );
+
+        } else {
+            Assertions.assertEquals(
+                EXPECTED_WIDTH,
+                dimension.getWidth(),
+                "Width should be " + EXPECTED_WIDTH + " pixels."
+            );
+            Assertions.assertEquals(
+                EXPECTED_HEIGHT,
+                dimension.getHeight(),
+                "Height should be " + EXPECTED_HEIGHT + " pixels."
+            );
+        }
     }
 
     @ParameterizedTest

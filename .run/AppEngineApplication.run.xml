@@ -1,0 +1,27 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="AppEngineApplication" type="Application" factoryName="Application" nameIsGenerated="true">
+    <envs>
+      <env name="DB_HOST" value="172.16.238.3" />
+      <env name="DB_NAME" value="appengine" />
+      <env name="DB_USERNAME" value="appengine" />
+      <env name="KUBECONFIG" value=".kube/shared/config" />
+      <env name="REGISTRY_URL" value="http://172.16.238.4:5000" />
+      <env name="SCHEDULER_ADVERTISED_URL" value="http://172.16.238.10:8080" />
+      <env name="SCHEDULER_REGISTRY_ADVERTISED_URL" value="http://172.16.238.4:5000" />
+      <env name="SCHEDULER_TASKS_NAMESPACE" value="tasks-ns" />
+      <env name="SCHEDULER_USE_HOST_NETWORK" value="true" />
+      <env name="DB_PASSWORD" value="password" />
+    </envs>
+    <option name="MAIN_CLASS_NAME" value="be.cytomine.appengine.AppEngineApplication" />
+    <module name="cytomine-platform" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="be.cytomine.appengine.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

@@ -1,1 +1,3 @@
 include("core", "app-engine", "registry-client")
+
+include 'common-beans'

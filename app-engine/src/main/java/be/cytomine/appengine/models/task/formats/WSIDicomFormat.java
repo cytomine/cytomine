@@ -27,7 +27,6 @@ public class WSIDicomFormat implements FileFormat {
                 System.out.println(dicom.getName() + " is dir = "
                     + dicom.isDirectory()
                     + " valid signature = " + dicomFormat.checkSignature(dicom));
-                return false;
             }
         }
         return true;

@@ -50,6 +50,6 @@ public class WSIDicomFormat implements FileFormat {
 
     @Override
     public Dimension getDimensions(File file) {
-        return null;
+        return dicomFormat.getDimensions(file);
     }
 }

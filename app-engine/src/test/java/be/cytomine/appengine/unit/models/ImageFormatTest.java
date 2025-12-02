@@ -78,13 +78,14 @@ public class ImageFormatTest {
             return;
         }
         File image = images.get(formatKey);
-        if (format instanceof WSIDicomFormat) {
+        if (formatKey.equalsIgnoreCase("WSIDICOM")) {
             image = Files.walk(image.toPath())
                 .filter(Files::isRegularFile)
                 .max(Comparator.comparingLong(p -> p.toFile().length()))
                 .map(Path::toFile)
                 .orElse(null);
         }
+
         Dimension dimension = format.getDimensions(image);
 
         Assertions.assertEquals(

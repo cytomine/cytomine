@@ -1,18 +1,16 @@
 package be.cytomine.service.social;
 
-import be.cytomine.domain.image.ImageInstance;
-import be.cytomine.domain.security.User;
-import be.cytomine.domain.social.LastUserPosition;
-import be.cytomine.exceptions.ServerException;
-import be.cytomine.repository.image.ImageInstanceRepository;
-import be.cytomine.repository.security.UserRepository;
-import be.cytomine.service.CytomineWebSocketHandler;
-import be.cytomine.service.image.ImageInstanceService;
-import be.cytomine.service.image.SliceInstanceService;
-import be.cytomine.utils.JsonObject;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -20,11 +18,17 @@ import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorator;
 
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import be.cytomine.domain.image.ImageInstance;
+import be.cytomine.domain.security.User;
+import be.cytomine.domain.social.LastUserPosition;
+import be.cytomine.exceptions.ServerException;
+import be.cytomine.repository.image.ImageInstanceRepository;
+import be.cytomine.repository.security.UserRepository;
+import be.cytomine.service.CytomineWebSocketHandler;
+import be.cytomine.utils.JsonObject;
 
 @Slf4j
+@RequiredArgsConstructor
 @Component
 public class WebSocketUserPositionHandler extends CytomineWebSocketHandler {
 
@@ -36,20 +40,11 @@ public class WebSocketUserPositionHandler extends CytomineWebSocketHandler {
     // sessions key -> "userId"
     public static Map<String, ConcurrentWebSocketSessionDecorator[]> sessions = new ConcurrentHashMap<>();
 
-    @Autowired
-    UserPositionService userPositionService;
+    private final UserPositionService userPositionService;
 
-    @Autowired
-    ImageInstanceService imageInstanceService;
+    private final ImageInstanceRepository imageInstanceRepository;
 
-    @Autowired
-    SliceInstanceService sliceInstanceService;
-
-    @Autowired
-    ImageInstanceRepository imageInstanceRepository;
-
-    @Autowired
-    UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {

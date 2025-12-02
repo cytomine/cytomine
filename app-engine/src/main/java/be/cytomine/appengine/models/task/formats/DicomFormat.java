@@ -31,20 +31,22 @@ public class DicomFormat implements FileFormat {
         }
 
         try (FileInputStream fis = new FileInputStream(file)) {
-            byte[] fileSignature = new byte[SIGNATURE.length];
+            byte[] fileSignature = new byte[DICOM_MAGIC_BYTE_OFFSET + SIGNATURE.length];
             int bytesRead = fis.read(fileSignature);
-
-            return bytesRead == SIGNATURE.length && Arrays.equals(fileSignature, SIGNATURE);
+            byte[] magicBytes = Arrays.copyOfRange(fileSignature,
+                fileSignature.length - DICOM_MAGIC_BYTES_LENGTH, fileSignature.length);
+            return bytesRead == DICOM_MAGIC_BYTE_OFFSET
+                + SIGNATURE.length && Arrays.equals(magicBytes, SIGNATURE);
         } catch (IOException e) {
             return false;
         }
     }
 
-    public boolean checkSignature(byte[] fileSignature) {
-        if (fileSignature.length < SIGNATURE.length) {
+    public boolean checkSignature(byte[] magicBytes) {
+        if (magicBytes.length < SIGNATURE.length) {
             return false;
         }
-        return fileSignature.length == SIGNATURE.length && Arrays.equals(fileSignature, SIGNATURE);
+        return magicBytes.length == SIGNATURE.length && Arrays.equals(magicBytes, SIGNATURE);
     }
 
     @Override

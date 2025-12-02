@@ -1,6 +1,7 @@
 <template>
   <div>
     <h3 class="subtitle">{{ $t('app-engine.ae-run-task') }}</h3>
+
     <section class="fields">
       <app-engine-field
         v-for="input in taskInputs"
@@ -9,6 +10,11 @@
         :parameter="input"
       />
     </section>
+
+    <section v-if="hasGeometryOutput">
+      
+    </section>
+
     <section>
       <b-field class="buttons" grouped>
         <b-button type="is-primary" @click="resetForm">{{ $t('button-clear') }}</b-button>
@@ -39,6 +45,7 @@ export default {
       taskInputs: [],
       inputs: {},
       hasBinaryData: false,
+      hasGeometryOutput: false,
     };
   },
   computed: {
@@ -48,7 +55,10 @@ export default {
     }
   },
   async created() {
-    await this.fetchTaskInputs();
+    await Promise.all([
+      this.fetchTaskInputs(),
+      this.fetchTaskOutputs(),
+    ]);
   },
   watch: {
     async task() {
@@ -65,6 +75,18 @@ export default {
       });
 
       this.resetForm();
+    },
+    async fetchTaskOutputs() {
+      const outputs = await Task.fetchTaskOutputs(this.task.namespace, this.task.version);
+      this.hasGeometryOutput = outputs.some(output => {
+        if (output.type.id === 'geometry') {
+          return true;
+        }
+        if (output.type.id === 'array' && output.type.subType.id === 'geometry') {
+          return true;
+        }
+        return false;
+      });
     },
     async runTask() {
       // create task run and provision

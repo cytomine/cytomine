@@ -67,8 +67,17 @@ public class ImageFormatTest {
 
     @ParameterizedTest
     @MethodSource("streamImageFormat")
-    public void testCheckSignature(FileFormat format, String formatKey) {
+    public void testCheckSignature(FileFormat format, String formatKey)
+        throws IOException {
         File image = images.get(formatKey);
+        if (formatKey.equalsIgnoreCase("WSIDICOM")) {
+            image = Files.walk(image.toPath())
+                .filter(Files::isRegularFile)
+                .max(Comparator.comparingLong(p -> p.toFile().length()))
+                .map(Path::toFile)
+                .orElse(null);
+
+        }
         Assertions.assertTrue(format.checkSignature(image), "Image signature should be valid.");
     }
 

@@ -9,7 +9,6 @@ import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.CytomineWebSocketHandler;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.image.SliceInstanceService;
-import be.cytomine.service.security.UserService;
 import be.cytomine.utils.JsonObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -45,9 +44,6 @@ public class WebSocketUserPositionHandler extends CytomineWebSocketHandler {
 
     @Autowired
     SliceInstanceService sliceInstanceService;
-
-    @Autowired
-    UserService userService;
 
     @Autowired
     ImageInstanceRepository imageInstanceRepository;

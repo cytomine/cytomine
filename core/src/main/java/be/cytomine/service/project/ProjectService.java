@@ -95,6 +95,8 @@ public class ProjectService extends ModelService {
 
     private final CurrentUserService currentUserService;
 
+    private final ProjectMemberService projectMemberService;
+
     private final ProjectRepository projectRepository;
 
     private final SecurityACLService securityACLService;
@@ -594,7 +596,7 @@ public class ProjectService extends ModelService {
             Optional<User> optionalUser = userRepository.findById(userId);
             if (optionalUser.isPresent()) {
                 log.info("addUserToProject project="+project.getId()+" user="+optionalUser.get().getId());
-                userService.addUserToProject(optionalUser.get(), project, false);
+                projectMemberService.addUserToProject(optionalUser.get(), project, false);
                 progress = progress + (40/users.size());
                 taskService.updateTask(task,Math.min(100,progress),"User "+optionalUser.get().getUsername()+" added as User");
             }
@@ -605,7 +607,7 @@ public class ProjectService extends ModelService {
             if (optionalUser.isPresent() && !Objects.equals(optionalUser.get().getId(), currentUserService.getCurrentUser().getId())) {
                 // current user is already in project
                 log.info("addUserToProject (admin) project="+project.getId()+" user="+optionalUser.get().getId());
-                userService.addUserToProject(optionalUser.get(), project, true);
+                projectMemberService.addUserToProject(optionalUser.get(), project, true);
                 progress = progress + (40/admins.size());
                 taskService.updateTask(task,Math.min(100,progress),"User "+optionalUser.get().getUsername()+" added as Admin");
             }
@@ -757,7 +759,7 @@ public class ProjectService extends ModelService {
             Optional<User> optionalUser = userRepository.findById(userId);
             if (optionalUser.isPresent()) {
                 log.info("addUserToProject project="+project.getId()+" user="+optionalUser.get().getId());
-                userService.addUserToProject(optionalUser.get(), project, admin);
+                projectMemberService.addUserToProject(optionalUser.get(), project, admin);
                 progress = progress + (40/projectAddUser.size());
                 taskService.updateTask(task,Math.min(100,progress),"User "+optionalUser.get().getUsername()+" added as " + (admin? "Admin" : "User"));
             }
@@ -767,7 +769,7 @@ public class ProjectService extends ModelService {
             Optional<User> optionalUser = userRepository.findById(userId);
             if (optionalUser.isPresent()) {
                 log.info("projectDeleteUser project="+project.getId()+" user="+optionalUser.get().getId());
-                userService.deleteUserFromProject(optionalUser.get(), project, admin);
+                projectMemberService.deleteUserFromProject(optionalUser.get(), project, admin);
                 log.info("changeProjectUser " + permissionService.hasACLPermission(project, optionalUser.get().getUsername(), ADMINISTRATION));
                 progress = progress + (40/projectAddUser.size());
                 taskService.updateTask(task,Math.min(100,progress),"User "+optionalUser.get().getUsername()+" removed as " + (admin? "Admin" : "User"));
@@ -907,5 +909,12 @@ public class ProjectService extends ModelService {
     @Override
     public CytomineDomain createFromJSON(JsonObject json) {
         return new Project().buildDomainFromJson(json, getEntityManager());
+    }
+
+    public String getUserIdsFromProject(Long projectId) {
+        return userRepository.findAllUsersByProjectId(projectId)
+                .stream()
+                .map(user -> user.getId().toString())
+                .collect(Collectors.joining(","));
     }
 }

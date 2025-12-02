@@ -10,10 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import be.cytomine.appengine.exceptions.TypeValidationException;
 import be.cytomine.appengine.models.task.formats.WSIDicomFormat;
 import be.cytomine.appengine.models.task.formats.ZipFormat;
-import be.cytomine.appengine.models.task.image.ImageType;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;

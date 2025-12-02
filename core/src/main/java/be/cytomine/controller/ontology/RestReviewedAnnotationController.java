@@ -265,7 +265,8 @@ public class RestReviewedAnnotationController extends RestCytomineController {
     ) throws IOException {
         Project project = projectService.find(idProject)
                 .orElseThrow(() -> new ObjectNotFoundException("Project", idProject));
-        String users = reviewUsers.orElseGet(() -> projectService.getUserIdsFromProject(project.getId()));
+        String users = reviewUsers.filter(s -> !s.isBlank())
+                .orElseGet(() -> projectService.getUserIdsFromProject(project.getId()));
         terms = termService.fillEmptyTermIds(terms, project);
         JsonObject params = mergeQueryParamsAndBodyParams();
         params.put("reviewed", true);

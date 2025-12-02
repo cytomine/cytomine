@@ -74,8 +74,6 @@ public class UserPositionService {
 
     private final MongoTemplate mongoTemplate;
 
-    private final WebSocketUserPositionHandler webSocketUserPositionHandler;
-
     private final PersistentUserPositionRepository persistentUserPositionRepository;
 
     private final LastUserPositionRepository lastUserPositionRepository;
@@ -256,7 +254,7 @@ public class UserPositionService {
         if(broadcastSession!=null){
             ConcurrentWebSocketSessionDecorator[] followers = WebSocketUserPositionHandler.sessionsTracked.get(broadcastSession);
             if(followers != null) {
-                followersIds = webSocketUserPositionHandler.getSessionsUserIds(followers).stream().distinct().toList();
+                followersIds = WebSocketUserPositionHandler.getSessionsUserIds(followers).stream().distinct().toList();
             }
         }
 

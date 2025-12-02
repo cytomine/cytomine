@@ -1,33 +1,5 @@
 package be.cytomine.appengine.controllers;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.regex.Pattern;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
-
 import be.cytomine.appengine.dto.inputs.task.State;
 import be.cytomine.appengine.dto.inputs.task.StateAction;
 import be.cytomine.appengine.dto.inputs.task.TaskRunParameterValue;
@@ -41,8 +13,25 @@ import be.cytomine.appengine.exceptions.SchedulingException;
 import be.cytomine.appengine.exceptions.TypeValidationException;
 import be.cytomine.appengine.models.task.ParameterType;
 import be.cytomine.appengine.services.TaskProvisioningService;
-import tools.jackson.databind.node.BaseJsonNode;
-import tools.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import tools.jackson.databind.JsonNode;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.regex.Pattern;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -61,7 +50,7 @@ public class TaskRunController {
     public ResponseEntity<?> provisionJson(
             @PathVariable("run_id") String runId,
             @PathVariable("param_name") String parameterName,
-            @RequestBody ObjectNode provision
+            @RequestBody JsonNode provision
     ) throws ProvisioningException, JsonProcessingException {
         log.info("/task-runs/{}/input-provisions/{} JSON PUT", runId, parameterName);
         JsonNode provisioned = taskRunService.provisionRunParameter(

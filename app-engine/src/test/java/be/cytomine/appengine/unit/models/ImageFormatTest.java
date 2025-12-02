@@ -3,12 +3,17 @@ package be.cytomine.appengine.unit.models;
 import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import be.cytomine.appengine.exceptions.TypeValidationException;
 import be.cytomine.appengine.models.task.formats.WSIDicomFormat;
 import be.cytomine.appengine.models.task.formats.ZipFormat;
+import be.cytomine.appengine.models.task.image.ImageType;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -67,11 +72,19 @@ public class ImageFormatTest {
 
     @ParameterizedTest
     @MethodSource("streamImageFormat")
-    public void testGetDimensions(FileFormat format, String formatKey) {
+    public void testGetDimensions(FileFormat format, String formatKey)
+        throws IOException {
         if (formatKey.equalsIgnoreCase("ZIP")) {
             return;
         }
         File image = images.get(formatKey);
+        if (format instanceof WSIDicomFormat) {
+            image = Files.walk(image.toPath())
+                .filter(Files::isRegularFile)
+                .max(Comparator.comparingLong(p -> p.toFile().length()))
+                .map(Path::toFile)
+                .orElse(null);
+        }
         Dimension dimension = format.getDimensions(image);
 
         Assertions.assertEquals(

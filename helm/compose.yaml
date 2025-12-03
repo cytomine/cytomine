@@ -19,7 +19,6 @@ services:
       - K3S_KUBECONFIG_MODE=666S
     volumes:
       - ../k3s/entrypoint.sh:/entrypoint:ro
-      - k3s-server:/var/lib/rancher/k3s
       - ../k3s/registries.yaml:/etc/rancher/k3s/registries.yaml:ro
       - ../k3s/serviceaccounts.yaml:/var/lib/rancher/k3s/server/manifests/serviceaccounts.yaml:ro
       - ../k3s/nginx-ingress.yaml:/var/lib/rancher/k3s/server/manifests/nginx-ingress.yaml:ro
@@ -33,10 +32,6 @@ services:
     networks:
       host_network:
         ipv4_address: 172.16.238.15
-
-volumes:
-  k3s-server: {}
-  k3s-agent: {}
 
 networks:
   host_network:

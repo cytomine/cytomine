@@ -24,13 +24,8 @@ import be.cytomine.domain.security.User;
 import be.cytomine.domain.social.LastUserPosition;
 import be.cytomine.domain.social.PersistentUserPosition;
 import be.cytomine.dto.image.AreaDTO;
-import be.cytomine.repository.project.ProjectRepository;
-import be.cytomine.repository.security.UserRepository;
 import be.cytomine.repositorynosql.social.*;
-import be.cytomine.service.AnnotationListingService;
-import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.database.SequenceService;
-import be.cytomine.service.security.UserService;
 import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.utils.JsonObject;
 import com.mongodb.client.MongoClient;
@@ -38,11 +33,12 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Accumulators;
 import com.mongodb.client.model.Projections;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -52,7 +48,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorator;
 
-import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -66,74 +61,33 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 import static org.springframework.security.acls.domain.BasePermission.WRITE;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 @Transactional
 public class UserPositionService {
 
     static final int USER_UNFOLLOWING_DELAY = 10;
-    public static final String DATABASE_NAME = "cytomine";
-    @Autowired
-    CurrentUserService currentUserService;
 
-    @Autowired
-    UserService userService;
+    private final SecurityACLService securityACLService;
 
-    @Autowired
-    ProjectRepository projectRepository;
+    private final MongoClient mongoClient;
 
-    @Autowired
-    SecurityACLService securityACLService;
+    private final MongoTemplate mongoTemplate;
 
-    @Autowired
-    ProjectConnectionRepository projectConnectionRepository;
+    private final PersistentUserPositionRepository persistentUserPositionRepository;
 
-    @Autowired
-    UserRepository userRepository;
+    private final LastUserPositionRepository lastUserPositionRepository;
 
-    @Autowired
-    MongoClient mongoClient;
-
-    @Autowired
-    PersistentProjectConnectionRepository persistentProjectConnectionRepository;
-
-    @Autowired
-    AnnotationListingService annotationListingService;
-
-    @Autowired
-    LastConnectionRepository lastConnectionRepository;
-
-    @Autowired
-    EntityManager entityManager;
-
-    @Autowired
-    MongoTemplate mongoTemplate;
-
-    @Autowired
-    WebSocketUserPositionHandler webSocketUserPositionHandler;
-
-    @Autowired
-    PersistentUserPositionRepository persistentUserPositionRepository;
-
-    @Autowired
-    LastUserPositionRepository lastUserPositionRepository;
-
-    @Autowired
-    SequenceService sequenceService;
-
-//
-//    public LastUserPosition add(User user, SliceInstance sliceInstance) {
-//
-//    }
-//
-//    public LastUserPosition add(User user, ImageInstance imageInstance) {
-//
-//    }
+    private final SequenceService sequenceService;
 
     // usersTracked key -> "trackedUserId/imageId"
     public static Map<String, List<User>> broadcasters = new ConcurrentHashMap<>();
 
     // usersTracking key -> "followerId/imageId"
     public static Map<String, Boolean> followers = new ConcurrentHashMap<>();
+
+    @Value("${spring.data.mongodb.database}")
+    private String mongoDatabaseName;
 
     public PersistentUserPosition add(
             Date created,
@@ -252,7 +206,7 @@ public class UserPositionService {
         request.add(group("$user"));
 
 
-        MongoCollection<Document> persistentProjectConnection = mongoClient.getDatabase(DATABASE_NAME).getCollection("lastUserPosition");
+        MongoCollection<Document> persistentProjectConnection = mongoClient.getDatabase(mongoDatabaseName).getCollection("lastUserPosition");
 
         List<Document> results = persistentProjectConnection.aggregate(request)
                 .into(new ArrayList<>());
@@ -300,7 +254,7 @@ public class UserPositionService {
         if(broadcastSession!=null){
             ConcurrentWebSocketSessionDecorator[] followers = WebSocketUserPositionHandler.sessionsTracked.get(broadcastSession);
             if(followers != null) {
-                followersIds = webSocketUserPositionHandler.getSessionsUserIds(followers).stream().distinct().toList();
+                followersIds = WebSocketUserPositionHandler.getSessionsUserIds(followers).stream().distinct().toList();
             }
         }
 
@@ -340,7 +294,7 @@ public class UserPositionService {
                 Accumulators.sum("frequency", 1), Accumulators.first("image", "$image")));
 
 
-        MongoCollection<Document> persistentUserPosition = mongoClient.getDatabase(DATABASE_NAME).getCollection("persistentUserPosition");
+        MongoCollection<Document> persistentUserPosition = mongoClient.getDatabase(mongoDatabaseName).getCollection("persistentUserPosition");
 
         List<Document> results = persistentUserPosition.aggregate(request)
                 .into(new ArrayList<>());
@@ -374,7 +328,7 @@ public class UserPositionService {
         request.add(group(Document.parse("{user: '$_id.user'}"),
                 Accumulators.push("position", Document.parse("{id: '$_id.image',slice: '$_id.slice', image: '$image', filename: '$imageName', originalFilename: '$imageName', date: '$date'}"))));
 
-        MongoCollection<Document> persistentUserPosition = mongoClient.getDatabase(DATABASE_NAME).getCollection("lastUserPosition");
+        MongoCollection<Document> persistentUserPosition = mongoClient.getDatabase(mongoDatabaseName).getCollection("lastUserPosition");
 
         List<Document> results = persistentUserPosition.aggregate(request)
                 .into(new ArrayList<>());

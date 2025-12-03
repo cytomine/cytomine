@@ -88,7 +88,10 @@ public class ErrorDefinitions {
         codes.put(ErrorCode.APPSTORE_DOWNLOAD_FAILED, new MessageCode("APPE-appstore-download-failure", "failed to download task/app from configured appstore"));
         codes.put(ErrorCode.APPSTORE_NO_DEFAULT_STORE, new MessageCode("APPE-appstore-no-default", "no default store is configured"));
         codes.put(ErrorCode.INTERNAL_LOGO_NOT_FOUND, new MessageCode("APPE-internal-logo-not-found", "no logo found in storage"));
-
+        codes.put(ErrorCode.INTERNAL_PARAMETER_TYPE_ERROR_NO_MOVE, new MessageCode("APPE-internal-zip-not-moved", "failed to renamed zip archive"));
+        codes.put(ErrorCode.INTERNAL_PARAMETER_TYPE_ERROR_NO_UNZIP, new MessageCode("APPE-internal-zip-not-unzipped", "failed to write unzipped content"));
+        codes.put(ErrorCode.INTERNAL_PARAMETER_TYPE_ERROR_NO_DELETE, new MessageCode("APPE-internal-zip-not-deleted", "failed to delete zip archive"));
+        codes.put(ErrorCode.INTERNAL_PARAMETER_BASELINE_IMAGE_FAILED, new MessageCode("APPE-internal-no-baseline", "failed to extract baseline image"));
     }
 
     public static MessageCode fromCode(ErrorCode code) {

@@ -2,9 +2,16 @@ package be.cytomine.appengine.models.task.image;
 
 import java.awt.Dimension;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,6 +21,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Transient;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.beans.factory.annotation.Value;
 
 import be.cytomine.appengine.dto.inputs.task.types.image.ImageTypeConstraint;
 import be.cytomine.appengine.dto.inputs.task.types.image.ImageValue;
@@ -29,6 +37,8 @@ import be.cytomine.appengine.models.task.Type;
 import be.cytomine.appengine.models.task.TypePersistence;
 import be.cytomine.appengine.models.task.ValueType;
 import be.cytomine.appengine.models.task.formats.FileFormat;
+import be.cytomine.appengine.models.task.formats.WSIDicomFormat;
+import be.cytomine.appengine.models.task.formats.ZipFormat;
 import be.cytomine.appengine.repositories.image.ImagePersistenceRepository;
 import be.cytomine.appengine.utils.AppEngineApplicationContext;
 import be.cytomine.appengine.utils.units.Unit;
@@ -53,6 +63,10 @@ public class ImageType extends Type {
 
     @Transient
     private FileFormat format;
+
+    @Transient
+    @Value("${storage.base-path}")
+    private static String storageBasePath;
 
     public void setConstraint(ImageTypeConstraint constraint, JsonNode value) {
         switch (constraint) {
@@ -98,7 +112,6 @@ public class ImageType extends Type {
             .filter(checker -> checker.checkSignature(file))
             .findFirst()
             .orElse(null);
-
         if (this.format == null) {
             throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_INVALID_IMAGE_FORMAT);
         }
@@ -108,8 +121,9 @@ public class ImageType extends Type {
         if (maxWidth == null && maxHeight == null) {
             return;
         }
+        File toValidate = getBaselineImage(file);
 
-        Dimension dimension = format.getDimensions(file);
+        Dimension dimension = format.getDimensions(toValidate);
         if (dimension == null) {
             throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_INVALID_IMAGE_DIMENSION);
         }
@@ -123,10 +137,30 @@ public class ImageType extends Type {
         }
     }
 
+    private File getBaselineImage(File file) throws TypeValidationException {
+        File toValidate;
+        if (format instanceof WSIDicomFormat) {
+            try {
+                toValidate = Files.walk(file.toPath())
+                    .filter(Files::isRegularFile)
+                    .max(Comparator.comparingLong(p -> p.toFile().length()))
+                    .map(Path::toFile)
+                    .orElse(null);
+            } catch (IOException e) {
+                throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_BASELINE_IMAGE_FAILED);
+            }
+        } else {
+            toValidate = file;
+        }
+        return toValidate;
+    }
+
     private void validateImageSize(File file) throws TypeValidationException {
         if (maxFileSize == null) {
             return;
         }
+
+        File toValidate = getBaselineImage(file);
 
         if (!Unit.isValid(maxFileSize)) {
             throw new TypeValidationException(
@@ -135,9 +169,52 @@ public class ImageType extends Type {
         }
 
         Unit unit = new Unit(maxFileSize);
-        if (file.length() > unit.getBytes()) {
+        if (toValidate.length() > unit.getBytes()) {
             throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_INVALID_IMAGE_SIZE);
         }
+    }
+
+    public static void unzip(File zipFile) throws IOException, TypeValidationException {
+        Path targetDir = zipFile.toPath();
+
+        Path tempSourcePath = targetDir.resolveSibling(targetDir.getFileName().toString() + ".tmp");
+
+        try {
+            Files.move(targetDir, tempSourcePath, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_TYPE_ERROR_NO_MOVE);
+        }
+
+        Files.createDirectories(targetDir);
+
+        try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(tempSourcePath))) {
+            ZipEntry zipEntry = zis.getNextEntry();
+
+            while (zipEntry != null) {
+                // WARNING: No Zip Slip Protection is active here.
+                Path newPath = targetDir.resolve(zipEntry.getName());
+
+                if (zipEntry.isDirectory()) {
+                    Files.createDirectories(newPath);
+                } else {
+                    if (newPath.getParent() != null && !Files.exists(newPath.getParent())) {
+                        Files.createDirectories(newPath.getParent());
+                    }
+                    Files.copy(zis, newPath, StandardCopyOption.REPLACE_EXISTING);
+                }
+                zipEntry = zis.getNextEntry();
+            }
+        } catch (IOException e) {
+            // Re-throw exception indicating failure but allowing cleanup if necessary
+            throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_TYPE_ERROR_NO_UNZIP);
+        }
+
+        try {
+            Files.delete(tempSourcePath);
+        } catch (IOException e) {
+            throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_TYPE_ERROR_NO_DELETE);
+        }
+
     }
 
     @Override
@@ -156,16 +233,65 @@ public class ImageType extends Type {
             file = (File) valueObject;
         }
 
-        validateImageFormat(file);
+        ZipFormat zipFormat = new ZipFormat();
+        if (zipFormat.checkSignature(file)) {
+            WSIDicomFormat dicomFormat = new WSIDicomFormat();
+            dicomFormat.validateZippedWSIDicom(file);
+            try {
+                unzip(file);
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_TYPE_ERROR);
+            }
+        } else {
+            validateImageFormat(file);
+            validateImageDimension(file);
+            validateImageSize(file);
 
-        validateImageDimension(file);
-
-        validateImageSize(file);
-
-        /* Additional specific type validation */
-        if (!format.validate(file)) {
-            throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_INVALID_IMAGE);
+            /* Additional specific type validation */
+            if (!format.validate(file)) {
+                throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_INVALID_IMAGE);
+            }
         }
+
+    }
+
+    public File getDirectoryIfStructureIsValid(StorageData currentOutputStorageData)
+        throws TypeValidationException {
+        // validate file structure
+        File outputFile = currentOutputStorageData.peek().getData();
+        // if this is a directory-based image like wsi dicom
+        if (currentOutputStorageData.peek().getStorageDataType().equals(StorageDataType.DIRECTORY)) {
+            outputFile = new File(storageBasePath
+                + "/"
+                + currentOutputStorageData.peek().getStorageId()
+                + "/"
+                + currentOutputStorageData.peek().getName());
+            // here we assume the format is always wsidicom until other directory-based formats are supported
+            format = new WSIDicomFormat();
+        } else {
+
+            if (!outputFile.exists()) {
+                throw new TypeValidationException(
+                    ErrorCode.INTERNAL_MISSING_OUTPUT_FILE_FOR_PARAMETER
+                );
+            }
+
+            if (outputFile.isDirectory()) {
+                throw new TypeValidationException(
+                    ErrorCode.INTERNAL_OUTPUT_FILE_FOR_PARAMETER_IS_DIRECTORY
+                );
+            }
+
+            if (currentOutputStorageData.getEntryList().size() > 1) {
+                throw new TypeValidationException(
+                    ErrorCode.INTERNAL_EXTRA_OUTPUT_FILES_FOR_PARAMETER
+                );
+            }
+
+        }
+
+        return outputFile;
     }
 
     @Override
@@ -176,7 +302,7 @@ public class ImageType extends Type {
         throws TypeValidationException {
 
         // validate file structure
-        File outputFile = getFileIfStructureIsValid(currentOutputStorageData);
+        File outputFile = getDirectoryIfStructureIsValid(currentOutputStorageData);
 
         validate(outputFile);
 

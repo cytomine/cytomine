@@ -19,8 +19,6 @@ services:
     restart: unless-stopped
     volumes:
       - ${DATA_PATH:-./data}/postgis/data:/var/lib/postgresql/data
-    ports:
-      - 5432:5432
     environment:
       APPENGINE_DB: appengine
       APPENGINE_PASSWORD: password
@@ -182,7 +180,7 @@ services:
       IAM_URL: http://nginx
       PIMS_URL: http://nginx
       CBIR_URL: http://nginx
-      APPENGINE_API_URL: http://host.docker.internal:8080/
+      APPENGINE_API_URL: http://nginx
       SAM_URL: http://nginx
       JAVAMELODY_PASS: x6wp8Lg7K1fxr/7oa5gQD/NF7hqirE15g0P1STj5hCs
       JAVAMELODY_PATH: /javamelody-core
@@ -202,8 +200,6 @@ services:
     networks:
       host_network:
         ipv4_address: 172.16.238.11
-    extra_hosts:
-      - "host.docker.internal:172.16.238.1"
 
   cbir:
     image: cytomine/cbir:latest
@@ -255,15 +251,13 @@ services:
       IMAGES_PIMS_CACHE: redis:7.2
       IMAGES_POSTGIS: cytomine/postgis:latest
       IMAGES_WEB_UI: cytomine/web-ui:latest
-      INTERNAL_URLS_APPENGINE: host.docker.internal:8080
+      INTERNAL_URLS_APPENGINE: app-engine:8080
       INTERNAL_URLS_IAM: iam:8100
       INTERNAL_URLS_WEB_UI: web-ui
       URLS_SCHEME: ${URLS_SCHEME:-http}
     networks:
       host_network:
         ipv4_address: 172.16.238.14
-    extra_hosts:
-    - "host.docker.internal:172.16.238.1"
 
   # https://github.com/k3s-io/k3s/blob/3854eb56d4b8a183a1f8261aebd372111378a00f/docker-compose.yml
   k3s:
@@ -296,14 +290,6 @@ services:
     networks:
       host_network:
         ipv4_address: 172.16.238.15
-  ubuntu:
-    image: "curlimages/curl"
-    command: "sleep 3000"
-    networks:
-      host_network:
-        ipv4_address: 172.16.238.16
-    extra_hosts:
-    - "host.docker.internal:172.16.238.1"
 
 volumes:
   k3s-server: {}
@@ -316,6 +302,3 @@ networks:
       driver: default
       config:
         - subnet: 172.16.238.0/24
-#  host:
-#    name: host
-#    external: true

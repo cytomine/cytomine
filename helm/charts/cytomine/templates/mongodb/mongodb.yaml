@@ -32,10 +32,10 @@ spec:
       volumes:
         - name: temp
           emptyDir: {}
-      {{ if .Values.mongodb.storageClassName -}}
-      - emptyDir: {}
-      name: mongodb-storage
-      {{ end }}
+        {{ if not .Values.mongodb.storageClassName -}}
+        - name: mongodb-storage
+          emptyDir: {}
+        {{ end }}
       securityContext:
         runAsUser: {{ .Values.containerSecurity.userID }}
         fsGroup: {{ .Values.containerSecurity.fsgroupID }}

@@ -17,9 +17,10 @@ These are tasks to showcase different parameter types used by the app engine. To
 5. [File Identity task](https://github.com/cytomine/dummy-tasks/tree/main/identity%20file)
 6. [Geometry Identity task](https://github.com/cytomine/dummy-tasks/tree/main/identity%20geometry)
 7. [Image Identity task](https://github.com/cytomine/dummy-tasks/tree/main/identity%20image)
-8. [Integer Identity task](https://github.com/cytomine/dummy-tasks/tree/main/identity%20integer)
-9. [Number Identity task](https://github.com/cytomine/dummy-tasks/tree/main/identity%20number)
-10. [String Identity task](https://github.com/cytomine/dummy-tasks/tree/main/identity%20string)
+8. [WSIDICOM Image Identity task](https://github.com/cytomine/dummy-tasks/tree/main/identity%20wsi%20dicom%20image%20)
+9. [Integer Identity task](https://github.com/cytomine/dummy-tasks/tree/main/identity%20integer)
+10. [Number Identity task](https://github.com/cytomine/dummy-tasks/tree/main/identity%20number)
+11. [String Identity task](https://github.com/cytomine/dummy-tasks/tree/main/identity%20string)
 
 ## Other Tasks
 Here is a list of more concrete applications integrating different types of algorithms and models for various image recognition workflows.

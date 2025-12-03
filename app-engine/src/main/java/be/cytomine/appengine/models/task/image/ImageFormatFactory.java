@@ -9,6 +9,7 @@ import be.cytomine.appengine.models.task.formats.GenericFormat;
 import be.cytomine.appengine.models.task.formats.JpegFormat;
 import be.cytomine.appengine.models.task.formats.PngFormat;
 import be.cytomine.appengine.models.task.formats.TiffFormat;
+import be.cytomine.appengine.models.task.formats.WSIDicomFormat;
 
 public class ImageFormatFactory {
     private static final Map<String, FileFormat> formats = new HashMap<>();
@@ -18,6 +19,7 @@ public class ImageFormatFactory {
         formats.put("JPEG", new JpegFormat());
         formats.put("PNG", new PngFormat());
         formats.put("TIFF", new TiffFormat());
+        formats.put("WSIDICOM", new WSIDicomFormat());
     }
 
     public static FileFormat getFormat(String format) {

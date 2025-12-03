@@ -20,18 +20,46 @@ import be.cytomine.domain.annotation.Annotation;
 import be.cytomine.domain.annotation.AnnotationLayer;
 import be.cytomine.domain.appengine.TaskRun;
 import be.cytomine.domain.appengine.TaskRunLayer;
-import be.cytomine.domain.image.*;
+import be.cytomine.domain.image.AbstractImage;
+import be.cytomine.domain.image.AbstractSlice;
+import be.cytomine.domain.image.CompanionFile;
+import be.cytomine.domain.image.ImageInstance;
+import be.cytomine.domain.image.Mime;
+import be.cytomine.domain.image.NestedImageInstance;
+import be.cytomine.domain.image.SliceInstance;
+import be.cytomine.domain.image.UploadedFile;
 import be.cytomine.domain.image.group.ImageGroup;
 import be.cytomine.domain.image.group.ImageGroupImageInstance;
 import be.cytomine.domain.image.server.Storage;
-import be.cytomine.domain.meta.*;
-import be.cytomine.domain.ontology.*;
+import be.cytomine.domain.meta.AttachedFile;
+import be.cytomine.domain.meta.Configuration;
+import be.cytomine.domain.meta.ConfigurationReadingRole;
+import be.cytomine.domain.meta.Description;
+import be.cytomine.domain.meta.Property;
+import be.cytomine.domain.meta.Tag;
+import be.cytomine.domain.meta.TagDomainAssociation;
+import be.cytomine.domain.ontology.AnnotationDomain;
+import be.cytomine.domain.ontology.AnnotationGroup;
+import be.cytomine.domain.ontology.AnnotationIndex;
+import be.cytomine.domain.ontology.AnnotationLink;
+import be.cytomine.domain.ontology.AnnotationTerm;
+import be.cytomine.domain.ontology.AnnotationTrack;
+import be.cytomine.domain.ontology.Ontology;
+import be.cytomine.domain.ontology.Relation;
+import be.cytomine.domain.ontology.RelationTerm;
+import be.cytomine.domain.ontology.ReviewedAnnotation;
+import be.cytomine.domain.ontology.SharedAnnotation;
+import be.cytomine.domain.ontology.Term;
+import be.cytomine.domain.ontology.Track;
+import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.processing.ImageFilter;
 import be.cytomine.domain.processing.ImageFilterProject;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.project.ProjectDefaultLayer;
 import be.cytomine.domain.project.ProjectRepresentativeUser;
-import be.cytomine.domain.security.*;
+import be.cytomine.domain.security.SecRole;
+import be.cytomine.domain.security.SecUserSecRole;
+import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.image.MimeRepository;
 import be.cytomine.repository.security.SecRoleRepository;
@@ -157,11 +185,6 @@ public class BasicInstanceBuilder {
         return user;
     }
 
-
-
-
-
-
     public void addRole(User user, String authority) {
         SecUserSecRole secSecUserSecRole = new SecUserSecRole();
         secSecUserSecRole.setSecUser(user);
@@ -172,7 +195,8 @@ public class BasicInstanceBuilder {
     }
 
     public User given_superadmin() {
-        return (User)userRepository.findByUsernameLikeIgnoreCase("superadmin").orElseThrow(() -> new ObjectNotFoundException("superadmin not in db"));
+        return userRepository.findByUsernameLikeIgnoreCase("superadmin")
+                   .orElseThrow(() -> new ObjectNotFoundException("superadmin not in db"));
     }
 
     public static User given_a_not_persisted_user() {

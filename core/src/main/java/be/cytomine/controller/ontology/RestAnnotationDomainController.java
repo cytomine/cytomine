@@ -108,8 +108,8 @@ public class RestAnnotationDomainController extends RestCytomineController {
     public void download(
             @PathVariable Long project,
             @RequestParam String format,
-            @RequestParam(required = false) String users,
-            @RequestParam(required = false) String reviewUsers,
+            @RequestParam(required = false) Optional<String> users,
+            @RequestParam(required = false) Optional<String> reviewUsers,
             @RequestParam(defaultValue = "false") Boolean reviewed,
             @RequestParam(required = false) String terms,
             @RequestParam(required = false) String images,

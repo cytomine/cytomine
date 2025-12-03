@@ -63,11 +63,12 @@ import jakarta.persistence.Query;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.TupleElement;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -78,7 +79,6 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static be.cytomine.service.social.ImageConsultationService.DATABASE_NAME;
 import static com.mongodb.client.model.Aggregates.*;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.gte;
@@ -86,75 +86,59 @@ import static com.mongodb.client.model.Sorts.descending;
 import static org.springframework.security.acls.domain.BasePermission.*;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 @Transactional
 public class ProjectService extends ModelService {
 
-    @Autowired
-    private CommandHistoryRepository commandHistoryRepository;
+    private final CommandHistoryRepository commandHistoryRepository;
 
-    @Autowired
-    private CurrentUserService currentUserService;
+    private final CurrentUserService currentUserService;
 
-    @Autowired
-    private ProjectRepository projectRepository;
+    private final ProjectMemberService projectMemberService;
 
-    @Autowired
-    private SecurityACLService securityACLService;
+    private final ProjectRepository projectRepository;
 
-    @Autowired
-    private TaskService taskService;
+    private final SecurityACLService securityACLService;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final TaskService taskService;
 
-    @Autowired
-    private UserService userService;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private AnnotationTermService annotationTermService;
+    private final UserService userService;
 
-    @Autowired
-    private ReviewedAnnotationService reviewedAnnotationService;
+    private final AnnotationTermService annotationTermService;
 
-    @Autowired
-    private OntologyService ontologyService;
+    private final ReviewedAnnotationService reviewedAnnotationService;
 
-    @Autowired
-    private PermissionService permissionService;
+    private final OntologyService ontologyService;
 
-    @Autowired
-    private ProjectRepresentativeUserService projectRepresentativeUserService;
+    private final PermissionService permissionService;
 
-    @Autowired
-    private AnnotationDomainRepository annotationDomainRepository;
+    private final ProjectRepresentativeUserService projectRepresentativeUserService;
 
-    @Autowired
-    private ImageInstanceRepository imageInstanceRepository;
+    private final AnnotationDomainRepository annotationDomainRepository;
 
-    @Autowired
-    private CommandRepository commandRepository;
+    private final ImageInstanceRepository imageInstanceRepository;
 
-    @Autowired
-    private ImageInstanceService imageInstanceService;
+    private final CommandRepository commandRepository;
 
-    @Autowired
-    private UndoStackItemRepository undoStackItemRepository;
+    private final ImageInstanceService imageInstanceService;
 
-    @Autowired
-    private RedoStackItemRepository redoStackItemRepository;
+    private final UndoStackItemRepository undoStackItemRepository;
 
-    @Autowired
-    MongoClient mongoClient;
+    private final RedoStackItemRepository redoStackItemRepository;
 
-    @Autowired
-    private CurrentRoleService currentRoleService;
+    private final MongoClient mongoClient;
 
-    @Autowired
-    private ProjectRepresentativeUserRepository projectRepresentativeUserRepository;
+    private final CurrentRoleService currentRoleService;
 
-    @Autowired
-    private RetrievalService retrievalService;
+    private final ProjectRepresentativeUserRepository projectRepresentativeUserRepository;
+
+    private final RetrievalService retrievalService;
+
+    @Value("${spring.data.mongodb.database}")
+    private String mongoDatabaseName;
 
     public Project get(Long id) {
         return find(id).orElse(null);
@@ -206,7 +190,7 @@ public class ProjectService extends ModelService {
         requests.add(sort(descending("date")));
         requests.add(limit(max.intValue()));
 
-        MongoCollection<Document> persistentImageConsultation = mongoClient.getDatabase(DATABASE_NAME).getCollection("persistentProjectConnection");
+        MongoCollection<Document> persistentImageConsultation = mongoClient.getDatabase(mongoDatabaseName).getCollection("persistentProjectConnection");
 
         List<Document> results = persistentImageConsultation.aggregate(requests)
                 .into(new ArrayList<>());
@@ -612,7 +596,7 @@ public class ProjectService extends ModelService {
             Optional<User> optionalUser = userRepository.findById(userId);
             if (optionalUser.isPresent()) {
                 log.info("addUserToProject project="+project.getId()+" user="+optionalUser.get().getId());
-                userService.addUserToProject(optionalUser.get(), project, false);
+                projectMemberService.addUserToProject(optionalUser.get(), project, false);
                 progress = progress + (40/users.size());
                 taskService.updateTask(task,Math.min(100,progress),"User "+optionalUser.get().getUsername()+" added as User");
             }
@@ -623,7 +607,7 @@ public class ProjectService extends ModelService {
             if (optionalUser.isPresent() && !Objects.equals(optionalUser.get().getId(), currentUserService.getCurrentUser().getId())) {
                 // current user is already in project
                 log.info("addUserToProject (admin) project="+project.getId()+" user="+optionalUser.get().getId());
-                userService.addUserToProject(optionalUser.get(), project, true);
+                projectMemberService.addUserToProject(optionalUser.get(), project, true);
                 progress = progress + (40/admins.size());
                 taskService.updateTask(task,Math.min(100,progress),"User "+optionalUser.get().getUsername()+" added as Admin");
             }
@@ -775,7 +759,7 @@ public class ProjectService extends ModelService {
             Optional<User> optionalUser = userRepository.findById(userId);
             if (optionalUser.isPresent()) {
                 log.info("addUserToProject project="+project.getId()+" user="+optionalUser.get().getId());
-                userService.addUserToProject(optionalUser.get(), project, admin);
+                projectMemberService.addUserToProject(optionalUser.get(), project, admin);
                 progress = progress + (40/projectAddUser.size());
                 taskService.updateTask(task,Math.min(100,progress),"User "+optionalUser.get().getUsername()+" added as " + (admin? "Admin" : "User"));
             }
@@ -785,7 +769,7 @@ public class ProjectService extends ModelService {
             Optional<User> optionalUser = userRepository.findById(userId);
             if (optionalUser.isPresent()) {
                 log.info("projectDeleteUser project="+project.getId()+" user="+optionalUser.get().getId());
-                userService.deleteUserFromProject(optionalUser.get(), project, admin);
+                projectMemberService.deleteUserFromProject(optionalUser.get(), project, admin);
                 log.info("changeProjectUser " + permissionService.hasACLPermission(project, optionalUser.get().getUsername(), ADMINISTRATION));
                 progress = progress + (40/projectAddUser.size());
                 taskService.updateTask(task,Math.min(100,progress),"User "+optionalUser.get().getUsername()+" removed as " + (admin? "Admin" : "User"));
@@ -798,7 +782,7 @@ public class ProjectService extends ModelService {
         List<Bson> requests = new ArrayList<>();
         requests.add(match(gte("created", xSecondAgo)));
         requests.add(group("$project"));
-        MongoCollection<Document> persistentImageConsultation = mongoClient.getDatabase(DATABASE_NAME).getCollection("persistentProjectConnection");
+        MongoCollection<Document> persistentImageConsultation = mongoClient.getDatabase(mongoDatabaseName).getCollection("persistentProjectConnection");
         List<Document> results = persistentImageConsultation.aggregate(requests)
                 .into(new ArrayList<>());
         return results.stream().map(x -> x.getLong("_id")).collect(Collectors.toList());
@@ -811,7 +795,7 @@ public class ProjectService extends ModelService {
         requests.add(group(Document.parse("{project: '$project', user: '$user'}")));
         requests.add(group("$_id.project", Accumulators.sum("users", 1)));
 
-        MongoCollection<Document> persistentImageConsultation = mongoClient.getDatabase(DATABASE_NAME).getCollection("persistentProjectConnection");
+        MongoCollection<Document> persistentImageConsultation = mongoClient.getDatabase(mongoDatabaseName).getCollection("persistentProjectConnection");
         List<Document> results = persistentImageConsultation.aggregate(requests)
                 .into(new ArrayList<>());
 
@@ -925,5 +909,12 @@ public class ProjectService extends ModelService {
     @Override
     public CytomineDomain createFromJSON(JsonObject json) {
         return new Project().buildDomainFromJson(json, getEntityManager());
+    }
+
+    public String getUserIdsFromProject(Long projectId) {
+        return userRepository.findAllUsersByProjectId(projectId)
+                .stream()
+                .map(user -> user.getId().toString())
+                .collect(Collectors.joining(","));
     }
 }

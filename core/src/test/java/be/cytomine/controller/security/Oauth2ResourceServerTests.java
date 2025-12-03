@@ -16,9 +16,15 @@ package be.cytomine.controller.security;
  * limitations under the License.
  */
 
-import be.cytomine.CytomineCoreApplication;
-import be.cytomine.repository.security.UserRepository;
-import be.cytomine.utils.AuthenticationSuccessListener;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.nimbusds.jose.Algorithm;
 import com.nimbusds.jose.JOSEException;
@@ -38,17 +44,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.*;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.security.oauth2.jwt.Jwt;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
+import be.cytomine.CytomineCoreApplication;
+import be.cytomine.repository.security.UserRepository;
+import be.cytomine.utils.AuthenticationSuccessListener;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
@@ -192,8 +198,8 @@ public class Oauth2ResourceServerTests {
                 .issueTime(Date.from(issuedAt))
                 .claim("iss", "http://localhost:8888/")
                 .claim("sub", UUID.randomUUID())
-                .claim("name", "Some User")
-                .claim("preferred_username", "test_user_from_token")
+                                     .claim("name", "Some User")
+                                     .claim("preferred_username", "test_user_from_token")
                 .claim("resource_access" , resourceAccessClaim)
                 .build();
         SignedJWT signedJWT = new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.RS256)

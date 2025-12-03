@@ -35,6 +35,7 @@ import org.bson.Document;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -44,8 +45,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static be.cytomine.domain.social.PersistentUserPosition.getJtsPolygon;
-import static be.cytomine.service.social.ProjectConnectionService.DATABASE_NAME;
 import static com.mongodb.client.model.Filters.eq;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -84,6 +83,9 @@ public class MongoDBDomainTests {
     SimpleDateFormat mongoDBFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
     ObjectMapper objectMapper = new ObjectMapper();
+
+    @Value("${spring.data.mongodb.database}")
+    private String mongoDatabaseName;
 
     @BeforeEach
     public void cleanDB() {
@@ -496,7 +498,7 @@ public class MongoDBDomainTests {
 
         Document document = retrieveDocument("persistentUserPosition", lastPosition.getId());
 
-        MongoCollection<Document> persistentProjectConnectionFromGrails = mongoClient.getDatabase(DATABASE_NAME).getCollection("persistentUserPosition");
+        MongoCollection<Document> persistentProjectConnectionFromGrails = mongoClient.getDatabase(mongoDatabaseName).getCollection("persistentUserPosition");
         ArrayList<Document> results = persistentProjectConnectionFromGrails.find(eq("_id", 3977L))
                 .into(new ArrayList<>());
         for (Document result : results) {
@@ -560,7 +562,7 @@ public class MongoDBDomainTests {
 
 
     private Document retrieveDocument(String collectionName, Long id) {
-        MongoCollection<Document> persistentProjectConnection = mongoClient.getDatabase(DATABASE_NAME).getCollection(collectionName);
+        MongoCollection<Document> persistentProjectConnection = mongoClient.getDatabase(mongoDatabaseName).getCollection(collectionName);
 
         List<Document> results = persistentProjectConnection.find(eq("_id", id))
                 .into(new ArrayList<>());
@@ -571,7 +573,7 @@ public class MongoDBDomainTests {
     }
 
     private ListIndexesIterable<Document> retrieveIndex(String collectionName) {
-        MongoCollection<Document> persistentProjectConnection = mongoClient.getDatabase(DATABASE_NAME).getCollection(collectionName);
+        MongoCollection<Document> persistentProjectConnection = mongoClient.getDatabase(mongoDatabaseName).getCollection(collectionName);
         return persistentProjectConnection.listIndexes();
     }
 }

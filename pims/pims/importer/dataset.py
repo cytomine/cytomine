@@ -39,11 +39,11 @@ class BucketParser:
 
     @property
     def parent(self) -> str:
-        return next(iter(self.dependency.keys()))
+        return next(iter(self.dependency.keys()), None) or next(iter(self.datasets.keys()))
 
     @property
     def children(self) -> List[str]:
-        return next(iter(self.dependency.values()))
+        return self.dependency.get(self.parent, [])
 
     def discover(self) -> None:
         for child in self.root.iterdir():

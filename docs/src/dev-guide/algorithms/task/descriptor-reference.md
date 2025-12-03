@@ -1038,12 +1038,14 @@ inputs:
 - `png`
 - `jpeg`
 - `tiff` (RGB, planar)
+- `dicom`
+- `wsidicom` (multi-layered dicom image)
 
-|              |                                    |
-| ------------ | ---------------------------------- |
-| **Type**     | `array of string`                  |
-| **Required** | `false`                            |
-| **Default**  | `['dicom', 'jpeg', 'png', 'tiff']` |
+|              |                                                |
+| ------------ |------------------------------------------------|
+| **Type**     | `array of string`                              |
+| **Required** | `false`                                        |
+| **Default**  | `['dicom', 'jpeg', 'png', 'tiff', 'wsidicom']` |
 
 ### Type `array`
 

@@ -1,0 +1,286 @@
+x-version-env: &version-env
+  VERSIONS_CYTOMINE_COMMERCIAL: 2025.1
+
+services:
+  mongo:
+    image: cytomine/mongo:latest
+    restart: unless-stopped
+    volumes:
+      - ${DATA_PATH:-./data}/mongo:/data/db
+    ports:
+      -
+    environment:
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INIT_DATABASE: cytomine
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.2
+  postgis:
+    image: cytomine/postgis:latest
+    restart: unless-stopped
+    volumes:
+      - ${DATA_PATH:-./data}/postgis/data:/var/lib/postgresql/data
+    ports:
+    - 5432:5432
+    environment:
+      APPENGINE_DB: appengine
+      APPENGINE_PASSWORD: password
+      APPENGINE_USER: appengine
+      IAM_DB: iam
+      IAM_PASSWORD: password
+      IAM_USER: iam
+      POSTGRES_DB: docker
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: docker
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.3
+
+  registry:
+    image: registry:2.8.3
+    restart: unless-stopped
+    volumes:
+      - ${DATA_PATH:-./data}/registry:/var/lib/registry
+    environment:
+      REGISTRY_STORAGE_DELETE_ENABLED: true
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.4
+
+  redis:
+    image: redis:7.2
+    command: --port 6380
+    ports:
+      - 6380:6380
+    restart: unless-stopped
+    volumes:
+      - ${DATA_PATH:-./data}/redis:/data
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.5
+
+  pims-cache:
+    image: redis:7.2
+    restart: unless-stopped
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.6
+
+  web-ui:
+    image: cytomine/web-ui:latest
+    restart: unless-stopped
+    volumes:
+      - /etc/localtime:/etc/localtime
+    environment:
+      <<: [*version-env]
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.7
+
+  pims:
+    image: cytomine/pims:latest
+    restart: unless-stopped
+    depends_on:
+      - pims-cache
+    volumes:
+      - ${IMPORT_PATH:-./data/dataset}:/dataset
+      - ${DATA_PATH:-./data}/images:/data/images
+    environment:
+      API_BASE_PATH: ${IMS_API_BASE_PATH:-/ims}
+      CACHE_ENABLED: true
+      CACHE_URL: redis://pims-cache:6379
+      CYTOMINE_PRIVATE_KEY: d70607f5-c478-403c-be11-3dbc1716d1cf
+      CYTOMINE_PUBLIC_KEY: 9a8b8369-2446-44cb-b0af-604a74e1dcdb
+      DATASET_PATH: /dataset
+      DEFAULT_ANNOTATION_ORIGIN: LEFT_TOP
+      DEFAULT_IMAGE_SIZE_SAFETY_MODE: SAFE_REJECT
+      INTERNAL_URL_CORE: http://nginx
+      LOG_CONFIG_FILE: /app/logging.yml
+      MAX_REQUESTS: 100000
+      OUTPUT_SIZE_LIMIT: 10000
+      PENDING_PATH: /tmp/uploaded
+      ROOT: /data/images
+      TASK_QUEUE_ENABLED: false
+      WEB_CONCURRENCY: ${WEB_CONCURRENCY:-8}
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.8
+
+  iam:
+    image: cytomine/iam:latest
+    restart: unless-stopped
+    depends_on:
+      - postgis
+    environment:
+      KC_ADMIN_EMAIL: mail@mail.com
+      KC_DB_PASSWORD: password
+      KC_DB_URL_DATABASE: iam
+      KC_DB_URL_HOST: postgis
+      KC_DB_URL_PORT: 5432
+      KC_DB_USERNAME: iam
+      KC_HOSTNAME: 127.0.0.1
+      KC_HOSTNAME_ADMIN: 127.0.0.1
+      KC_HOSTNAME_STRICT: false
+      KC_HOSTNAME_STRICT_BACKCHANNEL: true
+      KC_HOSTNAME_STRICT_HTTPS: false
+      KC_HTTP_RELATIVE_PATH: /iam
+      KC_HTTP_ENABLED: true
+      KC_PROXY_HEADERS: xforwarded
+      KC_SMTP_FROM: mail@mail.com
+      KC_SMTP_HOST: mail.smtp
+      KC_SMTP_PASS: password
+      KC_SMTP_PORT: 587
+      KC_SMTP_USER: user
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: YMjl7YGabNbQmjVOONxo9AYSiJyvioTnbsMyBwT8/Jg=
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.9
+
+  app-engine:
+    image: cytomine/app-engine:latest
+    restart: unless-stopped
+    depends_on:
+      - postgis
+      - registry
+      - k3s
+    volumes:
+      - ${DATA_PATH:-./data}/app-engine:/data
+      - ${PWD}/.kube/shared:/root/.kube:ro
+      - ${DATA_PATH:-./data}/app-engine-shared-inputs:/app-engine-shared-inputs:rw
+      - ${DATA_PATH:-./data}/app-engine-shared-datasets:/app-engine-shared-datasets:rw
+    environment:
+      API_PREFIX: ${APP_ENGINE_API_BASE_PATH:-/app-engine/}
+      DB_HOST: postgis
+      DB_NAME: appengine
+      DB_PASSWORD: password
+      DB_PORT: 5432
+      DB_USERNAME: appengine
+      REGISTRY_URL: http://registry:5000
+      STORAGE_BASE_PATH: /app-engine-shared-inputs
+      RUN_STORAGE_BASE_PATH: /app-engine-shared-inputs
+      REF_STORAGE_BASE_PATH: /app-engine-shared-datasets
+      SCHEDULER_RUN_MODE: local # values: local, cluster
+      SCHEDULER_ADVERTISED_URL: http://172.16.238.10:8080
+      SCHEDULER_REGISTRY_ADVERTISED_URL: 172.16.238.4:5000
+      SCHEDULER_USE_HOST_NETWORK: true
+      SCHEDULER_TASKS_NAMESPACE: app-engine-tasks
+      KUBERNETES_MASTER: https://k3s:6443/
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.10
+
+  core:
+    image: cytomine/core:latest
+    restart: unless-stopped
+    depends_on:
+      - iam
+      - mongo
+      - postgis
+    volumes:
+      - /etc/localtime:/etc/localtime
+    environment:
+      IMAGE_SERVER_PRIVATE_KEY: d70607f5-c478-403c-be11-3dbc1716d1cf
+      IMAGE_SERVER_PUBLIC_KEY: 9a8b8369-2446-44cb-b0af-604a74e1dcdb
+      IAM_URL: http://nginx
+      PIMS_URL: http://nginx
+      CBIR_URL: http://nginx
+      APPENGINE_API_URL: http://host.docker.internal:8080/
+      SAM_URL: http://nginx
+      JAVAMELODY_PASS: x6wp8Lg7K1fxr/7oa5gQD/NF7hqirE15g0P1STj5hCs
+      JAVAMELODY_PATH: /javamelody-core
+      JAVAMELODY_USER: admin
+      JWT_SECRET: d0K3EqpNgHn1huF_N1kXw.s4P1Wq;V3'W_UL4pY.EEDC+~wnmKQy3F+_3+gUGZJmnMGUl73.R+bOcQa8lv6lpG5VB~AI_3wMWtAP^TVY5xffO7PPKus_tP5~v6s8kH7Q7'CjqPqXL.D4plG3NJGKumP0IyoWulSwWvYpWx9SQ1D+mQZVvCbIWuM~N;M16~clqB_MRecEXXb~CRfw;ydav~her+s6+'WItURgb2rKkPSAc93kuySIjEYNa_;8zIJ0
+      MONGO_DB_NAME: cytomine
+      MONGO_HOST: mongo
+      MONGO_PASS: password
+      MONGO_PORT: 27017
+      MONGO_USER: admin
+      POSTGIS_DB_NAME: docker
+      POSTGIS_HOST: postgis
+      POSTGIS_PASS: password
+      POSTGIS_PORT: 5432
+      POSTGIS_USER: docker
+      STORAGE_PATH: /data/images
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.11
+    extra_hosts:
+      - "host.docker.internal:172.16.238.1"
+
+  cbir:
+    image: cytomine/cbir:latest
+    restart: unless-stopped
+    depends_on:
+      - redis
+    volumes:
+      - ${DATA_PATH:-./data}/cbir:/data/cbir
+      - ${DATA_PATH:-./data}/weights:/weights
+    environment:
+      API_BASE_PATH: ${CBIR_API_BASE_PATH:-/cbir}
+      DATA_PATH: /data/cbir
+      DB: 0
+      EXTRACTOR: ${CBIR_EXTRACTOR:-resnet}
+      HOST: redis
+      PORT: 6380
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.12
+
+  sam:
+    image: cytomine/sam:latest
+    restart: unless-stopped
+    volumes:
+      - ${DATA_PATH:-./data}/weights:/weights
+    environment:
+      API_BASE_PATH: ${SAM_API_BASE_PATH:-/sam}
+      WEIGHTS_PATH: /weights
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.13
+
+  # https://github.com/k3s-io/k3s/blob/3854eb56d4b8a183a1f8261aebd372111378a00f/docker-compose.yml
+  k3s:
+    image: "rancher/k3s:v1.30.14-rc3-k3s3"
+    command: server
+    tmpfs:
+      - /run
+      - /var/run
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 65535
+        hard: 65535
+    privileged: true
+    restart: always
+    environment:
+      - K3S_TOKEN=65535-65535-65535 # plain text secret!
+      - K3S_KUBECONFIG_OUTPUT=/output/config
+      - K3S_KUBECONFIG_MODE=666
+    volumes:
+      - k3s-server:/var/lib/rancher/k3s
+      - ./k3s/registries.yaml:/etc/rancher/k3s/registries.yaml:ro
+      - ./k3s/serviceaccounts.yaml://var/lib/rancher/k3s/server/manifests/serviceaccounts.yaml:ro
+      - ${DATA_PATH:-./data}/app-engine-shared-inputs:/app-engine-shared-inputs:rw
+      - ${DATA_PATH:-./data}/app-engine-shared-datasets:/app-engine-shared-datasets:ro
+      # This is just so that we get the kubeconfig file out
+      - .kube/shared:/output/
+    ports:
+      - 6443:6443
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.15
+
+volumes:
+  k3s-server: {}
+  k3s-agent: {}
+
+networks:
+  host_network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.238.0/24
+

@@ -46,6 +46,7 @@ import be.cytomine.dto.image.AreaDTO;
 import be.cytomine.repositorynosql.social.*;
 import be.cytomine.service.PermissionService;
 import be.cytomine.service.database.SequenceService;
+import be.cytomine.service.project.ProjectMemberService;
 import be.cytomine.service.search.UserSearchExtension;
 import be.cytomine.service.social.ImageConsultationService;
 import be.cytomine.service.social.ProjectConnectionService;
@@ -54,8 +55,6 @@ import be.cytomine.service.social.UserPositionServiceTests;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.filters.SearchOperation;
 import be.cytomine.utils.filters.SearchParameterEntry;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 import static be.cytomine.service.search.RetrievalService.CBIR_API_BASE_PATH;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -73,6 +72,9 @@ public class UserServiceTests {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    private ProjectMemberService projectMemberService;
 
     @Autowired
     private BasicInstanceBuilder builder;
@@ -807,21 +809,6 @@ public class UserServiceTests {
     }
 
     @Test
-    void list_all_users_id_of_a_project() {
-        Project project = builder.given_a_project();
-        User user1 = builder.given_a_user("Paul");
-        User user2 = builder.given_a_user("Bob");
-
-        builder.addUserToProject(project, user1.getUsername());
-        builder.addUserToProject(project, user2.getUsername());
-
-        String userIds = userService.getUsersIdsFromProject(project.getId());
-        String expectedUserIds = user1.getId() + "," + user2.getId() + ",";
-
-        assertThat(expectedUserIds).isEqualTo(userIds);
-    }
-
-    @Test
     void list_online_user_for_project_wit_their_activities() {
         User userOnline = builder.given_default_user();
 
@@ -898,24 +885,6 @@ public class UserServiceTests {
 
     }
 
-    @Test
-    void fill_not_empty_users_ids_from_project_works(){
-        User user = builder.given_a_user();
-        Project project = builder.given_a_project_with_user(user);
-        String users = userService.fillEmptyUserIds(user.getId().toString(), project.getId());
-        assertThat(users).isEqualTo(user.getId().toString());
-    }
-
-    @Test
-    void fill_empty_users_ids_from_project_works(){
-        User user1 = builder.given_a_user();
-        User user2 = builder.given_a_user();
-        Project project = builder.given_a_project_with_user(user1);
-        builder.addUserToProject(project, user2.getUsername());
-        String users = userService.fillEmptyUserIds("", project.getId());
-        assertThat(users).isEqualTo(user1.getId().toString() + "," + user2.getId().toString() + ",");
-    }
-
 // TODO: IAM Account
 
     @Test
@@ -926,12 +895,12 @@ public class UserServiceTests {
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), ADMINISTRATION)).isFalse();
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isFalse();
 
-        userService.addUserToProject(user, project, false);
+        projectMemberService.addUserToProject(user, project, false);
 
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), ADMINISTRATION)).isFalse();
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isTrue();
 
-        userService.addUserToProject(user, project, true);
+        projectMemberService.addUserToProject(user, project, true);
 
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), ADMINISTRATION)).isTrue();
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isTrue();
@@ -942,19 +911,19 @@ public class UserServiceTests {
         User user = builder.given_a_user();
         Project project = builder.given_a_project();
 
-        userService.addUserToProject(user, project, true);
+        projectMemberService.addUserToProject(user, project, true);
 
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), ADMINISTRATION)).isTrue();
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isTrue();
         assertThat(permissionService.hasACLPermission(project.getOntology(), user.getUsername(), READ)).isTrue();
 
-        userService.deleteUserFromProject(user, project, true);
+        projectMemberService.deleteUserFromProject(user, project, true);
 
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), ADMINISTRATION)).isFalse();
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isTrue();
         assertThat(permissionService.hasACLPermission(project.getOntology(), user.getUsername(), READ)).isTrue();
 
-        userService.deleteUserFromProject(user, project, false);
+        projectMemberService.deleteUserFromProject(user, project, false);
 
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), ADMINISTRATION)).isFalse();
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isFalse();
@@ -967,12 +936,12 @@ public class UserServiceTests {
         User user = builder.given_a_user();
         Project project = builder.given_a_project();
 
-        userService.addUserToProject(user, project, false);
+        projectMemberService.addUserToProject(user, project, false);
 
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isTrue();
         assertThat(permissionService.hasACLPermission(project.getOntology(), user.getUsername(), READ)).isTrue();
 
-        userService.deleteUserFromProject(user, project, false);
+        projectMemberService.deleteUserFromProject(user, project, false);
 
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isFalse();
         assertThat(permissionService.hasACLPermission(project.getOntology(), user.getUsername(), READ)).isFalse();
@@ -984,16 +953,16 @@ public class UserServiceTests {
         User user = builder.given_a_user();
         Project project = builder.given_a_project();
 
-        userService.addUserToProject(user, project, false);
+        projectMemberService.addUserToProject(user, project, false);
 
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isTrue();
         assertThat(permissionService.hasACLPermission(project.getOntology(), user.getUsername(), READ)).isTrue();
 
         Project projectWithSameOntology = builder.given_a_project();
         projectWithSameOntology.setOntology(project.getOntology());
-        userService.addUserToProject(user, projectWithSameOntology, false);
+        projectMemberService.addUserToProject(user, projectWithSameOntology, false);
 
-        userService.deleteUserFromProject(user, project, false);
+        projectMemberService.deleteUserFromProject(user, project, false);
 
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isFalse();
         assertThat(permissionService.hasACLPermission(project.getOntology(), user.getUsername(), READ)).isTrue();

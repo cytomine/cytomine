@@ -9,9 +9,9 @@ import java.util.UUID;
 
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.informers.ResourceEventHandler;
+import jakarta.persistence.OptimisticLockException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 import be.cytomine.appengine.models.task.Run;
 import be.cytomine.appengine.repositories.RunRepository;
@@ -65,7 +65,7 @@ public class PodInformer implements ResourceEventHandler<Pod> {
                 run = runRepository.saveAndFlush(run);
                 log.info("Pod Informer: set Run {} to {}", run.getId(), run.getState());
                 return;
-            } catch (ObjectOptimisticLockingFailureException ex) {
+            } catch (OptimisticLockException ex) {
                 attempts++;
                 if (attempts >= maxAttempts) {
                     throw ex;
@@ -107,7 +107,7 @@ public class PodInformer implements ResourceEventHandler<Pod> {
                 run = runRepository.saveAndFlush(run);
                 log.info("Pod Informer: update Run {} to {}", run.getId(), run.getState());
                 return;
-            } catch (ObjectOptimisticLockingFailureException ex) {
+            } catch (OptimisticLockException ex) {
                 attempts++;
                 if (attempts >= maxAttempts) {
                     throw ex;

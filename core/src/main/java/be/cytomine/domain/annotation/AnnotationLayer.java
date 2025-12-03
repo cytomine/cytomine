@@ -3,11 +3,14 @@ package be.cytomine.domain.annotation;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
 import be.cytomine.domain.CytomineDomain;
+import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.utils.JsonObject;
 
 @Setter
@@ -18,6 +21,10 @@ public class AnnotationLayer extends CytomineDomain {
     @NotBlank
     @Column(unique = true, nullable = false)
     private String name;
+
+    @ManyToOne
+    @JoinColumn(name = "image_id", nullable = false)
+    private ImageInstance image;
 
     public static JsonObject getDataFromDomain(CytomineDomain domain) {
         AnnotationLayer annotationLayer = (AnnotationLayer) domain;

@@ -13,12 +13,17 @@ import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 
 import be.cytomine.domain.CytomineDomain;
+import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.utils.JsonObject;
 
 @Setter
 @Getter
 @Entity
 public class Annotation extends CytomineDomain {
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "slice_id", nullable = false)
+    private SliceInstance slice;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "layer_id")

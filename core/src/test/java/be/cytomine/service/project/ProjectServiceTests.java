@@ -979,4 +979,19 @@ public class ProjectServiceTests {
         PersistentProjectConnection connection = projectConnectionService.add(user, project, "xxx", "linux", "chrome", "123", created);
         return connection;
     }
+
+    @Test
+    void list_all_users_id_of_a_project() {
+        Project project = builder.given_a_project();
+        User user1 = builder.given_a_user("Paul");
+        User user2 = builder.given_a_user("Bob");
+
+        builder.addUserToProject(project, user1.getUsername());
+        builder.addUserToProject(project, user2.getUsername());
+
+        String userIds = projectService.getUserIdsFromProject(project.getId());
+        String expectedUserIds = user1.getId() + "," + user2.getId();
+
+        assertThat(expectedUserIds).isEqualTo(userIds);
+    }
 }

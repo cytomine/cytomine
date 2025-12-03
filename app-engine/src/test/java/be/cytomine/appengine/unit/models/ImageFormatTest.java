@@ -3,10 +3,15 @@ package be.cytomine.appengine.unit.models;
 import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import be.cytomine.appengine.models.task.formats.WSIDicomFormat;
+import be.cytomine.appengine.models.task.formats.ZipFormat;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -23,6 +28,10 @@ public class ImageFormatTest {
 
     private static final int EXPECTED_WIDTH = 680;
 
+    private static final int EXPECTED_WSIDICOM_WIDTH = 240;
+
+    private static final int EXPECTED_WSIDICOM_HEIGHT = 240;
+
     private static final int EXPECTED_HEIGHT = 512;
 
     private static Map<String, File> images;
@@ -33,6 +42,8 @@ public class ImageFormatTest {
         images.put("PNG", loadImage("src/test/resources/artifacts/images/image.png"));
         images.put("JPEG", loadImage("src/test/resources/artifacts/images/image.jpg"));
         images.put("TIFF", loadImage("src/test/resources/artifacts/images/image.tif"));
+        images.put("ZIP", loadImage("src/test/resources/artifacts/images/image.zip"));
+        images.put("WSIDICOM", loadImage("src/test/resources/artifacts/images/image"));
     }
 
     @AfterAll
@@ -48,7 +59,9 @@ public class ImageFormatTest {
         return Stream.of(
             Arguments.of(new PngFormat(), "PNG"),
             Arguments.of(new JpegFormat(), "JPEG"),
-            Arguments.of(new TiffFormat(), "TIFF")
+            Arguments.of(new TiffFormat(), "TIFF"),
+            Arguments.of(new ZipFormat(), "ZIP"),
+            Arguments.of(new WSIDicomFormat(), "WSIDICOM")
         );
     }
 
@@ -61,25 +74,57 @@ public class ImageFormatTest {
 
     @ParameterizedTest
     @MethodSource("streamImageFormat")
-    public void testGetDimensions(FileFormat format, String formatKey) {
+    public void testGetDimensions(FileFormat format, String formatKey)
+        throws IOException {
+        if (formatKey.equalsIgnoreCase("ZIP")) {
+            return;
+        }
         File image = images.get(formatKey);
+        if (formatKey.equalsIgnoreCase("WSIDICOM")) {
+            image = Files.walk(image.toPath())
+                .filter(Files::isRegularFile)
+                .max(Comparator.comparingLong(p -> p.toFile().length()))
+                .map(Path::toFile)
+                .orElse(null);
+
+        }
+
         Dimension dimension = format.getDimensions(image);
 
-        Assertions.assertEquals(
-            EXPECTED_WIDTH,
-            dimension.getWidth(),
-            "Width should be " + EXPECTED_WIDTH + " pixels."
-        );
-        Assertions.assertEquals(
-            EXPECTED_HEIGHT,
-            dimension.getHeight(),
-            "Height should be " + EXPECTED_HEIGHT + " pixels."
-        );
+        if (formatKey.equalsIgnoreCase("WSIDICOM")) {
+
+            Assertions.assertEquals(
+                EXPECTED_WSIDICOM_WIDTH,
+                dimension.getWidth(),
+                "Width should be " + EXPECTED_WIDTH + " pixels."
+            );
+
+            Assertions.assertEquals(
+                EXPECTED_WSIDICOM_HEIGHT,
+                dimension.getHeight(),
+                "Height should be " + EXPECTED_HEIGHT + " pixels."
+            );
+
+        } else {
+            Assertions.assertEquals(
+                EXPECTED_WIDTH,
+                dimension.getWidth(),
+                "Width should be " + EXPECTED_WIDTH + " pixels."
+            );
+            Assertions.assertEquals(
+                EXPECTED_HEIGHT,
+                dimension.getHeight(),
+                "Height should be " + EXPECTED_HEIGHT + " pixels."
+            );
+        }
     }
 
     @ParameterizedTest
     @MethodSource("streamImageFormat")
     public void testValidate(FileFormat format, String formatKey) {
+        if (formatKey.equalsIgnoreCase("ZIP")) {
+            return;
+        }
         File image = images.get(formatKey);
         Assertions.assertTrue(format.validate(image), "Validation should return true.");
     }

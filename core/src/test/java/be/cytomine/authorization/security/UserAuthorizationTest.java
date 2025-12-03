@@ -22,11 +22,11 @@ import be.cytomine.authorization.AbstractAuthorizationTest;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.service.PermissionService;
+import be.cytomine.service.project.ProjectMemberService;
 import be.cytomine.service.search.UserSearchExtension;
 import be.cytomine.service.security.SecUserSecRoleService;
 import be.cytomine.service.security.UserService;
 import be.cytomine.service.security.SecurityACLService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -35,7 +35,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
@@ -46,6 +45,8 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 @Transactional
 public class UserAuthorizationTest extends AbstractAuthorizationTest {
 
+    @Autowired
+    ProjectMemberService projectMemberService;
 
     @Autowired
     UserService userService;
@@ -61,12 +62,6 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
 
     @Autowired
     SecUserSecRoleService secSecUserSecRoleService;
-
-    @BeforeEach
-    public void before() throws Exception {
-        ;
-    }
-
 
     @Test
     @WithMockUser(username = GUEST)
@@ -163,8 +158,8 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
     public void admin_can_add_a_user_to_a_project() {
         User user = builder.given_a_user();
         Project project = builder.given_a_project();
-        expectOK(() -> userService.addUserToProject(user, project, false));
-        expectOK(() -> userService.deleteUserFromProject(user, project, false));
+        expectOK(() -> projectMemberService.addUserToProject(user, project, false));
+        expectOK(() -> projectMemberService.deleteUserFromProject(user, project, false));
     }
 
     @Test
@@ -173,8 +168,8 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
         User user = builder.given_a_user();
         Project project = builder.given_a_project();
         builder.addUserToProject(project, USER_ACL_ADMIN, ADMINISTRATION);
-        expectOK(() -> userService.addUserToProject(user, project, false));
-        expectOK(() -> userService.deleteUserFromProject(user, project, false));
+        expectOK(() -> projectMemberService.addUserToProject(user, project, false));
+        expectOK(() -> projectMemberService.deleteUserFromProject(user, project, false));
     }
 
     @Test
@@ -183,8 +178,8 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
         User user = builder.given_a_user();
         Project project = builder.given_a_project();
         builder.addUserToProject(project, USER_ACL_READ, READ);
-        expectForbidden(() -> userService.addUserToProject(user, project, false));
-        expectForbidden(() -> userService.deleteUserFromProject(user, project, false));
+        expectForbidden(() -> projectMemberService.addUserToProject(user, project, false));
+        expectForbidden(() -> projectMemberService.deleteUserFromProject(user, project, false));
     }
 
     @Test

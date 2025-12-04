@@ -1,4 +1,4 @@
-name: Client Python
+name: Python Client
 
 on:
   pull_request:

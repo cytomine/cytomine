@@ -1,7 +1,10 @@
-name: PR
+name: Docker push PR
 
 on:
-  pull_request:
+  workflow_run:
+    workflows: [Python Client, App Engine, CBIR, Core, IMS, SAM, Web UI]
+    types:
+      - completed
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -53,5 +56,6 @@ jobs:
           file: ./${{ matrix.image.dockerfile_location || matrix.image.context || matrix.image.name }}/Dockerfile
           push: true
           tags: registry.cytomine.org/cytomine/${{ matrix.image.name }}
+          labels: ${{ github.ref }}
           allow: network.host
           network: host

@@ -1,17 +1,9 @@
 name: Lint and Test Charts
 
 on:
-  workflow_run:
-    workflows: [Docker push PR]
-    types:
-      - completed
-
+  workflow_call:
 
 permissions: {}
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
 
 jobs:
   lint-test:

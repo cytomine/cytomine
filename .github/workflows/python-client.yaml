@@ -1,16 +1,7 @@
 name: Python Client
 
 on:
-  pull_request:
-    branches:
-      - main
-  push:
-    branches:
-      - main
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  workflow_call:
 
 defaults:
   run:

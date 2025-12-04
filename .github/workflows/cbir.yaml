@@ -2,9 +2,6 @@ name: CBIR
 
 on:
   workflow_call:
-  push:
-    branches:
-      - main
 
 permissions:
   contents: read

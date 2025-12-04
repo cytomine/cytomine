@@ -2,9 +2,6 @@ name: Python Client
 
 on:
   workflow_call:
-  push:
-    branches:
-      - main
 
 defaults:
   run:

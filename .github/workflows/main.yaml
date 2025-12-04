@@ -31,6 +31,7 @@ jobs:
   docker-images:
     needs: [app-engine, cbir, core, ims, python-client, sam, web-ui]
     uses: ./.github/workflows/docker.yaml
+    secrets: inherit
 
   helm-tests:
     needs: [docker-images]

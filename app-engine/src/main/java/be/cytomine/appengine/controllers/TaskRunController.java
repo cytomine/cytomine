@@ -280,7 +280,8 @@ public class TaskRunController {
         log.info("ProvisionCollectionItem: calculating & caching CRC32 checksum...");
         taskRunService.setChecksumCRC32(
             "task-run-inputs-" + runId,
-            taskRunService.calculateFileCRC32(uploadedFile),
+            uploadedFile.isFile() ? taskRunService.calculateFileCRC32(uploadedFile)
+                : taskRunService.calculateDirectoryCRC32(uploadedFile),
             parameterName + "/" + String.join("/", indexesArray)
         );
         log.info("/task-runs/{run_id}/input-provisions/{param_name}/indexes Binary POST Ended");

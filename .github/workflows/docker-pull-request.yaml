@@ -2,7 +2,7 @@ name: Docker push PR
 
 on:
   workflow_run:
-    workflows: [client-python] #, App Engine, CBIR, Python Client, Core, IMS, SAM, Web UI]
+    workflows: [Python Client, App Engine, CBIR, Core, IMS, SAM, Web UI]
     types:
       - completed
 

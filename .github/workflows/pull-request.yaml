@@ -1,0 +1,12 @@
+name: Build and Test
+
+on:
+  pull_request:
+    branches:
+    - main
+jobs:
+  app-engine:
+    uses: ./.github/workflows/app-engine.yaml
+  docker-images:
+    needs: [app-engine]
+    uses: ./.github/workflows/docker-pull-request.yaml

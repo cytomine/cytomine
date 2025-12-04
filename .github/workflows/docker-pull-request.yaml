@@ -1,10 +1,7 @@
 name: Docker push PR
 
 on:
-  workflow_run:
-    workflows: [Python Client, App Engine, CBIR, Core, IMS, SAM, Web UI]
-    types:
-      - completed
+  workflow_call:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

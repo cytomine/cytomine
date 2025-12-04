@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 import be.cytomine.domain.annotation.Annotation;
 import be.cytomine.domain.annotation.AnnotationLayer;
 import be.cytomine.dto.annotation.AnnotationLayerResponse;
+import be.cytomine.dto.annotation.AnnotationResponse;
 import be.cytomine.dto.appengine.task.TaskRunLayerValue;
 import be.cytomine.exceptions.ObjectNotFoundException;
+import be.cytomine.repository.annotation.AnnotationRepository;
 import be.cytomine.service.annotation.AnnotationLayerService;
 
 @Slf4j
@@ -22,6 +24,8 @@ import be.cytomine.service.annotation.AnnotationLayerService;
 @RequestMapping("/api")
 @RestController
 public class AnnotationLayerController {
+
+    private final AnnotationRepository annotationRepository;
 
     private final AnnotationLayerService annotationLayerService;
 
@@ -37,19 +41,23 @@ public class AnnotationLayerController {
     }
 
     @GetMapping("/annotation-layers/{id}/annotations")
-    public ResponseEntity<List<Annotation>> getAnnotationsByLayer(@PathVariable Long id) {
-        log.info("Retrieve all annotations for annotation layer {}", id);
+    public ResponseEntity<List<AnnotationResponse>> getAnnotationsByLayer(@PathVariable Long id) {
+        log.info("GET /annotation-layers/{}/annotations", id);
 
         AnnotationLayer layer = annotationLayerService
                 .find(id)
                 .orElseThrow(() -> new ObjectNotFoundException("AnnotationLayer " + id + " not found"));
+        List<Annotation> annotations = annotationRepository.findAllByAnnotationLayer(layer);
+        List<AnnotationResponse> responses = annotations.stream()
+                .map(annotation -> new AnnotationResponse(annotation.getId(), annotation.getSlice().getId(), id, annotation.getLocation()))
+                .toList();
 
-        return ResponseEntity.ok(annotationLayerService.findAnnotationsByLayer(layer));
+        return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/annotation-layers/{id}/task-run-layer")
     public ResponseEntity<TaskRunLayerValue> findTaskRunLayer(@PathVariable Long id) {
-        log.info("Restrieve all the task run layers for annotation layer {}", id);
+        log.info("GET /annotation-layers/{}/task-run-layer", id);
         return ResponseEntity.ok(annotationLayerService.findTaskRunLayer(id));
     }
 }

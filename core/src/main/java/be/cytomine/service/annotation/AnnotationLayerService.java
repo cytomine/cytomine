@@ -8,20 +8,16 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import be.cytomine.domain.annotation.Annotation;
 import be.cytomine.domain.annotation.AnnotationLayer;
 import be.cytomine.domain.appengine.TaskRunLayer;
 import be.cytomine.dto.appengine.task.TaskRunLayerValue;
 import be.cytomine.repository.annotation.AnnotationLayerRepository;
-import be.cytomine.repository.annotation.AnnotationRepository;
 import be.cytomine.repository.appengine.TaskRunLayerRepository;
 import be.cytomine.service.appengine.TaskRunLayerService;
 
 @Service
 @RequiredArgsConstructor
 public class AnnotationLayerService {
-
-    private final AnnotationRepository annotationRepository;
 
     private final AnnotationLayerRepository annotationLayerRepository;
 
@@ -63,9 +59,5 @@ public class AnnotationLayerService {
         }
 
         return taskRunLayerService.convertToDTO(optional.get());
-    }
-
-    public List<Annotation> findAnnotationsByLayer(AnnotationLayer layer) {
-        return annotationRepository.findAllByAnnotationLayer(layer);
     }
 }

@@ -37,7 +37,7 @@ jobs:
 
       - name: Log in to Cytomine registry
         uses: docker/login-action@v3
-        if: github.ref != 'main'
+        if: github.ref_name != 'main'
         with:
           registry: registry.cytomine.org
           username: ${{ secrets.REGISTRY_USERNAME }}
@@ -45,7 +45,7 @@ jobs:
 
       - name: Log in to Docker registry
         uses: docker/login-action@v3
-        if: github.ref == 'main'
+        if: github.ref_name == 'main'
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -56,7 +56,6 @@ jobs:
           context: ${{ matrix.image.context || matrix.image.name }}
           file: ./${{ matrix.image.dockerfile_location || matrix.image.context || matrix.image.name }}/Dockerfile
           push: true
-          tags: ${{ github.ref == 'main' && '' || 'registry.cytomine.org/' }}cytomine/${{ matrix.image.name }}
-          labels: ${{ github.ref == 'main' && 'latest' || github.ref }}
+          tags: ${{ github.ref_name == 'main' && '' || 'registry.cytomine.org/' }}cytomine/${{ matrix.image.name }}:${{ github.ref_name == 'main' && 'latest' || github.sha }}
           allow: network.host
           network: host

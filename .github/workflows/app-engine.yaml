@@ -112,6 +112,6 @@ jobs:
         if: ${{ always() }}
         uses: actions/upload-artifact@v5
         with:
-          name: reports
+          name: app-engine-report
           path: app-engine/build/reports/
           retention-days: 7

@@ -1,11 +1,11 @@
 <template>
   <b-tabs v-model="activeTab" expanded>
     <b-tab-item :label="$t('image')" icon="image">
-      <ImageMultiSelect :key="'image-' + activeTab" @input="$emit('input', $event)" />
+      <ImageMultiSelect :key="'image-' + activeTab" @input="$emit('input', $event)" @from="$emit('from', $event)" />
     </b-tab-item>
 
     <b-tab-item :label="$t('geometry')" icon="draw-polygon">
-      <AnnotationMultiSelect :key="'annotation-' + activeTab" @input="$emit('input', $event)" />
+      <AnnotationMultiSelect :key="'annotation-' + activeTab" @input="$emit('input', $event)" @from="$emit('from', $event)" />
     </b-tab-item>
   </b-tabs>
 </template>

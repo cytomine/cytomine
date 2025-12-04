@@ -28,6 +28,7 @@
       :min-size="minSize"
       :type="subType"
       @create-inputs="input = $event"
+      @from="$emit('from', $event)"
     />
   </div>
 </template>

@@ -52,6 +52,7 @@ export default {
   watch: {
     selectedImages(images) {
       this.$emit('input', images);
+      this.$emit('from', 'image');
     }
   },
   async created() {

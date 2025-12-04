@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import be.cytomine.domain.annotation.Annotation;
 import be.cytomine.domain.annotation.AnnotationLayer;
+import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.repository.annotation.AnnotationRepository;
 
 @Service
@@ -16,8 +17,9 @@ public class AnnotationService {
 
     private final AnnotationRepository annotationRepository;
 
-    public Annotation createAnnotation(AnnotationLayer layer, String geometry) {
+    public Annotation createAnnotation(AnnotationLayer layer, String geometry, SliceInstance slice) {
         Annotation annotation = new Annotation();
+        annotation.setSlice(slice);
         annotation.setAnnotationLayer(layer);
         annotation.setLocation(geometry.getBytes(StandardCharsets.UTF_8));
 

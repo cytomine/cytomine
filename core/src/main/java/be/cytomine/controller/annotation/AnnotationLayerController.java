@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import be.cytomine.domain.annotation.Annotation;
 import be.cytomine.domain.annotation.AnnotationLayer;
+import be.cytomine.dto.annotation.AnnotationLayerResponse;
 import be.cytomine.dto.appengine.task.TaskRunLayerValue;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.annotation.AnnotationLayerService;
@@ -25,9 +26,14 @@ public class AnnotationLayerController {
     private final AnnotationLayerService annotationLayerService;
 
     @GetMapping("/image-instances/{id}/annotation-layers")
-    public ResponseEntity<List<AnnotationLayer>> getAnnotationLayersByImage(@PathVariable Long id) {
-        log.info("Retrieve all annotation layers for image instance {}", id);
-        return ResponseEntity.ok(annotationLayerService.findByTaskRunLayer(id));
+    public ResponseEntity<List<AnnotationLayerResponse>> getAnnotationLayersByImage(@PathVariable Long id) {
+        log.info("GET /image-instances/{}/annotation-layers", id);
+        List<AnnotationLayer> layers = annotationLayerService.findByTaskRunLayer(id);
+        List<AnnotationLayerResponse> responses = layers.stream()
+                .map(layer -> new AnnotationLayerResponse(layer.getId(), layer.getName(), id))
+                .toList();
+
+        return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/annotation-layers/{id}/annotations")
@@ -35,8 +41,8 @@ public class AnnotationLayerController {
         log.info("Retrieve all annotations for annotation layer {}", id);
 
         AnnotationLayer layer = annotationLayerService
-            .find(id)
-            .orElseThrow(() -> new ObjectNotFoundException("AnnotationLayer " + id + " not found"));
+                .find(id)
+                .orElseThrow(() -> new ObjectNotFoundException("AnnotationLayer " + id + " not found"));
 
         return ResponseEntity.ok(annotationLayerService.findAnnotationsByLayer(layer));
     }

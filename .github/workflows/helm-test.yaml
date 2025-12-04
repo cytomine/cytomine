@@ -1,6 +1,11 @@
 name: Lint and Test Charts
 
-on: pull_request
+on:
+  workflow_run:
+    workflows: [Docker push PR]
+    types:
+      - completed
+
 
 permissions: {}
 

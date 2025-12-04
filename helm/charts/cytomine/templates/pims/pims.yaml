@@ -55,7 +55,7 @@ spec:
         {{ end }}
       containers:
         - name: pims
-          image: "{{ .Values.images.pims }}"
+          image: "{{ include "cytomine.pimsImage" . }}"
           imagePullPolicy: {{ .Values.images.pullPolicy }}
           envFrom:
             - configMapRef:

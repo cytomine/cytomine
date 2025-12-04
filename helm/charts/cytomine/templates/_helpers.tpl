@@ -86,3 +86,27 @@ http://iam.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.iam.port }}/iam
 {{- define "cytomine.appEngineTasksNamespace" -}}
 {{ .Values.app_engine.tasks_namespace | default (printf "%s-engine-tasks" .Release.Namespace) }}
 {{- end }}
+
+{{- define "cytomine.appEngineImage" -}}
+{{ printf "cytomine/app-engine:%s" (.Values.images.app_engine | default (.Values.images.global_label) | default "latest") }}
+{{- end }}
+
+{{- define "cytomine.samImage" -}}
+{{ printf "cytominesam:%s" (.Values.images.sam | default (.Values.images.global_label) | default "latest") }}
+{{- end }}
+
+{{- define "cytomine.coreImage" -}}
+{{ printf "cytomine/core:%s" (.Values.images.core | default (.Values.images.global_label) | default "latest") }}
+{{- end }}
+
+{{- define "cytomine.pimsImage" -}}
+{{ printf "cytomine/pims:%s" (.Values.images.pims | default (.Values.images.global_label) | default "latest") }}
+{{- end }}
+
+{{- define "cytomine.webUiImage" -}}
+{{ printf "cytomine/web-ui:%s" (.Values.images.web_ui | default (.Values.images.global_label) | default "latest") }}
+{{- end }}
+
+{{- define "cytomine.cbirImage" -}}
+{{ printf "cytomine/cbir:%s" (.Values.images.cbir | default (.Values.images.global_label) | default "latest") }}
+{{- end }}

@@ -1,9 +1,7 @@
 name: IMS
 
 on:
-  pull_request:
-    branches:
-      - main
+  workflow_call:
   push:
     branches:
       - main

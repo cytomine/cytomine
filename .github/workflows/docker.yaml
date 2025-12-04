@@ -2,7 +2,19 @@ name: Docker push PR
 
 on:
   workflow_call:
-
+    inputs:
+      is-main:
+        required: true
+        type: boolean
+    secrets:
+      DOCKERHUB_USERNAME:
+        required: true
+      DOCKERHUB_TOKEN:
+        required: true
+      REGISTRY_USERNAME:
+        required: true
+      REGISTRY_TOKEN:
+        required: true
 jobs:
   build-push:
     runs-on: self-hosted
@@ -37,7 +49,7 @@ jobs:
 
       - name: Log in to Cytomine registry
         uses: docker/login-action@v3
-        if: github.ref_name != 'main'
+        if: ! is-main
         with:
           registry: registry.cytomine.org
           username: ${{ secrets.REGISTRY_USERNAME }}
@@ -45,7 +57,7 @@ jobs:
 
       - name: Log in to Docker registry
         uses: docker/login-action@v3
-        if: github.ref_name == 'main'
+        if: is-main
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -56,6 +68,6 @@ jobs:
           context: ${{ matrix.image.context || matrix.image.name }}
           file: ./${{ matrix.image.dockerfile_location || matrix.image.context || matrix.image.name }}/Dockerfile
           push: true
-          tags: ${{ github.ref_name == 'main' && '' || 'registry.cytomine.org/' }}cytomine/${{ matrix.image.name }}:${{ github.ref_name == 'main' && 'latest' || github.sha }}
+          tags: ${{ is-main && '' || 'registry.cytomine.org/' }}cytomine/${{ matrix.image.name }}:${{ github.ref_name == 'main' && 'latest' || github.sha }}
           allow: network.host
           network: host

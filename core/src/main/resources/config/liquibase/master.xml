@@ -51,4 +51,6 @@
     <include file="/config/liquibase/changelog/2025-11-26-username-unique.sql"
              relativeToChangelogFile="false" />
 
+    <include file="/config/liquibase/changelog/2025-12-03-add-image-slice-to-annotations.sql" relativeToChangelogFile="false" />
+
 </databaseChangeLog>

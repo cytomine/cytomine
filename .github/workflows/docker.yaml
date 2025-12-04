@@ -56,7 +56,6 @@ jobs:
           context: ${{ matrix.image.context || matrix.image.name }}
           file: ./${{ matrix.image.dockerfile_location || matrix.image.context || matrix.image.name }}/Dockerfile
           push: true
-          tags: ${{ github.ref_name == 'main' && '' || 'registry.cytomine.org/' }}cytomine/${{ matrix.image.name }}
-          labels: ${{ github.ref_name == 'main' && 'latest' || github.ref_name }}
+          tags: ${{ github.ref_name == 'main' && '' || 'registry.cytomine.org/' }}cytomine/${{ matrix.image.name }}:${{ github.ref_name == 'main' && 'latest' || github.ref_name }}
           allow: network.host
           network: host

@@ -1,11 +1,7 @@
-name: PR
+name: Docker push PR
 
 on:
-  pull_request:
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  workflow_call:
 
 jobs:
   build-push:
@@ -21,7 +17,7 @@ jobs:
           - name: cbir
           - name: core
           - name: iam
-          # - name: mongo
+          - name: mongo
           - name: nginx
           - name: pims
           - name: postgis
@@ -41,10 +37,18 @@ jobs:
 
       - name: Log in to Cytomine registry
         uses: docker/login-action@v3
+        if: github.ref != 'refs/heads/main'
         with:
           registry: registry.cytomine.org
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_TOKEN }}
+
+      - name: Log in to Docker registry
+        uses: docker/login-action@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
@@ -52,6 +56,7 @@ jobs:
           context: ${{ matrix.image.context || matrix.image.name }}
           file: ./${{ matrix.image.dockerfile_location || matrix.image.context || matrix.image.name }}/Dockerfile
           push: true
-          tags: registry.cytomine.org/cytomine/${{ matrix.image.name }}
+          tags: ${{ github.ref == 'refs/heads/main' && '' || 'registry.cytomine.org/' }}cytomine/${{ matrix.image.name }}
+          labels: ${{ github.ref == 'refs/heads/main' && 'latest' || github.ref }}
           allow: network.host
           network: host

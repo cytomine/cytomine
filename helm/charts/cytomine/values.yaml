@@ -54,6 +54,10 @@ images:
   # use only tags here (e.g. `latest` which is the default)
   # specific image tag takes precedence on global_label
   global_label:
+
+  # If you use a private registry for all images
+  # add a trailing slash.
+  global_prefix:
   app_engine:
   sam:
   core:

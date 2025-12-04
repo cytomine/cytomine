@@ -1,6 +1,6 @@
 {{/* Core hostname */}}
 {{- define "core.hostname" -}}
-{{- .Values.global.urlCore | default (printf "%s" .Values.global.domainName )    }}
+{{- .Values.global.urlCore | default (printf "%s" .Values.global.domainName ) }}
 {{- end }}
 
 {{/* Core url */}}
@@ -81,4 +81,8 @@ Simple function that returns 'http' or 'https' depending on wheather
 
 {{- define "cytomine.iamInternalUrl" -}}
 http://iam.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.iam.port }}/iam
+{{- end }}
+
+{{- define "cytomine.appEngineTasksNamespace" -}}
+{{ .Values.app_engine.tasks_namespace | default (printf "%s-engine-tasks" .Release.Namespace) }}
 {{- end }}

@@ -32,8 +32,6 @@ jobs:
     needs: [app-engine, cbir, core, ims, python-client, sam, web-ui]
     uses: ./.github/workflows/docker.yaml
     secrets: inherit
-    with:
-      is-main: ${{ github.ref == 'refs/head/main' }}
 
   helm-tests:
     needs: [docker-images]

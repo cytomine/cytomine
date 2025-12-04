@@ -57,7 +57,7 @@ jobs:
         if: ${{ always() }}
         uses: actions/upload-artifact@v5
         with:
-          name: reports
+          name: core-reports
           path: core/build/reports/
           retention-days: 7
 

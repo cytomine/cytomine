@@ -1094,12 +1094,9 @@ public class CollectionType extends Type {
                         // add this collection to parent collection
                         CollectionPersistence parentPersistence = (CollectionPersistence) parameterNameToTypePersistence.get(parentName);
                         parentPersistence.getItems().add(subCollection);
-                    } else { // just a normal subdirectory within a directory-based type
-                            // what do we need to do to handle this??? it is not a subcollection
-                            // find the parent
+                    } else {
+
                         String parentName = entry.getName().substring(0, entry.getName().lastIndexOf("/") + 1);
-                        System.out.println(" parent -------------------> " + parentName);
-                        System.out.println(" self -------------------> " + entry.getName());
                         // how do we attach this directory to the parent????
                         DirectoryPersistence directory = new DirectoryPersistence();
                         directory.setParameterName(String.join("", nameParts));
@@ -1110,7 +1107,6 @@ public class CollectionType extends Type {
                         CollectionPersistence parentPersistence = (CollectionPersistence) parameterNameToTypePersistence.get(parentName);
                         parentPersistence.getItems().add(directory);
 
-                        System.out.println(" map --------------------> " + parameterNameToTypePersistence);
                     }
 
                 }
@@ -1252,7 +1248,7 @@ public class CollectionType extends Type {
 
                         parentCollection.getItems().add(filePersistence);
                         break;
-                    case "ImageType": // todo: if it is a part of a directory-based image a new typr of persistence?
+                    case "ImageType":
                         ImagePersistence imagePersistence = new ImagePersistence();
                         imagePersistence.setParameterType(ParameterType.OUTPUT);
                         imagePersistence.setRunId(run.getId());
@@ -1266,7 +1262,6 @@ public class CollectionType extends Type {
                             parentCollection.getItems().add(imagePersistence);
                         } else {
                             String parentDirectoryName = entry.getName().substring(0, entry.getName().lastIndexOf("/"));
-                            System.out.println(" lookup ----------------> " + parentDirectoryName);
                             DirectoryPersistence parentDirectory = (DirectoryPersistence) parameterNameToTypePersistence.get(parentDirectoryName);
                             parentDirectory.getItems().add(imagePersistence);
                         }

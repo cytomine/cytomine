@@ -1,5 +1,4 @@
 {{ if .Values.mongodb.deploy }}
-{{- $storageClassName := .Values.mongodb.storageClassName | required ".Values.mongodb.storageClassName is required." -}}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -33,6 +32,10 @@ spec:
       volumes:
         - name: temp
           emptyDir: {}
+        {{ if not .Values.mongodb.storageClassName -}}
+        - name: mongodb-storage
+          emptyDir: {}
+        {{ end }}
       securityContext:
         runAsUser: {{ .Values.containerSecurity.userID }}
         fsGroup: {{ .Values.containerSecurity.fsgroupID }}
@@ -69,14 +72,16 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+  {{ if .Values.mongodb.storageClassName -}}
   volumeClaimTemplates:
     - metadata:
         name: mongodb-storage
       spec:
-        storageClassName: {{ $storageClassName }}
+        storageClassName: {{ .Values.mongodb.storageClassName }}
         accessModes:
           - ReadWriteOnce
         resources:
           requests:
             storage: {{ .Values.mongodbStorage }}
+  {{ end }}
 {{ end }}

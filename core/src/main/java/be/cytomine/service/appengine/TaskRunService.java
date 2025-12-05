@@ -493,7 +493,7 @@ public class TaskRunService {
         AnnotationLayer annotationLayer = annotationLayerService.createAnnotationLayer(layerName);
         TaskRunLayer taskRunLayer = taskRunLayerRepository
                 .findByTaskRunAndImage(taskRun, taskRun.getImage())
-                .orElseThrow(() -> new ObjectNotFoundException("Task run", taskRunId));
+                .orElse(new TaskRunLayer());
 
         for (String geometry : geometries) {
             String wktGeometry = geometryService.GeoJSONToWKT(geometry);

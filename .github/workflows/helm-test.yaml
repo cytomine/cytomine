@@ -48,7 +48,7 @@ jobs:
 
       - name: Run chart-testing (lint and install PR)
         if: github.ref_name != 'main'
-        run: ct lint-and-install --target-branch ${{ github.event.repository.default_branch }} --chart-dirs=helm/charts/ --helm-extra-set-args="--set=images.global_tag=${{ github.sha }}" --helm-extra-set-args="--set=images.global_prefix=registry.cytomine.org/" --all --namespace=cytomine-${{ github.sha }}
+        run: ct lint-and-install --target-branch ${{ github.event.repository.default_branch }} --chart-dirs=helm/charts/ --helm-extra-set-args="--set=images.global_tag=${{ github.sha }} --set=images.global_prefix=registry.cytomine.org/" --all --namespace=cytomine-${{ github.sha }}
 
       - name: Run chart-testing (lint and install main)
         if: github.ref_name == 'main'

@@ -70,7 +70,6 @@ export default {
     },
     async runTask() {
       // create task run and provision
-      console.log('>>>>>>>>>>>>>>>>>>', this.fromValue);
       try {
         let taskRun = await Task.createTaskRun(
           this.projectId,

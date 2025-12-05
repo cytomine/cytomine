@@ -35,22 +35,22 @@ jobs:
 
       - name: Create Nasmespace
         if: github.ref_name != 'main'
-        run: kubectl create ns cytomine-${{ github.ref_name }}
+        run: kubectl create ns cytomine-${{ github.sha }}
 
       - name: Create Registry secrets
         if: github.ref_name != 'main'
-        run: echo "${{ secrets.REGISTRY_DOCKER_PULL_SECRET }}" | kubectl create secret generic --namespace=default docker-images-pull-secret --from-file=.dockerconfigjson=/dev/stdin --namespace=cytomine-${{ github.ref_name }}
+        run: echo "${{ secrets.REGISTRY_DOCKER_PULL_SECRET }}" | kubectl create secret generic --namespace=default docker-images-pull-secret --from-file=.dockerconfigjson=/dev/stdin --namespace=cytomine-${{ github.sha }}
 
       - name: Create Service Account
         if: github.ref_name != 'main'
-        run: 'kubectl patch serviceaccount default --namespace=cytomine-${{ github.ref_name }} -p ''{"imagePullSecrets": [{"name": "docker-images-pull-secret"}]}'''
+        run: 'kubectl patch serviceaccount default --namespace=cytomine-${{ github.sha }} -p ''{"imagePullSecrets": [{"name": "docker-images-pull-secret"}]}'''
 
 
       - name: Run chart-testing (lint and install PR)
         if: github.ref_name != 'main'
-        run: ct lint-and-install --target-branch ${{ github.event.repository.default_branch }} --chart-dirs=helm/charts/ --helm-extra-set-args="--set=images.global_tag=${{ github.sha }}" --helm-extra-set-args="--set=images.global_prefix=registry.cytomine.org/" --all --namespace=cytomine-${{ github.ref_name }}
+        run: ct lint-and-install --target-branch ${{ github.event.repository.default_branch }} --chart-dirs=helm/charts/ --helm-extra-set-args="--set=images.global_tag=${{ github.sha }}" --helm-extra-set-args="--set=images.global_prefix=registry.cytomine.org/" --all --namespace=cytomine-${{ github.sha }}
 
       - name: Run chart-testing (lint and install main)
         if: github.ref_name == 'main'
-        run: ct lint-and-install --target-branch ${{ github.event.repository.default_branch }} --chart-dirs=helm/charts/ --all --namespace=cytomine-${{ github.ref_name }}
+        run: ct lint-and-install --target-branch ${{ github.event.repository.default_branch }} --chart-dirs=helm/charts/ --all --namespace=cytomine-${{ github.sha }}
 # missing creds here

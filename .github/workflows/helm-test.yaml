@@ -33,9 +33,9 @@ jobs:
 
       - name: Create Registry secrets
         if: github.ref_name != 'main'
-        run: cat ${{ secrets.REGISTRY_DOCKER_PULL_SECRET }} | kubectl create secret --namespace=default kubernetes.io/dockerconfigjson docker-images-pull-secret --from-file=.dockerconfigjson=/dev/stdin
+        run: cat ${{ secrets.REGISTRY_DOCKER_PULL_SECRET }} | kubectl create secret generic --namespace=default kubernetes.io/dockerconfigjson docker-images-pull-secret --from-file=.dockerconfigjson=/dev/stdin
 
-      - name: Create Registry secrets
+      - name: Create Service Account
         if: github.ref_name != 'main'
         run: 'kubectl patch serviceaccount default --namespace=default -p ''{"imagePullSecrets": [{"name": "baeldung-secret"}]}'''
 

@@ -15,7 +15,7 @@ concurrency:
 jobs:
   helm-tests2:
     uses: ./.github/workflows/helm-test.yaml
-
+    secrets: inherit
   app-engine:
     uses: ./.github/workflows/app-engine.yaml
   cbir:
@@ -39,3 +39,4 @@ jobs:
   helm-tests:
     needs: [docker-images]
     uses: ./.github/workflows/helm-test.yaml
+    secrets: inherit

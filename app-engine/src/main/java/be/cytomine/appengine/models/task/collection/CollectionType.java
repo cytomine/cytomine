@@ -227,14 +227,14 @@ public class CollectionType extends Type {
         Map<String, Object> lists = new LinkedHashMap<>();
         for (StorageDataEntry entry : currentOutputStorageData.getEntryList()) {
             String entryName = entry.getName();
-            if (entryName.endsWith("/")) {
+            if (entryName.endsWith("/")) { // when it is a directory
                 boolean relatedToOutputParameter = entryName.startsWith(currentOutput.getName() + "/");
                 boolean isOutputParameterMainDirectory = entryName.equals(currentOutput.getName() + "/");
                 if (relatedToOutputParameter && isOutputParameterMainDirectory) {
                     List<Object> nestedItems = new ArrayList<>();
                     lists.put(entryName, nestedItems);
                 }
-            } else {
+            } else { // when it is a file
                 if (entryName.endsWith("array.yml")) {
                     String parentListName = entryName.substring(0, entryName.lastIndexOf('/') + 1);
                     Map<String, Object> item = new LinkedHashMap<>();
@@ -244,9 +244,16 @@ public class CollectionType extends Type {
                     continue;
                 }
                 String parentListName = entryName.substring(0, entryName.lastIndexOf('/') + 1);
-                Map<String, Object> item = new LinkedHashMap<>();
-                String index = entryName.substring(entryName.lastIndexOf('/') + 1);
-                item.put("index", Integer.parseInt(index));
+                Map<String, Object> item = new LinkedHashMap<>(); // anyway we need to add it to this item
+                String indexString = entryName.substring(entryName.lastIndexOf('/') + 1); // just the name of one dicom file
+                int index;
+                try {
+                    index = Integer.parseInt(indexString);
+                } catch (NumberFormatException e) {
+                    item.put(indexString, entry.getData());
+                    continue;
+                }
+                item.put("index", index);
                 String value = null;
                 switch (leafType) {
                     case "IntegerType":
@@ -272,7 +279,7 @@ public class CollectionType extends Type {
                         item.put("value", Instant.parse(value));
                         break;
                     case "FileType", "ImageType":
-                        item.put("value", entry.getData());
+                        item.put("value", entry.getData()); // this is how I should read it assuming it is a directory-based image wsidicom
                         break;
                     default:
                         throw new TypeValidationException("unknown leaf type: " + leafType);
@@ -1036,7 +1043,6 @@ public class CollectionType extends Type {
     @Override
     public void persistResult(Run run, Parameter currentOutput, StorageData outputValue)
         throws ProvisioningException {
-
         CollectionPersistenceRepository collectionPersistenceRepository =
             AppEngineApplicationContext.getBean(CollectionPersistenceRepository.class);
         CollectionPersistence result = null;
@@ -1050,8 +1056,8 @@ public class CollectionType extends Type {
         Map<String, TypePersistence> parameterNameToTypePersistence = new LinkedHashMap<>();
         outputValue.sortShallowToDeep();
         for (StorageDataEntry entry : outputValue.getEntryList()) {
-            if (entry.getStorageDataType().equals(StorageDataType.DIRECTORY)) {
-                if (entry.getName().equals(currentOutput.getName() + "/")) {
+            if (entry.getStorageDataType().equals(StorageDataType.DIRECTORY)) { // our code contains some directory logic
+                if (entry.getName().equals(currentOutput.getName() + "/")) { // the main collection directory
                     result = new CollectionPersistence();
                     result.setValueType(ValueType.ARRAY);
                     result.setParameterType(ParameterType.OUTPUT);
@@ -1060,31 +1066,57 @@ public class CollectionType extends Type {
                     List<TypePersistence> items = new ArrayList<>();
                     result.setItems(items);
                     parameterNameToTypePersistence.put(entry.getName(), result);
-                } else {
-                    CollectionPersistence subCollection = new CollectionPersistence();
+                } else { // any directory below main is a subCollection
+
                     String[] nameParts = entry.getName().trim().split("/");
                     for (int i = 0; i < nameParts.length; i++) {
                         if (i != 0) {
                             nameParts[i] = "[" + nameParts[i] + "]";
                         }
                     }
+                    // it is a subCollection if contains array.yml
+                    boolean containsArrayYml = outputValue.getEntryList().stream().anyMatch(
+                        storage -> storage.getName()
+                            .equalsIgnoreCase(entry.getName() + "array.yml"));
+                    boolean indexed = nameParts[nameParts.length - 1].startsWith("[")
+                        && nameParts[nameParts.length - 1].endsWith("]");
+                    boolean isSubCollectionDirectory = indexed && containsArrayYml;
+                    if (isSubCollectionDirectory) {
+                        CollectionPersistence subCollection = new CollectionPersistence();
+                        subCollection.setParameterName(String.join("", nameParts));
+                        subCollection.setCollectionIndex(Arrays.stream(nameParts, 1, nameParts.length).collect(
+                            Collectors.joining()));
+                        String parentName = entry.getName().substring(0, entry.getName().lastIndexOf("/") + 1);
+                        // prepare list for sub items
+                        List<TypePersistence> items = new ArrayList<>();
+                        subCollection.setItems(items);
+                        parameterNameToTypePersistence.put(entry.getName(), subCollection);
+                        // add this collection to parent collection
+                        CollectionPersistence parentPersistence = (CollectionPersistence) parameterNameToTypePersistence.get(parentName);
+                        parentPersistence.getItems().add(subCollection);
+                    } else { // just a normal subdirectory within a directory-based type
+                            // what do we need to do to handle this??? it is not a subcollection
+                            // find the parent
+                        String parentName = entry.getName().substring(0, entry.getName().lastIndexOf("/") + 1);
+                        System.out.println(" parent -------------------> " + parentName);
+                        System.out.println(" self -------------------> " + entry.getName());
+                        // how do we attach this directory to the parent????
+                        DirectoryPersistence directory = new DirectoryPersistence();
+                        directory.setParameterName(String.join("", nameParts));
+                        List<TypePersistence> items = new ArrayList<>();
+                        directory.setItems(items);
+                        parameterNameToTypePersistence.put(entry.getName(), directory);
+                        // add this directory to the parent collection
+                        CollectionPersistence parentPersistence = (CollectionPersistence) parameterNameToTypePersistence.get(parentName);
+                        parentPersistence.getItems().add(directory);
 
-                    subCollection.setParameterName(String.join("", nameParts));
-                    subCollection.setCollectionIndex(Arrays.stream(nameParts, 1, nameParts.length).collect(
-                        Collectors.joining()));
-                    String parentName = entry.getName().substring(0, entry.getName().lastIndexOf("/") + 1);
-                    // prepare list for sub items
-                    List<TypePersistence> items = new ArrayList<>();
-                    subCollection.setItems(items);
-                    parameterNameToTypePersistence.put(entry.getName(), subCollection);
-                    // add this collection to parent collection
-                    CollectionPersistence parentPersistence = (CollectionPersistence) parameterNameToTypePersistence.get(parentName);
-                    parentPersistence.getItems().add(subCollection);
+                        System.out.println(" map --------------------> " + parameterNameToTypePersistence);
+                    }
+
                 }
             }
             if (entry.getStorageDataType().equals(StorageDataType.FILE)) {
                 String parentName = entry.getName().substring(0, entry.getName().lastIndexOf("/") + 1);
-
                 if (entry.getName().endsWith("array.yml")) {
                     CollectionPersistence parentPersistence = (CollectionPersistence) parameterNameToTypePersistence.get(parentName);
                     parentPersistence.setSize(getCollectionSize(entry));
@@ -1097,7 +1129,8 @@ public class CollectionType extends Type {
                         nameParts[i] = "[" + nameParts[i] + "]";
                     }
                 }
-                CollectionPersistence parentCollection = (CollectionPersistence) parameterNameToTypePersistence.get(parentName);
+                CollectionPersistence parentCollection = (CollectionPersistence) parameterNameToTypePersistence.get(parentName); // can't get the parent collection because the parent is not a collection
+
                 String entryValue = null;
                 if (!(leafType.equals("FileType")
                     || leafType.equals("ImageType"))) {
@@ -1219,17 +1252,24 @@ public class CollectionType extends Type {
 
                         parentCollection.getItems().add(filePersistence);
                         break;
-                    case "ImageType":
+                    case "ImageType": // todo: if it is a part of a directory-based image a new typr of persistence?
                         ImagePersistence imagePersistence = new ImagePersistence();
                         imagePersistence.setParameterType(ParameterType.OUTPUT);
                         imagePersistence.setRunId(run.getId());
                         imagePersistence.setParameterName(String.join("", nameParts));
                         imagePersistence.setCollectionIndex(Arrays.stream(nameParts, 1, nameParts.length).collect(
                             Collectors.joining()));
-                        imagePersistence.setValue(null);
+                        imagePersistence.setValue(null); // basically we don't store data in the database
                         imagePersistence.setValueType(ValueType.IMAGE);
 
-                        parentCollection.getItems().add(imagePersistence);
+                        if (Objects.nonNull(parentCollection)) { // a collection item file
+                            parentCollection.getItems().add(imagePersistence);
+                        } else {
+                            String parentDirectoryName = entry.getName().substring(0, entry.getName().lastIndexOf("/"));
+                            System.out.println(" lookup ----------------> " + parentDirectoryName);
+                            DirectoryPersistence parentDirectory = (DirectoryPersistence) parameterNameToTypePersistence.get(parentDirectoryName);
+                            parentDirectory.getItems().add(imagePersistence);
+                        }
                         break;
                     case "DateTimeType":
                         DateTimePersistence datetimePersistence = new DateTimePersistence();
@@ -1586,6 +1626,8 @@ public class CollectionType extends Type {
             collectionItemValue.setType(ValueType.IMAGE);
         } else if (typePersistence instanceof FilePersistence) {
             collectionItemValue.setType(ValueType.FILE);
+        } else if (typePersistence instanceof DirectoryPersistence) {
+            collectionItemValue.setType(ValueType.IMAGE);
         } else {
             throw new ProvisioningException(ErrorCode.INTERNAL_UNKNOWN_SUBTYPE);
         }

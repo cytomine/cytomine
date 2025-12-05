@@ -276,7 +276,7 @@ public class TaskRunService {
         String uri = "task-runs/" + taskRunId + "/input-provisions/" + parameterName;
         String arrayTypeUri = "task-runs/" + taskRunId + "/input-provisions/" + parameterName + "/indexes";
         ObjectMapper mapper = new ObjectMapper();
-
+        File wsi = null;
         if (json.get("type").isObject() && json.get("type").get("id").asText().equals("array")) {
             String subtype = json.get("type").get("subType").get("id").asText();
 
@@ -284,11 +284,19 @@ public class TaskRunService {
 
             if (subtype.equals("image")) {
                 for (int i = 0; i < itemsArray.length; i++) {
-                    Long annotationId = itemsArray[i];
-                    MultiValueMap<String, Object> body = prepareImage(annotationId);
+                    Long imageId = itemsArray[i];
+                    if (json.get("from").asText().equalsIgnoreCase("annotation")) {
+                        MultiValueMap<String, Object> body = prepareImage(imageId, "annotation");
 
-                    String response = provisionCollectionItem(arrayTypeUri, i, body);
-                    if (response != null) return response;
+                        String response = provisionCollectionItem(arrayTypeUri, i, body);
+                        if (response != null) return response;
+                    }
+                    if (json.get("from").asText().equalsIgnoreCase("image")) {
+                        MultiValueMap<String, Object> body = prepareImage(imageId, "image");
+
+                        String response = provisionCollectionItem(arrayTypeUri, i, body);
+                        if (response != null) return response;
+                    }
                 }
             }
 
@@ -315,7 +323,6 @@ public class TaskRunService {
             JsonNode value = json.get("value");
             String type = value.get("type").asText();
             Long id = value.get("id").asLong();
-            File wsi = null;
 
             MultiValueMap<String, Object> body;
             if (type.equals("annotation")) {
@@ -334,7 +341,7 @@ public class TaskRunService {
                     taskRunLayerRepository.saveAndFlush(taskRunLayer);
                 }
 
-                body = prepareImage(id);
+                body = prepareImage(id, "annotation");
             } else if (type.equals("image")) {
                 wsi = downloadWsi(id);
 
@@ -375,17 +382,26 @@ public class TaskRunService {
 
     }
 
-    private MultiValueMap<String, Object> prepareImage(Long annotationId) {
-        UserAnnotation annotation = userAnnotationService.get(annotationId);
-        byte[] imageData = getImageAnnotation(annotation);
+    private MultiValueMap<String, Object> prepareImage(Long id, String type) {
 
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("file", new ByteArrayResource(imageData) {
-            @Override
-            public String getFilename() {
-                return annotationId + ".png";
-            }
-        });
+        if (type.equals("annotation")) {
+            UserAnnotation annotation = userAnnotationService.get(id);
+            byte[] imageData = getImageAnnotation(annotation);
+
+            body.add("file", new ByteArrayResource(imageData) {
+                @Override
+                public String getFilename() {
+                    return id + ".png";
+                }
+            });
+        }
+        if (type.equals("image")) {
+            File wsi = downloadWsi(id);
+
+            body = new LinkedMultiValueMap<>();
+            body.add("file", new FileSystemResource(wsi));
+        }
         return body;
     }
 

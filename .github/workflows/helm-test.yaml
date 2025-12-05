@@ -39,7 +39,7 @@ jobs:
 
       - name: Create Service Account
         if: github.ref_name != 'main'
-        run: 'kubectl patch serviceaccount default --namespace=default -p ''{"imagePullSecrets": [{"name": "baeldung-secret"}]}'''
+        run: 'kubectl patch serviceaccount default --namespace=default -p ''{"imagePullSecrets": [{"name": "docker-images-pull-secret"}]}'''
 
 
       - name: Run chart-testing (lint and install PR)

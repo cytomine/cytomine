@@ -49,15 +49,21 @@ ingress:
   className:
 
 images:
-  #
+
   # Cytomine Images
-  #
-  app_engine: cytomine/app-engine:latest
-  sam: cytomine/sam:latest
-  core: cytomine/core:latest
-  pims: cytomine/pims:latest
-  web_ui: cytomine/web-ui:latest
-  cbir: cytomine/cbir:latest
+  # use only tags here (e.g. `latest` which is the default)
+  # specific image tag takes precedence on global_tag
+  global_tag:
+
+  # If you use a private registry for all images
+  # add a trailing slash.
+  global_prefix:
+  app_engine:
+  sam:
+  core:
+  pims:
+  web_ui:
+  cbir:
 
   #
   # External Images

@@ -28,8 +28,17 @@ jobs:
         uses: helm/chart-testing-action@v2.8.0
 
       - name: Create kind cluster
-        if: steps.list-changed.outputs.changed == 'true'
+        if: steps.lisct-changed.outputs.changed == 'true'
         uses: helm/kind-action@v1.12.0
+
+      - name: Create Registry secrets
+        if: github.ref_name != 'main'
+        run: cat ${{ secrets.REGISTRY_DOCKER_PULL_SECRET }} | kubectl create secret --namespace=default kubernetes.io/dockerconfigjson docker-images-pull-secret --from-file=.dockerconfigjson=/dev/stdin
+
+      - name: Create Registry secrets
+        if: github.ref_name != 'main'
+        run: 'kubectl patch serviceaccount default --namespace=default -p ''{"imagePullSecrets": [{"name": "baeldung-secret"}]}'''
+
 
       - name: Run chart-testing (lint and install PR)
         if: github.ref_name != 'main'

@@ -13,6 +13,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  helm-tests2:
+    uses: ./.github/workflows/helm-test.yaml
+
   app-engine:
     uses: ./.github/workflows/app-engine.yaml
   cbir:

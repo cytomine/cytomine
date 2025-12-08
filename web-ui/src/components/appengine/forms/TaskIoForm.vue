@@ -29,7 +29,7 @@ import Vue from 'vue';
 
 import AppEngineField from '@/components/appengine/forms/fields/AppEngineField';
 import Task from '@/utils/appengine/task';
-import {hasBinaryType} from '@/utils/app';
+import {hasBinaryType, isGeometry} from '@/utils/app';
 
 export default {
   name: 'task-io-form',
@@ -78,15 +78,7 @@ export default {
     },
     async fetchTaskOutputs() {
       const outputs = await Task.fetchTaskOutputs(this.task.namespace, this.task.version);
-      this.hasGeometryOutput = outputs.some(output => {
-        if (output.type.id === 'geometry') {
-          return true;
-        }
-        if (output.type.id === 'array' && output.type.subType.id === 'geometry') {
-          return true;
-        }
-        return false;
-      });
+      this.hasGeometryOutput = outputs.some(output => isGeometry(output));
     },
     async runTask() {
       // create task run and provision

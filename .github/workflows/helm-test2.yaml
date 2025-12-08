@@ -37,7 +37,7 @@ jobs:
         run: kubectl create ns cytomine-953b43d1aafc65f590b9d4d4f18dd5af6a43d030
 
       - name: Create Registry secrets
-        run: echo "${{ secrets.REGISTRY_DOCKER_PULL_SECRET }}" | kubectl create secret generic --namespace=cytomine-953b43d1aafc65f590b9d4d4f18dd5af6a43d030 docker-images-pull-secret --from-literal=.dockerconfigjson=/dev/stdin --namespace=cytomine-953b43d1aafc65f590b9d4d4f18dd5af6a43d030 --type=kubernetes.io/dockerconfigjson
+        run: kubectl create secret generic --namespace=cytomine-953b43d1aafc65f590b9d4d4f18dd5af6a43d030 docker-images-pull-secret --from-literal=.dockerconfigjson=${{ secrets.REGISTRY_DOCKER_PULL_SECRET }} --namespace=cytomine-953b43d1aafc65f590b9d4d4f18dd5af6a43d030 --type=kubernetes.io/dockerconfigjson
 
       - name: Create Service Account
         run: 'kubectl patch serviceaccount default --namespace=cytomine-953b43d1aafc65f590b9d4d4f18dd5af6a43d030 -p ''{"imagePullSecrets": [{"name": "docker-images-pull-secret"}]}'''

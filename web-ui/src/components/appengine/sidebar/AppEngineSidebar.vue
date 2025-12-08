@@ -104,20 +104,20 @@ export default {
 
         if (taskRun.state !== 'FINISHED' && taskRun.state !== 'FAILED') {
           await taskRun.fetch();
+        }
 
-          if (taskRun.state === 'FINISHED' || taskRun.state === 'FAILED') {
-            taskRun.outputs = await taskRun.fetchOutputs();
+        if (taskRun.state === 'FINISHED' || taskRun.state === 'FAILED') {
+          taskRun.outputs = await taskRun.fetchOutputs();
 
-            if (taskRun.outputs.some(output => output.type === 'GEOMETRY')) {
-              this.$eventBus.$emit('annotation-layers:refresh');
-            }
+          if (taskRun.outputs.some(output => output.type === 'GEOMETRY')) {
+            this.$eventBus.$emit('annotation-layers:refresh');
+          }
 
-            let binaryOutputs = this.filterBinaryType(task, 'output');
-            if (binaryOutputs.length > 0) {
-              for (let output of binaryOutputs) {
-                let index = taskRun.outputs.findIndex(o => o.param_name === output.name);
-                this.$set(taskRun.outputs[index], 'value', await taskRun.fetchSingleIO(output.name, 'output'));
-              }
+          let binaryOutputs = this.filterBinaryType(task, 'output');
+          if (binaryOutputs.length > 0) {
+            for (let output of binaryOutputs) {
+              let index = taskRun.outputs.findIndex(o => o.param_name === output.name);
+              this.$set(taskRun.outputs[index], 'value', await taskRun.fetchSingleIO(output.name, 'output'));
             }
           }
         }

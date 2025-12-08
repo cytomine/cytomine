@@ -2,7 +2,7 @@ import {isGeometry} from '@/utils/app';
 
 describe('app.js', () => {
   describe('isGeometry', () => {
-    it('should return true when type is geometry', () => {
+    it('should return true when type is "geometry"', () => {
       const parameter = {
         type: {id: 'geometry'}
       };
@@ -10,7 +10,7 @@ describe('app.js', () => {
       expect(isGeometry(parameter)).toBe(true);
     });
 
-    it('should return true when type is an array of geometry', () => {
+    it('should return true when type is "array" of geometry', () => {
       const parameter = {
         type: {
           id: 'array',
@@ -37,7 +37,7 @@ describe('app.js', () => {
       expect(isGeometry(parameter)).toBe(false);
     });
 
-    it('should return false when type is an array but subType is not geometry', () => {
+    it('should return false when type is "array" but subType is not geometry', () => {
       const parameter = {
         type: {
           id: 'array',

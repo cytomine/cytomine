@@ -23,7 +23,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
 {{ if .Values.images.imagePullSecretsName }}
 imagePullSecrets:
-- {{ .Values.images.imagePullSecretsName }}
+- name: {{ .Values.images.imagePullSecretsName }}
 {{ end }}
 
 ---

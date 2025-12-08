@@ -1,0 +1,52 @@
+name: Lint and Test Charts
+
+on:
+  workflow_call:
+    secrets:
+      REGISTRY_DOCKER_PULL_SECRET:
+        required: true
+
+permissions: {}
+
+jobs:
+  lint-test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5.0.0
+        with:
+          fetch-depth: 0
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4.3.1
+
+      - uses: actions/setup-python@v6.0.0
+        with:
+          python-version: '3.x'
+          check-latest: true
+
+      - name: Set up chart-testing
+        uses: helm/chart-testing-action@v2.8.0
+
+      - name: Create kind cluster
+        uses: helm/kind-action@v1.12.0
+
+      - name: Create Nasmespace
+        run: kubectl create ns cytomine-953b43d1aafc65f590b9d4d4f18dd5af6a43d030
+
+      - name: Create Registry secrets
+        run: echo "${{ secrets.REGISTRY_DOCKER_PULL_SECRET }}" | kubectl create secret generic --namespace=cytomine-953b43d1aafc65f590b9d4d4f18dd5af6a43d030 docker-images-pull-secret --from-file=.dockerconfigjson=/dev/stdin --namespace=cytomine-953b43d1aafc65f590b9d4d4f18dd5af6a43d030
+
+      - name: Create Service Account
+        run: 'kubectl patch serviceaccount default --namespace=cytomine-953b43d1aafc65f590b9d4d4f18dd5af6a43d030 -p ''{"imagePullSecrets": [{"name": "docker-images-pull-secret"}]}'''
+
+      - name: Check Secret
+        run: kubectl get secrets docker-images-pull-secret  -o yaml
+
+      - name: Run chart-testing (lint and install PR)
+        run: ct lint-and-install --target-branch ${{ github.event.repository.default_branch }} --chart-dirs=helm/charts/ --helm-extra-set-args="--set=images.global_tag=953b43d1aafc65f590b9d4d4f18dd5af6a43d030 --set=images.global_prefix=registry.cytomine.org/" --all --namespace=cytomine-953b43d1aafc65f590b9d4d4f18dd5af6a43d030
+
+      - name: Run chart-testing (lint and install main)
+        run: ct lint-and-install --target-branch ${{ github.event.repository.default_branch }} --chart-dirs=helm/charts/ --all --namespace=cytomine-953b43d1aafc65f590b9d4d4f18dd5af6a43d030

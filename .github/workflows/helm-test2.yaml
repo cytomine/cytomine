@@ -37,10 +37,13 @@ jobs:
         run: kubectl create ns cytomine-953b43d1aafc65f590b9d4d4f18dd5af6a43d030
 
       - name: Create Registry secrets
-        run: echo "${{ secrets.REGISTRY_DOCKER_PULL_SECRET }}" | base64 -d - | kubectl create secret generic --namespace=cytomine-953b43d1aafc65f590b9d4d4f18dd5af6a43d030 docker-images-pull-secret --from-file=.dockerconfigjson=/dev/stdin --namespace=cytomine-953b43d1aafc65f590b9d4d4f18dd5af6a43d030 --type=kubernetes.io/dockerconfigjson
+        run: kubectl create secret docker-registry regcred --namespace=cytomine-953b43d1aafc65f590b9d4d4f18dd5af6a43d030 --docker-server=registry.cytomine.org --docker-username=${{ secrets.REGISTRY_USERNAME }} --docker-password=${{ secrets.REGISTRY_TOKEN }}
 
-      - name: Create Service Account
-        run: 'kubectl patch serviceaccount default --namespace=cytomine-953b43d1aafc65f590b9d4d4f18dd5af6a43d030 -p ''{"imagePullSecrets": [{"name": "docker-images-pull-secret"}]}'''
+      - name: Create Docker Registry secrets
+        run: kubectl create secret docker-registry regcred --namespace=cytomine-953b43d1aafc65f590b9d4d4f18dd5af6a43d030 --docker-username=${{ secrets.DOCKERHUB_USERNAME }} --docker-password=${{ secrets.DOCKERHUB_TOKEN }}
+
+      # - name: Create Service Account
+      #   run: 'kubectl patch serviceaccount default --namespace=cytomine-953b43d1aafc65f590b9d4d4f18dd5af6a43d030 -p ''{"imagePullSecrets": [{"name": "docker-images-pull-secret"}]}'''
 
       - name: Run chart-testing (lint and install PR)
         run: ct lint-and-install --target-branch ${{ github.event.repository.default_branch }} --chart-dirs=helm/charts/ --helm-extra-set-args="--set=images.global_tag=953b43d1aafc65f590b9d4d4f18dd5af6a43d030 --set=images.global_prefix=registry.cytomine.org/" --all --namespace=cytomine-953b43d1aafc65f590b9d4d4f18dd5af6a43d030

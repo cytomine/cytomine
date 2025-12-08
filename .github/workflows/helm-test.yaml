@@ -37,13 +37,14 @@ jobs:
         if: github.ref_name != 'main'
         run: kubectl create ns cytomine-${{ github.sha }}
 
-      - name: Create Registry secrets
-        if: github.ref_name != 'main'
-        run: echo "${{ secrets.REGISTRY_DOCKER_PULL_SECRET }}" | kubectl create secret generic --namespace=cytomine-${{ github.sha }} docker-images-pull-secret --from-file=.dockerconfigjson=/dev/stdin --namespace=cytomine-${{ github.sha }}
+      - name: Create Harbor Registry secrets
+        run: kubectl create secret docker-registry docker-images-pull-secret --namespace=cytomine-${{ github.sha }} --docker-server=registry.cytomine.org --docker-username=${{ secrets.REGISTRY_USERNAME }} --docker-password=${{ secrets.REGISTRY_TOKEN }}
+
+      - name: Create Docker Registry secrets
+        run: kubectl create secret docker-registry docker-images-pull-secret-2 --namespace=cytomine-${{ github.sha }} --docker-username=${{ secrets.DOCKERHUB_USERNAME }} --docker-password=${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Create Service Account
-        if: github.ref_name != 'main'
-        run: 'kubectl patch serviceaccount default --namespace=cytomine-${{ github.sha }} -p ''{"imagePullSecrets": [{"name": "docker-images-pull-secret"}]}'''
+        run: 'kubectl patch serviceaccount default --namespace=cytomine-${{ github.sha }} -p ''{"imagePullSecrets": [{"name": "docker-images-pull-secret"},{"name": "docker-images-pull-secret-2"}]}'''
 
       - name: Run chart-testing (lint and install PR)
         if: github.ref_name != 'main'

@@ -367,6 +367,7 @@ public class TaskRunService {
             provision.put("value", geometryService.WKTToGeoJSON(annotation.getWktLocation()));
         }
 
+        provision.remove("from");
         provision.remove("type");
 
         return appEngineService.put(uri, provision, MediaType.APPLICATION_JSON);

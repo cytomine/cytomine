@@ -504,7 +504,8 @@ public class TaskRunService {
 
         List<TaskRunValue> geoArrayValues = outputs
                 .stream()
-                .filter(output -> output.getType().equals("ARRAY"))
+                .filter(output -> output.getType().equals("ARRAY")
+                && output.getSubType().equalsIgnoreCase("GEOMETRY"))
                 .toList();
 
         if (!geoArrayValues.isEmpty()) {

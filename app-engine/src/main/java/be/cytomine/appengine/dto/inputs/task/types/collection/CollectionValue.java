@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import be.cytomine.appengine.dto.inputs.task.TaskRunParameterValue;
+import be.cytomine.appengine.models.task.ValueType;
 
 
 @EqualsAndHashCode(callSuper = false)
@@ -18,6 +19,6 @@ import be.cytomine.appengine.dto.inputs.task.TaskRunParameterValue;
 public class CollectionValue extends TaskRunParameterValue {
     @JsonIgnoreProperties({"param_name"})
     private List<TaskRunParameterValue> value;
-
+    private ValueType subType;
 
 }

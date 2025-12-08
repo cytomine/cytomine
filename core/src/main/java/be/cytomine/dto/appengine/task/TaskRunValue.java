@@ -24,4 +24,6 @@ public class TaskRunValue {
     private String type;
 
     private Object value;
+
+    private String subType;
 }

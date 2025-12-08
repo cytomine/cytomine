@@ -50,8 +50,11 @@ import be.cytomine.appengine.models.task.Type;
 import be.cytomine.appengine.models.task.TypePersistence;
 import be.cytomine.appengine.models.task.ValueType;
 import be.cytomine.appengine.models.task.bool.BooleanPersistence;
+import be.cytomine.appengine.models.task.bool.BooleanType;
 import be.cytomine.appengine.models.task.datetime.DateTimePersistence;
+import be.cytomine.appengine.models.task.datetime.DateTimeType;
 import be.cytomine.appengine.models.task.enumeration.EnumerationPersistence;
+import be.cytomine.appengine.models.task.enumeration.EnumerationType;
 import be.cytomine.appengine.models.task.file.FilePersistence;
 import be.cytomine.appengine.models.task.file.FileType;
 import be.cytomine.appengine.models.task.geometry.GeometryPersistence;
@@ -59,8 +62,11 @@ import be.cytomine.appengine.models.task.geometry.GeometryType;
 import be.cytomine.appengine.models.task.image.ImagePersistence;
 import be.cytomine.appengine.models.task.image.ImageType;
 import be.cytomine.appengine.models.task.integer.IntegerPersistence;
+import be.cytomine.appengine.models.task.integer.IntegerType;
 import be.cytomine.appengine.models.task.number.NumberPersistence;
+import be.cytomine.appengine.models.task.number.NumberType;
 import be.cytomine.appengine.models.task.string.StringPersistence;
+import be.cytomine.appengine.models.task.string.StringType;
 import be.cytomine.appengine.repositories.bool.BooleanPersistenceRepository;
 import be.cytomine.appengine.repositories.collection.CollectionPersistenceRepository;
 import be.cytomine.appengine.repositories.collection.ReferencePersistenceRepository;
@@ -72,7 +78,6 @@ import be.cytomine.appengine.repositories.number.NumberPersistenceRepository;
 import be.cytomine.appengine.repositories.string.StringPersistenceRepository;
 import be.cytomine.appengine.utils.AppEngineApplicationContext;
 import be.cytomine.appengine.utils.FileHelper;
-
 
 @SuppressWarnings("checkstyle:LineLength")
 @Data
@@ -1565,6 +1570,7 @@ public class CollectionType extends Type {
                 collectionValue.setType(ValueType.ARRAY);
                 collectionValue.setParameterName(collectionPersistence.getParameterName());
                 collectionValue.setTaskRunId(collectionPersistence.getRunId());
+                collectionValue.setSubType(getCollectionSubType());
 
                 List<TaskRunParameterValue> items = new ArrayList<>();
                 collectionValue.setValue(items);
@@ -1583,6 +1589,32 @@ public class CollectionType extends Type {
             }
         } else {
             return getCollectionItemValue(typePersistence, leafType);
+        }
+    }
+
+    private ValueType getCollectionSubType() {
+        if(subType instanceof CollectionType) {
+            return ValueType.ARRAY;
+        } else if (subType instanceof ImageType) {
+            return ValueType.IMAGE;
+        } else if (subType instanceof FileType) {
+            return ValueType.FILE;
+        } else if (subType instanceof GeometryType) {
+            return ValueType.GEOMETRY;
+        } else if (subType instanceof NumberType) {
+            return ValueType.NUMBER;
+        } else if (subType instanceof StringType) {
+            return ValueType.STRING;
+        } else if (subType instanceof BooleanType) {
+            return ValueType.BOOLEAN;
+        } else if (subType instanceof IntegerType) {
+            return ValueType.INTEGER;
+        } else if (subType instanceof EnumerationType) {
+            return ValueType.ENUMERATION;
+        } else if (subType instanceof DateTimeType) {
+            return ValueType.DATETIME;
+        } else {
+            return ValueType.GEOMETRY;
         }
     }
 

@@ -341,9 +341,9 @@ public class TaskRunController {
         @PathVariable("run_id") String runId
     ) throws ProvisioningException {
         log.info("/task-runs/{run_id}/inputs GET");
-        List<TaskRunParameterValue> outputs = taskRunService.retrieveRunInputs(runId);
+        List<TaskRunParameterValue> inputs = taskRunService.retrieveRunInputs(runId);
         log.info("/task-runs/{run_id}/inputs GET Ended");
-        return new ResponseEntity<>(outputs, HttpStatus.OK);
+        return new ResponseEntity<>(inputs, HttpStatus.OK);
     }
 
     @GetMapping(value = "/task-runs/{run_id}/input/{parameter_name}")

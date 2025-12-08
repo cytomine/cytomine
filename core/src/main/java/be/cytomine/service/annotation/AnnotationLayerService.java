@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import be.cytomine.domain.annotation.AnnotationLayer;
 import be.cytomine.domain.appengine.TaskRunLayer;
+import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.dto.appengine.task.TaskRunLayerValue;
 import be.cytomine.repository.annotation.AnnotationLayerRepository;
 import be.cytomine.repository.appengine.TaskRunLayerRepository;
@@ -31,10 +32,11 @@ public class AnnotationLayerService {
         return taskName + " (" + taskVersion + ") - " + createdTime;
     }
 
-    public AnnotationLayer createAnnotationLayer(String name) {
-        return annotationLayerRepository.findByName(name).orElseGet(()->{
+    public AnnotationLayer createAnnotationLayer(String name, ImageInstance image) {
+        return annotationLayerRepository.findByNameAndImage(name, image).orElseGet(() -> {
             AnnotationLayer annotationLayer = new AnnotationLayer();
             annotationLayer.setName(name);
+            annotationLayer.setImage(image);
             return annotationLayerRepository.saveAndFlush(annotationLayer);
         });
     }

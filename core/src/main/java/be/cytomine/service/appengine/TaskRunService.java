@@ -151,7 +151,7 @@ public class TaskRunService {
 
         if (hasGeometry) {
             String layerName = annotationLayerService.createLayerName(taskRunResponse.task().name(), taskRunResponse.task().version(), taskRun.getCreated());
-            AnnotationLayer annotationLayer = annotationLayerService.createAnnotationLayer(layerName);
+            AnnotationLayer annotationLayer = annotationLayerService.createAnnotationLayer(layerName, image);
             TaskRunLayer newLayer = new TaskRunLayer();
             newLayer.setAnnotationLayer(annotationLayer);
             newLayer.setTaskRun(taskRun);
@@ -486,7 +486,7 @@ public class TaskRunService {
         AnnotationLayer annotationLayer = null;
         SliceInstance slice = null;
         if (!geometries.isEmpty() || !geoArrayValues.isEmpty()) {
-            annotationLayer = annotationLayerService.createAnnotationLayer(layerName);
+            annotationLayer = annotationLayerService.createAnnotationLayer(layerName, taskRun.getImage());
             slice = sliceInstanceRepository.findAllByImage(taskRun.getImage())
                 .stream()
                 .findFirst()

@@ -6,8 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import be.cytomine.domain.annotation.AnnotationLayer;
+import be.cytomine.domain.image.ImageInstance;
 
 @Repository
 public interface AnnotationLayerRepository extends JpaRepository<AnnotationLayer, Long> {
-    Optional<AnnotationLayer> findByName(String name);
+    Optional<AnnotationLayer> findByNameAndImage(String name, ImageInstance image);
 }

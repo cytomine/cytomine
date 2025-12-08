@@ -1593,7 +1593,7 @@ public class CollectionType extends Type {
     }
 
     private ValueType getCollectionSubType() {
-        if(subType instanceof CollectionType) {
+        if (subType instanceof CollectionType) {
             return ValueType.ARRAY;
         } else if (subType instanceof ImageType) {
             return ValueType.IMAGE;

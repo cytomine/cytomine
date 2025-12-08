@@ -43,7 +43,7 @@ jobs:
         run: 'kubectl patch serviceaccount default --namespace=cytomine-953b43d1aafc65f590b9d4d4f18dd5af6a43d030 -p ''{"imagePullSecrets": [{"name": "docker-images-pull-secret"}]}'''
 
       - name: Check Secret
-        run: kubectl get secret docker-images-pull-secret --namespace=cytomine-953b43d1aafc65f590b9d4d4f18dd5af6a43d030 -o yaml
+        run: kubectl get secret docker-images-pull-secret --namespace=cytomine-953b43d1aafc65f590b9d4d4f18dd5af6a43d030 -ojson
 
       - name: Run chart-testing (lint and install PR)
         run: ct lint-and-install --target-branch ${{ github.event.repository.default_branch }} --chart-dirs=helm/charts/ --helm-extra-set-args="--set=images.global_tag=953b43d1aafc65f590b9d4d4f18dd5af6a43d030 --set=images.global_prefix=registry.cytomine.org/" --all --namespace=cytomine-953b43d1aafc65f590b9d4d4f18dd5af6a43d030

@@ -16,7 +16,11 @@
       </div>
     </b-field>
 
-    <ImageSelection :active.sync="selectImage" :title="$t('select-target-image-for-output-geometry')" @select-image="value = $event" />
+    <ImageSelection
+      :active.sync="selectImage"
+      :title="$t('select-target-image-for-output-geometry')"
+      @select-image="onSelectImage"
+    />
   </div>
 </template>
 
@@ -27,15 +31,21 @@ export default {
   name: 'OutputGeometryField',
   props: {
     parameter: {type: Object, required: true},
+    value: {},
   },
   data() {
     return {
       selectImage: false,
-      value: null,
     };
   },
   components: {
     ImageSelection,
+  },
+  methods: {
+    onSelectImage(imageId) {
+      this.$emit('input', imageId);
+      this.selectImage = false;
+    },
   },
 };
 </script>

@@ -12,7 +12,7 @@
     </section>
 
     <section v-if="geometryOutputs.length > 0">
-      <OutputGeometryField :parameter="parameter" v-for="parameter in geometryOutputs" :key="parameter.id"/>
+      <OutputGeometryField :parameter="parameter" v-model="parameter.targetImage" v-for="parameter in geometryOutputs" :key="parameter.id"/>
     </section>
 
     <section>
@@ -30,6 +30,7 @@ import Vue from 'vue';
 import AppEngineField from '@/components/appengine/forms/fields/AppEngineField';
 import OutputGeometryField from '@/components/appengine/forms/fields/OutputGeometryField.vue';
 import Task from '@/utils/appengine/task';
+import TaskRun from '@/utils/appengine/task-run';
 import {hasBinaryType, isGeometry} from '@/utils/app';
 
 export default {
@@ -109,6 +110,10 @@ export default {
           }
         } else {
           await Task.batchProvisionTask(this.projectId, taskRun.id, this.getInputProvisions());
+        }
+
+        for (const output of this.geometryOutputs) {
+          await TaskRun.provisionTargetImage(output.name, {'image': output.targetImage});
         }
 
         await Task.runTask(this.projectId, taskRun.id).then(async (taskRun) => {

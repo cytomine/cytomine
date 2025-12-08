@@ -10,7 +10,7 @@ describe('app.js', () => {
       expect(isGeometry(parameter)).toBe(true);
     });
 
-    it('should return true when type is "array" of geometry', () => {
+    it('should return true when type is "array" and subType is "geometry"', () => {
       const parameter = {
         type: {
           id: 'array',
@@ -37,11 +37,19 @@ describe('app.js', () => {
       expect(isGeometry(parameter)).toBe(false);
     });
 
-    it('should return false when type is "array" but subType is not geometry', () => {
+    it.each([
+      ['integer'],
+      ['number'],
+      ['string'],
+      ['enumeration'],
+      ['boolean'],
+      ['image'],
+      ['file'],
+    ])('should return false when type is "array" but subType is "%s"', (typeId) => {
       const parameter = {
         type: {
           id: 'array',
-          subType: {id: 'number'}
+          subType: {id: typeId}
         }
       };
 

@@ -39,7 +39,7 @@ jobs:
 
       - name: Create Registry secrets
         if: github.ref_name != 'main'
-        run: echo "${{ secrets.REGISTRY_DOCKER_PULL_SECRET }}" | kubectl create secret generic --namespace=default docker-images-pull-secret --from-file=.dockerconfigjson=/dev/stdin --namespace=cytomine-${{ github.sha }}
+        run: echo "${{ secrets.REGISTRY_DOCKER_PULL_SECRET }}" | kubectl create secret generic --namespace=cytomine-${{ github.sha }} docker-images-pull-secret --from-file=.dockerconfigjson=/dev/stdin --namespace=cytomine-${{ github.sha }}
 
       - name: Create Service Account
         if: github.ref_name != 'main'

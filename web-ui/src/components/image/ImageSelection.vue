@@ -2,7 +2,7 @@
   <form @submit.prevent="select">
     <cytomine-modal
       :active="active"
-      :title="$t('select-image-to-add')"
+      :title="title"
       @close="$emit('update:active', false)"
     >
       <b-loading class="small" :active="loading" :is-full-page="false"/>
@@ -45,6 +45,7 @@ export default {
   },
   props: {
     active: {type: Boolean, required: true},
+    title: {type: String, required: true},
   },
   data() {
     return {

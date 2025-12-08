@@ -11,8 +11,8 @@
       />
     </section>
 
-    <section v-if="hasGeometryOutput">
-      
+    <section v-if="geometryOutputs.length > 0">
+      <OutputGeometryField :parameter="parameter" v-for="parameter in geometryOutputs" :key="parameter.id"/>
     </section>
 
     <section>
@@ -28,6 +28,7 @@
 import Vue from 'vue';
 
 import AppEngineField from '@/components/appengine/forms/fields/AppEngineField';
+import OutputGeometryField from '@/components/appengine/forms/fields/OutputGeometryField.vue';
 import Task from '@/utils/appengine/task';
 import {hasBinaryType, isGeometry} from '@/utils/app';
 
@@ -35,6 +36,7 @@ export default {
   name: 'task-io-form',
   components: {
     AppEngineField,
+    OutputGeometryField,
   },
   props: {
     projectId: {type: Number, required: true},
@@ -45,7 +47,7 @@ export default {
       taskInputs: [],
       inputs: {},
       hasBinaryData: false,
-      hasGeometryOutput: false,
+      geometryOutputs: [],
     };
   },
   computed: {
@@ -78,7 +80,7 @@ export default {
     },
     async fetchTaskOutputs() {
       const outputs = await Task.fetchTaskOutputs(this.task.namespace, this.task.version);
-      this.hasGeometryOutput = outputs.some(output => isGeometry(output));
+      this.geometryOutputs = outputs.filter(output => isGeometry(output));
     },
     async runTask() {
       // create task run and provision

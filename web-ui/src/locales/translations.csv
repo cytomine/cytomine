@@ -919,6 +919,7 @@ select-layer,Select a layer,Sélectionner un calque,Selecciona una capa,Selectee
 select-ontology,Select ontology,Choisir l'ontologie,Seleccione ontología,Kies ontologie
 select-options,Select options,Sélectionner les options,Seleccione opciones,Selecteer opties
 select-project,Select a project,Sélectionner un project,Seleccione un proyecto,Selecteer een project
+select-target-image-for-output-geometry,Select a target image for output geometry,Sélectionnez une image cible pour la géométrie de sortie,Seleccione una imagen de destino para la geometría de salida,Selecteer een doelafbeelding voor de uitvoergeometrie
 send-to-all-project-members,Send to all project members,Envoyer à tous les membres du projet,Enviar a todos los miembros del proyecto,Stuur naar alle projectleden
 selection-in-view,Selection in view {number},Sélection dans la vue {number},Selección a la vista {número},Selectie in weergave {nummer}
 send-to-some-members,Send to some project members only,Envoyer à certains membres seulement,Enviar solo a algunos miembros del proyecto,Alleen naar bepaalde projectleden verzenden

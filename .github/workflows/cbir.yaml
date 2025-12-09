@@ -20,7 +20,7 @@ jobs:
 
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.1
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -40,7 +40,7 @@ jobs:
 
     steps:
       - name: Set up the repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.1
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -66,7 +66,7 @@ jobs:
 
     steps:
       - name: Set up the repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.1
 
       - name: Set up Python
         uses: actions/setup-python@v6

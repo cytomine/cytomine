@@ -35,7 +35,7 @@ jobs:
 
     steps:
       - name: Set up the repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 

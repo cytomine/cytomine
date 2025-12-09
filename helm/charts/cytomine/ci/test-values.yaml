@@ -21,3 +21,7 @@ iam:
   lsaaiClientIdSecretName:
   lsaaiClientSecretSecretName:
   lsaaiEndpoint:
+
+images:
+  global_prefix: registry.cytomine.org/
+  imagePullSecretsName: docker-images-pull-secret

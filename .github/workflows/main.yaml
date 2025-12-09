@@ -13,10 +13,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # helm-tests:
-  #   uses: ./.github/workflows/helm-test2.yaml
-  #   secrets: inherit
-
   app-engine:
     uses: ./.github/workflows/app-engine.yaml
   cbir:

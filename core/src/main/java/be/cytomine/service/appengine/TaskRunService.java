@@ -270,7 +270,8 @@ public class TaskRunService {
         }
     }
 
-    public String provisionTaskRun(JsonNode json, Long projectId, UUID taskRunId, String parameterName) {
+    public String provisionTaskRun(JsonNode json, Long projectId, UUID taskRunId, String parameterName)
+        throws JsonProcessingException {
         checkTaskRun(projectId, taskRunId);
 
         String uri = "task-runs/" + taskRunId + "/input-provisions/" + parameterName;
@@ -283,21 +284,29 @@ public class TaskRunService {
             Long[] itemsArray = mapper.convertValue(json.get("value"), Long[].class);
 
             if (subtype.equals("image")) {
+                ArrayNode responseArray = mapper.createArrayNode();
                 for (int i = 0; i < itemsArray.length; i++) {
                     Long imageId = itemsArray[i];
                     if (json.get("from").asText().equalsIgnoreCase("annotation")) {
                         MultiValueMap<String, Object> body = prepareImage(imageId, "annotation");
 
                         String response = provisionCollectionItem(arrayTypeUri, i, body);
-                        if (response != null) return response;
+                        if (response != null) {
+                            JsonNode itemNode = mapper.readTree(response);
+                            responseArray.add(itemNode);
+                        }
                     }
                     if (json.get("from").asText().equalsIgnoreCase("image")) {
                         MultiValueMap<String, Object> body = prepareImage(imageId, "image");
 
                         String response = provisionCollectionItem(arrayTypeUri, i, body);
-                        if (response != null) return response;
+                        if (response != null) {
+                            JsonNode itemNode = mapper.readTree(response);
+                            responseArray.add(itemNode);
+                        }
                     }
                 }
+                return responseArray.toString();
             }
 
             if (subtype.equals("geometry")) {

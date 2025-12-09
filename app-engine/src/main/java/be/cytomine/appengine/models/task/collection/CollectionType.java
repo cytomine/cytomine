@@ -1589,8 +1589,7 @@ public class CollectionType extends Type {
         }
     }
 
-    private ValueType getCollectionSubType() throws ProvisioningException
-    {
+    private ValueType getCollectionSubType() throws ProvisioningException {
         if (subType instanceof CollectionType) {
             return ValueType.ARRAY;
         } else if (subType instanceof ImageType) {

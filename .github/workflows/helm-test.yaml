@@ -3,7 +3,13 @@ name: Lint and Test Charts
 on:
   workflow_call:
     secrets:
-      REGISTRY_DOCKER_PULL_SECRET:
+      DOCKERHUB_USERNAME:
+        required: true
+      DOCKERHUB_TOKEN:
+        required: true
+      REGISTRY_USERNAME:
+        required: true
+      REGISTRY_TOKEN:
         required: true
 
 permissions: {}

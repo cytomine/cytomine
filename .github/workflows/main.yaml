@@ -36,3 +36,4 @@ jobs:
   helm-tests:
     needs: [docker-images]
     uses: ./.github/workflows/helm-test.yaml
+    secrets: inherit

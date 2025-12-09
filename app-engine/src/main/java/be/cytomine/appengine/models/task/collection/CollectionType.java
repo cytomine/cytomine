@@ -1083,10 +1083,8 @@ public class CollectionType extends Type {
                     boolean containsArrayYml = outputValue.getEntryList().stream().anyMatch(
                         storage -> storage.getName()
                             .equalsIgnoreCase(entry.getName() + "array.yml"));
-                    boolean indexed = nameParts[nameParts.length - 1].startsWith("[")
-                        && nameParts[nameParts.length - 1].endsWith("]");
-                    boolean isSubCollectionDirectory = indexed && containsArrayYml;
-                    if (isSubCollectionDirectory) {
+
+                    if (containsArrayYml) {
                         CollectionPersistence subCollection = new CollectionPersistence();
                         subCollection.setParameterName(String.join("", nameParts));
                         subCollection.setCollectionIndex(Arrays.stream(nameParts, 1, nameParts.length).collect(
@@ -1102,7 +1100,6 @@ public class CollectionType extends Type {
                     } else {
 
                         String parentName = entry.getName().substring(0, entry.getName().lastIndexOf("/") + 1);
-                        // how do we attach this directory to the parent????
                         DirectoryPersistence directory = new DirectoryPersistence();
                         directory.setParameterName(String.join("", nameParts));
                         List<TypePersistence> items = new ArrayList<>();
@@ -1592,7 +1589,8 @@ public class CollectionType extends Type {
         }
     }
 
-    private ValueType getCollectionSubType() {
+    private ValueType getCollectionSubType() throws ProvisioningException
+    {
         if (subType instanceof CollectionType) {
             return ValueType.ARRAY;
         } else if (subType instanceof ImageType) {
@@ -1614,7 +1612,7 @@ public class CollectionType extends Type {
         } else if (subType instanceof DateTimeType) {
             return ValueType.DATETIME;
         } else {
-            return ValueType.GEOMETRY;
+            throw new ProvisioningException(ErrorCode.INTERNAL_UNKNOWN_SUBTYPE);
         }
     }
 

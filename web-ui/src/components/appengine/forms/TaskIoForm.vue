@@ -7,7 +7,6 @@
         v-model="inputs[input.name].value"
         :key="input.id"
         :parameter="input"
-        @from="fromValue = $event"
       />
     </section>
     <section>
@@ -40,7 +39,6 @@ export default {
       taskInputs: [],
       inputs: {},
       hasBinaryData: false,
-      fromValue: null,
     };
   },
   computed: {
@@ -112,7 +110,6 @@ export default {
           'param_name': paramName,
           'type': value.type,
           'value': value.value,
-          'from': this.fromValue
         });
       }
       return provisions;

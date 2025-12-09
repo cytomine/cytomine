@@ -24,7 +24,6 @@
       <div v-else>
         <component
           v-model="items"
-          @from="from = $event"
           :is="selectedComplexField"
         />
       </div>
@@ -72,7 +71,6 @@ export default {
   data() {
     return {
       items: [],
-      from: null,
     };
   },
   computed: {
@@ -126,7 +124,6 @@ export default {
       }
 
       this.$emit('create-inputs', this.items);
-      this.$emit('from', this.from);
       this.$emit('update:active', false);
 
       this.items = [];

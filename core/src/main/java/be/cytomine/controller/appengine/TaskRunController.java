@@ -1,5 +1,6 @@
 package be.cytomine.controller.appengine;
 
+import be.cytomine.dto.appengine.task.TaskRunOutputRequest;
 import be.cytomine.service.appengine.TaskRunService;
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.servlet.http.HttpServletResponse;
@@ -84,6 +85,16 @@ public class TaskRunController {
             @RequestParam MultipartFile file
     ) {
         return taskRunService.provisionBinaryData(file, project, task, parameterName);
+    }
+
+    @PutMapping("/project/{project}/task-runs/{task}/input-provisions/{parameter_name}/geometry")
+    public void provisionTargetImage(
+        @PathVariable Long project,
+        @PathVariable UUID task,
+        @PathVariable("parameter_name") String parameterName,
+        @RequestBody TaskRunOutputRequest request
+    ) {
+        taskRunService.provisionTargetImage(request, project, task, parameterName);
     }
 
     @PostMapping("/project/{project}/task-runs/{task}/state-actions")

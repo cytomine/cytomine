@@ -10,6 +10,7 @@ import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.dto.appengine.task.TaskRunDetail;
+import be.cytomine.dto.appengine.task.TaskRunOutputRequest;
 import be.cytomine.dto.appengine.task.TaskRunOutputResponse;
 import be.cytomine.dto.appengine.task.TaskRunResponse;
 import be.cytomine.dto.appengine.task.TaskRunValue;
@@ -525,5 +526,25 @@ public class TaskRunService {
     public File getTaskRunIOParameter(Long projectId, UUID taskRunId, String parameterName, String type) {
         checkTaskRun(projectId, taskRunId);
         return appEngineService.getStreamedFile("task-runs/" + taskRunId + "/" + type + "/" + parameterName);
+    }
+
+    public void provisionTargetImage(TaskRunOutputRequest request, Long projectId, UUID taskRunId, String parameterName) {
+        TaskRun taskRun = taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId)
+                .orElseThrow(() -> new ObjectNotFoundException("TaskRun", taskRunId));
+
+        ImageInstance image = imageInstanceService.find(request.imageId())
+                .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", request.imageId()));
+
+        TaskRunResponse taskRunResponse = appEngineService.getTaskRun(taskRunId.toString());
+
+        String layerName = annotationLayerService.createLayerName(taskRunResponse.task().name(), taskRunResponse.task().version(), taskRun.getCreated());
+        AnnotationLayer annotationLayer = annotationLayerService.createAnnotationLayer(layerName, image);
+        TaskRunLayer newLayer = new TaskRunLayer();
+        newLayer.setAnnotationLayer(annotationLayer);
+        newLayer.setTaskRun(taskRun);
+        newLayer.setImage(taskRun.getImage());
+        newLayer.setXOffset(0);
+        newLayer.setYOffset(0);
+        taskRunLayerRepository.saveAndFlush(newLayer);
     }
 }

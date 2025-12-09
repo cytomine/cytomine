@@ -12,7 +12,7 @@
     </section>
 
     <section v-if="geometryOutputs.length > 0">
-      <OutputGeometryField :parameter="parameter" v-model="parameter.targetImage" v-for="parameter in geometryOutputs" :key="parameter.id"/>
+      <OutputGeometryField :parameter="parameter" v-model="parameter.targetImageId" v-for="parameter in geometryOutputs" :key="parameter.id"/>
     </section>
 
     <section>
@@ -113,7 +113,7 @@ export default {
         }
 
         for (const output of this.geometryOutputs) {
-          await TaskRun.provisionTargetImage(output.name, {'image': output.targetImage});
+          await TaskRun.provisionTargetImage(this.projectId, taskRun.id, output.name, {'imageId': output.targetImageId});
         }
 
         await Task.runTask(this.projectId, taskRun.id).then(async (taskRun) => {

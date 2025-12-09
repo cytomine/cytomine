@@ -88,25 +88,25 @@ http://iam.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.iam.port }}/iam
 {{- end }}
 
 {{- define "cytomine.appEngineImage" -}}
-{{ printf "%scytomine/app-engine:%s" .Values.images.global_prefix (.Values.images.app_engine | default (.Values.images.global_tag) | default "latest") }}
+{{ printf "%scytomine/app-engine:%s" .Values.images.globalPrefix (.Values.images.app_engine | default (.Values.images.globalTag) | default "latest") }}
 {{- end }}
 
 {{- define "cytomine.samImage" -}}
-{{ printf "%scytomine/sam:%s" .Values.images.global_prefix (.Values.images.sam | default (.Values.images.global_tag) | default "latest") }}
+{{ printf "%scytomine/sam:%s" .Values.images.globalPrefix (.Values.images.sam | default (.Values.images.globalTag) | default "latest") }}
 {{- end }}
 
 {{- define "cytomine.coreImage" -}}
-{{ printf "%scytomine/core:%s" .Values.images.global_prefix (.Values.images.core | default (.Values.images.global_tag) | default "latest") }}
+{{ printf "%scytomine/core:%s" .Values.images.globalPrefix (.Values.images.core | default (.Values.images.globalTag) | default "latest") }}
 {{- end }}
 
 {{- define "cytomine.pimsImage" -}}
-{{ printf "%scytomine/pims:%s" .Values.images.global_prefix (.Values.images.pims | default (.Values.images.global_tag) | default "latest") }}
+{{ printf "%scytomine/pims:%s" .Values.images.globalPrefix (.Values.images.pims | default (.Values.images.globalTag) | default "latest") }}
 {{- end }}
 
 {{- define "cytomine.webUiImage" -}}
-{{ printf "%scytomine/web-ui:%s" .Values.images.global_prefix (.Values.images.web_ui | default (.Values.images.global_tag) | default "latest") }}
+{{ printf "%scytomine/web-ui:%s" .Values.images.globalPrefix (.Values.images.web_ui | default (.Values.images.globalTag) | default "latest") }}
 {{- end }}
 
 {{- define "cytomine.cbirImage" -}}
-{{ printf "%scytomine/cbir:%s" .Values.images.global_prefix (.Values.images.cbir | default (.Values.images.global_tag) | default "latest") }}
+{{ printf "%scytomine/cbir:%s" .Values.images.globalPrefix (.Values.images.cbir | default (.Values.images.globalTag) | default "latest") }}
 {{- end }}

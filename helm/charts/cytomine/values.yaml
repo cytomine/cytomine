@@ -52,12 +52,12 @@ images:
 
   # Cytomine Images
   # use only tags here (e.g. `latest` which is the default)
-  # specific image tag takes precedence on global_tag
-  global_tag:
+  # specific image tag takes precedence on globalTag
+  globalTag:
 
   # If you use a private registry for all images
   # add a trailing slash.
-  global_prefix:
+  globalPrefix:
   app_engine:
   sam:
   core:

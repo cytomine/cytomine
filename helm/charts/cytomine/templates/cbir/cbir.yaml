@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: cbir
-        image: "{{ .Values.images.cbir }}"
+        image: "{{ include "cytomine.cbirImage" . }}"
         ports:
         - containerPort: {{ .Values.cbir.port }}
         envFrom:

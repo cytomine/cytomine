@@ -49,15 +49,21 @@ ingress:
   className:
 
 images:
-  #
+
   # Cytomine Images
-  #
-  app_engine: cytomine/app-engine:latest
-  sam: cytomine/sam:latest
-  core: cytomine/core:latest
-  pims: cytomine/pims:latest
-  web_ui: cytomine/web-ui:latest
-  cbir: cytomine/cbir:latest
+  # use only tags here (e.g. `latest` which is the default)
+  # specific image tag takes precedence on globalTag
+  globalTag:
+
+  # If you use a private registry for all images
+  # add a trailing slash.
+  globalPrefix:
+  app_engine:
+  sam:
+  core:
+  pims:
+  web_ui:
+  cbir:
 
   #
   # External Images
@@ -71,6 +77,7 @@ images:
   nginx: cytomine/nginx:latest
   iam: keycloak/keycloak:26.3
   pullPolicy: Always
+  imagePullSecretsName:
 
 #
 # Services - these are the services deployed by this chart

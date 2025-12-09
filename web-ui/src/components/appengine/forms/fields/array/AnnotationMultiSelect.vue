@@ -65,7 +65,6 @@ export default {
   watch: {
     selectedAnnotationIds(annotationIds) {
       this.$emit('input', annotationIds);
-      this.$emit('from', 'annotation');
     }
   },
   async created() {

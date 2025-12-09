@@ -21,6 +21,10 @@ kind: ServiceAccount
 metadata:
   name: app-engine
   namespace: {{ .Release.Namespace }}
+{{ if .Values.images.imagePullSecretsName }}
+imagePullSecrets:
+- name: {{ .Values.images.imagePullSecretsName }}
+{{ end }}
 
 ---
 apiVersion: v1

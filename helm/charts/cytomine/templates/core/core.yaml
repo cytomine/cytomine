@@ -28,7 +28,6 @@ spec:
       securityContext:
         runAsUser: {{ .Values.containerSecurity.userID }}
         fsGroup: {{ .Values.containerSecurity.fsgroupID }}
-      serviceAccountName: {{ include "cytomine.serviceAccountName" . }}
       {{- with .Values.global.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
@@ -44,7 +43,7 @@ spec:
         emptyDir: {}
       containers:
         - name: core
-          image: "{{ .Values.images.core }}"
+          image: "{{ include "cytomine.coreImage" . }}"
           imagePullPolicy: {{ .Values.images.pullPolicy }}
           env:
             - name: POSTGIS_PASS
@@ -103,7 +102,7 @@ spec:
             timeoutSeconds: 5
       initContainers:
         - name: core-init
-          image: "{{ .Values.images.core }}"
+          image: "{{ include "cytomine.coreImage" . }}"
           imagePullPolicy: {{ .Values.images.pullPolicy }}
           securityContext:
             allowPrivilegeEscalation: {{ .Values.containerSecurity.allowPrivilegeEscalation }}

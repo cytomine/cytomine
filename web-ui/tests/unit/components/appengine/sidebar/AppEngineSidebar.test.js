@@ -36,16 +36,6 @@ jest.mock('@/utils/appengine/task', () => ({
     mockTask1,
     mockTask2,
   ])),
-  /* eslint-disable */
-  fetchTaskInputs: jest.fn(() => Promise.resolve([
-    {param_name: 'input1'},
-    {param_name: 'input2'},
-  ])),
-  fetchTaskOutputs: jest.fn(() => Promise.resolve([
-    {param_name: 'output1'},
-    {param_name: 'output2'},
-  ])),
-  /* eslint-enable */
   fetchTaskRunStatus: jest.fn(() => Promise.resolve([
     {id: 'uuid-1'},
     {id: 'uuid-2'},
@@ -53,10 +43,15 @@ jest.mock('@/utils/appengine/task', () => ({
 }));
 
 jest.mock('@/utils/appengine/task-run', () => {
+  const mockFetchInputs = jest.fn();
+  const mockFetchOutputs = jest.fn();
+
   const mockTaskRun = jest.fn().mockImplementation((resource) => ({
     ...resource,
     project: null,
     state: null,
+    fetchInputs: mockFetchInputs,
+    fetchOutputs: mockFetchOutputs,
   }));
 
   mockTaskRun.fetchByProject = jest.fn(() => Promise.resolve([

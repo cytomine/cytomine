@@ -38,7 +38,7 @@ spec:
           name: localtime
       containers:
         - name: web-ui
-          image: "{{ include "cytomine.webUiImage" . }}"
+          image: "{{ .Values.images.web_ui }}"
           imagePullPolicy: {{ .Values.images.pullPolicy }}
           env:
           - name: URL_CORE

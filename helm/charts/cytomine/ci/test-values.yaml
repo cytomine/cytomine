@@ -23,5 +23,4 @@ iam:
   lsaaiEndpoint:
 
 images:
-  globalPrefix: registry.cytomine.org/
   imagePullSecretsName: docker-images-pull-secret

@@ -86,31 +86,3 @@ http://iam.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.iam.port }}/iam
 {{- define "cytomine.appEngineTasksNamespace" -}}
 {{ .Values.app_engine.tasks_namespace | default (printf "%s-engine-tasks" .Release.Namespace) }}
 {{- end }}
-
-{{- define "cytomine.globalPrefix" -}}
-{{ .Values.images.globalPrefix | default "" }}
-{{- end }}
-
-{{- define "cytomine.appEngineImage" -}}
-{{ printf "%scytomine/app-engine:%s" (include "cytomine.globalPrefix" . ) (.Values.images.app_engine | default (.Values.images.globalTag) | default "latest") }}
-{{- end }}
-
-{{- define "cytomine.samImage" -}}
-{{ printf "%scytomine/sam:%s" (include "cytomine.globalPrefix" . ) (.Values.images.sam | default (.Values.images.globalTag) | default "latest") }}
-{{- end }}
-
-{{- define "cytomine.coreImage" -}}
-{{ printf "%scytomine/core:%s" (include "cytomine.globalPrefix" . ) (.Values.images.core | default (.Values.images.globalTag) | default "latest") }}
-{{- end }}
-
-{{- define "cytomine.pimsImage" -}}
-{{ printf "%scytomine/pims:%s" (include "cytomine.globalPrefix" . ) (.Values.images.pims | default (.Values.images.globalTag) | default "latest") }}
-{{- end }}
-
-{{- define "cytomine.webUiImage" -}}
-{{ printf "%scytomine/web-ui:%s" (include "cytomine.globalPrefix" . ) (.Values.images.web_ui | default (.Values.images.globalTag) | default "latest") }}
-{{- end }}
-
-{{- define "cytomine.cbirImage" -}}
-{{ printf "%scytomine/cbir:%s" (include "cytomine.globalPrefix" . ) (.Values.images.cbir | default (.Values.images.globalTag) | default "latest") }}
-{{- end }}

@@ -87,7 +87,7 @@ http://iam.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.iam.port }}/iam
 {{ .Values.app_engine.tasks_namespace | default (printf "%s-engine-tasks" .Release.Namespace) }}
 {{- end }}
 
-{{- define "cytomine.globalPrefix"-}}
+{{- define "cytomine.globalPrefix" -}}
 {{ .Values.images.globalPrefix | default "" }}
 {{- end }}
 

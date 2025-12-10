@@ -113,7 +113,7 @@ export default {
     async catchTaskRunLaunch(event) {
       let taskRun = new TaskRun(event.resource);
       taskRun.project = this.currentProjectId;
-      await this.fetchInputs(taskRun);
+      await taskRun.fetchInputs();
       this.trackedTaskRuns = [taskRun, ...this.trackedTaskRuns];
     },
     async fetchTasks() {
@@ -136,23 +136,12 @@ export default {
         })
       );
 
-      await Promise.all(this.trackedTaskRuns.map(run => this.fetchInputs(run)));
+      await Promise.all(this.trackedTaskRuns.map(run => run.fetchInputs()));
 
       await Promise.all(
         this.trackedTaskRuns
           .filter(taskRun => taskRun.state === 'FINISHED')
           .map(run => this.fetchOutputs(run))
-      );
-    },
-    async fetchInputs(taskRun) {
-      taskRun.inputs = await taskRun.fetchInputs();
-
-      const binaryInputs = taskRun.inputs.filter(input => BINARY_TYPES.includes(input.type.toLowerCase()));
-
-      await Promise.all(
-        binaryInputs.map(async (input) => {
-          input.value = await taskRun.fetchSingleIO(input.param_name, 'input');
-        })
       );
     },
     async fetchOutputs(taskRun) {
@@ -165,28 +154,6 @@ export default {
           output.value = await taskRun.fetchSingleIO(output.param_name, 'output');
         })
       );
-    },
-    async getTask(taskRun) {
-      let task = this.tasks.find(task => task.id === taskRun.task.id);
-      if (!task.inputs) {
-        task.inputs = await Task.fetchTaskInputs(task.namespace, task.version);
-      }
-      if (!task.outputs) {
-        task.outputs = await Task.fetchTaskOutputs(task.namespace, task.version);
-      }
-
-      return task;
-    },
-    filterBinaryType(task, type) {
-      if (type === 'input') {
-        return task.inputs.filter(input => BINARY_TYPES.includes(input.type.id));
-      }
-
-      if (type === 'output') {
-        return task.outputs.filter(output => BINARY_TYPES.includes(output.type.id));
-      }
-
-      return [];
     },
   },
 };

@@ -1,7 +1,7 @@
 import Model from './model';
 import Task from './task';
 import {Cytomine} from '@/api';
-
+import {BINARY_TYPES} from '@/utils/app';
 
 export default class TaskRun extends Model {
   /** @inheritdoc */
@@ -57,8 +57,17 @@ export default class TaskRun extends Model {
   }
 
   async fetchInputs() {
-    let {data} = await Cytomine.instance.api.get(`${this.uri}/inputs`);
-    return data;
+    this.inputs = (await Cytomine.instance.api.get(`${this.uri}/inputs`)).data;
+
+    const binaryInputs = this.inputs.filter(input => BINARY_TYPES.includes(input.type.toLowerCase()));
+
+    await Promise.all(
+      binaryInputs.map(async (input) => {
+        input.value = await this.fetchSingleIO(input.param_name, 'input');
+      })
+    );
+
+    return this.inputs;
   }
 
   async fetchOutputs() {

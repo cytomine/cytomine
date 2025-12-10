@@ -80,7 +80,7 @@ describe('AppEngineSideBar.vue', () => {
     });
   });
 
-  it('The component should be rendered and show the task options', () => {
+  it('should render and show the task options', () => {
     const headers = wrapper.findAll('header');
     expect(headers.length).toBe(2);
     expect(headers.at(0).text()).toBe('app-engine.execute-a-task');
@@ -94,7 +94,7 @@ describe('AppEngineSideBar.vue', () => {
     expect(wrapper.find('h5').text()).toBe('app-engine.runs.title');
   });
 
-  it('The component should display the task name and description when a task is selected', async () => {
+  it('should display the task name and description when a task is selected', async () => {
     await wrapper.setData({selectedTask: {namespace: 'namespace1', version: '0.1.0', name: 'Task 1', id: 1}});
 
     expect(wrapper.find('.content p').text()).toBe('Task 1 (0.1.0)');
@@ -104,14 +104,14 @@ describe('AppEngineSideBar.vue', () => {
     expect(descriptionField.text()).toBe('app-engine.task.no-description');
   });
 
-  it('The component should fetch data on component created', async () => {
+  it('should fetch data on component created', async () => {
     expect(fetchTasksSpy).toHaveBeenCalled();
     expect(fetchTasksSpy).toHaveBeenCalledTimes(1);
     expect(fetchTaskRunsSpy).toHaveBeenCalled();
     expect(fetchTaskRunsSpy).toHaveBeenCalledTimes(1);
   });
 
-  it('The component should update tracked task runs every 2 seconds', async () => {
+  it('should update tracked task runs every 2 seconds', async () => {
     jest.useFakeTimers();
     jest.advanceTimersByTime(2000);
 

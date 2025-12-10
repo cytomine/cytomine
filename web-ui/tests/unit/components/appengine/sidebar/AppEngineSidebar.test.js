@@ -3,6 +3,20 @@ import Buefy from 'buefy';
 
 import AppEngineSideBar from '@/components/appengine/sidebar/AppEngineSidebar.vue';
 
+const mockTask1 = {
+  id: 1,
+  name: 'Task 1',
+  namespace: 'namespace1',
+  version: '0.1.0',
+};
+
+const mockTask2 = {
+  id: 2,
+  name: 'Task 2',
+  namespace: 'namespace2',
+  version: '0.5.0',
+};
+
 jest.mock('@/api', () => ({
   Cytomine: {
     instance: {
@@ -19,8 +33,8 @@ jest.mock('@/utils/image-utils', () => ({
 
 jest.mock('@/utils/appengine/task', () => ({
   fetchAll: jest.fn(() => Promise.resolve([
-    {namespace: 'namespace1', version: '0.1.0', name: 'Task 1', id: 1},
-    {namespace: 'namespace2', version: '0.5.0', name: 'Task 2', id: 2},
+    mockTask1,
+    mockTask2,
   ])),
   /* eslint-disable */
   fetchTaskInputs: jest.fn(() => Promise.resolve([
@@ -88,8 +102,8 @@ describe('AppEngineSideBar.vue', () => {
 
     const taskOptions = wrapper.findAll('option');
     expect(taskOptions.length).toBe(2);
-    expect(taskOptions.at(0).text()).toBe('Task 1 (0.1.0)');
-    expect(taskOptions.at(1).text()).toBe('Task 2 (0.5.0)');
+    expect(taskOptions.at(0).text()).toBe(`${mockTask1.name} (${mockTask1.version})`);
+    expect(taskOptions.at(1).text()).toBe(`${mockTask2.name} (${mockTask2.version})`);
 
     expect(wrapper.find('h5').text()).toBe('app-engine.runs.title');
   });

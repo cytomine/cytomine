@@ -77,12 +77,10 @@ export default {
       userInputs: [], //users filled in inputs
       taskState: '',
       executedTaskRun: null,
-      tasks: [],
       trackedTaskRuns: []
     };
   },
   async created() {
-    await this.fetchTasks();
     await this.fetchTaskRuns();
 
     setInterval(async () => {
@@ -115,9 +113,6 @@ export default {
       taskRun.project = this.currentProjectId;
       await this.fetchInputs(taskRun);
       this.trackedTaskRuns = [taskRun, ...this.trackedTaskRuns];
-    },
-    async fetchTasks() {
-      this.tasks = await Task.fetchAll();
     },
     async fetchTaskRuns() {
       let taskRuns = await TaskRun.fetchByProject(this.currentProjectId);
@@ -165,28 +160,6 @@ export default {
           output.value = await taskRun.fetchSingleIO(output.param_name, 'output');
         })
       );
-    },
-    async getTask(taskRun) {
-      let task = this.tasks.find(task => task.id === taskRun.task.id);
-      if (!task.inputs) {
-        task.inputs = await Task.fetchTaskInputs(task.namespace, task.version);
-      }
-      if (!task.outputs) {
-        task.outputs = await Task.fetchTaskOutputs(task.namespace, task.version);
-      }
-
-      return task;
-    },
-    filterBinaryType(task, type) {
-      if (type === 'input') {
-        return task.inputs.filter(input => BINARY_TYPES.includes(input.type.id));
-      }
-
-      if (type === 'output') {
-        return task.outputs.filter(output => BINARY_TYPES.includes(output.type.id));
-      }
-
-      return [];
     },
   },
 };

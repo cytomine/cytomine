@@ -2,7 +2,6 @@ import {createLocalVue, shallowMount} from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import AppEngineSideBar from '@/components/appengine/sidebar/AppEngineSidebar.vue';
-import TaskRun from '@/utils/appengine/task-run';
 
 const mockTask1 = {
   id: 1,

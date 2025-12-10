@@ -87,27 +87,17 @@ export default {
 
     setInterval(async () => {
       for (let taskRun of this.trackedTaskRuns) {
-        let task = await this.getTask(taskRun);
-
         if (taskRun.state !== 'FINISHED' && taskRun.state !== 'FAILED') {
           await taskRun.fetch();
         }
 
         if (taskRun.state === 'FINISHED') {
           if (!taskRun.outputs) {
-            taskRun.outputs = await taskRun.fetchOutputs();
+            this.fetchOutputs(taskRun);
           }
 
           if (taskRun.outputs.some(output => output.type === 'GEOMETRY')) {
             this.$eventBus.$emit('annotation-layers:refresh');
-          }
-
-          let binaryOutputs = this.filterBinaryType(task, 'output');
-          if (binaryOutputs.length > 0) {
-            for (let output of binaryOutputs) {
-              let index = taskRun.outputs.findIndex(o => o.param_name === output.name);
-              this.$set(taskRun.outputs[index], 'value', await taskRun.fetchSingleIO(output.name, 'output'));
-            }
           }
         }
       }
@@ -151,7 +141,7 @@ export default {
       await Promise.all(
         this.trackedTaskRuns
           .filter(taskRun => taskRun.state === 'FINISHED')
-          .map(async (taskRun) => taskRun.outputs = await taskRun.fetchOutputs())
+          .map(run => this.fetchOutputs(run))
       );
     },
     async fetchInputs(taskRun) {
@@ -162,6 +152,17 @@ export default {
       await Promise.all(
         binaryInputs.map(async (input) => {
           input.value = await taskRun.fetchSingleIO(input.param_name, 'input');
+        })
+      );
+    },
+    async fetchOutputs(taskRun) {
+      taskRun.outputs = await taskRun.fetchOutputs();
+
+      const binaryOutputs = taskRun.outputs.filter(output => BINARY_TYPES.includes(output.type.toLowerCase()));
+
+      await Promise.all(
+        binaryOutputs.map(async (output) => {
+          output.value = await taskRun.fetchSingleIO(output.param_name, 'output');
         })
       );
     },

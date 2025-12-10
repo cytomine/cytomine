@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: app-engine
-        image: "{{ include  "cytomine.appEngineImage" . }}"
+        image: "{{ .Values.images.app_engine }}"
         ports:
         - containerPort: {{ .Values.app_engine.port }}
         envFrom:

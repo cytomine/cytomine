@@ -2,6 +2,7 @@ import {createLocalVue, shallowMount} from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import AppEngineSideBar from '@/components/appengine/sidebar/AppEngineSidebar.vue';
+import TaskRun from '@/utils/appengine/task-run';
 
 const mockTask1 = {
   id: 1,
@@ -15,6 +16,16 @@ const mockTask2 = {
   name: 'Task 2',
   namespace: 'namespace2',
   version: '0.5.0',
+};
+
+const mockTaskRun1 = {
+  id: 'c11e717a-d5ac-4655-80c7-06946d266264',
+  state: 'FINISHED',
+};
+
+const mockTaskRun2 = {
+  id: '5f41ca2c-9b68-49fe-8f16-4e8005eb6893',
+  state: 'RUNNING',
 };
 
 jest.mock('@/api', () => ({
@@ -37,8 +48,8 @@ jest.mock('@/utils/appengine/task', () => ({
     mockTask2,
   ])),
   fetchTaskRunStatus: jest.fn(() => Promise.resolve([
-    {id: 'uuid-1'},
-    {id: 'uuid-2'},
+    mockTaskRun1,
+    mockTaskRun2,
   ])),
 }));
 
@@ -55,8 +66,8 @@ jest.mock('@/utils/appengine/task-run', () => {
   }));
 
   mockTaskRun.fetchByProject = jest.fn(() => Promise.resolve([
-    {taskRunId: '1', project: 'project1'},
-    {taskRunId: '2', project: 'project2'},
+    mockTaskRun1,
+    mockTaskRun2,
   ]));
 
   return {
@@ -118,6 +129,8 @@ describe('AppEngineSideBar.vue', () => {
     expect(fetchTasksSpy).toHaveBeenCalledTimes(1);
     expect(fetchTaskRunsSpy).toHaveBeenCalled();
     expect(fetchTaskRunsSpy).toHaveBeenCalledTimes(1);
+
+    expect(wrapper.vm.tasks).toStrictEqual([mockTask1, mockTask2]);
   });
 
   it('should update tracked task runs every 2 seconds', async () => {

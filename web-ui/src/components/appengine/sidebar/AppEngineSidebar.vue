@@ -62,7 +62,7 @@ import Task from '@/utils/appengine/task';
 import TaskRun from '@/utils/appengine/task-run';
 import TaskIoForm from '@/components/appengine/forms/TaskIoForm';
 import TaskRunTable from '@/components/appengine/task-run/TaskRunTable';
-
+import {BINARY_TYPES} from '@/utils/app';
 import {get} from '@/utils/store-helpers';
 
 export default {
@@ -89,25 +89,14 @@ export default {
       for (let taskRun of this.trackedTaskRuns) {
         let task = await this.getTask(taskRun);
 
-        // update task run in place
-        if (!['CREATED', 'FAILED'].includes(taskRun.state) && !taskRun.inputs) {
-          taskRun.inputs = await taskRun.fetchInputs();
-
-          let binaryInputs = this.filterBinaryType(task, 'input');
-          if (binaryInputs.length > 0) {
-            for (let input of binaryInputs) {
-              let index = taskRun.inputs.findIndex(i => i.param_name === input.name);
-              this.$set(taskRun.inputs[index], 'value', await taskRun.fetchSingleIO(input.name, 'input'));
-            }
-          }
-        }
-
         if (taskRun.state !== 'FINISHED' && taskRun.state !== 'FAILED') {
           await taskRun.fetch();
         }
 
-        if (taskRun.state === 'FINISHED' || taskRun.state === 'FAILED') {
-          taskRun.outputs = await taskRun.fetchOutputs();
+        if (taskRun.state === 'FINISHED') {
+          if (!taskRun.outputs) {
+            taskRun.outputs = await taskRun.fetchOutputs();
+          }
 
           if (taskRun.outputs.some(output => output.type === 'GEOMETRY')) {
             this.$eventBus.$emit('annotation-layers:refresh');
@@ -156,10 +145,23 @@ export default {
         })
       );
 
+      await Promise.all(this.trackedTaskRuns.map(run => this.fetchInputs(run)));
+
       await Promise.all(
         this.trackedTaskRuns
           .filter(taskRun => taskRun.state === 'FINISHED')
           .map(async (taskRun) => taskRun.outputs = await taskRun.fetchOutputs())
+      );
+    },
+    async fetchInputs(taskRun) {
+      taskRun.inputs = await taskRun.fetchInputs();
+
+      const binaryInputs = taskRun.inputs.filter(input => BINARY_TYPES.includes(input.type.toLowerCase()));
+
+      await Promise.all(
+        binaryInputs.map(async (input) => {
+          input.value = await taskRun.fetchSingleIO(input.param_name, 'input');
+        })
       );
     },
     async getTask(taskRun) {

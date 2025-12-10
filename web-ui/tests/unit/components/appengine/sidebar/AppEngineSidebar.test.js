@@ -109,9 +109,9 @@ describe('AppEngineSideBar.vue', () => {
   });
 
   it('should display the task name and description when a task is selected', async () => {
-    await wrapper.setData({selectedTask: {namespace: 'namespace1', version: '0.1.0', name: 'Task 1', id: 1}});
+    await wrapper.setData({selectedTask: mockTask1});
 
-    expect(wrapper.find('.content p').text()).toBe('Task 1 (0.1.0)');
+    expect(wrapper.find('.content p').text()).toBe(`${mockTask1.name} (${mockTask1.version})`);
 
     const descriptionField = wrapper.find('.no-description');
     expect(descriptionField.exists()).toBe(true);

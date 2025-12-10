@@ -93,7 +93,7 @@ export default {
 
         if (taskRun.state === 'FINISHED') {
           if (!taskRun.outputs) {
-            this.fetchOutputs(taskRun);
+            await this.fetchOutputs(taskRun);
           }
 
           if (taskRun.outputs.some(output => output.type === 'GEOMETRY')) {

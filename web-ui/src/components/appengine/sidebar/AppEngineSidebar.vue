@@ -123,6 +123,7 @@ export default {
     async catchTaskRunLaunch(event) {
       let taskRun = new TaskRun(event.resource);
       taskRun.project = this.currentProjectId;
+      await this.fetchInputs(taskRun);
       this.trackedTaskRuns = [taskRun, ...this.trackedTaskRuns];
     },
     async fetchTasks() {

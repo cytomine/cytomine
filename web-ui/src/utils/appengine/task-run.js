@@ -71,8 +71,17 @@ export default class TaskRun extends Model {
   }
 
   async fetchOutputs() {
-    let {data} = await Cytomine.instance.api.get(`${this.uri}/outputs`);
-    return data;
+    this.outputs = (await Cytomine.instance.api.get(`${this.uri}/outputs`)).data;
+
+    const binaryOutputs = this.outputs.filter(output => BINARY_TYPES.includes(output.type.toLowerCase()));
+
+    await Promise.all(
+      binaryOutputs.map(async (output) => {
+        output.value = await this.fetchSingleIO(output.param_name, 'output');
+      })
+    );
+
+    return this.outputs;
   }
 
   async fetchSingleIO(parameterName, type) {

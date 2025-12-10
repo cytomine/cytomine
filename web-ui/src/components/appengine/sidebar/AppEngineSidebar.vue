@@ -62,7 +62,6 @@ import Task from '@/utils/appengine/task';
 import TaskRun from '@/utils/appengine/task-run';
 import TaskIoForm from '@/components/appengine/forms/TaskIoForm';
 import TaskRunTable from '@/components/appengine/task-run/TaskRunTable';
-import {BINARY_TYPES} from '@/utils/app';
 import {get} from '@/utils/store-helpers';
 
 export default {
@@ -93,7 +92,7 @@ export default {
 
         if (taskRun.state === 'FINISHED') {
           if (!taskRun.outputs) {
-            await this.fetchOutputs(taskRun);
+            await taskRun.fetchOutputs();
           }
 
           if (taskRun.outputs.some(output => output.type === 'GEOMETRY')) {
@@ -141,18 +140,7 @@ export default {
       await Promise.all(
         this.trackedTaskRuns
           .filter(taskRun => taskRun.state === 'FINISHED')
-          .map(run => this.fetchOutputs(run))
-      );
-    },
-    async fetchOutputs(taskRun) {
-      taskRun.outputs = await taskRun.fetchOutputs();
-
-      const binaryOutputs = taskRun.outputs.filter(output => BINARY_TYPES.includes(output.type.toLowerCase()));
-
-      await Promise.all(
-        binaryOutputs.map(async (output) => {
-          output.value = await taskRun.fetchSingleIO(output.param_name, 'output');
-        })
+          .map(run => run.fetchOutputs())
       );
     },
   },

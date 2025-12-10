@@ -73,9 +73,6 @@ export default {
   data() {
     return {
       selectedTask: null,
-      userInputs: [], //users filled in inputs
-      taskState: '',
-      executedTaskRun: null,
       tasks: [],
       trackedTaskRuns: []
     };

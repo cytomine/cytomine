@@ -176,14 +176,12 @@ export default {
       return task;
     },
     filterBinaryType(task, type) {
-      let binaryType = ['file', 'image'];
-
       if (type === 'input') {
-        return task.inputs.filter(input => binaryType.includes(input.type.id));
+        return task.inputs.filter(input => BINARY_TYPES.includes(input.type.id));
       }
 
       if (type === 'output') {
-        return task.outputs.filter(output => binaryType.includes(output.type.id));
+        return task.outputs.filter(output => BINARY_TYPES.includes(output.type.id));
       }
 
       return [];

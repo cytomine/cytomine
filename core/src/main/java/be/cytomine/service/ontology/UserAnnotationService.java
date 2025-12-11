@@ -49,7 +49,6 @@ import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.GeometryUtils;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.Task;
-import be.cytomine.utils.TokenUtils;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.ParseException;
@@ -155,15 +154,6 @@ public class UserAnnotationService extends ModelService {
         Optional<UserAnnotation> optionalUserAnnotation = userAnnotationRepository.findById(id);
         optionalUserAnnotation.ifPresent(userAnnotation -> securityACLService.check(userAnnotation.container(),READ));
         return optionalUserAnnotation;
-    }
-
-    public Optional<UserAnnotation> find(Long id, String authHeader) {
-        Optional<UserAnnotation> userAnnotation = userAnnotationRepository.findById(id);
-        String token = authHeader.replace("Bearer ", "");
-        String username = TokenUtils.getUsernameFromToken(token);
-        User user = currentUserService.getCurrentUser(username);
-        userAnnotation.ifPresent(annotation -> securityACLService.check(annotation.container(),READ, user));
-        return userAnnotation;
     }
 
     public List listIncluded(ImageInstance image, String geometry, User user, List<Long> terms, AnnotationDomain annotation, List<String> propertiesToShow) {

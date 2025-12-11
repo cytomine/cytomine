@@ -1,0 +1,39 @@
+name: Build and Test
+
+on:
+  pull_request:
+    branches:
+    - main
+  push:
+    branches:
+    - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  app-engine:
+    uses: ./.github/workflows/app-engine.yaml
+  cbir:
+    uses: ./.github/workflows/cbir.yaml
+  core:
+    uses: ./.github/workflows/core.yaml
+  ims:
+    uses: ./.github/workflows/ims.yaml
+  python-client:
+    uses: ./.github/workflows/python-client.yaml
+  sam:
+    uses: ./.github/workflows/sam.yaml
+  web-ui:
+    uses: ./.github/workflows/web-ui.yaml
+
+  docker-images:
+    needs: [app-engine, cbir, core, ims, python-client, sam, web-ui]
+    uses: ./.github/workflows/docker.yaml
+    secrets: inherit
+
+  helm-tests:
+    needs: [docker-images]
+    uses: ./.github/workflows/helm-test.yaml
+    secrets: inherit

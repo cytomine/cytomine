@@ -1,10 +1,8 @@
-{{- $storageClassName := .Values.app_engine.tasks_namespace | required ".Values.app_engine.tasks_namespace is required." -}}
-
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: app-engine
-  namespace: {{ .Values.app_engine.tasks_namespace }}
+  namespace: {{ include "cytomine.appEngineTasksNamespace" . }}
 
 ---
 apiVersion: v1
@@ -12,7 +10,7 @@ kind: Secret
 type: kubernetes.io/service-account-token
 metadata:
   name: app-engine
-  namespace: {{ .Values.app_engine.tasks_namespace }}
+  namespace: {{ include "cytomine.appEngineTasksNamespace" . }}
   annotations:
     kubernetes.io/service-account.name: app-engine
 
@@ -23,6 +21,10 @@ kind: ServiceAccount
 metadata:
   name: app-engine
   namespace: {{ .Release.Namespace }}
+{{ if .Values.images.imagePullSecretsName }}
+imagePullSecrets:
+- name: {{ .Values.images.imagePullSecretsName }}
+{{ end }}
 
 ---
 apiVersion: v1
@@ -38,8 +40,8 @@ metadata:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role # we need to restrict that by namespace (Role not ClusterRole)
 metadata:
-  name: pod-starter-for-{{ .Values.app_engine.tasks_namespace }}
-  namespace: {{ .Values.app_engine.tasks_namespace }}
+  name: pod-starter-for-{{ include "cytomine.appEngineTasksNamespace" . }}
+  namespace: {{ include "cytomine.appEngineTasksNamespace" . }}
 rules:
 - apiGroups: [""] # "" indicates the core API group
   resources: ["pods"]
@@ -49,18 +51,18 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: pod-starter-app-engine-{{ .Values.app_engine.tasks_namespace }}
-  namespace: {{ .Values.app_engine.tasks_namespace }}
+  name: pod-starter-app-engine-{{ include "cytomine.appEngineTasksNamespace" . }}
+  namespace: {{ include "cytomine.appEngineTasksNamespace" . }}
 subjects:
 - kind: ServiceAccount
   name: app-engine
   apiGroup: ""
-  namespace: {{ .Values.app_engine.tasks_namespace }}
+  namespace: {{ include "cytomine.appEngineTasksNamespace" . }}
 - kind: ServiceAccount
   name: app-engine
   apiGroup: ""
   namespace: {{ .Release.Namespace }}
 roleRef:
   kind: Role #this must be Role or ClusterRole
-  name: pod-starter-for-{{ .Values.app_engine.tasks_namespace }} # this must match the name of the Role or ClusterRole you wish to bind to
+  name: pod-starter-for-{{ include "cytomine.appEngineTasksNamespace" . }} # this must match the name of the Role or ClusterRole you wish to bind to
   apiGroup: ""

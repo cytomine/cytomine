@@ -8,8 +8,6 @@
 #
 # kubectl -n <NAMESPACE> create secret generic <SECRET-NAME> --from-literal=password="$(pwgen 64 1)"
 
-
-
 #
 # Globals
 #
@@ -51,9 +49,6 @@ ingress:
   className:
 
 images:
-  #
-  # Cytomine Images
-  #
   app_engine: cytomine/app-engine:latest
   sam: cytomine/sam:latest
   core: cytomine/core:latest
@@ -73,6 +68,7 @@ images:
   nginx: cytomine/nginx:latest
   iam: keycloak/keycloak:26.3
   pullPolicy: Always
+  imagePullSecretsName:
 
 #
 # Services - these are the services deployed by this chart
@@ -210,7 +206,7 @@ iam:
   lsaaiEndpoint:
 
 cbir:
-  port: 6000 # https://github.com/cytomine/cytomine/blob/8e5a14bf70b22e9f96a253d6402f793e8a37ce3e/cbir/Dockerfile#L37
+  port: 6000  # https://github.com/cytomine/cytomine/blob/8e5a14bf70b22e9f96a253d6402f793e8a37ce3e/cbir/Dockerfile#L37
 
 app_engine:
   port: 8080
@@ -240,4 +236,3 @@ containerSecurity:
   userID: 20000
   groupID: 20000
   fsgroupID: 20000
-

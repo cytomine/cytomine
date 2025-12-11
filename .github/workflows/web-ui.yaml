@@ -1,19 +1,10 @@
 name: Web UI
 
 on:
-  pull_request:
-    branches:
-      - main
-  push:
-    branches:
-      - main
+  workflow_call:
 
 permissions:
   contents: read
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
 
 defaults:
   run:
@@ -24,7 +15,7 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Set up the repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.1
 
       - name: Set up NodeJS
         uses: actions/setup-node@v6
@@ -41,7 +32,7 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Set up the repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.1
 
       - name: Set up NodeJS
         uses: actions/setup-node@v6

@@ -1,16 +1,7 @@
-name: Client Python
+name: Python Client
 
 on:
-  pull_request:
-    branches:
-      - main
-  push:
-    branches:
-      - main
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  workflow_call:
 
 defaults:
   run:
@@ -22,7 +13,7 @@ jobs:
 
     steps:
       - name: Set up the repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.1
 
       - name: Install uv
         uses: astral-sh/setup-uv@v7
@@ -37,7 +28,7 @@ jobs:
 
     steps:
       - name: Set up the repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.1
 
       - name: Install uv
         uses: astral-sh/setup-uv@v7
@@ -55,7 +46,7 @@ jobs:
 
     steps:
       - name: Set up the repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.1
         with:
           fetch-depth: 2
 
@@ -80,7 +71,7 @@ jobs:
 
     steps:
       - name: Set up the repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.1
 
       - name: Install uv
         uses: astral-sh/setup-uv@v7

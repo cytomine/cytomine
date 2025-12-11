@@ -12,7 +12,7 @@ pims:
 mongodb:
   storageClassName: 'local-path'
 app_engine:
-  tasks_namespace: cytomine-local-tasks
+  tasks_namespace:
 
 ingress:
   className: nginx

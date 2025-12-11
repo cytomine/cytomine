@@ -83,7 +83,6 @@ export default {
               body = new FormData();
               body.append('file', provision.value, provision.value.name || 'uploaded-file');
             }
-
             await Task.singleProvisionTask(
               this.projectId,
               taskRun.id,

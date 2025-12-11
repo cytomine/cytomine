@@ -62,7 +62,6 @@ import Task from '@/utils/appengine/task';
 import TaskRun from '@/utils/appengine/task-run';
 import TaskIoForm from '@/components/appengine/forms/TaskIoForm';
 import TaskRunTable from '@/components/appengine/task-run/TaskRunTable';
-
 import {get} from '@/utils/store-helpers';
 
 export default {
@@ -74,9 +73,6 @@ export default {
   data() {
     return {
       selectedTask: null,
-      userInputs: [], //users filled in inputs
-      taskState: '',
-      executedTaskRun: null,
       tasks: [],
       trackedTaskRuns: []
     };
@@ -87,38 +83,17 @@ export default {
 
     setInterval(async () => {
       for (let taskRun of this.trackedTaskRuns) {
-        let task = await this.getTask(taskRun);
-
-        // update task run in place
-        if (!['CREATED', 'FAILED'].includes(taskRun.state) && !taskRun.inputs) {
-          taskRun.inputs = await taskRun.fetchInputs();
-
-          let binaryInputs = this.filterBinaryType(task, 'input');
-          if (binaryInputs.length > 0) {
-            for (let input of binaryInputs) {
-              let index = taskRun.inputs.findIndex(i => i.param_name === input.name);
-              this.$set(taskRun.inputs[index], 'value', await taskRun.fetchSingleIO(input.name, 'input'));
-            }
-          }
-        }
-
         if (taskRun.state !== 'FINISHED' && taskRun.state !== 'FAILED') {
           await taskRun.fetch();
+        }
 
-          if (taskRun.state === 'FINISHED' || taskRun.state === 'FAILED') {
-            taskRun.outputs = await taskRun.fetchOutputs();
+        if (taskRun.state === 'FINISHED') {
+          if (!taskRun.outputs) {
+            await taskRun.fetchOutputs();
+          }
 
-            if (taskRun.outputs.some(output => output.type === 'GEOMETRY')) {
-              this.$eventBus.$emit('annotation-layers:refresh');
-            }
-
-            let binaryOutputs = this.filterBinaryType(task, 'output');
-            if (binaryOutputs.length > 0) {
-              for (let output of binaryOutputs) {
-                let index = taskRun.outputs.findIndex(o => o.param_name === output.name);
-                this.$set(taskRun.outputs[index], 'value', await taskRun.fetchSingleIO(output.name, 'output'));
-              }
-            }
+          if (taskRun.outputs.some(output => output.type === 'GEOMETRY')) {
+            this.$eventBus.$emit('annotation-layers:refresh');
           }
         }
       }
@@ -134,6 +109,7 @@ export default {
     async catchTaskRunLaunch(event) {
       let taskRun = new TaskRun(event.resource);
       taskRun.project = this.currentProjectId;
+      await taskRun.fetchInputs();
       this.trackedTaskRuns = [taskRun, ...this.trackedTaskRuns];
     },
     async fetchTasks() {
@@ -156,35 +132,13 @@ export default {
         })
       );
 
+      await Promise.all(this.trackedTaskRuns.map(run => run.fetchInputs()));
+
       await Promise.all(
         this.trackedTaskRuns
           .filter(taskRun => taskRun.state === 'FINISHED')
-          .map(async (taskRun) => taskRun.outputs = await taskRun.fetchOutputs())
+          .map(run => run.fetchOutputs())
       );
-    },
-    async getTask(taskRun) {
-      let task = this.tasks.find(task => task.id === taskRun.task.id);
-      if (!task.inputs) {
-        task.inputs = await Task.fetchTaskInputs(task.namespace, task.version);
-      }
-      if (!task.outputs) {
-        task.outputs = await Task.fetchTaskOutputs(task.namespace, task.version);
-      }
-
-      return task;
-    },
-    filterBinaryType(task, type) {
-      let binaryType = ['file', 'image'];
-
-      if (type === 'input') {
-        return task.inputs.filter(input => binaryType.includes(input.type.id));
-      }
-
-      if (type === 'output') {
-        return task.outputs.filter(output => binaryType.includes(output.type.id));
-      }
-
-      return [];
     },
   },
 };

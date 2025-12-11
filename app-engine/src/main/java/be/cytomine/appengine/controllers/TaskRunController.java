@@ -280,7 +280,8 @@ public class TaskRunController {
         log.info("ProvisionCollectionItem: calculating & caching CRC32 checksum...");
         taskRunService.setChecksumCRC32(
             "task-run-inputs-" + runId,
-            taskRunService.calculateFileCRC32(uploadedFile),
+            uploadedFile.isFile() ? taskRunService.calculateFileCRC32(uploadedFile)
+                : taskRunService.calculateDirectoryCRC32(uploadedFile),
             parameterName + "/" + String.join("/", indexesArray)
         );
         log.info("/task-runs/{run_id}/input-provisions/{param_name}/indexes Binary POST Ended");
@@ -340,9 +341,9 @@ public class TaskRunController {
         @PathVariable("run_id") String runId
     ) throws ProvisioningException {
         log.info("/task-runs/{run_id}/inputs GET");
-        List<TaskRunParameterValue> outputs = taskRunService.retrieveRunInputs(runId);
+        List<TaskRunParameterValue> inputs = taskRunService.retrieveRunInputs(runId);
         log.info("/task-runs/{run_id}/inputs GET Ended");
-        return new ResponseEntity<>(outputs, HttpStatus.OK);
+        return new ResponseEntity<>(inputs, HttpStatus.OK);
     }
 
     @GetMapping(value = "/task-runs/{run_id}/input/{parameter_name}")

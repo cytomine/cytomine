@@ -20,11 +20,15 @@ const mockTask2 = {
 const mockTaskRun1 = {
   id: 'c11e717a-d5ac-4655-80c7-06946d266264',
   state: 'FINISHED',
+  project: 42,
+  taskRunId: 'c11e717a-d5ac-4655-80c7-06946d266264',
 };
 
 const mockTaskRun2 = {
   id: '5f41ca2c-9b68-49fe-8f16-4e8005eb6893',
   state: 'RUNNING',
+  project: 42,
+  taskRunId: '5f41ca2c-9b68-49fe-8f16-4e8005eb6893',
 };
 
 const mockFetchInputs = jest.fn(() => Promise.resolve());
@@ -49,17 +53,14 @@ jest.mock('@/utils/appengine/task', () => ({
     mockTask1,
     mockTask2,
   ])),
-  fetchTaskRunStatus: jest.fn(() => Promise.resolve([
-    mockTaskRun1,
-    mockTaskRun2,
-  ])),
+  fetchTaskRunStatus: jest.fn((_, taskRunId) =>
+    Promise.resolve(taskRunId === mockTaskRun1.id ? mockTaskRun1 : mockTaskRun2)
+  ),
 }));
 
 jest.mock('@/utils/appengine/task-run', () => {
   const mockTaskRun = jest.fn().mockImplementation((resource) => ({
     ...resource,
-    project: null,
-    state: null,
     fetchInputs: mockFetchInputs,
     fetchOutputs: mockFetchOutputs,
   }));
@@ -130,6 +131,7 @@ describe('AppEngineSideBar.vue', () => {
     expect(fetchTaskRunsSpy).toHaveBeenCalledTimes(1);
 
     expect(wrapper.vm.tasks).toStrictEqual([mockTask1, mockTask2]);
+    expect(wrapper.vm.trackedTaskRuns).toMatchObject([mockTaskRun1, mockTaskRun2]);
   });
 
   it('should update tracked task runs every 2 seconds', async () => {
@@ -149,5 +151,14 @@ describe('AppEngineSideBar.vue', () => {
 
     expect(mockFetchInputs).toHaveBeenCalled();
     expect(mockFetchInputs).toHaveBeenCalledTimes(2);
+  });
+
+  it('should fetch outputs for finished task runs', async () => {
+    mockFetchOutputs.mockClear();
+
+    await wrapper.vm.fetchTaskRuns();
+
+    expect(mockFetchOutputs).toHaveBeenCalled();
+    expect(mockFetchOutputs).toHaveBeenCalledTimes(1);
   });
 });

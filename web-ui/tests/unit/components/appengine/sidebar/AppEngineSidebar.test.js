@@ -27,6 +27,9 @@ const mockTaskRun2 = {
   state: 'RUNNING',
 };
 
+const mockFetchInputs = jest.fn(() => Promise.resolve());
+const mockFetchOutputs = jest.fn(() => Promise.resolve());
+
 jest.mock('@/api', () => ({
   Cytomine: {
     instance: {
@@ -53,9 +56,6 @@ jest.mock('@/utils/appengine/task', () => ({
 }));
 
 jest.mock('@/utils/appengine/task-run', () => {
-  const mockFetchInputs = jest.fn();
-  const mockFetchOutputs = jest.fn();
-
   const mockTaskRun = jest.fn().mockImplementation((resource) => ({
     ...resource,
     project: null,
@@ -140,5 +140,14 @@ describe('AppEngineSideBar.vue', () => {
     expect(fetchTaskRunsSpy).toHaveBeenCalled();
 
     jest.useRealTimers();
+  });
+
+  it('should fetch inputs for all task runs', async () => {
+    mockFetchInputs.mockClear();
+
+    await wrapper.vm.fetchTaskRuns();
+
+    expect(mockFetchInputs).toHaveBeenCalled();
+    expect(mockFetchInputs).toHaveBeenCalledTimes(2);
   });
 });

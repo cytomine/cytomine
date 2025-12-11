@@ -18,7 +18,7 @@ spec:
     spec:
         containers:
         -   name: sam
-            image: "{{ include "cytomine.samImage" . }}"
+            image: "{{ .Values.images.sam }}"
             ports:
             - containerPort: {{ .Values.sam.port }}
             envFrom:

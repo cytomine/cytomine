@@ -3,6 +3,37 @@ import Buefy from 'buefy';
 
 import AppEngineSideBar from '@/components/appengine/sidebar/AppEngineSidebar.vue';
 
+const mockTask1 = {
+  id: 1,
+  name: 'Task 1',
+  namespace: 'namespace1',
+  version: '0.1.0',
+};
+
+const mockTask2 = {
+  id: 2,
+  name: 'Task 2',
+  namespace: 'namespace2',
+  version: '0.5.0',
+};
+
+const mockTaskRun1 = {
+  id: 'c11e717a-d5ac-4655-80c7-06946d266264',
+  state: 'FINISHED',
+  project: 42,
+  taskRunId: 'c11e717a-d5ac-4655-80c7-06946d266264',
+};
+
+const mockTaskRun2 = {
+  id: '5f41ca2c-9b68-49fe-8f16-4e8005eb6893',
+  state: 'RUNNING',
+  project: 42,
+  taskRunId: '5f41ca2c-9b68-49fe-8f16-4e8005eb6893',
+};
+
+const mockFetchInputs = jest.fn(() => Promise.resolve());
+const mockFetchOutputs = jest.fn(() => Promise.resolve());
+
 jest.mock('@/api', () => ({
   Cytomine: {
     instance: {
@@ -19,35 +50,24 @@ jest.mock('@/utils/image-utils', () => ({
 
 jest.mock('@/utils/appengine/task', () => ({
   fetchAll: jest.fn(() => Promise.resolve([
-    {namespace: 'namespace1', version: '0.1.0', name: 'Task 1', id: 1},
-    {namespace: 'namespace2', version: '0.5.0', name: 'Task 2', id: 2},
+    mockTask1,
+    mockTask2,
   ])),
-  /* eslint-disable */
-  fetchTaskInputs: jest.fn(() => Promise.resolve([
-    {param_name: 'input1'},
-    {param_name: 'input2'},
-  ])),
-  fetchTaskOutputs: jest.fn(() => Promise.resolve([
-    {param_name: 'output1'},
-    {param_name: 'output2'},
-  ])),
-  /* eslint-enable */
-  fetchTaskRunStatus: jest.fn(() => Promise.resolve([
-    {id: 'uuid-1'},
-    {id: 'uuid-2'},
-  ])),
+  fetchTaskRunStatus: jest.fn((_, taskRunId) =>
+    Promise.resolve(taskRunId === mockTaskRun1.id ? mockTaskRun1 : mockTaskRun2)
+  ),
 }));
 
 jest.mock('@/utils/appengine/task-run', () => {
   const mockTaskRun = jest.fn().mockImplementation((resource) => ({
     ...resource,
-    project: null,
-    state: null,
+    fetchInputs: mockFetchInputs,
+    fetchOutputs: mockFetchOutputs,
   }));
 
   mockTaskRun.fetchByProject = jest.fn(() => Promise.resolve([
-    {taskRunId: '1', project: 'project1'},
-    {taskRunId: '2', project: 'project2'},
+    mockTaskRun1,
+    mockTaskRun2,
   ]));
 
   return {
@@ -80,7 +100,7 @@ describe('AppEngineSideBar.vue', () => {
     });
   });
 
-  it('The component should be rendered and show the task options', () => {
+  it('should render and show the task options', () => {
     const headers = wrapper.findAll('header');
     expect(headers.length).toBe(2);
     expect(headers.at(0).text()).toBe('app-engine.execute-a-task');
@@ -88,30 +108,33 @@ describe('AppEngineSideBar.vue', () => {
 
     const taskOptions = wrapper.findAll('option');
     expect(taskOptions.length).toBe(2);
-    expect(taskOptions.at(0).text()).toBe('Task 1 (0.1.0)');
-    expect(taskOptions.at(1).text()).toBe('Task 2 (0.5.0)');
+    expect(taskOptions.at(0).text()).toBe(`${mockTask1.name} (${mockTask1.version})`);
+    expect(taskOptions.at(1).text()).toBe(`${mockTask2.name} (${mockTask2.version})`);
 
     expect(wrapper.find('h5').text()).toBe('app-engine.runs.title');
   });
 
-  it('The component should display the task name and description when a task is selected', async () => {
-    await wrapper.setData({selectedTask: {namespace: 'namespace1', version: '0.1.0', name: 'Task 1', id: 1}});
+  it('should display the task name and description when a task is selected', async () => {
+    await wrapper.setData({selectedTask: mockTask1});
 
-    expect(wrapper.find('.content p').text()).toBe('Task 1 (0.1.0)');
+    expect(wrapper.find('.content p').text()).toBe(`${mockTask1.name} (${mockTask1.version})`);
 
     const descriptionField = wrapper.find('.no-description');
     expect(descriptionField.exists()).toBe(true);
     expect(descriptionField.text()).toBe('app-engine.task.no-description');
   });
 
-  it('The component should fetch data on component created', async () => {
+  it('should fetch data on component created', async () => {
     expect(fetchTasksSpy).toHaveBeenCalled();
     expect(fetchTasksSpy).toHaveBeenCalledTimes(1);
     expect(fetchTaskRunsSpy).toHaveBeenCalled();
     expect(fetchTaskRunsSpy).toHaveBeenCalledTimes(1);
+
+    expect(wrapper.vm.tasks).toStrictEqual([mockTask1, mockTask2]);
+    expect(wrapper.vm.trackedTaskRuns).toMatchObject([mockTaskRun1, mockTaskRun2]);
   });
 
-  it('The component should update tracked task runs every 2 seconds', async () => {
+  it('should update tracked task runs every 2 seconds', async () => {
     jest.useFakeTimers();
     jest.advanceTimersByTime(2000);
 
@@ -119,5 +142,23 @@ describe('AppEngineSideBar.vue', () => {
     expect(fetchTaskRunsSpy).toHaveBeenCalled();
 
     jest.useRealTimers();
+  });
+
+  it('should fetch inputs for all task runs', async () => {
+    mockFetchInputs.mockClear();
+
+    await wrapper.vm.fetchTaskRuns();
+
+    expect(mockFetchInputs).toHaveBeenCalled();
+    expect(mockFetchInputs).toHaveBeenCalledTimes(2);
+  });
+
+  it('should fetch outputs for finished task runs', async () => {
+    mockFetchOutputs.mockClear();
+
+    await wrapper.vm.fetchTaskRuns();
+
+    expect(mockFetchOutputs).toHaveBeenCalled();
+    expect(mockFetchOutputs).toHaveBeenCalledTimes(1);
   });
 });

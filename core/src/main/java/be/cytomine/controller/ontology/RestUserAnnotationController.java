@@ -271,11 +271,10 @@ public class RestUserAnnotationController extends RestCytomineController {
             @RequestParam(required = false) Integer thickness,
             @RequestParam(required = false) String color,
             @RequestParam(required = false) Integer jpegQuality,
-            @RequestParam(required = false) String Authorization,
             ProxyExchange<byte[]> proxy
     ) throws IOException, ParseException {
         log.debug("REST request to get associated image of a abstract image");
-        UserAnnotation userAnnotation = userAnnotationService.find(id, Authorization)
+        UserAnnotation userAnnotation = userAnnotationService.find(id)
                 .orElseThrow(() -> new ObjectNotFoundException("UserAnnotation", id));
 
         CropParameter cropParameter = new CropParameter();

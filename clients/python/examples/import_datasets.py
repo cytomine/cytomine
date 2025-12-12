@@ -10,7 +10,7 @@ from cytomine.models import StorageCollection
 
 logging.basicConfig()
 logger = logging.getLogger("cytomine.client")
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 
 
 if __name__ == "__main__":
@@ -18,12 +18,16 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "--cytomine_core_host",
-        default="demo.cytomine.be",
         help="The Cytomine core host",
     )
+
+    parser.add_argument(
+        "--cytomine_core_external_host",
+        help="The Cytomine external host (won't be called)",
+    )
+
     parser.add_argument(
         "--cytomine_pims_host",
-        default="demo.cytomine.be",
         help="The Cytomine pims host",
     )
     parser.add_argument(
@@ -40,12 +44,14 @@ if __name__ == "__main__":
         help="The Cytomine private key",
     )
     params, _ = parser.parse_known_args(sys.argv[1:])
-
+    logger.info("Before cytomine")
     with Cytomine(
         host=params.cytomine_core_host,
         public_key=params.public_key,
         private_key=params.private_key,
+        real_url = params.cytomine_core_external_host,
     ) as cytomine:
+        logger.info("In cytomine {cytomine}")
         # To import the datasets, we need to know the ID of your Cytomine storage.
         storages = StorageCollection().fetch()
         storage = next(

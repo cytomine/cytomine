@@ -119,22 +119,29 @@ class CytomineAuth(requests.auth.AuthBase):
         private_key: str,
         base_url: str,
         base_path: str,
+        real_url: str = "" ,
         sign_with_base_path: bool = True,
     ) -> None:
         self.public_key = public_key
         self.private_key = private_key
         self.base_url = base_url
         self.base_path = base_path if sign_with_base_path else ""
+        self.real_url = real_url
+        self._logger = logging.getLogger("cytomine.auth")
 
     def __call__(self, r: requests.PreparedRequest) -> requests.PreparedRequest:
         content_type = r.headers.get("content-type", "")
+        self._logger.info("REAL URL: {real_url}")
+        url = self.real_url if self.real_url else self.base_url
         token = (
             f"{r.method}\n\n"
             f"{content_type}\n"
             f"{r.headers['date']}\n"
             f"{self.base_path}"
-            f"{r.url.replace(self.base_url, '')}"  # type: ignore
+            f"{r.url.replace(url, '')}"  # type: ignore
         )
+
+        self._logger.info("Auth token: {token}")
 
         signature = base64.b64encode(
             hmac.new(
@@ -200,6 +207,7 @@ class Cytomine:
         protocol: Optional[str] = None,
         working_path: str = "/tmp",
         configure_logging: bool = True,
+        real_url: str = "",
         **kwargs: Any,
     ) -> None:
         """
@@ -236,6 +244,7 @@ class Cytomine:
         self._use_cache = use_cache
         self._base_path = "/api/"
         self._current_user = None
+        self._real_url = real_url
 
         if configure_logging:
             logging.basicConfig(
@@ -560,6 +569,7 @@ class Cytomine:
                 self._private_key,
                 self._base_url(),
                 self._base_path,
+                self._real_url,
             ),
             headers=self._headers(),
             params=query_parameters,
@@ -571,7 +581,7 @@ class Cytomine:
         query_parameters: Optional[Dict[str, Any]] = None,
     ) -> Union[bool, Dict[str, str]]:
         response = self._get(uri, query_parameters)
-        self._log_response(response, uri)
+        self._log_response(f"{self._base_url} {response}", uri)
         if not response.status_code == requests.codes.ok:
             return False
 
@@ -982,6 +992,7 @@ class Cytomine:
         self,
         storage_id: int,
         pims_url: str,
+        public_core_url: str,
         dataset_names: Optional[str] = None,
     ) -> Dict[str, str]:
         """Import datasets from a given path."""
@@ -991,10 +1002,11 @@ class Cytomine:
         response = self._session.post(
             pims_url,
             auth=CytomineAuth(
-                self._public_key,
-                self._private_key,
-                core_url,
-                "",
+                public_key=self._public_key,
+                private_key=self._private_key,
+                base_url=core_url,
+                base_path="",
+                real_url = public_core_url,
             ),
             headers=self._headers(content_type="text/plain"),
             params={"storage_id": storage_id},

@@ -17,7 +17,10 @@ app_engine:
 ingress:
   className: nginx
 
-iam:
-  lsaaiClientIdSecretName: lsaai-client-id
-  lsaaiClientSecretSecretName: lsaai-client-secret
-  lsaaiEndpoint: https://login.aai.lifescience-ri.eu/oidc/.well-known/openid-configuration
+# iam:
+#   lsaaiClientIdSecretName: lsaai-client-id
+#   lsaaiClientSecretSecretName: lsaai-client-secret
+#   lsaaiEndpoint: https://login.aai.lifescience-ri.eu/oidc/.well-known/openid-configuration
+
+images:
+  pims_import: cytomine/python-client:fix-job-import@sha256:75fc16ca67f2b1be7a7540459826f2e2390b8c0855488bcde2afd52957680c30

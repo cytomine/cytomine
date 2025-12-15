@@ -1051,7 +1051,6 @@ public class TaskProvisioningService {
         log.info("Get IO file from storage: read file " + collectionItem + " from storage...");
         try {
             data = fileStorageHandler.readStorageData(data);
-            log.info("item ---------------------> " + data);
             File tempFile = zipDirectory(true, parameterName, data);
             if (Objects.nonNull(tempFile)) {
                 return tempFile;

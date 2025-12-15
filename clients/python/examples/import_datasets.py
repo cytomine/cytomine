@@ -30,25 +30,29 @@ if __name__ == "__main__":
         "--cytomine_pims_host",
         help="The Cytomine pims host",
     )
+
     parser.add_argument(
         "--public_key",
         help="The Cytomine public key",
     )
+
     parser.add_argument(
         "--private_key",
         help="The Cytomine private key",
     )
+
     parser.add_argument(
         "--import-uri",
         default="import",
         help="The Cytomine private key",
     )
+
     params, _ = parser.parse_known_args(sys.argv[1:])
     logger.info("Before cytomine")
     with Cytomine(
-        host=params.cytomine_core_host,
-        public_key=params.public_key,
-        private_key=params.private_key,
+        host = params.cytomine_core_host,
+        public_key = params.public_key,
+        private_key = params.private_key,
         real_url = params.cytomine_core_external_host,
     ) as cytomine:
         logger.info("In cytomine {cytomine}")
@@ -60,6 +64,6 @@ if __name__ == "__main__":
         if not storage:
             raise ValueError("Storage not found")
 
-        response = cytomine.import_datasets(storage.id, pims_url= urljoin(params.cytomine_pims_host, params.import_uri))
+        response = cytomine.import_datasets(storage.id, pims_url = urljoin(params.cytomine_pims_host, params.import_uri))
 
         print(response)

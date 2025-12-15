@@ -130,8 +130,8 @@ class CytomineAuth(requests.auth.AuthBase):
         self._logger = logging.getLogger("cytomine.auth")
 
     def __call__(self, r: requests.PreparedRequest) -> requests.PreparedRequest:
-        content_type = r.headers.get("content-type", "")
         self._logger.info("REAL URL: {real_url}")
+        content_type = r.headers.get("content-type", "")
         url = self.real_url if self.real_url else self.base_url
         token = (
             f"{r.method}\n\n"

@@ -34,3 +34,25 @@ WHERE slice_id IS NULL;
 -- changeset bathienle:make-image-slice-columns-not-null
 ALTER TABLE annotation_layer ALTER COLUMN image_id SET NOT NULL;
 ALTER TABLE annotation ALTER COLUMN slice_id SET NOT NULL;
+
+-- changeset bathienle:add-task-run-output-geometry
+-- Add task run output geometry table
+CREATE TABLE task_run_output_geometry (
+    id BIGINT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    task_run_id BIGINT NOT NULL,
+    image_instance_id BIGINT NOT NULL,
+    created TIMESTAMP,
+    updated TIMESTAMP,
+    version BIGINT DEFAULT 0,
+    CONSTRAINT fk_task_run_output_geometry_task_run FOREIGN KEY (task_run_id) REFERENCES task_run(id),
+    CONSTRAINT fk_task_run_output_geometry_image_instance FOREIGN KEY (image_instance_id) REFERENCES image_instance(id)
+);
+
+--changeset bathienle:add-index-task-run-output-geometry
+-- Create indexes for task_run_output_geometry
+CREATE INDEX idx_task_run_output_geometry_task_run
+    ON task_run_output_geometry(task_run_id);
+
+CREATE INDEX idx_task_run_output_geometry_image_instance
+    ON task_run_output_geometry(image_instance_id);

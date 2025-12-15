@@ -62,8 +62,7 @@
 </template>
 
 <script>
-import {appendShortTermToken} from '@/utils/token-utils.js';
-import {get} from '@/utils/store-helpers.js';
+import {Cytomine} from '@/api';
 
 export default {
   name: 'annotation-preview',
@@ -87,11 +86,11 @@ export default {
   data() {
     return {
       opened: false,
-      revisionCrop: 0
+      revisionCrop: 0,
+      imageDataUrl: null,
     };
   },
   computed: {
-    shortTermToken: get('currentUser/shortTermToken'),
     cropParameters() {
       let params = {
         square: true,
@@ -117,10 +116,8 @@ export default {
       return this.annot.annotationCropURL(this.size, 'jpg', this.cropParameters);
     },
     styleAnnotDetails() {
-      let url = appendShortTermToken(`${this.cropUrl}`, this.shortTermToken);
-      //console.log('url', url);
       return {
-        backgroundImage: `url(${url})`,
+        backgroundImage: this.imageDataUrl ? `url(${this.imageDataUrl})` : 'none',
         backgroundRepeat: 'no-repeat',
         width: this.size + 'px',
         height: this.size + 'px'
@@ -131,6 +128,19 @@ export default {
     }
   },
   methods: {
+    async fetchThumbnail() {
+      try {
+        const response = await Cytomine.instance.api.get(this.cropUrl, {responseType: 'blob'});
+
+        if (this.imageDataUrl) {
+          URL.revokeObjectURL(this.imageDataUrl);
+        }
+
+        this.imageDataUrl = URL.createObjectURL(response.data);
+      } catch (error) {
+        console.error('Failed to load annotation crop:', error);
+      }
+    },
     viewAnnot(trySameView = false) {
       if (this.clickable) {
         this.$emit('select', {annot: this.annot, options:{trySameView}});
@@ -159,7 +169,8 @@ export default {
       }
     }
   },
-  mounted() {
+  async mounted() {
+    await this.fetchThumbnail();
     this.$eventBus.$on('reloadAnnotationCrop', this.reloadAnnotationCropHandler);
   },
   beforeDestroy() {

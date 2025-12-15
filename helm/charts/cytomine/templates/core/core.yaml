@@ -28,7 +28,6 @@ spec:
       securityContext:
         runAsUser: {{ .Values.containerSecurity.userID }}
         fsGroup: {{ .Values.containerSecurity.fsgroupID }}
-      serviceAccountName: {{ include "cytomine.serviceAccountName" . }}
       {{- with .Values.global.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}

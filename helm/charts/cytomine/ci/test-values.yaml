@@ -21,3 +21,6 @@ iam:
   lsaaiClientIdSecretName:
   lsaaiClientSecretSecretName:
   lsaaiEndpoint:
+
+images:
+  imagePullSecretsName: docker-images-pull-secret

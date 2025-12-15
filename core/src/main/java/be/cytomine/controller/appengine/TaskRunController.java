@@ -2,6 +2,7 @@ package be.cytomine.controller.appengine;
 
 import be.cytomine.dto.appengine.task.TaskRunOutputRequest;
 import be.cytomine.service.appengine.TaskRunService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -70,7 +71,7 @@ public class TaskRunController {
         @PathVariable UUID task,
         @PathVariable("parameter_name") String parameterName,
         @RequestBody JsonNode json
-    ) {
+    ) throws JsonProcessingException {
         return taskRunService.provisionTaskRun(json, project, task, parameterName);
     }
 

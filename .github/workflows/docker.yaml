@@ -2,7 +2,15 @@ name: Docker push PR
 
 on:
   workflow_call:
-
+    secrets:
+      DOCKERHUB_USERNAME:
+        required: true
+      DOCKERHUB_TOKEN:
+        required: true
+      REGISTRY_USERNAME:
+        required: true
+      REGISTRY_TOKEN:
+        required: true
 jobs:
   build-push:
     runs-on: self-hosted
@@ -28,7 +36,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.1
         with:
           submodules: true
 
@@ -56,6 +64,6 @@ jobs:
           context: ${{ matrix.image.context || matrix.image.name }}
           file: ./${{ matrix.image.dockerfile_location || matrix.image.context || matrix.image.name }}/Dockerfile
           push: true
-          tags: ${{ github.ref_name == 'main' && '' || 'registry.cytomine.org/' }}cytomine/${{ matrix.image.name }}:${{ github.ref_name == 'main' && 'latest' || github.sha }}
+          tags: ${{ (github.ref_name != 'main' && 'registry.cytomine.org/') || '' }}cytomine/${{ matrix.image.name }}:${{ github.ref_name == 'main' && 'latest' || github.sha }}
           allow: network.host
           network: host

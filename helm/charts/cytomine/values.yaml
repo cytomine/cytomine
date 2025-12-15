@@ -49,9 +49,6 @@ ingress:
   className:
 
 images:
-  #
-  # Cytomine Images
-  #
   app_engine: cytomine/app-engine:latest
   sam: cytomine/sam:latest
   core: cytomine/core:latest
@@ -71,6 +68,7 @@ images:
   nginx: cytomine/nginx:latest
   iam: keycloak/keycloak:26.3
   pullPolicy: Always
+  imagePullSecretsName:
 
 #
 # Services - these are the services deployed by this chart

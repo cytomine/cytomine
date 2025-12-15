@@ -1,7 +1,7 @@
 import Model from './model';
 import Task from './task';
 import {Cytomine} from '@/api';
-
+import {BINARY_TYPES} from '@/utils/app';
 
 export default class TaskRun extends Model {
   /** @inheritdoc */
@@ -62,13 +62,31 @@ export default class TaskRun extends Model {
   }
 
   async fetchInputs() {
-    let {data} = await Cytomine.instance.api.get(`${this.uri}/inputs`);
-    return data;
+    this.inputs = (await Cytomine.instance.api.get(`${this.uri}/inputs`)).data;
+
+    const binaryInputs = this.inputs.filter(input => BINARY_TYPES.includes(input.type.toLowerCase()));
+
+    await Promise.all(
+      binaryInputs.map(async (input) => {
+        input.value = await this.fetchSingleIO(input.param_name, 'input');
+      })
+    );
+
+    return this.inputs;
   }
 
   async fetchOutputs() {
-    let {data} = await Cytomine.instance.api.get(`${this.uri}/outputs`);
-    return data;
+    this.outputs = (await Cytomine.instance.api.get(`${this.uri}/outputs`)).data;
+
+    const binaryOutputs = this.outputs.filter(output => BINARY_TYPES.includes(output.type.toLowerCase()));
+
+    await Promise.all(
+      binaryOutputs.map(async (output) => {
+        output.value = await this.fetchSingleIO(output.param_name, 'output');
+      })
+    );
+
+    return this.outputs;
   }
 
   async fetchSingleIO(parameterName, type) {

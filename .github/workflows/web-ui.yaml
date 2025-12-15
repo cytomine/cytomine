@@ -47,7 +47,7 @@ jobs:
 
       - name: Upload test coverage
         if: ${{ always() }}
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: coverage
           path: ./web-ui/coverage
@@ -55,7 +55,7 @@ jobs:
 
       - name: Upload test report
         if: ${{ always() }}
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: test-report.html
           path: ./web-ui/reports/test-report.html

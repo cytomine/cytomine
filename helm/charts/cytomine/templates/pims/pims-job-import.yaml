@@ -13,6 +13,7 @@ spec:
     spec:
       template:
         spec:
+          serviceAccountName: {{ include "cytomine.serviceAccountName" . }}
           containers:
           # putting multiple containers for psql commands for the sake of clarity
           - name: private-key-fetcher

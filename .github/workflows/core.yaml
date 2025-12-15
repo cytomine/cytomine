@@ -55,7 +55,7 @@ jobs:
 
       - name: Upload test reports
         if: ${{ always() }}
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: core-reports
           path: core/build/reports/
@@ -63,7 +63,7 @@ jobs:
 
       - name: Upload test results
         if: ${{ always() }}
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: test-results
           path: core/build/test-results/
@@ -71,7 +71,7 @@ jobs:
 
       - name: Upload Java Code Coverage (JaCoCo)
         if: ${{ always() }}
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: jacoco
           path: core/build/jacoco/

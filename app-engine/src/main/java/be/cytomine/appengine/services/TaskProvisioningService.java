@@ -980,14 +980,14 @@ public class TaskProvisioningService {
         }
 
         log.info("Get IO file from storage: done");
-        File tempFile = zipDirectory(parameterName, data);
+        File tempFile = zipDirectory(false, parameterName, data);
         if (Objects.nonNull(tempFile)) {
             return tempFile;
         }
         return data.peek().getData();
     }
 
-    private File zipDirectory(String parameterName, StorageData data)
+    private File zipDirectory(boolean isCollectionItem, String parameterName, StorageData data)
         throws ProvisioningException {
 
         if (data.peek().getStorageDataType().equals(StorageDataType.DIRECTORY)) {
@@ -1004,6 +1004,10 @@ public class TaskProvisioningService {
                             entryName = current.getName();
                         } else {
                             entryName = current.getName() + "/";
+                        }
+
+                        if (isCollectionItem) {
+                            entryName = entryName.substring(parameterName.length() + 1);
                         }
 
                         if (current.getStorageDataType().equals(StorageDataType.FILE)) {
@@ -1048,7 +1052,7 @@ public class TaskProvisioningService {
         try {
             data = fileStorageHandler.readStorageData(data);
             log.info("item ---------------------> " + data);
-            File tempFile = zipDirectory(parameterName, data);
+            File tempFile = zipDirectory(true, parameterName, data);
             if (Objects.nonNull(tempFile)) {
                 return tempFile;
             }

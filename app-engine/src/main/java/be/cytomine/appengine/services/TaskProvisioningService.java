@@ -48,6 +48,7 @@ import org.apache.commons.fileupload2.core.FileItemInput;
 import org.apache.commons.fileupload2.core.FileItemInputIterator;
 import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletFileUpload;
 import org.apache.commons.io.IOUtils;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -979,6 +980,16 @@ public class TaskProvisioningService {
         }
 
         log.info("Get IO file from storage: done");
+        File tempFile = zipDirectory(parameterName, data);
+        if (Objects.nonNull(tempFile)) {
+            return tempFile;
+        }
+        return data.peek().getData();
+    }
+
+    private File zipDirectory(String parameterName, StorageData data)
+        throws ProvisioningException {
+
         if (data.peek().getStorageDataType().equals(StorageDataType.DIRECTORY)) {
             // this is a directory-based parameter that must be zipped
             log.info("Get IO file from storage: zipping...");
@@ -1014,9 +1025,8 @@ public class TaskProvisioningService {
                 throw new ProvisioningException(error);
             }
 
-
         }
-        return data.peek().getData();
+        return null;
     }
 
     public File retrieveSingleRunCollectionItemIO(
@@ -1037,6 +1047,11 @@ public class TaskProvisioningService {
         log.info("Get IO file from storage: read file " + collectionItem + " from storage...");
         try {
             data = fileStorageHandler.readStorageData(data);
+            log.info("item ---------------------> " + data);
+            File tempFile = zipDirectory(parameterName, data);
+            if (Objects.nonNull(tempFile)) {
+                return tempFile;
+            }
         } catch (FileStorageException e) {
             AppEngineError error = ErrorBuilder.buildParamRelatedError(
                 ErrorCode.STORAGE_READING_FILE_FAILED,

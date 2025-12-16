@@ -18,7 +18,7 @@ spec:
           # putting multiple containers for psql commands for the sake of clarity
           - name: private-key-fetcher
             image: {{ .Values.images.postgresql }}
-            imagePullPolicy: IfNotPresent
+            imagePullPolicy: {{ .Values.images.pullPolicy }}
             command: ["/bin/sh", "-c"]
             args: ["psql --no-align --quiet --tuples-only -U $(POSTGIS_USER) -h $(POSTGIS_HOST) -o /data/private_key -c \"SELECT private_key from sec_user where username = 'admin'\" && cat /data/private_key"]
             env:
@@ -38,7 +38,7 @@ spec:
               mountPath: /data
           - name: public-key-fetcher
             image: {{ .Values.images.postgresql }}
-            imagePullPolicy: IfNotPresent
+            imagePullPolicy: {{ .Values.images.pullPolicy }}
             command: ["/bin/sh", "-c"]
             args: ["psql --no-align --quiet --tuples-only -U $(POSTGIS_USER) -h $(POSTGIS_HOST) -o /data/public_key -c \"SELECT public_key from sec_user where username = 'admin'\" && cat /data/public_key"]
             env:
@@ -58,7 +58,7 @@ spec:
               mountPath: /data
           - name: import-call
             image: {{ .Values.images.pims_import }}
-            imagePullPolicy: Always
+            imagePullPolicy: {{ .Values.images.pullPolicy }}
             command: ["/bin/sh", "-c"]
             # we cannot currently differenciate urls in this helpers, so we call from outside.
             args: [ "python examples/import_datasets.py --cytomine_core_host=http://core.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.core.port }} --cytomine_core_external_host={{ include "core.url" . }}  --cytomine_pims_host=http://pims.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.pims.port }}/ --public_key=$$(cat /data/public_key) --private_key=$$(cat /data/private_key) --import-uri=ims/import"]

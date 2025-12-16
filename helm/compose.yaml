@@ -19,10 +19,10 @@ services:
       - K3S_KUBECONFIG_MODE=666S
     volumes:
       - ../k3s/entrypoint.sh:/entrypoint:ro
-      - ../k3s/registries.yaml:/etc/rancher/k3s/registries.yaml:ro
       - ../k3s/serviceaccounts.yaml:/var/lib/rancher/k3s/server/manifests/serviceaccounts.yaml:ro
       - ../k3s/nginx-ingress.yaml:/var/lib/rancher/k3s/server/manifests/nginx-ingress.yaml:ro
       - ../k3s/cytomine-local-ns.yaml:/var/lib/rancher/k3s/server/manifests/cytomine-local-ns.yaml:ro
+      - ../.kube/secrets/registries.yaml:/etc/rancher/k3s/registries.yaml:ro
       - ../.kube/secrets/lsaai-secrets.yaml:/var/lib/rancher/k3s/server/manifests/lsaai-secrets.yaml:ro
       - ../.kube/secrets/docker-image-pull-secrets.yaml:/var/lib/rancher/k3s/server/manifests/docker-image-pull-secrets.yaml:ro
       # This is just so that we get the kubeconfig file out

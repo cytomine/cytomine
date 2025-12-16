@@ -24,6 +24,8 @@ ingress:
 
 images:
   pims_import: registry.cytomine.org/cytomine/python-client:613d3b7c9e51b52790169a9cc311c89c718e9604
-  imagePullSecretsNames:
-  - docker-images-pull-secret
+  postgresql:  registry.cytomine.org/docker/cytomine/postgis:latest
+  # imagePullSecretsNames:
+  # - docker-images-pull-secret
+  pullPolicy: IfNotPresent
 #  - docker-images-pull-secret2

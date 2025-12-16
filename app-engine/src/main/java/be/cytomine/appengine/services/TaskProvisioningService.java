@@ -979,6 +979,16 @@ public class TaskProvisioningService {
         }
 
         log.info("Get IO file from storage: done");
+        File tempFile = zipDirectory(false, parameterName, data);
+        if (Objects.nonNull(tempFile)) {
+            return tempFile;
+        }
+        return data.peek().getData();
+    }
+
+    private File zipDirectory(boolean isCollectionItem, String parameterName, StorageData data)
+        throws ProvisioningException {
+
         if (data.peek().getStorageDataType().equals(StorageDataType.DIRECTORY)) {
             // this is a directory-based parameter that must be zipped
             log.info("Get IO file from storage: zipping...");
@@ -993,6 +1003,10 @@ public class TaskProvisioningService {
                             entryName = current.getName();
                         } else {
                             entryName = current.getName() + "/";
+                        }
+
+                        if (isCollectionItem) {
+                            entryName = entryName.substring(parameterName.length() + 1);
                         }
 
                         if (current.getStorageDataType().equals(StorageDataType.FILE)) {
@@ -1014,9 +1028,8 @@ public class TaskProvisioningService {
                 throw new ProvisioningException(error);
             }
 
-
         }
-        return data.peek().getData();
+        return null;
     }
 
     public File retrieveSingleRunCollectionItemIO(
@@ -1037,6 +1050,10 @@ public class TaskProvisioningService {
         log.info("Get IO file from storage: read file " + collectionItem + " from storage...");
         try {
             data = fileStorageHandler.readStorageData(data);
+            File tempFile = zipDirectory(true, parameterName, data);
+            if (Objects.nonNull(tempFile)) {
+                return tempFile;
+            }
         } catch (FileStorageException e) {
             AppEngineError error = ErrorBuilder.buildParamRelatedError(
                 ErrorCode.STORAGE_READING_FILE_FAILED,

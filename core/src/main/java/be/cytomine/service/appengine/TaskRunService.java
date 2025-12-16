@@ -69,6 +69,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.springframework.security.acls.domain.BasePermission.READ;
 
@@ -495,11 +496,9 @@ public class TaskRunService {
             throw new ObjectNotFoundException("Outputs from", taskRunId);
         }
 
-        List<String> geometries = outputs
+        List<TaskRunValue> geometries = outputs
                 .stream()
-                .map(TaskRunValue::getValue)
-                .filter(value -> value instanceof String geometry && geometryService.isGeometry(geometry))
-                .map(value -> (String) value)
+                .filter(output -> output.getValue() instanceof String geometry && geometryService.isGeometry(geometry))
                 .toList();
 
         List<TaskRunValue> geoArrayValues = outputs
@@ -517,36 +516,47 @@ public class TaskRunService {
         }
 
         String layerName = annotationLayerService.createLayerName(taskRunResponse.task().name(), taskRunResponse.task().version(), taskRun.getCreated());
-        AnnotationLayer annotationLayer = null;
-        SliceInstance slice = null;
-        if (!geometries.isEmpty() || !geoArrayValues.isEmpty()) {
-            annotationLayer = annotationLayerService.createAnnotationLayer(layerName, taskRun.getImage());
-            slice = sliceInstanceRepository.findAllByImage(taskRun.getImage())
+        List<TaskRunOutputGeometry> outputGeometries = taskRunOutputGeometryRepository.findAllByTaskRunId(taskRun.getId());
+        Map<String, TaskRunOutputGeometry> outputGeometryMap = outputGeometries
                 .stream()
-                .findFirst()
-                .orElseThrow(() -> new ObjectNotFoundException("slice with image", taskRun.getImage().getId()));
+                .collect(Collectors.toMap(TaskRunOutputGeometry::getName, og -> og));
+        Map<Long, AnnotationLayer> annotationLayers = new HashMap<>();
+        Map<Long, SliceInstance> slices = new HashMap<>();
+        for (TaskRunOutputGeometry outputGeometry : outputGeometries) {
+            AnnotationLayer layer = annotationLayerService.createAnnotationLayer(layerName, outputGeometry.getImage());
+            annotationLayers.putIfAbsent(outputGeometry.getImage().getId(), layer);
+
+            SliceInstance slice = sliceInstanceRepository.findAllByImage(outputGeometry.getImage())
+                    .stream()
+                    .findFirst()
+                    .orElseThrow(() -> new ObjectNotFoundException("slice with image", outputGeometry.getImage().getId()));
+            slices.putIfAbsent(outputGeometry.getImage().getId(), slice);
         }
 
         TaskRunLayer taskRunLayer = taskRunLayerRepository
                 .findByTaskRunAndImage(taskRun, taskRun.getImage())
                 .orElse(new TaskRunLayer());
 
-        for (String geometry : geometries) {
-            String wktGeometry = geometryService.GeoJSONToWKT(geometry);
+        for (TaskRunValue value : geometries) {
+            TaskRunOutputGeometry correspondingOutput = outputGeometryMap.get(value.getParameterName());
+            AnnotationLayer layer = annotationLayers.get(correspondingOutput.getImage().getId());
+            SliceInstance slice = slices.get(correspondingOutput.getImage().getId());
+
+            String wktGeometry = geometryService.GeoJSONToWKT((String) value.getValue());
             Geometry parsedGeometry = GeometryService.addOffset(wktGeometry, taskRunLayer.getXOffset(), taskRunLayer.getYOffset());
-            annotationService.createAnnotation(annotationLayer, parsedGeometry.toString(), slice);
+            annotationService.createAnnotation(layer, parsedGeometry.toString(), slice);
         }
 
-        for (TaskRunValue arrayValue : geoArrayValues) {
-            JsonNode items = new ObjectMapper().convertValue(arrayValue.getValue(), JsonNode.class);
-            for (JsonNode item : items) {
-                if (geometryService.isGeometry(item.get("value").asText())) {
-                    String wktGeometry = geometryService.GeoJSONToWKT(item.get("value").asText());
-                    Geometry parsedGeometry = GeometryService.addOffset(wktGeometry, taskRunLayer.getXOffset(), taskRunLayer.getYOffset());
-                    annotationService.createAnnotation(annotationLayer, parsedGeometry.toString(), slice);
-                }
-            }
-        }
+        // for (TaskRunValue arrayValue : geoArrayValues) {
+        //     JsonNode items = new ObjectMapper().convertValue(arrayValue.getValue(), JsonNode.class);
+        //     for (JsonNode item : items) {
+        //         if (geometryService.isGeometry(item.get("value").asText())) {
+        //             String wktGeometry = geometryService.GeoJSONToWKT(item.get("value").asText());
+        //             Geometry parsedGeometry = GeometryService.addOffset(wktGeometry, taskRunLayer.getXOffset(), taskRunLayer.getYOffset());
+        //             annotationService.createAnnotation(annotationLayer, parsedGeometry.toString(), slice);
+        //         }
+        //     }
+        // }
 
         return response;
     }

@@ -3,6 +3,7 @@ package be.cytomine.service.appengine;
 import be.cytomine.domain.annotation.AnnotationLayer;
 import be.cytomine.domain.appengine.TaskRun;
 import be.cytomine.domain.appengine.TaskRunLayer;
+import be.cytomine.domain.appengine.TaskRunOutputGeometry;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.ontology.AnnotationDomain;
@@ -20,6 +21,7 @@ import be.cytomine.dto.appengine.task.type.TaskParameterType;
 import be.cytomine.dto.image.CropParameter;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.appengine.TaskRunLayerRepository;
+import be.cytomine.repository.appengine.TaskRunOutputGeometryRepository;
 import be.cytomine.repository.appengine.TaskRunRepository;
 import be.cytomine.repository.image.SliceInstanceRepository;
 import be.cytomine.service.CurrentUserService;
@@ -100,6 +102,8 @@ public class TaskRunService {
     private final TaskRunRepository taskRunRepository;
 
     private final TaskRunLayerRepository taskRunLayerRepository;
+
+    private final TaskRunOutputGeometryRepository taskRunOutputGeometryRepository;
 
     private final ObjectMapper objectMapper;
 
@@ -564,16 +568,26 @@ public class TaskRunService {
         ImageInstance image = imageInstanceService.find(request.imageId())
                 .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", request.imageId()));
 
+        TaskRunOutputGeometry output = new TaskRunOutputGeometry();
+        output.setName(parameterName);
+        output.setTaskRun(taskRun);
+        output.setImage(image);
+        taskRunOutputGeometryRepository.saveAndFlush(output);
+
         TaskRunResponse taskRunResponse = appEngineService.getTaskRun(taskRunId.toString());
 
         String layerName = annotationLayerService.createLayerName(taskRunResponse.task().name(), taskRunResponse.task().version(), taskRun.getCreated());
         AnnotationLayer annotationLayer = annotationLayerService.createAnnotationLayer(layerName, image);
-        TaskRunLayer newLayer = new TaskRunLayer();
-        newLayer.setAnnotationLayer(annotationLayer);
-        newLayer.setTaskRun(taskRun);
-        newLayer.setImage(taskRun.getImage());
-        newLayer.setXOffset(0);
-        newLayer.setYOffset(0);
-        taskRunLayerRepository.saveAndFlush(newLayer);
+        taskRunLayerRepository
+                .findByTaskRunAndImage(taskRun, image)
+                .orElseGet(() -> {
+                    TaskRunLayer newLayer = new TaskRunLayer();
+                    newLayer.setAnnotationLayer(annotationLayer);
+                    newLayer.setTaskRun(taskRun);
+                    newLayer.setImage(image);
+                    newLayer.setXOffset(0);
+                    newLayer.setYOffset(0);
+                    return taskRunLayerRepository.saveAndFlush(newLayer);
+                });
     }
 }

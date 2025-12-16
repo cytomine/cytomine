@@ -20,7 +20,7 @@ import be.cytomine.utils.JsonObject;
 public class AnnotationLayer extends CytomineDomain {
 
     @NotBlank
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY)

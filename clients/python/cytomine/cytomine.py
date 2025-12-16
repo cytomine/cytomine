@@ -137,7 +137,6 @@ class CytomineAuth(requests.auth.AuthBase):
             f"{r.method}\n\n"
             f"{content_type}\n"
             f"{r.headers['date']}\n"
-            f"{self.base_path}"
             f"{r.url.replace(url, '')}"  # type: ignore
         )
 

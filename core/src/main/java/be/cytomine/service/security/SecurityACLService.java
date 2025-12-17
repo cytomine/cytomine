@@ -119,7 +119,6 @@ public class SecurityACLService {
 
 
     public void check(CytomineDomain domain, Permission permission, User currentUser) {
-        System.out.println(domain.getId());
         if (domain!=null) {
             if (!hasPermission(retrieveContainer(domain), permission, currentRoleService.isAdminByNow(currentUser))) {
                 throw new ForbiddenException("You don't have the right to read or modify this resource! "  + domain.getClass() + " " + domain.getId());

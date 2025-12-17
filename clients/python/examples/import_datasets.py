@@ -53,7 +53,6 @@ if __name__ == "__main__":
         host = params.cytomine_core_host,
         public_key = params.public_key,
         private_key = params.private_key,
-        real_url = params.cytomine_core_external_host,
     ) as cytomine:
         logger.info("In cytomine {cytomine}")
         # To import the datasets, we need to know the ID of your Cytomine storage.

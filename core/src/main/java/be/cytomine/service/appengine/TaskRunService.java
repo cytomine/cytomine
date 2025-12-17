@@ -3,7 +3,6 @@ package be.cytomine.service.appengine;
 import be.cytomine.domain.annotation.AnnotationLayer;
 import be.cytomine.domain.appengine.TaskRun;
 import be.cytomine.domain.appengine.TaskRunLayer;
-import be.cytomine.domain.appengine.TaskRunOutputGeometry;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.ontology.AnnotationDomain;
@@ -17,7 +16,6 @@ import be.cytomine.dto.appengine.task.TaskRunValue;
 import be.cytomine.dto.image.CropParameter;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.appengine.TaskRunLayerRepository;
-import be.cytomine.repository.appengine.TaskRunOutputGeometryRepository;
 import be.cytomine.repository.appengine.TaskRunRepository;
 import be.cytomine.repository.image.SliceInstanceRepository;
 import be.cytomine.service.CurrentUserService;
@@ -99,8 +97,6 @@ public class TaskRunService {
     private final TaskRunRepository taskRunRepository;
 
     private final TaskRunLayerRepository taskRunLayerRepository;
-
-    private final TaskRunOutputGeometryRepository taskRunOutputGeometryRepository;
 
     private final ObjectMapper objectMapper;
 
@@ -313,10 +309,10 @@ public class TaskRunService {
                 Envelope bounds = GeometryService.getBounds(annotation.getWktLocation());
 
                 TaskRun taskRun = taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId)
-                    .orElseThrow(() -> new ObjectNotFoundException("TaskRun", taskRunId));
+                        .orElseThrow(() -> new ObjectNotFoundException("TaskRun", taskRunId));
 
                 Optional<TaskRunLayer> optionalTaskRunLayer = taskRunLayerRepository
-                    .findByTaskRunAndImage(taskRun, taskRun.getImage());
+                        .findByTaskRunAndOutputName(taskRun, parameterName);
                 if (optionalTaskRunLayer.isPresent()) {
                     TaskRunLayer taskRunLayer = optionalTaskRunLayer.get();
                     taskRunLayer.setXOffset((int) bounds.getMinX());
@@ -468,57 +464,38 @@ public class TaskRunService {
                 && output.getSubType().equalsIgnoreCase("GEOMETRY"))
                 .toList();
 
-        String taskRunData = appEngineService.get("task-runs/" + taskRunId);
-        TaskRunResponse taskRunResponse;
-        try {
-            taskRunResponse = new ObjectMapper().readValue(taskRunData, TaskRunResponse.class);
-        } catch(JsonProcessingException e) {
-            throw new ObjectNotFoundException("Task run", taskRunId);
-        }
-
-        String layerName = annotationLayerService.createLayerName(taskRunResponse.task().name(), taskRunResponse.task().version(), taskRun.getCreated());
-        List<TaskRunOutputGeometry> outputGeometries = taskRunOutputGeometryRepository.findAllByTaskRunId(taskRun.getId());
-        Map<String, TaskRunOutputGeometry> outputGeometryMap = outputGeometries
-                .stream()
-                .collect(Collectors.toMap(TaskRunOutputGeometry::getName, og -> og));
-        Map<Long, AnnotationLayer> annotationLayers = new HashMap<>();
+        List<TaskRunLayer> trls = taskRunLayerRepository.findAllByTaskRun(taskRun);
+        Map<String, TaskRunLayer> trlsmap = trls.stream()
+                .collect(Collectors.toMap(TaskRunLayer::getOutputName, trl -> trl));
         Map<Long, SliceInstance> slices = new HashMap<>();
-        for (TaskRunOutputGeometry outputGeometry : outputGeometries) {
-            AnnotationLayer layer = annotationLayerService.createAnnotationLayer(layerName, outputGeometry.getImage());
-            annotationLayers.putIfAbsent(outputGeometry.getImage().getId(), layer);
-
-            SliceInstance slice = sliceInstanceRepository.findAllByImage(outputGeometry.getImage())
-                    .stream()
-                    .findFirst()
-                    .orElseThrow(() -> new ObjectNotFoundException("slice with image", outputGeometry.getImage().getId()));
-            slices.putIfAbsent(outputGeometry.getImage().getId(), slice);
-        }
-
-        TaskRunLayer taskRunLayer = taskRunLayerRepository
-                .findByTaskRunAndImage(taskRun, taskRun.getImage())
-                .orElse(new TaskRunLayer());
 
         for (TaskRunValue value : geometries) {
-            TaskRunOutputGeometry correspondingOutput = outputGeometryMap.get(value.getParameterName());
-            AnnotationLayer layer = annotationLayers.get(correspondingOutput.getImage().getId());
-            SliceInstance slice = slices.get(correspondingOutput.getImage().getId());
+            TaskRunLayer trl = trlsmap.get(value.getParameterName());
+            SliceInstance slice = sliceInstanceRepository.findAllByImage(trl.getImage())
+                    .stream()
+                    .findFirst()
+                    .orElseThrow(() -> new ObjectNotFoundException("slice with image", trl.getImage().getId()));
+            slices.putIfAbsent(trl.getImage().getId(), slice);
 
             String wktGeometry = geometryService.GeoJSONToWKT((String) value.getValue());
-            Geometry parsedGeometry = GeometryService.addOffset(wktGeometry, taskRunLayer.getXOffset(), taskRunLayer.getYOffset());
-            annotationService.createAnnotation(layer, parsedGeometry.toString(), slice);
+            Geometry parsedGeometry = GeometryService.addOffset(wktGeometry, trl.getXOffset(), trl.getYOffset());
+            annotationService.createAnnotation(trl.getAnnotationLayer(), parsedGeometry.toString(), slice);
         }
 
         for (TaskRunValue arrayValue : geoArrayValues) {
-            TaskRunOutputGeometry correspondingOutput = outputGeometryMap.get(arrayValue.getParameterName());
-            AnnotationLayer layer = annotationLayers.get(correspondingOutput.getImage().getId());
-            SliceInstance slice = slices.get(correspondingOutput.getImage().getId());
+            TaskRunLayer trl = trlsmap.get(arrayValue.getParameterName());
+            SliceInstance slice = sliceInstanceRepository.findAllByImage(trl.getImage())
+                    .stream()
+                    .findFirst()
+                    .orElseThrow(() -> new ObjectNotFoundException("slice with image", trl.getImage().getId()));
+            slices.putIfAbsent(trl.getImage().getId(), slice);
 
             JsonNode items = new ObjectMapper().convertValue(arrayValue.getValue(), JsonNode.class);
             for (JsonNode item : items) {
                 if (geometryService.isGeometry(item.get("value").asText())) {
                     String wktGeometry = geometryService.GeoJSONToWKT(item.get("value").asText());
-                    Geometry parsedGeometry = GeometryService.addOffset(wktGeometry, taskRunLayer.getXOffset(), taskRunLayer.getYOffset());
-                    annotationService.createAnnotation(layer, parsedGeometry.toString(), slice);
+                    Geometry parsedGeometry = GeometryService.addOffset(wktGeometry, trl.getXOffset(), trl.getYOffset());
+                    annotationService.createAnnotation(trl.getAnnotationLayer(), parsedGeometry.toString(), slice);
                 }
             }
         }
@@ -543,18 +520,12 @@ public class TaskRunService {
         ImageInstance image = imageInstanceService.find(request.imageId())
                 .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", request.imageId()));
 
-        TaskRunOutputGeometry output = new TaskRunOutputGeometry();
-        output.setName(parameterName);
-        output.setTaskRun(taskRun);
-        output.setImage(image);
-        taskRunOutputGeometryRepository.saveAndFlush(output);
-
         TaskRunResponse taskRunResponse = appEngineService.getTaskRun(taskRunId.toString());
 
         String layerName = annotationLayerService.createLayerName(taskRunResponse.task().name(), taskRunResponse.task().version(), taskRun.getCreated());
         AnnotationLayer annotationLayer = annotationLayerService.createAnnotationLayer(layerName, image);
         taskRunLayerRepository
-                .findByTaskRunAndImage(taskRun, image)
+                .findByTaskRunAndOutputName(taskRun, parameterName)
                 .orElseGet(() -> {
                     TaskRunLayer newLayer = new TaskRunLayer();
                     newLayer.setAnnotationLayer(annotationLayer);
@@ -562,6 +533,7 @@ public class TaskRunService {
                     newLayer.setImage(image);
                     newLayer.setXOffset(0);
                     newLayer.setYOffset(0);
+                    newLayer.setOutputName(parameterName);
                     return taskRunLayerRepository.saveAndFlush(newLayer);
                 });
     }

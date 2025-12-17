@@ -14,7 +14,11 @@ import be.cytomine.domain.image.ImageInstance;
 public interface TaskRunLayerRepository extends JpaRepository<TaskRunLayer, Long> {
     List<TaskRunLayer> findAllByImageId(Long imageId);
 
+    List<TaskRunLayer> findAllByTaskRun(TaskRun taskRun);
+
     Optional<TaskRunLayer> findByAnnotationLayerId(Long id);
 
     Optional<TaskRunLayer> findByTaskRunAndImage(TaskRun taskRun, ImageInstance image);
+
+    Optional<TaskRunLayer> findByTaskRunAndOutputName(TaskRun taskRun, String outputName);
 }

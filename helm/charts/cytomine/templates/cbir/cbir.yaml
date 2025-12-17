@@ -16,6 +16,7 @@ spec:
       annotations:
         checksum/config: "{{ include (print $.Template.BasePath "/cbir/cbir-config.yaml") . | sha256sum }}"
     spec:
+      serviceAccountName: {{ include "cytomine.serviceAccountName" . }}
       containers:
       - name: cbir
         image: "{{ .Values.images.cbir }}"

@@ -42,6 +42,7 @@ from typing import (
 )
 
 import requests  # type: ignore
+from urllib.parse import urlparse
 from cachecontrol import CacheControlAdapter
 from requests_toolbelt import MultipartEncoder
 from requests_toolbelt.utils import dump
@@ -127,13 +128,13 @@ class CytomineAuth(requests.auth.AuthBase):
         self.base_path = base_path if sign_with_base_path else ""
 
     def __call__(self, r: requests.PreparedRequest) -> requests.PreparedRequest:
+        uri = urlparse(r.url).path
         content_type = r.headers.get("content-type", "")
         token = (
             f"{r.method}\n\n"
             f"{content_type}\n"
             f"{r.headers['date']}\n"
-            f"{self.base_path}"
-            f"{r.url.replace(self.base_url, '')}"  # type: ignore
+            f"{uri}"
         )
 
         signature = base64.b64encode(

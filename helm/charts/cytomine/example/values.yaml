@@ -21,3 +21,6 @@ iam:
   lsaaiClientIdSecretName: lsaai-client-id
   lsaaiClientSecretSecretName: lsaai-client-secret
   lsaaiEndpoint: https://login.aai.lifescience-ri.eu/oidc/.well-known/openid-configuration
+
+images:
+  core: registry.cytomine.org/cytomine/core:fix-job-import@sha256:6f2d714284c780c39ca401dfc95290b55add6452b16b5d7f228639150cab6f6d

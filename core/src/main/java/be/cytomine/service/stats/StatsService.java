@@ -362,6 +362,7 @@ public class StatsService {
     }
 
     public List<JsonObject> statUserAnnotations(Project project) {
+        System.out.println("statUserAnnotations, "+project.getId());
         securityACLService.check(project, READ);
         Map<Long, JsonObject> result = new HashMap<>();
 

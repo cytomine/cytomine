@@ -46,7 +46,7 @@ public class RestProjectController extends RestCytomineController {
     private final CurrentUserService currentUserService;
 
     private final CurrentRoleService currentRoleService;
-    
+
     private final OntologyRepository ontologyRepository;
     private final UserService userService;
 

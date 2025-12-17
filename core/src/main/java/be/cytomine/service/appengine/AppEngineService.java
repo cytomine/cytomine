@@ -89,7 +89,11 @@ public class AppEngineService {
         headers.setContentType(contentType);
 
         HttpEntity<B> requestEntity = new HttpEntity<>(body, headers);
-
-        return restTemplate.exchange(finalUrl, HttpMethod.POST, requestEntity, String.class).getBody();
+        try {
+            return restTemplate.exchange(finalUrl, HttpMethod.POST, requestEntity, String.class)
+                .getBody();
+        } catch (HttpStatusCodeException e) {
+            throw new AppEngineException("error from appengine", e.getStatusCode().value(), e.getResponseBodyAsString());
+        }
     }
 }

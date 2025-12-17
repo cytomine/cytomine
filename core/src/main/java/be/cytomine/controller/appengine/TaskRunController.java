@@ -95,6 +95,7 @@ public class TaskRunController {
         @PathVariable("parameter_name") String parameterName,
         @RequestBody TaskRunOutputRequest request
     ) {
+        log.info("PUT /project/{}/task-runs/{}/input-provisions/{}/geometry", project, task, parameterName);
         taskRunService.provisionTargetImage(request, project, task, parameterName);
     }
 

@@ -508,16 +508,20 @@ public class TaskRunService {
             annotationService.createAnnotation(layer, parsedGeometry.toString(), slice);
         }
 
-        // for (TaskRunValue arrayValue : geoArrayValues) {
-        //     JsonNode items = new ObjectMapper().convertValue(arrayValue.getValue(), JsonNode.class);
-        //     for (JsonNode item : items) {
-        //         if (geometryService.isGeometry(item.get("value").asText())) {
-        //             String wktGeometry = geometryService.GeoJSONToWKT(item.get("value").asText());
-        //             Geometry parsedGeometry = GeometryService.addOffset(wktGeometry, taskRunLayer.getXOffset(), taskRunLayer.getYOffset());
-        //             annotationService.createAnnotation(annotationLayer, parsedGeometry.toString(), slice);
-        //         }
-        //     }
-        // }
+        for (TaskRunValue arrayValue : geoArrayValues) {
+            TaskRunOutputGeometry correspondingOutput = outputGeometryMap.get(arrayValue.getParameterName());
+            AnnotationLayer layer = annotationLayers.get(correspondingOutput.getImage().getId());
+            SliceInstance slice = slices.get(correspondingOutput.getImage().getId());
+
+            JsonNode items = new ObjectMapper().convertValue(arrayValue.getValue(), JsonNode.class);
+            for (JsonNode item : items) {
+                if (geometryService.isGeometry(item.get("value").asText())) {
+                    String wktGeometry = geometryService.GeoJSONToWKT(item.get("value").asText());
+                    Geometry parsedGeometry = GeometryService.addOffset(wktGeometry, taskRunLayer.getXOffset(), taskRunLayer.getYOffset());
+                    annotationService.createAnnotation(layer, parsedGeometry.toString(), slice);
+                }
+            }
+        }
 
         return response;
     }

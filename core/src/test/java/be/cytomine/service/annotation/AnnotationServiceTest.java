@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import be.cytomine.domain.annotation.Annotation;
 import be.cytomine.domain.annotation.AnnotationLayer;
+import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.repository.annotation.AnnotationRepository;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -36,6 +37,8 @@ public class AnnotationServiceTest {
 
     private static AnnotationLayer mockAnnotationLayer;
 
+    private static SliceInstance mockSliceInstance;
+
     private static String mockGeometry;
 
     @BeforeAll
@@ -53,7 +56,7 @@ public class AnnotationServiceTest {
     public void createAnnotationShouldReturnAnnotation() {
         when(annotationRepository.saveAndFlush(any(Annotation.class))).thenReturn(mockAnnotation);
     
-        Annotation result = annotationService.createAnnotation(mockAnnotationLayer, mockGeometry);
+        Annotation result = annotationService.createAnnotation(mockAnnotationLayer, mockGeometry, mockSliceInstance);
     
         assertNotNull(result);
         assertEquals(mockAnnotation.getId(), result.getId());

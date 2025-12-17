@@ -474,9 +474,8 @@ public class TaskRunService {
 
     public String postStateAction(JsonNode body, Long projectId, UUID taskRunId) {
         checkTaskRun(projectId, taskRunId);
-        String post = appEngineService.post("task-runs/" + taskRunId + "/state-actions", body,
+        return appEngineService.post("task-runs/" + taskRunId + "/state-actions", body,
             MediaType.APPLICATION_JSON);
-        return post;
     }
 
     public String getOutputs(Long projectId, UUID taskRunId) {

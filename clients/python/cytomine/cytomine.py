@@ -564,6 +564,7 @@ class Cytomine:
             ),
             headers=self._headers(),
             params=query_parameters,
+            verify=False
         )
 
     def get(

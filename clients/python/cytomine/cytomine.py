@@ -808,7 +808,8 @@ class Cytomine:
             response = self._get(uri, None, with_base_path=False)
             self._log_response(response, uri)
             return response.status_code == requests.codes.ok
-        except Exception:  # pylint: disable=broad-except
+        except Exception as inst:  # pylint: disable=broad-except
+            print(inst)
             return False
 
     def wait_to_accept_connection(

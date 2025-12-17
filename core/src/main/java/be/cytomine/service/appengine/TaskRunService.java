@@ -12,12 +12,8 @@ import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.dto.appengine.task.TaskRunDetail;
 import be.cytomine.dto.appengine.task.TaskRunOutputRequest;
-import be.cytomine.dto.appengine.task.TaskRunOutputResponse;
 import be.cytomine.dto.appengine.task.TaskRunResponse;
 import be.cytomine.dto.appengine.task.TaskRunValue;
-import be.cytomine.dto.appengine.task.type.CollectionType;
-import be.cytomine.dto.appengine.task.type.GeometryType;
-import be.cytomine.dto.appengine.task.type.TaskParameterType;
 import be.cytomine.dto.image.CropParameter;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.appengine.TaskRunLayerRepository;
@@ -131,41 +127,6 @@ public class TaskRunService {
         taskRun.setTaskRunId(taskRunResponse.id());
         taskRun.setImage(image);
         taskRun = taskRunRepository.saveAndFlush(taskRun);
-
-        List<TaskRunOutputResponse> taskRunOutputResponse;
-        String taskOutputsResponse = appEngineService.get("/tasks/" + taskId + "/outputs");
-        try {
-            taskRunOutputResponse = objectMapper.readValue(taskOutputsResponse, new TypeReference<>() {});
-        } catch (JsonProcessingException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error parsing JSON response");
-        }
-
-        boolean hasGeometry = false;
-        for (TaskRunOutputResponse taskRunOutput : taskRunOutputResponse) {
-            TaskParameterType type = taskRunOutput.type();
-
-            if (type instanceof GeometryType) {
-                hasGeometry = true;
-                break;
-            }
-
-            if (type instanceof CollectionType array && array.subType() instanceof GeometryType) {
-                hasGeometry = true;
-                break;
-            }
-        }
-
-        if (hasGeometry) {
-            String layerName = annotationLayerService.createLayerName(taskRunResponse.task().name(), taskRunResponse.task().version(), taskRun.getCreated());
-            AnnotationLayer annotationLayer = annotationLayerService.createAnnotationLayer(layerName, image);
-            TaskRunLayer newLayer = new TaskRunLayer();
-            newLayer.setAnnotationLayer(annotationLayer);
-            newLayer.setTaskRun(taskRun);
-            newLayer.setImage(taskRun.getImage());
-            newLayer.setXOffset(0);
-            newLayer.setYOffset(0);
-            taskRunLayerRepository.saveAndFlush(newLayer);
-        }
 
         // We return the App engine response. Should we include information from Cytomine (project ID, user ID, created, ... ?)
         return appEngineResponse;

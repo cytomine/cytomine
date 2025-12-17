@@ -25,6 +25,7 @@ spec:
       annotations:
         checksum/config: "{{ include (print $.Template.BasePath "/pims/pims-config.yaml") . | sha256sum }}"
     spec:
+      serviceAccountName: {{ include "cytomine.serviceAccountName" . }}
       securityContext:
         runAsUser: {{ .Values.containerSecurity.userID }}
         fsGroup: {{ .Values.containerSecurity.fsgroupID }}

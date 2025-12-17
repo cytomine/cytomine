@@ -16,6 +16,7 @@ spec:
       annotations:
         checksum/config: "{{ include (print $.Template.BasePath "/iam/iam-config.yaml") . | sha256sum }}"
     spec:
+      serviceAccountName: {{ include "cytomine.serviceAccountName" . }}
       volumes:
       - name: keystore
         emptyDir: {}

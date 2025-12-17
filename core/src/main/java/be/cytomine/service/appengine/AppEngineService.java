@@ -1,5 +1,7 @@
 package be.cytomine.service.appengine;
 
+import be.cytomine.exceptions.AppEngineException;
+import be.cytomine.exceptions.ForbiddenException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -65,7 +67,7 @@ public class AppEngineService {
             ResponseEntity<String> result = restTemplate.exchange(buildFullUrl(uri), method, request, String.class);
             return result.getBody();
         } catch (HttpStatusCodeException e) {
-            return e.getResponseBodyAsString();
+            throw new AppEngineException("error from appengine", e.getStatusCode().value(), e.getResponseBodyAsString());
         }
     }
 

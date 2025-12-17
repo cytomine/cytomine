@@ -23,4 +23,6 @@ iam:
   lsaaiEndpoint:
 
 images:
-  imagePullSecretsName: docker-images-pull-secret
+  imagePullSecretsNames:
+  - docker-images-pull-secret
+  - docker-images-pull-secret2

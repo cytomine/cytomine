@@ -41,7 +41,7 @@ spec:
         {{ end }}
       containers:
         - name: postgis
-          image: "{{ .Values.images.postgresql }}"
+          image: {{ .Values.images.postgresql }}
           imagePullPolicy: {{ .Values.images.pullPolicy }}
           volumeMounts:
             - name: postgres-storage

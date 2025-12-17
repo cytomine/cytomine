@@ -128,7 +128,7 @@ class CytomineAuth(requests.auth.AuthBase):
         self.base_path = base_path if sign_with_base_path else ""
 
     def __call__(self, r: requests.PreparedRequest) -> requests.PreparedRequest:
-        uri = urlparse(r.url).path
+        uri = urlparse(r.url).path if urlparse(r.url).path else '/'
         content_type = r.headers.get("content-type", "")
         token = (
             f"{r.method}\n\n"

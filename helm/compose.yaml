@@ -24,6 +24,7 @@ services:
       - ../k3s/nginx-ingress.yaml:/var/lib/rancher/k3s/server/manifests/nginx-ingress.yaml:ro
       - ../k3s/cytomine-local-ns.yaml:/var/lib/rancher/k3s/server/manifests/cytomine-local-ns.yaml:ro
       - ../.kube/secrets/lsaai-secrets.yaml:/var/lib/rancher/k3s/server/manifests/lsaai-secrets.yaml:ro
+      - ../.kube/secrets/registries.yaml:/etc/rancher/k3s/registries.yaml:ro
       # This is just so that we get the kubeconfig file out
       - ../.kube/shared:/output/
       - ../data/dataset:/data/dataset

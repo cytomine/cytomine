@@ -25,6 +25,7 @@ spec:
       annotations:
         checksum/config: "{{ include (print $.Template.BasePath "/web_ui/web_ui-config.yaml") . | sha256sum }}"
     spec:
+      serviceAccountName: {{ include "cytomine.serviceAccountName" . }}
       {{- with .Values.global.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}

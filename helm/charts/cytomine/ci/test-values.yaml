@@ -25,4 +25,4 @@ iam:
 images:
   imagePullSecretsNames:
   - docker-images-pull-secret
-  - docker-images-pull-secret2
+  - docker-images-pull-secret-2

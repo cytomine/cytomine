@@ -14,13 +14,13 @@ spec:
       template:
         spec:
           serviceAccountName: {{ include "cytomine.serviceAccountName" . }}
-          containers:
+          initContainers:
           # putting multiple containers for psql commands for the sake of clarity
           - name: private-key-fetcher
             image: {{ .Values.images.postgresql }}
             imagePullPolicy: {{ .Values.images.pullPolicy }}
             command: ["/bin/sh", "-c"]
-            args: ["psql --no-align --quiet --tuples-only -U $(POSTGIS_USER) -h $(POSTGIS_HOST) -o /data/private_key -c \"SELECT private_key from sec_user where username = 'admin'\" && cat /data/private_key"]
+            args: ["psql --no-align --tuples-only -U $(POSTGIS_USER) -h $(POSTGIS_HOST) -o /data/private_key -c \"SELECT private_key from sec_user where username = 'admin'\" && cat /data/private_key"]
             env:
             - name: PGPASSWORD
               valueFrom:
@@ -40,7 +40,7 @@ spec:
             image: {{ .Values.images.postgresql }}
             imagePullPolicy: {{ .Values.images.pullPolicy }}
             command: ["/bin/sh", "-c"]
-            args: ["psql --no-align --quiet --tuples-only -U $(POSTGIS_USER) -h $(POSTGIS_HOST) -o /data/public_key -c \"SELECT public_key from sec_user where username = 'admin'\" && cat /data/public_key"]
+            args: ["psql --no-align --tuples-only -U $(POSTGIS_USER) -h $(POSTGIS_HOST) -o /data/public_key -c \"SELECT public_key from sec_user where username = 'admin'\" && cat /data/public_key"]
             env:
             - name: PGPASSWORD
               valueFrom:
@@ -56,6 +56,7 @@ spec:
             volumeMounts:
             - name: data
               mountPath: /data
+          containers:
           - name: import-call
             image: {{ .Values.images.pims_import }}
             imagePullPolicy: {{ .Values.images.pullPolicy }}

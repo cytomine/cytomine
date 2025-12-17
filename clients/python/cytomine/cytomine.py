@@ -42,6 +42,7 @@ from typing import (
 )
 
 import requests  # type: ignore
+from urllib.parse import urlparse
 from cachecontrol import CacheControlAdapter
 from requests_toolbelt import MultipartEncoder
 from requests_toolbelt.utils import dump
@@ -128,14 +129,15 @@ class CytomineAuth(requests.auth.AuthBase):
         self._logger = logging.getLogger("cytomine.auth")
 
     def __call__(self, r: requests.PreparedRequest) -> requests.PreparedRequest:
-        self._logger.info("REAL URL: {real_url}")
+        uri = urlparse(r.url).path
+        self._logger.info("REAL URI: {uri}")
         content_type = r.headers.get("content-type", "")
-        url = self.real_url if self.real_url else self.base_url
+
         token = (
             f"{r.method}\n\n"
             f"{content_type}\n"
             f"{r.headers['date']}\n"
-            f"{urllib.parse(r.url).path}"  # type: ignore
+            f"{uri}"  # type: ignore
         )
 
         self._logger.info("Auth token: {token}")

@@ -62,6 +62,7 @@ import Task from '@/utils/appengine/task';
 import TaskRun from '@/utils/appengine/task-run';
 import TaskIoForm from '@/components/appengine/forms/TaskIoForm';
 import TaskRunTable from '@/components/appengine/task-run/TaskRunTable';
+import {isGeometry} from '@/utils/app';
 import {get} from '@/utils/store-helpers';
 
 export default {
@@ -92,7 +93,7 @@ export default {
             await taskRun.fetchOutputs();
           }
 
-          if (taskRun.outputs.some(output => output.type === 'GEOMETRY')) {
+          if (taskRun.outputs.some(output => isGeometry(output))) {
             this.$eventBus.$emit('annotation-layers:refresh');
           }
         }

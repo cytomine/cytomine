@@ -89,7 +89,7 @@ RUN chmod +x /start-reload.sh
 COPY ./pims/pims /app/pims
 COPY ./pims/resources/ ./resources/
 
-COPY ./pims/pyproject.toml /pims/uv.lock ./
+COPY ./pims/pyproject.toml ./pims/uv.lock ./
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync
 

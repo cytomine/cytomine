@@ -48,7 +48,7 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
         Optional<User> userByReference = userRepository.findByReference(sub.toString());
         Optional<User> userByUsername = userRepository.findByUsername(jwtAuthenticationToken.getName());
         if (userByUsername.isPresent() && userByReference.isEmpty()) {
-            User user = userByReference.get();
+            User user = userByUsername.get();
             user.setReference(sub.toString());
             userRepository.save(user);
         } else if (userByReference.isEmpty()) {

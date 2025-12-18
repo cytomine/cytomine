@@ -100,7 +100,10 @@ export default {
           this.$emit('appengine:task:started', taskRun);
         });
       } catch (e) {
-        this.$buefy.toast.open({message: e.message, type: 'is-danger'});
+        const serverError = e.response && e.response.data
+          ? (e.response.data.message || e.response.data.errorCode)
+          : e.message;
+        this.$buefy.toast.open({message: `Error : ${serverError}`, type: 'is-danger', indefinite: true});
       }
     },
     getInputProvisions() {

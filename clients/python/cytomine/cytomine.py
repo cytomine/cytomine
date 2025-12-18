@@ -983,8 +983,6 @@ class Cytomine:
     ) -> Dict[str, str]:
         """Import datasets from a given path."""
 
-        core_url = self._base_url(with_base_path=False)
-
         response = self._session.post(
             pims_url,
             auth=CytomineAuth(

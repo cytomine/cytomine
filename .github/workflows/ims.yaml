@@ -21,7 +21,7 @@ jobs:
           version: ${{ vars.UV_VERSION }}
 
       - name: Lint
-        run: uv run ruff check
+        run: uv --directory ./pims run ruff check
 
   tests:
     runs-on: self-hosted

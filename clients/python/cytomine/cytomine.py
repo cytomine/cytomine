@@ -134,7 +134,8 @@ class CytomineAuth(requests.auth.AuthBase):
             f"{r.method}\n\n"
             f"{content_type}\n"
             f"{r.headers['date']}\n"
-            f"{uri}"
+            f"{self.base_path}"
+            f"{r.url.replace(self.base_url, '')}"
         )
 
         signature = base64.b64encode(
@@ -1001,6 +1002,7 @@ class Cytomine:
             ),
             headers=self._headers(content_type="text/plain"),
             params={"storage_id": storage_id},
+            verify=False,
         )
 
         if response.status_code != requests.codes.ok:

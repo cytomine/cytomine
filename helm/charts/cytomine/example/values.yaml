@@ -17,16 +17,12 @@ app_engine:
 ingress:
   className: nginx
 
-# iam:
-#   lsaaiClientIdSecretName: lsaai-client-id
-#   lsaaiClientSecretSecretName: lsaai-client-secret
-#   lsaaiEndpoint: https://login.aai.lifescience-ri.eu/oidc/.well-known/openid-configuration
+iam:
+  lsaaiClientIdSecretName: lsaai-client-id
+  lsaaiClientSecretSecretName: lsaai-client-secret
+  lsaaiEndpoint: https://login.aai.lifescience-ri.eu/oidc/.well-known/openid-configuration
 
 images:
-  pims_import: registry.cytomine.org/cytomine/python-client:fix-job-import@sha256:63bb97f7abff0a73bcc4859034d94ba055099188400825032b959b744ef32a90
-  core: registry.cytomine.org/cytomine/core:fix-job-import@sha256:2078f77ff317977c82072c4d49cd91bd33c909bd15d3fde5b261e646c31121ae
-  # postgresql:  registry.cytomine.org/docker/cytomine/postgis:latest
-  # imagePullSecretsNames:
-  # - docker-images-pull-secret
   pullPolicy: IfNotPresent
-#  - docker-images-pull-secret2
+
+

@@ -46,7 +46,12 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
         Map<String, Object> tokenAttributes = jwtAuthenticationToken.getTokenAttributes();
         UUID sub = UUID.fromString(tokenAttributes.get("sub").toString());
         Optional<User> userByReference = userRepository.findByReference(sub.toString());
-        if (userByReference.isEmpty()) {
+        Optional<User> userByUsername = userRepository.findByUsername(jwtAuthenticationToken.getName());
+        if (userByUsername.isPresent() && userByReference.isEmpty()) {
+            User user = userByUsername.get();
+            user.setReference(sub.toString());
+            userRepository.save(user);
+        } else if (userByReference.isEmpty()) {
             User newUser = new User();
             newUser.setUsername(jwtAuthenticationToken.getName());
             newUser.setReference(sub.toString());

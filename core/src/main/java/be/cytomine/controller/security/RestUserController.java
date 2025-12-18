@@ -185,16 +185,10 @@ public class RestUserController extends RestCytomineController {
             @RequestParam(value = "content-MD5", required = false, defaultValue = "") String contentMD5,
             @RequestParam(value = "content-type", required = false, defaultValue = "") String contenttype,
             @RequestParam(value = "content-Type", required = false, defaultValue = "") String contentType,
-            @RequestParam(value = "date", required = false, defaultValue = "") String date,
-            @RequestParam(value = "queryString", required = false, defaultValue = "") String queryString,
-            @RequestParam(value = "forwardURI", required = false, defaultValue = "") String forwardURI
+            @RequestParam(value = "date", required = false, defaultValue = "") String date
     ) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
         User user = currentUserService.getCurrentUser();
-        if (!queryString.isEmpty()) {
-            queryString = "?" + queryString;
-        }
-        String signature = ApiKeyFilter.generateKeys(method,contentMD5,contenttype.isEmpty()?contentType:contenttype,date,queryString,forwardURI,user);
-
+        String signature = ApiKeyFilter.generateKeys(method,contentMD5,contenttype.isEmpty()?contentType:contenttype,date,user);
         return responseSuccess(JsonObject.of("signature", signature, "publicKey", user.getPublicKey()));
     }
 

@@ -1,5 +1,7 @@
 package be.cytomine.appengine.exceptions.handlers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -26,7 +28,7 @@ public class ProvisionTaskApiExceptionHandler {
     }
 
     @ExceptionHandler({ ProvisioningException.class })
-    public final ResponseEntity<AppEngineError> handleProvisioningException(
+    public final ResponseEntity<?> handleProvisioningException(
         ProvisioningException e
     ) {
         String runNotFoundErrorMessage = "APPE-internal-run-not-found-error";
@@ -47,8 +49,14 @@ public class ProvisionTaskApiExceptionHandler {
             e.getError().getErrorCode().equalsIgnoreCase(provisionsNotFound)
             || e.getError().getErrorCode().equalsIgnoreCase(invalidRunState)
         ) {
-            log.info("forbidden 403 error [{}]", e.getMessage());
-            return new ResponseEntity<AppEngineError>(e.getError(), HttpStatus.FORBIDDEN);
+            log.info("forbidden 403 error [{}]", e.getError());
+            ObjectMapper objectMapper = new ObjectMapper();
+            ObjectNode root = objectMapper.createObjectNode();
+
+            root.put("errorCode", e.getError().getErrorCode());
+            root.put("message", e.getError().getMessage());
+
+            return new ResponseEntity<String>(root.toString(), HttpStatus.FORBIDDEN);
         }
 
         log.info("bad request 400 error [{}]", e.getMessage());

@@ -16,6 +16,7 @@ spec:
       annotations:
         checksum/config: "{{ include (print $.Template.BasePath "/sam/sam-config.yaml") . | sha256sum }}"
     spec:
+        serviceAccountName: {{ include "cytomine.serviceAccountName" . }}
         containers:
         -   name: sam
             image: "{{ .Values.images.sam }}"

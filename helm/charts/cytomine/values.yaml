@@ -55,6 +55,7 @@ images:
   pims: cytomine/pims:latest
   web_ui: cytomine/web-ui:latest
   cbir: cytomine/cbir:latest
+  pims_import: cytomine/python-client:latest
 
   #
   # External Images
@@ -68,7 +69,8 @@ images:
   nginx: cytomine/nginx:latest
   iam: keycloak/keycloak:26.3
   pullPolicy: Always
-  imagePullSecretsName:
+  # array of image secrets names
+  imagePullSecretsNames:
 
 #
 # Services - these are the services deployed by this chart

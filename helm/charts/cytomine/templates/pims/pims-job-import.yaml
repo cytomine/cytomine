@@ -13,11 +13,12 @@ spec:
     spec:
       template:
         spec:
-          containers:
+          serviceAccountName: {{ include "cytomine.serviceAccountName" . }}
+          initContainers:
           # putting multiple containers for psql commands for the sake of clarity
           - name: private-key-fetcher
-            image: postgres:14
-            imagePullPolicy: IfNotPresent
+            image: {{ .Values.images.postgresql }}
+            imagePullPolicy: {{ .Values.images.pullPolicy }}
             command: ["/bin/sh", "-c"]
             args: ["psql --no-align --quiet --tuples-only -U $(POSTGIS_USER) -h $(POSTGIS_HOST) -o /data/private_key -c \"SELECT private_key from sec_user where username = 'admin'\" && cat /data/private_key"]
             env:
@@ -36,8 +37,8 @@ spec:
             - name: data
               mountPath: /data
           - name: public-key-fetcher
-            image: postgres:14
-            imagePullPolicy: IfNotPresent
+            image: {{ .Values.images.postgresql }}
+            imagePullPolicy: {{ .Values.images.pullPolicy }}
             command: ["/bin/sh", "-c"]
             args: ["psql --no-align --quiet --tuples-only -U $(POSTGIS_USER) -h $(POSTGIS_HOST) -o /data/public_key -c \"SELECT public_key from sec_user where username = 'admin'\" && cat /data/public_key"]
             env:
@@ -55,9 +56,10 @@ spec:
             volumeMounts:
             - name: data
               mountPath: /data
+          containers:
           - name: import-call
-            image: cytomine/python-client:latest
-            imagePullPolicy: Always
+            image: {{ .Values.images.pims_import }}
+            imagePullPolicy: {{ .Values.images.pullPolicy }}
             command: ["/bin/sh", "-c"]
             # we cannot currently differenciate urls in this helpers, so we call from outside.
             args: [ "python examples/import_datasets.py --cytomine_core_host=http://core.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.core.port }} --cytomine_pims_host=http://pims.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.pims.port }}/ --public_key=$$(cat /data/public_key) --private_key=$$(cat /data/private_key) --import-uri=ims/import"]

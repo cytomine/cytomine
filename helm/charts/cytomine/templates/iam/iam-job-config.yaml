@@ -9,6 +9,7 @@ metadata:
 spec:
   template:
     spec:
+      serviceAccountName: {{ include "cytomine.serviceAccountName" . }}
       initContainers: # initContainers run in sequence, not containers
       - name: login
         image: "{{ .Values.images.iam }}"

@@ -21,3 +21,6 @@ iam:
   lsaaiClientIdSecretName: lsaai-client-id
   lsaaiClientSecretSecretName: lsaai-client-secret
   lsaaiEndpoint: https://login.aai.lifescience-ri.eu/oidc/.well-known/openid-configuration
+
+images:
+  pullPolicy: IfNotPresent

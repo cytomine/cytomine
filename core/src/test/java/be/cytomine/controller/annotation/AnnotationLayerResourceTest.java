@@ -13,6 +13,7 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.domain.annotation.Annotation;
 import be.cytomine.domain.annotation.AnnotationLayer;
 import be.cytomine.domain.appengine.TaskRunLayer;
+import be.cytomine.domain.image.SliceInstance;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.everyItem;
@@ -48,9 +49,10 @@ public class AnnotationLayerResourceTest {
     @Test
     public void getAnnotationsByLayerShouldReturnAnnotations() throws Exception {
         AnnotationLayer annotationLayer = builder.given_a_persisted_annotation_layer();
-        Annotation first = builder.given_a_not_persisted_annotation(annotationLayer);
-        Annotation second = builder.given_a_not_persisted_annotation(annotationLayer);
-        Annotation third = builder.given_a_not_persisted_annotation(annotationLayer);
+        SliceInstance slice = builder.given_a_slice_instance();
+        Annotation first = builder.given_a_not_persisted_annotation(annotationLayer, slice);
+        Annotation second = builder.given_a_not_persisted_annotation(annotationLayer, slice);
+        Annotation third = builder.given_a_not_persisted_annotation(annotationLayer, slice);
         manager.persist(first);
         manager.persist(second);
         manager.persist(third);

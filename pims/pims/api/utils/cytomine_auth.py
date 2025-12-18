@@ -59,9 +59,8 @@ def parse_request_token(request: Request):
     else:
         client_url_path = request.url.path
 
-    message = "{}\n{}\n{}\n{}\n{}{}".format(
-        request.method, md5, content_type,
-        date, client_url_path, query_string
+    message = "{}\n{}\n{}\n{}".format(
+        request.method, md5, content_type, date
     )
     return message
 

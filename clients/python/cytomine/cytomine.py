@@ -131,11 +131,8 @@ class CytomineAuth(requests.auth.AuthBase):
         token = (
             f"{r.method}\n\n"
             f"{content_type}\n"
-            f"{r.headers['date']}\n"
-            f"{self.base_path}"
-            f"{r.url.replace(self.base_url, '')}"  # type: ignore
+            f"{r.headers['date']}"
         )
-
         signature = base64.b64encode(
             hmac.new(
                 bytes(self.private_key, "utf-8"),
@@ -993,7 +990,7 @@ class Cytomine:
             auth=CytomineAuth(
                 self._public_key,
                 self._private_key,
-                core_url,
+                pims_url,
                 "",
             ),
             headers=self._headers(content_type="text/plain"),

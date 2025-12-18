@@ -50,9 +50,9 @@ COPY --from=registry.cytomine.org/github/ghcr.io/astral-sh/uv:0.8.13 /uv /uvx /b
 
 # Download plugins
 WORKDIR /app
-COPY ./docker/plugins.py /app/plugins.py
-COPY ${PLUGIN_CSV} /app/plugins.csv
-COPY ./plugins/ /app/plugins/
+COPY ./pims/docker/plugins.py /app/plugins.py
+COPY ./pims/${PLUGIN_CSV} /app/plugins.csv
+COPY ./pims/plugins/ /app/plugins/
 
 RUN python plugins.py \
         --plugin_csv /app/plugins.csv \
@@ -68,26 +68,28 @@ RUN python plugins.py \
 # Cleaning. Cannot be done before as plugin prerequisites could use apt-get.
 RUN rm -rf /var/lib/apt/lists/*
 
+COPY ./clients/python /clients/python
+
 RUN --mount=type=cache,target=/root/.cache/uv \
-    --mount=type=bind,source=uv.lock,target=uv.lock \
-    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    --mount=type=bind,source=./pims/uv.lock,target=uv.lock \
+    --mount=type=bind,source=./pims/pyproject.toml,target=pyproject.toml \
     uv sync --frozen --no-install-project
 
 # Add default config
-COPY ./pims-config.env /app/pims-config.env
-COPY ./logging-prod.yml /app/logging.yml
-COPY ./docker/gunicorn_conf.py /app/gunicorn_conf.py
+COPY ./pims/pims-config.env /app/pims-config.env
+COPY ./pims/logging-prod.yml /app/logging.yml
+COPY ./pims/docker/gunicorn_conf.py /app/gunicorn_conf.py
 
-COPY ./docker/start.sh /start.sh
+COPY ./pims/docker/start.sh /start.sh
 RUN chmod +x /start.sh
 
-COPY ./docker/start-reload.sh /start-reload.sh
+COPY ./pims/docker/start-reload.sh /start-reload.sh
 RUN chmod +x /start-reload.sh
 
-COPY ./pims /app/pims
-COPY ./resources/ ./resources/
+COPY ./pims/pims /app/pims
+COPY ./pims/resources/ ./resources/
 
-COPY ./pyproject.toml ./uv.lock ./
+COPY ./pims/pyproject.toml ./pims/uv.lock ./
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync
 

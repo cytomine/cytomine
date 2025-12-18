@@ -6,10 +6,6 @@ on:
 permissions:
   contents: read
 
-defaults:
-  run:
-    working-directory: ./pims
-
 jobs:
   lint:
     runs-on: self-hosted
@@ -25,7 +21,7 @@ jobs:
           version: ${{ vars.UV_VERSION }}
 
       - name: Lint
-        run: uv run ruff check
+        run: uv --directory ./pims run ruff check
 
   tests:
     runs-on: self-hosted
@@ -50,6 +46,6 @@ jobs:
           version: ${{ vars.UV_VERSION }}
 
       - name: Run tests
-        run: uv run pytest tests
+        run: uv --directory ./pims run pytest tests
         env:
           CONFIG_FILE: ./tests/pims-config.env

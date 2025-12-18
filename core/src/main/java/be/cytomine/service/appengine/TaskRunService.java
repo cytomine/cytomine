@@ -333,43 +333,48 @@ public class TaskRunService {
 
         if (json.get("type").get("id").asText().equals("image")) {
             JsonNode value = json.get("value");
-            String type = value.get("type").asText();
-            Long id = value.get("id").asLong();
+            String type = Objects.nonNull(value.get("type")) ? value.get("type").asText() : null;
+            Long id = Objects.nonNull(value.get("id")) ? value.get("id").asLong() : null;
 
             MultiValueMap<String, Object> body;
-            if (type.equals("annotation")) {
-                UserAnnotation annotation = userAnnotationService.get(id);
-                Envelope bounds = GeometryService.getBounds(annotation.getWktLocation());
+            if (Objects.nonNull(type))
+            {
+                if (type.equals("annotation")) {
+                    UserAnnotation annotation = userAnnotationService.get(id);
+                    Envelope bounds = GeometryService.getBounds(annotation.getWktLocation());
 
-                TaskRun taskRun = taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId)
-                    .orElseThrow(() -> new ObjectNotFoundException("TaskRun", taskRunId));
+                    TaskRun taskRun =
+                        taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId)
+                            .orElseThrow(() -> new ObjectNotFoundException("TaskRun", taskRunId));
 
-                Optional<TaskRunLayer> optionalTaskRunLayer = taskRunLayerRepository
-                    .findByTaskRunAndImage(taskRun, taskRun.getImage());
-                if (optionalTaskRunLayer.isPresent()) {
-                    TaskRunLayer taskRunLayer = optionalTaskRunLayer.get();
-                    taskRunLayer.setXOffset((int) bounds.getMinX());
-                    taskRunLayer.setYOffset((int) bounds.getMinY());
-                    taskRunLayerRepository.saveAndFlush(taskRunLayer);
+                    Optional<TaskRunLayer> optionalTaskRunLayer = taskRunLayerRepository
+                        .findByTaskRunAndImage(taskRun, taskRun.getImage());
+                    if (optionalTaskRunLayer.isPresent()) {
+                        TaskRunLayer taskRunLayer = optionalTaskRunLayer.get();
+                        taskRunLayer.setXOffset((int) bounds.getMinX());
+                        taskRunLayer.setYOffset((int) bounds.getMinY());
+                        taskRunLayerRepository.saveAndFlush(taskRunLayer);
+                    }
+
+                    body = prepareImage(id, "annotation");
+                } else if (type.equals("image")) {
+                    wsi = downloadWsi(id);
+
+                    body = new LinkedMultiValueMap<>();
+                    body.add("file", new FileSystemResource(wsi));
+                } else {
+                    throw new IllegalArgumentException("Unsupported type: " + type);
                 }
 
-                body = prepareImage(id, "annotation");
-            } else if (type.equals("image")) {
-                wsi = downloadWsi(id);
 
-                body = new LinkedMultiValueMap<>();
-                body.add("file", new FileSystemResource(wsi));
-            } else {
-                throw new IllegalArgumentException("Unsupported type: " + type);
+                String response = appEngineService.post(uri, body, MediaType.MULTIPART_FORM_DATA);
+
+                if (wsi != null) {
+                    wsi.delete();
+                }
+
+                return response;
             }
-
-            String response = appEngineService.post(uri, body, MediaType.MULTIPART_FORM_DATA);
-
-            if (wsi != null) {
-                wsi.delete();
-            }
-
-            return response;
         }
 
         ObjectNode provision = json.deepCopy();
@@ -469,7 +474,8 @@ public class TaskRunService {
 
     public String postStateAction(JsonNode body, Long projectId, UUID taskRunId) {
         checkTaskRun(projectId, taskRunId);
-        return appEngineService.post("task-runs/" + taskRunId + "/state-actions", body, MediaType.APPLICATION_JSON);
+        return appEngineService.post("task-runs/" + taskRunId + "/state-actions", body,
+            MediaType.APPLICATION_JSON);
     }
 
     public String getOutputs(Long projectId, UUID taskRunId) {

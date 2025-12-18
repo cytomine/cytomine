@@ -1,6 +1,7 @@
 <template>
   <div>
     <h3 class="subtitle">{{ $t('app-engine.ae-run-task') }}</h3>
+
     <section class="fields">
       <app-engine-field
         v-for="input in taskInputs"
@@ -9,6 +10,11 @@
         :parameter="input"
       />
     </section>
+
+    <section v-if="geometryOutputs.length > 0">
+      <OutputGeometryField :parameter="parameter" v-model="parameter.targetImageId" v-for="parameter in geometryOutputs" :key="parameter.id"/>
+    </section>
+
     <section>
       <b-field class="buttons" grouped>
         <b-button type="is-primary" @click="resetForm">{{ $t('button-clear') }}</b-button>
@@ -22,13 +28,16 @@
 import Vue from 'vue';
 
 import AppEngineField from '@/components/appengine/forms/fields/AppEngineField';
+import OutputGeometryField from '@/components/appengine/forms/fields/OutputGeometryField.vue';
 import Task from '@/utils/appengine/task';
-import {hasBinaryType} from '@/utils/app';
+import TaskRun from '@/utils/appengine/task-run';
+import {hasBinaryType, isGeometry} from '@/utils/app';
 
 export default {
   name: 'task-io-form',
   components: {
     AppEngineField,
+    OutputGeometryField,
   },
   props: {
     projectId: {type: Number, required: true},
@@ -39,6 +48,7 @@ export default {
       taskInputs: [],
       inputs: {},
       hasBinaryData: false,
+      geometryOutputs: [],
     };
   },
   computed: {
@@ -48,7 +58,10 @@ export default {
     }
   },
   async created() {
-    await this.fetchTaskInputs();
+    await Promise.all([
+      this.fetchTaskInputs(),
+      this.fetchTaskOutputs(),
+    ]);
   },
   watch: {
     async task() {
@@ -65,6 +78,10 @@ export default {
       });
 
       this.resetForm();
+    },
+    async fetchTaskOutputs() {
+      const outputs = await Task.fetchTaskOutputs(this.task.namespace, this.task.version);
+      this.geometryOutputs = outputs.filter(output => isGeometry(output));
     },
     async runTask() {
       // create task run and provision
@@ -92,6 +109,10 @@ export default {
           }
         } else {
           await Task.batchProvisionTask(this.projectId, taskRun.id, this.getInputProvisions());
+        }
+
+        for (const output of this.geometryOutputs) {
+          await TaskRun.provisionTargetImage(this.projectId, taskRun.id, output.name, {'imageId': output.targetImageId});
         }
 
         await Task.runTask(this.projectId, taskRun.id).then(async (taskRun) => {

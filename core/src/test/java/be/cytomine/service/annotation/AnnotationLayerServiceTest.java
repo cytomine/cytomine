@@ -91,7 +91,7 @@ public class AnnotationLayerServiceTest {
     public void createAnnotationLayerShouldReturnAnnotationLayer() {
         when(annotationLayerRepository.saveAndFlush(any(AnnotationLayer.class))).thenReturn(mockAnnotationLayer);
 
-        AnnotationLayer result = annotationLayerService.createAnnotationLayer(name);
+        AnnotationLayer result = annotationLayerService.createAnnotationLayer(name, mockImage);
     
         assertNotNull(result);
         assertEquals(mockAnnotationLayer.getId(), result.getId());
@@ -166,18 +166,5 @@ public class AnnotationLayerServiceTest {
         assertNull(result);
 
         verify(taskRunLayerRepository, times(1)).findByAnnotationLayerId(mockAnnotationLayer.getId());
-    }
-
-    @Test
-    public void findAnnotationsByLayerShouldReturnAnnotations() {
-        List<Annotation> mockAnnotations = List.of(mockAnnotation, mockAnnotation);
-        when(annotationRepository.findAllByAnnotationLayer(mockAnnotationLayer)).thenReturn(mockAnnotations);
-
-        List<Annotation> results = annotationLayerService.findAnnotationsByLayer(mockAnnotationLayer);
-
-        assertFalse(results.isEmpty());
-        assertEquals(mockAnnotations.size(), results.size());
-
-        verify(annotationRepository, times(1)).findAllByAnnotationLayer(mockAnnotationLayer);
     }
 }

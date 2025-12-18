@@ -50,6 +50,11 @@ export default class TaskRun extends Model {
     return data;
   }
 
+  static async provisionTargetImage(project, taskRunId, paramName, param) {
+    let {data} = await Cytomine.instance.api.put(`/app-engine/project/${project}/task-runs/${taskRunId}/input-provisions/${paramName}/geometry`, param);
+    return data;
+  }
+
   // Step-3 Run/Execute the Provisioned Task
   async start() {
     let {data} = await Cytomine.instance.api.post(`${this.uri}/state-actions`, {'desired': 'RUNNING'});

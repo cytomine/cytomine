@@ -1066,25 +1066,27 @@ public class BasicInstanceBuilder {
         return persistAndReturn(given_a_not_persisted_task_run(given_a_project(), UUID.randomUUID(), given_an_image_instance()));
     }
 
-    public AnnotationLayer given_a_not_persisted_annotation_layer() {
+    public AnnotationLayer given_a_not_persisted_annotation_layer(ImageInstance image) {
         AnnotationLayer annotationLayer = new AnnotationLayer();
         annotationLayer.setName(randomString());
+        annotationLayer.setImage(image);
         return annotationLayer;
     }
 
     public AnnotationLayer given_a_persisted_annotation_layer() {
-        return persistAndReturn(given_a_not_persisted_annotation_layer());
+        return persistAndReturn(given_a_not_persisted_annotation_layer(given_an_image_instance()));
     }
 
-    public Annotation given_a_not_persisted_annotation(AnnotationLayer annotationLayer) {
+    public Annotation given_a_not_persisted_annotation(AnnotationLayer annotationLayer, SliceInstance slice) {
         Annotation annotation = new Annotation();
+        annotation.setSlice(slice);
         annotation.setAnnotationLayer(annotationLayer);
         annotation.setLocation("{\"type\": \"Point\",\"coordinates\": [0, 0]}".getBytes());
         return annotation;
     }
 
     public Annotation given_a_not_persisted_annotation() {
-        return given_a_not_persisted_annotation(given_a_persisted_annotation_layer());
+        return given_a_not_persisted_annotation(given_a_persisted_annotation_layer(), given_a_slice_instance());
     }
 
     public Annotation given_a_persisted_annotation() {

@@ -37,6 +37,9 @@ public class TaskRunLayer extends CytomineDomain {
     @Column(name = "y_offset")
     private Integer yOffset;
 
+    @Column(name = "output_name")
+    private String outputName;
+
     public static JsonObject getDataFromDomain(CytomineDomain domain) {
         TaskRunLayer taskRunLayer = (TaskRunLayer) domain;
         JsonObject domainData = CytomineDomain.getDataFromDomain(domain);

@@ -1,15 +1,5 @@
 package be.cytomine.service.appengine;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
-import org.springframework.stereotype.Service;
-import org.springframework.util.StreamUtils;
-import org.springframework.web.client.HttpStatusCodeException;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -18,10 +8,35 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StreamUtils;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import be.cytomine.dto.appengine.task.TaskRunResponse;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class AppEngineService {
+
+    private final ObjectMapper objectMapper;
+
+    private final RestTemplate restTemplate;
 
     @Value("${application.appEngine.apiUrl}")
     private String apiUrl;
@@ -32,8 +47,6 @@ public class AppEngineService {
     private String buildFullUrl(String uri) {
         return apiUrl + apiBasePath + uri;
     }
-
-    private final RestTemplate restTemplate;
 
     public String get(String uri) {
         return restTemplate.exchange(buildFullUrl(uri), HttpMethod.GET, null, String.class).getBody();
@@ -89,5 +102,21 @@ public class AppEngineService {
         HttpEntity<B> requestEntity = new HttpEntity<>(body, headers);
 
         return restTemplate.exchange(finalUrl, HttpMethod.POST, requestEntity, String.class).getBody();
+    }
+
+    public TaskRunResponse getTaskRun(String taskRunId) {
+        try {
+            String response = get("/task-runs/" + taskRunId);
+            if (response == null) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task run not found: " + taskRunId);
+            }
+            return objectMapper.readValue(response, TaskRunResponse.class);
+        } catch (JsonProcessingException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to parse task run response", e);
+        } catch (HttpClientErrorException e) {
+            throw new ResponseStatusException(e.getStatusCode(), "Error fetching task run: " + taskRunId, e);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Failed to fetch task run: " + taskRunId, e);
+        }
     }
 }

@@ -54,4 +54,4 @@ select = ["FAST001", "FAST003"]
 ignore = ["E402"]
 
 [tool.uv.sources]
-foo = { path = "../clients/python" }
+cytomine-python-client = { path = "../clients/python" }

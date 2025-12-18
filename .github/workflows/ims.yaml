@@ -46,6 +46,6 @@ jobs:
           version: ${{ vars.UV_VERSION }}
 
       - name: Run tests
-        run: uv run pytest tests
+        run: uv --directory ./pims run pytest tests
         env:
           CONFIG_FILE: ./tests/pims-config.env

@@ -9,7 +9,7 @@ license = "Apache-2.0"
 dependencies = [
   "aiofiles==23.1.0",
   "celery==5.2.7",
-  "cytomine-python-client==3.0.0",
+  "cytomine-python-client @ file:///${PROJECT_ROOT}/clients/python",
   "fastapi==0.110.3",
   "fastapi-utils==0.7.0",
   "geojson>=3.2.0",

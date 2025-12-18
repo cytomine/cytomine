@@ -54,11 +54,8 @@ public class ApiKeyFilter extends OncePerRequestFilter {
         this.secUserRepository = secUserRepository;
     }
 
-    public static String generateKeys(String method, String content_md5, String content_type, String date, String queryString, String path, User user) throws NoSuchAlgorithmException, InvalidKeyException, UnsupportedEncodingException {
-        String canonicalHeaders = method + "\n" + content_md5 + "\n" + content_type + "\n" + date + "\n";
-        String canonicalExtensionHeaders = "";
-        String canonicalResource = path + queryString;
-        String messageToSign = canonicalHeaders + canonicalExtensionHeaders + canonicalResource;
+    public static String generateKeys(String method, String content_md5, String content_type, String date, User user) throws NoSuchAlgorithmException, InvalidKeyException, UnsupportedEncodingException {
+        String canonicalHeaders = method + "\n" + content_md5 + "\n" + content_type + "\n" + date ;
 
         String key = user.getPrivateKey();
         SecretKeySpec signingKey = new SecretKeySpec(key.getBytes(), "HmacSHA1");
@@ -66,7 +63,7 @@ public class ApiKeyFilter extends OncePerRequestFilter {
         Mac mac = Mac.getInstance("HmacSHA1");
         mac.init(signingKey);
         // compute the hmac on input data bytes
-        byte[] rawHmac = mac.doFinal(new String(messageToSign.getBytes(), "UTF-8").getBytes());
+        byte[] rawHmac = mac.doFinal(new String(canonicalHeaders.getBytes(), "UTF-8").getBytes());
 
         // base64-encode the hmac
         byte[] signatureBytes = Base64.encodeBase64(rawHmac);
@@ -103,10 +100,6 @@ public class ApiKeyFilter extends OncePerRequestFilter {
             content_type = (request.getHeader("Content-Type") != null) ? request.getHeader("Content-Type") : content_type;
             String date = (request.getHeader("date") != null) ? request.getHeader("date") : "";
 
-            String queryString = (request.getQueryString() != null) ? "?" + request.getQueryString() : "";
-
-            String path = request.getRequestURI();
-
             String accessKey = authorization.substring(authorization.indexOf(" ") + 1, authorization.indexOf(":"));
             String authorizationSign = authorization.substring(authorization.indexOf(":") + 1);
 
@@ -116,7 +109,7 @@ public class ApiKeyFilter extends OncePerRequestFilter {
                 log.debug("User cannot be extracted with accessKey {}", accessKey);
                 throw new AuthenticationException("User cannot be extracted with accessKey " + accessKey);
             } else {
-                String signature = generateKeys(request.getMethod(),content_md5, content_type,date,queryString,path,user.get());
+                String signature = generateKeys(request.getMethod(),content_md5, content_type,date,user.get());
                 if (authorizationSign.equals(signature)) {
                     this.reauthenticate(user.get());
                     return true;
@@ -125,13 +118,11 @@ public class ApiKeyFilter extends OncePerRequestFilter {
                     // So the client thinks content-type is "" while spring boot set it to application/json. In order to match the client signature, we generate it
                     // with an empty value.
                     // => it would be better to improve the java client to set a valid content type.
-                    String signatureWithEmptyContentType = generateKeys(request.getMethod(),content_md5, "",date,queryString,path,user.get());
+                    String signatureWithEmptyContentType = generateKeys(request.getMethod(),content_md5, "",date,user.get());
                     if (authorizationSign.equals(signatureWithEmptyContentType)) {
                         this.reauthenticate(user.get());
                         return true;
                     }
-
-
                     return false;
                 }
             }

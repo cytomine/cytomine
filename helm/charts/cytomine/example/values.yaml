@@ -23,5 +23,7 @@ iam:
   lsaaiEndpoint: https://login.aai.lifescience-ri.eu/oidc/.well-known/openid-configuration
 
 images:
-  core: registry.cytomine.org/cytomine/core:fix-job-import@sha256:d5bb331e6edeb3e36b932c347f69944632e6fe4f302111ad62af84760d9fb303
+  core: registry.cytomine.org/cytomine/core:fix-job-import@sha256:5dfe84ca04d4b38b89769ec347633204daab8785922f1f4531d3751b491b737f
+  pims_import: registry.cytomine.org/cytomine/python-client:fix-job-import@sha256:a0f1da528ccbc3a5428d9bc861b285f37269be41db18eb6debc4f968a151d9ee
+  pims: registry.cytomine.org/cytomine/pims:fix-job-import@sha256:4b4511294a0d0f6a4347edb3c020986ace6bbe32adede086ee99c7e84a93396a
   pullPolicy: IfNotPresent

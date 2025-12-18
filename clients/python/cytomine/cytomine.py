@@ -128,16 +128,12 @@ class CytomineAuth(requests.auth.AuthBase):
         self.base_path = base_path if sign_with_base_path else ""
 
     def __call__(self, r: requests.PreparedRequest) -> requests.PreparedRequest:
-        uri = urlparse(r.url).path if urlparse(r.url).path else '/'
         content_type = r.headers.get("content-type", "")
         token = (
             f"{r.method}\n\n"
             f"{content_type}\n"
-            f"{r.headers['date']}\n"
-            f"{self.base_path}"
-            f"{r.url.replace(self.base_url, '')}"
+            f"{r.headers['date']}"
         )
-
         signature = base64.b64encode(
             hmac.new(
                 bytes(self.private_key, "utf-8"),
@@ -997,7 +993,7 @@ class Cytomine:
             auth=CytomineAuth(
                 self._public_key,
                 self._private_key,
-                core_url,
+                pims_url,
                 "",
             ),
             headers=self._headers(content_type="text/plain"),

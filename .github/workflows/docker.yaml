@@ -28,6 +28,8 @@ jobs:
           # - name: mongo
           - name: nginx
           - name: pims
+            context: '.'
+            dockerfile_location: pims
           - name: postgis
           - name: sam
           - name: web-ui

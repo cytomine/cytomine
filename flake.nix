@@ -9,6 +9,7 @@
       let pkgs = nixpkgs.legacyPackages.${system};
       in {
         devShell = pkgs.mkShell {
+          LD_LIBRARY_PATH = pkgs.lib.strings.makeLibraryPath [ pkgs.stdenv.cc.cc.lib pkgs.zlib ];
           buildInputs = with pkgs;[
             chart-testing
             fluxcd

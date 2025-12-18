@@ -133,4 +133,19 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         return JsonResponseEntity.status(HttpStatus.NOT_MODIFIED)
                         .headers(headers).build();
     }
+
+    @ExceptionHandler(AppEngineException.class)
+    public ResponseEntity<?> handleException(AppEngineException exception) {
+        log.debug("AppEngineException");
+        HttpHeaders headers = new HttpHeaders();
+        for (Map.Entry<String, String> entry : exception.getHeaders().entrySet()) {
+            headers.add(entry.getKey(), entry.getValue());
+        }
+
+        return new ResponseEntity<>(
+            exception.body,
+            headers,
+            HttpStatus.valueOf(exception.code)
+        );
+    }
 }

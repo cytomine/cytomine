@@ -68,7 +68,7 @@ RUN python plugins.py \
 # Cleaning. Cannot be done before as plugin prerequisites could use apt-get.
 RUN rm -rf /var/lib/apt/lists/*
 
-COPY ./clients/python /app/clients/python
+COPY ./clienxdts/python /clients/python
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=./pims/uv.lock,target=uv.lock \

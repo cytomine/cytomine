@@ -6,10 +6,6 @@ on:
 permissions:
   contents: read
 
-defaults:
-  run:
-    working-directory: ./pims
-
 jobs:
   lint:
     runs-on: self-hosted

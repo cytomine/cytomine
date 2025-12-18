@@ -124,6 +124,25 @@ On the right panel, you will find a menu related to your exploration: you can se
 But currently, there is no annotation on this image.
 We will add them in the next point.
 
+## Upload a task
+
+navigate to applications tab and upload the task zip archive from your machine.
+
+![upload_task](/images/user-guide/getting-started/upload_task.png)
+
+## Run a task
+
+Running a task involves 2 steps as follows:
+ #### 1. select the task from the dropdown list.
+ #### 2. provision the inputs of the task, the inputs will be listed by name, depending on the type the user sees :
+ - Field for numeric or textual values
+ - Toggle for boolean values
+ - Selector for images and annotations
+
+ after provisioning all inputs click on **Run Task** button to execute
+
+![upload_task](/images/user-guide/getting-started/run_task.png)
+
 ## Add annotations
 
 On the top navigation bar into the browsing view, you can select a mode for adding annotation.

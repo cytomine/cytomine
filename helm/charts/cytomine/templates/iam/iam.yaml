@@ -17,11 +17,15 @@ spec:
         checksum/config: "{{ include (print $.Template.BasePath "/iam/iam-config.yaml") . | sha256sum }}"
     spec:
       serviceAccountName: {{ include "cytomine.serviceAccountName" . }}
+      securityContext:
+      {{- include "cytomine.podSecurityContext" . | nindent 8 }}
       volumes:
       - name: keystore
         emptyDir: {}
       initContainers:
       - name: certificates-provider
+        securityContext:
+        {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
         image: eclipse-temurin:8u462-b08-jdk-ubi9-minimal
         command: ['sh', '-c', 'keytool -genkeypair -alias localhost -keyalg RSA -keysize 2048 -validity 365 -keystore /keystore/server.keystore -dname "cn=Server Administrator,o=Acme,c=GB" -keypass password -storepass password']
         volumeMounts:
@@ -29,6 +33,8 @@ spec:
           mountPath: "/keystore"
       containers:
       - name: iam
+        securityContext:
+        {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
         image: "{{ .Values.images.iam }}"
         ports:
         - containerPort: {{ .Values.iam.port }}

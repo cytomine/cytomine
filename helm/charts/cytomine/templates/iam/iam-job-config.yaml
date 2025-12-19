@@ -10,6 +10,8 @@ spec:
   template:
     spec:
       serviceAccountName: {{ include "cytomine.serviceAccountName" . }}
+      securityContext:
+      {{- include "cytomine.podSecurityContext" . | nindent 8 }}
       initContainers: # initContainers run in sequence, not containers
       - name: login
         image: "{{ .Values.images.iam }}"
@@ -25,8 +27,7 @@ spec:
               name: admin-iam-secret
               key: password
         securityContext:
-          runAsUser: 1000
-          runAsGroup: 3000
+        {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
 
       - name: create-realm
         image: "{{ .Values.images.iam }}"
@@ -36,8 +37,7 @@ spec:
         - name: kc-auth
           mountPath: "/opt/keycloak-auth"
         securityContext:
-          runAsUser: 1000
-          runAsGroup: 3000
+        {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
 
       - name: create-user
         image: "{{ .Values.images.iam }}"
@@ -50,8 +50,7 @@ spec:
           mountPath: "/opt/keycloak-conf/config.json"
           subPath: "config.json"
         securityContext:
-          runAsUser: 1000
-          runAsGroup: 3000
+        {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
 
       - name: set-password
         image: "{{ .Values.images.iam }}"
@@ -67,8 +66,7 @@ spec:
               name: cytomine-admin-iam-secret
               key: password
         securityContext:
-          runAsUser: 1000
-          runAsGroup: 3000
+        {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
 
       - name: create-client
         image: "{{ .Values.images.iam }}"
@@ -81,8 +79,7 @@ spec:
           mountPath: "/opt/keycloak-conf/config.json"
           subPath: "config.json"
         securityContext:
-          runAsUser: 1000
-          runAsGroup: 3000
+        {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
 
       - name: create-client-roles-admin
         image: "{{ .Values.images.iam }}"
@@ -92,8 +89,7 @@ spec:
         - name: kc-auth
           mountPath: "/opt/keycloak-auth"
         securityContext:
-          runAsUser: 1000
-          runAsGroup: 3000
+        {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
 
       - name: create-client-roles-guest
         image: "{{ .Values.images.iam }}"
@@ -103,8 +99,7 @@ spec:
         - name: kc-auth
           mountPath: "/opt/keycloak-auth"
         securityContext:
-          runAsUser: 1000
-          runAsGroup: 3000
+        {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
 
       - name: create-client-roles-user
         image: "{{ .Values.images.iam }}"
@@ -114,8 +109,7 @@ spec:
         - name: kc-auth
           mountPath: "/opt/keycloak-auth"
         securityContext:
-          runAsUser: 1000
-          runAsGroup: 3000
+        {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
 
       - name: add-roles-user
         image: "{{ .Values.images.iam }}"
@@ -125,8 +119,7 @@ spec:
         - name: kc-auth
           mountPath: "/opt/keycloak-auth"
         securityContext:
-          runAsUser: 1000
-          runAsGroup: 3000
+        {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
 
 {{ if and (.Values.iam.lsaaiClientIdSecretName) (and .Values.iam.lsaaiClientSecretSecretName .Values.iam.lsaaiEndpoint) }}
       # https://stackoverflow.com/a/75794013
@@ -138,8 +131,7 @@ spec:
         - name: kc-auth
           mountPath: "/opt/keycloak-auth"
         securityContext:
-          runAsUser: 1000
-          runAsGroup: 3000
+        {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
 
       - name: import-lsaai-config
         image: "curlimages/curl"
@@ -149,8 +141,7 @@ spec:
         - name: kc-auth
           mountPath: "/opt/keycloak-auth"
         securityContext:
-          runAsUser: 1000
-          runAsGroup: 3000
+        {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
 
 
       - name: add-provider-lsaai-instance
@@ -161,8 +152,7 @@ spec:
         - name: kc-auth
           mountPath: "/opt/keycloak-auth"
         securityContext:
-          runAsUser: 1000
-          runAsGroup: 3000
+        {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
         env:
         - name: LSAAI_CLIENT_SECRET
           valueFrom:
@@ -183,13 +173,14 @@ spec:
         - name: kc-auth
           mountPath: "/opt/keycloak-auth"
         securityContext:
-          runAsUser: 1000
-          runAsGroup: 3000
+        {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
 
 {{ end }}
       containers:
       - name: check-job-done
         image: "{{ .Values.images.iam }}"
+        securityContext:
+        {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
         command: ["/bin/sh", "-c"]
         args: ["/opt/keycloak/bin/kcadm.sh config credentials --server {{ include "cytomine.iamInternalUrl" . }} --realm cytomine --user admin --password $(CYTOMINE_USER)"]
         env:
@@ -214,8 +205,6 @@ spec:
           - key: "config.json"
             path: "config.json"
       restartPolicy: Never
-      securityContext:
-        runAsUser: 1000
-        runAsGroup: 3000
+
 
 

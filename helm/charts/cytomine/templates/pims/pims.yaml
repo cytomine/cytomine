@@ -27,8 +27,7 @@ spec:
     spec:
       serviceAccountName: {{ include "cytomine.serviceAccountName" . }}
       securityContext:
-        runAsUser: {{ .Values.containerSecurity.userID }}
-        fsGroup: {{ .Values.containerSecurity.fsgroupID }}
+      {{- include "cytomine.podSecurityContext" . | nindent 8 }}
       {{- with .Values.global.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
@@ -105,9 +104,7 @@ spec:
             - name: http
               containerPort: {{ .Values.pims.port }}
           securityContext:
-            allowPrivilegeEscalation: {{ .Values.containerSecurity.allowPrivilegeEscalation }}
-            privileged: {{ .Values.containerSecurity.privileged }}
-            readOnlyRootFilesystem: {{ .Values.containerSecurity.readOnlyRootFilesystem }}
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
           resources:
             {{- toYaml .Values.pims.resources | nindent 12 }}
       {{- with .Values.global.tolerations }}

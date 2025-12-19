@@ -89,7 +89,7 @@ http://iam.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.iam.port }}/iam
 
 {{- define "cytomine.podSecurityContext" }}
 runAsUser: {{ .Values.containerSecurity.userID }}
-runAsGroup: {{ .Values.containerSecurity.fsgroupID }}
+runAsGroup: {{ .Values.containerSecurity.groupID }}
 fsGroup: {{ .Values.containerSecurity.fsgroupID }}
 supplementalGroups: [4000]
 seccompProfile:

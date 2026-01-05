@@ -1137,7 +1137,6 @@ public class TaskProvisioningService {
             case PROVISIONED -> updateToProvisioned(run);
             case RUNNING -> run(run);
             case FINISHED -> updateToFinished(run);
-            case FAILED -> updateToFailed(run);
             // to safeguard against unknown state transition requests
             default -> throw new ProvisioningException(ErrorBuilder.build(ErrorCode.UNKNOWN_STATE));
         };
@@ -1427,13 +1426,6 @@ public class TaskProvisioningService {
         run.setState(TaskRunState.FINISHED);
         runRepository.saveAndFlush(run);
         return createStateAction(run, TaskRunState.FINISHED);
-    }
-
-    public StateAction updateToFailed(Run run) {
-        log.info("Set run {} to state FAILED", run.getId());
-        run.setState(TaskRunState.FAILED);
-        runRepository.saveAndFlush(run);
-        return createStateAction(run, TaskRunState.FAILED);
     }
 
     public TaskRunResponse retrieveRun(String runId) throws ProvisioningException {

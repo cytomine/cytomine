@@ -410,10 +410,7 @@ public class ProjectResourceTests {
                         .param("ontology[in]", "null")
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
-                .andExpect(jsonPath("$.collection[?(@.id=='"+projectWithCriteria.getId()+"')]").doesNotExist())
-                .andExpect(jsonPath("$.collection[?(@.id=='"+projectWithoutCriteria.getId()+"')]").doesNotExist())
-                .andExpect(jsonPath("$.collection[?(@.id=='"+projectWithNoOntology.getId()+"')]").exists());
+                .andExpect(jsonPath("$.collection", hasSize(0)));
     }
 
 

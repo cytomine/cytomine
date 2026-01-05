@@ -4,6 +4,26 @@ import {Cytomine} from '@/api';
 import {BINARY_TYPES} from '@/utils/app';
 
 export default class TaskRun extends Model {
+  static get STATES() {
+    return {
+      CREATED: 'CREATED',
+      PROVISIONED: 'PROVISIONED',
+      QUEUING: 'QUEUING',
+      QUEUED: 'QUEUED',
+      PENDING: 'PENDING',
+      RUNNING: 'RUNNING',
+      FAILED: 'FAILED',
+      FINISHED: 'FINISHED',
+    };
+  }
+
+  static get TERMINAL_STATES() {
+    return new Set([
+      this.STATES.FAILED,
+      this.STATES.FINISHED,
+    ]);
+  }
+
   /** @inheritdoc */
   static get callbackIdentifier() {
     return '/app-engine/project/${project}/task-runs'; // not used
@@ -39,6 +59,14 @@ export default class TaskRun extends Model {
     return data;
   }
 
+  isFinished() {
+    return this.state === TaskRun.STATES.FINISHED;
+  }
+
+  isTerminalState() {
+    return TaskRun.TERMINAL_STATES.has(this.state);
+  }
+
   // Step-2: Provision task / user inputs
   async batchProvisionTask(params) {
     let {data} = await Cytomine.instance.api.put(`${this.uri}/input-provisions`, params);
@@ -57,6 +85,10 @@ export default class TaskRun extends Model {
   }
 
   async fetchInputs() {
+    if (this.state === TaskRun.STATES.CREATED) {
+      return null;
+    }
+
     this.inputs = (await Cytomine.instance.api.get(`${this.uri}/inputs`)).data;
 
     const binaryInputs = this.inputs.filter(input => BINARY_TYPES.includes(input.type.toLowerCase()));
@@ -71,6 +103,10 @@ export default class TaskRun extends Model {
   }
 
   async fetchOutputs() {
+    if (this.state !== TaskRun.STATES.FINISHED) {
+      return null;
+    }
+
     this.outputs = (await Cytomine.instance.api.get(`${this.uri}/outputs`)).data;
 
     const binaryOutputs = this.outputs.filter(output => BINARY_TYPES.includes(output.type.toLowerCase()));

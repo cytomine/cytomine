@@ -83,11 +83,11 @@ export default {
 
     setInterval(async () => {
       for (let taskRun of this.trackedTaskRuns) {
-        if (taskRun.state !== 'FINISHED' && taskRun.state !== 'FAILED') {
+        if (!taskRun.isTerminalState()) {
           await taskRun.fetch();
         }
 
-        if (taskRun.state === 'FINISHED') {
+        if (taskRun.isFinished()) {
           if (!taskRun.outputs) {
             await taskRun.fetchOutputs();
           }
@@ -122,12 +122,6 @@ export default {
       this.trackedTaskRuns = await Promise.all(
         taskRuns.map(async ({project, taskRunId}) => {
           let taskRun = await Task.fetchTaskRunStatus(this.currentProjectId, taskRunId);
-
-          // Mark all previous runs as failed if not finished
-          if (taskRun.state !== 'FINISHED') {
-            taskRun.state = 'FAILED';
-          }
-
           return new TaskRun({...taskRun, project});
         })
       );
@@ -136,9 +130,16 @@ export default {
 
       await Promise.all(
         this.trackedTaskRuns
-          .filter(taskRun => taskRun.state === 'FINISHED')
+          .filter(taskRun => taskRun.isFinished())
           .map(run => run.fetchOutputs())
       );
+
+      // Mark all previous runs as failed if not finished
+      this.trackedTaskRuns.forEach(taskRun => {
+        if (!taskRun.isFinished()) {
+          taskRun.state = TaskRun.STATES.FAILED;
+        }
+      });
     },
   },
 };

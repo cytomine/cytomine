@@ -1,5 +1,4 @@
 services:
-
   mongo:
     image: cytomine/mongo:latest
     build:
@@ -18,7 +17,8 @@ services:
   pims:
     image: cytomine/pims:latest
     build:
-      context: ./pims/
+      context: ./
+      dockerfile: ./pims/Dockerfile
 
   iam:
     image: cytomine/iam:latest

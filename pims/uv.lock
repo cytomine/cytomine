@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 2
 requires-python = ">=3.10"
 resolution-markers = [
     "python_full_version >= '3.11'",
@@ -477,7 +477,7 @@ dev = [
 requires-dist = [
     { name = "aiofiles", specifier = "==23.1.0" },
     { name = "celery", specifier = "==5.2.7" },
-    { name = "cytomine-python-client", specifier = "==3.0.0" },
+    { name = "cytomine-python-client", directory = "../clients/python" },
     { name = "fastapi", specifier = "==0.110.3" },
     { name = "fastapi-utils", specifier = "==0.7.0" },
     { name = "geojson", specifier = ">=3.2.0" },
@@ -519,18 +519,31 @@ dev = [
 
 [[package]]
 name = "cytomine-python-client"
-version = "3.0.0"
-source = { registry = "https://pypi.org/simple" }
+version = "3.1.1"
+source = { directory = "../clients/python" }
 dependencies = [
     { name = "cachecontrol" },
-    { name = "future" },
     { name = "requests" },
     { name = "requests-toolbelt" },
     { name = "shapely" },
-    { name = "six" },
     { name = "urllib3" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f8/64/e7e301775a0f16d586dc8b483df4cb1bfc81288f1e681777e683c5fd40c8/cytomine-python-client-3.0.0.tar.gz", hash = "sha256:ea8c4b01fffe53b15ea10fab8c172574e87c8935cd9d53b7fa4cade110e87326", size = 36736, upload-time = "2024-04-23T13:59:44.598Z" }
+
+[package.metadata]
+requires-dist = [
+    { name = "cachecontrol", specifier = ">=0.12.10" },
+    { name = "requests", specifier = ">=2.27.1" },
+    { name = "requests-toolbelt", specifier = ">=0.9.1" },
+    { name = "shapely", specifier = ">=1.7.1" },
+    { name = "urllib3", specifier = ">=1.26.19" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "mypy", specifier = ">=1.14.1" },
+    { name = "pytest", specifier = ">=8.3.5" },
+    { name = "ruff", specifier = ">=0.12.11" },
+]
 
 [[package]]
 name = "exceptiongroup"
@@ -636,15 +649,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/e0/6d/04d16243eb441e8de61074c7809e92d2e35df4cd11af5632e486bc630dab/fonttools-4.60.0-cp314-cp314t-win32.whl", hash = "sha256:0f7b2c251dc338973e892a1e153016114e7a75f6aac7a49b84d5d1a4c0608d08", size = 2281217, upload-time = "2025-09-17T11:33:36.965Z" },
     { url = "https://files.pythonhosted.org/packages/ab/5f/09bd2f9f28ef0d6f3620fa19699d11c4bc83ff8a2786d8ccdd97c209b19a/fonttools-4.60.0-cp314-cp314t-win_amd64.whl", hash = "sha256:c8a72771106bc7434098db35abecd84d608857f6e116d3ef00366b213c502ce9", size = 2344738, upload-time = "2025-09-17T11:33:39.372Z" },
     { url = "https://files.pythonhosted.org/packages/f9/a4/247d3e54eb5ed59e94e09866cfc4f9567e274fbf310ba390711851f63b3b/fonttools-4.60.0-py3-none-any.whl", hash = "sha256:496d26e4d14dcccdd6ada2e937e4d174d3138e3d73f5c9b6ec6eb2fd1dab4f66", size = 1142186, upload-time = "2025-09-17T11:33:59.287Z" },
-]
-
-[[package]]
-name = "future"
-version = "1.0.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/a7/b2/4140c69c6a66432916b26158687e821ba631a4c9273c474343badf84d3ba/future-1.0.0.tar.gz", hash = "sha256:bd2968309307861edae1458a4f8a4f3598c03be43b97521076aebf5d94c07b05", size = 1228490, upload-time = "2024-02-21T11:52:38.461Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/da/71/ae30dadffc90b9006d77af76b393cb9dfbfc9629f339fc1574a1c52e6806/future-1.0.0-py3-none-any.whl", hash = "sha256:929292d34f5872e70396626ef385ec22355a1fae8ad29e1a734c3e43f9fbc216", size = 491326, upload-time = "2024-02-21T11:52:35.956Z" },
 ]
 
 [[package]]

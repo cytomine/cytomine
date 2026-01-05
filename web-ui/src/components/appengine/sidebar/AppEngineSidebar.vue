@@ -136,7 +136,7 @@ export default {
 
       // Mark all previous runs as failed if not finished
       this.trackedTaskRuns.forEach(taskRun => {
-        if (taskRun.state === TaskRun.STATES.CREATED) {
+        if (!taskRun.isFinished()) {
           taskRun.state = TaskRun.STATES.FAILED;
         }
       });

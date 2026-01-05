@@ -49,6 +49,6 @@ The main features of this front-end are:
 
 [cytomine-url]: https://uliege.cytomine.org/
 [license-badge]: https://img.shields.io/badge/License-Apache%202.0-blue.svg
-[license-url]: https://github.com/cytomine/Cytomine-Web-UI/blob/main/LICENSE
+[license-url]: https://github.com/cytomine/cytomine/blob/main/LICENSE
 [website-badge]: https://img.shields.io/badge/Website-blue
 [website-url]: https://uliege.cytomine.org/

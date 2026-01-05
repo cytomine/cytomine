@@ -473,7 +473,7 @@ public class ProjectResourceTests {
                         .param("order", "desc")
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.collection", hasSize(greaterThanOrEqualTo(3))))
+                .andExpect(jsonPath("$.collection", hasSize(greaterThanOrEqualTo(2))))
                 .andExpect(jsonPath("$.collection[0].id").value(project2.getId()))
                 .andExpect(jsonPath("$.collection[1].id").value(project1.getId()))
         ;

@@ -25,6 +25,8 @@ spec:
         release: {{ .Release.Name }}
     spec:
       serviceAccountName: {{ include "cytomine.serviceAccountName" . }}
+      securityContext:
+      {{- include "cytomine.podSecurityContext" . | nindent 8 }}
       {{- with .Values.global.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
@@ -43,6 +45,8 @@ spec:
         - name: mongodb
           image: "{{ .Values.images.mongodb }}"
           imagePullPolicy: {{ .Values.images.pullPolicy }}
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
           volumeMounts:
             - name: mongodb-storage
               mountPath: "/data/db"

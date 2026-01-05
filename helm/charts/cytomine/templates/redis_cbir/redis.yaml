@@ -33,3 +33,9 @@ spec:
           ports:
             - name: http
               containerPort: {{ .Values.redis.port }}
+          volumeMounts:
+            - name: temp
+              mountPath: /tmp
+      volumes:
+      - emptyDir: {}
+        name: temp

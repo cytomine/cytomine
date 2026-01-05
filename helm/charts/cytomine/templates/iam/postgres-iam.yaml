@@ -22,6 +22,8 @@ spec:
         app: postgres-iam
         release: {{ .Release.Name }}
     spec:
+      securityContext:
+      {{- include "cytomine.podSecurityContext" . | nindent 8 }}
       volumes:
         - name: temp
           emptyDir: {}
@@ -60,6 +62,8 @@ spec:
             - name: postgres
               containerPort: {{ .Values.postgresql.port }}
               protocol: TCP
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
   {{ if .Values.postgresql.storageClassName -}}
   volumeClaimTemplates:
     - metadata:

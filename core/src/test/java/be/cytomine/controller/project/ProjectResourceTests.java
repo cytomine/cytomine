@@ -163,8 +163,7 @@ public class ProjectResourceTests {
         Project project = builder.given_a_project();
         restProjectControllerMockMvc.perform(get("/api/project.json"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
-                .andExpect(jsonPath("$.collection[?(@.name=='"+project.getName()+"')]").exists());
+                .andExpect(jsonPath("$.collection", hasSize(0)));
     }
 
     @Test

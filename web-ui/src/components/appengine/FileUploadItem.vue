@@ -35,7 +35,7 @@
 
       <div class="column is-narrow has-text-right icon-actions">
         <b-icon v-if="status.isCompleted" icon="check-circle" size="is-medium" />
-        <b-icon v-if="status.isCancelled" type="is-danger" icon="exclamation-circle" size="is-medium" />
+        <b-icon v-if="status.isCancelled || status.isError" type="is-danger" icon="exclamation-circle" size="is-medium" />
         <b-button icon-left="times" @click="$emit('file:remove', file)" />
       </div>
     </div>
@@ -106,17 +106,13 @@ export default {
           }
         )).data;
 
-        if (data.message) {
-          this.uploadFile.status = UploadStatus.ERROR;
-          this.error = data;
-          return;
-        }
-
         this.uploadFile.status = UploadStatus.COMPLETED;
         this.$emit('task-upload:success', data);
       } catch (error) {
         console.error(error);
-        this.$emit('task-upload:error');
+
+        this.uploadFile.status = UploadStatus.ERROR;
+        this.error = error.response.data;
       }
     },
     handleCancelUpload() {

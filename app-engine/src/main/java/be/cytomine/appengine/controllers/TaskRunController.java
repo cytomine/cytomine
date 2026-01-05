@@ -306,12 +306,10 @@ public class TaskRunController {
 
     @GetMapping(value = "/task-runs/{run_id}")
     @ResponseStatus(code = HttpStatus.OK)
-    public ResponseEntity<?> getRun(
-        @PathVariable("run_id") String runId
-    ) throws ProvisioningException {
-        log.info("/task-runs/{run_id} GET");
+    public ResponseEntity<?> getRun(@PathVariable("run_id") String runId) throws ProvisioningException {
+        log.info("/task-runs/{} GET", runId);
         TaskRunResponse run = taskRunService.retrieveRun(runId);
-        log.info("/task-runs/{run_id} GET Ended");
+        log.info("/task-runs/{} GET Ended", runId);
         return new ResponseEntity<>(run, HttpStatus.OK);
     }
 

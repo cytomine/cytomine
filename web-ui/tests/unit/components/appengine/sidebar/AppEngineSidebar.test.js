@@ -149,8 +149,11 @@ describe('AppEngineSideBar.vue', () => {
     expect(fetchTasksSpy).toHaveBeenCalledTimes(1);
     expect(fetchTaskRunsSpy).toHaveBeenCalled();
     expect(fetchTaskRunsSpy).toHaveBeenCalledTimes(1);
+  });
 
+  it('should mark not finished runs as failed on component created', async () => {
     const expectedTaskRun2 = {...mockTaskRun2, state: 'FAILED'};
+
     expect(wrapper.vm.tasks).toStrictEqual([mockTask1, mockTask2]);
     expect(wrapper.vm.trackedTaskRuns).toMatchObject([mockTaskRun1, expectedTaskRun2]);
   });

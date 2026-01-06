@@ -1372,10 +1372,15 @@ public class TaskProvisioningService {
                 new StorageData(parameter.getName(), "task-run-outputs-" + run.getId())
             );
             if (provisionFileData == null || provisionFileData.getEntryList().isEmpty()) {
-                AppEngineError error = ErrorBuilder.build(
-                    ErrorCode.INTERNAL_MISSING_OUTPUT_FILE_FOR_PARAMETER
-                );
-                throw new ProvisioningException(error);
+                if (!parameter.isOptional()) {
+                    AppEngineError error = ErrorBuilder.build(
+                        ErrorCode.INTERNAL_MISSING_OUTPUT_FILE_FOR_PARAMETER
+                    );
+                    throw new ProvisioningException(error);
+                } else {
+                    continue; // ignore processing missing optional parameter
+                }
+
             }
 
             // validate files

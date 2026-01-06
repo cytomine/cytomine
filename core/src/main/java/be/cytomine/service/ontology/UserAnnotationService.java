@@ -56,6 +56,7 @@ import org.locationtech.jts.io.WKTReader;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
@@ -394,8 +395,12 @@ public class UserAnnotationService extends ModelService {
         response.getData().put("annotation", response.getData().get("userannotation"));
         response.getData().remove("userannotation");
 
-        AnnotationDomain annotation = (AnnotationDomain) domain;
-        retrievalService.indexAnnotation(annotation);
+        try {
+            AnnotationDomain annotation = (AnnotationDomain) domain;
+            retrievalService.indexAnnotation(annotation);
+        } catch (HttpClientErrorException e) {
+            log.warn("Indexing annotation failed: " + e.getMessage());
+        }
     }
 
     /**
@@ -494,7 +499,11 @@ public class UserAnnotationService extends ModelService {
         //Check if user is admin, the project mode and if is the owner of the annotation
         securityACLService.checkFullOrRestrictedForOwner(domain, ((UserAnnotation)domain).getUser());
 
-        retrievalService.deleteIndex((AnnotationDomain) domain);
+        try {
+            retrievalService.deleteIndex((AnnotationDomain) domain);
+        } catch (HttpClientErrorException e) {
+            log.warn("Deleting annotation index failed: " + e.getMessage());
+        }
 
         Command c = new DeleteCommand(currentUser, transaction);
         return executeCommand(c,domain, null);

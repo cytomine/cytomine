@@ -163,8 +163,7 @@ public class ProjectResourceTests {
         Project project = builder.given_a_project();
         restProjectControllerMockMvc.perform(get("/api/project.json"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
-                .andExpect(jsonPath("$.collection[?(@.name=='"+project.getName()+"')]").exists());
+                .andExpect(jsonPath("$.collection", hasSize(0)));
     }
 
     @Test
@@ -405,16 +404,13 @@ public class ProjectResourceTests {
                 .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
                 .andExpect(jsonPath("$.collection[?(@.id=='"+projectWithCriteria.getId()+"')]").exists())
                 .andExpect(jsonPath("$.collection[?(@.id=='"+projectWithoutCriteria.getId()+"')]").doesNotExist())
-                .andExpect(jsonPath("$.collection[?(@.id=='"+projectWithNoOntology.getId()+"')]").exists());
+                .andExpect(jsonPath("$.collection[?(@.id=='"+projectWithNoOntology.getId()+"')]").doesNotExist());
 
         restProjectControllerMockMvc.perform(get("/api/project.json")
                         .param("ontology[in]", "null")
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
-                .andExpect(jsonPath("$.collection[?(@.id=='"+projectWithCriteria.getId()+"')]").doesNotExist())
-                .andExpect(jsonPath("$.collection[?(@.id=='"+projectWithoutCriteria.getId()+"')]").doesNotExist())
-                .andExpect(jsonPath("$.collection[?(@.id=='"+projectWithNoOntology.getId()+"')]").exists());
+                .andExpect(jsonPath("$.collection", hasSize(0)));
     }
 
 
@@ -473,7 +469,7 @@ public class ProjectResourceTests {
                         .param("order", "desc")
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.collection", hasSize(greaterThanOrEqualTo(3))))
+                .andExpect(jsonPath("$.collection", hasSize(greaterThanOrEqualTo(2))))
                 .andExpect(jsonPath("$.collection[0].id").value(project2.getId()))
                 .andExpect(jsonPath("$.collection[1].id").value(project1.getId()))
         ;

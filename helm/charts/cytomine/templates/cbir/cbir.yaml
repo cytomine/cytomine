@@ -30,4 +30,5 @@ spec:
             mountPath: /data/
       volumes:
       - name: data
-        emptyDir: {}
+        persistentVolumeClaim:
+          claimName: cbir-data

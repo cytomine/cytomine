@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: cbir
   labels:
@@ -26,9 +26,22 @@ spec:
           - configMapRef:
               name: cbir
         volumeMounts:
-          - name: data
+          - name: cbir-storage
             mountPath: /data/
+      {{ if not .Values.cbir.storage.storageClassName -}}
       volumes:
-      - name: data
-        persistentVolumeClaim:
-          claimName: cbir-data
+        - name: cbir-storage
+          emptyDir: {}
+      {{ end }}
+  {{ if .Values.cbir.storage.storageClassName -}}
+  volumeClaimTemplates:
+    - metadata:
+        name: cbir-storage
+      spec:
+        storageClassName: {{ .Values.cbir.storage.storageClassName }}
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: {{ .Values.cbir.storage.size }}
+  {{- end }}

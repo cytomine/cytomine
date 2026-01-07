@@ -22,16 +22,22 @@ jobs:
           - name: app-engine
             context: '.'
             dockerfile_location: app-engine
+            target: production
           - name: cbir
+            target: production
           - name: core
+            target: production
           - name: iam
+            target: production
           # - name: mongo
           - name: nginx
           - name: pims
             context: '.'
             dockerfile_location: pims
+            target: production
           - name: postgis
           - name: sam
+            target: production
           - name: web-ui
           - name: python-client
             context: clients/python
@@ -69,3 +75,4 @@ jobs:
           tags: ${{ (github.ref_name != 'main' && 'registry.cytomine.org/') || '' }}cytomine/${{ matrix.image.name }}:${{ github.ref_name == 'main' && 'latest' || github.sha }}
           allow: network.host
           network: host
+          target: ${{ matrix.image.target || '' }}

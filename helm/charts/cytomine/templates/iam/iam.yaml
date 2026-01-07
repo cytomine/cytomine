@@ -22,7 +22,27 @@ spec:
       volumes:
       - name: keystore
         emptyDir: {}
+      - name: opt-keycloak
+        emptyDir: {}
       initContainers:
+      - name: iam-init
+        image: alpine:3.18
+        imagePullPolicy: {{ .Values.images.pullPolicy }}
+        securityContext:
+        {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
+        volumeMounts:
+          - name: opt-keycloak
+            mountPath: "/opt/keycloak"
+        command:
+          - /bin/sh
+          - -c
+          - >
+            set -x;
+            mkdir -p /opt/keycloak/lib;
+            chown -R {{ .Values.containerSecurity.userID }} /opt/keycloak/lib;
+        resources:
+          {{- toYaml .Values.postgresql.resources | nindent 12 }}
+
       - name: certificates-provider
         securityContext:
         {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
@@ -31,6 +51,7 @@ spec:
         volumeMounts:
         - name: keystore
           mountPath: "/keystore"
+
       containers:
       - name: iam
         securityContext:
@@ -62,7 +83,8 @@ spec:
               name: admin-iam-secret
               key: password
         volumeMounts:
+        - name: opt-keycloak
+          mountPath: "/opt/keycloak"
         - name: keystore
           mountPath: "/opt/keycloak/conf/server.keystore"
           subPath: "server.keystore"
-

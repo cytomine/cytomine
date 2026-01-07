@@ -41,21 +41,21 @@ spec:
         {{ end }}
       containers:
         - name: postgis
-          image: {{ .Values.images.postgresql }}
+          image: {{ .Values.images.postgis }}
           imagePullPolicy: {{ .Values.images.pullPolicy }}
 #          command: ["postgres", "-c", "config_file=/etc/postgres/postgres.conf"]
           securityContext:
           {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
           volumeMounts:
-            - name: postgres-storage
-              mountPath: "/var/lib/postgresql/data"
-              subPath: data
-            - name: postgres-storage
-              mountPath: "/var/lib/postgresql"
-            - name: temp
-              mountPath: /var/run
-            - name: temp
-              mountPath: /tmp
+          - name: postgres-storage
+            mountPath: "/var/lib/postgresql/data"
+            subPath: data
+          - name: postgres-storage
+            mountPath: "/var/lib/postgresql"
+          - name: temp
+            mountPath: /var/run
+          - name: temp
+            mountPath: /tmp
           env:
           - name: POSTGRES_USER
             value: {{ .Values.postgresql.user }}
@@ -79,8 +79,8 @@ spec:
           securityContext:
           {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
           volumeMounts:
-            - name: postgres-storage
-              mountPath: "/var/lib/postgresql/"
+          - name: postgres-storage
+            mountPath: "/var/lib/postgresql/"
           command:
             - /bin/sh
             - -c
@@ -90,6 +90,27 @@ spec:
               chown -R {{ .Values.containerSecurity.userID }} /var/lib/postgresql/data && chmod og-rwx /var/lib/postgresql/data;
           resources:
             {{- toYaml .Values.postgresql.resources | nindent 12 }}
+        - name: extensions
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 14 }}
+          image: {{ .Values.images.postgis }}
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          command: ["/bin/sh", "-c"]
+          args: ["psql --no-align --quiet --tuples-only -U $(POSTGRES_USER) -c \"CREATE EXTENSION IF NOT EXISTS ltree;\""]
+          env:
+          env:
+          - name: POSTGRES_USER
+            value: {{ .Values.postgresql.user }}
+          - name: POSTGRES_DB
+            value: {{ .Values.postgresql.database }}
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: postgres-core-secret
+                key: password
+          volumeMounts:
+          - name: postgres-storage
+            mountPath: "/var/lib/postgresql/"
       {{- with .Values.global.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}

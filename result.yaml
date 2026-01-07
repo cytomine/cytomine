@@ -1,0 +1,2662 @@
+NAME: cytomine-platform
+LAST DEPLOYED: Wed Jan  7 10:07:28 2026
+NAMESPACE: cytomine-local
+STATUS: pending-install
+REVISION: 1
+TEST SUITE: None
+USER-SUPPLIED VALUES:
+app_engine:
+  tasks_namespace: null
+global:
+  domainName: cytomine.local
+iam:
+  lsaaiClientIdSecretName: lsaai-client-id
+  lsaaiClientSecretSecretName: lsaai-client-secret
+  lsaaiEndpoint: https://login.aai.lifescience-ri.eu/oidc/.well-known/openid-configuration
+images:
+  app_engine: cytomine/app-engine:latest
+  cbir: cytomine/cbir:latest
+  core: cytomine/core:latest
+  iam: keycloak/keycloak:26.3
+  mongodb: mongo:4.4-focal
+  nginx: cytomine/nginx:latest
+  pims: cytomine/pims:latest
+  pims_cache: redis:7
+  pims_import: cytomine/python-client:latest
+  postgresql_app_engine: postgres:14
+  postgresql_iam: postgres:14
+  pullPolicy: IfNotPresent
+  redis: redis:7
+  sam: cytomine/sam:latest
+  web_ui: cytomine/web-ui:latest
+ingress:
+  className: nginx
+mongodb:
+  storageClassName: null
+pims:
+  datasetImportFolder: /data/dataset
+  imageStorage:
+    storageClassName: null
+  tempImageStorage:
+    storageClassName: null
+postgresql:
+  storageClassName: null
+
+COMPUTED VALUES:
+adminEmail: info@cytomine.coop
+app_engine:
+  port: 8080
+cbir:
+  port: 6000
+containerSecurity:
+  allowPrivilegeEscalation: false
+  fsgroupID: 20000
+  groupID: 20000
+  privileged: false
+  readOnlyRootFilesystem: true
+  userID: 20000
+core:
+  deploy: true
+  port: 8080
+  resources:
+    limits:
+      cpu: 500m
+      ephemeral-storage: 1Gi
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      ephemeral-storage: 1Gi
+      memory: 2Gi
+  server_id: 69308206-ed7c-454b-90b3-5639377ccd2f
+emailReceiver: receiver@XXX.com
+emailSender: your.email@gmail.com
+global:
+  affinity: {}
+  domainName: cytomine.local
+  imsDomainName: null
+  protocol: TCP
+  publicIP: 192.168.49.2/32
+  tolerations: {}
+  urlUpload: null
+iam:
+  lsaaiClientIdSecretName: lsaai-client-id
+  lsaaiClientSecretSecretName: lsaai-client-secret
+  lsaaiEndpoint: https://login.aai.lifescience-ri.eu/oidc/.well-known/openid-configuration
+  port: 8080
+imageStorage: 3Gi
+images:
+  app_engine: cytomine/app-engine:latest
+  cbir: cytomine/cbir:latest
+  core: cytomine/core:latest
+  iam: keycloak/keycloak:26.3
+  imagePullSecretsNames: null
+  mongodb: mongo:4.4-focal
+  nginx: cytomine/nginx:latest
+  pims: cytomine/pims:latest
+  pims_cache: redis:7
+  pims_import: cytomine/python-client:latest
+  postgis: postgis/postgis:15-3.5
+  postgresql_app_engine: postgres:14
+  postgresql_iam: postgres:14
+  pullPolicy: IfNotPresent
+  redis: redis:7
+  sam: cytomine/sam:latest
+  web_ui: cytomine/web-ui:latest
+ingress:
+  annotations: {}
+  className: nginx
+mongodb:
+  database: cytomine
+  deploy: true
+  mongoStorageHostPath: null
+  port: 27017
+  resources:
+    limits:
+      cpu: 200m
+      ephemeral-storage: 1Gi
+      memory: 256Mi
+    requests:
+      cpu: 50m
+      ephemeral-storage: 1Gi
+      memory: 256Mi
+  statusPort: 28017
+  storageAccessMode: ReadWriteOnce
+  username: mongoadmin
+mongodbStorage: 1Gi
+nginx:
+  deploy: false
+  port: 9000
+  resources:
+    limits:
+      cpu: 200m
+      ephemeral-storage: 1Gi
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      ephemeral-storage: 32Mi
+      memory: 256Mi
+  serverID: null
+pims:
+  datasetImportFolder: /data/dataset
+  datasetImportFolderFailIfAbsent: true
+  deploy: true
+  imageStorage: {}
+  port: 5000
+  resources:
+    limits:
+      cpu: 1000m
+      ephemeral-storage: 1Gi
+      memory: 4Gi
+    requests:
+      cpu: 1000m
+      ephemeral-storage: 1Gi
+      memory: 4Gi
+  tempImageStorage: {}
+pims_cache:
+  deploy: true
+  port: 6379
+  resources:
+    limits:
+      cpu: 200m
+      ephemeral-storage: 1Gi
+      memory: 256Mi
+    requests:
+      cpu: 200m
+      ephemeral-storage: 32Mi
+      memory: 256Mi
+postgresStorage: 3Gi
+postgresql:
+  database: docker
+  deploy: true
+  port: 5432
+  resources:
+    limits:
+      cpu: 200m
+      ephemeral-storage: 1Gi
+      memory: 512Mi
+    requests:
+      cpu: 50m
+      ephemeral-storage: 1Gi
+      memory: 512Mi
+  storageAccessMode: ReadWriteOnce
+  user: docker
+readManyStorageClass: null
+readOnceStorageClass: ""
+redis:
+  port: 6379
+sam:
+  port: 8000
+serviceAccount:
+  annotations: {}
+  create: true
+  name: ""
+singularityStorage: 10Gi
+smtpHost: mail.smtp
+smtpPass: null
+smtpPort: 587
+tempImageStorage: 1Gi
+web_ui:
+  deploy: true
+  port: 9090
+  replicas: 1
+  resources:
+    limits:
+      cpu: 200m
+      ephemeral-storage: 1Gi
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      ephemeral-storage: 32Mi
+      memory: 256Mi
+
+HOOKS:
+---
+# Source: cytomine-helm/templates/iam/iam-job-config.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: iam-config
+  labels:
+    app: iam-config
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+spec:
+  template:
+    spec:
+      serviceAccountName: cytomine-platform-cytomine-helm
+      securityContext:
+        
+        runAsUser: 20000
+        runAsGroup: 20000
+        fsGroup: 20000
+        supplementalGroups: [4000]
+        seccompProfile:
+            type: "RuntimeDefault"
+      initContainers: # initContainers run in sequence, not containers
+      - name: login
+        image: "keycloak/keycloak:26.3"
+        command: ["/bin/sh", "-c"]
+        args: ["/opt/keycloak/bin/kcadm.sh config credentials --server http://iam.cytomine-local.svc.cluster.local:8080/iam --realm master --user admin --password $(KEYCLOAK_ADMIN_PASSWORD) --config /opt/keycloak-auth/kcadm.config"]
+        volumeMounts:
+        - name: kc-auth
+          mountPath: "/opt/keycloak-auth"
+        env:
+        - name: KEYCLOAK_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: admin-iam-secret
+              key: password
+        securityContext:
+          
+          allowPrivilegeEscalation: false
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          capabilities:
+              drop: ["ALL"]
+
+      - name: create-realm
+        image: "keycloak/keycloak:26.3"
+        command: ["/bin/sh", "-c"]
+        args: ["/opt/keycloak/bin/kcadm.sh create realms --server http://iam.cytomine-local.svc.cluster.local:8080/iam --config /opt/keycloak-auth/kcadm.config -s realm=cytomine -s enabled=true -o || true"]
+        volumeMounts:
+        - name: kc-auth
+          mountPath: "/opt/keycloak-auth"
+        securityContext:
+          
+          allowPrivilegeEscalation: false
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          capabilities:
+              drop: ["ALL"]
+
+      - name: create-user
+        image: "keycloak/keycloak:26.3"
+        command: ["/bin/sh", "-c"]
+        args: ["/opt/keycloak/bin/kcadm.sh create users -r cytomine --server http://iam.cytomine-local.svc.cluster.local:8080/iam --config /opt/keycloak-auth/kcadm.config -f /opt/keycloak-conf/config.json -o || true"]
+        volumeMounts:
+        - name: kc-auth
+          mountPath: "/opt/keycloak-auth"
+        - name: iam-user-config
+          mountPath: "/opt/keycloak-conf/config.json"
+          subPath: "config.json"
+        securityContext:
+          
+          allowPrivilegeEscalation: false
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          capabilities:
+              drop: ["ALL"]
+
+      - name: set-password
+        image: "keycloak/keycloak:26.3"
+        command: ["/bin/sh", "-c"]
+        args: ["/opt/keycloak/bin/kcadm.sh set-password --server http://iam.cytomine-local.svc.cluster.local:8080/iam -r cytomine --username admin --new-password $(CYTOMINE_USER_PASSWORD) --config /opt/keycloak-auth/kcadm.config"]
+        volumeMounts:
+        - name: kc-auth
+          mountPath: "/opt/keycloak-auth"
+        env:
+        - name: CYTOMINE_USER_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: cytomine-admin-iam-secret
+              key: password
+        securityContext:
+          
+          allowPrivilegeEscalation: false
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          capabilities:
+              drop: ["ALL"]
+
+      - name: create-client
+        image: "keycloak/keycloak:26.3"
+        command: ["/bin/sh", "-c"]
+        args: ["/opt/keycloak/bin/kcadm.sh create clients -r cytomine --server http://iam.cytomine-local.svc.cluster.local:8080/iam --config /opt/keycloak-auth/kcadm.config -f /opt/keycloak-conf/config.json -o || true && /opt/keycloak/bin/kcadm.sh get clients -r cytomine --server http://iam.cytomine-local.svc.cluster.local:8080/iam --config /opt/keycloak-auth/kcadm.config -q clientId=core --fields=id | tr -d '\n][{} \"' | cut -f2 -d':' > /opt/keycloak-auth/client-core-id && cat /opt/keycloak-auth/client-core-id"]
+        volumeMounts:
+        - name: kc-auth
+          mountPath: "/opt/keycloak-auth"
+        - name: iam-client-config
+          mountPath: "/opt/keycloak-conf/config.json"
+          subPath: "config.json"
+        securityContext:
+          
+          allowPrivilegeEscalation: false
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          capabilities:
+              drop: ["ALL"]
+
+      - name: create-client-roles-admin
+        image: "keycloak/keycloak:26.3"
+        command: ["/bin/sh", "-c"]
+        args: ["/opt/keycloak/bin/kcadm.sh create clients/$(cat /opt/keycloak-auth/client-core-id)/roles -r cytomine --server http://iam.cytomine-local.svc.cluster.local:8080/iam --config /opt/keycloak-auth/kcadm.config -o -s name=ADMIN || true"]
+        volumeMounts:
+        - name: kc-auth
+          mountPath: "/opt/keycloak-auth"
+        securityContext:
+          
+          allowPrivilegeEscalation: false
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          capabilities:
+              drop: ["ALL"]
+
+      - name: create-client-roles-guest
+        image: "keycloak/keycloak:26.3"
+        command: ["/bin/sh", "-c"]
+        args: ["/opt/keycloak/bin/kcadm.sh create clients/$(cat /opt/keycloak-auth/client-core-id)/roles -r cytomine --server http://iam.cytomine-local.svc.cluster.local:8080/iam --config /opt/keycloak-auth/kcadm.config -o -s name=GUEST || true"]
+        volumeMounts:
+        - name: kc-auth
+          mountPath: "/opt/keycloak-auth"
+        securityContext:
+          
+          allowPrivilegeEscalation: false
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          capabilities:
+              drop: ["ALL"]
+
+      - name: create-client-roles-user
+        image: "keycloak/keycloak:26.3"
+        command: ["/bin/sh", "-c"]
+        args: ["/opt/keycloak/bin/kcadm.sh create clients/$(cat /opt/keycloak-auth/client-core-id)/roles -r cytomine --server http://iam.cytomine-local.svc.cluster.local:8080/iam --config /opt/keycloak-auth/kcadm.config -o -s name=USER || true"]
+        volumeMounts:
+        - name: kc-auth
+          mountPath: "/opt/keycloak-auth"
+        securityContext:
+          
+          allowPrivilegeEscalation: false
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          capabilities:
+              drop: ["ALL"]
+
+      - name: add-roles-user
+        image: "keycloak/keycloak:26.3"
+        command: ["/bin/sh", "-c"]
+        args: ["/opt/keycloak/bin/kcadm.sh add-roles -r cytomine --server http://iam.cytomine-local.svc.cluster.local:8080/iam --config /opt/keycloak-auth/kcadm.config  --uusername admin --cclientid core --rolename ADMIN || true"]
+        volumeMounts:
+        - name: kc-auth
+          mountPath: "/opt/keycloak-auth"
+        securityContext:
+          
+          allowPrivilegeEscalation: false
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          capabilities:
+              drop: ["ALL"]
+
+
+      # https://stackoverflow.com/a/75794013
+      - name: fetch-auth-config
+        image: "curlimages/curl"
+        command: ["/bin/sh", "-c"]
+        args: ["cat /opt/keycloak-auth/kcadm.config | grep token | sed -E 's/(token)|\"|:| |,//g' > /opt/keycloak-auth/token"]
+        volumeMounts:
+        - name: kc-auth
+          mountPath: "/opt/keycloak-auth"
+        securityContext:
+          
+          allowPrivilegeEscalation: false
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          capabilities:
+              drop: ["ALL"]
+
+      - name: import-lsaai-config
+        image: "curlimages/curl"
+        command: ["/bin/sh", "-c"]
+        args: ["AUTH=$(cat /opt/keycloak-auth/token) && curl -s -X POST -H \"Authorization: bearer $AUTH\" -H 'content-type: application/json' http://iam.cytomine-local.svc.cluster.local:8080/iam/admin/realms/cytomine/identity-provider/import-config -d '{\"fromUrl\":\"'https://login.aai.lifescience-ri.eu/oidc/.well-known/openid-configuration'\",\"providerId\":\"oidc\"}' > /opt/keycloak-auth/import-config.json && cat /opt/keycloak-auth/import-config.json"]
+        volumeMounts:
+        - name: kc-auth
+          mountPath: "/opt/keycloak-auth"
+        securityContext:
+          
+          allowPrivilegeEscalation: false
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          capabilities:
+              drop: ["ALL"]
+
+
+      - name: add-provider-lsaai-instance
+        image: "keycloak/keycloak:26.3"
+        command: ["/bin/sh", "-c"]
+        args: ["JSON=$(cat /opt/keycloak-auth/import-config.json) && /opt/keycloak/bin/kcadm.sh create identity-provider/instances -r cytomine --server http://iam.cytomine-local.svc.cluster.local:8080/iam --config /opt/keycloak-auth/kcadm.config -s providerId=oidc -s alias=oidc -s enabled=true -s displayName='Life Science' -s config=$JSON -s config.clientId=$(LSAAI_CLIENT_ID) -s config.clientSecret=$(LSAAI_CLIENT_SECRET) || true"]
+        volumeMounts:
+        - name: kc-auth
+          mountPath: "/opt/keycloak-auth"
+        securityContext:
+          
+          allowPrivilegeEscalation: false
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          capabilities:
+              drop: ["ALL"]
+        env:
+        - name: LSAAI_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: lsaai-client-secret
+              key: clientSecret
+        - name: LSAAI_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: lsaai-client-id
+              key: clientId
+
+      - name: add-provider-lsaai-mapper
+        image: "keycloak/keycloak:26.3"
+        command: ["/bin/sh", "-c"]
+        args: ["/opt/keycloak/bin/kcadm.sh create identity-provider/instances/oidc/mappers -r cytomine --server http://iam.cytomine-local.svc.cluster.local:8080/iam --config /opt/keycloak-auth/kcadm.config -s identityProviderAlias=oidc -s identityProviderMapper=oidc-hardcoded-role-idp-mapper -s name=oidc-mapper -s config.role=core.ADMIN -s config.syncMode=INHERIT || true"]
+        volumeMounts:
+        - name: kc-auth
+          mountPath: "/opt/keycloak-auth"
+        securityContext:
+          
+          allowPrivilegeEscalation: false
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          capabilities:
+              drop: ["ALL"]
+
+
+      containers:
+      - name: check-job-done
+        image: "keycloak/keycloak:26.3"
+        securityContext:
+          
+          allowPrivilegeEscalation: false
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          capabilities:
+              drop: ["ALL"]
+        command: ["/bin/sh", "-c"]
+        args: ["/opt/keycloak/bin/kcadm.sh config credentials --server http://iam.cytomine-local.svc.cluster.local:8080/iam --realm cytomine --user admin --password $(CYTOMINE_USER)"]
+        env:
+        - name: CYTOMINE_USER
+          valueFrom:
+            secretKeyRef:
+              name: cytomine-admin-iam-secret
+              key: password
+      volumes:
+      - emptyDir: {}
+        name: kc-auth
+      - name: iam-client-config
+        configMap:
+          name: iam-client-config
+          items:
+          - key: "config.json"
+            path: "config.json"
+      - name: iam-user-config
+        configMap:
+          name: iam-user-config
+          items:
+          - key: "config.json"
+            path: "config.json"
+      restartPolicy: Never
+MANIFEST:
+---
+# Source: cytomine-helm/templates/app-engine/app-engine-tasks-namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cytomine-local-engine-tasks
+---
+# Source: cytomine-helm/templates/app-engine/app-engine-sa.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: app-engine
+  namespace: cytomine-local-engine-tasks
+---
+# Source: cytomine-helm/templates/app-engine/app-engine-sa.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: app-engine
+  namespace: cytomine-local
+---
+# Source: cytomine-helm/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cytomine-platform-cytomine-helm
+  labels:
+    app.kubernetes.io/name: cytomine-helm
+    app.kubernetes.io/instance: cytomine-platform
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: cytomine-helm/templates/app-engine/app-engine-sa.yaml
+apiVersion: v1
+kind: Secret
+type: kubernetes.io/service-account-token
+metadata:
+  name: app-engine
+  namespace: cytomine-local-engine-tasks
+  annotations:
+    kubernetes.io/service-account.name: app-engine
+---
+# Source: cytomine-helm/templates/app-engine/app-engine-sa.yaml
+apiVersion: v1
+kind: Secret
+type: kubernetes.io/service-account-token
+metadata:
+  name: app-engine
+  namespace: cytomine-local
+  annotations:
+    kubernetes.io/service-account.name: app-engine
+---
+# Source: cytomine-helm/templates/app-engine/postgres-app-engine-secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-app-engine-secret
+type: Opaque
+data:
+  password: "bXZSY3Nabk9zeEJoMUNwb0ZkSHdjdHVuWWdpMXplNGdGem92TGNaZjVxMWt0WnVWQUN4a1c5QWNSa3BwWE96ZQ=="
+---
+# Source: cytomine-helm/templates/core/core-config.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: core-config
+stringData:
+  application.yml.sample: |-
+    spring:
+      datasource:
+        url: jdbc:postgresql://$POSTGIS_HOST:$POSTGIS_PORT/$POSTGIS_DB_NAME
+        username: $POSTGIS_USER
+        password: $POSTGIS_PASS
+
+      mail:
+        host: $SMTP_HOST
+        port: $SMTP_PORT
+        username: $SMTP_USER
+        password: $SMPT_PASS
+        auth: true
+
+      data:
+        mongodb:
+          authentication-database: admin
+          username: $MONGO_USER
+          password: $MONGO_PASS
+          database: $MONGO_DB_NAME
+          port: $MONGO_PORT
+          host: $MONGO_HOST
+
+    javamelody:
+      enabled: true
+      init-parameters:
+        authorized-users: $JAVAMELODY_USER:$JAVAMELODY_PASS
+        storage-directory: $JAVAMELODY_PATH
+
+    logging:
+      config: file:/app/logback.xml
+
+    application:
+      customUI:
+        global:
+          dashboard: ["ALL"]
+          search: [ "ROLE_ADMIN" ]
+          project: [ "ALL" ]
+          ontology: [ "ROLE_ADMIN" ]
+          storage: [ "ROLE_USER","ROLE_ADMIN" ]
+          software: []
+          activity: [ "ALL" ]
+          admin: [ "ROLE_ADMIN" ]
+          help: [ "ALL" ]
+          feedback: ["ROLE_USER","ROLE_ADMIN"]
+          explore: ["ROLE_USER","ROLE_ADMIN"]
+
+      serverId: $SERVER_ID
+      serverURL: $URL_CORE
+      imageServerURL: [$URL_PIMS1]
+
+      storagePath: $STORAGE_PATH
+      adminPassword: $ADMIN_PASSWORD
+      adminEmail: $ADMIN_EMAIL
+      adminPrivateKey: $ADMIN_PRIVATE_KEY
+      adminPublicKey: $ADMIN_PUBLIC_KEY
+      superAdminPrivateKey: $SUPER_ADMIN_PRIVATE_KEY
+      superAdminPublicKey: $SUPER_ADMIN_PUBLIC_KEY
+      ImageServerPrivateKey: $IMAGE_SERVER_PRIVATE_KEY
+      ImageServerPublicKey: $IMAGE_SERVER_PUBLIC_KEY
+
+
+      notification:
+        email: your.email@gmail.com
+
+      useHTTPInternally: false
+
+      instanceHostWebsite: $INSTANCE_HOST_WEBSITE_URL
+      instanceHostSupportMail: $INSTANCE_HOST_SUPPORT_MAIL
+      instanceHostPhoneNumber: $INSTANCE_HOST_PHONE_NUMBER
+
+      authentication:
+        jwt:
+          # This token must be encoded using Base64 and be at least 256 bits long (you can type `openssl rand -base64 64` on your command line to generate a 512 bits one)
+          secret: $JWT_SECRET
+
+  logback.xml: |-
+    <?xml version="1.0" encoding="UTF-8"?>
+    <!DOCTYPE configuration>
+
+    <configuration scan="true">
+        <include resource="org/springframework/boot/logging/logback/base.xml"/>
+
+    <!-- The FILE and ASYNC appenders are here as examples for a production configuration -->
+    <!--
+        <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>logFile.%d{yyyy-MM-dd}.log</fileNamePattern>
+                <maxHistory>90</maxHistory>
+            </rollingPolicy>
+            <encoder>
+                <charset>utf-8</charset>
+                <Pattern>%d %-5level [%thread] %logger{0}: %msg%n</Pattern>
+            </encoder>
+        </appender>
+
+        <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+            <queueSize>512</queueSize>
+            <appender-ref ref="FILE"/>
+        </appender>
+
+        <root level="${logging.level.root}">
+            <appender-ref ref="ASYNC"/>
+        </root>
+    -->
+        <logger name="org.mongodb" level="WARN"/>
+        <logger name="be.cytomine" level="DEBUG"/>
+        <logger name="javax.activation" level="WARN"/>
+        <logger name="javax.mail" level="WARN"/>
+        <logger name="javax.management.remote" level="WARN"/>
+        <logger name="javax.xml.bind" level="WARN"/>
+        <logger name="ch.qos.logback" level="WARN"/>
+        <logger name="com.ryantenney" level="WARN"/>
+        <logger name="com.sun" level="WARN"/>
+        <logger name="com.zaxxer" level="WARN"/>
+        <logger name="io.undertow" level="WARN"/>
+        <logger name="io.undertow.websockets.jsr" level="ERROR"/>
+        <logger name="org.apache" level="WARN"/>
+        <logger name="org.apache.catalina.startup.DigesterFactory" level="OFF"/>
+        <logger name="org.bson" level="WARN"/>
+        <logger name="org.hibernate.validator" level="WARN"/>
+        <logger name="org.hibernate" level="WARN"/>
+        <logger name="org.hibernate.ejb.HibernatePersistence" level="OFF"/>
+        <logger name="org.postgresql" level="WARN"/>
+        <logger name="org.springframework" level="WARN"/>
+        <logger name="org.springframework.web" level="DEBUG"/>
+        <logger name="org.springframework.security" level="WARN"/>
+        <logger name="org.springframework.web.socket" level="DEBUG"/>
+        <logger name="org.thymeleaf" level="WARN"/>
+        <logger name="org.xnio" level="WARN"/>
+        <logger name="springfox" level="WARN"/>
+        <logger name="sun.rmi" level="WARN"/>
+        <logger name="liquibase" level="WARN"/>
+        <logger name="LiquibaseSchemaResolver" level="INFO"/>
+        <logger name="springfox.documentation.schema.property" level="ERROR"/>
+        <logger name="sun.rmi.transport" level="WARN"/>
+
+        <logger name="org.hibernate.engine.internal.StatefulPersistenceContext" level="ERROR"/>
+        <!-->Ignore HHH000179: Narrowing proxy to class be.cytomine.domain.security.User - this operation breaks ==  ; as we have custom equals/hashcode<!-->
+
+        <!-- https://logback.qos.ch/manual/configuration.html#shutdownHook and https://jira.qos.ch/browse/LOGBACK-1090 -->
+        <shutdownHook class="ch.qos.logback.core.hook.DelayingShutdownHook"/>
+
+        <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+            <resetJUL>true</resetJUL>
+        </contextListener>
+
+    </configuration>
+---
+# Source: cytomine-helm/templates/core/core-secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: core-secret
+type: Opaque
+data:
+  ADMIN_PASSWORD: "bTJFdnZLMHpnclVGMHdUQWFWM1cxY0l6aUlEQmh3Umxsdkxlcmk5Y0FGVnF6TEVRQ0xlY1FNUndUSDFKSHNTOA=="
+  ADMIN_PRIVATE_KEY: "ZGE3NzY1ZGItOTcxZS00ODg2LTkxM2QtM2U1ZDhiMTA0MTRh"
+  ADMIN_PUBLIC_KEY: "NTBkOTAzM2QtMDQ0OC00ZDg5LTk2ZGQtMzAzNjEwZGE5NjA4"
+  JWT_SECRET: "ZFE2cE1WbXY2Qkp0WTJYYnc4WjdXRU5LcEUydE5lWmtyTzZGbDFjblpIdFdrTFVEZEQ4WVhmQWxINHpteXJRNQ=="
+  SUPER_ADMIN_PRIVATE_KEY: "Mjg0ZmUzYTUtMjgwMC00MmUxLWIyYmUtOTc1ZjcyN2QxNzc2"
+  SUPER_ADMIN_PUBLIC_KEY: "OGI5YjVmYzktMTA0MC00ZGNkLWEwMTAtN2YwNWQwODk1YmFl"
+  IMAGE_SERVER_PRIVATE_KEY: "YzEwMzdlYzktMzYzMi00ZjRmLThmYTYtODMzZmUyYzM4Y2U0"
+  IMAGE_SERVER_PUBLIC_KEY: "OWVmNjE2YTgtYjRkNC00MmI1LWE1NjAtZTYzMWNlNzc3NWE5"
+  SMTP_PASSWORD: "Q2sxVmxoMTcwUEtrR3plOVhmSUd3dDJVNUNSRnpZVkxhQURZS0Fhd2JmQ3BDQVdzN0RuQWZHaUVJcGFmZjdRaw=="
+  JAVAMELODY_PASS: "b2dBWFoySnI1bXdiZXV6ZHJlRzhRbUV3aTg5QzZ2ZDByRUtMbWdxenVRVEdTNzFyVjRvb2tjcmR0eVdPWWlUeQ=="
+---
+# Source: cytomine-helm/templates/iam/admin-iam-secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: "admin-iam-secret"
+type: Opaque
+data:
+  password: "N3c1UEZKY1p0aFJvOUVKcjE3aVYwMm9FZXRvZzVZSkcyYjlrWjBBTHlRY3VuemI1ZTNwMFRwY0Zaa3R0clVZTw=="
+---
+# Source: cytomine-helm/templates/iam/cytomine-admin-iam-secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: "cytomine-admin-iam-secret"
+type: Opaque
+data:
+  password: "ZkZFb2VucXJ1NVFuNEQ3Z3VhTFpQYlUzeDlDUUwyUVVLS2t4Z0ZCQUV2WVhxTFc5NlhtN2lYWGFWTTRsdTNoRA=="
+---
+# Source: cytomine-helm/templates/iam/iam-keystore-secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: "keystore-iam-secret"
+type: Opaque
+data:
+  password: "TnM0bXU3c2lwV1g5YlJWYlIzRFc0WDdHTWtUVkNmdllKRDVYMXZ0MHBMN1Nud1c1c3dFVXh3OWZPYnVWaVhOMA=="
+---
+# Source: cytomine-helm/templates/iam/postgres-iam-secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: "postgres-iam-secret"
+type: Opaque
+data:
+  password: "OEtOTjFHMWpsYjl5a2tEVkgwM3g2ZVVPSExrdUI4T0E0NFBHZ0NqV21BU2ZrZlAyMER5OG9PdGZqOUJmRU1vNw=="
+---
+# Source: cytomine-helm/templates/mongodb/mongodb-secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mongodb-secret
+type: Opaque
+data:
+  password: "M3MydFZLQWFBN2MzQkJ6SjBFRUs0Z0V0NWdaaU1XekJ4TFhjTmprTjQ1NTA2b0JrT0RtVDJkRlhWb0tXcklMRg=="
+---
+# Source: cytomine-helm/templates/postgresql/postgresql-secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: "postgres-core-secret"
+type: Opaque
+data:
+  password: "blpsazA3cmdqaVNDUTREQnJ4aUk2b0duUXVGaXFIUVoxWW5RakQ5bWtPcE1kb282Zmozd2lGcnQ1M3k0YlFzUA=="
+---
+# Source: cytomine-helm/templates/app-engine/app-engine-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-engine
+data:
+  DB_USERNAME: appengine
+  DB_NAME: appengine
+  DB_HOST: postgres-app-engine.cytomine-local.svc.cluster.local
+  DB_PORT: "5432"
+  API_PREFIX: /app-engine/
+  REGISTRY_URL: http://registry.container-registry.svc.cluster.local:5000
+  SCHEDULER_ADVERTISED_URL: http://app-engine.cytomine-local.svc.cluster.local:8080
+  SCHEDULER_REGISTRY_ADVERTISED_URL: localhost:32000
+  SCHEDULER_USE_HOST_NETWORK: "false"
+  SCHEDULER_RUN_MODE: "cluster"
+  SCHEDULER_TASKS_NAMESPACE: cytomine-local-engine-tasks
+---
+# Source: cytomine-helm/templates/cbir/cbir-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cbir
+data:
+  API_BASE_PATH: "/cbir"
+  HOST: "redis.cytomine-local.svc.cluster.local"
+  PORT: "6379"
+---
+# Source: cytomine-helm/templates/core/core-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: core-env
+data:
+  ADMIN_EMAIL: admin@cytomine.org
+  INSTANCE_HOST_PHONE_NUMBER: None
+  INSTANCE_HOST_SUPPORT_MAIL: None
+  REVERSE_PROXY_URL: "https://cytomine.local"
+  SERVER_ID: 69308206-ed7c-454b-90b3-5639377ccd2f
+  INSTANCE_HOST_WEBSITE_URL: core.cytomine-local.svc.cluster.local
+  JAVAMELODY_PATH: /javamelody-core
+  JAVAMELODY_USER: admin
+  MONGO_DB_NAME: cytomine-helm
+  MONGO_HOST: mongodb.cytomine-local.svc.cluster.local
+  MONGO_PORT: "27017"
+  MONGO_USER: mongoadmin
+  POSTGIS_DB_NAME: docker
+  POSTGIS_HOST: postgis.cytomine-local.svc.cluster.local
+  POSTGIS_PORT: "5432"
+  POSTGIS_USER: docker
+  SMTP_HOST: mail.smtp
+  SMTP_PORT: "587"
+  SMTP_USER: user
+  STORAGE_PATH: /data/images
+  URL_CORE: core.cytomine-local.svc.cluster.local
+  IAM_URL: http://iam.cytomine-local.svc.cluster.local:8080
+  PIMS_URL: http://pims.cytomine-local.svc.cluster.local:5000
+  SAM_URL: http://sam.cytomine-local.svc.cluster.local:8000
+  CBIR_URL: http://cbir.cytomine-local.svc.cluster.local:6000
+  SERVER_URL: "https://cytomine.local"
+  APPENGINE_ENABLED: "true"
+  APPENGINE_API_URL: http://app-engine.cytomine-local.svc.cluster.local:8080
+  APPENGINE_API_BASE_PATH: /app-engine/v1/
+---
+# Source: cytomine-helm/templates/iam/iam-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: iam
+data:
+  KC_BOOTSTRAP_ADMIN_USERNAME: admin
+  KC_PROXY_HEADERS: xforwarded
+  KC_HTTP_RELATIVE_PATH: /iam
+  KC_HTTP_ENABLED: "true"
+  KC_HTTP_PORT: "8080"
+  KC_HOSTNAME_STRICT: "false"
+  KC_HOSTNAME_STRICT_HTTPS: "false"
+  KC_HOSTNAME_STRICT_BACKCHANNEL: "true"
+  KC_FEATURES: token-exchange
+  KC_DB_USERNAME: iam
+  KC_DB_URL_DATABASE: iam
+  KC_DB_URL_HOST: postgres-iam.cytomine-local.svc.cluster.local
+  KC_DB_URL_PORT: "5432"
+  KC_HOSTNAME: "cytomine.local"
+  # KC_HOSTNAME_ADMIN: aaa_config.CYTOMINE_HOST
+  # KC_ADMIN_EMAIL: cytomine@uliege.be
+  # KC_SMTP_HOST: smtp.HOST
+  # KC_SMTP_PORT: smtp.PORT
+  # KC_SMTP_USER: smtp.USER
+  # KC_SMTP_PASS: smtp.PASS
+  # KC_SMTP_FROM: smtp.FROM
+---
+# Source: cytomine-helm/templates/iam/iam-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: iam-client-config
+data:
+  config.json: |-
+    {
+      "clientId" : "core",
+      "name" : "Cytomine Core",
+      "description" : "This is the default client for cytomine.",
+      "rootUrl" : "https://cytomine.local",
+      "adminUrl" : "https://cytomine.local",
+      "baseUrl" : "https://cytomine.local",
+      "surrogateAuthRequired" : false,
+      "enabled" : true,
+      "alwaysDisplayInConsole" : false,
+      "clientAuthenticatorType" : "client-secret",
+      "defaultRoles" : [ "USER" ],
+      "redirectUris" : [ "https://cytomine.local/*" ],
+      "webOrigins" : [ "*" ],
+      "notBefore" : 0,
+      "bearerOnly" : false,
+      "consentRequired" : false,
+      "standardFlowEnabled" : true,
+      "implicitFlowEnabled" : false,
+      "directAccessGrantsEnabled" : true,
+      "serviceAccountsEnabled" : false,
+      "publicClient" : true,
+      "frontchannelLogout" : true,
+      "protocol" : "openid-connect",
+      "attributes" : {
+        "realm_client" : "false",
+        "oidc.ciba.grant.enabled" : "false",
+        "backchannel.logout.session.required" : "true",
+        "login_theme" : "keycloak",
+        "post.logout.redirect.uris" : "https://cytomine.local/*",
+        "display.on.consent.screen" : "false",
+        "oauth2.device.authorization.grant.enabled" : "false",
+        "backchannel.logout.revoke.offline.tokens" : "false"
+      },
+      "authenticationFlowBindingOverrides" : { },
+      "fullScopeAllowed" : true,
+      "nodeReRegistrationTimeout" : -1,
+      "defaultClientScopes" : [ "web-origins", "acr", "roles", "profile", "basic", "email" ],
+      "optionalClientScopes" : [ "address", "phone", "offline_access", "microprofile-jwt" ]
+    }
+---
+# Source: cytomine-helm/templates/iam/iam-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: iam-user-config
+data:
+  config.json: |-
+    {
+      "username": "admin",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "admin@cytomine.org",
+      "firstName": "Admin",
+      "lastName": "Admin"
+    }
+---
+# Source: cytomine-helm/templates/localtime.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: localtime
+binaryData:
+  Europe: |-
+      VFppZjIAAAAAAAAAAAAAAAAAAAAAAAAFAAAABQAAAAAAAAB3AAAABQAAAA2AAAAAmx6MYJvV2vATTUQQFDP6kBUj65AWE9yQFwPNkBfzvpAY46+QGdOgkBrDkZAbvL0QHKyuEB2cnxAejJAQH3yBECBschAhXGMQIkxUECM8RRAkLDYQJRwnECYMGBAnBUOQJ/U0kCjlJZAp1RaQKsUHkCu0+JAspOmQLZTakC6Ey5AvdLyQMGStkDFd2RAycrQQMz27EDRSlhA1HZ0QNjJ4EDb9fxA4G5SQON1hEDn7dpA6vUMQO9tYkDymX5A9uzqQPoZBkD+bHJBAZiOQQYQ5EEJGBZBDZBsQRCXnkEVD/RBGBcmQRyPfEEfu5hBJA8EQSc7IEErjoxBLrqoQTMy/kE2OjBBOrKGQT25uEFCMg5BRV4qQUmxlkFM3bJBUTEeQVRdOkFYsKZBW9zCQWBVGEFjXEpBZ9SgQWrb0kFvVChBcoBEQXbTsEF5/8xBflM4QYF/VEGF96pBiP7cQY13MkGQfmRBlPa6QZgi1kGcdkJBn6JeQaP1ykGnIeZBq3VSQa6hbkGzGcRBtiD2QbqZTEG9oH5BwhjUQcVE8EHJmFxBzMR4QdEX5EHURABB2LxWQdvDiEHgO95B40MQQee7ZkHqwphB7zruQfJnCkH2unZB+eaSQf45/kAECAQMEAwQDBAMEAwQDBAMEAwQDBAMEAwQDBAMEAwQDBAMEAwQDBAMEAwQDBAMEAwQDBAMEAwQDBAMEAwQDBAMEAwQDBAMEAwQDBAMEAwQDBAMEAwQDBAMEAwQDBAMEAwQDBAMEAwQDBAMEAwQDBAMEAwQDBAMEAAAQ7AAAAAAOEAAEAAAcIAEIAAAcIAEIAAAOEAAETE1UAENFVABDRVNUAAAAAAEBAAAAAQFUWmlmMgAAAAAAAAAAAAAAAAAAAAAAAAYAAAAGAAAAAAAAAHgAAAAGAAAAEf////9U1Z+U/////3xVc2L/////mx6MYP////+b1drwAAAAABNNRBAAAAAAFDP6kAAAAAAVI+uQAAAAABYT3JAAAAAAFwPNkAAAAAAX876QAAAAABjjr5AAAAAAGdOgkAAAAAAaw5GQAAAAABu8vRAAAAAAHKyuEAAAAAAdnJ8QAAAAAB6MkBAAAAAAH3yBEAAAAAAgbHIQAAAAACFcYxAAAAAAIkxUEAAAAAAjPEUQAAAAACQsNhAAAAAAJRwnEAAAAAAmDBgQAAAAACcFQ5AAAAAAJ/U0kAAAAAAo5SWQAAAAACnVFpAAAAAAKsUHkAAAAAArtPiQAAAAACyk6ZAAAAAALZTakAAAAAAuhMuQAAAAAC90vJAAAAAAMGStkAAAAAAxXdkQAAAAADJytBAAAAAAMz27EAAAAAA0UpYQAAAAADUdnRAAAAAANjJ4EAAAAAA2/X8QAAAAADgblJAAAAAAON1hEAAAAAA5+3aQAAAAADq9QxAAAAAAO9tYkAAAAAA8pl+QAAAAAD27OpAAAAAAPoZBkAAAAAA/mxyQAAAAAEBmI5AAAAAAQYQ5EAAAAABCRgWQAAAAAENkGxAAAAAARCXnkAAAAABFQ/0QAAAAAEYFyZAAAAAARyPfEAAAAABH7uYQAAAAAEkDwRAAAAAASc7IEAAAAABK46MQAAAAAEuuqhAAAAAATMy/kAAAAABNjowQAAAAAE6soZAAAAAAT25uEAAAAABQjIOQAAAAAFFXipAAAAAAUmxlkAAAAABTN2yQAAAAAFRMR5AAAAAAVRdOkAAAAABWLCmQAAAAAFb3MJAAAAAAWBVGEAAAAABY1xKQAAAAAFn1KBAAAAAAWrb0kAAAAABb1QoQAAAAAFygERAAAAAAXbTsEAAAAABef/MQAAAAAF+UzhAAAAAAYF/VEAAAAABhfeqQAAAAAGI/txAAAAAAY13MkAAAAABkH5kQAAAAAGU9rpAAAAAAZgi1kAAAAABnHZCQAAAAAGfol5AAAAAAaP1ykAAAAABpyHmQAAAAAGrdVJAAAAAAa6hbkAAAAABsxnEQAAAAAG2IPZAAAAAAbqZTEAAAAABvaB+QAAAAAHCGNRAAAAAAcVE8EAAAAAByZhcQAAAAAHMxHhAAAAAAdEX5EAAAAAB1EQAQAAAAAHYvFZAAAAAAdvDiEAAAAAB4DveQAAAAAHjQxBAAAAAAee7ZkAAAAAB6sKYQAAAAAHvOu5AAAAAAfJnCkAAAAAB9rp2QAAAAAH55pJAAAAAAf45/kAECAwIEBQQFBAUEBQQFBAUEBQQFBAUEBQQFBAUEBQQFBAUEBQQFBAUEBQQFBAUEBQQFBAUEBQQFBAUEBQQFBAUEBQQFBAUEBQQFBAUEBQQFBAUEBQQFBAUEBQQFBAUEBQQFBAUEBQQFBAUEBQQFBAUEBQQFBAUEBQAAEOwAAAAADh4ABAAADhAACAAAHCABDAAAHCABDAAADhAACExNVABTRVQAQ0VUAENFU1QAAAAAAAEBAAAAAAEBCkNFVC0xQ0VTVCxNMy41LjAsTTEwLjUuMC8zCg==
+---
+# Source: cytomine-helm/templates/pims/pims-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pims-config
+data:
+    API_BASE_PATH: "/ims"
+    DEFAULT_ANNOTATION_ORIGIN: LEFT_TOP
+    DEFAULT_IMAGE_SIZE_SAFETY_MODE: SAFE_REJECT
+    LOG_CONFIG_FILE: /app/logging.yml
+    MAX_REQUESTS: "0"
+    OUTPUT_SIZE_LIMIT: "10000"
+    WEB_CONCURRENCY: "1"
+    MAX_WORKERS: "1"
+    MPLCONFIGDIR: "/tmp"
+    cache_enabled: "True"
+    task_queue_enabled: "False"
+    TASK_QUEUE_ENABLED: "False"
+    PENDING_PATH: /tmp/uploaded
+    PIMS_URL: pims.cytomine-local.svc.cluster.local
+    cache_url: redis://pims-cache.cytomine-local.svc.cluster.local:6379
+    ROOT: /data/images
+    INTERNAL_URL_CORE: http://core.cytomine-local.svc.cluster.local:8080
+    DEBUG: 'true'
+---
+# Source: cytomine-helm/templates/pims/pims-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pims-logging
+data:
+  logging.yml: |-
+    
+    version: 1
+    
+    formatters:
+      basic:
+        format: "[%(process)s][%(threadName)s] %(message)s"
+      complete:
+        format: "[%(asctime)s][%(levelname)s][%(process)s][%(threadName)s] %(message)s"
+    
+    handlers:
+      console:
+        class: logging.StreamHandler
+        level: DEBUG
+        formatter: complete
+    
+    loggers:
+      pims:
+        handlers: [console]
+        level: DEBUG
+      pims.app:
+        handlers: [console]
+        level: DEBUG
+      pims.cytomine:
+        level: DEBUG
+        handlers: [console]
+        propagate: false
+      pyvips:
+        level: INFO
+      pyvips.vobject:
+        level: ERROR
+      uvicorn:
+        level: DEBUG
+      uvicorn.access:
+        level: CRITICAL
+    #  gunicorn.error:
+    #    propagate: true
+      cytomine.client:
+        handlers: [console]
+        level: DEBUG
+    
+    root:
+      handlers: [console]
+      level: DEBUG
+---
+# Source: cytomine-helm/templates/sam/sam-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sam
+data:
+  API_BASE_PATH: /sam
+---
+# Source: cytomine-helm/templates/web_ui/web_ui-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: web-ui-config
+data:
+  configuration.json: |-
+    
+    {
+      "CYTOMINE_CORE_HOST": "https://cytomine.local",
+      "CYTOMINE_UPLOAD_URI": "/ims/upload",
+      "DIGITAL_ZOOM_INCREMENT": 4,
+      "VIEWER_ANNOTATIONS_REFRESH_INTERVAL": 10000,
+      "MEMBERS_ACTIVITY_REFRESH_INTERVAL": 30000,
+      "STORAGE_REFRESH_INTERVAL": 10000,
+      "ONGOING_UPLOAD_REFRESH_INTERVAL": 500,
+      "CYTOMINE_COMMERCIAL_VERSION": "",
+      "APPENGINE_ENABLED": true
+    }
+    
+  nginx.conf: |-
+    
+    user  nginx;
+    worker_processes  1;
+    error_log  /var/log/nginx/error.log warn;
+    pid        /var/run/nginx.pid;
+    events {
+      worker_connections  1024;
+    }
+    http {
+      include       /etc/nginx/mime.types;
+      default_type  application/octet-stream;
+      log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                        '$status $body_bytes_sent "$http_referer" '
+                        '"$http_user_agent" "$http_x_forwarded_for"';
+      access_log  /var/log/nginx/access.log  main;
+      sendfile        on;
+      keepalive_timeout  65;
+      server {
+        listen       9090;
+        server_name  localhost;
+        location / {
+          root   /app;
+          index  index.html;
+          try_files $uri $uri/ /index.html;
+        }
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+          root   /usr/share/nginx/html;
+        }
+      }
+    }
+---
+# Source: cytomine-helm/templates/app-engine/app-engine-sa.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role # we need to restrict that by namespace (Role not ClusterRole)
+metadata:
+  name: pod-starter-for-cytomine-local-engine-tasks
+  namespace: cytomine-local-engine-tasks
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["pods"]
+  verbs: ["post","get", "watch", "list"]
+---
+# Source: cytomine-helm/templates/serviceaccount.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: job-creator
+rules:
+- apiGroups: ["batch"]
+  resources: ["jobs", "jobs/status"]
+  verbs: ["get", "watch", "list", "create", "delete"]
+- apiGroups: [""]
+  resources: ["pods", "pods/log", "jobs/log"]
+  verbs: ["get", "watch", "list"]
+---
+# Source: cytomine-helm/templates/app-engine/app-engine-sa.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pod-starter-app-engine-cytomine-local-engine-tasks
+  namespace: cytomine-local-engine-tasks
+subjects:
+- kind: ServiceAccount
+  name: app-engine
+  apiGroup: ""
+  namespace: cytomine-local-engine-tasks
+- kind: ServiceAccount
+  name: app-engine
+  apiGroup: ""
+  namespace: cytomine-local
+roleRef:
+  kind: Role #this must be Role or ClusterRole
+  name: pod-starter-for-cytomine-local-engine-tasks # this must match the name of the Role or ClusterRole you wish to bind to
+  apiGroup: ""
+---
+# Source: cytomine-helm/templates/serviceaccount.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: create-jobs
+subjects:
+- kind: ServiceAccount
+  name: cytomine-platform-cytomine-helm
+  apiGroup: ""
+roleRef:
+  kind: Role
+  name: job-creator
+  apiGroup: ""
+---
+# Source: cytomine-helm/templates/app-engine/app-engine-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-engine
+spec:
+  selector:
+    app: app-engine
+  ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+---
+# Source: cytomine-helm/templates/app-engine/postgres-app-engine-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-app-engine
+spec:
+  clusterIP: None
+  selector:
+    app: postgres-app-engine
+  ports:
+    - name: postgresql
+      port: 5432
+      protocol: TCP
+---
+# Source: cytomine-helm/templates/cbir/cbir-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: cbir
+spec:
+  selector:
+    app: cbir
+  ports:
+    - name: http
+      port: 6000
+      protocol: TCP
+---
+# Source: cytomine-helm/templates/core/core-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: core
+spec:
+  selector:
+    app: core
+  ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+---
+# Source: cytomine-helm/templates/iam/iam-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: iam
+spec:
+  selector:
+    app: iam
+  ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+---
+# Source: cytomine-helm/templates/iam/postgres-iam-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-iam
+spec:
+  clusterIP: None
+  selector:
+    app: postgres-iam
+  ports:
+    - name: postgresql
+      port: 5432
+      protocol: TCP
+---
+# Source: cytomine-helm/templates/mongodb/mongodb-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb
+spec:
+  clusterIP: None
+  selector:
+    app: mongodb
+  ports:
+    - name: mongodb
+      port: 27017
+    - name: management
+      port: 28017
+---
+# Source: cytomine-helm/templates/pims/pims-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: pims
+spec:
+  clusterIP: None
+  selector:
+    app: pims
+  ports:
+    - name: http
+      port: 5000
+      protocol: TCP
+---
+# Source: cytomine-helm/templates/pims_cache/pims_cache-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: pims-cache
+spec:
+  selector:
+    app: pims-cache
+  ports:
+    - name: pims-cache
+      port: 6379
+      protocol: TCP
+---
+# Source: cytomine-helm/templates/postgresql/postgresql-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgis
+spec:
+  clusterIP: None
+  selector:
+    app: postgis
+  ports:
+    - name: postgresql
+      port: 5432
+      protocol: TCP
+---
+# Source: cytomine-helm/templates/redis_cbir/redis-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+spec:
+  selector:
+    app: redis
+  ports:
+    - name: redis
+      port: 6379
+      protocol: TCP
+---
+# Source: cytomine-helm/templates/sam/sam-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: sam
+spec:
+  selector:
+    app: sam
+  ports:
+    - name: http
+      port: 8000
+      protocol: TCP
+---
+# Source: cytomine-helm/templates/web_ui/web_ui-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-ui
+spec:
+  selector:
+    app: web-ui
+  ports:
+    - name: http
+      port: 9090
+      protocol: TCP
+---
+# Source: cytomine-helm/templates/app-engine/app-engine.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-engine
+  labels:
+    app: app-engine
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-engine
+  template:
+    metadata:
+      labels:
+        app: app-engine
+      annotations:
+        checksum/config: "7e03df36f3ae88d7b88f04edd2c8edf8f5596d29be7bdda1995d8372ddd7e50a"
+    spec:
+      securityContext:
+        
+        runAsUser: 20000
+        runAsGroup: 20000
+        fsGroup: 20000
+        supplementalGroups: [4000]
+        seccompProfile:
+            type: "RuntimeDefault"
+      containers:
+      - name: app-engine
+        securityContext:
+            
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            capabilities:
+                drop: ["ALL"]
+        image: cytomine/app-engine:latest
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: app-engine
+        env:
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-app-engine-secret
+              key: password
+        - name: SCHEDULER_MASTER_URL
+          value: "https://kubernetes.default.svc"
+        - name: SCHEDULER_OAUTH_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: app-engine
+              key: token
+      serviceAccountName: app-engine
+      automountServiceAccountToken: true
+---
+# Source: cytomine-helm/templates/cbir/cbir.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cbir
+  labels:
+    app: cbir
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cbir
+  template:
+    metadata:
+      labels:
+        app: cbir
+      annotations:
+        checksum/config: "f9ab353df84f9aec15cdcf091763140b7e34db39719ac7979afbd9f82f9e7b67"
+    spec:
+      serviceAccountName: cytomine-platform-cytomine-helm
+      securityContext:
+        
+        runAsUser: 20000
+        runAsGroup: 20000
+        fsGroup: 20000
+        supplementalGroups: [4000]
+        seccompProfile:
+            type: "RuntimeDefault"
+      containers:
+      - name: cbir
+        image: "cytomine/cbir:latest"
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          
+          allowPrivilegeEscalation: false
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          capabilities:
+              drop: ["ALL"]
+        ports:
+        - containerPort: 6000
+        envFrom:
+          - configMapRef:
+              name: cbir
+        volumeMounts:
+          - name: data
+            mountPath: /data/
+      volumes:
+      - name: data
+        emptyDir: {}
+---
+# Source: cytomine-helm/templates/core/core.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: core
+  annotations:
+    kube-score/ignore: pod-probes,container-security-context-user-group-id
+  labels:
+    role: core
+    app: core
+    component: cytomine-platform-core
+    release: cytomine-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: core
+      release: cytomine-platform
+  template:
+    metadata:
+      labels:
+        role: core
+        app: core
+        release: cytomine-platform
+      annotations:
+        checksum/config: "8844a603bd478df6d9370d4c1d079f6df89b02a8e6dde404a12f28e76621c252"
+    spec:
+      securityContext:
+        
+        runAsUser: 20000
+        runAsGroup: 20000
+        fsGroup: 20000
+        supplementalGroups: [4000]
+        seccompProfile:
+            type: "RuntimeDefault"
+      volumes:
+      - name: core-config
+        secret:
+          secretName: core-config
+      - name: core-localtime
+        configMap:
+          name: localtime
+      - name: temp
+        emptyDir: {}
+      containers:
+        - name: core
+          image: "cytomine/core:latest"
+          securityContext:
+            
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            capabilities:
+                drop: ["ALL"]
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: POSTGIS_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-core-secret
+                  key: password
+            - name: MONGO_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: password
+          envFrom:
+            - configMapRef:
+                name: core-env
+            - secretRef:
+                name: core-secret
+          volumeMounts:
+            - name: core-config
+              mountPath:  /cm_configs/app/application.yml.sample
+              subPath: application.yml.sample
+            - name: core-config
+              mountPath:  /cm_configs/app/logback.xml
+              subPath: logback.xml
+            - name: core-localtime
+              mountPath: /etc/localtime
+              subPath: Europe
+            - name: temp
+              mountPath: /tmp
+            - name: temp
+              mountPath: /app
+            - name: temp
+              mountPath: /javamelody-core
+          ports:
+            - name: http
+              containerPort: 8080
+          resources:
+            limits:
+              cpu: 500m
+              ephemeral-storage: 1Gi
+              memory: 2Gi
+            requests:
+              cpu: 500m
+              ephemeral-storage: 1Gi
+              memory: 2Gi
+          livenessProbe:
+            httpGet:
+              path: /server/ping
+              port: 8080
+            initialDelaySeconds: 600
+            failureThreshold: 30
+            timeoutSeconds: 8
+          readinessProbe:
+            httpGet:
+              path: /server/ping
+              port: 8080
+            initialDelaySeconds: 10
+            failureThreshold: 4
+            timeoutSeconds: 5
+      initContainers:
+        - name: core-init
+          image: "cytomine/core:latest"
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            capabilities:
+                drop: ["ALL"]
+          command:
+            - /bin/bash
+            - -c
+            - >
+              set -x;
+              cp -r /app/* /fix/;
+          volumeMounts:
+            - name: temp
+              mountPath: /fix/
+          resources:
+            limits:
+              cpu: 500m
+              ephemeral-storage: 1Gi
+              memory: 2Gi
+            requests:
+              cpu: 500m
+              ephemeral-storage: 1Gi
+              memory: 2Gi
+---
+# Source: cytomine-helm/templates/iam/iam.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: iam
+  labels:
+    app: iam
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: iam
+  template:
+    metadata:
+      labels:
+        app: iam
+      annotations:
+        checksum/config: "7814380be29b053eff7cf9d16c104fc62e8da2df6cb00e7b223218067bcb19f0"
+    spec:
+      serviceAccountName: cytomine-platform-cytomine-helm
+      securityContext:
+        
+        runAsUser: 20000
+        runAsGroup: 20000
+        fsGroup: 20000
+        supplementalGroups: [4000]
+        seccompProfile:
+            type: "RuntimeDefault"
+      volumes:
+      - name: keystore
+        emptyDir: {}
+      initContainers:
+      - name: certificates-provider
+        securityContext:
+          
+          allowPrivilegeEscalation: false
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          capabilities:
+              drop: ["ALL"]
+        image: eclipse-temurin:8u462-b08-jdk-ubi9-minimal
+        command: ['sh', '-c', 'keytool -genkeypair -alias localhost -keyalg RSA -keysize 2048 -validity 365 -keystore /keystore/server.keystore -dname "cn=Server Administrator,o=Acme,c=GB" -keypass password -storepass password']
+        volumeMounts:
+        - name: keystore
+          mountPath: "/keystore"
+      containers:
+      - name: iam
+        securityContext:
+          
+          allowPrivilegeEscalation: false
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          capabilities:
+              drop: ["ALL"]
+        image: "keycloak/keycloak:26.3"
+        ports:
+        - containerPort: 8080
+        command:
+        - "/opt/keycloak/bin/kc.sh"
+        - "start"
+        - "--log-level=DEBUG"
+        envFrom:
+        - configMapRef:
+            name: iam
+        env:
+        - name: KC_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-iam-secret
+              key: password
+        - name: KC_BOOTSTRAP_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: admin-iam-secret
+              key: password
+        - name: KC_KEYSTORE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: admin-iam-secret
+              key: password
+        volumeMounts:
+        - name: keystore
+          mountPath: "/opt/keycloak/conf/server.keystore"
+          subPath: "server.keystore"
+---
+# Source: cytomine-helm/templates/pims_cache/pims_cache.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pims-cache
+  annotations:
+    kube-score/ignore: pod-probes
+  labels:
+    role: pims-cache
+    app: cytomine-helm
+    component: cytomine-platform-pims-cache
+    release: cytomine-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pims-cache
+      release: cytomine-platform
+  template:
+    metadata:
+      labels:
+        role: pims-cache
+        app: pims-cache
+        release: cytomine-platform
+    spec:
+      securityContext:
+        
+        runAsUser: 20000
+        runAsGroup: 20000
+        fsGroup: 20000
+        supplementalGroups: [4000]
+        seccompProfile:
+            type: "RuntimeDefault"
+      serviceAccountName: cytomine-platform-cytomine-helm
+      containers:
+        - name: pims-cache
+          image: "redis:7"
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            capabilities:
+                drop: ["ALL"]
+          ports:
+            - name: http
+              containerPort: 6379
+          resources:
+            limits:
+              cpu: 200m
+              ephemeral-storage: 1Gi
+              memory: 256Mi
+            requests:
+              cpu: 200m
+              ephemeral-storage: 32Mi
+              memory: 256Mi
+          volumeMounts:
+            - name: tempdata
+              mountPath: "/data"
+      volumes:
+        - name: tempdata
+          emptyDir: {}
+---
+# Source: cytomine-helm/templates/redis_cbir/redis.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  annotations:
+    kube-score/ignore: pod-probes
+  labels:
+    role: redis
+    app: cytomine-helm
+    component: cytomine-platform-redis
+    release: cytomine-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+      release: cytomine-platform
+  template:
+    metadata:
+      labels:
+        role: redis
+        app: redis
+        release: cytomine-platform
+    spec:
+      securityContext:
+        
+        runAsUser: 20000
+        runAsGroup: 20000
+        fsGroup: 20000
+        supplementalGroups: [4000]
+        seccompProfile:
+            type: "RuntimeDefault"
+      containers:
+        - name: redis
+          image: "redis:7"
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            capabilities:
+                drop: ["ALL"]
+          ports:
+            - name: http
+              containerPort: 6379
+          volumeMounts:
+            - name: temp
+              mountPath: /tmp
+      volumes:
+      - emptyDir: {}
+        name: temp
+---
+# Source: cytomine-helm/templates/sam/sam.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sam
+  labels:
+    app: sam
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sam
+  template:
+    metadata:
+      labels:
+        app: sam
+      annotations:
+        checksum/config: "63e6122a72aee5dee166c41e80090a50d3b97b0c390178ffafaec56aed654dad"
+    spec:
+      securityContext:
+        
+        runAsUser: 20000
+        runAsGroup: 20000
+        fsGroup: 20000
+        supplementalGroups: [4000]
+        seccompProfile:
+            type: "RuntimeDefault"
+      serviceAccountName: cytomine-platform-cytomine-helm
+      containers:
+      -   name: sam
+          securityContext:
+              
+              allowPrivilegeEscalation: false
+              privileged: false
+              readOnlyRootFilesystem: true
+              runAsNonRoot: true
+              capabilities:
+                  drop: ["ALL"]
+          image: "cytomine/sam:latest"
+          ports:
+          - containerPort: 8000
+          envFrom:
+          - configMapRef:
+              name: sam
+          command: ["/bin/sh", "-c"]
+          args: [ "fastapi run app/main.py"]
+---
+# Source: cytomine-helm/templates/web_ui/web_ui.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-ui
+  annotations:
+    kube-score/ignore: pod-probes,container-security-context-user-group-id
+  labels:
+    role: web-ui
+    app: cytomine-helm
+    component: cytomine-platform-web-ui
+    release: cytomine-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web-ui
+      release: cytomine-platform
+  template:
+    metadata:
+      labels:
+        role: web-ui
+        app: web-ui
+        release: cytomine-platform
+      annotations:
+        checksum/config: "10f60664bab17899450140a324c63e9764bbaa61a5921646a1e72c4f2ce900ad"
+    spec:
+      securityContext:
+        
+        runAsUser: 20000
+        runAsGroup: 20000
+        fsGroup: 20000
+        supplementalGroups: [4000]
+        seccompProfile:
+            type: "RuntimeDefault"
+      serviceAccountName: cytomine-platform-cytomine-helm
+      volumes:
+      - name: web-ui-config
+        configMap:
+          name: web-ui-config
+      - name: web-ui-localtime
+        configMap:
+          name: localtime
+      - name: nginx
+        emptyDir: {}
+      - name: nginx-pid
+        emptyDir: {}
+      containers:
+        - name: web-ui
+          securityContext:
+            
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            capabilities:
+                drop: ["ALL"]
+          image: "cytomine/web-ui:latest"
+          imagePullPolicy: IfNotPresent
+          env:
+          - name: URL_CORE
+            value: https://cytomine.local
+          - name: CYTOMINE_COMMERCIAL_VERSION
+            value: 
+          - name: APPENGINE_ENABLED
+            value: "true"
+          volumeMounts:
+            - name: web-ui-localtime
+              mountPath: /etc/localtime
+              subPath: Europe
+            - name: web-ui-config
+              mountPath: /app/configuration.json
+              subPath: configuration.json
+            - name: web-ui-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+            - name: nginx
+              mountPath: /var/cache/nginx
+            - name: nginx
+              mountPath: /var/run
+          ports:
+            - name: http
+              containerPort: 9090
+          resources:
+            limits:
+              cpu: 200m
+              ephemeral-storage: 1Gi
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              ephemeral-storage: 32Mi
+              memory: 256Mi
+---
+# Source: cytomine-helm/templates/app-engine/postgres-app-engine.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres-app-engine
+  annotations:
+  labels:
+    role: postgres-app-engine
+    app: postgres-app-engine
+    component: cytomine-platform-app-engine-postgres
+    release: cytomine-platform
+spec:
+  replicas: 1
+  serviceName: postgres-app-engine
+  selector:
+    matchLabels:
+      app: postgres-app-engine
+      release: cytomine-platform
+  template:
+    metadata:
+      labels:
+        role: postgres-app-engine
+        app: postgres-app-engine
+        release: cytomine-platform
+    spec:
+      securityContext:
+        
+        runAsUser: 20000
+        runAsGroup: 20000
+        fsGroup: 20000
+        supplementalGroups: [4000]
+        seccompProfile:
+            type: "RuntimeDefault"
+      volumes:
+        - name: temp
+          emptyDir: {}
+        - name: postgres-app-engine-secret
+          secret:
+            secretName: postgres-app-engine-secret
+        - emptyDir: {}
+          name: postgres-app-engine-storage
+        
+      containers:
+        - name: postgres
+          image: "postgres:14"
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            capabilities:
+                drop: ["ALL"]
+          volumeMounts:
+            - name: postgres-app-engine-storage
+              mountPath: "/var/lib/postgresql/data"
+              subPath: data
+            - name: postgres-app-engine-storage
+              mountPath: "/var/lib/postgresql"
+            - name: temp
+              mountPath: /var/run
+            - name: temp
+              mountPath: /tmp
+          env:
+          - name: POSTGRES_USER
+            value: appengine
+          - name: POSTGRES_DB
+            value: appengine
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: postgres-app-engine-secret
+                key: password
+          ports:
+            - name: postgres
+              containerPort: 5432
+              protocol: TCP
+---
+# Source: cytomine-helm/templates/iam/postgres-iam.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres-iam
+  annotations:
+  labels:
+    role: postgres-iam
+    app: cytomine-helm
+    component: cytomine-platform-iam-postgres
+    release: cytomine-platform
+spec:
+  replicas: 1
+  serviceName: postgres-iam
+  selector:
+    matchLabels:
+      app: postgres-iam
+      release: cytomine-platform
+  template:
+    metadata:
+      labels:
+        role: postgres-iam
+        app: postgres-iam
+        release: cytomine-platform
+    spec:
+      securityContext:
+        
+        runAsUser: 20000
+        runAsGroup: 20000
+        fsGroup: 20000
+        supplementalGroups: [4000]
+        seccompProfile:
+            type: "RuntimeDefault"
+      volumes:
+        - name: temp
+          emptyDir: {}
+        - name: postgres-iam-secret
+          secret:
+            secretName: postgres-iam-secret
+        - emptyDir: {}
+          name: postgres-iam-storage
+        
+      containers:
+        - name: postgres
+          image: "postgres:14"
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: postgres-iam-storage
+              mountPath: "/var/lib/postgresql/data"
+              subPath: data
+            - name: postgres-iam-storage
+              mountPath: "/var/lib/postgresql"
+            - name: temp
+              mountPath: /var/run
+            - name: temp
+              mountPath: /tmp
+          env:
+          - name: POSTGRES_USER
+            value: iam
+          - name: POSTGRES_DB
+            value: iam
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: postgres-iam-secret
+                key: password
+          ports:
+            - name: postgres
+              containerPort: 5432
+              protocol: TCP
+          securityContext:
+            
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            capabilities:
+                drop: ["ALL"]
+---
+# Source: cytomine-helm/templates/mongodb/mongodb.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb
+  annotations:
+    kube-score/ignore: pod-probes,container-security-context-user-group-id
+  labels:
+    role: mongodb
+    app: cytomine-helm
+    component: cytomine-platform-mongodb
+    release: cytomine-platform
+spec:
+  replicas: 1
+  serviceName: mongodb
+  selector:
+    matchLabels:
+      app: mongodb
+      release: cytomine-platform
+  template:
+    metadata:
+      labels:
+        role: mongodb
+        app: mongodb
+        release: cytomine-platform
+    spec:
+      serviceAccountName: cytomine-platform-cytomine-helm
+      securityContext:
+        
+        runAsUser: 20000
+        runAsGroup: 20000
+        fsGroup: 20000
+        supplementalGroups: [4000]
+        seccompProfile:
+            type: "RuntimeDefault"
+      volumes:
+        - name: temp
+          emptyDir: {}
+        - name: mongodb-storage
+          emptyDir: {}
+        
+      containers:
+        - name: mongodb
+          image: "mongo:4.4-focal"
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            capabilities:
+                drop: ["ALL"]
+          volumeMounts:
+            - name: mongodb-storage
+              mountPath: "/data/db"
+            - name: temp
+              mountPath: "/tmp"
+          ports:
+            - name: mongodb
+              containerPort: 27017
+              protocol: TCP
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: mongoadmin
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: password
+            - name: MONGO_INIT_DATABASE
+              value: cytomine
+          resources:
+            limits:
+              cpu: 200m
+              ephemeral-storage: 1Gi
+              memory: 256Mi
+            requests:
+              cpu: 50m
+              ephemeral-storage: 1Gi
+              memory: 256Mi
+---
+# Source: cytomine-helm/templates/pims/pims.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: pims
+  annotations:
+    kube-score/ignore: pod-probes,container-security-context-user-group-id
+  labels:
+    role: pims
+    app: cytomine-helm
+    component: cytomine-platform-pims
+    release: cytomine-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pims
+      release: cytomine-platform
+  template:
+    metadata:
+      labels:
+        role: pims
+        app: pims
+        release: cytomine-platform
+      annotations:
+        checksum/config: "289f934c9a4d9ed0bae604904f0bb5a4bcd203dd3f70f56bd408bc12ffb59595"
+    spec:
+      serviceAccountName: cytomine-platform-cytomine-helm
+      securityContext:
+        
+        runAsUser: 20000
+        runAsGroup: 20000
+        fsGroup: 20000
+        supplementalGroups: [4000]
+        seccompProfile:
+            type: "RuntimeDefault"
+      volumes:
+        - name: pims-logging
+          configMap:
+            name: pims-logging
+        - name: temp
+          emptyDir: {}
+        - name: import-folder
+          hostPath:
+            path: /data/dataset # directory location on host
+            type: "Directory" # this field is optional
+        - emptyDir: {}
+          name: images
+        
+        - emptyDir: {}
+          name: images-temp
+        
+      containers:
+        - name: pims
+          image: "cytomine/pims:latest"
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: pims-config
+          env:
+            - name: POSTGRES_DB
+              value: docker
+            - name: POSTGRES_USER
+              value: docker
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-core-secret
+                  key: password
+            - name: CYTOMINE_PUBLIC_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: core-secret
+                  key: IMAGE_SERVER_PUBLIC_KEY
+            - name: CYTOMINE_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: core-secret
+                  key: IMAGE_SERVER_PRIVATE_KEY
+            - name: DATASET_PATH
+              value: /data/dataset
+          volumeMounts:
+            - name: images
+              mountPath: "/data/images"
+            - name: images
+              mountPath: "/data/pims"
+            - name: images-temp
+              mountPath: "/tmp/uploaded"
+            - name: pims-logging
+              mountPath: /cm_configs/app/logging.yml
+              subPath: logging.yml
+            - name: temp
+              mountPath: /tmp
+            - mountPath: "/data/dataset"
+              name: import-folder
+              readOnly: true
+          ports:
+            - name: http
+              containerPort: 5000
+          securityContext:
+            
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            capabilities:
+                drop: ["ALL"]
+          resources:
+            limits:
+              cpu: 1000m
+              ephemeral-storage: 1Gi
+              memory: 4Gi
+            requests:
+              cpu: 1000m
+              ephemeral-storage: 1Gi
+              memory: 4Gi
+  volumeClaimTemplates:
+---
+# Source: cytomine-helm/templates/postgresql/postgresql.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgis
+  annotations:
+    kube-score/ignore: pod-probes,container-security-context-user-group-id
+  labels:
+    role: postgresql
+    app: cytomine-helm
+    component: cytomine-platform-postgis
+    release: cytomine-platform
+spec:
+  replicas: 1
+  serviceName: postgis
+  selector:
+    matchLabels:
+      app: postgis
+      release: cytomine-platform
+  template:
+    metadata:
+      labels:
+        role: postgresql
+        app: postgis
+        release: cytomine-platform
+    spec:
+      securityContext:
+        
+        runAsUser: 20000
+        runAsGroup: 20000
+        fsGroup: 20000
+        supplementalGroups: [4000]
+        seccompProfile:
+            type: "RuntimeDefault"
+      serviceAccountName: cytomine-platform-cytomine-helm
+      volumes:
+        - name: temp
+          emptyDir: {}
+        - emptyDir: {}
+          name: postgres-storage
+        
+      containers:
+        - name: postgis
+          image: postgis/postgis:15-3.5
+          imagePullPolicy: IfNotPresent
+#          command: ["postgres", "-c", "config_file=/etc/postgres/postgres.conf"]
+          securityContext:
+            
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            capabilities:
+                drop: ["ALL"]
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: "/var/lib/postgresql/data"
+              subPath: data
+            - name: postgres-storage
+              mountPath: "/var/lib/postgresql"
+            - name: temp
+              mountPath: /var/run
+            - name: temp
+              mountPath: /tmp
+          env:
+          - name: POSTGRES_USER
+            value: docker
+          - name: POSTGRES_DB
+            value: docker
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: postgres-core-secret
+                key: password
+          ports:
+            - name: postgres
+              containerPort: 5432
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 200m
+              ephemeral-storage: 1Gi
+              memory: 512Mi
+            requests:
+              cpu: 50m
+              ephemeral-storage: 1Gi
+              memory: 512Mi
+      # initContainers:
+      #   - name: postgis-init
+      #     image: alpine:3.18
+      #     imagePullPolicy: IfNotPresent
+      #     securityContext:
+      #
+            
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            capabilities:
+                drop: ["ALL"]
+      #     volumeMounts:
+      #       - name: postgres-storage
+      #         mountPath: "/var/lib/postgresql/"
+      #     command:
+      #       - /bin/sh
+      #       - -c
+      #       - >
+      #         set -x;
+      #         mkdir -p /var/lib/postgresql/data;
+      #         chown -R 20000 /var/lib/postgresql/data && chmod og-rwx /var/lib/postgresql/data;
+      #     resources:
+      #
+            limits:
+              cpu: 200m
+              ephemeral-storage: 1Gi
+              memory: 512Mi
+            requests:
+              cpu: 50m
+              ephemeral-storage: 1Gi
+              memory: 512Mi
+---
+# Source: cytomine-helm/templates/pims/pims-job-import.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: pims-import
+  labels:
+    app: pims-import
+spec:
+  schedule: "@hourly"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: cytomine-platform-cytomine-helm
+          securityContext:
+            
+            runAsUser: 20000
+            runAsGroup: 20000
+            fsGroup: 20000
+            supplementalGroups: [4000]
+            seccompProfile:
+                type: "RuntimeDefault"
+          initContainers:
+          # putting multiple containers for psql commands for the sake of clarity
+          - name: private-key-fetcher
+            securityContext:
+              
+              allowPrivilegeEscalation: false
+              privileged: false
+              readOnlyRootFilesystem: true
+              runAsNonRoot: true
+              capabilities:
+                  drop: ["ALL"]
+            image: postgis/postgis:15-3.5
+            imagePullPolicy: IfNotPresent
+            command: ["/bin/sh", "-c"]
+            args: ["psql --no-align --quiet --tuples-only -U $(POSTGIS_USER) -h $(POSTGIS_HOST) -o /data/private_key -c \"SELECT private_key from sec_user where username = 'ImageServer1'\" && cat /data/private_key"]
+            env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                    name: postgres-core-secret
+                    key: password
+            - name: POSTGIS_HOST
+              value: postgis.cytomine-local.svc.cluster.local
+            - name: POSTGIS_PORT
+              value: "5432"
+            - name: POSTGIS_USER
+              value: "docker"
+            volumeMounts:
+            - name: data
+              mountPath: /data
+          - name: public-key-fetcher
+            securityContext:
+              
+              allowPrivilegeEscalation: false
+              privileged: false
+              readOnlyRootFilesystem: true
+              runAsNonRoot: true
+              capabilities:
+                  drop: ["ALL"]
+            image: postgis/postgis:15-3.5
+            imagePullPolicy: IfNotPresent
+            command: ["/bin/sh", "-c"]
+            args: ["psql --no-align --quiet --tuples-only -U $(POSTGIS_USER) -h $(POSTGIS_HOST) -o /data/public_key -c \"SELECT public_key from sec_user where username = 'ImageServer1'\" && cat /data/public_key"]
+            env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                    name: postgres-core-secret
+                    key: password
+            - name: POSTGIS_HOST
+              value: postgis.cytomine-local.svc.cluster.local
+            - name: POSTGIS_PORT
+              value: "5432"
+            - name: POSTGIS_USER
+              value: "docker"
+            volumeMounts:
+            - name: data
+              mountPath: /data
+          containers:
+          - name: import-call
+            securityContext:
+              
+              allowPrivilegeEscalation: false
+              privileged: false
+              readOnlyRootFilesystem: true
+              runAsNonRoot: true
+              capabilities:
+                  drop: ["ALL"]
+            image: cytomine/python-client:latest
+            imagePullPolicy: IfNotPresent
+            command: ["/bin/sh", "-c"]
+            # we cannot currently differenciate urls in this helpers, so we call from outside.
+            args: [ "python examples/import_datasets.py --cytomine_core_host=http://core.cytomine-local.svc.cluster.local:8080 --cytomine_pims_host=http://pims.cytomine-local.svc.cluster.local:5000/ --public_key=$$(cat /data/public_key) --private_key=$$(cat /data/private_key) --import-uri=/ims/import"]
+            volumeMounts:
+            - name: data
+              mountPath: /data
+          volumes:
+          - emptyDir: {}
+            name: data
+          restartPolicy: Never
+      backoffLimit: 1
+---
+# Source: cytomine-helm/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: cytomine-local
+  name: core
+  annotations:
+    cert-manager.io/issuer: letsencrypt
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+    nginx.ingress.kubernetes.io/cors-allow-headers: DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,dateFull,content-type-full,content-MD5
+    nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-origin: https://cytomine.local
+    nginx.ingress.kubernetes.io/enable-access-log: "true"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/enable-error-log: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+
+    # https://stackoverflow.com/a/73548785
+    nginx.org/client-max-body-size: "0"
+    nginx.org/proxy-connect-timeout: 3600s
+    nginx.org/proxy-read-timeout: 3600s
+    nginx.org/proxy-send-timeout: 3600s
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: cytomine.local
+      http:
+        paths:
+          - path: /server
+            pathType: Prefix
+            backend:
+              service:
+                name: core
+                port:
+                  number: 8080
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: core
+                port:
+                  number: 8080
+          - path: /iam
+            pathType: Prefix
+            backend:
+              service:
+                name: iam
+                port:
+                  number: 8080
+          - path: /cbir
+            pathType: Prefix
+            backend:
+              service:
+                name: cbir
+                port:
+                  number: 6000
+          - path: /sam
+            pathType: Prefix
+            backend:
+              service:
+                name: sam
+                port:
+                  number: 8000
+          - path: /ims/formats
+            pathType: Prefix
+            backend:
+              service:
+                name: pims
+                port:
+                  number: 5000
+          - path: /ims/image/upload
+            pathType: Prefix
+            backend:
+              service:
+                name: pims
+                port:
+                  number: 5000
+          - path: /ims/import
+            pathType: Prefix
+            backend:
+              service:
+                name: pims
+                port:
+                  number: 5000
+          - path: /ims/upload
+            pathType: Prefix
+            backend:
+              service:
+                name: pims
+                port:
+                  number: 5000
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-ui
+                port:
+                  number: 9090
+  tls:
+  - hosts:
+    - cytomine.local
+    secretName: ingress-tls
+---
+# Source: cytomine-helm/templates/core/tests/core.yaml
+# apiVersion: v1
+# kind: Pod
+# metadata:
+#   name: "core-test-connection"
+#   labels:
+#   annotations:
+#    "helm.sh/hook": test
+# spec:
+#   containers:
+#     - name: curl
+#       image: curlimages/curl
+#       command: ['curl']
+#       args: ['-f', 'https://cytomine.local/server/ping']
+#   restartPolicy: Never
+
+NOTES:
+Domain is cytomine.local
+
+Cytomine is being deployed at cytomine.local.
+
+For login in cytomine use admin and password from:
+
+
+admin:fFEoenqru5Qn4D7guaLZPbU3x9CQL2QUKKkxgFBAEvYXqLW96Xm7iXXaVM4lu3hD
+
+
+For login in keycloak (/iam) use admin and password from:
+
+
+admin:7w5PFJcZthRo9EJr17iV02oEetog5YJG2b9kZ0ALyQcunzb5e3p0TpcFZkttrUYO
+
+
+
+It takes a few minutes for it to fully deploy, so please be patient. This usually takes about 5 minutes, and if the site isn't reachable in 10 minutes,
+something has likely gone wrong.

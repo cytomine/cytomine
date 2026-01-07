@@ -19,6 +19,9 @@ spec:
       securityContext:
       {{- include "cytomine.podSecurityContext" . | nindent 8 }}
       serviceAccountName: {{ include "cytomine.serviceAccountName" . }}
+      volumes:
+        - name: temp
+          emptyDir: {}
       containers:
       -   name: sam
           securityContext:
@@ -31,3 +34,6 @@ spec:
               name: sam
           command: ["/bin/sh", "-c"]
           args: [ "fastapi run app/main.py"]
+          volumeMounts:
+            - name: temp
+              mountPath: /tmp

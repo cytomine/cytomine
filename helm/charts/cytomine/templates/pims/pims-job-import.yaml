@@ -21,7 +21,7 @@ spec:
           - name: private-key-fetcher
             securityContext:
             {{- include "cytomine.containerSecurityContext" . | nindent 14 }}
-            image: {{ .Values.images.postgresql }}
+            image: {{ .Values.images.postgis }}
             imagePullPolicy: {{ .Values.images.pullPolicy }}
             command: ["/bin/sh", "-c"]
             args: ["psql --no-align --quiet --tuples-only -U $(POSTGIS_USER) -h $(POSTGIS_HOST) -o /data/private_key -c \"SELECT private_key from sec_user where username = 'ImageServer1'\" && cat /data/private_key"]
@@ -43,7 +43,7 @@ spec:
           - name: public-key-fetcher
             securityContext:
             {{- include "cytomine.containerSecurityContext" . | nindent 14 }}
-            image: {{ .Values.images.postgresql }}
+            image: {{ .Values.images.postgis }}
             imagePullPolicy: {{ .Values.images.pullPolicy }}
             command: ["/bin/sh", "-c"]
             args: ["psql --no-align --quiet --tuples-only -U $(POSTGIS_USER) -h $(POSTGIS_HOST) -o /data/public_key -c \"SELECT public_key from sec_user where username = 'ImageServer1'\" && cat /data/public_key"]

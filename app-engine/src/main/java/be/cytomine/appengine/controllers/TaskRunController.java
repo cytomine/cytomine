@@ -15,6 +15,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.MediaTypeFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -353,9 +354,15 @@ public class TaskRunController {
         @PathVariable("parameter_name") String parameterName
     ) throws ProvisioningException {
         log.info("/task-runs/{run_id}/input/{parameter_name} GET");
+        String rawParameterName = null;
+        if (parameterName.endsWith(".geojson")) {
+            rawParameterName = parameterName.substring(0, parameterName.lastIndexOf("."));
+        } else {
+            rawParameterName = parameterName;
+        }
         File input = taskRunService.retrieveSingleRunIO(
             runId,
-            parameterName,
+            rawParameterName,
             ParameterType.INPUT
         );
 
@@ -364,7 +371,11 @@ public class TaskRunController {
             HttpHeaders.CONTENT_DISPOSITION,
             "attachment; filename=\"" + input.getName() + "\""
         );
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        if (parameterName.endsWith(".geojson")) {
+            headers.setContentType(MediaType.parseMediaType("application/geo+json"));
+        } else {
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        }
 
         log.info("/task-runs/{run_id}/input/{parameter_name} Ended");
 
@@ -391,9 +402,15 @@ public class TaskRunController {
         @PathVariable("parameter_name") String parameterName
     ) throws ProvisioningException {
         log.info("/task-runs/{run_id}/output/{parameter_name} GET");
+        String rawParameterName = null;
+        if (parameterName.endsWith(".geojson")) {
+            rawParameterName = parameterName.substring(0, parameterName.lastIndexOf("."));
+        } else {
+            rawParameterName = parameterName;
+        }
         File output = taskRunService.retrieveSingleRunIO(
             runId,
-            parameterName,
+            rawParameterName,
             ParameterType.OUTPUT
         );
 
@@ -402,7 +419,11 @@ public class TaskRunController {
             HttpHeaders.CONTENT_DISPOSITION,
             "attachment; filename=\"" + output.getName() + "\""
         );
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        if (parameterName.endsWith(".geojson")) {
+            headers.setContentType(MediaType.parseMediaType("application/geo+json"));
+        } else {
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        }
 
         log.info("/task-runs/{run_id}/output/{parameter_name} Ended");
 

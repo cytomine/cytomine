@@ -62,7 +62,7 @@ export default {
       this.download(output, output.param_name);
     },
     downloadGeometry(output) {
-      this.download(output.value,`${output.param_name}.geojson`);
+      this.download(output,`${output.param_name}.geojson`);
     },
   },
 };

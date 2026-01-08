@@ -113,8 +113,11 @@ public class TaskRunController {
         HttpServletResponse response
     )
     {
-
-        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        if (parameterName.endsWith(".geojson")) {
+            response.setContentType("application/geo+json");
+        } else {
+            response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        }
         response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
             "attachment; filename=\"" + parameterName + "\"");
         response.setHeader(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
@@ -151,7 +154,11 @@ public class TaskRunController {
             HttpServletResponse response
     ) {
 
-        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        if (parameterName.endsWith(".geojson")) {
+            response.setContentType("application/geo+json");
+        } else {
+            response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        }
         response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + parameterName + "\"");
         response.setHeader(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
         response.setHeader(HttpHeaders.PRAGMA, "no-cache");

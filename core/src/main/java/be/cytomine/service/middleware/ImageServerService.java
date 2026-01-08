@@ -219,7 +219,7 @@ public class ImageServerService {
     }
 
     public void streamDownload(AbstractImage abstractImage, OutputStream outputStream) {
-        streamDownload("file", abstractImage.getPath(), abstractImage.getOriginalFilename(), outputStream);
+        streamDownload("image", abstractImage.getPath(), abstractImage.getOriginalFilename(), outputStream);
     }
 
     public void streamDownload(UploadedFile uploadedFile, OutputStream outputStream) {

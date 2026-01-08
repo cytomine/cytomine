@@ -18,6 +18,8 @@ Cytomine uses keycloak as IAM and also as a broker to negotiate with LS-AAI to a
 8. In `client authentication` select `Client secret set as basic auth`
 9. Contact cytomine team at Uliege to get the `client ID` and `client secret` , click `contact us` button below
 10. Click save
+11. scroll down and click `Advanced` and toggle `Backchannel Logout` to `ON`
+12. click save again
 
 ### B. Map claims to roles
 

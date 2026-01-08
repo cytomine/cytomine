@@ -60,7 +60,14 @@ public class SecurityConfiguration {
                         authorizeHttpRequests
                                 .requestMatchers(new AntPathRequestMatcher("/api/abstractimage/**")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/api/imageinstance/**")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/api/userannotation/**")).permitAll()
+                            .requestMatchers(new AntPathRequestMatcher("/api/userannotation/**"))
+                            .permitAll()
+                            .requestMatchers(
+                                new AntPathRequestMatcher("/api/app-engine/project/*/task-runs/*/input/**"))
+                            .permitAll()
+                            .requestMatchers(
+                                new AntPathRequestMatcher("/api/app-engine/project/*/task-runs/*/output/**"))
+                            .permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/api/**")).authenticated()
                                 .requestMatchers("/session/admin/info.json").authenticated()
                                 .requestMatchers("/session/admin/open.json").authenticated()

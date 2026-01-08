@@ -109,7 +109,7 @@ public class TaskRunController {
         @PathVariable Long project,
         @PathVariable UUID task,
         @PathVariable("parameter_name") String parameterName,
-        @RequestParam(required = true) String auth,
+        @RequestParam(required = true) String auth, // don't remove this parameter, it's used by the security filter'
         HttpServletResponse response
     )
     {
@@ -147,7 +147,7 @@ public class TaskRunController {
             @PathVariable Long project,
             @PathVariable UUID task,
             @PathVariable("parameter_name") String parameterName,
-            @RequestParam(required = true) String auth,
+            @RequestParam(required = true) String auth, // don't remove this parameter, it's used by the security filter'
             HttpServletResponse response
     ) {
 

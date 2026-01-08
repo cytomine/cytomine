@@ -111,19 +111,18 @@ public class TaskRunController {
             @PathVariable("parameter_name") String parameterName,
             HttpServletResponse response
     ) {
-        File file = taskRunService.getTaskRunIOParameter(project, task, parameterName, "input");
-        try (InputStream is = new FileInputStream(file);
-             OutputStream os = response.getOutputStream()) {
 
-            response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-            response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + parameterName + "\"");
-            response.setHeader(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
-            response.setHeader(HttpHeaders.PRAGMA, "no-cache");
-            response.setHeader(HttpHeaders.EXPIRES, "0");
+        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + parameterName + "\"");
+        response.setHeader(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
+        response.setHeader(HttpHeaders.PRAGMA, "no-cache");
+        response.setHeader(HttpHeaders.EXPIRES, "0");
 
-            is.transferTo(os);
+        try (OutputStream os = response.getOutputStream()) {
+
+            taskRunService.getTaskRunIOParameter(project, task, parameterName, "input", os);
             os.flush();
-            file.delete();
+
         } catch (IOException e) {
             throw new RuntimeException("Error while streaming the input parameter", e);
         }
@@ -145,19 +144,17 @@ public class TaskRunController {
             @PathVariable("parameter_name") String parameterName,
             HttpServletResponse response
     ) {
-        File file = taskRunService.getTaskRunIOParameter(project, task, parameterName, "output");
-        try (InputStream is = new FileInputStream(file);
-             OutputStream os = response.getOutputStream()) {
 
-            response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-            response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + parameterName + "\"");
-            response.setHeader(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
-            response.setHeader(HttpHeaders.PRAGMA, "no-cache");
-            response.setHeader(HttpHeaders.EXPIRES, "0");
+        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + parameterName + "\"");
+        response.setHeader(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
+        response.setHeader(HttpHeaders.PRAGMA, "no-cache");
+        response.setHeader(HttpHeaders.EXPIRES, "0");
 
-            is.transferTo(os);
+        try (OutputStream os = response.getOutputStream()) {
+
+            taskRunService.getTaskRunIOParameter(project, task, parameterName, "output", os);
             os.flush();
-            file.delete();
         } catch (IOException e) {
             throw new RuntimeException("Error while streaming the output parameter", e);
         }

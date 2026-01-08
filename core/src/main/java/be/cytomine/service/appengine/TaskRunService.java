@@ -547,7 +547,7 @@ public class TaskRunService {
     }
 
     public void getTaskRunIOParameter(Long projectId, UUID taskRunId, String parameterName, String type, OutputStream outputStream) {
-//        checkTaskRun(projectId, taskRunId);
+        checkTaskRun(projectId, taskRunId);
         appEngineService.getStreamedFile("task-runs/" + taskRunId + "/" + type + "/" + parameterName, outputStream);
     }
 }

@@ -64,7 +64,7 @@ spec:
               subPath: nginx.conf
             - name: nginx
               mountPath: /var/cache/nginx
-            - name: nginx
+            - name: nginx-pid
               mountPath: /var/run
           ports:
             - name: http

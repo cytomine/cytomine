@@ -16,16 +16,12 @@ spec:
       annotations:
         checksum/config: "{{ include (print $.Template.BasePath "/sam/sam-config.yaml") . | sha256sum }}"
     spec:
-      securityContext:
-      {{- include "cytomine.podSecurityContext" . | nindent 8 }}
       serviceAccountName: {{ include "cytomine.serviceAccountName" . }}
       volumes:
         - name: temp
           emptyDir: {}
       containers:
       -   name: sam
-          securityContext:
-          {{- include "cytomine.containerSecurityContext" . | nindent 14 }}
           image: "{{ .Values.images.sam }}"
           ports:
           - containerPort: {{ .Values.sam.port }}

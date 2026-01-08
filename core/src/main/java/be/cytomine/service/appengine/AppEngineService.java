@@ -44,9 +44,6 @@ public class AppEngineService {
     }
 
     public void getStreamedFile(String uri, OutputStream outputStream) {
-        Path filePath = Paths.get("downloaded_" + System.currentTimeMillis() + ".tmp");
-        File targetFile = filePath.toFile();
-
         restTemplate.execute(buildFullUrl(uri), HttpMethod.GET, null, response -> {
             try (InputStream in = response.getBody()) {
                 in.transferTo(outputStream);

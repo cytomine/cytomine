@@ -18,6 +18,9 @@ spec:
     spec:
       securityContext:
       {{- include "cytomine.podSecurityContext" . | nindent 8 }}
+      volumes:
+        - name: temp
+          emptyDir: {}
       containers:
       - name: app-engine
         securityContext:
@@ -41,5 +44,8 @@ spec:
             secretKeyRef:
               name: app-engine
               key: token
+        volumeMounts:
+          - name: temp
+            mountPath: /tmp
       serviceAccountName: app-engine
       automountServiceAccountToken: true

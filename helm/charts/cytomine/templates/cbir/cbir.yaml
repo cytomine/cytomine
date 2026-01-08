@@ -32,11 +32,19 @@ spec:
               name: cbir
         volumeMounts:
           - name: cbir-storage
-            mountPath: /data/
-      {{ if not .Values.cbir.storage.storageClassName -}}
+            mountPath: /data
+          - name: cbir-tmp
+            mountPath: /tmp
+          - name: cbir-cache
+            mountPath: /.cache
       volumes:
-        - name: cbir-storage
-          emptyDir: {}
+      - name: cbir-tmp
+        emptyDir: {}
+      - name: cbir-cache
+        emptyDir: {}
+      {{ if not .Values.cbir.storage.storageClassName -}}
+      - name: cbir-storage
+        emptyDir: {}
       {{ end }}
   {{ if .Values.cbir.storage.storageClassName -}}
   volumeClaimTemplates:

@@ -218,13 +218,21 @@ public class ImageServerService {
                    .toList();
     }
 
+    public void streamDownload(AbstractImage abstractImage, OutputStream outputStream) {
+        streamDownload("file", abstractImage.getPath(), abstractImage.getOriginalFilename(), outputStream);
+    }
+
     public void streamDownload(UploadedFile uploadedFile, OutputStream outputStream) {
+        streamDownload("file", uploadedFile.getPath(), uploadedFile.getOriginalFilename(), outputStream);
+    }
+
+    public void streamDownload(String type, String path, String filename, OutputStream outputStream) {
         String url = UriComponentsBuilder
                 .fromUriString(this.internalImageServerURL())
-                .pathSegment("file")
-                .pathSegment(uploadedFile.getPath())
+                .pathSegment(type)
+                .pathSegment(path)
                 .pathSegment("export")
-                .queryParam("filename", uploadedFile.getOriginalFilename())
+                .queryParam("filename", filename)
                 .build()
                 .toUriString();
 

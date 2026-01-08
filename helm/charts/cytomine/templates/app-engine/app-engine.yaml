@@ -23,9 +23,9 @@ spec:
           emptyDir: {}
       containers:
       - name: app-engine
+        image: {{ .Values.images.app_engine }}
         securityContext:
         {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
-        image: {{ .Values.images.app_engine }}
         ports:
         - containerPort: {{ .Values.app_engine.port }}
         envFrom:

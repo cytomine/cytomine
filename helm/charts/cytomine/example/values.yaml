@@ -24,23 +24,3 @@ iam:
 
 images:
   pullPolicy: IfNotPresent
-
-  app_engine: cytomine/app-engine:latest
-  sam: cytomine/sam:latest
-  core: cytomine/core:latest
-  pims: cytomine/pims:latest
-  web_ui: cytomine/web-ui:latest
-  cbir: cytomine/cbir:latest
-  pims_import: cytomine/python-client:latest
-
-  #
-  # External Images
-  #
-  # postgis: cytomine/postgis:latest
-  postgresql_iam: postgres:14
-  postgresql_app_engine: postgres:14
-  mongodb: mongo:4.4-focal
-  pims_cache: redis:7
-  redis: redis:7
-  nginx: cytomine/nginx:latest
-  iam: keycloak/keycloak:26.3

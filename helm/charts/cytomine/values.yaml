@@ -60,10 +60,10 @@ images:
   #
   # External Images
   #
-  postgresql: cytomine/postgis:latest
+  postgis: postgis/postgis:15-3.5
   postgresql_iam: postgres:14
   postgresql_app_engine: postgres:14
-  mongodb: cytomine/mongo:latest
+  mongodb: mongo:4.4-focal
   pims_cache: redis:7
   redis: redis:7
   nginx: cytomine/nginx:latest

@@ -16,14 +16,20 @@ spec:
       annotations:
         checksum/config: "{{ include (print $.Template.BasePath "/sam/sam-config.yaml") . | sha256sum }}"
     spec:
-        serviceAccountName: {{ include "cytomine.serviceAccountName" . }}
-        containers:
-        -   name: sam
-            image: "{{ .Values.images.sam }}"
-            ports:
-            - containerPort: {{ .Values.sam.port }}
-            envFrom:
-            - configMapRef:
-                name: sam
-            command: ["/bin/sh", "-c"]
-            args: [ "fastapi run app/main.py"]
+      serviceAccountName: {{ include "cytomine.serviceAccountName" . }}
+      volumes:
+        - name: temp
+          emptyDir: {}
+      containers:
+      -   name: sam
+          image: "{{ .Values.images.sam }}"
+          ports:
+          - containerPort: {{ .Values.sam.port }}
+          envFrom:
+          - configMapRef:
+              name: sam
+          command: ["/bin/sh", "-c"]
+          args: [ "fastapi run app/main.py"]
+          volumeMounts:
+            - name: temp
+              mountPath: /tmp

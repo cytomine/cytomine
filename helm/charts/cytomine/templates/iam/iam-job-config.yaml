@@ -191,13 +191,16 @@ spec:
       - name: check-job-done
         image: "{{ .Values.images.iam }}"
         command: ["/bin/sh", "-c"]
-        args: ["/opt/keycloak/bin/kcadm.sh config credentials --server {{ include "cytomine.iamInternalUrl" . }} --realm cytomine --user admin --password $(CYTOMINE_USER)"]
+        args: ["/opt/keycloak/bin/kcadm.sh config credentials --server {{ include "cytomine.iamInternalUrl" . }} --realm cytomine --user admin --password $(CYTOMINE_USER) --config /opt/keycloak-auth/kcadm.config"]
         env:
         - name: CYTOMINE_USER
           valueFrom:
             secretKeyRef:
               name: cytomine-admin-iam-secret
               key: password
+        volumeMounts:
+        - name: kc-auth
+          mountPath: "/opt/keycloak-auth"
       volumes:
       - emptyDir: {}
         name: kc-auth

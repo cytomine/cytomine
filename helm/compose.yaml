@@ -25,6 +25,7 @@ services:
       - ../.kube/secrets/registries.yaml:/etc/rancher/k3s/registries.yaml:ro
       - ../.kube/secrets/lsaai-secrets.yaml:/var/lib/rancher/k3s/server/manifests/lsaai-secrets.yaml:ro
       - ../.kube/secrets/docker-image-pull-secrets.yaml:/var/lib/rancher/k3s/server/manifests/docker-image-pull-secrets.yaml:ro
+      - ../.kube/secrets/docker-image-pull-secrets-2.yaml:/var/lib/rancher/k3s/server/manifests/docker-image-pull-secrets-2.yaml:ro
       # This is just so that we get the kubeconfig file out
       - ../.kube/shared:/output/
       - ../data/dataset:/data/dataset

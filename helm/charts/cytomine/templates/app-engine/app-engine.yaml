@@ -16,9 +16,12 @@ spec:
       annotations:
         checksum/config: "{{ include (print $.Template.BasePath "/app-engine/app-engine-config.yaml") . | sha256sum }}"
     spec:
+      volumes:
+        - name: temp
+          emptyDir: {}
       containers:
       - name: app-engine
-        image: "{{ .Values.images.app_engine }}"
+        image: {{ .Values.images.app_engine }}
         ports:
         - containerPort: {{ .Values.app_engine.port }}
         envFrom:
@@ -37,5 +40,8 @@ spec:
             secretKeyRef:
               name: app-engine
               key: token
+        volumeMounts:
+          - name: temp
+            mountPath: /tmp
       serviceAccountName: app-engine
       automountServiceAccountToken: true

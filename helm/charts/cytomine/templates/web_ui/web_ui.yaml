@@ -37,6 +37,10 @@ spec:
       - name: web-ui-localtime
         configMap:
           name: localtime
+      - name: nginx
+        emptyDir: {}
+      - name: nginx-pid
+        emptyDir: {}
       containers:
         - name: web-ui
           image: "{{ .Values.images.web_ui }}"
@@ -58,6 +62,10 @@ spec:
             - name: web-ui-config
               mountPath: /etc/nginx/nginx.conf
               subPath: nginx.conf
+            - name: nginx
+              mountPath: /var/cache/nginx
+            - name: nginx
+              mountPath: /var/run
           ports:
             - name: http
               containerPort: {{ .Values.web_ui.port }}

@@ -43,7 +43,6 @@ spec:
         - name: postgis
           image: {{ .Values.images.postgis }}
           imagePullPolicy: {{ .Values.images.pullPolicy }}
-#          command: ["postgres", "-c", "config_file=/etc/postgres/postgres.conf"]
           securityContext:
           {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
           volumeMounts:

@@ -42,7 +42,6 @@ spec:
             set -x;
             cp -r /opt/keycloak/* /tmp/;
 
-        # chown -R {{ .Values.containerSecurity.userID }} /tmp/quarkus-data;
         resources:
           {{- toYaml .Values.postgresql.resources | nindent 12 }}
 

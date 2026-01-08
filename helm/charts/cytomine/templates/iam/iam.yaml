@@ -24,22 +24,25 @@ spec:
         emptyDir: {}
       - name: opt-keycloak
         emptyDir: {}
+      - name: tmp-keycloak
+        emptyDir: {}
       initContainers:
       - name: iam-init
-        image: alpine:3.18
+        image: {{ .Values.images.iam }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
         securityContext:
         {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
         volumeMounts:
           - name: opt-keycloak
-            mountPath: "/opt/keycloak"
+            mountPath: "/tmp"
         command:
           - /bin/sh
           - -c
           - >
             set -x;
-            mkdir -p /opt/keycloak/lib;
-            chown -R {{ .Values.containerSecurity.userID }} /opt/keycloak/lib;
+            cp -r /opt/keycloak/* /tmp/;
+
+        # chown -R {{ .Values.containerSecurity.userID }} /tmp/quarkus-data;
         resources:
           {{- toYaml .Values.postgresql.resources | nindent 12 }}
 
@@ -56,7 +59,7 @@ spec:
       - name: iam
         securityContext:
         {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
-        image: "{{ .Values.images.iam }}"
+        image: {{ .Values.images.iam }}
         ports:
         - containerPort: {{ .Values.iam.port }}
         command:
@@ -85,6 +88,8 @@ spec:
         volumeMounts:
         - name: opt-keycloak
           mountPath: "/opt/keycloak"
+        - name: tmp-keycloak
+          mountPath: "/tmp"
         - name: keystore
           mountPath: "/opt/keycloak/conf/server.keystore"
           subPath: "server.keystore"

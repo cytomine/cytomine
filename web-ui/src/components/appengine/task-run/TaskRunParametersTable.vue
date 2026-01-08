@@ -34,6 +34,7 @@
 
 <script>
 import {Cytomine} from '@/api';
+import {updateToken} from '@/utils/token-utils';
 
 export default {
   name: 'TaskRunParametersTable',
@@ -43,10 +44,10 @@ export default {
     type: {type: String, required: true}
   },
   methods: {
-    download(data, name) {
+    async download(data, name) {
       const cytomine = Cytomine.instance;
-      let url = `${cytomine.host}${cytomine.basePath}app-engine/project/${this.projectId}/task-runs/${data.task_run_id}/${this.type}/${name}`;
-      alert('url = ' + url);
+      const token = await updateToken();
+      let url = `${cytomine.host}${cytomine.basePath}app-engine/project/${this.projectId}/task-runs/${data.task_run_id}/${this.type}/${name}?auth=${token}`;
       let link = document.createElement('a');
       link.href = url;
       link.download = name;
@@ -54,11 +55,10 @@ export default {
 
       document.body.appendChild(link);
       link.click();
-
+    
       document.body.removeChild(link);
     },
     downloadFile(output) {
-      alert('output = ' + JSON.stringify(output, null, 2));
       this.download(output, output.param_name);
     },
     downloadGeometry(output) {

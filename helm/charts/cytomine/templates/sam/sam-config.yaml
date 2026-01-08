@@ -4,3 +4,4 @@ metadata:
   name: sam
 data:
   API_BASE_PATH: /sam
+  WEIGHTS_PATH: /tmp/weights

@@ -37,7 +37,6 @@ spec:
           - >
             set -x;
             cp -r /opt/keycloak/* /tmp/;
-
         resources:
           {{- toYaml .Values.postgresql.resources | nindent 12 }}
 

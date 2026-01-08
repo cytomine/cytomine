@@ -41,18 +41,23 @@ spec:
         {{ end }}
       containers:
         - name: postgis
-          image: {{ .Values.images.postgresql }}
+          image: {{ .Values.images.postgis }}
           imagePullPolicy: {{ .Values.images.pullPolicy }}
           volumeMounts:
-            - name: postgres-storage
-              mountPath: "/var/lib/postgresql/data"
-              subPath: data
-            - name: postgres-storage
-              mountPath: "/var/lib/postgresql"
-            - name: temp
-              mountPath: /var/run
-            - name: temp
-              mountPath: /tmp
+          - name: postgres-storage
+            mountPath: "/var/lib/postgresql/data"
+            subPath: data
+          - name: postgres-storage
+            mountPath: "/var/lib/postgresql"
+          - name: temp
+            mountPath: /var/run
+            subPath: run
+          - name: temp
+            mountPath: /tmp
+            subPath: tmp
+          - name: temp
+            mountPath: /docker-entrypoint-initdb.d/
+            subPath: entrypoint
           env:
           - name: POSTGRES_USER
             value: {{ .Values.postgresql.user }}
@@ -80,8 +85,8 @@ spec:
           securityContext:
             readOnlyRootFilesystem: {{ .Values.containerSecurity.readOnlyRootFilesystem }}
           volumeMounts:
-            - name: postgres-storage
-              mountPath: "/var/lib/postgresql/"
+          - name: postgres-storage
+            mountPath: "/var/lib/postgresql/"
           command:
             - /bin/sh
             - -c
@@ -91,6 +96,17 @@ spec:
               chown -R 999 /var/lib/postgresql/data && chmod og-rwx /var/lib/postgresql/data;
           resources:
             {{- toYaml .Values.postgresql.resources | nindent 12 }}
+
+        - name: extensions
+          image: {{ .Values.images.postgis }}
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          command: ["/bin/sh", "-c"]
+          args: ["cp -R /docker-entrypoint-initdb.d/* /docker-entrypoint-initdb.d-copy/ && echo \"CREATE EXTENSION IF NOT EXISTS ltree;\" >> /docker-entrypoint-initdb.d-copy/seed.sql"]
+          volumeMounts:
+          - name: temp
+            mountPath: /docker-entrypoint-initdb.d-copy/
+            subPath: entrypoint
+
       {{- with .Values.global.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}

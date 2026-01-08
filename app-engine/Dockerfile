@@ -78,7 +78,6 @@ FROM ${PROXY_CACHE}/eclipse-temurin:${JAVA_VERSION} AS production
 
 ARG APP_ENGINE_VERSION
 ARG APP_ENGINE_REVISION
-ARG ENTRYPOINT_SCRIPTS_VERSION
 ARG JAVA_VERSION
 ARG GRADLE_VERSION
 
@@ -91,8 +90,7 @@ LABEL org.opencontainers.image.authors="uliege@cytomine.org" \
       org.opencontainers.image.revision="${APP_ENGINE_REVISION}" \
       org.opencontainers.image.deps.java.distribution="eclipse-temurin" \
       org.opencontainers.image.deps.java.version="${JAVA_VERSION}" \
-      org.opencontainers.image.deps.gradle.version="${GRADLE_VERSION}" \
-      org.opencontainers.image.deps.entrypoint.scripts.version="${ENTRYPOINT_SCRIPTS_VERSION}"
+      org.opencontainers.image.deps.gradle.version="${GRADLE_VERSION}"
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV LANG=C.UTF-8
@@ -100,12 +98,6 @@ ENV LANG=C.UTF-8
 # base librairies and configuration
 COPY --from=jar-builder /app/app-engine/build/libs/cytomine-app-engine.jar /app/cytomine-app-engine.jar
 
-# entrypoint scripts
-RUN mkdir /docker-entrypoint-cytomine.d/
-COPY --from=entrypoint-scripts --chmod=774 /cytomine-entrypoint.sh /usr/local/bin/
-COPY --from=entrypoint-scripts --chmod=774 /envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
-
 WORKDIR /app
-ENTRYPOINT ["cytomine-entrypoint.sh"]
 
 CMD ["java", "-jar", "/app/cytomine-app-engine.jar"]

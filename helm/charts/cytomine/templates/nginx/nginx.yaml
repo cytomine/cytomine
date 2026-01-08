@@ -114,7 +114,7 @@ spec:
             - -c
             - >
               set -x;
-              cp -R /etc/nginx /fix && chown -R 20000:20000 /fix/nginx;
+              cp -R /etc/nginx /fix && chown -R {{ .Values.containerSecurity.userID }}:{{ .Values.containerSecurity.groupID }} /fix/nginx;
           imagePullPolicy: {{ .Values.images.pullPolicy }}
           securityContext:
             allowPrivilegeEscalation: {{ .Values.containerSecurity.allowPrivilegeEscalation }}

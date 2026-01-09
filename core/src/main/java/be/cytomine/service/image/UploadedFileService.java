@@ -330,6 +330,15 @@ public class UploadedFileService extends ModelService {
         return uploadedFile;
     }
 
+    public Optional<UploadedFile> find(Long id, String authHeader) {
+        Optional<UploadedFile> uploadedFile = uploadedFileRepository.findById(id);
+        String token = authHeader.replace("Bearer ", "");
+        String username = TokenUtils.getUsernameFromToken(token);
+        User user = currentUserService.getCurrentUser(username);
+        uploadedFile.ifPresent(file -> securityACLService.check(file.container(), READ, user));
+        return uploadedFile;
+    }
+
     public UploadedFile get(Long id) {
         return find(id).orElse(null);
     }

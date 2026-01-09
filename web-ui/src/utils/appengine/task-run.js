@@ -93,12 +93,6 @@ export default class TaskRun extends Model {
 
     const binaryInputs = this.inputs.filter(input => BINARY_TYPES.includes(input.type.toLowerCase()));
 
-    await Promise.all(
-      binaryInputs.map(async (input) => {
-        input.value = await this.fetchSingleIO(input.param_name, 'input');
-      })
-    );
-
     return this.inputs;
   }
 
@@ -108,14 +102,6 @@ export default class TaskRun extends Model {
     }
 
     this.outputs = (await Cytomine.instance.api.get(`${this.uri}/outputs`)).data;
-
-    const binaryOutputs = this.outputs.filter(output => BINARY_TYPES.includes(output.type.toLowerCase()));
-
-    await Promise.all(
-      binaryOutputs.map(async (output) => {
-        output.value = await this.fetchSingleIO(output.param_name, 'output');
-      })
-    );
 
     return this.outputs;
   }

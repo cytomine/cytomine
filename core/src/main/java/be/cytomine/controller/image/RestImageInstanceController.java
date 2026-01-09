@@ -30,8 +30,11 @@ import be.cytomine.utils.RequestParams;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.io.ParseException;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import org.springframework.cloud.gateway.mvc.ProxyExchange;
 
 import java.io.IOException;
@@ -452,15 +455,26 @@ public class RestImageInstanceController extends RestCytomineController {
     }
 
     @GetMapping("/imageinstance/{id}/download")
-    public ResponseEntity<byte[]> download(
+    public ResponseEntity<StreamingResponseBody> download(
         @PathVariable Long id,
-        @RequestParam String Authorization,
-        ProxyExchange<byte[]> proxy) throws IOException {
-        log.debug("REST request to download image instance");
+        @RequestParam String Authorization
+    ) throws IOException {
+        log.debug("GET /imageinstance/{}/download", id);
         ImageInstance imageinstance = imageInstanceService.find(id, Authorization)
                 .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", id));
 
-        return imageServerService.download(imageinstance.getBaseImage(), proxy);
+        StreamingResponseBody stream = outputStream -> {
+            imageServerService.streamDownload(imageinstance.getBaseImage(), outputStream);
+        };
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDispositionFormData("attachment", imageinstance.getBaseImage().getOriginalFilename());
+
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .body(stream);
     }
 
     @GetMapping("/imageinstance/{id}/sliceinstance/reference.json")

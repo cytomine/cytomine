@@ -17,9 +17,14 @@ spec:
         checksum/config: "{{ include (print $.Template.BasePath "/cbir/cbir-config.yaml") . | sha256sum }}"
     spec:
       serviceAccountName: {{ include "cytomine.serviceAccountName" . }}
+      securityContext:
+      {{- include "cytomine.podSecurityContext" . | nindent 8 }}
       containers:
       - name: cbir
         image: "{{ .Values.images.cbir }}"
+        imagePullPolicy: {{ .Values.images.pullPolicy }}
+        securityContext:
+        {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
         ports:
         - containerPort: {{ .Values.cbir.port }}
         envFrom:
@@ -27,11 +32,19 @@ spec:
               name: cbir
         volumeMounts:
           - name: cbir-storage
-            mountPath: /data/
-      {{ if not .Values.cbir.storage.storageClassName -}}
+            mountPath: /data
+          - name: cbir-tmp
+            mountPath: /tmp
+          - name: cbir-cache
+            mountPath: /.cache
       volumes:
-        - name: cbir-storage
-          emptyDir: {}
+      - name: cbir-tmp
+        emptyDir: {}
+      - name: cbir-cache
+        emptyDir: {}
+      {{ if not .Values.cbir.storage.storageClassName -}}
+      - name: cbir-storage
+        emptyDir: {}
       {{ end }}
   {{ if .Values.cbir.storage.storageClassName -}}
   volumeClaimTemplates:

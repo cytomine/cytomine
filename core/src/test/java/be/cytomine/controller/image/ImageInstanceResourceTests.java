@@ -75,7 +75,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
@@ -85,7 +85,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
@@ -817,8 +819,14 @@ public class ImageInstanceResourceTests {
         );
 
         MvcResult mvcResult = restImageInstanceControllerMockMvc.perform(get("/api/imageinstance/{id}/download?Authorization=Bearer " + getSignedNotExpiredJwt(), image.getId()))
-                .andExpect(status().isOk())
+                .andExpect(request().asyncStarted())
                 .andReturn();
+
+        mvcResult = restImageInstanceControllerMockMvc
+            .perform(asyncDispatch(mvcResult))
+            .andExpect(status().isOk())
+            .andReturn();
+
         assertThat(mvcResult.getResponse().getContentAsByteArray()).isEqualTo(mockResponse);
     }
 
@@ -842,8 +850,14 @@ public class ImageInstanceResourceTests {
         );
 
         MvcResult mvcResult = restImageInstanceControllerMockMvc.perform(get("/api/imageinstance/{id}/download?Authorization=Bearer " + getSignedNotExpiredJwt(), image.getId()))
-                .andExpect(status().isOk())
+                .andExpect(request().asyncStarted())
                 .andReturn();
+
+        mvcResult = restImageInstanceControllerMockMvc
+            .perform(asyncDispatch(mvcResult))
+            .andExpect(status().isOk())
+            .andReturn();
+
         assertThat(mvcResult.getResponse().getContentAsByteArray()).isEqualTo(mockResponse);
     }
 

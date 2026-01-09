@@ -26,7 +26,7 @@ spec:
         release: {{ .Release.Name }}
     spec:
       securityContext:
-        runAsUser: 999
+      {{- include "cytomine.podSecurityContext" . | nindent 8 }}
       serviceAccountName: {{ include "cytomine.serviceAccountName" . }}
       {{- with .Values.global.affinity }}
       affinity:
@@ -43,6 +43,8 @@ spec:
         - name: postgis
           image: {{ .Values.images.postgis }}
           imagePullPolicy: {{ .Values.images.pullPolicy }}
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
           volumeMounts:
           - name: postgres-storage
             mountPath: "/var/lib/postgresql/data"
@@ -74,16 +76,14 @@ spec:
               protocol: TCP
           resources:
             {{- toYaml .Values.postgresql.resources | nindent 12 }}
-          securityContext:
-            allowPrivilegeEscalation: {{ .Values.containerSecurity.allowPrivilegeEscalation }}
-            privileged: {{ .Values.containerSecurity.privileged }}
-            readOnlyRootFilesystem: {{ .Values.containerSecurity.readOnlyRootFilesystem }}
       initContainers:
-        - name: postgis-init
+        {{ if .Values.fixVolumesPermissions -}}
+        - name: fix-previous-permissions
           image: alpine:3.18
           imagePullPolicy: {{ .Values.images.pullPolicy }}
           securityContext:
-            readOnlyRootFilesystem: {{ .Values.containerSecurity.readOnlyRootFilesystem }}
+            runAsUser: 0
+            runAsGroup: 0
           volumeMounts:
           - name: postgres-storage
             mountPath: "/var/lib/postgresql/"
@@ -93,11 +93,31 @@ spec:
             - >
               set -x;
               mkdir -p /var/lib/postgresql/data;
-              chown -R 999 /var/lib/postgresql/data && chmod og-rwx /var/lib/postgresql/data;
+              chown -R {{ .Values.containerSecurity.userID }} /var/lib/postgresql/data || true;
+          resources:
+            {{- toYaml .Values.postgresql.resources | nindent 12 }}
+        {{ end }}
+        - name: postgis-init
+          image: alpine:3.18
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
+          volumeMounts:
+          - name: postgres-storage
+            mountPath: "/var/lib/postgresql/"
+          command:
+            - /bin/sh
+            - -c
+            - >
+              set -x;
+              mkdir -p /var/lib/postgresql/data;
+              chown -R {{ .Values.containerSecurity.userID }} /var/lib/postgresql/data && chmod og-rwx /var/lib/postgresql/data;
           resources:
             {{- toYaml .Values.postgresql.resources | nindent 12 }}
 
         - name: extensions
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 14 }}
           image: {{ .Values.images.postgis }}
           imagePullPolicy: {{ .Values.images.pullPolicy }}
           command: ["/bin/sh", "-c"]

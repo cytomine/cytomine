@@ -74,9 +74,13 @@ spec:
             volumeMounts:
             - name: data
               mountPath: /data
+            - name: temp
+              mountPath: /tmp
           volumes:
-          - emptyDir: {}
-            name: data
+          - name: data
+            emptyDir: {}
+          - name: temp
+            emptyDir: {}
           restartPolicy: Never
       backoffLimit: 1
 {{- end }}

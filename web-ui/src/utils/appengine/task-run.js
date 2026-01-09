@@ -1,7 +1,6 @@
 import Model from './model';
 import Task from './task';
 import {Cytomine} from '@/api';
-import {BINARY_TYPES} from '@/utils/app';
 
 export default class TaskRun extends Model {
   static get STATES() {

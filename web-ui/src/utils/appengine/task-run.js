@@ -91,8 +91,6 @@ export default class TaskRun extends Model {
 
     this.inputs = (await Cytomine.instance.api.get(`${this.uri}/inputs`)).data;
 
-    const binaryInputs = this.inputs.filter(input => BINARY_TYPES.includes(input.type.toLowerCase()));
-
     return this.inputs;
   }
 
@@ -106,8 +104,4 @@ export default class TaskRun extends Model {
     return this.outputs;
   }
 
-  async fetchSingleIO(parameterName, type) {
-    let {data} = await Cytomine.instance.api.get(`${this.uri}/${type}/${parameterName}`, {responseType: 'arraybuffer'});
-    return data;
-  }
 }

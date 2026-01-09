@@ -130,6 +130,9 @@ pims_cache:
 
 redis:
   port: 6379
+  storage:
+    size: 1Gi
+    storageClassName: null
 
 # Core - Main Cytomine Server
 core:

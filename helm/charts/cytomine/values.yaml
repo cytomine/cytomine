@@ -241,3 +241,7 @@ containerSecurity:
   userID: 20000
   groupID: 20000
   fsgroupID: 20000
+
+# Fix volumes permissions
+# will be removed soon, do not use for newly created environments
+fixVolumesPermissions: false

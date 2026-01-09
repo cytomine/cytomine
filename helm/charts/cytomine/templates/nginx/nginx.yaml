@@ -26,8 +26,7 @@ spec:
         release: {{ .Release.Name }}
     spec:
       securityContext:
-        runAsUser: {{ .Values.containerSecurity.userID }}
-        fsGroup: {{ .Values.containerSecurity.fsgroupID }}
+      {{- include "cytomine.podSecurityContext" . | nindent 8 }}
       serviceAccountName: {{ include "cytomine.serviceAccountName" . }}
       {{- with .Values.global.affinity }}
       affinity:
@@ -101,9 +100,7 @@ spec:
             - name: http
               containerPort: {{ .Values.nginx.port }}
           securityContext:
-            allowPrivilegeEscalation: {{ .Values.containerSecurity.allowPrivilegeEscalation }}
-            privileged: {{ .Values.containerSecurity.privileged }}
-            readOnlyRootFilesystem: {{ .Values.containerSecurity.readOnlyRootFilesystem }}
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
           resources:
             {{- toYaml .Values.nginx.resources | nindent 12 }}
       initContainers:
@@ -117,9 +114,7 @@ spec:
               cp -R /etc/nginx /fix && chown -R {{ .Values.containerSecurity.userID }}:{{ .Values.containerSecurity.groupID }} /fix/nginx;
           imagePullPolicy: {{ .Values.images.pullPolicy }}
           securityContext:
-            allowPrivilegeEscalation: {{ .Values.containerSecurity.allowPrivilegeEscalation }}
-            privileged: {{ .Values.containerSecurity.privileged }}
-            readOnlyRootFilesystem: {{ .Values.containerSecurity.readOnlyRootFilesystem }}
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
           volumeMounts:
             - name: temp
               mountPath: /fix/

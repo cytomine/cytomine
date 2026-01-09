@@ -14,9 +14,13 @@ spec:
       template:
         spec:
           serviceAccountName: {{ include "cytomine.serviceAccountName" . }}
+          securityContext:
+          {{- include "cytomine.podSecurityContext" . | nindent 12 }}
           initContainers:
           # putting multiple containers for psql commands for the sake of clarity
           - name: private-key-fetcher
+            securityContext:
+            {{- include "cytomine.containerSecurityContext" . | nindent 14 }}
             image: {{ .Values.images.postgis }}
             imagePullPolicy: {{ .Values.images.pullPolicy }}
             command: ["/bin/sh", "-c"]
@@ -37,6 +41,8 @@ spec:
             - name: data
               mountPath: /data
           - name: public-key-fetcher
+            securityContext:
+            {{- include "cytomine.containerSecurityContext" . | nindent 14 }}
             image: {{ .Values.images.postgis }}
             imagePullPolicy: {{ .Values.images.pullPolicy }}
             command: ["/bin/sh", "-c"]
@@ -58,6 +64,8 @@ spec:
               mountPath: /data
           containers:
           - name: import-call
+            securityContext:
+            {{- include "cytomine.containerSecurityContext" . | nindent 14 }}
             image: {{ .Values.images.pims_import }}
             imagePullPolicy: {{ .Values.images.pullPolicy }}
             command: ["/bin/sh", "-c"]

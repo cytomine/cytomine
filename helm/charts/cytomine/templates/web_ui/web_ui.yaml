@@ -25,6 +25,8 @@ spec:
       annotations:
         checksum/config: "{{ include (print $.Template.BasePath "/web_ui/web_ui-config.yaml") . | sha256sum }}"
     spec:
+      securityContext:
+        {{- include "cytomine.podSecurityContext" . | nindent 8 }}
       serviceAccountName: {{ include "cytomine.serviceAccountName" . }}
       {{- with .Values.global.affinity }}
       affinity:
@@ -43,6 +45,8 @@ spec:
         emptyDir: {}
       containers:
         - name: web-ui
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
           image: "{{ .Values.images.web_ui }}"
           imagePullPolicy: {{ .Values.images.pullPolicy }}
           env:

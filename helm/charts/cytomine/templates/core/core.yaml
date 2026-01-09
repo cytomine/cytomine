@@ -26,8 +26,7 @@ spec:
         checksum/config: "{{ include (print $.Template.BasePath "/core/core-config.yaml") . | sha256sum }}"
     spec:
       securityContext:
-        runAsUser: {{ .Values.containerSecurity.userID }}
-        fsGroup: {{ .Values.containerSecurity.fsgroupID }}
+      {{- include "cytomine.podSecurityContext" . | nindent 8 }}
       {{- with .Values.global.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
@@ -44,6 +43,8 @@ spec:
       containers:
         - name: core
           image: "{{ .Values.images.core }}"
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
           imagePullPolicy: {{ .Values.images.pullPolicy }}
           env:
             - name: POSTGIS_PASS
@@ -82,10 +83,6 @@ spec:
               containerPort: {{ .Values.core.port }}
           resources:
             {{- toYaml .Values.core.resources | nindent 12 }}
-          securityContext:
-            allowPrivilegeEscalation: {{ .Values.containerSecurity.allowPrivilegeEscalation }}
-            privileged: {{ .Values.containerSecurity.privileged }}
-            readOnlyRootFilesystem: {{ .Values.containerSecurity.readOnlyRootFilesystem }}
           livenessProbe:
             httpGet:
               path: /server/ping
@@ -105,9 +102,7 @@ spec:
           image: "{{ .Values.images.core }}"
           imagePullPolicy: {{ .Values.images.pullPolicy }}
           securityContext:
-            allowPrivilegeEscalation: {{ .Values.containerSecurity.allowPrivilegeEscalation }}
-            privileged: {{ .Values.containerSecurity.privileged }}
-            readOnlyRootFilesystem: {{ .Values.containerSecurity.readOnlyRootFilesystem }}
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
           command:
             - /bin/bash
             - -c

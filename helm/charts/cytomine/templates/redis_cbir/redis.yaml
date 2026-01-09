@@ -22,10 +22,14 @@ spec:
         app: redis
         release: {{ .Release.Name }}
     spec:
+      securityContext:
+      {{- include "cytomine.podSecurityContext" . | nindent 8 }}
       containers:
         - name: redis
           image: "{{ .Values.images.redis }}"
           imagePullPolicy: {{ .Values.images.pullPolicy }}
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
           ports:
             - name: http
               containerPort: {{ .Values.redis.port }}

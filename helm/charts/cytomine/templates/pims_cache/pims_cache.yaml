@@ -24,9 +24,7 @@ spec:
         release: {{ .Release.Name }}
     spec:
       securityContext:
-        runAsUser: {{ .Values.containerSecurity.userID }}
-        runAsGroup: {{ .Values.containerSecurity.groupID }}
-        fsGroup: {{ .Values.containerSecurity.fsgroupID }}
+      {{- include "cytomine.podSecurityContext" . | nindent 8 }}
       serviceAccountName: {{ include "cytomine.serviceAccountName" . }}
       {{- with .Values.global.affinity }}
       affinity:
@@ -36,13 +34,11 @@ spec:
         - name: pims-cache
           image: "{{ .Values.images.pims_cache }}"
           imagePullPolicy: {{ .Values.images.pullPolicy }}
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
           ports:
             - name: http
               containerPort: {{ .Values.pims_cache.port }}
-          securityContext:
-            allowPrivilegeEscalation: {{ .Values.containerSecurity.allowPrivilegeEscalation }}
-            privileged: {{ .Values.containerSecurity.privileged }}
-            readOnlyRootFilesystem: {{ .Values.containerSecurity.readOnlyRootFilesystem }}
           resources:
             {{- toYaml .Values.pims_cache.resources | nindent 12 }}
           volumeMounts:

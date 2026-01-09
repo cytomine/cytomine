@@ -22,6 +22,8 @@ spec:
         app: postgres-app-engine
         release: {{ .Release.Name }}
     spec:
+      securityContext:
+      {{- include "cytomine.podSecurityContext" . | nindent 8 }}
       volumes:
         - name: temp
           emptyDir: {}
@@ -36,6 +38,8 @@ spec:
         - name: postgres
           image: "{{ .Values.images.postgresql_app_engine }}"
           imagePullPolicy: {{ .Values.images.pullPolicy }}
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
           volumeMounts:
             - name: postgres-app-engine-storage
               mountPath: "/var/lib/postgresql/data"
@@ -64,6 +68,8 @@ spec:
         - name: postgres-init
           image: alpine:3.18
           imagePullPolicy: {{ .Values.images.pullPolicy }}
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
           volumeMounts:
             - name: postgres-app-engine-storage
               mountPath: "/var/lib/postgresql/"

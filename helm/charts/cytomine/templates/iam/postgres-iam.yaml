@@ -65,6 +65,26 @@ spec:
           securityContext:
           {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
       initContainers:
+        {{ if .Values.fixVolumesPermissions -}}
+        - name: fix-previous-permissions
+          image: alpine:3.18
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+          volumeMounts:
+          - name: postgres-iam-storage
+            mountPath: "/var/lib/postgresql/"
+          command:
+            - /bin/sh
+            - -c
+            - >
+              set -x;
+              mkdir -p /var/lib/postgresql/data;
+              chown -R {{ .Values.containerSecurity.userID }} /var/lib/postgresql/data || true;
+          resources:
+            {{- toYaml .Values.postgresql.resources | nindent 12 }}
+        {{ end }}
         - name: postgres-init
           image: alpine:3.18
           imagePullPolicy: {{ .Values.images.pullPolicy }}

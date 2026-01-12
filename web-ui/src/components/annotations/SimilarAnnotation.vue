@@ -157,7 +157,6 @@ export default {
 
       this.suggestedTerms = Object.entries(termFrequency)
         .sort((a, b) => b[1] - a[1])
-        .slice(0, 3)
         .map(([termId, count]) => {
           const termObject = this.findTerm(termId);
           return termObject ? [termObject, count] : null;

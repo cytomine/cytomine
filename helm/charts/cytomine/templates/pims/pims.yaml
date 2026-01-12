@@ -38,11 +38,9 @@ spec:
             name: pims-logging
         - name: temp
           emptyDir: {}
-        {{- if .Values.pims.datasetImportFolder }}
+        {{- if .Values.pims.datasetImportStorage }}
         - name: import-folder
-          hostPath:
-            path: {{ .Values.pims.datasetImportFolder }} # directory location on host
-            type: {{ .Values.pims.datasetImportFolderFailIfAbsent | ternary "Directory" "DirectoryOrCreate" | quote  }} # this field is optional
+          {{- .Values.pims.datasetImportStorage | toYaml | nindent 10 }}
         {{- end }}
         {{ if not .Values.pims.imageStorage.storageClassName -}}
         - emptyDir: {}
@@ -79,9 +77,9 @@ spec:
                 secretKeyRef:
                   name: core-secret
                   key: IMAGE_SERVER_PRIVATE_KEY
-            {{- if .Values.pims.datasetImportFolder }}
+            {{- if .Values.pims.datasetImportStorage }}
             - name: DATASET_PATH
-              value: {{ .Values.pims.datasetImportFolder }}
+              value: "/data/dataset"
             {{- end }}
           volumeMounts:
             - name: images
@@ -95,7 +93,7 @@ spec:
               subPath: logging.yml
             - name: temp
               mountPath: /tmp
-            {{- if .Values.pims.datasetImportFolder }}
+            {{- if .Values.pims.datasetImportStorage }}
             - mountPath: "/data/dataset"
               name: import-folder
               readOnly: true

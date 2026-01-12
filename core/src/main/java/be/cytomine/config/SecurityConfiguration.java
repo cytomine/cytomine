@@ -17,6 +17,7 @@ package be.cytomine.config;
  */
 
 import be.cytomine.config.security.ApiKeyFilter;
+import be.cytomine.config.security.TokenFromParameterFilter;
 import be.cytomine.repository.security.UserRepository;
 import be.cytomine.utils.JwtAuthConverter;
 import org.springframework.context.annotation.Bean;
@@ -26,6 +27,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -60,7 +62,9 @@ public class SecurityConfiguration {
                         authorizeHttpRequests
                                 .requestMatchers(new AntPathRequestMatcher("/api/abstractimage/**")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/api/imageinstance/**")).permitAll()
+                                .requestMatchers(new AntPathRequestMatcher("/api/uploadedfile/*/download")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/api/userannotation/**")).permitAll()
+
                                 .requestMatchers(new AntPathRequestMatcher("/api/**")).authenticated()
                                 .requestMatchers("/session/admin/info.json").authenticated()
                                 .requestMatchers("/session/admin/open.json").authenticated()
@@ -72,7 +76,9 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.POST, "/server/ping.json").permitAll() // TODO 2024.2 - LAST CONNECTION (IN A PROJECT)
                                 .requestMatchers(new AntPathRequestMatcher("/**")).permitAll() // TODO IAM: remove ?
                 );
-        http.oauth2ResourceServer((oauth2) -> oauth2
+        http
+            .addFilterBefore(new TokenFromParameterFilter(), BearerTokenAuthenticationFilter.class)
+            .oauth2ResourceServer((oauth2) -> oauth2
                 .jwt(jwtAuthConverter -> jwtAuthConverter.jwtAuthenticationConverter(customJwtAuthConverter)));
         return http.build();
     }

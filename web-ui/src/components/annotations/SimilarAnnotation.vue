@@ -146,17 +146,14 @@ export default {
       }
     },
     countTerm() {
-      let termCount = {};
-      for (let annotation of this.annotations) {
-        for (let term of annotation.term) {
-          termCount[term] = (termCount[term] || 0) + 1;
-        }
-      }
-      // Delete already existing terms
-      for (let term of this.annotation.term) {
-        delete termCount[term];
-      }
-      this.suggestedTerms = Object.keys(termCount).map((key) => [key, termCount[key]]);
+      const termFrequency = this.annotations.reduce((accumulator, annotation) => {
+        annotation.term?.forEach(term => {
+          accumulator[term] = (accumulator[term] || 0) + 1;
+        });
+        return accumulator;
+      }, {});
+
+      this.suggestedTerms = Object.keys(termFrequency).map((key) => [key, termFrequency[key]]);
       this.suggestedTerms.sort((a, b) => b[1] - a[1]);
       this.suggestedTerms.forEach((count) => count[0] = this.findTerm(count[0]));
       this.suggestedTerms = this.suggestedTerms.filter((term) => term[0] !== undefined);

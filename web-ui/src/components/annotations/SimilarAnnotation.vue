@@ -60,7 +60,7 @@
           <b-tag class="term-suggestion" v-for="value in suggestedTerms" :key="value[0].id">
             <cytomine-term :term="value[0]"/>
             ({{ value[1] }})
-            <button class="button is-small" @click="addTerm(value[0])">
+            <button class="button is-small" @click="addTerm(value[0])" :disabled="hasTermId(value[0].id)">
               <span class="icon is-small"><i class="fas fa-plus"/></span>
             </button>
           </b-tag>
@@ -153,14 +153,20 @@ export default {
         return accumulator;
       }, {});
 
-      this.suggestedTerms = Object.keys(termFrequency).map((key) => [key, termFrequency[key]]);
-      this.suggestedTerms.sort((a, b) => b[1] - a[1]);
-      this.suggestedTerms.forEach((count) => count[0] = this.findTerm(count[0]));
-      this.suggestedTerms = this.suggestedTerms.filter((term) => term[0] !== undefined);
-      this.suggestedTerms = this.suggestedTerms.slice(0, 3); // Only keep the 3 most frequent terms
+      this.suggestedTerms = Object.entries(termFrequency)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([termId, count]) => {
+          const termObject = this.findTerm(termId);
+          return termObject ? [termObject, count] : null;
+        })
+        .filter(Boolean);
     },
     findTerm(id) {
       return this.terms.find((term) => term.id === Number(id));
+    },
+    hasTermId(termId) {
+      return this.annotation.term.includes(termId);
     },
     async fetchAnnotations() {
       await Promise.all(this.data['similarities'].map(async ([id, _]) => { // eslint-disable-line no-unused-vars

@@ -56,14 +56,16 @@
           <h1>{{ $t('suggested-terms') }}</h1>
         </div>
 
-        <div>
-          <b-tag class="term-suggestion" v-for="value in suggestedTerms" :key="value[0].id">
-            <cytomine-term :term="value[0]"/>
-            ({{ value[1] }})
+        <div class="term-suggestions-container">
+          <div class="term-suggestion" v-for="value in suggestedTerms" :key="value[0].id">
+            <b-tag>
+              <cytomine-term :term="value[0]"/>
+              ({{ value[1] }})
+            </b-tag>
             <button class="button is-small" @click="addTerm(value[0])" :disabled="hasTermId(value[0].id)">
               <span class="icon is-small"><i class="fas fa-plus"/></span>
             </button>
-          </b-tag>
+          </div>
         </div>
       </div>
     </vue-draggable-resizable>
@@ -251,8 +253,17 @@ h1 {
   z-index: 20 !important;
 }
 
+.term-suggestions-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+
 .term-suggestion {
-  flex-direction: column;
-  margin: 0.5rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
 }
 </style>

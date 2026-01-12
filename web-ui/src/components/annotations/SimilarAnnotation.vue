@@ -56,14 +56,16 @@
           <h1>{{ $t('suggested-terms') }}</h1>
         </div>
 
-        <div>
-          <b-tag class="term-suggestion" v-for="value in suggestedTerms" :key="value[0].id">
-            <cytomine-term :term="value[0]"/>
-            ({{ value[1] }})
-            <button class="button is-small" @click="addTerm(value[0])">
+        <div class="term-suggestions-container">
+          <div class="term-suggestion" v-for="value in suggestedTerms" :key="value[0].id">
+            <b-tag>
+              <cytomine-term :term="value[0]"/>
+              ({{ value[1] }})
+            </b-tag>
+            <button class="button is-small" @click="addTerm(value[0])" :disabled="hasTermId(value[0].id)">
               <span class="icon is-small"><i class="fas fa-plus"/></span>
             </button>
-          </b-tag>
+          </div>
         </div>
       </div>
     </vue-draggable-resizable>
@@ -146,24 +148,26 @@ export default {
       }
     },
     countTerm() {
-      let termCount = {};
-      for (let annotation of this.annotations) {
-        for (let term of annotation.term) {
-          termCount[term] = (termCount[term] || 0) + 1;
-        }
-      }
-      // Delete already existing terms
-      for (let term of this.annotation.term) {
-        delete termCount[term];
-      }
-      this.suggestedTerms = Object.keys(termCount).map((key) => [key, termCount[key]]);
-      this.suggestedTerms.sort((a, b) => b[1] - a[1]);
-      this.suggestedTerms.forEach((count) => count[0] = this.findTerm(count[0]));
-      this.suggestedTerms = this.suggestedTerms.filter((term) => term[0] !== undefined);
-      this.suggestedTerms = this.suggestedTerms.slice(0, 3); // Only keep the 3 most frequent terms
+      const termFrequency = this.annotations.reduce((accumulator, annotation) => {
+        annotation.term?.forEach(term => {
+          accumulator[term] = (accumulator[term] || 0) + 1;
+        });
+        return accumulator;
+      }, {});
+
+      this.suggestedTerms = Object.entries(termFrequency)
+        .sort((a, b) => b[1] - a[1])
+        .map(([termId, count]) => {
+          const termObject = this.findTerm(termId);
+          return termObject ? [termObject, count] : null;
+        })
+        .filter(Boolean);
     },
     findTerm(id) {
       return this.terms.find((term) => term.id === Number(id));
+    },
+    hasTermId(termId) {
+      return this.annotation.term.includes(termId);
     },
     async fetchAnnotations() {
       await Promise.all(this.data['similarities'].map(async ([id, _]) => { // eslint-disable-line no-unused-vars
@@ -248,8 +252,17 @@ h1 {
   z-index: 20 !important;
 }
 
+.term-suggestions-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+
 .term-suggestion {
-  flex-direction: column;
-  margin: 0.5rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
 }
 </style>

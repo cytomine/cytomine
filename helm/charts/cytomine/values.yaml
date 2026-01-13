@@ -27,7 +27,6 @@ readManyStorageClass: null
 
 
 # Resource settings
-singularityStorage: "10Gi"
 tempImageStorage: "1Gi"
 imageStorage: "3Gi"
 mongodbStorage: "1Gi"

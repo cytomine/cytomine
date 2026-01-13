@@ -60,15 +60,6 @@ public class AnnotationLayerService {
         return annotationLayerRepository.findById(id);
     }
 
-//    public List<AnnotationLayer> findByTaskRunLayer(Long imageId) {
-//        List<TaskRunLayer> taskRunLayers = taskRunLayerRepository.findAllByImageId(imageId);
-//
-//        return taskRunLayers
-//            .stream()
-//            .map(TaskRunLayer::getAnnotationLayer)
-//            .toList();
-//    }
-
     public List<AnnotationLayer> findByTaskRunLayer(Long imageId) {
         List<TaskRunLayer> taskRunLayers = taskRunLayerRepository.findAllByImageId(imageId);
 

@@ -19,6 +19,10 @@ spec:
       securityContext:
       {{- include "cytomine.podSecurityContext" . | nindent 8 }}
       volumes:
+        {{ if not .Values.app_engine.storage.storageClassName -}}
+        - name: app-engine-storage
+          emptyDir: {}
+        {{ end }}
         - name: temp
           emptyDir: {}
       containers:
@@ -37,15 +41,22 @@ spec:
             secretKeyRef:
               name: postgres-app-engine-secret
               key: password
-        - name: SCHEDULER_MASTER_URL
-          value: "https://kubernetes.default.svc"
-        - name: SCHEDULER_OAUTH_TOKEN
-          valueFrom:
-            secretKeyRef:
-              name: app-engine
-              key: token
         volumeMounts:
+          - name: app-engine-storage
+            mountPath: /data
           - name: temp
             mountPath: /tmp
       serviceAccountName: app-engine
       automountServiceAccountToken: true
+  {{ if .Values.app_engine.storage.storageClassName -}}
+  volumeClaimTemplates:
+    - metadata:
+        name: app-engine-storage
+      spec:
+        storageClassName: {{ .Values.app_engine.storage.storageClassName }}
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: {{ .Values.app_engine.storage.size }}
+  {{ end }}

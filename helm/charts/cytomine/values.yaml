@@ -223,6 +223,9 @@ cbir:
 
 app_engine:
   port: 8080
+  storage:
+    size: 5Gi
+    storageClassName: null
   tasks_namespace:
 
 sam:

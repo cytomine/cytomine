@@ -1,10 +1,19 @@
 package be.cytomine.service.annotation;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
+import be.cytomine.domain.appengine.TaskRun;
+import be.cytomine.domain.image.ImageInstance;
+import be.cytomine.exceptions.ObjectNotFoundException;
+import be.cytomine.repository.appengine.TaskRunRepository;
+import be.cytomine.repository.image.ImageInstanceRepository;
+import be.cytomine.service.appengine.TaskRunService;
+import be.cytomine.service.image.ImageInstanceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +38,10 @@ public class AnnotationLayerService {
 
     private final TaskRunLayerService taskRunLayerService;
 
+    private final TaskRunRepository taskRunRepository;
+
+    private final ImageInstanceService imageInstanceService;
+
     public String createLayerName(String taskName, String taskVersion, Date created) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String createdTime = sdf.format(created);
@@ -47,13 +60,39 @@ public class AnnotationLayerService {
         return annotationLayerRepository.findById(id);
     }
 
+//    public List<AnnotationLayer> findByTaskRunLayer(Long imageId) {
+//        List<TaskRunLayer> taskRunLayers = taskRunLayerRepository.findAllByImageId(imageId);
+//
+//        return taskRunLayers
+//            .stream()
+//            .map(TaskRunLayer::getAnnotationLayer)
+//            .toList();
+//    }
+
     public List<AnnotationLayer> findByTaskRunLayer(Long imageId) {
         List<TaskRunLayer> taskRunLayers = taskRunLayerRepository.findAllByImageId(imageId);
 
-        return taskRunLayers
+        List<AnnotationLayer> annotationLayerList = new ArrayList<>(taskRunLayers
+            .stream()
+            .map(TaskRunLayer::getAnnotationLayer)
+            .toList());
+
+        ImageInstance imageInstance = imageInstanceService.get(imageId);
+
+        TaskRun lastTaskRun = taskRunRepository
+            .findFirstByProjectIdOrderByCreatedDesc(imageInstance.getProject().getId())
+            .orElseThrow(() -> new ObjectNotFoundException("TaskRun", imageInstance.getProject().getId()));
+
+        Optional<TaskRunLayer> lastExecutedRunLayer = taskRunLayerRepository.findByTaskRun(lastTaskRun);
+
+        List<AnnotationLayer> lastTaskRunAnnotationLayers = lastExecutedRunLayer
             .stream()
             .map(TaskRunLayer::getAnnotationLayer)
             .toList();
+
+        annotationLayerList.addAll(lastTaskRunAnnotationLayers);
+
+        return annotationLayerList.stream().distinct().toList();
     }
 
     public TaskRunLayerValue findTaskRunLayer(Long id) {

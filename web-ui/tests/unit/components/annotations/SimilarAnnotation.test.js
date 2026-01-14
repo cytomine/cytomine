@@ -18,12 +18,17 @@ describe('SimilarAnnotation.vue', () => {
   localVue.use(Buefy);
   localVue.use(Vuex);
 
-  const annotationsMock = [
+  const mockTerms = [
+    {id: 1, name: 'term1'},
+    {id: 2, name: 'term2'},
+  ];
+
+  const mockAnnotations = [
     {id: 1, term: [1]},
     {id: 2, term: [2]},
   ];
 
-  const dataMock = {
+  const mockSimilarAnnotations = {
     similarities: [
       ['1', 80.0],
       ['2', 70.0],
@@ -52,13 +57,13 @@ describe('SimilarAnnotation.vue', () => {
               selectedFeatures: {
                 showSimilarAnnotations: true,
                 displayAnnotDetails: true,
-                similarAnnotations: dataMock,
+                similarAnnotations: mockSimilarAnnotations,
                 queryAnnotation: {id: 1, term: [1]}
               },
             },
           },
         },
-        terms: [{id: 1, name: 'term1'}, {id: 2, name: 'term2'}],
+        terms: mockTerms,
       },
     };
 
@@ -122,9 +127,9 @@ describe('SimilarAnnotation.vue', () => {
     await wrapper.vm.$nextTick();
 
     const annotationPreviews = wrapper.findAllComponents(AnnotationPreview);
-    expect(annotationPreviews.length).toBe(2);
-    expect(annotationPreviews.at(0).props('annot')).toEqual(annotationsMock[0]);
-    expect(annotationPreviews.at(1).props('annot')).toEqual(annotationsMock[1]);
+    expect(annotationPreviews.length).toBe(mockAnnotations.length);
+    expect(annotationPreviews.at(0).props('annot')).toEqual(mockAnnotations[0]);
+    expect(annotationPreviews.at(1).props('annot')).toEqual(mockAnnotations[1]);
 
     const distances = wrapper.findAll('.annotation-data div');
     expect(distances.at(0).text()).toBe('80.00%');
@@ -134,8 +139,8 @@ describe('SimilarAnnotation.vue', () => {
   it('should fetch annotations on created hook and updates state', async () => {
     await wrapper.vm.$nextTick();
 
-    expect(Annotation.fetch).toHaveBeenCalledTimes(2);
-    expect(wrapper.vm.annotations).toEqual(annotationsMock);
+    expect(Annotation.fetch).toHaveBeenCalledTimes(mockAnnotations.length);
+    expect(wrapper.vm.annotations).toEqual(mockAnnotations);
     expect(wrapper.vm.loading).toBe(false);
   });
 
@@ -143,9 +148,8 @@ describe('SimilarAnnotation.vue', () => {
     await wrapper.vm.$nextTick();
     wrapper.vm.countTerm();
 
-    expect(wrapper.vm.suggestedTerms).toEqual([
-      [{id: 2, name: 'term2'}, 1],
-    ]);
+    const expectedSuggestedTerms = mockTerms.map(term => [term, 1]);
+    expect(wrapper.vm.suggestedTerms).toEqual(expectedSuggestedTerms);
   });
 
   it('should close the window when close button is clicked', async () => {

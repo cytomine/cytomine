@@ -81,7 +81,7 @@ spec:
             - >
               set -x;
               mkdir -p /var/lib/postgresql/data;
-              chown -R {{ .Values.containerSecurity.userID }} /var/lib/postgresql/data || true;
+              chown -R {{ .Values.containerSecurity.userID }} /var/lib/postgresql/data;
           resources:
             {{- toYaml .Values.postgresql.resources | nindent 12 }}
         {{ end }}

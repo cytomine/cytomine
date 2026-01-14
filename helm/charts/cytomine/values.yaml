@@ -27,7 +27,6 @@ readManyStorageClass: null
 
 
 # Resource settings
-singularityStorage: "10Gi"
 tempImageStorage: "1Gi"
 imageStorage: "3Gi"
 mongodbStorage: "1Gi"
@@ -60,10 +59,10 @@ images:
   #
   # External Images
   #
-  postgresql: cytomine/postgis:latest
+  postgis: postgis/postgis:15-3.5
   postgresql_iam: postgres:14
   postgresql_app_engine: postgres:14
-  mongodb: cytomine/mongo:latest
+  mongodb: mongo:4.4-focal
   pims_cache: redis:7
   redis: redis:7
   nginx: cytomine/nginx:latest
@@ -130,6 +129,9 @@ pims_cache:
 
 redis:
   port: 6379
+  storage:
+    size: 1Gi
+    storageClassName: null
 
 # Core - Main Cytomine Server
 core:
@@ -163,10 +165,15 @@ pims:
     storageClassName: null
   tempImageStorage:
     storageClassName: null
-  # set a folder on the nodepath to import data from.
-  datasetImportFolder: null
-  # whether to tolerate the absence of the folder or not
-  datasetImportFolderFailIfAbsent: true
+
+  # Volume block for the path of the images to import.
+  # Should be in the form:
+  # datasetImportStorage:
+  #   hostPath:
+  #     path: /data/dataset
+  #     type: DirectoryOrCreate
+  datasetImportStorage: null
+
 
 # Nginx - Main HTTP proxy dispatching incoming requests
 nginx:
@@ -209,9 +216,15 @@ iam:
 
 cbir:
   port: 6000  # https://github.com/cytomine/cytomine/blob/8e5a14bf70b22e9f96a253d6402f793e8a37ce3e/cbir/Dockerfile#L37
+  storage:
+    size: 1Gi
+    storageClassName: null
 
 app_engine:
   port: 8080
+  storage:
+    size: 5Gi
+    storageClassName: null
   tasks_namespace:
 
 sam:
@@ -238,3 +251,7 @@ containerSecurity:
   userID: 20000
   groupID: 20000
   fsgroupID: 20000
+
+# Fix volumes permissions
+# will be removed soon, do not use for newly created environments
+fixVolumesPermissions: false

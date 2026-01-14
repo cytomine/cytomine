@@ -20,9 +20,8 @@ describe('AnnotationSelection.vue', () => {
     {id: 2, name: 'Annotation 2'},
   ];
   const mockImages = [{imageInstance: {id: 1}}];
-  const mockedTerms = [{id: 1, name: 'Term 1'}];
 
-  const createWrapper = (options = {}) => {
+  const createWrapper = () => {
     return shallowMount(AnnotationSelection, {
       propsData: {
         active: true,
@@ -45,7 +44,6 @@ describe('AnnotationSelection.vue', () => {
         $store: {
           getters: {
             'currentProject/currentViewer': {images: mockImages},
-            'currentProject/terms': options.terms || [],
           },
         },
         $t: (message) => message,
@@ -106,19 +104,5 @@ describe('AnnotationSelection.vue', () => {
 
     expect(wrapper.vm.selectedAnnotation).toBe(null);
     expect(wrapper.emitted('update:active')).toEqual([[false]]);
-  });
-
-  describe('terms', () => {
-    it('should load an empty array when no term is provided', () => {
-      const wrapper = createWrapper({terms: []});
-
-      expect(wrapper.vm.terms).toEqual([]);
-    });
-
-    it('should load the terms data correctly', async () => {
-      const wrapper = createWrapper({terms: mockedTerms});
-
-      expect(wrapper.vm.terms).toEqual(mockedTerms);
-    });
   });
 });

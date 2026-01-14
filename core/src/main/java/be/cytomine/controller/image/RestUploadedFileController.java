@@ -1,23 +1,24 @@
 package be.cytomine.controller.image;
 
+import java.io.IOException;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
+
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.image.UploadedFile;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.CurrentUserService;
-import be.cytomine.service.image.AbstractImageService;
 import be.cytomine.service.image.UploadedFileService;
 import be.cytomine.service.middleware.ImageServerService;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.RequestParams;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.gateway.mvc.ProxyExchange;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.view.RedirectView;
-
-import java.io.IOException;
 
 @RestController
 @RequestMapping("/api")
@@ -25,14 +26,11 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class RestUploadedFileController extends RestCytomineController {
 
-    private final AbstractImageService abstractImageService;
-
     private final UploadedFileService uploadedFileService;
 
     private final ImageServerService imageServerService;
 
     private final CurrentUserService currentUserService;
-
 
     @GetMapping("/uploadedfile.json")
     public ResponseEntity<String> list(
@@ -85,12 +83,27 @@ public class RestUploadedFileController extends RestCytomineController {
         return delete(uploadedFileService, JsonObject.of("id", id), null);
     }
 
-
     @GetMapping("/uploadedfile/{id}/download")
-    public ResponseEntity<byte[]> download(@PathVariable Long id, ProxyExchange<byte[]> proxy) throws IOException {
-        log.debug("REST request to download uploadedFile");
-        UploadedFile uploadedFile = uploadedFileService.find(id)
+    public ResponseEntity<StreamingResponseBody> download(
+        @PathVariable Long id,
+        @RequestParam String Authorization
+    ) throws IOException {
+        log.debug("GET /uploadedfile/{}/download", id);
+
+        UploadedFile uploadedFile = uploadedFileService.find(id, Authorization)
                 .orElseThrow(() -> new ObjectNotFoundException("UploadedFile", id));
-        return imageServerService.download(uploadedFile, proxy);
+
+        StreamingResponseBody stream = outputStream -> {
+            imageServerService.streamDownload(uploadedFile, outputStream);
+        };
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDispositionFormData("attachment", uploadedFile.getOriginalFilename());
+
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .body(stream);
     }
 }

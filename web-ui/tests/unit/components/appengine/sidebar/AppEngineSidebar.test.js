@@ -59,16 +59,36 @@ jest.mock('@/utils/appengine/task', () => ({
 }));
 
 jest.mock('@/utils/appengine/task-run', () => {
+  const STATES = {
+    CREATED: 'CREATED',
+    PROVISIONED: 'PROVISIONED',
+    QUEUING: 'QUEUING',
+    QUEUED: 'QUEUED',
+    PENDING: 'PENDING',
+    RUNNING: 'RUNNING',
+    FAILED: 'FAILED',
+    FINISHED: 'FINISHED',
+  };
+
+  const mockIsFinished = jest.fn(function () {
+    return this.state === STATES.FINISHED;
+  });
+
   const mockTaskRun = jest.fn().mockImplementation((resource) => ({
     ...resource,
     fetchInputs: mockFetchInputs,
     fetchOutputs: mockFetchOutputs,
+    isFinished: mockIsFinished,
   }));
 
   mockTaskRun.fetchByProject = jest.fn(() => Promise.resolve([
     mockTaskRun1,
     mockTaskRun2,
   ]));
+
+  Object.defineProperty(mockTaskRun, 'STATES', {
+    get: () => STATES,
+  });
 
   return {
     __esModule: true,
@@ -129,9 +149,13 @@ describe('AppEngineSideBar.vue', () => {
     expect(fetchTasksSpy).toHaveBeenCalledTimes(1);
     expect(fetchTaskRunsSpy).toHaveBeenCalled();
     expect(fetchTaskRunsSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('should mark not finished runs as failed on component created', async () => {
+    const expectedTaskRun2 = {...mockTaskRun2, state: 'FAILED'};
 
     expect(wrapper.vm.tasks).toStrictEqual([mockTask1, mockTask2]);
-    expect(wrapper.vm.trackedTaskRuns).toMatchObject([mockTaskRun1, mockTaskRun2]);
+    expect(wrapper.vm.trackedTaskRuns).toMatchObject([mockTaskRun1, expectedTaskRun2]);
   });
 
   it('should update tracked task runs every 2 seconds', async () => {

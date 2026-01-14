@@ -72,8 +72,7 @@ public class RestProjectController extends RestCytomineController {
         log.debug("REST request to list projects");
         User user = currentUserService.getCurrentUser();
 
-        if(currentRoleService.isAdminByNow(user)) {
-            //if user is admin, we print all available project
+        if (user.getUsername().equals("admin") && currentRoleService.isAdminByNow(user)) {
             user = null;
         }
 

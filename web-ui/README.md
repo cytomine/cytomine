@@ -1,21 +1,21 @@
-# Cytomine WebUI
+# Cytomine Web UI
 
 [![Apache-2.0 license][license-badge]][license-url]
 [![Website][website-badge]][website-url]
 
 ## Presentation
 
-The Cytomine-WebUI is the official front-end for Cytomine, developed in [Vue.js](https://vuejs.org/).
+The Cytomine Web UI is the official front-end for Cytomine, developed in [Vue.js](https://vuejs.org/).
 You will find more information about the Cytomine project on the [website][website-url].
 You can also find, on our official documentation [how to install it](https://doc.uliege.cytomine.org/admin-guide/ce/installation) and a [user guide](https://doc.uliege.cytomine.org/user-guide/).
 
 The main features of this front-end are:
 
-* Support of internationalization, i.e., multiple languages (English, French, Spanish, Dutch, and Norwegian currently available). You can contribute by adding new languages (See [How to contribute page](https://doc.uliege.cytomine.org/community/how-to-contribute#translate-cytomine-in-your-language)).
+* Support of internationalization, i.e., multiple languages (English, French, Spanish, and Dutch currently available).
 * Reactive application.
-* New lists of project, image, job with sorting, searching and filtering.
+* Lists of project, image with sorting, searching and filtering.
 * Display details of images and projects in all the lists.
-* A complete refactoring of the image viewer to focus on the main part: the image. The other components have been developed to be discrete and can be fold in if necessary. The viewer is now compatible with tablets.
+* A redesigned image viewer focused on the image itself, with foldable secondary components The viewer is now compatible with tablets.
 * Rotation of images at any specific angle.
 * Set up of magnification and resolution of each image directly from the viewer or the image list.
 * Zoom beyond the maximum resolution of an image by activating a digital zoom.
@@ -30,25 +30,10 @@ The main features of this front-end are:
 * Set for projects default annotation layers and default property which will be displayed at the opening of an image.
 * Follow in real time another user viewer or part of viewer, only if this user have allowed the Cytomine platform to broadcast it.
 * Simplification of user management in projects.
-* Change the ontology of a project is now possible.
+* An ontology can be changed in a project.
 * Edition of ontology terms had been simplified.
-* Adding attached files to a project, a image, or an annotation is now possible.
+* Attached files can be added to a project, an image, or an annotation.
 * Manage files in storage is enriched by total size on disk and list of sub images for archived or converted images.
-
-## Installation
-
-This section assumes that you have access to an instance of Cytomine (especially [Cytomine-core](https://github.com/cytomine/Cytomine-core)) and an installed proxy. These two conditions are filled if you have used [Cytomine-community-edition](https://github.com/cytomine/Cytomine-community-edition). The following steps will allow you to run a front-end interacting with this instance:
-
-* Execute `npm install` to install the dependencies;
-* Execute `npm run build` to build all the files into a `dist` folder.
-* Configure your proxy to redirect http request on the index.html file or replace the dist folder in your Cytomine-bootstrap by this one.
-
-## Local installation
-
-This section assumes that you have access to an instance of Cytomine (especially [Cytomine-core](https://github.com/cytomine/Cytomine-core)). The following steps will allow you to run locally a front-end interacting with this instance:
-
-* Execute `npm install` to install the dependencies ;
-* Execute `npm run serve` to start a web server serving the front end (by default on `localhost:8080`).
 
 ## Remarks
 
@@ -64,6 +49,6 @@ This section assumes that you have access to an instance of Cytomine (especially
 
 [cytomine-url]: https://uliege.cytomine.org/
 [license-badge]: https://img.shields.io/badge/License-Apache%202.0-blue.svg
-[license-url]: https://github.com/cytomine/Cytomine-Web-UI/blob/main/LICENSE
+[license-url]: https://github.com/cytomine/cytomine/blob/main/LICENSE
 [website-badge]: https://img.shields.io/badge/Website-blue
 [website-url]: https://uliege.cytomine.org/

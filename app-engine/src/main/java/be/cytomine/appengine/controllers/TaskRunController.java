@@ -309,9 +309,9 @@ public class TaskRunController {
     public ResponseEntity<?> getRun(
         @PathVariable("run_id") String runId
     ) throws ProvisioningException {
-        log.info("/task-runs/{run_id} GET");
+        log.info("/task-runs/{} GET", runId);
         TaskRunResponse run = taskRunService.retrieveRun(runId);
-        log.info("/task-runs/{run_id} GET Ended");
+        log.info("/task-runs/{} GET Ended", runId);
         return new ResponseEntity<>(run, HttpStatus.OK);
     }
 
@@ -353,9 +353,15 @@ public class TaskRunController {
         @PathVariable("parameter_name") String parameterName
     ) throws ProvisioningException {
         log.info("/task-runs/{run_id}/input/{parameter_name} GET");
+        String rawParameterName = null;
+        if (parameterName.endsWith(".geojson")) {
+            rawParameterName = parameterName.substring(0, parameterName.lastIndexOf("."));
+        } else {
+            rawParameterName = parameterName;
+        }
         File input = taskRunService.retrieveSingleRunIO(
             runId,
-            parameterName,
+            rawParameterName,
             ParameterType.INPUT
         );
 
@@ -364,7 +370,11 @@ public class TaskRunController {
             HttpHeaders.CONTENT_DISPOSITION,
             "attachment; filename=\"" + input.getName() + "\""
         );
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        if (parameterName.endsWith(".geojson")) {
+            headers.setContentType(MediaType.parseMediaType("application/geo+json"));
+        } else {
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        }
 
         log.info("/task-runs/{run_id}/input/{parameter_name} Ended");
 
@@ -391,9 +401,15 @@ public class TaskRunController {
         @PathVariable("parameter_name") String parameterName
     ) throws ProvisioningException {
         log.info("/task-runs/{run_id}/output/{parameter_name} GET");
+        String rawParameterName = null;
+        if (parameterName.endsWith(".geojson")) {
+            rawParameterName = parameterName.substring(0, parameterName.lastIndexOf("."));
+        } else {
+            rawParameterName = parameterName;
+        }
         File output = taskRunService.retrieveSingleRunIO(
             runId,
-            parameterName,
+            rawParameterName,
             ParameterType.OUTPUT
         );
 
@@ -402,7 +418,11 @@ public class TaskRunController {
             HttpHeaders.CONTENT_DISPOSITION,
             "attachment; filename=\"" + output.getName() + "\""
         );
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        if (parameterName.endsWith(".geojson")) {
+            headers.setContentType(MediaType.parseMediaType("application/geo+json"));
+        } else {
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        }
 
         log.info("/task-runs/{run_id}/output/{parameter_name} Ended");
 
@@ -453,13 +473,13 @@ public class TaskRunController {
 
     @PostMapping(value = "/task-runs/{run_id}/state-actions")
     @ResponseStatus(code = HttpStatus.OK)
-    public ResponseEntity<?> updateState(
+    public ResponseEntity<StateAction> updateState(
         @PathVariable("run_id") String runId,
         @RequestBody State state
     ) throws ProvisioningException, SchedulingException, FileStorageException {
-        log.info("/task-runs/{run_id}/state_actions POST");
+        log.info("POST /task-runs/{}/state-actions", runId);
         StateAction stateAction = taskRunService.updateRunState(runId, state);
-        log.info("/task-runs/{run_id}/state_actions POST Ended");
+        log.info("POST /task-runs/{}/state-actions Ended", runId);
         return new ResponseEntity<>(stateAction, HttpStatus.OK);
     }
 }

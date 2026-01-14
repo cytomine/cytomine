@@ -25,6 +25,8 @@ spec:
       annotations:
         checksum/config: "{{ include (print $.Template.BasePath "/web_ui/web_ui-config.yaml") . | sha256sum }}"
     spec:
+      securityContext:
+        {{- include "cytomine.podSecurityContext" . | nindent 8 }}
       serviceAccountName: {{ include "cytomine.serviceAccountName" . }}
       {{- with .Values.global.affinity }}
       affinity:
@@ -37,8 +39,14 @@ spec:
       - name: web-ui-localtime
         configMap:
           name: localtime
+      - name: nginx
+        emptyDir: {}
+      - name: nginx-pid
+        emptyDir: {}
       containers:
         - name: web-ui
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
           image: "{{ .Values.images.web_ui }}"
           imagePullPolicy: {{ .Values.images.pullPolicy }}
           env:
@@ -58,6 +66,10 @@ spec:
             - name: web-ui-config
               mountPath: /etc/nginx/nginx.conf
               subPath: nginx.conf
+            - name: nginx
+              mountPath: /var/cache/nginx
+            - name: nginx-pid
+              mountPath: /var/run
           ports:
             - name: http
               containerPort: {{ .Values.web_ui.port }}

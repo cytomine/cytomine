@@ -21,11 +21,19 @@
     <template #detail="props">
       <section v-if="props.row.inputs">
         <h5 class="subtitle">{{ $t('app-engine.inputs.title') }}</h5>
-        <task-run-parameters-table :parameters="props.row.inputs" />
+        <task-run-parameters-table
+            :parameters="props.row.inputs"
+            :project-id="props.row.project"
+            type="input"
+        />
       </section>
       <section v-if="props.row.outputs" class="output-section">
         <h5 class="subtitle">{{ $t('app-engine.outputs.title') }}</h5>
-        <task-run-parameters-table :parameters="props.row.outputs" />
+        <task-run-parameters-table
+            :parameters="props.row.outputs"
+            :project-id="props.row.project"
+            type="output"
+        />
       </section>
     </template>
 

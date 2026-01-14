@@ -91,12 +91,12 @@ export default {
           if (!taskRun.outputs) {
             await taskRun.fetchOutputs();
           }
-
-          if (taskRun.outputs.some(output => output.type === 'GEOMETRY')) {
-            this.$eventBus.$emit('annotation-layers:refresh');
-          }
         }
       }
+    }, 2000);
+
+    setInterval(async () => {
+      this.$eventBus.$emit('annotation-layers:refresh');
     }, 2000);
   },
   computed: {

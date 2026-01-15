@@ -633,6 +633,13 @@
                 "unevaluatedProperties": true
               }
             }
+          },
+          {
+            "type": "object",
+            "properties": {
+              "optional": {"$ref": "#/$defs/io/parameter/optional"}
+            },
+            "unevaluatedProperties": true
           }
         ]
       }

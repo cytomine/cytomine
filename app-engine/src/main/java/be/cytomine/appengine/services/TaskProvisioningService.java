@@ -195,13 +195,14 @@ public class TaskProvisioningService {
             .getParameters()
             .stream()
             .filter(parameter -> parameter.getParameterType().equals(ParameterType.INPUT))
+            .filter(parameter -> !parameter.isOptional())
             .collect(Collectors.toSet());
 
         List<TypePersistence> persistenceList = typePersistenceRepository
             .findTypePersistenceByRunIdAndParameterTypeAndParameterNameIn(run.getId(),
             ParameterType.INPUT,
             inputParameters.stream().map(Parameter::getName).toList());
-        boolean allParametersAreChecked = inputParameters.size() == persistenceList.size();
+        boolean allParametersAreChecked = inputParameters.size() <= persistenceList.size();
         if (allParametersAreChecked
             && persistenceList.stream().allMatch(TypePersistence::isProvisioned)) {
             run.setState(TaskRunState.PROVISIONED);
@@ -1371,10 +1372,15 @@ public class TaskProvisioningService {
                 new StorageData(parameter.getName(), "task-run-outputs-" + run.getId())
             );
             if (provisionFileData == null || provisionFileData.getEntryList().isEmpty()) {
-                AppEngineError error = ErrorBuilder.build(
-                    ErrorCode.INTERNAL_MISSING_OUTPUT_FILE_FOR_PARAMETER
-                );
-                throw new ProvisioningException(error);
+                if (!parameter.isOptional()) {
+                    AppEngineError error = ErrorBuilder.build(
+                        ErrorCode.INTERNAL_MISSING_OUTPUT_FILE_FOR_PARAMETER
+                    );
+                    throw new ProvisioningException(error);
+                } else {
+                    continue; // ignore processing missing optional parameter
+                }
+
             }
 
             // validate files

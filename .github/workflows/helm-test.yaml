@@ -42,7 +42,7 @@ jobs:
       - name: Create Namespace
         run: kubectl create ns cytomine-${{ github.sha }}
 
-      - name: Create Namespace
+      - name: Enforce Restricted Namespace
         run: kubectl label --overwrite ns cytomine-${{ github.sha }} pod-security.kubernetes.io/enforce=restricted pod-security.kubernetes.io/enforce-version=latest pod-security.kubernetes.io/warn=restricted pod-security.kubernetes.io/warn-version=latest
 
       - name: Create Harbor Registry secrets

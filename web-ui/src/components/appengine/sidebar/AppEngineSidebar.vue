@@ -86,18 +86,12 @@ export default {
         if (!taskRun.isTerminalState()) {
           await taskRun.fetch();
         }
-
-        if (taskRun.isFinished()) {
-          if (!taskRun.outputs) {
-            await taskRun.fetchOutputs();
-          }
-        }
       }
     }, 2000);
 
-    setInterval(async () => {
-      this.$eventBus.$emit('annotation-layers:refresh');
-    }, 2000);
+    // setInterval(async () => {
+    //   this.$eventBus.$emit('annotation-layers:refresh');
+    // }, 2000);
   },
   computed: {
     currentProject: get('currentProject/project'),
@@ -124,14 +118,6 @@ export default {
           let taskRun = await Task.fetchTaskRunStatus(this.currentProjectId, taskRunId);
           return new TaskRun({...taskRun, project});
         })
-      );
-
-      await Promise.all(this.trackedTaskRuns.map(run => run.fetchInputs()));
-
-      await Promise.all(
-        this.trackedTaskRuns
-          .filter(taskRun => taskRun.isFinished())
-          .map(run => run.fetchOutputs())
       );
 
       // Mark all previous runs as failed if not finished

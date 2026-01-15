@@ -27,7 +27,6 @@ readManyStorageClass: null
 
 
 # Resource settings
-singularityStorage: "10Gi"
 tempImageStorage: "1Gi"
 imageStorage: "3Gi"
 mongodbStorage: "1Gi"
@@ -223,6 +222,9 @@ cbir:
 
 app_engine:
   port: 8080
+  storage:
+    size: 5Gi
+    storageClassName: null
   tasks_namespace:
 
 sam:

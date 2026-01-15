@@ -105,42 +105,46 @@ def run_import_datasets(
         annotation_summary = {}
         image_summary = ImportSummary()
         for bucket in buckets:
-            parser = BucketParser(bucket)
-            parser.discover()
-
             try:
+                parser = BucketParser(bucket)
+                parser.discover()
+
+                if not parser.parent:
+                    logger.warning(f"No parent dataset found for {bucket}, skipping...")
+                    continue
+
                 parent_dataset = parser.parent
-            except Exception:
-                logger.warning(f"Skipping {bucket} ...")
+
+                validator = MetadataValidator()
+                if validator.validate(bucket / parent_dataset / "METADATA"):
+                    logger.info(f"'{parent_dataset}' metadata validated successfully.")
+
+                project = get_project(parent_dataset, projects)
+
+                image_summary = ImageImporter(
+                    bucket / parent_dataset,
+                    cytomine_auth,
+                    c.current_user,
+                    storage_id,
+                ).run(projects=[project])
+
+                images = ImageInstanceCollection().fetch_with_filter("project", project.id)
+                ontologies = OntologyCollection().fetch()
+
+                for child in parser.children:
+                    child_path = bucket / child
+                    ontology = OntologyImporter(child_path).run()
+                    ontologies.append(ontology)
+
+                    if project.ontology is None:
+                        project.ontology = ontology.id
+                        project.update()
+
+                    result = AnnotationImporter(child_path, images, ontologies).run()
+                    annotation_summary[child] = result
+            except Exception as e:
+                logger.error(f"Failed to process bucket {bucket}: {e}", exc_info=True)
                 continue
-
-            validator = MetadataValidator()
-            if validator.validate(bucket / parent_dataset / "METADATA"):
-                logger.info(f"'{parent_dataset}' metadata validated successfully.")
-
-            project = get_project(parent_dataset, projects)
-
-            image_summary = ImageImporter(
-                bucket / parent_dataset,
-                cytomine_auth,
-                c.current_user,
-                storage_id,
-            ).run(projects=[project])
-
-            images = ImageInstanceCollection().fetch_with_filter("project", project.id)
-            ontologies = OntologyCollection().fetch()
-
-            for child in parser.children:
-                child_path = bucket / child
-                ontology = OntologyImporter(child_path).run()
-                ontologies.append(ontology)
-
-                if project.ontology is None:
-                    project.ontology = ontology.id
-                    project.update()
-
-                result = AnnotationImporter(child_path, images, ontologies).run()
-                annotation_summary[child] = result
 
         return ImportResponse(
             image_summary=image_summary,

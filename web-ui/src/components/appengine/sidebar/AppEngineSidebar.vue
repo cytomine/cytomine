@@ -88,6 +88,9 @@ export default {
         }
       }
     }, 2000);
+    setInterval(async () => {
+      this.$eventBus.$emit('annotation-layers:refresh');
+    }, 2000);
   },
   computed: {
     currentProject: get('currentProject/project'),

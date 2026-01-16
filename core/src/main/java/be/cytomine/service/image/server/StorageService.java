@@ -33,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Optional;
@@ -62,6 +63,10 @@ public class StorageService extends ModelService {
 
     public List<Storage> list(User user, String searchString) {
         return securityACLService.getStorageList(user, false, searchString);
+    }
+
+    public List<Storage> list(User user) {
+        return storageRepository.findAllByUser(user);
     }
 
     public Optional<Storage> find(Long id) {

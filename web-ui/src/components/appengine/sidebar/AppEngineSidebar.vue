@@ -87,6 +87,7 @@ export default {
           await taskRun.fetch();
         }
       }
+      this.$eventBus.$emit('annotation-layers:refresh');
     }, 2000);
   },
   computed: {

@@ -98,6 +98,8 @@ public class TaskRunService {
 
     private final ObjectMapper objectMapper;
 
+    private final AsyncService asyncService;
+
     public String addTaskRun(Long projectId, String taskId, JsonNode body) {
         Project project = projectService.get(projectId);
         User currentUser = currentUserService.getCurrentUser();
@@ -491,6 +493,9 @@ public class TaskRunService {
         } catch (JsonProcessingException e) {
             throw new ObjectNotFoundException("Outputs from", taskRunId);
         }
+
+        // pull the images and store them in the project
+        asyncService.launchImageAdditionJob(outputs, projectId, currentUserService.getCurrentUser());
 
         List<String> geometries = outputs
             .stream()

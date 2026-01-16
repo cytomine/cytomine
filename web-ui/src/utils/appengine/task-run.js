@@ -1,3 +1,4 @@
+import Vue from 'vue';
 import Model from './model';
 import Task from './task';
 import {Cytomine} from '@/api';
@@ -88,9 +89,10 @@ export default class TaskRun extends Model {
       return null;
     }
 
-    this.inputs = (await Cytomine.instance.api.get(`${this.uri}/inputs`)).data;
+    const inputs = (await Cytomine.instance.api.get(`${this.uri}/inputs`)).data;
+    Vue.set(this, 'inputs', inputs);
 
-    return this.inputs;
+    return inputs;
   }
 
   async fetchOutputs() {
@@ -98,9 +100,10 @@ export default class TaskRun extends Model {
       return null;
     }
 
-    this.outputs = (await Cytomine.instance.api.get(`${this.uri}/outputs`)).data;
+    const outputs = (await Cytomine.instance.api.get(`${this.uri}/outputs`)).data;
+    Vue.set(this, 'outputs', outputs);
 
-    return this.outputs;
+    return outputs;
   }
 
   async fetchSingleIO(parameterName, type) {

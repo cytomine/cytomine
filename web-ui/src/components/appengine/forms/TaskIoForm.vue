@@ -76,7 +76,6 @@ export default {
           this.task.version,
           this.activeImage.id,
         );
-        taskRun.task.outputs = this.task.outputs;
 
         if (this.hasBinaryData) {
           for (const provision of this.getInputProvisions()) {
@@ -96,10 +95,10 @@ export default {
           await Task.batchProvisionTask(this.projectId, taskRun.id, this.getInputProvisions());
         }
 
-        await Task.runTask(this.projectId, taskRun.id).then(async (taskRun) => {
+        await Task.runTask(this.projectId, taskRun.id).then(async (event) => {
           this.$buefy.toast.open({message: this.$t('app-engine.run.started'), type: 'is-success'});
           this.resetForm();
-          this.$emit('appengine:task:started', taskRun);
+          this.$emit('appengine:task:started', event);
         });
       } catch (e) {
         const serverError = e.response && e.response.data

@@ -88,7 +88,8 @@ export default {
           await taskRun.fetch();
         }
 
-        if (taskRun.isTerminalState()) {
+        if (taskRun.isTerminalState() && this.getTask(taskRun).hasGeometryOutput()) {
+          await taskRun.fetchOutputs();
           this.$eventBus.$emit('annotation-layers:refresh');
         }
       }
@@ -124,6 +125,9 @@ export default {
         })
       );
     },
+    getTask(taskRun) {
+      return this.tasks.find(task => task.id === taskRun.task.id);
+    }
   },
 };
 </script>

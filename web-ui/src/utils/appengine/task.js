@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Model from './model';
 import {Cytomine} from '@/api';
+import {isGeometry} from '@/utils/app';
 
 
 export default class Task extends Model {
@@ -17,6 +18,7 @@ export default class Task extends Model {
     this.name = null;
     this.description = null;
     this.authors = [];
+    this.outputs = [];
   }
 
   static async fetchAll() {
@@ -72,5 +74,9 @@ export default class Task extends Model {
     Vue.set(this, 'outputs', data);
 
     return data;
+  }
+
+  hasGeometryOutput() {
+    return this.outputs.some(output => isGeometry(output));
   }
 }

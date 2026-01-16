@@ -87,8 +87,6 @@ export default {
           await taskRun.fetch();
         }
       }
-    }, 2000);
-    setInterval(async () => {
       this.$eventBus.$emit('annotation-layers:refresh');
     }, 2000);
   },

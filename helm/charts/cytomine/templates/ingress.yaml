@@ -3,9 +3,9 @@ kind: Ingress
 metadata:
   namespace: {{ .Release.Namespace }}
   name: core
-  {{ .Values.ingress.annotations }}
+  {{ if .Values.ingress.annotations }}
   annotations:
-    {{- range .Values.ingress.annotations }}
+    {{- with .Values.ingress.annotations }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
   {{- end }}

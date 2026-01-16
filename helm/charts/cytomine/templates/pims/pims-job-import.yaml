@@ -1,4 +1,4 @@
-{{- if .Values.pims.datasetImportFolder }}
+{{- if .Values.pims.datasetImportStorage }}
 apiVersion: batch/v1
 kind: CronJob
 metadata:

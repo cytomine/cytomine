@@ -51,7 +51,7 @@
         <section class="content">
           <h5 class="subtitle">{{ $t('app-engine.runs.title') }}</h5>
         </section>
-        <task-run-table :task-runs="trackedTaskRuns"/>
+        <task-run-table :task-runs="allTaskRuns"/>
       </div>
     </div>
   </div>
@@ -74,7 +74,8 @@ export default {
     return {
       selectedTask: null,
       tasks: [],
-      trackedTaskRuns: []
+      allTaskRuns: [],
+      trackedTaskRuns: [],
     };
   },
   async created() {
@@ -86,7 +87,13 @@ export default {
         if (!taskRun.isTerminalState()) {
           await taskRun.fetch();
         }
+
+        if (taskRun.isTerminalState()) {
+          this.$eventBus.$emit('annotation-layers:refresh');
+        }
       }
+
+      this.trackedTaskRuns = this.trackedTaskRuns.filter(taskRun => !taskRun.isTerminalState());
     }, 2000);
   },
   computed: {
@@ -99,7 +106,8 @@ export default {
     async catchTaskRunLaunch(event) {
       let taskRun = new TaskRun(event.resource);
       taskRun.project = this.currentProjectId;
-      await taskRun.fetchInputs();
+
+      this.allTaskRuns = [taskRun, ...this.allTaskRuns];
       this.trackedTaskRuns = [taskRun, ...this.trackedTaskRuns];
     },
     async fetchTasks() {
@@ -109,19 +117,12 @@ export default {
       let taskRuns = await TaskRun.fetchByProject(this.currentProjectId);
       taskRuns.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
-      this.trackedTaskRuns = await Promise.all(
+      this.allTaskRuns = await Promise.all(
         taskRuns.map(async ({project, taskRunId}) => {
           let taskRun = await Task.fetchTaskRunStatus(this.currentProjectId, taskRunId);
           return new TaskRun({...taskRun, project});
         })
       );
-
-      // Mark all previous runs as failed if not finished
-      this.trackedTaskRuns.forEach(taskRun => {
-        if (!taskRun.isFinished()) {
-          taskRun.state = TaskRun.STATES.FAILED;
-        }
-      });
     },
   },
 };

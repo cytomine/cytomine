@@ -1,14 +1,9 @@
-x-version-env: &version-env
-  VERSIONS_CYTOMINE_COMMERCIAL: 2025.1
-
 services:
   mongo:
     image: cytomine/mongo:latest
     restart: unless-stopped
     volumes:
       - ${DATA_PATH:-./data}/mongo:/data/db
-    ports:
-      -
     environment:
       MONGO_INITDB_ROOT_PASSWORD: password
       MONGO_INITDB_ROOT_USERNAME: admin
@@ -72,8 +67,6 @@ services:
     restart: unless-stopped
     volumes:
       - /etc/localtime:/etc/localtime
-    environment:
-      <<: [*version-env]
     networks:
       host_network:
         ipv4_address: 172.16.238.7

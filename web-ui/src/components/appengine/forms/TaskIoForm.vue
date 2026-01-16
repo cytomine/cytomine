@@ -49,6 +49,7 @@ export default {
   },
   async created() {
     await this.fetchTaskInputs();
+    await this.task.fetchOutputs();
   },
   watch: {
     async task() {
@@ -94,10 +95,10 @@ export default {
           await Task.batchProvisionTask(this.projectId, taskRun.id, this.getInputProvisions());
         }
 
-        await Task.runTask(this.projectId, taskRun.id).then(async (taskRun) => {
+        await Task.runTask(this.projectId, taskRun.id).then(async (event) => {
           this.$buefy.toast.open({message: this.$t('app-engine.run.started'), type: 'is-success'});
           this.resetForm();
-          this.$emit('appengine:task:started', taskRun);
+          this.$emit('appengine:task:started', event);
         });
       } catch (e) {
         const serverError = e.response && e.response.data

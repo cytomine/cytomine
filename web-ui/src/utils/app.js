@@ -40,3 +40,15 @@ export async function hasBinaryType(input) {
   const typeId = input.type.id === 'array' ? input.type.subType.id : input.type.id;
   return BINARY_TYPES.includes(typeId);
 }
+
+export function isGeometry(parameter) {
+  if (parameter.type.id === 'geometry') {
+    return true;
+  }
+
+  if (parameter.type.id === 'array' && parameter.type.subType.id === 'geometry') {
+    return true;
+  }
+
+  return false;
+}

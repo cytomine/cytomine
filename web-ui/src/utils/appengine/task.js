@@ -1,3 +1,4 @@
+import Vue from 'vue';
 import Model from './model';
 import {Cytomine} from '@/api';
 
@@ -37,11 +38,6 @@ export default class Task extends Model {
     return data;
   }
 
-  static async fetchTaskOutputs(namespace, version) {
-    let {data} = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${namespace}/${version}/outputs`);
-    return data;
-  }
-
   // Step-1: Create TaskRun Must be part of a project to run a task
   static async createTaskRun(project, namespace, version, image) {
     let {data} = await Cytomine.instance.api.post(`/app-engine/project/${project}/tasks/${namespace}/${version}/runs`, {'image': image});
@@ -71,9 +67,10 @@ export default class Task extends Model {
     return data;
   }
 
-  // Output: get a TaskRun output
-  static async fetchTaskRunOutput(project, runId) {
-    let {data} = await Cytomine.instance.api.get(`/app-engine/project/${project}/task-runs/${runId}/outputs`);
+  async fetchOutputs() {
+    let {data} = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.namespace}/${this.version}/outputs`);
+    Vue.set(this, 'outputs', data);
+
     return data;
   }
 }

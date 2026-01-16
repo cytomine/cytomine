@@ -49,6 +49,7 @@ export default {
   },
   async created() {
     await this.fetchTaskInputs();
+    await this.task.fetchOutputs();
   },
   watch: {
     async task() {
@@ -75,6 +76,7 @@ export default {
           this.task.version,
           this.activeImage.id,
         );
+        taskRun.task.outputs = this.task.outputs;
 
         if (this.hasBinaryData) {
           for (const provision of this.getInputProvisions()) {

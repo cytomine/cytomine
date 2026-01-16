@@ -3,12 +3,11 @@ kind: Ingress
 metadata:
   namespace: {{ .Release.Namespace }}
   name: core
-  {{ if .Values.ingress.annotations }}
   annotations:
+    nginx.ingress.kubernetes.io/cors-allow-origin: '{{ include "core.url" . }}'
     {{- with .Values.ingress.annotations }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
-  {{- end }}
 spec:
   ingressClassName: {{ .Values.ingress.className }}
   rules:

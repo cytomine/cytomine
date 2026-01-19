@@ -70,18 +70,19 @@ public class AnnotationLayerService {
 
         ImageInstance imageInstance = imageInstanceService.get(imageId);
 
-        TaskRun lastTaskRun = taskRunRepository
-            .findFirstByProjectIdOrderByCreatedDesc(imageInstance.getProject().getId())
-            .orElseThrow(() -> new ObjectNotFoundException("TaskRun", imageInstance.getProject().getId()));
+        Optional<TaskRun> lastTaskRun = taskRunRepository
+            .findFirstByProjectIdOrderByCreatedDesc(imageInstance.getProject().getId());
 
-        Optional<TaskRunLayer> lastExecutedRunLayer = taskRunLayerRepository.findByTaskRun(lastTaskRun);
+        if (lastTaskRun.isPresent()) {
+            Optional<TaskRunLayer> lastExecutedRunLayer = taskRunLayerRepository.findByTaskRun(lastTaskRun.get());
 
-        List<AnnotationLayer> lastTaskRunAnnotationLayers = lastExecutedRunLayer
-            .stream()
-            .map(TaskRunLayer::getAnnotationLayer)
-            .toList();
+            List<AnnotationLayer> lastTaskRunAnnotationLayers = lastExecutedRunLayer
+                .stream()
+                .map(TaskRunLayer::getAnnotationLayer)
+                .toList();
 
-        annotationLayerList.addAll(lastTaskRunAnnotationLayers);
+            annotationLayerList.addAll(lastTaskRunAnnotationLayers);
+        }
 
         return annotationLayerList.stream().distinct().toList();
     }

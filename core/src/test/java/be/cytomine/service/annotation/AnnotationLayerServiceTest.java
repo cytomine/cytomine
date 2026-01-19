@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
+import net.bytebuddy.dynamic.DynamicType;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -127,7 +128,7 @@ public class AnnotationLayerServiceTest {
     public void findByTaskRunLayerShouldReturnAnnotationLayers() {
         List<TaskRunLayer> mockTaskRunLayers = List.of(mockTaskRunLayer, mockTaskRunLayer);
         when(taskRunLayerRepository.findAllByImageId(mockImage.getId())).thenReturn(mockTaskRunLayers);
-
+        when(taskRunLayerRepository.findByTaskRun(mockTaskRun)).thenReturn(Optional.of(mockTaskRunLayer));
         List<AnnotationLayer> results = annotationLayerService.findByTaskRunLayer(mockImage.getId());
 
         assertFalse(results.isEmpty());

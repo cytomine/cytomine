@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
+import be.cytomine.domain.project.Project;
 import be.cytomine.service.image.ImageInstanceService;
 import net.bytebuddy.dynamic.DynamicType;
 import org.junit.jupiter.api.BeforeAll;
@@ -79,7 +80,11 @@ public class AnnotationLayerServiceTest {
         mockAnnotation.setAnnotationLayer(mockAnnotationLayer);
         mockAnnotation.setLocation(mockGeometry.getBytes());
 
+        Project mockProject = new Project();
+        mockProject.setId(1L);
+
         mockImage = new ImageInstance();
+        mockImage.setProject(mockProject);
 
         mockTaskRun = new TaskRun();
         mockTaskRun.setImage(mockImage);

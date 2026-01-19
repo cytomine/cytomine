@@ -360,6 +360,7 @@ export default {
   border-right: 1px solid #333;
   overflow: hidden;
   transition: width 0.2s ease;
+  position: relative;
 }
 
 .ae-sidebar.collapsed {
@@ -373,8 +374,12 @@ export default {
 }
 
 .toggle-ae-sidebar {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 2;
   align-self: flex-end;
-  margin: 0.25rem;
+  margin: 0;
   width: 2.5rem;
   height: 2.5rem;
   display: flex;
@@ -389,6 +394,11 @@ export default {
 
 .toggle-ae-sidebar:hover {
   background: #ededed;
+}
+
+.ae-sidebar.collapsed .toggle-ae-sidebar {
+  top: 0.25rem;
+  right: 0.25rem;
 }
 
 .maps-wrapper {

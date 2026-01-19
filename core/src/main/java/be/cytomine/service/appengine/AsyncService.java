@@ -70,11 +70,11 @@ public class AsyncService {
                     && value.getSubType().equalsIgnoreCase("IMAGE"))
             )
             .toList();
-        // check if the run images already added then do nothing .. not sure how yet
+
         for (TaskRunValue output: outputs) {
             if (output.getType().equalsIgnoreCase("IMAGE")) {
                 try {
-                    log.info("adding image {"+output.getParameterName()+"} to project {"+projectId+"}");
+
                     handleImage(output, projectId, currentUser);
                 } catch (IOException | NoSuchAlgorithmException | InvalidKeyException e) {
                     throw new RuntimeException(e);
@@ -92,11 +92,9 @@ public class AsyncService {
     private void handleImage(TaskRunValue output, Long projectId, User currentUser)
         throws IOException, NoSuchAlgorithmException, InvalidKeyException
     {
-        log.info("handling image now ... ");
         String originalFileName =
             output.getTaskRunId().toString() + "_" + output.getParameterName();
-        Optional<AbstractImage> abstractImage = abstractImageService.find(originalFileName);
-        if (abstractImage.isPresent()) {
+        if (abstractImageService.find(originalFileName).isPresent()) {
             return;
         }
         // download the image from app-engine
@@ -111,7 +109,6 @@ public class AsyncService {
             signatureDate,currentUser);
         String authorizationHeader = "CYTOMINE " + currentUser.getPublicKey() + ":" + signature;
         String contentTypeFull = null;
-        log.info("signature : {}", signature);
 
         // Prepare headers
         HttpHeaders headers = new HttpHeaders();
@@ -120,7 +117,7 @@ public class AsyncService {
         headers.set("dateFull", signatureDate);
         headers.set("content-type-full", contentTypeFull);
 
-        // Prepare multipart body
+        // Prepare a multipart body
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         body.add("files[]", new FileSystemResource(tempFile){
             @Override
@@ -137,8 +134,6 @@ public class AsyncService {
         String uploadUrl = imageServerService.internalImageServerURL() + "/upload";
         ResponseEntity<String> response = restTemplate.postForEntity(uploadUrl + queryString, requestEntity, String.class);
 
-        log.info("Image upload response {}", response.getBody());
-        log.info("Image added to the storage {} in project {}", userStorage.getId(), projectId);
         // Clean up temp file
         tempFile.delete();
 

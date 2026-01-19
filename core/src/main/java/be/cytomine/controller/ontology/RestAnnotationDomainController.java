@@ -3,7 +3,9 @@ package be.cytomine.controller.ontology;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import jakarta.persistence.EntityManager;
@@ -21,7 +23,14 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -29,14 +38,14 @@ import org.springframework.web.util.UriComponentsBuilder;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.image.ImageInstance;
-import be.cytomine.domain.ontology.*;
+import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.security.User;
 import be.cytomine.dto.annotation.SimplifiedAnnotation;
 import be.cytomine.dto.image.CropParameter;
 import be.cytomine.exceptions.CytomineMethodNotYetImplementedException;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.exceptions.WrongArgumentException;
-import be.cytomine.repository.*;
+import be.cytomine.repository.AnnotationListing;
 import be.cytomine.repository.ontology.AnnotationDomainRepository;
 import be.cytomine.service.AnnotationListingService;
 import be.cytomine.service.image.ImageInstanceService;
@@ -104,23 +113,21 @@ public class RestAnnotationDomainController extends RestCytomineController {
         return responseSuccess(annotations, params.getJSONAttrLong("offset", 0L),params.getJSONAttrLong("max", 0L));
     }
 
-    @RequestMapping(value = {"/project/{project}/annotation/download"}, method = {RequestMethod.GET})
+    @GetMapping(value = {"/project/{project}/annotation/download"})
     public void download(
             @PathVariable Long project,
             @RequestParam String format,
             @RequestParam(required = false) Optional<String> users,
             @RequestParam(required = false) Optional<String> reviewUsers,
-            @RequestParam(defaultValue = "false") Boolean reviewed,
-            @RequestParam(required = false) String terms,
-            @RequestParam(required = false) String images,
-            @RequestParam(required = false) Long beforeThan,
-            @RequestParam(required = false) Long afterThan
+            @RequestParam(required = false) boolean reviewed,
+            @RequestParam(required = false) String terms
     ) throws IOException {
         if(reviewed) {
-            restReviewedAnnotationController.downloadDocumentByProject(project, format, terms, reviewUsers, images, beforeThan, afterThan);
+            restReviewedAnnotationController.downloadDocumentByProject(project, format, terms,
+                reviewUsers);
         }
         else {
-            restUserAnnotationController.downloadDocumentByProject(project, format, terms, users, images, beforeThan, afterThan);
+            restUserAnnotationController.downloadDocumentByProject(project, format, terms, users);
         }
     }
 

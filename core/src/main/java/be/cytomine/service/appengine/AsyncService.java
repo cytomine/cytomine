@@ -26,6 +26,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -91,7 +92,7 @@ public class AsyncService {
     private void handleImage(TaskRunValue output, Long projectId, User currentUser)
         throws IOException, NoSuchAlgorithmException, InvalidKeyException
     {
-        // TODO: implement storing one image
+        log.info("handling image now ... ");
         String originalFileName =
             output.getTaskRunId().toString() + "_" + output.getParameterName();
         Optional<AbstractImage> abstractImage = abstractImageService.find(originalFileName);
@@ -134,8 +135,9 @@ public class AsyncService {
         String queryString = "?idStorage=" + userStorage.getId() + "&idProject=" + projectId;
         // Send the request
         String uploadUrl = imageServerService.internalImageServerURL() + "/upload";
-        restTemplate.postForEntity(uploadUrl + queryString, requestEntity, String.class);
+        ResponseEntity<String> response = restTemplate.postForEntity(uploadUrl + queryString, requestEntity, String.class);
 
+        log.info("Image upload response {}", response.getBody());
         log.info("Image added to the storage {} in project {}", userStorage.getId(), projectId);
         // Clean up temp file
         tempFile.delete();

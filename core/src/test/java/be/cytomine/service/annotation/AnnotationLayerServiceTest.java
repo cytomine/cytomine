@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
+import be.cytomine.service.image.ImageInstanceService;
 import net.bytebuddy.dynamic.DynamicType;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -48,6 +49,9 @@ public class AnnotationLayerServiceTest {
 
     @Mock
     private TaskRunLayerService taskRunLayerService;
+
+    @Mock
+    private ImageInstanceService imageInstanceService;
 
     @InjectMocks
     private AnnotationLayerService annotationLayerService;
@@ -128,6 +132,7 @@ public class AnnotationLayerServiceTest {
     public void findByTaskRunLayerShouldReturnAnnotationLayers() {
         List<TaskRunLayer> mockTaskRunLayers = List.of(mockTaskRunLayer, mockTaskRunLayer);
         when(taskRunLayerRepository.findAllByImageId(mockImage.getId())).thenReturn(mockTaskRunLayers);
+        when(imageInstanceService.get(mockImage.getId())).thenReturn(mockImage);
         when(taskRunLayerRepository.findByTaskRun(mockTaskRun)).thenReturn(Optional.of(mockTaskRunLayer));
         List<AnnotationLayer> results = annotationLayerService.findByTaskRunLayer(mockImage.getId());
 

@@ -27,13 +27,16 @@ from pims.utils.dtypes import np_dtype
 from pims.utils.types import parse_float
 
 
+EXCLUDED_TAGS = [
+    "ICCProfile",
+]
+
+
 def sanitize(value):
     if isinstance(value, DSfloat):
         return float(value)
     if isinstance(value, MultiValue):
         return [sanitize(v) for v in value]
-    if isinstance(value, dict):
-        return {k: sanitize(v) for k, v in value.items()}
     return value
 
 
@@ -180,6 +183,9 @@ class WSIDicomParser(AbstractParser):
                 tag = data_element.tag
                 name = f"{tag.group:04x}_{tag.element:04x}"  # noqa
             name = name.replace(' ', '')
+
+            if name in EXCLUDED_TAGS:
+                continue
 
             value = sanitize(data_element.value)
             store.set(name, value, namespace="DICOM")

@@ -84,6 +84,7 @@ public class AnnotationLayerServiceTest {
         mockProject.setId(1L);
 
         mockImage = new ImageInstance();
+        mockImage.setId(1L);
         mockImage.setProject(mockProject);
 
         mockTaskRun = new TaskRun();

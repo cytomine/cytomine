@@ -21,8 +21,18 @@
 <div v-else class="cytomine-viewer">
   <b-loading :is-full-page="false" :active="loading" />
 
-  <div class="ae-sidebar">
-    <app-engine-sidebar></app-engine-sidebar>
+  <div class="ae-sidebar" :class="{collapsed: !showAppEngineSidebar}">
+    <button
+      class="toggle-ae-sidebar"
+      type="button"
+      :aria-expanded="showAppEngineSidebar"
+      @click="toggleAppEngineSidebar"
+    >
+      <i class="fas" :class="showAppEngineSidebar ? 'fa-chevron-left' : 'fa-chevron-right'"></i>
+    </button>
+    <div class="ae-sidebar-content" v-show="showAppEngineSidebar">
+      <app-engine-sidebar></app-engine-sidebar>
+    </div>
   </div>
 
   <div v-if="!loading" class="maps-wrapper">
@@ -77,7 +87,8 @@ export default {
       errorBadImageProject: false,
       loading: true,
       reloadInterval: null,
-      idViewer: null
+      idViewer: null,
+      showAppEngineSidebar: true
     };
   },
   computed: {
@@ -310,6 +321,11 @@ export default {
 
     shortkeyEvent(event) {
       this.$eventBus.$emit('shortkeyEvent', event.srcKey);
+    },
+
+    toggleAppEngineSidebar() {
+      this.showAppEngineSidebar = !this.showAppEngineSidebar;
+      this.$nextTick(() => this.$eventBus.$emit('updateMapSize'));
     }
   },
   async created() {
@@ -338,9 +354,41 @@ export default {
 
 .ae-sidebar {
   width: 24rem;
-  border-right-color: #333;
-  border-right-width: 1px;
-  border-right-style: solid;
+  min-width: 24rem;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #333;
+  overflow: hidden;
+  transition: width 0.2s ease;
+}
+
+.ae-sidebar.collapsed {
+  width: 3rem;
+  min-width: 3rem;
+}
+
+.ae-sidebar-content {
+  flex: 1;
+  min-height: 0;
+}
+
+.toggle-ae-sidebar {
+  align-self: flex-end;
+  margin: 0.25rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  background: #f6f6f6;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.toggle-ae-sidebar:hover {
+  background: #ededed;
 }
 
 .maps-wrapper {

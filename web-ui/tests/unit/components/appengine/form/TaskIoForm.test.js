@@ -55,6 +55,12 @@ describe('TaskIoForm.vue', () => {
       mocks: {
         $t: (key) => key,
       },
+      stubs: {
+        'b-button': {
+          template: '<button><slot /></button>',
+        },
+        'b-field': true,
+      },
     });
   };
 
@@ -66,7 +72,7 @@ describe('TaskIoForm.vue', () => {
     expect(headers.at(0).text()).toBe('app-engine.ae-run-task');
     console.log(wrapper.html());
 
-    const buttons = wrapper.findAll('b-button');
+    const buttons = wrapper.findAll('button');
     expect(buttons.length).toBe(2);
     expect(buttons.at(0).text()).toBe('button-clear');
     expect(buttons.at(1).text()).toBe('app-engine.ae-run-task');

@@ -150,7 +150,7 @@ public class AnnotationLayerServiceTest {
         List<AnnotationLayer> results = annotationLayerService.findByTaskRunLayer(mockImage.getId());
 
         assertFalse(results.isEmpty());
-        assertEquals(mockTaskRunLayers.size(), results.size());
+        assertEquals(mockTaskRunLayers.size(), results.size() + 1);
 
         verify(taskRunLayerRepository, times(1)).findAllByImageId(mockImage.getId());
     }

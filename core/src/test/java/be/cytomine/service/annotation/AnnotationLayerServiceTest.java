@@ -6,6 +6,7 @@ import java.util.Random;
 import java.util.UUID;
 
 import be.cytomine.domain.project.Project;
+import be.cytomine.repository.appengine.TaskRunRepository;
 import be.cytomine.service.image.ImageInstanceService;
 import net.bytebuddy.dynamic.DynamicType;
 import org.junit.jupiter.api.BeforeAll;
@@ -46,6 +47,9 @@ public class AnnotationLayerServiceTest {
     private AnnotationLayerRepository annotationLayerRepository;
 
     @Mock
+    private TaskRunRepository taskRunRepository;
+
+    @Mock
     private TaskRunLayerRepository taskRunLayerRepository;
 
     @Mock
@@ -69,6 +73,8 @@ public class AnnotationLayerServiceTest {
 
     private static String name;
 
+    private static Project mockProject;
+
     @BeforeAll
     public static void setUp() {
         name = UUID.randomUUID().toString();
@@ -80,7 +86,7 @@ public class AnnotationLayerServiceTest {
         mockAnnotation.setAnnotationLayer(mockAnnotationLayer);
         mockAnnotation.setLocation(mockGeometry.getBytes());
 
-        Project mockProject = new Project();
+        mockProject = new Project();
         mockProject.setId(1L);
 
         mockImage = new ImageInstance();
@@ -140,6 +146,7 @@ public class AnnotationLayerServiceTest {
         when(taskRunLayerRepository.findAllByImageId(mockImage.getId())).thenReturn(mockTaskRunLayers);
         when(imageInstanceService.get(mockImage.getId())).thenReturn(mockImage);
         when(taskRunLayerRepository.findByTaskRun(mockTaskRun)).thenReturn(Optional.of(mockTaskRunLayer));
+        when(taskRunRepository.findFirstByProjectIdOrderByCreatedDesc(mockProject.getId())).thenReturn(Optional.of(mockTaskRun));
         List<AnnotationLayer> results = annotationLayerService.findByTaskRunLayer(mockImage.getId());
 
         assertFalse(results.isEmpty());

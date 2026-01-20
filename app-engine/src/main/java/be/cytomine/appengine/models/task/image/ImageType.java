@@ -21,7 +21,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Transient;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.springframework.beans.factory.annotation.Value;
 
 import be.cytomine.appengine.dto.inputs.task.types.image.ImageTypeConstraint;
 import be.cytomine.appengine.dto.inputs.task.types.image.ImageValue;

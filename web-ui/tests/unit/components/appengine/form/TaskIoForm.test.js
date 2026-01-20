@@ -28,6 +28,7 @@ describe('TaskIoForm.vue', () => {
   const mockTask = {
     namespace: 'mock-namespace',
     version: '1.0.0',
+    fetchOutputs: jest.fn(),
   };
 
   const mockInputs = [
@@ -38,6 +39,7 @@ describe('TaskIoForm.vue', () => {
   const mockOtherTask = {
     namespace: 'another-mocked-namespace',
     version: '0.2.3',
+    fetchOutputs: jest.fn(),
   };
 
   const mockOtherInputs = [
@@ -64,13 +66,23 @@ describe('TaskIoForm.vue', () => {
     });
   };
 
+  const createExpectedInputs = (inputs) => {
+    return inputs.reduce((acc, {name, type, default: value}) => {
+      acc[name] = {type, value};
+      return acc;
+    }, {});
+  };
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('should render translated text', () => {
     const wrapper = createWrapper();
 
     const headers = wrapper.findAll('h3');
     expect(headers.length).toBe(1);
     expect(headers.at(0).text()).toBe('app-engine.ae-run-task');
-    console.log(wrapper.html());
 
     const buttons = wrapper.findAll('button');
     expect(buttons.length).toBe(2);
@@ -80,17 +92,13 @@ describe('TaskIoForm.vue', () => {
 
   describe('task input form', () => {
     it('should initialise inputs with initial task', async () => {
-      Task.fetchTaskInputs.mockResolvedValueOnce(mockInputs);
+      Task.fetchTaskInputs.mockResolvedValue(mockInputs);
 
       const wrapper = createWrapper();
 
       await flushPromises();
 
-      const expectedTaskInputs = mockInputs.reduce(
-        (acc, {name, type, default: value}) => {
-          acc[name] = {type, value};
-          return acc;
-        }, {});
+      const expectedTaskInputs = createExpectedInputs(mockInputs);
 
       expect(wrapper.vm.taskInputs).toStrictEqual(mockInputs);
       expect(wrapper.vm.inputs).toStrictEqual(expectedTaskInputs);
@@ -106,11 +114,7 @@ describe('TaskIoForm.vue', () => {
       await wrapper.setProps({task: mockOtherTask});
       await flushPromises();
 
-      const expectedTaskInputs = mockOtherInputs.reduce(
-        (acc, {name, type, default: value}) => {
-          acc[name] = {type, value};
-          return acc;
-        }, {});
+      const expectedTaskInputs = createExpectedInputs(mockOtherInputs);
 
       expect(wrapper.vm.taskInputs).toStrictEqual(mockOtherInputs);
       expect(wrapper.vm.inputs).toStrictEqual(expectedTaskInputs);

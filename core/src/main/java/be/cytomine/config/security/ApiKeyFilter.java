@@ -89,6 +89,7 @@ public class ApiKeyFilter extends OncePerRequestFilter {
         if (authorization == null) {
             return false;
         }
+        System.out.println("auth: "+authorization);
         if (!authorization.startsWith("CYTOMINE") || !authorization.contains(" ") || !authorization.contains(":")) {
             return false;
         }

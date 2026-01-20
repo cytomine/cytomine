@@ -78,6 +78,8 @@ describe('TaskIoForm.vue', () => {
   });
 
   it('should render translated text', () => {
+    Task.fetchTaskInputs.mockResolvedValue(mockInputs);
+
     const wrapper = createWrapper();
 
     const headers = wrapper.findAll('h3');

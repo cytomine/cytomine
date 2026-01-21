@@ -23,7 +23,7 @@ public class RegistryClientTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        registryContainer = new GenericContainer<>(DockerImageName.parse("registry:2.8.3"))
+        registryContainer = new GenericContainer<>(DockerImageName.parse(TestConfig.REGISTRY_IMAGE))
                 .withExposedPorts(5000)
                 .withEnv("REGISTRY_STORAGE_DELETE_ENABLED", "true");
         registryContainer.start();

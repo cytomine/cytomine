@@ -2,16 +2,17 @@ package com.cytomine.registry.client.manager;
 
 import java.io.IOException;
 
-import com.cytomine.registry.client.RegistryClientTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.utility.DockerImageName;
 
-import com.cytomine.registry.client.RegistryClient;
 import com.cytomine.registry.client.image.Context;
 import com.cytomine.registry.client.name.Reference;
-import org.testcontainers.utility.DockerImageName;
+import com.cytomine.registry.client.RegistryClient;
+import com.cytomine.registry.client.RegistryClientTest;
+import com.cytomine.registry.client.TestConfig;
 
 public class RegistryManagerTest {
 
@@ -19,7 +20,7 @@ public class RegistryManagerTest {
 
     @BeforeEach
     void init() throws IOException {
-        GenericContainer<?> registryContainer = new GenericContainer<>(DockerImageName.parse("registry:2.8.3"))
+        GenericContainer<?> registryContainer = new GenericContainer<>(DockerImageName.parse(TestConfig.REGISTRY_IMAGE))
                 .withExposedPorts(5000)
                 .withEnv("REGISTRY_STORAGE_DELETE_ENABLED", "true");
         registryContainer.start();

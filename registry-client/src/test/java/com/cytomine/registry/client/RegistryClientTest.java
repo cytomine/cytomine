@@ -28,6 +28,7 @@ import org.testcontainers.utility.DockerImageName;
 
 class RegistryClientTest {
     private GenericContainer<?> registryContainer;
+    private String registryUrl;
 
     @BeforeEach
     void setUp() throws IOException {
@@ -36,7 +37,7 @@ class RegistryClientTest {
                 .withEnv("REGISTRY_STORAGE_DELETE_ENABLED", "true");
         registryContainer.start();
 
-        String registryUrl = String.format("http://%s:%d",
+        registryUrl = String.format("http://%s:%d",
                 registryContainer.getHost(),
                 registryContainer.getMappedPort(5000));
 
@@ -109,26 +110,14 @@ class RegistryClientTest {
     }
 
     @Test
-    @Disabled
-    void registryPullPush() throws IOException {
-        Path path = Files.createTempFile("postmine", ".tar");
-        RegistryClient.pull("postomine:1.3", path.toString());
-        Assertions.assertTrue(Files.exists(path));
-        InputStream stream = new FileInputStream(path.toString());
-        RegistryClient.push(stream, "postomine:1.4");
-        Assertions.assertEquals(
-                RegistryClient.digest("postomine:1.3").get(),
-                RegistryClient.digest("postomine:1.4").get());
-        Files.delete(path);
-    }
+    void shouldReturnCatalogWithRepositories() throws IOException {
+        int pageSize = 10;
+        String lastRepository = "";
 
-    @Test
-    @Disabled
-    void registryCatalog() {
-        Assertions.assertDoesNotThrow(() -> {
-            CatalogResp catalogResp = RegistryClient.catalog("http://registry:5000", 10, "test");
-            System.out.println(JsonUtil.toJson(catalogResp));
-            Assertions.assertNotNull(catalogResp);
-        });
+        CatalogResp catalogResp = RegistryClient.catalog(registryUrl, pageSize, lastRepository);
+
+        Assertions.assertNotNull(catalogResp);
+        Assertions.assertNotNull(catalogResp.getRepositories());
+        Assertions.assertTrue(catalogResp.getRepositories().contains("postomine"));
     }
 }

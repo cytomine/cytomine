@@ -19,6 +19,7 @@ import be.cytomine.dto.appengine.task.TaskRunValue;
 import be.cytomine.service.image.AbstractImageService;
 import be.cytomine.service.image.server.StorageService;
 import be.cytomine.service.middleware.ImageServerService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
@@ -33,6 +34,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class AsyncService {
 
     private final AbstractImageService abstractImageService;
@@ -45,16 +47,6 @@ public class AsyncService {
 
     private final ImageServerService imageServerService;
 
-    public AsyncService(AbstractImageService abstractImageService, AppEngineService appEngineService,
-                        RestTemplate restTemplate, StorageService storageService,
-                        ImageServerService imageServerService)
-    {
-        this.abstractImageService = abstractImageService;
-        this.appEngineService = appEngineService;
-        this.restTemplate = restTemplate;
-        this.storageService = storageService;
-        this.imageServerService = imageServerService;
-    }
 
     @Async
     public void launchImageAdditionJob(List<TaskRunValue> taskRunId, Long projectId,

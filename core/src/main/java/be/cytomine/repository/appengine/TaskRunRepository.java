@@ -13,4 +13,6 @@ public interface TaskRunRepository extends JpaRepository<TaskRun, Long>, JpaSpec
     Optional<TaskRun> findByProjectIdAndTaskRunId(Long projectId, UUID taskRunId);
 
     List<TaskRun> findAllByProjectId(Long projectId);
+
+    Optional<TaskRun> findFirstByProjectIdOrderByCreatedDesc(Long projectId);
 }

@@ -5,6 +5,9 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
+import be.cytomine.domain.project.Project;
+import be.cytomine.repository.appengine.TaskRunRepository;
+import be.cytomine.service.image.ImageInstanceService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,10 +46,16 @@ public class AnnotationLayerServiceTest {
     private AnnotationLayerRepository annotationLayerRepository;
 
     @Mock
+    private TaskRunRepository taskRunRepository;
+
+    @Mock
     private TaskRunLayerRepository taskRunLayerRepository;
 
     @Mock
     private TaskRunLayerService taskRunLayerService;
+
+    @Mock
+    private ImageInstanceService imageInstanceService;
 
     @InjectMocks
     private AnnotationLayerService annotationLayerService;
@@ -63,6 +72,8 @@ public class AnnotationLayerServiceTest {
 
     private static String name;
 
+    private static Project mockProject;
+
     @BeforeAll
     public static void setUp() {
         name = UUID.randomUUID().toString();
@@ -74,7 +85,12 @@ public class AnnotationLayerServiceTest {
         mockAnnotation.setAnnotationLayer(mockAnnotationLayer);
         mockAnnotation.setLocation(mockGeometry.getBytes());
 
+        mockProject = new Project();
+        mockProject.setId(1L);
+
         mockImage = new ImageInstance();
+        mockImage.setId(1L);
+        mockImage.setProject(mockProject);
 
         mockTaskRun = new TaskRun();
         mockTaskRun.setImage(mockImage);
@@ -127,11 +143,13 @@ public class AnnotationLayerServiceTest {
     public void findByTaskRunLayerShouldReturnAnnotationLayers() {
         List<TaskRunLayer> mockTaskRunLayers = List.of(mockTaskRunLayer, mockTaskRunLayer);
         when(taskRunLayerRepository.findAllByImageId(mockImage.getId())).thenReturn(mockTaskRunLayers);
-
+        when(imageInstanceService.get(mockImage.getId())).thenReturn(mockImage);
+        when(taskRunLayerRepository.findByTaskRun(mockTaskRun)).thenReturn(Optional.of(mockTaskRunLayer));
+        when(taskRunRepository.findFirstByProjectIdOrderByCreatedDesc(mockProject.getId())).thenReturn(Optional.of(mockTaskRun));
         List<AnnotationLayer> results = annotationLayerService.findByTaskRunLayer(mockImage.getId());
 
         assertFalse(results.isEmpty());
-        assertEquals(mockTaskRunLayers.size(), results.size());
+        assertEquals(mockTaskRunLayers.size(), results.size() + 1);
 
         verify(taskRunLayerRepository, times(1)).findAllByImageId(mockImage.getId());
     }

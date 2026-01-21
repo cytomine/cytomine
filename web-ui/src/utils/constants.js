@@ -43,5 +43,6 @@ export default {
   ANNOTATIONS_MAX_ITEMS_PER_CATEGORY: 10,
   // To keep the WebSockets alive by sending the broadcaster viewer position
   WS_POSITION_KEEP_ALIVE_INTERVAL: 10000,
-  CYTOMINE_UPLOAD_URI: '/upload'
+  CYTOMINE_UPLOAD_URI: '/upload',
+  IAM_URL: null,
 };

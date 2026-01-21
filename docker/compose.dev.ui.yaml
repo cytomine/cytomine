@@ -1,5 +1,4 @@
 services:
-
   web-ui:
     image: cytomine/web-ui:dev-latest
     build:
@@ -12,3 +11,4 @@ services:
     environment:
       PORT: ${DEV_UI_PORT:-80}
       NODE_ENV: development
+      IAM_URL: http://test.com/

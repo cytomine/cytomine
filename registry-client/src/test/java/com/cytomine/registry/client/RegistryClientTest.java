@@ -54,14 +54,16 @@ class RegistryClientTest {
     }
 
     @Test
-    void digest() throws Exception {
+    void shouldReturnValidDigestForExistingImage() throws Exception {
         Optional<String> digest = RegistryClient.digest("postomine:1.3");
         Assertions.assertTrue(digest.get().startsWith("sha256:"));
     }
 
     @Test
-    void tags() throws Exception {
+    void shouldReturnAllTagsForRepository() throws Exception {
         List<String> tags = RegistryClient.tags("postomine");
+
+        Assertions.assertFalse(tags.isEmpty(), "Tags list should not be empty");
         Assertions.assertTrue(tags.contains("1.3"));
     }
 

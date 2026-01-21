@@ -2,8 +2,8 @@ services:
   mongo:
     image: cytomine/mongo:latest
     restart: unless-stopped
-    volumes:
-      - ${DATA_PATH:-./data}/mongo:/data/db
+#    volumes:
+#      - ${DATA_PATH:-./data}/mongo:/data/db
     environment:
       MONGO_INITDB_ROOT_PASSWORD: password
       MONGO_INITDB_ROOT_USERNAME: admin
@@ -14,8 +14,8 @@ services:
   postgis:
     image: cytomine/postgis:latest
     restart: unless-stopped
-    volumes:
-      - ${DATA_PATH:-./data}/postgis/data:/var/lib/postgresql/data
+#    volumes:
+#      - ${DATA_PATH:-./data}/postgis/data:/var/lib/postgresql/data
     ports:
     - 5432:5432
     environment:
@@ -35,8 +35,8 @@ services:
   registry:
     image: registry:2.8.3
     restart: unless-stopped
-    volumes:
-      - ${DATA_PATH:-./data}/registry:/var/lib/registry
+#    volumes:
+#      - ${DATA_PATH:-./data}/registry:/var/lib/registry
     environment:
       REGISTRY_STORAGE_DELETE_ENABLED: true
     networks:
@@ -49,8 +49,8 @@ services:
     ports:
       - 6380:6380
     restart: unless-stopped
-    volumes:
-      - ${DATA_PATH:-./data}/redis:/data
+#    volumes:
+#      - ${DATA_PATH:-./data}/redis:/data
     networks:
       host_network:
         ipv4_address: 172.16.238.5
@@ -70,15 +70,19 @@ services:
     networks:
       host_network:
         ipv4_address: 172.16.238.7
+    environment:
+      URL_CORE: 172.16.238.11
+    ports:
+    -  80:80
 
   pims:
     image: cytomine/pims:latest
     restart: unless-stopped
     depends_on:
       - pims-cache
-    volumes:
-      - ${IMPORT_PATH:-./data/dataset}:/dataset
-      - ${DATA_PATH:-./data}/images:/data/images
+#    volumes:
+#      - ${IMPORT_PATH:-./data/dataset}:/dataset
+#      - ${DATA_PATH:-./data}/images:/data/images
     environment:
       API_BASE_PATH: ${IMS_API_BASE_PATH:-/ims}
       CACHE_ENABLED: true
@@ -130,6 +134,8 @@ services:
     networks:
       host_network:
         ipv4_address: 172.16.238.9
+    ports:
+      - 80:80
 
   app-engine:
     image: cytomine/app-engine:latest
@@ -176,7 +182,7 @@ services:
     environment:
       IMAGE_SERVER_PRIVATE_KEY: d70607f5-c478-403c-be11-3dbc1716d1cf
       IMAGE_SERVER_PUBLIC_KEY: 9a8b8369-2446-44cb-b0af-604a74e1dcdb
-      IAM_URL: http://nginx
+      IAM_URL: http://172.16.238.9
       PIMS_URL: http://nginx
       CBIR_URL: http://nginx
       APPENGINE_API_URL: http://host.docker.internal:8080/
@@ -276,4 +282,3 @@ networks:
       driver: default
       config:
         - subnet: 172.16.238.0/24
-

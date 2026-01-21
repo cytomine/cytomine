@@ -92,7 +92,6 @@ public class AsyncService {
         try (FileOutputStream tempFileOutputStream = new FileOutputStream(tempFile)) {
             getTaskRunIOParameter(projectId, output.getTaskRunId(), output.getParameterName(), "output", tempFileOutputStream);
         }
-        log.info("image size : {} bytes", tempFile.length());
         // signature
         String signatureDate = Instant.now().toString();
         String signature = ApiKeyFilter.generateKeys("POST","","",
@@ -126,8 +125,6 @@ public class AsyncService {
 
         // Clean up temp file
         tempFile.delete();
-
-        log.info("cleaning");
     }
 
     public void getTaskRunIOParameter(Long projectId, UUID taskRunId, String parameterName, String type, OutputStream outputStream) {

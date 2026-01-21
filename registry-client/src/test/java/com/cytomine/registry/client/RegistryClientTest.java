@@ -31,8 +31,7 @@ class RegistryClientTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        String imageName = DockerImageName.parse("registry:2.8.3");
-        registryContainer = new GenericContainer<>(imageName)
+        registryContainer = new GenericContainer<>(DockerImageName.parse("registry:2.8.3"))
                 .withExposedPorts(5000)
                 .withEnv("REGISTRY_STORAGE_DELETE_ENABLED", "true");
         registryContainer.start();
@@ -67,14 +66,28 @@ class RegistryClientTest {
     }
 
     @Test
-    void dockerIOPullPush() throws IOException {
+    void shouldPullImageByDigestAndPushWithNewTag() throws Exception {
+        Optional<String> originalDigest = RegistryClient.digest("postomine:1.3");
+        Assertions.assertTrue(originalDigest.isPresent());
+
         Path path = Files.createTempFile(UUID.randomUUID().toString(), ".tar");
-        RegistryClient.pull("registry@sha256" +
-                ":cc6393207bf9d3e032c4d9277834c1695117532c9f7e8c64e7b7adcda3a85f39", path.toString());
-        Assertions.assertTrue(Files.exists(path));
-        InputStream stream = new ByteArrayInputStream(path.toString().getBytes());
-        RegistryClient.push(stream, System.getenv("DOCKER_USERNAME") + "/registry");
-        Assertions.assertTrue(RegistryClient.digest(System.getenv("DOCKER_USERNAME") + "/registry").isPresent());
+
+        try {
+            RegistryClient.pull("postomine@" + originalDigest.get(), path.toString());
+            Assertions.assertTrue(Files.exists(path));
+
+            InputStream stream = Files.newInputStream(path);
+
+            RegistryClient.push(stream, "postomine:copied");
+
+            Optional<String> copiedDigest = RegistryClient.digest("postomine:copied");
+
+            Assertions.assertTrue(copiedDigest.isPresent());
+            Assertions.assertTrue(copiedDigest.get().startsWith("sha256:"));
+            Assertions.assertEquals(originalDigest.get(), copiedDigest.get());
+        } finally {
+            Files.deleteIfExists(path);
+        }
     }
 
     @Test

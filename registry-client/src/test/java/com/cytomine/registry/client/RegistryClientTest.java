@@ -17,7 +17,7 @@ import org.testcontainers.utility.DockerImageName;
 
 import com.cytomine.registry.client.http.resp.CatalogResp;
 
-class RegistryClientTest {
+public class RegistryClientTest {
     private GenericContainer<?> registryContainer;
     private String registryUrl;
 

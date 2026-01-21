@@ -5,14 +5,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import be.cytomine.domain.appengine.TaskRun;
 import be.cytomine.domain.image.ImageInstance;
-import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.appengine.TaskRunRepository;
-import be.cytomine.repository.image.ImageInstanceRepository;
-import be.cytomine.service.appengine.TaskRunService;
 import be.cytomine.service.image.ImageInstanceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

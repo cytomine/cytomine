@@ -111,4 +111,12 @@ public class RegistryClientTest {
         Assertions.assertNotNull(catalogResp.getRepositories());
         Assertions.assertTrue(catalogResp.getRepositories().contains("postomine"));
     }
+
+    @Test
+    void shouldDeleteImageTag() throws IOException {
+        RegistryClient.delete("postomine:1.3");
+
+        Optional<String> originalDigest = RegistryClient.digest("postomine:1.3");
+        Assertions.assertTrue(originalDigest.isEmpty());
+    }
 }

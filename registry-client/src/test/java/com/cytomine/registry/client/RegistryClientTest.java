@@ -93,12 +93,19 @@ class RegistryClientTest {
     }
 
     @Test
-    @Disabled
-    void dockerIOCopy() throws IOException {
-        RegistryClient.copy("registry@sha256" +
-                ":712c58f0d738ba95788d2814979028fd648a37186ae0dd4141f786125ba6d680",
-                System.getenv("DOCKER_USERNAME") + "/registry");
-        Assertions.assertTrue(RegistryClient.digest(System.getenv("DOCKER_USERNAME") + "/registry").isPresent());
+    void shouldCopyImageFromDigestToNewRepository() throws Exception {
+        Optional<String> originalDigest = RegistryClient.digest("postomine:1.3");
+        Assertions.assertTrue(originalDigest.isPresent());
+
+        String sourceImage = "postomine@" + originalDigest.get();
+        String targetImage = "postomine-copy:latest";
+
+        RegistryClient.copy(sourceImage, targetImage);
+
+        Optional<String> copiedDigest = RegistryClient.digest(targetImage);
+
+        Assertions.assertTrue(copiedDigest.isPresent());
+        Assertions.assertEquals(originalDigest.get(), copiedDigest.get());
     }
 
     @Test

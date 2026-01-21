@@ -8,7 +8,6 @@ import java.util.UUID;
 import be.cytomine.domain.project.Project;
 import be.cytomine.repository.appengine.TaskRunRepository;
 import be.cytomine.service.image.ImageInstanceService;
-import net.bytebuddy.dynamic.DynamicType;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

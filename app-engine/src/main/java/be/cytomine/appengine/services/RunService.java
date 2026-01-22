@@ -44,12 +44,12 @@ public class RunService {
 
     private void deleteStorage(String storageName) throws RunTaskServiceException {
         try {
-            log.info("Deleting storage {}", storageName);
-            Storage storage = new Storage();
+            log.info("Deleting storage '{}'", storageName);
+            Storage storage = new Storage(storageName);
             storageHandler.deleteStorage(storage);
-            log.info("Storage {} successfully deleted", storageName);
+            log.info("Storage '{}' successfully deleted", storageName);
         } catch (FileStorageException e) {
-            log.error("Failed to delete storage {}: [{}]", storageName, e.getMessage());
+            log.error("Failed to delete storage '{}': [{}]", storageName, e.getMessage());
             AppEngineError error = ErrorBuilder.build(ErrorCode.STORAGE_DELETE_FAILED);
             throw new RunTaskServiceException(error);
         }

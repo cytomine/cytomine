@@ -9,11 +9,16 @@ App Engine and its Task system are still in BETA. Therefore, all information pre
 :::
 ## How To Debug
 
-Tasks run steps :
-1. Select the task you want to run.
+#### Tasks run steps :
+1. Select the task you want to run. (drop down menu)
+2. select inputs (by entering the values or selecting them from cytomine)
 2. provision task inputs.
 3. Run the task.
-4. expand the run to see both inputs and outputs.
+4. expand the run to see both inputs and outputs. (output images are synchronously added to the project)
+
+::: tip
+provisioning and scheduling a task are done sequentially when you click the run task button in UI
+:::
 
 Task run goes through different states depending on many factors like availability of data and other things check out [Task Run States](/dev-guide/algorithms/task/run) for more details. Running 
 a task does not always run as expected. So to help developers debug their tasks and identify issues, a few logs are available to help troubleshoot.
@@ -40,6 +45,12 @@ if you don't have `kubectl` installed you can use the following command, `<name-
 ```
 docker compose exec -it k3s kubectl -n app-engine-tasks logs <name-of-pod>
 ```
+
+#### Debugging steps
+
+1. For provisioning issues, check the logs of the task run in app-engine commands 1 above.
+2. For scheduling issues, check the logs of `K3s` using the command number 2 above.
+3. For algorithm issues, check the logs of the app/algorithm inside the pod using the command number 3 above.
 
 ## Frequently Asked Questions
 

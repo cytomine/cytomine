@@ -498,7 +498,7 @@ public class TaskService {
 
     private void deleteTaskStorage(Task task) throws TaskServiceException {
         try {
-            log.info("Deleting storage {}...", task.getStorageReference());
+            log.info("Deleting storage {}", task.getStorageReference());
             Storage storage = new Storage(task.getStorageReference());
             fileStorageHandler.deleteStorage(storage);
             log.info("Storage {} successfully deleted", task.getStorageReference());
@@ -512,18 +512,18 @@ public class TaskService {
     public void deleteTask(Task task) throws RegistryException, RunTaskServiceException, TaskServiceException {
         String identifier = task.getNamespace() + ":" + task.getVersion();
 
-        log.info("Deleting all storage runs associated with task {}...", identifier);
+        log.info("Deleting all storage runs associated with task {}", identifier);
         for (Run run : task.getRuns()) {
             runService.deleteRunStorage(run);
         }
 
-        log.info("Deleting task {} storage...", identifier);
+        log.info("Deleting task {} storage", identifier);
         deleteTaskStorage(task);
 
-        log.info("Deleting task image {} from registry...", task.getImageName());
+        log.info("Deleting task image {} from registry", task.getImageName());
         registryHandler.deleteImage(task.getImageName());
 
-        log.info("Deleting task {} from database...", identifier);
+        log.info("Deleting task {} from database", identifier);
         taskRepository.deleteByNamespaceAndVersion(task.getNamespace(), task.getVersion());
     }
 

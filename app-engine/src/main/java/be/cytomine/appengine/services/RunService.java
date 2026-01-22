@@ -44,7 +44,7 @@ public class RunService {
 
     private void deleteStorage(String storageName) throws RunTaskServiceException {
         try {
-            log.info("Deleting storage {}...", storageName);
+            log.info("Deleting storage {}", storageName);
             Storage storage = new Storage();
             storageHandler.deleteStorage(storage);
             log.info("Storage {} successfully deleted", storageName);

@@ -56,7 +56,9 @@ public class SecurityConfiguration {
                 .exceptionHandling((exceptionHandling) ->
                         exceptionHandling
                                 .authenticationEntryPoint(
-                                        (request, response, authException) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED))
+                                        (request,  response, authException) -> {
+                                            System.out.println(authException);
+                                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);})
                 )
                 .authorizeHttpRequests((authorizeHttpRequests) ->
                         authorizeHttpRequests

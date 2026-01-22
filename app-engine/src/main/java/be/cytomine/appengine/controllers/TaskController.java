@@ -104,10 +104,16 @@ public class TaskController {
     public ResponseEntity<?> deleteTaskByNamespaceAndVersion(
         @PathVariable String namespace,
         @PathVariable String version
-    ) throws RegistryException, RunTaskServiceException, TaskNotFoundException, TaskServiceException {
+    ) throws RegistryException,
+            RunTaskServiceException,
+            TaskNotFoundException,
+            TaskServiceException {
         log.info("DELETE /tasks/{}/{}", namespace, version);
         Task task = taskService.findByNamespaceAndVersion(namespace, version)
-                .orElseThrow(() -> new TaskNotFoundException("Task " + namespace + ":" + version + " not found."));
+                .orElseThrow(() -> {
+                    String errorMessage = "Task " + namespace + ":" + version + " not found.";
+                    return new TaskNotFoundException(errorMessage);
+                });
 
         taskService.deleteTask(task);
         return ResponseEntity.noContent().build();
@@ -295,7 +301,10 @@ public class TaskController {
             @PathVariable String version
     ) throws TaskNotFoundException {
         Task task = taskService.findByNamespaceAndVersion(namespace, version)
-                .orElseThrow(() -> new TaskNotFoundException("Task " + namespace + ":" + version + " not found."));
+                .orElseThrow(() -> {
+                    String errorMessage = "Task " + namespace + ":" + version + " not found.";
+                    return new TaskNotFoundException(errorMessage);
+                });
 
         return ResponseEntity.ok(taskService.getRunsByTask(task));
     }

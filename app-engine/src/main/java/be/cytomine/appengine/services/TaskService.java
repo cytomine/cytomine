@@ -497,19 +497,21 @@ public class TaskService {
     }
 
     private void deleteTaskStorage(Task task) throws TaskServiceException {
+        String storageName = task.getStorageReference();
         try {
-            log.info("Deleting storage '{}'", task.getStorageReference());
-            Storage storage = new Storage(task.getStorageReference());
+            log.info("Deleting storage '{}'", storageName);
+            Storage storage = new Storage(storageName);
             fileStorageHandler.deleteStorage(storage);
-            log.info("Storage '{}' successfully deleted", task.getStorageReference());
+            log.info("Storage '{}' successfully deleted", storageName);
         } catch (FileStorageException e) {
-            log.error("Failed to delete storage '{}': [{}]", task.getStorageReference(), e.getMessage());
+            log.error("Failed to delete storage '{}': [{}]", storageName, e.getMessage());
             AppEngineError error = ErrorBuilder.build(ErrorCode.STORAGE_DELETE_FAILED);
             throw new TaskServiceException(error);
         }
     }
 
-    public void deleteTask(Task task) throws RegistryException, RunTaskServiceException, TaskServiceException {
+    public void deleteTask(Task task) throws RegistryException,
+            RunTaskServiceException, TaskServiceException {
         String identifier = task.getNamespace() + ":" + task.getVersion();
 
         log.info("Deleting all storage runs associated with task '{}'", identifier);
@@ -806,7 +808,11 @@ public class TaskService {
         List<Run> runs = runRepository.findAllByTask(task);
 
         return runs.stream()
-                .map(run -> new TaskRun(run.getId(), makeTaskDescription(run.getTask()), run.getState()))
+                .map(run -> new TaskRun(
+                        run.getId(),
+                        makeTaskDescription(run.getTask()),
+                        run.getState())
+                )
                 .collect(Collectors.toList());
     }
 }

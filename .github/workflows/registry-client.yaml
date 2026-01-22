@@ -1,0 +1,37 @@
+name: Registry Client
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  integration-tests:
+    runs-on: self-hosted
+
+    steps:
+      - name: Set up the repository
+        uses: actions/checkout@v6.0.1
+
+      - name: Set up JDK ${{ vars.JAVA_VERSION }}
+        uses: actions/setup-java@v5
+        with:
+          distribution: ${{ vars.JAVA_DIST }}
+          java-version: ${{ vars.JAVA_VERSION }}
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          gradle-version: ${{ vars.GRADLE_VERSION }}
+
+      - name: Test registry client
+        run: ./gradlew :registry-client:test --no-daemon --info
+
+      - name: Upload test reports
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: registry-reports
+          path: registry-client/build/reports/
+          retention-days: 7

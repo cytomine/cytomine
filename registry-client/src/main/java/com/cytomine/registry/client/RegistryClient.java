@@ -100,11 +100,14 @@ public class RegistryClient {
         Reference reference = Reference.prepareReference(image);
         context.setReference(reference);
 
-        if (Configurer.authenticated())
-            context.setToken(AUTHENTICATOR.getToken(new Pair<>(Scope.PULL, reference)));
-        String digest = REGISTRY_OPERATE.digest(context, reference)
-                .orElseThrow(() -> new RuntimeException("digest not found"));
-        reference.setDigest(digest);
+        if (reference.getDigest() == null) {
+            if (Configurer.authenticated()) {
+                context.setToken(AUTHENTICATOR.getToken(new Pair<>(Scope.PULL, reference)));
+            }
+            String digest = REGISTRY_OPERATE.digest(context, reference)
+                    .orElseThrow(() -> new RuntimeException("digest not found"));
+            reference.setDigest(digest);
+        }
 
         if (Configurer.authenticated())
             context.setToken(AUTHENTICATOR.getToken(new Pair<>(Scope.DELETE, reference)));

@@ -46,7 +46,7 @@ if you don't have `kubectl` installed you can use the following command, `<name-
 docker compose exec -it k3s kubectl -n app-engine-tasks logs <name-of-pod>
 ```
 
-#### Debugging steps
+#### Debugging
 
 1. For provisioning issues, check the logs of the task run in app-engine commands 1 above.
 2. For scheduling issues, check the logs of `K3s` using the command number 2 above.

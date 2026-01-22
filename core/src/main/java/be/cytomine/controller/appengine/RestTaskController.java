@@ -34,6 +34,7 @@ public class RestTaskController extends RestCytomineController {
     private final AppEngineService appEngineService;
 
     private final RestTemplate restTemplate;
+
     private final TaskRunService taskRunService;
 
     @GetMapping("/tasks/{id}")

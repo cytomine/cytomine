@@ -193,4 +193,17 @@ public class StorageTest {
         Assertions.assertTrue(Files.exists(randomPath));
         Assertions.assertTrue(Files.exists(orderedPath));
     }
+
+    @Test
+    @DisplayName("Should delete directory when storage is deleted")
+    public void shouldDeleteDirectoryWhenStorageIsDeleted() throws FileStorageException {
+        Storage testStorage = new Storage("test-storage");
+        storageHandler.createStorage(testStorage);
+        Path filePath = Paths.get(basePath, testStorage.getIdStorage());
+        Assertions.assertTrue(Files.exists(filePath));
+
+        storageHandler.deleteStorage(testStorage);
+
+        Assertions.assertFalse(Files.exists(filePath));
+    }
 }

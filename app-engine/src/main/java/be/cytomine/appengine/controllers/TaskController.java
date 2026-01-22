@@ -104,17 +104,13 @@ public class TaskController {
     public ResponseEntity<?> deleteTaskByNamespaceAndVersion(
         @PathVariable String namespace,
         @PathVariable String version
-    ) throws RegistryException, RunTaskServiceException, TaskServiceException {
+    ) throws RegistryException, RunTaskServiceException, TaskNotFoundException, TaskServiceException {
         log.info("DELETE /tasks/{}/{}", namespace, version);
-        return taskService.findByNamespaceAndVersion(namespace, version)
-            .map(task -> {
-                taskService.deleteTask(task);
-                return ResponseEntity.noContent().build();
-            })
-            .orElseGet(() -> new ResponseEntity<>(
-                ErrorBuilder.build(ErrorCode.INTERNAL_TASK_NOT_FOUND),
-                HttpStatus.NOT_FOUND
-            ));
+        Task task = taskService.findByNamespaceAndVersion(namespace, version)
+                .orElseThrow(() -> new TaskNotFoundException("Task " + namespace + ":" + version + " not found."));
+
+        taskService.deleteTask(task);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping(value = "tasks/{id}/inputs")

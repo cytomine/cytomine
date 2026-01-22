@@ -154,7 +154,6 @@ $border: #383838;
   text-decoration: none;
   display: flex;
   align-items: center;
-  padding-right: 3rem;
 }
 
 .card-header-title:hover {

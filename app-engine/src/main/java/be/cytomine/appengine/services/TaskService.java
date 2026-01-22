@@ -301,10 +301,6 @@ public class TaskService {
         return Optional.of(makeTaskDescription(task));
     }
 
-    public void deleteTask(Task task) {
-        taskRepository.deleteByNamespaceAndVersion(task.getNamespace(), task.getVersion());
-    }
-
     private List<Match> getMatches(JsonNode descriptor, Set<Parameter> parameters) {
         log.info("UploadTask: looking for matches...");
         JsonNode inputsNode = descriptor.get("inputs");
@@ -496,6 +492,25 @@ public class TaskService {
         }
         log.info("UploadTask: successful authors ");
         return authors;
+    }
+
+    private void deleteTaskStorage(Task task) throws TaskServiceException {
+        try {
+            log.info("Deleting storage {}...", task.getStorageReference());
+            Storage storage = new Storage(task.getStorageReference());
+            fileStorageHandler.deleteStorage(storage);
+            log.info("Storage {} successfully deleted", task.getStorageReference());
+        } catch (FileStorageException e) {
+            log.error("Failed to delete storage {}: [{}]", task.getStorageReference(), e.getMessage());
+            AppEngineError error = ErrorBuilder.build(ErrorCode.STORAGE_DELETE_FAILED);
+            throw new TaskServiceException(error);
+        }
+    }
+
+    public void deleteTask(Task task) throws TaskServiceException {
+        deleteTaskStorage(task);
+
+        taskRepository.deleteByNamespaceAndVersion(task.getNamespace(), task.getVersion());
     }
 
     public StorageData retrieveYmlDescriptor(String namespace, String version)

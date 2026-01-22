@@ -100,11 +100,10 @@ public class TaskController {
     }
 
     @DeleteMapping(value = "tasks/{namespace}/{version}")
-    @ResponseStatus(code = HttpStatus.OK)
     public ResponseEntity<?> deleteTaskByNamespaceAndVersion(
         @PathVariable String namespace,
         @PathVariable String version
-    ) {
+    ) throws TaskServiceException {
         log.info("DELETE /tasks/{}/{}", namespace, version);
         return taskService.findByNamespaceAndVersion(namespace, version)
             .map(task -> {

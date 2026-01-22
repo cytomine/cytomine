@@ -8,6 +8,7 @@ import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
+import be.cytomine.dto.appengine.task.TaskDescription;
 import be.cytomine.dto.appengine.task.TaskRunDetail;
 import be.cytomine.dto.appengine.task.TaskRunOutputResponse;
 import be.cytomine.dto.appengine.task.TaskRunResponse;
@@ -161,6 +162,22 @@ public class TaskRunService {
 
         // We return the App engine response. Should we include information from Cytomine (project ID, user ID, created, ... ?)
         return appEngineResponse;
+    }
+
+    public void deleteAllTaskRunForTask(String taskId) {
+        log.info("Deleting all task runs associated to task '{}'", taskId);
+
+        String response = appEngineService.get("/tasks/" + taskId + "/runs");
+        List<TaskRunResponse> taskRunResponses;
+        try {
+            taskRunResponses = objectMapper.readValue(response, new TypeReference<>() {});
+        } catch (JsonProcessingException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error parsing JSON response");
+        }
+
+        for (TaskRunResponse taskRun : taskRunResponses) {
+            taskRunRepository.deleteTaskRunByTaskRunId(taskRun.id());
+        }
     }
 
     public List<TaskRunDetail> getTaskRuns(Long projectId) {

@@ -288,4 +288,15 @@ public class TaskController {
                 .headers(headers)
                 .body(new FileSystemResource(file));
     }
+
+    @GetMapping("tasks/{namespace}/{version}/runs")
+    public ResponseEntity<List<TaskRun>> getTaskRuns(
+            @PathVariable String namespace,
+            @PathVariable String version
+    ) throws TaskNotFoundException {
+        Task task = taskService.findByNamespaceAndVersion(namespace, version)
+                .orElseThrow(() -> new TaskNotFoundException("Task " + namespace + ":" + version + " not found."));
+
+        return ResponseEntity.ok(taskService.getRunsByTask(task));
+    }
 }

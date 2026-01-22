@@ -2,6 +2,7 @@ package be.cytomine.controller.appengine;
 
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.service.appengine.AppEngineService;
+import be.cytomine.service.appengine.TaskRunService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -33,6 +34,7 @@ public class RestTaskController extends RestCytomineController {
     private final AppEngineService appEngineService;
 
     private final RestTemplate restTemplate;
+    private final TaskRunService taskRunService;
 
     @GetMapping("/tasks/{id}")
     public String descriptionById(@PathVariable String id) {
@@ -58,8 +60,10 @@ public class RestTaskController extends RestCytomineController {
 
     @DeleteMapping("/tasks/{namespace}/{version}")
     public void deleteTask(@PathVariable String namespace, @PathVariable String version) {
-        log.info("DELETE /tasks/{}/{}", namespace, version);
-        appEngineService.delete("tasks/" + namespace + "/" + version);
+        String identifier = namespace + "/" + version;
+        log.info("DELETE /tasks/{}", identifier);
+        taskRunService.deleteAllTaskRunForTask(identifier);
+        appEngineService.delete("tasks/" + identifier);
     }
 
     @PostMapping("/tasks/{namespace}/{version}/install")

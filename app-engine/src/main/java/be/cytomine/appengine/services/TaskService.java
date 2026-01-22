@@ -801,4 +801,12 @@ public class TaskService {
         }
         return file;
     }
+
+    public List<TaskRun> getRunsByTask(Task task) {
+        List<Run> runs = runRepository.findAllByTask(task);
+
+        return runs.stream()
+                .map(run -> new TaskRun(run.getId(), makeTaskDescription(run.getTask()), run.getState()))
+                .collect(Collectors.toList());
+    }
 }

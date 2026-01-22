@@ -80,6 +80,8 @@ public class TaskService {
 
     private final RunRepository runRepository;
 
+    private final RunService runService;
+
     private final StorageHandler fileStorageHandler;
 
     private final RegistryHandler registryHandler;
@@ -507,9 +509,21 @@ public class TaskService {
         }
     }
 
-    public void deleteTask(Task task) throws TaskServiceException {
+    public void deleteTask(Task task) throws RegistryException, RunTaskServiceException, TaskServiceException {
+        String identifier = task.getNamespace() + ":" + task.getVersion();
+
+        log.info("Deleting all storage runs associated with task {}...", identifier);
+        for (Run run : task.getRuns()) {
+            runService.deleteRunStorage(run);
+        }
+
+        log.info("Deleting task {} storage...", identifier);
         deleteTaskStorage(task);
 
+        log.info("Deleting task image {} from registry...", task.getImageName());
+        registryHandler.deleteImage(task.getImageName());
+
+        log.info("Deleting task {} from database...", identifier);
         taskRepository.deleteByNamespaceAndVersion(task.getNamespace(), task.getVersion());
     }
 

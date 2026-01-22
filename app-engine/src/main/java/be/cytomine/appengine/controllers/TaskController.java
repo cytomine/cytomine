@@ -103,7 +103,7 @@ public class TaskController {
     public ResponseEntity<?> deleteTaskByNamespaceAndVersion(
         @PathVariable String namespace,
         @PathVariable String version
-    ) throws TaskServiceException {
+    ) throws RegistryException, RunTaskServiceException, TaskServiceException {
         log.info("DELETE /tasks/{}/{}", namespace, version);
         return taskService.findByNamespaceAndVersion(namespace, version)
             .map(task -> {

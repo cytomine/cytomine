@@ -206,4 +206,14 @@ public class StorageTest {
 
         Assertions.assertFalse(Files.exists(filePath));
     }
+
+    @Test
+    @DisplayName("Should throw exception when deleting non-existent storage")
+    public void shouldThrowExceptionWhenDeletingNonExistentStorage() {
+        Storage nonExistentStorage = new Storage("nonexistent");
+
+        Assertions.assertThrows(FileStorageException.class, () -> {
+            storageHandler.deleteStorage(nonExistentStorage);
+        });
+    }
 }

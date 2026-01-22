@@ -176,8 +176,11 @@ public class TaskRunService {
         }
 
         for (TaskRunResponse taskRun : taskRunResponses) {
+            log.info("Delete task run '{}'", taskRun.id());
             taskRunRepository.deleteTaskRunByTaskRunId(taskRun.id());
         }
+
+        log.info("Deleted all task runs associated to task '{}'", taskId);
     }
 
     public List<TaskRunDetail> getTaskRuns(Long projectId) {

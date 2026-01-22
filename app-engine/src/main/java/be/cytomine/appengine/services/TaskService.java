@@ -301,6 +301,10 @@ public class TaskService {
         return Optional.of(makeTaskDescription(task));
     }
 
+    public void deleteTask(Task task) {
+        taskRepository.deleteByNamespaceAndVersion(task.getNamespace(), task.getVersion());
+    }
+
     private List<Match> getMatches(JsonNode descriptor, Set<Parameter> parameters) {
         log.info("UploadTask: looking for matches...");
         JsonNode inputsNode = descriptor.get("inputs");

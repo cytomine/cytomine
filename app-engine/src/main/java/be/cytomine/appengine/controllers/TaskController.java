@@ -34,7 +34,6 @@ import be.cytomine.appengine.exceptions.TaskServiceException;
 import be.cytomine.appengine.exceptions.ValidationException;
 import be.cytomine.appengine.handlers.StorageData;
 import be.cytomine.appengine.models.task.Task;
-import be.cytomine.appengine.repositories.TaskRepository;
 import be.cytomine.appengine.services.AppStoreService;
 import be.cytomine.appengine.services.TaskService;
 
@@ -43,8 +42,6 @@ import be.cytomine.appengine.services.TaskService;
 @RestController
 @RequestMapping(path = "${app-engine.api_prefix}${app-engine.api_version}/")
 public class TaskController {
-
-    private final TaskRepository taskRepository;
 
     private final TaskService taskService;
     private final AppStoreService appStoreService;
@@ -111,7 +108,7 @@ public class TaskController {
         log.info("DELETE /tasks/{}/{}", namespace, version);
         return taskService.findByNamespaceAndVersion(namespace, version)
             .map(task -> {
-                taskRepository.deleteByNamespaceAndVersion(namespace, version);
+                taskService.deleteTask(task);
                 return ResponseEntity.noContent().build();
             })
             .orElseGet(() -> new ResponseEntity<>(

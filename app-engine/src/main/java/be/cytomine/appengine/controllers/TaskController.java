@@ -28,6 +28,7 @@ import be.cytomine.appengine.dto.responses.errors.ErrorBuilder;
 import be.cytomine.appengine.dto.responses.errors.ErrorCode;
 import be.cytomine.appengine.exceptions.AppStoreServiceException;
 import be.cytomine.appengine.exceptions.BundleArchiveException;
+import be.cytomine.appengine.exceptions.RegistryException;
 import be.cytomine.appengine.exceptions.RunTaskServiceException;
 import be.cytomine.appengine.exceptions.TaskNotFoundException;
 import be.cytomine.appengine.exceptions.TaskServiceException;

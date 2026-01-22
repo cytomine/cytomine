@@ -109,8 +109,9 @@ public class RegistryClient {
             reference.setDigest(digest);
         }
 
-        if (Configurer.authenticated())
+        if (Configurer.authenticated()) {
             context.setToken(AUTHENTICATOR.getToken(new Pair<>(Scope.DELETE, reference)));
+        }
         REGISTRY_OPERATE.delete(context, reference);
     }
 

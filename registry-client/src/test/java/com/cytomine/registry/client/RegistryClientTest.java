@@ -24,13 +24,13 @@ public class RegistryClientTest {
     @BeforeEach
     void setUp() throws IOException {
         registryContainer = new GenericContainer<>(DockerImageName.parse(TestConfig.REGISTRY_IMAGE))
-                .withExposedPorts(5000)
+                .withExposedPorts(TestConfig.REGISTRY_PORT)
                 .withEnv("REGISTRY_STORAGE_DELETE_ENABLED", "true");
         registryContainer.start();
 
         registryUrl = String.format("http://%s:%d",
                 registryContainer.getHost(),
-                registryContainer.getMappedPort(5000));
+                registryContainer.getMappedPort(TestConfig.REGISTRY_PORT));
 
         RegistryClient.config(registryUrl);
 

@@ -16,23 +16,26 @@ package be.cytomine.repository;
 * limitations under the License.
 */
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import jakarta.persistence.EntityManager;
+import lombok.Getter;
+import lombok.Setter;
+
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.ontology.AnnotationDomain;
-import be.cytomine.domain.ontology.AnnotationGroup;
 import be.cytomine.domain.ontology.Term;
-import be.cytomine.domain.ontology.Track;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.exceptions.WrongArgumentException;
-import lombok.Getter;
-import lombok.Setter;
-
-import jakarta.persistence.EntityManager;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -54,21 +57,14 @@ public abstract class AnnotationListing {
     List<String> columnsToPrint;
 
     Long project = null;
-    Long image = null;
     List<Long> images = null;
 
-    Long slice = null;
     List<Long> slices = null;
-
-    Long track = null;
     List<Long> tracks = null;
     Long beforeSlice = null;
     Long afterSlice = null;
     Long sliceDimension = null;
-
-    Long annotationGroup = null;
     List<Long> annotationGroups = null;
-
     Long user = null;
 
     Long term = null;
@@ -79,7 +75,6 @@ public abstract class AnnotationListing {
 
     List<Long> reviewUsers;
 
-    Long tag = null;
     List<Long> tags = null;
 
     Date afterThan = null;
@@ -91,14 +86,10 @@ public abstract class AnnotationListing {
     Boolean multipleTerm = false;
     Boolean noTrack = false;
     Boolean multipleTrack = false;
-
     String bbox = null;
     String bboxAnnotation = null;
-
     Object baseAnnotation = null;
     Long maxDistanceBaseAnnotation = null;
-
-
     List<Long> parents;
 
     //not used for search critera (just for specific request
@@ -114,7 +105,7 @@ public abstract class AnnotationListing {
 
     abstract String buildExtraRequest();
 
-    LinkedHashMap<String,String> extraColmun = new LinkedHashMap<>();
+    LinkedHashMap<String, String> extraColumn = new LinkedHashMap<>();
 
     LinkedHashMap<String,String> orderBy = new LinkedHashMap<>();
 
@@ -123,7 +114,7 @@ public abstract class AnnotationListing {
     }
 
     public void addExtraColumn(String propName, String column) {
-        extraColmun.put(propName, column);
+        extraColumn.put(propName, column);
     }
 
     /**
@@ -161,7 +152,7 @@ public abstract class AnnotationListing {
                 columns.putAll(entry.getValue());
             }
         }
-        columns.putAll(extraColmun);
+        columns.putAll(extraColumn);
         return columns;
     }
 
@@ -171,8 +162,6 @@ public abstract class AnnotationListing {
     public CytomineDomain container() {
         if (project!=null) {
             return entityManager.find(Project.class, project);
-        } else if (image!=null) {
-            return entityManager.find(ImageInstance.class, image).container();
         } else if (images!=null) {
             List<Project> projectList = new ArrayList<>();
             for (Long idImage : images) {
@@ -183,12 +172,10 @@ public abstract class AnnotationListing {
                 throw new WrongArgumentException("Images from filter must all be from the same project!");
             }
             return projectList.stream().findFirst().get();
-        } else if (slice!=null) {
-            return entityManager.find(SliceInstance.class, slice).container();
-        } else if (slices!=null) {
+        } else if (slices != null) {
             List<Project> projectList = new ArrayList<>();
             for (Long idImage : slices) {
-                projectList.add((Project)entityManager.find(SliceInstance.class, idImage).getProject());
+                projectList.add(entityManager.find(SliceInstance.class, idImage).getProject());
             }
             projectList = projectList.stream().distinct().collect(Collectors.toList());
             if (projectList.size() > 1) {
@@ -221,43 +208,28 @@ public abstract class AnnotationListing {
                 getProjectConst() +
                         getUserConst() +
                         getUsersConst() +
-
-                        getImageConst() +
                         getImagesConst() +
-
-                        getSliceConst() +
                         getSlicesConst() +
-
-                        getTagConst() +
-                        getTagsConst() +
-
+                    getTagsConst() +
                         getTermConst() +
                         getTermsConst() +
-
-                        getTrackConst() +
                         getTracksConst() +
                         getBeforeOrAfterSliceConst() +
-
-                        getGroupConst() +
                         getGroupsConst() +
-
                         getUsersForTermConst() +
-
                         getNotReviewedOnlyConst() +
                         getParentsConst() +
                         getAvoidEmptyCentroidConst() +
                         getReviewUsersConst() +
-
                         getIntersectConst() +
                         getIntersectAnnotationConst() +
                         getMaxDistanceAnnotationConst() +
                         getExcludedAnnotationConst() +
-
                         getBeforeThan() +
                         getAfterThan() +
                         createOrderBy();
 
-        if (term!=null || terms!=null || track!=null || tracks!=null) {
+        if (term != null || terms != null || tracks != null) {
             String request = "SELECT DISTINCT a.*, ";
 
             if (term!=null || terms!=null) {
@@ -274,11 +246,11 @@ public abstract class AnnotationListing {
 
             }
 
-            if ((term!=null || terms!=null) && (track!=null || tracks!=null)) {
+            if ((term != null || terms != null) && (tracks != null)) {
                 request += ", ";
             }
 
-            if (track!=null || tracks!=null) {
+            if (tracks != null) {
                 sqlColumns.remove("track");
                 sqlColumns.remove("annotationTracks");
                 request += "atr.track_id as track, atr.id as annotationTracks ";
@@ -296,7 +268,7 @@ public abstract class AnnotationListing {
             }
 
 
-            if (track!=null || tracks!=null)
+            if (tracks != null)
                 request += "LEFT OUTER JOIN annotation_track atr ON a.id = atr.annotation_ident ";
 
             request += "WHERE true ";
@@ -307,11 +279,11 @@ public abstract class AnnotationListing {
             }
 
             request += "ORDER BY ";
-            request += (track!=null || tracks!=null) ? "a.rank asc" : "a.id desc ";
+            request += (tracks != null) ? "a.rank asc" : "a.id desc ";
             if (term!=null || terms!=null) {
                 request += ", at.term_id ";
             }
-            request += ((track!=null || tracks!=null) ? ", atr.track_id " : "");
+            request += ((tracks != null) ? ", atr.track_id " : "");
             return request;
         }
 
@@ -338,7 +310,7 @@ public abstract class AnnotationListing {
                     requestHeadList.add(entry.getValue() + " as " + entry.getKey());
                 }
             }
-            if (track!=null || tracks!=null) {
+            if (tracks != null) {
                 requestHeadList.add("(asl.channel + ai.channels * (asl.z_stack + ai.depth * asl.time)) as rank");
             }
             return "SELECT " + String.join(", ", requestHeadList) + " \n";
@@ -358,8 +330,8 @@ public abstract class AnnotationListing {
         }
     }
 
-    String joinValues(List list) {
-        return (String)list.stream().map(x -> String.valueOf(x)).collect(Collectors.joining(", "));
+    String joinValues(List<Long> list) {
+        return list.stream().map(String::valueOf).collect(Collectors.joining(", "));
     }
 
     String getProjectConst() {
@@ -395,17 +367,6 @@ public abstract class AnnotationListing {
 
     }
 
-    String getImageConst() {
-        if (image!=null) {
-            ImageInstance imageInstance = entityManager.find(ImageInstance.class, image);
-            if (imageInstance==null) {
-                throw new ObjectNotFoundException("Image " + image + " not exist!");
-            }
-            return "AND a.image_id = " + imageInstance.getId() + "\n";
-        } else {
-            return "";
-        }
-    }
 
     String getSlicesConst() {
         if (slices!=null && slices.isEmpty()) {
@@ -416,16 +377,6 @@ public abstract class AnnotationListing {
 
     }
 
-    String getSliceConst() {
-        if (slice!=null) {
-            if (entityManager.find(SliceInstance.class, slice)==null) {
-                throw new ObjectNotFoundException("Slice "+slice+" not exist!");
-            }
-            return "AND a.slice_id = " + slice + "\n";
-        } else {
-            return "";
-        }
-    }
 
     String getUserConst() {
         if (user!=null) {
@@ -441,11 +392,14 @@ public abstract class AnnotationListing {
     abstract String getNotReviewedOnlyConst();
 
     String getIntersectConst() {
-        return (bbox!=null ? "AND ST_Intersects(a.location,ST_GeometryFromText('"+bbox.toString()+"',0))\n" : "");
+        return (bbox != null ? "AND ST_Intersects(a.location,ST_GeometryFromText('" + bbox
+                                   + "',0))\n" : "");
     }
 
     String getIntersectAnnotationConst() {
-        return (bboxAnnotation!=null ? "AND ST_Intersects(a.location,ST_GeometryFromText('" + bboxAnnotation.toString() + "',0))\n" : "");
+        return (bboxAnnotation != null ? "AND ST_Intersects(a.location,ST_GeometryFromText('"
+                                             + bboxAnnotation
+                                             + "',0))\n" : "");
     }
 
     String getMaxDistanceAnnotationConst() {
@@ -506,18 +460,6 @@ public abstract class AnnotationListing {
         }
     }
 
-    String getTrackConst() {
-        if (track!=null) {
-            if (entityManager.find(Track.class, track)!=null) {
-                throw new ObjectNotFoundException("Track " + track + " not exists !");
-            }
-            addIfMissingColumn("track");
-            return " AND (atr.track_id = "+track + ((noTrack) ? " OR atr.track_id IS NULL" : "") + ")\n";
-        } else {
-            return "";
-        }
-    }
-
     String getTracksConst() {
         if (tracks!=null) {
             addIfMissingColumn("track");
@@ -525,19 +467,6 @@ public abstract class AnnotationListing {
         } else {
             return "";
         }
-    }
-
-    String getGroupConst() {
-        if (annotationGroup == null) {
-            return "";
-        }
-
-        if (entityManager.find(AnnotationGroup.class, annotationGroup) != null) {
-            throw new ObjectNotFoundException("Annotation group  " + annotationGroup + " does not exists!");
-        }
-
-        addIfMissingColumn("group");
-        return " AND al1.group_id = " + annotationGroup + "\n";
     }
 
     String getGroupsConst() {
@@ -549,15 +478,7 @@ public abstract class AnnotationListing {
         return " AND al1.group_id IN (" + joinValues(annotationGroups) + ")\n";
     }
 
-    String getTagConst() {
-        if (tag!=null && noTag) {
-            return "AND (tda.tag_id = "+tag + " OR tda.tag_id IS NULL)\n";
-        } else if (tag!=null) {
-            return "AND tda.tag_id = "+tag +"\n";
-        } else {
-            return "";
-        }
-    }
+
 
     String getTagsConst() {
         if (tags!=null  && noTag) {
@@ -571,7 +492,7 @@ public abstract class AnnotationListing {
 
 
         String getBeforeOrAfterSliceConst() {
-        if ((track!=null || tracks!=null) && (beforeSlice!=null || afterSlice!=null)) {
+            if ((tracks != null) && (beforeSlice != null || afterSlice != null)) {
             addIfMissingColumn("slice");
             Long sliceId = (beforeSlice!=null) ? beforeSlice : afterSlice;
             SliceInstance sliceInstance = entityManager.find(SliceInstance.class, sliceId);

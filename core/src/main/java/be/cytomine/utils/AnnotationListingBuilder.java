@@ -16,24 +16,31 @@ package be.cytomine.utils;
 * limitations under the License.
 */
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import jakarta.persistence.EntityManager;
+import lombok.AllArgsConstructor;
+import org.locationtech.jts.io.ParseException;
+import org.springframework.stereotype.Component;
+
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.dto.annotation.AnnotationResult;
 import be.cytomine.exceptions.WrongArgumentException;
-import be.cytomine.repository.*;
+import be.cytomine.repository.AnnotationListing;
+import be.cytomine.repository.ReviewedAnnotationListing;
+import be.cytomine.repository.UserAnnotationListing;
 import be.cytomine.service.AnnotationListingService;
 import be.cytomine.service.ontology.TermService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.report.ReportService;
 import be.cytomine.service.security.UserService;
 import be.cytomine.service.utils.ParamsService;
-
-import org.locationtech.jts.io.ParseException;
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Component;
-
-import jakarta.persistence.EntityManager;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Component
@@ -99,23 +106,18 @@ public class AnnotationListingBuilder {
         return buildAnnotationListing(al, params);
     }
 
-    public AnnotationListing buildAnnotationListing(AnnotationListing al, JsonObject params) {
+    public AnnotationListing buildAnnotationListing(AnnotationListing al,
+                                                    Long project,
+                                                    List<Long> tracks, List<Long> slices,
+                                                    List<Long> images, long user) {
         al.setColumnsToPrint(paramsService.getPropertyGroupToShow(params));
-
-        // Project
-        al.setProject(params.getJSONAttrLong("project"));
-
-        // Images
+        al.setProject(project);
         al.setImage(params.getJSONAttrLong("image"));
-        al.setImages(StringUtils.extractListFromParameter(params.getJSONAttrStr("images")));
-
-        // Slices
+        al.setImages(images);
         al.setSlice(params.getJSONAttrLong("slice"));
-        al.setSlices(StringUtils.extractListFromParameter(params.getJSONAttrStr("slices")));
-
-        // Tracks
+        al.setSlices(slices);
         al.setTrack(params.getJSONAttrLong("track"));
-        al.setTracks(StringUtils.extractListFromParameter(params.getJSONAttrStr("tracks")));
+        al.setTracks(tracks);
 
         if (al.getTrack()!=null || al.getTracks()!=null) {
             al.setBeforeSlice(params.getJSONAttrLong("beforeSlice"));
@@ -123,8 +125,8 @@ public class AnnotationListingBuilder {
             al.setSliceDimension(params.getJSONAttrLong("sliceDimension"));
         }
 
-        // Users
-        al.setUser(params.getJSONAttrLong("user"));
+
+        al.setUser(user);
         al.setUsers(StringUtils.extractListFromParameter(params.getJSONAttrStr("users")));
 
         al.setUsersForTerm(StringUtils.extractListFromParameter(params.getJSONAttrStr("usersForTerm")));

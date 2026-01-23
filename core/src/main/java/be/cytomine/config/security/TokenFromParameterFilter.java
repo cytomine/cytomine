@@ -26,16 +26,16 @@ public class TokenFromParameterFilter extends OncePerRequestFilter {
             Optional.ofNullable(request.getParameter("auth"))
                 .filter(not(String::isBlank))
                 .or(() -> Optional.ofNullable(request.getParameter("Authorization"))
-                              .filter(not(String::isBlank)));
+                              .filter(not(String::isBlank)))
+                .map(token -> token.startsWith("Bearer") ? token : "Bearer " + token);
 
-        System.out.println(authToken);
         if (authToken.isPresent() && request.getHeader("Authorization") == null) {
             // Wrap the request to "fake" the Authorization header
             HttpServletRequest wrappedRequest = new HttpServletRequestWrapper(request) {
                 @Override
                 public String getHeader(String name) {
                     if ("Authorization".equalsIgnoreCase(name)) {
-                        return "Bearer " + authToken.get();
+                        return authToken.get();
                     }
                     return super.getHeader(name);
                 }

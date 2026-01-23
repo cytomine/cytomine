@@ -122,6 +122,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
             @RequestParam(required = false) boolean reviewed,
             @RequestParam(required = false) String terms
     ) throws IOException {
+        System.out.println("ANNOTATION");
         if(reviewed) {
             restReviewedAnnotationController.downloadDocumentByProject(project, format, terms,
                 reviewUsers);

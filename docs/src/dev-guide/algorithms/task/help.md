@@ -28,6 +28,10 @@ a task does not always run as expected. So to help developers debug their tasks 
 
 #### Logs
 
+::: warning
+For docker compose commands, you may need sudo permission if you are not in the docker group.
+:::
+
 1. Check the logs of the task run in app-engine using the following command
 ```
 docker compose logs -f app-engine

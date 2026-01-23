@@ -44,6 +44,11 @@ otherwise you can use
 ```
 docker compose exec -it k3s kubectl -n app-engine-tasks get pods
 ```
+which lists all the pods along with their status as follows 
+```
+NAME                                                             READY   STATUS      RESTARTS   AGE
+identitywithwsidicomimage-113539bf-8285-4212-9ea5-aa61208ff5e8   0/2     Completed   0          26m
+```
 3. To check the logs of the app inside the pod, `<name-of-pod>` comes from name column of the command number 2 above
 ```
 kubectl --kubeconfig=./.kube/shared/config -n app-engine-tasks logs <name-of-pod>

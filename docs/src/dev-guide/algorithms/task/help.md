@@ -20,7 +20,7 @@ App Engine and its Task system are still in BETA. Therefore, all information pre
 provisioning and scheduling a task are done sequentially when you click the run task button in UI
 :::
 
-Task run goes through different states depending on many factors like availability of data and other things check out [Task Run States](/dev-guide/algorithms/task/run) for more details. Running 
+Task run goes through different states depending on many factors like availability of data and other things check out [Task Run States](/dev-guide/algorithms/task/#run) for more details. Running 
 a task does not always run as expected. So to help developers debug their tasks and identify issues, a few logs are available to help troubleshoot.
 
 #### Logs

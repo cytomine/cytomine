@@ -121,10 +121,16 @@ public class AnnotationListingBuilder {
                                                     List<String> propertyGroupToShow,
                                                     List<Long> tags, boolean withoutTerm,
                                                     boolean withoutTag,
+                                                    boolean withoutTrack,
                                                     List<Long> usersForTerm, List<Long> terms,
                                                     boolean multipleTerm,
+                                                    boolean multipleTrack,
+                                                    boolean notReviewedOnly,
                                                     Optional<Date> afterThan,
-                                                    Optional<Date> beforeThan
+                                                    Optional<Date> beforeThan,
+                                                    List<Long> reviewUsers,
+                                                    boolean kmeans,
+                                                    int kmeansValue
     ) {
         al.setColumnsToPrint(propertyGroupToShow);
         al.setProject(project);
@@ -147,20 +153,19 @@ public class AnnotationListingBuilder {
         // Boolean for terms
         al.setWithoutTerm(withoutTerm);
         al.setMultipleTerm(multipleTerm);
-        al.setNoTrack(params.getJSONAttrBoolean("noTrack", false));
-        al.setMultipleTrack(params.getJSONAttrBoolean("multipleTrack", false));
+        al.setWithoutTrack(withoutTrack);
+        al.setMultipleTrack(multipleTrack);
 
         // Review
-        al.setNotReviewedOnly(params.getJSONAttrBoolean("notReviewedOnly", false));
+        al.setNotReviewedOnly(notReviewedOnly);
 
         // Review users
         // TODO: reviewUser ?
-        al.setReviewUsers(
-            StringUtils.extractListFromParameter(params.getJSONAttrStr("reviewUsers")));
+        al.setReviewUsers(reviewUsers);
 
         // Kmeans
-        al.setKmeans(params.getJSONAttrBoolean("kmeans", false));
-        al.setKmeansValue(params.getJSONAttrInteger("kmeansValue", null));
+        al.setKmeans(kmeans);
+        al.setKmeansValue(kmeansValue);
 
         // BBOX
         if (params.get("bbox") != null) {

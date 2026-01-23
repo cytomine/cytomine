@@ -74,11 +74,11 @@ public abstract class AnnotationListing {
     Optional<Date> beforeThan = Optional.empty();
     boolean notReviewedOnly = false;
     boolean multipleTerm = false;
-    boolean noTrack = false;
+    boolean withoutTrack = false;
     boolean multipleTrack = false;
     //not used for search critera (just for specific request
     boolean avoidEmptyCentroid = false;
-    String bbox = null;
+    Optional<String> bbox = null;
     String bboxAnnotation = null;
     Object baseAnnotation = null;
     Long maxDistanceBaseAnnotation = null;
@@ -160,7 +160,7 @@ public abstract class AnnotationListing {
             List<Project> projectList = new ArrayList<>();
             for (Long idImage : images) {
                 projectList.add(
-                    (Project) entityManager.find(ImageInstance.class, idImage).getProject());
+                    entityManager.find(ImageInstance.class, idImage).getProject());
             }
             projectList = projectList.stream().distinct().collect(Collectors.toList());
             if (projectList.size() > 1) {
@@ -469,7 +469,7 @@ public abstract class AnnotationListing {
     String getTracksConst() {
         if (tracks != null) {
             addIfMissingColumn("track");
-            return "AND (atr.track_id IN (" + joinValues(tracks) + ") " + ((noTrack)
+            return "AND (atr.track_id IN (" + joinValues(tracks) + ") " + ((withoutTrack)
                                                                                ? " OR atr.track_id IS NULL"
                                                                                : "") + ")\n";
         } else {

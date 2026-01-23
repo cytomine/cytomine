@@ -119,6 +119,8 @@ export default {
       return provisions;
     },
     resetForm() {
+      this.inputs = {};
+
       const setDefaultValue = (input) => {
         const value = (() => {
           if (input.default === 'null') {

@@ -2,8 +2,8 @@ import {shallowMount, createLocalVue} from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import TaskIoForm from '@/components/appengine/forms/TaskIoForm.vue';
-import AppEngineField from '@/components/appengine/forms/fields/AppEngineField';
 import Task from '@/utils/appengine/task';
+import {flushPromises} from '../../../../utils';
 
 jest.mock('@/api', () => ({
   Cytomine: {
@@ -28,6 +28,7 @@ describe('TaskIoForm.vue', () => {
   const mockTask = {
     namespace: 'mock-namespace',
     version: '1.0.0',
+    fetchOutputs: jest.fn(),
   };
 
   const mockInputs = [
@@ -35,36 +36,90 @@ describe('TaskIoForm.vue', () => {
     {id: 2, name: 'input2', type: {id: 'number'}, default: 4.2},
   ];
 
-  let wrapper;
+  const mockOtherTask = {
+    namespace: 'another-mocked-namespace',
+    version: '0.2.3',
+    fetchOutputs: jest.fn(),
+  };
 
-  beforeEach(() => {
-    Task.fetchTaskInputs.mockResolvedValue(mockInputs);
-    Task.createTaskRun.mockResolvedValue({id: 123});
-    Task.batchProvisionTask.mockResolvedValue();
-    Task.runTask.mockResolvedValue({id: 123});
+  const mockOtherInputs = [
+    {id: 3, name: 'other1', type: {id: 'string'}, default: 'default-value'},
+    {id: 4, name: 'other2', type: {id: 'int'}, default: 42},
+  ];
 
-    wrapper = shallowMount(TaskIoForm, {
-      localVue,
-      mocks: {
-        $t: (message) => message,
-      },
+  const createWrapper = (overrides = {}) => {
+    return shallowMount(TaskIoForm, {
       propsData: {
         task: mockTask,
         projectId: 1,
+        ...overrides.propsData,
+      },
+      mocks: {
+        $t: (key) => key,
+      },
+      stubs: {
+        'b-button': {
+          template: '<button><slot /></button>',
+        },
+        'b-field': true,
       },
     });
+  };
+
+  const createExpectedInputs = (inputs) => {
+    return inputs.reduce((acc, {name, type, default: value}) => {
+      acc[name] = {type, value};
+      return acc;
+    }, {});
+  };
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
-  it('The component should be rendered correctly', () => {
+  it('should render translated text', () => {
+    Task.fetchTaskInputs.mockResolvedValue(mockInputs);
+
+    const wrapper = createWrapper();
+
     const headers = wrapper.findAll('h3');
     expect(headers.length).toBe(1);
     expect(headers.at(0).text()).toBe('app-engine.ae-run-task');
 
-    expect(wrapper.findAllComponents(AppEngineField).length).toBe(mockInputs.length);
-
-    const buttons = wrapper.findAll('b-button-stub');
+    const buttons = wrapper.findAll('button');
     expect(buttons.length).toBe(2);
     expect(buttons.at(0).text()).toBe('button-clear');
     expect(buttons.at(1).text()).toBe('app-engine.ae-run-task');
+  });
+
+  describe('task input form', () => {
+    it('should initialise inputs with initial task', async () => {
+      Task.fetchTaskInputs.mockResolvedValue(mockInputs);
+
+      const wrapper = createWrapper();
+
+      await flushPromises();
+
+      const expectedTaskInputs = createExpectedInputs(mockInputs);
+
+      expect(wrapper.vm.taskInputs).toStrictEqual(mockInputs);
+      expect(wrapper.vm.inputs).toStrictEqual(expectedTaskInputs);
+    });
+
+    it('should change inputs when task changes', async () => {
+      Task.fetchTaskInputs.mockResolvedValueOnce(mockInputs);
+      Task.fetchTaskInputs.mockResolvedValueOnce(mockOtherInputs);
+
+      const wrapper = createWrapper();
+      await flushPromises();
+
+      await wrapper.setProps({task: mockOtherTask});
+      await flushPromises();
+
+      const expectedTaskInputs = createExpectedInputs(mockOtherInputs);
+
+      expect(wrapper.vm.taskInputs).toStrictEqual(mockOtherInputs);
+      expect(wrapper.vm.inputs).toStrictEqual(expectedTaskInputs);
+    });
   });
 });

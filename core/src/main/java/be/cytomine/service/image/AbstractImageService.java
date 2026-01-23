@@ -117,6 +117,12 @@ public class AbstractImageService extends ModelService {
         return abstractImage;
     }
 
+    public Optional<AbstractImage> find(String originalFileName) {
+        Optional<AbstractImage> abstractImage = abstractImageRepository.findByOriginalFilename(originalFileName);
+        abstractImage.ifPresent(image -> securityACLService.check(image.container(),READ));
+        return abstractImage;
+    }
+
     public Optional<AbstractImage> find(Long id, String authHeader) {
         Optional<AbstractImage> abstractImage = abstractImageRepository.findById(id);
         String token = authHeader.replace("Bearer ", "");

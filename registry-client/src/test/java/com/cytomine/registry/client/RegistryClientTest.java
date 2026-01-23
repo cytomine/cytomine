@@ -1,7 +1,5 @@
 package com.cytomine.registry.client;
 
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -10,85 +8,115 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.LoggerContext;
-import com.cytomine.registry.client.http.resp.CatalogResp;
-import com.cytomine.registry.client.utils.JsonUtil;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.slf4j.LoggerFactory;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.utility.DockerImageName;
 
-class RegistryClientTest {
+import com.cytomine.registry.client.http.resp.CatalogResp;
 
-    @BeforeAll
-    static void init() throws IOException {
-        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-        Logger logger = loggerContext.getLogger("ROOT");
-        logger.setLevel(Level.DEBUG);
-        RegistryClient.config("http://registry:5000");
+public class RegistryClientTest {
+    private GenericContainer<?> registryContainer;
+    private String registryUrl;
+
+    @BeforeEach
+    void setUp() throws IOException {
+        registryContainer = new GenericContainer<>(DockerImageName.parse(TestConfig.REGISTRY_IMAGE))
+                .withExposedPorts(TestConfig.REGISTRY_PORT)
+                .withEnv("REGISTRY_STORAGE_DELETE_ENABLED", "true");
+        registryContainer.start();
+
+        registryUrl = String.format("http://%s:%d",
+                registryContainer.getHost(),
+                registryContainer.getMappedPort(TestConfig.REGISTRY_PORT));
+
+        RegistryClient.config(registryUrl);
+
         ClassLoader classLoader = RegistryClientTest.class.getClassLoader();
         RegistryClient.push(classLoader.getResourceAsStream("postomine.tar"), "postomine:1.3");
     }
 
+    @AfterEach
+    void tearDown() {
+        if (registryContainer != null) {
+            registryContainer.stop();
+        }
+    }
+
     @Test
-    void digest() throws Exception {
+    void shouldReturnValidDigestForExistingImage() throws Exception {
         Optional<String> digest = RegistryClient.digest("postomine:1.3");
         Assertions.assertTrue(digest.get().startsWith("sha256:"));
     }
 
     @Test
-    void tags() throws Exception {
+    void shouldReturnAllTagsForRepository() throws Exception {
         List<String> tags = RegistryClient.tags("postomine");
+
+        Assertions.assertFalse(tags.isEmpty(), "Tags list should not be empty");
         Assertions.assertTrue(tags.contains("1.3"));
     }
 
     @Test
-    @Disabled
-    void dockerIOPullPush() throws IOException {
+    void shouldPullImageByDigestAndPushWithNewTag() throws Exception {
+        Optional<String> originalDigest = RegistryClient.digest("postomine:1.3");
+        Assertions.assertTrue(originalDigest.isPresent());
+
         Path path = Files.createTempFile(UUID.randomUUID().toString(), ".tar");
-        RegistryClient.pull("registry@sha256" +
-            ":cc6393207bf9d3e032c4d9277834c1695117532c9f7e8c64e7b7adcda3a85f39", path.toString());
-        Assertions.assertTrue(Files.exists(path));
-        InputStream stream = new ByteArrayInputStream(path.toString().getBytes());
-        RegistryClient.push(stream, System.getenv("DOCKER_USERNAME") + "/registry");
-        Assertions.assertTrue(RegistryClient.digest(System.getenv("DOCKER_USERNAME") + "/registry"
-        ).isPresent());
 
+        try {
+            RegistryClient.pull("postomine@" + originalDigest.get(), path.toString());
+            Assertions.assertTrue(Files.exists(path));
+
+            InputStream stream = Files.newInputStream(path);
+
+            RegistryClient.push(stream, "postomine:copied");
+
+            Optional<String> copiedDigest = RegistryClient.digest("postomine:copied");
+
+            Assertions.assertTrue(copiedDigest.isPresent());
+            Assertions.assertTrue(copiedDigest.get().startsWith("sha256:"));
+            Assertions.assertEquals(originalDigest.get(), copiedDigest.get());
+        } finally {
+            Files.deleteIfExists(path);
+        }
     }
 
     @Test
-    @Disabled
-    void dockerIOCopy() throws IOException {
-        RegistryClient.copy("registry@sha256" +
-                ":712c58f0d738ba95788d2814979028fd648a37186ae0dd4141f786125ba6d680",
-            System.getenv("DOCKER_USERNAME") + "/registry");
-        Assertions.assertTrue(RegistryClient.digest(System.getenv("DOCKER_USERNAME") + "/registry"
-        ).isPresent());
+    void shouldCopyImageFromDigestToNewRepository() throws Exception {
+        Optional<String> originalDigest = RegistryClient.digest("postomine:1.3");
+        Assertions.assertTrue(originalDigest.isPresent());
+
+        String sourceImage = "postomine@" + originalDigest.get();
+        String targetImage = "postomine-copy:latest";
+
+        RegistryClient.copy(sourceImage, targetImage);
+
+        Optional<String> copiedDigest = RegistryClient.digest(targetImage);
+
+        Assertions.assertTrue(copiedDigest.isPresent());
+        Assertions.assertEquals(originalDigest.get(), copiedDigest.get());
     }
 
     @Test
-    void registryPullPush() throws IOException {
-        Path path = Files.createTempFile("postmine", ".tar");
-        RegistryClient.pull("postomine:1.3", path.toString());
-        Assertions.assertTrue(Files.exists(path));
-        InputStream stream = new FileInputStream(path.toString());
-        RegistryClient.push(stream, "postomine:1.4");
-        Assertions.assertEquals(
-            RegistryClient.digest("postomine:1.3").get(),
-            RegistryClient.digest("postomine:1.4").get()
-        );
-        Files.delete(path);
+    void shouldReturnCatalogWithRepositories() throws IOException {
+        int pageSize = 10;
+        String lastRepository = "";
+
+        CatalogResp catalogResp = RegistryClient.catalog(registryUrl, pageSize, lastRepository);
+
+        Assertions.assertNotNull(catalogResp);
+        Assertions.assertNotNull(catalogResp.getRepositories());
+        Assertions.assertTrue(catalogResp.getRepositories().contains("postomine"));
     }
 
     @Test
-    void registryCatalog() {
-        Assertions.assertDoesNotThrow(() -> {
-            CatalogResp catalogResp = RegistryClient.catalog("http://registry:5000", 10, "test");
-            System.out.println(JsonUtil.toJson(catalogResp));
-            Assertions.assertNotNull(catalogResp);
-        });
+    void shouldDeleteImageTag() throws IOException {
+        RegistryClient.delete("postomine:1.3");
+
+        Optional<String> originalDigest = RegistryClient.digest("postomine:1.3");
+        Assertions.assertTrue(originalDigest.isEmpty());
     }
 }

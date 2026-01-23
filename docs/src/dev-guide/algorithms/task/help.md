@@ -44,7 +44,7 @@ otherwise you can use
 ```
 docker compose exec -it k3s kubectl -n app-engine-tasks get pods
 ```
-3. To check the logs of the app/algorithm inside the pod, `<name-of-pod>` comes from name column of the command number 2 above
+3. To check the logs of the app inside the pod, `<name-of-pod>` comes from name column of the command number 2 above
 ```
 kubectl --kubeconfig=./.kube/shared/config -n app-engine-tasks logs <name-of-pod>
 ```

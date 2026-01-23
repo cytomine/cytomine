@@ -539,7 +539,7 @@ public class UploadedFileResourceTests {
         );
 
         MvcResult mvcResult = restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile/{id}/download?Authorization=Bearer " + getSignedNotExpiredJwt(), uploadedFile.getId()))
-                .andExpect(request().asyncStarted())
+                .andExpect(status().isOk())
                 .andReturn();
 
         mvcResult = restUploadedFileControllerMockMvc

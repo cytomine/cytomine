@@ -729,6 +729,7 @@ notif-success-user-update,User successfully updated,L'utilisateur a bien été m
 notif-unexpected-error,Unexpected error,Une erreur inattendue s'est produite,Se ha producido un error inesperado,Er is een onverwachte fout opgetreden
 notif-warn-ontology-tree-order-not-persisted,The order of children in the ontology tree is not persisted in database,L'ordre des enfants dans l'arborescence n'est pas sauvegardée dans la base de données,La jerarquía de términos dentro de la ontología no se mantiene en la base de datos.,De volgorde van de kinderen in de stamboom wordt niet opgeslagen in de database
 notify-error-app-deletion,Failed to delete the app,Échec de la suppression de l'application,Error al eliminar la aplicación,Kan de app niet verwijderen
+notify-error-app-deletion-forbidden,Only admin can delete apps,Seul l'administrateur peut supprimer des applications,Solo el administrador puede eliminar aplicaciones,Alleen admin kan apps verwijderen
 notify-error-app-installation,Failed to install the app,Échec de l'installation de l'application,Error al instalar la aplicación,Installatie van de app mislukt
 notify-error-empty-list,The list is empty,La liste est vide,La lista está vacía,De lijst is leeg
 notify-error-not-enough-item,Not enough items provided,Pas assez d'éléments fournis,No se han proporcionado suficientes elementos,Niet genoeg items verstrekt

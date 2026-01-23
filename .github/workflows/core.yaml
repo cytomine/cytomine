@@ -66,7 +66,7 @@ jobs:
         uses: actions/upload-artifact@v6
         with:
           name: test-results
-          path: core/build/test-results/
+          path: core/build/reports/
           retention-days: 7
 
       - name: Upload Java Code Coverage (JaCoCo)

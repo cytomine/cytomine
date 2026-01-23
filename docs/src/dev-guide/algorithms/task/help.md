@@ -57,7 +57,7 @@ docker compose exec -it k3s kubectl -n app-engine-tasks logs <name-of-pod>
 
 1. For provisioning issues, check the logs of the task run in app-engine commands 1 above.
 2. For scheduling issues, check the logs of `K3s` using the command number 2 above.
-3. For algorithm issues, check the logs of the app/algorithm inside the pod using the command number 3 above.
+3. For app issues, check the logs of the app/algorithm inside the pod using the command number 3 above.
 
 ## Frequently Asked Questions
 

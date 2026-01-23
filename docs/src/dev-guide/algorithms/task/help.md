@@ -10,6 +10,9 @@ App Engine and its Task system are still in BETA. Therefore, all information pre
 ## How To Debug
 
 #### Tasks run steps :
+
+Check out [How to run a task](/user-guide/getting-started#run-a-task)
+
 1. Select the task you want to run. (drop down menu)
 2. select inputs (by entering the values or selecting them from cytomine)
 2. provision task inputs.

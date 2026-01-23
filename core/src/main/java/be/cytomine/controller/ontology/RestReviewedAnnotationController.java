@@ -275,7 +275,6 @@ public class RestReviewedAnnotationController extends RestCytomineController {
             @RequestParam String terms,
             @RequestParam Optional<String> reviewUsers
     ) throws IOException {
-        System.out.println("D1");
         Project project = projectService.find(idProject)
                 .orElseThrow(() -> new ObjectNotFoundException("Project", idProject));
         String users = reviewUsers.filter(s -> !s.isBlank())

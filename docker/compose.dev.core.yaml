@@ -7,9 +7,7 @@ services:
     ports:
       - "${DEV_CORE_PORT:-8080}:8080"
       - "${DEV_SSH_CORE_PORT:-10022}:22"
-    command: []
     entrypoint: ["/opt/gradle/bin/gradle", "bootRun"]
-    #command: ["/bin/sh"]
     stdin_open: true
     tty: true
     volumes:

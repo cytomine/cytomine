@@ -226,7 +226,10 @@ export default {
       let id = (this.currentAccount.isDeveloper) ? ` (${this.$t('id')}: ${layer.id})` : '';
 
       let indexLayer = this.indexLayers.find(index => index.user === layer.id) || {};
-      return `${layer.fullName}${id} (${indexLayer.countAnnotation || 0})`;
+
+      let displayName = String(layer.fullName || '').replace(/\s*\([^)]*\)\s*$/, '').trim();
+
+      return `${displayName}${id} (${indexLayer.countAnnotation || 0})`;
     },
 
     canDraw(layer) {

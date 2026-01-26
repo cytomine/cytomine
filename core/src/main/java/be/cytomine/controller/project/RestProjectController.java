@@ -3,7 +3,6 @@ package be.cytomine.controller.project;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -28,9 +27,6 @@ import be.cytomine.service.utils.TaskService;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.Task;
 import be.cytomine.utils.filters.SearchParameterEntry;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -228,9 +224,9 @@ public class RestProjectController extends RestCytomineController {
         return responseSuccess(JsonObject.toJsonString(projectService.findCommandHistory(projects, user, max, offset, fullData, startDate, endDate)));
     }
 
-    @GetMapping("/project/{id}/task-runs")
-    public ResponseEntity<?> getTaskRuns(@PathVariable Long id) {
-        log.debug("Request to retrieve Task Runs for project {}", id);
-        return ResponseEntity.ok(taskRunService.getTaskRuns(id));
+    @GetMapping("/project/{projectId}/image/{imageId}/task-runs")
+    public ResponseEntity<?> getTaskRuns(@PathVariable Long projectId, @PathVariable Long imageId) {
+        log.debug("GET /project/{}/image/{}/task-runs", projectId, imageId);
+        return ResponseEntity.ok(taskRunService.getTaskRuns(projectId, imageId));
     }
 }

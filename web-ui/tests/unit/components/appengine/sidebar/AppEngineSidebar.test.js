@@ -123,7 +123,7 @@ describe('AppEngineSideBar.vue', () => {
     });
   };
 
-  beforeEach(async () => {
+  beforeEach(() => {
     fetchTasksSpy.mockClear();
     fetchTaskRunsSpy.mockClear();
   });

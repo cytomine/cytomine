@@ -1,14 +1,11 @@
 package be.cytomine.appengine.unit.services;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import be.cytomine.appengine.utils.DescriptorHelper;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -18,12 +15,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.mock.web.MockHttpServletRequest;
 
 import be.cytomine.appengine.dto.handlers.filestorage.Storage;
 import be.cytomine.appengine.dto.inputs.task.TaskDescription;
 import be.cytomine.appengine.dto.inputs.task.TaskRun;
 import be.cytomine.appengine.exceptions.FileStorageException;
+import be.cytomine.appengine.exceptions.RegistryException;
 import be.cytomine.appengine.exceptions.RunTaskServiceException;
 import be.cytomine.appengine.exceptions.TaskNotFoundException;
 import be.cytomine.appengine.exceptions.TaskServiceException;
@@ -34,10 +31,11 @@ import be.cytomine.appengine.models.task.Run;
 import be.cytomine.appengine.models.task.Task;
 import be.cytomine.appengine.repositories.RunRepository;
 import be.cytomine.appengine.repositories.TaskRepository;
+import be.cytomine.appengine.services.RunService;
 import be.cytomine.appengine.services.TaskService;
 import be.cytomine.appengine.services.TaskValidationService;
 import be.cytomine.appengine.states.TaskRunState;
-import be.cytomine.appengine.utils.ArchiveUtils;
+import be.cytomine.appengine.utils.DescriptorHelper;
 import be.cytomine.appengine.utils.TaskUtils;
 import be.cytomine.appengine.utils.TestTaskBuilder;
 
@@ -55,9 +53,6 @@ import static org.mockito.Mockito.when;
 public class TaskServiceTest {
 
     @Mock
-    private ArchiveUtils archiveUtils;
-
-    @Mock
     private RegistryHandler registryHandler;
 
     @Mock
@@ -65,6 +60,9 @@ public class TaskServiceTest {
 
     @Mock
     private RunRepository runRepository;
+
+    @Mock
+    private RunService runService;
 
     @Mock
     private TaskRepository taskRepository;
@@ -346,5 +344,15 @@ public class TaskServiceTest {
         assertEquals(expectedMessage, exception.getMessage());
         verify(taskRepository, times(1)).findByNamespaceAndVersion(task.getNamespace(), task.getVersion());
         verify(runRepository, times(0)).saveAndFlush(any(Run.class));
+    }
+
+    @DisplayName("Should delete a task successfully")
+    @Test
+    void shouldDeleteTaskSuccessfully() throws FileStorageException, RegistryException, RunTaskServiceException, TaskServiceException {
+        taskService.deleteTask(task);
+
+        verify(registryHandler, times(1)).deleteImage(task.getImageName());
+        verify(storageHandler, times(1)).deleteStorage(any(Storage.class));
+        verify(taskRepository, times(1)).deleteByNamespaceAndVersion(task.getNamespace(), task.getVersion());
     }
 }

@@ -183,6 +183,16 @@ export default {
     },
     nbImages() {
       this.$eventBus.$emit('updateMapSize');
+    },
+    showAppEngineSidebar(newValue, oldValue) {
+      if (newValue === oldValue) {
+        return;
+      }
+      this.$nextTick(() => {
+        const emitUpdate = () => this.$eventBus.$emit('updateMapSize');
+        emitUpdate();
+        setTimeout(emitUpdate, 220);
+      });
     }
   },
   methods: {
@@ -325,7 +335,6 @@ export default {
 
     toggleAppEngineSidebar() {
       this.showAppEngineSidebar = !this.showAppEngineSidebar;
-      this.$nextTick(() => this.$eventBus.$emit('updateMapSize'));
     }
   },
   async created() {

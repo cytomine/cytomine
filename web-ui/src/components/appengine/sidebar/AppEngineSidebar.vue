@@ -72,6 +72,7 @@ export default {
   },
   data() {
     return {
+      initialImageLoaded: false,
       selectedTask: null,
       tasks: [],
       allTaskRuns: [],
@@ -80,7 +81,6 @@ export default {
   },
   async created() {
     await this.fetchTasks();
-    await this.fetchTaskRuns();
 
     setInterval(async () => {
       for (let taskRun of this.trackedTaskRuns) {
@@ -102,6 +102,15 @@ export default {
     currentProjectId() {
       return this.currentProject.id;
     },
+    viewerWrapper() {
+      return this.$store.getters['currentProject/currentViewer'];
+    },
+    imageWrapper() {
+      return this.viewerWrapper.images[this.viewerWrapper.activeImage];
+    },
+    image() {
+      return this.imageWrapper?.imageInstance;
+    },
   },
   methods: {
     async catchTaskRunLaunch(event) {
@@ -115,7 +124,7 @@ export default {
       this.tasks = await Task.fetchAll();
     },
     async fetchTaskRuns() {
-      let taskRuns = await TaskRun.fetchByProject(this.currentProjectId);
+      let taskRuns = await TaskRun.fetchByProjectAndImage(this.currentProjectId, this.image.id);
       taskRuns.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
       this.allTaskRuns = await Promise.all(
@@ -128,6 +137,17 @@ export default {
     getTask(taskRun) {
       return this.tasks.find(task => task.id === taskRun.task.id);
     }
+  },
+  watch: {
+    image: {
+      immediate: true,
+      async handler(newImage) {
+        if (newImage?.id && !this.initialImageLoaded) {
+          this.initialImageLoaded = true;
+          await this.fetchTaskRuns();
+        }
+      }
+    },
   },
 };
 </script>

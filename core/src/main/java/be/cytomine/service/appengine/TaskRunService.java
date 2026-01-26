@@ -8,7 +8,6 @@ import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
-import be.cytomine.dto.appengine.task.TaskDescription;
 import be.cytomine.dto.appengine.task.TaskRunDetail;
 import be.cytomine.dto.appengine.task.TaskRunOutputResponse;
 import be.cytomine.dto.appengine.task.TaskRunResponse;
@@ -183,15 +182,22 @@ public class TaskRunService {
         log.info("Deleted all task runs associated to task '{}'", taskId);
     }
 
-    public List<TaskRunDetail> getTaskRuns(Long projectId) {
+    public List<TaskRunDetail> getTaskRuns(Long projectId, Long imageId) {
         User currentUser = currentUserService.getCurrentUser();
         Project project = projectService.find(projectId)
             .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
 
+        ImageInstance image = imageInstanceService.find(imageId)
+            .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", imageId));
+
+        if (!image.getProject().getId().equals(projectId)) {
+            throw new ObjectNotFoundException("ImageInstance in project", imageId);
+        }
+
         securityACLService.checkUser(currentUser);
         securityACLService.check(project, READ);
 
-        List<TaskRun> taskRuns = taskRunRepository.findAllByProjectId(projectId);
+        List<TaskRun> taskRuns = taskRunRepository.findAllByProjectIdAndImageId(projectId, imageId);
 
         return taskRuns.stream()
             .map(taskRun -> new TaskRunDetail(

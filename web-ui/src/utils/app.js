@@ -18,7 +18,12 @@ export async function deleteApp(app, notify, t) {
     notify({type: 'success', text: t('notify-success-app-deletion')});
   } catch (error) {
     console.error('Failed to delete app:', error);
-    notify({type: 'error', text: t('notify-error-app-deletion')});
+
+    if (error.response?.status === 403) {
+      notify({type: 'error', text: t('notify-error-app-deletion-forbidden')});
+    } else {
+      notify({type: 'error', text: t('notify-error-app-deletion')});
+    }
   }
 }
 

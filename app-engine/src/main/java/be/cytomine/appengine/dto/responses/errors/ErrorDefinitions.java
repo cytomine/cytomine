@@ -59,6 +59,7 @@ public class ErrorDefinitions {
         codes.put(ErrorCode.REGISTRY_PUSHING_TASK_IMAGE_FAILED, new MessageCode("APPE-registry-push-failed", "pushing task image to registry failed in registry"));
         codes.put(ErrorCode.RUN_NOT_FOUND, new MessageCode("APPE-internal-run-not-found-error", "Run not found."));
         codes.put(ErrorCode.STORAGE_CREATING_STORAGE_FAILED, new MessageCode("APPE-storage-storage-creation-error", "creating storage failed in storage service"));
+        codes.put(ErrorCode.STORAGE_DELETE_FAILED, new MessageCode("APPE-storage-deletion-error", "Failed to delete storage."));
         codes.put(ErrorCode.STORAGE_READING_FILE_FAILED, new MessageCode("APPE-storage-reading-file-error", "failed to read file from storage service"));
         codes.put(ErrorCode.STORAGE_STORING_INPUT_FAILED, new MessageCode("APPE-storage-storing-input-failed", "failed to store input file in storage service"));
         codes.put(ErrorCode.STORAGE_STORING_TASK_DEFINITION_FAILED, new MessageCode("APPE-storage-definition-storage-error", "storing task definition failed in storage service"));

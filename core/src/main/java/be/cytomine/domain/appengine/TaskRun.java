@@ -1,5 +1,7 @@
 package be.cytomine.domain.appengine;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -33,6 +35,9 @@ public class TaskRun extends CytomineDomain {
     @Column(nullable = false)
     @Convert(converter = UUIDConverter.class)
     private UUID taskRunId;
+
+    @OneToMany(mappedBy = "taskRun", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TaskRunLayer> taskRunLayers = new ArrayList<>();
 
     public static JsonObject getDataFromDomain(CytomineDomain domain) {
         JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);

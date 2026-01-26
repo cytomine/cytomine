@@ -6,11 +6,18 @@ from typing import List, Optional
 
 import shapely
 from pydicom.multival import MultiValue
+from pydicom.valuerep import DSfloat
 from wsidicom.graphical_annotations import Point as WsiPoint
 from wsidicom.graphical_annotations import Polygon as WsiPolygon
 from wsidicom.wsidicom import WsiDicom
 
-from pims.formats.utils.abstract import AbstractChecker, AbstractParser, AbstractReader, AbstractFormat, CachedDataPath
+from pims.formats.utils.abstract import (
+    AbstractChecker,
+    AbstractParser,
+    AbstractReader,
+    AbstractFormat,
+    CachedDataPath,
+)
 from pims.formats.utils.histogram import DefaultHistogramReader
 from pims.formats.utils.structures.annotations import ParsedMetadataAnnotation
 from pims.formats.utils.structures.metadata import ImageMetadata, ImageChannel
@@ -18,6 +25,19 @@ from pims.formats.utils.structures.pyramid import Pyramid
 from pims.utils import UNIT_REGISTRY
 from pims.utils.dtypes import np_dtype
 from pims.utils.types import parse_float
+
+
+EXCLUDED_TAGS = [
+    "ICCProfile",
+]
+
+
+def sanitize(value):
+    if isinstance(value, DSfloat):
+        return float(value)
+    if isinstance(value, MultiValue):
+        return [sanitize(v) for v in value]
+    return value
 
 
 def dictify(ds):
@@ -164,9 +184,10 @@ class WSIDicomParser(AbstractParser):
                 name = f"{tag.group:04x}_{tag.element:04x}"  # noqa
             name = name.replace(' ', '')
 
-            value = data_element.value
-            if type(value) is MultiValue:
-                value = list(value)
+            if name in EXCLUDED_TAGS:
+                continue
+
+            value = sanitize(data_element.value)
             store.set(name, value, namespace="DICOM")
 
         return store

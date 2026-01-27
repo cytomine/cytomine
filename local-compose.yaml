@@ -1,12 +1,9 @@
-x-version-env: &version-env
-  VERSIONS_CYTOMINE_COMMERCIAL: 2025.1
-
 services:
   mongo:
     image: cytomine/mongo:latest
     restart: unless-stopped
-    volumes:
-      - ${DATA_PATH:-./data}/mongo:/data/db
+#    volumes:
+#      - ${DATA_PATH:-./data}/mongo:/data/db
     environment:
       MONGO_INITDB_ROOT_PASSWORD: password
       MONGO_INITDB_ROOT_USERNAME: admin
@@ -17,10 +14,10 @@ services:
   postgis:
     image: cytomine/postgis:latest
     restart: unless-stopped
-    volumes:
-      - ${DATA_PATH:-./data}/postgis/data:/var/lib/postgresql/data
+#    volumes:
+#      - ${DATA_PATH:-./data}/postgis/data:/var/lib/postgresql/data
     ports:
-      - 5432:5432
+    - 5432:5432
     environment:
       APPENGINE_DB: appengine
       APPENGINE_PASSWORD: password
@@ -38,8 +35,8 @@ services:
   registry:
     image: registry:2.8.3
     restart: unless-stopped
-    volumes:
-      - ${DATA_PATH:-./data}/registry:/var/lib/registry
+#    volumes:
+#      - ${DATA_PATH:-./data}/registry:/var/lib/registry
     environment:
       REGISTRY_STORAGE_DELETE_ENABLED: true
     networks:
@@ -49,9 +46,11 @@ services:
   redis:
     image: redis:7.2
     command: --port 6380
+    ports:
+      - 6380:6380
     restart: unless-stopped
-    volumes:
-      - ${DATA_PATH:-./data}/redis:/data
+#    volumes:
+#      - ${DATA_PATH:-./data}/redis:/data
     networks:
       host_network:
         ipv4_address: 172.16.238.5
@@ -68,20 +67,22 @@ services:
     restart: unless-stopped
     volumes:
       - /etc/localtime:/etc/localtime
-    environment:
-      <<: [*version-env]
     networks:
       host_network:
         ipv4_address: 172.16.238.7
+    environment:
+      URL_CORE: 172.16.238.11
+    ports:
+    -  80:80
 
   pims:
     image: cytomine/pims:latest
     restart: unless-stopped
     depends_on:
       - pims-cache
-    volumes:
-      - ${IMPORT_PATH:-./data/dataset}:/dataset
-      - ${DATA_PATH:-./data}/images:/data/images
+#    volumes:
+#      - ${IMPORT_PATH:-./data/dataset}:/dataset
+#      - ${DATA_PATH:-./data}/images:/data/images
     environment:
       API_BASE_PATH: ${IMS_API_BASE_PATH:-/ims}
       CACHE_ENABLED: true
@@ -133,6 +134,8 @@ services:
     networks:
       host_network:
         ipv4_address: 172.16.238.9
+    ports:
+      - 80:80
 
   app-engine:
     image: cytomine/app-engine:latest
@@ -179,7 +182,7 @@ services:
     environment:
       IMAGE_SERVER_PRIVATE_KEY: d70607f5-c478-403c-be11-3dbc1716d1cf
       IMAGE_SERVER_PUBLIC_KEY: 9a8b8369-2446-44cb-b0af-604a74e1dcdb
-      IAM_URL: http://nginx
+      IAM_URL: http://172.16.238.9
       PIMS_URL: http://nginx
       CBIR_URL: http://nginx
       APPENGINE_API_URL: http://host.docker.internal:8080/
@@ -236,35 +239,6 @@ services:
       host_network:
         ipv4_address: 172.16.238.13
 
-  nginx:
-    image: cytomine/nginx:latest
-    restart: unless-stopped
-    ports:
-      - 80:80
-    depends_on:
-      - core
-      - iam
-      - pims
-      - web-ui
-    environment:
-      <<: [*version-env]
-      IMAGES_CORE: cytomine/core:latest
-      IMAGES_MONGO: cytomine/mongo:latest
-      IMAGES_NGINX: cytomine/nginx:latest
-      IMAGES_PIMS: cytomine/pims:latest
-      IMAGES_PIMS_CACHE: redis:7.2
-      IMAGES_POSTGIS: cytomine/postgis:latest
-      IMAGES_WEB_UI: cytomine/web-ui:latest
-      INTERNAL_URLS_APPENGINE: host.docker.internal:8080
-      INTERNAL_URLS_IAM: iam:8100
-      INTERNAL_URLS_WEB_UI: web-ui
-      URLS_SCHEME: ${URLS_SCHEME:-http}
-    networks:
-      host_network:
-        ipv4_address: 172.16.238.14
-    extra_hosts:
-    - "host.docker.internal:172.16.238.1"
-
   # https://github.com/k3s-io/k3s/blob/3854eb56d4b8a183a1f8261aebd372111378a00f/docker-compose.yml
   k3s:
     image: "rancher/k3s:v1.30.14-rc3-k3s3"
@@ -296,14 +270,6 @@ services:
     networks:
       host_network:
         ipv4_address: 172.16.238.15
-  ubuntu:
-    image: "curlimages/curl"
-    command: "sleep 3000"
-    networks:
-      host_network:
-        ipv4_address: 172.16.238.16
-    extra_hosts:
-    - "host.docker.internal:172.16.238.1"
 
 volumes:
   k3s-server: {}
@@ -316,6 +282,3 @@ networks:
       driver: default
       config:
         - subnet: 172.16.238.0/24
-#  host:
-#    name: host
-#    external: true

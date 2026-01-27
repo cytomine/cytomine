@@ -1,5 +1,26 @@
 package be.cytomine.controller.ontology;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.locationtech.jts.io.ParseException;
+import org.springframework.cloud.gateway.mvc.ProxyExchange;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.ontology.ReviewedAnnotation;
@@ -20,17 +41,11 @@ import be.cytomine.utils.AnnotationListingBuilder;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.Task;
-import org.locationtech.jts.io.ParseException;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.gateway.mvc.ProxyExchange;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.util.*;
-
-import static org.springframework.web.bind.annotation.RequestMethod.*;
+import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
 @RestController
 @RequestMapping("/api")
@@ -258,10 +273,7 @@ public class RestReviewedAnnotationController extends RestCytomineController {
             @PathVariable Long idProject,
             @RequestParam String format,
             @RequestParam String terms,
-            @RequestParam Optional<String> reviewUsers,
-            @RequestParam String images,
-            @RequestParam(required = false) Long beforeThan,
-            @RequestParam(required = false) Long afterThan
+            @RequestParam Optional<String> reviewUsers
     ) throws IOException {
         Project project = projectService.find(idProject)
                 .orElseThrow(() -> new ObjectNotFoundException("Project", idProject));

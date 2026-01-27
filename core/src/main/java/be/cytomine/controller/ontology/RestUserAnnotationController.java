@@ -1,5 +1,27 @@
 package be.cytomine.controller.ontology;
 
+import java.io.IOException;
+import java.util.Date;
+import java.util.Optional;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.locationtech.jts.io.ParseException;
+import org.springframework.cloud.gateway.mvc.ProxyExchange;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
@@ -21,17 +43,6 @@ import be.cytomine.service.security.UserService;
 import be.cytomine.utils.AnnotationListingBuilder;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.locationtech.jts.io.ParseException;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.gateway.mvc.ProxyExchange;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
-import java.util.*;
 
 @RestController
 @RequestMapping("/api")
@@ -102,10 +113,7 @@ public class RestUserAnnotationController extends RestCytomineController {
             @PathVariable Long idProject,
             @RequestParam String format,
             @RequestParam String terms,
-            @RequestParam Optional<String> users,
-            @RequestParam String images,
-            @RequestParam(required = false) Long beforeThan,
-            @RequestParam(required = false) Long afterThan
+            @RequestParam Optional<String> users
     ) throws IOException {
         Project project = projectService.find(idProject)
                 .orElseThrow(() -> new ObjectNotFoundException("Project", idProject));

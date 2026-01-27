@@ -16,17 +16,17 @@ package be.cytomine.repository;
 * limitations under the License.
 */
 
-import be.cytomine.domain.image.ImageInstance;
-import be.cytomine.exceptions.WrongArgumentException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import jakarta.persistence.EntityManager;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
+import be.cytomine.domain.image.ImageInstance;
+import be.cytomine.exceptions.WrongArgumentException;
 
 public class ReviewedAnnotationListing extends AnnotationListing {
 
@@ -176,7 +176,7 @@ public class ReviewedAnnotationListing extends AnnotationListing {
 
     String buildExtraRequest() {
 
-        if (kmeansValue == 3 && image != null && bbox != null) {
+        if (kmeansValue == 3 && bbox.isPresent()) {
             /**
              * We will sort annotation so that big annotation that covers a lot of annotation comes first (appear behind little annotation so we can select annotation behind other)
              * We compute in 'gc' the set of all other annotation that must be list
@@ -194,7 +194,7 @@ public class ReviewedAnnotationListing extends AnnotationListing {
             double imageWidth = imageInstance.getBaseImage().getWidth();
             Geometry bboxLocal = null;
             try {
-                bboxLocal = new WKTReader().read(bbox);
+                bboxLocal = new WKTReader().read(bbox.get());
             } catch (ParseException e) {
                 throw new WrongArgumentException("Annotation " + bbox + " cannot be parsed");
             }

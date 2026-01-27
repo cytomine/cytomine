@@ -73,19 +73,17 @@ jobs:
 
   validate-openapi:
     runs-on: self-hosted
+    container:
+      image: registry.cytomine.org/docker/redocly/cli:1.10.6
+      env:
+        OPENAPI_PATH: ./app-engine/src/test/resources/spec/api/openapi_spec.v0.1.0.yml
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6.0.2
 
       - name: Validate OpenAPI specifications
-        uses: addnab/docker-run-action@v3
-        with:
-          image: registry.cytomine.org/docker/redocly/cli:1.10.6
-          run: 'redocly lint ${{ env.OPENAPI_PATH }}'
-          options: -v ${{ github.workspace }}/app-engine:/app-engine -w /app-engine
-        env:
-          OPENAPI_PATH: /app-engine/src/test/resources/spec/api/openapi_spec.v0.1.0.yml
+        run: 'redocly lint ${{ env.OPENAPI_PATH }}'
 
   unit-tests:
     runs-on: self-hosted

@@ -82,6 +82,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6.0.2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Validate OpenAPI specifications
         run: 'redocly lint ${{ env.OPENAPI_PATH }}'

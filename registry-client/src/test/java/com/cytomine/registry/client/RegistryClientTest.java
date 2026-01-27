@@ -23,14 +23,14 @@ public class RegistryClientTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        registryContainer = new GenericContainer<>(DockerImageName.parse("registry:2.8.3"))
-                .withExposedPorts(5000)
+        registryContainer = new GenericContainer<>(DockerImageName.parse(TestConfig.REGISTRY_IMAGE))
+                .withExposedPorts(TestConfig.REGISTRY_PORT)
                 .withEnv("REGISTRY_STORAGE_DELETE_ENABLED", "true");
         registryContainer.start();
 
         registryUrl = String.format("http://%s:%d",
                 registryContainer.getHost(),
-                registryContainer.getMappedPort(5000));
+                registryContainer.getMappedPort(TestConfig.REGISTRY_PORT));
 
         RegistryClient.config(registryUrl);
 
@@ -110,5 +110,13 @@ public class RegistryClientTest {
         Assertions.assertNotNull(catalogResp);
         Assertions.assertNotNull(catalogResp.getRepositories());
         Assertions.assertTrue(catalogResp.getRepositories().contains("postomine"));
+    }
+
+    @Test
+    void shouldDeleteImageTag() throws IOException {
+        RegistryClient.delete("postomine:1.3");
+
+        Optional<String> originalDigest = RegistryClient.digest("postomine:1.3");
+        Assertions.assertTrue(originalDigest.isEmpty());
     }
 }

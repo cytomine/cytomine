@@ -77,7 +77,8 @@ jobs:
       image: registry.cytomine.org/docker/redocly/cli:1.10.6
       env:
         OPENAPI_PATH: ./app-engine/src/test/resources/spec/api/openapi_spec.v0.1.0.yml
-
+      # https://stackoverflow.com/a/68761652
+      options: --user root
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6.0.2

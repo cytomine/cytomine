@@ -72,7 +72,7 @@ jobs:
           --all-errors
 
   validate-openapi:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     container:
       image: registry.cytomine.org/docker/redocly/cli:1.10.6
       env:

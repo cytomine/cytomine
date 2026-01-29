@@ -62,5 +62,5 @@ export function isNumeric(str) {
 }
 
 export function removeUsername(name) {
-  return name;
+  return name.replace(/\s*\([^)]*\)\s*$/, '').trim();
 }

@@ -199,7 +199,7 @@
         <tr>
           <td><strong>{{$t('created-by')}}</strong></td>
           <td>
-            {{ creator.fullName }}
+            {{ creatorName }}
           </td>
         </tr>
         <template v-if="!isReviewedAnnotation">
@@ -220,7 +220,7 @@
           <tr>
             <td><strong>{{$t('reviewed-by')}}</strong></td>
             <td>
-              {{ reviewer.fullName }}
+              {{ reviewerName }}
             </td>
           </tr>
           <tr>
@@ -303,6 +303,7 @@ import AnnotationLinksPreview from '@/components/annotations/AnnotationLinksPrev
 import {appendShortTermToken} from '@/utils/token-utils.js';
 import ChannelName from '@/components/viewer/ChannelName';
 import constants from '@/utils/constants.js';
+import {removeUsername} from '@/utils/string-utils';
 
 export default {
   name: 'annotations-details',
@@ -354,6 +355,9 @@ export default {
     creator() {
       return this.users.find(user => user.id === this.annotation.user) || {};
     },
+    creatorName() {
+      return removeUsername(this.creator.fullName || '');
+    },
     isReviewedAnnotation() {
       return this.annotation.type === AnnotationType.REVIEWED;
     },
@@ -362,6 +366,9 @@ export default {
         return this.users.find(user => user.id === this.annotation.reviewUser) || {};
       }
       return null;
+    },
+    reviewerName() {
+      return removeUsername(this.reviewer.fullName || '');
     },
     canEdit() {
       return this.$store.getters['currentProject/canEditAnnot'](this.annotation);

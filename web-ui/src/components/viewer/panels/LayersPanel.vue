@@ -71,7 +71,7 @@
 <script>
 import _ from 'lodash';
 import {get} from '@/utils/store-helpers';
-
+import {removeUsername} from '@/utils/string-utils';
 import {Cytomine, ProjectDefaultLayerCollection} from '@/api';
 
 export default {
@@ -227,7 +227,7 @@ export default {
 
       let indexLayer = this.indexLayers.find(index => index.user === layer.id) || {};
 
-      let displayName = String(layer.fullName || '').replace(/\s*\([^)]*\)\s*$/, '').trim();
+      let displayName = removeUsername(String(layer.fullName || ''));
 
       return `${displayName}${id} (${indexLayer.countAnnotation || 0})`;
     },

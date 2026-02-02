@@ -303,7 +303,6 @@ import AnnotationLinksPreview from '@/components/annotations/AnnotationLinksPrev
 import {appendShortTermToken} from '@/utils/token-utils.js';
 import ChannelName from '@/components/viewer/ChannelName';
 import constants from '@/utils/constants.js';
-import {removeUsername} from '@/utils/string-utils';
 
 export default {
   name: 'annotations-details',

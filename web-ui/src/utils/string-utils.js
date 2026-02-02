@@ -60,7 +60,3 @@ export function isDate(str) {
 export function isNumeric(str) {
   return !isNaN(str);
 }
-
-export function removeUsername(name) {
-  return name.replace(/\s*\([^)]*\)\s*$/, '').trim();
-}

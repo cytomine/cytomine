@@ -71,7 +71,7 @@
         <td colspan="2">
           <h5>{{$t('terms')}}</h5>
           <b-tag v-for="{term, user} in associatedTerms" :key="term.id"
-          :title="$t('associated-by', {username: user.fullName})">
+          :title="$t('associated-by', {username: user.name})">
             <cytomine-term :term="term" />
             <button v-if="canEditTerms" class="delete is-small" :title="$t('button-delete')"
               @click="removeTerm(term.id, user.id)">
@@ -199,7 +199,7 @@
         <tr>
           <td><strong>{{$t('created-by')}}</strong></td>
           <td>
-            {{ creatorName }}
+            {{ creator.name }}
           </td>
         </tr>
         <template v-if="!isReviewedAnnotation">
@@ -220,7 +220,7 @@
           <tr>
             <td><strong>{{$t('reviewed-by')}}</strong></td>
             <td>
-              {{ reviewerName }}
+              {{ reviewer.name }}
             </td>
           </tr>
           <tr>
@@ -355,9 +355,6 @@ export default {
     creator() {
       return this.users.find(user => user.id === this.annotation.user) || {};
     },
-    creatorName() {
-      return removeUsername(this.creator.fullName || '');
-    },
     isReviewedAnnotation() {
       return this.annotation.type === AnnotationType.REVIEWED;
     },
@@ -366,9 +363,6 @@ export default {
         return this.users.find(user => user.id === this.annotation.reviewUser) || {};
       }
       return null;
-    },
-    reviewerName() {
-      return removeUsername(this.reviewer.fullName || '');
     },
     canEdit() {
       return this.$store.getters['currentProject/canEditAnnot'](this.annotation);

@@ -28,6 +28,10 @@ const localVue = createLocalVue();
 localVue.use(Buefy);
 localVue.use(VueRouter);
 
+localVue.directive('click-outside', {
+  bind() {},
+  unbind() {},
+});
 localVue.filter('moment', (value) => value);
 
 const mockAnnotation = {

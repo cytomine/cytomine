@@ -34,12 +34,17 @@ localVue.directive('click-outside', {
 });
 localVue.filter('moment', (value) => value);
 
+const mockAdminUser = {
+  id: 123,
+  name: 'User Admin',
+};
+
 const mockAnnotation = {
   id: 1,
   project: 100,
   image: 200,
   slice: 300,
-  user: 1,
+  user: mockAdminUser.id,
   type: AnnotationType.USER,
   area: 1500.5,
   areaUnit: 'µm²',
@@ -85,11 +90,6 @@ const mockStore = {
   dispatch: jest.fn(),
 };
 
-const mockUsers = [
-  {id: 123, name: 'User Admin'},
-  {id: 124, name: 'Test user'},
-];
-
 describe('AnnotationDetails.vue', () => {
 
   const createWrapper = () => {
@@ -104,7 +104,10 @@ describe('AnnotationDetails.vue', () => {
         tracks: [
           {id: 20, name: 'Track 1', image: 200},
         ],
-        users: mockUsers,
+        users: [
+          mockAdminUser,
+          {id: 124, name: 'Test user'},
+        ],
         images: [
           {
             id: 200,
@@ -173,5 +176,12 @@ describe('AnnotationDetails.vue', () => {
     expect(wrapper.text()).toContain('button-view-crop');
     expect(wrapper.text()).toContain('button-copy-url');
     expect(wrapper.text()).toContain('button-delete');
+  });
+
+  it('should display the creator name of the annotation', () => {
+    const wrapper = createWrapper();
+
+    expect(wrapper.text()).toContain('created-by');
+    expect(wrapper.text()).toContain(mockAdminUser.name);
   });
 });

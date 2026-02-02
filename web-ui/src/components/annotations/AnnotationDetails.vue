@@ -71,7 +71,7 @@
         <td colspan="2">
           <h5>{{$t('terms')}}</h5>
           <b-tag v-for="{term, user} in associatedTerms" :key="term.id"
-          :title="$t('associated-by', {username: user.fullName})">
+          :title="$t('associated-by', {username: user.name})">
             <cytomine-term :term="term" />
             <button v-if="canEditTerms" class="delete is-small" :title="$t('button-delete')"
               @click="removeTerm(term.id, user.id)">
@@ -199,7 +199,7 @@
         <tr>
           <td><strong>{{$t('created-by')}}</strong></td>
           <td>
-            {{ creator.fullName }}
+            {{ creator.name }}
           </td>
         </tr>
         <template v-if="!isReviewedAnnotation">
@@ -220,7 +220,7 @@
           <tr>
             <td><strong>{{$t('reviewed-by')}}</strong></td>
             <td>
-              {{ reviewer.fullName }}
+              {{ reviewer.name }}
             </td>
           </tr>
           <tr>

@@ -72,7 +72,7 @@ const mockStore = {
         'project-explore-annotation-creation-info': true,
         'project-explore-annotation-comments': true,
       },
-      ontology: {id: 1, name: 'Test Ontology'}
+      ontology: {id: 1, name: 'Test Ontology'},
     },
     currentUser: {
       account: {isDeveloper: false},
@@ -102,7 +102,7 @@ describe('AnnotationDetails.vue', () => {
           {id: 11, name: 'Nucleus'},
         ],
         tracks: [
-          {id: 20, name: 'Track 1', image: 200}
+          {id: 20, name: 'Track 1', image: 200},
         ],
         users: mockUsers,
         images: [
@@ -122,7 +122,7 @@ describe('AnnotationDetails.vue', () => {
         profiles: [
           {image: 201},
         ],
-        showImageInfo: true,
+        showImageInfo: false,
         showChannelInfo: false,
         showComments: false,
       },
@@ -150,7 +150,7 @@ describe('AnnotationDetails.vue', () => {
         'ontology-tree': true,
         'router-link': true,
         'track-tree': true,
-      }
+      },
     });
   };
 
@@ -158,5 +158,20 @@ describe('AnnotationDetails.vue', () => {
     const wrapper = createWrapper();
 
     expect(wrapper.exists()).toBe(true);
+    expect(wrapper.text()).toContain('area');
+    expect(wrapper.text()).toContain('perimeter');
+    expect(wrapper.text()).toContain('description');
+    expect(wrapper.text()).toContain('terms');
+    expect(wrapper.text()).toContain('tags');
+    expect(wrapper.text()).toContain('properties');
+    expect(wrapper.text()).toContain('attached-files');
+    expect(wrapper.text()).toContain('similar-annotations');
+    expect(wrapper.text()).toContain('linked-annotations');
+    expect(wrapper.text()).toContain('created-by');
+    expect(wrapper.text()).toContain('created-on');
+    expect(wrapper.text()).toContain('button-center-view-on-annot');
+    expect(wrapper.text()).toContain('button-view-crop');
+    expect(wrapper.text()).toContain('button-copy-url');
+    expect(wrapper.text()).toContain('button-delete');
   });
 });

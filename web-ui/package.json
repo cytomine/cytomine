@@ -28,7 +28,7 @@
     "filesize": "^4.1.2",
     "ifvisible": "^1.1.0",
     "keycloak-js": "^24.0.4",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "npm-font-open-sans": "^1.1.0",
     "ol": "^5.3.1",
     "ol-rescale-feature": "^1.0.0",

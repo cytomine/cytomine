@@ -1,7 +1,8 @@
 import Keycloak from 'keycloak-js';
+import constants from './utils/constants';
 
 const initOptions = {
-  url: `${window.location.origin}/iam`,
+  url: constants.IAM_URL ? constants.IAM_URL : `${window.location.origin}/iam`,
   realm: 'cytomine',
   clientId: 'core',
   enableLogging: true

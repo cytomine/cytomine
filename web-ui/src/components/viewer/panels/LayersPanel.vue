@@ -71,7 +71,6 @@
 <script>
 import _ from 'lodash';
 import {get} from '@/utils/store-helpers';
-
 import {Cytomine, ProjectDefaultLayerCollection} from '@/api';
 
 export default {
@@ -226,7 +225,7 @@ export default {
       let id = (this.currentAccount.isDeveloper) ? ` (${this.$t('id')}: ${layer.id})` : '';
 
       let indexLayer = this.indexLayers.find(index => index.user === layer.id) || {};
-      return `${layer.fullName}${id} (${indexLayer.countAnnotation || 0})`;
+      return `${layer.name}${id} (${indexLayer.countAnnotation || 0})`;
     },
 
     canDraw(layer) {

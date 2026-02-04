@@ -107,8 +107,7 @@ public class TaskController {
         @PathVariable String version
     ) throws RegistryException,
             SchedulingException,
-            TaskNotFoundException,
-            TaskServiceException {
+            TaskNotFoundException {
         log.info("DELETE /tasks/{}/{}", namespace, version);
         Task task = taskService.findByNamespaceAndVersion(namespace, version)
                 .orElseThrow(() -> {

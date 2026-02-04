@@ -500,7 +500,7 @@ public class TaskService {
         return authors;
     }
 
-    private void deleteTaskStorage(Task task) throws TaskServiceException {
+    private void deleteTaskStorageIfExists(Task task) {
         String storageName = task.getStorageReference();
         try {
             log.info("Deleting storage '{}'", storageName);
@@ -508,14 +508,11 @@ public class TaskService {
             fileStorageHandler.deleteStorage(storage);
             log.info("Storage '{}' successfully deleted", storageName);
         } catch (FileStorageException e) {
-            log.error("Failed to delete storage '{}': [{}]", storageName, e.getMessage());
-            AppEngineError error = ErrorBuilder.build(ErrorCode.STORAGE_DELETE_FAILED);
-            throw new TaskServiceException(error);
+            log.error("Failed to delete storage '{}': [{}]. Skipping.", storageName, e.getMessage());
         }
     }
 
-    public void deleteTask(Task task) throws RegistryException,
-            SchedulingException, TaskServiceException {
+    public void deleteTask(Task task) throws RegistryException, SchedulingException {
         String identifier = task.getNamespace() + ":" + task.getVersion();
 
         log.info("Deleting all storage runs associated with task '{}'", identifier);
@@ -530,7 +527,7 @@ public class TaskService {
         }
 
         log.info("Deleting task '{}' storage", identifier);
-        deleteTaskStorage(task);
+        deleteTaskStorageIfExists(task);
 
         log.info("Deleting task image '{}' from registry", task.getImageName());
         registryHandler.deleteImage(task.getImageName());

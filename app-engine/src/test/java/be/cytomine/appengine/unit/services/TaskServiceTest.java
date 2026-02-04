@@ -349,7 +349,7 @@ public class TaskServiceTest {
 
     @DisplayName("Should delete a task successfully")
     @Test
-    void shouldDeleteTaskSuccessfully() throws FileStorageException, RegistryException, SchedulingException, TaskServiceException {
+    void shouldDeleteTaskSuccessfully() throws FileStorageException, RegistryException, SchedulingException {
         taskService.deleteTask(task);
 
         verify(registryHandler, times(1)).deleteImage(task.getImageName());

@@ -29,12 +29,35 @@ Cytomine installation requires about **15GB**. You need to provide enough space 
 - [Docker Compose](https://docs.docker.com/compose/) (v2.0+ recommended)
 - [Git](https://git-scm.com/) (v2.0+ recommended)
 
-### Running App in Cytomine
+### Running Apps in Cytomine
 
 ::: warning
+Ensure that the disk on which Docker is installed **must not exceed 89% utilisation** to ensure stable and reliable execution of apps in Cytomine. Insufficient available disk space may result in Docker build failures, container startup issues, or unstable runtime behaviour.
+
+> By default, the Docker Engine is installed on the root filesystem (`/`). Verify that this filesystem has adequate free space before running containers.
+
+Disk usage can be verified using the following command:
+
+```bash
+df -h
+```
+
+Example output of the command:
+```bash
+some-user:~/cytomine$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda1       937G  650G  240G  74% /
+tmpfs            32G   20M   32G   1% /dev/shm
+tmpfs           6.3G  5.3M  6.3G   1% /run
+```
+
+In this example, Docker is installed on the root filesystem (`/`), which is 74% utilised and therefore within the acceptable threshold for running Cytomine apps.
+:::
+
+::: danger
 In previous versions, MicroK8s was required for the installation. This is no longer the case.
 
-Cytomine now uses K3s, which is deployed automatically via Docker Compose. No manual installation or configuration is required anymore.
+Cytomine now uses K3s, which is deployed automatically via Docker Compose. No manual installation or configuration is required any more.
 
 If you previously installed MicroK8s only for Cytomine, you can safely remove it using the following command:
 ```bash

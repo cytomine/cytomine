@@ -50,7 +50,7 @@ jobs:
       - name: Set up node
         uses: actions/setup-node@v6
         with:
-          node-version: '16'
+          node-version: "16"
 
       - name: Install dependencies
         run: >-
@@ -106,6 +106,7 @@ jobs:
 
       - name: Trigger unit tests
         run: gradle :app-engine:test --info
+        env: TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX=registry.cytomine.org/docker/
 
       - name: Upload test reports
         if: ${{ always() }}

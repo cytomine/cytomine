@@ -442,21 +442,25 @@ public class KubernetesScheduler implements SchedulerHandler {
 
     @Override
     public void deleteRun(Run run) throws SchedulingException {
-        log.info("Delete pod with run {}", run.getId());
-
         String taskName = run.getTask().getName().toLowerCase().replaceAll("[^a-zA-Z0-9]", "");
         String podName = taskName + "-" + run.getId();
+
+        log.info("Deleting pod '{}' for run '{}'", podName, run.getId());
+
         try {
             kubernetesClient
                     .pods()
                     .inNamespace(tasksNamespace)
                     .withName(podName)
                     .delete();
-        } catch (KubernetesClientException e) {
-            throw new SchedulingException("Delete pod " + podName + " failed");
-        }
 
-        log.info("Delete pod with run {} - completed successfully", run.getId());
+            log.info("Successfully deleted pod '{}' for run '{}'", podName, run.getId());
+        } catch (KubernetesClientException e) {
+            log.error("Failed to delete pod '{}' for run '{}'", podName, run.getId(), e);
+            String errorMessage = String.format("Failed to delete pod '%s' for run '%s': %s",
+                    podName, run.getId(), e.getMessage());
+            throw new SchedulingException(errorMessage);
+        }
     }
 
     public String convertBracketsToPath(String input) {

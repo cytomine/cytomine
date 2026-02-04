@@ -440,6 +440,25 @@ public class KubernetesScheduler implements SchedulerHandler {
         log.info("Monitor: informer added");
     }
 
+    @Override
+    public void deleteRun(Run run) throws SchedulingException {
+        log.info("Delete pod with run {}", run.getId());
+
+        String taskName = run.getTask().getName().toLowerCase().replaceAll("[^a-zA-Z0-9]", "");
+        String podName = taskName + "-" + run.getId();
+        try {
+            kubernetesClient
+                    .pods()
+                    .inNamespace(tasksNamespace)
+                    .withName(podName)
+                    .delete();
+        } catch (KubernetesClientException e) {
+            throw new SchedulingException("Delete pod " + podName + " failed");
+        }
+
+        log.info("Delete pod with run {} - completed successfully", run.getId());
+    }
+
     public String convertBracketsToPath(String input) {
         if (input == null || input.isEmpty()) {
             return "";

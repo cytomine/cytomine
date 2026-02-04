@@ -30,6 +30,7 @@ import be.cytomine.appengine.exceptions.AppStoreServiceException;
 import be.cytomine.appengine.exceptions.BundleArchiveException;
 import be.cytomine.appengine.exceptions.RegistryException;
 import be.cytomine.appengine.exceptions.RunTaskServiceException;
+import be.cytomine.appengine.exceptions.SchedulingException;
 import be.cytomine.appengine.exceptions.TaskNotFoundException;
 import be.cytomine.appengine.exceptions.TaskServiceException;
 import be.cytomine.appengine.exceptions.ValidationException;
@@ -101,11 +102,12 @@ public class TaskController {
     }
 
     @DeleteMapping(value = "tasks/{namespace}/{version}")
-    public ResponseEntity<?> deleteTaskByNamespaceAndVersion(
+    public ResponseEntity<Void> deleteTaskByNamespaceAndVersion(
         @PathVariable String namespace,
         @PathVariable String version
     ) throws RegistryException,
             RunTaskServiceException,
+            SchedulingException,
             TaskNotFoundException,
             TaskServiceException {
         log.info("DELETE /tasks/{}/{}", namespace, version);
@@ -116,6 +118,7 @@ public class TaskController {
                 });
 
         taskService.deleteTask(task);
+        log.info("DELETE /tasks/{}/{} - completed successfully", namespace, version);
         return ResponseEntity.noContent().build();
     }
 

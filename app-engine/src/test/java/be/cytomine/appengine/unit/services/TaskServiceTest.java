@@ -25,6 +25,7 @@ import be.cytomine.appengine.exceptions.RunTaskServiceException;
 import be.cytomine.appengine.exceptions.TaskNotFoundException;
 import be.cytomine.appengine.exceptions.TaskServiceException;
 import be.cytomine.appengine.handlers.RegistryHandler;
+import be.cytomine.appengine.exceptions.SchedulingException;
 import be.cytomine.appengine.handlers.StorageData;
 import be.cytomine.appengine.handlers.StorageHandler;
 import be.cytomine.appengine.models.task.Run;
@@ -348,7 +349,7 @@ public class TaskServiceTest {
 
     @DisplayName("Should delete a task successfully")
     @Test
-    void shouldDeleteTaskSuccessfully() throws FileStorageException, RegistryException, RunTaskServiceException, TaskServiceException {
+    void shouldDeleteTaskSuccessfully() throws FileStorageException, RegistryException, SchedulingException, TaskServiceException {
         taskService.deleteTask(task);
 
         verify(registryHandler, times(1)).deleteImage(task.getImageName());

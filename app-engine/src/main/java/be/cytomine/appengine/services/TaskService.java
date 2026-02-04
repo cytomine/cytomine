@@ -515,12 +515,13 @@ public class TaskService {
     }
 
     public void deleteTask(Task task) throws RegistryException,
-            RunTaskServiceException, SchedulingException, TaskServiceException {
+            SchedulingException, TaskServiceException {
         String identifier = task.getNamespace() + ":" + task.getVersion();
 
         log.info("Deleting all storage runs associated with task '{}'", identifier);
         for (Run run : task.getRuns()) {
-            runService.deleteRunStorage(run);
+            runService.deleteStorageIfExists("task-run-inputs-" + run.getId());
+            runService.deleteStorageIfExists("task-run-outputs-" + run.getId());
         }
 
         log.info("Deleting all runs on cluster associated with task '{}'", identifier);

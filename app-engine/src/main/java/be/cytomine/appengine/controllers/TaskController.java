@@ -106,7 +106,6 @@ public class TaskController {
         @PathVariable String namespace,
         @PathVariable String version
     ) throws RegistryException,
-            RunTaskServiceException,
             SchedulingException,
             TaskNotFoundException,
             TaskServiceException {

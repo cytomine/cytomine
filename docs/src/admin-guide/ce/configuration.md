@@ -58,15 +58,27 @@ The complete installation guide is available in the [sdafs repository](https://g
 export PATH=$PATH:/usr/local/go/bin
 ```
 
-3. Install sdafs
+3. Install `sdafs`
 ```bash
 go install github.com/NBISweden/sdafs/cmd/sdafs@v0.0.23
 ```
 Where `v0.0.23` is the version you want to install
 
-4. Follow sdafs [usage](https://github.com/NBISweden/sdafs?tab=readme-ov-file#usage) documentation to download credentials.
+4. Follow `sdafs` [usage](https://github.com/NBISweden/sdafs?tab=readme-ov-file#usage) documentation to download credentials.
 
-5. Depending on the OS, edit `user_allow_other` variable in `/etc/fuse.conf` as explained in sdafs [permissions](https://github.com/NBISweden/sdafs?tab=readme-ov-file#permissions) section.
+5. Depending on the OS, edit `user_allow_other` variable in `/etc/fuse.conf` as explained in `sdafs` [permissions](https://github.com/NBISweden/sdafs?tab=readme-ov-file#permissions) section.
+
+6. Create a folder to host the mount point
+```bash
+mkdir bp-datasets
+```
+
+7. Mount `sdafs` with the downloaded credentials to the created folder
+```bash
+sdafs --open --credentialsfile s3cmd-download.conf bp-datasets
+```
+
+> The command is from the `sdafs` [usage](https://github.com/NBISweden/sdafs?tab=readme-ov-file#usage) section.
 :::
 
 - The structure of the imported directory should follows:

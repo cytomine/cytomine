@@ -1,4 +1,4 @@
-{{- if .Values.pims.datasetImportFolder }}
+{{- if .Values.pims.datasetImportStorage }}
 apiVersion: batch/v1
 kind: CronJob
 metadata:
@@ -14,10 +14,14 @@ spec:
       template:
         spec:
           serviceAccountName: {{ include "cytomine.serviceAccountName" . }}
+          securityContext:
+          {{- include "cytomine.podSecurityContext" . | nindent 12 }}
           initContainers:
           # putting multiple containers for psql commands for the sake of clarity
           - name: private-key-fetcher
-            image: {{ .Values.images.postgresql }}
+            securityContext:
+            {{- include "cytomine.containerSecurityContext" . | nindent 14 }}
+            image: {{ .Values.images.postgis }}
             imagePullPolicy: {{ .Values.images.pullPolicy }}
             command: ["/bin/sh", "-c"]
             args: ["psql --no-align --quiet --tuples-only -U $(POSTGIS_USER) -h $(POSTGIS_HOST) -o /data/private_key -c \"SELECT private_key from sec_user where username = 'ImageServer1'\" && cat /data/private_key"]
@@ -37,7 +41,9 @@ spec:
             - name: data
               mountPath: /data
           - name: public-key-fetcher
-            image: {{ .Values.images.postgresql }}
+            securityContext:
+            {{- include "cytomine.containerSecurityContext" . | nindent 14 }}
+            image: {{ .Values.images.postgis }}
             imagePullPolicy: {{ .Values.images.pullPolicy }}
             command: ["/bin/sh", "-c"]
             args: ["psql --no-align --quiet --tuples-only -U $(POSTGIS_USER) -h $(POSTGIS_HOST) -o /data/public_key -c \"SELECT public_key from sec_user where username = 'ImageServer1'\" && cat /data/public_key"]
@@ -58,6 +64,8 @@ spec:
               mountPath: /data
           containers:
           - name: import-call
+            securityContext:
+            {{- include "cytomine.containerSecurityContext" . | nindent 14 }}
             image: {{ .Values.images.pims_import }}
             imagePullPolicy: {{ .Values.images.pullPolicy }}
             command: ["/bin/sh", "-c"]
@@ -66,9 +74,13 @@ spec:
             volumeMounts:
             - name: data
               mountPath: /data
+            - name: temp
+              mountPath: /tmp
           volumes:
-          - emptyDir: {}
-            name: data
+          - name: data
+            emptyDir: {}
+          - name: temp
+            emptyDir: {}
           restartPolicy: Never
       backoffLimit: 1
 {{- end }}

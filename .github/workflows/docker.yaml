@@ -20,31 +20,41 @@ jobs:
       matrix:
         image:
           - name: app-engine
-            context: '.'
+            context: "."
             dockerfile_location: app-engine
+            target: production
           - name: cbir
+            target: production
           - name: core
+            target: production
           - name: iam
+            target: production
           # - name: mongo
           - name: nginx
           - name: pims
-            context: '.'
+            context: "."
             dockerfile_location: pims
+            target: production
           - name: postgis
           - name: sam
+            target: production
           - name: web-ui
           - name: python-client
             context: clients/python
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6.0.1
+        uses: actions/checkout@v6.0.2
         with:
           submodules: true
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-
+        with:
+          driver-opts: image=registry.cytomine.org/docker/moby/buildkit:buildx-stable-1
+          buildkitd-config-inline: |
+            [registry."docker.io"]
+              mirrors = ["registry.cytomine.org/docker/"]
       - name: Log in to Cytomine registry
         uses: docker/login-action@v3
         if: github.ref_name != 'main'
@@ -69,3 +79,4 @@ jobs:
           tags: ${{ (github.ref_name != 'main' && 'registry.cytomine.org/') || '' }}cytomine/${{ matrix.image.name }}:${{ github.ref_name == 'main' && 'latest' || github.sha }}
           allow: network.host
           network: host
+          target: ${{ matrix.image.target || '' }}

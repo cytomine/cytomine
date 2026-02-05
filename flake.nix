@@ -20,6 +20,7 @@
             postgresql
             python3
             uv
+            nodejs
           ];
           shellHook = ''
             export KUBECONFIG=./.kube/config

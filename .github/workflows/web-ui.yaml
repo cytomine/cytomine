@@ -15,7 +15,7 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Set up the repository
-        uses: actions/checkout@v6.0.1
+        uses: actions/checkout@v6.0.2
 
       - name: Set up NodeJS
         uses: actions/setup-node@v6
@@ -32,7 +32,7 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Set up the repository
-        uses: actions/checkout@v6.0.1
+        uses: actions/checkout@v6.0.2
 
       - name: Set up NodeJS
         uses: actions/setup-node@v6

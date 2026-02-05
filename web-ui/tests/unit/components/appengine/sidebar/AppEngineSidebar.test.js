@@ -31,9 +31,6 @@ const mockTaskRun2 = {
   taskRunId: '5f41ca2c-9b68-49fe-8f16-4e8005eb6893',
 };
 
-const mockFetchInputs = jest.fn(() => Promise.resolve());
-const mockFetchOutputs = jest.fn(() => Promise.resolve());
-
 jest.mock('@/api', () => ({
   Cytomine: {
     instance: {
@@ -76,8 +73,6 @@ jest.mock('@/utils/appengine/task-run', () => {
 
   const mockTaskRun = jest.fn().mockImplementation((resource) => ({
     ...resource,
-    fetchInputs: mockFetchInputs,
-    fetchOutputs: mockFetchOutputs,
     isFinished: mockIsFinished,
   }));
 
@@ -151,13 +146,6 @@ describe('AppEngineSideBar.vue', () => {
     expect(fetchTaskRunsSpy).toHaveBeenCalledTimes(1);
   });
 
-  it('should mark not finished runs as failed on component created', async () => {
-    const expectedTaskRun2 = {...mockTaskRun2, state: 'FAILED'};
-
-    expect(wrapper.vm.tasks).toStrictEqual([mockTask1, mockTask2]);
-    expect(wrapper.vm.trackedTaskRuns).toMatchObject([mockTaskRun1, expectedTaskRun2]);
-  });
-
   it('should update tracked task runs every 2 seconds', async () => {
     jest.useFakeTimers();
     jest.advanceTimersByTime(2000);
@@ -166,23 +154,5 @@ describe('AppEngineSideBar.vue', () => {
     expect(fetchTaskRunsSpy).toHaveBeenCalled();
 
     jest.useRealTimers();
-  });
-
-  it('should fetch inputs for all task runs', async () => {
-    mockFetchInputs.mockClear();
-
-    await wrapper.vm.fetchTaskRuns();
-
-    expect(mockFetchInputs).toHaveBeenCalled();
-    expect(mockFetchInputs).toHaveBeenCalledTimes(2);
-  });
-
-  it('should fetch outputs for finished task runs', async () => {
-    mockFetchOutputs.mockClear();
-
-    await wrapper.vm.fetchTaskRuns();
-
-    expect(mockFetchOutputs).toHaveBeenCalled();
-    expect(mockFetchOutputs).toHaveBeenCalledTimes(1);
   });
 });

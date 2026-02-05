@@ -1,7 +1,7 @@
+import Vue from 'vue';
 import Model from './model';
 import Task from './task';
 import {Cytomine} from '@/api';
-import {BINARY_TYPES} from '@/utils/app';
 
 export default class TaskRun extends Model {
   static get STATES() {
@@ -89,17 +89,10 @@ export default class TaskRun extends Model {
       return null;
     }
 
-    this.inputs = (await Cytomine.instance.api.get(`${this.uri}/inputs`)).data;
+    const inputs = (await Cytomine.instance.api.get(`${this.uri}/inputs`)).data;
+    Vue.set(this, 'inputs', inputs);
 
-    const binaryInputs = this.inputs.filter(input => BINARY_TYPES.includes(input.type.toLowerCase()));
-
-    await Promise.all(
-      binaryInputs.map(async (input) => {
-        input.value = await this.fetchSingleIO(input.param_name, 'input');
-      })
-    );
-
-    return this.inputs;
+    return inputs;
   }
 
   async fetchOutputs() {
@@ -107,17 +100,10 @@ export default class TaskRun extends Model {
       return null;
     }
 
-    this.outputs = (await Cytomine.instance.api.get(`${this.uri}/outputs`)).data;
+    const outputs = (await Cytomine.instance.api.get(`${this.uri}/outputs`)).data;
+    Vue.set(this, 'outputs', outputs);
 
-    const binaryOutputs = this.outputs.filter(output => BINARY_TYPES.includes(output.type.toLowerCase()));
-
-    await Promise.all(
-      binaryOutputs.map(async (output) => {
-        output.value = await this.fetchSingleIO(output.param_name, 'output');
-      })
-    );
-
-    return this.outputs;
+    return outputs;
   }
 
   async fetchSingleIO(parameterName, type) {

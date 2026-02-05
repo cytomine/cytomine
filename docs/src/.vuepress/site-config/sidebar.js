@@ -87,6 +87,7 @@ module.exports = {
           ],
         },
         ["/dev-guide/algorithms/task/execution", "Task Execution"],
+        ["/dev-guide/algorithms/task/help", "Help"]
       ],
     },
     {

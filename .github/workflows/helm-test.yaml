@@ -21,14 +21,14 @@ jobs:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.1
+        uses: actions/checkout@v6.0.2
         with:
           fetch-depth: 0
 
       - name: Set up Helm
         uses: azure/setup-helm@v4.3.1
 
-      - uses: actions/setup-python@v6.1.0
+      - uses: actions/setup-python@v6.2.0
         with:
           python-version: '3.x'
           check-latest: true
@@ -41,6 +41,9 @@ jobs:
 
       - name: Create Namespace
         run: kubectl create ns cytomine-${{ github.sha }}
+
+      - name: Enforce Restricted Namespace
+        run: kubectl label --overwrite ns cytomine-${{ github.sha }} pod-security.kubernetes.io/enforce=restricted pod-security.kubernetes.io/enforce-version=latest pod-security.kubernetes.io/warn=restricted pod-security.kubernetes.io/warn-version=latest
 
       - name: Create Harbor Registry secrets
         run: kubectl create secret docker-registry docker-images-pull-secret --namespace=cytomine-${{ github.sha }} --docker-server=registry.cytomine.org --docker-username=${{ secrets.REGISTRY_USERNAME }} --docker-password=${{ secrets.REGISTRY_TOKEN }}

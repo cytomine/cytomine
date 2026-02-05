@@ -1,10 +1,15 @@
 package be.cytomine.service.annotation;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import be.cytomine.domain.appengine.TaskRun;
+import be.cytomine.domain.image.ImageInstance;
+import be.cytomine.repository.appengine.TaskRunRepository;
+import be.cytomine.service.image.ImageInstanceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +34,10 @@ public class AnnotationLayerService {
 
     private final TaskRunLayerService taskRunLayerService;
 
+    private final TaskRunRepository taskRunRepository;
+
+    private final ImageInstanceService imageInstanceService;
+
     public String createLayerName(String taskName, String taskVersion, Date created) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String createdTime = sdf.format(created);
@@ -50,10 +59,28 @@ public class AnnotationLayerService {
     public List<AnnotationLayer> findByTaskRunLayer(Long imageId) {
         List<TaskRunLayer> taskRunLayers = taskRunLayerRepository.findAllByImageId(imageId);
 
-        return taskRunLayers
+        List<AnnotationLayer> annotationLayerList = new ArrayList<>(taskRunLayers
             .stream()
             .map(TaskRunLayer::getAnnotationLayer)
-            .toList();
+            .toList());
+
+        ImageInstance imageInstance = imageInstanceService.get(imageId);
+
+        Optional<TaskRun> lastTaskRun = taskRunRepository
+            .findFirstByProjectIdOrderByCreatedDesc(imageInstance.getProject().getId());
+
+        if (lastTaskRun.isPresent()) {
+            Optional<TaskRunLayer> lastExecutedRunLayer = taskRunLayerRepository.findByTaskRun(lastTaskRun.get());
+
+            List<AnnotationLayer> lastTaskRunAnnotationLayers = lastExecutedRunLayer
+                .stream()
+                .map(TaskRunLayer::getAnnotationLayer)
+                .toList();
+
+            annotationLayerList.addAll(lastTaskRunAnnotationLayers);
+        }
+
+        return annotationLayerList.stream().distinct().toList();
     }
 
     public TaskRunLayerValue findTaskRunLayer(Long id) {

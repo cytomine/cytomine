@@ -1,13 +1,19 @@
 package be.cytomine.controller.appengine;
 
-import be.cytomine.controller.RestCytomineController;
-import be.cytomine.service.appengine.AppEngineService;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.Optional;
+import java.util.UUID;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
@@ -16,12 +22,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.web.util.UriUtils;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.util.Optional;
-import java.util.UUID;
+import be.cytomine.controller.RestCytomineController;
+import be.cytomine.service.appengine.AppEngineService;
+import be.cytomine.service.appengine.TaskRunService;
 
 @RestController
 @RequestMapping("/api/app-engine") // Defined an "app-engine" prefix to avoid clash with existing Task Controller.
@@ -33,6 +36,8 @@ public class RestTaskController extends RestCytomineController {
     private final AppEngineService appEngineService;
 
     private final RestTemplate restTemplate;
+
+    private final TaskRunService taskRunService;
 
     @GetMapping("/tasks/{id}")
     public String descriptionById(@PathVariable String id) {
@@ -56,10 +61,13 @@ public class RestTaskController extends RestCytomineController {
             .orElseGet(() -> appEngineService.get("tasks/" + namespace + "/" + version));
     }
 
+    @PreAuthorize("authentication.name == 'admin'")
     @DeleteMapping("/tasks/{namespace}/{version}")
     public void deleteTask(@PathVariable String namespace, @PathVariable String version) {
-        log.info("DELETE /tasks/{}/{}", namespace, version);
-        appEngineService.delete("tasks/" + namespace + "/" + version);
+        String identifier = namespace + "/" + version;
+        log.info("DELETE /tasks/{}", identifier);
+        taskRunService.deleteAllTaskRunForTask(identifier);
+        appEngineService.delete("tasks/" + identifier);
     }
 
     @PostMapping("/tasks/{namespace}/{version}/install")
@@ -77,9 +85,7 @@ public class RestTaskController extends RestCytomineController {
     }
 
     @PostMapping("/tasks")
-    public String upload(
-            @RequestParam("task") MultipartFile task
-    ) throws IOException {
+    public String upload(@RequestParam("task") MultipartFile task) throws IOException {
         String name = UUID.randomUUID().toString();
         File tmpFile = Files.createTempFile(name, null).toFile();
         task.transferTo(tmpFile);

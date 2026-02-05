@@ -64,6 +64,10 @@ public class StorageService extends ModelService {
         return securityACLService.getStorageList(user, false, searchString);
     }
 
+    public List<Storage> list(User user) {
+        return storageRepository.findAllByUser(user);
+    }
+
     public Optional<Storage> find(Long id) {
         Optional<Storage> Storage = storageRepository.findById(id);
         Storage.ifPresent(image -> securityACLService.check(image.container(),READ));

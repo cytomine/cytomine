@@ -47,11 +47,7 @@ ext {
 springBoot {
     mainClass = "be.cytomine.appengine.AppEngineApplication"
 }
-test {
-    filter {
-        excludeTestsMatching "be.cytomine.appengine.integration.*"
-    }
-}
+
 dependencies {
     // Lombok
     implementation "org.mapstruct:mapstruct:${mapstructVersion}", "org.projectlombok:lombok:${lombokVersion}"
@@ -127,7 +123,7 @@ dependencies {
     testImplementation "org.testcontainers:testcontainers-postgresql"
     testImplementation "org.testcontainers:testcontainers"
     testImplementation "org.testcontainers:testcontainers-k3s"
-
+    testImplementation "org.testcontainers:testcontainers-postgresql"
 }
 
 tasks.named('test') {

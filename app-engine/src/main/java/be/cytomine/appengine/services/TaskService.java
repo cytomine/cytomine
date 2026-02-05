@@ -508,7 +508,10 @@ public class TaskService {
             fileStorageHandler.deleteStorage(storage);
             log.info("Storage '{}' successfully deleted", storageName);
         } catch (FileStorageException e) {
-            log.error("Failed to delete storage '{}': [{}]. Skipping.", storageName, e.getMessage());
+            log.error(
+                    "Failed to delete storage '{}': [{}]. Skipping.",
+                    storageName,
+                    e.getMessage());
         }
     }
 

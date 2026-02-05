@@ -92,7 +92,7 @@ public class UploadTaskStepDefinitions {
     public void app_engine_is_up_and_running() {
         ResponseEntity<String> health = apiClient.checkHealth();
         Assertions.assertTrue(health.getStatusCode().is2xxSuccessful());
-        taskRepository.deleteAllTasks();
+        taskRepository.deleteAll();
     }
 
     @Given("File storage service is up and running")

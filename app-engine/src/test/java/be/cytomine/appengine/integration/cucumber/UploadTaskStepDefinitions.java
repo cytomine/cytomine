@@ -320,7 +320,7 @@ public class UploadTaskStepDefinitions {
         Assertions.assertTrue(shortName.equalsIgnoreCase("must_not_have_changed"));
 
         // and registry
-        CatalogResp response = RegistryClient.catalog("http://" + registry, 2, "");
+        CatalogResp response = RegistryClient.catalog(registry, 2, "");
         String imageName = uploaded.getNamespace().replace(".", "/");
         response.getRepositories().contains(imageName);
     }

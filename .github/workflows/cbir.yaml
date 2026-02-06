@@ -67,5 +67,5 @@ jobs:
         run: uv run pytest
         env:
           DATA_PATH: ./
-          TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX: registry.cytomine.org/docker/
+          RYUK_CONTAINER_IMAGE: registry.cytomine.org/docker/testcontainers/ryuk:0.13.0
           WEIGHTS: ./weights/resnet

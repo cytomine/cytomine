@@ -1,5 +1,6 @@
 """Pytest configuration and fixtures for the test suite."""
 
+import os
 import shutil
 import tempfile
 from typing import Generator
@@ -17,6 +18,9 @@ from cbir import config
 @pytest.fixture(scope="session")
 def redis_container():
     """Start a Redis container for the test session."""
+
+    os.environ['DOCKER_CLIENT_TIMEOUT'] = '300'
+    os.environ['COMPOSE_HTTP_TIMEOUT'] = '300'
 
     with RedisContainer(image="registry.cytomine.org/docker/redis:7.2") as container:
         yield container

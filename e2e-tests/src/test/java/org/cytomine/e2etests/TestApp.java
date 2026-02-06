@@ -8,7 +8,7 @@ class TestApp {
 
 	@Test
 	void contextLoads() {
-       
+        assert(false);
 	}
 
 }

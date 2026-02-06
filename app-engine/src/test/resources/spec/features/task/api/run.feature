@@ -193,7 +193,7 @@ Feature: [URS00003-TASK] Execute a task
     And a task run has been created with "<task_run_id>"
     And a user provisioned all the parameters
       | parameter_name | parameter_type | parameter_value |
-      | verbose        | boolean        | true            |
+      | input          | string         | test-string     |
     When When user calls the endpoint to run task with HTTP method POST
     Then the cluster has allocated "<resource_ram>" RAM, "<resource_cpu>" CPUs, and "<resource_gpu>" GPUs as requested.
 

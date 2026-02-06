@@ -8,6 +8,7 @@ import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.api.model.ResourceRequirements;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,13 +16,16 @@ public class ClusterClient {
 
     private final KubernetesClient kubernetesClient;
 
+    @Value("${scheduler.tasks-namespace}")
+    private String tasksNamespace;
+
     public ClusterClient(KubernetesClient client) {
         kubernetesClient = client;
     }
 
     public Map<String, String> getAllocatedResources(String uuid) {
-        Pod pod = kubernetesClient.pods().inNamespace("default").withName(uuid).get();
-        
+        Pod pod = kubernetesClient.pods().inNamespace(tasksNamespace).withName(uuid).get();
+
         Container task = pod.getSpec()
             .getContainers()
             .stream()

@@ -8,9 +8,15 @@ metadata:
 spec:
   securityContext:
   {{- include "cytomine.podSecurityContext" . | nindent 4 }}
+  volumes:
+    - name: tmp
+      emptyDir: {}
   containers:
     - name: e2e-tests
       image: "{{ .Values.images.e2e_tests }}"
       securityContext:
       {{- include "cytomine.containerSecurityContext" . | nindent 8 }}
+      volumeMounts:
+      - name: tmp
+        mountPath: /tmp/gradle
   restartPolicy: Never

@@ -556,7 +556,7 @@ public class AbstractImageResourceTests {
                 .claim("iss", "http://localhost:8888/")
                 .claim("sub", UUID.randomUUID())
                                      .claim("name", "Some User")
-                .claim("preferred_username", "superadmin")
+                .claim("preferred_username", "superadmin_" + UUID.randomUUID())
                 .claim("resource_access" , resourceAccessClaim)
                 .build();
         SignedJWT signedJWT = new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.RS256)

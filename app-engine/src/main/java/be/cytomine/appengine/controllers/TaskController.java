@@ -102,7 +102,7 @@ public class TaskController {
     }
 
     @DeleteMapping(value = "tasks/{namespace}/{version}")
-    public ResponseEntity<Void> deleteTaskByNamespaceAndVersion(
+    public void deleteTaskByNamespaceAndVersion(
         @PathVariable String namespace,
         @PathVariable String version
     ) throws RegistryException,
@@ -117,7 +117,6 @@ public class TaskController {
 
         taskService.deleteTask(task);
         log.info("DELETE /tasks/{}/{} - completed successfully", namespace, version);
-        return ResponseEntity.noContent().build();
     }
 
     @GetMapping(value = "tasks/{id}/inputs")

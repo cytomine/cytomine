@@ -15,6 +15,9 @@ from cbir import app as main
 from cbir import config
 
 
+os.environ["DOCKER_CLIENT_TIMEOUT"] = "300"
+
+
 @pytest.fixture(scope="session")
 def redis_container():
     """Start a Redis container for the test session."""

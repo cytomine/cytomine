@@ -18,7 +18,7 @@ from cbir import config
 def redis_container():
     """Start a Redis container for the test session."""
 
-    with RedisContainer() as container:
+    with RedisContainer(image="registry.cytomine.org/docker/redis:7.2") as container:
         yield container
 
 

@@ -68,4 +68,5 @@ jobs:
         env:
           DATA_PATH: ./
           RYUK_CONTAINER_IMAGE: registry.cytomine.org/docker/testcontainers/ryuk:0.13.0
+          TESTCONTAINERS_RYUK_PRIVILEGED: true
           WEIGHTS: ./weights/resnet

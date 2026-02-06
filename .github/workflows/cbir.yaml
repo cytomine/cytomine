@@ -64,7 +64,7 @@ jobs:
         run: uv sync --group test
 
       - name: Pull test images
-        run: >
+        run: |
           docker pull registry.cytomine.org/docker/redis:7.2
           docker pull registry.cytomine.org/docker/testcontainers/ryuk:0.13.0
 

@@ -337,7 +337,7 @@ public class RunTaskStepDefinitions {
         Assertions.assertEquals(Integer.parseInt(ResponseCode), persistedException.getStatusCode().value());
         ObjectMapper mapper = new ObjectMapper();
         JsonNode errorJsonNodeFromServer = mapper.readTree(persistedException.getResponseBodyAsString());
-        Assertions.assertEquals(errorCode, errorJsonNodeFromServer.get("error_code").textValue());
+        Assertions.assertEquals(errorCode, errorJsonNodeFromServer.get("errorCode").textValue());
     }
 
     // successful fetch of task run outputs archive in a finished task run

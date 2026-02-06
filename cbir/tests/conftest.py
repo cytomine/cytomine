@@ -15,14 +15,15 @@ from cbir import app as main
 from cbir import config
 
 
+os.environ["DOCKER_CLIENT_TIMEOUT"] = "300"
+os.environ["COMPOSE_HTTP_TIMEOUT"] = "300"
+
+
 @pytest.fixture(scope="session")
 def redis_container():
     """Start a Redis container for the test session."""
 
-    os.environ['DOCKER_CLIENT_TIMEOUT'] = '300'
-    os.environ['COMPOSE_HTTP_TIMEOUT'] = '300'
-
-    image_prefix = os.environ.get('PROXY_CACHE', '')
+    image_prefix = os.environ.get("PROXY_CACHE", "")
 
     with RedisContainer(image=f"{image_prefix}redis:7.2") as container:
         yield container

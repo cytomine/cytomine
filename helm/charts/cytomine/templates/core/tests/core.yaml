@@ -22,6 +22,6 @@
      "helm.sh/hook": test
  spec:
    containers:
-     - name: curl
-       image: cytomine/e2e-tests:latest
+     - name: e2e-tests
+       image: {{ .Values.images.e2e_tests }}
    restartPolicy: Never

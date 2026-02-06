@@ -6,7 +6,7 @@ authors = [
   { name = "Ba Thien Le", email = "ba.le@uliege.be" },
 ]
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.11"
 license = "Apache-2.0"
 dependencies = [
   "faiss-gpu==1.7.2",

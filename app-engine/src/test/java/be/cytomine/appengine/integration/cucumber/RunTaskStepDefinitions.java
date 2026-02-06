@@ -493,7 +493,7 @@ public class RunTaskStepDefinitions {
         Assertions.assertEquals(Integer.parseInt(ResponseCode), persistedException.getStatusCode().value());
         ObjectMapper mapper = new ObjectMapper();
         JsonNode errorJsonNodeFromServer = mapper.readTree(persistedException.getResponseBodyAsString());
-        Assertions.assertEquals(errorCode, errorJsonNodeFromServer.get("error_code").textValue());
+        Assertions.assertEquals(errorCode, errorJsonNodeFromServer.get("errorCode").textValue());
     }
 
     @Then("this task run remains in state {string}")

@@ -13,8 +13,8 @@ spec:
       image: curlimages/curl
       command: ["curl"]
       args: ["-f", '{{ include "core.url" . }}/server/ping']
-      securitycontext:
-      {{- include "cytomine.containersecuritycontext" . | nindent 6 }}
+      securityContext:
+      {{- include "cytomine.containerSecurityContext" . | nindent 6 }}
   restartPolicy: Never
 ---
 apiVersion: v1
@@ -30,6 +30,6 @@ spec:
   containers:
     - name: e2e-tests
       image: "{{ .Values.images.e2e_tests }}"
-      securitycontext:
-      {{- include "cytomine.containersecuritycontext" . | nindent 6 }}
+      securityContext:
+      {{- include "cytomine.containerSecurityContext" . | nindent 6 }}
   restartPolicy: Never

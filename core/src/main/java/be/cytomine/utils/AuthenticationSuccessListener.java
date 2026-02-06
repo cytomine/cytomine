@@ -93,24 +93,18 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
         }
     }
 
-    private void setCumulativeRole(Set<String> rolesFromAuthentication, User user)
-    {
+    private void setCumulativeRole(Set<String> rolesFromAuthentication, User user) {
+
+        SecUserSecRole secSecUserSecRole = new SecUserSecRole();
         if (rolesFromAuthentication.contains("ROLE_ADMIN")) {
-            SecUserSecRole secSecUserSecRole = new SecUserSecRole();
             secSecUserSecRole.setSecRole(secRoleRepository.getByAuthority("ROLE_ADMIN"));
-            secSecUserSecRole.setSecUser(user);
-            secSecUserSecRoleRepository.save(secSecUserSecRole);
         } else if (rolesFromAuthentication.contains("ROLE_USER")) {
-            SecUserSecRole secSecUserSecRole = new SecUserSecRole();
             secSecUserSecRole.setSecRole(secRoleRepository.getByAuthority("ROLE_USER"));
-            secSecUserSecRole.setSecUser(user);
-            secSecUserSecRoleRepository.save(secSecUserSecRole);
         } else {
-            SecUserSecRole secSecUserSecRole = new SecUserSecRole();
             secSecUserSecRole.setSecRole(secRoleRepository.getByAuthority("ROLE_GUEST"));
-            secSecUserSecRole.setSecUser(user);
-            secSecUserSecRoleRepository.save(secSecUserSecRole);
         }
+        secSecUserSecRole.setSecUser(user);
+        secSecUserSecRoleRepository.save(secSecUserSecRole);
     }
 
     private static Set<String> extractRolesFromAuthentication(JwtAuthenticationToken jwtAuthenticationToken) {

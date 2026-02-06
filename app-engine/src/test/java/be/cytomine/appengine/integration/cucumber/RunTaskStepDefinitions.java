@@ -719,9 +719,9 @@ public class RunTaskStepDefinitions {
 
     @And("a task run has been created with {string}")
     public void createTaskRun(String uuid) {
+        persistedTask = taskRepository.saveAndFlush(persistedTask);
         persistedRun = new Run(UUID.fromString(uuid), TaskRunState.CREATED, persistedTask);
         persistedRun = runRepository.save(persistedRun);
-
     }
 
     @And("a user provisioned all the parameters")

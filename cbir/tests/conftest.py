@@ -16,6 +16,7 @@ from cbir import config
 
 
 os.environ["DOCKER_CLIENT_TIMEOUT"] = "300"
+os.environ["COMPOSE_HTTP_TIMEOUT"] = "300"
 
 
 @pytest.fixture(scope="session")

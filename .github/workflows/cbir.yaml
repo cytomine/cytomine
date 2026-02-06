@@ -60,6 +60,9 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
           version: ${{ vars.UV_VERSION }}
 
+      - name: Install test dependencies
+        run: uv sync --group test
+
       - name: Run tests
         run: uv run pytest
         env:

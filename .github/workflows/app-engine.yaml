@@ -85,7 +85,7 @@ jobs:
       - name: Validate OpenAPI specifications
         run: 'redocly lint src/test/resources/spec/api/openapi_spec.v0.1.0.yml'
 
-  unit-tests:
+  tests:
     runs-on: self-hosted
 
     steps:

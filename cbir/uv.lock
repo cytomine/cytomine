@@ -171,33 +171,37 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "httpx" },
     { name = "mypy" },
-    { name = "pytest" },
     { name = "ruff" },
+]
+test = [
+    { name = "httpx" },
+    { name = "pytest" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "faiss-gpu", specifier = ">=1.7.2" },
-    { name = "fastapi", specifier = ">=0.116.1" },
-    { name = "numpy", specifier = ">=1.26.2,<2.0.0" },
-    { name = "pillow", specifier = ">=11.3.0" },
-    { name = "pydantic-settings", specifier = ">=2.10.1" },
-    { name = "python-multipart", specifier = ">=0.0.20" },
-    { name = "redis", specifier = ">=6.4.0" },
-    { name = "timm", specifier = ">=1.0.19" },
-    { name = "torch", specifier = ">=2.8.0", index = "https://download.pytorch.org/whl/cpu" },
-    { name = "torchvision", specifier = ">=0.23.0", index = "https://download.pytorch.org/whl/cpu" },
-    { name = "uvicorn", extras = ["standard"], specifier = ">=0.35.0" },
+    { name = "faiss-gpu", specifier = "==1.7.2" },
+    { name = "fastapi", specifier = "==0.128.1" },
+    { name = "numpy", specifier = "==1.26.4" },
+    { name = "pillow", specifier = "==11.3.0" },
+    { name = "pydantic-settings", specifier = "==2.10.1" },
+    { name = "python-multipart", specifier = "==0.0.22" },
+    { name = "redis", specifier = "==6.4.0" },
+    { name = "timm", specifier = "==1.0.19" },
+    { name = "torch", specifier = "==2.8.0", index = "https://download.pytorch.org/whl/cpu" },
+    { name = "torchvision", specifier = "==0.23.0", index = "https://download.pytorch.org/whl/cpu" },
+    { name = "uvicorn", extras = ["standard"], specifier = "==0.35.0" },
 ]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "httpx", specifier = ">=0.28.1" },
-    { name = "mypy", specifier = ">=1.17.1" },
-    { name = "pytest", specifier = ">=8.4.2" },
-    { name = "ruff", specifier = ">=0.12.12" },
+    { name = "mypy", specifier = "==1.17.1" },
+    { name = "ruff", specifier = "==0.12.12" },
+]
+test = [
+    { name = "httpx", specifier = "==0.28.1" },
+    { name = "pytest", specifier = "==8.4.2" },
 ]
 
 [[package]]

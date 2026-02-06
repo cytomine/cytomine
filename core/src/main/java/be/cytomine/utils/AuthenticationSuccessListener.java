@@ -1,5 +1,6 @@
 package be.cytomine.utils;
 
+import be.cytomine.domain.security.SecRole;
 import be.cytomine.domain.security.SecUserSecRole;
 import be.cytomine.domain.security.User;
 import be.cytomine.repository.security.SecRoleRepository;
@@ -18,6 +19,9 @@ import java.util.*;
 
 @Component
 public class AuthenticationSuccessListener implements ApplicationListener<AuthenticationSuccessEvent> {
+
+    @Autowired
+    private AuthenticationSuccessListener self; // necessary, otherwise spring will bypass the proxy for transactional
 
     @Autowired
     private UserRepository userRepository;
@@ -42,7 +46,6 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
 
     }
 
-    @Transactional
     protected void saveUserOfToken(JwtAuthenticationToken jwtAuthenticationToken) {
 
         Set<String> rolesFromAuthentication =
@@ -62,7 +65,7 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
             //save domain into the database
             User savedUser = userRepository.save(newUser);
             // Guest > User > Admin
-            setCumulativeRole(rolesFromAuthentication, savedUser);
+            self.setCumulativeRole(rolesFromAuthentication, savedUser);
             // create storage for the user
             storageService.initUserStorage(savedUser);
 
@@ -83,9 +86,9 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
                     .map(SecUserSecRole::getId).toList());
             secSecUserSecRoleRepository.flush();
             // Guest > User > Admin
-            setCumulativeRole(rolesFromAuthentication, user);
+            self.setCumulativeRole(rolesFromAuthentication, user);
 
-            if (rolesFromAuthentication.contains("ADMIN")) {
+            if (rolesFromAuthentication.contains("ROLE_ADMIN")) {
                 if (currentRoleService.hasCurrentUserAdminRole(user)) {
                     currentRoleService.activeAdminSession(user, jwtAuthenticationToken);
                 }
@@ -93,7 +96,8 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
         }
     }
 
-    private void setCumulativeRole(Set<String> rolesFromAuthentication, User user) {
+    @Transactional
+    protected void setCumulativeRole(Set<String> rolesFromAuthentication, User user) {
 
         SecUserSecRole secSecUserSecRole = new SecUserSecRole();
         if (rolesFromAuthentication.contains("ROLE_ADMIN")) {
@@ -114,6 +118,7 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
                 rolesFromAuthentication.add(authority.getAuthority());
             }
         });
+        System.out.println("Roles from authentication: " + rolesFromAuthentication);
         return rolesFromAuthentication;
     }
 

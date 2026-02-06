@@ -9,8 +9,8 @@ COPY ./e2e-tests/build.gradle /app/e2e-tests/build.gradle
 COPY ./settings.gradle /app/settings.gradle
 RUN gradle :e2e-tests:clean :e2e-tests:compileJava :e2e-tests:bootJar --no-daemon --console=verbose
 
-FROM ${PROXY_CACHE}/eclipse-temurin:${JAVA_VERSION}
-COPY --from=build /app/e2e-tests/build/libs/e2e-tests.jar /app/e2e-tests.jar
-WORKDIR /app
+# FROM ${PROXY_CACHE}/eclipse-temurin:${JAVA_VERSION}
+# COPY --from=build /app/e2e-tests/build/libs/e2e-tests.jar /app/e2e-tests.jar
+# WORKDIR /app
 
-CMD ["java", "-jar", "/app/e2e-tests.jar"]
+CMD ["gradle", ":e2e-tests:test"]

@@ -22,6 +22,8 @@ spec:
         app: postgres-app-engine
         release: {{ .Release.Name }}
     spec:
+      securityContext:
+      {{- include "cytomine.podSecurityContext" . | nindent 8 }}
       volumes:
         - name: temp
           emptyDir: {}
@@ -36,6 +38,8 @@ spec:
         - name: postgres
           image: "{{ .Values.images.postgresql_app_engine }}"
           imagePullPolicy: {{ .Values.images.pullPolicy }}
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
           volumeMounts:
             - name: postgres-app-engine-storage
               mountPath: "/var/lib/postgresql/data"
@@ -60,6 +64,44 @@ spec:
             - name: postgres
               containerPort: {{ .Values.postgresql.port }}
               protocol: TCP
+      initContainers:
+        {{ if .Values.fixVolumesPermissions -}}
+        - name: fix-previous-permissions
+          image: alpine:3.18
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+          volumeMounts:
+          - name: postgres-app-engine-storage
+            mountPath: "/var/lib/postgresql/"
+          command:
+            - /bin/sh
+            - -c
+            - >
+              set -x;
+              mkdir -p /var/lib/postgresql/data;
+              chown -R {{ .Values.containerSecurity.userID }} /var/lib/postgresql/data;
+          resources:
+            {{- toYaml .Values.postgresql.resources | nindent 12 }}
+        {{ end }}
+        - name: postgres-init
+          image: alpine:3.18
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
+          volumeMounts:
+            - name: postgres-app-engine-storage
+              mountPath: "/var/lib/postgresql/"
+          command:
+            - /bin/sh
+            - -c
+            - >
+              set -x;
+              mkdir -p /var/lib/postgresql/data;
+              chown -R {{ .Values.containerSecurity.userID }} /var/lib/postgresql/data && chmod og-rwx /var/lib/postgresql/data;
+          resources:
+            {{- toYaml .Values.postgresql.resources | nindent 12 }}
   {{ if .Values.postgresql.storageClassName -}}
   volumeClaimTemplates:
     - metadata:

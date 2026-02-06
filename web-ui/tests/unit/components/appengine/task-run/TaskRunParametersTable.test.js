@@ -5,7 +5,9 @@ import TaskRunParametersTable from '@/components/appengine/task-run/TaskRunParam
 describe('TaskRunParametersTable.vue', () => {
   const createWrapper = (options = {}) => shallowMount(TaskRunParametersTable, {
     propsData: {
-      parameters: [],
+      parameters: options.parameters || [],
+      projectId: 42,
+      type: 'input',
     },
     mocks: {
       $t: (key) => key,
@@ -31,7 +33,7 @@ describe('TaskRunParametersTable.vue', () => {
         // eslint-disable-next-line camelcase
         {param_name: 'test', type: 'STRING', value: 'test value'},
       ];
-      const wrapper = createWrapper({propsData: {parameters}});
+      const wrapper = createWrapper({parameters});
 
       const table = wrapper.findComponent({name: 'b-table'});
       expect(table.exists()).toBe(true);
@@ -45,7 +47,7 @@ describe('TaskRunParametersTable.vue', () => {
         // eslint-disable-next-line camelcase
         {param_name: 'testParameter', type: 'STRING', value: 'test value'},
       ];
-      const wrapper = createWrapper({propsData: {parameters}});
+      const wrapper = createWrapper({parameters});
 
       expect(wrapper.text()).toContain(parameters[0].param_name);
       expect(wrapper.text()).toContain(parameters[0].type);
@@ -57,7 +59,7 @@ describe('TaskRunParametersTable.vue', () => {
         // eslint-disable-next-line camelcase
         {param_name: 'numParameter', type: 'NUMBER', value: 42.0},
       ];
-      const wrapper = createWrapper({propsData: {parameters}});
+      const wrapper = createWrapper({parameters});
 
       expect(wrapper.text()).toContain(parameters[0].param_name);
       expect(wrapper.text()).toContain(parameters[0].type);
@@ -69,7 +71,7 @@ describe('TaskRunParametersTable.vue', () => {
         // eslint-disable-next-line camelcase
         {param_name: 'fileParameter', type: 'FILE', value: new Uint8Array([1, 2, 3])},
       ];
-      const wrapper = createWrapper({propsData: {parameters}});
+      const wrapper = createWrapper({parameters});
 
       const buttons = wrapper.findAll('button');
       expect(buttons.length).toBeGreaterThan(0);
@@ -80,7 +82,7 @@ describe('TaskRunParametersTable.vue', () => {
         // eslint-disable-next-line camelcase
         {param_name: 'imageParameter', type: 'IMAGE', value: new Uint8Array([1, 2, 3])},
       ];
-      const wrapper = createWrapper({propsData: {parameters}});
+      const wrapper = createWrapper({parameters});
 
       const buttons = wrapper.findAll('button');
       expect(buttons.length).toBeGreaterThan(0);
@@ -95,7 +97,7 @@ describe('TaskRunParametersTable.vue', () => {
           value: '{"type":"Point","coordinates":[0,0]}',
         },
       ];
-      const wrapper = createWrapper({propsData: {parameters}});
+      const wrapper = createWrapper({parameters});
 
       const buttons = wrapper.findAll('button');
       expect(buttons.length).toBeGreaterThan(0);
@@ -106,7 +108,7 @@ describe('TaskRunParametersTable.vue', () => {
         // eslint-disable-next-line camelcase
         {param_name: 'numParameter', type: 'NUMBER', value: 42},
       ];
-      const wrapper = createWrapper({propsData: {parameters}});
+      const wrapper = createWrapper({parameters});
 
       const buttons = wrapper.findAll('button');
       expect(buttons.length).toBe(0);

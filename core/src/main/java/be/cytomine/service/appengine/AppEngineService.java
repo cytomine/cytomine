@@ -1,7 +1,6 @@
 package be.cytomine.service.appengine;
 
 import be.cytomine.exceptions.AppEngineException;
-import be.cytomine.exceptions.ForbiddenException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,7 +12,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Path;
@@ -45,18 +43,14 @@ public class AppEngineService {
         restTemplate.exchange(buildFullUrl(uri), HttpMethod.DELETE, null, Void.class);
     }
 
-    public File getStreamedFile(String uri) {
-        Path filePath = Paths.get("downloaded_" + System.currentTimeMillis() + ".tmp");
-        File targetFile = filePath.toFile();
-
+    public void getStreamedFile(String uri, OutputStream outputStream) {
         restTemplate.execute(buildFullUrl(uri), HttpMethod.GET, null, response -> {
-            try (InputStream in = response.getBody(); OutputStream out = new FileOutputStream(targetFile)) {
-                StreamUtils.copy(in, out);
+            try (InputStream in = response.getBody()) {
+                in.transferTo(outputStream);
                 return null;
             }
         });
 
-        return targetFile;
     }
 
     public <B> String sendWithBody(HttpMethod method, String uri, B body, MediaType contentType) {

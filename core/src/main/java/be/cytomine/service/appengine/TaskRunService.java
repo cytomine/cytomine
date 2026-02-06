@@ -8,6 +8,7 @@ import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
+import be.cytomine.dto.appengine.task.TaskDescription;
 import be.cytomine.dto.appengine.task.TaskRunDetail;
 import be.cytomine.dto.appengine.task.TaskRunOutputResponse;
 import be.cytomine.dto.appengine.task.TaskRunResponse;
@@ -98,6 +99,8 @@ public class TaskRunService {
 
     private final ObjectMapper objectMapper;
 
+    private final AsyncService asyncService;
+
     public String addTaskRun(Long projectId, String taskId, JsonNode body) {
         Project project = projectService.get(projectId);
         User currentUser = currentUserService.getCurrentUser();
@@ -159,6 +162,25 @@ public class TaskRunService {
 
         // We return the App engine response. Should we include information from Cytomine (project ID, user ID, created, ... ?)
         return appEngineResponse;
+    }
+
+    public void deleteAllTaskRunForTask(String taskId) {
+        log.info("Deleting all task runs associated to task '{}'", taskId);
+
+        String response = appEngineService.get("/tasks/" + taskId + "/runs");
+        List<TaskRunResponse> taskRunResponses;
+        try {
+            taskRunResponses = objectMapper.readValue(response, new TypeReference<>() {});
+        } catch (JsonProcessingException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error parsing JSON response");
+        }
+
+        for (TaskRunResponse taskRun : taskRunResponses) {
+            log.info("Delete task run '{}'", taskRun.id());
+            taskRunRepository.deleteTaskRunByTaskRunId(taskRun.id());
+        }
+
+        log.info("Deleted all task runs associated to task '{}'", taskId);
     }
 
     public List<TaskRunDetail> getTaskRuns(Long projectId) {
@@ -492,6 +514,9 @@ public class TaskRunService {
             throw new ObjectNotFoundException("Outputs from", taskRunId);
         }
 
+        // pull the images and store them in the project
+        asyncService.launchImageAdditionJob(outputs, projectId, currentUserService.getCurrentUser());
+
         List<String> geometries = outputs
             .stream()
                 .map(TaskRunValue::getValue)
@@ -546,8 +571,8 @@ public class TaskRunService {
         return appEngineService.get("task-runs/" + taskRunId + "/inputs");
     }
 
-    public File getTaskRunIOParameter(Long projectId, UUID taskRunId, String parameterName, String type) {
+    public void getTaskRunIOParameter(Long projectId, UUID taskRunId, String parameterName, String type, OutputStream outputStream) {
         checkTaskRun(projectId, taskRunId);
-        return appEngineService.getStreamedFile("task-runs/" + taskRunId + "/" + type + "/" + parameterName);
+        appEngineService.getStreamedFile("task-runs/" + taskRunId + "/" + type + "/" + parameterName, outputStream);
     }
 }

@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: redis
   annotations:
@@ -22,10 +22,38 @@ spec:
         app: redis
         release: {{ .Release.Name }}
     spec:
+      securityContext:
+      {{- include "cytomine.podSecurityContext" . | nindent 8 }}
       containers:
         - name: redis
           image: "{{ .Values.images.redis }}"
           imagePullPolicy: {{ .Values.images.pullPolicy }}
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
           ports:
             - name: http
               containerPort: {{ .Values.redis.port }}
+          volumeMounts:
+            - name: redis-storage
+              mountPath: /data
+            - name: temp
+              mountPath: /tmp
+      volumes:
+      - emptyDir: {}
+        name: temp
+      {{ if not .Values.redis.storage.storageClassName -}}
+      - name: redis-storage
+        emptyDir: {}
+      {{ end }}
+  {{ if .Values.redis.storage.storageClassName -}}
+  volumeClaimTemplates:
+    - metadata:
+        name: redis-storage
+      spec:
+        storageClassName: {{ .Values.redis.storage.storageClassName }}
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: {{ .Values.redis.storage.size }}
+  {{- end }}

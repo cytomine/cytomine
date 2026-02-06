@@ -10,6 +10,7 @@
       :showDetails="false"
       :size="85"
       :users="users"
+      color="000000"
     />
   </div>
 </template>

@@ -8,7 +8,6 @@ pims:
     storageClassName: 'local-path'
   tempImageStorage:
     storageClassName: 'local-path'
-  datasetImportFolder: '/data/dataset'
 mongodb:
   storageClassName: 'local-path'
 app_engine:

@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: cbir
   labels:
@@ -17,17 +17,44 @@ spec:
         checksum/config: "{{ include (print $.Template.BasePath "/cbir/cbir-config.yaml") . | sha256sum }}"
     spec:
       serviceAccountName: {{ include "cytomine.serviceAccountName" . }}
+      securityContext:
+      {{- include "cytomine.podSecurityContext" . | nindent 8 }}
       containers:
       - name: cbir
         image: "{{ .Values.images.cbir }}"
+        imagePullPolicy: {{ .Values.images.pullPolicy }}
+        securityContext:
+        {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
         ports:
         - containerPort: {{ .Values.cbir.port }}
         envFrom:
           - configMapRef:
               name: cbir
         volumeMounts:
-          - name: data
-            mountPath: /data/
+          - name: cbir-storage
+            mountPath: /data
+          - name: cbir-tmp
+            mountPath: /tmp
+          - name: cbir-cache
+            mountPath: /.cache
       volumes:
-      - name: data
+      - name: cbir-tmp
         emptyDir: {}
+      - name: cbir-cache
+        emptyDir: {}
+      {{ if not .Values.cbir.storage.storageClassName -}}
+      - name: cbir-storage
+        emptyDir: {}
+      {{ end }}
+  {{ if .Values.cbir.storage.storageClassName -}}
+  volumeClaimTemplates:
+    - metadata:
+        name: cbir-storage
+      spec:
+        storageClassName: {{ .Values.cbir.storage.storageClassName }}
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: {{ .Values.cbir.storage.size }}
+  {{- end }}

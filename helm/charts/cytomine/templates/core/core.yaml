@@ -43,8 +43,8 @@ spec:
       containers:
         - name: core
           image: "{{ .Values.images.core }}"
-          securityContext:
-          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
+          securitycontext:
+          {{- include "cytomine.containersecuritycontext" . | nindent 12 }}
           imagePullPolicy: {{ .Values.images.pullPolicy }}
           env:
             - name: POSTGIS_PASS

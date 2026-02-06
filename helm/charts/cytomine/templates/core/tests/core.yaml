@@ -6,22 +6,30 @@ metadata:
   annotations:
     "helm.sh/hook": test
 spec:
+  securityContext:
+  {{- include "cytomine.podSecurityContext" . | nindent 4 }}
   containers:
     - name: curl
       image: curlimages/curl
       command: ["curl"]
       args: ["-f", '{{ include "core.url" . }}/server/ping']
-  restartPolicy: Never
+      securitycontext:
+      {{- include "cytomine.containersecuritycontext" . | nindent 6 }}
+      restartPolicy: Never
 ---
 apiVersion: v1
 kind: Pod
 metadata:
-  name: "tests"
+  name: "e2e-tests"
   labels:
   annotations:
     "helm.sh/hook": test
 spec:
+  securityContext:
+  {{- include "cytomine.podSecurityContext" . | nindent 4 }}
   containers:
     - name: e2e-tests
       image: "{{ .Values.images.e2e_tests }}"
-  restartPolicy: Never
+      securitycontext:
+      {{- include "cytomine.containersecuritycontext" . | nindent 6 }}
+      restartPolicy: Never

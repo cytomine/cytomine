@@ -7,6 +7,7 @@ import be.cytomine.repository.security.SecUserSecRoleRepository;
 import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.image.server.StorageService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
@@ -41,12 +42,16 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
 
     }
 
-    private void saveUserOfToken(JwtAuthenticationToken jwtAuthenticationToken) {
-        Set<String> rolesFromAuthentication = extractRolesFromAuthentication(jwtAuthenticationToken);
+    @Transactional
+    protected void saveUserOfToken(JwtAuthenticationToken jwtAuthenticationToken) {
+
+        Set<String> rolesFromAuthentication =
+            extractRolesFromAuthentication(jwtAuthenticationToken);
         Map<String, Object> tokenAttributes = jwtAuthenticationToken.getTokenAttributes();
         UUID sub = UUID.fromString(tokenAttributes.get("sub").toString());
         Optional<User> userByReference = userRepository.findByReference(sub.toString());
         if (userByReference.isEmpty()) {
+
             User newUser = new User();
             newUser.setUsername(jwtAuthenticationToken.getName());
             newUser.setReference(sub.toString());
@@ -63,8 +68,9 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
 
             // activate admin session for user
             savedUser = userRepository.findByReference(sub.toString()).orElse(null);
-            if (currentRoleService.hasCurrentUserAdminRole(savedUser)) {
-                currentRoleService.activeAdminSession(savedUser,jwtAuthenticationToken);
+            if (currentRoleService.hasCurrentUserAdminRole(savedUser))
+            {
+                currentRoleService.activeAdminSession(savedUser, jwtAuthenticationToken);
             }
 
 
@@ -72,13 +78,16 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
             // update authorities
             User user = userByReference.get();
             // remove all roles of user
-            secSecUserSecRoleRepository.deleteAllByIdInBatch(secSecUserSecRoleRepository.findAllBySecUser(user).stream().map(SecUserSecRole::getId).toList());
+            secSecUserSecRoleRepository.deleteAllByIdInBatch(
+                secSecUserSecRoleRepository.findAllBySecUser(user).stream()
+                    .map(SecUserSecRole::getId).toList());
+            secSecUserSecRoleRepository.flush();
             // Guest > User > Admin
             setCumulativeRole(rolesFromAuthentication, user);
 
-            if(rolesFromAuthentication.contains("ADMIN")) {
+            if (rolesFromAuthentication.contains("ADMIN")) {
                 if (currentRoleService.hasCurrentUserAdminRole(user)) {
-                    currentRoleService.activeAdminSession(user,jwtAuthenticationToken);
+                    currentRoleService.activeAdminSession(user, jwtAuthenticationToken);
                 }
             }
         }

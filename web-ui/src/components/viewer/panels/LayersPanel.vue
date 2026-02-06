@@ -411,6 +411,10 @@ td .button {
 
 .name-column {
   width: 100%;
+  max-width: 14em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 >>> .checkbox .control-label {

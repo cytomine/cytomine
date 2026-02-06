@@ -118,7 +118,6 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
                 rolesFromAuthentication.add(authority.getAuthority());
             }
         });
-        System.out.println("Roles from authentication: " + rolesFromAuthentication);
         return rolesFromAuthentication;
     }
 

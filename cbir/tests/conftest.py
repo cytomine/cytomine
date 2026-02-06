@@ -22,7 +22,9 @@ def redis_container():
     os.environ['DOCKER_CLIENT_TIMEOUT'] = '300'
     os.environ['COMPOSE_HTTP_TIMEOUT'] = '300'
 
-    with RedisContainer(image="registry.cytomine.org/docker/redis:7.2") as container:
+    image_prefix = os.environ.get('PROXY_CACHE', '')
+
+    with RedisContainer(image=f"{image_prefix}redis:7.2") as container:
         yield container
 
 

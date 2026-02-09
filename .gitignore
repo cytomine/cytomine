@@ -19,3 +19,4 @@ build/
 # Cytomine data
 cache/
 data/
+**/out/

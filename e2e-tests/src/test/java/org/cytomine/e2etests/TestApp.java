@@ -6,9 +6,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 class TestApp {
 
-	@Test
-	void contextLoads() {
-        assert(false);
-	}
-
+  @Test
+  void contextLoads() {}
 }

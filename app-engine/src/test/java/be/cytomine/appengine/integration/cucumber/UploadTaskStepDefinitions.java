@@ -92,7 +92,7 @@ public class UploadTaskStepDefinitions {
     public void app_engine_is_up_and_running() {
         ResponseEntity<String> health = apiClient.checkHealth();
         Assertions.assertTrue(health.getStatusCode().is2xxSuccessful());
-        taskRepository.deleteAllTasks();
+        taskRepository.deleteAll();
     }
 
     @Given("File storage service is up and running")
@@ -320,7 +320,7 @@ public class UploadTaskStepDefinitions {
         Assertions.assertTrue(shortName.equalsIgnoreCase("must_not_have_changed"));
 
         // and registry
-        CatalogResp response = RegistryClient.catalog("http://" + registry, 2, "");
+        CatalogResp response = RegistryClient.catalog(registry, 2, "");
         String imageName = uploaded.getNamespace().replace(".", "/");
         response.getRepositories().contains(imageName);
     }

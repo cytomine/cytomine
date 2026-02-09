@@ -87,6 +87,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-testcontainers'
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'org.testcontainers:testcontainers:2.0.3'
+    testImplementation 'org.testcontainers:testcontainers-mongodb:2.0.3'
     testImplementation 'org.testcontainers:testcontainers-postgresql:2.0.3'
 
     // -----------------------------------------------------------------------------------------------------------------

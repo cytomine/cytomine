@@ -11,6 +11,8 @@ spec:
   volumes:
     - name: tmp
       emptyDir: {}
+    - name: workspace
+      emptyDir: {}
   containers:
     - name: e2e-tests
       image: "{{ .Values.images.e2e_tests }}"
@@ -19,4 +21,6 @@ spec:
       volumeMounts:
       - name: tmp
         mountPath: /tmp/gradle
+      - name: workspace
+        mountPath: /workspace
   restartPolicy: Never

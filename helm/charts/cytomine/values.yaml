@@ -79,6 +79,7 @@ images:
   redis: redis:7
   nginx: cytomine/nginx:latest
   iam: keycloak/keycloak:26.3
+  e2e_tests: cytomine/e2e-tests:latest
   pullPolicy: Always
   # array of image secrets names
   imagePullSecretsNames:

@@ -59,7 +59,7 @@ public class ApiClient {
     }
 
     public <T> ResponseEntity<Resource> getData(String url, HttpEntity<Object> entity, Map<String,String> params) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromPath(url);
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url);
 
         for (Map.Entry<String, String> entry : params.entrySet()) {
             builder.queryParam(entry.getKey(), entry.getValue());
@@ -104,7 +104,7 @@ public class ApiClient {
     }
 
     public <T> ResponseEntity<T> put(String url, HttpEntity<Object> entity, Class<T> responseType, Map<String, String> params) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromPath(url);
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url);
 
         for (Map.Entry<String, String> entry : params.entrySet()) {
             builder.queryParam(entry.getKey(), entry.getValue());
@@ -115,7 +115,7 @@ public class ApiClient {
     }
 
     public <T> ResponseEntity<T> postDataPart(String url, HttpEntity<Object> entity, Class<T> responseType, Map<String, String> params) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromPath(url);
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url);
 
         for (Map.Entry<String, String> entry : params.entrySet()) {
             builder.queryParam(entry.getKey(), entry.getValue());

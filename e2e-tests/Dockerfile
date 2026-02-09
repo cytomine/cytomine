@@ -1,13 +1,14 @@
 ARG PROXY_CACHE=registry.cytomine.org/docker
 ARG JAVA_VERSION=17-jre
+# ARG GRADLE_VERSION=8.14-jdk21-alpine
 ARG GRADLE_VERSION=8.14-jdk21
-FROM ${PROXY_CACHE}/gradle:${GRADLE_VERSION} AS build
 
+FROM ${PROXY_CACHE}/gradle:${GRADLE_VERSION}
+# RUN apk add --no-cache libstdc++
 WORKDIR /app
 COPY ./e2e-tests/src /app/e2e-tests/src
 COPY ./e2e-tests/build.gradle /app/e2e-tests/build.gradle
 COPY ./settings.gradle /app/settings.gradle
-
 # RUN mkdir -p /opt/gradle/.gradle
 RUN chmod 777 /app
 ENV GRADLE_USER_HOME=/tmp/gradle

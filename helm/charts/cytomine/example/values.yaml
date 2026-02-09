@@ -26,20 +26,4 @@ iam:
   lsaaiEndpoint: https://login.aai.lifescience-ri.eu/oidc/.well-known/openid-configuration
 
 images:
-  app_engine: cytomine/app-engine:latest
-  sam: cytomine/sam:latest
-  core: cytomine/core:latest
-  pims: cytomine/pims:latest
-  web_ui: cytomine/web-ui:latest
-  cbir: cytomine/cbir:latest
-  pims_import: cytomine/python-client:latest
-  postgis: postgis/postgis:15-3.5
-  postgresql_iam: postgres:14
-  postgresql_app_engine: postgres:14
-  mongodb: mongo:4.4-focal
-  pims_cache: redis:7
-  redis: redis:7
-  nginx: cytomine/nginx:latest
-  iam: keycloak/keycloak:26.3
-  e2e_tests: cytomine/e2e-tests:latest
   pullPolicy: IfNotPresent

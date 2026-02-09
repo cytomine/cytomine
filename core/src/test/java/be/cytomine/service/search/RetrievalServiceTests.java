@@ -13,11 +13,14 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.io.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
+import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.PostGisTestConfiguration;
 import be.cytomine.controller.ontology.UserAnnotationResourceTests;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.dto.search.SearchResponse;
@@ -30,6 +33,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
 public class RetrievalServiceTests {
 
     @Autowired

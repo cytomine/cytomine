@@ -80,10 +80,14 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
 
     // Tests
+    testImplementation 'com.github.tomakehurst:wiremock:1.58'
+    testImplementation 'org.assertj:assertj-core:3.4.1' // TODO: upgrade to 3.23.1
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
     testImplementation 'org.springframework.security:spring-security-test'
-    testImplementation 'org.assertj:assertj-core:3.4.1' // TODO: upgrade to 3.23.1
+    testImplementation 'org.testcontainers:testcontainers:2.0.3'
+    testImplementation 'org.testcontainers:testcontainers-postgresql:2.0.3'
 
     // -----------------------------------------------------------------------------------------------------------------
     // Dependencies not managed by Spring dependency-management
@@ -128,7 +132,6 @@ dependencies {
     // Utils
     implementation 'org.apache.commons:commons-text:1.11.0'
     implementation 'net.bull.javamelody:javamelody-spring-boot-starter:2.1.0'
-    testImplementation 'com.github.tomakehurst:wiremock:1.58'
 }
 
 test {

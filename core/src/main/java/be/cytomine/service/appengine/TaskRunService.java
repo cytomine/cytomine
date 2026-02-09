@@ -401,9 +401,11 @@ public class TaskRunService {
 
         ObjectNode provision = json.deepCopy();
         if (provision.get("type").get("id").asText().equals("geometry")) {
-            Long annotationId = provision.get("value").asLong();
-            UserAnnotation annotation = userAnnotationService.get(annotationId);
-            provision.put("value", geometryService.WKTToGeoJSON(annotation.getWktLocation()));
+            if (!provision.get("value").isNull()) {
+                Long annotationId = provision.get("value").asLong();
+                UserAnnotation annotation = userAnnotationService.get(annotationId);
+                provision.put("value", geometryService.WKTToGeoJSON(annotation.getWktLocation()));
+            }
         }
 
         provision.remove("type");

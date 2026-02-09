@@ -1,5 +1,6 @@
 package be.cytomine.config;
 
+import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +16,11 @@ public class MongoTestConfiguration {
         MongoDBContainer mongoContainer = new MongoDBContainer(imageName);
         mongoContainer.start();
         return mongoContainer;
+    }
+
+    @Bean
+    public MongoClient mongoClient(MongoDBContainer mongoDBContainer) {
+        return MongoClients.create(mongoDBContainer.getReplicaSetUrl());
     }
 
     @Bean

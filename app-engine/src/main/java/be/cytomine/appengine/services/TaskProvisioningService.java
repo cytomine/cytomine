@@ -428,6 +428,10 @@ public class TaskProvisioningService {
         for (Parameter parameter : inputs) {
             if (parameter.getName().equalsIgnoreCase(provision.getParameterName())) {
                 inputFound = true;
+                log.info("parameter {} is {} and th value is {}", parameter.getName(), parameter.isOptional()? "optional" : "not optional", provision.getValue());
+                if (parameter.isOptional() && Objects.isNull(provision.getValue())) {
+                    continue;
+                }
                 parameter.getType().validate(provision.getValue());
             }
         }

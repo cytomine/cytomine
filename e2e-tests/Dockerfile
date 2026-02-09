@@ -1,6 +1,5 @@
 ARG PROXY_CACHE=registry.cytomine.org/docker
 ARG JAVA_VERSION=17-jre
-# ARG GRADLE_VERSION=8.14-jdk21-alpine
 ARG GRADLE_VERSION=8.14-jdk21-alpine
 
 FROM ${PROXY_CACHE}/gradle:${GRADLE_VERSION}

@@ -15,10 +15,6 @@ java {
 bootJar {
     archiveFileName = 'e2e-tests.jar'
 }
-//
-//springBoot {
-//    mainClass = "org.cytomine.e2etests.TestApp"
-//}
 
 configurations {
 	compileOnly {

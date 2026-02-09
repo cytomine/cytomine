@@ -29,9 +29,14 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
 	compileOnly 'org.projectlombok:lombok'
+	testCompileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
+	testAnnotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testImplementation 'org.seleniumhq.selenium:selenium-java'
+	// Source: https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java
+	implementation("org.seleniumhq.selenium:selenium-java")
 }
 
 tasks.named('test') {

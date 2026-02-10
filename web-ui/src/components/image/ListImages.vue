@@ -292,7 +292,8 @@ export default {
       return this.$store.getters['currentProject/canManageProject'];
     },
     canAddImage() {
-      return !this.currentUser.guestByNow && (this.canManageProject || !this.project.isReadOnly);
+      let isLSAAIUser = this.currentUser.username.endsWith('@lifescience-ri.eu'); // temp flag
+      return !this.currentUser.guestByNow && (this.canManageProject || !this.project.isReadOnly) && !isLSAAIUser;
     },
 
     storeModule() { // path to the vuex module in which state of this component is stored (projects/currentProject/listImages)

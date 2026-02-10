@@ -192,6 +192,7 @@ public class RunTaskStepDefinitions {
     public void a_task_run_exists_with_identifier(String uuid) throws FileStorageException {
         runRepository.deleteAll();
         task = TestTaskBuilder.buildHardcodedAddInteger(UUID.fromString(uuid));
+        task = taskRepository.saveAndFlush(task);
         secret = UUID.randomUUID().toString();
         persistedRun = new Run(UUID.fromString(uuid), null, null , secret);
         persistedRun.setTask(task);
@@ -336,7 +337,7 @@ public class RunTaskStepDefinitions {
         Assertions.assertEquals(Integer.parseInt(ResponseCode), persistedException.getStatusCode().value());
         ObjectMapper mapper = new ObjectMapper();
         JsonNode errorJsonNodeFromServer = mapper.readTree(persistedException.getResponseBodyAsString());
-        Assertions.assertEquals(errorCode, errorJsonNodeFromServer.get("error_code").textValue());
+        Assertions.assertEquals(errorCode, errorJsonNodeFromServer.get("errorCode").textValue());
     }
 
     // successful fetch of task run outputs archive in a finished task run
@@ -464,12 +465,12 @@ public class RunTaskStepDefinitions {
         runRepository.deleteAll();
         taskRepository.deleteAll();
         Task task = TestTaskBuilder.buildHardcodedAddInteger();
+        task = taskRepository.saveAndFlush(task);
         persistedRun = new Run(UUID.fromString(runId), null, null);
         persistedRun.setTask(task);
         persistedRun = runRepository.save(persistedRun);
         taskRepository.save(task);
         persistedRun = runRepository.findById(persistedRun.getId()).get();
-
     }
 
     @Given("this task run has not been successfully provisioned yet and is therefore in state {string}")
@@ -492,7 +493,7 @@ public class RunTaskStepDefinitions {
         Assertions.assertEquals(Integer.parseInt(ResponseCode), persistedException.getStatusCode().value());
         ObjectMapper mapper = new ObjectMapper();
         JsonNode errorJsonNodeFromServer = mapper.readTree(persistedException.getResponseBodyAsString());
-        Assertions.assertEquals(errorCode, errorJsonNodeFromServer.get("error_code").textValue());
+        Assertions.assertEquals(errorCode, errorJsonNodeFromServer.get("errorCode").textValue());
     }
 
     @Then("this task run remains in state {string}")
@@ -718,9 +719,9 @@ public class RunTaskStepDefinitions {
 
     @And("a task run has been created with {string}")
     public void createTaskRun(String uuid) {
+        persistedTask = taskRepository.saveAndFlush(persistedTask);
         persistedRun = new Run(UUID.fromString(uuid), TaskRunState.CREATED, persistedTask);
         persistedRun = runRepository.save(persistedRun);
-
     }
 
     @And("a user provisioned all the parameters")

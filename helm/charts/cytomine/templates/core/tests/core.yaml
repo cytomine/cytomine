@@ -1,14 +1,26 @@
-# apiVersion: v1
-# kind: Pod
-# metadata:
-#   name: "core-test-connection"
-#   labels:
-#   annotations:
-#    "helm.sh/hook": test
-# spec:
-#   containers:
-#     - name: curl
-#       image: curlimages/curl
-#       command: ['curl']
-#       args: ['-f', '{{ include "core.url" . }}/server/ping']
-#   restartPolicy: Never
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "e2e-tests"
+  labels:
+  annotations:
+    "helm.sh/hook": test
+spec:
+  securityContext:
+  {{- include "cytomine.podSecurityContext" . | nindent 4 }}
+  volumes:
+    - name: tmp
+      emptyDir: {}
+    - name: workspace
+      emptyDir: {}
+  containers:
+    - name: e2e-tests
+      image: "{{ .Values.images.e2e_tests }}"
+      securityContext:
+      {{- include "cytomine.containerSecurityContext" . | nindent 8 }}
+      volumeMounts:
+      - name: tmp
+        mountPath: /tmp/gradle
+      - name: workspace
+        mountPath: /workspace
+  restartPolicy: Never

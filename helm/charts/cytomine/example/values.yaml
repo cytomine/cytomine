@@ -1,5 +1,5 @@
 global:
-  domainName: 'cytomine.local'
+  domainName: "cytomine.local"
 
 postgresql:
   storageClassName:

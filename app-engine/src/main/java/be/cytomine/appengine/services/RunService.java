@@ -55,8 +55,11 @@ public class RunService {
         }
     }
 
-    public void deleteRunStorage(Run run) throws RunTaskServiceException {
-        deleteStorage("task-run-inputs-" + run.getId());
-        deleteStorage("task-run-outputs-" + run.getId());
+    public void deleteStorageIfExists(String storageName) {
+        try {
+            deleteStorage(storageName);
+        } catch (RunTaskServiceException e) {
+            log.warn("Failed to delete storage '{}': [{}]. Skipping.", storageName, e.getMessage());
+        }
     }
 }

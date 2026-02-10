@@ -220,7 +220,7 @@ public class ProjectServiceTests {
         assertThat(results.get(1).get("opened")).isEqualTo(true);
 
         results = projectService.listLastOpened(user1, 3L);
-        System.out.println(results);
+
         assertThat(results).hasSize(3);
         assertThat(results.get(0).get("id")).isEqualTo(project2.getId());
         assertThat(results.get(0).get("opened")).isEqualTo(true);

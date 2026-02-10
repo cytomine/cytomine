@@ -123,8 +123,6 @@ public class BasicInstanceBuilder {
                         .orElseGet(() -> given_default_user());
                 anAdmin = userRepository.findByUsernameLikeIgnoreCase("admin")
                         .orElseGet(() -> given_default_admin());
-
-                em.flush();
             }
         });
     }
@@ -180,7 +178,7 @@ public class BasicInstanceBuilder {
     }
 
     public User given_a_admin(String username) {
-        User user = persistAndReturn(given_a_not_persisted_user());
+        User user = given_a_not_persisted_user();
         user.setUsername(username);
         user = persistAndReturn(user);
         addRole(user, ROLE_ADMIN);

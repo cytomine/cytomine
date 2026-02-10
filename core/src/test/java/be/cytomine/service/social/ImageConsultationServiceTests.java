@@ -16,6 +16,24 @@ package be.cytomine.service.social;
 * limitations under the License.
 */
 
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
+import com.mongodb.client.MongoClient;
+import jakarta.transaction.Transactional;
+import org.apache.commons.lang3.time.DateUtils;
+import org.assertj.core.api.AssertionsForClassTypes;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.test.context.support.WithMockUser;
+
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.domain.image.ImageInstance;
@@ -30,23 +48,6 @@ import be.cytomine.repositorynosql.social.PersistentImageConsultationRepository;
 import be.cytomine.service.database.SequenceService;
 import be.cytomine.service.image.SliceCoordinatesService;
 import be.cytomine.utils.JsonObject;
-import com.mongodb.client.MongoClient;
-import org.apache.commons.lang3.time.DateUtils;
-import org.assertj.core.api.AssertionsForClassTypes;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.security.test.context.support.WithMockUser;
-
-import jakarta.transaction.Transactional;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
 
 import static be.cytomine.service.social.UserPositionServiceTests.USER_VIEW;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -108,7 +109,6 @@ public class ImageConsultationServiceTests {
     void creation_and_close() {
         User user = builder.given_superadmin();
         ImageInstance imageInstance = builder.given_a_slice_instance().getImage();
-        Date before = new Date(new Date().getTime()-1000);
         PersistentImageConsultation consultation = given_a_persistent_image_consultation(user, imageInstance, new Date());
         AssertionsForClassTypes.assertThat(consultation).isNotNull();
         AssertionsForClassTypes.assertThat(consultation.getTime()).isNull();

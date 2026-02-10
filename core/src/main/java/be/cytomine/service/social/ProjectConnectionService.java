@@ -16,6 +16,35 @@ package be.cytomine.service.social;
 * limitations under the License.
 */
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Accumulators;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.time.DateUtils;
+import org.bson.Document;
+import org.bson.conversions.Bson;
+import org.bson.json.JsonWriterSettings;
+import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.stereotype.Service;
+
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.domain.social.PersistentConnection;
@@ -49,11 +78,16 @@ import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.stereotype.Service;
 
-import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
-
-import static com.mongodb.client.model.Aggregates.*;
-import static com.mongodb.client.model.Filters.*;
+import static com.mongodb.client.model.Aggregates.group;
+import static com.mongodb.client.model.Aggregates.limit;
+import static com.mongodb.client.model.Aggregates.match;
+import static com.mongodb.client.model.Aggregates.skip;
+import static com.mongodb.client.model.Aggregates.sort;
+import static com.mongodb.client.model.Filters.and;
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.gte;
+import static com.mongodb.client.model.Filters.in;
+import static com.mongodb.client.model.Filters.lte;
 import static com.mongodb.client.model.Sorts.ascending;
 import static com.mongodb.client.model.Sorts.descending;
 import java.util.*;
@@ -61,6 +95,9 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static org.springframework.security.acls.domain.BasePermission.*;
+import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
+import static org.springframework.security.acls.domain.BasePermission.READ;
+import static org.springframework.security.acls.domain.BasePermission.WRITE;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -176,7 +213,8 @@ public class ProjectConnectionService {
 
         AggregationResults queryResults = persistentProjectConnectionRepository.retrieve(project.getId(), sortProperty, (sortDirection.equals("desc")? -1 : 1));
         List aggregation = queryResults.getMappedResults();
-        List<Long> connected = (List<Long>) aggregation.stream().map(x -> x instanceof LinkedHashMap ? (Long)((LinkedHashMap)x).get("user") : (Long)((PersistentProjectConnection)x).getUser()).distinct().collect(Collectors.toList());
+        List<Long> connected = (List<Long>) aggregation.stream().map(x -> x instanceof Map ?
+            (Long) ((Map) x).get("user") : (Long) ((PersistentProjectConnection) x).getUser()).distinct().collect(Collectors.toList());
 
         List<Long> unconnectedIds =  new ArrayList<>(userIds);
         unconnectedIds.removeAll(connected);
@@ -223,10 +261,12 @@ public class ProjectConnectionService {
         List aggregation = connections.getMappedResults();
 
         List<Long> continuousConnections = new ArrayList<>();
-        // don't understand why sometime it is LinkedHashMap and sometimes PersistentConnection :-/
-        if (!aggregation.isEmpty() && aggregation.get(0) instanceof LinkedHashMap) {
+        // don't understand why sometimes it is LinkedHashMap and sometimes PersistentConnection :-/
+        if (!aggregation.isEmpty() && aggregation.get(0) instanceof Map) {
             continuousConnections = (List<Long>)aggregation.stream().map(x ->
-                    x instanceof LinkedHashMap ? be.cytomine.utils.DateUtils.computeDateInMillis((Date)((LinkedHashMap) x).get("created")) :
+                x instanceof Map ?
+                    be.cytomine.utils.DateUtils.computeDateInMillis((Date) ((Map) x).get("created"
+                    )) :
                             be.cytomine.utils.DateUtils.computeDateInMillis((Date)((PersistentConnection) x).getCreated())).collect(Collectors.toList());
         }
 

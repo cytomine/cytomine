@@ -1,2 +1,4 @@
 cytomine:
     url: https://cytomine.local
+    admin: admin
+    password: password

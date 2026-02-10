@@ -1,0 +1,3 @@
+cytomine:
+  admin: ${CYTOMINE_ADMIN_USERNAME}
+  password: ${CYTOMINE_ADMIN_PASSWORD}

@@ -50,7 +50,7 @@ jobs:
       - name: Set up node
         uses: actions/setup-node@v6
         with:
-          node-version: '16'
+          node-version: "16"
 
       - name: Install dependencies
         run: >-
@@ -71,22 +71,21 @@ jobs:
           --strict=false
           --all-errors
 
-  # will be fixed in https://github.com/cytomine/cytomine/pull/587
-  # validate-openapi:
-  #   runs-on: self-hosted
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v6.0.2
-  #     - name: Validate OpenAPI specifications
-  #       uses: addnab/docker-run-action@v3
-  #       with:
-  #         image: registry.cytomine.org/docker/redocly/cli:1.10.6
-  #         run: 'redocly lint ${{ env.OPENAPI_PATH }}'
-  #         options: -v ${{ github.workspace }}/app-engine:/app-engine -w /app-engine
-  #       env:
-  #         OPENAPI_PATH: /app-engine/src/test/resources/spec/api/openapi_spec.v0.1.0.yml
+  validate-openapi:
+    runs-on: ubuntu-latest
+    container:
+      image: registry.cytomine.org/docker/redocly/cli:1.10.6
+      # https://stackoverflow.com/a/68761652
+      options: --user root
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6.0.2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Validate OpenAPI specifications
+        run: 'redocly lint src/test/resources/spec/api/openapi_spec.v0.1.0.yml'
 
-  unit-tests:
+  tests:
     runs-on: self-hosted
 
     steps:
@@ -106,6 +105,8 @@ jobs:
 
       - name: Trigger unit tests
         run: gradle :app-engine:test --info
+        env:
+          TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX: registry.cytomine.org/docker/
 
       - name: Upload test reports
         if: ${{ always() }}

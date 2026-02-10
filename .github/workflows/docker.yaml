@@ -41,6 +41,9 @@ jobs:
           - name: web-ui
           - name: python-client
             context: clients/python
+          - name: e2e-tests
+            context: "."
+            dockerfile_location: e2e-tests
 
     steps:
       - name: Checkout repository

@@ -30,6 +30,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.test.context.support.WithMockUser;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import jakarta.transaction.Transactional;

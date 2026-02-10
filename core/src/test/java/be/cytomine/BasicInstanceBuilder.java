@@ -119,10 +119,12 @@ public class BasicInstanceBuilder {
         this.transactionTemplate.execute(new TransactionCallbackWithoutResult() {
             @Override
             protected void doInTransactionWithoutResult(TransactionStatus status) {
-                aUser = (User) userRepository.findByUsernameLikeIgnoreCase("user")
+                aUser = userRepository.findByUsernameLikeIgnoreCase("user")
                         .orElseGet(() -> given_default_user());
-                anAdmin = (User) userRepository.findByUsernameLikeIgnoreCase("admin")
+                anAdmin = userRepository.findByUsernameLikeIgnoreCase("admin")
                         .orElseGet(() -> given_default_admin());
+
+                em.flush();
             }
         });
     }

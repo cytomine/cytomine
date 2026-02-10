@@ -1,21 +1,5 @@
 package be.cytomine.domain;
 
-/*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
-
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.config.MongoTestConfiguration;
@@ -47,6 +31,7 @@ import org.springframework.context.annotation.Import;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.*;
 
 import static com.mongodb.client.model.Filters.eq;
@@ -126,42 +111,30 @@ public class MongoDBDomainTests {
         assertThat(indexUserDate.get("expireAfterSeconds")).isEqualTo(300L);
     }
     
-    /**
-     * Check that the format of MongoDB is the same as
-     */
     @Test
-    void last_connection_domain() throws ParseException, JsonProcessingException {
+    void last_connection_domain() {
+        Long expectedId = 60657L;
+        Long expectedUserId = 58L;
+        Instant expectedInstant = Instant.parse("2022-02-02T07:30:23.384Z");
+        Date expectedDate = Date.from(expectedInstant);
+
         LastConnection lastConnection = new LastConnection();
-        lastConnection.setId(60657L);
+        lastConnection.setId(expectedId);
         lastConnection.setProject(null);
-        lastConnection.setUser(58L);
-        lastConnection.setCreated(mongoDBFormat.parse("2022-02-02T07:30:23.384Z"));
-        lastConnection.setDate(mongoDBFormat.parse("2022-02-02T07:30:23.384Z"));
+        lastConnection.setUser(expectedUserId);
+        lastConnection.setCreated(expectedDate);
+        lastConnection.setDate(expectedDate);
         lastConnection = lastConnectionRepository.insert(lastConnection);
 
         Document document = retrieveDocument("lastConnection", lastConnection.getId());
 
-
-        String expectedResults =
-                "{\n" +
-                        "\t\"_id\": 60657,\n" +
-                        "\t\"date\": {\n" +
-                        "\t\t\"$date\": \"2022-02-02T06:30:23.384Z\"\n" + //UTC
-                        "\t},\n" +
-                        "\t\"created\": {\n" +
-                        "\t\t\"$date\": \"2022-02-02T06:30:23.384Z\"\n" + //UTC
-                        "\t},\n" +
-                        "\t\"user\": 58,\n" +
-                        "\t\"version\": 0\n" +
-                        "}";
-
-
-        String expectedResultsAnotherTimeZone = expectedResults.replaceAll("2022-02-02T06:30:23.384Z", "2022-02-02T07:30:23.384Z");
-
-        assertThat(objectMapper.readTree(document.toJson())).isIn(objectMapper.readTree(expectedResults), objectMapper.readTree(expectedResultsAnotherTimeZone));
-
+        assertThat(document.getLong("_id")).isEqualTo(expectedId);
+        assertThat(document.getLong("user")).isEqualTo(expectedUserId);
+        assertThat(document.getInteger("version")).isEqualTo(0);
+        assertThat(document.get("project")).isNull();
+        assertThat(document.getDate("date").toInstant()).isEqualTo(expectedInstant);
+        assertThat(document.getDate("created").toInstant()).isEqualTo(expectedInstant);
     }
-
 
     /**
      * Check that the format of MongoDB is the same as

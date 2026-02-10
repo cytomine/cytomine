@@ -1,20 +1,15 @@
 package be.cytomine.domain;
 
-import be.cytomine.BasicInstanceBuilder;
-import be.cytomine.CytomineCoreApplication;
-import be.cytomine.domain.image.ImageInstance;
-import be.cytomine.domain.image.SliceInstance;
-import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
-import be.cytomine.domain.social.*;
-import be.cytomine.dto.image.AreaDTO;
-import be.cytomine.repositorynosql.social.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.ListIndexesIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
+import jakarta.transaction.Transactional;
 import org.bson.Document;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,12 +18,20 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.util.*;
+import be.cytomine.CytomineCoreApplication;
+import be.cytomine.domain.social.LastConnection;
+import be.cytomine.domain.social.LastUserPosition;
+import be.cytomine.domain.social.PersistentConnection;
+import be.cytomine.domain.social.PersistentProjectConnection;
+import be.cytomine.domain.social.PersistentImageConsultation;
+import be.cytomine.domain.social.PersistentUserPosition;
+import be.cytomine.dto.image.AreaDTO;
+import be.cytomine.repositorynosql.social.LastConnectionRepository;
+import be.cytomine.repositorynosql.social.LastUserPositionRepository;
+import be.cytomine.repositorynosql.social.PersistentConnectionRepository;
+import be.cytomine.repositorynosql.social.PersistentImageConsultationRepository;
+import be.cytomine.repositorynosql.social.PersistentProjectConnectionRepository;
+import be.cytomine.repositorynosql.social.PersistentUserPositionRepository;
 
 import static com.mongodb.client.model.Filters.eq;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,12 +40,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureMockMvc
 @Transactional
 public class MongoDBDomainTests {
-
-    @Autowired
-    BasicInstanceBuilder builder;
-
-    @Autowired
-    EntityManager entityManager;
 
     @Autowired
     PersistentProjectConnectionRepository persistentProjectConnectionRepository;
@@ -67,8 +64,6 @@ public class MongoDBDomainTests {
 
     SimpleDateFormat mongoDBFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
-    ObjectMapper objectMapper = new ObjectMapper();
-
     @Value("${spring.data.mongodb.database}")
     private String mongoDatabaseName;
 
@@ -82,11 +77,23 @@ public class MongoDBDomainTests {
         lastUserPositionRepository.deleteAll();
     }
 
-    /**
-     * Check that the format of MongoDB is the same as
-     */
+    private Document retrieveDocument(String collectionName, Long id) {
+        MongoCollection<Document> persistentProjectConnection = mongoClient.getDatabase(mongoDatabaseName).getCollection(collectionName);
+
+        List<Document> results = persistentProjectConnection.find(eq("_id", id))
+                .into(new ArrayList<>());
+
+        assertThat(results).hasSize(1);
+        return results.get(0);
+    }
+
+    private ListIndexesIterable<Document> retrieveIndex(String collectionName) {
+        MongoCollection<Document> persistentProjectConnection = mongoClient.getDatabase(mongoDatabaseName).getCollection(collectionName);
+        return persistentProjectConnection.listIndexes();
+    }
+
     @Test
-    void last_connection_indexes() throws ParseException, JsonProcessingException {
+    void last_connection_indexes() {
         ListIndexesIterable<Document> indexes = retrieveIndex("lastConnection");
         Document indexId = null;
         Document indexUserDate = null;
@@ -100,12 +107,12 @@ public class MongoDBDomainTests {
         }
         assertThat(indexes).hasSize(2);
         assertThat(indexId).isNotNull();
-        assertThat(((Document)indexId.get("key")).get("_id")).isEqualTo(1);
+        assertThat(((Document) indexId.get("key")).get("_id")).isEqualTo(1);
         assertThat(indexUserDate).isNotNull();
-        assertThat(((Document)indexUserDate.get("key")).get("date")).isEqualTo(1); // 1 or 2
+        assertThat(((Document) indexUserDate.get("key")).get("date")).isEqualTo(1);
         assertThat(indexUserDate.get("expireAfterSeconds")).isEqualTo(300L);
     }
-    
+
     @Test
     void last_connection_domain() throws ParseException {
         Long expectedId = 60657L;
@@ -130,11 +137,8 @@ public class MongoDBDomainTests {
         assertThat(document.getDate("created")).isEqualTo(expectedDate);
     }
 
-    /**
-     * Check that the format of MongoDB is the same as
-     */
     @Test
-    void last_user_position_index() throws ParseException, JsonProcessingException {
+    void last_user_position_index() {
         ListIndexesIterable<Document> indexes = retrieveIndex("lastUserPosition");
         Document indexId = null;
         Document indexUserImageSliceCreated = null;
@@ -164,25 +168,25 @@ public class MongoDBDomainTests {
         assertThat(indexes).hasSize(5);
 
         assertThat(indexId).isNotNull();
-        assertThat(((Document)indexId.get("key")).get("_id")).isEqualTo(1);
+        assertThat(((Document) indexId.get("key")).get("_id")).isEqualTo(1);
 
         assertThat(indexUserImageSliceCreated).isNotNull();
-        assertThat(((Document)indexUserImageSliceCreated.get("key")).get("user")).isEqualTo(1);
-        assertThat(((Document)indexUserImageSliceCreated.get("key")).get("image")).isEqualTo(1);
-        assertThat(((Document)indexUserImageSliceCreated.get("key")).get("slice")).isEqualTo(1);
-        assertThat(((Document)indexUserImageSliceCreated.get("key")).get("created")).isEqualTo(-1);
+        assertThat(((Document) indexUserImageSliceCreated.get("key")).get("user")).isEqualTo(1);
+        assertThat(((Document) indexUserImageSliceCreated.get("key")).get("image")).isEqualTo(1);
+        assertThat(((Document) indexUserImageSliceCreated.get("key")).get("slice")).isEqualTo(1);
+        assertThat(((Document) indexUserImageSliceCreated.get("key")).get("created")).isEqualTo(-1);
 
         assertThat(locationImageSlice).isNotNull();
-        assertThat(((Document)locationImageSlice.get("key")).get("location")).isEqualTo("2d");
-        assertThat(((Document)locationImageSlice.get("key")).get("image")).isEqualTo(1);
-        assertThat(((Document)locationImageSlice.get("key")).get("slice")).isEqualTo(1);
+        assertThat(((Document) locationImageSlice.get("key")).get("location")).isEqualTo("2d");
+        assertThat(((Document) locationImageSlice.get("key")).get("image")).isEqualTo(1);
+        assertThat(((Document) locationImageSlice.get("key")).get("slice")).isEqualTo(1);
 
         assertThat(created).isNotNull();
-        assertThat(((Document)created.get("key")).get("created")).isEqualTo(1);
+        assertThat(((Document) created.get("key")).get("created")).isEqualTo(1);
         assertThat(created.get("expireAfterSeconds")).isEqualTo(60L);
 
         assertThat(image).isNotNull();
-        assertThat(((Document)image.get("key")).get("image")).isEqualTo(1);
+        assertThat(((Document) image.get("key")).get("image")).isEqualTo(1);
     }
 
     @Test
@@ -254,10 +258,10 @@ public class MongoDBDomainTests {
         }
         assertThat(indexes).hasSize(2);
         assertThat(indexId).isNotNull();
-        assertThat(((Document)indexId.get("key")).get("_id")).isEqualTo(1);
+        assertThat(((Document) indexId.get("key")).get("_id")).isEqualTo(1);
         assertThat(indexUserCreated).isNotNull();
-        assertThat(((Document)indexUserCreated.get("key")).get("user")).isEqualTo(1);
-        assertThat(((Document)indexUserCreated.get("key")).get("created")).isEqualTo(-1);
+        assertThat(((Document) indexUserCreated.get("key")).get("user")).isEqualTo(1);
+        assertThat(((Document) indexUserCreated.get("key")).get("created")).isEqualTo(-1);
     }
 
     @Test
@@ -265,13 +269,12 @@ public class MongoDBDomainTests {
         Long expectedId = 3073L;
         Date expectedCreated = mongoDBFormat.parse("2021-09-22T09:06:32.472Z");
         String expectedSession = "B7850470EED8CD7570E05C50FD5F02F6";
-        Long expectedProject = null;
 
         PersistentConnection connection = new PersistentConnection();
         connection.setId(expectedId);
         connection.setCreated(expectedCreated);
         connection.setSession(expectedSession);
-        connection.setProject(expectedProject);
+        connection.setProject(null);
         connection = persistentConnectionRepository.insert(connection);
 
         Document document = retrieveDocument("persistentConnection", connection.getId());
@@ -279,7 +282,7 @@ public class MongoDBDomainTests {
         assertThat(document.getLong("_id")).isEqualTo(expectedId);
         assertThat(document.getDate("created")).isEqualTo(expectedCreated);
         assertThat(document.getString("session")).isEqualTo(expectedSession);
-        assertThat(document.get("project")).isEqualTo(expectedProject);
+        assertThat(document.get("project")).isEqualTo(null);
     }
 
     @Test
@@ -371,11 +374,8 @@ public class MongoDBDomainTests {
         assertThat(document.getInteger("countCreatedAnnotations")).isEqualTo(expectedCountCreatedAnnotations);
     }
 
-    /**
-     * Check that the format of MongoDB is the same as
-     */
     @Test
-    void persistent_user_position_index() throws ParseException, JsonProcessingException {
+    void persistent_user_position_index() {
         ListIndexesIterable<Document> indexes = retrieveIndex("persistentUserPosition");
         Document indexId = null;
         Document indexUserImageSliceCreated = null;
@@ -400,21 +400,21 @@ public class MongoDBDomainTests {
         assertThat(indexes).hasSize(4);
 
         assertThat(indexId).isNotNull();
-        assertThat(((Document)indexId.get("key")).get("_id")).isEqualTo(1);
+        assertThat(((Document) indexId.get("key")).get("_id")).isEqualTo(1);
 
         assertThat(indexUserImageSliceCreated).isNotNull();
-        assertThat(((Document)indexUserImageSliceCreated.get("key")).get("user")).isEqualTo(1);
-        assertThat(((Document)indexUserImageSliceCreated.get("key")).get("image")).isEqualTo(1);
-        assertThat(((Document)indexUserImageSliceCreated.get("key")).get("slice")).isEqualTo(1);
-        assertThat(((Document)indexUserImageSliceCreated.get("key")).get("created")).isEqualTo(-1);
+        assertThat(((Document) indexUserImageSliceCreated.get("key")).get("user")).isEqualTo(1);
+        assertThat(((Document) indexUserImageSliceCreated.get("key")).get("image")).isEqualTo(1);
+        assertThat(((Document) indexUserImageSliceCreated.get("key")).get("slice")).isEqualTo(1);
+        assertThat(((Document) indexUserImageSliceCreated.get("key")).get("created")).isEqualTo(-1);
 
         assertThat(locationImageSlice).isNotNull();
-        assertThat(((Document)locationImageSlice.get("key")).get("location")).isEqualTo("2d");
-        assertThat(((Document)locationImageSlice.get("key")).get("image")).isEqualTo(1);
-        assertThat(((Document)locationImageSlice.get("key")).get("slice")).isEqualTo(1);
+        assertThat(((Document) locationImageSlice.get("key")).get("location")).isEqualTo("2d");
+        assertThat(((Document) locationImageSlice.get("key")).get("image")).isEqualTo(1);
+        assertThat(((Document) locationImageSlice.get("key")).get("slice")).isEqualTo(1);
 
         assertThat(image).isNotNull();
-        assertThat(((Document)image.get("key")).get("image")).isEqualTo(1);
+        assertThat(((Document) image.get("key")).get("image")).isEqualTo(1);
     }
 
     @Test
@@ -472,11 +472,8 @@ public class MongoDBDomainTests {
         assertThat(document.getInteger("zoom")).isEqualTo(expectedZoom);
     }
 
-    /**
-     * Check that the format of MongoDB is the same as
-     */
     @Test
-    void annotation_action_indexes() throws ParseException, JsonProcessingException {
+    void annotation_action_indexes() {
         ListIndexesIterable<Document> indexes = retrieveIndex("annotationAction");
         Document indexId = null;
         Document indexUserDate = null;
@@ -490,27 +487,10 @@ public class MongoDBDomainTests {
         }
         assertThat(indexes).hasSize(2);
         assertThat(indexId).isNotNull();
-        assertThat(((Document)indexId.get("key")).get("_id")).isEqualTo(1);
+        assertThat(((Document) indexId.get("key")).get("_id")).isEqualTo(1);
         assertThat(indexUserDate).isNotNull();
-        assertThat(((Document)indexUserDate.get("key")).get("user")).isEqualTo(1);
-        assertThat(((Document)indexUserDate.get("key")).get("image")).isEqualTo(1);
-        assertThat(((Document)indexUserDate.get("key")).get("created")).isEqualTo(-1);
-    }
-
-
-    private Document retrieveDocument(String collectionName, Long id) {
-        MongoCollection<Document> persistentProjectConnection = mongoClient.getDatabase(mongoDatabaseName).getCollection(collectionName);
-
-        List<Document> results = persistentProjectConnection.find(eq("_id", id))
-                .into(new ArrayList<>());
-        System.out.println("****************************");
-        assertThat(results).hasSize(1);
-        Document document = results.get(0);
-        return document;
-    }
-
-    private ListIndexesIterable<Document> retrieveIndex(String collectionName) {
-        MongoCollection<Document> persistentProjectConnection = mongoClient.getDatabase(mongoDatabaseName).getCollection(collectionName);
-        return persistentProjectConnection.listIndexes();
+        assertThat(((Document) indexUserDate.get("key")).get("user")).isEqualTo(1);
+        assertThat(((Document) indexUserDate.get("key")).get("image")).isEqualTo(1);
+        assertThat(((Document) indexUserDate.get("key")).get("created")).isEqualTo(-1);
     }
 }

@@ -107,11 +107,10 @@ public class MongoDBDomainTests {
     }
     
     @Test
-    void last_connection_domain() {
+    void last_connection_domain() throws ParseException {
         Long expectedId = 60657L;
         Long expectedUserId = 58L;
-        Instant expectedInstant = Instant.parse("2022-02-02T07:30:23.384Z");
-        Date expectedDate = Date.from(expectedInstant);
+        Date expectedDate = mongoDBFormat.parse("2022-02-02T07:30:23.384Z");
 
         LastConnection lastConnection = new LastConnection();
         lastConnection.setId(expectedId);
@@ -127,8 +126,8 @@ public class MongoDBDomainTests {
         assertThat(document.getLong("user")).isEqualTo(expectedUserId);
         assertThat(document.getInteger("version")).isEqualTo(0);
         assertThat(document.get("project")).isNull();
-        assertThat(document.getDate("date").toInstant()).isEqualTo(expectedInstant);
-        assertThat(document.getDate("created").toInstant()).isEqualTo(expectedInstant);
+        assertThat(document.getDate("date")).isEqualTo(expectedDate);
+        assertThat(document.getDate("created")).isEqualTo(expectedDate);
     }
 
     /**
@@ -186,58 +185,57 @@ public class MongoDBDomainTests {
         assertThat(((Document)image.get("key")).get("image")).isEqualTo(1);
     }
 
-    /**
-     * Check that the format of MongoDB is the same as
-     */
     @Test
-    void last_user_position_domain() throws ParseException, JsonProcessingException {
-        LastUserPosition lastPosition = new LastUserPosition();
-        lastPosition.setId(60911L);
-        lastPosition.setBroadcast(false);
-        lastPosition.setCreated(mongoDBFormat.parse("2022-02-02T07:40:46.710Z"));
-        lastPosition.setImage(29240L);
-        lastPosition.setImageName("CMU-1-Small-Region (1).svs");
-        lastPosition.setLocation(new AreaDTO(
-                new be.cytomine.dto.image.Point(-109d,2548d),
-                new be.cytomine.dto.image.Point(683d,2548d),
-                new be.cytomine.dto.image.Point(683d,2028d),
-                new be.cytomine.dto.image.Point(-109d,2028d)
-        ).toMongodbLocation().getCoordinates());
-        lastPosition.setProject(22782L);
-        lastPosition.setRotation(0d);
-        lastPosition.setSlice(29241L);
-        lastPosition.setUser(58L);
-        lastPosition.setZoom(5);
+    void last_user_position_domain() throws ParseException {
+        boolean expectedBroadcast = false;
+        Long expectedId = 60911L;
+        Long expectedImageId = 29240L;
+        Long expectedProjectId = 22782L;
+        Long expectedSliceId = 29241L;
+        String expectedImageName = "CMU-1-Small-Region (1).svs";
+        Date expectedDate = mongoDBFormat.parse("2022-02-02T07:40:46.710Z");
+        Double expectedRotation = 0d;
+        Long expectedUserId = 58L;
+        Integer expectedZoom = 5;
 
+        List<List<Double>> expectedLocation = new AreaDTO(
+                new be.cytomine.dto.image.Point(-109d, 2548d),
+                new be.cytomine.dto.image.Point(683d, 2548d),
+                new be.cytomine.dto.image.Point(683d, 2028d),
+                new be.cytomine.dto.image.Point(-109d, 2028d)
+        ).toMongodbLocation().getCoordinates();
+
+        LastUserPosition lastPosition = new LastUserPosition();
+        lastPosition.setId(expectedId);
+        lastPosition.setBroadcast(expectedBroadcast);
+        lastPosition.setCreated(expectedDate);
+        lastPosition.setImage(expectedImageId);
+        lastPosition.setImageName(expectedImageName);
+        lastPosition.setLocation(expectedLocation);
+        lastPosition.setProject(expectedProjectId);
+        lastPosition.setRotation(expectedRotation);
+        lastPosition.setSlice(expectedSliceId);
+        lastPosition.setUser(expectedUserId);
+        lastPosition.setZoom(expectedZoom);
         lastPosition = lastUserPositionRepository.insert(lastPosition);
 
         Document document = retrieveDocument("lastUserPosition", lastPosition.getId());
 
-        String expectedResults = "{\n" +
-                "\"_id\": 60911,\n" +
-                "\"broadcast\": false,\n" +
-                "\"created\": {\n" +
-                "\"$date\": \"2022-02-02T06:40:46.71Z\"\n" +//UTC
-                "},\n" +
-                "\"image\": 29240,\n" +
-                "\"imageName\": \"CMU-1-Small-Region (1).svs\",\n" +
-                "\"location\": [\n" +
-                "[-109.0, 2548.0],\n" +
-                "[683.0, 2548.0],\n" +
-                "[683.0, 2028.0],\n" +
-                "[-109.0, 2028.0]\n" +
-                "],\n" +
-                "\"project\": 22782,\n" +
-                "\"rotation\": 0.0,\n" + // ???????????
-                "\"slice\": 29241,\n" +
-                "\"user\": 58,\n" +
-                "\"zoom\": 5\n" +
-                "}";
+        assertThat(document.getLong("_id")).isEqualTo(expectedId);
+        assertThat(document.getLong("image")).isEqualTo(expectedImageId);
+        assertThat(document.getLong("project")).isEqualTo(expectedProjectId);
+        assertThat(document.getLong("slice")).isEqualTo(expectedSliceId);
+        assertThat(document.getBoolean("broadcast")).isEqualTo(expectedBroadcast);
+        assertThat(document.getString("imageName")).isEqualTo(expectedImageName);
 
-        String expectedResultsAnotherTimeZone = expectedResults.replaceAll("2022-02-02T06:40:46.71Z", "2022-02-02T07:40:46.71Z");
+        assertThat(document.getDate("created")).isEqualTo(expectedDate);
+        assertThat(document.getDouble("rotation")).isEqualTo(expectedRotation);
+        assertThat(document.getLong("user")).isEqualTo(expectedUserId);
+        assertThat(document.getInteger("zoom")).isEqualTo(expectedZoom);
 
-        assertThat(objectMapper.readTree(document.toJson())).isIn(objectMapper.readTree(expectedResults), objectMapper.readTree(expectedResultsAnotherTimeZone));
-        // fails because in grails version, rotation is a string
+        @SuppressWarnings("unchecked")
+        List<List<Double>> actualLocation = (List<List<Double>>) document.get("location");
+        assertThat(actualLocation).isEqualTo(expectedLocation);
     }
 
     @Test

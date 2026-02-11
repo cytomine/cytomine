@@ -10,7 +10,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -58,17 +61,15 @@ public class TaskRunAuthorizationTest extends CRDAuthorizationTest {
         taskRun.getProject().setMode(EditingMode.CLASSIC);
     }
 
-    @Disabled("This test does not work, the returned entity is a 500, but expectOK() ignores that")
     @WithMockUser(username = USER_ACL_ADMIN)
-
-    public void user_admin_can_add_in_readonly_mode(){
+    public void user_admin_can_add_in_readonly_mode() {
         taskRun.getProject().setMode(EditingMode.READ_ONLY);
         expectOK(() -> when_i_add_domain());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_add_in_readonly_mode(){
+    public void user_cannot_add_in_readonly_mode() {
         taskRun.getProject().setMode(EditingMode.READ_ONLY);
         expectForbidden(() -> when_i_add_domain());
     }

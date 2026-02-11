@@ -1,0 +1,4 @@
+cytomine:
+  url: http://cytomine.local
+  admin:
+    username: admin

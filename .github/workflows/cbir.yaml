@@ -22,14 +22,10 @@ jobs:
       - name: Checkout the repository
         uses: actions/checkout@v6.0.2
 
-      - name: Set up Python
-        uses: actions/setup-python@v6.2.0
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-
       - name: Install uv
         uses: astral-sh/setup-uv@v7
         with:
+          python-version: ${{ env.PYTHON_VERSION }}
           version: ${{ vars.UV_VERSION }}
 
       - name: Lint
@@ -42,14 +38,10 @@ jobs:
       - name: Set up the repository
         uses: actions/checkout@v6.0.2
 
-      - name: Set up Python
-        uses: actions/setup-python@v6.2.0
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-
       - name: Install uv
         uses: astral-sh/setup-uv@v7
         with:
+          python-version: ${{ env.PYTHON_VERSION }}
           version: ${{ vars.UV_VERSION }}
 
       - name: Type check
@@ -58,28 +50,28 @@ jobs:
   test:
     runs-on: self-hosted
 
-    services:
-      redis:
-        image: registry.cytomine.org/docker/redis:${{ vars.REDIS_VERSION }}
-        ports:
-          - 6379:6379
-
     steps:
       - name: Set up the repository
         uses: actions/checkout@v6.0.2
 
-      - name: Set up Python
-        uses: actions/setup-python@v6.2.0
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-
       - name: Install uv
         uses: astral-sh/setup-uv@v7
         with:
+          python-version: ${{ env.PYTHON_VERSION }}
           version: ${{ vars.UV_VERSION }}
+
+      - name: Install test dependencies
+        run: uv sync --group test
+
+      - name: Pull test images
+        run: |
+          docker pull registry.cytomine.org/docker/redis:7.2
+          docker pull registry.cytomine.org/docker/testcontainers/ryuk:0.13.0
 
       - name: Run tests
         run: uv run pytest
         env:
           DATA_PATH: ./
+          PROXY_CACHE: registry.cytomine.org/docker/
+          RYUK_CONTAINER_IMAGE: registry.cytomine.org/docker/testcontainers/ryuk:0.13.0
           WEIGHTS: ./weights/resnet

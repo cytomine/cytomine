@@ -103,7 +103,7 @@ jobs:
         with:
           gradle-version: ${{ vars.GRADLE_VERSION }}
 
-      - name: Trigger unit tests
+      - name: Run tests
         run: gradle :app-engine:test --info
         env:
           TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX: registry.cytomine.org/docker/

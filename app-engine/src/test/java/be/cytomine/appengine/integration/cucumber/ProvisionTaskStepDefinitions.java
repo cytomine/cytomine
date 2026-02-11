@@ -734,7 +734,7 @@ public class ProvisionTaskStepDefinitions {
         for (Map<String, String> param : parameters) {
             String name = param.get("parameter_name");
             String type = param.get("parameter_type");
-            String value = param.get("parameter_value");
+            String value = param.get("parameter_value").equalsIgnoreCase("null") ? null : param.get("parameter_value");
 
             try {
                 apiClient.provisionInput(persistedRun.getId().toString(), name, type, value);

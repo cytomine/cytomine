@@ -423,8 +423,7 @@ public class TaskService {
                 input.setName(inputKey);
                 input.setDisplayName(inputValue.get("display_name").textValue());
                 input.setDescription(inputValue.get("description").textValue());
-                input.setOptional(inputValue.get("optional") != null
-                    && inputValue.get("optional").asBoolean(false));
+                input.setOptional(inputValue.path("optional").asBoolean(false));
                 // use type factory to generate the correct type
                 input.setType(TypeFactory.createType(inputValue, charset));
                 input.setParameterType(ParameterType.INPUT);

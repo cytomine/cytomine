@@ -104,7 +104,6 @@ name = "cytomine-cbir"
 version = "0.5.0"
 source = { virtual = "." }
 dependencies = [
-    { name = "docker" },
     { name = "faiss-gpu" },
     { name = "fastapi" },
     { name = "numpy" },
@@ -133,7 +132,6 @@ test = [
 
 [package.metadata]
 requires-dist = [
-    { name = "docker", specifier = ">=7.1.0" },
     { name = "faiss-gpu", specifier = "==1.7.2" },
     { name = "fastapi", specifier = "==0.128.1" },
     { name = "numpy", specifier = "==1.26.4" },

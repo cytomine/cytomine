@@ -16,6 +16,8 @@ package be.cytomine.authorization;
 * limitations under the License.
 */
 
+import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.PostGisTestConfiguration;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ForbiddenException;
@@ -27,13 +29,13 @@ import be.cytomine.service.PermissionService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.EntityManager;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
 @Transactional
 public abstract class AbstractAuthorizationTest {
 

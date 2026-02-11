@@ -51,8 +51,8 @@ RUN apt-get update \
 ENV GRADLE_USER_HOME=/opt/gradle/.gradle
 
 WORKDIR /app
-
-CMD ["/bin/sh"]
+COPY --from=jar-builder /app/build/libs/cytomine.jar /app/cytomine.jar
+CMD ["java", "-jar", "/app/cytomine.jar"]
 
 #######################################################################################
 ## Stage: Cytomine core image

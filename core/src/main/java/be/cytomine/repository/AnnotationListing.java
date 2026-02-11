@@ -1,111 +1,91 @@
 package be.cytomine.repository;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import jakarta.persistence.EntityManager;
+import lombok.Getter;
+import lombok.Setter;
 
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.ontology.AnnotationDomain;
-import be.cytomine.domain.ontology.AnnotationGroup;
-import be.cytomine.domain.ontology.Term;
-import be.cytomine.domain.ontology.Track;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.exceptions.WrongArgumentException;
-import lombok.Getter;
-import lombok.Setter;
-
-import jakarta.persistence.EntityManager;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
 public abstract class AnnotationListing {
 
     /**
-     *  default property group to show
+     * default property group to show
      */
     public static final List<String> availableColumnsDefault = List.of("basic", "meta", "term");
-
-    /**
-     *  all properties group available, each value is a list of assoc [propertyName, SQL columnName/methodName)
-     *  If value start with #, don't use SQL column, its a "trensiant property"
-     */
-    abstract LinkedHashMap<String, AvailableColumns> getAvailableColumn();
+    Optional<Long> beforeSlice = Optional.empty();
 
     protected EntityManager entityManager;
 
     List<String> columnsToPrint;
 
     Long project = null;
-    Long image = null;
     List<Long> images = null;
 
-    Long slice = null;
     List<Long> slices = null;
-
-    Long track = null;
     List<Long> tracks = null;
-    Long beforeSlice = null;
-    Long afterSlice = null;
+    Optional<Long> afterSlice = Optional.empty();
+    boolean withoutTerm;
     Long sliceDimension = null;
-
-    Long annotationGroup = null;
     List<Long> annotationGroups = null;
-
     Long user = null;
-
-    Long term = null;
     List<Long> terms = null;
+    boolean withoutTag;
+    Optional<Date> afterThan = Optional.empty();
 
     List<Long> users = null;//for user that draw annotation
     List<Long> usersForTerm = null;//for user that add a term to annotation
 
     List<Long> reviewUsers;
 
-    Long tag = null;
     List<Long> tags = null;
-
-    Date afterThan = null;
-    Date beforeThan = null;
-
-    Boolean notReviewedOnly = false;
-    Boolean noTerm = false;
-    Boolean noTag = false;
-    Boolean multipleTerm = false;
-    Boolean noTrack = false;
-    Boolean multipleTrack = false;
-
-    String bbox = null;
+    Optional<Date> beforeThan = Optional.empty();
+    boolean notReviewedOnly = false;
+    boolean multipleTerm = false;
+    boolean withoutTrack = false;
+    boolean multipleTrack = false;
+    //not used for search critera (just for specific request
+    boolean avoidEmptyCentroid = false;
+    Optional<String> bbox = null;
     String bboxAnnotation = null;
-
     Object baseAnnotation = null;
     Long maxDistanceBaseAnnotation = null;
-
-
     List<Long> parents;
-
-    //not used for search critera (just for specific request
-    Boolean avoidEmptyCentroid = false;
+    boolean kmeans = false;
     Long excludedAnnotation = null;
-
-    Boolean kmeans = false;
+    LinkedHashMap<String, String> orderBy = new LinkedHashMap<>();
     Integer kmeansValue = 3;
 
     abstract String getFrom();
@@ -114,16 +94,21 @@ public abstract class AnnotationListing {
 
     abstract String buildExtraRequest();
 
-    LinkedHashMap<String,String> extraColmun = new LinkedHashMap<>();
+    LinkedHashMap<String, String> extraColumn = new LinkedHashMap<>();
 
-    LinkedHashMap<String,String> orderBy = new LinkedHashMap<>();
+    /**
+     * all properties group available, each value is a list of assoc [propertyName, SQL
+     * columnName/methodName)
+     * If value start with #, don't use SQL column, its a "trensiant property"
+     */
+    abstract LinkedHashMap<String, AvailableColumns> getAvailableColumn();
 
     public AnnotationListing(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
     public void addExtraColumn(String propName, String column) {
-        extraColmun.put(propName, column);
+        extraColumn.put(propName, column);
     }
 
     /**
@@ -148,7 +133,7 @@ public abstract class AnnotationListing {
      * Get all properties to print
      */
     Map<String, String> buildColumnToPrint() {
-        if (columnsToPrint==null) {
+        if (columnsToPrint == null) {
             columnsToPrint = new ArrayList<>(availableColumnsDefault);
         }
         columnsToPrint.add("basic"); //mandatory to have id
@@ -161,7 +146,7 @@ public abstract class AnnotationListing {
                 columns.putAll(entry.getValue());
             }
         }
-        columns.putAll(extraColmun);
+        columns.putAll(extraColumn);
         return columns;
     }
 
@@ -169,34 +154,34 @@ public abstract class AnnotationListing {
      * Get container for security check
      */
     public CytomineDomain container() {
-        if (project!=null) {
+        if (project != null) {
             return entityManager.find(Project.class, project);
-        } else if (image!=null) {
-            return entityManager.find(ImageInstance.class, image).container();
-        } else if (images!=null) {
+        } else if (images != null) {
             List<Project> projectList = new ArrayList<>();
             for (Long idImage : images) {
-                projectList.add((Project)entityManager.find(ImageInstance.class, idImage).getProject());
+                projectList.add(
+                    entityManager.find(ImageInstance.class, idImage).getProject());
             }
             projectList = projectList.stream().distinct().collect(Collectors.toList());
             if (projectList.size() > 1) {
-                throw new WrongArgumentException("Images from filter must all be from the same project!");
+                throw new WrongArgumentException(
+                    "Images from filter must all be from the same project!");
             }
             return projectList.stream().findFirst().get();
-        } else if (slice!=null) {
-            return entityManager.find(SliceInstance.class, slice).container();
-        } else if (slices!=null) {
+        } else if (slices != null) {
             List<Project> projectList = new ArrayList<>();
             for (Long idImage : slices) {
-                projectList.add((Project)entityManager.find(SliceInstance.class, idImage).getProject());
+                projectList.add(entityManager.find(SliceInstance.class, idImage).getProject());
             }
             projectList = projectList.stream().distinct().collect(Collectors.toList());
             if (projectList.size() > 1) {
-                throw new WrongArgumentException("Slices from filter must all be from the same project!");
+                throw new WrongArgumentException(
+                    "Slices from filter must all be from the same project!");
             }
             return projectList.stream().findFirst().get();
         }
-        throw new WrongArgumentException("There is no project or image or slice filter. We cannot check acl!");
+        throw new WrongArgumentException(
+            "There is no project or image or slice filter. We cannot check acl!");
     }
 
     /**
@@ -208,7 +193,8 @@ public abstract class AnnotationListing {
 
         Map<String, String> columns = buildColumnToPrint();
         Map<String, String> sqlColumns = new LinkedHashMap<>();
-        Map<String, String>  postComputedColumns = new LinkedHashMap<>();
+        Map<String, String> postComputedColumns = new LinkedHashMap<>(); // I've no idea what
+        // postComputedColumns does
 
         for (Map.Entry<String, String> colum : columns.entrySet()) {
             if (!colum.getValue().startsWith("#")) {
@@ -218,67 +204,52 @@ public abstract class AnnotationListing {
             }
         }
         String whereRequest =
-                getProjectConst() +
-                        getUserConst() +
-                        getUsersConst() +
+            getProjectConst() +
+                getUserConst() +
+                getUsersConst() +
+                getImagesConst() +
+                getSlicesConst() +
+                getTagsConst() +
 
-                        getImageConst() +
-                        getImagesConst() +
+                getTermsConst() +
+                getTracksConst() +
+                getBeforeOrAfterSliceConst() +
+                getGroupsConst() +
+                getUsersForTermConst() +
+                getNotReviewedOnlyConst() +
+                getParentsConst() +
+                getAvoidEmptyCentroidConst() +
+                getReviewUsersConst() +
+                getIntersectConst() +
+                getIntersectAnnotationConst() +
+                getMaxDistanceAnnotationConst() +
+                getExcludedAnnotationConst() +
+                getBeforeThan() +
+                getAfterThan() +
+                createOrderBy();
 
-                        getSliceConst() +
-                        getSlicesConst() +
-
-                        getTagConst() +
-                        getTagsConst() +
-
-                        getTermConst() +
-                        getTermsConst() +
-
-                        getTrackConst() +
-                        getTracksConst() +
-                        getBeforeOrAfterSliceConst() +
-
-                        getGroupConst() +
-                        getGroupsConst() +
-
-                        getUsersForTermConst() +
-
-                        getNotReviewedOnlyConst() +
-                        getParentsConst() +
-                        getAvoidEmptyCentroidConst() +
-                        getReviewUsersConst() +
-
-                        getIntersectConst() +
-                        getIntersectAnnotationConst() +
-                        getMaxDistanceAnnotationConst() +
-                        getExcludedAnnotationConst() +
-
-                        getBeforeThan() +
-                        getAfterThan() +
-                        createOrderBy();
-
-        if (term!=null || terms!=null || track!=null || tracks!=null) {
+        if (terms != null || tracks != null) {
             String request = "SELECT DISTINCT a.*, ";
 
-            if (term!=null || terms!=null) {
+            if (terms != null) {
                 sqlColumns.remove("term");
                 sqlColumns.remove("annotationTerms");
                 sqlColumns.remove("userTerm");
 
                 if (this instanceof ReviewedAnnotationListing) {
                     request += "at.term_id as term, 0 as annotationTerms, a.user as userTerm ";
-                }
-                else {
-                    request += "at.term_id as term, at.id as annotationTerms, at.user_id as userTerm ";
+                } else {
+                    request +=
+                        "at.term_id as term, at.id as annotationTerms, at.user_id as userTerm ";
                 }
 
             }
 
-            if ((term!=null || terms!=null) && (track!=null || tracks!=null)) {
+            if ((terms != null) && (tracks != null)) {
                 request += ", ";
             }
 
-            if (track!=null || tracks!=null) {
+            if (tracks != null) {
                 sqlColumns.remove("track");
                 sqlColumns.remove("annotationTracks");
                 request += "atr.track_id as track, atr.id as annotationTracks ";
@@ -286,32 +257,34 @@ public abstract class AnnotationListing {
 
             request += "FROM (" + getSelect(sqlColumns) + getFrom() + whereRequest + ") a \n";
 
-            if (term!=null || terms!=null) {
+            if (terms != null) {
                 if (this instanceof ReviewedAnnotationListing) {
-                    request += "LEFT OUTER JOIN reviewed_annotation_term at ON a.id = at.reviewed_annotation_terms_id ";
-                }
-                else {
-                    request += "LEFT OUTER JOIN annotation_term at ON a.id = at.user_annotation_id ";
+                    request +=
+                        "LEFT OUTER JOIN reviewed_annotation_term at ON a.id = at"
+                            + ".reviewed_annotation_terms_id ";
+                } else {
+                    request +=
+                        "LEFT OUTER JOIN annotation_term at ON a.id = at.user_annotation_id ";
                 }
             }
 
 
-            if (track!=null || tracks!=null)
+            if (tracks != null)
                 request += "LEFT OUTER JOIN annotation_track atr ON a.id = atr.annotation_ident ";
 
             request += "WHERE true ";
-            if (term!=null || terms!=null) {
-                 if (!(this instanceof ReviewedAnnotationListing)) {
+            if (terms != null) {
+                if (!(this instanceof ReviewedAnnotationListing)) {
                     request += "AND at.deleted IS NULL ";
                 }
             }
 
             request += "ORDER BY ";
-            request += (track!=null || tracks!=null) ? "a.rank asc" : "a.id desc ";
-            if (term!=null || terms!=null) {
+            request += (tracks != null) ? "a.rank asc" : "a.id desc ";
+            if (terms != null) {
                 request += ", at.term_id ";
             }
-            request += ((track!=null || tracks!=null) ? ", atr.track_id " : "");
+            request += ((tracks != null) ? ", atr.track_id " : "");
             return request;
         }
 
@@ -322,24 +295,27 @@ public abstract class AnnotationListing {
     /**
      * Generate SQL string for SELECT with only asked properties
      */
-    String getSelect(Map<String,String> columns) {
+    String getSelect(Map<String, String> columns) {
         if (kmeansValue >= 3) {
             List<String> requestHeadList = new ArrayList<>();
             for (Map.Entry<String, String> entry : columns.entrySet()) {
                 if (entry.getKey().equals("term") && !(this instanceof ReviewedAnnotationListing)) {
-                    String table ="";
-                    if(entry.getValue().contains("aat")) {
+                    String table = "";
+                    if (entry.getValue().contains("aat")) {
                         table = "aat";
-                    } else if(entry.getValue().contains("at")) {
+                    } else if (entry.getValue().contains("at")) {
                         table = "at";
                     }
-                    requestHeadList.add("CASE WHEN "+table+".deleted IS NOT NULL THEN NULL ELSE "+entry.getValue()+" END as " + entry.getKey());
+                    requestHeadList.add(
+                        "CASE WHEN " + table + ".deleted IS NOT NULL THEN NULL ELSE "
+                            + entry.getValue() + " END as " + entry.getKey());
                 } else {
                     requestHeadList.add(entry.getValue() + " as " + entry.getKey());
                 }
             }
-            if (track!=null || tracks!=null) {
-                requestHeadList.add("(asl.channel + ai.channels * (asl.z_stack + ai.depth * asl.time)) as rank");
+            if (tracks != null) {
+                requestHeadList.add(
+                    "(asl.channel + ai.channels * (asl.z_stack + ai.depth * asl.time)) as rank");
             }
             return "SELECT " + String.join(", ", requestHeadList) + " \n";
         } else {
@@ -347,6 +323,7 @@ public abstract class AnnotationListing {
         }
 
     }
+
     /**
      * Add property group to show if use in where constraint.
      * E.g: if const with term_id = x, we need to make a join on annotation_term.
@@ -358,81 +335,62 @@ public abstract class AnnotationListing {
         }
     }
 
-    String joinValues(List list) {
-        return (String)list.stream().map(x -> String.valueOf(x)).collect(Collectors.joining(", "));
+    String joinValues(List<Long> list) {
+        return list.stream().map(String::valueOf).collect(Collectors.joining(", "));
     }
 
     String getProjectConst() {
-        return (project!=null ? "AND a.project_id = " + project + "\n" : "");
+        return (project != null ? "AND a.project_id = " + project + "\n" : "");
     }
 
     String getUsersConst() {
-        return (users!=null ? "AND a.user_id IN ("+joinValues(users)+")\n" : "");
+        return (users != null ? "AND a.user_id IN (" + joinValues(users) + ")\n" : "");
     }
 
     String getReviewUsersConst() {
-        return (reviewUsers!=null ? "AND a.review_user_id IN ("+joinValues(reviewUsers)+")\n" : "");
+        return (reviewUsers != null ? "AND a.review_user_id IN (" + joinValues(reviewUsers) + ")\n"
+                    : "");
     }
 
 
     String getUsersForTermConst() {
-        if (usersForTerm!=null) {
+        if (usersForTerm != null) {
             addIfMissingColumn("term");
-            return "AND at.user_id IN ("+joinValues(usersForTerm)+")\n";
+            return "AND at.user_id IN (" + joinValues(usersForTerm) + ")\n";
         } else {
             return "";
         }
     }
 
     String getImagesConst() {
-        if (images!=null && project!=null && images.size() == entityManager.find(Project.class, project).getCountImages()) {
+        if (images != null && project != null && images.size() == entityManager.find(Project.class,
+            project).getCountImages()) {
             return ""; //images number equals to project image number, no const needed
-        } else if (images!=null && images.isEmpty()) {
+        } else if (images != null && images.isEmpty()) {
             throw new ObjectNotFoundException("The image has been deleted!");
         } else {
-            return (images!=null ? "AND a.image_id IN ("+joinValues(images)+")\n" : "");
+            return (images != null ? "AND a.image_id IN (" + joinValues(images) + ")\n" : "");
         }
 
     }
 
-    String getImageConst() {
-        if (image!=null) {
-            ImageInstance imageInstance = entityManager.find(ImageInstance.class, image);
-            if (imageInstance==null) {
-                throw new ObjectNotFoundException("Image " + image + " not exist!");
-            }
-            return "AND a.image_id = " + imageInstance.getId() + "\n";
-        } else {
-            return "";
-        }
-    }
 
     String getSlicesConst() {
-        if (slices!=null && slices.isEmpty()) {
+        if (slices != null && slices.isEmpty()) {
             throw new ObjectNotFoundException("The slice has been deleted!");
         } else {
-            return (slices!=null ? "AND a.slice_id IN ("+joinValues(slices)+")\n" : "");
+            return (slices != null ? "AND a.slice_id IN (" + joinValues(slices) + ")\n" : "");
         }
 
     }
 
-    String getSliceConst() {
-        if (slice!=null) {
-            if (entityManager.find(SliceInstance.class, slice)==null) {
-                throw new ObjectNotFoundException("Slice "+slice+" not exist!");
-            }
-            return "AND a.slice_id = " + slice + "\n";
-        } else {
-            return "";
-        }
-    }
 
     String getUserConst() {
-        if (user!=null) {
-            if (entityManager.find(User.class, user)==null) {
-                throw new ObjectNotFoundException("User "+user+" not exist!");
+        if (user != null) {
+            if (entityManager.find(User.class, user) == null) {
+                throw new ObjectNotFoundException("User " + user + " not exist!");
             }
-            return "AND a.user_id = "+user+"\n";
+            return "AND a.user_id = " + user + "\n";
         } else {
             return "";
         }
@@ -441,24 +399,34 @@ public abstract class AnnotationListing {
     abstract String getNotReviewedOnlyConst();
 
     String getIntersectConst() {
-        return (bbox!=null ? "AND ST_Intersects(a.location,ST_GeometryFromText('"+bbox.toString()+"',0))\n" : "");
+        return (bbox != null ? "AND ST_Intersects(a.location,ST_GeometryFromText('" + bbox
+                                   + "',0))\n" : "");
     }
 
     String getIntersectAnnotationConst() {
-        return (bboxAnnotation!=null ? "AND ST_Intersects(a.location,ST_GeometryFromText('" + bboxAnnotation.toString() + "',0))\n" : "");
+        return (bboxAnnotation != null ? "AND ST_Intersects(a.location,ST_GeometryFromText('"
+                                             + bboxAnnotation
+                                             + "',0))\n" : "");
     }
 
     String getMaxDistanceAnnotationConst() {
-        if(maxDistanceBaseAnnotation!=null) {
-            if(baseAnnotation==null) {
-                throw new ObjectNotFoundException("You need to provide a 'baseAnnotation' parameter (annotation id/location = "+baseAnnotation+")!");
+        if (maxDistanceBaseAnnotation != null) {
+            if (baseAnnotation == null) {
+                throw new ObjectNotFoundException(
+                    "You need to provide a 'baseAnnotation' parameter (annotation id/location = "
+                        + baseAnnotation + ")!");
             } else {
                 try {
-                    AnnotationDomain base = AnnotationDomain.getAnnotationDomain(entityManager, ((Long)baseAnnotation), null);
+                    AnnotationDomain base =
+                        AnnotationDomain.getAnnotationDomain(entityManager, ((Long) baseAnnotation),
+                            null);
                     //ST_distance(a.location,ST_GeometryFromText('POINT (0 0)'))
-                    return "AND ST_distance(a.location,ST_GeometryFromText('"+base.getWktLocation() + "')) <= "+maxDistanceBaseAnnotation+"\n";
+                    return "AND ST_distance(a.location,ST_GeometryFromText('"
+                               + base.getWktLocation() + "')) <= " + maxDistanceBaseAnnotation
+                               + "\n";
                 } catch (Exception e) {
-                    return "AND ST_distance(a.location,ST_GeometryFromText('"+baseAnnotation+ "')) <= " + maxDistanceBaseAnnotation + "\n";
+                    return "AND ST_distance(a.location,ST_GeometryFromText('" + baseAnnotation
+                               + "')) <= " + maxDistanceBaseAnnotation + "\n";
                 }
             }
         } else {
@@ -470,24 +438,11 @@ public abstract class AnnotationListing {
         return (avoidEmptyCentroid ? "AND ST_IsEmpty(st_centroid(a.location))=false\n" : "");
     }
 
-    String getTermConst() {
-        if (term!=null) {
-            if (entityManager.find(Term.class, term)==null) {
-                throw new ObjectNotFoundException("Term " + term + "not exist!");
-            }
-            addIfMissingColumn("term");
 
-            if (this instanceof ReviewedAnnotationListing)
-                return " AND (at.term_id = "+term + ((noTerm) ? " OR at.term_id IS NULL" : "") + ")\n";
-            else
-                return " AND ((at.term_id = "+term+ ")" + ((noTerm) ? " OR at.term_id IS NULL" : "") + ")\n";
-        } else {
-            return "";
-        }
-    }
+
     String getParentsConst() {
-        if (parents!=null) {
-            return " AND a.parent_ident IN ("+joinValues(parents)+")\n";
+        if (parents != null) {
+            return " AND a.parent_ident IN (" + joinValues(parents) + ")\n";
         } else {
             return "";
         }
@@ -495,49 +450,31 @@ public abstract class AnnotationListing {
 
 
     String getTermsConst() {
-        if (terms!=null) {
+        if (terms != null) {
             addIfMissingColumn("term");
             if (this instanceof ReviewedAnnotationListing)
-                return " AND (at.term_id IN ("+joinValues(terms) + ")" + ((noTerm) ? " OR at.term_id IS NULL" : "") + ")\n";
+                return " AND (at.term_id IN (" + joinValues(terms) + ")" + ((withoutTerm)
+                                                                                ? " OR at.term_id"
+                                                                                      + " IS NULL"
+                                                                                : "") + ")\n";
             else
-                return " AND ((at.term_id IN ("+joinValues(terms) + "))" + ((noTerm) ? " OR at.term_id IS NULL" : "") + ")\n";
-        } else {
-            return "";
-        }
-    }
-
-    String getTrackConst() {
-        if (track!=null) {
-            if (entityManager.find(Track.class, track)!=null) {
-                throw new ObjectNotFoundException("Track " + track + " not exists !");
-            }
-            addIfMissingColumn("track");
-            return " AND (atr.track_id = "+track + ((noTrack) ? " OR atr.track_id IS NULL" : "") + ")\n";
+                return " AND ((at.term_id IN (" + joinValues(terms) + "))" + ((withoutTerm)
+                                                                                  ? " OR at.term_id IS NULL"
+                                                                                  : "") + ")\n";
         } else {
             return "";
         }
     }
 
     String getTracksConst() {
-        if (tracks!=null) {
+        if (tracks != null) {
             addIfMissingColumn("track");
-            return "AND (atr.track_id IN ("+joinValues(tracks) +") " + ((noTrack) ? " OR atr.track_id IS NULL" : "") + ")\n";
+            return "AND (atr.track_id IN (" + joinValues(tracks) + ") " + ((withoutTrack)
+                                                                               ? " OR atr.track_id IS NULL"
+                                                                               : "") + ")\n";
         } else {
             return "";
         }
-    }
-
-    String getGroupConst() {
-        if (annotationGroup == null) {
-            return "";
-        }
-
-        if (entityManager.find(AnnotationGroup.class, annotationGroup) != null) {
-            throw new ObjectNotFoundException("Annotation group  " + annotationGroup + " does not exists!");
-        }
-
-        addIfMissingColumn("group");
-        return " AND al1.group_id = " + annotationGroup + "\n";
     }
 
     String getGroupsConst() {
@@ -549,18 +486,9 @@ public abstract class AnnotationListing {
         return " AND al1.group_id IN (" + joinValues(annotationGroups) + ")\n";
     }
 
-    String getTagConst() {
-        if (tag!=null && noTag) {
-            return "AND (tda.tag_id = "+tag + " OR tda.tag_id IS NULL)\n";
-        } else if (tag!=null) {
-            return "AND tda.tag_id = "+tag +"\n";
-        } else {
-            return "";
-        }
-    }
 
     String getTagsConst() {
-        if (tags!=null  && noTag) {
+        if (tags != null && withoutTag) {
             return "AND (tda.tag_id IN ("+joinValues(tags) + ") OR tda.tag_id IS NULL)\n";
         } else if (tags!=null ) {
             return "AND tda.tag_id IN (" + joinValues(tags) + ")\n";
@@ -569,38 +497,39 @@ public abstract class AnnotationListing {
         }
     }
 
-
-        String getBeforeOrAfterSliceConst() {
-        if ((track!=null || tracks!=null) && (beforeSlice!=null || afterSlice!=null)) {
+    String getBeforeOrAfterSliceConst() {
+        if ((tracks != null) && (beforeSlice.isPresent() || afterSlice.isPresent())) {
             addIfMissingColumn("slice");
-            Long sliceId = (beforeSlice!=null) ? beforeSlice : afterSlice;
+            Long sliceId = beforeSlice.orElseGet(() -> afterSlice.orElseThrow());
             SliceInstance sliceInstance = entityManager.find(SliceInstance.class, sliceId);
-            if (sliceInstance==null) {
-                throw new ObjectNotFoundException("Slice "+ sliceId +" not exists !");
+            if (sliceInstance == null) {
+                throw new ObjectNotFoundException("Slice " + sliceId + " not exists !");
             }
-            String sign = (beforeSlice!=null) ? "<" : ">";
-            return "AND (asl.channel + ai.channels * (asl.z_stack + ai.depth * asl.time)) "+sign+" " + sliceInstance.getBaseSlice().getRank() +"\n";
+            String sign = (beforeSlice.isPresent()) ? "<" : ">";
+            return "AND (asl.channel + ai.channels * (asl.z_stack + ai.depth * asl.time)) " + sign
+                       + " " + sliceInstance.getBaseSlice().getRank() + "\n";
         } else {
             return "";
         }
     }
 
     String getExcludedAnnotationConst() {
-        return (excludedAnnotation!=null ? "AND a.id <> " + excludedAnnotation + "\n" : "");
+        return (excludedAnnotation != null ? "AND a.id <> " + excludedAnnotation + "\n" : "");
     }
 
     abstract String createOrderBy();
 
     String getBeforeThan() {
-        if (beforeThan!=null) {
-            return "AND a.created < '"+beforeThan+"'\n";
+        if (beforeThan.isPresent()) {
+            return "AND a.created < '" + beforeThan + "'\n";
         } else {
             return "";
         }
     }
+
     String getAfterThan() {
-        if (afterThan!=null) {
-            return "AND a.created > '"+afterThan+"'\n";
+        if (afterThan.isPresent()) {
+            return "AND a.created > '" + afterThan + "'\n";
         } else {
             return "";
         }

@@ -1,5 +1,4 @@
 services:
-
   core:
     image: cytomine/core:dev-latest
     build:
@@ -8,7 +7,7 @@ services:
     ports:
       - "${DEV_CORE_PORT:-8080}:8080"
       - "${DEV_SSH_CORE_PORT:-10022}:22"
-    command: ["/bin/sh"]
+    entrypoint: ["/opt/gradle/bin/gradle", "bootRun"]
     stdin_open: true
     tty: true
     volumes:

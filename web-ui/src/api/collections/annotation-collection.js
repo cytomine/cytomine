@@ -64,7 +64,7 @@ export default class AnnotationCollection extends Collection {
       throw new Error('Cannot construct download URL if no project ID is provided.');
     }
     let strParam = `format=${format}`;
-    let paramFields = ['reviewed', 'terms', 'users', 'reviewUsers', 'images', 'noTerm', 'multipleTerms', 'afterThan', 'beforeThan'];
+    let paramFields = ['reviewed', 'terms', 'users', 'reviewUsers', 'noTerm', 'multipleTerms'];
     paramFields.forEach(param => {
       if (this[param] !== null) {
         strParam += `&${param}=${this[param]}`;

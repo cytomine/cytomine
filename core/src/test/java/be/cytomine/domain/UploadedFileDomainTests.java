@@ -18,6 +18,8 @@ package be.cytomine.domain;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
+import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.PostGisTestConfiguration;
 import be.cytomine.domain.image.UploadedFile;
 import be.cytomine.repository.image.UploadedFileRepository;
 import org.junit.jupiter.api.Test;
@@ -27,12 +29,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+import org.springframework.context.annotation.Import;
+
 import java.util.Arrays;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
 @Transactional
 public class UploadedFileDomainTests {
 

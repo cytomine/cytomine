@@ -1,4 +1,5 @@
 import docker
+from testcontainers.redis import RedisContainer
 
 
 def main():
@@ -26,6 +27,10 @@ def main():
 
     container.stop()
     print(f"Container {container.id} stopped!")
+
+    with RedisContainer(image="registry.cytomine.org/docker/redis:7.2", docker_client_kw={"timeout": 300}) as container:
+        redis_client = container.get_client()
+        print(f"Redis {redis_client} started")
 
 
 if __name__ == "__main__":

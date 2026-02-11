@@ -21,7 +21,10 @@ def redis_container():
 
     image_prefix = os.environ.get("PROXY_CACHE", "")
 
-    with RedisContainer(image=f"{image_prefix}redis:7.2") as container:
+    with RedisContainer(
+        image=f"{image_prefix}redis:7.2",
+        docker_client_kw={"timeout": 300},
+    ) as container:
         yield container
 
 

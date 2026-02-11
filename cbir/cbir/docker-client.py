@@ -2,7 +2,7 @@ import docker
 
 
 def main():
-    client = docker.from_env()
+    client = docker.from_env(timeout=300)
     print(client.ping())
 
     container_config = {

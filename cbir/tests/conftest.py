@@ -15,11 +15,6 @@ from cbir import app as main
 from cbir import config
 
 
-def pytest_configure(config):
-    """Configure pytest and set environment variables before any tests run."""
-    os.environ["TESTCONTAINERS_RYUK_DISABLED"] = "true"
-
-
 @pytest.fixture(scope="session")
 def redis_container():
     """Start a Redis container for the test session."""

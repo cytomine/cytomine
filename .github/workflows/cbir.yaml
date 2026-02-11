@@ -63,6 +63,9 @@ jobs:
       - name: Install test dependencies
         run: uv sync --group test
 
+      - name: Test docker
+        run: uv run python cbir/docker-client.py
+
       - name: Pull test images
         run: |
           docker version

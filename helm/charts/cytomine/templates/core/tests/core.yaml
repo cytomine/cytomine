@@ -23,4 +23,14 @@ spec:
         mountPath: /tmp/gradle
       - name: workspace
         mountPath: /workspace
+      env:
+        - name: CYTOMINE_ADMIN_PASSWORD
+          valueFrom:
+            secretRef:
+              name: cytomine-admin-iam-secret
+              key: password
+        - name: CYTOMINE_ADMIN_USERNAME
+          value: admin
+        - name: CYTOMINE_URL
+          value: core.{{ .Release.Namespace }}.svc.cluster.local
   restartPolicy: Never

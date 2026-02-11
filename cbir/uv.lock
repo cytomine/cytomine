@@ -125,6 +125,7 @@ dev = [
     { name = "ruff" },
 ]
 test = [
+    { name = "docker" },
     { name = "httpx" },
     { name = "pytest" },
     { name = "testcontainers", extra = ["redis"] },
@@ -151,6 +152,7 @@ dev = [
     { name = "ruff", specifier = "==0.12.12" },
 ]
 test = [
+    { name = "docker", specifier = "==7.1.0" },
     { name = "httpx", specifier = "==0.28.1" },
     { name = "pytest", specifier = "==8.4.2" },
     { name = "testcontainers", extras = ["redis"], specifier = "==4.13.3" },

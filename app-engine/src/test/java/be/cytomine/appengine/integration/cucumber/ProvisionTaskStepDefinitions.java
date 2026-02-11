@@ -735,7 +735,9 @@ public class ProvisionTaskStepDefinitions {
             String name = param.get("parameter_name");
             String type = param.get("parameter_type");
             String value = param.get("parameter_value").equalsIgnoreCase("null") ? null : param.get("parameter_value");
-
+            if (value == null) {
+                continue;
+            }
             try {
                 apiClient.provisionInput(persistedRun.getId().toString(), name, type, value);
             } catch (RestClientResponseException e) {

@@ -19,6 +19,8 @@ package be.cytomine.service.security;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.PostGisTestConfiguration;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import jakarta.persistence.EntityManager;
@@ -28,6 +30,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -67,6 +70,7 @@ import static org.springframework.security.acls.domain.BasePermission.*;
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(username = "superadmin")
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
 @Transactional
 public class UserServiceTests {
 

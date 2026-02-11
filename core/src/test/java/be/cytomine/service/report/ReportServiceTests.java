@@ -17,6 +17,8 @@ package be.cytomine.service.report;
 */
 
 import be.cytomine.CytomineCoreApplication;
+import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.PostGisTestConfiguration;
 import be.cytomine.exceptions.ServerException;
 import be.cytomine.service.utils.ReportFormatService;
 import be.cytomine.utils.JsonObject;
@@ -25,6 +27,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 
 import jakarta.transaction.Transactional;
@@ -40,6 +43,7 @@ import static org.mockito.Mockito.times;
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
 @Transactional
 @ExtendWith(MockitoExtension.class)
 public class ReportServiceTests {

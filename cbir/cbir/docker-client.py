@@ -3,6 +3,7 @@ import docker
 
 def main():
     client = docker.from_env()
+    print(client.ping())
 
     container_config = {
         "image": "registry.cytomine.org/docker/redis:7.2",

@@ -1,3 +1,4 @@
 cytomine:
-  admin: ${CYTOMINE_ADMIN_USERNAME}
-  password: ${CYTOMINE_ADMIN_PASSWORD}
+  admin:
+    username: ${CYTOMINE_ADMIN_USERNAME}
+    password: ${CYTOMINE_ADMIN_PASSWORD}

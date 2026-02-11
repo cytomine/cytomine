@@ -5,7 +5,7 @@ def main():
     client = docker.from_env()
 
     container_config = {
-        "image": "redis:7.2",
+        "image": "registry.cytomine.org/docker/redis:7.2",
         "ports": {"6379/tcp": 6379},
         "tty": False,
         "stdin_open": False,

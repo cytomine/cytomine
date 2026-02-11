@@ -19,6 +19,8 @@ package be.cytomine.controller.ontology;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.TestUtils;
+import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.PostGisTestConfiguration;
 import be.cytomine.config.properties.ApplicationProperties;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.AbstractSlice;
@@ -42,6 +44,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -71,6 +74,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(username = "superadmin")
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
 public class ReviewedAnnotationResourceTests {
 
     @Autowired

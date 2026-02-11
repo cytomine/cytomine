@@ -17,12 +17,15 @@ package be.cytomine.service.report;
 */
 
 import be.cytomine.CytomineCoreApplication;
+import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.PostGisTestConfiguration;
 import be.cytomine.exceptions.ServerException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 
 import jakarta.transaction.Transactional;
@@ -34,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
 @Transactional
 public class PDFReportServiceTests {
 

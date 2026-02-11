@@ -18,6 +18,8 @@ package be.cytomine.service.meta;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
+import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.PostGisTestConfiguration;
 import be.cytomine.domain.meta.Configuration;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.repository.meta.ConfigurationRepository;
@@ -31,6 +33,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 
 import jakarta.transaction.Transactional;
@@ -40,6 +43,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
 @Transactional
 public class ConfigurationServiceTests {
 

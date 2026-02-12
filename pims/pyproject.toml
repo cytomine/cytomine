@@ -20,7 +20,7 @@ dependencies = [
   "numpy==1.24.4",
   "orjson==3.10.3",
   "pathvalidate==2.5.2",
-  "pillow==10.3.0",
+  "pillow==12.1.1",
   "pint==0.20.1",
   "pydantic==2.7.3",
   "pydantic-extra-types==2.8.0",

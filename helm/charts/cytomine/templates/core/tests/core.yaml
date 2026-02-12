@@ -33,4 +33,32 @@ spec:
           value: admin
         - name: CYTOMINE_URL
           value: core.{{ .Release.Namespace }}.svc.cluster.local
+        - name: SELENIUM_URL
+          value: selenium.{{ .Release.Namespace }}.svc.cluster.local
   restartPolicy: Never
+---
+
+apiVersion: v1
+kind: Deployment
+metadata:
+  name: e2e-tests-selenium
+  labels:
+  annotations:
+    "helm.sh/hook": test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: selenium
+  template:
+    metadata:
+      labels:
+        app: selenium
+    spec:
+      securityContext:
+      {{- include "cytomine.podSecurityContext" . | nindent 4 }}
+      containers:
+        - name: selenium
+          image: selenium/standalone-firefox
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 8 }}

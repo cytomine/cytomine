@@ -71,7 +71,6 @@ jobs:
         run: uv run pytest
         env:
           DATA_PATH: ./
-          DOCKER_CLIENT_TIMEOUT: 300
           PROXY_CACHE: registry.cytomine.org/docker/
           TESTCONTAINERS_RYUK_DISABLED: true
           WEIGHTS: ./weights/resnet

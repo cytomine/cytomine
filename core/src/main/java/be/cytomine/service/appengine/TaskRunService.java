@@ -228,28 +228,32 @@ public class TaskRunService {
 
             // Process the input if it is an annotation type
             if (provision.get("type").get("id").asText().equals("geometry")) {
-                Long annotationId = provision.get("value").asLong();
-                UserAnnotation annotation = userAnnotationService.get(annotationId);
-                processedProvision.put("value", geometryService.WKTToGeoJSON(annotation.getWktLocation()));
+                if (!provision.get("value").isNull()) {
+                    Long annotationId = provision.get("value").asLong();
+                    UserAnnotation annotation = userAnnotationService.get(annotationId);
+                    processedProvision.put("value", geometryService.WKTToGeoJSON(annotation.getWktLocation()));
+                }
             }
 
             if (provision.get("type").get("id").asText().equals("array") && provision.get("value").isArray()) {
                 int index = 0;
                 ArrayNode valueListNode = mapper.createArrayNode();
                 boolean subTypeIsGeometry = provision.get("type").get("subType").get("id").asText().equals("geometry");
-                for (JsonNode element : provision.get("value")) {
-                    ObjectNode itemJsonObject = mapper.createObjectNode();
-                    itemJsonObject.put("index", index);
+                if (!provision.get("value").isNull()) {
+                    for (JsonNode element : provision.get("value")) {
+                        ObjectNode itemJsonObject = mapper.createObjectNode();
+                        itemJsonObject.put("index", index);
 
-                    if (subTypeIsGeometry) {
-                        Long annotationId = element.asLong();
-                        UserAnnotation annotation = userAnnotationService.get(annotationId);
-                        itemJsonObject.put("value", geometryService.WKTToGeoJSON(annotation.getWktLocation()));
-                    } else {
-                        itemJsonObject.set("value", element);
+                        if (subTypeIsGeometry) {
+                            Long annotationId = element.asLong();
+                            UserAnnotation annotation = userAnnotationService.get(annotationId);
+                            itemJsonObject.put("value", geometryService.WKTToGeoJSON(annotation.getWktLocation()));
+                        } else {
+                            itemJsonObject.set("value", element);
+                        }
+                        valueListNode.add(itemJsonObject);
+                        index++;
                     }
-                    valueListNode.add(itemJsonObject);
-                    index++;
                 }
                 processedProvision.set("value", valueListNode);
             }
@@ -304,106 +308,112 @@ public class TaskRunService {
             String subtype = json.get("type").get("subType").get("id").asText();
 
             JsonNode value = json.get("value");
-            String type = value.get("type").asText();
+            if (!json.get("value").isNull()) {
+                String type = value.get("type").asText();
 
-            Long[] itemsArray = mapper.convertValue(value.get("ids"), Long[].class);
+                Long[] itemsArray = mapper.convertValue(value.get("ids"), Long[].class);
 
-            if (subtype.equals("image")) {
-                ArrayNode responseArray = mapper.createArrayNode();
-                for (int i = 0; i < itemsArray.length; i++) {
-                    Long imageId = itemsArray[i];
-                    if (type.equalsIgnoreCase("annotation")) {
-                        MultiValueMap<String, Object> body = prepareImage(imageId, "annotation");
+                if (subtype.equals("image")) {
+                    ArrayNode responseArray = mapper.createArrayNode();
+                    for (int i = 0; i < itemsArray.length; i++) {
+                        Long imageId = itemsArray[i];
+                        if (type.equalsIgnoreCase("annotation")) {
+                            MultiValueMap<String, Object> body = prepareImage(imageId, "annotation");
 
-                        String response = provisionCollectionItem(arrayTypeUri, i, body);
-                        if (response != null) {
-                            JsonNode itemNode = mapper.readTree(response);
-                            responseArray.add(itemNode);
+                            String response = provisionCollectionItem(arrayTypeUri, i, body);
+                            if (response != null) {
+                                JsonNode itemNode = mapper.readTree(response);
+                                responseArray.add(itemNode);
+                            }
+                        }
+                        if (type.equalsIgnoreCase("image")) {
+                            MultiValueMap<String, Object> body = prepareImage(imageId, "image");
+
+                            String response = provisionCollectionItem(arrayTypeUri, i, body);
+                            if (response != null) {
+                                JsonNode itemNode = mapper.readTree(response);
+                                responseArray.add(itemNode);
+                            }
                         }
                     }
-                    if (type.equalsIgnoreCase("image")) {
-                        MultiValueMap<String, Object> body = prepareImage(imageId, "image");
-
-                        String response = provisionCollectionItem(arrayTypeUri, i, body);
-                        if (response != null) {
-                            JsonNode itemNode = mapper.readTree(response);
-                            responseArray.add(itemNode);
-                        }
-                    }
+                    return responseArray.toString();
                 }
-                return responseArray.toString();
-            }
 
-            if (subtype.equals("geometry")) {
-                ObjectNode provision = json.deepCopy();
-                provision.remove("type");
-                provision.remove("value");
+                if (subtype.equals("geometry")) {
+                    ObjectNode provision = json.deepCopy();
+                    provision.remove("type");
+                    provision.remove("value");
 
-                ArrayNode valueListNode = mapper.createArrayNode();
-                for (int i = 0; i < itemsArray.length; i++) {
-                    Long annotationId = itemsArray[i];
-                    UserAnnotation annotation = userAnnotationService.get(annotationId);
+                    ArrayNode valueListNode = mapper.createArrayNode();
+                    for (int i = 0; i < itemsArray.length; i++) {
+                        Long annotationId = itemsArray[i];
+                        UserAnnotation annotation = userAnnotationService.get(annotationId);
 
-                    ObjectNode itemJsonObject = mapper.createObjectNode();
-                    itemJsonObject.put("index", i);
-                    itemJsonObject.put("value", geometryService.WKTToGeoJSON(annotation.getWktLocation()));
+                        ObjectNode itemJsonObject = mapper.createObjectNode();
+                        itemJsonObject.put("index", i);
+                        itemJsonObject.put("value", geometryService.WKTToGeoJSON(annotation.getWktLocation()));
 
-                    valueListNode.add(itemJsonObject);
+                        valueListNode.add(itemJsonObject);
+                    }
                 }
             }
         }
 
         if (json.get("type").get("id").asText().equals("image")) {
             JsonNode value = json.get("value");
-            String type = Objects.nonNull(value.get("type")) ? value.get("type").asText() : null;
-            Long id = Objects.nonNull(value.get("id")) ? value.get("id").asLong() : null;
+            if (!json.get("value").isNull()) {
+                String type = Objects.nonNull(value.get("type")) ? value.get("type").asText() : null;
+                Long id = Objects.nonNull(value.get("id")) ? value.get("id").asLong() : null;
 
-            MultiValueMap<String, Object> body;
-            if (Objects.nonNull(type))
-            {
-                if (type.equals("annotation")) {
-                    UserAnnotation annotation = userAnnotationService.get(id);
-                    Envelope bounds = GeometryService.getBounds(annotation.getWktLocation());
+                MultiValueMap<String, Object> body;
+                if (Objects.nonNull(type))
+                {
+                    if (type.equals("annotation")) {
+                        UserAnnotation annotation = userAnnotationService.get(id);
+                        Envelope bounds = GeometryService.getBounds(annotation.getWktLocation());
 
-                    TaskRun taskRun =
-                        taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId)
-                            .orElseThrow(() -> new ObjectNotFoundException("TaskRun", taskRunId));
+                        TaskRun taskRun =
+                            taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId)
+                                .orElseThrow(() -> new ObjectNotFoundException("TaskRun", taskRunId));
 
-                    Optional<TaskRunLayer> optionalTaskRunLayer = taskRunLayerRepository
-                        .findByTaskRunAndImage(taskRun, taskRun.getImage());
-                    if (optionalTaskRunLayer.isPresent()) {
-                        TaskRunLayer taskRunLayer = optionalTaskRunLayer.get();
-                        taskRunLayer.setXOffset((int) bounds.getMinX());
-                        taskRunLayer.setYOffset((int) bounds.getMinY());
-                        taskRunLayerRepository.saveAndFlush(taskRunLayer);
+                        Optional<TaskRunLayer> optionalTaskRunLayer = taskRunLayerRepository
+                            .findByTaskRunAndImage(taskRun, taskRun.getImage());
+                        if (optionalTaskRunLayer.isPresent()) {
+                            TaskRunLayer taskRunLayer = optionalTaskRunLayer.get();
+                            taskRunLayer.setXOffset((int) bounds.getMinX());
+                            taskRunLayer.setYOffset((int) bounds.getMinY());
+                            taskRunLayerRepository.saveAndFlush(taskRunLayer);
+                        }
+
+                        body = prepareImage(id, "annotation");
+                    } else if (type.equals("image")) {
+                        wsi = downloadWsi(id);
+
+                        body = new LinkedMultiValueMap<>();
+                        body.add("file", new FileSystemResource(wsi));
+                    } else {
+                        throw new IllegalArgumentException("Unsupported type: " + type);
                     }
 
-                    body = prepareImage(id, "annotation");
-                } else if (type.equals("image")) {
-                    wsi = downloadWsi(id);
 
-                    body = new LinkedMultiValueMap<>();
-                    body.add("file", new FileSystemResource(wsi));
-                } else {
-                    throw new IllegalArgumentException("Unsupported type: " + type);
+                    String response = appEngineService.post(uri, body, MediaType.MULTIPART_FORM_DATA);
+
+                    if (wsi != null) {
+                        wsi.delete();
+                    }
+
+                    return response;
                 }
-
-
-                String response = appEngineService.post(uri, body, MediaType.MULTIPART_FORM_DATA);
-
-                if (wsi != null) {
-                    wsi.delete();
-                }
-
-                return response;
             }
         }
 
         ObjectNode provision = json.deepCopy();
         if (provision.get("type").get("id").asText().equals("geometry")) {
-            Long annotationId = provision.get("value").asLong();
-            UserAnnotation annotation = userAnnotationService.get(annotationId);
-            provision.put("value", geometryService.WKTToGeoJSON(annotation.getWktLocation()));
+            if (!provision.get("value").isNull()) {
+                Long annotationId = provision.get("value").asLong();
+                UserAnnotation annotation = userAnnotationService.get(annotationId);
+                provision.put("value", geometryService.WKTToGeoJSON(annotation.getWktLocation()));
+            }
         }
 
         provision.remove("type");

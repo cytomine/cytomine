@@ -29,7 +29,6 @@ dev = [
 ]
 
 test = [
-  "docker==7.1.0",
   "httpx==0.28.1",
   "pytest==8.4.2",
   "testcontainers[redis]==4.13.3",

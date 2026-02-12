@@ -5,7 +5,6 @@ import shutil
 import tempfile
 from typing import Generator
 
-import docker
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
@@ -21,9 +20,11 @@ def redis_container():
     """Start a Redis container for the test session."""
 
     image_prefix = os.environ.get("PROXY_CACHE", "")
-    docker.from_env(timeout=300)
 
-    with RedisContainer(image=f"{image_prefix}redis:7.2") as container:
+    with RedisContainer(
+        image=f"{image_prefix}redis:7.2",
+        docker_client_kw={"timeout": 300},
+    ) as container:
         yield container
 
 

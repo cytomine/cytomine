@@ -1,8 +1,8 @@
 openapi: 3.0.3
 info:
-  title: Cytomine Python Image Managament Server PIMS
+  title: Cytomine Python Image Management Server PIMS
   description: |
-    Cytomine Python Image Managament Server (PIMS) HTTP API. While this API is intended to be internal, a lot of the
+    Cytomine Python Image Management Server (PIMS) HTTP API. While this API is intended to be internal, a lot of the
     following specification can be ported to the external Cytomine API.
 
     # Additional API formats
@@ -12,7 +12,7 @@ info:
     | Type | Format | Examples | Specification |
     |------|--------|----------|---------------|
     | `string` | `range` | **"1:3"**, **"2:"**, **":"**| Inspired from Python slicing |
-    | `string` | `wkt` | **"POINT (10 20)"** | [Open Geospacial Consortium](https://www.ogc.org/standards/sfa)|
+    | `string` | `wkt` | **"POINT (10 20)"** | [Open Geospatial Consortium](https://www.ogc.org/standards/sfa)|
     | `string` | `color` | **"#FF00AA"**, **"rgb(100,0,0)"**, **"red"** | [CSS Color Module Level 3](https://drafts.csswg.org/css-color-3/#colorunits)|
     | `string` | `colormap-id` | **"jet"**, **"!jet"**||
     | `string` | `filter-id` | **"yen"** ||
@@ -22,7 +22,7 @@ info:
 tags:
   - name: Tiles
     description: |
-      Tiles are non-overlaping rectangular regions covering an image at given resolution (a tier in a pyramidal image).
+      Tiles are non-overlapping rectangular regions covering an image at given resolution (a tier in a pyramidal image).
 
       Tile size is fixed except right-most or bottom-most tiles which might be smaller. **It depends on
       internal image parameters.** Common tile sizes are `256*256` and `512*512`. Non tiled file formats only have
@@ -36,7 +36,7 @@ tags:
       Always defined by underlying image tile size.
   - name: Normalized tiles
     description: |
-      Normalized tiles are non-overlaping rectangular regions covering an image at given resolution (a tier in a pyramidal image).
+      Normalized tiles are non-overlapping rectangular regions covering an image at given resolution (a tier in a pyramidal image).
 
       Normalized tiles have a width and height of 256 pixels, except right-most and bottom-most tiles which might be smaller.
 
@@ -48,11 +48,11 @@ tags:
 
       ### Target size
       * Width: 256 pixels, except for right-most tiles that might have size lower than 256.
-      * Height: 256 pixels, except for bottom-most tiles that moghe have size lower than 256.
+      * Height: 256 pixels, except for bottom-most tiles that might have size lower than 256.
 
   - name: Windows
     description: |
-      Windows are rectangular portions extracted from the underlying image content (input region) and optionnaly
+      Windows are rectangular portions extracted from the underlying image content (input region) and optionally
       rescaled (target size).
 
       ### Input region
@@ -92,7 +92,7 @@ tags:
       * Level
   - name: Annotations
     description: |
-      Annotations are geometries that can be reprsented on an image crop in various ways.
+      Annotations are geometries that can be represented on an image crop in various ways.
 
       ### Input region
       Always rectangular envelope of all geometries multiplied by an optional context factor.
@@ -123,7 +123,7 @@ tags:
 #  - name: Colormaps
 #    description: Colormaps are functions that maps colors of an input image to the colors of a target image.
   - name: Filters
-    description: Image filters are used to change the appareance of an image and helps at understanding the
+    description: Image filters are used to change the appearance of an image and helps at understanding the
       source image.
   - name: Server
   - name: Housekeeping
@@ -2710,21 +2710,21 @@ components:
         - MAX
     z-slice-reduction:
       description: |
-        Reduction function used to combinate selected focal planes.
+        Reduction function used to combine selected focal planes.
 
         **This parameter is required if `z_slices` is not a single focal plane index.**
       allOf:
         - $ref: '#/components/schemas/generic-reduction'
     timepoint-reduction:
       description: |
-        Reduction function used to combinate selected timepoints.
+        Reduction function used to combine selected timepoints.
 
         **This parameter is required if `timepoints` is not a single timepoint index.**
       allOf:
         - $ref: '#/components/schemas/generic-reduction'
     footprint-reduction:
       description: |
-        Reduction function used to combinate selected items in the dimension.
+        Reduction function used to combine selected items in the dimension.
       allOf:
         - $ref: '#/components/schemas/generic-reduction'
     footprint-reduction-nullable:
@@ -3389,7 +3389,7 @@ components:
             - ZOOM
           default: LEVEL
           description: |
-            How to interprete `reference_tier_index`, either as a zoom index, either as a level index.
+            How to interpret `reference_tier_index`, either as a zoom index, either as a level index.
     region-object:
       type: object
       required:
@@ -3605,7 +3605,7 @@ components:
           description: |
             Point geometries have no area. Possible representation as a drawing are:
             * `CROSS` - A regular cross, hiding point location
-            * `CROSSHAIR` - A cross but whose intersection is removed to show the point locatio
+            * `CROSSHAIR` - A cross but whose intersection is removed to show the point location
             * `CIRCLE` - A circle around the point location
             This parameter has no effect on non-point geometries.
     annotation-drawing-basis:
@@ -3645,7 +3645,7 @@ components:
     file-role:
       description: |
         The role of a file. The same image data can be represented in different ways, in different files, each of them
-        serving differnt purposes.
+        serving different purposes.
 
         * `UPLOAD` - This file is the one such as received by PIMS.
         * `ORIGINAL` - This file is in its original format and contains (part of) metadata.

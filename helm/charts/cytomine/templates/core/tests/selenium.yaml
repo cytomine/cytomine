@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: selenium
+  labels:
+  annotations:
+    "helm.sh/hook": test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: selenium
+  template:
+    metadata:
+      labels:
+        app: selenium
+    spec:
+      securityContext:
+      {{- include "cytomine.podSecurityContext" . | nindent 8 }}
+      containers:
+        - name: selenium
+          image: selenium/standalone-firefox
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
+          ports:
+          - name: http
+            containerPort: 4444
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: selenium
+spec:
+  selector:
+    app: selenium
+  ports:
+    - name: http
+      port: 4444
+      protocol: TCP

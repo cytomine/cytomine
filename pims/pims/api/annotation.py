@@ -41,11 +41,10 @@ from pims.processing.image_response import MaskResponse
 from pims.utils.color import WHITE
 from pims.utils.iterables import ensure_list
 
-router = APIRouter(prefix=get_settings().api_base_path)
-api_tags = ['Annotations']
+router = APIRouter(prefix=get_settings().api_base_path, tags=['Annotations'])
 
 
-@router.post('/image/{filepath:path}/annotation/mask{extension:path}', tags=api_tags)
+@router.post('/image/{filepath:path}/annotation/mask{extension:path}')
 async def show_mask(
     request: Request, response: Response,
     body: AnnotationMaskRequest,
@@ -118,7 +117,7 @@ async def _show_mask(
         )
 
 
-@router.post('/image/{filepath:path}/annotation/crop{extension:path}', tags=api_tags)
+@router.post('/image/{filepath:path}/annotation/crop{extension:path}')
 async def show_crop(
     request: Request, response: Response,
     body: AnnotationCropRequest,
@@ -194,7 +193,7 @@ async def _show_crop(
         )
 
 
-@router.post('/image/{filepath:path}/annotation/drawing{extension:path}', tags=api_tags)
+@router.post('/image/{filepath:path}/annotation/drawing{extension:path}')
 async def show_drawing(
     request: Request, response: Response,
     body: AnnotationDrawingRequest,

@@ -56,3 +56,7 @@ jobs:
 
       - name: Run chart-testing (lint and install)
         run: ct lint-and-install --target-branch ${{ github.event.repository.default_branch }} --chart-dirs=helm/charts/ --all --namespace=cytomine-${{ github.sha }} ${{ github.ref_name != 'main' && format('--helm-extra-set-args=--set=images.core=registry.cytomine.org/cytomine/core:{0} --helm-extra-set-args=--set=images.app_engine=registry.cytomine.org/cytomine/app-engine:{0} --helm-extra-set-args=--set=images.sam=registry.cytomine.org/cytomine/sam:{0} --helm-extra-set-args=--set=images.web_ui=registry.cytomine.org/cytomine/web-ui:{0} --helm-extra-set-args=--set=images.cbir=registry.cytomine.org/cytomine/cbir:{0} --helm-extra-set-args=--set=images.pims=registry.cytomine.org/cytomine/pims:{0} --helm-extra-set-args=--set=images.e2e_tests=registry.cytomine.org/cytomine/e2e-tests:{0}', github.sha) || '' }}
+
+      - name: Logs e2e tests results
+        if: always()
+        run: kubectl --namespace=cytomine-${{ github.sha }} logs e2e-tests

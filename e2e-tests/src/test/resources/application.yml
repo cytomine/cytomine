@@ -3,4 +3,4 @@ cytomine:
     username: ${CYTOMINE_ADMIN_USERNAME}
     password: ${CYTOMINE_ADMIN_PASSWORD}
 selenium:
-  url: ${SELENIUM_URL}
+  url: ${SELENIUM_URL:}

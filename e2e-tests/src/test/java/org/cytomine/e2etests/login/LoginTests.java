@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.Wait;
@@ -38,7 +39,7 @@ public class LoginTests {
         options.addArguments("--headless");
         driver =
             seleniumUrl.map(url -> new RemoteWebDriver(url, options))
-                .orElseGet(() -> new RemoteWebDriver(options));
+                .orElseGet(() -> new FirefoxDriver(options));
     }
 
     @AfterEach

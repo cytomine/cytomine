@@ -31,6 +31,14 @@ const mockTaskRun2 = {
   taskRunId: '5f41ca2c-9b68-49fe-8f16-4e8005eb6893',
 };
 
+const mockCurrentViewer = {
+  activeImage: 0,
+  images: [
+    {imageInstance: {id: 123}},
+    {imageInstance: {id: 321}},
+  ],
+};
+
 jest.mock('@/api', () => ({
   Cytomine: {
     instance: {
@@ -98,24 +106,36 @@ describe('AppEngineSideBar.vue', () => {
   const localVue = createLocalVue();
   localVue.use(Buefy);
 
-  let wrapper;
-
-  beforeEach(async () => {
-    fetchTasksSpy.mockClear();
-    fetchTaskRunsSpy.mockClear();
-
-    wrapper = shallowMount(AppEngineSideBar, {
+  const createWrapper = () => {
+    return shallowMount(AppEngineSideBar, {
       localVue,
       mocks: {
-        $t: (key) => key
+        $store: {
+          getters: {
+            'currentProject/currentViewer': mockCurrentViewer,
+          },
+        },
+        $t: (key) => key,
       },
       computed: {
         currentProject: () => ({id: 42}),
       },
     });
+  };
+
+  beforeEach(() => {
+    fetchTasksSpy.mockClear();
+    fetchTaskRunsSpy.mockClear();
   });
 
-  it('should render and show the task options', () => {
+  it('should render and show the task options', async () => {
+    const wrapper = createWrapper();
+    wrapper.vm.$store.getters['currentProject/currentViewer'] = {
+      activeImage: 0,
+      images: [{imageInstance: {id: 456}}],
+    };
+    await wrapper.vm.$nextTick();
+
     const headers = wrapper.findAll('header');
     expect(headers.length).toBe(2);
     expect(headers.at(0).text()).toBe('app-engine.execute-a-task');
@@ -130,6 +150,7 @@ describe('AppEngineSideBar.vue', () => {
   });
 
   it('should display the task name and description when a task is selected', async () => {
+    const wrapper = createWrapper();
     await wrapper.setData({selectedTask: mockTask1});
 
     expect(wrapper.find('.content p').text()).toBe(`${mockTask1.name} (${mockTask1.version})`);
@@ -139,14 +160,15 @@ describe('AppEngineSideBar.vue', () => {
     expect(descriptionField.text()).toBe('app-engine.task.no-description');
   });
 
-  it('should fetch data on component created', async () => {
-    expect(fetchTasksSpy).toHaveBeenCalled();
+  it('should fetch tasks on component created', () => {
+    createWrapper();
+
     expect(fetchTasksSpy).toHaveBeenCalledTimes(1);
-    expect(fetchTaskRunsSpy).toHaveBeenCalled();
-    expect(fetchTaskRunsSpy).toHaveBeenCalledTimes(1);
   });
 
-  it('should update tracked task runs every 2 seconds', async () => {
+  it('should update tracked task runs every 2 seconds', () => {
+    createWrapper();
+
     jest.useFakeTimers();
     jest.advanceTimersByTime(2000);
 

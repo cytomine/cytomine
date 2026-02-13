@@ -54,8 +54,8 @@ export default class TaskRun extends Model {
     /* eslint-enable */
   }
 
-  static async fetchByProject(projectId) {
-    let {data} = await Cytomine.instance.api.get(`project/${projectId}/task-runs`);
+  static async fetchByProjectAndImage(projectId, imageId) {
+    let {data} = await Cytomine.instance.api.get(`project/${projectId}/image/${imageId}/task-runs`);
     return data;
   }
 

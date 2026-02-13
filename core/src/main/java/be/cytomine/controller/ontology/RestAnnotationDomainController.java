@@ -6,6 +6,10 @@ import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import be.cytomine.service.annotation.AnnotationReportService;
+import be.cytomine.service.report.ReportService;
+import be.cytomine.utils.JsonNodeUtils;
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,7 +63,11 @@ public class RestAnnotationDomainController extends RestCytomineController {
 
     private final AnnotationListingService annotationListingService;
 
+    private final AnnotationReportService annotationReportService;
+
     private final GenericAnnotationService genericAnnotationService;
+
+    private final ReportService reportService;
 
     private final UserService userService;
 
@@ -104,24 +112,37 @@ public class RestAnnotationDomainController extends RestCytomineController {
         return responseSuccess(annotations, params.getJSONAttrLong("offset", 0L),params.getJSONAttrLong("max", 0L));
     }
 
-    @RequestMapping(value = {"/project/{project}/annotation/download"}, method = {RequestMethod.GET})
+    @RequestMapping(value = {"/project/{project}/annotation/download"}, method = {RequestMethod.POST})
     public void download(
             @PathVariable Long project,
-            @RequestParam String format,
-            @RequestParam(required = false) Optional<String> users,
-            @RequestParam(required = false) Optional<String> reviewUsers,
-            @RequestParam(defaultValue = "false") Boolean reviewed,
-            @RequestParam(required = false) String terms,
-            @RequestParam(required = false) String images,
-            @RequestParam(required = false) Long beforeThan,
-            @RequestParam(required = false) Long afterThan
+            @RequestBody JsonNode params
     ) throws IOException {
-        if(reviewed) {
-            restReviewedAnnotationController.downloadDocumentByProject(project, format, terms, reviewUsers, images, beforeThan, afterThan);
-        }
-        else {
-            restUserAnnotationController.downloadDocumentByProject(project, format, terms, users, images, beforeThan, afterThan);
-        }
+        log.info("params {}", params);
+        // handle the params first
+        boolean reviewed = params.path("reviewed").asBoolean(false);
+        Optional<String> users = JsonNodeUtils.optString(params, "users");
+        Optional<String> reviewUsers = JsonNodeUtils.optString(params, "reviewUsers");
+        String format = params.path("format").asText("pdf");
+        String terms = JsonNodeUtils.csvFromStringArrayNode(params.path("terms"));
+        String images = JsonNodeUtils.csvFromStringArrayNode(params.path("images"));
+        Long beforeThan = params.path("beforeThan").asLong();
+        Long afterThan = params.path("afterThan").asLong();
+        Map<String, Object> bodyMap = new HashMap<>();
+        bodyMap.put("project", project);
+        bodyMap.put("format", format);
+        bodyMap.put("users", users.orElse(null));
+        bodyMap.put("reviewUsers", reviewUsers.orElse(null));
+        bodyMap.put("reviewed", reviewed);
+        bodyMap.put("terms", terms);
+        bodyMap.put("images", images);
+        bodyMap.put("beforeThan", beforeThan);
+        bodyMap.put("afterThan", afterThan);
+
+        log.info("bodyMap {}", bodyMap);
+
+        JsonObject body = new JsonObject(bodyMap);
+        byte[] report = annotationReportService.downloadDocumentByProject(body);
+        responseReportFile(reportService.getAnnotationReportFileName(format, project), report, format);
     }
 
     @RequestMapping(value = "/annotation/{id}/crop.{format}", method = {RequestMethod.GET, RequestMethod.POST})

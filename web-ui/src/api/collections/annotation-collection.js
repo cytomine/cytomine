@@ -55,23 +55,73 @@ export default class AnnotationCollection extends Collection {
   }
 
   /**
-   * Returns the URL for downloading the collection under the provided format
+   * Downloads the collection under the provided format
    * @param   {String} [format="pdf"] The format of the file to download ("csv", "xls" or "pdf")
-   * @returns {String} The download URL
    */
-  getDownloadURL(format = 'pdf') {
+  download(format = 'pdf') {
     if (!this.project) {
-      throw new Error('Cannot construct download URL if no project ID is provided.');
+      throw new Error('Cannot construct download if no project ID is provided.');
     }
-    let strParam = `format=${format}`;
-    let paramFields = ['reviewed', 'terms', 'users', 'reviewUsers', 'images', 'noTerm', 'multipleTerms', 'afterThan', 'beforeThan'];
-    paramFields.forEach(param => {
-      if (this[param] !== null) {
-        strParam += `&${param}=${this[param]}`;
+    // from this collection create a json
+    let paramsBody = {
+      format,
+      users: this.users ?? null,
+      reviewUsers: this.reviewUsers ?? null,
+      reviewed: Boolean(this.reviewed),
+      terms: this.terms ?? null,
+      images: this.images ?? null,
+      beforeThan: this.beforeThan ?? null,
+      afterThan: this.afterThan ?? null,
+    };
+    paramsBody = Object.fromEntries(
+      Object.entries(paramsBody).filter(([, v]) => v !== null && v !== undefined)
+    );
+    let uri = `project/${this.project}/annotation/download`;
+    Cytomine.instance.api.post(uri, paramsBody, {
+      responseType: 'blob',
+    }).then(response => {
+      const cd = response.headers?.['content-disposition'];
+      const filename = this.getFilenameFromContentDisposition(cd);
+      this.triggerBlobDownload(response.data, filename);
+    }) ;
+  }
+
+  triggerBlobDownload(blob, filename) {
+    const blobUrl = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    window.URL.revokeObjectURL(blobUrl);
+  }
+
+  getFilenameFromContentDisposition(contentDisposition) {
+
+    const starMatch = contentDisposition.match(/filename\*\s*=\s*([^;]+)/i);
+    if (starMatch) {
+      const value = starMatch[1].trim();
+      const unquoted = value.replace(/^"(.*)"$/, '$1');
+      const parts = unquoted.split("''");
+      if (parts.length === 2) {
+        try {
+          return decodeURIComponent(parts[1]);
+        } catch {
+          return parts[1];
+        }
       }
-    });
-    let uri = `project/${this.project}/annotation/download?${strParam}`;
-    return Cytomine.instance.host + Cytomine.instance.basePath + uri;
+      return unquoted;
+    }
+
+    // Basic filename=
+    const match = contentDisposition.match(/filename\s*=\s*([^;]+)/i);
+    if (!match) {
+      return null;
+    }
+
+    return match[1].trim().replace(/^"(.*)"$/, '$1');
   }
 
   /**

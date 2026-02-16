@@ -6,6 +6,7 @@ import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import be.cytomine.dto.annotation.AnnotationReportParams;
 import be.cytomine.dto.annotation.Params;
 import be.cytomine.service.annotation.AnnotationReportService;
 import be.cytomine.service.report.ReportService;
@@ -116,7 +117,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
     @RequestMapping(value = {"/project/{project}/annotation/download"}, method = {RequestMethod.POST})
     public void download(
             @PathVariable Long project,
-            @RequestBody Params params
+            @RequestBody AnnotationReportParams params
     ) throws IOException {
 
         boolean reviewed = Boolean.TRUE.equals(params.reviewed());

@@ -317,3 +317,21 @@ Feature: [URS00003-TASK] Provision a task run
     Examples:
       | task_namespace                             | task_version |
       | com.cytomine.dummy.identity.multiple.types | 0.1.0        |
+
+
+  Scenario Outline: successful provisioning of optional parameters
+
+    Given this task has "<task_namespace>" and "<task_version>"
+    And a task run has been created for this task
+    When a user calls the provisioning endpoint for provisioning all the parameters
+      | parameter_name | parameter_type | parameter_value                               |
+      | int_input      | integer        | 1                                             |
+      | number_input   | number         | 1.1                                           |
+      | string_input   | string         | this is a string                              |
+      | enum_input     | enumeration    | A                                             |
+      | geometry_input | geometry       | null                                          |
+    Then the App Engine returns a '200 OK' HTTP response with the updated task run information as JSON payload
+
+    Examples:
+      | task_namespace                                      | task_version |
+      | com.cytomine.dummy.identity.optional                | 0.1.0        |

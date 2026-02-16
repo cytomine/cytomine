@@ -66,12 +66,11 @@ jobs:
       - name: Pull test images
         run: |
           docker pull registry.cytomine.org/docker/redis:7.2
-          docker pull registry.cytomine.org/docker/testcontainers/ryuk:0.13.0
 
       - name: Run tests
         run: uv run pytest
         env:
           DATA_PATH: ./
           PROXY_CACHE: registry.cytomine.org/docker/
-          RYUK_CONTAINER_IMAGE: registry.cytomine.org/docker/testcontainers/ryuk:0.13.0
+          TESTCONTAINERS_RYUK_DISABLED: true
           WEIGHTS: ./weights/resnet

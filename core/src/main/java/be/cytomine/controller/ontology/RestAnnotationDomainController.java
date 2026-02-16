@@ -6,6 +6,7 @@ import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import be.cytomine.dto.annotation.Params;
 import be.cytomine.service.annotation.AnnotationReportService;
 import be.cytomine.service.report.ReportService;
 import be.cytomine.utils.JsonNodeUtils;
@@ -115,25 +116,23 @@ public class RestAnnotationDomainController extends RestCytomineController {
     @RequestMapping(value = {"/project/{project}/annotation/download"}, method = {RequestMethod.POST})
     public void download(
             @PathVariable Long project,
-            @RequestBody JsonNode params
+            @RequestBody Params params
     ) throws IOException {
 
-        boolean reviewed = params.path("reviewed").asBoolean(false);
-        Optional<String> users = JsonNodeUtils.optString(params, "users");
-        Optional<String> reviewUsers = JsonNodeUtils.optString(params, "reviewUsers");
-        String format = params.path("format").asText("pdf");
-        String terms = JsonNodeUtils.csvFromStringArrayNode(params.path("terms"));
-        String images = JsonNodeUtils.csvFromStringArrayNode(params.path("images"));
-        JsonNode beforeThanNode = params.path("beforeThan");
-        Long beforeThan = (beforeThanNode.isMissingNode() || beforeThanNode.isNull()) ? null : beforeThanNode.asLong();
-        JsonNode afterThanNode = params.path("afterThan");
-        Long afterThan = (afterThanNode.isMissingNode() || afterThanNode.isNull()) ? null : afterThanNode.asLong();
+        boolean reviewed = Boolean.TRUE.equals(params.reviewed());
+        String users = JsonNodeUtils.csvFromStringList(params.users());
+        String reviewUsers = JsonNodeUtils.csvFromStringList(params.reviewUsers());
+        String format = (params.format() == null || params.format().isBlank()) ? "pdf" : params.format();
+        String terms = JsonNodeUtils.csvFromStringList(params.terms());
+        String images = JsonNodeUtils.csvFromStringList(params.images());
+        Long beforeThan = params.beforeThan();
+        Long afterThan = params.afterThan();
 
         Map<String, Object> bodyMap = new HashMap<>();
         bodyMap.put("project", project);
         bodyMap.put("format", format);
-        bodyMap.put("users", users.orElse(null));
-        bodyMap.put("reviewUsers", reviewUsers.orElse(null));
+        bodyMap.put("users", users);
+        bodyMap.put("reviewUsers", reviewUsers);
         bodyMap.put("reviewed", reviewed);
         bodyMap.put("terms", terms);
         bodyMap.put("images", images);

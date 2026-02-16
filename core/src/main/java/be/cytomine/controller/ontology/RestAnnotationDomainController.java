@@ -7,11 +7,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import be.cytomine.dto.annotation.AnnotationReportParams;
-import be.cytomine.dto.annotation.Params;
 import be.cytomine.service.annotation.AnnotationReportService;
 import be.cytomine.service.report.ReportService;
 import be.cytomine.utils.JsonNodeUtils;
-import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

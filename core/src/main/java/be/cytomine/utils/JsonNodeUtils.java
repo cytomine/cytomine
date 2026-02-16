@@ -18,7 +18,7 @@ public class JsonNodeUtils {
         if (value == null) return Optional.empty();
 
         value = value.trim();
-        return value.isEmpty() ? Optional.empty() : Optional.of(value);
+        return value.isBlank() ? Optional.empty() : Optional.of(value);
     }
 
     public static String csvFromStringArrayNode(JsonNode arrayNode) {

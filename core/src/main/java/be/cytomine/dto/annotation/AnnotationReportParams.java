@@ -11,6 +11,6 @@ public record AnnotationReportParams(
     boolean reviewed,
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY) List<String> terms,
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY) List<String> images,
-    long beforeThan,
-    long afterThan
+    Long beforeThan,
+    Long afterThan
 ) {}

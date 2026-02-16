@@ -1051,7 +1051,9 @@ public class AnnotationDomainResourceTests {
 
         Map<String, Object> jsonBody = new LinkedHashMap<>();
         jsonBody.put("format", format);
-        jsonBody.put("users", users);
+        if (users != null && !users.isBlank()) {
+            jsonBody.put("users", users);
+        }
         jsonBody.put("reviewed", reviewed);
         jsonBody.put("terms", this.term.getId().toString());
         jsonBody.put("images", this.image.getId().toString());

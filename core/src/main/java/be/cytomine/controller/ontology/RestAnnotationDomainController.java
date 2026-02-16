@@ -117,16 +117,18 @@ public class RestAnnotationDomainController extends RestCytomineController {
             @PathVariable Long project,
             @RequestBody JsonNode params
     ) throws IOException {
-        log.info("params {}", params);
-        // handle the params first
+
         boolean reviewed = params.path("reviewed").asBoolean(false);
         Optional<String> users = JsonNodeUtils.optString(params, "users");
         Optional<String> reviewUsers = JsonNodeUtils.optString(params, "reviewUsers");
         String format = params.path("format").asText("pdf");
         String terms = JsonNodeUtils.csvFromStringArrayNode(params.path("terms"));
         String images = JsonNodeUtils.csvFromStringArrayNode(params.path("images"));
-        Long beforeThan = params.path("beforeThan").asLong();
-        Long afterThan = params.path("afterThan").asLong();
+        JsonNode beforeThanNode = params.path("beforeThan");
+        Long beforeThan = (beforeThanNode.isMissingNode() || beforeThanNode.isNull()) ? null : beforeThanNode.asLong();
+        JsonNode afterThanNode = params.path("afterThan");
+        Long afterThan = (afterThanNode.isMissingNode() || afterThanNode.isNull()) ? null : afterThanNode.asLong();
+
         Map<String, Object> bodyMap = new HashMap<>();
         bodyMap.put("project", project);
         bodyMap.put("format", format);
@@ -137,8 +139,6 @@ public class RestAnnotationDomainController extends RestCytomineController {
         bodyMap.put("images", images);
         bodyMap.put("beforeThan", beforeThan);
         bodyMap.put("afterThan", afterThan);
-
-        log.info("bodyMap {}", bodyMap);
 
         JsonObject body = new JsonObject(bodyMap);
         byte[] report = annotationReportService.downloadDocumentByProject(body);

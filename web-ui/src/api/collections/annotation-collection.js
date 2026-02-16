@@ -62,20 +62,14 @@ export default class AnnotationCollection extends Collection {
     if (!this.project) {
       throw new Error('Cannot construct download if no project ID is provided.');
     }
+    let paramsBody = {format: format};
+    let paramFields = ['format', 'reviewed', 'terms', 'users', 'reviewUsers', 'images', 'noTerm', 'multipleTerms', 'afterThan', 'beforeThan'];
+    paramFields.forEach(param => {
+      if (this[param] !== null) {
+        paramsBody[param] = this[param];
+      }
+    });
     // from this collection create a json
-    let paramsBody = {
-      format,
-      users: this.users ?? null,
-      reviewUsers: this.reviewUsers ?? null,
-      reviewed: Boolean(this.reviewed),
-      terms: this.terms ?? null,
-      images: this.images ?? null,
-      beforeThan: this.beforeThan ?? null,
-      afterThan: this.afterThan ?? null,
-    };
-    paramsBody = Object.fromEntries(
-      Object.entries(paramsBody).filter(([, v]) => v !== null && v !== undefined)
-    );
     let uri = `project/${this.project}/annotation/download`;
     Cytomine.instance.api.post(uri, paramsBody, {
       responseType: 'blob',

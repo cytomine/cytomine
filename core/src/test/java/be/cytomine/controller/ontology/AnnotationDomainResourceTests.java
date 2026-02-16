@@ -1051,12 +1051,10 @@ public class AnnotationDomainResourceTests {
 
         Map<String, Object> jsonBody = new LinkedHashMap<>();
         jsonBody.put("format", format);
-        if (users != null && !users.isBlank()) {
-            jsonBody.put("users", users);
-        }
+        jsonBody.put("users", List.of(users));
         jsonBody.put("reviewed", reviewed);
-        jsonBody.put("terms", this.term.getId().toString());
-        jsonBody.put("images", this.image.getId().toString());
+        jsonBody.put("terms", List.of(this.term.getId().toString()));
+        jsonBody.put("images", List.of(this.image.getId().toString()));
 
         return restAnnotationDomainControllerMockMvc.perform(post("/api/project/{project}/annotation/download", project.getId())
             .contentType(MediaType.APPLICATION_JSON)

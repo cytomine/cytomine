@@ -15,13 +15,9 @@ spec:
       labels:
         app: selenium
     spec:
-      securityContext:
-      {{- include "cytomine.podSecurityContext" . | nindent 8 }}
       containers:
         - name: selenium
           image: selenium/standalone-firefox
-          securityContext:
-          {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
           ports:
           - name: http
             containerPort: 4444

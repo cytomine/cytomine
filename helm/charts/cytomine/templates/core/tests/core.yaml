@@ -23,7 +23,7 @@ spec:
         - -c
         - |
           timeout=60; elapsed=0;
-          until nc -z selenium.{{ .Release.Namespace }}.svc.cluster.local 4444; do
+          until nc -w 1 selenium.{{ .Release.Namespace }}.svc.cluster.local 4444 </dev/null; do
             if [ "$elapsed" -ge "$timeout" ]; then echo "Timed out waiting for Selenium"; exit 1; fi;
             echo "Waiting for Selenium... ($elapsed s)"; sleep 2; elapsed=$((elapsed+2));
           done

@@ -1,4 +1,5 @@
 cytomine:
+  url: ${CYTOMINE_URL}
   admin:
     username: ${CYTOMINE_ADMIN_USERNAME}
     password: ${CYTOMINE_ADMIN_PASSWORD}

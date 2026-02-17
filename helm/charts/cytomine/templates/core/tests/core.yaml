@@ -32,7 +32,7 @@ spec:
         - name: CYTOMINE_ADMIN_USERNAME
           value: admin
         - name: CYTOMINE_URL
-          value: core.{{ .Release.Namespace }}.svc.cluster.local
+          value: http://core.{{ .Release.Namespace }}.svc.cluster.local
         - name: SELENIUM_URL
-          value: selenium.{{ .Release.Namespace }}.svc.cluster.local
+          value: http://selenium.{{ .Release.Namespace }}.svc.cluster.local:4444
   restartPolicy: Never

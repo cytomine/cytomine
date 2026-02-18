@@ -1,9 +1,8 @@
-package org.cytomine.e2etests.login;
+package org.cytomine.e2etests.project;
 
 import java.net.URL;
 import java.time.Duration;
 
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -11,17 +10,13 @@ import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@Slf4j
-@SpringBootTest
-public class LoginTests {
+public class ProjectTests {
     @Autowired
     WebDriver driver;
 
     @Value("${cytomine.url}")
     URL cytomineUrl;
-
     @Value("${cytomine.admin.username}")
     String adminUsername;
 
@@ -39,4 +34,5 @@ public class LoginTests {
         wait.until(d -> driver.getTitle().equals("Cytomine"));
         wait.until(d -> driver.findElement(By.id("app")));
     }
+
 }

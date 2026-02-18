@@ -25,7 +25,6 @@ global:
 readOnceStorageClass: ""
 readManyStorageClass: null
 
-
 # Resource settings
 tempImageStorage: "1Gi"
 imageStorage: "3Gi"
@@ -80,6 +79,7 @@ images:
   nginx: cytomine/nginx:latest
   iam: keycloak/keycloak:26.3
   e2e_tests: cytomine/e2e-tests:latest
+  selenium: selenium/standalone-firefox
   pullPolicy: Always
   # array of image secrets names
   imagePullSecretsNames:
@@ -186,7 +186,6 @@ pims:
   #     path: /data/dataset
   #     type: DirectoryOrCreate
   datasetImportStorage: null
-
 
 # Nginx - Main HTTP proxy dispatching incoming requests
 nginx:

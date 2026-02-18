@@ -1,3 +1,8 @@
+{{- $ingressSvc := lookup "v1" "Service" "ingress" "ingress-nginx-controller" }}
+{{- $ingressIP := "" }}
+{{- if $ingressSvc }}
+{{- $ingressIP = $ingressSvc.spec.clusterIP }}
+{{- end }}
 apiVersion: v1
 kind: Pod
 metadata:
@@ -9,6 +14,10 @@ metadata:
 spec:
   securityContext:
   {{- include "cytomine.podSecurityContext" . | nindent 4 }}
+  hostAliases:
+    - ip: "{{ $ingressIP }}"
+      hostnames:
+        - "{{ .Values.global.domainName }}"
   volumes:
     - name: tmp
       emptyDir: {}
@@ -70,7 +79,7 @@ spec:
         - name: CYTOMINE_ADMIN_USERNAME
           value: admin
         - name: CYTOMINE_URL
-          value: http://web-ui.{{ .Release.Namespace }}.svc.cluster.local:9090
+          value: https://{{ .Values.global.domainName }}
         - name: SELENIUM_URL
           value: http://localhost:4444
   restartPolicy: Never

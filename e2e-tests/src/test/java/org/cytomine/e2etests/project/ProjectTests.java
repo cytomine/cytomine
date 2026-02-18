@@ -17,6 +17,7 @@ public class ProjectTests {
 
     @Value("${cytomine.url}")
     URL cytomineUrl;
+
     @Value("${cytomine.admin.username}")
     String adminUsername;
 
@@ -24,7 +25,7 @@ public class ProjectTests {
     String adminPassword;
 
     @Test
-    void login() {
+    void createProject() {
         driver.get(cytomineUrl.toString());
         Wait<WebDriver> wait = new WebDriverWait(driver, Duration.ofSeconds(3));
         wait.until(d -> driver.findElement(By.id("username")).isDisplayed());

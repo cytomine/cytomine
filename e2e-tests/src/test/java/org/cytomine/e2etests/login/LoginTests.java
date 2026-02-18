@@ -4,6 +4,7 @@ import java.net.URL;
 import java.time.Duration;
 
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.e2etests.configuration.SeleniumDriver;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -12,9 +13,11 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 
 @Slf4j
 @SpringBootTest
+@Import(SeleniumDriver.class)
 public class LoginTests {
     @Autowired
     WebDriver driver;

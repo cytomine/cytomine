@@ -4,6 +4,7 @@ import java.net.URL;
 import java.time.Duration;
 import java.util.Optional;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,9 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import static java.lang.String.format;
+
+@Slf4j
 @SpringBootTest
 public class LoginTests {
     WebDriver driver;
@@ -38,8 +42,16 @@ public class LoginTests {
         FirefoxOptions options = new FirefoxOptions();
         options.addArguments("--headless");
         driver =
-            seleniumUrl.map(url -> new RemoteWebDriver(url, options))
-                .orElseGet(() -> new FirefoxDriver(options));
+            seleniumUrl.map(url -> {
+                    log.info("Instantiated RemoteWebDriver with url: {}", url);
+                    return new RemoteWebDriver(url, options);
+                })
+                .orElseGet(() ->
+                    {
+                        log.info("Instantiated FirefoxDriver");
+                        return new FirefoxDriver(options);
+                    }
+                );
     }
 
     @AfterEach

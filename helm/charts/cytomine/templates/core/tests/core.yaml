@@ -5,7 +5,7 @@ metadata:
   labels:
   annotations:
     "helm.sh/hook": test
-    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-weight": "1"
 spec:
   securityContext:
   {{- include "cytomine.podSecurityContext" . | nindent 4 }}
@@ -14,9 +14,46 @@ spec:
       emptyDir: {}
     - name: workspace
       emptyDir: {}
+  initContainers:
+    - name: selenium
+      image: "{{ .Values.images.selenium }}"
+      imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+      securityContext:
+        allowPrivilegeEscalation: false
+        privileged: false
+        readOnlyRootFilesystem: false
+        runAsNonRoot: true
+        runAsUser: 1200
+        runAsGroup: 1200
+        capabilities:
+          drop: ["ALL"]
+      volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+      ports:
+        - name: http
+          containerPort: 4444
+      readinessProbe:
+        httpGet:
+          path: /wd/hub/status
+          port: 4444
+        initialDelaySeconds: 5
+        periodSeconds: 3
+    - name: report-exporter
+      image: busybox
+      imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+      securityContext:
+      {{- include "cytomine.containerSecurityContext" . | nindent 8 }}
+      volumeMounts:
+        - name: workspace
+          mountPath: /reports
+      command: ["sh", "-c", "sleep infinity"]
   containers:
     - name: e2e-tests
       image: "{{ .Values.images.e2e_tests }}"
+      imagePullPolicy: IfNotPresent
       securityContext:
       {{- include "cytomine.containerSecurityContext" . | nindent 8 }}
       volumeMounts:
@@ -33,7 +70,7 @@ spec:
         - name: CYTOMINE_ADMIN_USERNAME
           value: admin
         - name: CYTOMINE_URL
-          value: http://core.{{ .Release.Namespace }}.svc.cluster.local
+          value: http://web-ui.{{ .Release.Namespace }}.svc.cluster.local:9090
         - name: SELENIUM_URL
-          value: http://selenium.{{ .Release.Namespace }}.svc.cluster.local:4444
+          value: http://localhost:4444
   restartPolicy: Never

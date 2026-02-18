@@ -5,6 +5,7 @@ metadata:
   labels:
   annotations:
     "helm.sh/hook": test
+    "helm.sh/hook-weight": "0"
 spec:
   securityContext:
   {{- include "cytomine.podSecurityContext" . | nindent 4 }}
@@ -13,20 +14,6 @@ spec:
       emptyDir: {}
     - name: workspace
       emptyDir: {}
-  initContainers:
-    - name: wait-for-selenium
-      image: busybox
-      securityContext:
-      {{- include "cytomine.containerSecurityContext" . | nindent 8 }}
-      command:
-        - sh
-        - -c
-        - |
-          timeout=60; elapsed=0;
-          until nc -w 1 selenium.{{ .Release.Namespace }}.svc.cluster.local 4444 </dev/null; do
-            if [ "$elapsed" -ge "$timeout" ]; then echo "Timed out waiting for Selenium"; exit 1; fi;
-            echo "Waiting for Selenium... ($elapsed s)"; sleep 2; elapsed=$((elapsed+2));
-          done
   containers:
     - name: e2e-tests
       image: "{{ .Values.images.e2e_tests }}"

@@ -227,7 +227,7 @@ iam:
   lsaaiEndpoint:
 
 cbir:
-  port: 6000 # https://github.com/cytomine/cytomine/blob/8e5a14bf70b22e9f96a253d6402f793e8a37ce3e/cbir/Dockerfile#L37
+  port: 6000  # https://github.com/cytomine/cytomine/blob/8e5a14bf70b22e9f96a253d6402f793e8a37ce3e/cbir/Dockerfile#L37
   storage:
     size: 1Gi
     storageClassName: null
@@ -257,9 +257,9 @@ serviceAccount:
   name: ""
 
 containerSecurity:
-  allowPrivilegeEscalation: false # do not allow the container to switch to a user with more permissions
-  privileged: false # the container is not privileged (usually the default)
-  readOnlyRootFilesystem: true # the container does not write to the root filesystem
+  allowPrivilegeEscalation: false  # do not allow the container to switch to a user with more permissions
+  privileged: false  # the container is not privileged (usually the default)
+  readOnlyRootFilesystem: true  # the container does not write to the root filesystem
   userID: 20000
   groupID: 20000
   fsgroupID: 20000

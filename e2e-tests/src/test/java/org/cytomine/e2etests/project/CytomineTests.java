@@ -1,11 +1,10 @@
-package org.cytomine.e2etests.login;
+package org.cytomine.e2etests.project;
 
-import lombok.extern.slf4j.Slf4j;
 import org.cytomine.e2etests.configuration.SeleniumDriver;
 import org.cytomine.e2etests.ui.CytomineSteps;
+import org.cytomine.e2etests.ui.WebDriverUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.Wait;
@@ -17,14 +16,13 @@ import org.springframework.context.annotation.Import;
 
 import java.net.URL;
 import java.time.Duration;
+import java.util.UUID;
 
-@Slf4j
+@Import({SeleniumDriver.class, CytomineSteps.class, WebDriverUtils.class})
 @SpringBootTest
-@Import({SeleniumDriver.class, CytomineSteps.class})
-public class LoginTests {
+public class CytomineTests {
     @Autowired
     SeleniumDriver driverProvider;
-
     WebDriver driver;
     Wait<WebDriver> wait;
 
@@ -43,19 +41,34 @@ public class LoginTests {
     @BeforeEach
     void setUp() {
         driver = driverProvider.driver();
-        wait = new WebDriverWait(driver, Duration.ofSeconds(3));
+        wait = new WebDriverWait(driver, Duration.ofSeconds(5));
     }
 
     @AfterEach
     void tearDown() {
         driver.close();
     }
-    @Disabled
+
     @Test
     void login() {
-
-            cytomineSteps.login(wait,driver, cytomineUrl, adminUsername, adminPassword);
-
-
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
     }
+
+    @Test
+    void createProject() {
+        String projectName = "selenium-" + UUID.randomUUID();
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        cytomineSteps.createProject(wait, cytomineUrl, projectName);
+        cytomineSteps.deleteProject(wait, driver.getCurrentUrl());
+    }
+
+
+    @Test
+    void deleteProject() {
+        String projectName = "selenium-" + UUID.randomUUID();
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        cytomineSteps.createProject(wait, cytomineUrl, projectName);
+        cytomineSteps.deleteProject(wait, driver.getCurrentUrl());
+    }
+
 }

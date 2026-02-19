@@ -1,5 +1,6 @@
 package org.cytomine.e2etests.ui;
 
+import lombok.SneakyThrows;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.Wait;
@@ -13,6 +14,7 @@ public class WebDriverUtils {
     }
 
     void byClick(Wait<WebDriver> wait, By by) {
+        byIsDisplayed(wait, by);
         wait.until(d -> {
             d.findElement(by)
                     .click();
@@ -21,6 +23,7 @@ public class WebDriverUtils {
     }
 
     void bySendKeys(Wait<WebDriver> wait, By by, String keys) {
+        byIsDisplayed(wait, by);
         wait.until(d -> {
             d.findElement(by)
                     .sendKeys(keys);
@@ -35,10 +38,12 @@ public class WebDriverUtils {
         });
     }
 
+    @SneakyThrows
     void byIsDisplayed(Wait<WebDriver> wait, By by) {
         wait.until(d -> d.findElement(by)
                 .isDisplayed()
         );
+        Thread.sleep(500);
     }
 
 }

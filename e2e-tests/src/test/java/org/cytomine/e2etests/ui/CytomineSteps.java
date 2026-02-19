@@ -30,7 +30,8 @@ public class CytomineSteps {
      * @return the URL of the created project
      */
     @SneakyThrows
-    public void createProject(Wait<WebDriver> wait, URL cytomineUrl, String projectName) {
+    public void
+    createProject(Wait<WebDriver> wait, URL cytomineUrl, String projectName) {
         webDriverUtils.goTo(wait, cytomineUrl.toString());
         webDriverUtils.xpathClick(wait, "//a[@href='#/projects']");
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'New project')]");

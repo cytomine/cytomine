@@ -23,12 +23,12 @@ public class SeleniumDriver {
         WebDriver webDriver =
                 seleniumUrl.map(url -> {
                             log.info("Instantiated RemoteWebDriver with url: {}", url);
+                            options.addArguments("--headless");
                             return new RemoteWebDriver(url, options);
                         })
                         .orElseGet(() ->
                                 {
                                     log.info("Instantiated FirefoxDriver");
-                                    options.addArguments("--headless");
                                     return new FirefoxDriver(options);
                                 }
                         );

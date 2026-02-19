@@ -22,7 +22,7 @@
   <div v-else-if="!loading" class="panel">
     <p class="panel-heading">
       {{$t('projects')}}
-      <button v-if="!currentUser.guestByNow" class="button is-link" id="new-project" @click="creationModal = true">
+      <button v-if="!currentUser.guestByNow" class="button is-link" @click="creationModal = true">
         {{$t('new-project')}}
       </button>
     </p>

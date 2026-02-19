@@ -15,7 +15,7 @@
 <template>
 <div class="sidebar-wrapper" :class="{expanded: expanded}" ref="sidebar">
   <nav class="sidebar" @click="clickHandler">
-    <h1 class="project-name" id="project-name-left-panel">{{`${$t('project')}: ${project.name}`}}</h1>
+    <h1 class="project-name">{{`${$t('project')}: ${project.name}`}}</h1>
     <ul>
       <template v-if="isTabDisplayed('images')">
         <router-link tag="li" :to="`/project/${project.id}/images`">

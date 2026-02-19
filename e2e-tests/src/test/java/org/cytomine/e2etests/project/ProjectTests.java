@@ -51,29 +51,22 @@ public class ProjectTests {
 
     @Test
     void createProject() {
-        driver.get(cytomineUrl.toString());
-        wait.until(d ->
-        {
-            String projectName = "selenium-" + UUID.randomUUID();
-            cytomineSteps.login(driver, cytomineUrl, adminUsername, adminPassword);
-            URL url = cytomineSteps.createProject(driver, cytomineUrl, projectName);
-            cytomineSteps.deleteProject(driver, url);
-            return true;
-        });
+
+        String projectName = "selenium-" + UUID.randomUUID();
+        cytomineSteps.login(wait, driver, cytomineUrl, adminUsername, adminPassword);
+        URL url = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
+        cytomineSteps.deleteProject(driver, url);
 
     }
 
+    @Disabled
     @Test
     void deleteProject() {
-        driver.get(cytomineUrl.toString());
-        wait.until(d ->
-        {
-            String projectName = "selenium-" + UUID.randomUUID();
-            cytomineSteps.login(driver, cytomineUrl, adminUsername, adminPassword);
-            URL url = cytomineSteps.createProject(driver, cytomineUrl, projectName);
-            cytomineSteps.deleteProject(driver, url);
-            return true;
-        });
+
+        String projectName = "selenium-" + UUID.randomUUID();
+        cytomineSteps.login(wait, driver, cytomineUrl, adminUsername, adminPassword);
+        URL url = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
+        cytomineSteps.deleteProject(driver, url);
 
     }
 

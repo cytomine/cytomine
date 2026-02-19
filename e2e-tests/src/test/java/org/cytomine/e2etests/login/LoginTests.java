@@ -5,6 +5,7 @@ import org.cytomine.e2etests.configuration.SeleniumDriver;
 import org.cytomine.e2etests.ui.CytomineSteps;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.Wait;
@@ -49,14 +50,12 @@ public class LoginTests {
     void tearDown() {
         driver.close();
     }
-
+    @Disabled
     @Test
     void login() {
-        driver.get(cytomineUrl.toString());
-        wait.until(d ->
-        {
-            cytomineSteps.login(d, cytomineUrl, adminUsername, adminPassword);
-            return true;
-        });
+
+            cytomineSteps.login(wait,driver, cytomineUrl, adminUsername, adminPassword);
+
+
     }
 }

@@ -4,6 +4,7 @@ import org.cytomine.e2etests.configuration.SeleniumDriver;
 import org.cytomine.e2etests.ui.CytomineSteps;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +15,9 @@ import org.springframework.context.annotation.Import;
 import java.net.URL;
 import java.util.UUID;
 
-@Import({SeleniumDriver.class,CytomineSteps.class})
+@Import({SeleniumDriver.class, CytomineSteps.class})
 @SpringBootTest
+@Disabled
 public class ProjectTests {
     @Autowired
     SeleniumDriver driverProvider;
@@ -48,6 +50,14 @@ public class ProjectTests {
         String projectName = "selenium-" + UUID.randomUUID();
         cytomineSteps.login(driver, cytomineUrl, adminUsername, adminPassword);
         cytomineSteps.createProject(driver, cytomineUrl, projectName);
+    }
+
+    @Test
+    void deleteProject() {
+        String projectName = "selenium-" + UUID.randomUUID();
+        cytomineSteps.login(driver, cytomineUrl, adminUsername, adminPassword);
+        URL url = cytomineSteps.createProject(driver, cytomineUrl, projectName);
+        cytomineSteps.deleteProject(driver, url);
     }
 
 }

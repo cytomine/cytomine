@@ -1,18 +1,15 @@
 package org.cytomine.e2etests.configuration;
 
-import java.net.URL;
-import java.util.Optional;
-
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
+
+import java.net.URL;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -23,17 +20,24 @@ public class SeleniumDriver {
 
     public WebDriver driver() {
         FirefoxOptions options = new FirefoxOptions();
+        // comment the following line to see it in real time!
         //options.addArguments("--headless");
-        return
-            seleniumUrl.map(url -> {
-                    log.info("Instantiated RemoteWebDriver with url: {}", url);
-                    return new RemoteWebDriver(url, options);
-                })
-                .orElseGet(() ->
-                    {
-                        log.info("Instantiated FirefoxDriver");
-                        return new FirefoxDriver(options);
-                    }
-                );
+        WebDriver webDriver =
+                seleniumUrl.map(url -> {
+                            log.info("Instantiated RemoteWebDriver with url: {}", url);
+                            return new RemoteWebDriver(url, options);
+                        })
+                        .orElseGet(() ->
+                                {
+                                    log.info("Instantiated FirefoxDriver");
+                                    return new FirefoxDriver(options);
+                                }
+                        );
+        // This does not work. I am leaving it here so that we know.
+        // https://www.selenium.dev/documentation/webdriver/waits/ <- I could not make it work.
+        //        webDriver.manage()
+        //                .timeouts()
+        //                .implicitlyWait(Duration.ofSeconds(10));
+        return webDriver;
     }
 }

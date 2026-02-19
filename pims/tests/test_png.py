@@ -1,6 +1,5 @@
 import io
 import os
-import urllib.request
 
 import pytest
 from PIL import Image as PILImage
@@ -23,18 +22,6 @@ from tests.utils.formats import (
 
 def get_image(path, filename):
     filepath = os.path.join(path, filename)
-    # If image does not exist locally -> download image
-
-    if not os.path.exists(path):
-        os.mkdir(path)
-
-    if not os.path.exists(filepath):
-        try:
-            url = f"https://data.cytomine.coop/open/tests/{filename}"  # OAC
-            urllib.request.urlretrieve(url, filepath)
-        except Exception as e:
-            print("Could not download image")
-            print(e)
 
     if not os.path.exists(os.path.join(path, "processed")):
         try:

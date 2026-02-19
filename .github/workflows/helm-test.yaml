@@ -73,7 +73,7 @@ jobs:
       - name: Export test results
         if: always()
         run: |
-          kubectl --namespace=cytomine-${{ github.sha }} cp e2e-tests:/workspace ./test-results -c report-exporter || echo "Failed to copy test results"
+          kubectl --namespace=cytomine-${{ github.sha }} cp e2e-tests:/reports ./test-results -c report-exporter || echo "Failed to copy test results"
           ls -la ./test-results || echo "No test results directory found"
 
       - name: Upload test results

@@ -102,7 +102,7 @@ def root():
 
 @pytest.fixture
 def image_path_jpeg():
-    filename = "cytomine-org-logo.jpeg"
+    filename = "test-image.jpeg"
     path = f"{test_root()}/upload_test_jpeg/"
     return path, filename
 

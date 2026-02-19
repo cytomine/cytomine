@@ -49,21 +49,7 @@ public class CytomineSteps {
     }
 
     public void deleteProject(WebDriver driver, URL projectURL, String projectId) {
-        driver.get(projectURL.toString());
-        Wait<WebDriver> wait = new WebDriverWait(driver, Duration.ofSeconds(3));
 
-        wait.until(d -> driver.findElement(By.id("view-all-projects"))
-                .isDisplayed());
-        driver.findElement(By.id("view-all-projects"))
-                .click();
-        wait.until(d -> driver.findElement(By.id("new-project"))
-                .isDisplayed());
-        driver.findElement(By.id("new-project"))
-                .click();
-
-        driver.findElement(By.id("button-save"))
-                .click();
-        wait.until(d -> driver.findElement(By.id("project-name-left-panel")));
     }
 
 }

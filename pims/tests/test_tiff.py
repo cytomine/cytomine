@@ -117,7 +117,7 @@ def test_tiff_metadata(client, image_path_tiff):
 def test_tiff_norm_tile(client, image_path_tiff):
     _, filename = image_path_tiff
     response = client.get(
-        f"/image/upload_test_tiff/{filename}/normalized-tile/zoom/3/ti/15",
+        f"/image/upload_test_tiff/{filename}/normalized-tile/zoom/2/ti/1",
         headers={"accept": "image/png"},
     )
     assert response.status_code == 200

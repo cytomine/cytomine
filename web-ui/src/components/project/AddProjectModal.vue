@@ -58,7 +58,7 @@
         <button class="button" type="button" @click="$emit('update:active', false)">
           {{ $t('button-cancel') }}
         </button>
-        <button class="button is-link" :disabled="errors.any()">
+        <button class="button is-link" :disabled="errors.any()" id="button-save">
           {{ $t('button-save') }}
         </button>
       </template>

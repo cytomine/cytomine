@@ -15,7 +15,7 @@ public class CytomineSteps {
     public void login(WebDriver driver, URL cytomineUrl, String username, String password) {
         driver.get(cytomineUrl.toString());
         Wait<WebDriver> wait = new WebDriverWait(driver, Duration.ofSeconds(3));
-        wait.until(d -> driver.findElement(By.id("username"))
+        wait.until(d -> d.findElement(By.id("username"))
                 .isDisplayed());
         driver.findElement(By.id("username"))
                 .sendKeys(username);
@@ -28,7 +28,7 @@ public class CytomineSteps {
         wait.until(d -> driver.findElement(By.id("app")));
     }
 
-    public void createProject(WebDriver driver, URL cytomineUrl, String projectName) {
+    public String createProject(WebDriver driver, URL cytomineUrl, String projectName) {
         driver.get(cytomineUrl.toString());
         Wait<WebDriver> wait = new WebDriverWait(driver, Duration.ofSeconds(3));
 
@@ -40,6 +40,30 @@ public class CytomineSteps {
                 .isDisplayed());
         driver.findElement(By.id("new-project"))
                 .click();
+        driver.findElement(By.name("name"))
+                .sendKeys(projectName);
+        driver.findElement(By.id("button-save"))
+                .click();
+        wait.until(d -> driver.findElement(By.id("project-name-left-panel")));
+        return driver.getCurrentUrl();
+    }
+
+    public void deleteProject(WebDriver driver, URL projectURL, String projectId) {
+        driver.get(projectURL.toString());
+        Wait<WebDriver> wait = new WebDriverWait(driver, Duration.ofSeconds(3));
+
+        wait.until(d -> driver.findElement(By.id("view-all-projects"))
+                .isDisplayed());
+        driver.findElement(By.id("view-all-projects"))
+                .click();
+        wait.until(d -> driver.findElement(By.id("new-project"))
+                .isDisplayed());
+        driver.findElement(By.id("new-project"))
+                .click();
+
+        driver.findElement(By.id("button-save"))
+                .click();
+        wait.until(d -> driver.findElement(By.id("project-name-left-panel")));
     }
 
 }

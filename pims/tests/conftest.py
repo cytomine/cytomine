@@ -116,7 +116,7 @@ def image_path_png():
 
 @pytest.fixture
 def image_path_tiff():
-    filename = "earthworm-transv-posterior-to-clitellum-02.tiff"
+    filename = "test-image.tiff"
     path = f"{test_root()}/upload_test_tiff/"
     return path, filename
 

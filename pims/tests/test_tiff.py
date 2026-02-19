@@ -90,28 +90,23 @@ def test_tiff_info(client, image_path_tiff):
 
 
 def test_tiff_metadata(client, image_path_tiff):
-    _, filename = image_path_tiff
+    path, filename = image_path_tiff
+    image = PILImage.open(os.path.join(path, filename))
     response = client.get(f"/image/upload_test_tiff/{filename}/metadata")
     assert response.status_code == 200
-    lst = response.json()["items"]
 
-    index = next(
-        (index for (index, d) in enumerate(lst) if d["key"] == "XResolution"),
-        None,
-    )
-    assert response.json()["items"][index]["value"] == "(4294967295, 69255)"
+    items = response.json()["items"]
+    metadata = {item["key"]: item["value"] for item in items}
 
-    index = next(
-        (index for (index, d) in enumerate(lst) if d["key"] == "YResolution"),
-        None,
-    )
-    assert response.json()["items"][index]["value"] == "(4294967295, 69255)"
+    expected_values = {
+        "ImageWidth": image.width,
+        "ImageLength": image.height,
+        "PhotometricInterpretation": image.mode,
+    }
 
-    index = next(
-        (index for (index, d) in enumerate(lst) if d["key"] == "ResolutionUnit"),
-        None,
-    )
-    assert response.json()["items"][index]["value"] == "CENTIMETER"
+    for key, expected in expected_values.items():
+        assert key in metadata
+        assert metadata[key] == expected
 
 
 def test_tiff_norm_tile(client, image_path_tiff):

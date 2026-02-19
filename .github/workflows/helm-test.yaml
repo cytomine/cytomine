@@ -76,10 +76,10 @@ jobs:
           kubectl --namespace=cytomine-${{ github.sha }} cp e2e-tests:/reports ./test-results -c report-exporter || echo "Failed to copy test results"
           ls -la ./test-results || echo "No test results directory found"
 
-      - name: Upload test results
+      - name: Upload helm test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results
+          name: helm-test-results
           path: ./test-results
           if-no-files-found: warn

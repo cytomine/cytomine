@@ -138,6 +138,3 @@ ci/
 !.vscode/launch.json
 .idea
 *.iml
-
-# Tests outputs
-tests/test_data/png/processed

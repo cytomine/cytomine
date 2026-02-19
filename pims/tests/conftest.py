@@ -110,7 +110,7 @@ def image_path_jpeg():
 @pytest.fixture
 def image_path_png():
     filename = "test-image.png"
-    path = f"{test_root()}/png/"
+    path = f"{test_root()}/upload_test_png/"
     return path, filename
 
 

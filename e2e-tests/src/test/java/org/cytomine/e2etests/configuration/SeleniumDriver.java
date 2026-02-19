@@ -20,8 +20,6 @@ public class SeleniumDriver {
 
     public WebDriver driver() {
         FirefoxOptions options = new FirefoxOptions();
-        // comment the following line to see it in real time!
-        options.addArguments("--headless");
         WebDriver webDriver =
                 seleniumUrl.map(url -> {
                             log.info("Instantiated RemoteWebDriver with url: {}", url);
@@ -30,6 +28,7 @@ public class SeleniumDriver {
                         .orElseGet(() ->
                                 {
                                     log.info("Instantiated FirefoxDriver");
+                                    options.addArguments("--headless");
                                     return new FirefoxDriver(options);
                                 }
                         );

@@ -444,6 +444,14 @@ public class TaskRunService {
                     return id + ".png";
                 }
             });
+
+            String geometry = geometryService.WKTToGeoJSON(annotation.getWktLocation());
+            body.add("location", new ByteArrayResource(geometry.getBytes(StandardCharsets.UTF_8)) {
+                @Override
+                public String getFilename() {
+                    return id + ".geojson";
+                }
+            });
         }
         if (type.equals("image")) {
             File wsi = downloadWsi(id);

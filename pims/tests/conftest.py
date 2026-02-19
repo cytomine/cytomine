@@ -1,17 +1,3 @@
-#  * Copyright (c) 2020-2021. Authors: see NOTICE file.
-#  *
-#  * Licensed under the Apache License, Version 2.0 (the "License");
-#  * you may not use this file except in compliance with the License.
-#  * You may obtain a copy of the License at
-#  *
-#  *      http://www.apache.org/licenses/LICENSE-2.0
-#  *
-#  * Unless required by applicable law or agreed to in writing, software
-#  * distributed under the License is distributed on an "AS IS" BASIS,
-#  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  * See the License for the specific language governing permissions and
-#  * limitations under the License.
-
 import os
 import shutil
 from contextlib import contextmanager
@@ -22,9 +8,9 @@ from fastapi.testclient import TestClient
 
 from pims import config
 
-CLEAR_AT_SHUTDOWN=False
+CLEAR_AT_SHUTDOWN = False
 
-with open(os.path.join(os.path.dirname(__file__), 'fake_files.csv'), 'r') as f:
+with open(os.path.join(os.path.dirname(__file__), "fake_files.csv"), "r") as f:
     lines = f.read().splitlines()
     _fake_files = dict()
     for line in lines[1:]:
@@ -34,7 +20,7 @@ with open(os.path.join(os.path.dirname(__file__), 'fake_files.csv'), 'r') as f:
             "filepath": filepath,
             "link": link,
             "role": role,
-            "collection": (kind == "collection")
+            "collection": (kind == "collection"),
         }
 
 fake_files_info = _fake_files.values()
@@ -43,16 +29,18 @@ fake_files_info = _fake_files.values()
 def create_fake_files(fake_files):
     root = Path(test_root())
     for ff in fake_files.values():
-        path = root / Path(ff['filepath'])
+        path = root / Path(ff["filepath"])
         path.parent.mkdir(exist_ok=True, parents=True)
 
-        if ff['filetype'] == "f":
+        if ff["filetype"] == "f":
             path.touch(exist_ok=True)
-        elif ff['filetype'] == "d":
+        elif ff["filetype"] == "d":
             path.mkdir(exist_ok=True, parents=True)
-        elif ff['filetype'] == "l" and not path.exists():
-            link = root / Path(ff['link'])
-            target_is_directory = True if fake_files[ff['link']]['filetype'] == "d" else False
+        elif ff["filetype"] == "l" and not path.exists():
+            link = root / Path(ff["link"])
+            target_is_directory = (
+                True if fake_files[ff["link"]]["filetype"] == "d" else False
+            )
             path.symlink_to(link, target_is_directory=target_is_directory)
 
 
@@ -73,9 +61,7 @@ def test_root():
 
 
 def get_settings():
-    return config.Settings(
-        _env_file=os.getenv("CONFIG_FILE")
-    )
+    return config.Settings(_env_file=os.getenv("CONFIG_FILE"))
 
 
 @pytest.fixture
@@ -95,9 +81,11 @@ def app():
 def client(app):
     return TestClient(app)
 
+
 @pytest.fixture
 def root():
-     return test_root()
+    return test_root()
+
 
 @pytest.fixture
 def image_path_jpeg():
@@ -105,11 +93,13 @@ def image_path_jpeg():
     path = f"{test_root()}/upload_test_jpeg/"
     return path, filename
 
+
 @pytest.fixture
 def image_path_png():
-    filename = "cytomine-org-logo.png"
-    path = f"{test_root()}/upload_test_png/"
+    filename = "test-image.png"
+    path = "./tests/test_data/png/"
     return path, filename
+
 
 @pytest.fixture
 def image_path_tiff():
@@ -117,11 +107,13 @@ def image_path_tiff():
     path = f"{test_root()}/upload_test_tiff/"
     return path, filename
 
+
 @pytest.fixture
 def image_path_excentric_filename():
     filename = "Test special char %(_!.tiff"
     path = f"{test_root()}/upload_test_excentric"
     return path, filename
+
 
 @contextmanager
 def not_raises(expected_exc):
@@ -134,6 +126,4 @@ def not_raises(expected_exc):
         )
 
     except Exception as err:
-        raise AssertionError(
-            f"An unexpected exception {repr(err)} raised."
-        )
+        raise AssertionError(f"An unexpected exception {repr(err)} raised.")

@@ -32,7 +32,7 @@
           </b-table>
 
           <p class="has-text-centered all-projects">
-            <router-link class="button is-link" to="/projects">{{$t('view-all-projects')}}</router-link>
+            <router-link class="button is-link" to="/projects" id="view-all-projects">{{$t('view-all-projects')}}</router-link>
           </p>
         </div>
       </div>

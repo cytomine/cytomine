@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Import;
 
 import java.net.URL;
 import java.time.Duration;
+import java.util.UUID;
 
 @Import(SeleniumDriver.class)
 @SpringBootTest
@@ -44,6 +45,7 @@ public class ProjectTests {
 
     @Test
     void createProject() {
+        String projectName = "selenium-"+UUID.randomUUID();
 
         driver.get(cytomineUrl.toString());
         Wait<WebDriver> wait = new WebDriverWait(driver, Duration.ofSeconds(3));
@@ -58,6 +60,12 @@ public class ProjectTests {
         wait.until(d -> driver.getTitle()
                 .equals("Cytomine"));
         wait.until(d -> driver.findElement(By.id("app")));
+
+        wait.until(d -> driver.findElement(By.id("view-all-projects")).isDisplayed());
+        driver.findElement(By.id("view-all-projects")).click();
+        wait.until(d -> driver.findElement(By.id("new-project")).isDisplayed());
+        driver.findElement(By.id("new-project")).click();
+
     }
 
 }

@@ -9,6 +9,8 @@ from fastapi.testclient import TestClient
 from pims import config
 
 CLEAR_AT_SHUTDOWN = False
+TEST_DATA_PATH = Path(os.path.dirname(__file__)) / "test_data"
+
 
 with open(os.path.join(os.path.dirname(__file__), "fake_files.csv"), "r") as f:
     lines = f.read().splitlines()
@@ -56,6 +58,17 @@ def fake_files(request):
     return _fake_files
 
 
+@pytest.fixture(scope="session", autouse=True)
+def load_test_data():
+    root = Path(test_root())
+    for item in TEST_DATA_PATH.iterdir():
+        dest_path = root / item.name
+        if item.is_dir():
+            shutil.copytree(item, dest_path, dirs_exist_ok=True)
+        else:
+            shutil.copy2(item, dest_path)
+
+
 def test_root():
     return get_settings().root
 
@@ -97,7 +110,7 @@ def image_path_jpeg():
 @pytest.fixture
 def image_path_png():
     filename = "test-image.png"
-    path = "./tests/test_data/png/"
+    path = f"{test_root()}/png/"
     return path, filename
 
 

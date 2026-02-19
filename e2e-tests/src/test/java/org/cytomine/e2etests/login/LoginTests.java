@@ -5,6 +5,8 @@ import java.time.Duration;
 
 import lombok.extern.slf4j.Slf4j;
 import org.cytomine.e2etests.configuration.SeleniumDriver;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -20,6 +22,8 @@ import org.springframework.context.annotation.Import;
 @Import(SeleniumDriver.class)
 public class LoginTests {
     @Autowired
+    SeleniumDriver driverProvider;
+
     WebDriver driver;
 
     @Value("${cytomine.url}")
@@ -31,8 +35,19 @@ public class LoginTests {
     @Value("${cytomine.admin.password}")
     String adminPassword;
 
+    @BeforeEach
+    void setUp(){
+         driver = driverProvider.driver();
+    }
+
+    @AfterEach
+    void tearDown(){
+        driver.close();
+    }
+
     @Test
     void login() {
+
         driver.get(cytomineUrl.toString());
         Wait<WebDriver> wait = new WebDriverWait(driver, Duration.ofSeconds(3));
         wait.until(d -> driver.findElement(By.id("username")).isDisplayed());

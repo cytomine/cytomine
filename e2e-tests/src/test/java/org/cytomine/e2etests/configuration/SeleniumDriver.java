@@ -12,18 +12,18 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 @Slf4j
-@TestConfiguration
+@Component
 public class SeleniumDriver {
 
     @Value("${selenium.url}")
     Optional<URL> seleniumUrl;
 
-    @Bean
-    WebDriver driver() {
+    public WebDriver driver() {
         FirefoxOptions options = new FirefoxOptions();
-        options.addArguments("--headless");
+        //options.addArguments("--headless");
         return
             seleniumUrl.map(url -> {
                     log.info("Instantiated RemoteWebDriver with url: {}", url);

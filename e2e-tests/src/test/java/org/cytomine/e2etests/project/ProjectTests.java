@@ -1,23 +1,20 @@
 package org.cytomine.e2etests.project;
 
 import org.cytomine.e2etests.configuration.SeleniumDriver;
+import org.cytomine.e2etests.ui.CytomineSteps;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.Wait;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
 import java.net.URL;
-import java.time.Duration;
 import java.util.UUID;
 
-@Import(SeleniumDriver.class)
+@Import({SeleniumDriver.class,CytomineSteps.class})
 @SpringBootTest
 public class ProjectTests {
     @Autowired
@@ -33,6 +30,9 @@ public class ProjectTests {
     @Value("${cytomine.admin.password}")
     String adminPassword;
 
+    @Autowired
+    CytomineSteps cytomineSteps;
+
     @BeforeEach
     void setUp() {
         driver = driverProvider.driver();
@@ -45,27 +45,9 @@ public class ProjectTests {
 
     @Test
     void createProject() {
-        String projectName = "selenium-"+UUID.randomUUID();
-
-        driver.get(cytomineUrl.toString());
-        Wait<WebDriver> wait = new WebDriverWait(driver, Duration.ofSeconds(3));
-        wait.until(d -> driver.findElement(By.id("username"))
-                .isDisplayed());
-        driver.findElement(By.id("username"))
-                .sendKeys(adminUsername);
-        driver.findElement(By.id("password"))
-                .sendKeys(adminPassword);
-        driver.findElement(By.cssSelector("input[type='submit']"))
-                .click();
-        wait.until(d -> driver.getTitle()
-                .equals("Cytomine"));
-        wait.until(d -> driver.findElement(By.id("app")));
-
-        wait.until(d -> driver.findElement(By.id("view-all-projects")).isDisplayed());
-        driver.findElement(By.id("view-all-projects")).click();
-        wait.until(d -> driver.findElement(By.id("new-project")).isDisplayed());
-        driver.findElement(By.id("new-project")).click();
-
+        String projectName = "selenium-" + UUID.randomUUID();
+        cytomineSteps.login(driver, cytomineUrl, adminUsername, adminPassword);
+        cytomineSteps.createProject(driver, cytomineUrl, projectName);
     }
 
 }

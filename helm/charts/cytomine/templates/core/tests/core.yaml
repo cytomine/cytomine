@@ -39,8 +39,19 @@ spec:
       volumeMounts:
         - name: tmp
           mountPath: /tmp
+      env:
+        - name: SE_EVENT_BUS_PUBLISH_PORT
+          value: "4442"
+        - name: SE_EVENT_BUS_SUBSCRIBE_PORT
+          value: "4443"
+        - name: SE_NODE_MAX_SESSIONS
+          value: "30"
       ports:
         - name: http
+          containerPort: 4442
+        - name: http2
+          containerPort: 4443
+        - name: http3
           containerPort: 4444
       readinessProbe:
         httpGet:

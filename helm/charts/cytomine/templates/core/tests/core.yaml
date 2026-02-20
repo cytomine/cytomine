@@ -39,6 +39,9 @@ spec:
       volumeMounts:
         - name: tmp
           mountPath: /tmp
+      env:
+        - name: SE_NODE_MAX_SESSIONS
+          value: "30"
       ports:
         - name: http
           containerPort: 4444
@@ -55,7 +58,7 @@ spec:
       {{- include "cytomine.containerSecurityContext" . | nindent 8 }}
       volumeMounts:
         - name: workspace
-          mountPath: /reports
+          mountPath: /workspace
       command: ["sh", "-c", "sleep infinity"]
   containers:
     - name: e2e-tests

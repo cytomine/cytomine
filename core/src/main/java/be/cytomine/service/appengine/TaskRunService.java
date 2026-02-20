@@ -444,6 +444,18 @@ public class TaskRunService {
                     return id + ".png";
                 }
             });
+
+            Envelope bounds = GeometryService.getBounds(annotation.getWktLocation());
+            int xOffset = (int) -bounds.getMinX();
+            int yOffset = (int) -bounds.getMinY();
+            Geometry shifted = GeometryService.addOffset(annotation.getWktLocation(), xOffset, yOffset);
+            String geometry = geometryService.WKTToGeoJSON(shifted.toText());
+            body.add("location", new ByteArrayResource(geometry.getBytes(StandardCharsets.UTF_8)) {
+                @Override
+                public String getFilename() {
+                    return id + ".geojson";
+                }
+            });
         }
         if (type.equals("image")) {
             File wsi = downloadWsi(id);

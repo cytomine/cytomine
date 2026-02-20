@@ -24,6 +24,8 @@ import java.util.stream.Collectors;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.OptimisticLockException;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.ReplicationMode;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.annotation.Transactional;
@@ -106,14 +108,25 @@ public abstract class ModelService<T extends CytomineDomain> {
             if (newObject.getId() != null && !entityManager.contains(newObject)) {
                 log.debug("object detached");
                 // entity is detached, merge it in the session
-                newObject.setId(null);
+                try {
+                    newObject = entityManager.merge(newObject);
+                } catch (OptimisticLockException e) {
+                    // This is some AI generated code. Be careful
 
+                    // Entity was deleted, we need to persist it again with same ID
+                    // Use Hibernate's replicate to force insert with existing ID
+                    Session session = entityManager.unwrap(Session.class);
+                    session.replicate(newObject, ReplicationMode.OVERWRITE);
+                    entityManager.flush();
+                    return;
+                }
             }
             entityManager.persist(newObject);
             entityManager.flush();
         } catch (OptimisticLockException e) {
             log.error(String.format("CANNOT SAVE OBJECT %s", e));
-            newObject = entityManager.merge(newObject);
+            Session session = entityManager.unwrap(Session.class);
+            session.replicate(newObject, ReplicationMode.OVERWRITE);
         } catch (Exception e) {
             throw new WrongArgumentException("Cannot persist object:" + e);
         }

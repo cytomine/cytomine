@@ -194,7 +194,8 @@ export default {
     currentUser: get('currentUser/user'),
     currentAccount: get('currentUser/account'),
     role() {
-      let key = this.$keycloak.hasResourceRole('GUEST') ? 'ROLE_GUEST' : this.$keycloak.hasResourceRole('ADMIN') ? 'ROLE_ADMIN' : 'ROLE_USER';
+      // Guest > User > Admin
+      let key = this.$keycloak.hasResourceRole('ADMIN') ? 'ROLE_ADMIN' : this.$keycloak.hasResourceRole('USER') ? 'ROLE_USER' : 'ROLE_GUEST';
       return rolesMapping[key];
     },
 

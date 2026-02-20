@@ -19,3 +19,9 @@ build/
 # Cytomine data
 cache/
 data/
+**/out/
+**/.project
+**/.classpath
+**/.factorypath
+**/.settings
+**/bin

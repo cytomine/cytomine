@@ -19,6 +19,8 @@ package be.cytomine.service.project;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.PostGisTestConfiguration;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.time.DateUtils;
@@ -27,6 +29,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -77,6 +80,7 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
 @Transactional
 public class ProjectServiceTests {
 
@@ -216,7 +220,7 @@ public class ProjectServiceTests {
         assertThat(results.get(1).get("opened")).isEqualTo(true);
 
         results = projectService.listLastOpened(user1, 3L);
-        System.out.println(results);
+
         assertThat(results).hasSize(3);
         assertThat(results.get(0).get("id")).isEqualTo(project2.getId());
         assertThat(results.get(0).get("opened")).isEqualTo(true);

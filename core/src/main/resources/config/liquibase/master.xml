@@ -13,6 +13,8 @@
     Please use unique id tags for your change sets, such as a random uuid.
     -->
 
+    <include file="config/liquibase/changelog/2026-02-09-init-postgis-ltree.sql" relativeToChangelogFile="false"/>
+
     <include file="config/liquibase/changelog/00000000_0_init.xml" relativeToChangelogFile="false"/>
 
     <include file="config/liquibase/changelog/00000000_1_domain.xml" relativeToChangelogFile="false"/>

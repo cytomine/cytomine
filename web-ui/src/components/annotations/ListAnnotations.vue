@@ -302,9 +302,9 @@
     <div class="box">
       <h2 class="has-text-centered"> {{ $t('download-results') }} </h2>
       <div class="buttons is-centered">
-        <a class="button is-link" :href="downloadURL('pdf')">{{$t('download-PDF')}}</a>
-        <a class="button is-link" :href="downloadURL('csv')">{{$t('download-CSV')}}</a>
-        <a class="button is-link" :href="downloadURL('xls')">{{$t('download-excel')}}</a>
+        <button class="button is-link" type="button" @click="download('pdf')">{{$t('download-PDF')}}</button>
+        <button class="button is-link" type="button" @click="download('csv')">{{$t('download-CSV')}}</button>
+        <button class="button is-link" type="button" @click="download('xls')">{{$t('download-excel')}}</button>
       </div>
     </div>
   </div>
@@ -701,8 +701,8 @@ export default {
     async fetchTags() {
       this.tags = (await TagCollection.fetchAll()).array;
     },
-    downloadURL(format) {
-      return appendShortTermToken(this.collection.getDownloadURL(format), this.shortTermToken);
+    download(format) {
+      this.collection.download(format);
     },
     addTerm(term) {
       this.terms.push(term);

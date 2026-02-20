@@ -17,8 +17,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 
 import be.cytomine.CytomineCoreApplication;
+import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.PostGisTestConfiguration;
 import be.cytomine.domain.social.LastConnection;
 import be.cytomine.domain.social.LastUserPosition;
 import be.cytomine.domain.social.PersistentConnection;
@@ -38,6 +41,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
 @Transactional
 public class MongoDBDomainTests {
 

@@ -1,13 +1,14 @@
-package be.cytomine.utils;
+package be.cytomine.unit.utils;
+
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
+import be.cytomine.utils.PreparedRequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class PreparedRequestUtilsTests {
-
 
     @Test
     public void set_url() {

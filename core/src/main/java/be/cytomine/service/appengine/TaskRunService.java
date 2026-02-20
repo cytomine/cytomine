@@ -445,7 +445,11 @@ public class TaskRunService {
                 }
             });
 
-            String geometry = geometryService.WKTToGeoJSON(annotation.getWktLocation());
+            Envelope bounds = GeometryService.getBounds(annotation.getWktLocation());
+            int xOffset = (int) -bounds.getMinX();
+            int yOffset = (int) -bounds.getMinY();
+            Geometry shifted = GeometryService.addOffset(annotation.getWktLocation(), xOffset, yOffset);
+            String geometry = geometryService.WKTToGeoJSON(shifted.toText());
             body.add("location", new ByteArrayResource(geometry.getBytes(StandardCharsets.UTF_8)) {
                 @Override
                 public String getFilename() {

@@ -416,16 +416,16 @@ public class UserAnnotationServiceTests {
         entityManager.refresh(created);
         assertThat(created.getTerms()).hasSize(2);
 
-        List<CommandResponse> undo = commandService.undo();
+        commandService.undo();
 
         AssertionsForClassTypes.assertThat(
             userAnnotationService.find(commandResponse.getObject().getId())).isEmpty();
 
-        List<CommandResponse> redo = commandService.redo(undo.get(0).getObject().getId());
+        commandService.redo();
 
         AssertionsForClassTypes.assertThat(
-            userAnnotationService.find(redo.get(0).toJsonObject().getId())).isPresent();
-        userAnnotation = userAnnotationService.find(redo.get(0).getObject().getId()).get();
+            userAnnotationService.find(commandResponse.getObject().getId())).isPresent();
+        userAnnotation = userAnnotationService.find(commandResponse.getObject().getId()).get();
         entityManager.refresh(userAnnotation);
         assertThat(userAnnotation.terms()).hasSize(2);
     }

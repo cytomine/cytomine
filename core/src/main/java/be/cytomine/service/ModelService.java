@@ -104,6 +104,7 @@ public abstract class ModelService<T extends CytomineDomain> {
     public void saveDomain(CytomineDomain newObject) {
         checkDoNotAlreadyExist(newObject);
 
+        boolean alreadyPersisted = false;
         try {
             if (newObject.getId() != null && !entityManager.contains(newObject)) {
                 log.debug("object detached");
@@ -113,20 +114,25 @@ public abstract class ModelService<T extends CytomineDomain> {
                 } catch (OptimisticLockException e) {
                     // This is some AI generated code. Be careful
 
-                    // Entity was deleted, we need to persist it again with same ID
+                    // Entity was deleted during undo/redo, need to re-insert with same ID
                     // Use Hibernate's replicate to force insert with existing ID
                     Session session = entityManager.unwrap(Session.class);
                     session.replicate(newObject, ReplicationMode.OVERWRITE);
-                    entityManager.flush();
-                    return;
+                    session.flush();
+                    // Mark as already persisted so we don't try to persist again
+                    alreadyPersisted = true;
                 }
             }
-            entityManager.persist(newObject);
+            // Only persist if we haven't already replicated
+            if (!alreadyPersisted && !entityManager.contains(newObject)) {
+                entityManager.persist(newObject);
+            }
             entityManager.flush();
         } catch (OptimisticLockException e) {
             log.error(String.format("CANNOT SAVE OBJECT %s", e));
             Session session = entityManager.unwrap(Session.class);
             session.replicate(newObject, ReplicationMode.OVERWRITE);
+            entityManager.flush();
         } catch (Exception e) {
             throw new WrongArgumentException("Cannot persist object:" + e);
         }

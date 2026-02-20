@@ -1622,7 +1622,7 @@ public class TaskProvisioningService {
         JakartaServletFileUpload<DiskFileItem, FileItemFactory<DiskFileItem>> upload =
             new JakartaServletFileUpload<>(factory);
         File uploadedFile = new File(filePath.toAbsolutePath().toString());
-        ;
+
         try {
             FileItemInputIterator iter = upload.getItemIterator(request);
 
@@ -1658,6 +1658,19 @@ public class TaskProvisioningService {
                 log.info("provisioning streaming: file successfully streamed and saved ");
             }
 
+            if (!iter.hasNext()) {
+                return uploadedFile;
+            }
+
+            item = iter.next();
+
+            Path geometryPath = Paths.get(filePath.toAbsolutePath() + ".geojson");
+            File geometryFile = new File(geometryPath.toAbsolutePath().toString());
+            try (InputStream uploadedStream = item.getInputStream();
+                FileOutputStream fos = new FileOutputStream(geometryFile)) {
+                IOUtils.copyLarge(uploadedStream, fos);
+                log.info("provisioning streaming: geometry successfully streamed and saved");
+            }
         } catch (Exception e) {
             log.warn("provisioning streaming: failed to stream input file {}", e.getMessage());
             AppEngineError error = ErrorBuilder.build(

@@ -34,6 +34,7 @@ jobs:
         run: |
           sudo apt-get -y update && \
           sudo apt-get -y install --no-install-recommends --no-install-suggests \
+            libimage-exiftool-perl \
             libopenslide-dev \
             libopenjp2-7-dev \
             libvips42 \

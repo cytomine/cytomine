@@ -22,7 +22,8 @@ spec:
     - name: tmp
       emptyDir: {}
     - name: workspace
-      emptyDir: {}
+      persistentVolumeClaim:
+        claimName: "e2e-test-reports"
   initContainers:
     - name: selenium
       image: "{{ .Values.images.selenium }}"

@@ -3,7 +3,7 @@ x-version-env: &version-env
 
 services:
   mongo:
-    image: cytomine/mongo:latest
+    image: mongo:4.4-focal
     restart: unless-stopped
     volumes:
       - ${DATA_PATH:-./data}/mongo:/data/db
@@ -14,6 +14,7 @@ services:
     networks:
       host_network:
         ipv4_address: 172.16.238.2
+
   postgis:
     image: cytomine/postgis:latest
     restart: unless-stopped

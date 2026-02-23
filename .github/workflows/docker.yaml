@@ -29,13 +29,11 @@ jobs:
             target: production
           - name: iam
             target: production
-          # - name: mongo
           - name: nginx
           - name: pims
             context: "."
             dockerfile_location: pims
             target: production
-          - name: postgis
           - name: sam
             target: production
           - name: web-ui

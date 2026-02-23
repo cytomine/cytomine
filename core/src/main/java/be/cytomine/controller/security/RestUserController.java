@@ -516,11 +516,11 @@ public class RestUserController extends RestCytomineController {
         List<Map<String, Object>> users = new ArrayList<>();
 
         for (User user : projectUsers) {
-            if (user instanceof User) {
+            if (user != null) {
                 users.add(Map.of(
-                        "username", ((User) user).getUsername(),
-                        "name", (((User) user).getName())
-                ));
+                        "username", user.getUsername(),
+                        "name", user.getName())
+                );
             }
 
             byte[] report = reportService.generateUsersReport(project.getName(), users, format);

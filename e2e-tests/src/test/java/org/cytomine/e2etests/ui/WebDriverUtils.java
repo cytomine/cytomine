@@ -40,10 +40,10 @@ public class WebDriverUtils {
 
     @SneakyThrows
     boolean byIsDisplayed(Wait<WebDriver> wait, By by) {
+        Thread.sleep(500);
         wait.until(d -> d.findElement(by)
                 .isDisplayed()
         );
-        Thread.sleep(500);
         return true;
     }
 

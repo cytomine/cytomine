@@ -89,6 +89,7 @@ jobs:
           kubectl --namespace=cytomine-${{ github.sha }} cp export-test-results:/reports/e2e-tests/build/reports ./test-results/build/ -c exporter || echo "Failed to copy test results from /reports/e2e-tests/build/reports"
 
           kubectl --namespace=cytomine-${{ github.sha }} delete pod export-test-results --ignore-not-found=true
+          kubectl --namespace=cytomine-${{ github.sha }} delete pvc e2e-test-reports --ignore-not-found=true --timeout=60s
 
       - name: Upload helm test results
         if: always()

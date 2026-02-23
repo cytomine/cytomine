@@ -228,8 +228,8 @@ public abstract class ModelService<T extends CytomineDomain> {
     }
 
     public CommandResponse add(JsonObject jsonObject, Transaction transaction, Task task) {
-        throw new CytomineMethodNotYetImplementedException("No add method implemented with " +
-                                                               "transaction/task");
+        throw new CytomineMethodNotYetImplementedException(
+            "No add method implemented with " + "transaction/task");
     }
 
     public abstract Class currentDomain();
@@ -266,8 +266,9 @@ public abstract class ModelService<T extends CytomineDomain> {
         beforeAdd(domain);
         saveDomain(domain);
 
-        CommandResponse response = responseService.createResponseMessage(domain,
-            getStringParamsI18n(domain), printMessage, "Add", domain.getCallBack());
+        CommandResponse response =
+            responseService.createResponseMessage(domain, getStringParamsI18n(domain), printMessage,
+                "Add", domain.getCallBack());
         afterAdd(domain, response);
         //Build response message
         return response;
@@ -289,8 +290,8 @@ public abstract class ModelService<T extends CytomineDomain> {
                     json),
                 printMessage);
         } catch (Exception e) {
-            throw new ObjectNotFoundException("Cannot create instance of object: " + json + " " +
-                                                  "Exception " + e);
+            throw new ObjectNotFoundException(
+                "Cannot create instance of object: " + json + " " + "Exception " + e);
         }
     }
 
@@ -305,8 +306,9 @@ public abstract class ModelService<T extends CytomineDomain> {
         //Build response message
         beforeUpdate(domain);
         saveDomain(domain);
-        CommandResponse response = responseService.createResponseMessage(domain,
-            getStringParamsI18n(domain), printMessage, "Edit", domain.getCallBack());
+        CommandResponse response =
+            responseService.createResponseMessage(domain, getStringParamsI18n(domain), printMessage,
+                "Edit", domain.getCallBack());
         afterUpdate(domain, response);
         return response;
     }
@@ -321,8 +323,8 @@ public abstract class ModelService<T extends CytomineDomain> {
      */
     public CommandResponse destroy(JsonObject json, boolean printMessage) {
         //Get object to delete
-        return destroy((CytomineDomain) entityManager.find(currentDomain(), retrieveLongId(json))
-            , printMessage);
+        return destroy((CytomineDomain) entityManager.find(currentDomain(), retrieveLongId(json)),
+            printMessage);
     }
 
     /**
@@ -334,8 +336,9 @@ public abstract class ModelService<T extends CytomineDomain> {
      */
     public CommandResponse destroy(CytomineDomain domain, boolean printMessage) {
         //Build response message
-        CommandResponse response = responseService.createResponseMessage(domain,
-            getStringParamsI18n(domain), printMessage, "Delete", domain.getCallBack());
+        CommandResponse response =
+            responseService.createResponseMessage(domain, getStringParamsI18n(domain), printMessage,
+                "Delete", domain.getCallBack());
         beforeDelete(domain);
         //Delete object
         removeDomain(domain);
@@ -357,8 +360,8 @@ public abstract class ModelService<T extends CytomineDomain> {
         }
 
         if (domain == null) {
-            throw new ObjectNotFoundException(currentDomain() + " " + json.get("id") + " not " +
-                                                  "found");
+            throw new ObjectNotFoundException(
+                currentDomain() + " " + json.get("id") + " not " + "found");
         }
         CytomineDomain container = domain.container();
         if (container != null) {
@@ -433,8 +436,8 @@ public abstract class ModelService<T extends CytomineDomain> {
         if (task == null) {
             return update(domain, jsonNewData, transaction);
         } else {
-            throw new CytomineMethodNotYetImplementedException("No update method implemented with" +
-                                                                   " task");
+            throw new CytomineMethodNotYetImplementedException(
+                "No update method implemented with" + " task");
         }
     }
 
@@ -475,7 +478,8 @@ public abstract class ModelService<T extends CytomineDomain> {
     protected void deleteDependentTagDomainAssociation(CytomineDomain domain,
                                                        Transaction transaction, Task task) {
         for (TagDomainAssociation tagDomainAssociation :
-            tagDomainAssociationService.listAllByDomain(domain)) {
+            tagDomainAssociationService.listAllByDomain(
+                domain)) {
             tagDomainAssociationService.delete(tagDomainAssociation, transaction, task, false);
         }
     }
@@ -495,8 +499,8 @@ public abstract class ModelService<T extends CytomineDomain> {
 
     public CytomineDomain getCytomineDomain(String domainClassName, Long domainIdent) {
         try {
-            return (CytomineDomain) getEntityManager()
-                                        .find(Class.forName(domainClassName), domainIdent);
+            return (CytomineDomain) getEntityManager().find(Class.forName(domainClassName),
+                domainIdent);
         } catch (ClassNotFoundException e) {
             throw new ObjectNotFoundException(domainClassName, domainIdent);
         }
@@ -539,37 +543,35 @@ public abstract class ModelService<T extends CytomineDomain> {
 
         JsonObject response = new JsonObject();
 
-        List<JsonObject> succeeded =
-            result.stream()
-                .filter(x -> x.getJSONAttrInteger("status") >= 200
-                                 && x.getJSONAttrInteger("status") <= 300)
-                .toList();
+        List<JsonObject> succeeded = result.stream()
+                                         .filter(x -> x.getJSONAttrInteger("status") >= 200
+                                                          && x.getJSONAttrInteger("status") <= 300)
+                                         .toList();
 
         if (succeeded.size() == result.size()) {
             String[] split = currentDomain().toString().toLowerCase().split("\\.");
             response.put("data", JsonObject.of("message",
-                split[split.length - 1] + "s " + succeeded.stream().map(x -> x.getJSONAttrStr(
-                    "domain")).collect(Collectors.joining(",")) + " added"));
+                split[split.length - 1] + "s " + succeeded.stream()
+                                                     .map(x -> x.getJSONAttrStr("domain"))
+                                                     .collect(Collectors.joining(",")) + " added"));
             response.put("status", 200);
         } else if (succeeded.size() == 0) {
-            response.put("data", JsonObject.of("success", false, "message", "No entry saved",
-                "errors", errors));
+            response.put("data",
+                JsonObject.of("success", false, "message", "No entry saved", "errors", errors));
             response.put("status", 400);
         } else {
             String[] split = currentDomain().toString().toLowerCase().split("\\.");
-            response.put("data", JsonObject.of("success", false, "message", "Only part of the " +
-                                                                                "entries (" + split[
-                                                                                                  split.length
-                                                                                                      - 1]
-                                                                                + "s "
-                                                                                + succeeded.stream()
-                                                                                      .map(
-                                                                                          x -> x.getJSONAttrStr(
-                                                                                              "domain"))
-                                                                                      .collect(
-                                                                                          Collectors.joining(
-                                                                                              ",")),
-                "errors", errors));
+            response.put("data",
+                JsonObject.of("success", false, "message",
+                    "Only part of the entries (" + split[split.length - 1] + "s "
+                        + succeeded.stream()
+                              .map(
+                                  x -> x.getJSONAttrStr(
+                                      "domain"))
+                              .collect(
+                                  Collectors.joining(
+                                      ",")),
+                    "errors", errors));
             response.put("status", 206);
         }
         return response;

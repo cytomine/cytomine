@@ -1,5 +1,10 @@
 package org.cytomine.e2etests.project;
 
+import java.net.URL;
+import java.time.Duration;
+import java.util.Set;
+import java.util.UUID;
+
 import org.cytomine.e2etests.configuration.SeleniumDriver;
 import org.cytomine.e2etests.ui.CytomineSteps;
 import org.cytomine.e2etests.ui.WebDriverUtils;
@@ -14,9 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
-import java.net.URL;
-import java.time.Duration;
-import java.util.UUID;
+import static java.util.stream.Collectors.toSet;
 
 @Import({SeleniumDriver.class, CytomineSteps.class, WebDriverUtils.class})
 @SpringBootTest
@@ -58,8 +61,8 @@ public class CytomineTests {
     void createProject() {
         String projectName = "selenium-" + UUID.randomUUID();
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
-        cytomineSteps.createProject(wait, cytomineUrl, projectName);
-        cytomineSteps.deleteProject(wait, driver.getCurrentUrl());
+        String projectURL = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
+        cytomineSteps.deleteProject(wait, projectURL);
     }
 
 
@@ -67,8 +70,25 @@ public class CytomineTests {
     void deleteProject() {
         String projectName = "selenium-" + UUID.randomUUID();
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
-        cytomineSteps.createProject(wait, cytomineUrl, projectName);
-        cytomineSteps.deleteProject(wait, driver.getCurrentUrl());
+        String projectURL = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
+        cytomineSteps.deleteProject(wait, projectURL);
+    }
+
+    @Test
+    void listProjects() {
+        Set<String> projectNames = Set.of(
+            "selenium-" + UUID.randomUUID(),
+            "selenium-" + UUID.randomUUID(),
+            "selenium-" + UUID.randomUUID()
+        );
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        Set<String> projectUrls =
+            projectNames.stream().map(name -> cytomineSteps.createProject(wait, driver,
+                cytomineUrl, name)).collect(toSet());
+        cytomineSteps.listProjects(wait, cytomineUrl, projectNames);
+        Set<String> ignored =
+            projectUrls.stream().map(projectUrl -> cytomineSteps.deleteProject(wait,
+                projectUrl)).collect(toSet());
     }
 
 }

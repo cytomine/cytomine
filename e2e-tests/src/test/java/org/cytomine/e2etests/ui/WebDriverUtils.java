@@ -39,11 +39,12 @@ public class WebDriverUtils {
     }
 
     @SneakyThrows
-    void byIsDisplayed(Wait<WebDriver> wait, By by) {
+    boolean byIsDisplayed(Wait<WebDriver> wait, By by) {
         wait.until(d -> d.findElement(by)
                 .isDisplayed()
         );
         Thread.sleep(500);
+        return true;
     }
 
 }

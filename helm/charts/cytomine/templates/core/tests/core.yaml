@@ -22,8 +22,7 @@ spec:
     - name: tmp
       emptyDir: {}
     - name: workspace
-      persistentVolumeClaim:
-        claimName: "e2e-test-reports"
+      emptyDir: {}
   initContainers:
     - name: selenium
       image: "{{ .Values.images.selenium }}"
@@ -52,6 +51,15 @@ spec:
           port: 4444
         initialDelaySeconds: 5
         periodSeconds: 3
+    - name: report-exporter
+      image: busybox
+      restartPolicy: Always
+      securityContext:
+      {{- include "cytomine.containerSecurityContext" . | nindent 8 }}
+      volumeMounts:
+        - name: workspace
+          mountPath: /workspace
+      command: ["sh", "-c", "sleep infinity"]
   containers:
     - name: e2e-tests
       image: "{{ .Values.images.e2e_tests }}"

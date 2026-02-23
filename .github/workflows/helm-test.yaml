@@ -81,8 +81,8 @@ jobs:
       - name: Export test results
         if: always()
         run: |
-          kubectl --namespace=cytomine-${{ github.sha }} cp e2e-tests:/workspace/build/reports ./test-results/build/ -c report-exporter || echo "Failed to copy test results"
-          kubectl --namespace=cytomine-${{ github.sha }} cp e2e-tests:/workspace/e2e-tests/build/reports ./test-results/build/ -c report-exporter || echo "Failed to copy test results"
+          kubectl --namespace=cytomine-${{ github.sha }} cp e2e-tests:/workspace/build/reports ./test-results/build/ -c e2e-tests || echo "Failed to copy test results"
+          kubectl --namespace=cytomine-${{ github.sha }} cp e2e-tests:/workspace/e2e-tests/build/reports ./test-results/build/ -c e2e-tests || echo "Failed to copy test results"
 
       - name: Upload helm test results
         if: always()

@@ -1,14 +1,4 @@
 services:
-  mongo:
-    image: cytomine/mongo:latest
-    build:
-      context: ./mongo/
-
-  postgis:
-    image: cytomine/postgis:latest
-    build:
-      context: ./postgis/
-
   web-ui:
     image: cytomine/web-ui:latest
     build:

@@ -845,6 +845,20 @@
       "consent.screen.text" : "${profileScopeConsentText}"
     },
     "protocolMappers" : [ {
+      "id" : "664d95a6-359d-4a88-a5a6-d3b96621aaaa",
+      "name" : "projects",
+      "protocol" : "openid-connect",
+      "protocolMapper" : "oidc-usermodel-attribute-mapper",
+      "consentRequired" : false,
+      "config" : {
+        "userinfo.token.claim" : "true",
+        "user.attribute" : "projects",
+        "id.token.claim" : "true",
+        "access.token.claim" : "true",
+        "claim.name" : "projects",
+        "jsonType.label" : "JSON"
+      }
+    },{
       "id" : "664d95a6-359d-4a88-a5a6-d3b966219c39",
       "name" : "middle name",
       "protocol" : "openid-connect",

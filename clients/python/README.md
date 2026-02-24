@@ -15,7 +15,7 @@ To ease interaction with Cytomine, the Cytomine API client for Python encapsulat
 
 ## Requirements
 
-- Python 3.5+
+- Python `>=3.10, <3.13`
 
 ## Installation
 

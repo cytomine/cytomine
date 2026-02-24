@@ -4,7 +4,7 @@ version = "3.1.1"
 description = "Python client to interact with Cytomine."
 authors = [{ name = "Cytomine ULiège", email = "uliege@cytomine.org" }]
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.13"
 license = "Apache-2.0"
 classifiers = [
   "Programming Language :: Python :: 3 :: Only",

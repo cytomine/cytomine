@@ -1,16 +1,16 @@
 # Java files
-.gradle/
-build/
+.gradle
+build
 
 # JetBrains IDEs files
-.idea/
+.idea
 *.iml
 
 # VS Code files
-.vscode/
+.vscode
 
 # Kubernetes configuration
-.kube/
+.kube
 
 # Env files
 .direnv

@@ -1,6 +1,5 @@
-from typing import Any, Dict
+from typing import Any
 
-from cytomine.cytomine import Cytomine
 from cytomine.models import Project, ProjectCollection
 from tests.conftest import random_string
 
@@ -15,45 +14,53 @@ def test_create_project(dataset: dict[str, Any]) -> None:
     assert project.ontology == dataset["ontology"].id
 
 
-class TestProject:
-    def test_project(self, connect: Cytomine, dataset: Dict[str, Any]) -> None:
-        name = random_string()
-        project = Project(name, dataset["ontology"].id).save()
-        assert isinstance(project, Project)
-        assert project.name == name
+def test_update_project(dataset: dict[str, Any]) -> None:
+    name = random_string()
+    project = dataset["project"]
 
-        project = Project().fetch(project.id)
-        assert isinstance(project, Project)
-        assert project.name == name
+    project.name = name
+    project.update()
 
-        name = random_string()
-        project.name = name
-        project.update()
-        assert isinstance(project, Project)
-        assert project.name == name
+    assert isinstance(project, Project)
+    assert project.name == name
+    assert project.ontology == dataset["ontology"].id
 
-        project.delete()
-        assert not Project().fetch(project.id)
 
-    def test_projects(self, connect: Cytomine, dataset: Dict[str, Any]) -> None:
-        projects = ProjectCollection().fetch()
-        assert isinstance(projects, ProjectCollection)
+def test_delete_project(dataset: dict[str, Any]) -> None:
+    name = random_string()
+    project = Project(name, dataset["ontology"].id).save()
 
-    def test_projects_by_user(
-        self,
-        connect: Cytomine,
-        dataset: Dict[str, Any],
-    ) -> None:
-        projects = ProjectCollection().fetch_with_filter("user", dataset["user"].id)
-        assert isinstance(projects, ProjectCollection)
+    project.delete()
 
-    def test_projects_by_ontology(
-        self,
-        connect: Cytomine,
-        dataset: Dict[str, Any],
-    ) -> None:
-        projects = ProjectCollection().fetch_with_filter(
-            "ontology",
-            dataset["ontology"].id,
-        )
-        assert isinstance(projects, ProjectCollection)
+    assert not Project().fetch(project.id)
+
+
+def test_fetch_project(dataset: dict[str, Any]) -> None:
+    expected_project = dataset["project"]
+
+    project = Project().fetch(expected_project.id)
+
+    assert isinstance(project, Project)
+    assert project.id == expected_project.id
+    assert project.ontology == dataset["ontology"].id
+
+
+def test_fetch_project_collection() -> None:
+    projects = ProjectCollection().fetch()
+
+    assert isinstance(projects, ProjectCollection)
+
+
+def test_fetch_project_collection_by_user(dataset: dict[str, Any]) -> None:
+    projects = ProjectCollection().fetch_with_filter("user", dataset["user"].id)
+
+    assert isinstance(projects, ProjectCollection)
+
+
+def test_fetch_project_collection_by_ontology(dataset: dict[str, Any]) -> None:
+    projects = ProjectCollection().fetch_with_filter(
+        "ontology",
+        dataset["ontology"].id,
+    )
+
+    assert isinstance(projects, ProjectCollection)

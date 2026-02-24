@@ -72,7 +72,7 @@ def connect(setup_cytomine) -> Cytomine:
 
 
 @pytest.fixture(scope="session")
-def dataset(connect: Cytomine, request: pytest.FixtureRequest) -> Dict[str, Any]:
+def dataset(request: pytest.FixtureRequest) -> Dict[str, Any]:
     data: Dict[str, Any] = {}
     data["user"] = CurrentUser().fetch()
 

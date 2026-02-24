@@ -54,6 +54,7 @@ public class CytomineSteps {
     public void listProjects(Wait<WebDriver> wait, URL cytomineUrl, Set<String> projectNames) {
         webDriverUtils.goTo(wait, cytomineUrl.toString());
         webDriverUtils.xpathClick(wait, "//a[@href='#/projects']");
+        webDriverUtils.waitForTableToLoad(wait);
         Set<Boolean> ignored = projectNames.stream()
                 .map(name ->
                         webDriverUtils.byIsDisplayed(wait,

@@ -856,7 +856,7 @@
         "id.token.claim" : "true",
         "access.token.claim" : "true",
         "claim.name" : "projects",
-        "jsonType.label" : "JSON",
+        "jsonType.label" : "String",
         "multivalued" : true
       }
     },{

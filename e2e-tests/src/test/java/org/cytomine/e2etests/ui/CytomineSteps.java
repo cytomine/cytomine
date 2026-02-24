@@ -2,6 +2,7 @@ package org.cytomine.e2etests.ui;
 
 import java.net.URL;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import lombok.SneakyThrows;
 import org.openqa.selenium.By;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toSet;
 
 @Component
 public class CytomineSteps {
@@ -52,10 +54,12 @@ public class CytomineSteps {
     public void listProjects(Wait<WebDriver> wait, URL cytomineUrl, Set<String> projectNames) {
         webDriverUtils.goTo(wait, cytomineUrl.toString());
         webDriverUtils.xpathClick(wait, "//a[@href='#/projects']");
-        projectNames.stream().map(name ->
-                                      webDriverUtils.byIsDisplayed(wait,
-                                          By.xpath(format("//a[contains(text(), '%s')]",
-                                              name))));
+        Set<Boolean> ignored = projectNames.stream()
+                .map(name ->
+                        webDriverUtils.byIsDisplayed(wait,
+                                By.xpath(format("//a[contains(text(), '%s')]",
+                                        name))))
+                .collect(toSet());
 
     }
 

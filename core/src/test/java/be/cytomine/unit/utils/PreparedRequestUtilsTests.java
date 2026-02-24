@@ -18,8 +18,7 @@ public class PreparedRequestUtilsTests {
         assertThat(pr.getHost()).isEqualTo("domain.com");
         assertThat(pr.getPort()).isEqualTo(-1);
         assertThat(pr.getPath()).isEqualTo("");
-        assertThat(pr.getHeaders()).containsKey("Host");
-        assertThat(pr.getHeaders()).containsEntry("Host", List.of("domain.com"));
+        assertThat(pr.getHeaders()).hasFieldOrPropertyWithValue("Host", List.of("domain.com"));
 
         pr = new PreparedRequest();
         pr.setUrl("https://domain.com:10900/basepath");
@@ -27,8 +26,7 @@ public class PreparedRequestUtilsTests {
         assertThat(pr.getHost()).isEqualTo("domain.com");
         assertThat(pr.getPort()).isEqualTo(10900);
         assertThat(pr.getPath()).isEqualTo("/basepath");
-        assertThat(pr.getHeaders()).containsKey("Host");
-        assertThat(pr.getHeaders()).containsEntry("Host", List.of("domain.com"));
+        assertThat(pr.getHeaders()).hasFieldOrPropertyWithValue("Host", List.of("domain.com"));
     }
 
     @Test

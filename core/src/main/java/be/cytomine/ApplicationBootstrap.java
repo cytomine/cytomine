@@ -9,7 +9,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
+
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.*;
@@ -37,7 +37,7 @@ import static be.cytomine.service.database.BootstrapTestsDataService.*;
 @Order(0)
 @Slf4j
 @RequiredArgsConstructor
-@EnableConfigurationProperties({LiquibaseProperties.class, ApplicationProperties.class})
+@EnableConfigurationProperties({ApplicationProperties.class})
 @Transactional
 class ApplicationBootstrap {
 

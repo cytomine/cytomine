@@ -20,6 +20,7 @@ import be.cytomine.config.security.ApiKeyFilter;
 import be.cytomine.config.security.TokenFromParameterFilter;
 import be.cytomine.repository.security.UserRepository;
 import be.cytomine.utils.JwtAuthConverter;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -29,10 +30,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
-
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -47,12 +45,12 @@ public class SecurityConfiguration {
         this.customJwtAuthConverter = customJwtAuthConverter;
     }
 
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .addFilterBefore(new ApiKeyFilter(userRepository), BasicAuthenticationFilter.class) // Deprecated. Kept as transitional in 2024.2
+                .addFilterBefore(new ApiKeyFilter(userRepository),
+                        BasicAuthenticationFilter.class) // Deprecated. Kept as transitional in 2024.2
                 .exceptionHandling((exceptionHandling) ->
                         exceptionHandling
                                 .authenticationEntryPoint(
@@ -60,28 +58,39 @@ public class SecurityConfiguration {
                 )
                 .authorizeHttpRequests((authorizeHttpRequests) ->
                         authorizeHttpRequests
-                                .requestMatchers(new AntPathRequestMatcher("/api/abstractimage/**")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/api/imageinstance/**")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/api/uploadedfile/*/download")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/api/userannotation/**")).permitAll()
+                                .requestMatchers("/api/abstractimage/**")
+                                .permitAll()
+                                .requestMatchers("/api/imageinstance/**")
+                                .permitAll()
+                                .requestMatchers("/api/uploadedfile/*/download")
+                                .permitAll()
+                                .requestMatchers("/api/userannotation/**")
+                                .permitAll()
 
-                                .requestMatchers(new AntPathRequestMatcher("/api/**")).authenticated()
-                                .requestMatchers("/session/admin/info.json").authenticated()
-                                .requestMatchers("/session/admin/open.json").authenticated()
-                                .requestMatchers("/session/admin/close.json").authenticated()
+                                .requestMatchers("/api/**")
+                                .authenticated()
+                                .requestMatchers("/session/admin/info.json")
+                                .authenticated()
+                                .requestMatchers("/session/admin/open.json")
+                                .authenticated()
+                                .requestMatchers("/session/admin/close.json")
+                                .authenticated()
 
-                                .requestMatchers(HttpMethod.GET, "/server/ping").permitAll() // TODO 2024.2 - LAST CONNECTION (IN A PROJECT)
-                                .requestMatchers(HttpMethod.GET, "/server/ping.json").permitAll() // TODO 2024.2 - LAST CONNECTION (IN A PROJECT)
-                                .requestMatchers(HttpMethod.POST, "/server/ping").permitAll() // TODO 2024.2 - LAST CONNECTION (IN A PROJECT)
-                                .requestMatchers(HttpMethod.POST, "/server/ping.json").permitAll() // TODO 2024.2 - LAST CONNECTION (IN A PROJECT)
-                                .requestMatchers(new AntPathRequestMatcher("/**")).permitAll() // TODO IAM: remove ?
+                                .requestMatchers(HttpMethod.GET, "/server/ping")
+                                .permitAll() // TODO 2024.2 - LAST CONNECTION (IN A PROJECT)
+                                .requestMatchers(HttpMethod.GET, "/server/ping.json")
+                                .permitAll() // TODO 2024.2 - LAST CONNECTION (IN A PROJECT)
+                                .requestMatchers(HttpMethod.POST, "/server/ping")
+                                .permitAll() // TODO 2024.2 - LAST CONNECTION (IN A PROJECT)
+                                .requestMatchers(HttpMethod.POST, "/server/ping.json")
+                                .permitAll() // TODO 2024.2 - LAST CONNECTION (IN A PROJECT)
+                                .requestMatchers("/**")
+                                .permitAll() // TODO IAM: remove ?
                 );
         http
-            .addFilterBefore(new TokenFromParameterFilter(), BearerTokenAuthenticationFilter.class)
-            .oauth2ResourceServer((oauth2) -> oauth2
-                .jwt(jwtAuthConverter -> jwtAuthConverter.jwtAuthenticationConverter(customJwtAuthConverter)));
+                .addFilterBefore(new TokenFromParameterFilter(), BearerTokenAuthenticationFilter.class)
+                .oauth2ResourceServer((oauth2) -> oauth2
+                        .jwt(jwtAuthConverter -> jwtAuthConverter.jwtAuthenticationConverter(customJwtAuthConverter)));
         return http.build();
     }
 }
-
-

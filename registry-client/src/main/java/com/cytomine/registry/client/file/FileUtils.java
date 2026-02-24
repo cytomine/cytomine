@@ -29,7 +29,7 @@ public class FileUtils {
         };
         try {
             TarArchiveEntry entry = null;
-            while ((entry = tarArchiveIs.getNextTarEntry()) != null) {
+            while ((entry = tarArchiveIs.getNextEntry()) != null) {
                 if (entry.isDirectory()) continue;
                 if (!tarArchiveIs.canReadEntryData(entry))
                     throw new IOException("read tar entry error");

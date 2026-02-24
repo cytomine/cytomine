@@ -80,7 +80,7 @@ public class UploadTaskApiExceptionHandler {
         log.info("Bundle/Archive processing failure [{}]", message);
 
         AppEngineError error = ErrorBuilder.build(ErrorCode.INTERNAL_MAX_UPLOAD_SIZE_EXCEEDED);
-        return new ResponseEntity<AppEngineError>(error, HttpStatus.PAYLOAD_TOO_LARGE);
+        return new ResponseEntity<AppEngineError>(error, HttpStatus.CONTENT_TOO_LARGE);
     }
 
     @ExceptionHandler({ IllegalArgumentException.class })

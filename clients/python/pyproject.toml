@@ -4,26 +4,30 @@ version = "3.1.1"
 description = "Python client to interact with Cytomine."
 authors = [{ name = "Cytomine ULiège", email = "uliege@cytomine.org" }]
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10,<3.13"
 license = "Apache-2.0"
 classifiers = [
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
   "Operating System :: OS Independent",
 ]
 dependencies = [
-  "cachecontrol>=0.12.10",
-  "requests>=2.27.1",
-  "requests-toolbelt>=0.9.1",
-  "shapely>=1.7.1",
-  "urllib3>=1.26.19",
+  "cachecontrol==0.14.2",
+  "requests==2.32.4",
+  "requests-toolbelt==1.0.0",
+  "shapely==2.0.7",
+  "urllib3==2.2.3",
 ]
 
 [dependency-groups]
 dev = [
-  "mypy>=1.14.1",
-  "pytest>=8.3.5",
-  "ruff>=0.12.11",
+  "mypy==1.14.1",
+  "ruff==0.12.11",
+]
+test = [
+  "pytest==8.3.5",
 ]
 
 [project.urls]

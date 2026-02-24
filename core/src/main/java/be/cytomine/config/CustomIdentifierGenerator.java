@@ -12,7 +12,7 @@ public class CustomIdentifierGenerator extends SequenceStyleGenerator {
     public Serializable generate(SharedSessionContractImplementor session, Object object)
             throws HibernateException {
         Serializable id = (Serializable) session.getEntityPersister(null, object)
-                .getClassMetadat().getIdentifier(object, session);
+                .getIdentifier(object, session);
         return id != null ? id : (Serializable) super.generate(session, object);
     }
 }

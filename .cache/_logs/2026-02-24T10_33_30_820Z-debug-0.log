@@ -1,0 +1,18 @@
+0 verbose cli /nix/store/pjr8jcds298brhwy1d3rmym9vayxhbfs-nodejs-22.16.0/bin/node /nix/store/pjr8jcds298brhwy1d3rmym9vayxhbfs-nodejs-22.16.0/bin/npm
+1 info using npm@10.9.2
+2 info using node@v22.16.0
+3 silly config load:file:/nix/store/pjr8jcds298brhwy1d3rmym9vayxhbfs-nodejs-22.16.0/lib/node_modules/npm/npmrc
+4 silly config load:file:/home/luca/Worktrees/cytomine/01/.npmrc
+5 silly config load:file:/home/luca/.npmrc
+6 silly config load:file:/nix/store/pjr8jcds298brhwy1d3rmym9vayxhbfs-nodejs-22.16.0/etc/npmrc
+7 verbose title npm config get prefix
+8 verbose argv "config" "get" "prefix"
+9 verbose logfile logs-max:10 dir:/home/luca/Worktrees/cytomine/01/.cache/_logs/2026-02-24T10_33_30_820Z-
+10 verbose logfile /home/luca/Worktrees/cytomine/01/.cache/_logs/2026-02-24T10_33_30_820Z-debug-0.log
+11 silly logfile start cleaning logs, removing 1 files
+12 verbose cwd /home/luca/Worktrees/cytomine/01
+13 verbose os Linux 6.6.120
+14 verbose node v22.16.0
+15 verbose npm  v10.9.2
+16 verbose exit 0
+17 info ok

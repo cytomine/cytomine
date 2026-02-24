@@ -3,7 +3,6 @@ package org.cytomine.e2etests.ui;
 import lombok.SneakyThrows;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Wait;
 import org.springframework.stereotype.Component;
 
@@ -44,6 +43,7 @@ public class WebDriverUtils {
   boolean byIsDisplayed(Wait<WebDriver> wait, By by) {
     waitLoading(wait);
     wait.until(d -> d.findElement(by).isDisplayed());
+    Thread.sleep(500);
     return true;
   }
 

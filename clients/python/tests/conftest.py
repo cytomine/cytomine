@@ -20,6 +20,7 @@ import string
 from typing import Any, Dict
 
 import pytest
+from testcontainers.compose import DockerCompose
 
 from cytomine import Cytomine
 from cytomine.models import (
@@ -47,6 +48,15 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     parser.addoption("--host", action="store")
     parser.addoption("--public_key", action="store")
     parser.addoption("--private_key", action="store")
+
+
+@pytest.fixture(scope="session", autouse=True)
+def setup_cytomine():
+    compose_path = "../../compose.yaml"
+
+    with DockerCompose(".", compose_file_name=compose_path) as compose:
+        compose.wait_for("http://127.0.0.1/server/ping")
+        yield compose
 
 
 @pytest.fixture(scope="session")

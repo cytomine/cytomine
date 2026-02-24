@@ -1,10 +1,7 @@
 plugins {
-    id 'java'
     id 'org.springframework.boot'
     id 'io.spring.dependency-management'
-    id 'jacoco'
     id 'org.liquibase.gradle' version '2.2.0'
-    id 'checkstyle'
 }
 
 bootJar {
@@ -14,15 +11,6 @@ bootJar {
 group = 'be.cytomine'
 version = 'ce-0.0.0-SNAPSHOT' // do not modify this, it will be replace during build (ci)
 
-java {
-    sourceCompatibility = '17'
-}
-
-checkstyle {
-    toolVersion = '10.21.2'
-    configFile = file("${rootProject.projectDir}/checkstyle.xml")
-}
-
 configurations {
     liquibaseRuntime.extendsFrom runtimeClasspath
     compileOnly {
@@ -31,17 +19,10 @@ configurations {
 }
 
 repositories {
-    mavenCentral()
     mavenLocal()
     maven {
         url "https://maven.dcm4che.org/"
     }
-}
-
-ext {
-    mapstructVersion = "1.5.5.Final"
-    lombokVersion = "1.18.30"
-    lombokMapstructBindingVersion = "0.2.0"
 }
 
 springBoot {
@@ -49,9 +30,9 @@ springBoot {
 }
 
 dependencies {
-    // Lombok
-    implementation "org.mapstruct:mapstruct:${mapstructVersion}", "org.projectlombok:lombok:${lombokVersion}"
-    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}", "org.projectlombok:lombok:${lombokVersion}", "org.projectlombok:lombok-mapstruct-binding:${lombokMapstructBindingVersion}"
+    // Lombok & MapStruct
+    implementation "org.mapstruct:mapstruct:${rootProject.ext.mapstructVersion}", "org.projectlombok:lombok:${rootProject.ext.lombokVersion}"
+    annotationProcessor "org.mapstruct:mapstruct-processor:${rootProject.ext.mapstructVersion}", "org.projectlombok:lombok:${rootProject.ext.lombokVersion}", "org.projectlombok:lombok-mapstruct-binding:${rootProject.ext.lombokMapstructBindingVersion}"
 
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -73,12 +54,12 @@ dependencies {
     implementation 'org.apache.commons:commons-fileupload2-jakarta-servlet6:2.0.0-M4'
     implementation 'commons-io:commons-io:2.15.1'
     // Geometry
-    implementation 'org.locationtech.jts:jts-core:1.19.0'
-    implementation 'org.locationtech.jts.io:jts-io-common:1.19.0'
+    implementation "org.locationtech.jts:jts-core:${rootProject.ext.jtsVersion}"
+    implementation "org.locationtech.jts.io:jts-io-common:${rootProject.ext.jtsVersion}"
 
     // Hibernate
-    implementation 'org.hibernate:hibernate-core:7.1.8.Final'
-    implementation 'org.hibernate:hibernate-spatial:7.1.8.Final'
+    implementation "org.hibernate:hibernate-core:${rootProject.ext.hibernateVersion}"
+    implementation "org.hibernate:hibernate-spatial:${rootProject.ext.hibernateVersion}"
 
 
     // Jakarta
@@ -101,17 +82,15 @@ dependencies {
     implementation group: 'io.cucumber', name: 'cucumber-spring', version: '6.10.4'
     testImplementation 'io.cucumber:cucumber-java:6.10.4'
     testImplementation 'io.cucumber:cucumber-junit:6.10.4'
-    testImplementation 'org.assertj:assertj-core:3.4.1'
+    // assertj-core and junit-jupiter are defined in root build.gradle
     testImplementation 'org.junit.vintage:junit-vintage-engine'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api'
-    testImplementation "org.junit.jupiter:junit-jupiter"
 
     // registry client
     implementation project(':registry-client')
 
     // liquibase
     liquibaseRuntime 'info.picocli:picocli:4.7.5'
-    implementation 'org.liquibase:liquibase-core:4.25.0'
+    implementation "org.liquibase:liquibase-core:${rootProject.ext.liquibaseVersion}"
 
     // Image processing
     implementation 'org.apache.commons:commons-imaging:1.0.0-alpha5'
@@ -120,19 +99,17 @@ dependencies {
     testImplementation "org.springframework.boot:spring-boot-testcontainers"
     testImplementation "org.testcontainers:testcontainers-junit-jupiter"
     testImplementation 'com.google.cloud.tools:jib-core:0.27.3'
-    testImplementation "org.testcontainers:testcontainers-postgresql"
-    testImplementation "org.testcontainers:testcontainers"
-    testImplementation "org.testcontainers:testcontainers-k3s"
+    testImplementation "org.testcontainers:testcontainers-postgresql:${rootProject.ext.testcontainersVersion}"
+    testImplementation "org.testcontainers:testcontainers:${rootProject.ext.testcontainersVersion}"
+    testImplementation "org.testcontainers:testcontainers-k3s:${rootProject.ext.testcontainersVersion}"
 }
 
-tasks.named('test') {
-    useJUnitPlatform()
+test {
+    finalizedBy jacocoTestReport // report is always generated after tests run
 }
-
-// Jacoco coverage report is always generated after tests run
-test.finalizedBy jacocoTestReport
 
 jacocoTestReport {
+    dependsOn test
 }
 
 // Cucumber as a test implementation

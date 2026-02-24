@@ -1,32 +1,16 @@
 plugins {
-    id 'java'
-    id 'org.springframework.boot' version '3.5.5'
-    id 'io.spring.dependency-management' version '1.1.7'
-    id 'jacoco'
-    id 'checkstyle'
+    id 'org.springframework.boot'
+    id 'io.spring.dependency-management'
 }
 
 bootJar {
     archiveFileName = 'cytomine.jar'
 }
 
-java {
-    sourceCompatibility = '17'
-}
-
-checkstyle {
-    toolVersion = '10.21.2'
-    configFile = file("${rootProject.projectDir}/checkstyle.xml")
-}
-
 configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
-}
-
-repositories {
-    mavenCentral()
 }
 
 springBoot {
@@ -47,9 +31,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
     // Hibernate
-    annotationProcessor 'org.hibernate.orm:hibernate-jpamodelgen'
-    implementation 'org.hibernate.orm:hibernate-core'
-    implementation 'org.hibernate.orm:hibernate-spatial'
+    annotationProcessor "org.hibernate.orm:hibernate-jpamodelgen:${rootProject.ext.hibernateVersion}"
+    implementation "org.hibernate.orm:hibernate-core:${rootProject.ext.hibernateVersion}"
+    implementation "org.hibernate.orm:hibernate-spatial:${rootProject.ext.hibernateVersion}"
     implementation 'org.hibernate.validator:hibernate-validator'
 
     // Postgresql
@@ -75,19 +59,18 @@ dependencies {
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate5'
 
     // Lombok
-    compileOnly 'org.projectlombok:lombok:1.18.30'
-    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+    compileOnly "org.projectlombok:lombok:${rootProject.ext.lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${rootProject.ext.lombokVersion}"
 
     // Tests
     testImplementation 'com.github.tomakehurst:wiremock:1.58'
-    testImplementation 'org.assertj:assertj-core:3.4.1' // TODO: upgrade to 3.23.1
-    testImplementation 'org.junit.jupiter:junit-jupiter'
+    // assertj-core and junit-jupiter are defined in root build.gradle
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.boot:spring-boot-testcontainers'
     testImplementation 'org.springframework.security:spring-security-test'
-    testImplementation 'org.testcontainers:testcontainers:2.0.3'
-    testImplementation 'org.testcontainers:testcontainers-mongodb:2.0.3'
-    testImplementation 'org.testcontainers:testcontainers-postgresql:2.0.3'
+    testImplementation "org.testcontainers:testcontainers:${rootProject.ext.testcontainersVersion}"
+    testImplementation "org.testcontainers:testcontainers-mongodb:${rootProject.ext.testcontainersVersion}"
+    testImplementation "org.testcontainers:testcontainers-postgresql:${rootProject.ext.testcontainersVersion}"
 
     // -----------------------------------------------------------------------------------------------------------------
     // Dependencies not managed by Spring dependency-management
@@ -107,8 +90,8 @@ dependencies {
     // Hibernate
     // See https://github.com/vladmihalcea/hypersistence-utils for related Hibernate version package
     implementation 'io.hypersistence:hypersistence-utils-hibernate-62:3.7.3'
-    implementation 'org.locationtech.jts:jts-core:1.19.0'
-    implementation 'org.locationtech.jts.io:jts-io-common:1.19.0'
+    implementation "org.locationtech.jts:jts-core:${rootProject.ext.jtsVersion}"
+    implementation "org.locationtech.jts.io:jts-io-common:${rootProject.ext.jtsVersion}"
 
     // Reports (PDF, CSV, Excel, ...)
     implementation 'org.apache.pdfbox:pdfbox:2.0.25'
@@ -135,21 +118,12 @@ dependencies {
 }
 
 test {
-    useJUnitPlatform()
     testLogging.showStandardStreams = true
-}
-
-
-test {
     finalizedBy jacocoTestReport // report is always generated after tests run
 }
+
 jacocoTestReport {
     dependsOn test // tests are required to run before generating the report
-}
-
-jacoco {
-    toolVersion = "0.8.11"
-    reportsDirectory = file("$buildDir/jacoco")
 }
 
 jacocoTestCoverageVerification {

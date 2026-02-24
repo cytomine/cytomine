@@ -1,0 +1,61 @@
+
+plugins {
+    id 'org.springframework.boot' version '4.0.0' apply false
+    id 'io.spring.dependency-management' version '1.1.7' apply false
+    id 'org.liquibase.gradle' version '2.2.0' apply false
+}
+
+ext {
+    // Common versions
+    javaVersion = JavaVersion.VERSION_17
+    lombokVersion = "1.18.30"
+    mapstructVersion = "1.5.5.Final"
+    lombokMapstructBindingVersion = "0.2.0"
+    checkstyleVersion = "10.21.2"
+    jacocoVersion = "0.8.11"
+
+    // Common dependency versions
+    jtsVersion = "1.19.0"
+    liquibaseVersion = "4.25.0"
+    testcontainersVersion = "2.0.3"
+    assertjVersion = "3.4.1"
+    junitVersion = "5.8.1"
+    hibernateVersion = "7.1.8.Final"
+}
+
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'jacoco'
+    apply plugin: 'checkstyle'
+
+    java {
+        sourceCompatibility = rootProject.ext.javaVersion
+        targetCompatibility = rootProject.ext.javaVersion
+    }
+
+    checkstyle {
+        toolVersion = rootProject.ext.checkstyleVersion
+        configFile = file("${rootProject.projectDir}/checkstyle.xml")
+    }
+
+    jacoco {
+        toolVersion = rootProject.ext.jacocoVersion
+    }
+
+    dependencies {
+        // Common test dependencies
+        testImplementation 'org.junit.jupiter:junit-jupiter'
+        testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${rootProject.ext.junitVersion}"
+        testImplementation "org.assertj:assertj-core:${rootProject.ext.assertjVersion}"
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+}

@@ -56,6 +56,7 @@ dependencies {
     implementation 'org.postgresql:postgresql'
     implementation 'com.zaxxer:HikariCP'
     implementation 'org.liquibase:liquibase-core'
+    implementation 'org.springframework.boot:spring-boot-liquibase'
 
     // Spring security
     implementation 'org.springframework.security:spring-security-acl'
@@ -72,7 +73,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hppc'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
     implementation 'com.fasterxml.jackson.module:jackson-module-jaxb-annotations'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate5'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate7'
 
     // Lombok
     compileOnly 'org.projectlombok:lombok:1.18.30'
@@ -107,7 +108,7 @@ dependencies {
 
     // Hibernate
     // See https://github.com/vladmihalcea/hypersistence-utils for related Hibernate version package
-    implementation 'io.hypersistence:hypersistence-utils-hibernate-62:3.7.3'
+    implementation 'io.hypersistence:hypersistence-utils-hibernate-70:3.11.0'
     implementation 'org.locationtech.jts:jts-core:1.19.0'
     implementation 'org.locationtech.jts.io:jts-io-common:1.19.0'
 

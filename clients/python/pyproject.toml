@@ -22,8 +22,11 @@ dependencies = [
 [dependency-groups]
 dev = [
   "mypy==1.14.1",
-  "pytest==8.3.5",
   "ruff==0.12.11",
+]
+test = [
+  "pytest==8.3.5",
+  "testcontainers==3.7.1",
 ]
 
 [project.urls]

@@ -53,13 +53,13 @@ public class CytomineSteps {
     public void listProjects(Wait<WebDriver> wait, URL cytomineUrl, Set<String> projectNames) {
         webDriverUtils.goTo(wait, cytomineUrl.toString());
         webDriverUtils.xpathClick(wait, "//a[@href='#/projects']");
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//button[contains(text(), 'New project')]"));
         Set<Boolean> ignored = projectNames.stream()
                 .map(name ->
                         webDriverUtils.byIsDisplayed(wait,
                                 By.xpath(format("//a[contains(text(), '%s')]",
                                         name))))
                 .collect(toSet());
-
     }
 
 }

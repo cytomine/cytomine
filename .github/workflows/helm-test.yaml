@@ -42,29 +42,27 @@ jobs:
           config: .github/workflows/kind/kind-config.yaml
           node_image: kindest/node:v1.32.0
 
-      - name: Configure containerd registry mirrors
+      - name: Configure containerd registry credentials
         env:
           REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
           REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
         run: |
           NODE=chart-testing-control-plane
-          AUTH=$(echo -n "${REGISTRY_USERNAME}:${REGISTRY_TOKEN}" | base64 -w0)
 
-          # Create docker config.json for containerd
-          docker exec $NODE mkdir -p /root/.docker
-          echo "{\"auths\":{\"https://registry.cytomine.org\":{\"auth\":\"${AUTH}\"},\"registry.cytomine.org\":{\"auth\":\"${AUTH}\"},\"registry.cytomine.org/docker\":{\"auth\":\"${AUTH}\"}}}" | \
-            docker exec -i $NODE tee /root/.docker/config.json > /dev/null
+          # Add registry credentials directly to containerd config.toml
+          printf '\n%s\n%s\n%s\n' \
+            '[plugins."io.containerd.grpc.v1.cri".registry.configs."registry.cytomine.org".auth]' \
+            "  username = \"${REGISTRY_USERNAME}\"" \
+            "  password = \"${REGISTRY_TOKEN}\"" \
+            | docker exec -i $NODE tee -a /etc/containerd/config.toml > /dev/null
 
-          # Configure docker.io to use registry.cytomine.org/docker as proxy cache (with auth header)
+          # Configure docker.io to mirror to registry.cytomine.org/docker
           docker exec $NODE mkdir -p /etc/containerd/certs.d/docker.io
           printf '%s\n' \
             "server = \"https://registry-1.docker.io\"" \
             "" \
             "[host.\"https://registry.cytomine.org/docker\"]" \
             "  capabilities = [\"pull\", \"resolve\"]" \
-            "" \
-            "  [host.\"https://registry.cytomine.org/docker\".header]" \
-            "    Authorization = [\"Basic ${AUTH}\"]" \
             | docker exec -i $NODE tee /etc/containerd/certs.d/docker.io/hosts.toml > /dev/null
 
           # Configure registry.cytomine.org
@@ -74,16 +72,13 @@ jobs:
             "" \
             "[host.\"https://registry.cytomine.org\"]" \
             "  capabilities = [\"pull\", \"resolve\"]" \
-            "" \
-            "  [host.\"https://registry.cytomine.org\".header]" \
-            "    Authorization = [\"Basic ${AUTH}\"]" \
             | docker exec -i $NODE tee /etc/containerd/certs.d/registry.cytomine.org/hosts.toml > /dev/null
 
-          # Debug: show the created files
+          # Debug output
+          echo "=== containerd config.toml (last 10 lines) ==="
+          docker exec $NODE tail -10 /etc/containerd/config.toml
           echo "=== docker.io hosts.toml ==="
           docker exec $NODE cat /etc/containerd/certs.d/docker.io/hosts.toml
-          echo "=== registry.cytomine.org hosts.toml ==="
-          docker exec $NODE cat /etc/containerd/certs.d/registry.cytomine.org/hosts.toml
 
           # Restart containerd to pick up changes
           docker exec $NODE systemctl restart containerd

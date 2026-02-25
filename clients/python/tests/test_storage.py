@@ -70,7 +70,6 @@ class TestUploadedFile:
             ext="ext",
             contentType="contentType",
             id_storage=storages[0].id,  # type: ignore
-            id_image_server=dataset["image_servers"][0].id,
         ).save()
         assert isinstance(uf, UploadedFile)
         assert uf.filename == filename

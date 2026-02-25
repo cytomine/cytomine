@@ -25,8 +25,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.Set;
 
+import static java.nio.file.StandardCopyOption.COPY_ATTRIBUTES;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static java.nio.file.attribute.PosixFilePermission.*;
 import static java.util.UUID.randomUUID;
 
 @Import({SeleniumDriver.class, CytomineSteps.class, WebDriverUtils.class})
@@ -65,11 +68,12 @@ public class CytomineTests {
 
     @SneakyThrows
     void saveScreenshot(String name) {
-        Path destination = Paths.get("./build/reports/" + name);
+        Path destination = Paths.get("./build/reports/" + name + ".jpg");
         Files.createDirectories(Path.of("./build/reports/"));
         File screenshot =
             ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);  // Capture the screenshot as a file
-        Files.move(screenshot.toPath(), destination, REPLACE_EXISTING);
+        Files.move(screenshot.toPath(), destination, REPLACE_EXISTING, COPY_ATTRIBUTES);
+        Files.setPosixFilePermissions(destination, Set.of(OTHERS_READ, OWNER_READ, GROUP_READ));
     }
 
 

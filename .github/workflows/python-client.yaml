@@ -3,13 +3,12 @@ name: Python Client
 on:
   workflow_call:
 
-defaults:
-  run:
-    working-directory: ./clients/python
-
 jobs:
   lint:
     runs-on: self-hosted
+    defaults:
+      run:
+        working-directory: ./clients/python
 
     steps:
       - name: Set up the repository
@@ -25,6 +24,9 @@ jobs:
 
   type-check:
     runs-on: self-hosted
+    defaults:
+      run:
+        working-directory: ./clients/python
 
     steps:
       - name: Set up the repository
@@ -59,6 +61,9 @@ jobs:
   check-version:
     if: github.ref_name == 'main' && github.event_name == 'push'
     runs-on: self-hosted
+    defaults:
+      run:
+        working-directory: ./clients/python
     outputs:
       changed: ${{ steps.check.outputs.changed }}
 
@@ -86,6 +91,9 @@ jobs:
     if: needs.check-version.outputs.changed == 'true'
     needs: check-version
     runs-on: self-hosted
+    defaults:
+      run:
+        working-directory: ./clients/python
 
     steps:
       - name: Set up the repository

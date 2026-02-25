@@ -1,11 +1,5 @@
 package org.cytomine.e2etests.project;
 
-import static java.util.stream.Collectors.toSet;
-
-import java.net.URL;
-import java.time.Duration;
-import java.util.Set;
-import java.util.UUID;
 import lombok.SneakyThrows;
 import org.cytomine.e2etests.configuration.SeleniumDriver;
 import org.cytomine.e2etests.ui.CytomineSteps;
@@ -25,14 +19,18 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.Set;
 import java.util.UUID;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static java.util.UUID.randomUUID;
+import static java.util.stream.Collectors.toSet;
 
 @Import({SeleniumDriver.class, CytomineSteps.class, WebDriverUtils.class})
 @SpringBootTest
@@ -60,7 +58,9 @@ public class CytomineTests {
 
     @AfterEach
     void tearDown(TestInfo testInfo) {
-        saveScreenshot("closing-" + testInfo.getDisplayName());
+        saveScreenshot("closing-" + testInfo.getTestMethod()
+            .map(Method::getName)
+            .orElseGet(() -> "no-name-" + randomUUID()));
         driver.close();
     }
 

@@ -38,6 +38,17 @@ jobs:
 
       - name: Create kind cluster
         uses: helm/kind-action@v1.14.0
+        with:
+          config: |
+            kind: Cluster
+            apiVersion: kind.x-k8s.io/v1alpha4
+            containerdConfigPatches:
+            - |-
+              [plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"]
+                endpoint = ["https://registry.cytomine.org/docker"]
+              [plugins."io.containerd.grpc.v1.cri".registry.configs."registry.cytomine.org".auth]
+                username = "${{ secrets.REGISTRY_USERNAME }}"
+                password = "${{ secrets.REGISTRY_TOKEN }}"
 
       - name: Install ingress-nginx
         run: |

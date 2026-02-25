@@ -19,14 +19,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
-import java.util.UUID;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static java.util.UUID.randomUUID;
 
 @Import({SeleniumDriver.class, CytomineSteps.class, WebDriverUtils.class})
 @SpringBootTest
@@ -56,7 +57,9 @@ public class CytomineTests {
 
     @AfterEach
     void tearDown(TestInfo testInfo) {
-        saveScreenshot("closing-" + testInfo.getDisplayName());
+        saveScreenshot("closing-" + testInfo.getTestMethod()
+            .map(Method::getName)
+            .orElseGet(() -> "no-name-" + randomUUID()));
         driver.close();
     }
 
@@ -77,7 +80,7 @@ public class CytomineTests {
 
     @Test
     void createProject() {
-        String projectName = "selenium-" + UUID.randomUUID();
+        String projectName = "selenium-" + randomUUID();
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
         cytomineSteps.createProject(wait, cytomineUrl, projectName);
         cytomineSteps.deleteProject(wait, driver.getCurrentUrl());
@@ -85,7 +88,7 @@ public class CytomineTests {
 
     @Test
     void deleteProject() {
-        String projectName = "selenium-" + UUID.randomUUID();
+        String projectName = "selenium-" + randomUUID();
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
         cytomineSteps.createProject(wait, cytomineUrl, projectName);
         cytomineSteps.deleteProject(wait, driver.getCurrentUrl());

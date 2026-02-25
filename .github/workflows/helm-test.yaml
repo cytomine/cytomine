@@ -36,17 +36,38 @@ jobs:
       - name: Set up chart-testing
         uses: helm/chart-testing-action@v2.8.0
 
-      - name: Create kind config
-        run: envsubst < .github/workflows/kind/kind-config.yaml > /tmp/kind-config.yaml
-        env:
-          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
-          REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
-
       - name: Create kind cluster
         uses: helm/kind-action@v1.14.0
         with:
-          config: /tmp/kind-config.yaml
+          config: .github/workflows/kind/kind-config.yaml
           node_image: kindest/node:v1.32.0
+
+      - name: Configure containerd registry mirrors
+        env:
+          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+          REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
+        run: |
+          NODE=chart-testing-control-plane
+
+          # Create auth config for containerd (needed for all registry.cytomine.org pulls)
+          AUTH=$(echo -n "${REGISTRY_USERNAME}:${REGISTRY_TOKEN}" | base64 -w0)
+          docker exec $NODE mkdir -p /root/.docker
+          echo "{\"auths\":{\"https://registry.cytomine.org\":{\"auth\":\"${AUTH}\"},\"registry.cytomine.org\":{\"auth\":\"${AUTH}\"}}}" | \
+            docker exec -i $NODE tee /root/.docker/config.json > /dev/null
+
+          # Configure docker.io to use registry.cytomine.org/docker as proxy cache
+          docker exec $NODE mkdir -p /etc/containerd/certs.d/docker.io
+          printf '%s\n' 'server = "https://registry-1.docker.io"' '' '[host."https://registry.cytomine.org/docker"]' '  capabilities = ["pull", "resolve"]' | \
+            docker exec -i $NODE tee /etc/containerd/certs.d/docker.io/hosts.toml > /dev/null
+
+          # Configure registry.cytomine.org
+          docker exec $NODE mkdir -p /etc/containerd/certs.d/registry.cytomine.org
+          printf '%s\n' 'server = "https://registry.cytomine.org"' '' '[host."https://registry.cytomine.org"]' '  capabilities = ["pull", "resolve"]' | \
+            docker exec -i $NODE tee /etc/containerd/certs.d/registry.cytomine.org/hosts.toml > /dev/null
+
+          # Restart containerd to pick up changes
+          docker exec $NODE systemctl restart containerd
+          sleep 5
 
       - name: Install ingress-nginx
         run: |

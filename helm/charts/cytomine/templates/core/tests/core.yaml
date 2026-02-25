@@ -59,7 +59,7 @@ spec:
       {{- include "cytomine.containerSecurityContext" . | nindent 8 }}
       volumeMounts:
       - name: tmp
-        mountPath: /tmp/gradle
+        mountPath: /tmp
       - name: workspace
         mountPath: /workspace
       env:

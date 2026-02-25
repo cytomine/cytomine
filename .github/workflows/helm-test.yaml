@@ -48,22 +48,36 @@ jobs:
           REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
         run: |
           NODE=chart-testing-control-plane
-
-          # Create auth config for containerd (needed for all registry.cytomine.org pulls)
           AUTH=$(echo -n "${REGISTRY_USERNAME}:${REGISTRY_TOKEN}" | base64 -w0)
+
+          # Create docker config.json for containerd
           docker exec $NODE mkdir -p /root/.docker
-          echo "{\"auths\":{\"https://registry.cytomine.org\":{\"auth\":\"${AUTH}\"},\"registry.cytomine.org\":{\"auth\":\"${AUTH}\"}}}" | \
+          echo "{\"auths\":{\"https://registry.cytomine.org\":{\"auth\":\"${AUTH}\"},\"registry.cytomine.org\":{\"auth\":\"${AUTH}\"},\"registry.cytomine.org/docker\":{\"auth\":\"${AUTH}\"}}}" | \
             docker exec -i $NODE tee /root/.docker/config.json > /dev/null
 
-          # Configure docker.io to use registry.cytomine.org/docker as proxy cache
+          # Configure docker.io to use registry.cytomine.org/docker as proxy cache (with auth header)
           docker exec $NODE mkdir -p /etc/containerd/certs.d/docker.io
-          printf '%s\n' 'server = "https://registry-1.docker.io"' '' '[host."https://registry.cytomine.org/docker"]' '  capabilities = ["pull", "resolve"]' | \
-            docker exec -i $NODE tee /etc/containerd/certs.d/docker.io/hosts.toml > /dev/null
+          cat <<EOF | docker exec -i $NODE tee /etc/containerd/certs.d/docker.io/hosts.toml > /dev/null
+          server = "https://registry-1.docker.io"
+
+          [host."https://registry.cytomine.org/docker"]
+            capabilities = ["pull", "resolve"]
+
+            [host."https://registry.cytomine.org/docker".header]
+              Authorization = ["Basic ${AUTH}"]
+          EOF
 
           # Configure registry.cytomine.org
           docker exec $NODE mkdir -p /etc/containerd/certs.d/registry.cytomine.org
-          printf '%s\n' 'server = "https://registry.cytomine.org"' '' '[host."https://registry.cytomine.org"]' '  capabilities = ["pull", "resolve"]' | \
-            docker exec -i $NODE tee /etc/containerd/certs.d/registry.cytomine.org/hosts.toml > /dev/null
+          cat <<EOF | docker exec -i $NODE tee /etc/containerd/certs.d/registry.cytomine.org/hosts.toml > /dev/null
+          server = "https://registry.cytomine.org"
+
+          [host."https://registry.cytomine.org"]
+            capabilities = ["pull", "resolve"]
+
+            [host."https://registry.cytomine.org".header]
+              Authorization = ["Basic ${AUTH}"]
+          EOF
 
           # Restart containerd to pick up changes
           docker exec $NODE systemctl restart containerd

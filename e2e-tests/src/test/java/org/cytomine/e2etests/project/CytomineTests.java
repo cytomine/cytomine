@@ -6,12 +6,16 @@ import java.net.URL;
 import java.time.Duration;
 import java.util.Set;
 import java.util.UUID;
+import lombok.SneakyThrows;
 import org.cytomine.e2etests.configuration.SeleniumDriver;
 import org.cytomine.e2etests.ui.CytomineSteps;
 import org.cytomine.e2etests.ui.WebDriverUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -19,6 +23,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+
+import java.io.File;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Duration;
+import java.util.UUID;
+
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 @Import({SeleniumDriver.class, CytomineSteps.class, WebDriverUtils.class})
 @SpringBootTest
@@ -44,15 +58,26 @@ public class CytomineTests {
     wait = new WebDriverWait(driver, Duration.ofSeconds(10));
   }
 
-  @AfterEach
-  void tearDown() {
-    driver.close();
-  }
+    @AfterEach
+    void tearDown(TestInfo testInfo) {
+        saveScreenshot("closing-" + testInfo.getDisplayName());
+        driver.close();
+    }
 
-  @Test
-  void login() {
-    cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
-  }
+    @SneakyThrows
+    void saveScreenshot(String name) {
+        Path destination = Paths.get("./build/reports/" + name);
+        Files.createDirectories(Path.of("./build/reports/"));
+        File screenshot =
+            ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);  // Capture the screenshot as a file
+        Files.move(screenshot.toPath(), destination, REPLACE_EXISTING);
+    }
+
+
+    @Test
+    void login() {
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+    }
 
   @Test
   void createProject() {

@@ -1,0 +1,9 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+containerdConfigPatches:
+- |-
+  [plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"]
+    endpoint = ["https://registry.cytomine.org/docker"]
+  [plugins."io.containerd.grpc.v1.cri".registry.configs."registry.cytomine.org".auth]
+    username = "${REGISTRY_USERNAME}"
+    password = "${REGISTRY_TOKEN}"

@@ -29,6 +29,7 @@ def test_update_project(dataset: dict[str, Any]) -> None:
 def test_delete_project(dataset: dict[str, Any]) -> None:
     name = random_string()
     project = Project(name, dataset["ontology"].id).save()
+    assert isinstance(project, Project)
 
     project.delete()
 

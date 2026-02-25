@@ -29,11 +29,7 @@ from tests.conftest import random_string
 
 
 class TestStorage:
-    def test_storage(
-        self,
-        connect: Cytomine,
-        dataset: Dict[str, Any],
-    ) -> None:
+    def test_storage(self, dataset: Dict[str, Any]) -> None:
         name = random_string()
         storage = Storage(name, dataset["user"].id).save()
         assert isinstance(storage, Storage)
@@ -53,7 +49,7 @@ class TestStorage:
         # storage.delete()
         # assert(not Storage().fetch(storage.id))
 
-    def test_storages(self, connect: Cytomine, dataset: Dict[str, Any]) -> None:
+    def test_storages(self, dataset: Dict[str, Any]) -> None:
         storages = StorageCollection().fetch()
         assert isinstance(storages, StorageCollection)
 
@@ -88,10 +84,6 @@ class TestUploadedFile:
         uf.delete()
         assert not UploadedFile().fetch(uf.id)
 
-    def test_uploaded_files(
-        self,
-        connect: Cytomine,
-        dataset: Dict[str, Any],
-    ) -> None:
+    def test_uploaded_files(self, dataset: Dict[str, Any]) -> None:
         uploaded_files = UploadedFileCollection().fetch()
         assert isinstance(uploaded_files, UploadedFileCollection)

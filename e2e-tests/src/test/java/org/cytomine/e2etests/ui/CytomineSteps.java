@@ -47,6 +47,7 @@ public class CytomineSteps {
         webDriverUtils.goTo(wait, projectURL);
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Delete')]");
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Confirm')]");
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'successfully deleted')]"));
         return projectURL;
     }
 

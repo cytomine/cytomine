@@ -7,6 +7,7 @@ import org.cytomine.e2etests.ui.WebDriverUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
@@ -18,14 +19,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
-import java.util.UUID;
+import java.util.Set;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static java.nio.file.attribute.PosixFilePermission.*;
+import static java.util.UUID.randomUUID;
 
 @Import({SeleniumDriver.class, CytomineSteps.class, WebDriverUtils.class})
 @SpringBootTest
@@ -54,19 +58,23 @@ public class CytomineTests {
     }
 
     @AfterEach
-    @SneakyThrows
-    void tearDown() {
-
-        File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);  // Capture the screenshot as a file
-        System.out.println("Screenshot captured at: " + screenshot.getAbsolutePath());
-
-        // Define the destination path for saving the screenshot
-        Path destination = Paths.get("./build/reports/" + screenshot.getName());
-        Files.createDirectories(Path.of("./build/reports/"));
-        // Move the screenshot to the desired location
-        Files.move(screenshot.toPath(), destination, REPLACE_EXISTING);
+    void tearDown(TestInfo testInfo) {
+        saveScreenshot("closing-" + testInfo.getTestMethod()
+            .map(Method::getName)
+            .orElseGet(() -> "no-name-" + randomUUID()));
         driver.close();
     }
+
+    @SneakyThrows
+    void saveScreenshot(String name) {
+        Path destination = Paths.get("./build/reports/" + name + ".jpg");
+        Files.createDirectories(Path.of("./build/reports/"));
+        File screenshot =
+            ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);  // Capture the screenshot as a file
+        Files.move(screenshot.toPath(), destination, REPLACE_EXISTING);
+        Files.setPosixFilePermissions(destination, Set.of(OTHERS_READ, OWNER_READ, GROUP_READ));
+    }
+
 
     @Test
     void login() {
@@ -75,7 +83,7 @@ public class CytomineTests {
 
     @Test
     void createProject() {
-        String projectName = "selenium-" + UUID.randomUUID();
+        String projectName = "selenium-" + randomUUID();
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
         cytomineSteps.createProject(wait, cytomineUrl, projectName);
         cytomineSteps.deleteProject(wait, driver.getCurrentUrl());
@@ -83,7 +91,7 @@ public class CytomineTests {
 
     @Test
     void deleteProject() {
-        String projectName = "selenium-" + UUID.randomUUID();
+        String projectName = "selenium-" + randomUUID();
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
         cytomineSteps.createProject(wait, cytomineUrl, projectName);
         cytomineSteps.deleteProject(wait, driver.getCurrentUrl());

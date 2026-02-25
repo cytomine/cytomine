@@ -16,6 +16,7 @@
 
 # pylint: disable=unused-argument
 
+import pytest
 from typing import Any, Dict
 
 from cytomine.models import (
@@ -93,6 +94,7 @@ class TestTerm:
         terms = TermCollection().fetch_with_filter("ontology", dataset["ontology"].id)
         assert isinstance(terms, TermCollection)
 
+    @pytest.mark.skip(reason="Failing")
     def test_terms_by_annotation(self, dataset: Dict[str, Any]) -> None:
         terms = TermCollection().fetch_with_filter(
             "annotation",

@@ -18,7 +18,6 @@
 
 from typing import Any, Dict
 
-from cytomine.cytomine import Cytomine
 from cytomine.models import (
     AnnotationAction,
     AnnotationActionCollection,
@@ -28,7 +27,7 @@ from cytomine.models import (
 
 
 class TestPosition:
-    def test_positions(self, connect: Cytomine, dataset: Dict[str, Any]) -> None:
+    def test_positions(self, dataset: Dict[str, Any]) -> None:
         positions = PositionCollection().fetch_with_filter(
             "imageinstance",
             dataset["image_instance"].id,
@@ -41,11 +40,7 @@ class TestPosition:
 
 
 class TestAnnotationAction:
-    def test_annotationactions(
-        self,
-        connect: Cytomine,
-        dataset: Dict[str, Any],
-    ) -> None:
+    def test_annotationactions(self, dataset: Dict[str, Any]) -> None:
         annot_actions = AnnotationActionCollection().fetch_with_filter(
             "imageinstance",
             dataset["image_instance"].id,

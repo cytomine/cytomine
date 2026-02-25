@@ -1,67 +1,67 @@
-# -*- coding: utf-8 -*-
+from typing import Any
 
-# * Copyright (c) 2009-2024. Authors: see NOTICE file.
-# *
-# * Licensed under the Apache License, Version 2.0 (the "License");
-# * you may not use this file except in compliance with the License.
-# * You may obtain a copy of the License at
-# *
-# *      http://www.apache.org/licenses/LICENSE-2.0
-# *
-# * Unless required by applicable law or agreed to in writing, software
-# * distributed under the License is distributed on an "AS IS" BASIS,
-# * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# * See the License for the specific language governing permissions and
-# * limitations under the License.
-
-# pylint: disable=unused-argument
-
-from typing import Any, Dict
-
-from cytomine.cytomine import Cytomine
 from cytomine.models import Project, ProjectCollection
 from tests.conftest import random_string
 
 
-class TestProject:
-    def test_project(self, connect: Cytomine, dataset: Dict[str, Any]) -> None:
-        name = random_string()
-        project = Project(name, dataset["ontology"].id).save()
-        assert isinstance(project, Project)
-        assert project.name == name
+def test_create_project(dataset: dict[str, Any]) -> None:
+    name = random_string()
 
-        project = Project().fetch(project.id)
-        assert isinstance(project, Project)
-        assert project.name == name
+    project = Project(name, dataset["ontology"].id).save()
 
-        name = random_string()
-        project.name = name
-        project.update()
-        assert isinstance(project, Project)
-        assert project.name == name
+    assert isinstance(project, Project)
+    assert project.name == name
+    assert project.ontology == dataset["ontology"].id
 
-        project.delete()
-        assert not Project().fetch(project.id)
 
-    def test_projects(self, connect: Cytomine, dataset: Dict[str, Any]) -> None:
-        projects = ProjectCollection().fetch()
-        assert isinstance(projects, ProjectCollection)
+def test_update_project(dataset: dict[str, Any]) -> None:
+    name = random_string()
+    project = dataset["project"]
 
-    def test_projects_by_user(
-        self,
-        connect: Cytomine,
-        dataset: Dict[str, Any],
-    ) -> None:
-        projects = ProjectCollection().fetch_with_filter("user", dataset["user"].id)
-        assert isinstance(projects, ProjectCollection)
+    project.name = name
+    project.update()
 
-    def test_projects_by_ontology(
-        self,
-        connect: Cytomine,
-        dataset: Dict[str, Any],
-    ) -> None:
-        projects = ProjectCollection().fetch_with_filter(
-            "ontology",
-            dataset["ontology"].id,
-        )
-        assert isinstance(projects, ProjectCollection)
+    assert isinstance(project, Project)
+    assert project.name == name
+    assert project.ontology == dataset["ontology"].id
+
+
+def test_delete_project(dataset: dict[str, Any]) -> None:
+    name = random_string()
+    project = Project(name, dataset["ontology"].id).save()
+    assert isinstance(project, Project)
+
+    project.delete()
+
+    assert not Project().fetch(project.id)
+
+
+def test_fetch_project(dataset: dict[str, Any]) -> None:
+    expected_project = dataset["project"]
+
+    project = Project().fetch(expected_project.id)
+
+    assert isinstance(project, Project)
+    assert project.id == expected_project.id
+    assert project.ontology == dataset["ontology"].id
+
+
+def test_fetch_project_collection() -> None:
+    projects = ProjectCollection().fetch()
+
+    assert isinstance(projects, ProjectCollection)
+
+
+def test_fetch_project_collection_by_user(dataset: dict[str, Any]) -> None:
+    projects = ProjectCollection().fetch_with_filter("user", dataset["user"].id)
+
+    assert isinstance(projects, ProjectCollection)
+
+
+def test_fetch_project_collection_by_ontology(dataset: dict[str, Any]) -> None:
+    projects = ProjectCollection().fetch_with_filter(
+        "ontology",
+        dataset["ontology"].id,
+    )
+
+    assert isinstance(projects, ProjectCollection)

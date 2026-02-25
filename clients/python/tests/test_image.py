@@ -35,7 +35,7 @@ from tests.conftest import random_string
 
 
 class TestAbstractImage:
-    def test_abstract_image(self, connect: Cytomine, dataset: Dict[str, Any]) -> None:
+    def test_abstract_image(self, dataset: Dict[str, Any]) -> None:
         filename = random_string()
         abstract_image = AbstractImage(filename, dataset["uploaded_file"].id).save()
         assert isinstance(abstract_image, AbstractImage)
@@ -59,29 +59,13 @@ class TestAbstractImage:
         # abstract_image.delete()
         # assert (not AbstractImage().fetch(abstract_image.id))
 
-    def test_abstract_image_server(
-        self,
-        connect: Cytomine,
-        dataset: Dict[str, Any],
-    ) -> None:
-        # TODO
-        pass
-
-    def test_abstract_image_download(
-        self,
-        connect: Cytomine,
-        dataset: Dict[str, Any],
-    ) -> None:
-        # TODO
-        pass
-
-    def test_abstract_images(self, connect: Cytomine, dataset: Dict[str, Any]) -> None:
+    def test_abstract_images(self, dataset: Dict[str, Any]) -> None:
         abstract_images = AbstractImageCollection().fetch()
         assert isinstance(abstract_images, AbstractImageCollection)
 
 
 class TestImageInstance:
-    def test_image_instance(self, connect: Cytomine, dataset: Dict[str, Any]) -> None:
+    def test_image_instance(self, dataset: Dict[str, Any]) -> None:
         image_instance = ImageInstance(
             dataset["abstract_image3"].id,
             dataset["project"].id,
@@ -99,35 +83,7 @@ class TestImageInstance:
         image_instance.delete()
         assert not ImageInstance().fetch(image_instance.id)
 
-    def test_image_instance_server(
-        self,
-        connect: Cytomine,
-        dataset: Dict[str, Any],
-    ) -> None:
-        # TODO
-        pass
-
-    def test_image_instance_download(
-        self,
-        connect: Cytomine,
-        dataset: Dict[str, Any],
-    ) -> None:
-        # TODO
-        pass
-
-    def test_image_instance_dump(
-        self,
-        connect: Cytomine,
-        dataset: Dict[str, Any],
-    ) -> None:
-        # TODO
-        pass
-
-    def test_image_instance_by_project(
-        self,
-        connect: Cytomine,
-        dataset: Dict[str, Any],
-    ) -> None:
+    def test_image_instance_by_project(self, dataset: Dict[str, Any]) -> None:
         image_instances = ImageInstanceCollection().fetch_with_filter(
             "project",
             dataset["project"].id,
@@ -136,7 +92,7 @@ class TestImageInstance:
 
 
 class TestAbstractSlice:
-    def test_abstract_slice(self, connect: Cytomine, dataset: Dict[str, Any]) -> None:
+    def test_abstract_slice(self, dataset: Dict[str, Any]) -> None:
         abstract_slice = AbstractSlice(
             dataset["abstract_image2"].id,
             dataset["uploaded_file2"].id,
@@ -152,7 +108,6 @@ class TestAbstractSlice:
 
     def test_abstract_slices_by_abstract_image(
         self,
-        connect: Cytomine,
         dataset: Dict[str, Any],
     ) -> None:
         abstract_slices = AbstractSliceCollection().fetch_with_filter(
@@ -161,11 +116,7 @@ class TestAbstractSlice:
         )
         assert isinstance(abstract_slices, AbstractSliceCollection)
 
-    def test_abstract_slices_by_uploadedfile(
-        self,
-        connect: Cytomine,
-        dataset: Dict[str, Any],
-    ) -> None:
+    def test_abstract_slices_by_uploadedfile(self, dataset: Dict[str, Any]) -> None:
         abstract_slices = AbstractSliceCollection().fetch_with_filter(
             "uploadedfile",
             dataset["uploaded_file"].id,
@@ -199,7 +150,7 @@ class TestSliceInstance:
         slice_instance.delete()
         assert not SliceInstance.fetch(slice_instance.id)  # type: ignore
 
-    def test_slices_by_image(self, connect: Cytomine, dataset: Dict[str, Any]) -> None:
+    def test_slices_by_image(self, dataset: Dict[str, Any]) -> None:
         slices = SliceInstanceCollection().fetch_with_filter(
             "imageinstance",
             dataset["image_instance"].id,

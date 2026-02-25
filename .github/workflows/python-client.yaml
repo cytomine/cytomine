@@ -68,6 +68,9 @@ jobs:
     if: needs.check-version.outputs.changed == 'true'
     needs: check-version
     runs-on: self-hosted
+    permissions:
+      id-token: write
+      contents: read
 
     steps:
       - name: Set up the repository

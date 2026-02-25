@@ -57,27 +57,33 @@ jobs:
 
           # Configure docker.io to use registry.cytomine.org/docker as proxy cache (with auth header)
           docker exec $NODE mkdir -p /etc/containerd/certs.d/docker.io
-          cat <<EOF | docker exec -i $NODE tee /etc/containerd/certs.d/docker.io/hosts.toml > /dev/null
-          server = "https://registry-1.docker.io"
-
-          [host."https://registry.cytomine.org/docker"]
-            capabilities = ["pull", "resolve"]
-
-            [host."https://registry.cytomine.org/docker".header]
-              Authorization = ["Basic ${AUTH}"]
-          EOF
+          printf '%s\n' \
+            "server = \"https://registry-1.docker.io\"" \
+            "" \
+            "[host.\"https://registry.cytomine.org/docker\"]" \
+            "  capabilities = [\"pull\", \"resolve\"]" \
+            "" \
+            "  [host.\"https://registry.cytomine.org/docker\".header]" \
+            "    Authorization = [\"Basic ${AUTH}\"]" \
+            | docker exec -i $NODE tee /etc/containerd/certs.d/docker.io/hosts.toml > /dev/null
 
           # Configure registry.cytomine.org
           docker exec $NODE mkdir -p /etc/containerd/certs.d/registry.cytomine.org
-          cat <<EOF | docker exec -i $NODE tee /etc/containerd/certs.d/registry.cytomine.org/hosts.toml > /dev/null
-          server = "https://registry.cytomine.org"
+          printf '%s\n' \
+            "server = \"https://registry.cytomine.org\"" \
+            "" \
+            "[host.\"https://registry.cytomine.org\"]" \
+            "  capabilities = [\"pull\", \"resolve\"]" \
+            "" \
+            "  [host.\"https://registry.cytomine.org\".header]" \
+            "    Authorization = [\"Basic ${AUTH}\"]" \
+            | docker exec -i $NODE tee /etc/containerd/certs.d/registry.cytomine.org/hosts.toml > /dev/null
 
-          [host."https://registry.cytomine.org"]
-            capabilities = ["pull", "resolve"]
-
-            [host."https://registry.cytomine.org".header]
-              Authorization = ["Basic ${AUTH}"]
-          EOF
+          # Debug: show the created files
+          echo "=== docker.io hosts.toml ==="
+          docker exec $NODE cat /etc/containerd/certs.d/docker.io/hosts.toml
+          echo "=== registry.cytomine.org hosts.toml ==="
+          docker exec $NODE cat /etc/containerd/certs.d/registry.cytomine.org/hosts.toml
 
           # Restart containerd to pick up changes
           docker exec $NODE systemctl restart containerd

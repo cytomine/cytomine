@@ -7,6 +7,7 @@ import org.cytomine.e2etests.ui.WebDriverUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
@@ -54,19 +55,20 @@ public class CytomineTests {
     }
 
     @AfterEach
-    @SneakyThrows
-    void tearDown() {
-
-        File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);  // Capture the screenshot as a file
-        System.out.println("Screenshot captured at: " + screenshot.getAbsolutePath());
-
-        // Define the destination path for saving the screenshot
-        Path destination = Paths.get("./build/reports/" + screenshot.getName());
-        Files.createDirectories(Path.of("./build/reports/"));
-        // Move the screenshot to the desired location
-        Files.move(screenshot.toPath(), destination, REPLACE_EXISTING);
+    void tearDown(TestInfo testInfo) {
+        saveScreenshot("closing-" + testInfo.getDisplayName());
         driver.close();
     }
+
+    @SneakyThrows
+    void saveScreenshot(String name) {
+        Path destination = Paths.get("./build/reports/" + name);
+        Files.createDirectories(Path.of("./build/reports/"));
+        File screenshot =
+            ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);  // Capture the screenshot as a file
+        Files.move(screenshot.toPath(), destination, REPLACE_EXISTING);
+    }
+
 
     @Test
     void login() {

@@ -53,10 +53,10 @@ jobs:
           version: ${{ vars.UV_VERSION }}
 
       - name: Install test dependencies
-        run: uv sync --group test
+        run: uv sync --directory clients/python --group test
 
       - name: Run tests
-        run: uv run pytest
+        run: uv run --directory clients/python pytest
 
   check-version:
     if: github.ref_name == 'main' && github.event_name == 'push'

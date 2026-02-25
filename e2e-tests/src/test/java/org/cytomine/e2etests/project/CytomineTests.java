@@ -27,7 +27,6 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.Set;
 
-import static java.nio.file.StandardCopyOption.COPY_ATTRIBUTES;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.nio.file.attribute.PosixFilePermission.*;
 import static java.util.UUID.randomUUID;
@@ -72,7 +71,7 @@ public class CytomineTests {
         Files.createDirectories(Path.of("./build/reports/"));
         File screenshot =
             ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);  // Capture the screenshot as a file
-        Files.move(screenshot.toPath(), destination, REPLACE_EXISTING, COPY_ATTRIBUTES);
+        Files.move(screenshot.toPath(), destination, REPLACE_EXISTING);
         Files.setPosixFilePermissions(destination, Set.of(OTHERS_READ, OWNER_READ, GROUP_READ));
     }
 

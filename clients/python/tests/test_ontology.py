@@ -1,21 +1,3 @@
-# -*- coding: utf-8 -*-
-
-# * Copyright (c) 2009-2024. Authors: see NOTICE file.
-# *
-# * Licensed under the Apache License, Version 2.0 (the "License");
-# * you may not use this file except in compliance with the License.
-# * You may obtain a copy of the License at
-# *
-# *      http://www.apache.org/licenses/LICENSE-2.0
-# *
-# * Unless required by applicable law or agreed to in writing, software
-# * distributed under the License is distributed on an "AS IS" BASIS,
-# * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# * See the License for the specific language governing permissions and
-# * limitations under the License.
-
-# pylint: disable=unused-argument
-
 from typing import Any, Dict
 
 from cytomine.cytomine import Cytomine
@@ -29,33 +11,53 @@ from cytomine.models import (
 from tests.conftest import random_string
 
 
-class TestOntology:
-    def test_ontology(self, connect: Cytomine, dataset: Dict[str, Any]) -> None:
-        name = random_string()
-        ontology = Ontology(name).save()
-        assert isinstance(ontology, Ontology)
-        assert ontology.name == name
+def test_fetch_ontology(ontology_factory) -> None:
+    expected_name = random_string()
+    created = ontology_factory(name=expected_name)
+    print(created)
 
-        ontology = Ontology().fetch(ontology.id)
-        assert isinstance(ontology, Ontology)
-        assert ontology.name == name
+    fetched = Ontology().fetch(created.id)
 
-        name = random_string()
-        ontology.name = name
-        ontology.update()
-        assert isinstance(ontology, Ontology)
-        assert ontology.name == name
+    assert isinstance(fetched, Ontology)
+    assert fetched.name == expected_name
 
-        ontology.delete()
-        assert not Ontology().fetch(ontology.id)
 
-    def test_ontologies(self, connect: Cytomine, dataset: Dict[str, Any]) -> None:
-        ontologies = OntologyCollection().fetch()
-        assert isinstance(ontologies, OntologyCollection)
+def test_create_ontology(ontology_factory) -> None:
+    expected_name = random_string()
+    ontology = ontology_factory(name=expected_name)
 
-        ontologies = OntologyCollection()
-        ontologies.append(Ontology(random_string()))
-        assert ontologies.save()
+    assert ontology.name == expected_name
+
+
+def test_update_ontology(ontology_factory) -> None:
+    previous_name = random_string()
+    expected_name = random_string()
+    ontology = ontology_factory(name=previous_name)
+
+    ontology.name = expected_name
+    ontology.update()
+
+    assert ontology.name != previous_name
+    assert ontology.name == expected_name
+
+
+def test_delete_ontology(ontology_factory) -> None:
+    ontology = ontology_factory(name=random_string())
+
+    ontology.delete()
+
+    assert not Ontology().fetch(ontology.id)
+
+
+def test_fetch_ontologies(ontology_factory) -> None:
+    created = [ontology_factory() for _ in range(5)]
+
+    fetched = OntologyCollection().fetch()
+    assert isinstance(fetched, OntologyCollection)
+
+    fetched_names = {o.name for o in fetched}
+    for ontology in created:
+        assert ontology.name in fetched_names
 
 
 class TestTerm:

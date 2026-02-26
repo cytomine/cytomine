@@ -62,7 +62,6 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
             extractRolesFromAuthentication(jwtAuthenticationToken);
         Map<String, Object> tokenAttributes = jwtAuthenticationToken.getTokenAttributes();
         List<String> projects = (List<String>) tokenAttributes.getOrDefault("projects", Collections.emptyList());
-        log.info("PROJECTS : {}", projects);
         UUID sub = UUID.fromString(tokenAttributes.get("sub").toString());
         Optional<User> userByReference = userRepository.findByReference(sub.toString());
         Optional<User> userByUsername = userRepository.findByUsername(jwtAuthenticationToken.getName());

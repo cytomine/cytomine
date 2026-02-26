@@ -2,7 +2,10 @@ ARG PROXY_CACHE=registry.cytomine.org/docker
 
 FROM ${PROXY_CACHE}/python:3.12-alpine
 
-RUN apk add geos
+RUN apk add --no-cache \
+    gcc \
+    geos-dev \
+    musl-dev
 
 COPY . /app
 

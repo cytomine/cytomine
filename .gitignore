@@ -25,4 +25,4 @@ data/
 **/.factorypath
 **/.settings
 **/bin
-**/.cache
+**/.cache/**

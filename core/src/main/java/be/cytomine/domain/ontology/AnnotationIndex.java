@@ -27,7 +27,7 @@ import lombok.Data;
 public class AnnotationIndex {
 
     @Id
-    @GeneratedValue(generator = "myGenerator")
+    @GeneratedValue
     Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

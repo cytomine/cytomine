@@ -63,26 +63,26 @@ public interface AclRepository extends JpaRepository<User, Long> {
 
     @Modifying
     @Query(value = "INSERT INTO acl_entry(id,ace_order,acl_object_identity,audit_failure,audit_success,granting,mask,sid) " +
-            "VALUES(nextval('hibernate_sequence'),:aceOrder,:aclObjectIdentity,false,false,true,:mask,:sid)", nativeQuery = true)
+        "VALUES(nextval('acl_entry_seq'),:aceOrder,:aclObjectIdentity,false,false,true,:mask,:sid)", nativeQuery = true)
     void insertAclEntry(Integer aceOrder, Long aclObjectIdentity, Integer mask, Long sid);
 
     @Modifying
     @Query(value = "INSERT INTO acl_object_identity(id,object_id_class,entries_inheriting,object_id_identity,owner_sid,parent_object) " +
-            "VALUES (nextval('hibernate_sequence'),:objectIdClass,true,:domainId,:sid,null)", nativeQuery = true)
+        "VALUES (nextval('acl_object_identity_seq'),:objectIdClass,true,:domainId,:sid,null)", nativeQuery = true)
     void insertAclObjectIdentity(Long objectIdClass, Long domainId, Long sid);
 
     @Query(value = "SELECT id FROM acl_sid WHERE sid = :username", nativeQuery = true)
     Long getAclSid(String username);
 
     @Modifying
-    @Query(value = "INSERT INTO acl_sid(id,principal,sid) VALUES(nextval('hibernate_sequence'),true,:username)", nativeQuery = true)
+    @Query(value = "INSERT INTO acl_sid(id,principal,sid) VALUES(nextval('acl_sid_seq'),true,:username)", nativeQuery = true)
     void insertAclSid(String username);
 
     @Query(value = "SELECT id FROM acl_class WHERE class = :className", nativeQuery = true)
     Long getAclClassId(String className);
 
     @Modifying
-    @Query(value = "INSERT INTO acl_class(id,class) VALUES(nextval('hibernate_sequence'),:className)", nativeQuery = true)
+    @Query(value = "INSERT INTO acl_class(id,class) VALUES(nextval('acl_class_seq'),:className)", nativeQuery = true)
     void insertAclClassId(String className);
 
     @Modifying

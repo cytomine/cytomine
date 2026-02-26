@@ -10,13 +10,19 @@ import org.springframework.stereotype.Service;
 @Service
 public class SequenceService {
 
+    /**
+     * Shared sequence for MongoDB document IDs.
+     * This sequence is used by MongoDB documents (social domain) to generate unique IDs
+     * that are consistent across the system. JPA entities use per-table sequences.
+     */
     public final static String SEQ_NAME = "hibernate_sequence";
 
     @Autowired
     private EntityManager entityManager;
 
     /**
-     * Get a new id number
+     * Get a new id number for MongoDB documents.
+     * This is used by social domain entities stored in MongoDB.
      */
     public Long generateID()  {
         try {

@@ -55,6 +55,8 @@ spring:
         format_sql: false
         jdbc:
           batch_size: 50
+        id:
+          db_structure_naming_strategy: standard
 
   # Replace by 'prod, faker' to add the faker context and have sample data loaded in production
   #liquibase:

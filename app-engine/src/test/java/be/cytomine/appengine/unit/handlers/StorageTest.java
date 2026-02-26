@@ -2,13 +2,16 @@ package be.cytomine.appengine.unit.handlers;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.Properties;
+import java.util.UUID;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
@@ -46,7 +49,7 @@ public class StorageTest {
 
     @AfterAll
     public static void cleanUp() throws IOException {
-        Path dirPath = Paths.get(basePath + "/main");
+        Path dirPath = Paths.get(basePath);
         Files.walk(dirPath)
             .sorted(Comparator.reverseOrder())
             .map(Path::toFile)
@@ -192,6 +195,41 @@ public class StorageTest {
         Assertions.assertTrue(Files.exists(subdirPath));
         Assertions.assertTrue(Files.exists(randomPath));
         Assertions.assertTrue(Files.exists(orderedPath));
+    }
+
+    @Test
+    @DisplayName("Should read the data successfully when data is a simple file")
+    public void shouldReadDataSuccessfullyWhenDataIsSimpleFile() throws FileStorageException, JsonProcessingException {
+        Storage testStorage = new Storage(UUID.randomUUID().toString());
+        storageHandler.createStorage(testStorage);
+
+        String parameterName = UUID.randomUUID().toString();
+        int expectedValue = 200;
+        String valueString = new ObjectMapper().writeValueAsString(expectedValue);
+        byte[] valueBytes = valueString.getBytes(StandardCharsets.UTF_8);
+
+        StorageData integerStorageData = new StorageData(FileHelper.write(parameterName, valueBytes), parameterName);
+        storageHandler.saveStorageData(testStorage, integerStorageData);
+
+        StorageData emptyFile = new StorageData(parameterName, testStorage.getIdStorage());
+        storageHandler.readStorageData(emptyFile);
+        int actualValue = Integer.parseInt(FileHelper.read(emptyFile.peek().getData(), Charset.defaultCharset()));
+
+        Assertions.assertEquals(expectedValue, actualValue);
+    }
+
+    @Test
+    @DisplayName("Should throw FileStorageException when failing to read the data")
+    public void shouldThrowFileStorageExceptionOnReadFailed() throws FileStorageException {
+        Storage testStorage = new Storage(UUID.randomUUID().toString());
+        storageHandler.createStorage(testStorage);
+        String parameterName = UUID.randomUUID().toString();
+
+        FileStorageException exception = Assertions.assertThrows(FileStorageException.class, () -> {
+            StorageData emptyFile = new StorageData(parameterName, testStorage.getIdStorage());
+            storageHandler.readStorageData(emptyFile);
+        });
+        Assertions.assertEquals("Failed to read file " + parameterName, exception.getMessage());
     }
 
     @Test

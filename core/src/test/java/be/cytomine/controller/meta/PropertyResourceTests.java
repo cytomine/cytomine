@@ -29,7 +29,7 @@ import be.cytomine.domain.project.Project;
 import be.cytomine.utils.JsonObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
@@ -54,7 +54,7 @@ public class PropertyResourceTests {
 
     @Autowired
     private MockMvc restPropertyControllerMockMvc;
-    
+
     @Test
     @Transactional
     public void list_all_property_for_project() throws Exception {
@@ -113,7 +113,7 @@ public class PropertyResourceTests {
     @Transactional
     public void list_all_property_for_domain() throws Exception {
         Property property = builder.given_a_property(builder.given_an_image_instance());
-        restPropertyControllerMockMvc.perform(get("/api/domain/{domainClassName}/{domainIdent}/property.json", 
+        restPropertyControllerMockMvc.perform(get("/api/domain/{domainClassName}/{domainIdent}/property.json",
                         property.getDomainClassName(), property.getDomainIdent()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
@@ -301,8 +301,8 @@ public class PropertyResourceTests {
                         property.getDomainClassName(), property.getDomainIdent(), "xxx"))
                 .andExpect(status().isNotFound());
     }
-    
-    
+
+
 
 
     @Test
@@ -373,7 +373,7 @@ public class PropertyResourceTests {
                 .andExpect(jsonPath("$.property.value").value("v2"));
 
     }
-    
+
     @Test
     @Transactional
     public void delete_property() throws Exception {
@@ -382,6 +382,6 @@ public class PropertyResourceTests {
         restPropertyControllerMockMvc.perform(delete("/api/domain/{domainClassName}/{domainIdent}/property/{id}.json", property.getDomainClassName(), property.getDomainIdent(), property.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
-        
+
     }
 }

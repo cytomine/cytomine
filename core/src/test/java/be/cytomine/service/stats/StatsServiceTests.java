@@ -19,7 +19,7 @@ import org.locationtech.jts.io.ParseException;
 import org.apache.commons.lang3.time.DateUtils;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -507,6 +507,6 @@ public class StatsServiceTests {
         assertThat(jsonObjects.get(1).getJSONAttrLong("size")).isEqualTo(3);
         assertThat(jsonObjects.get(2).getJSONAttrLong("size")).isEqualTo(3);
     }
-    
-    
+
+
 }

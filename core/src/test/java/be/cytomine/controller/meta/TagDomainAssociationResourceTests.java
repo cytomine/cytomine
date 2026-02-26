@@ -25,7 +25,7 @@ import be.cytomine.domain.meta.TagDomainAssociation;
 import be.cytomine.domain.project.Project;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
@@ -65,7 +65,7 @@ public class TagDomainAssociationResourceTests {
         restTagDomainAssociationControllerMockMvc.perform(get("/api/tag_domain_association/{id}.json", 0L))
                 .andExpect(status().isNotFound());
     }
-    
+
     @Test
     @Transactional
     public void list_all_tag_domain_association() throws Exception {
@@ -109,7 +109,7 @@ public class TagDomainAssociationResourceTests {
     @Transactional
     public void list_all_tag_domain_association_with_filters_pagination() throws Exception {
         Tag tag = builder.given_a_tag();
-        
+
         TagDomainAssociation t1 = builder.given_a_tag_association(tag, builder.given_a_project());
         TagDomainAssociation t2 = builder.given_a_tag_association(tag, builder.given_a_project());
         TagDomainAssociation t3 = builder.given_a_tag_association(tag, builder.given_a_project());

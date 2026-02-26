@@ -32,7 +32,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
@@ -71,7 +71,7 @@ public class AbstractSliceResourceTests {
     private MockMvc restAbstractSliceControllerMockMvc;
 
     private static WireMockServer wireMockServer = new WireMockServer(8888);
-    
+
     @BeforeAll
     public static void beforeAll() {
         wireMockServer.start();

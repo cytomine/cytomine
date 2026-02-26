@@ -125,18 +125,17 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
         if (!isExternal(user)) {
             return; // do nothing if user is local
         }
-        // get list of matching projects
+
         List<Project> permittedUserProjects = projectRepository.findByNameIn(projects);
-        // get the list of projects of the user
         List<Project> actualUserProjects = projectRepository.findAllProjectForUser(user.getUsername());
-        // if project permitted but not in user actual projects add user to project as contributor if user is external, otherwise do nothing
+
         List<Project> projectsToAdd = permittedUserProjects.stream()
             .filter(p -> !actualUserProjects.contains(p))
             .toList();
         for (Project project : projectsToAdd) {
             projectMemberService.addUserToProjectWithAdmin(user, project, false);
         }
-        // if project is in actual projects but not in permitted projects remove user from project if user is external, otherwise do nothing
+
         List<Project> projectsToRemove = actualUserProjects.stream()
             .filter(p -> !permittedUserProjects.contains(p))
             .toList();

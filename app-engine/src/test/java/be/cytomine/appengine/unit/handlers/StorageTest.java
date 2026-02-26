@@ -219,6 +219,42 @@ public class StorageTest {
     }
 
     @Test
+    @DisplayName("Testing readStorageData with nested directory structure")
+    public void testReadStorageDataWithNestedDirectoryStructure() throws FileStorageException {
+        Storage dir = new Storage("nuclei");
+        storageHandler.createStorage(dir);
+
+        String arrayYmlContent = "size: 1";
+        byte[] arrayYmlBytes = arrayYmlContent.getBytes(StandardCharsets.UTF_8);
+        File arrayYmlFile = FileHelper.write("array.yml", arrayYmlBytes);
+        StorageDataEntry arrayYmlEntry = new StorageDataEntry(
+                arrayYmlFile,
+                "array.yml",
+                StorageDataType.FILE
+        );
+
+        String expectedValue = "{\"type\":\"Polygon\",\"coordinates\":[[[0,0],[0,1],[1,1],[1,0],[0,0]]]}";
+        File subDirFile = FileHelper.write("0", expectedValue.getBytes(StandardCharsets.UTF_8));
+        StorageDataEntry subDirFileEntry = new StorageDataEntry(subDirFile, "0/0", StorageDataType.FILE);
+
+        String subArrayYmlContent = "size: 1";
+        byte[] subArrayYmlBytes = subArrayYmlContent.getBytes(StandardCharsets.UTF_8);
+        File subArrayYmlFile = FileHelper.write("array.yml", subArrayYmlBytes);
+        StorageDataEntry subArrayYmlEntry = new StorageDataEntry(subArrayYmlFile, "0/array.yml", StorageDataType.FILE);
+
+        StorageData nestedDirectory = new StorageData();
+        nestedDirectory.add(arrayYmlEntry);
+        nestedDirectory.add(subDirFileEntry);
+        nestedDirectory.add(subArrayYmlEntry);
+
+        storageHandler.saveStorageData(dir, nestedDirectory);
+
+
+        StorageData emptyFile = new StorageData("nuclei/0/0", dir.getIdStorage());
+        storageHandler.readStorageData(emptyFile);
+    }
+
+    @Test
     @DisplayName("Should throw FileStorageException when failing to read the data")
     public void shouldThrowFileStorageExceptionOnReadFailed() throws FileStorageException {
         Storage testStorage = new Storage(UUID.randomUUID().toString());

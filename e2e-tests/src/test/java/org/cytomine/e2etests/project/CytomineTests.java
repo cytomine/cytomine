@@ -115,4 +115,9 @@ public class CytomineTests {
                         .map(projectUrl -> cytomineSteps.deleteProject(wait, projectUrl))
                         .collect(toSet());
     }
+
+    @Test
+    void addImageToStorage(){
+
+    }
 }

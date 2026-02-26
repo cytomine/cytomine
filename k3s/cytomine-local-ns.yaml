@@ -3,7 +3,8 @@ kind: Namespace
 metadata:
   name: cytomine-local
   labels:
-    pod-security.kubernetes.io/enforce: restricted
+    # privileged required for hostPath volumes (used by PIMS)
+    pod-security.kubernetes.io/enforce: privileged
     pod-security.kubernetes.io/enforce-version: latest
     pod-security.kubernetes.io/warn: restricted
     pod-security.kubernetes.io/warn-version: latest

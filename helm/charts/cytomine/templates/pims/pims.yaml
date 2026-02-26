@@ -4,7 +4,7 @@ kind: StatefulSet
 metadata:
   name: pims
   annotations:
-    kube-score/ignore: pod-probes,container-security-context-user-group-id
+    kube-score/ignore: pod-probes,container-security-context-user-group-id,pod-hostpath
   labels:
     role: pims
     app: {{ include "cytomine.name" . }}

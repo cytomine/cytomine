@@ -16,12 +16,12 @@ package be.cytomine.domain;
 * limitations under the License.
 */
 
+import be.cytomine.config.CustomId;
 import be.cytomine.domain.security.User;
 import be.cytomine.utils.DateUtils;
 import be.cytomine.utils.JsonObject;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -40,16 +40,8 @@ import java.util.stream.Collectors;
 @EntityListeners(AuditingEntityListener.class)
 public abstract class CytomineDomain {
 
-    @GenericGenerator(
-        name = "myGenerator",
-        type = be.cytomine.config.CustomIdentifierGenerator.class,
-        parameters = {
-            @org.hibernate.annotations.Parameter(name = "sequence_name", value = "hibernate_sequence"),
-            @org.hibernate.annotations.Parameter(name = "increment_size", value = "1")
-        }
-    )
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "myGenerator")
     @Id
+    @CustomId
     protected Long id;
 
     @CreatedDate

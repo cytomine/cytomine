@@ -38,7 +38,7 @@ public class SpecificationBuilder {
             }
             return specification;
         } else {
-           return Specification.where(null);
+           return Specification.where((Specification<T>) null);
         }
     }
 

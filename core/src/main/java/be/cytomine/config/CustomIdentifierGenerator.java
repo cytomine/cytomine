@@ -1,22 +1,47 @@
 package be.cytomine.config;
 
-import org.hibernate.HibernateException;
-import org.hibernate.engine.spi.SharedSessionContractImplementor;
-import org.hibernate.id.enhanced.SequenceStyleGenerator;
+import java.lang.reflect.Member;
+import java.util.EnumSet;
 
-public class CustomIdentifierGenerator extends SequenceStyleGenerator {
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.generator.BeforeExecutionGenerator;
+import org.hibernate.generator.EventType;
+import org.hibernate.generator.GeneratorCreationContext;
+import org.hibernate.persister.entity.EntityPersister;
+
+public class CustomIdentifierGenerator implements BeforeExecutionGenerator {
+
+    private static final String SEQUENCE_NAME = "hibernate_sequence";
+
+    public CustomIdentifierGenerator(CustomId config, Member annotatedMember, GeneratorCreationContext creationContext) {
+        // No initialization needed - we use native query to get sequence values
+    }
 
     @Override
-    public Object generate(SharedSessionContractImplementor session, Object object)
-            throws HibernateException {
-        // In Hibernate 6, use getIdentifier() directly on EntityPersister (getClassMetadata() was removed)
-        Object id = session.getEntityPersister(null, object).getIdentifier(object, session);
-        return id != null ? id : super.generate(session, object);
+    public Object generate(SharedSessionContractImplementor session, Object owner, Object currentValue, EventType eventType) {
+        // Check if entity already has an ID assigned
+        EntityPersister persister = session.getEntityPersister(null, owner);
+        Object existingId = persister.getIdentifier(owner, session);
+        if (existingId != null) {
+            return existingId;
+        }
+        // Generate new ID from sequence
+        return session.createNativeQuery("SELECT nextval('" + SEQUENCE_NAME + "')", Long.class)
+                .getSingleResult();
+    }
+
+    @Override
+    public EnumSet<EventType> getEventTypes() {
+        return EnumSet.of(EventType.INSERT);
+    }
+
+    @Override
+    public boolean generatedOnExecution() {
+        return false;
     }
 
     @Override
     public boolean allowAssignedIdentifiers() {
-        // Allow entities to have pre-assigned IDs
         return true;
     }
 }

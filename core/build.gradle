@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.5.5'
+    id 'org.springframework.boot' version '4.0.0'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'jacoco'
     id 'checkstyle'
@@ -43,11 +43,12 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-restclient'
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
     // Hibernate
-    annotationProcessor 'org.hibernate.orm:hibernate-jpamodelgen'
+    annotationProcessor 'org.hibernate.orm:hibernate-jpamodelgen:7.1.8.Final'
     implementation 'org.hibernate.orm:hibernate-core'
     implementation 'org.hibernate.orm:hibernate-spatial'
     implementation 'org.hibernate.validator:hibernate-validator'
@@ -56,6 +57,7 @@ dependencies {
     implementation 'org.postgresql:postgresql'
     implementation 'com.zaxxer:HikariCP'
     implementation 'org.liquibase:liquibase-core'
+    implementation 'org.springframework.boot:spring-boot-liquibase'
 
     // Spring security
     implementation 'org.springframework.security:spring-security-acl'
@@ -72,7 +74,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hppc'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
     implementation 'com.fasterxml.jackson.module:jackson-module-jaxb-annotations'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate6'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate7'
 
     // Lombok
     compileOnly 'org.projectlombok:lombok:1.18.30'
@@ -84,6 +86,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+    testImplementation 'org.springframework.boot:spring-boot-webmvc-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'org.testcontainers:testcontainers:2.0.3'
     testImplementation 'org.testcontainers:testcontainers-mongodb:2.0.3'
@@ -97,7 +100,7 @@ dependencies {
 
     // Gateway
     // See https://spring.io/projects/spring-cloud for compatibility matrix with Spring Boot
-    implementation 'org.springframework.cloud:spring-cloud-gateway-mvc:4.0.9'
+    implementation 'org.springframework.cloud:spring-cloud-gateway-mvc:4.3.0'
 
     // JSON tokens
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
@@ -106,7 +109,7 @@ dependencies {
 
     // Hibernate
     // See https://github.com/vladmihalcea/hypersistence-utils for related Hibernate version package
-    implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.15.2'
+    implementation 'io.hypersistence:hypersistence-utils-hibernate-71:3.15.2'
     implementation 'org.locationtech.jts:jts-core:1.19.0'
     implementation 'org.locationtech.jts.io:jts-io-common:1.19.0'
 
@@ -123,7 +126,7 @@ dependencies {
     implementation 'org.apache.poi:poi:5.2.3'
 
     // Keycloak admin SDK
-    implementation group: 'org.keycloak', name: 'keycloak-admin-client', version: '24.0.2'
+    implementation group: 'org.keycloak', name: 'keycloak-admin-client', version: '26.0.5'
 
     // OAuth2 Server resource & client
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'

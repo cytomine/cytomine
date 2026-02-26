@@ -18,19 +18,18 @@ package be.cytomine.domain.image;
 
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.utils.JsonObject;
-import lombok.Getter;
-import lombok.Setter;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Entity
-@Getter
-@Setter
+@EqualsAndHashCode(callSuper = true)
+@Data
 public class CompanionFile extends CytomineDomain{
+    @Id
+    @GeneratedValue
+    Long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
     private UploadedFile uploadedFile;
@@ -40,18 +39,18 @@ public class CompanionFile extends CytomineDomain{
 
     @NotBlank
     private String originalFilename;
-    
+
     @NotBlank
     private String filename;
-    
+
     private  String type;
-    
+
     private  Integer progress = 0;
 
 
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
         CompanionFile companionFile = this;
-        companionFile.id = json.getJSONAttrLong("id",null);
+        companionFile.setId(json.getJSONAttrLong("id", null));
         companionFile.created = json.getJSONAttrDate("created");
         companionFile.updated = json.getJSONAttrDate("updated");
 

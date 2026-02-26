@@ -18,16 +18,16 @@ package be.cytomine.domain.image;
 
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.utils.JsonObject;
-import lombok.Getter;
-import lombok.Setter;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import java.util.Optional;
 
 @Entity
-@Getter
-@Setter
+@EqualsAndHashCode(callSuper = true)
+@Data
 @DiscriminatorValue("be.cytomine.domain.image.NestedImageInstance")
 public class NestedImageInstance extends ImageInstance {
 

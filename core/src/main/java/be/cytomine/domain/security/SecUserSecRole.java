@@ -18,16 +18,19 @@ package be.cytomine.domain.security;
 
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.utils.JsonObject;
-import lombok.Getter;
-import lombok.Setter;
-
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import java.io.Serializable;
 
 @Entity
-@Getter
-@Setter
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class SecUserSecRole extends CytomineDomain implements Serializable {
+    @Id
+    @GeneratedValue
+    Long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "sec_user_id", nullable = false)
@@ -51,7 +54,7 @@ public class SecUserSecRole extends CytomineDomain implements Serializable {
 
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
         SecUserSecRole secSecUserSecRole = this;
-        secSecUserSecRole.id = json.getJSONAttrLong("id",null);
+        secSecUserSecRole.setId(json.getJSONAttrLong("id", null));
         secSecUserSecRole.secUser = (User)json.getJSONAttrDomain(entityManager, "user", new User(), true);
         secSecUserSecRole.secRole = (SecRole)json.getJSONAttrDomain(entityManager, "role", new SecRole(), true);
         secSecUserSecRole.created = json.getJSONAttrDate("created");

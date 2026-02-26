@@ -20,17 +20,19 @@ import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.project.Project;
 import be.cytomine.utils.JsonObject;
-import lombok.Getter;
-import lombok.Setter;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
-@Getter
-@Setter
+@Data
 public class Track extends CytomineDomain {
+    @Id
+    @GeneratedValue
+    Long id;
 
     @NotNull
     @NotBlank
@@ -46,8 +48,8 @@ public class Track extends CytomineDomain {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", nullable = true)
     private Project project;
-    
-    
+
+
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
         Track track = this;
         track.id = json.getJSONAttrLong("id",null);

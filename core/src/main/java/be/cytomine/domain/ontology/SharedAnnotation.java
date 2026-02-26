@@ -20,31 +20,34 @@ import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.GenericCytomineDomainContainer;
 import be.cytomine.domain.security.User;
 import be.cytomine.utils.JsonObject;
-import lombok.Getter;
-import lombok.Setter;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Entity
-@Getter
-@Setter
+@EqualsAndHashCode(callSuper = true)
+@Data
 /**
  * A shared annotation is a comment on a specific annotation
  * (e.g. is it the good term?, ...)
  * Receiver user can see the comment and add answer
  */
 public class SharedAnnotation extends CytomineDomain implements Serializable {
+    @Id
+    @GeneratedValue
+    Long id;
 
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "sender_id", nullable = false)
     private User sender;
-    
+
     private String comment;
 
 
@@ -62,17 +65,34 @@ public class SharedAnnotation extends CytomineDomain implements Serializable {
             inverseJoinColumns = { @JoinColumn(name = "user_id") }
     )
     private List<User> receivers = new ArrayList<>();
-    
+
 
     public String toString() {
         return "Annotation " + annotationIdent + " shared by " + sender;
     }
-    
+
     public void setAnnotation(AnnotationDomain annotation) {
         annotationClassName = annotation.getClass().getName();
         annotationIdent = annotation.getId();
     }
-    
+
+    public static JsonObject getDataFromDomain(CytomineDomain domain) {
+        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
+        SharedAnnotation sharedAnnotation = (SharedAnnotation)domain;
+        returnArray.put("annotationIdent", sharedAnnotation.getAnnotationIdent());
+        returnArray.put("annotationClassName", sharedAnnotation.getAnnotationClassName());
+
+        returnArray.put("comment", sharedAnnotation.getComment());
+        returnArray.put("sender", (sharedAnnotation.getSender()!=null ? sharedAnnotation.getSender().getId() : null));
+        returnArray.put("senderName", (sharedAnnotation.getSender()!=null ? sharedAnnotation.getSender().toString() : null));
+
+        returnArray.put("receivers", sharedAnnotation.receivers.stream().map(x -> x.getId()).collect(Collectors.toList()));
+        return returnArray;
+    }
+
+    public User userDomainCreator() {
+        return sender;
+    }
 
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
         SharedAnnotation sharedAnnotation = this;
@@ -94,28 +114,10 @@ public class SharedAnnotation extends CytomineDomain implements Serializable {
         sharedAnnotation.comment = json.getJSONAttrStr("comment", false);
         sharedAnnotation.created = json.getJSONAttrDate("created");
         sharedAnnotation.updated = json.getJSONAttrDate("updated");
-        
+
         sharedAnnotation.sender = (User) json.getJSONAttrDomain(entityManager, "sender", new User(), false);
-        
+
         return sharedAnnotation;
-    }
-
-    public User userDomainCreator() {
-        return sender;
-    }
-
-    public static JsonObject getDataFromDomain(CytomineDomain domain) {
-        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
-        SharedAnnotation sharedAnnotation = (SharedAnnotation)domain;
-        returnArray.put("annotationIdent", sharedAnnotation.getAnnotationIdent());
-        returnArray.put("annotationClassName", sharedAnnotation.getAnnotationClassName());
-        
-        returnArray.put("comment", sharedAnnotation.getComment());
-        returnArray.put("sender", (sharedAnnotation.getSender()!=null ? sharedAnnotation.getSender().getId() : null));
-        returnArray.put("senderName", (sharedAnnotation.getSender()!=null ? sharedAnnotation.getSender().toString() : null));
-
-        returnArray.put("receivers", sharedAnnotation.receivers.stream().map(x -> x.getId()).collect(Collectors.toList()));
-        return returnArray;
     }
 
     @Override

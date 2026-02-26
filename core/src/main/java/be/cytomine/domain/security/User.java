@@ -21,8 +21,8 @@ import be.cytomine.utils.JsonObject;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -30,9 +30,12 @@ import java.util.UUID;
 
 @Table(name = "sec_user" , uniqueConstraints = @UniqueConstraint(name = "unique_reference" , columnNames = {"reference"}))
 @Entity
-@Getter
-@Setter
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class User extends CytomineDomain {
+    @Id
+    @GeneratedValue
+    Long id;
 
     @NotNull
     @NotBlank

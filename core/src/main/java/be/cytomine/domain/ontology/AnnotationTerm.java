@@ -20,17 +20,20 @@ import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.utils.JsonObject;
-import lombok.Getter;
-import lombok.Setter;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import java.io.Serializable;
 
 @Entity
-@Getter
-@Setter
+@EqualsAndHashCode(callSuper = true)
+@Data
 public class AnnotationTerm extends CytomineDomain implements Serializable {
+    @Id
+    @GeneratedValue
+    Long id;
 
 
     @NotNull

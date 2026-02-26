@@ -22,20 +22,23 @@ import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
-import lombok.Getter;
-import lombok.Setter;
-
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import java.util.Date;
 import java.util.Optional;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
-@Getter
-@Setter
+@Data
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"base_image_id", "project_id" }))
 @DiscriminatorColumn(name = "class")
 @DiscriminatorValue("be.cytomine.domain.image.ImageInstance")
 public class ImageInstance extends CytomineDomain {
+    @Id
+    @GeneratedValue
+    Long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
     private AbstractImage baseImage;

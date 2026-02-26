@@ -16,21 +16,25 @@ package be.cytomine.domain.meta;
 * limitations under the License.
 */
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityManager;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
-
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.GenericCytomineDomainContainer;
 import be.cytomine.utils.JsonObject;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Entity
-@Getter
-@Setter
+@EqualsAndHashCode(callSuper = true)
+@Data
 public class Property extends CytomineDomain {
+    @Id
+    @GeneratedValue
+    Long id;
 
     @NotNull
     @NotBlank

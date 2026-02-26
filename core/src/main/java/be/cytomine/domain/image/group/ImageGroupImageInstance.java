@@ -1,20 +1,19 @@
 package be.cytomine.domain.image.group;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
-import lombok.Getter;
-import lombok.Setter;
-
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.utils.JsonObject;
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Entity
-@Getter
-@Setter
+@EqualsAndHashCode(callSuper = true)
+@Data
 public class ImageGroupImageInstance extends CytomineDomain {
+    @Id
+    @GeneratedValue
+    Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private ImageGroup group;

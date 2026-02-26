@@ -19,19 +19,20 @@ package be.cytomine.domain.processing;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.project.Project;
 import be.cytomine.utils.JsonObject;
-import lombok.Getter;
-import lombok.Setter;
-
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Null;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import java.util.Optional;
 
 @Entity
-@Getter
-@Setter
+@EqualsAndHashCode(callSuper = true)
+@Data
 public class ImageFilterProject extends CytomineDomain {
+    @Id
+    @GeneratedValue
+    Long id;
 
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER)

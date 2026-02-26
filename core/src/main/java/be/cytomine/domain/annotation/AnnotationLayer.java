@@ -1,19 +1,19 @@
 package be.cytomine.domain.annotation;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityManager;
-import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.Setter;
-
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.utils.JsonObject;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-@Setter
-@Getter
 @Entity
+@EqualsAndHashCode(callSuper = true)
+@Data
 public class AnnotationLayer extends CytomineDomain {
+    @Id
+    @GeneratedValue
+    Long id;
 
     @NotBlank
     @Column(unique = true, nullable = false)

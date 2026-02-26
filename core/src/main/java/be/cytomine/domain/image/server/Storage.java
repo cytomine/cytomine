@@ -1,19 +1,21 @@
 package be.cytomine.domain.image.server;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
-
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.security.User;
 import be.cytomine.utils.JsonObject;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
-@Getter
-@Setter
+@Data
 public class Storage extends CytomineDomain {
+    @Id
+    @GeneratedValue
+    Long id;
 
     @NotNull
     @NotBlank

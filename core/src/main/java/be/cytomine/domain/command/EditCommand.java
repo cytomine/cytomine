@@ -23,14 +23,19 @@ import be.cytomine.service.ModelService;
 import be.cytomine.utils.ClassUtils;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
-
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+
 import java.util.HashMap;
 
 @Entity
 @DiscriminatorValue("be.cytomine.domain.command.EditCommand")
 public class EditCommand extends Command {
+    @Id
+    @GeneratedValue
+    Long id;
 
     public EditCommand(User currentUser, Transaction transaction) {
         this.user = currentUser;

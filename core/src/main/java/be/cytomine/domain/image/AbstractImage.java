@@ -21,19 +21,22 @@ import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
-import lombok.Getter;
-import lombok.Setter;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
-@Getter
-@Setter
+@Data
 public class AbstractImage extends CytomineDomain {
+    @Id
+    @GeneratedValue
+    Long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
     private UploadedFile uploadedFile;

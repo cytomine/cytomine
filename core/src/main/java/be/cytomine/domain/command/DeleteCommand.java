@@ -21,19 +21,18 @@ import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.service.ModelService;
 import be.cytomine.utils.CommandResponse;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Transient;
 
 @Getter
 @Setter
 @Entity
 @DiscriminatorValue("be.cytomine.domain.command.DeleteCommand")
 public class DeleteCommand extends Command {
-
+    @Id
+    @GeneratedValue
+    Long id;
 
 
     public DeleteCommand(User currentUser, Transaction transaction) {

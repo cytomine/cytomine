@@ -20,19 +20,22 @@ import be.cytomine.domain.CytomineDomain;
 import be.cytomine.utils.JsonObject;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.proxy.HibernateProxy;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
-import java.util.Objects;
 
 @Entity
-@Getter
-@Setter
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class SecRole extends CytomineDomain implements Serializable {
+    @Id
+    @GeneratedValue
+    Long id;
 
     @NotNull
     @NotBlank
@@ -54,19 +57,5 @@ public class SecRole extends CytomineDomain implements Serializable {
     @Override
     public JsonObject toJsonObject() {
         return getDataFromDomain(this);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        SecRole secRole = (SecRole) o;
-        return Objects.equals(authority, secRole.authority);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), authority);
     }
 }

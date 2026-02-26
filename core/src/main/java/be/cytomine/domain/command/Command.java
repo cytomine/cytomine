@@ -22,18 +22,20 @@ import be.cytomine.domain.security.User;
 import be.cytomine.service.ModelService;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
-import lombok.Getter;
-import lombok.Setter;
-
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
-@Getter
-@Setter
+@Data
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name="class",
         discriminatorType = DiscriminatorType.STRING)
 public abstract class Command extends CytomineDomain {
+    @Id
+    @GeneratedValue
+    Long id;
 
     /**
      * JSON string with relevant field data
@@ -98,7 +100,7 @@ public abstract class Command extends CytomineDomain {
     protected boolean refuseUndo = false;
 
     public String toString() {
-        return this.getClass().getSimpleName() +" "+this.id + "[" + this.created + "]";
+        return this.getClass().getSimpleName() + " " + this.getId() + "[" + this.created + "]";
     }
 
     /**

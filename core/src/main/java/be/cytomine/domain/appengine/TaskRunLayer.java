@@ -1,23 +1,20 @@
 package be.cytomine.domain.appengine;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import lombok.Getter;
-import lombok.Setter;
-
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.annotation.AnnotationLayer;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.utils.JsonObject;
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-@Setter
-@Getter
+@EqualsAndHashCode(callSuper = true)
+@Data
 @Entity
 public class TaskRunLayer extends CytomineDomain {
+    @Id
+    @GeneratedValue
+    Long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "layer_id")
@@ -52,7 +49,7 @@ public class TaskRunLayer extends CytomineDomain {
     @Override
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
         TaskRunLayer taskRunLayer = this;
-        taskRunLayer.id = json.getJSONAttrLong("id", null);
+        taskRunLayer.setId(json.getJSONAttrLong("id", null));
         taskRunLayer.annotationLayer = (AnnotationLayer) json.getJSONAttrDomain(entityManager, "annotationLayer", new AnnotationLayer(), true);
         taskRunLayer.taskRun = (TaskRun) json.getJSONAttrDomain(entityManager, "taskRun", new TaskRun(), true);
         taskRunLayer.image = (ImageInstance) json.getJSONAttrDomain(entityManager, "image", new ImageInstance(), true);

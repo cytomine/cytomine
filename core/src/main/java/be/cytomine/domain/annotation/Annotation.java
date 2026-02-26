@@ -1,24 +1,21 @@
 package be.cytomine.domain.annotation;
 
-import java.sql.Types;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
-import jakarta.persistence.ManyToOne;
-import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.annotations.JdbcTypeCode;
-
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.utils.JsonObject;
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.JdbcTypeCode;
 
-@Setter
-@Getter
+import java.sql.Types;
+
 @Entity
+@EqualsAndHashCode(callSuper = true)
+@Data
 public class Annotation extends CytomineDomain {
+    @Id
+    @GeneratedValue
+    Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "layer_id")

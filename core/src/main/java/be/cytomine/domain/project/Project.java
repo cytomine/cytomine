@@ -19,16 +19,19 @@ package be.cytomine.domain.project;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.utils.JsonObject;
-import lombok.Getter;
-import lombok.Setter;
-
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import java.util.Set;
 
 @Entity
-@Getter
-@Setter
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class Project extends CytomineDomain {
+    @Id
+    @GeneratedValue
+    Long id;
 
     private String name;
 

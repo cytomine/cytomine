@@ -18,12 +18,12 @@ package be.cytomine.domain.ontology;
 
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.utils.JsonObject;
-import lombok.Getter;
-import lombok.Setter;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
@@ -32,10 +32,13 @@ import java.util.stream.Collectors;
 
 import static be.cytomine.domain.ontology.RelationTerm.PARENT;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
-@Getter
-@Setter
+@Data
 public class Term extends CytomineDomain {
+    @Id
+    @GeneratedValue
+    Long id;
 
     @NotNull
     @NotBlank

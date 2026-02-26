@@ -18,17 +18,20 @@ package be.cytomine.domain.ontology;
 
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.utils.JsonObject;
-import lombok.Getter;
-import lombok.Setter;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import java.io.Serializable;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
-@Getter
-@Setter
+@Data
 public class RelationTerm extends CytomineDomain implements Serializable {
+    @Id
+    @GeneratedValue
+    Long id;
 
     public static String PARENT = "parent";
     public static String SYNONYM = "synonyme";

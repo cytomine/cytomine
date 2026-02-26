@@ -21,9 +21,10 @@ import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.service.ModelService;
 import be.cytomine.utils.CommandResponse;
-
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
 
 /**
  * @author Cytomine Team
@@ -33,6 +34,9 @@ import jakarta.persistence.Entity;
 @Entity
 @DiscriminatorValue("be.cytomine.domain.command.AddCommand")
 public class AddCommand extends Command {
+    @Id
+    @GeneratedValue
+    Long id;
 
     public AddCommand(User currentUser) {
         this.user = currentUser;

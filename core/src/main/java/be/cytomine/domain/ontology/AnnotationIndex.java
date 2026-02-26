@@ -19,14 +19,11 @@ package be.cytomine.domain.ontology;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.security.User;
 import be.cytomine.utils.JsonObject;
-import lombok.Getter;
-import lombok.Setter;
-
 import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity
-@Getter
-@Setter
+@Data
 public class AnnotationIndex {
 
     @Id

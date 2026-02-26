@@ -19,17 +19,20 @@ package be.cytomine.domain.ontology;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.utils.JsonObject;
-import lombok.Getter;
-import lombok.Setter;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import java.io.Serializable;
 
 @Entity
-@Getter
-@Setter
+@EqualsAndHashCode(callSuper = true)
+@Data
 public class AnnotationTrack extends CytomineDomain implements Serializable {
+    @Id
+    @GeneratedValue
+    Long id;
 
 
     @NotNull
@@ -38,7 +41,7 @@ public class AnnotationTrack extends CytomineDomain implements Serializable {
     @NotNull
     @Column(name = "annotation_ident")
     private Long annotationIdent;
-    
+
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "track_id", nullable = false)
@@ -48,12 +51,12 @@ public class AnnotationTrack extends CytomineDomain implements Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "slice_id", nullable = false)
     private SliceInstance slice;
-    
+
     public void setAnnotation(AnnotationDomain annotation) {
         annotationClassName = annotation.getClass().getName();
         annotationIdent = annotation.getId();
     }
-    
+
 
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
         AnnotationTrack annotationTrack = this;

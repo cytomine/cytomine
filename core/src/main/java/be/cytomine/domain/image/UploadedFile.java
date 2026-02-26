@@ -22,19 +22,21 @@ import be.cytomine.domain.security.User;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.LTreeType;
 import be.cytomine.utils.LongArrayToBytesConverter;
-import lombok.Getter;
-import lombok.Setter;
-
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.Type;
 
 import java.io.Serializable;
 import java.util.Set;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
-@Getter
-@Setter
+@Data
 public class UploadedFile extends CytomineDomain implements Serializable {
+    @Id
+    @GeneratedValue
+    Long id;
 
     public static Set<String> ARCHIVE_FORMATS = Set.of("ZIP", "TAR", "GZTAR", "BZTAR", "XZTAR");
 

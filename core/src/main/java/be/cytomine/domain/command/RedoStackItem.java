@@ -1,17 +1,19 @@
 package be.cytomine.domain.command;
 
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.security.User;
 import be.cytomine.utils.JsonObject;
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode(callSuper = true)
+@Data
 @Entity
-@Getter
-@Setter
 public class RedoStackItem extends CytomineDomain {
+    @Id
+    @GeneratedValue
+    Long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "command_id", nullable = false)
@@ -26,7 +28,8 @@ public class RedoStackItem extends CytomineDomain {
     @JoinColumn(name = "transaction_id", nullable = true)
     protected Transaction transaction;
 
-    public RedoStackItem() { }
+    public RedoStackItem() {
+    }
 
     public RedoStackItem(UndoStackItem firstUndoStack) {
         this.command = firstUndoStack.getCommand();

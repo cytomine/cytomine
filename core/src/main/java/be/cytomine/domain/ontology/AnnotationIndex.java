@@ -16,6 +16,7 @@ package be.cytomine.domain.ontology;
 * limitations under the License.
 */
 
+import be.cytomine.config.CustomId;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.security.User;
 import be.cytomine.utils.JsonObject;
@@ -30,7 +31,7 @@ import jakarta.persistence.*;
 public class AnnotationIndex {
 
     @Id
-    @GeneratedValue(generator = "myGenerator")
+    @CustomId
     Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

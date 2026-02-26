@@ -18,7 +18,6 @@ package be.cytomine.domain;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
-import be.cytomine.config.CustomIdentifierGenerator;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.PostGisTestConfiguration;
 import be.cytomine.domain.ontology.Ontology;
@@ -101,9 +100,4 @@ public class CytomineDomainTests {
         assertThat(retrieved.getId()).isEqualTo(preassignedId);
     }
 
-    @Test
-    void custom_identifier_generator_allows_assigned_identifiers() {
-        CustomIdentifierGenerator generator = new CustomIdentifierGenerator();
-        assertThat(generator.allowAssignedIdentifiers()).isTrue();
-    }
 }

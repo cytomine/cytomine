@@ -43,6 +43,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-restclient'
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
@@ -99,7 +100,7 @@ dependencies {
 
     // Gateway
     // See https://spring.io/projects/spring-cloud for compatibility matrix with Spring Boot
-    implementation 'org.springframework.cloud:spring-cloud-gateway-mvc:4.0.9'
+    implementation 'org.springframework.cloud:spring-cloud-gateway-mvc:4.3.0'
 
     // JSON tokens
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
@@ -125,7 +126,7 @@ dependencies {
     implementation 'org.apache.poi:poi:5.2.3'
 
     // Keycloak admin SDK
-    implementation group: 'org.keycloak', name: 'keycloak-admin-client', version: '24.0.2'
+    implementation group: 'org.keycloak', name: 'keycloak-admin-client', version: '26.0.5'
 
     // OAuth2 Server resource & client
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'

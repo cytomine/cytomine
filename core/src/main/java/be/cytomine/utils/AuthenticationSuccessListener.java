@@ -1,14 +1,18 @@
 package be.cytomine.utils;
 
+import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.SecRole;
 import be.cytomine.domain.security.SecUserSecRole;
 import be.cytomine.domain.security.User;
+import be.cytomine.repository.project.ProjectRepository;
 import be.cytomine.repository.security.SecRoleRepository;
 import be.cytomine.repository.security.SecUserSecRoleRepository;
 import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.image.server.StorageService;
+import be.cytomine.service.project.ProjectMemberService;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
@@ -16,7 +20,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-
+@Slf4j
 @Component
 public class AuthenticationSuccessListener implements ApplicationListener<AuthenticationSuccessEvent> {
 
@@ -38,6 +42,12 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
     @Autowired
     private CurrentRoleService currentRoleService;
 
+    @Autowired
+    private ProjectRepository projectRepository;
+
+    @Autowired
+    private ProjectMemberService projectMemberService;
+
     @Override
     public void onApplicationEvent(AuthenticationSuccessEvent event) {
 
@@ -51,6 +61,8 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
         Set<String> rolesFromAuthentication =
             extractRolesFromAuthentication(jwtAuthenticationToken);
         Map<String, Object> tokenAttributes = jwtAuthenticationToken.getTokenAttributes();
+        List<String> projects = (List<String>) tokenAttributes.getOrDefault("projects", Collections.emptyList());
+        log.info("PROJECTS : {}", projects);
         UUID sub = UUID.fromString(tokenAttributes.get("sub").toString());
         Optional<User> userByReference = userRepository.findByReference(sub.toString());
         Optional<User> userByUsername = userRepository.findByUsername(jwtAuthenticationToken.getName());
@@ -60,6 +72,7 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
             userRepository.save(user);
 
             self.updateRolesAndAdminSession(jwtAuthenticationToken, user, rolesFromAuthentication);
+            self.updateProjectsMembership(projects, user);
 
         } else if (userByReference.isEmpty()) {
 
@@ -75,15 +88,17 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
             self.setCumulativeRole(rolesFromAuthentication, savedUser);
             storageService.initUserStorage(savedUser);
 
+            self.updateProjectsMembership(projects, savedUser);
+
             savedUser = userRepository.findByReference(sub.toString()).orElse(null);
             if (currentRoleService.hasCurrentUserAdminRole(savedUser)) {
                 currentRoleService.activeAdminSession(savedUser, jwtAuthenticationToken);
             }
 
-
         } else {
             User user = userByReference.get();
             self.updateRolesAndAdminSession(jwtAuthenticationToken, user, rolesFromAuthentication);
+            self.updateProjectsMembership(projects, user);
         }
     }
 
@@ -104,6 +119,36 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
                 currentRoleService.activeAdminSession(user, jwtAuthenticationToken);
             }
         }
+    }
+
+    @Transactional
+    protected void updateProjectsMembership(List<String> projects, User user) {
+        if (!isExternal(user)) {
+            return; // do nothing if user is local
+        }
+        // get list of matching projects
+        List<Project> permittedUserProjects = projectRepository.findByNameIn(projects);
+        // get the list of projects of the user
+        List<Project> actualUserProjects = projectRepository.findAllProjectForUser(user.getUsername());
+        // if project permitted but not in user actual projects add user to project as contributor if user is external, otherwise do nothing
+        List<Project> projectsToAdd = permittedUserProjects.stream()
+            .filter(p -> !actualUserProjects.contains(p))
+            .toList();
+        for (Project project : projectsToAdd) {
+            projectMemberService.addUserToProjectWithAdmin(user, project, false);
+        }
+        // if project is in actual projects but not in permitted projects remove user from project if user is external, otherwise do nothing
+        List<Project> projectsToRemove = actualUserProjects.stream()
+            .filter(p -> !permittedUserProjects.contains(p))
+            .toList();
+
+        for (Project project : projectsToRemove) {
+            projectMemberService.deleteUserFromProjectWithAdmin(user, project, false);
+        }
+    }
+
+    private boolean isExternal(User user) {
+        return user.getUsername().endsWith("@lifescience-ri.eu");
     }
 
     @Transactional

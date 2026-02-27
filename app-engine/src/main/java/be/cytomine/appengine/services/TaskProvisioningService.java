@@ -1330,12 +1330,12 @@ public class TaskProvisioningService {
     }
 
     private StateAction updateToFinished(Run run) throws ProvisioningException, FileStorageException {
-        // check the status of Run it should be Queueing
         log.info("Provisioning: processing outputs...");
         if (!run.getState().equals(TaskRunState.QUEUING)) {
             AppEngineError error = ErrorBuilder.build(ErrorCode.INTERNAL_INVALID_TASK_RUN_STATE);
             throw new ProvisioningException(error);
         }
+
         // list all outputs of the task
         Set<Parameter> outputs = run
             .getTask()
@@ -1358,7 +1358,6 @@ public class TaskProvisioningService {
                 }
             }
 
-            // validate files
             log.info("Provisioning: validating output files...");
             try {
                 validateFiles(run, parameter, provisionFileData);
@@ -1369,13 +1368,11 @@ public class TaskProvisioningService {
                 multipleErrors.add(error);
                 continue;
             }
-            // store in the database
+
             log.info("Provisioning: storing output in database...");
             saveOutput(run, parameter, provisionFileData);
 
-            // calculate CRC32 for all storage data entry and save it in the database
-            log.info("Provisioning: calculating CRC32 checksum for zip entry {}",
-                parameter.getName());
+            log.info("Provisioning: calculating CRC32 checksum for zip entry {}", parameter.getName());
             for (StorageDataEntry current : provisionFileData.getEntryList()) {
                 try {
                     setChecksumCRC32(

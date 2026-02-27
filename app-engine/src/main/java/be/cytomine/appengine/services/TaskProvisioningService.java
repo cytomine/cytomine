@@ -1272,7 +1272,7 @@ public class TaskProvisioningService {
         List<Match> matches = run.getTask()
                 .getMatches()
                 .stream()
-                .filter(match ->match.getCheckTime().equals(CheckTime.AFTER_EXECUTION))
+                .filter(match -> match.getCheckTime().equals(CheckTime.AFTER_EXECUTION))
                 .toList();
 
         for (Match match : matches) {

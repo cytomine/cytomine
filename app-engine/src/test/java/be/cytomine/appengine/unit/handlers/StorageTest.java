@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -42,8 +43,7 @@ public class StorageTest {
         yamlFactory.setResources(new ClassPathResource("application.yml"));
         Properties properties = yamlFactory.getObject();
         assert properties != null;
-        String property = properties.getProperty("storage.base-path");
-        basePath = property;
+        basePath = properties.getProperty("storage.base-path");
         storageHandler = new FileSystemStorageHandler(basePath);
     }
 
@@ -221,37 +221,44 @@ public class StorageTest {
     @Test
     @DisplayName("Testing readStorageData with nested directory structure")
     public void testReadStorageDataWithNestedDirectoryStructure() throws FileStorageException {
-        Storage dir = new Storage("nuclei");
-        storageHandler.createStorage(dir);
+        Storage storage = new Storage(UUID.randomUUID().toString());
+        storageHandler.createStorage(storage);
 
         String arrayYmlContent = "size: 1";
         byte[] arrayYmlBytes = arrayYmlContent.getBytes(StandardCharsets.UTF_8);
         File arrayYmlFile = FileHelper.write("array.yml", arrayYmlBytes);
         StorageDataEntry arrayYmlEntry = new StorageDataEntry(
                 arrayYmlFile,
-                "array.yml",
+                "nuclei/array.yml",
                 StorageDataType.FILE
         );
 
         String expectedValue = "{\"type\":\"Polygon\",\"coordinates\":[[[0,0],[0,1],[1,1],[1,0],[0,0]]]}";
         File subDirFile = FileHelper.write("0", expectedValue.getBytes(StandardCharsets.UTF_8));
-        StorageDataEntry subDirFileEntry = new StorageDataEntry(subDirFile, "0/0", StorageDataType.FILE);
+        StorageDataEntry subDirFileEntry = new StorageDataEntry(subDirFile, "nuclei/0/0", StorageDataType.FILE);
 
         String subArrayYmlContent = "size: 1";
         byte[] subArrayYmlBytes = subArrayYmlContent.getBytes(StandardCharsets.UTF_8);
         File subArrayYmlFile = FileHelper.write("array.yml", subArrayYmlBytes);
-        StorageDataEntry subArrayYmlEntry = new StorageDataEntry(subArrayYmlFile, "0/array.yml", StorageDataType.FILE);
+        StorageDataEntry subArrayYmlEntry = new StorageDataEntry(subArrayYmlFile, "nuclei/0/array.yml", StorageDataType.FILE);
 
         StorageData nestedDirectory = new StorageData();
         nestedDirectory.add(arrayYmlEntry);
         nestedDirectory.add(subDirFileEntry);
         nestedDirectory.add(subArrayYmlEntry);
 
-        storageHandler.saveStorageData(dir, nestedDirectory);
+        storageHandler.saveStorageData(storage, nestedDirectory);
 
-
-        StorageData emptyFile = new StorageData("nuclei/0/0", dir.getIdStorage());
+        StorageData emptyFile = new StorageData("nuclei", storage.getIdStorage());
         storageHandler.readStorageData(emptyFile);
+
+        List<String> expectedNames = List.of("nuclei", "nuclei/array.yml", "nuclei/0", "nuclei/0/array.yml", "nuclei/0/0");
+        for (StorageDataEntry entry : emptyFile.getEntryList()) {
+            Assertions.assertTrue(
+                    expectedNames.contains(entry.getName()),
+                    "Unexpected entry name: " + entry.getName()
+            );
+        }
     }
 
     @Test
@@ -286,8 +293,6 @@ public class StorageTest {
     public void shouldThrowExceptionWhenDeletingNonExistentStorage() {
         Storage nonExistentStorage = new Storage("nonexistent");
 
-        Assertions.assertThrows(FileStorageException.class, () -> {
-            storageHandler.deleteStorage(nonExistentStorage);
-        });
+        Assertions.assertThrows(FileStorageException.class, () -> storageHandler.deleteStorage(nonExistentStorage));
     }
 }

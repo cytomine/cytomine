@@ -296,7 +296,7 @@ public class CollectionType extends Type {
 
     @Override
     public void validate(Object valueObject) throws TypeValidationException {
-        if (Objects.isNull(valueObject)) {
+        if (valueObject == null) {
             return;
         }
 
@@ -345,11 +345,9 @@ public class CollectionType extends Type {
                 validatePrimitiveCollectionItem(valueObject);
             }
         }
-
     }
 
-    private void validatePrimitiveCollectionItem(Object valueObject)
-        throws TypeValidationException {
+    private void validatePrimitiveCollectionItem(Object valueObject) throws TypeValidationException {
         Type currentType = new CollectionType(this);
         while (currentType instanceof CollectionType collectionType) {
             currentType = collectionType.getSubType();
@@ -373,67 +371,51 @@ public class CollectionType extends Type {
         validateNode(value);
     }
 
-    @SuppressWarnings("unchecked")
-    public void validateNode(Object obj)
-        throws TypeValidationException {
-        if (Objects.isNull(trackingType)) {
+    public void validateNode(Object obj) throws TypeValidationException {
+        if (trackingType == null) {
             trackingType = new CollectionType(this);
             parentType = trackingType;
-        } else {
-            if (trackingType instanceof CollectionType) {
-                parentType = trackingType;
-                trackingType = ((CollectionType) trackingType).getSubType();
-            }
+        } else if (trackingType instanceof CollectionType) {
+            parentType = trackingType;
+            trackingType = ((CollectionType) trackingType).getSubType();
         }
-        if (trackingType instanceof CollectionType && !(obj instanceof List<?>)) {
-            throw new TypeValidationException(ErrorCode.INTERNAL_INVALID_COLLECTION_DIMENSIONS);
-        }
-        if (obj instanceof List<?>) {
-            List<?> list = (List<?>) obj;
-            assert trackingType instanceof CollectionType;
-            CollectionType currentType = (CollectionType) trackingType;
-            if (Objects.nonNull(currentType.getMinSize()) && Objects.nonNull(currentType.getMaxSize())) {
-                if (list.size() < currentType.getMinSize() || list.size() > currentType.getMaxSize()) {
-                    throw new TypeValidationException(ErrorCode.INTERNAL_INVALID_COLLECTION_DIMENSIONS);
-                }
+
+        if (obj instanceof List<?> elements && trackingType instanceof CollectionType currentType) {
+            Integer minSize = currentType.getMinSize();
+            Integer maxSize = currentType.getMaxSize();
+
+            if (minSize != null && maxSize != null && (elements.size() < minSize || elements.size() > maxSize)) {
+                throw new TypeValidationException(ErrorCode.INTERNAL_INVALID_COLLECTION_DIMENSIONS);
             }
-            for (Object o : list) {
+
+            for (Object o : elements) {
                 validateNode(o);
             }
-        } else {
-            Map<String, Object> map = null;
-            if (obj instanceof Map) {
-                map = (LinkedHashMap<String, Object>) obj;
-            }
-            assert map != null;
-            if (!(trackingType instanceof CollectionType) && map.get("value") instanceof List<?>) {
+        } else if (obj instanceof Map<?, ?> map) {
+            Object value = map.get("value");
+
+            if (!(trackingType instanceof CollectionType) && value instanceof List<?>) {
                 throw new TypeValidationException(ErrorCode.INTERNAL_WRONG_PROVISION_STRUCTURE);
             }
-            if (map.get("value") instanceof List<?>) {
-                if (trackingType instanceof CollectionType) {
-                    parentType = trackingType;
-                    trackingType = ((CollectionType) trackingType).getSubType();
-                }
-                List<?> list = (List<?>) map.get("value");
+
+            if (value instanceof List<?> elements) {
                 CollectionType currentType = (CollectionType) trackingType;
-                if (list.size() < currentType.getMinSize() || list.size() > currentType.getMaxSize()) {
+                if (elements.size() < currentType.getMinSize() || elements.size() > currentType.getMaxSize()) {
                     throw new TypeValidationException(ErrorCode.INTERNAL_INVALID_COLLECTION_DIMENSIONS);
                 }
-                for (Object o : list) {
+                for (Object o : elements) {
                     validateNode(o);
                 }
                 trackingType = parentType;
             }
 
-            // validate subtype
-            if (map.get("value") != null) {
-                trackingType.validate(map.get("value"));
-                referenced = map.get("value") instanceof String
+            if (value != null) {
+                trackingType.validate(value);
+                referenced = value instanceof String
                         && (trackingType instanceof FileType
                         || trackingType instanceof ImageType);
                 trackingType = parentType;
             }
-
         }
     }
 

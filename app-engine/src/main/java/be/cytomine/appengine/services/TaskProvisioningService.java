@@ -874,29 +874,6 @@ public class TaskProvisioningService {
         log.info("Posting Outputs Archive: validated finished...");
     }
 
-    private void storeOutputInFileStorage(
-        Run run,
-        StorageData outputFileData,
-        String name
-    ) throws ProvisioningException {
-        log.info("Posting Outputs Archive: storing in file storage...");
-        Storage outputsStorage = new Storage("task-run-outputs-" + run.getId());
-        try {
-            fileStorageHandler.saveStorageData(outputsStorage, outputFileData);
-        } catch (FileStorageException e) {
-            run.setState(TaskRunState.FAILED);
-            runRepository.saveAndFlush(run);
-            log.info("Posting Outputs Archive: updated Run state to FAILED");
-            AppEngineError error = ErrorBuilder.buildParamRelatedError(
-                ErrorCode.STORAGE_STORING_INPUT_FAILED,
-                name,
-                e.getMessage()
-            );
-            throw new ProvisioningException(error);
-        }
-        log.info("Posting Outputs Archive: stored");
-    }
-
     private void saveOutput(Run run, Parameter currentOutput, StorageData outputValue)
         throws ProvisioningException {
         log.info("Posting Outputs Archive: saving...");
@@ -1352,8 +1329,7 @@ public class TaskProvisioningService {
         return createStateAction(run, TaskRunState.PROVISIONED);
     }
 
-    private StateAction updateToFinished(Run run)
-        throws ProvisioningException, FileStorageException {
+    private StateAction updateToFinished(Run run) throws ProvisioningException, FileStorageException {
         // check the status of Run it should be Queueing
         log.info("Provisioning: processing outputs...");
         if (!run.getState().equals(TaskRunState.QUEUING)) {
@@ -1375,14 +1351,11 @@ public class TaskProvisioningService {
             );
             if (provisionFileData == null || provisionFileData.getEntryList().isEmpty()) {
                 if (!parameter.isOptional()) {
-                    AppEngineError error = ErrorBuilder.build(
-                        ErrorCode.INTERNAL_MISSING_OUTPUT_FILE_FOR_PARAMETER
-                    );
+                    AppEngineError error = ErrorBuilder.build(ErrorCode.INTERNAL_MISSING_OUTPUT_FILE_FOR_PARAMETER);
                     throw new ProvisioningException(error);
                 } else {
                     continue; // ignore processing missing optional parameter
                 }
-
             }
 
             // validate files
@@ -1390,10 +1363,7 @@ public class TaskProvisioningService {
             try {
                 validateFiles(run, parameter, provisionFileData);
             } catch (TypeValidationException e) {
-                log.info(
-                    "Provisioning: "
-                    + "output provision is invalid value validation failed"
-                );
+                log.info("Provisioning: output provision is invalid value validation failed");
                 ParameterError parameterError = new ParameterError(parameter.getName());
                 AppEngineError error = ErrorBuilder.build(e.getErrorCode(), parameterError);
                 multipleErrors.add(error);
@@ -1416,12 +1386,10 @@ public class TaskProvisioningService {
                     throw new ProvisioningException(error);
                 }
             }
-
         }
 
         multipleErrors.addAll(checkAfterExecutionMatches(run));
 
-        // throw multiple errors if exist
         if (!multipleErrors.isEmpty()) {
             log.info("Provisioning: state updated to FAILED");
             run.setState(TaskRunState.FAILED);

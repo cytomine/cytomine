@@ -87,10 +87,10 @@ import be.cytomine.appengine.utils.FileHelper;
 @NoArgsConstructor
 public class CollectionType extends Type {
 
-    @Column(nullable = true)
+    @Column
     private Integer minSize;
 
-    @Column(nullable = true)
+    @Column
     private Integer maxSize;
 
     @OneToOne(cascade = CascadeType.ALL, optional = false)

@@ -868,8 +868,7 @@ public class TaskProvisioningService {
         Parameter currentOutput,
         StorageData currentOutputStorageData
     ) throws TypeValidationException {
-        log.info("Posting Outputs Archive: "
-            + "validating files and directories contents and structure...");
+        log.info("Posting Outputs Archive: validating files and directories contents and structure...");
         currentOutput.getType().validateFiles(run, currentOutput, currentOutputStorageData);
         log.info("Posting Outputs Archive: validated finished...");
     }
@@ -1362,7 +1361,7 @@ public class TaskProvisioningService {
             try {
                 validateFiles(run, parameter, provisionFileData);
             } catch (TypeValidationException e) {
-                log.info("Provisioning: output provision is invalid value validation failed");
+                log.info("Provisioning: output provision is invalid value validation failed: " + e.getMessage());
                 ParameterError parameterError = new ParameterError(parameter.getName());
                 AppEngineError error = ErrorBuilder.build(e.getErrorCode(), parameterError);
                 multipleErrors.add(error);

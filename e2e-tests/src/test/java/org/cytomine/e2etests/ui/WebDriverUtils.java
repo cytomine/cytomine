@@ -15,35 +15,47 @@ public class WebDriverUtils {
 
     void byClick(Wait<WebDriver> wait, By by) {
         byIsDisplayed(wait, by);
-        wait.until(d -> {
-            d.findElement(by)
-                    .click();
-            return true;
-        });
+        wait.until(
+                d -> {
+                    d.findElement(by)
+                            .click();
+                    return true;
+                });
     }
 
     void bySendKeys(Wait<WebDriver> wait, By by, String keys) {
         byIsDisplayed(wait, by);
-        wait.until(d -> {
-            d.findElement(by)
-                    .sendKeys(keys);
-            return true;
-        });
+        wait.until(
+                d -> {
+                    d.findElement(by)
+                            .sendKeys(keys);
+                    return true;
+                });
     }
 
     void goTo(Wait<WebDriver> wait, String url) {
-        wait.until(d -> {
-            d.get(url);
-            return true;
-        });
+        wait.until(
+                d -> {
+                    d.get(url);
+                    return true;
+                });
     }
 
     @SneakyThrows
-    void byIsDisplayed(Wait<WebDriver> wait, By by) {
-        wait.until(d -> d.findElement(by)
-                .isDisplayed()
-        );
+    boolean byIsDisplayed(Wait<WebDriver> wait, By by) {
         Thread.sleep(500);
+        waitLoading(wait);
+        wait.until(d -> d.findElement(by)
+                .isDisplayed());
+        return true;
     }
 
+    @SneakyThrows
+    void waitLoading(Wait<WebDriver> wait) {
+        wait.until(
+                d -> {
+                    var loadingOverlays = d.findElements(By.cssSelector(".loading-overlay.is-active"));
+                    return loadingOverlays.isEmpty();
+                });
+    }
 }

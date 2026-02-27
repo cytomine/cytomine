@@ -210,7 +210,6 @@ public class CollectionType extends Type {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void validateFiles(
         Run run,
         Parameter currentOutput,

@@ -161,23 +161,17 @@ public class FileSystemStorageHandler implements StorageHandler {
             Files.walk(filePath).forEach(path -> {
                 StorageDataEntry entry = new StorageDataEntry();
                 entry.setStorageId(current.getStorageId());
+                String subTreeFileName = getSubTreeFilename(current.getStorageId(), path.toString());
+                entry.setName(subTreeFileName);
 
                 if (Files.isRegularFile(path) || Files.isSymbolicLink(path)) {
                     entry.setStorageDataType(StorageDataType.FILE);
                     entry.setData(path.toFile());
-                    String subTreeFileName = getSubTreeFilename(current.getStorageId(), path.toString());
-                    if (!subTreeFileName.equalsIgnoreCase(filename)) {
-                        entry.setName(subTreeFileName);
-                    }
-                }
-
-                if (Files.isDirectory(path)) {
+                    emptyFile.getEntryList().add(entry);
+                } else if (Files.isDirectory(path)) {
                     entry.setStorageDataType(StorageDataType.DIRECTORY);
-                    String subTreeFileName = getSubTreeFilename(current.getStorageId(), path.toString());
-                    entry.setName(subTreeFileName);
+                    emptyFile.getEntryList().add(entry);
                 }
-
-                emptyFile.getEntryList().add(entry);
             });
 
             return emptyFile;

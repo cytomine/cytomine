@@ -232,10 +232,8 @@ public class CollectionType extends Type {
         Map<String, Object> lists = new LinkedHashMap<>();
         for (StorageDataEntry entry : currentOutputStorageData.getEntryList()) {
             String entryName = entry.getName();
-            if (entryName.endsWith("/")) { // when it is a directory
-                boolean relatedToOutputParameter = entryName.startsWith(currentOutput.getName() + "/");
-                boolean isOutputParameterMainDirectory = entryName.equals(currentOutput.getName() + "/");
-                if (relatedToOutputParameter && isOutputParameterMainDirectory) {
+            if (entry.getStorageDataType() == StorageDataType.DIRECTORY) {
+                if (entryName.equals(currentOutput.getName() + "/")) {
                     List<Object> nestedItems = new ArrayList<>();
                     lists.put(entryName, nestedItems);
                 }

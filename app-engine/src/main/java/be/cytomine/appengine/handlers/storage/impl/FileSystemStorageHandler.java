@@ -9,7 +9,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Comparator;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -71,19 +70,6 @@ public class FileSystemStorageHandler implements StorageHandler {
                 createStorage(modifiedStorage);
             }
         }
-    }
-
-    private static String getIdentifier(String storageId) {
-        String identifier = "";
-        if (storageId.startsWith("task-") && storageId.endsWith("-def")) { // task storage
-            identifier = storageId.replace("task-", "");
-            identifier = identifier.replace("-def", "");
-        } else if (storageId.startsWith("task-run-inputs-")) { // inputs
-            identifier = storageId.replace("task-run-inputs-", "");
-        } else if (storageId.startsWith("task-run-outputs-")) { // outputs
-            identifier = storageId.replace("task-run-outputs-", "");
-        }
-        return identifier;
     }
 
     @Override

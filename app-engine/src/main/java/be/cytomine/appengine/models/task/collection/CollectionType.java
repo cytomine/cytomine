@@ -1010,8 +1010,7 @@ public class CollectionType extends Type {
 
     @Transactional
     @Override
-    public void persistResult(Run run, Parameter currentOutput, StorageData outputValue)
-        throws ProvisioningException {
+    public void persistResult(Run run, Parameter currentOutput, StorageData outputValue) throws ProvisioningException {
         CollectionPersistenceRepository collectionPersistenceRepository =
             AppEngineApplicationContext.getBean(CollectionPersistenceRepository.class);
         CollectionPersistence result = null;
@@ -1025,15 +1024,14 @@ public class CollectionType extends Type {
         Map<String, TypePersistence> parameterNameToTypePersistence = new LinkedHashMap<>();
         outputValue.sortShallowToDeep();
         for (StorageDataEntry entry : outputValue.getEntryList()) {
-            if (entry.getStorageDataType().equals(StorageDataType.DIRECTORY)) { // our code contains some directory logic
-                if (entry.getName().equals(currentOutput.getName() + "/")) { // the main collection directory
+            if (entry.getStorageDataType() == StorageDataType.DIRECTORY) {
+                if (entry.getName().equals(currentOutput.getName())) { // the main collection directory
                     result = new CollectionPersistence();
                     result.setValueType(ValueType.ARRAY);
                     result.setParameterType(ParameterType.OUTPUT);
                     result.setParameterName(currentOutput.getName());
                     result.setRunId(run.getId());
-                    List<TypePersistence> items = new ArrayList<>();
-                    result.setItems(items);
+                    result.setItems(new ArrayList<>());
                     parameterNameToTypePersistence.put(entry.getName(), result);
                 } else { // any directory below main is a subCollection
 
@@ -1048,37 +1046,33 @@ public class CollectionType extends Type {
                         storage -> storage.getName()
                             .equalsIgnoreCase(entry.getName() + "array.yml"));
 
+                    String parentName = entry.getName().substring(0, entry.getName().lastIndexOf("/"));
                     if (containsArrayYml) {
                         CollectionPersistence subCollection = new CollectionPersistence();
                         subCollection.setParameterName(String.join("", nameParts));
                         subCollection.setCollectionIndex(Arrays.stream(nameParts, 1, nameParts.length).collect(
                             Collectors.joining()));
-                        String parentName = entry.getName().substring(0, entry.getName().lastIndexOf("/") + 1);
+
                         // prepare list for sub items
-                        List<TypePersistence> items = new ArrayList<>();
-                        subCollection.setItems(items);
+                        subCollection.setItems(new ArrayList<>());
                         parameterNameToTypePersistence.put(entry.getName(), subCollection);
                         // add this collection to parent collection
                         CollectionPersistence parentPersistence = (CollectionPersistence) parameterNameToTypePersistence.get(parentName);
                         parentPersistence.getItems().add(subCollection);
                     } else {
-
-                        String parentName = entry.getName().substring(0, entry.getName().lastIndexOf("/") + 1);
                         DirectoryPersistence directory = new DirectoryPersistence();
                         directory.setParameterName(String.join("", nameParts));
-                        List<TypePersistence> items = new ArrayList<>();
-                        directory.setItems(items);
+                        directory.setItems(new ArrayList<>());
                         parameterNameToTypePersistence.put(entry.getName(), directory);
                         // add this directory to the parent collection
                         CollectionPersistence parentPersistence = (CollectionPersistence) parameterNameToTypePersistence.get(parentName);
                         parentPersistence.getItems().add(directory);
-
                     }
-
                 }
             }
+
             if (entry.getStorageDataType().equals(StorageDataType.FILE)) {
-                String parentName = entry.getName().substring(0, entry.getName().lastIndexOf("/") + 1);
+                String parentName = entry.getName().substring(0, entry.getName().lastIndexOf("/"));
                 if (entry.getName().endsWith("array.yml")) {
                     CollectionPersistence parentPersistence = (CollectionPersistence) parameterNameToTypePersistence.get(parentName);
                     parentPersistence.setSize(getCollectionSize(entry));
@@ -1250,7 +1244,6 @@ public class CollectionType extends Type {
             }
         }
 
-        assert result != null;
         collectionPersistenceRepository.save(result);
     }
 

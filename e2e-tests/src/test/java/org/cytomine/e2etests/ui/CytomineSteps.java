@@ -84,8 +84,7 @@ public class CytomineSteps {
             copiedFile.toString(), false);
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Start upload')]");
         webDriverUtils.byIsDisplayed(wait, By.xpath(
-            "//div[contains(@class, 'storage-list')]//td[contains(text(), '" + imageName
-            + "')]/ancestor::tr//span[@data-status='success']"));
+            "//td[contains(text(), '" + imageName + "')]/ancestor::tr//span[@data-status='success']"));
         return imageName;
     }
 
@@ -102,12 +101,12 @@ public class CytomineSteps {
                             String imageName) {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/storage");
         webDriverUtils.byIsDisplayed(wait, By.xpath(
-            "//div[contains(@class, 'storage-list')]//td[contains(text(), '" + imageName + "')]"));
-        webDriverUtils.xpathClick(wait, "//div[contains(@class, 'storage-list')]//td[contains(text(), '"
-            + imageName + "')]/ancestor::tr//button[contains(text(), 'Delete')]");
+            "//td[contains(text(), '" + imageName + "')]/ancestor::tr//span[@data-status='success']"));
+        webDriverUtils.xpathClick(wait, "//td[contains(text(), '" + imageName
+            + "')]/ancestor::tr//button[contains(text(), 'Delete')]");
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Confirm')]");
         webDriverUtils.waitUntilByEmpty(wait, By.xpath(
-            "//div[contains(@class, 'storage-list')]//td[contains(text(), '" + imageName + "')]"));
+            "//td[contains(text(), '" + imageName + "')]"));
     }
 
 }

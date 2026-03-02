@@ -13,7 +13,7 @@
  limitations under the License.-->
 
 <template>
-  <div class="panel storage-list">
+  <div class="panel">
     <p class="panel-heading">
       {{ $t('storage') }}
     </p>

@@ -100,6 +100,7 @@ public class CytomineSteps {
     public void deleteImage(Wait<WebDriver> wait, URL cytomineUrl,
                             String imageName) {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/storage");
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//td[contains(text(), '" + imageName + "')]"));
         webDriverUtils.xpathClick(wait, "//td[contains(text(), '" + imageName
                                             + "')]/ancestor::tr//button[contains(text(), "
                                             + "'Delete')]");

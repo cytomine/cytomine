@@ -1072,7 +1072,7 @@ public class CollectionType extends Type {
                 yield p;
             }
 
-          default ->  throw new ProvisioningException("unknown leaf type: " + leafType);
+            default ->  throw new ProvisioningException("unknown leaf type: " + leafType);
         };
     }
 

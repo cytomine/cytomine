@@ -3,7 +3,6 @@ package org.cytomine.e2etests.ui;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -73,11 +72,12 @@ public class CytomineSteps {
     public String addImage(Wait<WebDriver> wait, URL cytomineUrl,
                            Optional<String> maybeProjectName) {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/storage");
-        String originalPath = getClass().getClassLoader().getResource("cat.png").getPath();
         String imageName = "selenium-" + UUID.randomUUID() + ".png";
-        Path originalFile = Paths.get(originalPath);
-        Path copiedFile = originalFile.resolveSibling(imageName);
-        Files.copy(originalFile, copiedFile);
+        Path tempDir = Files.createTempDirectory("selenium-upload");
+        Path copiedFile = tempDir.resolve(imageName);
+        try (var in = getClass().getClassLoader().getResourceAsStream("cat.png")) {
+            Files.copy(in, copiedFile);
+        }
         maybeProjectName.ifPresent(projectName -> selectProject(wait, projectName));
 
         webDriverUtils.bySendKeysWait(wait, By.cssSelector("input[type='file']"),

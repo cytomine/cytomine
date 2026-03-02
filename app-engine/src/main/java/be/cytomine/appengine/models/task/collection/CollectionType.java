@@ -1032,6 +1032,8 @@ public class CollectionType extends Type {
 
         List<StorageDataEntry> entries = outputValue.getEntryList();
         for (StorageDataEntry entry : entries.subList(1, entries.size())) {
+            String parentName = entry.getName().substring(0, entry.getName().lastIndexOf("/"));
+
             if (entry.getStorageDataType() == StorageDataType.DIRECTORY) {
                 String[] nameParts = entry.getName().trim().split("/");
                 for (int i = 0; i < nameParts.length; i++) {
@@ -1044,7 +1046,6 @@ public class CollectionType extends Type {
                     storage -> storage.getName()
                         .equalsIgnoreCase(entry.getName() + "array.yml"));
 
-                String parentName = entry.getName().substring(0, entry.getName().lastIndexOf("/"));
                 CollectionPersistence parentPersistence = (CollectionPersistence) parameterNameToTypePersistence.get(parentName);
                 if (containsArrayYml) {
                     CollectionPersistence subCollection = new CollectionPersistence();
@@ -1064,7 +1065,6 @@ public class CollectionType extends Type {
             }
 
             if (entry.getStorageDataType().equals(StorageDataType.FILE)) {
-                String parentName = entry.getName().substring(0, entry.getName().lastIndexOf("/"));
                 if (entry.getName().endsWith("array.yml")) {
                     CollectionPersistence parentPersistence = (CollectionPersistence) parameterNameToTypePersistence.get(parentName);
                     parentPersistence.setSize(getCollectionSize(entry));

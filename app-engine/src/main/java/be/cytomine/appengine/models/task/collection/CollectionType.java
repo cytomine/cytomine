@@ -450,7 +450,6 @@ public class CollectionType extends Type {
                         persistedProvision.setParameterName(indexes[i]);
                         persistedProvision.setValueType(ValueType.ARRAY);
                         persistedProvision.setProvisioned(true);
-                        persistedProvision.setItems(new ArrayList<>());
                         persistedProvision = collectionRepo.save(persistedProvision);
                     }
                     parentType = (CollectionType) currentType;
@@ -1031,7 +1030,6 @@ public class CollectionType extends Type {
                     result.setParameterType(ParameterType.OUTPUT);
                     result.setParameterName(currentOutput.getName());
                     result.setRunId(run.getId());
-                    result.setItems(new ArrayList<>());
                     parameterNameToTypePersistence.put(entry.getName(), result);
                 } else { // any directory below main is a subCollection
 
@@ -1053,8 +1051,6 @@ public class CollectionType extends Type {
                         subCollection.setCollectionIndex(Arrays.stream(nameParts, 1, nameParts.length).collect(
                             Collectors.joining()));
 
-                        // prepare list for sub items
-                        subCollection.setItems(new ArrayList<>());
                         parameterNameToTypePersistence.put(entry.getName(), subCollection);
                         // add this collection to parent collection
                         CollectionPersistence parentPersistence = (CollectionPersistence) parameterNameToTypePersistence.get(parentName);
@@ -1062,7 +1058,6 @@ public class CollectionType extends Type {
                     } else {
                         DirectoryPersistence directory = new DirectoryPersistence();
                         directory.setParameterName(String.join("", nameParts));
-                        directory.setItems(new ArrayList<>());
                         parameterNameToTypePersistence.put(entry.getName(), directory);
                         // add this directory to the parent collection
                         CollectionPersistence parentPersistence = (CollectionPersistence) parameterNameToTypePersistence.get(parentName);

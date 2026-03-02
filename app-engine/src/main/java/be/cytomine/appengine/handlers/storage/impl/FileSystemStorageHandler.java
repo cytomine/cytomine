@@ -9,7 +9,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Comparator;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -73,19 +72,6 @@ public class FileSystemStorageHandler implements StorageHandler {
         }
     }
 
-    private static String getIdentifier(String storageId) {
-        String identifier = "";
-        if (storageId.startsWith("task-") && storageId.endsWith("-def")) { // task storage
-            identifier = storageId.replace("task-", "");
-            identifier = identifier.replace("-def", "");
-        } else if (storageId.startsWith("task-run-inputs-")) { // inputs
-            identifier = storageId.replace("task-run-inputs-", "");
-        } else if (storageId.startsWith("task-run-outputs-")) { // outputs
-            identifier = storageId.replace("task-run-outputs-", "");
-        }
-        return identifier;
-    }
-
     @Override
     public void createStorage(Storage storage) throws FileStorageException {
         String storageId = storage.getIdStorage();
@@ -145,50 +131,33 @@ public class FileSystemStorageHandler implements StorageHandler {
         }
     }
 
+    private String getSubTreeFilename(String storageId, String path) {
+        int startIndex = path.indexOf(storageId) + storageId.length() + 1;
+        return path.substring(startIndex);
+    }
+
     @Override
     public StorageData readStorageData(StorageData emptyFile) throws FileStorageException {
         StorageDataEntry current = emptyFile.peek();
         emptyFile.getEntryList().clear();
         String filename = current.getName();
         Path filePath = Paths.get(basePath, current.getStorageId(), filename);
-        AtomicBoolean currentUsed = new AtomicBoolean(false);
+
         try {
             Files.walk(filePath).forEach(path -> {
-                StorageDataEntry entry;
-                if (currentUsed.get()) {
-                    entry = new StorageDataEntry();
-                } else {
-                    entry = current;
-                }
-                if (Files.isRegularFile(path) || Files.isSymbolicLink(path)) {
-                    entry.setData(path.toFile());
-                    String fromStorageId = path
-                        .toString()
-                        .substring(path.toString().indexOf(current.getStorageId()));
-                    String subTreeFileName = fromStorageId
-                        .substring(current.getStorageId().length() + 1);
-                    if (!subTreeFileName.equalsIgnoreCase(filename)) {
-                        entry.setName(subTreeFileName);
-                    }
-                    entry.setStorageDataType(StorageDataType.FILE);
-                    emptyFile.getEntryList().add(entry);
-                }
+                StorageDataEntry entry = new StorageDataEntry();
+                entry.setStorageId(current.getStorageId());
+                String subTreeFileName = getSubTreeFilename(current.getStorageId(), path.toString());
+                entry.setName(subTreeFileName);
 
-                if (Files.isDirectory(path)) {
+                if (Files.isRegularFile(path) || Files.isSymbolicLink(path)) {
+                    entry.setStorageDataType(StorageDataType.FILE);
+                    entry.setData(path.toFile());
+                    emptyFile.getEntryList().add(entry);
+                } else if (Files.isDirectory(path)) {
                     entry.setStorageDataType(StorageDataType.DIRECTORY);
-                    String fromStorageId = path
-                        .toString()
-                        .substring(path.toString().indexOf(current.getStorageId()));
-                    String subTreeFileName = fromStorageId
-                        .substring(current.getStorageId().length() + 1);
-                    if (!subTreeFileName.equalsIgnoreCase(filename)) {
-                        entry.setName(subTreeFileName);
-                    } else {
-                        entry.setName(subTreeFileName + "/");
-                    }
                     emptyFile.getEntryList().add(entry);
                 }
-                currentUsed.set(true);
             });
 
             return emptyFile;

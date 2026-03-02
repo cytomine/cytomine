@@ -87,10 +87,10 @@ import be.cytomine.appengine.utils.FileHelper;
 @NoArgsConstructor
 public class CollectionType extends Type {
 
-    @Column(nullable = true)
+    @Column
     private Integer minSize;
 
-    @Column(nullable = true)
+    @Column
     private Integer maxSize;
 
     @OneToOne(cascade = CascadeType.ALL, optional = false)
@@ -210,7 +210,6 @@ public class CollectionType extends Type {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void validateFiles(
         Run run,
         Parameter currentOutput,
@@ -232,63 +231,47 @@ public class CollectionType extends Type {
         Map<String, Object> lists = new LinkedHashMap<>();
         for (StorageDataEntry entry : currentOutputStorageData.getEntryList()) {
             String entryName = entry.getName();
-            if (entryName.endsWith("/")) { // when it is a directory
-                boolean relatedToOutputParameter = entryName.startsWith(currentOutput.getName() + "/");
-                boolean isOutputParameterMainDirectory = entryName.equals(currentOutput.getName() + "/");
-                if (relatedToOutputParameter && isOutputParameterMainDirectory) {
-                    List<Object> nestedItems = new ArrayList<>();
-                    lists.put(entryName, nestedItems);
-                }
+            if (entry.getStorageDataType() == StorageDataType.DIRECTORY) {
+                List<Object> nestedItems = new ArrayList<>();
+                lists.put(entryName, nestedItems);
             } else { // when it is a file
+                String parentListName = entryName.substring(0, entryName.lastIndexOf('/'));
+
                 if (entryName.endsWith("array.yml")) {
-                    String parentListName = entryName.substring(0, entryName.lastIndexOf('/') + 1);
                     Map<String, Object> item = new LinkedHashMap<>();
                     String arrayDotYmlContent = FileHelper.read(entry.getData(), getStorageCharset());
                     item.put("array.yml", arrayDotYmlContent);
                     ((List<Object>) lists.get(parentListName)).add(item);
                     continue;
                 }
-                String parentListName = entryName.substring(0, entryName.lastIndexOf('/') + 1);
+
                 Map<String, Object> item = new LinkedHashMap<>(); // anyway we need to add it to this item
                 String indexString = entryName.substring(entryName.lastIndexOf('/') + 1); // just the name of one dicom file
-                int index;
+
                 try {
-                    index = Integer.parseInt(indexString);
+                    item.put("index", Integer.parseInt(indexString));
                 } catch (NumberFormatException e) {
                     item.put(indexString, entry.getData());
                     continue;
                 }
-                item.put("index", index);
-                String value = null;
-                switch (leafType) {
-                    case "IntegerType":
-                        value = FileHelper.read(entry.getData(), getStorageCharset());
-                        item.put("value", Integer.parseInt(value));
-                        break;
-                    case "StringType",
-                         "GeometryType",
-                         "EnumerationType":
-                        value = FileHelper.read(entry.getData(), getStorageCharset());
-                        item.put("value", value);
-                        break;
-                    case "NumberType":
-                        value = FileHelper.read(entry.getData(), getStorageCharset());
-                        item.put("value", Double.parseDouble(value));
-                        break;
-                    case "BooleanType":
-                        value = FileHelper.read(entry.getData(), getStorageCharset());
-                        item.put("value", Boolean.parseBoolean(value));
-                        break;
-                    case "DateTimeType":
-                        value = FileHelper.read(entry.getData(), getStorageCharset());
-                        item.put("value", Instant.parse(value));
-                        break;
-                    case "FileType", "ImageType":
-                        item.put("value", entry.getData()); // this is how I should read it assuming it is a directory-based image wsidicom
-                        break;
-                    default:
-                        throw new TypeValidationException("unknown leaf type: " + leafType);
+
+                Set<String> rawTypes = Set.of(FileType.class.getSimpleName(), ImageType.class.getSimpleName());
+                Object value;
+                if (rawTypes.contains(leafType)) {
+                    value = entry.getData();
+                } else {
+                    String raw = FileHelper.read(entry.getData(), getStorageCharset());
+                    value = switch (leafType) {
+                        case "IntegerType"  -> Integer.parseInt(raw);
+                        case "StringType", "GeometryType", "EnumerationType" -> raw;
+                        case "NumberType"   -> Double.parseDouble(raw);
+                        case "BooleanType"  -> Boolean.parseBoolean(raw);
+                        case "DateTimeType" -> Instant.parse(raw);
+                        default -> throw new TypeValidationException("unknown leaf type: " + leafType);
+                    };
                 }
+                item.put("value", value);
+
                 ((List<Object>) lists.get(parentListName)).add(item);
             }
         }
@@ -307,13 +290,12 @@ public class CollectionType extends Type {
             }
         }
 
-        validate(lists.get(currentOutput.getName() + "/"));
-
+        validate(lists.get(currentOutput.getName()));
     }
 
     @Override
     public void validate(Object valueObject) throws TypeValidationException {
-        if (Objects.isNull(valueObject)) {
+        if (valueObject == null) {
             return;
         }
 
@@ -362,11 +344,9 @@ public class CollectionType extends Type {
                 validatePrimitiveCollectionItem(valueObject);
             }
         }
-
     }
 
-    private void validatePrimitiveCollectionItem(Object valueObject)
-        throws TypeValidationException {
+    private void validatePrimitiveCollectionItem(Object valueObject) throws TypeValidationException {
         Type currentType = new CollectionType(this);
         while (currentType instanceof CollectionType collectionType) {
             currentType = collectionType.getSubType();
@@ -390,67 +370,51 @@ public class CollectionType extends Type {
         validateNode(value);
     }
 
-    @SuppressWarnings("unchecked")
-    public void validateNode(Object obj)
-        throws TypeValidationException {
-        if (Objects.isNull(trackingType)) {
+    public void validateNode(Object obj) throws TypeValidationException {
+        if (trackingType == null) {
             trackingType = new CollectionType(this);
             parentType = trackingType;
-        } else {
-            if (trackingType instanceof CollectionType) {
-                parentType = trackingType;
-                trackingType = ((CollectionType) trackingType).getSubType();
-            }
+        } else if (trackingType instanceof CollectionType) {
+            parentType = trackingType;
+            trackingType = ((CollectionType) trackingType).getSubType();
         }
-        if (trackingType instanceof CollectionType && !(obj instanceof List<?>)) {
-            throw new TypeValidationException(ErrorCode.INTERNAL_INVALID_COLLECTION_DIMENSIONS);
-        }
-        if (obj instanceof List<?>) {
-            List<?> list = (List<?>) obj;
-            assert trackingType instanceof CollectionType;
-            CollectionType currentType = (CollectionType) trackingType;
-            if (Objects.nonNull(currentType.getMinSize()) && Objects.nonNull(currentType.getMaxSize())) {
-                if (list.size() < currentType.getMinSize() || list.size() > currentType.getMaxSize()) {
-                    throw new TypeValidationException(ErrorCode.INTERNAL_INVALID_COLLECTION_DIMENSIONS);
-                }
+
+        if (obj instanceof List<?> elements && trackingType instanceof CollectionType currentType) {
+            Integer minSize = currentType.getMinSize();
+            Integer maxSize = currentType.getMaxSize();
+
+            if (minSize != null && maxSize != null && (elements.size() < minSize || elements.size() > maxSize)) {
+                throw new TypeValidationException(ErrorCode.INTERNAL_INVALID_COLLECTION_DIMENSIONS);
             }
-            for (Object o : list) {
+
+            for (Object o : elements) {
                 validateNode(o);
             }
-        } else {
-            Map<String, Object> map = null;
-            if (obj instanceof Map) {
-                map = (LinkedHashMap<String, Object>) obj;
-            }
-            assert map != null;
-            if (!(trackingType instanceof CollectionType) && map.get("value") instanceof List<?>) {
+        } else if (obj instanceof Map<?, ?> map) {
+            Object value = map.get("value");
+
+            if (!(trackingType instanceof CollectionType) && value instanceof List<?>) {
                 throw new TypeValidationException(ErrorCode.INTERNAL_WRONG_PROVISION_STRUCTURE);
             }
-            if (map.get("value") instanceof List<?>) {
-                if (trackingType instanceof CollectionType) {
-                    parentType = trackingType;
-                    trackingType = ((CollectionType) trackingType).getSubType();
-                }
-                List<?> list = (List<?>) map.get("value");
+
+            if (value instanceof List<?> elements) {
                 CollectionType currentType = (CollectionType) trackingType;
-                if (list.size() < currentType.getMinSize() || list.size() > currentType.getMaxSize()) {
+                if (elements.size() < currentType.getMinSize() || elements.size() > currentType.getMaxSize()) {
                     throw new TypeValidationException(ErrorCode.INTERNAL_INVALID_COLLECTION_DIMENSIONS);
                 }
-                for (Object o : list) {
+                for (Object o : elements) {
                     validateNode(o);
                 }
                 trackingType = parentType;
             }
 
-            // validate subtype
-            if (map.get("value") != null) {
-                trackingType.validate(map.get("value"));
-                referenced = map.get("value") instanceof String
+            if (value != null) {
+                trackingType.validate(value);
+                referenced = value instanceof String
                         && (trackingType instanceof FileType
                         || trackingType instanceof ImageType);
                 trackingType = parentType;
             }
-
         }
     }
 
@@ -486,7 +450,6 @@ public class CollectionType extends Type {
                         persistedProvision.setParameterName(indexes[i]);
                         persistedProvision.setValueType(ValueType.ARRAY);
                         persistedProvision.setProvisioned(true);
-                        persistedProvision.setItems(new ArrayList<>());
                         persistedProvision = collectionRepo.save(persistedProvision);
                     }
                     parentType = (CollectionType) currentType;
@@ -1046,8 +1009,7 @@ public class CollectionType extends Type {
 
     @Transactional
     @Override
-    public void persistResult(Run run, Parameter currentOutput, StorageData outputValue)
-        throws ProvisioningException {
+    public void persistResult(Run run, Parameter currentOutput, StorageData outputValue) throws ProvisioningException {
         CollectionPersistenceRepository collectionPersistenceRepository =
             AppEngineApplicationContext.getBean(CollectionPersistenceRepository.class);
         CollectionPersistence result = null;
@@ -1061,15 +1023,13 @@ public class CollectionType extends Type {
         Map<String, TypePersistence> parameterNameToTypePersistence = new LinkedHashMap<>();
         outputValue.sortShallowToDeep();
         for (StorageDataEntry entry : outputValue.getEntryList()) {
-            if (entry.getStorageDataType().equals(StorageDataType.DIRECTORY)) { // our code contains some directory logic
-                if (entry.getName().equals(currentOutput.getName() + "/")) { // the main collection directory
+            if (entry.getStorageDataType() == StorageDataType.DIRECTORY) {
+                if (entry.getName().equals(currentOutput.getName())) { // the main collection directory
                     result = new CollectionPersistence();
                     result.setValueType(ValueType.ARRAY);
                     result.setParameterType(ParameterType.OUTPUT);
                     result.setParameterName(currentOutput.getName());
                     result.setRunId(run.getId());
-                    List<TypePersistence> items = new ArrayList<>();
-                    result.setItems(items);
                     parameterNameToTypePersistence.put(entry.getName(), result);
                 } else { // any directory below main is a subCollection
 
@@ -1084,37 +1044,30 @@ public class CollectionType extends Type {
                         storage -> storage.getName()
                             .equalsIgnoreCase(entry.getName() + "array.yml"));
 
+                    String parentName = entry.getName().substring(0, entry.getName().lastIndexOf("/"));
                     if (containsArrayYml) {
                         CollectionPersistence subCollection = new CollectionPersistence();
                         subCollection.setParameterName(String.join("", nameParts));
                         subCollection.setCollectionIndex(Arrays.stream(nameParts, 1, nameParts.length).collect(
                             Collectors.joining()));
-                        String parentName = entry.getName().substring(0, entry.getName().lastIndexOf("/") + 1);
-                        // prepare list for sub items
-                        List<TypePersistence> items = new ArrayList<>();
-                        subCollection.setItems(items);
+
                         parameterNameToTypePersistence.put(entry.getName(), subCollection);
                         // add this collection to parent collection
                         CollectionPersistence parentPersistence = (CollectionPersistence) parameterNameToTypePersistence.get(parentName);
                         parentPersistence.getItems().add(subCollection);
                     } else {
-
-                        String parentName = entry.getName().substring(0, entry.getName().lastIndexOf("/") + 1);
                         DirectoryPersistence directory = new DirectoryPersistence();
                         directory.setParameterName(String.join("", nameParts));
-                        List<TypePersistence> items = new ArrayList<>();
-                        directory.setItems(items);
                         parameterNameToTypePersistence.put(entry.getName(), directory);
                         // add this directory to the parent collection
                         CollectionPersistence parentPersistence = (CollectionPersistence) parameterNameToTypePersistence.get(parentName);
                         parentPersistence.getItems().add(directory);
-
                     }
-
                 }
             }
+
             if (entry.getStorageDataType().equals(StorageDataType.FILE)) {
-                String parentName = entry.getName().substring(0, entry.getName().lastIndexOf("/") + 1);
+                String parentName = entry.getName().substring(0, entry.getName().lastIndexOf("/"));
                 if (entry.getName().endsWith("array.yml")) {
                     CollectionPersistence parentPersistence = (CollectionPersistence) parameterNameToTypePersistence.get(parentName);
                     parentPersistence.setSize(getCollectionSize(entry));
@@ -1286,7 +1239,6 @@ public class CollectionType extends Type {
             }
         }
 
-        assert result != null;
         collectionPersistenceRepository.save(result);
     }
 

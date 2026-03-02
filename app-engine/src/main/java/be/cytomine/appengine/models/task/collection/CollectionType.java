@@ -1048,7 +1048,7 @@ public class CollectionType extends Type {
                 CollectionPersistence parentPersistence = (CollectionPersistence) parameterNameToTypePersistence.get(parentName);
                 if (containsArrayYml) {
                     CollectionPersistence subCollection = new CollectionPersistence();
-                    subCollection.setParameterName(String.join("", nameParts));
+                    subCollection.setParameterName(entry.getName());
                     subCollection.setCollectionIndex(Arrays.stream(nameParts, 1, nameParts.length).collect(
                         Collectors.joining()));
 

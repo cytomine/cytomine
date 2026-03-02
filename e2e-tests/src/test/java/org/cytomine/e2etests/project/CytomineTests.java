@@ -72,8 +72,7 @@ public class CytomineTests {
     void saveScreenshot(String name) {
         Path destination = Paths.get("./build/reports/" + name + ".jpg");
         Files.createDirectories(Path.of("./build/reports/"));
-        File screenshot =
-            ((TakesScreenshot) driver).getScreenshotAs(FILE);  // Capture the screenshot as a file
+        File screenshot = ((TakesScreenshot) driver).getScreenshotAs(FILE);
         Files.move(screenshot.toPath(), destination, REPLACE_EXISTING);
         Files.setPosixFilePermissions(destination, Set.of(OTHERS_READ, OWNER_READ, GROUP_READ));
     }

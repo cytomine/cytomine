@@ -1022,47 +1022,46 @@ public class CollectionType extends Type {
         String leafType = currentType.getClass().getSimpleName();
         Map<String, TypePersistence> parameterNameToTypePersistence = new LinkedHashMap<>();
         outputValue.sortShallowToDeep();
-        for (StorageDataEntry entry : outputValue.getEntryList()) {
+
+        CollectionPersistence root = new CollectionPersistence();
+        root.setValueType(ValueType.ARRAY);
+        root.setParameterType(ParameterType.OUTPUT);
+        root.setParameterName(currentOutput.getName());
+        root.setRunId(run.getId());
+        parameterNameToTypePersistence.put(currentOutput.getName(), root);
+
+        List<StorageDataEntry> entries = outputValue.getEntryList();
+        for (StorageDataEntry entry : entries.subList(1, entries.size())) {
             if (entry.getStorageDataType() == StorageDataType.DIRECTORY) {
-                if (entry.getName().equals(currentOutput.getName())) { // the main collection directory
-                    result = new CollectionPersistence();
-                    result.setValueType(ValueType.ARRAY);
-                    result.setParameterType(ParameterType.OUTPUT);
-                    result.setParameterName(currentOutput.getName());
-                    result.setRunId(run.getId());
-                    parameterNameToTypePersistence.put(entry.getName(), result);
-                } else { // any directory below main is a subCollection
-
-                    String[] nameParts = entry.getName().trim().split("/");
-                    for (int i = 0; i < nameParts.length; i++) {
-                        if (i != 0) {
-                            nameParts[i] = "[" + nameParts[i] + "]";
-                        }
+                String[] nameParts = entry.getName().trim().split("/");
+                for (int i = 0; i < nameParts.length; i++) {
+                    if (i != 0) {
+                        nameParts[i] = "[" + nameParts[i] + "]";
                     }
-                    // it is a subCollection if contains array.yml
-                    boolean containsArrayYml = outputValue.getEntryList().stream().anyMatch(
-                        storage -> storage.getName()
-                            .equalsIgnoreCase(entry.getName() + "array.yml"));
+                }
+                // it is a subCollection if contains array.yml
+                boolean containsArrayYml = outputValue.getEntryList().stream().anyMatch(
+                    storage -> storage.getName()
+                        .equalsIgnoreCase(entry.getName() + "array.yml"));
 
-                    String parentName = entry.getName().substring(0, entry.getName().lastIndexOf("/"));
-                    if (containsArrayYml) {
-                        CollectionPersistence subCollection = new CollectionPersistence();
-                        subCollection.setParameterName(String.join("", nameParts));
-                        subCollection.setCollectionIndex(Arrays.stream(nameParts, 1, nameParts.length).collect(
-                            Collectors.joining()));
+                String parentName = entry.getName().substring(0, entry.getName().lastIndexOf("/"));
+                if (containsArrayYml) {
+                    CollectionPersistence subCollection = new CollectionPersistence();
+                    subCollection.setParameterName(String.join("", nameParts));
+                    subCollection.setCollectionIndex(Arrays.stream(nameParts, 1, nameParts.length).collect(
+                        Collectors.joining()));
 
-                        parameterNameToTypePersistence.put(entry.getName(), subCollection);
-                        // add this collection to parent collection
-                        CollectionPersistence parentPersistence = (CollectionPersistence) parameterNameToTypePersistence.get(parentName);
-                        parentPersistence.getItems().add(subCollection);
-                    } else {
-                        DirectoryPersistence directory = new DirectoryPersistence();
-                        directory.setParameterName(String.join("", nameParts));
-                        parameterNameToTypePersistence.put(entry.getName(), directory);
-                        // add this directory to the parent collection
-                        CollectionPersistence parentPersistence = (CollectionPersistence) parameterNameToTypePersistence.get(parentName);
-                        parentPersistence.getItems().add(directory);
-                    }
+                    parameterNameToTypePersistence.put(entry.getName(), subCollection);
+                    // add this collection to parent collection
+                    CollectionPersistence parentPersistence = (CollectionPersistence) parameterNameToTypePersistence.get(parentName);
+                    parentPersistence.getItems().add(subCollection);
+                } else {
+                    DirectoryPersistence directory = new DirectoryPersistence();
+                    directory.setParameterName(String.join("", nameParts));
+                    parameterNameToTypePersistence.put(entry.getName(), directory);
+                    // add this directory to the parent collection
+                    CollectionPersistence parentPersistence = (CollectionPersistence) parameterNameToTypePersistence.get(parentName);
+                    parentPersistence.getItems().add(directory);
                 }
             }
 

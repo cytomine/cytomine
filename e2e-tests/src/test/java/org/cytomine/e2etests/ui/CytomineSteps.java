@@ -80,7 +80,7 @@ public class CytomineSteps {
         Files.copy(originalFile, copiedFile);
         maybeProjectName.ifPresent(projectName -> {
                 webDriverUtils.byClick(wait, By.cssSelector(".project-select .multiselect__tags"));
-                webDriverUtils.byClick(wait, By.cssSelector("[data-option='" + projectName + "']"));
+                webDriverUtils.xpathClick(wait, "//span[contains(@data-option, '" + projectName.substring(1) + "')]");
             }
         );
 

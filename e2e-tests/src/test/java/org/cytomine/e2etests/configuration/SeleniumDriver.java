@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -24,10 +25,12 @@ public class SeleniumDriver {
             seleniumUrl.map(url -> {
                     log.info("Instantiated RemoteWebDriver with url: {}", url);
                     options.addArguments("--headless");
-                    return RemoteWebDriver.builder()
+                    RemoteWebDriver driver = (RemoteWebDriver) RemoteWebDriver.builder()
                                .address(url)
                                .oneOf(options)
                                .build();
+                    driver.setFileDetector(new LocalFileDetector());
+                    return driver;
                 })
                 .orElseGet(() ->
                     {

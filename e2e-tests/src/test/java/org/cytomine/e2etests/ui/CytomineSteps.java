@@ -78,17 +78,20 @@ public class CytomineSteps {
         Path originalFile = Paths.get(originalPath);
         Path copiedFile = originalFile.resolveSibling(imageName);
         Files.copy(originalFile, copiedFile);
-        maybeProjectName.ifPresent(projectName -> {
-                webDriverUtils.byClick(wait, By.cssSelector(".project-select .multiselect__tags"));
-                webDriverUtils.xpathClick(wait, "//span[contains(@data-option, '" + projectName.substring(1) + "')]");
-            }
-        );
+        maybeProjectName.ifPresent(projectName -> selectProject(wait, projectName));
 
         webDriverUtils.bySendKeysWait(wait, By.cssSelector("input[type='file']"),
             copiedFile.toString(), false);
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Start upload')]");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//td[contains(text(), '" + imageName + "')]"));
         return imageName;
+    }
+
+    @SneakyThrows
+    private void selectProject(Wait<WebDriver> wait, String projectName) {
+        webDriverUtils.byClick(wait, By.cssSelector(".project-select .multiselect__tags"));
+        Thread.sleep(1000);
+        webDriverUtils.xpathClick(wait, "//span[contains(@data-option, '" + projectName.substring(1) + "')]/parent::span");
     }
 
     @SneakyThrows

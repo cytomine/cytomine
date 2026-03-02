@@ -1088,9 +1088,7 @@ public class CollectionType extends Type {
                 CollectionPersistence parentCollection = (CollectionPersistence) parameterNameToTypePersistence.get(parentName); // can't get the parent collection because the parent is not a collection
 
                 String entryValue = null;
-                if (!(leafType.equals("FileType")
-                    || leafType.equals("ImageType"))) {
-
+                if (!(leafType.equals("FileType") || leafType.equals("ImageType"))) {
                     entryValue = FileHelper.read(entry.getData(), getStorageCharset());
                 }
 
@@ -1240,7 +1238,6 @@ public class CollectionType extends Type {
                     default:
                         throw new ProvisioningException("unknown leaf type: " + leafType);
                 }
-
             }
         }
 

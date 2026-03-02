@@ -232,63 +232,47 @@ public class CollectionType extends Type {
         Map<String, Object> lists = new LinkedHashMap<>();
         for (StorageDataEntry entry : currentOutputStorageData.getEntryList()) {
             String entryName = entry.getName();
-            if (entryName.endsWith("/")) { // when it is a directory
-                boolean relatedToOutputParameter = entryName.startsWith(currentOutput.getName() + "/");
-                boolean isOutputParameterMainDirectory = entryName.equals(currentOutput.getName() + "/");
-                if (relatedToOutputParameter && isOutputParameterMainDirectory) {
-                    List<Object> nestedItems = new ArrayList<>();
-                    lists.put(entryName, nestedItems);
-                }
+            if (entry.getStorageDataType() == StorageDataType.DIRECTORY) {
+                List<Object> nestedItems = new ArrayList<>();
+                lists.put(entryName, nestedItems);
             } else { // when it is a file
+                String parentListName = entryName.substring(0, entryName.lastIndexOf('/'));
+
                 if (entryName.endsWith("array.yml")) {
-                    String parentListName = entryName.substring(0, entryName.lastIndexOf('/') + 1);
                     Map<String, Object> item = new LinkedHashMap<>();
                     String arrayDotYmlContent = FileHelper.read(entry.getData(), getStorageCharset());
                     item.put("array.yml", arrayDotYmlContent);
                     ((List<Object>) lists.get(parentListName)).add(item);
                     continue;
                 }
-                String parentListName = entryName.substring(0, entryName.lastIndexOf('/') + 1);
+
                 Map<String, Object> item = new LinkedHashMap<>(); // anyway we need to add it to this item
                 String indexString = entryName.substring(entryName.lastIndexOf('/') + 1); // just the name of one dicom file
-                int index;
+
                 try {
-                    index = Integer.parseInt(indexString);
+                    item.put("index", Integer.parseInt(indexString));
                 } catch (NumberFormatException e) {
                     item.put(indexString, entry.getData());
                     continue;
                 }
-                item.put("index", index);
-                String value = null;
-                switch (leafType) {
-                    case "IntegerType":
-                        value = FileHelper.read(entry.getData(), getStorageCharset());
-                        item.put("value", Integer.parseInt(value));
-                        break;
-                    case "StringType",
-                         "GeometryType",
-                         "EnumerationType":
-                        value = FileHelper.read(entry.getData(), getStorageCharset());
-                        item.put("value", value);
-                        break;
-                    case "NumberType":
-                        value = FileHelper.read(entry.getData(), getStorageCharset());
-                        item.put("value", Double.parseDouble(value));
-                        break;
-                    case "BooleanType":
-                        value = FileHelper.read(entry.getData(), getStorageCharset());
-                        item.put("value", Boolean.parseBoolean(value));
-                        break;
-                    case "DateTimeType":
-                        value = FileHelper.read(entry.getData(), getStorageCharset());
-                        item.put("value", Instant.parse(value));
-                        break;
-                    case "FileType", "ImageType":
-                        item.put("value", entry.getData()); // this is how I should read it assuming it is a directory-based image wsidicom
-                        break;
-                    default:
-                        throw new TypeValidationException("unknown leaf type: " + leafType);
+
+                Set<String> rawTypes = Set.of(FileType.class.getSimpleName(), ImageType.class.getSimpleName());
+                Object value;
+                if (rawTypes.contains(leafType)) {
+                    value = entry.getData();
+                } else {
+                    String raw = FileHelper.read(entry.getData(), getStorageCharset());
+                    value = switch (leafType) {
+                        case "IntegerType"  -> Integer.parseInt(raw);
+                        case "StringType", "GeometryType", "EnumerationType" -> raw;
+                        case "NumberType"   -> Double.parseDouble(raw);
+                        case "BooleanType"  -> Boolean.parseBoolean(raw);
+                        case "DateTimeType" -> Instant.parse(raw);
+                        default -> throw new TypeValidationException("unknown leaf type: " + leafType);
+                    };
                 }
+                item.put("value", value);
+
                 ((List<Object>) lists.get(parentListName)).add(item);
             }
         }
@@ -307,8 +291,7 @@ public class CollectionType extends Type {
             }
         }
 
-        validate(lists.get(currentOutput.getName() + "/"));
-
+        validate(lists.get(currentOutput.getName()));
     }
 
     @Override

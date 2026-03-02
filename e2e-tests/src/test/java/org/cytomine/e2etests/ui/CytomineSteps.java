@@ -79,13 +79,8 @@ public class CytomineSteps {
         Path copiedFile = originalFile.resolveSibling(imageName);
         Files.copy(originalFile, copiedFile);
         maybeProjectName.ifPresent(projectName -> {
-                webDriverUtils.xpathClick(wait,
-                    "//strong[contains(text(), 'Link with project')]/ancestor::div[contains"
-                        + "(@class, 'columns')]//div[contains(@class, 'multiselect__tags')]");
-                webDriverUtils.byIsDisplayed(wait, By.cssSelector(".multiselect__content-wrapper"));
-                webDriverUtils.xpathClick(wait,
-                    "//span[contains(@class, 'multiselect__option') and contains(text(), '"
-                        + projectName + "') and not(contains(text(), 'Select'))]");
+                webDriverUtils.byClick(wait, By.cssSelector(".project-select .multiselect__tags"));
+                webDriverUtils.byClick(wait, By.cssSelector("[data-option='" + projectName + "']"));
             }
         );
 

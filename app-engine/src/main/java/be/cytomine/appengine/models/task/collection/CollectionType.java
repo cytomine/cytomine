@@ -1044,7 +1044,7 @@ public class CollectionType extends Type {
                 // it is a subCollection if contains array.yml
                 boolean containsArrayYml = outputValue.getEntryList().stream().anyMatch(
                     storage -> storage.getName()
-                        .equalsIgnoreCase(entry.getName() + "array.yml"));
+                        .equalsIgnoreCase(entry.getName() + "/array.yml"));
 
                 CollectionPersistence parentPersistence = (CollectionPersistence) parameterNameToTypePersistence.get(parentName);
                 if (containsArrayYml) {

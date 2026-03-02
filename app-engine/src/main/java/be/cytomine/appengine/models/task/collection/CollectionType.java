@@ -1045,6 +1045,7 @@ public class CollectionType extends Type {
                         .equalsIgnoreCase(entry.getName() + "array.yml"));
 
                 String parentName = entry.getName().substring(0, entry.getName().lastIndexOf("/"));
+                CollectionPersistence parentPersistence = (CollectionPersistence) parameterNameToTypePersistence.get(parentName);
                 if (containsArrayYml) {
                     CollectionPersistence subCollection = new CollectionPersistence();
                     subCollection.setParameterName(String.join("", nameParts));
@@ -1052,15 +1053,12 @@ public class CollectionType extends Type {
                         Collectors.joining()));
 
                     parameterNameToTypePersistence.put(entry.getName(), subCollection);
-                    // add this collection to parent collection
-                    CollectionPersistence parentPersistence = (CollectionPersistence) parameterNameToTypePersistence.get(parentName);
                     parentPersistence.getItems().add(subCollection);
                 } else {
                     DirectoryPersistence directory = new DirectoryPersistence();
-                    directory.setParameterName(String.join("", nameParts));
+                    directory.setParameterName(entry.getName());
                     parameterNameToTypePersistence.put(entry.getName(), directory);
-                    // add this directory to the parent collection
-                    CollectionPersistence parentPersistence = (CollectionPersistence) parameterNameToTypePersistence.get(parentName);
+
                     parentPersistence.getItems().add(directory);
                 }
             }

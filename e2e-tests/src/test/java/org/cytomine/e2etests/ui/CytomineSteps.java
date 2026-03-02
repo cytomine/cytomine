@@ -99,7 +99,7 @@ public class CytomineSteps {
                                             + "')]/ancestor::tr//button[contains(text(), "
                                             + "'Delete')]");
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Confirm')]");
-        webDriverUtils.byIsDisplayed(wait, By.xpath("//p[contains(text(), 'No uploaded file')]"));
+        webDriverUtils.waitUntilByEmpty(wait, By.xpath("//td[contains(text(), '" + imageName + "')]"));
     }
 
 }

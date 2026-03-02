@@ -2,9 +2,7 @@ package org.cytomine.e2etests.ui;
 
 import lombok.SneakyThrows;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Wait;
 import org.springframework.stereotype.Component;
 
@@ -67,16 +65,7 @@ public class WebDriverUtils {
             });
     }
 
-    void clickElementContainingText(Wait<WebDriver> wait, String text) {
-        wait.until(d -> {
-            var elements = d.findElements(By.xpath("//*[contains(text(), '" + text + "')]"));
-            for (WebElement el : elements) {
-                if (el.isDisplayed() && el.isEnabled()) {
-                    ((JavascriptExecutor) d).executeScript("arguments[0].click();", el);
-                    return true;
-                }
-            }
-            return false;
-        });
+    void waitUntilByEmpty(Wait<WebDriver> wait, By by) {
+        wait.until(d -> d.findElements(by).isEmpty());
     }
 }

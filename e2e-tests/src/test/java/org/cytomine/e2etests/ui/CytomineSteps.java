@@ -84,6 +84,7 @@ public class CytomineSteps {
             copiedFile.toString(), false);
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Start upload')]");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//td[contains(text(), '" + imageName + "')]"));
+        Thread.sleep(2000);
         return imageName;
     }
 

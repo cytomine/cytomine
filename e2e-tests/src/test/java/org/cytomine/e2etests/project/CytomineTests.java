@@ -122,17 +122,17 @@ public class CytomineTests {
     @Test
     void addImageToStorageNoProject() {
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
-        String imageName=   cytomineSteps.addImage(wait, cytomineUrl, Optional.empty());
-        cytomineSteps.deleteImage(wait,cytomineUrl,imageName);
+        String imageName = cytomineSteps.addImage(wait, cytomineUrl, Optional.empty());
+        cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
     }
 
     @Test
     void addImageToStorageWithProject() {
         String projectName = "selenium-" + randomUUID();
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
-        String projectURL =   cytomineSteps.createProject(wait,driver, cytomineUrl, projectName);
-       String imageName= cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName));
+        String projectURL = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
+        String imageName = cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName));
         cytomineSteps.deleteProject(wait, projectURL);
-        cytomineSteps.deleteImage(wait,cytomineUrl,imageName);
+        cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
     }
 }

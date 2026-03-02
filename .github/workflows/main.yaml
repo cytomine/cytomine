@@ -5,31 +5,41 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main]
+    branches: [main, faster-ci-e2e]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  # Only run full test suite on main branch
   app-engine:
+    if: github.ref_name == 'main'
     uses: ./.github/workflows/app-engine.yaml
   cbir:
+    if: github.ref_name == 'main'
     uses: ./.github/workflows/cbir.yaml
   core:
+    if: github.ref_name == 'main'
     uses: ./.github/workflows/core.yaml
   ims:
+    if: github.ref_name == 'main'
     uses: ./.github/workflows/ims.yaml
   python-client:
+    if: github.ref_name == 'main'
     uses: ./.github/workflows/python-client.yaml
   registry-client:
+    if: github.ref_name == 'main'
     uses: ./.github/workflows/registry-client.yaml
   sam:
+    if: github.ref_name == 'main'
     uses: ./.github/workflows/sam.yaml
   web-ui:
+    if: github.ref_name == 'main'
     uses: ./.github/workflows/web-ui.yaml
 
   docker-images:
+    # On main, wait for tests. On other branches, run immediately.
     needs:
       - app-engine
       - cbir
@@ -39,10 +49,12 @@ jobs:
       - registry-client
       - sam
       - web-ui
+    if: always() && (github.ref_name != 'main' || !contains(needs.*.result, 'failure'))
     uses: ./.github/workflows/docker.yaml
     secrets: inherit
 
   helm-tests:
     needs: [docker-images]
+    if: always() && needs.docker-images.result == 'success'
     uses: ./.github/workflows/helm-test.yaml
     secrets: inherit

@@ -91,7 +91,8 @@ public class CytomineSteps {
     private void selectProject(Wait<WebDriver> wait, String projectName) {
         webDriverUtils.byClick(wait, By.cssSelector(".project-select .multiselect__tags"));
         Thread.sleep(1000);
-        webDriverUtils.xpathClick(wait, "//span[contains(@data-option, '" + projectName.substring(1) + "')]/parent::span");
+        webDriverUtils.xpathClick(wait,
+            "//span[contains(@data-option, '" + projectName.substring(1) + "')]/parent::span");
     }
 
     @SneakyThrows
@@ -102,7 +103,8 @@ public class CytomineSteps {
                                             + "')]/ancestor::tr//button[contains(text(), "
                                             + "'Delete')]");
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Confirm')]");
-        webDriverUtils.waitUntilByEmpty(wait, By.xpath("//td[contains(text(), '" + imageName + "')]"));
+        webDriverUtils.waitUntilByEmpty(wait,
+            By.xpath("//td[contains(text(), '" + imageName + "')]"));
     }
 
 }

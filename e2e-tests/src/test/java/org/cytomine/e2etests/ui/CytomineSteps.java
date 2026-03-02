@@ -70,24 +70,42 @@ public class CytomineSteps {
     }
 
     @SneakyThrows
-    public void addImage(Wait<WebDriver> wait, URL cytomineUrl, Optional<String> maybeProjectName) {
+    public String addImage(Wait<WebDriver> wait, URL cytomineUrl,
+                           Optional<String> maybeProjectName) {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/storage");
-        //  webDriverUtils.xpathClick(wait, "//a[contains(text(), 'Add files...')]");
         String originalPath = getClass().getClassLoader().getResource("cat.png").getPath();
-        String uuid = UUID.randomUUID().toString();
+        String imageName = "selenium-" + UUID.randomUUID() + ".png";
         Path originalFile = Paths.get(originalPath);
-        Path copiedFile = originalFile.resolveSibling(uuid + ".png");
+        Path copiedFile = originalFile.resolveSibling(imageName);
         Files.copy(originalFile, copiedFile);
         maybeProjectName.ifPresent(projectName -> {
-                webDriverUtils.xpathClick(wait, "//strong[contains(text(), 'Link with project')]/ancestor::div[contains(@class, 'columns')]//div[contains(@class, 'multiselect__tags')]");
-                webDriverUtils.xpathClick(wait, "//strong[contains(text(), 'Link with project')]/ancestor::div[contains(@class, 'columns')]//li[contains(@class, 'multiselect__element') and not(contains(@class, 'multiselect__select-all'))]//span[contains(., '" + projectName + "')]");
+                webDriverUtils.xpathClick(wait,
+                    "//strong[contains(text(), 'Link with project')]/ancestor::div[contains"
+                        + "(@class, 'columns')]//div[contains(@class, 'multiselect__tags')]");
+                webDriverUtils.xpathClick(wait,
+                    "//strong[contains(text(), 'Link with project')]/ancestor::div[contains"
+                        + "(@class, 'columns')]//li[contains(@class, 'multiselect__element') and "
+                        + "not(contains(@class, 'multiselect__select-all'))]//span[contains(., '"
+                        + projectName + "')]");
             }
         );
 
         webDriverUtils.bySendKeysWait(wait, By.cssSelector("input[type='file']"),
             copiedFile.toString(), false);
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Start upload')]");
-        webDriverUtils.byIsDisplayed(wait, By.xpath("//td[contains(text(), '" + uuid + ".png')]"));
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//td[contains(text(), '" + imageName + "')]"));
+        return imageName;
+    }
+
+    @SneakyThrows
+    public void deleteImage(Wait<WebDriver> wait, URL cytomineUrl,
+                            String imageName) {
+        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/storage");
+        webDriverUtils.xpathClick(wait, "//td[contains(text(), '" + imageName
+                                            + "')]/ancestor::tr//button[contains(text(), "
+                                            + "'Delete')]");
+        webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Confirm')]");
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//p[contains(text(), 'No uploaded file')]"));
     }
 
 }

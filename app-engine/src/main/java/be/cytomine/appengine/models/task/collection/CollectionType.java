@@ -1012,7 +1012,6 @@ public class CollectionType extends Type {
     public void persistResult(Run run, Parameter currentOutput, StorageData outputValue) throws ProvisioningException {
         CollectionPersistenceRepository collectionPersistenceRepository =
             AppEngineApplicationContext.getBean(CollectionPersistenceRepository.class);
-        CollectionPersistence result = null;
 
         Type currentType = getSubType();
         while (currentType instanceof CollectionType ct) {
@@ -1233,7 +1232,7 @@ public class CollectionType extends Type {
             }
         }
 
-        collectionPersistenceRepository.save(result);
+        collectionPersistenceRepository.save(root);
     }
 
     @Override

@@ -8,9 +8,12 @@ import java.util.Set;
 import java.util.UUID;
 
 import lombok.SneakyThrows;
+import java.time.Duration;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.Wait;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -69,7 +72,7 @@ public class CytomineSteps {
     }
 
     @SneakyThrows
-    public String addImage(Wait<WebDriver> wait, URL cytomineUrl,
+    public String addImage(Wait<WebDriver> wait, WebDriver driver, URL cytomineUrl,
                            Optional<String> maybeProjectName) {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/storage");
         String imageName = "selenium-" + UUID.randomUUID() + ".png";
@@ -83,7 +86,8 @@ public class CytomineSteps {
         webDriverUtils.bySendKeysWait(wait, By.cssSelector("input[type='file']"),
             copiedFile.toString(), false);
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Start upload')]");
-        webDriverUtils.byIsDisplayed(wait, By.xpath("//td[contains(text(), '" + imageName
+        Wait<WebDriver> longWait = new WebDriverWait(driver, Duration.ofSeconds(60));
+        webDriverUtils.byIsDisplayed(longWait, By.xpath("//td[contains(text(), '" + imageName
             + "')]/ancestor::tr//span[contains(@class, 'is-success')]"));
         return imageName;
     }

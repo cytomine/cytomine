@@ -868,33 +868,9 @@ public class TaskProvisioningService {
         Parameter currentOutput,
         StorageData currentOutputStorageData
     ) throws TypeValidationException {
-        log.info("Posting Outputs Archive: "
-            + "validating files and directories contents and structure...");
+        log.info("Posting Outputs Archive: validating files and directories contents and structure...");
         currentOutput.getType().validateFiles(run, currentOutput, currentOutputStorageData);
         log.info("Posting Outputs Archive: validated finished...");
-    }
-
-    private void storeOutputInFileStorage(
-        Run run,
-        StorageData outputFileData,
-        String name
-    ) throws ProvisioningException {
-        log.info("Posting Outputs Archive: storing in file storage...");
-        Storage outputsStorage = new Storage("task-run-outputs-" + run.getId());
-        try {
-            fileStorageHandler.saveStorageData(outputsStorage, outputFileData);
-        } catch (FileStorageException e) {
-            run.setState(TaskRunState.FAILED);
-            runRepository.saveAndFlush(run);
-            log.info("Posting Outputs Archive: updated Run state to FAILED");
-            AppEngineError error = ErrorBuilder.buildParamRelatedError(
-                ErrorCode.STORAGE_STORING_INPUT_FAILED,
-                name,
-                e.getMessage()
-            );
-            throw new ProvisioningException(error);
-        }
-        log.info("Posting Outputs Archive: stored");
     }
 
     private void saveOutput(Run run, Parameter currentOutput, StorageData outputValue)
@@ -1290,52 +1266,51 @@ public class TaskProvisioningService {
         }
     }
 
-    private List<AppEngineError> checkAfterExecutionMatches(Run run) throws ProvisioningException {
+    private List<AppEngineError> checkAfterExecutionMatches(Run run) {
         List<AppEngineError> multipleErrors = new ArrayList<>();
-        List<Match> matches = run.getTask().getMatches().stream().filter(match ->
-            match.getCheckTime().equals(CheckTime.AFTER_EXECUTION)).toList();
+        List<Match> matches = run.getTask()
+                .getMatches()
+                .stream()
+                .filter(match -> match.getCheckTime().equals(CheckTime.AFTER_EXECUTION))
+                .toList();
 
-        if (!matches.isEmpty()) {
-            for (Match match : matches) {
-                CollectionPersistence matching = collectionPersistenceRepository
-                    .findCollectionPersistenceByParameterNameAndRunId(match
-                    .getMatching()
-                    .getName(), run.getId());
-                CollectionPersistence matched = collectionPersistenceRepository
-                    .findCollectionPersistenceByParameterNameAndRunId(match
-                    .getMatched()
-                    .getName(), run.getId());
-                // compare size
-                if (!Objects.equals(matching.getSize(), matched.getSize())) {
+        for (Match match : matches) {
+            CollectionPersistence matching = collectionPersistenceRepository
+                .findCollectionPersistenceByParameterNameAndRunId(match
+                .getMatching()
+                .getName(), run.getId());
+            CollectionPersistence matched = collectionPersistenceRepository
+                .findCollectionPersistenceByParameterNameAndRunId(match
+                .getMatched()
+                .getName(), run.getId());
+
+            // compare size
+            if (!Objects.equals(matching.getSize(), matched.getSize())) {
+                ParameterError parameterError = new ParameterError(matching.getParameterName());
+                AppEngineError error = ErrorBuilder.build(ErrorCode.INTERNAL_NOT_MATCHING_DIFF_SIZE, parameterError);
+                multipleErrors.add(error);
+            }
+            // map indexes
+            for (TypePersistence item : matching.getItems()) {
+                String matchingItemIndex = item
+                    .getCollectionIndex()
+                    .substring(item.getCollectionIndex().lastIndexOf('['));
+                List<TypePersistence> matchedItemIndexes = matched
+                    .getItems()
+                    .stream()
+                    .filter(typePersistence -> typePersistence
+                    .getCollectionIndex()
+                    .endsWith(matchingItemIndex))
+                    .toList();
+                if (matchedItemIndexes.size() != 1) {
                     ParameterError parameterError = new ParameterError(matching.getParameterName());
                     AppEngineError error = ErrorBuilder
-                        .build(ErrorCode.INTERNAL_NOT_MATCHING_DIFF_SIZE, parameterError);
+                        .build(ErrorCode.INTERNAL_NOT_MATCHING_NOT_ALIGNED_INDEXES, parameterError);
                     multipleErrors.add(error);
-                }
-                // map indexes
-                for (TypePersistence item : matching.getItems()) {
-                    String matchingItemIndex = item
-                        .getCollectionIndex()
-                        .substring(item.getCollectionIndex().lastIndexOf('['));
-                    List<TypePersistence> matchedItemIndexes = matched
-                        .getItems()
-                        .stream()
-                        .filter(typePersistence -> typePersistence
-                        .getCollectionIndex()
-                        .endsWith(matchingItemIndex))
-                        .toList();
-                    if (matchedItemIndexes.size() != 1) {
-                        ParameterError parameterError = new ParameterError(
-                            matching.getParameterName()
-                        );
-                        AppEngineError error = ErrorBuilder
-                            .build(ErrorCode
-                            .INTERNAL_NOT_MATCHING_NOT_ALIGNED_INDEXES, parameterError);
-                        multipleErrors.add(error);
-                    }
                 }
             }
         }
+
         return multipleErrors;
     }
 
@@ -1353,14 +1328,13 @@ public class TaskProvisioningService {
         return createStateAction(run, TaskRunState.PROVISIONED);
     }
 
-    private StateAction updateToFinished(Run run)
-        throws ProvisioningException, FileStorageException {
-        // check the status of Run it should be Queueing
+    private StateAction updateToFinished(Run run) throws ProvisioningException, FileStorageException {
         log.info("Provisioning: processing outputs...");
         if (!run.getState().equals(TaskRunState.QUEUING)) {
             AppEngineError error = ErrorBuilder.build(ErrorCode.INTERNAL_INVALID_TASK_RUN_STATE);
             throw new ProvisioningException(error);
         }
+
         // list all outputs of the task
         Set<Parameter> outputs = run
             .getTask()
@@ -1376,37 +1350,28 @@ public class TaskProvisioningService {
             );
             if (provisionFileData == null || provisionFileData.getEntryList().isEmpty()) {
                 if (!parameter.isOptional()) {
-                    AppEngineError error = ErrorBuilder.build(
-                        ErrorCode.INTERNAL_MISSING_OUTPUT_FILE_FOR_PARAMETER
-                    );
+                    AppEngineError error = ErrorBuilder.build(ErrorCode.INTERNAL_MISSING_OUTPUT_FILE_FOR_PARAMETER);
                     throw new ProvisioningException(error);
                 } else {
                     continue; // ignore processing missing optional parameter
                 }
-
             }
 
-            // validate files
             log.info("Provisioning: validating output files...");
             try {
                 validateFiles(run, parameter, provisionFileData);
             } catch (TypeValidationException e) {
-                log.info(
-                    "Provisioning: "
-                    + "output provision is invalid value validation failed"
-                );
+                log.info("Provisioning: output provision is invalid value validation failed: " + e.getMessage());
                 ParameterError parameterError = new ParameterError(parameter.getName());
                 AppEngineError error = ErrorBuilder.build(e.getErrorCode(), parameterError);
                 multipleErrors.add(error);
                 continue;
             }
-            // store in the database
+
             log.info("Provisioning: storing output in database...");
             saveOutput(run, parameter, provisionFileData);
 
-            // calculate CRC32 for all storage data entry and save it in the database
-            log.info("Provisioning: calculating CRC32 checksum for zip entry {}",
-                parameter.getName());
+            log.info("Provisioning: calculating CRC32 checksum for zip entry {}", parameter.getName());
             for (StorageDataEntry current : provisionFileData.getEntryList()) {
                 try {
                     setChecksumCRC32(
@@ -1417,12 +1382,10 @@ public class TaskProvisioningService {
                     throw new ProvisioningException(error);
                 }
             }
-
         }
 
         multipleErrors.addAll(checkAfterExecutionMatches(run));
 
-        // throw multiple errors if exist
         if (!multipleErrors.isEmpty()) {
             log.info("Provisioning: state updated to FAILED");
             run.setState(TaskRunState.FAILED);

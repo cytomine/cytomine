@@ -47,7 +47,8 @@ public class CytomineSteps {
         webDriverUtils.goTo(wait, projectURL);
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Delete')]");
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Confirm')]");
-        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'successfully deleted')]"));
+        webDriverUtils.byIsDisplayed(wait,
+            By.xpath("//div[contains(text(), 'successfully deleted')]"));
         return projectURL;
     }
 
@@ -56,11 +57,48 @@ public class CytomineSteps {
         webDriverUtils.xpathClick(wait, "//a[@href='#/projects']");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//button[contains(text(), 'New project')]"));
         Set<Boolean> ignored = projectNames.stream()
-                .map(name ->
-                        webDriverUtils.byIsDisplayed(wait,
-                                By.xpath(format("//a[contains(text(), '%s')]",
-                                        name))))
-                .collect(toSet());
+                                   .map(name ->
+                                            webDriverUtils.byIsDisplayed(wait,
+                                                By.xpath(format("//a[contains(text(), '%s')]",
+                                                    name))))
+                                   .collect(toSet());
     }
 
+    public String createOntology(Wait<WebDriver> wait, WebDriver driver, URL cytomineUrl,
+                                 String ontologyName) {
+        webDriverUtils.goTo(wait, cytomineUrl.toString());
+        webDriverUtils.xpathClick(wait, "//a[@href='#/ontology']");
+        webDriverUtils.xpathClick(wait, "//button[contains(text(), 'New ontology')]");
+        webDriverUtils.bySendKeys(wait, By.name("name"), ontologyName);
+        webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Save')]");
+        webDriverUtils.byIsDisplayed(wait, By.xpath(
+            "//p[contains(@class, 'panel-heading') and contains(text(), '" + ontologyName + "')]"));
+        return driver.getCurrentUrl();
+    }
+
+    public String deleteOntology(Wait<WebDriver> wait, String ontologyURL) {
+        webDriverUtils.goTo(wait, ontologyURL);
+        webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Delete')]");
+        webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Confirm')]");
+        webDriverUtils.byIsDisplayed(wait,
+            By.xpath("//div[contains(text(), 'successfully deleted')]"));
+        return ontologyURL;
+    }
+    /**
+     * Navigate to project information page and extract the ontology URL.
+     * @return the ontology URL, or null if no ontology is linked
+     */
+    public String getOntologyUrlFromProject(Wait<WebDriver> wait, WebDriver driver, String projectURL) {
+        webDriverUtils.goTo(wait, projectURL);
+        webDriverUtils.xpathClick(wait, "//a[contains(@href, '/information')]");
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//td[contains(text(), 'Ontology')]"));
+        return wait.until(d -> {
+            var elements = d.findElements(By.xpath("//a[contains(@href, '/ontology/')]"));
+            if (elements.isEmpty()) {
+                return null;
+            }
+            String href = elements.get(0).getAttribute("href");
+            return href;
+        });
+    }
 }

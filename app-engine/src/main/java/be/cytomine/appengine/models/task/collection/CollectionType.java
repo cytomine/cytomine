@@ -1015,9 +1015,9 @@ public class CollectionType extends Type {
             AppEngineApplicationContext.getBean(CollectionPersistenceRepository.class);
         CollectionPersistence result = null;
 
-        Type currentType = new CollectionType(this);
-        while (currentType instanceof CollectionType) {
-            currentType = ((CollectionType) currentType).getSubType();
+        Type currentType = getSubType();
+        while (currentType instanceof CollectionType ct) {
+            currentType = ct.getSubType();
         }
 
         String leafType = currentType.getClass().getSimpleName();

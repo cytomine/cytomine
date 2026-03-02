@@ -88,7 +88,7 @@ public class CytomineTests {
         String projectName = "selenium-" + randomUUID();
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
         String projectURL = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
-        String ontologyURL = cytomineSteps.getOntologyUrlFromProject(wait, driver, projectURL);
+        String ontologyURL = cytomineSteps.getOntologyUrlFromProject(wait, projectURL);
         cytomineSteps.deleteProject(wait, projectURL);
         if (ontologyURL != null) {
             cytomineSteps.deleteOntology(wait, ontologyURL);
@@ -111,7 +111,7 @@ public class CytomineTests {
         Set<String> ignored =
             projectUrls.stream()
                 .map(projectURL -> {
-                    String ontologyURL = cytomineSteps.getOntologyUrlFromProject(wait, driver, projectURL);
+                    String ontologyURL = cytomineSteps.getOntologyUrlFromProject(wait, projectURL);
                     cytomineSteps.deleteProject(wait, projectURL);
                     if (ontologyURL != null) {
                         cytomineSteps.deleteOntology(wait, ontologyURL);

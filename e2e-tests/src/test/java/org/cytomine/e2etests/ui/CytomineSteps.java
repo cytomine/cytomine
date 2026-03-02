@@ -28,9 +28,7 @@ public class CytomineSteps {
         webDriverUtils.byIsDisplayed(wait, By.id("app"));
     }
 
-    /**
-     * @return the URL of the created project
-     */
+
     @SneakyThrows
     public String createProject(Wait<WebDriver> wait, WebDriver driver, URL cytomineUrl,
                                 String projectName) {
@@ -84,21 +82,14 @@ public class CytomineSteps {
             By.xpath("//div[contains(text(), 'successfully deleted')]"));
         return ontologyURL;
     }
-    /**
-     * Navigate to project information page and extract the ontology URL.
-     * @return the ontology URL, or null if no ontology is linked
-     */
-    public String getOntologyUrlFromProject(Wait<WebDriver> wait, WebDriver driver, String projectURL) {
+
+    public String getOntologyUrlFromProject(Wait<WebDriver> wait, String projectURL) {
         webDriverUtils.goTo(wait, projectURL);
         webDriverUtils.xpathClick(wait, "//a[contains(@href, '/information')]");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//td[contains(text(), 'Ontology')]"));
         return wait.until(d -> {
             var elements = d.findElements(By.xpath("//a[contains(@href, '/ontology/')]"));
-            if (elements.isEmpty()) {
-                return null;
-            }
-            String href = elements.get(0).getAttribute("href");
-            return href;
+            return elements.get(0).getAttribute("href");
         });
     }
 }

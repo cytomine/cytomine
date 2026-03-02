@@ -1,7 +1,12 @@
 package org.cytomine.e2etests.ui;
 
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import lombok.SneakyThrows;
 import org.openqa.selenium.By;
@@ -47,7 +52,8 @@ public class CytomineSteps {
         webDriverUtils.goTo(wait, projectURL);
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Delete')]");
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Confirm')]");
-        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'successfully deleted')]"));
+        webDriverUtils.byIsDisplayed(wait,
+            By.xpath("//div[contains(text(), 'successfully deleted')]"));
         return projectURL;
     }
 
@@ -56,11 +62,32 @@ public class CytomineSteps {
         webDriverUtils.xpathClick(wait, "//a[@href='#/projects']");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//button[contains(text(), 'New project')]"));
         Set<Boolean> ignored = projectNames.stream()
-                .map(name ->
-                        webDriverUtils.byIsDisplayed(wait,
-                                By.xpath(format("//a[contains(text(), '%s')]",
-                                        name))))
-                .collect(toSet());
+                                   .map(name ->
+                                            webDriverUtils.byIsDisplayed(wait,
+                                                By.xpath(format("//a[contains(text(), '%s')]",
+                                                    name))))
+                                   .collect(toSet());
+    }
+
+    @SneakyThrows
+    public void addImage(Wait<WebDriver> wait, URL cytomineUrl, Optional<String> maybeProjectName) {
+        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/storage");
+        //  webDriverUtils.xpathClick(wait, "//a[contains(text(), 'Add files...')]");
+        String originalPath = getClass().getClassLoader().getResource("cat.png").getPath();
+        String uuid = UUID.randomUUID().toString();
+        Path originalFile = Paths.get(originalPath);
+        Path copiedFile = originalFile.resolveSibling(uuid + ".png");
+        Files.copy(originalFile, copiedFile);
+        maybeProjectName.ifPresent(projectName -> {
+                webDriverUtils.xpathClick(wait, "//strong[contains(text(), 'Link with project')]/ancestor::div[contains(@class, 'columns')]//div[contains(@class, 'multiselect__tags')]");
+                webDriverUtils.xpathClick(wait, "//strong[contains(text(), 'Link with project')]/ancestor::div[contains(@class, 'columns')]//li[contains(@class, 'multiselect__element') and not(contains(@class, 'multiselect__select-all'))]//span[contains(., '" + projectName + "')]");
+            }
+        );
+
+        webDriverUtils.bySendKeysWait(wait, By.cssSelector("input[type='file']"),
+            copiedFile.toString(), false);
+        webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Start upload')]");
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//td[contains(text(), '" + uuid + ".png')]"));
     }
 
 }

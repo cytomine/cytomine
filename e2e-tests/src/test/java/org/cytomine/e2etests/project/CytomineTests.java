@@ -1,5 +1,15 @@
 package org.cytomine.e2etests.project;
 
+import java.io.File;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Duration;
+import java.util.Optional;
+import java.util.Set;
+
 import lombok.SneakyThrows;
 import org.cytomine.e2etests.configuration.SeleniumDriver;
 import org.cytomine.e2etests.ui.CytomineSteps;
@@ -17,17 +27,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
-import java.io.File;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.Duration;
-import java.util.Set;
-
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-import static java.nio.file.attribute.PosixFilePermission.*;
+import static java.nio.file.attribute.PosixFilePermission.GROUP_READ;
+import static java.nio.file.attribute.PosixFilePermission.OTHERS_READ;
+import static java.nio.file.attribute.PosixFilePermission.OWNER_READ;
 import static java.util.UUID.randomUUID;
 import static java.util.stream.Collectors.toSet;
 import static org.openqa.selenium.OutputType.FILE;
@@ -61,8 +64,8 @@ public class CytomineTests {
     @AfterEach
     void tearDown(TestInfo testInfo) {
         saveScreenshot("closing-" + testInfo.getTestMethod()
-                .map(Method::getName)
-                .orElseGet(() -> "no-name-" + randomUUID()));
+                                        .map(Method::getName)
+                                        .orElseGet(() -> "no-name-" + randomUUID()));
         driver.close();
     }
 
@@ -71,7 +74,7 @@ public class CytomineTests {
         Path destination = Paths.get("./build/reports/" + name + ".jpg");
         Files.createDirectories(Path.of("./build/reports/"));
         File screenshot =
-                ((TakesScreenshot) driver).getScreenshotAs(FILE);  // Capture the screenshot as a file
+            ((TakesScreenshot) driver).getScreenshotAs(FILE);  // Capture the screenshot as a file
         Files.move(screenshot.toPath(), destination, REPLACE_EXISTING);
         Files.setPosixFilePermissions(destination, Set.of(OTHERS_READ, OWNER_READ, GROUP_READ));
     }
@@ -100,24 +103,34 @@ public class CytomineTests {
     @Test
     void listProjects() {
         Set<String> projectNames =
-                Set.of(
-                        "selenium-" + randomUUID(),
-                        "selenium-" + randomUUID(),
-                        "selenium-" + randomUUID());
+            Set.of(
+                "selenium-" + randomUUID(),
+                "selenium-" + randomUUID(),
+                "selenium-" + randomUUID());
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
         Set<String> projectUrls =
-                projectNames.stream()
-                        .map(name -> cytomineSteps.createProject(wait, driver, cytomineUrl, name))
-                        .collect(toSet());
+            projectNames.stream()
+                .map(name -> cytomineSteps.createProject(wait, driver, cytomineUrl, name))
+                .collect(toSet());
         cytomineSteps.listProjects(wait, cytomineUrl, projectNames);
         Set<String> ignored =
-                projectUrls.stream()
-                        .map(projectUrl -> cytomineSteps.deleteProject(wait, projectUrl))
-                        .collect(toSet());
+            projectUrls.stream()
+                .map(projectUrl -> cytomineSteps.deleteProject(wait, projectUrl))
+                .collect(toSet());
     }
 
     @Test
-    void addImageToStorage(){
+    void addImageToStorageNoProject() {
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        cytomineSteps.addImage(wait, cytomineUrl, Optional.empty());
+    }
 
+    @Test
+    void addImageToStorageWithProject() {
+        String projectName = "selenium-" + randomUUID();
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        String projectURL =   cytomineSteps.createProject(wait,driver, cytomineUrl, projectName);
+        cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName));
+        cytomineSteps.deleteProject(wait, projectURL);
     }
 }

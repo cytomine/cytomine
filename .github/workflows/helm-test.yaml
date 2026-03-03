@@ -83,7 +83,8 @@ jobs:
           EXTRA_ARGS+="--set images.postgresql_iam=registry.cytomine.org/docker/library/postgres:14 "
           EXTRA_ARGS+="--set images.postgresql_app_engine=registry.cytomine.org/docker/library/postgres:14 "
           EXTRA_ARGS+="--set images.postgis=registry.cytomine.org/docker/postgis/postgis:15-3.5 "
-          EXTRA_ARGS+="--set images.selenium=registry.cytomine.org/docker/selenium/standalone-firefox"
+          EXTRA_ARGS+="--set images.selenium=registry.cytomine.org/docker/selenium/standalone-firefox "
+          EXTRA_ARGS+="--set images.registry=registry.cytomine.org/docker/library/registry:2"
           ct lint-and-install --target-branch ${{ github.event.repository.default_branch }} \
             --chart-dirs=helm/charts/ --all --namespace=cytomine-${{ github.sha }} \
             --helm-extra-set-args="$EXTRA_ARGS"

@@ -70,6 +70,7 @@ images:
   #
   # External Images
   #
+  registry: registry:2
   alpine: alpine:3.18
   curl: curlimages/curl
   eclipse_temurin: eclipse-temurin:8u462-b08-jdk-ubi9-minimal
@@ -241,6 +242,11 @@ app_engine:
     size: 5Gi
     storageClassName: null
   tasks_namespace:
+  registry:
+    port: 5000
+    storage:
+      size: 5Gi
+      storageClassName: null
 
 sam:
   port: 8000

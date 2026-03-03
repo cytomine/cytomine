@@ -92,6 +92,16 @@ jobs:
         if: always()
         run: kubectl --namespace=cytomine-${{ github.sha }} logs e2e-tests
 
+      - name: Logs core
+        if: failure()
+        run: |
+          kubectl --namespace=cytomine-${{ github.sha }} logs -l app=core --tail=500 || echo "Failed to get core logs"
+
+      - name: Logs app-engine
+        if: failure()
+        run: |
+          kubectl --namespace=cytomine-${{ github.sha }} logs -l app=app-engine --tail=500 || echo "Failed to get app-engine logs"
+
       - name: Export test results
         if: always()
         run: |

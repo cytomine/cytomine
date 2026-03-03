@@ -1117,6 +1117,7 @@ public class CollectionType extends Type {
                 CollectionPersistence parentPersistence = (CollectionPersistence) parameterNameToTypePersistence.get(parentName);
                 if (containsArrayYml) {
                     CollectionPersistence subCollection = new CollectionPersistence();
+                    subCollection.setValueType(ValueType.ARRAY);
                     subCollection.setParameterName(entry.getName());
                     subCollection.setCollectionIndex(Arrays.stream(nameParts, 1, nameParts.length).collect(
                         Collectors.joining()));
@@ -1473,13 +1474,14 @@ public class CollectionType extends Type {
             collectionValue.setType(ValueType.ARRAY);
             collectionValue.setParameterName(collectionPersistence.getParameterName());
             collectionValue.setTaskRunId(collectionPersistence.getRunId());
-            collectionValue.setSubType(getCollectionSubType());
 
             List<TaskRunParameterValue> items = new ArrayList<>();
             collectionValue.setValue(items);
             for (TypePersistence persistence : collectionPersistence.getItems()) {
                 items.add(buildNode(persistence));
             }
+            collectionValue.setSubType(items.get(0).getType());
+
             return collectionValue;
         }
 
@@ -1490,32 +1492,6 @@ public class CollectionType extends Type {
         geoCollectionValue.setValue(collectionPersistence.getCompactValue());
 
         return geoCollectionValue;
-    }
-
-    private ValueType getCollectionSubType() throws ProvisioningException {
-        if (subType instanceof CollectionType) {
-            return ValueType.ARRAY;
-        } else if (subType instanceof ImageType) {
-            return ValueType.IMAGE;
-        } else if (subType instanceof FileType) {
-            return ValueType.FILE;
-        } else if (subType instanceof GeometryType) {
-            return ValueType.GEOMETRY;
-        } else if (subType instanceof NumberType) {
-            return ValueType.NUMBER;
-        } else if (subType instanceof StringType) {
-            return ValueType.STRING;
-        } else if (subType instanceof BooleanType) {
-            return ValueType.BOOLEAN;
-        } else if (subType instanceof IntegerType) {
-            return ValueType.INTEGER;
-        } else if (subType instanceof EnumerationType) {
-            return ValueType.ENUMERATION;
-        } else if (subType instanceof DateTimeType) {
-            return ValueType.DATETIME;
-        } else {
-            throw new ProvisioningException(ErrorCode.INTERNAL_UNKNOWN_SUBTYPE);
-        }
     }
 
     private CollectionItemValue getCollectionItemValue(TypePersistence typePersistence)

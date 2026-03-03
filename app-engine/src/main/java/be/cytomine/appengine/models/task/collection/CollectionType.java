@@ -1469,10 +1469,9 @@ public class CollectionType extends Type {
 
         if (typePersistence instanceof CollectionPersistence collectionPersistence) {
             // either items or compact value but not both
-            if (Objects.nonNull(collectionPersistence.getItems())
-                && !collectionPersistence.getItems().isEmpty()
-                && Objects.isNull(collectionPersistence.getCompactValue())) {
-
+            boolean hasItems = !collectionPersistence.getItems().isEmpty();
+            boolean isCompactValueMissing = collectionPersistence.getCompactValue() == null;
+            if (hasItems && isCompactValueMissing) {
                 CollectionValue collectionValue = new CollectionValue();
                 collectionValue.setType(ValueType.ARRAY);
                 collectionValue.setParameterName(collectionPersistence.getParameterName());
@@ -1485,18 +1484,18 @@ public class CollectionType extends Type {
                     items.add(buildNode(persistence));
                 }
                 return collectionValue;
-            } else {
-                GeoCollectionValue geoCollectionValue = new GeoCollectionValue();
-                geoCollectionValue.setType(ValueType.ARRAY);
-                geoCollectionValue.setParameterName(collectionPersistence.getParameterName());
-                geoCollectionValue.setTaskRunId(collectionPersistence.getRunId());
-                geoCollectionValue.setValue(collectionPersistence.getCompactValue());
-
-                return geoCollectionValue;
             }
-        } else {
-            return getCollectionItemValue(typePersistence, leafType);
+
+            GeoCollectionValue geoCollectionValue = new GeoCollectionValue();
+            geoCollectionValue.setType(ValueType.ARRAY);
+            geoCollectionValue.setParameterName(collectionPersistence.getParameterName());
+            geoCollectionValue.setTaskRunId(collectionPersistence.getRunId());
+            geoCollectionValue.setValue(collectionPersistence.getCompactValue());
+
+            return geoCollectionValue;
         }
+
+        return getCollectionItemValue(typePersistence, leafType);
     }
 
     private ValueType getCollectionSubType() throws ProvisioningException {

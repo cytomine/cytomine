@@ -84,25 +84,14 @@ jobs:
           EXTRA_ARGS+="--set images.postgresql_app_engine=registry.cytomine.org/docker/library/postgres:14 "
           EXTRA_ARGS+="--set images.postgis=registry.cytomine.org/docker/postgis/postgis:15-3.5 "
           EXTRA_ARGS+="--set images.selenium=registry.cytomine.org/docker/selenium/standalone-firefox "
-          EXTRA_ARGS+="--set images.registry=registry.cytomine.org/docker/library/registry:2.8.3 "
-
-          dump_logs() {
-            echo "=== Core logs ==="
-            kubectl --namespace=cytomine-${{ github.sha }} logs -l app=core --tail=200 || true
-            echo "=== App-engine logs ==="
-            kubectl --namespace=cytomine-${{ github.sha }} logs -l app=app-engine --tail=200 || true
-          }
-          trap dump_logs EXIT
-
+          EXTRA_ARGS+="--set images.registry=registry.cytomine.org/docker/library/registry:2.8.3"
           ct lint-and-install --target-branch ${{ github.event.repository.default_branch }} \
             --chart-dirs=helm/charts/ --all --namespace=cytomine-${{ github.sha }} \
-            --helm-extra-set-args="$EXTRA_ARGS" \
-            --helm-extra-args="--timeout 20m"
+            --helm-extra-set-args="$EXTRA_ARGS"
 
       - name: Logs e2e tests results
         if: always()
-        run: kubectl --namespace=cytomine-${{ github.sha }} logs e2e-tests || echo
-          "Failed to get e2e-tests logs"
+        run: kubectl --namespace=cytomine-${{ github.sha }} logs e2e-tests
 
       - name: Export test results
         if: always()

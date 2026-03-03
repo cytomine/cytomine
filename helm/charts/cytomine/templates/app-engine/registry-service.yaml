@@ -3,9 +3,13 @@ kind: Service
 metadata:
   name: registry
 spec:
+  type: {{ .Values.app_engine.registry.serviceType }}
   selector:
     app: registry
   ports:
     - name: registry
       port: {{ .Values.app_engine.registry.port }}
+      {{- if eq .Values.app_engine.registry.serviceType "NodePort" }}
+      nodePort: {{ .Values.app_engine.registry.nodePort }}
+      {{- end }}
       protocol: TCP

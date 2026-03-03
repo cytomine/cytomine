@@ -244,6 +244,13 @@ app_engine:
   tasks_namespace:
   registry:
     port: 5000
+    # Service type: NodePort exposes on node, ClusterIP for internal only
+    serviceType: NodePort
+    nodePort: 32000
+    # URL used by the container runtime to pull task images
+    # This must be reachable from the node's container runtime (containerd/docker)
+    # Examples: "localhost:32000" for NodePort, or external registry URL
+    advertisedUrl: null
     storage:
       size: 5Gi
       storageClassName: null

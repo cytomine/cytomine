@@ -46,7 +46,7 @@ metadata:
   namespace: {{ include "cytomine.appEngineTasksNamespace" . }}
 rules:
 - apiGroups: [""] # "" indicates the core API group
-  resources: ["pods"]
+  resources: ["pods", "pods/status"]
   verbs: ["create", "get", "watch", "list", "delete"]
 
 ---

@@ -1461,11 +1461,6 @@ public class CollectionType extends Type {
     }
 
     private TaskRunParameterValue buildNode(TypePersistence typePersistence) throws ProvisioningException {
-        Type currentType = getSubType();
-        while (currentType instanceof CollectionType ct) {
-            currentType = ct.getSubType();
-        }
-
         if (!(typePersistence instanceof CollectionPersistence collectionPersistence)) {
             return getCollectionItemValue(typePersistence);
         }

@@ -1523,7 +1523,7 @@ public class CollectionType extends Type {
         }
     }
 
-    private static CollectionItemValue getCollectionItemValue(TypePersistence typePersistence)
+    private CollectionItemValue getCollectionItemValue(TypePersistence typePersistence)
         throws ProvisioningException {
 
         CollectionItemValue collectionItemValue = new CollectionItemValue();
@@ -1531,26 +1531,26 @@ public class CollectionType extends Type {
             typePersistence.getParameterName().lastIndexOf("[") + 1).replace("]", "");
         collectionItemValue.setIndex(Integer.parseInt(fileName));
 
-        if (typePersistence instanceof IntegerPersistence) {
-            collectionItemValue.setValue(((IntegerPersistence) typePersistence).getValue());
+        if (typePersistence instanceof IntegerPersistence ip) {
+            collectionItemValue.setValue(ip.getValue());
             collectionItemValue.setType(ValueType.INTEGER);
-        } else if (typePersistence instanceof StringPersistence) {
-            collectionItemValue.setValue(((StringPersistence) typePersistence).getValue());
+        } else if (typePersistence instanceof StringPersistence sp) {
+            collectionItemValue.setValue(sp.getValue());
             collectionItemValue.setType(ValueType.STRING);
-        } else if (typePersistence instanceof GeometryPersistence) {
-            collectionItemValue.setValue(((GeometryPersistence) typePersistence).getValue());
+        } else if (typePersistence instanceof GeometryPersistence gp) {
+            collectionItemValue.setValue(gp.getValue());
             collectionItemValue.setType(ValueType.GEOMETRY);
-        } else if (typePersistence instanceof NumberPersistence) {
-            collectionItemValue.setValue(((NumberPersistence) typePersistence).getValue());
+        } else if (typePersistence instanceof NumberPersistence np) {
+            collectionItemValue.setValue(np.getValue());
             collectionItemValue.setType(ValueType.NUMBER);
-        } else if (typePersistence instanceof BooleanPersistence) {
-            collectionItemValue.setValue(((BooleanPersistence) typePersistence).isValue());
+        } else if (typePersistence instanceof BooleanPersistence bp) {
+            collectionItemValue.setValue(bp.isValue());
             collectionItemValue.setType(ValueType.BOOLEAN);
-        } else if (typePersistence instanceof EnumerationPersistence) {
-            collectionItemValue.setValue(((EnumerationPersistence) typePersistence).getValue());
+        } else if (typePersistence instanceof EnumerationPersistence ep) {
+            collectionItemValue.setValue(ep.getValue());
             collectionItemValue.setType(ValueType.ENUMERATION);
-        } else if (typePersistence instanceof DateTimePersistence) {
-            collectionItemValue.setValue(((DateTimePersistence) typePersistence).getValue());
+        } else if (typePersistence instanceof DateTimePersistence dp) {
+            collectionItemValue.setValue(dp.getValue());
             collectionItemValue.setType(ValueType.DATETIME);
         } else if (typePersistence instanceof ImagePersistence) {
             collectionItemValue.setType(ValueType.IMAGE);

@@ -887,17 +887,15 @@ public class TaskProvisioningService {
             && !run.getState().equals(TaskRunState.QUEUING);
     }
 
-    public List<TaskRunParameterValue> retrieveRunOutputs(
-        String runId
-    ) throws ProvisioningException {
+    public List<TaskRunParameterValue> retrieveRunOutputs(String runId) throws ProvisioningException {
         log.info("Retrieving Outputs Json: retrieving...");
-        // validate run
+
         Run run = getRunIfValid(runId);
         if (!run.getState().equals(TaskRunState.FINISHED)) {
             AppEngineError error = ErrorBuilder.build(ErrorCode.INTERNAL_INVALID_TASK_RUN_STATE);
             throw new ProvisioningException(error);
         }
-        // find all the results
+
         List<TaskRunParameterValue> outputList = buildTaskRunParameterValues(
             run,
             ParameterType.OUTPUT

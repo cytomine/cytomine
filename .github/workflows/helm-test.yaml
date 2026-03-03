@@ -84,7 +84,9 @@ jobs:
           EXTRA_ARGS+="--set images.postgresql_app_engine=registry.cytomine.org/docker/library/postgres:14 "
           EXTRA_ARGS+="--set images.postgis=registry.cytomine.org/docker/postgis/postgis:15-3.5 "
           EXTRA_ARGS+="--set images.selenium=registry.cytomine.org/docker/selenium/standalone-firefox "
+          EXTRA_ARGS+="--set images.registry=registry.cytomine.org/docker/library/registry:2.8.3 "
           EXTRA_ARGS+="--timeout 20m"
+
           dump_logs() {
             echo "=== Core logs ==="
             kubectl --namespace=cytomine-${{ github.sha }} logs -l app=core --tail=200 || true

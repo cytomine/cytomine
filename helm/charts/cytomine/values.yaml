@@ -70,7 +70,7 @@ images:
   #
   # External Images
   #
-  registry: registry:2
+  registry: registry:2.8.3
   alpine: alpine:3.18
   curl: curlimages/curl
   eclipse_temurin: eclipse-temurin:8u462-b08-jdk-ubi9-minimal

@@ -25,6 +25,27 @@ spec:
         {{ end }}
         - name: temp
           emptyDir: {}
+      initContainers:
+        - name: wait-for-postgres
+          image: "{{ .Values.images.postgresql_app_engine }}"
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
+          env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-app-engine-secret
+                  key: password
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Waiting for postgres-app-engine to be ready..."
+              until pg_isready -h postgres-app-engine.{{ .Release.Namespace }}.svc.cluster.local -p 5432 -U appengine; do
+                echo "postgres-app-engine not ready, retrying in 2s..."
+                sleep 2
+              done
+              echo "postgres-app-engine is ready!"
       containers:
       - name: app-engine
         image: {{ .Values.images.app_engine }}

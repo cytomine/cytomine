@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: registry
+  annotations:
+    kube-score/ignore: pod-probes
+  labels:
+    role: registry
+    app: registry
+    component: {{ .Release.Name }}-registry
+    release: {{ .Release.Name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: registry
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        role: registry
+        app: registry
+        release: {{ .Release.Name }}
+    spec:
+      securityContext:
+      {{- include "cytomine.podSecurityContext" . | nindent 8 }}
+      containers:
+        - name: registry
+          image: "{{ .Values.images.registry }}"
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.app_engine.registry.port }}
+          env:
+            - name: REGISTRY_STORAGE_DELETE_ENABLED
+              value: "true"
+            - name: REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY
+              value: /data
+          volumeMounts:
+            - name: registry-storage
+              mountPath: /data
+            - name: temp
+              mountPath: /tmp
+      volumes:
+      - emptyDir: {}
+        name: temp
+      {{ if not .Values.app_engine.registry.storage.storageClassName -}}
+      - name: registry-storage
+        emptyDir: {}
+      {{ end }}
+  {{ if .Values.app_engine.registry.storage.storageClassName -}}
+  volumeClaimTemplates:
+    - metadata:
+        name: registry-storage
+      spec:
+        storageClassName: {{ .Values.app_engine.registry.storage.storageClassName }}
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: {{ .Values.app_engine.registry.storage.size }}
+  {{- end }}

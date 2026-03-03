@@ -40,6 +40,50 @@ spec:
         securityContext:
         {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
 
+      - name: update-user-profile-schema
+        image: "{{ .Values.images.iam }}"
+        command: [ "/bin/sh", "-c" ]
+        args:
+          - |
+            # 1. Fetch current profile
+            /opt/keycloak/bin/kcadm.sh get users-profile -r cytomine --server {{ include "cytomine.iamInternalUrl" . }} --config /opt/keycloak-auth/kcadm.config > /tmp/profile.json
+
+            # 2. Define Attributes
+            ATTR_ISDEV='{"name":"isDeveloper","displayName":"developer","validations":{"options":{"options":["1","0"]}},"annotations":{"inputType":"select"},"required":{"roles":["admin","user"]},"permissions":{"view":[],"edit":["admin"]},"multivalued":false}'
+            ATTR_LOCALE='{"name":"user_locale","displayName":"locale","validations":{"options":{"options":["no","nl","en","es","fr"]}},"annotations":{"inputType":"select"},"permissions":{"view":["admin"],"edit":["admin"]},"multivalued":false}'
+            ATTR_PROJECTS='{"name":"projects","displayName":"projects","validations":{},"annotations":{},"required":{"roles":["admin","user"]},"permissions":{"view":[],"edit":["admin"]},"multivalued":true}'
+
+            # 3. Inject missing attributes surgically
+            if ! grep -q "isDeveloper" /tmp/profile.json; then
+              sed -i "s/],\"groups\"/,$ATTR_ISDEV],\"groups\"/" /tmp/profile.json
+            fi
+
+            if ! grep -q "user_locale" /tmp/profile.json; then
+              sed -i "s/],\"groups\"/,$ATTR_LOCALE],\"groups\"/" /tmp/profile.json
+            fi
+
+            if ! grep -q "\"name\":\"projects\"" /tmp/profile.json; then
+              sed -i "s/],\"groups\"/,$ATTR_PROJECTS],\"groups\"/" /tmp/profile.json
+            fi
+
+            # 4. Push update back to Keycloak
+            /opt/keycloak/bin/kcadm.sh update users-profile -r cytomine --server {{ include "cytomine.iamInternalUrl" . }} --config /opt/keycloak-auth/kcadm.config -f /tmp/profile.json
+        volumeMounts:
+          - name: kc-auth
+            mountPath: "/opt/keycloak-auth"
+        securityContext:
+              {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
+
+      - name: add-projects-protocol-mapper
+        image: "{{ .Values.images.iam }}"
+        command: [ "/bin/sh", "-c" ]
+        args: [ "PROFILE_SCOPE_ID=$(/opt/keycloak/bin/kcadm.sh get client-scopes -r cytomine --server {{ include "cytomine.iamInternalUrl" . }} --config /opt/keycloak-auth/kcadm.config -q name=profile --fields id --format csv | sed 's/\"//g') && /opt/keycloak/bin/kcadm.sh create client-scopes/$PROFILE_SCOPE_ID/protocol-mappers/models -r cytomine --server {{ include "cytomine.iamInternalUrl" . }} --config /opt/keycloak-auth/kcadm.config -s name=projects -s protocol=openid-connect -s protocolMapper=oidc-usermodel-attribute-mapper -s config.\"user.attribute\"=projects -s config.\"claim.name\"=projects -s config.\"id.token.claim\"=true -s config.\"access.token.claim\"=true -s config.\"userinfo.token.claim\"=true -s config.\"jsonType.label\"=String -s config.multivalued=true || true" ]
+        volumeMounts:
+          - name: kc-auth
+            mountPath: "/opt/keycloak-auth"
+        securityContext:
+        {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
+
       - name: create-user
         image: "{{ .Values.images.iam }}"
         command: ["/bin/sh", "-c"]

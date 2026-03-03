@@ -1461,9 +1461,9 @@ public class CollectionType extends Type {
     }
 
     private TaskRunParameterValue buildNode(TypePersistence typePersistence) throws ProvisioningException {
-        Type currentType = new CollectionType(this);
-        while (currentType instanceof CollectionType) {
-            currentType = ((CollectionType) currentType).getSubType();
+        Type currentType = getSubType();
+        while (currentType instanceof CollectionType ct) {
+            currentType = ct.getSubType();
         }
         String leafType = currentType.getClass().getSimpleName();
 

@@ -50,6 +50,21 @@ spec:
         - emptyDir: {}
           name: images-temp
         {{ end }}
+      initContainers:
+        - name: wait-for-cache
+          image: "{{ .Values.images.pims_cache }}"
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Waiting for pims-cache (Redis) to be ready..."
+              until redis-cli -h pims-cache.{{ .Release.Namespace }}.svc.cluster.local -p {{ .Values.pims_cache.port }} ping | grep -q PONG; do
+                echo "pims-cache not ready, retrying in 2s..."
+                sleep 2
+              done
+              echo "pims-cache is ready!"
       containers:
         - name: pims
           image: "{{ .Values.images.pims }}"

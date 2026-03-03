@@ -1465,37 +1465,36 @@ public class CollectionType extends Type {
         while (currentType instanceof CollectionType ct) {
             currentType = ct.getSubType();
         }
-        String leafType = currentType.getClass().getSimpleName();
 
-        if (typePersistence instanceof CollectionPersistence collectionPersistence) {
-            // either items or compact value but not both
-            boolean hasItems = !collectionPersistence.getItems().isEmpty();
-            boolean isCompactValueMissing = collectionPersistence.getCompactValue() == null;
-            if (hasItems && isCompactValueMissing) {
-                CollectionValue collectionValue = new CollectionValue();
-                collectionValue.setType(ValueType.ARRAY);
-                collectionValue.setParameterName(collectionPersistence.getParameterName());
-                collectionValue.setTaskRunId(collectionPersistence.getRunId());
-                collectionValue.setSubType(getCollectionSubType());
-
-                List<TaskRunParameterValue> items = new ArrayList<>();
-                collectionValue.setValue(items);
-                for (TypePersistence persistence : collectionPersistence.getItems()) {
-                    items.add(buildNode(persistence));
-                }
-                return collectionValue;
-            }
-
-            GeoCollectionValue geoCollectionValue = new GeoCollectionValue();
-            geoCollectionValue.setType(ValueType.ARRAY);
-            geoCollectionValue.setParameterName(collectionPersistence.getParameterName());
-            geoCollectionValue.setTaskRunId(collectionPersistence.getRunId());
-            geoCollectionValue.setValue(collectionPersistence.getCompactValue());
-
-            return geoCollectionValue;
+        if (!(typePersistence instanceof CollectionPersistence collectionPersistence)) {
+            return getCollectionItemValue(typePersistence);
         }
 
-        return getCollectionItemValue(typePersistence, leafType);
+        // either items or compact value but not both
+        boolean hasItems = !collectionPersistence.getItems().isEmpty();
+        boolean isCompactValueMissing = collectionPersistence.getCompactValue() == null;
+        if (hasItems && isCompactValueMissing) {
+            CollectionValue collectionValue = new CollectionValue();
+            collectionValue.setType(ValueType.ARRAY);
+            collectionValue.setParameterName(collectionPersistence.getParameterName());
+            collectionValue.setTaskRunId(collectionPersistence.getRunId());
+            collectionValue.setSubType(getCollectionSubType());
+
+            List<TaskRunParameterValue> items = new ArrayList<>();
+            collectionValue.setValue(items);
+            for (TypePersistence persistence : collectionPersistence.getItems()) {
+                items.add(buildNode(persistence));
+            }
+            return collectionValue;
+        }
+
+        GeoCollectionValue geoCollectionValue = new GeoCollectionValue();
+        geoCollectionValue.setType(ValueType.ARRAY);
+        geoCollectionValue.setParameterName(collectionPersistence.getParameterName());
+        geoCollectionValue.setTaskRunId(collectionPersistence.getRunId());
+        geoCollectionValue.setValue(collectionPersistence.getCompactValue());
+
+        return geoCollectionValue;
     }
 
     private ValueType getCollectionSubType() throws ProvisioningException {
@@ -1524,9 +1523,7 @@ public class CollectionType extends Type {
         }
     }
 
-    private static CollectionItemValue getCollectionItemValue(
-        TypePersistence typePersistence,
-        String leafType)
+    private static CollectionItemValue getCollectionItemValue(TypePersistence typePersistence)
         throws ProvisioningException {
 
         CollectionItemValue collectionItemValue = new CollectionItemValue();

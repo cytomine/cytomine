@@ -4,7 +4,7 @@ kind: StatefulSet
 metadata:
   name: pims
   annotations:
-    kube-score/ignore: pod-probes,container-security-context-user-group-id,pod-hostpath
+    kube-score/ignore: container-security-context-user-group-id,pod-hostpath
   labels:
     role: pims
     app: {{ include "cytomine.name" . }}
@@ -101,6 +101,22 @@ spec:
           ports:
             - name: http
               containerPort: {{ .Values.pims.port }}
+          readinessProbe:
+            httpGet:
+              path: /ims/disk-usage
+              port: {{ .Values.pims.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 12
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /ims/disk-usage
+              port: {{ .Values.pims.port }}
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            failureThreshold: 3
+            timeoutSeconds: 10
           securityContext:
           {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
           resources:

@@ -1007,67 +1007,132 @@ public class CollectionType extends Type {
         return datetimePersistence;
     }
 
+    private TypePersistence createPersistence(String leafType, String value) throws ProvisioningException {
+        return switch (leafType) {
+            case "IntegerType" -> {
+                IntegerPersistence p = new IntegerPersistence();
+                p.setValue(Integer.parseInt(value));
+                p.setValueType(ValueType.INTEGER);
+                yield p;
+            }
+
+            case "StringType" -> {
+                StringPersistence p = new StringPersistence();
+                p.setValue(value);
+                p.setValueType(ValueType.STRING);
+                yield p;
+            }
+
+            case "EnumerationType" -> {
+                EnumerationPersistence p = new EnumerationPersistence();
+                p.setValue(value);
+                p.setValueType(ValueType.ENUMERATION);
+                yield p;
+            }
+
+            case "GeometryType" -> {
+                GeometryPersistence p = new GeometryPersistence();
+                p.setValue(value);
+                p.setValueType(ValueType.GEOMETRY);
+                yield p;
+            }
+
+            case "NumberType" -> {
+                NumberPersistence p = new NumberPersistence();
+                p.setValue(Double.parseDouble(value));
+                p.setValueType(ValueType.NUMBER);
+                yield p;
+            }
+
+            case "BooleanType" -> {
+                BooleanPersistence p = new BooleanPersistence();
+                p.setValue(Boolean.parseBoolean(value));
+                p.setValueType(ValueType.BOOLEAN);
+                yield p;
+            }
+
+            case "FileType" -> {
+                FilePersistence p = new FilePersistence();
+                p.setValue(null);
+                p.setValueType(ValueType.FILE);
+                yield p;
+            }
+
+            case "ImageType" -> {
+                ImagePersistence p = new ImagePersistence();
+                p.setValue(null);
+                p.setValueType(ValueType.IMAGE);
+                yield p;
+            }
+
+            case "DateTimeType" -> {
+                DateTimePersistence p = new DateTimePersistence();
+                p.setValue(Instant.parse(value));
+                p.setValueType(ValueType.DATETIME);
+                yield p;
+            }
+
+            default ->  throw new ProvisioningException("unknown leaf type: " + leafType);
+        };
+    }
+
     @Transactional
     @Override
     public void persistResult(Run run, Parameter currentOutput, StorageData outputValue) throws ProvisioningException {
         CollectionPersistenceRepository collectionPersistenceRepository =
             AppEngineApplicationContext.getBean(CollectionPersistenceRepository.class);
-        CollectionPersistence result = null;
 
-        Type currentType = new CollectionType(this);
-        while (currentType instanceof CollectionType) {
-            currentType = ((CollectionType) currentType).getSubType();
+        Type currentType = getSubType();
+        while (currentType instanceof CollectionType ct) {
+            currentType = ct.getSubType();
         }
 
         String leafType = currentType.getClass().getSimpleName();
         Map<String, TypePersistence> parameterNameToTypePersistence = new LinkedHashMap<>();
         outputValue.sortShallowToDeep();
-        for (StorageDataEntry entry : outputValue.getEntryList()) {
+
+        CollectionPersistence root = new CollectionPersistence();
+        root.setValueType(ValueType.ARRAY);
+        root.setParameterType(ParameterType.OUTPUT);
+        root.setParameterName(currentOutput.getName());
+        root.setRunId(run.getId());
+        parameterNameToTypePersistence.put(currentOutput.getName(), root);
+
+        List<StorageDataEntry> entries = outputValue.getEntryList();
+        for (StorageDataEntry entry : entries.subList(1, entries.size())) {
+            String parentName = entry.getName().substring(0, entry.getName().lastIndexOf("/"));
+
             if (entry.getStorageDataType() == StorageDataType.DIRECTORY) {
-                if (entry.getName().equals(currentOutput.getName())) { // the main collection directory
-                    result = new CollectionPersistence();
-                    result.setValueType(ValueType.ARRAY);
-                    result.setParameterType(ParameterType.OUTPUT);
-                    result.setParameterName(currentOutput.getName());
-                    result.setRunId(run.getId());
-                    parameterNameToTypePersistence.put(entry.getName(), result);
-                } else { // any directory below main is a subCollection
-
-                    String[] nameParts = entry.getName().trim().split("/");
-                    for (int i = 0; i < nameParts.length; i++) {
-                        if (i != 0) {
-                            nameParts[i] = "[" + nameParts[i] + "]";
-                        }
+                String[] nameParts = entry.getName().trim().split("/");
+                for (int i = 0; i < nameParts.length; i++) {
+                    if (i != 0) {
+                        nameParts[i] = "[" + nameParts[i] + "]";
                     }
-                    // it is a subCollection if contains array.yml
-                    boolean containsArrayYml = outputValue.getEntryList().stream().anyMatch(
-                        storage -> storage.getName()
-                            .equalsIgnoreCase(entry.getName() + "array.yml"));
+                }
+                // it is a subCollection if contains array.yml
+                boolean containsArrayYml = outputValue.getEntryList().stream().anyMatch(
+                    storage -> storage.getName()
+                        .equalsIgnoreCase(entry.getName() + "/array.yml"));
 
-                    String parentName = entry.getName().substring(0, entry.getName().lastIndexOf("/"));
-                    if (containsArrayYml) {
-                        CollectionPersistence subCollection = new CollectionPersistence();
-                        subCollection.setParameterName(String.join("", nameParts));
-                        subCollection.setCollectionIndex(Arrays.stream(nameParts, 1, nameParts.length).collect(
-                            Collectors.joining()));
+                CollectionPersistence parentPersistence = (CollectionPersistence) parameterNameToTypePersistence.get(parentName);
+                if (containsArrayYml) {
+                    CollectionPersistence subCollection = new CollectionPersistence();
+                    subCollection.setParameterName(entry.getName());
+                    subCollection.setCollectionIndex(Arrays.stream(nameParts, 1, nameParts.length).collect(
+                        Collectors.joining()));
 
-                        parameterNameToTypePersistence.put(entry.getName(), subCollection);
-                        // add this collection to parent collection
-                        CollectionPersistence parentPersistence = (CollectionPersistence) parameterNameToTypePersistence.get(parentName);
-                        parentPersistence.getItems().add(subCollection);
-                    } else {
-                        DirectoryPersistence directory = new DirectoryPersistence();
-                        directory.setParameterName(String.join("", nameParts));
-                        parameterNameToTypePersistence.put(entry.getName(), directory);
-                        // add this directory to the parent collection
-                        CollectionPersistence parentPersistence = (CollectionPersistence) parameterNameToTypePersistence.get(parentName);
-                        parentPersistence.getItems().add(directory);
-                    }
+                    parameterNameToTypePersistence.put(entry.getName(), subCollection);
+                    parentPersistence.getItems().add(subCollection);
+                } else {
+                    DirectoryPersistence directory = new DirectoryPersistence();
+                    directory.setParameterName(entry.getName());
+                    parameterNameToTypePersistence.put(entry.getName(), directory);
+
+                    parentPersistence.getItems().add(directory);
                 }
             }
 
             if (entry.getStorageDataType().equals(StorageDataType.FILE)) {
-                String parentName = entry.getName().substring(0, entry.getName().lastIndexOf("/"));
                 if (entry.getName().endsWith("array.yml")) {
                     CollectionPersistence parentPersistence = (CollectionPersistence) parameterNameToTypePersistence.get(parentName);
                     parentPersistence.setSize(getCollectionSize(entry));
@@ -1080,12 +1145,10 @@ public class CollectionType extends Type {
                         nameParts[i] = "[" + nameParts[i] + "]";
                     }
                 }
-                CollectionPersistence parentCollection = (CollectionPersistence) parameterNameToTypePersistence.get(parentName); // can't get the parent collection because the parent is not a collection
+                CollectionPersistence parentCollection = (CollectionPersistence) parameterNameToTypePersistence.get(parentName);
 
                 String entryValue = null;
-                if (!(leafType.equals("FileType")
-                    || leafType.equals("ImageType"))) {
-
+                if (!(leafType.equals("FileType") || leafType.equals("ImageType"))) {
                     entryValue = FileHelper.read(entry.getData(), getStorageCharset());
                 }
 
@@ -1118,128 +1181,23 @@ public class CollectionType extends Type {
                     continue;
                 }
 
-                switch (leafType) {
-                    case "IntegerType":
-                        IntegerPersistence integerPersistence = new IntegerPersistence();
-                        integerPersistence.setParameterType(ParameterType.OUTPUT);
-                        integerPersistence.setRunId(run.getId());
-                        integerPersistence.setParameterName(String.join("", nameParts));
-                        integerPersistence.setCollectionIndex(Arrays.stream(nameParts, 1, nameParts.length).collect(
-                            Collectors.joining()));
-                        integerPersistence.setValue(Integer.parseInt(entryValue));
-                        integerPersistence.setValueType(ValueType.INTEGER);
+                TypePersistence persistence = createPersistence(leafType, entryValue);
+                persistence.setParameterType(ParameterType.OUTPUT);
+                persistence.setRunId(run.getId());
+                persistence.setParameterName(String.join("", nameParts));
+                persistence.setCollectionIndex(Arrays.stream(nameParts, 1, nameParts.length).collect(Collectors.joining()));
 
-                        parentCollection.getItems().add(integerPersistence);
-                        break;
-                    case "StringType":
-                        StringPersistence stringPersistence = new StringPersistence();
-                        stringPersistence.setParameterType(ParameterType.OUTPUT);
-                        stringPersistence.setRunId(run.getId());
-                        stringPersistence.setParameterName(String.join("", nameParts));
-                        stringPersistence.setCollectionIndex(Arrays.stream(nameParts, 1, nameParts.length).collect(
-                            Collectors.joining()));
-                        stringPersistence.setValue(entryValue);
-                        stringPersistence.setValueType(ValueType.STRING);
-
-                        parentCollection.getItems().add(stringPersistence);
-                        break;
-                    case "EnumerationType":
-                        EnumerationPersistence enumerationPersistence = new EnumerationPersistence();
-                        enumerationPersistence.setParameterType(ParameterType.OUTPUT);
-                        enumerationPersistence.setRunId(run.getId());
-                        enumerationPersistence.setParameterName(String.join("", nameParts));
-                        enumerationPersistence.setCollectionIndex(Arrays.stream(nameParts, 1, nameParts.length).collect(
-                            Collectors.joining()));
-                        enumerationPersistence.setValue(entryValue);
-                        enumerationPersistence.setValueType(ValueType.ENUMERATION);
-
-                        parentCollection.getItems().add(enumerationPersistence);
-                        break;
-                    case "GeometryType":
-                        GeometryPersistence geoPersistence = new GeometryPersistence();
-                        geoPersistence.setParameterType(ParameterType.OUTPUT);
-                        geoPersistence.setRunId(run.getId());
-                        geoPersistence.setParameterName(String.join("", nameParts));
-                        geoPersistence.setCollectionIndex(Arrays.stream(nameParts, 1, nameParts.length).collect(
-                            Collectors.joining()));
-                        geoPersistence.setValue(entryValue);
-                        geoPersistence.setValueType(ValueType.GEOMETRY);
-
-                        parentCollection.getItems().add(geoPersistence);
-                        break;
-                    case "NumberType":
-                        NumberPersistence numberPersistence = new NumberPersistence();
-                        numberPersistence.setParameterType(ParameterType.OUTPUT);
-                        numberPersistence.setRunId(run.getId());
-                        numberPersistence.setParameterName(String.join("", nameParts));
-                        numberPersistence.setCollectionIndex(Arrays.stream(nameParts, 1, nameParts.length).collect(
-                            Collectors.joining()));
-                        numberPersistence.setValue(Double.parseDouble(entryValue));
-                        numberPersistence.setValueType(ValueType.NUMBER);
-
-                        parentCollection.getItems().add(numberPersistence);
-                        break;
-                    case "BooleanType":
-                        BooleanPersistence booleanPersistence = new BooleanPersistence();
-                        booleanPersistence.setParameterType(ParameterType.OUTPUT);
-                        booleanPersistence.setRunId(run.getId());
-                        booleanPersistence.setParameterName(String.join("", nameParts));
-                        booleanPersistence.setCollectionIndex(Arrays.stream(nameParts, 1, nameParts.length).collect(
-                            Collectors.joining()));
-                        booleanPersistence.setValue(Boolean.parseBoolean(entryValue));
-                        booleanPersistence.setValueType(ValueType.BOOLEAN);
-
-                        parentCollection.getItems().add(booleanPersistence);
-                        break;
-                    case "FileType":
-                        FilePersistence filePersistence = new FilePersistence();
-                        filePersistence.setParameterType(ParameterType.OUTPUT);
-                        filePersistence.setRunId(run.getId());
-                        filePersistence.setParameterName(String.join("", nameParts));
-                        filePersistence.setCollectionIndex(Arrays.stream(nameParts, 1, nameParts.length).collect(
-                            Collectors.joining()));
-                        filePersistence.setValue(null);
-                        filePersistence.setValueType(ValueType.FILE);
-
-                        parentCollection.getItems().add(filePersistence);
-                        break;
-                    case "ImageType":
-                        ImagePersistence imagePersistence = new ImagePersistence();
-                        imagePersistence.setParameterType(ParameterType.OUTPUT);
-                        imagePersistence.setRunId(run.getId());
-                        imagePersistence.setParameterName(String.join("", nameParts));
-                        imagePersistence.setCollectionIndex(Arrays.stream(nameParts, 1, nameParts.length).collect(
-                            Collectors.joining()));
-                        imagePersistence.setValue(null); // basically we don't store data in the database
-                        imagePersistence.setValueType(ValueType.IMAGE);
-
-                        if (Objects.nonNull(parentCollection)) { // a collection item file
-                            parentCollection.getItems().add(imagePersistence);
-                        } else {
-                            String parentDirectoryName = entry.getName().substring(0, entry.getName().lastIndexOf("/"));
-                            DirectoryPersistence parentDirectory = (DirectoryPersistence) parameterNameToTypePersistence.get(parentDirectoryName);
-                            parentDirectory.getItems().add(imagePersistence);
-                        }
-                        break;
-                    case "DateTimeType":
-                        DateTimePersistence datetimePersistence = new DateTimePersistence();
-                        datetimePersistence.setParameterType(ParameterType.OUTPUT);
-                        datetimePersistence.setRunId(run.getId());
-                        datetimePersistence.setParameterName(String.join("", nameParts));
-                        datetimePersistence.setCollectionIndex(Arrays.stream(nameParts, 1, nameParts.length).collect(Collectors.joining()));
-                        datetimePersistence.setValue(Instant.parse(entryValue));
-                        datetimePersistence.setValueType(ValueType.DATETIME);
-
-                        parentCollection.getItems().add(datetimePersistence);
-                        break;
-                    default:
-                        throw new ProvisioningException("unknown leaf type: " + leafType);
+                if (leafType.equals("ImageType") && parentCollection == null) {
+                    String parentDirectoryName = entry.getName().substring(0, entry.getName().lastIndexOf("/"));
+                    DirectoryPersistence parentDirectory = (DirectoryPersistence) parameterNameToTypePersistence.get(parentDirectoryName);
+                    parentDirectory.getItems().add(persistence);
+                } else {
+                    parentCollection.getItems().add(persistence);
                 }
-
             }
         }
 
-        collectionPersistenceRepository.save(result);
+        collectionPersistenceRepository.save(root);
     }
 
     @Override

@@ -7,6 +7,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.Set;
+
+import java.io.File;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.Optional;
 import java.util.Set;
 
@@ -73,8 +82,7 @@ public class CytomineTests {
     void saveScreenshot(String name) {
         Path destination = Paths.get("./build/reports/" + name + ".jpg");
         Files.createDirectories(Path.of("./build/reports/"));
-        File screenshot =
-            ((TakesScreenshot) driver).getScreenshotAs(FILE);  // Capture the screenshot as a file
+        File screenshot = ((TakesScreenshot) driver).getScreenshotAs(FILE);
         Files.move(screenshot.toPath(), destination, REPLACE_EXISTING);
         Files.setPosixFilePermissions(destination, Set.of(OTHERS_READ, OWNER_READ, GROUP_READ));
     }
@@ -85,19 +93,15 @@ public class CytomineTests {
     }
 
     @Test
-    void createProject() {
+    void createAndDeleteProject() {
         String projectName = "selenium-" + randomUUID();
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
         String projectURL = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
+        String ontologyURL = cytomineSteps.getOntologyUrlFromProject(wait, projectURL);
         cytomineSteps.deleteProject(wait, projectURL);
-    }
-
-    @Test
-    void deleteProject() {
-        String projectName = "selenium-" + randomUUID();
-        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
-        String projectURL = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
-        cytomineSteps.deleteProject(wait, projectURL);
+        if (ontologyURL != null) {
+            cytomineSteps.deleteOntology(wait, ontologyURL);
+        }
     }
 
     @Test
@@ -115,8 +119,23 @@ public class CytomineTests {
         cytomineSteps.listProjects(wait, cytomineUrl, projectNames);
         Set<String> ignored =
             projectUrls.stream()
-                .map(projectUrl -> cytomineSteps.deleteProject(wait, projectUrl))
+                .map(projectURL -> {
+                    String ontologyURL = cytomineSteps.getOntologyUrlFromProject(wait, projectURL);
+                    cytomineSteps.deleteProject(wait, projectURL);
+                    if (ontologyURL != null) {
+                        cytomineSteps.deleteOntology(wait, ontologyURL);
+                    }
+                    return projectURL;
+                })
                 .collect(toSet());
+    }
+
+    @Test
+    void createAndDeleteOntology() {
+        String ontologyName = "selenium-" + randomUUID();
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        String ontologyURL = cytomineSteps.createOntology(wait, driver, cytomineUrl, ontologyName);
+        cytomineSteps.deleteOntology(wait, ontologyURL);
     }
 
     @Test

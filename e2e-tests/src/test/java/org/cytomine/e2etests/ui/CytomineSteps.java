@@ -32,9 +32,7 @@ public class CytomineSteps {
         webDriverUtils.byIsDisplayed(wait, By.id("app"));
     }
 
-    /**
-     * @return the URL of the created project
-     */
+
     @SneakyThrows
     public String createProject(Wait<WebDriver> wait, WebDriver driver, URL cytomineUrl,
                                 String projectName) {
@@ -68,6 +66,36 @@ public class CytomineSteps {
                                    .collect(toSet());
     }
 
+    public String createOntology(Wait<WebDriver> wait, WebDriver driver, URL cytomineUrl,
+                                 String ontologyName) {
+        webDriverUtils.goTo(wait, cytomineUrl.toString());
+        webDriverUtils.xpathClick(wait, "//a[@href='#/ontology']");
+        webDriverUtils.xpathClick(wait, "//button[contains(text(), 'New ontology')]");
+        webDriverUtils.bySendKeys(wait, By.name("name"), ontologyName);
+        webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Save')]");
+        webDriverUtils.byIsDisplayed(wait, By.xpath(
+            "//p[contains(@class, 'panel-heading') and contains(text(), '" + ontologyName + "')]"));
+        return driver.getCurrentUrl();
+    }
+
+    public String deleteOntology(Wait<WebDriver> wait, String ontologyURL) {
+        webDriverUtils.goTo(wait, ontologyURL);
+        webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Delete')]");
+        webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Confirm')]");
+        webDriverUtils.byIsDisplayed(wait,
+            By.xpath("//div[contains(text(), 'successfully deleted')]"));
+        return ontologyURL;
+    }
+
+    public String getOntologyUrlFromProject(Wait<WebDriver> wait, String projectURL) {
+        webDriverUtils.goTo(wait, projectURL);
+        webDriverUtils.xpathClick(wait, "//a[contains(@href, '/information')]");
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//td[contains(text(), 'Ontology')]"));
+        return wait.until(d -> {
+            var elements = d.findElements(By.xpath("//a[contains(@href, '/ontology/')]"));
+            return elements.get(0).getAttribute("href");
+        });
+    }
     @SneakyThrows
     public String addImage(Wait<WebDriver> wait, URL cytomineUrl,
                            Optional<String> maybeProjectName) {

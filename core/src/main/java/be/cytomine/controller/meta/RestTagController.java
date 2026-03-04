@@ -1,12 +1,7 @@
 package be.cytomine.controller.meta;
 
 import be.cytomine.controller.RestCytomineController;
-import be.cytomine.repository.meta.TagRepository;
-import be.cytomine.repository.ontology.OntologyRepository;
-import be.cytomine.repository.project.ProjectRepository;
 import be.cytomine.service.meta.TagService;
-import be.cytomine.service.ontology.OntologyService;
-import be.cytomine.service.ontology.TermService;
 import be.cytomine.service.utils.TaskService;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.Task;
@@ -15,9 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
-
 @RestController
 @RequestMapping("/api")
 @Slf4j
@@ -25,10 +17,6 @@ import java.util.Map;
 public class RestTagController extends RestCytomineController {
 
     private final TagService tagService;
-
-    private final TagRepository tagRepository;
-
-    private final ProjectRepository projectRepository;
 
     private final TaskService taskService;
 
@@ -47,7 +35,6 @@ public class RestTagController extends RestCytomineController {
                 .map(this::responseSuccess)
                 .orElseGet(() -> responseNotFound("Tag", id));
     }
-
 
     @PostMapping("/tag.json")
     public ResponseEntity<String> add(@RequestBody String json) {

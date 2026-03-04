@@ -9,11 +9,9 @@ import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
-import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.ontology.TermRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.project.ProjectService;
-import be.cytomine.service.security.SecRoleService;
 import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.service.social.ProjectConnectionService;
 import be.cytomine.service.stats.StatsService;
@@ -85,7 +83,6 @@ public class RestStatsController extends RestCytomineController {
         return responseSuccess(statsService.statTermSlide(project, startDate, endDate));
     }
 
-
     @GetMapping("/project/{project}/stats/termimage.json")
     public ResponseEntity<String> statPerTermAndImage(
             @PathVariable("project") Long projectId,
@@ -99,7 +96,6 @@ public class RestStatsController extends RestCytomineController {
         return responseSuccess(statsService.statPerTermAndImage(project, startDate, endDate));
     }
 
-
     @GetMapping("/project/{project}/stats/userslide.json")
     public ResponseEntity<String> statUserSlide(
             @PathVariable("project") Long projectId,
@@ -112,7 +108,6 @@ public class RestStatsController extends RestCytomineController {
         Date endDate = endDateLong != null ? new Date(endDateLong) : null;
         return responseSuccess(statsService.statUserSlide(project, startDate, endDate));
     }
-
 
     @GetMapping("/project/{project}/stats/userannotations.json")
     public ResponseEntity<String> statUserAnnotations(
@@ -132,8 +127,6 @@ public class RestStatsController extends RestCytomineController {
             @RequestParam(value = "term", required = false) Long termId,
             @RequestParam(value = "accumulate", required = false, defaultValue = "true") Boolean accumulate,
             @RequestParam(value = "reverseOrder", required = false, defaultValue = "true") Boolean reverseOrder
-
-
     ) {
         Project project = projectService.find(projectId)
                 .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
@@ -159,8 +152,6 @@ public class RestStatsController extends RestCytomineController {
             @RequestParam(value = "term", required = false) Long termId,
             @RequestParam(value = "accumulate", required = false, defaultValue = "true") Boolean accumulate,
             @RequestParam(value = "reverseOrder", required = false, defaultValue = "true") Boolean reverseOrder
-
-
     ) {
         Project project = projectService.find(projectId)
                 .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
@@ -177,31 +168,22 @@ public class RestStatsController extends RestCytomineController {
         return responseSuccess(statsService.statReviewedAnnotationEvolution(project, term, daysRange, startDate, endDate, reverseOrder, accumulate));
     }
 
-
-
     @GetMapping("/term/{id}/project/stat.json")
-    public ResponseEntity<String> statAnnotationTermedByProject(
-            @PathVariable("id") Long id
-    ) {
-
+    public ResponseEntity<String> statAnnotationTermedByProject(@PathVariable Long id) {
         Term term = termRepository.findById(id)
                     .orElseThrow(() -> new ObjectNotFoundException("Term", id));
         securityACLService.check(term.container(),READ);
         return responseSuccess(statsService.statAnnotationTermedByProject(term));
     }
 
-
     @GetMapping("/total/project/connections.json")
-    public ResponseEntity<String> totalNumberOfConnectionsByProject(
-    ) {
+    public ResponseEntity<String> totalNumberOfConnectionsByProject() {
         securityACLService.checkAdmin(currentUserService.getCurrentUser());
         return responseSuccess(projectConnectionService.totalNumberOfConnectionsByProject());
     }
 
     @GetMapping("/total/{domain}.json")
-    public ResponseEntity<String> totalDomains(
-            @PathVariable String domain
-    ) {
+    public ResponseEntity<String> totalDomains(@PathVariable String domain) {
         try {
             return responseSuccess(JsonObject.of("total", statsService.total(Class.forName(domain))));
         } catch (ClassNotFoundException e) {
@@ -210,8 +192,7 @@ public class RestStatsController extends RestCytomineController {
     }
 
     @GetMapping("/stats/currentStats.json")
-    public ResponseEntity<String> statsOfCurrentActions(
-    ) {
+    public ResponseEntity<String> statsOfCurrentActions() {
         securityACLService.checkAdmin(currentUserService.getCurrentUser());
         JsonObject result = new JsonObject();
         result.put("users", statsService.numberOfCurrentUsers());
@@ -219,7 +200,6 @@ public class RestStatsController extends RestCytomineController {
         result.put("mostActiveProject", statsService.mostActiveProjects().orElse(null));
         return responseSuccess(result);
     }
-
 
     @GetMapping("/stats/imageserver/total.json")
     public ResponseEntity<String> statUsedStorage() {
@@ -245,7 +225,6 @@ public class RestStatsController extends RestCytomineController {
         return responseSuccess(statsService.statConnectionsEvolution(project, daysRange, startDate, endDate, accumulate));
     }
 
-
     @GetMapping("/project/{project}/stats/imageconsultationsevolution.json")
     public ResponseEntity<String> statImageConsultationsEvolution(
             @PathVariable(value = "project") Long projectId,
@@ -263,9 +242,6 @@ public class RestStatsController extends RestCytomineController {
 
         return responseSuccess(statsService.statImageConsultationsEvolution(project, daysRange, startDate, endDate, accumulate));
     }
-
-
-
 
     @GetMapping("/project/{project}/stats/annotationactionsevolution.json")
     public ResponseEntity<String> statAnnotationActionsEvolution(

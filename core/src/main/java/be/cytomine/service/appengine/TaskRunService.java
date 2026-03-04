@@ -60,6 +60,7 @@ import be.cytomine.dto.appengine.task.type.GeometryType;
 import be.cytomine.dto.appengine.task.type.TaskParameterType;
 import be.cytomine.dto.image.CropParameter;
 import be.cytomine.exceptions.ObjectNotFoundException;
+import be.cytomine.repository.annotation.AnnotationLayerRepository;
 import be.cytomine.repository.appengine.TaskRunLayerRepository;
 import be.cytomine.repository.appengine.TaskRunRepository;
 import be.cytomine.service.CurrentUserService;
@@ -80,6 +81,8 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 public class TaskRunService {
 
     private final AnnotationService annotationService;
+
+    private final AnnotationLayerRepository annotationLayerRepository;
 
     private final AnnotationLayerService annotationLayerService;
 
@@ -609,6 +612,10 @@ public class TaskRunService {
         }
 
         String layerName = annotationLayerService.createLayerName(taskRunResponse.task().name(), taskRunResponse.task().version(), taskRun.getCreated());
+        if (annotationLayerRepository.findByName(layerName).isPresent()) {
+            return response;
+        }
+
         AnnotationLayer annotationLayer = annotationLayerService.createAnnotationLayer(layerName);
         TaskRunLayer taskRunLayer = taskRunLayerRepository
                 .findByTaskRunAndImage(taskRun, taskRun.getImage())

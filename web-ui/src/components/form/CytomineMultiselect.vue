@@ -57,7 +57,11 @@
   </template>
 
   <template #option="{option}">
-    <slot name="option" :option="option"></slot>
+    <span :data-option="label ? option[label] : option">
+      <slot name="option" :option="option">
+        {{ label ? option[label] : option }}
+      </slot>
+    </span>
   </template>
 
 </multiselect>

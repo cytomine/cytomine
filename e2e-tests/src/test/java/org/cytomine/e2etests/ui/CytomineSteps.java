@@ -96,6 +96,7 @@ public class CytomineSteps {
             return elements.get(0).getAttribute("href");
         });
     }
+
     @SneakyThrows
     public String addImage(Wait<WebDriver> wait, URL cytomineUrl,
                            Optional<String> maybeProjectName) {
@@ -112,7 +113,8 @@ public class CytomineSteps {
             copiedFile.toString(), false);
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Start upload')]");
         webDriverUtils.byIsDisplayed(wait, By.xpath(
-            "//div[contains(@class,'uploaded-files-list')]//*[contains(text(),'" + imageName + "')]"));
+            "//div[contains(@class,'uploaded-files-list')]//*[contains(text(),'" + imageName
+                + "')]"));
         webDriverUtils.byIsDisplayed(wait, By.xpath(
             "//div[contains(@class,'uploaded-files-list')]//span[@data-status='success']"));
         return imageName;
@@ -131,12 +133,15 @@ public class CytomineSteps {
                             String imageName) {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/storage");
         webDriverUtils.byIsDisplayed(wait, By.xpath(
-            "//div[contains(@class,'uploaded-files-list')]//span[@data-filename='" + imageName + "']"));
+            "//div[contains(@class,'uploaded-files-list')]//span[@data-filename='" + imageName
+                + "']"));
         webDriverUtils.byClick(wait, By.xpath(
-            "//div[contains(@class,'uploaded-files-list')]//button[@data-filename='" + imageName + "']"));
+            "//div[contains(@class,'uploaded-files-list')]//button[@data-filename='" + imageName
+                + "']"));
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Confirm')]");
         webDriverUtils.waitUntilByEmpty(wait, By.xpath(
-            "//div[contains(@class,'uploaded-files-list')]//span[@data-filename='" + imageName + "']"));
+            "//div[contains(@class,'uploaded-files-list')]//span[@data-filename='" + imageName
+                + "']"));
     }
 
 }

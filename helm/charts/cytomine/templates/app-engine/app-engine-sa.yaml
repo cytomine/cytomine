@@ -46,8 +46,8 @@ metadata:
   namespace: {{ include "cytomine.appEngineTasksNamespace" . }}
 rules:
 - apiGroups: [""] # "" indicates the core API group
-  resources: ["pods"]
-  verbs: ["post","get", "watch", "list"]
+  resources: ["pods", "pods/status"]
+  verbs: ["create", "get", "watch", "list", "delete"]
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1

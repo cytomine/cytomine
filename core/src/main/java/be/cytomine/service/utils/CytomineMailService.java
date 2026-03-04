@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import be.cytomine.config.properties.ApplicationProperties;
-//import be.cytomine.config.properties.NotificationProperties;
 
 @Slf4j
 @Service

@@ -6,7 +6,6 @@ import be.cytomine.domain.image.CompanionFile;
 import be.cytomine.domain.image.UploadedFile;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.image.AbstractImageRepository;
-import be.cytomine.service.image.AbstractImageService;
 import be.cytomine.service.image.CompanionFileService;
 import be.cytomine.service.image.UploadedFileService;
 import be.cytomine.service.middleware.ImageServerService;
@@ -16,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.mvc.ProxyExchange;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
 
@@ -25,8 +23,6 @@ import java.io.IOException;
 @Slf4j
 @RequiredArgsConstructor
 public class RestCompanionFileController extends RestCytomineController {
-
-    private final AbstractImageService abstractImageService;
 
     private final UploadedFileService uploadedFileService;
 

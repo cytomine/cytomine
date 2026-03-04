@@ -13,7 +13,7 @@ import be.cytomine.domain.appengine.TaskRun;
 public interface TaskRunRepository extends JpaRepository<TaskRun, Long>, JpaSpecificationExecutor<TaskRun> {
     Optional<TaskRun> findByProjectIdAndTaskRunId(Long projectId, UUID taskRunId);
 
-    List<TaskRun> findAllByProjectId(Long projectId);
+    List<TaskRun> findAllByProjectIdAndImageId(Long projectId, Long imageId);
 
     Optional<TaskRun> findFirstByProjectIdOrderByCreatedDesc(Long projectId);
 

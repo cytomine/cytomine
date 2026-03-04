@@ -1,6 +1,8 @@
 package be.cytomine.controller.annotation;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,13 +31,13 @@ public class AnnotationLayerController {
     private final AnnotationRepository annotationRepository;
 
     @GetMapping("/image-instances/{id}/annotation-layers")
-    public List<AnnotationLayerResponse> getAnnotationLayersByImage(@PathVariable Long id) {
+    public Set<AnnotationLayerResponse> getAnnotationLayersByImage(@PathVariable Long id) {
         log.info("GET /image-instances/{}/annotation-layers", id);
         return annotationLayerService.findByTaskRunLayer(id);
     }
 
     @GetMapping("/annotation-layers/{id}/annotations")
-    public List<AnnotationResponse> getAnnotationsByLayer(@PathVariable Long id) {
+    public Set<AnnotationResponse> getAnnotationsByLayer(@PathVariable Long id) {
         log.info("GET /annotation-layers/{}/annotations", id);
 
         AnnotationLayer layer = annotationLayerService
@@ -49,7 +51,7 @@ public class AnnotationLayerController {
                         annotation.getAnnotationLayer().getId(),
                         annotation.getLocation()
                 ))
-                .toList();
+                .collect(Collectors.toSet());
     }
 
     @GetMapping("/annotation-layers/{id}/task-run-layer")

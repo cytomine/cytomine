@@ -14,10 +14,16 @@ spec:
       securityContext:
       {{- include "cytomine.podSecurityContext" . | nindent 8 }}
       initContainers: # initContainers run in sequence, not containers
-      - name: login
+      - name: wait-for-iam-login
         image: "{{ .Values.images.iam }}"
         command: ["/bin/sh", "-c"]
-        args: ["/opt/keycloak/bin/kcadm.sh config credentials --server {{ include "cytomine.iamInternalUrl" . }} --realm master --user admin --password $(KEYCLOAK_ADMIN_PASSWORD) --config /opt/keycloak-auth/kcadm.config"]
+        args:
+          - |
+            until /opt/keycloak/bin/kcadm.sh config credentials --server {{ include "cytomine.iamInternalUrl" . }} --realm master --user admin --password $KEYCLOAK_ADMIN_PASSWORD --config /opt/keycloak-auth/kcadm.config; do
+              echo "Waiting for IAM to be ready..."
+              sleep 5
+            done
+            echo "IAM is ready"
         volumeMounts:
         - name: kc-auth
           mountPath: "/opt/keycloak-auth"

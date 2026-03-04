@@ -12,7 +12,7 @@ until wget -qO- "${SELENIUM}/wd/hub/status" 2>/dev/null |grep -q '"ready": true'
   echo "Selenium not ready, retrying in 2s..."
   sleep 2
 done
-sleep 5
+sleep 10
 echo "Selenium is ready."
 
 exec gradle :e2e-tests:test --no-daemon

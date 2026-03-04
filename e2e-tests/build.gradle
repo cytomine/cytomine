@@ -42,7 +42,7 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 	retry {
-		maxRetries = 4  // 5 total attempts (1 initial + 4 retries)
-		failOnPassedAfterRetry = false  // succeed if any attempt passes
+		maxRetries = 3
+		failOnPassedAfterRetry = false
 	}
 }

@@ -107,6 +107,16 @@ public class TaskRunService {
 
     private final AsyncService asyncService;
 
+    private boolean containsGeometry(TaskParameterType type) {
+        if (type instanceof GeometryType) {
+            return true;
+        }
+        if (type instanceof CollectionType collection) {
+            return containsGeometry(collection.subType());
+        }
+        return false;
+    }
+
     public String addTaskRun(Long projectId, String taskId, JsonNode body) {
         Project project = projectService.get(projectId);
         User currentUser = currentUserService.getCurrentUser();
@@ -139,20 +149,9 @@ public class TaskRunService {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error parsing JSON response");
         }
 
-        boolean hasGeometry = false;
-        for (TaskRunOutputResponse taskRunOutput : taskRunOutputResponse) {
-            TaskParameterType type = taskRunOutput.type();
-
-            if (type instanceof GeometryType) {
-                hasGeometry = true;
-                break;
-            }
-
-            if (type instanceof CollectionType array && array.subType() instanceof GeometryType) {
-                hasGeometry = true;
-                break;
-            }
-        }
+        boolean hasGeometry = taskRunOutputResponse.stream()
+                .map(TaskRunOutputResponse::type)
+                .anyMatch(this::containsGeometry);
 
         if (hasGeometry) {
             String layerName = annotationLayerService.createLayerName(taskRunResponse.task().name(), taskRunResponse.task().version(), taskRun.getCreated());
@@ -527,6 +526,33 @@ public class TaskRunService {
         return appEngineService.post("task-runs/" + taskRunId + "/state-actions", body, MediaType.APPLICATION_JSON);
     }
 
+    private void processGeometryValue(TaskRunValue value, AnnotationLayer annotationLayer, TaskRunLayer taskRunLayer) {
+        if (!"ARRAY".equals(value.getType())) {
+            return;
+        }
+
+        List<?> items = (List<?>) value.getValue();
+        if (items == null || items.isEmpty()) {
+            return;
+        }
+
+        if ("GEOMETRY".equals(value.getSubType())) {
+            JsonNode jsonItems = objectMapper.convertValue(items, JsonNode.class);
+            for (JsonNode item : jsonItems) {
+                String geoJson = item.get("value").asText();
+                if (geometryService.isGeometry(geoJson)) {
+                    String wktGeometry = geometryService.GeoJSONToWKT(geoJson);
+                    Geometry parsedGeometry = GeometryService.addOffset(wktGeometry, taskRunLayer.getXOffset(), taskRunLayer.getYOffset());
+                    annotationService.createAnnotation(annotationLayer, parsedGeometry.toString());
+                }
+            }
+        } else if ("ARRAY".equals(value.getSubType())) {
+            items.stream()
+                    .map(item -> objectMapper.convertValue(item, TaskRunValue.class))
+                    .forEach(inner -> processGeometryValue(inner, annotationLayer, taskRunLayer));
+        }
+    }
+
     private boolean hasGeometrySubType(TaskRunValue value) {
         if (!"ARRAY".equals(value.getType())) {
             return false;
@@ -599,21 +625,8 @@ public class TaskRunService {
                 .filter(this::hasGeometrySubType)
                 .toList();
 
-        List<TaskRunValue> geoArrayValues = outputs
-                .stream()
-                .filter(output -> output.getType().equals("ARRAY")
-                && output.getSubType().equalsIgnoreCase("GEOMETRY"))
-                .toList();
-
-        for (TaskRunValue arrayValue : geoArrayValues) {
-            JsonNode items = objectMapper.convertValue(arrayValue.getValue(), JsonNode.class);
-            for (JsonNode item : items) {
-                if (geometryService.isGeometry(item.get("value").asText())) {
-                    String wktGeometry = geometryService.GeoJSONToWKT(item.get("value").asText());
-                    Geometry parsedGeometry = GeometryService.addOffset(wktGeometry, taskRunLayer.getXOffset(), taskRunLayer.getYOffset());
-                    annotationService.createAnnotation(annotationLayer, parsedGeometry.toString());
-                }
-            }
+        for (TaskRunValue arrayValue : geometryArrays) {
+            processGeometryValue(arrayValue, annotationLayer, taskRunLayer);
         }
 
         return response;

@@ -1,10 +1,12 @@
 package be.cytomine.service.annotation;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -53,14 +55,14 @@ public class AnnotationLayerService {
         return annotationLayerRepository.findById(id);
     }
 
-    public List<AnnotationLayerResponse> findByTaskRunLayer(Long imageId) {
+    public Set<AnnotationLayerResponse> findByTaskRunLayer(Long imageId) {
         List<TaskRunLayer> taskRunLayers = taskRunLayerRepository.findAllByImageId(imageId);
 
-        List<AnnotationLayerResponse> annotationLayerList = new ArrayList<>(taskRunLayers
+        Set<AnnotationLayerResponse> annotationLayerSet = taskRunLayers
                 .stream()
                 .map(TaskRunLayer::getAnnotationLayer)
                 .map(layer -> new AnnotationLayerResponse(layer.getId(), layer.getName()))
-                .toList());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
 
         ImageInstance imageInstance = imageInstanceService.get(imageId);
 
@@ -70,16 +72,13 @@ public class AnnotationLayerService {
         if (lastTaskRun.isPresent()) {
             Optional<TaskRunLayer> lastExecutedRunLayer = taskRunLayerRepository.findByTaskRun(lastTaskRun.get());
 
-            List<AnnotationLayerResponse> lastTaskRunAnnotationLayers = lastExecutedRunLayer
-                .stream()
+            lastExecutedRunLayer
                 .map(TaskRunLayer::getAnnotationLayer)
                 .map(layer -> new AnnotationLayerResponse(layer.getId(), layer.getName()))
-                .toList();
-
-            annotationLayerList.addAll(lastTaskRunAnnotationLayers);
+                .ifPresent(annotationLayerSet::add);
         }
 
-        return annotationLayerList.stream().distinct().toList();
+        return annotationLayerSet;
     }
 
     public TaskRunLayerValue findTaskRunLayer(Long id) {

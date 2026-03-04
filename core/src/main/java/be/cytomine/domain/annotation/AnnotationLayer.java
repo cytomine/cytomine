@@ -1,7 +1,7 @@
 package be.cytomine.domain.annotation;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -25,7 +25,7 @@ public class AnnotationLayer extends CytomineDomain {
     private String name;
 
     @OneToMany(mappedBy = "annotationLayer", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Annotation> annotations = new ArrayList<>();
+    private Set<Annotation> annotations = new HashSet<>();
 
     public static JsonObject getDataFromDomain(CytomineDomain domain) {
         AnnotationLayer annotationLayer = (AnnotationLayer) domain;

@@ -6,20 +6,21 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import be.cytomine.domain.appengine.TaskRun;
-import be.cytomine.domain.image.ImageInstance;
-import be.cytomine.repository.appengine.TaskRunRepository;
-import be.cytomine.service.image.ImageInstanceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.domain.appengine.TaskRun;
 import be.cytomine.domain.annotation.Annotation;
 import be.cytomine.domain.annotation.AnnotationLayer;
 import be.cytomine.domain.appengine.TaskRunLayer;
+import be.cytomine.domain.image.ImageInstance;
+import be.cytomine.dto.annotation.AnnotationLayerResponse;
 import be.cytomine.dto.appengine.task.TaskRunLayerValue;
 import be.cytomine.repository.annotation.AnnotationLayerRepository;
 import be.cytomine.repository.annotation.AnnotationRepository;
 import be.cytomine.repository.appengine.TaskRunLayerRepository;
+import be.cytomine.repository.appengine.TaskRunRepository;
+import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.appengine.TaskRunLayerService;
 
 @Service
@@ -56,13 +57,14 @@ public class AnnotationLayerService {
         return annotationLayerRepository.findById(id);
     }
 
-    public List<AnnotationLayer> findByTaskRunLayer(Long imageId) {
+    public List<AnnotationLayerResponse> findByTaskRunLayer(Long imageId) {
         List<TaskRunLayer> taskRunLayers = taskRunLayerRepository.findAllByImageId(imageId);
 
-        List<AnnotationLayer> annotationLayerList = new ArrayList<>(taskRunLayers
-            .stream()
-            .map(TaskRunLayer::getAnnotationLayer)
-            .toList());
+        List<AnnotationLayerResponse> annotationLayerList = new ArrayList<>(taskRunLayers
+                .stream()
+                .map(TaskRunLayer::getAnnotationLayer)
+                .map(layer -> new AnnotationLayerResponse(layer.getId(), layer.getName()))
+                .toList());
 
         ImageInstance imageInstance = imageInstanceService.get(imageId);
 
@@ -72,9 +74,10 @@ public class AnnotationLayerService {
         if (lastTaskRun.isPresent()) {
             Optional<TaskRunLayer> lastExecutedRunLayer = taskRunLayerRepository.findByTaskRun(lastTaskRun.get());
 
-            List<AnnotationLayer> lastTaskRunAnnotationLayers = lastExecutedRunLayer
+            List<AnnotationLayerResponse> lastTaskRunAnnotationLayers = lastExecutedRunLayer
                 .stream()
                 .map(TaskRunLayer::getAnnotationLayer)
+                .map(layer -> new AnnotationLayerResponse(layer.getId(), layer.getName()))
                 .toList();
 
             annotationLayerList.addAll(lastTaskRunAnnotationLayers);

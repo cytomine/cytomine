@@ -40,62 +40,6 @@ spec:
         securityContext:
         {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
 
-      - name: update-user-profile-schema
-        image: "{{ .Values.images.iam }}"
-        command: [ "/bin/sh", "-c" ]
-        args: [" /opt/keycloak/bin/kcadm.sh update users/profile -r cytomine --server {{ include "cytomine.iamInternalUrl" . }} --config /opt/keycloak-auth/kcadm.config -f /tmp/profile.json"]
-        volumeMounts:
-          - name: kc-auth
-            mountPath: "/opt/keycloak-auth"
-          - name: iam-profile-config
-            mountPath: "/tmp/profile.json"
-            subPath: profile.json
-        securityContext:
-              {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
-
-      - name: add-projects-protocol-mapper
-        image: "{{ .Values.images.iam }}"
-        command: [ "/bin/sh", "-c" ]
-        args:
-          - |
-            PROFILE_SCOPE_ID=$(
-              /opt/keycloak/bin/kcadm.sh get client-scopes \
-                -r cytomine \
-                --server {{ include "cytomine.iamInternalUrl" . }} \
-                --config /opt/keycloak-auth/kcadm.config \
-                -q name=profile \
-                --fields id \
-                --format json \
-              | sed -n 's/.*"id" : "\([^"]*\)".*/\1/p'
-            )
-
-            if ! /opt/keycloak/bin/kcadm.sh get client-scopes/$PROFILE_SCOPE_ID/protocol-mappers/models \
-                  -r cytomine \
-                  --server {{ include "cytomine.iamInternalUrl" . }} \
-                  --config /opt/keycloak-auth/kcadm.config \
-                | grep -q '"name" : "projects"'; then
-
-              /opt/keycloak/bin/kcadm.sh create client-scopes/$PROFILE_SCOPE_ID/protocol-mappers/models \
-                -r cytomine \
-                --server {{ include "cytomine.iamInternalUrl" . }} \
-                --config /opt/keycloak-auth/kcadm.config \
-                -s name=projects \
-                -s protocol=openid-connect \
-                -s protocolMapper=oidc-usermodel-attribute-mapper \
-                -s config."user.attribute"=projects \
-                -s config."claim.name"=projects \
-                -s config."id.token.claim"=true \
-                -s config."access.token.claim"=true \
-                -s config."userinfo.token.claim"=true \
-                -s config."jsonType.label"=String \
-                -s config.multivalued=true
-            fi
-        volumeMounts:
-          - name: kc-auth
-            mountPath: "/opt/keycloak-auth"
-        securityContext:
-        {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
-
       - name: create-user
         image: "{{ .Values.images.iam }}"
         command: ["/bin/sh", "-c"]
@@ -229,6 +173,63 @@ spec:
         volumeMounts:
         - name: kc-auth
           mountPath: "/opt/keycloak-auth"
+        securityContext:
+        {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
+
+      - name: update-user-profile-schema
+        image: "{{ .Values.images.iam }}"
+        command: [ "/bin/sh", "-c" ]
+        args: [ " /opt/keycloak/bin/kcadm.sh update users/profile -r cytomine --server {{ include "cytomine.iamInternalUrl" . }} --config /opt/keycloak-auth/kcadm.config -f /tmp/profile.json" ]
+        volumeMounts:
+          - name: kc-auth
+            mountPath: "/opt/keycloak-auth"
+          - name: iam-profile-config
+            mountPath: "/tmp/profile.json"
+            subPath: profile.json
+        securityContext:
+              {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
+
+      - name: add-projects-protocol-mapper
+        image: "{{ .Values.images.iam }}"
+        command: [ "/bin/sh", "-c" ]
+        args:
+          - |
+            PROFILE_SCOPE_ID=$(
+            /opt/keycloak/bin/kcadm.sh get client-scopes \
+               -r cytomine \
+               --server {{ include "cytomine.iamInternalUrl" . }} \
+               --config /opt/keycloak-auth/kcadm.config \
+               --fields id,name \
+               -q name=profile \
+               --format csv \
+               | sed 's/"//g' \
+               | sed -n 's/^\([^,]*\),profile$/\1/p'
+            )
+
+            if ! /opt/keycloak/bin/kcadm.sh get client-scopes/$PROFILE_SCOPE_ID/protocol-mappers/models \
+                  -r cytomine \
+                  --server {{ include "cytomine.iamInternalUrl" . }} \
+                  --config /opt/keycloak-auth/kcadm.config \
+                | grep -q '"name" : "projects"'; then
+
+              /opt/keycloak/bin/kcadm.sh create client-scopes/$PROFILE_SCOPE_ID/protocol-mappers/models \
+                -r cytomine \
+                --server {{ include "cytomine.iamInternalUrl" . }} \
+                --config /opt/keycloak-auth/kcadm.config \
+                -s name="projects" \
+                -s protocol="openid-connect" \
+                -s protocolMapper="oidc-usermodel-attribute-mapper" \
+                -s 'config."user.attribute"=projects' \
+                -s 'config."claim.name"=projects' \
+                -s 'config."id.token.claim"=true' \
+                -s 'config."access.token.claim"=true' \
+                -s 'config."userinfo.token.claim"=true' \
+                -s 'config."jsonType.label"=String' \
+                -s 'config.multivalued=true'
+            fi
+        volumeMounts:
+          - name: kc-auth
+            mountPath: "/opt/keycloak-auth"
         securityContext:
         {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
 

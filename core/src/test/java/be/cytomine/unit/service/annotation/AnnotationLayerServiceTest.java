@@ -3,6 +3,7 @@ package be.cytomine.unit.service.annotation;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -145,7 +146,7 @@ public class AnnotationLayerServiceTest {
         when(taskRunLayerRepository.findByTaskRun(mockTaskRun)).thenReturn(Optional.of(mockTaskRunLayer));
         when(taskRunRepository.findFirstByProjectIdOrderByCreatedDesc(mockProject.getId())).thenReturn(Optional.of(mockTaskRun));
 
-        List<AnnotationLayerResponse> results = annotationLayerService.findByTaskRunLayer(mockImage.getId());
+        Set<AnnotationLayerResponse> results = annotationLayerService.findByTaskRunLayer(mockImage.getId());
 
         assertFalse(results.isEmpty());
         assertEquals(mockTaskRunLayers.size(), results.size() + 1);

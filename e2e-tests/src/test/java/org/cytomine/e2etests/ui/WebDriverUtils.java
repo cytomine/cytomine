@@ -16,29 +16,35 @@ public class WebDriverUtils {
     void byClick(Wait<WebDriver> wait, By by) {
         byIsDisplayed(wait, by);
         wait.until(
-                d -> {
-                    d.findElement(by)
-                            .click();
-                    return true;
-                });
+            d -> {
+                d.findElement(by)
+                    .click();
+                return true;
+            });
     }
 
     void bySendKeys(Wait<WebDriver> wait, By by, String keys) {
-        byIsDisplayed(wait, by);
+        bySendKeysWait(wait, by, keys, true);
+    }
+
+    void bySendKeysWait(Wait<WebDriver> wait, By by, String keys, boolean waitDisplayed) {
+        if (waitDisplayed) {
+            byIsDisplayed(wait, by);
+        }
         wait.until(
-                d -> {
-                    d.findElement(by)
-                            .sendKeys(keys);
-                    return true;
-                });
+            d -> {
+                d.findElement(by)
+                    .sendKeys(keys);
+                return true;
+            });
     }
 
     void goTo(Wait<WebDriver> wait, String url) {
         wait.until(
-                d -> {
-                    d.get(url);
-                    return true;
-                });
+            d -> {
+                d.get(url);
+                return true;
+            });
     }
 
     @SneakyThrows
@@ -46,16 +52,20 @@ public class WebDriverUtils {
         Thread.sleep(500);
         waitLoading(wait);
         wait.until(d -> d.findElement(by)
-                .isDisplayed());
+                            .isDisplayed());
         return true;
     }
 
     @SneakyThrows
     void waitLoading(Wait<WebDriver> wait) {
         wait.until(
-                d -> {
-                    var loadingOverlays = d.findElements(By.cssSelector(".loading-overlay.is-active"));
-                    return loadingOverlays.isEmpty();
-                });
+            d -> {
+                var loadingOverlays = d.findElements(By.cssSelector(".loading-overlay.is-active"));
+                return loadingOverlays.isEmpty();
+            });
+    }
+
+    void waitUntilByEmpty(Wait<WebDriver> wait, By by) {
+        wait.until(d -> d.findElements(by).isEmpty());
     }
 }

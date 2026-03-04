@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '4.0.2'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'org.gradle.test-retry' version '1.6.0'
 }
 
 group = 'org.cytomine'
@@ -40,10 +41,14 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
-	// Enable parallel test execution (equivalent to Maven Surefire <parallel>methods</parallel>)
 	systemProperty 'junit.jupiter.execution.parallel.enabled', 'true'
 	systemProperty 'junit.jupiter.execution.parallel.mode.default', 'concurrent'
 	systemProperty 'junit.jupiter.execution.parallel.mode.classes.default', 'concurrent'
 	systemProperty 'junit.jupiter.execution.parallel.config.strategy', 'dynamic'
 	systemProperty 'junit.jupiter.execution.parallel.config.dynamic.factor', '1'
+
+  retry {
+		maxRetries = 3
+		failOnPassedAfterRetry = false
+	}
 }

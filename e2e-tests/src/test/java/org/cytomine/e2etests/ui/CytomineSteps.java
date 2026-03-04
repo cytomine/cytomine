@@ -1,7 +1,11 @@
 package org.cytomine.e2etests.ui;
 
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import lombok.SneakyThrows;
 import org.openqa.selenium.By;
@@ -92,4 +96,52 @@ public class CytomineSteps {
             return elements.get(0).getAttribute("href");
         });
     }
+
+    @SneakyThrows
+    public String addImage(Wait<WebDriver> wait, URL cytomineUrl,
+                           Optional<String> maybeProjectName) {
+        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/storage");
+        String imageName = "selenium-" + UUID.randomUUID() + ".png";
+        Path tempDir = Files.createTempDirectory("selenium-upload");
+        Path copiedFile = tempDir.resolve(imageName);
+        try (var in = getClass().getClassLoader().getResourceAsStream("cat.png")) {
+            Files.copy(in, copiedFile);
+        }
+        maybeProjectName.ifPresent(projectName -> selectProject(wait, projectName));
+
+        webDriverUtils.bySendKeysWait(wait, By.cssSelector("input[type='file']"),
+            copiedFile.toString(), false);
+        webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Start upload')]");
+        webDriverUtils.byIsDisplayed(wait, By.xpath(
+            "//div[contains(@class,'uploaded-files-list')]//*[contains(text(),'" + imageName
+                + "')]"));
+        webDriverUtils.byIsDisplayed(wait, By.xpath(
+            "//div[contains(@class,'uploaded-files-list')]//span[@data-status='success']"));
+        return imageName;
+    }
+
+    @SneakyThrows
+    private void selectProject(Wait<WebDriver> wait, String projectName) {
+        webDriverUtils.byClick(wait, By.cssSelector(".project-select .multiselect__tags"));
+        Thread.sleep(1000);
+        webDriverUtils.xpathClick(wait,
+            "//span[contains(@data-option, '" + projectName.substring(1) + "')]/parent::span");
+    }
+
+    @SneakyThrows
+    public void deleteImage(Wait<WebDriver> wait, URL cytomineUrl,
+                            String imageName) {
+        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/storage");
+        webDriverUtils.byIsDisplayed(wait, By.xpath(
+            "//div[contains(@class,'uploaded-files-list')]//span[@data-filename='" + imageName
+                + "']"));
+        webDriverUtils.byClick(wait, By.xpath(
+            "//div[contains(@class,'uploaded-files-list')]//button[@data-filename='" + imageName
+                + "']"));
+        webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Confirm')]");
+        webDriverUtils.waitUntilByEmpty(wait, By.xpath(
+            "//div[contains(@class,'uploaded-files-list')]//span[@data-filename='" + imageName
+                + "']"));
+    }
+
 }

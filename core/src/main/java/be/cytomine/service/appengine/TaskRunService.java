@@ -524,8 +524,30 @@ public class TaskRunService {
 
     public String postStateAction(JsonNode body, Long projectId, UUID taskRunId) {
         checkTaskRun(projectId, taskRunId);
-        return appEngineService.post("task-runs/" + taskRunId + "/state-actions", body,
-            MediaType.APPLICATION_JSON);
+        return appEngineService.post("task-runs/" + taskRunId + "/state-actions", body, MediaType.APPLICATION_JSON);
+    }
+
+    private boolean hasGeometrySubType(TaskRunValue value) {
+        if (!"ARRAY".equals(value.getType())) {
+            return false;
+        }
+
+        String subType = value.getSubType();
+        if ("GEOMETRY".equals(subType)) {
+            return true;
+        }
+
+        if ("ARRAY".equals(subType)) {
+            if (!(value.getValue() instanceof List<?> innerList)) {
+                return false;
+            }
+
+            return innerList.stream()
+                    .map(item -> objectMapper.convertValue(item, TaskRunValue.class))
+                    .anyMatch(this::hasGeometrySubType);
+        }
+
+        return false;
     }
 
     public String getOutputs(Long projectId, UUID taskRunId) {
@@ -571,6 +593,11 @@ public class TaskRunService {
             Geometry parsedGeometry = GeometryService.addOffset(wktGeometry, taskRunLayer.getXOffset(), taskRunLayer.getYOffset());
             annotationService.createAnnotation(annotationLayer, parsedGeometry.toString());
         }
+
+        List<TaskRunValue> geometryArrays = outputs
+                .stream()
+                .filter(this::hasGeometrySubType)
+                .toList();
 
         List<TaskRunValue> geoArrayValues = outputs
                 .stream()

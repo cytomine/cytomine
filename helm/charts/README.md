@@ -25,10 +25,11 @@ installing minikube can be found in the
 ```
 minikube start --network-plugin=cni --cni=calico
 ```
-2. Enable the addons
+2. Install Gateway API CRDs and enable Cilium Gateway
 ```
-minikube addons enable ingress
-minikube addons enable ingress-dns
+kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.0/standard-install.yaml
+helm repo add cilium https://helm.cilium.io/
+helm install cilium cilium/cilium --namespace kube-system --set gatewayAPI.enabled=true
 ```
 3. Add the `minikube-ip` as a DNS server
 ```
@@ -85,10 +86,9 @@ an infrastructure, but we're only using a few in this project:
 - [ConfigMap](https://kubernetes.io/docs/concepts/configuration/configmap/)s
   are a way of passing configuration settings to other resources. We use them
   to set values and mount configuration files for containers.
-- [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/)
-  is kubernetes system to handle communication between the internal kubernetes
-  network and external networks. We use ingress to allow communication to the
-  `nginx` pod.
+- [Gateway API](https://gateway-api.sigs.k8s.io/) is the next-generation
+  Kubernetes API for traffic management, replacing Ingress. We use Gateway and
+  HTTPRoute resources to route external traffic to the appropriate services.
 
 You can interact with your kubernetes cluster using the
 [kubectl](https://kubernetes.io/docs/reference/kubectl/overview/) tool. Here are
@@ -97,9 +97,8 @@ some examples:
 - `kubectl get pods`: lists all pods.
 - `kubectl get svc`: lists all services. This will list which ports are open on
   all pods.
-- `kubectl get ing`: lists all ingress resources. Ingress resources are external
-  communication interfaces. In this particular system there's currently only one
-  ingress, getting to port 80 in the `nginx` container.
+- `kubectl get gateway`: lists all Gateway resources.
+- `kubectl get httproute`: lists all HTTPRoute resources for traffic routing.
 
 To get details from running pods you can use the `kubectl logs` command.
 ex.

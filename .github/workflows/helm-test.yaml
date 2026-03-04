@@ -35,13 +35,17 @@ jobs:
       - name: Create kind cluster
         uses: helm/kind-action@v1.14.0
 
-      - name: Install ingress-nginx
+      - name: Install Gateway API CRDs
         run: |
-          helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-          helm install ingress-nginx ingress-nginx/ingress-nginx \
-            --namespace ingress \
+          kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.0/standard-install.yaml
+
+      - name: Install Envoy Gateway
+        run: |
+          helm repo add envoy-gateway https://charts.envoygateway.io
+          helm install envoy-gateway envoy-gateway/envoy-gateway \
+            --namespace envoy-gateway-system \
             --create-namespace \
-            --set controller.service.type=ClusterIP \
+            --set service.type=ClusterIP \
             --wait
 
       - name: Create Namespace

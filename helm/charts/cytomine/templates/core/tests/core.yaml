@@ -1,7 +1,18 @@
-{{- $ingressSvc := lookup "v1" "Service" "ingress" "ingress-nginx-controller" }}
-{{- $ingressIP := "" }}
-{{- if $ingressSvc }}
-{{- $ingressIP = $ingressSvc.spec.clusterIP }}
+{{- $gateway := lookup "gateway.networking.k8s.io/v1" "Gateway" .Release.Namespace "cytomine" }}
+{{- $gatewayIP := "" }}
+{{- if $gateway }}
+  {{- if $gateway.status }}
+    {{- if $gateway.status.addresses }}
+      {{- $gatewayIP = (index $gateway.status.addresses 0).value }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{- /* Fallback: look for Envoy Gateway proxy service */}}
+{{- if not $gatewayIP }}
+  {{- $envoyProxySvc := lookup "v1" "Service" "envoy-gateway-system" (printf "envoy-%s-cytomine" .Release.Namespace) }}
+  {{- if $envoyProxySvc }}
+    {{- $gatewayIP = $envoyProxySvc.spec.clusterIP }}
+  {{- end }}
 {{- end }}
 apiVersion: v1
 kind: Pod
@@ -15,7 +26,7 @@ spec:
   securityContext:
   {{- include "cytomine.podSecurityContext" . | nindent 4 }}
   hostAliases:
-    - ip: "{{ $ingressIP }}"
+    - ip: "{{ $gatewayIP }}"
       hostnames:
         - "{{ .Values.global.domainName }}"
   volumes:

@@ -144,4 +144,76 @@ public class TaskRunServiceTest {
         verify(annotationService, times(2)).createAnnotation(eq(annotationLayer), any(String.class));
         verify(asyncService, times(1)).launchImageAdditionJob(ArgumentMatchers.any(), eq(projectId), eq(currentUser));
     }
+
+    @DisplayName("Successfully create annotations from nested geometry array output")
+    @Test
+    public void shouldCreateAnnotationsFromNestedGeometryArrayOutput() throws JsonProcessingException {
+        Long projectId = 1L;
+        UUID taskRunId = UUID.randomUUID();
+
+        String geoJson1 = "{\"type\":\"Point\",\"coordinates\":[1.0,2.0]}";
+        String geoJson2 = "{\"type\":\"Point\",\"coordinates\":[3.0,4.0]}";
+
+        TaskRunValue innerGeometryValue = new TaskRunValue();
+        innerGeometryValue.setType("ARRAY");
+        innerGeometryValue.setSubType("GEOMETRY");
+        innerGeometryValue.setValue(List.of(
+                Map.of("value", geoJson1),
+                Map.of("value", geoJson2)
+        ));
+
+        TaskRunValue outerArrayValue = new TaskRunValue();
+        outerArrayValue.setType("ARRAY");
+        outerArrayValue.setSubType("ARRAY");
+        outerArrayValue.setValue(List.of(innerGeometryValue));
+
+        List<TaskRunValue> outputs = List.of(outerArrayValue);
+        String outputsJson = new ObjectMapper().writeValueAsString(outputs);
+
+        String taskRunJson = """
+                    {
+                        "task": {
+                            "name": "my-task",
+                            "version": "1.0"
+                        }
+                    }
+                """;
+
+        TaskRun taskRun = new TaskRun();
+        User currentUser = new User();
+        Project project = new Project();
+
+        TaskRunLayer taskRunLayer = new TaskRunLayer();
+        taskRunLayer.setXOffset(0);
+        taskRunLayer.setYOffset(0);
+
+        AnnotationLayer annotationLayer = new AnnotationLayer();
+
+        when(taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId)).thenReturn(Optional.of(taskRun));
+        when(currentUserService.getCurrentUser()).thenReturn(currentUser);
+        when(projectService.get(projectId)).thenReturn(project);
+        doNothing().when(securityACLService).checkUser(currentUser);
+        doNothing().when(securityACLService).check(project, READ);
+        doNothing().when(securityACLService).checkIsNotReadOnly(project);
+
+        when(appEngineService.get("task-runs/" + taskRunId + "/outputs")).thenReturn(outputsJson);
+        when(appEngineService.get("task-runs/" + taskRunId)).thenReturn(taskRunJson);
+        when(annotationLayerService.createLayerName(any(), any(), any())).thenReturn("layer-name");
+        when(annotationLayerService.createAnnotationLayer("layer-name")).thenReturn(annotationLayer);
+        when(taskRunLayerRepository.findByTaskRunAndImage(any(), any())).thenReturn(Optional.of(taskRunLayer));
+        when(geometryService.isGeometry(geoJson1)).thenReturn(true);
+        when(geometryService.isGeometry(geoJson2)).thenReturn(true);
+        when(geometryService.GeoJSONToWKT(geoJson1)).thenReturn("POINT (1 2)");
+        when(geometryService.GeoJSONToWKT(geoJson2)).thenReturn("POINT (3 4)");
+
+        String result = taskRunService.getOutputs(projectId, taskRunId);
+
+        assertEquals(outputsJson, result);
+        verify(annotationService, times(2)).createAnnotation(eq(annotationLayer), any(String.class));
+        verify(asyncService, times(1)).launchImageAdditionJob(
+                ArgumentMatchers.any(),
+                eq(projectId),
+                eq(currentUser)
+        );
+    }
 }

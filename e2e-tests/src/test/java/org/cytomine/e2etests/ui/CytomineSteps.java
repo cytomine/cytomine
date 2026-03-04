@@ -45,13 +45,12 @@ public class CytomineSteps {
         return driver.getCurrentUrl();
     }
 
-    public String deleteProject(Wait<WebDriver> wait, String projectURL) {
+    public void deleteProject(Wait<WebDriver> wait, String projectURL) {
         webDriverUtils.goTo(wait, projectURL);
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Delete')]");
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Confirm')]");
         webDriverUtils.byIsDisplayed(wait,
             By.xpath("//div[contains(text(), 'successfully deleted')]"));
-        return projectURL;
     }
 
     public void listProjects(Wait<WebDriver> wait, URL cytomineUrl, Set<String> projectNames) {
@@ -78,13 +77,12 @@ public class CytomineSteps {
         return driver.getCurrentUrl();
     }
 
-    public String deleteOntology(Wait<WebDriver> wait, String ontologyURL) {
+    public void deleteOntology(Wait<WebDriver> wait, String ontologyURL) {
         webDriverUtils.goTo(wait, ontologyURL);
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Delete')]");
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Confirm')]");
         webDriverUtils.byIsDisplayed(wait,
             By.xpath("//div[contains(text(), 'successfully deleted')]"));
-        return ontologyURL;
     }
 
     public String getOntologyUrlFromProject(Wait<WebDriver> wait, String projectURL) {
@@ -142,6 +140,27 @@ public class CytomineSteps {
         webDriverUtils.waitUntilByEmpty(wait, By.xpath(
             "//div[contains(@class,'uploaded-files-list')]//span[@data-filename='" + imageName
                 + "']"));
+    }
+
+    public String addTermToOntology(Wait<WebDriver> wait, WebDriver driver, String ontologyURL,
+                                     String termName) {
+        webDriverUtils.goTo(wait, ontologyURL);
+        webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Add a term')]");
+        webDriverUtils.bySendKeys(wait, By.name("name"), termName);
+        webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Save')]");
+        webDriverUtils.byIsDisplayed(wait, By.xpath(
+            "//span[contains(@class, 'ontology-term') and contains(text(), '" + termName + "')]"));
+        return driver.getCurrentUrl();
+    }
+
+    public void deleteTermFromOntology(Wait<WebDriver> wait, String ontologyURL, String termName) {
+        webDriverUtils.goTo(wait, ontologyURL);
+        webDriverUtils.xpathClick(wait,
+            "//span[contains(@class, 'ontology-term') and contains(text(), '" + termName + "')]");
+        webDriverUtils.xpathClick(wait, "//button[contains(@data-delete-term, '" + termName + "')]");
+        webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Confirm')]");
+        webDriverUtils.waitUntilByEmpty(wait, By.xpath(
+            "//span[contains(@class, 'ontology-term') and contains(text(), '" + termName + "')]"));
     }
 
 }

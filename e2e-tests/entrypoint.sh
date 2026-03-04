@@ -1,8 +1,9 @@
 #!/bin/sh
 set -e
 
-mkdir -p /workspace/build
-cd /app
+mkdir -p /workspace
+cp -r /app/* /workspace/
+cd /workspace
 
 SELENIUM="${SELENIUM_URL:-http://localhost:4444}"
 
@@ -19,4 +20,3 @@ exec gradle :e2e-tests:test \
   --no-daemon \
   --project-cache-dir=/workspace/.gradle \
   -Dorg.gradle.project.buildDir=/workspace/build
-

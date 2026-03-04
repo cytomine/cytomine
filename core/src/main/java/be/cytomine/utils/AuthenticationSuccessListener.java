@@ -1,6 +1,5 @@
 package be.cytomine.utils;
 
-import be.cytomine.domain.security.SecRole;
 import be.cytomine.domain.security.SecUserSecRole;
 import be.cytomine.domain.security.User;
 import be.cytomine.repository.security.SecRoleRepository;

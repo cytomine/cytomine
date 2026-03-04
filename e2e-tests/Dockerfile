@@ -12,6 +12,7 @@ ENV GRADLE_USER_HOME=/gradle-cache
 RUN gradle :e2e-tests:testClasses --no-daemon --console=verbose
 
 FROM ${PROXY_CACHE}/gradle:${GRADLE_VERSION}
+RUN apk add --no-cache libstdc++
 WORKDIR /app
 COPY --from=builder /app /app
 COPY --from=builder /gradle-cache /gradle-cache

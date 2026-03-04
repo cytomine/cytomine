@@ -98,6 +98,26 @@ spec:
             failureThreshold: 4
             timeoutSeconds: 5
       initContainers:
+        - name: wait-for-postgis
+          image: "{{ .Values.images.postgis }}"
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
+          env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-core-secret
+                  key: password
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Waiting for postgis to be ready..."
+              until pg_isready -h postgis.{{ .Release.Namespace }}.svc.cluster.local -p {{ .Values.postgresql.port }} -U {{ .Values.postgresql.user }}; do
+                echo "postgis not ready, retrying in 2s..."
+                sleep 2
+              done
+              echo "postgis is ready!"
         - name: core-init
           image: "{{ .Values.images.core }}"
           imagePullPolicy: {{ .Values.images.pullPolicy }}

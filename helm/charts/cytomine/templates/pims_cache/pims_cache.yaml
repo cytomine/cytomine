@@ -3,8 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: pims-cache
-  annotations:
-    kube-score/ignore: pod-probes
+  annotations: {}
   labels:
     role: pims-cache
     app: {{ include "cytomine.name" . }}
@@ -39,6 +38,24 @@ spec:
           ports:
             - name: http
               containerPort: {{ .Values.pims_cache.port }}
+          readinessProbe:
+            exec:
+              command:
+                - redis-cli
+                - ping
+            initialDelaySeconds: 5
+            periodSeconds: 3
+            failureThreshold: 5
+            timeoutSeconds: 2
+          livenessProbe:
+            exec:
+              command:
+                - redis-cli
+                - ping
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 2
           resources:
             {{- toYaml .Values.pims_cache.resources | nindent 12 }}
           volumeMounts:

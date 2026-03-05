@@ -87,15 +87,15 @@ spec:
             httpGet:
               path: /server/ping
               port: 8080
-            initialDelaySeconds: 60
-            failureThreshold: 30
+            initialDelaySeconds: 300
+            failureThreshold: 10
             timeoutSeconds: 8
           readinessProbe:
             httpGet:
               path: /server/ping
               port: 8080
-            initialDelaySeconds: 180
-            failureThreshold: 10
+            initialDelaySeconds: 30
+            failureThreshold: 20
             timeoutSeconds: 5
       initContainers:
         - name: wait-for-postgis

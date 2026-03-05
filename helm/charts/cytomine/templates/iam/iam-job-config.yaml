@@ -14,10 +14,16 @@ spec:
       securityContext:
       {{- include "cytomine.podSecurityContext" . | nindent 8 }}
       initContainers: # initContainers run in sequence, not containers
-      - name: login
+      - name: wait-for-iam-login
         image: "{{ .Values.images.iam }}"
         command: ["/bin/sh", "-c"]
-        args: ["/opt/keycloak/bin/kcadm.sh config credentials --server {{ include "cytomine.iamInternalUrl" . }} --realm master --user admin --password $(KEYCLOAK_ADMIN_PASSWORD) --config /opt/keycloak-auth/kcadm.config"]
+        args:
+          - |
+            until /opt/keycloak/bin/kcadm.sh config credentials --server {{ include "cytomine.iamInternalUrl" . }} --realm master --user admin --password $KEYCLOAK_ADMIN_PASSWORD --config /opt/keycloak-auth/kcadm.config; do
+              echo "Waiting for IAM to be ready..."
+              sleep 5
+            done
+            echo "IAM is ready"
         volumeMounts:
         - name: kc-auth
           mountPath: "/opt/keycloak-auth"
@@ -125,7 +131,7 @@ spec:
 {{ if and (.Values.iam.lsaaiClientIdSecretName) (and .Values.iam.lsaaiClientSecretSecretName .Values.iam.lsaaiEndpoint) }}
       # https://stackoverflow.com/a/75794013
       - name: fetch-auth-config
-        image: "curlimages/curl"
+        image: {{ .Values.images.curl }}
         command: ["/bin/sh", "-c"]
         args: ["cat /opt/keycloak-auth/kcadm.config | grep token | sed -E 's/(token)|\"|:| |,//g' > /opt/keycloak-auth/token"]
         volumeMounts:
@@ -135,7 +141,7 @@ spec:
         {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
 
       - name: import-lsaai-config
-        image: "curlimages/curl"
+        image: {{ .Values.images.curl }}
         command: ["/bin/sh", "-c"]
         args: ["AUTH=$(cat /opt/keycloak-auth/token) && curl -s -X POST -H \"Authorization: bearer $AUTH\" -H 'content-type: application/json' {{ include "cytomine.iamInternalUrl" . }}/admin/realms/cytomine/identity-provider/import-config -d '{\"fromUrl\":\"'{{ .Values.iam.lsaaiEndpoint }}'\",\"providerId\":\"oidc\"}' > /opt/keycloak-auth/import-config.json && cat /opt/keycloak-auth/import-config.json"]
         volumeMounts:

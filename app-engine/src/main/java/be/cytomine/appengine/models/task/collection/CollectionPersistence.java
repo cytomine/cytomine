@@ -1,5 +1,6 @@
 package be.cytomine.appengine.models.task.collection;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -36,5 +37,5 @@ public class CollectionPersistence extends TypePersistence {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "collection_id")
-    private List<TypePersistence> items;
+    private List<TypePersistence> items = new ArrayList<>();
 }

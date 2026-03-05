@@ -70,6 +70,10 @@ images:
   #
   # External Images
   #
+  registry: registry:2.8.3
+  alpine: alpine:3.18
+  curl: curlimages/curl
+  eclipse_temurin: eclipse-temurin:8u462-b08-jdk-ubi9-minimal
   postgis: postgis/postgis:15-3.5
   postgresql_iam: postgres:14
   postgresql_app_engine: postgres:14
@@ -238,6 +242,18 @@ app_engine:
     size: 5Gi
     storageClassName: null
   tasks_namespace:
+  registry:
+    port: 5000
+    # Service type: NodePort exposes on node, ClusterIP for internal only
+    serviceType: NodePort
+    nodePort: 32000
+    # URL used by the container runtime to pull task images
+    # This must be reachable from the node's container runtime (containerd/docker)
+    # Examples: "localhost:32000" for NodePort, or external registry URL
+    advertisedUrl: null
+    storage:
+      size: 5Gi
+      storageClassName: null
 
 sam:
   port: 8000

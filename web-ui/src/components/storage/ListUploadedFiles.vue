@@ -13,7 +13,7 @@
  limitations under the License.-->
 
 <template>
-  <div class="panel">
+  <div class="panel uploaded-files-list">
     <p class="panel-heading">
       {{ $t('storage') }}
     </p>
@@ -40,8 +40,8 @@
             <div v-else class="is-size-7 has-text-grey">{{$t('no-preview-available')}}</div>
           </b-table-column>
 
-          <b-table-column field="originalFilename" :label="$t('filename')" sortable width="200">
-            {{ uFile.originalFilename }}
+          <b-table-column field="originalFilename" :label="$t('filename')" sortable width="200" :data-filename="uFile.originalFilename">
+            <span :data-filename="uFile.originalFilename">{{ uFile.originalFilename }}</span>
           </b-table-column>
 
           <b-table-column field="created" :label="$t('created')" sortable width="150">
@@ -61,7 +61,7 @@
               <a class="button is-small is-link" @click="download(uFile.downloadURL)" v-if="uFile.status >= 100">
                 {{$t('button-download')}}
               </a>
-              <button class="button is-small is-danger" @click="confirmDeletion(uFile)">
+              <button class="button is-small is-danger delete-file" :data-filename="uFile.originalFilename" @click="confirmDeletion(uFile)">
                 {{$t('button-delete')}}
               </button>
             </div>

@@ -43,28 +43,6 @@ spec:
         emptyDir: {}
       - name: nginx-pid
         emptyDir: {}
-      initContainers:
-        - name: wait-for-dependencies
-          image: "{{ .Values.images.curl }}"
-          securityContext:
-          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
-          command:
-            - /bin/sh
-            - -c
-            - |
-              echo "Waiting for core to be ready..."
-              until curl -sf http://core.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.core.port }}/server/ping; do
-                echo "core not ready, retrying in 2s..."
-                sleep 2
-              done
-              echo "core is ready!"
-
-              echo "Waiting for app-engine to be ready..."
-              until curl -sf http://app-engine.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.app_engine.port }}/app-engine/openapi/swagger-config; do
-                echo "app-engine not ready, retrying in 2s..."
-                sleep 2
-              done
-              echo "app-engine is ready!"
       containers:
         - name: web-ui
           securityContext:

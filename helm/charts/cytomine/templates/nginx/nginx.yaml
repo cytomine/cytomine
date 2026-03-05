@@ -133,7 +133,7 @@ spec:
           - ReadWriteMany
         resources:
           requests:
-            storage: {{ .Values.imageStorage }}
+            storage: {{ .Values.pims.imageStorage.size }}
     - metadata:
         name: image-temp
       spec:
@@ -142,5 +142,5 @@ spec:
           - ReadWriteMany
         resources:
           requests:
-            storage: {{ .Values.tempImageStorage }}
+            storage: {{ .Values.pims.tempImageStorage.size }}
 {{ end }}

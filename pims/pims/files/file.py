@@ -170,7 +170,9 @@ class Path(PlatformPath, _Path, SafelyCopiable):
 
     @property
     def size(self) -> int:
-        """Get file size, in bytes"""
+        """Get file size, in bytes. Symlinks are skipped to avoid counting external data."""
+        if self.is_symlink():
+            return 0
         if self.is_dir():
             return sum([it.size for it in self.iterdir() if os.access(it, os.R_OK)])
         if not self.is_file() and not self.is_dir():

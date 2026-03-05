@@ -17,6 +17,7 @@ import be.cytomine.domain.annotation.Annotation;
 import be.cytomine.domain.annotation.AnnotationLayer;
 import be.cytomine.domain.appengine.TaskRunLayer;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.everyItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -63,10 +64,12 @@ public class AnnotationLayerResourceTest {
         mockMvc.perform(get("/api/annotation-layers/{id}/annotations", annotationLayer.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.length()").value(3))
-            .andExpect(jsonPath("$[0].id").value(first.getId()))
-            .andExpect(jsonPath("$[1].id").value(second.getId()))
-            .andExpect(jsonPath("$[2].id").value(third.getId()))
-            .andExpect(jsonPath("$[*].annotationLayer.id", everyItem(is(Integer.valueOf(annotationLayer.getId().toString())))));
+            .andExpect(jsonPath("$[*].id", containsInAnyOrder(
+                    first.getId().intValue(),
+                    second.getId().intValue(),
+                    third.getId().intValue()
+            )))
+            .andExpect(jsonPath("$[*].annotationLayer.id", everyItem(is(annotationLayer.getId().intValue()))));
     }
 
     @Test

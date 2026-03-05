@@ -162,36 +162,17 @@ public class CytomineTests {
         String projectName = "selenium-" + randomUUID();
         String termName = "selenium-term-" + randomUUID();
 
-        // Login
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
-
-        // Create project (this also creates an ontology)
         String projectURL = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
         String ontologyURL = cytomineSteps.getOntologyUrlFromProject(wait, projectURL);
-
-        // Add a term to the ontology
         cytomineSteps.addTermToOntology(wait, driver, ontologyURL, termName);
-
-        // Upload an image to the project
         String imageName = cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName));
-
-        // Open the image in the viewer
         cytomineSteps.openImageInViewer(wait, driver, projectURL);
-
-        // Select the term for annotation
         cytomineSteps.selectTermForAnnotation(wait, termName);
-
-        // Draw a rectangle annotation
         cytomineSteps.drawRectangleAnnotation(wait, driver);
-
-        // Verify annotation was created
         cytomineSteps.verifyAnnotationCreated(wait, driver);
-
-        // Cleanup
         cytomineSteps.deleteProject(wait, projectURL);
         cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
-        if (ontologyURL != null) {
-            cytomineSteps.deleteOntology(wait, ontologyURL);
-        }
+        cytomineSteps.deleteOntology(wait, ontologyURL);
     }
 }

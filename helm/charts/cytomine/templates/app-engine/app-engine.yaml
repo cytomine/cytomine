@@ -46,6 +46,20 @@ spec:
                 sleep 2
               done
               echo "postgres-app-engine is ready!"
+        - name: wait-for-registry
+          image: "{{ .Values.images.curl }}"
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Waiting for registry to be ready..."
+              until curl -sf http://registry.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.app_engine.registry.port }}/v2/; do
+                echo "registry not ready, retrying in 2s..."
+                sleep 2
+              done
+              echo "registry is ready!"
       containers:
       - name: app-engine
         image: {{ .Values.images.app_engine }}

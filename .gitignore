@@ -4,7 +4,9 @@ build
 
 # JetBrains IDEs files
 .idea
+!.idea/codeStyles/Project.xml
 *.iml
+
 
 # VS Code files
 .vscode

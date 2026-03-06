@@ -366,50 +366,54 @@ public class TaskRunService {
 
         if (json.get("type").get("id").asText().equals("image")) {
             JsonNode value = json.get("value");
-            if (!json.get("value").isNull()) {
-                String type = Objects.nonNull(value.get("type")) ? value.get("type").asText() : null;
-                Long id = Objects.nonNull(value.get("id")) ? value.get("id").asLong() : null;
-
-                MultiValueMap<String, Object> body;
-                if (Objects.nonNull(type))
-                {
-                    if (type.equals("annotation")) {
-                        UserAnnotation annotation = userAnnotationService.get(id);
-                        Envelope bounds = GeometryService.getBounds(annotation.getWktLocation());
-
-                        TaskRun taskRun =
-                            taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId)
-                                .orElseThrow(() -> new ObjectNotFoundException("TaskRun", taskRunId));
-
-                        Optional<TaskRunLayer> optionalTaskRunLayer = taskRunLayerRepository
-                            .findByTaskRunAndImage(taskRun, taskRun.getImage());
-                        if (optionalTaskRunLayer.isPresent()) {
-                            TaskRunLayer taskRunLayer = optionalTaskRunLayer.get();
-                            taskRunLayer.setXOffset((int) bounds.getMinX());
-                            taskRunLayer.setYOffset((int) bounds.getMinY());
-                            taskRunLayerRepository.saveAndFlush(taskRunLayer);
-                        }
-
-                        body = prepareImage(id, "annotation");
-                    } else if (type.equals("image")) {
-                        wsi = downloadWsi(id);
-
-                        body = new LinkedMultiValueMap<>();
-                        body.add("file", new FileSystemResource(wsi));
-                    } else {
-                        throw new IllegalArgumentException("Unsupported type: " + type);
-                    }
-
-
-                    String response = appEngineService.post(uri, body, MediaType.MULTIPART_FORM_DATA);
-
-                    if (wsi != null) {
-                        wsi.delete();
-                    }
-
-                    return response;
-                }
+            if (value.isNull()) {
+                throw new RuntimeException("value cannot be null");
             }
+
+            String type = value.path("type").asText(null);
+            long id = value.path("id").asLong(0);
+
+            if (type == null) {
+                throw new RuntimeException("type cannot be null");
+            }
+
+            MultiValueMap<String, Object> body;
+            switch (type) {
+                case "annotation" -> {
+                    UserAnnotation annotation = userAnnotationService.get(id);
+                    Envelope bounds = GeometryService.getBounds(annotation.getWktLocation());
+
+                    TaskRun taskRun = taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId)
+                            .orElseThrow(() -> new ObjectNotFoundException("TaskRun", taskRunId));
+
+                    Optional<TaskRunLayer> optionalTaskRunLayer = taskRunLayerRepository
+                            .findByTaskRunAndImage(taskRun, taskRun.getImage());
+                    if (optionalTaskRunLayer.isPresent()) {
+                        TaskRunLayer taskRunLayer = optionalTaskRunLayer.get();
+                        taskRunLayer.setXOffset((int) bounds.getMinX());
+                        taskRunLayer.setYOffset((int) bounds.getMinY());
+                        taskRunLayerRepository.saveAndFlush(taskRunLayer);
+                    }
+
+                    body = prepareImage(id, "annotation");
+                }
+
+                case "image" -> {
+                    wsi = downloadWsi(id);
+                    body = new LinkedMultiValueMap<>();
+                    body.add("file", new FileSystemResource(wsi));
+                }
+
+                default -> throw new IllegalArgumentException("Unsupported type: " + type);
+            }
+
+            String response = appEngineService.post(uri, body, MediaType.MULTIPART_FORM_DATA);
+
+            if (wsi != null) {
+                wsi.delete();
+            }
+
+            return response;
         }
 
         ObjectNode provision = json.deepCopy();

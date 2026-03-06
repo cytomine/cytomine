@@ -1,0 +1,48 @@
+{{- if eq .Values.gateway.className "envoy-gateway" }}
+{{- if .Values.gateway.cors.enabled }}
+# CORS policy for Envoy Gateway
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: cytomine-cors
+  labels:
+    {{- include "cytomine.labels" . | nindent 4 }}
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: cytomine
+  cors:
+    allowOrigins:
+      - type: Exact
+        value: {{ include "core.url" . | quote }}
+    allowMethods:
+      {{- range .Values.gateway.cors.allowMethods }}
+      - {{ . }}
+      {{- end }}
+    allowHeaders:
+      {{- range .Values.gateway.cors.allowHeaders }}
+      - {{ . }}
+      {{- end }}
+    allowCredentials: {{ .Values.gateway.cors.allowCredentials }}
+{{- end }}
+---
+# Backend traffic policy for timeouts and connection settings
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: BackendTrafficPolicy
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: cytomine-backend
+  labels:
+    {{- include "cytomine.labels" . | nindent 4 }}
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: cytomine
+  timeout:
+    http:
+      connectionIdleTimeout: {{ .Values.gateway.timeouts.connectionIdle | default "3600s" }}
+      maxConnectionDuration: {{ .Values.gateway.timeouts.maxConnectionDuration | default "3600s" }}
+{{- end }}

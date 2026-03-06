@@ -1,7 +1,12 @@
-{{- $ingressSvc := lookup "v1" "Service" "ingress" "ingress-nginx-controller" }}
-{{- $ingressIP := "" }}
-{{- if $ingressSvc }}
-{{- $ingressIP = $ingressSvc.spec.clusterIP }}
+{{- /* Look for Gateway addresses in status - this lookup happens during helm test, after Gateway is created */}}
+{{- $gateway := lookup "gateway.networking.k8s.io/v1" "Gateway" .Release.Namespace "cytomine" }}
+{{- $gatewayIP := "" }}
+{{- if $gateway }}
+  {{- if $gateway.status }}
+    {{- if $gateway.status.addresses }}
+      {{- $gatewayIP = (index $gateway.status.addresses 0).value }}
+    {{- end }}
+  {{- end }}
 {{- end }}
 apiVersion: v1
 kind: Pod
@@ -14,10 +19,12 @@ metadata:
 spec:
   securityContext:
   {{- include "cytomine.podSecurityContext" . | nindent 4 }}
+  {{- if $gatewayIP }}
   hostAliases:
-    - ip: "{{ $ingressIP }}"
+    - ip: "{{ $gatewayIP }}"
       hostnames:
         - "{{ .Values.global.domainName }}"
+  {{- end }}
   volumes:
     - name: tmp
       emptyDir: {}

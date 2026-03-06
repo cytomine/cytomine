@@ -32,10 +32,10 @@ public class TaskRunLayer extends CytomineDomain {
     private ImageInstance image;
 
     @Column(name = "x_offset")
-    private Integer xOffset;
+    private Integer xOffset = 0;
 
     @Column(name = "y_offset")
-    private Integer yOffset;
+    private Integer yOffset = 0;
 
     public static JsonObject getDataFromDomain(CytomineDomain domain) {
         TaskRunLayer taskRunLayer = (TaskRunLayer) domain;

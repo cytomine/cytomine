@@ -1,5 +1,6 @@
 package be.cytomine.domain.appengine;
 
+import be.cytomine.domain.ontology.UserAnnotation;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
@@ -30,6 +31,10 @@ public class TaskRunLayer extends CytomineDomain {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "image_instance_id")
     private ImageInstance image;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_annotation_id")
+    private UserAnnotation roi;
 
     @Column(name = "x_offset")
     private Integer xOffset = 0;

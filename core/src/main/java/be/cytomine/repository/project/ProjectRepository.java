@@ -103,4 +103,6 @@ public interface ProjectRepository extends JpaRepository<Project, Long>  {
     @Query(value = "SELECT a.project_id FROM image_instance a WHERE id=:imageInstanceId", nativeQuery = true)
     Long findByProjectIdByImageInstanceId(Long imageInstanceId);
 
+    List<Project> findByNameIn(List<String> names);
+
 }

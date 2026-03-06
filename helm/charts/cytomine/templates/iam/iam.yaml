@@ -83,6 +83,7 @@ spec:
         command:
         - "/opt/keycloak/bin/kc.sh"
         - "start"
+        # Uncomment next line to print debug logs
         # - "--log-level=DEBUG"
         envFrom:
         - configMapRef:

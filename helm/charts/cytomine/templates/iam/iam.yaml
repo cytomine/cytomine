@@ -27,6 +27,26 @@ spec:
       - name: tmp-keycloak
         emptyDir: {}
       initContainers:
+      - name: wait-for-postgres
+        image: "{{ .Values.images.postgresql_iam }}"
+        securityContext:
+        {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
+        env:
+          - name: PGPASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: postgres-iam-secret
+                key: password
+        command:
+          - /bin/sh
+          - -c
+          - |
+            echo "Waiting for postgres-iam to be ready..."
+            until pg_isready -h postgres-iam.{{ .Release.Namespace }}.svc.cluster.local -p 5432 -U iam; do
+              echo "postgres-iam not ready, retrying in 2s..."
+              sleep 2
+            done
+
       - name: iam-init
         image: {{ .Values.images.iam }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
@@ -48,7 +68,7 @@ spec:
         securityContext:
         {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
         image: {{ .Values.images.eclipse_temurin }}
-        command: ['sh', '-c', 'keytool -genkeypair -alias localhost -keyalg RSA -keysize 2048 -validity 365 -keystore /keystore/server.keystore -dname "cn=Server Administrator,o=Acme,c=GB" -keypass password -storepass password']
+        command: ['sh', '-c', '[ -f /keystore/server.keystore ] || keytool -genkeypair -alias localhost -keyalg RSA -keysize 2048 -validity 365 -keystore /keystore/server.keystore -dname "cn=Server Administrator,o=Acme,c=GB" -keypass password -storepass password']
         volumeMounts:
         - name: keystore
           mountPath: "/keystore"
@@ -63,7 +83,8 @@ spec:
         command:
         - "/opt/keycloak/bin/kc.sh"
         - "start"
-        - "--log-level=DEBUG"
+        # Uncomment next line to print debug logs
+        # - "--log-level=DEBUG"
         envFrom:
         - configMapRef:
             name: iam
@@ -83,6 +104,24 @@ spec:
             secretKeyRef:
               name: admin-iam-secret
               key: password
+        readinessProbe:
+          exec:
+            command:
+              - /bin/sh
+              - -c
+              - /opt/keycloak/bin/kcadm.sh config credentials --server http://localhost:{{ .Values.iam.port }}/iam --realm master --user admin --password $KC_BOOTSTRAP_ADMIN_PASSWORD --config /tmp/probe.config
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          failureThreshold: 12
+          timeoutSeconds: 10
+        livenessProbe:
+          httpGet:
+           path: /health/live
+           port: {{ .Values.iam.port }}
+          initialDelaySeconds: 20
+          periodSeconds: 20
+          failureThreshold: 10
+
         volumeMounts:
         - name: opt-keycloak
           mountPath: "/opt/keycloak"

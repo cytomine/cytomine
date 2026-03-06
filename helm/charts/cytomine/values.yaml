@@ -26,8 +26,6 @@ readOnceStorageClass: ""
 readManyStorageClass: null
 
 # Resource settings
-tempImageStorage: "1Gi"
-imageStorage: "3Gi"
 mongodbStorage: "1Gi"
 postgresStorage: "3Gi"
 
@@ -200,8 +198,10 @@ pims:
       cpu: "1000m"
       ephemeral-storage: 1Gi
   imageStorage:
+    size: 3Gi
     storageClassName: null
   tempImageStorage:
+    size: 1Gi
     storageClassName: null
 
   # Volume block for the path of the images to import.

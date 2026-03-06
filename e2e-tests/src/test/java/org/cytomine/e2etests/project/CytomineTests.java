@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.Optional;
 import java.util.Set;
 
 import lombok.SneakyThrows;
@@ -57,7 +58,7 @@ public class CytomineTests {
     @BeforeEach
     void setUp() {
         driver = driverProvider.driver();
-        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        wait = new WebDriverWait(driver, Duration.ofSeconds(5));
     }
 
     @AfterEach
@@ -125,6 +126,53 @@ public class CytomineTests {
         String ontologyName = "selenium-" + randomUUID();
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
         String ontologyURL = cytomineSteps.createOntology(wait, driver, cytomineUrl, ontologyName);
+        cytomineSteps.deleteOntology(wait, ontologyURL);
+    }
+
+    @Test
+    void addImageToStorageNoProject() {
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        String imageName = cytomineSteps.addImage(wait, cytomineUrl, Optional.empty());
+        cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
+    }
+
+    @Test
+    void addImageToStorageWithProject() {
+        String projectName = "selenium-" + randomUUID();
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        String projectURL = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
+        String imageName = cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName));
+        cytomineSteps.deleteProject(wait, projectURL);
+        cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
+    }
+
+    @Test
+    void addTermToOntology() {
+        String ontologyName = "selenium-ontology-" + randomUUID();
+        String termName = "selenium-term-" + randomUUID();
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        String ontologyURL = cytomineSteps.createOntology(wait, driver, cytomineUrl, ontologyName);
+        cytomineSteps.addTermToOntology(wait, driver, ontologyURL, termName);
+        cytomineSteps.deleteTermFromOntology(wait, ontologyURL, termName);
+        cytomineSteps.deleteOntology(wait, ontologyURL);
+    }
+
+    @Test
+    void addAnnotationWithTerm() {
+        String projectName = "selenium-" + randomUUID();
+        String termName = "selenium-term-" + randomUUID();
+
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        String projectURL = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
+        String ontologyURL = cytomineSteps.getOntologyUrlFromProject(wait, projectURL);
+        cytomineSteps.addTermToOntology(wait, driver, ontologyURL, termName);
+        String imageName = cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName));
+        cytomineSteps.openImageInViewer(wait, driver, projectURL);
+        cytomineSteps.selectTermForAnnotation(wait, termName);
+        cytomineSteps.drawRectangleAnnotation(wait, driver);
+        cytomineSteps.verifyAnnotationCreated(wait, driver);
+        cytomineSteps.deleteProject(wait, projectURL);
+        cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
         cytomineSteps.deleteOntology(wait, ontologyURL);
     }
 }

@@ -392,6 +392,7 @@ public class TaskRunService {
                         TaskRunLayer taskRunLayer = optionalTaskRunLayer.get();
                         taskRunLayer.setXOffset((int) bounds.getMinX());
                         taskRunLayer.setYOffset((int) bounds.getMinY());
+                        taskRunLayer.setRoi(annotation);
                         taskRunLayerRepository.saveAndFlush(taskRunLayer);
                     }
 

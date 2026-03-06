@@ -5,6 +5,8 @@ services:
   mongo:
     image: mongo:4.4-focal
     restart: unless-stopped
+    ports:
+      - 27017:27017
     volumes:
       - ${DATA_PATH:-./data}/mongo:/data/db
     environment:

@@ -50,7 +50,7 @@ public class RetrievalService {
 
     public void createStorage(String projectId) {
         URI url = UriComponentsBuilder
-            .fromHttpUrl(getInternalCbirURL())
+            .fromUriString(getInternalCbirURL())
             .path("/storages")
             .build()
             .toUri();
@@ -78,7 +78,7 @@ public class RetrievalService {
 
     public void deleteStorage(String projectId) {
         URI url = UriComponentsBuilder
-            .fromHttpUrl(getInternalCbirURL())
+            .fromUriString(getInternalCbirURL())
             .pathSegment("storages", projectId)
             .build()
             .toUri();
@@ -135,7 +135,7 @@ public class RetrievalService {
     public ResponseEntity<String> indexAnnotation(AnnotationDomain annotation) {
         String storageName = annotation.getProject().getId().toString();
         URI url = UriComponentsBuilder
-            .fromHttpUrl(getInternalCbirURL())
+            .fromUriString(getInternalCbirURL())
             .path("/images")
             .queryParam("storage", storageName)
             .queryParam("index", INDEX_NAME)
@@ -150,7 +150,7 @@ public class RetrievalService {
 
     public ResponseEntity<String> deleteIndex(AnnotationDomain annotation) {
         URI url = UriComponentsBuilder
-            .fromHttpUrl(getInternalCbirURL())
+            .fromUriString(getInternalCbirURL())
             .pathSegment("images", annotation.getId().toString())
             .queryParam("storage", annotation.getProject().getId())
             .queryParam("index", INDEX_NAME)
@@ -182,7 +182,7 @@ public class RetrievalService {
 
     public ResponseEntity<SearchResponse> retrieveSimilarImages(AnnotationDomain annotation, Long nrt_neigh) {
         String url = UriComponentsBuilder
-            .fromHttpUrl(getInternalCbirURL())
+            .fromUriString(getInternalCbirURL())
             .path("/search")
             .queryParam("storage", annotation.getProject().getId())
             .queryParam("index", INDEX_NAME)

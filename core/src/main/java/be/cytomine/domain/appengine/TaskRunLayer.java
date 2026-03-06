@@ -1,6 +1,5 @@
 package be.cytomine.domain.appengine;
 
-import be.cytomine.domain.ontology.UserAnnotation;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
@@ -13,6 +12,7 @@ import lombok.Setter;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.annotation.AnnotationLayer;
 import be.cytomine.domain.image.ImageInstance;
+import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.utils.JsonObject;
 
 @Setter

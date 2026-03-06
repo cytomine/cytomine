@@ -1,34 +1,22 @@
 package be.cytomine.service.appengine;
 
-import be.cytomine.domain.annotation.AnnotationLayer;
-import be.cytomine.domain.appengine.TaskRun;
-import be.cytomine.domain.appengine.TaskRunLayer;
-import be.cytomine.domain.image.ImageInstance;
-import be.cytomine.domain.ontology.AnnotationDomain;
-import be.cytomine.domain.ontology.UserAnnotation;
-import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
-import be.cytomine.dto.appengine.task.TaskDescription;
-import be.cytomine.dto.appengine.task.TaskRunDetail;
-import be.cytomine.dto.appengine.task.TaskRunOutputResponse;
-import be.cytomine.dto.appengine.task.TaskRunResponse;
-import be.cytomine.dto.appengine.task.TaskRunValue;
-import be.cytomine.dto.appengine.task.type.CollectionType;
-import be.cytomine.dto.appengine.task.type.GeometryType;
-import be.cytomine.dto.appengine.task.type.TaskParameterType;
-import be.cytomine.dto.image.CropParameter;
-import be.cytomine.exceptions.ObjectNotFoundException;
-import be.cytomine.repository.appengine.TaskRunLayerRepository;
-import be.cytomine.repository.appengine.TaskRunRepository;
-import be.cytomine.service.CurrentUserService;
-import be.cytomine.service.annotation.AnnotationLayerService;
-import be.cytomine.service.annotation.AnnotationService;
-import be.cytomine.service.image.ImageInstanceService;
-import be.cytomine.service.middleware.ImageServerService;
-import be.cytomine.service.ontology.UserAnnotationService;
-import be.cytomine.service.project.ProjectService;
-import be.cytomine.service.security.SecurityACLService;
-import be.cytomine.service.utils.GeometryService;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -55,16 +43,34 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URI;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
+import be.cytomine.domain.annotation.AnnotationLayer;
+import be.cytomine.domain.appengine.TaskRun;
+import be.cytomine.domain.appengine.TaskRunLayer;
+import be.cytomine.domain.image.ImageInstance;
+import be.cytomine.domain.ontology.AnnotationDomain;
+import be.cytomine.domain.ontology.UserAnnotation;
+import be.cytomine.domain.project.Project;
+import be.cytomine.domain.security.User;
+import be.cytomine.dto.appengine.task.TaskRunDetail;
+import be.cytomine.dto.appengine.task.TaskRunOutputResponse;
+import be.cytomine.dto.appengine.task.TaskRunResponse;
+import be.cytomine.dto.appengine.task.TaskRunValue;
+import be.cytomine.dto.appengine.task.type.CollectionType;
+import be.cytomine.dto.appengine.task.type.GeometryType;
+import be.cytomine.dto.appengine.task.type.TaskParameterType;
+import be.cytomine.dto.image.CropParameter;
+import be.cytomine.exceptions.ObjectNotFoundException;
+import be.cytomine.repository.appengine.TaskRunLayerRepository;
+import be.cytomine.repository.appengine.TaskRunRepository;
+import be.cytomine.service.CurrentUserService;
+import be.cytomine.service.annotation.AnnotationLayerService;
+import be.cytomine.service.annotation.AnnotationService;
+import be.cytomine.service.image.ImageInstanceService;
+import be.cytomine.service.middleware.ImageServerService;
+import be.cytomine.service.ontology.UserAnnotationService;
+import be.cytomine.service.project.ProjectService;
+import be.cytomine.service.security.SecurityACLService;
+import be.cytomine.service.utils.GeometryService;
 
 import static org.springframework.security.acls.domain.BasePermission.READ;
 
@@ -101,6 +107,16 @@ public class TaskRunService {
 
     private final AsyncService asyncService;
 
+    private boolean containsGeometry(TaskParameterType type) {
+        if (type instanceof GeometryType) {
+            return true;
+        }
+        if (type instanceof CollectionType collection) {
+            return containsGeometry(collection.subType());
+        }
+        return false;
+    }
+
     public String addTaskRun(Long projectId, String taskId, JsonNode body) {
         Project project = projectService.get(projectId);
         User currentUser = currentUserService.getCurrentUser();
@@ -133,20 +149,9 @@ public class TaskRunService {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error parsing JSON response");
         }
 
-        boolean hasGeometry = false;
-        for (TaskRunOutputResponse taskRunOutput : taskRunOutputResponse) {
-            TaskParameterType type = taskRunOutput.type();
-
-            if (type instanceof GeometryType) {
-                hasGeometry = true;
-                break;
-            }
-
-            if (type instanceof CollectionType array && array.subType() instanceof GeometryType) {
-                hasGeometry = true;
-                break;
-            }
-        }
+        boolean hasGeometry = taskRunOutputResponse.stream()
+                .map(TaskRunOutputResponse::type)
+                .anyMatch(this::containsGeometry);
 
         if (hasGeometry) {
             String layerName = annotationLayerService.createLayerName(taskRunResponse.task().name(), taskRunResponse.task().version(), taskRun.getCreated());
@@ -518,8 +523,57 @@ public class TaskRunService {
 
     public String postStateAction(JsonNode body, Long projectId, UUID taskRunId) {
         checkTaskRun(projectId, taskRunId);
-        return appEngineService.post("task-runs/" + taskRunId + "/state-actions", body,
-            MediaType.APPLICATION_JSON);
+        return appEngineService.post("task-runs/" + taskRunId + "/state-actions", body, MediaType.APPLICATION_JSON);
+    }
+
+    private void processGeometryValue(TaskRunValue value, AnnotationLayer annotationLayer, TaskRunLayer taskRunLayer) {
+        if (!"ARRAY".equals(value.getType())) {
+            return;
+        }
+
+        List<?> items = (List<?>) value.getValue();
+        if (items == null || items.isEmpty()) {
+            return;
+        }
+
+        if ("GEOMETRY".equals(value.getSubType())) {
+            JsonNode jsonItems = objectMapper.convertValue(items, JsonNode.class);
+            for (JsonNode item : jsonItems) {
+                String geoJson = item.get("value").asText();
+                if (geometryService.isGeometry(geoJson)) {
+                    String wktGeometry = geometryService.GeoJSONToWKT(geoJson);
+                    Geometry parsedGeometry = GeometryService.addOffset(wktGeometry, taskRunLayer.getXOffset(), taskRunLayer.getYOffset());
+                    annotationService.createAnnotation(annotationLayer, parsedGeometry.toString());
+                }
+            }
+        } else if ("ARRAY".equals(value.getSubType())) {
+            items.stream()
+                    .map(item -> objectMapper.convertValue(item, TaskRunValue.class))
+                    .forEach(inner -> processGeometryValue(inner, annotationLayer, taskRunLayer));
+        }
+    }
+
+    private boolean hasGeometrySubType(TaskRunValue value) {
+        if (!"ARRAY".equals(value.getType())) {
+            return false;
+        }
+
+        String subType = value.getSubType();
+        if ("GEOMETRY".equals(subType)) {
+            return true;
+        }
+
+        if ("ARRAY".equals(subType)) {
+            if (!(value.getValue() instanceof List<?> innerList)) {
+                return false;
+            }
+
+            return innerList.stream()
+                    .map(item -> objectMapper.convertValue(item, TaskRunValue.class))
+                    .anyMatch(this::hasGeometrySubType);
+        }
+
+        return false;
     }
 
     public String getOutputs(Long projectId, UUID taskRunId) {
@@ -556,6 +610,10 @@ public class TaskRunService {
 
         String layerName = annotationLayerService.createLayerName(taskRunResponse.task().name(), taskRunResponse.task().version(), taskRun.getCreated());
         AnnotationLayer annotationLayer = annotationLayerService.createAnnotationLayer(layerName);
+        if (!annotationLayer.getAnnotations().isEmpty()) {
+            return response;
+        }
+
         TaskRunLayer taskRunLayer = taskRunLayerRepository
                 .findByTaskRunAndImage(taskRun, taskRun.getImage())
                 .orElse(new TaskRunLayer());
@@ -566,23 +624,13 @@ public class TaskRunService {
             annotationService.createAnnotation(annotationLayer, parsedGeometry.toString());
         }
 
-        List<TaskRunValue> geoArrayValues = outputs
+        List<TaskRunValue> geometryArrays = outputs
                 .stream()
-                .filter(output -> output.getType().equals("ARRAY")
-                && output.getSubType().equalsIgnoreCase("GEOMETRY"))
+                .filter(this::hasGeometrySubType)
                 .toList();
 
-        if (!geoArrayValues.isEmpty()) {
-            for (TaskRunValue arrayValue : geoArrayValues) {
-                    JsonNode items = new ObjectMapper().convertValue(arrayValue.getValue(), JsonNode.class);
-                    for (JsonNode item : items) {
-                        if (geometryService.isGeometry(item.get("value").asText())) {
-                            String wktGeometry = geometryService.GeoJSONToWKT(item.get("value").asText());
-                            Geometry parsedGeometry = GeometryService.addOffset(wktGeometry, taskRunLayer.getXOffset(), taskRunLayer.getYOffset());
-                            annotationService.createAnnotation(annotationLayer, parsedGeometry.toString());
-                        }
-                    }
-            }
+        for (TaskRunValue arrayValue : geometryArrays) {
+            processGeometryValue(arrayValue, annotationLayer, taskRunLayer);
         }
 
         return response;

@@ -1,15 +1,13 @@
 # List ARGs here for better readability.
 ARG APP_ENGINE_VERSION
 ARG APP_ENGINE_REVISION
-ARG ENTRYPOINT_SCRIPTS_VERSION=1.4.0
 ARG JAVA_VERSION=17-jre
-ARG GRADLE_VERSION=8.14-jdk21-alpine
-ARG GRADLE_DEV_VERSION=8.14-jdk21-jammy
+ARG GRADLE_VERSION=8.14-jdk21
 ARG PROXY_CACHE=registry.cytomine.org/docker
 
 #######################################################################################
 # Stage: dependencies download via gradle
-FROM ${PROXY_CACHE}/gradle:${GRADLE_VERSION} AS deps-downloader
+FROM ${PROXY_CACHE}/gradle:${GRADLE_VERSION}-alpine AS deps-downloader
 
 # We first copy the build.gradle file and the binaries stored in the source repository.
 # This way, we retrieve all gradle dependencies at the beginning. All these steps will be
@@ -29,7 +27,7 @@ RUN gradle :app-engine:clean :app-engine:compileJava --no-daemon --console=verbo
 
 #######################################################################################
 ## Stage: building the jar file
-FROM ${PROXY_CACHE}/gradle:${GRADLE_VERSION} AS jar-builder
+FROM ${PROXY_CACHE}/gradle:${GRADLE_VERSION}-alpine AS jar-builder
 
 ENV GRADLE_USER_HOME=/opt/gradle/.gradle
 COPY --from=deps-downloader /opt/gradle/.gradle /opt/gradle/.gradle
@@ -48,12 +46,8 @@ RUN sed -i -- "s/version: ce-0.0.0/version: ${APP_ENGINE_VERSION}/g" /app/app-en
     gradle :app-engine:bootJar --console=verbose
 
 #######################################################################################
-## Stage: entrypoint script. Use a multi-stage because COPY --from cannot interpolate variables
-FROM ${PROXY_CACHE}/cytomine/entrypoint-scripts:${ENTRYPOINT_SCRIPTS_VERSION} AS entrypoint-scripts
-
-#######################################################################################
 ## Stage: App-Engine development image
-FROM ${PROXY_CACHE}/gradle:${GRADLE_DEV_VERSION} AS dev-server
+FROM ${PROXY_CACHE}/gradle:${GRADLE_VERSION}-jammy AS dev-server
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -63,14 +57,8 @@ RUN apt-get update \
 
 ENV GRADLE_USER_HOME=/opt/gradle/.gradle
 
-# startup scripts
-RUN mkdir /docker-entrypoint-cytomine.d/
-COPY --from=entrypoint-scripts --chmod=774 /cytomine-entrypoint.sh /usr/local/bin/
-COPY --from=entrypoint-scripts --chmod=774 /envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
-COPY --from=entrypoint-scripts --chmod=774 /setup-ssh-dev-env.sh /docker-entrypoint-cytomine.d/1-start-ssh-dev-env.sh
-
 WORKDIR /app
-ENTRYPOINT ["cytomine-entrypoint.sh"]
+CMD ["/bin/sh"]
 
 #######################################################################################
 ## Stage: Cytomine core image
@@ -95,7 +83,7 @@ LABEL org.opencontainers.image.authors="uliege@cytomine.org" \
 ENV DEBIAN_FRONTEND=noninteractive
 ENV LANG=C.UTF-8
 
-# base librairies and configuration
+# base libraries and configuration
 COPY --from=jar-builder /app/app-engine/build/libs/cytomine-app-engine.jar /app/cytomine-app-engine.jar
 
 WORKDIR /app

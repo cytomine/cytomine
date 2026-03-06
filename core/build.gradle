@@ -132,6 +132,7 @@ dependencies {
     // Utils
     implementation 'org.apache.commons:commons-text:1.11.0'
     implementation 'net.bull.javamelody:javamelody-spring-boot-starter:2.1.0'
+    implementation project(":common")
 }
 
 test {

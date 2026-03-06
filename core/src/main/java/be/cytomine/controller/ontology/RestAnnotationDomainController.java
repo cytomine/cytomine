@@ -463,7 +463,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
         URI url = UriComponentsBuilder
-            .fromHttpUrl(this.samUrl)
+            .fromUriString(this.samUrl)
             .path("/sam/annotations/refine")
             .build()
             .toUri();

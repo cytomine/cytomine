@@ -1,32 +1,31 @@
 package be.cytomine.service.annotation;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import be.cytomine.domain.appengine.TaskRun;
-import be.cytomine.domain.image.ImageInstance;
-import be.cytomine.repository.appengine.TaskRunRepository;
-import be.cytomine.service.image.ImageInstanceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import be.cytomine.domain.annotation.Annotation;
+import be.cytomine.domain.appengine.TaskRun;
 import be.cytomine.domain.annotation.AnnotationLayer;
 import be.cytomine.domain.appengine.TaskRunLayer;
+import be.cytomine.domain.image.ImageInstance;
+import be.cytomine.dto.annotation.AnnotationLayerResponse;
 import be.cytomine.dto.appengine.task.TaskRunLayerValue;
 import be.cytomine.repository.annotation.AnnotationLayerRepository;
-import be.cytomine.repository.annotation.AnnotationRepository;
 import be.cytomine.repository.appengine.TaskRunLayerRepository;
+import be.cytomine.repository.appengine.TaskRunRepository;
+import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.appengine.TaskRunLayerService;
 
 @Service
 @RequiredArgsConstructor
 public class AnnotationLayerService {
-
-    private final AnnotationRepository annotationRepository;
 
     private final AnnotationLayerRepository annotationLayerRepository;
 
@@ -56,13 +55,14 @@ public class AnnotationLayerService {
         return annotationLayerRepository.findById(id);
     }
 
-    public List<AnnotationLayer> findByTaskRunLayer(Long imageId) {
+    public Set<AnnotationLayerResponse> findByTaskRunLayer(Long imageId) {
         List<TaskRunLayer> taskRunLayers = taskRunLayerRepository.findAllByImageId(imageId);
 
-        List<AnnotationLayer> annotationLayerList = new ArrayList<>(taskRunLayers
-            .stream()
-            .map(TaskRunLayer::getAnnotationLayer)
-            .toList());
+        Set<AnnotationLayerResponse> annotationLayerSet = taskRunLayers
+                .stream()
+                .map(TaskRunLayer::getAnnotationLayer)
+                .map(layer -> new AnnotationLayerResponse(layer.getId(), layer.getName()))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
 
         ImageInstance imageInstance = imageInstanceService.get(imageId);
 
@@ -72,15 +72,13 @@ public class AnnotationLayerService {
         if (lastTaskRun.isPresent()) {
             Optional<TaskRunLayer> lastExecutedRunLayer = taskRunLayerRepository.findByTaskRun(lastTaskRun.get());
 
-            List<AnnotationLayer> lastTaskRunAnnotationLayers = lastExecutedRunLayer
-                .stream()
+            lastExecutedRunLayer
                 .map(TaskRunLayer::getAnnotationLayer)
-                .toList();
-
-            annotationLayerList.addAll(lastTaskRunAnnotationLayers);
+                .map(layer -> new AnnotationLayerResponse(layer.getId(), layer.getName()))
+                .ifPresent(annotationLayerSet::add);
         }
 
-        return annotationLayerList.stream().distinct().toList();
+        return annotationLayerSet;
     }
 
     public TaskRunLayerValue findTaskRunLayer(Long id) {
@@ -90,9 +88,5 @@ public class AnnotationLayerService {
         }
 
         return taskRunLayerService.convertToDTO(optional.get());
-    }
-
-    public List<Annotation> findAnnotationsByLayer(AnnotationLayer layer) {
-        return annotationRepository.findAllByAnnotationLayer(layer);
     }
 }

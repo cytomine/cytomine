@@ -68,7 +68,7 @@ spec:
         securityContext:
         {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
         image: {{ .Values.images.eclipse_temurin }}
-        command: ['sh', '-c', 'keytool -genkeypair -alias localhost -keyalg RSA -keysize 2048 -validity 365 -keystore /keystore/server.keystore -dname "cn=Server Administrator,o=Acme,c=GB" -keypass password -storepass password']
+        command: ['sh', '-c', '[ -f /keystore/server.keystore ] || keytool -genkeypair -alias localhost -keyalg RSA -keysize 2048 -validity 365 -keystore /keystore/server.keystore -dname "cn=Server Administrator,o=Acme,c=GB" -keypass password -storepass password']
         volumeMounts:
         - name: keystore
           mountPath: "/keystore"
@@ -83,7 +83,8 @@ spec:
         command:
         - "/opt/keycloak/bin/kc.sh"
         - "start"
-        - "--log-level=DEBUG"
+        # Uncomment next line to print debug logs
+        # - "--log-level=DEBUG"
         envFrom:
         - configMapRef:
             name: iam
@@ -113,6 +114,14 @@ spec:
           periodSeconds: 10
           failureThreshold: 12
           timeoutSeconds: 10
+        livenessProbe:
+          httpGet:
+           path: /health/live
+           port: {{ .Values.iam.port }}
+          initialDelaySeconds: 20
+          periodSeconds: 20
+          failureThreshold: 10
+
         volumeMounts:
         - name: opt-keycloak
           mountPath: "/opt/keycloak"

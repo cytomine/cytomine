@@ -70,7 +70,7 @@ public class AppEngineService {
     }
 
     public <B> String postWithParams(String uri, B body, MediaType contentType, Map<String, String> queryParams) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(apiUrl + apiBasePath + uri);
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(apiUrl + apiBasePath + uri);
         if (queryParams != null) {
             queryParams.forEach(builder::queryParam);
         }

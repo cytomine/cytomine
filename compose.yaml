@@ -62,7 +62,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime
     environment:
-      <<: [*version-env]
+      <<: [ *version-env ]
     networks:
       host_network:
         ipv4_address: 172.16.238.7
@@ -193,6 +193,8 @@ services:
       - iam
       - mongo
       - postgis
+    ports:
+      - 8080:8080
     volumes:
       - /etc/localtime:/etc/localtime
     environment:
@@ -264,7 +266,7 @@ services:
       - pims
       - web-ui
     environment:
-      <<: [*version-env]
+      <<: [ *version-env ]
       IMAGES_CORE: cytomine/core:latest
       IMAGES_MONGO: mongo:4.4-focal
       IMAGES_NGINX: cytomine/nginx:latest
@@ -313,8 +315,8 @@ services:
         ipv4_address: 172.16.238.15
 
 volumes:
-  k3s-server: {}
-  k3s-agent: {}
+  k3s-server: { }
+  k3s-agent: { }
 
 networks:
   host_network:

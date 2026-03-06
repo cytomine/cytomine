@@ -1,10 +1,11 @@
 package org.cytomine.common.repository.http;
 
-import org.springframework.web.service.annotation.GetExchange;
-import org.springframework.web.service.annotation.HttpExchange;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@HttpExchange("/ping")
+@RestController("/ping")
 public interface HealthService {
-    @GetExchange()
+
+    @GetMapping()
     String ping();
 }

@@ -83,7 +83,7 @@ spec:
         command:
         - "/opt/keycloak/bin/kc.sh"
         - "start"
-        - "--log-level=DEBUG"
+        # - "--log-level=DEBUG"
         envFrom:
         - configMapRef:
             name: iam
@@ -113,6 +113,14 @@ spec:
           periodSeconds: 10
           failureThreshold: 12
           timeoutSeconds: 10
+        livenessProbe:
+          httpGet:
+           path: /health/live
+           port: {{ .Values.iam.port }}
+          initialDelaySeconds: 20
+          periodSeconds: 20
+          failureThreshold: 10
+
         volumeMounts:
         - name: opt-keycloak
           mountPath: "/opt/keycloak"

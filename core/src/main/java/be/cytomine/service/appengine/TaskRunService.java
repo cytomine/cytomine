@@ -306,7 +306,7 @@ public class TaskRunService {
         checkTaskRun(projectId, taskRunId);
 
         String uri = "task-runs/" + taskRunId + "/input-provisions/" + parameterName;
-        String arrayTypeUri = "task-runs/" + taskRunId + "/input-provisions/" + parameterName + "/indexes";
+        String arrayTypeUri = uri + "/indexes";
         ObjectMapper mapper = new ObjectMapper();
         File wsi = null;
         if (json.get("type").isObject() && json.get("type").get("id").asText().equals("array")) {
@@ -321,9 +321,9 @@ public class TaskRunService {
                 if (subtype.equals("image")) {
                     ArrayNode responseArray = mapper.createArrayNode();
                     for (int i = 0; i < itemsArray.length; i++) {
-                        Long imageId = itemsArray[i];
+                        Long id = itemsArray[i];
                         if (type.equalsIgnoreCase("annotation")) {
-                            MultiValueMap<String, Object> body = prepareImage(imageId, "annotation");
+                            MultiValueMap<String, Object> body = prepareImage(id, "annotation");
 
                             String response = provisionCollectionItem(arrayTypeUri, i, body);
                             if (response != null) {
@@ -332,7 +332,7 @@ public class TaskRunService {
                             }
                         }
                         if (type.equalsIgnoreCase("image")) {
-                            MultiValueMap<String, Object> body = prepareImage(imageId, "image");
+                            MultiValueMap<String, Object> body = prepareImage(id, "image");
 
                             String response = provisionCollectionItem(arrayTypeUri, i, body);
                             if (response != null) {

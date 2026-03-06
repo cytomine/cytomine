@@ -33,7 +33,7 @@ public class TaskRunLayer extends CytomineDomain {
     private ImageInstance image;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_annotation_id")
+    @JoinColumn(name = "roi_id")
     private UserAnnotation roi;
 
     @Column(name = "x_offset")

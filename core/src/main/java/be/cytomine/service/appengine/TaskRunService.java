@@ -494,7 +494,7 @@ public class TaskRunService {
             .replace("%2F", "/");
 
         URI uri = UriComponentsBuilder
-            .fromHttpUrl(imageServerService.internalImageServerURL())
+            .fromUriString(imageServerService.internalImageServerURL())
             .pathSegment("image", imagePath, "export")
             .queryParam("filename", ii.getBaseImage().getOriginalFilename())
             .build()

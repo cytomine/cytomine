@@ -64,6 +64,7 @@ images:
   web_ui: cytomine/web-ui:latest
   cbir: cytomine/cbir:latest
   pims_import: cytomine/python-client:latest
+  repository: cytomine/repository:latest
 
   #
   # External Images
@@ -257,6 +258,19 @@ app_engine:
 
 sam:
   port: 8000
+
+# Repository - Storage and artifact repository microservice
+repository:
+  port: 8081
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "100m"
+      ephemeral-storage: 256Mi
+    limits:
+      memory: "512Mi"
+      cpu: "200m"
+      ephemeral-storage: 512Mi
 
 #
 # Kubernetes things

@@ -42,6 +42,8 @@ jobs:
           - name: e2e-tests
             context: "."
             dockerfile_location: e2e-tests
+          - name: repository
+            context: "."
 
     steps:
       - name: Checkout repository

@@ -1,4 +1,5 @@
-name: Core
+---
+name: Repository
 
 on:
   workflow_call:

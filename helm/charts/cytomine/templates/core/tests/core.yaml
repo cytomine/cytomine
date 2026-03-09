@@ -1,3 +1,8 @@
+{{- $ingressSvc := lookup "v1" "Service" "ingress" "ingress-nginx-controller" }}
+{{- $ingressIP := "" }}
+{{- if $ingressSvc }}
+{{- $ingressIP = $ingressSvc.spec.clusterIP }}
+{{- end }}
 apiVersion: v1
 kind: Pod
 metadata:
@@ -5,14 +10,68 @@ metadata:
   labels:
   annotations:
     "helm.sh/hook": test
+    "helm.sh/hook-weight": "1"
 spec:
   securityContext:
   {{- include "cytomine.podSecurityContext" . | nindent 4 }}
+  hostAliases:
+    - ip: "{{ $ingressIP }}"
+      hostnames:
+        - "{{ .Values.global.domainName }}"
   volumes:
     - name: tmp
       emptyDir: {}
     - name: workspace
-      emptyDir: {}
+      persistentVolumeClaim:
+        claimName: "e2e-test-reports"
+  initContainers:
+    - name: wait-for-services
+      image: "{{ .Values.images.curl }}"
+      securityContext:
+      {{- include "cytomine.containerSecurityContext" . | nindent 8 }}
+      command:
+        - /bin/sh
+        - -c
+        - |
+          echo "Waiting for core to be ready..."
+          until curl -sf http://core.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.core.port }}/server/ping; do
+            echo "core not ready, retrying in 5s..."
+            sleep 5
+          done
+          echo "core is ready!"
+          echo "Waiting for pims to be ready..."
+          until curl -sf http://pims.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.pims.port }}/ims/disk-usage; do
+            echo "pims not ready, retrying in 5s..."
+            sleep 5
+          done
+          echo "pims is ready!"
+    - name: selenium
+      image: "{{ .Values.images.selenium }}"
+      restartPolicy: Always
+      securityContext:
+        allowPrivilegeEscalation: false
+        privileged: false
+        readOnlyRootFilesystem: false
+        runAsNonRoot: true
+        runAsUser: 1200
+        runAsGroup: 1200
+        capabilities:
+          drop: ["ALL"]
+      volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+      env:
+        - name: SE_NODE_MAX_SESSIONS
+          value: "30"
+      ports:
+        - name: http
+          containerPort: 4444
+      readinessProbe:
+        httpGet:
+          path: /wd/hub/status
+          port: 4444
+        initialDelaySeconds: 5
+        periodSeconds: 3
   containers:
     - name: e2e-tests
       image: "{{ .Values.images.e2e_tests }}"
@@ -20,7 +79,19 @@ spec:
       {{- include "cytomine.containerSecurityContext" . | nindent 8 }}
       volumeMounts:
       - name: tmp
-        mountPath: /tmp/gradle
+        mountPath: /tmp
       - name: workspace
         mountPath: /workspace
+      env:
+        - name: CYTOMINE_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: cytomine-admin-iam-secret
+              key: password
+        - name: CYTOMINE_ADMIN_USERNAME
+          value: admin
+        - name: CYTOMINE_URL
+          value: https://{{ .Values.global.domainName }}
+        - name: SELENIUM_URL
+          value: http://localhost:4444
   restartPolicy: Never

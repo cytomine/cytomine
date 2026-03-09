@@ -1,12 +1,11 @@
+---
 name: Build and Test
 
 on:
   pull_request:
-    branches:
-    - main
+    branches: [main]
   push:
-    branches:
-    - main
+    branches: [main]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -29,9 +28,20 @@ jobs:
     uses: ./.github/workflows/sam.yaml
   web-ui:
     uses: ./.github/workflows/web-ui.yaml
+  e2e-tests:
+    uses: ./.github/workflows/e2e-tests.yaml
 
   docker-images:
-    needs: [app-engine, cbir, core, ims, python-client, registry-client, sam, web-ui]
+    needs:
+      - app-engine
+      - cbir
+      - core
+      - ims
+      - python-client
+      - registry-client
+      - sam
+      - web-ui
+      - e2e-tests
     uses: ./.github/workflows/docker.yaml
     secrets: inherit
 

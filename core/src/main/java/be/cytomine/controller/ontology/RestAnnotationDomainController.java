@@ -6,6 +6,10 @@ import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import be.cytomine.dto.annotation.AnnotationReportParams;
+import be.cytomine.service.annotation.AnnotationReportService;
+import be.cytomine.service.report.ReportService;
+import be.cytomine.utils.JsonNodeUtils;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,7 +63,11 @@ public class RestAnnotationDomainController extends RestCytomineController {
 
     private final AnnotationListingService annotationListingService;
 
+    private final AnnotationReportService annotationReportService;
+
     private final GenericAnnotationService genericAnnotationService;
+
+    private final ReportService reportService;
 
     private final UserService userService;
 
@@ -104,24 +112,35 @@ public class RestAnnotationDomainController extends RestCytomineController {
         return responseSuccess(annotations, params.getJSONAttrLong("offset", 0L),params.getJSONAttrLong("max", 0L));
     }
 
-    @RequestMapping(value = {"/project/{project}/annotation/download"}, method = {RequestMethod.GET})
+    @RequestMapping(value = {"/project/{project}/annotation/download"}, method = {RequestMethod.POST})
     public void download(
             @PathVariable Long project,
-            @RequestParam String format,
-            @RequestParam(required = false) Optional<String> users,
-            @RequestParam(required = false) Optional<String> reviewUsers,
-            @RequestParam(defaultValue = "false") Boolean reviewed,
-            @RequestParam(required = false) String terms,
-            @RequestParam(required = false) String images,
-            @RequestParam(required = false) Long beforeThan,
-            @RequestParam(required = false) Long afterThan
+            @RequestBody AnnotationReportParams params
     ) throws IOException {
-        if(reviewed) {
-            restReviewedAnnotationController.downloadDocumentByProject(project, format, terms, reviewUsers, images, beforeThan, afterThan);
-        }
-        else {
-            restUserAnnotationController.downloadDocumentByProject(project, format, terms, users, images, beforeThan, afterThan);
-        }
+
+        boolean reviewed = Boolean.TRUE.equals(params.reviewed());
+        String users = JsonNodeUtils.csvFromStringList(params.users());
+        String reviewUsers = JsonNodeUtils.csvFromStringList(params.reviewUsers());
+        String format = (params.format() == null || params.format().isBlank()) ? "pdf" : params.format();
+        String terms = JsonNodeUtils.csvFromStringList(params.terms());
+        String images = JsonNodeUtils.csvFromStringList(params.images());
+        Long beforeThan = params.beforeThan();
+        Long afterThan = params.afterThan();
+
+        Map<String, Object> bodyMap = new HashMap<>();
+        bodyMap.put("project", project);
+        bodyMap.put("format", format);
+        bodyMap.put("users", users);
+        bodyMap.put("reviewUsers", reviewUsers);
+        bodyMap.put("reviewed", reviewed);
+        bodyMap.put("terms", terms);
+        bodyMap.put("images", images);
+        bodyMap.put("beforeThan", beforeThan);
+        bodyMap.put("afterThan", afterThan);
+
+        JsonObject body = new JsonObject(bodyMap);
+        byte[] report = annotationReportService.downloadDocumentByProject(body);
+        responseReportFile(reportService.getAnnotationReportFileName(format, project), report, format);
     }
 
     @RequestMapping(value = "/annotation/{id}/crop.{format}", method = {RequestMethod.GET, RequestMethod.POST})
@@ -444,7 +463,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
         URI url = UriComponentsBuilder
-            .fromHttpUrl(this.samUrl)
+            .fromUriString(this.samUrl)
             .path("/sam/annotations/refine")
             .build()
             .toUri();

@@ -3,7 +3,6 @@ package be.cytomine.controller.project;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -29,9 +28,6 @@ import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.Task;
 import be.cytomine.utils.filters.SearchParameterEntry;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @RestController
 @RequestMapping("/api")
 @Slf4j
@@ -52,7 +48,6 @@ public class RestProjectController extends RestCytomineController {
 
     private final TaskRunService taskRunService;
 
-
     /**
      * List all ontology visible for the current user
      * For each ontology, print the terms tree
@@ -67,7 +62,6 @@ public class RestProjectController extends RestCytomineController {
             @RequestParam(value = "order", defaultValue = "desc", required = false) String order,
             @RequestParam(value = "offset", defaultValue = "0", required = false) Long offset,
             @RequestParam(value = "max", defaultValue = "0", required = false) Long max
-
     ) {
         log.debug("REST request to list projects");
         User user = currentUserService.getCurrentUser();
@@ -86,9 +80,7 @@ public class RestProjectController extends RestCytomineController {
     }
 
     @GetMapping("/project/{id}.json")
-    public ResponseEntity<String> show(
-            @PathVariable Long id
-    ) {
+    public ResponseEntity<String> show(@PathVariable Long id) {
         log.debug("REST request to get project : {}", id);
         return projectService.find(id)
                 .map(this::responseSuccess)
@@ -134,21 +126,17 @@ public class RestProjectController extends RestCytomineController {
     }
 
     @GetMapping("/project/method/lastopened.json")
-    public ResponseEntity<String> listLastOpened(
-            @RequestParam(required = false, defaultValue = "0") Long max
-    ) {
+    public ResponseEntity<String> listLastOpened(@RequestParam(required = false, defaultValue = "0") Long max) {
         log.debug("REST request to list last opened");
 
-        return responseSuccess(projectService.listLastOpened((User) currentUserService.getCurrentUser(), max));
+        return responseSuccess(projectService.listLastOpened(currentUserService.getCurrentUser(), max));
     }
 
     /**
      * List all project available for this user, that use a ontology
      */
     @GetMapping("/ontology/{id}/project.json")
-    public ResponseEntity<String> listByOntology(
-            @PathVariable Long id
-    ) {
+    public ResponseEntity<String> listByOntology(@PathVariable Long id) {
         log.debug("REST request to list project with ontology {}", id);
         Ontology ontology = ontologyRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException("Ontology", id));
@@ -163,7 +151,6 @@ public class RestProjectController extends RestCytomineController {
             @PathVariable Long id,
             @RequestParam(required = false, defaultValue = "0") Long max,
             @RequestParam(required = false, defaultValue = "0") Long offset
-
     ) {
         log.debug("REST request to list project with user {}", id);
         User user = userService.findUser(id)
@@ -181,7 +168,6 @@ public class RestProjectController extends RestCytomineController {
             @RequestParam(required = false, defaultValue = "false") Boolean creator,
             @RequestParam(required = false, defaultValue = "false") Boolean admin,
             @RequestParam(required = false, defaultValue = "false") Boolean user
-
     ) {
         log.debug("REST request to list project with user {}", id);
         User requestedUser = userService.findUser(id)

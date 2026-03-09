@@ -4,7 +4,7 @@ kind: StatefulSet
 metadata:
   name: pims
   annotations:
-    kube-score/ignore: pod-probes,container-security-context-user-group-id
+    kube-score/ignore: container-security-context-user-group-id,pod-hostpath
   labels:
     role: pims
     app: {{ include "cytomine.name" . }}
@@ -50,6 +50,21 @@ spec:
         - emptyDir: {}
           name: images-temp
         {{ end }}
+      initContainers:
+        - name: wait-for-cache
+          image: "{{ .Values.images.pims_cache }}"
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Waiting for pims-cache (Redis) to be ready..."
+              until redis-cli -h pims-cache.{{ .Release.Namespace }}.svc.cluster.local -p {{ .Values.pims_cache.port }} ping | grep -q PONG; do
+                echo "pims-cache not ready, retrying in 2s..."
+                sleep 2
+              done
+              echo "pims-cache is ready!"
       containers:
         - name: pims
           image: "{{ .Values.images.pims }}"
@@ -101,6 +116,22 @@ spec:
           ports:
             - name: http
               containerPort: {{ .Values.pims.port }}
+          readinessProbe:
+            httpGet:
+              path: /ims/disk-usage
+              port: {{ .Values.pims.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 12
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /ims/disk-usage
+              port: {{ .Values.pims.port }}
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            failureThreshold: 3
+            timeoutSeconds: 10
           securityContext:
           {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
           resources:
@@ -119,7 +150,7 @@ spec:
           - ReadWriteOnce
         resources:
           requests:
-            storage: {{ .Values.imageStorage }}
+            storage: {{ .Values.pims.imageStorage.size }}
     {{ end }}
     {{ if .Values.pims.tempImageStorage.storageClassName -}}
     - metadata:
@@ -130,6 +161,6 @@ spec:
           - ReadWriteOnce
         resources:
           requests:
-            storage: {{ .Values.tempImageStorage }}
+            storage: {{ .Values.pims.tempImageStorage.size }}
     {{ end }}
 {{ end }}

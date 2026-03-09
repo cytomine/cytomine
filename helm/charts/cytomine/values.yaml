@@ -25,10 +25,7 @@ global:
 readOnceStorageClass: ""
 readManyStorageClass: null
 
-
 # Resource settings
-tempImageStorage: "1Gi"
-imageStorage: "3Gi"
 mongodbStorage: "1Gi"
 postgresStorage: "3Gi"
 
@@ -71,6 +68,10 @@ images:
   #
   # External Images
   #
+  registry: registry:2.8.3
+  alpine: alpine:3.18
+  curl: curlimages/curl
+  eclipse_temurin: eclipse-temurin:8u462-b08-jdk-ubi9-minimal
   postgis: postgis/postgis:15-3.5
   postgresql_iam: postgres:14
   postgresql_app_engine: postgres:14
@@ -80,6 +81,7 @@ images:
   nginx: cytomine/nginx:latest
   iam: keycloak/keycloak:26.3
   e2e_tests: cytomine/e2e-tests:latest
+  selenium: selenium/standalone-firefox
   pullPolicy: Always
   # array of image secrets names
   imagePullSecretsNames:
@@ -175,8 +177,10 @@ pims:
       cpu: "1000m"
       ephemeral-storage: 1Gi
   imageStorage:
+    size: 3Gi
     storageClassName: null
   tempImageStorage:
+    size: 1Gi
     storageClassName: null
 
   # Volume block for the path of the images to import.
@@ -186,7 +190,6 @@ pims:
   #     path: /data/dataset
   #     type: DirectoryOrCreate
   datasetImportStorage: null
-
 
 # Nginx - Main HTTP proxy dispatching incoming requests
 nginx:
@@ -239,6 +242,18 @@ app_engine:
     size: 5Gi
     storageClassName: null
   tasks_namespace:
+  registry:
+    port: 5000
+    # Service type: NodePort exposes on node, ClusterIP for internal only
+    serviceType: NodePort
+    nodePort: 32000
+    # URL used by the container runtime to pull task images
+    # This must be reachable from the node's container runtime (containerd/docker)
+    # Examples: "localhost:32000" for NodePort, or external registry URL
+    advertisedUrl: null
+    storage:
+      size: 5Gi
+      storageClassName: null
 
 sam:
   port: 8000

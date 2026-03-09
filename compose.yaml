@@ -3,7 +3,7 @@ x-version-env: &version-env
 
 services:
   mongo:
-    image: cytomine/mongo:latest
+    image: mongo:4.4-focal
     restart: unless-stopped
     volumes:
       - ${DATA_PATH:-./data}/mongo:/data/db
@@ -14,18 +14,13 @@ services:
     networks:
       host_network:
         ipv4_address: 172.16.238.2
+
   postgis:
-    image: cytomine/postgis:latest
+    image: postgis/postgis:15-3.5
     restart: unless-stopped
     volumes:
       - ${DATA_PATH:-./data}/postgis/data:/var/lib/postgresql/data
     environment:
-      APPENGINE_DB: appengine
-      APPENGINE_PASSWORD: password
-      APPENGINE_USER: appengine
-      IAM_DB: iam
-      IAM_PASSWORD: password
-      IAM_USER: iam
       POSTGRES_DB: docker
       POSTGRES_PASSWORD: password
       POSTGRES_USER: docker
@@ -101,16 +96,29 @@ services:
       host_network:
         ipv4_address: 172.16.238.8
 
+  iam-db:
+    image: postgres:14
+    restart: unless-stopped
+    volumes:
+      - ${DATA_PATH:-./data}/iam-db/data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: iam
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: iam
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.16
+
   iam:
     image: cytomine/iam:latest
     restart: unless-stopped
     depends_on:
-      - postgis
+      - iam-db
     environment:
       KC_ADMIN_EMAIL: mail@mail.com
       KC_DB_PASSWORD: password
       KC_DB_URL_DATABASE: iam
-      KC_DB_URL_HOST: postgis
+      KC_DB_URL_HOST: iam-db
       KC_DB_URL_PORT: 5432
       KC_DB_USERNAME: iam
       KC_HOSTNAME: 127.0.0.1
@@ -132,11 +140,24 @@ services:
       host_network:
         ipv4_address: 172.16.238.9
 
+  app-engine-db:
+    image: postgres:14
+    restart: unless-stopped
+    volumes:
+      - ${DATA_PATH:-./data}/app-engine-db/data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: appengine
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: appengine
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.17
+
   app-engine:
     image: cytomine/app-engine:latest
     restart: unless-stopped
     depends_on:
-      - postgis
+      - app-engine-db
       - registry
       - k3s
     volumes:
@@ -146,7 +167,7 @@ services:
       - ${DATA_PATH:-./data}/app-engine-shared-datasets:/app-engine-shared-datasets:rw
     environment:
       API_PREFIX: ${APP_ENGINE_API_BASE_PATH:-/app-engine/}
-      DB_HOST: postgis
+      DB_HOST: app-engine-db
       DB_NAME: appengine
       DB_PASSWORD: password
       DB_PORT: 5432
@@ -245,11 +266,11 @@ services:
     environment:
       <<: [*version-env]
       IMAGES_CORE: cytomine/core:latest
-      IMAGES_MONGO: cytomine/mongo:latest
+      IMAGES_MONGO: mongo:4.4-focal
       IMAGES_NGINX: cytomine/nginx:latest
       IMAGES_PIMS: cytomine/pims:latest
       IMAGES_PIMS_CACHE: redis:7.2
-      IMAGES_POSTGIS: cytomine/postgis:latest
+      IMAGES_POSTGIS: postgis/postgis:15-3.5
       IMAGES_WEB_UI: cytomine/web-ui:latest
       INTERNAL_URLS_APPENGINE: app-engine:8080
       INTERNAL_URLS_IAM: iam:8100

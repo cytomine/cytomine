@@ -79,7 +79,7 @@ spec:
       initContainers:
         {{ if .Values.fixVolumesPermissions -}}
         - name: fix-previous-permissions
-          image: alpine:3.18
+          image: {{ .Values.images.alpine }}
           imagePullPolicy: {{ .Values.images.pullPolicy }}
           securityContext:
             runAsUser: 0
@@ -98,7 +98,7 @@ spec:
             {{- toYaml .Values.postgresql.resources | nindent 12 }}
         {{ end }}
         - name: postgis-init
-          image: alpine:3.18
+          image: {{ .Values.images.alpine }}
           imagePullPolicy: {{ .Values.images.pullPolicy }}
           securityContext:
           {{- include "cytomine.containerSecurityContext" . | nindent 12 }}

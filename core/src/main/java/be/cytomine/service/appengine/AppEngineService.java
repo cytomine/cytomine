@@ -6,16 +6,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StreamUtils;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map;
 
 @Slf4j
@@ -74,7 +70,7 @@ public class AppEngineService {
     }
 
     public <B> String postWithParams(String uri, B body, MediaType contentType, Map<String, String> queryParams) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(apiUrl + apiBasePath + uri);
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(apiUrl + apiBasePath + uri);
         if (queryParams != null) {
             queryParams.forEach(builder::queryParam);
         }

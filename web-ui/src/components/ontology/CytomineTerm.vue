@@ -13,7 +13,7 @@
  limitations under the License.-->
 
 <template>
-<span v-if="term">
+<span v-if="term" class="ontology-term">
   <div class="color-preview" v-if="term.color" :style="{background: term.color}"></div>
   {{term.name}}
   <span v-if="currentAccount.isDeveloper && term.id > 0"> ({{$t('id')}}: {{term.id}})</span>

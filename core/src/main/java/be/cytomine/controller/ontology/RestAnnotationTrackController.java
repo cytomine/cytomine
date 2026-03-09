@@ -5,8 +5,6 @@ import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.ontology.Track;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.ontology.AnnotationDomainRepository;
-import be.cytomine.repository.ontology.OntologyRepository;
-import be.cytomine.repository.project.ProjectRepository;
 import be.cytomine.service.ontology.AnnotationTrackService;
 import be.cytomine.service.ontology.TrackService;
 import be.cytomine.utils.JsonObject;
@@ -29,8 +27,6 @@ public class RestAnnotationTrackController extends RestCytomineController {
 
     private final AnnotationDomainRepository annotationDomainRepository;
 
-    private final ProjectRepository projectRepository;
-
     @GetMapping("/track/{id}/annotationtrack.json")
     public ResponseEntity<String> listByTrack(
             @PathVariable Long id
@@ -48,7 +44,6 @@ public class RestAnnotationTrackController extends RestCytomineController {
         return responseSuccess(annotationTrackService.list(annotationDomainRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException("Annotation", id))));
     }
-
 
     @GetMapping("/annotationtrack/{annotation}/{track}.json")
     public ResponseEntity<String> show(

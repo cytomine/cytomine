@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: export-test-results
+spec:
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+  - name: exporter
+    image: alpine:3.19
+    command: ["sh", "-c", "sleep 3600"]
+    securityContext:
+      allowPrivilegeEscalation: false
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 1000
+      runAsGroup: 1000
+      capabilities:
+        drop: ["ALL"]
+    volumeMounts:
+    - name: test-reports
+      mountPath: /reports
+    - name: tmp
+      mountPath: /tmp
+  volumes:
+  - name: test-reports
+    persistentVolumeClaim:
+      claimName: e2e-test-reports
+  - name: tmp
+    emptyDir: {}
+  restartPolicy: Never

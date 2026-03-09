@@ -28,6 +28,7 @@ jobs:
           - name: core
             target: production
             context: "."
+            dockerfile_location: core
           - name: iam
             target: production
           - name: nginx

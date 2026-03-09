@@ -35,6 +35,8 @@ services:
   registry:
     image: registry:2.8.3
     restart: unless-stopped
+    ports:
+    - 5000:5000
     volumes:
       - ${DATA_PATH:-./data}/registry:/var/lib/registry
     environment:

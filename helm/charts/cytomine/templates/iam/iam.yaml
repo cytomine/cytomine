@@ -116,7 +116,8 @@ spec:
           timeoutSeconds: 10
         livenessProbe:
           httpGet:
-           path: /health/live
+           path: /iam/health/live
+           scheme: HTTPS
            port: 9000
           initialDelaySeconds: 20
           periodSeconds: 20

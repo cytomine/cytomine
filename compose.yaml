@@ -35,6 +35,8 @@ services:
   registry:
     image: registry:2.8.3
     restart: unless-stopped
+    ports:
+    - 5000:5000
     volumes:
       - ${DATA_PATH:-./data}/registry:/var/lib/registry
     environment:
@@ -105,6 +107,8 @@ services:
   iam-db:
     image: postgres:14
     restart: unless-stopped
+    ports:
+      - 5434:5432
     volumes:
       - ${DATA_PATH:-./data}/iam-db/data:/var/lib/postgresql/data
     environment:

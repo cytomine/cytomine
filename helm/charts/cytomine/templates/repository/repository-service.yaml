@@ -1,4 +1,3 @@
-{{ if .Values.repository.deploy }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -10,4 +9,3 @@ spec:
     - name: http
       port: {{ .Values.repository.port }}
       protocol: TCP
-{{ end }}

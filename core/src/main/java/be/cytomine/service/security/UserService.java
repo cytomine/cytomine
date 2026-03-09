@@ -220,6 +220,10 @@ public class UserService extends ModelService {
         }
     }
 
+    public List<User> find(List<String> ids) {
+        return userRepository.findAllByReferenceIn(ids);
+    }
+
     public Optional<User> findUser(Long id) {
         securityACLService.checkGuest(currentUserService.getCurrentUser());
         return userRepository.findById(id);

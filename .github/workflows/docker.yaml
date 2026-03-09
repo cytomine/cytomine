@@ -27,6 +27,7 @@ jobs:
             target: production
           - name: core
             target: production
+            context: "."
           - name: iam
             target: production
           - name: nginx

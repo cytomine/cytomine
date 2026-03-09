@@ -17,9 +17,11 @@ RUN mkdir -p /opt/gradle/.gradle
 ENV GRADLE_USER_HOME=/opt/gradle/.gradle
 
 WORKDIR /app
-COPY ./build.gradle /app/build.gradle
+COPY ./settings.gradle /app/settings.gradle
+COPY ./common/build.gradle /app/common/build.gradle
+COPY ./core/build.gradle /app/core/build.gradle
 
-RUN gradle clean build --no-daemon --console=verbose
+RUN gradle :core:dependencies --no-daemon --console=verbose
 
 #######################################################################################
 ## Stage: building the core jar file
@@ -29,14 +31,17 @@ ENV GRADLE_USER_HOME=/opt/gradle/.gradle
 COPY --from=deps-downloader /opt/gradle/.gradle /opt/gradle/.gradle
 
 WORKDIR /app
-COPY ./src /app/src
-COPY ./build.gradle /app/build.gradle
+COPY ./settings.gradle /app/settings.gradle
+COPY ./common/build.gradle /app/common/build.gradle
+COPY ./common/src /app/common/src
+COPY ./core/src /app/core/src
+COPY ./core/build.gradle /app/core/build.gradle
 
 ARG CORE_VERSION
 ENV CORE_VERSION=$CORE_VERSION
 
-RUN sed -i -- 's/version: 0.0.0/version: '$CORE_VERSION'/g' /app/src/main/resources/application.yml && \
-    gradle bootJar --console=verbose
+RUN sed -i -- 's/version: 0.0.0/version: '$CORE_VERSION'/g' /app/core/src/main/resources/application.yml && \
+    gradle :core:bootJar --console=verbose
 
 #######################################################################################
 ## Stage: Cytomine core development image
@@ -77,7 +82,7 @@ LABEL org.opencontainers.image.authors="uliege@cytomine.org" \
 ENV DEBIAN_FRONTEND=noninteractive
 ENV LANG=C.UTF-8
 
-COPY --from=jar-builder /app/build/libs/cytomine.jar /app/cytomine.jar
+COPY --from=jar-builder /app/core/build/libs/cytomine.jar /app/cytomine.jar
 
 WORKDIR /app
 

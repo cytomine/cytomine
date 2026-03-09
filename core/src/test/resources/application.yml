@@ -93,6 +93,7 @@ application:
   pimsURL: http://localhost:8888
   samURL: http://localhost:8888
   cbirURL: http://localhost:8888
+  repositoryURL: http://localhost:8888
 
   appEngine:
     enabled: ${APPENGINE_ENABLED:true}

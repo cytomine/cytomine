@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.FetchType;
@@ -12,6 +13,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderColumn;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import be.cytomine.domain.CytomineDomain;
@@ -20,6 +22,7 @@ import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.utils.JsonObject;
 
+@NoArgsConstructor
 @Setter
 @Getter
 @Entity
@@ -41,10 +44,20 @@ public class TaskRunLayer extends CytomineDomain {
     @JoinColumn(name = "roi_id")
     private UserAnnotation roi;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "task_run_layer_id")
+    @Column(name = "parameter_name")
+    private String parameterName;
+
+    @OneToMany(mappedBy = "taskRunLayer", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderColumn(name = "order_index")
     private List<CropOffset> offsets = new ArrayList<>();
+
+    public TaskRunLayer(AnnotationLayer layer, TaskRun taskRun, ImageInstance image, UserAnnotation roi, String parameterName) {
+        this.annotationLayer = layer;
+        this.taskRun = taskRun;
+        this.image = image;
+        this.roi = roi;
+        this.parameterName = parameterName;
+    }
 
     public static JsonObject getDataFromDomain(CytomineDomain domain) {
         TaskRunLayer taskRunLayer = (TaskRunLayer) domain;

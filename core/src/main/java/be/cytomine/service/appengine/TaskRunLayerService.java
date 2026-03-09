@@ -14,8 +14,8 @@ public class TaskRunLayerService {
             taskRunLayer.getAnnotationLayer().getId(),
             taskRunLayer.getTaskRun().getId(),
             taskRunLayer.getImage().getId(),
-            taskRunLayer.getXOffset(),
-            taskRunLayer.getYOffset()
+            0,
+            0
         );
     }
 }

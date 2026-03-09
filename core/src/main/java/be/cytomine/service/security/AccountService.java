@@ -1,0 +1,660 @@
+package be.cytomine.service.security;
+
+import be.cytomine.controller.JsonResponseEntity;
+import be.cytomine.controller.error.ErrorBuilder;
+import be.cytomine.controller.error.ErrorCode;
+import be.cytomine.domain.security.SecUserSecRole;
+import be.cytomine.domain.security.User;
+import be.cytomine.dto.Account;
+import be.cytomine.dto.Accounts;
+import be.cytomine.exceptions.UserManagementException;
+import be.cytomine.repository.security.SecRoleRepository;
+import be.cytomine.repository.security.SecUserSecRoleRepository;
+import be.cytomine.repository.security.UserRepository;
+import be.cytomine.service.command.TransactionService;
+import be.cytomine.service.image.server.StorageService;
+import io.jsonwebtoken.lang.Strings;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.ServerErrorException;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Response;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.keycloak.admin.client.CreatedResponseUtil;
+import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.resource.*;
+import org.keycloak.representations.idm.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static be.cytomine.service.utils.IAM_RepresentationUtil.*;
+
+@Slf4j
+@Service
+@Transactional
+public class AccountService {
+
+    public final int CREATED = 201;
+    public final int NOT_FOUND = 404;
+    public final int INTERNAL_SERVER_ERROR = 500;
+    public final int CONFLICT = 409;
+    public final int BAD_REQUEST = 400;
+
+    @Autowired
+    Keycloak keycloak;
+
+    @Autowired
+    private TransactionService transactionService;
+
+    @Value("${keycloak-client.target.client-id}")
+    String clientId;
+
+    @Value("${keycloak-client.target.realm}")
+    String realm;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private StorageService storageService;
+
+    @Autowired
+    SecUserSecRoleRepository secSecUserSecRoleRepository;
+
+    @Autowired
+    private SecRoleRepository secRoleRepository;
+
+
+    public ResponseEntity<?> createAccount(Account account) throws UserManagementException {
+        log.info("Creating account for user {}", account.getUsername());
+        // validate account
+        Validation validation = validateAccount(account, ValidationFor.CREATE);
+        if (!validation.isOk()) return validation.getResponseEntity();
+
+        UserRepresentation user = getAccountRepresentation(account);
+        // Get realm
+        RealmResource realmResource = keycloak.realm(realm);
+
+        UsersResource usersResource;
+        Response response;
+        try {
+            usersResource = realmResource.users();
+            response = usersResource.create(user);
+            log.info("created account for user {} in IAM", account.getUsername());
+        } catch (ServerErrorException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorBuilder.build(ErrorCode.CORE_IAM_NOT_REACHABLE));
+        }
+
+        // in case account wasn't successfully created in IAM
+        if (response.getStatus() == NOT_FOUND) {
+            log.error("Realm {} not found", realm);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorBuilder.build(ErrorCode.CORE_REALM_NOT_FOUND));
+        } else if (response.getStatus() == CONFLICT) {
+            log.error("Account {} already exists", account.getUsername());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(ErrorBuilder.build(ErrorCode.CORE_ACCOUNT_ALREADY_EXISTS));
+        } else if (response.getStatus() != CREATED) {
+            log.error("Failed to create account {} for [{}] from IAM", account.getUsername(), response.getStatusInfo().getReasonPhrase());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorBuilder.build(ErrorCode.CORE_IAM_UNKNOWN_CREATE_ERROR));
+        }
+        // Get client
+        ClientRepresentation client = getClientRepresentation(realmResource, usersResource, user);
+
+        List<RoleRepresentation> listOfRoles = getRoleRepresentations(account, realmResource, client, usersResource, user);
+
+        // Assign client level roles to user
+        try {
+            UserResource userResource = usersResource.get(CreatedResponseUtil.getCreatedId(response));
+            userResource.roles().clientLevel(client.getId()).add(listOfRoles);
+            log.info("assigned roles for user {}", account.getUsername());
+        } catch (WebApplicationException e) {
+            usersResource.delete(user.getId());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorBuilder.build(ErrorCode.CORE_ROLES_NOT_ASSIGNED_TO_ACCOUNT));
+        }
+
+        // save User to user cache
+        UserRepresentation userRepresentation = usersResource.searchByUsername(user.getUsername(), true).get(0);
+        User savedUser = saveSecUser(userRepresentation, client);
+        log.info("saved user {} in user cache", account.getUsername());
+
+        Account createdAccount = new Account();
+        createdAccount.setEmail(user.getEmail());
+        createdAccount.setFirstName(user.getFirstName());
+        createdAccount.setLastName(user.getLastName());
+        createdAccount.setUsername(user.getUsername());
+        createdAccount.setReference(userRepresentation.getId());
+        createdAccount.setUserId(savedUser.getId()); // get user ID from
+        createdAccount.setDeveloper(account.isDeveloper());
+        createdAccount.setUserLocale(account.getUserLocale());
+        createdAccount.setRoles(account.getRoles());
+        createdAccount.setEmailVerified(user.isEmailVerified());
+        createdAccount.setCreatedAt(user.getCreatedTimestamp());
+
+        // update the account with user id
+        updateCytomineUserIdInIam(createdAccount);
+        log.info("Updated account for user {} successfully with User ID {}", account.getUsername(), createdAccount.getUserId());
+
+        log.info("Created account for user {} successfully", account.getUsername());
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdAccount);
+    }
+
+    private List<RoleRepresentation> getRoleRepresentations(Account account, RealmResource realmResource, ClientRepresentation client, UsersResource usersResource, UserRepresentation user) {
+        log.info("Retrieving roles for user {}", account.getUsername());
+        List<RoleRepresentation> listOfRoles;
+        try {
+            // Get client level roles (requires view-clients roles in IAM)
+            listOfRoles = account.getRoles().stream()
+                    .map(role -> realmResource.clients()
+                            .get(client.getId())
+                            .roles()
+                            .get(role)
+                            .toRepresentation())
+                    .collect(Collectors.toList());
+        } catch (NotFoundException e) {
+            log.error("roles {} not found and deleting partially created account", account.getRoles());
+            deletePartiallyCreatedAccount(usersResource, user);
+            throw new UserManagementException(BAD_REQUEST, ErrorCode.CORE_INVALID_ROLES);
+        }
+        log.info("Retrieved roles for user {}", account.getUsername());
+        return listOfRoles;
+    }
+
+    private ClientRepresentation getClientRepresentation(RealmResource realmResource, UsersResource usersResource, UserRepresentation user) {
+        log.info("Retrieving clients");
+        ClientRepresentation client;
+        try {
+            client = realmResource.clients().findByClientId(clientId).get(0);
+        } catch (IndexOutOfBoundsException e) {
+            log.error("client {} not found and deleting partially created account", clientId);
+            deletePartiallyCreatedAccount(usersResource, user);
+            throw new UserManagementException(INTERNAL_SERVER_ERROR, ErrorCode.CORE_INVALID_CLIENT);
+        }
+        log.info("Retrieved client {}", client.getClientId());
+        return client;
+    }
+
+    protected User saveSecUser(UserRepresentation userRepresentation, ClientRepresentation client) {
+        log.info("Saving sec user {}", userRepresentation.getUsername());
+        final User savedUser;
+        Optional<User> userFromCache = userService.find(UUID.fromString(userRepresentation.getId()));
+        if (userFromCache.isEmpty()) {
+            log.info("Creating user {}", userRepresentation.getUsername());
+            User newUser = new User();
+            newUser.setUsername(userRepresentation.getUsername());
+            newUser.setReference(userRepresentation.getId());
+            newUser.setName(String.format("%s %s", userRepresentation.getFirstName(), userRepresentation.getLastName()));
+            // generate keys for public/private keys authentication
+            newUser.generateKeys();
+            // TODO : use the user service to persist the user + roles + storage
+            //save domain into the database
+            savedUser = userRepository.save(newUser);
+
+            getClientLevelUserRoles(userRepresentation, client).stream()
+                    .map(role -> {
+                        SecUserSecRole secSecUserSecRole = new SecUserSecRole();
+                        secSecUserSecRole.setSecRole(secRoleRepository.getByAuthority("ROLE_" + role.getName()));
+                        secSecUserSecRole.setSecUser(savedUser);
+                        return secSecUserSecRole;
+                    })
+                    .forEach(secSecUserSecRole -> secSecUserSecRoleRepository.saveAndFlush(secSecUserSecRole));
+
+            // create storage for the user
+            storageService.initUserStorage(savedUser);
+            return savedUser;
+
+        } else {
+            log.info("Updating sec user {}", userRepresentation.getUsername());
+            User cachedUser = userFromCache.get();
+            cachedUser.setName(String.format("%s %s", userRepresentation.getFirstName(), userRepresentation.getLastName()));
+            //save domain into the database
+            savedUser = userRepository.saveAndFlush(cachedUser);
+
+            getClientLevelUserRoles(userRepresentation, client).stream()
+                    .map(role -> {
+                        SecUserSecRole secSecUserSecRole = new SecUserSecRole();
+                        secSecUserSecRole.setSecRole(secRoleRepository.getByAuthority("ROLE_" + role.getName()));
+                        secSecUserSecRole.setSecUser(savedUser);
+                        return secSecUserSecRole;
+                    })
+                    .forEach(secSecUserSecRole -> secSecUserSecRoleRepository.saveAndFlush(secSecUserSecRole));
+
+            log.info("Saved user {} in cache", savedUser);
+            return savedUser;
+        }
+    }
+
+    private List<RoleRepresentation> getClientLevelUserRoles(UserRepresentation userRepresentation, ClientRepresentation client) {
+        return keycloak.realm(realm).users().get(userRepresentation.getId()).roles().clientLevel(client.getId()).listAll();
+    }
+
+    private static void deletePartiallyCreatedAccount(UsersResource usersResource, UserRepresentation user) {
+        UserRepresentation badAccount = usersResource.searchByUsername(user.getUsername(), true).get(0);
+        usersResource.delete(badAccount.getId());
+    }
+
+
+    public ResponseEntity<?> find(String reference) {
+        log.info("Retrieving account {}", reference);
+        // validate reference is indeed a UUID
+        Validation validation = validateReference(reference);
+        if (!validation.isOk()) return validation.getResponseEntity();
+
+        ClientRepresentation client = getClientRepresentation();
+        UserRepresentation userRepresentation = new UserRepresentation();
+        try {
+            userRepresentation = keycloak.realm(realm).users().get(reference).toRepresentation();
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorBuilder.build(ErrorCode.CORE_ACCOUNT_NOT_FOUND));
+        }
+        Account account = setAccount(userRepresentation, client);
+
+        Optional<User> userFromCache = userRepository.findByReference(userRepresentation.getId());
+        if (userFromCache.isPresent()) {
+            User cachedUser = userFromCache.get();
+            account.setUserId(cachedUser.getId());
+            account.setCreatedAt(userRepresentation.getCreatedTimestamp());
+        }
+        log.info("Retrieved account {}", account.getUsername());
+        return ResponseEntity.status(HttpStatus.OK).body(account);
+    }
+
+    private Account setAccount(UserRepresentation userRepresentation, ClientRepresentation client) {
+        Account account = new Account();
+        account.setReference(userRepresentation.getId());
+        account.setFirstName(userRepresentation.getFirstName());
+        account.setLastName(userRepresentation.getLastName());
+        account.setEmail(userRepresentation.getEmail());
+        account.setUsername(userRepresentation.getUsername());
+        account.setEmailVerified(userRepresentation.isEmailVerified());
+        try {
+            if (Optional.ofNullable(userRepresentation.getAttributes()).isPresent()) {
+                account.setDeveloper(userRepresentation.getAttributes().get("isDeveloper").get(0).equalsIgnoreCase("1"));
+                account.setUserLocale(userRepresentation.getAttributes().get("user_locale").get(0));
+                account.setUserId(Long.valueOf(userRepresentation.getAttributes().get("user_id").get(0)));
+
+            }
+        } catch (NullPointerException e) {
+            throw new UserManagementException(INTERNAL_SERVER_ERROR, ErrorCode.CORE_CUSTOM_ATTRIBUTES_NOT_SET);
+        }
+        List<RoleRepresentation> roleRepresentations = getClientLevelUserRoles(userRepresentation, client);
+
+        account.setRoles(roleRepresentations.stream().map(RoleRepresentation::getName).collect(Collectors.toList()));
+        return account;
+    }
+
+    private ClientRepresentation getClientRepresentation() {
+        ClientRepresentation client;
+        try {
+            client = keycloak.realm(realm).clients().findByClientId(clientId).get(0);
+        } catch (IndexOutOfBoundsException e) {
+            log.error("client {} not found and deleting partially created account", clientId);
+            throw new UserManagementException(INTERNAL_SERVER_ERROR, ErrorCode.CORE_INVALID_CLIENT);
+        }
+        return client;
+    }
+
+    public ResponseEntity<?> delete(String reference) {
+        log.info("Deleting account {}", reference);
+        // validate reference is indeed a UUID
+        Validation validation = validateReference(reference);
+        if (!validation.isOk()) return validation.getResponseEntity();
+
+        // disable user first
+        UsersResource users = keycloak.realm(realm).users();
+        try {
+            disableUserInIAM(users, reference, true);
+            log.info("disabled account {} in IAM", reference);
+        } catch (NotFoundException e) {
+            log.error("account {} not found in IAM", reference);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorBuilder.build(ErrorCode.CORE_ACCOUNT_NOT_FOUND));
+        }
+
+        // delete user from cache
+        try {
+            Optional<User> userFromCache = userRepository.findByReference(reference);
+            if (userFromCache.isPresent()) {
+                User cachedUser = userFromCache.get();
+                log.info("deleting account {} from user cache", reference);
+                userService.delete(cachedUser, transactionService.start(), null, true);
+            }
+        } catch (Exception e) {
+            log.error("Error deleting account {} enabling account in IAM", reference, e);
+            disableUserInIAM(users, reference, false);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorBuilder.build(ErrorCode.CORE_IAM_UNKNOWN_DELETE_ERROR));
+        }
+
+        // remove from IAM
+        users = keycloak.realm(realm).users();
+        UserRepresentation userRepresentation;
+        Account account = new Account();
+        try {
+            userRepresentation = users.get(reference).toRepresentation();
+            account.setReference(userRepresentation.getId());
+            account.setFirstName(userRepresentation.getFirstName());
+            account.setLastName(userRepresentation.getLastName());
+            account.setEmail(userRepresentation.getEmail());
+            account.setUsername(userRepresentation.getUsername());
+            log.info("removing account {} from IAM", reference);
+            users.get(reference).remove();
+
+        } catch (NotFoundException e) {
+            log.error("account {} not found in IAM", reference);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorBuilder.build(ErrorCode.CORE_ACCOUNT_NOT_FOUND));
+        } catch (Exception e) {
+            // disabled ghost IAM account is lingering in IAM service
+            log.warn("Error deleting account {} disabled ghost IAM account is lingering in IAM service ", reference);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorBuilder.build(ErrorCode.CORE_IAM_UNKNOWN_DELETE_ERROR));
+        }
+        log.info("deleting account {} from IAM", reference);
+        return JsonResponseEntity.status(HttpStatus.NO_CONTENT).body(account);
+    }
+
+    private void disableUserInIAM(UsersResource users, String reference, boolean disabled) {
+        UserRepresentation userRepresentation;
+        userRepresentation = users.get(reference).toRepresentation();
+        userRepresentation.setEnabled(disabled);
+
+        users.get(reference).update(userRepresentation);
+
+    }
+
+    public ResponseEntity<?> update(Account account) {
+        log.info("Updating account {}", account);
+        // validate account
+        Validation validation = validateAccount(account, ValidationFor.UPDATE);
+        if (!validation.isOk()) return validation.getResponseEntity();
+
+        UsersResource users = keycloak.realm(realm).users();
+        UserRepresentation userRepresentation;
+        UserRepresentation userRepresentationBeforeUpdate;
+        try {
+            userRepresentation = users.get(account.getReference()).toRepresentation();
+            userRepresentationBeforeUpdate = userRepresentation; // used to rollback operation in IAM in case of downstream failure
+            userRepresentation.setFirstName(account.getFirstName());
+            userRepresentation.setLastName(account.getLastName());
+            userRepresentation.setEmail(account.getEmail());
+            userRepresentation.setUsername(account.getUsername());
+
+            setCustomAttributes(account, userRepresentation);
+
+            // Set password credential
+            userRepresentation.setCredentials(setPermanentPassword(account));
+
+            // update account in IAM
+            users.get(account.getReference()).update(userRepresentation);
+
+
+        } catch (NotFoundException e) {
+            // create the account if doesn't exist in IAM
+            log.info("account {} not found in IAM", account.getReference());
+            return createAccount(account);
+        } catch (BadRequestException e) {
+            log.error("IAM doesn't allow the update of username {}", account.getUsername());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorBuilder.build(ErrorCode.CORE_USERNAME_UPDATE_NOT_ALLOWED));
+        }
+
+        ClientRepresentation clientRepresentation = getClientRepresentation();
+        updateAccountClientLevelRoles(account, users, clientRepresentation);
+
+        // update the user in user cache
+        try {
+            UserRepresentation searchedUserRepresentation = users.searchByUsername(userRepresentation.getUsername(), true).get(0);
+            User savedUser = saveSecUser(searchedUserRepresentation, clientRepresentation);
+
+            account.setUserId(savedUser.getId());
+            account.setEmailVerified(searchedUserRepresentation.isEmailVerified());
+            account.setCreatedAt(searchedUserRepresentation.getCreatedTimestamp());
+        } catch (Exception e) {
+            //rollback if failure is encountered in saving the account in the cache
+            // restore account in IAM
+            log.error("error updating account {} in user cache", account.getReference(), e);
+            log.info("restoring account {} in IAM", account.getReference());
+            users.get(userRepresentationBeforeUpdate.getId()).update(userRepresentationBeforeUpdate);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorBuilder.build(ErrorCode.CORE_IAM_UNKNOWN_UPDATE_ERROR));
+
+        }
+        log.info("account updated successfully");
+        return JsonResponseEntity.status(HttpStatus.OK).body(account);
+    }
+
+    public ResponseEntity<?> updateCytomineUserIdInIam(Account account) {
+        log.info("Updating account {} with generated cytomine user ID", account.getUserId());
+        // validate account
+        Validation validation = validateAccount(account, ValidationFor.UPDATE);
+        if (!validation.isOk()) return validation.getResponseEntity();
+
+        UsersResource users = keycloak.realm(realm).users();
+        UserRepresentation userRepresentation;
+        try {
+            userRepresentation = users.get(account.getReference()).toRepresentation();
+            if (userRepresentation.getAttributes() == null) {
+                userRepresentation.setAttributes(new HashMap<>());
+            }
+            try {
+                log.info("account reference {} ", account.getReference());
+                log.info("account user id {} ", account.getUserId());
+                log.info("user representation {} ", userRepresentation.getId());
+                log.info("user representation attributes {} ", userRepresentation.getAttributes());
+                if (account.getUserId() != null)
+                    userRepresentation.getAttributes().put("user_id", Collections.singletonList(String.valueOf(account.getUserId())));
+            } catch (NullPointerException e) {
+                throw new UserManagementException(500, ErrorCode.CORE_CUSTOM_ATTRIBUTES_NOT_SET);
+            }
+            // update account in IAM
+            users.get(account.getReference()).update(userRepresentation);
+
+        } catch (NotFoundException e) {
+            // create the account if doesn't exist in IAM
+            log.info("account {} not found in IAM", account.getReference());
+        } catch (BadRequestException e) {
+            log.error("IAM doesn't allow the update of username {}", account.getUsername());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorBuilder.build(ErrorCode.CORE_USERNAME_UPDATE_NOT_ALLOWED));
+        }
+
+        log.info("account updated successfully");
+        return JsonResponseEntity.status(HttpStatus.OK).body(account);
+    }
+
+    private void updateAccountClientLevelRoles(Account account, UsersResource users, ClientRepresentation client) {
+        log.info("updating account client level roles to {}", account.getReference());
+        try {
+            UserResource userResource = users.get(account.getReference());
+            List<RoleRepresentation> listOfRoles = getAccountRoleRepresentations(account, client);
+            List<RoleRepresentation> allRoles = userResource.roles().clientLevel(client.getId()).listAll();
+            userResource.roles().clientLevel(client.getId()).remove(allRoles);
+
+            if (listOfRoles.isEmpty()) {
+                account.getRoles().clear();
+            } else {
+                userResource.roles().clientLevel(client.getId()).add(listOfRoles);
+            }
+
+
+        } catch (WebApplicationException e) {
+            log.error("failed to assign roles to account {}", account.getReference(), e);
+            throw new UserManagementException(INTERNAL_SERVER_ERROR, ErrorCode.CORE_ROLES_NOT_ASSIGNED_TO_ACCOUNT);
+        }
+    }
+
+    private List<RoleRepresentation> getAccountRoleRepresentations(Account account, ClientRepresentation client) {
+        log.info("getting account client level roles to {}", account.getReference());
+        List<RoleRepresentation> listOfRoles;
+        try {
+            // Get client level roles (requires view-clients roles in IAM)
+            listOfRoles = account.getRoles().stream()
+                    .map(role -> keycloak.realm(realm).clients()
+                            .get(client.getId())
+                            .roles()
+                            .get(role)
+                            .toRepresentation())
+                    .collect(Collectors.toList());
+        } catch (NotFoundException e) {
+            log.error("account roles {} not found in IAM", account.getRoles(), e);
+            throw new UserManagementException(BAD_REQUEST, ErrorCode.CORE_INVALID_ROLES);
+
+        }
+        log.info("account roles retrieved successfully");
+        return listOfRoles;
+    }
+
+    private Validation validateAccount(Account account, ValidationFor source) {
+        log.info("Validating account {}", account.getUserId());
+        Validation validation = new Validation();
+        validation.setOk(true);
+        Map<String, String> errors = new HashMap<>();
+        // validate required properties
+        // updating username and password is not allowed but the error will come from IAM as it's
+        // impossible to validate the values here
+        if (source.equals(ValidationFor.UPDATE)) {
+            log.info("Validating account for update");
+            if (account.getReference() == null) {
+                validation.setOk(false);
+                errors.put("reference", "this property is required");
+            } else {
+                try {
+                    UUID.fromString(account.getReference());
+                } catch (IllegalArgumentException ex) {
+                    validation.setOk(false);
+                    errors.put("reference", "not valid UUID");
+                }
+                validation.setOk(true);
+                log.info("Validated account {} successfully", account.getUsername());
+                return validation;
+            }
+        }
+
+        if (source.equals(ValidationFor.CREATE)) {
+            log.info("Validating account for create");
+            if (account.getPassword() == null || account.getPassword().isEmpty()) {
+                validation.setOk(false);
+                errors.put("password", "this property is required");
+            }
+            if (account.getFirstName() == null || account.getFirstName().isEmpty()) {
+                validation.setOk(false);
+                errors.put("first_name", "this property is required");
+            }
+            if (account.getLastName() == null || account.getLastName().isEmpty()) {
+                validation.setOk(false);
+                errors.put("last_name", "this property is required");
+            }
+            if (account.getUsername() == null || account.getUsername().isEmpty()) {
+                validation.setOk(false);
+                errors.put("username", "this property is required");
+            }
+            if (account.getEmail() == null || account.getEmail().isEmpty()) {
+                validation.setOk(false);
+                errors.put("email", "this property is required");
+            }
+            if (account.getUserLocale() == null || account.getUserLocale().isEmpty()) {
+                validation.setOk(false);
+                errors.put("user_locale", "this property is required");
+            } else {
+                List<String> cytomineLocales = List.of("en", "es", "nl", "fr", "no");
+                if (!cytomineLocales.contains(account.getUserLocale())) {
+                    validation.setOk(false);
+                    errors.put("user_locale", "unknown locales [" + account.getUserLocale() + "] , allowed roles [en, es, nl, fr, no]");
+                }
+            }
+            if (account.getRoles() == null || account.getRoles().isEmpty()) {
+                validation.setOk(false);
+                errors.put("roles", "this property is required");
+            } else {
+                List<String> cytomineRoles = List.of("ADMIN", "USER", "GUEST");
+                List<String> invalidRoles = account.getRoles().stream().filter(role -> !cytomineRoles.contains(role)).toList();
+                if (!invalidRoles.isEmpty()) {
+                    String unknownRoles = Strings.collectionToCommaDelimitedString(invalidRoles);
+                    validation.setOk(false);
+                    errors.put("roles", "unknown roles [" + unknownRoles + "] , allowed roles [ADMIN, USER, GUEST]");
+                } else {
+                    validation.setOk(true);
+                    log.info("Validated account {} successfully", account.getUsername());
+                    return validation;
+                }
+            }
+        }
+        log.info("Validated account {} with following errors {}", account.getUsername(), errors);
+        validation.setResponseEntity(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorBuilder.build(ErrorCode.CORE_INVALID_ACCOUNT, errors)));
+        return validation;
+    }
+
+    private Validation validateReference(String reference) {
+        log.info("validating account reference {}", reference);
+        Validation validation = new Validation();
+        validation.setOk(true);
+        try {
+            UUID.fromString(reference);
+        } catch (IllegalArgumentException ex) {
+            validation.setOk(false);
+            validation.setResponseEntity(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorBuilder.build(ErrorCode.CORE_INVALID_REFERENCE)));
+            return validation;
+        }
+        log.info("Validated account reference {} successfully", reference);
+        return validation;
+    }
+
+    public ResponseEntity<?> find(int offset, int limit) {
+        log.info("finding accounts from offset # {} with size {}", offset, limit);
+        if (offset < 0) offset = 0;
+
+        int usersCount = keycloak.realm(realm).users().count();
+        int totalPages = (int) Math.ceil((double) usersCount / limit);
+
+        if (offset >= usersCount) offset = usersCount - 1;
+
+        int from = offset * limit;
+
+        // get the client
+        ClientRepresentation client = getClientRepresentation();
+
+        List<UserRepresentation> users = keycloak.realm(realm).users().list(offset, limit);
+        Accounts accounts = new Accounts();
+        accounts.setTotal(usersCount);
+        accounts.setNbPages(totalPages);
+        accounts.setLimit(limit);
+        accounts.setItems(new ArrayList<>());
+        accounts.setOffset(offset);
+
+        List<String> ids = users.stream().parallel().map(AbstractUserRepresentation::getId).collect(Collectors.toList());
+
+        List<User> userIds = userService.find(ids); // get all IDs in one database round trip
+
+        users.stream().parallel().forEach(user -> {
+            Account account = setAccount(user, client);
+            Optional<User> retrievedUserOptional = userIds.stream().filter(cachedUser -> cachedUser.getReference().equalsIgnoreCase(user.getId())).toList().stream().findFirst();
+            if (retrievedUserOptional.isPresent()) {
+                User retrievedUser = retrievedUserOptional.get();
+                account.setCreatedAt(user.getCreatedTimestamp());
+            }
+            accounts.getItems().add(account);
+        });
+
+        log.info("accounts page {} successfully loaded", from);
+        return JsonResponseEntity.status(HttpStatus.OK).body(accounts);
+    }
+}
+
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+class Validation {
+    private boolean ok = true;
+    private ResponseEntity<?> responseEntity;
+}
+
+enum ValidationFor {
+    CREATE, UPDATE
+}

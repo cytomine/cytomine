@@ -1,11 +1,16 @@
 package be.cytomine.domain.appengine;
 
-import jakarta.persistence.Column;
+import java.util.ArrayList;
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderColumn;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -36,11 +41,10 @@ public class TaskRunLayer extends CytomineDomain {
     @JoinColumn(name = "roi_id")
     private UserAnnotation roi;
 
-    @Column(name = "x_offset")
-    private Integer xOffset = 0;
-
-    @Column(name = "y_offset")
-    private Integer yOffset = 0;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "task_run_layer_id")
+    @OrderColumn(name = "order_index")
+    private List<CropOffset> offsets = new ArrayList<>();
 
     public static JsonObject getDataFromDomain(CytomineDomain domain) {
         TaskRunLayer taskRunLayer = (TaskRunLayer) domain;
@@ -48,8 +52,6 @@ public class TaskRunLayer extends CytomineDomain {
         domainData.put("annotationLayer", taskRunLayer.getAnnotationLayer().getId());
         domainData.put("taskRun", taskRunLayer.getTaskRun().getId());
         domainData.put("image", taskRunLayer.getImage().getId());
-        domainData.put("xOffset", taskRunLayer.getXOffset());
-        domainData.put("yOffset", taskRunLayer.getYOffset());
 
         return domainData;
     }
@@ -61,8 +63,6 @@ public class TaskRunLayer extends CytomineDomain {
         taskRunLayer.annotationLayer = (AnnotationLayer) json.getJSONAttrDomain(entityManager, "annotationLayer", new AnnotationLayer(), true);
         taskRunLayer.taskRun = (TaskRun) json.getJSONAttrDomain(entityManager, "taskRun", new TaskRun(), true);
         taskRunLayer.image = (ImageInstance) json.getJSONAttrDomain(entityManager, "image", new ImageInstance(), true);
-        taskRunLayer.xOffset = json.getJSONAttrInteger("xOffset");
-        taskRunLayer.yOffset = json.getJSONAttrInteger("yOffset");
         taskRunLayer.created = json.getJSONAttrDate("created");
         taskRunLayer.updated = json.getJSONAttrDate("updated");
 

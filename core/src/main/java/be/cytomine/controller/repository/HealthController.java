@@ -1,17 +1,20 @@
 package be.cytomine.controller.repository;
 
+import lombok.RequiredArgsConstructor;
 import org.cytomine.common.repository.http.HealthService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController("/repository/ping")
+@RestController
+@RequestMapping("/repository/ping")
+@RequiredArgsConstructor
 public class HealthController {
-    HealthService healthService;
+
+    private final HealthService healthService;
 
     @GetMapping
     public String ping() {
         return healthService.ping();
-
     }
-
 }

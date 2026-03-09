@@ -117,7 +117,7 @@ spec:
         livenessProbe:
           httpGet:
            path: /health/live
-           port: {{ .Values.iam.port }}
+           port: 9000
           initialDelaySeconds: 20
           periodSeconds: 20
           failureThreshold: 10

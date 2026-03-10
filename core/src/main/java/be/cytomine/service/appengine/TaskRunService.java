@@ -373,7 +373,7 @@ public class TaskRunService {
                             }
 
                             TaskRunLayer taskRunLayer = taskRunLayerRepository
-                                    .findByTaskRunAndParameterName(taskRun, parameterName)
+                                    .findByTaskRunAndDerivedFrom(taskRun, parameterName)
                                     .orElse(new TaskRunLayer(annotationLayer, taskRun, taskRun.getImage(), annotation, parameterName));
                             CropOffset cropOffset = new CropOffset((int) bounds.getMinX(), (int) bounds.getMinY(), taskRunLayer, i-1);
                             taskRunLayer.getOffsets().add(cropOffset);
@@ -577,7 +577,7 @@ public class TaskRunService {
         return appEngineService.post("task-runs/" + taskRunId + "/state-actions", body, MediaType.APPLICATION_JSON);
     }
 
-    private void processGeometryValue(TaskRunValue value, AnnotationLayer annotationLayer, TaskRunLayer taskRunLayer) {
+    private void processGeometryValue(TaskRunValue value, AnnotationLayer annotationLayer, TaskRunLayer taskRunLayer, int index) {
         if (!"ARRAY".equals(value.getType())) {
             return;
         }
@@ -588,19 +588,24 @@ public class TaskRunService {
         }
 
         if ("GEOMETRY".equals(value.getSubType())) {
+            List<CropOffset> offsets = taskRunLayer.getOffsets();
+            CropOffset offset = index < offsets.size() ? offsets.get(index) : new CropOffset();
+
             JsonNode jsonItems = objectMapper.convertValue(items, JsonNode.class);
             for (JsonNode item : jsonItems) {
                 String geoJson = item.get("value").asText();
                 if (geometryService.isGeometry(geoJson)) {
                     String wktGeometry = geometryService.GeoJSONToWKT(geoJson);
-                    Geometry parsedGeometry = GeometryService.addOffset(wktGeometry, 0, 0);
+                    Geometry parsedGeometry = GeometryService.addOffset(wktGeometry, offset.getX(), offset.getY());
                     annotationService.createAnnotation(annotationLayer, parsedGeometry.toString());
                 }
             }
         } else if ("ARRAY".equals(value.getSubType())) {
+            int[] currentIndex = {0};
+
             items.stream()
                     .map(item -> objectMapper.convertValue(item, TaskRunValue.class))
-                    .forEach(inner -> processGeometryValue(inner, annotationLayer, taskRunLayer));
+                    .forEach(inner -> processGeometryValue(inner, annotationLayer, taskRunLayer, currentIndex[0]++));
         }
     }
 
@@ -685,7 +690,7 @@ public class TaskRunService {
 
         for (TaskRunValue arrayValue : geometryArrays) {
             TaskRunLayer matchedLayer = layersByParameterName.get(arrayValue.getParameterName());
-            //processGeometryValue(arrayValue, annotationLayer, taskRunLayer);
+            processGeometryValue(arrayValue, annotationLayer, matchedLayer, 0);
         }
 
         return response;

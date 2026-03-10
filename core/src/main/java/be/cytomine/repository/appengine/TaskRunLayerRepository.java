@@ -21,7 +21,7 @@ public interface TaskRunLayerRepository extends JpaRepository<TaskRunLayer, Long
 
     Optional<TaskRunLayer> findByTaskRun(TaskRun taskRun);
 
-    Optional<TaskRunLayer> findByTaskRunAndParameterName(TaskRun taskRun, String parameterName);
+    Optional<TaskRunLayer> findByTaskRunAndDerivedFrom(TaskRun taskRun, String parameterName);
 
     Set<TaskRunLayer> findAllByTaskRunAndImage(TaskRun taskRun, ImageInstance image);
 }

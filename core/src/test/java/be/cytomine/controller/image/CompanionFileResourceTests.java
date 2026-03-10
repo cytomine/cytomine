@@ -21,7 +21,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.PostGisTestConfiguration;
 import be.cytomine.domain.image.CompanionFile;
-import be.cytomine.utils.JsonObject;
+
 import com.github.tomakehurst.wiremock.WireMockServer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;

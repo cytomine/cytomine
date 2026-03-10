@@ -22,7 +22,7 @@ import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.PostGisTestConfiguration;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.project.Project;
-import be.cytomine.utils.JsonObject;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;

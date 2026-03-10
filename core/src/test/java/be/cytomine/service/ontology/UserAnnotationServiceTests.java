@@ -63,7 +63,7 @@ import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.ontology.UserAnnotationRepository;
 import be.cytomine.service.CommandService;
 import be.cytomine.utils.CommandResponse;
-import be.cytomine.utils.JsonObject;
+
 
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
 import static be.cytomine.service.search.RetrievalService.CBIR_API_BASE_PATH;

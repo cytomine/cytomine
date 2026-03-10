@@ -35,7 +35,7 @@ import be.cytomine.service.report.ReportService;
 import be.cytomine.service.search.UserSearchExtension;
 import be.cytomine.service.security.UserService;
 import be.cytomine.service.security.SecurityACLService;
-import be.cytomine.utils.JsonObject;
+
 
 
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;

@@ -11,7 +11,7 @@ import be.cytomine.service.project.ProjectRepresentativeUserService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.security.UserService;
 import be.cytomine.service.utils.TaskService;
-import be.cytomine.utils.JsonObject;
+
 import be.cytomine.utils.Task;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,7 +59,7 @@ public class RestProjectRepresentativeUserController extends RestCytomineControl
                 .map(this::responseSuccess)
                 .orElseGet(() -> responseNotFound("ProjectRepresentativeUser", id));
     }
-    
+
     @PostMapping("/project/{id}/representative.json")
     public ResponseEntity<String> add(
             @PathVariable Long id,

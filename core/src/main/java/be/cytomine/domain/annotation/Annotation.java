@@ -13,7 +13,7 @@ import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 
 import be.cytomine.domain.CytomineDomain;
-import be.cytomine.utils.JsonObject;
+
 
 @Setter
 @Getter

@@ -5,7 +5,7 @@ import be.cytomine.domain.CytomineDomain;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.command.TransactionService;
 import be.cytomine.service.meta.DescriptionService;
-import be.cytomine.utils.JsonObject;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

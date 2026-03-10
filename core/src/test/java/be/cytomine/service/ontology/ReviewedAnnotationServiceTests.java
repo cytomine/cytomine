@@ -37,7 +37,7 @@ import be.cytomine.service.CommandService;
 import be.cytomine.service.command.TransactionService;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.utils.CommandResponse;
-import be.cytomine.utils.JsonObject;
+
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 import org.apache.commons.lang3.time.DateUtils;

@@ -15,7 +15,7 @@ import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.CytomineException;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.security.AclAuthService;
-import be.cytomine.utils.JsonObject;
+
 
 @Slf4j
 @RequiredArgsConstructor

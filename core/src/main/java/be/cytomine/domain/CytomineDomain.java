@@ -18,6 +18,7 @@ package be.cytomine.domain;
 
 import be.cytomine.domain.security.User;
 import be.cytomine.utils.DateUtils;
+
 import be.cytomine.utils.JsonObject;
 import lombok.Getter;
 import lombok.Setter;

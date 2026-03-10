@@ -1,12 +1,13 @@
-package be.cytomine.utils;
+package org.cytomine.common.repository.utils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 
 public class JsonNodeUtils {
 
-    public static String csvFromStringList(List<String> values) {
+    public static String csvFromStringList(Collection<String> values) {
         if (values == null || values.isEmpty()) return null;
 
         List<String> parts = new ArrayList<>();

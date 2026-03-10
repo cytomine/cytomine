@@ -1,6 +1,7 @@
 package be.cytomine.domain.security;
 
 import be.cytomine.domain.CytomineDomain;
+
 import be.cytomine.utils.JsonObject;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

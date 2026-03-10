@@ -19,11 +19,10 @@ package be.cytomine.domain.project;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.security.User;
 import be.cytomine.utils.JsonObject;
-import lombok.Getter;
-import lombok.Setter;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Getter

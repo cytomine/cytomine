@@ -7,7 +7,7 @@ import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.ontology.TermService;
 import be.cytomine.service.security.UserService;
-import be.cytomine.utils.JsonObject;
+
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -17,6 +17,7 @@ package be.cytomine.domain.security;
 */
 
 import be.cytomine.domain.CytomineDomain;
+
 import be.cytomine.utils.JsonObject;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;

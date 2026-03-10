@@ -9,7 +9,7 @@ import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.ontology.*;
 import be.cytomine.service.security.UserService;
 import be.cytomine.service.security.SecurityACLService;
-import be.cytomine.utils.JsonObject;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

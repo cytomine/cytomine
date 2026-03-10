@@ -25,7 +25,7 @@ import be.cytomine.exceptions.ServerException;
 import be.cytomine.repository.image.ImageInstanceRepository;
 import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.CytomineWebSocketHandler;
-import be.cytomine.utils.JsonObject;
+
 
 @Slf4j
 @RequiredArgsConstructor
@@ -302,4 +302,3 @@ public class WebSocketUserPositionHandler extends CytomineWebSocketHandler {
         }*/
     }
 }
-

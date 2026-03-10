@@ -18,10 +18,10 @@ package be.cytomine.domain.security;
 
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.utils.JsonObject;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import jakarta.persistence.*;
 import java.io.Serializable;
 
 @Entity

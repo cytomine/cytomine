@@ -27,7 +27,7 @@ import be.cytomine.repository.ontology.SharedAnnotationRepository;
 import be.cytomine.service.CommandService;
 import be.cytomine.service.command.TransactionService;
 import be.cytomine.utils.CommandResponse;
-import be.cytomine.utils.JsonObject;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;

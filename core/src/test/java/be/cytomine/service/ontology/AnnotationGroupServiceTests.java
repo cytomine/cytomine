@@ -20,7 +20,7 @@ import be.cytomine.domain.ontology.AnnotationGroup;
 import be.cytomine.domain.project.Project;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.utils.CommandResponse;
-import be.cytomine.utils.JsonObject;
+
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -143,4 +143,3 @@ public class AnnotationGroupServiceTests {
         AssertionsForClassTypes.assertThat(annotationGroupService.find(annotationGroup.getId()).isPresent());
     }
 }
-

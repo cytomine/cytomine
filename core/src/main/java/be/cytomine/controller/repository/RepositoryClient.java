@@ -1,6 +1,7 @@
 package be.cytomine.controller.repository;
 
-import org.cytomine.common.repository.http.HealthService;
+import org.cytomine.common.repository.http.AnnotationReportHttpContract;
+import org.cytomine.common.repository.http.HealthHttpContract;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,10 +23,21 @@ public class RepositoryClient {
     }
 
     @Bean
-    HealthService healthServiceClient(RestClient repositoryRestClient) {
+    HttpServiceProxyFactory httpServiceProxyFactory(RestClient repositoryRestClient) {
         RestClientAdapter adapter = RestClientAdapter.create(repositoryRestClient);
         HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(adapter)
             .build();
-        return factory.createClient(HealthService.class);
+        return factory;
     }
+
+    @Bean
+    HealthHttpContract healthServiceClient(HttpServiceProxyFactory factory) {
+        return factory.createClient(HealthHttpContract.class);
+    }
+
+    @Bean
+    AnnotationReportHttpContract annotationReportServiceClient(HttpServiceProxyFactory factory) {
+        return factory.createClient(AnnotationReportHttpContract.class);
+    }
+
 }

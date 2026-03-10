@@ -7,7 +7,7 @@ import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.image.NestedImageInstanceService;
 import be.cytomine.service.image.UploadedFileService;
 import be.cytomine.service.middleware.ImageServerService;
-import be.cytomine.utils.JsonObject;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

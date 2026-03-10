@@ -18,7 +18,7 @@ package be.cytomine.domain.social;
 
 import be.cytomine.domain.CytomineSocialDomain;
 import be.cytomine.exceptions.WrongArgumentException;
-import be.cytomine.utils.JsonObject;
+
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;

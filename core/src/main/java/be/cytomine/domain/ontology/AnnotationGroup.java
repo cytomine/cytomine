@@ -1,5 +1,9 @@
 package be.cytomine.domain.ontology;
 
+import be.cytomine.domain.CytomineDomain;
+import be.cytomine.domain.image.group.ImageGroup;
+import be.cytomine.domain.project.Project;
+import be.cytomine.utils.JsonObject;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.FetchType;
@@ -7,10 +11,6 @@ import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
 
-import be.cytomine.domain.CytomineDomain;
-import be.cytomine.domain.image.group.ImageGroup;
-import be.cytomine.domain.project.Project;
-import be.cytomine.utils.JsonObject;
 
 @Entity
 @Getter

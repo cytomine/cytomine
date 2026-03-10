@@ -34,7 +34,7 @@ import be.cytomine.domain.social.PersistentProjectConnection;
 import be.cytomine.repositorynosql.social.LastConnectionRepository;
 import be.cytomine.repositorynosql.social.PersistentProjectConnectionRepository;
 import be.cytomine.service.database.SequenceService;
-import be.cytomine.utils.JsonObject;
+
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 

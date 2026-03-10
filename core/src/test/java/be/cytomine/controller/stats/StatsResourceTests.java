@@ -31,7 +31,7 @@ import be.cytomine.repositorynosql.social.*;
 import be.cytomine.service.social.AnnotationActionService;
 import be.cytomine.service.social.ImageConsultationService;
 import be.cytomine.service.social.ProjectConnectionService;
-import be.cytomine.utils.JsonObject;
+
 import com.github.tomakehurst.wiremock.WireMockServer;
 import org.apache.commons.lang3.time.DateUtils;
 import org.junit.jupiter.api.AfterAll;

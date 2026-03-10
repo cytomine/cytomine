@@ -27,7 +27,7 @@ import be.cytomine.domain.security.User;
 import be.cytomine.domain.social.PersistentImageConsultation;
 import be.cytomine.repositorynosql.social.PersistentImageConsultationRepository;
 import be.cytomine.service.social.ImageConsultationService;
-import be.cytomine.utils.JsonObject;
+
 import org.apache.commons.lang3.time.DateUtils;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;

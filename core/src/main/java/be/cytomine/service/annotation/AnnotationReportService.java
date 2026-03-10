@@ -11,7 +11,7 @@ import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.ontology.TermService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.utils.AnnotationListingBuilder;
-import be.cytomine.utils.JsonObject;
+
 
 @Slf4j
 @RequiredArgsConstructor

@@ -1,13 +1,13 @@
 package be.cytomine.domain.command;
 
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.utils.JsonObject;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 
 @Entity
 @Getter

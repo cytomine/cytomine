@@ -25,7 +25,7 @@ import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.search.ImageSearchExtension;
 import be.cytomine.service.security.UserService;
 import be.cytomine.service.security.SecurityACLService;
-import be.cytomine.utils.JsonObject;
+
 import be.cytomine.utils.RequestParams;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -60,7 +60,7 @@ public class RestImageInstanceController extends RestCytomineController {
     private final ImageServerService imageServerService;
 
     private final UserService userService;
-    
+
     private final SliceCoordinatesService sliceCoordinatesService;
 
     private final SecurityACLService securityACLService;

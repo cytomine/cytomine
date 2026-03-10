@@ -31,7 +31,7 @@ import be.cytomine.service.PermissionService;
 import be.cytomine.service.security.UserService;
 import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.utils.CommandResponse;
-import be.cytomine.utils.JsonObject;
+
 import be.cytomine.utils.Task;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

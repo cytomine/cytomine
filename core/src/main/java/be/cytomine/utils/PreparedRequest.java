@@ -103,8 +103,8 @@ public class PreparedRequest {
         }
     }
 
-    public void setJsonBody(JsonObject body) {
-        this.body = JsonObject.toJsonString(
+    public void setJsonBody(org.cytomine.common.repository.utils.JsonObject body) {
+        this.body = org.cytomine.common.repository.utils.JsonObject.toJsonString(
                 body.entrySet()
                 .stream()
                 .filter(e -> e.getValue() != null && !e.getValue().toString().isEmpty())

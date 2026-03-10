@@ -33,7 +33,7 @@ import be.cytomine.service.middleware.ImageServerService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.security.UserService;
 import be.cytomine.service.security.SecurityACLService;
-import be.cytomine.utils.JsonObject;
+
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 

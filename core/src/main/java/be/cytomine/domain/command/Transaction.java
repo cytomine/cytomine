@@ -17,7 +17,7 @@ package be.cytomine.domain.command;
 */
 
 import be.cytomine.domain.CytomineDomain;
-import be.cytomine.utils.JsonObject;
+
 import lombok.Getter;
 import lombok.Setter;
 

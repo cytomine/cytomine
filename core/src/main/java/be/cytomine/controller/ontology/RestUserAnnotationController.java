@@ -20,7 +20,7 @@ import be.cytomine.service.report.ReportService;
 import be.cytomine.service.security.UserService;
 import be.cytomine.utils.AnnotationListingBuilder;
 import be.cytomine.utils.CommandResponse;
-import be.cytomine.utils.JsonObject;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.locationtech.jts.io.ParseException;

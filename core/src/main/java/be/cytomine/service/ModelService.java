@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import be.cytomine.utils.JsonObject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.OptimisticLockException;
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +53,7 @@ import be.cytomine.service.meta.PropertyService;
 import be.cytomine.service.meta.TagDomainAssociationService;
 import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.utils.CommandResponse;
-import be.cytomine.utils.JsonObject;
+
 import be.cytomine.utils.Task;
 
 import static org.springframework.security.acls.domain.BasePermission.READ;

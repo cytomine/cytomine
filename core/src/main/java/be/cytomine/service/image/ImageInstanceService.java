@@ -161,7 +161,7 @@ public class ImageInstanceService extends ModelService {
     }
 
     @Override
-    public CytomineDomain createFromJSON(JsonObject json) {
+    public CytomineDomain createFromJSON(org.cytomine.common.repository.utils.JsonObject json) {
         return new ImageInstance().buildDomainFromJson(json, getEntityManager());
     }
 
@@ -413,7 +413,7 @@ public class ImageInstanceService extends ModelService {
         List<Tuple> resultList = query.list();
         List<Map<String, Object>> results = new ArrayList<>();
         for (Tuple rowResult : resultList) {
-            JsonObject result = new JsonObject();
+            org.cytomine.common.repository.utils.JsonObject result = new org.cytomine.common.repository.utils.JsonObject();
             for (TupleElement<?> element : rowResult.getElements()) {
                 Object value = rowResult.get(element.getAlias());
                 if (value instanceof BigInteger) {
@@ -431,7 +431,7 @@ public class ImageInstanceService extends ModelService {
             result.put("baseImage", result.get("baseImageId"));
             result.put("project", result.get("projectId"));
             // TODO: select N + 1 => see projectService (eagerOntology to load domain directly without fetching database)
-            JsonObject object = ImageInstance.getDataFromDomain(new ImageInstance().buildDomainFromJson(result, entityManager));
+            org.cytomine.common.repository.utils.JsonObject object = ImageInstance.getDataFromDomain(new ImageInstance().buildDomainFromJson(result, entityManager));
             object.put("projectBlind", result.get("projectBlind"));
             object.put("projectName", result.get("projectName"));
             results.add(result);
@@ -618,7 +618,7 @@ public class ImageInstanceService extends ModelService {
         List<Tuple> resultList = query.getResultList();
         List<Map<String, Object>> results = new ArrayList<>();
         for (Tuple rowResult : resultList) {
-            JsonObject result = new JsonObject();
+            org.cytomine.common.repository.utils.JsonObject result = new org.cytomine.common.repository.utils.JsonObject();
             for (TupleElement<?> element : rowResult.getElements()) {
                 Object value = rowResult.get(element.getAlias());
                 if (value instanceof BigInteger) {
@@ -637,7 +637,7 @@ public class ImageInstanceService extends ModelService {
             result.put("project", result.get("projectId"));
             result.put("user", result.get("userId"));
 
-            JsonObject object = ImageInstance.getDataFromDomain(new ImageInstance().buildDomainFromJson(result, entityManager)); //TODO: select N+1
+            org.cytomine.common.repository.utils.JsonObject object = ImageInstance.getDataFromDomain(new ImageInstance().buildDomainFromJson(result, entityManager)); //TODO: select N+1
             object.put("numberOfAnnotations", result.get("countImageAnnotations"));
             object.put("numberOfJobAnnotations", result.get("countImageJobAnnotations"));
             object.put("numberOfReviewedAnnotations", result.get("countImageReviewedAnnotations"));
@@ -660,7 +660,7 @@ public class ImageInstanceService extends ModelService {
         if (light) {
             List<Map<String, Object>> lightResult = new ArrayList<>();
             for (Map<String, Object> result : results) {
-                lightResult.add(JsonObject.of("id", result.get("id"), "instanceFilename", result.get("instanceFilename"), "blindedName", result.get("blindedName")));
+                lightResult.add(org.cytomine.common.repository.utils.JsonObject.of("id", result.get("id"), "instanceFilename", result.get("instanceFilename"), "blindedName", result.get("blindedName")));
             }
             results = lightResult;
         }
@@ -711,12 +711,12 @@ public class ImageInstanceService extends ModelService {
 
     }
 
-    public JsonObject listTree(Project project, Long offset, Long max) {
+    public org.cytomine.common.repository.utils.JsonObject listTree(Project project, Long offset, Long max) {
         securityACLService.check(project, READ);
-        List<JsonObject> children = new ArrayList<>();
+        List<org.cytomine.common.repository.utils.JsonObject> children = new ArrayList<>();
         Page<Map<String, Object>> images = list(project, new ArrayList<>(), null, null, offset, max, false, false);
         for (Map<String, Object> image : images.getContent()) {
-            JsonObject jsonObject = new JsonObject();
+            org.cytomine.common.repository.utils.JsonObject jsonObject = new org.cytomine.common.repository.utils.JsonObject();
             jsonObject.put("id", image.get("id"));
             jsonObject.put("key", image.get("id"));
             jsonObject.put("title", image.get("instanceFilename"));
@@ -725,7 +725,7 @@ public class ImageInstanceService extends ModelService {
             children.add(jsonObject);
         }
 
-        JsonObject tree = new JsonObject();
+        org.cytomine.common.repository.utils.JsonObject tree = new org.cytomine.common.repository.utils.JsonObject();
         tree.put("isFolder", true);
         tree.put("hideCheckbox", true);
         tree.put("name", project.getName());
@@ -783,7 +783,7 @@ public class ImageInstanceService extends ModelService {
      * @param json New domain data
      * @return Response structure (created domain data,..)
      */
-    public CommandResponse add(JsonObject json) {
+    public CommandResponse add(org.cytomine.common.repository.utils.JsonObject json) {
         if(json.isMissing("baseImage")) throw new WrongArgumentException("abstract image not set");
         if(json.isMissing("project")) throw new WrongArgumentException("project not set");
         User currentUser = currentUserService.getCurrentUser();
@@ -832,7 +832,7 @@ public class ImageInstanceService extends ModelService {
      * @return Response structure (new domain data, old domain data..)
      */
     @Override
-    public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
+    public CommandResponse update(CytomineDomain domain, org.cytomine.common.repository.utils.JsonObject jsonNewData, Transaction transaction) {
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.check(domain.container(), READ);
         securityACLService.checkUser(currentUser);
@@ -843,7 +843,7 @@ public class ImageInstanceService extends ModelService {
 
         jsonNewData.putIfAbsent("user", ((ImageInstance) domain).getUser().getId());
 
-        JsonObject attributes = domain.toJsonObject();
+        org.cytomine.common.repository.utils.JsonObject attributes = domain.toJsonObject();
         CommandResponse commandResponse = executeCommand(new EditCommand(currentUser, transaction), domain, jsonNewData);
 
         ImageInstance imageInstance = (ImageInstance) commandResponse.getObject();

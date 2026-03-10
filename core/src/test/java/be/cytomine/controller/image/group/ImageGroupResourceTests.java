@@ -17,7 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.domain.image.group.ImageGroup;
-import be.cytomine.utils.JsonObject;
+
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;

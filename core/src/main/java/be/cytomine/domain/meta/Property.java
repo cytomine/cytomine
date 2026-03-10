@@ -25,7 +25,7 @@ import lombok.Setter;
 
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.GenericCytomineDomainContainer;
-import be.cytomine.utils.JsonObject;
+
 
 @Entity
 @Getter

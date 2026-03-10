@@ -21,7 +21,7 @@ import be.cytomine.dto.auth.AuthInformation;
 import be.cytomine.domain.security.User;
 import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.CurrentUserService;
-import be.cytomine.utils.JsonObject;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

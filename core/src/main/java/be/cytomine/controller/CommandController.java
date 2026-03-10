@@ -40,7 +40,7 @@ import be.cytomine.repository.command.CommandRepository;
 import be.cytomine.service.CommandService;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.utils.CommandResponse;
-import be.cytomine.utils.JsonObject;
+
 
 @RestController
 @RequestMapping("")

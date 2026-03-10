@@ -41,7 +41,7 @@ import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.service.utils.TaskService;
 import be.cytomine.service.utils.ValidateGeometryService;
 import be.cytomine.utils.CommandResponse;
-import be.cytomine.utils.JsonObject;
+
 import be.cytomine.utils.Task;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.ParseException;

@@ -19,6 +19,7 @@ package be.cytomine.domain.image;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.image.server.Storage;
 import be.cytomine.domain.security.User;
+
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.LTreeType;
 import be.cytomine.utils.LongArrayToBytesConverter;

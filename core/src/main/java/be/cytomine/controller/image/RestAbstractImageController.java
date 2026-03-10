@@ -14,7 +14,7 @@ import be.cytomine.service.image.ImagePropertiesService;
 import be.cytomine.service.image.SliceCoordinatesService;
 import be.cytomine.service.middleware.ImageServerService;
 import be.cytomine.service.project.ProjectService;
-import be.cytomine.utils.JsonObject;
+
 import org.locationtech.jts.io.ParseException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

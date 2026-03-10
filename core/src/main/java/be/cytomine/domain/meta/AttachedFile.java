@@ -2,7 +2,7 @@ package be.cytomine.domain.meta;
 
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.GenericCytomineDomainContainer;
-import be.cytomine.utils.JsonObject;
+
 import lombok.Getter;
 import lombok.Setter;
 

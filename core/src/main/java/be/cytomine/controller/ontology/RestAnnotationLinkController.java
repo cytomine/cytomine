@@ -8,7 +8,7 @@ import be.cytomine.repository.ontology.AnnotationLinkRepository;
 import be.cytomine.service.command.TransactionService;
 import be.cytomine.service.ontology.AnnotationGroupService;
 import be.cytomine.service.ontology.AnnotationLinkService;
-import be.cytomine.utils.JsonObject;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

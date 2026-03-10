@@ -31,7 +31,7 @@ import be.cytomine.repository.image.UploadedFileRepository;
 import be.cytomine.service.CommandService;
 import be.cytomine.service.command.TransactionService;
 import be.cytomine.utils.CommandResponse;
-import be.cytomine.utils.JsonObject;
+
 import be.cytomine.utils.filters.SearchOperation;
 import be.cytomine.utils.filters.SearchParameterEntry;
 import org.assertj.core.api.AssertionsForClassTypes;

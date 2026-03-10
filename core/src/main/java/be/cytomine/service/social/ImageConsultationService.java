@@ -40,14 +40,13 @@ import be.cytomine.repository.project.ProjectRepository;
 import be.cytomine.repositorynosql.social.PersistentImageConsultationRepository;
 import be.cytomine.repositorynosql.social.PersistentProjectConnectionRepository;
 import be.cytomine.repositorynosql.social.PersistentUserPositionRepository;
-import be.cytomine.repositorynosql.social.*;
 import be.cytomine.service.AnnotationListingService;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.UrlApi;
 import be.cytomine.service.database.SequenceService;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.security.SecurityACLService;
-import be.cytomine.utils.JsonObject;
+
 
 import static com.mongodb.client.model.Aggregates.group;
 import static com.mongodb.client.model.Aggregates.limit;
@@ -239,7 +238,7 @@ public class ImageConsultationService {
                 } else {
                     filename = "Image " + imageInstanceId;
                 }
-                be.cytomine.utils.JsonObject jsonObject = new be.cytomine.utils.JsonObject();
+                org.cytomine.common.repository.utils.JsonObject jsonObject = new org.cytomine.common.repository.utils.JsonObject();
                 jsonObject.put("created", result.get("date"));
                 jsonObject.put("image", imageInstanceId);
                 jsonObject.put("user", result.get("user"));

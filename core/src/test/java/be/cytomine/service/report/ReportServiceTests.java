@@ -21,7 +21,7 @@ import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.PostGisTestConfiguration;
 import be.cytomine.exceptions.ServerException;
 import be.cytomine.service.utils.ReportFormatService;
-import be.cytomine.utils.JsonObject;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;

@@ -28,7 +28,7 @@ import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.ontology.AnnotationTermRepository;
 import be.cytomine.service.CommandService;
 import be.cytomine.utils.CommandResponse;
-import be.cytomine.utils.JsonObject;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -19,7 +19,7 @@ import be.cytomine.dto.image.WindowParameter;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.image.*;
 import be.cytomine.service.middleware.ImageServerService;
-import be.cytomine.utils.JsonObject;
+
 
 @RestController
 @RequestMapping("/api")
@@ -68,7 +68,7 @@ public class RestSliceInstanceController extends RestCytomineController {
                 .orElseThrow(() -> new ObjectNotFoundException("SliceInstance", id + "[" + channel + "-" + zStack + "-" + time + "]"));
         return responseSuccess(sliceInstance);
     }
-    
+
     @PostMapping("/sliceinstance.json")
     public ResponseEntity<String> add(@RequestBody String json) {
         log.debug("REST request to save sliceinstance : " + json);

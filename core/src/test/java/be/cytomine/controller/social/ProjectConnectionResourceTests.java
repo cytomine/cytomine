@@ -26,7 +26,7 @@ import be.cytomine.domain.social.PersistentProjectConnection;
 import be.cytomine.repositorynosql.social.LastConnectionRepository;
 import be.cytomine.repositorynosql.social.PersistentProjectConnectionRepository;
 import be.cytomine.service.social.ProjectConnectionService;
-import be.cytomine.utils.JsonObject;
+
 import org.apache.commons.lang3.time.DateUtils;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
@@ -101,7 +101,7 @@ public class ProjectConnectionResourceTests {
         jsonObject.put("os", "Linux");
         jsonObject.put("browser", "chrome");
         jsonObject.put("browserVersion", "97.0.4692");
-        
+
         restProjectConnectionControllerMockMvc.perform(post("/api/project/{id}/userconnection.json", project.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonObject.toJsonString()))
@@ -111,7 +111,7 @@ public class ProjectConnectionResourceTests {
                 .andExpect(jsonPath("$.project").value(project.getId()))
                 .andExpect(jsonPath("$.browser").exists())
                 .andExpect(jsonPath("$.browserVersion").exists());
-        
+
     }
 
     @Test

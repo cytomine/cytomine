@@ -12,7 +12,7 @@ import lombok.Setter;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.annotation.AnnotationLayer;
 import be.cytomine.domain.image.ImageInstance;
-import be.cytomine.utils.JsonObject;
+
 
 @Setter
 @Getter

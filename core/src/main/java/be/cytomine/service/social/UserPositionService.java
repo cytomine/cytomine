@@ -27,7 +27,7 @@ import be.cytomine.dto.image.AreaDTO;
 import be.cytomine.repositorynosql.social.*;
 import be.cytomine.service.database.SequenceService;
 import be.cytomine.service.security.SecurityACLService;
-import be.cytomine.utils.JsonObject;
+
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Accumulators;

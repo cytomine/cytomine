@@ -6,7 +6,7 @@ import be.cytomine.repository.image.AbstractImageRepository;
 import be.cytomine.repository.image.AbstractSliceRepository;
 import be.cytomine.repository.meta.PropertyRepository;
 import be.cytomine.service.middleware.ImageServerService;
-import be.cytomine.utils.JsonObject;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

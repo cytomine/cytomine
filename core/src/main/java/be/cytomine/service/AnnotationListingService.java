@@ -25,7 +25,7 @@ import be.cytomine.repository.UserAnnotationListing;
 import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.service.utils.KmeansGeometryService;
 import be.cytomine.utils.GisUtils;
-import be.cytomine.utils.JsonObject;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

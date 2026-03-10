@@ -13,7 +13,6 @@ import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.ontology.AnnotationDomainRepository;
 import be.cytomine.service.social.AnnotationActionService;
@@ -22,7 +21,7 @@ import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.image.SliceInstanceService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.security.UserService;
-import be.cytomine.utils.JsonObject;
+
 
 /**
  * Controller for user position

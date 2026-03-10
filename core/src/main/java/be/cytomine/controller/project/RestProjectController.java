@@ -24,7 +24,7 @@ import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.search.ProjectSearchExtension;
 import be.cytomine.service.security.UserService;
 import be.cytomine.service.utils.TaskService;
-import be.cytomine.utils.JsonObject;
+
 import be.cytomine.utils.Task;
 import be.cytomine.utils.filters.SearchParameterEntry;
 

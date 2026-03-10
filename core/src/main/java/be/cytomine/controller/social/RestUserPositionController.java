@@ -21,13 +21,7 @@ import be.cytomine.service.image.SliceInstanceService;
 import be.cytomine.service.security.UserService;
 import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.service.social.UserPositionService;
-import be.cytomine.utils.JsonObject;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 
 /**
  * Controller for user position

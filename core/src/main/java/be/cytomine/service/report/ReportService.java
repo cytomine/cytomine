@@ -29,7 +29,7 @@ import org.springframework.stereotype.Service;
 import be.cytomine.exceptions.ServerException;
 import be.cytomine.service.utils.ReportFormatService;
 import be.cytomine.utils.DateUtils;
-import be.cytomine.utils.JsonObject;
+
 
 @Slf4j
 @Service

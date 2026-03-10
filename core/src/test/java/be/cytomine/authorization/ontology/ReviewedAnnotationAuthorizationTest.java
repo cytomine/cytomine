@@ -40,7 +40,7 @@ import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.service.PermissionService;
 import be.cytomine.service.ontology.ReviewedAnnotationService;
 import be.cytomine.service.security.SecurityACLService;
-import be.cytomine.utils.JsonObject;
+
 
 @AutoConfigureMockMvc
 @SpringBootTest(classes = CytomineCoreApplication.class)

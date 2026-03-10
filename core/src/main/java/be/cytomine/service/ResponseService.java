@@ -18,7 +18,7 @@ package be.cytomine.service;
 
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.utils.CommandResponse;
-import be.cytomine.utils.JsonObject;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;

@@ -9,7 +9,7 @@ import be.cytomine.repository.image.AbstractImageRepository;
 import be.cytomine.service.image.CompanionFileService;
 import be.cytomine.service.image.UploadedFileService;
 import be.cytomine.service.middleware.ImageServerService;
-import be.cytomine.utils.JsonObject;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.mvc.ProxyExchange;

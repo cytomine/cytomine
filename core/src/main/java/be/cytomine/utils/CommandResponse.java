@@ -17,12 +17,12 @@ public class CommandResponse {
 
     Map<String, Object> data;
 
-    public JsonObject toJsonObject() {
+    public org.cytomine.common.repository.utils.JsonObject toJsonObject() {
         return getDataFromDomain(this);
     }
 
-    public static JsonObject getDataFromDomain(CommandResponse domain) {
-       JsonObject jsonObject = new JsonObject();
+    public static org.cytomine.common.repository.utils.JsonObject getDataFromDomain(CommandResponse domain) {
+       org.cytomine.common.repository.utils.JsonObject jsonObject = new org.cytomine.common.repository.utils.JsonObject();
        jsonObject.put("status", domain.getStatus());
        jsonObject.put("object", domain.getObject().toJsonObject());
        jsonObject.put("data", domain.getData());

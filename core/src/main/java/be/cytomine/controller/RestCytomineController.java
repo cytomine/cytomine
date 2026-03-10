@@ -13,7 +13,7 @@ import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.service.ModelService;
 import be.cytomine.service.command.TransactionService;
 import be.cytomine.utils.CommandResponse;
-import be.cytomine.utils.JsonObject;
+
 import be.cytomine.utils.OffsetBasedPageRequest;
 import be.cytomine.utils.RequestParams;
 import be.cytomine.utils.Task;

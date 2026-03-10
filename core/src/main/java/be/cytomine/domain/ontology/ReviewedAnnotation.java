@@ -22,7 +22,7 @@ import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.service.UrlApi;
-import be.cytomine.utils.JsonObject;
+
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;

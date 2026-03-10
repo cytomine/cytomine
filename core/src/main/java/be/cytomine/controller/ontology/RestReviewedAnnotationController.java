@@ -18,7 +18,7 @@ import be.cytomine.service.utils.ParamsService;
 import be.cytomine.service.utils.TaskService;
 import be.cytomine.utils.AnnotationListingBuilder;
 import be.cytomine.utils.CommandResponse;
-import be.cytomine.utils.JsonObject;
+
 import be.cytomine.utils.Task;
 import org.locationtech.jts.io.ParseException;
 import lombok.RequiredArgsConstructor;

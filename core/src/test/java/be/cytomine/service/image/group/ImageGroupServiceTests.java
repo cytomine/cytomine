@@ -18,7 +18,7 @@ import be.cytomine.domain.image.group.ImageGroup;
 import be.cytomine.domain.project.Project;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.utils.CommandResponse;
-import be.cytomine.utils.JsonObject;
+
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 

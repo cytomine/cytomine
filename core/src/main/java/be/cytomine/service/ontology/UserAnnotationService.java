@@ -47,7 +47,7 @@ import be.cytomine.service.utils.SimplifyGeometryService;
 import be.cytomine.service.utils.ValidateGeometryService;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.GeometryUtils;
-import be.cytomine.utils.JsonObject;
+
 import be.cytomine.utils.Task;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;

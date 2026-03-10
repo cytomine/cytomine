@@ -13,7 +13,7 @@ import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.meta.AttachedFile;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.meta.AttachedFileService;
-import be.cytomine.utils.JsonObject;
+
 
 @Slf4j
 @RequiredArgsConstructor

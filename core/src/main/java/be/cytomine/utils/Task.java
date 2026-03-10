@@ -32,8 +32,8 @@ public class Task {
     private boolean printInActivity = false;
 
 
-    public JsonObject toJsonObject() {
-        JsonObject map = new JsonObject();
+    public org.cytomine.common.repository.utils.JsonObject toJsonObject() {
+        org.cytomine.common.repository.utils.JsonObject map = new org.cytomine.common.repository.utils.JsonObject();
         map.put("id", id);
         map.put("progress", progress);
         map.put("project", projectIdent);

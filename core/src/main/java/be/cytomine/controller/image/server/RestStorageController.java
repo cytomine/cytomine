@@ -4,7 +4,7 @@ import be.cytomine.controller.RestCytomineController;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.image.server.StorageService;
 import be.cytomine.service.utils.TaskService;
-import be.cytomine.utils.JsonObject;
+
 import be.cytomine.utils.Task;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

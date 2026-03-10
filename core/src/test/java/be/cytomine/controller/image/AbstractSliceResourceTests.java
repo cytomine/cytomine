@@ -21,7 +21,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.PostGisTestConfiguration;
 import be.cytomine.domain.image.AbstractSlice;
-import be.cytomine.utils.JsonObject;
+
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.RequestPatternBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
@@ -71,7 +71,7 @@ public class AbstractSliceResourceTests {
     private MockMvc restAbstractSliceControllerMockMvc;
 
     private static WireMockServer wireMockServer = new WireMockServer(8888);
-    
+
     @BeforeAll
     public static void beforeAll() {
         wireMockServer.start();

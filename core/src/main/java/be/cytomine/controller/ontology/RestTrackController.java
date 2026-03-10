@@ -10,7 +10,7 @@ import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.image.ImageInstanceRepository;
 import be.cytomine.repository.project.ProjectRepository;
 import be.cytomine.service.ontology.TrackService;
-import be.cytomine.utils.JsonObject;
+
 
 @Slf4j
 @RequiredArgsConstructor

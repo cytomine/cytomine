@@ -28,7 +28,7 @@ import be.cytomine.service.command.TransactionService;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.utils.CommandResponse;
-import be.cytomine.utils.JsonObject;
+
 import be.cytomine.utils.Task;
 
 import static org.springframework.security.acls.domain.BasePermission.READ;

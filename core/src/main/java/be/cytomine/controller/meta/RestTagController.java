@@ -3,7 +3,7 @@ package be.cytomine.controller.meta;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.service.meta.TagService;
 import be.cytomine.service.utils.TaskService;
-import be.cytomine.utils.JsonObject;
+
 import be.cytomine.utils.Task;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

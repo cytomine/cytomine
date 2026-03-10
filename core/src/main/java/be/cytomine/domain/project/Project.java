@@ -18,6 +18,7 @@ package be.cytomine.domain.project;
 
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.ontology.Ontology;
+
 import be.cytomine.utils.JsonObject;
 import lombok.Getter;
 import lombok.Setter;

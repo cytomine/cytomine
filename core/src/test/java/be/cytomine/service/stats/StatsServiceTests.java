@@ -13,7 +13,7 @@ import be.cytomine.repositorynosql.social.*;
 import be.cytomine.service.social.AnnotationActionService;
 import be.cytomine.service.social.ImageConsultationService;
 import be.cytomine.service.social.ProjectConnectionService;
-import be.cytomine.utils.JsonObject;
+
 import com.github.tomakehurst.wiremock.WireMockServer;
 import org.locationtech.jts.io.ParseException;
 import org.apache.commons.lang3.time.DateUtils;
@@ -507,6 +507,6 @@ public class StatsServiceTests {
         assertThat(jsonObjects.get(1).getJSONAttrLong("size")).isEqualTo(3);
         assertThat(jsonObjects.get(2).getJSONAttrLong("size")).isEqualTo(3);
     }
-    
-    
+
+
 }

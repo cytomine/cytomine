@@ -18,11 +18,11 @@ package be.cytomine.domain.ontology;
 
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.utils.JsonObject;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 
 @Entity

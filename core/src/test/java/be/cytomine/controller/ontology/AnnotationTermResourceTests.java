@@ -24,7 +24,7 @@ import be.cytomine.domain.ontology.AnnotationTerm;
 import be.cytomine.domain.ontology.ReviewedAnnotation;
 import be.cytomine.repository.ontology.AnnotationTermRepository;
 import be.cytomine.service.ontology.AnnotationTermService;
-import be.cytomine.utils.JsonObject;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;

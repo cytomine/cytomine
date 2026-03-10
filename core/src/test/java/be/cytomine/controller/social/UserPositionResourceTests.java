@@ -32,7 +32,7 @@ import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.social.UserPositionService;
 import be.cytomine.service.social.UserPositionServiceTests;
 import be.cytomine.service.social.WebSocketUserPositionHandler;
-import be.cytomine.utils.JsonObject;
+
 import org.apache.commons.lang3.time.DateUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

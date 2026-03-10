@@ -42,7 +42,7 @@ import be.cytomine.dto.image.WindowParameter;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.utils.SimplifyGeometryService;
-import be.cytomine.utils.JsonObject;
+
 import be.cytomine.utils.PreparedRequest;
 import be.cytomine.utils.StringUtils;
 

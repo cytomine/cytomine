@@ -30,7 +30,7 @@ import be.cytomine.service.meta.PropertyService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.security.UserService;
 import be.cytomine.utils.GeometryUtils;
-import be.cytomine.utils.JsonObject;
+
 
 
 
@@ -41,9 +41,9 @@ import be.cytomine.utils.JsonObject;
 public class RestPropertyController extends RestCytomineController {
 
     private final PropertyService propertyService;
-    
+
     private final ProjectService projectService;
-    
+
     private final ImageInstanceService imageInstanceService;
 
     private final AnnotationDomainRepository annotationDomainRepository;
@@ -155,7 +155,7 @@ public class RestPropertyController extends RestCytomineController {
         return responseSuccess(propertyService.findByDomainAndKey(project, key)
                 .orElseThrow(() -> new ObjectNotFoundException("Property", projectId + "/" + key)));
     }
-    
+
     @GetMapping("/project/{project}/property/{id}.json")
     public ResponseEntity<String> showProject(
             @PathVariable("project") Long projectId,

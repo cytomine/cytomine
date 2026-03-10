@@ -1,5 +1,6 @@
 package be.cytomine.domain.image.group;
 
+import be.cytomine.utils.JsonObject;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.FetchType;
@@ -9,7 +10,7 @@ import lombok.Setter;
 
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.image.ImageInstance;
-import be.cytomine.utils.JsonObject;
+
 
 @Entity
 @Getter

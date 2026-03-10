@@ -9,7 +9,7 @@ import be.cytomine.repository.project.ProjectRepository;
 import be.cytomine.service.meta.TagDomainAssociationService;
 import be.cytomine.service.meta.TagService;
 import be.cytomine.service.utils.TaskService;
-import be.cytomine.utils.JsonObject;
+
 import be.cytomine.utils.RequestParams;
 import be.cytomine.utils.Task;
 import be.cytomine.utils.filters.SearchParameterEntry;

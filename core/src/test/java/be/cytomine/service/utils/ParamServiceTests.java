@@ -17,7 +17,7 @@ import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.repository.AnnotationListing;
-import be.cytomine.utils.JsonObject;
+
 
 import static org.assertj.core.api.Assertions.assertThat;
 

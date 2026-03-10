@@ -13,7 +13,7 @@ import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.image.*;
 import be.cytomine.service.middleware.ImageServerService;
 import be.cytomine.service.project.ProjectService;
-import be.cytomine.utils.JsonObject;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.io.ParseException;
@@ -90,7 +90,7 @@ public class RestAbstractSliceController extends RestCytomineController {
                 .orElseThrow(() -> new ObjectNotFoundException("AbstractSlice", id + "[" + channel + "-" + zStack + "-" + time + "]"));
         return responseSuccess(abstractSlice);
     }
-    
+
     @PostMapping("/abstractslice.json")
     public ResponseEntity<String> add(@RequestBody String json) {
         log.debug("REST request to save abstractslice : " + json);

@@ -23,7 +23,7 @@ import be.cytomine.domain.security.User;
 import be.cytomine.dto.image.Point;
 import be.cytomine.service.ontology.TermService;
 import be.cytomine.service.report.ReportService;
-import be.cytomine.utils.JsonObject;
+
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 

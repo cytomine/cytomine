@@ -17,7 +17,7 @@ import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.image.UploadedFileService;
 import be.cytomine.service.middleware.ImageServerService;
-import be.cytomine.utils.JsonObject;
+
 import be.cytomine.utils.RequestParams;
 
 @RestController

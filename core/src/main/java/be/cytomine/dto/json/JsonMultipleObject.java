@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import be.cytomine.utils.JsonObject;
+
 
 @Data
 @EqualsAndHashCode(callSuper=false)

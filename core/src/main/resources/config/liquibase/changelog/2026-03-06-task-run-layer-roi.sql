@@ -3,7 +3,8 @@
 --changeset bathienle:add-roi-to-task-run-layer
 ALTER TABLE task_run_layer
     ADD COLUMN roi_id BIGINT REFERENCES user_annotation(id),
-    ADD COLUMN parameter_name VARCHAR(255);
+    ADD COLUMN parameter_name VARCHAR(255),
+    ADD COLUMN derived_from VARCHAR(255);
 
 ALTER TABLE task_run_layer
     DROP COLUMN x_offset,

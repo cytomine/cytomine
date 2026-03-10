@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -150,17 +152,19 @@ public class TaskRunService {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error parsing JSON response");
         }
 
-        boolean hasGeometry = taskRunOutputResponse.stream()
-                .map(TaskRunOutputResponse::type)
-                .anyMatch(this::containsGeometry);
+        Set<TaskRunOutputResponse> outputResponses = taskRunOutputResponse.stream()
+                .filter(output -> containsGeometry(output.type()))
+                .collect(Collectors.toSet());
 
-        if (hasGeometry) {
+        for (TaskRunOutputResponse output : outputResponses) {
             String layerName = annotationLayerService.createLayerName(taskRunResponse.task().name(), taskRunResponse.task().version(), taskRun.getCreated());
             AnnotationLayer annotationLayer = annotationLayerService.createAnnotationLayer(layerName);
             TaskRunLayer newLayer = new TaskRunLayer();
             newLayer.setAnnotationLayer(annotationLayer);
             newLayer.setTaskRun(taskRun);
             newLayer.setImage(taskRun.getImage());
+            newLayer.setParameterName(output.name());
+            newLayer.setDerivedFrom(output.derivedFrom());
             taskRunLayerRepository.saveAndFlush(newLayer);
         }
 
@@ -369,7 +373,7 @@ public class TaskRunService {
                             }
 
                             TaskRunLayer taskRunLayer = taskRunLayerRepository
-                                    .findByTaskRunAndImage(taskRun, taskRun.getImage())
+                                    .findByTaskRunAndParameterName(taskRun, parameterName)
                                     .orElse(new TaskRunLayer(annotationLayer, taskRun, taskRun.getImage(), annotation, parameterName));
                             CropOffset cropOffset = new CropOffset((int) bounds.getMinX(), (int) bounds.getMinY(), taskRunLayer, i-1);
                             taskRunLayer.getOffsets().add(cropOffset);
@@ -676,7 +680,11 @@ public class TaskRunService {
                 .filter(this::hasGeometrySubType)
                 .toList();
 
+        Map<String, TaskRunLayer> layersByParameterName = taskRunLayers.stream()
+                .collect(Collectors.toMap(TaskRunLayer::getParameterName, Function.identity()));
+
         for (TaskRunValue arrayValue : geometryArrays) {
+            TaskRunLayer matchedLayer = layersByParameterName.get(arrayValue.getParameterName());
             //processGeometryValue(arrayValue, annotationLayer, taskRunLayer);
         }
 

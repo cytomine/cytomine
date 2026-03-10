@@ -27,6 +27,8 @@ jobs:
             target: production
           - name: core
             target: production
+            context: "."
+            dockerfile_location: core
           - name: iam
             target: production
           - name: nginx
@@ -42,6 +44,9 @@ jobs:
           - name: e2e-tests
             context: "."
             dockerfile_location: e2e-tests
+          - name: repository
+            context: "."
+            dockerfile_location: repository
 
     steps:
       - name: Checkout repository

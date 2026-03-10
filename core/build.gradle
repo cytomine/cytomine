@@ -45,7 +45,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
-
     // Hibernate
     annotationProcessor 'org.hibernate.orm:hibernate-jpamodelgen'
     implementation 'org.hibernate.orm:hibernate-core'
@@ -132,6 +131,7 @@ dependencies {
     // Utils
     implementation 'org.apache.commons:commons-text:1.11.0'
     implementation 'net.bull.javamelody:javamelody-spring-boot-starter:2.1.0'
+    implementation project(":common")
 }
 
 test {

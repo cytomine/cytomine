@@ -60,12 +60,12 @@ public class SecurityConfiguration {
                 )
                 .authorizeHttpRequests((authorizeHttpRequests) ->
                         authorizeHttpRequests
-                                .requestMatchers(new AntPathRequestMatcher("/api/abstractimage/**")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/api/imageinstance/**")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/api/uploadedfile/*/download")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/api/userannotation/**")).permitAll()
+                                .requestMatchers("/api/abstractimage/**").permitAll()
+                                .requestMatchers("/api/imageinstance/**").permitAll()
+                                .requestMatchers("/api/uploadedfile/*/download").permitAll()
+                                .requestMatchers("/api/userannotation/**").permitAll()
 
-                                .requestMatchers(new AntPathRequestMatcher("/api/**")).authenticated()
+                                .requestMatchers("/api/**").authenticated()
                                 .requestMatchers("/session/admin/info.json").authenticated()
                                 .requestMatchers("/session/admin/open.json").authenticated()
                                 .requestMatchers("/session/admin/close.json").authenticated()
@@ -74,7 +74,7 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.GET, "/server/ping.json").permitAll() // TODO 2024.2 - LAST CONNECTION (IN A PROJECT)
                                 .requestMatchers(HttpMethod.POST, "/server/ping").permitAll() // TODO 2024.2 - LAST CONNECTION (IN A PROJECT)
                                 .requestMatchers(HttpMethod.POST, "/server/ping.json").permitAll() // TODO 2024.2 - LAST CONNECTION (IN A PROJECT)
-                                .requestMatchers(new AntPathRequestMatcher("/**")).permitAll() // TODO IAM: remove ?
+                                .requestMatchers("/**").permitAll() // TODO IAM: remove ?
                 );
         http
             .addFilterBefore(new TokenFromParameterFilter(), BearerTokenAuthenticationFilter.class)

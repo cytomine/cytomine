@@ -5,6 +5,8 @@ services:
   mongo:
     image: mongo:4.4-focal
     restart: unless-stopped
+    ports:
+      - 27017:27017
     volumes:
       - ${DATA_PATH:-./data}/mongo:/data/db
     environment:
@@ -18,6 +20,8 @@ services:
   postgis:
     image: postgis/postgis:15-3.5
     restart: unless-stopped
+    ports:
+      - 5432:5432
     volumes:
       - ${DATA_PATH:-./data}/postgis/data:/var/lib/postgresql/data
     environment:
@@ -31,6 +35,8 @@ services:
   registry:
     image: registry:2.8.3
     restart: unless-stopped
+    ports:
+    - 5000:5000
     volumes:
       - ${DATA_PATH:-./data}/registry:/var/lib/registry
     environment:
@@ -62,7 +68,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime
     environment:
-      <<: [*version-env]
+      <<: [ *version-env ]
     networks:
       host_network:
         ipv4_address: 172.16.238.7
@@ -72,6 +78,8 @@ services:
     restart: unless-stopped
     depends_on:
       - pims-cache
+    ports:
+      - 5001:5000
     volumes:
       - ${IMPORT_PATH:-./data/dataset}:/dataset
       - ${DATA_PATH:-./data}/images:/data/images
@@ -114,6 +122,8 @@ services:
     restart: unless-stopped
     depends_on:
       - iam-db
+    ports:
+      - 8070:8080
     environment:
       KC_ADMIN_EMAIL: mail@mail.com
       KC_DB_PASSWORD: password
@@ -143,6 +153,8 @@ services:
   app-engine-db:
     image: postgres:14
     restart: unless-stopped
+    ports:
+      - 5433:5432
     volumes:
       - ${DATA_PATH:-./data}/app-engine-db/data:/var/lib/postgresql/data
     environment:
@@ -193,6 +205,8 @@ services:
       - iam
       - mongo
       - postgis
+    ports:
+      - 8080:8080
     volumes:
       - /etc/localtime:/etc/localtime
     environment:
@@ -227,6 +241,8 @@ services:
     restart: unless-stopped
     depends_on:
       - redis
+    ports:
+      - 6000:6000
     volumes:
       - ${DATA_PATH:-./data}/cbir:/data/cbir
       - ${DATA_PATH:-./data}/weights:/weights
@@ -244,6 +260,8 @@ services:
   sam:
     image: cytomine/sam:latest
     restart: unless-stopped
+    ports:
+      - 8000:8000
     volumes:
       - ${DATA_PATH:-./data}/weights:/weights
     environment:
@@ -264,7 +282,7 @@ services:
       - pims
       - web-ui
     environment:
-      <<: [*version-env]
+      <<: [ *version-env ]
       IMAGES_CORE: cytomine/core:latest
       IMAGES_MONGO: mongo:4.4-focal
       IMAGES_NGINX: cytomine/nginx:latest
@@ -313,8 +331,8 @@ services:
         ipv4_address: 172.16.238.15
 
 volumes:
-  k3s-server: {}
-  k3s-agent: {}
+  k3s-server: { }
+  k3s-agent: { }
 
 networks:
   host_network:

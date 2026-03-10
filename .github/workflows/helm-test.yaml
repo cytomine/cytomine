@@ -82,6 +82,7 @@ jobs:
           EXTRA_ARGS+="--set images.cbir=registry.cytomine.org/cytomine/cbir:${{ github.sha }} "
           EXTRA_ARGS+="--set images.pims=registry.cytomine.org/cytomine/pims:${{ github.sha }} "
           EXTRA_ARGS+="--set images.pims_import=registry.cytomine.org/cytomine/python-client:${{ github.sha }} "
+          EXTRA_ARGS+="--set images.repository=registry.cytomine.org/cytomine/repository:${{ github.sha }} "
           EXTRA_ARGS+="--set images.e2e_tests=registry.cytomine.org/cytomine/e2e-tests:${{ github.sha }} "
           # External images from registry.cytomine.org/docker/
           EXTRA_ARGS+="--set images.alpine=registry.cytomine.org/docker/library/alpine:3.18 "

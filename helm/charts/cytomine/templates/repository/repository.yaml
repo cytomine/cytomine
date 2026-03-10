@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: repository
+  annotations:
+    kube-score/ignore: pod-probes,container-security-context-user-group-id
+  labels:
+    role: repository
+    app: repository
+    component: {{ .Release.Name }}-repository
+    release: {{ .Release.Name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: repository
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        role: repository
+        app: repository
+        release: {{ .Release.Name }}
+    spec:
+      securityContext:
+      {{- include "cytomine.podSecurityContext" . | nindent 8 }}
+      {{- with .Values.global.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+      - name: temp
+        emptyDir: {}
+      initContainers:
+        - name: repository-init
+          image: "{{ .Values.images.repository }}"
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -x
+              cp -r /app/* /fix/
+          volumeMounts:
+            - name: temp
+              mountPath: /fix
+          resources:
+            {{- toYaml .Values.repository.resources | nindent 12 }}
+      containers:
+        - name: repository
+          image: "{{ .Values.images.repository }}"
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          volumeMounts:
+            - name: temp
+              mountPath: /tmp
+            - name: temp
+              mountPath: /app
+          ports:
+            - name: http
+              containerPort: {{ .Values.repository.port }}
+          resources:
+            {{- toYaml .Values.repository.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /ping
+              port: {{ .Values.repository.port }}
+            initialDelaySeconds: 30
+            failureThreshold: 10
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /ping
+              port: {{ .Values.repository.port }}
+            initialDelaySeconds: 30
+            failureThreshold: 10
+            timeoutSeconds: 5
+      {{- with .Values.global.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

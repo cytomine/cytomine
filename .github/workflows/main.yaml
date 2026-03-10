@@ -28,6 +28,8 @@ jobs:
     uses: ./.github/workflows/sam.yaml
   web-ui:
     uses: ./.github/workflows/web-ui.yaml
+  repository:
+    uses: ./.github/workflows/repository.yaml
   e2e-tests:
     uses: ./.github/workflows/e2e-tests.yaml
 
@@ -41,6 +43,7 @@ jobs:
       - registry-client
       - sam
       - web-ui
+      - repository
       - e2e-tests
     uses: ./.github/workflows/docker.yaml
     secrets: inherit

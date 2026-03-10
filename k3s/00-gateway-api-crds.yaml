@@ -1,0 +1,42 @@
+# Install Gateway API CRDs before other components
+# Named with 00- prefix to ensure it runs first (k3s processes manifests alphabetically)
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: gateway-api-installer
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: gateway-api-installer
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+  - kind: ServiceAccount
+    name: gateway-api-installer
+    namespace: kube-system
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: install-gateway-api-crds
+  namespace: kube-system
+spec:
+  template:
+    spec:
+      serviceAccountName: gateway-api-installer
+      containers:
+        - name: kubectl
+          image: bitnami/kubectl:latest
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Installing Gateway API CRDs..."
+              kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.0/standard-install.yaml
+              echo "Gateway API CRDs installed successfully"
+      restartPolicy: OnFailure
+  backoffLimit: 10

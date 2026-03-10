@@ -21,6 +21,7 @@ services:
       - /sys/fs/bpf:/sys/fs/bpf:rshared
       - ../k3s/entrypoint.sh:/entrypoint:ro
       - ../k3s/serviceaccounts.yaml:/var/lib/rancher/k3s/server/manifests/serviceaccounts.yaml:ro
+      - ../k3s/00-gateway-api-crds.yaml:/var/lib/rancher/k3s/server/manifests/00-gateway-api-crds.yaml:ro
       - ../k3s/gateway.yaml:/var/lib/rancher/k3s/server/manifests/gateway.yaml:ro
       - ../k3s/cytomine-local-ns.yaml:/var/lib/rancher/k3s/server/manifests/cytomine-local-ns.yaml:ro
       - ../.kube/secrets/registries.yaml:/etc/rancher/k3s/registries.yaml:ro

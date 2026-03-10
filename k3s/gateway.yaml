@@ -3,23 +3,6 @@ kind: Namespace
 metadata:
   name: gateway-system
 ---
-# Install Gateway API CRDs before Cilium
-apiVersion: helm.cattle.io/v1
-kind: HelmChart
-metadata:
-  name: gateway-api-crds
-  namespace: kube-system
-spec:
-  repo: https://kubernetes-sigs.github.io/gateway-api
-  chart: gateway-api
-  version: v1.2.0
-  targetNamespace: gateway-system
-  valuesContent: |-
-    crds:
-      enabled: true
-    webhook:
-      enabled: false
----
 apiVersion: helm.cattle.io/v1
 kind: HelmChart
 metadata:

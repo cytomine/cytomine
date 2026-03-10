@@ -1,4 +1,5 @@
 package be.cytomine.service.ontology;
+import be.cytomine.utils.JsonObject;
 
 import jakarta.transaction.Transactional;
 import org.assertj.core.api.AssertionsForClassTypes;

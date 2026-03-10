@@ -1,4 +1,5 @@
 package be.cytomine.controller.project;
+import be.cytomine.utils.JsonObject;
 
 /*
 * Copyright (c) 2009-2022. Authors: see NOTICE file.

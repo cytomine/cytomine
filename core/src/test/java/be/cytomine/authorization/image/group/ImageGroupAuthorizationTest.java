@@ -1,4 +1,5 @@
 package be.cytomine.authorization.image.group;
+import be.cytomine.utils.JsonObject;
 
 import java.util.Optional;
 

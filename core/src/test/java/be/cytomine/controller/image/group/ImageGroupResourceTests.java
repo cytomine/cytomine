@@ -1,4 +1,5 @@
 package be.cytomine.controller.image.group;
+import be.cytomine.utils.JsonObject;
 
 import java.util.UUID;
 

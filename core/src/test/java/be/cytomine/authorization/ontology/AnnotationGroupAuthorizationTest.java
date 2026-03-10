@@ -1,4 +1,5 @@
 package be.cytomine.authorization.ontology;
+import be.cytomine.utils.JsonObject;
 
 import java.util.Optional;
 

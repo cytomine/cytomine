@@ -1,4 +1,5 @@
 package be.cytomine.service.stats;
+import be.cytomine.utils.JsonObject;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;

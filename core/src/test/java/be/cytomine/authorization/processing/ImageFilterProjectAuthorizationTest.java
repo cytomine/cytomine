@@ -1,4 +1,5 @@
 package be.cytomine.authorization.processing;
+import be.cytomine.utils.JsonObject;
 
 /*
 * Copyright (c) 2009-2022. Authors: see NOTICE file.

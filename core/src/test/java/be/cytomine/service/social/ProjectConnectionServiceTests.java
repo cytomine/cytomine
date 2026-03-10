@@ -1,4 +1,5 @@
 package be.cytomine.service.social;
+import be.cytomine.utils.JsonObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

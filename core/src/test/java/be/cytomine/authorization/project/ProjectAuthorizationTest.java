@@ -1,4 +1,5 @@
 package be.cytomine.authorization.project;
+import be.cytomine.utils.JsonObject;
 
 import java.util.*;
 

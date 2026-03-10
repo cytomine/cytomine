@@ -1,4 +1,5 @@
 package be.cytomine.service.utils;
+import be.cytomine.utils.JsonObject;
 
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;

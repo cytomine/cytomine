@@ -7,8 +7,12 @@ metadata:
     {{- include "cytomine.labels" . | nindent 4 }}
 spec:
   parentRefs:
+    {{- if .Values.gateway.parentRefs }}
+    {{- toYaml .Values.gateway.parentRefs | nindent 4 }}
+    {{- else }}
     - name: cytomine
       namespace: {{ .Release.Namespace }}
+    {{- end }}
   hostnames:
     - {{ .Values.global.domainName }}
   rules:

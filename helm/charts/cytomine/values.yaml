@@ -43,6 +43,14 @@ smtpPort: 587
 gateway:
   # Gateway class to use (e.g., cilium, envoy-gateway, nginx)
   className: cilium
+  # Parent references for HTTPRoute. If set, the helm chart will NOT create a Gateway
+  # and will instead reference an externally managed Gateway.
+  # Example:
+  #   parentRefs:
+  #     - name: my-gateway
+  #       namespace: gateway-namespace
+  #       sectionName: https
+  parentRefs: []
   # Annotations for the Gateway resource
   annotations: {}
   # Timeout settings for HTTPRoute

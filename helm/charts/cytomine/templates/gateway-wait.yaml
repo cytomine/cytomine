@@ -1,3 +1,4 @@
+{{- if not .Values.gateway.parentRefs }}
 apiVersion: v1
 kind: Pod
 metadata:
@@ -39,3 +40,4 @@ spec:
           echo "Warning: Gateway may not be fully ready"
           exit 0
   restartPolicy: Never
+{{- end }}

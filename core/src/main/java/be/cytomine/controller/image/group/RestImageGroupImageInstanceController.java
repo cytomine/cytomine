@@ -5,7 +5,7 @@ import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.image.group.ImageGroupImageInstanceService;
-
+import be.cytomine.utils.JsonObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

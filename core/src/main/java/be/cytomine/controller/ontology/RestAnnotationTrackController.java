@@ -7,7 +7,7 @@ import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.ontology.AnnotationDomainRepository;
 import be.cytomine.service.ontology.AnnotationTrackService;
 import be.cytomine.service.ontology.TrackService;
-
+import be.cytomine.utils.JsonObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

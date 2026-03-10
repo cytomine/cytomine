@@ -1,4 +1,5 @@
 package be.cytomine.domain.annotation;
+import be.cytomine.utils.JsonObject;
 
 import java.sql.Types;
 

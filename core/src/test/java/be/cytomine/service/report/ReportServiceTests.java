@@ -21,7 +21,8 @@ import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.PostGisTestConfiguration;
 import be.cytomine.exceptions.ServerException;
 import be.cytomine.service.utils.ReportFormatService;
-
+import be.cytomine.utils.JsonObject;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -30,15 +31,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 
-import jakarta.transaction.Transactional;
-
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.times;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc

@@ -1,5 +1,11 @@
 package be.cytomine.controller.security;
 
+import be.cytomine.controller.RestCytomineController;
+import be.cytomine.domain.security.User;
+import be.cytomine.exceptions.CytomineException;
+import be.cytomine.exceptions.ObjectNotFoundException;
+import be.cytomine.service.security.AclAuthService;
+import be.cytomine.utils.JsonObject;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,12 +15,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import be.cytomine.controller.RestCytomineController;
-import be.cytomine.domain.security.User;
-import be.cytomine.exceptions.CytomineException;
-import be.cytomine.exceptions.ObjectNotFoundException;
-import be.cytomine.service.security.AclAuthService;
 
 
 @Slf4j

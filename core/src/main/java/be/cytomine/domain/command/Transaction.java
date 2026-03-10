@@ -1,4 +1,5 @@
 package be.cytomine.domain.command;
+import be.cytomine.utils.JsonObject;
 
 /*
 * Copyright (c) 2009-2022. Authors: see NOTICE file.

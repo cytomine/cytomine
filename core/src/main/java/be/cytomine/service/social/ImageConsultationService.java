@@ -1,4 +1,5 @@
 package be.cytomine.service.social;
+import be.cytomine.utils.JsonObject;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -238,7 +239,7 @@ public class ImageConsultationService {
                 } else {
                     filename = "Image " + imageInstanceId;
                 }
-                org.cytomine.common.repository.utils.JsonObject jsonObject = new org.cytomine.common.repository.utils.JsonObject();
+                JsonObject jsonObject = new JsonObject();
                 jsonObject.put("created", result.get("date"));
                 jsonObject.put("image", imageInstanceId);
                 jsonObject.put("user", result.get("user"));

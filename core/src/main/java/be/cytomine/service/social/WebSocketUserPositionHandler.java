@@ -1,13 +1,13 @@
 package be.cytomine.service.social;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-
+import be.cytomine.domain.image.ImageInstance;
+import be.cytomine.domain.security.User;
+import be.cytomine.domain.social.LastUserPosition;
+import be.cytomine.exceptions.ServerException;
+import be.cytomine.repository.image.ImageInstanceRepository;
+import be.cytomine.repository.security.UserRepository;
+import be.cytomine.service.CytomineWebSocketHandler;
+import be.cytomine.utils.JsonObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -18,13 +18,9 @@ import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorator;
 
-import be.cytomine.domain.image.ImageInstance;
-import be.cytomine.domain.security.User;
-import be.cytomine.domain.social.LastUserPosition;
-import be.cytomine.exceptions.ServerException;
-import be.cytomine.repository.image.ImageInstanceRepository;
-import be.cytomine.repository.security.UserRepository;
-import be.cytomine.service.CytomineWebSocketHandler;
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 @Slf4j

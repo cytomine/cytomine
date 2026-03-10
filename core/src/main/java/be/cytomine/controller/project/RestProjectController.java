@@ -1,4 +1,5 @@
 package be.cytomine.controller.project;
+import be.cytomine.utils.JsonObject;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,5 @@
 package be.cytomine.utils;
+import be.cytomine.utils.JsonObject;
 
 import java.util.Map;
 
@@ -17,12 +18,12 @@ public class CommandResponse {
 
     Map<String, Object> data;
 
-    public org.cytomine.common.repository.utils.JsonObject toJsonObject() {
+    public JsonObject toJsonObject() {
         return getDataFromDomain(this);
     }
 
-    public static org.cytomine.common.repository.utils.JsonObject getDataFromDomain(CommandResponse domain) {
-       org.cytomine.common.repository.utils.JsonObject jsonObject = new org.cytomine.common.repository.utils.JsonObject();
+    public static JsonObject getDataFromDomain(CommandResponse domain) {
+       JsonObject jsonObject = new JsonObject();
        jsonObject.put("status", domain.getStatus());
        jsonObject.put("object", domain.getObject().toJsonObject());
        jsonObject.put("data", domain.getData());

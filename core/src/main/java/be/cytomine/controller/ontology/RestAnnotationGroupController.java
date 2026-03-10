@@ -1,4 +1,5 @@
 package be.cytomine.controller.ontology;
+import be.cytomine.utils.JsonObject;
 
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.image.group.ImageGroup;

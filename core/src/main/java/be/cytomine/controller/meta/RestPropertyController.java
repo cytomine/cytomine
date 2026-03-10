@@ -1,4 +1,5 @@
 package be.cytomine.controller.meta;
+import be.cytomine.utils.JsonObject;
 
 import java.util.List;
 import java.util.Map;

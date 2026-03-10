@@ -1,4 +1,5 @@
 package be.cytomine.service.annotation;
+import be.cytomine.utils.JsonObject;
 
 import java.util.Optional;
 

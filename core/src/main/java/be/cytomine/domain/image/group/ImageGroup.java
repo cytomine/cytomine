@@ -1,4 +1,5 @@
 package be.cytomine.domain.image.group;
+import be.cytomine.utils.JsonObject;
 
 import java.util.ArrayList;
 import java.util.List;

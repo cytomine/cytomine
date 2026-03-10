@@ -4,7 +4,7 @@ import be.cytomine.controller.RestCytomineController;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.processing.ImageFilterProjectService;
 import be.cytomine.service.project.ProjectService;
-
+import be.cytomine.utils.JsonObject;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

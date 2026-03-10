@@ -1,4 +1,5 @@
 package be.cytomine.service.image;
+import be.cytomine.utils.JsonObject;
 
 /*
 * Copyright (c) 2009-2022. Authors: see NOTICE file.
@@ -106,7 +107,7 @@ public class AbstractImageService extends ModelService {
     }
 
     @Override
-    public CytomineDomain createFromJSON(org.cytomine.common.repository.utils.JsonObject json) {
+    public CytomineDomain createFromJSON(JsonObject json) {
         return new AbstractImage().buildDomainFromJson(json, getEntityManager());
     }
 
@@ -208,7 +209,7 @@ public class AbstractImageService extends ModelService {
      * @param json New domain data
      * @return Response structure (created domain data,..)
      */
-    public CommandResponse add(org.cytomine.common.repository.utils.JsonObject json) {
+    public CommandResponse add(JsonObject json) {
         transactionService.start();
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
@@ -227,11 +228,11 @@ public class AbstractImageService extends ModelService {
      * @return  Response structure (new domain data, old domain data..)
      */
     @Override
-    public CommandResponse update(CytomineDomain domain, org.cytomine.common.repository.utils.JsonObject jsonNewData, Transaction transaction) {
+    public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.check(domain.container(),WRITE);
 
-        org.cytomine.common.repository.utils.JsonObject versionBeforeUpdate = domain.toJsonObject();
+        JsonObject versionBeforeUpdate = domain.toJsonObject();
 
         CommandResponse commandResponse = executeCommand(new EditCommand(currentUser, transaction), domain,jsonNewData);
         AbstractImage abstractImage = (AbstractImage)commandResponse.getObject();
@@ -254,7 +255,7 @@ public class AbstractImageService extends ModelService {
                 images.addAll(imageInstanceRepository.findAllByBaseImage(abstractImage, x -> x.getMagnification()==null && x.getPhysicalSizeX()==null));
             }
             for (ImageInstance image : images) {
-                org.cytomine.common.repository.utils.JsonObject json = image.toJsonObject();
+                JsonObject json = image.toJsonObject();
                 json.put("physicalSizeX", abstractImage.getPhysicalSizeX());
                 json.put("magnification", abstractImage.getMagnification());
                 imageInstanceService.update(image, json);
@@ -267,7 +268,7 @@ public class AbstractImageService extends ModelService {
             }
 
             for (ImageInstance image : images) {
-                org.cytomine.common.repository.utils.JsonObject json = image.toJsonObject();
+                JsonObject json = image.toJsonObject();
                 json.put("physicalSizeX", abstractImage.getPhysicalSizeX());
                 imageInstanceService.update(image, json);
             }
@@ -280,7 +281,7 @@ public class AbstractImageService extends ModelService {
             }
 
             for (ImageInstance image : images) {
-                org.cytomine.common.repository.utils.JsonObject json = image.toJsonObject();
+                JsonObject json = image.toJsonObject();
                 json.put("magnification", abstractImage.getMagnification());
                 imageInstanceService.update(image, json);
             }

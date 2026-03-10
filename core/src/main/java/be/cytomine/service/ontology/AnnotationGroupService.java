@@ -1,4 +1,5 @@
 package be.cytomine.service.ontology;
+import be.cytomine.utils.JsonObject;
 
 import java.util.List;
 import java.util.Optional;

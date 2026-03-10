@@ -1,4 +1,5 @@
 package be.cytomine.service.security;
+import be.cytomine.utils.JsonObject;
 
 /*
 * Copyright (c) 2009-2022. Authors: see NOTICE file.
@@ -309,14 +310,14 @@ public class UserService extends ModelService {
         List<Tuple> resultList = query.getResultList();
         List<Map<String, Object>> results = new ArrayList<>();
         for (Tuple rowResult : resultList) {
-            org.cytomine.common.repository.utils.JsonObject result = new org.cytomine.common.repository.utils.JsonObject();
+            JsonObject result = new JsonObject();
             for (TupleElement<?> element : rowResult.getElements()) {
                 Object value = rowResult.get(element.getAlias());
                 String alias = SQLUtils.toCamelCase(element.getAlias());
                 result.put(alias, value);
             }
 
-            org.cytomine.common.repository.utils.JsonObject object = User.getDataFromDomain(new User().buildDomainFromJson(result, getEntityManager()));
+            JsonObject object = User.getDataFromDomain(new User().buildDomainFromJson(result, getEntityManager()));
             results.add(object);
         }
         request = "SELECT COUNT(DISTINCT U.id) " + from + where + search;
@@ -329,7 +330,7 @@ public class UserService extends ModelService {
         return PageUtils.buildPageFromPageResults(results, max, offset, count);
     }
 
-    public Page<org.cytomine.common.repository.utils.JsonObject> listUsersExtendedByProject(Project project, UserSearchExtension userSearchExtension, List<SearchParameterEntry> searchParameters, String sortColumn, String sortDirection, Long max, Long offset) {
+    public Page<JsonObject> listUsersExtendedByProject(Project project, UserSearchExtension userSearchExtension, List<SearchParameterEntry> searchParameters, String sortColumn, String sortDirection, Long max, Long offset) {
 
         if (ReflectionUtils.findField(User.class, sortColumn) == null && !(List.of("projectRole", "fullName", "lastImageName", "lastConnection", "frequency").contains(sortColumn))) {
             throw new CytomineMethodNotYetImplementedException("User list sorted by " + sortColumn + "is not implemented");
@@ -347,11 +348,11 @@ public class UserService extends ModelService {
         if (userSearchExtension == null || userSearchExtension.noExtension()) {
             return listUsersByProject(project, searchParameters, sortColumn, sortDirection, max, offset);
         } else {
-            List<org.cytomine.common.repository.utils.JsonObject> results = new ArrayList<>();
-            Page<org.cytomine.common.repository.utils.JsonObject> users;
-            List<org.cytomine.common.repository.utils.JsonObject> images;
-            List<org.cytomine.common.repository.utils.JsonObject> connections;
-            List<org.cytomine.common.repository.utils.JsonObject> frequencies;
+            List<JsonObject> results = new ArrayList<>();
+            Page<JsonObject> users;
+            List<JsonObject> images;
+            List<JsonObject> connections;
+            List<JsonObject> frequencies;
 
             boolean usersFetched = false;
             boolean consultationsFetched = false;
@@ -367,40 +368,40 @@ public class UserService extends ModelService {
                 users = this.listUsersByProject(project, searchParameters, "id", "asc", 0L, 0L);
             }
             userIds = users.stream().map(x -> (Long) x.get("id")).collect(Collectors.toList());
-            Map<Long, org.cytomine.common.repository.utils.JsonObject> userMap = users.stream().collect(Collectors.toMap(
-                org.cytomine.common.repository.utils.JsonObject::getId, Function.identity()));
+            Map<Long, JsonObject> userMap = users.stream().collect(Collectors.toMap(
+                JsonObject::getId, Function.identity()));
 
             switch (sortColumn) {
                 case "lastImageName":
                     images = imageConsultationService.lastImageOfGivenUsersByProject(project, userIds, "name", sortDirection, max, offset);
-                    results = images.stream().map(x -> org.cytomine.common.repository.utils.JsonObject.of("id", x.get("user"), "lastImage", x.get("image"))).collect(Collectors.toList());
+                    results = images.stream().map(x -> JsonObject.of("id", x.get("user"), "lastImage", x.get("image"))).collect(Collectors.toList());
                     userIds = results.stream().map(x -> (Long) x.get("id")).collect(Collectors.toList());
                     consultationsFetched = true;
                     break;
                 case "lastConnection":
                     connections = projectConnectionService.lastConnectionOfGivenUsersInProject(project, userIds, "created", sortDirection, max, offset);
-                    results = connections.stream().map(x -> org.cytomine.common.repository.utils.JsonObject.of("id", x.get("user"), "lastConnection", (x.get("created")!=null? ((Date)x.get("created")).getTime() : null))).collect(Collectors.toList());
+                    results = connections.stream().map(x -> JsonObject.of("id", x.get("user"), "lastConnection", (x.get("created")!=null? ((Date)x.get("created")).getTime() : null))).collect(Collectors.toList());
                     userIds = results.stream().map(x -> (Long) x.get("id")).collect(Collectors.toList());
                     connectionsFetched = true;
                     break;
                 case "frequency":
                     frequencies = projectConnectionService.numberOfConnectionsOfGivenByProject(project, userIds, "frequency", sortDirection, max, offset);
-                    results = frequencies.stream().map(x -> org.cytomine.common.repository.utils.JsonObject.of("id", x.get("user"), "numberConnections", x.getJSONAttrInteger("frequency", 0))).collect(Collectors.toList());
+                    results = frequencies.stream().map(x -> JsonObject.of("id", x.get("user"), "numberConnections", x.getJSONAttrInteger("frequency", 0))).collect(Collectors.toList());
                     userIds = results.stream().map(x -> (Long) x.get("id")).collect(Collectors.toList());
                     frequenciessFetched = true;
                     break;
             }
 
             if (!usersFetched) {
-                for (org.cytomine.common.repository.utils.JsonObject entry : results) {
+                for (JsonObject entry : results) {
                     Map<String, Object> userJson = userMap.get((Long) entry.get("id"));
                     entry.putAll(userJson);
                 }
             }
             if (!consultationsFetched && userSearchExtension.isWithLastImage()) {
                 images = imageConsultationService.lastImageOfUsersByProject(project, userIds, "id", "asc", 0L, 0L);
-                Map<Long, org.cytomine.common.repository.utils.JsonObject> imagesMap = images.stream().collect(Collectors.toMap(x -> x.getJSONAttrLong("user"), Function.identity()));
-                for (org.cytomine.common.repository.utils.JsonObject entry : results) {
+                Map<Long, JsonObject> imagesMap = images.stream().collect(Collectors.toMap(x -> x.getJSONAttrLong("user"), Function.identity()));
+                for (JsonObject entry : results) {
                     Optional<Map<String, Object>> image = Optional.ofNullable(imagesMap.get(entry.getId()));
                     entry.put("lastImage", image.map(x -> x.get("image")).orElse(null));
                 }
@@ -408,8 +409,8 @@ public class UserService extends ModelService {
             }
             if (!connectionsFetched && userSearchExtension.isWithLastConnection()) {
                 connections = projectConnectionService.lastConnectionInProject(project, userIds, "id", "asc", 0L, 0L);
-                Map<Long, org.cytomine.common.repository.utils.JsonObject> connectionsMap = connections.stream().collect(Collectors.toMap(x -> x.getJSONAttrLong("user"), Function.identity()));
-                for (org.cytomine.common.repository.utils.JsonObject user : results) {
+                Map<Long, JsonObject> connectionsMap = connections.stream().collect(Collectors.toMap(x -> x.getJSONAttrLong("user"), Function.identity()));
+                for (JsonObject user : results) {
                     Optional<Map<String, Object>> connection = Optional.ofNullable(connectionsMap.get(user.getId()));
                     user.put("lastConnection", connection.map(x -> (x.get("created")!=null ? ((Date)x.get("created")).getTime() : null)).orElse(null));
                 }
@@ -417,9 +418,9 @@ public class UserService extends ModelService {
             }
             if (!frequenciessFetched && userSearchExtension.isWithNumberConnections()) {
                 frequencies = projectConnectionService.numberOfConnectionsByProjectAndUser(project, userIds, "id", "asc", 0L, 0L);
-                Map<Long, org.cytomine.common.repository.utils.JsonObject> frequencyMap = frequencies.stream().collect(Collectors.toMap(x -> x.getJSONAttrLong("user"), Function.identity()));
-                for (org.cytomine.common.repository.utils.JsonObject user : results) {
-                    Optional<org.cytomine.common.repository.utils.JsonObject> frequency = Optional.ofNullable(frequencyMap.get(user.getId()));
+                Map<Long, JsonObject> frequencyMap = frequencies.stream().collect(Collectors.toMap(x -> x.getJSONAttrLong("user"), Function.identity()));
+                for (JsonObject user : results) {
+                    Optional<JsonObject> frequency = Optional.ofNullable(frequencyMap.get(user.getId()));
                     user.put("numberConnections", frequency.map(x -> x.getJSONAttrInteger("frequency",0)).orElse(null));
                 }
                 frequenciessFetched = true;
@@ -429,7 +430,7 @@ public class UserService extends ModelService {
 
     }
 
-    public Page<org.cytomine.common.repository.utils.JsonObject> listUsersByProject(Project project, List<SearchParameterEntry> searchParameters, String sortColumn, String sortDirection, Long max, Long offset) {
+    public Page<JsonObject> listUsersByProject(Project project, List<SearchParameterEntry> searchParameters, String sortColumn, String sortDirection, Long max, Long offset) {
         securityACLService.check(project, READ);
         // migration from grails: parameter boolean withProjectRole is always true
         Optional<SearchParameterEntry> onlineUserSearch = searchParameters.stream().filter(x -> x.getProperty().equals("status") && x.getValue().equals("online")).findFirst();
@@ -494,10 +495,10 @@ public class UserService extends ModelService {
             query.setFirstResult(offset.intValue());
         }
 
-        List<org.cytomine.common.repository.utils.JsonObject> results = new ArrayList<>();
+        List<JsonObject> results = new ArrayList<>();
         List<Object[]> resultList = query.getResultList();
         for (Object[] row : resultList) {
-            org.cytomine.common.repository.utils.JsonObject jsonObject = ((User) row[0]).toJsonObject();
+            JsonObject jsonObject = ((User) row[0]).toJsonObject();
             jsonObject.put("role", (String) row[1]);
             results.add(jsonObject);
         }
@@ -521,7 +522,7 @@ public class UserService extends ModelService {
         request = "SELECT COUNT(DISTINCT user) " + from + where;
         query = getEntityManager().createQuery(request);
         long count = ((Long) query.getResultList().get(0));
-        Page<org.cytomine.common.repository.utils.JsonObject> page = PageUtils.buildPageFromPageResults(results, max, offset, count);
+        Page<JsonObject> page = PageUtils.buildPageFromPageResults(results, max, offset, count);
         return page;
 
 
@@ -577,16 +578,16 @@ public class UserService extends ModelService {
      * Each user has its own layer
      * If project has private layer, just get current user layer
      */
-    public List<org.cytomine.common.repository.utils.JsonObject> listLayers(Project project, ImageInstance image) {
+    public List<JsonObject> listLayers(Project project, ImageInstance image) {
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.check(project, READ, currentUser);
 
         List<User> humanAdmins = listAdmins(project);
         List<User> humanUsers = listUsers(project);
 
-        List<org.cytomine.common.repository.utils.JsonObject> humanUsersFormatted = humanUsers.stream().map(User::toJsonObject).toList();
+        List<JsonObject> humanUsersFormatted = humanUsers.stream().map(User::toJsonObject).toList();
 
-        List<org.cytomine.common.repository.utils.JsonObject> layersFormatted = new ArrayList<>();
+        List<JsonObject> layersFormatted = new ArrayList<>();
 
         if (permissionService.hasACLPermission(project, ADMINISTRATION, currentRoleService.isAdminByNow(currentUser))
                 || (!project.isHideAdminsLayers() && !project.isHideUsersLayers())) {
@@ -606,15 +607,15 @@ public class UserService extends ModelService {
         return layersFormatted;
     }
 
-    public List<org.cytomine.common.repository.utils.JsonObject> getAllOnlineUserWithTheirPositions(Project project) {
+    public List<JsonObject> getAllOnlineUserWithTheirPositions(Project project) {
 //        //Get all project user online
         List<Long> usersId = this.getAllFriendsUsersOnline(currentUserService.getCurrentUser(), project).stream().map(CytomineDomain::getId)
                     .collect(Collectors.toList());
-        List<org.cytomine.common.repository.utils.JsonObject> usersWithPosition = userPositionService.findUsersPositions(project);
-        usersId.removeAll(usersWithPosition.stream().map(org.cytomine.common.repository.utils.JsonObject::getId).toList());
+        List<JsonObject> usersWithPosition = userPositionService.findUsersPositions(project);
+        usersId.removeAll(usersWithPosition.stream().map(JsonObject::getId).toList());
 
         for (Long userId : usersId) {
-            usersWithPosition.add(org.cytomine.common.repository.utils.JsonObject.of("id", userId, "position", new ArrayList<>()));
+            usersWithPosition.add(JsonObject.of("id", userId, "position", new ArrayList<>()));
         }
 
         return usersWithPosition;
@@ -622,9 +623,9 @@ public class UserService extends ModelService {
 
 
 
-    public org.cytomine.common.repository.utils.JsonObject getResumeActivities(Project project, User user) {
+    public JsonObject getResumeActivities(Project project, User user) {
         securityACLService.checkIsSameUserOrAdminContainer(project,user, currentUserService.getCurrentUser());
-        org.cytomine.common.repository.utils.JsonObject jsonObject = new org.cytomine.common.repository.utils.JsonObject();
+        JsonObject jsonObject = new JsonObject();
 
         jsonObject.put("firstConnection", persistentProjectConnectionRepository
                 .findAllByUserAndProject(user.getId(), project.getId(), PageRequest.of(0, 1, Sort.by(Sort.Direction.ASC, "created"))).stream().findFirst().map(x -> x.getCreated()).orElse(null));
@@ -639,25 +640,25 @@ public class UserService extends ModelService {
         return jsonObject;
     }
 
-    public List<org.cytomine.common.repository.utils.JsonObject> getUsersWithLastActivities(Project project) {
-        List<org.cytomine.common.repository.utils.JsonObject> results = new ArrayList<>();
+    public List<JsonObject> getUsersWithLastActivities(Project project) {
+        List<JsonObject> results = new ArrayList<>();
         List<User> users = listUsers(project).stream().sorted(Comparator.comparing(CytomineDomain::getId)).toList();
 
 
-        Map<Long, org.cytomine.common.repository.utils.JsonObject> connections = projectConnectionService.lastConnectionInProject(project, null, "user", "asc", 0L, 0L)
+        Map<Long, JsonObject> connections = projectConnectionService.lastConnectionInProject(project, null, "user", "asc", 0L, 0L)
                 .stream().collect(Collectors.toMap(x -> x.getJSONAttrLong("user"), Function.identity()));
-        Map<Long, org.cytomine.common.repository.utils.JsonObject> frequencies = projectConnectionService.numberOfConnectionsByProjectAndUser(project, null, "user", "asc", 0L, 0L)
+        Map<Long, JsonObject> frequencies = projectConnectionService.numberOfConnectionsByProjectAndUser(project, null, "user", "asc", 0L, 0L)
                 .stream().collect(Collectors.toMap(x -> x.getJSONAttrLong("user"), Function.identity()));
-        Map<Long, org.cytomine.common.repository.utils.JsonObject> images = imageConsultationService.lastImageOfUsersByProject(project, null, "user", "asc", 0L, 0L)
+        Map<Long, JsonObject> images = imageConsultationService.lastImageOfUsersByProject(project, null, "user", "asc", 0L, 0L)
                 .stream().collect(Collectors.toMap(x -> x.getJSONAttrLong("user"), Function.identity()));
 
         for (User user : users) {
             if (user != null) {
-                org.cytomine.common.repository.utils.JsonObject image = images.get(user.getId());
-                org.cytomine.common.repository.utils.JsonObject connection = connections.get(user.getId());
-                org.cytomine.common.repository.utils.JsonObject frequency = frequencies.get(user.getId());
+                JsonObject image = images.get(user.getId());
+                JsonObject connection = connections.get(user.getId());
+                JsonObject frequency = frequencies.get(user.getId());
 
-                org.cytomine.common.repository.utils.JsonObject jsonObject = new org.cytomine.common.repository.utils.JsonObject();
+                JsonObject jsonObject = new JsonObject();
                 jsonObject.put("id", user.getId());
                 jsonObject.put("username", user.getUsername());
                 jsonObject.put("name", user.getName());
@@ -750,7 +751,7 @@ public class UserService extends ModelService {
      * @return Response structure (created domain data,..)
      */
     // TODO IAM: refactor. ADMIN ROLE can create IAM account (and create the underlying Cytomine user to the cache)
-    public CommandResponse add(org.cytomine.common.repository.utils.JsonObject json) {
+    public CommandResponse add(JsonObject json) {
         synchronized (this.getClass()) {
             User currentUser = currentUserService.getCurrentUser();
             securityACLService.checkUser(currentUser);
@@ -772,7 +773,7 @@ public class UserService extends ModelService {
      * @return Response structure (new domain data, old domain data..)
      */
     // TODO IAM: refactor. ADMIN ROLE can update an IAM account (and update the underlying Cytomine user to the cache)
-    public CommandResponse update(CytomineDomain domain, org.cytomine.common.repository.utils.JsonObject jsonNewData, Transaction transaction) {
+    public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.checkIsCreator((User) domain, currentUser);
         return executeCommand(new EditCommand(currentUser, null), domain, jsonNewData);
@@ -802,7 +803,7 @@ public class UserService extends ModelService {
     }
 
     @Override
-    public CytomineDomain createFromJSON(org.cytomine.common.repository.utils.JsonObject json) {
+    public CytomineDomain createFromJSON(JsonObject json) {
         return new User().buildDomainFromJson(json, getEntityManager());
     }
 
@@ -871,7 +872,7 @@ public class UserService extends ModelService {
     }
 
     @Override
-    public CytomineDomain retrieve(org.cytomine.common.repository.utils.JsonObject json) {
+    public CytomineDomain retrieve(JsonObject json) {
         return userRepository.findById(json.getJSONAttrLong("id"))
                 .orElseThrow(() -> new ObjectNotFoundException("User", json.toJsonString()));
     }

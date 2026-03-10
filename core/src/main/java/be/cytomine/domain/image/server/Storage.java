@@ -1,4 +1,5 @@
 package be.cytomine.domain.image.server;
+import be.cytomine.utils.JsonObject;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;

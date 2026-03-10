@@ -6,7 +6,9 @@ import be.cytomine.repository.image.AbstractImageRepository;
 import be.cytomine.repository.image.AbstractSliceRepository;
 import be.cytomine.repository.meta.PropertyRepository;
 import be.cytomine.service.middleware.ImageServerService;
-
+import be.cytomine.utils.JsonObject;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,10 +16,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 

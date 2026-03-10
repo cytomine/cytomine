@@ -1,16 +1,15 @@
 package be.cytomine.service.middleware;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
+import be.cytomine.domain.image.*;
+import be.cytomine.domain.ontology.AnnotationDomain;
+import be.cytomine.dto.StorageStats;
+import be.cytomine.dto.image.*;
+import be.cytomine.exceptions.WrongArgumentException;
+import be.cytomine.service.image.ImageInstanceService;
+import be.cytomine.service.utils.SimplifyGeometryService;
+import be.cytomine.utils.JsonObject;
+import be.cytomine.utils.PreparedRequest;
+import be.cytomine.utils.StringUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,25 +25,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import be.cytomine.domain.image.AbstractImage;
-import be.cytomine.domain.image.AbstractSlice;
-import be.cytomine.domain.image.CompanionFile;
-import be.cytomine.domain.image.ImageInstance;
-import be.cytomine.domain.image.SliceInstance;
-import be.cytomine.domain.image.UploadedFile;
-import be.cytomine.domain.ontology.AnnotationDomain;
-import be.cytomine.dto.StorageStats;
-import be.cytomine.dto.image.CropParameter;
-import be.cytomine.dto.image.ImageParameter;
-import be.cytomine.dto.image.LabelParameter;
-import be.cytomine.dto.image.TileParameters;
-import be.cytomine.dto.image.WindowParameter;
-import be.cytomine.exceptions.WrongArgumentException;
-import be.cytomine.service.image.ImageInstanceService;
-import be.cytomine.service.utils.SimplifyGeometryService;
-
-import be.cytomine.utils.PreparedRequest;
-import be.cytomine.utils.StringUtils;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.*;
 
 @Slf4j
 @RequiredArgsConstructor

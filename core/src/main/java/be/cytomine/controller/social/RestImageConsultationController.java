@@ -1,4 +1,5 @@
 package be.cytomine.controller.social;
+import be.cytomine.utils.JsonObject;
 
 import java.io.IOException;
 import java.util.Date;

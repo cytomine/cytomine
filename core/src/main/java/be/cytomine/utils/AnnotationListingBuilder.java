@@ -1,4 +1,5 @@
 package be.cytomine.utils;
+import be.cytomine.utils.JsonObject;
 
 /*
 * Copyright (c) 2009-2022. Authors: see NOTICE file.
@@ -61,7 +62,7 @@ public class AnnotationListingBuilder {
         return reportService.generateAnnotationsReport(projectService.get(project).getName(), termNames, userNames, annotations, format);
     }
 
-    public List<Map<String, Object>> buildAnnotationList(org.cytomine.common.repository.utils.JsonObject params, String users){
+    public List<Map<String, Object>> buildAnnotationList(JsonObject params, String users){
         AnnotationListing annotationListing = buildAnnotationListing(params);
         annotationListing.getColumnsToPrint().add("gis");
         annotationListing.getColumnsToPrint().add("image");
@@ -87,7 +88,7 @@ public class AnnotationListingBuilder {
     }
 
 
-    public AnnotationListing buildAnnotationListing(org.cytomine.common.repository.utils.JsonObject params) {
+    public AnnotationListing buildAnnotationListing(JsonObject params) {
         AnnotationListing al;
         if(isReviewedAnnotationAsked(params)) {
             al = new ReviewedAnnotationListing(entityManager);
@@ -99,7 +100,7 @@ public class AnnotationListingBuilder {
         return buildAnnotationListing(al, params);
     }
 
-    public AnnotationListing buildAnnotationListing(AnnotationListing al, org.cytomine.common.repository.utils.JsonObject params) {
+    public AnnotationListing buildAnnotationListing(AnnotationListing al, JsonObject params) {
         al.setColumnsToPrint(paramsService.getPropertyGroupToShow(params));
 
         // Project
@@ -186,7 +187,7 @@ public class AnnotationListingBuilder {
     /**
      * Check if we ask reviewed annotation
      */
-    private boolean isReviewedAnnotationAsked(org.cytomine.common.repository.utils.JsonObject params) {
+    private boolean isReviewedAnnotationAsked(JsonObject params) {
         return params.getJSONAttrBoolean("reviewed", false);
     }
 

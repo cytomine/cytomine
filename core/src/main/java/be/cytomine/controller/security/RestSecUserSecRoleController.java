@@ -1,4 +1,5 @@
 package be.cytomine.controller.security;
+import be.cytomine.utils.JsonObject;
 
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.security.SecRole;

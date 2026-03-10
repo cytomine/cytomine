@@ -1,4 +1,5 @@
 package be.cytomine.controller.image;
+import be.cytomine.utils.JsonObject;
 
 import java.io.IOException;
 

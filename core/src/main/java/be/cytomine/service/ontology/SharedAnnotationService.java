@@ -1,4 +1,5 @@
 package be.cytomine.service.ontology;
+import be.cytomine.utils.JsonObject;
 
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;

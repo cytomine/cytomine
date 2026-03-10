@@ -1,4 +1,5 @@
 package be.cytomine.service.image;
+import be.cytomine.utils.JsonObject;
 
 /*
  * Copyright (c) 2009-2022. Authors: see NOTICE file.
@@ -97,7 +98,7 @@ public class UploadedFileService extends ModelService {
     }
 
     @Override
-    public CytomineDomain createFromJSON(org.cytomine.common.repository.utils.JsonObject json) {
+    public CytomineDomain createFromJSON(JsonObject json) {
         return new UploadedFile().buildDomainFromJson(json, getEntityManager());
     }
 
@@ -349,7 +350,7 @@ public class UploadedFileService extends ModelService {
      * @param json New domain data
      * @return Response structure (created domain data,..)
      */
-    public CommandResponse add(org.cytomine.common.repository.utils.JsonObject json) {
+    public CommandResponse add(JsonObject json) {
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
         if (!json.isMissing("storage")) {
@@ -373,7 +374,7 @@ public class UploadedFileService extends ModelService {
      * @return Response structure (new domain data, old domain data..)
      */
     @Override
-    public CommandResponse update(CytomineDomain domain, org.cytomine.common.repository.utils.JsonObject jsonNewData, Transaction transaction) {
+    public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
         securityACLService.check(domain.container(), WRITE);

@@ -8,7 +8,8 @@ import be.cytomine.repositorynosql.social.LastConnectionRepository;
 import be.cytomine.repositorynosql.social.PersistentConnectionRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.database.SequenceService;
-
+import be.cytomine.utils.JsonObject;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.NonTransientDataAccessException;
@@ -17,10 +18,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestContextHolder;
 
-import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Date;
 import java.util.stream.Stream;

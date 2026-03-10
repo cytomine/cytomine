@@ -15,7 +15,7 @@ import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.service.social.ProjectConnectionService;
 import be.cytomine.service.stats.StatsService;
-
+import be.cytomine.utils.JsonObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

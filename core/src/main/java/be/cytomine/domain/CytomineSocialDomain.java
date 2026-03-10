@@ -1,4 +1,5 @@
 package be.cytomine.domain;
+import be.cytomine.utils.JsonObject;
 
 
 

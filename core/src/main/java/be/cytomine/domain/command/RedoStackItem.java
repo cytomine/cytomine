@@ -1,4 +1,5 @@
 package be.cytomine.domain.command;
+import be.cytomine.utils.JsonObject;
 
 import jakarta.persistence.*;
 import lombok.Getter;

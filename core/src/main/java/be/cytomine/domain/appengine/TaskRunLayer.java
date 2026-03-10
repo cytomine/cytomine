@@ -1,4 +1,5 @@
 package be.cytomine.domain.appengine;
+import be.cytomine.utils.JsonObject;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

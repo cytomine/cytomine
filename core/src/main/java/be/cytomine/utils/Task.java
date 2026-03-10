@@ -1,4 +1,5 @@
 package be.cytomine.utils;
+import be.cytomine.utils.JsonObject;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -32,8 +33,8 @@ public class Task {
     private boolean printInActivity = false;
 
 
-    public org.cytomine.common.repository.utils.JsonObject toJsonObject() {
-        org.cytomine.common.repository.utils.JsonObject map = new org.cytomine.common.repository.utils.JsonObject();
+    public JsonObject toJsonObject() {
+        JsonObject map = new JsonObject();
         map.put("id", id);
         map.put("progress", progress);
         map.put("project", projectIdent);

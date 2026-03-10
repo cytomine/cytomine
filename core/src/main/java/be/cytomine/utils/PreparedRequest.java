@@ -1,4 +1,5 @@
 package be.cytomine.utils;
+import be.cytomine.utils.JsonObject;
 
 import be.cytomine.exceptions.ServerException;
 import lombok.Getter;
@@ -103,8 +104,8 @@ public class PreparedRequest {
         }
     }
 
-    public void setJsonBody(org.cytomine.common.repository.utils.JsonObject body) {
-        this.body = org.cytomine.common.repository.utils.JsonObject.toJsonString(
+    public void setJsonBody(JsonObject body) {
+        this.body = JsonObject.toJsonString(
                 body.entrySet()
                 .stream()
                 .filter(e -> e.getValue() != null && !e.getValue().toString().isEmpty())

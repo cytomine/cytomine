@@ -1,4 +1,5 @@
 package be.cytomine.controller;
+import be.cytomine.utils.JsonObject;
 
 import be.cytomine.config.properties.ApplicationProperties;
 import be.cytomine.domain.meta.Property;

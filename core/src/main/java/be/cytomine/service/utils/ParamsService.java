@@ -1,4 +1,5 @@
 package be.cytomine.service.utils;
+import be.cytomine.utils.JsonObject;
 
 import be.cytomine.domain.project.Project;
 import be.cytomine.exceptions.ObjectNotFoundException;

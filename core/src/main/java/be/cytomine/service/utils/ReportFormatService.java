@@ -1,4 +1,5 @@
 package be.cytomine.service.utils;
+import be.cytomine.utils.JsonObject;
 
 import be.cytomine.dto.image.Point;
 import be.cytomine.service.ontology.TermService;

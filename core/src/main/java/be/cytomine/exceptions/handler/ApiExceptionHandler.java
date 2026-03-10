@@ -1,12 +1,13 @@
 package be.cytomine.exceptions.handler;
 
-import java.util.Map;
-
 import be.cytomine.controller.JsonResponseEntity;
 import be.cytomine.exceptions.*;
-
+import be.cytomine.utils.JsonObject;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.lang.Nullable;
 import org.springframework.security.access.AccessDeniedException;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import java.util.Map;
 
 @Slf4j
 @ControllerAdvice

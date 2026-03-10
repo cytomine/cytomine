@@ -1,4 +1,5 @@
 package be.cytomine.controller.project;
+import be.cytomine.utils.JsonObject;
 
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.project.Project;

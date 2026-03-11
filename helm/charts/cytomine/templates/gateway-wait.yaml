@@ -1,0 +1,43 @@
+{{- if not .Values.gateway.parentRefs }}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "gateway-wait"
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "cytomine.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": hook-succeeded,hook-failed
+spec:
+  securityContext:
+  {{- include "cytomine.podSecurityContext" . | nindent 4 }}
+  containers:
+    - name: wait
+      image: "{{ .Values.images.curl }}"
+      securityContext:
+      {{- include "cytomine.containerSecurityContext" . | nindent 8 }}
+      command:
+        - /bin/sh
+        - -c
+        - |
+          echo "Waiting for Gateway to be programmed..."
+          for i in $(seq 1 120); do
+            # Check if Gateway has an address
+            if nslookup cytomine.{{ .Release.Namespace }}.svc.cluster.local 2>/dev/null | grep -q "Address"; then
+              echo "Gateway service is available"
+              exit 0
+            fi
+            # Also check for envoy proxy service
+            if nslookup envoy-{{ .Release.Namespace }}-cytomine-https.{{ .Release.Namespace }}.svc.cluster.local 2>/dev/null | grep -q "Address"; then
+              echo "Envoy proxy service is available"
+              exit 0
+            fi
+            echo "Gateway not ready yet, waiting... ($i/120)"
+            sleep 5
+          done
+          echo "Warning: Gateway may not be fully ready"
+          exit 0
+  restartPolicy: Never
+{{- end }}

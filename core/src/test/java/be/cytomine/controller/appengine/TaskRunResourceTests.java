@@ -107,11 +107,11 @@ public class TaskRunResourceTests {
         mockResponseMap = Map.of(
             "id", taskRun.getTaskRunId().toString(),
             "name", "test name",
-            "display_name", "test display name",
+            "displayName", "test display name",
             "description", "test description",
             "optional", false,
             "type", Map.of("id", "string"),
-            "derived_from", ""
+            "derivedFrom", ""
         );
 
         mockResponse = objectMapper.writeValueAsString(List.of(mockResponseMap));

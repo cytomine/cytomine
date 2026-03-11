@@ -19,7 +19,7 @@ package be.cytomine.controller.security;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.config.MongoTestConfiguration;
-import org.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.domain.ontology.RelationTerm;
 import be.cytomine.domain.security.SecUserSecRole;
 import be.cytomine.domain.security.User;

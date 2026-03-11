@@ -6,7 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
 import be.cytomine.config.MongoTestConfiguration;
-import org.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.PostGisTestConfiguration;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc

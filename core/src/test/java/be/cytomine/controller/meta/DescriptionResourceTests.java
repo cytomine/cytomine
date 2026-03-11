@@ -17,7 +17,7 @@ package be.cytomine.controller.meta;
 */
 
 import be.cytomine.config.MongoTestConfiguration;
-import org.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.PostGisTestConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -112,7 +112,7 @@ public class DescriptionResourceTests {
                 .andExpect(jsonPath("$.description.id").exists())
                 .andExpect(jsonPath("$.description.data").value("v2"));
     }
-    
+
     @Test
     @Transactional
     public void delete_description() throws Exception {

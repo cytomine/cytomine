@@ -17,7 +17,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.config.MongoTestConfiguration;
-import org.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.security.User;
 import be.cytomine.dto.image.Point;

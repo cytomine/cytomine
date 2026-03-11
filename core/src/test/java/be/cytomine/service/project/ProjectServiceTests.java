@@ -20,7 +20,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import be.cytomine.config.MongoTestConfiguration;
-import org.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.PostGisTestConfiguration;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.time.DateUtils;

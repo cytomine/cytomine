@@ -1,4 +1,4 @@
-package org.cytomine.common;
+package be.cytomine.common;
 
 import liquibase.Liquibase;
 import liquibase.database.Database;

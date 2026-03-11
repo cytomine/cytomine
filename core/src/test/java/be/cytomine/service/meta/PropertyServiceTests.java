@@ -19,7 +19,7 @@ package be.cytomine.service.meta;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.config.MongoTestConfiguration;
-import org.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.meta.Property;
 import be.cytomine.domain.ontology.UserAnnotation;
@@ -116,7 +116,7 @@ public class PropertyServiceTests {
         Property property = builder.given_a_property(project);
 
         assertThat(propertyService.findByDomainAndKey(project,"key")).isPresent();
-        
+
         CommandResponse commandResponse = propertyService.update(property, property.toJsonObject().withChange("value", "NEW VALUE"));
 
         assertThat(commandResponse).isNotNull();

@@ -19,7 +19,7 @@ package be.cytomine.service.ontology;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.config.MongoTestConfiguration;
-import org.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.domain.ontology.AnnotationTrack;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.exceptions.AlreadyExistException;
@@ -93,7 +93,7 @@ public class AnnotationTrackServiceTests {
         annotationTrack.setAnnotation(annotation);
         assertThat(annotationTrackService.find(annotation, annotationTrack.getTrack()).isPresent());
     }
-    
+
 
     @Test
     void list_all_annotationTrack_by_track() {

@@ -659,31 +659,31 @@ public class TaskRunService {
 
         String layerName = annotationLayerService.createLayerName(taskRunResponse.task().name(), taskRunResponse.task().version(), taskRun.getCreated());
         AnnotationLayer annotationLayer = annotationLayerService.createAnnotationLayer(layerName);
-        //if (!annotationLayer.getAnnotations().isEmpty()) {
-        //    return response;
-        //}
+        if (!annotationLayer.getAnnotations().isEmpty()) {
+            return response;
+        }
 
         Set<TaskRunLayer> taskRunLayers = taskRunLayerRepository.findAllByTaskRunAndImage(taskRun, taskRun.getImage());
+        Map<String, TaskRunLayer> layersByParameterName = taskRunLayers.stream()
+                .collect(Collectors.toMap(TaskRunLayer::getParameterName, Function.identity()));
 
-        /*
         Set<TaskRunValue> geometries = outputs
                 .stream()
                 .filter(v -> v.getValue() instanceof String geometry && geometryService.isGeometry(geometry))
                 .collect(Collectors.toSet());
 
-        for (String geometry : geometries) {
-            String wktGeometry = geometryService.GeoJSONToWKT(geometry);
-            Geometry parsedGeometry = GeometryService.addOffset(wktGeometry, taskRunLayer.getXOffset(), taskRunLayer.getYOffset());
+        for (TaskRunValue geometry : geometries) {
+            TaskRunLayer matchedLayer = layersByParameterName.get(geometry.getParameterName());
+            CropOffset offset = matchedLayer.getOffsets().get(0);
+            String wktGeometry = geometryService.GeoJSONToWKT((String) geometry.getValue());
+            Geometry parsedGeometry = GeometryService.addOffset(wktGeometry, offset.getX(), offset.getY());
             annotationService.createAnnotation(annotationLayer, parsedGeometry.toString());
         }
-        */
+
         List<TaskRunValue> geometryArrays = outputs
                 .stream()
                 .filter(this::hasGeometrySubType)
                 .toList();
-
-        Map<String, TaskRunLayer> layersByParameterName = taskRunLayers.stream()
-                .collect(Collectors.toMap(TaskRunLayer::getParameterName, Function.identity()));
 
         for (TaskRunValue arrayValue : geometryArrays) {
             TaskRunLayer matchedLayer = layersByParameterName.get(arrayValue.getParameterName());

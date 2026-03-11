@@ -1,5 +1,7 @@
 package be.cytomine.dto.appengine.task;
 
+import be.cytomine.dto.appengine.task.type.TaskParameterType;
+
 public record TaskRunOutputResponse(
     String id,
     String name,

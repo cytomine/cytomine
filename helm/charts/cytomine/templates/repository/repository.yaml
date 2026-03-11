@@ -32,6 +32,26 @@ spec:
       - name: temp
         emptyDir: {}
       initContainers:
+        - name: wait-for-postgis
+          image: "{{ .Values.images.postgis }}"
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
+          env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-core-secret
+                  key: password
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Waiting for postgis to be ready..."
+              until pg_isready -h postgis.{{ .Release.Namespace }}.svc.cluster.local -p {{ .Values.postgresql.port }} -U {{ .Values.postgresql.user }}; do
+                echo "postgis not ready, retrying in 2s..."
+                sleep 2
+              done
+              echo "postgis is ready!"
         - name: repository-init
           image: "{{ .Values.images.repository }}"
           imagePullPolicy: {{ .Values.images.pullPolicy }}
@@ -54,6 +74,20 @@ spec:
           securityContext:
           {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
           imagePullPolicy: {{ .Values.images.pullPolicy }}
+          env:
+            - name: POSTGIS_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-core-secret
+                  key: password
+            - name: POSTGIS_HOST
+              value: postgis.{{ .Release.Namespace }}.svc.cluster.local
+            - name: POSTGIS_PORT
+              value: "{{ .Values.postgresql.port }}"
+            - name: POSTGIS_USER
+              value: {{ .Values.postgresql.user }}
+            - name: POSTGIS_DB_NAME
+              value: {{ .Values.postgresql.database }}
           volumeMounts:
             - name: temp
               mountPath: /tmp

@@ -650,13 +650,6 @@ public class TaskRunService {
         // pull the images and store them in the project
         asyncService.launchImageAdditionJob(outputs, projectId, currentUserService.getCurrentUser());
 
-        List<String> geometries = outputs
-            .stream()
-                .map(TaskRunValue::getValue)
-            .filter(value -> value instanceof String geometry && geometryService.isGeometry(geometry))
-            .map(value -> (String) value)
-            .toList();
-
         String taskRunData = appEngineService.get("task-runs/" + taskRunId);
         TaskRunResponse taskRunResponse;
         try {
@@ -674,13 +667,17 @@ public class TaskRunService {
         Set<TaskRunLayer> taskRunLayers = taskRunLayerRepository.findAllByTaskRunAndImage(taskRun, taskRun.getImage());
 
         /*
+        Set<TaskRunValue> geometries = outputs
+                .stream()
+                .filter(v -> v.getValue() instanceof String geometry && geometryService.isGeometry(geometry))
+                .collect(Collectors.toSet());
+
         for (String geometry : geometries) {
             String wktGeometry = geometryService.GeoJSONToWKT(geometry);
             Geometry parsedGeometry = GeometryService.addOffset(wktGeometry, taskRunLayer.getXOffset(), taskRunLayer.getYOffset());
             annotationService.createAnnotation(annotationLayer, parsedGeometry.toString());
         }
         */
-
         List<TaskRunValue> geometryArrays = outputs
                 .stream()
                 .filter(this::hasGeometrySubType)

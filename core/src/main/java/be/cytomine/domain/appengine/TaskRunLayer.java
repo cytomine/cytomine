@@ -15,6 +15,7 @@ import jakarta.persistence.OrderColumn;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.annotation.AnnotationLayer;
@@ -22,6 +23,7 @@ import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.utils.JsonObject;
 
+@ToString
 @NoArgsConstructor
 @Setter
 @Getter

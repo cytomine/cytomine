@@ -19,7 +19,7 @@ package be.cytomine.authorization;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.config.MongoTestConfiguration;
-import org.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.repository.security.AclRepository;
 import be.cytomine.service.PermissionService;

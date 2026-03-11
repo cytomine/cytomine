@@ -19,7 +19,7 @@ package be.cytomine.controller.image;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.config.MongoTestConfiguration;
-import org.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.domain.image.AbstractSlice;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.utils.JsonObject;
@@ -74,7 +74,7 @@ public class SliceInstanceResourceTests {
     private MockMvc restSliceInstanceControllerMockMvc;
 
     private static WireMockServer wireMockServer = new WireMockServer(8888);
-    
+
     @BeforeAll
     public static void beforeAll() {
         wireMockServer.start();
@@ -340,7 +340,7 @@ public class SliceInstanceResourceTests {
                                                 42760403,101379601,116701787,117473388,74001707,10310828,1870030,1317215,957974,786907,598734,506898,
                                                 408760,319625,263803,210682,151259,114345,91836,59423,45018,42317,27011,20708,10804,8103,6302,6302,4502,900,900,3601],
                                                 "channel":0,"concrete_channel":0,"sample":0,"color":"#f00","z_slice":0,"timepoint":0}
-                                    ],"size":1}                                   
+                                    ],"size":1}
                                 """
                         )
                 )
@@ -366,7 +366,7 @@ public class SliceInstanceResourceTests {
                 .willReturn(
                         aResponse().withBody(
                                 """
-                                    {"items":[{"type":"FAST","minimum":6,"maximum":255,"channel":0,"concrete_channel":0,"sample":0,"color":"#f00","z_slice":0,"timepoint":0}],"size":1}                                                                                             
+                                    {"items":[{"type":"FAST","minimum":6,"maximum":255,"channel":0,"concrete_channel":0,"sample":0,"color":"#f00","z_slice":0,"timepoint":0}],"size":1}
                                 """
                         )
                 )
@@ -407,7 +407,7 @@ public class SliceInstanceResourceTests {
                                 1180361,1222678,1224478,1167756,1176760,1179461,1244286,1286603,1305510,1385641,1508089,1732277,1969069,2427348,
                                 3583400,4999653,7937501,14420933,20375859,42760403,101379601,116701787,117473388,74001707,10310828,1870030,1317215,
                                 957974,786907,598734,506898,408760,319625,263803,210682,151259,114345,91836,59423,45018,42317,27011,20708,10804,8103,
-                                6302,6302,4502,900,900,3601],"channel":0,"concrete_channel":0,"sample":0,"color":"#f00","z_slice":0,"timepoint":0}],"size":1}                          
+                                6302,6302,4502,900,900,3601],"channel":0,"concrete_channel":0,"sample":0,"color":"#f00","z_slice":0,"timepoint":0}],"size":1}
                                 """
                         )
                 )
@@ -433,7 +433,7 @@ public class SliceInstanceResourceTests {
                                 """
                                 {"items":[{"type":"FAST","minimum":6,"maximum":255,"channel":0,"concrete_channel":0,"sample":0,"color":"#f00","z_slice":0,"timepoint":0},
                                 {"type":"FAST","minimum":0,"maximum":244,"channel":1,"concrete_channel":0,"sample":1,"color":"#0f0","z_slice":0,"timepoint":0},
-                                {"type":"FAST","minimum":23,"maximum":255,"channel":2,"concrete_channel":0,"sample":2,"color":"#00f","z_slice":0,"timepoint":0}],"size":3}                                                                                                                                                                                                                                                                                                   
+                                {"type":"FAST","minimum":23,"maximum":255,"channel":2,"concrete_channel":0,"sample":2,"color":"#00f","z_slice":0,"timepoint":0}],"size":3}
                                 """
                         )
                 )

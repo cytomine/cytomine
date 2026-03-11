@@ -19,7 +19,7 @@ package be.cytomine.controller.meta;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.config.MongoTestConfiguration;
-import org.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.domain.meta.Tag;
 import be.cytomine.domain.meta.TagDomainAssociation;
 import be.cytomine.domain.project.Project;
@@ -65,7 +65,7 @@ public class TagDomainAssociationResourceTests {
         restTagDomainAssociationControllerMockMvc.perform(get("/api/tag_domain_association/{id}.json", 0L))
                 .andExpect(status().isNotFound());
     }
-    
+
     @Test
     @Transactional
     public void list_all_tag_domain_association() throws Exception {
@@ -109,7 +109,7 @@ public class TagDomainAssociationResourceTests {
     @Transactional
     public void list_all_tag_domain_association_with_filters_pagination() throws Exception {
         Tag tag = builder.given_a_tag();
-        
+
         TagDomainAssociation t1 = builder.given_a_tag_association(tag, builder.given_a_project());
         TagDomainAssociation t2 = builder.given_a_tag_association(tag, builder.given_a_project());
         TagDomainAssociation t3 = builder.given_a_tag_association(tag, builder.given_a_project());

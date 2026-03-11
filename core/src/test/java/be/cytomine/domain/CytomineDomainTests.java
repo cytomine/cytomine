@@ -20,7 +20,7 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.config.CustomIdentifierGenerator;
 import be.cytomine.config.MongoTestConfiguration;
-import org.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.domain.ontology.Ontology;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

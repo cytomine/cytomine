@@ -19,7 +19,7 @@ package be.cytomine.service.security;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.config.MongoTestConfiguration;
-import org.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.exceptions.ForbiddenException;
 import be.cytomine.repository.security.SecRoleRepository;
 import be.cytomine.service.CurrentRoleService;

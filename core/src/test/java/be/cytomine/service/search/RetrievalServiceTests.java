@@ -22,7 +22,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.config.MongoTestConfiguration;
-import org.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.controller.ontology.UserAnnotationResourceTests;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.dto.search.SearchResponse;

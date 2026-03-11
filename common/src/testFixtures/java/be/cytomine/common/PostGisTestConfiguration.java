@@ -1,4 +1,4 @@
-package org.cytomine.common;
+package be.cytomine.common;
 
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;

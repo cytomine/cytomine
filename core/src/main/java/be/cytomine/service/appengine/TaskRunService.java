@@ -435,13 +435,13 @@ public class TaskRunService {
                     TaskRun taskRun = taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId)
                             .orElseThrow(() -> new ObjectNotFoundException("TaskRun", taskRunId));
 
-                    Optional<TaskRunLayer> optionalTaskRunLayer = taskRunLayerRepository
-                            .findByTaskRunAndImage(taskRun, taskRun.getImage());
-                    if (optionalTaskRunLayer.isPresent()) {
-                        TaskRunLayer taskRunLayer = optionalTaskRunLayer.get();
-                        taskRunLayer.setRoi(annotation);
-                        taskRunLayerRepository.saveAndFlush(taskRunLayer);
-                    }
+                    TaskRunLayer taskRunLayer = taskRunLayerRepository
+                            .findByTaskRunAndDerivedFrom(taskRun, parameterName)
+                            .orElseThrow(() -> new RuntimeException("Task run layer not found for " + parameterName));
+                    taskRunLayer.setRoi(annotation);
+                    taskRunLayer.getOffsets()
+                            .add(new CropOffset((int) bounds.getMinX(), (int) bounds.getMinY(), taskRunLayer, 0));
+                    taskRunLayerRepository.saveAndFlush(taskRunLayer);
 
                     body = prepareImage(id, "annotation");
                 }

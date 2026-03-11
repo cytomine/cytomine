@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -601,9 +602,10 @@ public class TaskRunService {
                 }
             }
         } else if ("ARRAY".equals(value.getSubType())) {
+            List<TaskRunValue> innerValues = objectMapper.convertValue(items, new TypeReference<>() {});
+
             for (int i = 0; i < items.size(); i++) {
-                TaskRunValue inner = objectMapper.convertValue(items.get(i), TaskRunValue.class);
-                processGeometryValue(inner, annotationLayer, taskRunLayer, i);
+                processGeometryValue(innerValues.get(i), annotationLayer, taskRunLayer, i);
             }
         }
     }
@@ -665,9 +667,9 @@ public class TaskRunService {
 
         String layerName = annotationLayerService.createLayerName(taskRunResponse.task().name(), taskRunResponse.task().version(), taskRun.getCreated());
         AnnotationLayer annotationLayer = annotationLayerService.createAnnotationLayer(layerName);
-        if (!annotationLayer.getAnnotations().isEmpty()) {
-            return response;
-        }
+        //if (!annotationLayer.getAnnotations().isEmpty()) {
+        //    return response;
+        //}
 
         Set<TaskRunLayer> taskRunLayers = taskRunLayerRepository.findAllByTaskRunAndImage(taskRun, taskRun.getImage());
 

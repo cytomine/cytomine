@@ -28,68 +28,17 @@ clean:
 build:
 	docker compose -f compose.yaml -f compose.override.yaml build
 
-# Push images to local registry (starts registry first if needed)
+# Start K3s from helm/docker-compose.yaml
+start-k3s:
+	docker-compose -f ./helm/compose.yaml up -d
+
+# Save docker images to k3s
 push-local:
-	@echo "Starting local registry..."
-	docker compose up -d registry
-	@sleep 2
-	@echo "Tagging and pushing images to local registry..."
 	@for service in $(SERVICES); do \
-		echo "Pushing $$service..."; \
-		docker tag cytomine/$$service:latest $(LOCAL_REGISTRY)/cytomine/$$service:latest; \
-		docker push $(LOCAL_REGISTRY)/cytomine/$$service:latest; \
+		echo "Pushing cytomine/$$service:latest to k3s..."; \
+		docker save cytomine/$$service:latest | docker exec -i helm-k3s-1 ctr -n k8s.io images import -; \
 	done
-	@echo "All images pushed to $(LOCAL_REGISTRY)"
 
-# Start infrastructure services (databases, k3s, registry)
-start-infra:
-	@echo "Starting infrastructure services..."
-	docker compose up -d mongo postgis registry redis pims-cache iam-db app-engine-db k3s
-	@echo "Waiting for k3s to be ready..."
-	@until KUBECONFIG=$(KUBECONFIG) kubectl get nodes >/dev/null 2>&1; do \
-		echo "Waiting for k3s..."; \
-		sleep 3; \
-	done
-	@echo "k3s is ready"
-
-# Deploy helm chart to local k3s
-helm-local:
-	@echo "Creating namespace..."
-	-KUBECONFIG=$(KUBECONFIG) kubectl create namespace $(HELM_NAMESPACE)
-	KUBECONFIG=$(KUBECONFIG) kubectl apply -f k3s/cytomine-local-ns.yaml
-	@echo "Installing/upgrading helm chart..."
-	KUBECONFIG=$(KUBECONFIG) helm upgrade --install $(HELM_RELEASE) ./helm/charts/cytomine \
-		-f ./helm/charts/cytomine/local/values.yaml \
-		--set images.app_engine=$(LOCAL_REGISTRY)/cytomine/app-engine:latest \
-		--set images.core=$(LOCAL_REGISTRY)/cytomine/core:latest \
-		--set images.pims=$(LOCAL_REGISTRY)/cytomine/pims:latest \
-		--set images.web_ui=$(LOCAL_REGISTRY)/cytomine/web-ui:latest \
-		--set images.cbir=$(LOCAL_REGISTRY)/cytomine/cbir:latest \
-		--set images.sam=$(LOCAL_REGISTRY)/cytomine/sam:latest \
-		--set images.nginx=$(LOCAL_REGISTRY)/cytomine/nginx:latest \
-		--set images.repository=$(LOCAL_REGISTRY)/cytomine/repository:latest \
-		--set images.iam=$(LOCAL_REGISTRY)/cytomine/iam:latest \
-		--set images.pullPolicy=Always \
-		-n $(HELM_NAMESPACE) \
-		--wait --timeout 10m
-	@echo "Helm deployment complete"
-
-# Start local k3s environment with helm
-start-local: start-infra helm-local
-	@echo "Local k3s environment is running"
-	@echo "Access Cytomine at http://cytomine.local (add to /etc/hosts: 127.0.0.1 cytomine.local)"
-
-# Full local workflow: build, push, and start
-local: build push-local start-local
-	@echo "Local environment ready!"
-
-# Stop local k3s environment
-stop-local:
-	@echo "Uninstalling helm release..."
-	-KUBECONFIG=$(KUBECONFIG) helm uninstall $(HELM_RELEASE) -n $(HELM_NAMESPACE) 2>/dev/null
-	@echo "Stopping docker compose services..."
-	docker compose down
-
-# Catch-all rule to prevent "No rule to make target ..." errors
-%:
-	@:
+# Deploy helm cytomine to k3s
+helm-install:
+	helm upgrade --kubeconfig=./.kube/shared/config -f ./helm/charts/cytomine/example/values.yaml cytomine-platform ./helm/charts/cytomine/ -n cytomine-local --install

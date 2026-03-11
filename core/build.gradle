@@ -54,7 +54,6 @@ dependencies {
     // Postgresql
     implementation 'org.postgresql:postgresql'
     implementation 'com.zaxxer:HikariCP'
-    implementation 'org.liquibase:liquibase-core'
 
     // Spring security
     implementation 'org.springframework.security:spring-security-acl'

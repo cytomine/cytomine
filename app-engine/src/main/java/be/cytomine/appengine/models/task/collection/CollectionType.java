@@ -1464,10 +1464,13 @@ public class CollectionType extends Type {
         boolean hasItems = !collectionPersistence.getItems().isEmpty();
         boolean isCompactValueMissing = collectionPersistence.getCompactValue() == null;
         if (hasItems && isCompactValueMissing) {
+            String parameterName = typePersistence.getParameterName();
+            int index = parameterName.contains("/") ? Integer.parseInt(parameterName.split("/")[1]) : 0;
             CollectionValue collectionValue = new CollectionValue();
             collectionValue.setType(ValueType.ARRAY);
-            collectionValue.setParameterName(collectionPersistence.getParameterName());
+            collectionValue.setParameterName(parameterName);
             collectionValue.setTaskRunId(collectionPersistence.getRunId());
+            collectionValue.setIndex(index);
 
             List<TaskRunParameterValue> items = new ArrayList<>();
             collectionValue.setValue(items);

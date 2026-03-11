@@ -601,11 +601,10 @@ public class TaskRunService {
                 }
             }
         } else if ("ARRAY".equals(value.getSubType())) {
-            int[] currentIndex = {0};
-
-            items.stream()
-                    .map(item -> objectMapper.convertValue(item, TaskRunValue.class))
-                    .forEach(inner -> processGeometryValue(inner, annotationLayer, taskRunLayer, currentIndex[0]++));
+            for (int i = 0; i < items.size(); i++) {
+                TaskRunValue inner = objectMapper.convertValue(items.get(i), TaskRunValue.class);
+                processGeometryValue(inner, annotationLayer, taskRunLayer, i);
+            }
         }
     }
 

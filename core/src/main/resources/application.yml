@@ -65,7 +65,7 @@ spring:
   data:
     mongodb:
       authentication-database: admin
-      username: ${MONGO_USER:mongoadmin}
+      username: ${MONGO_USER:admin}
       password: ${MONGO_PASS:password}
       database: ${MONGO_DB_NAME:cytomine}
       port: ${MONGO_PORT:27017}
@@ -130,6 +130,7 @@ application:
   pimsURL: ${PIMS_URL}
   samURL: ${SAM_URL}
   cbirURL: ${CBIR_URL}
+  repositoryURL: ${REPOSITORY_URL}
 
   annotation:
     maxNumberOfPoint: ${ANNOTATION_MAX_POINTS:200}

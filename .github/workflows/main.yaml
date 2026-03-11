@@ -28,10 +28,16 @@ jobs:
     uses: ./.github/workflows/sam.yaml
   web-ui:
     uses: ./.github/workflows/web-ui.yaml
+  repository:
+    uses: ./.github/workflows/repository.yaml
   e2e-tests:
     uses: ./.github/workflows/e2e-tests.yaml
 
   docker-images:
+    uses: ./.github/workflows/docker.yaml
+    secrets: inherit
+
+  helm-tests:
     needs:
       - app-engine
       - cbir
@@ -41,11 +47,8 @@ jobs:
       - registry-client
       - sam
       - web-ui
+      - repository
       - e2e-tests
-    uses: ./.github/workflows/docker.yaml
-    secrets: inherit
-
-  helm-tests:
-    needs: [docker-images]
+      - docker-images
     uses: ./.github/workflows/helm-test.yaml
     secrets: inherit

@@ -20,5 +20,5 @@ public class CollectionValue extends TaskRunParameterValue {
     @JsonIgnoreProperties({"param_name"})
     private List<TaskRunParameterValue> value;
     private ValueType subType;
-    private int index;
+
 }

@@ -20,7 +20,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.config.PostGisTestConfiguration;
+import be.cytomine.common.PostGisTestConfiguration;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import jakarta.persistence.EntityManager;

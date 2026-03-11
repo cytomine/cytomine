@@ -1,4 +1,4 @@
-package org.cytomine.common.repository.http;
+package be.cytomine.common.repository.http;
 
 import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;

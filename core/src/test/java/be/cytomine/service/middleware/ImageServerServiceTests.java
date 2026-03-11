@@ -19,7 +19,7 @@ package be.cytomine.service.middleware;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.config.PostGisTestConfiguration;
+import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.properties.ApplicationProperties;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.AbstractSlice;
@@ -142,7 +142,7 @@ public class ImageServerServiceTests {
                                     {"id":"SCN","name":"Leica SCN","remarks":"","convertible":false,"readable":true,"writable":false,"importable":true,"plugin":"pims_plugin_format_openslide"},
                                     {"id":"SVS","name":"Leica Aperio SVS","remarks":"","convertible":false,"readable":true,"writable":false,"importable":true,"plugin":"pims_plugin_format_openslide"},
                                     {"id":"VMS","name":"Hamamatsu VMS","remarks":"One .vms file, one .opt optimization file and several .jpg with same name, packed in an archive. ","convertible":false,"readable":true,"writable":false,"importable":true,"plugin":"pims_plugin_format_openslide"}
-                                    ],"size":26}                                        
+                                    ],"size":26}
                                         """
                         )
                 )
@@ -277,7 +277,7 @@ public class ImageServerServiceTests {
                                                           {"file_type":"SINGLE","filepath":"/data/images/upload1644425985928451/processed/original.PYRTIFF","stem":"original","extension":".PYRTIFF","created_at":"2022-05-05T22:16:23.318839","size":126616954,"is_symbolic":true,"role":"ORIGINAL"}
                                                           },
                                                           {"role":"SPATIAL","file":{"file_type":"SINGLE","filepath":"/data/images/upload1644425985928451/processed/visualisation.PYRTIFF","stem":"visualisation","extension":".PYRTIFF","created_at":"2022-05-05T22:16:23.318839","size":126616954,"is_symbolic":true,"role":"SPATIAL"},"pyramid":{"n_tiers":8,"tiers":[{"zoom":7,"level":0,"width":30720,"height":25600,"tile_width":256,"tile_height":256,"downsampling_factor":1.0,"n_tiles":12000,"n_tx":120,"n_ty":100},{"zoom":6,"level":1,"width":15360,"height":12800,"tile_width":256,"tile_height":256,"downsampling_factor":2.0,"n_tiles":3000,"n_tx":60,"n_ty":50},{"zoom":5,"level":2,"width":7680,"height":6400,"tile_width":256,"tile_height":256,"downsampling_factor":4.0,"n_tiles":750,"n_tx":30,"n_ty":25},{"zoom":4,"level":3,"width":3840,"height":3200,"tile_width":256,"tile_height":256,"downsampling_factor":8.0,"n_tiles":195,"n_tx":15,"n_ty":13},{"zoom":3,"level":4,"width":1920,"height":1600,"tile_width":256,"tile_height":256,"downsampling_factor":16.0,"n_tiles":56,"n_tx":8,"n_ty":7},{"zoom":2,"level":5,"width":960,"height":800,"tile_width":256,"tile_height":256,"downsampling_factor":32.0,"n_tiles":16,"n_tx":4,"n_ty":4},{"zoom":1,"level":6,"width":480,"height":400,"tile_width":256,"tile_height":256,"downsampling_factor":64.0,"n_tiles":4,"n_tx":2,"n_ty":2},{"zoom":0,"level":7,"width":240,"height":200,"tile_width":256,"tile_height":256,"downsampling_factor":128.0,"n_tiles":1,"n_tx":1,"n_ty":1}]}}]}
-      
+
                                   """
                         )
                 )
@@ -538,7 +538,7 @@ public class ImageServerServiceTests {
                                 3861608,3876915,3783278,3733759,3765270,3683339,3677937,3724755,3808488,3925534,4095700,4282072,4672825,5382302,
                                 6388896,7618776,10436878,15088093,25878810,65904844,153326293,264905079,212651367,181677468,228504759,204774190,
                                 143072188,36629008,4463044,3138626,2549795,2030294,1769191,1577416,1322617,1176760,1016497,841829,664460,596934,
-                                509598,389852,358340,282711,216084,188173,195376,135052,99939,86434,70227,37814,180970]}                           
+                                509598,389852,358340,282711,216084,188173,195376,135052,99939,86434,70227,37814,180970]}
                                 """
                         )
                 )
@@ -569,7 +569,7 @@ public class ImageServerServiceTests {
                 .willReturn(
                         aResponse().withBody(
                                 """
-                                 {"type":"FAST","minimum":0,"maximum":255}                                                                                   
+                                 {"type":"FAST","minimum":0,"maximum":255}
                                 """
                         )
                 )
@@ -622,7 +622,7 @@ public class ImageServerServiceTests {
                                                 42760403,101379601,116701787,117473388,74001707,10310828,1870030,1317215,957974,786907,598734,506898,
                                                 408760,319625,263803,210682,151259,114345,91836,59423,45018,42317,27011,20708,10804,8103,6302,6302,4502,900,900,3601],
                                                 "channel":0,"concrete_channel":0,"sample":0,"color":"#f00","z_slice":0,"timepoint":0}
-                                    ],"size":1}                                   
+                                    ],"size":1}
                                 """
                         )
                 )
@@ -654,7 +654,7 @@ public class ImageServerServiceTests {
                 .willReturn(
                         aResponse().withBody(
                                 """
-                                    {"items":[{"type":"FAST","minimum":6,"maximum":255,"channel":0,"concrete_channel":0,"sample":0,"color":"#f00","z_slice":0,"timepoint":0}],"size":1}                                                                                             
+                                    {"items":[{"type":"FAST","minimum":6,"maximum":255,"channel":0,"concrete_channel":0,"sample":0,"color":"#f00","z_slice":0,"timepoint":0}],"size":1}
                                 """
                         )
                 )
@@ -703,7 +703,7 @@ public class ImageServerServiceTests {
                                 1180361,1222678,1224478,1167756,1176760,1179461,1244286,1286603,1305510,1385641,1508089,1732277,1969069,2427348,
                                 3583400,4999653,7937501,14420933,20375859,42760403,101379601,116701787,117473388,74001707,10310828,1870030,1317215,
                                 957974,786907,598734,506898,408760,319625,263803,210682,151259,114345,91836,59423,45018,42317,27011,20708,10804,8103,
-                                6302,6302,4502,900,900,3601],"channel":0,"concrete_channel":0,"sample":0,"color":"#f00","z_slice":0,"timepoint":0}],"size":1}                          
+                                6302,6302,4502,900,900,3601],"channel":0,"concrete_channel":0,"sample":0,"color":"#f00","z_slice":0,"timepoint":0}],"size":1}
                                 """
                         )
                 )
@@ -739,7 +739,7 @@ public class ImageServerServiceTests {
                                 {"type":"FAST","minimum":6,"maximum":255,"channel":0,"concrete_channel":0,"sample":0,"color":"#f00","z_slice":0,"timepoint":0},
                                 {"type":"FAST","minimum":0,"maximum":244,"channel":1,"concrete_channel":0,"sample":1,"color":"#0f0","z_slice":0,"timepoint":0},
                                 {"type":"FAST","minimum":23,"maximum":255,"channel":2,"concrete_channel":0,"sample":2,"color":"#00f","z_slice":0,"timepoint":0}],
-                                "size":3}                                                                                    
+                                "size":3}
                                 """
                         )
                 )

@@ -19,7 +19,7 @@ package be.cytomine.controller;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.config.PostGisTestConfiguration;
+import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.properties.ApplicationProperties;
 import be.cytomine.domain.project.Project;
 import be.cytomine.repositorynosql.social.LastConnectionRepository;

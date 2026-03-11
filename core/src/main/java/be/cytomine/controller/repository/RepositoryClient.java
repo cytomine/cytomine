@@ -1,6 +1,6 @@
 package be.cytomine.controller.repository;
 
-import org.cytomine.common.repository.http.HealthService;
+import be.cytomine.common.repository.http.HealthService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

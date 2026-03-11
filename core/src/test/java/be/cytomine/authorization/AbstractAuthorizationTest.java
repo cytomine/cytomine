@@ -17,7 +17,7 @@ package be.cytomine.authorization;
 */
 
 import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.config.PostGisTestConfiguration;
+import org.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ForbiddenException;

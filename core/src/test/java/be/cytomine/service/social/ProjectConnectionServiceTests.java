@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.config.PostGisTestConfiguration;
+import org.cytomine.common.PostGisTestConfiguration;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.time.DateUtils;
 import org.junit.jupiter.api.BeforeEach;

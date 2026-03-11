@@ -19,7 +19,7 @@ package be.cytomine.service.image;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.config.PostGisTestConfiguration;
+import org.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.meta.Property;
 import be.cytomine.repository.meta.PropertyRepository;

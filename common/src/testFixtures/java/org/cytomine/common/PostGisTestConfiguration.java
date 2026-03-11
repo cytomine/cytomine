@@ -1,4 +1,4 @@
-package be.cytomine.config;
+package org.cytomine.common;
 
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
@@ -8,6 +8,7 @@ import org.testcontainers.utility.DockerImageName;
 
 @TestConfiguration(proxyBeanMethods = false)
 public class PostGisTestConfiguration {
+
     @Bean
     @ServiceConnection
     PostgreSQLContainer postGisContainer() {

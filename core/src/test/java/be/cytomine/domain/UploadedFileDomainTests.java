@@ -19,7 +19,7 @@ package be.cytomine.domain;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.config.PostGisTestConfiguration;
+import org.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.domain.image.UploadedFile;
 import be.cytomine.repository.image.UploadedFileRepository;
 import org.junit.jupiter.api.Test;

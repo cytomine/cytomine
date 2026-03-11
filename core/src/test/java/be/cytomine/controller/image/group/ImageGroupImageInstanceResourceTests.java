@@ -1,7 +1,7 @@
 package be.cytomine.controller.image.group;
 
 import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.config.PostGisTestConfiguration;
+import org.cytomine.common.PostGisTestConfiguration;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterAll;

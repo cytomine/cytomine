@@ -12,7 +12,7 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.security.test.context.support.WithMockUser;
 
 import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.config.PostGisTestConfiguration;
+import org.cytomine.common.PostGisTestConfiguration;
 
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
 @Transactional

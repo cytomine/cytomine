@@ -4,7 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
 
-import be.cytomine.common.repository.http.serialization.ObjectMapperFactory;
+import org.cytomine.repository.http.serialization.ObjectMapperFactory;
 
 @SpringBootApplication
 @Import(ObjectMapperFactory.class)

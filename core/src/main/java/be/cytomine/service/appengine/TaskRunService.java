@@ -304,6 +304,34 @@ public class TaskRunService {
         }
     }
 
+    private MultiValueMap<String, Object> prepareAnnotationBody(Long id, UserAnnotation annotation, Envelope bounds) {
+        byte[] imageData = getImageAnnotation(annotation);
+
+        int xOffset = (int) -bounds.getMinX();
+        int yOffset = (int) -bounds.getMinY();
+        Geometry shifted = GeometryService.addOffset(annotation.getWktLocation(), xOffset, yOffset);
+        String geometry = geometryService.WKTToGeoJSON(shifted.toText());
+
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("file", new ByteArrayResource(imageData) {
+            @Override
+            public String getFilename() { return id + ".png"; }
+        });
+        body.add("location", new ByteArrayResource(geometry.getBytes(StandardCharsets.UTF_8)) {
+            @Override
+            public String getFilename() { return id + ".geojson"; }
+        });
+        return body;
+    }
+
+    private void saveCropOffset(TaskRun taskRun, String parameterName, Envelope bounds, int index) {
+        TaskRunLayer taskRunLayer = taskRunLayerRepository
+                .findByTaskRunAndDerivedFrom(taskRun, parameterName)
+                .orElseThrow(() -> new RuntimeException("Task run layer not found for " + parameterName));
+        taskRunLayer.getOffsets().add(new CropOffset((int) bounds.getMinX(), (int) bounds.getMinY(), index));
+        taskRunLayerRepository.saveAndFlush(taskRunLayer);
+    }
+
     public String provisionTaskRun(JsonNode json, Long projectId, UUID taskRunId, String parameterName)
         throws JsonProcessingException {
         checkTaskRun(projectId, taskRunId);
@@ -311,7 +339,6 @@ public class TaskRunService {
         String uri = "task-runs/" + taskRunId + "/input-provisions/" + parameterName;
         String arrayTypeUri = uri + "/indexes";
         ObjectMapper mapper = new ObjectMapper();
-        File wsi = null;
         if (json.get("type").isObject() && json.get("type").get("id").asText().equals("array")) {
             String subtype = json.get("type").get("subType").get("id").asText();
 
@@ -321,50 +348,18 @@ public class TaskRunService {
 
                 Long[] itemsArray = mapper.convertValue(value.get("ids"), Long[].class);
 
-                AnnotationLayer annotationLayer = null;
-                TaskRun taskRun = null;
-                if ("annotation".equals(type)) {
-                    taskRun = taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId)
-                            .orElseThrow(() -> new ObjectNotFoundException("TaskRun", taskRunId));
-
-                    String appEngineResponse = appEngineService.get("/task-runs/" + taskRunId);
-                    TaskRunResponse taskRunResponse;
-                    try {
-                        taskRunResponse = objectMapper.readValue(appEngineResponse, TaskRunResponse.class);
-                    } catch (JsonProcessingException e) {
-                        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error parsing JSON response");
-                    }
-                    String layerName = annotationLayerService.createLayerName(taskRunResponse.task().name(), taskRunResponse.task().version(), taskRun.getCreated());
-                    annotationLayer = annotationLayerService.createAnnotationLayer(layerName);
-                }
-
                 if (subtype.equals("image")) {
                     ArrayNode responseArray = mapper.createArrayNode();
                     for (int i = 0; i < itemsArray.length; i++) {
                         Long id = itemsArray[i];
                         if (type.equalsIgnoreCase("annotation")) {
                             UserAnnotation annotation = userAnnotationService.get(id);
-                            byte[] imageData = getImageAnnotation(annotation);
-
-                            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-                            body.add("file", new ByteArrayResource(imageData) {
-                                @Override
-                                public String getFilename() {
-                                    return id + ".png";
-                                }
-                            });
-
                             Envelope bounds = GeometryService.getBounds(annotation.getWktLocation());
-                            int xOffset = (int) -bounds.getMinX();
-                            int yOffset = (int) -bounds.getMinY();
-                            Geometry shifted = GeometryService.addOffset(annotation.getWktLocation(), xOffset, yOffset);
-                            String geometry = geometryService.WKTToGeoJSON(shifted.toText());
-                            body.add("location", new ByteArrayResource(geometry.getBytes(StandardCharsets.UTF_8)) {
-                                @Override
-                                public String getFilename() {
-                                    return id + ".geojson";
-                                }
-                            });
+
+                            TaskRun taskRun = taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId)
+                                    .orElseThrow(() -> new ObjectNotFoundException("TaskRun", taskRunId));
+
+                            MultiValueMap<String, Object> body = prepareAnnotationBody(id, annotation, bounds);
 
                             String response = provisionCollectionItem(arrayTypeUri, i, body);
                             if (response != null) {
@@ -372,15 +367,13 @@ public class TaskRunService {
                                 responseArray.add(itemNode);
                             }
 
-                            TaskRunLayer taskRunLayer = taskRunLayerRepository
-                                    .findByTaskRunAndDerivedFrom(taskRun, parameterName)
-                                    .orElse(new TaskRunLayer(annotationLayer, taskRun, taskRun.getImage(), annotation, parameterName));
-                            CropOffset cropOffset = new CropOffset((int) bounds.getMinX(), (int) bounds.getMinY(), i-1);
-                            taskRunLayer.getOffsets().add(cropOffset);
-                            taskRunLayerRepository.saveAndFlush(taskRunLayer);
+                            saveCropOffset(taskRun, parameterName, bounds, i - 1);
                         }
                         if (type.equalsIgnoreCase("image")) {
-                            MultiValueMap<String, Object> body = prepareImage(id, "image");
+                            File wsi = downloadWsi(id);
+
+                            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+                            body.add("file", new FileSystemResource(wsi));
 
                             String response = provisionCollectionItem(arrayTypeUri, i, body);
                             if (response != null) {
@@ -413,6 +406,7 @@ public class TaskRunService {
         }
 
         if (json.get("type").get("id").asText().equals("image")) {
+            File wsi = null;
             JsonNode value = json.get("value");
             if (value.isNull()) {
                 throw new RuntimeException("value cannot be null");
@@ -434,15 +428,9 @@ public class TaskRunService {
                     TaskRun taskRun = taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId)
                             .orElseThrow(() -> new ObjectNotFoundException("TaskRun", taskRunId));
 
-                    TaskRunLayer taskRunLayer = taskRunLayerRepository
-                            .findByTaskRunAndDerivedFrom(taskRun, parameterName)
-                            .orElseThrow(() -> new RuntimeException("Task run layer not found for " + parameterName));
-                    taskRunLayer.setRoi(annotation);
-                    taskRunLayer.getOffsets()
-                            .add(new CropOffset((int) bounds.getMinX(), (int) bounds.getMinY(), 0));
-                    taskRunLayerRepository.saveAndFlush(taskRunLayer);
+                    saveCropOffset(taskRun, parameterName, bounds, 0);
 
-                    body = prepareImage(id, "annotation");
+                    body = prepareAnnotationBody(id, annotation, bounds);
                 }
 
                 case "image" -> {
@@ -485,41 +473,6 @@ public class TaskRunService {
 
         return appEngineService.postWithParams(arrayTypeUri, body, MediaType.MULTIPART_FORM_DATA, params);
 
-    }
-
-    private MultiValueMap<String, Object> prepareImage(Long id, String type) {
-
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        if (type.equals("annotation")) {
-            UserAnnotation annotation = userAnnotationService.get(id);
-            byte[] imageData = getImageAnnotation(annotation);
-
-            body.add("file", new ByteArrayResource(imageData) {
-                @Override
-                public String getFilename() {
-                    return id + ".png";
-                }
-            });
-
-            Envelope bounds = GeometryService.getBounds(annotation.getWktLocation());
-            int xOffset = (int) -bounds.getMinX();
-            int yOffset = (int) -bounds.getMinY();
-            Geometry shifted = GeometryService.addOffset(annotation.getWktLocation(), xOffset, yOffset);
-            String geometry = geometryService.WKTToGeoJSON(shifted.toText());
-            body.add("location", new ByteArrayResource(geometry.getBytes(StandardCharsets.UTF_8)) {
-                @Override
-                public String getFilename() {
-                    return id + ".geojson";
-                }
-            });
-        }
-        if (type.equals("image")) {
-            File wsi = downloadWsi(id);
-
-            body = new LinkedMultiValueMap<>();
-            body.add("file", new FileSystemResource(wsi));
-        }
-        return body;
     }
 
     public File downloadFile(URI uri, File destinationFile) {

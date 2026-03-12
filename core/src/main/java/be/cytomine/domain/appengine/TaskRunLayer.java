@@ -42,10 +42,6 @@ public class TaskRunLayer extends CytomineDomain {
     @JoinColumn(name = "image_instance_id")
     private ImageInstance image;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "roi_id")
-    private UserAnnotation roi;
-
     @Column(name = "parameter_name")
     private String parameterName;
 
@@ -57,11 +53,10 @@ public class TaskRunLayer extends CytomineDomain {
     @OrderColumn(name = "order_index")
     private List<CropOffset> offsets = new ArrayList<>();
 
-    public TaskRunLayer(AnnotationLayer layer, TaskRun taskRun, ImageInstance image, UserAnnotation roi, String parameterName) {
+    public TaskRunLayer(AnnotationLayer layer, TaskRun taskRun, ImageInstance image, String parameterName) {
         this.annotationLayer = layer;
         this.taskRun = taskRun;
         this.image = image;
-        this.roi = roi;
         this.parameterName = parameterName;
     }
 

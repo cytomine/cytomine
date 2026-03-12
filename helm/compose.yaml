@@ -15,7 +15,7 @@ services:
     environment:
       - K3S_TOKEN=65535-65535-65535  # plain text secret!
       - K3S_KUBECONFIG_OUTPUT=/output/config
-      - K3S_KUBECONFIG_MODE=666S
+      - K3S_KUBECONFIG_MODE=666
     volumes:
       - ../k3s/entrypoint.sh:/entrypoint:ro
       - ../k3s/serviceaccounts.yaml:/var/lib/rancher/k3s/server/manifests/serviceaccounts.yaml:ro

@@ -1,6 +1,6 @@
 --liquibase formatted sql
 
---changeset bathienle:add-roi-to-task-run-layer
+--changeset bathienle:add-derived-from-to-task-run-layer
 ALTER TABLE task_run_layer
     ADD COLUMN parameter_name VARCHAR(255),
     ADD COLUMN derived_from VARCHAR(255);

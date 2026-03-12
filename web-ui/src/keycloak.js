@@ -5,8 +5,16 @@ let _keycloak = null;
 
 function getKeycloak() {
   if (!_keycloak) {
+    // Strip /realms/cytomine if present, as Keycloak JS adds it automatically
+    let url = constants.IAM_URL;
+    if (url.endsWith('/')) {
+      url = url.slice(0, -1);
+    }
+    if (url.endsWith('/realms/cytomine')) {
+      url = url.slice(0, -'/realms/cytomine'.length);
+    }
     const initOptions = {
-      url: constants.IAM_URL,
+      url: url,
       realm: 'cytomine',
       clientId: 'core',
       enableLogging: true

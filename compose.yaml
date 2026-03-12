@@ -76,7 +76,7 @@ services:
     environment:
       <<: [ *version-env ]
       CORE_URL: http://localhost:8080/api
-      IAM_URL: http://localhost
+      IAM_URL: http://localhost:8070/iam/realms/cytomine
       PIMS_URL: http://localhost:5001
       APPENGINE_URL: http://localhost:8082
       CBIR_URL: http://localhost:6000
@@ -142,12 +142,13 @@ services:
       KC_DB_URL_HOST: iam-db
       KC_DB_URL_PORT: 5432
       KC_DB_USERNAME: iam
-      KC_HOSTNAME: localhost
-      KC_HOSTNAME_ADMIN: localhost
+      KC_HOSTNAME: localhost:8070
+      KC_HOSTNAME_ADMIN: localhost:8070
       KC_HOSTNAME_STRICT: false
       KC_HOSTNAME_STRICT_BACKCHANNEL: false
       KC_HOSTNAME_STRICT_HTTPS: false
       KC_HTTP_ENABLED: true
+      KC_HTTP_RELATIVE_PATH: /iam
       KC_PROXY_HEADERS: xforwarded
       KC_SPI_STICKY_SESSION_ENCODER_INFINISPAN_SHOULD_ATTACH_ROUTE: false
       KC_SMTP_FROM: mail@mail.com
@@ -225,7 +226,7 @@ services:
       IMAGE_SERVER_PRIVATE_KEY: d70607f5-c478-403c-be11-3dbc1716d1cf
       IMAGE_SERVER_PUBLIC_KEY: 9a8b8369-2446-44cb-b0af-604a74e1dcdb
       IAM_URL: http://iam:8100
-      SERVER_URL: http://localhost
+      SERVER_URL: http://localhost:8070
       PIMS_URL: http://pims:5000
       CBIR_URL: http://cbir:6000
       APPENGINE_API_URL: http://app-engine:8080
@@ -270,20 +271,6 @@ services:
       host_network:
         ipv4_address: 172.16.238.12
 
-  repository:
-    image: cytomine/repository:latest
-    restart: unless-stopped
-    ports:
-      - 8081:8081
-    environment:
-      POSTGIS_HOST: postgis
-      POSTGIS_PASS: password
-      POSTGIS_PORT: 5432
-      POSTGIS_USER: docker
-    networks:
-      host_network:
-        ipv4_address: 172.16.238.18
-
   sam:
     image: cytomine/sam:latest
     restart: unless-stopped
@@ -296,11 +283,17 @@ services:
     networks:
       host_network:
         ipv4_address: 172.16.238.13
+
   repository:
     image: cytomine/repository:latest
     restart: unless-stopped
     ports:
       - 8081:8081
+    environment:
+      POSTGIS_HOST: postgis
+      POSTGIS_PASS: password
+      POSTGIS_PORT: 5432
+      POSTGIS_USER: docker
     networks:
       host_network:
         ipv4_address: 172.16.238.18

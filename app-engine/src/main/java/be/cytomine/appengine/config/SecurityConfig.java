@@ -16,7 +16,6 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOriginPatterns(List.of("*"));

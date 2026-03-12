@@ -142,13 +142,13 @@ services:
       KC_DB_URL_HOST: iam-db
       KC_DB_URL_PORT: 5432
       KC_DB_USERNAME: iam
-      KC_HOSTNAME: localhost:8070
-      KC_HOSTNAME_ADMIN: localhost:8070
+      KC_HOSTNAME: 127.0.0.1:8070
+      KC_HOSTNAME_ADMIN: 127.0.0.1:8070
       KC_HOSTNAME_STRICT: false
       KC_HOSTNAME_STRICT_BACKCHANNEL: false
       KC_HOSTNAME_STRICT_HTTPS: false
-      KC_HTTP_ENABLED: true
       KC_HTTP_RELATIVE_PATH: /iam
+      KC_HTTP_ENABLED: true
       KC_PROXY_HEADERS: xforwarded
       KC_SPI_STICKY_SESSION_ENCODER_INFINISPAN_SHOULD_ATTACH_ROUTE: false
       KC_SMTP_FROM: mail@mail.com
@@ -192,6 +192,7 @@ services:
       - ${DATA_PATH:-./data}/app-engine-shared-inputs:/app-engine-shared-inputs:rw
       - ${DATA_PATH:-./data}/app-engine-shared-datasets:/app-engine-shared-datasets:rw
     environment:
+      API_PREFIX: ${APP_ENGINE_API_BASE_PATH:-/}
       DB_HOST: app-engine-db
       DB_NAME: appengine
       DB_PASSWORD: password
@@ -226,8 +227,8 @@ services:
       IMAGE_SERVER_PRIVATE_KEY: d70607f5-c478-403c-be11-3dbc1716d1cf
       IMAGE_SERVER_PUBLIC_KEY: 9a8b8369-2446-44cb-b0af-604a74e1dcdb
       IAM_URL: http://iam:8100
-      IAM_EXTERNAL_URL: http://localhost:8070
-      SERVER_URL: http://localhost:8080
+      IAM_EXTERNAL_URL: http://127.0.0.1:8070
+      SERVER_URL: http://127.0.0.1:8080
       PIMS_URL: http://pims:5000
       CBIR_URL: http://cbir:6000
       APPENGINE_API_URL: http://app-engine:8080
@@ -263,6 +264,7 @@ services:
       - ${DATA_PATH:-./data}/cbir:/data/cbir
       - ${DATA_PATH:-./data}/weights:/weights
     environment:
+      API_BASE_PATH: ${CBIR_API_BASE_PATH:-/}
       DATA_PATH: /data/cbir
       DB: 0
       EXTRACTOR: ${CBIR_EXTRACTOR:-resnet}
@@ -280,6 +282,7 @@ services:
     volumes:
       - ${DATA_PATH:-./data}/weights:/weights
     environment:
+      API_BASE_PATH: ${SAM_API_BASE_PATH:-/}
       WEIGHTS_PATH: /weights
     networks:
       host_network:

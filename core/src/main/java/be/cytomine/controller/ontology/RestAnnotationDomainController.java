@@ -464,7 +464,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
 
         URI url = UriComponentsBuilder
             .fromUriString(this.samUrl)
-            .path("/api/annotations/refine")
+            .path("/annotations/refine")
             .build()
             .toUri();
 

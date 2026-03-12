@@ -17,7 +17,6 @@
 export default {
   STOP_PREVIEW_KEYWORD: 'STOP_PREVIEW',
   DIGITAL_ZOOM_INCREMENT: 4,
-  // Service URLs (null = use window.location.origin with default path)
   CORE_URL: null,
   IAM_URL: null,
   PIMS_URL: null,

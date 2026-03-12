@@ -11,6 +11,7 @@ FROM ${PROXY_CACHE}/keycloak/keycloak:${KEYCLOAK_VERSION} AS builder
 ENV KC_DB=postgres \
     KC_FEATURES=token-exchange \
     KC_HEALTH_ENABLED=true \
+    KC_HTTP_RELATIVE_PATH=/iam \
     KC_METRICS_ENABLED=true
 
 WORKDIR /opt/keycloak
@@ -35,6 +36,8 @@ COPY --from=dev-tools-builder /mnt/rootfs /
 
 RUN mkdir /opt/keycloak/data/import
 COPY kc_config.json /opt/keycloak/data/import
+
+ENV KC_HTTP_RELATIVE_PATH=/iam
 
 ENTRYPOINT ["/opt/keycloak/bin/kc.sh"]
 CMD ["start-dev", "--import-realm", "--http-port=8100"]

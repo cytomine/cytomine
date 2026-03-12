@@ -49,13 +49,6 @@ spec:
                 name: sam
                 port:
                   number: {{ .Values.sam.port }}
-          - path: /app-engine
-            pathType: Prefix
-            backend:
-              service:
-                name: app-engine
-                port:
-                  number: {{ .Values.app_engine.port }}
           - path: /ims/formats
             pathType: Prefix
             backend:

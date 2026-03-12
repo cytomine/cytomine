@@ -33,14 +33,14 @@ spring:
             jwk-set-uri: ${IAM_URL}/iam/realms/cytomine/.well-known/openid-configuration
       resourceserver:
         jwt:
-          issuer-uri: ${IAM_EXTERNAL_URL:http://localhost:8070}/iam/realms/cytomine
+          issuer-uri: ${IAM_EXTERNAL_URL:http://127.0.0.1:8070}/iam/realms/cytomine
           jws-algorithms: RS256
           jwk-set-uri: ${IAM_URL}/iam/realms/cytomine/protocol/openid-connect/certs
 
 
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:postgresql://${POSTGIS_HOST:localhost}:${POSTGIS_PORT:5432}/${POSTGIS_DB_NAME:docker}
+    url: jdbc:postgresql://${POSTGIS_HOST:127.0.0.1}:${POSTGIS_PORT:5432}/${POSTGIS_DB_NAME:docker}
     username: ${POSTGIS_USER:docker}
     password: ${POSTGIS_PASS:password}
     hikari:

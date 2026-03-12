@@ -53,7 +53,6 @@ public class SecurityConfiguration {
         this.customJwtAuthConverter = customJwtAuthConverter;
     }
 
-    @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOriginPatterns(List.of("*"));

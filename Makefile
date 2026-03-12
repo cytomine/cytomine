@@ -12,7 +12,6 @@ clean:
 doctor:
 	@echo "Checking required tools..."
 	@command -v docker >/dev/null 2>&1 || { echo "docker: NOT FOUND"; exit 1; } && echo "docker: OK"
-	@command -v docker compose >/dev/null 2>&1 || { echo "docker compose: NOT FOUND"; exit 1; } && echo "docker compose: OK"
 	@command -v kubectl >/dev/null 2>&1 || { echo "kubectl: NOT FOUND"; exit 1; } && echo "kubectl: OK"
 	@command -v helm >/dev/null 2>&1 || { echo "helm: NOT FOUND"; exit 1; } && echo "helm: OK"
 	@echo "All required tools are installed"

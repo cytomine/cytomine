@@ -12,7 +12,7 @@ clean:
 doctor:
 	@echo "Checking required tools..."
 	@command -v docker >/dev/null 2>&1 || { echo "docker: NOT FOUND"; exit 1; } && echo "docker: OK"
-	@command -v docker-compose >/dev/null 2>&1 || { echo "docker-compose: NOT FOUND"; exit 1; } && echo "docker-compose: OK"
+	@command -v docker compose >/dev/null 2>&1 || { echo "docker compose: NOT FOUND"; exit 1; } && echo "docker compose: OK"
 	@command -v kubectl >/dev/null 2>&1 || { echo "kubectl: NOT FOUND"; exit 1; } && echo "kubectl: OK"
 	@command -v helm >/dev/null 2>&1 || { echo "helm: NOT FOUND"; exit 1; } && echo "helm: OK"
 	@echo "All required tools are installed"
@@ -26,12 +26,12 @@ init-secrets:
 		exit 1; \
 	fi
 	@echo "Reading dockerauth.json and creating secret..."
-	@SECRET=$$(base64 -w 0 ./dockerauth.json) && sed "s|<SERCRET>|$$SECRET|g" helm/docker-images-pull-secrets.yaml > ./.kube/secrets/docker-images-pull-secrets.yaml
+	@SECRET=$$(base64 -w 0 ./dockerauth.json) && sed "s|<SECRET>|$$SECRET|g" helm/docker-images-pull-secrets.yaml > ./.kube/secrets/docker-images-pull-secrets.yaml
 	@echo "Created .kube/secrets/dockerpullimages.yaml"
 	@echo "You're good to go"
 
 start-k3s-cluster:
-	@docker-compose -f ./helm/compose.yaml up
+	@docker compose -f ./helm/compose.yaml up
 
 deploy-helm:
 	@helm upgrade --kubeconfig=./.kube/shared/config -f ./helm/charts/cytomine/example/values.yaml cytomine-platform ./helm/charts/cytomine/ -n cytomine-local --install

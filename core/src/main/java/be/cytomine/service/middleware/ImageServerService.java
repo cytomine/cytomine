@@ -52,7 +52,7 @@ import be.cytomine.utils.StringUtils;
 @Transactional
 public class ImageServerService {
     // Internal communication to image server must use this base path as a convention.
-    public static final String IMS_API_BASE_PATH = "/ims";
+    public static final String IMS_API_BASE_PATH = "";
 
     private final ImageInstanceService imageInstanceService;
 

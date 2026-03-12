@@ -75,7 +75,7 @@ services:
       - /etc/localtime:/etc/localtime
     environment:
       <<: [ *version-env ]
-      CORE_URL: http://localhost:8080
+      CORE_URL: http://localhost:8080/api
       IAM_URL: http://localhost
       PIMS_URL: http://localhost:5001
       APPENGINE_URL: http://localhost:8082
@@ -142,8 +142,8 @@ services:
       KC_DB_URL_HOST: iam-db
       KC_DB_URL_PORT: 5432
       KC_DB_USERNAME: iam
-      KC_HOSTNAME: 127.0.0.1
-      KC_HOSTNAME_ADMIN: 127.0.0.1
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_ADMIN: localhost
       KC_HOSTNAME_STRICT: false
       KC_HOSTNAME_STRICT_BACKCHANNEL: false
       KC_HOSTNAME_STRICT_HTTPS: false
@@ -225,6 +225,7 @@ services:
       IMAGE_SERVER_PRIVATE_KEY: d70607f5-c478-403c-be11-3dbc1716d1cf
       IMAGE_SERVER_PUBLIC_KEY: 9a8b8369-2446-44cb-b0af-604a74e1dcdb
       IAM_URL: http://iam:8100
+      SERVER_URL: http://localhost
       PIMS_URL: http://pims:5000
       CBIR_URL: http://cbir:6000
       APPENGINE_API_URL: http://app-engine:8080
@@ -274,6 +275,11 @@ services:
     restart: unless-stopped
     ports:
       - 8081:8081
+    environment:
+      POSTGIS_HOST: postgis
+      POSTGIS_PASS: password
+      POSTGIS_PORT: 5432
+      POSTGIS_USER: docker
     networks:
       host_network:
         ipv4_address: 172.16.238.18

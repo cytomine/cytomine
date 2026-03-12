@@ -1,3 +1,4 @@
+---
 services:
   web-ui:
     image: cytomine/web-ui:latest
@@ -24,7 +25,8 @@ services:
   core:
     image: cytomine/core:latest
     build:
-      context: ./core/
+      context: ./
+      dockerfile: ./core/Dockerfile
 
   cbir:
     image: cytomine/cbir:latest
@@ -36,3 +38,8 @@ services:
     build:
       context: ./sam/
 
+  repository:
+    image: cytomine/repository:latest
+    build:
+      context: ./
+      dockerfile: ./repository/Dockerfile

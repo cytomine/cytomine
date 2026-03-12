@@ -18,6 +18,14 @@ For installation procedure, please refer to the [local installation documentatio
 
 For installing Cytomine on Kubernetes, please refer to the [Kubernetes installation documentation](https://doc.uliege.cytomine.org/admin-guide/k8s/installation).
 
+### Local dev installation
+
+K3S is provided as a mean to deploy on a local docker-compose environment. Run:
+- `make doctor`
+- `make init-secrets`
+- `make start-k3s-cluster`
+- `make deploy-helm`
+
 ## License
 
 [Apache 2.0](https://github.com/cytomine/cytomine/blob/main/LICENSE).

@@ -296,6 +296,14 @@ services:
     networks:
       host_network:
         ipv4_address: 172.16.238.13
+  repository:
+    image: cytomine/repository:latest
+    restart: unless-stopped
+    ports:
+      - 8081:8081
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.18
 
   # https://github.com/k3s-io/k3s/blob/3854eb56d4b8a183a1f8261aebd372111378a00f/docker-compose.yml
   k3s:

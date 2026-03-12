@@ -68,4 +68,4 @@ logging:
 app-engine:
   version: ce-0.0.0 # do not modify this, it will be replaced during build (ci)
   api_version: v1
-  api_prefix: ${API_PREFIX:/api/}
+  api_prefix: ${API_PREFIX:/}

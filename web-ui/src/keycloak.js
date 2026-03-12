@@ -1,29 +1,36 @@
 import Keycloak from 'keycloak-js';
 import constants from './utils/constants';
 
-const initOptions = {
-  url: constants.IAM_URL,
-  realm: 'cytomine',
-  clientId: 'core',
-  enableLogging: true
-};
+let _keycloak = null;
 
-const _keycloak = new Keycloak(initOptions);
+function getKeycloak() {
+  if (!_keycloak) {
+    const initOptions = {
+      url: constants.IAM_URL,
+      realm: 'cytomine',
+      clientId: 'core',
+      enableLogging: true
+    };
+    _keycloak = new Keycloak(initOptions);
+  }
+  return _keycloak;
+}
 
 const plugin = {
   install: Vue => {
-    Vue.$keycloak = _keycloak;
-  },
-};
-plugin.install = Vue => {
-  Vue.$keycloak = _keycloak;
-  Object.defineProperties(Vue.prototype, {
-    $keycloak: {
+    Object.defineProperty(Vue, '$keycloak', {
       get() {
-        return _keycloak;
+        return getKeycloak();
+      }
+    });
+    Object.defineProperties(Vue.prototype, {
+      $keycloak: {
+        get() {
+          return getKeycloak();
+        },
       },
-    },
-  });
+    });
+  },
 };
 
 export default plugin;

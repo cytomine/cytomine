@@ -75,12 +75,12 @@ services:
       - /etc/localtime:/etc/localtime
     environment:
       <<: [ *version-env ]
-      CORE_URL: http://core:8080/api/
-      IAM_URL: http://iam:8080/iam
-      PIMS_URL: http://pims:5000/ims/
-      APPENGINE_URL: http://app-engine:8080/app-engine/
-      CBIR_URL: http://cbir:6000/cbir/
-      SAM_URL: http://sam:8000/sam/
+      CORE_URL: http://localhost:8080
+      IAM_URL: http://localhost
+      PIMS_URL: http://localhost:5001
+      APPENGINE_URL: http://localhost:8082
+      CBIR_URL: http://localhost:6000
+      SAM_URL: http://localhost:8000
     networks:
       host_network:
         ipv4_address: 172.16.238.7
@@ -96,7 +96,6 @@ services:
       - ${IMPORT_PATH:-./data/dataset}:/dataset
       - ${DATA_PATH:-./data}/images:/data/images
     environment:
-      API_BASE_PATH: ${IMS_API_BASE_PATH:-/ims}
       CACHE_ENABLED: true
       CACHE_URL: redis://pims-cache:6379
       CYTOMINE_PRIVATE_KEY: d70607f5-c478-403c-be11-3dbc1716d1cf
@@ -135,7 +134,7 @@ services:
     depends_on:
       - iam-db
     ports:
-      - 8070:8080
+      - 8070:8100
     environment:
       KC_ADMIN_EMAIL: mail@mail.com
       KC_DB_PASSWORD: password
@@ -146,11 +145,11 @@ services:
       KC_HOSTNAME: 127.0.0.1
       KC_HOSTNAME_ADMIN: 127.0.0.1
       KC_HOSTNAME_STRICT: false
-      KC_HOSTNAME_STRICT_BACKCHANNEL: true
+      KC_HOSTNAME_STRICT_BACKCHANNEL: false
       KC_HOSTNAME_STRICT_HTTPS: false
-      KC_HTTP_RELATIVE_PATH: /iam
       KC_HTTP_ENABLED: true
       KC_PROXY_HEADERS: xforwarded
+      KC_SPI_STICKY_SESSION_ENCODER_INFINISPAN_SHOULD_ATTACH_ROUTE: false
       KC_SMTP_FROM: mail@mail.com
       KC_SMTP_HOST: mail.smtp
       KC_SMTP_PASS: password
@@ -184,13 +183,14 @@ services:
       - app-engine-db
       - registry
       - k3s
+    ports:
+      - 8082:8080
     volumes:
       - ${DATA_PATH:-./data}/app-engine:/data
       - ${PWD}/.kube/shared:/root/.kube:ro
       - ${DATA_PATH:-./data}/app-engine-shared-inputs:/app-engine-shared-inputs:rw
       - ${DATA_PATH:-./data}/app-engine-shared-datasets:/app-engine-shared-datasets:rw
     environment:
-      API_PREFIX: ${APP_ENGINE_API_BASE_PATH:-/app-engine/}
       DB_HOST: app-engine-db
       DB_NAME: appengine
       DB_PASSWORD: password
@@ -224,7 +224,7 @@ services:
     environment:
       IMAGE_SERVER_PRIVATE_KEY: d70607f5-c478-403c-be11-3dbc1716d1cf
       IMAGE_SERVER_PUBLIC_KEY: 9a8b8369-2446-44cb-b0af-604a74e1dcdb
-      IAM_URL: http://iam:8080
+      IAM_URL: http://iam:8100
       PIMS_URL: http://pims:5000
       CBIR_URL: http://cbir:6000
       APPENGINE_API_URL: http://app-engine:8080
@@ -244,6 +244,7 @@ services:
       POSTGIS_PORT: 5432
       POSTGIS_USER: docker
       STORAGE_PATH: /data/images
+      REPOSITORY_URL: http://repository:8081/
     networks:
       host_network:
         ipv4_address: 172.16.238.11
@@ -259,7 +260,6 @@ services:
       - ${DATA_PATH:-./data}/cbir:/data/cbir
       - ${DATA_PATH:-./data}/weights:/weights
     environment:
-      API_BASE_PATH: ${CBIR_API_BASE_PATH:-/cbir}
       DATA_PATH: /data/cbir
       DB: 0
       EXTRACTOR: ${CBIR_EXTRACTOR:-resnet}
@@ -269,6 +269,15 @@ services:
       host_network:
         ipv4_address: 172.16.238.12
 
+  repository:
+    image: cytomine/repository:latest
+    restart: unless-stopped
+    ports:
+      - 8081:8081
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.18
+
   sam:
     image: cytomine/sam:latest
     restart: unless-stopped
@@ -277,7 +286,6 @@ services:
     volumes:
       - ${DATA_PATH:-./data}/weights:/weights
     environment:
-      API_BASE_PATH: ${SAM_API_BASE_PATH:-/sam}
       WEIGHTS_PATH: /weights
     networks:
       host_network:

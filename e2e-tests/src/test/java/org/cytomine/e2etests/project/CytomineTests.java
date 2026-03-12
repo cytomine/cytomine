@@ -175,4 +175,10 @@ public class CytomineTests {
         cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
         cytomineSteps.deleteOntology(wait, ontologyURL);
     }
+
+    @Test
+    void uploadTask() {
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        cytomineSteps.uploadTask(wait, cytomineUrl);
+    }
 }

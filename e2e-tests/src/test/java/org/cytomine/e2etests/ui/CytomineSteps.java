@@ -219,4 +219,7 @@ public class CytomineSteps {
                 + "'fa-mouse-pointer')]]"));
     }
 
+    public void uploadTask(Wait<WebDriver> wait, URL cytomineUrl) {
+        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/apps");
+    }
 }

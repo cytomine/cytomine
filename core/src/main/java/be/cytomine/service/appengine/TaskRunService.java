@@ -375,7 +375,7 @@ public class TaskRunService {
                             TaskRunLayer taskRunLayer = taskRunLayerRepository
                                     .findByTaskRunAndDerivedFrom(taskRun, parameterName)
                                     .orElse(new TaskRunLayer(annotationLayer, taskRun, taskRun.getImage(), annotation, parameterName));
-                            CropOffset cropOffset = new CropOffset((int) bounds.getMinX(), (int) bounds.getMinY(), taskRunLayer, i-1);
+                            CropOffset cropOffset = new CropOffset((int) bounds.getMinX(), (int) bounds.getMinY(), i-1);
                             taskRunLayer.getOffsets().add(cropOffset);
                             taskRunLayerRepository.saveAndFlush(taskRunLayer);
                         }
@@ -439,7 +439,7 @@ public class TaskRunService {
                             .orElseThrow(() -> new RuntimeException("Task run layer not found for " + parameterName));
                     taskRunLayer.setRoi(annotation);
                     taskRunLayer.getOffsets()
-                            .add(new CropOffset((int) bounds.getMinX(), (int) bounds.getMinY(), taskRunLayer, 0));
+                            .add(new CropOffset((int) bounds.getMinX(), (int) bounds.getMinY(), 0));
                     taskRunLayerRepository.saveAndFlush(taskRunLayer);
 
                     body = prepareImage(id, "annotation");

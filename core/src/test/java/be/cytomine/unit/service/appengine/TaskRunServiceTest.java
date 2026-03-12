@@ -118,7 +118,7 @@ public class TaskRunServiceTest {
         Project project = new Project();
 
         TaskRunLayer taskRunLayer = new TaskRunLayer();
-        CropOffset offset = new CropOffset(0, 0, taskRunLayer, 0);
+        CropOffset offset = new CropOffset(0, 0, 0);
         taskRunLayer.getOffsets().add(offset);
 
         AnnotationLayer annotationLayer = new AnnotationLayer();
@@ -186,7 +186,7 @@ public class TaskRunServiceTest {
         Project project = new Project();
 
         TaskRunLayer taskRunLayer = new TaskRunLayer();
-        CropOffset offset = new CropOffset(0, 0, taskRunLayer, 0);
+        CropOffset offset = new CropOffset(0, 0, 0);
         taskRunLayer.getOffsets().add(offset);
         AnnotationLayer annotationLayer = new AnnotationLayer();
 

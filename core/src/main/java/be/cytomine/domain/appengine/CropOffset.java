@@ -1,6 +1,5 @@
 package be.cytomine.domain.appengine;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,9 +17,6 @@ import be.cytomine.utils.JsonObject;
 public class CropOffset extends CytomineDomain {
     private int x;
     private int y;
-
-    @Column(name = "order_index")
-    private int order;
 
     @Override
     public JsonObject toJsonObject() {

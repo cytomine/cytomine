@@ -324,11 +324,11 @@ public class TaskRunService {
         return body;
     }
 
-    private void saveCropOffset(TaskRun taskRun, String parameterName, Envelope bounds, int index) {
+    private void saveCropOffset(TaskRun taskRun, String parameterName, Envelope bounds) {
         TaskRunLayer taskRunLayer = taskRunLayerRepository
                 .findByTaskRunAndDerivedFrom(taskRun, parameterName)
                 .orElseThrow(() -> new RuntimeException("Task run layer not found for " + parameterName));
-        taskRunLayer.getOffsets().add(new CropOffset((int) bounds.getMinX(), (int) bounds.getMinY(), index));
+        taskRunLayer.getOffsets().add(new CropOffset((int) bounds.getMinX(), (int) bounds.getMinY()));
         taskRunLayerRepository.saveAndFlush(taskRunLayer);
     }
 
@@ -367,7 +367,7 @@ public class TaskRunService {
                                 responseArray.add(itemNode);
                             }
 
-                            saveCropOffset(taskRun, parameterName, bounds, i - 1);
+                            saveCropOffset(taskRun, parameterName, bounds);
                         }
                         if (type.equalsIgnoreCase("image")) {
                             File wsi = downloadWsi(id);
@@ -428,7 +428,7 @@ public class TaskRunService {
                     TaskRun taskRun = taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId)
                             .orElseThrow(() -> new ObjectNotFoundException("TaskRun", taskRunId));
 
-                    saveCropOffset(taskRun, parameterName, bounds, 0);
+                    saveCropOffset(taskRun, parameterName, bounds);
 
                     body = prepareAnnotationBody(id, annotation, bounds);
                 }

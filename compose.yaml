@@ -271,6 +271,15 @@ services:
       host_network:
         ipv4_address: 172.16.238.13
 
+  repository:
+    image: cytomine/repository:latest
+    restart: unless-stopped
+    ports:
+      - 8081:8081
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.18
+
   nginx:
     image: cytomine/nginx:latest
     restart: unless-stopped

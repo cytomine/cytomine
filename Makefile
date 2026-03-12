@@ -25,12 +25,16 @@ init-secrets:
 		exit 1; \
 	fi
 	@echo "Reading dockerauth.json and creating secret..."
-	@SECRET=$$(base64 -w 0 ./dockerauth.json) && sed "s|<SECRET>|$$SECRET|g" helm/docker-images-pull-secrets.yaml > ./.kube/secrets/docker-images-pull-secrets.yaml
-	@echo "Created .kube/secrets/dockerpullimages.yaml"
+	@SECRET=$$(base64 -w 0 ./dockerauth.json) && sed "s|<SECRET>|$$SECRET|g" helm/docker-image-pull-secrets.yaml > ./.kube/secrets/docker-image-pull-secrets.yaml
+	@echo "Created .kube/secrets/docker-image-pull-secrets.yaml"
 	@echo "You're good to go"
 
 start-k3s-cluster:
-	@docker compose -f ./helm/compose.yaml up
+	$(eval FILES := -f helm/compose.yaml)
+	$(if $(wildcard .kube/secrets/registries.yaml),$(eval FILES += -f helm/docker/compose.registries.yaml))
+	$(if $(wildcard .kube/secrets/lsaai-secrets.yaml),$(eval FILES += -f helm/docker/compose.lsaai.yaml))
+	$(if $(wildcard .kube/secrets/docker-image-pull-secrets.yaml),$(eval FILES += -f helm/docker/compose.docker-pull.yaml))
+	docker compose $(FILES) up
 
 deploy-helm:
 	@helm upgrade --kubeconfig=./.kube/shared/config -f ./helm/charts/cytomine/example/values.yaml cytomine-platform ./helm/charts/cytomine/ -n cytomine-local --install

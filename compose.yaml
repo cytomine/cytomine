@@ -226,7 +226,8 @@ services:
       IMAGE_SERVER_PRIVATE_KEY: d70607f5-c478-403c-be11-3dbc1716d1cf
       IMAGE_SERVER_PUBLIC_KEY: 9a8b8369-2446-44cb-b0af-604a74e1dcdb
       IAM_URL: http://iam:8100
-      SERVER_URL: http://localhost:8070
+      IAM_EXTERNAL_URL: http://localhost:8070
+      SERVER_URL: http://localhost:8080
       PIMS_URL: http://pims:5000
       CBIR_URL: http://cbir:6000
       APPENGINE_API_URL: http://app-engine:8080

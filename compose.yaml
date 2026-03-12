@@ -65,10 +65,22 @@ services:
   web-ui:
     image: cytomine/web-ui:latest
     restart: unless-stopped
+    ports:
+      - 80:80
+    depends_on:
+      - core
+      - iam
+      - pims
     volumes:
       - /etc/localtime:/etc/localtime
     environment:
       <<: [ *version-env ]
+      CORE_URL: http://core:8080/api/
+      IAM_URL: http://iam:8080/iam
+      PIMS_URL: http://pims:5000/ims/
+      APPENGINE_URL: http://app-engine:8080/app-engine/
+      CBIR_URL: http://cbir:6000/cbir/
+      SAM_URL: http://sam:8000/sam/
     networks:
       host_network:
         ipv4_address: 172.16.238.7
@@ -92,7 +104,7 @@ services:
       DATASET_PATH: /dataset
       DEFAULT_ANNOTATION_ORIGIN: LEFT_TOP
       DEFAULT_IMAGE_SIZE_SAFETY_MODE: SAFE_REJECT
-      INTERNAL_URL_CORE: http://nginx
+      INTERNAL_URL_CORE: http://core:8080
       LOG_CONFIG_FILE: /app/logging.yml
       MAX_REQUESTS: 100000
       OUTPUT_SIZE_LIMIT: 10000
@@ -212,11 +224,11 @@ services:
     environment:
       IMAGE_SERVER_PRIVATE_KEY: d70607f5-c478-403c-be11-3dbc1716d1cf
       IMAGE_SERVER_PUBLIC_KEY: 9a8b8369-2446-44cb-b0af-604a74e1dcdb
-      IAM_URL: http://nginx
-      PIMS_URL: http://nginx
-      CBIR_URL: http://nginx
-      APPENGINE_API_URL: http://nginx
-      SAM_URL: http://nginx
+      IAM_URL: http://iam:8080
+      PIMS_URL: http://pims:5000
+      CBIR_URL: http://cbir:6000
+      APPENGINE_API_URL: http://app-engine:8080
+      SAM_URL: http://sam:8000
       JAVAMELODY_PASS: x6wp8Lg7K1fxr/7oa5gQD/NF7hqirE15g0P1STj5hCs
       JAVAMELODY_PATH: /javamelody-core
       JAVAMELODY_USER: admin
@@ -270,33 +282,6 @@ services:
     networks:
       host_network:
         ipv4_address: 172.16.238.13
-
-  nginx:
-    image: cytomine/nginx:latest
-    restart: unless-stopped
-    ports:
-      - 80:80
-    depends_on:
-      - core
-      - iam
-      - pims
-      - web-ui
-    environment:
-      <<: [ *version-env ]
-      IMAGES_CORE: cytomine/core:latest
-      IMAGES_MONGO: mongo:4.4-focal
-      IMAGES_NGINX: cytomine/nginx:latest
-      IMAGES_PIMS: cytomine/pims:latest
-      IMAGES_PIMS_CACHE: redis:7.2
-      IMAGES_POSTGIS: postgis/postgis:15-3.5
-      IMAGES_WEB_UI: cytomine/web-ui:latest
-      INTERNAL_URLS_APPENGINE: app-engine:8080
-      INTERNAL_URLS_IAM: iam:8100
-      INTERNAL_URLS_WEB_UI: web-ui
-      URLS_SCHEME: ${URLS_SCHEME:-http}
-    networks:
-      host_network:
-        ipv4_address: 172.16.238.14
 
   # https://github.com/k3s-io/k3s/blob/3854eb56d4b8a183a1f8261aebd372111378a00f/docker-compose.yml
   k3s:

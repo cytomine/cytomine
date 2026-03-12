@@ -241,7 +241,7 @@ export default {
       return Math.floor(totalProgress / nbUploads);
     },
     uri() {
-      return constants.CYTOMINE_UPLOAD_URI;
+      return constants.PIMS_URL + '/upload';
     },
     queryString() {
       return new URLSearchParams({

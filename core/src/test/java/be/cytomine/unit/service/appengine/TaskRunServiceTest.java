@@ -3,8 +3,10 @@ package be.cytomine.unit.service.appengine;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
+import be.cytomine.domain.appengine.CropOffset;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -116,8 +118,8 @@ public class TaskRunServiceTest {
         Project project = new Project();
 
         TaskRunLayer taskRunLayer = new TaskRunLayer();
-        taskRunLayer.setXOffset(0);
-        taskRunLayer.setYOffset(0);
+        CropOffset offset = new CropOffset(0, 0, taskRunLayer, 0);
+        taskRunLayer.getOffsets().add(offset);
 
         AnnotationLayer annotationLayer = new AnnotationLayer();
 
@@ -132,7 +134,7 @@ public class TaskRunServiceTest {
         when(appEngineService.get("task-runs/" + taskRunId)).thenReturn(taskRunJson);
         when(annotationLayerService.createLayerName(any(), any(), any())).thenReturn("layer-name");
         when(annotationLayerService.createAnnotationLayer("layer-name")).thenReturn(annotationLayer);
-        when(taskRunLayerRepository.findByTaskRunAndImage(any(), any())).thenReturn(Optional.of(taskRunLayer));
+        when(taskRunLayerRepository.findAllByTaskRunAndImage(any(), any())).thenReturn(Set.of(taskRunLayer));
         when(geometryService.isGeometry(geoJson1)).thenReturn(true);
         when(geometryService.isGeometry(geoJson2)).thenReturn(true);
         when(geometryService.GeoJSONToWKT(geoJson1)).thenReturn("POINT (1 2)");
@@ -184,9 +186,8 @@ public class TaskRunServiceTest {
         Project project = new Project();
 
         TaskRunLayer taskRunLayer = new TaskRunLayer();
-        taskRunLayer.setXOffset(0);
-        taskRunLayer.setYOffset(0);
-
+        CropOffset offset = new CropOffset(0, 0, taskRunLayer, 0);
+        taskRunLayer.getOffsets().add(offset);
         AnnotationLayer annotationLayer = new AnnotationLayer();
 
         when(taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId)).thenReturn(Optional.of(taskRun));
@@ -200,7 +201,7 @@ public class TaskRunServiceTest {
         when(appEngineService.get("task-runs/" + taskRunId)).thenReturn(taskRunJson);
         when(annotationLayerService.createLayerName(any(), any(), any())).thenReturn("layer-name");
         when(annotationLayerService.createAnnotationLayer("layer-name")).thenReturn(annotationLayer);
-        when(taskRunLayerRepository.findByTaskRunAndImage(any(), any())).thenReturn(Optional.of(taskRunLayer));
+        when(taskRunLayerRepository.findAllByTaskRunAndImage(any(), any())).thenReturn(Set.of(taskRunLayer));
         when(geometryService.isGeometry(geoJson1)).thenReturn(true);
         when(geometryService.isGeometry(geoJson2)).thenReturn(true);
         when(geometryService.GeoJSONToWKT(geoJson1)).thenReturn("POINT (1 2)");

@@ -52,7 +52,8 @@ public class TaskRunLayer extends CytomineDomain {
     @Column(name = "derived_from")
     private String derivedFrom;
 
-    @OneToMany(mappedBy = "taskRunLayer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "task_run_layer_id", nullable = false)
     @OrderColumn(name = "order_index")
     private List<CropOffset> offsets = new ArrayList<>();
 

@@ -186,7 +186,8 @@ export default {
       }
 
       let labelTranslation = this.editionMode ? 'update' : 'creation';
-
+      this.internalUser.name = `${this.internalUser.firstname} ${this.internalUser.lastname}`;
+      this.internalUser.reference = crypto.randomUUID();
       try {
         await this.internalUser.save();
         if (!this.editionMode || this.selectedRole !== this.user.role) {
@@ -196,6 +197,7 @@ export default {
         if (this.editionMode && this.internalUser.password) {
           await this.internalUser.savePassword(this.internalUser.password);
         }
+
         this.internalUser.password = ''; // reinitialize password so that if modal reopened, field empty
         this.$notify({type: 'success', text: this.$t('notif-success-user-' + labelTranslation)});
         this.$emit('update:active', false);

@@ -82,4 +82,6 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     }
     Optional<User> findByReference(String sub);
 
+    List<User> findAllByReferenceIn(List<String> ids);
+
 }

@@ -145,3 +145,15 @@ jwt:
     converter:
       resource-id: core
       principle-attribute: preferred_username
+
+# admin of the master realm not cytomine realm
+keycloak-client:
+  admin:
+    user: ${KEYCLOAK_ADMIN:admin}
+    password: ${KEYCLOAK_ADMIN_PASSWORD:password}
+    realm: master
+  target:
+    realm: cytomine
+    client-id: core
+  client-id: admin-cli
+  url: ${INTERNAL_PROXY_URL:http://nginx}/iam

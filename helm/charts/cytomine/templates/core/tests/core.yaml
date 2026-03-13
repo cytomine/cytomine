@@ -40,7 +40,7 @@ spec:
           done
           echo "core is ready!"
           echo "Waiting for pims to be ready..."
-          until curl -sf http://pims.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.pims.port }}/disk-usage; do
+          until curl -sf http://pims.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.pims.port }}/ims/disk-usage; do
             echo "pims not ready, retrying in 5s..."
             sleep 5
           done

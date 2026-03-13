@@ -9,7 +9,7 @@ ENV PYTHONUNBUFFERED=1 \
     UV_LINK_MODE=copy \
     UV_PROJECT_ENVIRONMENT=/usr/local
 
-COPY --from=ghcr.io/astral-sh/uv:0.8.13 /uv /uvx /bin/
+COPY --from=ghcr.io/astral-sh/uv:0.9.30 /uv /uvx /bin/
 
 WORKDIR /app
 
@@ -47,7 +47,7 @@ ENV PYTHONPATH=/app \
     UV_LINK_MODE=copy \
     UV_PROJECT_ENVIRONMENT=/usr/local
 
-COPY --from=registry.cytomine.org/github/ghcr.io/astral-sh/uv:0.8.13 /uv /uvx /bin/
+COPY --from=registry.cytomine.org/github/ghcr.io/astral-sh/uv:0.9.30 /uv /uvx /bin/
 
 WORKDIR /app
 

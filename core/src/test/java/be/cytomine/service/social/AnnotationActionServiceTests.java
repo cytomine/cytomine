@@ -3,7 +3,7 @@ package be.cytomine.service.social;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.config.PostGisTestConfiguration;
+import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.security.User;
 import be.cytomine.domain.social.AnnotationAction;

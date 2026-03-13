@@ -18,7 +18,7 @@ package be.cytomine.service.report;
 
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.config.PostGisTestConfiguration;
+import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.exceptions.ServerException;
 import be.cytomine.service.utils.ReportFormatService;
 import be.cytomine.utils.JsonObject;

@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -1471,9 +1472,19 @@ public class CollectionType extends Type {
 
             List<TaskRunParameterValue> items = new ArrayList<>();
             collectionValue.setValue(items);
-            for (TypePersistence persistence : collectionPersistence.getItems()) {
-                items.add(buildNode(persistence));
-            }
+            collectionPersistence.getItems().stream()
+                    .sorted(Comparator.comparingInt(p -> {
+                        String index = p.getCollectionIndex();
+                        int last = index.lastIndexOf('[');
+                        return Integer.parseInt(index.substring(last + 1, index.length() - 1));
+                    }))
+                    .forEach(persistence -> {
+                        try {
+                            items.add(buildNode(persistence));
+                        } catch (ProvisioningException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
             collectionValue.setSubType(items.get(0).getType());
 
             return collectionValue;

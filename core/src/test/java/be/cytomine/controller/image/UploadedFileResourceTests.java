@@ -19,7 +19,7 @@ package be.cytomine.controller.image;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.config.PostGisTestConfiguration;
+import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.domain.image.*;
 import be.cytomine.repository.image.UploadedFileRepository;
 import be.cytomine.utils.JsonObject;
@@ -75,7 +75,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
@@ -443,7 +442,7 @@ public class UploadedFileResourceTests {
     @Transactional
     public void get_an_uploaded_file() throws Exception {
         UploadedFile image = builder.given_a_uploaded_file();
-        
+
 
         restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile/{id}.json", image.getId()))
                 .andExpect(status().isOk())

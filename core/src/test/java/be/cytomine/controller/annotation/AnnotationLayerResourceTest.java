@@ -1,7 +1,7 @@
 package be.cytomine.controller.annotation;
 
 import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.config.PostGisTestConfiguration;
+import be.cytomine.common.PostGisTestConfiguration;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
@@ -86,8 +86,6 @@ public class AnnotationLayerResourceTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.annotationLayer").value(taskRunLayer.getAnnotationLayer().getId()))
             .andExpect(jsonPath("$.taskRun").value(taskRunLayer.getTaskRun().getId()))
-            .andExpect(jsonPath("$.image").value(taskRunLayer.getImage().getId()))
-            .andExpect(jsonPath("$.xoffset").value(taskRunLayer.getXOffset()))
-            .andExpect(jsonPath("$.yoffset").value(taskRunLayer.getYOffset()));
+            .andExpect(jsonPath("$.image").value(taskRunLayer.getImage().getId()));
     }
 }

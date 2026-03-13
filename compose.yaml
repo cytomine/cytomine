@@ -1,3 +1,4 @@
+---
 x-version-env: &version-env
   VERSIONS_CYTOMINE_COMMERCIAL: 2025.1
 
@@ -5,10 +6,8 @@ services:
   mongo:
     image: mongo:4.4-focal
     restart: unless-stopped
-    ports:
-      - 27017:27017
-    volumes:
-      - ${DATA_PATH:-./data}/mongo:/data/db
+    ports: [27017:27017]
+    volumes: ['${DATA_PATH:-./data}/mongo:/data/db']
     environment:
       MONGO_INITDB_ROOT_PASSWORD: password
       MONGO_INITDB_ROOT_USERNAME: admin
@@ -20,10 +19,8 @@ services:
   postgis:
     image: postgis/postgis:15-3.5
     restart: unless-stopped
-    ports:
-      - 5432:5432
-    volumes:
-      - ${DATA_PATH:-./data}/postgis/data:/var/lib/postgresql/data
+    ports: [5432:5432]
+    volumes: ['${DATA_PATH:-./data}/postgis/data:/var/lib/postgresql/data']
     environment:
       POSTGRES_DB: docker
       POSTGRES_PASSWORD: password
@@ -35,10 +32,8 @@ services:
   registry:
     image: registry:2.8.3
     restart: unless-stopped
-    ports:
-    - 5000:5000
-    volumes:
-      - ${DATA_PATH:-./data}/registry:/var/lib/registry
+    ports: [5000:5000]
+    volumes: ['${DATA_PATH:-./data}/registry:/var/lib/registry']
     environment:
       REGISTRY_STORAGE_DELETE_ENABLED: true
     networks:
@@ -49,8 +44,7 @@ services:
     image: redis:7.2
     command: --port 6380
     restart: unless-stopped
-    volumes:
-      - ${DATA_PATH:-./data}/redis:/data
+    volumes: ['${DATA_PATH:-./data}/redis:/data']
     networks:
       host_network:
         ipv4_address: 172.16.238.5
@@ -65,10 +59,9 @@ services:
   web-ui:
     image: cytomine/web-ui:latest
     restart: unless-stopped
-    volumes:
-      - /etc/localtime:/etc/localtime
+    volumes: [/etc/localtime:/etc/localtime]
     environment:
-      <<: [ *version-env ]
+      <<: *version-env
     networks:
       host_network:
         ipv4_address: 172.16.238.7
@@ -76,10 +69,8 @@ services:
   pims:
     image: cytomine/pims:latest
     restart: unless-stopped
-    depends_on:
-      - pims-cache
-    ports:
-      - 5001:5000
+    depends_on: [pims-cache]
+    ports: [5001:5000]
     volumes:
       - ${IMPORT_PATH:-./data/dataset}:/dataset
       - ${DATA_PATH:-./data}/images:/data/images
@@ -107,8 +98,7 @@ services:
   iam-db:
     image: postgres:14
     restart: unless-stopped
-    volumes:
-      - ${DATA_PATH:-./data}/iam-db/data:/var/lib/postgresql/data
+    volumes: ['${DATA_PATH:-./data}/iam-db/data:/var/lib/postgresql/data']
     environment:
       POSTGRES_DB: iam
       POSTGRES_PASSWORD: password
@@ -120,10 +110,8 @@ services:
   iam:
     image: cytomine/iam:latest
     restart: unless-stopped
-    depends_on:
-      - iam-db
-    ports:
-      - 8070:8080
+    depends_on: [iam-db]
+    ports: [8070:8080]
     environment:
       KC_ADMIN_EMAIL: mail@mail.com
       KC_DB_PASSWORD: password
@@ -153,8 +141,7 @@ services:
   app-engine-db:
     image: postgres:14
     restart: unless-stopped
-    ports:
-      - 5433:5432
+    ports: [5433:5432]
     volumes:
       - ${DATA_PATH:-./data}/app-engine-db/data:/var/lib/postgresql/data
     environment:
@@ -168,10 +155,7 @@ services:
   app-engine:
     image: cytomine/app-engine:latest
     restart: unless-stopped
-    depends_on:
-      - app-engine-db
-      - registry
-      - k3s
+    depends_on: [app-engine-db, registry, k3s]
     volumes:
       - ${DATA_PATH:-./data}/app-engine:/data
       - ${PWD}/.kube/shared:/root/.kube:ro
@@ -188,7 +172,7 @@ services:
       STORAGE_BASE_PATH: /app-engine-shared-inputs
       RUN_STORAGE_BASE_PATH: /app-engine-shared-inputs
       REF_STORAGE_BASE_PATH: /app-engine-shared-datasets
-      SCHEDULER_RUN_MODE: local # values: local, cluster
+      SCHEDULER_RUN_MODE: local  # values: local, cluster
       SCHEDULER_ADVERTISED_URL: http://172.16.238.10:8080
       SCHEDULER_REGISTRY_ADVERTISED_URL: 172.16.238.4:5000
       SCHEDULER_USE_HOST_NETWORK: true
@@ -201,14 +185,9 @@ services:
   core:
     image: cytomine/core:latest
     restart: unless-stopped
-    depends_on:
-      - iam
-      - mongo
-      - postgis
-    ports:
-      - 8080:8080
-    volumes:
-      - /etc/localtime:/etc/localtime
+    depends_on: [iam, mongo, postgis]
+    ports: [8080:8080]
+    volumes: [/etc/localtime:/etc/localtime]
     environment:
       IMAGE_SERVER_PRIVATE_KEY: d70607f5-c478-403c-be11-3dbc1716d1cf
       IMAGE_SERVER_PUBLIC_KEY: 9a8b8369-2446-44cb-b0af-604a74e1dcdb
@@ -231,6 +210,7 @@ services:
       POSTGIS_PASS: password
       POSTGIS_PORT: 5432
       POSTGIS_USER: docker
+      REPOSITORY_URL: http://repository:8081
       STORAGE_PATH: /data/images
     networks:
       host_network:
@@ -239,10 +219,8 @@ services:
   cbir:
     image: cytomine/cbir:latest
     restart: unless-stopped
-    depends_on:
-      - redis
-    ports:
-      - 6000:6000
+    depends_on: [redis]
+    ports: [6000:6000]
     volumes:
       - ${DATA_PATH:-./data}/cbir:/data/cbir
       - ${DATA_PATH:-./data}/weights:/weights
@@ -260,10 +238,8 @@ services:
   sam:
     image: cytomine/sam:latest
     restart: unless-stopped
-    ports:
-      - 8000:8000
-    volumes:
-      - ${DATA_PATH:-./data}/weights:/weights
+    ports: [8000:8000]
+    volumes: ['${DATA_PATH:-./data}/weights:/weights']
     environment:
       API_BASE_PATH: ${SAM_API_BASE_PATH:-/sam}
       WEIGHTS_PATH: /weights
@@ -274,8 +250,9 @@ services:
   repository:
     image: cytomine/repository:latest
     restart: unless-stopped
-    ports:
-      - 8081:8081
+    ports: [8081:8081]
+    environment:
+      POSTGIS_HOST: postgis
     networks:
       host_network:
         ipv4_address: 172.16.238.18
@@ -283,15 +260,10 @@ services:
   nginx:
     image: cytomine/nginx:latest
     restart: unless-stopped
-    ports:
-      - 80:80
-    depends_on:
-      - core
-      - iam
-      - pims
-      - web-ui
+    ports: [80:80]
+    depends_on: [core, iam, pims, web-ui]
     environment:
-      <<: [ *version-env ]
+      <<: *version-env
       IMAGES_CORE: cytomine/core:latest
       IMAGES_MONGO: mongo:4.4-focal
       IMAGES_NGINX: cytomine/nginx:latest
@@ -309,11 +281,9 @@ services:
 
   # https://github.com/k3s-io/k3s/blob/3854eb56d4b8a183a1f8261aebd372111378a00f/docker-compose.yml
   k3s:
-    image: "rancher/k3s:v1.30.14-rc3-k3s3"
+    image: rancher/k3s:v1.30.14-rc3-k3s3
     command: server
-    tmpfs:
-      - /run
-      - /var/run
+    tmpfs: [/run, /var/run]
     ulimits:
       nproc: 65535
       nofile:
@@ -322,7 +292,7 @@ services:
     privileged: true
     restart: always
     environment:
-      - K3S_TOKEN=65535-65535-65535 # plain text secret!
+      - K3S_TOKEN=65535-65535-65535  # plain text secret!
       - K3S_KUBECONFIG_OUTPUT=/output/config
       - K3S_KUBECONFIG_MODE=666
     volumes:
@@ -333,15 +303,14 @@ services:
       - ${DATA_PATH:-./data}/app-engine-shared-datasets:/app-engine-shared-datasets:ro
       # This is just so that we get the kubeconfig file out
       - .kube/shared:/output/
-    ports:
-      - 6443:6443
+    ports: [6443:6443]
     networks:
       host_network:
         ipv4_address: 172.16.238.15
 
 volumes:
-  k3s-server: { }
-  k3s-agent: { }
+  k3s-server: {}
+  k3s-agent: {}
 
 networks:
   host_network:

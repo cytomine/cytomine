@@ -232,5 +232,6 @@ public class CytomineSteps {
 
         webDriverUtils.bySendKeys(wait, By.cssSelector("input[type='file']"), copiedFile.toAbsolutePath().toString());
         webDriverUtils.xpathClick(wait, "//button[contains(., 'Upload')]");
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//*[contains(text(),'Upload completed')]"));
     }
 }

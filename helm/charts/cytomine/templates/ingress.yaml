@@ -35,48 +35,6 @@ spec:
                 name: iam
                 port:
                   number: {{ .Values.iam.port }}
-          - path: /cbir
-            pathType: Prefix
-            backend:
-              service:
-                name: cbir
-                port:
-                  number: {{ .Values.cbir.port }}
-          - path: /sam
-            pathType: Prefix
-            backend:
-              service:
-                name: sam
-                port:
-                  number: {{ .Values.sam.port }}
-          - path: /ims/formats
-            pathType: Prefix
-            backend:
-              service:
-                name: pims
-                port:
-                  number: {{ .Values.pims.port }}
-          - path: /ims/image/upload
-            pathType: Prefix
-            backend:
-              service:
-                name: pims
-                port:
-                  number: {{ .Values.pims.port }}
-          - path: /ims/import
-            pathType: Prefix
-            backend:
-              service:
-                name: pims
-                port:
-                  number: {{ .Values.pims.port }}
-          - path: /ims/upload
-            pathType: Prefix
-            backend:
-              service:
-                name: pims
-                port:
-                  number: {{ .Values.pims.port }}
           - path: /
             pathType: Prefix
             backend:
@@ -84,6 +42,90 @@ spec:
                 name: web-ui
                 port:
                   number: {{ .Values.web_ui.port }}
+  tls:
+  - hosts:
+    - {{ include "core.hostname" . }}
+    secretName: ingress-tls
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: pims
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    {{- with .Values.ingress.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  rules:
+    - host: {{ .Values.global.domainName }}
+      http:
+        paths:
+          - path: /ims(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: pims
+                port:
+                  number: {{ .Values.pims.port }}
+  tls:
+  - hosts:
+    - {{ include "core.hostname" . }}
+    secretName: ingress-tls
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: cbir
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    {{- with .Values.ingress.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  rules:
+    - host: {{ .Values.global.domainName }}
+      http:
+        paths:
+          - path: /cbir(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: cbir
+                port:
+                  number: {{ .Values.cbir.port }}
+  tls:
+  - hosts:
+    - {{ include "core.hostname" . }}
+    secretName: ingress-tls
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: sam
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    {{- with .Values.ingress.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  rules:
+    - host: {{ .Values.global.domainName }}
+      http:
+        paths:
+          - path: /sam(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: sam
+                port:
+                  number: {{ .Values.sam.port }}
   tls:
   - hosts:
     - {{ include "core.hostname" . }}

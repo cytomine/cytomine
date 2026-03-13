@@ -132,13 +132,25 @@ public class PreparedRequest {
             }
         }
         else {
+            // Strip CORS headers from upstream response - core handles CORS
+            java.util.function.Function<org.springframework.http.HttpHeaders, org.springframework.http.HttpHeaders> stripCorsHeaders = headers -> {
+                headers.remove("Access-Control-Allow-Origin");
+                headers.remove("Access-Control-Allow-Methods");
+                headers.remove("Access-Control-Allow-Headers");
+                headers.remove("Access-Control-Allow-Credentials");
+                headers.remove("Access-Control-Expose-Headers");
+                headers.remove("Access-Control-Max-Age");
+                return headers;
+            };
             if (method.equals(GET)) {
                 return proxy.headers(this.headers)
                         .uri(this.getURI())
+                        .responseHeadersFilter(stripCorsHeaders)
                         .get();
             } else if (method.equals(POST)) {
                 return proxy.headers(this.headers)
                         .uri(this.getURI())
+                        .responseHeadersFilter(stripCorsHeaders)
                         .body(this.body)
                         .post();
             }

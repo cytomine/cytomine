@@ -3,5 +3,5 @@ kind: ConfigMap
 metadata:
   name: sam
 data:
-  API_BASE_PATH: /sam
+  API_BASE_PATH: ""
   WEIGHTS_PATH: /tmp/weights

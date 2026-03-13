@@ -7,7 +7,7 @@ data:
   DB_NAME: appengine
   DB_HOST: postgres-app-engine.{{ .Release.Namespace }}.svc.cluster.local
   DB_PORT: "5432"
-  API_PREFIX: /app-engine/
+  API_PREFIX: /api/
   REGISTRY_URL: http://registry.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.app_engine.registry.port }}
   SCHEDULER_ADVERTISED_URL: http://app-engine.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.app_engine.port }}
   SCHEDULER_REGISTRY_ADVERTISED_URL: {{ .Values.app_engine.registry.advertisedUrl | default (printf "localhost:%d" (int .Values.app_engine.registry.nodePort)) }}

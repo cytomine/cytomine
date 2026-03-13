@@ -188,6 +188,6 @@ data:
   SERVER_URL: "{{ include "core.url" . }}"
   APPENGINE_ENABLED: "true"
   APPENGINE_API_URL: http://app-engine.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.app_engine.port }}
-  APPENGINE_API_BASE_PATH: /app-engine/v1/
+  APPENGINE_API_BASE_PATH: /api/v1/
   REPOSITORY_URL: http://repository.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.repository.port }}
 {{ end }}

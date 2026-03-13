@@ -4,7 +4,7 @@ kind: ConfigMap
 metadata:
   name: pims-config
 data:
-    API_BASE_PATH: "/ims"
+    API_BASE_PATH: ""
     DEFAULT_ANNOTATION_ORIGIN: LEFT_TOP
     DEFAULT_IMAGE_SIZE_SAFETY_MODE: SAFE_REJECT
     LOG_CONFIG_FILE: /app/logging.yml

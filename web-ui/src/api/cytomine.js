@@ -73,6 +73,22 @@ export default class Cytomine {
   }
 
   /**
+   * @returns {string} The host (protocol + hostname + port)
+   */
+  get host() {
+    const url = new URL(this._coreUrl);
+    return url.origin;
+  }
+
+  /**
+   * @returns {string} The base path
+   */
+  get basePath() {
+    const url = new URL(this._coreUrl);
+    return url.pathname;
+  }
+
+  /**
    * Ping the server to get info
    *
    * @param {number}  [project]   The identifier of the active project

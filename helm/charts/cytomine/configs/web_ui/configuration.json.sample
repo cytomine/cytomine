@@ -9,7 +9,7 @@
   "APPENGINE_ENABLED": true,
   "CORE_URL": "{{ include "core.url" . }}/api/",
   "IAM_URL": "{{ include "core.url" . }}/iam/realms/cytomine/",
-  "PIMS_URL": "{{ include "core.url" . }}/ims/",
+  "PIMS_URL": "{{ include "core.url" . }}/ims",
   "APPENGINE_URL": "{{ include "core.url" . }}/app-engine/",
   "CBIR_URL": "{{ include "core.url" . }}/cbir/",
   "SAM_URL": "{{ include "core.url" . }}/sam/"

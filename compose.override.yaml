@@ -37,11 +37,6 @@ services:
     build:
       context: ./sam/
 
-  nginx:
-    image: cytomine/nginx:latest
-    build:
-      context: ./nginx/
-
   repository:
     image: cytomine/repository:latest
     build:

@@ -14,7 +14,6 @@ apply_fastapi_tweaks()
 
 import time
 from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
 from pydantic import ValidationError
 from redis.exceptions import ConnectionError, TimeoutError
 
@@ -38,15 +37,6 @@ app = FastAPI(
     docs_url=None,
     redoc_url=f"{get_settings().api_base_path}/docs",
 )
-
-# CORS is handled by core which proxies requests to PIMS
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=["*"],
-#     allow_credentials=False,
-#     allow_methods=["*"],
-#     allow_headers=["*"],
-# )
 
 
 @app.on_event("startup")

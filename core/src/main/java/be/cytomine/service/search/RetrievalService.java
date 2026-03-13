@@ -33,7 +33,7 @@ import be.cytomine.service.middleware.ImageServerService;
 @Service
 public class RetrievalService {
 
-    public static final String CBIR_API_BASE_PATH = "";
+    public static final String CBIR_API_BASE_PATH = "/cbir";
 
     private final static String INDEX_NAME = "annotation";
 

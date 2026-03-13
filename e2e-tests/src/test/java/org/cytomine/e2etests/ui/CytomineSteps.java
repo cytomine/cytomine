@@ -219,7 +219,18 @@ public class CytomineSteps {
                 + "'fa-mouse-pointer')]]"));
     }
 
+    @SneakyThrows
     public void uploadTask(Wait<WebDriver> wait, URL cytomineUrl) {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/apps");
+        String bundleName = "selenium-" + UUID.randomUUID() + ".zip";
+        Path tempDir = Files.createTempDirectory("selenium-task");
+        Path copiedFile = tempDir.resolve(bundleName);
+        String zipName = "com.cytomine.dummy.identity.geometry-1.0.0.zip";
+        try (var in = getClass().getClassLoader().getResourceAsStream(zipName)) {
+            Files.copy(in, copiedFile);
+        }
+
+        webDriverUtils.bySendKeys(wait, By.cssSelector("input[type='file']"), copiedFile.toAbsolutePath().toString());
+        webDriverUtils.xpathClick(wait, "//button[contains(., 'Upload')]");
     }
 }

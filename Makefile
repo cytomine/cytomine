@@ -23,7 +23,7 @@ build:
 
 # Start K3s from helm/docker-compose.yaml
 start-k3s:
-	docker-compose -f ./helm/compose.yaml up -d
+	docker compose -f ./helm/compose.yaml up -d
 
 # Save docker images to k3s
 push-local:

@@ -124,7 +124,7 @@ public class PreparedRequest {
         throw new NotImplementedException("toObject is not implemented for method: " + method);
     }
 
-    private static final List<String> CORS_HEADERS = Arrays.asList(
+    private static final List<String> CORS_HEADERS = List.of(
         "access-control-allow-origin",
         "access-control-allow-methods",
         "access-control-allow-headers",

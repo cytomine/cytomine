@@ -231,6 +231,7 @@ services:
       POSTGIS_PASS: password
       POSTGIS_PORT: 5432
       POSTGIS_USER: docker
+      REPOSITORY_URL: http://repository:8081
       STORAGE_PATH: /data/images
     networks:
       host_network:
@@ -303,6 +304,7 @@ services:
       INTERNAL_URLS_IAM: iam:8100
       INTERNAL_URLS_WEB_UI: web-ui
       URLS_SCHEME: ${URLS_SCHEME:-http}
+      # INTERNAL_URLS_CORE: 172.16.238.1:8080
     networks:
       host_network:
         ipv4_address: 172.16.238.14

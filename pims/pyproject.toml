@@ -49,9 +49,5 @@ dev = [
   "ruff>=0.13.2",
 ]
 
-[tool.ruff.lint]
-select = ["FAST001", "FAST003"]
-ignore = ["E402"]
-
 [tool.uv.sources]
 cytomine-python-client = { path = "../clients/python" }

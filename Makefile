@@ -4,7 +4,7 @@ LOCAL_REGISTRY := 172.16.238.4:5000
 # Services to build (from compose.override.yaml)
 SERVICES := web-ui pims iam app-engine core cbir sam nginx repository
 
-.PHONY: start-dev stop-dev clean build push-local start-infra start-local local stop-local helm-local
+.PHONY: start-dev stop-dev clean build push-local
 
 start-dev:
 	$(eval FILES := -f compose.yaml)

@@ -32,6 +32,8 @@ jobs:
     uses: ./.github/workflows/repository.yaml
   e2e-tests:
     uses: ./.github/workflows/e2e-tests.yaml
+  code-quality:
+    uses: ./.github/workflows/code-quality.yaml
 
   docker-images:
     uses: ./.github/workflows/docker.yaml
@@ -48,6 +50,7 @@ jobs:
       - sam
       - web-ui
       - repository
+      - code-quality   
       - e2e-tests
       - docker-images
     uses: ./.github/workflows/helm-test.yaml

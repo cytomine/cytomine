@@ -15,7 +15,7 @@ if __name__ == '__main__':
     parser.add_argument('--value', help="the property value")
 
     parser.add_argument('--id_project', required=False, help="The project to which the property will be added (optional)")
-    parser.add_argument('--id_image_instance',, required=False, help="The image to which the property will be added (optional)")
+    parser.add_argument('--id_image_instance', required=False, help="The image to which the property will be added (optional)")
     parser.add_argument('--id_annotation', required=False, help="The annotation to which the property will be added (optional)")
     params, other = parser.parse_known_args(sys.argv[1:])
 

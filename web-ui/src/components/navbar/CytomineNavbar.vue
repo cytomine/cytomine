@@ -47,7 +47,7 @@
         <i class="fas fa-code"></i>
         {{ $t('app-engine.applications') }}
       </router-link>
-      <router-link v-if="currentUser.admin" to="/admin" class="navbar-item">
+      <router-link v-if="isAdmin" to="/admin" class="navbar-item">
         <i class="fas fa-wrench"></i>
         {{ $t('admin-menu') }}
       </router-link>
@@ -117,6 +117,9 @@ export default {
   },
   computed: {
     currentUser: get('currentUser/user'),
+    isAdmin() {
+      return this.$keycloak.hasResourceRole('ADMIN');
+    },
     nbActiveProjects() {
       return Object.keys(this.$store.state.projects).length;
     },

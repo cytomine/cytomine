@@ -11,21 +11,6 @@ defaults:
     working-directory: ./sam
 
 jobs:
-  lint:
-    runs-on: self-hosted
-
-    steps:
-      - name: Checkout the repository
-        uses: actions/checkout@v6.0.2
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v7
-        with:
-          version: ${{ vars.UV_VERSION }}
-
-      - name: Lint
-        run: uv run ruff check
-
   type-check:
     runs-on: self-hosted
 

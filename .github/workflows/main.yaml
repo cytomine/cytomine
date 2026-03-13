@@ -50,6 +50,7 @@ jobs:
       - sam
       - web-ui
       - repository
+      - code-quality   
       - e2e-tests
       - docker-images
     uses: ./.github/workflows/helm-test.yaml

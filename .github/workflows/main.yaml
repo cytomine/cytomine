@@ -32,6 +32,8 @@ jobs:
     uses: ./.github/workflows/repository.yaml
   e2e-tests:
     uses: ./.github/workflows/e2e-tests.yaml
+  code-quality:
+    uses: ./.github/workflows/code-quality.yaml
 
   docker-images:
     uses: ./.github/workflows/docker.yaml

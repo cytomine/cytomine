@@ -1,6 +1,14 @@
 package be.cytomine.utils;
 
-import be.cytomine.exceptions.ServerException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.NotImplementedException;
@@ -11,15 +19,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.stream.Collectors;
+import be.cytomine.exceptions.ServerException;
 
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
@@ -51,7 +51,7 @@ public class PreparedRequest {
         path = "";
     }
 
-    public void setUrl(String url){
+    public void setUrl(String url) {
         URI uri = null;
         try {
             uri = new URI(url);
@@ -83,7 +83,7 @@ public class PreparedRequest {
             // whereas pims supports both '/' and '%2F'. Therefore, we revert the
             // encoding of the `/` to support routing through an Apache proxy.
             // see issue cm/rnd/cytomine/core/core-ce#84
-            fragment = URLEncoder.encode(fragment , StandardCharsets.UTF_8).replace("%2F", "/");
+            fragment = URLEncoder.encode(fragment, StandardCharsets.UTF_8).replace("%2F", "/");
         }
         fragment = org.apache.commons.lang3.StringUtils.strip(fragment, "/");
         this.path += "/" + fragment;
@@ -91,15 +91,16 @@ public class PreparedRequest {
 
     public String getQuery() {
         return this.queryParameters.entrySet()
-                .stream()
-                .filter(e -> e.getValue() != null && !e.getValue().toString().isEmpty())
-                .map(e -> e.getKey() + "=" + e.getValue())
-                .collect(Collectors.joining("&"));
+                   .stream()
+                   .filter(e -> e.getValue() != null && !e.getValue().toString().isEmpty())
+                   .map(e -> e.getKey() + "=" + e.getValue())
+                   .collect(Collectors.joining("&"));
     }
 
     public URI getURI() {
         try {
-            return new URI(this.scheme, null, this.host, this.port, this.path, this.getQuery(), null);
+            return new URI(this.scheme, null, this.host, this.port, this.path, this.getQuery(),
+                null);
         } catch (URISyntaxException e) {
             throw new ServerException(e.getMessage(), e.getCause());
         }
@@ -107,7 +108,7 @@ public class PreparedRequest {
 
     public void setJsonBody(JsonObject body) {
         this.body = JsonObject.toJsonString(
-                body.entrySet()
+            body.entrySet()
                 .stream()
                 .filter(e -> e.getValue() != null && !e.getValue().toString().isEmpty())
                 .collect(Collectors.toMap(x -> x.getKey(), x -> x.getValue()))
@@ -124,12 +125,12 @@ public class PreparedRequest {
     }
 
     private static final List<String> CORS_HEADERS = Arrays.asList(
-            "access-control-allow-origin",
-            "access-control-allow-methods",
-            "access-control-allow-headers",
-            "access-control-allow-credentials",
-            "access-control-expose-headers",
-            "access-control-max-age"
+        "access-control-allow-origin",
+        "access-control-allow-methods",
+        "access-control-allow-headers",
+        "access-control-allow-credentials",
+        "access-control-expose-headers",
+        "access-control-max-age"
     );
 
     private <T> ResponseEntity<T> stripCorsHeaders(ResponseEntity<T> response) {
@@ -143,32 +144,21 @@ public class PreparedRequest {
     }
 
     public <T> ResponseEntity<T> toResponseEntity(ProxyExchange<T> proxy, Class<T> returnType) {
+        // Always use RestTemplate to avoid ProxyExchange forwarding the Origin header,
+        // which causes PIMS to add duplicate CORS headers.
         ResponseEntity<T> response;
-        if (proxy == null) {
-            if (method.equals(GET)) {
-                HttpEntity<?> request = new HttpEntity<>(this.headers);
-                response = new RestTemplate().exchange(this.getURI(), this.method, request, returnType);
-            } else if (method.equals(POST)) {
-                HttpEntity<?> request = new HttpEntity<>(this.body, this.headers);
-                response = new RestTemplate().exchange(this.getURI(), this.method, request, returnType);
-            } else {
-                throw new NotImplementedException("toResponseEntity is not implemented for method: " + method);
-            }
-        }
-        else {
-            if (method.equals(GET)) {
-                response = proxy.headers(this.headers)
-                        .uri(this.getURI())
-                        .get();
-            } else if (method.equals(POST)) {
-                response = proxy.headers(this.headers)
-                        .uri(this.getURI())
-                        .body(this.body)
-                        .post();
-            } else {
-                throw new NotImplementedException("toResponseEntity is not implemented for method: " + method);
-            }
+        if (method.equals(GET)) {
+            HttpEntity<?> request = new HttpEntity<>(this.headers);
+            response = new RestTemplate().exchange(this.getURI(), this.method, request, returnType);
+        } else if (method.equals(POST)) {
+            HttpEntity<?> request = new HttpEntity<>(this.body, this.headers);
+            response = new RestTemplate().exchange(this.getURI(), this.method, request, returnType);
+        } else {
+            throw new NotImplementedException(
+                "toResponseEntity is not implemented for method: " + method);
         }
         return stripCorsHeaders(response);
+
+
     }
 }

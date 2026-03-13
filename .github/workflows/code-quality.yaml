@@ -31,7 +31,7 @@ jobs:
         with:
           version: ${{ vars.UV_VERSION }}
 
-      - name: Lint
+      - name: Type check
         run: |
           uvx mypy cbir
           uvx mypy clients/python/cytomine clients/python/tests

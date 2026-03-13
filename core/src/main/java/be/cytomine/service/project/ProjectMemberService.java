@@ -3,7 +3,9 @@ package be.cytomine.service.project;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
+import be.cytomine.service.security.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +39,7 @@ public class ProjectMemberService {
     private final ProjectRepresentativeUserService projectRepresentativeUserService;
 
     private final SecurityACLService securityACLService;
+    private final UserService userService;
 
     public void addUserToProject(User user, Project project, boolean admin) {
         securityACLService.check(project, ADMINISTRATION);
@@ -54,6 +57,32 @@ public class ProjectMemberService {
                     permissionService.addPermission(project.getOntology(), user.getUsername(), READ);
                     if (admin) {
                         permissionService.addPermission(project.getOntology(), user.getUsername(), ADMINISTRATION);
+                    }
+                }
+            }
+        }
+    }
+
+    public void addUserToProjectWithAdmin(User user, Project project, boolean admin) {
+        log.info("service.addUserToProject");
+        if (project != null) {
+            Optional<User> adminAsCurrentUserOptional = userService.findByUsernameWithAdmin("admin");
+            User adminUser = null;
+            if (adminAsCurrentUserOptional.isPresent()) {
+                adminUser = adminAsCurrentUserOptional.get();
+            }
+            log.info("addUserToProject project=" + project + " user=" + user + " ADMIN=" + admin);
+            synchronized (this.getClass()) {
+                if (admin) {
+                    permissionService.addPermission(project, user.getUsername(), ADMINISTRATION, adminUser);
+                }
+                permissionService.addPermission(project, user.getUsername(), READ, adminUser);
+                if (project.getOntology() != null) {
+                    log.info(
+                        "addUserToProject ontology=" + project.getOntology() + " user=" + user + " ADMIN=" + admin);
+                    permissionService.addPermission(project.getOntology(), user.getUsername(), READ, adminUser);
+                    if (admin) {
+                        permissionService.addPermission(project.getOntology(), user.getUsername(), ADMINISTRATION, adminUser);
                     }
                 }
             }
@@ -94,6 +123,54 @@ public class ProjectMemberService {
                 projectRepresentativeUserService.add(pru.toJsonObject());
 
                 projectRepresentativeUserService.find(project, (User) user).ifPresent(x -> projectRepresentativeUserService.delete(x, null, null, false));
+
+            }
+            log.info("deleteUserFromProject " + permissionService.hasACLPermission(project, user.getUsername(), ADMINISTRATION));
+        }
+    }
+
+    public void deleteUserFromProjectWithAdmin(User user, Project project, boolean admin) {
+        if (project != null) {
+            Optional<User> adminAsCurrentUserOptional = userService.findByUsernameWithAdmin("admin");
+            User adminUser = null;
+            if (adminAsCurrentUserOptional.isPresent()) {
+                adminUser = adminAsCurrentUserOptional.get();
+            }
+            log.info("deleteUserFromProject project=" + project.getId() + " username=" + user.getUsername() + " ADMIN=" + admin);
+
+            log.info("deleteUserFromProject BEFORE ADMINISTRATION=" + permissionService.hasACLPermission(project, user.getUsername(), ADMINISTRATION));
+            log.info("deleteUserFromProject BEFORE READ=" + permissionService.hasACLPermission(project, user.getUsername(), READ));
+            if (admin) {
+                permissionService.deletePermission(project, user.getUsername(), ADMINISTRATION);
+            } else {
+                permissionService.deletePermission(project, user.getUsername(), READ);
+            }
+            log.info("deleteUserFromProject AFTER ADMINISTRATION=" + permissionService.hasACLPermission(project, user.getUsername(), ADMINISTRATION));
+            log.info("deleteUserFromProject AFTER READ=" + permissionService.hasACLPermission(project, user.getUsername(), READ));
+            if (!permissionService.hasACLPermission(project, user.getUsername(), READ) && project.getOntology() != null) {
+                removeOntologyRightIfNecessary(project, (User) user, admin);
+            }
+
+            // if no representative, add current user as a representative
+            boolean hasLostAccessToProject = (!permissionService.hasACLPermission(project, user.getUsername(), READ) && !permissionService.hasACLPermission(project, user.getUsername(), READ));
+            boolean isLastRepresentative = projectRepresentativeUserService.listByProjectWithAdmin(project).size() == 1 && projectRepresentativeUserService.listByProjectWithAdmin(project).get(0).getUser().getId().equals(user.getId());
+            if (hasLostAccessToProject && isLastRepresentative) {
+                if (!securityACLService.getProjectList(adminUser, null).contains(project)) {
+                    // if current user is not in project (= SUPERADMIN), add to the project
+                    addUserToProject(adminUser, project, true);
+                }
+                assert adminUser != null;
+                log.info("add current user " + adminUser.getUsername() + " as representative for project " + project.getId());
+                ProjectRepresentativeUser pru = new ProjectRepresentativeUser();
+                pru.setProject(project);
+                pru.setUser((User) adminUser);
+                projectRepresentativeUserService.add(pru.toJsonObject(), adminUser);
+
+                Optional<ProjectRepresentativeUser> foundRepOptional = projectRepresentativeUserService.find(project, (User) user);
+                if (foundRepOptional.isPresent()) {
+                    ProjectRepresentativeUser foundRep = foundRepOptional.get();
+                    projectRepresentativeUserService.deleteWithAdmin(foundRep, null, null, false, adminUser);
+                }
 
             }
             log.info("deleteUserFromProject " + permissionService.hasACLPermission(project, user.getUsername(), ADMINISTRATION));

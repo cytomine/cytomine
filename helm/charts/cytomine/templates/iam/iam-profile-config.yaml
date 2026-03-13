@@ -1,0 +1,193 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: iam-profile-config
+data:
+  profile.json: |
+    {
+      "attributes": [
+        {
+          "name": "username",
+          "displayName": "username",
+          "validations": {
+            "length": {
+              "min": 3,
+              "max": 255
+            },
+            "username-prohibited-characters": {},
+            "up-username-not-idn-homograph": {}
+          },
+          "permissions": {
+            "view": [
+              "admin",
+              "user"
+            ],
+            "edit": [
+              "admin",
+              "user"
+            ]
+          },
+          "multivalued": false
+        },
+        {
+          "name": "email",
+          "displayName": "email",
+          "validations": {
+            "email": {},
+            "length": {
+              "max": 255
+            }
+          },
+          "required": {
+            "roles": [
+              "user"
+            ]
+          },
+          "permissions": {
+            "view": [
+              "admin",
+              "user"
+            ],
+            "edit": [
+              "admin",
+              "user"
+            ]
+          },
+          "multivalued": false
+        },
+        {
+          "name": "firstName",
+          "displayName": "First Name",
+          "validations": {
+            "length": {
+              "max": 255
+            },
+            "person-name-prohibited-characters": {}
+          },
+          "required": {
+            "roles": [
+              "user"
+            ]
+          },
+          "permissions": {
+            "view": [
+              "admin",
+              "user"
+            ],
+            "edit": [
+              "admin",
+              "user"
+            ]
+          },
+          "multivalued": false
+        },
+        {
+          "name": "lastName",
+          "displayName": "Last Name",
+          "validations": {
+            "length": {
+              "max": 255
+            },
+            "person-name-prohibited-characters": {}
+          },
+          "required": {
+            "roles": [
+              "user"
+            ]
+          },
+          "permissions": {
+            "view": [
+              "admin",
+              "user"
+            ],
+            "edit": [
+              "admin",
+              "user"
+            ]
+          },
+          "multivalued": false
+        },
+        {
+          "name": "isDeveloper",
+          "displayName": "developer",
+          "validations": {
+            "options": {
+              "options": [
+                "1",
+                "0"
+              ]
+            }
+          },
+          "annotations": {
+            "inputType": "select"
+          },
+          "required": {
+            "roles": [
+              "admin",
+              "user"
+            ]
+          },
+          "permissions": {
+            "view": [],
+            "edit": [
+              "admin"
+            ]
+          },
+          "multivalued": false
+        },
+        {
+          "name": "user_locale",
+          "displayName": "locale",
+          "validations": {
+            "options": {
+              "options": [
+                "no",
+                "nl",
+                "en",
+                "es",
+                "fr"
+              ]
+            }
+          },
+          "annotations": {
+            "inputType": "select"
+          },
+          "permissions": {
+            "view": [
+              "admin"
+            ],
+            "edit": [
+              "admin"
+            ]
+          },
+          "multivalued": false
+        },
+        {
+          "name": "projects",
+          "displayName": "projects",
+          "validations": {},
+          "annotations": {},
+          "required": {
+            "roles": [
+              "admin",
+              "user"
+            ]
+          },
+          "permissions": {
+            "view": [],
+            "edit": [
+              "admin"
+            ]
+          },
+          "multivalued": true
+        }
+      ],
+      "groups": [
+        {
+          "name": "user-metadata",
+          "displayHeader": "User metadata",
+          "displayDescription": "Attributes, which refer to user metadata"
+        }
+      ],
+      "unmanagedAttributePolicy": "ENABLED"
+    }

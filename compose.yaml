@@ -130,7 +130,7 @@ services:
     depends_on:
       - iam-db
     ports:
-      - 8070:8080
+      - 8070:8100
     environment:
       KC_ADMIN_EMAIL: mail@mail.com
       KC_DB_PASSWORD: password

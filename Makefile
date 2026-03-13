@@ -31,6 +31,8 @@ push-local:
 		echo "Pushing cytomine/$$service:latest to k3s..."; \
 		docker save cytomine/$$service:latest | docker exec -i helm-k3s-1 ctr -n k8s.io images import -; \
 	done
+	@echo "Deleting all pods to pick up new images..."
+	@kubectl --kubeconfig=./.kube/shared/config delete pods --all -n cytomine-local
 
 # Deploy helm cytomine to k3s
 helm-install:

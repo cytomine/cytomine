@@ -2,6 +2,7 @@
 set -e
 
 # Substitute environment variables in configuration.json
-envsubst < /app/configuration.json.template > /app/configuration.json
+# Write to /tmp to support read-only root filesystems (k8s)
+envsubst < /app/configuration.json.template > /tmp/configuration.json
 
 exec "$@"

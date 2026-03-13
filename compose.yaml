@@ -73,7 +73,7 @@ services:
       <<: *version-env
       CORE_URL: http://127.0.0.1:8080/api
       IAM_URL: http://127.0.0.1:8070/iam/realms/cytomine
-      PIMS_URL: http://127.0.0.1:5001
+      PIMS_URL: http://127.0.0.1:5001/ims
       APPENGINE_URL: http://127.0.0.1:8082
       CBIR_URL: http://127.0.0.1:6000
       SAM_URL: http://127.0.0.1:8000
@@ -92,6 +92,7 @@ services:
       - ${IMPORT_PATH:-./data/dataset}:/dataset
       - ${DATA_PATH:-./data}/images:/data/images
     environment:
+      API_BASE_PATH: ${IMS_API_BASE_PATH:-/ims}
       CACHE_ENABLED: true
       CACHE_URL: redis://pims-cache:6379
       CYTOMINE_PRIVATE_KEY: d70607f5-c478-403c-be11-3dbc1716d1cf

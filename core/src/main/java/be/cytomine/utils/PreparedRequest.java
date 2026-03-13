@@ -16,7 +16,9 @@ import java.net.URISyntaxException;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpMethod.GET;
@@ -121,28 +123,52 @@ public class PreparedRequest {
         throw new NotImplementedException("toObject is not implemented for method: " + method);
     }
 
+    private static final List<String> CORS_HEADERS = Arrays.asList(
+            "access-control-allow-origin",
+            "access-control-allow-methods",
+            "access-control-allow-headers",
+            "access-control-allow-credentials",
+            "access-control-expose-headers",
+            "access-control-max-age"
+    );
+
+    private <T> ResponseEntity<T> stripCorsHeaders(ResponseEntity<T> response) {
+        HttpHeaders newHeaders = new HttpHeaders();
+        response.getHeaders().forEach((name, values) -> {
+            if (!CORS_HEADERS.contains(name.toLowerCase())) {
+                newHeaders.addAll(name, values);
+            }
+        });
+        return new ResponseEntity<>(response.getBody(), newHeaders, response.getStatusCode());
+    }
+
     public <T> ResponseEntity<T> toResponseEntity(ProxyExchange<T> proxy, Class<T> returnType) {
+        ResponseEntity<T> response;
         if (proxy == null) {
             if (method.equals(GET)) {
                 HttpEntity<?> request = new HttpEntity<>(this.headers);
-                return new RestTemplate().exchange(this.getURI(), this.method, request, returnType);
+                response = new RestTemplate().exchange(this.getURI(), this.method, request, returnType);
             } else if (method.equals(POST)) {
                 HttpEntity<?> request = new HttpEntity<>(this.body, this.headers);
-                return new RestTemplate().exchange(this.getURI(), this.method, request, returnType);
+                response = new RestTemplate().exchange(this.getURI(), this.method, request, returnType);
+            } else {
+                throw new NotImplementedException("toResponseEntity is not implemented for method: " + method);
             }
         }
         else {
             if (method.equals(GET)) {
-                return proxy.headers(this.headers)
+                response = proxy.headers(this.headers)
                         .uri(this.getURI())
                         .get();
             } else if (method.equals(POST)) {
-                return proxy.headers(this.headers)
+                response = proxy.headers(this.headers)
                         .uri(this.getURI())
                         .body(this.body)
                         .post();
+            } else {
+                throw new NotImplementedException("toResponseEntity is not implemented for method: " + method);
             }
         }
-        throw new NotImplementedException("toResponseEntity is not implemented for method: " + method);
+        return stripCorsHeaders(response);
     }
 }

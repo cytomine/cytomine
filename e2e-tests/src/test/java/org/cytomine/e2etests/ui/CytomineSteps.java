@@ -243,14 +243,11 @@ public class CytomineSteps {
                         "//a[contains(text(), 'More')]"
         );
 
-        // On the detail page, open the dropdown (ellipsis button)
         webDriverUtils.byIsDisplayed(wait, By.cssSelector(".panel-heading .panel-actions"));
         webDriverUtils.byClick(wait, By.cssSelector(".panel-actions .dropdown .icon"));
 
-        // Click the Delete item in the dropdown
         webDriverUtils.xpathClick(wait, "//a[contains(@class, 'dropdown-item') and .//span[contains(text(), 'Delete')]]");
 
-        // Confirm the deletion dialog
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Confirm')]");
     }
 }

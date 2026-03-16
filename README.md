@@ -12,7 +12,7 @@ This repository provides the necessary files and instructions to build and launc
 
 ### Local Installation
 
-For installation procedure, please refer to the [local installation documentation](https://doc.uliege.cytomine.org/admin-guide/ce/installation).
+For installation procedure, please refer to the [local installation documentation](https://doc.uliege.cytomine.org/admin-guide/docker/installation).
 
 ### Kubernetes Installation
 

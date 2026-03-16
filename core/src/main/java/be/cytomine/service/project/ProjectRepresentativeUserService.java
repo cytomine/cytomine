@@ -96,6 +96,10 @@ public class ProjectRepresentativeUserService extends ModelService {
         return projectRepresentativeUserRepository.findAllByProject(project);
     }
 
+    public List<ProjectRepresentativeUser> listByProjectWithAdmin(Project project) {
+        return projectRepresentativeUserRepository.findAllByProject(project);
+    }
+
 
     @Override
     public CommandResponse add(JsonObject jsonObject) {
@@ -111,6 +115,18 @@ public class ProjectRepresentativeUserService extends ModelService {
         return executeCommand(new AddCommand(currentUser),null,jsonObject);
     }
 
+    public CommandResponse add(JsonObject jsonObject, User adminAsCurrent) {
+        securityACLService.check(jsonObject.getJSONAttrLong("project"),Project.class,WRITE);
+        User user = userService.findUser(jsonObject.getJSONAttrLong("user"))
+            .orElseThrow(() -> new ObjectNotFoundException("User", jsonObject.getJSONAttrStr("user")));
+        Project project = projectRepository.findById(jsonObject.getJSONAttrLong("project"))
+            .orElseThrow(() -> new ObjectNotFoundException("Project", jsonObject.getJSONAttrStr("project")));
+
+        securityACLService.checkIsUserInProject(user, project);
+
+        return executeCommand(new AddCommand(adminAsCurrent),null,jsonObject);
+    }
+
 
     @Override
     public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
@@ -120,6 +136,15 @@ public class ProjectRepresentativeUserService extends ModelService {
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.check(domain.container(),WRITE);
         Command c = new DeleteCommand(currentUser, transaction);
+        return executeCommand(c,domain, null);
+    }
+
+    public CommandResponse deleteWithAdmin(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage, User currentAsAdmin) {
+        if (listByProject(((ProjectRepresentativeUser)domain).getProject()).size()<2) {
+            throw new WrongArgumentException("You cannot remove the last representative role. Add someone else as representative");
+        }
+        securityACLService.check(domain.container(),WRITE);
+        Command c = new DeleteCommand(currentAsAdmin, transaction);
         return executeCommand(c,domain, null);
     }
 

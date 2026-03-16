@@ -235,6 +235,10 @@ public class UserService extends ModelService {
         return userRepository.findByUsernameLikeIgnoreCase(username);
     }
 
+    public Optional<User> findByUsernameWithAdmin(String username) {
+        return userRepository.findByUsernameLikeIgnoreCase(username);
+    }
+
     public Optional<User> findByPublicKey(String publicKey) {
         securityACLService.checkGuest(currentUserService.getCurrentUser());
         return userRepository.findByPublicKey(publicKey);

@@ -1,6 +1,7 @@
 package be.cytomine.common.repository.http;
 
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.service.annotation.GetExchange;
@@ -16,4 +17,7 @@ public interface TermHttpContract {
 
     @GetExchange("/{id}")
     Optional<Term> findTermByID(@PathVariable Long id);
+
+    @GetExchange("/")
+    Set<Term> findAll();
 }

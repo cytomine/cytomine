@@ -24,8 +24,8 @@ public class RelationTermEntity {
     private Date updated;
     @Column
     private long relationId;
-    @Column
+    @Column(name = "term1_id")
     private long term1Id;
-    @Column
+    @Column(name = "term2_id")
     private long term2Id;
 }

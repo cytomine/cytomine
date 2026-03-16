@@ -5,10 +5,10 @@ import java.util.Set;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.OneToMany;
 import lombok.Getter;
-
-import be.cytomine.common.repository.model.Term;
 
 @Entity(name = "term")
 @Getter
@@ -23,6 +23,7 @@ public class TermEntity {
     private String name;
     @Column
     private String color;
-    @OneToMany(mappedBy = "term_id2")
-    private Set<Term> children;
+    @OneToMany
+    @JoinTable(name = "relation_term", joinColumns = @JoinColumn(name = "term1_id"), inverseJoinColumns = @JoinColumn(name = "term2_id"))
+    private Set<TermEntity> children;
 }

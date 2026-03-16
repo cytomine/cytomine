@@ -1,6 +1,7 @@
 package org.cytomine.repository.http;
 
 import java.util.Optional;
+import java.util.Set;
 
 import lombok.RequiredArgsConstructor;
 import org.cytomine.repository.mapper.OntologyMapper;
@@ -12,6 +13,7 @@ import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.common.repository.model.Term;
 
 import static be.cytomine.common.repository.http.TermHttpContract.ROOT_PATH;
+import static java.util.stream.Collectors.toSet;
 
 
 @RequiredArgsConstructor
@@ -24,5 +26,10 @@ public class TermController implements TermHttpContract {
     @Override
     public Optional<Term> findTermByID(Long id) {
         return termRepository.findById(id).map(ontologyMapper::map);
+    }
+
+    @Override
+    public Set<Term> findAll() {
+        return termRepository.findAll().stream().map(ontologyMapper::map).collect(toSet());
     }
 }

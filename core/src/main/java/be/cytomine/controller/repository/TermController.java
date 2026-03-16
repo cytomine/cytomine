@@ -17,29 +17,27 @@ import be.cytomine.common.repository.model.CreateTerm;
 import be.cytomine.common.repository.model.Term;
 
 @RestController
-@RequestMapping("/api/term")
+@RequestMapping("/api")
 @Slf4j
 @RequiredArgsConstructor
 public class TermController {
 
     private final TermHttpContract termHttpContract;
 
-    @GetMapping(".json")
+    @GetMapping("term.json")
     public Set<Term> list() {
         log.debug("REST request to list terms");
         return termHttpContract.findAll();
     }
 
-    @PostMapping(".json")
+    @PostMapping("term.json")
     public Term create(@RequestBody CreateTerm createTerm) {
         return termHttpContract.add(createTerm);
     }
 
-    @GetMapping("{id}.json")
+    @GetMapping("term/{id}.json")
     public Optional<Term> term(@PathVariable long id) {
         log.debug("REST request to list terms");
         return termHttpContract.findTermByID(id);
     }
-
-
 }

@@ -8,24 +8,25 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.OneToMany;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.Generated;
 
 @Entity(name = "term")
-@Getter
-@AllArgsConstructor
+@Data
 public class TermEntity {
     @Id
-    private long id;
+    @Generated
+    private Long id;
     @Column
-    private long version;
+    private Long version;
     @Column
-    private long ontologyId;
+    private Long ontologyId;
     @Column
     private String name;
     @Column
     private String color;
     @OneToMany
-    @JoinTable(name = "relation_term", joinColumns = @JoinColumn(name = "term1_id"), inverseJoinColumns = @JoinColumn(name = "term2_id"))
+    @JoinTable(name = "relation_term", joinColumns = @JoinColumn(name = "term1_id"),
+        inverseJoinColumns = @JoinColumn(name = "term2_id"))
     private Set<TermEntity> children;
 }

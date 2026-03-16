@@ -38,8 +38,5 @@ explicit = true
 torch = [{ index = "pytorch-cpu" }]
 torchvision = [{ index = "pytorch-cpu" }]
 
-[tool.mypy]
-ignore_missing_imports = true
-
 [tool.setuptools.packages]
 find = { include = ["app"] }

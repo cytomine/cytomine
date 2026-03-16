@@ -18,3 +18,21 @@ jobs:
 
       - name: Lint
         run: uvx ruff check .
+
+  python-type-check:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v6.0.2
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: ${{ vars.UV_VERSION }}
+
+      - name: Type check
+        run: |
+          uvx mypy cbir
+          uvx mypy clients/python/cytomine clients/python/tests
+          uvx mypy sam

@@ -21,7 +21,7 @@ import java.util.List;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.config.PostGisTestConfiguration;
+import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.meta.Property;
 import be.cytomine.domain.ontology.UserAnnotation;
@@ -54,7 +54,7 @@ public class PropertyResourceTests {
 
     @Autowired
     private MockMvc restPropertyControllerMockMvc;
-    
+
     @Test
     @Transactional
     public void list_all_property_for_project() throws Exception {
@@ -113,7 +113,7 @@ public class PropertyResourceTests {
     @Transactional
     public void list_all_property_for_domain() throws Exception {
         Property property = builder.given_a_property(builder.given_an_image_instance());
-        restPropertyControllerMockMvc.perform(get("/api/domain/{domainClassName}/{domainIdent}/property.json", 
+        restPropertyControllerMockMvc.perform(get("/api/domain/{domainClassName}/{domainIdent}/property.json",
                         property.getDomainClassName(), property.getDomainIdent()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
@@ -301,8 +301,8 @@ public class PropertyResourceTests {
                         property.getDomainClassName(), property.getDomainIdent(), "xxx"))
                 .andExpect(status().isNotFound());
     }
-    
-    
+
+
 
 
     @Test
@@ -373,7 +373,7 @@ public class PropertyResourceTests {
                 .andExpect(jsonPath("$.property.value").value("v2"));
 
     }
-    
+
     @Test
     @Transactional
     public void delete_property() throws Exception {
@@ -382,6 +382,6 @@ public class PropertyResourceTests {
         restPropertyControllerMockMvc.perform(delete("/api/domain/{domainClassName}/{domainIdent}/property/{id}.json", property.getDomainClassName(), property.getDomainIdent(), property.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
-        
+
     }
 }

@@ -3,7 +3,7 @@ package be.cytomine.controller.ontology;
 import java.util.UUID;
 
 import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.config.PostGisTestConfiguration;
+import be.cytomine.common.PostGisTestConfiguration;
 import jakarta.transaction.Transactional;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.Test;

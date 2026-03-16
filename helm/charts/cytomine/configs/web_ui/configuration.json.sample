@@ -1,11 +1,16 @@
 {
-  "CYTOMINE_CORE_HOST": "{{ include "core.url" . }}",
-  "CYTOMINE_UPLOAD_URI": "/ims/upload",
   "DIGITAL_ZOOM_INCREMENT": 4,
   "VIEWER_ANNOTATIONS_REFRESH_INTERVAL": 10000,
   "MEMBERS_ACTIVITY_REFRESH_INTERVAL": 30000,
   "STORAGE_REFRESH_INTERVAL": 10000,
   "ONGOING_UPLOAD_REFRESH_INTERVAL": 500,
+  "WS_POSITION_KEEP_ALIVE_INTERVAL": 10000,
   "CYTOMINE_COMMERCIAL_VERSION": "{{ .Release.appVersion }}",
-  "APPENGINE_ENABLED": true
+  "APPENGINE_ENABLED": true,
+  "CORE_URL": "{{ include "core.url" . }}/api/",
+  "IAM_URL": "{{ include "core.url" . }}/iam/realms/cytomine/",
+  "PIMS_URL": "{{ include "core.url" . }}/ims",
+  "APPENGINE_URL": "{{ include "core.url" . }}/app-engine/",
+  "CBIR_URL": "{{ include "core.url" . }}/cbir/",
+  "SAM_URL": "{{ include "core.url" . }}/sam/"
 }

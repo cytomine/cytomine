@@ -54,7 +54,6 @@ dependencies {
     // Postgresql
     implementation 'org.postgresql:postgresql'
     implementation 'com.zaxxer:HikariCP'
-    implementation 'org.liquibase:liquibase-core'
 
     // Spring security
     implementation 'org.springframework.security:spring-security-acl'
@@ -87,6 +86,7 @@ dependencies {
     testImplementation 'org.testcontainers:testcontainers:2.0.3'
     testImplementation 'org.testcontainers:testcontainers-mongodb:2.0.3'
     testImplementation 'org.testcontainers:testcontainers-postgresql:2.0.3'
+    testImplementation testFixtures(project(':common'))
 
     // -----------------------------------------------------------------------------------------------------------------
     // Dependencies not managed by Spring dependency-management

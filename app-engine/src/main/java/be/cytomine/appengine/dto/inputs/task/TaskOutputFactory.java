@@ -97,7 +97,7 @@ public class TaskOutputFactory {
             output.getDescription(),
             output.isOptional(),
             taskParameterType,
-            output.getDerivedFrom() != null ? output.getDerivedFrom().getId().toString() : null
+            output.getDerivedFrom() != null ? output.getDerivedFrom().getName() : null
         );
     }
 }

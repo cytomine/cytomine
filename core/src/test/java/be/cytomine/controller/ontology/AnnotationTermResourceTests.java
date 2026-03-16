@@ -19,7 +19,7 @@ package be.cytomine.controller.ontology;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.config.PostGisTestConfiguration;
+import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.domain.ontology.AnnotationTerm;
 import be.cytomine.domain.ontology.ReviewedAnnotation;
 import be.cytomine.repository.ontology.AnnotationTermRepository;

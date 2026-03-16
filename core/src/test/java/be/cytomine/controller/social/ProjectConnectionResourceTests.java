@@ -19,7 +19,7 @@ package be.cytomine.controller.social;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.config.PostGisTestConfiguration;
+import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.domain.social.PersistentProjectConnection;
@@ -101,7 +101,7 @@ public class ProjectConnectionResourceTests {
         jsonObject.put("os", "Linux");
         jsonObject.put("browser", "chrome");
         jsonObject.put("browserVersion", "97.0.4692");
-        
+
         restProjectConnectionControllerMockMvc.perform(post("/api/project/{id}/userconnection.json", project.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonObject.toJsonString()))
@@ -111,7 +111,7 @@ public class ProjectConnectionResourceTests {
                 .andExpect(jsonPath("$.project").value(project.getId()))
                 .andExpect(jsonPath("$.browser").exists())
                 .andExpect(jsonPath("$.browserVersion").exists());
-        
+
     }
 
     @Test

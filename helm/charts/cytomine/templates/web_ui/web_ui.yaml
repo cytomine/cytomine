@@ -43,6 +43,8 @@ spec:
         emptyDir: {}
       - name: nginx-pid
         emptyDir: {}
+      - name: tmp
+        emptyDir: {}
       containers:
         - name: web-ui
           securityContext:
@@ -70,6 +72,8 @@ spec:
               mountPath: /var/cache/nginx
             - name: nginx-pid
               mountPath: /var/run
+            - name: tmp
+              mountPath: /tmp
           ports:
             - name: http
               containerPort: {{ .Values.web_ui.port }}

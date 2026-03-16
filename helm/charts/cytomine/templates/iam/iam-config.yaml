@@ -6,6 +6,9 @@ data:
   KC_BOOTSTRAP_ADMIN_USERNAME: admin
   KC_PROXY_HEADERS: xforwarded
   KC_HTTP_RELATIVE_PATH: /iam
+  KC_HEALTH_ENABLED: "true"
+  KC_HTTP_MANAGEMENT_PORT: "9000"
+  KC_HTTP_MANAGEMENT_ENABLE: "true"
   KC_HTTP_ENABLED: "true"
   KC_HTTP_PORT: "{{ .Values.iam.port }}"
   KC_HOSTNAME_STRICT: "false"

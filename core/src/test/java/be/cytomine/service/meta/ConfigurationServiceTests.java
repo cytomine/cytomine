@@ -19,7 +19,7 @@ package be.cytomine.service.meta;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.config.PostGisTestConfiguration;
+import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.domain.meta.Configuration;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.repository.meta.ConfigurationRepository;

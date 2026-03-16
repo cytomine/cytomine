@@ -29,10 +29,16 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -47,10 +53,23 @@ public class SecurityConfiguration {
         this.customJwtAuthConverter = customJwtAuthConverter;
     }
 
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOriginPatterns(List.of("*"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true);
+        configuration.setExposedHeaders(List.of("*"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .addFilterBefore(new ApiKeyFilter(userRepository), BasicAuthenticationFilter.class) // Deprecated. Kept as transitional in 2024.2
                 .exceptionHandling((exceptionHandling) ->
@@ -60,12 +79,12 @@ public class SecurityConfiguration {
                 )
                 .authorizeHttpRequests((authorizeHttpRequests) ->
                         authorizeHttpRequests
-                                .requestMatchers(new AntPathRequestMatcher("/api/abstractimage/**")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/api/imageinstance/**")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/api/uploadedfile/*/download")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/api/userannotation/**")).permitAll()
+                                .requestMatchers("/api/abstractimage/**").permitAll()
+                                .requestMatchers("/api/imageinstance/**").permitAll()
+                                .requestMatchers("/api/uploadedfile/*/download").permitAll()
+                                .requestMatchers("/api/userannotation/**").permitAll()
 
-                                .requestMatchers(new AntPathRequestMatcher("/api/**")).authenticated()
+                                .requestMatchers("/api/**").authenticated()
                                 .requestMatchers("/session/admin/info.json").authenticated()
                                 .requestMatchers("/session/admin/open.json").authenticated()
                                 .requestMatchers("/session/admin/close.json").authenticated()
@@ -74,7 +93,7 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.GET, "/server/ping.json").permitAll() // TODO 2024.2 - LAST CONNECTION (IN A PROJECT)
                                 .requestMatchers(HttpMethod.POST, "/server/ping").permitAll() // TODO 2024.2 - LAST CONNECTION (IN A PROJECT)
                                 .requestMatchers(HttpMethod.POST, "/server/ping.json").permitAll() // TODO 2024.2 - LAST CONNECTION (IN A PROJECT)
-                                .requestMatchers(new AntPathRequestMatcher("/**")).permitAll() // TODO IAM: remove ?
+                                .requestMatchers("/**").permitAll() // TODO IAM: remove ?
                 );
         http
             .addFilterBefore(new TokenFromParameterFilter(), BearerTokenAuthenticationFilter.class)

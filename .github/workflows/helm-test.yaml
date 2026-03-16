@@ -53,13 +53,13 @@ jobs:
           pod-security.kubernetes.io/warn-version=latest
 
       - name: Create Harbor Registry secrets
-        run: kubectl create secret docker-registry docker-images-pull-secret --namespace=cytomine-${{ github.sha }}
+        run: kubectl create secret docker-registry docker-image-pull-secrets --namespace=cytomine-${{ github.sha }}
           --docker-server=registry.cytomine.org --docker-username=${{ secrets.REGISTRY_USERNAME }}
           --docker-password=${{ secrets.REGISTRY_TOKEN }}
 
       - name: Create Service Account
         run: kubectl patch serviceaccount default --namespace=cytomine-${{ github.sha }}
-          -p '{"imagePullSecrets":[{"name":"docker-images-pull-secret"}]}'
+          -p '{"imagePullSecrets":[{"name":"docker-image-pull-secrets"}]}'
 
       - name: Run chart-testing (lint and install)
         run: |
@@ -71,6 +71,7 @@ jobs:
           EXTRA_ARGS+="--set images.cbir=registry.cytomine.org/cytomine/cbir:${{ github.sha }} "
           EXTRA_ARGS+="--set images.pims=registry.cytomine.org/cytomine/pims:${{ github.sha }} "
           EXTRA_ARGS+="--set images.pims_import=registry.cytomine.org/cytomine/python-client:${{ github.sha }} "
+          EXTRA_ARGS+="--set images.repository=registry.cytomine.org/cytomine/repository:${{ github.sha }} "
           EXTRA_ARGS+="--set images.e2e_tests=registry.cytomine.org/cytomine/e2e-tests:${{ github.sha }} "
           # External images from registry.cytomine.org/docker/
           EXTRA_ARGS+="--set images.alpine=registry.cytomine.org/docker/library/alpine:3.18 "

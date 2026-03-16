@@ -118,6 +118,20 @@ spec:
                 sleep 2
               done
               echo "postgis is ready!"
+        - name: wait-for-repository
+          image: "{{ .Values.images.curl }}"
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Waiting for repository to be ready..."
+              until curl -sf http://repository.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.repository.port }}/ping; do
+                echo "repository not ready, retrying in 2s..."
+                sleep 2
+              done
+              echo "repository is ready!"
         - name: core-init
           image: "{{ .Values.images.core }}"
           imagePullPolicy: {{ .Values.images.pullPolicy }}

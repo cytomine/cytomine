@@ -1,0 +1,25 @@
+---
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            redirect-uri: http://0.0.0.0:8070/iam/realms/cytomine
+        provider:
+          keycloak:
+            authorization-uri: http://0.0.0.0:8070/iam/realms/cytomine/protocol/openid-connect/auth
+            token-uri: http://0.0.0.0:8070/iam/realms/cytomine/protocol/openid-connect/token
+            jwk-set-uri: http://0.0.0.0:8070/iam/realms/cytomine/.well-known/openid-configuration
+      resourceserver:
+        jwt:
+          issuer-uri: http://0.0.0.0:8070/iam/realms/cytomine
+          jwk-set-uri: http://0.0.0.0:8070/iam/realms/cytomine/protocol/openid-connect/certs
+  datasource:
+    url: jdbc:postgresql://0.0.0.0:5432/docker
+
+application:
+  pimsURL: http://0.0.0.0:5001
+  samURL: http://0.0.0.0:8000
+  cbirURL: http://0.0.0.0:6000
+  repositoryURL: http://0.0.0.0:8081

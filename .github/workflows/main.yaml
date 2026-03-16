@@ -3,9 +3,11 @@ name: Build and Test
 
 on:
   pull_request:
-    branches: [main]
+    branches:
+      - main
   push:
-    branches: [main]
+    branches:
+      - main
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -20,32 +22,35 @@ jobs:
     uses: ./.github/workflows/core.yaml
   ims:
     uses: ./.github/workflows/ims.yaml
-  python-client:
-    uses: ./.github/workflows/python-client.yaml
   registry-client:
     uses: ./.github/workflows/registry-client.yaml
   sam:
     uses: ./.github/workflows/sam.yaml
   web-ui:
     uses: ./.github/workflows/web-ui.yaml
+  repository:
+    uses: ./.github/workflows/repository.yaml
   e2e-tests:
     uses: ./.github/workflows/e2e-tests.yaml
+  code-quality:
+    uses: ./.github/workflows/code-quality.yaml
 
   docker-images:
+    uses: ./.github/workflows/docker.yaml
+    secrets: inherit
+
+  helm-tests:
     needs:
       - app-engine
       - cbir
       - core
       - ims
-      - python-client
       - registry-client
       - sam
       - web-ui
+      - repository
+      - code-quality   
       - e2e-tests
-    uses: ./.github/workflows/docker.yaml
-    secrets: inherit
-
-  helm-tests:
-    needs: [docker-images]
+      - docker-images
     uses: ./.github/workflows/helm-test.yaml
     secrets: inherit

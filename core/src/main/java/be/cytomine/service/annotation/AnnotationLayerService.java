@@ -16,12 +16,10 @@ import be.cytomine.domain.annotation.AnnotationLayer;
 import be.cytomine.domain.appengine.TaskRunLayer;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.dto.annotation.AnnotationLayerResponse;
-import be.cytomine.dto.appengine.task.TaskRunLayerValue;
 import be.cytomine.repository.annotation.AnnotationLayerRepository;
 import be.cytomine.repository.appengine.TaskRunLayerRepository;
 import be.cytomine.repository.appengine.TaskRunRepository;
 import be.cytomine.service.image.ImageInstanceService;
-import be.cytomine.service.appengine.TaskRunLayerService;
 
 @Service
 @RequiredArgsConstructor
@@ -30,8 +28,6 @@ public class AnnotationLayerService {
     private final AnnotationLayerRepository annotationLayerRepository;
 
     private final TaskRunLayerRepository taskRunLayerRepository;
-
-    private final TaskRunLayerService taskRunLayerService;
 
     private final TaskRunRepository taskRunRepository;
 
@@ -79,14 +75,5 @@ public class AnnotationLayerService {
         }
 
         return annotationLayerSet;
-    }
-
-    public TaskRunLayerValue findTaskRunLayer(Long id) {
-        Optional<TaskRunLayer> optional = taskRunLayerRepository.findByAnnotationLayerId(id);
-        if (optional.isEmpty()) {
-            return null;
-        }
-
-        return taskRunLayerService.convertToDTO(optional.get());
     }
 }

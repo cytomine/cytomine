@@ -10,7 +10,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.config.PostGisTestConfiguration;
+import be.cytomine.common.PostGisTestConfiguration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

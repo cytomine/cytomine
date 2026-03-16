@@ -1,0 +1,23 @@
+server:
+  port: 8081
+
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:postgresql://${POSTGIS_HOST:localhost}:${POSTGIS_PORT:5432}/${POSTGIS_DB_NAME:docker}
+    username: ${POSTGIS_USER:docker}
+    password: ${POSTGIS_PASS:password}
+    hikari:
+      poolName: Hikari
+      auto-commit: false
+
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+        jdbc:
+          batch_size: 50
+
+  liquibase:
+    change-log: classpath:config/liquibase/master.xml

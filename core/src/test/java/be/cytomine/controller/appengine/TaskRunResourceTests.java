@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.config.PostGisTestConfiguration;
+import be.cytomine.common.PostGisTestConfiguration;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
@@ -107,11 +107,11 @@ public class TaskRunResourceTests {
         mockResponseMap = Map.of(
             "id", taskRun.getTaskRunId().toString(),
             "name", "test name",
-            "display_name", "test display name",
+            "displayName", "test display name",
             "description", "test description",
             "optional", false,
             "type", Map.of("id", "string"),
-            "derived_from", ""
+            "derivedFrom", ""
         );
 
         mockResponse = objectMapper.writeValueAsString(List.of(mockResponseMap));

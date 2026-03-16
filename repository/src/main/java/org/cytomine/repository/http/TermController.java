@@ -65,4 +65,14 @@ public class TermController implements TermHttpContract {
         termRepository.deleteById(id);
         return term;
     }
+
+    @Override
+    public Set<Term> findTermsByProject(Long id) {
+        return termRepository.findAllByOntologyId(id).stream().map(ontologyMapper::map).collect(toSet());
+    }
+
+    @Override
+    public Set<Term> findTermsByOntology(Long id) {
+        return termRepository.findAllByProjectId(id).stream().map(ontologyMapper::map).collect(toSet());
+    }
 }

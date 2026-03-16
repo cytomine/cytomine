@@ -3,6 +3,7 @@ package be.cytomine.common.repository.http;
 import java.util.Optional;
 import java.util.Set;
 
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.service.annotation.DeleteExchange;
@@ -35,4 +36,10 @@ public interface TermHttpContract {
 
     @DeleteExchange("/{id}")
     Optional<Term> delete(@PathVariable Long id);
+
+    @GetMapping("/project/{id}/term.json")
+    Set<Term> findTermsByProject(@PathVariable Long id);
+
+    @GetMapping("/ontology/{id}/term.json")
+    Set<Term> findTermsByOntology(@PathVariable Long id);
 }

@@ -11,4 +11,8 @@ public interface TermRepository extends JpaRepository<TermEntity, Long> {
 
     TermEntity save(TermEntity termEntity);
 
+    List<TermEntity> findAllByProjectId(long id);
+
+    List<TermEntity> findAllByOntologyId(long id);
+
 }

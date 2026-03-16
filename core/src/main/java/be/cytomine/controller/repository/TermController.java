@@ -54,4 +54,7 @@ public class TermController {
         log.debug("REST request to delete term {}", id);
         return termHttpContract.delete(id);
     }
+
+    @GetMapping("/project/{id}/term.json")
+    public List
 }

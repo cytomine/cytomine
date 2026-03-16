@@ -7,10 +7,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import be.cytomine.common.repository.http.TermHttpContract;
+import be.cytomine.common.repository.model.CreateTerm;
 import be.cytomine.common.repository.model.Term;
 
 @RestController
@@ -27,10 +30,16 @@ public class TermController {
         return termHttpContract.findAll();
     }
 
+    @PostMapping(".json")
+    public Term create(@RequestBody CreateTerm createTerm) {
+        return termHttpContract.add(createTerm);
+    }
+
     @GetMapping("{id}.json")
     public Optional<Term> term(@PathVariable long id) {
         log.debug("REST request to list terms");
         return termHttpContract.findTermByID(id);
     }
+
 
 }

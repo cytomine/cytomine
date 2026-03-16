@@ -6,10 +6,15 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.cytomine.repository.mapper.OntologyMapper;
 import org.cytomine.repository.persistence.TermRepository;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import be.cytomine.common.repository.http.TermHttpContract;
+import be.cytomine.common.repository.model.CreateTerm;
 import be.cytomine.common.repository.model.Term;
 
 import static be.cytomine.common.repository.http.TermHttpContract.ROOT_PATH;
@@ -24,12 +29,19 @@ public class TermController implements TermHttpContract {
     private final TermRepository termRepository;
 
     @Override
-    public Optional<Term> findTermByID(Long id) {
+    @GetMapping("/{id}")
+    public Optional<Term> findTermByID(@PathVariable Long id) {
         return termRepository.findById(id).map(ontologyMapper::map);
     }
 
     @Override
     public Set<Term> findAll() {
         return termRepository.findAll().stream().map(ontologyMapper::map).collect(toSet());
+    }
+
+    @Override
+    @PostMapping
+    public Term add(@RequestBody CreateTerm createTerm) {
+        return ontologyMapper.map(termRepository.save(ontologyMapper.map(createTerm)));
     }
 }

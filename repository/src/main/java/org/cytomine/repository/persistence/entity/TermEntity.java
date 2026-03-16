@@ -8,10 +8,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.OneToMany;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Entity(name = "term")
 @Getter
+@AllArgsConstructor
 public class TermEntity {
     @Id
     private long id;

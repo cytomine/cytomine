@@ -9,4 +9,6 @@ public interface TermRepository extends JpaRepository<TermEntity, Long> {
 
     List<TermEntity> findAll();
 
+    TermEntity save(TermEntity termEntity);
+
 }

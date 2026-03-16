@@ -1,13 +1,11 @@
 package be.cytomine.controller.ontology;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,18 +29,6 @@ public class RestTermController extends RestCytomineController {
     private final OntologyRepository ontologyRepository;
 
     private final ProjectRepository projectRepository;
-
-    /**
-     * Add a new term
-     * Use next add relation-term to add relation with another term
-     * @param json JSON with Term data
-     * @return Response map with .code = http response code and .data.term = new created Term
-     */
-    @PostMapping("/term.json")
-    public ResponseEntity<String> add(@RequestBody String json) throws JsonProcessingException {
-        log.debug("REST request to save Term: " + json);
-        return add(termService, json);
-    }
 
     /**
      * Update a term

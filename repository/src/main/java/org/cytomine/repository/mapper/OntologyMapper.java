@@ -23,7 +23,7 @@ public interface OntologyMapper {
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "name", source = "name")
     @Mapping(target = "color", source = "color")
-    @Mapping(target = "ontologyId", source = "ontologyId")
+    @Mapping(target = "ontologyId", source = "ontology")
     TermEntity map(CreateTerm createTerm);
 
 }

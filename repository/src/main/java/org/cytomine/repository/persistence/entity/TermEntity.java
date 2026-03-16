@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Version;
 import lombok.Data;
 
 @Entity(name = "term")
@@ -19,7 +20,8 @@ public class TermEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column
-    private Long version;
+    @Version
+    private long version = 0;
     @Column
     private Long ontologyId;
     @Column

@@ -11,10 +11,14 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Version;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity(name = "term")
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class TermEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

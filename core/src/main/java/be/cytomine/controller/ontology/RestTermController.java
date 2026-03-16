@@ -3,11 +3,8 @@ package be.cytomine.controller.ontology;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,7 +13,6 @@ import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.ontology.OntologyRepository;
 import be.cytomine.repository.project.ProjectRepository;
 import be.cytomine.service.ontology.TermService;
-import be.cytomine.utils.JsonObject;
 
 @RestController
 @RequestMapping("/api")
@@ -29,29 +25,6 @@ public class RestTermController extends RestCytomineController {
     private final OntologyRepository ontologyRepository;
 
     private final ProjectRepository projectRepository;
-
-    /**
-     * Update a term
-     * @param id Term id
-     * @param json JSON with the new Term data
-     * @return Response map with .code = http response code and .data.newTerm = new created Term and  .data.oldTerm = old term value
-     */
-    @PutMapping("/term/{id}.json")
-    public ResponseEntity<String> edit(@PathVariable String id, @RequestBody JsonObject json) {
-        log.debug("REST request to edit Term : " + id);
-        return update(termService, json);
-    }
-
-    /**
-     * Delete a term
-     * @param id Term id
-     * @return Response map with .code = http response code and .data.term = deleted term value
-     */
-    @DeleteMapping("/term/{id}.json")
-    public ResponseEntity<String> delete(@PathVariable String id) {
-        log.debug("REST request to delete Term : " + id);
-        return delete(termService, JsonObject.of("id", id), null);
-    }
 
     @GetMapping("/ontology/{id}/term.json")
     public ResponseEntity<String> listByOntology(@PathVariable Long id) {

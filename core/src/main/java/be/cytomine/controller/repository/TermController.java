@@ -5,9 +5,11 @@ import java.util.Set;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.common.repository.model.CreateTerm;
 import be.cytomine.common.repository.model.Term;
+import be.cytomine.common.repository.model.UpdateTerm;
 
 @RestController
 @RequestMapping("/api")
@@ -37,7 +40,18 @@ public class TermController {
 
     @GetMapping("term/{id}.json")
     public Optional<Term> term(@PathVariable long id) {
-        log.debug("REST request to list terms");
+        log.debug("REST request to get term {}", id);
         return termHttpContract.findTermByID(id);
+    }
+
+    @PutMapping("term/{id}.json")
+    public Term update(@PathVariable Long id, @RequestBody UpdateTerm updateTerm) {
+        return termHttpContract.update(id, updateTerm);
+    }
+
+    @DeleteMapping("term/{id}.json")
+    public Optional<Term> delete(@PathVariable Long id) {
+        log.debug("REST request to delete term {}", id);
+        return termHttpContract.delete(id);
     }
 }

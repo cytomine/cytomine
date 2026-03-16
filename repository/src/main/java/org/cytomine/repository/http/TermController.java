@@ -6,9 +6,11 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.cytomine.repository.mapper.OntologyMapper;
 import org.cytomine.repository.persistence.TermRepository;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -47,12 +49,20 @@ public class TermController implements TermHttpContract {
     }
 
     @Override
-    public Term update(Long ontologyId, Long id, UpdateTerm createTerm) {
-        return null;
+    @PutMapping("/{id}")
+    public Term update(@PathVariable Long id, @RequestBody UpdateTerm updateTerm) {
+        return termRepository.findById(id).map(entity -> {
+            updateTerm.name().ifPresent(entity::setName);
+            updateTerm.color().ifPresent(entity::setColor);
+            return ontologyMapper.map(termRepository.save(entity));
+        }).orElseThrow(() -> new RuntimeException("Term not found: " + id));
     }
 
     @Override
-    public Term delete() {
-        return null;
+    @DeleteMapping("/{id}")
+    public Optional<Term> delete(@PathVariable Long id) {
+        Optional<Term> term = termRepository.findById(id).map(ontologyMapper::map);
+        termRepository.deleteById(id);
+        return term;
     }
 }

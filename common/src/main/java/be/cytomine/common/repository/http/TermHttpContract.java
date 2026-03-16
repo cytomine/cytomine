@@ -30,9 +30,9 @@ public interface TermHttpContract {
     @PostExchange
     Term update(@RequestBody CreateTerm createTerm);
 
-    @PutExchange("/ontology/{ontologyId}/term/{id}")
-    Term update(@PathVariable Long ontologyId, @PathVariable Long id, @RequestBody UpdateTerm createTerm);
+    @PutExchange("/{id}")
+    Term update(@PathVariable Long id, @RequestBody UpdateTerm createTerm);
 
     @DeleteExchange("/{id}")
-    Term delete();
+    Optional<Term> delete(@PathVariable Long id);
 }

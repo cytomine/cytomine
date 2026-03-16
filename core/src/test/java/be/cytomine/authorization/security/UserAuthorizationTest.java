@@ -35,6 +35,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
@@ -120,6 +121,7 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
     @WithMockUser(username = SUPERADMIN)
     public void admin_can_modify_a_user() {
         User user = userRepository.findByUsernameLikeIgnoreCase(USER_NO_ACL).get();
+        user.setReference(UUID.randomUUID().toString());
         expectOK(() -> userService.update(user, user.toJsonObject().withChange("name", "admin_can_modify_a_user")));
         assertThat(user.getName()).isEqualTo("admin_can_modify_a_user");
     }
@@ -129,6 +131,7 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
     @WithMockUser(username = USER_NO_ACL)
     public void user_cannot_modify_another_user() {
         User user =userRepository.findByUsernameLikeIgnoreCase(GUEST).get();
+        user.setReference(UUID.randomUUID().toString());
         expectForbidden(() -> userService.update(user, user.toJsonObject().withChange("name", "user_can_modify_himself")));
     }
 

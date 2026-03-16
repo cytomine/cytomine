@@ -33,7 +33,6 @@ Cytomine-community-edition/docker-compose.yml: the attribute `version` is obsole
  ✔ postgis Pulled                                                                 23.5s
  ✔ web_ui Pulled                                                                  15.9s
  ✔ mongo Pulled                                                                   14.4s
- ✔ nginx Pulled                                                                   13.2s
 [+] Running 1/1
  ✘ Network cytomine-ce_cytomine-network  Error                                     0.0s
 failed to create network cytomine-ce_cytomine-network: Error response from daemon: invalid pool request: Pool overlaps with other one on this address space

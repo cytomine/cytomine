@@ -18,11 +18,6 @@ import hmac
 from starlette.requests import Request
 
 from pims.api.exceptions import AuthenticationException
-from pims.config import get_settings
-
-
-def lreplace(string, old, new):
-    return new + string[len(old):] if string.startswith(old) else string
 
 
 def parse_authorization_header(raw_headers):
@@ -51,18 +46,7 @@ def parse_request_token(request: Request):
     )
     content_type = "" if content_type == "null" else content_type
 
-    query_string = request.url.query
-    query_string = "?" + query_string if query_string is not None else ""
-
-    if "nginx" in get_settings().internal_url_core:
-        client_url_path = lreplace(request.url.path, get_settings().api_base_path, "")
-    else:
-        client_url_path = request.url.path
-
-    message = "{}\n{}\n{}\n{}".format(
-        request.method, md5, content_type, date
-    )
-    return message
+    return f"{request.method}\n{md5}\n{content_type}\n{date}"
 
 
 def sign_token(private_key, token):

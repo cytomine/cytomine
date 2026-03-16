@@ -181,4 +181,10 @@ public class CytomineTests {
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
         cytomineSteps.uploadTask(wait, cytomineUrl);
     }
+
+    @Test
+    void deleteTask() {
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        cytomineSteps.deleteTask(wait, cytomineUrl, "identity with geometry");
+    }
 }

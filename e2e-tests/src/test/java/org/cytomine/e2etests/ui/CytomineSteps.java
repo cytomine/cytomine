@@ -234,4 +234,23 @@ public class CytomineSteps {
         webDriverUtils.xpathClick(wait, "//button[contains(., 'Upload')]");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//*[contains(text(),'Upload completed')]"));
     }
+
+    public void deleteTask(Wait<WebDriver> wait, URL cytomineUrl, String taskName) {
+        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/apps");
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//p[contains(@class, 'title') and contains(text(), '" + taskName + "')]"));
+        webDriverUtils.xpathClick(wait,
+                "//div[contains(@class, 'card') and .//p[contains(@class, 'title') and contains(text(), '" + taskName + "')]]" +
+                        "//a[contains(text(), 'More')]"
+        );
+
+        // On the detail page, open the dropdown (ellipsis button)
+        webDriverUtils.byIsDisplayed(wait, By.cssSelector(".panel-heading .panel-actions"));
+        webDriverUtils.byClick(wait, By.cssSelector(".panel-actions .dropdown .icon"));
+
+        // Click the Delete item in the dropdown
+        webDriverUtils.xpathClick(wait, "//a[contains(@class, 'dropdown-item') and .//span[contains(text(), 'Delete')]]");
+
+        // Confirm the deletion dialog
+        webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Confirm')]");
+    }
 }

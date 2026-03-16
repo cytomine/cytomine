@@ -55,4 +55,6 @@
 
     <include file="/config/liquibase/changelog/2026-03-06-task-run-layer-offset.sql" relativeToChangelogFile="false" />
 
+    <include file="/config/liquibase/changelog/2026-03-16-term-id-sequence.sql" relativeToChangelogFile="false"/>
+
 </databaseChangeLog>

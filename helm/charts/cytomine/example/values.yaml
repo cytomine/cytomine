@@ -17,8 +17,8 @@ mongodb:
 app_engine:
   tasks_namespace:
 
-ingress:
-  className: nginx
+gateway:
+  className: cilium
 
 iam:
   lsaaiClientIdSecretName: lsaai-client-id

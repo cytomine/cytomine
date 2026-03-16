@@ -1,0 +1,103 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: cytomine
+  labels:
+    {{- include "cytomine.labels" . | nindent 4 }}
+spec:
+  parentRefs:
+    {{- if .Values.gateway.parentRefs }}
+    {{- toYaml .Values.gateway.parentRefs | nindent 4 }}
+    {{- else }}
+    - name: cytomine
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+  hostnames:
+    - {{ .Values.global.domainName }}
+  rules:
+    # Core API routes - /server and /api
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /server
+        - path:
+            type: PathPrefix
+            value: /api
+      backendRefs:
+        - name: core
+          port: {{ .Values.core.port }}
+      {{- if .Values.gateway.timeouts.request }}
+      timeouts:
+        request: {{ .Values.gateway.timeouts.request }}
+      {{- end }}
+
+    # IAM routes - /iam
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /iam
+      backendRefs:
+        - name: iam
+          port: {{ .Values.iam.port }}
+      {{- if .Values.gateway.timeouts.request }}
+      timeouts:
+        request: {{ .Values.gateway.timeouts.request }}
+      {{- end }}
+
+    # CBIR routes - /cbir
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /cbir
+      backendRefs:
+        - name: cbir
+          port: {{ .Values.cbir.port }}
+      {{- if .Values.gateway.timeouts.request }}
+      timeouts:
+        request: {{ .Values.gateway.timeouts.request }}
+      {{- end }}
+
+    # SAM routes - /sam
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /sam
+      backendRefs:
+        - name: sam
+          port: {{ .Values.sam.port }}
+      {{- if .Values.gateway.timeouts.request }}
+      timeouts:
+        request: {{ .Values.gateway.timeouts.request }}
+      {{- end }}
+
+    # PIMS routes - /ims/*
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /ims/formats
+        - path:
+            type: PathPrefix
+            value: /ims/image/upload
+        - path:
+            type: PathPrefix
+            value: /ims/import
+        - path:
+            type: PathPrefix
+            value: /ims/upload
+      backendRefs:
+        - name: pims
+          port: {{ .Values.pims.port }}
+      {{- if .Values.gateway.timeouts.request }}
+      timeouts:
+        request: {{ .Values.gateway.timeouts.request }}
+      {{- end }}
+
+    # Default route - Web UI (catch-all)
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: web-ui
+          port: {{ .Values.web_ui.port }}

@@ -29,6 +29,8 @@ public class TermEntity {
     @Column
     private Long ontologyId;
     @Column
+    private Long projectId;
+    @Column
     private String name;
     @Column
     private String color;

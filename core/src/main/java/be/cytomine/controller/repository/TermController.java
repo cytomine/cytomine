@@ -55,6 +55,15 @@ public class TermController {
         return termHttpContract.delete(id);
     }
 
-    @GetMapping("/project/{id}/term.json")
-    public List
+    @GetMapping("project/{id}/term.json")
+    public Set<Term> listByProject(@PathVariable Long id) {
+        log.debug("REST request to list terms for project {}", id);
+        return termHttpContract.findTermsByProject(id);
+    }
+
+    @GetMapping("ontology/{id}/term.json")
+    public Set<Term> listByOntology(@PathVariable Long id) {
+        log.debug("REST request to list terms for ontology {}", id);
+        return termHttpContract.findTermsByOntology(id);
+    }
 }

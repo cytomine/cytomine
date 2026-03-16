@@ -52,9 +52,13 @@ LABEL org.opencontainers.image.authors="uliege@cytomine.org" \
 
 WORKDIR /app
 
+RUN apk add --no-cache gettext
+
 COPY ./nginx.conf /etc/nginx/nginx.conf
-COPY ./scripts/configuration.json ./configuration.json
+COPY ./scripts/configuration.json ./configuration.json.template
+COPY --chmod=755 ./docker-entrypoint.sh /docker-entrypoint.sh
 
 COPY --from=frontend-builder /app/dist /app
 
+ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["nginx", "-g", "daemon off;"]

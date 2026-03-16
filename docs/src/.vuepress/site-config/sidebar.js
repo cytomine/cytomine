@@ -30,11 +30,11 @@ module.exports = {
       title: "Cytomine",
       collapsable: true,
       children: [
-        ["/admin-guide/ce/installation", "Installation Guide"],
-        ["/admin-guide/ce/configuration", "Configuration"],
-        ["/admin-guide/ce/backup", "Backup and restore"],
-        ["/admin-guide/ce/troubleshooting", "Troubleshooting"],
-        ["/admin-guide/ce/uninstallation", "Uninstallation"],
+        ["/admin-guide/docker/installation", "Installation Guide"],
+        ["/admin-guide/docker/configuration", "Configuration"],
+        ["/admin-guide/docker/backup", "Backup and restore"],
+        ["/admin-guide/docker/troubleshooting", "Troubleshooting"],
+        ["/admin-guide/docker/uninstallation", "Uninstallation"],
       ],
     },
     {

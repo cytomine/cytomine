@@ -29,6 +29,7 @@ jobs:
         run: ./gradlew :registry-client:test --no-daemon --info
         env:
           TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX: registry.cytomine.org/docker/
+          TESTCONTAINERS_RYUK_DISABLED: true
 
       - name: Upload test reports
         if: ${{ always() }}

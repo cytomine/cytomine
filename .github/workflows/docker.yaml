@@ -1,3 +1,4 @@
+---
 name: Docker push PR
 
 on:
@@ -20,20 +21,19 @@ jobs:
       matrix:
         image:
           - name: app-engine
-            context: "."
+            context: .
             dockerfile_location: app-engine
             target: production
           - name: cbir
             target: production
           - name: core
             target: production
-            context: "."
+            context: .
             dockerfile_location: core
           - name: iam
             target: production
-          - name: nginx
           - name: pims
-            context: "."
+            context: .
             dockerfile_location: pims
             target: production
           - name: sam
@@ -42,10 +42,10 @@ jobs:
           - name: python-client
             context: clients/python
           - name: e2e-tests
-            context: "."
+            context: .
             dockerfile_location: e2e-tests
           - name: repository
-            context: "."
+            context: .
             dockerfile_location: repository
 
     steps:

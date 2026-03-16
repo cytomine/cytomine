@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +16,7 @@ import be.cytomine.dto.annotation.AnnotationResponse;
 import be.cytomine.dto.appengine.task.TaskRunLayerValue;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.annotation.AnnotationRepository;
+import be.cytomine.repository.appengine.TaskRunLayerRepository;
 import be.cytomine.service.annotation.AnnotationLayerService;
 
 @Slf4j
@@ -28,6 +28,8 @@ public class AnnotationLayerController {
     private final AnnotationLayerService annotationLayerService;
 
     private final AnnotationRepository annotationRepository;
+
+    private final TaskRunLayerRepository taskRunLayerRepository;
 
     @GetMapping("/image-instances/{id}/annotation-layers")
     public Set<AnnotationLayerResponse> getAnnotationLayersByImage(@PathVariable Long id) {
@@ -54,8 +56,14 @@ public class AnnotationLayerController {
     }
 
     @GetMapping("/annotation-layers/{id}/task-run-layer")
-    public ResponseEntity<TaskRunLayerValue> findTaskRunLayer(@PathVariable Long id) {
-        log.info("Restrieve all the task run layers for annotation layer {}", id);
-        return ResponseEntity.ok(annotationLayerService.findTaskRunLayer(id));
+    public TaskRunLayerValue findTaskRunLayer(@PathVariable Long id) {
+        log.info("GET /annotation-layers/{}/task-run-layer", id);
+        return taskRunLayerRepository.findByAnnotationLayerId(id)
+                .map(trl -> new TaskRunLayerValue(
+                        trl.getAnnotationLayer().getId(),
+                        trl.getTaskRun().getId(),
+                        trl.getImage().getId()
+                ))
+                .orElseThrow(() -> new ObjectNotFoundException("TaskRunLayer", id));
     }
 }

@@ -1096,8 +1096,6 @@ public class BasicInstanceBuilder {
         taskRunLayer.setAnnotationLayer(annotationLayer);
         taskRunLayer.setTaskRun(taskRun);
         taskRunLayer.setImage(image);
-        taskRunLayer.setXOffset(new Random().nextInt(100));
-        taskRunLayer.setYOffset(new Random().nextInt(100));
         return taskRunLayer;
     }
 

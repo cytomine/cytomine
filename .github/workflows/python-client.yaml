@@ -13,7 +13,6 @@ defaults:
 
 jobs:
   check-version:
-    if: github.ref_name == 'main' && github.event_name == 'push'
     runs-on: self-hosted
     outputs:
       changed: ${{ steps.check.outputs.changed }}

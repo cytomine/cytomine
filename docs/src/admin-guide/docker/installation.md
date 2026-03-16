@@ -4,6 +4,7 @@ redirectFrom:
   - /display/PubOp/Install+Cytomine+on+Linux
   - /How-to-install-Cytomine
   - /admin-guide/ce/ce-install
+  - /admin-guide/ce/installation
 ---
 
 # Installation Guide

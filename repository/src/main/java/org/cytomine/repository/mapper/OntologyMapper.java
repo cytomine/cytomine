@@ -24,6 +24,5 @@ public interface OntologyMapper {
     @Mapping(target = "name", source = "name")
     @Mapping(target = "color", source = "color")
     @Mapping(target = "ontologyId", source = "ontology")
-    @Mapping(target = "projectId", source = "project")
     TermEntity map(CreateTerm createTerm);
 }

@@ -1,28 +1,25 @@
 package org.cytomine.repository.persistence.entity;
 
-import java.util.Set;
+import java.util.Date;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import lombok.Getter;
 
-import be.cytomine.common.repository.model.Term;
-
-@Entity(name = "term")
+@Entity(name = "relation")
 @Getter
-public class TermEntity {
+public class RelationEntity {
     @Id
     private long id;
     @Column
     private long version;
     @Column
-    private long ontologyId;
+    private Date created;
+    @Column
+    private Date deleted;
     @Column
     private String name;
     @Column
-    private String color;
-    @OneToMany(mappedBy = "term_id2")
-    private Set<Term> children;
+    private Date updated;
 }

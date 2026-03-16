@@ -249,7 +249,6 @@ services:
       POSTGIS_PASS: password
       POSTGIS_PORT: 5432
       POSTGIS_USER: docker
-      REPOSITORY_URL: http://repository:8081
       STORAGE_PATH: /data/images
       REPOSITORY_URL: http://repository:8081/
     networks:

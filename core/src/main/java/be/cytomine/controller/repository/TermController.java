@@ -32,7 +32,7 @@ public class TermController {
 
     @PostMapping("term.json")
     public Term create(@RequestBody CreateTerm createTerm) {
-        return termHttpContract.add(createTerm);
+        return termHttpContract.update(createTerm);
     }
 
     @GetMapping("term/{id}.json")

@@ -9,6 +9,7 @@ import org.mapstruct.Mapping;
 import be.cytomine.common.repository.model.CreateTerm;
 import be.cytomine.common.repository.model.Ontology;
 import be.cytomine.common.repository.model.Term;
+import be.cytomine.common.repository.model.UpdateTerm;
 
 @Mapper(componentModel = "spring")
 public interface OntologyMapper {
@@ -25,5 +26,13 @@ public interface OntologyMapper {
     @Mapping(target = "color", source = "color")
     @Mapping(target = "ontologyId", source = "ontology")
     TermEntity map(CreateTerm createTerm);
+
+    @Mapping(target = "children", ignore = true)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "name", source = "name")
+    @Mapping(target = "color", source = "color")
+    @Mapping(target = "ontologyId", source = "ontology")
+    TermEntity map(UpdateTerm createTerm);
 
 }

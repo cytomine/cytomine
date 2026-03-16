@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.common.repository.model.CreateTerm;
 import be.cytomine.common.repository.model.Term;
+import be.cytomine.common.repository.model.UpdateTerm;
 
 import static be.cytomine.common.repository.http.TermHttpContract.ROOT_PATH;
 import static java.util.stream.Collectors.toSet;
@@ -41,7 +42,17 @@ public class TermController implements TermHttpContract {
 
     @Override
     @PostMapping
-    public Term add(@RequestBody CreateTerm createTerm) {
+    public Term update(@RequestBody CreateTerm createTerm) {
         return ontologyMapper.map(termRepository.save(ontologyMapper.map(createTerm)));
+    }
+
+    @Override
+    public Term update(Long ontologyId, Long id, UpdateTerm createTerm) {
+        return null;
+    }
+
+    @Override
+    public Term delete() {
+        return null;
     }
 }

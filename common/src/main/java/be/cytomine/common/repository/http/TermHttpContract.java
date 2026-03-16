@@ -5,12 +5,15 @@ import java.util.Set;
 
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.service.annotation.DeleteExchange;
 import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;
 import org.springframework.web.service.annotation.PostExchange;
+import org.springframework.web.service.annotation.PutExchange;
 
 import be.cytomine.common.repository.model.CreateTerm;
 import be.cytomine.common.repository.model.Term;
+import be.cytomine.common.repository.model.UpdateTerm;
 
 import static be.cytomine.common.repository.http.TermHttpContract.ROOT_PATH;
 
@@ -25,5 +28,11 @@ public interface TermHttpContract {
     Set<Term> findAll();
 
     @PostExchange
-    Term add(@RequestBody CreateTerm createTerm);
+    Term update(@RequestBody CreateTerm createTerm);
+
+    @PutExchange("/ontology/{ontologyId}/term/{id}")
+    Term update(@PathVariable Long ontologyId, @PathVariable Long id, @RequestBody UpdateTerm createTerm);
+
+    @DeleteExchange("/{id}")
+    Term delete();
 }

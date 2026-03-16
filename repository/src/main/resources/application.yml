@@ -22,10 +22,3 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath:config/liquibase/master.xml
-
-logging:
-  level:
-    liquibase: DEBUG
-    org.springframework.boot.autoconfigure: DEBUG
-
-debug: true

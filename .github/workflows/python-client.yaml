@@ -1,7 +1,11 @@
 name: Python Client
 
 on:
-  workflow_call:
+  push:
+    branches:
+      - main
+    paths:
+      - "clients/python/**"
 
 defaults:
   run:

@@ -1,3 +1,6 @@
+[tool.mypy]
+ignore_missing_imports = true
+
 [tool.ruff.lint]
 select = ["FAST001", "FAST003"]
 ignore = ["E402"]

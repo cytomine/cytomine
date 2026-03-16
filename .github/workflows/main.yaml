@@ -3,9 +3,11 @@ name: Build and Test
 
 on:
   pull_request:
-    branches: [main]
+    branches:
+      - main
   push:
-    branches: [main]
+    branches:
+      - main
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -20,8 +22,6 @@ jobs:
     uses: ./.github/workflows/core.yaml
   ims:
     uses: ./.github/workflows/ims.yaml
-  python-client:
-    uses: ./.github/workflows/python-client.yaml
   registry-client:
     uses: ./.github/workflows/registry-client.yaml
   sam:
@@ -45,7 +45,6 @@ jobs:
       - cbir
       - core
       - ims
-      - python-client
       - registry-client
       - sam
       - web-ui

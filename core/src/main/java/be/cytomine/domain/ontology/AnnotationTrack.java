@@ -16,15 +16,21 @@ package be.cytomine.domain.ontology;
 * limitations under the License.
 */
 
-import be.cytomine.domain.CytomineDomain;
-import be.cytomine.domain.image.SliceInstance;
-import be.cytomine.utils.JsonObject;
+import java.io.Serializable;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import java.io.Serializable;
+import be.cytomine.domain.CytomineDomain;
+import be.cytomine.domain.image.SliceInstance;
+import be.cytomine.utils.JsonObject;
 
 @Entity
 @Getter

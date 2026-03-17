@@ -16,12 +16,12 @@ package be.cytomine.service.command;
 * limitations under the License.
 */
 
-import be.cytomine.domain.command.Transaction;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
+import be.cytomine.domain.command.Transaction;
 
 @Service
 @Transactional

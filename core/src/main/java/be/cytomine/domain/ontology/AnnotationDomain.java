@@ -16,6 +16,25 @@ package be.cytomine.domain.ontology;
 * limitations under the License.
 */
 
+import java.io.Serializable;
+import java.util.List;
+import java.util.Optional;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.locationtech.jts.geom.Geometry;
+
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.ImageInstance;
@@ -27,18 +46,6 @@ import be.cytomine.exceptions.CytomineMethodNotYetImplementedException;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.utils.GisUtils;
 import be.cytomine.utils.JsonObject;
-import org.locationtech.jts.geom.Geometry;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
-
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-
-import java.io.Serializable;
-import java.util.List;
-import java.util.Optional;
 
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)

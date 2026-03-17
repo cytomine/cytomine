@@ -1,5 +1,23 @@
 package be.cytomine.controller.image;
 
+import java.io.IOException;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.locationtech.jts.io.ParseException;
+import org.springframework.cloud.gateway.mvc.ProxyExchange;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.AbstractSlice;
@@ -10,18 +28,14 @@ import be.cytomine.dto.image.ImageParameter;
 import be.cytomine.dto.image.TileParameters;
 import be.cytomine.dto.image.WindowParameter;
 import be.cytomine.exceptions.ObjectNotFoundException;
-import be.cytomine.service.image.*;
+import be.cytomine.service.image.AbstractImageService;
+import be.cytomine.service.image.AbstractSliceService;
+import be.cytomine.service.image.ImagePropertiesService;
+import be.cytomine.service.image.SliceCoordinatesService;
+import be.cytomine.service.image.UploadedFileService;
 import be.cytomine.service.middleware.ImageServerService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.utils.JsonObject;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.locationtech.jts.io.ParseException;
-import org.springframework.cloud.gateway.mvc.ProxyExchange;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
 
 @RestController
 @RequestMapping("/api")

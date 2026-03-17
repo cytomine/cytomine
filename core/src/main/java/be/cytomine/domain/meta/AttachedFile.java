@@ -1,14 +1,14 @@
 package be.cytomine.domain.meta;
 
-import be.cytomine.domain.CytomineDomain;
-import be.cytomine.domain.GenericCytomineDomainContainer;
-import be.cytomine.utils.JsonObject;
-import lombok.Getter;
-import lombok.Setter;
-
 import jakarta.persistence.Entity;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
+
+import be.cytomine.domain.CytomineDomain;
+import be.cytomine.domain.GenericCytomineDomainContainer;
+import be.cytomine.utils.JsonObject;
 
 @Entity
 @Getter

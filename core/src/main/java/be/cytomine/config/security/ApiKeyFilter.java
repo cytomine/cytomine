@@ -16,10 +16,15 @@ package be.cytomine.config.security;
 * limitations under the License.
 */
 
-import be.cytomine.domain.security.User;
-import be.cytomine.exceptions.AuthenticationException;
-import be.cytomine.exceptions.ForbiddenException;
-import be.cytomine.repository.security.UserRepository;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,14 +38,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import be.cytomine.domain.security.User;
+import be.cytomine.exceptions.AuthenticationException;
+import be.cytomine.exceptions.ForbiddenException;
+import be.cytomine.repository.security.UserRepository;
 
 @Deprecated
 public class ApiKeyFilter extends OncePerRequestFilter {

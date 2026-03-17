@@ -4,16 +4,27 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-import be.cytomine.config.security.ApiKeyFilter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
+import be.cytomine.config.security.ApiKeyFilter;
 import be.cytomine.controller.JsonResponseEntity;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.image.ImageInstance;
@@ -33,10 +44,9 @@ import be.cytomine.service.project.ProjectRepresentativeUserService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.report.ReportService;
 import be.cytomine.service.search.UserSearchExtension;
-import be.cytomine.service.security.UserService;
 import be.cytomine.service.security.SecurityACLService;
+import be.cytomine.service.security.UserService;
 import be.cytomine.utils.JsonObject;
-
 
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
 

@@ -16,9 +16,11 @@ package be.cytomine.utils;
 * limitations under the License.
 */
 
-import org.springframework.data.domain.*;
-
 import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Sort;
 
 public class PageUtils {
 

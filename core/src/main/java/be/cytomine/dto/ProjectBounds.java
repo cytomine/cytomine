@@ -16,12 +16,13 @@ package be.cytomine.dto;
 * limitations under the License.
 */
 
-import be.cytomine.utils.JsonObject;
-import be.cytomine.utils.MinMax;
+import java.util.Date;
+
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Date;
+import be.cytomine.utils.JsonObject;
+import be.cytomine.utils.MinMax;
 
 @Slf4j
 @Getter

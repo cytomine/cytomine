@@ -16,12 +16,12 @@ package be.cytomine.domain.command;
 * limitations under the License.
 */
 
-import be.cytomine.domain.CytomineDomain;
-import be.cytomine.utils.JsonObject;
+import jakarta.persistence.Entity;
 import lombok.Getter;
 import lombok.Setter;
 
-import jakarta.persistence.Entity;
+import be.cytomine.domain.CytomineDomain;
+import be.cytomine.utils.JsonObject;
 
 @Entity
 @Getter

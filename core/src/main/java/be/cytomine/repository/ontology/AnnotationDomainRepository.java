@@ -16,13 +16,14 @@ package be.cytomine.repository.ontology;
 * limitations under the License.
 */
 
-import be.cytomine.domain.ontology.AnnotationDomain;
+import java.util.List;
+
+import jakarta.persistence.Tuple;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
-import jakarta.persistence.Tuple;
-import java.util.List;
+import be.cytomine.domain.ontology.AnnotationDomain;
 
 public interface AnnotationDomainRepository extends JpaRepository<AnnotationDomain, Long>, JpaSpecificationExecutor<AnnotationDomain>  {
 

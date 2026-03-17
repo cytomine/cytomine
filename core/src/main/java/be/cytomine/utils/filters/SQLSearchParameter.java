@@ -16,16 +16,22 @@ package be.cytomine.utils.filters;
 * limitations under the License.
 */
 
+import java.lang.reflect.Field;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import jakarta.persistence.EntityManager;
+import org.springframework.util.ReflectionUtils;
+
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.ImageInstance;
-import org.springframework.util.ReflectionUtils;
-
-import jakarta.persistence.EntityManager;
-import java.lang.reflect.Field;
-import java.time.ZoneId;
-import java.util.*;
-import java.util.stream.Collectors;
 
 import static be.cytomine.utils.filters.SearchOperation.ilike;
 import static be.cytomine.utils.filters.SearchOperation.like;
@@ -33,7 +39,6 @@ import static be.cytomine.utils.filters.SearchOperation.like;
 
 public class SQLSearchParameter {
 
-    //
     public static List<SearchParameterEntry> getDomainAssociatedSearchParameters(Class<? extends CytomineDomain> domain, List<SearchParameterEntry> searchParameters, EntityManager entityManager) {
         if(searchParameters==null) {
             return new ArrayList();

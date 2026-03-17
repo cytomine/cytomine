@@ -16,18 +16,17 @@ package be.cytomine.config.security;
 * limitations under the License.
 */
 
-import be.cytomine.repository.security.UserRepository;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import be.cytomine.repository.security.UserRepository;
+
 @Deprecated
 public class ApiKeyConfigurer extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> {
 
-
     private final UserRepository userRepository;
-
 
     public ApiKeyConfigurer(UserRepository userRepository) {
         this.userRepository = userRepository;

@@ -16,12 +16,13 @@ package be.cytomine.service.security;
 * limitations under the License.
 */
 
-import be.cytomine.domain.security.User;
-import be.cytomine.repository.security.AclRepository;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import be.cytomine.domain.security.User;
+import be.cytomine.repository.security.AclRepository;
 
 @Service
 public class AclAuthService {

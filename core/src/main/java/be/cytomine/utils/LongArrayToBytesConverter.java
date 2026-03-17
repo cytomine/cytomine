@@ -16,9 +16,14 @@ package be.cytomine.utils;
 * limitations under the License.
 */
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
-import java.io.*;
 
 @Converter
 public class LongArrayToBytesConverter implements AttributeConverter<Long[],byte[]>{

@@ -16,19 +16,23 @@ package be.cytomine.utils;
 * limitations under the License.
 */
 
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
+
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.dto.json.JsonInput;
 import be.cytomine.exceptions.ServerException;
 import be.cytomine.exceptions.WrongArgumentException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.Query;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 import static be.cytomine.utils.DateUtils.MONGO_DB_FORMAT;
 

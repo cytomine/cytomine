@@ -1,5 +1,19 @@
 package be.cytomine.controller.ontology;
 
+import java.util.ArrayList;
+import java.util.Map;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.ontology.AnnotationGroup;
 import be.cytomine.domain.ontology.AnnotationLink;
@@ -9,13 +23,6 @@ import be.cytomine.service.command.TransactionService;
 import be.cytomine.service.ontology.AnnotationGroupService;
 import be.cytomine.service.ontology.AnnotationLinkService;
 import be.cytomine.utils.JsonObject;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -23,13 +30,13 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class RestAnnotationLinkController extends RestCytomineController {
 
-    final private AnnotationGroupService annotationGroupService;
+    private final AnnotationGroupService annotationGroupService;
 
-    final private AnnotationLinkService annotationLinkService;
+    private final AnnotationLinkService annotationLinkService;
 
-    final private TransactionService transactionService;
+    private final TransactionService transactionService;
 
-    final private AnnotationLinkRepository annotationLinkRepository;
+    private final AnnotationLinkRepository annotationLinkRepository;
 
     @PostMapping("/annotationlink.json")
     public ResponseEntity<String> add(@RequestBody JsonObject json) {

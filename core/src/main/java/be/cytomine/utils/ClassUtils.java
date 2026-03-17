@@ -17,6 +17,7 @@ package be.cytomine.utils;
 */
 
 import org.hibernate.proxy.HibernateProxy;
+
 public class ClassUtils {
 
     /**

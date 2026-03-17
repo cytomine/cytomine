@@ -16,12 +16,13 @@ package be.cytomine.repository.security;
 * limitations under the License.
 */
 
-import be.cytomine.domain.security.SecRole;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import be.cytomine.domain.security.SecRole;
 
 /**
  * Spring Data JPA repository for the user entity.

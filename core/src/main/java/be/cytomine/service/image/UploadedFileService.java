@@ -16,9 +16,37 @@ package be.cytomine.service.image;
  * limitations under the License.
  */
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import jakarta.persistence.Query;
+import jakarta.persistence.Tuple;
+import jakarta.persistence.TupleElement;
+import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
 import be.cytomine.domain.CytomineDomain;
-import be.cytomine.domain.command.*;
-import be.cytomine.domain.image.*;
+import be.cytomine.domain.command.AddCommand;
+import be.cytomine.domain.command.Command;
+import be.cytomine.domain.command.DeleteCommand;
+import be.cytomine.domain.command.EditCommand;
+import be.cytomine.domain.command.Transaction;
+import be.cytomine.domain.image.AbstractImage;
+import be.cytomine.domain.image.AbstractSlice;
+import be.cytomine.domain.image.CompanionFile;
+import be.cytomine.domain.image.UploadedFile;
+import be.cytomine.domain.image.UploadedFileStatus;
 import be.cytomine.domain.image.server.Storage;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ForbiddenException;
@@ -32,25 +60,16 @@ import be.cytomine.service.ModelService;
 import be.cytomine.service.UrlApi;
 import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.service.utils.TaskService;
-import be.cytomine.utils.*;
+import be.cytomine.utils.CommandResponse;
+import be.cytomine.utils.DomainUtils;
+import be.cytomine.utils.JsonObject;
+import be.cytomine.utils.SQLUtils;
+import be.cytomine.utils.Task;
+import be.cytomine.utils.TokenUtils;
 import be.cytomine.utils.filters.SQLSearchParameter;
 import be.cytomine.utils.filters.SearchOperation;
 import be.cytomine.utils.filters.SearchParameterEntry;
 import be.cytomine.utils.filters.SearchParameterProcessed;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-
-import jakarta.persistence.Query;
-import jakarta.persistence.Tuple;
-import jakarta.persistence.TupleElement;
-import jakarta.transaction.Transactional;
-
-import java.math.BigInteger;
-import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.springframework.security.acls.domain.BasePermission.READ;
 import static org.springframework.security.acls.domain.BasePermission.WRITE;

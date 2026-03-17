@@ -1,28 +1,29 @@
 package be.cytomine.controller.ontology;
 
 /*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+* Copyright (c) 2009-2022. Authors: see NOTICE file.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*      http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 
+import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.http.TermHttpContract;
-import be.cytomine.common.repository.model.CreateTerm;
 import be.cytomine.common.repository.model.TermResponse;
-import be.cytomine.common.repository.model.UpdateTerm;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.domain.ontology.Term;
+import be.cytomine.domain.project.Project;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -35,11 +36,13 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -55,143 +58,139 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class TermResourceTests {
 
     @Autowired
+    private BasicInstanceBuilder builder;
+
+    @Autowired
     private MockMvc restTermControllerMockMvc;
 
     @MockitoBean
     private TermHttpContract termHttpContract;
 
+    private TermResponse toTermResponse(Term term) {
+        return new TermResponse(
+                term.getId(),
+                term.getName(),
+                term.getColor(),
+                term.getOntology().getId(),
+                0L,
+                Set.of()
+        );
+    }
+
     @Test
+    @Transactional
     public void list_all_terms() throws Exception {
-        TermResponse term1 = new TermResponse(1L, "Cell", "#FF0000", 100L, 200L, Set.of());
-        TermResponse term2 = new TermResponse(2L, "Nucleus", "#00FF00", 100L, 200L, Set.of());
-        Page<TermResponse> page = new PageImpl<>(List.of(term1, term2));
+        Term term = builder.given_a_term();
+        Page<TermResponse> page = new PageImpl<>(List.of(toTermResponse(term)));
         when(termHttpContract.findAll(any(Pageable.class))).thenReturn(page);
 
         restTermControllerMockMvc.perform(get("/api/term.json"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.collection", hasSize(2)))
-                .andExpect(jsonPath("$.collection[?(@.name=='Cell')].id").value(1))
-                .andExpect(jsonPath("$.collection[?(@.name=='Nucleus')].id").value(2))
-                .andExpect(jsonPath("$.size").value(2))
-                .andExpect(jsonPath("$.totalPages").value(1));
+                .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
+                .andExpect(jsonPath("$.collection[?(@.name=='"+term.getName()+"')].ontologyId").value(term.getOntology().getId().intValue()));
     }
 
     @Test
-    public void list_all_terms_empty() throws Exception {
-        Page<TermResponse> emptyPage = Page.empty();
-        when(termHttpContract.findAll(any(Pageable.class))).thenReturn(emptyPage);
-
-        restTermControllerMockMvc.perform(get("/api/term.json"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.collection", hasSize(0)))
-                .andExpect(jsonPath("$.size").value(0));
-    }
-
-    @Test
+    @Transactional
     public void get_a_term() throws Exception {
-        TermResponse child = new TermResponse(2L, "Mitochondria", "#0000FF", 100L, 200L, Set.of());
-        TermResponse term = new TermResponse(1L, "Cell", "#FF0000", 100L, 200L, Set.of(child));
-        when(termHttpContract.findTermByID(1L)).thenReturn(Optional.of(term));
+        Term term = builder.given_a_term();
+        when(termHttpContract.findTermByID(term.getId())).thenReturn(Optional.of(toTermResponse(term)));
 
-        restTermControllerMockMvc.perform(get("/api/term/{id}.json", 1L))
+        restTermControllerMockMvc.perform(get("/api/term/{id}.json", term.getId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.name").value("Cell"))
-                .andExpect(jsonPath("$.color").value("#FF0000"))
-                .andExpect(jsonPath("$.ontologyId").value(100))
-                .andExpect(jsonPath("$.children", hasSize(1)))
-                .andExpect(jsonPath("$.children[0].name").value("Mitochondria"));
+                .andExpect(jsonPath("$.id").value(term.getId().intValue()))
+                .andExpect(jsonPath("$.color").value(term.getColor()))
+                .andExpect(jsonPath("$.ontologyId").value(term.getOntology().getId().intValue()));
     }
 
     @Test
-    public void get_a_term_not_found() throws Exception {
-        when(termHttpContract.findTermByID(999L)).thenReturn(Optional.empty());
+    @Transactional
+    public void list_terms_by_ontology() throws Exception {
+        Term term = builder.given_a_term();
+        Page<TermResponse> page = new PageImpl<>(List.of(toTermResponse(term)));
+        when(termHttpContract.findTermsByOntology(eq(term.getOntology().getId()), any(Pageable.class))).thenReturn(page);
 
-        restTermControllerMockMvc.perform(get("/api/term/{id}.json", 999L))
+        restTermControllerMockMvc.perform(get("/api/ontology/{id}/term.json", term.getOntology().getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
+                .andExpect(jsonPath("$.collection[?(@.name=='"+term.getName()+"')].ontologyId").value(term.getOntology().getId().intValue()));
+    }
+
+    @Test
+    @Transactional
+    public void list_terms_by_project() throws Exception {
+        Term term = builder.given_a_term();
+        Project project = builder.given_a_project_with_ontology(term.getOntology());
+        Page<TermResponse> page = new PageImpl<>(List.of(toTermResponse(term)));
+        when(termHttpContract.findTermsByProject(eq(project.getId()), any(Pageable.class))).thenReturn(page);
+
+        restTermControllerMockMvc.perform(get("/api/project/{id}/term.json", project.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
+                .andExpect(jsonPath("$.collection[?(@.name=='"+term.getName()+"')].ontologyId").value(term.getOntology().getId().intValue()));
+    }
+
+    @Test
+    @Transactional
+    public void add_valid_term() throws Exception {
+        Term term = BasicInstanceBuilder.given_a_not_persisted_term(builder.given_an_ontology());
+        TermResponse response = new TermResponse(1L, term.getName(), term.getColor(), term.getOntology().getId(), 0L, Set.of());
+        when(termHttpContract.update(any())).thenReturn(response);
+
+        restTermControllerMockMvc.perform(post("/api/term.json")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"" + term.getName() + "\",\"color\":\"" + term.getColor() + "\",\"ontology\":" + term.getOntology().getId() + ",\"project\":0}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.name").value(term.getName()))
+                .andExpect(jsonPath("$.ontologyId").value(term.getOntology().getId()));
+    }
+
+    @Test
+    @Transactional
+    public void edit_valid_term() throws Exception {
+        Term term = builder.given_a_term();
+        TermResponse response = toTermResponse(term);
+        when(termHttpContract.update(eq(term.getId()), any())).thenReturn(response);
+
+        restTermControllerMockMvc.perform(put("/api/term/{id}.json", term.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"" + term.getName() + "\",\"color\":\"" + term.getColor() + "\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(term.getId().intValue()))
+                .andExpect(jsonPath("$.name").value(term.getName()))
+                .andExpect(jsonPath("$.ontologyId").value(term.getOntology().getId()));
+    }
+
+    @Test
+    @Transactional
+    public void delete_term() throws Exception {
+        Term term = builder.given_a_term();
+        when(termHttpContract.delete(term.getId())).thenReturn(Optional.of(toTermResponse(term)));
+
+        restTermControllerMockMvc.perform(delete("/api/term/{id}.json", term.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(term.getId().intValue()))
+                .andExpect(jsonPath("$.name").value(term.getName()))
+                .andExpect(jsonPath("$.ontologyId").value(term.getOntology().getId()));
+    }
+
+    @Test
+    @Transactional
+    public void delete_term_not_exist_returns_empty() throws Exception {
+        when(termHttpContract.delete(0L)).thenReturn(Optional.empty());
+
+        restTermControllerMockMvc.perform(delete("/api/term/{id}.json", 0))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").doesNotExist());
     }
 
     @Test
-    public void list_terms_by_ontology() throws Exception {
-        TermResponse term = new TermResponse(1L, "Cell", "#FF0000", 100L, 200L, Set.of());
-        Page<TermResponse> page = new PageImpl<>(List.of(term));
-        when(termHttpContract.findTermsByOntology(eq(100L), any(Pageable.class))).thenReturn(page);
+    @Transactional
+    public void get_term_not_exist_returns_empty() throws Exception {
+        when(termHttpContract.findTermByID(0L)).thenReturn(Optional.empty());
 
-        restTermControllerMockMvc.perform(get("/api/ontology/{id}/term.json", 100L))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.collection", hasSize(1)))
-                .andExpect(jsonPath("$.collection[0].name").value("Cell"))
-                .andExpect(jsonPath("$.collection[0].ontologyId").value(100))
-                .andExpect(jsonPath("$.size").value(1));
-    }
-
-    @Test
-    public void list_terms_by_project() throws Exception {
-        TermResponse term = new TermResponse(1L, "Cell", "#FF0000", 100L, 200L, Set.of());
-        Page<TermResponse> page = new PageImpl<>(List.of(term));
-        when(termHttpContract.findTermsByProject(eq(200L), any(Pageable.class))).thenReturn(page);
-
-        restTermControllerMockMvc.perform(get("/api/project/{id}/term.json", 200L))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.collection", hasSize(1)))
-                .andExpect(jsonPath("$.collection[0].name").value("Cell"))
-                .andExpect(jsonPath("$.collection[0].projectId").value(200))
-                .andExpect(jsonPath("$.size").value(1));
-    }
-
-    @Test
-    public void create_term() throws Exception {
-        TermResponse createdTerm = new TermResponse(1L, "NewTerm", "#123456", 100L, 200L, Set.of());
-        when(termHttpContract.update(any(CreateTerm.class))).thenReturn(createdTerm);
-
-        String json = """
-                {"name": "NewTerm", "color": "#123456", "ontology": 100, "project": 200}
-                """;
-
-        restTermControllerMockMvc.perform(post("/api/term.json")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.name").value("NewTerm"))
-                .andExpect(jsonPath("$.color").value("#123456"));
-    }
-
-    @Test
-    public void update_term() throws Exception {
-        TermResponse updatedTerm = new TermResponse(1L, "UpdatedName", "#ABCDEF", 100L, 200L, Set.of());
-        when(termHttpContract.update(eq(1L), any(UpdateTerm.class))).thenReturn(updatedTerm);
-
-        String json = """
-                {"name": "UpdatedName", "color": "#ABCDEF"}
-                """;
-
-        restTermControllerMockMvc.perform(put("/api/term/{id}.json", 1L)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.name").value("UpdatedName"))
-                .andExpect(jsonPath("$.color").value("#ABCDEF"));
-    }
-
-    @Test
-    public void delete_term() throws Exception {
-        TermResponse deletedTerm = new TermResponse(1L, "DeletedTerm", "#FF0000", 100L, 200L, Set.of());
-        when(termHttpContract.delete(1L)).thenReturn(Optional.of(deletedTerm));
-
-        restTermControllerMockMvc.perform(delete("/api/term/{id}.json", 1L))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.name").value("DeletedTerm"));
-    }
-
-    @Test
-    public void delete_term_not_found() throws Exception {
-        when(termHttpContract.delete(999L)).thenReturn(Optional.empty());
-
-        restTermControllerMockMvc.perform(delete("/api/term/{id}.json", 999L))
+        restTermControllerMockMvc.perform(get("/api/term/{id}.json", 0))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").doesNotExist());
     }

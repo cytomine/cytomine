@@ -11,14 +11,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-
-import be.cytomine.config.security.ApiKeyFilter;
-import be.cytomine.domain.image.server.Storage;
-import be.cytomine.domain.security.User;
-import be.cytomine.dto.appengine.task.TaskRunValue;
-import be.cytomine.service.image.AbstractImageService;
-import be.cytomine.service.image.server.StorageService;
-import be.cytomine.service.middleware.ImageServerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.FileSystemResource;
@@ -31,6 +23,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+
+import be.cytomine.config.security.ApiKeyFilter;
+import be.cytomine.domain.image.server.Storage;
+import be.cytomine.domain.security.User;
+import be.cytomine.dto.appengine.task.TaskRunValue;
+import be.cytomine.service.image.AbstractImageService;
+import be.cytomine.service.image.server.StorageService;
+import be.cytomine.service.middleware.ImageServerService;
 
 @Slf4j
 @Service

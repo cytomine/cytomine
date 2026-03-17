@@ -16,10 +16,9 @@ package be.cytomine.config;
  * limitations under the License.
  */
 
-import be.cytomine.config.security.ApiKeyFilter;
-import be.cytomine.config.security.TokenFromParameterFilter;
-import be.cytomine.repository.security.UserRepository;
-import be.cytomine.utils.JwtAuthConverter;
+import java.util.List;
+
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -29,16 +28,15 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-
-import java.util.Arrays;
-import java.util.List;
+import be.cytomine.config.security.ApiKeyFilter;
+import be.cytomine.config.security.TokenFromParameterFilter;
+import be.cytomine.repository.security.UserRepository;
+import be.cytomine.utils.JwtAuthConverter;
 
 @Configuration
 @EnableWebSecurity

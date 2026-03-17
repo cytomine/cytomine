@@ -16,18 +16,19 @@ package be.cytomine.service;
 * limitations under the License.
 */
 
-import be.cytomine.domain.CytomineDomain;
-import be.cytomine.utils.CommandResponse;
-import be.cytomine.utils.JsonObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
-import org.springframework.stereotype.Service;
-
-import jakarta.transaction.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.stereotype.Service;
+
+import be.cytomine.domain.CytomineDomain;
+import be.cytomine.utils.CommandResponse;
+import be.cytomine.utils.JsonObject;
 
 import static be.cytomine.utils.ClassUtils.getClassName;
 

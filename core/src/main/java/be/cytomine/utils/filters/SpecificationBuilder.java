@@ -16,13 +16,14 @@ package be.cytomine.utils.filters;
 * limitations under the License.
 */
 
-import be.cytomine.domain.CytomineDomain;
-import be.cytomine.exceptions.WrongArgumentException;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import be.cytomine.domain.CytomineDomain;
+import be.cytomine.exceptions.WrongArgumentException;
 
 @Slf4j
 public class SpecificationBuilder {

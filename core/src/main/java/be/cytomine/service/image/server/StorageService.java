@@ -16,8 +16,19 @@ package be.cytomine.service.image.server;
 * limitations under the License.
 */
 
+import java.util.List;
+import java.util.Optional;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
 import be.cytomine.domain.CytomineDomain;
-import be.cytomine.domain.command.*;
+import be.cytomine.domain.command.AddCommand;
+import be.cytomine.domain.command.Command;
+import be.cytomine.domain.command.DeleteCommand;
+import be.cytomine.domain.command.EditCommand;
+import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.image.server.Storage;
 import be.cytomine.domain.security.User;
 import be.cytomine.repository.image.server.StorageRepository;
@@ -29,15 +40,10 @@ import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.Task;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-
-import static org.springframework.security.acls.domain.BasePermission.*;
+import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
+import static org.springframework.security.acls.domain.BasePermission.READ;
+import static org.springframework.security.acls.domain.BasePermission.WRITE;
 
 @Service
 @Slf4j
@@ -45,8 +51,6 @@ import static org.springframework.security.acls.domain.BasePermission.*;
 public class StorageService extends ModelService {
 
     private final SecurityACLService securityACLService;
-
-    private final ApplicationContext applicationContext;
 
     private final StorageRepository storageRepository;
 

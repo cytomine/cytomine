@@ -16,16 +16,16 @@ package be.cytomine.repository.meta;
 * limitations under the License.
 */
 
-import be.cytomine.domain.meta.Property;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import be.cytomine.domain.meta.Property;
 
 public interface PropertyRepository extends JpaRepository<Property, Long>, JpaSpecificationExecutor<Property>  {
 

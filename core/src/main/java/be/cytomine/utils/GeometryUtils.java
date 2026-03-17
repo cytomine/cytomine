@@ -1,14 +1,18 @@
 package be.cytomine.utils;
 
-import be.cytomine.dto.image.BoundariesCropParameter;
-import be.cytomine.exceptions.WrongArgumentException;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.locationtech.jts.geom.*;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LinearRing;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 
-import java.util.ArrayList;
-import java.util.List;
+import be.cytomine.dto.image.BoundariesCropParameter;
+import be.cytomine.exceptions.WrongArgumentException;
 
 public class GeometryUtils {
 

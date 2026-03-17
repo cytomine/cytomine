@@ -1,12 +1,13 @@
 package be.cytomine.repository.meta;
 
-import be.cytomine.domain.meta.Configuration;
-import be.cytomine.domain.meta.ConfigurationReadingRole;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-import java.util.List;
-import java.util.Optional;
+import be.cytomine.domain.meta.Configuration;
+import be.cytomine.domain.meta.ConfigurationReadingRole;
 
 public interface ConfigurationRepository extends JpaRepository<Configuration, Long>, JpaSpecificationExecutor<Configuration>  {
 

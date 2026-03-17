@@ -1,9 +1,8 @@
 package be.cytomine.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import be.cytomine.dto.appengine.task.type.TaskParameterType;
 import be.cytomine.dto.appengine.task.type.TaskParameterTypeMixin;

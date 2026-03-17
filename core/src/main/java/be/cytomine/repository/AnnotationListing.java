@@ -16,6 +16,17 @@ package be.cytomine.repository;
 * limitations under the License.
 */
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import jakarta.persistence.EntityManager;
+import lombok.Getter;
+import lombok.Setter;
+
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
@@ -27,12 +38,6 @@ import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.exceptions.WrongArgumentException;
-import lombok.Getter;
-import lombok.Setter;
-
-import jakarta.persistence.EntityManager;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter

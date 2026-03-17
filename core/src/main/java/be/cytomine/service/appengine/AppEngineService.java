@@ -1,18 +1,23 @@
 package be.cytomine.service.appengine;
 
-import be.cytomine.exceptions.AppEngineException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Map;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Map;
+import be.cytomine.exceptions.AppEngineException;
 
 @Slf4j
 @Service

@@ -1,6 +1,8 @@
 package be.cytomine.repositorynosql.social;
 
-import be.cytomine.domain.social.PersistentImageConsultation;
+import java.util.Date;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -8,8 +10,7 @@ import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
-import java.util.List;
+import be.cytomine.domain.social.PersistentImageConsultation;
 
 @Repository
 public interface PersistentImageConsultationRepository extends MongoRepository<PersistentImageConsultation, Long> {

@@ -1,7 +1,5 @@
 package be.cytomine.service.utils;
 
-import be.cytomine.dto.annotation.SimplifiedAnnotation;
-import be.cytomine.exceptions.WrongArgumentException;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Polygon;
@@ -13,6 +11,9 @@ import org.locationtech.jts.simplify.DouglasPeuckerSimplifier;
 import org.locationtech.jts.simplify.TopologyPreservingSimplifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import be.cytomine.dto.annotation.SimplifiedAnnotation;
+import be.cytomine.exceptions.WrongArgumentException;
 
 @Service
 public class SimplifyGeometryService {

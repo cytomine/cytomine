@@ -16,9 +16,9 @@ package be.cytomine.utils;
 * limitations under the License.
 */
 
-import org.springframework.core.env.Environment;
-
 import java.util.Arrays;
+
+import org.springframework.core.env.Environment;
 
 public class EnvironmentUtils {
 

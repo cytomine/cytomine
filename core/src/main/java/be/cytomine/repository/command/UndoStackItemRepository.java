@@ -16,12 +16,12 @@ package be.cytomine.repository.command;
 * limitations under the License.
 */
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
 import be.cytomine.domain.command.UndoStackItem;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
-import be.cytomine.domain.security.User;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UndoStackItemRepository extends JpaRepository<UndoStackItem, Long> {

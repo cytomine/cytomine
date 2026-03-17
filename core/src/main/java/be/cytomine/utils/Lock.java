@@ -1,13 +1,14 @@
 package be.cytomine.utils;
 
-import be.cytomine.domain.project.Project;
-import be.cytomine.exceptions.ServerException;
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
+
+import lombok.extern.slf4j.Slf4j;
+
+import be.cytomine.domain.project.Project;
+import be.cytomine.exceptions.ServerException;
 
 @Slf4j
 public class Lock {

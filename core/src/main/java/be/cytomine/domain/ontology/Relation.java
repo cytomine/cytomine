@@ -16,15 +16,14 @@ package be.cytomine.domain.ontology;
 * limitations under the License.
 */
 
-import be.cytomine.domain.CytomineDomain;
-import be.cytomine.utils.JsonObject;
-
-
 import jakarta.persistence.Entity;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+
+import be.cytomine.domain.CytomineDomain;
+import be.cytomine.utils.JsonObject;
 
 @Entity
 @Getter

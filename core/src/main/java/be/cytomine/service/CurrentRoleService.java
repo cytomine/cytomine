@@ -16,11 +16,13 @@ package be.cytomine.service;
 * limitations under the License.
 */
 
-import be.cytomine.domain.security.SecRole;
-import be.cytomine.domain.security.User;
-import be.cytomine.exceptions.ForbiddenException;
-import be.cytomine.repository.security.SecUserSecRoleRepository;
-import be.cytomine.utils.WeakConcurrentHashMap;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -30,8 +32,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import be.cytomine.domain.security.SecRole;
+import be.cytomine.domain.security.User;
+import be.cytomine.exceptions.ForbiddenException;
+import be.cytomine.repository.security.SecUserSecRoleRepository;
+import be.cytomine.utils.WeakConcurrentHashMap;
 
 // TODO IAM - ADMIN SESSION ADAPT IF NEEDED
 @Service

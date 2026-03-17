@@ -16,6 +16,11 @@ package be.cytomine.domain.command;
 * limitations under the License.
 */
 
+import java.util.HashMap;
+
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
@@ -23,10 +28,6 @@ import be.cytomine.service.ModelService;
 import be.cytomine.utils.ClassUtils;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
-
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
-import java.util.HashMap;
 
 @Entity
 @DiscriminatorValue("be.cytomine.domain.command.EditCommand")

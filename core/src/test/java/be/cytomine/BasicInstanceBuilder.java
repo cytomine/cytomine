@@ -3,8 +3,10 @@ package be.cytomine;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 
+import be.cytomine.common.repository.model.TermResponse;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.locationtech.jts.io.ParseException;
@@ -236,6 +238,10 @@ public class BasicInstanceBuilder {
 
     public Term given_a_term() {
         return persistAndReturn(given_a_not_persisted_term(given_an_ontology()));
+    }
+
+    public TermResponse given_a_response_term(){
+        return new TermResponse(1l, "name", "color",2l, 2l, Set.of());
     }
 
     public Term given_a_term(Ontology ontology) {

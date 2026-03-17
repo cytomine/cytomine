@@ -1,10 +1,10 @@
 package be.cytomine.controller.repository;
 
 import java.util.Optional;
-import java.util.Set;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.common.repository.model.CreateTerm;
-import be.cytomine.common.repository.model.Term;
+import be.cytomine.common.repository.model.TermResponse;
 import be.cytomine.common.repository.model.UpdateTerm;
+import be.cytomine.controller.utils.CollectionResponse;
+import be.cytomine.controller.utils.PageMapper;
 
 @RestController
 @RequestMapping("/api")
@@ -26,44 +28,45 @@ import be.cytomine.common.repository.model.UpdateTerm;
 public class TermController {
 
     private final TermHttpContract termHttpContract;
+    private final PageMapper pageMapper;
 
     @GetMapping("term.json")
-    public Set<Term> list() {
+    public CollectionResponse<TermResponse> list(Pageable pageable) {
         log.debug("REST request to list terms");
-        return termHttpContract.findAll();
+        return pageMapper.toCollectionResponse(termHttpContract.findAll(pageable));
     }
 
     @PostMapping("term.json")
-    public Term create(@RequestBody CreateTerm createTerm) {
+    public TermResponse create(@RequestBody CreateTerm createTerm) {
         return termHttpContract.update(createTerm);
     }
 
     @GetMapping("term/{id}.json")
-    public Optional<Term> term(@PathVariable long id) {
+    public Optional<TermResponse> term(@PathVariable long id) {
         log.debug("REST request to get term {}", id);
         return termHttpContract.findTermByID(id);
     }
 
     @PutMapping("term/{id}.json")
-    public Term update(@PathVariable Long id, @RequestBody UpdateTerm updateTerm) {
+    public TermResponse update(@PathVariable Long id, @RequestBody UpdateTerm updateTerm) {
         return termHttpContract.update(id, updateTerm);
     }
 
     @DeleteMapping("term/{id}.json")
-    public Optional<Term> delete(@PathVariable Long id) {
+    public Optional<TermResponse> delete(@PathVariable Long id) {
         log.debug("REST request to delete term {}", id);
         return termHttpContract.delete(id);
     }
 
     @GetMapping("project/{id}/term.json")
-    public Set<Term> listByProject(@PathVariable Long id) {
+    public CollectionResponse<TermResponse> listByProject(@PathVariable Long id, Pageable pageable) {
         log.debug("REST request to list terms for project {}", id);
-        return termHttpContract.findTermsByProject(id);
+        return pageMapper.toCollectionResponse(termHttpContract.findTermsByProject(id, pageable));
     }
 
     @GetMapping("ontology/{id}/term.json")
-    public Set<Term> listByOntology(@PathVariable Long id) {
+    public CollectionResponse<TermResponse> listByOntology(@PathVariable Long id, Pageable pageable) {
         log.debug("REST request to list terms for ontology {}", id);
-        return termHttpContract.findTermsByOntology(id);
+        return pageMapper.toCollectionResponse(termHttpContract.findTermsByOntology(id, pageable));
     }
 }

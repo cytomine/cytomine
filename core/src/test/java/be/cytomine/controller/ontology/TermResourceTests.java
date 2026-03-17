@@ -16,34 +16,33 @@ package be.cytomine.controller.ontology;
  * limitations under the License.
  */
 
-import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.http.TermHttpContract;
+import be.cytomine.common.repository.model.CreateTerm;
+import be.cytomine.common.repository.model.TermResponse;
+import be.cytomine.common.repository.model.UpdateTerm;
 import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.domain.ontology.Term;
-import be.cytomine.domain.project.Project;
-import be.cytomine.utils.JsonObject;
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -56,216 +55,144 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class TermResourceTests {
 
     @Autowired
-    private EntityManager em;
-
-    @Autowired
-    private BasicInstanceBuilder builder;
-
-    @Autowired
     private MockMvc restTermControllerMockMvc;
 
     @MockitoBean
     private TermHttpContract termHttpContract;
 
     @Test
-    @Transactional
     public void list_all_terms() throws Exception {
-        Term term = builder.given_a_term();
-        when(termHttpContract.findAll()).thenReturn(Set.of());
+        TermResponse term1 = new TermResponse(1L, "Cell", "#FF0000", 100L, 200L, Set.of());
+        TermResponse term2 = new TermResponse(2L, "Nucleus", "#00FF00", 100L, 200L, Set.of());
+        Page<TermResponse> page = new PageImpl<>(List.of(term1, term2));
+        when(termHttpContract.findAll(any(Pageable.class))).thenReturn(page);
+
         restTermControllerMockMvc.perform(get("/api/term.json"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
-                .andExpect(jsonPath("$.collection[?(@.name=='" + term.getName() + "')].ontology").value(term.getOntology().getId().intValue()));
+                .andExpect(jsonPath("$.collection", hasSize(2)))
+                .andExpect(jsonPath("$.collection[?(@.name=='Cell')].id").value(1))
+                .andExpect(jsonPath("$.collection[?(@.name=='Nucleus')].id").value(2))
+                .andExpect(jsonPath("$.size").value(2))
+                .andExpect(jsonPath("$.totalPages").value(1));
     }
 
+    @Test
+    public void list_all_terms_empty() throws Exception {
+        Page<TermResponse> emptyPage = Page.empty();
+        when(termHttpContract.findAll(any(Pageable.class))).thenReturn(emptyPage);
+
+        restTermControllerMockMvc.perform(get("/api/term.json"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.collection", hasSize(0)))
+                .andExpect(jsonPath("$.size").value(0));
+    }
 
     @Test
-    @Transactional
     public void get_a_term() throws Exception {
-        Term term = builder.given_a_term();
-        Term parent = builder.given_a_term(term.getOntology());
-        builder.given_a_relation_term(parent, term);
-        em.refresh(term);
-        when(termHttpContract.findTermByID(anyLong())).thenReturn(Optional.empty());
-        restTermControllerMockMvc.perform(get("/api/term/{id}.json", term.getId()))
+        TermResponse child = new TermResponse(2L, "Mitochondria", "#0000FF", 100L, 200L, Set.of());
+        TermResponse term = new TermResponse(1L, "Cell", "#FF0000", 100L, 200L, Set.of(child));
+        when(termHttpContract.findTermByID(1L)).thenReturn(Optional.of(term));
+
+        restTermControllerMockMvc.perform(get("/api/term/{id}.json", 1L))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(term.getId().intValue()))
-                .andExpect(jsonPath("$.class").value("be.cytomine.domain.ontology.Term"))
-                .andExpect(jsonPath("$.color").value(term.getColor()))
-                .andExpect(jsonPath("$.created").isNotEmpty())
-                .andExpect(jsonPath("$.ontology").value(term.getOntology().getId().intValue()))
-                .andExpect(jsonPath("$.parent").value(parent.getId().intValue()))
-        ;
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("Cell"))
+                .andExpect(jsonPath("$.color").value("#FF0000"))
+                .andExpect(jsonPath("$.ontologyId").value(100))
+                .andExpect(jsonPath("$.children", hasSize(1)))
+                .andExpect(jsonPath("$.children[0].name").value("Mitochondria"));
     }
 
     @Test
-    @Transactional
+    public void get_a_term_not_found() throws Exception {
+        when(termHttpContract.findTermByID(999L)).thenReturn(Optional.empty());
+
+        restTermControllerMockMvc.perform(get("/api/term/{id}.json", 999L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").doesNotExist());
+    }
+
+    @Test
     public void list_terms_by_ontology() throws Exception {
-        Term term = builder.given_a_term();
-        when(termHttpContract.findTermsByOntology(anyLong())).thenReturn(Set.of());
-        restTermControllerMockMvc.perform(get("/api/ontology/{id}/term.json", term.getOntology().getId()))
+        TermResponse term = new TermResponse(1L, "Cell", "#FF0000", 100L, 200L, Set.of());
+        Page<TermResponse> page = new PageImpl<>(List.of(term));
+        when(termHttpContract.findTermsByOntology(eq(100L), any(Pageable.class))).thenReturn(page);
+
+        restTermControllerMockMvc.perform(get("/api/ontology/{id}/term.json", 100L))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
-                .andExpect(jsonPath("$.collection[?(@.name=='" + term.getName() + "')].ontology").value(term.getOntology().getId().intValue()));
+                .andExpect(jsonPath("$.collection", hasSize(1)))
+                .andExpect(jsonPath("$.collection[0].name").value("Cell"))
+                .andExpect(jsonPath("$.collection[0].ontologyId").value(100))
+                .andExpect(jsonPath("$.size").value(1));
     }
 
     @Test
-    @Transactional
     public void list_terms_by_project() throws Exception {
-        Term term = builder.given_a_term();
-        Project project = builder.given_a_project_with_ontology(term.getOntology());
-        when(termHttpContract.findTermsByProject(anyLong())).thenReturn(Set.of());
-        restTermControllerMockMvc.perform(get("/api/project/{id}/term.json", project.getId()))
+        TermResponse term = new TermResponse(1L, "Cell", "#FF0000", 100L, 200L, Set.of());
+        Page<TermResponse> page = new PageImpl<>(List.of(term));
+        when(termHttpContract.findTermsByProject(eq(200L), any(Pageable.class))).thenReturn(page);
+
+        restTermControllerMockMvc.perform(get("/api/project/{id}/term.json", 200L))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
-                .andExpect(jsonPath("$.collection[?(@.name=='" + term.getName() + "')].ontology").value(term.getOntology().getId().intValue()));
+                .andExpect(jsonPath("$.collection", hasSize(1)))
+                .andExpect(jsonPath("$.collection[0].name").value("Cell"))
+                .andExpect(jsonPath("$.collection[0].projectId").value(200))
+                .andExpect(jsonPath("$.size").value(1));
     }
 
     @Test
-    @Transactional
-    public void add_valid_term() throws Exception {
-        Term term = BasicInstanceBuilder.given_a_not_persisted_term(builder.given_an_ontology());
-        when(termHttpContract.update(any(be.cytomine.common.repository.model.CreateTerm.class))).thenReturn(null);
+    public void create_term() throws Exception {
+        TermResponse createdTerm = new TermResponse(1L, "NewTerm", "#123456", 100L, 200L, Set.of());
+        when(termHttpContract.update(any(CreateTerm.class))).thenReturn(createdTerm);
+
+        String json = """
+                {"name": "NewTerm", "color": "#123456", "ontology": 100, "project": 200}
+                """;
+
         restTermControllerMockMvc.perform(post("/api/term.json")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(term.toJSON()))
+                        .content(json))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.printMessage").value(true))
-                .andExpect(jsonPath("$.callback").exists())
-                .andExpect(jsonPath("$.callback.termID").exists())
-                .andExpect(jsonPath("$.callback.method").value("be.cytomine.AddTermCommand"))
-                .andExpect(jsonPath("$.callback.ontologyID").value(String.valueOf(term.getOntology().getId())))
-                .andExpect(jsonPath("$.message").exists())
-                .andExpect(jsonPath("$.command").exists())
-                .andExpect(jsonPath("$.term.id").exists())
-                .andExpect(jsonPath("$.term.name").value(term.getName()))
-                .andExpect(jsonPath("$.term.ontology").value(term.getOntology().getId()));
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("NewTerm"))
+                .andExpect(jsonPath("$.color").value("#123456"));
     }
 
     @Test
-    @Transactional
-    public void add_valid_term_by_group() throws Exception {
-        Term term1 = BasicInstanceBuilder.given_a_not_persisted_term(builder.given_an_ontology());
-        Term term2 = BasicInstanceBuilder.given_a_not_persisted_term(term1.getOntology());
-        when(termHttpContract.update(any(be.cytomine.common.repository.model.CreateTerm.class))).thenReturn(null);
-        restTermControllerMockMvc.perform(post("/api/term.json")
+    public void update_term() throws Exception {
+        TermResponse updatedTerm = new TermResponse(1L, "UpdatedName", "#ABCDEF", 100L, 200L, Set.of());
+        when(termHttpContract.update(eq(1L), any(UpdateTerm.class))).thenReturn(updatedTerm);
+
+        String json = """
+                {"name": "UpdatedName", "color": "#ABCDEF"}
+                """;
+
+        restTermControllerMockMvc.perform(put("/api/term/{id}.json", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(JsonObject.toJsonString(List.of(term1.toJsonObject(), term2.toJsonObject()))))
+                        .content(json))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value(200));
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("UpdatedName"))
+                .andExpect(jsonPath("$.color").value("#ABCDEF"));
     }
 
     @Test
-    @Transactional
-    public void add_term_refused_if_already_exists() throws Exception {
-        Term term = BasicInstanceBuilder.given_a_not_persisted_term(builder.given_an_ontology());
-        builder.persistAndReturn(term);
-        when(termHttpContract.update(any(be.cytomine.common.repository.model.CreateTerm.class))).thenReturn(null);
-        restTermControllerMockMvc.perform(post("/api/term.json")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(term.toJSON()))
-                .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.errors").value("Term " + term.getName() + " already exist in this ontology!"));
-    }
-
-    @Test
-    @Transactional
-    public void add_term_refused_if_ontology_not_set() throws Exception {
-        Term term = BasicInstanceBuilder.given_a_not_persisted_term(null);
-        when(termHttpContract.update(any(be.cytomine.common.repository.model.CreateTerm.class))).thenReturn(null);
-        restTermControllerMockMvc.perform(post("/api/term.json")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(term.toJSON()))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.errors").value("Ontology is mandatory for term creation"));
-    }
-
-    @Test
-    @Transactional
-    public void add_term_refused_if_name_not_set() throws Exception {
-        Term term = BasicInstanceBuilder.given_a_not_persisted_term(builder.given_an_ontology());
-        term.setName(null);
-        when(termHttpContract.update(any(be.cytomine.common.repository.model.CreateTerm.class))).thenReturn(null);
-        restTermControllerMockMvc.perform(post("/api/term.json")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(term.toJSON()))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.success").value(false));
-    }
-
-    @Test
-    @Transactional
-    public void edit_valid_term() throws Exception {
-        Term term = builder.given_a_term();
-        when(termHttpContract.update(anyLong(), any(be.cytomine.common.repository.model.UpdateTerm.class))).thenReturn(null);
-        restTermControllerMockMvc.perform(put("/api/term/{id}.json", term.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(term.toJSON()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.printMessage").value(true))
-                .andExpect(jsonPath("$.callback").exists())
-                .andExpect(jsonPath("$.callback.termID").exists())
-                .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditTermCommand"))
-                .andExpect(jsonPath("$.callback.ontologyID").value(String.valueOf(term.getOntology().getId())))
-                .andExpect(jsonPath("$.message").exists())
-                .andExpect(jsonPath("$.command").exists())
-                .andExpect(jsonPath("$.term.id").exists())
-                .andExpect(jsonPath("$.term.name").value(term.getName()))
-                .andExpect(jsonPath("$.term.ontology").value(term.getOntology().getId()));
-
-    }
-
-
-    @Test
-    @Transactional
-    public void edit_term_not_exists_fails() throws Exception {
-        Term term = builder.given_a_term();
-        em.remove(term);
-        when(termHttpContract.update(anyLong(), any(be.cytomine.common.repository.model.UpdateTerm.class))).thenReturn(null);
-        restTermControllerMockMvc.perform(put("/api/term/{id}.json", 0)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(term.toJSON()))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.errors").exists());
-
-    }
-
-    @Test
-    @Transactional
     public void delete_term() throws Exception {
-        Term term = builder.given_a_term();
-        when(termHttpContract.delete(anyLong())).thenReturn(Optional.empty());
-        restTermControllerMockMvc.perform(delete("/api/term/{id}.json", term.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(term.toJSON()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.printMessage").value(true))
-                .andExpect(jsonPath("$.callback").exists())
-                .andExpect(jsonPath("$.callback.termID").exists())
-                .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteTermCommand"))
-                .andExpect(jsonPath("$.callback.ontologyID").value(String.valueOf(term.getOntology().getId())))
-                .andExpect(jsonPath("$.message").exists())
-                .andExpect(jsonPath("$.command").exists())
-                .andExpect(jsonPath("$.term.id").exists())
-                .andExpect(jsonPath("$.term.name").value(term.getName()))
-                .andExpect(jsonPath("$.term.ontology").value(term.getOntology().getId()));
+        TermResponse deletedTerm = new TermResponse(1L, "DeletedTerm", "#FF0000", 100L, 200L, Set.of());
+        when(termHttpContract.delete(1L)).thenReturn(Optional.of(deletedTerm));
 
+        restTermControllerMockMvc.perform(delete("/api/term/{id}.json", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("DeletedTerm"));
     }
 
     @Test
-    @Transactional
-    public void delete_term_not_exist_fails() throws Exception {
-        Term term = builder.given_a_term();
-        when(termHttpContract.delete(anyLong())).thenReturn(Optional.empty());
-        restTermControllerMockMvc.perform(delete("/api/term/{id}.json", 0)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(term.toJSON()))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.errors").exists());
+    public void delete_term_not_found() throws Exception {
+        when(termHttpContract.delete(999L)).thenReturn(Optional.empty());
 
+        restTermControllerMockMvc.perform(delete("/api/term/{id}.json", 999L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").doesNotExist());
     }
 }

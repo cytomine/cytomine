@@ -18,8 +18,6 @@ public class ApplicationProperties {
 
     private String serverURL;
 
-//    private NotificationProperties notification;
-
     private String storagePath;
 
     private CustomUIProperties customUI;

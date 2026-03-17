@@ -16,16 +16,17 @@ package be.cytomine.repository.ontology;
 * limitations under the License.
 */
 
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+
 import be.cytomine.domain.ontology.AnnotationTerm;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-
-import java.util.List;
-import java.util.Optional;
 
 public interface AnnotationTermRepository extends JpaRepository<AnnotationTerm, Long>, JpaSpecificationExecutor<AnnotationTerm>  {
     List<AnnotationTerm> findAllByUserAnnotation(UserAnnotation annotation);

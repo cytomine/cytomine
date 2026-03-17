@@ -16,9 +16,10 @@ package be.cytomine.repository.image;
 * limitations under the License.
 */
 
-import be.cytomine.domain.image.AbstractImage;
-import be.cytomine.domain.image.UploadedFile;
-import be.cytomine.domain.project.Project;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -29,9 +30,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import be.cytomine.domain.image.AbstractImage;
+import be.cytomine.domain.image.UploadedFile;
+import be.cytomine.domain.project.Project;
 
 /**
  * Spring Data JPA repository for the abstract image entity.

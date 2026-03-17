@@ -16,14 +16,15 @@ package be.cytomine.repository.ontology;
 * limitations under the License.
 */
 
-import be.cytomine.domain.image.SliceInstance;
-import be.cytomine.domain.ontology.AnnotationTrack;
-import be.cytomine.domain.ontology.Track;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-import java.util.List;
-import java.util.Optional;
+import be.cytomine.domain.image.SliceInstance;
+import be.cytomine.domain.ontology.AnnotationTrack;
+import be.cytomine.domain.ontology.Track;
 
 public interface AnnotationTrackRepository extends JpaRepository<AnnotationTrack, Long>, JpaSpecificationExecutor<AnnotationTrack>  {
 

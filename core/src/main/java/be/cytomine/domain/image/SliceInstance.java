@@ -16,18 +16,19 @@ package be.cytomine.domain.image;
 * limitations under the License.
 */
 
-import be.cytomine.domain.CytomineDomain;
-import be.cytomine.domain.project.Project;
-import be.cytomine.utils.JsonObject;
-import lombok.Getter;
-import lombok.Setter;
+import java.io.Serializable;
+import java.util.Optional;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
-import java.io.Serializable;
-import java.util.Optional;
+import lombok.Getter;
+import lombok.Setter;
+
+import be.cytomine.domain.CytomineDomain;
+import be.cytomine.domain.project.Project;
+import be.cytomine.utils.JsonObject;
 
 @Entity
 @Getter

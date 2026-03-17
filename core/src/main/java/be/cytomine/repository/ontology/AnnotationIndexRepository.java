@@ -16,17 +16,17 @@ package be.cytomine.repository.ontology;
 * limitations under the License.
 */
 
-import be.cytomine.domain.image.SliceInstance;
-import be.cytomine.domain.ontology.AnnotationIndex;
-import be.cytomine.domain.security.User;
-import be.cytomine.dto.annotation.AnnotationIndexLightDTO;
+import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.List;
-import java.util.Optional;
+import be.cytomine.domain.image.SliceInstance;
+import be.cytomine.domain.ontology.AnnotationIndex;
+import be.cytomine.domain.security.User;
+import be.cytomine.dto.annotation.AnnotationIndexLightDTO;
 
 public interface AnnotationIndexRepository extends JpaRepository<AnnotationIndex, Long>, JpaSpecificationExecutor<AnnotationIndex>  {
 

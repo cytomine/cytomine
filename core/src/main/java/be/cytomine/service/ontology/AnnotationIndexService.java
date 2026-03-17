@@ -16,17 +16,18 @@ package be.cytomine.service.ontology;
 * limitations under the License.
 */
 
-import be.cytomine.domain.image.SliceInstance;
-import be.cytomine.domain.security.User;
-import be.cytomine.dto.annotation.AnnotationIndexLightDTO;
-import be.cytomine.repository.ontology.AnnotationIndexRepository;
+import java.util.List;
+
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
-import java.util.List;
+import be.cytomine.domain.image.SliceInstance;
+import be.cytomine.domain.security.User;
+import be.cytomine.dto.annotation.AnnotationIndexLightDTO;
+import be.cytomine.repository.ontology.AnnotationIndexRepository;
 
 @Slf4j
 @Service

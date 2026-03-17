@@ -1,12 +1,12 @@
 package be.cytomine.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter

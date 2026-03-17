@@ -1,8 +1,8 @@
 package be.cytomine.utils;
 
-import org.apache.commons.text.CaseUtils;
-
 import java.math.BigInteger;
+
+import org.apache.commons.text.CaseUtils;
 
 public class SQLUtils {
 

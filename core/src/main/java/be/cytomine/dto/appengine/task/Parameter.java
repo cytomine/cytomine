@@ -1,8 +1,8 @@
 package be.cytomine.dto.appengine.task;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record Parameter(
@@ -13,4 +13,4 @@ public record Parameter(
     String description,
     boolean optional,
     Parameter derivedFrom
-) { }
+) {}

@@ -16,9 +16,10 @@ package be.cytomine.repositorynosql.social;
 * limitations under the License.
 */
 
-import be.cytomine.domain.social.LastUserPosition;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
+
+import be.cytomine.domain.social.LastUserPosition;
 
 @Repository
 public interface LastUserPositionRepository extends MongoRepository<LastUserPosition, Long> {

@@ -1,6 +1,5 @@
 package com.cytomine.registry.client.http.auth;
 
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -69,8 +68,10 @@ public class Authenticator {
         List<String> scopes = Arrays.stream(pairs)
             .map(p -> String.format(SCOPE, p.getSecond().getName(), p.getFirst().getScope()))
             .collect(Collectors.toList());
-        String token =
-            Optional.ofNullable(dockerToken.get(String.join("", scopes))).map(Pair::getSecond).map(DockerAuthResp::getToken).orElse(null);
+        String token = Optional.ofNullable(dockerToken.get(String.join("", scopes)))
+                .map(Pair::getSecond)
+                .map(DockerAuthResp::getToken)
+                .orElse(null);
         if (token == null) {
             Map<String, String> headers = new HashMap<>(2);
             if (dockerCredential != null) {

@@ -219,4 +219,35 @@ public class CytomineSteps {
                 + "'fa-mouse-pointer')]]"));
     }
 
+    @SneakyThrows
+    public void uploadTask(Wait<WebDriver> wait, URL cytomineUrl) {
+        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/apps");
+        String bundleName = "selenium-" + UUID.randomUUID() + ".zip";
+        Path tempDir = Files.createTempDirectory("selenium-task");
+        Path copiedFile = tempDir.resolve(bundleName);
+        String zipName = "com.cytomine.dummy.identity.geometry-1.0.0.zip";
+        try (var in = getClass().getClassLoader().getResourceAsStream(zipName)) {
+            Files.copy(in, copiedFile);
+        }
+
+        webDriverUtils.bySendKeysWait(wait, By.cssSelector("input[type='file']"), copiedFile.toString(), false);
+        webDriverUtils.xpathClick(wait, "//button[contains(., 'Upload')]");
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//*[contains(text(),'Upload completed')]"));
+    }
+
+    public void deleteTask(Wait<WebDriver> wait, URL cytomineUrl, String taskName) {
+        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/apps");
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//p[contains(@class, 'title') and contains(text(), '" + taskName + "')]"));
+        webDriverUtils.xpathClick(wait,
+                "//div[contains(@class, 'card') and .//p[contains(@class, 'title') and contains(text(), '" + taskName + "')]]" +
+                        "//a[contains(text(), 'More')]"
+        );
+
+        webDriverUtils.byIsDisplayed(wait, By.cssSelector(".panel-heading .panel-actions"));
+        webDriverUtils.byClick(wait, By.cssSelector(".panel-actions .dropdown .icon"));
+
+        webDriverUtils.xpathClick(wait, "//a[contains(@class, 'dropdown-item') and .//span[contains(text(), 'Delete')]]");
+
+        webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Confirm')]");
+    }
 }

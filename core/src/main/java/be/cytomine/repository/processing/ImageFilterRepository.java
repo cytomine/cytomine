@@ -16,12 +16,13 @@ package be.cytomine.repository.processing;
 * limitations under the License.
 */
 
-import be.cytomine.domain.processing.ImageFilter;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import be.cytomine.domain.processing.ImageFilter;
 
 @Repository
 public interface ImageFilterRepository extends JpaRepository<ImageFilter, Long>, JpaSpecificationExecutor<ImageFilter> {

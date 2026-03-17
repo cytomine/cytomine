@@ -16,10 +16,10 @@ package be.cytomine.utils;
 * limitations under the License.
 */
 
-import be.cytomine.domain.CytomineDomain;
-
 import java.util.List;
 import java.util.stream.Collectors;
+
+import be.cytomine.domain.CytomineDomain;
 
 public class DomainUtils {
     public static List<Long> extractIds(List<? extends CytomineDomain> domains) {

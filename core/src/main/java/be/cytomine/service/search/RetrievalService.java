@@ -35,7 +35,7 @@ public class RetrievalService {
 
     public static final String CBIR_API_BASE_PATH = "/cbir";
 
-    private final static String INDEX_NAME = "annotation";
+    private static final String INDEX_NAME = "annotation";
 
     private final ImageServerService imageServerService;
 

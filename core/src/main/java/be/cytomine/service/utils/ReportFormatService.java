@@ -1,15 +1,19 @@
 package be.cytomine.service.utils;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
+
 import be.cytomine.dto.image.Point;
 import be.cytomine.service.ontology.TermService;
 import be.cytomine.service.report.ReportColumn;
 import be.cytomine.utils.DateUtils;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.StringUtils;
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
-
-import java.util.*;
 
 @Service
 @AllArgsConstructor

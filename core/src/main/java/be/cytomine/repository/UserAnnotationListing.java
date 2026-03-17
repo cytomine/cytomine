@@ -16,9 +16,10 @@ package be.cytomine.repository;
 * limitations under the License.
 */
 
-import jakarta.persistence.EntityManager;
 import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
+
+import jakarta.persistence.EntityManager;
 
 public class UserAnnotationListing extends AnnotationListing {
 

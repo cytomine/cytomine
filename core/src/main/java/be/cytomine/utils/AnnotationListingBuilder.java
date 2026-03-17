@@ -16,24 +16,31 @@ package be.cytomine.utils;
 * limitations under the License.
 */
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import jakarta.persistence.EntityManager;
+import lombok.AllArgsConstructor;
+import org.locationtech.jts.io.ParseException;
+import org.springframework.stereotype.Component;
+
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.dto.annotation.AnnotationResult;
 import be.cytomine.exceptions.WrongArgumentException;
-import be.cytomine.repository.*;
+import be.cytomine.repository.AnnotationListing;
+import be.cytomine.repository.ReviewedAnnotationListing;
+import be.cytomine.repository.UserAnnotationListing;
 import be.cytomine.service.AnnotationListingService;
 import be.cytomine.service.ontology.TermService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.report.ReportService;
 import be.cytomine.service.security.UserService;
 import be.cytomine.service.utils.ParamsService;
-
-import org.locationtech.jts.io.ParseException;
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Component;
-
-import jakarta.persistence.EntityManager;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Component

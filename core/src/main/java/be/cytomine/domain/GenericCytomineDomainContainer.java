@@ -16,9 +16,10 @@ package be.cytomine.domain;
 * limitations under the License.
 */
 
-import be.cytomine.utils.JsonObject;
 import lombok.Getter;
 import lombok.Setter;
+
+import be.cytomine.utils.JsonObject;
 
 @Getter
 @Setter

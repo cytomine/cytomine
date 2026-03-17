@@ -12,12 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.env.*;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import be.cytomine.config.properties.ApplicationProperties;
 import be.cytomine.config.nosqlmigration.InitialMongodbSetupMigration;
+import be.cytomine.config.properties.ApplicationProperties;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.security.UserRepository;
@@ -28,8 +28,16 @@ import be.cytomine.service.database.BootstrapUtilsService;
 import be.cytomine.service.utils.Dataset;
 import be.cytomine.utils.EnvironmentUtils;
 
-
-import static be.cytomine.service.database.BootstrapTestsDataService.*;
+import static be.cytomine.service.database.BootstrapTestsDataService.ADMIN;
+import static be.cytomine.service.database.BootstrapTestsDataService.CREATOR;
+import static be.cytomine.service.database.BootstrapTestsDataService.GUEST;
+import static be.cytomine.service.database.BootstrapTestsDataService.SUPERADMIN;
+import static be.cytomine.service.database.BootstrapTestsDataService.USER_ACL_ADMIN;
+import static be.cytomine.service.database.BootstrapTestsDataService.USER_ACL_CREATE;
+import static be.cytomine.service.database.BootstrapTestsDataService.USER_ACL_DELETE;
+import static be.cytomine.service.database.BootstrapTestsDataService.USER_ACL_READ;
+import static be.cytomine.service.database.BootstrapTestsDataService.USER_ACL_WRITE;
+import static be.cytomine.service.database.BootstrapTestsDataService.USER_NO_ACL;
 
 @Component
 @Order(0)

@@ -1,14 +1,10 @@
 package be.cytomine.controller;
 
-import be.cytomine.config.properties.ApplicationProperties;
-import be.cytomine.domain.security.User;
-import be.cytomine.domain.social.LastConnection;
-import be.cytomine.domain.social.PersistentConnection;
-import be.cytomine.repositorynosql.social.LastConnectionRepository;
-import be.cytomine.repositorynosql.social.PersistentConnectionRepository;
-import be.cytomine.service.CurrentUserService;
-import be.cytomine.service.database.SequenceService;
-import be.cytomine.utils.JsonObject;
+import java.io.IOException;
+import java.util.Date;
+import java.util.stream.Stream;
+
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.NonTransientDataAccessException;
@@ -17,13 +13,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestContextHolder;
 
-import jakarta.servlet.http.HttpSession;
-import java.io.IOException;
-import java.util.Date;
-import java.util.stream.Stream;
+import be.cytomine.config.properties.ApplicationProperties;
+import be.cytomine.domain.security.User;
+import be.cytomine.domain.social.LastConnection;
+import be.cytomine.domain.social.PersistentConnection;
+import be.cytomine.repositorynosql.social.LastConnectionRepository;
+import be.cytomine.repositorynosql.social.PersistentConnectionRepository;
+import be.cytomine.service.database.SequenceService;
+import be.cytomine.utils.JsonObject;
 
 @RestController
 @RequestMapping("")
@@ -32,8 +35,6 @@ import java.util.stream.Stream;
 public class ServerController extends RestCytomineController {
 
     private final ApplicationProperties applicationProperties;
-
-    private final CurrentUserService currentUserService;
 
     private final SequenceService sequenceService;
 

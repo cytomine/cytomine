@@ -16,10 +16,9 @@ package be.cytomine.service;
 * limitations under the License.
 */
 
-import be.cytomine.domain.CytomineDomain;
-import be.cytomine.domain.security.User;
-import be.cytomine.exceptions.ObjectNotFoundException;
-import be.cytomine.repository.security.AclRepository;
+import java.util.List;
+import java.util.Random;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.domain.BasePermission;
@@ -27,8 +26,10 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Random;
+import be.cytomine.domain.CytomineDomain;
+import be.cytomine.domain.security.User;
+import be.cytomine.exceptions.ObjectNotFoundException;
+import be.cytomine.repository.security.AclRepository;
 
 @Slf4j
 @Service

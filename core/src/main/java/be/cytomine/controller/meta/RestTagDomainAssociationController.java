@@ -1,24 +1,29 @@
 package be.cytomine.controller.meta;
 
+import java.util.List;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.exceptions.ObjectNotFoundException;
-import be.cytomine.repository.meta.TagRepository;
 import be.cytomine.repository.ontology.AnnotationDomainRepository;
-import be.cytomine.repository.project.ProjectRepository;
 import be.cytomine.service.meta.TagDomainAssociationService;
-import be.cytomine.service.meta.TagService;
 import be.cytomine.service.utils.TaskService;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.RequestParams;
 import be.cytomine.utils.Task;
 import be.cytomine.utils.filters.SearchParameterEntry;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -26,19 +31,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RestTagDomainAssociationController extends RestCytomineController {
 
-    private final TagService tagService;
-
     private final TagDomainAssociationService tagDomainAssociationService;
-
-    private final TagRepository tagRepository;
-
-    private final ProjectRepository projectRepository;
 
     private final TaskService taskService;
 
     private final AnnotationDomainRepository annotationDomainRepository;
-
-
 
     @GetMapping("/tag_domain_association/{id}.json")
     public ResponseEntity<String> show(

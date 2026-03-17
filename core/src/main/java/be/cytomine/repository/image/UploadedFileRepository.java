@@ -16,9 +16,10 @@ package be.cytomine.repository.image;
 * limitations under the License.
 */
 
-import be.cytomine.domain.image.UploadedFile;
-import be.cytomine.domain.image.server.Storage;
-import be.cytomine.domain.security.User;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,9 +27,9 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import be.cytomine.domain.image.UploadedFile;
+import be.cytomine.domain.image.server.Storage;
+import be.cytomine.domain.security.User;
 
 /**
  * Spring Data JPA repository for the user entity.

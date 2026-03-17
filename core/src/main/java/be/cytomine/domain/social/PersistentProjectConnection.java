@@ -16,19 +16,20 @@ package be.cytomine.domain.social;
 * limitations under the License.
 */
 
-import be.cytomine.domain.CytomineSocialDomain;
-import be.cytomine.utils.DateUtils;
-import be.cytomine.utils.JsonObject;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import jakarta.validation.constraints.NotNull;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import be.cytomine.domain.CytomineSocialDomain;
+import be.cytomine.utils.DateUtils;
+import be.cytomine.utils.JsonObject;
 
 /**
  * Info on user connection for a project

@@ -23,7 +23,7 @@ jobs:
           gradle-version: ${{ vars.GRADLE_VERSION }}
 
       - name: Check lint
-        run: gradle :app-engine:checkstyleMain :common:checkstyleMain :e2e-tests:checkstyleMain :repository:checkstyleMain
+        run: gradle :app-engine:checkstyleMain :common:checkstyleMain :e2e-tests:checkstyleMain :registry-client:checkstyleMain :repository:checkstyleMain
 
       - name: Upload lint reports
         if: ${{ always() }}
@@ -34,6 +34,7 @@ jobs:
             app-engine/build/reports/checkstyle
             common/build/reports/checkstyle
             e2e-tests/build/reports/checkstyle
+            registry-client/build/reports/checkstyle
             repository/build/reports/checkstyle
           retention-days: 7
 

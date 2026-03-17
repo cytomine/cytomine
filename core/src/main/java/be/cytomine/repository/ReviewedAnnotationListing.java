@@ -230,7 +230,9 @@ public class ReviewedAnnotationListing extends AnnotationListing {
     }
 
     String createOrderBy() {
-        if (kmeansValue < 3) return "";
+        if (kmeansValue < 3) {
+            return "";
+        }
         if (orderBy != null && !orderBy.isEmpty()) {
             return "ORDER BY " + orderBy.entrySet().stream().map(x -> x.getKey() + " " + x.getValue()).collect(Collectors.joining(", "));
         } else {

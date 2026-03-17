@@ -278,22 +278,25 @@ public class UploadedFileService extends ModelService {
             }
 
             result.put("image", (Arrays.stream((Long[]) rowResult.get("image"))).filter(x -> {
-                if (x == null)
+                if (x == null) {
                     return false;
+                }
                 Long z = (Long)x;
                 boolean b = z != 0;
                 return b;
             }).findFirst().orElse(null));
             result.put("slices", (Arrays.stream((Long[]) rowResult.get("slices"))).filter(x -> {
-                if (x == null)
+                if (x == null) {
                     return false;
+                }
                 Long z = (Long)x;
                 boolean b = z!= 0;
                 return b;
             }).collect(Collectors.toList())); // A same UF can be linked to several slices (virtual stacks)
             result.put("companionFile", (Arrays.stream((Long[]) rowResult.get("image"))).filter(x -> {
-                if (x == null)
+                if (x == null) {
                     return false;
+                }
                 Long z = (Long)x;
                 boolean b = z != 0;
                 return b;

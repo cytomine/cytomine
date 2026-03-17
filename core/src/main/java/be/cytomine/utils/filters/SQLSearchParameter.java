@@ -74,16 +74,12 @@ public class SQLSearchParameter {
         return result;
     }
 
-
-
-
-
     public static Object convertSearchParameter(Class type, Object parameter, EntityManager entityManager){
 
-        if(parameter == null || parameter.equals("null")) {
+        if (parameter == null || parameter.equals("null")) {
             return null;
         }
-        if(parameter instanceof List || parameter.getClass().isArray()) {
+        if (parameter instanceof List || parameter.getClass().isArray()) {
             return ((List)parameter).stream().map(x -> convertSearchParameter(type, x, entityManager)).collect(Collectors.toList());
         }
 
@@ -106,7 +102,7 @@ public class SQLSearchParameter {
     }
 
     private static Object replaceJocker(Object value) {
-        if (value!=null && value instanceof String) {
+        if (value != null && value instanceof String) {
             return ((String)value).replaceAll("\\*", "%");
         }
         return value;
@@ -114,22 +110,28 @@ public class SQLSearchParameter {
 
 
     public static SearchParameterProcessed searchParametersToSQLConstraints(List<SearchParameterEntry> parameters) {
-        for (SearchParameterEntry parameter : parameters){
+        for (SearchParameterEntry parameter : parameters) {
             parameter.property = fieldNameToSQL(parameter.property);
 
-            if(parameter.value instanceof Date){
+            if (parameter.value instanceof Date) {
                 parameter.value = ((Date) parameter.value).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
             }
 
             String sql = "";
-            switch(parameter.operation){
+            switch (parameter.operation) {
                 case equals:
-                    if(parameter.value != null) sql = parameter.property+" = :"+parameter.property.replaceAll("\\.","_");
-                    else sql = parameter.property+" IS NULL ";
+                    if (parameter.value != null) {
+                        sql = parameter.property + " = :" + parameter.property.replaceAll("\\.", "_");
+                    } else {
+                        sql = parameter.property + " IS NULL ";
+                    }
                     break;
                 case nequals:
-                    if(parameter.value != null) sql = parameter.property+" != :"+parameter.property.replaceAll("\\.","_");
-                    else sql = parameter.property+" IS NOT NULL ";
+                    if (parameter.value != null) {
+                        sql = parameter.property + " != :" + parameter.property.replaceAll("\\.", "_");
+                    } else {
+                        sql = parameter.property + " IS NOT NULL ";
+                    }
                     break;
                 case like:
                     sql = parameter.property+" LIKE :"+parameter.property.replaceAll("\\.","_");
@@ -144,19 +146,19 @@ public class SQLSearchParameter {
                     sql = parameter.property+" >= :"+parameter.property.replaceAll("\\.","_");
                     break;
                 case in:
-                    if(parameter.value == null || parameter.value == "null") {
+                    if (parameter.value == null || parameter.value == "null") {
                         sql = parameter.property+" IS NULL ";
                         break;
                     }
 
-                    if(!parameter.value.getClass().isArray() && !(parameter.value instanceof List)){
+                    if (!parameter.value.getClass().isArray() && !(parameter.value instanceof List)) {
                         parameter.value = List.of(parameter.value);
                     }
 
                     parameter.value = ((List)parameter.value).stream().distinct().collect(Collectors.toList());
                     List values = (List)parameter.value;
 
-                    if(values.size() == 1 && (values.get(0) == null || (values.get(0).equals("null")))) {
+                    if (values.size() == 1 && (values.get(0) == null || (values.get(0).equals("null")))) {
                         sql = parameter.property+" IS NULL ";
                         break;
                     }
@@ -173,7 +175,7 @@ public class SQLSearchParameter {
                     sql = sql + String.join(",", strings);
                     sql += ") ";
 
-                    if(values.contains(null) || values.contains("null")){
+                    if (values.contains(null) || values.contains("null")) {
                         parameter.value = values.stream().filter(x -> x != null && !x.equals("null")).collect(Collectors.toList());
                         sql = "("+sql+" OR "+parameter.property+" IS NULL) ";
                     } else {
@@ -184,7 +186,7 @@ public class SQLSearchParameter {
             parameter.sql = sql;
             parameter.sqlParameter = new HashMap<>();
 
-            if(parameter.value!=null && (parameter.value.getClass().isArray() || (parameter.value instanceof List))){
+            if (parameter.value!=null && (parameter.value.getClass().isArray() || (parameter.value instanceof List))) {
                 List values = (List)parameter.value;
                 for(int i=1; i<= values.size(); i++) {
                     parameter.sqlParameter.put(parameter.property.replaceAll("\\.","_")+"_"+i, replaceJocker(values.get(i-1)));
@@ -203,7 +205,7 @@ public class SQLSearchParameter {
                 }
             }
             parameter.sqlParameter = filtered;
-            if(parameter.sqlParameter.size() == 0) {
+            if (parameter.sqlParameter.size() == 0) {
                 parameter.sqlParameter = null;
             }
         }
@@ -253,9 +255,4 @@ public class SQLSearchParameter {
         String replacement = "$1_$2";
         return field.replaceAll(regex, replacement).toLowerCase();
     }
-
-
-
-
-
 }

@@ -13,7 +13,7 @@ import java.util.List;
 public class GeometryUtils {
 
     public static Geometry createBoundingBox(String bbox) throws ParseException {
-        if(bbox.startsWith("POLYGON")) {
+        if (bbox.startsWith("POLYGON")) {
             return new WKTReader().read(bbox);
         }
         String[] coordinates = bbox.split(",");
@@ -64,9 +64,12 @@ public class GeometryUtils {
      * @return A polygon or multipolygon filled points
      */
     public static String fillPolygon(String polygon) {
-        if (polygon.startsWith("POLYGON")) return "POLYGON(" + getFirstPolygonLocation(polygon) + ")";
-        else if (polygon.startsWith("MULTIPOLYGON")) return "MULTIPOLYGON(" + getFirstPolygonLocationForEachItem(polygon) + ")";
-        else throw new WrongArgumentException("Form cannot be filled:" + polygon);
+        if (polygon.startsWith("POLYGON")) {
+            return "POLYGON(" + getFirstPolygonLocation(polygon) + ")";
+        } else if (polygon.startsWith("MULTIPOLYGON")) {
+            return "MULTIPOLYGON(" + getFirstPolygonLocationForEachItem(polygon) + ")";
+        }
+        throw new WrongArgumentException("Form cannot be filled:" + polygon);
     }
 
     /**
@@ -116,10 +119,16 @@ public class GeometryUtils {
     private static String getFirstPolygonLocation(String polygon) {
         int i = 0;
         int start, stop;
-        while (polygon.charAt(i) != '(') i++;
-        while (polygon.charAt(i + 1) == '(') i++;
+        while (polygon.charAt(i) != '(') {
+            i++;
+        }
+        while (polygon.charAt(i + 1) == '(') {
+            i++;
+        }
         start = i;
-        while (polygon.charAt(i) != ')') i++;
+        while (polygon.charAt(i) != ')') {
+            i++;
+        }
         stop = i;
         return polygon.substring(start, stop + 1);
     }

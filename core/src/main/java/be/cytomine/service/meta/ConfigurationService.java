@@ -66,9 +66,9 @@ public class ConfigurationService extends ModelService {
     public List<Configuration> list() {
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.checkGuest(currentUser);
-        if(currentRoleService.isAdminByNow(currentUser)) {
+        if (currentRoleService.isAdminByNow(currentUser)) {
             return configurationRepository.findAll();
-        } else if(currentRoleService.isUser(currentUser)) {
+        } else if (currentRoleService.isUser(currentUser)) {
             return configurationRepository.findAllByReadingRoleIn(List.of(ConfigurationReadingRole.ALL, ConfigurationReadingRole.USER));
         } else {
             return configurationRepository.findAllByReadingRole(ConfigurationReadingRole.ALL);
@@ -82,18 +82,19 @@ public class ConfigurationService extends ModelService {
         return config;
     }
 
-    private void checkPermission(Configuration config){
+    private void checkPermission(Configuration config) {
         User currentUser = currentUserService.getCurrentUser();
-        if(config.getReadingRole().equals(ConfigurationReadingRole.ALL)) {
+        if (config.getReadingRole().equals(ConfigurationReadingRole.ALL)) {
             return;
         }
-        if(currentRoleService.isAdminByNow(currentUser)) {
+        if (currentRoleService.isAdminByNow(currentUser)) {
             return;
         }
-        if(currentRoleService.isUser(currentUser)  && config.getReadingRole().equals(ConfigurationReadingRole.USER)) {
+        if (currentRoleService.isUser(currentUser)  && config.getReadingRole().equals(ConfigurationReadingRole.USER)) {
             return;
         }
-        else throw new ForbiddenException("You don't have the right to read this resource!");
+
+        throw new ForbiddenException("You don't have the right to read this resource!");
     }
 
     @Override

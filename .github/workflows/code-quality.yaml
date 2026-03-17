@@ -34,7 +34,7 @@ jobs:
             app-engine/build/reports/checkstyle
             common/build/reports/checkstyle
             e2e-tests/build/reports/checkstyle
-            repository:build/reports/checkstyle
+            repository/build/reports/checkstyle
           retention-days: 7
 
   python-lint:

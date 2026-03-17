@@ -84,7 +84,7 @@ This installation procedure is intended for desktop or laptop computers running 
    cd cytomine
    ```
 
-3. Launch cytomine:
+3. Launch cytomine using k3s in docker-compose:
 
    ```bash
    sudo docker compose up -d

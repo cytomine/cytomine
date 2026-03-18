@@ -63,36 +63,38 @@ public class SecurityConfiguration {
         return source;
     }
 
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(AbstractHttpConfigurer::disable)
-                .addFilterBefore(new ApiKeyFilter(userRepository), BasicAuthenticationFilter.class) // Deprecated. Kept as transitional in 2024.2
-                .exceptionHandling((exceptionHandling) ->
-                        exceptionHandling
-                                .authenticationEntryPoint(
-                                        (request, response, authException) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED))
-                )
-                .authorizeHttpRequests((authorizeHttpRequests) ->
-                        authorizeHttpRequests
-                                .requestMatchers("/api/abstractimage/**").permitAll()
-                                .requestMatchers("/api/imageinstance/**").permitAll()
-                                .requestMatchers("/api/uploadedfile/*/download").permitAll()
-                                .requestMatchers("/api/userannotation/**").permitAll()
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .csrf(AbstractHttpConfigurer::disable)
+            // Deprecated. Kept as transitional in 2024.2
+            .addFilterBefore(new ApiKeyFilter(userRepository), BasicAuthenticationFilter.class)
+            .exceptionHandling((exceptionHandling) ->
+                exceptionHandling
+                    .authenticationEntryPoint(
+                        (request, response, authException) ->
+                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED))
+            )
+            .authorizeHttpRequests((authorizeHttpRequests) ->
+                authorizeHttpRequests
+                    .requestMatchers("/api/abstractimage/**").permitAll()
+                    .requestMatchers("/api/imageinstance/**").permitAll()
+                    .requestMatchers("/api/uploadedfile/*/download").permitAll()
+                    .requestMatchers("/api/userannotation/**").permitAll()
 
-                                .requestMatchers("/api/**").authenticated()
-                                .requestMatchers("/session/admin/info.json").authenticated()
-                                .requestMatchers("/session/admin/open.json").authenticated()
-                                .requestMatchers("/session/admin/close.json").authenticated()
+                    .requestMatchers("/api/**").authenticated()
+                    .requestMatchers("/session/admin/info.json").authenticated()
+                    .requestMatchers("/session/admin/open.json").authenticated()
+                    .requestMatchers("/session/admin/close.json").authenticated()
 
-                                .requestMatchers(HttpMethod.GET, "/server/ping").permitAll() // TODO 2024.2 - LAST CONNECTION (IN A PROJECT)
-                                .requestMatchers(HttpMethod.GET, "/server/ping.json").permitAll() // TODO 2024.2 - LAST CONNECTION (IN A PROJECT)
-                                .requestMatchers(HttpMethod.POST, "/server/ping").permitAll() // TODO 2024.2 - LAST CONNECTION (IN A PROJECT)
-                                .requestMatchers(HttpMethod.POST, "/server/ping.json").permitAll() // TODO 2024.2 - LAST CONNECTION (IN A PROJECT)
-                                .requestMatchers("/**").permitAll() // TODO IAM: remove ?
-                );
+                    // TODO 2024.2 - LAST CONNECTION (IN A PROJECT)
+                    .requestMatchers(HttpMethod.GET, "/server/ping").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/server/ping.json").permitAll() // TODO 2024.2
+                    .requestMatchers(HttpMethod.POST, "/server/ping").permitAll() // TODO 2024.2
+                    .requestMatchers(HttpMethod.POST, "/server/ping.json").permitAll() // TODO 2024.2
+                    .requestMatchers("/**").permitAll() // TODO IAM: remove ?
+            );
         http
             .addFilterBefore(new TokenFromParameterFilter(), BearerTokenAuthenticationFilter.class)
             .oauth2ResourceServer((oauth2) -> oauth2

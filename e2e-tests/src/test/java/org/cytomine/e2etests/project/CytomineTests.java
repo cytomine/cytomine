@@ -182,4 +182,24 @@ public class CytomineTests {
         cytomineSteps.uploadTask(wait, cytomineUrl);
         cytomineSteps.deleteTask(wait, cytomineUrl, "identity with geometry");
     }
+
+    @Test
+    void runTask() {
+        String projectName = "selenium-" + randomUUID();
+        String taskName = "identity with geometry";
+        String taskVersion = "1.0.0";
+
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        cytomineSteps.uploadTask(wait, cytomineUrl);
+        String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
+        String imageName = cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName));
+        cytomineSteps.openImageInViewer(wait, driver, projectUrl);
+        cytomineSteps.drawRectangleAnnotation(wait, driver);
+        cytomineSteps.verifyAnnotationCreated(wait, driver);
+        cytomineSteps.selectTask(wait, taskName, taskVersion);
+
+        cytomineSteps.deleteProject(wait, projectUrl);
+        cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
+        cytomineSteps.deleteTask(wait, cytomineUrl, taskName);
+    }
 }

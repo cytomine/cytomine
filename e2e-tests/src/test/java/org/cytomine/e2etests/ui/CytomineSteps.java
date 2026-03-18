@@ -250,4 +250,19 @@ public class CytomineSteps {
 
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Confirm')]");
     }
+
+    public void selectTask(Wait<WebDriver> wait, String taskName, String taskVersion) {
+        webDriverUtils.byClick(wait, By.cssSelector(".executor .select select"));
+
+        String optionXpath = format(
+            "//div[contains(@class, 'executor')]//option[contains(text(), '%s') and contains(text(), '%s')]",
+            taskName, taskVersion
+        );
+        webDriverUtils.xpathClick(wait, optionXpath);
+
+        webDriverUtils.byIsDisplayed(wait, By.xpath(
+            format("//div[contains(@class, 'executor')]//p[contains(text(), '%s') and contains(text(), '%s')]",
+                taskName, taskVersion)
+        ));
+    }
 }

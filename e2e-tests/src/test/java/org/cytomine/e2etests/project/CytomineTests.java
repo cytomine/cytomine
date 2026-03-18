@@ -188,7 +188,6 @@ public class CytomineTests {
         String projectName = "selenium-" + randomUUID();
         String taskName = "identity with geometry";
         String taskVersion = "1.0.0";
-        String parameterName = "input";
 
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
         cytomineSteps.uploadTask(wait, cytomineUrl);
@@ -198,7 +197,7 @@ public class CytomineTests {
         cytomineSteps.drawRectangleAnnotation(wait, driver);
         cytomineSteps.verifyAnnotationCreated(wait, driver);
         cytomineSteps.selectTask(wait, taskName, taskVersion);
-        cytomineSteps.selectAnnotationForGeometryInput(wait, driver, parameterName);
+        cytomineSteps.selectAnnotationForGeometryInput(wait, driver);
 
         cytomineSteps.deleteProject(wait, projectUrl);
         cytomineSteps.deleteImage(wait, cytomineUrl, imageName);

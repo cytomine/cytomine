@@ -2,10 +2,10 @@ package be.cytomine.common.repository.model;
 
 import java.util.Set;
 
-public record Ontology(long id, String name, long userId, Set<TermResponse> termResponses) {
+public record Ontology(long id, String name, long userId, Set<TermResponse> terms) {
     public Ontology {
-        if (termResponses == null) {
-            termResponses = Set.of();
+        if (terms == null) {
+            terms = Set.of();
         }
     }
 

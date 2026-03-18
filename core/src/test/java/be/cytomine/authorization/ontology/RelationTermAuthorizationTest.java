@@ -16,16 +16,8 @@ package be.cytomine.authorization.ontology;
 * limitations under the License.
 */
 
-import be.cytomine.BasicInstanceBuilder;
-import be.cytomine.CytomineCoreApplication;
-import be.cytomine.authorization.CRDAuthorizationTest;
-import be.cytomine.authorization.CRUDAuthorizationTest;
-import be.cytomine.domain.ontology.RelationTerm;
-import be.cytomine.domain.ontology.Term;
-import be.cytomine.service.PermissionService;
-import be.cytomine.service.ontology.RelationTermService;
-import be.cytomine.service.ontology.TermService;
-import be.cytomine.service.security.SecurityACLService;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,12 +28,20 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import be.cytomine.BasicInstanceBuilder;
+import be.cytomine.CytomineCoreApplication;
+import be.cytomine.authorization.CRDAuthorizationTest;
+import be.cytomine.domain.ontology.RelationTerm;
+import be.cytomine.service.PermissionService;
+import be.cytomine.service.ontology.RelationTermService;
+import be.cytomine.service.security.SecurityACLService;
 
 @AutoConfigureMockMvc
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @Transactional
 public class RelationTermAuthorizationTest extends CRDAuthorizationTest {
+    @Autowired
+    private BasicInstanceBuilder basicInstanceBuilder;
 
 
     private RelationTerm relationTerm = null;
@@ -97,8 +97,8 @@ public class RelationTermAuthorizationTest extends CRDAuthorizationTest {
 
     @Override
     protected void when_i_add_domain() {
-        relationTermService.add(
-                BasicInstanceBuilder.given_a_not_persisted_relation_term(relationTerm.getRelation(), relationTerm.getTerm1(), builder.given_a_term(relationTerm.getTerm1().getOntology())).toJsonObject()
+        relationTermService.add(basicInstanceBuilder.given_a_not_persisted_relation_term(relationTerm.getRelation(),
+            relationTerm.getTerm1(), builder.given_a_term(relationTerm.getTerm1().getOntology())).toJsonObject()
         );
     }
 

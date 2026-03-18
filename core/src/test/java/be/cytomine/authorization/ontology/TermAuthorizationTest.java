@@ -16,13 +16,8 @@ package be.cytomine.authorization.ontology;
 * limitations under the License.
 */
 
-import be.cytomine.BasicInstanceBuilder;
-import be.cytomine.CytomineCoreApplication;
-import be.cytomine.authorization.CRUDAuthorizationTest;
-import be.cytomine.domain.ontology.Term;
-import be.cytomine.service.PermissionService;
-import be.cytomine.service.ontology.TermService;
-import be.cytomine.service.security.SecurityACLService;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,20 +28,20 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.persistence.EntityManager;
-
-import java.util.Optional;
-
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import be.cytomine.BasicInstanceBuilder;
+import be.cytomine.CytomineCoreApplication;
+import be.cytomine.authorization.CRUDAuthorizationTest;
+import be.cytomine.domain.ontology.Term;
+import be.cytomine.service.PermissionService;
+import be.cytomine.service.ontology.TermService;
+import be.cytomine.service.security.SecurityACLService;
 
 @AutoConfigureMockMvc
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @Transactional
 public class TermAuthorizationTest extends CRUDAuthorizationTest {
+    @Autowired
+    private BasicInstanceBuilder basicInstanceBuilder;
 
 
     private Term term = null;
@@ -93,7 +88,7 @@ public class TermAuthorizationTest extends CRUDAuthorizationTest {
 
     @Override
     protected void when_i_add_domain() {
-        termService.add(BasicInstanceBuilder.given_a_not_persisted_term(term.getOntology()).toJsonObject());
+        termService.add(basicInstanceBuilder.given_a_not_persisted_term(term.getOntology()).toJsonObject());
     }
 
     @Override

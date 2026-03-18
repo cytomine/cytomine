@@ -16,12 +16,7 @@ package be.cytomine.controller.ontology;
 * limitations under the License.
 */
 
-import be.cytomine.BasicInstanceBuilder;
-import be.cytomine.CytomineCoreApplication;
-import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.domain.ontology.Ontology;
-import be.cytomine.domain.ontology.RelationTerm;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -32,10 +27,17 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.persistence.EntityManager;
+import be.cytomine.BasicInstanceBuilder;
+import be.cytomine.CytomineCoreApplication;
+import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.domain.ontology.Ontology;
+import be.cytomine.domain.ontology.RelationTerm;
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -44,6 +46,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WithMockUser(username = "superadmin")
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
 public class RelationTermResourceTests {
+
+    @Autowired
+    private BasicInstanceBuilder basicInstanceBuilder;
 
     @Autowired
     private EntityManager em;
@@ -119,7 +124,8 @@ public class RelationTermResourceTests {
     @Transactional
     public void add_valid_relation() throws Exception {
         Ontology ontology = builder.given_an_ontology();
-        RelationTerm relationTerm = BasicInstanceBuilder.given_a_not_persisted_relation_term(builder.given_a_relation(), builder.given_a_term(ontology), builder.given_a_term(ontology));
+        RelationTerm relationTerm = basicInstanceBuilder.given_a_not_persisted_relation_term(builder.given_a_relation(),
+            builder.given_a_term(ontology), builder.given_a_term(ontology));
         restRelationTermControllerMockMvc.perform(post("/api/relation/parent/term.json")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(relationTerm.toJSON()))

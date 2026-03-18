@@ -64,6 +64,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class TermResourceTests {
 
     @Autowired
+    private BasicInstanceBuilder basicInstanceBuilder;
+
+    @Autowired
     private BasicInstanceBuilder builder;
 
     @Autowired
@@ -133,7 +136,7 @@ public class TermResourceTests {
     @Test
     @Transactional
     public void add_valid_term() throws Exception {
-        Term term = BasicInstanceBuilder.given_a_not_persisted_term(builder.given_an_ontology());
+        Term term = basicInstanceBuilder.given_a_not_persisted_term(builder.given_an_ontology());
         TermResponse response =
             new TermResponse(1L, term.getName(), term.getColor(), term.getOntology().getId(), 0L, Set.of());
         when(termHttpContract.update(any())).thenReturn(response);

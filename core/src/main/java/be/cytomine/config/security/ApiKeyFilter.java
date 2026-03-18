@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.crypto.Mac;
@@ -55,8 +56,14 @@ public class ApiKeyFilter extends OncePerRequestFilter {
         this.secUserRepository = secUserRepository;
     }
 
-    public static String generateKeys(String method, String content_md5, String content_type, String date, User user) throws NoSuchAlgorithmException, InvalidKeyException, UnsupportedEncodingException {
-        String canonicalHeaders = method + "\n" + content_md5 + "\n" + content_type + "\n" + date ;
+    public static String generateKeys(
+        String method,
+        String content_md5,
+        String content_type,
+        String date,
+        User user
+    ) throws NoSuchAlgorithmException, InvalidKeyException, UnsupportedEncodingException {
+        String canonicalHeaders = method + "\n" + content_md5 + "\n" + content_type + "\n" + date;
 
         String key = user.getPrivateKey();
         SecretKeySpec signingKey = new SecretKeySpec(key.getBytes(), "HmacSHA1");
@@ -73,7 +80,11 @@ public class ApiKeyFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(
+        HttpServletRequest request,
+        HttpServletResponse response,
+        FilterChain filterChain
+    ) throws ServletException, IOException {
         tryAPIAuthentification(request);
         filterChain.doFilter(request, response);
     }
@@ -94,32 +105,39 @@ public class ApiKeyFilter extends OncePerRequestFilter {
             return false;
         }
         try {
-
-            String content_md5 = (request.getHeader("content-MD5") != null) ? request.getHeader("content-MD5") : "";
-
-            String content_type = (request.getHeader("content-type") != null) ? request.getHeader("content-type") : "";
-            content_type = (request.getHeader("Content-Type") != null) ? request.getHeader("Content-Type") : content_type;
+            String contentMd5 = Objects.requireNonNullElse(request.getHeader("content-MD5"), "");
+            String contentType = Objects.requireNonNullElse(
+                request.getHeader("Content-Type"),
+                Objects.requireNonNullElse(request.getHeader("content-type"), "")
+            );
             String date = (request.getHeader("date") != null) ? request.getHeader("date") : "";
 
             String accessKey = authorization.substring(authorization.indexOf(" ") + 1, authorization.indexOf(":"));
             String authorizationSign = authorization.substring(authorization.indexOf(":") + 1);
 
-            Optional<User> user = secUserRepository.findByPublicKeyAndEnabled(accessKey,true);
+            Optional<User> user = secUserRepository.findByPublicKeyAndEnabled(accessKey, true);
 
             if (user.isEmpty()) {
                 log.debug("User cannot be extracted with accessKey {}", accessKey);
                 throw new AuthenticationException("User cannot be extracted with accessKey " + accessKey);
             } else {
-                String signature = generateKeys(request.getMethod(),content_md5, content_type,date,user.get());
+                String signature = generateKeys(request.getMethod(), contentMd5, contentType, date, user.get());
                 if (authorizationSign.equals(signature)) {
                     this.reauthenticate(user.get());
                     return true;
                 } else {
-                    // the java client does not set content-type, so we override the header to application/json BEFORE this authentication.
-                    // So the client thinks content-type is "" while spring boot set it to application/json. In order to match the client signature, we generate it
-                    // with an empty value.
+                    // the java client does not set content-type,
+                    // so we override the header to application/json BEFORE this authentication.
+                    // So the client thinks content-type is "" while spring boot set it to application/json.
+                    // In order to match the client signature, we generate it with an empty value.
                     // => it would be better to improve the java client to set a valid content type.
-                    String signatureWithEmptyContentType = generateKeys(request.getMethod(),content_md5, "",date,user.get());
+                    String signatureWithEmptyContentType = generateKeys(
+                        request.getMethod(),
+                        contentMd5,
+                        "",
+                        date,
+                        user.get()
+                    );
                     if (authorizationSign.equals(signatureWithEmptyContentType)) {
                         this.reauthenticate(user.get());
                         return true;
@@ -142,11 +160,14 @@ public class ApiKeyFilter extends OncePerRequestFilter {
      */
     private void reauthenticate(final User secUser) {
         UserDetails userDetails = createSpringSecurityUser(secUser);
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-                userDetails, userDetails.getPassword(), userDetails.getAuthorities());
-        usernamePasswordAuthenticationToken.setDetails(secUser);
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+            userDetails,
+            userDetails.getPassword(),
+            userDetails.getAuthorities()
+        );
+        authenticationToken.setDetails(secUser);
 
-        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
     }
 
     private org.springframework.security.core.userdetails.User createSpringSecurityUser(User user) {
@@ -154,9 +175,12 @@ public class ApiKeyFilter extends OncePerRequestFilter {
             throw new ForbiddenException("User with access key " + user.getPublicKey() + "is not enabled.");
         }
         return new org.springframework.security.core.userdetails.User(
-                user.getUsername(),
-                "null",
-                user.getRoles().stream().map(x -> new SimpleGrantedAuthority(x.getAuthority())).collect(Collectors.toList())
+            user.getUsername(),
+            "null",
+            user.getRoles()
+                .stream()
+                .map(x -> new SimpleGrantedAuthority(x.getAuthority()))
+                .collect(Collectors.toList())
         );
     }
 }

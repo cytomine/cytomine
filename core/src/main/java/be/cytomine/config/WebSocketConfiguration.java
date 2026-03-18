@@ -1,11 +1,9 @@
 package be.cytomine.config;
 
-import be.cytomine.domain.project.Project;
-import be.cytomine.repository.image.ImageInstanceRepository;
-import be.cytomine.repository.project.ProjectRepository;
-import be.cytomine.service.security.SecurityACLService;
-import be.cytomine.service.social.WebSocketUserPositionHandler;
-import be.cytomine.utils.StringUtils;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.util.Map;
+
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -19,9 +17,12 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 import org.springframework.web.socket.server.HandshakeInterceptor;
 import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
 
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.util.Map;
+import be.cytomine.domain.project.Project;
+import be.cytomine.repository.image.ImageInstanceRepository;
+import be.cytomine.repository.project.ProjectRepository;
+import be.cytomine.service.security.SecurityACLService;
+import be.cytomine.service.social.WebSocketUserPositionHandler;
+import be.cytomine.utils.StringUtils;
 
 import static org.springframework.security.acls.domain.BasePermission.READ;
 

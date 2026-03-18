@@ -16,14 +16,15 @@ package be.cytomine.repository.command;
 * limitations under the License.
 */
 
-import be.cytomine.domain.command.CommandHistory;
-import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
+import java.util.List;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import be.cytomine.domain.command.CommandHistory;
+import be.cytomine.domain.project.Project;
+import be.cytomine.domain.security.User;
 
 @Repository
 public interface CommandHistoryRepository extends JpaRepository<CommandHistory, Long> {

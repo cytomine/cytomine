@@ -1,19 +1,26 @@
 package be.cytomine.controller.project;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.project.Project;
 import be.cytomine.exceptions.ObjectNotFoundException;
-import be.cytomine.repository.project.ProjectDefaultLayerRepository;
-import be.cytomine.repository.project.ProjectRepository;
 import be.cytomine.service.project.ProjectDefaultLayerService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.utils.TaskService;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.Task;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
@@ -23,19 +30,12 @@ public class RestProjectDefaultLayerController extends RestCytomineController {
 
     private final ProjectDefaultLayerService projectDefaultLayerService;
 
-    private final ProjectDefaultLayerRepository projectDefaultLayerRepository;
-
-    private final ProjectRepository projectRepository;
-
     private final TaskService taskService;
 
     private final ProjectService projectService;
 
-
     @GetMapping("/project/{id}/defaultlayer.json")
-    public ResponseEntity<String> listByProject(
-            @PathVariable Long id
-    ) {
+    public ResponseEntity<String> listByProject(@PathVariable Long id) {
         log.debug("REST request to list projectDefaultLayers for project {}", id);
         Project project = projectService.find(id)
                 .orElseThrow(() -> new ObjectNotFoundException("Project", id));
@@ -54,7 +54,6 @@ public class RestProjectDefaultLayerController extends RestCytomineController {
                 .map(this::responseSuccess)
                 .orElseGet(() -> responseNotFound("ProjectDefaultLayer", id));
     }
-
 
     @PostMapping("/project/{id}/defaultlayer.json")
     public ResponseEntity<String> add(

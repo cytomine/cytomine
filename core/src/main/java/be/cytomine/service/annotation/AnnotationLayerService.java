@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import be.cytomine.domain.appengine.TaskRun;
 import be.cytomine.domain.annotation.AnnotationLayer;
+import be.cytomine.domain.appengine.TaskRun;
 import be.cytomine.domain.appengine.TaskRunLayer;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.dto.annotation.AnnotationLayerResponse;

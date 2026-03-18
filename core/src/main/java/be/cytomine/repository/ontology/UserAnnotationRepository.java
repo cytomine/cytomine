@@ -16,20 +16,21 @@ package be.cytomine.repository.ontology;
  * limitations under the License.
  */
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import jakarta.persistence.Tuple;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.dto.annotation.AnnotationLight;
 import be.cytomine.service.UrlApi;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Query;
-
-import jakarta.persistence.Tuple;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 
 public interface UserAnnotationRepository extends JpaRepository<UserAnnotation, Long>, JpaSpecificationExecutor<UserAnnotation> {

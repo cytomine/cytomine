@@ -16,18 +16,19 @@ package be.cytomine.repository.image;
 * limitations under the License.
 */
 
-import be.cytomine.domain.image.AbstractImage;
-import be.cytomine.domain.image.ImageInstance;
-import be.cytomine.domain.image.NestedImageInstance;
-import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
+import be.cytomine.domain.image.AbstractImage;
+import be.cytomine.domain.image.ImageInstance;
+import be.cytomine.domain.image.NestedImageInstance;
+import be.cytomine.domain.project.Project;
+import be.cytomine.domain.security.User;
 
 @Repository
 public interface NestedImageInstanceRepository extends JpaRepository<NestedImageInstance, Long>, JpaSpecificationExecutor<NestedImageInstance> {

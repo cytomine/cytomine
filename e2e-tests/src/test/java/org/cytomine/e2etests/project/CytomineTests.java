@@ -175,4 +175,11 @@ public class CytomineTests {
         cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
         cytomineSteps.deleteOntology(wait, ontologyURL);
     }
+
+    @Test
+    void uploadAndDeleteTask() {
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        cytomineSteps.uploadTask(wait, cytomineUrl);
+        cytomineSteps.deleteTask(wait, cytomineUrl, "identity with geometry");
+    }
 }

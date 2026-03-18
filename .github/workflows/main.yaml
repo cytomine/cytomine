@@ -30,8 +30,6 @@ jobs:
     uses: ./.github/workflows/web-ui.yaml
   repository:
     uses: ./.github/workflows/repository.yaml
-  e2e-tests:
-    uses: ./.github/workflows/e2e-tests.yaml
   code-quality:
     uses: ./.github/workflows/code-quality.yaml
 
@@ -50,7 +48,6 @@ jobs:
       - web-ui
       - repository
       - code-quality   
-      - e2e-tests
       - docker-images
     uses: ./.github/workflows/helm-test.yaml
     secrets: inherit

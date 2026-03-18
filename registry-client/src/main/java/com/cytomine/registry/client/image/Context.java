@@ -1,6 +1,5 @@
 package com.cytomine.registry.client.image;
 
-
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -46,8 +45,15 @@ public class Context {
         manifest.setMediaType(ImageMediaType.MANIFEST_V2);
         manifest.setConfig(new ManifestHttp.BlobDTO(ImageMediaType.CONFIG, getConfig().getSize(),
             getConfig().getDigest()));
-        manifest.setLayers(getLayers().stream().map(blob -> new ManifestHttp.BlobDTO(ImageMediaType.LAYER, blob.getSize(),
-            blob.getDigest())).collect(Collectors.toList()));
+        manifest.setLayers(
+                getLayers().stream()
+                        .map(blob -> new ManifestHttp.BlobDTO(
+                                ImageMediaType.LAYER,
+                                blob.getSize(),
+                                blob.getDigest()
+                        ))
+                        .collect(Collectors.toList())
+        );
         return manifest;
     }
 }

@@ -16,9 +16,14 @@ package be.cytomine.domain.social;
 * limitations under the License.
 */
 
-import be.cytomine.domain.CytomineSocialDomain;
-import be.cytomine.utils.DateUtils;
-import be.cytomine.utils.JsonObject;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 import org.locationtech.jts.geom.Coordinate;
@@ -29,10 +34,9 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.geo.GeoJsonPolygon;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import jakarta.persistence.*;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
+import be.cytomine.domain.CytomineSocialDomain;
+import be.cytomine.utils.DateUtils;
+import be.cytomine.utils.JsonObject;
 
 @Getter
 @Setter

@@ -1,11 +1,12 @@
 package be.cytomine.repositorynosql.social;
 
-import be.cytomine.domain.social.LastConnection;
+import java.util.Date;
+import java.util.List;
+
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
-import java.util.List;
+import be.cytomine.domain.social.LastConnection;
 
 
 @Repository

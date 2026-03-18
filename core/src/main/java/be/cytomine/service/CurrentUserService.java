@@ -1,12 +1,7 @@
 package be.cytomine.service;
 
-import be.cytomine.domain.security.User;
-import be.cytomine.exceptions.ObjectNotFoundException;
-import be.cytomine.exceptions.ServerException;
-import be.cytomine.repository.security.UserRepository;
-import be.cytomine.security.current.CurrentUser;
-import be.cytomine.security.current.FullCurrentUser;
-import be.cytomine.security.current.PartialCurrentUser;
+import java.util.Optional;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -16,7 +11,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import be.cytomine.domain.security.User;
+import be.cytomine.exceptions.ObjectNotFoundException;
+import be.cytomine.exceptions.ServerException;
+import be.cytomine.repository.security.UserRepository;
+import be.cytomine.security.current.CurrentUser;
+import be.cytomine.security.current.FullCurrentUser;
+import be.cytomine.security.current.PartialCurrentUser;
 
 // TODO IAM: adapt to get the Cytomine user from IAM reference
 @Slf4j

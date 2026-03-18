@@ -2,11 +2,11 @@ package be.cytomine.exceptions.handler;
 
 import java.util.Map;
 
-import be.cytomine.controller.JsonResponseEntity;
-import be.cytomine.exceptions.*;
-import be.cytomine.utils.JsonObject;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.lang.Nullable;
 import org.springframework.security.access.AccessDeniedException;
@@ -16,6 +16,19 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import be.cytomine.controller.JsonResponseEntity;
+import be.cytomine.exceptions.AlreadyExistException;
+import be.cytomine.exceptions.AppEngineException;
+import be.cytomine.exceptions.AuthenticationException;
+import be.cytomine.exceptions.ConstraintException;
+import be.cytomine.exceptions.CytomineMethodNotYetImplementedException;
+import be.cytomine.exceptions.ForbiddenException;
+import be.cytomine.exceptions.MiddlewareException;
+import be.cytomine.exceptions.NotModifiedException;
+import be.cytomine.exceptions.ObjectNotFoundException;
+import be.cytomine.exceptions.WrongArgumentException;
+import be.cytomine.utils.JsonObject;
 
 @Slf4j
 @ControllerAdvice

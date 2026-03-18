@@ -16,15 +16,19 @@ package be.cytomine.domain.meta;
 * limitations under the License.
 */
 
-import be.cytomine.domain.CytomineDomain;
-import be.cytomine.utils.JsonObject;
-import lombok.Getter;
-import lombok.Setter;
-
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import lombok.Getter;
+import lombok.Setter;
+
+import be.cytomine.domain.CytomineDomain;
+import be.cytomine.utils.JsonObject;
 
 @Entity
 @Getter

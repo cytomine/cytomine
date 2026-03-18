@@ -16,17 +16,17 @@ package be.cytomine.repository;
 * limitations under the License.
 */
 
-import be.cytomine.domain.image.ImageInstance;
-import be.cytomine.exceptions.WrongArgumentException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import jakarta.persistence.EntityManager;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
+import be.cytomine.domain.image.ImageInstance;
+import be.cytomine.exceptions.WrongArgumentException;
 
 public class ReviewedAnnotationListing extends AnnotationListing {
 

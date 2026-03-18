@@ -58,12 +58,12 @@ public class ApiKeyFilter extends OncePerRequestFilter {
 
     public static String generateKeys(
         String method,
-        String content_md5,
-        String content_type,
+        String contentMd5,
+        String contentType,
         String date,
         User user
     ) throws NoSuchAlgorithmException, InvalidKeyException, UnsupportedEncodingException {
-        String canonicalHeaders = method + "\n" + content_md5 + "\n" + content_type + "\n" + date;
+        String canonicalHeaders = method + "\n" + contentMd5 + "\n" + contentType + "\n" + date;
 
         String key = user.getPrivateKey();
         SecretKeySpec signingKey = new SecretKeySpec(key.getBytes(), "HmacSHA1");

@@ -262,12 +262,10 @@ public class CytomineSteps {
         webDriverUtils.byIsDisplayed(wait, By.xpath(format("//div[contains(@class, 'executor')]//p[contains(text(), '%s') and contains(text(), '%s')]", taskName, taskVersion)));
         webDriverUtils.byIsDisplayed(wait, By.xpath("//section[contains(@class, 'fields')]//button[.//span[contains(text(), 'Select')]]"));    }
 
-    public void selectAnnotationForGeometryInput(Wait<WebDriver> wait, WebDriver driver) {
+    public void selectAnnotationForGeometryInput(Wait<WebDriver> wait) {
         webDriverUtils.xpathClick(wait, "//section[contains(@class, 'fields')]//button[.//span[contains(text(), 'Select')]]");
         webDriverUtils.byIsDisplayed(wait, By.cssSelector(".modal-card .annotation-content"));
-
-        Wait<WebDriver> longWait = new WebDriverWait(driver, Duration.ofSeconds(15));
-        longWait.until(d -> !d.findElements(By.cssSelector(".annotation-content > div")).isEmpty());
+        wait.until(d -> !d.findElements(By.cssSelector(".annotation-content > div")).isEmpty());
 
         webDriverUtils.byClick(wait, By.cssSelector(".annotation-content > div:first-child"));
         webDriverUtils.byIsDisplayed(wait, By.cssSelector(".annotation-content > div.selected"));

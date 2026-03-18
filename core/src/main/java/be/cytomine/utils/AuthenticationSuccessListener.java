@@ -44,10 +44,9 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
 
     @Override
     public void onApplicationEvent(AuthenticationSuccessEvent event) {
-
-        if (event.getAuthentication() instanceof JwtAuthenticationToken jwtAuthenticationToken)
+        if (event.getAuthentication() instanceof JwtAuthenticationToken jwtAuthenticationToken) {
             saveUserOfToken(jwtAuthenticationToken);
-
+        }
     }
 
     protected void saveUserOfToken(JwtAuthenticationToken jwtAuthenticationToken) {

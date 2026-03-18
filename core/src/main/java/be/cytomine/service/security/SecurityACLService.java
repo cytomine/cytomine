@@ -218,7 +218,9 @@ public class SecurityACLService {
 
 
     public List<Ontology> getOntologyList(User user) {
-        if (currentRoleService.isAdminByNow(user)) return ontologyRepository.findAll();
+        if (currentRoleService.isAdminByNow(user)) {
+            return ontologyRepository.findAll();
+        }
         Query query = entityManager.createQuery(
                 "select distinct ontology "+
                         "from AclObjectIdentity as aclObjectId, AclEntry as aclEntry, AclSid as aclSid,  Ontology as ontology "+
@@ -349,8 +351,10 @@ public class SecurityACLService {
     //check if the container (e.g. Project) has the minimal editing mode or is Admin. If not, exception will be thown
     public void checkFullOrRestrictedForOwner(CytomineDomain domain, User owner) {
         if (domain!=null) {
-            if(permissionService.hasACLPermission(retrieveContainer(domain),ADMINISTRATION)
-                    || currentRoleService.isAdminByNow(currentUserService.getCurrentUser())) return;
+            if (permissionService.hasACLPermission(retrieveContainer(domain),ADMINISTRATION)
+                    || currentRoleService.isAdminByNow(currentUserService.getCurrentUser())) {
+                return;
+            }
 
             CytomineDomain container = retrieveContainer(domain);
             switch (((Project) retrieveContainer(domain)).getMode()) {
@@ -431,7 +435,7 @@ public class SecurityACLService {
 
     public void checkIsUserInProject(User user, Project project) {
         boolean result = isUserInProject(user, project);
-        if(!result) {
+        if (!result) {
             throw new ConstraintException("Error: the user "+user.getId()+" is not into the project "+project.getId());
         }
     }
@@ -455,12 +459,12 @@ public class SecurityACLService {
 
     public void checkUserAccessRightsForMeta(CytomineDomain domain, User currentUser){
         //Is domain Project?
-        if(domain instanceof Project){
+        if (domain instanceof Project) {
             checkGuest(currentUser);
             //Check if user has at least WRITE permission for Project domain, e.g.: is a manager
             check( domain,WRITE,  currentUser);
            // check(domain,WRITE);
-        } else if(domain instanceof ImageInstance){
+        } else if (domain instanceof ImageInstance) {
             //Only ROLE_USER can associate meta domains to image instances
             checkUser(currentUser);
             //Check if user has at least READ permission for the domain Image Instance

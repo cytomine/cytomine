@@ -343,10 +343,12 @@ public class ImageInstanceService extends ModelService {
         }
 
         String sortedProperty = ReflectionUtils.findField(ImageInstance.class, sortColumn) != null ? imageInstanceAlias + "." + sortColumn : null;
-        if (sortedProperty == null)
+        if (sortedProperty == null) {
             sortedProperty = ReflectionUtils.findField(AbstractImage.class, sortColumn) != null ? abstractImageAlias + "." + sortColumn : null;
-        if (sortedProperty == null)
+        }
+        if (sortedProperty == null) {
             throw new CytomineMethodNotYetImplementedException("ImageInstance list sorted by " + sortColumn + " is not implemented");
+        }
         sortedProperty = SQLSearchParameter.fieldNameToSQL(sortedProperty);
 
         List<SearchParameterEntry> validatedSearchParameters = getDomainAssociatedSearchParameters(searchParameters, false);
@@ -519,12 +521,15 @@ public class ImageInstanceService extends ModelService {
             sortedProperty = imageInstanceAlias + ".baseImageId";
         }
 
-        if (sortedProperty == null)
+        if (sortedProperty == null) {
             sortedProperty = ReflectionUtils.findField(AbstractImage.class, sortColumn) != null ? abstractImageAlias + "." + sortColumn : null;
-        if (sortedProperty == null)
+        }
+        if (sortedProperty == null) {
             sortedProperty = ReflectionUtils.findField(UploadedFile.class, sortColumn) != null ? mimeAlias + "." + sortColumn : null;
-        if (sortedProperty == null)
+        }
+        if (sortedProperty == null) {
             throw new CytomineMethodNotYetImplementedException("ImageInstance list sorted by " + sortColumn + " is not implemented");
+        }
         sortedProperty = SQLSearchParameter.fieldNameToSQL(sortedProperty);
 
         List<SearchParameterEntry> validatedSearchParameters = getDomainAssociatedSearchParameters(searchParameters, project.getBlindMode());
@@ -820,8 +825,12 @@ public class ImageInstanceService extends ModelService {
      * @return Response structure (created domain data,..)
      */
     public CommandResponse add(JsonObject json) {
-        if(json.isMissing("baseImage")) throw new WrongArgumentException("abstract image not set");
-        if(json.isMissing("project")) throw new WrongArgumentException("project not set");
+        if (json.isMissing("baseImage")) {
+            throw new WrongArgumentException("abstract image not set");
+        }
+        if (json.isMissing("project")) {
+            throw new WrongArgumentException("project not set");
+        }
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
         securityACLService.check(json.getJSONAttrLong("project"), Project.class, READ);

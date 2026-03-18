@@ -35,23 +35,25 @@ public class SimplifyGeometryService {
      */
     public SimplifiedAnnotation simplifyPolygon(Geometry geometry, Long minPoint, Long maxPoint) {
         // Fast response for simple geometries
-        if (geometry.getNumPoints() < 100)
+        if (geometry.getNumPoints() < 100) {
             return new SimplifiedAnnotation(geometry, 0.0d);
+        }
 
         int numOfGeometry = 0;
         if (geometry instanceof MultiPolygon) {
             for (int i = 0; i < geometry.getNumGeometries(); i++) {
                 Geometry geom = geometry.getGeometryN(i);
                 int nbInteriorRing = 1;
-                if(geom instanceof Polygon) {
+                if (geom instanceof Polygon) {
                     nbInteriorRing = ((Polygon)geom).getNumInteriorRing();
                 }
                 numOfGeometry +=  geom.getNumGeometries() * nbInteriorRing;
             }
         } else {
             int nbInteriorRing = 1;
-            if(geometry instanceof Polygon)
-                nbInteriorRing = ((Polygon)geometry).getNumInteriorRing();
+            if (geometry instanceof Polygon) {
+                nbInteriorRing = ((Polygon) geometry).getNumInteriorRing();
+            }
             numOfGeometry = geometry.getNumGeometries() * nbInteriorRing;
         }
         numOfGeometry = Math.max(1, numOfGeometry);
@@ -103,8 +105,9 @@ public class SimplifyGeometryService {
                 newGeometry = DouglasPeuckerSimplifier.simplify(geometry, rate);
             }
 
-            if (newGeometry.getNumPoints() < rateLimitMin)
+            if (newGeometry.getNumPoints() < rateLimitMin) {
                 break;
+            }
 
             i = i + ((incrThreshold));
             numberOfPoint = newGeometry.getNumPoints();
@@ -161,6 +164,4 @@ public class SimplifyGeometryService {
         GeometryPrecisionReducer reducer = new GeometryPrecisionReducer(new PrecisionModel(scale));
         return reducer.reduce(geometry).norm();
     }
-
-
 }

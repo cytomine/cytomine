@@ -332,7 +332,9 @@ public class UserService extends ModelService {
             sort = "ORDER BY u.name " + sortDirection + ", u.id ";
         } else if (!sortColumn.equals("id")) { //avoid random sort when multiple values of the
             sort = "ORDER BY u." + sortColumn + " " + sortDirection + ", u.id ";
-        } else sort = "ORDER BY u." + sortColumn + " " + sortDirection + " ";
+        } else {
+            sort = "ORDER BY u." + sortColumn + " " + sortDirection + " ";
+        }
 
         String request = select + from + where + search + groupBy + sort;
 

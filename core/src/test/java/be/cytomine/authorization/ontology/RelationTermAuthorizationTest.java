@@ -97,8 +97,10 @@ public class RelationTermAuthorizationTest extends CRDAuthorizationTest {
 
     @Override
     protected void when_i_add_domain() {
-        relationTermService.add(basicInstanceBuilder.given_a_not_persisted_relation_term(relationTerm.getRelation(),
-            relationTerm.getTerm1(), builder.given_a_term(relationTerm.getTerm1().getOntology())).toJsonObject()
+        relationTermService.add(
+            basicInstanceBuilder.given_a_not_persisted_relation_term(relationTerm.getRelation(),
+                relationTerm.getTerm1(),
+                builder.given_a_term(relationTerm.getTerm1().getOntology())).toJsonObject()
         );
     }
 

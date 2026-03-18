@@ -108,7 +108,8 @@ public class RelationTermServiceTests {
         Term parent = builder.given_a_term();
         Term child1 = builder.given_a_term(parent.getOntology());
         RelationTerm parentRelationTerm =
-            basicInstanceBuilder.given_a_not_persisted_relation_term(builder.given_a_relation(), parent, child1);
+            basicInstanceBuilder.given_a_not_persisted_relation_term(builder.given_a_relation(),
+                parent, child1);
 
         CommandResponse commandResponse = relationTermService.add(parentRelationTerm.toJsonObject());
 
@@ -121,7 +122,8 @@ public class RelationTermServiceTests {
     void add_relation_term_with_null_term_fail() {
         Term parent = builder.given_a_term();
         RelationTerm parentRelationTerm =
-            basicInstanceBuilder.given_a_not_persisted_relation_term(builder.given_a_relation(), parent, null);
+            basicInstanceBuilder.given_a_not_persisted_relation_term(builder.given_a_relation(),
+                parent, null);
         Assertions.assertThrows(ObjectNotFoundException.class, () -> {
             relationTermService.add(parentRelationTerm.toJsonObject());
         });

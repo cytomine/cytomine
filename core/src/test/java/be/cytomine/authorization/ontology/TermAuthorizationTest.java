@@ -88,7 +88,8 @@ public class TermAuthorizationTest extends CRUDAuthorizationTest {
 
     @Override
     protected void when_i_add_domain() {
-        termService.add(basicInstanceBuilder.given_a_not_persisted_term(term.getOntology()).toJsonObject());
+        termService.add(
+            basicInstanceBuilder.given_a_not_persisted_term(term.getOntology()).toJsonObject());
     }
 
     @Override

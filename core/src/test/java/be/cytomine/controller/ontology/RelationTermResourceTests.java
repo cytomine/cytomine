@@ -124,8 +124,9 @@ public class RelationTermResourceTests {
     @Transactional
     public void add_valid_relation() throws Exception {
         Ontology ontology = builder.given_an_ontology();
-        RelationTerm relationTerm = basicInstanceBuilder.given_a_not_persisted_relation_term(builder.given_a_relation(),
-            builder.given_a_term(ontology), builder.given_a_term(ontology));
+        RelationTerm relationTerm =
+            basicInstanceBuilder.given_a_not_persisted_relation_term(builder.given_a_relation(),
+                builder.given_a_term(ontology), builder.given_a_term(ontology));
         restRelationTermControllerMockMvc.perform(post("/api/relation/parent/term.json")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(relationTerm.toJSON()))

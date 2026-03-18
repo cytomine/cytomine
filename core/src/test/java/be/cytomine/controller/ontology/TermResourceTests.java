@@ -16,13 +16,9 @@ package be.cytomine.controller.ontology;
 * limitations under the License.
 */
 
-import be.cytomine.BasicInstanceBuilder;
-import be.cytomine.CytomineCoreApplication;
-import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.domain.ontology.Term;
-import be.cytomine.domain.project.Project;
-import be.cytomine.utils.JsonObject;
+import java.util.List;
+
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -33,17 +29,20 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.persistence.EntityManager;
-
-import java.util.List;
+import be.cytomine.BasicInstanceBuilder;
+import be.cytomine.CytomineCoreApplication;
+import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.domain.ontology.Term;
+import be.cytomine.domain.project.Project;
+import be.cytomine.utils.JsonObject;
 
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
-
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -52,6 +51,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WithMockUser(username = "superadmin")
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
 public class TermResourceTests {
+
+    @Autowired
+    private BasicInstanceBuilder basicInstanceBuilder;
 
     @Autowired
     private EntityManager em;
@@ -115,7 +117,7 @@ public class TermResourceTests {
     @Test
     @Transactional
     public void add_valid_term() throws Exception {
-        Term term = BasicInstanceBuilder.given_a_not_persisted_term(builder.given_an_ontology());
+        Term term = basicInstanceBuilder.given_a_not_persisted_term(builder.given_an_ontology());
         restTermControllerMockMvc.perform(post("/api/term.json")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(term.toJSON()))
@@ -135,8 +137,8 @@ public class TermResourceTests {
     @Test
     @Transactional
     public void add_valid_term_by_group() throws Exception {
-        Term term1 = BasicInstanceBuilder.given_a_not_persisted_term(builder.given_an_ontology());
-        Term term2 = BasicInstanceBuilder.given_a_not_persisted_term(term1.getOntology());
+        Term term1 = basicInstanceBuilder.given_a_not_persisted_term(builder.given_an_ontology());
+        Term term2 = basicInstanceBuilder.given_a_not_persisted_term(term1.getOntology());
         restTermControllerMockMvc.perform(post("/api/term.json")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(JsonObject.toJsonString(List.of(term1.toJsonObject(),term2.toJsonObject()))))
@@ -147,7 +149,7 @@ public class TermResourceTests {
     @Test
     @Transactional
     public void add_term_refused_if_already_exists() throws Exception {
-        Term term = BasicInstanceBuilder.given_a_not_persisted_term(builder.given_an_ontology());
+        Term term = basicInstanceBuilder.given_a_not_persisted_term(builder.given_an_ontology());
         builder.persistAndReturn(term);
         restTermControllerMockMvc.perform(post("/api/term.json")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -160,7 +162,7 @@ public class TermResourceTests {
     @Test
     @Transactional
     public void add_term_refused_if_ontology_not_set() throws Exception {
-        Term term = BasicInstanceBuilder.given_a_not_persisted_term(null);
+        Term term = basicInstanceBuilder.given_a_not_persisted_term(null);
         restTermControllerMockMvc.perform(post("/api/term.json")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(term.toJSON()))
@@ -172,7 +174,7 @@ public class TermResourceTests {
     @Test
     @Transactional
     public void add_term_refused_if_name_not_set() throws Exception {
-        Term term = BasicInstanceBuilder.given_a_not_persisted_term(builder.given_an_ontology());
+        Term term = basicInstanceBuilder.given_a_not_persisted_term(builder.given_an_ontology());
         term.setName(null);
         restTermControllerMockMvc.perform(post("/api/term.json")
                         .contentType(MediaType.APPLICATION_JSON)

@@ -16,11 +16,25 @@ package be.cytomine.service.ontology;
 * limitations under the License.
 */
 
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
+
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
-import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.domain.ontology.*;
+import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.domain.ontology.AnnotationTerm;
+import be.cytomine.domain.ontology.Ontology;
+import be.cytomine.domain.ontology.RelationTerm;
+import be.cytomine.domain.ontology.ReviewedAnnotation;
+import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.project.Project;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.ConstraintException;
@@ -30,16 +44,6 @@ import be.cytomine.repository.ontology.TermRepository;
 import be.cytomine.service.CommandService;
 import be.cytomine.service.command.TransactionService;
 import be.cytomine.utils.CommandResponse;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.security.test.context.support.WithMockUser;
-
-import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -55,6 +59,9 @@ public class TermServiceTests {
 
     @Autowired
     TermRepository termRepository;
+
+    @Autowired
+    BasicInstanceBuilder basicInstanceBuilder;
 
     @Autowired
     BasicInstanceBuilder builder;
@@ -157,7 +164,7 @@ public class TermServiceTests {
     @Test
     void add_valid_term_with_success() {
         Ontology ontology = builder.given_an_ontology();
-        Term term = BasicInstanceBuilder.given_a_not_persisted_term(ontology);
+        Term term = basicInstanceBuilder.given_a_not_persisted_term(ontology);
 
         CommandResponse commandResponse = termService.add(term.toJsonObject());
 
@@ -171,7 +178,7 @@ public class TermServiceTests {
 
     @Test
     void add_term_with_null_ontology_fail() {
-        Term term = BasicInstanceBuilder.given_a_not_persisted_term(null);
+        Term term = basicInstanceBuilder.given_a_not_persisted_term(null);
         Assertions.assertThrows(WrongArgumentException.class, () -> {
             termService.add(term.toJsonObject());
         });
@@ -179,7 +186,7 @@ public class TermServiceTests {
 
     @Test
     void add_term_with_null_color_fail() {
-        Term term = BasicInstanceBuilder.given_a_not_persisted_term(builder.given_an_ontology());
+        Term term = basicInstanceBuilder.given_a_not_persisted_term(builder.given_an_ontology());
         term.setColor(null);
         Assertions.assertThrows(WrongArgumentException.class, () -> {
             termService.add(term.toJsonObject());
@@ -188,7 +195,7 @@ public class TermServiceTests {
 
     @Test
     void undo_redo_term_creation_with_success() {
-        Term term = BasicInstanceBuilder.given_a_not_persisted_term(builder.given_an_ontology());
+        Term term = basicInstanceBuilder.given_a_not_persisted_term(builder.given_an_ontology());
         CommandResponse commandResponse = termService.add(term.toJsonObject());
         assertThat(termService.find(commandResponse.getObject().getId())).isPresent();
         System.out.println("id = " + commandResponse.getObject().getId() + " name = " + term.getName());
@@ -205,7 +212,7 @@ public class TermServiceTests {
 
     @Test
     void redo_term_creation_fail_if_term_already_exist() {
-        Term term = BasicInstanceBuilder.given_a_not_persisted_term(builder.given_an_ontology());
+        Term term = basicInstanceBuilder.given_a_not_persisted_term(builder.given_an_ontology());
         CommandResponse commandResponse = termService.add(term.toJsonObject());
         assertThat(termService.find(commandResponse.getObject().getId())).isPresent();
         System.out.println("id = " + commandResponse.getObject().getId() + " name = " + term.getName());
@@ -214,7 +221,7 @@ public class TermServiceTests {
 
         assertThat(termService.find(commandResponse.getObject().getId())).isEmpty();
 
-        Term termWithSameName = BasicInstanceBuilder.given_a_not_persisted_term(term.getOntology());
+        Term termWithSameName = basicInstanceBuilder.given_a_not_persisted_term(term.getOntology());
         termWithSameName.setName(term.getName());
         builder.persistAndReturn(termWithSameName);
 

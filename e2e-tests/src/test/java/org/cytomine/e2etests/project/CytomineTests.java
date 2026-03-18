@@ -178,19 +178,21 @@ public class CytomineTests {
 
     @Test
     void uploadAndDeleteTask() {
+        String zipName = "com.cytomine.dummy.identity.image-1.0.0.zip";
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
-        cytomineSteps.uploadTask(wait, cytomineUrl);
-        cytomineSteps.deleteTask(wait, cytomineUrl, "identity with geometry");
+        cytomineSteps.uploadTask(wait, cytomineUrl, zipName);
+        cytomineSteps.deleteTask(wait, cytomineUrl, "identity with image");
     }
 
     @Test
     void runTask() {
+        String zipName = "com.cytomine.dummy.identity.geometry-1.0.0.zip";
         String projectName = "selenium-" + randomUUID();
         String taskName = "identity with geometry";
         String taskVersion = "1.0.0";
 
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
-        cytomineSteps.uploadTask(wait, cytomineUrl);
+        cytomineSteps.uploadTask(wait, cytomineUrl, zipName);
         String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
         String imageName = cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName));
         cytomineSteps.openImageInViewer(wait, driver, projectUrl);

@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -33,8 +34,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
-import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.command.Command;
 import be.cytomine.domain.command.DeleteCommand;
 import be.cytomine.domain.image.UploadedFile;
@@ -42,8 +43,6 @@ import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.repository.command.CommandRepository;
 import be.cytomine.repository.ontology.OntologyRepository;
 import be.cytomine.service.image.UploadedFileService;
-
-import org.springframework.context.annotation.Import;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
@@ -56,6 +55,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
 public class CommandControllerTests {
+
+    @Autowired
+    private BasicInstanceBuilder basicInstanceBuilder;
 
     @Autowired
     private BasicInstanceBuilder builder;
@@ -138,7 +140,7 @@ public class CommandControllerTests {
     @WithMockUser(username = "superadmin")
     public void undo_redo() throws Exception {
 
-        Ontology ontology = BasicInstanceBuilder.given_a_not_persisted_ontology();
+        Ontology ontology = basicInstanceBuilder.given_a_not_persisted_ontology();
         ontology.setName("undo_redo");
         restCommandControllerMockMvc.perform(
                 post("/api/ontology.json").contentType(MediaType.APPLICATION_JSON)
@@ -181,7 +183,7 @@ public class CommandControllerTests {
     @WithMockUser(username = "superadmin")
     public void undo_redo_with_command_id() throws Exception {
 
-        Ontology ontology = BasicInstanceBuilder.given_a_not_persisted_ontology();
+        Ontology ontology = basicInstanceBuilder.given_a_not_persisted_ontology();
         ontology.setName("undo_redo");
         restCommandControllerMockMvc.perform(
                 post("/api/ontology.json").contentType(MediaType.APPLICATION_JSON)

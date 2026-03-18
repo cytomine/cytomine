@@ -20,11 +20,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.common.PostGisTestConfiguration;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
-
 import jakarta.persistence.EntityManager;
 import org.apache.commons.lang3.time.DateUtils;
 import org.junit.jupiter.api.AfterAll;
@@ -37,11 +34,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
+import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.meta.TagDomainAssociation;
 import be.cytomine.domain.ontology.AnnotationTerm;
 import be.cytomine.domain.ontology.Ontology;
@@ -59,9 +59,6 @@ import be.cytomine.service.PermissionService;
 import be.cytomine.service.ontology.UserAnnotationService;
 import be.cytomine.service.social.ProjectConnectionService;
 
-import org.springframework.security.test.context.support.WithMockUser;
-
-
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
 import static be.cytomine.service.search.RetrievalService.CBIR_API_BASE_PATH;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -70,10 +67,17 @@ import static com.github.tomakehurst.wiremock.client.WireMock.matching;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
 import static org.springframework.security.acls.domain.BasePermission.READ;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -82,6 +86,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WithMockUser(username = "superadmin")
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
 public class ProjectResourceTests {
+
+    @Autowired
+    private BasicInstanceBuilder basicInstanceBuilder;
 
     @Autowired
     private EntityManager em;
@@ -521,7 +528,7 @@ public class ProjectResourceTests {
     @Test
     @Transactional
     public void add_valid_project() throws Exception {
-        Project project = BasicInstanceBuilder.given_a_not_persisted_project();
+        Project project = basicInstanceBuilder.given_a_not_persisted_project();
         project.setOntology(builder.given_an_ontology());
         project.setName("add_valid_project");
 
@@ -549,7 +556,7 @@ public class ProjectResourceTests {
     @Test
     @Transactional
     public void add_valid_project_without_ontology() throws Exception {
-        Project project = BasicInstanceBuilder.given_a_not_persisted_project();
+        Project project = basicInstanceBuilder.given_a_not_persisted_project();
         project.setOntology(null);
 
         /* Test project creation */
@@ -575,7 +582,7 @@ public class ProjectResourceTests {
         User user = builder.given_a_user();
         User admin = builder.given_a_user();
 
-        Project project = BasicInstanceBuilder.given_a_not_persisted_project();
+        Project project = basicInstanceBuilder.given_a_not_persisted_project();
         project.setOntology(builder.given_an_ontology());
         project.setName("add_valid_project_with_users_admins");
         restProjectControllerMockMvc.perform(post("/api/project.json")

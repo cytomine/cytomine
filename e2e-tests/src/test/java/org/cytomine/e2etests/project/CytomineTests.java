@@ -198,6 +198,7 @@ public class CytomineTests {
         cytomineSteps.verifyAnnotationCreated(wait, driver);
         cytomineSteps.selectTask(wait, taskName, taskVersion);
         cytomineSteps.selectAnnotationForGeometryInput(wait, driver);
+        cytomineSteps.runTask(wait);
 
         cytomineSteps.deleteProject(wait, projectUrl);
         cytomineSteps.deleteImage(wait, cytomineUrl, imageName);

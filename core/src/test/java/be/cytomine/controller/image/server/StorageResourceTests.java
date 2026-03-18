@@ -12,13 +12,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
-import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.image.server.Storage;
 
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -27,6 +30,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WithMockUser(username = "superadmin")
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
 public class StorageResourceTests {
+
+    @Autowired
+    private BasicInstanceBuilder basicInstanceBuilder;
 
     @Autowired
     private BasicInstanceBuilder builder;
@@ -76,7 +82,8 @@ public class StorageResourceTests {
     @Test
     @Transactional
     public void add_valid_storage() throws Exception {
-        Storage storage = BasicInstanceBuilder.given_a_not_persisted_storage(builder.given_superadmin());
+        Storage storage =
+            basicInstanceBuilder.given_a_not_persisted_storage(builder.given_superadmin());
         restStorageControllerMockMvc.perform(post("/api/storage.json")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(storage.toJSON()))
@@ -94,7 +101,8 @@ public class StorageResourceTests {
     @Test
     @Transactional
     public void add_storage_refused_if_name_not_set() throws Exception {
-        Storage storage = BasicInstanceBuilder.given_a_not_persisted_storage(builder.given_superadmin());
+        Storage storage =
+            basicInstanceBuilder.given_a_not_persisted_storage(builder.given_superadmin());
         storage.setName(null);
         restStorageControllerMockMvc.perform(post("/api/storage.json")
                         .contentType(MediaType.APPLICATION_JSON)

@@ -160,8 +160,7 @@ public abstract class AnnotationDomain extends CytomineDomain implements Seriali
 
             perimeter = (double)Math.round(this.location.getLength());
             perimeterUnit = GisUtils.PIXELv;
-        }
-        else {
+        } else {
             area = this.location.getArea() * image.getPhysicalSizeX() * image.getPhysicalSizeX();
             areaUnit = GisUtils.MICRON2v;
 
@@ -179,6 +178,7 @@ public abstract class AnnotationDomain extends CytomineDomain implements Seriali
     public static Optional<AnnotationDomain> findAnnotationDomain(EntityManager entityManager, Long id) {
         return Optional.ofNullable(getAnnotationDomain(entityManager, id, ""));
     }
+
     public static AnnotationDomain getAnnotationDomain(EntityManager entityManager, Long id) {
         return getAnnotationDomain(entityManager, id, "");
     }
@@ -206,18 +206,19 @@ public abstract class AnnotationDomain extends CytomineDomain implements Seriali
         }
 
         AnnotationDomain annotation;
-        if (domain!=null) {
-            annotation = (AnnotationDomain)entityManager.find(domain, id);
+        if (domain != null) {
+            annotation = (AnnotationDomain) entityManager.find(domain, id);
         } else {
             annotation = entityManager.find(UserAnnotation.class, id);
-            if (annotation==null) annotation = entityManager.find(ReviewedAnnotation.class, id);
+            if (annotation == null) {
+                annotation = entityManager.find(ReviewedAnnotation.class, id);
+            }
         }
 
-        if (annotation!=null) {
+        if (annotation != null) {
             return annotation;
-        }
-        else {
-            throw new ObjectNotFoundException("Annotation "+id+" not found");
+        } else {
+            throw new ObjectNotFoundException("Annotation " + id + " not found");
         }
     }
 

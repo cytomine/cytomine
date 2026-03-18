@@ -19,8 +19,6 @@ package be.cytomine.service.ontology;
 import java.util.List;
 import java.util.UUID;
 
-import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.common.PostGisTestConfiguration;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import jakarta.transaction.Transactional;
@@ -36,6 +34,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
+import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.domain.ontology.RelationTerm;
 import be.cytomine.domain.ontology.Term;
@@ -74,6 +74,9 @@ public class OntologyServiceTests {
 
     @Autowired
     OntologyRepository ontologyRepository;
+
+    @Autowired
+    BasicInstanceBuilder basicInstanceBuilder;
 
     @Autowired
     BasicInstanceBuilder builder;
@@ -160,7 +163,7 @@ public class OntologyServiceTests {
 
     @Test
     void add_valid_ontology_with_success() {
-        Ontology ontology = BasicInstanceBuilder.given_a_not_persisted_ontology();
+        Ontology ontology = basicInstanceBuilder.given_a_not_persisted_ontology();
 
         CommandResponse commandResponse = ontologyService.add(ontology.toJsonObject());
 
@@ -173,7 +176,7 @@ public class OntologyServiceTests {
 
     @Test
     void add_ontology_with_null_name_fail() {
-        Ontology ontology = BasicInstanceBuilder.given_a_not_persisted_ontology();
+        Ontology ontology = basicInstanceBuilder.given_a_not_persisted_ontology();
         ontology.setName("");
         Assertions.assertThrows(WrongArgumentException.class, () -> {
             ontologyService.add(ontology.toJsonObject());
@@ -183,7 +186,7 @@ public class OntologyServiceTests {
 
     @Test
     void undo_redo_ontology_creation_with_success() {
-        Ontology ontology = BasicInstanceBuilder.given_a_not_persisted_ontology();
+        Ontology ontology = basicInstanceBuilder.given_a_not_persisted_ontology();
         CommandResponse commandResponse = ontologyService.add(ontology.toJsonObject());
         assertThat(ontologyService.find(commandResponse.getObject().getId())).isPresent();
         System.out.println(
@@ -201,7 +204,7 @@ public class OntologyServiceTests {
 
     @Test
     void redo_ontology_creation_fail_if_ontology_already_exist() {
-        Ontology ontology = BasicInstanceBuilder.given_a_not_persisted_ontology();
+        Ontology ontology = basicInstanceBuilder.given_a_not_persisted_ontology();
         CommandResponse commandResponse = ontologyService.add(ontology.toJsonObject());
         assertThat(ontologyService.find(commandResponse.getObject().getId())).isPresent();
         System.out.println(
@@ -211,7 +214,7 @@ public class OntologyServiceTests {
 
         assertThat(ontologyService.find(commandResponse.getObject().getId())).isEmpty();
 
-        Ontology ontologyWithSameName = BasicInstanceBuilder.given_a_not_persisted_ontology();
+        Ontology ontologyWithSameName = basicInstanceBuilder.given_a_not_persisted_ontology();
         ontologyWithSameName.setName(ontology.getName());
         builder.persistAndReturn(ontologyWithSameName);
 
@@ -376,7 +379,7 @@ public class OntologyServiceTests {
     void determine_rights_for_users_keep_rights_for_ontology_creator() {
 
         // create ontology for user
-        Ontology ontology = BasicInstanceBuilder.given_a_not_persisted_ontology();
+        Ontology ontology = basicInstanceBuilder.given_a_not_persisted_ontology();
         CommandResponse commandResponse = ontologyService.add(ontology.toJsonObject());
         ontology = (Ontology) commandResponse.getObject();
 
@@ -385,7 +388,7 @@ public class OntologyServiceTests {
         assertThat(permissionService.hasACLPermission(ontology, "user", READ)).isTrue();
 
         // create project with ontology
-        Project project = BasicInstanceBuilder.given_a_not_persisted_project();
+        Project project = basicInstanceBuilder.given_a_not_persisted_project();
         project.setOntology(ontology);
         commandResponse = projectService.add(project.toJsonObject());
         project = (Project) commandResponse.getObject();

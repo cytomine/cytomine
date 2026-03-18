@@ -1,6 +1,10 @@
 package be.cytomine.authorization.project;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
@@ -41,10 +45,15 @@ import be.cytomine.service.project.ProjectRepresentativeUserService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.search.ProjectSearchExtension;
 
-import static be.cytomine.domain.project.EditingMode.*;
+import static be.cytomine.domain.project.EditingMode.CLASSIC;
+import static be.cytomine.domain.project.EditingMode.READ_ONLY;
+import static be.cytomine.domain.project.EditingMode.RESTRICTED;
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
 import static be.cytomine.service.search.RetrievalService.CBIR_API_BASE_PATH;
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.delete;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
 
@@ -52,6 +61,9 @@ import static org.springframework.security.acls.domain.BasePermission.ADMINISTRA
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @Transactional
 public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
+
+    @Autowired
+    private BasicInstanceBuilder basicInstanceBuilder;
 
     @Autowired
     private ProjectMemberService projectMemberService;
@@ -1339,7 +1351,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
 
     @Override
     protected void when_i_add_domain() {
-        projectService.add(BasicInstanceBuilder.given_a_not_persisted_project().toJsonObject());
+        projectService.add(basicInstanceBuilder.given_a_not_persisted_project().toJsonObject());
     }
 
     @Override

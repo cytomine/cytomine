@@ -20,9 +20,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import java.util.List;
-
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -46,20 +43,12 @@ import be.cytomine.common.repository.model.TermResponse;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.project.Project;
-import be.cytomine.BasicInstanceBuilder;
-import be.cytomine.CytomineCoreApplication;
-import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.domain.ontology.Term;
-import be.cytomine.domain.project.Project;
-import be.cytomine.utils.JsonObject;
 
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -73,9 +62,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WithMockUser(username = "superadmin")
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
 public class TermResourceTests {
-
-    @Autowired
-    private BasicInstanceBuilder basicInstanceBuilder;
 
     @Autowired
     private BasicInstanceBuilder basicInstanceBuilder;

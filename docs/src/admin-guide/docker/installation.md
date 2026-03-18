@@ -72,8 +72,6 @@ This installation procedure is intended for desktop or laptop computers running 
 
 > It is expected to have `root` permissions (sudo privileges in Debian/Ubuntu).
 
-> you should have `172.16.238.15 cytomine.local` in your /etc/hosts
-
 1. Clone the cytomine repository:
 
    ```bash
@@ -86,13 +84,10 @@ This installation procedure is intended for desktop or laptop computers running 
    cd cytomine
    ```
 
-3. Launch cytomine using k3s in docker-compose:
-
-_This step takes around 10 minutes to download all docker images._
+3. Launch cytomine:
 
    ```bash
-   docker-compose -f ./helm/compose.yaml -d
-   helm upgrade --kubeconfig=./.kube/shared/config -f ./helm/charts/cytomine/example/values.yaml cytomine-platform ./helm/charts/cytomine/ -n cytomine-local --install
+   sudo docker compose up -d
    ```
 
 4. Once all services are up and running, Cytomine is ready to be used:

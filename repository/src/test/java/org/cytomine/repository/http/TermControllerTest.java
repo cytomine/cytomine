@@ -3,7 +3,6 @@ package org.cytomine.repository.http;
 import java.util.Optional;
 
 import org.cytomine.repository.RepositoryApp;
-import org.cytomine.repository.persistence.OntologyRepository;
 import org.cytomine.repository.persistence.TermRepository;
 import org.cytomine.repository.persistence.entity.TermEntity;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,10 +34,6 @@ class TermControllerTest {
 
     @Autowired
     private TermRepository termRepository;
-
-    @Autowired
-    private OntologyRepository ontologyRepository;
-
 
     @Autowired
     private JdbcTemplate jdbcTemplate;

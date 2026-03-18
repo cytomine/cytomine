@@ -41,14 +41,11 @@ public class ContentTypeRequestWrapper extends HttpServletRequestWrapper {
 
     @Override
     public String getHeader(String name) {
-        try {
-            if (name.equalsIgnoreCase("content-type")
-                    && (super.getHeader(name)==null || super.getHeader(name).equalsIgnoreCase("application/octet-stream")) &&
-                    super.getRequestURL().toString().contains(".json")) {
-                return "application/json";
-            }
-        } catch (Exception ignored) {
-
+        if (name.equalsIgnoreCase("content-type")
+            && (super.getHeader(name) == null
+            || super.getHeader(name).equalsIgnoreCase("application/octet-stream"))
+            && super.getRequestURL().toString().contains(".json")) {
+            return "application/json";
         }
 
         return super.getHeader(name);
@@ -66,18 +63,14 @@ public class ContentTypeRequestWrapper extends HttpServletRequestWrapper {
     }
 
     @Override
-    public Enumeration <String> getHeaders(String name) {
-        try {
-            if (name.equalsIgnoreCase("content-type")
-                    && (super.getHeader(name)==null || super.getHeader(name).equalsIgnoreCase("application/octet-stream")) &&
-                    super.getRequestURL().toString().contains(".json")) {
-                return Collections.enumeration(Collections.singletonList("application/json"));
-            }
-        } catch (Exception ignored) {
-
+    public Enumeration<String> getHeaders(String name) {
+        if (name.equalsIgnoreCase("content-type")
+            && (super.getHeader(name) == null
+            || super.getHeader(name).equalsIgnoreCase("application/octet-stream"))
+            && super.getRequestURL().toString().contains(".json")) {
+            return Collections.enumeration(Collections.singletonList("application/json"));
         }
+
         return super.getHeaders(name);
-
     }
-
 }

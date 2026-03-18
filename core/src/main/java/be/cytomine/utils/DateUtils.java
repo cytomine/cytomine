@@ -46,7 +46,7 @@ public class DateUtils {
             " ", " ");
     }
 
-    public static String getSimpleFormatLocaleDate(Date date){
+    public static String getSimpleFormatLocaleDate(Date date) {
         return REPORT_FILENAME_FORMAT.format(date);
     }
 
@@ -68,12 +68,13 @@ public class DateUtils {
             if (rhs==null) {
                 return -1;
             }
-            if (lhs.getCreated().getTime() < rhs.getCreated().getTime())
+            if (lhs.getCreated().getTime() < rhs.getCreated().getTime()) {
                 return 1;
-            else if (lhs.getCreated().getTime() == rhs.getCreated().getTime())
+            } else if (lhs.getCreated().getTime() == rhs.getCreated().getTime()) {
                 return 0;
-            else
+            } else {
                 return -1;
+            }
         };
     }
 }

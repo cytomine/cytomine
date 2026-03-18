@@ -105,13 +105,13 @@ public class ImageServerService {
     private static String checkType(WindowParameter params) {
         if ((params.getDraw() != null && params.getDraw()) || (params.getType() != null
                                                                    && params.getType()
-                                                                          .equals("draw")))
+                                                                          .equals("draw"))) {
             return "draw";
-        else if ((params.getMask() != null && params.getMask()) || (params.getType() != null
+        } else if ((params.getMask() != null && params.getMask()) || (params.getType() != null
                                                                         && params.getType()
-                                                                               .equals("mask")))
+                                                                               .equals("mask"))) {
             return "mask";
-        else if ((params.getAlphaMask() != null && params.getAlphaMask()) || (
+        } else if ((params.getAlphaMask() != null && params.getAlphaMask()) || (
             params.getType() != null && (params.getType().equals("alphaMask") || params.getType()
                                                                                      .equals(
                                                                                          "alphamask")))) {

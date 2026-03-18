@@ -1,0 +1,161 @@
+package org.cytomine.repository.http;
+
+import java.util.Optional;
+
+import org.cytomine.repository.RepositoryApp;
+import org.cytomine.repository.persistence.OntologyRepository;
+import org.cytomine.repository.persistence.TermRepository;
+import org.cytomine.repository.persistence.entity.TermEntity;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.transaction.annotation.Transactional;
+
+import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.model.CreateTerm;
+import be.cytomine.common.repository.model.TermResponse;
+import be.cytomine.common.repository.model.UpdateTerm;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+@SpringBootTest(classes = RepositoryApp.class)
+@Import(PostGisTestConfiguration.class)
+@Transactional
+class TermControllerTest {
+
+    @Autowired
+    private TermController termController;
+
+    @Autowired
+    private TermRepository termRepository;
+
+    @Autowired
+    private OntologyRepository ontologyRepository;
+
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    private Long ontologyId;
+    private Long projectId;
+
+    @BeforeEach
+    void setUp() {
+        Long userId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
+        jdbcTemplate.update(
+            "INSERT INTO sec_user (id, version, username) VALUES (?, 0, 'admin')", userId);
+
+        ontologyId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
+        jdbcTemplate.update(
+            "INSERT INTO ontology (id, version, name, user_id) VALUES (?, 0, 'test', ?)", ontologyId, userId);
+
+        projectId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
+        jdbcTemplate.update("""
+            INSERT INTO project (id, version, name, ontology_id, mode,
+                are_images_downloadable, blind_mode, count_annotations, count_images,
+                count_job_annotations, count_reviewed_annotations, hide_admins_layers,
+                hide_users_layers, is_closed)
+            VALUES (?, 0, 'test', ?, 'CLASSIC', false, false, 0, 0, 0, 0, false, false, false)
+            """, projectId, ontologyId);
+    }
+
+    @Test
+    void findTermByIdWhenExistsReturnsTerm() {
+        TermEntity entity = createAndSaveTermEntity("term1", "#FF0000");
+
+        Optional<TermResponse> result = termController.findTermByID(entity.getId());
+
+        assertTrue(result.isPresent());
+        assertEquals("term1", result.get().name());
+    }
+
+    @Test
+    void findTermByIdWhenNotExistsReturnsEmpty() {
+        Optional<TermResponse> result = termController.findTermByID(999L);
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void findAllReturnsPageOfTerms() {
+        createAndSaveTermEntity("term1", "#FF0000");
+        createAndSaveTermEntity("term2", "#00FF00");
+
+        Page<TermResponse> result = termController.findAll(PageRequest.of(0, 10));
+
+        assertEquals(2, result.getTotalElements());
+    }
+
+    @Test
+    void createSavesAndReturnsTerm() {
+        CreateTerm createTerm = new CreateTerm("newTerm", "#00FF00", ontologyId);
+
+        TermResponse result = termController.update(createTerm);
+
+        assertEquals("newTerm", result.name());
+        assertEquals("#00FF00", result.color());
+        assertEquals(ontologyId, result.ontologyId());
+    }
+
+    @Test
+    void updateWhenExistsUpdatesAndReturnsTerm() {
+        TermEntity entity = createAndSaveTermEntity("oldName", "#FF0000");
+        UpdateTerm updateTerm = new UpdateTerm(Optional.of("newName"), Optional.of("#00FF00"));
+
+        TermResponse result = termController.update(entity.getId(), updateTerm);
+
+        assertEquals("newName", result.name());
+        assertEquals("#00FF00", result.color());
+    }
+
+    @Test
+    void updateWhenNotExistsThrowsException() {
+        UpdateTerm updateTerm = new UpdateTerm(Optional.of("newName"), Optional.empty());
+
+        assertThrows(RuntimeException.class, () -> termController.update(999L, updateTerm));
+    }
+
+    @Test
+    void deleteWhenExistsDeletesAndReturnsTerm() {
+        TermEntity entity = createAndSaveTermEntity("term1", "#FF0000");
+
+        Optional<TermResponse> result = termController.delete(entity.getId());
+
+        assertTrue(result.isPresent());
+        assertEquals("term1", result.get().name());
+        assertTrue(termRepository.findById(entity.getId()).isEmpty());
+    }
+
+    @Test
+    void findTermsByProjectReturnsPageOfTerms() {
+        createAndSaveTermEntity("term1", "#FF0000");
+
+        Page<TermResponse> result = termController.findTermsByProject(projectId, PageRequest.of(0, 10));
+
+        assertEquals(1, result.getTotalElements());
+    }
+
+    @Test
+    void findTermsByOntologyReturnsPageOfTerms() {
+        createAndSaveTermEntity("term1", "#FF0000");
+
+        Page<TermResponse> result = termController.findTermsByOntology(ontologyId, PageRequest.of(0, 10));
+
+        assertEquals(1, result.getTotalElements());
+    }
+
+    private TermEntity createAndSaveTermEntity(String name, String color) {
+        TermEntity entity = new TermEntity();
+        entity.setName(name);
+        entity.setColor(color);
+        entity.setOntologyId(ontologyId);
+        return termRepository.saveAndFlush(entity);
+    }
+}

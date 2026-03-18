@@ -7,16 +7,17 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import be.cytomine.common.repository.model.CreateTerm;
-import be.cytomine.common.repository.model.Ontology;
+import be.cytomine.common.repository.model.OntologyResponse;
 import be.cytomine.common.repository.model.TermResponse;
 
 @Mapper(componentModel = "spring")
 public interface OntologyMapper {
-
-    Ontology map(OntologyEntity ontologyEntity);
+    @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
+    OntologyResponse map(OntologyEntity ontologyEntity);
 
     @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
     TermResponse map(TermEntity termEntity);
+
 
     @Mapping(target = "children", ignore = true)
     @Mapping(target = "id", ignore = true)
@@ -24,6 +25,5 @@ public interface OntologyMapper {
     @Mapping(target = "name", source = "name")
     @Mapping(target = "color", source = "color")
     @Mapping(target = "ontologyId", source = "ontology")
-    @Mapping(target = "projectId", ignore = true)
     TermEntity map(CreateTerm createTerm);
 }

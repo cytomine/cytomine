@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import be.cytomine.common.repository.http.OntologyHttpContract;
-import be.cytomine.common.repository.model.Ontology;
+import be.cytomine.common.repository.model.OntologyResponse;
 
 import static be.cytomine.common.repository.http.OntologyHttpContract.ROOT_PATH;
 
@@ -22,12 +22,12 @@ public class OntologyController implements OntologyHttpContract {
     private final OntologyMapper ontologyMapper;
 
     @Override
-    public Optional<Ontology> findOntologyByName(String name) {
+    public Optional<OntologyResponse> findOntologyByName(String name) {
         return ontologyRepository.findByName(name).map(ontologyMapper::map);
     }
 
     @Override
-    public Optional<Ontology> findOntologyById(long id) {
+    public Optional<OntologyResponse> findOntologyById(long id) {
         return ontologyRepository.findById(id).map(ontologyMapper::map);
     }
 }

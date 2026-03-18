@@ -76,13 +76,13 @@ public class TermResourceTests {
     private TermHttpContract termHttpContract;
 
     private TermResponse toTermResponse(Term term) {
-        return new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(), 0L,
+        return new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
             Set.of());
     }
 
     @Test
     @Transactional
-    public void list_all_terms() throws Exception {
+    public void listAllTerms() throws Exception {
         Term term = builder.given_a_term();
         Page<TermResponse> page = new PageImpl<>(List.of(toTermResponse(term)));
         when(termHttpContract.findAll(any(Pageable.class))).thenReturn(page);
@@ -95,7 +95,7 @@ public class TermResourceTests {
 
     @Test
     @Transactional
-    public void get_a_term() throws Exception {
+    public void getATerm() throws Exception {
         Term term = builder.given_a_term();
         when(termHttpContract.findTermByID(term.getId())).thenReturn(Optional.of(toTermResponse(term)));
 
@@ -107,7 +107,7 @@ public class TermResourceTests {
 
     @Test
     @Transactional
-    public void list_terms_by_ontology() throws Exception {
+    public void listTermsByOntology() throws Exception {
         Term term = builder.given_a_term();
         Page<TermResponse> page = new PageImpl<>(List.of(toTermResponse(term)));
         when(termHttpContract.findTermsByOntology(eq(term.getOntology().getId()), any(Pageable.class))).thenReturn(
@@ -121,7 +121,7 @@ public class TermResourceTests {
 
     @Test
     @Transactional
-    public void list_terms_by_project() throws Exception {
+    public void listTermsByProject() throws Exception {
         Term term = builder.given_a_term();
         Project project = builder.given_a_project_with_ontology(term.getOntology());
         Page<TermResponse> page = new PageImpl<>(List.of(toTermResponse(term)));
@@ -135,22 +135,22 @@ public class TermResourceTests {
 
     @Test
     @Transactional
-    public void add_valid_term() throws Exception {
+    public void addValidTerm() throws Exception {
         Term term = basicInstanceBuilder.given_a_not_persisted_term(builder.given_an_ontology());
         TermResponse response =
-            new TermResponse(1L, term.getName(), term.getColor(), term.getOntology().getId(), 0L, Set.of());
+            new TermResponse(1L, term.getName(), term.getColor(), term.getOntology().getId(), Set.of());
         when(termHttpContract.update(any())).thenReturn(response);
 
         restTermControllerMockMvc.perform(post("/api/term.json").contentType(MediaType.APPLICATION_JSON).content(
-                "{\"name\":\"" + term.getName() + "\",\"color\":\"" + term.getColor() + "\",\"ontology\":" +
-                    term.getOntology().getId() + ",\"project\":0}")).andExpect(status().isOk())
+                "{\"name\":\"" + term.getName() + "\",\"color\":\"" + term.getColor() + "\",\"ontology\":"
+                    + term.getOntology().getId() + ",\"project\":0}")).andExpect(status().isOk())
             .andExpect(jsonPath("$.id").exists()).andExpect(jsonPath("$.name").value(term.getName()))
             .andExpect(jsonPath("$.ontologyId").value(term.getOntology().getId()));
     }
 
     @Test
     @Transactional
-    public void edit_valid_term() throws Exception {
+    public void editValidTerm() throws Exception {
         Term term = builder.given_a_term();
         TermResponse response = toTermResponse(term);
         when(termHttpContract.update(eq(term.getId()), any())).thenReturn(response);
@@ -165,7 +165,7 @@ public class TermResourceTests {
 
     @Test
     @Transactional
-    public void delete_term() throws Exception {
+    public void deleteTerm() throws Exception {
         Term term = builder.given_a_term();
         when(termHttpContract.delete(term.getId())).thenReturn(Optional.of(toTermResponse(term)));
 
@@ -177,7 +177,7 @@ public class TermResourceTests {
 
     @Test
     @Transactional
-    public void delete_term_not_exist_returns_empty() throws Exception {
+    public void deleteTermNotExistReturnsEmpty() throws Exception {
         when(termHttpContract.delete(0L)).thenReturn(Optional.empty());
 
         restTermControllerMockMvc.perform(delete("/api/term/{id}.json", 0)).andExpect(status().isOk())
@@ -186,7 +186,7 @@ public class TermResourceTests {
 
     @Test
     @Transactional
-    public void get_term_not_exist_returns_empty() throws Exception {
+    public void getTermNotExistReturnsEmpty() throws Exception {
         when(termHttpContract.findTermByID(0L)).thenReturn(Optional.empty());
 
         restTermControllerMockMvc.perform(get("/api/term/{id}.json", 0)).andExpect(status().isOk())

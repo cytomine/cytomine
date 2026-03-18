@@ -14,12 +14,12 @@ import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Formula;
 
 @Entity(name = "term")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+
 public class TermEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,8 +30,6 @@ public class TermEntity {
     @Column
     private Long ontologyId;
 
-    @Formula("(SELECT o.project_id FROM ontology o WHERE o.id = ontology_id)")
-    private Long projectId;
     @Column
     private String name;
     @Column

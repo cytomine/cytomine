@@ -245,10 +245,10 @@ public class CytomineSteps {
 
         webDriverUtils.byIsDisplayed(wait, By.cssSelector(".panel-heading .panel-actions"));
         webDriverUtils.byClick(wait, By.cssSelector(".panel-actions .dropdown .icon"));
-
         webDriverUtils.xpathClick(wait, "//a[contains(@class, 'dropdown-item') and .//span[contains(text(), 'Delete')]]");
-
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Confirm')]");
+
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'App deleted successfully')]"));
     }
 
     public void selectTask(Wait<WebDriver> wait, String taskName, String taskVersion) {
@@ -278,8 +278,11 @@ public class CytomineSteps {
         webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(@class, 'annotation-container') and contains(text(), 'Annotation')]"));
     }
 
-    public void runTask(Wait<WebDriver> wait) {
+    public void runTask(Wait<WebDriver> wait, WebDriver driver) {
         webDriverUtils.byIsDisplayed(wait, By.cssSelector(".executor .card-content section:last-child .button.is-primary:last-child"));
         webDriverUtils.byClick(wait, By.cssSelector(".executor .card-content section:last-child .button.is-primary:last-child"));
+
+        Wait<WebDriver> longWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        webDriverUtils.byIsDisplayed(longWait, By.cssSelector(".runs .fa-check-circle"));
     }
 }

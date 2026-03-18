@@ -14,6 +14,7 @@ import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Formula;
 
 @Entity(name = "term")
 @Data
@@ -28,10 +29,14 @@ public class TermEntity {
     private long version = 0;
     @Column
     private Long ontologyId;
+
+    @Formula("(SELECT o.project_id FROM ontology o WHERE o.id = ontology_id)")
+    private Long projectId;
     @Column
     private String name;
     @Column
     private String color;
+
     @OneToMany
     @JoinTable(name = "relation_term", joinColumns = @JoinColumn(name = "term1_id"),
         inverseJoinColumns = @JoinColumn(name = "term2_id"))

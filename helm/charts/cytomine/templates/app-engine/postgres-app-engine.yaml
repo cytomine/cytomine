@@ -22,6 +22,7 @@ spec:
         app: postgres-app-engine
         release: {{ .Release.Name }}
     spec:
+      serviceAccountName: app-engine
       securityContext:
       {{- include "cytomine.podSecurityContext" . | nindent 8 }}
       volumes:

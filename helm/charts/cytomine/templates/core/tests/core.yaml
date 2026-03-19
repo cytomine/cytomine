@@ -11,9 +11,7 @@ metadata:
   annotations:
     "helm.sh/hook": test
     "helm.sh/hook-weight": "1"
-    "helm.sh/hook-delete-policy": hook-succeeded,hook-failed
 spec:
-  terminationGracePeriodSeconds: 5
   securityContext:
   {{- include "cytomine.podSecurityContext" . | nindent 4 }}
   {{- if $ingressIP }}
@@ -49,10 +47,10 @@ spec:
             sleep 5
           done
           echo "pims is ready!"
+  containers:
     - name: selenium
       image: "{{ .Values.images.selenium }}"
-      imagePullPolicy: {{ .Values.images.pullPolicy }}
-      restartPolicy: Always
+      imagePullPolicy: { { .Values.images.pullPolicy } }
       securityContext:
         allowPrivilegeEscalation: false
         privileged: false
@@ -61,13 +59,15 @@ spec:
         runAsUser: 1200
         runAsGroup: 1200
         capabilities:
-          drop: ["ALL"]
+          drop: [ "ALL" ]
       volumeMounts:
         - name: tmp
           mountPath: /tmp
       env:
         - name: SE_NODE_MAX_SESSIONS
           value: "30"
+        - name: SE_DRAIN_AFTER_SESSION_COUNT
+          value: "5"
       ports:
         - name: http
           containerPort: 4444
@@ -77,7 +77,6 @@ spec:
           port: 4444
         initialDelaySeconds: 5
         periodSeconds: 3
-  containers:
     - name: e2e-tests
       image: "{{ .Values.images.e2e_tests }}"
       imagePullPolicy: {{ .Values.images.pullPolicy }}

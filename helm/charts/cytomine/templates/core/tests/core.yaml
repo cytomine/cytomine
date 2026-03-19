@@ -15,10 +15,12 @@ metadata:
 spec:
   securityContext:
   {{- include "cytomine.podSecurityContext" . | nindent 4 }}
+  {{- if $ingressIP }}
   hostAliases:
     - ip: "{{ $ingressIP }}"
       hostnames:
         - "{{ .Values.global.domainName }}"
+  {{- end }}
   volumes:
     - name: tmp
       emptyDir: {}

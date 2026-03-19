@@ -23,8 +23,8 @@ public class SeleniumDriver {
 
     public WebDriver driver() {
         ClientConfig config = ClientConfig.defaultConfig()
-            .readTimeout(Duration.ofSeconds(60))
-            .connectionTimeout(Duration.ofSeconds(180));
+            .connectionTimeout(Duration.ofSeconds(60))
+            .readTimeout(Duration.ofSeconds(180));
 
         FirefoxOptions options = new FirefoxOptions();
         WebDriver webDriver = seleniumUrl.map(url -> {

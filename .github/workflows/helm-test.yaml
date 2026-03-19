@@ -34,6 +34,8 @@ jobs:
 
       - name: Create kind cluster
         uses: helm/kind-action@v1.14.0
+        with:
+          node_image: kindest/node:v1.32.0
 
       - name: Install ingress-nginx
         run: |

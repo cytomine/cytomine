@@ -12,5 +12,5 @@ public record Parameter(
     String displayName,
     String description,
     boolean optional,
-    Parameter derivedFrom
-) {}
+    Parameter derivedFrom) {
+}

@@ -26,10 +26,10 @@ import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
 @Converter
-public class LongArrayToBytesConverter implements AttributeConverter<Long[],byte[]>{
+public class LongArrayToBytesConverter implements AttributeConverter<Long[], byte[]> {
     @Override
     public byte[] convertToDatabaseColumn(Long[] attribute) {
-        if (attribute==null) {
+        if (attribute == null) {
             return null;
         }
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -52,7 +52,7 @@ public class LongArrayToBytesConverter implements AttributeConverter<Long[],byte
 
     @Override
     public Long[] convertToEntityAttribute(byte[] dbData) {
-        if (dbData==null) {
+        if (dbData == null) {
             return null;
         }
         try (ByteArrayInputStream b = new ByteArrayInputStream(dbData)) {

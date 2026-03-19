@@ -14,24 +14,20 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  #app-engine:
-  #  uses: ./.github/workflows/app-engine.yaml
-  #cbir:
-  #  uses: ./.github/workflows/cbir.yaml
-  #core:
-  #  uses: ./.github/workflows/core.yaml
-  #ims:
-  #  uses: ./.github/workflows/ims.yaml
-  #registry-client:
-  #  uses: ./.github/workflows/registry-client.yaml
-  #sam:
-  #  uses: ./.github/workflows/sam.yaml
-  #web-ui:
-  #  uses: ./.github/workflows/web-ui.yaml
-  #repository:
-  #  uses: ./.github/workflows/repository.yaml
-  #code-quality:
-  #  uses: ./.github/workflows/code-quality.yaml
+  app-engine:
+    uses: ./.github/workflows/app-engine.yaml
+  cbir:
+    uses: ./.github/workflows/cbir.yaml
+  ims:
+    uses: ./.github/workflows/ims.yaml
+  sam:
+    uses: ./.github/workflows/sam.yaml
+  web-ui:
+    uses: ./.github/workflows/web-ui.yaml
+  code-quality:
+    uses: ./.github/workflows/code-quality.yaml
+  test:
+    uses: ./.github/workflows/test.yaml
 
   docker-images:
     uses: ./.github/workflows/docker.yaml
@@ -39,15 +35,13 @@ jobs:
 
   helm-tests:
     needs:
-      #- app-engine
-      #- cbir
-      #- core
-      #- ims
-      #- registry-client
-      #- sam
-      #- web-ui
-      #- repository
-      #- code-quality
+      - app-engine
+      - cbir
+      - ims
+      - sam
+      - web-ui
+      - code-quality
+      - test
       - docker-images
     uses: ./.github/workflows/helm-test.yaml
     secrets: inherit

@@ -101,7 +101,7 @@ spec:
           startupProbe:
             httpGet:
               path: /ping
-              port: { { .Values.repository.port } }
+              port: {{ .Values.repository.port }}
             initialDelaySeconds: 10
             periodSeconds: 10
             failureThreshold: 30

@@ -66,7 +66,7 @@ public class CytomineTests {
         saveScreenshot("closing-" + testInfo.getTestMethod()
                                         .map(Method::getName)
                                         .orElseGet(() -> "no-name-" + randomUUID()));
-        driver.close();
+        driver.quit();
     }
 
     @SneakyThrows

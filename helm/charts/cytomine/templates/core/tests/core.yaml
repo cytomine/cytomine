@@ -50,7 +50,7 @@ spec:
   containers:
     - name: selenium
       image: "{{ .Values.images.selenium }}"
-      imagePullPolicy: { { .Values.images.pullPolicy } }
+      imagePullPolicy: {{ .Values.images.pullPolicy }}
       securityContext:
         allowPrivilegeEscalation: false
         privileged: false
@@ -67,7 +67,7 @@ spec:
         - name: SE_NODE_MAX_SESSIONS
           value: "30"
         - name: SE_DRAIN_AFTER_SESSION_COUNT
-          value: "5"
+          value: "9"
       ports:
         - name: http
           containerPort: 4444

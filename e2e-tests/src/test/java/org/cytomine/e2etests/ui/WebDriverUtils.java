@@ -2,6 +2,8 @@ package org.cytomine.e2etests.ui;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.ElementClickInterceptedException;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -18,11 +20,12 @@ public class WebDriverUtils {
     void byClick(Wait<WebDriver> wait, By by) {
         waitLoading(wait);
         wait.until(d -> {
-            WebElement element = d.findElement(by);
             try {
+                WebElement element = d.findElement(by);
                 element.click();
                 return true;
-            } catch (ElementClickInterceptedException e) {
+            } catch (ElementClickInterceptedException | NoSuchElementException
+                     | StaleElementReferenceException e) {
                 return false;
             }
         });
@@ -36,12 +39,14 @@ public class WebDriverUtils {
         if (waitDisplayed) {
             byIsDisplayed(wait, by);
         }
-        wait.until(
-            d -> {
-                d.findElement(by)
-                    .sendKeys(keys);
+        wait.until(d -> {
+            try {
+                d.findElement(by).sendKeys(keys);
                 return true;
-            });
+            } catch (NoSuchElementException | StaleElementReferenceException e) {
+                return false;
+            }
+        });
     }
 
     void goTo(Wait<WebDriver> wait, String url) {
@@ -72,16 +77,20 @@ public class WebDriverUtils {
     WebElement waitForCanvasReady(Wait<WebDriver> wait, By canvasLocator) {
         waitLoading(wait);
         return wait.until(d -> {
-            WebElement canvas = d.findElement(canvasLocator);
-            if (!canvas.isDisplayed()) {
+            try {
+                WebElement canvas = d.findElement(canvasLocator);
+                if (!canvas.isDisplayed()) {
+                    return null;
+                }
+                int width = canvas.getSize().getWidth();
+                int height = canvas.getSize().getHeight();
+                if (width <= 0 || height <= 0) {
+                    return null;
+                }
+                return canvas;
+            } catch (NoSuchElementException | StaleElementReferenceException e) {
                 return null;
             }
-            int width = canvas.getSize().getWidth();
-            int height = canvas.getSize().getHeight();
-            if (width <= 0 || height <= 0) {
-                return null;
-            }
-            return canvas;
         });
     }
 }

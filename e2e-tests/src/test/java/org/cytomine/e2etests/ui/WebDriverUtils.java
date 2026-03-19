@@ -4,6 +4,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -64,10 +65,13 @@ public class WebDriverUtils {
     }
 
     void waitLoading(Wait<WebDriver> wait) {
-        wait.until(d -> {
-            var loadingOverlays = d.findElements(By.cssSelector(".loading-overlay.is-active"));
-            return loadingOverlays.isEmpty();
-        });
+        try {
+            wait.until(d -> {
+                var loadingOverlays = d.findElements(By.cssSelector(".loading-overlay.is-active"));
+                return loadingOverlays.isEmpty();
+            });
+        } catch (TimeoutException ignored) {
+        }
     }
 
     void waitUntilByEmpty(Wait<WebDriver> wait, By by) {

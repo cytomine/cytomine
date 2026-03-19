@@ -68,7 +68,7 @@ spec:
           mountPath: /tmp
       env:
         - name: SE_NODE_MAX_SESSIONS
-          value: "30"
+          value: "5"
       ports:
         - name: http
           containerPort: 4444

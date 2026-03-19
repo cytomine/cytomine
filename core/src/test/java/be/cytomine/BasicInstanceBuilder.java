@@ -119,9 +119,9 @@ public class BasicInstanceBuilder {
             @Override
             protected void doInTransactionWithoutResult(TransactionStatus status) {
                 aUser = userRepository.findByUsernameLikeIgnoreCase("user")
-                            .orElseGet(() -> given_default_user());
+                    .orElseGet(() -> given_default_user());
                 anAdmin = userRepository.findByUsernameLikeIgnoreCase("admin")
-                              .orElseGet(() -> given_default_admin());
+                    .orElseGet(() -> given_default_admin());
             }
         });
     }
@@ -184,8 +184,8 @@ public class BasicInstanceBuilder {
         return user;
     }
 
-    public static RelationTerm given_a_not_persisted_relation_term(Relation relation, Term term1,
-                                                                   Term term2) {
+    public RelationTerm given_a_not_persisted_relation_term(Relation relation, Term term1,
+                                                            Term term2) {
         RelationTerm relationTerm = new RelationTerm();
         relationTerm.setRelation(relation);
         relationTerm.setTerm1(term1);
@@ -196,10 +196,10 @@ public class BasicInstanceBuilder {
 
     public User given_superadmin() {
         return userRepository.findByUsernameLikeIgnoreCase("superadmin")
-                   .orElseThrow(() -> new ObjectNotFoundException("superadmin not in db"));
+            .orElseThrow(() -> new ObjectNotFoundException("superadmin not in db"));
     }
 
-    public static User given_a_not_persisted_user() {
+    public User given_a_not_persisted_user() {
         //User user2 = new User();
         User user = new User();
         user.setName("firstname lastname");
@@ -213,8 +213,8 @@ public class BasicInstanceBuilder {
         SecUserSecRole secSecUserSecRole = new SecUserSecRole();
         secSecUserSecRole.setSecUser(user);
         secSecUserSecRole.setSecRole(secRoleRepository.findByAuthority(authority)
-                                         .orElseThrow(() -> new ObjectNotFoundException(
-                                             "authority " + authority + " does not exists")));
+            .orElseThrow(() -> new ObjectNotFoundException(
+                "authority " + authority + " does not exists")));
         em.persist(secSecUserSecRole);
         em.flush();
         em.refresh(user);
@@ -252,7 +252,7 @@ public class BasicInstanceBuilder {
         return persistAndReturn(given_a_not_persisted_term(ontology));
     }
 
-    public static Term given_a_not_persisted_term(Ontology ontology) {
+    public Term given_a_not_persisted_term(Ontology ontology) {
         Term term = new Term();
         term.setName(randomString());
         term.setOntology(ontology);
@@ -281,8 +281,8 @@ public class BasicInstanceBuilder {
     public Relation given_a_relation() {
         return (Relation) em.createQuery(
                 "SELECT relation FROM Relation relation WHERE relation.name LIKE 'parent'")
-                              .getResultList()
-                              .get(0);
+            .getResultList()
+            .get(0);
     }
 
     public Ontology given_an_ontology() {
@@ -312,7 +312,7 @@ public class BasicInstanceBuilder {
         return persistAndReturn(project);
     }
 
-    public static Project given_a_not_persisted_project() {
+    public Project given_a_not_persisted_project() {
         Project project = new Project();
         project.setName(randomString());
         project.setOntology(null);
@@ -386,7 +386,7 @@ public class BasicInstanceBuilder {
         return storage;
     }
 
-    public static Storage given_a_not_persisted_storage(User user) {
+    public Storage given_a_not_persisted_storage(User user) {
         Storage storage = new Storage();
         storage.setName(randomString());
         storage.setUser(user);
@@ -397,7 +397,7 @@ public class BasicInstanceBuilder {
         return given_a_not_persisted_storage(given_superadmin());
     }
 
-    private static String randomString() {
+    private String randomString() {
         return UUID.randomUUID().toString();
     }
 
@@ -542,7 +542,7 @@ public class BasicInstanceBuilder {
 
     public Mime given_a_mime(String mimeType) {
         return mimeRepository.findByMimeType(mimeType)
-                   .orElseThrow(() -> new ObjectNotFoundException("MimeType", mimeType));
+            .orElseThrow(() -> new ObjectNotFoundException("MimeType", mimeType));
     }
 
     public NestedImageInstance given_a_nested_image_instance() {

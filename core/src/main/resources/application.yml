@@ -108,8 +108,8 @@ application:
   adminPrivateKey: ${ADMIN_PRIVATE_KEY:adminPrivateKey}
   superAdminPublicKey: ${SUPER_ADMIN_PUBLIC_KEY:superAdminPublicKey}
   superAdminPrivateKey: ${SUPER_ADMIN_PRIVATE_KEY:superAdminPrivateKey}
-  ImageServerPublicKey: ${IMAGE_SERVER_PUBLIC_KEY:imageServerPublicKey}
-  ImageServerPrivateKey: ${IMAGE_SERVER_PRIVATE_KEY:imageServerPrivateKey}
+  imageServerPublicKey: ${IMAGE_SERVER_PUBLIC_KEY:imageServerPublicKey}
+  imageServerPrivateKey: ${IMAGE_SERVER_PRIVATE_KEY:imageServerPrivateKey}
   instanceHostWebsite: ${INSTANCE_HOST_WEBSITE_URL:#{'https://www.cytomine.com'}}
   instanceHostSupportMail: ${INSTANCE_HOST_SUPPORT_MAIL:support@cytomine.com}
   instanceHostPhoneNumber: ${INSTANCE_HOST_PHONE_NUMBER:+320/000.00.00}

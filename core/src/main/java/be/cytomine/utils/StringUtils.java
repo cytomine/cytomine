@@ -34,7 +34,6 @@ public class StringUtils {
         return (str == null ? "" : str);
     }
 
-
     public static boolean isNotBlank(String str) {
         return str != null && !str.equals("");
     }
@@ -44,32 +43,35 @@ public class StringUtils {
     }
 
     public static String obscurify(String property, int numberOfCharsToKeepOnEachSide) {
-        if (property==null) {
+        if (property == null) {
             return "<NULL>";
         }
         if (property.trim().isEmpty()) {
             return "<EMPTY>";
         }
-        if (numberOfCharsToKeepOnEachSide*2<property.length()) {
+        if (numberOfCharsToKeepOnEachSide * 2 < property.length()) {
             StringBuffer buffer = new StringBuffer();
-            for (int i = 0; i< property.length()-(numberOfCharsToKeepOnEachSide*2);i++) {
+            for (int i = 0; i < property.length() - (numberOfCharsToKeepOnEachSide * 2); i++) {
                 buffer.append("*");
             }
-            return property.substring(0,numberOfCharsToKeepOnEachSide)+ buffer.toString() + property.substring(property.length()-numberOfCharsToKeepOnEachSide,property.length());
+
+            String start = property.substring(0, numberOfCharsToKeepOnEachSide);
+            String end = property.substring(property.length() - numberOfCharsToKeepOnEachSide);
+            return start + buffer + end;
         } else {
             return property;
         }
     }
 
     public static List<Long> extractListFromParameter(String parameter) {
-        if (parameter==null ||  parameter.isEmpty()) {
+        if (parameter == null || parameter.isEmpty()) {
             return null;
         }
-        return Arrays.stream(parameter.replaceAll("_",",").split(",")).map(Long::parseLong)
-                .collect(Collectors.toList());
+        return Arrays.stream(parameter.replaceAll("_", ",").split(",")).map(Long::parseLong)
+            .collect(Collectors.toList());
     }
 
-    public static String decimalFormatter(Object value){
+    public static String decimalFormatter(Object value) {
         DecimalFormat df = new DecimalFormat("0.00");
         return df.format(value);
     }
@@ -83,14 +85,17 @@ public class StringUtils {
     }
 
     public static Map<String, String> splitQuery(URL url) throws UnsupportedEncodingException {
-        Map<String, String> query_pairs = new LinkedHashMap<String, String>();
+        Map<String, String> queryPairs = new LinkedHashMap<String, String>();
         String query = url.getQuery();
         String[] pairs = query.split("&");
         for (String pair : pairs) {
             int idx = pair.indexOf("=");
-            query_pairs.put(URLDecoder.decode(pair.substring(0, idx), "UTF-8"), URLDecoder.decode(pair.substring(idx + 1), "UTF-8"));
+            queryPairs.put(
+                URLDecoder.decode(pair.substring(0, idx), "UTF-8"),
+                URLDecoder.decode(pair.substring(idx + 1), "UTF-8")
+            );
         }
-        return query_pairs;
+        return queryPairs;
     }
 
     public static String urlEncodeUTF8(String s) {
@@ -100,15 +105,16 @@ public class StringUtils {
             throw new UnsupportedOperationException(e);
         }
     }
-    public static String urlEncodeUTF8(Map<?,?> map) {
+
+    public static String urlEncodeUTF8(Map<?, ?> map) {
         StringBuilder sb = new StringBuilder();
-        for (Map.Entry<?,?> entry : map.entrySet()) {
+        for (Map.Entry<?, ?> entry : map.entrySet()) {
             if (sb.length() > 0) {
                 sb.append("&");
             }
             sb.append(String.format("%s=%s",
-                    urlEncodeUTF8(entry.getKey().toString()),
-                    urlEncodeUTF8(entry.getValue().toString())
+                urlEncodeUTF8(entry.getKey().toString()),
+                urlEncodeUTF8(entry.getValue().toString())
             ));
         }
         return sb.toString();

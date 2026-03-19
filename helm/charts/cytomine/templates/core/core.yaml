@@ -87,14 +87,14 @@ spec:
             httpGet:
               path: /server/ping
               port: 8080
-            initialDelaySeconds: 120
+            initialDelaySeconds: 20
             failureThreshold: 40
             timeoutSeconds: 5
           readinessProbe:
             httpGet:
               path: /server/ping
               port: 8080
-            initialDelaySeconds: 120
+            initialDelaySeconds: 20
             failureThreshold: 40
             timeoutSeconds: 5
       initContainers:

@@ -68,7 +68,7 @@ public class OffsetBasedPageRequest implements Pageable, Serializable {
 
     @Override
     public int getPageNumber() {
-        return (int)offset / limit;
+        return (int) offset / limit;
     }
 
     @Override

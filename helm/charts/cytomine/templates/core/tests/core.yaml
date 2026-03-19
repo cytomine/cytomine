@@ -57,6 +57,13 @@ spec:
         runAsGroup: 1200
         capabilities:
           drop: ["ALL"]
+      resources:
+        requests:
+          memory: "2Gi"
+          cpu: "1"
+        limits:
+          memory: "4Gi"
+          cpu: "2"
       volumeMounts:
         - name: tmp
           mountPath: /tmp

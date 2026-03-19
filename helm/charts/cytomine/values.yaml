@@ -302,3 +302,6 @@ fixVolumesPermissions: false
 test:
   # Override ingress IP for e2e tests (used when lookup doesn't work)
   ingressIP:
+  # Number of e2e tests (used for SE_DRAIN_AFTER_SESSION_COUNT)
+  # This is automatically set by CI from counting @Test annotations
+  e2eTestCount: 9

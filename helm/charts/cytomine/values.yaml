@@ -297,3 +297,8 @@ containerSecurity:
 # Fix volumes permissions
 # will be removed soon, do not use for newly created environments
 fixVolumesPermissions: false
+
+# Test configuration
+test:
+  # Override ingress IP for e2e tests (used when lookup doesn't work)
+  ingressIP:

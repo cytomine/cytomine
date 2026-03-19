@@ -1,6 +1,6 @@
 {{- $ingressSvc := lookup "v1" "Service" "ingress" "ingress-nginx-controller" }}
-{{- $ingressIP := "" }}
-{{- if $ingressSvc }}
+{{- $ingressIP := .Values.test.ingressIP | default "" }}
+{{- if and (not $ingressIP) $ingressSvc }}
 {{- $ingressIP = $ingressSvc.spec.clusterIP }}
 {{- end }}
 apiVersion: v1
@@ -13,6 +13,7 @@ metadata:
     "helm.sh/hook-weight": "1"
     "helm.sh/hook-delete-policy": hook-succeeded,hook-failed
 spec:
+  terminationGracePeriodSeconds: 5
   securityContext:
   {{- include "cytomine.podSecurityContext" . | nindent 4 }}
   {{- if $ingressIP }}
@@ -50,6 +51,7 @@ spec:
           echo "pims is ready!"
     - name: selenium
       image: "{{ .Values.images.selenium }}"
+      imagePullPolicy: {{ .Values.images.pullPolicy }}
       restartPolicy: Always
       securityContext:
         allowPrivilegeEscalation: false
@@ -78,6 +80,7 @@ spec:
   containers:
     - name: e2e-tests
       image: "{{ .Values.images.e2e_tests }}"
+      imagePullPolicy: {{ .Values.images.pullPolicy }}
       securityContext:
       {{- include "cytomine.containerSecurityContext" . | nindent 8 }}
       volumeMounts:

@@ -61,10 +61,16 @@ jobs:
         run: kubectl patch serviceaccount default --namespace=cytomine-${{ github.sha }}
           -p '{"imagePullSecrets":[{"name":"docker-image-pull-secrets"}]}'
 
+      - name: Get ingress IP
+        run: |
+          INGRESS_IP=$(kubectl get svc -n ingress ingress-nginx-controller -o jsonpath='{.spec.clusterIP}')
+          echo "INGRESS_IP=$INGRESS_IP" >> $GITHUB_ENV
+
       - name: Run chart-testing (lint and install)
         run: |
           # Cytomine images from registry.cytomine.org/cytomine/
-          EXTRA_ARGS="--set images.core=registry.cytomine.org/cytomine/core:${{ github.sha }} "
+          EXTRA_ARGS="--set test.ingressIP=${{ env.INGRESS_IP }} "
+          EXTRA_ARGS+="--set images.core=registry.cytomine.org/cytomine/core:${{ github.sha }} "
           EXTRA_ARGS+="--set images.app_engine=registry.cytomine.org/cytomine/app-engine:${{ github.sha }} "
           EXTRA_ARGS+="--set images.sam=registry.cytomine.org/cytomine/sam:${{ github.sha }} "
           EXTRA_ARGS+="--set images.web_ui=registry.cytomine.org/cytomine/web-ui:${{ github.sha }} "

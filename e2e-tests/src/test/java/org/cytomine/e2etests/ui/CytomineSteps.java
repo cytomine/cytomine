@@ -222,6 +222,7 @@ public class CytomineSteps {
     @SneakyThrows
     public void uploadTask(Wait<WebDriver> wait, URL cytomineUrl) {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/apps");
+        webDriverUtils.byIsDisplayed(wait, By.cssSelector(".upload-icon"));
         String bundleName = "selenium-" + UUID.randomUUID() + ".zip";
         Path tempDir = Files.createTempDirectory("selenium-task");
         Path copiedFile = tempDir.resolve(bundleName);

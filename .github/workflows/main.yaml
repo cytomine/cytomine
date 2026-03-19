@@ -39,15 +39,15 @@ jobs:
 
   helm-tests:
     needs:
-      - app-engine
-      - cbir
-      - core
-      - ims
-      - registry-client
-      - sam
-      - web-ui
-      - repository
-      - code-quality   
+      #- app-engine
+      #- cbir
+      #- core
+      #- ims
+      #- registry-client
+      #- sam
+      #- web-ui
+      #- repository
+      #- code-quality
       - docker-images
     uses: ./.github/workflows/helm-test.yaml
     secrets: inherit

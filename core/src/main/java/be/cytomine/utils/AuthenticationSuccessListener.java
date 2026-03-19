@@ -127,7 +127,9 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
     private static Set<String> extractRolesFromAuthentication(JwtAuthenticationToken jwtAuthenticationToken) {
         Set<String> rolesFromAuthentication = new HashSet<>();
         jwtAuthenticationToken.getAuthorities().forEach((authority) -> {
-            if (authority.getAuthority().equals("ROLE_USER") || authority.getAuthority().equals("ROLE_ADMIN") || authority.getAuthority().equals("ROLE_GUEST")) {
+            if (authority.getAuthority().equals("ROLE_USER")
+                || authority.getAuthority().equals("ROLE_ADMIN")
+                || authority.getAuthority().equals("ROLE_GUEST")) {
                 rolesFromAuthentication.add(authority.getAuthority());
             }
         });

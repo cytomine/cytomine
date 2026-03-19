@@ -1,6 +1,7 @@
 package be.cytomine.appengine.integration.cucumber;
 
 import java.io.IOException;
+import java.time.Duration;
 
 import com.cytomine.registry.client.RegistryClient;
 import io.cucumber.junit.Cucumber;
@@ -45,7 +46,8 @@ public class RunCucumberIntegrationTests {
 
     @Container
     static K3sContainer k3sContainer = new K3sContainer(DockerImageName.parse("rancher/k3s:v1.21.3-k3s1"))
-            .withCommand("server", "--disable", "metrics-server");
+            .withCommand("server", "--disable", "metrics-server")
+            .withStartupTimeout(Duration.ofMinutes(5));
 
     @BeforeClass
     public static void startContainers() throws IOException {

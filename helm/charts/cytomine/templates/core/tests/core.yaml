@@ -29,26 +29,6 @@ spec:
       persistentVolumeClaim:
         claimName: "e2e-test-reports"
   initContainers:
-    - name: wait-for-services
-      image: "{{ .Values.images.curl }}"
-      securityContext:
-      {{- include "cytomine.containerSecurityContext" . | nindent 8 }}
-      command:
-        - /bin/sh
-        - -c
-        - |
-          echo "Waiting for core to be ready..."
-          until curl -sf http://core.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.core.port }}/server/ping; do
-            echo "core not ready, retrying in 5s..."
-            sleep 5
-          done
-          echo "core is ready!"
-          echo "Waiting for pims to be ready..."
-          until curl -sf http://pims.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.pims.port }}/ims/disk-usage; do
-            echo "pims not ready, retrying in 5s..."
-            sleep 5
-          done
-          echo "pims is ready!"
     - name: selenium
       image: "{{ .Values.images.selenium }}"
       restartPolicy: Always
@@ -78,6 +58,32 @@ spec:
           port: 4444
         initialDelaySeconds: 5
         periodSeconds: 3
+    - name: wait-for-services
+      image: "{{ .Values.images.curl }}"
+      securityContext:
+      {{- include "cytomine.containerSecurityContext" . | nindent 8 }}
+      command:
+        - /bin/sh
+        - -c
+        - |
+          echo "Waiting for core to be ready..."
+          until curl -sf http://core.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.core.port }}/server/ping; do
+            echo "core not ready, retrying in 5s..."
+            sleep 5
+          done
+          echo "core is ready!"
+          echo "Waiting for pims to be ready..."
+          until curl -sf http://pims.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.pims.port }}/ims/disk-usage; do
+            echo "pims not ready, retrying in 5s..."
+            sleep 5
+          done
+          echo "pims is ready!"
+          echo "Waiting for Selenium to be ready..."
+          until curl -sf http://localhost:4444/wd/hub/status; do
+            echo "Selenium not ready, retrying in 5s..."
+            sleep 5
+          done
+          echo "All services ready."
   containers:
     - name: e2e-tests
       image: "{{ .Values.images.e2e_tests }}"

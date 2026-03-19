@@ -47,6 +47,12 @@ spec:
             sleep 5
           done
           echo "pims is ready!"
+          echo "Waiting for app-engine to be ready..."
+          until curl -sf http://app-engine.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.app_engine.port }}/ping; do
+            echo "app-engine not ready, retrying in 5s..."
+            sleep 5
+          done
+          echo "app-engine is ready!"
   containers:
     - name: selenium
       image: "{{ .Values.images.selenium }}"

@@ -99,7 +99,7 @@ jobs:
 
       - name: Logs e2e tests results
         if: always()
-        run: kubectl --namespace=cytomine-${{ github.sha }} logs e2e-tests
+        run: kubectl --namespace=cytomine-${{ github.sha }} logs e2e-tests -c e2e-tests
 
       - name: Export test results
         if: always()

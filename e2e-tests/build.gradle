@@ -46,9 +46,12 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
-    systemProperty 'junit.jupiter.execution.parallel.enabled', 'true'
-    systemProperty 'junit.jupiter.execution.parallel.mode.default', 'concurrent'
-    systemProperty 'junit.jupiter.execution.parallel.mode.classes.default', 'concurrent'
-    systemProperty 'junit.jupiter.execution.parallel.config.strategy', 'dynamic'
-    systemProperty 'junit.jupiter.execution.parallel.config.dynamic.factor', '1'
+    def parallelEnabled = System.getenv('E2E_PARALLEL') == 'true'
+    systemProperty 'junit.jupiter.execution.parallel.enabled', parallelEnabled.toString()
+    if (parallelEnabled) {
+        systemProperty 'junit.jupiter.execution.parallel.mode.default', 'concurrent'
+        systemProperty 'junit.jupiter.execution.parallel.mode.classes.default', 'concurrent'
+        systemProperty 'junit.jupiter.execution.parallel.config.strategy', 'dynamic'
+        systemProperty 'junit.jupiter.execution.parallel.config.dynamic.factor', '1'
+    }
 }

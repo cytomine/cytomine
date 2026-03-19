@@ -11,7 +11,9 @@ metadata:
   annotations:
     "helm.sh/hook": test
     "helm.sh/hook-weight": "1"
+    "helm.sh/hook-delete-policy": hook-succeeded,hook-failed
 spec:
+  terminationGracePeriodSeconds: 5
   securityContext:
   {{- include "cytomine.podSecurityContext" . | nindent 4 }}
   hostAliases:

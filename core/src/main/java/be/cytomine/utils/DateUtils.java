@@ -37,9 +37,9 @@ public class DateUtils {
         }
     }
 
-    public static String getLocaleDate(Date date){
-        DateFormat DFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, Locale.getDefault());
-        return DFormat.format(date).replaceAll(
+    public static String getLocaleDate(Date date) {
+        DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, Locale.getDefault());
+        return dateFormat.format(date).replaceAll(
             // This char appears in the Date string but cannot end up in the PDF with
             // our current police used.
             // https://stackoverflow.com/q/77225936
@@ -58,14 +58,16 @@ public class DateUtils {
         return l != null ? l - new Date(0).getTime() : null;
     }
 
-    public static Date computeMillisInDate(long millis) {return new Date(millis);}
+    public static Date computeMillisInDate(long millis) {
+        return new Date(millis);
+    }
 
     public static Comparator<CytomineDomain> descCreatedComparator() {
         return (lhs, rhs) -> {
-            if (lhs==null) {
+            if (lhs == null) {
                 return 1;
             }
-            if (rhs==null) {
+            if (rhs == null) {
                 return -1;
             }
             if (lhs.getCreated().getTime() < rhs.getCreated().getTime()) {

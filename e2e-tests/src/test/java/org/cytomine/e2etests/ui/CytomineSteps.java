@@ -193,7 +193,9 @@ public class CytomineSteps {
         webDriverUtils.byIsDisplayed(wait, By.xpath(
             "//button[contains(@class, 'is-selected') and .//i[contains(@class, 'fa-square')]]"));
 
-        WebElement mapCanvas = driver.findElement(By.cssSelector(".ol-viewport canvas"));
+        // Wait for canvas to be fully rendered and interactive
+        WebElement mapCanvas = webDriverUtils.waitForCanvasReady(wait,
+            By.cssSelector(".ol-viewport canvas"));
 
         int canvasWidth = mapCanvas.getSize().getWidth();
         int canvasHeight = mapCanvas.getSize().getHeight();

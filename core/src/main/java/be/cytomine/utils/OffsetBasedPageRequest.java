@@ -1,10 +1,10 @@
 package be.cytomine.utils;
 
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-
 import java.io.Serializable;
 import java.util.Optional;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 public class OffsetBasedPageRequest implements Pageable, Serializable {
 
@@ -68,7 +68,7 @@ public class OffsetBasedPageRequest implements Pageable, Serializable {
 
     @Override
     public int getPageNumber() {
-        return (int)offset / limit;
+        return (int) offset / limit;
     }
 
     @Override

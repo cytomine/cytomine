@@ -16,6 +16,20 @@ package be.cytomine.service.security;
 * limitations under the License.
 */
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.stereotype.Service;
+
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.GenericCytomineDomainContainer;
 import be.cytomine.domain.image.AbstractImage;
@@ -36,21 +50,10 @@ import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.PermissionService;
 import be.cytomine.utils.StringUtils;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.stereotype.Service;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.Query;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static org.springframework.security.acls.domain.BasePermission.*;
+import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
+import static org.springframework.security.acls.domain.BasePermission.READ;
+import static org.springframework.security.acls.domain.BasePermission.WRITE;
 
 @Slf4j
 @Service
@@ -215,7 +218,9 @@ public class SecurityACLService {
 
 
     public List<Ontology> getOntologyList(User user) {
-        if (currentRoleService.isAdminByNow(user)) return ontologyRepository.findAll();
+        if (currentRoleService.isAdminByNow(user)) {
+            return ontologyRepository.findAll();
+        }
         Query query = entityManager.createQuery(
                 "select distinct ontology "+
                         "from AclObjectIdentity as aclObjectId, AclEntry as aclEntry, AclSid as aclSid,  Ontology as ontology "+
@@ -346,8 +351,10 @@ public class SecurityACLService {
     //check if the container (e.g. Project) has the minimal editing mode or is Admin. If not, exception will be thown
     public void checkFullOrRestrictedForOwner(CytomineDomain domain, User owner) {
         if (domain!=null) {
-            if(permissionService.hasACLPermission(retrieveContainer(domain),ADMINISTRATION)
-                    || currentRoleService.isAdminByNow(currentUserService.getCurrentUser())) return;
+            if (permissionService.hasACLPermission(retrieveContainer(domain),ADMINISTRATION)
+                    || currentRoleService.isAdminByNow(currentUserService.getCurrentUser())) {
+                return;
+            }
 
             CytomineDomain container = retrieveContainer(domain);
             switch (((Project) retrieveContainer(domain)).getMode()) {
@@ -428,7 +435,7 @@ public class SecurityACLService {
 
     public void checkIsUserInProject(User user, Project project) {
         boolean result = isUserInProject(user, project);
-        if(!result) {
+        if (!result) {
             throw new ConstraintException("Error: the user "+user.getId()+" is not into the project "+project.getId());
         }
     }
@@ -452,12 +459,12 @@ public class SecurityACLService {
 
     public void checkUserAccessRightsForMeta(CytomineDomain domain, User currentUser){
         //Is domain Project?
-        if(domain instanceof Project){
+        if (domain instanceof Project) {
             checkGuest(currentUser);
             //Check if user has at least WRITE permission for Project domain, e.g.: is a manager
             check( domain,WRITE,  currentUser);
            // check(domain,WRITE);
-        } else if(domain instanceof ImageInstance){
+        } else if (domain instanceof ImageInstance) {
             //Only ROLE_USER can associate meta domains to image instances
             checkUser(currentUser);
             //Check if user has at least READ permission for the domain Image Instance

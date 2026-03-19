@@ -16,20 +16,26 @@ package be.cytomine.domain.image;
 * limitations under the License.
 */
 
+import java.io.Serializable;
+import java.util.Set;
+
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PreUpdate;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.Type;
+
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.image.server.Storage;
 import be.cytomine.domain.security.User;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.LTreeType;
 import be.cytomine.utils.LongArrayToBytesConverter;
-import lombok.Getter;
-import lombok.Setter;
-
-import jakarta.persistence.*;
-import org.hibernate.annotations.Type;
-
-import java.io.Serializable;
-import java.util.Set;
 
 @Entity
 @Getter

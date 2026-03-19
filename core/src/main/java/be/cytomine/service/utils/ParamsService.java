@@ -1,5 +1,15 @@
 package be.cytomine.service.utils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
+
 import be.cytomine.domain.project.Project;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.AnnotationListing;
@@ -8,15 +18,6 @@ import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.ontology.TermService;
 import be.cytomine.service.security.UserService;
 import be.cytomine.utils.JsonObject;
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
-
-import jakarta.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional

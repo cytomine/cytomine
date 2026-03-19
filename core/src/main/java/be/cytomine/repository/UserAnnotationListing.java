@@ -16,9 +16,10 @@ package be.cytomine.repository;
 * limitations under the License.
 */
 
-import jakarta.persistence.EntityManager;
 import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
+
+import jakarta.persistence.EntityManager;
 
 public class UserAnnotationListing extends AnnotationListing {
 
@@ -191,7 +192,9 @@ public class UserAnnotationListing extends AnnotationListing {
     }
 
     String createOrderBy() {
-        if (kmeansValue < 3) return "";
+        if (kmeansValue < 3) {
+            return "";
+        }
         if (orderBy == null || orderBy.isEmpty()) {
             String order = (track != null || tracks != null) ? "rank asc" : "a.id desc ";
             return "ORDER BY " + order + ((term != null || terms != null || columnsToPrint.contains("term")) ? ", at.term_id " : "") + ((track != null || tracks != null || columnsToPrint.contains("track")) ? ", atr.track_id " : "");

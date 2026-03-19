@@ -16,29 +16,36 @@ package be.cytomine.service.security;
 * limitations under the License.
 */
 
-import be.cytomine.domain.CytomineDomain;
-import be.cytomine.domain.command.*;
-import be.cytomine.domain.security.SecRole;
-import be.cytomine.domain.security.User;
-import be.cytomine.domain.security.SecUserSecRole;
-import be.cytomine.exceptions.AlreadyExistException;
-import be.cytomine.exceptions.ForbiddenException;
-import be.cytomine.exceptions.ObjectNotFoundException;
-import be.cytomine.repository.security.SecRoleRepository;
-import be.cytomine.repository.security.UserRepository;
-import be.cytomine.repository.security.SecUserSecRoleRepository;
-import be.cytomine.service.CurrentUserService;
-import be.cytomine.service.ModelService;
-import be.cytomine.utils.CommandResponse;
-import be.cytomine.utils.JsonObject;
-import be.cytomine.utils.Task;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import be.cytomine.domain.CytomineDomain;
+import be.cytomine.domain.command.AddCommand;
+import be.cytomine.domain.command.Command;
+import be.cytomine.domain.command.DeleteCommand;
+import be.cytomine.domain.command.Transaction;
+import be.cytomine.domain.security.SecRole;
+import be.cytomine.domain.security.SecUserSecRole;
+import be.cytomine.domain.security.User;
+import be.cytomine.exceptions.AlreadyExistException;
+import be.cytomine.exceptions.ForbiddenException;
+import be.cytomine.exceptions.ObjectNotFoundException;
+import be.cytomine.repository.security.SecRoleRepository;
+import be.cytomine.repository.security.SecUserSecRoleRepository;
+import be.cytomine.repository.security.UserRepository;
+import be.cytomine.service.CurrentUserService;
+import be.cytomine.service.ModelService;
+import be.cytomine.utils.CommandResponse;
+import be.cytomine.utils.JsonObject;
+import be.cytomine.utils.Task;
 
 @Slf4j
 @Service

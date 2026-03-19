@@ -16,6 +16,22 @@ package be.cytomine.service.ontology;
 * limitations under the License.
 */
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Tuple;
+import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.ontology.ReviewedAnnotation;
@@ -26,15 +42,6 @@ import be.cytomine.repository.ontology.ReviewedAnnotationRepository;
 import be.cytomine.repository.ontology.UserAnnotationRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.security.SecurityACLService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.Tuple;
-import jakarta.transaction.Transactional;
-import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
 

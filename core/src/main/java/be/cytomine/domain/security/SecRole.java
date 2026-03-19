@@ -1,7 +1,8 @@
 package be.cytomine.domain.security;
 
-import be.cytomine.domain.CytomineDomain;
-import be.cytomine.utils.JsonObject;
+import java.io.Serializable;
+import java.util.Objects;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.validation.constraints.NotBlank;
@@ -9,8 +10,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.Serializable;
-import java.util.Objects;
+import be.cytomine.domain.CytomineDomain;
+import be.cytomine.utils.JsonObject;
 
 @Entity
 @Getter
@@ -41,9 +42,15 @@ public class SecRole extends CytomineDomain implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
         SecRole secRole = (SecRole) o;
         return Objects.equals(authority, secRole.authority);
     }

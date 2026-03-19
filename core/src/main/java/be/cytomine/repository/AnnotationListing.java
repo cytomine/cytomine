@@ -16,6 +16,17 @@ package be.cytomine.repository;
 * limitations under the License.
 */
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import jakarta.persistence.EntityManager;
+import lombok.Getter;
+import lombok.Setter;
+
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
@@ -27,12 +38,6 @@ import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.exceptions.WrongArgumentException;
-import lombok.Getter;
-import lombok.Setter;
-
-import jakarta.persistence.EntityManager;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -296,8 +301,9 @@ public abstract class AnnotationListing {
             }
 
 
-            if (track!=null || tracks!=null)
+            if (track != null || tracks != null) {
                 request += "LEFT OUTER JOIN annotation_track atr ON a.id = atr.annotation_ident ";
+            }
 
             request += "WHERE true ";
             if (term!=null || terms!=null) {
@@ -322,15 +328,15 @@ public abstract class AnnotationListing {
     /**
      * Generate SQL string for SELECT with only asked properties
      */
-    String getSelect(Map<String,String> columns) {
+    String getSelect(Map<String, String> columns) {
         if (kmeansValue >= 3) {
             List<String> requestHeadList = new ArrayList<>();
             for (Map.Entry<String, String> entry : columns.entrySet()) {
                 if (entry.getKey().equals("term") && !(this instanceof ReviewedAnnotationListing)) {
-                    String table ="";
-                    if(entry.getValue().contains("aat")) {
+                    String table = "";
+                    if (entry.getValue().contains("aat")) {
                         table = "aat";
-                    } else if(entry.getValue().contains("at")) {
+                    } else if (entry.getValue().contains("at")) {
                         table = "at";
                     }
                     requestHeadList.add("CASE WHEN "+table+".deleted IS NOT NULL THEN NULL ELSE "+entry.getValue()+" END as " + entry.getKey());
@@ -338,7 +344,7 @@ public abstract class AnnotationListing {
                     requestHeadList.add(entry.getValue() + " as " + entry.getKey());
                 }
             }
-            if (track!=null || tracks!=null) {
+            if (track != null || tracks != null) {
                 requestHeadList.add("(asl.channel + ai.channels * (asl.z_stack + ai.depth * asl.time)) as rank");
             }
             return "SELECT " + String.join(", ", requestHeadList) + " \n";
@@ -477,10 +483,11 @@ public abstract class AnnotationListing {
             }
             addIfMissingColumn("term");
 
-            if (this instanceof ReviewedAnnotationListing)
-                return " AND (at.term_id = "+term + ((noTerm) ? " OR at.term_id IS NULL" : "") + ")\n";
-            else
-                return " AND ((at.term_id = "+term+ ")" + ((noTerm) ? " OR at.term_id IS NULL" : "") + ")\n";
+            if (this instanceof ReviewedAnnotationListing) {
+                return " AND (at.term_id = " + term + ((noTerm) ? " OR at.term_id IS NULL" : "") + ")\n";
+            } else {
+                return " AND ((at.term_id = " + term + ")" + ((noTerm) ? " OR at.term_id IS NULL" : "") + ")\n";
+            }
         } else {
             return "";
         }
@@ -497,10 +504,11 @@ public abstract class AnnotationListing {
     String getTermsConst() {
         if (terms!=null) {
             addIfMissingColumn("term");
-            if (this instanceof ReviewedAnnotationListing)
-                return " AND (at.term_id IN ("+joinValues(terms) + ")" + ((noTerm) ? " OR at.term_id IS NULL" : "") + ")\n";
-            else
-                return " AND ((at.term_id IN ("+joinValues(terms) + "))" + ((noTerm) ? " OR at.term_id IS NULL" : "") + ")\n";
+            if (this instanceof ReviewedAnnotationListing) {
+                return " AND (at.term_id IN (" + joinValues(terms) + ")" + ((noTerm) ? " OR at.term_id IS NULL" : "") + ")\n";
+            } else {
+                return " AND ((at.term_id IN (" + joinValues(terms) + "))" + ((noTerm) ? " OR at.term_id IS NULL" : "") + ")\n";
+            }
         } else {
             return "";
         }
@@ -560,17 +568,16 @@ public abstract class AnnotationListing {
     }
 
     String getTagsConst() {
-        if (tags!=null  && noTag) {
+        if (tags != null  && noTag) {
             return "AND (tda.tag_id IN ("+joinValues(tags) + ") OR tda.tag_id IS NULL)\n";
-        } else if (tags!=null ) {
+        } else if (tags != null) {
             return "AND tda.tag_id IN (" + joinValues(tags) + ")\n";
         } else {
             return "";
         }
     }
 
-
-        String getBeforeOrAfterSliceConst() {
+    String getBeforeOrAfterSliceConst() {
         if ((track!=null || tracks!=null) && (beforeSlice!=null || afterSlice!=null)) {
             addIfMissingColumn("slice");
             Long sliceId = (beforeSlice!=null) ? beforeSlice : afterSlice;
@@ -598,6 +605,7 @@ public abstract class AnnotationListing {
             return "";
         }
     }
+
     String getAfterThan() {
         if (afterThan!=null) {
             return "AND a.created > '"+afterThan+"'\n";
@@ -606,5 +614,3 @@ public abstract class AnnotationListing {
         }
     }
 }
-
-

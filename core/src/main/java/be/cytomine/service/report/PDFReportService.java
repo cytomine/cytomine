@@ -16,28 +16,27 @@ package be.cytomine.service.report;
 * limitations under the License.
 */
 
-import be.cytomine.exceptions.ServerException;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
-import java.awt.*;
+import java.awt.Color;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 import be.quodlibet.boxable.BaseTable;
 import be.quodlibet.boxable.Cell;
 import be.quodlibet.boxable.HorizontalAlignment;
 import be.quodlibet.boxable.Row;
 import be.quodlibet.boxable.datatable.DataTable;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.List;
+import be.cytomine.exceptions.ServerException;
 
 @Service
 @Slf4j
@@ -116,19 +115,19 @@ public class PDFReportService {
                            boolean hasHeader) throws ServerException {
 
         checkData(dataArray);
-        if(documentIsUsed){
+        if (documentIsUsed) {
             initPDFWriterService();
         }
         drawDataTable(arrayToString(dataArray), columnWidth, hasHeader);
 
-        if(title == null){
+        if (title == null) {
             log.error("Cannot generate pdf report with null title, expected type: String.");
             throw new ServerException("Cannot generate pdf report with null title, expected type: String.");
         }
-        if(!title.isEmpty()) {
+        if (!title.isEmpty()) {
             writeMessage(document.getPage(0), TOP_POSITION, pageSize.getHeight() - BOTTOM_POSITION, title);
         }
-        if(hasPagination) {
+        if (hasPagination) {
             setPagination();
         }
 
@@ -177,12 +176,12 @@ public class PDFReportService {
      * @return String
      */
     private String arrayToString(Object[][] dataArray) throws ServerException {
-        if(dataArray == null){
+        if (dataArray == null) {
             log.error("Cannot generate pdf report with null data, expected type: Object[][].");
             throw new ServerException("Cannot generate pdf report with null data, expected type: Object[][].");
         }
         String stringArray = "";
-        for(Object[] row : dataArray){
+        for (Object[] row : dataArray) {
             stringArray += Arrays.toString(row).replace('[', ' ').replace(']', ' ') + "\r\n";
         }
         return stringArray;
@@ -207,11 +206,11 @@ public class PDFReportService {
             dataTable.addCsvToTable(data, hasHeader, ',');
 
             List<Row<PDPage>> rows = dataTable.getTable().getRows();
-            if(columnWidth != null){
+            if (columnWidth != null) {
                 checkPercentArraySum(columnWidth);
                 checkColumnWidthSize(columnWidth, rows.get(0).getCells().size());
                 setColumnWidth(rows, columnWidth);
-            }else{
+            } else {
                 autoSetColumnWidth(rows);
             }
 
@@ -356,9 +355,11 @@ public class PDFReportService {
      * @param  maxPercentIndexes
      * @return
      */
-    private void dispatch(float[] cellsSizePercent, float diff, int[] maxPercentIndexes){
-        for(int i = 0; i < cellsSizePercent.length; i++ ){
-            if (!Arrays.asList(maxPercentIndexes).contains(i)) cellsSizePercent[i] += diff;
+    private void dispatch(float[] cellsSizePercent, float diff, int[] maxPercentIndexes) {
+        for (int i = 0; i < cellsSizePercent.length; i++ ) {
+            if (!Arrays.asList(maxPercentIndexes).contains(i)) {
+                cellsSizePercent[i] += diff;
+            }
         }
     }
 

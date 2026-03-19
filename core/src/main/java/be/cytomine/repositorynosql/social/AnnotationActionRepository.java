@@ -1,10 +1,11 @@
 package be.cytomine.repositorynosql.social;
 
-import be.cytomine.domain.social.AnnotationAction;
+import java.util.Date;
+
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
+import be.cytomine.domain.social.AnnotationAction;
 
 @Repository
 public interface AnnotationActionRepository extends MongoRepository<AnnotationAction, Long> {

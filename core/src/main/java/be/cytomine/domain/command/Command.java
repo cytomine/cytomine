@@ -16,16 +16,25 @@ package be.cytomine.domain.command;
 * limitations under the License.
 */
 
+import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorColumn;
+import jakarta.persistence.DiscriminatorType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Transient;
+import lombok.Getter;
+import lombok.Setter;
+
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.service.ModelService;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
-import lombok.Getter;
-import lombok.Setter;
-
-import jakarta.persistence.*;
 
 @Entity
 @Getter

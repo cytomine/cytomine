@@ -16,6 +16,25 @@ package be.cytomine.domain.ontology;
 * limitations under the License.
 */
 
+import java.io.Serializable;
+import java.util.List;
+import java.util.Optional;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.locationtech.jts.geom.Geometry;
+
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.ImageInstance;
@@ -27,18 +46,6 @@ import be.cytomine.exceptions.CytomineMethodNotYetImplementedException;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.utils.GisUtils;
 import be.cytomine.utils.JsonObject;
-import org.locationtech.jts.geom.Geometry;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
-
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-
-import java.io.Serializable;
-import java.util.List;
-import java.util.Optional;
 
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
@@ -153,8 +160,7 @@ public abstract class AnnotationDomain extends CytomineDomain implements Seriali
 
             perimeter = (double)Math.round(this.location.getLength());
             perimeterUnit = GisUtils.PIXELv;
-        }
-        else {
+        } else {
             area = this.location.getArea() * image.getPhysicalSizeX() * image.getPhysicalSizeX();
             areaUnit = GisUtils.MICRON2v;
 
@@ -172,6 +178,7 @@ public abstract class AnnotationDomain extends CytomineDomain implements Seriali
     public static Optional<AnnotationDomain> findAnnotationDomain(EntityManager entityManager, Long id) {
         return Optional.ofNullable(getAnnotationDomain(entityManager, id, ""));
     }
+
     public static AnnotationDomain getAnnotationDomain(EntityManager entityManager, Long id) {
         return getAnnotationDomain(entityManager, id, "");
     }
@@ -199,18 +206,19 @@ public abstract class AnnotationDomain extends CytomineDomain implements Seriali
         }
 
         AnnotationDomain annotation;
-        if (domain!=null) {
-            annotation = (AnnotationDomain)entityManager.find(domain, id);
+        if (domain != null) {
+            annotation = (AnnotationDomain) entityManager.find(domain, id);
         } else {
             annotation = entityManager.find(UserAnnotation.class, id);
-            if (annotation==null) annotation = entityManager.find(ReviewedAnnotation.class, id);
+            if (annotation == null) {
+                annotation = entityManager.find(ReviewedAnnotation.class, id);
+            }
         }
 
-        if (annotation!=null) {
+        if (annotation != null) {
             return annotation;
-        }
-        else {
-            throw new ObjectNotFoundException("Annotation "+id+" not found");
+        } else {
+            throw new ObjectNotFoundException("Annotation " + id + " not found");
         }
     }
 

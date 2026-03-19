@@ -16,15 +16,16 @@ package be.cytomine.repositorynosql.social;
 * limitations under the License.
 */
 
-import be.cytomine.domain.social.PersistentConnection;
+import java.util.Date;
+import java.util.Optional;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
-import java.util.Optional;
+import be.cytomine.domain.social.PersistentConnection;
 
 /**
  * Spring Data JPA repository for the user entity.

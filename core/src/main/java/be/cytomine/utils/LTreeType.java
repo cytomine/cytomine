@@ -16,14 +16,14 @@ package be.cytomine.utils;
 * limitations under the License.
 */
 
-import org.hibernate.engine.spi.SharedSessionContractImplementor;
-import org.hibernate.usertype.UserType;
-
 import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.usertype.UserType;
 
 public class LTreeType implements UserType<String> {
     @Override
@@ -38,7 +38,7 @@ public class LTreeType implements UserType<String> {
 
     @Override
     public boolean equals(String s, String j1) {
-        return s!= null && s.equals(j1);
+        return s != null && s.equals(j1);
     }
 
     @Override
@@ -47,18 +47,28 @@ public class LTreeType implements UserType<String> {
     }
 
     @Override
-    public String nullSafeGet(ResultSet resultSet, int i, SharedSessionContractImplementor sharedSessionContractImplementor, Object o) throws SQLException {
+    public String nullSafeGet(
+        ResultSet resultSet,
+        int i,
+        SharedSessionContractImplementor sharedSessionContractImplementor,
+        Object o
+    ) throws SQLException {
         return resultSet.getString(i);
     }
 
     @Override
-    public void nullSafeSet(PreparedStatement preparedStatement, String s, int i, SharedSessionContractImplementor sharedSessionContractImplementor) throws SQLException {
+    public void nullSafeSet(
+        PreparedStatement preparedStatement,
+        String s,
+        int i,
+        SharedSessionContractImplementor sharedSessionContractImplementor
+    ) throws SQLException {
         preparedStatement.setObject(i, s, Types.OTHER);
     }
 
     @Override
     public String deepCopy(String s) {
-        if(s == null){
+        if (s == null) {
             return null;
         }
         return new String(s);

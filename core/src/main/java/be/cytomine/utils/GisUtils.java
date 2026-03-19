@@ -31,11 +31,10 @@ public class GisUtils {
     public static Integer MICRON2v = 3;
 
 
-    public static Map<Integer,String> unit =
-            Map.of(0, PIXEL,1, PIXELS2,2 ,MM,3 ,MICRON2);
+    public static Map<Integer, String> unit = Map.of(0, PIXEL, 1, PIXELS2, 2, MM, 3, MICRON2);
 
     public static String retrieveUnit(Integer value) {
-        return (value==null? null : unit.get(value));
+        return (value == null ? null : unit.get(value));
     }
 
 }

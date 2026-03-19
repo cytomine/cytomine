@@ -16,8 +16,22 @@ package be.cytomine.service.meta;
 * limitations under the License.
 */
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
+import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import be.cytomine.domain.CytomineDomain;
-import be.cytomine.domain.command.*;
+import be.cytomine.domain.command.AddCommand;
+import be.cytomine.domain.command.Command;
+import be.cytomine.domain.command.DeleteCommand;
+import be.cytomine.domain.command.EditCommand;
+import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.meta.Configuration;
 import be.cytomine.domain.meta.ConfigurationReadingRole;
 import be.cytomine.domain.security.User;
@@ -31,15 +45,6 @@ import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.Task;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import jakarta.transaction.Transactional;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -66,9 +71,9 @@ public class ConfigurationService extends ModelService {
     public List<Configuration> list() {
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.checkGuest(currentUser);
-        if(currentRoleService.isAdminByNow(currentUser)) {
+        if (currentRoleService.isAdminByNow(currentUser)) {
             return configurationRepository.findAll();
-        } else if(currentRoleService.isUser(currentUser)) {
+        } else if (currentRoleService.isUser(currentUser)) {
             return configurationRepository.findAllByReadingRoleIn(List.of(ConfigurationReadingRole.ALL, ConfigurationReadingRole.USER));
         } else {
             return configurationRepository.findAllByReadingRole(ConfigurationReadingRole.ALL);
@@ -82,18 +87,19 @@ public class ConfigurationService extends ModelService {
         return config;
     }
 
-    private void checkPermission(Configuration config){
+    private void checkPermission(Configuration config) {
         User currentUser = currentUserService.getCurrentUser();
-        if(config.getReadingRole().equals(ConfigurationReadingRole.ALL)) {
+        if (config.getReadingRole().equals(ConfigurationReadingRole.ALL)) {
             return;
         }
-        if(currentRoleService.isAdminByNow(currentUser)) {
+        if (currentRoleService.isAdminByNow(currentUser)) {
             return;
         }
-        if(currentRoleService.isUser(currentUser)  && config.getReadingRole().equals(ConfigurationReadingRole.USER)) {
+        if (currentRoleService.isUser(currentUser)  && config.getReadingRole().equals(ConfigurationReadingRole.USER)) {
             return;
         }
-        else throw new ForbiddenException("You don't have the right to read this resource!");
+
+        throw new ForbiddenException("You don't have the right to read this resource!");
     }
 
     @Override

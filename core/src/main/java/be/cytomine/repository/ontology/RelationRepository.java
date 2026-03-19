@@ -16,10 +16,11 @@ package be.cytomine.repository.ontology;
 * limitations under the License.
 */
 
-import be.cytomine.domain.ontology.Relation;
-import be.cytomine.domain.ontology.RelationTerm;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+
+import be.cytomine.domain.ontology.Relation;
+import be.cytomine.domain.ontology.RelationTerm;
 
 public interface RelationRepository extends JpaRepository<Relation, Long>, JpaSpecificationExecutor<Relation>  {
 

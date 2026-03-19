@@ -16,9 +16,24 @@ package be.cytomine.domain;
 * limitations under the License.
 */
 
-import be.cytomine.domain.security.User;
-import be.cytomine.utils.DateUtils;
-import be.cytomine.utils.JsonObject;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Version;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
@@ -26,13 +41,9 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import jakarta.persistence.*;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
-import java.util.*;
-import java.util.stream.Collectors;
+import be.cytomine.domain.security.User;
+import be.cytomine.utils.DateUtils;
+import be.cytomine.utils.JsonObject;
 
 @Getter
 @Setter
@@ -67,7 +78,9 @@ public abstract class CytomineDomain {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
+        if (this == o) {
+            return true;
+        }
         if (o == null) { //we do not compare class type as hibernate proxy is a different class
             return false;
         }

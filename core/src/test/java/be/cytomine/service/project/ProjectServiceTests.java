@@ -16,16 +16,27 @@ package be.cytomine.service.project;
 * limitations under the License.
 */
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
-import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.common.PostGisTestConfiguration;
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.time.DateUtils;
 import org.assertj.core.api.AssertionsForClassTypes;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,11 +45,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithMockUser;
 
-import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.client.WireMock;
-
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
+import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.meta.AttachedFile;
 import be.cytomine.domain.meta.Description;
 import be.cytomine.domain.meta.Property;
@@ -86,6 +96,9 @@ public class ProjectServiceTests {
 
     @Autowired
     ProjectService projectService;
+
+    @Autowired
+    BasicInstanceBuilder basicInstanceBuilder;
 
     @Autowired
     BasicInstanceBuilder builder;
@@ -704,7 +717,7 @@ public class ProjectServiceTests {
 
     @Test
     void add_project() {
-        Project project = BasicInstanceBuilder.given_a_not_persisted_project();
+        Project project = basicInstanceBuilder.given_a_not_persisted_project();
 
         CommandResponse commandResponse = projectService.add(project.toJsonObject());
 
@@ -723,7 +736,7 @@ public class ProjectServiceTests {
 
     @Test
     void add_project_with_users_and_admins() {
-        Project project = BasicInstanceBuilder.given_a_not_persisted_project();
+        Project project = basicInstanceBuilder.given_a_not_persisted_project();
         project.setOntology(builder.given_an_ontology());
         User user = builder.given_a_user();
         User admin = builder.given_a_user();
@@ -934,7 +947,7 @@ public class ProjectServiceTests {
 
     @Test
     void delete_project_just_beeing_created() {
-        Project project = BasicInstanceBuilder.given_a_not_persisted_project();
+        Project project = basicInstanceBuilder.given_a_not_persisted_project();
 
         CommandResponse commandResponse = projectService.add(project.toJsonObject());
 

@@ -16,6 +16,19 @@ package be.cytomine.service.utils;
 * limitations under the License.
 */
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
+import jakarta.persistence.Tuple;
+import lombok.AllArgsConstructor;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKTReader;
+import org.springframework.stereotype.Service;
+
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.security.User;
@@ -23,18 +36,6 @@ import be.cytomine.dto.Kmeans;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.image.SliceInstanceRepository;
 import be.cytomine.service.ontology.AnnotationIndexService;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.io.ParseException;
-import org.locationtech.jts.io.WKTReader;
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
-
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.Query;
-import jakarta.persistence.Tuple;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 @Service
 @AllArgsConstructor
@@ -151,14 +152,21 @@ public class KmeansGeometryService {
     }
 
     public Integer getRuleForNumberOfAnnotations(long annotations, Map<Integer, Integer> ruleLine) {
-        if (annotations >= ANNOTATIONSIZE5) return ruleLine.get(ANNOTATIONSIZE5);
-        if (annotations >= ANNOTATIONSIZE4) return ruleLine.get(ANNOTATIONSIZE4);
-        if (annotations >= ANNOTATIONSIZE3) return ruleLine.get(ANNOTATIONSIZE3);
-        if (annotations >= ANNOTATIONSIZE2) return ruleLine.get(ANNOTATIONSIZE2);
-        if (annotations >= ANNOTATIONSIZE1) return ruleLine.get(ANNOTATIONSIZE1);
+        if (annotations >= ANNOTATIONSIZE5) {
+            return ruleLine.get(ANNOTATIONSIZE5);
+        }
+        if (annotations >= ANNOTATIONSIZE4) {
+            return ruleLine.get(ANNOTATIONSIZE4);
+        }
+        if (annotations >= ANNOTATIONSIZE3) {
+            return ruleLine.get(ANNOTATIONSIZE3);
+        }
+        if (annotations >= ANNOTATIONSIZE2) {
+            return ruleLine.get(ANNOTATIONSIZE2);
+        }
+        if (annotations >= ANNOTATIONSIZE1) {
+            return ruleLine.get(ANNOTATIONSIZE1);
+        }
         throw new WrongArgumentException("Cannot find rule for annotations count = " + annotations);
     }
-
-
-
 }

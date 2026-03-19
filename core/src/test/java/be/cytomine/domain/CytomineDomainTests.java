@@ -16,12 +16,11 @@ package be.cytomine.domain;
 * limitations under the License.
 */
 
-import be.cytomine.BasicInstanceBuilder;
-import be.cytomine.CytomineCoreApplication;
-import be.cytomine.config.CustomIdentifierGenerator;
-import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.domain.ontology.Ontology;
+import java.util.Date;
+import java.util.UUID;
+
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -29,11 +28,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 
-import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
-
-import java.util.Date;
-import java.util.UUID;
+import be.cytomine.BasicInstanceBuilder;
+import be.cytomine.CytomineCoreApplication;
+import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.CustomIdentifierGenerator;
+import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.domain.ontology.Ontology;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -45,6 +45,9 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 public class CytomineDomainTests {
 
     @Autowired
+    BasicInstanceBuilder basicInstanceBuilder;
+
+    @Autowired
     BasicInstanceBuilder builder;
 
     @Autowired
@@ -52,7 +55,7 @@ public class CytomineDomainTests {
 
     @Test
     void assign_id_automatically() {
-        Ontology ontology = BasicInstanceBuilder.given_a_not_persisted_ontology();
+        Ontology ontology = basicInstanceBuilder.given_a_not_persisted_ontology();
         assertThat(ontology.getId()).isNull();
         ontology = builder.persistAndReturn(ontology);
         assertThat(ontology.getId()).isPositive();
@@ -61,7 +64,7 @@ public class CytomineDomainTests {
     @Test
     void assign_created_date() {
         Date beforeCreate = new Date();
-        Ontology ontology = BasicInstanceBuilder.given_a_not_persisted_ontology();
+        Ontology ontology = basicInstanceBuilder.given_a_not_persisted_ontology();
         assertThat(ontology.getCreated()).isNull();
         ontology = builder.persistAndReturn(ontology);
         Date afterCreate = new Date();
@@ -71,7 +74,7 @@ public class CytomineDomainTests {
     @Test
     void assign_updated_date() {
         Date beforeCreate = new Date();
-        Ontology ontology = BasicInstanceBuilder.given_a_not_persisted_ontology();
+        Ontology ontology = basicInstanceBuilder.given_a_not_persisted_ontology();
         assertThat(ontology.getUpdated()).isNull();
         ontology = builder.persistAndReturn(ontology);
         Date afterCreate = new Date();
@@ -88,7 +91,7 @@ public class CytomineDomainTests {
     @Test
     void preserve_preassigned_id() {
         Long preassignedId = 999999999L;
-        Ontology ontology = BasicInstanceBuilder.given_a_not_persisted_ontology();
+        Ontology ontology = basicInstanceBuilder.given_a_not_persisted_ontology();
         ontology.setId(preassignedId);
         assertThat(ontology.getId()).isEqualTo(preassignedId);
         ontology = builder.persistAndReturn(ontology);

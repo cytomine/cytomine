@@ -58,7 +58,11 @@ public class RestNestedImageInstanceController extends RestCytomineController {
     }
 
     @PutMapping("/imageinstance/{imageInstanceId}/nested/{id}.json")
-    public ResponseEntity<String> edit(@PathVariable Long imageInstanceId, @PathVariable String id, @RequestBody JsonObject json) {
+    public ResponseEntity<String> edit(
+        @PathVariable Long imageInstanceId,
+        @PathVariable String id,
+        @RequestBody JsonObject json
+    ) {
         log.debug("REST request to edit nested image instance : " + id);
         return update(nestedImageInstanceService, json);
     }

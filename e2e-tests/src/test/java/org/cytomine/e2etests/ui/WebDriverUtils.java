@@ -2,8 +2,6 @@ package org.cytomine.e2etests.ui;
 
 import lombok.SneakyThrows;
 import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -20,7 +18,14 @@ public class WebDriverUtils {
 
     void byClick(Wait<WebDriver> wait, By by) {
         waitLoading(wait);
-        wait.until(ExpectedConditions.elementToBeClickable(by)).click();
+        wait.until(d -> {
+            try {
+                ExpectedConditions.elementToBeClickable(by).apply(d).click();
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        });
     }
 
     void bySendKeys(Wait<WebDriver> wait, By by, String keys) {
@@ -35,7 +40,7 @@ public class WebDriverUtils {
             try {
                 d.findElement(by).sendKeys(keys);
                 return true;
-            } catch (NoSuchElementException | StaleElementReferenceException e) {
+            } catch (Exception e) {
                 return false;
             }
         });
@@ -44,8 +49,12 @@ public class WebDriverUtils {
     void goTo(Wait<WebDriver> wait, String url) {
         wait.until(
             d -> {
-                d.get(url);
-                return true;
+                try {
+                    d.get(url);
+                    return true;
+                } catch (Exception e) {
+                    return false;
+                }
             });
     }
 
@@ -53,7 +62,13 @@ public class WebDriverUtils {
     boolean byIsDisplayed(Wait<WebDriver> wait, By by) {
         Thread.sleep(500);
         waitLoading(wait);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(by));
+        wait.until(d -> {
+            try {
+                return ExpectedConditions.visibilityOfElementLocated(by);
+            } catch (Exception e) {
+                return false;
+            }
+        });
         return true;
     }
 
@@ -68,7 +83,13 @@ public class WebDriverUtils {
     }
 
     void waitUntilByEmpty(Wait<WebDriver> wait, By by) {
-        wait.until(d -> d.findElements(by).isEmpty());
+        wait.until(d -> {
+            try {
+                return d.findElements(by).isEmpty();
+            } catch (Exception e) {
+                return false;
+            }
+        });
     }
 
     WebElement waitForCanvasReady(Wait<WebDriver> wait, By canvasLocator) {
@@ -85,7 +106,7 @@ public class WebDriverUtils {
                     return null;
                 }
                 return canvas;
-            } catch (NoSuchElementException | StaleElementReferenceException e) {
+            } catch (Exception e) {
                 return null;
             }
         });

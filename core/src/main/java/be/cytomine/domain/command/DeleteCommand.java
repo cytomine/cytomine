@@ -35,13 +35,13 @@ import be.cytomine.utils.CommandResponse;
 public class DeleteCommand extends Command {
 
 
-
     public DeleteCommand(User currentUser, Transaction transaction) {
         this.user = currentUser;
         this.transaction = transaction;
     }
 
-    public DeleteCommand() {}
+    public DeleteCommand() {
+    }
 
     @Transient
     Object backup;
@@ -53,6 +53,7 @@ public class DeleteCommand extends Command {
 
     /**
      * Process an Add operation for this command
+     *
      * @return Message
      */
     public CommandResponse execute(ModelService service) {
@@ -60,8 +61,8 @@ public class DeleteCommand extends Command {
         CytomineDomain oldDomain = domain;
         //Init command info
         CytomineDomain container = oldDomain.container();
-        if(container!=null && container instanceof Project && linkProject) {
-            super.setProject((Project)container);
+        if (container != null && container instanceof Project && linkProject) {
+            super.setProject((Project) container);
         }
         CommandResponse response = service.destroy(oldDomain, printMessage);
         fillCommandInfoJSON(backup.toString(), response.getData().get("message").toString());

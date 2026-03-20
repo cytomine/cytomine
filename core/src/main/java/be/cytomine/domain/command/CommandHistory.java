@@ -71,8 +71,10 @@ public class CommandHistory extends CytomineDomain {
 
     public static JsonObject getDataFromDomain(CytomineDomain domain) {
         JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
-        CommandHistory commandHistory = (CommandHistory)domain;
-        returnArray.put("command", commandHistory.getCommand()!=null? commandHistory.getCommand().toJsonObject() : null);
+        CommandHistory commandHistory = (CommandHistory) domain;
+        returnArray.put(
+            "command", commandHistory.getCommand() != null ? commandHistory.getCommand().toJsonObject() : null
+        );
         returnArray.put("prefixAction", commandHistory.prefixAction);
         returnArray.put("user", commandHistory.user);
         return returnArray;

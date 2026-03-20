@@ -103,6 +103,10 @@ jobs:
         if: always()
         run: kubectl --namespace=cytomine-${{ github.sha }} logs e2e-tests -c e2e-tests
 
+      - name: Logs e2e tests results - selenium
+        if: always()
+        run: kubectl --namespace=cytomine-${{ github.sha }} logs e2e-tests -c selenium
+
       - name: Export test results
         if: always()
         run: |

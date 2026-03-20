@@ -2,7 +2,6 @@ package org.cytomine.e2etests.ui;
 
 import lombok.SneakyThrows;
 import org.openqa.selenium.By;
-import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
@@ -21,19 +20,7 @@ public class WebDriverUtils {
 
     void byClick(Wait<WebDriver> wait, By by) {
         waitLoading(wait);
-        wait.until(d -> {
-            try {
-                WebElement element = d.findElement(by);
-                if (!element.isDisplayed()) {
-                    return false;
-                }
-                element.click();
-                return true;
-            } catch (ElementClickInterceptedException | NoSuchElementException
-                     | StaleElementReferenceException e) {
-                return false;
-            }
-        });
+        wait.until(ExpectedConditions.elementToBeClickable(by)).click();
     }
 
     void bySendKeys(Wait<WebDriver> wait, By by, String keys) {

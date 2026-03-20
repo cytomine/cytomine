@@ -131,6 +131,8 @@ public class CytomineSteps {
     public void deleteImage(Wait<WebDriver> wait, URL cytomineUrl,
                             String imageName) {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/storage");
+        Thread.sleep(2000);
+        webDriverUtils.waitLoading(wait);
         webDriverUtils.byIsDisplayed(wait, By.xpath(
             "//div[contains(@class,'uploaded-files-list')]//span[@data-filename='" + imageName
                 + "']"));
@@ -165,12 +167,17 @@ public class CytomineSteps {
             "//span[contains(@class, 'ontology-term') and contains(text(), '" + termName + "')]"));
     }
 
+    @SneakyThrows
     public void openImageInViewer(Wait<WebDriver> wait, WebDriver driver, String projectURL) {
         webDriverUtils.goTo(wait, projectURL);
         webDriverUtils.xpathClick(wait, "//li//a[.//i[contains(@class, 'fa-image')]]");
         Wait<WebDriver> longWait = new WebDriverWait(driver, Duration.ofSeconds(60));
+        Thread.sleep(2000);
+        webDriverUtils.waitLoading(longWait);
         webDriverUtils.byIsDisplayed(longWait, By.xpath("//td//a[contains(@href, '/image/')]"));
         webDriverUtils.xpathClick(wait, "//td//a[contains(@href, '/image/')]");
+        Thread.sleep(1000);
+        webDriverUtils.waitLoading(longWait);
         webDriverUtils.byIsDisplayed(longWait, By.cssSelector(".draw-tools-wrapper"));
     }
 

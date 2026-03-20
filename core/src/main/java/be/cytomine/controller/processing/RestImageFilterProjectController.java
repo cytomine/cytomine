@@ -40,7 +40,7 @@ public class RestImageFilterProjectController extends RestCytomineController {
     ) {
         log.debug("REST request to list imagefilterproject for project {}", id);
         return projectService.find(id)
-                .map( project -> responseSuccess(imageFilterProjectService.list(project)))
+                .map(project -> responseSuccess(imageFilterProjectService.list(project)))
                 .orElseThrow(() -> new ObjectNotFoundException("Project", id));
     }
 

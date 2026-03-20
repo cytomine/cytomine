@@ -73,7 +73,9 @@ public class TaskRunLayer extends CytomineDomain {
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
         TaskRunLayer taskRunLayer = this;
         taskRunLayer.id = json.getJSONAttrLong("id", null);
-        taskRunLayer.annotationLayer = (AnnotationLayer) json.getJSONAttrDomain(entityManager, "annotationLayer", new AnnotationLayer(), true);
+        taskRunLayer.annotationLayer = (AnnotationLayer) json.getJSONAttrDomain(
+            entityManager, "annotationLayer", new AnnotationLayer(), true
+        );
         taskRunLayer.taskRun = (TaskRun) json.getJSONAttrDomain(entityManager, "taskRun", new TaskRun(), true);
         taskRunLayer.image = (ImageInstance) json.getJSONAttrDomain(entityManager, "image", new ImageInstance(), true);
         taskRunLayer.created = json.getJSONAttrDate("created");

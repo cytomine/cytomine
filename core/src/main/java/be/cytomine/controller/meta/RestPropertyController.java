@@ -105,7 +105,9 @@ public class RestPropertyController extends RestCytomineController {
             @RequestParam(value = "idImage", required = false) Long imageInstanceId,
             @RequestParam(value = "user", required = false, defaultValue = "false") Boolean withUser
     ) {
-        log.debug("REST request to list keys for project {} image {} and withUser {}", projectId, imageInstanceId, withUser);
+        log.debug(
+            "REST request to list keys for project {} image {} and withUser {}", projectId, imageInstanceId, withUser
+        );
         if (projectId != null) {
             Project project = projectService.find(projectId)
                     .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
@@ -144,7 +146,7 @@ public class RestPropertyController extends RestCytomineController {
         User user = userService.find(userId)
                 .orElseThrow(() -> new ObjectNotFoundException("User", userId));
         Geometry boundingbox = null;
-        if (bbox!=null) {
+        if (bbox != null) {
             boundingbox = GeometryUtils.createBoundingBox(bbox);
         }
         return responseSuccess(propertyService.listAnnotationCenterPosition(user, imageInstance, boundingbox, key));
@@ -268,8 +270,8 @@ public class RestPropertyController extends RestCytomineController {
         } catch (Exception ex) {
             try {
                 data = new ObjectMapper().readValue(json, JsonSingleObject.class);
-                ((JsonSingleObject)data).putIfAbsent("domainClassName", domainClassName);
-                ((JsonSingleObject)data).putIfAbsent("domainIdent", domainIdent);
+                ((JsonSingleObject) data).putIfAbsent("domainClassName", domainClassName);
+                ((JsonSingleObject) data).putIfAbsent("domainIdent", domainIdent);
             } catch (JsonProcessingException e) {
                 throw new WrongArgumentException("Json not valid");
             }

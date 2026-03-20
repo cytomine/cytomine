@@ -38,13 +38,15 @@ public class EditCommand extends Command {
         this.transaction = transaction;
     }
 
-    public EditCommand() {}
+    public EditCommand() {
+    }
 
     /**
      * Add command info for the new domain concerned by the command
+     *
      * @param newObject domain after update
      * @param oldObject domain before update
-     * @param message Message build for the command
+     * @param message   Message build for the command
      */
     protected void fillCommandInfo(CytomineDomain newObject, String oldObject, String message) {
         HashMap<String, Object> paramsData = new HashMap<String, Object>();
@@ -56,6 +58,7 @@ public class EditCommand extends Command {
 
     /**
      * Get domain name
+     *
      * @return domaine name
      */
     public String domainName() {
@@ -65,6 +68,7 @@ public class EditCommand extends Command {
 
     /**
      * Process an Add operation for this command
+     *
      * @return Message
      */
     public CommandResponse execute(ModelService service) {
@@ -74,11 +78,11 @@ public class EditCommand extends Command {
         updatedDomain.buildDomainFromJson(json, service.getEntityManager());
         //Init command info TODO
         CytomineDomain container = updatedDomain.container();
-        if(container!=null && container instanceof Project) {
-            super.setProject((Project)container);
+        if (container != null && container instanceof Project) {
+            super.setProject((Project) container);
         }
         CommandResponse response = service.edit(updatedDomain, printMessage);
-        fillCommandInfo(updatedDomain, oldDomain, (String)response.getData().get("message"));
+        fillCommandInfo(updatedDomain, oldDomain, (String) response.getData().get("message"));
         return response;
     }
 }

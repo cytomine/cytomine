@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import be.cytomine.domain.social.PersistentUserPosition;
 
+@SuppressWarnings("checkstyle:all") // This file will be refactored in https://github.com/cytomine/cytomine/issues/625
 @Repository
 public interface PersistentUserPositionRepository extends MongoRepository<PersistentUserPosition, Long> {
 

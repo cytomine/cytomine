@@ -28,7 +28,8 @@ import be.cytomine.utils.CommandResponse;
 /**
  * @author Cytomine Team
  * The AddCommand class is a command that create a new domain
- * It provide an execute method that create domain from command, an undo method that drop domain and an redo method that recreate domain
+ * It provide an execute method that create domain from command,
+ * an undo method that drop domain and an redo method that recreate domain
  */
 @Entity
 @DiscriminatorValue("be.cytomine.domain.command.AddCommand")
@@ -49,6 +50,7 @@ public class AddCommand extends Command {
 
     /**
      * Process an Add operation for this command
+     *
      * @return Message
      */
     public CommandResponse execute(ModelService service) {
@@ -59,11 +61,11 @@ public class AddCommand extends Command {
         CommandResponse response = service.create(newDomain, printMessage);
         //Init command domain
         newDomain = response.getObject();
-        fillCommandInfo(newDomain, (String)response.getData().get("message"));
+        fillCommandInfo(newDomain, (String) response.getData().get("message"));
         if (newDomain != null) {
             CytomineDomain container = newDomain.container();
-            if(container!=null && container instanceof Project) {
-                super.setProject((Project)container);
+            if (container != null && container instanceof Project) {
+                super.setProject((Project) container);
             }
         }
 

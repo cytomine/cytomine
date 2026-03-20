@@ -40,8 +40,7 @@ import be.cytomine.utils.JsonObject;
 @Getter
 @Setter
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name="class",
-        discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorColumn(name = "class", discriminatorType = DiscriminatorType.STRING)
 public abstract class Command extends CytomineDomain {
 
     /**
@@ -107,13 +106,14 @@ public abstract class Command extends CytomineDomain {
     protected boolean refuseUndo = false;
 
     public String toString() {
-        return this.getClass().getSimpleName() +" "+this.id + "[" + this.created + "]";
+        return this.getClass().getSimpleName() + " " + this.id + "[" + this.created + "]";
     }
 
     /**
      * Add command info for the new domain concerned by the command
+     *
      * @param newObject New domain
-     * @param message Message build for the command
+     * @param message   Message build for the command
      */
     protected void fillCommandInfo(CytomineDomain newObject, String message) {
         data = newObject.toJSON();
@@ -122,8 +122,9 @@ public abstract class Command extends CytomineDomain {
 
     /**
      * Add command info for the new domain concerned by the command
+     *
      * @param newObject New json domain
-     * @param message Message build for the command
+     * @param message   Message build for the command
      */
     protected void fillCommandInfoJSON(String newObject, String message) {
         data = newObject;
@@ -134,15 +135,18 @@ public abstract class Command extends CytomineDomain {
 
     /**
      * Define fields available for JSON response
+     *
      * @param domain Domain source for json value
      * @return Map with fields (keys) and their values
      */
     public static JsonObject getDataFromDomain(CytomineDomain domain) {
         JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
-        Command command = (Command)domain;
+        Command command = (Command) domain;
         returnArray.put("CLASSNAME", domain.getClass().getSimpleName());
         returnArray.put("serviceName", ((Command) domain).getServiceName());
-        returnArray.put("action", command.getActionMessage()  + " by " + (command.getUser() != null ? command.getUser().getUsername() : ""));
+        returnArray.put("action",
+            command.getActionMessage() + " by " + (command.getUser() != null ? command.getUser().getUsername() : "")
+        );
         returnArray.put("data", command.getData());
         returnArray.put("user", command.getUser().getId());
         String type = "UNKNOWN";

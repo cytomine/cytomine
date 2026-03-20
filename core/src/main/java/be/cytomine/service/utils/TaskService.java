@@ -36,6 +36,7 @@ import be.cytomine.utils.TaskComment;
 
 import static org.springframework.security.acls.domain.BasePermission.READ;
 
+@SuppressWarnings("checkstyle:all") // This file will be refactored in https://github.com/cytomine/cytomine/issues/625
 @Service
 @Transactional
 public class TaskService {

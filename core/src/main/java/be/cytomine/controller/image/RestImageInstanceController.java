@@ -285,7 +285,9 @@ public class RestImageInstanceController extends RestCytomineController {
             .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", id));
 
         String etag = getRequestETag();
-        return imageServerService.thumb(sliceCoordinatesService.getReferenceSlice(imageInstance.getBaseImage()), previewParameter, etag, proxy);
+        return imageServerService.thumb(
+            sliceCoordinatesService.getReferenceSlice(imageInstance.getBaseImage()), previewParameter, etag, proxy
+        );
     }
 
 
@@ -401,7 +403,7 @@ public class RestImageInstanceController extends RestCytomineController {
         CropParameter cropParameter = new CropParameter();
         cropParameter.setGeometry(geometry);
         cropParameter.setLocation(location);
-//        cropParameter.setBoundaries(boundaries);
+        // cropParameter.setBoundaries(boundaries);
         cropParameter.setMaxSize(maxSize);
         cropParameter.setComplete(complete);
         cropParameter.setZoom(zoom);

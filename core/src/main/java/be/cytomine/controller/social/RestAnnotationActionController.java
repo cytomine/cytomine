@@ -58,9 +58,15 @@ public class RestAnnotationActionController extends RestCytomineController {
             @RequestBody JsonObject json
     ) {
         log.debug("REST request add annotation action");
-        AnnotationDomain annotationDomain = annotationDomainRepository.findById(json.getJSONAttrLong("annotationIdent", 0L))
-                .orElseThrow(() -> new ObjectNotFoundException("Annotation", json.getJSONAttrStr("annotationIdent")));
-        return responseSuccess(annotationActionService.add(annotationDomain, currentUserService.getCurrentUser(), json.getJSONAttrStr("action"), new Date()));
+        AnnotationDomain annotationDomain = annotationDomainRepository.findById(
+                json.getJSONAttrLong("annotationIdent", 0L)
+            )
+            .orElseThrow(() -> new ObjectNotFoundException("Annotation", json.getJSONAttrStr("annotationIdent")));
+        return responseSuccess(
+            annotationActionService.add(
+                annotationDomain, currentUserService.getCurrentUser(), json.getJSONAttrStr("action"), new Date()
+            )
+        );
     }
 
     @GetMapping("/imageinstance/{image}/annotation_action.json")
@@ -74,7 +80,7 @@ public class RestAnnotationActionController extends RestCytomineController {
                         .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", imageId));
 
         User user = null;
-        if (userId!=null) {
+        if (userId != null) {
             user = userService.findUser(userId)
                     .orElseThrow(() -> new ObjectNotFoundException("User", userId));
         }
@@ -92,7 +98,7 @@ public class RestAnnotationActionController extends RestCytomineController {
                 .orElseThrow(() -> new ObjectNotFoundException("SliceInstance", sliceId));
 
         User user = null;
-        if (userId!=null) {
+        if (userId != null) {
             user = userService.findUser(userId)
                     .orElseThrow(() -> new ObjectNotFoundException("User", userId));
         }
@@ -108,6 +114,8 @@ public class RestAnnotationActionController extends RestCytomineController {
         Project project = projectService.find(projectId)
                 .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
 
-        return responseSuccess(JsonObject.of("total", annotationActionService.countByProject(project, startDate, endDate)));
+        return responseSuccess(
+            JsonObject.of("total", annotationActionService.countByProject(project, startDate, endDate))
+        );
     }
 }

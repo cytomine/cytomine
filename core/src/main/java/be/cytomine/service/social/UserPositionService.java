@@ -1,8 +1,5 @@
 package be.cytomine.service.social;
 
-// CHECKSTYLE:OFF
-// TODO: This file will be refactored - see https://github.com/cytomine/cytomine/issues/625
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -61,6 +58,7 @@ import static java.util.stream.Collectors.toSet;
 import static org.springframework.security.acls.domain.BasePermission.READ;
 import static org.springframework.security.acls.domain.BasePermission.WRITE;
 
+@SuppressWarnings("checkstyle:all") // This file will be refactored in https://github.com/cytomine/cytomine/issues/625
 @Slf4j
 @RequiredArgsConstructor
 @Service

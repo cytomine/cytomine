@@ -1,8 +1,5 @@
 package be.cytomine.service.ontology;
 
-// CHECKSTYLE:OFF
-// TODO: This file will be refactored - see https://github.com/cytomine/cytomine/issues/625
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -55,6 +52,7 @@ import be.cytomine.utils.Task;
 
 import static org.springframework.security.acls.domain.BasePermission.READ;
 
+@SuppressWarnings("checkstyle:all") // This file will be refactored in https://github.com/cytomine/cytomine/issues/625
 @Slf4j
 @Service
 @Transactional

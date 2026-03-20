@@ -1,8 +1,5 @@
 package be.cytomine.repository.project;
 
-// CHECKSTYLE:OFF
-// TODO: This file will be refactored - see https://github.com/cytomine/cytomine/issues/625
-
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +16,7 @@ import be.cytomine.domain.security.User;
 import be.cytomine.dto.DatedCytomineDomain;
 import be.cytomine.dto.NamedCytomineDomain;
 
+@SuppressWarnings("checkstyle:all") // This file will be refactored in https://github.com/cytomine/cytomine/issues/625
 @Repository
 public interface ProjectRepository extends JpaRepository<Project, Long>  {
 

@@ -98,19 +98,27 @@ spec:
               containerPort: {{ .Values.repository.port }}
           resources:
             {{- toYaml .Values.repository.resources | nindent 12 }}
+          startupProbe:
+            httpGet:
+              path: /ping
+              port: {{ .Values.repository.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 30
+            timeoutSeconds: 5
           livenessProbe:
             httpGet:
               path: /ping
               port: {{ .Values.repository.port }}
-            initialDelaySeconds: 30
-            failureThreshold: 10
+            periodSeconds: 10
+            failureThreshold: 3
             timeoutSeconds: 5
           readinessProbe:
             httpGet:
               path: /ping
               port: {{ .Values.repository.port }}
-            initialDelaySeconds: 30
-            failureThreshold: 10
+            periodSeconds: 10
+            failureThreshold: 3
             timeoutSeconds: 5
       {{- with .Values.global.tolerations }}
       tolerations:

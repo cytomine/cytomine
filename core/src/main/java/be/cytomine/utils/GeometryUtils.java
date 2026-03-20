@@ -25,7 +25,7 @@ public class GeometryUtils {
         double minY = Double.parseDouble(coordinates[1]);
         double maxX = Double.parseDouble(coordinates[2]);
         double maxY = Double.parseDouble(coordinates[3]);
-        return GeometryUtils.createBoundingBox(minX, maxX, minY , maxY);
+        return GeometryUtils.createBoundingBox(minX, maxX, minY, maxY);
     }
 
     public static Geometry createBoundingBox(double minX, double maxX, double minY, double maxY) {
@@ -44,16 +44,16 @@ public class GeometryUtils {
         if (geometry.getNumPoints() > 1) {
             Envelope env = geometry.getEnvelopeInternal();
             BoundariesCropParameter cropParameter = new BoundariesCropParameter();
-            cropParameter.setTopLeftX((int)Math.round(env.getMinX()));
-            cropParameter.setTopLeftY((int)Math.round(env.getMaxY()));
-            cropParameter.setWidth((int)env.getWidth());
-            cropParameter.setHeight((int)env.getHeight());
+            cropParameter.setTopLeftX((int) Math.round(env.getMinX()));
+            cropParameter.setTopLeftY((int) Math.round(env.getMaxY()));
+            cropParameter.setWidth((int) env.getWidth());
+            cropParameter.setHeight((int) env.getHeight());
             return cropParameter;
         } else if (geometry.getNumPoints() == 1) {
             Envelope env = geometry.getEnvelopeInternal();
             BoundariesCropParameter cropParameter = new BoundariesCropParameter();
-            cropParameter.setTopLeftX((int)Math.round(env.getMinX() - 50));
-            cropParameter.setTopLeftY((int)Math.round(env.getMaxY() + 50));
+            cropParameter.setTopLeftX((int) Math.round(env.getMinX() - 50));
+            cropParameter.setTopLeftY((int) Math.round(env.getMaxY() + 50));
             cropParameter.setWidth(100);
             cropParameter.setHeight(100);
             return cropParameter;
@@ -64,6 +64,7 @@ public class GeometryUtils {
 
     /**
      * Fill polygon to complete empty space inside polygon/mulypolygon
+     *
      * @param polygon A polygon or multipolygon wkt polygon
      * @return A polygon or multipolygon filled points
      */
@@ -78,6 +79,7 @@ public class GeometryUtils {
 
     /**
      * Fill all polygon inside a Multipolygon WKT polygon
+     *
      * @param form Multipolygon WKT polygon
      * @return Multipolygon with all its polygon filled
      */
@@ -92,7 +94,7 @@ public class GeometryUtils {
         //"((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2)),((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2)),((6 3,9 2,9 4,6 3))";
         String[] polygons = workingForm.split("\\)\\)\\,\\(\\(");
         //"[ ((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2] [1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2] [6 3,9 2,9 4,6 3)) ]";
-        List<String> fixedPolygon = new ArrayList<String>();
+        List<String> fixedPolygon = new ArrayList<>();
         for (int i = 0; i < polygons.length; i++) {
             if (i == 0) {
                 fixedPolygon.add(polygons[i] + "))");
@@ -104,7 +106,7 @@ public class GeometryUtils {
             //"[ ((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2))] [((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2))] [((6 3,9 2,9 4,6 3)) ]";
         }
 
-        List<String> filledPolygon = new ArrayList<String>();
+        List<String> filledPolygon = new ArrayList<>();
         for (int i = 0; i < fixedPolygon.size(); i++) {
             filledPolygon.add("(" + getFirstPolygonLocation(fixedPolygon.get(i)) + ")");
             //"[ ((1 1,5 1,5 5,1 5,1 1))] [((1 1,5 1,5 5,1 5,1 1))] [((6 3,9 2,9 4,6 3)) ]";
@@ -117,12 +119,14 @@ public class GeometryUtils {
 
     /**
      * Fill a polygon
+     *
      * @param polygon Polygon as wkt
      * @return Polygon filled points
      */
     private static String getFirstPolygonLocation(String polygon) {
         int i = 0;
-        int start, stop;
+        int start;
+        int stop;
         while (polygon.charAt(i) != '(') {
             i++;
         }

@@ -25,14 +25,16 @@ public class RequestParams extends HashMap<String, String> {
     }
 
     public boolean isNull(String key) {
-        return get(key)==null;
+        return get(key) == null;
     }
 
     public boolean isValue(String key, String value) {
         return !isNull(key) && get(key).equals(value);
     }
 
-    public boolean getWithImageGroup() { return get("withImageGroup").equals("true"); }
+    public boolean getWithImageGroup() {
+        return get("withImageGroup").equals("true");
+    }
 
     public Long getOffset() {
         return Long.parseLong(get("offset"));

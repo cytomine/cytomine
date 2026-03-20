@@ -34,10 +34,10 @@ import be.cytomine.utils.JsonObject;
 
 import static org.springframework.security.acls.domain.BasePermission.READ;
 
-@RestController
-@RequestMapping("/api")
 @Slf4j
 @RequiredArgsConstructor
+@RequestMapping("/api")
+@RestController
 public class RestAnnotationTermController extends RestCytomineController {
 
     private final AnnotationTermService annotationTermService;
@@ -58,20 +58,20 @@ public class RestAnnotationTermController extends RestCytomineController {
 
     @GetMapping("/annotation/{idAnnotation}/term.json")
     public ResponseEntity<String> listByAnnotation(
-            @PathVariable Long idAnnotation,
-            @RequestParam(value = "idUser", required = false) Long idUser
+        @PathVariable Long idAnnotation,
+        @RequestParam(value = "idUser", required = false) Long idUser
     ) {
         log.debug("REST request to list terms for annotation {}", idAnnotation);
         List results = new ArrayList<>();
         AnnotationDomain annotation = annotationDomainRepository.findById(idAnnotation)
-                .orElseThrow(() -> new ObjectNotFoundException("Annotation", idAnnotation));
-        if (idUser==null && annotation.isUserAnnotation()) {
-            results.addAll(annotationTermService.list((UserAnnotation)annotation));
-        } else if(idUser==null && annotation.isReviewedAnnotation()) {
-            results.addAll(reviewedAnnotationService.listTerms((ReviewedAnnotation)annotation));
-        } else if(idUser!=null) {
-            User user = (User)userService.find(idUser).orElseThrow(() -> new ObjectNotFoundException("User", idUser));
-            results.addAll(annotationTermService.list((UserAnnotation)annotation, user));
+            .orElseThrow(() -> new ObjectNotFoundException("Annotation", idAnnotation));
+        if (idUser == null && annotation.isUserAnnotation()) {
+            results.addAll(annotationTermService.list((UserAnnotation) annotation));
+        } else if (idUser == null && annotation.isReviewedAnnotation()) {
+            results.addAll(reviewedAnnotationService.listTerms((ReviewedAnnotation) annotation));
+        } else if (idUser != null) {
+            User user = userService.find(idUser).orElseThrow(() -> new ObjectNotFoundException("User", idUser));
+            results.addAll(annotationTermService.list((UserAnnotation) annotation, user));
         }
         return responseSuccess(results);
     }
@@ -81,35 +81,43 @@ public class RestAnnotationTermController extends RestCytomineController {
      */
     @GetMapping("/annotation/{idAnnotation}/notuser/{idNotUser}/term.json")
     public ResponseEntity<String> listAnnotationTermByUserNot(
-            @PathVariable Long idAnnotation,
-            @PathVariable Long idNotUser
+        @PathVariable Long idAnnotation,
+        @PathVariable Long idNotUser
     ) {
         log.debug("REST request to list terms for annotation {} not defined by user {}", idAnnotation, idNotUser);
         UserAnnotation annotation = userAnnotationService.find(idAnnotation)
-                .orElseThrow(() -> new ObjectNotFoundException("UserAnnotation", idAnnotation));
-        User user = (User)userService.find(idNotUser)
-                .orElseThrow(() -> new ObjectNotFoundException("User", idNotUser));
+            .orElseThrow(() -> new ObjectNotFoundException("UserAnnotation", idAnnotation));
+        User user = (User) userService.find(idNotUser)
+            .orElseThrow(() -> new ObjectNotFoundException("User", idNotUser));
         return responseSuccess(annotationTermService.listAnnotationTermNotDefinedByUser(annotation, user));
     }
 
-    @GetMapping(value = {"/annotation/{idAnnotation}/term/{idTerm}.json", "/annotation/{idAnnotation}/term/{idTerm}/user/{idUser}.json"})
+    @GetMapping({
+        "/annotation/{idAnnotation}/term/{idTerm}.json",
+        "/annotation/{idAnnotation}/term/{idTerm}/user/{idUser}.json"
+    })
     public ResponseEntity<String> show(
-            @PathVariable Long idAnnotation,
-            @PathVariable Long idTerm,
-            @PathVariable(required = false) Long idUser
+        @PathVariable Long idAnnotation,
+        @PathVariable Long idTerm,
+        @PathVariable(required = false) Long idUser
     ) {
-        log.debug("REST request to get annotation term with annotation {} term {} user {}", idAnnotation, idTerm, idUser);
+        log.debug(
+            "REST request to get annotation term with annotation {} term {} user {}", idAnnotation, idTerm, idUser
+        );
         AnnotationDomain annotation = annotationDomainRepository.findById(idAnnotation)
-                .orElseThrow(() -> new ObjectNotFoundException("Annotation", idAnnotation));;
-        Term term = termService.find(idTerm)
-                .orElseThrow(() -> new ObjectNotFoundException("Term", idTerm));
+            .orElseThrow(() -> new ObjectNotFoundException("Annotation", idAnnotation));
 
-        if (idUser!=null) {
+        Term term = termService.find(idTerm)
+            .orElseThrow(() -> new ObjectNotFoundException("Term", idTerm));
+
+        if (idUser != null) {
             User user = userService.find(idUser)
-                    .orElseThrow(() -> new ObjectNotFoundException("User", idUser));
+                .orElseThrow(() -> new ObjectNotFoundException("User", idUser));
 
             return responseSuccess(annotationTermService.find(annotation, term, user)
-                .orElseThrow(() -> new ObjectNotFoundException("AnnotationTerm", annotation + "-" + term + "-" + idUser)));
+                .orElseThrow(() -> new ObjectNotFoundException(
+                    "AnnotationTerm", annotation + "-" + term + "-" + idUser))
+            );
         } else {
             // user is not set, we will get the annotation-term from all user
             return responseSuccess(annotationTermService.find(annotation, term, null)
@@ -126,41 +134,65 @@ public class RestAnnotationTermController extends RestCytomineController {
 
         // Get annotation, it can be a user annotation or a reviewed annotation
         AnnotationDomain annotation =
-                annotationDomainRepository.findById(json.get("annotationIdent")!=null ? json.getJSONAttrLong("annotationIdent") : json.getJSONAttrLong("userannotation"))
-                .orElseThrow(() -> new ObjectNotFoundException("Annotation", "annotationIdent="+json.getJSONAttrStr("annotationIdent","null") + "-userannotation="+json.getJSONAttrStr("userannotation","null")));
-            //if term is added from a user, check if the user has permission for UserAnnotation domain
-            securityACLService.check(json.getJSONAttrLong("userannotation"),UserAnnotation.class,READ);
-            //Check if user is admin, the project mode and if is the owner of the annotation
-            securityACLService.checkFullOrRestrictedForOwner(json.getJSONAttrLong("userannotation"),UserAnnotation.class, "user");
-            return responseSuccess(annotationTermService.add(json));
+            annotationDomainRepository.findById(
+                    json.get("annotationIdent") != null
+                        ? json.getJSONAttrLong("annotationIdent")
+                        : json.getJSONAttrLong("userannotation")
+                )
+                .orElseThrow(() -> new ObjectNotFoundException(
+                    "Annotation", "annotationIdent="
+                    + json.getJSONAttrStr("annotationIdent", "null")
+                    + "-userannotation=" + json.getJSONAttrStr("userannotation", "null"))
+                );
+        //if term is added from a user, check if the user has permission for UserAnnotation domain
+        securityACLService.check(json.getJSONAttrLong("userannotation"), UserAnnotation.class, READ);
+        //Check if user is admin, the project mode and if is the owner of the annotation
+        securityACLService.checkFullOrRestrictedForOwner(
+            json.getJSONAttrLong("userannotation"), UserAnnotation.class, "user"
+        );
+        return responseSuccess(annotationTermService.add(json));
     }
 
 
-    @DeleteMapping(value = {"/annotation/{idAnnotation}/term/{idTerm}.json", "/annotation/{idAnnotation}/term/{idTerm}/user/{idUser}.json"})
+    @DeleteMapping({
+        "/annotation/{idAnnotation}/term/{idTerm}.json",
+        "/annotation/{idAnnotation}/term/{idTerm}/user/{idUser}.json"
+    })
     public ResponseEntity<String> delete(
-            @PathVariable Long idAnnotation,
-            @PathVariable Long idTerm,
-            @PathVariable(required = false) Long idUser
+        @PathVariable Long idAnnotation,
+        @PathVariable Long idTerm,
+        @PathVariable(required = false) Long idUser
     ) {
-        log.debug("REST request to get annotation term with annotation {} term {} user {}", idAnnotation, idTerm, idUser);
+        log.debug(
+            "REST request to get annotation term with annotation {} term {} user {}", idAnnotation, idTerm, idUser
+        );
         AnnotationDomain annotation = userAnnotationService.find(idAnnotation)
-                .orElseThrow(() -> new ObjectNotFoundException("Annotation", idAnnotation));;
-        Term term = termService.find(idTerm)
-                .orElseThrow(() -> new ObjectNotFoundException("Term", idTerm));
-        User user = userService.find(idUser!=null? idUser: -1L)
-                .orElseGet(currentUserService::getCurrentUser);
-        return delete(annotationTermService, JsonObject.of("userannotation", annotation.getId(), "term", term.getId(), "user", user.getId()), null);
-    }
+            .orElseThrow(() -> new ObjectNotFoundException("Annotation", idAnnotation));
 
+        Term term = termService.find(idTerm)
+            .orElseThrow(() -> new ObjectNotFoundException("Term", idTerm));
+        User user = userService.find(idUser != null ? idUser : -1L)
+            .orElseGet(currentUserService::getCurrentUser);
+        return delete(
+            annotationTermService,
+            JsonObject.of(
+                "userannotation", annotation.getId(),
+                "term", term.getId(),
+                "user", user.getId()
+            ),
+            null
+        );
+    }
 
     /**
-     * Add annotation-term for an annotation and delete all annotation-term that where already map with this annotation by this user
+     * Add annotation-term for an annotation and delete all annotation-term
+     * that where already map with this annotation by this user
      */
     @PostMapping("/annotation/{idAnnotation}/term/{idTerm}/clearBefore.json")
     public ResponseEntity<String> addWithDeletingOldTerm(
-            @PathVariable Long idAnnotation,
-            @PathVariable Long idTerm,
-            @RequestParam(required = false, defaultValue = "false") Boolean clearForAll
+        @PathVariable Long idAnnotation,
+        @PathVariable Long idTerm,
+        @RequestParam(required = false, defaultValue = "false") Boolean clearForAll
 
     ) {
         log.debug("REST request to save annotation term and clean before");

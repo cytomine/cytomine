@@ -36,9 +36,7 @@ public class RestOntologyController extends RestCytomineController {
      * For each ontology, print the terms tree
      */
     @GetMapping("/ontology.json")
-    public ResponseEntity<String> list(
-            @RequestParam Map<String,String> allParams
-    ) {
+    public ResponseEntity<String> list(@RequestParam Map<String, String> allParams) {
         log.debug("REST request to list ontologys");
         boolean light = allParams.containsKey("light") && Boolean.parseBoolean(allParams.get("light"));
         return responseSuccess(light ? ontologyService.listLight() : ontologyService.list());

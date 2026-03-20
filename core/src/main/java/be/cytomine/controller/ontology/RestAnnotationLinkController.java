@@ -47,7 +47,8 @@ public class RestAnnotationLinkController extends RestCytomineController {
     @GetMapping("/annotationgroup/{id}/annotationlink.json")
     public ResponseEntity<String> listByAnnotationGroup(@PathVariable Long id) {
         log.debug("REST request to list all annotationlinks for annotationgroup " + id);
-        AnnotationGroup annotationGroup = annotationGroupService.find(id).orElseThrow(() -> new ObjectNotFoundException("AnnotationGroup", id));
+        AnnotationGroup annotationGroup = annotationGroupService.find(id)
+            .orElseThrow(() -> new ObjectNotFoundException("AnnotationGroup", id));
         return responseSuccess(annotationLinkService.list(annotationGroup));
     }
 
@@ -65,38 +66,15 @@ public class RestAnnotationLinkController extends RestCytomineController {
         return responseSuccess(annotationLinkService.list(link.getGroup()));
     }
 
-    /* getAnnotationDomain() not implemented see L197 AnnotationDomain.java
-    @GetMapping("/annotationgroup/{annotationGroup}/annotation/{annotation}.json")
-    public ResponseEntity<String> show(@PathVariable Long annotation, @PathVariable Long annotationGroup) {
-        log.debug("REST request to get annotation {} in annotationgroup {}", annotation, annotationGroup);
-
-        AnnotationDomain annotationDomain = AnnotationDomain.getAnnotationDomain(annotation);
-        AnnotationGroup group = annotationGroupService.get(annotationGroup);
-
-        if (annotationDomain == null) {
-            return responseNotFound("Annotation", annotation);
-        }
-
-        if (group == null) {
-            return responseNotFound("AnnotationGroup", annotationGroup);
-        }
-
-        AnnotationLink link = annotationLinkService.get(group, annotationDomain);
-        if (link == null) {
-            return responseNotFound("AnnotationLink", Map.of("Annotation", annotation, "AnnotationGroup", annotationGroup));
-        }
-
-        return null;
-    }
-     */
-
     @DeleteMapping("/annotationgroup/{annotationGroup}/annotation/{annotation}.json")
     public ResponseEntity<String> delete(@PathVariable Long annotation, @PathVariable Long annotationGroup) {
         log.debug("REST request to delete annotation {} in annotationgroup {}", annotation, annotationGroup);
 
         AnnotationLink link = annotationLinkRepository.findByAnnotationIdent(annotation).orElse(null);
         if (link == null) {
-            return responseNotFound("Annotationlink", Map.of("Annotation", annotation, "AnnotationGroup", annotationGroup));
+            return responseNotFound(
+                "Annotationlink", Map.of("Annotation", annotation, "AnnotationGroup", annotationGroup)
+            );
         }
 
         return responseSuccess(annotationLinkService.delete(link, transactionService.start(), null, true));

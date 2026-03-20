@@ -36,8 +36,16 @@ import org.hibernate.annotations.Immutable;
 
 
 @Entity(name = "AclObjectIdentity")
-@Table(name = "acl_object_identity", uniqueConstraints = @UniqueConstraint(name = "uk_acl_object_identity", columnNames = {
-        "object_id_class", "object_id_identity" }))
+@Table(
+    name = "acl_object_identity",
+    uniqueConstraints = @UniqueConstraint(
+        name = "uk_acl_object_identity",
+        columnNames = {
+            "object_id_class",
+            "object_id_identity"
+        }
+    )
+)
 @Immutable
 public class AclObjectIdentity implements Serializable {
 
@@ -48,26 +56,31 @@ public class AclObjectIdentity implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "object_id_identity", nullable = false, unique = false)
+    @Column(name = "object_id_identity", nullable = false)
     private Long objectId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "object_id_class", referencedColumnName = "id", nullable = false, unique = false, insertable = true, updatable = true)
+    @JoinColumn(name = "object_id_class", referencedColumnName = "id", nullable = false)
     private AclClass objectIdClass;
 
-    @Column(name = "entries_inheriting", nullable = false, unique = false)
+    @Column(name = "entries_inheriting", nullable = false)
     private Boolean entriesInheriting;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_object", referencedColumnName = "id", nullable = true, unique = false, insertable = true, updatable = true)
+    @JoinColumn(name = "parent_object", referencedColumnName = "id")
     private AclObjectIdentity parentObject;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_sid", referencedColumnName = "id", nullable = true, unique = false, insertable = true, updatable = true)
+    @JoinColumn(name = "owner_sid", referencedColumnName = "id")
     private AclSid ownerSid;
 
-    @OneToMany(targetEntity = AclEntry.class, fetch = FetchType.LAZY, mappedBy = "aclObjectIdentity", cascade = CascadeType.REMOVE)
-    private Set<AclEntry> aclEntries = new HashSet<AclEntry>();
+    @OneToMany(
+        targetEntity = AclEntry.class,
+        fetch = FetchType.LAZY,
+        mappedBy = "aclObjectIdentity",
+        cascade = CascadeType.REMOVE
+    )
+    private Set<AclEntry> aclEntries = new HashSet<>();
 
     public AclObjectIdentity() {
     }

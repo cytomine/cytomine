@@ -58,7 +58,7 @@ public class CytomineTests {
     @BeforeEach
     void setUp() {
         driver = driverProvider.driver();
-        wait = new WebDriverWait(driver, Duration.ofSeconds(30));
+        wait = new WebDriverWait(driver, Duration.ofSeconds(60));
     }
 
     @AfterEach

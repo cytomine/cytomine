@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 import jakarta.persistence.EntityManager;
 
+@SuppressWarnings("checkstyle:all") // This file will be refactored in https://github.com/cytomine/cytomine/issues/625
 public class UserAnnotationListing extends AnnotationListing {
 
     public UserAnnotationListing(EntityManager entityManager) {

@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 
 import be.cytomine.exceptions.WrongArgumentException;
 
+@SuppressWarnings("checkstyle:all") // This file will be refactored in https://github.com/cytomine/cytomine/issues/625
 @Service
 @Slf4j
 @AllArgsConstructor

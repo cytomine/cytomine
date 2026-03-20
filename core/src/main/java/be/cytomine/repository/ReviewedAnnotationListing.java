@@ -28,6 +28,7 @@ import org.locationtech.jts.io.WKTReader;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.exceptions.WrongArgumentException;
 
+@SuppressWarnings("checkstyle:all") // This file will be refactored in https://github.com/cytomine/cytomine/issues/625
 public class ReviewedAnnotationListing extends AnnotationListing {
 
     public ReviewedAnnotationListing(EntityManager entityManager) {

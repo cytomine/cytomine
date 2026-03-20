@@ -25,6 +25,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import be.cytomine.domain.ontology.AnnotationDomain;
 
+@SuppressWarnings("checkstyle:all") // This file will be refactored in https://github.com/cytomine/cytomine/issues/625
 public interface AnnotationDomainRepository extends JpaRepository<AnnotationDomain, Long>, JpaSpecificationExecutor<AnnotationDomain>  {
 
 

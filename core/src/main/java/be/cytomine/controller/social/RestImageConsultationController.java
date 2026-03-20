@@ -62,14 +62,15 @@ public class RestImageConsultationController extends RestCytomineController {
     ) {
         Project project = projectService.find(projectId)
                 .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
-        return responseSuccess(imageConsultationService.lastImageOfUsersByProject(project, null, "created", "desc", 0L, 0L));
+        return responseSuccess(imageConsultationService.lastImageOfUsersByProject(
+            project, null, "created", "desc", 0L, 0L)
+        );
     }
 
     @GetMapping("/imageinstance/method/lastopened.json")
     public ResponseEntity<String> listLastOpenImage() {
         log.debug("REST request to get last image instance opened for user");
         RequestParams requestParams = retrievePageableParameters();
-//        User secUser = currentUserService.getCurrentUser();
         return responseSuccess(imageConsultationService.listLastOpened(requestParams.getMax()));
     }
 
@@ -86,9 +87,13 @@ public class RestImageConsultationController extends RestCytomineController {
         User user = userService.find(userId).orElseThrow(() -> new ObjectNotFoundException("User", userId));
 
         if (distinctImages) {
-            return responseSuccess(imageConsultationService.listImageConsultationByProjectAndUserWithDistinctImage(project, user));
+            return responseSuccess(imageConsultationService.listImageConsultationByProjectAndUserWithDistinctImage(
+                project, user
+            ));
         } else {
-            return responseSuccess(imageConsultationService.listImageConsultationByProjectAndUserNoImageDistinct(project, user, max, offset));
+            return responseSuccess(imageConsultationService.listImageConsultationByProjectAndUserNoImageDistinct(
+                project, user, max, offset
+            ));
         }
     }
 
@@ -101,7 +106,9 @@ public class RestImageConsultationController extends RestCytomineController {
         Project project = projectService.find(projectId)
                 .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
 
-        return responseSuccess(JsonObject.of("total", imageConsultationService.countByProject(project, startDate, endDate)));
+        return responseSuccess(
+            JsonObject.of("total", imageConsultationService.countByProject(project, startDate, endDate))
+        );
     }
 
     @GetMapping("/imageconsultation/resume.json")
@@ -111,15 +118,19 @@ public class RestImageConsultationController extends RestCytomineController {
             @RequestParam(required = false, value = "export") String export
     ) throws IOException {
         List<JsonObject> results = imageConsultationService.resumeByUserAndProject(userId, projectId);
-        if (export!=null && export.equals("csv")) {
+        if (export != null && export.equals("csv")) {
 
             Project project = projectService.find(projectId)
                     .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
             User user = userService.findUser(userId)
                     .orElseThrow(() -> new ObjectNotFoundException("User", userId));
 
-            byte[] report = reportService.generateImageConsultationReport(project.getName(), user.getUsername(), results);
-            responseReportFile(reportService.getImageConsultationReportFileName(export, projectId, userId), report, export);
+            byte[] report = reportService.generateImageConsultationReport(
+                project.getName(), user.getUsername(), results
+            );
+            responseReportFile(reportService.getImageConsultationReportFileName(
+                export, projectId, userId), report, export
+            );
             return null;
         } else {
             return responseSuccess(results);

@@ -25,8 +25,10 @@ import jakarta.servlet.http.HttpServletRequestWrapper;
 
 /**
  * The cytomine java client does not set any content-type header.
- * It seems that by default, spring receives 'application/octet-stream' which is not compatible to automatically parse JSON data.
- * So if the request has a ".json" string in its path AND if the header is null or equal to application/octet-stream, then we return a application/json contenttype
+ * It seems that by default, spring receives 'application/octet-stream'
+ * which is not compatible to automatically parse JSON data.
+ * So if the request has a ".json" string in its path AND if the header is null or equal to application/octet-stream,
+ * then we return a application/json contenttype
  */
 public class ContentTypeRequestWrapper extends HttpServletRequestWrapper {
 

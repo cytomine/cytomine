@@ -43,7 +43,14 @@ public class RestDescriptionController extends RestCytomineController {
         log.debug("REST request to read description for domain {} {}", domainClassName, domainIdent);
 
         return responseSuccess(descriptionService.findByDomain(domainClassName.replaceAll("_", "."), domainIdent)
-                .orElseThrow(() -> new ObjectNotFoundException("Description", JsonObject.of("domainIdent", domainIdent, "domainClassName", domainClassName.replaceAll("_", ".")).toJsonString())));
+                .orElseThrow(() -> new ObjectNotFoundException(
+                    "Description",
+                    JsonObject.of(
+                        "domainIdent", domainIdent,
+                        "domainClassName", domainClassName.replaceAll("_", ".")
+                    ).toJsonString())
+                )
+        );
     }
 
     @PostMapping({"/description.json", "/domain/{domainClassName}/{domainIdent}/description.json"})
@@ -70,8 +77,11 @@ public class RestDescriptionController extends RestCytomineController {
             @PathVariable String domainClassName,
             @PathVariable Long domainIdent) {
         log.debug("REST request to delete description for {} {}", domainClassName, domainIdent);
-        JsonObject jsonObject = JsonObject.of("domainIdent", domainIdent, "domainClassName", domainClassName.replaceAll("_", "."));
+        JsonObject jsonObject = JsonObject.of(
+            "domainIdent", domainIdent,
+            "domainClassName", domainClassName.replaceAll("_", ".")
+        );
         CytomineDomain domain = descriptionService.retrieve(jsonObject);
-        return responseSuccess(descriptionService.delete(domain,transactionService.start(), null, true));
+        return responseSuccess(descriptionService.delete(domain, transactionService.start(), null, true));
     }
 }

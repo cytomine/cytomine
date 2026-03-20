@@ -16,8 +16,6 @@ package be.cytomine.config.security;
 * limitations under the License.
 */
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
@@ -25,6 +23,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

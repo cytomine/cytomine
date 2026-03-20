@@ -1,5 +1,8 @@
 package be.cytomine.repositorynosql.social;
 
+// CHECKSTYLE:OFF
+// TODO: This file will be refactored - see https://github.com/cytomine/cytomine/issues/625
+
 import java.util.Date;
 
 import org.springframework.data.domain.Page;
@@ -11,7 +14,9 @@ import org.springframework.stereotype.Repository;
 
 import be.cytomine.domain.social.PersistentProjectConnection;
 
-@SuppressWarnings("checkstyle:all") // This file will be refactored in https://github.com/cytomine/cytomine/issues/625
+/**
+ * Spring Data JPA repository for the user entity.
+ */
 @Repository
 public interface PersistentProjectConnectionRepository extends MongoRepository<PersistentProjectConnection, Long> {
 

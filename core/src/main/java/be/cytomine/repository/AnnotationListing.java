@@ -1,5 +1,8 @@
 package be.cytomine.repository;
 
+// CHECKSTYLE:OFF
+// TODO: This file will be refactored - see https://github.com/cytomine/cytomine/issues/625
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -23,7 +26,6 @@ import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.exceptions.WrongArgumentException;
 
-@SuppressWarnings("checkstyle:all") // This file will be refactored in https://github.com/cytomine/cytomine/issues/625
 @Getter
 @Setter
 public abstract class AnnotationListing {

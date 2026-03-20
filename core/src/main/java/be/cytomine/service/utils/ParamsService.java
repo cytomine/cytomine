@@ -19,7 +19,6 @@ import be.cytomine.service.ontology.TermService;
 import be.cytomine.service.security.UserService;
 import be.cytomine.utils.JsonObject;
 
-@SuppressWarnings("checkstyle:all") // This file will be refactored in https://github.com/cytomine/cytomine/issues/596
 @Service
 @Transactional
 @AllArgsConstructor

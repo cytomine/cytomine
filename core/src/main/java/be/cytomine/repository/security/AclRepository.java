@@ -1,5 +1,8 @@
 package be.cytomine.repository.security;
 
+// CHECKSTYLE:OFF
+// TODO: This file will be refactored - see https://github.com/cytomine/cytomine/issues/625
+
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,7 +12,6 @@ import org.springframework.stereotype.Repository;
 
 import be.cytomine.domain.security.User;
 
-@SuppressWarnings("checkstyle:all") // This file will be refactored in https://github.com/cytomine/cytomine/issues/625
 @Repository
 public interface AclRepository extends JpaRepository<User, Long> {
 

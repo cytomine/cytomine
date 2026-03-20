@@ -1,5 +1,8 @@
 package be.cytomine.service;
 
+// CHECKSTYLE:OFF
+// TODO: This file will be refactored - see https://github.com/cytomine/cytomine/issues/625
+
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,7 +30,6 @@ import be.cytomine.utils.JsonObject;
 
 import static org.springframework.security.acls.domain.BasePermission.READ;
 
-@SuppressWarnings("checkstyle:all") // This file will be refactored in https://github.com/cytomine/cytomine/issues/625
 @Transactional
 @Service
 public class AnnotationListingService {

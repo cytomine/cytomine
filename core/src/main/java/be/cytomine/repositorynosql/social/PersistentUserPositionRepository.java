@@ -1,5 +1,8 @@
 package be.cytomine.repositorynosql.social;
 
+// CHECKSTYLE:OFF
+// TODO: This file will be refactored - see https://github.com/cytomine/cytomine/issues/625
+
 import java.util.Date;
 
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -9,7 +12,6 @@ import org.springframework.stereotype.Repository;
 
 import be.cytomine.domain.social.PersistentUserPosition;
 
-@SuppressWarnings("checkstyle:all") // This file will be refactored in https://github.com/cytomine/cytomine/issues/625
 @Repository
 public interface PersistentUserPositionRepository extends MongoRepository<PersistentUserPosition, Long> {
 

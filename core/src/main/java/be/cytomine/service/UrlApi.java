@@ -6,7 +6,6 @@ import java.util.Set;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.ImageInstance;
 
-@SuppressWarnings("checkstyle:all") // This file will be refactored in https://github.com/cytomine/cytomine/issues/596
 public class UrlApi {
 
     private static String serverUrl = "http://localhost:8090";

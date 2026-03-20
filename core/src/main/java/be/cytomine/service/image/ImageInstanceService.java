@@ -1,5 +1,8 @@
 package be.cytomine.service.image;
 
+// CHECKSTYLE:OFF
+// TODO: This file will be refactored - see https://github.com/cytomine/cytomine/issues/625
+
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -96,7 +99,6 @@ import static com.mongodb.client.model.Sorts.ascending;
 import static com.mongodb.client.model.Sorts.descending;
 import static org.springframework.security.acls.domain.BasePermission.READ;
 
-@SuppressWarnings("checkstyle:all") // This file will be refactored in https://github.com/cytomine/cytomine/issues/625
 @Slf4j
 @Service
 @Transactional

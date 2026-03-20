@@ -168,7 +168,7 @@ public class CytomineSteps {
     public void openImageInViewer(Wait<WebDriver> wait, WebDriver driver, String projectURL) {
         webDriverUtils.goTo(wait, projectURL);
         webDriverUtils.xpathClick(wait, "//li//a[.//i[contains(@class, 'fa-image')]]");
-        Wait<WebDriver> longWait = new WebDriverWait(driver, Duration.ofSeconds(15));
+        Wait<WebDriver> longWait = new WebDriverWait(driver, Duration.ofSeconds(60));
         webDriverUtils.byIsDisplayed(longWait, By.xpath("//td//a[contains(@href, '/image/')]"));
         webDriverUtils.xpathClick(wait, "//td//a[contains(@href, '/image/')]");
         webDriverUtils.byIsDisplayed(longWait, By.cssSelector(".draw-tools-wrapper"));

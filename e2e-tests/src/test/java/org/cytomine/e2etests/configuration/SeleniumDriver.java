@@ -6,12 +6,10 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.remote.http.ClientConfig;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.net.URL;
-import java.time.Duration;
 import java.util.Optional;
 
 @Slf4j
@@ -22,10 +20,6 @@ public class SeleniumDriver {
     Optional<URL> seleniumUrl;
 
     public WebDriver driver() {
-        ClientConfig config = ClientConfig.defaultConfig()
-            .connectionTimeout(Duration.ofSeconds(60))
-            .readTimeout(Duration.ofSeconds(300));
-
         FirefoxOptions options = new FirefoxOptions();
         WebDriver webDriver = seleniumUrl.map(url -> {
                 log.info("Instantiated RemoteWebDriver with url: {}", url);
@@ -33,7 +27,6 @@ public class SeleniumDriver {
                 RemoteWebDriver driver = (RemoteWebDriver) RemoteWebDriver.builder()
                     .address(url)
                     .oneOf(options)
-                    .config(config)
                     .build();
                 driver.setFileDetector(new LocalFileDetector());
                 return driver;

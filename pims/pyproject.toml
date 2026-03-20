@@ -25,7 +25,7 @@ dependencies = [
   "pydantic==2.7.3",
   "pydantic-extra-types==2.8.0",
   "pydantic-settings==2.3.1",
-  "pydicom==3.0.1",
+  "pydicom==3.0.2",
   "pylibjpeg>=2.1.0",
   "python-dateutil==2.9.0.post0",
   "python-multipart==0.0.22",

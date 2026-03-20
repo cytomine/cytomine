@@ -62,11 +62,8 @@ public class CytomineSteps {
         webDriverUtils.xpathClick(wait, "//a[@href='#/projects']");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//button[contains(text(), 'New project')]"));
         Set<Boolean> ignored = projectNames.stream()
-                                   .map(name ->
-                                            webDriverUtils.byIsDisplayed(wait,
-                                                By.xpath(format("//a[contains(text(), '%s')]",
-                                                    name))))
-                                   .collect(toSet());
+            .map(name -> webDriverUtils.byIsDisplayed(wait, By.xpath(format("//a[contains(text(), '%s')]", name))))
+            .collect(toSet());
     }
 
     public String createOntology(Wait<WebDriver> wait, WebDriver driver, URL cytomineUrl,
@@ -103,6 +100,8 @@ public class CytomineSteps {
     public String addImage(Wait<WebDriver> wait, URL cytomineUrl,
                            Optional<String> maybeProjectName) {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/storage");
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//button[contains(text(), 'Add files')]"));
+
         String imageName = "selenium-" + UUID.randomUUID() + ".png";
         Path tempDir = Files.createTempDirectory("selenium-upload");
         Path copiedFile = tempDir.resolve(imageName);
@@ -113,6 +112,7 @@ public class CytomineSteps {
 
         webDriverUtils.bySendKeysWait(wait, By.cssSelector("input[type='file']"),
             copiedFile.toString(), false);
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//button[contains(text(), 'Start upload') and not(@disabled)]"));
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Start upload')]");
         webDriverUtils.byIsDisplayed(wait, By.xpath(
             "//div[contains(@class,'uploaded-files-list')]//*[contains(text(),'" + imageName
@@ -239,16 +239,18 @@ public class CytomineSteps {
 
     public void deleteTask(Wait<WebDriver> wait, URL cytomineUrl, String taskName) {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/apps");
-        webDriverUtils.byIsDisplayed(wait, By.xpath("//p[contains(@class, 'title') and contains(text(), '" + taskName + "')]"));
+        webDriverUtils.byIsDisplayed(wait,
+            By.xpath("//p[contains(@class, 'title') and contains(text(), '" + taskName + "')]"));
         webDriverUtils.xpathClick(wait,
-                "//div[contains(@class, 'card') and .//p[contains(@class, 'title') and contains(text(), '" + taskName + "')]]" +
-                        "//a[contains(text(), 'More')]"
+            "//div[contains(@class, 'card') and .//p[contains(@class, 'title') and contains(text(), '" + taskName
+                + "')]]//a[contains(text(), 'More')]"
         );
 
         webDriverUtils.byIsDisplayed(wait, By.cssSelector(".panel-heading .panel-actions"));
         webDriverUtils.byClick(wait, By.cssSelector(".panel-actions .dropdown .icon"));
 
-        webDriverUtils.xpathClick(wait, "//a[contains(@class, 'dropdown-item') and .//span[contains(text(), 'Delete')]]");
+        webDriverUtils.xpathClick(wait,
+            "//a[contains(@class, 'dropdown-item') and .//span[contains(text(), 'Delete')]]");
 
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Confirm')]");
     }

@@ -57,11 +57,11 @@ public class AclEntry implements Serializable {
     private Boolean auditFailure;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "acl_object_identity", referencedColumnName = "id", nullable = false, unique = false, insertable = true, updatable = true)
+    @JoinColumn(name = "acl_object_identity", referencedColumnName = "id", nullable = false)
     private AclObjectIdentity aclObjectIdentity;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "sid", referencedColumnName = "id", nullable = false, unique = false, insertable = true, updatable = true)
+    @JoinColumn(name = "sid", referencedColumnName = "id", nullable = false)
     private AclSid sid;
 
     public AclEntry() {

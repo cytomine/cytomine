@@ -46,12 +46,14 @@ public class RestSecUserSecRoleController extends RestCytomineController {
     @GetMapping("/user/{user}/role.json")
     public ResponseEntity<String> list(
             @PathVariable("user") Long userId,
-            @RequestParam(defaultValue = "false") Boolean highest)
-    {
+            @RequestParam(defaultValue = "false") Boolean highest
+    ) {
         log.debug("REST request to list roles for user {}", userId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ObjectNotFoundException("User", userId));
-        return responseSuccess(highest ? List.of(secUserSecRoleService.getHighest(user)) : secUserSecRoleService.list(user));
+        return responseSuccess(
+            highest ? List.of(secUserSecRoleService.getHighest(user)) : secUserSecRoleService.list(user)
+        );
     }
 
     @GetMapping("/user/{user}/role/{role}.json")
@@ -65,7 +67,8 @@ public class RestSecUserSecRoleController extends RestCytomineController {
         SecRole role = secRoleRepository.findById(roleId)
                 .orElseThrow(() -> new ObjectNotFoundException("SecRole", roleId));
         return responseSuccess(secUserSecRoleService.find(user, role)
-                .orElseThrow(() -> new ObjectNotFoundException("SecUserSecRole", JsonObject.of("user", user.getId(),"role", role.getId()).toJsonString())));
+            .orElseThrow(() -> new ObjectNotFoundException(
+                "SecUserSecRole", JsonObject.of("user", user.getId(), "role", role.getId()).toJsonString())));
     }
 
     @PostMapping("/user/{user}/role.json")
@@ -88,7 +91,8 @@ public class RestSecUserSecRoleController extends RestCytomineController {
         SecRole role = secRoleRepository.findById(roleId)
                 .orElseThrow(() -> new ObjectNotFoundException("SecRole", roleId));
         SecUserSecRole secSecUserSecRole = secUserSecRoleService.find(user, role)
-                .orElseThrow(() -> new ObjectNotFoundException("SecUserSecRole", JsonObject.of("user", user.getId(), "role", role.getId()).toJsonString()));
+                .orElseThrow(() -> new ObjectNotFoundException(
+                    "SecUserSecRole", JsonObject.of("user", user.getId(), "role", role.getId()).toJsonString()));
         return delete(secUserSecRoleService, secSecUserSecRole.toJsonObject(), null);
     }
 

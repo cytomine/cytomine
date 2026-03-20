@@ -24,15 +24,15 @@ public class CustomErrorController implements ErrorController {
         String subject = switch (statusCode) {
             case 401 -> "Authorization required";
             case 404 -> "Resource not found";
-            default-> "Internal Error";
+            default -> "Internal Error";
         };
 
         String message = switch (statusCode) {
             case 401 -> "This page is not publicly available. To access it, please login first or use a valid token.";
             case 404 -> "The page does not exists.";
-            default-> "";
+            default -> "";
         };
-        return TEMPLATE.formatted(statusCode,CSS, statusCode, subject, message, serverURL);
+        return TEMPLATE.formatted(statusCode, CSS, statusCode, subject, message, serverURL);
     }
 
 

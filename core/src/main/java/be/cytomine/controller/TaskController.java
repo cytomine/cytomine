@@ -54,7 +54,7 @@ public class TaskController extends RestCytomineController {
             throw new ObjectNotFoundException("Task", id);
         }
         JsonObject jsonObject = task.toJsonObject();
-        jsonObject.put("comments", taskService.getLastComments(task,5));
+        jsonObject.put("comments", taskService.getLastComments(task, 5));
         return responseSuccess(jsonObject);
     }
 
@@ -63,21 +63,21 @@ public class TaskController extends RestCytomineController {
         Project project = null;
         try {
             project = projectService.get(json.getJSONAttrLong("project", 0L));
-        } catch(Exception ignored) {
-
+        } catch (Exception ignored) {
+            // TODO
         }
         User user = currentUserService.getCurrentUser();
         boolean printInActivity = json.getJSONAttrBoolean("printInActivity", false);
-        Task task = taskService.createNewTask(project,user,printInActivity);
+        Task task = taskService.createNewTask(project, user, printInActivity);
         JsonObject jsonObject = task.toJsonObject();
-        jsonObject.put("comments", taskService.getLastComments(task,5));
+        jsonObject.put("comments", taskService.getLastComments(task, 5));
         return responseSuccess(JsonObject.of("task", jsonObject));
     }
 
     @GetMapping("/project/{project}/task/comment.json")
     public ResponseEntity<String> listCommentByProject(@PathVariable(value = "project") Long projectId) {
         Project project = projectService.find(projectId)
-                .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
+            .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
         return responseSuccess(taskService.listLastComments(project));
     }
 }

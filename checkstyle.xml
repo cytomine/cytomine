@@ -417,11 +417,7 @@
             <property name="optional" value="true" />
         </module>
         <module name="SuppressWarningsHolder" />
-        <module name="SuppressionCommentFilter">
-            <property name="offCommentFormat" value="CHECKSTYLE.OFF\: ([\w\|]+)" />
-            <property name="onCommentFormat" value="CHECKSTYLE.ON\: ([\w\|]+)" />
-            <property name="checkFormat" value="$1" />
-        </module>
+        <module name="SuppressionCommentFilter"/>
         <module name="SuppressWithNearbyCommentFilter">
             <property name="commentFormat" value="CHECKSTYLE.SUPPRESS\: ([\w\|]+)" />
             <!-- $1 refers to the first match group in the regex defined in commentFormat -->

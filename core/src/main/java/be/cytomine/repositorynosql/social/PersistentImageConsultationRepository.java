@@ -1,5 +1,8 @@
 package be.cytomine.repositorynosql.social;
 
+// CHECKSTYLE:OFF
+// TODO: This file will be refactored - see https://github.com/cytomine/cytomine/issues/625
+
 import java.util.Date;
 import java.util.List;
 

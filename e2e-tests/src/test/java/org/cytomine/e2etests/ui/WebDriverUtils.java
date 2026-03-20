@@ -24,6 +24,9 @@ public class WebDriverUtils {
         wait.until(d -> {
             try {
                 WebElement element = d.findElement(by);
+                if (!element.isDisplayed()) {
+                    return false;
+                }
                 element.click();
                 return true;
             } catch (ElementClickInterceptedException | NoSuchElementException

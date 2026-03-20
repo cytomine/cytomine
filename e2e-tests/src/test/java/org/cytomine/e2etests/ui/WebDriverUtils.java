@@ -64,7 +64,7 @@ public class WebDriverUtils {
         waitLoading(wait);
         wait.until(d -> {
             try {
-                return ExpectedConditions.visibilityOfElementLocated(by);
+                return ExpectedConditions.visibilityOfElementLocated(by).apply(d) != null;
             } catch (Exception e) {
                 return false;
             }

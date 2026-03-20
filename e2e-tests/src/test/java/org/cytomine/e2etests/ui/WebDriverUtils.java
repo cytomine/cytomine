@@ -1,5 +1,6 @@
 package org.cytomine.e2etests.ui;
 
+import lombok.SneakyThrows;
 import org.openqa.selenium.By;
 import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.NoSuchElementException;
@@ -58,7 +59,9 @@ public class WebDriverUtils {
             });
     }
 
+    @SneakyThrows
     boolean byIsDisplayed(Wait<WebDriver> wait, By by) {
+        Thread.sleep(500);
         waitLoading(wait);
         wait.until(ExpectedConditions.visibilityOfElementLocated(by));
         return true;

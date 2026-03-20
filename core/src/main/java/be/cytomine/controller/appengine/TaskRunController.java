@@ -120,8 +120,7 @@ public class TaskRunController {
         @PathVariable("parameter_name") String parameterName,
         @RequestParam(required = true) String auth, // don't remove this parameter, it's used by the security filter'
         HttpServletResponse response
-    )
-    {
+    ) {
         if (parameterName.endsWith(".geojson")) {
             response.setContentType("application/geo+json");
         } else {
@@ -133,14 +132,10 @@ public class TaskRunController {
         response.setHeader(HttpHeaders.PRAGMA, "no-cache");
         response.setHeader(HttpHeaders.EXPIRES, "0");
 
-        try (OutputStream os = response.getOutputStream())
-        {
-
+        try (OutputStream os = response.getOutputStream()) {
             taskRunService.getTaskRunIOParameter(project, task, parameterName, "input", os);
             os.flush();
-
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             throw new RuntimeException("Error while streaming the input parameter", e);
         }
     }
@@ -159,7 +154,7 @@ public class TaskRunController {
             @PathVariable Long project,
             @PathVariable UUID task,
             @PathVariable("parameter_name") String parameterName,
-            @RequestParam(required = true) String auth, // don't remove this parameter, it's used by the security filter'
+            @RequestParam(required = true) String auth, // don't remove this parameter, it's used by the security filter
             HttpServletResponse response
     ) {
 

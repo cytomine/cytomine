@@ -97,27 +97,6 @@ public class SecurityACLService {
 
     }
 
-    public void checkIsAdminContainer(CytomineDomain domain) {
-        checkIsAdminContainer(domain, currentUserService.getCurrentUser());
-    }
-
-    public void checkIsAdminContainer(CytomineDomain domain, User currentUser) {
-        if (domain != null) {
-            if (!hasPermission(
-                retrieveContainer(domain),
-                ADMINISTRATION,
-                currentRoleService.isAdminByNow(currentUser)
-            )) {
-                throw new ForbiddenException(
-                    "You don't have the right to do this. You must be the creator or the container admin");
-            }
-        } else {
-            throw new ObjectNotFoundException("ACL error: domain is null! Unable to process project auth checking");
-        }
-
-    }
-
-
     public void check(CytomineDomain domain, Permission permission, User currentUser) {
         if (domain != null) {
             if (!hasPermission(retrieveContainer(domain), permission, currentRoleService.isAdminByNow(currentUser))) {
@@ -133,6 +112,27 @@ public class SecurityACLService {
 
     public void check(CytomineDomain domain, Permission permission) {
         check(domain, permission, currentUserService.getCurrentUser());
+
+    }
+
+    public void checkIsAdminContainer(CytomineDomain domain) {
+        checkIsAdminContainer(domain, currentUserService.getCurrentUser());
+    }
+
+    public void checkIsAdminContainer(CytomineDomain domain, User currentUser) {
+        if (domain != null) {
+            if (!hasPermission(
+                retrieveContainer(domain),
+                ADMINISTRATION,
+                currentRoleService.isAdminByNow(currentUser)
+            )) {
+                throw new ForbiddenException(
+                    "You don't have the right to do this. You must be the creator or the container admin"
+                );
+            }
+        } else {
+            throw new ObjectNotFoundException("ACL error: domain is null! Unable to process project auth checking");
+        }
 
     }
 
@@ -181,12 +181,9 @@ public class SecurityACLService {
                 "select distinct storage "
                     +
                     "from AclObjectIdentity as aclObjectId, AclEntry as aclEntry, AclSid as aclSid,  Storage as storage "
-                    +
-                    "where aclObjectId.objectId = storage.id "
-                    +
-                    "and aclEntry.aclObjectIdentity = aclObjectId "
-                    +
-                    "and aclEntry.sid = aclSid and aclSid.sid like '"
+                    + "where aclObjectId.objectId = storage.id "
+                    + "and aclEntry.aclObjectIdentity = aclObjectId "
+                    + "and aclEntry.sid = aclSid and aclSid.sid like '"
                     + user.getUsername()
                     + "'"
                     + (StringUtils.isNotBlank(searchString) ? " and lower(storage.name) like '%"
@@ -206,34 +203,28 @@ public class SecurityACLService {
                 "select distinct project "
                     +
                     "from AclObjectIdentity as aclObjectId, AclEntry as aclEntry, AclSid as aclSid,  Project as project "
-                    +
-                    "where aclObjectId.objectId = project.id "
-                    +
-                    "and aclEntry.aclObjectIdentity = aclObjectId "
-                    +
-                    (ontology != null ? "and project.ontology.id = " + ontology.getId() : " ")
-                    +
-                    "and aclEntry.sid = aclSid and aclSid.sid like '"
+                    + "where aclObjectId.objectId = project.id "
+                    + "and aclEntry.aclObjectIdentity = aclObjectId "
+                    + (ontology != null ? "and project.ontology.id = " + ontology.getId() : " ")
+                    + "and aclEntry.sid = aclSid and aclSid.sid like '"
                     + user.getUsername()
                     + "'");
             return query.getResultList();
         }
     }
 
-
     public List<String> getProjectUsers(Project project) {
         // adminByPass TODO
 
         Query query = entityManager.createQuery(
-            "select distinct aclSid.sid " +
-                "from AclObjectIdentity as aclObjectId, AclEntry as aclEntry, AclSid as aclSid,  Project as project " +
-                "where aclObjectId.objectId = project.id " +
-                "and aclEntry.aclObjectIdentity = aclObjectId " +
-                "and aclEntry.sid = aclSid and project.id = " + project.getId());
+            "select distinct aclSid.sid "
+                + "from AclObjectIdentity as aclObjectId, AclEntry as aclEntry, AclSid as aclSid,  Project as project "
+                + "where aclObjectId.objectId = project.id "
+                + "and aclEntry.aclObjectIdentity = aclObjectId "
+                + "and aclEntry.sid = aclSid and project.id = " + project.getId());
         List<String> usernames = query.getResultList();
         return usernames;
     }
-
 
     public List<Ontology> getOntologyList(User user) {
         if (currentRoleService.isAdminByNow(user)) {
@@ -241,26 +232,22 @@ public class SecurityACLService {
         }
         Query query = entityManager.createQuery(
             "select distinct ontology "
-                +
-                "from AclObjectIdentity as aclObjectId, AclEntry as aclEntry, AclSid as aclSid,  Ontology as ontology "
-                +
-                "where aclObjectId.objectId = ontology.id "
-                +
-                "and aclEntry.aclObjectIdentity = aclObjectId "
-                +
-                "and aclEntry.sid = aclSid and aclSid.sid like '"
+                + "from AclObjectIdentity as aclObjectId, AclEntry as aclEntry, AclSid as aclSid,  Ontology as ontology "
+                + "where aclObjectId.objectId = ontology.id "
+                + "and aclEntry.aclObjectIdentity = aclObjectId "
+                + "and aclEntry.sid = aclSid and aclSid.sid like '"
                 + user.getUsername()
                 + "'");
         List<Ontology> ontologies = query.getResultList();
         return ontologies;
     }
 
-    public void checkIsSameUser(User user, User currentUser) {
-        checkIsSameUser(user.getId(), currentUser);
-    }
-
     public void checkIsCurrentUserSameUser(Long userId) {
         checkIsSameUser(userId, currentUserService.getCurrentUser());
+    }
+
+    public void checkIsSameUser(User user, User currentUser) {
+        checkIsSameUser(user.getId(), currentUser);
     }
 
     public void checkIsSameUser(Long userId, User currentUser) {
@@ -274,7 +261,6 @@ public class SecurityACLService {
     public void checkCurrentUserIsAdmin() {
         checkAdmin(currentUserService.getCurrentUser());
     }
-
 
     public void checkAdmin(User user) {
         if (!currentRoleService.isAdminByNow(user)) {
@@ -291,7 +277,6 @@ public class SecurityACLService {
             throw new ForbiddenException("You don't have the right to perform this action! You must be user!");
         }
     }
-
 
     public void checkGuest() {
         checkGuest(currentUserService.getCurrentUser());
@@ -310,25 +295,19 @@ public class SecurityACLService {
         checkIsNotReadOnly(id, className.getName());
     }
 
-
     public void checkIsNotReadOnly(Long id, String className) {
         try {
             CytomineDomain domain = (CytomineDomain) entityManager.find(Class.forName(className), id);
             if (domain != null) {
                 checkIsNotReadOnly(domain);
             } else {
-                throw new ObjectNotFoundException("ACL error: "
-                    + className
-                    + " with id "
-                    + id
-                    + " was not found! Unable to process auth checking");
+                throw new ObjectNotFoundException(
+                    "ACL error: " + className + " with id " + id + " was not found! Unable to process auth checking"
+                );
             }
         } catch (IllegalArgumentException | ClassNotFoundException ex) {
             throw new ObjectNotFoundException("ACL error: "
-                + className
-                + " with id "
-                + id
-                + " was not found! Unable to process auth checking");
+                + className + " with id " + id + " was not found! Unable to process auth checking");
         }
 
     }
@@ -342,7 +321,9 @@ public class SecurityACLService {
             boolean readOnly = !retrieveContainer(domain).canUpdateContent();
             if (readOnly && !permissionService.hasACLPermission(retrieveContainer(domain), ADMINISTRATION)) {
                 throw new ForbiddenException(
-                    "The project for this data is in readonly mode! You must be project manager to add, edit or delete this resource in a readonly project.");
+                    "The project for this data is in readonly mode! "
+                        + "You must be project manager to add, edit or delete this resource in a readonly project."
+                );
             }
         } else {
             throw new ObjectNotFoundException("ACL error: domain is null! Unable to process project auth checking");

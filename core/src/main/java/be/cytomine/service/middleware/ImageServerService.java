@@ -151,8 +151,23 @@ public class ImageServerService {
         return hist;
     }
 
-    public List<Map<String, Object>> rawProperties(ImageInstance image) throws IOException {
+    public List<Map<String, Object>> rawProperties(ImageInstance image) {
         return this.rawProperties(image.getBaseImage());
+    }
+
+    public List<Map<String, Object>> rawProperties(AbstractImage image) {
+        PreparedRequest request = new PreparedRequest();
+        request.setMethod(HttpMethod.GET);
+        request.setUrl(this.internalImageServerURL());
+        request.addPathFragment("image");
+        request.addPathFragment(image.getPath(), true);
+        request.addPathFragment("metadata");
+
+        return JsonObject.toJsonObject(request.toObject(String.class))
+            .getJSONAttrListMap("items")
+            .stream()
+            .map(StringUtils::keysToCamelCase)
+            .toList();
     }
 
     public Map<String, Object> imageHistogram(AbstractImage image, int nBins) {
@@ -279,20 +294,24 @@ public class ImageServerService {
         return download(companionFile.getUploadedFile(), proxy);
     }
 
-    public List<Map<String, Object>> rawProperties(AbstractImage image) throws IOException {
+    public List<String> associated(ImageInstance image) throws IOException {
+        return associated(image.getBaseImage());
+    }
+
+    public List<String> associated(AbstractImage image) throws IOException {
         PreparedRequest request = new PreparedRequest();
         request.setMethod(HttpMethod.GET);
         request.setUrl(this.internalImageServerURL());
         request.addPathFragment("image");
         request.addPathFragment(image.getPath(), true);
-        request.addPathFragment("metadata");
+        request.addPathFragment("info");
+        request.addPathFragment("associated");
 
         return JsonObject.toJsonObject(request.toObject(String.class))
-            .getJSONAttrListMap("items").stream().map(StringUtils::keysToCamelCase).toList();
-    }
-
-    public List<String> associated(ImageInstance image) throws IOException {
-        return associated(image.getBaseImage());
+            .getJSONAttrListMap("items")
+            .stream()
+            .map(x -> (String) x.get("name"))
+            .toList();
     }
 
     public List<Map<String, Object>> channelHistograms(AbstractImage image, int nBins) {
@@ -381,19 +400,6 @@ public class ImageServerService {
         return items.stream()
             .map(x -> renameChannelHistogramKeys(StringUtils.keysToCamelCase(x)))
             .toList();
-    }
-
-    public List<String> associated(AbstractImage image) throws IOException {
-        PreparedRequest request = new PreparedRequest();
-        request.setMethod(HttpMethod.GET);
-        request.setUrl(this.internalImageServerURL());
-        request.addPathFragment("image");
-        request.addPathFragment(image.getPath(), true);
-        request.addPathFragment("info");
-        request.addPathFragment("associated");
-
-        return JsonObject.toJsonObject(request.toObject(String.class))
-            .getJSONAttrListMap("items").stream().map(x -> (String) x.get("name")).toList();
     }
 
     public ResponseEntity<byte[]> label(
@@ -569,15 +575,6 @@ public class ImageServerService {
         return request.toResponseEntity(proxy, byte[].class);
     }
 
-    public ResponseEntity<byte[]> crop(
-        AnnotationDomain annotation, CropParameter params,
-        String etag, ProxyExchange<byte[]> proxy
-    )
-        throws UnsupportedEncodingException, ParseException {
-        params.setLocation(annotation.getWktLocation());
-        return crop(annotation.getSlice().getBaseSlice(), params, etag, proxy);
-    }
-
     private static String retrieveWindowFormat(WindowParameter params) {
         String format;
         if (checkType(params).equals("alphamask")) {
@@ -586,14 +583,6 @@ public class ImageServerService {
             format = checkFormat(params.getFormat(), List.of("png", "jpg", "webp"));
         }
         return format;
-    }
-
-    public ResponseEntity<byte[]> crop(
-        SliceInstance slice, CropParameter params, String etag,
-        ProxyExchange<byte[]> proxy
-    )
-        throws UnsupportedEncodingException, ParseException {
-        return crop(slice.getBaseSlice(), params, etag, proxy);
     }
 
     private static String formatToMediaType(String format) {
@@ -608,6 +597,21 @@ public class ImageServerService {
             case "jpg" -> MediaType.IMAGE_JPEG_VALUE;
             default -> defaultMediaType;
         };
+    }
+
+    public ResponseEntity<byte[]> crop(
+        AnnotationDomain annotation, CropParameter params,
+        String etag, ProxyExchange<byte[]> proxy
+    ) throws UnsupportedEncodingException, ParseException {
+        params.setLocation(annotation.getWktLocation());
+        return crop(annotation.getSlice().getBaseSlice(), params, etag, proxy);
+    }
+
+    public ResponseEntity<byte[]> crop(
+        SliceInstance slice, CropParameter params, String etag,
+        ProxyExchange<byte[]> proxy
+    ) throws UnsupportedEncodingException, ParseException {
+        return crop(slice.getBaseSlice(), params, etag, proxy);
     }
 
     public ResponseEntity<byte[]> crop(

@@ -109,7 +109,8 @@ public class GenericAnnotationService {
         if (users.size() > 1
             && !table.equals("reviewed_annotation")) { //if more annotation from more than 1 user NOT IN REVIEW MODE!
             throw new WrongArgumentException(
-                "Annotations from multiple users are under this area. You can correct only annotation from 1 user (hide layer if necessary)");
+                "Annotations from multiple users are under this area. "
+                    + "You can correct only annotation from 1 user (hide layer if necessary)");
         }
 
         List<AnnotationDomain> annotations = annotationDomainRepository.findAllById(ids);
@@ -134,7 +135,6 @@ public class GenericAnnotationService {
                 }
             }
 
-//            annotations = new ArrayList<>();
             for (AnnotationDomain annotation : annotations) {
                 if (!annotation.termsId().contains(goodTerm)) {
                     annotations.remove(annotation);
@@ -200,6 +200,4 @@ public class GenericAnnotationService {
         }
         return annotationsWithSameTerm;
     }
-
-
 }

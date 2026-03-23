@@ -219,83 +219,52 @@ public class UploadedFileService extends ModelService {
             treeSelect += "COUNT(DISTINCT tree.id) AS nb_children, ";
             treeSelect += "COALESCE(SUM(DISTINCT tree.size),0)+uf.size AS global_size, ";
 
-            treeJoin = "LEFT JOIN (SELECT *  FROM uploaded_file t " +
-                "WHERE EXISTS (SELECT 1 FROM acl_sid AS asi LEFT JOIN acl_entry AS ae ON asi.id = ae.sid " +
-                "LEFT JOIN acl_object_identity AS aoi ON ae.acl_object_identity = aoi.id " +
-                "WHERE aoi.object_id_identity = t.storage_id AND asi.sid = :username) AND t.deleted IS NULL) " +
-                "AS tree ON (uf.l_tree @> tree.l_tree AND tree.id != uf.id) ";
+            treeJoin = "LEFT JOIN (SELECT *  FROM uploaded_file t "
+                + "WHERE EXISTS (SELECT 1 FROM acl_sid AS asi LEFT JOIN acl_entry AS ae ON asi.id = ae.sid "
+                + "LEFT JOIN acl_object_identity AS aoi ON ae.acl_object_identity = aoi.id "
+                + "WHERE aoi.object_id_identity = t.storage_id AND asi.sid = :username) AND t.deleted IS NULL) "
+                + "AS tree ON (uf.l_tree @> tree.l_tree AND tree.id != uf.id) ";
         }
 
         String request = "SELECT uf.id, "
-            +
-            "uf.content_type, "
-            +
-            "uf.created, "
-            +
-            "uf.filename, "
-            +
-            "uf.original_filename, "
-            +
-            "uf.size, "
-            +
-            "uf.status, "
-            +
-            "uf.storage_id, "
-            +
-            "uf.user_id, "
-            +
-            "ai.height, "
-            +
-            "ai.magnification, "
-            +
-            "ai.width, "
-            +
-            "CASE WHEN (nlevel(uf.l_tree) > 0) THEN ltree2text(subltree(uf.l_tree, 0, 1)) ELSE NULL END AS root, "
-            +
-            treeSelect
-            +
-            "CASE WHEN (uf.status = "
+            + "uf.content_type, "
+            + "uf.created, "
+            + "uf.filename, "
+            + "uf.original_filename, "
+            + "uf.size, "
+            + "uf.status, "
+            + "uf.storage_id, "
+            + "uf.user_id, "
+            + "ai.height, "
+            + "ai.magnification, "
+            + "ai.width, "
+            + "CASE WHEN (nlevel(uf.l_tree) > 0) THEN ltree2text(subltree(uf.l_tree, 0, 1)) ELSE NULL END AS root, "
+            + treeSelect
+            + "CASE WHEN (uf.status = "
             + UploadedFileStatus.CONVERTED.getCode()
             + " OR uf.status = "
             + UploadedFileStatus.DEPLOYED.getCode()
             + ") "
-            +
-            "THEN ai.id ELSE NULL END AS image "
-            +
-            "FROM uploaded_file uf "
-            +
-            treeJoin
-            +
-            "LEFT JOIN abstract_image AS ai ON ai.uploaded_file_id = uf.id "
-            +
-            "LEFT JOIN uploaded_file AS parent ON parent.id = uf.parent_id "
-            +
-            "WHERE EXISTS (SELECT 1 FROM acl_sid AS asi "
-            +
-            "LEFT JOIN acl_entry AS ae ON asi.id = ae.sid "
-            +
-            "LEFT JOIN acl_object_identity AS aoi ON ae.acl_object_identity = aoi.id "
-            +
-            "WHERE aoi.object_id_identity = uf.storage_id AND asi.sid = :username) "
-            +
-            "AND (uf.parent_id IS NULL OR parent.content_type IN ('"
+            + "THEN ai.id ELSE NULL END AS image "
+            + "FROM uploaded_file uf "
+            + treeJoin
+            + "LEFT JOIN abstract_image AS ai ON ai.uploaded_file_id = uf.id "
+            + "LEFT JOIN uploaded_file AS parent ON parent.id = uf.parent_id "
+            + "WHERE EXISTS (SELECT 1 FROM acl_sid AS asi "
+            + "LEFT JOIN acl_entry AS ae ON asi.id = ae.sid "
+            + "LEFT JOIN acl_object_identity AS aoi ON ae.acl_object_identity = aoi.id "
+            + "WHERE aoi.object_id_identity = uf.storage_id AND asi.sid = :username) "
+            + "AND (uf.parent_id IS NULL OR parent.content_type IN ('"
             + String.join("','", UploadedFile.ARCHIVE_FORMATS)
             + "')) "
-            +
-            "AND uf.content_type NOT IN ('"
+            + "AND uf.content_type NOT IN ('"
             + String.join("','", UploadedFile.ARCHIVE_FORMATS)
             + "') "
-            +
-            "AND uf.deleted IS NULL "
-            +
-            "AND "
-            +
-            (search.trim().isEmpty() ? "true" : search)
-            +
-            " GROUP BY uf.id, ai.id "
-            +
-            sort;
-
+            + "AND uf.deleted IS NULL "
+            + "AND "
+            + (search.trim().isEmpty() ? "true" : search)
+            + " GROUP BY uf.id, ai.id "
+            + sort;
 
         Query query = getEntityManager().createNativeQuery(request, Tuple.class);
         Map<String, Object> mapParams = sqlSearchConditions.getSqlParameters();
@@ -328,44 +297,30 @@ public class UploadedFileService extends ModelService {
 
     }
 
-
     public List<Map<String, Object>> listHierarchicalTree(User user, Long rootId) {
         UploadedFile root = this.find(rootId)
             .orElseThrow(() -> new ObjectNotFoundException("UploadedFile", rootId));
 
         String request = "SELECT uf.id, uf.created, uf.original_filename, uf.content_type, "
-            +
-            "uf.l_tree, uf.parent_id as parent, "
-            +
-            "uf.size, uf.status, "
-            +
-            "cast (array_agg(ai.id) AS BIGINT[]) as image, cast (array_agg(asl.id) AS BIGINT[]) as slices, cast (array_agg(cf.id) AS BIGINT[]) as companion_file "
-            +
-            "FROM uploaded_file uf "
-            +
-            "LEFT JOIN abstract_image ai ON ai.uploaded_file_id = uf.id "
-            +
-            "LEFT JOIN abstract_slice asl ON asl.uploaded_file_id = uf.id "
-            +
-            "LEFT JOIN companion_file cf ON cf.uploaded_file_id = uf.id "
-            +
-            "LEFT JOIN acl_object_identity as aoi ON aoi.object_id_identity = uf.storage_id "
-            +
-            "LEFT JOIN acl_entry as ae ON ae.acl_object_identity = aoi.id "
-            +
-            "LEFT JOIN acl_sid as asi ON asi.id = ae.sid "
-            +
-            "WHERE uf.l_tree <@ CAST(CAST('"
+            + "uf.l_tree, uf.parent_id as parent, "
+            + "uf.size, uf.status, "
+            + "cast (array_agg(ai.id) AS BIGINT[]) as image, "
+            + "cast (array_agg(asl.id) AS BIGINT[]) as slices, "
+            + "cast (array_agg(cf.id) AS BIGINT[]) as companion_file "
+            + "FROM uploaded_file uf "
+            + "LEFT JOIN abstract_image ai ON ai.uploaded_file_id = uf.id "
+            + "LEFT JOIN abstract_slice asl ON asl.uploaded_file_id = uf.id "
+            + "LEFT JOIN companion_file cf ON cf.uploaded_file_id = uf.id "
+            + "LEFT JOIN acl_object_identity as aoi ON aoi.object_id_identity = uf.storage_id "
+            + "LEFT JOIN acl_entry as ae ON ae.acl_object_identity = aoi.id "
+            + "LEFT JOIN acl_sid as asi ON asi.id = ae.sid "
+            + "WHERE uf.l_tree <@ CAST(CAST('"
             + root.getLTree()
             + "' as text) as ltree) "
-            +
-            "AND asi.sid = :username "
-            +
-            "AND uf.deleted IS NULL "
-            +
-            "GROUP BY uf.id , uf.l_tree "
-            +
-            "ORDER BY uf.l_tree ASC ";
+            + "AND asi.sid = :username "
+            + "AND uf.deleted IS NULL "
+            + "GROUP BY uf.id , uf.l_tree "
+            + "ORDER BY uf.l_tree ASC ";
 
         Query query = getEntityManager().createNativeQuery(request, Tuple.class);
         query.setParameter("username", user.getUsername());

@@ -82,8 +82,8 @@ public class AnnotationTrackService extends ModelService {
 
     public Optional<AnnotationTrack> find(Long id) {
         Optional<AnnotationTrack> optionalAnnotationTrack = annotationTrackRepository.findById(id);
-        optionalAnnotationTrack.ifPresent(AnnotationTrack -> securityACLService.check(
-            AnnotationTrack.container(),
+        optionalAnnotationTrack.ifPresent(annotationTrack -> securityACLService.check(
+            annotationTrack.container(),
             READ
         ));
         return optionalAnnotationTrack;
@@ -94,8 +94,8 @@ public class AnnotationTrackService extends ModelService {
             annotation.getId(),
             track
         );
-        optionalAnnotationTrack.ifPresent(AnnotationTrack -> securityACLService.check(
-            AnnotationTrack.container(),
+        optionalAnnotationTrack.ifPresent(annotationTrack -> securityACLService.check(
+            annotationTrack.container(),
             READ
         ));
         return optionalAnnotationTrack;

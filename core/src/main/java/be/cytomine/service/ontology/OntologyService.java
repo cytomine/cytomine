@@ -110,7 +110,6 @@ public class OntologyService extends ModelService {
         return data;
     }
 
-
     @Override
     public CommandResponse add(JsonObject jsonObject) {
         User currentUser = currentUserService.getCurrentUser();
@@ -206,8 +205,7 @@ public class OntologyService extends ModelService {
         for (Term term : termService.list(ontology)) {
             termService.delete(term, transaction, task, false);
         }
-        ontology.setTerms(new HashSet<>()); //otherwise, when you write the json, term cannot be found (because term link is LAZY + term deleted)
+        //otherwise, when you write the json, term cannot be found (because term link is LAZY + term deleted)
+        ontology.setTerms(new HashSet<>());
     }
-
-
 }

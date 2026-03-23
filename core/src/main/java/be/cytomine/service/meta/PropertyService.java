@@ -179,19 +179,19 @@ public class PropertyService extends ModelService {
             securityACLService.check(image.container(), READ);
         }
 
-        String request = "SELECT DISTINCT p.key " +
-            (withUser ? ", ua.user_id " : "") +
-            "FROM property as p, user_annotation as ua " +
-            "WHERE p.domain_ident = ua.id " +
-            (project != null ? "AND ua.project_id = '" + project.getId() + "' " : "") +
-            (image != null ? "AND ua.image_id = '" + image.getId() + "' " : "") +
-            "UNION " +
-            "SELECT DISTINCT p2.key " +
-            (withUser ? ", ra.user_id " : "") +
-            "FROM property as p2, reviewed_annotation as ra " +
-            "WHERE p2.domain_ident = ra.id " +
-            (project != null ? "AND ra.project_id = '" + project.getId() + "' " : "") +
-            (image != null ? "AND ra.image_id = '" + image.getId() + "' " : "");
+        String request = "SELECT DISTINCT p.key "
+            + (withUser ? ", ua.user_id " : "")
+            + "FROM property as p, user_annotation as ua "
+            + "WHERE p.domain_ident = ua.id "
+            + (project != null ? "AND ua.project_id = '" + project.getId() + "' " : "")
+            + (image != null ? "AND ua.image_id = '" + image.getId() + "' " : "")
+            + "UNION "
+            + "SELECT DISTINCT p2.key "
+            + (withUser ? ", ra.user_id " : "")
+            + "FROM property as p2, reviewed_annotation as ra "
+            + "WHERE p2.domain_ident = ra.id "
+            + (project != null ? "AND ra.project_id = '" + project.getId() + "' " : "")
+            + (image != null ? "AND ra.image_id = '" + image.getId() + "' " : "");
 
         return selectListKeyWithUser(request, Map.of());
     }
@@ -201,10 +201,10 @@ public class PropertyService extends ModelService {
             securityACLService.check(project, READ);
         }
 
-        String request = "SELECT DISTINCT p.key " +
-            "FROM property as p, image_instance as ii " +
-            "WHERE p.domain_ident = ii.id " +
-            "AND ii.project_id = " + project.getId();
+        String request = "SELECT DISTINCT p.key "
+            + "FROM property as p, image_instance as ii "
+            + "WHERE p.domain_ident = ii.id "
+            + "AND ii.project_id = " + project.getId();
 
         return selectListkey(request, Map.of());
     }
@@ -218,26 +218,20 @@ public class PropertyService extends ModelService {
         securityACLService.check(image.container(), READ);
         String request =
             "SELECT DISTINCT ua.id, ST_X(ST_CENTROID(ua.location)) as x,ST_Y(ST_CENTROID(ua.location)) as y, p.value "
-                +
-                "FROM user_annotation ua, property as p "
-                +
-                "WHERE p.domain_ident = ua.id "
-                +
-                "AND p.key = :key "
-                +
-                "AND ua.image_id = '"
+                + "FROM user_annotation ua, property as p "
+                + "WHERE p.domain_ident = ua.id "
+                + "AND p.key = :key "
+                + "AND ua.image_id = '"
                 + image.getId()
                 + "' "
-                +
-                "AND ua.user_id = '"
+                + "AND ua.user_id = '"
                 + user.getId()
                 + "' "
-                +
-                (boundingbox != null ? "AND ST_Intersects(ua.location,ST_GeometryFromText('"
-                    + boundingbox.toString()
-                    + "',0)) " : "");
+                + (boundingbox != null ? "AND ST_Intersects(ua.location,ST_GeometryFromText('"
+                + boundingbox
+                + "',0)) " : "");
 
-        return selectsql(request, Map.of("key", (Object) key));
+        return selectsql(request, Map.of("key", key));
     }
 
     private List<String> selectListkey(String request, Map<String, Object> parameters) {
@@ -270,5 +264,4 @@ public class PropertyService extends ModelService {
             .map(x -> Map.of("idAnnotation", castToLong(x.get(0)), "x", x.get(1), "y", x.get(2), "value", x.get(3)))
             .collect(Collectors.toList());
     }
-
 }

@@ -236,7 +236,8 @@ public class UserAnnotationService extends ModelService {
         ImageInstance image = null;
         // TODO perf: we load twice slice/image/... : here + in userannotation domain "build from json" method
         // Same for user
-        // We could provide "sliceObject", "imageObject", "userObject" in JSON and first check for them in the userannotation class
+        // We could provide "sliceObject", "imageObject", "userObject" in JSON
+        // and first check for them in the userannotation class
         if (!jsonObject.isMissing("slice")) {
             slice = sliceInstanceService.find(jsonObject.getJSONAttrLong("slice"))
                 .orElseThrow(() -> new ObjectNotFoundException("SliceInstance with id " + jsonObject.get("slice")));
@@ -290,9 +291,9 @@ public class UserAnnotationService extends ModelService {
 
         Envelope envelope = annotationShape.getEnvelopeInternal();
         boolean isSizeDefined = image.getBaseImage().getWidth() != null && image.getBaseImage().getHeight() != null;
-        if (isSizeDefined && (envelope.getMinX() < 0 || envelope.getMinY() < 0 ||
-            envelope.getMaxX() > image.getBaseImage().getWidth() ||
-            envelope.getMaxY() > image.getBaseImage().getHeight())) {
+        if (isSizeDefined && (envelope.getMinX() < 0 || envelope.getMinY() < 0
+            || envelope.getMaxX() > image.getBaseImage().getWidth()
+            || envelope.getMaxY() > image.getBaseImage().getHeight())) {
             double maxX = Math.min(envelope.getMaxX(), image.getBaseImage().getWidth());
             double maxY = Math.min(envelope.getMaxY(), image.getBaseImage().getHeight());
             Geometry insideBounds = null;
@@ -505,9 +506,9 @@ public class UserAnnotationService extends ModelService {
 
         Envelope envelope = annotationShape.getEnvelopeInternal();
         boolean isSizeDefined = image.getBaseImage().getWidth() != null && image.getBaseImage().getHeight() != null;
-        if (isSizeDefined && (envelope.getMinX() < 0 || envelope.getMinY() < 0 ||
-            envelope.getMaxX() > image.getBaseImage().getWidth() ||
-            envelope.getMaxY() > image.getBaseImage().getHeight())) {
+        if (isSizeDefined && (envelope.getMinX() < 0 || envelope.getMinY() < 0
+            || envelope.getMaxX() > image.getBaseImage().getWidth()
+            || envelope.getMaxY() > image.getBaseImage().getHeight())) {
             double maxX = Math.min(envelope.getMaxX(), image.getBaseImage().getWidth());
             double maxY = Math.min(envelope.getMaxY(), image.getBaseImage().getHeight());
             Geometry insideBounds = null;

@@ -151,10 +151,9 @@ public class ReviewedAnnotationService extends ModelService {
         return reviewedAnnotationRepository.findByParentIdent(annotationDomain.getId());
     }
 
-    public List<ReviewedAnnotationStatsEntry> statsGroupByUser(ImageInstance ImageInstance) {
-        return reviewedAnnotationRepository.stats(ImageInstance);
+    public List<ReviewedAnnotationStatsEntry> statsGroupByUser(ImageInstance imageInstance) {
+        return reviewedAnnotationRepository.stats(imageInstance);
     }
-
 
     public List listIncluded(
         ImageInstance image,
@@ -175,8 +174,8 @@ public class ReviewedAnnotationService extends ModelService {
     }
 
     public List<UserTermMapping> listTerms(ReviewedAnnotation annotation) {
-        Long reviewer = (annotation.getImage().getReviewUser() != null ?
-            annotation.getImage().getReviewUser().getId() : null);
+        Long reviewer = (annotation.getImage().getReviewUser() != null
+            ? annotation.getImage().getReviewUser().getId() : null);
         return annotation.getTerms().stream().map(x -> new UserTermMapping(x.getId(), reviewer))
             .collect(Collectors.toList());
     }
@@ -272,7 +271,9 @@ public class ReviewedAnnotationService extends ModelService {
         }
 
         reviewedAnnotationRepository.findByParentIdent(basedAnnotation.getId()).ifPresent(
-            duplicate -> { throw new AlreadyExistException("Annotation is already accepted!"); }
+            duplicate -> {
+                throw new AlreadyExistException("Annotation is already accepted!");
+            }
         );
 
         ReviewedAnnotation review = createReviewAnnotation(basedAnnotation, terms);

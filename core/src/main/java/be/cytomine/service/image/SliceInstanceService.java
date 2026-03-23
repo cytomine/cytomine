@@ -91,17 +91,16 @@ public class SliceInstanceService extends ModelService {
         return sliceInstance;
     }
 
-    public SliceInstance get(Long id) {
-        return find(id).orElse(null);
-    }
-
-
     public Optional<SliceInstance> find(ImageInstance image, int c, int z, int t) {
         Optional<SliceInstance> optionalSliceInstance = sliceInstanceRepository.findByCZT(image, c, z, t);
         optionalSliceInstance.ifPresent(cf -> {
             securityACLService.check(cf.container(), READ);
         });
         return optionalSliceInstance;
+    }
+
+    public SliceInstance get(Long id) {
+        return find(id).orElse(null);
     }
 
     public List<SliceInstance> list(ImageInstance image) {

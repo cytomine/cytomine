@@ -83,14 +83,6 @@ public class TermService extends ModelService {
         return Term.class;
     }
 
-    /**
-     * List all term, Only for admin
-     */
-    public List<Term> list() {
-        securityACLService.checkAdmin(currentUserService.getCurrentUser());
-        return termRepository.findAll();
-    }
-
     public Term get(Long id) {
         return find(id).orElse(null);
     }
@@ -99,6 +91,14 @@ public class TermService extends ModelService {
         Optional<Term> optionalTerm = termRepository.findById(id);
         optionalTerm.ifPresent(term -> securityACLService.check(term.container(), READ));
         return optionalTerm;
+    }
+
+    /**
+     * List all term, Only for admin
+     */
+    public List<Term> list() {
+        securityACLService.checkAdmin(currentUserService.getCurrentUser());
+        return termRepository.findAll();
     }
 
     public List<Term> list(Ontology ontology) {

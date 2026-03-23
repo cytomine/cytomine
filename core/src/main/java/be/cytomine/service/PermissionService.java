@@ -47,17 +47,17 @@ public class PermissionService {
         return masks.stream().max(Integer::compare).orElse(-1) >= permission.getMask();
     }
 
-    public boolean hasExactACLPermission(CytomineDomain domain, String username, Permission permission) {
-        List<Integer> masks = getPermissionInACL(domain, username);
-        return masks.contains(permission.getMask());
-    }
-
     public boolean hasACLPermission(CytomineDomain domain, Permission permission) {
         return hasACLPermission(domain, currentUserService.getCurrentUsername(), permission);
     }
 
     public boolean hasACLPermission(CytomineDomain domain, Permission permission, boolean isAdmin) {
         return isAdmin || hasACLPermission(domain, currentUserService.getCurrentUsername(), permission);
+    }
+
+    public boolean hasExactACLPermission(CytomineDomain domain, String username, Permission permission) {
+        List<Integer> masks = getPermissionInACL(domain, username);
+        return masks.contains(permission.getMask());
     }
 
     List<Integer> getPermissionInACL(CytomineDomain domain, User user) {
@@ -67,7 +67,6 @@ public class PermissionService {
     List<Integer> getPermissionInACL(CytomineDomain domain, String username) {
         return aclRepository.listMaskForUsers(domain.getId(), username);
     }
-
 
     public void deletePermission(CytomineDomain domain, String username, Permission permission) {
         log.debug(
@@ -111,10 +110,6 @@ public class PermissionService {
 
     /**
      * Add Permission right
-     *
-     * @param domain
-     * @param username
-     * @param permission
      */
     public void addPermission(CytomineDomain domain, String username, int permission) {
         addPermission(domain, username, readFromMask(permission));
@@ -143,19 +138,18 @@ public class PermissionService {
         }
     }
 
-
     public void addPermissionOptimised(Long aclObjectIdentity, String username, Permission permission, Integer index) {
         //get acl sid for the user
         Long sid = getAclSid(username);
         aclRepository.insertAclEntry(index, aclObjectIdentity, permission.getMask(), sid);
     }
 
-
     public Long createAclEntry(Long aoi, Long sid, Integer mask) {
         log.debug("create acl entry for {}, {}, {}", aoi, sid, mask);
         synchronized (this.getClass()) {
             // method is synchronized since we have to compute the aceOrder+1.
-            // the synchronize does not resolve fully the issue since the INSERT may not be persisted in database directly (batch_insert / flush / ...)
+            // the synchronize does not resolve fully the issue
+            // since the INSERT may not be persisted in database directly (batch_insert / flush / ...)
             // TODO: Not sure the aceOrder is really usefull ? couldn't we use a sequence?
             Long aclEntryId = aclRepository.getAclEntryId(aoi, sid, mask);
             if (aclEntryId == null) {

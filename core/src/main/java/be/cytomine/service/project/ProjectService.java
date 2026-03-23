@@ -512,6 +512,8 @@ public class ProjectService extends ModelService {
                     .replaceAll(regex, replacement)
                     .toLowerCase();
                 break;
+            default:
+                break;
         }
 
         sort = " ORDER BY " + sortColumn;

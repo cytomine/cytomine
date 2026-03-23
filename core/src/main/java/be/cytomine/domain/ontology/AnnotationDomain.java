@@ -206,6 +206,8 @@ public abstract class AnnotationDomain extends CytomineDomain implements Seriali
                     break;
                 case "be.cytomine.domain.processing.RoiAnnotation":
                     throw new CytomineMethodNotYetImplementedException("migration");
+                default:
+                    throw new RuntimeException("Unsupported className: " + className);
             }
         }
 

@@ -642,6 +642,8 @@ public class ProjectConnectionService {
                 group = Document.parse(
                     "{$group : {_id : { year: '$y', month: '$m', week: '$w'}, \"time\":{$first:'$time'}, \"frequency\":{$sum:1}}}");
                 break;
+            default:
+                break;
         }
 
         if (afterThan != null) {
@@ -740,6 +742,8 @@ public class ProjectConnectionService {
                     "{$project : { w : {$week:'$created'}, time : '$created'}}");
                 group = Document.parse(
                     "{$group : {_id : { week: '$w'}, \"time\":{$first:'$time'}, \"frequency\":{$sum:1}}}");
+                break;
+            default:
                 break;
         }
 

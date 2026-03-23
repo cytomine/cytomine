@@ -212,7 +212,8 @@ public class PermissionService {
                 return BasePermission.DELETE;
             case 16:
                 return BasePermission.ADMINISTRATION;
+            default:
+                throw new RuntimeException("Unsupported mask: " + mask);
         }
-        throw new RuntimeException("Mask " + mask + " not supported");
     }
 }

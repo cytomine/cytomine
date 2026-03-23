@@ -486,6 +486,8 @@ public class UserService extends ModelService {
                     userIds = results.stream().map(x -> (Long) x.get("id")).collect(Collectors.toList());
                     frequenciessFetched = true;
                     break;
+                default:
+                    break;
             }
 
             if (!usersFetched) {

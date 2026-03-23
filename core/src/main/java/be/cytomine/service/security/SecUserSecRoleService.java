@@ -202,6 +202,8 @@ public class SecUserSecRoleService extends ModelService {
                 removeRole(user, roleAdmin);
                 removeRole(user, roleSuperAdmin);
                 break;
+            default:
+                break;
         }
     }
 

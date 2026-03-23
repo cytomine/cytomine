@@ -20,7 +20,6 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.image.UploadedFile;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.image.UploadedFileService;
@@ -42,35 +41,45 @@ public class RestUploadedFileController extends RestCytomineController {
 
     @GetMapping("/uploadedfile.json")
     public ResponseEntity<String> list(
-            @RequestParam(defaultValue = "false") Boolean onlyRootsWithDetails,
-            @RequestParam(defaultValue = "true") Boolean withTreeDetails,
-            @RequestParam(defaultValue = "false") Boolean onlyRoots,
-            @RequestParam(required = false) Long parent,
-            @RequestParam(required = false)  Long root,
-            @RequestParam(defaultValue = "false") Boolean all
+        @RequestParam(defaultValue = "false") Boolean onlyRootsWithDetails,
+        @RequestParam(defaultValue = "true") Boolean withTreeDetails,
+        @RequestParam(defaultValue = "false") Boolean onlyRoots,
+        @RequestParam(required = false) Long parent,
+        @RequestParam(required = false) Long root,
+        @RequestParam(defaultValue = "false") Boolean all
     ) {
         log.debug("REST request to list uploaded files");
 
         RequestParams requestParams = retrievePageableParameters();
-        if (root!=null) {
-            return responseSuccess(uploadedFileService.listHierarchicalTree((User) currentUserService.getCurrentUser(), root));
+        if (root != null) {
+            return responseSuccess(uploadedFileService.listHierarchicalTree(currentUserService.getCurrentUser(), root));
         } else if (onlyRootsWithDetails) {
-            return responseSuccess(uploadedFileService.list(retrieveSearchParameters(), requestParams.getSort(), requestParams.getOrder(), withTreeDetails));
+            return responseSuccess(uploadedFileService.list(
+                retrieveSearchParameters(),
+                requestParams.getSort(),
+                requestParams.getOrder(),
+                withTreeDetails)
+            );
         } else if (all) {
             return responseSuccess(uploadedFileService.list(retrievePageable()));
         } else {
-            return responseSuccess(uploadedFileService.list(currentUserService.getCurrentUser(), parent, onlyRoots, retrievePageable()));
+            return responseSuccess(uploadedFileService.list(
+                currentUserService.getCurrentUser(),
+                parent,
+                onlyRoots,
+                retrievePageable()
+            ));
         }
     }
 
     @GetMapping("/uploadedfile/{id}.json")
     public ResponseEntity<String> show(
-            @PathVariable Long id
+        @PathVariable Long id
     ) {
         log.debug("REST request to get uploadedFile {}", id);
         return uploadedFileService.find(id)
-                .map(this::responseSuccess)
-                .orElseThrow(() -> new ObjectNotFoundException("UploadedFile", id));
+            .map(this::responseSuccess)
+            .orElseThrow(() -> new ObjectNotFoundException("UploadedFile", id));
     }
 
     @PostMapping(value = "/uploadedfile.json")
@@ -99,7 +108,7 @@ public class RestUploadedFileController extends RestCytomineController {
         log.debug("GET /uploadedfile/{}/download", id);
 
         UploadedFile uploadedFile = uploadedFileService.find(id, Authorization)
-                .orElseThrow(() -> new ObjectNotFoundException("UploadedFile", id));
+            .orElseThrow(() -> new ObjectNotFoundException("UploadedFile", id));
 
         StreamingResponseBody stream = outputStream -> {
             imageServerService.streamDownload(uploadedFile, outputStream);
@@ -110,8 +119,8 @@ public class RestUploadedFileController extends RestCytomineController {
         headers.setContentDispositionFormData("attachment", uploadedFile.getOriginalFilename());
 
         return ResponseEntity
-                .ok()
-                .headers(headers)
-                .body(stream);
+            .ok()
+            .headers(headers)
+            .body(stream);
     }
 }

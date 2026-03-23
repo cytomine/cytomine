@@ -1,24 +1,7 @@
 package be.cytomine.controller;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.util.Date;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,9 +57,6 @@ public class CommandControllerTests {
     @Autowired
     private UploadedFileService uploadedFileService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
     @Test
     @Transactional
     @WithMockUser(username = "superadmin")
@@ -85,16 +65,13 @@ public class CommandControllerTests {
         Long start = System.currentTimeMillis();
 
         int initialSize = (int) commandRepository.findAll()
-                                    .stream()
-                                    .filter(x -> x instanceof DeleteCommand)
-                                    .count();
+            .stream()
+            .filter(x -> x instanceof DeleteCommand)
+            .count();
         int initialSizeUploadedFileDeleteCommand = (int) commandRepository.findAll()
-                                                             .stream()
-                                                             .filter(x -> x instanceof DeleteCommand
-                                                                              && x.getServiceName()
-                                                                                     .equals(
-                                                                                         "UploadedFileService"))
-                                                             .count();
+            .stream()
+            .filter(x -> x instanceof DeleteCommand && x.getServiceName().equals("UploadedFileService"))
+            .count();
 
         restCommandControllerMockMvc.perform(get("/api/deletecommand.json"))
             .andExpect(status().isOk())
@@ -132,14 +109,12 @@ public class CommandControllerTests {
                     .param("after", String.valueOf(start)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(1))));
-
     }
 
     @Test
     @Transactional
     @WithMockUser(username = "superadmin")
     public void undo_redo() throws Exception {
-
         Ontology ontology = basicInstanceBuilder.given_a_not_persisted_ontology();
         ontology.setName("undo_redo");
         restCommandControllerMockMvc.perform(
@@ -149,26 +124,25 @@ public class CommandControllerTests {
             .andExpect(jsonPath("$.ontology.name").value(ontology.getName()));
 
         ontology = ontologyRepository.findAll()
-                       .stream()
-                       .filter(x -> x.getName().equals("undo_redo"))
-                       .findFirst()
-                       .get();
+            .stream()
+            .filter(x -> x.getName().equals("undo_redo"))
+            .findFirst()
+            .get();
 
         restCommandControllerMockMvc.perform(get("/api/ontology/{id}.json", ontology.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(ontology.getId().intValue()));
 
-        restCommandControllerMockMvc.perform(
-                get("/command/undo.json").contentType(MediaType.APPLICATION_JSON))
+        restCommandControllerMockMvc.perform(get("/api/command/undo.json").contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk());
 
         restCommandControllerMockMvc.perform(get("/api/ontology/{id}.json", ontology.getId()))
             .andExpect(status().isNotFound());
 
         MvcResult result = restCommandControllerMockMvc.perform(
-                get("/command/redo.json").contentType(MediaType.APPLICATION_JSON))
-                               .andExpect(status().isOk())
-                               .andReturn();
+                get("/api/command/redo.json").contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andReturn();
 
         String json = result.getResponse().getContentAsString();
         Integer id = JsonPath.read(json, "$.collection[0].ontology.key");
@@ -182,7 +156,6 @@ public class CommandControllerTests {
     @Transactional
     @WithMockUser(username = "superadmin")
     public void undo_redo_with_command_id() throws Exception {
-
         Ontology ontology = basicInstanceBuilder.given_a_not_persisted_ontology();
         ontology.setName("undo_redo");
         restCommandControllerMockMvc.perform(
@@ -192,10 +165,10 @@ public class CommandControllerTests {
             .andExpect(jsonPath("$.ontology.name").value(ontology.getName()));
 
         ontology = ontologyRepository.findAll()
-                       .stream()
-                       .filter(x -> x.getName().equals("undo_redo"))
-                       .findFirst()
-                       .get();
+            .stream()
+            .filter(x -> x.getName().equals("undo_redo"))
+            .findFirst()
+            .get();
 
         Command command = commandRepository.findAll(Sort.by(Sort.Direction.DESC, "created")).get(0);
 
@@ -204,16 +177,16 @@ public class CommandControllerTests {
             .andExpect(jsonPath("$.id").value(ontology.getId().intValue()));
 
         restCommandControllerMockMvc.perform(
-                get("/command/{id}/undo.json", command.getId()).contentType(MediaType.APPLICATION_JSON))
+                get("/api/command/{id}/undo.json", command.getId()).contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk());
 
         restCommandControllerMockMvc.perform(get("/api/ontology/{id}.json", ontology.getId()))
             .andExpect(status().isNotFound());
 
         MvcResult result = restCommandControllerMockMvc.perform(
-                get("/command/{id}/redo.json", command.getId()).contentType(MediaType.APPLICATION_JSON))
-                               .andExpect(status().isOk())
-                               .andReturn();
+                get("/api/command/{id}/redo.json", command.getId()).contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andReturn();
 
         String json = result.getResponse().getContentAsString();
         Integer id = JsonPath.read(json, "$.collection[0].ontology.key");

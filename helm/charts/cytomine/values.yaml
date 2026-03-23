@@ -136,11 +136,11 @@ pims_cache:
   resources:
     requests:
       memory: "256Mi"
-      cpu: "200m"
+      cpu: "500m"
       ephemeral-storage: 32Mi
     limits:
-      memory: "256Mi"
-      cpu: "200m"
+      memory: "512Mi"
+      cpu: "1000m"
       ephemeral-storage: 1Gi
 
 redis:
@@ -157,11 +157,11 @@ core:
   resources:
     requests:
       memory: "2Gi"
-      cpu: "500m"
+      cpu: "1000m"
       ephemeral-storage: 1Gi
     limits:
-      memory: "2Gi"
-      cpu: "500m"
+      memory: "4Gi"
+      cpu: "2000m"
       ephemeral-storage: 1Gi
 
 # Pims - Main Image Server
@@ -265,11 +265,11 @@ repository:
   resources:
     requests:
       memory: "512Mi"
-      cpu: "100m"
+      cpu: "500m"
       ephemeral-storage: 256Mi
     limits:
-      memory: "512Mi"
-      cpu: "200m"
+      memory: "1Gi"
+      cpu: "1000m"
       ephemeral-storage: 512Mi
 
 #

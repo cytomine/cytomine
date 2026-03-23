@@ -23,7 +23,7 @@ public class Lock {
 
     public static Lock getInstance() {
         synchronized (Lock.class) {
-            if (lock==null) {
+            if (lock == null) {
                 lock = new Lock();
             }
             return lock;
@@ -52,7 +52,11 @@ public class Lock {
         try {
             log.debug("Try to lock custom UI for project " + project.getId());
             customUILocks.putIfAbsent(project.getId(), new ReentrantLock());
-            log.debug("Custom UI Project {} current lock {}", project.getId(), customUILocks.get(project.getId()).isLocked());
+            log.debug(
+                "Custom UI Project {} current lock {}",
+                project.getId(),
+                customUILocks.get(project.getId()).isLocked()
+            );
             boolean result = customUILocks.get(project.getId()).tryLock(60, TimeUnit.SECONDS);
             log.debug("Custom UI Project {} lock result {}", project.getId(), result);
             return result;

@@ -30,11 +30,8 @@ import be.cytomine.dto.image.WindowParameter;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.image.AbstractImageService;
 import be.cytomine.service.image.AbstractSliceService;
-import be.cytomine.service.image.ImagePropertiesService;
-import be.cytomine.service.image.SliceCoordinatesService;
 import be.cytomine.service.image.UploadedFileService;
 import be.cytomine.service.middleware.ImageServerService;
-import be.cytomine.service.project.ProjectService;
 import be.cytomine.utils.JsonObject;
 
 @RestController
@@ -47,64 +44,58 @@ public class RestAbstractSliceController extends RestCytomineController {
 
     private final AbstractImageService abstractImageService;
 
-    private final ProjectService projectService;
-
     private final ImageServerService imageServerService;
 
     private final UploadedFileService uploadedFileService;
 
-    private final SliceCoordinatesService sliceCoordinatesService;
-
-    private final ImagePropertiesService imagePropertiesService;
-
     @GetMapping("/abstractimage/{id}/abstractslice.json")
-    public ResponseEntity<String> listByAbstractSlice(
-            @PathVariable Long id
-    ) {
+    public ResponseEntity<String> listByAbstractSlice(@PathVariable Long id) {
         log.debug("REST request to list abstract slice for image {}", id);
         AbstractImage abstractImage = abstractImageService.find(id)
-                .orElseThrow(() -> new ObjectNotFoundException("AbstractImage", id));
+            .orElseThrow(() -> new ObjectNotFoundException("AbstractImage", id));
         return responseSuccess(abstractSliceService.list(abstractImage));
     }
 
     @GetMapping("/uploadedfile/{id}/abstractslice.json")
-    public ResponseEntity<String> listByUploadedFile(
-            @PathVariable Long id
-    ) {
+    public ResponseEntity<String> listByUploadedFile(@PathVariable Long id) {
         log.debug("REST request to list abstract slice for image {}", id);
         UploadedFile uploadedFile = uploadedFileService.find(id)
-                .orElseThrow(() -> new ObjectNotFoundException("UploadedFile", id));
+            .orElseThrow(() -> new ObjectNotFoundException("UploadedFile", id));
         return responseSuccess(abstractSliceService.list(uploadedFile));
     }
 
 
     @GetMapping("/abstractslice/{id}.json")
     public ResponseEntity<String> show(
-            @PathVariable Long id
+        @PathVariable Long id
     ) {
         log.debug("REST request to get abstract slice {}", id);
         return abstractSliceService.find(id)
-                .map(this::responseSuccess)
-                .orElseThrow(() -> new ObjectNotFoundException("AbstractSlice", id));
+            .map(this::responseSuccess)
+            .orElseThrow(() -> new ObjectNotFoundException("AbstractSlice", id));
     }
 
 
     @GetMapping("/abstractimage/{id}/{channel}/{zStack}/{time}/abstractslice.json")
     public ResponseEntity<String> getByAbstractSliceAndCoordinates(
-            @PathVariable Long id,
-            @PathVariable Integer channel,
-            @PathVariable Integer zStack,
-            @PathVariable Integer time
+        @PathVariable Long id,
+        @PathVariable Integer channel,
+        @PathVariable Integer zStack,
+        @PathVariable Integer time
     ) {
-        log.debug("REST request to get abstract slice for  image {} and coordinates {}-{}-{}", id, channel, zStack, time);
+        log.debug(
+            "REST request to get abstract slice for  image {} and coordinates {}-{}-{}", id, channel, zStack, time
+        );
         AbstractImage abstractImage = abstractImageService.find(id)
-                .orElseThrow(() -> new ObjectNotFoundException("AbstractSlice", id));
+            .orElseThrow(() -> new ObjectNotFoundException("AbstractSlice", id));
 
-        AbstractSlice abstractSlice = abstractSliceService.find(abstractImage, channel,zStack, time)
-                .orElseThrow(() -> new ObjectNotFoundException("AbstractSlice", id + "[" + channel + "-" + zStack + "-" + time + "]"));
+        AbstractSlice abstractSlice = abstractSliceService.find(abstractImage, channel, zStack, time)
+            .orElseThrow(() -> new ObjectNotFoundException(
+                "AbstractSlice", id + "[" + channel + "-" + zStack + "-" + time + "]"
+            ));
         return responseSuccess(abstractSlice);
     }
-    
+
     @PostMapping("/abstractslice.json")
     public ResponseEntity<String> add(@RequestBody String json) {
         log.debug("REST request to save abstractslice : " + json);
@@ -127,7 +118,7 @@ public class RestAbstractSliceController extends RestCytomineController {
     public ResponseEntity<String> showUploaderOfImage(@PathVariable Long id) {
         log.debug("REST request to show image uploader");
         User user = abstractSliceService.findImageUploaded(id);
-        if (user !=null) {
+        if (user != null) {
             return responseSuccess(user);
         } else {
             return responseNotFound("AbstractSlice", "User", id);
@@ -137,22 +128,22 @@ public class RestAbstractSliceController extends RestCytomineController {
 
     @GetMapping("/abstractslice/{id}/normalized-tile/zoom/{z}/tx/{tx}/ty/{ty}.{format}")
     public ResponseEntity<byte[]> tile(
-            @PathVariable Long id,
-            @PathVariable Long z,
-            @PathVariable Long tx,
-            @PathVariable Long ty,
+        @PathVariable Long id,
+        @PathVariable Long z,
+        @PathVariable Long tx,
+        @PathVariable Long ty,
 
-            @PathVariable String format,
-            @RequestParam(required = false) String channels,
-            @RequestParam(required = false) String zSlices,
-            @RequestParam(required = false) String timepoints,
-            @RequestParam(required = false) String filters,
-            @RequestParam(required = false) String minIntensities,
-            @RequestParam(required = false) String maxIntensities,
-            @RequestParam(required = false) String gammas,
-            @RequestParam(required = false) String colormaps,
+        @PathVariable String format,
+        @RequestParam(required = false) String channels,
+        @RequestParam(required = false) String zSlices,
+        @RequestParam(required = false) String timepoints,
+        @RequestParam(required = false) String filters,
+        @RequestParam(required = false) String minIntensities,
+        @RequestParam(required = false) String maxIntensities,
+        @RequestParam(required = false) String gammas,
+        @RequestParam(required = false) String colormaps,
 
-            ProxyExchange<byte[]> proxy
+        ProxyExchange<byte[]> proxy
     ) throws IOException {
         /* Request parameter validation is delegated to PIMS to avoid double validation. Moreover, these parameter
         validation is complex as they can accept multiple types: e.g. 'gammas' accept a Double or List<Double> whose
@@ -160,7 +151,7 @@ public class RestAbstractSliceController extends RestCytomineController {
          */
 
         AbstractSlice abstractSlice = abstractSliceService.find(id)
-                .orElseThrow(() -> new ObjectNotFoundException("AbstractSlice", id));
+            .orElseThrow(() -> new ObjectNotFoundException("AbstractSlice", id));
 
         TileParameters tileParameters = new TileParameters();
         tileParameters.setFormat(format);
@@ -180,22 +171,20 @@ public class RestAbstractSliceController extends RestCytomineController {
         return imageServerService.normalizedTile(abstractSlice, tileParameters, etag, proxy);
     }
 
-
-    //
-//    // TODO:MIGRATION GET params vs POST params!
+    // TODO:MIGRATION GET params vs POST params!
     @RequestMapping(value = "/abstractslice/{id}/thumb.{format}", method = {RequestMethod.GET, RequestMethod.POST})
-    public ResponseEntity<byte[]>thumb(
-            @PathVariable Long id,
-            @PathVariable String format,
-            @RequestParam(required = false) Boolean refresh,
-            @RequestParam(defaultValue = "512", required = false) Integer maxSize,
-            @RequestParam(required = false) String colormap,
-            @RequestParam(required = false) Boolean inverse,
-            @RequestParam(required = false) Double contrast,
-            @RequestParam(required = false) Double gamma,
-            @RequestParam(required = false) String bits,
+    public ResponseEntity<byte[]> thumb(
+        @PathVariable Long id,
+        @PathVariable String format,
+        @RequestParam(required = false) Boolean refresh,
+        @RequestParam(defaultValue = "512", required = false) Integer maxSize,
+        @RequestParam(required = false) String colormap,
+        @RequestParam(required = false) Boolean inverse,
+        @RequestParam(required = false) Double contrast,
+        @RequestParam(required = false) Double gamma,
+        @RequestParam(required = false) String bits,
 
-            ProxyExchange<byte[]> proxy
+        ProxyExchange<byte[]> proxy
     ) throws IOException {
         log.debug("REST request get abstractslice {} thumb {}", id, format);
         ImageParameter thumbParameter = new ImageParameter();
@@ -205,56 +194,56 @@ public class RestAbstractSliceController extends RestCytomineController {
         thumbParameter.setInverse(inverse);
         thumbParameter.setContrast(contrast);
         thumbParameter.setGamma(gamma);
-        thumbParameter.setMaxBits(bits!=null && bits.equals("max"));
-        thumbParameter.setBits(bits!=null && !bits.equals("max") ? Integer.parseInt(bits): null);
+        thumbParameter.setMaxBits(bits != null && bits.equals("max"));
+        thumbParameter.setBits(bits != null && !bits.equals("max") ? Integer.parseInt(bits) : null);
         thumbParameter.setRefresh(refresh);
 
         AbstractSlice abstractSlice = abstractSliceService.find(id)
-                .orElseThrow(() -> new ObjectNotFoundException("AbstractSlice", id));
+            .orElseThrow(() -> new ObjectNotFoundException("AbstractSlice", id));
         String etag = getRequestETag();
         return imageServerService.thumb(abstractSlice, thumbParameter, etag, proxy);
     }
 
     @RequestMapping(value = "/abstractslice/{id}/crop.{format}", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<byte[]> crop(
-            @PathVariable Long id,
-            @PathVariable String format,
-            @RequestParam(defaultValue = "256") Integer maxSize,
-            @RequestParam(required = false) String geometry,
-            @RequestParam(required = false) String location,
-            @RequestParam(required = false) String boundaries,
-            @RequestParam(defaultValue = "false") Boolean complete,
-            @RequestParam(required = false) Integer zoom,
-            @RequestParam(required = false) Double increaseArea,
-            @RequestParam(required = false) Boolean safe,
-            @RequestParam(required = false) Boolean square,
-            @RequestParam(required = false) String type,
-            @RequestParam(required = false) Boolean draw,
-            @RequestParam(required = false) Boolean mask,
-            @RequestParam(required = false) Boolean alphaMask,
-            @RequestParam(required = false) Boolean drawScaleBar,
-            @RequestParam(required = false) Double resolution,
-            @RequestParam(required = false) Double magnification,
-            @RequestParam(required = false) String colormap,
-            @RequestParam(required = false) Boolean inverse,
-            @RequestParam(required = false) Double contrast,
-            @RequestParam(required = false) Double gamma,
-            @RequestParam(required = false) String bits,
-            @RequestParam(required = false) Integer alpha,
-            @RequestParam(required = false) Integer thickness,
-            @RequestParam(required = false) String color,
-            @RequestParam(required = false) Integer jpegQuality,
+        @PathVariable Long id,
+        @PathVariable String format,
+        @RequestParam(defaultValue = "256") Integer maxSize,
+        @RequestParam(required = false) String geometry,
+        @RequestParam(required = false) String location,
+        @RequestParam(required = false) String boundaries,
+        @RequestParam(defaultValue = "false") Boolean complete,
+        @RequestParam(required = false) Integer zoom,
+        @RequestParam(required = false) Double increaseArea,
+        @RequestParam(required = false) Boolean safe,
+        @RequestParam(required = false) Boolean square,
+        @RequestParam(required = false) String type,
+        @RequestParam(required = false) Boolean draw,
+        @RequestParam(required = false) Boolean mask,
+        @RequestParam(required = false) Boolean alphaMask,
+        @RequestParam(required = false) Boolean drawScaleBar,
+        @RequestParam(required = false) Double resolution,
+        @RequestParam(required = false) Double magnification,
+        @RequestParam(required = false) String colormap,
+        @RequestParam(required = false) Boolean inverse,
+        @RequestParam(required = false) Double contrast,
+        @RequestParam(required = false) Double gamma,
+        @RequestParam(required = false) String bits,
+        @RequestParam(required = false) Integer alpha,
+        @RequestParam(required = false) Integer thickness,
+        @RequestParam(required = false) String color,
+        @RequestParam(required = false) Integer jpegQuality,
 
-            ProxyExchange<byte[]> proxy
+        ProxyExchange<byte[]> proxy
     ) throws IOException, ParseException {
         log.debug("REST request to get associated image of a abstract slice");
         AbstractSlice abstractSlice = abstractSliceService.find(id)
-                .orElseThrow(() -> new ObjectNotFoundException("AbstractSlice", id));
+            .orElseThrow(() -> new ObjectNotFoundException("AbstractSlice", id));
 
         CropParameter cropParameter = new CropParameter();
         cropParameter.setGeometry(geometry);
         cropParameter.setLocation(location);
-//        cropParameter.setBoundaries(boundaries);
+        // cropParameter.setBoundaries(boundaries);
         cropParameter.setComplete(complete);
         cropParameter.setZoom(zoom);
         cropParameter.setIncreaseArea(increaseArea);
@@ -275,24 +264,26 @@ public class RestAbstractSliceController extends RestCytomineController {
         cropParameter.setThickness(thickness);
         cropParameter.setColor(color);
         cropParameter.setJpegQuality(jpegQuality);
-        cropParameter.setMaxBits(bits!=null && bits.equals("max"));
-        cropParameter.setBits(bits!=null && !bits.equals("max") ? Integer.parseInt(bits): null);
+        cropParameter.setMaxBits(bits != null && bits.equals("max"));
+        cropParameter.setBits(bits != null && !bits.equals("max") ? Integer.parseInt(bits) : null);
         cropParameter.setFormat(format);
         String etag = getRequestETag();
         return imageServerService.crop(abstractSlice, cropParameter, etag, proxy);
     }
 
-    @RequestMapping(value = "/abstractslice/{id}/window-{x}-{y}-{w}-{h}.{format}", method = {RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(
+        value = "/abstractslice/{id}/window-{x}-{y}-{w}-{h}.{format}", method = {RequestMethod.GET, RequestMethod.POST}
+    )
     public ResponseEntity<byte[]> window(
-            @PathVariable Long id,
-            @PathVariable String format,
-            @PathVariable Integer x,
-            @PathVariable Integer y,
-            @PathVariable Integer w,
-            @PathVariable Integer h,
-            @RequestParam(defaultValue = "false", required = false) Boolean withExterior,
+        @PathVariable Long id,
+        @PathVariable String format,
+        @PathVariable Integer x,
+        @PathVariable Integer y,
+        @PathVariable Integer w,
+        @PathVariable Integer h,
+        @RequestParam(defaultValue = "false", required = false) Boolean withExterior,
 
-            ProxyExchange<byte[]> proxy
+        ProxyExchange<byte[]> proxy
     ) throws IOException, ParseException {
         log.debug("REST request get abstractslice {} window {}", id, format);
         WindowParameter windowParameter = new WindowParameter();
@@ -303,21 +294,23 @@ public class RestAbstractSliceController extends RestCytomineController {
         windowParameter.setWithExterior(withExterior);
         windowParameter.setFormat(format);
         AbstractSlice abstractSlice = abstractSliceService.find(id)
-                .orElseThrow(() -> new ObjectNotFoundException("AbstractSlice", id));
+            .orElseThrow(() -> new ObjectNotFoundException("AbstractSlice", id));
         String etag = getRequestETag();
-        return  imageServerService.window(abstractSlice, windowParameter, etag, proxy);
+        return imageServerService.window(abstractSlice, windowParameter, etag, proxy);
     }
 
-    @RequestMapping(value = "/abstractslice/{id}/camera-{x}-{y}-{w}-{h}.{format}", method = {RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(
+        value = "/abstractslice/{id}/camera-{x}-{y}-{w}-{h}.{format}", method = {RequestMethod.GET, RequestMethod.POST}
+    )
     public ResponseEntity<byte[]> camera(
-            @PathVariable Long id,
-            @PathVariable String format,
-            @PathVariable Integer x,
-            @PathVariable Integer y,
-            @PathVariable Integer w,
-            @PathVariable Integer h,
+        @PathVariable Long id,
+        @PathVariable String format,
+        @PathVariable Integer x,
+        @PathVariable Integer y,
+        @PathVariable Integer w,
+        @PathVariable Integer h,
 
-            ProxyExchange<byte[]> proxy
+        ProxyExchange<byte[]> proxy
     ) throws IOException, ParseException {
         log.debug("REST request get abstractslice {} camera {}", id, format);
         WindowParameter windowParameter = new WindowParameter();
@@ -328,7 +321,7 @@ public class RestAbstractSliceController extends RestCytomineController {
         windowParameter.setWithExterior(false);
         windowParameter.setFormat(format);
         AbstractSlice abstractSlice = abstractSliceService.find(id)
-                .orElseThrow(() -> new ObjectNotFoundException("AbstractSlice", id));
+            .orElseThrow(() -> new ObjectNotFoundException("AbstractSlice", id));
         String etag = getRequestETag();
         return imageServerService.window(abstractSlice, windowParameter, etag, proxy);
     }

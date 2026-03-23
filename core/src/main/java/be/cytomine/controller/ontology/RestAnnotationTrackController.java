@@ -56,7 +56,7 @@ public class RestAnnotationTrackController extends RestCytomineController {
     public ResponseEntity<String> show(
             @PathVariable(value = "annotation") Long annotationId,
             @PathVariable(value = "track") Long trackId
-            ) {
+    ) {
         log.debug("REST request to get AnnotationTrack : {} {}", annotationId, trackId);
         AnnotationDomain annotationDomain = annotationDomainRepository.findById(annotationId)
                 .orElseThrow(() -> new ObjectNotFoundException("Annotation", annotationId));
@@ -65,7 +65,10 @@ public class RestAnnotationTrackController extends RestCytomineController {
 
         return annotationTrackService.find(annotationDomain, track)
                 .map(this::responseSuccess)
-                .orElseGet(() -> responseNotFound("AnnotationTrack", Map.of("annotation", annotationId, "track", trackId)));
+                .orElseGet(() -> responseNotFound(
+                    "AnnotationTrack",
+                    Map.of("annotation", annotationId, "track", trackId))
+                );
     }
 
     @DeleteMapping("/annotationtrack/{annotation}/{track}.json")

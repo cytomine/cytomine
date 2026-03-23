@@ -22,7 +22,6 @@ import be.cytomine.config.properties.ApplicationProperties;
 import be.cytomine.domain.meta.Property;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.SecRole;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.exceptions.ServerException;
 import be.cytomine.service.CurrentRoleService;
@@ -36,10 +35,10 @@ import be.cytomine.utils.Lock;
 
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
 
-@RestController
-@RequestMapping("")
 @Slf4j
 @RequiredArgsConstructor
+@RequestMapping("/api")
+@RestController
 public class CustomUIController extends RestCytomineController {
 
     private final CurrentRoleService currentRoleService;
@@ -56,9 +55,9 @@ public class CustomUIController extends RestCytomineController {
 
     static String CUSTOM_UI_PROJECT = "@CUSTOM_UI_PROJECT";
 
-    @GetMapping({"/api/custom-ui/config.json", "/custom-ui/config.json"})
+    @GetMapping("/custom-ui/config.json")
     public ResponseEntity<String> retrieveUIConfig(
-            @RequestParam(required = false, value = "project", defaultValue = "0") Long projectId
+        @RequestParam(value = "project", defaultValue = "0") Long projectId
     ) {
         log.debug("REST request to retrieve custom UI");
         Set<SecRole> roles = currentRoleService.findCurrentRole(currentUserService.getCurrentUser());
@@ -66,53 +65,49 @@ public class CustomUIController extends RestCytomineController {
 
         JsonObject config = new JsonObject();
         config.putAll(getGlobalConfig(roles));
-        if(project!=null) {
+        if (project != null) {
             config.putAll(getProjectConfigCurrentUser(project));
         }
         return responseSuccess(config);
     }
 
-
-    @GetMapping({"/api/custom-ui/project/{project}.json", "/custom-ui/project/{project}.json"}) // DEPRECATED
-    public ResponseEntity<String> showCustomUIForProject(
-            @PathVariable(value = "project") Long projectId
-    ) {
+    @GetMapping("/custom-ui/project/{project}.json") // DEPRECATED
+    public ResponseEntity<String> showCustomUIForProject(@PathVariable(value = "project") Long projectId) {
         log.debug("REST request to retrieve custom UI for project");
         Project project = projectService.find(projectId)
-                .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
+            .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
 
         return responseSuccess(JsonObject.toJsonString(getProjectConfig(project)));
     }
 
-
-    @PostMapping({"/api/custom-ui/project/{project}.json", "/custom-ui/project/{project}.json"}) // DEPRECATED
+    @PostMapping("/custom-ui/project/{project}.json") // DEPRECATED
     public ResponseEntity<String> addCustomUIForProject(
-            @PathVariable(value = "project") Long projectId,
-            @RequestBody JsonObject jsonObject
+        @PathVariable(value = "project") Long projectId,
+        @RequestBody JsonObject jsonObject
     ) {
         log.debug("REST request to save custom UI for project");
         Project project = projectService.find(projectId)
-                .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
+            .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
 
         if (Lock.getInstance().lockCustomUI(project)) {
             try {
-                Optional<Property> optionalProperty = propertyService.findByDomainAndKey(project,CUSTOM_UI_PROJECT);
-                securityACLService.check(project,ADMINISTRATION);
+                Optional<Property> optionalProperty = propertyService.findByDomainAndKey(project, CUSTOM_UI_PROJECT);
+                securityACLService.check(project, ADMINISTRATION);
 
-                if(optionalProperty.isEmpty()) {
+                if (optionalProperty.isEmpty()) {
                     Property property = new Property();
                     property.setKey(CUSTOM_UI_PROJECT);
                     property.setValue(jsonObject.toJsonString());
                     property.setDomain(project);
 
                     CommandResponse result = propertyService.add(property.toJsonObject());
-                    responseSuccess((String)((LinkedHashMap)result.getData().get("property")).get("value"));
+                    responseSuccess((String) ((LinkedHashMap) result.getData().get("property")).get("value"));
                 } else {
                     JsonObject jsonEdit = optionalProperty.get().toJsonObject()
-                            .withChange("value", jsonObject.toJsonString());
+                        .withChange("value", jsonObject.toJsonString());
 
-                    CommandResponse result = propertyService.update(optionalProperty.get(),jsonEdit);
-                    responseSuccess((String)((LinkedHashMap)result.getData().get("property")).get("value"));
+                    CommandResponse result = propertyService.update(optionalProperty.get(), jsonEdit);
+                    responseSuccess((String) ((LinkedHashMap) result.getData().get("property")).get("value"));
                 }
 
                 return responseSuccess(JsonObject.toJsonString(getProjectConfig(project)));
@@ -120,10 +115,11 @@ public class CustomUIController extends RestCytomineController {
                 Lock.getInstance().unlockCustomUI(project);
             }
         } else {
-            throw new ServerException("Cannot acquire lock for custom UI project " + project.getId()  + " , tryLock return false");
+            throw new ServerException(
+                "Cannot acquire lock for custom UI project " + project.getId() + " , tryLock return false"
+            );
         }
     }
-
 
     public JsonObject getGlobalConfig(Set<SecRole> roles) {
         JsonObject globalConfig = new JsonObject();
@@ -142,11 +138,11 @@ public class CustomUIController extends RestCytomineController {
         return globalConfig;
     }
 
-
     public Map<String, Map<String, Boolean>> getProjectConfig(Project project) {
         // clone config so that the default configuration is not updated
         Map<String, Map<String, Boolean>> result = new LinkedHashMap<>();
-        for (Map.Entry<String, LinkedHashMap<String, Boolean>> it : applicationProperties.getCustomUI().getProject().entrySet()) {
+        Map<String, LinkedHashMap<String, Boolean>> projectMap = applicationProperties.getCustomUI().getProject();
+        for (Map.Entry<String, LinkedHashMap<String, Boolean>> it : projectMap.entrySet()) {
             LinkedHashMap<String, Boolean> value = new LinkedHashMap<>();
             for (Map.Entry<String, Boolean> itValue : it.getValue().entrySet()) {
                 value.put(itValue.getKey(), Boolean.valueOf(itValue.getValue().toString()));
@@ -154,22 +150,23 @@ public class CustomUIController extends RestCytomineController {
             result.put(it.getKey(), value);
         }
 
-        Optional<Property> optionalProperty = propertyService.findByDomainAndKey(project,CUSTOM_UI_PROJECT);
+        Optional<Property> optionalProperty = propertyService.findByDomainAndKey(project, CUSTOM_UI_PROJECT);
         // if a property is saved, we override the default config
-        if(optionalProperty.isPresent()) {
+        if (optionalProperty.isPresent()) {
             JsonObject configProject = JsonObject.toJsonObject(optionalProperty.get().getValue());
 
             for (Map.Entry<String, Object> it : configProject.entrySet()) {
-                result.put(it.getKey(), (Map<String, Boolean>)it.getValue());
+                result.put(it.getKey(), (Map<String, Boolean>) it.getValue());
             }
         }
 
         return result;
     }
 
-
     private Map<String, Boolean> getProjectConfigCurrentUser(Project project) {
-        boolean isProjectAdmin = projectService.listByAdmin((User) currentUserService.getCurrentUser()).stream().anyMatch(x -> x.getId().equals(project.getId()));
+        boolean isProjectAdmin = projectService.listByAdmin(currentUserService.getCurrentUser())
+            .stream()
+            .anyMatch(x -> x.getId().equals(project.getId()));
         boolean isAdminByNow = currentRoleService.isAdminByNow(currentUserService.getCurrentUser());
 
         Map<String, Map<String, Boolean>> configProject = getProjectConfig(project);
@@ -182,16 +179,14 @@ public class CustomUIController extends RestCytomineController {
     }
 
     private boolean shouldBeShown(boolean isAdminByNow, boolean isProjectAdmin, Map<String, Boolean> config) {
-        if(isAdminByNow) {
+        if (isAdminByNow) {
             return true;
         }
 
-        if(isProjectAdmin) {
+        if (isProjectAdmin) {
             return config.get("ADMIN_PROJECT");
         }
 
         return config.get("CONTRIBUTOR_PROJECT");
     }
-
-
 }

@@ -47,6 +47,12 @@ spec:
             sleep 5
           done
           echo "pims is ready!"
+          echo "Waiting for app-engine to be ready..."
+          until curl -sf http://app-engine.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.app_engine.port }}/ping; do
+            echo "app-engine not ready, retrying in 5s..."
+            sleep 5
+          done
+          echo "app-engine is ready!"
   containers:
     - name: selenium
       image: "{{ .Values.images.selenium }}"
@@ -75,8 +81,17 @@ spec:
         httpGet:
           path: /wd/hub/status
           port: 4444
+        periodSeconds: 5
+        failureThreshold: 20
+        timeoutSeconds: 5
+      startupProbe:
+        httpGet:
+          path: /wd/hub/status
+          port: 4444
         initialDelaySeconds: 5
-        periodSeconds: 3
+        periodSeconds: 5
+        failureThreshold: 30
+        timeoutSeconds: 5
     - name: e2e-tests
       image: "{{ .Values.images.e2e_tests }}"
       imagePullPolicy: {{ .Values.images.pullPolicy }}

@@ -131,7 +131,7 @@ public class CytomineSteps {
     public void deleteImage(Wait<WebDriver> wait, URL cytomineUrl,
                             String imageName) {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/storage");
-        Thread.sleep(2000);
+        Thread.sleep(5000);
         webDriverUtils.waitLoading(wait);
         webDriverUtils.byIsDisplayed(wait, By.xpath(
             "//div[contains(@class,'uploaded-files-list')]//span[@data-filename='" + imageName

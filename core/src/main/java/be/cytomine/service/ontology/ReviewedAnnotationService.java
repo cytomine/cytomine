@@ -136,7 +136,7 @@ public class ReviewedAnnotationService extends ModelService {
     }
 
     public Long countByProjectAndWithTerms(Project project) {
-        return reviewedAnnotationRepository.countAllByProjectAndTerms_Empty(project);
+        return reviewedAnnotationRepository.countAllByProjectAndTermsEmpty(project);
     }
 
     public List list(Project project, List<String> propertiesToShow) {

@@ -84,7 +84,7 @@ public interface ReviewedAnnotationRepository
 
     long countAllByTermsContaining(Term term);
 
-    long countAllByProjectAndTerms_Empty(Project project);
+    long countAllByProjectAndTermsEmpty(Project project);
 
     List<ReviewedAnnotation> findAllByUser(User user);
 }

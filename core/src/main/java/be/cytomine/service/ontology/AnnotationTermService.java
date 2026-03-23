@@ -109,7 +109,7 @@ public class AnnotationTermService extends ModelService {
 
     public List<AnnotationTerm> list(Project project) {
         securityACLService.check(project.container(), READ);
-        return annotationTermRepository.findAllByUserAnnotation_Project(project);
+        return annotationTermRepository.findAllByUserAnnotationProject(project);
     }
 
     public List<AnnotationTerm> listAnnotationTermNotDefinedByUser(UserAnnotation userAnnotation, User user) {

@@ -1050,8 +1050,8 @@ public class ProjectService extends ModelService {
     protected void beforeDelete(CytomineDomain domain) {
         Project project = (Project) domain;
         commandHistoryRepository.deleteAllByProject(project);
-        undoStackItemRepository.deleteAllByCommand_Project(project);
-        redoStackItemRepository.deleteAllByCommand_Project(project);
+        undoStackItemRepository.deleteAllByCommandProject(project);
+        redoStackItemRepository.deleteAllByCommandProject(project);
         commandRepository.deleteAllByProject(project);
         retrievalService.deleteStorage(project.getId().toString());
     }

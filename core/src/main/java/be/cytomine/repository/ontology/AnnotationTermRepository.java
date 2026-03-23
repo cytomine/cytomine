@@ -44,7 +44,7 @@ public interface AnnotationTermRepository
 
     long countByTerm(Term term);
 
-    List<AnnotationTerm> findAllByUserAnnotation_Project(Project project);
+    List<AnnotationTerm> findAllByUserAnnotationProject(Project project);
 
     List<AnnotationTerm> findAllByUser(User user);
 }

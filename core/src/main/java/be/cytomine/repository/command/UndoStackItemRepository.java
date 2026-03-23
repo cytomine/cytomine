@@ -26,7 +26,7 @@ import be.cytomine.domain.security.User;
 @Repository
 public interface UndoStackItemRepository extends JpaRepository<UndoStackItem, Long> {
 
-    void deleteAllByCommand_Project(Project project);
+    void deleteAllByCommandProject(Project project);
 
     void deleteAllByUser(User user);
 }

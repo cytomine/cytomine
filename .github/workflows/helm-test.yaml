@@ -116,11 +116,11 @@ jobs:
       - name: Export test results
         if: always()
         run: |
-          kubectl --namespace=cytomine-${{ github.sha }} delete pod e2e-tests --wait=true --timeout=60s || true
+          kubectl --namespace=cytomine-${{ github.sha }} delete pod e2e-tests --wait=true --timeout=60s
           kubectl --namespace=cytomine-${{ github.sha }} apply -f .github/workflows/test-reports/export-pod.yaml
-          kubectl --namespace=cytomine-${{ github.sha }} wait --for=condition=Ready pod/export-test-results --timeout=60s || echo "Pod not ready, attempting copy anyway"
-          kubectl --namespace=cytomine-${{ github.sha }} cp export-test-results:/reports/build/reports ./test-results/build/ -c exporter || echo "Failed to copy test results from /reports/build/reports"
-          kubectl --namespace=cytomine-${{ github.sha }} cp export-test-results:/reports/e2e-tests/build/reports ./test-results/build/ -c exporter || echo "Failed to copy test results from /reports/e2e-tests/build/reports"
+          kubectl --namespace=cytomine-${{ github.sha }} wait --for=jsonpath='{.status.phase}'=Running pod/export-test-results --timeout=60s
+          kubectl --namespace=cytomine-${{ github.sha }} cp export-test-results:/reports/build/reports ./test-results/build/ -c exporter
+          kubectl --namespace=cytomine-${{ github.sha }} cp export-test-results:/reports/e2e-tests/build/reports ./test-results/build/ -c exporter
 
       - name: Upload helm test results
         if: always()

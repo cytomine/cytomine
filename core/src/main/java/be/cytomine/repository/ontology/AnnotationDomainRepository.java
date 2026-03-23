@@ -25,22 +25,29 @@ import org.springframework.data.jpa.repository.Query;
 
 import be.cytomine.domain.ontology.AnnotationDomain;
 
-@SuppressWarnings("checkstyle:all") // This file will be refactored in https://github.com/cytomine/cytomine/issues/625
 public interface AnnotationDomainRepository
     extends JpaRepository<AnnotationDomain, Long>, JpaSpecificationExecutor<AnnotationDomain> {
 
 
-    @Query(value = "SELECT annotation.id as annotation,user_id as user\n" +
-        "FROM user_annotation annotation\n" +
-        "WHERE annotation.image_id = :image\n" +
-        "AND user_id IN (:layers)\n" +
-        "AND ST_Intersects(annotation.location,ST_GeometryFromText(:location,0))", nativeQuery = true)
+    @Query(
+        value =
+            "SELECT annotation.id as annotation, user_id as user "
+                + "FROM user_annotation annotation "
+                + "WHERE annotation.image_id = :image "
+                + "AND user_id IN (:layers) "
+                + "AND ST_Intersects(annotation.location, ST_GeometryFromText(:location, 0))",
+        nativeQuery = true
+    )
     List<Tuple> findAllIntersectForUserAnnotations(Long image, List<Long> layers, String location);
 
-    @Query(value = "SELECT annotation.id as annotation,user_id as user\n" +
-        "FROM reviewed_annotation annotation\n" +
-        "WHERE annotation.image_id = :image\n" +
-        "AND ST_Intersects(annotation.location,ST_GeometryFromText(:location,0))", nativeQuery = true)
+    @Query(
+        value =
+            "SELECT annotation.id as annotation, user_id as user "
+                + "FROM reviewed_annotation annotation "
+                + "WHERE annotation.image_id = :image "
+                + "AND ST_Intersects(annotation.location, ST_GeometryFromText(:location, 0))",
+        nativeQuery = true
+    )
     List<Tuple> findAllIntersectForReviewedAnnotations(Long image, String location);
 
     @Query(
@@ -49,8 +56,11 @@ public interface AnnotationDomainRepository
     Long countAllUserAnnotationAndProject(Long projectId);
 
     @Query(
-        value = "SELECT count(annotation.id) FROM reviewed_annotation annotation WHERE annotation.project_id = :projectId",
-        nativeQuery = true)
+        value = "SELECT count(annotation.id) "
+            + "FROM reviewed_annotation annotation "
+            + "WHERE annotation.project_id = :projectId",
+        nativeQuery = true
+    )
     Long countAllReviewedAnnotationAndProject(Long projectId);
 
 }

@@ -38,14 +38,16 @@ import be.cytomine.domain.security.User;
 public interface UploadedFileRepository
     extends JpaRepository<UploadedFile, Long>, JpaSpecificationExecutor<UploadedFile> {
 
-    @Query(value = "SELECT uf.* " +
-        "FROM uploaded_file uf " +
-        "WHERE true " +
-        "AND (:ignoreUserIdFilter IS TRUE OR uf.user_id = :userId) " +
-        "AND (:ignoreParentIdFilter IS TRUE OR uf.parent_id = :parentId) " +
-        "AND (:ignoreOnlyRootFilter IS TRUE OR (:onlyRoot IS FALSE OR uf.parent_id IS NULL)) " +
-        "AND (:ignoreStorageIdsFilter IS TRUE OR (uf.storage_id IN (:storagesIds)))"
-        , nativeQuery = true)
+    @Query(
+        value = "SELECT uf.* "
+            + "FROM uploaded_file uf "
+            + "WHERE true "
+            + "AND (:ignoreUserIdFilter IS TRUE OR uf.user_id = :userId) "
+            + "AND (:ignoreParentIdFilter IS TRUE OR uf.parent_id = :parentId) "
+            + "AND (:ignoreOnlyRootFilter IS TRUE OR (:onlyRoot IS FALSE OR uf.parent_id IS NULL)) "
+            + "AND (:ignoreStorageIdsFilter IS TRUE OR (uf.storage_id IN (:storagesIds)))",
+        nativeQuery = true
+    )
     Page<UploadedFile> search(
         Boolean ignoreUserIdFilter,
         Long userId,

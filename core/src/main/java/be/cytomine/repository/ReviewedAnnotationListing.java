@@ -28,7 +28,6 @@ import org.locationtech.jts.io.WKTReader;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.exceptions.WrongArgumentException;
 
-@SuppressWarnings("checkstyle:all") // This file will be refactored in https://github.com/cytomine/cytomine/issues/625
 public class ReviewedAnnotationListing extends AnnotationListing {
 
     public ReviewedAnnotationListing(EntityManager entityManager) {
@@ -154,24 +153,31 @@ public class ReviewedAnnotationListing extends AnnotationListing {
 
         if (columnsToPrint.contains("imageGroup")) {
             from
-                += "LEFT JOIN (SELECT * FROM image_group_image_instance WHERE deleted IS NULL) ig ON a.image_id = ig.image_id ";
+                += "LEFT JOIN ("
+                + "SELECT * FROM image_group_image_instance WHERE deleted IS NULL"
+                + ") ig ON a.image_id = ig.image_id ";
         }
 
         if (columnsToPrint.contains("group") || annotationGroup != null || annotationGroups != null) {
-            from
-                += "LEFT OUTER JOIN (SELECT * FROM annotation_link WHERE deleted IS NULL) al1 ON al1.annotation_ident = a.id ";
-            from
-                += "LEFT OUTER JOIN (SELECT * FROM annotation_link WHERE deleted IS NULL) al ON al.group_id = al1.group_id ";
+            from += "LEFT OUTER JOIN ("
+                + "SELECT * FROM annotation_link "
+                + "WHERE deleted IS NULL"
+                + ") al1 ON al1.annotation_ident = a.id ";
+
+            from += "LEFT OUTER JOIN ("
+                + "SELECT * FROM annotation_link "
+                + "WHERE deleted IS NULL"
+                + ") al ON al.group_id = al1.group_id ";
         }
 
         if (columnsToPrint.contains("image")) {
-            from
-                += "INNER JOIN image_instance ii ON a.image_id = ii.id INNER JOIN abstract_image ai ON ii.base_image_id = ai.id ";
+            from += "INNER JOIN image_instance ii ON a.image_id = ii.id "
+                + "INNER JOIN abstract_image ai ON ii.base_image_id = ai.id ";
         }
 
         if (columnsToPrint.contains("slice")) {
-            from
-                += "INNER JOIN slice_instance si ON a.slice_id = si.id INNER JOIN abstract_slice asl ON si.base_slice_id = asl.id ";
+            from += "INNER JOIN slice_instance si ON a.slice_id = si.id "
+                + "INNER JOIN abstract_slice asl ON si.base_slice_id = asl.id ";
         }
 
         if (columnsToPrint.contains("user")) {
@@ -189,14 +195,18 @@ public class ReviewedAnnotationListing extends AnnotationListing {
     String buildExtraRequest() {
 
         if (kmeansValue == 3 && image != null && bbox != null) {
-            /**
-             * We will sort annotation so that big annotation that covers a lot of annotation comes first (appear behind little annotation so we can select annotation behind other)
+            /*
+             * We will sort annotation so that big annotation that covers a lot of annotation comes first
+             * (appear behind little annotation so we can select annotation behind other)
              * We compute in 'gc' the set of all other annotation that must be list
-             * For each review annotation, we compute the number of other annotation that cover it (ST_CoveredBy => t or f => 0 or 1)
+             * For each review annotation, we compute the number of other annotation that cover it
+             * (ST_CoveredBy => t or f => 0 or 1)
              *
-             * ST_CoveredBy will return false if the annotation is not perfectly "under" the compare annotation (if some points are outside)
+             * ST_CoveredBy will return false if the annotation is not perfectly "under" the compare annotation
+             * (if some points are outside)
              * So in gc, we increase the size of each compare annotation just for the check
-             * So if an annotation x is under y but x has some point next outside y, x will appear top (if no resize, it will appear top or behind).
+             * So if an annotation x is under y but x has some point next outside y, x will appear top
+             * (if no resize, it will appear top or behind).
              */
             String xfactor = "1.28";
             String yfactor = "1.28";
@@ -232,12 +242,12 @@ public class ReviewedAnnotationListing extends AnnotationListing {
 
             }
 
-            subRequest = subRequest +
-                "FROM reviewed_annotation ga, reviewed_annotation gb " +
-                "WHERE ga.id=a.id " +
-                "AND ga.id<>gb.id " +
-                "AND ga.image_id=gb.image_id " +
-                "AND ST_Intersects(gb.location,ST_GeometryFromText('" + bbox + "',0)))\n";
+            subRequest = subRequest
+                + "FROM reviewed_annotation ga, reviewed_annotation gb "
+                + "WHERE ga.id = a.id "
+                + "AND ga.id <> gb.id "
+                + "AND ga.image_id = gb.image_id "
+                + "AND ST_Intersects(gb.location, ST_GeometryFromText('" + bbox + "', 0))\n";
 
             orderBy = new LinkedHashMap<>(Map.of("id", "desc"));
             return subRequest;

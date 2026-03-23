@@ -32,7 +32,6 @@ import be.cytomine.utils.JsonObject;
 
 import static be.cytomine.utils.ClassUtils.getClassName;
 
-@SuppressWarnings("checkstyle:all") // This file will be refactored in https://github.com/cytomine/cytomine/issues/596
 @Service
 @Transactional()
 public class ResponseService {

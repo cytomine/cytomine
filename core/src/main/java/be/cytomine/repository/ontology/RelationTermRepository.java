@@ -31,8 +31,12 @@ public interface RelationTermRepository extends JpaRepository<RelationTerm, Long
 
     Optional<RelationTerm> findByRelationAndTerm1AndTerm2(Relation relation, Term term1, Term term2);
 
-    @Query(
-        "SELECT rt FROM RelationTerm rt WHERE rt.relation.id = :relation AND rt.term1.id = :term1 AND rt.term2.id = :term2")
+    @Query("SELECT rt "
+        + "FROM RelationTerm rt "
+        + "WHERE rt.relation.id = :relation "
+        + "AND rt.term1.id = :term1 "
+        + "AND rt.term2.id = :term2"
+    )
     Optional<RelationTerm> findByRelationAndTerm1AndTerm2(Long relation, Long term1, Long term2);
 
     List<RelationTerm> findAllByTerm1(Term term);
@@ -41,6 +45,4 @@ public interface RelationTermRepository extends JpaRepository<RelationTerm, Long
 
     @Query("SELECT rt FROM RelationTerm rt WHERE rt.term1 = :term OR rt.term2 = :term")
     List<RelationTerm> findAllByTerm(Term term);
-
-
 }

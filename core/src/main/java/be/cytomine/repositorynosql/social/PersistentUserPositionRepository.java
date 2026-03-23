@@ -1,8 +1,5 @@
 package be.cytomine.repositorynosql.social;
 
-// CHECKSTYLE:OFF
-// TODO: This file will be refactored - see https://github.com/cytomine/cytomine/issues/625
-
 import java.util.Date;
 
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -16,8 +13,19 @@ import be.cytomine.domain.social.PersistentUserPosition;
 public interface PersistentUserPositionRepository extends MongoRepository<PersistentUserPosition, Long> {
 
     @Aggregation(pipeline = {
-        "{$match: {project: ?0, user: ?1, image: ?2, $and : [{created: {$gte: ?4}},{created: {$lte: ?3}}]}},{$sort: {created: 1}},{$project: {dateInMillis: {$subtract: {'$created', ?5}}}}"
-    })
+        "{$match: {"
+            + "project: ?0, "
+            + "user: ?1, "
+            + "image: ?2, "
+            + "$and: ["
+            + "    {created: {$gte: ?4}}, "
+            + "    {created: {$lte: ?3}}"
+            + "]"
+            + "}},"
+            + "{$sort: {created: 1}},"
+            + "{$project: {dateInMillis: {$subtract: ['$created', ?5]}}}"
+    }
+    )
     AggregationResults retrieve(Long project, Long user, Long image, Date before, Date after, Date firstDate);
 
     void deleteAllByImage(Long id);

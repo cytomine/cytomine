@@ -1,8 +1,5 @@
 package be.cytomine.service.project;
 
-// CHECKSTYLE:OFF
-// TODO: This file will be refactored - see https://github.com/cytomine/cytomine/issues/625
-
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;

@@ -117,14 +117,14 @@ public class PersistentProjectConnection extends CytomineSocialDomain implements
 
     @Override
     public String toString() {
-        return "PersistentProjectConnection{" +
-            "id='" + id + '\'' +
-            ", created=" + created +
-            ", createdTime=" + (created != null ? created.getTime() : null) +
-            ", user=" + user +
-            ", project=" + project +
-            ", time=" + time +
-            '}';
+        return "PersistentProjectConnection{"
+            + "id='" + id + '\''
+            + ", created=" + created
+            + ", createdTime=" + (created != null ? created.getTime() : null)
+            + ", user=" + user
+            + ", project=" + project
+            + ", time=" + time
+            + '}';
     }
 
     @Override

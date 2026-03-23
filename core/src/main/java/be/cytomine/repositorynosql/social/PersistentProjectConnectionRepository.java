@@ -1,8 +1,5 @@
 package be.cytomine.repositorynosql.social;
 
-// CHECKSTYLE:OFF
-// TODO: This file will be refactored - see https://github.com/cytomine/cytomine/issues/625
-
 import java.util.Date;
 
 import org.springframework.data.domain.Page;
@@ -20,15 +17,36 @@ import be.cytomine.domain.social.PersistentProjectConnection;
 @Repository
 public interface PersistentProjectConnectionRepository extends MongoRepository<PersistentProjectConnection, Long> {
 
-    Page<PersistentProjectConnection> findAllByUserAndProjectAndCreatedLessThan(Long user, Long project, Date created, PageRequest pageRequest);
+    Page<PersistentProjectConnection> findAllByUserAndProjectAndCreatedLessThan(
+        Long user,
+        Long project,
+        Date created,
+        PageRequest pageRequest
+    );
 
-    
-    @Aggregation(pipeline = {"{$match: {project: ?0, user: ?1, $and : [{created: {$gte: ?3}},{created: {$lte: ?2}}]}},{$sort: {created: 1}},{$project: {dateInMillis: {$subtract: {'$created', ?4}}}}"})
+    @Aggregation(pipeline = {
+        "{$match: {"
+            + "project: ?0, "
+            + "user: ?1, "
+            + "$and: ["
+            + "    {created: {$gte: ?3}}, "
+            + "    {created: {$lte: ?2}}"
+            + "]"
+            + "}},"
+            + "{$sort: {created: 1}},"
+            + "{$project: {dateInMillis: {$subtract: ['$created', ?4]}}}"
+    }
+    )
     AggregationResults test(Long project, Long user, Date before, Date after, Date firstDate);
 
     Page<PersistentProjectConnection> findAllByUserAndProject(Long user, Long project, PageRequest pageRequest);
 
-    @Aggregation(pipeline = {"{$match: {project: ?0}},{$sort: {?1: ?2}},{$group: {_id : '$user', created : {$max :'$created'}}}"})
+    @Aggregation(pipeline = {
+        "{$match: {project: ?0}}",
+        "{$sort: {?1: ?2}}",
+        "{$group: {_id: '$user', created: {$max: '$created'}}}"
+    }
+    )
     AggregationResults retrieve(Long project, String sortProperty, Integer sortDirection);
 
     Long countAllByProjectAndUser(Long project, Long user);

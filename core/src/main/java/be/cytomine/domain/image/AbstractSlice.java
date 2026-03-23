@@ -127,9 +127,9 @@ public class AbstractSlice extends CytomineDomain {
     }
 
     public Integer getRank() {
-        return this.channel +
-            Optional.ofNullable(this.image.getChannels()).orElse(0) *
-                (this.zStack + Optional.ofNullable(this.image.getDepth()).orElse(0) * this.time);
+        return this.channel
+            + Optional.ofNullable(this.image.getChannels()).orElse(0)
+            * (this.zStack + Optional.ofNullable(this.image.getDepth()).orElse(0) * this.time);
     }
 
     public UploadedFile getReferenceUploadedFile() {

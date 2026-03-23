@@ -121,15 +121,15 @@ public class PersistentImageConsultation extends CytomineSocialDomain implements
 
     @Override
     public String toString() {
-        return "PersistentImageConsultation{" +
-            "id='" + id + '\'' +
-            ", created=" + created +
-            ", createdTime=" + (created != null ? created.getTime() : null) +
-            ", user=" + user +
-            ", project=" + project +
-            ", image=" + image +
-            ", time=" + time +
-            '}';
+        return "PersistentImageConsultation{"
+            + "id='" + id + '\''
+            + ", created=" + created
+            + ", createdTime=" + (created != null ? created.getTime() : null)
+            + ", user=" + user
+            + ", project=" + project
+            + ", image=" + image
+            + ", time=" + time
+            + '}';
     }
 
     @Override

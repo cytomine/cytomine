@@ -48,20 +48,14 @@ public interface ReviewedAnnotationRepository
     Long countByProjectAndCreatedBetween(Project project, Date createdMin, Date createdMax);
 
     @Query(
-        value = "SELECT user_id, count(*), sum(count_reviewed_annotations) as total \n" +
-            "FROM user_annotation ua\n" +
-            "WHERE ua.image_id = :imageId\n" +
-            "GROUP BY user_id\n" +
-            "ORDER BY total desc;", nativeQuery = true
+        value = "SELECT user_id, count(*), sum(count_reviewed_annotations) as total "
+            + "FROM user_annotation ua "
+            + "WHERE ua.image_id = :imageId "
+            + "GROUP BY user_id "
+            + "ORDER BY total DESC",
+        nativeQuery = true
     )
     List<Tuple> stats(Long imageId);
-
-    @Query(
-        value = "SELECT count_reviewed_annotations as total \n" +
-            "FROM user_annotation ua\n" +
-            "WHERE ua.id = :userAnnotationId\n", nativeQuery = true
-    )
-    long countReviewedAnnotation(Long userAnnotationId);
 
     default List<ReviewedAnnotationStatsEntry> stats(ImageInstance imageInstance) {
         List<ReviewedAnnotationStatsEntry> reviewedAnnotationStatsEntries = new ArrayList<>();
@@ -75,6 +69,14 @@ public interface ReviewedAnnotationRepository
         }
         return reviewedAnnotationStatsEntries;
     }
+
+    @Query(
+        value = "SELECT count_reviewed_annotations as total "
+            + "FROM user_annotation ua "
+            + "WHERE ua.id = :userAnnotationId",
+        nativeQuery = true
+    )
+    long countReviewedAnnotation(Long userAnnotationId);
 
     Optional<ReviewedAnnotation> findByParentIdent(Long parentIdent);
 

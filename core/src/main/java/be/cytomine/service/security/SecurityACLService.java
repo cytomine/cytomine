@@ -1,8 +1,5 @@
 package be.cytomine.service.security;
 
-// CHECKSTYLE:OFF
-// TODO: This file will be refactored - see https://github.com/cytomine/cytomine/issues/625
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;

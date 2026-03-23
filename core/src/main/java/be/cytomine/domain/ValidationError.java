@@ -38,10 +38,10 @@ public class ValidationError {
 
     @Override
     public String toString() {
-        return "ValidationError{" +
-            "message='" + message + '\'' +
-            ", property='" + property + '\'' +
-            ", invalidValue=" + invalidValue +
-            '}';
+        return "ValidationError{"
+            + "message='" + message + '\''
+            + ", property='" + property + '\''
+            + ", invalidValue=" + invalidValue
+            + '}';
     }
 }

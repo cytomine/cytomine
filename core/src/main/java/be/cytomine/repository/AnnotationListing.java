@@ -1,8 +1,5 @@
 package be.cytomine.repository;
 
-// CHECKSTYLE:OFF
-// TODO: This file will be refactored - see https://github.com/cytomine/cytomine/issues/625
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -66,8 +63,8 @@ public abstract class AnnotationListing {
     Long term = null;
     List<Long> terms = null;
 
-    List<Long> users = null;//for user that draw annotation
-    List<Long> usersForTerm = null;//for user that add a term to annotation
+    List<Long> users = null; //for user that draw annotation
+    List<Long> usersForTerm = null; //for user that add a term to annotation
 
     List<Long> reviewUsers;
 
@@ -209,44 +206,34 @@ public abstract class AnnotationListing {
             }
         }
         String whereRequest =
-            getProjectConst() +
-                getUserConst() +
-                getUsersConst() +
-
-                getImageConst() +
-                getImagesConst() +
-
-                getSliceConst() +
-                getSlicesConst() +
-
-                getTagConst() +
-                getTagsConst() +
-
-                getTermConst() +
-                getTermsConst() +
-
-                getTrackConst() +
-                getTracksConst() +
-                getBeforeOrAfterSliceConst() +
-
-                getGroupConst() +
-                getGroupsConst() +
-
-                getUsersForTermConst() +
-
-                getNotReviewedOnlyConst() +
-                getParentsConst() +
-                getAvoidEmptyCentroidConst() +
-                getReviewUsersConst() +
-
-                getIntersectConst() +
-                getIntersectAnnotationConst() +
-                getMaxDistanceAnnotationConst() +
-                getExcludedAnnotationConst() +
-
-                getBeforeThan() +
-                getAfterThan() +
-                createOrderBy();
+            getProjectConst()
+                + getUserConst()
+                + getUsersConst()
+                + getImageConst()
+                + getImagesConst()
+                + getSlicesConst()
+                + getSliceConst()
+                + getTagConst()
+                + getTagsConst()
+                + getTermConst()
+                + getTermsConst()
+                + getTrackConst()
+                + getTracksConst()
+                + getBeforeOrAfterSliceConst()
+                + getGroupConst()
+                + getGroupsConst()
+                + getUsersForTermConst()
+                + getNotReviewedOnlyConst()
+                + getParentsConst()
+                + getAvoidEmptyCentroidConst()
+                + getReviewUsersConst()
+                + getIntersectConst()
+                + getIntersectAnnotationConst()
+                + getMaxDistanceAnnotationConst()
+                + getExcludedAnnotationConst()
+                + getBeforeThan()
+                + getAfterThan()
+                + createOrderBy();
 
         if (term != null || terms != null || track != null || tracks != null) {
             String request = "SELECT DISTINCT a.*, ";

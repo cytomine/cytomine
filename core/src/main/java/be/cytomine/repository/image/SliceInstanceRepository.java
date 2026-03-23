@@ -43,35 +43,38 @@ public interface SliceInstanceRepository
 
     List<SliceInstance> findAllByBaseSlice(AbstractSlice abstractSlice);
 
-    @Query("SELECT si " +
-        "FROM SliceInstance si INNER JOIN FETCH si.baseSlice as bs " +
-        "WHERE si.image = :imageInstance " +
-        "AND si.baseSlice.channel = :c " +
-        "AND si.baseSlice.zStack = :z " +
-        "AND si.baseSlice.time = :t")
+    @Query("SELECT si "
+        + "FROM SliceInstance si INNER JOIN FETCH si.baseSlice as bs "
+        + "WHERE si.image = :imageInstance "
+        + "AND si.baseSlice.channel = :c "
+        + "AND si.baseSlice.zStack = :z "
+        + "AND si.baseSlice.time = :t"
+    )
     Optional<SliceInstance> findByCZT(ImageInstance imageInstance, int c, int z, int t);
 
-    @Query("SELECT si " +
-        "FROM SliceInstance si INNER JOIN FETCH si.baseSlice as bs INNER JOIN bs.uploadedFile uf " +
-        "WHERE si.image = :imageInstance " +
-        "ORDER BY " +
-        "   si.baseSlice.channel ASC, " +
-        "   si.baseSlice.zStack ASC, " +
-        "   si.baseSlice.time ASC ")
+    @Query("SELECT si "
+        + "FROM SliceInstance si INNER JOIN FETCH si.baseSlice as bs INNER JOIN bs.uploadedFile uf "
+        + "WHERE si.image = :imageInstance "
+        + "ORDER BY "
+        + "    si.baseSlice.channel ASC, "
+        + "    si.baseSlice.zStack ASC, "
+        + "    si.baseSlice.time ASC"
+    )
     List<SliceInstance> listByImageInstanceOrderedByCZT(ImageInstance imageInstance);
 
 
-    @Query("SELECT si " +
-        "FROM SliceInstance si INNER JOIN FETCH si.baseSlice as bs " +
-        "WHERE si.image = :imageInstance " +
-        "AND bs.time >= :baseSliceTime " +
-        "AND bs.zStack >= :baseSliceZStack " +
-        "AND bs.channel >= :baseSliceChannel " +
-        "AND si.id <> :userAnnotationSliceId " +
-        "ORDER BY " +
-        "   bs.time ASC, " +
-        "   bs.zStack ASC, " +
-        "   bs.channel ASC ")
+    @Query("SELECT si "
+        + "FROM SliceInstance si INNER JOIN FETCH si.baseSlice as bs "
+        + "WHERE si.image = :imageInstance "
+        + "AND bs.time >= :baseSliceTime "
+        + "AND bs.zStack >= :baseSliceZStack "
+        + "AND bs.channel >= :baseSliceChannel "
+        + "AND si.id <> :userAnnotationSliceId "
+        + "ORDER BY "
+        + "    bs.time ASC, "
+        + "    bs.zStack ASC, "
+        + "    bs.channel ASC"
+    )
     List<SliceInstance> listByImageInstanceOrderedByTZC(
         ImageInstance imageInstance,
         Integer baseSliceTime,

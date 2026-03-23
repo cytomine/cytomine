@@ -28,18 +28,19 @@ import be.cytomine.domain.ontology.AnnotationIndex;
 import be.cytomine.domain.security.User;
 import be.cytomine.dto.annotation.AnnotationIndexLightDTO;
 
-@SuppressWarnings("checkstyle:all") // This file will be refactored in https://github.com/cytomine/cytomine/issues/625
 public interface AnnotationIndexRepository
     extends JpaRepository<AnnotationIndex, Long>, JpaSpecificationExecutor<AnnotationIndex> {
 
-    @Query(value =
-        "SELECT user_id as user, slice_id as slice ,count_annotation as countAnnotation,count_reviewed_annotation as countReviewedAnnotation "
-            +
-            " FROM annotation_index "
-            +
-            " WHERE slice_id = :slice", nativeQuery = true)
+    @Query(
+        value = "SELECT"
+            + " user_id AS user,"
+            + " slice_id AS slice,"
+            + " count_annotation AS countAnnotation,"
+            + " count_reviewed_annotation AS countReviewedAnnotation"
+            + " FROM annotation_index"
+            + " WHERE slice_id = :slice",
+        nativeQuery = true)
     List<AnnotationIndexLightDTO> findAllLightBySliceInstance(long slice);
-
 
     Optional<AnnotationIndexLightDTO> findOneBySliceAndUser(SliceInstance slice, User user);
 

@@ -37,7 +37,6 @@ import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.image.SliceInstanceRepository;
 import be.cytomine.service.ontology.AnnotationIndexService;
 
-@SuppressWarnings("checkstyle:all") // This file will be refactored in https://github.com/cytomine/cytomine/issues/625
 @Service
 @AllArgsConstructor
 public class KmeansGeometryService {

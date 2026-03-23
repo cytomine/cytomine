@@ -52,9 +52,9 @@ public class Description extends CytomineDomain {
         Description description = this;
         description.id = json.getJSONAttrLong("id", null);
 
-        Long id = json.getJSONAttrLong("domainIdent", -1l);
+        Long id = json.getJSONAttrLong("domainIdent", -1L);
         if (id == -1) {
-            id = json.getJSONAttrLong("domain", -1l);
+            id = json.getJSONAttrLong("domain", -1L);
         }
         description.domainIdent = id;
         description.domainClassName = json.getJSONAttrStr("domainClassName", true);

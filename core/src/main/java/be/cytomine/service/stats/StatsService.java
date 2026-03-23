@@ -66,7 +66,6 @@ import be.cytomine.utils.JsonObject;
 import static be.cytomine.utils.SQLUtils.castToLong;
 import static org.springframework.security.acls.domain.BasePermission.READ;
 
-@SuppressWarnings("checkstyle:all") // This file will be refactored in https://github.com/cytomine/cytomine/issues/625
 @Service
 @Transactional
 public class StatsService {

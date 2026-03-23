@@ -132,8 +132,6 @@ public abstract class AnnotationDomain extends CytomineDomain implements Seriali
     /**
      * Get all terms for automatic review If review is done "for all" (without manual user control), we add these term
      * to the new review annotation
-     *
-     * @return
      */
     public abstract List<Term> termsForReview();
 

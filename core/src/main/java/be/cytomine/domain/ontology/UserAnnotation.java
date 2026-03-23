@@ -138,8 +138,6 @@ public class UserAnnotation extends AnnotationDomain implements Serializable {
     /**
      * Get all terms for automatic review If review is done "for all" (without manual user control), we add these term
      * to the new review annotation
-     *
-     * @return
      */
     public List<Term> termsForReview() {
         return terms().stream().distinct().collect(Collectors.toList());

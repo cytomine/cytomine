@@ -1,8 +1,5 @@
 package be.cytomine.service;
 
-// CHECKSTYLE:OFF
-// TODO: This file will be refactored - see https://github.com/cytomine/cytomine/issues/625
-
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -153,15 +150,15 @@ public class AnnotationListingService {
                     item.put("term", tuple.get("term") != null ? buildList(tuple.get("term")) : new ArrayList<>());
                     item.put(
                         "userByTerm",
-                        tuple.get("term") != null ?
-                            buildList(new HashMap<>(JsonObject.of(
-                                "id",
-                                tuple.get("annotationterms"),
-                                "term",
-                                tuple.get("term"),
-                                "user",
-                                buildList(tuple.get("userterm"))
-                            ))) : new ArrayList<>()
+                        tuple.get("term") != null
+                            ? buildList(new HashMap<>(JsonObject.of(
+                            "id",
+                            tuple.get("annotationterms"),
+                            "term",
+                            tuple.get("term"),
+                            "user",
+                            buildList(tuple.get("userterm"))
+                        ))) : new ArrayList<>()
                     );
                 }
 

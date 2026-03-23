@@ -54,7 +54,7 @@ public class TagDomainAssociation extends CytomineDomain {
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
         TagDomainAssociation tagDomainAssocitation = (TagDomainAssociation) this;
         tagDomainAssocitation.setId(json.getJSONAttrLong("id", null));
-        tagDomainAssocitation.setDomainIdent(json.getJSONAttrLong("domainIdent", -1l));
+        tagDomainAssocitation.setDomainIdent(json.getJSONAttrLong("domainIdent", -1L));
         tagDomainAssocitation.setDomainClassName(json.getJSONAttrStr("domainClassName"));
         tagDomainAssocitation.setTag((Tag) json.getJSONAttrDomain(entityManager, "tag", new Tag(), true));
         return tagDomainAssocitation;

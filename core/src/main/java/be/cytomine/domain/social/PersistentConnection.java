@@ -56,13 +56,13 @@ public class PersistentConnection extends CytomineSocialDomain {
 
     @Override
     public String toString() {
-        return "PersistentConnection{" +
-            "id=" + id +
-            ", created=" + created +
-            ", updated=" + updated +
-            ", user=" + user +
-            ", project=" + project +
-            ", session='" + session + '\'' +
-            '}';
+        return "PersistentConnection{"
+            + "id=" + id
+            + ", created=" + created
+            + ", updated=" + updated
+            + ", user=" + user
+            + ", project=" + project
+            + ", session='" + session + '\''
+            + '}';
     }
 }

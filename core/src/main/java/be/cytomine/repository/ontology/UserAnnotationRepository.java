@@ -54,8 +54,16 @@ public interface UserAnnotationRepository
 
 
     @Query(
-        value = "SELECT a.id id, a.project_id container, '' url FROM user_annotation a, image_instance ii, abstract_image ai WHERE a.image_id = ii.id AND ii.base_image_id = ai.id AND ai.original_filename not like '%ndpi%svs%' AND GeometryType(a.location) != 'POINT' AND st_area(a.location) < 1500000 ORDER BY st_area(a.location) DESC",
-        nativeQuery = true)
+        value = "SELECT a.id as id, a.project_id as container, '' as url "
+            + "FROM user_annotation a, image_instance ii, abstract_image ai "
+            + "WHERE a.image_id = ii.id "
+            + "AND ii.base_image_id = ai.id "
+            + "AND ai.original_filename NOT LIKE '%ndpi%svs%' "
+            + "AND GeometryType(a.location) != 'POINT' "
+            + "AND ST_Area(a.location) < 1500000 "
+            + "ORDER BY ST_Area(a.location) DESC",
+        nativeQuery = true
+    )
     List<Tuple> listTuplesLight();
 
     default List<AnnotationLight> listLight() {
@@ -73,8 +81,11 @@ public interface UserAnnotationRepository
 
 
     @Query(
-        value = "SELECT a.id id, ST_distance(a.location,ST_GeometryFromText(:geometry))  FROM user_annotation a WHERE project_id = :projectId",
-        nativeQuery = true)
+        value = "SELECT a.id as id, ST_Distance(a.location, ST_GeometryFromText(:geometry)) "
+            + "FROM user_annotation a "
+            + "WHERE project_id = :projectId",
+        nativeQuery = true
+    )
     List<Tuple> listAnnotationWithDistance(Long projectId, String geometry);
 
 

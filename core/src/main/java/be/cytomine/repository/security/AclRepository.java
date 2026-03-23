@@ -1,8 +1,5 @@
 package be.cytomine.repository.security;
 
-// CHECKSTYLE:OFF
-// TODO: This file will be refactored - see https://github.com/cytomine/cytomine/issues/625
-
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,26 +14,37 @@ public interface AclRepository extends JpaRepository<User, Long> {
 
 
     @Query(value =
-        "select count(user) from AclObjectIdentity as aclObjectId, AclEntry as aclEntry, AclSid as aclSid, User as user "
-            +
-            "where aclObjectId.objectId = :projectId and aclEntry.aclObjectIdentity = aclObjectId and aclEntry.sid = aclSid and aclSid.sid = user.username "
-            +
-            "and user.id = :userId")
+        "select count(user) "
+            + "from AclObjectIdentity as aclObjectId, AclEntry as aclEntry, AclSid as aclSid, User as user "
+            + "where aclObjectId.objectId = :projectId "
+            + "and aclEntry.aclObjectIdentity = aclObjectId "
+            + "and aclEntry.sid = aclSid "
+            + "and aclSid.sid = user.username "
+            + "and user.id = :userId"
+    )
     Long countEntries(long projectId, long userId);
 
 
-    @Query(value = "SELECT mask FROM acl_object_identity aoi, acl_sid sid, acl_entry ae " +
-        "WHERE aoi.object_id_identity = :domainId " +
-        "AND sid.sid = :username " +
-        "AND ae.acl_object_identity = aoi.id " +
-        "AND ae.sid = sid.id ", nativeQuery = true)
+    @Query(value =
+        "SELECT mask "
+            + "FROM acl_object_identity aoi, acl_sid sid, acl_entry ae "
+            + "WHERE aoi.object_id_identity = :domainId "
+            + "AND sid.sid = :username "
+            + "AND ae.acl_object_identity = aoi.id "
+            + "AND ae.sid = sid.id ",
+        nativeQuery = true
+    )
     List<Integer> listMaskForUsers(Long domainId, String username);
 
-    @Query(value = "SELECT mask FROM acl_object_identity aoi, acl_sid sid, acl_entry ae " +
-        "WHERE aoi.object_id_identity = :domainId " +
-        "AND sid.sid = :humanUsername " +
-        "AND ae.acl_object_identity = aoi.id " +
-        "AND ae.sid = sid.id ", nativeQuery = true)
+    @Query(value =
+        "SELECT mask "
+            + "FROM acl_object_identity aoi, acl_sid sid, acl_entry ae "
+            + "WHERE aoi.object_id_identity = :domainId "
+            + "AND sid.sid = :humanUsername "
+            + "AND ae.acl_object_identity = aoi.id "
+            + "AND ae.sid = sid.id ",
+        nativeQuery = true
+    )
     List<Integer> listMaskForUsers(Long domainId);
 
     @Query(value = "SELECT id FROM acl_object_identity WHERE object_id_identity = :domainId", nativeQuery = true)
@@ -46,12 +54,23 @@ public interface AclRepository extends JpaRepository<User, Long> {
     Long getAclSidFromUsername(String username);
 
     @Query(
-        value = "SELECT id FROM acl_entry WHERE acl_object_identity = :aclObjectIdentity AND mask = :mask AND sid= :sid",
-        nativeQuery = true)
+        value =
+            "SELECT id "
+                + "FROM acl_entry "
+                + "WHERE acl_object_identity = :aclObjectIdentity "
+                + "AND mask = :mask "
+                + "AND sid= :sid",
+        nativeQuery = true
+    )
     Long getAclEntryId(Long aclObjectIdentity, Long sid, Integer mask);
 
-    @Query(value = "SELECT max(ace_order) FROM acl_entry WHERE acl_object_identity = :aclObjectIdentity",
-        nativeQuery = true)
+    @Query(
+        value =
+            "SELECT max(ace_order) "
+                + "FROM acl_entry "
+                + "WHERE acl_object_identity = :aclObjectIdentity",
+        nativeQuery = true
+    )
     Integer getMaxAceOrder(Long aclObjectIdentity);
 
     @Modifying
@@ -63,10 +82,15 @@ public interface AclRepository extends JpaRepository<User, Long> {
     void insertAclEntry(Integer aceOrder, Long aclObjectIdentity, Integer mask, Long sid);
 
     @Modifying
-    @Query(value =
-        "INSERT INTO acl_object_identity(id,object_id_class,entries_inheriting,object_id_identity,owner_sid,parent_object) "
-            +
-            "VALUES (nextval('hibernate_sequence'),:objectIdClass,true,:domainId,:sid,null)", nativeQuery = true)
+    @Query(
+        value =
+            "INSERT INTO acl_object_identity("
+                + "id, object_id_class, entries_inheriting, object_id_identity, owner_sid, parent_object"
+                + ") VALUES ("
+                + "nextval('hibernate_sequence'), :objectIdClass, true, :domainId, :sid, null"
+                + ")",
+        nativeQuery = true
+    )
     void insertAclObjectIdentity(Long objectIdClass, Long domainId, Long sid);
 
     @Query(value = "SELECT id FROM acl_sid WHERE sid = :username", nativeQuery = true)
@@ -90,7 +114,13 @@ public interface AclRepository extends JpaRepository<User, Long> {
     void deleteAclEntry(Long aclObjectIdentity, int mask, Long sid);
 
     @Query(
-        value = "select user from AclObjectIdentity as aclObjectId, AclSid as aclSid, User as user where aclObjectId.objectId = :domainId and aclObjectId.ownerSid = aclSid and aclSid.sid = user.username")
+        value =
+            "select user "
+                + "from AclObjectIdentity as aclObjectId, AclSid as aclSid, User as user "
+                + "where aclObjectId.objectId = :domainId "
+                + "and aclObjectId.ownerSid = aclSid "
+                + "and aclSid.sid = user.username"
+    )
     List<User> listCreators(Long domainId);
 
 }

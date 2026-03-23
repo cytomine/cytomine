@@ -45,9 +45,9 @@ public interface ImageInstanceRepository
     @EntityGraph(attributePaths = {"baseImage.uploadedFile"})
     List<ImageInstance> findAllWithBaseImageUploadedFileByProject(Project project);
 
-    List<ImageInstance> findAllByBaseImage(AbstractImage abstractImage);
-
     boolean existsByBaseImage(AbstractImage abstractImage);
+
+    List<ImageInstance> findAllByBaseImage(AbstractImage abstractImage);
 
     default List<ImageInstance> findAllByBaseImage(AbstractImage abstractImage, Predicate<ImageInstance> predicate) {
         return findAllByBaseImage(abstractImage).stream().filter(predicate).collect(Collectors.toList());
@@ -58,12 +58,17 @@ public interface ImageInstanceRepository
     List<Long> getAllImageId(Long projectId);
 
     @Query(
-        value = "SELECT a FROM image_instance a WHERE project_id=:projectId AND base_image_id=:baseImageId AND parent_id IS NULL",
-        nativeQuery = true)
+        value =
+            "SELECT a "
+                + "FROM image_instance a "
+                + "WHERE project_id = :projectId "
+                + "AND base_image_id = :baseImageId "
+                + "AND parent_id IS NULL",
+        nativeQuery = true
+    )
     Optional<ImageInstance> findByProjectIdAndBaseImageId(Long projectId, Long baseImageId);
 
     Optional<ImageInstance> findByProjectAndBaseImage(Project project, AbstractImage baseImage);
-
 
     Optional<ImageInstance> findTopByProjectAndCreatedLessThanOrderByCreatedDesc(Project project, Date created);
 

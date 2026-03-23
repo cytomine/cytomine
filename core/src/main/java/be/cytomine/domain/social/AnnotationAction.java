@@ -86,14 +86,14 @@ public class AnnotationAction extends CytomineSocialDomain implements Cloneable 
 
     @Override
     public String toString() {
-        return "AnnotationAction{" +
-            "id=" + id +
-            ", created=" + created +
-            ", user=" + user +
-            ", image=" + image +
-            ", slice=" + slice +
-            ", annotationIdent=" + annotationIdent +
-            ", action='" + action + '\'' +
-            '}';
+        return "AnnotationAction{"
+            + "id=" + id
+            + ", created=" + created
+            + ", user=" + user
+            + ", image=" + image
+            + ", slice=" + slice
+            + ", annotationIdent=" + annotationIdent
+            + ", action='" + action + '\''
+            + '}';
     }
 }

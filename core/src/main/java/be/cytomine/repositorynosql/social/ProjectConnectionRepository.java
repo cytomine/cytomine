@@ -1,8 +1,5 @@
 package be.cytomine.repositorynosql.social;
 
-// CHECKSTYLE:OFF
-// TODO: This file will be refactored - see https://github.com/cytomine/cytomine/issues/625
-
 import java.util.Date;
 import java.util.Optional;
 
@@ -27,9 +24,17 @@ public interface ProjectConnectionRepository extends MongoRepository<PersistentC
         PageRequest pageRequest
     );
 
-
     @Aggregation(pipeline = {
-        "{$match: {project: ?0, user: ?1, $and : [{created: {$gte: ?3}},{created: {$lte: ?2}}]}},{$sort: {created: 1}},{$project: {dateInMillis: {$subtract: {'$created', ?4}}}}"
+        "{$match: {"
+            + "project: ?0, "
+            + "user: ?1, "
+            + "$and: ["
+            + "    {created: {$gte: ?3}}, "
+            + "    {created: {$lte: ?2}}"
+            + "]"
+            + "}},"
+            + "{$sort: {created: 1}},"
+            + "{$project: {dateInMillis: {$subtract: ['$created', ?4]}}}"
     })
     AggregationResults retrieve(Long project, Long user, Date before, Date after, Date firstDate);
 

@@ -1,8 +1,5 @@
 package be.cytomine.repository.project;
 
-// CHECKSTYLE:OFF
-// TODO: This file will be refactored - see https://github.com/cytomine/cytomine/issues/625
-
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -22,20 +19,24 @@ import be.cytomine.dto.NamedCytomineDomain;
 @Repository
 public interface ProjectRepository extends JpaRepository<Project, Long> {
 
-    @Query(value = "select distinct project " +
-        "from AclObjectIdentity as aclObjectId, AclEntry as aclEntry, AclSid as aclSid, Project as project " +
-        "where aclObjectId.objectId = project.id " +
-        "and aclEntry.aclObjectIdentity = aclObjectId " +
-        "and project.ontology = :ontology " +
-        "and aclEntry.sid = aclSid and aclSid.sid like :username")
+    @Query(value =
+        "select distinct project "
+            + "from AclObjectIdentity as aclObjectId, AclEntry as aclEntry, AclSid as aclSid, Project as project "
+            + "where aclObjectId.objectId = project.id "
+            + "and aclEntry.aclObjectIdentity = aclObjectId "
+            + "and project.ontology = :ontology "
+            + "and aclEntry.sid = aclSid and aclSid.sid like :username"
+    )
     List<Project> findAllProjectForUserByOntology(String username, Ontology ontology);
 
 
-    @Query(value = "select distinct project " +
-        "from AclObjectIdentity as aclObjectId, AclEntry as aclEntry, AclSid as aclSid, Project as project " +
-        "where aclObjectId.objectId = project.id " +
-        "and aclEntry.aclObjectIdentity = aclObjectId " +
-        "and aclEntry.sid = aclSid and aclSid.sid like :username")
+    @Query(value =
+        "select distinct project "
+            + "from AclObjectIdentity as aclObjectId, AclEntry as aclEntry, AclSid as aclSid, Project as project "
+            + "where aclObjectId.objectId = project.id "
+            + "and aclEntry.aclObjectIdentity = aclObjectId "
+            + "and aclEntry.sid = aclSid and aclSid.sid like :username"
+    )
     List<Project> findAllProjectForUser(String username);
 
 

@@ -39,15 +39,21 @@ public interface PropertyRepository extends JpaRepository<Property, Long>, JpaSp
 
     List<Property> findAllByDomainIdent(Long id);
 
-
     @Query(
-        value = "SELECT * FROM property p WHERE p.domain_ident = :domainIdent AND NOT EXISTS ( SELECT 1 FROM unnest(STRING_TO_ARRAY(:excludedKeys, ';')) AS substr WHERE p.key LIKE (substr || '%'))",
-        nativeQuery = true)
+        value = "SELECT * "
+            + "FROM property p "
+            + "WHERE p.domain_ident = :domainIdent "
+            + "AND NOT EXISTS ( "
+            + "    SELECT 1 "
+            + "    FROM unnest(STRING_TO_ARRAY(:excludedKeys, ';')) AS substr "
+            + "    WHERE p.key LIKE (substr || '%')"
+            + ")",
+        nativeQuery = true
+    )
     List<Property> findByDomainIdentAndExcludedKeys(
         @Param("domainIdent") Long domainIdent,
         @Param("excludedKeys") String excludedKeys
     );
-
 
     void deleteAllByDomainIdent(Long id);
 }

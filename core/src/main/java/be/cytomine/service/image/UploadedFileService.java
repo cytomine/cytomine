@@ -74,7 +74,6 @@ import be.cytomine.utils.filters.SearchParameterProcessed;
 import static org.springframework.security.acls.domain.BasePermission.READ;
 import static org.springframework.security.acls.domain.BasePermission.WRITE;
 
-@SuppressWarnings("checkstyle:all") // This file will be refactored in https://github.com/cytomine/cytomine/issues/625
 @Slf4j
 @Service
 @Transactional

@@ -185,9 +185,9 @@ public class Ontology extends CytomineDomain {
 
     @Override
     public String toString() {
-        return "Ontology{" +
-            "id=" + id +
-            ", name='" + name + '\'' +
-            '}';
+        return "Ontology{"
+            + "id=" + id
+            + ", name='" + name + '\''
+            + '}';
     }
 }

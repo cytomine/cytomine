@@ -60,9 +60,9 @@ public class Property extends CytomineDomain {
         Property property = (Property) this;
         property.id = json.getJSONAttrLong("id", null);
 
-        Long id = json.getJSONAttrLong("domainIdent", -1l);
+        Long id = json.getJSONAttrLong("domainIdent", -1L);
         if (id == -1) {
-            id = json.getJSONAttrLong("domain", -1l);
+            id = json.getJSONAttrLong("domain", -1L);
         }
         property.domainIdent = id;
         property.domainClassName = json.getJSONAttrStr("domainClassName", true);

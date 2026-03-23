@@ -136,9 +136,9 @@ public class Term extends CytomineDomain {
 
     @Override
     public String toString() {
-        return "Term{" +
-            "id=" + id +
-            ", name='" + name + '\'' +
-            '}';
+        return "Term{"
+            + "id=" + id
+            + ", name='" + name + '\''
+            + '}';
     }
 }

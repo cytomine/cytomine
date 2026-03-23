@@ -104,10 +104,10 @@ public class RelationTerm extends CytomineDomain implements Serializable {
 
     @Override
     public String toString() {
-        return "RelationTerm{" +
-            "relation=" + relation +
-            ", term1=" + term1 +
-            ", term2=" + term2 +
-            '}';
+        return "RelationTerm{"
+            + "relation=" + relation
+            + ", term1=" + term1
+            + ", term2=" + term2
+            + '}';
     }
 }

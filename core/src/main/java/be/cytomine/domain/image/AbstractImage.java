@@ -1,20 +1,20 @@
 package be.cytomine.domain.image;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,15 +95,20 @@ public class AbstractImage extends CytomineDomain {
 
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
         AbstractImage abstractImage = this;
-        abstractImage.id = json.getJSONAttrLong("id",null);
+        abstractImage.id = json.getJSONAttrLong("id", null);
         abstractImage.created = json.getJSONAttrDate("created");
         abstractImage.updated = json.getJSONAttrDate("updated");
 
         abstractImage.originalFilename = json.getJSONAttrStr("originalFilename");
-        if (originalFilename!=null && originalFilename.trim().equals("")) {
+        if (originalFilename != null && originalFilename.trim().equals("")) {
             throw new WrongArgumentException("'originalFilename' property cannot be blank");
         }
-        abstractImage.uploadedFile = (UploadedFile) json.getJSONAttrDomain(entityManager, "uploadedFile", new UploadedFile(), false);
+        abstractImage.uploadedFile = (UploadedFile) json.getJSONAttrDomain(
+            entityManager,
+            "uploadedFile",
+            new UploadedFile(),
+            false
+        );
 
         abstractImage.height = json.getJSONAttrInteger("height", null);
         abstractImage.width = json.getJSONAttrInteger("width", null);
@@ -130,7 +135,7 @@ public class AbstractImage extends CytomineDomain {
 
     public static JsonObject getDataFromDomain(CytomineDomain domain) {
         JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
-        AbstractImage abstractImage = (AbstractImage)domain;
+        AbstractImage abstractImage = (AbstractImage) domain;
         returnArray.put("filename", abstractImage.getFilename());
         returnArray.put("originalFilename", abstractImage.getOriginalFilename());
         returnArray.put("uploadedFile", abstractImage.getUploadedFileId());
@@ -162,7 +167,16 @@ public class AbstractImage extends CytomineDomain {
         returnArray.put("colorspace", abstractImage.getColorspace());
         returnArray.put("thumb", UrlApi.getAbstractImageThumbUrlWithMaxSize(abstractImage.id, 512, "png"));
         returnArray.put("preview", UrlApi.getAbstractImageThumbUrlWithMaxSize(abstractImage.id, 1024, "png"));
-        returnArray.put("macroURL", UrlApi.getAssociatedImage(abstractImage, "macro", Optional.ofNullable(abstractImage.getUploadedFile()).map(UploadedFile::getContentType).orElse(null), 512, "png"));
+        returnArray.put(
+            "macroURL",
+            UrlApi.getAssociatedImage(
+                abstractImage,
+                "macro",
+                Optional.ofNullable(abstractImage.getUploadedFile()).map(UploadedFile::getContentType).orElse(null),
+                512,
+                "png"
+            )
+        );
 
         returnArray.put("inProject", abstractImage.getInProject());
         return returnArray;
@@ -173,24 +187,24 @@ public class AbstractImage extends CytomineDomain {
     }
 
     public boolean isVirtual() {
-        return uploadedFile!=null? uploadedFile.isVirtual() : false;
+        return uploadedFile != null ? uploadedFile.isVirtual() : false;
     }
 
 
     public Long getUploadedFileId() {
-        return this.getUploadedFile()!=null ? this.getUploadedFile().getId() : null;
+        return this.getUploadedFile() != null ? this.getUploadedFile().getId() : null;
     }
 
     public String getContentType() {
-        return this.getUploadedFile()!=null ? this.getUploadedFile().getContentType() : null;
+        return this.getUploadedFile() != null ? this.getUploadedFile().getContentType() : null;
     }
 
     public String getPath() {
-        return this.getUploadedFile()!=null ? this.getUploadedFile().getPath() : null;
+        return this.getUploadedFile() != null ? this.getUploadedFile().getPath() : null;
     }
 
     public Integer getZoomLevels() {
-        if (width==null || height==null) {
+        if (width == null || height == null) {
             return 1;
         }
 
@@ -213,13 +227,13 @@ public class AbstractImage extends CytomineDomain {
         List<String> dimensions = new ArrayList<>();
         dimensions.add("X");
         dimensions.add("Y");
-        if (channels!=null && channels > 1) {
+        if (channels != null && channels > 1) {
             dimensions.add("C");
         }
-        if (depth!=null && depth > 1) {
+        if (depth != null && depth > 1) {
             dimensions.add("Z");
         }
-        if (duration!=null && duration > 1) {
+        if (duration != null && duration > 1) {
             dimensions.add("T");
         }
         return String.join("", dimensions);
@@ -228,6 +242,7 @@ public class AbstractImage extends CytomineDomain {
 
     /**
      * Get the container domain for this domain (usefull for security)
+     *
      * @return Container of this domain
      */
     public CytomineDomain container() {
@@ -241,7 +256,6 @@ public class AbstractImage extends CytomineDomain {
     public JsonObject toJsonObject() {
         return getDataFromDomain(this);
     }
-
 
 
 }

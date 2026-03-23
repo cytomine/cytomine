@@ -3,6 +3,7 @@ package org.cytomine.e2etests.ui;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -13,6 +14,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Wait;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -223,13 +225,12 @@ public class CytomineSteps {
     }
 
     @SneakyThrows
-    public void uploadTask(Wait<WebDriver> wait, URL cytomineUrl) {
+    public void uploadTask(Wait<WebDriver> wait, URL cytomineUrl, String zipName) {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/apps");
         webDriverUtils.byIsDisplayed(wait, By.cssSelector(".upload-icon"));
         String bundleName = "selenium-" + UUID.randomUUID() + ".zip";
         Path tempDir = Files.createTempDirectory("selenium-task");
         Path copiedFile = tempDir.resolve(bundleName);
-        String zipName = "com.cytomine.dummy.identity.geometry-1.0.0.zip";
         try (var in = getClass().getClassLoader().getResourceAsStream(zipName)) {
             Files.copy(in, copiedFile);
         }
@@ -255,5 +256,40 @@ public class CytomineSteps {
             "//a[contains(@class, 'dropdown-item') and .//span[contains(text(), 'Delete')]]");
 
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Confirm')]");
+
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'App deleted successfully')]"));
+    }
+
+    public void selectTask(Wait<WebDriver> wait, String taskName, String taskVersion) {
+        webDriverUtils.byClick(wait, By.cssSelector(".executor .select select"));
+
+        String optionXpath = format(
+            "//div[contains(@class, 'executor')]//option[contains(text(), '%s') and contains(text(), '%s')]",
+            taskName, taskVersion
+        );
+        webDriverUtils.xpathClick(wait, optionXpath);
+        webDriverUtils.byIsDisplayed(wait, By.xpath(format("//div[contains(@class, 'executor')]//p[contains(text(), '%s') and contains(text(), '%s')]", taskName, taskVersion)));
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//section[contains(@class, 'fields')]//button[.//span[contains(text(), 'Select')]]"));    }
+
+    public void selectAnnotationForGeometryInput(Wait<WebDriver> wait) {
+        webDriverUtils.xpathClick(wait, "//section[contains(@class, 'fields')]//button[.//span[contains(text(), 'Select')]]");
+        webDriverUtils.byIsDisplayed(wait, By.cssSelector(".modal-card .annotation-content"));
+        wait.until(d -> !d.findElements(By.cssSelector(".annotation-content > div")).isEmpty());
+
+        webDriverUtils.byClick(wait, By.cssSelector(".annotation-content > div:first-child"));
+        webDriverUtils.byIsDisplayed(wait, By.cssSelector(".annotation-content > div.selected"));
+
+        webDriverUtils.byIsDisplayed(wait, By.cssSelector(".modal-card .modal-card-foot .is-link"));
+        webDriverUtils.byClick(wait, By.cssSelector(".modal-card .modal-card-foot .is-link"));
+
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(@class, 'annotation-container') and contains(text(), 'Annotation')]"));
+    }
+
+    public void runTask(Wait<WebDriver> wait, WebDriver driver) {
+        webDriverUtils.byIsDisplayed(wait, By.cssSelector(".executor .card-content section:last-child .button.is-primary:last-child"));
+        webDriverUtils.byClick(wait, By.cssSelector(".executor .card-content section:last-child .button.is-primary:last-child"));
+
+        Wait<WebDriver> longWait = new WebDriverWait(driver, Duration.ofSeconds(20));
+        webDriverUtils.byIsDisplayed(longWait, By.cssSelector(".runs .fa-check-circle"));
     }
 }

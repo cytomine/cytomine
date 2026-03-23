@@ -31,24 +31,24 @@ public class RestNestedImageInstanceController extends RestCytomineController {
 
     @GetMapping("/imageinstance/{imageInstanceId}/nested.json")
     public ResponseEntity<String> listByImageInstance(
-            @PathVariable Long imageInstanceId
+        @PathVariable Long imageInstanceId
     ) {
         log.debug("REST request to list nested image for imageinstance {}", imageInstanceId);
         ImageInstance imageInstance = imageInstanceService.find(imageInstanceId)
-                .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", imageInstanceId));
+            .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", imageInstanceId));
         return responseSuccess(nestedImageInstanceService.list(imageInstance));
     }
 
 
     @GetMapping("/imageinstance/{imageInstanceId}/nested/{id}.json")
     public ResponseEntity<String> show(
-            @PathVariable Long imageInstanceId,
-            @PathVariable Long id
+        @PathVariable Long imageInstanceId,
+        @PathVariable Long id
     ) {
         log.debug("REST request to get nested image instance {}", id);
         return nestedImageInstanceService.find(id)
-                .map(this::responseSuccess)
-                .orElseThrow(() -> new ObjectNotFoundException("NestedImageInstance", id));
+            .map(this::responseSuccess)
+            .orElseThrow(() -> new ObjectNotFoundException("NestedImageInstance", id));
     }
 
     @PostMapping("/imageinstance/{imageInstanceId}/nested.json")

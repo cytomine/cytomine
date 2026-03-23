@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import be.cytomine.domain.ontology.SharedAnnotation;
 
-public interface SharedAnnotationRepository extends JpaRepository<SharedAnnotation, Long>, JpaSpecificationExecutor<SharedAnnotation> {
+public interface SharedAnnotationRepository
+    extends JpaRepository<SharedAnnotation, Long>, JpaSpecificationExecutor<SharedAnnotation> {
     List<SharedAnnotation> findAllByAnnotationIdentOrderByCreatedDesc(Long annotationId);
 }

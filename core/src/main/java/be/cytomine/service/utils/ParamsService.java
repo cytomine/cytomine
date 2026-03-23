@@ -19,19 +19,15 @@ import be.cytomine.service.ontology.TermService;
 import be.cytomine.service.security.UserService;
 import be.cytomine.utils.JsonObject;
 
-@Service
-@Transactional
-@AllArgsConstructor
 /**
  * This service simplify request parameters extraction in controller
  * E.g. thanks to "/api/annotation.json?users=1,5 => it will retrieve user object with 1 and 5
  */
+@Service
+@Transactional
+@AllArgsConstructor
 public class ParamsService {
 
-//    def imageInstanceService
-//    def termService
-//    def userService
-//    def dataSource
     private final UserService userService;
 
     private final UserRepository userRepository;
@@ -42,14 +38,19 @@ public class ParamsService {
 
 
     /**
-     * Retrieve all user id from paramsUsers request string (format users=x,y,z or x_y_z)
-     * Just get user from project
+     * Retrieve all user id from paramsUsers request string (format users=x,y,z or x_y_z) Just get user from project
      */
     public List<Long> getParamsUserList(String paramsUsers, Project project) {
-        if(paramsUsers != null && !paramsUsers.equals("null")) {
+        if (paramsUsers != null && !paramsUsers.equals("null")) {
             if (!paramsUsers.equals("")) {
-                List<Long> userIdsFromParams = Arrays.stream(paramsUsers.split(paramsUsers.contains("_") ? "_" : ",")).map(x -> Long.parseLong(x)).collect(Collectors.toList());
-                return userRepository.findAllAllowedUserIdList(project.getId()).stream().distinct().filter(userIdsFromParams::contains).collect(Collectors.toList());
+                List<Long> userIdsFromParams = Arrays.stream(paramsUsers.split(paramsUsers.contains("_") ? "_" : ","))
+                    .map(x -> Long.parseLong(x))
+                    .collect(Collectors.toList());
+                return userRepository.findAllAllowedUserIdList(project.getId())
+                    .stream()
+                    .distinct()
+                    .filter(userIdsFromParams::contains)
+                    .collect(Collectors.toList());
             } else {
                 return new ArrayList<>();
             }
@@ -60,14 +61,20 @@ public class ParamsService {
 
 
     /**
-     * Retrieve all images id from paramsImages request string (format images=x,y,z or x_y_z)
-     * Just get images from project
+     * Retrieve all images id from paramsImages request string (format images=x,y,z or x_y_z) Just get images from
+     * project
      */
     public List<Long> getParamsImageInstanceList(String paramsImages, Project project) {
-        if(paramsImages != null && !paramsImages.equals("null")) {
+        if (paramsImages != null && !paramsImages.equals("null")) {
             if (!paramsImages.equals("")) {
-                List<Long> userIdsFromParams = Arrays.stream(paramsImages.split(paramsImages.contains("_") ? "_" : ",")).map(x -> Long.parseLong(x)).collect(Collectors.toList());
-                return imageInstanceService.getAllImageId(project).stream().distinct().filter(userIdsFromParams::contains).collect(Collectors.toList());
+                List<Long> userIdsFromParams = Arrays.stream(paramsImages.split(paramsImages.contains("_") ? "_" : ","))
+                    .map(x -> Long.parseLong(x))
+                    .collect(Collectors.toList());
+                return imageInstanceService.getAllImageId(project)
+                    .stream()
+                    .distinct()
+                    .filter(userIdsFromParams::contains)
+                    .collect(Collectors.toList());
             } else {
                 return new ArrayList<>();
             }
@@ -77,14 +84,20 @@ public class ParamsService {
     }
 
     /**
-     * Retrieve all images id from paramsImages request string (format images=x,y,z or x_y_z)
-     * Just get images from project
+     * Retrieve all images id from paramsImages request string (format images=x,y,z or x_y_z) Just get images from
+     * project
      */
     public List<Long> getParamsTermList(String paramsTerms, Project project) {
-        if(paramsTerms != null && !paramsTerms.equals("null")) {
+        if (paramsTerms != null && !paramsTerms.equals("null")) {
             if (!paramsTerms.equals("")) {
-                List<Long> termsIdsFromParams = Arrays.stream(paramsTerms.split(paramsTerms.contains("_") ? "_" : ",")).map(x -> Long.parseLong(x)).collect(Collectors.toList());
-                return termService.getAllTermId(project).stream().distinct().filter(termsIdsFromParams::contains).collect(Collectors.toList());
+                List<Long> termsIdsFromParams = Arrays.stream(paramsTerms.split(paramsTerms.contains("_") ? "_" : ","))
+                    .map(x -> Long.parseLong(x))
+                    .collect(Collectors.toList());
+                return termService.getAllTermId(project)
+                    .stream()
+                    .distinct()
+                    .filter(termsIdsFromParams::contains)
+                    .collect(Collectors.toList());
             } else {
                 return new ArrayList<>();
             }
@@ -94,30 +107,31 @@ public class ParamsService {
     }
 
     private static Map<String, String> PARAMETER_ASSOCIATION = Map.of(
-            "showBasic","basic",
-            "showMeta","meta",
-            "showWKT","wkt",
-            "showGIS","gis",
-            "showTerm","term",
-            "showImage","image",
-            "showUser","user",
-            "showSlice","slice",
-            "showTrack","track");
+        "showBasic", "basic",
+        "showMeta", "meta",
+        "showWKT", "wkt",
+        "showGIS", "gis",
+        "showTerm", "term",
+        "showImage", "image",
+        "showUser", "user",
+        "showSlice", "slice",
+        "showTrack", "track"
+    );
 
 
     public List<String> getPropertyGroupToShow(JsonObject params) {
         List<String> propertiesToPrint = new ArrayList<>();
 
         for (Map.Entry<String, String> entry : PARAMETER_ASSOCIATION.entrySet()) {
-            if(params.getJSONAttrBoolean(entry.getKey(), false)) {
+            if (params.getJSONAttrBoolean(entry.getKey(), false)) {
                 propertiesToPrint.add(entry.getValue());
             }
         }
 
 
         //if no specific show asked show default prop
-        if(params.getJSONAttrBoolean("showDefault", false) || propertiesToPrint.isEmpty()) {
-            for(String column : AnnotationListing.availableColumnsDefault) {
+        if (params.getJSONAttrBoolean("showDefault", false) || propertiesToPrint.isEmpty()) {
+            for (String column : AnnotationListing.availableColumnsDefault) {
                 propertiesToPrint.add(column);
             }
             propertiesToPrint = propertiesToPrint.stream().distinct().collect(Collectors.toList());
@@ -125,12 +139,12 @@ public class ParamsService {
 
         //hide if asked
         for (Map.Entry<String, String> entry : PARAMETER_ASSOCIATION.entrySet()) {
-            if(params.getJSONAttrBoolean(entry.getKey().replaceAll("show", "hide"), false)) {
+            if (params.getJSONAttrBoolean(entry.getKey().replaceAll("show", "hide"), false)) {
                 propertiesToPrint.remove(entry.getValue());
             }
         }
 
-        if(propertiesToPrint.isEmpty()) {
+        if (propertiesToPrint.isEmpty()) {
             throw new ObjectNotFoundException("You must ask at least one properties group for request.");
         }
 

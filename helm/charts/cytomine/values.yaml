@@ -79,7 +79,6 @@ images:
   mongodb: mongo:4.4-focal
   pims_cache: redis:7
   redis: redis:7
-  nginx: cytomine/nginx:latest
   iam: keycloak/keycloak:26.3
   e2e_tests: cytomine/e2e-tests:latest
   selenium: selenium/standalone-firefox
@@ -304,4 +303,4 @@ test:
   ingressIP:
   # Number of e2e tests (used for SE_DRAIN_AFTER_SESSION_COUNT)
   # This is automatically set by CI from counting @Test annotations
-  e2eTestCount: 9
+  e2eTestCount: 10

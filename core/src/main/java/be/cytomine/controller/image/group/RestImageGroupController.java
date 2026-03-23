@@ -37,7 +37,7 @@ public class RestImageGroupController extends RestCytomineController {
     public ResponseEntity<String> listByProject(@PathVariable Long id) {
         log.debug("REST request to list an imagegroup for project: {}", id);
         Project project = projectService.find(id)
-                .orElseThrow(() -> new ObjectNotFoundException("Project", id));
+            .orElseThrow(() -> new ObjectNotFoundException("Project", id));
 
         return responseSuccess(imageGroupService.list(project));
     }

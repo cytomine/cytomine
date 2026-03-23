@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationToken> {
 
     private final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter =
-            new JwtGrantedAuthoritiesConverter();
+        new JwtGrantedAuthoritiesConverter();
 
     @Value("${jwt.auth.converter.principle-attribute}")
     private String principleAttribute;
@@ -32,14 +32,14 @@ public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationTo
     @Override
     public AbstractAuthenticationToken convert(@NonNull Jwt jwt) {
         Collection<GrantedAuthority> authorities = Stream.concat(
-                jwtGrantedAuthoritiesConverter.convert(jwt).stream(),
-                extractResourceRoles(jwt).stream()
+            jwtGrantedAuthoritiesConverter.convert(jwt).stream(),
+            extractResourceRoles(jwt).stream()
         ).collect(Collectors.toSet());
 
         return new JwtAuthenticationToken(
-                jwt,
-                authorities,
-                getPrincipleClaimName(jwt)
+            jwt,
+            authorities,
+            getPrincipleClaimName(jwt)
         );
     }
 
@@ -67,8 +67,8 @@ public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationTo
 
         resourceRoles = (Collection<String>) resource.get("roles");
         return resourceRoles
-                .stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-                .collect(Collectors.toSet());
+            .stream()
+            .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+            .collect(Collectors.toSet());
     }
 }

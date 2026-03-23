@@ -43,8 +43,8 @@ public class RestAnnotationGroupController extends RestCytomineController {
     public ResponseEntity<String> show(@PathVariable Long id) {
         log.debug("REST request to show annotationgroup: " + id);
         return annotationGroupService.find(id)
-                .map(this::responseSuccess)
-                .orElseThrow(() -> new ObjectNotFoundException("AnnotationGroup", id));
+            .map(this::responseSuccess)
+            .orElseThrow(() -> new ObjectNotFoundException("AnnotationGroup", id));
     }
 
     @PutMapping("/annotationgroup/{id}.json")

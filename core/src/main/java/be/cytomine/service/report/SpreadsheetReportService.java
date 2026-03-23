@@ -21,14 +21,13 @@ public class SpreadsheetReportService {
     /**
      * Write a spreadsheet report (xls)
      *
-     * @param  dataArray
      * @return Spreadsheet byte array report encoded in base 64
      */
     public byte[] writeSpreadsheet(Object[][] dataArray) throws ServerException {
         log.info(String.format("Generating spread sheet with delimiter: '%s'", ";"));
         CSVFormat format = CSVFormat.EXCEL.withDelimiter(';');
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        try (CSVPrinter csvPrinter = new CSVPrinter(new OutputStreamWriter(output), format)){
+        try (CSVPrinter csvPrinter = new CSVPrinter(new OutputStreamWriter(output), format)) {
 
             for (Object[] row : dataArray) {
                 csvPrinter.printRecord(row);
@@ -39,7 +38,11 @@ public class SpreadsheetReportService {
             return output.toByteArray();
         } catch (IOException e) {
             log.error("Failed to generate spread sheet. Error: %s".format(e.getMessage()));
-            throw new ServerException(String.format("Cannot generate spread sheet with params: format=%s. Error: %s",format, e.getMessage()));
+            throw new ServerException(String.format(
+                "Cannot generate spread sheet with params: format=%s. Error: %s",
+                format,
+                e.getMessage()
+            ));
         }
     }
 
@@ -47,7 +50,6 @@ public class SpreadsheetReportService {
     /**
      * Write a spreadsheet report (xls)
      *
-     * @param  dataArray
      * @return Spreadsheet byte array report encoded in base 64
      */
     public byte[] writeSpreadsheetXLS(Object[][] dataArray) throws ServerException {

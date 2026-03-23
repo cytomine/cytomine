@@ -153,6 +153,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
         responseReportFile(reportService.getAnnotationReportFileName(format, project), report, format);
     }
 
+    @SuppressWarnings("checkstyle:VariableDeclarationUsageDistance")
     @RequestMapping(value = "/annotation/{id}/crop.{format}", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<byte[]> crop(
         @PathVariable Long id,
@@ -266,9 +267,8 @@ public class RestAnnotationDomainController extends RestCytomineController {
     }
 
     /**
-     * Read a specific annotation
-     * It's better to avoid the user of this method if we know the correct type of an annotation id
-     * Annotation x => annotation/x.json is slower than userannotation/x.json
+     * Read a specific annotation It's better to avoid the user of this method if we know the correct type of an
+     * annotation id Annotation x => annotation/x.json is slower than userannotation/x.json
      */
     @RequestMapping(value = "/annotation/{id}.json", method = {RequestMethod.GET})
     public ResponseEntity<String> show(@PathVariable Long id) throws IOException {
@@ -283,14 +283,14 @@ public class RestAnnotationDomainController extends RestCytomineController {
     }
 
     /**
-     * Add an annotation
-     * Redirect to the controller depending on the user type
+     * Add an annotation Redirect to the controller depending on the user type
      */
     @RequestMapping(value = "/annotation.json", method = {RequestMethod.POST})
-    public ResponseEntity<String> add(@RequestBody String json,
-                                      @RequestParam(required = false, defaultValue = "false") Boolean roi,
-                                      @RequestParam(required = false) Long minPoint,
-                                      @RequestParam(required = false) Long maxPoint
+    public ResponseEntity<String> add(
+        @RequestBody String json,
+        @RequestParam(required = false, defaultValue = "false") Boolean roi,
+        @RequestParam(required = false) Long minPoint,
+        @RequestParam(required = false) Long maxPoint
     ) throws IOException {
         log.debug("REST request to create new annotation(s)");
         ResponseEntity<String> response = restUserAnnotationController.add(json, minPoint, maxPoint);
@@ -299,8 +299,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
     }
 
     /**
-     * Update an annotation
-     * Redirect to the good controller with the annotation type
+     * Update an annotation Redirect to the good controller with the annotation type
      */
     @RequestMapping(value = "/annotation/{id}.json", method = {RequestMethod.PUT})
     public ResponseEntity<String> update(
@@ -324,8 +323,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
     }
 
     /**
-     * Delete an annotation
-     * Redirect to the good controller with the current user type
+     * Delete an annotation Redirect to the good controller with the current user type
      */
     @RequestMapping(value = "/annotation/{id}.json", method = {RequestMethod.DELETE})
     public ResponseEntity<String> delete(
@@ -374,8 +372,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
     }
 
     /**
-     * Fill an annotation.
-     * Remove empty space in the polygon
+     * Fill an annotation. Remove empty space in the polygon
      */
     @RequestMapping(value = "/annotation/{id}/fill.json", method = {RequestMethod.POST}) // TODO: should be PUT
     public ResponseEntity<String> fillAnnotation(
@@ -396,8 +393,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
     }
 
     /**
-     * Add/Remove a geometry Y to/from the annotation geometry X.
-     * Y must have intersection with X
+     * Add/Remove a geometry Y to/from the annotation geometry X. Y must have intersection with X
      */
     @PostMapping("/annotationcorrection.json")
     public ResponseEntity<String> addCorrection(

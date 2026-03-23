@@ -37,51 +37,51 @@ public class CustomErrorController implements ErrorController {
 
 
     private static final String CSS = """
-                h1{
-                font-size:80px;
-                font-weight:800;
-                text-align:center;
-                font-family: 'Roboto', sans-serif;
-                }
-                h2
-                {
-                font-size:25px;
-                text-align:center;
-                font-family: 'Roboto', sans-serif;
-                margin-top:-40px;
-                }
-                p{
-                text-align:center;
-                font-family: 'Roboto', sans-serif;
-                font-size:12px;
-                }
-                
-                .container
-                {
-                width:300px;
-                margin: 0 auto;
-                margin-top:15%;
-                color: #1e3148;
-                }                
-                """;
+        h1{
+        font-size:80px;
+        font-weight:800;
+        text-align:center;
+        font-family: 'Roboto', sans-serif;
+        }
+        h2
+        {
+        font-size:25px;
+        text-align:center;
+        font-family: 'Roboto', sans-serif;
+        margin-top:-40px;
+        }
+        p{
+        text-align:center;
+        font-family: 'Roboto', sans-serif;
+        font-size:12px;
+        }
+        
+        .container
+        {
+        width:300px;
+        margin: 0 auto;
+        margin-top:15%;
+        color: #1e3148;
+        }                
+        """;
 
     private static final String TEMPLATE = """
-                <html>
-                <head>
-                <title>Cytomine error %s</title>
-                <link href="https://fonts.googleapis.com/css?family=Roboto:700" rel="stylesheet">
-                <style>
-                   %s 
-                </style>
-                </head>
-                <body>
-                <div class="container">
-                <h1>%s</h1>
-                <h2>%s</h2>
-                <p>%s</p>
-                <p><a href="%s">Go back to Cytomine homepage</a></p>
-                </div>
-                </body>
-                </html>      
-                """;
+        <html>
+        <head>
+        <title>Cytomine error %s</title>
+        <link href="https://fonts.googleapis.com/css?family=Roboto:700" rel="stylesheet">
+        <style>
+           %s 
+        </style>
+        </head>
+        <body>
+        <div class="container">
+        <h1>%s</h1>
+        <h2>%s</h2>
+        <p>%s</p>
+        <p><a href="%s">Go back to Cytomine homepage</a></p>
+        </div>
+        </body>
+        </html>      
+        """;
 }

@@ -110,7 +110,6 @@ public class UserService extends ModelService {
     @Autowired
     private UserPositionService userPositionService;
 
-
     @Autowired
     private UserRepository userRepository;
 
@@ -280,6 +279,10 @@ public class UserService extends ModelService {
             && currentRoleService.isGuestByNow(user));
 
         return authInformation;
+    }
+
+    public List<User> list(List<Long> ids) {
+        return userRepository.findAllByIdIn(ids);
     }
 
     // TODO 2024.2
@@ -568,10 +571,10 @@ public class UserService extends ModelService {
             + "), "
             +
             "AclObjectIdentity as aclObjectId, AclEntry as aclEntry, AclSid as aclSid ";
-        String where = "where aclObjectId.objectId = " + project.getId() + " " +
-            "and aclEntry.aclObjectIdentity = aclObjectId " +
-            "and aclEntry.sid = aclSid " +
-            "and aclSid.sid = user.username ";
+        String where = "where aclObjectId.objectId = " + project.getId() + " "
+            + "and aclEntry.aclObjectIdentity = aclObjectId "
+            + "and aclEntry.sid = aclSid "
+            + "and aclSid.sid = user.username ";
         String groupBy = "";
         String order = "";
         String having = "";
@@ -605,12 +608,14 @@ public class UserService extends ModelService {
         }
 
         //works because 'contributor' < 'manager' < 'representative'
-        select += ", MAX( CASE WHEN r.id IS NOT NULL THEN 'representative'\n" +
-            "     WHEN aclEntry.mask = 16 THEN 'manager'\n" +
-            "     ELSE 'contributor'\n" +
-            " END) as role ";
-        groupBy
-            = "GROUP BY user.id , user.accountExpired , user.accountLocked, user.created, user.enabled, user.origin, user.password, user.passwordExpired, user.privateKey, user.publicKey, user.updated, user.username, user.version,user.email,user.firstname,user.isDeveloper,user.language,user.lastname,user.creator,user.name,user.reference";
+        select += ", MAX( CASE WHEN r.id IS NOT NULL THEN 'representative'\n"
+            + "     WHEN aclEntry.mask = 16 THEN 'manager'\n"
+            + "     ELSE 'contributor'\n"
+            + " END) as role ";
+        groupBy = "GROUP BY user.id, user.accountExpired, user.accountLocked, user.created, user.enabled, user.origin, "
+            + "user.password, user.passwordExpired, user.privateKey, user.publicKey, user.updated, user.username, "
+            + "user.version, user.email, user.firstname, user.isDeveloper, user.language, user.lastname, user.creator, "
+            + "user.name, user.reference";
 
         if (sortColumn.equals("projectRole")) {
             sortColumn = "role";
@@ -640,22 +645,6 @@ public class UserService extends ModelService {
             results.add(jsonObject);
         }
 
-
-//        List<Map<String, Object>> results = new ArrayList<>();
-//        for (Tuple rowResult : resultList) {
-//            JsonObject result = new JsonObject();
-//            for (TupleElement<?> element : rowResult.getElements()) {
-//                Object value = rowResult.get(element.getAlias());
-//                if (value instanceof BigInteger) {
-//                    value = ((BigInteger)value).longValue();
-//                }
-//                String alias = SQLUtils.toCamelCase(element.getAlias());
-//                result.put(alias, value);
-//            }
-//            JsonObject object = Project.getDataFromDomain(new User().buildDomainFromJson(result, getEntityManager()));
-//            object.put("role", result.get("role"));
-//            results.add(object);
-//        }
         request = "SELECT COUNT(DISTINCT user) " + from + where;
         query = getEntityManager().createQuery(request);
         long count = ((Long) query.getResultList().get(0));
@@ -664,7 +653,6 @@ public class UserService extends ModelService {
 
 
     }
-
 
     public List<User> listAdmins(Project project) {
         return listAdmins(project, true);
@@ -687,9 +675,6 @@ public class UserService extends ModelService {
         return userRepository.findAllUsersByProjectId(project.getId());
     }
 
-    public List<User> list(List<Long> ids) {
-        return userRepository.findAllByIdIn(ids);
-    }
 
     public List<User> listUsers(Ontology ontology) {
         securityACLService.check(ontology, READ);
@@ -746,7 +731,7 @@ public class UserService extends ModelService {
     }
 
     public List<JsonObject> getAllOnlineUserWithTheirPositions(Project project) {
-//        //Get all project user online
+        //Get all project user online
         List<Long> usersId = this.getAllFriendsUsersOnline(currentUserService.getCurrentUser(), project)
             .stream()
             .map(CytomineDomain::getId)
@@ -869,6 +854,14 @@ public class UserService extends ModelService {
     }
 
     /**
+     * Get all online user for a project
+     */
+    public List<User> getAllOnlineUsers(Project project) {
+        securityACLService.check(project, READ);
+        return userRepository.findAllByIdIn(getAllOnlineUserIds(project));
+    }
+
+    /**
      * Get all online userIds for a project
      */
     public List<Long> getAllOnlineUserIds(Project project) {
@@ -882,14 +875,6 @@ public class UserService extends ModelService {
         );
         List<Long> userIds = connections.stream().map(LastConnection::getUser).distinct().collect(Collectors.toList());
         return userIds;
-    }
-
-    /**
-     * Get all online user for a project
-     */
-    public List<User> getAllOnlineUsers(Project project) {
-        securityACLService.check(project, READ);
-        return userRepository.findAllByIdIn(getAllOnlineUserIds(project));
     }
 
     /**
@@ -926,7 +911,6 @@ public class UserService extends ModelService {
         user.generateKeys();
         return userRepository.save(user);
     }
-
 
     /**
      * Add the new domain with JSON data
@@ -1040,7 +1024,6 @@ public class UserService extends ModelService {
         commandRepository.deleteAllByUser(user);
     }
 
-
     protected void afterAdd(CytomineDomain domain, CommandResponse response) {
         User user = (User) domain;
         if (user.getPublicKey() == null || user.getPrivateKey() == null) {
@@ -1067,7 +1050,6 @@ public class UserService extends ModelService {
             .orElseThrow(() -> new ObjectNotFoundException("User", json.toJsonString()));
     }
 
-
     public void deleteDependencies(CytomineDomain domain, Transaction transaction, Task task) {
         deleteDependentAnnotationTerm((User) domain, transaction, task);
         deleteDependentImageInstance((User) domain, transaction, task);
@@ -1085,7 +1067,6 @@ public class UserService extends ModelService {
         deleteDependentProjectDefaultLayer((User) domain, transaction, task);
         deleteDependentProjectRepresentativeUser((User) domain, transaction, task);
     }
-
 
     public void deleteDependentAnnotationTerm(User user, Transaction transaction, Task task) {
         if (user instanceof User) {
@@ -1186,8 +1167,8 @@ public class UserService extends ModelService {
 
     public void deleteDependentProjectRepresentativeUser(User user, Transaction transaction, Task task) {
         if (user instanceof User) {
-            for (ProjectRepresentativeUser projectRepresentativeUser : projectRepresentativeUserRepository.findAllByUser(
-                user)) {
+            for (ProjectRepresentativeUser projectRepresentativeUser
+                : projectRepresentativeUserRepository.findAllByUser(user)) {
                 projectRepresentativeUserService.delete(projectRepresentativeUser, transaction, null, false);
             }
         }

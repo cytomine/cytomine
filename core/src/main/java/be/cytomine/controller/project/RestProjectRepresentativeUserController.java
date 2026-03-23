@@ -79,7 +79,7 @@ public class RestProjectRepresentativeUserController extends RestCytomineControl
         log.debug("REST request to delete ProjectRepresentativeUser");
 
         ProjectRepresentativeUser projectRepresentativeUser;
-        if(id!=null) {
+        if (id != null) {
             projectRepresentativeUser = projectRepresentativeUserService.find(id)
                     .orElseThrow(() -> new ObjectNotFoundException("ProjectRepresentativeUser", id));
         } else {
@@ -88,10 +88,16 @@ public class RestProjectRepresentativeUserController extends RestCytomineControl
             User user = userService.findUser(userId)
                     .orElseThrow(() -> new ObjectNotFoundException("User", userId));
             projectRepresentativeUser = projectRepresentativeUserService.find(project, user)
-                    .orElseThrow(() -> new ObjectNotFoundException("ProjectRepresentativeUser", JsonObject.of("project", projectId, "user", userId).toJsonString()));
+                    .orElseThrow(() -> new ObjectNotFoundException(
+                        "ProjectRepresentativeUser",
+                        JsonObject.of("project", projectId, "user", userId).toJsonString()));
         }
         Task existingTask = taskService.get(task);
-        return delete(projectRepresentativeUserService, JsonObject.of("id", projectRepresentativeUser.getId()), existingTask);
+        return delete(
+            projectRepresentativeUserService,
+            JsonObject.of("id", projectRepresentativeUser.getId()),
+            existingTask
+        );
     }
 
 }

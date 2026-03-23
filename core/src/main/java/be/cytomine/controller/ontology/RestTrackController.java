@@ -33,34 +33,35 @@ public class RestTrackController extends RestCytomineController {
 
     @GetMapping("/project/{id}/track.json")
     public ResponseEntity<String> listByProject(
-            @PathVariable Long id
+        @PathVariable Long id
     ) {
         log.debug("REST request to list tracks for project {}", id);
         return projectRepository.findById(id)
-                .map( project -> responseSuccess(trackService.list(project)))
-                .orElseThrow(() -> new ObjectNotFoundException("Project", id));
+            .map(project -> responseSuccess(trackService.list(project)))
+            .orElseThrow(() -> new ObjectNotFoundException("Project", id));
     }
 
     @GetMapping("/imageinstance/{id}/track.json")
     public ResponseEntity<String> listByImage(
-            @PathVariable Long id
+        @PathVariable Long id
     ) {
         log.debug("REST request to list tracks for imageinstance {}", id);
         return imageInstanceRepository.findById(id)
-                .map( imageInstance -> responseSuccess(trackService.list(imageInstance)))
-                .orElseThrow(() -> new ObjectNotFoundException("imageInstance", id));
+            .map(imageInstance -> responseSuccess(trackService.list(imageInstance)))
+            .orElseThrow(() -> new ObjectNotFoundException("imageInstance", id));
     }
 
     @GetMapping("/track/{id}.json")
     public ResponseEntity<String> show(@PathVariable Long id) {
         log.debug("REST request to get Track : {}", id);
         return trackService.find(id)
-                .map(this::responseSuccess)
-                .orElseGet(() -> responseNotFound("Track", id));
+            .map(this::responseSuccess)
+            .orElseGet(() -> responseNotFound("Track", id));
     }
 
     /**
      * Add a new track
+     *
      * @param json JSON with Track data
      * @return Response map with .code = http response code and .data.track = new created Track
      */
@@ -72,9 +73,11 @@ public class RestTrackController extends RestCytomineController {
 
     /**
      * Update a track
-     * @param id Track id
+     *
+     * @param id   Track id
      * @param json JSON with the new Track data
-     * @return Response map with .code = http response code and .data.newTrack = new created Track and  .data.oldTrack = old track value
+     * @return Response map with .code = http response code and
+     * .data.newTrack = new created Track and  .data.oldTrack = old track value
      */
     @PutMapping("/track/{id}.json")
     public ResponseEntity<String> edit(@PathVariable String id, @RequestBody JsonObject json) {
@@ -84,6 +87,7 @@ public class RestTrackController extends RestCytomineController {
 
     /**
      * Delete a track
+     *
      * @param id Track id
      * @return Response map with .code = http response code and .data.track = deleted track value
      */

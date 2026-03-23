@@ -58,7 +58,7 @@ public class CytomineTests {
     @BeforeEach
     void setUp() {
         driver = driverProvider.driver();
-        wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        wait = new WebDriverWait(driver, Duration.ofSeconds(60));
     }
 
     @AfterEach
@@ -66,7 +66,7 @@ public class CytomineTests {
         saveScreenshot("closing-" + testInfo.getTestMethod()
                                         .map(Method::getName)
                                         .orElseGet(() -> "no-name-" + randomUUID()));
-        driver.close();
+        driver.quit();
     }
 
     @SneakyThrows

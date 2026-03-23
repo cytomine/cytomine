@@ -247,7 +247,7 @@ public class TaskRunService {
                 if (!provision.get("value").isNull()) {
                     Long annotationId = provision.get("value").asLong();
                     UserAnnotation annotation = userAnnotationService.get(annotationId);
-                    processedProvision.put("value", geometryService.WKTToGeoJSON(annotation.getWktLocation()));
+                    processedProvision.put("value", geometryService.wktToGeoJson(annotation.getWktLocation()));
                 }
             }
 
@@ -263,7 +263,7 @@ public class TaskRunService {
                         if (subTypeIsGeometry) {
                             Long annotationId = element.asLong();
                             UserAnnotation annotation = userAnnotationService.get(annotationId);
-                            itemJsonObject.put("value", geometryService.WKTToGeoJSON(annotation.getWktLocation()));
+                            itemJsonObject.put("value", geometryService.wktToGeoJson(annotation.getWktLocation()));
                         } else {
                             itemJsonObject.set("value", element);
                         }
@@ -318,7 +318,7 @@ public class TaskRunService {
         int xOffset = (int) -bounds.getMinX();
         int yOffset = (int) -bounds.getMinY();
         Geometry shifted = GeometryService.addOffset(annotation.getWktLocation(), xOffset, yOffset);
-        String geometry = geometryService.WKTToGeoJSON(shifted.toText());
+        String geometry = geometryService.wktToGeoJson(shifted.toText());
 
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         body.add(
@@ -413,7 +413,7 @@ public class TaskRunService {
 
                         ObjectNode itemJsonObject = mapper.createObjectNode();
                         itemJsonObject.put("index", i);
-                        itemJsonObject.put("value", geometryService.WKTToGeoJSON(annotation.getWktLocation()));
+                        itemJsonObject.put("value", geometryService.wktToGeoJson(annotation.getWktLocation()));
 
                         valueListNode.add(itemJsonObject);
                     }
@@ -472,7 +472,7 @@ public class TaskRunService {
             if (!provision.get("value").isNull()) {
                 Long annotationId = provision.get("value").asLong();
                 UserAnnotation annotation = userAnnotationService.get(annotationId);
-                provision.put("value", geometryService.WKTToGeoJSON(annotation.getWktLocation()));
+                provision.put("value", geometryService.wktToGeoJson(annotation.getWktLocation()));
             }
         }
 
@@ -570,7 +570,7 @@ public class TaskRunService {
             for (JsonNode item : jsonItems) {
                 String geoJson = item.get("value").asText();
                 if (geometryService.isGeometry(geoJson)) {
-                    String wktGeometry = geometryService.GeoJSONToWKT(geoJson);
+                    String wktGeometry = geometryService.geoJsonToWkt(geoJson);
                     Geometry parsedGeometry = GeometryService.addOffset(wktGeometry, offset.getX(), offset.getY());
                     annotationService.createAnnotation(annotationLayer, parsedGeometry.toString());
                 }
@@ -654,7 +654,7 @@ public class TaskRunService {
         for (TaskRunValue geometry : geometries) {
             TaskRunLayer matchedLayer = layersByParameterName.get(geometry.getParameterName());
             CropOffset offset = matchedLayer.getOffsets().get(0);
-            String wktGeometry = geometryService.GeoJSONToWKT((String) geometry.getValue());
+            String wktGeometry = geometryService.geoJsonToWkt((String) geometry.getValue());
             Geometry parsedGeometry = GeometryService.addOffset(wktGeometry, offset.getX(), offset.getY());
             annotationService.createAnnotation(annotationLayer, parsedGeometry.toString());
         }

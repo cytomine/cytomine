@@ -131,18 +131,18 @@ public class KmeansGeometryService {
 
 
     public List<Kmeans> doKeamsFullRequest(String request) {
-        String requestKmeans = "SELECT kmeans, count(*), st_astext(ST_ConvexHull(ST_Collect(location))) \n" +
-            "FROM (\n" + request + "\n" + ") AS ksub\n" +
-            "GROUP BY kmeans\n" +
-            "ORDER BY kmeans;";
+        String requestKmeans = "SELECT kmeans, count(*), st_astext(ST_ConvexHull(ST_Collect(location))) \n"
+            + "FROM (\n" + request + "\n" + ") AS ksub\n"
+            + "GROUP BY kmeans\n"
+            + "ORDER BY kmeans;";
         return selectAnnotationLightKmeans(requestKmeans);
     }
 
     public List<Kmeans> doKeamsSoftRequest(String request) {
-        String requestKmeans = "SELECT kmeans, count(*), st_astext(ST_Centroid(ST_Collect(location))) \n" +
-            "FROM (\n" + request + "\n" + ") AS ksub\n" +
-            "GROUP BY kmeans\n" +
-            "ORDER BY kmeans;";
+        String requestKmeans = "SELECT kmeans, count(*), st_astext(ST_Centroid(ST_Collect(location))) \n"
+            + "FROM (\n" + request + "\n" + ") AS ksub\n"
+            + "GROUP BY kmeans\n"
+            + "ORDER BY kmeans;";
         return selectAnnotationLightKmeans(requestKmeans);
     }
 

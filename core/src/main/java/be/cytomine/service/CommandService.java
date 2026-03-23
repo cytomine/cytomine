@@ -98,7 +98,8 @@ public class CommandService {
         CommandResponse result = c.execute(service);
         if (result.getStatus() == successCode) {
             if ((service instanceof ProjectService && c instanceof DeleteCommand)) {
-                c.setProject(null); // project has been deleted in this command, so we cannot link the command to the deleted project
+                // project has been deleted in this command, so we cannot link the command to the deleted project
+                c.setProject(null);
             }
 
             entityManager.persist(c);
@@ -144,6 +145,41 @@ public class CommandService {
         }
     }
 
+    public List<CommandResponse> undo(UndoStackItem undoItem, User user) {
+        CommandResponse result;
+        List<CommandResponse> results = new ArrayList<>();
+
+        Transaction transaction = undoItem.getTransaction();
+        log.debug("FirstUndoStack=" + undoItem);
+
+        if (transaction == null) {
+            log.debug("Transaction not in progress");
+            //Not Transaction, no other command must be deleted
+            result = performUndo(undoItem.getCommand());
+            //An undo command must be move to redo stack
+            moveToRedoStack(undoItem);
+            results.add(result);
+        } else {
+            log.debug("Transaction in progress");
+            //Its a transaction, many other command will be deleted
+            List<UndoStackItem> undoStacks = commandRepository.findAllUndoOrderByCreatedDesc(user, transaction);
+            for (UndoStackItem undoStack : undoStacks) {
+                //browse all command and undo it while its the same transaction
+                if (undoStack.getCommand().isRefuseUndo()) {
+                    //undo delete project is not possible
+                    //responseError(new ObjectNotFoundException("You cannot delete your last operation!"))
+                    throw new ObjectNotFoundException("You cannot delete your last operation!");
+                }
+                result = performUndo(undoStack.getCommand());
+                log.info("Undo stack transaction: " + result);
+                results.add(result);
+                moveToRedoStack(undoStack);
+            }
+        }
+
+        return results;
+    }
+
     private ModelService loadCorrespondingModelService(Command command) {
         if (command.getServiceName() == null || command.getServiceName().length() < 1) {
             throw new RuntimeException("Bean definition name " + command.getServiceName() + " is null or blank");
@@ -167,42 +203,36 @@ public class CommandService {
         throw new RuntimeException("not yet implemented");
     }
 
-    public List<CommandResponse> undo(UndoStackItem undoItem, User user) {
+    public List<CommandResponse> redo() {
+        return redo(null);
+    }
+
+    public List<CommandResponse> redo(RedoStackItem redoItem, User user) {
         CommandResponse result;
         List<CommandResponse> results = new ArrayList<>();
 
-        Transaction transaction = undoItem.getTransaction();
-        log.debug("FirstUndoStack=" + undoItem);
+        Transaction transaction = redoItem.getTransaction();
+        log.debug("LastRedoStack=" + redoItem);
 
         if (transaction == null) {
             log.debug("Transaction not in progress");
             //Not Transaction, no other command must be deleted
-            result = performUndo(undoItem.getCommand());
+            result = performRedo(redoItem.getCommand());
             //An undo command must be move to redo stack
-            moveToRedoStack(undoItem);
+            moveToUndoStack(redoItem);
             results.add(result);
         } else {
             log.debug("Transaction in progress");
             //Its a transaction, many other command will be deleted
-            List<UndoStackItem> undoStacks = commandRepository.findAllUndoOrderByCreatedDesc(user, transaction);
-            for (UndoStackItem undoStack : undoStacks) {
-                //browse all command and undo it while its the same transaction
-                if (undoStack.getCommand().isRefuseUndo()) {
-                    //responseError(new ObjectNotFoundException("You cannot delete your last operation!")) //undo delete project is not possible
-                    throw new ObjectNotFoundException("You cannot delete your last operation!"); //undo delete project is not possible
-                }
-                result = performUndo(undoStack.getCommand());
-                log.info("Undo stack transaction: " + result);
+            List<RedoStackItem> redoStacks = commandRepository.findAllRedoOrderByCreatedDesc(user, transaction);
+            for (RedoStackItem redoStack : redoStacks) {
+                //Redo each command from the same transaction
+                result = performRedo(redoStack.getCommand());
+                moveToUndoStack(redoStack);
                 results.add(result);
-                moveToRedoStack(undoStack);
             }
         }
-
         return results;
-    }
-
-    public List<CommandResponse> redo() {
-        return redo(null);
     }
 
     public List<CommandResponse> redo(Long commandId) {
@@ -239,34 +269,6 @@ public class CommandService {
             return modelService.destroy(JsonObject.toJsonObject(command.getData()), command.isPrintMessage());
         }
         throw new RuntimeException("not yet implemented");
-    }
-
-    public List<CommandResponse> redo(RedoStackItem redoItem, User user) {
-        CommandResponse result;
-        List<CommandResponse> results = new ArrayList<>();
-
-        Transaction transaction = redoItem.getTransaction();
-        log.debug("LastRedoStack=" + redoItem);
-
-        if (transaction == null) {
-            log.debug("Transaction not in progress");
-            //Not Transaction, no other command must be deleted
-            result = performRedo(redoItem.getCommand());
-            //An undo command must be move to redo stack
-            moveToUndoStack(redoItem);
-            results.add(result);
-        } else {
-            log.debug("Transaction in progress");
-            //Its a transaction, many other command will be deleted
-            List<RedoStackItem> redoStacks = commandRepository.findAllRedoOrderByCreatedDesc(user, transaction);
-            for (RedoStackItem redoStack : redoStacks) {
-                //Redo each command from the same transaction
-                result = performRedo(redoStack.getCommand());
-                moveToUndoStack(redoStack);
-                results.add(result);
-            }
-        }
-        return results;
     }
 
     /**

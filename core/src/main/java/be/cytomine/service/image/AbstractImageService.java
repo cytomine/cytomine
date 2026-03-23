@@ -382,10 +382,10 @@ public class AbstractImageService extends ModelService {
         } else {
             List<ImageInstance> instances = imageInstanceRepository.findAllByBaseImage((AbstractImage) domain);
             throw new ForbiddenException(
-                "Abstract Image has instances in active projects : " +
-                    instances.stream().map(x -> x.getProject().getName()).collect(Collectors.joining(",")) +
-                    " with the following names : " +
-                    instances.stream().map(x -> x.getInstanceFilename()).distinct().collect(Collectors.joining(",")),
+                "Abstract Image has instances in active projects : "
+                    + instances.stream().map(x -> x.getProject().getName()).collect(Collectors.joining(","))
+                    + " with the following names : "
+                    + instances.stream().map(x -> x.getInstanceFilename()).distinct().collect(Collectors.joining(",")),
                 Map.of(
                     "projectNames",
                     instances.stream().map(x -> x.getProject().getName()).collect(Collectors.toList()),

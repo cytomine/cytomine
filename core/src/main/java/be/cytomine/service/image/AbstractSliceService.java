@@ -84,15 +84,10 @@ public class AbstractSliceService extends ModelService {
         return Optional.ofNullable(abstractSlice.getUploadedFile()).map(UploadedFile::getUser).orElse(null);
     }
 
-
     public Optional<AbstractSlice> find(Long id) {
         Optional<AbstractSlice> abstractSlice = abstractSliceRepository.findById(id);
         abstractSlice.ifPresent(image -> securityACLService.check(image.container(), READ));
         return abstractSlice;
-    }
-
-    public AbstractSlice get(Long id) {
-        return find(id).orElse(null);
     }
 
     public Optional<AbstractSlice> find(AbstractImage abstractImage, Integer channel, Integer zStack, Integer time) {
@@ -106,6 +101,9 @@ public class AbstractSliceService extends ModelService {
         return abstractSlice;
     }
 
+    public AbstractSlice get(Long id) {
+        return find(id).orElse(null);
+    }
 
     public List<AbstractSlice> list(AbstractImage image) {
         securityACLService.check(image, READ);
@@ -169,13 +167,13 @@ public class AbstractSliceService extends ModelService {
         } else {
             List<SliceInstance> instances = sliceInstanceRepository.findAllByBaseSlice((AbstractSlice) domain);
             throw new ForbiddenException(
-                "Abstract Slice has instances in active projects: " +
-                    instances.stream().map(x -> x.getProject().getName()).collect(Collectors.joining(",")) +
-                    " with the following names : " +
-                    instances.stream()
-                        .map(x -> x.getBaseSlice().getImage().getOriginalFilename())
-                        .distinct()
-                        .collect(Collectors.joining(",")),
+                "Abstract Slice has instances in active projects: "
+                    + instances.stream().map(x -> x.getProject().getName()).collect(Collectors.joining(","))
+                    + " with the following names : "
+                    + instances.stream()
+                    .map(x -> x.getBaseSlice().getImage().getOriginalFilename())
+                    .distinct()
+                    .collect(Collectors.joining(",")),
                 Map.of(
                     "projectNames",
                     instances.stream().map(x -> x.getProject().getName()).collect(Collectors.toList()),

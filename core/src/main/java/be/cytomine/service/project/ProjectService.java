@@ -217,19 +217,16 @@ public class ProjectService extends ModelService {
 
         if (data.size() < max) {
             //user has open less than max project, so we add last created project
-            List<DatedCytomineDomain> unopened = data.isEmpty() ?
-                projectRepository.listLastCreated() :
-                projectRepository.listLastCreated(data.stream()
+            List<DatedCytomineDomain> unopened = data.isEmpty()
+                ? projectRepository.listLastCreated()
+                : projectRepository.listLastCreated(data.stream()
                     .map(x -> (Long) x.get("id"))
                     .collect(Collectors.toList()));
             for (DatedCytomineDomain datedCytomineDomain : unopened) {
                 data.add(JsonObject.of(
-                    "id",
-                    datedCytomineDomain.getId(),
-                    "date",
-                    datedCytomineDomain.getDate(),
-                    "opened",
-                    false
+                    "id", datedCytomineDomain.getId(),
+                    "date", datedCytomineDomain.getDate(),
+                    "opened", false
                 ));
             }
 
@@ -381,15 +378,17 @@ public class ProjectService extends ModelService {
             throw new WrongArgumentException("Cannot search on members attributes without argument withMembersCount");
         }
 
-        String select, from, where, search, sort;
-        String request;
+        String select;
+        String from;
+        String where;
+        String search;
 
         if (user != null) {
             select = "SELECT DISTINCT p.* ";
-            from = "FROM project p " +
-                "JOIN acl_object_identity as aclObjectId ON aclObjectId.object_id_identity = p.id " +
-                "JOIN acl_entry as aclEntry ON aclEntry.acl_object_identity = aclObjectId.id " +
-                "JOIN acl_sid as aclSid ON aclEntry.sid = aclSid.id ";
+            from = "FROM project p "
+                + "JOIN acl_object_identity as aclObjectId ON aclObjectId.object_id_identity = p.id "
+                + "JOIN acl_entry as aclEntry ON aclEntry.acl_object_identity = aclObjectId.id "
+                + "JOIN acl_sid as aclSid ON aclEntry.sid = aclSid.id ";
             where = "WHERE aclSid.sid like '" + user.getUsername() + "' ";
         } else {
             select = "SELECT DISTINCT(p.id) as distinctId, p.* ";
@@ -400,7 +399,6 @@ public class ProjectService extends ModelService {
         from += "LEFT OUTER JOIN ontology ON p.ontology_id = ontology.id ";
 
         search = "";
-        sort = "";
         if (!project.isBlank()) {
             search += " AND ";
             search += project;
@@ -412,34 +410,30 @@ public class ProjectService extends ModelService {
         }
 
         if (!tags.isBlank()) {
-            from
-                += "LEFT OUTER JOIN tag_domain_association t ON p.id = t.domain_ident AND t.domain_class_name = 'be.cytomine.domain.project.Project' ";
+            from += "LEFT OUTER JOIN tag_domain_association t ON p.id = t.domain_ident "
+                + "AND t.domain_class_name = 'be.cytomine.domain.project.Project' ";
             search += " AND ";
             search += tags;
         }
 
-
         if (projectSearchExtension.isWithLastActivity()) {
             select += ", activities.max_date ";
-            from += "LEFT OUTER JOIN " +
-                "( SELECT  project_id, MAX(created) max_date " +
-                "  FROM command_history " +
-                "  GROUP BY project_id " +
-                ") activities ON p.id = activities.project_id ";
+            from += "LEFT OUTER JOIN "
+                + "( SELECT  project_id, MAX(created) max_date "
+                + "  FROM command_history "
+                + "  GROUP BY project_id "
+                + ") activities ON p.id = activities.project_id ";
         }
         if (projectSearchExtension.isWithMembersCount()) {
             select += ", members.member_count ";
             from += "LEFT OUTER JOIN "
-                +
-                " ( SELECT aclObjectId.object_id_identity as project_id, COUNT(DISTINCT secUser.id) as member_count "
-                +
-                "   FROM acl_object_identity as aclObjectId, acl_entry as aclEntry, acl_sid as aclSid, sec_user as secUser "
-                +
-                "   WHERE aclEntry.acl_object_identity = aclObjectId.id and aclEntry.sid = aclSid.id and aclSid.sid = secUser.username"
-                +
-                "   GROUP BY aclObjectId.object_id_identity "
-                +
-                ") members ON p.id = members.project_id ";
+                + "(SELECT aclObjectId.object_id_identity as project_id, COUNT(DISTINCT secUser.id) as member_count "
+                + "FROM acl_object_identity as aclObjectId, acl_entry as aclEntry, "
+                + "acl_sid as aclSid, sec_user as secUser "
+                + "WHERE aclEntry.acl_object_identity = aclObjectId.id "
+                + "and aclEntry.sid = aclSid.id and aclSid.sid = secUser.username "
+                + "GROUP BY aclObjectId.object_id_identity "
+                + ") members ON p.id = members.project_id ";
 
             if (!members.isBlank()) {
                 search += " AND ";
@@ -451,14 +445,13 @@ public class ProjectService extends ModelService {
             from += "LEFT OUTER JOIN description d ON d.domain_ident = p.id ";
         }
         if (projectSearchExtension.isWithCurrentUserRoles()) {
-            User
-                currentUser
-                = currentUserService.getCurrentUser(); // cannot use user param because it is set to null if user connected as admin
+            // cannot use user param because it is set to null if user connected as admin
+            User currentUser = currentUserService.getCurrentUser();
             select += ", (admin_project.id IS NOT NULL) AS is_admin, (repr.id IS NOT NULL) AS is_representative ";
-            from += "LEFT OUTER JOIN admin_project " +
-                "ON admin_project.id = p.id AND admin_project.user_id = " + currentUser.getId() + " " +
-                "LEFT OUTER JOIN project_representative_user repr " +
-                "ON repr.project_id = p.id AND repr.user_id = " + currentUser.getId() + " ";
+            from += "LEFT OUTER JOIN admin_project "
+                + "ON admin_project.id = p.id AND admin_project.user_id = " + currentUser.getId() + " "
+                + "LEFT OUTER JOIN project_representative_user repr "
+                + "ON repr.project_id = p.id AND repr.user_id = " + currentUser.getId() + " ";
 
             SearchParameterEntry searchedRole = searchParameters.stream()
                 .filter(x -> x.getProperty().equals("currentUserRole"))
@@ -469,8 +462,8 @@ public class ProjectService extends ModelService {
                     ? List.of((String) searchedRole.getValue())
                     : ((List) searchedRole.getValue()));
                 if (value.contains("manager") && value.contains("contributor")) {
-                } // nothing because null or not null
-                else if (value.contains("manager")) {
+                    // nothing because null or not null
+                } else if (value.contains("manager")) {
                     search += " AND admin_project.id IS NOT NULL  ";
                 } else if (value.contains("contributor")) {
                     search += " AND admin_project.id IS NULL  ";
@@ -478,7 +471,6 @@ public class ProjectService extends ModelService {
             }
 
         }
-
 
         switch (sortColumn) {
             case "currentUserRole":
@@ -513,11 +505,11 @@ public class ProjectService extends ModelService {
                 break;
         }
 
-        sort = " ORDER BY " + sortColumn;
+        String sort = " ORDER BY " + sortColumn;
         sort += (sortDirection.equals("desc")) ? " DESC " : " ASC ";
         sort += (sortDirection.equals("desc")) ? " NULLS LAST " : " NULLS FIRST ";
 
-        request = select + from + where + search + sort;
+        String request = select + from + where + search + sort;
 
         if (max > 0) {
             request += " LIMIT " + max;
@@ -600,23 +592,23 @@ public class ProjectService extends ModelService {
             return new ArrayList<>();
         }
 
-        String select = "SELECT ch.id as id, ch.created as created, ch.message as message, " +
-            "ch.prefix_action as prefixAction, ch.user_id as user, ch.project_id as project ";
+        String select = "SELECT ch.id as id, ch.created as created, ch.message as message, "
+            + "ch.prefix_action as prefixAction, ch.user_id as user, ch.project_id as project ";
         String from = "FROM command_history ch ";
-        String where = "WHERE true " +
-            (projects != null ? "AND ch.project_id IN (" + projects.stream()
-                .map(x -> x.getId().toString())
-                .collect(Collectors.joining(",")) + ") " : " ") +
-            (user != null ? "AND ch.user_id =  " + user + " " : " ") +
-            (startDate != null ? "AND ch.created > '" + new Date(startDate) + "' " : "") +
-            (endDate != null ? "AND ch.created < '" + new Date(endDate) + "' " : "");
+        String where = "WHERE true "
+            + (projects != null ? "AND ch.project_id IN (" + projects.stream()
+            .map(x -> x.getId().toString())
+            .collect(Collectors.joining(",")) + ") " : " ")
+            + (user != null ? "AND ch.user_id =  " + user + " " : " ")
+            + (startDate != null ? "AND ch.created > '" + new Date(startDate) + "' " : "")
+            + (endDate != null ? "AND ch.created < '" + new Date(endDate) + "' " : "");
         String orderBy = "ORDER BY ch.created desc LIMIT " + max + " OFFSET " + offset;
 
         if (fullData) {
-            select += ", c.data as data,c.service_name as serviceName, " +
-                "c.class as className, c.action_message as actionMessage, u.username as username ";
-            from += "LEFT JOIN command c ON ch.command_id = c.id " +
-                "LEFT JOIN sec_user u ON u.id = ch.user_id ";
+            select += ", c.data as data,c.service_name as serviceName, "
+                + "c.class as className, c.action_message as actionMessage, u.username as username ";
+            from += "LEFT JOIN command c ON ch.command_id = c.id "
+                + "LEFT JOIN sec_user u ON u.id = ch.user_id ";
         }
 
         List<JsonObject> data = new ArrayList<>();
@@ -1049,7 +1041,9 @@ public class ProjectService extends ModelService {
     protected void beforeUpdate(CytomineDomain domain) {
         Project project = (Project) domain;
         project.setCountAnnotations(annotationDomainRepository.countAllUserAnnotationAndProject(domain.getId()));
-        project.setCountReviewedAnnotations(annotationDomainRepository.countAllReviewedAnnotationAndProject(domain.getId()));
+        project.setCountReviewedAnnotations(
+            annotationDomainRepository.countAllReviewedAnnotationAndProject(domain.getId())
+        );
         project.setCountImages(imageInstanceRepository.countAllByProject(project));
     }
 

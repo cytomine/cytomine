@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class SequenceService {
 
-    public final static String SEQ_NAME = "hibernate_sequence";
+    public static final String SEQ_NAME = "hibernate_sequence";
 
     @Autowired
     private EntityManager entityManager;

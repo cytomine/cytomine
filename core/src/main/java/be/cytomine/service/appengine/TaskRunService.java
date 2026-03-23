@@ -176,7 +176,8 @@ public class TaskRunService {
             taskRunLayerRepository.saveAndFlush(newLayer);
         }
 
-        // We return the App engine response. Should we include information from Cytomine (project ID, user ID, created, ... ?)
+        // We return the App engine response.
+        // Should we include information from Cytomine (project ID, user ID, created, ... ?)
         return appEngineResponse;
     }
 

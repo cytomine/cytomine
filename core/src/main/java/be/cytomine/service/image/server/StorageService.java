@@ -73,9 +73,9 @@ public class StorageService extends ModelService {
     }
 
     public Optional<Storage> find(Long id) {
-        Optional<Storage> Storage = storageRepository.findById(id);
-        Storage.ifPresent(image -> securityACLService.check(image.container(), READ));
-        return Storage;
+        Optional<Storage> storage = storageRepository.findById(id);
+        storage.ifPresent(image -> securityACLService.check(image.container(), READ));
+        return storage;
     }
 
     public Storage get(Long id) {

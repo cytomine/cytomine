@@ -53,8 +53,6 @@ public class CurrentRoleService {
 
     /**
      * Active an admin session for a user (by default user with ROLE_ADMIN are connected as ROLE_USER)
-     *
-     * @param user
      */
     public void activeAdminSession(User user) {
         if (hasCurrentUserAdminRole(user)) {
@@ -84,8 +82,6 @@ public class CurrentRoleService {
 
     /**
      * Disable admin session for a user
-     *
-     * @param user
      */
     public void closeAdminSession(User user) {
         if (hasCurrentUserAdminRole(user)) {

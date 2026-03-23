@@ -73,7 +73,7 @@ spec:
         - name: SE_NODE_MAX_SESSIONS
           value: "30"
         - name: SE_DRAIN_AFTER_SESSION_COUNT
-          value: {{ .Values.test.e2eTestCount | default 9 | quote }}
+          value: {{ .Values.test.e2eTestCount | quote }}
       ports:
         - name: http
           containerPort: 4444

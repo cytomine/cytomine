@@ -569,6 +569,7 @@ public class ImageInstanceService extends ModelService {
         return list(project, searchParameters, "created", "desc", 0L, 0L, false, false);
     }
 
+    @SuppressWarnings("checkstyle:VariableDeclarationUsageDistance")
     public Page<Map<String, Object>> list(
         Project project,
         List<SearchParameterEntry> searchParameters,

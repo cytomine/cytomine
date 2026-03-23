@@ -253,6 +253,7 @@ public class RestUserAnnotationController extends RestCytomineController {
     }
 
 
+    @SuppressWarnings("checkstyle:VariableDeclarationUsageDistance")
     @RequestMapping(value = "/userannotation/{id}/crop.{format}", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<byte[]> crop(
         @PathVariable Long id,
@@ -319,6 +320,7 @@ public class RestUserAnnotationController extends RestCytomineController {
         return imageServerService.crop(userAnnotation, cropParameter, etag, proxy);
     }
 
+    @SuppressWarnings("checkstyle:VariableDeclarationUsageDistance")
     @RequestMapping(value = "/userannotation/{id}/mask.{format}", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<byte[]> cropMask(
         @PathVariable Long id,
@@ -384,6 +386,7 @@ public class RestUserAnnotationController extends RestCytomineController {
         return imageServerService.crop(userAnnotation, cropParameter, etag, proxy);
     }
 
+    @SuppressWarnings("checkstyle:VariableDeclarationUsageDistance")
     @RequestMapping(value = "/userannotation/{id}/alphamask.{format}", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<byte[]> cropAlphaMask(
         @PathVariable Long id,

@@ -101,6 +101,7 @@ public class RestSliceInstanceController extends RestCytomineController {
         return delete(sliceInstanceService, JsonObject.of("id", id), null);
     }
 
+    @SuppressWarnings("checkstyle:VariableDeclarationUsageDistance")
     @GetMapping("/sliceinstance/{id}/normalized-tile/zoom/{z}/tx/{tx}/ty/{ty}.{format}")
     public ResponseEntity<byte[]> tile(
         @PathVariable Long id,
@@ -180,6 +181,7 @@ public class RestSliceInstanceController extends RestCytomineController {
         return imageServerService.thumb(sliceInstance, thumbParameter, etag, proxy);
     }
 
+    @SuppressWarnings("checkstyle:VariableDeclarationUsageDistance")
     @RequestMapping(value = "/sliceinstance/{id}/crop.{format}", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<byte[]> crop(
         @PathVariable Long id,

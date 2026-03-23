@@ -213,6 +213,7 @@ public class RestAbstractImageController extends RestCytomineController {
         return imageServerService.label(abstractImage, labelParameter, etag, proxy);
     }
 
+    @SuppressWarnings("checkstyle:VariableDeclarationUsageDistance")
     @RequestMapping(value = "/abstractimage/{id}/crop.{format}", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<byte[]> crop(
         @PathVariable Long id,

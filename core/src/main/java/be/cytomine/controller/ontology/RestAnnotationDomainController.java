@@ -153,6 +153,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
         responseReportFile(reportService.getAnnotationReportFileName(format, project), report, format);
     }
 
+    @SuppressWarnings("checkstyle:VariableDeclarationUsageDistance")
     @RequestMapping(value = "/annotation/{id}/crop.{format}", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<byte[]> crop(
         @PathVariable Long id,

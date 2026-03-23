@@ -285,6 +285,7 @@ public class RestReviewedAnnotationController extends RestCytomineController {
         responseReportFile(reportService.getAnnotationReportFileName(format, idProject), report, format);
     }
 
+    @SuppressWarnings("checkstyle:VariableDeclarationUsageDistance")
     @RequestMapping(value = "/reviewedannotation/{id}/crop.{format}", method = {GET, POST})
     public ResponseEntity<byte[]> crop(
         @PathVariable Long id,
@@ -352,6 +353,7 @@ public class RestReviewedAnnotationController extends RestCytomineController {
         return imageServerService.crop(reviewedannotation, cropParameter, etag, proxy);
     }
 
+    @SuppressWarnings("checkstyle:VariableDeclarationUsageDistance")
     @RequestMapping(value = "/reviewedannotation/{id}/mask.{format}", method = {GET, POST})
     public ResponseEntity<byte[]> cropMask(
         @PathVariable Long id,
@@ -417,6 +419,7 @@ public class RestReviewedAnnotationController extends RestCytomineController {
         return imageServerService.crop(reviewedannotation, cropParameter, etag, proxy);
     }
 
+    @SuppressWarnings("checkstyle:VariableDeclarationUsageDistance")
     @RequestMapping(value = "/reviewedannotation/{id}/alphamask.{format}", method = {GET, POST})
     public ResponseEntity<byte[]> cropAlphaMask(
         @PathVariable Long id,

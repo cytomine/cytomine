@@ -102,8 +102,6 @@ public class PDFReportService {
      * Write a PDF from given data array (all types allowed)
      *
      * @param dataArray     data to write on PDF
-     * @param hasPagination
-     * @param hasHeader
      *
      * @return PDF in a byte array encoded in base 64
      */
@@ -155,8 +153,6 @@ public class PDFReportService {
 
     /**
      * Verify that all rows have the same number of cells Throw a Report Generation error if not
-     *
-     * @param dataArray
      */
     private void checkData(Object[][] dataArray) throws ServerException {
         if (dataArray != null) {
@@ -172,8 +168,6 @@ public class PDFReportService {
 
     /**
      * Transform given data array in a string Value delimiter is space and row break is '\r\n'
-     *
-     * @param dataArray
      *
      * @return String
      */
@@ -191,10 +185,6 @@ public class PDFReportService {
 
     /**
      * Draw the data table on PDF document
-     *
-     * @param data
-     *
-     * @return
      */
     private void drawDataTable(String data, float[] columnWidth, boolean hasHeader) throws ServerException {
         log.info("Drawing data table");
@@ -236,8 +226,6 @@ public class PDFReportService {
 
     /**
      * Verify that the sum of a percent array is equal to 1 Throw a Report Generation error if not
-     *
-     * @param percentArray
      */
     private void checkPercentArraySum(float[] percentArray) throws ServerException {
         float sum = 0;
@@ -264,10 +252,6 @@ public class PDFReportService {
 
     /**
      * Set the row colors of the given datable
-     *
-     * @param dataTable
-     *
-     * @return
      */
     private void setDatatableColor(DataTable dataTable) {
         dataTable.getDataCellTemplateEven().setFillColor(Color.LIGHT_GRAY);
@@ -282,10 +266,6 @@ public class PDFReportService {
      * <br> <br>
      * If the maximum percentage of width that a cell can reach is reached, then the difference between the desired size
      * (proportional to the number of characters) and the maximum size is redistributed to the other cells.
-     *
-     * @param rows
-     *
-     * @return
      */
     private void autoSetColumnWidth(List<Row<PDPage>> rows) {
         // Take second index (second row) if exists, to avoid possible headers.
@@ -317,9 +297,6 @@ public class PDFReportService {
     /**
      * Cap 'cellsSizePercent' array values to 'maxPercentWidth' and dispatch the percent excess to others values.
      *
-     * @param cellsSizePercent
-     * @param nbOfCellPerRow
-     *
      * @return An array of the list of the indexes that have reached the max percentage
      */
     private int[] updateCellsSize(float[] cellsSizePercent, float nbOfCellPerRow) {
@@ -344,12 +321,6 @@ public class PDFReportService {
     /**
      * Calculate the width unused btw 'cellsSizePercent' and PDF document width. Then dispatch the difference in cells
      * that have not reached max percent width value.
-     *
-     * @param cellsSizePercent
-     * @param nbOfCellPerRow
-     * @param maxPercentIndexes
-     *
-     * @return
      */
     private void dispatchUnusedWidth(float[] cellsSizePercent, float nbOfCellPerRow, int[] maxPercentIndexes) {
         float actualWidth = 0;
@@ -362,12 +333,6 @@ public class PDFReportService {
 
     /**
      * Dispatch the given diff in cells that have not reached max percent width value.
-     *
-     * @param cellsSizePercent
-     * @param diff
-     * @param maxPercentIndexes
-     *
-     * @return
      */
     private void dispatch(float[] cellsSizePercent, float diff, int[] maxPercentIndexes) {
         for (int i = 0; i < cellsSizePercent.length; i++) {
@@ -379,11 +344,6 @@ public class PDFReportService {
 
     /**
      * Set column width according to column width percent values.
-     *
-     * @param rows
-     * @param cellsSizePercent
-     *
-     * @return
      */
     private void setColumnWidth(List<Row<PDPage>> rows, float[] cellsSizePercent) {
         for (Row<PDPage> row : rows) {
@@ -397,13 +357,6 @@ public class PDFReportService {
 
     /**
      * Write a given message at a given position on a given page.
-     *
-     * @param page
-     * @param topPosition
-     * @param bottomPosition
-     * @param message
-     *
-     * @return
      */
     private void writeMessage(PDPage page, float topPosition, float bottomPosition, String message)
         throws ServerException {
@@ -429,8 +382,6 @@ public class PDFReportService {
 
     /**
      * Write the n° of page for each page of the PDF document.
-     *
-     * @return
      */
     private void setPagination() throws ServerException {
         log.info("Setting pagination");

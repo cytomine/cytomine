@@ -19,19 +19,15 @@ import be.cytomine.service.ontology.TermService;
 import be.cytomine.service.security.UserService;
 import be.cytomine.utils.JsonObject;
 
-@Service
-@Transactional
-@AllArgsConstructor
 /**
  * This service simplify request parameters extraction in controller
  * E.g. thanks to "/api/annotation.json?users=1,5 => it will retrieve user object with 1 and 5
  */
+@Service
+@Transactional
+@AllArgsConstructor
 public class ParamsService {
 
-    //    def imageInstanceService
-//    def termService
-//    def userService
-//    def dataSource
     private final UserService userService;
 
     private final UserRepository userRepository;

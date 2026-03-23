@@ -180,13 +180,13 @@ public class RetrievalService {
         return percentages;
     }
 
-    public ResponseEntity<SearchResponse> retrieveSimilarImages(AnnotationDomain annotation, Long nrt_neigh) {
+    public ResponseEntity<SearchResponse> retrieveSimilarImages(AnnotationDomain annotation, Long nearestNeighbours) {
         String url = UriComponentsBuilder
             .fromUriString(getInternalCbirURL())
             .path("/search")
             .queryParam("storage", annotation.getProject().getId())
             .queryParam("index", INDEX_NAME)
-            .queryParam("nrt_neigh", nrt_neigh + 1)
+            .queryParam("nrt_neigh", nearestNeighbours + 1)
             .toUriString();
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = createEntity(annotation);

@@ -365,14 +365,24 @@ public class UserPositionService {
             Accumulators.first("imageName", "$imageName")
         ));
 
-        request.add(group(
-            Document.parse("{user: '$_id.user'}"),
-            Accumulators.push(
-                "position",
-                Document.parse(
-                    "{id: '$_id.image',slice: '$_id.slice', image: '$image', filename: '$imageName', originalFilename: '$imageName', date: '$date'}")
+        request.add(
+            group(
+                Document.parse("{user: '$_id.user'}"),
+                Accumulators.push(
+                    "position",
+                    Document.parse(
+                        "{"
+                            + "id: '$_id.image', "
+                            + "slice: '$_id.slice', "
+                            + "image: '$image', "
+                            + "filename: '$imageName', "
+                            + "originalFilename: '$imageName', "
+                            + "date: '$date'"
+                            + "}"
+                    )
+                )
             )
-        ));
+        );
 
         MongoCollection<Document> persistentUserPosition = mongoClient.getDatabase(mongoDatabaseName)
             .getCollection("lastUserPosition");

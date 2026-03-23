@@ -180,9 +180,9 @@ public class ImageConsultationService {
         List<Long> continuousConnections = (List<Long>) positions.getMappedResults()
             .stream()
             .map(x ->
-                x instanceof Map ?
-                    be.cytomine.utils.DateUtils.computeDateInMillis((Date) ((Map) x).get("created")) :
-                    be.cytomine.utils.DateUtils.computeDateInMillis((Date) ((PersistentUserPosition) x).getCreated()))
+                x instanceof Map
+                    ? be.cytomine.utils.DateUtils.computeDateInMillis((Date) ((Map) x).get("created"))
+                    : be.cytomine.utils.DateUtils.computeDateInMillis((Date) ((PersistentUserPosition) x).getCreated()))
             .collect(Collectors.toList());
 
 
@@ -348,8 +348,10 @@ public class ImageConsultationService {
                 }
             }
             data.add(JsonObject.of(
-                "user", result.get("_id"), "created", result.get("created"), "image", result.get("image")
-                , "imageName", filename
+                "user", result.get("_id"),
+                "created", result.get("created"),
+                "image", result.get("image"),
+                "imageName", filename
             ));
         }
         return data;
@@ -377,8 +379,8 @@ public class ImageConsultationService {
         List aggregation = queryResults.getMappedResults();
 
         List<Long> connected = (List<Long>) aggregation.stream()
-            .map(x -> x instanceof Map ?
-                (Long) ((Map) x).get("user") : (Long) ((PersistentImageConsultation) x).getUser())
+            .map(x -> x instanceof Map
+                ? (Long) ((Map) x).get("user") : (Long) ((PersistentImageConsultation) x).getUser())
             .distinct()
             .collect(Collectors.toList());
 
@@ -473,8 +475,11 @@ public class ImageConsultationService {
                 }
             }
             data.add(JsonObject.of(
-                "user", result.get("user"), "created", result.get("created"), "image", result.get("image")
-                , "imageName", filename, "mode", result.get("mode")
+                "user", result.get("user"),
+                "created", result.get("created"),
+                "image", result.get("image"),
+                "imageName", filename,
+                "mode", result.get("mode")
             ));
         }
         return data;

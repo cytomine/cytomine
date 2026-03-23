@@ -21,8 +21,6 @@ public class SpreadsheetReportService {
     /**
      * Write a spreadsheet report (xls)
      *
-     * @param dataArray
-     *
      * @return Spreadsheet byte array report encoded in base 64
      */
     public byte[] writeSpreadsheet(Object[][] dataArray) throws ServerException {
@@ -51,8 +49,6 @@ public class SpreadsheetReportService {
 
     /**
      * Write a spreadsheet report (xls)
-     *
-     * @param dataArray
      *
      * @return Spreadsheet byte array report encoded in base 64
      */

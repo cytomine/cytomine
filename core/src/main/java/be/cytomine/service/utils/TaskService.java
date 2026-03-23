@@ -205,8 +205,14 @@ public class TaskService {
 
     private List<TaskComment> listFromDatabase(Long idProject) {
         List<Object[]> rows = entityManager.createNativeQuery(
-                "SELECT comment, timestamp FROM task_comment tc, task t WHERE tc.task_id = t.id  AND project_id = ? and t.print_in_activity=true ORDER BY timestamp DESC")
-            .setParameter(1, idProject).getResultList();
+                "SELECT comment, timestamp "
+                    + "FROM task_comment tc, task t "
+                    + "WHERE tc.task_id = t.id "
+                    + "AND project_id = ? "
+                    + "AND t.print_in_activity = true "
+                    + "ORDER BY timestamp DESC")
+            .setParameter(1, idProject)
+            .getResultList();
         return rows.stream().map(x -> {
             TaskComment comment = new TaskComment();
             comment.setComment((String) x[0]);

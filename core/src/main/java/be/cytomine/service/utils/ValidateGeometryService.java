@@ -104,7 +104,7 @@ public class ValidateGeometryService {
                 throw new WrongArgumentException(geom.getGeometryType() + " is not a valid geometry type!");
             }
         } catch (ParseException exception) {
-
+            // TODO
         }
         return result;
     }

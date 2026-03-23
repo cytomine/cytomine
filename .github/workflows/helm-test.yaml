@@ -70,7 +70,7 @@ jobs:
 
       - name: Count e2e tests
         run: |
-          E2E_TEST_COUNT=$(grep -r "@Test" e2e-tests/src/test/java --include="*.java" | wc -l)
+          E2E_TEST_COUNT=$(grep -r "@Test" e2e-tests/src/test/java/org/cytomine/e2etests/project/ --include="*.java" | wc -l)
           echo "E2E_TEST_COUNT=$E2E_TEST_COUNT" >> $GITHUB_ENV
 
       - name: Run chart-testing (lint and install)

@@ -164,16 +164,15 @@ public class StatsService {
         boolean accumulate
     ) {
         securityACLService.check(project, READ);
-        String request = "SELECT created " +
-            "FROM UserAnnotation " +
-            "WHERE project.id = " + project.getId() + " " +
-            (term != null ? "AND id IN (SELECT userAnnotation.id FROM AnnotationTerm WHERE term.id = "
-                + term.getId()
-                + ") " : "") +
-            (startDate != null ? " AND created > cast(date('" + startDate + "') as timestamp)" : "") +
-            (endDate != null ? " AND created < cast(date('" + endDate + "') as timestamp)" : "") +
-            " ORDER BY created ASC";
-
+        String request = "SELECT created "
+            + "FROM UserAnnotation "
+            + "WHERE project.id = " + project.getId() + " "
+            + (term != null ? "AND id IN (SELECT userAnnotation.id FROM AnnotationTerm WHERE term.id = "
+            + term.getId()
+            + ") " : "")
+            + (startDate != null ? " AND created > cast(date('" + startDate + "') as timestamp)" : "")
+            + (endDate != null ? " AND created < cast(date('" + endDate + "') as timestamp)" : "")
+            + " ORDER BY created ASC";
 
         List<Date> annotationsDates = entityManager.createQuery(request, Date.class).getResultList();
 
@@ -202,16 +201,16 @@ public class StatsService {
     ) {
         securityACLService.check(project, READ);
 
-        String request = "SELECT created " +
-            "FROM reviewed_annotation " +
-            "WHERE project_id = " + project.getId() + " " +
-            (term != null ?
-                "AND id IN (SELECT reviewed_annotation_terms_id FROM reviewed_annotation_term WHERE term_id = "
-                    + term.getId()
-                    + ") " : "") +
-            (startDate != null ? "AND created > '" + startDate + "'" : "") +
-            (endDate != null ? "AND created < '" + endDate + "'" : "") +
-            "ORDER BY created ASC";
+        String request = "SELECT created "
+            + "FROM reviewed_annotation "
+            + "WHERE project_id = " + project.getId() + " "
+            + (term != null
+            ? "AND id IN (SELECT reviewed_annotation_terms_id FROM reviewed_annotation_term WHERE term_id = "
+            + term.getId()
+            + ") " : "")
+            + (startDate != null ? "AND created > '" + startDate + "'" : "")
+            + (endDate != null ? "AND created < '" + endDate + "'" : "")
+            + "ORDER BY created ASC";
 
         List<java.util.Date> annotationsDates = entityManager.createNativeQuery(request).getResultList();
 
@@ -230,7 +229,6 @@ public class StatsService {
 
     public List<JsonObject> statUserSlide(Project project, Date startDate, Date endDate) {
         securityACLService.check(project, READ);
-//        Session session = ((Session) entityManager.getDelegate());
         // this is a new implementation using JakartaEE Criteria API instead of Hibernate Criteria API
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Tuple> cq = cb.createQuery(Tuple.class);
@@ -254,20 +252,7 @@ public class StatsService {
             .groupBy(userAnnotationRoot.get("user").get("id"));
 
         TypedQuery<Tuple> q = entityManager.createQuery(cq);
-        // this is a new implementation using JakartaEE Criteria API instead of Hibernate Criteria API
-//        Criteria criteria = session.createCriteria(UserAnnotation.class);
-//        criteria.add(Restrictions.eq("project", project));
-//        if(startDate!=null) {
-//            criteria.add(Restrictions.gt("created", startDate));
-//        }
-//        if(endDate!=null) {
-//            criteria.add(Restrictions.lt("created", endDate));
-//        }
-//        criteria.setProjection( Projections.projectionList()
-//                .add( Projections.groupProperty("user.id") )
-//                .add( Projections.countDistinct("image.id") ));
 
-//        List<Object[]> numberOfAnnotatedImagesByUser = criteria.list();
         List<Tuple> numberOfAnnotatedImagesByUser = q.getResultList();
         // Build empty result table
         Map<Long, JsonObject> result = new HashMap<Long, JsonObject>();
@@ -310,15 +295,14 @@ public class StatsService {
         result.put(0L, JsonObject.of("value", 0));
 
         //Get the number of annotation for each term
-        String request = "" +
-            "SELECT at.term_id, count(DISTINCT ua.image_id) " +
-            "FROM user_annotation ua " +
-            "LEFT JOIN annotation_term at " +
-            "ON at.user_annotation_id = ua.id " +
-            "WHERE ua.project_id = " + project.getId() + " " +
-            (startDate != null ? "AND at.created > '" + startDate + "'" : "") +
-            (endDate != null ? "AND at.created < '" + endDate + "'" : "") +
-            "GROUP BY at.term_id ";
+        String request = "SELECT at.term_id, count(DISTINCT ua.image_id) "
+            + "FROM user_annotation ua "
+            + "LEFT JOIN annotation_term at "
+            + "ON at.user_annotation_id = ua.id "
+            + "WHERE ua.project_id = " + project.getId() + " "
+            + (startDate != null ? "AND at.created > '" + startDate + "'" : "")
+            + (endDate != null ? "AND at.created < '" + endDate + "'" : "")
+            + "GROUP BY at.term_id ";
 
         List<Tuple> rows = entityManager.createNativeQuery(request, Tuple.class).getResultList();
 
@@ -335,17 +319,15 @@ public class StatsService {
         securityACLService.check(project, READ);
         List<JsonObject> result = new ArrayList<>();
 
-
         //Get the number of annotation for each term
-        String request = "" +
-            "SELECT ua.image_id, at.term_id, COUNT(ua.id) as count  " +
-            "FROM user_annotation ua " +
-            "LEFT JOIN annotation_term at ON at.user_annotation_id = ua.id " +
-            "WHERE ua.deleted is NULL and at.deleted is NULL and ua.project_id = " + project.getId() + " " +
-            (startDate != null ? "AND at.created > '" + startDate + "'" : "") +
-            (endDate != null ? "AND at.created < '" + endDate + "'" : "") +
-            "GROUP BY ua.image_id, at.term_id " +
-            "ORDER BY ua.image_id, at.term_id ";
+        String request = "SELECT ua.image_id, at.term_id, COUNT(ua.id) as count  "
+            + "FROM user_annotation ua "
+            + "LEFT JOIN annotation_term at ON at.user_annotation_id = ua.id "
+            + "WHERE ua.deleted is NULL and at.deleted is NULL and ua.project_id = " + project.getId() + " "
+            + (startDate != null ? "AND at.created > '" + startDate + "'" : "")
+            + (endDate != null ? "AND at.created < '" + endDate + "'" : "")
+            + "GROUP BY ua.image_id, at.term_id "
+            + "ORDER BY ua.image_id, at.term_id ";
 
         List<Tuple> rows = entityManager.createNativeQuery(request, Tuple.class).getResultList();
 
@@ -364,9 +346,9 @@ public class StatsService {
     public List<JsonObject> statTerm(Project project, Date startDate, Date endDate, boolean leafsOnly) {
         securityACLService.check(project, READ);
         //Get leaf term (parent term cannot be map with annotation)
-        List<Term> terms = leafsOnly ?
-            termRepository.findAllLeafTerms(project.getOntology(), relationRepository.getParent()) :
-            new ArrayList<>(project.getOntology().getTerms());
+        List<Term> terms = leafsOnly
+            ? termRepository.findAllLeafTerms(project.getOntology(), relationRepository.getParent())
+            : new ArrayList<>(project.getOntology().getTerms());
 
         JsonObject stats = new JsonObject();
         JsonObject color = new JsonObject();
@@ -385,15 +367,14 @@ public class StatsService {
         stats.put("0", 0);
 
         //Get the number of annotation for each term
-        String request = "" +
-            "SELECT at.term_id, count(*) " +
-            "FROM user_annotation ua " +
-            "LEFT JOIN annotation_term at " +
-            "ON at.user_annotation_id = ua.id " +
-            "WHERE ua.project_id = " + project.getId() + " " +
-            (startDate != null ? "AND at.created > '" + startDate + "'" : "") +
-            (endDate != null ? "AND at.created < '" + endDate + "'" : "") +
-            "GROUP BY at.term_id ";
+        String request = "SELECT at.term_id, count(*) "
+            + "FROM user_annotation ua "
+            + "LEFT JOIN annotation_term at "
+            + "ON at.user_annotation_id = ua.id "
+            + "WHERE ua.project_id = " + project.getId() + " "
+            + (startDate != null ? "AND at.created > '" + startDate + "'" : "")
+            + (endDate != null ? "AND at.created < '" + endDate + "'" : "")
+            + "GROUP BY at.term_id ";
 
         List<Tuple> rows = entityManager.createNativeQuery(request, Tuple.class).getResultList();
         for (Tuple row : rows) {
@@ -410,14 +391,10 @@ public class StatsService {
 
         for (Map.Entry<String, Object> entry : stats.entrySet()) {
             list.add(JsonObject.of(
-                "id",
-                ids.get(entry.getKey()),
-                "key",
-                (entry.getKey().equals("0") ? null : entry.getKey()),
-                "value",
-                entry.getValue(),
-                "color",
-                color.get(entry.getKey())
+                "id", ids.get(entry.getKey()),
+                "key", (entry.getKey().equals("0") ? null : entry.getKey()),
+                "value", entry.getValue(),
+                "color", color.get(entry.getKey())
             ));
         }
         return list;
@@ -449,19 +426,6 @@ public class StatsService {
         TypedQuery<Tuple> q = entityManager.createQuery(cq);
         List<Tuple> nbAnnotationsByUserAndTerms = q.getResultList();
         // use Jakarta JPA Criteria API instead of Hibernate Criteria API
-        //compute number of annotation for each user and each term
-//        Session session = ((Session) entityManager.getDelegate());
-//        Criteria criteria = session.createCriteria(AnnotationTerm.class);
-//        criteria.add(Restrictions.in("term", terms));
-//        criteria.createAlias("userAnnotation", "a");
-//        criteria.add(Restrictions.eq("a.project", project));
-//        criteria.setProjection(Projections.projectionList()
-//                .add(Projections.groupProperty("user.id"))
-//                .add(Projections.groupProperty("term.id"))
-//                .add(Projections.count("term")));
-
-//        List<Object[]> nbAnnotationsByUserAndTerms = criteria.list();
-
 
         for (User user : userService.listUsers(project)) {
             JsonObject item = new JsonObject();
@@ -486,21 +450,16 @@ public class StatsService {
             if (user != null) {
                 List<JsonObject> termsJsonObjects = (List<JsonObject>) user.get("terms");
                 for (JsonObject jsonObject : termsJsonObjects) {
-//                    if (Objects.equals(jsonObject.getJSONAttrLong("id"),row.get(1))) {
                     jsonObject.put("value", row.get(1));
-//                    }
                 }
-
             }
         }
         return new ArrayList<>(result.values());
-
     }
 
     public List<JsonObject> statUser(Project project, Date startDate, Date endDate) {
         securityACLService.check(project, READ);
         Map<Long, JsonObject> result = new HashMap<>();
-
 
         //compute number of annotation for each user
 
@@ -512,7 +471,6 @@ public class StatsService {
         List<Predicate> predicatesList = new ArrayList<>();
         Path<Project> expression = userAnnotationRoot.get("project").get("id");
         Predicate projectPredicate = cb.equal(expression, project.getId());
-//        Predicate projectPredicate = cb.equal(userAnnotationRoot.get("project"), project);
         predicatesList.add(projectPredicate);
         if (startDate != null) {
             Predicate startDatePredicate = cb.greaterThan(userAnnotationRoot.get("created"), startDate);
@@ -531,22 +489,6 @@ public class StatsService {
         TypedQuery<Tuple> q = entityManager.createQuery(cq);
         List<Tuple> userAnnotations = q.getResultList();
         // user Jakarta JPA Criteria API
-//        Session session = ((Session) entityManager.getDelegate());
-//        Criteria criteria = session.createCriteria(UserAnnotation.class);
-//        criteria.add(Restrictions.eq("project", project));
-//        if (startDate != null) {
-//            criteria.add(Restrictions.gt("created", startDate));
-//        }
-//        if (endDate != null) {
-//            criteria.add(Restrictions.lt("created", endDate));
-//        }
-//        criteria.setFetchMode("user", FetchMode.JOIN); //right join possible ? it will be sufficient
-
-//        criteria.setProjection(Projections.projectionList()
-//                .add(Projections.countDistinct("id"))
-//                .add(Projections.groupProperty("user.id")));
-
-//        List<Object[]> userAnnotations = criteria.list();
 
         //build empty result table
         for (JsonObject user : userService.listLayers(project, null)) {
@@ -706,7 +648,6 @@ public class StatsService {
         );
     }
 
-
     private List<JsonObject> aggregateByPeriods(
         List<Date> creationDates,
         int daysRange,
@@ -748,6 +689,4 @@ public class StatsService {
         }
         return data;
     }
-
-
 }

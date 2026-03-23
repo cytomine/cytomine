@@ -46,7 +46,7 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 3
             failureThreshold: 5
-            timeoutSeconds: 2
+            timeoutSeconds: 5
           livenessProbe:
             exec:
               command:
@@ -55,7 +55,7 @@ spec:
             initialDelaySeconds: 15
             periodSeconds: 10
             failureThreshold: 3
-            timeoutSeconds: 2
+            timeoutSeconds: 5
           resources:
             {{- toYaml .Values.pims_cache.resources | nindent 12 }}
           volumeMounts:

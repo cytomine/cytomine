@@ -54,7 +54,7 @@ public class ImagePropertiesService {
 
         try {
             Map<String, Object> properties = imageServerService.properties(image);
-            Map<String, Object> imageProperties = (Map<String, Object>)properties.getOrDefault("image", Map.of());
+            Map<String, Object> imageProperties = (Map<String, Object>) properties.getOrDefault("image", Map.of());
             JsonObject imagePropertiesObject = new JsonObject(imageProperties);
 
 
@@ -72,9 +72,9 @@ public class ImagePropertiesService {
 
             image.setFps(imagePropertiesObject.getJSONAttrDouble("frame_rate"));
 
-            Map<String, Object> instrument = ((Map<String, Object>)properties.getOrDefault("instrument", Map.of()));
-            Map<String, Object> objective = ((Map<String, Object>)instrument.getOrDefault("objective", Map.of()));
-            Integer nominal_magnification = (Integer)objective.get("nominal_magnification");
+            Map<String, Object> instrument = ((Map<String, Object>) properties.getOrDefault("instrument", Map.of()));
+            Map<String, Object> objective = ((Map<String, Object>) instrument.getOrDefault("objective", Map.of()));
+            Integer nominal_magnification = (Integer) objective.get("nominal_magnification");
 
             image.setMagnification(nominal_magnification);
             image.setBitPerSample(imagePropertiesObject.getJSONAttrInteger("bits", 8));
@@ -83,23 +83,26 @@ public class ImagePropertiesService {
             abstractImageRepository.save(image);
 
             if (deep) {
-                List<Map<String, Object>> channels = (List<Map<String, Object>>)properties.getOrDefault("channels", List.of());
+                List<Map<String, Object>> channels = (List<Map<String, Object>>) properties.getOrDefault(
+                    "channels",
+                    List.of()
+                );
                 for (int i = 0; i < image.getApparentChannels(); i += image.getSamplePerPixel()) {
                     Map<String, Object> channel = (Map<String, Object>) channels.get(i);
-                    int index = Math.floorDiv((Integer)channel.get("index"), image.getSamplePerPixel());
+                    int index = Math.floorDiv((Integer) channel.get("index"), image.getSamplePerPixel());
                     String name = (String) channel.get("suggested_name");
                     String color = (String) channel.get("color");
                     if (image.getSamplePerPixel() != 1) {
                         color = null;
 
                         List<String> parts = new ArrayList<>();
-                        for (int j = 0; j<image.getSamplePerPixel() ; j++) {
-                            parts.add((String) channels.get(i+j).get("suggested_name"));
+                        for (int j = 0; j < image.getSamplePerPixel(); j++) {
+                            parts.add((String) channels.get(i + j).get("suggested_name"));
                         }
                         name = parts.stream().distinct().collect(Collectors.joining("|"));
                     }
                     List<AbstractSlice> slices = abstractSliceRepository.findAllByImageAndChannel(image, index)
-                            .stream().filter(x -> Objects.equals(x.getChannel(), (Integer)channel.get("index"))).toList();
+                        .stream().filter(x -> Objects.equals(x.getChannel(), (Integer) channel.get("index"))).toList();
                     for (AbstractSlice slice : slices) {
                         slice.setChannelName(name);
                         slice.setChannelColor(color);

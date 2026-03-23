@@ -1,20 +1,20 @@
 package be.cytomine.service.ontology;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -162,11 +162,18 @@ public class UserAnnotationService extends ModelService {
 
     public Optional<UserAnnotation> find(Long id) {
         Optional<UserAnnotation> optionalUserAnnotation = userAnnotationRepository.findById(id);
-        optionalUserAnnotation.ifPresent(userAnnotation -> securityACLService.check(userAnnotation.container(),READ));
+        optionalUserAnnotation.ifPresent(userAnnotation -> securityACLService.check(userAnnotation.container(), READ));
         return optionalUserAnnotation;
     }
 
-    public List listIncluded(ImageInstance image, String geometry, User user, List<Long> terms, AnnotationDomain annotation, List<String> propertiesToShow) {
+    public List listIncluded(
+        ImageInstance image,
+        String geometry,
+        User user,
+        List<Long> terms,
+        AnnotationDomain annotation,
+        List<String> propertiesToShow
+    ) {
         securityACLService.check(image.container(), READ);
 
         UserAnnotationListing userAnnotationListing = new UserAnnotationListing(entityManager);
@@ -174,14 +181,14 @@ public class UserAnnotationService extends ModelService {
         userAnnotationListing.setImage(image.getId());
         userAnnotationListing.setUser(user.getId());
         userAnnotationListing.setTerms(terms);
-        userAnnotationListing.setExcludedAnnotation((annotation!=null? annotation.getId() : null));
+        userAnnotationListing.setExcludedAnnotation((annotation != null ? annotation.getId() : null));
         userAnnotationListing.setBbox(geometry);
         return annotationListingService.executeRequest(userAnnotationListing);
     }
 
 
     public Long count(User user, Project project) {
-        if (project!=null) {
+        if (project != null) {
             securityACLService.checkIsSameUserOrAdminContainer(project, user, currentUserService.getCurrentUser());
             return userAnnotationRepository.countByUserAndProject(user, project);
         } else {
@@ -196,11 +203,11 @@ public class UserAnnotationService extends ModelService {
     }
 
     public Long countByProject(Project project, Date startDate, Date endDate) {
-        if (startDate!=null && endDate!=null) {
+        if (startDate != null && endDate != null) {
             return userAnnotationRepository.countByProjectAndCreatedBetween(project, startDate, endDate);
-        } else if (startDate!=null) {
+        } else if (startDate != null) {
             return userAnnotationRepository.countByProjectAndCreatedAfter(project, startDate);
-        } else if (endDate!=null) {
+        } else if (endDate != null) {
             return userAnnotationRepository.countByProjectAndCreatedBefore(project, endDate);
         } else {
             return userAnnotationRepository.countByProject(project);
@@ -218,7 +225,9 @@ public class UserAnnotationService extends ModelService {
 
     /**
      * Add the new domain with JSON data
+     *
      * @param jsonObject New domain data
+     *
      * @return Response structure (created domain data,..)
      */
     @Override
@@ -230,11 +239,11 @@ public class UserAnnotationService extends ModelService {
         // We could provide "sliceObject", "imageObject", "userObject" in JSON and first check for them in the userannotation class
         if (!jsonObject.isMissing("slice")) {
             slice = sliceInstanceService.find(jsonObject.getJSONAttrLong("slice"))
-                    .orElseThrow(() -> new ObjectNotFoundException("SliceInstance with id " + jsonObject.get("slice")));
+                .orElseThrow(() -> new ObjectNotFoundException("SliceInstance with id " + jsonObject.get("slice")));
             image = slice.getImage();
         } else if (!jsonObject.isMissing("image")) {
             image = imageInstanceRepository.findById(jsonObject.getJSONAttrLong("image"))
-                    .orElseThrow(() -> new ObjectNotFoundException("ImageInstance with id " + jsonObject.get("image")));
+                .orElseThrow(() -> new ObjectNotFoundException("ImageInstance with id " + jsonObject.get("image")));
             slice = sliceCoordinatesService.getReferenceSlice(image);
 
         } else {
@@ -270,8 +279,7 @@ public class UserAnnotationService extends ModelService {
         Geometry annotationShape;
         try {
             annotationShape = new WKTReader().read(jsonObject.getJSONAttrStr("location"));
-        }
-        catch (Exception ignored) {
+        } catch (Exception ignored) {
             throw new WrongArgumentException("Annotation location is not valid");
         }
 
@@ -281,22 +289,30 @@ public class UserAnnotationService extends ModelService {
 
 
         Envelope envelope = annotationShape.getEnvelopeInternal();
-        boolean isSizeDefined = image.getBaseImage().getWidth()!=null && image.getBaseImage().getHeight()!=null;
+        boolean isSizeDefined = image.getBaseImage().getWidth() != null && image.getBaseImage().getHeight() != null;
         if (isSizeDefined && (envelope.getMinX() < 0 || envelope.getMinY() < 0 ||
-                envelope.getMaxX() > image.getBaseImage().getWidth() ||
-                envelope.getMaxY() > image.getBaseImage().getHeight())) {
+            envelope.getMaxX() > image.getBaseImage().getWidth() ||
+            envelope.getMaxY() > image.getBaseImage().getHeight())) {
             double maxX = Math.min(envelope.getMaxX(), image.getBaseImage().getWidth());
             double maxY = Math.min(envelope.getMaxY(), image.getBaseImage().getHeight());
             Geometry insideBounds = null;
             try {
-                insideBounds = new WKTReader().read("POLYGON((0 0,0 " + maxY + "," + maxX + " " + maxY + "," + maxX + " 0,0 0))");
+                insideBounds = new WKTReader().read("POLYGON((0 0,0 "
+                    + maxY
+                    + ","
+                    + maxX
+                    + " "
+                    + maxY
+                    + ","
+                    + maxX
+                    + " 0,0 0))");
             } catch (ParseException e) {
                 throw new WrongArgumentException("Annotation cannot be parsed with maxX/maxY:" + e.getMessage());
             }
             annotationShape = annotationShape.intersection(insideBounds);
         }
 
-        if(!(annotationShape.getGeometryType().equals("LineString"))) {
+        if (!(annotationShape.getGeometryType().equals("LineString"))) {
             BoundariesCropParameter boundaries = GeometryUtils.getGeometryBoundaries(annotationShape);
             if (boundaries == null || boundaries.getWidth() == 0 || boundaries.getHeight() == 0) {
                 throw new WrongArgumentException("Annotation dimension not valid");
@@ -306,7 +322,11 @@ public class UserAnnotationService extends ModelService {
         //simplify annotation
         try {
             SimplifiedAnnotation simplifiedAnnotation =
-                    simplifyGeometryService.simplifyPolygon(annotationShape, jsonObject.getJSONAttrLong("minPoint", null), jsonObject.getJSONAttrLong("maxPoint", null));
+                simplifyGeometryService.simplifyPolygon(
+                    annotationShape,
+                    jsonObject.getJSONAttrLong("minPoint", null),
+                    jsonObject.getJSONAttrLong("maxPoint", null)
+                );
             jsonObject.put("location", simplifiedAnnotation.getNewAnnotation());
             jsonObject.put("geometryCompression", simplifiedAnnotation.getRate());
         } catch (Exception e) {
@@ -319,16 +339,22 @@ public class UserAnnotationService extends ModelService {
         }
 
         if (jsonObject.get("location") instanceof Geometry) {
-            jsonObject.put("location", validateGeometryService.tryToMakeItValidIfNotValid((Geometry)jsonObject.get("location")));
+            jsonObject.put(
+                "location",
+                validateGeometryService.tryToMakeItValidIfNotValid((Geometry) jsonObject.get("location"))
+            );
         } else {
-            jsonObject.put("location", validateGeometryService.tryToMakeItValidIfNotValid(jsonObject.getJSONAttrStr("location")));
+            jsonObject.put(
+                "location",
+                validateGeometryService.tryToMakeItValidIfNotValid(jsonObject.getJSONAttrStr("location"))
+            );
         }
 
         //Start transaction
         Transaction transaction = transactionService.start();
 
         CommandResponse commandResponse = executeCommand(new AddCommand(currentUser, transaction), null, jsonObject);
-        UserAnnotation addedAnnotation = (UserAnnotation)commandResponse.getObject();
+        UserAnnotation addedAnnotation = (UserAnnotation) commandResponse.getObject();
 
         if (addedAnnotation == null) {
             return commandResponse;
@@ -343,11 +369,21 @@ public class UserAnnotationService extends ModelService {
         List<Term> terms = new ArrayList<>();
         for (Long termId : termIds) {
 
-            CommandResponse response = annotationTermService.addAnnotationTerm(addedAnnotation.getId(), termId, null, currentUser.getId(), currentUser, transaction);
-            terms.add(((AnnotationTerm)(response.getObject())).getTerm());
+            CommandResponse response = annotationTermService.addAnnotationTerm(
+                addedAnnotation.getId(),
+                termId,
+                null,
+                currentUser.getId(),
+                currentUser,
+                transaction
+            );
+            terms.add(((AnnotationTerm) (response.getObject())).getTerm());
         }
 
-        ((Map<String, Object>)commandResponse.getData().get("annotation")).put("term", terms.stream().map(x -> x.toJsonObject().getId()).toList());
+        ((Map<String, Object>) commandResponse.getData().get("annotation")).put(
+            "term",
+            terms.stream().map(x -> x.toJsonObject().getId()).toList()
+        );
 
 
         // Add properties if any
@@ -358,7 +394,14 @@ public class UserAnnotationService extends ModelService {
         for (Map.Entry<String, String> entry : properties.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
-            propertyService.addProperty(UserAnnotation.class.getName(), addedAnnotation.getId(), key, value, currentUser, transaction);
+            propertyService.addProperty(
+                UserAnnotation.class.getName(),
+                addedAnnotation.getId(),
+                key,
+                value,
+                currentUser,
+                transaction
+            );
         }
 
         List<Long> tracksIds = new ArrayList<>();
@@ -369,26 +412,41 @@ public class UserAnnotationService extends ModelService {
             List<AnnotationTrack> annotationTracks = new ArrayList<>();
             for (Long trackId : tracksIds) {
                 CommandResponse response =
-                        annotationTrackService.addAnnotationTrack(UserAnnotation.class.getName(), addedAnnotation.getId(), trackId, addedAnnotation.getSlice().getId(), transaction);
+                    annotationTrackService.addAnnotationTrack(
+                        UserAnnotation.class.getName(),
+                        addedAnnotation.getId(),
+                        trackId,
+                        addedAnnotation.getSlice().getId(),
+                        transaction
+                    );
                 annotationTracks.add((AnnotationTrack) response.getData().get("annotationtrack"));
             }
-            ((Map<String, Object>)commandResponse.getData().get("annotation")).put("annotationTrack", annotationTracks);
-            ((Map<String, Object>)commandResponse.getData().get("annotation")).put("track", annotationTracks.stream().map(x -> x.getTrack()).collect(Collectors.toList()));
+            ((Map<String, Object>) commandResponse.getData().get("annotation")).put(
+                "annotationTrack",
+                annotationTracks
+            );
+            ((Map<String, Object>) commandResponse.getData().get("annotation")).put(
+                "track",
+                annotationTracks.stream().map(x -> x.getTrack()).collect(Collectors.toList())
+            );
         }
 
         // Add annotation-group/link if any
         Long groupId = jsonObject.getJSONAttrLong("group", null);
         if (groupId != null) {
             CommandResponse response = annotationLinkService.addAnnotationLink(
-                    UserAnnotation.class.getName(),
-                    addedAnnotation.getId(),
-                    groupId,
-                    addedAnnotation.getImage().getId(),
-                    transaction
+                UserAnnotation.class.getName(),
+                addedAnnotation.getId(),
+                groupId,
+                addedAnnotation.getImage().getId(),
+                transaction
             );
 
-            ((Map<String, Object>)commandResponse.getData().get("annotation")).put("group", groupId);
-            ((Map<String, Object>)commandResponse.getData().get("annotation")).put("annotationLinks", response.getData().get("annotationlink"));
+            ((Map<String, Object>) commandResponse.getData().get("annotation")).put("group", groupId);
+            ((Map<String, Object>) commandResponse.getData().get("annotation")).put(
+                "annotationLinks",
+                response.getData().get("annotationlink")
+            );
         }
 
         log.debug("end of add command");
@@ -397,7 +455,7 @@ public class UserAnnotationService extends ModelService {
 
     protected void beforeAdd(CytomineDomain domain) {
         // this will be done in the PrePersist method ; but the validation is done before PrePersist
-        ((UserAnnotation)domain).setWktLocation(((UserAnnotation)domain).getLocation().toText());
+        ((UserAnnotation) domain).setWktLocation(((UserAnnotation) domain).getLocation().toText());
     }
 
     protected void afterAdd(CytomineDomain domain, CommandResponse response) {
@@ -414,8 +472,10 @@ public class UserAnnotationService extends ModelService {
 
     /**
      * Update this domain with new data from json
-     * @param domain Domain to update
+     *
+     * @param domain      Domain to update
      * @param jsonNewData New domain datas
+     *
      * @return Response structure (new domain data, old domain data..)
      */
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
@@ -432,8 +492,7 @@ public class UserAnnotationService extends ModelService {
         Geometry annotationShape;
         try {
             annotationShape = new WKTReader().read(jsonNewData.getJSONAttrStr("location"));
-        }
-        catch (ParseException ignored) {
+        } catch (ParseException ignored) {
             throw new WrongArgumentException("Annotation location is not valid");
         }
 
@@ -442,18 +501,26 @@ public class UserAnnotationService extends ModelService {
         }
 
         ImageInstance image = imageInstanceRepository.findById(jsonNewData.getJSONAttrLong("image"))
-                .orElseThrow(() -> new WrongArgumentException("Annotation not associated with a valid image"));
+            .orElseThrow(() -> new WrongArgumentException("Annotation not associated with a valid image"));
 
         Envelope envelope = annotationShape.getEnvelopeInternal();
-        boolean isSizeDefined = image.getBaseImage().getWidth()!=null && image.getBaseImage().getHeight()!=null;
+        boolean isSizeDefined = image.getBaseImage().getWidth() != null && image.getBaseImage().getHeight() != null;
         if (isSizeDefined && (envelope.getMinX() < 0 || envelope.getMinY() < 0 ||
-                envelope.getMaxX() > image.getBaseImage().getWidth() ||
-                envelope.getMaxY() > image.getBaseImage().getHeight())) {
+            envelope.getMaxX() > image.getBaseImage().getWidth() ||
+            envelope.getMaxY() > image.getBaseImage().getHeight())) {
             double maxX = Math.min(envelope.getMaxX(), image.getBaseImage().getWidth());
             double maxY = Math.min(envelope.getMaxY(), image.getBaseImage().getHeight());
             Geometry insideBounds = null;
             try {
-                insideBounds = new WKTReader().read("POLYGON((0 0,0 " + maxY + "," + maxX + " " + maxY + "," + maxX + " 0,0 0))");
+                insideBounds = new WKTReader().read("POLYGON((0 0,0 "
+                    + maxY
+                    + ","
+                    + maxX
+                    + " "
+                    + maxY
+                    + ","
+                    + maxX
+                    + " 0,0 0))");
             } catch (ParseException e) {
                 throw new WrongArgumentException("Annotation cannot be parsed with maxX/maxY:" + e.getMessage());
             }
@@ -471,9 +538,15 @@ public class UserAnnotationService extends ModelService {
         }
 
         if (jsonNewData.get("location") instanceof Geometry) {
-            jsonNewData.put("location", validateGeometryService.tryToMakeItValidIfNotValid((Geometry)jsonNewData.get("location")));
+            jsonNewData.put(
+                "location",
+                validateGeometryService.tryToMakeItValidIfNotValid((Geometry) jsonNewData.get("location"))
+            );
         } else {
-            jsonNewData.put("location", validateGeometryService.tryToMakeItValidIfNotValid(jsonNewData.getJSONAttrStr("location")));
+            jsonNewData.put(
+                "location",
+                validateGeometryService.tryToMakeItValidIfNotValid(jsonNewData.getJSONAttrStr("location"))
+            );
         }
         CommandResponse result = executeCommand(new EditCommand(currentUser, null), domain, jsonNewData);
 
@@ -492,10 +565,12 @@ public class UserAnnotationService extends ModelService {
 
     /**
      * Delete this domain
-     * @param domain Domain to delete
-     * @param transaction Transaction link with this command
-     * @param task Task for this command
+     *
+     * @param domain       Domain to delete
+     * @param transaction  Transaction link with this command
+     * @param task         Task for this command
      * @param printMessage Flag if client will print or not confirm message
+     *
      * @return Response structure (code, old domain,..)
      */
     @Override
@@ -506,7 +581,7 @@ public class UserAnnotationService extends ModelService {
         //Check if user has at least READ permission for the project
         securityACLService.check(domain.container(), READ, currentUser);
         //Check if user is admin, the project mode and if is the owner of the annotation
-        securityACLService.checkFullOrRestrictedForOwner(domain, ((UserAnnotation)domain).getUser());
+        securityACLService.checkFullOrRestrictedForOwner(domain, ((UserAnnotation) domain).getUser());
 
         try {
             retrievalService.deleteIndex((AnnotationDomain) domain);
@@ -515,7 +590,7 @@ public class UserAnnotationService extends ModelService {
         }
 
         Command c = new DeleteCommand(currentUser, transaction);
-        return executeCommand(c,domain, null);
+        return executeCommand(c, domain, null);
     }
 
     protected void afterDelete(CytomineDomain domain, CommandResponse response) {
@@ -525,37 +600,42 @@ public class UserAnnotationService extends ModelService {
 
     public List<CommandResponse> repeat(UserAnnotation userAnnotation, Long baseSliceId, int repeat) {
         SliceInstance currentSlice = sliceInstanceService.find(baseSliceId)
-                .orElseThrow(() -> new ObjectNotFoundException("SliceInstance with id " + baseSliceId));
+            .orElseThrow(() -> new ObjectNotFoundException("SliceInstance with id " + baseSliceId));
 
         List<SliceInstance> slices = sliceInstanceRepository.listByImageInstanceOrderedByTZC(
-                userAnnotation.getImage(),
-                currentSlice.getBaseSlice().getTime(),
-                currentSlice.getBaseSlice().getZStack(),
-                currentSlice.getBaseSlice().getChannel(),
-                userAnnotation.getSlice().getId()
+            userAnnotation.getImage(),
+            currentSlice.getBaseSlice().getTime(),
+            currentSlice.getBaseSlice().getZStack(),
+            currentSlice.getBaseSlice().getChannel(),
+            userAnnotation.getSlice().getId()
         ).stream().limit(repeat).collect(Collectors.toList());
 
         List<CommandResponse> collection = slices.stream()
-                .map(slice -> this.add(JsonObject.of(
-                        "slice", slice.getId(),
-                        "location", userAnnotation.getLocation().toString(),
-                        "terms", userAnnotation.termsId(),
-                        "tracks", userAnnotation.tracksId())))
-                .collect(Collectors.toList());
+            .map(slice -> this.add(JsonObject.of(
+                "slice", slice.getId(),
+                "location", userAnnotation.getLocation().toString(),
+                "terms", userAnnotation.termsId(),
+                "tracks", userAnnotation.tracksId()
+            )))
+            .collect(Collectors.toList());
 
         return collection;
     }
 
 
     public List<Object> getStringParamsI18n(CytomineDomain domain) {
-        UserAnnotation annotation = (UserAnnotation)domain;
-        return List.of(currentUserService.getCurrentUser().toString(), annotation.getImage().getBlindInstanceFilename(), ((UserAnnotation) domain).getUser().toString());
+        UserAnnotation annotation = (UserAnnotation) domain;
+        return List.of(
+            currentUserService.getCurrentUser().toString(),
+            annotation.getImage().getBlindInstanceFilename(),
+            ((UserAnnotation) domain).getUser().toString()
+        );
     }
 
     public void deleteDependencies(CytomineDomain domain, Transaction transaction, Task task) {
-        deleteDependentAnnotationTerm((UserAnnotation)domain, transaction, task);
-        deleteDependentSharedAnnotation((UserAnnotation)domain, transaction, task);
-        deleteDependentAnnotationTrack((UserAnnotation)domain, transaction, task);
+        deleteDependentAnnotationTerm((UserAnnotation) domain, transaction, task);
+        deleteDependentSharedAnnotation((UserAnnotation) domain, transaction, task);
+        deleteDependentAnnotationTrack((UserAnnotation) domain, transaction, task);
         deleteDependentMetadata(domain, transaction, task);
     }
 
@@ -565,23 +645,32 @@ public class UserAnnotationService extends ModelService {
             try {
                 annotationTermService.delete(annotationTerm, transaction, null, false);
             } catch (ForbiddenException fe) {
-                throw new ForbiddenException("This annotation has been linked to the term " + annotationTerm.getTerm() + " by " + annotationTerm.userDomainCreator() + ". " + annotationTerm.userDomainCreator() + " must unlink its term before you can delete this annotation.");
+                throw new ForbiddenException("This annotation has been linked to the term "
+                    + annotationTerm.getTerm()
+                    + " by "
+                    + annotationTerm.userDomainCreator()
+                    + ". "
+                    + annotationTerm.userDomainCreator()
+                    + " must unlink its term before you can delete this annotation.");
             }
         }
     }
 
     public void deleteDependentSharedAnnotation(UserAnnotation aa, Transaction transaction, Task task) {
-        for (SharedAnnotation sharedAnnotation : sharedAnnotationRepository.findAllByAnnotationIdentOrderByCreatedDesc(aa.getId())) {
-            sharedAnnotationService.delete(sharedAnnotation,transaction,task,false);
+        for (SharedAnnotation sharedAnnotation : sharedAnnotationRepository.findAllByAnnotationIdentOrderByCreatedDesc(
+            aa.getId())) {
+            sharedAnnotationService.delete(sharedAnnotation, transaction, task, false);
         }
     }
+
     public void deleteDependentAnnotationTrack(UserAnnotation ua, Transaction transaction, Task task) {
         for (AnnotationTrack annotationTrack : annotationTrackService.list(ua)) {
             annotationTrackService.delete(annotationTrack, transaction, task, false);
         }
     }
 
-    public CommandResponse doCorrectUserAnnotation(List<Long> coveringAnnotations, String newLocation, boolean remove) throws ParseException {
+    public CommandResponse doCorrectUserAnnotation(List<Long> coveringAnnotations, String newLocation, boolean remove)
+        throws ParseException {
         if (coveringAnnotations.isEmpty()) {
             return null;
         }
@@ -594,11 +683,14 @@ public class UserAnnotationService extends ModelService {
 
         //Get all other annotation with same term
         List<Long> allOtherAnnotationId = coveringAnnotations.subList(1, coveringAnnotations.size());
-        List<UserAnnotation> allAnnotationWithSameTerm = genericAnnotationService.findUserAnnotationWithTerm(allOtherAnnotationId, basedTerms);
+        List<UserAnnotation> allAnnotationWithSameTerm = genericAnnotationService.findUserAnnotationWithTerm(
+            allOtherAnnotationId,
+            basedTerms
+        );
 
         //Create the new geometry
         Geometry newGeometry = new WKTReader().read(newLocation);
-        if(!newGeometry.isValid()) {
+        if (!newGeometry.isValid()) {
             throw new WrongArgumentException("Your annotation cannot be self-intersected.");
         }
 
@@ -611,14 +703,15 @@ public class UserAnnotationService extends ModelService {
             //-remove the new geometry from all other annotation location
             based.setLocation(based.getLocation().difference(newGeometry));
             if (based.getLocation().getNumPoints() < 2) {
-                throw new WrongArgumentException("You cannot delete an annotation with substract! Use reject or delete tool.");
+                throw new WrongArgumentException(
+                    "You cannot delete an annotation with substract! Use reject or delete tool.");
             }
 
             JsonObject jsonObject = based.toJsonObject();
             based.setLocation(oldLocation);
             result = update(based, jsonObject);
 
-            for(int i = 0; i < allAnnotationWithSameTerm.size(); i++) {
+            for (int i = 0; i < allAnnotationWithSameTerm.size(); i++) {
                 UserAnnotation other = allAnnotationWithSameTerm.get(i);
                 other.setLocation(other.getLocation().difference(newGeometry));
                 update(other, other.toJsonObject());
@@ -639,7 +732,6 @@ public class UserAnnotationService extends ModelService {
         }
         return result;
     }
-
 
 
 }

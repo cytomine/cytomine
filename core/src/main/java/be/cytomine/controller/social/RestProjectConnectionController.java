@@ -49,11 +49,11 @@ public class RestProjectConnectionController extends RestCytomineController {
 
     @PostMapping("/project/{project}/userconnection.json")
     public ResponseEntity<String> add(
-            @PathVariable("project") Long projectId,
-            @RequestBody JsonObject json
+        @PathVariable("project") Long projectId,
+        @RequestBody JsonObject json
     ) {
         Project project = projectService.find(projectId)
-                .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
+            .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
         String session = RequestContextHolder.currentRequestAttributes().getSessionId();
         String os = json.getJSONAttrStr("os");
         String browser = json.getJSONAttrStr("browser");
@@ -66,10 +66,10 @@ public class RestProjectConnectionController extends RestCytomineController {
 
     @GetMapping("/project/{project}/lastConnection.json")
     public ResponseEntity<String> lastConnectionInProject(
-            @PathVariable("project") Long projectId
+        @PathVariable("project") Long projectId
     ) {
         Project project = projectService.find(projectId)
-                .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
+            .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
         return responseSuccess(projectConnectionService.lastConnectionInProject(
             project, null, "created", "desc", 0L, 0L
         ));
@@ -78,11 +78,11 @@ public class RestProjectConnectionController extends RestCytomineController {
 
     @GetMapping("/project/{project}/lastConnection/{user}.json")
     public ResponseEntity<String> lastConnectionInProjectByUser(
-            @PathVariable("project") Long projectId,
-            @PathVariable("user") Long userId
+        @PathVariable("project") Long projectId,
+        @PathVariable("user") Long userId
     ) {
         Project project = projectService.find(projectId)
-                .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
+            .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
         return responseSuccess(projectConnectionService.lastConnectionInProject(
             project, List.of(userId), "created", "desc", 0L, 0L
         ));
@@ -91,15 +91,15 @@ public class RestProjectConnectionController extends RestCytomineController {
 
     @GetMapping("/project/{project}/userconnection/{user}.json")
     public ResponseEntity<String> getConnectionByUserAndProject(
-            @PathVariable("project") Long projectId,
-            @PathVariable("user") Long userId,
-            @RequestParam(required = false, defaultValue = "0") Integer max,
-            @RequestParam(required = false, defaultValue = "0") Integer offset
+        @PathVariable("project") Long projectId,
+        @PathVariable("user") Long userId,
+        @RequestParam(required = false, defaultValue = "0") Integer max,
+        @RequestParam(required = false, defaultValue = "0") Integer offset
     ) {
         Project project = projectService.find(projectId)
-                .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
+            .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
         User user = userService.find(userId)
-                .orElseThrow(() -> new ObjectNotFoundException("User", userId));
+            .orElseThrow(() -> new ObjectNotFoundException("User", userId));
 
         return responseSuccess(projectConnectionService.getConnectionByUserAndProject(user, project, max, offset));
 
@@ -107,13 +107,13 @@ public class RestProjectConnectionController extends RestCytomineController {
 
     @GetMapping("/project/{project}/connectionFrequency.json")
     public ResponseEntity<String> numberOfConnectionsByProject(
-            @PathVariable("project") Long projectId,
-            @RequestParam(required = false) Long afterThan,
-            @RequestParam(required = false) String period,
-            @RequestParam(required = false, defaultValue = "false") Boolean heatmap
+        @PathVariable("project") Long projectId,
+        @RequestParam(required = false) Long afterThan,
+        @RequestParam(required = false) String period,
+        @RequestParam(required = false, defaultValue = "false") Boolean heatmap
     ) {
         Project project = projectService.find(projectId)
-                .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
+            .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
 
         if (heatmap) {
             return responseSuccess(projectConnectionService.numberOfConnectionsByProjectOrderedByHourAndDays(
@@ -131,19 +131,18 @@ public class RestProjectConnectionController extends RestCytomineController {
     }
 
 
-
     @GetMapping("/project/{project}/connectionFrequency/{user}.json")
     public ResponseEntity<String> numberOfConnectionsByProjectAndUser(
-            @PathVariable("project") Long projectId,
-            @PathVariable("user") Long userId,
-            @RequestParam(required = false) Long afterThan,
-            @RequestParam(required = false) String period,
-            @RequestParam(required = false, defaultValue = "false") Boolean heatmap
+        @PathVariable("project") Long projectId,
+        @PathVariable("user") Long userId,
+        @RequestParam(required = false) Long afterThan,
+        @RequestParam(required = false) String period,
+        @RequestParam(required = false, defaultValue = "false") Boolean heatmap
     ) {
         Project project = projectService.find(projectId)
-                .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
+            .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
         User user = userService.find(userId)
-                .orElseThrow(() -> new ObjectNotFoundException("User", userId));
+            .orElseThrow(() -> new ObjectNotFoundException("User", userId));
         if (heatmap) {
             return responseSuccess(projectConnectionService.numberOfConnectionsByProjectOrderedByHourAndDays(
                 project, afterThan, user
@@ -162,9 +161,9 @@ public class RestProjectConnectionController extends RestCytomineController {
 
     @GetMapping("/connectionFrequency.json")
     public ResponseEntity<String> getConnectionFrequency(
-            @RequestParam(required = false) Long afterThan,
-            @RequestParam(required = false) Long beforeThan,
-            @RequestParam(required = true) String period
+        @RequestParam(required = false) Long afterThan,
+        @RequestParam(required = false) Long beforeThan,
+        @RequestParam(required = true) String period
     ) {
         return responseSuccess(projectConnectionService.numberOfProjectConnections(
             period, afterThan, beforeThan, null, null
@@ -173,11 +172,11 @@ public class RestProjectConnectionController extends RestCytomineController {
 
     @GetMapping("/averageConnections.json")
     public ResponseEntity<String> averageOfProjectConnections(
-            @RequestParam(required = false) Long afterThan,
-            @RequestParam(required = false) Long beforeThan,
-            @RequestParam(required = true) String period,
-            @RequestParam(required = false, value = "project", defaultValue = "0") Long projectId,
-            @RequestParam(required = false, value = "user", defaultValue = "0") Long userId
+        @RequestParam(required = false) Long afterThan,
+        @RequestParam(required = false) Long beforeThan,
+        @RequestParam(required = true) String period,
+        @RequestParam(required = false, value = "project", defaultValue = "0") Long projectId,
+        @RequestParam(required = false, value = "user", defaultValue = "0") Long userId
     ) {
         Project project = projectService.find(projectId).orElse(null);
         User user = userService.find(userId).orElse(null);
@@ -189,29 +188,31 @@ public class RestProjectConnectionController extends RestCytomineController {
 
     @GetMapping("/project/{project}/userconnection/count.json")
     public ResponseEntity<String> countByProject(
-            @PathVariable("project") Long projectId,
-            @RequestParam(required = false) Long startDate,
-            @RequestParam(required = false) Long endDate
+        @PathVariable("project") Long projectId,
+        @RequestParam(required = false) Long startDate,
+        @RequestParam(required = false) Long endDate
     ) {
         Project project = projectService.find(projectId)
-                .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
-        return responseSuccess(JsonObject.of("total", projectConnectionService.countByProject(
-            project, startDate, endDate
-        )));
+            .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
+        return responseSuccess(JsonObject.of(
+            "total", projectConnectionService.countByProject(
+                project, startDate, endDate
+            )
+        ));
     }
 
     @GetMapping("/project/{project}/connectionHistory/{user}.json")
     public ResponseEntity<String> userProjectConnectionHistory(
-            @PathVariable("project") Long projectId,
-            @PathVariable("user") Long userId,
-            @RequestParam(required = false, defaultValue = "0") Integer max,
-            @RequestParam(required = false, defaultValue = "0") Integer offset,
-            @RequestParam(required = false, value = "export") String export
+        @PathVariable("project") Long projectId,
+        @PathVariable("user") Long userId,
+        @RequestParam(required = false, defaultValue = "0") Integer max,
+        @RequestParam(required = false, defaultValue = "0") Integer offset,
+        @RequestParam(required = false, value = "export") String export
     ) throws IOException {
         Project project = projectService.find(projectId)
-                .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
+            .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
         User user = userService.find(userId)
-                .orElseThrow(() -> new ObjectNotFoundException("User", userId));
+            .orElseThrow(() -> new ObjectNotFoundException("User", userId));
 
         Page<PersistentProjectConnection> page = projectConnectionService.getConnectionByUserAndProject(
             user, project, max, offset
@@ -227,8 +228,9 @@ public class RestProjectConnectionController extends RestCytomineController {
             byte[] report = reportService.generateConnectionHistoryReport(
                 project.getName(), user.getUsername(), projectConnectionDataList
             );
-            responseReportFile(reportService.getConnectionHistoryReportFileName(
-                export, projectId, userId), report, export
+            responseReportFile(
+                reportService.getConnectionHistoryReportFileName(
+                    export, projectId, userId), report, export
             );
             return null;
         } else {
@@ -239,10 +241,10 @@ public class RestProjectConnectionController extends RestCytomineController {
 
     @GetMapping("/projectConnection/{id}.json")
     public ResponseEntity<String> getUserActivityDetails(
-            @PathVariable("id") Long id,
-            @RequestParam(required = false, defaultValue = "0", value = "start") Integer max, // why not max?
-            @RequestParam(required = false, defaultValue = "0", value = "length") Integer offset,  // why not length?
-            @RequestParam(required = false) String export
+        @PathVariable("id") Long id,
+        @RequestParam(required = false, defaultValue = "0", value = "start") Integer max, // why not max?
+        @RequestParam(required = false, defaultValue = "0", value = "length") Integer offset,  // why not length?
+        @RequestParam(required = false) String export
     ) {
 
         List<PersistentImageConsultation> result = projectConnectionService.getUserActivityDetails(id);

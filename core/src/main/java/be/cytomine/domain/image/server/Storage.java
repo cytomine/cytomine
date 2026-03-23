@@ -30,10 +30,10 @@ public class Storage extends CytomineDomain {
     protected User user;
 
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
-        Storage storage = (Storage)this;
-        storage.id = json.getJSONAttrLong("id",null);
+        Storage storage = (Storage) this;
+        storage.id = json.getJSONAttrLong("id", null);
         storage.name = json.getJSONAttrStr("name", true);
-        storage.user = (User)json.getJSONAttrDomain(entityManager, "user", new User(), true);
+        storage.user = (User) json.getJSONAttrDomain(entityManager, "user", new User(), true);
         storage.created = json.getJSONAttrDate("created");
         storage.updated = json.getJSONAttrDate("updated");
         return storage;
@@ -41,9 +41,9 @@ public class Storage extends CytomineDomain {
 
     public static JsonObject getDataFromDomain(CytomineDomain domain) {
         JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
-        Storage storage = (Storage)domain;
+        Storage storage = (Storage) domain;
         returnArray.put("name", storage.getName());
-        returnArray.put("user", (storage.getUser()!=null ? storage.getUser().getId() : null));
+        returnArray.put("user", (storage.getUser() != null ? storage.getUser().getId() : null));
         return returnArray;
     }
 

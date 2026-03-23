@@ -185,10 +185,10 @@ public class RestUserAnnotationController extends RestCytomineController {
 
 
     /**
-     * Add a new term
-     * Use next add relation-term to add relation with another term
+     * Add a new term Use next add relation-term to add relation with another term
      *
      * @param json JSON with Term data
+     *
      * @return Response map with .code = http response code and .data.term = new created Term
      */
     @PostMapping("/userannotation.json")

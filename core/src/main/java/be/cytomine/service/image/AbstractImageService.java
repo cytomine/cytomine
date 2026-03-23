@@ -1,20 +1,20 @@
 package be.cytomine.service.image;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 import java.util.ArrayList;
 import java.util.List;
@@ -138,13 +138,13 @@ public class AbstractImageService extends ModelService {
 
     public Optional<AbstractImage> find(Long id) {
         Optional<AbstractImage> abstractImage = abstractImageRepository.findById(id);
-        abstractImage.ifPresent(image -> securityACLService.check(image.container(),READ));
+        abstractImage.ifPresent(image -> securityACLService.check(image.container(), READ));
         return abstractImage;
     }
 
     public Optional<AbstractImage> find(String originalFileName) {
         Optional<AbstractImage> abstractImage = abstractImageRepository.findByOriginalFilename(originalFileName);
-        abstractImage.ifPresent(image -> securityACLService.check(image.container(),READ));
+        abstractImage.ifPresent(image -> securityACLService.check(image.container(), READ));
         return abstractImage;
     }
 
@@ -153,15 +153,17 @@ public class AbstractImageService extends ModelService {
         String token = authHeader.replace("Bearer ", "");
         String username = TokenUtils.getUsernameFromToken(token);
         User user = currentUserService.getCurrentUser(username);
-        abstractImage.ifPresent(image -> securityACLService.check(image.container(),READ, user));
+        abstractImage.ifPresent(image -> securityACLService.check(image.container(), READ, user));
         return abstractImage;
     }
 
     public Optional<AbstractImage> findByUploadedFile(Long id) {
         UploadedFile uploadedFile = uploadedFileRepository.findById(id)
-                .orElseThrow(() -> new ObjectNotFoundException("UploadedFile", id));
-        Optional<AbstractImage> abstractImage = abstractImageRepository.findAllByUploadedFile(uploadedFile).stream().findAny();
-        abstractImage.ifPresent(image -> securityACLService.check(image.container(),READ));
+            .orElseThrow(() -> new ObjectNotFoundException("UploadedFile", id));
+        Optional<AbstractImage> abstractImage = abstractImageRepository.findAllByUploadedFile(uploadedFile)
+            .stream()
+            .findAny();
+        abstractImage.ifPresent(image -> securityACLService.check(image.container(), READ));
         return abstractImage;
     }
 
@@ -171,7 +173,10 @@ public class AbstractImageService extends ModelService {
 
 
     public User getImageUploader(Long abstractImageId) {
-        AbstractImage abstractImage = find(abstractImageId).orElseThrow(() -> new ObjectNotFoundException("AbstractImage", abstractImageId));
+        AbstractImage abstractImage = find(abstractImageId).orElseThrow(() -> new ObjectNotFoundException(
+            "AbstractImage",
+            abstractImageId
+        ));
         return Optional.ofNullable(abstractImage.getUploadedFile()).map(UploadedFile::getUser).orElse(null);
     }
 
@@ -179,7 +184,10 @@ public class AbstractImageService extends ModelService {
      * Check if some instances of this image exists and are still active
      */
     public boolean isAbstractImageUsed(Long abstractImageId) {
-        AbstractImage domain = find(abstractImageId).orElseThrow(() -> new ObjectNotFoundException("AbstractImage", abstractImageId));
+        AbstractImage domain = find(abstractImageId).orElseThrow(() -> new ObjectNotFoundException(
+            "AbstractImage",
+            abstractImageId
+        ));
         return isAbstractImageUsed(domain);
     }
 
@@ -203,23 +211,30 @@ public class AbstractImageService extends ModelService {
     }
 
     public Page<AbstractImage> list(Project project, List<SearchParameterEntry> searchParameters, Pageable pageable) {
-        List<SearchParameterEntry> validSearchParameters = SQLSearchParameter.getDomainAssociatedSearchParameters(AbstractImage.class, searchParameters, getEntityManager());
+        List<SearchParameterEntry> validSearchParameters = SQLSearchParameter.getDomainAssociatedSearchParameters(
+            AbstractImage.class,
+            searchParameters,
+            getEntityManager()
+        );
 
-        Specification<AbstractImage> specification = SpecificationBuilder.getSpecificationFromFilters(validSearchParameters);
+        Specification<AbstractImage> specification = SpecificationBuilder.getSpecificationFromFilters(
+            validSearchParameters);
 
         if (!currentRoleService.isAdminByNow(currentUserService.getCurrentUser())) {
             List<Storage> storages = securityACLService.getStorageList(currentUserService.getCurrentUser(), false);
             Specification<AbstractImage> filterStorages = (root, query, criteriaBuilder) -> {
-                    Join<AbstractImage, UploadedFile> uploadedFileJoin = root.join(AbstractImage_.uploadedFile);
-                    return criteriaBuilder.in(uploadedFileJoin.get("storage")).value(storages);
+                Join<AbstractImage, UploadedFile> uploadedFileJoin = root.join(AbstractImage_.uploadedFile);
+                return criteriaBuilder.in(uploadedFileJoin.get("storage")).value(storages);
             };
             specification = specification.and(filterStorages);
         }
         Page<AbstractImage> images = abstractImageRepository.findAll(specification, pageable);
 
         if (project != null) {
-            TreeSet<Long> inProjectImagesId = new TreeSet<>(imageInstanceRepository.findAllByProject(project).stream().map(x -> x.getBaseImage().getId())
-                    .collect(Collectors.toList()));
+            TreeSet<Long> inProjectImagesId = new TreeSet<>(imageInstanceRepository.findAllByProject(project)
+                .stream()
+                .map(x -> x.getBaseImage().getId())
+                .collect(Collectors.toList()));
             for (AbstractImage abstractImage : images.getContent()) {
                 abstractImage.setInProject(inProjectImagesId.contains(abstractImage.getId()));
             }
@@ -230,7 +245,9 @@ public class AbstractImageService extends ModelService {
 
     /**
      * Add the new domain with JSON data
+     *
      * @param json New domain data
+     *
      * @return Response structure (created domain data,..)
      */
     public CommandResponse add(JsonObject json) {
@@ -241,42 +258,60 @@ public class AbstractImageService extends ModelService {
         if (!json.isMissing("uploadedFile")) {
             //TODO: ???
         }
-        return executeCommand(new AddCommand(currentUser),null, json);
+        return executeCommand(new AddCommand(currentUser), null, json);
 
     }
 
     /**
      * Update this domain with new data from json
-     * @param domain Domain to update
+     *
+     * @param domain      Domain to update
      * @param jsonNewData New domain datas
-     * @return  Response structure (new domain data, old domain data..)
+     *
+     * @return Response structure (new domain data, old domain data..)
      */
     @Override
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
         User currentUser = currentUserService.getCurrentUser();
-        securityACLService.check(domain.container(),WRITE);
+        securityACLService.check(domain.container(), WRITE);
 
         JsonObject versionBeforeUpdate = domain.toJsonObject();
 
-        CommandResponse commandResponse = executeCommand(new EditCommand(currentUser, transaction), domain,jsonNewData);
-        AbstractImage abstractImage = (AbstractImage)commandResponse.getObject();
+        CommandResponse commandResponse = executeCommand(
+            new EditCommand(currentUser, transaction),
+            domain,
+            jsonNewData
+        );
+        AbstractImage abstractImage = (AbstractImage) commandResponse.getObject();
 
-        Integer magnification = versionBeforeUpdate.getJSONAttrInteger("magnification",null);
-        Double physicalSizeX = versionBeforeUpdate.getJSONAttrDouble("physicalSizeX",null);
+        Integer magnification = versionBeforeUpdate.getJSONAttrInteger("magnification", null);
+        Double physicalSizeX = versionBeforeUpdate.getJSONAttrDouble("physicalSizeX", null);
 
         boolean magnificationUpdated = !Objects.equals(magnification, abstractImage.getMagnification());
         boolean physicalSizeXUpdated = !Objects.equals(physicalSizeX, abstractImage.getPhysicalSizeX());
 
         List<ImageInstance> images = new ArrayList<>();
-        if(physicalSizeXUpdated && magnificationUpdated ) {
-            if(physicalSizeX!= null && magnification!= null) {
-                images.addAll(imageInstanceRepository.findAllByBaseImage(abstractImage, x -> physicalSizeX.equals(x.getPhysicalSizeX()) && magnification.equals(x.getMagnification())));
-            } else if(physicalSizeX!= null) {
-                images.addAll(imageInstanceRepository.findAllByBaseImage(abstractImage, x -> physicalSizeX.equals(x.getPhysicalSizeX()) && x.getMagnification()==null));
-            } else if(magnification!= null) {
-                images.addAll(imageInstanceRepository.findAllByBaseImage(abstractImage, x -> magnification.equals(x.getMagnification()) && x.getPhysicalSizeX()==null));
+        if (physicalSizeXUpdated && magnificationUpdated) {
+            if (physicalSizeX != null && magnification != null) {
+                images.addAll(imageInstanceRepository.findAllByBaseImage(
+                    abstractImage,
+                    x -> physicalSizeX.equals(x.getPhysicalSizeX()) && magnification.equals(x.getMagnification())
+                ));
+            } else if (physicalSizeX != null) {
+                images.addAll(imageInstanceRepository.findAllByBaseImage(
+                    abstractImage,
+                    x -> physicalSizeX.equals(x.getPhysicalSizeX()) && x.getMagnification() == null
+                ));
+            } else if (magnification != null) {
+                images.addAll(imageInstanceRepository.findAllByBaseImage(
+                    abstractImage,
+                    x -> magnification.equals(x.getMagnification()) && x.getPhysicalSizeX() == null
+                ));
             } else {
-                images.addAll(imageInstanceRepository.findAllByBaseImage(abstractImage, x -> x.getMagnification()==null && x.getPhysicalSizeX()==null));
+                images.addAll(imageInstanceRepository.findAllByBaseImage(
+                    abstractImage,
+                    x -> x.getMagnification() == null && x.getPhysicalSizeX() == null
+                ));
             }
             for (ImageInstance image : images) {
                 JsonObject json = image.toJsonObject();
@@ -285,10 +320,16 @@ public class AbstractImageService extends ModelService {
                 imageInstanceService.update(image, json);
             }
         } else if (physicalSizeXUpdated) {
-            if(physicalSizeX!= null) {
-                images.addAll(imageInstanceRepository.findAllByBaseImage(abstractImage, x -> physicalSizeX.equals(x.getPhysicalSizeX()) ));
+            if (physicalSizeX != null) {
+                images.addAll(imageInstanceRepository.findAllByBaseImage(
+                    abstractImage,
+                    x -> physicalSizeX.equals(x.getPhysicalSizeX())
+                ));
             } else {
-                images.addAll(imageInstanceRepository.findAllByBaseImage(abstractImage, x -> x.getPhysicalSizeX()==null));
+                images.addAll(imageInstanceRepository.findAllByBaseImage(
+                    abstractImage,
+                    x -> x.getPhysicalSizeX() == null
+                ));
             }
 
             for (ImageInstance image : images) {
@@ -297,11 +338,17 @@ public class AbstractImageService extends ModelService {
                 imageInstanceService.update(image, json);
             }
         }
-        if(magnificationUpdated) {
-            if(magnification!= null) {
-                images.addAll(imageInstanceRepository.findAllByBaseImage(abstractImage, x -> magnification.equals(x.getMagnification()) ));
+        if (magnificationUpdated) {
+            if (magnification != null) {
+                images.addAll(imageInstanceRepository.findAllByBaseImage(
+                    abstractImage,
+                    x -> magnification.equals(x.getMagnification())
+                ));
             } else {
-                images.addAll(imageInstanceRepository.findAllByBaseImage(abstractImage, x -> x.getMagnification()==null));
+                images.addAll(imageInstanceRepository.findAllByBaseImage(
+                    abstractImage,
+                    x -> x.getMagnification() == null
+                ));
             }
 
             for (ImageInstance image : images) {
@@ -315,28 +362,37 @@ public class AbstractImageService extends ModelService {
 
     /**
      * Delete this domain
-     * @param domain Domain to delete
-     * @param transaction Transaction link with this command
-     * @param task Task for this command
+     *
+     * @param domain       Domain to delete
+     * @param transaction  Transaction link with this command
+     * @param task         Task for this command
      * @param printMessage Flag if client will print or not confirm message
+     *
      * @return Response structure (code, old domain,..)
      */
     @Override
     public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
-        securityACLService.check(domain.container(),WRITE);
+        securityACLService.check(domain.container(), WRITE);
 
         if (!isAbstractImageUsed(domain.getId())) {
             Command c = new DeleteCommand(currentUser, transaction);
-            return executeCommand(c,domain, null);
+            return executeCommand(c, domain, null);
         } else {
             List<ImageInstance> instances = imageInstanceRepository.findAllByBaseImage((AbstractImage) domain);
-            throw new ForbiddenException("Abstract Image has instances in active projects : " +
+            throw new ForbiddenException(
+                "Abstract Image has instances in active projects : " +
                     instances.stream().map(x -> x.getProject().getName()).collect(Collectors.joining(",")) +
                     " with the following names : " +
                     instances.stream().map(x -> x.getInstanceFilename()).distinct().collect(Collectors.joining(",")),
-                    Map.of("projectNames", instances.stream().map(x -> x.getProject().getName()).collect(Collectors.toList()), "imageNames", instances.stream().map(x -> x.getInstanceFilename()).distinct().collect(Collectors.toList())));
+                Map.of(
+                    "projectNames",
+                    instances.stream().map(x -> x.getProject().getName()).collect(Collectors.toList()),
+                    "imageNames",
+                    instances.stream().map(x -> x.getInstanceFilename()).distinct().collect(Collectors.toList())
+                )
+            );
         }
 
 
@@ -348,14 +404,14 @@ public class AbstractImageService extends ModelService {
     }
 
     public void deleteDependencies(CytomineDomain domain, Transaction transaction, Task task) {
-        deleteDependentAbstractSlice((AbstractImage)domain, transaction, task);
-        deleteDependentImageInstance((AbstractImage)domain, transaction, task);
-        deleteDependentCompanionFile((AbstractImage)domain, transaction, task);
-        deleteDependentAttachedFile((AbstractImage)domain, transaction, task);
-        deleteDependentNestedImageInstance((AbstractImage)domain, transaction, task);
+        deleteDependentAbstractSlice((AbstractImage) domain, transaction, task);
+        deleteDependentImageInstance((AbstractImage) domain, transaction, task);
+        deleteDependentCompanionFile((AbstractImage) domain, transaction, task);
+        deleteDependentAttachedFile((AbstractImage) domain, transaction, task);
+        deleteDependentNestedImageInstance((AbstractImage) domain, transaction, task);
     }
 
-    private void  deleteDependentAbstractSlice(AbstractImage ai, Transaction transaction, Task task) {
+    private void deleteDependentAbstractSlice(AbstractImage ai, Transaction transaction, Task task) {
         List<AbstractSlice> slices = abstractSliceRepository.findAllByImage(ai);
         for (AbstractSlice slice : slices) {
             abstractSliceService.delete(slice, transaction, task, false);
@@ -363,31 +419,31 @@ public class AbstractImageService extends ModelService {
 
     }
 
-    private void deleteDependentImageInstance(AbstractImage ai, Transaction transaction,Task task) {
+    private void deleteDependentImageInstance(AbstractImage ai, Transaction transaction, Task task) {
         List<ImageInstance> images = imageInstanceRepository.findAllByBaseImage(ai);
-        if(!images.isEmpty()) {
+        if (!images.isEmpty()) {
             throw new ConstraintException("This image cannot be deleted as it has already been insert " +
-                    "in projects " + images.stream().map(x -> x.getProject().getName()).collect(Collectors.joining(",")));
+                "in projects " + images.stream().map(x -> x.getProject().getName()).collect(Collectors.joining(",")));
         }
     }
 
-    private void deleteDependentCompanionFile (AbstractImage ai, Transaction transaction, Task task) {
+    private void deleteDependentCompanionFile(AbstractImage ai, Transaction transaction, Task task) {
         List<CompanionFile> companionFiles = companionFileRepository.findAllByImage(ai);
         for (CompanionFile companionFile : companionFiles) {
             companionFileService.delete(companionFile, transaction, task, false);
         }
     }
 
-    private void deleteDependentAttachedFile(AbstractImage ai, Transaction transaction,Task task)  {
+    private void deleteDependentAttachedFile(AbstractImage ai, Transaction transaction, Task task) {
         List<AttachedFile> attachedFiles = attachedFileService.findAllByDomain(ai);
         for (AttachedFile attachedFile : attachedFiles) {
             attachedFileService.delete(attachedFile, transaction, task, false);
         }
     }
 
-    private void  deleteDependentNestedImageInstance(AbstractImage ai, Transaction transaction,Task task) {
+    private void deleteDependentNestedImageInstance(AbstractImage ai, Transaction transaction, Task task) {
         List<NestedImageInstance> nestedImageInstances = nestedImageInstanceRepository.findAllByBaseImage(ai);
-        for(NestedImageInstance nestedImageInstance : nestedImageInstances) {
+        for (NestedImageInstance nestedImageInstance : nestedImageInstances) {
             nestedImageInstanceRepository.delete(nestedImageInstance);
         }
     }

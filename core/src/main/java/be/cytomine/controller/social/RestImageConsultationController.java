@@ -46,8 +46,8 @@ public class RestImageConsultationController extends RestCytomineController {
 
     @PostMapping("/imageinstance/{id}/consultation.json")
     public ResponseEntity<String> add(
-            @PathVariable("id") Long imageId,
-            @RequestBody JsonObject json
+        @PathVariable("id") Long imageId,
+        @RequestBody JsonObject json
     ) {
         log.info("add an image consultation for image {}", imageId);
         User user = currentUserService.getCurrentUser();
@@ -58,10 +58,10 @@ public class RestImageConsultationController extends RestCytomineController {
 
     @GetMapping("/project/{project}/lastImages.json")
     public ResponseEntity<String> lastImageOfUsersByProject(
-            @PathVariable("project") Long projectId
+        @PathVariable("project") Long projectId
     ) {
         Project project = projectService.find(projectId)
-                .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
+            .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
         return responseSuccess(imageConsultationService.lastImageOfUsersByProject(
             project, null, "created", "desc", 0L, 0L)
         );
@@ -76,14 +76,14 @@ public class RestImageConsultationController extends RestCytomineController {
 
     @GetMapping("/project/{project}/user/{user}/imageconsultation.json")
     public ResponseEntity<String> listImageConsultationByProjectAndUser(
-            @PathVariable("project") Long projectId,
-            @PathVariable("user") Long userId,
-            @RequestParam(required = false, defaultValue = "false") Boolean distinctImages,
-            @RequestParam(required = false, defaultValue = "0") Integer max,
-            @RequestParam(required = false, defaultValue = "0") Integer offset
+        @PathVariable("project") Long projectId,
+        @PathVariable("user") Long userId,
+        @RequestParam(required = false, defaultValue = "false") Boolean distinctImages,
+        @RequestParam(required = false, defaultValue = "0") Integer max,
+        @RequestParam(required = false, defaultValue = "0") Integer offset
     ) {
         Project project = projectService.find(projectId)
-                .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
+            .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
         User user = userService.find(userId).orElseThrow(() -> new ObjectNotFoundException("User", userId));
 
         if (distinctImages) {
@@ -99,12 +99,12 @@ public class RestImageConsultationController extends RestCytomineController {
 
     @GetMapping("/project/{project}/imageconsultation/count.json")
     public ResponseEntity<String> countByProject(
-            @PathVariable("project") Long projectId,
-            @RequestParam(required = false) Long startDate,
-            @RequestParam(required = false) Long endDate
+        @PathVariable("project") Long projectId,
+        @RequestParam(required = false) Long startDate,
+        @RequestParam(required = false) Long endDate
     ) {
         Project project = projectService.find(projectId)
-                .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
+            .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
 
         return responseSuccess(
             JsonObject.of("total", imageConsultationService.countByProject(project, startDate, endDate))
@@ -113,23 +113,24 @@ public class RestImageConsultationController extends RestCytomineController {
 
     @GetMapping("/imageconsultation/resume.json")
     public ResponseEntity<String> resumeByUserAndProject(
-            @RequestParam(value = "user") Long userId,
-            @RequestParam(value = "project") Long projectId,
-            @RequestParam(required = false, value = "export") String export
+        @RequestParam(value = "user") Long userId,
+        @RequestParam(value = "project") Long projectId,
+        @RequestParam(required = false, value = "export") String export
     ) throws IOException {
         List<JsonObject> results = imageConsultationService.resumeByUserAndProject(userId, projectId);
         if (export != null && export.equals("csv")) {
 
             Project project = projectService.find(projectId)
-                    .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
+                .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
             User user = userService.findUser(userId)
-                    .orElseThrow(() -> new ObjectNotFoundException("User", userId));
+                .orElseThrow(() -> new ObjectNotFoundException("User", userId));
 
             byte[] report = reportService.generateImageConsultationReport(
                 project.getName(), user.getUsername(), results
             );
-            responseReportFile(reportService.getImageConsultationReportFileName(
-                export, projectId, userId), report, export
+            responseReportFile(
+                reportService.getImageConsultationReportFileName(
+                    export, projectId, userId), report, export
             );
             return null;
         } else {

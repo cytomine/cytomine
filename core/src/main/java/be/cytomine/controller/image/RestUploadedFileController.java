@@ -55,10 +55,11 @@ public class RestUploadedFileController extends RestCytomineController {
             return responseSuccess(uploadedFileService.listHierarchicalTree(currentUserService.getCurrentUser(), root));
         } else if (onlyRootsWithDetails) {
             return responseSuccess(uploadedFileService.list(
-                retrieveSearchParameters(),
-                requestParams.getSort(),
-                requestParams.getOrder(),
-                withTreeDetails)
+                    retrieveSearchParameters(),
+                    requestParams.getSort(),
+                    requestParams.getOrder(),
+                    withTreeDetails
+                )
             );
         } else if (all) {
             return responseSuccess(uploadedFileService.list(retrievePageable()));

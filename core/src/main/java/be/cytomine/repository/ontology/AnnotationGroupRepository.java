@@ -27,7 +27,8 @@ import be.cytomine.domain.ontology.AnnotationGroup;
 import be.cytomine.domain.project.Project;
 
 @Repository
-public interface AnnotationGroupRepository extends JpaRepository<AnnotationGroup, Long>, JpaSpecificationExecutor<AnnotationGroup> {
+public interface AnnotationGroupRepository
+    extends JpaRepository<AnnotationGroup, Long>, JpaSpecificationExecutor<AnnotationGroup> {
 
     List<AnnotationGroup> findAllByImageGroup(ImageGroup group);
 

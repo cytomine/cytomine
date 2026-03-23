@@ -30,8 +30,7 @@ import be.cytomine.service.social.UserPositionService;
 import be.cytomine.utils.JsonObject;
 
 /**
- * Controller for user position
- * Position of the user (x,y) on an image for a time
+ * Controller for user position Position of the user (x,y) on an image for a time
  */
 @RestController
 @RequestMapping("/api")
@@ -190,7 +189,8 @@ public class RestUserPositionController extends RestCytomineController {
     @GetMapping("/imageinstance/{image}/followers/{user}.json")
     public ResponseEntity<String> listFollowers(
         @PathVariable("image") Long imageId,
-        @PathVariable("user") Long userId) {
+        @PathVariable("user") Long userId
+    ) {
         log.debug("REST request get list of followers");
         User user = userService.find(userId)
             .orElseThrow(() -> new ObjectNotFoundException("User", userId));

@@ -1,20 +1,20 @@
 package be.cytomine.service.meta;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 import java.util.Arrays;
 import java.util.List;
@@ -74,7 +74,10 @@ public class ConfigurationService extends ModelService {
         if (currentRoleService.isAdminByNow(currentUser)) {
             return configurationRepository.findAll();
         } else if (currentRoleService.isUser(currentUser)) {
-            return configurationRepository.findAllByReadingRoleIn(List.of(ConfigurationReadingRole.ALL, ConfigurationReadingRole.USER));
+            return configurationRepository.findAllByReadingRoleIn(List.of(
+                ConfigurationReadingRole.ALL,
+                ConfigurationReadingRole.USER
+            ));
         } else {
             return configurationRepository.findAllByReadingRole(ConfigurationReadingRole.ALL);
         }
@@ -95,7 +98,7 @@ public class ConfigurationService extends ModelService {
         if (currentRoleService.isAdminByNow(currentUser)) {
             return;
         }
-        if (currentRoleService.isUser(currentUser)  && config.getReadingRole().equals(ConfigurationReadingRole.USER)) {
+        if (currentRoleService.isUser(currentUser) && config.getReadingRole().equals(ConfigurationReadingRole.USER)) {
             return;
         }
 
@@ -106,7 +109,7 @@ public class ConfigurationService extends ModelService {
     public CommandResponse add(JsonObject jsonObject) {
         securityACLService.checkAdmin(currentUserService.getCurrentUser());
         User currentUser = currentUserService.getCurrentUser();
-        return executeCommand(new AddCommand(currentUser),null,jsonObject);
+        return executeCommand(new AddCommand(currentUser), null, jsonObject);
     }
 
 
@@ -114,7 +117,7 @@ public class ConfigurationService extends ModelService {
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
         securityACLService.checkAdmin(currentUserService.getCurrentUser());
         User currentUser = currentUserService.getCurrentUser();
-        return executeCommand(new EditCommand(currentUser, transaction), domain,jsonNewData);
+        return executeCommand(new EditCommand(currentUser, transaction), domain, jsonNewData);
     }
 
     @Override
@@ -122,7 +125,7 @@ public class ConfigurationService extends ModelService {
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.checkAdmin(currentUser);
         Command c = new DeleteCommand(currentUser, transaction);
-        return executeCommand(c,domain, null);
+        return executeCommand(c, domain, null);
     }
 
     @Override
@@ -132,15 +135,20 @@ public class ConfigurationService extends ModelService {
 
     @Override
     public List<String> getStringParamsI18n(CytomineDomain domain) {
-        Configuration configuration = (Configuration)domain;
+        Configuration configuration = (Configuration) domain;
         return Arrays.asList(configuration.getKey());
     }
 
     @Override
     public void checkDoNotAlreadyExist(CytomineDomain domain) {
-        Optional<Configuration> configurationAlreadyExist = configurationRepository.findByKey(((Configuration)domain).getKey());
-        if (configurationAlreadyExist.isPresent() && (!Objects.equals(configurationAlreadyExist.get().getId(), domain.getId()))) {
-            throw new AlreadyExistException("Configuration " + ((Configuration)domain).getKey()+ " already exists");
+        Optional<Configuration>
+            configurationAlreadyExist
+            = configurationRepository.findByKey(((Configuration) domain).getKey());
+        if (configurationAlreadyExist.isPresent() && (!Objects.equals(
+            configurationAlreadyExist.get().getId(),
+            domain.getId()
+        ))) {
+            throw new AlreadyExistException("Configuration " + ((Configuration) domain).getKey() + " already exists");
         }
     }
 

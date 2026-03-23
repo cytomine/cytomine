@@ -370,13 +370,12 @@ public abstract class RestCytomineController {
     }
 
     /**
-     * Call add function for this service with the json
-     * json parameter can be an array or a single item
-     * If json is array => add multiple item
-     * otherwise add single item
+     * Call add function for this service with the json json parameter can be an array or a single item If json is array
+     * => add multiple item otherwise add single item
      *
      * @param service Service for this domain
      * @param json    JSON data
+     *
      * @return response
      */
     public ResponseEntity<String> add(ModelService service, JsonInput json, Task task) {
@@ -411,6 +410,7 @@ public abstract class RestCytomineController {
      *
      * @param service Service for this domain
      * @param json    JSON data
+     *
      * @return response
      */
     public ResponseEntity<String> update(ModelService service, JsonObject json, Task task) {
@@ -429,6 +429,7 @@ public abstract class RestCytomineController {
      *
      * @param service Service for this domain
      * @param json    JSON data
+     *
      * @return response
      */
     public ResponseEntity<String> delete(ModelService service, JsonObject json, Task task) {
@@ -447,6 +448,7 @@ public abstract class RestCytomineController {
      *
      * @param service Service for this domain
      * @param json    JSON data
+     *
      * @return response
      */
     public CommandResponse addOne(ModelService service, JsonObject json) {

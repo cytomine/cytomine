@@ -40,31 +40,31 @@ public class RestProjectRepresentativeUserController extends RestCytomineControl
 
     @GetMapping("/project/{id}/representative.json")
     public ResponseEntity<String> listByProject(
-            @PathVariable Long id
+        @PathVariable Long id
     ) {
         log.debug("REST request to list projectRepresentativeUsers for project {}", id);
         Project project = projectService.find(id)
-                .orElseThrow(() -> new ObjectNotFoundException("Project", id));
+            .orElseThrow(() -> new ObjectNotFoundException("Project", id));
         return responseSuccess(projectRepresentativeUserService.listByProject(project));
     }
 
     @GetMapping("/project/{project}/representative/{id}.json")
     public ResponseEntity<String> show(
-            @PathVariable("project") Long projectId,
-            @PathVariable Long id
+        @PathVariable("project") Long projectId,
+        @PathVariable Long id
     ) {
         log.debug("REST request to get ProjectRepresentativeUser : {}", id);
         Project project = projectService.find(projectId)
-                .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
+            .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
         return projectRepresentativeUserService.find(id)
-                .map(this::responseSuccess)
-                .orElseGet(() -> responseNotFound("ProjectRepresentativeUser", id));
+            .map(this::responseSuccess)
+            .orElseGet(() -> responseNotFound("ProjectRepresentativeUser", id));
     }
-    
+
     @PostMapping("/project/{id}/representative.json")
     public ResponseEntity<String> add(
-            @PathVariable Long id,
-            @RequestBody JsonObject json
+        @PathVariable Long id,
+        @RequestBody JsonObject json
     ) {
         log.debug("REST request to save ProjectRepresentativeUser : " + json);
         return add(projectRepresentativeUserService, json);
@@ -72,25 +72,27 @@ public class RestProjectRepresentativeUserController extends RestCytomineControl
 
     @DeleteMapping({"/project/{project}/representative/{id}.json", "/project/{project}/representative.json"})
     public ResponseEntity<String> delete(
-            @PathVariable(value = "project", required = true) Long projectId,
-            @PathVariable(required = false) Long id,
-            @RequestParam(value = "user", required = false) Long userId,
-            @RequestParam(required = false) Long task) {
+        @PathVariable(value = "project", required = true) Long projectId,
+        @PathVariable(required = false) Long id,
+        @RequestParam(value = "user", required = false) Long userId,
+        @RequestParam(required = false) Long task
+    ) {
         log.debug("REST request to delete ProjectRepresentativeUser");
 
         ProjectRepresentativeUser projectRepresentativeUser;
         if (id != null) {
             projectRepresentativeUser = projectRepresentativeUserService.find(id)
-                    .orElseThrow(() -> new ObjectNotFoundException("ProjectRepresentativeUser", id));
+                .orElseThrow(() -> new ObjectNotFoundException("ProjectRepresentativeUser", id));
         } else {
             Project project = projectService.find(projectId)
-                    .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
+                .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
             User user = userService.findUser(userId)
-                    .orElseThrow(() -> new ObjectNotFoundException("User", userId));
+                .orElseThrow(() -> new ObjectNotFoundException("User", userId));
             projectRepresentativeUser = projectRepresentativeUserService.find(project, user)
-                    .orElseThrow(() -> new ObjectNotFoundException(
-                        "ProjectRepresentativeUser",
-                        JsonObject.of("project", projectId, "user", userId).toJsonString()));
+                .orElseThrow(() -> new ObjectNotFoundException(
+                    "ProjectRepresentativeUser",
+                    JsonObject.of("project", projectId, "user", userId).toJsonString()
+                ));
         }
         Task existingTask = taskService.get(task);
         return delete(

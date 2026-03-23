@@ -144,23 +144,27 @@ public class RestImageInstanceController extends RestCytomineController {
             return responseSuccess(
                 imageInstanceService.listLight(project), securityACLService.isFilterRequired(project));
         } else if (tree) {
-            return responseSuccess(imageInstanceService.listTree(
+            return responseSuccess(
+                imageInstanceService.listTree(
                     project,
                     requestParams.getOffset(),
-                    requestParams.getMax()),
+                    requestParams.getMax()
+                ),
                 securityACLService.isFilterRequired(project)
             );
         } else if (withLastActivity) {
             ImageSearchExtension imageSearchExtension = new ImageSearchExtension();
             imageSearchExtension.setWithLastActivity(withLastActivity);
-            return responseSuccess(imageInstanceService.listExtended(
+            return responseSuccess(
+                imageInstanceService.listExtended(
                     project,
                     imageSearchExtension,
                     retrieveSearchParameters(),
                     requestParams.getSort(),
                     requestParams.getOrder(),
                     requestParams.getOffset(),
-                    requestParams.getMax()),
+                    requestParams.getMax()
+                ),
                 securityACLService.isFilterRequired(project)
             );
         } else {
@@ -303,7 +307,8 @@ public class RestImageInstanceController extends RestCytomineController {
     @GetMapping("/imageinstance/{id}/histogram.json")
     public ResponseEntity<String> histogram(
         @PathVariable Long id,
-        @RequestParam(required = false, defaultValue = "256") Integer nBins) throws IOException {
+        @RequestParam(required = false, defaultValue = "256") Integer nBins
+    ) throws IOException {
         log.debug("REST request to get histogram images");
         ImageInstance imageInstance = imageInstanceService.find(id)
             .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", id));
@@ -321,7 +326,8 @@ public class RestImageInstanceController extends RestCytomineController {
     @GetMapping("/imageinstance/{id}/channelhistogram.json")
     public ResponseEntity<String> channelHistograms(
         @PathVariable Long id,
-        @RequestParam(required = false, defaultValue = "256") Integer nBins) throws IOException {
+        @RequestParam(required = false, defaultValue = "256") Integer nBins
+    ) throws IOException {
         log.debug("REST request to get channelhistogram images");
         ImageInstance imageInstance = imageInstanceService.find(id)
             .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", id));
@@ -347,7 +353,8 @@ public class RestImageInstanceController extends RestCytomineController {
         @PathVariable String format,
         @RequestParam(defaultValue = "256") Integer maxSize,
 
-        ProxyExchange<byte[]> proxy) throws IOException {
+        ProxyExchange<byte[]> proxy
+    ) throws IOException {
         log.debug("REST request to get associated image of an imageInstance image");
         ImageInstance imageInstance = imageInstanceService.find(id)
             .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", id));

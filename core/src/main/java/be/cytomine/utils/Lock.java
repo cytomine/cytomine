@@ -19,7 +19,8 @@ public class Lock {
     private Map<Long, ReentrantLock> customUILocks = new ConcurrentHashMap<>();
     private static Lock lock = null;
 
-    private Lock() {}
+    private Lock() {
+    }
 
     public static Lock getInstance() {
         synchronized (Lock.class) {

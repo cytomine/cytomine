@@ -37,12 +37,12 @@ public class RestTagController extends RestCytomineController {
 
     @GetMapping("/tag/{id}.json")
     public ResponseEntity<String> show(
-            @PathVariable Long id
+        @PathVariable Long id
     ) {
         log.debug("REST request to get Tag : {}", id);
         return tagService.find(id)
-                .map(this::responseSuccess)
-                .orElseGet(() -> responseNotFound("Tag", id));
+            .map(this::responseSuccess)
+            .orElseGet(() -> responseNotFound("Tag", id));
     }
 
     @PostMapping("/tag.json")

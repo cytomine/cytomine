@@ -314,7 +314,8 @@ public class RestSliceInstanceController extends RestCytomineController {
     @GetMapping("/sliceinstance/{id}/histogram.json")
     public ResponseEntity<String> histogram(
         @PathVariable Long id,
-        @RequestParam(required = false, defaultValue = "256") Integer nBins) throws IOException {
+        @RequestParam(required = false, defaultValue = "256") Integer nBins
+    ) throws IOException {
         log.debug("REST request to get histogram slice");
         SliceInstance sliceInstance = sliceInstanceService.find(id)
             .orElseThrow(() -> new ObjectNotFoundException("sliceInstance", id));
@@ -332,7 +333,8 @@ public class RestSliceInstanceController extends RestCytomineController {
     @GetMapping("/sliceinstance/{id}/channelhistogram.json")
     public ResponseEntity<String> channelHistograms(
         @PathVariable Long id,
-        @RequestParam(required = false, defaultValue = "256") Integer nBins) throws IOException {
+        @RequestParam(required = false, defaultValue = "256") Integer nBins
+    ) throws IOException {
         log.debug("REST request to get channelhistogram slice");
         SliceInstance sliceInstance = sliceInstanceService.find(id)
             .orElseThrow(() -> new ObjectNotFoundException("sliceInstance", id));

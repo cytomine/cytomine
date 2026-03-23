@@ -135,9 +135,8 @@ public class RestReviewedAnnotationController extends RestCytomineController {
     }
 
     /**
-     * Add reviewed annotation
-     * Only use to create a reviewed annotation with all json data.
-     * Its better to use 'addAnnotationReview' that needs only the annotation id and a list of term
+     * Add reviewed annotation Only use to create a reviewed annotation with all json data. Its better to use
+     * 'addAnnotationReview' that needs only the annotation id and a list of term
      */
     @PostMapping("/reviewedannotation.json")
     public ResponseEntity<String> add(@RequestBody String json) {
@@ -159,8 +158,7 @@ public class RestReviewedAnnotationController extends RestCytomineController {
 
 
     /**
-     * Start the review mode on an image
-     * To review annotation, a user must enable review mode in the current image
+     * Start the review mode on an image To review annotation, a user must enable review mode in the current image
      */
     @RequestMapping(value = "/imageinstance/{image}/review.json", method = {POST, PUT})
     public ResponseEntity<String> startImageInstanceReview(
@@ -180,8 +178,7 @@ public class RestReviewedAnnotationController extends RestCytomineController {
     }
 
     /**
-     * Start the review mode on an image
-     * To review annotation, a user must enable review mode in the current image
+     * Start the review mode on an image To review annotation, a user must enable review mode in the current image
      */
     @DeleteMapping("/imageinstance/{image}/review.json")
     public ResponseEntity<String> stopImageInstanceReview(
@@ -232,10 +229,8 @@ public class RestReviewedAnnotationController extends RestCytomineController {
 
 
     /**
-     * Review all annotation in image for a user
-     * It support the task functionnality, if task param is set,
-     * this method will update its progress status to the task.
-     * User can access task status by getting the task info
+     * Review all annotation in image for a user It support the task functionnality, if task param is set, this method
+     * will update its progress status to the task. User can access task status by getting the task info
      */
     @RequestMapping(value = "/imageinstance/{image}/annotation/review.json", method = {POST, PUT})
     public ResponseEntity<String> reviewLayer(

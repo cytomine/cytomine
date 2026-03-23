@@ -120,13 +120,23 @@ public class AnnotationGroupService extends ModelService {
         if (ag == null || agToMerge == null) {
             throw new ObjectNotFoundException("AnnotationGroup {} not found.", ag == null ? id : mergedId);
         }
-        if (ag.getProject() != agToMerge.getProject() || ag.getImageGroup() != agToMerge.getImageGroup() || !ag.getType().equals(agToMerge.getType())) {
-            throw new InvalidRequestException("Annotation groups " + id + " and " + mergedId + " are incompatible to be merged.");
+        if (ag.getProject() != agToMerge.getProject()
+            || ag.getImageGroup() != agToMerge.getImageGroup()
+            || !ag.getType().equals(agToMerge.getType())) {
+            throw new InvalidRequestException("Annotation groups "
+                + id
+                + " and "
+                + mergedId
+                + " are incompatible to be merged.");
         }
 
         annotationLinkRepository.setMergedAnnotationGroup(ag, agToMerge);
         annotationGroupRepository.delete(agToMerge);
 
-        return executeCommand(new EditCommand(currentUserService.getCurrentUser(), null), ag, AnnotationGroup.getDataFromDomain(ag));
+        return executeCommand(
+            new EditCommand(currentUserService.getCurrentUser(), null),
+            ag,
+            AnnotationGroup.getDataFromDomain(ag)
+        );
     }
 }

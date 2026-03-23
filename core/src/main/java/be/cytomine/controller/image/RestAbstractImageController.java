@@ -200,7 +200,8 @@ public class RestAbstractImageController extends RestCytomineController {
         @PathVariable String format,
         @RequestParam(defaultValue = "256") Integer maxSize,
 
-        ProxyExchange<byte[]> proxy) throws IOException {
+        ProxyExchange<byte[]> proxy
+    ) throws IOException {
         log.debug("REST request to get associated image of a abstract image");
         AbstractImage abstractImage = abstractImageService.find(id)
             .orElseThrow(() -> new ObjectNotFoundException("AbstractImage", id));
@@ -375,7 +376,8 @@ public class RestAbstractImageController extends RestCytomineController {
     public ResponseEntity<byte[]> download(
         @PathVariable Long id,
         @RequestParam String Authorization,
-        ProxyExchange<byte[]> proxy) throws IOException {
+        ProxyExchange<byte[]> proxy
+    ) throws IOException {
         log.debug("REST request to download image instance");
         AbstractImage abstractImage = abstractImageService.find(id, Authorization)
             .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", id));

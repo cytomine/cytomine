@@ -36,12 +36,12 @@ public class RestImageFilterProjectController extends RestCytomineController {
 
     @GetMapping("/project/{id}/imagefilterproject.json")
     public ResponseEntity<String> listByProject(
-            @PathVariable Long id
+        @PathVariable Long id
     ) {
         log.debug("REST request to list imagefilterproject for project {}", id);
         return projectService.find(id)
-                .map(project -> responseSuccess(imageFilterProjectService.list(project)))
-                .orElseThrow(() -> new ObjectNotFoundException("Project", id));
+            .map(project -> responseSuccess(imageFilterProjectService.list(project)))
+            .orElseThrow(() -> new ObjectNotFoundException("Project", id));
     }
 
     @PostMapping("/imagefilterproject.json")

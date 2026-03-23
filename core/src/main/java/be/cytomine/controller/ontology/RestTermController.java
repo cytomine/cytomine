@@ -47,10 +47,10 @@ public class RestTermController extends RestCytomineController {
     }
 
     /**
-     * Add a new term
-     * Use next add relation-term to add relation with another term
+     * Add a new term Use next add relation-term to add relation with another term
      *
      * @param json JSON with Term data
+     *
      * @return Response map with .code = http response code and .data.term = new created Term
      */
     @PostMapping("/term.json")
@@ -64,8 +64,9 @@ public class RestTermController extends RestCytomineController {
      *
      * @param id   Term id
      * @param json JSON with the new Term data
-     * @return Response map with .code = http response code
-     * and .data.newTerm = new created Term and  .data.oldTerm = old term value
+     *
+     * @return Response map with .code = http response code and .data.newTerm = new created Term and  .data.oldTerm =
+     * old term value
      */
     @PutMapping("/term/{id}.json")
     public ResponseEntity<String> edit(@PathVariable String id, @RequestBody JsonObject json) {
@@ -77,6 +78,7 @@ public class RestTermController extends RestCytomineController {
      * Delete a term
      *
      * @param id Term id
+     *
      * @return Response map with .code = http response code and .data.term = deleted term value
      */
     @DeleteMapping("/term/{id}.json")

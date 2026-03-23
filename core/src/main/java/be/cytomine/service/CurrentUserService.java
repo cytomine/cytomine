@@ -28,29 +28,40 @@ public class CurrentUserService {
     private UserRepository userRepository;
 
     public String getCurrentUsername() {
-        CurrentUser currentUser = getSecurityCurrentUser().orElseThrow(() -> new ServerException("Cannot read current user"));
+        CurrentUser currentUser = getSecurityCurrentUser().orElseThrow(() -> new ServerException(
+            "Cannot read current user"));
         if (currentUser.isFullObjectProvided() || currentUser.isUsernameProvided()) {
             return currentUser.getUser().getUsername();
         } else {
-            throw new ObjectNotFoundException("User", "Cannot read current username. Object " + currentUser + " is not supported");
+            throw new ObjectNotFoundException(
+                "User",
+                "Cannot read current username. Object " + currentUser + " is not supported"
+            );
         }
     }
 
     public User getCurrentUser() {
-        CurrentUser currentUser = getSecurityCurrentUser().orElseThrow(() -> new ServerException("Cannot read current user"));
+        CurrentUser currentUser = getSecurityCurrentUser().orElseThrow(() -> new ServerException(
+            "Cannot read current user"));
         User user;
         if (currentUser.isFullObjectProvided()) {
             user = currentUser.getUser();
-        } else if(currentUser.isUsernameProvided()) {
-            user = userRepository.findByUsernameLikeIgnoreCase(currentUser.getUser().getUsername()).orElseThrow(() -> new ServerException("Cannot find current user with username " + currentUser.getUser().getUsername()));
+        } else if (currentUser.isUsernameProvided()) {
+            user = userRepository.findByUsernameLikeIgnoreCase(currentUser.getUser().getUsername())
+                .orElseThrow(() -> new ServerException("Cannot find current user with username " + currentUser.getUser()
+                    .getUsername()));
         } else {
-            throw new ObjectNotFoundException("User", "Cannot read current user. Object " + currentUser + " is not supported");
+            throw new ObjectNotFoundException(
+                "User",
+                "Cannot read current user. Object " + currentUser + " is not supported"
+            );
         }
         return user;
     }
 
     public User getCurrentUser(String username) {
-        return userRepository.findByUsernameLikeIgnoreCase(username).orElseThrow(() -> new ServerException("Cannot find current user with username " + username));
+        return userRepository.findByUsernameLikeIgnoreCase(username)
+            .orElseThrow(() -> new ServerException("Cannot find current user with username " + username));
     }
 
     public static Optional<CurrentUser> getSecurityCurrentUser() {
@@ -63,17 +74,17 @@ public class CurrentUserService {
             return null;
         } else if (authentication.getDetails() instanceof User) {
             FullCurrentUser fullCurrentUser = new FullCurrentUser();
-            fullCurrentUser.setUser((User)authentication.getDetails());
+            fullCurrentUser.setUser((User) authentication.getDetails());
             return fullCurrentUser;
         } else if (authentication.getPrincipal() instanceof String) {
             PartialCurrentUser partialCurrentUser = new PartialCurrentUser();
-            partialCurrentUser.setUsername((String)authentication.getPrincipal());
+            partialCurrentUser.setUsername((String) authentication.getPrincipal());
             return partialCurrentUser;
         } else if (authentication.getPrincipal() instanceof UserDetails) {
             PartialCurrentUser partialCurrentUser = new PartialCurrentUser();
             partialCurrentUser.setUsername(((UserDetails) authentication.getPrincipal()).getUsername());
             return partialCurrentUser;
-        }else if (authentication instanceof JwtAuthenticationToken) {
+        } else if (authentication instanceof JwtAuthenticationToken) {
             PartialCurrentUser partialCurrentUser = new PartialCurrentUser();
             // this is the preferred_username coming from token claims
             partialCurrentUser.setUsername(authentication.getName());

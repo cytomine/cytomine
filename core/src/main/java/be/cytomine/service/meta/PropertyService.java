@@ -68,7 +68,7 @@ public class PropertyService extends ModelService {
     }
 
     public List<Property> list(CytomineDomain cytomineDomain) {
-        securityACLService.check(cytomineDomain.container(),READ);
+        securityACLService.check(cytomineDomain.container(), READ);
         return propertyRepository.findAllByDomainIdent(cytomineDomain.getId());
     }
 
@@ -76,7 +76,7 @@ public class PropertyService extends ModelService {
 
         Optional<Property> property = propertyRepository.findById(id);
         if (property.isPresent()) {
-            securityACLService.check(property.get().container(),READ);
+            securityACLService.check(property.get().container(), READ);
         }
         return property;
     }
@@ -84,7 +84,7 @@ public class PropertyService extends ModelService {
     public Optional<Property> findByDomainAndKey(CytomineDomain domain, String key) {
         Optional<Property> property = propertyRepository.findByDomainIdentAndKey(domain.getId(), key);
         if (property.isPresent()) {
-            securityACLService.check(property.get().container(),READ);
+            securityACLService.check(property.get().container(), READ);
         }
         return property;
     }
@@ -96,23 +96,33 @@ public class PropertyService extends ModelService {
 
     public CommandResponse add(JsonObject jsonObject, Transaction transaction, Task task) {
         User currentUser = currentUserService.getCurrentUser();
-        CytomineDomain domain = getCytomineDomain(jsonObject.getJSONAttrStr("domainClassName"), jsonObject.getJSONAttrLong("domainIdent"));
-        if(!domain.getClass().getName().contains("AbstractImage")) {
-            securityACLService.checkUserAccessRightsForMeta( domain,  currentUser);
-        }else{
+        CytomineDomain domain = getCytomineDomain(
+            jsonObject.getJSONAttrStr("domainClassName"),
+            jsonObject.getJSONAttrLong("domainIdent")
+        );
+        if (!domain.getClass().getName().contains("AbstractImage")) {
+            securityACLService.checkUserAccessRightsForMeta(domain, currentUser);
+        } else {
             //TODO when is this used ?
             securityACLService.checkUser(currentUser);
         }
-        Command command = new AddCommand(currentUser,transaction);
-        return executeCommand(command,null, jsonObject);
+        Command command = new AddCommand(currentUser, transaction);
+        return executeCommand(command, null, jsonObject);
     }
 
-    public CommandResponse addProperty(String domainClassName, Long domainIdent, String key, String value, User user, Transaction transaction) {
+    public CommandResponse addProperty(
+        String domainClassName,
+        Long domainIdent,
+        String key,
+        String value,
+        User user,
+        Transaction transaction
+    ) {
         JsonObject jsonObject = JsonObject.of(
-                "domainClassName", domainClassName,
-                "domainIdent", domainIdent,
-                "key", key,
-                "value", value
+            "domainClassName", domainClassName,
+            "domainIdent", domainIdent,
+            "key", key,
+            "value", value
         );
         return executeCommand(new AddCommand(user, transaction), null, jsonObject);
     }
@@ -120,28 +130,34 @@ public class PropertyService extends ModelService {
     @Override
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
         User currentUser = currentUserService.getCurrentUser();
-        CytomineDomain parentDomain = getCytomineDomain(((Property) domain).getDomainClassName(), ((Property) domain).getDomainIdent());
-        if(!parentDomain.getClass().getName().contains("AbstractImage")) {
+        CytomineDomain parentDomain = getCytomineDomain(
+            ((Property) domain).getDomainClassName(),
+            ((Property) domain).getDomainIdent()
+        );
+        if (!parentDomain.getClass().getName().contains("AbstractImage")) {
             securityACLService.checkUserAccessRightsForMeta(parentDomain, currentUser);
-        }else{
+        } else {
             //TODO when is this used ?
             securityACLService.checkUser(currentUser);
         }
-        return executeCommand(new EditCommand(currentUser, transaction), domain,jsonNewData);
+        return executeCommand(new EditCommand(currentUser, transaction), domain, jsonNewData);
     }
 
     @Override
     public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
         User currentUser = currentUserService.getCurrentUser();
-        CytomineDomain parentDomain = getCytomineDomain(((Property) domain).getDomainClassName(), ((Property) domain).getDomainIdent());
-        if(!parentDomain.getClass().getName().contains("AbstractImage")) {
+        CytomineDomain parentDomain = getCytomineDomain(
+            ((Property) domain).getDomainClassName(),
+            ((Property) domain).getDomainIdent()
+        );
+        if (!parentDomain.getClass().getName().contains("AbstractImage")) {
             securityACLService.checkUserAccessRightsForMeta(parentDomain, currentUser);
-        }else{
+        } else {
             //TODO when is this used ?
             securityACLService.checkUser(currentUser);
         }
         Command c = new DeleteCommand(currentUser, transaction);
-        return executeCommand(c,domain, null);
+        return executeCommand(c, domain, null);
     }
 
     @Override
@@ -151,58 +167,80 @@ public class PropertyService extends ModelService {
 
     @Override
     public List<String> getStringParamsI18n(CytomineDomain domain) {
-        Property property = (Property)domain;
-        return Arrays.asList(property.getKey(), property.getDomainClassName(), String.valueOf(property.getDomainIdent()));
+        Property property = (Property) domain;
+        return Arrays.asList(
+            property.getKey(),
+            property.getDomainClassName(),
+            String.valueOf(property.getDomainIdent())
+        );
     }
 
     public List<Map<String, Object>> listKeysForAnnotation(Project project, ImageInstance image, Boolean withUser) {
         if (project != null) {
-            securityACLService.check(project,READ);
+            securityACLService.check(project, READ);
         } else {
-            securityACLService.check(image.container(),READ);
+            securityACLService.check(image.container(), READ);
         }
 
         String request = "SELECT DISTINCT p.key " +
-                (withUser? ", ua.user_id " : "") +
-                "FROM property as p, user_annotation as ua " +
-                "WHERE p.domain_ident = ua.id " +
-                (project!=null? "AND ua.project_id = '"+ project.getId() + "' " : "") +
-                (image!=null? "AND ua.image_id = '"+ image.getId() + "' " : "") +
-                "UNION " +
-                "SELECT DISTINCT p2.key " +
-                (withUser? ", ra.user_id " : "") +
-                "FROM property as p2, reviewed_annotation as ra " +
-                "WHERE p2.domain_ident = ra.id " +
-                (project!=null? "AND ra.project_id = '"+ project.getId() + "' " : "") +
-                (image!=null? "AND ra.image_id = '"+ image.getId() + "' " : "");
+            (withUser ? ", ua.user_id " : "") +
+            "FROM property as p, user_annotation as ua " +
+            "WHERE p.domain_ident = ua.id " +
+            (project != null ? "AND ua.project_id = '" + project.getId() + "' " : "") +
+            (image != null ? "AND ua.image_id = '" + image.getId() + "' " : "") +
+            "UNION " +
+            "SELECT DISTINCT p2.key " +
+            (withUser ? ", ra.user_id " : "") +
+            "FROM property as p2, reviewed_annotation as ra " +
+            "WHERE p2.domain_ident = ra.id " +
+            (project != null ? "AND ra.project_id = '" + project.getId() + "' " : "") +
+            (image != null ? "AND ra.image_id = '" + image.getId() + "' " : "");
 
-        return  selectListKeyWithUser(request, Map.of());
+        return selectListKeyWithUser(request, Map.of());
     }
 
     public List<String> listKeysForImageInstance(Project project) {
         if (project != null) {
-            securityACLService.check(project,READ);
+            securityACLService.check(project, READ);
         }
 
         String request = "SELECT DISTINCT p.key " +
-                "FROM property as p, image_instance as ii " +
-                "WHERE p.domain_ident = ii.id " +
-                "AND ii.project_id = "+ project.getId();
+            "FROM property as p, image_instance as ii " +
+            "WHERE p.domain_ident = ii.id " +
+            "AND ii.project_id = " + project.getId();
 
         return selectListkey(request, Map.of());
     }
 
-    public List<Map<String, Object>> listAnnotationCenterPosition(User user, ImageInstance image, Geometry boundingbox, String key) {
-        securityACLService.check(image.container(),READ);
-        String request = "SELECT DISTINCT ua.id, ST_X(ST_CENTROID(ua.location)) as x,ST_Y(ST_CENTROID(ua.location)) as y, p.value " +
-                "FROM user_annotation ua, property as p " +
-                "WHERE p.domain_ident = ua.id " +
-                "AND p.key = :key " +
-                "AND ua.image_id = '"+ image.getId() +"' " +
-                "AND ua.user_id = '"+ user.getId() +"' " +
-                (boundingbox!=null ? "AND ST_Intersects(ua.location,ST_GeometryFromText('" + boundingbox.toString() + "',0)) " :"");
+    public List<Map<String, Object>> listAnnotationCenterPosition(
+        User user,
+        ImageInstance image,
+        Geometry boundingbox,
+        String key
+    ) {
+        securityACLService.check(image.container(), READ);
+        String request =
+            "SELECT DISTINCT ua.id, ST_X(ST_CENTROID(ua.location)) as x,ST_Y(ST_CENTROID(ua.location)) as y, p.value "
+                +
+                "FROM user_annotation ua, property as p "
+                +
+                "WHERE p.domain_ident = ua.id "
+                +
+                "AND p.key = :key "
+                +
+                "AND ua.image_id = '"
+                + image.getId()
+                + "' "
+                +
+                "AND ua.user_id = '"
+                + user.getId()
+                + "' "
+                +
+                (boundingbox != null ? "AND ST_Intersects(ua.location,ST_GeometryFromText('"
+                    + boundingbox.toString()
+                    + "',0)) " : "");
 
-        return selectsql(request, Map.of("key", (Object)key));
+        return selectsql(request, Map.of("key", (Object) key));
     }
 
     private List<String> selectListkey(String request, Map<String, Object> parameters) {
@@ -211,7 +249,7 @@ public class PropertyService extends ModelService {
             nativeQuery.setParameter(map.getKey(), map.getValue());
         }
         List<Tuple> resultList = nativeQuery.getResultList();
-        return resultList.stream().map(x -> (String)x.get(0)).collect(Collectors.toList());
+        return resultList.stream().map(x -> (String) x.get(0)).collect(Collectors.toList());
     }
 
     private List<Map<String, Object>> selectListKeyWithUser(String request, Map<String, Object> parameters) {
@@ -220,7 +258,9 @@ public class PropertyService extends ModelService {
             nativeQuery.setParameter(map.getKey(), map.getValue());
         }
         List<Tuple> resultList = nativeQuery.getResultList();
-        return resultList.stream().map(x -> Map.of("key", x.get(0), "user", (x.getElements().size()>1 ? castToLong(x.get(1)) : 0L))).collect(Collectors.toList());
+        return resultList.stream()
+            .map(x -> Map.of("key", x.get(0), "user", (x.getElements().size() > 1 ? castToLong(x.get(1)) : 0L)))
+            .collect(Collectors.toList());
     }
 
     private List<Map<String, Object>> selectsql(String request, Map<String, Object> parameters) {
@@ -229,7 +269,9 @@ public class PropertyService extends ModelService {
             nativeQuery.setParameter(map.getKey(), map.getValue());
         }
         List<Tuple> resultList = nativeQuery.getResultList();
-        return resultList.stream().map(x -> Map.of("idAnnotation", castToLong(x.get(0)), "x", x.get(1), "y", x.get(2), "value", x.get(3))).collect(Collectors.toList());
+        return resultList.stream()
+            .map(x -> Map.of("idAnnotation", castToLong(x.get(0)), "x", x.get(1), "y", x.get(2), "value", x.get(3)))
+            .collect(Collectors.toList());
     }
 
 }

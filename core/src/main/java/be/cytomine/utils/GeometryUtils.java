@@ -66,6 +66,7 @@ public class GeometryUtils {
      * Fill polygon to complete empty space inside polygon/mulypolygon
      *
      * @param polygon A polygon or multipolygon wkt polygon
+     *
      * @return A polygon or multipolygon filled points
      */
     public static String fillPolygon(String polygon) {
@@ -81,6 +82,7 @@ public class GeometryUtils {
      * Fill all polygon inside a Multipolygon WKT polygon
      *
      * @param form Multipolygon WKT polygon
+     *
      * @return Multipolygon with all its polygon filled
      */
     private static String getFirstPolygonLocationForEachItem(String form) {
@@ -121,6 +123,7 @@ public class GeometryUtils {
      * Fill a polygon
      *
      * @param polygon Polygon as wkt
+     *
      * @return Polygon filled points
      */
     private static String getFirstPolygonLocation(String polygon) {

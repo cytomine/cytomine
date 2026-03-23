@@ -1,20 +1,20 @@
 package be.cytomine.service;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -89,9 +89,8 @@ public class CommandService {
     }
 
     /**
-     * Execute a 'command' c with json data
-     * Store command in undo stack if necessary and in command history
-     * if success, put http response code as successCode
+     * Execute a 'command' c with json data Store command in undo stack if necessary and in command history if success,
+     * put http response code as successCode
      */
     CommandResponse processCommand(Command c, ModelService service, int successCode) throws CytomineException {
         //execute command
@@ -127,7 +126,7 @@ public class CommandService {
     public List<CommandResponse> undo(Long commandId) {
         User user = currentUserService.getCurrentUser();
         Optional<UndoStackItem> lastUndoStackItem;
-        if (commandId!=null) {
+        if (commandId != null) {
             lastUndoStackItem = commandRepository.findLastUndoStackItem(user, commandRepository.getById(commandId));
         } else {
             lastUndoStackItem = commandRepository.findLastUndoStackItem(user);
@@ -146,10 +145,11 @@ public class CommandService {
     }
 
     private ModelService loadCorrespondingModelService(Command command) {
-        if (command.getServiceName()==null || command.getServiceName().length()<1 ) {
+        if (command.getServiceName() == null || command.getServiceName().length() < 1) {
             throw new RuntimeException("Bean definition name " + command.getServiceName() + " is null or blank");
         }
-        return (ModelService)beanFactory.getBean(Character.toLowerCase(command.getServiceName().charAt(0)) + command.getServiceName().substring(1));
+        return (ModelService) beanFactory.getBean(Character.toLowerCase(command.getServiceName().charAt(0))
+            + command.getServiceName().substring(1));
     }
 
     private CommandResponse performUndo(Command command) {
@@ -157,7 +157,10 @@ public class CommandService {
         if (command instanceof AddCommand) {
             return modelService.destroy(JsonObject.toJsonObject(command.getData()), command.isPrintMessage());
         } else if (command instanceof EditCommand) {
-            return modelService.edit(JsonObject.toJsonObject(command.getData()).extractProperty("previous" + ((EditCommand) command).domainName()), command.isPrintMessage());
+            return modelService.edit(
+                JsonObject.toJsonObject(command.getData())
+                    .extractProperty("previous" + ((EditCommand) command).domainName()), command.isPrintMessage()
+            );
         } else if (command instanceof DeleteCommand) {
             return modelService.create(JsonObject.toJsonObject(command.getData()), command.isPrintMessage());
         }
@@ -168,10 +171,10 @@ public class CommandService {
         CommandResponse result;
         List<CommandResponse> results = new ArrayList<>();
 
-        Transaction transaction =  undoItem.getTransaction();
+        Transaction transaction = undoItem.getTransaction();
         log.debug("FirstUndoStack=" + undoItem);
 
-        if (transaction==null) {
+        if (transaction == null) {
             log.debug("Transaction not in progress");
             //Not Transaction, no other command must be deleted
             result = performUndo(undoItem.getCommand());
@@ -184,7 +187,7 @@ public class CommandService {
             List<UndoStackItem> undoStacks = commandRepository.findAllUndoOrderByCreatedDesc(user, transaction);
             for (UndoStackItem undoStack : undoStacks) {
                 //browse all command and undo it while its the same transaction
-                if(undoStack.getCommand().isRefuseUndo()) {
+                if (undoStack.getCommand().isRefuseUndo()) {
                     //responseError(new ObjectNotFoundException("You cannot delete your last operation!")) //undo delete project is not possible
                     throw new ObjectNotFoundException("You cannot delete your last operation!"); //undo delete project is not possible
                 }
@@ -205,7 +208,7 @@ public class CommandService {
     public List<CommandResponse> redo(Long commandId) {
         User user = currentUserService.getCurrentUser();
         Optional<RedoStackItem> lastRedoStackItem;
-        if (commandId!=null) {
+        if (commandId != null) {
             lastRedoStackItem = commandRepository.findLastRedoStackItem(user, commandRepository.getById(commandId));
         } else {
             lastRedoStackItem = commandRepository.findLastRedoStackItem(user);
@@ -228,7 +231,10 @@ public class CommandService {
         if (command instanceof AddCommand) {
             return modelService.create(JsonObject.toJsonObject(command.getData()), command.isPrintMessage());
         } else if (command instanceof EditCommand) {
-            return modelService.edit(JsonObject.toJsonObject(command.getData()).extractProperty("new" + ((EditCommand) command).domainName()), command.isPrintMessage());
+            return modelService.edit(
+                JsonObject.toJsonObject(command.getData())
+                    .extractProperty("new" + ((EditCommand) command).domainName()), command.isPrintMessage()
+            );
         } else if (command instanceof DeleteCommand) {
             return modelService.destroy(JsonObject.toJsonObject(command.getData()), command.isPrintMessage());
         }
@@ -239,10 +245,10 @@ public class CommandService {
         CommandResponse result;
         List<CommandResponse> results = new ArrayList<>();
 
-        Transaction transaction =  redoItem.getTransaction();
+        Transaction transaction = redoItem.getTransaction();
         log.debug("LastRedoStack=" + redoItem);
 
-        if (transaction==null) {
+        if (transaction == null) {
             log.debug("Transaction not in progress");
             //Not Transaction, no other command must be deleted
             result = performRedo(redoItem.getCommand());
@@ -265,6 +271,7 @@ public class CommandService {
 
     /**
      * Move an undo stack item to redo stack
+     *
      * @param firstUndoStack Undo stack item to move
      */
     private void moveToRedoStack(UndoStackItem firstUndoStack) {
@@ -283,6 +290,7 @@ public class CommandService {
 
     /**
      * Move redo item to the undo stack
+     *
      * @param lastRedoStack redo item to move
      */
     private void moveToUndoStack(RedoStackItem lastRedoStack) {
@@ -302,16 +310,19 @@ public class CommandService {
     public List<Command> list(String domain, Class commandClass, Long afterThan) {
         securityACLService.checkAdmin(currentUserService.getCurrentUser());
         List<Command> commands = new ArrayList<>();
-        if(domain!=null) {
+        if (domain != null) {
             String serviceName = domain.substring(0, 1).toUpperCase() + domain.substring(1) + "Service";
 
-            if(afterThan!=null){
-                commands = commandRepository.findAllByServiceNameAndCreatedGreaterThan(serviceName, new Date(afterThan));
+            if (afterThan != null) {
+                commands = commandRepository.findAllByServiceNameAndCreatedGreaterThan(
+                    serviceName,
+                    new Date(afterThan)
+                );
             } else {
                 commands = commandRepository.findAllByServiceName(serviceName);
             }
         } else {
-            commands =  commandRepository.findAll();
+            commands = commandRepository.findAll();
         }
         return commands.stream().filter(x -> x.getClass().equals(commandClass)).toList();
     }

@@ -9,7 +9,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import be.cytomine.domain.meta.Configuration;
 import be.cytomine.domain.meta.ConfigurationReadingRole;
 
-public interface ConfigurationRepository extends JpaRepository<Configuration, Long>, JpaSpecificationExecutor<Configuration>  {
+public interface ConfigurationRepository
+    extends JpaRepository<Configuration, Long>, JpaSpecificationExecutor<Configuration> {
 
 
     List<Configuration> findAllByReadingRole(ConfigurationReadingRole role);

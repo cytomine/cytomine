@@ -1,20 +1,20 @@
 package be.cytomine.repository;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -84,7 +84,10 @@ public class ReviewedAnnotationListing extends AnnotationListing {
         AvailableColumns term = new AvailableColumns();
         term.put("term", "at.term_id");
         term.put("annotationTerms", "0");
-        term.put("userTerm", "a.user_id"); //user who add the term, is the user that create reviewedannotation (a.user_id)
+        term.put(
+            "userTerm",
+            "a.user_id"
+        ); //user who add the term, is the user that create reviewedannotation (a.user_id)
         map.put("term", term);
 
         AvailableColumns imageGroup = new AvailableColumns();
@@ -119,15 +122,18 @@ public class ReviewedAnnotationListing extends AnnotationListing {
     }
 
     /**
-     * Generate SQL string for FROM
-     * FROM depends on data to print (if image name is aksed, need to join with imageinstance+abstractimage,...)
+     * Generate SQL string for FROM FROM depends on data to print (if image name is aksed, need to join with
+     * imageinstance+abstractimage,...)
      */
     String getFrom() {
         String from = "FROM reviewed_annotation a ";
         String where = "WHERE true\n";
 
         if (tags != null) {
-            from += " LEFT OUTER JOIN tag_domain_association tda ON a.id = tda.domain_ident AND tda.domain_class_name = '" + getDomainClass() + "' ";
+            from +=
+                " LEFT OUTER JOIN tag_domain_association tda ON a.id = tda.domain_ident AND tda.domain_class_name = '"
+                    + getDomainClass()
+                    + "' ";
         }
 
         if (multipleTerm) {
@@ -147,20 +153,25 @@ public class ReviewedAnnotationListing extends AnnotationListing {
         }
 
         if (columnsToPrint.contains("imageGroup")) {
-            from += "LEFT JOIN (SELECT * FROM image_group_image_instance WHERE deleted IS NULL) ig ON a.image_id = ig.image_id ";
+            from
+                += "LEFT JOIN (SELECT * FROM image_group_image_instance WHERE deleted IS NULL) ig ON a.image_id = ig.image_id ";
         }
 
         if (columnsToPrint.contains("group") || annotationGroup != null || annotationGroups != null) {
-            from += "LEFT OUTER JOIN (SELECT * FROM annotation_link WHERE deleted IS NULL) al1 ON al1.annotation_ident = a.id ";
-            from += "LEFT OUTER JOIN (SELECT * FROM annotation_link WHERE deleted IS NULL) al ON al.group_id = al1.group_id ";
+            from
+                += "LEFT OUTER JOIN (SELECT * FROM annotation_link WHERE deleted IS NULL) al1 ON al1.annotation_ident = a.id ";
+            from
+                += "LEFT OUTER JOIN (SELECT * FROM annotation_link WHERE deleted IS NULL) al ON al.group_id = al1.group_id ";
         }
 
         if (columnsToPrint.contains("image")) {
-            from += "INNER JOIN image_instance ii ON a.image_id = ii.id INNER JOIN abstract_image ai ON ii.base_image_id = ai.id ";
+            from
+                += "INNER JOIN image_instance ii ON a.image_id = ii.id INNER JOIN abstract_image ai ON ii.base_image_id = ai.id ";
         }
 
         if (columnsToPrint.contains("slice")) {
-            from += "INNER JOIN slice_instance si ON a.slice_id = si.id INNER JOIN abstract_slice asl ON si.base_slice_id = asl.id ";
+            from
+                += "INNER JOIN slice_instance si ON a.slice_id = si.id INNER JOIN abstract_slice asl ON si.base_slice_id = asl.id ";
         }
 
         if (columnsToPrint.contains("user")) {
@@ -209,16 +220,24 @@ public class ReviewedAnnotationListing extends AnnotationListing {
                 subRequest = "(SELECT SUM(ST_CoveredBy(ga.location,gb.location )::integer) ";
             } else {
                 //too heavy to use with little zoom
-                subRequest = "(SELECT SUM(ST_CoveredBy(ga.location,ST_Translate(ST_Scale(gb.location, " + xfactor + "," + yfactor + "), ST_X(ST_Centroid(gb.location))*(1 - " + xfactor + "), ST_Y(ST_Centroid(gb.location))*(1 - " + yfactor + ") ))::integer) ";
+                subRequest = "(SELECT SUM(ST_CoveredBy(ga.location,ST_Translate(ST_Scale(gb.location, "
+                    + xfactor
+                    + ","
+                    + yfactor
+                    + "), ST_X(ST_Centroid(gb.location))*(1 - "
+                    + xfactor
+                    + "), ST_Y(ST_Centroid(gb.location))*(1 - "
+                    + yfactor
+                    + ") ))::integer) ";
 
             }
 
             subRequest = subRequest +
-                    "FROM reviewed_annotation ga, reviewed_annotation gb " +
-                    "WHERE ga.id=a.id " +
-                    "AND ga.id<>gb.id " +
-                    "AND ga.image_id=gb.image_id " +
-                    "AND ST_Intersects(gb.location,ST_GeometryFromText('" + bbox + "',0)))\n";
+                "FROM reviewed_annotation ga, reviewed_annotation gb " +
+                "WHERE ga.id=a.id " +
+                "AND ga.id<>gb.id " +
+                "AND ga.image_id=gb.image_id " +
+                "AND ST_Intersects(gb.location,ST_GeometryFromText('" + bbox + "',0)))\n";
 
             orderBy = new LinkedHashMap<>(Map.of("id", "desc"));
             return subRequest;
@@ -235,7 +254,10 @@ public class ReviewedAnnotationListing extends AnnotationListing {
             return "";
         }
         if (orderBy != null && !orderBy.isEmpty()) {
-            return "ORDER BY " + orderBy.entrySet().stream().map(x -> x.getKey() + " " + x.getValue()).collect(Collectors.joining(", "));
+            return "ORDER BY " + orderBy.entrySet()
+                .stream()
+                .map(x -> x.getKey() + " " + x.getValue())
+                .collect(Collectors.joining(", "));
         } else {
             return "ORDER BY a.id desc " + ((term != null || terms != null) ? ", at.term_id " : "");
         }

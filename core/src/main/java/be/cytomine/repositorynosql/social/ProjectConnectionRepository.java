@@ -20,10 +20,17 @@ import be.cytomine.domain.social.PersistentConnection;
 @Repository
 public interface ProjectConnectionRepository extends MongoRepository<PersistentConnection, String> {
 
-    Optional<PersistentConnection> findByUserAndProjectAndCreatedLessThan(Long user, Long project, Date created, PageRequest pageRequest);
+    Optional<PersistentConnection> findByUserAndProjectAndCreatedLessThan(
+        Long user,
+        Long project,
+        Date created,
+        PageRequest pageRequest
+    );
 
-    
-    @Aggregation(pipeline = {"{$match: {project: ?0, user: ?1, $and : [{created: {$gte: ?3}},{created: {$lte: ?2}}]}},{$sort: {created: 1}},{$project: {dateInMillis: {$subtract: {'$created', ?4}}}}"})
+
+    @Aggregation(pipeline = {
+        "{$match: {project: ?0, user: ?1, $and : [{created: {$gte: ?3}},{created: {$lte: ?2}}]}},{$sort: {created: 1}},{$project: {dateInMillis: {$subtract: {'$created', ?4}}}}"
+    })
     AggregationResults retrieve(Long project, Long user, Date before, Date after, Date firstDate);
 
 }

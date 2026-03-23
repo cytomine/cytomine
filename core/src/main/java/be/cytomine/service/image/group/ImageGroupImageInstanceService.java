@@ -69,9 +69,9 @@ public class ImageGroupImageInstanceService extends ModelService {
     @Override
     public List<Object> getStringParamsI18n(CytomineDomain domain) {
         return List.of(
-                domain.getId(),
-                ((ImageGroupImageInstance) domain).getGroup().getName(),
-                ((ImageGroupImageInstance) domain).getImage().getBlindInstanceFilename()
+            domain.getId(),
+            ((ImageGroupImageInstance) domain).getGroup().getName(),
+            ((ImageGroupImageInstance) domain).getImage().getBlindInstanceFilename()
         );
     }
 
@@ -140,21 +140,21 @@ public class ImageGroupImageInstanceService extends ModelService {
         }
 
         return imageGroupImageInstanceRepository.findAllByGroup(group)
-                .stream()
-                .map((ImageGroupImageInstance::getImage))
-                .sorted(Comparator.comparing(ImageInstance::getBlindInstanceFilename))
-                .toList();
+            .stream()
+            .map((ImageGroupImageInstance::getImage))
+            .sorted(Comparator.comparing(ImageInstance::getBlindInstanceFilename))
+            .toList();
     }
 
     public List<Object> buildImageInstances(ImageGroup group) {
         List<Object> images = new ArrayList<>();
         for (ImageGroupImageInstance igii : list(group)) {
             images.add(Map.of(
-                    "id", igii.getImage().getId(),
-                    "instanceFilename", igii.getImage().getBlindInstanceFilename(),
-                    "thumb", UrlApi.getImageInstanceThumbUrlWithMaxSize(igii.getImage().getId()),
-                    "width", igii.getImage().getBaseImage().getWidth(),
-                    "height", igii.getImage().getBaseImage().getHeight()
+                "id", igii.getImage().getId(),
+                "instanceFilename", igii.getImage().getBlindInstanceFilename(),
+                "thumb", UrlApi.getImageInstanceThumbUrlWithMaxSize(igii.getImage().getId()),
+                "width", igii.getImage().getBaseImage().getWidth(),
+                "height", igii.getImage().getBaseImage().getHeight()
             ));
         }
 

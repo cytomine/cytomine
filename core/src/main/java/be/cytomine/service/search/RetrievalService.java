@@ -119,7 +119,7 @@ public class RetrievalService {
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
         byte[] image = Objects.requireNonNull(getImageAnnotation(annotation));
-        ByteArrayResource resource =  new ByteArrayResource(image) {
+        ByteArrayResource resource = new ByteArrayResource(image) {
             @Override
             public String getFilename() {
                 return annotation.getId().toString();

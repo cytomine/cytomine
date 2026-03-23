@@ -1,20 +1,20 @@
 package be.cytomine.service;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -52,17 +52,21 @@ public class CurrentRoleService {
     }
 
     /**
-     * Active an admin session for a user
-     * (by default user with ROLE_ADMIN are connected as ROLE_USER)
+     * Active an admin session for a user (by default user with ROLE_ADMIN are connected as ROLE_USER)
+     *
      * @param user
      */
     public void activeAdminSession(User user) {
-        if(hasCurrentUserAdminRole(user)) {
+        if (hasCurrentUserAdminRole(user)) {
             currentAdmins.put(user.getUsername(), new Date());
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             List<GrantedAuthority> authorities = new ArrayList<>(auth.getAuthorities());
             authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
-            UsernamePasswordAuthenticationToken newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(),auth.getCredentials(),authorities);
+            UsernamePasswordAuthenticationToken newAuth = new UsernamePasswordAuthenticationToken(
+                auth.getPrincipal(),
+                auth.getCredentials(),
+                authorities
+            );
             newAuth.setDetails(user);
             SecurityContextHolder.getContext().setAuthentication(newAuth);
         } else {
@@ -70,8 +74,8 @@ public class CurrentRoleService {
         }
     }
 
-    public void activeAdminSession(User user , JwtAuthenticationToken jwtAuthenticationToken) {
-        if(hasCurrentUserAdminRole(user)) {
+    public void activeAdminSession(User user, JwtAuthenticationToken jwtAuthenticationToken) {
+        if (hasCurrentUserAdminRole(user)) {
             currentAdmins.put(user.getUsername(), new Date());
         } else {
             throw new ForbiddenException("You are not an admin!");
@@ -80,15 +84,20 @@ public class CurrentRoleService {
 
     /**
      * Disable admin session for a user
+     *
      * @param user
      */
     public void closeAdminSession(User user) {
-        if(hasCurrentUserAdminRole(user)) {
+        if (hasCurrentUserAdminRole(user)) {
             currentAdmins.remove(user.getUsername());
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>(auth.getAuthorities());
             authorities.removeIf(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
-            Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(),auth.getCredentials(),authorities);
+            Authentication newAuth = new UsernamePasswordAuthenticationToken(
+                auth.getPrincipal(),
+                auth.getCredentials(),
+                authorities
+            );
             SecurityContextHolder.getContext().setAuthentication(newAuth);
         } else {
             throw new ForbiddenException("You are not an admin!");
@@ -109,8 +118,10 @@ public class CurrentRoleService {
         Set<SecRole> roles = findRealRole(user);
         boolean isSuperAdmin = roles.stream().anyMatch(role -> role.getAuthority().equals("ROLE_SUPER_ADMIN"));
         //role super admin don't need to open a admin session, so we don't remove the role admin from the current role
-        if(!currentAdmins.containsKey(user.getUsername()) && !isSuperAdmin) {
-            roles = roles.stream().filter(role -> !role.getAuthority().equals("ROLE_ADMIN")).collect(Collectors.toSet());
+        if (!currentAdmins.containsKey(user.getUsername()) && !isSuperAdmin) {
+            roles = roles.stream()
+                .filter(role -> !role.getAuthority().equals("ROLE_ADMIN"))
+                .collect(Collectors.toSet());
         }
         return roles;
     }
@@ -147,9 +158,11 @@ public class CurrentRoleService {
     public boolean isAdmin(User user) {
         return findRealAuthorities(user).contains("ROLE_ADMIN");
     }
+
     public boolean isUser(User user) {
         return findRealAuthorities(user).contains("ROLE_USER");
     }
+
     public boolean isGuest(User user) {
         return findRealAuthorities(user).contains("ROLE_GUEST");
     }

@@ -52,7 +52,6 @@ import be.cytomine.utils.Task;
 @Transactional
 public class SecUserSecRoleService extends ModelService {
 
-
     @Autowired
     SecurityACLService securityACLService;
 
@@ -88,28 +87,28 @@ public class SecUserSecRoleService extends ModelService {
 
         List<SecUserSecRole> secSecUserSecRoles = secSecUserSecRoleRepository.findAllBySecUser(user);
 
-        Optional<SecUserSecRole> role_super_admin = secSecUserSecRoles.stream()
+        Optional<SecUserSecRole> roleSuperAdmin = secSecUserSecRoles.stream()
             .filter(x -> x.getSecRole().getAuthority().equals("ROLE_SUPER_ADMIN")).findFirst();
-        if (role_super_admin.isPresent()) {
-            return role_super_admin.get().getSecRole();
+        if (roleSuperAdmin.isPresent()) {
+            return roleSuperAdmin.get().getSecRole();
         }
 
-        Optional<SecUserSecRole> role_admin = secSecUserSecRoles.stream()
+        Optional<SecUserSecRole> roleAdmin = secSecUserSecRoles.stream()
             .filter(x -> x.getSecRole().getAuthority().equals("ROLE_ADMIN")).findFirst();
-        if (role_admin.isPresent()) {
-            return role_admin.get().getSecRole();
+        if (roleAdmin.isPresent()) {
+            return roleAdmin.get().getSecRole();
         }
 
-        Optional<SecUserSecRole> role_user = secSecUserSecRoles.stream()
+        Optional<SecUserSecRole> roleUser = secSecUserSecRoles.stream()
             .filter(x -> x.getSecRole().getAuthority().equals("ROLE_USER")).findFirst();
-        if (role_user.isPresent()) {
-            return role_user.get().getSecRole();
+        if (roleUser.isPresent()) {
+            return roleUser.get().getSecRole();
         }
 
-        Optional<SecUserSecRole> role_guest = secSecUserSecRoles.stream()
+        Optional<SecUserSecRole> roleGuest = secSecUserSecRoles.stream()
             .filter(x -> x.getSecRole().getAuthority().equals("ROLE_GUEST")).findFirst();
-        if (role_guest.isPresent()) {
-            return role_guest.get().getSecRole();
+        if (roleGuest.isPresent()) {
+            return roleGuest.get().getSecRole();
         }
         return null;
     }
@@ -140,7 +139,6 @@ public class SecUserSecRoleService extends ModelService {
             securityACLService.checkUser(currentUser);
         }
 
-
         return executeCommand(new AddCommand(currentUser), null, jsonObject);
     }
 
@@ -157,12 +155,10 @@ public class SecUserSecRoleService extends ModelService {
         return executeCommand(c, domain, null);
     }
 
-
     public List<Object> getStringParamsI18n(CytomineDomain domain) {
         SecUserSecRole secSecUserSecRole = (SecUserSecRole) domain;
         return List.of(secSecUserSecRole.getSecUser().getId(), secSecUserSecRole.getSecRole().getId());
     }
-
 
     /**
      * Define a role for a user. If admin is defined, user will have admin,user,guest. If user is defined, user will
@@ -207,7 +203,6 @@ public class SecUserSecRoleService extends ModelService {
         }
     }
 
-
     private void addRole(User user, SecRole role) {
         Optional<SecUserSecRole> linked = secSecUserSecRoleRepository.findBySecUserAndSecRole(user, role);
         if (linked.isEmpty()) {
@@ -243,7 +238,6 @@ public class SecUserSecRoleService extends ModelService {
             .orElseThrow(() -> new ObjectNotFoundException("SecUserSecRole", json.toJsonString()));
     }
 
-
     public void checkDoNotAlreadyExist(CytomineDomain domain) {
         SecUserSecRole secSecUserSecRole = (SecUserSecRole) domain;
         if (domain != null) {
@@ -259,5 +253,4 @@ public class SecUserSecRoleService extends ModelService {
             }
         }
     }
-
 }

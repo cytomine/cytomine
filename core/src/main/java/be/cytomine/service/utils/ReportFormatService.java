@@ -24,12 +24,10 @@ public class ReportFormatService {
     private Map<Long, String> termNameCache;
 
     /**
-     * Transform a List<JsonObject> into an Object[][] with headers (first row) corresponding to given columns.
+     * Transforms a {@link List} of {@link JsonObject} into an {@code Object[][]} with headers in the first row
+     * corresponding to the given columns.
      *
-     * @param columns
-     * @param data
-     *
-     * @return Object[][]
+     * @return {@code Object[][]}
      */
     public Object[][] formatJsonObjectForReport(List<ReportColumn> columns, List<JsonObject> data) {
         List<Map<String, Object>> imageConsultations = new ArrayList<>();
@@ -63,13 +61,10 @@ public class ReportFormatService {
     }
 
     /**
-     * Transform a List<Map<String,Object>> of users into an Object[][] with headers (first row) corresponding to given
-     * columns.
+     * Transform a {@code List<Map<String,Object>>} of users into an {@code Object[][]} with headers (first row)
+     * corresponding to given columns.
      *
-     * @param columns
-     * @param data
-     *
-     * @return Object[][]
+     * @return {@code Object[][]}
      */
     public Object[][] formatMapForReport(List<ReportColumn> columns, List<Map<String, Object>> data) {
         Object[] headers = getColumnHeaders(columns);
@@ -92,13 +87,10 @@ public class ReportFormatService {
     }
 
     /**
-     * Transform a List<Map<String,Object>> of annotation into an Object[][] with headers (first row) corresponding to
-     * given columns.
+     * Transform a {@code List<Map<String,Object>>} of annotation into an {@code Object[][]} with headers (first row)
+     * corresponding to given columns.
      *
-     * @param columns
-     * @param data
-     *
-     * @return Object[][]
+     * @return {@code Object[][]}
      */
     public Object[][] formatAnnotationsForReport(List<ReportColumn> columns, List<Map<String, Object>> data) {
         Object[] headers = getColumnHeaders(columns);
@@ -122,10 +114,6 @@ public class ReportFormatService {
 
     /**
      * Get value for annotation report
-     *
-     * @param value
-     * @param annotation
-     * @param header
      *
      * @return String
      */
@@ -204,11 +192,6 @@ public class ReportFormatService {
 
     /**
      * Convert data headers (actually property values of columns list) to columns titles.
-     *
-     * @param columns
-     * @param data
-     *
-     * @return
      */
     private static void headerPropertyToTitle(List<ReportColumn> columns, Object[][] data) {
         for (int i = 0; i < data[0].length; i++) {
@@ -218,8 +201,6 @@ public class ReportFormatService {
 
     /**
      * Check if term is already in cache. If yes return term name, if not add it.
-     *
-     * @param termId
      *
      * @return String term name
      */

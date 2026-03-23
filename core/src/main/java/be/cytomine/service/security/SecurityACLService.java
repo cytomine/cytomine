@@ -179,8 +179,10 @@ public class SecurityACLService {
         } else {
             query = entityManager.createQuery(
                 "select distinct storage "
-                    +
-                    "from AclObjectIdentity as aclObjectId, AclEntry as aclEntry, AclSid as aclSid,  Storage as storage "
+                    + "from AclObjectIdentity as aclObjectId, "
+                    + "AclEntry as aclEntry, "
+                    + "AclSid as aclSid, "
+                    + "Storage as storage "
                     + "where aclObjectId.objectId = storage.id "
                     + "and aclEntry.aclObjectIdentity = aclObjectId "
                     + "and aclEntry.sid = aclSid and aclSid.sid like '"
@@ -201,8 +203,10 @@ public class SecurityACLService {
         } else {
             Query query = entityManager.createQuery(
                 "select distinct project "
-                    +
-                    "from AclObjectIdentity as aclObjectId, AclEntry as aclEntry, AclSid as aclSid,  Project as project "
+                    + "from AclObjectIdentity as aclObjectId, "
+                    + "AclEntry as aclEntry, "
+                    + "AclSid as aclSid, "
+                    + "Project as project "
                     + "where aclObjectId.objectId = project.id "
                     + "and aclEntry.aclObjectIdentity = aclObjectId "
                     + (ontology != null ? "and project.ontology.id = " + ontology.getId() : " ")
@@ -232,10 +236,14 @@ public class SecurityACLService {
         }
         Query query = entityManager.createQuery(
             "select distinct ontology "
-                + "from AclObjectIdentity as aclObjectId, AclEntry as aclEntry, AclSid as aclSid,  Ontology as ontology "
+                + "from AclObjectIdentity as aclObjectId, "
+                + "AclEntry as aclEntry, "
+                + "AclSid as aclSid, "
+                + "Ontology as ontology "
                 + "where aclObjectId.objectId = ontology.id "
                 + "and aclEntry.aclObjectIdentity = aclObjectId "
-                + "and aclEntry.sid = aclSid and aclSid.sid like '"
+                + "and aclEntry.sid = aclSid "
+                + "and aclSid.sid like '"
                 + user.getUsername()
                 + "'");
         List<Ontology> ontologies = query.getResultList();

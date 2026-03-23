@@ -21,9 +21,9 @@ export function appendShortTermToken(url, shortTermToken) {
     return url;
   }
   if (url.indexOf('?') === -1) {
-    return url + '?Authorization=Bearer ' + shortTermToken;
+    return url + '?authorization=Bearer ' + shortTermToken;
   } else {
-    return url + '&Authorization=' + encodeURI('Bearer ' + shortTermToken);
+    return url + '&authorization=' + encodeURI('Bearer ' + shortTermToken);
   }
 }
 

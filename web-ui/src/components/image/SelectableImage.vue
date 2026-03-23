@@ -8,7 +8,7 @@
       :key="`${image.id}-thumb-128`"
       :image="image"
       :size="128"
-      :extra-parameters="{Authorization: 'Bearer ' + shortTermToken}"
+      :extra-parameters="{authorization: 'Bearer ' + shortTermToken}"
     />
     <span>{{ image.instanceFilename }}</span>
   </div>

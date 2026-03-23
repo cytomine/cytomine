@@ -104,11 +104,11 @@ public class RestUploadedFileController extends RestCytomineController {
     @GetMapping("/uploadedfile/{id}/download")
     public ResponseEntity<StreamingResponseBody> download(
         @PathVariable Long id,
-        @RequestParam String Authorization
+        @RequestParam String authorization
     ) throws IOException {
         log.debug("GET /uploadedfile/{}/download", id);
 
-        UploadedFile uploadedFile = uploadedFileService.find(id, Authorization)
+        UploadedFile uploadedFile = uploadedFileService.find(id, authorization)
             .orElseThrow(() -> new ObjectNotFoundException("UploadedFile", id));
 
         StreamingResponseBody stream = outputStream -> {

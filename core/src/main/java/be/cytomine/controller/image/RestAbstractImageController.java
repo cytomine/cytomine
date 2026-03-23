@@ -124,7 +124,7 @@ public class RestAbstractImageController extends RestCytomineController {
         @RequestParam(required = false) Double contrast,
         @RequestParam(required = false) Double gamma,
         @RequestParam(required = false) String bits,
-        @RequestParam(required = false) String Authorization,
+        @RequestParam(required = false) String authorization,
 
         ProxyExchange<byte[]> proxy
     ) throws IOException {
@@ -140,14 +140,13 @@ public class RestAbstractImageController extends RestCytomineController {
         thumbParameter.setBits(bits != null && !bits.equals("max") ? Integer.parseInt(bits) : null);
         thumbParameter.setRefresh(refresh);
 
-        AbstractImage abstractImage = abstractImageService.find(id, Authorization)
+        AbstractImage abstractImage = abstractImageService.find(id, authorization)
             .orElseThrow(() -> new ObjectNotFoundException("AbstractImage", id));
         String etag = getRequestETag();
         return imageServerService.thumb(
             sliceCoordinatesService.getReferenceSlice(abstractImage), thumbParameter, etag, proxy
         );
     }
-
 
     @RequestMapping(value = "/abstractimage/{id}/preview.{format}", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<byte[]> preview(
@@ -376,11 +375,11 @@ public class RestAbstractImageController extends RestCytomineController {
     @GetMapping("/abstractimage/{id}/download")
     public ResponseEntity<byte[]> download(
         @PathVariable Long id,
-        @RequestParam String Authorization,
+        @RequestParam String authorization,
         ProxyExchange<byte[]> proxy
     ) throws IOException {
         log.debug("REST request to download image instance");
-        AbstractImage abstractImage = abstractImageService.find(id, Authorization)
+        AbstractImage abstractImage = abstractImageService.find(id, authorization)
             .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", id));
         return imageServerService.download(abstractImage, proxy);
     }

@@ -19,6 +19,7 @@ package be.cytomine.service.utils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+@SuppressWarnings("checkstyle:all")
 @Component
 public class Dataset {
 

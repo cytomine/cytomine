@@ -239,7 +239,7 @@ public class RestImageInstanceController extends RestCytomineController {
         @RequestParam(required = false) Double contrast,
         @RequestParam(required = false) Double gamma,
         @RequestParam(required = false) String bits,
-        @RequestParam(required = false) String Authorization,
+        @RequestParam(required = false) String authorization,
 
         ProxyExchange<byte[]> proxy
     ) throws IOException {
@@ -253,7 +253,7 @@ public class RestImageInstanceController extends RestCytomineController {
         thumbParameter.setGamma(gamma);
         thumbParameter.setMaxBits(bits != null && bits.equals("max"));
         thumbParameter.setBits(bits != null && !bits.equals("max") ? Integer.parseInt(bits) : null);
-        ImageInstance imageInstance = imageInstanceService.find(id, Authorization)
+        ImageInstance imageInstance = imageInstanceService.find(id, authorization)
             .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", id));
 
         String etag = getRequestETag();
@@ -507,10 +507,10 @@ public class RestImageInstanceController extends RestCytomineController {
     @GetMapping("/imageinstance/{id}/download")
     public ResponseEntity<StreamingResponseBody> download(
         @PathVariable Long id,
-        @RequestParam String Authorization
+        @RequestParam String authorization
     ) throws IOException {
         log.debug("GET /imageinstance/{}/download", id);
-        ImageInstance imageinstance = imageInstanceService.find(id, Authorization)
+        ImageInstance imageinstance = imageInstanceService.find(id, authorization)
             .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", id));
 
         StreamingResponseBody stream = outputStream -> {

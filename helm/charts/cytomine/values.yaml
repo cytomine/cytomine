@@ -136,11 +136,11 @@ pims_cache:
   resources:
     requests:
       memory: "256Mi"
-      cpu: "200m"
+      cpu: "500m"
       ephemeral-storage: 32Mi
     limits:
-      memory: "256Mi"
-      cpu: "200m"
+      memory: "512Mi"
+      cpu: "1000m"
       ephemeral-storage: 1Gi
 
 redis:

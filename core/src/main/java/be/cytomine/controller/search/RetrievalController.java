@@ -36,12 +36,12 @@ public class RetrievalController {
     @GetMapping("/retrieval/search")
     public ResponseEntity<SearchResponse> retrieveSimilarAnnotations(
         @RequestParam(value = "annotation") Long id,
-        @RequestParam(value = "nrt_neigh") Long nrt_neigh
+        @RequestParam(value = "nrt_neigh") Long nearestNeighbours
     ) {
         log.debug("Retrieve similar annotations for query annotation {}", id);
 
         AnnotationDomain annotation = AnnotationDomain.getAnnotationDomain(entityManager, id);
 
-        return retrievalService.retrieveSimilarImages(annotation, nrt_neigh);
+        return retrievalService.retrieveSimilarImages(annotation, nearestNeighbours);
     }
 }

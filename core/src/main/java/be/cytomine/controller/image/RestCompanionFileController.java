@@ -104,7 +104,7 @@ public class RestCompanionFileController extends RestCytomineController {
         log.debug("REST request to show companionfile uploader");
         CompanionFile companionFile = companionFileService.find(id)
                 .orElseThrow(() -> new ObjectNotFoundException("CompanionFile", id));
-        if (companionFile.getUploadedFile() !=null && companionFile.getUploadedFile().getUser()!=null) {
+        if (companionFile.getUploadedFile() != null && companionFile.getUploadedFile().getUser() != null) {
             return responseSuccess(companionFile.getUploadedFile().getUser());
         } else {
             return responseNotFound("CompanionFile", "User", id);

@@ -58,7 +58,9 @@ public class RestProjectConnectionController extends RestCytomineController {
         String os = json.getJSONAttrStr("os");
         String browser = json.getJSONAttrStr("browser");
         String browserVersion = json.getJSONAttrStr("browserVersion");
-        return responseSuccess(projectConnectionService.add(currentUserService.getCurrentUser(), project, session, os, browser, browserVersion));
+        return responseSuccess(projectConnectionService.add(
+            currentUserService.getCurrentUser(), project, session, os, browser, browserVersion
+        ));
 
     }
 
@@ -68,7 +70,9 @@ public class RestProjectConnectionController extends RestCytomineController {
     ) {
         Project project = projectService.find(projectId)
                 .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
-        return responseSuccess(projectConnectionService.lastConnectionInProject(project, null, "created", "desc", 0L, 0L));
+        return responseSuccess(projectConnectionService.lastConnectionInProject(
+            project, null, "created", "desc", 0L, 0L
+        ));
 
     }
 
@@ -79,7 +83,9 @@ public class RestProjectConnectionController extends RestCytomineController {
     ) {
         Project project = projectService.find(projectId)
                 .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
-        return responseSuccess(projectConnectionService.lastConnectionInProject(project, List.of(userId), "created", "desc", 0L, 0L));
+        return responseSuccess(projectConnectionService.lastConnectionInProject(
+            project, List.of(userId), "created", "desc", 0L, 0L
+        ));
 
     }
 
@@ -110,11 +116,17 @@ public class RestProjectConnectionController extends RestCytomineController {
                 .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
 
         if (heatmap) {
-            return responseSuccess(projectConnectionService.numberOfConnectionsByProjectOrderedByHourAndDays(project, afterThan, null));
-        } else if(period!=null) {
-            return responseSuccess(projectConnectionService.numberOfProjectConnections(period, afterThan, null, project, null));
+            return responseSuccess(projectConnectionService.numberOfConnectionsByProjectOrderedByHourAndDays(
+                project, afterThan, null
+            ));
+        } else if (period != null) {
+            return responseSuccess(projectConnectionService.numberOfProjectConnections(
+                period, afterThan, null, project, null
+            ));
         } else {
-            return responseSuccess(projectConnectionService.numberOfConnectionsByProjectAndUser(project, null, "created", "desc", 0L, 0L));
+            return responseSuccess(projectConnectionService.numberOfConnectionsByProjectAndUser(
+                project, null, "created", "desc", 0L, 0L
+            ));
         }
     }
 
@@ -133,22 +145,30 @@ public class RestProjectConnectionController extends RestCytomineController {
         User user = userService.find(userId)
                 .orElseThrow(() -> new ObjectNotFoundException("User", userId));
         if (heatmap) {
-            return responseSuccess(projectConnectionService.numberOfConnectionsByProjectOrderedByHourAndDays(project, afterThan, user));
-        } else if(period!=null) {
-            return responseSuccess(projectConnectionService.numberOfProjectConnections(period, afterThan, null, project, user));
+            return responseSuccess(projectConnectionService.numberOfConnectionsByProjectOrderedByHourAndDays(
+                project, afterThan, user
+            ));
+        } else if (period != null) {
+            return responseSuccess(projectConnectionService.numberOfProjectConnections(
+                period, afterThan, null, project, user
+            ));
         } else {
-            return responseSuccess(projectConnectionService.numberOfConnectionsByProjectAndUser(project, List.of(user.getId()), "created", "desc", 0L, 0L));
+            return responseSuccess(projectConnectionService.numberOfConnectionsByProjectAndUser(
+                project, List.of(user.getId()), "created", "desc", 0L, 0L
+            ));
         }
     }
 
 
     @GetMapping("/connectionFrequency.json")
-    public ResponseEntity<String> lastConnectionInProjectByUser(
+    public ResponseEntity<String> getConnectionFrequency(
             @RequestParam(required = false) Long afterThan,
             @RequestParam(required = false) Long beforeThan,
             @RequestParam(required = true) String period
     ) {
-        return responseSuccess(projectConnectionService.numberOfProjectConnections(period, afterThan, beforeThan, null, null));
+        return responseSuccess(projectConnectionService.numberOfProjectConnections(
+            period, afterThan, beforeThan, null, null
+        ));
     }
 
     @GetMapping("/averageConnections.json")
@@ -161,7 +181,9 @@ public class RestProjectConnectionController extends RestCytomineController {
     ) {
         Project project = projectService.find(projectId).orElse(null);
         User user = userService.find(userId).orElse(null);
-        return responseSuccess(projectConnectionService.averageOfProjectConnections(period, afterThan, beforeThan, project, user));
+        return responseSuccess(projectConnectionService.averageOfProjectConnections(
+            period, afterThan, beforeThan, project, user
+        ));
     }
 
 
@@ -173,7 +195,9 @@ public class RestProjectConnectionController extends RestCytomineController {
     ) {
         Project project = projectService.find(projectId)
                 .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
-        return responseSuccess(JsonObject.of("total", projectConnectionService.countByProject(project, startDate, endDate)));
+        return responseSuccess(JsonObject.of("total", projectConnectionService.countByProject(
+            project, startDate, endDate
+        )));
     }
 
     @GetMapping("/project/{project}/connectionHistory/{user}.json")
@@ -189,17 +213,23 @@ public class RestProjectConnectionController extends RestCytomineController {
         User user = userService.find(userId)
                 .orElseThrow(() -> new ObjectNotFoundException("User", userId));
 
-        Page<PersistentProjectConnection> page = projectConnectionService.getConnectionByUserAndProject(user, project, max, offset);
+        Page<PersistentProjectConnection> page = projectConnectionService.getConnectionByUserAndProject(
+            user, project, max, offset
+        );
 
-        if (export!=null && export.equals("csv")) {
+        if (export != null && export.equals("csv")) {
 
             List<JsonObject> projectConnectionDataList = new ArrayList<>();
-            for(PersistentProjectConnection projectConnection : page){
+            for (PersistentProjectConnection projectConnection : page) {
                 projectConnectionDataList.add(PersistentProjectConnection.getDataFromDomain(projectConnection));
             }
 
-            byte[] report = reportService.generateConnectionHistoryReport(project.getName(), user.getUsername(), projectConnectionDataList);
-            responseReportFile(reportService.getConnectionHistoryReportFileName(export, projectId, userId), report, export);
+            byte[] report = reportService.generateConnectionHistoryReport(
+                project.getName(), user.getUsername(), projectConnectionDataList
+            );
+            responseReportFile(reportService.getConnectionHistoryReportFileName(
+                export, projectId, userId), report, export
+            );
             return null;
         } else {
             return responseSuccess(page);
@@ -213,11 +243,11 @@ public class RestProjectConnectionController extends RestCytomineController {
             @RequestParam(required = false, defaultValue = "0", value = "start") Integer max, // why not max?
             @RequestParam(required = false, defaultValue = "0", value = "length") Integer offset,  // why not length?
             @RequestParam(required = false) String export
-            ) {
+    ) {
 
         List<PersistentImageConsultation> result = projectConnectionService.getUserActivityDetails(id);
 
-        if (export!=null && export.equals("csv")) {
+        if (export != null && export.equals("csv")) {
             throw new CytomineMethodNotYetImplementedException("todo");
         } else {
             return responseSuccess(result, offset, max, false);

@@ -16,7 +16,6 @@ package be.cytomine.service.report;
  * limitations under the License.
  */
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -38,48 +37,49 @@ public class ReportService {
 
     public static final boolean HAS_PAGINATION = true;
     public static final boolean HAS_HEADER = true;
-    public static final List<ReportColumn> ANNOTATION_REPORT_COLUMNS = new ArrayList<>() {{
-        add(new ReportColumn("id", "Id", (float) 0.05));
-        add(new ReportColumn("area", "Area (microns²)", (float) 0.10));
-        add(new ReportColumn("perimeter", "Perimeter (mm)", (float) 0.10));
-        add(new ReportColumn("X", "X", (float) 0.05));
-        add(new ReportColumn("Y", "Y", (float) 0.05));
-        add(new ReportColumn("image", "Image Id", (float) 0.07));
-        add(new ReportColumn("filename", "Image Filename", (float) 0.10));
-        add(new ReportColumn("user", "User", (float) 0.05));
-        add(new ReportColumn("term", "Term", (float) 0.05));
-        add(new ReportColumn("cropURL", "View annotation picture", (float) 0.19));
-        add(new ReportColumn("imageURL", "View annotation on image", (float) 0.19));
-    }};
-    public static final List<ReportColumn> USER_REPORT_COLUMNS = new ArrayList<>() {{
-        add(new ReportColumn("username", "Username", (float) 0.5));
-        add(new ReportColumn("name", "Name", (float) 0.5));
-    }};
-    public static final List<ReportColumn> IMAGE_CONSULTATION_COLUMNS = new ArrayList<>() {{
-        add(new ReportColumn("time", "Cumulated duration (ms)", (float) 0.10));
-        add(new ReportColumn("first", "First consultation", (float) 0.15));
-        add(new ReportColumn("last", "Last consultation", (float) 0.15));
-        add(new ReportColumn("frequency", "Number of consultations", (float) 0.10));
-        add(new ReportColumn("imageId", "Id of image", (float) 0.10));
-        add(new ReportColumn("imageName", "Name", (float) 0.10));
-        add(new ReportColumn("imageThumb", "Thumb", (float) 0.20));
-        add(new ReportColumn(
+    public static final List<ReportColumn> ANNOTATION_REPORT_COLUMNS = List.of(
+        new ReportColumn("id", "Id", (float) 0.05),
+        new ReportColumn("area", "Area (microns²)", (float) 0.10),
+        new ReportColumn("perimeter", "Perimeter (mm)", (float) 0.10),
+        new ReportColumn("X", "X", (float) 0.05),
+        new ReportColumn("Y", "Y", (float) 0.05),
+        new ReportColumn("image", "Image Id", (float) 0.07),
+        new ReportColumn("filename", "Image Filename", (float) 0.10),
+        new ReportColumn("user", "User", (float) 0.05),
+        new ReportColumn("term", "Term", (float) 0.05),
+        new ReportColumn("cropURL", "View annotation picture", (float) 0.19),
+        new ReportColumn("imageURL", "View annotation on image", (float) 0.19)
+    );
+    public static final List<ReportColumn> USER_REPORT_COLUMNS = List.of(
+        new ReportColumn("username", "Username", (float) 0.5),
+        new ReportColumn("name", "Name", (float) 0.5)
+    );
+    public static final List<ReportColumn> IMAGE_CONSULTATION_COLUMNS = List.of(
+        new ReportColumn("time", "Cumulated duration (ms)", (float) 0.10),
+        new ReportColumn("first", "First consultation", (float) 0.15),
+        new ReportColumn("last", "Last consultation", (float) 0.15),
+        new ReportColumn("frequency", "Number of consultations", (float) 0.10),
+        new ReportColumn("imageId", "Id of image", (float) 0.10),
+        new ReportColumn("imageName", "Name", (float) 0.10),
+        new ReportColumn("imageThumb", "Thumb", (float) 0.20),
+        new ReportColumn(
             "numberOfCreatedAnnotations", "Number of created annotations",
             (float) 0.10
-        ));
-    }};
-    public static final List<ReportColumn> CONNECTION_HISTORY_REPORT_COLUMNS = new ArrayList<>() {{
-        add(new ReportColumn("created", "Date", (float) 0.20));
-        add(new ReportColumn("time", "Duration (ms)", (float) 0.10));
-        add(new ReportColumn("countViewedImages", "Number of viewed images", (float) 0.10));
-        add(new ReportColumn(
+        )
+    );
+    public static final List<ReportColumn> CONNECTION_HISTORY_REPORT_COLUMNS = List.of(
+        new ReportColumn("created", "Date", (float) 0.20),
+        new ReportColumn("time", "Duration (ms)", (float) 0.10),
+        new ReportColumn("countViewedImages", "Number of viewed images", (float) 0.10),
+        new ReportColumn(
             "countCreatedAnnotations", "Number of created annotations",
             (float) 0.10
-        ));
-        add(new ReportColumn("os", "Operating System", (float) 0.10));
-        add(new ReportColumn("browser", "Browser", (float) 0.20));
-        add(new ReportColumn("browserVersion", "Browser Version", (float) 0.20));
-    }};
+        ),
+        new ReportColumn("os", "Operating System", (float) 0.10),
+        new ReportColumn("browser", "Browser", (float) 0.20),
+        new ReportColumn("browserVersion", "Browser Version", (float) 0.20)
+    );
+
     private final PDFReportService pdfReportService;
 
     private final SpreadsheetReportService spreadsheetReportService;

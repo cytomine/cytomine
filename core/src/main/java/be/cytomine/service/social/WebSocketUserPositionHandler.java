@@ -167,7 +167,8 @@ public class WebSocketUserPositionHandler extends CytomineWebSocketHandler {
         // Comment for tests
         // ------------------------------------------------ //
         //List<GrantedAuthority> authorities = Arrays.asList(new SimpleGrantedAuthority("ROLE_ADMIN"));
-        //UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken("admin", "adminPassword", authorities);
+        //UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+        // new UsernamePasswordAuthenticationToken("admin", "adminPassword", authorities);
         //SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
         // ------------------------------------------------ //
 
@@ -234,7 +235,8 @@ public class WebSocketUserPositionHandler extends CytomineWebSocketHandler {
     private static String getSessionUserId(ConcurrentWebSocketSessionDecorator session) {
         String userId = "";
         loop:
-        for (Map.Entry<String, ConcurrentWebSocketSessionDecorator[]> entry : WebSocketUserPositionHandler.sessions.entrySet()) {
+        for (Map.Entry<String, ConcurrentWebSocketSessionDecorator[]> entry
+            : WebSocketUserPositionHandler.sessions.entrySet()) {
             for (ConcurrentWebSocketSessionDecorator sessionDecorator : entry.getValue()) {
 
                 if (sessionDecorator.getId().equals(session.getId())) {
@@ -250,7 +252,8 @@ public class WebSocketUserPositionHandler extends CytomineWebSocketHandler {
 
     private void removeSessionFromTrackerSessions(WebSocketSession session) {
         log.debug("Remove this tracking session from tracked sessions");
-        for (Map.Entry<ConcurrentWebSocketSessionDecorator, ConcurrentWebSocketSessionDecorator[]> entry : WebSocketUserPositionHandler.sessionsTracked.entrySet()) {
+        for (Map.Entry<ConcurrentWebSocketSessionDecorator, ConcurrentWebSocketSessionDecorator[]> entry
+            : WebSocketUserPositionHandler.sessionsTracked.entrySet()) {
 
             for (ConcurrentWebSocketSessionDecorator trackedSession : entry.getValue()) {
                 if (trackedSession.getId().equals(session.getId())) {
@@ -271,7 +274,8 @@ public class WebSocketUserPositionHandler extends CytomineWebSocketHandler {
     }
 
     private void removeFromSessions(WebSocketSession session) {
-        for (Map.Entry<String, ConcurrentWebSocketSessionDecorator[]> entry : WebSocketUserPositionHandler.sessions.entrySet()) {
+        for (Map.Entry<String, ConcurrentWebSocketSessionDecorator[]> entry
+            : WebSocketUserPositionHandler.sessions.entrySet()) {
 
             for (ConcurrentWebSocketSessionDecorator trackedSession : entry.getValue()) {
                 if (trackedSession.getId().equals(session.getId())) {
@@ -298,7 +302,8 @@ public class WebSocketUserPositionHandler extends CytomineWebSocketHandler {
 
     private void removeFromBroadcastSession(ConcurrentWebSocketSessionDecorator broadcastSession) {
         log.debug("Remove this broadcast session from broadcast sessions");
-        for (Map.Entry<String, ConcurrentWebSocketSessionDecorator> entry : WebSocketUserPositionHandler.sessionsBroadcast.entrySet()) {
+        for (Map.Entry<String, ConcurrentWebSocketSessionDecorator> entry
+            : WebSocketUserPositionHandler.sessionsBroadcast.entrySet()) {
             if (entry.getValue().getId().equals(broadcastSession.getId())) {
                 WebSocketUserPositionHandler.sessionsBroadcast.remove(entry.getKey());
             }
@@ -344,4 +349,3 @@ public class WebSocketUserPositionHandler extends CytomineWebSocketHandler {
         }*/
     }
 }
-

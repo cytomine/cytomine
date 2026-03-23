@@ -196,7 +196,8 @@ public class ProjectConnectionService {
             .into(new ArrayList<>());
         results.forEach(printDocuments());
 
-        //TODO: bug?...seems that sometimes ProjectConnectionServiceTests.* tests are failing. the sorting on created does not work perfectly (only sort with s, not with ms)?
+        //TODO: bug?...seems that sometimes ProjectConnectionServiceTests.* tests are failing.
+        // the sorting on created does not work perfectly (only sort with s, not with ms)?
 
         return results.stream()
             .map(x -> JsonObject.of("user", x.get("_id"), "created", x.get("created")))
@@ -226,8 +227,8 @@ public class ProjectConnectionService {
         );
         List aggregation = queryResults.getMappedResults();
         List<Long> connected = (List<Long>) aggregation.stream()
-            .map(x -> x instanceof Map ?
-                (Long) ((Map) x).get("user") : (Long) ((PersistentProjectConnection) x).getUser())
+            .map(x -> x instanceof Map
+                ? (Long) ((Map) x).get("user") : (Long) ((PersistentProjectConnection) x).getUser())
             .distinct()
             .collect(Collectors.toList());
 
@@ -299,10 +300,9 @@ public class ProjectConnectionService {
         if (!aggregation.isEmpty() && aggregation.get(0) instanceof Map) {
             continuousConnections = (List<Long>) aggregation.stream()
                 .map(x ->
-                    x instanceof Map ?
-                        be.cytomine.utils.DateUtils.computeDateInMillis((Date) ((Map) x).get("created"
-                        )) :
-                        be.cytomine.utils.DateUtils.computeDateInMillis((Date) ((PersistentConnection) x).getCreated()))
+                    x instanceof Map
+                        ? be.cytomine.utils.DateUtils.computeDateInMillis((Date) ((Map) x).get("created"))
+                        : be.cytomine.utils.DateUtils.computeDateInMillis(((PersistentConnection) x).getCreated()))
                 .collect(Collectors.toList());
         }
 
@@ -442,8 +442,8 @@ public class ProjectConnectionService {
 
         MongoCollection<Document> persistentProjectConnection = mongoClient.getDatabase(mongoDatabaseName)
             .getCollection("persistentProjectConnection");
-        List<Document> requestResults = persistentProjectConnection.
-            aggregate(List.of(
+        List<Document> requestResults = persistentProjectConnection
+            .aggregate(List.of(
                 Document.parse("{$match: {project: " + project.getId() + "}}"),
                 Document.parse("{$group: {_id : '$user', created : {$max :'$created'}}}"),
                 Document.parse("{$sort: {" + sortProperty + ": " + (sortDirection.equals("desc") ? -1 : 1) + "}}")
@@ -530,12 +530,29 @@ public class ProjectConnectionService {
         securityACLService.check(project, WRITE);
 
         Bson projection1 = Document.parse(
-            "{$project : { created : {$subtract:['$created', {$add : [{$millisecond : '$created'}, {$multiply : [{$second : '$created'}, 1000]}, {$multiply : [{$minute : '$created'}, 60000]} ]}]}}}");
+            "{$project: { created: { $subtract: ['$created', "
+                + "{ $add: [ "
+                + "{ $millisecond: '$created' }, "
+                + "{ $multiply: [ { $second: '$created' }, 1000 ] }, "
+                + "{ $multiply: [ { $minute: '$created' }, 60000 ] } "
+                + "] } ] } } }"
+        );
         Bson projection2 = Document.parse(
-            "{$project : { y : {$year:'$created'}, m : {$month:'$created'}, d : {$dayOfMonth:'$created'}, h : {$hour:'$created'}, time : '$created'}}");
+            "{$project: { "
+                + "y: { $year: '$created' }, "
+                + "m: { $month: '$created' }, "
+                + "d: { $dayOfMonth: '$created' }, "
+                + "h: { $hour: '$created' }, "
+                + "time: '$created' "
+                + "} }"
+        );
         Bson group = Document.parse(
-            "{$group : {_id : { year: '$y', month: '$m', day: '$d', hour: '$h'}, \"time\":{$first:'$time'}, \"frequency\":{$sum:1}}}");
-
+            "{$group: { "
+                + "_id: { year: '$y', month: '$m', day: '$d', hour: '$h' }, "
+                + "time: { $first: '$time' }, "
+                + "frequency: { $sum: 1 } "
+                + "} }"
+        );
         Bson match = match(eq("project", project.getId()));
         if (afterThan != null) {
             match = match(and(gte("created", new Date(afterThan)), eq("project", project.getId())));
@@ -615,29 +632,96 @@ public class ProjectConnectionService {
             case "hour":
                 //substract all minutes,seconds & milliseconds (last unit is hour)
                 projection1 = Document.parse(
-                    "{$project : { created : {$subtract:['$created', {$add : [{$millisecond : '$created'}, {$multiply : [{$second : '$created'}, 1000]}, {$multiply : [{$minute : '$created'}, 60000]} ]}]}}}");
+                    "{$project: { "
+                        + "created: { $subtract: ['$created', "
+                        + "{ $add: [ "
+                        + "{ $millisecond: '$created' }, "
+                        + "{ $multiply: [ { $second: '$created' }, 1000 ] }, "
+                        + "{ $multiply: [ { $minute: '$created' }, 60000 ] } "
+                        + "] } ] } "
+                        + "} }"
+                );
+
                 projection2 = Document.parse(
-                    "{$project : { y : {$year:'$created'}, m : {$month:'$created'}, d : {$dayOfMonth:'$created'}, h : {$hour:'$created'}, time : '$created'}}");
+                    "{$project: { "
+                        + "y: { $year: '$created' }, "
+                        + "m: { $month: '$created' }, "
+                        + "d: { $dayOfMonth: '$created' }, "
+                        + "h: { $hour: '$created' }, "
+                        + "time: '$created' "
+                        + "} }"
+                );
+
                 group = Document.parse(
-                    "{$group : {_id : { year: '$y', month: '$m', day: '$d', hour: '$h'}, \"time\":{$first:'$time'}, \"frequency\":{$sum:1}}}");
+                    "{$group: { "
+                        + "_id: { year: '$y', month: '$m', day: '$d', hour: '$h' }, "
+                        + "time: { $first: '$time' }, "
+                        + "frequency: { $sum: 1 } "
+                        + "} }"
+                );
                 break;
             case "day":
                 //also substract hours (last unit is day)
                 projection1 = Document.parse(
-                    "{$project : { created : {$subtract:['$created', {$add : [{$millisecond : '$created'}, {$multiply : [{$second : '$created'}, 1000]}, {$multiply : [{$minute : '$created'}, 60000]}, {$multiply : [{$hour : '$created'}, 3600000]}]}]}}}");
+                    "{$project: { "
+                        + "created: { $subtract: ['$created', "
+                        + "{ $add: [ "
+                        + "{ $millisecond: '$created' }, "
+                        + "{ $multiply: [ { $second: '$created' }, 1000 ] }, "
+                        + "{ $multiply: [ { $minute: '$created' }, 60000 ] }, "
+                        + "{ $multiply: [ { $hour: '$created' }, 3600000 ] } "
+                        + "] } ] } "
+                        + "} }"
+                );
+
                 projection2 = Document.parse(
-                    "{$project : { y : {$year:'$created'}, m : {$month:'$created'}, d : {$dayOfMonth:'$created'}, time : '$created'}}");
+                    "{$project: { "
+                        + "y: { $year: '$created' }, "
+                        + "m: { $month: '$created' }, "
+                        + "d: { $dayOfMonth: '$created' }, "
+                        + "time: '$created' "
+                        + "} }"
+                );
+
                 group = Document.parse(
-                    "{$group : {_id : { year: '$y', month: '$m', day: '$d'}, \"time\":{$first:'$time'}, \"frequency\":{$sum:1}}}");
+                    "{$group: { "
+                        + "_id: { year: '$y', month: '$m', day: '$d' }, "
+                        + "time: { $first: '$time' }, "
+                        + "frequency: { $sum: 1 } "
+                        + "} }"
+                );
                 break;
             case "week":
                 //also substract days (last unit is week)
                 projection1 = Document.parse(
-                    "{$project : { created : {$subtract:['$created', {$add : [{$millisecond : '$created'}, {$multiply : [{$second : '$created'}, 1000]}, {$multiply : [{$minute : '$created'}, 60000]}, {$multiply : [{$hour : '$created'}, 3600000]},  {$multiply : [{$subtract : [{$dayOfWeek: '$created'}, 1]}, 86400000]}       ]}]}}}");
+                    "{$project: { "
+                        + "created: { $subtract: ['$created', "
+                        + "{ $add: [ "
+                        + "{ $millisecond: '$created' }, "
+                        + "{ $multiply: [ { $second: '$created' }, 1000 ] }, "
+                        + "{ $multiply: [ { $minute: '$created' }, 60000 ] }, "
+                        + "{ $multiply: [ { $hour: '$created' }, 3600000 ] }, "
+                        + "{ $multiply: [ { $subtract: [ { $dayOfWeek: '$created' }, 1 ] }, 86400000 ] } "
+                        + "] } ] } "
+                        + "} }"
+                );
+
                 projection2 = Document.parse(
-                    "{$project : { y : {$year:'$created'}, m : {$month:'$created'}, w : {$week:'$created'}, time : '$created'}}");
+                    "{$project: { "
+                        + "y: { $year: '$created' }, "
+                        + "m: { $month: '$created' }, "
+                        + "w: { $week: '$created' }, "
+                        + "time: '$created' "
+                        + "} }"
+                );
+
                 group = Document.parse(
-                    "{$group : {_id : { year: '$y', month: '$m', week: '$w'}, \"time\":{$first:'$time'}, \"frequency\":{$sum:1}}}");
+                    "{$group: { "
+                        + "_id: { year: '$y', month: '$m', week: '$w' }, "
+                        + "time: { $first: '$time' }, "
+                        + "frequency: { $sum: 1 } "
+                        + "} }"
+                );
                 break;
             default:
                 break;
@@ -701,7 +785,14 @@ public class ProjectConnectionService {
             afterThan = DateUtils.addYears(new Date(beforeThan), -1).getTime();
         }
 
-        // what we want: db.persistentProjectConnection.aggregate( {"$match": {$and: [{project : ID_PROJECT}, {created : {$gte : new Date(AFTER) }}]}}, { "$project": { "created": {  "$subtract" : [  "$created",  {  "$add" : [  {"$millisecond" : "$created"}, { "$multiply" : [ {"$second" : "$created"}, 1000 ] }, { "$multiply" : [ {"$minute" : "$created"}, 60, 1000 ] } ] } ] } }  }, { "$project": { "y":{"$year":"$created"}, "m":{"$month":"$created"}, "d":{"$dayOfMonth":"$created"}, "h":{"$hour":"$created"}, "time":"$created" }  },  { "$group":{ "_id": { "year":"$y","month":"$m","day":"$d","hour":"$h"}, time:{"$first":"$time"},  "total":{ "$sum": 1}  }});
+        // what we want: db.persistentProjectConnection.aggregate( {"$match": {$and: [{project : ID_PROJECT},
+        // {created : {$gte : new Date(AFTER) }}]}}, { "$project": { "created": {  "$subtract" : [  "$created",
+        // {  "$add" : [  {"$millisecond" : "$created"}, { "$multiply" : [ {"$second" : "$created"}, 1000 ] },
+        // { "$multiply" : [ {"$minute" : "$created"}, 60, 1000 ] } ] } ] } }  },
+        // { "$project": { "y":{"$year":"$created"}, "m":{"$month":"$created"},
+        // "d":{"$dayOfMonth":"$created"}, "h":{"$hour":"$created"}, "time":"$created" }  },
+        // { "$group":{ "_id": { "year":"$y","month":"$m","day":"$d","hour":"$h"}, time:{"$first":"$time"},
+        // "total":{ "$sum": 1}  }});
 
         List<Bson> matchs = new ArrayList<>();
         Bson projection1 = null;
@@ -716,30 +807,87 @@ public class ProjectConnectionService {
             case "hour":
                 //substract all minutes,seconds & milliseconds (last unit is hour)
                 projection1 = Document.parse(
-                    "{$project : { created : {$subtract:['$created', {$add : [{$millisecond : '$created'}, {$multiply : [{$second : '$created'}, 1000]}, {$multiply : [{$minute : '$created'}, 60000]} ]}]}}}");
+                    "{$project: { "
+                        + "created: { $subtract: ['$created', "
+                        + "{ $add: [ "
+                        + "{ $millisecond: '$created' }, "
+                        + "{ $multiply: [ { $second: '$created' }, 1000 ] }, "
+                        + "{ $multiply: [ { $minute: '$created' }, 60000 ] } "
+                        + "] } ] } "
+                        + "} }"
+                );
                 projection2 = Document.parse(
-                    "{$project : { h : {$hour:'$created'}, time : '$created'}}");
+                    "{$project: { "
+                        + "h: { $hour: '$created' }, "
+                        + "time: '$created' "
+                        + "} }"
+                );
                 group = Document.parse(
-                    "{$group : {_id : { hour: '$h'}, \"time\":{$first:'$time'}, \"frequency\":{$sum:1}}}");
+                    "{$group: { "
+                        + "_id: { hour: '$h' }, "
+                        + "time: { $first: '$time' }, "
+                        + "frequency: { $sum: 1 } "
+                        + "} }"
+                );
                 break;
+
             case "day":
                 //also substract hours (last unit is day)
                 projection1 = Document.parse(
-                    "{$project : { created : {$subtract:['$created', {$add : [{$millisecond : '$created'}, {$multiply : [{$second : '$created'}, 1000]}, {$multiply : [{$minute : '$created'}, 60000]}, {$multiply : [{$hour : '$created'}, 3600000]}]}]}}}");
+                    "{$project: { "
+                        + "created: { $subtract: ['$created', "
+                        + "{ $add: [ "
+                        + "{ $millisecond: '$created' }, "
+                        + "{ $multiply: [ { $second: '$created' }, 1000 ] }, "
+                        + "{ $multiply: [ { $minute: '$created' }, 60000 ] }, "
+                        + "{ $multiply: [ { $hour: '$created' }, 3600000 ] } "
+                        + "] } ] } "
+                        + "} }"
+                );
                 projection2 = Document.parse(
-                    "{$project : { d : {$dayOfMonth:'$created'}, time : '$created'}}");
+                    "{$project: { "
+                        + "d: { $dayOfMonth: '$created' }, "
+                        + "time: '$created' "
+                        + "} }"
+                );
                 group = Document.parse(
-                    "{$group : {_id : { day: '$d'}, \"time\":{$first:'$time'}, \"frequency\":{$sum:1}}}");
+                    "{$group: { "
+                        + "_id: { day: '$d' }, "
+                        + "time: { $first: '$time' }, "
+                        + "frequency: { $sum: 1 } "
+                        + "} }"
+                );
                 break;
+
             case "week":
                 //also substract days (last unit is week)
                 projection1 = Document.parse(
-                    "{$project : { created : {$subtract:['$created', {$add : [{$millisecond : '$created'}, {$multiply : [{$second : '$created'}, 1000]}, {$multiply : [{$minute : '$created'}, 60000]}, {$multiply : [{$hour : '$created'}, 3600000]},  {$multiply : [{$subtract : [{$dayOfWeek: '$created'}, 1]}, 86400000]}       ]}]}}}");
+                    "{$project: { "
+                        + "created: { $subtract: ['$created', "
+                        + "{ $add: [ "
+                        + "{ $millisecond: '$created' }, "
+                        + "{ $multiply: [ { $second: '$created' }, 1000 ] }, "
+                        + "{ $multiply: [ { $minute: '$created' }, 60000 ] }, "
+                        + "{ $multiply: [ { $hour: '$created' }, 3600000 ] }, "
+                        + "{ $multiply: [ { $subtract: [ { $dayOfWeek: '$created' }, 1 ] }, 86400000 ] } "
+                        + "] } ] } "
+                        + "} }"
+                );
                 projection2 = Document.parse(
-                    "{$project : { w : {$week:'$created'}, time : '$created'}}");
+                    "{$project: { "
+                        + "w: { $week: '$created' }, "
+                        + "time: '$created' "
+                        + "} }"
+                );
                 group = Document.parse(
-                    "{$group : {_id : { week: '$w'}, \"time\":{$first:'$time'}, \"frequency\":{$sum:1}}}");
+                    "{$group: { "
+                        + "_id: { week: '$w' }, "
+                        + "time: { $first: '$time' }, "
+                        + "frequency: { $sum: 1 } "
+                        + "} }"
+                );
                 break;
+
             default:
                 break;
         }

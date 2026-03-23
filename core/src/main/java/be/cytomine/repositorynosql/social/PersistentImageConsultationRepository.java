@@ -32,12 +32,11 @@ public interface PersistentImageConsultationRepository extends MongoRepository<P
     );
 
     @Aggregation(pipeline = {
-        "{$match: {project: ?0}}",
-        "{$sort: {?1: ?2}}",
-        "{$group: {_id: '$user', created: {$max: '$created'}}}",
-        "{$sort: {?1: ?2}}"
-    }
-    )
+        "{$match: {project: ?0}},"
+            + "{$sort: {?1: ?2}},"
+            + "{$group: {_id : '$user', created : {$max :'$created'}},"
+            + "{$sort: {?1: ?2}}}"
+    })
     AggregationResults retrieve(Long project, String sortProperty, Integer sortDirection);
 
 

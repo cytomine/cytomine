@@ -1,4 +1,4 @@
-package org.cytomine.e2etests.project;
+package org.cytomine.e2etests.selenium;
 
 import java.io.File;
 import java.lang.reflect.Method;

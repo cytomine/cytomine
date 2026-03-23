@@ -99,18 +99,17 @@ jobs:
             --helm-extra-set-args="$EXTRA_ARGS" \
             --helm-extra-args="--timeout 20m"
 
-      - name: Logs e2e tests results
+      - name: Logs e2e tests results - e2e-tests pod
         if: always()
         run: kubectl --namespace=cytomine-${{ github.sha }} logs e2e-tests -c e2e-tests
 
-      - name: Logs e2e tests results - selenium
+      - name: Logs e2e tests results - selenium pod
         if: always()
         run: kubectl --namespace=cytomine-${{ github.sha }} logs e2e-tests -c selenium
 
       - name: Export test results
         if: always()
         run: |
-          # Delete e2e-tests pod to release the PVC (ReadWriteOnce)
           kubectl --namespace=cytomine-${{ github.sha }} delete pod e2e-tests --wait=true --timeout=60s || true
           kubectl --namespace=cytomine-${{ github.sha }} apply -f .github/workflows/test-reports/export-pod.yaml
           kubectl --namespace=cytomine-${{ github.sha }} wait --for=condition=Ready pod/export-test-results --timeout=60s || echo "Pod not ready, attempting copy anyway"

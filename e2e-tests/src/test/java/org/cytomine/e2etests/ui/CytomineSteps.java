@@ -3,7 +3,6 @@ package org.cytomine.e2etests.ui;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Duration;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -14,7 +13,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Wait;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -171,14 +169,13 @@ public class CytomineSteps {
     public void openImageInViewer(Wait<WebDriver> wait, WebDriver driver, String projectURL) {
         webDriverUtils.goTo(wait, projectURL);
         webDriverUtils.xpathClick(wait, "//li//a[.//i[contains(@class, 'fa-image')]]");
-        Wait<WebDriver> longWait = new WebDriverWait(driver, Duration.ofSeconds(60));
         Thread.sleep(2000);
-        webDriverUtils.waitLoading(longWait);
-        webDriverUtils.byIsDisplayed(longWait, By.xpath("//td//a[contains(@href, '/image/')]"));
+        webDriverUtils.waitLoading(wait);
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//td//a[contains(@href, '/image/')]"));
         webDriverUtils.xpathClick(wait, "//td//a[contains(@href, '/image/')]");
         Thread.sleep(1000);
-        webDriverUtils.waitLoading(longWait);
-        webDriverUtils.byIsDisplayed(longWait, By.cssSelector(".draw-tools-wrapper"));
+        webDriverUtils.waitLoading(wait);
+        webDriverUtils.byIsDisplayed(wait, By.cssSelector(".draw-tools-wrapper"));
     }
 
     public void selectTermForAnnotation(Wait<WebDriver> wait, String termName) {
@@ -195,7 +192,6 @@ public class CytomineSteps {
     }
 
     public void drawRectangleAnnotation(Wait<WebDriver> wait, WebDriver driver) {
-        // Click on the rectangle tool and wait for it to be selected
         webDriverUtils.xpathClick(wait, "//button[.//i[contains(@class, 'fa-square')]]");
         webDriverUtils.byIsDisplayed(wait, By.xpath(
             "//button[contains(@class, 'is-selected') and .//i[contains(@class, 'fa-square')]]"));
@@ -219,8 +215,7 @@ public class CytomineSteps {
     }
 
     public void verifyAnnotationCreated(Wait<WebDriver> wait, WebDriver driver) {
-        Wait<WebDriver> longWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        webDriverUtils.byIsDisplayed(longWait, By.cssSelector(".draw-tools-wrapper"));
+        webDriverUtils.byIsDisplayed(wait, By.cssSelector(".draw-tools-wrapper"));
         webDriverUtils.xpathClick(wait, "//button[.//i[contains(@class, 'fa-mouse-pointer')]]");
         webDriverUtils.byIsDisplayed(wait, By.xpath(
             "//button[contains(@class, 'is-selected') and .//i[contains(@class, "

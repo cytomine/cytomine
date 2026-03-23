@@ -68,6 +68,11 @@ jobs:
           INGRESS_IP=$(kubectl get svc -n ingress ingress-nginx-controller -o jsonpath='{.spec.clusterIP}')
           echo "INGRESS_IP=$INGRESS_IP" >> $GITHUB_ENV
 
+      - name: Count e2e tests in selenium folder
+        run: |
+          E2E_TEST_COUNT=$(grep -r "@Test" e2e-tests/src/test/java/org/cytomine/e2etests/selenium/ --include="*.java" | wc -l)
+          echo "E2E_TEST_COUNT=$E2E_TEST_COUNT" >> $GITHUB_ENV
+
       - name: Run chart-testing (lint and install)
         run: |
           # Cytomine images from registry.cytomine.org/cytomine/
@@ -93,7 +98,8 @@ jobs:
           EXTRA_ARGS+="--set images.postgresql_app_engine=registry.cytomine.org/docker/library/postgres:14 "
           EXTRA_ARGS+="--set images.postgis=registry.cytomine.org/docker/postgis/postgis:15-3.5 "
           EXTRA_ARGS+="--set images.selenium=registry.cytomine.org/docker/selenium/standalone-firefox "
-          EXTRA_ARGS+="--set images.registry=registry.cytomine.org/docker/library/registry:2.8.3"
+          EXTRA_ARGS+="--set images.registry=registry.cytomine.org/docker/library/registry:2.8.3 "
+          EXTRA_ARGS+="--set test.e2eTestCount=${{ env.E2E_TEST_COUNT }}"
           ct lint-and-install --target-branch ${{ github.event.repository.default_branch }} \
             --chart-dirs=helm/charts/ --all --namespace=cytomine-${{ github.sha }} \
             --helm-extra-set-args="$EXTRA_ARGS" \

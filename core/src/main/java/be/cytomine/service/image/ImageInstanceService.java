@@ -187,18 +187,18 @@ public class ImageInstanceService extends ModelService {
 
 
     public Optional<ImageInstance> find(Long id) {
-        Optional<ImageInstance> ImageInstance = imageInstanceRepository.findById(id);
-        ImageInstance.ifPresent(image -> securityACLService.check(image.container(), READ));
-        return ImageInstance;
+        Optional<ImageInstance> imageInstance = imageInstanceRepository.findById(id);
+        imageInstance.ifPresent(image -> securityACLService.check(image.container(), READ));
+        return imageInstance;
     }
 
     public Optional<ImageInstance> find(Long id, String authHeader) {
-        Optional<ImageInstance> ImageInstance = imageInstanceRepository.findById(id);
+        Optional<ImageInstance> imageInstance = imageInstanceRepository.findById(id);
         String token = authHeader.replace("Bearer ", "");
         String username = TokenUtils.getUsernameFromToken(token);
         User user = currentUserService.getCurrentUser(username);
-        ImageInstance.ifPresent(image -> securityACLService.check(image.container(), READ, user));
-        return ImageInstance;
+        imageInstance.ifPresent(image -> securityACLService.check(image.container(), READ, user));
+        return imageInstance;
     }
 
     public ImageInstance get(Long id) {
@@ -430,8 +430,10 @@ public class ImageInstanceService extends ModelService {
             .map(x -> x.getSql())
             .collect(Collectors.joining(" AND "));
 
-        String select, from, where, search, sort;
-        String request;
+        String select;
+        String from;
+        String where;
+        String search;
 
         select = "SELECT distinct " + imageInstanceAlias + ".* ";
         from = "FROM user_image " + imageInstanceAlias + " ";
@@ -447,8 +449,8 @@ public class ImageInstanceService extends ModelService {
             search += abstractImageCondition;
         }
         if (!tagsCondition.isBlank()) {
-            from
-                += "LEFT OUTER JOIN tag_domain_association tda ON ui.id = tda.domain_ident AND tda.domain_class_name = 'be.cytomine.domain.image.ImageInstance' ";
+            from += "LEFT OUTER JOIN tag_domain_association tda ON ui.id = tda.domain_ident "
+                + "AND tda.domain_class_name = 'be.cytomine.domain.image.ImageInstance' ";
             search += " AND ";
             search += tagsCondition;
         }
@@ -462,25 +464,12 @@ public class ImageInstanceService extends ModelService {
             } else if (nameSearch.getOperation() == SearchOperation.equals) {
                 operation = "==";
             }
-            search += "AND ( (NOT project_blind AND "
-                + imageInstanceAlias
-                + ".instance_filename "
-                + operation
-                + " :name) "
-                +
-                "  OR (project_blind AND NOT user_project_manager AND CAST(base_image_id as text) "
-                + operation
-                + " :name) "
-                +
-                "  OR (project_blind AND user_project_manager AND CAST(base_image_id as text) "
-                + operation
-                + " :name "
-                +
-                "  OR "
-                + imageInstanceAlias
-                + ".instance_filename "
-                + operation
-                + " :name))";
+            search += "AND ( (NOT project_blind AND " + imageInstanceAlias + ".instance_filename "
+                + operation + " :name) "
+                + "  OR (project_blind AND NOT user_project_manager AND CAST(base_image_id as text) "
+                + operation + " :name) "
+                + "  OR (project_blind AND user_project_manager AND CAST(base_image_id as text) "
+                + operation + " :name " + "  OR " + imageInstanceAlias + ".instance_filename " + operation + " :name))";
         }
 
         if (search.contains(imageInstanceAlias + ".instance_filename") || sortedProperty.contains(imageInstanceAlias
@@ -506,24 +495,18 @@ public class ImageInstanceService extends ModelService {
                 + ".original_filename) ";
         }
 
-        sort = " ORDER BY " + sortedProperty;
+        String sort = " ORDER BY " + sortedProperty;
         sort += (sortDirection.equals("desc")) ? " DESC " : " ASC ";
-
 
         if (joinAI) {
             select += ", " + ABSTRACT_IMAGE_COLUMNS_FOR_SEARCH.stream()
                 .map(x -> abstractImageAlias + "." + x)
                 .collect(Collectors.joining(",")) + " ";
-            from += "JOIN abstract_image "
-                + abstractImageAlias
-                + " ON "
-                + abstractImageAlias
-                + ".id = "
-                + imageInstanceAlias
-                + ".base_image_id ";
+            from += "JOIN abstract_image " + abstractImageAlias + " ON " + abstractImageAlias
+                + ".id = " + imageInstanceAlias + ".base_image_id ";
         }
 
-        request = select + from + where + search + sort;
+        String request = select + from + where + search + sort;
         if (max > 0) {
             request += " LIMIT " + max;
         }
@@ -560,7 +543,8 @@ public class ImageInstanceService extends ModelService {
             result.put("reviewUser", result.get("reviewUserId"));
             result.put("baseImage", result.get("baseImageId"));
             result.put("project", result.get("projectId"));
-            // TODO: select N + 1 => see projectService (eagerOntology to load domain directly without fetching database)
+            // TODO: select N + 1 => see projectService
+            //  (eagerOntology to load domain directly without fetching database)
             JsonObject object = ImageInstance.getDataFromDomain(new ImageInstance().buildDomainFromJson(
                 result,
                 entityManager
@@ -600,7 +584,6 @@ public class ImageInstanceService extends ModelService {
         String imageInstanceAlias = "ii";
         String abstractImageAlias = "ai";
         String mimeAlias = "mime";
-        String imageGroupAlias = "igii";
 
         if (sortColumn == null) {
             sortColumn = "created";
@@ -663,6 +646,7 @@ public class ImageInstanceService extends ModelService {
             }
         }
 
+        String imageGroupAlias = "igii";
         final String finalSortedProperty = sortedProperty;
         boolean joinAI = validatedSearchParameters.stream()
             .anyMatch(x -> x.getProperty().contains(abstractImageAlias + ".") || finalSortedProperty.contains(
@@ -710,21 +694,19 @@ public class ImageInstanceService extends ModelService {
                 securityACLService.checkIsAdminContainer(project, currentUserService.getCurrentUser());
                 manager = true;
             } catch (ForbiddenException e) {
+                // TODO
             }
         }
 
-        String select, from, where, search, sort;
-        String request;
+        String select;
+        String from;
+        String where;
+        String search;
 
         select = "SELECT distinct " + imageInstanceAlias + ".* ";
         from = "FROM image_instance " + imageInstanceAlias + " ";
-        where = "WHERE "
-            + imageInstanceAlias
-            + ".project_id = "
-            + project.getId()
-            + " AND "
-            + imageInstanceAlias
-            + ".parent_id IS NULL ";
+        where = "WHERE " + imageInstanceAlias + ".project_id = " + project.getId()
+            + " AND " + imageInstanceAlias + ".parent_id IS NULL ";
         search = "";
 
         if (!imageInstanceCondition.isBlank()) {
@@ -740,8 +722,8 @@ public class ImageInstanceService extends ModelService {
             search += mimeCondition;
         }
         if (!tagsCondition.isBlank()) {
-            from
-                += "LEFT OUTER JOIN tag_domain_association tda ON ii.id = tda.domain_ident AND tda.domain_class_name = 'be.cytomine.domain.image.ImageInstance' ";
+            from += "LEFT OUTER JOIN tag_domain_association tda ON ii.id = tda.domain_ident "
+                + "AND tda.domain_class_name = 'be.cytomine.domain.image.ImageInstance' ";
             search += " AND ";
             search += tagsCondition;
         }
@@ -785,43 +767,28 @@ public class ImageInstanceService extends ModelService {
                 + ".original_filename) ";
         }
 
-        sort = " ORDER BY " + sortedProperty;
+        String sort = " ORDER BY " + sortedProperty;
         sort += (sortDirection.equals("desc")) ? " DESC " : " ASC ";
 
         if (joinAI || joinMime) {
             select += ", " + ABSTRACT_IMAGE_COLUMNS_FOR_SEARCH.stream()
                 .map(x -> abstractImageAlias + "." + x)
                 .collect(Collectors.joining(",")) + " ";
-            from += "JOIN abstract_image "
-                + abstractImageAlias
-                + " ON "
-                + abstractImageAlias
-                + ".id = "
-                + imageInstanceAlias
-                + ".base_image_id ";
+            from += "JOIN abstract_image " + abstractImageAlias + " ON " + abstractImageAlias
+                + ".id = " + imageInstanceAlias + ".base_image_id ";
         }
         if (joinMime) {
             select += ", " + mimeAlias + ".content_type ";
-            from += "JOIN uploaded_file  "
-                + mimeAlias
-                + " ON "
-                + mimeAlias
-                + ".id = "
-                + abstractImageAlias
-                + ".uploaded_file_id ";
+            from += "JOIN uploaded_file  " + mimeAlias + " ON "
+                + mimeAlias + ".id = " + abstractImageAlias + ".uploaded_file_id ";
         }
         if (joinImageGroup) {
             select += ", igii.group_id as image_group_id ";
             from += "LEFT OUTER JOIN (SELECT * FROM image_group_image_instance WHERE deleted IS NULL) "
-                + imageGroupAlias
-                + " ON "
-                + imageInstanceAlias
-                + ".id = "
-                + imageGroupAlias
-                + ".image_id ";
+                + imageGroupAlias + " ON " + imageInstanceAlias + ".id = " + imageGroupAlias + ".image_id ";
         }
 
-        request = select + from + where + search + sort;
+        String request = select + from + where + search + sort;
         if (max > 0) {
             request += " LIMIT " + max;
         }

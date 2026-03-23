@@ -91,9 +91,11 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
     }
 
     @Transactional
-    protected void updateRolesAndAdminSession(JwtAuthenticationToken jwtAuthenticationToken,
-                                              User user,
-                                              Set<String> rolesFromAuthentication) {
+    protected void updateRolesAndAdminSession(
+        JwtAuthenticationToken jwtAuthenticationToken,
+        User user,
+        Set<String> rolesFromAuthentication
+    ) {
 
         secSecUserSecRoleRepository.deleteAllByIdInBatch(
             secSecUserSecRoleRepository.findAllBySecUser(user).stream()

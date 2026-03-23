@@ -137,8 +137,8 @@ public class TaskRunServiceTest {
         when(taskRunLayerRepository.findAllByTaskRunAndImage(any(), any())).thenReturn(Set.of(taskRunLayer));
         when(geometryService.isGeometry(geoJson1)).thenReturn(true);
         when(geometryService.isGeometry(geoJson2)).thenReturn(true);
-        when(geometryService.GeoJSONToWKT(geoJson1)).thenReturn("POINT (1 2)");
-        when(geometryService.GeoJSONToWKT(geoJson2)).thenReturn("POINT (3 4)");
+        when(geometryService.geoJsonToWkt(geoJson1)).thenReturn("POINT (1 2)");
+        when(geometryService.geoJsonToWkt(geoJson2)).thenReturn("POINT (3 4)");
 
         String result = taskRunService.getOutputs(projectId, taskRunId);
 
@@ -204,8 +204,8 @@ public class TaskRunServiceTest {
         when(taskRunLayerRepository.findAllByTaskRunAndImage(any(), any())).thenReturn(Set.of(taskRunLayer));
         when(geometryService.isGeometry(geoJson1)).thenReturn(true);
         when(geometryService.isGeometry(geoJson2)).thenReturn(true);
-        when(geometryService.GeoJSONToWKT(geoJson1)).thenReturn("POINT (1 2)");
-        when(geometryService.GeoJSONToWKT(geoJson2)).thenReturn("POINT (3 4)");
+        when(geometryService.geoJsonToWkt(geoJson1)).thenReturn("POINT (1 2)");
+        when(geometryService.geoJsonToWkt(geoJson2)).thenReturn("POINT (3 4)");
 
         String result = taskRunService.getOutputs(projectId, taskRunId);
 

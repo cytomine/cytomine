@@ -144,23 +144,27 @@ public class RestImageInstanceController extends RestCytomineController {
             return responseSuccess(
                 imageInstanceService.listLight(project), securityACLService.isFilterRequired(project));
         } else if (tree) {
-            return responseSuccess(imageInstanceService.listTree(
+            return responseSuccess(
+                imageInstanceService.listTree(
                     project,
                     requestParams.getOffset(),
-                    requestParams.getMax()),
+                    requestParams.getMax()
+                ),
                 securityACLService.isFilterRequired(project)
             );
         } else if (withLastActivity) {
             ImageSearchExtension imageSearchExtension = new ImageSearchExtension();
             imageSearchExtension.setWithLastActivity(withLastActivity);
-            return responseSuccess(imageInstanceService.listExtended(
+            return responseSuccess(
+                imageInstanceService.listExtended(
                     project,
                     imageSearchExtension,
                     retrieveSearchParameters(),
                     requestParams.getSort(),
                     requestParams.getOrder(),
                     requestParams.getOffset(),
-                    requestParams.getMax()),
+                    requestParams.getMax()
+                ),
                 securityACLService.isFilterRequired(project)
             );
         } else {
@@ -235,7 +239,7 @@ public class RestImageInstanceController extends RestCytomineController {
         @RequestParam(required = false) Double contrast,
         @RequestParam(required = false) Double gamma,
         @RequestParam(required = false) String bits,
-        @RequestParam(required = false) String Authorization,
+        @RequestParam(required = false) String authorization,
 
         ProxyExchange<byte[]> proxy
     ) throws IOException {
@@ -249,7 +253,7 @@ public class RestImageInstanceController extends RestCytomineController {
         thumbParameter.setGamma(gamma);
         thumbParameter.setMaxBits(bits != null && bits.equals("max"));
         thumbParameter.setBits(bits != null && !bits.equals("max") ? Integer.parseInt(bits) : null);
-        ImageInstance imageInstance = imageInstanceService.find(id, Authorization)
+        ImageInstance imageInstance = imageInstanceService.find(id, authorization)
             .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", id));
 
         String etag = getRequestETag();
@@ -285,7 +289,9 @@ public class RestImageInstanceController extends RestCytomineController {
             .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", id));
 
         String etag = getRequestETag();
-        return imageServerService.thumb(sliceCoordinatesService.getReferenceSlice(imageInstance.getBaseImage()), previewParameter, etag, proxy);
+        return imageServerService.thumb(
+            sliceCoordinatesService.getReferenceSlice(imageInstance.getBaseImage()), previewParameter, etag, proxy
+        );
     }
 
 
@@ -301,7 +307,8 @@ public class RestImageInstanceController extends RestCytomineController {
     @GetMapping("/imageinstance/{id}/histogram.json")
     public ResponseEntity<String> histogram(
         @PathVariable Long id,
-        @RequestParam(required = false, defaultValue = "256") Integer nBins) throws IOException {
+        @RequestParam(required = false, defaultValue = "256") Integer nBins
+    ) throws IOException {
         log.debug("REST request to get histogram images");
         ImageInstance imageInstance = imageInstanceService.find(id)
             .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", id));
@@ -319,7 +326,8 @@ public class RestImageInstanceController extends RestCytomineController {
     @GetMapping("/imageinstance/{id}/channelhistogram.json")
     public ResponseEntity<String> channelHistograms(
         @PathVariable Long id,
-        @RequestParam(required = false, defaultValue = "256") Integer nBins) throws IOException {
+        @RequestParam(required = false, defaultValue = "256") Integer nBins
+    ) throws IOException {
         log.debug("REST request to get channelhistogram images");
         ImageInstance imageInstance = imageInstanceService.find(id)
             .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", id));
@@ -345,7 +353,8 @@ public class RestImageInstanceController extends RestCytomineController {
         @PathVariable String format,
         @RequestParam(defaultValue = "256") Integer maxSize,
 
-        ProxyExchange<byte[]> proxy) throws IOException {
+        ProxyExchange<byte[]> proxy
+    ) throws IOException {
         log.debug("REST request to get associated image of an imageInstance image");
         ImageInstance imageInstance = imageInstanceService.find(id)
             .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", id));
@@ -362,6 +371,7 @@ public class RestImageInstanceController extends RestCytomineController {
         return imageServerService.label(imageInstance, labelParameter, etag, proxy);
     }
 
+    @SuppressWarnings("checkstyle:VariableDeclarationUsageDistance")
     @RequestMapping(value = "/imageinstance/{id}/crop.{format}", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<byte[]> crop(
         @PathVariable Long id,
@@ -401,7 +411,7 @@ public class RestImageInstanceController extends RestCytomineController {
         CropParameter cropParameter = new CropParameter();
         cropParameter.setGeometry(geometry);
         cropParameter.setLocation(location);
-//        cropParameter.setBoundaries(boundaries);
+        // cropParameter.setBoundaries(boundaries);
         cropParameter.setMaxSize(maxSize);
         cropParameter.setComplete(complete);
         cropParameter.setZoom(zoom);
@@ -497,10 +507,10 @@ public class RestImageInstanceController extends RestCytomineController {
     @GetMapping("/imageinstance/{id}/download")
     public ResponseEntity<StreamingResponseBody> download(
         @PathVariable Long id,
-        @RequestParam String Authorization
+        @RequestParam String authorization
     ) throws IOException {
         log.debug("GET /imageinstance/{}/download", id);
-        ImageInstance imageinstance = imageInstanceService.find(id, Authorization)
+        ImageInstance imageinstance = imageInstanceService.find(id, authorization)
             .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", id));
 
         StreamingResponseBody stream = outputStream -> {

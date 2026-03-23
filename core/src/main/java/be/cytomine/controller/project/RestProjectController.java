@@ -59,8 +59,7 @@ public class RestProjectController extends RestCytomineController {
     private final TaskRunService taskRunService;
 
     /**
-     * List all ontology visible for the current user
-     * For each ontology, print the terms tree
+     * List all ontology visible for the current user For each ontology, print the terms tree
      */
     @GetMapping("/project.json")
     public ResponseEntity<String> list(
@@ -126,8 +125,7 @@ public class RestProjectController extends RestCytomineController {
     }
 
     /**
-     * Get last action done on a specific project
-     * ex: "user x add a new annotation on image y",...
+     * Get last action done on a specific project ex: "user x add a new annotation on image y",...
      */
     @GetMapping("/project/{id}/last/{max}.json")
     public ResponseEntity<String> lastAction(

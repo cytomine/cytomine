@@ -140,9 +140,10 @@ public class RestAnnotationTermController extends RestCytomineController {
                         : json.getJSONAttrLong("userannotation")
                 )
                 .orElseThrow(() -> new ObjectNotFoundException(
-                    "Annotation", "annotationIdent="
-                    + json.getJSONAttrStr("annotationIdent", "null")
-                    + "-userannotation=" + json.getJSONAttrStr("userannotation", "null"))
+                        "Annotation", "annotationIdent="
+                        + json.getJSONAttrStr("annotationIdent", "null")
+                        + "-userannotation=" + json.getJSONAttrStr("userannotation", "null")
+                    )
                 );
         //if term is added from a user, check if the user has permission for UserAnnotation domain
         securityACLService.check(json.getJSONAttrLong("userannotation"), UserAnnotation.class, READ);
@@ -185,8 +186,8 @@ public class RestAnnotationTermController extends RestCytomineController {
     }
 
     /**
-     * Add annotation-term for an annotation and delete all annotation-term
-     * that where already map with this annotation by this user
+     * Add annotation-term for an annotation and delete all annotation-term that where already map with this annotation
+     * by this user
      */
     @PostMapping("/annotation/{idAnnotation}/term/{idTerm}/clearBefore.json")
     public ResponseEntity<String> addWithDeletingOldTerm(

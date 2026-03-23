@@ -86,7 +86,7 @@ public class BootstrapUtilsService {
 
     public void createFilter(String name, String method, Boolean available) {
         ImageFilter filter = imageFilterRepository.findByName(name)
-                .orElseGet(ImageFilter::new);
+            .orElseGet(ImageFilter::new);
         filter.setName(name);
         filter.setMethod(method);
         filter.setAvailable(available);
@@ -102,7 +102,7 @@ public class BootstrapUtilsService {
         }
     }
 
-    public void createConfigurations(String key, String value, ConfigurationReadingRole readingRole){
+    public void createConfigurations(String key, String value, ConfigurationReadingRole readingRole) {
         Configuration configuration = new Configuration();
         configuration.setKey(key);
         configuration.setValue(value);

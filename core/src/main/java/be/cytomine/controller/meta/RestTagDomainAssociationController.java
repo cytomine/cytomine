@@ -39,12 +39,12 @@ public class RestTagDomainAssociationController extends RestCytomineController {
 
     @GetMapping("/tag_domain_association/{id}.json")
     public ResponseEntity<String> show(
-            @PathVariable Long id
+        @PathVariable Long id
     ) {
         log.debug("REST request to get Tag domain association : {}", id);
         return tagDomainAssociationService.find(id)
-                .map(this::responseSuccess)
-                .orElseGet(() -> responseNotFound("Tag", id));
+            .map(this::responseSuccess)
+            .orElseGet(() -> responseNotFound("Tag", id));
     }
 
     @GetMapping("/tag_domain_association.json")
@@ -52,17 +52,19 @@ public class RestTagDomainAssociationController extends RestCytomineController {
         log.debug("REST request to list tags");
         List<SearchParameterEntry> searchParameterEntries = retrieveSearchParameters();
         RequestParams requestParams = retrievePageableParameters();
-        return responseSuccess(tagDomainAssociationService.list(searchParameterEntries), requestParams.getOffset(), requestParams.getMax());
+        return responseSuccess(
+            tagDomainAssociationService.list(searchParameterEntries), requestParams.getOffset(), requestParams.getMax()
+        );
     }
 
     @GetMapping("/domain/{domainClassName}/{domainIdent}/tag_domain_association.json")
     public ResponseEntity<String> listByDomain(
-            @PathVariable String domainClassName,
-            @PathVariable Long domainIdent
+        @PathVariable String domainClassName,
+        @PathVariable Long domainIdent
     ) {
         log.debug("REST request to list tags for domain {} {}", domainClassName, domainIdent);
         CytomineDomain domain = null;
-        if(domainClassName.contains("AnnotationDomain")) {
+        if (domainClassName.contains("AnnotationDomain")) {
             domain = annotationDomainRepository.findById(domainIdent).orElse(null);
         } else {
             domain = tagDomainAssociationService.getCytomineDomain(domainClassName, domainIdent);
@@ -73,11 +75,15 @@ public class RestTagDomainAssociationController extends RestCytomineController {
         return responseSuccess(tagDomainAssociationService.listAllByDomain(domain));
     }
 
-    @PostMapping({"/tag_domain_association.json", "/domain/{domainClassName}/{domainIdent}/tag_domain_association.json"})
+    @PostMapping({
+        "/tag_domain_association.json",
+        "/domain/{domainClassName}/{domainIdent}/tag_domain_association.json"
+    })
     public ResponseEntity<String> add(
-            @PathVariable(required = false) String domainClassName,
-            @PathVariable(required = false) Long domainIdent,
-            @RequestBody JsonObject json) {
+        @PathVariable(required = false) String domainClassName,
+        @PathVariable(required = false) Long domainIdent,
+        @RequestBody JsonObject json
+    ) {
         log.debug("REST request to save Tag association: " + json);
         return add(tagDomainAssociationService, json);
     }

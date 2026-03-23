@@ -24,18 +24,44 @@ public interface PersistentImageConsultationRepository extends MongoRepository<P
     Long countByProjectAndCreatedBetween(Long project, Date createdMin, Date createdMax);
 
 
-    Page<PersistentImageConsultation> findAllByUserAndImageAndCreatedLessThan(Long user, Long image, Date before, PageRequest created);
+    Page<PersistentImageConsultation> findAllByUserAndImageAndCreatedLessThan(
+        Long user,
+        Long image,
+        Date before,
+        PageRequest created
+    );
 
-    @Aggregation(pipeline = {"{$match: {project: ?0}},{$sort: {?1: ?2}},{$group: {_id : '$user', created : {$max :'$created'}},{$sort: {?1: ?2}}}"})
+    @Aggregation(pipeline = {
+        "{$match: {project: ?0}},"
+            + "{$sort: {?1: ?2}},"
+            + "{$group: {_id : '$user', created : {$max :'$created'}},"
+            + "{$sort: {?1: ?2}}}"
+    })
     AggregationResults retrieve(Long project, String sortProperty, Integer sortDirection);
 
 
-    @Aggregation(pipeline = {"{$match: {project: ?0, user: ?1, image: ?2, $and : [{created: {$gte: ?4}},{created: {$lte: ?3}}]}},{$sort: {created: 1}},{$project: {dateInMillis: {$subtract: {'$created', ?5}}}}"})
+    @Aggregation(pipeline = {
+        "{$match: {"
+            + "project: ?0, "
+            + "user: ?1, "
+            + "image: ?2, "
+            + "$and: ["
+            + "    {created: {$gte: ?4}}, "
+            + "    {created: {$lte: ?3}}"
+            + "]"
+            + "}},"
+            + "{$sort: {created: 1}},"
+            + "{$project: {dateInMillis: {$subtract: ['$created', ?5]}}}"
+    }
+    )
     AggregationResults retrieve(Long project, Long user, Long image, Date before, Date after, Date firstDate);
 
     Page<PersistentImageConsultation> findAllByProjectAndUser(Long project, Long user, PageRequest request);
 
-    List<PersistentImageConsultation> findAllByCreatedGreaterThanAndProjectConnectionOrderByCreatedDesc(Date created, Long activityId);
+    List<PersistentImageConsultation> findAllByCreatedGreaterThanAndProjectConnectionOrderByCreatedDesc(
+        Date created,
+        Long activityId
+    );
 
     void deleteAllByImage(Long id);
 

@@ -1,20 +1,20 @@
 package be.cytomine.service.processing;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 import java.util.List;
 import java.util.Objects;
@@ -98,13 +98,13 @@ public class ImageFilterProjectService extends ModelService {
     public CommandResponse add(JsonObject jsonObject) {
 
         Project project = projectRepository.findById(jsonObject.getJSONAttrLong("project"))
-                .orElseThrow(() -> new ObjectNotFoundException("Project", jsonObject.getJSONAttrStr("project")));
+            .orElseThrow(() -> new ObjectNotFoundException("Project", jsonObject.getJSONAttrStr("project")));
         ImageFilter imageFilter = imageFilterRepository.findById(jsonObject.getJSONAttrLong("imageFilter"))
-                .orElseThrow(() -> new ObjectNotFoundException("ImageFilter", jsonObject.getJSONAttrStr("imageFilter")));
+            .orElseThrow(() -> new ObjectNotFoundException("ImageFilter", jsonObject.getJSONAttrStr("imageFilter")));
 
         securityACLService.check(project, ADMINISTRATION);
 
-        return executeCommand(new AddCommand(currentUserService.getCurrentUser()),null,jsonObject);
+        return executeCommand(new AddCommand(currentUserService.getCurrentUser()), null, jsonObject);
     }
 
     @Override
@@ -112,36 +112,43 @@ public class ImageFilterProjectService extends ModelService {
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.check(domain.container(), ADMINISTRATION);
         Command c = new DeleteCommand(currentUser, transaction);
-        return executeCommand(c,domain, null);
+        return executeCommand(c, domain, null);
     }
 
     public List<Object> getStringParamsI18n(CytomineDomain domain) {
-        ImageFilterProject imageFilterProject = (ImageFilterProject)domain;
+        ImageFilterProject imageFilterProject = (ImageFilterProject) domain;
         return List.of(imageFilterProject.getImageFilter().getName(), imageFilterProject.getProject().getName());
     }
 
     /**
      * Retrieve domain thanks to a JSON object
+     *
      * @return domain retrieve thanks to json
      */
     @Override
     public CytomineDomain retrieve(JsonObject json) {
-       if (json.containsKey("id")) {
-           return imageFilterProjectRepository.findById(json.getId())
-                   .orElseThrow(() -> new ObjectNotFoundException("ImageFilterProject", json.toJsonString()));
-       }
-       ImageFilter imageFilter = imageFilterRepository.getById(json.getJSONAttrLong("imageFilter"));
-       Project project = projectRepository.getById(json.getJSONAttrLong("project"));
-       return imageFilterProjectRepository.findByImageFilterAndProject(imageFilter,project)
-               .orElseThrow(() -> new ObjectNotFoundException("ImageFilterProject", json.toJsonString()));
+        if (json.containsKey("id")) {
+            return imageFilterProjectRepository.findById(json.getId())
+                .orElseThrow(() -> new ObjectNotFoundException("ImageFilterProject", json.toJsonString()));
+        }
+        ImageFilter imageFilter = imageFilterRepository.getById(json.getJSONAttrLong("imageFilter"));
+        Project project = projectRepository.getById(json.getJSONAttrLong("project"));
+        return imageFilterProjectRepository.findByImageFilterAndProject(imageFilter, project)
+            .orElseThrow(() -> new ObjectNotFoundException("ImageFilterProject", json.toJsonString()));
     }
 
-    public void checkDoNotAlreadyExist(CytomineDomain domain){
-        ImageFilterProject imageFilterProject = (ImageFilterProject)domain;
-        if(domain!=null) {
-            if(imageFilterProjectRepository.findByImageFilterAndProject(imageFilterProject.getImageFilter(), imageFilterProject.getProject())
-                    .stream().anyMatch(x -> !Objects.equals(x.getId(), imageFilterProject.getId())))  {
-                throw new AlreadyExistException("ImageFilter " + imageFilterProject.getImageFilter().getName() + " already linked to project " + imageFilterProject.getProject().getName());
+    public void checkDoNotAlreadyExist(CytomineDomain domain) {
+        ImageFilterProject imageFilterProject = (ImageFilterProject) domain;
+        if (domain != null) {
+            if (imageFilterProjectRepository.findByImageFilterAndProject(
+                    imageFilterProject.getImageFilter(),
+                    imageFilterProject.getProject()
+                )
+                .stream().anyMatch(x -> !Objects.equals(x.getId(), imageFilterProject.getId()))) {
+                throw new AlreadyExistException("ImageFilter "
+                    + imageFilterProject.getImageFilter().getName()
+                    + " already linked to project "
+                    + imageFilterProject.getProject().getName());
             }
         }
     }

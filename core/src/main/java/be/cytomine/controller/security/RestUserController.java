@@ -93,9 +93,11 @@ public class RestUserController extends RestCytomineController {
         log.debug("REST request to list representatives from project {}", id);
         Project project = projectService.find(id)
             .orElseThrow(() -> new ObjectNotFoundException("Project", id));
-        return responseSuccess(projectRepresentativeUserService.listByProject(project)
-            .stream().map(ProjectRepresentativeUser::getUser)
-            .collect(Collectors.toList()), isFilterRequired());
+        return responseSuccess(
+            projectRepresentativeUserService.listByProject(project)
+                .stream().map(ProjectRepresentativeUser::getUser)
+                .collect(Collectors.toList()), isFilterRequired()
+        );
     }
 
     @GetMapping("/project/{id}/creator.json")
@@ -213,8 +215,9 @@ public class RestUserController extends RestCytomineController {
     public ResponseEntity<String> getCurrentUserKeys() {
         User user = currentUserService.getCurrentUser();
         return responseSuccess(JsonObject.of(
-            "primaryKey", user.getPublicKey(),
-            "secondaryKey", user.getPrivateKey())
+                "primaryKey", user.getPublicKey(),
+                "secondaryKey", user.getPrivateKey()
+            )
         );
     }
 
@@ -222,8 +225,9 @@ public class RestUserController extends RestCytomineController {
     public ResponseEntity<String> regenerateCurrentUserKeys() {
         User user = userService.regenerateKeys(currentUserService.getCurrentUser());
         return responseSuccess(JsonObject.of(
-            "primaryKey", user.getPublicKey(),
-            "secondaryKey", user.getPrivateKey())
+                "primaryKey", user.getPublicKey(),
+                "secondaryKey", user.getPrivateKey()
+            )
         );
     }
 
@@ -562,8 +566,9 @@ public class RestUserController extends RestCytomineController {
         for (User user : projectUsers) {
             if (user != null) {
                 users.add(Map.of(
-                    "username", user.getUsername(),
-                    "name", user.getName())
+                        "username", user.getUsername(),
+                        "name", user.getName()
+                    )
                 );
             }
 

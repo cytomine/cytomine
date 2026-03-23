@@ -1,20 +1,20 @@
 package be.cytomine.service.ontology;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 import java.util.Arrays;
 import java.util.Date;
@@ -82,26 +82,26 @@ public class TrackService extends ModelService {
 
     public Optional<Track> find(Long id) {
         Optional<Track> optionalTrack = trackRepository.findById(id);
-        optionalTrack.ifPresent(track -> securityACLService.check(track.container(),READ));
+        optionalTrack.ifPresent(track -> securityACLService.check(track.container(), READ));
         return optionalTrack;
     }
 
     public List<Track> list(ImageInstance imageInstance) {
-        securityACLService.check(imageInstance.container(),READ);
+        securityACLService.check(imageInstance.container(), READ);
         return trackRepository.findAllByImage(imageInstance);
     }
 
     public List<Track> list(Project project) {
-        securityACLService.check(project,READ);
+        securityACLService.check(project, READ);
         return trackRepository.findAllByProject(project);
     }
 
     public Long countByProject(Project project, Date startDate, Date endDate) {
-        if (startDate!=null && endDate!=null) {
+        if (startDate != null && endDate != null) {
             return trackRepository.countByProjectAndCreatedBetween(project, startDate, endDate);
-        } else if (startDate!=null) {
+        } else if (startDate != null) {
             return trackRepository.countByProjectAndCreatedAfter(project, startDate);
-        } else if (endDate!=null) {
+        } else if (endDate != null) {
             return trackRepository.countByProjectAndCreatedBefore(project, endDate);
         } else {
             return trackRepository.countByProject(project);
@@ -110,13 +110,15 @@ public class TrackService extends ModelService {
 
     /**
      * Add the new domain with JSON data
+     *
      * @param jsonObject New domain data
+     *
      * @return Response structure (created domain data,..)
      */
     @Override
     public CommandResponse add(JsonObject jsonObject) {
-        ImageInstance imageInstance = imageInstanceService.find(jsonObject.getJSONAttrLong("image",0L))
-                .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", jsonObject.getJSONAttrStr("image")));
+        ImageInstance imageInstance = imageInstanceService.find(jsonObject.getJSONAttrLong("image", 0L))
+            .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", jsonObject.getJSONAttrStr("image")));
         jsonObject.put("project", imageInstance.getProject().getId());
 
         securityACLService.check(imageInstance.getProject(), READ);
@@ -124,48 +126,52 @@ public class TrackService extends ModelService {
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
 
-        return executeCommand(new AddCommand(currentUser),null,jsonObject);
+        return executeCommand(new AddCommand(currentUser), null, jsonObject);
     }
 
     /**
      * Update this domain with new data from json
-     * @param domain Domain to update
+     *
+     * @param domain      Domain to update
      * @param jsonNewData New domain datas
-     * @return  Response structure (new domain data, old domain data..)
+     *
+     * @return Response structure (new domain data, old domain data..)
      */
     @Override
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
-        Track track = ((Track)domain);
-        securityACLService.check(domain.container(),READ);
+        Track track = ((Track) domain);
+        securityACLService.check(domain.container(), READ);
         securityACLService.checkFullOrRestrictedForOwner(track, track.getImage().getUser());
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
 
         ImageInstance imageInstance = imageInstanceService.find(jsonNewData.getJSONAttrLong("image", 0L))
-                .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", jsonNewData.getJSONAttrStr("image")));
+            .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", jsonNewData.getJSONAttrStr("image")));
         jsonNewData.put("project", imageInstance.getProject().getId());
 
-        return executeCommand(new EditCommand(currentUser, transaction), domain,jsonNewData);
+        return executeCommand(new EditCommand(currentUser, transaction), domain, jsonNewData);
     }
 
     /**
      * Delete this domain
-     * @param domain Domain to delete
-     * @param transaction Transaction link with this command
-     * @param task Task for this command
+     *
+     * @param domain       Domain to delete
+     * @param transaction  Transaction link with this command
+     * @param task         Task for this command
      * @param printMessage Flag if client will print or not confirm message
+     *
      * @return Response structure (code, old domain,..)
      */
     @Override
     public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
-        Track track = ((Track)domain);
-        securityACLService.check(domain.container(),READ);
+        Track track = ((Track) domain);
+        securityACLService.check(domain.container(), READ);
         securityACLService.checkFullOrRestrictedForOwner(track, track.getImage().getUser());
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
 
         Command c = new DeleteCommand(currentUser, transaction);
-        return executeCommand(c,domain, null);
+        return executeCommand(c, domain, null);
     }
 
 
@@ -174,10 +180,12 @@ public class TrackService extends ModelService {
         return new Track().buildDomainFromJson(json, getEntityManager());
     }
 
-    public void checkDoNotAlreadyExist(CytomineDomain domain){
-        Track track = (Track)domain;
-        if(track!=null && track.getName()!=null) {
-            if(trackRepository.findByNameAndImage(track.getName(), track.getImage()).stream().anyMatch(x -> !Objects.equals(x.getId(), track.getId())))  {
+    public void checkDoNotAlreadyExist(CytomineDomain domain) {
+        Track track = (Track) domain;
+        if (track != null && track.getName() != null) {
+            if (trackRepository.findByNameAndImage(track.getName(), track.getImage())
+                .stream()
+                .anyMatch(x -> !Objects.equals(x.getId(), track.getId()))) {
                 throw new AlreadyExistException("Track " + track.getName() + " already exist in this image!");
             }
         }
@@ -185,13 +193,13 @@ public class TrackService extends ModelService {
 
     @Override
     public List<String> getStringParamsI18n(CytomineDomain domain) {
-        Track track = (Track)domain;
+        Track track = (Track) domain;
         return Arrays.asList(String.valueOf(track.getId()), track.getName());
     }
 
     @Override
     public void deleteDependencies(CytomineDomain domain, Transaction transaction, Task task) {
-        deleteDependentAnnotationTrack((Track)domain, transaction, task);
+        deleteDependentAnnotationTrack((Track) domain, transaction, task);
     }
 
     public void deleteDependentAnnotationTrack(Track track, Transaction transaction, Task task) {

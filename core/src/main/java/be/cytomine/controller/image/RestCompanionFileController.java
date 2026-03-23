@@ -42,32 +42,32 @@ public class RestCompanionFileController extends RestCytomineController {
 
     @GetMapping("/abstractimage/{id}/companionfile.json")
     public ResponseEntity<String> listByAbstractImage(
-            @PathVariable Long id
+        @PathVariable Long id
     ) {
         log.debug("REST request to list companion file for abstract image {}", id);
         AbstractImage abstractImage = abstractImageRepository.findById(id)
-                .orElseThrow(() -> new ObjectNotFoundException("AbstractImage", id));
+            .orElseThrow(() -> new ObjectNotFoundException("AbstractImage", id));
         return responseSuccess(companionFileService.list(abstractImage));
     }
 
     @GetMapping("/uploadedfile/{id}/companionfile.json")
     public ResponseEntity<String> listByUploadedFile(
-            @PathVariable Long id
+        @PathVariable Long id
     ) {
         log.debug("REST request to list companion file for uploaded file {}", id);
         UploadedFile uploadedFile = uploadedFileService.find(id)
-                .orElseThrow(() -> new ObjectNotFoundException("UploadedFile", id));
+            .orElseThrow(() -> new ObjectNotFoundException("UploadedFile", id));
         return responseSuccess(companionFileService.list(uploadedFile));
     }
 
     @GetMapping("/companionfile/{id}.json")
     public ResponseEntity<String> show(
-            @PathVariable Long id
+        @PathVariable Long id
     ) {
         log.debug("REST request to get companionfile {}", id);
         return companionFileService.find(id)
-                .map(this::responseSuccess)
-                .orElseThrow(() -> new ObjectNotFoundException("AbstractImage", id));
+            .map(this::responseSuccess)
+            .orElseThrow(() -> new ObjectNotFoundException("AbstractImage", id));
     }
 
     @PostMapping("/companionfile.json")
@@ -93,7 +93,7 @@ public class RestCompanionFileController extends RestCytomineController {
     public ResponseEntity<byte[]> download(@PathVariable Long id, ProxyExchange<byte[]> proxy) throws IOException {
         log.debug("REST request to download companionfile");
         CompanionFile companionFile = companionFileService.find(id)
-                .orElseThrow(() -> new ObjectNotFoundException("CompanionFile", id));
+            .orElseThrow(() -> new ObjectNotFoundException("CompanionFile", id));
         // TODO: in abstract image, there is no check fos download auth!?
         return imageServerService.download(companionFile, proxy);
     }
@@ -103,7 +103,7 @@ public class RestCompanionFileController extends RestCytomineController {
     public ResponseEntity<String> showUploaderOfImage(@PathVariable Long id) {
         log.debug("REST request to show companionfile uploader");
         CompanionFile companionFile = companionFileService.find(id)
-                .orElseThrow(() -> new ObjectNotFoundException("CompanionFile", id));
+            .orElseThrow(() -> new ObjectNotFoundException("CompanionFile", id));
         if (companionFile.getUploadedFile() != null && companionFile.getUploadedFile().getUser() != null) {
             return responseSuccess(companionFile.getUploadedFile().getUser());
         } else {

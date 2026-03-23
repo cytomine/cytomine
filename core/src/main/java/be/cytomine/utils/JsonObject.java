@@ -401,7 +401,7 @@ public class JsonObject extends HashMap<String, Object> implements JsonInput {
         }
     }
 
-    static public Object convertValue(Object value, String type) {
+    public static Object convertValue(Object value, String type) {
         if (value.equals("null")) {
             return null;
         } else if (type.equals("String")) {

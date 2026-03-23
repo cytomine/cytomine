@@ -123,6 +123,13 @@ spec:
           periodSeconds: 20
           failureThreshold: 10
 
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
         volumeMounts:
         - name: opt-keycloak
           mountPath: "/opt/keycloak"

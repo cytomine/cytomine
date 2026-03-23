@@ -81,9 +81,16 @@ spec:
         httpGet:
           path: /wd/hub/status
           port: 4444
-        initialDelaySeconds: 30
         periodSeconds: 5
         failureThreshold: 20
+        timeoutSeconds: 5
+      startupProbe:
+        httpGet:
+          path: /wd/hub/status
+          port: 4444
+        initialDelaySeconds: 5
+        periodSeconds: 5
+        failureThreshold: 30
         timeoutSeconds: 5
     - name: e2e-tests
       image: "{{ .Values.images.e2e_tests }}"

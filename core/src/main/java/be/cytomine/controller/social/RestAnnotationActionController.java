@@ -30,8 +30,7 @@ import be.cytomine.service.social.AnnotationActionService;
 import be.cytomine.utils.JsonObject;
 
 /**
- * Controller for user position
- * Position of the user (x,y) on an image for a time
+ * Controller for user position Position of the user (x,y) on an image for a time
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -55,59 +54,67 @@ public class RestAnnotationActionController extends RestCytomineController {
 
     @PostMapping("/annotation_action.json")
     public ResponseEntity<String> add(
-            @RequestBody JsonObject json
+        @RequestBody JsonObject json
     ) {
         log.debug("REST request add annotation action");
-        AnnotationDomain annotationDomain = annotationDomainRepository.findById(json.getJSONAttrLong("annotationIdent", 0L))
-                .orElseThrow(() -> new ObjectNotFoundException("Annotation", json.getJSONAttrStr("annotationIdent")));
-        return responseSuccess(annotationActionService.add(annotationDomain, currentUserService.getCurrentUser(), json.getJSONAttrStr("action"), new Date()));
+        AnnotationDomain annotationDomain = annotationDomainRepository.findById(
+                json.getJSONAttrLong("annotationIdent", 0L)
+            )
+            .orElseThrow(() -> new ObjectNotFoundException("Annotation", json.getJSONAttrStr("annotationIdent")));
+        return responseSuccess(
+            annotationActionService.add(
+                annotationDomain, currentUserService.getCurrentUser(), json.getJSONAttrStr("action"), new Date()
+            )
+        );
     }
 
     @GetMapping("/imageinstance/{image}/annotation_action.json")
     public ResponseEntity<String> listByImage(
-            @PathVariable("image") Long imageId,
-            @RequestParam(value = "user", required = false) Long userId,
-            @RequestParam(value = "afterThan", required = false) Long afterThan,
-            @RequestParam(value = "beforeThan", required = false) Long beforeThan
+        @PathVariable("image") Long imageId,
+        @RequestParam(value = "user", required = false) Long userId,
+        @RequestParam(value = "afterThan", required = false) Long afterThan,
+        @RequestParam(value = "beforeThan", required = false) Long beforeThan
     ) {
         ImageInstance image = imageInstanceService.find(imageId)
-                        .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", imageId));
+            .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", imageId));
 
         User user = null;
-        if (userId!=null) {
+        if (userId != null) {
             user = userService.findUser(userId)
-                    .orElseThrow(() -> new ObjectNotFoundException("User", userId));
+                .orElseThrow(() -> new ObjectNotFoundException("User", userId));
         }
         return responseSuccess(annotationActionService.list(image, user, afterThan, beforeThan));
     }
 
     @GetMapping("/sliceinstance/{slice}/annotation_action.json")
     public ResponseEntity<String> listBySlice(
-            @PathVariable("slice") Long sliceId,
-            @RequestParam(value = "user", required = false) Long userId,
-            @RequestParam(value = "afterThan", required = false) Long afterThan,
-            @RequestParam(value = "beforeThan", required = false) Long beforeThan
+        @PathVariable("slice") Long sliceId,
+        @RequestParam(value = "user", required = false) Long userId,
+        @RequestParam(value = "afterThan", required = false) Long afterThan,
+        @RequestParam(value = "beforeThan", required = false) Long beforeThan
     ) {
         SliceInstance sliceInstance = sliceInstanceService.find(sliceId)
-                .orElseThrow(() -> new ObjectNotFoundException("SliceInstance", sliceId));
+            .orElseThrow(() -> new ObjectNotFoundException("SliceInstance", sliceId));
 
         User user = null;
-        if (userId!=null) {
+        if (userId != null) {
             user = userService.findUser(userId)
-                    .orElseThrow(() -> new ObjectNotFoundException("User", userId));
+                .orElseThrow(() -> new ObjectNotFoundException("User", userId));
         }
         return responseSuccess(annotationActionService.list(sliceInstance, user, afterThan, beforeThan));
     }
 
     @GetMapping("/project/{project}/annotation_action/count.json")
     public ResponseEntity<String> countByProject(
-            @PathVariable("project") Long projectId,
-            @RequestParam(required = false) Long startDate,
-            @RequestParam(required = false) Long endDate
+        @PathVariable("project") Long projectId,
+        @RequestParam(required = false) Long startDate,
+        @RequestParam(required = false) Long endDate
     ) {
         Project project = projectService.find(projectId)
-                .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
+            .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
 
-        return responseSuccess(JsonObject.of("total", annotationActionService.countByProject(project, startDate, endDate)));
+        return responseSuccess(
+            JsonObject.of("total", annotationActionService.countByProject(project, startDate, endDate))
+        );
     }
 }

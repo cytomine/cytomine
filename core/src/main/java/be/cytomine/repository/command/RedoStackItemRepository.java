@@ -9,7 +9,7 @@ import be.cytomine.domain.security.User;
 
 @Repository
 public interface RedoStackItemRepository extends JpaRepository<RedoStackItem, Long> {
-    void deleteAllByCommand_Project(Project project);
+    void deleteAllByCommandProject(Project project);
 
     void deleteAllByUser(User user);
 }

@@ -25,7 +25,7 @@ limitations under the License.-->
     <b-carousel-item v-for="image in imageGroup.imageInstances" :key="`${imageGroup.id}-${image.id}`">
       <div class="has-text-centered">
         <image-thumbnail
-            :extra-parameters="{Authorization: 'Bearer ' + shortTermToken}"
+            :extra-parameters="{authorization: 'Bearer ' + shortTermToken}"
             :key="`${imageGroup.id}-${image.thumb}`"
             :size="128"
             :url="image.thumb"

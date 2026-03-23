@@ -45,12 +45,14 @@ public class AppEngineService {
     }
 
     public void getStreamedFile(String uri, OutputStream outputStream) {
-        restTemplate.execute(buildFullUrl(uri), HttpMethod.GET, null, response -> {
-            try (InputStream in = response.getBody()) {
-                in.transferTo(outputStream);
-                return null;
+        restTemplate.execute(
+            buildFullUrl(uri), HttpMethod.GET, null, response -> {
+                try (InputStream in = response.getBody()) {
+                    in.transferTo(outputStream);
+                    return null;
+                }
             }
-        });
+        );
 
     }
 
@@ -62,7 +64,11 @@ public class AppEngineService {
             ResponseEntity<String> result = restTemplate.exchange(buildFullUrl(uri), method, request, String.class);
             return result.getBody();
         } catch (HttpStatusCodeException e) {
-            throw new AppEngineException("error from appengine", e.getStatusCode().value(), e.getResponseBodyAsString());
+            throw new AppEngineException(
+                "error from appengine",
+                e.getStatusCode().value(),
+                e.getResponseBodyAsString()
+            );
         }
     }
 
@@ -88,7 +94,11 @@ public class AppEngineService {
             return restTemplate.exchange(finalUrl, HttpMethod.POST, requestEntity, String.class)
                 .getBody();
         } catch (HttpStatusCodeException e) {
-            throw new AppEngineException("error from appengine", e.getStatusCode().value(), e.getResponseBodyAsString());
+            throw new AppEngineException(
+                "error from appengine",
+                e.getStatusCode().value(),
+                e.getResponseBodyAsString()
+            );
         }
     }
 }

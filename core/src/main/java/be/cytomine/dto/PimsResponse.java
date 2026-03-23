@@ -30,11 +30,10 @@ public class PimsResponse {
         } else {
             String[] parts = cacheControl.split(",");
             String header = Arrays.stream(parts)
-                    .map(x -> x.startsWith("max-age")? "max-age="+timeToLive : x).collect(Collectors.joining(","));
+                .map(x -> x.startsWith("max-age") ? "max-age=" + timeToLive : x).collect(Collectors.joining(","));
             headers.put("Cache-Control", header);
         }
     }
-
 
 
 }

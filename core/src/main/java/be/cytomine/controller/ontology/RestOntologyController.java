@@ -32,8 +32,7 @@ public class RestOntologyController extends RestCytomineController {
     private final TaskService taskService;
 
     /**
-     * List all ontology visible for the current user
-     * For each ontology, print the terms tree
+     * List all ontology visible for the current user For each ontology, print the terms tree
      */
     @GetMapping("/ontology.json")
     public ResponseEntity<String> list(@RequestParam Map<String, String> allParams) {
@@ -44,12 +43,12 @@ public class RestOntologyController extends RestCytomineController {
 
     @GetMapping("/ontology/{id}.json")
     public ResponseEntity<String> show(
-            @PathVariable Long id
+        @PathVariable Long id
     ) {
         log.debug("REST request to get Ontology : {}", id);
         return ontologyService.find(id)
-                .map(this::responseSuccess)
-                .orElseGet(() -> responseNotFound("Ontology", id));
+            .map(this::responseSuccess)
+            .orElseGet(() -> responseNotFound("Ontology", id));
     }
 
 

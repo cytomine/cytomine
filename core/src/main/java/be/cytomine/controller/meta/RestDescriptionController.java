@@ -37,29 +37,38 @@ public class RestDescriptionController extends RestCytomineController {
 
     @GetMapping("/domain/{domainClassName}/{domainIdent}/description.json")
     public ResponseEntity<String> readByDomain(
-            @PathVariable String domainClassName,
-            @PathVariable Long domainIdent
-    )  {
+        @PathVariable String domainClassName,
+        @PathVariable Long domainIdent
+    ) {
         log.debug("REST request to read description for domain {} {}", domainClassName, domainIdent);
 
         return responseSuccess(descriptionService.findByDomain(domainClassName.replaceAll("_", "."), domainIdent)
-                .orElseThrow(() -> new ObjectNotFoundException("Description", JsonObject.of("domainIdent", domainIdent, "domainClassName", domainClassName.replaceAll("_", ".")).toJsonString())));
+            .orElseThrow(() -> new ObjectNotFoundException(
+                    "Description",
+                    JsonObject.of(
+                        "domainIdent", domainIdent,
+                        "domainClassName", domainClassName.replaceAll("_", ".")
+                    ).toJsonString()
+                )
+            )
+        );
     }
 
     @PostMapping({"/description.json", "/domain/{domainClassName}/{domainIdent}/description.json"})
     public ResponseEntity<String> add(
-            @PathVariable(required = false) String domainClassName,
-            @PathVariable(required = false) Long domainIdent,
-            @RequestBody JsonObject json) {
+        @PathVariable(required = false) String domainClassName,
+        @PathVariable(required = false) Long domainIdent,
+        @RequestBody JsonObject json
+    ) {
         log.debug("REST request to save description : " + json);
         return add(descriptionService, json);
     }
 
     @PutMapping("/domain/{domainClassName}/{domainIdent}/description.json")
     public ResponseEntity<String> edit(
-            @PathVariable(required = false) String domainClassName,
-            @PathVariable(required = false) Long domainIdent,
-            @RequestBody JsonObject json
+        @PathVariable(required = false) String domainClassName,
+        @PathVariable(required = false) Long domainIdent,
+        @RequestBody JsonObject json
     ) {
         log.debug("REST request to edit description : " + domainClassName + " " + domainIdent);
         return update(descriptionService, json);
@@ -67,11 +76,15 @@ public class RestDescriptionController extends RestCytomineController {
 
     @DeleteMapping("/domain/{domainClassName}/{domainIdent}/description.json")
     public ResponseEntity<String> delete(
-            @PathVariable String domainClassName,
-            @PathVariable Long domainIdent) {
+        @PathVariable String domainClassName,
+        @PathVariable Long domainIdent
+    ) {
         log.debug("REST request to delete description for {} {}", domainClassName, domainIdent);
-        JsonObject jsonObject = JsonObject.of("domainIdent", domainIdent, "domainClassName", domainClassName.replaceAll("_", "."));
+        JsonObject jsonObject = JsonObject.of(
+            "domainIdent", domainIdent,
+            "domainClassName", domainClassName.replaceAll("_", ".")
+        );
         CytomineDomain domain = descriptionService.retrieve(jsonObject);
-        return responseSuccess(descriptionService.delete(domain,transactionService.start(), null, true));
+        return responseSuccess(descriptionService.delete(domain, transactionService.start(), null, true));
     }
 }

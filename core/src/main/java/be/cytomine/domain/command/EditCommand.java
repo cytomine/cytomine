@@ -1,20 +1,20 @@
 package be.cytomine.domain.command;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 import java.util.HashMap;
 
@@ -38,13 +38,15 @@ public class EditCommand extends Command {
         this.transaction = transaction;
     }
 
-    public EditCommand() {}
+    public EditCommand() {
+    }
 
     /**
      * Add command info for the new domain concerned by the command
+     *
      * @param newObject domain after update
      * @param oldObject domain before update
-     * @param message Message build for the command
+     * @param message   Message build for the command
      */
     protected void fillCommandInfo(CytomineDomain newObject, String oldObject, String message) {
         HashMap<String, Object> paramsData = new HashMap<String, Object>();
@@ -56,6 +58,7 @@ public class EditCommand extends Command {
 
     /**
      * Get domain name
+     *
      * @return domaine name
      */
     public String domainName() {
@@ -65,6 +68,7 @@ public class EditCommand extends Command {
 
     /**
      * Process an Add operation for this command
+     *
      * @return Message
      */
     public CommandResponse execute(ModelService service) {
@@ -74,11 +78,11 @@ public class EditCommand extends Command {
         updatedDomain.buildDomainFromJson(json, service.getEntityManager());
         //Init command info TODO
         CytomineDomain container = updatedDomain.container();
-        if(container!=null && container instanceof Project) {
-            super.setProject((Project)container);
+        if (container != null && container instanceof Project) {
+            super.setProject((Project) container);
         }
         CommandResponse response = service.edit(updatedDomain, printMessage);
-        fillCommandInfo(updatedDomain, oldDomain, (String)response.getData().get("message"));
+        fillCommandInfo(updatedDomain, oldDomain, (String) response.getData().get("message"));
         return response;
     }
 }

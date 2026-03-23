@@ -37,15 +37,15 @@ public class RestImageGroupImageInstanceController extends RestCytomineControlle
     public ResponseEntity<String> listByImageInstance(@PathVariable Long id) {
         log.debug("REST request to get all relations for an image: {}", id);
         ImageInstance imageInstance = imageInstanceService.find(id)
-                .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", id));
+            .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", id));
         return responseSuccess(imageGroupImageInstanceService.list(imageInstance));
     }
 
     @PostMapping("/imagegroup/{group}/imageinstance/{image}.json")
     public ResponseEntity<String> add(
-            @PathVariable Long group,
-            @PathVariable Long image,
-            @RequestBody String json
+        @PathVariable Long group,
+        @PathVariable Long image,
+        @RequestBody String json
     ) {
         log.debug("REST request to add image {} to imagegroup {}", image, group);
         return add(imageGroupImageInstanceService, json);
@@ -59,9 +59,9 @@ public class RestImageGroupImageInstanceController extends RestCytomineControlle
 
     @GetMapping("/imagegroup/{group}/imageinstance/{image}/previous.json")
     public ResponseEntity<String> previous(
-            @PathVariable Long group,
-            @PathVariable Long image,
-            @RequestParam(defaultValue = "true", required = false) Boolean circular
+        @PathVariable Long group,
+        @PathVariable Long image,
+        @RequestParam(defaultValue = "true", required = false) Boolean circular
     ) {
         log.debug("REST request to get the previous image to image {} from imagegroup {}", image, group);
 
@@ -84,9 +84,9 @@ public class RestImageGroupImageInstanceController extends RestCytomineControlle
 
     @GetMapping("/imagegroup/{group}/imageinstance/{image}/next.json")
     public ResponseEntity<String> next(
-            @PathVariable Long group,
-            @PathVariable Long image,
-            @RequestParam(defaultValue = "true", required = false) Boolean circular
+        @PathVariable Long group,
+        @PathVariable Long image,
+        @RequestParam(defaultValue = "true", required = false) Boolean circular
     ) {
         log.debug("REST request to get the next image to image {} from imagegroup {}", image, group);
 
@@ -97,7 +97,7 @@ public class RestImageGroupImageInstanceController extends RestCytomineControlle
 
         int index = images.indexOf(imageInstanceService.get(image));
         int next = index + 1;
-        if (next ==  images.size()) {
+        if (next == images.size()) {
             if (!circular) {
                 return responseSuccess(new ArrayList<>());
             }

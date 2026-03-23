@@ -45,8 +45,18 @@ public class AnnotationLink extends CytomineDomain {
 
         annotationLink.annotationClassName = json.getJSONAttrStr("annotationClassName", true);
         annotationLink.annotationIdent = json.getJSONAttrLong("annotationIdent", null);
-        annotationLink.group = (AnnotationGroup) json.getJSONAttrDomain(entityManager, "group", new AnnotationGroup(), true);
-        annotationLink.image = (ImageInstance) json.getJSONAttrDomain(entityManager, "image", new ImageInstance(), true);
+        annotationLink.group = (AnnotationGroup) json.getJSONAttrDomain(
+            entityManager,
+            "group",
+            new AnnotationGroup(),
+            true
+        );
+        annotationLink.image = (ImageInstance) json.getJSONAttrDomain(
+            entityManager,
+            "image",
+            new ImageInstance(),
+            true
+        );
 
         return annotationLink;
     }

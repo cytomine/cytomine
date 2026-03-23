@@ -7,6 +7,6 @@ public class TokenUtils {
 
     public static String getUsernameFromToken(String token) {
         DecodedJWT jwt = JWT.decode(token);
-        return jwt.getClaim("preferred_username").asString(); 
+        return jwt.getClaim("preferred_username").asString();
     }
 }

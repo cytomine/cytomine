@@ -1,21 +1,5 @@
 package be.cytomine.service.social;
 
-/*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -104,14 +88,15 @@ public class UserPositionService {
     private String mongoDatabaseName;
 
     public PersistentUserPosition add(
-            Date created,
-            User user,
-            SliceInstance sliceInstance,
-            ImageInstance imageInstance,
-            AreaDTO area,
-            Integer zoom,
-            Double rotation,
-            Boolean broadcast) {
+        Date created,
+        User user,
+        SliceInstance sliceInstance,
+        ImageInstance imageInstance,
+        AreaDTO area,
+        Integer zoom,
+        Double rotation,
+        Boolean broadcast
+    ) {
 
         Optional<LastUserPosition> lastPosition = lastPositionByUser(imageInstance, sliceInstance, user, broadcast);
 
@@ -150,18 +135,18 @@ public class UserPositionService {
         return persistedPosition;
     }
 
-    public void addAsFollower(User broadcaster, User follower, ImageInstance imageInstance){
+    public void addAsFollower(User broadcaster, User follower, ImageInstance imageInstance) {
         String broadcasterAndImageId = broadcaster.getId().toString() + "/" + imageInstance.getId().toString();
         String followerAndImageId = follower.getId().toString() + "/" + imageInstance.getId().toString();
 
         if (broadcasters.containsKey(broadcasterAndImageId)) {
             Set<Long> userIds = broadcasters.get(broadcasterAndImageId).stream()
-                    .map(CytomineDomain::getId).collect(toSet());
+                .map(CytomineDomain::getId).collect(toSet());
 
-            if(!userIds.contains(follower.getId())){
+            if (!userIds.contains(follower.getId())) {
                 broadcasters.get(broadcasterAndImageId).add(follower);
                 followers.put(followerAndImageId, true);
-            }else{
+            } else {
                 // Mark as fetching
                 followers.replace(followerAndImageId, followers.get(followerAndImageId), true);
             }
@@ -171,8 +156,13 @@ public class UserPositionService {
         }
     }
 
-    public Optional<LastUserPosition> lastPositionByUser(ImageInstance image, SliceInstance slice, User user, boolean broadcast) {
-        securityACLService.check(image,READ);
+    public Optional<LastUserPosition> lastPositionByUser(
+        ImageInstance image,
+        SliceInstance slice,
+        User user,
+        boolean broadcast
+    ) {
+        securityACLService.check(image, READ);
 
         return getLastUserPosition(image, slice, user, broadcast);
     }
@@ -181,15 +171,25 @@ public class UserPositionService {
      * TODO Do not bypass ACL checks.
      * Temporary solution to the WebSocket issue
      */
-    public Optional<LastUserPosition> lastPositionByUserBypassACL(ImageInstance image, SliceInstance slice, User user, boolean broadcast) {
+    public Optional<LastUserPosition> lastPositionByUserBypassACL(
+        ImageInstance image,
+        SliceInstance slice,
+        User user,
+        boolean broadcast
+    ) {
         return getLastUserPosition(image, slice, user, broadcast);
     }
 
-    private Optional<LastUserPosition> getLastUserPosition(ImageInstance image, SliceInstance slice, User user, boolean broadcast) {
+    private Optional<LastUserPosition> getLastUserPosition(
+        ImageInstance image,
+        SliceInstance slice,
+        User user,
+        boolean broadcast
+    ) {
         Query query = new Query();
         query.addCriteria(Criteria.where("user").is(user.getId()));
         query.addCriteria(Criteria.where("image").is(image.getId()));
-        if (slice!=null) {
+        if (slice != null) {
             query.addCriteria(Criteria.where("slice").is(slice.getId()));
         }
         if (broadcast) {
@@ -203,7 +203,7 @@ public class UserPositionService {
     }
 
     public List<Long> listOnlineUsersByImage(ImageInstance image, SliceInstance slice, boolean broadcast) {
-        securityACLService.check(image,READ);
+        securityACLService.check(image, READ);
         Date thirtySecondsAgo = DateUtils.addSeconds(new Date(), -30);
 
         List<Bson> request = new ArrayList<>();
@@ -212,7 +212,7 @@ public class UserPositionService {
         if (broadcast) {
             request.add(match(eq("broadcast", true)));
         }
-        if (slice!=null) {
+        if (slice != null) {
             request.add(match(eq("slice", slice.getId())));
         }
 
@@ -220,35 +220,44 @@ public class UserPositionService {
         request.add(group("$user"));
 
 
-        MongoCollection<Document> persistentProjectConnection = mongoClient.getDatabase(mongoDatabaseName).getCollection("lastUserPosition");
+        MongoCollection<Document> persistentProjectConnection = mongoClient.getDatabase(mongoDatabaseName)
+            .getCollection("lastUserPosition");
 
         List<Document> results = persistentProjectConnection.aggregate(request)
-                .into(new ArrayList<>());
+            .into(new ArrayList<>());
 
         return results.stream().map(x -> x.getLong("_id")).toList();
     }
 
-    public List<PersistentUserPosition> list(ImageInstance image, User user, SliceInstance slice, Long afterThan, Long beforeThan, Integer max, Integer offset){
-        securityACLService.check(image,WRITE);
+    public List<PersistentUserPosition> list(
+        ImageInstance image,
+        User user,
+        SliceInstance slice,
+        Long afterThan,
+        Long beforeThan,
+        Integer max,
+        Integer offset
+    ) {
+        securityACLService.check(image, WRITE);
         if (max == 0) {
             max = Integer.MAX_VALUE;
         }
 
         Query query = new Query();
-        if (user!=null) {
+        if (user != null) {
             query.addCriteria(Criteria.where("user").is(user.getId()));
         }
-        if (image!=null) {
+        if (image != null) {
             query.addCriteria(Criteria.where("image").is(image.getId()));
         }
-        if (slice!=null) {
+        if (slice != null) {
             query.addCriteria(Criteria.where("slice").is(slice.getId()));
         }
-        if (afterThan!=null && beforeThan!=null) {
+        if (afterThan != null && beforeThan != null) {
             query.addCriteria(Criteria.where("created").gte(new Date(afterThan)).lte(new Date(beforeThan)));
-        } else if (afterThan!=null) {
+        } else if (afterThan != null) {
             query.addCriteria(Criteria.where("created").gte(new Date(afterThan)));
-        } else if (beforeThan!=null) {
+        } else if (beforeThan != null) {
             query.addCriteria(Criteria.where("created").lte(new Date(beforeThan)));
         }
         query.with(Sort.by(Sort.Direction.DESC, "created"));
@@ -260,22 +269,24 @@ public class UserPositionService {
 
     }
 
-    public List<String> listFollowers(Long userId, Long imageId){
-        String userAndImageId = userId.toString()+"/"+imageId.toString();
+    public List<String> listFollowers(Long userId, Long imageId) {
+        String userAndImageId = userId.toString() + "/" + imageId.toString();
         List<String> followersIds = new ArrayList<>();
 
-        ConcurrentWebSocketSessionDecorator broadcastSession = WebSocketUserPositionHandler.sessionsBroadcast.get(userAndImageId);
-        if(broadcastSession!=null){
-            ConcurrentWebSocketSessionDecorator[] followers = WebSocketUserPositionHandler.sessionsTracked.get(broadcastSession);
-            if(followers != null) {
+        ConcurrentWebSocketSessionDecorator broadcastSession = WebSocketUserPositionHandler.sessionsBroadcast.get(
+            userAndImageId);
+        if (broadcastSession != null) {
+            ConcurrentWebSocketSessionDecorator[] followers = WebSocketUserPositionHandler.sessionsTracked.get(
+                broadcastSession);
+            if (followers != null) {
                 followersIds = WebSocketUserPositionHandler.getSessionsUserIds(followers).stream().distinct().toList();
             }
         }
 
         List<User> poolingUsers = broadcasters.get(userAndImageId);
-        if(poolingUsers != null){
-            for(User user : poolingUsers){
-                if(!followersIds.contains(user.getId().toString())){
+        if (poolingUsers != null) {
+            for (User user : poolingUsers) {
+                if (!followersIds.contains(user.getId().toString())) {
                     List<String> followersIdsList = new ArrayList<>(followersIds);
                     followersIdsList.add(user.getId().toString());
                     followersIds = followersIdsList;
@@ -285,7 +296,13 @@ public class UserPositionService {
         return followersIds;
     }
 
-    public List<Map<String, Object>> summarize(ImageInstance image, User user, SliceInstance slice, Long afterThan, Long beforeThan) {
+    public List<Map<String, Object>> summarize(
+        ImageInstance image,
+        User user,
+        SliceInstance slice,
+        Long afterThan,
+        Long beforeThan
+    ) {
         securityACLService.check(image, WRITE);
 
         List<Bson> request = new ArrayList<>();
@@ -304,22 +321,27 @@ public class UserPositionService {
         }
 
 
-        request.add(group(Document.parse("{location: '$location', zoom: '$zoom', rotation: '$rotation'}"),
-                Accumulators.sum("frequency", 1), Accumulators.first("image", "$image")));
+        request.add(group(
+            Document.parse("{location: '$location', zoom: '$zoom', rotation: '$rotation'}"),
+            Accumulators.sum("frequency", 1), Accumulators.first("image", "$image")
+        ));
 
 
-        MongoCollection<Document> persistentUserPosition = mongoClient.getDatabase(mongoDatabaseName).getCollection("persistentUserPosition");
+        MongoCollection<Document> persistentUserPosition = mongoClient.getDatabase(mongoDatabaseName)
+            .getCollection("persistentUserPosition");
 
         List<Document> results = persistentUserPosition.aggregate(request)
-                .into(new ArrayList<>());
+            .into(new ArrayList<>());
 
         return results.stream().map(x ->
-                JsonObject.of("location", ((Document) x.get("_id")).get("location"),
-                        "zoom", ((Document) x.get("_id")).get("zoom"),
-                        "rotation", ((Document) x.get("_id")).get("rotation"),
-                        "rotation", ((Document) x.get("_id")).get("rotation"),
-                        "frequency", x.get("frequency"),
-                        "image", x.get("image"))).collect(toList());
+            JsonObject.of(
+                "location", ((Document) x.get("_id")).get("location"),
+                "zoom", ((Document) x.get("_id")).get("zoom"),
+                "rotation", ((Document) x.get("_id")).get("rotation"),
+                "rotation", ((Document) x.get("_id")).get("rotation"),
+                "frequency", x.get("frequency"),
+                "image", x.get("image")
+            )).collect(toList());
 
     }
 
@@ -336,50 +358,73 @@ public class UserPositionService {
         request.add(project(Document.parse("{user: 1, image: 1, slice: 1, imageName: 1, created: 1}")));
 
 
-        request.add(group(Document.parse("{user: '$user', slice: '$slice'}"),
-                Accumulators.max("date", "$created"), Accumulators.first("image", "$image"), Accumulators.first("imageName", "$imageName")));
+        request.add(group(
+            Document.parse("{user: '$user', slice: '$slice'}"),
+            Accumulators.max("date", "$created"),
+            Accumulators.first("image", "$image"),
+            Accumulators.first("imageName", "$imageName")
+        ));
 
-        request.add(group(Document.parse("{user: '$_id.user'}"),
-                Accumulators.push("position", Document.parse("{id: '$_id.image',slice: '$_id.slice', image: '$image', filename: '$imageName', originalFilename: '$imageName', date: '$date'}"))));
+        request.add(
+            group(
+                Document.parse("{user: '$_id.user'}"),
+                Accumulators.push(
+                    "position",
+                    Document.parse(
+                        "{"
+                            + "id: '$_id.image', "
+                            + "slice: '$_id.slice', "
+                            + "image: '$image', "
+                            + "filename: '$imageName', "
+                            + "originalFilename: '$imageName', "
+                            + "date: '$date'"
+                            + "}"
+                    )
+                )
+            )
+        );
 
-        MongoCollection<Document> persistentUserPosition = mongoClient.getDatabase(mongoDatabaseName).getCollection("lastUserPosition");
+        MongoCollection<Document> persistentUserPosition = mongoClient.getDatabase(mongoDatabaseName)
+            .getCollection("lastUserPosition");
 
         List<Document> results = persistentUserPosition.aggregate(request)
-                .into(new ArrayList<>());
+            .into(new ArrayList<>());
 
-        List<JsonObject> usersWithPosition =  results.stream().map(x ->
-                JsonObject.of("id", ((Document) x.get("_id")).get("user"),
-                        "position", x.get("position"))).collect(toList());
+        List<JsonObject> usersWithPosition = results.stream().map(x ->
+            JsonObject.of(
+                "id", ((Document) x.get("_id")).get("user"),
+                "position", x.get("position")
+            )).collect(toList());
 
         return usersWithPosition;
     }
 
-    public void removeFollower(Map.Entry<String, Boolean> entry){
+    public void removeFollower(Map.Entry<String, Boolean> entry) {
         String[] splitEntry = entry.getKey().split("/");
         String followerId = splitEntry[0];
         String imageId = splitEntry[1];
 
         // For each broadcaster
-        for(Map.Entry<String, List<User>> trackedEntry : broadcasters.entrySet()){
+        for (Map.Entry<String, List<User>> trackedEntry : broadcasters.entrySet()) {
             String broadcaster = trackedEntry.getKey();
             String entryImageId = broadcaster.split("/")[1];
 
             // If he is same image
-            if(entryImageId.equals(imageId)){
+            if (entryImageId.equals(imageId)) {
                 Set<String> userIds = trackedEntry.getValue().stream()
-                        .map(user -> user.getId().toString()).collect(toSet());
+                    .map(user -> user.getId().toString()).collect(toSet());
                 // and one of his follower id is followerId
-                if(userIds.contains(followerId)){
+                if (userIds.contains(followerId)) {
                     removeFollower(Long.parseLong(followerId), broadcaster);
                 }
             }
         }
     }
 
-    private void removeFollower(Long followerId, String broadcaster){
+    private void removeFollower(Long followerId, String broadcaster) {
         List<User> newFollowers = new ArrayList<>();
-        for(User user : broadcasters.get(broadcaster)){
-            if(!user.getId().equals(followerId)){
+        for (User user : broadcasters.get(broadcaster)) {
+            if (!user.getId().equals(followerId)) {
                 newFollowers.add(user);
             }
         }
@@ -387,21 +432,24 @@ public class UserPositionService {
     }
 
     @PostConstruct
-    public void positionScheduler(){
-        DelegatingSecurityContextScheduledExecutorService delegatedScheduler = new DelegatingSecurityContextScheduledExecutorService(
-                Executors.newScheduledThreadPool(1),
-                SecurityContextHolder.getContext()
+    public void positionScheduler() {
+        DelegatingSecurityContextScheduledExecutorService
+            delegatedScheduler
+            = new DelegatingSecurityContextScheduledExecutorService(
+            Executors.newScheduledThreadPool(1),
+            SecurityContextHolder.getContext()
         );
         delegatedScheduler.scheduleAtFixedRate(
             () -> {
-                for(Map.Entry<String, Boolean> entry : followers.entrySet()){
-                    if(!entry.getValue()){
+                for (Map.Entry<String, Boolean> entry : followers.entrySet()) {
+                    if (!entry.getValue()) {
                         followers.remove(entry.getKey());
                         removeFollower(entry);
-                    }else{
+                    } else {
                         followers.replace(entry.getKey(), true, false);
                     }
                 }
-            }, USER_UNFOLLOWING_DELAY, USER_UNFOLLOWING_DELAY, TimeUnit.SECONDS);
+            }, USER_UNFOLLOWING_DELAY, USER_UNFOLLOWING_DELAY, TimeUnit.SECONDS
+        );
     }
 }

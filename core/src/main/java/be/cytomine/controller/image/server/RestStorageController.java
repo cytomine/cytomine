@@ -41,7 +41,9 @@ public class RestStorageController extends RestCytomineController {
             @RequestParam(defaultValue = "false", required = false) Boolean all
     ) {
         log.debug("REST request to list storages: all? {}", all);
-        return responseSuccess(all ? storageService.list() : storageService.list(currentUserService.getCurrentUser(), null));
+        return responseSuccess(
+            all ? storageService.list() : storageService.list(currentUserService.getCurrentUser(), null)
+        );
     }
 
     @GetMapping("/storage/{id}.json")

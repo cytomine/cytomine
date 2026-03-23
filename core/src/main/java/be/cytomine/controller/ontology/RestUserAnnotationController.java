@@ -67,8 +67,7 @@ public class RestUserAnnotationController extends RestCytomineController {
     private final AnnotationListingBuilder annotationListingBuilder;
 
     @GetMapping("/userannotation.json")
-    public ResponseEntity<String> listLight(
-    ) {
+    public ResponseEntity<String> listLight() {
         log.debug("REST request to list user annotation light");
         return responseSuccess(userAnnotationService.listLight());
     }
@@ -76,32 +75,32 @@ public class RestUserAnnotationController extends RestCytomineController {
 
     @GetMapping("/user/{idUser}/userannotation/count.json")
     public ResponseEntity<String> countByUser(
-            @PathVariable(value = "idUser") Long idUser,
-            @RequestParam(value="project", required = false) Long idProject
+        @PathVariable(value = "idUser") Long idUser,
+        @RequestParam(value = "project", required = false) Long idProject
     ) {
         log.debug("REST request to count user annotation by user/project");
         User user = userService.find(idUser)
-                .orElseThrow(() -> new ObjectNotFoundException("User", idUser));
+            .orElseThrow(() -> new ObjectNotFoundException("User", idUser));
         Project project = null;
-        if (idProject!=null) {
+        if (idProject != null) {
             project = projectService.find(idProject)
-                    .orElseThrow(() -> new ObjectNotFoundException("Project", idProject));
+                .orElseThrow(() -> new ObjectNotFoundException("Project", idProject));
         }
-        return responseSuccess(JsonObject.of("total", userAnnotationService.count((User)user, project)));
+        return responseSuccess(JsonObject.of("total", userAnnotationService.count((User) user, project)));
     }
 
 
     @GetMapping("/project/{idProject}/userannotation/count.json")
     public ResponseEntity<String> countByProject(
-            @PathVariable(value = "idProject") Long idProject,
-            @RequestParam(value="startDate", required = false) Long startDate,
-            @RequestParam(value="endDate", required = false) Long endDate
+        @PathVariable(value = "idProject") Long idProject,
+        @RequestParam(value = "startDate", required = false) Long startDate,
+        @RequestParam(value = "endDate", required = false) Long endDate
     ) {
         log.debug("REST request to count user annotation by user/project");
-        Project project= projectService.find(idProject)
-                .orElseThrow(() -> new ObjectNotFoundException("Project", idProject));
-        Date start = (startDate!=null? new Date(startDate) : null);
-        Date end = (endDate!=null? new Date(endDate) : null);
+        Project project = projectService.find(idProject)
+            .orElseThrow(() -> new ObjectNotFoundException("Project", idProject));
+        Date start = (startDate != null ? new Date(startDate) : null);
+        Date end = (endDate != null ? new Date(endDate) : null);
         return responseSuccess(JsonObject.of("total", userAnnotationService.countByProject(project, start, end)));
     }
 
@@ -110,18 +109,18 @@ public class RestUserAnnotationController extends RestCytomineController {
      */
     @GetMapping("/project/{idProject}/userannotation/download")
     public void downloadDocumentByProject(
-            @PathVariable Long idProject,
-            @RequestParam String format,
-            @RequestParam String terms,
-            @RequestParam Optional<String> users,
-            @RequestParam String images,
-            @RequestParam(required = false) Long beforeThan,
-            @RequestParam(required = false) Long afterThan
+        @PathVariable Long idProject,
+        @RequestParam String format,
+        @RequestParam String terms,
+        @RequestParam Optional<String> users,
+        @RequestParam String images,
+        @RequestParam(required = false) Long beforeThan,
+        @RequestParam(required = false) Long afterThan
     ) throws IOException {
         Project project = projectService.find(idProject)
-                .orElseThrow(() -> new ObjectNotFoundException("Project", idProject));
+            .orElseThrow(() -> new ObjectNotFoundException("Project", idProject));
         String userIds = users.filter(s -> !s.isBlank())
-                .orElseGet(() -> projectService.getUserIdsFromProject(project.getId()));
+            .orElseGet(() -> projectService.getUserIdsFromProject(project.getId()));
         terms = termService.fillEmptyTermIds(terms, project);
         JsonObject params = mergeQueryParamsAndBodyParams();
         byte[] report = annotationListingBuilder.buildAnnotationReport(idProject, userIds, params, terms, format);
@@ -133,12 +132,12 @@ public class RestUserAnnotationController extends RestCytomineController {
      */
     @PostMapping("/userannotation/{annotation}/comment.json")
     public ResponseEntity<String> addComment(
-            @PathVariable(value = "annotation") Long annotationId,
-            @RequestBody JsonObject json
+        @PathVariable(value = "annotation") Long annotationId,
+        @RequestBody JsonObject json
     ) {
         log.debug("REST request to create comment for annotation : " + json);
         UserAnnotation annotation = userAnnotationService.find(annotationId)
-                .orElseThrow(()-> new ObjectNotFoundException("Annotation", annotationId));
+            .orElseThrow(() -> new ObjectNotFoundException("Annotation", annotationId));
         json.put("annotationIdent", annotation.getId());
         json.put("annotationClassName", annotation.getClass().getName());
         return responseSuccess(sharedAnnotationService.add(json));
@@ -150,14 +149,14 @@ public class RestUserAnnotationController extends RestCytomineController {
      */
     @GetMapping("/userannotation/{annotation}/comment/{id}.json")
     public ResponseEntity<String> showComment(
-            @PathVariable(value = "annotation") Long annotationId,
-            @PathVariable(value = "id") Long commentId
+        @PathVariable(value = "annotation") Long annotationId,
+        @PathVariable(value = "id") Long commentId
     ) {
         log.debug("REST request to read comment {} for annotation {}", commentId, annotationId);
         UserAnnotation annotation = userAnnotationService.find(annotationId)
-                .orElseThrow(()-> new ObjectNotFoundException("Annotation", annotationId));
+            .orElseThrow(() -> new ObjectNotFoundException("Annotation", annotationId));
         return responseSuccess(sharedAnnotationService.find(commentId).orElseThrow(() ->
-                new ObjectNotFoundException("SharedAnnotation", commentId)));
+            new ObjectNotFoundException("SharedAnnotation", commentId)));
     }
 
     /**
@@ -165,37 +164,38 @@ public class RestUserAnnotationController extends RestCytomineController {
      */
     @GetMapping("/userannotation/{annotation}/comment.json")
     public ResponseEntity<String> listComments(
-            @PathVariable(value = "annotation") Long annotationId
+        @PathVariable(value = "annotation") Long annotationId
     ) {
         log.debug("REST request to read comments for annotation {}", annotationId);
         UserAnnotation annotation = userAnnotationService.find(annotationId)
-                .orElseThrow(()-> new ObjectNotFoundException("Annotation", annotationId));
+            .orElseThrow(() -> new ObjectNotFoundException("Annotation", annotationId));
         return responseSuccess(sharedAnnotationService.listComments(annotation));
     }
 
 
     @GetMapping("/userannotation/{id}.json")
     public ResponseEntity<String> show(
-            @PathVariable Long id
+        @PathVariable Long id
     ) {
         log.debug("REST request to get Term : {}", id);
         return userAnnotationService.find(id)
-                .map(this::responseSuccess)
-                .orElseGet(() -> responseNotFound("UserAnnotation", id));
+            .map(this::responseSuccess)
+            .orElseGet(() -> responseNotFound("UserAnnotation", id));
     }
 
 
     /**
      * Add a new term
      * Use next add relation-term to add relation with another term
+     *
      * @param json JSON with Term data
      * @return Response map with .code = http response code and .data.term = new created Term
      */
     @PostMapping("/userannotation.json")
     public ResponseEntity<String> add(
-            @RequestBody String json,
-            @RequestParam(required = false) Long minPoint,
-            @RequestParam(required = false) Long maxPoint
+        @RequestBody String json,
+        @RequestParam(required = false) Long minPoint,
+        @RequestParam(required = false) Long maxPoint
     ) {
         log.debug("REST request to save user annotation");
         JsonInput data;
@@ -209,8 +209,8 @@ public class RestUserAnnotationController extends RestCytomineController {
         } catch (Exception ex) {
             try {
                 data = new ObjectMapper().readValue(json, JsonSingleObject.class);
-                ((JsonSingleObject)data).putIfAbsent("minPoint", minPoint);
-                ((JsonSingleObject)data).putIfAbsent("maxPoint", maxPoint);
+                ((JsonSingleObject) data).putIfAbsent("minPoint", minPoint);
+                ((JsonSingleObject) data).putIfAbsent("maxPoint", maxPoint);
             } catch (JsonProcessingException e) {
                 throw new WrongArgumentException("Json not valid");
             }
@@ -241,52 +241,52 @@ public class RestUserAnnotationController extends RestCytomineController {
 
     @PostMapping("/userannotation/{id}/repeat.json")
     public ResponseEntity<String> repeat(
-            @RequestBody JsonObject json,
-            @PathVariable Long id
+        @RequestBody JsonObject json,
+        @PathVariable Long id
     ) {
         log.debug("REST request to repeat user annotation : {} ", id);
 
         UserAnnotation annotation = userAnnotationService.find(id)
-                .orElseThrow(()-> new ObjectNotFoundException("Annotation", id));
+            .orElseThrow(() -> new ObjectNotFoundException("Annotation", id));
         return responseSuccess(userAnnotationService.repeat(
-                annotation, json.getJSONAttrLong("repeat", 1L), json.getJSONAttrInteger("slice", null)));
+            annotation, json.getJSONAttrLong("repeat", 1L), json.getJSONAttrInteger("slice", null)));
     }
 
 
     @RequestMapping(value = "/userannotation/{id}/crop.{format}", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<byte[]> crop(
-            @PathVariable Long id,
-            @PathVariable String format,
-            @RequestParam(required = false) Integer maxSize,
-            @RequestParam(required = false) String geometry,
-            @RequestParam(required = false) String location,
-            @RequestParam(required = false) String boundaries,
-            @RequestParam(defaultValue = "false") Boolean complete,
-            @RequestParam(required = false) Integer zoom,
-            @RequestParam(required = false) Double increaseArea,
-            @RequestParam(required = false) Boolean safe,
-            @RequestParam(required = false) Boolean square,
-            @RequestParam(required = false) String type,
-            @RequestParam(required = false) Boolean draw,
-            @RequestParam(required = false) Boolean mask,
-            @RequestParam(required = false) Boolean alphaMask,
-            @RequestParam(required = false) Boolean drawScaleBar,
-            @RequestParam(required = false) Double resolution,
-            @RequestParam(required = false) Double magnification,
-            @RequestParam(required = false) String colormap,
-            @RequestParam(required = false) Boolean inverse,
-            @RequestParam(required = false) Double contrast,
-            @RequestParam(required = false) Double gamma,
-            @RequestParam(required = false) String bits,
-            @RequestParam(required = false) Integer alpha,
-            @RequestParam(required = false) Integer thickness,
-            @RequestParam(required = false) String color,
-            @RequestParam(required = false) Integer jpegQuality,
-            ProxyExchange<byte[]> proxy
+        @PathVariable Long id,
+        @PathVariable String format,
+        @RequestParam(required = false) Integer maxSize,
+        @RequestParam(required = false) String geometry,
+        @RequestParam(required = false) String location,
+        @RequestParam(required = false) String boundaries,
+        @RequestParam(defaultValue = "false") Boolean complete,
+        @RequestParam(required = false) Integer zoom,
+        @RequestParam(required = false) Double increaseArea,
+        @RequestParam(required = false) Boolean safe,
+        @RequestParam(required = false) Boolean square,
+        @RequestParam(required = false) String type,
+        @RequestParam(required = false) Boolean draw,
+        @RequestParam(required = false) Boolean mask,
+        @RequestParam(required = false) Boolean alphaMask,
+        @RequestParam(required = false) Boolean drawScaleBar,
+        @RequestParam(required = false) Double resolution,
+        @RequestParam(required = false) Double magnification,
+        @RequestParam(required = false) String colormap,
+        @RequestParam(required = false) Boolean inverse,
+        @RequestParam(required = false) Double contrast,
+        @RequestParam(required = false) Double gamma,
+        @RequestParam(required = false) String bits,
+        @RequestParam(required = false) Integer alpha,
+        @RequestParam(required = false) Integer thickness,
+        @RequestParam(required = false) String color,
+        @RequestParam(required = false) Integer jpegQuality,
+        ProxyExchange<byte[]> proxy
     ) throws IOException, ParseException {
         log.debug("REST request to get associated image of a abstract image");
         UserAnnotation userAnnotation = userAnnotationService.find(id)
-                .orElseThrow(() -> new ObjectNotFoundException("UserAnnotation", id));
+            .orElseThrow(() -> new ObjectNotFoundException("UserAnnotation", id));
 
         CropParameter cropParameter = new CropParameter();
         cropParameter.setGeometry(geometry);
@@ -312,8 +312,8 @@ public class RestUserAnnotationController extends RestCytomineController {
         cropParameter.setThickness(thickness);
         cropParameter.setColor(color);
         cropParameter.setJpegQuality(jpegQuality);
-        cropParameter.setMaxBits(bits!=null && bits.equals("max"));
-        cropParameter.setBits(bits!=null && !bits.equals("max") ? Integer.parseInt(bits): null);
+        cropParameter.setMaxBits(bits != null && bits.equals("max"));
+        cropParameter.setBits(bits != null && !bits.equals("max") ? Integer.parseInt(bits) : null);
         cropParameter.setFormat(format);
         String etag = getRequestETag();
         return imageServerService.crop(userAnnotation, cropParameter, etag, proxy);
@@ -321,37 +321,37 @@ public class RestUserAnnotationController extends RestCytomineController {
 
     @RequestMapping(value = "/userannotation/{id}/mask.{format}", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<byte[]> cropMask(
-            @PathVariable Long id,
-            @PathVariable String format,
-            @RequestParam(required = false) Integer maxSize,
-            @RequestParam(required = false) String geometry,
-            @RequestParam(required = false) String location,
-            @RequestParam(required = false) String boundaries,
-            @RequestParam(defaultValue = "false") Boolean complete,
-            @RequestParam(required = false) Integer zoom,
-            @RequestParam(required = false) Double increaseArea,
-            @RequestParam(required = false) Boolean safe,
-            @RequestParam(required = false) Boolean square,
-            @RequestParam(required = false) String type,
-            @RequestParam(required = false) Boolean draw,
-            @RequestParam(required = false) Boolean drawScaleBar,
-            @RequestParam(required = false) Double resolution,
-            @RequestParam(required = false) Double magnification,
-            @RequestParam(required = false) String colormap,
-            @RequestParam(required = false) Boolean inverse,
-            @RequestParam(required = false) Double contrast,
-            @RequestParam(required = false) Double gamma,
-            @RequestParam(required = false) String bits,
-            @RequestParam(required = false) Integer alpha,
-            @RequestParam(required = false) Integer thickness,
-            @RequestParam(required = false) String color,
-            @RequestParam(required = false) Integer jpegQuality,
+        @PathVariable Long id,
+        @PathVariable String format,
+        @RequestParam(required = false) Integer maxSize,
+        @RequestParam(required = false) String geometry,
+        @RequestParam(required = false) String location,
+        @RequestParam(required = false) String boundaries,
+        @RequestParam(defaultValue = "false") Boolean complete,
+        @RequestParam(required = false) Integer zoom,
+        @RequestParam(required = false) Double increaseArea,
+        @RequestParam(required = false) Boolean safe,
+        @RequestParam(required = false) Boolean square,
+        @RequestParam(required = false) String type,
+        @RequestParam(required = false) Boolean draw,
+        @RequestParam(required = false) Boolean drawScaleBar,
+        @RequestParam(required = false) Double resolution,
+        @RequestParam(required = false) Double magnification,
+        @RequestParam(required = false) String colormap,
+        @RequestParam(required = false) Boolean inverse,
+        @RequestParam(required = false) Double contrast,
+        @RequestParam(required = false) Double gamma,
+        @RequestParam(required = false) String bits,
+        @RequestParam(required = false) Integer alpha,
+        @RequestParam(required = false) Integer thickness,
+        @RequestParam(required = false) String color,
+        @RequestParam(required = false) Integer jpegQuality,
 
-            ProxyExchange<byte[]> proxy
+        ProxyExchange<byte[]> proxy
     ) throws IOException, ParseException {
         log.debug("REST request to get associated image of a abstract image");
         UserAnnotation userAnnotation = userAnnotationService.find(id)
-                .orElseThrow(() -> new ObjectNotFoundException("UserAnnotation", id));
+            .orElseThrow(() -> new ObjectNotFoundException("UserAnnotation", id));
 
         CropParameter cropParameter = new CropParameter();
         cropParameter.setGeometry(geometry);
@@ -377,8 +377,8 @@ public class RestUserAnnotationController extends RestCytomineController {
         cropParameter.setThickness(thickness);
         cropParameter.setColor(color);
         cropParameter.setJpegQuality(jpegQuality);
-        cropParameter.setMaxBits(bits!=null && bits.equals("max"));
-        cropParameter.setBits(bits!=null && !bits.equals("max") ? Integer.parseInt(bits): null);
+        cropParameter.setMaxBits(bits != null && bits.equals("max"));
+        cropParameter.setBits(bits != null && !bits.equals("max") ? Integer.parseInt(bits) : null);
         cropParameter.setFormat(format);
         String etag = getRequestETag();
         return imageServerService.crop(userAnnotation, cropParameter, etag, proxy);
@@ -386,37 +386,37 @@ public class RestUserAnnotationController extends RestCytomineController {
 
     @RequestMapping(value = "/userannotation/{id}/alphamask.{format}", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<byte[]> cropAlphaMask(
-            @PathVariable Long id,
-            @PathVariable String format,
-            @RequestParam(required = false) Integer maxSize,
-            @RequestParam(required = false) String geometry,
-            @RequestParam(required = false) String location,
-            @RequestParam(required = false) String boundaries,
-            @RequestParam(defaultValue = "false") Boolean complete,
-            @RequestParam(required = false) Integer zoom,
-            @RequestParam(required = false) Double increaseArea,
-            @RequestParam(required = false) Boolean safe,
-            @RequestParam(required = false) Boolean square,
-            @RequestParam(required = false) String type,
-            @RequestParam(required = false) Boolean draw,
-            @RequestParam(required = false) Boolean drawScaleBar,
-            @RequestParam(required = false) Double resolution,
-            @RequestParam(required = false) Double magnification,
-            @RequestParam(required = false) String colormap,
-            @RequestParam(required = false) Boolean inverse,
-            @RequestParam(required = false) Double contrast,
-            @RequestParam(required = false) Double gamma,
-            @RequestParam(required = false) String bits,
-            @RequestParam(required = false) Integer alpha,
-            @RequestParam(required = false) Integer thickness,
-            @RequestParam(required = false) String color,
-            @RequestParam(required = false) Integer jpegQuality,
+        @PathVariable Long id,
+        @PathVariable String format,
+        @RequestParam(required = false) Integer maxSize,
+        @RequestParam(required = false) String geometry,
+        @RequestParam(required = false) String location,
+        @RequestParam(required = false) String boundaries,
+        @RequestParam(defaultValue = "false") Boolean complete,
+        @RequestParam(required = false) Integer zoom,
+        @RequestParam(required = false) Double increaseArea,
+        @RequestParam(required = false) Boolean safe,
+        @RequestParam(required = false) Boolean square,
+        @RequestParam(required = false) String type,
+        @RequestParam(required = false) Boolean draw,
+        @RequestParam(required = false) Boolean drawScaleBar,
+        @RequestParam(required = false) Double resolution,
+        @RequestParam(required = false) Double magnification,
+        @RequestParam(required = false) String colormap,
+        @RequestParam(required = false) Boolean inverse,
+        @RequestParam(required = false) Double contrast,
+        @RequestParam(required = false) Double gamma,
+        @RequestParam(required = false) String bits,
+        @RequestParam(required = false) Integer alpha,
+        @RequestParam(required = false) Integer thickness,
+        @RequestParam(required = false) String color,
+        @RequestParam(required = false) Integer jpegQuality,
 
-            ProxyExchange<byte[]> proxy
+        ProxyExchange<byte[]> proxy
     ) throws IOException, ParseException {
         log.debug("REST request to get associated image of a abstract image");
         UserAnnotation userAnnotation = userAnnotationService.find(id)
-                .orElseThrow(() -> new ObjectNotFoundException("UserAnnotation", id));
+            .orElseThrow(() -> new ObjectNotFoundException("UserAnnotation", id));
 
         CropParameter cropParameter = new CropParameter();
         cropParameter.setGeometry(geometry);
@@ -441,8 +441,8 @@ public class RestUserAnnotationController extends RestCytomineController {
         cropParameter.setThickness(thickness);
         cropParameter.setColor(color);
         cropParameter.setJpegQuality(jpegQuality);
-        cropParameter.setMaxBits(bits!=null && bits.equals("max"));
-        cropParameter.setBits(bits!=null && !bits.equals("max") ? Integer.parseInt(bits): null);
+        cropParameter.setMaxBits(bits != null && bits.equals("max"));
+        cropParameter.setBits(bits != null && !bits.equals("max") ? Integer.parseInt(bits) : null);
         cropParameter.setFormat(format);
         String etag = getRequestETag();
         return imageServerService.crop(userAnnotation, cropParameter, etag, proxy);

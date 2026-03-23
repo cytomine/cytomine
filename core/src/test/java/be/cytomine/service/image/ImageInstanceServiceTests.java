@@ -122,8 +122,26 @@ public class ImageInstanceServiceTests {
         wireMockServer = new WireMockServer(8888);
         wireMockServer.start();
         WireMock.configureFor("localhost", wireMockServer.port());
+        waitForWireMock();
 
         setupStub();
+    }
+
+    private static void waitForWireMock() {
+        int maxAttempts = 50;
+        for (int i = 0; i < maxAttempts; i++) {
+            try {
+                WireMock.listAllStubMappings();
+                return;
+            } catch (Exception e) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
+        throw new IllegalStateException("WireMock server did not start in time");
     }
 
     @AfterAll

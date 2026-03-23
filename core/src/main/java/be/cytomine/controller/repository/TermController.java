@@ -59,13 +59,15 @@ public class TermController {
     }
 
     @GetMapping("project/{id}/term.json")
-    public CollectionResponse<TermResponse> listByProject(@PathVariable Long id, Pageable pageable) {
+    public CollectionResponse<TermResponse> listByProject(@PathVariable Long id,
+                                                          Pageable pageable) {
         log.debug("REST request to list terms for project {}", id);
         return pageMapper.toCollectionResponse(termHttpContract.findTermsByProject(id, pageable));
     }
 
     @GetMapping("ontology/{id}/term.json")
-    public CollectionResponse<TermResponse> listByOntology(@PathVariable Long id, Pageable pageable) {
+    public CollectionResponse<TermResponse> listByOntology(@PathVariable Long id,
+                                                           Pageable pageable) {
         log.debug("REST request to list terms for ontology {}", id);
         return pageMapper.toCollectionResponse(termHttpContract.findTermsByOntology(id, pageable));
     }

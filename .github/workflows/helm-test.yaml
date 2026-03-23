@@ -68,9 +68,10 @@ jobs:
           INGRESS_IP=$(kubectl get svc -n ingress ingress-nginx-controller -o jsonpath='{.spec.clusterIP}')
           echo "INGRESS_IP=$INGRESS_IP" >> $GITHUB_ENV
 
-      - name: Count e2e tests
+      - name: Count e2e tests in selenium folder
         run: |
-          E2E_TEST_COUNT=$(grep -r "@Test" e2e-tests/src/test/java/org/cytomine/e2etests/project/ --include="*.java" | wc -l)
+          E2E_TEST_COUNT=$(grep -r "@Test" e2e-tests/src/test/java/org/cytomine/e2etests/selenium/
+          --include="*.java" | wc -l)
           echo "E2E_TEST_COUNT=$E2E_TEST_COUNT" >> $GITHUB_ENV
 
       - name: Run chart-testing (lint and install)

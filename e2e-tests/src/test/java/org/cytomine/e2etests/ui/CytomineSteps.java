@@ -266,7 +266,6 @@ public class CytomineSteps {
         webDriverUtils.byIsDisplayed(wait, By.xpath("//*[contains(text(),'Successful SAM Processing !')]"));
     }
 
-    @SneakyThrows
     public void createAnnotationAndSearchAnnotations(Wait<WebDriver> wait, WebDriver driver, int nbAnnotations) {
         drawRectangleAnnotation(wait, driver);
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Search for similar annotations')]");

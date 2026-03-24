@@ -197,6 +197,23 @@ public class CytomineSteps {
     }
 
     @SneakyThrows
+    public void drawPoint(Wait<WebDriver> wait, WebDriver driver) {
+        WebElement mapCanvas = webDriverUtils.waitForCanvasReady(wait, By.cssSelector(".ol-viewport canvas"));
+
+        int canvasWidth = mapCanvas.getSize().getWidth();
+        int canvasHeight = mapCanvas.getSize().getHeight();
+        int x = canvasWidth / 4;
+        int y = canvasHeight / 4;
+
+        Actions actions = new Actions(driver);
+        actions.moveToElement(mapCanvas, x - canvasWidth / 2, y - canvasHeight / 2)
+            .click()
+            .perform();
+
+        Thread.sleep(2000);
+    }
+
+    @SneakyThrows
     public void drawRectangle(Wait<WebDriver> wait, WebDriver driver, int xOffset, int yOffset) {
         WebElement mapCanvas = webDriverUtils.waitForCanvasReady(wait, By.cssSelector(".ol-viewport canvas"));
 

@@ -159,7 +159,20 @@ public class CytomineTests {
 
     @Test
     void addAnnotationWithTools() {
+        String projectName = "selenium-" + randomUUID();
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        String projectURL = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
+        String imageName = cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName));
+        cytomineSteps.openImageInViewer(wait, driver, projectURL);
 
+        cytomineSteps.drawPoint(wait, driver);
+        cytomineSteps.verifyAnnotationCreated(wait);
+
+        cytomineSteps.drawRectangleAnnotation(wait, driver);
+        cytomineSteps.verifyAnnotationCreated(wait);
+
+        cytomineSteps.deleteProject(wait, projectURL);
+        cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
     }
 
     @Test

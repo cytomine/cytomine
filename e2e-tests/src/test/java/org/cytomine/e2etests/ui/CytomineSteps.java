@@ -198,15 +198,15 @@ public class CytomineSteps {
 
     @SneakyThrows
     public void drawPoint(Wait<WebDriver> wait, WebDriver driver) {
+        webDriverUtils.xpathClick(wait, "//button[.//i[contains(@class, 'fa-map-pin')]]");
+        webDriverUtils.byIsDisplayed(
+            wait,
+            By.xpath("//button[contains(@class, 'is-selected') and .//i[contains(@class, 'fa-map-pin')]]")
+        );
+
         WebElement mapCanvas = webDriverUtils.waitForCanvasReady(wait, By.cssSelector(".ol-viewport canvas"));
-
-        int canvasWidth = mapCanvas.getSize().getWidth();
-        int canvasHeight = mapCanvas.getSize().getHeight();
-        int x = canvasWidth / 4;
-        int y = canvasHeight / 4;
-
         Actions actions = new Actions(driver);
-        actions.moveToElement(mapCanvas, x - canvasWidth / 2, y - canvasHeight / 2)
+        actions.moveToElement(mapCanvas, 0, 0)
             .click()
             .perform();
 

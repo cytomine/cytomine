@@ -1,5 +1,6 @@
 package org.cytomine.repository.http;
 
+import java.util.Date;
 import java.util.Optional;
 
 import be.cytomine.common.repository.model.command.HttpCommandResponse;
@@ -148,10 +149,8 @@ class TermControllerTest {
     }
 
     private TermEntity createAndSaveTermEntity(String name, String color) {
-        TermEntity entity = new TermEntity();
-        entity.setName(name);
-        entity.setColor(color);
-        entity.setOntologyId(ontologyId);
-        return termRepository.saveAndFlush(entity);
+        Date now = new Date();
+        return termRepository.saveAndFlush(
+            new TermEntity(null, 0, ontologyId, name, color, now, now, "", null));
     }
 }

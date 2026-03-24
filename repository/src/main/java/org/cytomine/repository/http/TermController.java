@@ -33,7 +33,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class TermController implements TermHttpContract {
     private final OntologyMapper ontologyMapper;
     private final TermRepository termRepository;
-    private final CommandService commandService;
     private final TermCommandService termCommandService;
 
     @Override

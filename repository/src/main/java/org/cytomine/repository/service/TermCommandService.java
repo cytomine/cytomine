@@ -24,12 +24,11 @@ public class TermCommandService {
 
     public Optional<HttpCommandResponse<TermResponse>> deleteTerm(Long id, Long userId) {
         return termRepository.findById(id).map(termEntity -> {
-
             DeleteTermCommand deleteCommand =
                 new DeleteTermCommand(id, ontologyMapper.mapToTermCommandPayload(termEntity), userId, null);
             CommandEntity commandEntity = commandService.delete(deleteCommand);
-            termRepository.delete(termEntity);
             TermResponse termResponse = ontologyMapper.map(termEntity);
+            termRepository.deleteById(id);
             return new HttpCommandResponse<>(null, null, true, termResponse, commandEntity.getId());
         });
     }

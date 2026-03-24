@@ -230,7 +230,7 @@ public class CytomineTests {
     }
 
     @Test
-    void retrieveSimilarAnnotationWithCbir() throws InterruptedException {
+    void retrieveSimilarAnnotationWithCbir() {
         String projectName = "selenium-" + randomUUID();
         String termName = "selenium-term-" + randomUUID();
         int nbAnnotations = 3;
@@ -244,8 +244,7 @@ public class CytomineTests {
         cytomineSteps.selectTermForAnnotation(wait, termName);
 
         for (int i = 0; i < nbAnnotations; i++) {
-            cytomineSteps.drawRectangleAnnotation(wait, driver);
-            Thread.sleep(2000);
+            cytomineSteps.drawRandomRectangleAnnotation(wait, driver);
             cytomineSteps.verifyAnnotationCreated(wait);
         }
 

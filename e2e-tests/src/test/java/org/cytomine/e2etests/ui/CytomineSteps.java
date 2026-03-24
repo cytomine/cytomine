@@ -297,6 +297,16 @@ public class CytomineSteps {
         drawRectangle(wait, driver);
     }
 
+    public void drawCircle(Wait<WebDriver> wait, WebDriver driver) {
+        webDriverUtils.xpathClick(wait, "//button[.//i[contains(@class, 'fa-circle')]]");
+        webDriverUtils.byIsDisplayed(
+            wait,
+            By.xpath("//button[contains(@class, 'is-selected') and .//i[contains(@class, 'fa-circle')]]")
+        );
+
+        drawRectangle(wait, driver);
+    }
+
     public void verifyAnnotationCreated(Wait<WebDriver> wait) {
         webDriverUtils.byIsDisplayed(wait, By.cssSelector(".draw-tools-wrapper"));
         webDriverUtils.xpathClick(wait, "//button[.//i[contains(@class, 'fa-mouse-pointer')]]");

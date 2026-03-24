@@ -158,6 +158,11 @@ public class CytomineTests {
     }
 
     @Test
+    void addAnnotationWithTools() {
+
+    }
+
+    @Test
     void addAnnotationWithTerm() {
         String projectName = "selenium-" + randomUUID();
         String termName = "selenium-term-" + randomUUID();

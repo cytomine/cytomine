@@ -193,13 +193,8 @@ public class CytomineSteps {
         webDriverUtils.xpathClick(wait, "//div[contains(@class, 'term-selection')]//button");
     }
 
-    public void drawRectangleAnnotation(Wait<WebDriver> wait, WebDriver driver) {
-        webDriverUtils.xpathClick(wait, "//button[.//i[contains(@class, 'fa-square')]]");
-        webDriverUtils.byIsDisplayed(wait, By.xpath(
-            "//button[contains(@class, 'is-selected') and .//i[contains(@class, 'fa-square')]]"));
-
-        WebElement mapCanvas = webDriverUtils.waitForCanvasReady(wait,
-            By.cssSelector(".ol-viewport canvas"));
+    public void drawRectangle(Wait<WebDriver> wait, WebDriver driver) {
+        WebElement mapCanvas = webDriverUtils.waitForCanvasReady(wait, By.cssSelector(".ol-viewport canvas"));
 
         int canvasWidth = mapCanvas.getSize().getWidth();
         int canvasHeight = mapCanvas.getSize().getHeight();
@@ -216,12 +211,37 @@ public class CytomineSteps {
             .perform();
     }
 
-    public void verifyAnnotationCreated(Wait<WebDriver> wait, WebDriver driver) {
+    public void drawRectangleAnnotation(Wait<WebDriver> wait, WebDriver driver) {
+        webDriverUtils.xpathClick(wait, "//button[.//i[contains(@class, 'fa-square')]]");
+        webDriverUtils.byIsDisplayed(
+            wait,
+            By.xpath("//button[contains(@class, 'is-selected') and .//i[contains(@class, 'fa-square')]]")
+        );
+
+        drawRectangle(wait, driver);
+    }
+
+    public void drawRectangleAnnotationWithMagicWand(Wait<WebDriver> wait, WebDriver driver) {
+        webDriverUtils.xpathClick(wait, "//button[.//i[contains(@class, 'fa-magic')]]");
+        webDriverUtils.byIsDisplayed(
+            wait,
+            By.xpath("//button[contains(@class, 'is-selected') and .//i[contains(@class, 'fa-magic')]]")
+        );
+
+        drawRectangle(wait, driver);
+    }
+
+    public void verifyAnnotationCreated(Wait<WebDriver> wait) {
         webDriverUtils.byIsDisplayed(wait, By.cssSelector(".draw-tools-wrapper"));
         webDriverUtils.xpathClick(wait, "//button[.//i[contains(@class, 'fa-mouse-pointer')]]");
         webDriverUtils.byIsDisplayed(wait, By.xpath(
             "//button[contains(@class, 'is-selected') and .//i[contains(@class, "
                 + "'fa-mouse-pointer')]]"));
+    }
+
+    public void verifyAnnotationProcessedWithSam(Wait<WebDriver> wait) {
+        verifyAnnotationCreated(wait);
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//*[contains(text(),'Successful SAM Processing !')]"));
     }
 
     @SneakyThrows

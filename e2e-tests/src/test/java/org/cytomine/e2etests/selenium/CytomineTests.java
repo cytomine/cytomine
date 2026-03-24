@@ -228,4 +228,28 @@ public class CytomineTests {
         cytomineSteps.deleteProject(wait, projectUrl);
         cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
     }
+
+    @Test
+    void retrieveSimilarAnnotationWithCbir() {
+        String projectName = "selenium-" + randomUUID();
+        String termName = "selenium-term-" + randomUUID();
+        int nbAnnotations = 5;
+
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        String projectURL = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
+        String ontologyURL = cytomineSteps.getOntologyUrlFromProject(wait, projectURL);
+        cytomineSteps.addTermToOntology(wait, driver, ontologyURL, termName);
+        String imageName = cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName));
+        cytomineSteps.openImageInViewer(wait, driver, projectURL);
+        cytomineSteps.selectTermForAnnotation(wait, termName);
+
+        for (int i = 0; i < nbAnnotations; i++) {
+            cytomineSteps.drawRectangleAnnotation(wait, driver);
+            cytomineSteps.verifyAnnotationCreated(wait);
+        }
+
+        cytomineSteps.deleteProject(wait, projectURL);
+        cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
+        cytomineSteps.deleteOntology(wait, ontologyURL);
+    }
 }

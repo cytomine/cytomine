@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
@@ -23,6 +24,8 @@ import static java.util.stream.Collectors.toSet;
 
 @Component
 public class CytomineSteps {
+
+    public static final int DEFAULT_CANVA_OFFSET = 2;
 
     @Autowired
     WebDriverUtils webDriverUtils;
@@ -193,7 +196,8 @@ public class CytomineSteps {
         webDriverUtils.xpathClick(wait, "//div[contains(@class, 'term-selection')]//button");
     }
 
-    public void drawRectangle(Wait<WebDriver> wait, WebDriver driver) {
+    @SneakyThrows
+    public void drawRectangle(Wait<WebDriver> wait, WebDriver driver, int xOffset, int yOffset) {
         WebElement mapCanvas = webDriverUtils.waitForCanvasReady(wait, By.cssSelector(".ol-viewport canvas"));
 
         int canvasWidth = mapCanvas.getSize().getWidth();
@@ -204,11 +208,17 @@ public class CytomineSteps {
         int endY = canvasHeight * 3 / 4;
 
         Actions actions = new Actions(driver);
-        actions.moveToElement(mapCanvas, startX - canvasWidth / 2, startY - canvasHeight / 2)
+        actions.moveToElement(mapCanvas, startX - canvasWidth / xOffset, startY - canvasHeight / yOffset)
             .click()
             .moveToElement(mapCanvas, endX - canvasWidth / 2, endY - canvasHeight / 2)
             .click()
             .perform();
+
+        Thread.sleep(2000);
+    }
+
+    public void drawRectangle(Wait<WebDriver> wait, WebDriver driver) {
+        drawRectangle(wait, driver, DEFAULT_CANVA_OFFSET, DEFAULT_CANVA_OFFSET);
     }
 
     public void drawRectangleAnnotation(Wait<WebDriver> wait, WebDriver driver) {
@@ -219,6 +229,18 @@ public class CytomineSteps {
         );
 
         drawRectangle(wait, driver);
+    }
+
+    public void drawRandomRectangleAnnotation(Wait<WebDriver> wait, WebDriver driver) {
+        webDriverUtils.xpathClick(wait, "//button[.//i[contains(@class, 'fa-square')]]");
+        webDriverUtils.byIsDisplayed(
+            wait,
+            By.xpath("//button[contains(@class, 'is-selected') and .//i[contains(@class, 'fa-square')]]")
+        );
+
+        int xOffset = new Random().nextInt(3) + DEFAULT_CANVA_OFFSET;
+        int yOffset = new Random().nextInt(3) + DEFAULT_CANVA_OFFSET;
+        drawRectangle(wait, driver, xOffset, yOffset);
     }
 
     public void drawRectangleAnnotationWithMagicWand(Wait<WebDriver> wait, WebDriver driver) {
@@ -242,6 +264,13 @@ public class CytomineSteps {
     public void verifyAnnotationProcessedWithSam(Wait<WebDriver> wait) {
         verifyAnnotationCreated(wait);
         webDriverUtils.byIsDisplayed(wait, By.xpath("//*[contains(text(),'Successful SAM Processing !')]"));
+    }
+
+    public void createAnnotationAndSearchAnnotations(Wait<WebDriver> wait, WebDriver driver, int nbAnnotations) {
+        drawRectangleAnnotation(wait, driver);
+        webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Search for similar annotations')]");
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//*[contains(text(), 'Similar annotations')]"));
+        wait.until(d -> d.findElements(By.cssSelector(".similar-annotations-playground .annotation-data")).size() == nbAnnotations);
     }
 
     @SneakyThrows

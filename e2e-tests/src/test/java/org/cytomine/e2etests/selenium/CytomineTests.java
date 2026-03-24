@@ -170,7 +170,28 @@ public class CytomineTests {
         cytomineSteps.openImageInViewer(wait, driver, projectURL);
         cytomineSteps.selectTermForAnnotation(wait, termName);
         cytomineSteps.drawRectangleAnnotation(wait, driver);
-        cytomineSteps.verifyAnnotationCreated(wait, driver);
+        cytomineSteps.verifyAnnotationCreated(wait);
+        cytomineSteps.deleteProject(wait, projectURL);
+        cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
+        cytomineSteps.deleteOntology(wait, ontologyURL);
+    }
+
+    @Test
+    void addAnnotationWithSam() {
+        String projectName = "selenium-" + randomUUID();
+        String termName = "selenium-term-" + randomUUID();
+
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        String projectURL = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
+        String ontologyURL = cytomineSteps.getOntologyUrlFromProject(wait, projectURL);
+        cytomineSteps.addTermToOntology(wait, driver, ontologyURL, termName);
+        String imageName = cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName));
+        cytomineSteps.openImageInViewer(wait, driver, projectURL);
+        cytomineSteps.selectTermForAnnotation(wait, termName);
+
+        cytomineSteps.drawRectangleAnnotationWithMagicWand(wait, driver);
+        cytomineSteps.verifyAnnotationProcessedWithSam(wait);
+
         cytomineSteps.deleteProject(wait, projectURL);
         cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
         cytomineSteps.deleteOntology(wait, ontologyURL);
@@ -197,7 +218,7 @@ public class CytomineTests {
         String imageName = cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName));
         cytomineSteps.openImageInViewer(wait, driver, projectUrl);
         cytomineSteps.drawRectangleAnnotation(wait, driver);
-        cytomineSteps.verifyAnnotationCreated(wait, driver);
+        cytomineSteps.verifyAnnotationCreated(wait);
 
         cytomineSteps.selectTask(wait, taskName, taskVersion);
         cytomineSteps.selectAnnotationForGeometryInput(wait);

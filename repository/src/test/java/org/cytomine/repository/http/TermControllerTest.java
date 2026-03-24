@@ -2,6 +2,7 @@ package org.cytomine.repository.http;
 
 import java.util.Optional;
 
+import be.cytomine.common.repository.model.command.HttpCommandResponse;
 import org.cytomine.repository.RepositoryApp;
 import org.cytomine.repository.persistence.TermRepository;
 import org.cytomine.repository.persistence.entity.TermEntity;
@@ -121,10 +122,10 @@ class TermControllerTest {
     void deleteWhenExistsDeletesAndReturnsTerm() {
         TermEntity entity = createAndSaveTermEntity("term1", "#FF0000");
 
-        Optional<TermResponse> result = termController.delete(entity.getId());
+        Optional<HttpCommandResponse<TermResponse>> result = termController.delete(entity.getId());
 
         assertTrue(result.isPresent());
-        assertEquals("term1", result.get().name());
+        assertEquals("term1", result.get().data().name());
         assertTrue(termRepository.findById(entity.getId()).isEmpty());
     }
 

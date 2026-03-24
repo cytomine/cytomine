@@ -2,9 +2,19 @@ package org.cytomine.repository.http;
 
 import java.util.Optional;
 
+import static be.cytomine.common.repository.http.TermHttpContract.ROOT_PATH;
+
+import be.cytomine.common.repository.http.TermHttpContract;
+import be.cytomine.common.repository.model.CreateTerm;
+import be.cytomine.common.repository.model.TermResponse;
+import be.cytomine.common.repository.model.UpdateTerm;
+import be.cytomine.common.repository.model.command.HttpCommandResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.cytomine.repository.mapper.OntologyMapper;
 import org.cytomine.repository.persistence.TermRepository;
+import org.cytomine.repository.service.CommandService;
+import org.cytomine.repository.service.TermCommandService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,13 +26,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import be.cytomine.common.repository.http.TermHttpContract;
-import be.cytomine.common.repository.model.CreateTerm;
-import be.cytomine.common.repository.model.TermResponse;
-import be.cytomine.common.repository.model.UpdateTerm;
-
-import static be.cytomine.common.repository.http.TermHttpContract.ROOT_PATH;
-
 
 @RequiredArgsConstructor
 @RestController
@@ -30,6 +33,8 @@ import static be.cytomine.common.repository.http.TermHttpContract.ROOT_PATH;
 public class TermController implements TermHttpContract {
     private final OntologyMapper ontologyMapper;
     private final TermRepository termRepository;
+    private final CommandService commandService;
+    private final TermCommandService termCommandService;
 
     @Override
     @GetMapping("/{id}")
@@ -61,10 +66,9 @@ public class TermController implements TermHttpContract {
 
     @Override
     @DeleteMapping("/{id}")
-    public Optional<TermResponse> delete(@PathVariable Long id) {
-        Optional<TermResponse> term = termRepository.findById(id).map(ontologyMapper::map);
-        termRepository.deleteById(id);
-        return term;
+    @Transactional
+    public Optional<HttpCommandResponse<TermResponse>> delete(@PathVariable Long id) {
+        return termCommandService.deleteTerm(id);
     }
 
     @Override

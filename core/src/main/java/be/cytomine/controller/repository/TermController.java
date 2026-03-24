@@ -2,6 +2,7 @@ package be.cytomine.controller.repository;
 
 import java.util.Optional;
 
+import be.cytomine.common.repository.model.command.HttpCommandResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -53,7 +54,7 @@ public class TermController {
     }
 
     @DeleteMapping("term/{id}.json")
-    public Optional<TermResponse> delete(@PathVariable Long id) {
+    public Optional<HttpCommandResponse<TermResponse>> delete(@PathVariable Long id) {
         log.debug("REST request to delete term {}", id);
         return termHttpContract.delete(id);
     }

@@ -20,6 +20,27 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import be.cytomine.BasicInstanceBuilder;
+import be.cytomine.CytomineCoreApplication;
+import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.http.TermHttpContract;
+import be.cytomine.common.repository.model.TermResponse;
+import be.cytomine.common.repository.model.command.HttpCommandResponse;
+import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.domain.ontology.Term;
+import be.cytomine.domain.project.Project;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -34,27 +55,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-
-import be.cytomine.BasicInstanceBuilder;
-import be.cytomine.CytomineCoreApplication;
-import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.common.repository.http.TermHttpContract;
-import be.cytomine.common.repository.model.TermResponse;
-import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.domain.ontology.Term;
-import be.cytomine.domain.project.Project;
-
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @DirtiesContext
 @SpringBootTest(classes = CytomineCoreApplication.class)
@@ -75,9 +75,12 @@ public class TermResourceTests {
     @MockitoBean
     private TermHttpContract termHttpContract;
 
+    private HttpCommandResponse<TermResponse> toHttpTermResponse(Term term) {
+        return new HttpCommandResponse<>("", null, false, toTermResponse(term), -1);
+    }
+
     private TermResponse toTermResponse(Term term) {
-        return new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
-            Set.of());
+        return new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(), Set.of());
     }
 
     @Test
@@ -142,8 +145,8 @@ public class TermResourceTests {
         when(termHttpContract.update(any())).thenReturn(response);
 
         restTermControllerMockMvc.perform(post("/api/term.json").contentType(MediaType.APPLICATION_JSON).content(
-                "{\"name\":\"" + term.getName() + "\",\"color\":\"" + term.getColor() + "\",\"ontology\":"
-                    + term.getOntology().getId() + ",\"project\":0}")).andExpect(status().isOk())
+                "{\"name\":\"" + term.getName() + "\",\"color\":\"" + term.getColor() + "\",\"ontology\":" +
+                    term.getOntology().getId() + ",\"project\":0}")).andExpect(status().isOk())
             .andExpect(jsonPath("$.id").exists()).andExpect(jsonPath("$.name").value(term.getName()))
             .andExpect(jsonPath("$.ontologyId").value(term.getOntology().getId()));
     }
@@ -167,7 +170,7 @@ public class TermResourceTests {
     @Transactional
     public void deleteTerm() throws Exception {
         Term term = builder.given_a_term();
-        when(termHttpContract.delete(term.getId())).thenReturn(Optional.of(toTermResponse(term)));
+        when(termHttpContract.delete(term.getId())).thenReturn(Optional.of(toHttpTermResponse(term)));
 
         restTermControllerMockMvc.perform(delete("/api/term/{id}.json", term.getId())).andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(term.getId().intValue()))

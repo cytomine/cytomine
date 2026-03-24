@@ -123,7 +123,7 @@ class TermControllerTest {
     void deleteWhenExistsDeletesAndReturnsTerm() {
         TermEntity entity = createAndSaveTermEntity("term1", "#FF0000");
 
-        Optional<HttpCommandResponse<TermResponse>> result = termController.delete(entity.getId());
+        Optional<HttpCommandResponse<TermResponse>> result = termController.delete(entity.getId(), 0);
 
         assertTrue(result.isPresent());
         assertEquals("term1", result.get().data().name());

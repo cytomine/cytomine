@@ -3,6 +3,7 @@ package be.cytomine.controller.repository;
 import java.util.Optional;
 
 import be.cytomine.common.repository.model.command.HttpCommandResponse;
+import be.cytomine.service.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +31,7 @@ public class TermController {
 
     private final TermHttpContract termHttpContract;
     private final PageMapper pageMapper;
+    private final CurrentUserService currentUserService;
 
     @GetMapping("term.json")
     public CollectionResponse<TermResponse> list(Pageable pageable) {
@@ -56,7 +58,7 @@ public class TermController {
     @DeleteMapping("term/{id}.json")
     public Optional<HttpCommandResponse<TermResponse>> delete(@PathVariable Long id) {
         log.debug("REST request to delete term {}", id);
-        return termHttpContract.delete(id);
+        return termHttpContract.delete(id, currentUserService.getCurrentUser().getId());
     }
 
     @GetMapping("project/{id}/term.json")

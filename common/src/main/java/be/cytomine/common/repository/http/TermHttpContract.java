@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.service.annotation.DeleteExchange;
 import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;
@@ -23,7 +24,7 @@ public interface TermHttpContract {
     String ROOT_PATH = "/terms";
 
     @GetExchange("/{id}")
-    Optional<TermResponse> findTermByID(@PathVariable Long id);
+    Optional<TermResponse> findTermByID(@PathVariable long id);
 
     @GetExchange
     Page<TermResponse> findAll(Pageable pageable);
@@ -32,14 +33,14 @@ public interface TermHttpContract {
     TermResponse update(@RequestBody CreateTerm createTerm);
 
     @PutExchange("/{id}")
-    TermResponse update(@PathVariable Long id, @RequestBody UpdateTerm createTerm);
+    TermResponse update(@PathVariable long id, @RequestBody UpdateTerm createTerm);
 
     @DeleteExchange("/{id}")
-    Optional<HttpCommandResponse<TermResponse>> delete(@PathVariable Long id);
+    Optional<HttpCommandResponse<TermResponse>> delete(@PathVariable long id, @RequestParam long userId);
 
     @GetExchange("/project/{id}")
-    Page<TermResponse> findTermsByProject(@PathVariable Long id, Pageable pageable);
+    Page<TermResponse> findTermsByProject(@PathVariable long id, Pageable pageable);
 
     @GetExchange("/ontology/{id}")
-    Page<TermResponse> findTermsByOntology(@PathVariable Long id, Pageable pageable);
+    Page<TermResponse> findTermsByOntology(@PathVariable long id, Pageable pageable);
 }

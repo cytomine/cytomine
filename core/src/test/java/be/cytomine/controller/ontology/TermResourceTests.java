@@ -41,6 +41,7 @@ import be.cytomine.common.repository.model.command.HttpCommandResponse;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.project.Project;
+import be.cytomine.domain.security.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -142,8 +143,8 @@ public class TermResourceTests {
     public void addValidTerm() throws Exception {
         Term term = basicInstanceBuilder.given_a_not_persisted_term(builder.given_an_ontology());
         TermResponse response =
-            new TermResponse(1L, term.getName(), term.getColor(), term.getOntology().getId(),
-                term.getCreated(), term.getUpdated(), term.getComment(), Set.of());
+            new TermResponse(1L, term.getName(), term.getColor(), term.getOntology().getId(), term.getCreated(),
+                term.getUpdated(), term.getComment(), Set.of());
         when(termHttpContract.update(any())).thenReturn(response);
 
         restTermControllerMockMvc.perform(post("/api/term.json").contentType(MediaType.APPLICATION_JSON).content(
@@ -172,9 +173,10 @@ public class TermResourceTests {
     @Transactional
     public void deleteTerm() throws Exception {
         Term term = builder.given_a_term();
-        when(termHttpContract.delete(term.getId())).thenReturn(Optional.of(toHttpTermResponse(term)));
+        User user = builder.given_a_user();
+        when(termHttpContract.delete(term.getId(), user.getId())).thenReturn(Optional.of(toHttpTermResponse(term)));
 
-        restTermControllerMockMvc.perform(delete("/api/term/{id}.json", term.getId())).andExpect(status().isOk())
+        restTermControllerMockMvc.perform(delete("/api/term/{id}.json?user={}", term.getId(),user.getId())).andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(term.getId().intValue()))
             .andExpect(jsonPath("$.name").value(term.getName()))
             .andExpect(jsonPath("$.ontologyId").value(term.getOntology().getId()));
@@ -183,7 +185,8 @@ public class TermResourceTests {
     @Test
     @Transactional
     public void deleteTermNotExistReturnsEmpty() throws Exception {
-        when(termHttpContract.delete(0L)).thenReturn(Optional.empty());
+        User user = builder.given_a_user();
+        when(termHttpContract.delete(0L, user.getId())).thenReturn(Optional.empty());
 
         restTermControllerMockMvc.perform(delete("/api/term/{id}.json", 0)).andExpect(status().isOk())
             .andExpect(jsonPath("$").doesNotExist());

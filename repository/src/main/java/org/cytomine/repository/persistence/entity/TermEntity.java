@@ -1,5 +1,6 @@
 package org.cytomine.repository.persistence.entity;
 
+import java.util.Date;
 import java.util.Set;
 
 import jakarta.persistence.Column;
@@ -19,7 +20,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-
 public class TermEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,11 +29,16 @@ public class TermEntity {
     private long version = 0;
     @Column
     private Long ontologyId;
-
     @Column
     private String name;
     @Column
     private String color;
+    @Column
+    private Date created;
+    @Column
+    private Date updated;
+    @Column
+    private String comment;
 
     @OneToMany
     @JoinTable(name = "relation_term", joinColumns = @JoinColumn(name = "term1_id"),

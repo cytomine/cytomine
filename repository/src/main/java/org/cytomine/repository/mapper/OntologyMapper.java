@@ -1,5 +1,7 @@
 package org.cytomine.repository.mapper;
 
+import be.cytomine.common.repository.model.command.TermCommandPayload;
+import be.cytomine.common.repository.model.command.delete.DeleteTermCommand;
 import org.cytomine.repository.persistence.entity.OntologyEntity;
 import org.cytomine.repository.persistence.entity.TermEntity;
 import org.mapstruct.BeanMapping;
@@ -26,4 +28,9 @@ public interface OntologyMapper {
     @Mapping(target = "color", source = "color")
     @Mapping(target = "ontologyId", source = "ontology")
     TermEntity map(CreateTerm createTerm);
+
+    @BeanMapping(ignoreUnmappedSourceProperties = {"version", "children"})
+    @Mapping(target = "ontology", source = "ontologyId")
+    @Mapping(target = "parent", ignore = true)
+    TermCommandPayload mapToTermCommandPayload(TermEntity termEntity);
 }

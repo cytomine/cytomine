@@ -91,7 +91,7 @@ class TermControllerTest {
 
     @Test
     void createSavesAndReturnsTerm() {
-        CreateTerm createTerm = new CreateTerm("newTerm", "#00FF00", ontologyId);
+        CreateTerm createTerm = new CreateTerm("newTerm", "#00FF00", ontologyId, null, null, null);
 
         TermResponse result = termController.update(createTerm);
 

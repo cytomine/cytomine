@@ -80,7 +80,8 @@ public class TermResourceTests {
     }
 
     private TermResponse toTermResponse(Term term) {
-        return new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(), Set.of());
+        return new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
+            term.getCreated(), term.getUpdated(), term.getComment(), Set.of());
     }
 
     @Test
@@ -141,7 +142,8 @@ public class TermResourceTests {
     public void addValidTerm() throws Exception {
         Term term = basicInstanceBuilder.given_a_not_persisted_term(builder.given_an_ontology());
         TermResponse response =
-            new TermResponse(1L, term.getName(), term.getColor(), term.getOntology().getId(), Set.of());
+            new TermResponse(1L, term.getName(), term.getColor(), term.getOntology().getId(),
+                term.getCreated(), term.getUpdated(), term.getComment(), Set.of());
         when(termHttpContract.update(any())).thenReturn(response);
 
         restTermControllerMockMvc.perform(post("/api/term.json").contentType(MediaType.APPLICATION_JSON).content(

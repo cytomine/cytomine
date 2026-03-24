@@ -68,7 +68,10 @@ public class TermController implements TermHttpContract {
     @DeleteMapping("/{id}")
     @Transactional
     public Optional<HttpCommandResponse<TermResponse>> delete(@PathVariable Long id) {
-        return termCommandService.deleteTerm(id);
+
+        long userId = 1;
+
+        return termCommandService.deleteTerm(id, userId);
     }
 
     @Override

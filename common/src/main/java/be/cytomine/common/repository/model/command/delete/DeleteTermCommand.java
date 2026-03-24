@@ -1,4 +1,19 @@
 package be.cytomine.common.repository.model.command.delete;
 
-public record DeleteTermCommand(Long id) implements DeleteCommandRequest {
+import be.cytomine.common.repository.model.TermResponse;
+import be.cytomine.common.repository.model.command.TermCommandPayload;
+
+public record DeleteTermCommand(
+    Long id,
+    TermCommandPayload data,
+    Long userId,
+    Long projectId
+) implements DeleteCommandRequest {
+
+    public static final String SERVICE_NAME = "TermService";
+
+    @Override
+    public String serviceName() {
+        return SERVICE_NAME;
+    }
 }

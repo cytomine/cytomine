@@ -40,8 +40,8 @@ public class TermController {
     }
 
     @PostMapping("term.json")
-    public TermResponse create(@RequestBody CreateTerm createTerm) {
-        return termHttpContract.update(createTerm);
+    public Optional<HttpCommandResponse<TermResponse>> create(@RequestBody CreateTerm createTerm) {
+        return termHttpContract.create(createTerm);
     }
 
     @GetMapping("term/{id}.json")
@@ -51,7 +51,7 @@ public class TermController {
     }
 
     @PutMapping("term/{id}.json")
-    public TermResponse update(@PathVariable Long id, @RequestBody UpdateTerm updateTerm) {
+    public Optional<HttpCommandResponse<TermResponse>> update(@PathVariable Long id, @RequestBody UpdateTerm updateTerm) {
         return termHttpContract.update(id, updateTerm);
     }
 

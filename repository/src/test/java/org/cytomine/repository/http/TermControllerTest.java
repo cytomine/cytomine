@@ -3,7 +3,6 @@ package org.cytomine.repository.http;
 import java.util.Date;
 import java.util.Optional;
 
-import be.cytomine.common.repository.model.command.HttpCommandResponse;
 import org.cytomine.repository.RepositoryApp;
 import org.cytomine.repository.persistence.TermRepository;
 import org.cytomine.repository.persistence.entity.TermEntity;
@@ -21,6 +20,7 @@ import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.model.CreateTerm;
 import be.cytomine.common.repository.model.TermResponse;
 import be.cytomine.common.repository.model.UpdateTerm;
+import be.cytomine.common.repository.model.command.HttpCommandResponse;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -45,13 +45,16 @@ class TermControllerTest {
 
     @BeforeEach
     void setUp() {
-        Long userId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
+        Long userId =
+            jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
         jdbcTemplate.update(
             "INSERT INTO sec_user (id, version, username) VALUES (?, 0, 'admin')", userId);
 
-        ontologyId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
+        ontologyId =
+            jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
         jdbcTemplate.update(
-            "INSERT INTO ontology (id, version, name, user_id) VALUES (?, 0, 'test', ?)", ontologyId, userId);
+            "INSERT INTO ontology (id, version, name, user_id) VALUES (?, 0, 'test', ?)",
+            ontologyId, userId);
 
         projectId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
         jdbcTemplate.update("""
@@ -94,11 +97,11 @@ class TermControllerTest {
     void createSavesAndReturnsTerm() {
         CreateTerm createTerm = new CreateTerm("newTerm", "#00FF00", ontologyId, null, null, null);
 
-        TermResponse result = termController.update(createTerm);
+        Optional<HttpCommandResponse<TermResponse>> result = termController.create(createTerm);
 
-        assertEquals("newTerm", result.name());
-        assertEquals("#00FF00", result.color());
-        assertEquals(ontologyId, result.ontologyId());
+        assertEquals("newTerm", result.get().data().name());
+        assertEquals("#00FF00", result.get().data().color());
+        assertEquals(ontologyId, result.get().data().ontologyId());
     }
 
     @Test
@@ -106,10 +109,10 @@ class TermControllerTest {
         TermEntity entity = createAndSaveTermEntity("oldName", "#FF0000");
         UpdateTerm updateTerm = new UpdateTerm(Optional.of("newName"), Optional.of("#00FF00"));
 
-        TermResponse result = termController.update(entity.getId(), updateTerm);
+        Optional<HttpCommandResponse<TermResponse>> result = termController.update(entity.getId(), updateTerm);
 
-        assertEquals("newName", result.name());
-        assertEquals("#00FF00", result.color());
+        assertEquals("newName", result.get().data().name());
+        assertEquals("#00FF00", result.get().data().color());
     }
 
     @Test
@@ -123,7 +126,8 @@ class TermControllerTest {
     void deleteWhenExistsDeletesAndReturnsTerm() {
         TermEntity entity = createAndSaveTermEntity("term1", "#FF0000");
 
-        Optional<HttpCommandResponse<TermResponse>> result = termController.delete(entity.getId(), 0);
+        Optional<HttpCommandResponse<TermResponse>> result =
+            termController.delete(entity.getId(), 0);
 
         assertTrue(result.isPresent());
         assertEquals("term1", result.get().data().name());
@@ -134,7 +138,8 @@ class TermControllerTest {
     void findTermsByProjectReturnsPageOfTerms() {
         createAndSaveTermEntity("term1", "#FF0000");
 
-        Page<TermResponse> result = termController.findTermsByProject(projectId, PageRequest.of(0, 10));
+        Page<TermResponse> result =
+            termController.findTermsByProject(projectId, PageRequest.of(0, 10));
 
         assertEquals(1, result.getTotalElements());
     }
@@ -143,7 +148,8 @@ class TermControllerTest {
     void findTermsByOntologyReturnsPageOfTerms() {
         createAndSaveTermEntity("term1", "#FF0000");
 
-        Page<TermResponse> result = termController.findTermsByOntology(ontologyId, PageRequest.of(0, 10));
+        Page<TermResponse> result =
+            termController.findTermsByOntology(ontologyId, PageRequest.of(0, 10));
 
         assertEquals(1, result.getTotalElements());
     }

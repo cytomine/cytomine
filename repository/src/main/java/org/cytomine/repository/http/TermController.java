@@ -49,18 +49,14 @@ public class TermController implements TermHttpContract {
 
     @Override
     @PostMapping
-    public TermResponse update(@RequestBody CreateTerm createTerm) {
-        return ontologyMapper.map(termRepository.save(ontologyMapper.map(createTerm)));
+    public Optional<HttpCommandResponse<TermResponse>> create(@RequestBody CreateTerm createTerm) {
+        return termCommandService.createTerm(createTerm);
     }
 
     @Override
     @PutMapping("/{id}")
-    public TermResponse update(@PathVariable long id, @RequestBody UpdateTerm updateTerm) {
-        return termRepository.findById(id).map(entity -> {
-            updateTerm.name().ifPresent(entity::setName);
-            updateTerm.color().ifPresent(entity::setColor);
-            return ontologyMapper.map(termRepository.save(entity));
-        }).orElseThrow(() -> new RuntimeException("Term not found: " + id));
+    public Optional<HttpCommandResponse<TermResponse>> update(@PathVariable long id, @RequestBody UpdateTerm updateTerm) {
+      return termCommandService.updateTerm(id, updateTerm);
     }
 
     @Override

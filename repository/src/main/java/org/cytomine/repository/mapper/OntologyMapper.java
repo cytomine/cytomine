@@ -18,6 +18,7 @@ public interface OntologyMapper {
     OntologyResponse map(OntologyEntity ontologyEntity);
 
     @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
+    @Mapping(target = "ontology", source = "ontologyId")
     TermResponse map(TermEntity termEntity);
 
 

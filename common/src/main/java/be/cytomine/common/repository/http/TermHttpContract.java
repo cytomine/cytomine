@@ -30,10 +30,10 @@ public interface TermHttpContract {
     Page<TermResponse> findAll(Pageable pageable);
 
     @PostExchange
-    TermResponse update(@RequestBody CreateTerm createTerm);
+    Optional<HttpCommandResponse<TermResponse>> create(@RequestBody CreateTerm createTerm);
 
     @PutExchange("/{id}")
-    TermResponse update(@PathVariable long id, @RequestBody UpdateTerm createTerm);
+    Optional<HttpCommandResponse<TermResponse>> update(@PathVariable long id, @RequestBody UpdateTerm createTerm);
 
     @DeleteExchange("/{id}")
     Optional<HttpCommandResponse<TermResponse>> delete(@PathVariable long id, @RequestParam long userId);

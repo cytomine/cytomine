@@ -1,5 +1,16 @@
 package be.cytomine.service.ontology;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;
@@ -18,16 +29,6 @@ import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.Task;
-import jakarta.transaction.Transactional;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.springframework.security.acls.domain.BasePermission.READ;
 
@@ -70,19 +71,23 @@ public class SharedAnnotationService extends ModelService {
 
     public Optional<SharedAnnotation> find(Long id) {
         Optional<SharedAnnotation> optionalSharedAnnotation = sharedAnnotationRepository.findById(id);
-        optionalSharedAnnotation.ifPresent(sharedAnnotation -> securityACLService.check(sharedAnnotation.container(),READ));
+        optionalSharedAnnotation.ifPresent(sharedAnnotation -> securityACLService.check(
+            sharedAnnotation.container(),
+            READ
+        ));
         return optionalSharedAnnotation;
     }
 
 
     public List<SharedAnnotation> listComments(AnnotationDomain annotation) {
-        User user = (User)currentUserService.getCurrentUser();
+        User user = (User) currentUserService.getCurrentUser();
         List<SharedAnnotation> sharedAnnotations = sharedAnnotationRepository
-                .findAllByAnnotationIdentOrderByCreatedDesc(annotation.getId());
+            .findAllByAnnotationIdentOrderByCreatedDesc(annotation.getId());
         boolean isUserAdmin = currentRoleService.isAdminByNow(user);
-        sharedAnnotations = sharedAnnotations.stream().filter(x -> isUserAdmin || x.getSender().equals(user) || x.getReceivers().contains(user))
-                .distinct()
-                .collect(Collectors.toList());
+        sharedAnnotations = sharedAnnotations.stream()
+            .filter(x -> isUserAdmin || x.getSender().equals(user) || x.getReceivers().contains(user))
+            .distinct()
+            .collect(Collectors.toList());
 
         return sharedAnnotations;
     }
@@ -90,17 +95,19 @@ public class SharedAnnotationService extends ModelService {
 
     /**
      * Add the new domain with JSON data
+     *
      * @param jsonObject New domain data
+     *
      * @return Response structure (created domain data,..)
      */
     @Override
     @Transactional(dontRollbackOn = IOException.class)
     public CommandResponse add(JsonObject jsonObject) {
-        User sender = (User)currentUserService.getCurrentUser();
+        User sender = (User) currentUserService.getCurrentUser();
         securityACLService.checkUser(sender);
 
         AnnotationDomain annotation = annotationDomainRepository.findById(jsonObject.getJSONAttrLong("annotationIdent"))
-                        .orElseThrow(() -> new ObjectNotFoundException("Annotation", jsonObject.getJSONAttrStr("annotationIdent")));
+            .orElseThrow(() -> new ObjectNotFoundException("Annotation", jsonObject.getJSONAttrStr("annotationIdent")));
 
         jsonObject.putIfAbsent("sender", sender.getId());
 
@@ -111,18 +118,20 @@ public class SharedAnnotationService extends ModelService {
 
     /**
      * Delete this domain
-     * @param domain Domain to delete
-     * @param transaction Transaction link with this command
-     * @param task Task for this command
+     *
+     * @param domain       Domain to delete
+     * @param transaction  Transaction link with this command
+     * @param task         Task for this command
      * @param printMessage Flag if client will print or not confirm message
+     *
      * @return Response structure (code, old domain,..)
      */
     @Override
     public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
         User currentUser = currentUserService.getCurrentUser();
-        securityACLService.checkFullOrRestrictedForOwner(domain.container(),((SharedAnnotation)domain).getSender());
+        securityACLService.checkFullOrRestrictedForOwner(domain.container(), ((SharedAnnotation) domain).getSender());
         Command c = new DeleteCommand(currentUser, transaction);
-        return executeCommand(c,domain, null);
+        return executeCommand(c, domain, null);
     }
 
 
@@ -133,8 +142,12 @@ public class SharedAnnotationService extends ModelService {
 
     @Override
     public List<String> getStringParamsI18n(CytomineDomain domain) {
-        SharedAnnotation sharedAnnotation = (SharedAnnotation)domain;
-        return Arrays.asList(String.valueOf(sharedAnnotation.getSender().getId()), String.valueOf(sharedAnnotation.getAnnotationIdent()), sharedAnnotation.getAnnotationClassName());
+        SharedAnnotation sharedAnnotation = (SharedAnnotation) domain;
+        return Arrays.asList(
+            String.valueOf(sharedAnnotation.getSender().getId()),
+            String.valueOf(sharedAnnotation.getAnnotationIdent()),
+            sharedAnnotation.getAnnotationClassName()
+        );
     }
 
     @Override

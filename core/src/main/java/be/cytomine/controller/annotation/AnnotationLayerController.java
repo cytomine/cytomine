@@ -42,28 +42,28 @@ public class AnnotationLayerController {
         log.info("GET /annotation-layers/{}/annotations", id);
 
         AnnotationLayer layer = annotationLayerService
-                .find(id)
-                .orElseThrow(() -> new ObjectNotFoundException("AnnotationLayer " + id + " not found"));
+            .find(id)
+            .orElseThrow(() -> new ObjectNotFoundException("AnnotationLayer " + id + " not found"));
 
         return annotationRepository.findAllByAnnotationLayer(layer)
-                .stream()
-                .map(annotation -> new AnnotationResponse(
-                        annotation.getId(),
-                        annotation.getAnnotationLayer().getId(),
-                        annotation.getLocation()
-                ))
-                .collect(Collectors.toSet());
+            .stream()
+            .map(annotation -> new AnnotationResponse(
+                annotation.getId(),
+                annotation.getAnnotationLayer().getId(),
+                annotation.getLocation()
+            ))
+            .collect(Collectors.toSet());
     }
 
     @GetMapping("/annotation-layers/{id}/task-run-layer")
     public TaskRunLayerValue findTaskRunLayer(@PathVariable Long id) {
         log.info("GET /annotation-layers/{}/task-run-layer", id);
         return taskRunLayerRepository.findByAnnotationLayerId(id)
-                .map(trl -> new TaskRunLayerValue(
-                        trl.getAnnotationLayer().getId(),
-                        trl.getTaskRun().getId(),
-                        trl.getImage().getId()
-                ))
-                .orElseThrow(() -> new ObjectNotFoundException("TaskRunLayer", id));
+            .map(trl -> new TaskRunLayerValue(
+                trl.getAnnotationLayer().getId(),
+                trl.getTaskRun().getId(),
+                trl.getImage().getId()
+            ))
+            .orElseThrow(() -> new ObjectNotFoundException("TaskRunLayer", id));
     }
 }

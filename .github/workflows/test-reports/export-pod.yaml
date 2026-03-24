@@ -5,22 +5,22 @@ metadata:
 spec:
   securityContext:
     runAsNonRoot: true
-    runAsUser: 1000
-    runAsGroup: 1000
-    fsGroup: 1000
+    runAsUser: 20000
+    runAsGroup: 20000
+    fsGroup: 20000
     seccompProfile:
       type: RuntimeDefault
   containers:
   - name: exporter
-    image: alpine:3.19
+    image: registry.cytomine.org/docker/library/alpine:3.18
     command: ["sh", "-c", "sleep 3600"]
     securityContext:
       allowPrivilegeEscalation: false
       privileged: false
       readOnlyRootFilesystem: true
       runAsNonRoot: true
-      runAsUser: 1000
-      runAsGroup: 1000
+      runAsUser: 20000
+      runAsGroup: 20000
       capabilities:
         drop: ["ALL"]
     volumeMounts:

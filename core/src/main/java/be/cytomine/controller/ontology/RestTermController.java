@@ -1,16 +1,24 @@
 package be.cytomine.controller.ontology;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.ontology.OntologyRepository;
 import be.cytomine.repository.project.ProjectRepository;
 import be.cytomine.service.ontology.TermService;
 import be.cytomine.utils.JsonObject;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
@@ -34,14 +42,15 @@ public class RestTermController extends RestCytomineController {
     public ResponseEntity<String> show(@PathVariable Long id) {
         log.debug("REST request to get Term : {}", id);
         return termService.find(id)
-                .map(this::responseSuccess)
-                .orElseGet(() -> responseNotFound("Term", id));
+            .map(this::responseSuccess)
+            .orElseGet(() -> responseNotFound("Term", id));
     }
 
     /**
-     * Add a new term
-     * Use next add relation-term to add relation with another term
+     * Add a new term Use next add relation-term to add relation with another term
+     *
      * @param json JSON with Term data
+     *
      * @return Response map with .code = http response code and .data.term = new created Term
      */
     @PostMapping("/term.json")
@@ -52,9 +61,12 @@ public class RestTermController extends RestCytomineController {
 
     /**
      * Update a term
-     * @param id Term id
+     *
+     * @param id   Term id
      * @param json JSON with the new Term data
-     * @return Response map with .code = http response code and .data.newTerm = new created Term and  .data.oldTerm = old term value
+     *
+     * @return Response map with .code = http response code and .data.newTerm = new created Term and  .data.oldTerm =
+     * old term value
      */
     @PutMapping("/term/{id}.json")
     public ResponseEntity<String> edit(@PathVariable String id, @RequestBody JsonObject json) {
@@ -64,7 +76,9 @@ public class RestTermController extends RestCytomineController {
 
     /**
      * Delete a term
+     *
      * @param id Term id
+     *
      * @return Response map with .code = http response code and .data.term = deleted term value
      */
     @DeleteMapping("/term/{id}.json")
@@ -77,15 +91,15 @@ public class RestTermController extends RestCytomineController {
     public ResponseEntity<String> listByOntology(@PathVariable Long id) {
         log.debug("REST request to list terms for ontology {}", id);
         return ontologyRepository.findById(id)
-                .map( ontology -> responseSuccess(termService.list(ontology)))
-                .orElseThrow(() -> new ObjectNotFoundException("Ontology", id));
+            .map(ontology -> responseSuccess(termService.list(ontology)))
+            .orElseThrow(() -> new ObjectNotFoundException("Ontology", id));
     }
 
     @GetMapping("/project/{id}/term.json")
     public ResponseEntity<String> listByProject(@PathVariable Long id) {
         log.debug("REST request to list terms for project {}", id);
         return projectRepository.findById(id)
-                .map( ontology -> responseSuccess(termService.list(ontology)))
-                .orElseThrow(() -> new ObjectNotFoundException("Ontology", id));
+            .map(ontology -> responseSuccess(termService.list(ontology)))
+            .orElseThrow(() -> new ObjectNotFoundException("Ontology", id));
     }
 }

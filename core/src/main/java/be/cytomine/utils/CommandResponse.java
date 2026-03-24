@@ -22,11 +22,11 @@ public class CommandResponse {
     }
 
     public static JsonObject getDataFromDomain(CommandResponse domain) {
-       JsonObject jsonObject = new JsonObject();
-       jsonObject.put("status", domain.getStatus());
-       jsonObject.put("object", domain.getObject().toJsonObject());
-       jsonObject.put("data", domain.getData());
-       return jsonObject;
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.put("status", domain.getStatus());
+        jsonObject.put("object", domain.getObject().toJsonObject());
+        jsonObject.put("data", domain.getData());
+        return jsonObject;
     }
 
 }

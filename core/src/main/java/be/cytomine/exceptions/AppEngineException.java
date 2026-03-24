@@ -7,9 +7,11 @@ public class AppEngineException extends CytomineException {
 
     /**
      * Message map with this exception
+     *
      * @param message Message
      */
     public String body;
+
     public AppEngineException(String message, int httpCode, String body) {
         super(message, httpCode);
         this.body = body;

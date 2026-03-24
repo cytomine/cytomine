@@ -11,14 +11,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-
-import be.cytomine.config.security.ApiKeyFilter;
-import be.cytomine.domain.image.server.Storage;
-import be.cytomine.domain.security.User;
-import be.cytomine.dto.appengine.task.TaskRunValue;
-import be.cytomine.service.image.AbstractImageService;
-import be.cytomine.service.image.server.StorageService;
-import be.cytomine.service.middleware.ImageServerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.FileSystemResource;
@@ -31,6 +23,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+
+import be.cytomine.config.security.ApiKeyFilter;
+import be.cytomine.domain.image.server.Storage;
+import be.cytomine.domain.security.User;
+import be.cytomine.dto.appengine.task.TaskRunValue;
+import be.cytomine.service.image.AbstractImageService;
+import be.cytomine.service.image.server.StorageService;
+import be.cytomine.service.middleware.ImageServerService;
 
 @Slf4j
 @Service
@@ -49,8 +49,10 @@ public class AsyncService {
 
 
     @Async
-    public void launchImageAdditionJob(List<TaskRunValue> taskRunId, Long projectId,
-                                       User currentUser) {
+    public void launchImageAdditionJob(
+        List<TaskRunValue> taskRunId, Long projectId,
+        User currentUser
+    ) {
         // get all images and arrays of images
         List<TaskRunValue> outputs = taskRunId
             .stream()
@@ -61,7 +63,7 @@ public class AsyncService {
             )
             .toList();
 
-        for (TaskRunValue output: outputs) {
+        for (TaskRunValue output : outputs) {
             if (output.getType().equalsIgnoreCase("IMAGE")) {
                 try {
 
@@ -80,8 +82,7 @@ public class AsyncService {
     }
 
     private void handleImage(TaskRunValue output, Long projectId, User currentUser)
-        throws IOException, NoSuchAlgorithmException, InvalidKeyException
-    {
+        throws IOException, NoSuchAlgorithmException, InvalidKeyException {
         String originalFileName =
             output.getTaskRunId().toString() + "_" + output.getParameterName();
         if (abstractImageService.find(originalFileName).isPresent()) {
@@ -90,12 +91,20 @@ public class AsyncService {
         // download the image from app-engine
         File tempFile = Files.createTempFile("image_", ".tmp").toFile();
         try (FileOutputStream tempFileOutputStream = new FileOutputStream(tempFile)) {
-            getTaskRunIOParameter(projectId, output.getTaskRunId(), output.getParameterName(), "output", tempFileOutputStream);
+            getTaskRunIOParameter(
+                projectId,
+                output.getTaskRunId(),
+                output.getParameterName(),
+                "output",
+                tempFileOutputStream
+            );
         }
         // signature
         String signatureDate = Instant.now().toString();
-        String signature = ApiKeyFilter.generateKeys("POST","","",
-            signatureDate,currentUser);
+        String signature = ApiKeyFilter.generateKeys(
+            "POST", "", "",
+            signatureDate, currentUser
+        );
         String authorizationHeader = "CYTOMINE " + currentUser.getPublicKey() + ":" + signature;
         String contentTypeFull = null;
 
@@ -108,12 +117,14 @@ public class AsyncService {
 
         // Prepare a multipart body
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("files[]", new FileSystemResource(tempFile){
-            @Override
-            public String getFilename() {
-                return originalFileName; // Use the desired name here
+        body.add(
+            "files[]", new FileSystemResource(tempFile) {
+                @Override
+                public String getFilename() {
+                    return originalFileName; // Use the desired name here
+                }
             }
-        });
+        );
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
@@ -121,13 +132,23 @@ public class AsyncService {
         String queryString = "?idStorage=" + userStorage.getId() + "&idProject=" + projectId;
         // Send the request
         String uploadUrl = imageServerService.internalImageServerURL() + "/upload";
-        ResponseEntity<String> response = restTemplate.postForEntity(uploadUrl + queryString, requestEntity, String.class);
+        ResponseEntity<String> response = restTemplate.postForEntity(
+            uploadUrl + queryString,
+            requestEntity,
+            String.class
+        );
 
         // Clean up temp file
         tempFile.delete();
     }
 
-    public void getTaskRunIOParameter(Long projectId, UUID taskRunId, String parameterName, String type, OutputStream outputStream) {
+    public void getTaskRunIOParameter(
+        Long projectId,
+        UUID taskRunId,
+        String parameterName,
+        String type,
+        OutputStream outputStream
+    ) {
         appEngineService.getStreamedFile("task-runs/" + taskRunId + "/" + type + "/" + parameterName, outputStream);
     }
 }

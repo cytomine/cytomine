@@ -36,7 +36,7 @@
       >
         <template #default="{row: uFile}">
           <b-table-column :label="$t('preview')" width="80" class="image-overview">
-            <image-thumbnail v-if="uFile.thumbURL" :url="uFile.thumbURL" :size="128" :key="uFile.thumbURL" :extra-parameters="{Authorization: 'Bearer ' + shortTermToken }"/>
+            <image-thumbnail v-if="uFile.thumbURL" :url="uFile.thumbURL" :size="128" :key="uFile.thumbURL" :extra-parameters="{authorization: 'Bearer ' + shortTermToken }"/>
             <div v-else class="is-size-7 has-text-grey">{{$t('no-preview-available')}}</div>
           </b-table-column>
 

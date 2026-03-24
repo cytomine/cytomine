@@ -1,18 +1,25 @@
 package be.cytomine.controller.ontology;
 
+import java.util.Map;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import be.cytomine.controller.RestCytomineController;
-import be.cytomine.repository.ontology.OntologyRepository;
-import be.cytomine.repository.project.ProjectRepository;
 import be.cytomine.service.ontology.OntologyService;
 import be.cytomine.service.utils.TaskService;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.Task;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -22,20 +29,13 @@ public class RestOntologyController extends RestCytomineController {
 
     private final OntologyService ontologyService;
 
-    private final OntologyRepository ontologyRepository;
-
-    private final ProjectRepository projectRepository;
-
     private final TaskService taskService;
 
     /**
-     * List all ontology visible for the current user
-     * For each ontology, print the terms tree
+     * List all ontology visible for the current user For each ontology, print the terms tree
      */
     @GetMapping("/ontology.json")
-    public ResponseEntity<String> list(
-            @RequestParam Map<String,String> allParams
-    ) {
+    public ResponseEntity<String> list(@RequestParam Map<String, String> allParams) {
         log.debug("REST request to list ontologys");
         boolean light = allParams.containsKey("light") && Boolean.parseBoolean(allParams.get("light"));
         return responseSuccess(light ? ontologyService.listLight() : ontologyService.list());
@@ -43,12 +43,12 @@ public class RestOntologyController extends RestCytomineController {
 
     @GetMapping("/ontology/{id}.json")
     public ResponseEntity<String> show(
-            @PathVariable Long id
+        @PathVariable Long id
     ) {
         log.debug("REST request to get Ontology : {}", id);
         return ontologyService.find(id)
-                .map(this::responseSuccess)
-                .orElseGet(() -> responseNotFound("Ontology", id));
+            .map(this::responseSuccess)
+            .orElseGet(() -> responseNotFound("Ontology", id));
     }
 
 

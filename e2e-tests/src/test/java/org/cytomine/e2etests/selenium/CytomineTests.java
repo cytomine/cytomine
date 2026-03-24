@@ -1,4 +1,4 @@
-package org.cytomine.e2etests.project;
+package org.cytomine.e2etests.selenium;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -58,7 +58,7 @@ public class CytomineTests {
     @BeforeEach
     void setUp() {
         driver = driverProvider.driver();
-        wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        wait = new WebDriverWait(driver, Duration.ofSeconds(60));
     }
 
     @AfterEach
@@ -66,7 +66,7 @@ public class CytomineTests {
         saveScreenshot("closing-" + testInfo.getTestMethod()
                                         .map(Method::getName)
                                         .orElseGet(() -> "no-name-" + randomUUID()));
-        driver.close();
+        driver.quit();
     }
 
     @SneakyThrows
@@ -170,9 +170,62 @@ public class CytomineTests {
         cytomineSteps.openImageInViewer(wait, driver, projectURL);
         cytomineSteps.selectTermForAnnotation(wait, termName);
         cytomineSteps.drawRectangleAnnotation(wait, driver);
-        cytomineSteps.verifyAnnotationCreated(wait, driver);
+        cytomineSteps.verifyAnnotationCreated(wait);
         cytomineSteps.deleteProject(wait, projectURL);
         cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
         cytomineSteps.deleteOntology(wait, ontologyURL);
+    }
+
+    @Test
+    void addAnnotationWithSam() {
+        String projectName = "selenium-" + randomUUID();
+        String termName = "selenium-term-" + randomUUID();
+
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        String projectURL = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
+        String ontologyURL = cytomineSteps.getOntologyUrlFromProject(wait, projectURL);
+        cytomineSteps.addTermToOntology(wait, driver, ontologyURL, termName);
+        String imageName = cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName));
+        cytomineSteps.openImageInViewer(wait, driver, projectURL);
+        cytomineSteps.selectTermForAnnotation(wait, termName);
+
+        cytomineSteps.drawRectangleAnnotationWithMagicWand(wait, driver);
+        cytomineSteps.verifyAnnotationProcessedWithSam(wait);
+
+        cytomineSteps.deleteProject(wait, projectURL);
+        cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
+        cytomineSteps.deleteOntology(wait, ontologyURL);
+    }
+
+    @Test
+    void uploadAndDeleteTask() {
+        String zipName = "com.cytomine.dummy.identity.image-1.0.0.zip";
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        cytomineSteps.uploadTask(wait, cytomineUrl, zipName);
+        cytomineSteps.deleteTask(wait, cytomineUrl, "identity with image");
+    }
+
+    @Test
+    void runTask() {
+        String zipName = "com.cytomine.dummy.identity.geometry-1.0.0.zip";
+        String projectName = "selenium-" + randomUUID();
+        String taskName = "identity with geometry";
+        String taskVersion = "1.0.0";
+
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        cytomineSteps.uploadTask(wait, cytomineUrl, zipName);
+        String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
+        String imageName = cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName));
+        cytomineSteps.openImageInViewer(wait, driver, projectUrl);
+        cytomineSteps.drawRectangleAnnotation(wait, driver);
+        cytomineSteps.verifyAnnotationCreated(wait);
+
+        cytomineSteps.selectTask(wait, taskName, taskVersion);
+        cytomineSteps.selectAnnotationForGeometryInput(wait);
+        cytomineSteps.runTask(wait, driver);
+
+        cytomineSteps.deleteTask(wait, cytomineUrl, taskName);
+        cytomineSteps.deleteProject(wait, projectUrl);
+        cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
     }
 }

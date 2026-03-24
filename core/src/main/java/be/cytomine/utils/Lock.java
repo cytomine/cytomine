@@ -1,13 +1,14 @@
 package be.cytomine.utils;
 
-import be.cytomine.domain.project.Project;
-import be.cytomine.exceptions.ServerException;
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
+
+import lombok.extern.slf4j.Slf4j;
+
+import be.cytomine.domain.project.Project;
+import be.cytomine.exceptions.ServerException;
 
 @Slf4j
 public class Lock {
@@ -18,11 +19,12 @@ public class Lock {
     private Map<Long, ReentrantLock> customUILocks = new ConcurrentHashMap<>();
     private static Lock lock = null;
 
-    private Lock() {}
+    private Lock() {
+    }
 
     public static Lock getInstance() {
         synchronized (Lock.class) {
-            if (lock==null) {
+            if (lock == null) {
                 lock = new Lock();
             }
             return lock;
@@ -51,7 +53,11 @@ public class Lock {
         try {
             log.debug("Try to lock custom UI for project " + project.getId());
             customUILocks.putIfAbsent(project.getId(), new ReentrantLock());
-            log.debug("Custom UI Project {} current lock {}", project.getId(), customUILocks.get(project.getId()).isLocked());
+            log.debug(
+                "Custom UI Project {} current lock {}",
+                project.getId(),
+                customUILocks.get(project.getId()).isLocked()
+            );
             boolean result = customUILocks.get(project.getId()).tryLock(60, TimeUnit.SECONDS);
             log.debug("Custom UI Project {} lock result {}", project.getId(), result);
             return result;

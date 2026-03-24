@@ -1,13 +1,6 @@
 package be.cytomine.service.processing;
 
-import be.cytomine.BasicInstanceBuilder;
-import be.cytomine.CytomineCoreApplication;
-import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.domain.processing.ImageFilterProject;
-import be.cytomine.exceptions.AlreadyExistException;
-import be.cytomine.exceptions.ObjectNotFoundException;
-import be.cytomine.utils.CommandResponse;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +9,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 
-import jakarta.transaction.Transactional;
+import be.cytomine.BasicInstanceBuilder;
+import be.cytomine.CytomineCoreApplication;
+import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.domain.processing.ImageFilterProject;
+import be.cytomine.exceptions.AlreadyExistException;
+import be.cytomine.exceptions.ObjectNotFoundException;
+import be.cytomine.utils.CommandResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -29,6 +29,9 @@ public class ImageFilterProjectServiceTests {
 
     @Autowired
     ImageFilterProjectService imageFilterProjectService;
+
+    @Autowired
+    BasicInstanceBuilder basicInstanceBuilder;
 
     @Autowired
     BasicInstanceBuilder builder;
@@ -85,7 +88,8 @@ public class ImageFilterProjectServiceTests {
     @Test
     public void add_image_filter_with_unexisting_project_return_error() {
         ImageFilterProject imageFilterProject =
-                builder.given_a_not_persisted_image_filter_project(builder.given_a_image_filter(), BasicInstanceBuilder.given_a_not_persisted_project());
+            builder.given_a_not_persisted_image_filter_project(builder.given_a_image_filter(),
+                basicInstanceBuilder.given_a_not_persisted_project());
         Assertions.assertThrows(ObjectNotFoundException.class, () -> {
             imageFilterProjectService.add(imageFilterProject.toJsonObject().withChange("project", 0L));
         });

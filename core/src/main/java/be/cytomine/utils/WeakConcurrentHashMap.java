@@ -40,10 +40,11 @@ public class WeakConcurrentHashMap<K, V> extends ConcurrentHashMap<K, V> {
 
     @Override
     public V putIfAbsent(K key, V value) {
-        if (!containsKey(key))
+        if (!containsKey(key)) {
             return put(key, value);
-        else
+        } else {
             return get(key);
+        }
     }
 
     class CleanerThread extends Thread {

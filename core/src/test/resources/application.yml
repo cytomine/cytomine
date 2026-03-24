@@ -76,6 +76,7 @@ logging:
     org.springframework.data.mongodb.core.MongoTemplate: DEBUG
 
 application:
+  version: 0.0.0
   serverId: default
   serverURL: http://localhost:8080
   adminPassword: password

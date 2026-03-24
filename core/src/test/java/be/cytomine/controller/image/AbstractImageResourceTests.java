@@ -589,7 +589,8 @@ public class AbstractImageResourceTests {
                 )
         );
 
-        MvcResult mvcResult = restAbstractImageControllerMockMvc.perform(get("/api/abstractimage/{id}/thumb.png?maxSize=512&Authorization=Bearer "+getSignedNotExpiredJwt(), image.getId()))
+        MvcResult mvcResult = restAbstractImageControllerMockMvc.perform(
+            get("/api/abstractimage/{id}/thumb.png?maxSize=512&authorization=Bearer "+getSignedNotExpiredJwt(), image.getId()))
                 .andExpect(status().isOk())
                 .andReturn();
         List<LoggedRequest> all = wireMockServer.findAll(RequestPatternBuilder.allRequests());
@@ -599,7 +600,7 @@ public class AbstractImageResourceTests {
     @Test
     @Transactional
     public void get_abstract_image_thumb_if_image_not_exist() throws Exception {
-        restAbstractImageControllerMockMvc.perform(get("/api/abstractimage/{id}/thumb.png?Authorization=Bearer "+getSignedNotExpiredJwt(), 0))
+        restAbstractImageControllerMockMvc.perform(get("/api/abstractimage/{id}/thumb.png?authorization=Bearer "+getSignedNotExpiredJwt(), 0))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.errors").exists());
     }
@@ -762,7 +763,7 @@ public class AbstractImageResourceTests {
                 )
         );
 
-        MvcResult mvcResult = restAbstractImageControllerMockMvc.perform(get("/api/abstractimage/{id}/download?Authorization=Bearer "+getSignedNotExpiredJwt(), image.getId()))
+        MvcResult mvcResult = restAbstractImageControllerMockMvc.perform(get("/api/abstractimage/{id}/download?authorization=Bearer "+getSignedNotExpiredJwt(), image.getId()))
                 .andExpect(status().isOk())
                 .andReturn();
         assertThat(mvcResult.getResponse().getContentAsByteArray()).isEqualTo(mockResponse);

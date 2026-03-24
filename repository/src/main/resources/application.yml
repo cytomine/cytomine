@@ -20,4 +20,5 @@ spring:
           batch_size: 50
 
   liquibase:
+    enabled: true
     change-log: classpath:config/liquibase/master.xml

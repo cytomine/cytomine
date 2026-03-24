@@ -1,25 +1,27 @@
 package be.cytomine.service.database;
 
-import be.cytomine.domain.image.Mime;
-import be.cytomine.domain.meta.Configuration;
-import be.cytomine.domain.meta.ConfigurationReadingRole;
-import be.cytomine.domain.processing.ImageFilter;
-import be.cytomine.domain.security.*;
-import be.cytomine.repository.image.MimeRepository;
-import be.cytomine.repository.meta.ConfigurationRepository;
-import be.cytomine.repository.ontology.RelationRepository;
-import be.cytomine.repository.processing.ImageFilterRepository;
-import be.cytomine.repository.security.SecRoleRepository;
-import be.cytomine.repository.security.UserRepository;
-import be.cytomine.repository.security.SecUserSecRoleRepository;
-import be.cytomine.service.image.server.StorageService;
+import java.util.List;
+import java.util.UUID;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.UUID;
+import be.cytomine.domain.image.Mime;
+import be.cytomine.domain.meta.Configuration;
+import be.cytomine.domain.meta.ConfigurationReadingRole;
+import be.cytomine.domain.processing.ImageFilter;
+import be.cytomine.domain.security.SecUserSecRole;
+import be.cytomine.domain.security.User;
+import be.cytomine.repository.image.MimeRepository;
+import be.cytomine.repository.meta.ConfigurationRepository;
+import be.cytomine.repository.ontology.RelationRepository;
+import be.cytomine.repository.processing.ImageFilterRepository;
+import be.cytomine.repository.security.SecRoleRepository;
+import be.cytomine.repository.security.SecUserSecRoleRepository;
+import be.cytomine.repository.security.UserRepository;
+import be.cytomine.service.image.server.StorageService;
 
 @Service
 @Slf4j
@@ -84,7 +86,7 @@ public class BootstrapUtilsService {
 
     public void createFilter(String name, String method, Boolean available) {
         ImageFilter filter = imageFilterRepository.findByName(name)
-                .orElseGet(ImageFilter::new);
+            .orElseGet(ImageFilter::new);
         filter.setName(name);
         filter.setMethod(method);
         filter.setAvailable(available);
@@ -100,7 +102,7 @@ public class BootstrapUtilsService {
         }
     }
 
-    public void createConfigurations(String key, String value, ConfigurationReadingRole readingRole){
+    public void createConfigurations(String key, String value, ConfigurationReadingRole readingRole) {
         Configuration configuration = new Configuration();
         configuration.setKey(key);
         configuration.setValue(value);

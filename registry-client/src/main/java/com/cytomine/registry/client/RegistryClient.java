@@ -1,6 +1,5 @@
 package com.cytomine.registry.client;
 
-
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,8 +41,9 @@ public class RegistryClient {
     public static void push(InputStream is, String image) throws IOException {
         Reference reference = Reference.prepareReference(image);
         Context context = FILE_OPERATE.load(is);
-        if (Configurer.authenticated())
+        if (Configurer.authenticated()) {
             context.setToken(AUTHENTICATOR.getToken(new Pair<>(Scope.PULL_PUSH, reference)));
+        }
         REGISTRY_OPERATE.push(context, reference);
     }
 
@@ -59,10 +59,8 @@ public class RegistryClient {
         Configurer.url(url);
     }
 
-
     public static void pull(String image, String filePath) throws IOException {
-        try (OutputStream os =
-                 new BufferedOutputStream(Files.newOutputStream(Paths.get(filePath)))) {
+        try (OutputStream os = new BufferedOutputStream(Files.newOutputStream(Paths.get(filePath)))) {
             pull(image, os);
         }
     }
@@ -70,8 +68,9 @@ public class RegistryClient {
     public static void pull(String image, OutputStream outputStream) throws IOException {
         Context context = new Context();
         Reference reference = Reference.prepareReference(image);
-        if (Configurer.authenticated())
+        if (Configurer.authenticated()) {
             context.setToken(AUTHENTICATOR.getToken(new Pair<>(Scope.PULL, reference)));
+        }
         REGISTRY_OPERATE.load(context, reference);
         FILE_OPERATE.save(context, outputStream);
     }
@@ -80,8 +79,9 @@ public class RegistryClient {
         Context context = new Context();
         Reference reference = Reference.prepareReference(image);
         context.setReference(reference);
-        if (Configurer.authenticated())
+        if (Configurer.authenticated()) {
             context.setToken(AUTHENTICATOR.getToken(new Pair<>(Scope.PULL, reference)));
+        }
         return REGISTRY_OPERATE.digest(context, reference);
     }
 
@@ -89,8 +89,9 @@ public class RegistryClient {
         Context context = new Context();
         Reference reference = Reference.prepareReference(image);
         context.setReference(reference);
-        if (Configurer.authenticated())
+        if (Configurer.authenticated()) {
             context.setToken(AUTHENTICATOR.getToken(new Pair<>(Scope.PULL, reference)));
+        }
         return REGISTRY_OPERATE.tags(context, reference);
 
     }
@@ -119,17 +120,22 @@ public class RegistryClient {
         Context context = new Context();
         Reference srcReference = Reference.prepareReference(src);
         Reference dstReference = Reference.prepareReference(dst);
-        if (srcReference.getEndpoint().endsWith(Authenticator.DOCKER_DOMAIN) && dstReference.getEndpoint().endsWith(Authenticator.DOCKER_DOMAIN)) {
-            if (Configurer.authenticated())
+        boolean srcIsDocker = srcReference.getEndpoint().endsWith(Authenticator.DOCKER_DOMAIN);
+        boolean dstIsDocker = dstReference.getEndpoint().endsWith(Authenticator.DOCKER_DOMAIN);
+        if (srcIsDocker && dstIsDocker) {
+            if (Configurer.authenticated()) {
                 context.setToken(AUTHENTICATOR.getToken(new Pair<>(Scope.PULL, srcReference),
-                    new Pair<>(Scope.PULL_PUSH, dstReference)));
+                        new Pair<>(Scope.PULL_PUSH, dstReference)));
+            }
             REGISTRY_OPERATE.load(context, srcReference);
         } else {
-            if (Configurer.authenticated())
+            if (Configurer.authenticated()) {
                 context.setToken(AUTHENTICATOR.getToken(new Pair<>(Scope.PULL, srcReference)));
+            }
             REGISTRY_OPERATE.load(context, srcReference);
-            if (Configurer.authenticated())
+            if (Configurer.authenticated()) {
                 context.setToken(AUTHENTICATOR.getToken(new Pair<>(Scope.PULL_PUSH, srcReference)));
+            }
         }
         REGISTRY_OPERATE.copy(context, dst);
     }
@@ -139,8 +145,9 @@ public class RegistryClient {
         reference.setEndpoint(url);
         Context context = new Context();
         context.setReference(reference);
-        if (Configurer.authenticated())
+        if (Configurer.authenticated()) {
             context.setToken(AUTHENTICATOR.getToken(new Pair<>(Scope.NONE, reference)));
+        }
         return REGISTRY_OPERATE.catalog(context, count, last);
     }
 

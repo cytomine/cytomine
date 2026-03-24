@@ -1,12 +1,11 @@
 package be.cytomine.utils;
 
-import be.cytomine.domain.security.SecUserSecRole;
-import be.cytomine.domain.security.User;
-import be.cytomine.repository.security.SecRoleRepository;
-import be.cytomine.repository.security.SecUserSecRoleRepository;
-import be.cytomine.repository.security.UserRepository;
-import be.cytomine.service.CurrentRoleService;
-import be.cytomine.service.image.server.StorageService;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
@@ -14,7 +13,13 @@ import org.springframework.security.authentication.event.AuthenticationSuccessEv
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import be.cytomine.domain.security.SecUserSecRole;
+import be.cytomine.domain.security.User;
+import be.cytomine.repository.security.SecRoleRepository;
+import be.cytomine.repository.security.SecUserSecRoleRepository;
+import be.cytomine.repository.security.UserRepository;
+import be.cytomine.service.CurrentRoleService;
+import be.cytomine.service.image.server.StorageService;
 
 @Component
 public class AuthenticationSuccessListener implements ApplicationListener<AuthenticationSuccessEvent> {
@@ -39,10 +44,9 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
 
     @Override
     public void onApplicationEvent(AuthenticationSuccessEvent event) {
-
-        if (event.getAuthentication() instanceof JwtAuthenticationToken jwtAuthenticationToken)
+        if (event.getAuthentication() instanceof JwtAuthenticationToken jwtAuthenticationToken) {
             saveUserOfToken(jwtAuthenticationToken);
-
+        }
     }
 
     protected void saveUserOfToken(JwtAuthenticationToken jwtAuthenticationToken) {
@@ -87,9 +91,11 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
     }
 
     @Transactional
-    protected void updateRolesAndAdminSession(JwtAuthenticationToken jwtAuthenticationToken,
-                                              User user,
-                                              Set<String> rolesFromAuthentication) {
+    protected void updateRolesAndAdminSession(
+        JwtAuthenticationToken jwtAuthenticationToken,
+        User user,
+        Set<String> rolesFromAuthentication
+    ) {
 
         secSecUserSecRoleRepository.deleteAllByIdInBatch(
             secSecUserSecRoleRepository.findAllBySecUser(user).stream()
@@ -123,7 +129,9 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
     private static Set<String> extractRolesFromAuthentication(JwtAuthenticationToken jwtAuthenticationToken) {
         Set<String> rolesFromAuthentication = new HashSet<>();
         jwtAuthenticationToken.getAuthorities().forEach((authority) -> {
-            if (authority.getAuthority().equals("ROLE_USER") || authority.getAuthority().equals("ROLE_ADMIN") || authority.getAuthority().equals("ROLE_GUEST")) {
+            if (authority.getAuthority().equals("ROLE_USER")
+                || authority.getAuthority().equals("ROLE_ADMIN")
+                || authority.getAuthority().equals("ROLE_GUEST")) {
                 rolesFromAuthentication.add(authority.getAuthority());
             }
         });

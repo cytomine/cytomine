@@ -16,16 +16,9 @@ package be.cytomine.service.ontology;
 * limitations under the License.
 */
 
-import be.cytomine.BasicInstanceBuilder;
-import be.cytomine.CytomineCoreApplication;
-import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.domain.ontology.RelationTerm;
-import be.cytomine.domain.ontology.Term;
-import be.cytomine.exceptions.ObjectNotFoundException;
-import be.cytomine.repository.ontology.RelationTermRepository;
-import be.cytomine.service.CommandService;
-import be.cytomine.utils.CommandResponse;
+import java.util.Optional;
+
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +27,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 
-import jakarta.transaction.Transactional;
-
-import java.util.Optional;
+import be.cytomine.BasicInstanceBuilder;
+import be.cytomine.CytomineCoreApplication;
+import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.domain.ontology.RelationTerm;
+import be.cytomine.domain.ontology.Term;
+import be.cytomine.exceptions.ObjectNotFoundException;
+import be.cytomine.repository.ontology.RelationTermRepository;
+import be.cytomine.service.CommandService;
+import be.cytomine.utils.CommandResponse;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -52,6 +52,9 @@ public class RelationTermServiceTests {
 
     @Autowired
     RelationTermRepository relationTermRepository;
+
+    @Autowired
+    BasicInstanceBuilder basicInstanceBuilder;
 
     @Autowired
     BasicInstanceBuilder builder;
@@ -104,7 +107,9 @@ public class RelationTermServiceTests {
     void add_valid_relation_term_with_success() {
         Term parent = builder.given_a_term();
         Term child1 = builder.given_a_term(parent.getOntology());
-        RelationTerm parentRelationTerm = BasicInstanceBuilder.given_a_not_persisted_relation_term(builder.given_a_relation(), parent, child1);
+        RelationTerm parentRelationTerm =
+            basicInstanceBuilder.given_a_not_persisted_relation_term(builder.given_a_relation(),
+                parent, child1);
 
         CommandResponse commandResponse = relationTermService.add(parentRelationTerm.toJsonObject());
 
@@ -116,7 +121,9 @@ public class RelationTermServiceTests {
     @Test
     void add_relation_term_with_null_term_fail() {
         Term parent = builder.given_a_term();
-        RelationTerm parentRelationTerm = BasicInstanceBuilder.given_a_not_persisted_relation_term(builder.given_a_relation(), parent, null);
+        RelationTerm parentRelationTerm =
+            basicInstanceBuilder.given_a_not_persisted_relation_term(builder.given_a_relation(),
+                parent, null);
         Assertions.assertThrows(ObjectNotFoundException.class, () -> {
             relationTermService.add(parentRelationTerm.toJsonObject());
         });

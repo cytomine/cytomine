@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import be.cytomine.domain.appengine.TaskRun;
 import be.cytomine.domain.annotation.AnnotationLayer;
+import be.cytomine.domain.appengine.TaskRun;
 import be.cytomine.domain.appengine.TaskRunLayer;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.dto.annotation.AnnotationLayerResponse;
@@ -40,7 +40,7 @@ public class AnnotationLayerService {
     }
 
     public AnnotationLayer createAnnotationLayer(String name) {
-        return annotationLayerRepository.findByName(name).orElseGet(()->{
+        return annotationLayerRepository.findByName(name).orElseGet(() -> {
             AnnotationLayer annotationLayer = new AnnotationLayer();
             annotationLayer.setName(name);
             return annotationLayerRepository.saveAndFlush(annotationLayer);
@@ -55,10 +55,10 @@ public class AnnotationLayerService {
         List<TaskRunLayer> taskRunLayers = taskRunLayerRepository.findAllByImageId(imageId);
 
         Set<AnnotationLayerResponse> annotationLayerSet = taskRunLayers
-                .stream()
-                .map(TaskRunLayer::getAnnotationLayer)
-                .map(layer -> new AnnotationLayerResponse(layer.getId(), layer.getName()))
-                .collect(Collectors.toCollection(LinkedHashSet::new));
+            .stream()
+            .map(TaskRunLayer::getAnnotationLayer)
+            .map(layer -> new AnnotationLayerResponse(layer.getId(), layer.getName()))
+            .collect(Collectors.toCollection(LinkedHashSet::new));
 
         ImageInstance imageInstance = imageInstanceService.get(imageId);
 

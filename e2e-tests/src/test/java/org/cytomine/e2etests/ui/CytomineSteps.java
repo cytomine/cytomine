@@ -244,6 +244,15 @@ public class CytomineSteps {
         webDriverUtils.byIsDisplayed(wait, By.xpath("//*[contains(text(),'Successful SAM Processing !')]"));
     }
 
+    public void createAnnotationAndSearchAnnotations(Wait<WebDriver> wait, WebDriver driver, int nbAnnotations)
+        throws InterruptedException {
+        drawRectangleAnnotation(wait, driver);
+        Thread.sleep(2000);
+        webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Search for similar annotations')]");
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//*[contains(text(), 'Similar annotations')]"));
+        wait.until(d -> d.findElements(By.cssSelector(".similar-annotations-playground .annotation-data")).size() == nbAnnotations);
+    }
+
     @SneakyThrows
     public void uploadTask(Wait<WebDriver> wait, URL cytomineUrl, String zipName) {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/apps");

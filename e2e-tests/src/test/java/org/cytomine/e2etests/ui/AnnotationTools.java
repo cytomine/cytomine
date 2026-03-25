@@ -48,15 +48,13 @@ public class AnnotationTools {
 
         int canvasWidth = mapCanvas.getSize().getWidth();
         int canvasHeight = mapCanvas.getSize().getHeight();
-        int startX = canvasWidth / 4;
-        int startY = canvasHeight / 4;
-        int endX = canvasWidth * 3 / 4;
-        int endY = canvasHeight * 3 / 4;
+        int xOffset = canvasWidth / 8;
+        int yOffset = canvasHeight / 8;
 
         Actions actions = new Actions(driver);
-        actions.moveToElement(mapCanvas, startX - canvasWidth / 2, startY - canvasHeight / 2)
+        actions.moveToElement(mapCanvas, -xOffset, -yOffset)
             .click()
-            .moveToElement(mapCanvas, endX - canvasWidth / 2, endY - canvasHeight / 2)
+            .moveToElement(mapCanvas, xOffset, yOffset)
             .doubleClick()
             .perform();
 

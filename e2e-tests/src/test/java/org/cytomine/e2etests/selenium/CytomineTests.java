@@ -180,6 +180,9 @@ public class CytomineTests {
         cytomineSteps.drawPolygon(wait, driver);
         cytomineSteps.verifyAnnotationCreated(wait);
 
+        cytomineSteps.drawFreeHandPolygon(wait, driver);
+        cytomineSteps.verifyAnnotationCreated(wait);
+
         cytomineSteps.deleteProject(wait, projectURL);
         cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
     }

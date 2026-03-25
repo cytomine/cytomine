@@ -2,6 +2,7 @@ package be.cytomine.common.repository.http;
 
 import java.util.Optional;
 
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,12 +33,12 @@ public interface TermHttpContract {
 
     @PostExchange
     Optional<HttpCommandResponse<TermResponse>> create(@RequestParam long userId,
-                                                       @RequestBody CreateTerm createTerm);
+                                                       @Valid @RequestBody CreateTerm createTerm);
 
     @PutExchange("/{id}")
     Optional<HttpCommandResponse<TermResponse>> update(@PathVariable long id,
                                                        @RequestParam long userId,
-                                                       @RequestBody UpdateTerm createTerm);
+                                                       @RequestBody UpdateTerm updateTerm);
 
     @DeleteExchange("/{id}")
     Optional<HttpCommandResponse<TermResponse>> delete(@PathVariable long id,

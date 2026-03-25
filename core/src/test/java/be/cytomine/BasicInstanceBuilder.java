@@ -1,5 +1,6 @@
 package be.cytomine;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -14,6 +15,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import be.cytomine.common.repository.model.CreateTerm;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.annotation.Annotation;
 import be.cytomine.domain.annotation.AnnotationLayer;
@@ -119,9 +121,9 @@ public class BasicInstanceBuilder {
             @Override
             protected void doInTransactionWithoutResult(TransactionStatus status) {
                 aUser = userRepository.findByUsernameLikeIgnoreCase("user")
-                    .orElseGet(() -> given_default_user());
+                            .orElseGet(() -> given_default_user());
                 anAdmin = userRepository.findByUsernameLikeIgnoreCase("admin")
-                    .orElseGet(() -> given_default_admin());
+                              .orElseGet(() -> given_default_admin());
             }
         });
     }
@@ -196,7 +198,7 @@ public class BasicInstanceBuilder {
 
     public User given_superadmin() {
         return userRepository.findByUsernameLikeIgnoreCase("superadmin")
-            .orElseThrow(() -> new ObjectNotFoundException("superadmin not in db"));
+                   .orElseThrow(() -> new ObjectNotFoundException("superadmin not in db"));
     }
 
     public User given_a_not_persisted_user() {
@@ -213,8 +215,8 @@ public class BasicInstanceBuilder {
         SecUserSecRole secSecUserSecRole = new SecUserSecRole();
         secSecUserSecRole.setSecUser(user);
         secSecUserSecRole.setSecRole(secRoleRepository.findByAuthority(authority)
-            .orElseThrow(() -> new ObjectNotFoundException(
-                "authority " + authority + " does not exists")));
+                                         .orElseThrow(() -> new ObjectNotFoundException(
+                                             "authority " + authority + " does not exists")));
         em.persist(secSecUserSecRole);
         em.flush();
         em.refresh(user);
@@ -260,6 +262,10 @@ public class BasicInstanceBuilder {
         return term;
     }
 
+    public CreateTerm given_a_not_persisted_create_term(Ontology ontology, String name) {
+        return new CreateTerm(name, "blue", ontology.getId(), new Date(), new Date(), "");
+    }
+
     public ImageFilterProject given_a_image_filter_project(ImageFilter imageFilter,
                                                            Project project) {
         return persistAndReturn(given_a_not_persisted_image_filter_project(imageFilter, project));
@@ -281,8 +287,8 @@ public class BasicInstanceBuilder {
     public Relation given_a_relation() {
         return (Relation) em.createQuery(
                 "SELECT relation FROM Relation relation WHERE relation.name LIKE 'parent'")
-            .getResultList()
-            .get(0);
+                              .getResultList()
+                              .get(0);
     }
 
     public Ontology given_an_ontology() {
@@ -542,7 +548,7 @@ public class BasicInstanceBuilder {
 
     public Mime given_a_mime(String mimeType) {
         return mimeRepository.findByMimeType(mimeType)
-            .orElseThrow(() -> new ObjectNotFoundException("MimeType", mimeType));
+                   .orElseThrow(() -> new ObjectNotFoundException("MimeType", mimeType));
     }
 
     public NestedImageInstance given_a_nested_image_instance() {

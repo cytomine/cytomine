@@ -177,6 +177,9 @@ public class CytomineTests {
         cytomineSteps.drawCircle(wait, driver);
         cytomineSteps.verifyAnnotationCreated(wait);
 
+        cytomineSteps.drawPolygon(wait, driver);
+        cytomineSteps.verifyAnnotationCreated(wait);
+
         cytomineSteps.deleteProject(wait, projectURL);
         cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
     }

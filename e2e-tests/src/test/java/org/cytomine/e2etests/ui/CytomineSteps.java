@@ -307,6 +307,43 @@ public class CytomineSteps {
         drawRectangle(wait, driver);
     }
 
+    @SneakyThrows
+    public void drawPolygon(Wait<WebDriver> wait, WebDriver driver) {
+        webDriverUtils.xpathClick(wait, "//button[.//i[contains(@class, 'fa-draw-polygon')]]");
+        webDriverUtils.byIsDisplayed(
+            wait,
+            By.xpath("//button[contains(@class, 'is-selected') and .//i[contains(@class, 'fa-draw-polygon')]]")
+        );
+
+        WebElement mapCanvas = webDriverUtils.waitForCanvasReady(wait, By.cssSelector(".ol-viewport canvas"));
+
+        int canvasWidth = mapCanvas.getSize().getWidth();
+        int canvasHeight = mapCanvas.getSize().getHeight();
+        int startX = canvasWidth / 4;
+        int startY = canvasHeight / 4;
+
+        int[][] points = {
+            {startX, startY},
+            {startX + 100, startY - 80},
+            {startX + 160, startY + 40},
+            {startX + 40,  startY + 120},
+            {startX - 80,  startY + 40},
+        };
+
+        Actions actions = new Actions(driver);
+        Actions chain = actions.moveToElement(mapCanvas, startX - canvasWidth / 2, startY - canvasHeight / 2)
+            .click();
+        for (int i = 1; i < points.length; i++) {
+            chain = chain.moveToElement(mapCanvas, points[i][0] - canvasWidth / 2, points[i][1] - canvasHeight / 2)
+                .click();
+        }
+        chain.moveToElement(mapCanvas, points[0][0] - canvasWidth / 2, points[0][1] - canvasHeight / 2)
+            .click()
+            .perform();
+
+        Thread.sleep(2000);
+    }
+
     public void verifyAnnotationCreated(Wait<WebDriver> wait) {
         webDriverUtils.byIsDisplayed(wait, By.cssSelector(".draw-tools-wrapper"));
         webDriverUtils.xpathClick(wait, "//button[.//i[contains(@class, 'fa-mouse-pointer')]]");

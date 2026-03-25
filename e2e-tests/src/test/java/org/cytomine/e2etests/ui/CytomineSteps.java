@@ -4,6 +4,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -303,7 +304,23 @@ public class CytomineSteps {
         webDriverUtils.byIsDisplayed(wait, By.xpath("//*[contains(text(),'" + username + "')]"));
     }
 
-    public void filterProjectByName(Wait<WebDriver> wait, URL cytomineUrl, String projectName) {
+    public void filterProjectByName(
+        Wait<WebDriver> wait,
+        URL cytomineUrl,
+        String projectNameToSearch,
+        List<String> projectNames
+    ) {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/projects");
+        By searchInput = By.cssSelector("div.search-projects input[type='search']");
+        webDriverUtils.byClick(wait, searchInput);
+        webDriverUtils.bySendKeys(wait, searchInput, projectNameToSearch);
+
+        projectNames.forEach(projectName ->
+            webDriverUtils.waitUntilByEmpty(
+                wait,
+                By.xpath("//a[normalize-space(text())='" + projectName + "']")
+            )
+        );
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//a[normalize-space(text())='" + projectNameToSearch + "']"));
     }
 }

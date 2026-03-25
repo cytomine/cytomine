@@ -329,18 +329,21 @@ public class CytomineTests {
 
     @Test
     void filterProjectByName() {
-        int nbProjects = 5;
-        String projectName = "search-" + randomUUID();
+        int nbProjects = 3;
+        String projectNameToSearch = "search-" + randomUUID();
         List<String> projectUrls = new ArrayList<>();
+        List<String> projectNames = new ArrayList<>();
 
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
-        projectUrls.add(cytomineSteps.createProject(wait, driver, cytomineUrl, projectName));
+        projectUrls.add(cytomineSteps.createProject(wait, driver, cytomineUrl, projectNameToSearch));
         for (int i = 0; i < nbProjects; i++) {
-            String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, "selenium-" + randomUUID());
+            String projectName = "selenium-" + randomUUID();
+            projectNames.add(projectName);
+            String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
             projectUrls.add(projectUrl);
         }
 
-        cytomineSteps.filterProjectByName(wait, cytomineUrl, projectName);
+        cytomineSteps.filterProjectByName(wait, cytomineUrl, projectNameToSearch, projectNames);
 
         for (String projectUrl : projectUrls) {
             cytomineSteps.deleteProject(wait, projectUrl);

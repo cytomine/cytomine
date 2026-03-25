@@ -77,9 +77,9 @@ public class AnnotationTools {
         int yOffset = canvasHeight / 8;
 
         Actions actions = new Actions(driver);
-        actions.moveToElement(mapCanvas, -xOffset, -yOffset)
+        actions.moveToElement(mapCanvas, -xOffset, yOffset)
             .clickAndHold()
-            .moveToElement(mapCanvas, xOffset, yOffset)
+            .moveToElement(mapCanvas, xOffset, -yOffset)
             .release()
             .perform();
 
@@ -175,11 +175,11 @@ public class AnnotationTools {
         int h = mapCanvas.getSize().getHeight() / 6;
 
         int[][] points = {
-            {-w, -h},
-            {w / 2, -h},
-            {w, 0},
-            {w / 2, h},
-            {-w, h / 2},
+            {0, -h / 2},
+            {w, -h},
+            {w, h},
+            {0, h / 2},
+            {-w / 2, 0},
         };
 
         Actions actions = new Actions(driver);

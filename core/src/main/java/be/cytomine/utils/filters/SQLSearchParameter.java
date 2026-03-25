@@ -45,10 +45,10 @@ public class SQLSearchParameter {
         EntityManager entityManager
     ) {
         if (searchParameters == null) {
-            return new ArrayList();
+            return new ArrayList<>();
         }
 
-        List<SearchParameterEntry> result = new ArrayList();
+        List<SearchParameterEntry> result = new ArrayList<>();
         List<SearchParameterEntry> translated = new ArrayList<>();
 
         for (SearchParameterEntry parameter : searchParameters) {

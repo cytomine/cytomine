@@ -549,7 +549,7 @@ public abstract class ModelService<T extends CytomineDomain> {
     }
 
     public JsonObject addMultiple(List<JsonObject> json) {
-        List<JsonObject> result = new ArrayList();
+        List<JsonObject> result = new ArrayList<>();
         List errors = new ArrayList();
         JsonObject resp;
         for (JsonObject jsonObject : json) {

@@ -87,7 +87,7 @@ public class AnnotationListingBuilder {
         List<Long> userIds = Arrays.stream(users.split(","))
             .sequential()
             .filter(id -> !id.isEmpty())
-            .map(id -> Long.parseLong(id))
+            .map(Long::parseLong)
             .collect(Collectors.toList());
 
         for (AnnotationResult annotation : annotations) {

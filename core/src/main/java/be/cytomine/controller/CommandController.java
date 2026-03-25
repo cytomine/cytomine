@@ -83,7 +83,7 @@ public class CommandController extends RestCytomineController {
         } else {
             response.setStatus(200);
         }
-        return responseSuccess(results.stream().map(x -> x.getData()).toList());
+        return responseSuccess(results.stream().map(CommandResponse::getData).toList());
     }
 
     @GetMapping({"/command/redo.json", "/command/{id}/redo.json"})
@@ -129,7 +129,7 @@ public class CommandController extends RestCytomineController {
         } else {
             response.setStatus(200);
         }
-        return responseSuccess(results.stream().map(x -> x.getData()).toList());
+        return responseSuccess(results.stream().map(CommandResponse::getData).toList());
     }
 
     @GetMapping({"/deletecommand.json", "/deletecommand"}) // without json for backward compatibility

@@ -2,6 +2,7 @@ package org.cytomine.e2etests.ui;
 
 import lombok.SneakyThrows;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -39,6 +40,17 @@ public class WebDriverUtils {
         wait.until(d -> {
             try {
                 d.findElement(by).sendKeys(keys);
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        });
+    }
+
+    void byHitEnter(Wait<WebDriver> wait, By by) {
+        wait.until(d -> {
+            try {
+                d.findElement(by).sendKeys(Keys.ENTER);
                 return true;
             } catch (Exception e) {
                 return false;

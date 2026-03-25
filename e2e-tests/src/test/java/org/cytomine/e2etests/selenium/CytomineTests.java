@@ -165,25 +165,25 @@ public class CytomineTests {
         String imageName = cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName));
         cytomineSteps.openImageInViewer(wait, driver, projectURL);
 
-        cytomineSteps.drawPoint(wait, driver);
+        cytomineSteps.drawPointAnnotation(wait, driver);
         cytomineSteps.verifyAnnotationCreated(wait);
 
-        cytomineSteps.drawLine(wait, driver);
+        cytomineSteps.drawLineAnnotation(wait, driver);
         cytomineSteps.verifyAnnotationCreated(wait);
 
-        cytomineSteps.drawFreeHandLine(wait, driver);
+        cytomineSteps.drawFreeHandLineAnnotation(wait, driver);
         cytomineSteps.verifyAnnotationCreated(wait);
 
         cytomineSteps.drawRectangleAnnotation(wait, driver);
         cytomineSteps.verifyAnnotationCreated(wait);
 
-        cytomineSteps.drawCircle(wait, driver);
+        cytomineSteps.drawCircleAnnotation(wait, driver);
         cytomineSteps.verifyAnnotationCreated(wait);
 
-        cytomineSteps.drawPolygon(wait, driver);
+        cytomineSteps.drawPolygonAnnotation(wait, driver);
         cytomineSteps.verifyAnnotationCreated(wait);
 
-        cytomineSteps.drawFreeHandPolygon(wait, driver);
+        cytomineSteps.drawFreeHandPolygonAnnotation(wait, driver);
         cytomineSteps.verifyAnnotationCreated(wait);
 
         cytomineSteps.deleteProject(wait, projectURL);

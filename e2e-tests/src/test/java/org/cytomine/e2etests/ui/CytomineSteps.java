@@ -197,7 +197,7 @@ public class CytomineSteps {
     }
 
     @SneakyThrows
-    public void drawPoint(Wait<WebDriver> wait, WebDriver driver) {
+    public void drawPointAnnotation(Wait<WebDriver> wait, WebDriver driver) {
         webDriverUtils.xpathClick(wait, "//button[.//i[contains(@class, 'fa-map-pin')]]");
         webDriverUtils.byIsDisplayed(
             wait,
@@ -214,7 +214,7 @@ public class CytomineSteps {
     }
 
     @SneakyThrows
-    public void drawLine(Wait<WebDriver> wait, WebDriver driver) {
+    public void drawLineAnnotation(Wait<WebDriver> wait, WebDriver driver) {
         webDriverUtils.xpathClick(wait, "//button[.//i[contains(@class, 'fa-minus')]]");
         webDriverUtils.byIsDisplayed(
             wait,
@@ -241,7 +241,7 @@ public class CytomineSteps {
     }
 
     @SneakyThrows
-    public void drawFreeHandLine(Wait<WebDriver> wait, WebDriver driver) {
+    public void drawFreeHandLineAnnotation(Wait<WebDriver> wait, WebDriver driver) {
         webDriverUtils.xpathClick(wait, "//button[.//*[@d and starts-with(@d,'m 28.507424')]]");
         webDriverUtils.byIsDisplayed(
             wait,
@@ -324,7 +324,7 @@ public class CytomineSteps {
         drawRectangle(wait, driver);
     }
 
-    public void drawCircle(Wait<WebDriver> wait, WebDriver driver) {
+    public void drawCircleAnnotation(Wait<WebDriver> wait, WebDriver driver) {
         webDriverUtils.xpathClick(wait, "//button[.//i[contains(@class, 'fa-circle')]]");
         webDriverUtils.byIsDisplayed(
             wait,
@@ -335,7 +335,7 @@ public class CytomineSteps {
     }
 
     @SneakyThrows
-    public void drawPolygon(Wait<WebDriver> wait, WebDriver driver) {
+    public void drawPolygonAnnotation(Wait<WebDriver> wait, WebDriver driver) {
         webDriverUtils.xpathClick(wait, "//button[.//i[contains(@class, 'fa-draw-polygon')]]");
         webDriverUtils.byIsDisplayed(
             wait,
@@ -372,7 +372,7 @@ public class CytomineSteps {
     }
 
     @SneakyThrows
-    public void drawFreeHandPolygon(Wait<WebDriver> wait, WebDriver driver) {
+    public void drawFreeHandPolygonAnnotation(Wait<WebDriver> wait, WebDriver driver) {
         webDriverUtils.xpathClick(wait, "//button[.//*[@d and starts-with(@d,'m 38.949622')]]");
         webDriverUtils.byIsDisplayed(
             wait,

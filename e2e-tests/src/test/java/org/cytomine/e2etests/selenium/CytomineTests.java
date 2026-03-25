@@ -339,8 +339,7 @@ public class CytomineTests {
         for (int i = 0; i < nbProjects; i++) {
             String projectName = "selenium-" + randomUUID();
             projectNames.add(projectName);
-            String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
-            projectUrls.add(projectUrl);
+            projectUrls.add(cytomineSteps.createProject(wait, driver, cytomineUrl, projectName));
         }
 
         cytomineSteps.filterProjectByName(wait, cytomineUrl, projectNameToSearch, projectNames);

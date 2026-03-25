@@ -171,6 +171,9 @@ public class CytomineTests {
         cytomineSteps.drawLine(wait, driver);
         cytomineSteps.verifyAnnotationCreated(wait);
 
+        cytomineSteps.drawFreeHandLine(wait, driver);
+        cytomineSteps.verifyAnnotationCreated(wait);
+
         cytomineSteps.drawRectangleAnnotation(wait, driver);
         cytomineSteps.verifyAnnotationCreated(wait);
 

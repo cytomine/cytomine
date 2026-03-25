@@ -211,9 +211,7 @@ public class WebSocketUserPositionHandler extends CytomineWebSocketHandler {
     private void sendPosition(ConcurrentWebSocketSessionDecorator[] sessions, String position) {
         TextMessage message = new TextMessage(position);
         for (ConcurrentWebSocketSessionDecorator s : sessions) {
-            new Thread(() -> {
-                sendPosition(s, message);
-            }).start();
+            new Thread(() -> sendPosition(s, message)).start();
         }
     }
 

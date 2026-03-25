@@ -341,7 +341,7 @@ public abstract class AnnotationListing {
     }
 
     String joinValues(List list) {
-        return (String) list.stream().map(x -> String.valueOf(x)).collect(Collectors.joining(", "));
+        return (String) list.stream().map(String::valueOf).collect(Collectors.joining(", "));
     }
 
     String getProjectConst() {

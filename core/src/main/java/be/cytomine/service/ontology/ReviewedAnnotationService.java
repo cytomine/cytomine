@@ -548,8 +548,7 @@ public class ReviewedAnnotationService extends ModelService {
             based.setLocation(oldLocation);
             result = update(based, jsonObject);
 
-            for (int i = 0; i < allAnnotationWithSameTerm.size(); i++) {
-                ReviewedAnnotation other = allAnnotationWithSameTerm.get(i);
+            for (ReviewedAnnotation other : allAnnotationWithSameTerm) {
                 other.setLocation(other.getLocation().difference(newGeometry));
                 update(other, other.toJsonObject());
             }

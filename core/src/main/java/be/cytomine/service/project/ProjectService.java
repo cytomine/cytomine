@@ -283,7 +283,7 @@ public class ProjectService extends ModelService {
         }
 
         log.debug("searchParameters:");
-        searchParameters.stream().map(x -> x.toString()).forEach(log::debug);
+        searchParameters.stream().map(SearchParameterEntry::toString).forEach(log::debug);
 
         List<SearchParameterEntry>
             validParameters
@@ -294,7 +294,7 @@ public class ProjectService extends ModelService {
         );
 
         log.debug("validParameters:");
-        validParameters.stream().map(x -> x.toString()).forEach(log::debug);
+        validParameters.stream().map(SearchParameterEntry::toString).forEach(log::debug);
 
         validParameters.forEach(searchParameterEntry -> searchParameterEntry.setProperty("p."
             + searchParameterEntry.getProperty()));
@@ -349,29 +349,29 @@ public class ProjectService extends ModelService {
         SearchParameterProcessed sqlSearchConditions = SQLSearchParameter.searchParametersToSQLConstraints(
             validParameters);
         log.debug("sqlSearchConditions:");
-        sqlSearchConditions.getData().stream().map(x -> x.toString()).forEach(log::debug);
+        sqlSearchConditions.getData().stream().map(SearchParameterEntry::toString).forEach(log::debug);
         log.debug("sqlSearchConditions.params:");
         sqlSearchConditions.getSqlParameters().entrySet().stream().map(Object::toString).forEach(log::debug);
 
         String project = sqlSearchConditions.getData()
             .stream()
             .filter(x -> x.getProperty().startsWith("p."))
-            .map(x -> x.getSql())
+            .map(SearchParameterEntry::getSql)
             .collect(Collectors.joining(" AND "));
         String ontology = sqlSearchConditions.getData()
             .stream()
             .filter(x -> x.getProperty().startsWith("ontology."))
-            .map(x -> x.getSql())
+            .map(SearchParameterEntry::getSql)
             .collect(Collectors.joining(" AND "));
         String members = sqlSearchConditions.getData()
             .stream()
             .filter(x -> x.getProperty().startsWith("members."))
-            .map(x -> x.getSql())
+            .map(SearchParameterEntry::getSql)
             .collect(Collectors.joining(" AND "));
         String tags = sqlSearchConditions.getData()
             .stream()
             .filter(x -> x.getProperty().startsWith("t."))
-            .map(x -> x.getSql())
+            .map(SearchParameterEntry::getSql)
             .collect(Collectors.joining(" AND "));
 
         if (!members.isBlank() && !projectSearchExtension.isWithMembersCount()) {

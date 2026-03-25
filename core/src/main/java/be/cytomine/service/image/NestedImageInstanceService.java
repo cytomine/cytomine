@@ -74,9 +74,7 @@ public class NestedImageInstanceService extends ModelService {
 
     public Optional<NestedImageInstance> find(Long id) {
         Optional<NestedImageInstance> nestedImageInstance = nestedImageInstanceRepository.findById(id);
-        nestedImageInstance.ifPresent(cf -> {
-            securityACLService.check(cf.container(), READ);
-        });
+        nestedImageInstance.ifPresent(cf -> securityACLService.check(cf.container(), READ));
         return nestedImageInstance;
     }
 

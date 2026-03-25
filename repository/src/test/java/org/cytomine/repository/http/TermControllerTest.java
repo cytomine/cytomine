@@ -3,14 +3,6 @@ package org.cytomine.repository.http;
 import java.util.Date;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.common.repository.model.CreateTerm;
-import be.cytomine.common.repository.model.TermResponse;
-import be.cytomine.common.repository.model.UpdateTerm;
-import be.cytomine.common.repository.model.command.HttpCommandResponse;
 import org.cytomine.repository.RepositoryApp;
 import org.cytomine.repository.persistence.TermRepository;
 import org.cytomine.repository.persistence.entity.TermEntity;
@@ -23,6 +15,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
+
+import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.model.CreateTerm;
+import be.cytomine.common.repository.model.TermResponse;
+import be.cytomine.common.repository.model.UpdateTerm;
+import be.cytomine.common.repository.model.command.HttpCommandResponse;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(classes = RepositoryApp.class)
 @Import(PostGisTestConfiguration.class)

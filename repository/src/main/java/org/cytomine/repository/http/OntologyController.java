@@ -2,15 +2,16 @@ package org.cytomine.repository.http;
 
 import java.util.Optional;
 
-import static be.cytomine.common.repository.http.OntologyHttpContract.ROOT_PATH;
-
-import be.cytomine.common.repository.http.OntologyHttpContract;
-import be.cytomine.common.repository.model.OntologyResponse;
 import lombok.RequiredArgsConstructor;
 import org.cytomine.repository.mapper.OntologyMapper;
 import org.cytomine.repository.persistence.OntologyRepository;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import be.cytomine.common.repository.http.OntologyHttpContract;
+import be.cytomine.common.repository.model.OntologyResponse;
+
+import static be.cytomine.common.repository.http.OntologyHttpContract.ROOT_PATH;
 
 @RequiredArgsConstructor
 @RestController

@@ -3,6 +3,14 @@ package org.cytomine.repository.service;
 import java.util.Date;
 import java.util.Optional;
 
+import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
+import org.cytomine.repository.mapper.OntologyMapper;
+import org.cytomine.repository.persistence.TermRepository;
+import org.cytomine.repository.persistence.entity.CommandEntity;
+import org.cytomine.repository.persistence.entity.TermEntity;
+import org.springframework.stereotype.Component;
+
 import be.cytomine.common.repository.model.CreateTerm;
 import be.cytomine.common.repository.model.TermResponse;
 import be.cytomine.common.repository.model.UpdateTerm;
@@ -12,13 +20,6 @@ import be.cytomine.common.repository.model.command.TermCommandPayload;
 import be.cytomine.common.repository.model.command.delete.DeleteTermCommand;
 import be.cytomine.common.repository.model.command.insert.InsertTermCommand;
 import be.cytomine.common.repository.model.command.update.UpdateTermCommand;
-import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
-import org.cytomine.repository.mapper.OntologyMapper;
-import org.cytomine.repository.persistence.TermRepository;
-import org.cytomine.repository.persistence.entity.CommandEntity;
-import org.cytomine.repository.persistence.entity.TermEntity;
-import org.springframework.stereotype.Component;
 
 @Component
 @AllArgsConstructor

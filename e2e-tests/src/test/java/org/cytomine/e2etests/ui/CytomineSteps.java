@@ -283,4 +283,23 @@ public class CytomineSteps {
         Wait<WebDriver> longWait = new WebDriverWait(driver, Duration.ofSeconds(20));
         webDriverUtils.byIsDisplayed(longWait, By.cssSelector(".runs .fa-check-circle"));
     }
+
+    public void addUserToProject(Wait<WebDriver> wait, String projectUrl, String username) {
+        webDriverUtils.goTo(wait, projectUrl);
+        webDriverUtils.byClick(wait, By.xpath("//label[contains(@class,'b-radio') and contains(text(),'Members')]"));
+        webDriverUtils.byClick(wait, By.cssSelector("button.button.is-link.add-member"));
+        By searchInput = By.xpath("//input[@placeholder='Search user...']");
+        webDriverUtils.byClick(wait, searchInput);
+        webDriverUtils.bySendKeys(wait, searchInput, username);
+        webDriverUtils.byHitEnter(wait, searchInput);
+        webDriverUtils.byClick(
+            wait,
+            By.xpath(
+                "//button[contains(@class,'button') "
+                    + "and contains(@class,'is-link') "
+                    + "and normalize-space(text())='Add']"
+            )
+        );
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//*[contains(text(),'" + username + "')]"));
+    }
 }

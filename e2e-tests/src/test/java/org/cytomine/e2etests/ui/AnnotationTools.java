@@ -19,13 +19,17 @@ public class AnnotationTools {
     @Autowired
     WebDriverUtils webDriverUtils;
 
-    @SneakyThrows
-    public void drawPointAnnotation(Wait<WebDriver> wait, WebDriver driver) {
-        webDriverUtils.xpathClick(wait, "//button[.//i[contains(@class, 'fa-map-pin')]]");
+    private void selectDrawTool(Wait<WebDriver> wait, String iconClass) {
+        webDriverUtils.xpathClick(wait, "//button[.//i[contains(@class, '" + iconClass + "')]]");
         webDriverUtils.byIsDisplayed(
             wait,
-            By.xpath("//button[contains(@class, 'is-selected') and .//i[contains(@class, 'fa-map-pin')]]")
+            By.xpath("//button[contains(@class, 'is-selected') and .//i[contains(@class, '" + iconClass + "')]]")
         );
+    }
+
+    @SneakyThrows
+    public void drawPointAnnotation(Wait<WebDriver> wait, WebDriver driver) {
+        selectDrawTool(wait, "fa-map-pin");
 
         WebElement mapCanvas = webDriverUtils.waitForCanvasReady(wait, By.cssSelector(".ol-viewport canvas"));
         Actions actions = new Actions(driver);
@@ -38,11 +42,7 @@ public class AnnotationTools {
 
     @SneakyThrows
     public void drawLineAnnotation(Wait<WebDriver> wait, WebDriver driver) {
-        webDriverUtils.xpathClick(wait, "//button[.//i[contains(@class, 'fa-minus')]]");
-        webDriverUtils.byIsDisplayed(
-            wait,
-            By.xpath("//button[contains(@class, 'is-selected') and .//i[contains(@class, 'fa-minus')]]")
-        );
+        selectDrawTool(wait, "fa-minus");
 
         WebElement mapCanvas = webDriverUtils.waitForCanvasReady(wait, By.cssSelector(".ol-viewport canvas"));
 
@@ -116,54 +116,30 @@ public class AnnotationTools {
     }
 
     public void drawRectangleAnnotation(Wait<WebDriver> wait, WebDriver driver) {
-        webDriverUtils.xpathClick(wait, "//button[.//i[contains(@class, 'fa-square')]]");
-        webDriverUtils.byIsDisplayed(
-            wait,
-            By.xpath("//button[contains(@class, 'is-selected') and .//i[contains(@class, 'fa-square')]]")
-        );
-
+        selectDrawTool(wait, "fa-square");
         drawRectangle(wait, driver);
     }
 
     public void drawRandomRectangleAnnotation(Wait<WebDriver> wait, WebDriver driver) {
-        webDriverUtils.xpathClick(wait, "//button[.//i[contains(@class, 'fa-square')]]");
-        webDriverUtils.byIsDisplayed(
-            wait,
-            By.xpath("//button[contains(@class, 'is-selected') and .//i[contains(@class, 'fa-square')]]")
-        );
-
+        selectDrawTool(wait, "fa-square");
         int xOffset = new Random().nextInt(3) + DEFAULT_CANVA_OFFSET;
         int yOffset = new Random().nextInt(3) + DEFAULT_CANVA_OFFSET;
         drawRectangle(wait, driver, xOffset, yOffset);
     }
 
     public void drawRectangleAnnotationWithMagicWand(Wait<WebDriver> wait, WebDriver driver) {
-        webDriverUtils.xpathClick(wait, "//button[.//i[contains(@class, 'fa-magic')]]");
-        webDriverUtils.byIsDisplayed(
-            wait,
-            By.xpath("//button[contains(@class, 'is-selected') and .//i[contains(@class, 'fa-magic')]]")
-        );
-
+        selectDrawTool(wait, "fa-magic");
         drawRectangle(wait, driver);
     }
 
     public void drawCircleAnnotation(Wait<WebDriver> wait, WebDriver driver) {
-        webDriverUtils.xpathClick(wait, "//button[.//i[contains(@class, 'fa-circle')]]");
-        webDriverUtils.byIsDisplayed(
-            wait,
-            By.xpath("//button[contains(@class, 'is-selected') and .//i[contains(@class, 'fa-circle')]]")
-        );
-
+        selectDrawTool(wait, "fa-circle");
         drawRectangle(wait, driver);
     }
 
     @SneakyThrows
     public void drawPolygonAnnotation(Wait<WebDriver> wait, WebDriver driver) {
-        webDriverUtils.xpathClick(wait, "//button[.//i[contains(@class, 'fa-draw-polygon')]]");
-        webDriverUtils.byIsDisplayed(
-            wait,
-            By.xpath("//button[contains(@class, 'is-selected') and .//i[contains(@class, 'fa-draw-polygon')]]")
-        );
+        selectDrawTool(wait, "fa-draw-polygon");
 
         WebElement mapCanvas = webDriverUtils.waitForCanvasReady(wait, By.cssSelector(".ol-viewport canvas"));
 

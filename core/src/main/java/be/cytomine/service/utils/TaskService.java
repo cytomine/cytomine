@@ -190,7 +190,7 @@ public class TaskService {
         try {
             row = (Object[]) entityManager.createNativeQuery(
                     "SELECT id,progress,project_id,user_id FROM task where id = ?")
-                .setParameter(1, id.longValue()).getSingleResult();
+                .setParameter(1, id).getSingleResult();
         } catch (jakarta.persistence.NoResultException ex) {
             return null;
         }

@@ -123,7 +123,7 @@ public class CustomUIController extends RestCytomineController {
 
     public JsonObject getGlobalConfig(Set<SecRole> roles) {
         JsonObject globalConfig = new JsonObject();
-        Set<String> authorities = roles.stream().map(x -> x.getAuthority()).collect(Collectors.toSet());
+        Set<String> authorities = roles.stream().map(SecRole::getAuthority).collect(Collectors.toSet());
 
         for (Map.Entry<String, List<String>> it : applicationProperties.getCustomUI().getGlobal().entrySet()) {
             boolean print;

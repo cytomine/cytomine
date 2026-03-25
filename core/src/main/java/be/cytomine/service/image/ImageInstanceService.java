@@ -389,15 +389,15 @@ public class ImageInstanceService extends ModelService {
             false
         );
 
-        validatedSearchParameters.stream().filter(x -> !x.getProperty().contains(".")).forEach(searchParameterEntry -> {
-            searchParameterEntry.setProperty(imageInstanceAlias + "." + searchParameterEntry.getProperty());
-        });
+        validatedSearchParameters.stream()
+            .filter(x -> !x.getProperty().contains("."))
+            .forEach(searchParameterEntry -> searchParameterEntry.setProperty(imageInstanceAlias
+                + "."
+                + searchParameterEntry.getProperty()));
 
         validatedSearchParameters.stream()
             .filter(x -> x.getProperty().equals("ui.instanceFilename"))
-            .forEach(searchParameterEntry -> {
-                searchParameterEntry.setProperty("name");
-            });
+            .forEach(searchParameterEntry -> searchParameterEntry.setProperty("name"));
 
 
         final String finalSortedProperty = sortedProperty;
@@ -417,17 +417,17 @@ public class ImageInstanceService extends ModelService {
         String imageInstanceCondition = sqlSearchConditions.getData()
             .stream()
             .filter(x -> x.getProperty().startsWith(imageInstanceAlias + "."))
-            .map(x -> x.getSql())
+            .map(SearchParameterEntry::getSql)
             .collect(Collectors.joining(" AND "));
         String abstractImageCondition = sqlSearchConditions.getData()
             .stream()
             .filter(x -> x.getProperty().startsWith(abstractImageAlias + "."))
-            .map(x -> x.getSql())
+            .map(SearchParameterEntry::getSql)
             .collect(Collectors.joining(" AND "));
         String tagsCondition = sqlSearchConditions.getData()
             .stream()
             .filter(x -> x.getProperty().startsWith("tda."))
-            .map(x -> x.getSql())
+            .map(SearchParameterEntry::getSql)
             .collect(Collectors.joining(" AND "));
 
         String select;
@@ -633,9 +633,11 @@ public class ImageInstanceService extends ModelService {
             project.getBlindMode()
         );
 
-        validatedSearchParameters.stream().filter(x -> !x.getProperty().contains(".")).forEach(searchParameterEntry -> {
-            searchParameterEntry.setProperty(imageInstanceAlias + "." + searchParameterEntry.getProperty());
-        });
+        validatedSearchParameters.stream()
+            .filter(x -> !x.getProperty().contains("."))
+            .forEach(searchParameterEntry -> searchParameterEntry.setProperty(imageInstanceAlias
+                + "."
+                + searchParameterEntry.getProperty()));
 
         SearchParameterEntry blindedNameSearch = null;
         boolean manager = false;
@@ -664,27 +666,27 @@ public class ImageInstanceService extends ModelService {
         String imageInstanceCondition = sqlSearchConditions.getData()
             .stream()
             .filter(x -> x.getProperty().startsWith(imageInstanceAlias + "."))
-            .map(x -> x.getSql())
+            .map(SearchParameterEntry::getSql)
             .collect(Collectors.joining(" AND "));
         String abstractImageCondition = sqlSearchConditions.getData()
             .stream()
             .filter(x -> x.getProperty().startsWith(abstractImageAlias + "."))
-            .map(x -> x.getSql())
+            .map(SearchParameterEntry::getSql)
             .collect(Collectors.joining(" AND "));
         String mimeCondition = sqlSearchConditions.getData()
             .stream()
             .filter(x -> x.getProperty().startsWith(mimeAlias + "."))
-            .map(x -> x.getSql())
+            .map(SearchParameterEntry::getSql)
             .collect(Collectors.joining(" AND "));
         String tagsCondition = sqlSearchConditions.getData()
             .stream()
             .filter(x -> x.getProperty().startsWith("tda."))
-            .map(x -> x.getSql())
+            .map(SearchParameterEntry::getSql)
             .collect(Collectors.joining(" AND "));
         String imageGroupCondition = sqlSearchConditions.getData()
             .stream()
             .filter(x -> x.getProperty().startsWith(imageGroupAlias + "."))
-            .map(x -> x.getSql())
+            .map(SearchParameterEntry::getSql)
             .collect(Collectors.joining(" AND "));
 
         if (blindedNameSearch != null) {

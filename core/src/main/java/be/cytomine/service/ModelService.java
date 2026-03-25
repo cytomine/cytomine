@@ -552,9 +552,9 @@ public abstract class ModelService<T extends CytomineDomain> {
         List<JsonObject> result = new ArrayList();
         List errors = new ArrayList();
         JsonObject resp;
-        for (int i = 0; i < json.size(); i++) {
+        for (JsonObject jsonObject : json) {
             try {
-                CommandResponse commandResponse = addOne(json.get(i));
+                CommandResponse commandResponse = addOne(jsonObject);
 
                 String objectName;
                 if (currentDomain() == UserAnnotation.class) {
@@ -570,7 +570,7 @@ public abstract class ModelService<T extends CytomineDomain> {
                 );
             } catch (CytomineException e) {
                 log.info(((CytomineException) e).getMessage());
-                errors.add(JsonObject.of("data", json.get(i), "message", e.msg));
+                errors.add(JsonObject.of("data", jsonObject, "message", e.msg));
                 resp = JsonObject.of("message", e.msg, "status", e.code);
             } catch (Exception e) {
                 log.info(e.toString());

@@ -23,7 +23,6 @@ import be.cytomine.common.repository.model.UpdateTerm;
 import be.cytomine.common.repository.model.command.HttpCommandResponse;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(classes = RepositoryApp.class)
@@ -42,10 +41,11 @@ class TermControllerTest {
 
     private Long ontologyId;
     private Long projectId;
+    private Long userId;
 
     @BeforeEach
     void setUp() {
-        Long userId =
+        userId =
             jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
         jdbcTemplate.update(
             "INSERT INTO sec_user (id, version, username) VALUES (?, 0, 'admin')", userId);
@@ -97,7 +97,7 @@ class TermControllerTest {
     void createSavesAndReturnsTerm() {
         CreateTerm createTerm = new CreateTerm("newTerm", "#00FF00", ontologyId, null, null, null);
 
-        Optional<HttpCommandResponse<TermResponse>> result = termController.create(createTerm);
+        Optional<HttpCommandResponse<TermResponse>> result = termController.create(userId, createTerm);
 
         assertEquals("newTerm", result.get().data().name());
         assertEquals("#00FF00", result.get().data().color());
@@ -109,7 +109,8 @@ class TermControllerTest {
         TermEntity entity = createAndSaveTermEntity("oldName", "#FF0000");
         UpdateTerm updateTerm = new UpdateTerm(Optional.of("newName"), Optional.of("#00FF00"));
 
-        Optional<HttpCommandResponse<TermResponse>> result = termController.update(entity.getId(), updateTerm);
+        Optional<HttpCommandResponse<TermResponse>> result = termController.update(entity.getId()
+            , 0, updateTerm);
 
         assertEquals("newName", result.get().data().name());
         assertEquals("#00FF00", result.get().data().color());
@@ -119,7 +120,7 @@ class TermControllerTest {
     void updateWhenNotExistsThrowsException() {
         UpdateTerm updateTerm = new UpdateTerm(Optional.of("newName"), Optional.empty());
 
-        assertThrows(RuntimeException.class, () -> termController.update(999L, updateTerm));
+        assertEquals(Optional.empty(), termController.update(999L, 0, updateTerm));
     }
 
     @Test

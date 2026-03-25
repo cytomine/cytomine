@@ -1,8 +1,8 @@
 package be.cytomine.common.repository.model.command.update;
 
-public sealed interface UpdateCommandRequest permits UpdateTermCommand {
+public sealed interface UpdateCommandRequest<T> permits UpdateTermCommand {
 
-    String data();
+    T data();
 
     Long userId();
 

@@ -34,4 +34,6 @@ public interface OntologyMapper {
     @Mapping(target = "ontology", source = "ontologyId")
     @Mapping(target = "parent", ignore = true)
     TermCommandPayload mapToTermCommandPayload(TermEntity termEntity);
+
+
 }

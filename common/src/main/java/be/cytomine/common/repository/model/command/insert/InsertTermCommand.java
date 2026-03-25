@@ -1,10 +1,12 @@
 package be.cytomine.common.repository.model.command.insert;
 
+import be.cytomine.common.repository.model.command.TermCommandPayload;
+
 public record InsertTermCommand(
-    String data,
+    TermCommandPayload data,
     Long userId,
     Long projectId
-) implements InsertCommandRequest {
+) implements InsertCommandRequest<TermCommandPayload> {
 
     public static final String SERVICE_NAME = "TermService";
 

@@ -1,10 +1,13 @@
 package be.cytomine.common.repository.model.command.update;
 
+import be.cytomine.common.repository.model.command.TermCommandPayload;
+
 public record UpdateTermCommand(
-    String data,
+    Long id,
+    TermCommandPayload data,
     Long userId,
     Long projectId
-) implements UpdateCommandRequest {
+) implements UpdateCommandRequest<TermCommandPayload> {
 
     public static final String SERVICE_NAME = "TermService";
 

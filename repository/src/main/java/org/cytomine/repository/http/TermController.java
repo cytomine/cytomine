@@ -2,13 +2,6 @@ package org.cytomine.repository.http;
 
 import java.util.Optional;
 
-import static be.cytomine.common.repository.http.TermHttpContract.ROOT_PATH;
-
-import be.cytomine.common.repository.http.TermHttpContract;
-import be.cytomine.common.repository.model.CreateTerm;
-import be.cytomine.common.repository.model.TermResponse;
-import be.cytomine.common.repository.model.UpdateTerm;
-import be.cytomine.common.repository.model.command.HttpCommandResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.cytomine.repository.mapper.OntologyMapper;
@@ -25,6 +18,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import be.cytomine.common.repository.http.TermHttpContract;
+import be.cytomine.common.repository.model.CreateTerm;
+import be.cytomine.common.repository.model.TermResponse;
+import be.cytomine.common.repository.model.UpdateTerm;
+import be.cytomine.common.repository.model.command.HttpCommandResponse;
+
+import static be.cytomine.common.repository.http.TermHttpContract.ROOT_PATH;
 
 
 @RequiredArgsConstructor
@@ -49,20 +50,23 @@ public class TermController implements TermHttpContract {
 
     @Override
     @PostMapping
-    public Optional<HttpCommandResponse<TermResponse>> create(@RequestBody CreateTerm createTerm) {
-        return termCommandService.createTerm(createTerm);
+    public Optional<HttpCommandResponse<TermResponse>> create(@RequestParam long userId,@RequestBody CreateTerm createTerm) {
+        return termCommandService.createTerm(userId,createTerm);
     }
 
     @Override
     @PutMapping("/{id}")
-    public Optional<HttpCommandResponse<TermResponse>> update(@PathVariable long id, @RequestBody UpdateTerm updateTerm) {
-      return termCommandService.updateTerm(id, updateTerm);
+    public Optional<HttpCommandResponse<TermResponse>> update(@PathVariable long id,
+                                                              @RequestParam long userId,
+                                                              @RequestBody UpdateTerm updateTerm) {
+        return termCommandService.updateTerm(id, userId, updateTerm);
     }
 
     @Override
     @DeleteMapping("/{id}")
     @Transactional
-    public Optional<HttpCommandResponse<TermResponse>> delete(@PathVariable long id, @RequestParam long userId) {
+    public Optional<HttpCommandResponse<TermResponse>> delete(@PathVariable long id,
+                                                              @RequestParam long userId) {
         return termCommandService.deleteTerm(id, userId);
     }
 

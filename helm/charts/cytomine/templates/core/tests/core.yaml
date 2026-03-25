@@ -68,17 +68,21 @@ spec:
           drop: [ "ALL" ]
       resources:
         requests:
-          memory: "2Gi"
-          cpu: "1"
-        limits:
           memory: "4Gi"
           cpu: "2"
+        limits:
+          memory: "8Gi"
+          cpu: "4"
       volumeMounts:
         - name: tmp
           mountPath: /tmp
       env:
         - name: SE_NODE_MAX_SESSIONS
-          value: "30"
+          value: "8"
+        - name: SE_SESSION_REQUEST_TIMEOUT
+          value: "300"
+        - name: SE_SESSION_RETRY_INTERVAL
+          value: "5"
         - name: SE_DRAIN_AFTER_SESSION_COUNT
           value: {{ .Values.test.e2eTestCount | quote }}
       ports:

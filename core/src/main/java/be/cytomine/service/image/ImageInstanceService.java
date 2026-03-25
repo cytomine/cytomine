@@ -389,15 +389,11 @@ public class ImageInstanceService extends ModelService {
             false
         );
 
-        validatedSearchParameters.stream().filter(x -> !x.getProperty().contains(".")).forEach(searchParameterEntry -> {
-            searchParameterEntry.setProperty(imageInstanceAlias + "." + searchParameterEntry.getProperty());
-        });
+        validatedSearchParameters.stream().filter(x -> !x.getProperty().contains(".")).forEach(searchParameterEntry -> searchParameterEntry.setProperty(imageInstanceAlias + "." + searchParameterEntry.getProperty()));
 
         validatedSearchParameters.stream()
             .filter(x -> x.getProperty().equals("ui.instanceFilename"))
-            .forEach(searchParameterEntry -> {
-                searchParameterEntry.setProperty("name");
-            });
+            .forEach(searchParameterEntry -> searchParameterEntry.setProperty("name"));
 
 
         final String finalSortedProperty = sortedProperty;
@@ -633,9 +629,7 @@ public class ImageInstanceService extends ModelService {
             project.getBlindMode()
         );
 
-        validatedSearchParameters.stream().filter(x -> !x.getProperty().contains(".")).forEach(searchParameterEntry -> {
-            searchParameterEntry.setProperty(imageInstanceAlias + "." + searchParameterEntry.getProperty());
-        });
+        validatedSearchParameters.stream().filter(x -> !x.getProperty().contains(".")).forEach(searchParameterEntry -> searchParameterEntry.setProperty(imageInstanceAlias + "." + searchParameterEntry.getProperty()));
 
         SearchParameterEntry blindedNameSearch = null;
         boolean manager = false;

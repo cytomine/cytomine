@@ -494,9 +494,7 @@ public abstract class ModelService<T extends CytomineDomain> {
         CytomineDomain domain, Transaction transaction,
         Task task
     ) {
-        descriptionService.findByDomain(domain).ifPresent(description -> {
-            descriptionService.delete(description, transaction, task, false);
-        });
+        descriptionService.findByDomain(domain).ifPresent(description -> descriptionService.delete(description, transaction, task, false));
     }
 
     protected void deleteDependentAttachedFile(

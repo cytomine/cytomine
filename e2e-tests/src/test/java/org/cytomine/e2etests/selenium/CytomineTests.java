@@ -88,6 +88,12 @@ public class CytomineTests {
     }
 
     @Test
+    void logout() {
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        cytomineSteps.logout(wait, cytomineUrl);
+    }
+
+    @Test
     void createAndDeleteProject() {
         String projectName = "selenium-" + randomUUID();
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
@@ -97,6 +103,7 @@ public class CytomineTests {
         if (ontologyURL != null) {
             cytomineSteps.deleteOntology(wait, ontologyURL);
         }
+        cytomineSteps.logout(wait, cytomineUrl);
     }
 
     @Test
@@ -123,6 +130,7 @@ public class CytomineTests {
                     return projectURL;
                 })
                 .collect(toSet());
+        cytomineSteps.logout(wait, cytomineUrl);
     }
 
     @Test
@@ -131,6 +139,7 @@ public class CytomineTests {
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
         String ontologyURL = cytomineSteps.createOntology(wait, driver, cytomineUrl, ontologyName);
         cytomineSteps.deleteOntology(wait, ontologyURL);
+        cytomineSteps.logout(wait, cytomineUrl);
     }
 
     @Test
@@ -138,6 +147,7 @@ public class CytomineTests {
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
         String imageName = cytomineSteps.addImage(wait, cytomineUrl, Optional.empty());
         cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
+        cytomineSteps.logout(wait, cytomineUrl);
     }
 
     @Test
@@ -148,6 +158,7 @@ public class CytomineTests {
         String imageName = cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName));
         cytomineSteps.deleteProject(wait, projectURL);
         cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
+        cytomineSteps.logout(wait, cytomineUrl);
     }
 
     @Test
@@ -159,6 +170,7 @@ public class CytomineTests {
         cytomineSteps.addTermToOntology(wait, driver, ontologyURL, termName);
         cytomineSteps.deleteTermFromOntology(wait, ontologyURL, termName);
         cytomineSteps.deleteOntology(wait, ontologyURL);
+        cytomineSteps.logout(wait, cytomineUrl);
     }
 
     @Test
@@ -192,6 +204,7 @@ public class CytomineTests {
 
         cytomineSteps.deleteProject(wait, projectURL);
         cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
+        cytomineSteps.logout(wait, cytomineUrl);
     }
 
     @Test
@@ -205,12 +218,15 @@ public class CytomineTests {
         cytomineSteps.addTermToOntology(wait, driver, ontologyURL, termName);
         String imageName = cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName));
         cytomineSteps.openImageInViewer(wait, projectURL);
+
         cytomineSteps.selectTermForAnnotation(wait, termName);
         annotationTools.drawRectangleAnnotation(wait, driver);
         cytomineSteps.verifyAnnotationCreated(wait);
+
         cytomineSteps.deleteProject(wait, projectURL);
         cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
         cytomineSteps.deleteOntology(wait, ontologyURL);
+        cytomineSteps.logout(wait, cytomineUrl);
     }
 
     @Test
@@ -232,14 +248,18 @@ public class CytomineTests {
         cytomineSteps.deleteProject(wait, projectURL);
         cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
         cytomineSteps.deleteOntology(wait, ontologyURL);
+        cytomineSteps.logout(wait, cytomineUrl);
     }
 
     @Test
     void uploadAndDeleteTask() {
         String zipName = "com.cytomine.dummy.identity.image-1.0.0.zip";
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+
         cytomineSteps.uploadTask(wait, cytomineUrl, zipName);
         cytomineSteps.deleteTask(wait, cytomineUrl, "identity with image");
+
+        cytomineSteps.logout(wait, cytomineUrl);
     }
 
     @Test
@@ -264,6 +284,7 @@ public class CytomineTests {
         cytomineSteps.deleteTask(wait, cytomineUrl, taskName);
         cytomineSteps.deleteProject(wait, projectUrl);
         cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
+        cytomineSteps.logout(wait, cytomineUrl);
     }
 
     @Test
@@ -290,5 +311,6 @@ public class CytomineTests {
         cytomineSteps.deleteProject(wait, projectURL);
         cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
         cytomineSteps.deleteOntology(wait, ontologyURL);
+        cytomineSteps.logout(wait, cytomineUrl);
     }
 }

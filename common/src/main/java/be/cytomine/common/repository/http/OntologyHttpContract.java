@@ -2,10 +2,11 @@ package be.cytomine.common.repository.http;
 
 import java.util.Optional;
 
-import be.cytomine.common.repository.model.OntologyResponse;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;
+
+import be.cytomine.common.repository.model.OntologyResponse;
 
 @HttpExchange(OntologyHttpContract.ROOT_PATH)
 public interface OntologyHttpContract {

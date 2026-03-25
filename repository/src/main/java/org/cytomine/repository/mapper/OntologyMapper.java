@@ -1,5 +1,7 @@
 package org.cytomine.repository.mapper;
 
+import java.util.Date;
+
 import be.cytomine.common.repository.model.CreateTerm;
 import be.cytomine.common.repository.model.OntologyResponse;
 import be.cytomine.common.repository.model.TermResponse;
@@ -16,17 +18,18 @@ public interface OntologyMapper {
     OntologyResponse map(OntologyEntity ontologyEntity);
 
     @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
-    @Mapping(target = "ontology", source = "ontologyId")
     TermResponse map(TermEntity termEntity);
 
 
     @Mapping(target = "children", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)
-    @Mapping(target = "name", source = "name")
-    @Mapping(target = "color", source = "color")
-    @Mapping(target = "ontologyId", source = "ontology")
-    TermEntity map(CreateTerm createTerm);
+    @Mapping(target = "name", source = "createTerm.name")
+    @Mapping(target = "color", source = "createTerm.color")
+    @Mapping(target = "ontologyId", source = "createTerm.ontology")
+    @Mapping(target = "created", source = "creationDate")
+    @Mapping(target = "updated", source = "creationDate")
+    TermEntity map(CreateTerm createTerm, Date creationDate);
 
     @BeanMapping(ignoreUnmappedSourceProperties = {"version", "children"})
     @Mapping(target = "ontology", source = "ontologyId")

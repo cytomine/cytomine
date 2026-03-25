@@ -1,5 +1,6 @@
 package org.cytomine.repository.service;
 
+import java.util.Date;
 import java.util.Optional;
 
 import be.cytomine.common.repository.model.CreateTerm;
@@ -41,7 +42,7 @@ public class TermCommandService {
 
     public Optional<HttpCommandResponse<TermResponse>> createTerm(Long userId,
                                                                   CreateTerm createTerm) {
-        TermEntity termEntity = ontologyMapper.map(createTerm);
+        TermEntity termEntity = ontologyMapper.map(createTerm, new Date());
         TermCommandPayload termCommandPayload = ontologyMapper.mapToTermCommandPayload(termEntity);
         InsertTermCommand insertTermCommand =
             new InsertTermCommand(termCommandPayload, userId, null);

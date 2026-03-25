@@ -263,7 +263,7 @@ public class BasicInstanceBuilder {
     }
 
     public CreateTerm given_a_not_persisted_create_term(Ontology ontology, String name) {
-        return new CreateTerm(name, "blue", ontology.getId(), new Date(), new Date(), "");
+        return new CreateTerm(name, "blue", ontology.getId(),  "");
     }
 
     public ImageFilterProject given_a_image_filter_project(ImageFilter imageFilter,

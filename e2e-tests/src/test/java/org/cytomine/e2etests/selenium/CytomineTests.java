@@ -328,6 +328,19 @@ public class CytomineTests {
     }
 
     @Test
+    void removeUserFromProject() {
+        String username = "ImageServer1";
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, "selenium-" + randomUUID());
+        cytomineSteps.addUserToProject(wait, projectUrl, username);
+
+        cytomineSteps.removeUserFromProject(wait, projectUrl, username);
+
+        cytomineSteps.deleteProject(wait, projectUrl);
+        cytomineSteps.logout(wait, cytomineUrl);
+    }
+
+    @Test
     void filterProjectByName() {
         int nbProjects = 3;
         String projectNameToSearch = "search-" + randomUUID();

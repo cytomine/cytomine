@@ -37,6 +37,13 @@ public class CytomineSteps {
         webDriverUtils.byIsDisplayed(wait, By.id("app"));
     }
 
+    public void logout(Wait<WebDriver> wait, URL cytomineUrl) {
+        webDriverUtils.goTo(wait, cytomineUrl.toString());
+        webDriverUtils.byClick(wait, By.cssSelector(".navbar-end .navbar-item.has-dropdown"));
+        webDriverUtils.byClick(wait, By.cssSelector(".navbar-item .fa-power-off"));
+        webDriverUtils.byIsDisplayed(wait, By.id("username"));
+    }
+
     @SneakyThrows
     public String createProject(Wait<WebDriver> wait, WebDriver driver, URL cytomineUrl, String projectName) {
         webDriverUtils.goTo(wait, cytomineUrl.toString());

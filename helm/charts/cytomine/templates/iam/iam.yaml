@@ -128,7 +128,7 @@ spec:
             memory: "1Gi"
             cpu: "500m"
           limits:
-            memory: "2Gi"
+            memory: "8Gi"
             cpu: "1000m"
         volumeMounts:
         - name: opt-keycloak

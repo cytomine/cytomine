@@ -458,7 +458,7 @@ public class SecurityACLService {
     }
 
     private static List<Field> getAllFields(Object obj) {
-        List<Field> fields = new ArrayList<Field>();
+        List<Field> fields = new ArrayList<>();
         getAllFieldsRecursive(fields, obj.getClass());
         return fields;
     }

@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WeakConcurrentHashMap<K, V> extends ConcurrentHashMap<K, V> {
     private static final long serialVersionUID = 1L;
 
-    private Map<K, Long> timeMap = new ConcurrentHashMap<K, Long>();
+    private Map<K, Long> timeMap = new ConcurrentHashMap<>();
     private long expiryInMillis = 1000;
 
     public WeakConcurrentHashMap() {

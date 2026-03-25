@@ -30,7 +30,7 @@ public class AuthenticationException extends CytomineException {
      * @param message Message
      */
     public AuthenticationException(String message) {
-        this(message, new LinkedHashMap<Object, Object>());
+        this(message, new LinkedHashMap<>());
     }
 
     public AuthenticationException(String message, Map<Object, Object> values) {

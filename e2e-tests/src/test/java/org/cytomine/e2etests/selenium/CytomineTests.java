@@ -200,7 +200,7 @@ public class CytomineTests {
         String ontologyURL = cytomineSteps.getOntologyUrlFromProject(wait, projectURL);
         cytomineSteps.addTermToOntology(wait, driver, ontologyURL, termName);
         String imageName = cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName));
-        cytomineSteps.openImageInViewer(wait, driver, projectURL);
+        cytomineSteps.openImageInViewer(wait, projectURL);
         cytomineSteps.selectTermForAnnotation(wait, termName);
         cytomineSteps.drawRectangleAnnotation(wait, driver);
         cytomineSteps.verifyAnnotationCreated(wait);
@@ -219,7 +219,7 @@ public class CytomineTests {
         String ontologyURL = cytomineSteps.getOntologyUrlFromProject(wait, projectURL);
         cytomineSteps.addTermToOntology(wait, driver, ontologyURL, termName);
         String imageName = cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName));
-        cytomineSteps.openImageInViewer(wait, driver, projectURL);
+        cytomineSteps.openImageInViewer(wait, projectURL);
         cytomineSteps.selectTermForAnnotation(wait, termName);
 
         cytomineSteps.drawRectangleAnnotationWithMagicWand(wait, driver);
@@ -249,7 +249,7 @@ public class CytomineTests {
         cytomineSteps.uploadTask(wait, cytomineUrl, zipName);
         String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
         String imageName = cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName));
-        cytomineSteps.openImageInViewer(wait, driver, projectUrl);
+        cytomineSteps.openImageInViewer(wait, projectUrl);
         cytomineSteps.drawRectangleAnnotation(wait, driver);
         cytomineSteps.verifyAnnotationCreated(wait);
 
@@ -273,7 +273,7 @@ public class CytomineTests {
         String ontologyURL = cytomineSteps.getOntologyUrlFromProject(wait, projectURL);
         cytomineSteps.addTermToOntology(wait, driver, ontologyURL, termName);
         String imageName = cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName));
-        cytomineSteps.openImageInViewer(wait, driver, projectURL);
+        cytomineSteps.openImageInViewer(wait, projectURL);
         cytomineSteps.selectTermForAnnotation(wait, termName);
 
         for (int i = 0; i < nbAnnotations; i++) {

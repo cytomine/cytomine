@@ -12,6 +12,7 @@ import java.util.Set;
 
 import lombok.SneakyThrows;
 import org.cytomine.e2etests.configuration.SeleniumDriver;
+import org.cytomine.e2etests.ui.AnnotationTools;
 import org.cytomine.e2etests.ui.CytomineSteps;
 import org.cytomine.e2etests.ui.WebDriverUtils;
 import org.junit.jupiter.api.AfterEach;
@@ -35,7 +36,7 @@ import static java.util.UUID.randomUUID;
 import static java.util.stream.Collectors.toSet;
 import static org.openqa.selenium.OutputType.FILE;
 
-@Import({SeleniumDriver.class, CytomineSteps.class, WebDriverUtils.class})
+@Import({SeleniumDriver.class, AnnotationTools.class, CytomineSteps.class, WebDriverUtils.class})
 @SpringBootTest
 public class CytomineTests {
     @Autowired
@@ -51,6 +52,9 @@ public class CytomineTests {
 
     @Value("${cytomine.admin.password}")
     String adminPassword;
+
+    @Autowired
+    AnnotationTools annotationTools;
 
     @Autowired
     CytomineSteps cytomineSteps;
@@ -158,6 +162,39 @@ public class CytomineTests {
     }
 
     @Test
+    void addAnnotationWithTools() {
+        String projectName = "selenium-" + randomUUID();
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        String projectURL = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
+        String imageName = cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName));
+        cytomineSteps.openImageInViewer(wait, projectURL);
+
+        annotationTools.drawPointAnnotation(wait, driver);
+        cytomineSteps.verifyAnnotationCreated(wait);
+
+        annotationTools.drawLineAnnotation(wait, driver);
+        cytomineSteps.verifyAnnotationCreated(wait);
+
+        annotationTools.drawFreeHandLineAnnotation(wait, driver);
+        cytomineSteps.verifyAnnotationCreated(wait);
+
+        annotationTools.drawRectangleAnnotation(wait, driver);
+        cytomineSteps.verifyAnnotationCreated(wait);
+
+        annotationTools.drawCircleAnnotation(wait, driver);
+        cytomineSteps.verifyAnnotationCreated(wait);
+
+        annotationTools.drawPolygonAnnotation(wait, driver);
+        cytomineSteps.verifyAnnotationCreated(wait);
+
+        annotationTools.drawFreeHandPolygonAnnotation(wait, driver);
+        cytomineSteps.verifyAnnotationCreated(wait);
+
+        cytomineSteps.deleteProject(wait, projectURL);
+        cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
+    }
+
+    @Test
     void addAnnotationWithTerm() {
         String projectName = "selenium-" + randomUUID();
         String termName = "selenium-term-" + randomUUID();
@@ -169,7 +206,7 @@ public class CytomineTests {
         String imageName = cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName));
         cytomineSteps.openImageInViewer(wait, projectURL);
         cytomineSteps.selectTermForAnnotation(wait, termName);
-        cytomineSteps.drawRectangleAnnotation(wait, driver);
+        annotationTools.drawRectangleAnnotation(wait, driver);
         cytomineSteps.verifyAnnotationCreated(wait);
         cytomineSteps.deleteProject(wait, projectURL);
         cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
@@ -189,7 +226,7 @@ public class CytomineTests {
         cytomineSteps.openImageInViewer(wait, projectURL);
         cytomineSteps.selectTermForAnnotation(wait, termName);
 
-        cytomineSteps.drawRectangleAnnotationWithMagicWand(wait, driver);
+        annotationTools.drawRectangleAnnotationWithMagicWand(wait, driver);
         cytomineSteps.verifyAnnotationProcessedWithSam(wait);
 
         cytomineSteps.deleteProject(wait, projectURL);
@@ -217,7 +254,7 @@ public class CytomineTests {
         String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
         String imageName = cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName));
         cytomineSteps.openImageInViewer(wait, projectUrl);
-        cytomineSteps.drawRectangleAnnotation(wait, driver);
+        annotationTools.drawRectangleAnnotation(wait, driver);
         cytomineSteps.verifyAnnotationCreated(wait);
 
         cytomineSteps.selectTask(wait, taskName, taskVersion);
@@ -244,7 +281,7 @@ public class CytomineTests {
         cytomineSteps.selectTermForAnnotation(wait, termName);
 
         for (int i = 0; i < nbAnnotations; i++) {
-            cytomineSteps.drawRandomRectangleAnnotation(wait, driver);
+            annotationTools.drawRandomRectangleAnnotation(wait, driver);
             cytomineSteps.verifyAnnotationCreated(wait);
         }
 

@@ -115,8 +115,8 @@ public class GeometryUtils {
         }
 
         List<String> filledPolygon = new ArrayList<>();
-        for (int i = 0; i < fixedPolygon.size(); i++) {
-            filledPolygon.add("(" + getFirstPolygonLocation(fixedPolygon.get(i)) + ")");
+        for (String s : fixedPolygon) {
+            filledPolygon.add("(" + getFirstPolygonLocation(s) + ")");
             //"[ ((1 1,5 1,5 5,1 5,1 1))] [((1 1,5 1,5 5,1 5,1 1))] [((6 3,9 2,9 4,6 3)) ]";
         }
 

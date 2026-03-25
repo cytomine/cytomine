@@ -55,7 +55,8 @@ public class TermController {
     public Optional<HttpCommandResponse<TermResponse>> update(@PathVariable Long id,
                                                               @RequestBody UpdateTerm updateTerm) {
         long userId = currentUserService.getCurrentUser().getId();
-        return termHttpContract.update(userId, id, updateTerm);
+
+        return termHttpContract.update(id, userId, updateTerm);
     }
 
     @DeleteMapping("term/{id}.json")

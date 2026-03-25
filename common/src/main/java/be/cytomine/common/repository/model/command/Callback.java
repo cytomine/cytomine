@@ -1,4 +1,7 @@
 package be.cytomine.common.repository.model.command;
 
-public record Callback(String method, long termID,long ontologyID) {
+import java.util.Optional;
+
+public record Callback(String method, Optional<Long> termId, Optional<Long> ontologyId,
+                       Optional<Long> projectId) {
 }

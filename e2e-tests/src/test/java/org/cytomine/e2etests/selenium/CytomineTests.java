@@ -313,4 +313,15 @@ public class CytomineTests {
         cytomineSteps.deleteOntology(wait, ontologyURL);
         cytomineSteps.logout(wait, cytomineUrl);
     }
+
+    @Test
+    void addUserToProject() {
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, "selenium-" + randomUUID());
+
+        cytomineSteps.addUserToProject(wait, projectUrl, "ImageServer1");
+
+        cytomineSteps.deleteProject(wait, projectUrl);
+        cytomineSteps.logout(wait, cytomineUrl);
+    }
 }

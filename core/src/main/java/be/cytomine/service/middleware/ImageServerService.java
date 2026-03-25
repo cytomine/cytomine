@@ -236,9 +236,7 @@ public class ImageServerService {
         restTemplate.execute(
             url,
             HttpMethod.GET,
-            clientHttpRequest -> {
-                clientHttpRequest.getHeaders().setContentType(MediaType.APPLICATION_JSON);
-            },
+            clientHttpRequest -> clientHttpRequest.getHeaders().setContentType(MediaType.APPLICATION_JSON),
             clientHttpResponse -> {
                 try (InputStream inputStream = clientHttpResponse.getBody()) {
                     byte[] buffer = new byte[8192];
@@ -696,9 +694,7 @@ public class ImageServerService {
                 annot.put("stroke_width", params.getThickness());
             });
         } else if (params.getMask() != null && params.getMask()) {
-            annotations.forEach(annot -> {
-                annot.put("fill_color", "#fff");
-            });
+            annotations.forEach(annot -> annot.put("fill_color", "#fff"));
         } else if (params.getAlphaMask() != null && params.getAlphaMask()) {
             body.put(
                 "background_transparency",

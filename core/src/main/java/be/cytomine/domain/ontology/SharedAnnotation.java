@@ -131,7 +131,7 @@ public class SharedAnnotation extends CytomineDomain implements Serializable {
 
         returnArray.put(
             "receivers",
-            sharedAnnotation.receivers.stream().map(x -> x.getId()).collect(Collectors.toList())
+            sharedAnnotation.receivers.stream().map(CytomineDomain::getId).collect(Collectors.toList())
         );
         return returnArray;
     }

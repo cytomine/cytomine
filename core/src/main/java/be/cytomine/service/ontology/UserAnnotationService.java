@@ -428,7 +428,7 @@ public class UserAnnotationService extends ModelService {
             );
             ((Map<String, Object>) commandResponse.getData().get("annotation")).put(
                 "track",
-                annotationTracks.stream().map(x -> x.getTrack()).collect(Collectors.toList())
+                annotationTracks.stream().map(AnnotationTrack::getTrack).collect(Collectors.toList())
             );
         }
 

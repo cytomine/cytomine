@@ -44,7 +44,7 @@ public class ParamsService {
         if (paramsUsers != null && !paramsUsers.equals("null")) {
             if (!paramsUsers.equals("")) {
                 List<Long> userIdsFromParams = Arrays.stream(paramsUsers.split(paramsUsers.contains("_") ? "_" : ","))
-                    .map(x -> Long.parseLong(x))
+                    .map(Long::parseLong)
                     .collect(Collectors.toList());
                 return userRepository.findAllAllowedUserIdList(project.getId())
                     .stream()
@@ -68,7 +68,7 @@ public class ParamsService {
         if (paramsImages != null && !paramsImages.equals("null")) {
             if (!paramsImages.equals("")) {
                 List<Long> userIdsFromParams = Arrays.stream(paramsImages.split(paramsImages.contains("_") ? "_" : ","))
-                    .map(x -> Long.parseLong(x))
+                    .map(Long::parseLong)
                     .collect(Collectors.toList());
                 return imageInstanceService.getAllImageId(project)
                     .stream()
@@ -91,7 +91,7 @@ public class ParamsService {
         if (paramsTerms != null && !paramsTerms.equals("null")) {
             if (!paramsTerms.equals("")) {
                 List<Long> termsIdsFromParams = Arrays.stream(paramsTerms.split(paramsTerms.contains("_") ? "_" : ","))
-                    .map(x -> Long.parseLong(x))
+                    .map(Long::parseLong)
                     .collect(Collectors.toList());
                 return termService.getAllTermId(project)
                     .stream()

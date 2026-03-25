@@ -2,6 +2,13 @@ package org.cytomine.repository.http;
 
 import java.util.Optional;
 
+import static be.cytomine.common.repository.http.TermHttpContract.ROOT_PATH;
+
+import be.cytomine.common.repository.http.TermHttpContract;
+import be.cytomine.common.repository.model.CreateTerm;
+import be.cytomine.common.repository.model.TermResponse;
+import be.cytomine.common.repository.model.UpdateTerm;
+import be.cytomine.common.repository.model.command.HttpCommandResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.cytomine.repository.mapper.OntologyMapper;
@@ -18,14 +25,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import be.cytomine.common.repository.http.TermHttpContract;
-import be.cytomine.common.repository.model.CreateTerm;
-import be.cytomine.common.repository.model.TermResponse;
-import be.cytomine.common.repository.model.UpdateTerm;
-import be.cytomine.common.repository.model.command.HttpCommandResponse;
-
-import static be.cytomine.common.repository.http.TermHttpContract.ROOT_PATH;
 
 
 @RequiredArgsConstructor
@@ -50,8 +49,9 @@ public class TermController implements TermHttpContract {
 
     @Override
     @PostMapping
-    public Optional<HttpCommandResponse<TermResponse>> create(@RequestParam long userId,@RequestBody CreateTerm createTerm) {
-        return termCommandService.createTerm(userId,createTerm);
+    public Optional<HttpCommandResponse<TermResponse>> create(@RequestParam long userId,
+                                                              @RequestBody CreateTerm createTerm) {
+        return termCommandService.createTerm(userId, createTerm);
     }
 
     @Override

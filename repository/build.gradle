@@ -58,8 +58,8 @@ test {
 
 compileJava {
     options.compilerArgs += [
-        '-Amapstruct.unmappedTargetPolicy=ERROR',
-        '-Amapstruct.unmappedSourcePolicy=ERROR'
+            '-Amapstruct.unmappedTargetPolicy=ERROR',
+            '-Amapstruct.unmappedSourcePolicy=ERROR'
     ]
 }
 

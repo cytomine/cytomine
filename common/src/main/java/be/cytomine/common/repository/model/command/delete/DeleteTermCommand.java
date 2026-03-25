@@ -1,6 +1,5 @@
 package be.cytomine.common.repository.model.command.delete;
 
-import be.cytomine.common.repository.model.TermResponse;
 import be.cytomine.common.repository.model.command.TermCommandPayload;
 
 public record DeleteTermCommand(

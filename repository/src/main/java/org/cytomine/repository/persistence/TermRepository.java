@@ -10,8 +10,10 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface TermRepository extends JpaRepository<TermEntity, Long> {
 
-    @Query(value = "SELECT t.* FROM term t JOIN project p ON t.ontology_id = p.ontology_id WHERE p.id = :id",
-        countQuery = "SELECT count(*) FROM term t JOIN project p ON t.ontology_id = p.ontology_id WHERE p.id = :id",
+    @Query(value = "SELECT t.* FROM term t JOIN project p ON t.ontology_id = p.ontology_id WHERE "
+                       + "p.id = :id",
+        countQuery = "SELECT count(*) FROM term t JOIN project p ON t.ontology_id = p.ontology_id"
+                         + " WHERE p.id = :id",
         nativeQuery = true)
     Page<TermEntity> findAllByProjectId(long id, Pageable pageable);
 

@@ -25,21 +25,25 @@ public class CommandService {
     public CommandEntity delete(DeleteCommandRequest request) {
         Date now = new Date();
         return commandRepository.save(
-            new CommandEntity(null, null, now, now, DELETE_COMMAND, objectMapper.writeValueAsString(request.data()),
-                request.userId(), null, request.projectId(), true, null, true, request.serviceName(), false));
+            new CommandEntity(null, null, now, now, DELETE_COMMAND,
+                objectMapper.writeValueAsString(request.data()),
+                request.userId(), null, request.projectId(), true, null, true,
+                request.serviceName(), false));
     }
 
     public CommandEntity update(UpdateCommandRequest request) {
         Date now = new Date();
         return commandRepository.save(
-            new CommandEntity(null, null, now, now, EDIT_COMMAND, objectMapper.writeValueAsString(request.data()), request.userId(), null,
+            new CommandEntity(null, null, now, now, EDIT_COMMAND,
+                objectMapper.writeValueAsString(request.data()), request.userId(), null,
                 request.projectId(), true, null, true, request.serviceName(), false));
     }
 
     public CommandEntity insert(InsertCommandRequest request) {
         Date now = new Date();
         return commandRepository.save(
-            new CommandEntity(null, null, now, now, ADD_COMMAND, objectMapper.writeValueAsString(request.data()), request.userId(), null,
+            new CommandEntity(null, null, now, now, ADD_COMMAND,
+                objectMapper.writeValueAsString(request.data()), request.userId(), null,
                 request.projectId(), true, null, true, request.serviceName(), false));
     }
 }

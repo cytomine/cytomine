@@ -38,7 +38,7 @@ You do not need our permission to start working on an issue labeled as suitable 
 
 3. Under "**Owner**", select the dropdown menu and click an owner for the forked repository.
 
-    > :bulb: By default, it is your personal account that is set as owner. 
+    > :bulb: By default, it is your personal account that is set as owner.
 
 4. Click on **Create fork**.
 
@@ -143,5 +143,18 @@ We follow the [Conventional Commit](https://www.conventionalcommits.org/en/v1.0.
     > :warning: It is the responsability of the contributor to ensure that all the CI checks pass!
 
     After the approval and passing CI, your contribution will be merged.
+
+6. CheckStyle Intellij Note
+
+    When using idea with the checkstyle plugin, the imports are not always the right order. The
+   order is:
+    - import javax.*
+    - import java.*
+    - <blank line>
+    - import all other imports
+    - <blank line>
+    - import be.cytomine.*
+    - <blank line>
+    - import static all other imports
 
 Thank you for helping make Cytomine even better!

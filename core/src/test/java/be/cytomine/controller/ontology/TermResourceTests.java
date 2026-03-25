@@ -84,7 +84,7 @@ public class TermResourceTests {
         restTermControllerMockMvc.perform(get("/api/term.json"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
-            .andExpect(jsonPath("$.collection[?(@.name=='" + term.getName() + "')].ontology")
+            .andExpect(jsonPath("$.collection[?(@.name=='" + term.getName() + "')].ontologyId")
                            .value(term.getOntology().getId().intValue()));
     }
 
@@ -102,7 +102,7 @@ public class TermResourceTests {
             .andExpect(jsonPath("$.id").value(term.getId().intValue()))
             .andExpect(jsonPath("$.color").value(term.getColor()))
             .andExpect(jsonPath("$.created").isNotEmpty())
-            .andExpect(jsonPath("$.ontology").value(term.getOntology().getId().intValue()));
+            .andExpect(jsonPath("$.ontologyId").value(term.getOntology().getId().intValue()));
     }
 
     @Test
@@ -117,7 +117,7 @@ public class TermResourceTests {
         restTermControllerMockMvc.perform(get("/api/ontology/{id}/term.json", term.getOntology().getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
-            .andExpect(jsonPath("$.collection[?(@.name=='" + term.getName() + "')].ontology")
+            .andExpect(jsonPath("$.collection[?(@.name=='" + term.getName() + "')].ontologyId")
                            .value(term.getOntology().getId().intValue()));
     }
 
@@ -134,7 +134,7 @@ public class TermResourceTests {
         restTermControllerMockMvc.perform(get("/api/project/{id}/term.json", project.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
-            .andExpect(jsonPath("$.collection[?(@.name=='" + term.getName() + "')].ontology")
+            .andExpect(jsonPath("$.collection[?(@.name=='" + term.getName() + "')].ontologyId")
                            .value(term.getOntology().getId().intValue()));
     }
 

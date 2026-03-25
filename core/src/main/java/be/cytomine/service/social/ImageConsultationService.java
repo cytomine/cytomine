@@ -117,7 +117,7 @@ public class ImageConsultationService {
         ).stream().findFirst();
 
 
-        consultation.setProjectConnection(persistentImageConsultation.map(x -> x.getId()).orElse(null));
+        consultation.setProjectConnection(persistentImageConsultation.map(PersistentProjectConnection::getId).orElse(null));
 
         consultation.setCreated(created);
         consultation.setSession(session);

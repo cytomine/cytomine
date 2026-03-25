@@ -413,17 +413,17 @@ public class ImageInstanceService extends ModelService {
         String imageInstanceCondition = sqlSearchConditions.getData()
             .stream()
             .filter(x -> x.getProperty().startsWith(imageInstanceAlias + "."))
-            .map(x -> x.getSql())
+            .map(SearchParameterEntry::getSql)
             .collect(Collectors.joining(" AND "));
         String abstractImageCondition = sqlSearchConditions.getData()
             .stream()
             .filter(x -> x.getProperty().startsWith(abstractImageAlias + "."))
-            .map(x -> x.getSql())
+            .map(SearchParameterEntry::getSql)
             .collect(Collectors.joining(" AND "));
         String tagsCondition = sqlSearchConditions.getData()
             .stream()
             .filter(x -> x.getProperty().startsWith("tda."))
-            .map(x -> x.getSql())
+            .map(SearchParameterEntry::getSql)
             .collect(Collectors.joining(" AND "));
 
         String select;
@@ -658,27 +658,27 @@ public class ImageInstanceService extends ModelService {
         String imageInstanceCondition = sqlSearchConditions.getData()
             .stream()
             .filter(x -> x.getProperty().startsWith(imageInstanceAlias + "."))
-            .map(x -> x.getSql())
+            .map(SearchParameterEntry::getSql)
             .collect(Collectors.joining(" AND "));
         String abstractImageCondition = sqlSearchConditions.getData()
             .stream()
             .filter(x -> x.getProperty().startsWith(abstractImageAlias + "."))
-            .map(x -> x.getSql())
+            .map(SearchParameterEntry::getSql)
             .collect(Collectors.joining(" AND "));
         String mimeCondition = sqlSearchConditions.getData()
             .stream()
             .filter(x -> x.getProperty().startsWith(mimeAlias + "."))
-            .map(x -> x.getSql())
+            .map(SearchParameterEntry::getSql)
             .collect(Collectors.joining(" AND "));
         String tagsCondition = sqlSearchConditions.getData()
             .stream()
             .filter(x -> x.getProperty().startsWith("tda."))
-            .map(x -> x.getSql())
+            .map(SearchParameterEntry::getSql)
             .collect(Collectors.joining(" AND "));
         String imageGroupCondition = sqlSearchConditions.getData()
             .stream()
             .filter(x -> x.getProperty().startsWith(imageGroupAlias + "."))
-            .map(x -> x.getSql())
+            .map(SearchParameterEntry::getSql)
             .collect(Collectors.joining(" AND "));
 
         if (blindedNameSearch != null) {

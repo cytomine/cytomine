@@ -185,7 +185,7 @@ public class KmeansGeometryService {
 
 
     public int mustBeReduce(List<SliceInstance> slices, User user, Geometry bbox) {
-        List<ImageInstance> images = slices.stream().map(x -> x.getImage()).distinct().toList();
+        List<ImageInstance> images = slices.stream().map(SliceInstance::getImage).distinct().toList();
 
         if (images.size() != 1) {
             throw new WrongArgumentException("To use kmeans, all slices must belong to the same image.");

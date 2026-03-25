@@ -561,7 +561,7 @@ public class StatsService {
             PersistentProjectConnection.class
         );
         List<Date> createdDates = persistentProjectConnections.stream()
-            .map(x -> x.getCreated())
+            .map(PersistentProjectConnection::getCreated)
             .collect(Collectors.toList());
         return this.aggregateByPeriods(
             createdDates,
@@ -599,7 +599,7 @@ public class StatsService {
             PersistentImageConsultation.class
         );
         List<Date> createdDates = persistentProjectConnections.stream()
-            .map(x -> x.getCreated())
+            .map(PersistentImageConsultation::getCreated)
             .collect(Collectors.toList());
         return this.aggregateByPeriods(
             createdDates,
@@ -637,7 +637,7 @@ public class StatsService {
 
         List<AnnotationAction> persistentProjectConnections = mongoTemplate.find(query, AnnotationAction.class);
         List<Date> createdDates = persistentProjectConnections.stream()
-            .map(x -> x.getCreated())
+            .map(AnnotationAction::getCreated)
             .collect(Collectors.toList());
         return this.aggregateByPeriods(
             createdDates,

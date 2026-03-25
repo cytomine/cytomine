@@ -302,4 +302,8 @@ public class CytomineSteps {
         );
         webDriverUtils.byIsDisplayed(wait, By.xpath("//*[contains(text(),'" + username + "')]"));
     }
+
+    public void filterProjectByName(Wait<WebDriver> wait, URL cytomineUrl, String projectName) {
+        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/projects");
+    }
 }

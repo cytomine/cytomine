@@ -385,7 +385,10 @@ public class AbstractImageService extends ModelService {
                 "Abstract Image has instances in active projects : "
                     + instances.stream().map(x -> x.getProject().getName()).collect(Collectors.joining(","))
                     + " with the following names : "
-                    + instances.stream().map(ImageInstance::getInstanceFilename).distinct().collect(Collectors.joining(",")),
+                    + instances.stream()
+                    .map(ImageInstance::getInstanceFilename)
+                    .distinct()
+                    .collect(Collectors.joining(",")),
                 Map.of(
                     "projectNames",
                     instances.stream().map(x -> x.getProject().getName()).collect(Collectors.toList()),
@@ -394,8 +397,6 @@ public class AbstractImageService extends ModelService {
                 )
             );
         }
-
-
     }
 
     @Override

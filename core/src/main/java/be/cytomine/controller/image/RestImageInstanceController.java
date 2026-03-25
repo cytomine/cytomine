@@ -513,7 +513,10 @@ public class RestImageInstanceController extends RestCytomineController {
         ImageInstance imageinstance = imageInstanceService.find(id, authorization)
             .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", id));
 
-        StreamingResponseBody stream = outputStream -> imageServerService.streamDownload(imageinstance.getBaseImage(), outputStream);
+        StreamingResponseBody stream = outputStream -> imageServerService.streamDownload(
+            imageinstance.getBaseImage(),
+            outputStream
+        );
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);

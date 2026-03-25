@@ -136,30 +136,25 @@ public class AnnotationTools {
     @SneakyThrows
     public void drawPolygonAnnotation(Wait<WebDriver> wait, WebDriver driver) {
         selectDrawTool(wait, "fa-draw-polygon");
-
         WebElement mapCanvas = webDriverUtils.waitForCanvasReady(wait, By.cssSelector(".ol-viewport canvas"));
 
-        int canvasWidth = mapCanvas.getSize().getWidth();
-        int canvasHeight = mapCanvas.getSize().getHeight();
-        int startX = canvasWidth / 4;
-        int startY = canvasHeight / 4;
+        int w = mapCanvas.getSize().getWidth() / 6;
+        int h = mapCanvas.getSize().getHeight() / 6;
 
         int[][] points = {
-            {startX, startY},
-            {startX + 100, startY - 80},
-            {startX + 160, startY + 40},
-            {startX + 40, startY + 120},
-            {startX - 80, startY + 40},
+            {-w, -h},
+            {w / 2, -h},
+            {w, 0},
+            {w / 2, h},
+            {-w, h / 2},
         };
 
         Actions actions = new Actions(driver);
-        Actions chain = actions.moveToElement(mapCanvas, startX - canvasWidth / 2, startY - canvasHeight / 2)
-            .click();
+        Actions chain = actions.moveToElement(mapCanvas, points[0][0], points[0][1]).click();
         for (int i = 1; i < points.length; i++) {
-            chain = chain.moveToElement(mapCanvas, points[i][0] - canvasWidth / 2, points[i][1] - canvasHeight / 2)
-                .click();
+            chain = chain.moveToElement(mapCanvas, points[i][0], points[i][1]).click();
         }
-        chain.moveToElement(mapCanvas, points[0][0] - canvasWidth / 2, points[0][1] - canvasHeight / 2)
+        chain.moveToElement(mapCanvas, points[0][0], points[0][1])
             .click()
             .perform();
 
@@ -176,26 +171,23 @@ public class AnnotationTools {
 
         WebElement mapCanvas = webDriverUtils.waitForCanvasReady(wait, By.cssSelector(".ol-viewport canvas"));
 
-        int canvasWidth = mapCanvas.getSize().getWidth();
-        int canvasHeight = mapCanvas.getSize().getHeight();
-        int startX = canvasWidth / 4;
-        int startY = canvasHeight / 4;
+        int w = mapCanvas.getSize().getWidth() / 6;
+        int h = mapCanvas.getSize().getHeight() / 6;
 
         int[][] points = {
-            {startX, startY},
-            {startX + 100, startY - 80},
-            {startX + 160, startY + 40},
-            {startX + 40, startY + 120},
-            {startX - 80, startY + 40},
+            {-w, -h},
+            {w / 2, -h},
+            {w, 0},
+            {w / 2, h},
+            {-w, h / 2},
         };
 
         Actions actions = new Actions(driver);
-        actions.moveToElement(mapCanvas, points[0][0] - canvasWidth / 2, points[0][1] - canvasHeight / 2)
-            .clickAndHold();
+        actions.moveToElement(mapCanvas, points[0][0], points[0][1]).clickAndHold();
         for (int i = 1; i < points.length; i++) {
-            actions.moveToElement(mapCanvas, points[i][0] - canvasWidth / 2, points[i][1] - canvasHeight / 2);
+            actions.moveToElement(mapCanvas, points[i][0], points[i][1]);
         }
-        actions.moveToElement(mapCanvas, points[0][0] - canvasWidth / 2, points[0][1] - canvasHeight / 2)
+        actions.moveToElement(mapCanvas, points[0][0], points[0][1])
             .release()
             .perform();
 

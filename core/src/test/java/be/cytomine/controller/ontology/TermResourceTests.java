@@ -156,7 +156,7 @@ public class TermResourceTests {
                 new Callback("be.cytomine.DeleteTermCommand", term.getId(),
                     term.getOntology().getId()), true,
                 toTermResponse(term), -1);
-        when(termHttpContract.update(any(), any())).thenReturn(Optional.of(response));
+        when(termHttpContract.update(any(), any(),any())).thenReturn(Optional.of(response));
 
         restTermControllerMockMvc.perform(
                 post("/api/term.json").contentType(MediaType.APPLICATION_JSON).content(term.toJSON()))
@@ -185,7 +185,7 @@ public class TermResourceTests {
                 term1.getId(), term1.getOntology().getId()), true,
                 toTermResponse(term1), -1);
 
-        when(termHttpContract.create(any())).thenReturn(Optional.of(response));
+        when(termHttpContract.create(any(),any())).thenReturn(Optional.of(response));
 
         restTermControllerMockMvc.perform(
                 post("/api/term.json").contentType(MediaType.APPLICATION_JSON)
@@ -200,7 +200,7 @@ public class TermResourceTests {
     public void add_term_refused_if_already_exists() throws Exception {
         Term term = basicInstanceBuilder.given_a_not_persisted_term(builder.given_an_ontology());
         builder.persistAndReturn(term);
-        when(termHttpContract.create(any())).thenReturn(Optional.empty());
+        when(termHttpContract.create(any(),any())).thenReturn(Optional.empty());
 
         restTermControllerMockMvc.perform(
                 post("/api/term.json").contentType(MediaType.APPLICATION_JSON).content(term.toJSON()))
@@ -238,7 +238,7 @@ public class TermResourceTests {
                 new Callback("be.cytomine.DeleteTermCommand", term.getId(),
                     term.getOntology().getId()), true,
                 toTermResponse(term), -1);
-        when(termHttpContract.update(eq(term.getId()), any())).thenReturn(Optional.of(response));
+        when(termHttpContract.update(eq(term.getId()), any(),any())).thenReturn(Optional.of(response));
 
         restTermControllerMockMvc.perform(
                 put("/api/term/{id}.json", term.getId()).contentType(MediaType.APPLICATION_JSON)
@@ -262,7 +262,7 @@ public class TermResourceTests {
     @Test
     @Transactional
     public void edit_term_not_exists_fails() throws Exception {
-        when(termHttpContract.update(eq(0L), any())).thenReturn(null);
+        when(termHttpContract.update(eq(0L), any(),any())).thenReturn(null);
 
         restTermControllerMockMvc.perform(
                 put("/api/term/{id}.json", 0).contentType(MediaType.APPLICATION_JSON).content("{}"))

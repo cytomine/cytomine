@@ -2,8 +2,6 @@ package be.cytomine.controller.repository;
 
 import java.util.Optional;
 
-import be.cytomine.common.repository.model.command.HttpCommandResponse;
-import be.cytomine.service.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -20,8 +18,10 @@ import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.common.repository.model.CreateTerm;
 import be.cytomine.common.repository.model.TermResponse;
 import be.cytomine.common.repository.model.UpdateTerm;
+import be.cytomine.common.repository.model.command.HttpCommandResponse;
 import be.cytomine.controller.utils.CollectionResponse;
 import be.cytomine.controller.utils.PageMapper;
+import be.cytomine.service.CurrentUserService;
 
 @RestController
 @RequestMapping("/api")
@@ -41,7 +41,8 @@ public class TermController {
 
     @PostMapping("term.json")
     public Optional<HttpCommandResponse<TermResponse>> create(@RequestBody CreateTerm createTerm) {
-        return termHttpContract.create(createTerm);
+        long userId = currentUserService.getCurrentUser().getId();
+        return termHttpContract.create(userId, createTerm);
     }
 
     @GetMapping("term/{id}.json")
@@ -51,8 +52,10 @@ public class TermController {
     }
 
     @PutMapping("term/{id}.json")
-    public Optional<HttpCommandResponse<TermResponse>> update(@PathVariable Long id, @RequestBody UpdateTerm updateTerm) {
-        return termHttpContract.update(id, updateTerm);
+    public Optional<HttpCommandResponse<TermResponse>> update(@PathVariable Long id,
+                                                              @RequestBody UpdateTerm updateTerm) {
+        long userId = currentUserService.getCurrentUser().getId();
+        return termHttpContract.update(userId, id, updateTerm);
     }
 
     @DeleteMapping("term/{id}.json")

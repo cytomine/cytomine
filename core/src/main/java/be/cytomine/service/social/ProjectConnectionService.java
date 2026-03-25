@@ -362,7 +362,7 @@ public class ProjectConnectionService {
         );
         List<PersistentProjectConnection>
             connections
-            = new ArrayList<PersistentProjectConnection>(results.getContent());
+            = new ArrayList<>(results.getContent());
         if (connections.size() == 0) {
             return Page.empty();
         }

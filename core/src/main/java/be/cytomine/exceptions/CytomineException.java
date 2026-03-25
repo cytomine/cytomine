@@ -56,16 +56,16 @@ public abstract class CytomineException extends RuntimeException {
      * @param code Http code
      */
     public CytomineException(String msg, int code) {
-        this(msg, code, new HashMap<>(), new LinkedHashMap<String, String>(), null);
+        this(msg, code, new HashMap<>(), new LinkedHashMap<>(), null);
     }
 
     public CytomineException(String msg, int code, Throwable cause) {
-        this(msg, code, new HashMap<>(), new LinkedHashMap<String, String>(), cause);
+        this(msg, code, new HashMap<>(), new LinkedHashMap<>(), cause);
     }
 
 
     public CytomineException(String msg, int code, Map<Object, Object> values) {
-        this(msg, code, values, new LinkedHashMap<String, String>(), null);
+        this(msg, code, values, new LinkedHashMap<>(), null);
     }
 
     public CytomineException(

@@ -54,7 +54,7 @@ public class Type extends BaseEntity {
     public static List<String> parse(String input) {
         ObjectMapper mapper = new ObjectMapper();
         try {
-            return mapper.readValue(input, new TypeReference<List<String>>() {});
+            return mapper.readValue(input, new TypeReference<>() {});
         } catch (Exception e) {
             return new ArrayList<>();
         }

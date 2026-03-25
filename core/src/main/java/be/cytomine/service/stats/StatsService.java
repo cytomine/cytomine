@@ -255,7 +255,7 @@ public class StatsService {
 
         List<Tuple> numberOfAnnotatedImagesByUser = q.getResultList();
         // Build empty result table
-        Map<Long, JsonObject> result = new HashMap<Long, JsonObject>();
+        Map<Long, JsonObject> result = new HashMap<>();
         for (JsonObject user : userService.listLayers(project, null)) {
             JsonObject item = new JsonObject();
             item.put("id", user.get("id"));

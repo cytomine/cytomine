@@ -81,7 +81,7 @@ public class ResponseService {
         //load message from i18n filel
         String message = messageSource.getMessage(command, messageParams.toArray(), Locale.ENGLISH);
 
-        HashMap<String, Object> params = new HashMap<String, Object>();
+        HashMap<String, Object> params = new HashMap<>();
         params.put("message", message);
         params.put("callback", paramsCallback);
         params.put("printMessage", printMessage);

@@ -188,7 +188,7 @@ public class JsonObject extends HashMap<String, Object> implements JsonInput {
 
     public static Map<String, Object> toMap(String json) {
         try {
-            return new ObjectMapper().readValue(json, new TypeReference<Map<String, Object>>() {});
+            return new ObjectMapper().readValue(json, new TypeReference<>() {});
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return null;
@@ -206,7 +206,7 @@ public class JsonObject extends HashMap<String, Object> implements JsonInput {
 
     public static List<String> toStringList(String json) {
         try {
-            return new ObjectMapper().readValue(json, new TypeReference<List<String>>() {});
+            return new ObjectMapper().readValue(json, new TypeReference<>() {});
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return null;
@@ -215,7 +215,7 @@ public class JsonObject extends HashMap<String, Object> implements JsonInput {
 
     public static List<Map<String, Object>> toMapList(String json) {
         try {
-            return new ObjectMapper().readValue(json, new TypeReference<List<Map<String, Object>>>() {});
+            return new ObjectMapper().readValue(json, new TypeReference<>() {});
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return null;
@@ -225,7 +225,7 @@ public class JsonObject extends HashMap<String, Object> implements JsonInput {
 
     public static JsonObject toJsonObject(String json) {
         try {
-            return new ObjectMapper().readValue(json, new TypeReference<JsonObject>() {});
+            return new ObjectMapper().readValue(json, new TypeReference<>() {});
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return null;

@@ -23,28 +23,28 @@ public class AppStoreApiExceptionHandler {
     public final ResponseEntity<AppEngineError> handleAppStoreException(Exception e) {
         AppEngineError error = ErrorBuilder.build(ErrorCode.INTERNAL_INVALID_STORE_DATA);
         log.info("bad request 400 error [{}]", e.getMessage());
-        return new ResponseEntity<AppEngineError>(error, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler({ AppStoreNotFoundException.class })
     public final ResponseEntity<AppEngineError> handleAppStoreNotFoundException(Exception e) {
         AppEngineError error = ErrorBuilder.build(ErrorCode.INTERNAL_INVALID_STORE_NOT_FOUND);
         log.info("bad request 404 error [{}]", e.getMessage());
-        return new ResponseEntity<AppEngineError>(error, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler({ AppStoreAlreadyExistsException.class })
     public final ResponseEntity<AppEngineError> handleAppStoreExistsException(Exception e) {
         AppEngineError error = ErrorBuilder.build(ErrorCode.INTERNAL_INVALID_STORE_NOT_FOUND);
         log.info("bad request 400 error [{}]", e.getMessage());
-        return new ResponseEntity<AppEngineError>(error, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler({ AppStoreServiceException.class })
     public final ResponseEntity<AppEngineError> handleException(Exception e) {
         AppEngineError error = ErrorBuilder.build(ErrorCode.APPSTORE_DOWNLOAD_FAILED);
         log.info("bad request 400 error: {}", error.getMessage());
-        return new ResponseEntity<AppEngineError>(error, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
 }

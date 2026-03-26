@@ -17,7 +17,7 @@ public class MongoTestConfiguration {
 
     @Bean
     public MongoDBContainer mongoDBContainer() {
-        DockerImageName imageName = DockerImageName.parse("mongo:4.4-focal");
+        DockerImageName imageName = DockerImageName.parse("mongo:5.0-focal");
         MongoDBContainer mongoContainer = new MongoDBContainer(imageName);
         mongoContainer.start();
         return mongoContainer;

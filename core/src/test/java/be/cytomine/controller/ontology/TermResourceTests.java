@@ -128,7 +128,7 @@ public class TermResourceTests {
     public void add_valid_term() throws Exception {
         Term term = builder.given_a_term();
         when(termHttpContract.create(anyLong(), any()))
-            .thenReturn(Optional.of(new HttpCommandResponse<>("",
+            .thenReturn(Optional.of(new HttpCommandResponse<>(
                 new Callback("be.cytomine.AddTermCommand", Optional.of(term.getId()),
                     Optional.of(term.getOntology().getId()), Optional.empty()),
                 true, new TermResponse(term.getId(), term.getName(), term.getColor(),
@@ -157,7 +157,7 @@ public class TermResourceTests {
     public void edit_valid_term() throws Exception {
         Term term = builder.given_a_term();
         when(termHttpContract.update(eq(term.getId()), anyLong(), any()))
-            .thenReturn(Optional.of(new HttpCommandResponse<>("",
+            .thenReturn(Optional.of(new HttpCommandResponse<>(
                 new Callback("be.cytomine.EditTermCommand", Optional.of(term.getId()),
                     Optional.of(term.getOntology().getId()), Optional.empty()),
                 true, new TermResponse(term.getId(), term.getName(), term.getColor(),
@@ -185,7 +185,7 @@ public class TermResourceTests {
     public void delete_term() throws Exception {
         Term term = builder.given_a_term();
         when(termHttpContract.delete(eq(term.getId()), anyLong()))
-            .thenReturn(Optional.of(new HttpCommandResponse<>("",
+            .thenReturn(Optional.of(new HttpCommandResponse<>(
                 new Callback("be.cytomine.DeleteTermCommand", Optional.of(term.getId()),
                     Optional.of(term.getOntology().getId()), Optional.empty()),
                 true, new TermResponse(term.getId(), term.getName(), term.getColor(),

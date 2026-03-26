@@ -43,7 +43,7 @@ public class TermCommandService {
                        Callback callback = new Callback("be.cytomine.DeleteTermCommand",
                            Optional.of(termEntity.getId()), Optional.of(termEntity.getOntologyId()), Optional.empty());
                        termRepository.deleteTermById(id);
-                       return new HttpCommandResponse<>("", callback, true, termResponse, commandEntity.getId());
+                       return new HttpCommandResponse<>(callback, true, termResponse, commandEntity.getId());
                    });
     }
 
@@ -62,7 +62,7 @@ public class TermCommandService {
         TermResponse termResponse = ontologyMapper.map(savedEntity);
         Callback callback = new Callback("be.cytomine.AddTermCommand",
             Optional.of(savedEntity.getId()), Optional.of(savedEntity.getOntologyId()), Optional.empty());
-        return Optional.of(new HttpCommandResponse<>("", callback, true, termResponse,
+        return Optional.of(new HttpCommandResponse<>(callback, true, termResponse,
             commandEntity.getId()));
     }
 
@@ -84,7 +84,7 @@ public class TermCommandService {
                        Callback callback = new Callback("be.cytomine.EditTermCommand",
                            Optional.of(savedEntity.getId()), Optional.of(savedEntity.getOntologyId()),
                            Optional.empty());
-                       return new HttpCommandResponse<>("", callback, true, termResponse, commandEntity.getId());
+                       return new HttpCommandResponse<>(callback, true, termResponse, commandEntity.getId());
                    });
     }
 

@@ -26,7 +26,7 @@ public interface TermHttpContract {
     String ROOT_PATH = "/terms";
 
     @GetExchange("/{id}")
-    Optional<TermResponse> findTermByID(@PathVariable long id,@RequestParam long userId );
+    Optional<TermResponse> findTermByID(@PathVariable long id, @RequestParam long userId);
 
     @PostExchange
     Optional<HttpCommandResponse<TermResponse>> create(@RequestParam long userId,
@@ -42,8 +42,8 @@ public interface TermHttpContract {
                                                        @RequestParam long userId);
 
     @GetExchange("/project/{id}")
-    Page<TermResponse> findTermsByProject(@PathVariable long id,@RequestParam long userId, Pageable pageable);
+    Page<TermResponse> findTermsByProject(@PathVariable long id, @RequestParam long userId, Pageable pageable);
 
     @GetExchange("/ontology/{id}")
-    Page<TermResponse> findTermsByOntology(@PathVariable long id,@RequestParam long userId, Pageable pageable);
+    Page<TermResponse> findTermsByOntology(@PathVariable long id, @RequestParam long userId, Pageable pageable);
 }

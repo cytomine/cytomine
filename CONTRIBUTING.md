@@ -148,8 +148,8 @@ We follow the [Conventional Commit](https://www.conventionalcommits.org/en/v1.0.
 
     When using idea with the checkstyle plugin, the imports are not always the right order. The
    order is:
-    - import javax.*
     - import java.*
+    - import javax.*
     - <blank line>
     - import all other imports
     - <blank line>

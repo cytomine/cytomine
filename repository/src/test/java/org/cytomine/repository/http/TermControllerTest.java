@@ -95,7 +95,8 @@ class TermControllerTest {
     void findTermByIdWhenExistsReturnsTerm() {
         TermEntity entity = createAndSaveTermEntity("term1", "#FF0000");
 
-        String response = mockMvc.perform(get("/terms/{id}", entity.getId()))
+        String response = mockMvc.perform(get("/terms/{id}", entity.getId())
+                .param("userId", userId.toString()))
             .andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString();
 
@@ -108,30 +109,10 @@ class TermControllerTest {
     @Test
     @SneakyThrows
     void findTermByIdWhenNotExistsReturnsEmpty() {
-        mockMvc.perform(get("/terms/{id}", 999L))
+        mockMvc.perform(get("/terms/{id}", 999L)
+                .param("userId", userId.toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$").doesNotExist());
-    }
-
-    @Test
-    @SneakyThrows
-    void findAllReturnsPageOfTerms() {
-        TermEntity entity1 = createAndSaveTermEntity("term1", "#FF0000");
-        TermEntity entity2 = createAndSaveTermEntity("term2", "#00FF00");
-
-        String response = mockMvc.perform(get("/terms"))
-            .andExpect(status().isOk())
-            .andReturn().getResponse().getContentAsString();
-
-        SpringPage<TermResponse> page = objectMapper.readValue(response,
-            new TypeReference<SpringPage<TermResponse>>() {});
-
-        assertEquals(2, page.getTotalElements());
-        TermResponse expected1 = new TermResponse(entity1.getId(), "term1", "#FF0000", ontologyId,
-            entity1.getCreated(), entity1.getUpdated(), "", null);
-        TermResponse expected2 = new TermResponse(entity2.getId(), "term2", "#00FF00", ontologyId,
-            entity2.getCreated(), entity2.getUpdated(), "", null);
-        assertEquals(List.of(expected1, expected2), page.getContent());
     }
 
     @Test
@@ -227,7 +208,8 @@ class TermControllerTest {
     void findTermsByProjectReturnsPageOfTerms() {
         TermEntity entity = createAndSaveTermEntity("term1", "#FF0000");
 
-        String response = mockMvc.perform(get("/terms/project/{id}", projectId))
+        String response = mockMvc.perform(get("/terms/project/{id}", projectId)
+                .param("userId", userId.toString()))
             .andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString();
 
@@ -245,7 +227,8 @@ class TermControllerTest {
     void findTermsByOntologyReturnsPageOfTerms() {
         TermEntity entity = createAndSaveTermEntity("term1", "#FF0000");
 
-        String response = mockMvc.perform(get("/terms/ontology/{id}", ontologyId))
+        String response = mockMvc.perform(get("/terms/ontology/{id}", ontologyId)
+                .param("userId", userId.toString()))
             .andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString();
 

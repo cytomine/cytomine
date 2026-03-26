@@ -72,19 +72,20 @@ public class TermCommandService {
         return termRepository.findById(id)
                    .filter(entity -> aclService.canWriteOntology(userId, entity.getOntologyId()))
                    .map(termEntity -> {
-            updateTerm.name().ifPresent(termEntity::setName);
-            updateTerm.color().ifPresent(termEntity::setColor);
+                       updateTerm.name().ifPresent(termEntity::setName);
+                       updateTerm.color().ifPresent(termEntity::setColor);
 
-            UpdateTermCommand updateCommand =
-                new UpdateTermCommand(id, ontologyMapper.mapToTermCommandPayload(termEntity),
-                    userId, null);
-            CommandEntity commandEntity = commandService.update(updateCommand);
-            TermEntity savedEntity = termRepository.save(termEntity);
-            TermResponse termResponse = ontologyMapper.map(savedEntity);
-            Callback callback = new Callback("be.cytomine.EditTermCommand",
-                Optional.of(savedEntity.getId()), Optional.of(savedEntity.getOntologyId()), Optional.empty());
-            return new HttpCommandResponse<>("", callback, true, termResponse, commandEntity.getId());
-        });
+                       UpdateTermCommand updateCommand =
+                           new UpdateTermCommand(id, ontologyMapper.mapToTermCommandPayload(termEntity),
+                               userId, null);
+                       CommandEntity commandEntity = commandService.update(updateCommand);
+                       TermEntity savedEntity = termRepository.save(termEntity);
+                       TermResponse termResponse = ontologyMapper.map(savedEntity);
+                       Callback callback = new Callback("be.cytomine.EditTermCommand",
+                           Optional.of(savedEntity.getId()), Optional.of(savedEntity.getOntologyId()),
+                           Optional.empty());
+                       return new HttpCommandResponse<>("", callback, true, termResponse, commandEntity.getId());
+                   });
     }
 
 }

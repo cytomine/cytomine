@@ -13,6 +13,7 @@ public class ACLService {
     private static final int DELETE_MASK = 8;
 
     private static final String ONTOLOGY_CLASS = "be.cytomine.domain.ontology.Ontology";
+    private static final String PROJECT_CLASS = "be.cytomine.domain.project.Project";
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -22,6 +23,10 @@ public class ACLService {
 
     public boolean canReadOntology(long userId, long ontologyId) {
         return isAdmin(userId) || hasPermission(userId, ontologyId, ONTOLOGY_CLASS, READ_MASK);
+    }
+
+    public boolean canReadProject(long userId, long projectId) {
+        return isAdmin(userId) || hasPermission(userId, projectId, PROJECT_CLASS, READ_MASK);
     }
 
     public boolean canDeleteOntology(long userId, long ontologyId) {

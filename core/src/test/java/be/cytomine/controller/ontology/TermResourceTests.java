@@ -20,30 +20,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import be.cytomine.BasicInstanceBuilder;
-import be.cytomine.CytomineCoreApplication;
-import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.common.repository.http.TermHttpContract;
-import be.cytomine.common.repository.model.TermResponse;
-import be.cytomine.common.repository.model.command.Callback;
-import be.cytomine.common.repository.model.command.HttpCommandResponse;
-import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.domain.ontology.Term;
-import be.cytomine.domain.project.Project;
-import be.cytomine.utils.JsonObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -56,6 +32,31 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+
+import be.cytomine.BasicInstanceBuilder;
+import be.cytomine.CytomineCoreApplication;
+import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.http.TermHttpContract;
+import be.cytomine.common.repository.model.TermResponse;
+import be.cytomine.common.repository.model.command.Callback;
+import be.cytomine.common.repository.model.command.HttpCommandResponse;
+import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.domain.ontology.Term;
+import be.cytomine.domain.project.Project;
+import be.cytomine.utils.JsonObject;
+
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
@@ -74,27 +75,11 @@ public class TermResourceTests {
 
     @Test
     @Transactional
-    public void list_all_terms() throws Exception {
-        Term term = builder.given_a_term();
-        when(termHttpContract.findAll(any(Pageable.class)))
-            .thenReturn(new PageImpl<>(List.of(new TermResponse(term.getId(), term.getName(),
-                term.getColor(), term.getOntology().getId(),
-                term.getCreated(), term.getUpdated(), term.getComment(), Set.of()))));
-
-        restTermControllerMockMvc.perform(get("/api/term.json"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
-            .andExpect(jsonPath("$.collection[?(@.name=='" + term.getName() + "')].ontologyId")
-                           .value(term.getOntology().getId().intValue()));
-    }
-
-    @Test
-    @Transactional
     public void get_a_term() throws Exception {
         Term term = builder.given_a_term();
-        when(termHttpContract.findTermByID(term.getId()))
+        when(termHttpContract.findTermByID(eq(term.getId()), anyLong()))
             .thenReturn(Optional.of(new TermResponse(term.getId(), term.getName(), term.getColor(),
-                term.getOntology().getId(),  term.getCreated(),
+                term.getOntology().getId(), term.getCreated(),
                 term.getUpdated(), term.getComment(), Set.of())));
 
         restTermControllerMockMvc.perform(get("/api/term/{id}.json", term.getId()))
@@ -109,7 +94,7 @@ public class TermResourceTests {
     @Transactional
     public void list_terms_by_ontology() throws Exception {
         Term term = builder.given_a_term();
-        when(termHttpContract.findTermsByOntology(eq(term.getOntology().getId()), any(Pageable.class)))
+        when(termHttpContract.findTermsByOntology(eq(term.getOntology().getId()), anyLong(), any(Pageable.class)))
             .thenReturn(new PageImpl<>(List.of(new TermResponse(term.getId(), term.getName(),
                 term.getColor(), term.getOntology().getId(),
                 term.getCreated(), term.getUpdated(), term.getComment(), Set.of()))));
@@ -126,7 +111,7 @@ public class TermResourceTests {
     public void list_terms_by_project() throws Exception {
         Term term = builder.given_a_term();
         Project project = builder.given_a_project_with_ontology(term.getOntology());
-        when(termHttpContract.findTermsByProject(eq(project.getId()), any(Pageable.class)))
+        when(termHttpContract.findTermsByProject(eq(project.getId()), eq(1), any(Pageable.class)))
             .thenReturn(new PageImpl<>(List.of(new TermResponse(term.getId(), term.getName(),
                 term.getColor(), term.getOntology().getId(),
                 term.getCreated(), term.getUpdated(), term.getComment(), Set.of()))));
@@ -176,7 +161,7 @@ public class TermResourceTests {
                 new Callback("be.cytomine.EditTermCommand", Optional.of(term.getId()),
                     Optional.of(term.getOntology().getId()), Optional.empty()),
                 true, new TermResponse(term.getId(), term.getName(), term.getColor(),
-                term.getOntology().getId(),  term.getCreated(),
+                term.getOntology().getId(), term.getCreated(),
                 term.getUpdated(), term.getComment(), Set.of()), 1L)));
 
         String updateTermJson = JsonObject.of(
@@ -204,7 +189,7 @@ public class TermResourceTests {
                 new Callback("be.cytomine.DeleteTermCommand", Optional.of(term.getId()),
                     Optional.of(term.getOntology().getId()), Optional.empty()),
                 true, new TermResponse(term.getId(), term.getName(), term.getColor(),
-                term.getOntology().getId(),  term.getCreated(),
+                term.getOntology().getId(), term.getCreated(),
                 term.getUpdated(), term.getComment(), Set.of()), 1L)));
 
         restTermControllerMockMvc.perform(delete("/api/term/{id}.json", term.getId()))

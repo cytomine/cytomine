@@ -258,6 +258,25 @@ class TermControllerTest {
         assertEquals(List.of(expected), page.getContent());
     }
 
+    @Test
+    @SneakyThrows
+    void createWhenUserHasNoWriteAccessReturnsEmpty() {
+        Long nonAdminUserId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
+        jdbcTemplate.update(
+            "INSERT INTO sec_user (id, version, username) VALUES (?, 0, 'nonadmin')", nonAdminUserId);
+
+        CreateTerm createTerm = new CreateTerm("newTerm", "#00FF00", ontologyId, null);
+
+        mockMvc.perform(post("/terms")
+                .param("userId", nonAdminUserId.toString())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(createTerm)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").doesNotExist());
+
+        assertTrue(termRepository.findAll().isEmpty());
+    }
+
     private TermEntity createAndSaveTermEntity(String name, String color) {
         Date now = new Date();
         return termRepository.saveAndFlush(

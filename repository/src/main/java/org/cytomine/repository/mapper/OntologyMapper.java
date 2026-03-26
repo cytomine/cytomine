@@ -2,22 +2,17 @@ package org.cytomine.repository.mapper;
 
 import java.util.Date;
 
-import org.cytomine.repository.persistence.entity.OntologyEntity;
 import org.cytomine.repository.persistence.entity.TermEntity;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import be.cytomine.common.repository.model.CreateTerm;
-import be.cytomine.common.repository.model.OntologyResponse;
 import be.cytomine.common.repository.model.TermResponse;
 import be.cytomine.common.repository.model.command.TermCommandPayload;
 
 @Mapper(componentModel = "spring")
 public interface OntologyMapper {
-    @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
-    OntologyResponse map(OntologyEntity ontologyEntity);
-
     @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
     TermResponse map(TermEntity termEntity);
 

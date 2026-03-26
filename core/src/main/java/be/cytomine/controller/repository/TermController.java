@@ -38,13 +38,6 @@ public class TermController {
     private final PageMapper pageMapper;
     private final CurrentUserService currentUserService;
 
-
-    @GetMapping("term.json")
-    public CollectionResponse<TermResponse> list(Pageable pageable) {
-        log.debug("REST request to list terms");
-        return pageMapper.toCollectionResponse(termHttpContract.findAll(pageable));
-    }
-
     @PostMapping("term.json")
     public Optional<HttpCommandResponse<TermResponse>> create(@RequestBody CreateTerm createTerm) {
         long userId = currentUserService.getCurrentUser().getId();
@@ -54,7 +47,8 @@ public class TermController {
     @GetMapping("term/{id}.json")
     public TermResponse term(@PathVariable long id) {
         log.debug("REST request to get term {}", id);
-        return termHttpContract.findTermByID(id)
+        long userId = currentUserService.getCurrentUser().getId();
+        return termHttpContract.findTermByID(userId, id)
                    .orElseThrow(() -> new ResponseStatusException(NOT_FOUND,
                        format(UNABLE_TO_FIND_TERM, id)));
     }
@@ -79,12 +73,14 @@ public class TermController {
     @GetMapping("project/{id}/term.json")
     public CollectionResponse<TermResponse> listByProject(@PathVariable Long id, Pageable pageable) {
         log.debug("REST request to list terms for project {}", id);
-        return pageMapper.toCollectionResponse(termHttpContract.findTermsByProject(id, pageable));
+        long userId = currentUserService.getCurrentUser().getId();
+        return pageMapper.toCollectionResponse(termHttpContract.findTermsByProject(userId, id, pageable));
     }
 
     @GetMapping("ontology/{id}/term.json")
     public CollectionResponse<TermResponse> listByOntology(@PathVariable Long id, Pageable pageable) {
         log.debug("REST request to list terms for ontology {}", id);
-        return pageMapper.toCollectionResponse(termHttpContract.findTermsByOntology(id, pageable));
+        long userId = currentUserService.getCurrentUser().getId();
+        return pageMapper.toCollectionResponse(termHttpContract.findTermsByOntology(userId, id, pageable));
     }
 }

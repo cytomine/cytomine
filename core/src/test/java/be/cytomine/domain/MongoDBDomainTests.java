@@ -114,7 +114,7 @@ public class MongoDBDomainTests {
         assertThat(((Document) indexId.get("key")).get("_id")).isEqualTo(1);
         assertThat(indexUserDate).isNotNull();
         assertThat(((Document) indexUserDate.get("key")).get("date")).isEqualTo(1);
-        assertThat(indexUserDate.get("expireAfterSeconds")).isEqualTo(300L);
+        assertThat(indexUserDate.get("expireAfterSeconds")).isEqualTo(300);
     }
 
     @Test
@@ -187,7 +187,7 @@ public class MongoDBDomainTests {
 
         assertThat(created).isNotNull();
         assertThat(((Document) created.get("key")).get("created")).isEqualTo(1);
-        assertThat(created.get("expireAfterSeconds")).isEqualTo(60L);
+        assertThat(created.get("expireAfterSeconds")).isEqualTo(60);
 
         assertThat(image).isNotNull();
         assertThat(((Document) image.get("key")).get("image")).isEqualTo(1);

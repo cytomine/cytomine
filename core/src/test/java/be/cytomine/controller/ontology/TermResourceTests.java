@@ -48,7 +48,6 @@ import be.cytomine.utils.JsonObject;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -77,7 +76,8 @@ public class TermResourceTests {
     @Transactional
     public void get_a_term() throws Exception {
         Term term = builder.given_a_term();
-        when(termHttpContract.findTermByID(eq(term.getId()), anyLong()))
+        Long userId = builder.given_superadmin().getId();
+        when(termHttpContract.findTermByID(eq(term.getId()), eq(userId)))
             .thenReturn(Optional.of(new TermResponse(term.getId(), term.getName(), term.getColor(),
                 term.getOntology().getId(), term.getCreated(),
                 term.getUpdated(), term.getComment(), Set.of())));
@@ -92,9 +92,27 @@ public class TermResourceTests {
 
     @Test
     @Transactional
+    public void get_a_term_with_wrong_user_returns_not_found() throws Exception {
+        Term term = builder.given_a_term();
+        Long userId = builder.given_superadmin().getId();
+        Long wrongUserId = userId + 1;
+        when(termHttpContract.findTermByID(eq(term.getId()), eq(userId)))
+            .thenReturn(Optional.of(new TermResponse(term.getId(), term.getName(), term.getColor(),
+                term.getOntology().getId(), term.getCreated(),
+                term.getUpdated(), term.getComment(), Set.of())));
+        when(termHttpContract.findTermByID(eq(term.getId()), eq(wrongUserId)))
+            .thenReturn(Optional.empty());
+
+        restTermControllerMockMvc.perform(get("/api/term/{id}.json", term.getId()))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    @Transactional
     public void list_terms_by_ontology() throws Exception {
         Term term = builder.given_a_term();
-        when(termHttpContract.findTermsByOntology(eq(term.getOntology().getId()), anyLong(), any(Pageable.class)))
+        Long userId = builder.given_superadmin().getId();
+        when(termHttpContract.findTermsByOntology(eq(term.getOntology().getId()), eq(userId), any(Pageable.class)))
             .thenReturn(new PageImpl<>(List.of(new TermResponse(term.getId(), term.getName(),
                 term.getColor(), term.getOntology().getId(),
                 term.getCreated(), term.getUpdated(), term.getComment(), Set.of()))));
@@ -108,10 +126,24 @@ public class TermResourceTests {
 
     @Test
     @Transactional
+    public void list_terms_by_ontology_with_wrong_user_returns_empty() throws Exception {
+        Term term = builder.given_a_term();
+        Long userId = builder.given_superadmin().getId();
+        when(termHttpContract.findTermsByOntology(eq(term.getOntology().getId()), eq(userId), any(Pageable.class)))
+            .thenReturn(new PageImpl<>(List.of()));
+
+        restTermControllerMockMvc.perform(get("/api/ontology/{id}/term.json", term.getOntology().getId()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.collection", hasSize(0)));
+    }
+
+    @Test
+    @Transactional
     public void list_terms_by_project() throws Exception {
         Term term = builder.given_a_term();
         Project project = builder.given_a_project_with_ontology(term.getOntology());
-        when(termHttpContract.findTermsByProject(eq(project.getId()), eq(1), any(Pageable.class)))
+        Long userId = builder.given_superadmin().getId();
+        when(termHttpContract.findTermsByProject(eq(project.getId()), eq(userId), any(Pageable.class)))
             .thenReturn(new PageImpl<>(List.of(new TermResponse(term.getId(), term.getName(),
                 term.getColor(), term.getOntology().getId(),
                 term.getCreated(), term.getUpdated(), term.getComment(), Set.of()))));
@@ -125,9 +157,24 @@ public class TermResourceTests {
 
     @Test
     @Transactional
+    public void list_terms_by_project_with_wrong_user_returns_empty() throws Exception {
+        Term term = builder.given_a_term();
+        Project project = builder.given_a_project_with_ontology(term.getOntology());
+        Long userId = builder.given_superadmin().getId();
+        when(termHttpContract.findTermsByProject(eq(project.getId()), eq(userId), any(Pageable.class)))
+            .thenReturn(new PageImpl<>(List.of()));
+
+        restTermControllerMockMvc.perform(get("/api/project/{id}/term.json", project.getId()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.collection", hasSize(0)));
+    }
+
+    @Test
+    @Transactional
     public void add_valid_term() throws Exception {
         Term term = builder.given_a_term();
-        when(termHttpContract.create(anyLong(), any()))
+        Long userId = builder.given_superadmin().getId();
+        when(termHttpContract.create(eq(userId), any()))
             .thenReturn(Optional.of(new HttpCommandResponse<>(
                 new Callback("be.cytomine.AddTermCommand", Optional.of(term.getId()),
                     Optional.of(term.getOntology().getId()), Optional.empty()),
@@ -154,9 +201,31 @@ public class TermResourceTests {
 
     @Test
     @Transactional
+    public void add_term_with_no_write_access_returns_empty() throws Exception {
+        Term term = builder.given_a_term();
+        Long userId = builder.given_superadmin().getId();
+        when(termHttpContract.create(eq(userId), any()))
+            .thenReturn(Optional.empty());
+
+        String createTermJson = JsonObject.of(
+            "name", term.getName(),
+            "color", term.getColor(),
+            "ontology", term.getOntology().getId()
+        ).toJsonString();
+
+        restTermControllerMockMvc.perform(post("/api/term.json")
+                                              .contentType(MediaType.APPLICATION_JSON)
+                                              .content(createTermJson))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").doesNotExist());
+    }
+
+    @Test
+    @Transactional
     public void edit_valid_term() throws Exception {
         Term term = builder.given_a_term();
-        when(termHttpContract.update(eq(term.getId()), anyLong(), any()))
+        Long userId = builder.given_superadmin().getId();
+        when(termHttpContract.update(eq(term.getId()), eq(userId), any()))
             .thenReturn(Optional.of(new HttpCommandResponse<>(
                 new Callback("be.cytomine.EditTermCommand", Optional.of(term.getId()),
                     Optional.of(term.getOntology().getId()), Optional.empty()),
@@ -182,9 +251,29 @@ public class TermResourceTests {
 
     @Test
     @Transactional
+    public void edit_term_with_no_write_access_returns_not_found() throws Exception {
+        Term term = builder.given_a_term();
+        Long userId = builder.given_superadmin().getId();
+        when(termHttpContract.update(eq(term.getId()), eq(userId), any()))
+            .thenReturn(Optional.empty());
+
+        String updateTermJson = JsonObject.of(
+            "name", term.getName(),
+            "color", term.getColor()
+        ).toJsonString();
+
+        restTermControllerMockMvc.perform(put("/api/term/{id}.json", term.getId())
+                                              .contentType(MediaType.APPLICATION_JSON)
+                                              .content(updateTermJson))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @Transactional
     public void delete_term() throws Exception {
         Term term = builder.given_a_term();
-        when(termHttpContract.delete(eq(term.getId()), anyLong()))
+        Long userId = builder.given_superadmin().getId();
+        when(termHttpContract.delete(eq(term.getId()), eq(userId)))
             .thenReturn(Optional.of(new HttpCommandResponse<>(
                 new Callback("be.cytomine.DeleteTermCommand", Optional.of(term.getId()),
                     Optional.of(term.getOntology().getId()), Optional.empty()),
@@ -199,5 +288,17 @@ public class TermResourceTests {
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteTermCommand"))
             .andExpect(jsonPath("$.data.id").value(term.getId()))
             .andExpect(jsonPath("$.data.name").value(term.getName()));
+    }
+
+    @Test
+    @Transactional
+    public void delete_term_with_no_delete_access_returns_not_found() throws Exception {
+        Term term = builder.given_a_term();
+        Long userId = builder.given_superadmin().getId();
+        when(termHttpContract.delete(eq(term.getId()), eq(userId)))
+            .thenReturn(Optional.empty());
+
+        restTermControllerMockMvc.perform(delete("/api/term/{id}.json", term.getId()))
+            .andExpect(status().isNotFound());
     }
 }

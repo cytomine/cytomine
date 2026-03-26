@@ -48,7 +48,7 @@ public class TermController {
     public TermResponse term(@PathVariable long id) {
         log.debug("REST request to get term {}", id);
         long userId = currentUserService.getCurrentUser().getId();
-        return termHttpContract.findTermByID(userId, id)
+        return termHttpContract.findTermByID(id, userId)
                    .orElseThrow(() -> new ResponseStatusException(NOT_FOUND,
                        format(UNABLE_TO_FIND_TERM, id)));
     }
@@ -74,13 +74,13 @@ public class TermController {
     public CollectionResponse<TermResponse> listByProject(@PathVariable Long id, Pageable pageable) {
         log.debug("REST request to list terms for project {}", id);
         long userId = currentUserService.getCurrentUser().getId();
-        return pageMapper.toCollectionResponse(termHttpContract.findTermsByProject(userId, id, pageable));
+        return pageMapper.toCollectionResponse(termHttpContract.findTermsByProject(id, userId, pageable));
     }
 
     @GetMapping("ontology/{id}/term.json")
     public CollectionResponse<TermResponse> listByOntology(@PathVariable Long id, Pageable pageable) {
         log.debug("REST request to list terms for ontology {}", id);
         long userId = currentUserService.getCurrentUser().getId();
-        return pageMapper.toCollectionResponse(termHttpContract.findTermsByOntology(userId, id, pageable));
+        return pageMapper.toCollectionResponse(termHttpContract.findTermsByOntology(id, userId, pageable));
     }
 }

@@ -63,6 +63,34 @@ spec:
                   key: password
             - name: MONGO_INIT_DATABASE
               value: {{ .Values.mongodb.database }}
+          startupProbe:
+            exec:
+              command:
+                - mongosh
+                - --eval
+                - "db.adminCommand('ping')"
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 30
+            timeoutSeconds: 5
+          readinessProbe:
+            exec:
+              command:
+                - mongosh
+                - --eval
+                - "db.adminCommand('ping')"
+            periodSeconds: 5
+            failureThreshold: 3
+            timeoutSeconds: 5
+          livenessProbe:
+            exec:
+              command:
+                - mongosh
+                - --eval
+                - "db.adminCommand('ping')"
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 5
           resources:
             {{- toYaml .Values.mongodb.resources | nindent 12 }}
       {{- with .Values.global.tolerations }}

@@ -32,21 +32,13 @@ public class LongArrayToBytesConverter implements AttributeConverter<Long[], byt
         if (attribute == null) {
             return null;
         }
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ObjectOutputStream out = null;
-        try {
-            out = new ObjectOutputStream(bos);
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
+             ObjectOutputStream out = new ObjectOutputStream(bos)) {
             out.writeObject(attribute);
             out.flush();
             return bos.toByteArray();
         } catch (IOException e) {
             throw new RuntimeException("cannot serialize", e);
-        } finally {
-            try {
-                bos.close();
-            } catch (IOException ex) {
-                // ignore close exception
-            }
         }
     }
 

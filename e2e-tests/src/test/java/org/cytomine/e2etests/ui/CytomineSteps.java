@@ -302,4 +302,23 @@ public class CytomineSteps {
         );
         webDriverUtils.byIsDisplayed(wait, By.xpath("//*[contains(text(),'" + username + "')]"));
     }
+
+    public void removeUserFromProject(Wait<WebDriver> wait, String projectUrl, String username) {
+        webDriverUtils.goTo(wait, projectUrl);
+        webDriverUtils.byClick(wait, By.xpath("//label[contains(@class,'b-radio') and contains(text(),'Members')]"));
+        webDriverUtils.byClick(
+            wait,
+            By.xpath("//td[@data-label='Username' and normalize-space(text())='" + username + "']" +
+                "/preceding-sibling::td[contains(@class,'checkbox-cell')]//label[contains(@class,'b-checkbox')]")
+        );
+        webDriverUtils.byClick(
+            wait,
+            By.xpath("//button[contains(@class,'is-danger') and normalize-space(text())='Remove selected members']")
+        );
+        webDriverUtils.byClick(
+            wait,
+            By.xpath("//button[contains(@class,'is-danger') and normalize-space(text())='Confirm']")
+        );
+        webDriverUtils.waitUntilByEmpty(wait, By.xpath("//*[contains(text(),'" + username + "')]"));
+    }
 }

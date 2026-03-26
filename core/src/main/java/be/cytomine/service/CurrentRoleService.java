@@ -87,7 +87,7 @@ public class CurrentRoleService {
         if (hasCurrentUserAdminRole(user)) {
             currentAdmins.remove(user.getUsername());
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>(auth.getAuthorities());
+            List<GrantedAuthority> authorities = new ArrayList<>(auth.getAuthorities());
             authorities.removeIf(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
             Authentication newAuth = new UsernamePasswordAuthenticationToken(
                 auth.getPrincipal(),

@@ -71,8 +71,8 @@ spec:
           memory: "4Gi"
           cpu: "2"
         limits:
-          memory: "32Gi"
-          cpu: "8"
+          memory: "64Gi"
+          cpu: "16"
       volumeMounts:
         - name: tmp
           mountPath: /tmp

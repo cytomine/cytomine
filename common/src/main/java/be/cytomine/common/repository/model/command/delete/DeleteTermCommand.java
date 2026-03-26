@@ -4,19 +4,14 @@ import java.util.Optional;
 
 import be.cytomine.common.repository.model.command.TermCommandPayload;
 
+import static java.lang.String.format;
+
 public record DeleteTermCommand(
     Long id,
     TermCommandPayload data,
     Long userId,
-    Long internalOntologyId
+    Long ontologyId
 ) implements DeleteCommandRequest<TermCommandPayload> {
-
-    public static final String SERVICE_NAME = "TermService";
-
-    @Override
-    public Optional<Long> ontologyId() {
-        return Optional.of(internalOntologyId);
-    }
 
     @Override
     public Optional<Long> projectId() {
@@ -24,12 +19,12 @@ public record DeleteTermCommand(
     }
 
     @Override
-    public Optional<Long> storageId() {
-        return Optional.empty();
+    public String serviceName() {
+        return "TermService";
     }
 
     @Override
-    public String serviceName() {
-        return SERVICE_NAME;
+    public String getActionMessage() {
+        return format("Term %s (%s) deleted in ontology %s", data.id(), data.name(), ontologyId);
     }
 }

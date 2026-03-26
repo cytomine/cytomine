@@ -28,7 +28,7 @@ public class CommandService {
         return commandRepository.save(
             new CommandEntity(null, null, now, now, DELETE_COMMAND,
                 objectMapper.writeValueAsString(request.data()),
-                request.userId(), null, (Long) request.projectId().orElse(null), true, null, true,
+                request.userId(), null, request.projectId().orElse(null), true, request.getActionMessage(), true,
                 request.serviceName(), false));
     }
 
@@ -37,7 +37,8 @@ public class CommandService {
         return commandRepository.save(
             new CommandEntity(null, null, now, now, EDIT_COMMAND,
                 objectMapper.writeValueAsString(request.data()), request.userId(), null,
-                request.projectId(), true, null, true, request.serviceName(), false));
+                request.projectId().orElse(null), true, request.getActionMessage(), true, request.serviceName(),
+                false));
     }
 
     public CommandEntity insert(InsertCommandRequest<?> request) {
@@ -45,6 +46,9 @@ public class CommandService {
         return commandRepository.save(
             new CommandEntity(null, null, now, now, ADD_COMMAND,
                 objectMapper.writeValueAsString(request.data()), request.userId(), null,
-                request.projectId(), true, null, true, request.serviceName(), false));
+                request.projectId().orElse(null), true, request.getActionMessage(), true, request.serviceName(),
+                false));
     }
+
+    private CommandEntity createCommandEntity(){}
 }

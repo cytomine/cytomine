@@ -28,24 +28,31 @@ public class TermCommandService {
     private final TermRepository termRepository;
     private final OntologyMapper ontologyMapper;
     private final CommandService commandService;
+    private final ACLService aclService;
 
     @Transactional
     public Optional<HttpCommandResponse<TermResponse>> deleteTerm(Long id, Long userId) {
-        return termRepository.findById(id).map(termEntity -> {
-            DeleteTermCommand deleteCommand =
-                new DeleteTermCommand(id, ontologyMapper.mapToTermCommandPayload(termEntity),
-                    userId, null);
-            CommandEntity commandEntity = commandService.delete(deleteCommand);
-            TermResponse termResponse = ontologyMapper.map(termEntity);
-            Callback callback = new Callback("be.cytomine.DeleteTermCommand",
-                Optional.of(termEntity.getId()), Optional.of(termEntity.getOntologyId()), Optional.empty());
-            termRepository.deleteTermById(id);
-            return new HttpCommandResponse<>("", callback, true, termResponse, commandEntity.getId());
-        });
+        return termRepository.findById(id)
+                   .filter(entity -> aclService.canDeleteOntology(userId, entity.getOntologyId()))
+                   .map(termEntity -> {
+                       DeleteTermCommand deleteCommand =
+                           new DeleteTermCommand(id, ontologyMapper.mapToTermCommandPayload(termEntity),
+                               userId, null);
+                       CommandEntity commandEntity = commandService.delete(deleteCommand);
+                       TermResponse termResponse = ontologyMapper.map(termEntity);
+                       Callback callback = new Callback("be.cytomine.DeleteTermCommand",
+                           Optional.of(termEntity.getId()), Optional.of(termEntity.getOntologyId()), Optional.empty());
+                       termRepository.deleteTermById(id);
+                       return new HttpCommandResponse<>("", callback, true, termResponse, commandEntity.getId());
+                   });
     }
 
     public Optional<HttpCommandResponse<TermResponse>> createTerm(Long userId,
                                                                   CreateTerm createTerm) {
+        if (!aclService.canWriteOntology(userId, createTerm.ontology())) {
+            return Optional.empty();
+        }
+
         TermEntity termEntity = ontologyMapper.map(createTerm, new Date());
         TermCommandPayload termCommandPayload = ontologyMapper.mapToTermCommandPayload(termEntity);
         InsertTermCommand insertTermCommand =
@@ -62,7 +69,9 @@ public class TermCommandService {
     @Transactional
     public Optional<HttpCommandResponse<TermResponse>> updateTerm(long id, Long userId,
                                                                   UpdateTerm updateTerm) {
-        return termRepository.findById(id).map(termEntity -> {
+        return termRepository.findById(id)
+                   .filter(entity -> aclService.canWriteOntology(userId, entity.getOntologyId()))
+                   .map(termEntity -> {
             updateTerm.name().ifPresent(termEntity::setName);
             updateTerm.color().ifPresent(termEntity::setColor);
 

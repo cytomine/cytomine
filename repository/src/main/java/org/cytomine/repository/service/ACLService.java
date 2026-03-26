@@ -10,17 +10,34 @@ public class ACLService {
 
     private static final int READ_MASK = 1;
     private static final int WRITE_MASK = 2;
+    private static final int DELETE_MASK = 8;
 
     private static final String ONTOLOGY_CLASS = "be.cytomine.domain.ontology.Ontology";
 
     private final JdbcTemplate jdbcTemplate;
 
     public boolean canWriteOntology(long userId, long ontologyId) {
-        return hasPermission(userId, ontologyId, ONTOLOGY_CLASS, WRITE_MASK);
+        return isAdmin(userId) || hasPermission(userId, ontologyId, ONTOLOGY_CLASS, WRITE_MASK);
     }
 
     public boolean canReadOntology(long userId, long ontologyId) {
-        return hasPermission(userId, ontologyId, ONTOLOGY_CLASS, READ_MASK);
+        return isAdmin(userId) || hasPermission(userId, ontologyId, ONTOLOGY_CLASS, READ_MASK);
+    }
+
+    public boolean canDeleteOntology(long userId, long ontologyId) {
+        return isAdmin(userId) || hasPermission(userId, ontologyId, ONTOLOGY_CLASS, DELETE_MASK);
+    }
+
+    private boolean isAdmin(long userId) {
+        String sql = """
+            SELECT COUNT(*) > 0
+            FROM sec_user_sec_role usr
+            JOIN sec_role sr ON sr.id = usr.sec_role_id
+            WHERE usr.sec_user_id = ?
+            AND sr.authority IN ('ROLE_ADMIN', 'ROLE_SUPER_ADMIN')
+            """;
+
+        return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sql, Boolean.class, userId));
     }
 
     private boolean hasPermission(long userId, long domainId, String domainClass, int requiredMask) {

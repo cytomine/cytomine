@@ -24,31 +24,28 @@ public class CommandService {
     private final CommandRepository commandRepository;
 
     public CommandEntity delete(DeleteCommandRequest<?> request) {
-        Date now = new Date();
-        return commandRepository.save(
-            new CommandEntity(null, null, now, now, DELETE_COMMAND,
-                objectMapper.writeValueAsString(request.data()),
-                request.userId(), null, request.projectId().orElse(null), true, request.getActionMessage(), true,
-                request.serviceName(), false));
+        return createCommandEntity(
+            DELETE_COMMAND, request.data(), request.userId(),
+            request.projectId().orElse(null), request.getActionMessage(), request.serviceName());
     }
 
     public CommandEntity update(UpdateCommandRequest<?> request) {
-        Date now = new Date();
-        return commandRepository.save(
-            new CommandEntity(null, null, now, now, EDIT_COMMAND,
-                objectMapper.writeValueAsString(request.data()), request.userId(), null,
-                request.projectId().orElse(null), true, request.getActionMessage(), true, request.serviceName(),
-                false));
+        return createCommandEntity(
+            EDIT_COMMAND, request.data(), request.userId(),
+            request.projectId().orElse(null), request.getActionMessage(), request.serviceName());
     }
 
     public CommandEntity insert(InsertCommandRequest<?> request) {
-        Date now = new Date();
-        return commandRepository.save(
-            new CommandEntity(null, null, now, now, ADD_COMMAND,
-                objectMapper.writeValueAsString(request.data()), request.userId(), null,
-                request.projectId().orElse(null), true, request.getActionMessage(), true, request.serviceName(),
-                false));
+        return createCommandEntity(
+            ADD_COMMAND, request.data(), request.userId(),
+            request.projectId().orElse(null), request.getActionMessage(), request.serviceName());
     }
 
-    private CommandEntity createCommandEntity(){}
+    private CommandEntity createCommandEntity(String commandType, Object data, Long userId,
+                                              Long projectId, String actionMessage, String serviceName) {
+        Date now = new Date();
+        return commandRepository.save(new CommandEntity(null, null, now, now, commandType,
+            objectMapper.writeValueAsString(data), userId, null, projectId,
+            true, actionMessage, true, serviceName, false));
+    }
 }

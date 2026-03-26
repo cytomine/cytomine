@@ -120,7 +120,7 @@ mongodb:
       cpu: 50m
       ephemeral-storage: 1Gi
     limits:
-      memory: 256Mi
+      memory: 1Gi
       cpu: 200m
       ephemeral-storage: 1Gi
   mongoStorageHostPath:

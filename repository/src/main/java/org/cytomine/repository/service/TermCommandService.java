@@ -42,7 +42,7 @@ public class TermCommandService {
                        TermResponse termResponse = ontologyMapper.map(termEntity);
                        Callback callback = new Callback("be.cytomine.DeleteTermCommand",
                            Optional.of(termEntity.getId()), Optional.of(termEntity.getOntologyId()), Optional.empty());
-                       termRepository.deleteTermById(id);
+                       termRepository.deleteById(id);
                        return new HttpCommandResponse<>(callback, true, termResponse, commandEntity.getId());
                    });
     }

@@ -37,3 +37,18 @@ spec:
           volumeMounts:
             - name: temp
               mountPath: /tmp
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.sam.port }}
+            periodSeconds: 5
+            failureThreshold: 10
+            timeoutSeconds: 5
+          startupProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.sam.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 30
+            timeoutSeconds: 5

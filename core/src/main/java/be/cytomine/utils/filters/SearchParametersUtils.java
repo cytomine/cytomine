@@ -40,7 +40,7 @@ public class SearchParametersUtils {
                 Object values = entry.getValue();
                 if (operator.equals(SEARCH_PARAM_IN)) {
                     if (values.toString().contains(",")) {
-                        values = new ArrayList<String>(Arrays.asList(values.toString().split(",")));
+                        values = new ArrayList<>(Arrays.asList(values.toString().split(",")));
                     }
                 } else if (operator.equals(SEARCH_PARAM_LIKE) || operator.equals(SEARCH_PARAM_ILIKE)) {
                     values = values.toString().replaceAll("\\*", "%");

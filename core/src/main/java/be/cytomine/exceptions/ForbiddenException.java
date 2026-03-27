@@ -30,7 +30,7 @@ public class ForbiddenException extends CytomineException {
      * @param message Message
      */
     public ForbiddenException(String message) {
-        this(message, new LinkedHashMap<Object, Object>());
+        this(message, new LinkedHashMap<>());
     }
 
     public ForbiddenException(String message, Map<Object, Object> values) {

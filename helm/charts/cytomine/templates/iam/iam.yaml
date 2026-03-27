@@ -128,8 +128,8 @@ spec:
             memory: "1Gi"
             cpu: "500m"
           limits:
-            memory: "2Gi"
-            cpu: "1000m"
+            memory: "12Gi"
+            cpu: "4"
         volumeMounts:
         - name: opt-keycloak
           mountPath: "/opt/keycloak"

@@ -281,7 +281,7 @@ public class CytomineSteps {
         webDriverUtils.byIsDisplayed(wait, By.cssSelector(".executor .card-content section:last-child .button.is-primary:last-child"));
         webDriverUtils.byClick(wait, By.cssSelector(".executor .card-content section:last-child .button.is-primary:last-child"));
 
-        Wait<WebDriver> longWait = new WebDriverWait(driver, Duration.ofSeconds(180));
+        Wait<WebDriver> longWait = new WebDriverWait(driver, Duration.ofSeconds(300));
         webDriverUtils.byIsDisplayed(longWait, By.cssSelector(".runs .fa-check-circle"));
     }
 

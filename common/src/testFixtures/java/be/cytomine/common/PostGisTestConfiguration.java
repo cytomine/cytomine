@@ -13,7 +13,7 @@ public class PostGisTestConfiguration {
     @ServiceConnection
     PostgreSQLContainer postGisContainer() {
         DockerImageName image = DockerImageName.parse("postgis/postgis:15-3.5")
-                .asCompatibleSubstituteFor("postgres");
+                                    .asCompatibleSubstituteFor("postgres");
 
         return new PostgreSQLContainer(image);
     }

@@ -8,6 +8,7 @@ import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
 import be.cytomine.common.repository.http.HealthService;
+import be.cytomine.common.repository.http.TermHttpContract;
 
 @Configuration
 public class RepositoryClient {
@@ -28,5 +29,12 @@ public class RepositoryClient {
         HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(adapter)
             .build();
         return factory.createClient(HealthService.class);
+    }
+
+    @Bean
+    TermHttpContract termServiceClient(RestClient repositoryRestClient) {
+        RestClientAdapter adapter = RestClientAdapter.create(repositoryRestClient);
+        HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(adapter).build();
+        return factory.createClient(TermHttpContract.class);
     }
 }

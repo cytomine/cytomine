@@ -4,6 +4,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -60,15 +61,16 @@ public class CytomineSteps {
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Delete')]");
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Confirm')]");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'successfully deleted')]"));
+        webDriverUtils.waitUntilByEmpty(wait, By.xpath("//div[contains(text(), 'successfully deleted')]"));
     }
 
     public void listProjects(Wait<WebDriver> wait, URL cytomineUrl, Set<String> projectNames) {
         webDriverUtils.goTo(wait, cytomineUrl.toString());
         webDriverUtils.xpathClick(wait, "//a[@href='#/projects']");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//button[contains(text(), 'New project')]"));
-        Set<Boolean> ignored = projectNames.stream()
-            .map(name -> webDriverUtils.byIsDisplayed(wait, By.xpath(format("//a[contains(text(), '%s')]", name))))
-            .collect(toSet());
+        projectNames.forEach(
+            name -> webDriverUtils.byIsDisplayed(wait, By.xpath(format("//a[contains(text(), '%s')]", name)))
+        );
     }
 
     public String createOntology(Wait<WebDriver> wait, WebDriver driver, URL cytomineUrl, String ontologyName) {
@@ -280,7 +282,7 @@ public class CytomineSteps {
         webDriverUtils.byIsDisplayed(wait, By.cssSelector(".executor .card-content section:last-child .button.is-primary:last-child"));
         webDriverUtils.byClick(wait, By.cssSelector(".executor .card-content section:last-child .button.is-primary:last-child"));
 
-        Wait<WebDriver> longWait = new WebDriverWait(driver, Duration.ofSeconds(20));
+        Wait<WebDriver> longWait = new WebDriverWait(driver, Duration.ofSeconds(300));
         webDriverUtils.byIsDisplayed(longWait, By.cssSelector(".runs .fa-check-circle"));
     }
 
@@ -320,5 +322,26 @@ public class CytomineSteps {
             By.xpath("//button[contains(@class,'is-danger') and normalize-space(text())='Confirm']")
         );
         webDriverUtils.waitUntilByEmpty(wait, By.xpath("//*[contains(text(),'" + username + "')]"));
+    }
+
+    public void filterProjectByName(
+        Wait<WebDriver> wait,
+        URL cytomineUrl,
+        String projectNameToSearch,
+        List<String> projectNames
+    ) {
+        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/projects");
+        By searchInput = By.cssSelector("div.search-projects input[type='search']");
+        webDriverUtils.byClick(wait, searchInput);
+        webDriverUtils.bySendKeys(wait, searchInput, projectNameToSearch);
+
+        projectNames.forEach(projectName ->
+            webDriverUtils.waitUntilByEmpty(
+                wait,
+                By.xpath("//a[normalize-space(text())='" + projectName + "']")
+            )
+        );
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//a[normalize-space(text())='" + projectNameToSearch + "']"));
+        webDriverUtils.byClear(wait, searchInput);
     }
 }

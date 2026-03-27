@@ -53,6 +53,18 @@ spec:
             sleep 5
           done
           echo "app-engine is ready!"
+          echo "Waiting for sam to be ready..."
+          until curl -sf http://sam.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.sam.port }}/; do
+            echo "sam not ready, retrying in 5s..."
+            sleep 5
+          done
+          echo "sam is ready!"
+          echo "Waiting for cbir to be ready..."
+          until curl -sf http://cbir.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.cbir.port }}/health; do
+            echo "cbir not ready, retrying in 5s..."
+            sleep 5
+          done
+          echo "cbir is ready!"
   containers:
     - name: selenium
       image: "{{ .Values.images.selenium }}"
@@ -126,5 +138,5 @@ spec:
         - name: SELENIUM_URL
           value: http://localhost:4444
         - name: E2E_PARALLEL
-          value: "true"
+          value: "false"
   restartPolicy: Never

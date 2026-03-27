@@ -10,7 +10,7 @@ public class ObjectMapperFactory {
 
     @Bean
     JsonMapperBuilderCustomizer snakeCaseCustomizer() {
-        return builder -> builder.propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
+        return builder -> builder.propertyNamingStrategy(PropertyNamingStrategies.LOWER_CAMEL_CASE);
     }
 
 

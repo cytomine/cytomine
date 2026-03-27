@@ -4,7 +4,7 @@ x-version-env: &version-env
 
 services:
   mongo:
-    image: mongo:4.4-focal
+    image: mongo:5.0-focal
     restart: unless-stopped
     ports:
       - 27017:27017

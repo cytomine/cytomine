@@ -88,7 +88,7 @@ public class WebDriverUtils {
     void waitUntilByEmpty(Wait<WebDriver> wait, By by) {
         wait.until(d -> {
             try {
-                return d.findElements(by).isEmpty();
+                return d.findElements(by).stream().noneMatch(WebElement::isDisplayed);
             } catch (Exception e) {
                 return false;
             }

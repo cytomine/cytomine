@@ -70,18 +70,9 @@ public class WebDriverUtils {
             });
     }
 
-    @SneakyThrows
-    boolean byIsDisplayed(Wait<WebDriver> wait, By by) {
-        Thread.sleep(500);
+    void byIsDisplayed(Wait<WebDriver> wait, By by) {
         waitLoading(wait);
-        wait.until(d -> {
-            try {
-                return ExpectedConditions.visibilityOfElementLocated(by);
-            } catch (Exception e) {
-                return false;
-            }
-        });
-        return true;
+        wait.until(d -> ExpectedConditions.visibilityOfElementLocated(by).apply(d));
     }
 
     void waitLoading(Wait<WebDriver> wait) {

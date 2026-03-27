@@ -29,6 +29,15 @@ public class WebDriverUtils {
         });
     }
 
+    void byClear(Wait<WebDriver> wait, By by) {
+        wait.until(d -> {
+            WebElement el = d.findElement(by);
+            el.sendKeys(Keys.CONTROL + "a");
+            el.sendKeys(Keys.DELETE);
+            return true;
+        });
+    }
+
     void bySendKeys(Wait<WebDriver> wait, By by, String keys) {
         bySendKeysWait(wait, by, keys, true);
     }

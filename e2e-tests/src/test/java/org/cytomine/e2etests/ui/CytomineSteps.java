@@ -341,5 +341,6 @@ public class CytomineSteps {
             )
         );
         webDriverUtils.byIsDisplayed(wait, By.xpath("//a[normalize-space(text())='" + projectNameToSearch + "']"));
+        webDriverUtils.byClear(wait, searchInput);
     }
 }

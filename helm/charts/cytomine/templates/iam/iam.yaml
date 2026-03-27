@@ -104,24 +104,32 @@ spec:
             secretKeyRef:
               name: admin-iam-secret
               key: password
+        startupProbe:
+          httpGet:
+            path: /iam/health/live
+            scheme: HTTPS
+            port: 9000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          failureThreshold: 30
+          timeoutSeconds: 10
         readinessProbe:
           exec:
             command:
               - /bin/sh
               - -c
               - /opt/keycloak/bin/kcadm.sh config credentials --server http://localhost:{{ .Values.iam.port }}/iam --realm master --user admin --password $KC_BOOTSTRAP_ADMIN_PASSWORD --config /tmp/probe.config
-          initialDelaySeconds: 30
           periodSeconds: 10
-          failureThreshold: 12
+          failureThreshold: 3
           timeoutSeconds: 10
         livenessProbe:
           httpGet:
-           path: /iam/health/live
-           scheme: HTTPS
-           port: 9000
-          initialDelaySeconds: 20
-          periodSeconds: 20
-          failureThreshold: 10
+            path: /iam/health/live
+            scheme: HTTPS
+            port: 9000
+          periodSeconds: 10
+          failureThreshold: 3
+          timeoutSeconds: 5
 
         resources:
           requests:

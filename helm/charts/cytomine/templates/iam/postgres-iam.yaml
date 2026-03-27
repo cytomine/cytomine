@@ -62,6 +62,34 @@ spec:
             - name: postgres
               containerPort: {{ .Values.postgresql.port }}
               protocol: TCP
+          startupProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - iam
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 30
+            timeoutSeconds: 5
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - iam
+            periodSeconds: 5
+            failureThreshold: 3
+            timeoutSeconds: 5
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - iam
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 5
           securityContext:
           {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
       initContainers:

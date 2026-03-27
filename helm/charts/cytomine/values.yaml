@@ -1,3 +1,4 @@
+---
 # Default values for cytomine.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
@@ -13,27 +14,26 @@
 #
 
 global:
-  domainName: null
+  domainName:
   # will be generated as ims.<domainName>
-  imsDomainName: null
+  imsDomainName:
   # will be generated as upload.<domainName>
-  urlUpload: null
+  urlUpload:
   affinity: {}
   tolerations: {}
-  publicIP: "192.168.49.2/32"
+  publicIP: 192.168.49.2/32
   protocol: TCP
-readOnceStorageClass: ""
-readManyStorageClass: null
-
+readOnceStorageClass: ''
+readManyStorageClass:
 # Resource settings
-mongodbStorage: "1Gi"
-postgresStorage: "3Gi"
+mongodbStorage: 1Gi
+postgresStorage: 3Gi
 
 # Email settings
 adminEmail: info@cytomine.coop
 emailSender: your.email@gmail.com
 emailReceiver: receiver@XXX.com
-smtpPass: null
+smtpPass:
 smtpHost: mail.smtp
 smtpPort: 587
 
@@ -42,15 +42,15 @@ smtpPort: 587
 #
 ingress:
   annotations:
-    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: 'true'
     nginx.ingress.kubernetes.io/cors-allow-headers: DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,dateFull,content-type-full,content-MD5
-    nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, DELETE, OPTIONS"
-    nginx.ingress.kubernetes.io/enable-access-log: "true"
-    nginx.ingress.kubernetes.io/enable-cors: "true"
-    nginx.ingress.kubernetes.io/enable-error-log: "true"
-    nginx.ingress.kubernetes.io/proxy-body-size: "0"
-    nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.org/client-max-body-size: "0"
+    nginx.ingress.kubernetes.io/cors-allow-methods: PUT, GET, POST, DELETE, OPTIONS
+    nginx.ingress.kubernetes.io/enable-access-log: 'true'
+    nginx.ingress.kubernetes.io/enable-cors: 'true'
+    nginx.ingress.kubernetes.io/enable-error-log: 'true'
+    nginx.ingress.kubernetes.io/proxy-body-size: '0'
+    nginx.ingress.kubernetes.io/use-regex: 'true'
+    nginx.org/client-max-body-size: '0'
     nginx.org/proxy-connect-timeout: 3600s
     nginx.org/proxy-read-timeout: 3600s
     nginx.org/proxy-send-timeout: 3600s
@@ -76,7 +76,7 @@ images:
   postgis: postgis/postgis:15-3.5
   postgresql_iam: postgres:14
   postgresql_app_engine: postgres:14
-  mongodb: mongo:4.4-focal
+  mongodb: mongo:5.0-focal
   pims_cache: redis:7
   redis: redis:7
   iam: keycloak/keycloak:26.3
@@ -85,7 +85,6 @@ images:
   pullPolicy: Always
   # array of image secrets names
   imagePullSecretsNames:
-
 #
 # Services - these are the services deployed by this chart
 #
@@ -98,14 +97,14 @@ postgresql:
   database: docker
   resources:
     requests:
-      memory: "512Mi"
-      cpu: "50m"
+      memory: 512Mi
+      cpu: 50m
       ephemeral-storage: 1Gi
     limits:
-      memory: "512Mi"
-      cpu: "200m"
+      memory: 512Mi
+      cpu: 200m
       ephemeral-storage: 1Gi
-  storageClassName: null
+  storageClassName:
   storageAccessMode: ReadWriteOnce
 
 # MongoDB - Secondary database.Stores activity data
@@ -117,15 +116,15 @@ mongodb:
   database: cytomine
   resources:
     requests:
-      memory: "256Mi"
-      cpu: "50m"
+      memory: 256Mi
+      cpu: 50m
       ephemeral-storage: 1Gi
     limits:
-      memory: "256Mi"
-      cpu: "200m"
+      memory: 1Gi
+      cpu: 200m
       ephemeral-storage: 1Gi
-  mongoStorageHostPath: null
-  storageClassName: null
+  mongoStorageHostPath:
+  storageClassName:
   storageAccessMode: ReadWriteOnce
 
 # Redis - Cache for fast image extractor
@@ -134,19 +133,19 @@ pims_cache:
   port: 6379
   resources:
     requests:
-      memory: "256Mi"
-      cpu: "500m"
+      memory: 256Mi
+      cpu: 500m
       ephemeral-storage: 32Mi
     limits:
-      memory: "512Mi"
-      cpu: "1000m"
+      memory: 512Mi
+      cpu: 1000m
       ephemeral-storage: 1Gi
 
 redis:
   port: 6379
   storage:
     size: 1Gi
-    storageClassName: null
+    storageClassName:
 
 # Core - Main Cytomine Server
 core:
@@ -155,12 +154,12 @@ core:
   server_id: 69308206-ed7c-454b-90b3-5639377ccd2f
   resources:
     requests:
-      memory: "2Gi"
-      cpu: "1000m"
+      memory: 2Gi
+      cpu: 1000m
       ephemeral-storage: 1Gi
     limits:
-      memory: "4Gi"
-      cpu: "2000m"
+      memory: 4Gi
+      cpu: 2000m
       ephemeral-storage: 1Gi
 
 # Pims - Main Image Server
@@ -169,19 +168,19 @@ pims:
   port: 5000
   resources:
     requests:
-      memory: "4Gi"
-      cpu: "1000m"
+      memory: 4Gi
+      cpu: 1000m
       ephemeral-storage: 1Gi
     limits:
-      memory: "4Gi"
-      cpu: "1000m"
+      memory: 4Gi
+      cpu: 1000m
       ephemeral-storage: 1Gi
   imageStorage:
     size: 3Gi
-    storageClassName: null
+    storageClassName:
   tempImageStorage:
     size: 1Gi
-    storageClassName: null
+    storageClassName:
 
   # Volume block for the path of the images to import.
   # Should be in the form:
@@ -189,21 +188,21 @@ pims:
   #   hostPath:
   #     path: /data/dataset
   #     type: DirectoryOrCreate
-  datasetImportStorage: null
+  datasetImportStorage:
 
 # Nginx - Main HTTP proxy dispatching incoming requests
 nginx:
   deploy: false
   port: 9000
-  serverID: null
+  serverID:
   resources:
     requests:
-      memory: "256Mi"
-      cpu: "100m"
+      memory: 256Mi
+      cpu: 100m
       ephemeral-storage: 32Mi
     limits:
-      memory: "256Mi"
-      cpu: "200m"
+      memory: 256Mi
+      cpu: 200m
       ephemeral-storage: 1Gi
 
 # Web-ui - Cytomine GUI interface
@@ -212,12 +211,12 @@ web_ui:
   port: 9090
   resources:
     requests:
-      memory: "256Mi"
-      cpu: "100m"
+      memory: 256Mi
+      cpu: 100m
       ephemeral-storage: 32Mi
     limits:
-      memory: "256Mi"
-      cpu: "200m"
+      memory: 256Mi
+      cpu: 200m
       ephemeral-storage: 1Gi
   replicas: 1
 
@@ -234,13 +233,13 @@ cbir:
   port: 6000  # https://github.com/cytomine/cytomine/blob/8e5a14bf70b22e9f96a253d6402f793e8a37ce3e/cbir/Dockerfile#L37
   storage:
     size: 1Gi
-    storageClassName: null
+    storageClassName:
 
 app_engine:
   port: 8080
   storage:
     size: 5Gi
-    storageClassName: null
+    storageClassName:
   tasks_namespace:
   registry:
     port: 5000
@@ -250,10 +249,10 @@ app_engine:
     # URL used by the container runtime to pull task images
     # This must be reachable from the node's container runtime (containerd/docker)
     # Examples: "localhost:32000" for NodePort, or external registry URL
-    advertisedUrl: null
+    advertisedUrl:
     storage:
       size: 5Gi
-      storageClassName: null
+      storageClassName:
 
 sam:
   port: 8000
@@ -263,12 +262,12 @@ repository:
   port: 8081
   resources:
     requests:
-      memory: "512Mi"
-      cpu: "500m"
+      memory: 512Mi
+      cpu: 500m
       ephemeral-storage: 256Mi
     limits:
-      memory: "1Gi"
-      cpu: "1000m"
+      memory: 1Gi
+      cpu: 1000m
       ephemeral-storage: 512Mi
 
 #
@@ -283,7 +282,7 @@ serviceAccount:
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname
   # template
-  name: ""
+  name: ''
 
 containerSecurity:
   allowPrivilegeEscalation: false  # do not allow the container to switch to a user with more permissions
@@ -292,7 +291,6 @@ containerSecurity:
   userID: 20000
   groupID: 20000
   fsgroupID: 20000
-
 # Fix volumes permissions
 # will be removed soon, do not use for newly created environments
 fixVolumesPermissions: false

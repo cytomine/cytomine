@@ -83,6 +83,14 @@ spec:
               containerPort: {{ .Values.core.port }}
           resources:
             {{- toYaml .Values.core.resources | nindent 12 }}
+          startupProbe:
+            httpGet:
+              path: /server/ping
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            failureThreshold: 30
+            timeoutSeconds: 5
           livenessProbe:
             httpGet:
               path: /server/ping

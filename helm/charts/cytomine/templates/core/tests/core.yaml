@@ -132,5 +132,5 @@ spec:
         - name: SELENIUM_URL
           value: http://localhost:4444
         - name: E2E_PARALLEL
-          value: "true"
+          value: "false"
   restartPolicy: Never

@@ -7,6 +7,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -335,6 +337,29 @@ public class CytomineTests {
         cytomineSteps.removeUserFromProject(wait, projectUrl, username);
 
         cytomineSteps.deleteProject(wait, projectUrl);
+        cytomineSteps.logout(wait, cytomineUrl);
+    }
+
+    @Test
+    void filterProjectByName() {
+        int nbProjects = 3;
+        String projectNameToSearch = "search-" + randomUUID();
+        List<String> projectUrls = new ArrayList<>();
+        List<String> projectNames = new ArrayList<>();
+
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        projectUrls.add(cytomineSteps.createProject(wait, driver, cytomineUrl, projectNameToSearch));
+        for (int i = 0; i < nbProjects; i++) {
+            String projectName = "selenium-" + randomUUID();
+            projectNames.add(projectName);
+            projectUrls.add(cytomineSteps.createProject(wait, driver, cytomineUrl, projectName));
+        }
+
+        cytomineSteps.filterProjectByName(wait, cytomineUrl, projectNameToSearch, projectNames);
+
+        for (String projectUrl : projectUrls) {
+            cytomineSteps.deleteProject(wait, projectUrl);
+        }
         cytomineSteps.logout(wait, cytomineUrl);
     }
 }

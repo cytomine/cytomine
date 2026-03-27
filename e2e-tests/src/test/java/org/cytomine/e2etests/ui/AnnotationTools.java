@@ -66,7 +66,7 @@ public class AnnotationTools {
         webDriverUtils.xpathClick(wait, "//button[.//*[@d and starts-with(@d,'m 28.507424')]]");
         webDriverUtils.byIsDisplayed(
             wait,
-            By.xpath("//button[contains(@class, 'is-selected') and .//svg//*[starts-with(@d,'m 28.507424')]]")
+            By.xpath("//button[contains(@class, 'is-selected') and .//*[@d and starts-with(@d,'m 28.507424')]]")
         );
 
         WebElement mapCanvas = webDriverUtils.waitForCanvasReady(wait, By.cssSelector(".ol-viewport canvas"));
@@ -166,7 +166,7 @@ public class AnnotationTools {
         webDriverUtils.xpathClick(wait, "//button[.//*[@d and starts-with(@d,'m 38.949622')]]");
         webDriverUtils.byIsDisplayed(
             wait,
-            By.xpath("//button[contains(@class, 'is-selected') and .//svg//*[starts-with(@d,'m 38.949622')]]")
+            By.xpath("//button[contains(@class, 'is-selected') and .//*[@d and starts-with(@d,'m 38.949622')]]")
         );
 
         WebElement mapCanvas = webDriverUtils.waitForCanvasReady(wait, By.cssSelector(".ol-viewport canvas"));

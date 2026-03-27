@@ -89,8 +89,8 @@ spec:
                 - --eval
                 - "db.adminCommand('ping')"
             periodSeconds: 10
-            failureThreshold: 3
-            timeoutSeconds: 5
+            failureThreshold: 6
+            timeoutSeconds: 10
           resources:
             {{- toYaml .Values.mongodb.resources | nindent 12 }}
       {{- with .Values.global.tolerations }}

@@ -32,11 +32,17 @@ public interface OntologyMapper {
     @Mapping(target = "parent", ignore = true)
     TermCommandPayload mapToTermCommandPayload(TermEntity termEntity);
 
+
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "ontologyId", source = "ontology")
     @Mapping(target = "children", ignore = true)
     @BeanMapping(ignoreUnmappedSourceProperties = {"parent",})
     TermEntity mapToTermEntity(TermCommandPayload termCommandPayload);
 
-
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "ontologyId", source = "ontology")
+    @Mapping(target = "children", ignore = true)
+    @BeanMapping(ignoreUnmappedSourceProperties = {"parent", "id"})
+    TermEntity mapToTermEntityWithoutID(TermCommandPayload termCommandPayload);
 }

@@ -1,11 +1,14 @@
 package org.cytomine.repository.service;
 
+import java.util.Optional;
+
 import lombok.AllArgsConstructor;
 import org.cytomine.repository.mapper.OntologyMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
 import org.cytomine.repository.persistence.TermRepository;
 import org.cytomine.repository.persistence.entity.CommandV2Entity;
 import org.cytomine.repository.persistence.entity.TermEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import be.cytomine.common.repository.model.command.DeleteTermCommand;
@@ -20,16 +23,17 @@ public class UndoCommandService {
     private final ACLService aclService;
     private final TermRepository termRepository;
     private final OntologyMapper ontologyMapper;
+    private final JdbcTemplate jdbcTemplate;
 
-    public boolean undoCommand(long userId, UndoCommand undoCommand) {
+    public Optional<Long> undoCommand(long userId, UndoCommand undoCommand) {
         return commandRepository.findById(undoCommand.id())
                    .filter(commandEntity -> userCanUndoCommand(userId, commandEntity))
-                   .map(commandEntity -> switch (commandEntity.getData()) {
+                   .flatMap(commandEntity -> switch (commandEntity.getData()) {
                            case DeleteTermCommand dtc -> undoDeleteTermCommand(dtc);
                            case InsertTermCommand icr -> undoInsertTermCommand(icr);
                            case UpdateTermCommand ucr -> undoUpdateTermCommand(ucr);
                        }
-                   ).isPresent();
+                   );
     }
 
     boolean userCanUndoCommand(long userId, CommandV2Entity commandEntity) {
@@ -40,18 +44,19 @@ public class UndoCommandService {
         };
     }
 
-    boolean undoDeleteTermCommand(DeleteTermCommand dtc) {
-        TermEntity termEntity = ontologyMapper.mapToTermEntity(dtc.data());
-        termRepository.save(termEntity);
-        return true;
+    Optional<Long> undoDeleteTermCommand(DeleteTermCommand dtc) {
+        TermEntity termEntity = ontologyMapper.mapToTermEntityWithoutID(dtc.data());
+        return Optional.of(termRepository.save(termEntity).getId());
+
     }
 
-    boolean undoInsertTermCommand(InsertTermCommand dtc) {
-        return true;
+    Optional<Long> undoInsertTermCommand(InsertTermCommand dtc) {
+        termRepository.deleteById(dtc.data().id());
+        return Optional.empty();
     }
 
-    boolean undoUpdateTermCommand(UpdateTermCommand dtc) {
-        return true;
+    Optional<Long> undoUpdateTermCommand(UpdateTermCommand dtc) {
+        return Optional.of(dtc.data().id());
     }
 
 }

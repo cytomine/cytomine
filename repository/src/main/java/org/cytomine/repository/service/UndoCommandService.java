@@ -27,11 +27,10 @@ public class UndoCommandService {
         return commandRepository.findById(undoCommand)
                    .filter(commandEntity -> userCanUndoCommand(userId, commandEntity))
                    .flatMap(commandEntity -> switch (commandEntity.getData()) {
-                           case DeleteTermCommand dtc -> undoDeleteTermCommand(dtc);
-                           case InsertTermCommand icr -> undoInsertTermCommand(icr);
-                           case UpdateTermCommand ucr -> undoUpdateTermCommand(ucr);
-                       }
-                   );
+                       case DeleteTermCommand dtc -> undoDeleteTermCommand(dtc);
+                       case InsertTermCommand icr -> undoInsertTermCommand(icr);
+                       case UpdateTermCommand ucr -> undoUpdateTermCommand(ucr);
+                   });
     }
 
     boolean userCanUndoCommand(long userId, CommandV2Entity commandEntity) {

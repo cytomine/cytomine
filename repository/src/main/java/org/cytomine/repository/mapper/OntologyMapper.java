@@ -36,7 +36,7 @@ public interface OntologyMapper {
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "ontologyId", source = "ontology")
     @Mapping(target = "children", ignore = true)
-    @BeanMapping(ignoreUnmappedSourceProperties = {"parent",})
+    @BeanMapping(ignoreUnmappedSourceProperties = {"parent"})
     TermEntity mapToTermEntity(TermCommandPayload termCommandPayload);
 
     @Mapping(target = "version", ignore = true)

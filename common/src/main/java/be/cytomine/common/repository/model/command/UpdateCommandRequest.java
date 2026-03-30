@@ -4,7 +4,7 @@ import static be.cytomine.common.repository.model.command.CommandType.UPDATE_COM
 
 public sealed interface UpdateCommandRequest<T> extends CommandV2Request<T> permits UpdateTermCommand {
     @Override
-    default CommandType commandType() {
+    default CommandType getCommandType() {
         return UPDATE_COMMAND;
     }
 }

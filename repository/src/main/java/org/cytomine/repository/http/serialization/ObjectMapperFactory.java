@@ -12,6 +12,4 @@ public class ObjectMapperFactory {
     JsonMapperBuilderCustomizer snakeCaseCustomizer() {
         return builder -> builder.propertyNamingStrategy(PropertyNamingStrategies.LOWER_CAMEL_CASE);
     }
-
-
 }

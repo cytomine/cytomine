@@ -4,17 +4,17 @@ import java.util.Optional;
 
 import static java.lang.String.format;
 
-public record InsertTermCommand(TermCommandPayload data, Long userId, Long ontologyId)
+public record InsertTermCommand(TermCommandPayload data, Long userId, long ontologyId)
     implements InsertCommandRequest<TermCommandPayload> {
 
-
     @Override
-    public Optional<Long> projectId() {
+    public Optional<Long> getProjectId() {
         return Optional.empty();
     }
 
     @Override
-    public DataType dataType() {
+
+    public DataType getDataType() {
         return DataType.TERM;
     }
 

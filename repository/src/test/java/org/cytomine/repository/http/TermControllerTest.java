@@ -69,22 +69,18 @@ class TermControllerTest {
     @BeforeEach
     void setUp() {
         userId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
-        jdbcTemplate.update(
-            "INSERT INTO sec_user (id, version, username) VALUES (?, 0, 'admin')", userId);
+        jdbcTemplate.update("INSERT INTO sec_user (id, version, username) VALUES (?, 0, 'admin')", userId);
 
         // Make user an admin
         Long adminRoleId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
-        jdbcTemplate.update(
-            "INSERT INTO sec_role (id, version, authority) VALUES (?, 0, 'ROLE_ADMIN')", adminRoleId);
+        jdbcTemplate.update("INSERT INTO sec_role (id, version, authority) VALUES (?, 0, 'ROLE_ADMIN')", adminRoleId);
         Long userRoleId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
-        jdbcTemplate.update(
-            "INSERT INTO sec_user_sec_role (id, version, sec_user_id, sec_role_id) VALUES (?, 0, ?, ?)",
+        jdbcTemplate.update("INSERT INTO sec_user_sec_role (id, version, sec_user_id, sec_role_id) VALUES (?, 0, ?, ?)",
             userRoleId, userId, adminRoleId);
 
         ontologyId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
-        jdbcTemplate.update(
-            "INSERT INTO ontology (id, version, name, user_id) VALUES (?, 0, 'test', ?)",
-            ontologyId, userId);
+        jdbcTemplate.update("INSERT INTO ontology (id, version, name, user_id) VALUES (?, 0, 'test', ?)", ontologyId,
+            userId);
 
         projectId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
         jdbcTemplate.update("""
@@ -101,23 +97,20 @@ class TermControllerTest {
     void findTermByIdWhenExistsReturnsTerm() {
         TermEntity entity = createAndSaveTermEntity("term1", "#FF0000");
 
-        String response = mockMvc.perform(get("/terms/{id}", entity.getId())
-                .param("userId", userId.toString()))
-            .andExpect(status().isOk())
-            .andReturn().getResponse().getContentAsString();
+        String response = mockMvc.perform(get("/terms/{id}", entity.getId()).param("userId", userId.toString()))
+                              .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
         TermResponse result = objectMapper.readValue(response, TermResponse.class);
-        TermResponse expected = new TermResponse(entity.getId(), "term1", "#FF0000", ontologyId,
-            entity.getCreated(), entity.getUpdated(), "", null);
+        TermResponse expected =
+            new TermResponse(entity.getId(), "term1", "#FF0000", ontologyId, entity.getCreated(), entity.getUpdated(),
+                "", null);
         assertEquals(expected, result);
     }
 
     @Test
     @SneakyThrows
     void findTermByIdWhenNotExistsReturnsEmpty() {
-        mockMvc.perform(get("/terms/{id}", 999L)
-                .param("userId", userId.toString()))
-            .andExpect(status().isOk())
+        mockMvc.perform(get("/terms/{id}", 999L).param("userId", userId.toString())).andExpect(status().isOk())
             .andExpect(jsonPath("$").doesNotExist());
     }
 
@@ -126,12 +119,10 @@ class TermControllerTest {
     void createSavesAndReturnsTerm() {
         CreateTerm createTerm = new CreateTerm("newTerm", "#00FF00", ontologyId, null);
 
-        String response = mockMvc.perform(post("/terms")
-                .param("userId", userId.toString())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(createTerm)))
-            .andExpect(status().isOk())
-            .andReturn().getResponse().getContentAsString();
+        String response = mockMvc.perform(
+                post("/terms").param("userId", userId.toString()).contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(createTerm))).andExpect(status().isOk()).andReturn()
+                              .getResponse().getContentAsString();
 
         HttpCommandResponse<TermResponse> result = objectMapper.readValue(response,
             objectMapper.getTypeFactory().constructParametricType(HttpCommandResponse.class, TermResponse.class));
@@ -141,9 +132,9 @@ class TermControllerTest {
         assertEquals(ontologyId, result.data().ontologyId());
 
         CommandV2Entity command = commandRepository.findById(result.command()).orElseThrow();
-        assertEquals(CommandType.INSERT_COMMAND, command.getData().commandType());
+        assertEquals(CommandType.INSERT_COMMAND, command.getData().getCommandType());
         assertEquals(userId, command.getUserId());
-        assertEquals("TermService", command.getData().dataType());
+        assertEquals(DataType.TERM, command.getData().getDataType());
 
     }
 
@@ -153,12 +144,10 @@ class TermControllerTest {
         TermEntity entity = createAndSaveTermEntity("oldName", "#FF0000");
         UpdateTerm updateTerm = new UpdateTerm(Optional.of("newName"), Optional.of("#00FF00"));
 
-        String response = mockMvc.perform(put("/terms/{id}", entity.getId())
-                .param("userId", userId.toString())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updateTerm)))
-            .andExpect(status().isOk())
-            .andReturn().getResponse().getContentAsString();
+        String response = mockMvc.perform(put("/terms/{id}", entity.getId()).param("userId", userId.toString())
+                                              .contentType(MediaType.APPLICATION_JSON)
+                                              .content(objectMapper.writeValueAsString(updateTerm)))
+                              .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
         HttpCommandResponse<TermResponse> result = objectMapper.readValue(response,
             objectMapper.getTypeFactory().constructParametricType(HttpCommandResponse.class, TermResponse.class));
@@ -168,7 +157,7 @@ class TermControllerTest {
 
         CommandV2Entity command = commandRepository.findById(result.command()).orElseThrow();
         assertEquals(userId, command.getUserId());
-        assertEquals("TermService", command.getData());
+        assertEquals(DataType.TERM, command.getData().getDataType());
 
     }
 
@@ -177,11 +166,9 @@ class TermControllerTest {
     void updateWhenNotExistsReturnsEmpty() {
         UpdateTerm updateTerm = new UpdateTerm(Optional.of("newName"), Optional.empty());
 
-        mockMvc.perform(put("/terms/{id}", 999L)
-                .param("userId", userId.toString())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updateTerm)))
-            .andExpect(status().isOk())
+        mockMvc.perform(
+                put("/terms/{id}", 999L).param("userId", userId.toString()).contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(updateTerm))).andExpect(status().isOk())
             .andExpect(jsonPath("$").doesNotExist());
     }
 
@@ -190,10 +177,8 @@ class TermControllerTest {
     void deleteWhenExistsDeletesAndReturnsTerm() {
         TermEntity entity = createAndSaveTermEntity("term1", "#FF0000");
 
-        String response = mockMvc.perform(delete("/terms/{id}", entity.getId())
-                .param("userId", userId.toString()))
-            .andExpect(status().isOk())
-            .andReturn().getResponse().getContentAsString();
+        String response = mockMvc.perform(delete("/terms/{id}", entity.getId()).param("userId", userId.toString()))
+                              .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
         HttpCommandResponse<TermResponse> result = objectMapper.readValue(response,
             objectMapper.getTypeFactory().constructParametricType(HttpCommandResponse.class, TermResponse.class));
@@ -202,9 +187,9 @@ class TermControllerTest {
         assertTrue(termRepository.findById(entity.getId()).isEmpty());
 
         CommandV2Entity command = commandRepository.findById(result.command()).orElseThrow();
-        assertEquals(CommandType.DELETE_COMMAND, command.getData().commandType());
+        assertEquals(CommandType.DELETE_COMMAND, command.getData().getCommandType());
         assertEquals(userId, command.getUserId());
-        assertEquals(DataType.TERM, command.getData().dataType());
+        assertEquals(DataType.TERM, command.getData().getDataType());
 
     }
 
@@ -213,17 +198,16 @@ class TermControllerTest {
     void findTermsByProjectReturnsPageOfTerms() {
         TermEntity entity = createAndSaveTermEntity("term1", "#FF0000");
 
-        String response = mockMvc.perform(get("/terms/project/{id}", projectId)
-                .param("userId", userId.toString()))
-            .andExpect(status().isOk())
-            .andReturn().getResponse().getContentAsString();
+        String response = mockMvc.perform(get("/terms/project/{id}", projectId).param("userId", userId.toString()))
+                              .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
-        SpringPage<TermResponse> page = objectMapper.readValue(response,
-            new TypeReference<SpringPage<TermResponse>>() {});
+        SpringPage<TermResponse> page = objectMapper.readValue(response, new TypeReference<SpringPage<TermResponse>>() {
+        });
 
         assertEquals(1, page.getTotalElements());
-        TermResponse expected = new TermResponse(entity.getId(), "term1", "#FF0000", ontologyId,
-            entity.getCreated(), entity.getUpdated(), "", null);
+        TermResponse expected =
+            new TermResponse(entity.getId(), "term1", "#FF0000", ontologyId, entity.getCreated(), entity.getUpdated(),
+                "", null);
         assertEquals(List.of(expected), page.getContent());
     }
 
@@ -232,17 +216,16 @@ class TermControllerTest {
     void findTermsByOntologyReturnsPageOfTerms() {
         TermEntity entity = createAndSaveTermEntity("term1", "#FF0000");
 
-        String response = mockMvc.perform(get("/terms/ontology/{id}", ontologyId)
-                .param("userId", userId.toString()))
-            .andExpect(status().isOk())
-            .andReturn().getResponse().getContentAsString();
+        String response = mockMvc.perform(get("/terms/ontology/{id}", ontologyId).param("userId", userId.toString()))
+                              .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
-        SpringPage<TermResponse> page = objectMapper.readValue(response,
-            new TypeReference<SpringPage<TermResponse>>() {});
+        SpringPage<TermResponse> page = objectMapper.readValue(response, new TypeReference<SpringPage<TermResponse>>() {
+        });
 
         assertEquals(1, page.getTotalElements());
-        TermResponse expected = new TermResponse(entity.getId(), "term1", "#FF0000", ontologyId,
-            entity.getCreated(), entity.getUpdated(), "", null);
+        TermResponse expected =
+            new TermResponse(entity.getId(), "term1", "#FF0000", ontologyId, entity.getCreated(), entity.getUpdated(),
+                "", null);
         assertEquals(List.of(expected), page.getContent());
     }
 
@@ -250,16 +233,13 @@ class TermControllerTest {
     @SneakyThrows
     void createWhenUserHasNoWriteAccessReturnsEmpty() {
         Long nonAdminUserId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
-        jdbcTemplate.update(
-            "INSERT INTO sec_user (id, version, username) VALUES (?, 0, 'nonadmin')", nonAdminUserId);
+        jdbcTemplate.update("INSERT INTO sec_user (id, version, username) VALUES (?, 0, 'nonadmin')", nonAdminUserId);
 
         CreateTerm createTerm = new CreateTerm("newTerm", "#00FF00", ontologyId, null);
 
-        mockMvc.perform(post("/terms")
-                .param("userId", nonAdminUserId.toString())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(createTerm)))
-            .andExpect(status().isOk())
+        mockMvc.perform(
+                post("/terms").param("userId", nonAdminUserId.toString()).contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(createTerm))).andExpect(status().isOk())
             .andExpect(jsonPath("$").doesNotExist());
 
         assertTrue(termRepository.findAll().isEmpty());
@@ -267,7 +247,6 @@ class TermControllerTest {
 
     private TermEntity createAndSaveTermEntity(String name, String color) {
         Date now = new Date();
-        return termRepository.saveAndFlush(
-            new TermEntity(null, 0, ontologyId, name, color, now, now, "", null));
+        return termRepository.saveAndFlush(new TermEntity(null, 0, ontologyId, name, color, now, now, "", null));
     }
 }

@@ -62,7 +62,7 @@ public class TermCommandService {
         TermEntity termEntity = ontologyMapper.map(createTerm, new Date());
         TermCommandPayload termCommandPayload = ontologyMapper.mapToTermCommandPayload(termEntity);
         InsertTermCommand insertTermCommand =
-            new InsertTermCommand(termCommandPayload, userId, null);
+            new InsertTermCommand(termCommandPayload, userId, termCommandPayload.ontology());
         ZonedDateTime now = ZonedDateTime.now();
         CommandV2Entity commandV2Entity = commandV2Repository.save(commandMapper.map(insertTermCommand,
             now, now, userId));

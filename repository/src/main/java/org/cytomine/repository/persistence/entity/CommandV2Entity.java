@@ -28,7 +28,7 @@ public class CommandV2Entity {
     @Column
     private ZonedDateTime updated;
 
-    @Column
+    @Column(columnDefinition = "jsonb")
     @JdbcTypeCode(SqlTypes.JSON)
     private CommandV2Request<?> data;
 

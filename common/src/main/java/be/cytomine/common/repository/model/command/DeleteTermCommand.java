@@ -12,12 +12,12 @@ public record DeleteTermCommand(
 ) implements DeleteCommandRequest<TermCommandPayload> {
 
     @Override
-    public Optional<Long> projectId() {
+    public Optional<Long> getProjectId() {
         return Optional.empty();
     }
 
     @Override
-    public DataType dataType() {
+    public DataType getDataType() {
         return DataType.TERM;
     }
 

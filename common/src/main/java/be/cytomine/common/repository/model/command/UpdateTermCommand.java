@@ -8,12 +8,12 @@ public record UpdateTermCommand(Long id, TermCommandPayload data, Long userId, L
     implements UpdateCommandRequest<TermCommandPayload> {
 
     @Override
-    public Optional<Long> projectId() {
+    public Optional<Long> getProjectId() {
         return Optional.empty();
     }
 
     @Override
-    public DataType dataType() {
+    public DataType getDataType() {
         return DataType.TERM;
     }
 

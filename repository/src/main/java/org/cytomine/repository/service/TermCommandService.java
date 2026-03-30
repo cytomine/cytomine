@@ -83,13 +83,14 @@ public class TermCommandService {
         return termRepository.findById(id)
                    .filter(entity -> aclService.canWriteOntology(userId, entity.getOntologyId()))
                    .map(termEntity -> {
+                       TermCommandPayload beforePayload = ontologyMapper.mapToTermCommandPayload(termEntity);
                        updateTerm.name().ifPresent(termEntity::setName);
                        updateTerm.color().ifPresent(termEntity::setColor);
                        TermEntity savedEntity = termRepository.save(termEntity);
                        UpdateTermCommand updateCommand =
-                           new UpdateTermCommand(id, ontologyMapper.mapToTermCommandPayload(termEntity),
+                           new UpdateTermCommand(id, beforePayload,
                                ontologyMapper.mapToTermCommandPayload(savedEntity),
-                               userId, null);
+                               userId, termEntity.getOntologyId());
                        ZonedDateTime now = ZonedDateTime.now();
                        CommandV2Entity commandV2Entity = commandV2Repository.save(commandMapper.map(updateCommand,
                            now, now, userId));

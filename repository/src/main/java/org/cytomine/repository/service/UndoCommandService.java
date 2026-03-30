@@ -9,7 +9,6 @@ import org.cytomine.repository.persistence.CommandV2Repository;
 import org.cytomine.repository.persistence.TermRepository;
 import org.cytomine.repository.persistence.entity.CommandV2Entity;
 import org.cytomine.repository.persistence.entity.TermEntity;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import be.cytomine.common.repository.model.command.DeleteTermCommand;
@@ -23,7 +22,6 @@ public class UndoCommandService {
     private final ACLService aclService;
     private final TermRepository termRepository;
     private final OntologyMapper ontologyMapper;
-    private final JdbcTemplate jdbcTemplate;
 
     public Optional<Long> undoCommand(long userId, UUID undoCommand) {
         return commandRepository.findById(undoCommand)

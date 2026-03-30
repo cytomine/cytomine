@@ -1,16 +1,10 @@
 package be.cytomine.common.repository.model.command;
 
-import java.util.Optional;
-
 import static java.lang.String.format;
 
-public record InsertTermCommand(TermCommandPayload data, Long userId, long ontologyId)
+public record InsertTermCommand(TermCommandPayload data, long userId, long ontologyId)
     implements InsertCommandRequest<TermCommandPayload> {
 
-    @Override
-    public Optional<Long> getProjectId() {
-        return Optional.empty();
-    }
 
     @Override
 

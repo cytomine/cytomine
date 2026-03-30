@@ -1,6 +1,7 @@
 package org.cytomine.repository.service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import lombok.AllArgsConstructor;
 import org.cytomine.repository.mapper.OntologyMapper;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Component;
 import be.cytomine.common.repository.model.command.DeleteTermCommand;
 import be.cytomine.common.repository.model.command.InsertTermCommand;
 import be.cytomine.common.repository.model.command.UpdateTermCommand;
-import be.cytomine.common.repository.model.command.api.UndoCommand;
 
 @Component
 @AllArgsConstructor
@@ -25,8 +25,8 @@ public class UndoCommandService {
     private final OntologyMapper ontologyMapper;
     private final JdbcTemplate jdbcTemplate;
 
-    public Optional<Long> undoCommand(long userId, UndoCommand undoCommand) {
-        return commandRepository.findById(undoCommand.id())
+    public Optional<Long> undoCommand(long userId, UUID undoCommand) {
+        return commandRepository.findById(undoCommand)
                    .filter(commandEntity -> userCanUndoCommand(userId, commandEntity))
                    .flatMap(commandEntity -> switch (commandEntity.getData()) {
                            case DeleteTermCommand dtc -> undoDeleteTermCommand(dtc);
@@ -45,18 +45,18 @@ public class UndoCommandService {
     }
 
     Optional<Long> undoDeleteTermCommand(DeleteTermCommand dtc) {
-        TermEntity termEntity = ontologyMapper.mapToTermEntityWithoutID(dtc.data());
+        TermEntity termEntity = ontologyMapper.mapToTermEntityWithoutID(dtc.before());
         return Optional.of(termRepository.save(termEntity).getId());
-
     }
 
     Optional<Long> undoInsertTermCommand(InsertTermCommand dtc) {
-        termRepository.deleteById(dtc.data().id());
+        termRepository.deleteById(dtc.after().id());
         return Optional.empty();
     }
 
     Optional<Long> undoUpdateTermCommand(UpdateTermCommand dtc) {
-        return Optional.of(dtc.data().id());
+        termRepository.save(ontologyMapper.mapToTermEntity(dtc.before()));
+        return Optional.of(dtc.before().id());
     }
 
 }

@@ -22,8 +22,8 @@ import be.cytomine.common.repository.model.command.Commands;
 import be.cytomine.common.repository.model.command.DeleteTermCommand;
 import be.cytomine.common.repository.model.command.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.InsertTermCommand;
-import be.cytomine.common.repository.model.command.TermCommandPayload;
 import be.cytomine.common.repository.model.command.UpdateTermCommand;
+import be.cytomine.common.repository.model.command.payload.term.TermCommandPayload;
 
 @Component
 @AllArgsConstructor
@@ -61,13 +61,15 @@ public class TermCommandService {
         }
 
         TermEntity termEntity = ontologyMapper.map(createTerm, new Date());
-        TermCommandPayload termCommandPayload = ontologyMapper.mapToTermCommandPayload(termEntity);
+
+        TermEntity savedEntity = termRepository.save(termEntity);
+        TermCommandPayload termCommandPayload = ontologyMapper.mapToTermCommandPayload(savedEntity);
         InsertTermCommand insertTermCommand =
             new InsertTermCommand(termCommandPayload, userId, termCommandPayload.ontology());
         ZonedDateTime now = ZonedDateTime.now();
         CommandV2Entity commandV2Entity = commandV2Repository.save(commandMapper.map(insertTermCommand,
             now, now, userId));
-        TermEntity savedEntity = termRepository.save(termEntity);
+
         TermResponse termResponse = ontologyMapper.map(savedEntity);
         Callback callback = new Callback(Commands.INSERT_TERM,
             Optional.of(savedEntity.getId()), Optional.of(savedEntity.getOntologyId()), Optional.empty());
@@ -83,14 +85,15 @@ public class TermCommandService {
                    .map(termEntity -> {
                        updateTerm.name().ifPresent(termEntity::setName);
                        updateTerm.color().ifPresent(termEntity::setColor);
-
+                       TermEntity savedEntity = termRepository.save(termEntity);
                        UpdateTermCommand updateCommand =
                            new UpdateTermCommand(id, ontologyMapper.mapToTermCommandPayload(termEntity),
+                               ontologyMapper.mapToTermCommandPayload(savedEntity),
                                userId, null);
                        ZonedDateTime now = ZonedDateTime.now();
                        CommandV2Entity commandV2Entity = commandV2Repository.save(commandMapper.map(updateCommand,
                            now, now, userId));
-                       TermEntity savedEntity = termRepository.save(termEntity);
+
                        TermResponse termResponse = ontologyMapper.map(savedEntity);
                        Callback callback = new Callback(Commands.UPDATE_TERM,
                            Optional.of(savedEntity.getId()), Optional.of(savedEntity.getOntologyId()),

@@ -9,7 +9,7 @@ import org.mapstruct.Mapping;
 
 import be.cytomine.common.repository.model.CreateTerm;
 import be.cytomine.common.repository.model.TermResponse;
-import be.cytomine.common.repository.model.command.TermCommandPayload;
+import be.cytomine.common.repository.model.command.payload.term.TermCommandPayload;
 
 @Mapper(componentModel = "spring")
 public interface OntologyMapper {

@@ -18,7 +18,6 @@ import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.model.CreateTerm;
 import be.cytomine.common.repository.model.TermResponse;
 import be.cytomine.common.repository.model.command.HttpCommandResponse;
-import be.cytomine.common.repository.model.command.api.UndoCommand;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -75,9 +74,7 @@ class UndoCommandServiceTest {
 
         assertTrue(termRepository.findById(originalTermId).isEmpty());
 
-        UndoCommand undoCommand = new UndoCommand(deleteCommandId, UUID.randomUUID());
-
-        Optional<Long> undoResult = undoCommandService.undoCommand(userId, undoCommand);
+        Optional<Long> undoResult = undoCommandService.undoCommand(userId, deleteCommandId);
 
         assertTrue(undoResult.isPresent());
 
@@ -89,10 +86,7 @@ class UndoCommandServiceTest {
 
     @Test
     void undoCommandWithNonExistentCommandIdReturnsFalse() {
-        UndoCommand undoCommand = new UndoCommand(UUID.randomUUID(), UUID.randomUUID());
-
-        Optional<Long> result = undoCommandService.undoCommand(userId, undoCommand);
-
+        Optional<Long> result = undoCommandService.undoCommand(userId, UUID.randomUUID());
         assertFalse(result.isPresent());
     }
 
@@ -110,8 +104,7 @@ class UndoCommandServiceTest {
         Long nonAdminUserId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
         jdbcTemplate.update("INSERT INTO sec_user (id, version, username) VALUES (?, 0, 'nonadmin')", nonAdminUserId);
 
-        UndoCommand undoCommand = new UndoCommand(deleteCommandId, UUID.randomUUID());
-        Optional<Long> result = undoCommandService.undoCommand(nonAdminUserId, undoCommand);
+        Optional<Long> result = undoCommandService.undoCommand(nonAdminUserId, deleteCommandId);
 
         assertFalse(result.isPresent());
         assertTrue(termRepository.findById(termId).isEmpty());

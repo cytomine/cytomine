@@ -19,6 +19,7 @@ package be.cytomine.controller.ontology;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -174,13 +175,14 @@ public class TermResourceTests {
     public void add_valid_term() throws Exception {
         Term term = builder.given_a_term();
         Long userId = builder.given_superadmin().getId();
+        UUID commandId = UUID.randomUUID();
         when(termHttpContract.create(eq(userId), any()))
             .thenReturn(Optional.of(new HttpCommandResponse<>(
                 new Callback("be.cytomine.AddTermCommand", Optional.of(term.getId()),
                     Optional.of(term.getOntology().getId()), Optional.empty()),
                 true, new TermResponse(term.getId(), term.getName(), term.getColor(),
                 term.getOntology().getId(), term.getCreated(),
-                term.getUpdated(), term.getComment(), Set.of()), 1L)));
+                term.getUpdated(), term.getComment(), Set.of()), commandId)));
 
         String createTermJson = JsonObject.of(
             "name", term.getName(),
@@ -225,13 +227,14 @@ public class TermResourceTests {
     public void edit_valid_term() throws Exception {
         Term term = builder.given_a_term();
         Long userId = builder.given_superadmin().getId();
+        UUID commandId = UUID.randomUUID();
         when(termHttpContract.update(eq(term.getId()), eq(userId), any()))
             .thenReturn(Optional.of(new HttpCommandResponse<>(
                 new Callback("be.cytomine.EditTermCommand", Optional.of(term.getId()),
                     Optional.of(term.getOntology().getId()), Optional.empty()),
                 true, new TermResponse(term.getId(), term.getName(), term.getColor(),
                 term.getOntology().getId(), term.getCreated(),
-                term.getUpdated(), term.getComment(), Set.of()), 1L)));
+                term.getUpdated(), term.getComment(), Set.of()), commandId)));
 
         String updateTermJson = JsonObject.of(
             "name", term.getName(),
@@ -273,13 +276,14 @@ public class TermResourceTests {
     public void delete_term() throws Exception {
         Term term = builder.given_a_term();
         Long userId = builder.given_superadmin().getId();
+        UUID commandId = UUID.randomUUID();
         when(termHttpContract.delete(eq(term.getId()), eq(userId)))
             .thenReturn(Optional.of(new HttpCommandResponse<>(
                 new Callback("be.cytomine.DeleteTermCommand", Optional.of(term.getId()),
                     Optional.of(term.getOntology().getId()), Optional.empty()),
                 true, new TermResponse(term.getId(), term.getName(), term.getColor(),
                 term.getOntology().getId(), term.getCreated(),
-                term.getUpdated(), term.getComment(), Set.of()), 1L)));
+                term.getUpdated(), term.getComment(), Set.of()), commandId)));
 
         restTermControllerMockMvc.perform(delete("/api/term/{id}.json", term.getId()))
             .andExpect(status().isOk())

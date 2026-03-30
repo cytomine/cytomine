@@ -1,8 +1,6 @@
-package be.cytomine.common.repository.model.command.delete;
+package be.cytomine.common.repository.model.command;
 
 import java.util.Optional;
-
-import be.cytomine.common.repository.model.command.TermCommandPayload;
 
 import static java.lang.String.format;
 
@@ -19,8 +17,8 @@ public record DeleteTermCommand(
     }
 
     @Override
-    public String serviceName() {
-        return "TermService";
+    public DataType dataType() {
+        return DataType.TERM;
     }
 
     @Override

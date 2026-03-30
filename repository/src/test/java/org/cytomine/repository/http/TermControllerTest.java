@@ -6,15 +6,15 @@ import java.util.Optional;
 
 import lombok.SneakyThrows;
 import org.cytomine.repository.RepositoryApp;
-import org.cytomine.repository.persistence.CommandRepository;
+import org.cytomine.repository.persistence.CommandV2Repository;
 import org.cytomine.repository.persistence.TermRepository;
-import org.cytomine.repository.persistence.entity.CommandEntity;
+import org.cytomine.repository.persistence.entity.CommandV2Entity;
 import org.cytomine.repository.persistence.entity.TermEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -28,12 +28,18 @@ import be.cytomine.common.SpringPage;
 import be.cytomine.common.repository.model.CreateTerm;
 import be.cytomine.common.repository.model.TermResponse;
 import be.cytomine.common.repository.model.UpdateTerm;
+import be.cytomine.common.repository.model.command.CommandType;
+import be.cytomine.common.repository.model.command.DataType;
 import be.cytomine.common.repository.model.command.HttpCommandResponse;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = RepositoryApp.class)
 @AutoConfigureMockMvc
@@ -48,7 +54,7 @@ class TermControllerTest {
     private TermRepository termRepository;
 
     @Autowired
-    private CommandRepository commandRepository;
+    private CommandV2Repository commandRepository;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -134,11 +140,11 @@ class TermControllerTest {
         assertEquals("#00FF00", result.data().color());
         assertEquals(ontologyId, result.data().ontologyId());
 
-        CommandEntity command = commandRepository.findById(result.command()).orElseThrow();
-        assertEquals("be.cytomine.domain.command.AddCommand", command.getCommandType());
+        CommandV2Entity command = commandRepository.findById(result.command()).orElseThrow();
+        assertEquals(CommandType.INSERT_COMMAND, command.getData().commandType());
         assertEquals(userId, command.getUserId());
-        assertEquals("TermService", command.getServiceName());
-        assertTrue(command.isSaveOnUndoRedoStack());
+        assertEquals("TermService", command.getData().dataType());
+
     }
 
     @Test
@@ -160,11 +166,10 @@ class TermControllerTest {
         assertEquals("newName", result.data().name());
         assertEquals("#00FF00", result.data().color());
 
-        CommandEntity command = commandRepository.findById(result.command()).orElseThrow();
-        assertEquals("be.cytomine.domain.command.EditCommand", command.getCommandType());
+        CommandV2Entity command = commandRepository.findById(result.command()).orElseThrow();
         assertEquals(userId, command.getUserId());
-        assertEquals("TermService", command.getServiceName());
-        assertTrue(command.isSaveOnUndoRedoStack());
+        assertEquals("TermService", command.getData());
+
     }
 
     @Test
@@ -196,11 +201,11 @@ class TermControllerTest {
         assertEquals("term1", result.data().name());
         assertTrue(termRepository.findById(entity.getId()).isEmpty());
 
-        CommandEntity command = commandRepository.findById(result.command()).orElseThrow();
-        assertEquals("be.cytomine.domain.command.DeleteCommand", command.getCommandType());
+        CommandV2Entity command = commandRepository.findById(result.command()).orElseThrow();
+        assertEquals(CommandType.DELETE_COMMAND, command.getData().commandType());
         assertEquals(userId, command.getUserId());
-        assertEquals("TermService", command.getServiceName());
-        assertTrue(command.isSaveOnUndoRedoStack());
+        assertEquals(DataType.TERM, command.getData().dataType());
+
     }
 
     @Test

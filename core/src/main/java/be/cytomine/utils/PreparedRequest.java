@@ -6,6 +6,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import lombok.Getter;
@@ -90,16 +91,18 @@ public class PreparedRequest {
 
     public String getQuery() {
         return this.queryParameters.entrySet()
-                   .stream()
-                   .filter(e -> e.getValue() != null && !e.getValue().toString().isEmpty())
-                   .map(e -> e.getKey() + "=" + e.getValue())
-                   .collect(Collectors.joining("&"));
+            .stream()
+            .filter(e -> e.getValue() != null && !e.getValue().toString().isEmpty())
+            .map(e -> e.getKey() + "=" + e.getValue())
+            .collect(Collectors.joining("&"));
     }
 
     public URI getURI() {
         try {
-            return new URI(this.scheme, null, this.host, this.port, this.path, this.getQuery(),
-                null);
+            return new URI(
+                this.scheme, null, this.host, this.port, this.path, this.getQuery(),
+                null
+            );
         } catch (URISyntaxException e) {
             throw new ServerException(e.getMessage(), e.getCause());
         }
@@ -110,7 +113,7 @@ public class PreparedRequest {
             body.entrySet()
                 .stream()
                 .filter(e -> e.getValue() != null && !e.getValue().toString().isEmpty())
-                .collect(Collectors.toMap(x -> x.getKey(), x -> x.getValue()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
         );
     }
 

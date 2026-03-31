@@ -25,14 +25,13 @@ public class RestAnnotationIndexController extends RestCytomineController {
     private final SliceInstanceService sliceInstanceService;
 
     /**
-     * List all ontology visible for the current user
-     * For each ontology, print the terms tree
+     * List all ontology visible for the current user For each ontology, print the terms tree
      */
     @GetMapping("/sliceinstance/{id}/annotationindex.json")
     public ResponseEntity<String> listBySlice(@PathVariable Long id) {
         log.debug("REST request to get annotationindex for slice {}", id);
         SliceInstance sliceInstance = sliceInstanceService.find(id)
-                .orElseThrow(() -> new ObjectNotFoundException("SliceInstance", id));
+            .orElseThrow(() -> new ObjectNotFoundException("SliceInstance", id));
         return responseSuccess(annotationIndexService.list(sliceInstance));
     }
 }

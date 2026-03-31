@@ -1,20 +1,20 @@
 package be.cytomine.utils;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,14 +61,20 @@ public class AnnotationListingBuilder {
     private final ProjectService projectService;
 
 
-    public byte[] buildAnnotationReport(Long project, String users, JsonObject params, String terms, String format){
+    public byte[] buildAnnotationReport(Long project, String users, JsonObject params, String terms, String format) {
         List<Map<String, Object>> annotations = buildAnnotationList(params, users);
         Set<String> termNames = getTermNames(terms);
         Set<String> userNames = getUserNames(users);
-        return reportService.generateAnnotationsReport(projectService.get(project).getName(), termNames, userNames, annotations, format);
+        return reportService.generateAnnotationsReport(
+            projectService.get(project).getName(),
+            termNames,
+            userNames,
+            annotations,
+            format
+        );
     }
 
-    public List<Map<String, Object>> buildAnnotationList(JsonObject params, String users){
+    public List<Map<String, Object>> buildAnnotationList(JsonObject params, String users) {
         AnnotationListing annotationListing = buildAnnotationListing(params);
         annotationListing.getColumnsToPrint().add("gis");
         annotationListing.getColumnsToPrint().add("image");
@@ -76,16 +82,16 @@ public class AnnotationListingBuilder {
         return filterAnnotationByUsers(annotationListingService.listGeneric(annotationListing), users);
     }
 
-    private List<Map<String, Object>> filterAnnotationByUsers(List<AnnotationResult> annotations, String users){
+    private List<Map<String, Object>> filterAnnotationByUsers(List<AnnotationResult> annotations, String users) {
         List<Map<String, Object>> filteredAnnotations = new ArrayList<>();
         List<Long> userIds = Arrays.stream(users.split(","))
-                .sequential()
-                .filter(id -> !id.isEmpty())
-                .map(id -> Long.parseLong(id))
-                .collect(Collectors.toList());
+            .sequential()
+            .filter(id -> !id.isEmpty())
+            .map(Long::parseLong)
+            .collect(Collectors.toList());
 
-        for(AnnotationResult annotation : annotations){
-            if(userIds.contains((long)annotation.get("user"))){
+        for (AnnotationResult annotation : annotations) {
+            if (userIds.contains((long) annotation.get("user"))) {
                 filteredAnnotations.add(annotation);
             }
         }
@@ -96,10 +102,9 @@ public class AnnotationListingBuilder {
 
     public AnnotationListing buildAnnotationListing(JsonObject params) {
         AnnotationListing al;
-        if(isReviewedAnnotationAsked(params)) {
+        if (isReviewedAnnotationAsked(params)) {
             al = new ReviewedAnnotationListing(entityManager);
-        }
-        else {
+        } else {
             al = new UserAnnotationListing(entityManager);
         }
 
@@ -124,7 +129,7 @@ public class AnnotationListingBuilder {
         al.setTrack(params.getJSONAttrLong("track"));
         al.setTracks(StringUtils.extractListFromParameter(params.getJSONAttrStr("tracks")));
 
-        if (al.getTrack()!=null || al.getTracks()!=null) {
+        if (al.getTrack() != null || al.getTracks() != null) {
             al.setBeforeSlice(params.getJSONAttrLong("beforeSlice"));
             al.setAfterSlice(params.getJSONAttrLong("afterSlice"));
             al.setSliceDimension(params.getJSONAttrLong("sliceDimension"));
@@ -163,22 +168,25 @@ public class AnnotationListingBuilder {
         al.setKmeansValue(params.getJSONAttrInteger("kmeansValue", null));
 
         // BBOX
-        if(params.get("bbox")!=null) {
+        if (params.get("bbox") != null) {
             try {
                 al.setBbox(GeometryUtils.createBoundingBox(params.getJSONAttrStr("bbox")).toText());
             } catch (ParseException e) {
                 throw new WrongArgumentException("Geometry cannot be parsed for annotation search request:" + e);
             }
         }
-        if(params.get("bboxAnnotation")!=null) {
-            AnnotationDomain annotationDomain = AnnotationDomain.getAnnotationDomain(entityManager, params.getJSONAttrLong("bboxAnnotation"));
+        if (params.get("bboxAnnotation") != null) {
+            AnnotationDomain annotationDomain = AnnotationDomain.getAnnotationDomain(
+                entityManager,
+                params.getJSONAttrLong("bboxAnnotation")
+            );
             al.setBboxAnnotation(annotationDomain.getWktLocation());
         }
 
         // Base annotation
-        al.setBaseAnnotation(params.getJSONAttrLong("baseAnnotation")!=null?
-                params.getJSONAttrLong("baseAnnotation") : // can be an annotation id
-                params.getJSONAttrStr("baseAnnotation")); // can be a string (wkt) too
+        al.setBaseAnnotation(params.getJSONAttrLong("baseAnnotation") != null
+            ? params.getJSONAttrLong("baseAnnotation") // can be an annotation id
+            : params.getJSONAttrStr("baseAnnotation")); // can be a string (wkt) too
         al.setMaxDistanceBaseAnnotation(params.getJSONAttrLong("maxDistanceBaseAnnotation"));
 
         // Date
@@ -200,10 +208,10 @@ public class AnnotationListingBuilder {
     /**
      * From a string representing the list of terms ids, get a set of terms name.
      */
-    public Set<String> getTermNames(String terms){
+    public Set<String> getTermNames(String terms) {
         Set<String> termNames = new HashSet<>();
-        for (String termId : terms.split(",")){
-            if(!termId.equals("0") && !termId.equals("-1") && !termId.isEmpty()){
+        for (String termId : terms.split(",")) {
+            if (!termId.equals("0") && !termId.equals("-1") && !termId.isEmpty()) {
                 termNames.add(termService.find(Long.parseLong(termId)).get().getName());
             }
         }
@@ -215,8 +223,8 @@ public class AnnotationListingBuilder {
      */
     public Set<String> getUserNames(String users) {
         Set<String> userNames = new HashSet<>();
-        for (String userId : users.split(",")){
-            if(!userId.isEmpty()){
+        for (String userId : users.split(",")) {
+            if (!userId.isEmpty()) {
                 userNames.add(userService.get(Long.parseLong(userId)).getUsername());
             }
         }

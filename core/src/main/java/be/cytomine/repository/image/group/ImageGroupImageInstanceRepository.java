@@ -28,7 +28,8 @@ import be.cytomine.domain.image.group.ImageGroup;
 import be.cytomine.domain.image.group.ImageGroupImageInstance;
 
 @Repository
-public interface ImageGroupImageInstanceRepository extends JpaRepository<ImageGroupImageInstance, Long>, JpaSpecificationExecutor<ImageGroupImageInstance> {
+public interface ImageGroupImageInstanceRepository
+    extends JpaRepository<ImageGroupImageInstance, Long>, JpaSpecificationExecutor<ImageGroupImageInstance> {
 
     List<ImageGroupImageInstance> findAllByImage(ImageInstance image);
 

@@ -1,5 +1,6 @@
 package be.cytomine;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -14,6 +15,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import be.cytomine.common.repository.model.CreateTerm;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.annotation.Annotation;
 import be.cytomine.domain.annotation.AnnotationLayer;
@@ -258,6 +260,10 @@ public class BasicInstanceBuilder {
         term.setOntology(ontology);
         term.setColor("blue");
         return term;
+    }
+
+    public CreateTerm given_a_not_persisted_create_term(Ontology ontology, String name) {
+        return new CreateTerm(name, "blue", ontology.getId(),  "");
     }
 
     public ImageFilterProject given_a_image_filter_project(ImageFilter imageFilter,

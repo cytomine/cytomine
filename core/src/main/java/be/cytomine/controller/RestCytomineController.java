@@ -54,7 +54,7 @@ public abstract class RestCytomineController {
     protected HttpServletResponse response;
 
     protected String getRequestETag() {
-        return request.getHeader("If-None-Match")!=null ? request.getHeader("If-None-Match") : request.getHeader("if-none-match");
+        return request.getHeader("If-None-Match");
     }
 
     protected RequestParams retrievePageableParameters() {
@@ -75,7 +75,9 @@ public abstract class RestCytomineController {
             sort = Sort.by(requestParams.get("sort")).descending();
         }
 
-        int realMax = requestParams.get("max").equals("0") ? Integer.MAX_VALUE : Integer.parseInt(requestParams.get("max"));
+        int realMax = requestParams.get("max").equals("0")
+            ? Integer.MAX_VALUE
+            : Integer.parseInt(requestParams.get("max"));
 
         return new OffsetBasedPageRequest(Long.parseLong(requestParams.get("offset")), realMax, sort);
     }
@@ -85,9 +87,11 @@ public abstract class RestCytomineController {
         Map<String, String[]> parameterMap = request.getParameterMap();
 
         for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
-            if (entry.getValue()!= null  && entry.getValue().length>1) {
-                throw new CytomineMethodNotYetImplementedException("Multiple request params are not supported in this method");
-            } else if(entry.getValue()!= null && entry.getValue().length==1) {
+            if (entry.getValue() != null && entry.getValue().length > 1) {
+                throw new CytomineMethodNotYetImplementedException(
+                    "Multiple request params are not supported in this method"
+                );
+            } else if (entry.getValue() != null && entry.getValue().length == 1) {
                 response.put(entry.getKey(), entry.getValue()[0]);
             }
         }
@@ -110,20 +114,26 @@ public abstract class RestCytomineController {
     private JsonObject buildJsonList(List list, Integer offsetParameter, Integer maxParameter) {
 
         Integer offset = offsetParameter != null ? offsetParameter : 0;
-        Integer max = (maxParameter != null && maxParameter!=0) ? maxParameter : Integer.MAX_VALUE;
+        Integer max = (maxParameter != null && maxParameter != 0) ? maxParameter : Integer.MAX_VALUE;
 
         List subList;
         if (offset >= list.size()) {
             subList = new ArrayList();
         } else {
             int maxForCollection = Math.min(list.size() - offset, max);
-            subList = list.subList(offset,offset + maxForCollection);
+            subList = list.subList(offset, offset + maxForCollection);
         }
-        return JsonObject.of("collection", subList, "offset", offset, "perPage", Math.min(max, list.size()), "size", list.size(), "totalPages", (int)Math.ceil((double)list.size()/(double)max));
+        return JsonObject.of(
+            "collection", subList,
+            "offset", offset,
+            "perPage", Math.min(max, list.size()),
+            "size", list.size(),
+            "totalPages", (int) Math.ceil((double) list.size() / (double) max)
+        );
 
     }
 
-    private JsonObject buildJsonList(Page page, Map<String,String> params) {
+    private JsonObject buildJsonList(Page page, Map<String, String> params) {
         // TODO: should we need params if we have page
         return buildJsonList(page, Integer.parseInt(params.get("offset")), Integer.parseInt(params.get("max")));
     }
@@ -137,8 +147,14 @@ public abstract class RestCytomineController {
             finalContent = convertCytomineSocialDomainListToJSON(page.getContent());
         }
         Integer offset = offsetParameter != null ? offsetParameter : 0;
-        Integer max = (maxParameter != null && maxParameter!=0) ? maxParameter : Integer.MAX_VALUE;
-        return JsonObject.of("collection", finalContent, "offset", offset, "perPage", Math.min(max, page.getContent().size()), "size", page.getTotalElements(), "totalPages", (int)Math.ceil((double)page.getTotalElements()/(double)max));
+        Integer max = (maxParameter != null && maxParameter != 0) ? maxParameter : Integer.MAX_VALUE;
+        return JsonObject.of(
+            "collection", finalContent,
+            "offset", offset,
+            "perPage", Math.min(max, page.getContent().size()),
+            "size", page.getTotalElements(),
+            "totalPages", (int) Math.ceil((double) page.getTotalElements() / (double) max)
+        );
     }
 
     protected ResponseEntity<String> responseSuccess(Page page) {
@@ -149,23 +165,26 @@ public abstract class RestCytomineController {
         RequestParams requestParams = retrieveRequestParam();
         requestParams.putIfAbsent("offset", "0");
         requestParams.putIfAbsent("max", "0");
-        if(isFilterRequired) {
+        if (isFilterRequired) {
             if (!page.getContent().isEmpty() && page.getContent().get(0) instanceof Map) {
                 for (Object o : page.getContent()) {
-                    filterOneElement((Map<String,Object>)o);
+                    filterOneElement((Map<String, Object>) o);
                 }
-            } else if(!page.getContent().isEmpty()) {
-                throw new CytomineMethodNotYetImplementedException("Filter is not working with this class type " + page.getContent().get(0).getClass());
+            } else if (!page.getContent().isEmpty()) {
+                throw new CytomineMethodNotYetImplementedException(
+                    "Filter is not working with this class type " + page.getContent().get(0).getClass()
+                );
             }
         }
         return JsonResponseEntity.status(HttpStatus.OK).body(buildJsonList(page, requestParams).toJsonString());
     }
 
     protected ResponseEntity<String> responseSuccess(Page page, Integer offsetParameter, Integer maxParameter) {
-        return JsonResponseEntity.status(HttpStatus.OK).body(buildJsonList(page, offsetParameter, maxParameter).toJsonString());
+        return JsonResponseEntity.status(HttpStatus.OK)
+            .body(buildJsonList(page, offsetParameter, maxParameter).toJsonString());
     }
 
-    protected ResponseEntity<String> responseSuccess(Page page, Map<String,String> params) {
+    protected ResponseEntity<String> responseSuccess(Page page, Map<String, String> params) {
         return JsonResponseEntity.status(HttpStatus.OK).body(buildJsonList(page, params).toJsonString());
     }
 
@@ -173,7 +192,9 @@ public abstract class RestCytomineController {
         return responseSuccess(list, offsetParameter.intValue(), maxParameter.intValue(), false);
     }
 
-    public ResponseEntity<String> responseSuccess(List list, Integer offsetParameter, Integer maxParameter, boolean isFilterRequired) {
+    public ResponseEntity<String> responseSuccess(
+        List list, Integer offsetParameter, Integer maxParameter, boolean isFilterRequired
+    ) {
         List filtered = list;
         if (isFilterRequired) {
             filtered = new ArrayList();
@@ -191,7 +212,7 @@ public abstract class RestCytomineController {
                 }
             } else if (!list.isEmpty() && list.get(0) instanceof Map) {
                 for (Object o : list) {
-                    Map json = (Map)o;
+                    Map json = (Map) o;
                     filterOneElement(json);
                     filtered.add(json);
                 }
@@ -201,7 +222,9 @@ public abstract class RestCytomineController {
         if (filtered.isEmpty() || filtered.get(0) instanceof CytomineDomain) {
             return responseSuccessDomainList((List<? extends CytomineDomain>) filtered, offsetParameter, maxParameter);
         } else if (filtered.isEmpty() || filtered.get(0) instanceof CytomineSocialDomain) {
-            return responseSuccessSocialDomainList((List<? extends CytomineSocialDomain>) filtered, offsetParameter, maxParameter);
+            return responseSuccessSocialDomainList(
+                (List<? extends CytomineSocialDomain>) filtered, offsetParameter, maxParameter
+            );
         } else {
             return responseSuccessGenericList(filtered, offsetParameter, maxParameter);
         }
@@ -213,19 +236,9 @@ public abstract class RestCytomineController {
 
     public ResponseEntity<String> responseSuccess(List list, boolean isFilterRequired) {
         RequestParams requestParams = retrievePageableParameters();
-        return responseSuccess(list, requestParams.getOffset().intValue(), requestParams.getMax().intValue(), isFilterRequired);
-    }
-
-    private ResponseEntity<String> responseSuccessDomainList(List<? extends CytomineDomain> list, Integer offsetParameter, Integer maxParameter) {
-        return JsonResponseEntity.status(HttpStatus.OK).body(buildJsonList(convertCytomineDomainListToJSON(list), offsetParameter, maxParameter).toJsonString()); //TODO: perf convert after buildJsonList will avoid converting unused items (out of page)
-    }
-
-    private ResponseEntity<String> responseSuccessSocialDomainList(List<? extends CytomineSocialDomain> list, Integer offsetParameter, Integer maxParameter) {
-        return JsonResponseEntity.status(HttpStatus.OK).body(buildJsonList(convertCytomineSocialDomainListToJSON(list), offsetParameter, maxParameter).toJsonString()); //TODO: perf convert after buildJsonList will avoid converting unused items (out of page)
-    }
-
-    private ResponseEntity<String> responseSuccessGenericList(List list, Integer offsetParameter, Integer maxParameter) {
-        return JsonResponseEntity.status(HttpStatus.OK).body(buildJsonList(list, offsetParameter, maxParameter).toJsonString()); //TODO: perf convert after buildJsonList will avoid converting unused items (out of page)
+        return responseSuccess(
+            list, requestParams.getOffset().intValue(), requestParams.getMax().intValue(), isFilterRequired
+        );
     }
 
     protected ResponseEntity<String> responseSuccess(CytomineDomain response, boolean isFilterRequired) {
@@ -263,17 +276,42 @@ public abstract class RestCytomineController {
         return JsonResponseEntity.status(HttpStatus.OK).body(JsonObject.toJsonString(response));
     }
 
+    protected ResponseEntity<String> responseSuccess(CommandResponse commandResponse) {
+        return ResponseEntity.status(commandResponse.getStatus()).body(
+            convertObjectToJSON(commandResponse.getData()));
+    }
+
+    private ResponseEntity<String> responseSuccessDomainList(
+        List<? extends CytomineDomain> list, Integer offsetParameter, Integer maxParameter
+    ) {
+        //TODO: perf convert after buildJsonList will avoid converting unused items (out of page)
+        return JsonResponseEntity.status(HttpStatus.OK)
+            .body(buildJsonList(convertCytomineDomainListToJSON(list), offsetParameter, maxParameter).toJsonString());
+    }
+
+    private ResponseEntity<String> responseSuccessSocialDomainList(
+        List<? extends CytomineSocialDomain> list, Integer offsetParameter, Integer maxParameter
+    ) {
+        return JsonResponseEntity.status(HttpStatus.OK)
+            .body(
+                buildJsonList(convertCytomineSocialDomainListToJSON(list), offsetParameter, maxParameter).toJsonString()
+            ); //TODO: perf convert after buildJsonList will avoid converting unused items (out of page)
+    }
+
+    private ResponseEntity<String> responseSuccessGenericList(
+        List list, Integer offsetParameter, Integer maxParameter
+    ) {
+        //TODO: perf convert after buildJsonList will avoid converting unused items (out of page)
+        return JsonResponseEntity.status(HttpStatus.OK)
+            .body(buildJsonList(list, offsetParameter, maxParameter).toJsonString());
+    }
+
     protected ResponseEntity<String> buildJson(CytomineDomain response, int code) {
         return ResponseEntity.status(code).body(response.toJSON());
     }
 
     protected ResponseEntity<String> buildJson(Map<String, Object> response, int code) {
         return ResponseEntity.status(code).body(convertObjectToJSON(response));
-    }
-
-    protected ResponseEntity<String> responseSuccess(CommandResponse commandResponse) {
-        return ResponseEntity.status(commandResponse.getStatus()).body(
-                convertObjectToJSON(commandResponse.getData()));
     }
 
     protected String convertObjectToJSON(Object o) {
@@ -331,25 +369,21 @@ public abstract class RestCytomineController {
         return add(service, data);
     }
 
-    public JsonObject addMultiple(ModelService service, List<JsonObject> json) {
-        return service.addMultiple(json);
-    }
-
     /**
-     * Call add function for this service with the json
-     * json parameter can be an array or a single item
-     * If json is array => add multiple item
-     * otherwise add single item
+     * Call add function for this service with the json json parameter can be an array or a single item If json is array
+     * => add multiple item otherwise add single item
+     *
      * @param service Service for this domain
-     * @param json JSON data
+     * @param json    JSON data
+     *
      * @return response
      */
     public ResponseEntity<String> add(ModelService service, JsonInput json, Task task) {
         try {
             if (json instanceof JsonMultipleObject) {
-                return responseSuccess(addMultiple(service, ((JsonMultipleObject)json)));
+                return responseSuccess(addMultiple(service, ((JsonMultipleObject) json)));
             } else {
-                JsonObject jsonObject = json instanceof JsonObject ? (JsonObject) json : ((JsonSingleObject)json);
+                JsonObject jsonObject = json instanceof JsonObject ? (JsonObject) json : ((JsonSingleObject) json);
                 CommandResponse result = addOne(service, jsonObject, task);
                 if (result != null) {
                     return responseSuccess(result);
@@ -363,19 +397,25 @@ public abstract class RestCytomineController {
         return null;
     }
 
+    public JsonObject addMultiple(ModelService service, List<JsonObject> json) {
+        return service.addMultiple(json);
+    }
+
     public ResponseEntity<String> update(ModelService service, JsonObject json) {
         return update(service, json, null);
     }
 
     /**
      * Call update function for this service with the json
+     *
      * @param service Service for this domain
-     * @param json JSON data
+     * @param json    JSON data
+     *
      * @return response
      */
     public ResponseEntity<String> update(ModelService service, JsonObject json, Task task) {
         try {
-            CytomineDomain domain =  service.retrieve(json);
+            CytomineDomain domain = service.retrieve(json);
             CommandResponse result = service.update(domain, json, null, task);
             return responseSuccess(result);
         } catch (CytomineException e) {
@@ -386,14 +426,16 @@ public abstract class RestCytomineController {
 
     /**
      * Call delete function for this service with the json
+     *
      * @param service Service for this domain
-     * @param json JSON data
+     * @param json    JSON data
+     *
      * @return response
      */
     public ResponseEntity<String> delete(ModelService service, JsonObject json, Task task) {
         try {
-            CytomineDomain domain =  service.retrieve(json);
-            CommandResponse result = service.delete(domain, transactionService.start(), task,true);
+            CytomineDomain domain = service.retrieve(json);
+            CommandResponse result = service.delete(domain, transactionService.start(), task, true);
             return responseSuccess(result);
         } catch (CytomineException e) {
             log.error(e.toString());
@@ -403,8 +445,10 @@ public abstract class RestCytomineController {
 
     /**
      * Call add function for this service with the json
+     *
      * @param service Service for this domain
-     * @param json JSON data
+     * @param json    JSON data
+     *
      * @return response
      */
     public CommandResponse addOne(ModelService service, JsonObject json) {
@@ -424,22 +468,26 @@ public abstract class RestCytomineController {
         log.info("responseNotFound $className $id");
         log.error(className + " with filter " + filters + " does not exist");
         JsonObject jsonObject = new JsonObject();
-        jsonObject.put("errors", Map.of("message",  className + " not found with filters : " + filters));
+        jsonObject.put("errors", Map.of("message", className + " not found with filters : " + filters));
         return jsonObject;
     }
 
     protected ResponseEntity<String> responseNotFound(String className, String id) {
         return responseNotFound(className, "id", id);
     }
+
     protected ResponseEntity<String> responseNotFound(String className, Long id) {
         return responseNotFound(className, "id", String.valueOf(id));
     }
+
     protected ResponseEntity<String> responseNotFound(String className, String filter, String id) {
         return responseNotFound(className, Map.of(filter, id));
     }
+
     protected ResponseEntity<String> responseNotFound(String className, String filter, Long id) {
         return responseNotFound(className, Map.of(filter, String.valueOf(id)));
     }
+
     protected ResponseEntity<String> responseNotFound(String className, Map<String, Object> filters) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(buildJsonNotFound(className, filters).toJsonString());
     }
@@ -449,12 +497,14 @@ public abstract class RestCytomineController {
         RequestParams flatMap = new RequestParams();
         for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
             String value = null;
-            if (entry.getValue()!=null && entry.getValue().length>1) {
-                throw new CytomineMethodNotYetImplementedException("Multiple request params are not supported in this method");
-            } else if (entry.getValue()!=null && entry.getValue().length==1) {
+            if (entry.getValue() != null && entry.getValue().length > 1) {
+                throw new CytomineMethodNotYetImplementedException(
+                    "Multiple request params are not supported in this method"
+                );
+            } else if (entry.getValue() != null && entry.getValue().length == 1) {
                 value = entry.getValue()[0];
             }
-            if (value!=null) {
+            if (value != null) {
                 value = URLDecoder.decode(value, Charset.defaultCharset());
             }
             flatMap.put(URLDecoder.decode(entry.getKey(), Charset.defaultCharset()), value);
@@ -468,8 +518,8 @@ public abstract class RestCytomineController {
         response.setHeader("Connection", "Keep-Alive");
         response.setHeader("Accept-Ranges", "bytes");
         response.setHeader("Content-Type", contentType);
-        try(OutputStream os = response.getOutputStream()) {
-            os.write(bytes , 0, bytes.length);
+        try (OutputStream os = response.getOutputStream()) {
+            os.write(bytes, 0, bytes.length);
             os.flush();
         }
     }
@@ -478,8 +528,8 @@ public abstract class RestCytomineController {
         response.setStatus(200);
         response.setHeader("Content-Type", "application/octet-stream");
         response.setHeader("Content-disposition", "attachment; filename=" + name);
-        try(OutputStream os = response.getOutputStream()) {
-            os.write(array , 0, array.length);
+        try (OutputStream os = response.getOutputStream()) {
+            os.write(array, 0, array.length);
             os.flush();
         }
     }
@@ -496,10 +546,12 @@ public abstract class RestCytomineController {
             case "xls":
                 response.setHeader("Content-Type", "application/octet-stream");
                 break;
+            default:
+                throw new RuntimeException("Unsupported format: " + format);
         }
         response.setHeader("Content-disposition", "attachment; filename=" + name);
-        try(OutputStream os = response.getOutputStream()) {
-            os.write(array , 0, array.length);
+        try (OutputStream os = response.getOutputStream()) {
+            os.write(array, 0, array.length);
             os.flush();
         }
     }
@@ -515,14 +567,13 @@ public abstract class RestCytomineController {
         String contentType = image.getHeaders().get("Content-Type");
         if (request.getMethod().equals("HEAD")) {
             responseString(contentType, "");
-        }
-        else {
+        } else {
             for (Map.Entry<String, String> entry : image.getHeaders().entrySet()) {
                 response.setHeader(entry.getKey(), entry.getValue());
             }
             response.setContentLength(image.getContent().length);
-            try(OutputStream os = response.getOutputStream()) {
-                os.write(image.getContent() , 0, image.getContent().length);
+            try (OutputStream os = response.getOutputStream()) {
+                os.write(image.getContent(), 0, image.getContent().length);
                 os.flush();
             }
         }
@@ -530,9 +581,10 @@ public abstract class RestCytomineController {
 
     /**
      * Response an image as a HTTP response
+     *
      * @param bytes Image
      */
-    protected void responseByteArray(byte[] bytes, String expectedFormat)  {
+    protected void responseByteArray(byte[] bytes, String expectedFormat) {
         try {
             RequestParams params = retrieveRequestParam();
             String format = expectedFormat;
@@ -558,8 +610,7 @@ public abstract class RestCytomineController {
                 } else {
                     responseImageByteArray("image/webp", bytes);
                 }
-            }
-            else if (format.equals("png")) {
+            } else if (format.equals("png")) {
                 if (request.getMethod().equals("HEAD")) {
                     responseString("image/png", "");
                 } else {
@@ -568,8 +619,7 @@ public abstract class RestCytomineController {
             } else {
                 throw new InvalidRequestException("Format " + format + " is not supported");
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             log.error("Cannot response bytes from controller", e);
         }
     }

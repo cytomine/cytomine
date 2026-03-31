@@ -67,6 +67,28 @@ spec:
             mountPath: /data
           - name: temp
             mountPath: /tmp
+        startupProbe:
+          httpGet:
+            path: /ping
+            port: {{ .Values.app_engine.port }}
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          failureThreshold: 30
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /ping
+            port: {{ .Values.app_engine.port }}
+          periodSeconds: 5
+          failureThreshold: 3
+          timeoutSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /ping
+            port: {{ .Values.app_engine.port }}
+          periodSeconds: 10
+          failureThreshold: 3
+          timeoutSeconds: 5
       serviceAccountName: app-engine
       automountServiceAccountToken: true
   {{ if .Values.app_engine.storage.storageClassName -}}

@@ -33,25 +33,26 @@ public class RestStorageController extends RestCytomineController {
     private final TaskService taskService;
 
     /**
-     * List all storage visible for the current user
-     * For each storage, print the terms tree
+     * List all storage visible for the current user For each storage, print the terms tree
      */
     @GetMapping("/storage.json")
     public ResponseEntity<String> list(
-            @RequestParam(defaultValue = "false", required = false) Boolean all
+        @RequestParam(defaultValue = "false", required = false) Boolean all
     ) {
         log.debug("REST request to list storages: all? {}", all);
-        return responseSuccess(all ? storageService.list() : storageService.list(currentUserService.getCurrentUser(), null));
+        return responseSuccess(
+            all ? storageService.list() : storageService.list(currentUserService.getCurrentUser(), null)
+        );
     }
 
     @GetMapping("/storage/{id}.json")
     public ResponseEntity<String> show(
-            @PathVariable Long id
+        @PathVariable Long id
     ) {
         log.debug("REST request to get Storage : {}", id);
         return storageService.find(id)
-                .map(this::responseSuccess)
-                .orElseGet(() -> responseNotFound("Storage", id));
+            .map(this::responseSuccess)
+            .orElseGet(() -> responseNotFound("Storage", id));
     }
 
 

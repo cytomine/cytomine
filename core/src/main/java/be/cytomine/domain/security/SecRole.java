@@ -25,7 +25,7 @@ public class SecRole extends CytomineDomain implements Serializable {
 
     public static JsonObject getDataFromDomain(CytomineDomain domain) {
         JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
-        SecRole role = (SecRole)domain;
+        SecRole role = (SecRole) domain;
         returnArray.put("authority", role.authority);
         return returnArray;
     }

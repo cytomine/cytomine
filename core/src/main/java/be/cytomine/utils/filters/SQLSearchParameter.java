@@ -1,20 +1,20 @@
 package be.cytomine.utils.filters;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 import java.lang.reflect.Field;
 import java.time.ZoneId;
@@ -39,12 +39,16 @@ import static be.cytomine.utils.filters.SearchOperation.like;
 
 public class SQLSearchParameter {
 
-    public static List<SearchParameterEntry> getDomainAssociatedSearchParameters(Class<? extends CytomineDomain> domain, List<SearchParameterEntry> searchParameters, EntityManager entityManager) {
-        if(searchParameters==null) {
-            return new ArrayList();
+    public static List<SearchParameterEntry> getDomainAssociatedSearchParameters(
+        Class<? extends CytomineDomain> domain,
+        List<SearchParameterEntry> searchParameters,
+        EntityManager entityManager
+    ) {
+        if (searchParameters == null) {
+            return new ArrayList<>();
         }
 
-        List<SearchParameterEntry> result = new ArrayList();
+        List<SearchParameterEntry> result = new ArrayList<>();
         List<SearchParameterEntry> translated = new ArrayList<>();
 
         for (SearchParameterEntry parameter : searchParameters) {
@@ -55,7 +59,7 @@ public class SQLSearchParameter {
 
             Field field = ReflectionUtils.findField(domain, parameter.property);
 
-            if (field!=null) {
+            if (field != null) {
                 Object value = convertSearchParameter(field.getType(), parameter.getValue(), entityManager);
 
                 result.add(new SearchParameterEntry(field.getName(), parameter.operation, value));
@@ -65,9 +69,10 @@ public class SQLSearchParameter {
             List classes = Arrays.asList(AbstractImage.class, ImageInstance.class);
             if (parameter.property.equals("include") && classes.contains(domain)) {
                 result.add(new SearchParameterEntry(
-                    domain == AbstractImage.class ? "id" : "base_image_id",
-                    parameter.operation,
-                    convertSearchParameter(Long.class, parameter.getValue(), entityManager))
+                        domain == AbstractImage.class ? "id" : "base_image_id",
+                        parameter.operation,
+                        convertSearchParameter(Long.class, parameter.getValue(), entityManager)
+                    )
                 );
 
                 translated.add(parameter);
@@ -79,13 +84,15 @@ public class SQLSearchParameter {
         return result;
     }
 
-    public static Object convertSearchParameter(Class type, Object parameter, EntityManager entityManager){
+    public static Object convertSearchParameter(Class type, Object parameter, EntityManager entityManager) {
 
         if (parameter == null || parameter.equals("null")) {
             return null;
         }
         if (parameter instanceof List || parameter.getClass().isArray()) {
-            return ((List)parameter).stream().map(x -> convertSearchParameter(type, x, entityManager)).collect(Collectors.toList());
+            return ((List) parameter).stream()
+                .map(x -> convertSearchParameter(type, x, entityManager))
+                .collect(Collectors.toList());
         }
 
         Object output = null;
@@ -108,7 +115,7 @@ public class SQLSearchParameter {
 
     private static Object replaceJocker(Object value) {
         if (value != null && value instanceof String) {
-            return ((String)value).replaceAll("\\*", "%");
+            return ((String) value).replaceAll("\\*", "%");
         }
         return value;
     }
@@ -139,20 +146,20 @@ public class SQLSearchParameter {
                     }
                     break;
                 case like:
-                    sql = parameter.property+" LIKE :"+parameter.property.replaceAll("\\.","_");
+                    sql = parameter.property + " LIKE :" + parameter.property.replaceAll("\\.", "_");
                     break;
                 case ilike:
-                    sql = parameter.property+" ILIKE :"+parameter.property.replaceAll("\\.","_");
+                    sql = parameter.property + " ILIKE :" + parameter.property.replaceAll("\\.", "_");
                     break;
                 case lte:
-                    sql = parameter.property+" <= :"+parameter.property.replaceAll("\\.","_");
+                    sql = parameter.property + " <= :" + parameter.property.replaceAll("\\.", "_");
                     break;
                 case gte:
-                    sql = parameter.property+" >= :"+parameter.property.replaceAll("\\.","_");
+                    sql = parameter.property + " >= :" + parameter.property.replaceAll("\\.", "_");
                     break;
                 case in:
                     if (parameter.value == null || parameter.value == "null") {
-                        sql = parameter.property+" IS NULL ";
+                        sql = parameter.property + " IS NULL ";
                         break;
                     }
 
@@ -160,44 +167,56 @@ public class SQLSearchParameter {
                         parameter.value = List.of(parameter.value);
                     }
 
-                    parameter.value = ((List)parameter.value).stream().distinct().collect(Collectors.toList());
-                    List values = (List)parameter.value;
+                    parameter.value = ((List) parameter.value).stream().distinct().collect(Collectors.toList());
+                    List values = (List) parameter.value;
 
                     if (values.size() == 1 && (values.get(0) == null || (values.get(0).equals("null")))) {
-                        sql = parameter.property+" IS NULL ";
+                        sql = parameter.property + " IS NULL ";
                         break;
                     }
 
-                    sql = parameter.property+" IN (";
+                    sql = parameter.property + " IN (";
 
 
-                    int count = ((List)values.stream().filter(x -> x != null && !x.equals("null")).collect(Collectors.toList())).size();
+                    int count = ((List) values.stream()
+                        .filter(x -> x != null && !x.equals("null"))
+                        .collect(Collectors.toList()))
+                        .size();
 
                     List<String> strings = new ArrayList<>();
-                    for (int i=1; i<=count; i++) {
-                        strings.add(":"+parameter.property.replaceAll("\\.","_")+"_"+i);
+                    for (int i = 1; i <= count; i++) {
+                        strings.add(":" + parameter.property.replaceAll("\\.", "_") + "_" + i);
                     }
                     sql = sql + String.join(",", strings);
                     sql += ") ";
 
                     if (values.contains(null) || values.contains("null")) {
-                        parameter.value = values.stream().filter(x -> x != null && !x.equals("null")).collect(Collectors.toList());
-                        sql = "("+sql+" OR "+parameter.property+" IS NULL) ";
-                    } else {
-                        break;
+                        parameter.value = values.stream()
+                            .filter(x -> x != null && !x.equals("null"))
+                            .collect(Collectors.toList());
+                        sql = "(" + sql + " OR " + parameter.property + " IS NULL) ";
                     }
                     break;
+                default:
+                    throw new RuntimeException("Unsupported operation: " + parameter.operation);
             }
             parameter.sql = sql;
             parameter.sqlParameter = new HashMap<>();
 
-            if (parameter.value!=null && (parameter.value.getClass().isArray() || (parameter.value instanceof List))) {
-                List values = (List)parameter.value;
-                for(int i=1; i<= values.size(); i++) {
-                    parameter.sqlParameter.put(parameter.property.replaceAll("\\.","_")+"_"+i, replaceJocker(values.get(i-1)));
+            if (parameter.value != null
+                && (parameter.value.getClass().isArray() || (parameter.value instanceof List))) {
+                List values = (List) parameter.value;
+                for (int i = 1; i <= values.size(); i++) {
+                    parameter.sqlParameter.put(
+                        parameter.property.replaceAll("\\.", "_") + "_" + i,
+                        replaceJocker(values.get(i - 1))
+                    );
                 }
             } else {
-                parameter.sqlParameter.put(parameter.property.replaceAll("\\.","_"), replaceJocker(parameter.value));
+                parameter.sqlParameter.put(
+                    parameter.property.replaceAll("\\.", "_"),
+                    replaceJocker(parameter.value)
+                );
             }
         }
 
@@ -232,17 +251,23 @@ public class SQLSearchParameter {
                 Integer numberOfEntries = parametersCount.getOrDefault(key, 0);
                 parametersCount.put(key, numberOfEntries + 1);
             }
-        };
+        }
 
         //if a same property is used multiple times
         for (Map.Entry<String, Integer> properties : parametersCount.entrySet()) {
             if (properties.getValue() > 1) {
-                List<SearchParameterEntry> duplicatedEntries = searchParameters.data.stream().filter( x -> properties.getKey().equals(x.property.replaceAll("\\.","_"))).collect(Collectors.toList());
-                for (int i = 0 ; i<duplicatedEntries.size() ; i++) {
+                List<SearchParameterEntry> duplicatedEntries = searchParameters.data
+                    .stream()
+                    .filter(x -> properties.getKey().equals(x.property.replaceAll("\\.", "_")))
+                    .toList();
+                for (int i = 0; i < duplicatedEntries.size(); i++) {
                     String oldName = duplicatedEntries.get(i).sqlParameter.keySet().iterator().next();
-                    String newName = oldName+"_"+i;
-                    duplicatedEntries.get(i).sql = duplicatedEntries.get(i).sql.replace(":"+oldName, ":"+newName);
-                    duplicatedEntries.get(i).sqlParameter.put(newName, duplicatedEntries.get(i).sqlParameter.remove(oldName));
+                    String newName = oldName + "_" + i;
+                    duplicatedEntries.get(i).sql = duplicatedEntries.get(i).sql.replace(":" + oldName, ":" + newName);
+                    duplicatedEntries.get(i).sqlParameter.put(
+                        newName,
+                        duplicatedEntries.get(i).sqlParameter.remove(oldName)
+                    );
                 }
 
             }

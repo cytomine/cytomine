@@ -71,8 +71,9 @@ class UndoControllerTest {
     @SneakyThrows
     void undoInsertTermCommandDeletesCreatedTerm() {
         CreateTerm createTerm = new CreateTerm("termToUndo", "#00FF00", ontologyId, null);
-        HttpCommandResponse<TermResponse> createResponse = termCommandService.createTerm(userId, createTerm)
-                                                               .orElseThrow();
+        HttpCommandResponse<TermResponse> createResponse =
+            termCommandService.createTerm(userId, createTerm, Optional.empty())
+                .orElseThrow();
 
         Long termId = createResponse.data().id();
         UUID insertCommandId = createResponse.command();
@@ -90,8 +91,9 @@ class UndoControllerTest {
     @SneakyThrows
     void undoUpdateTermCommandRestoresPreviousState() {
         CreateTerm createTerm = new CreateTerm("originalName", "#FF0000", ontologyId, null);
-        HttpCommandResponse<TermResponse> createResponse = termCommandService.createTerm(userId, createTerm)
-                                                               .orElseThrow();
+        HttpCommandResponse<TermResponse> createResponse =
+            termCommandService.createTerm(userId, createTerm, Optional.empty())
+                .orElseThrow();
 
         Long termId = createResponse.data().id();
 
@@ -127,8 +129,9 @@ class UndoControllerTest {
     @SneakyThrows
     void undoByUserWithoutPermissionReturnsEmpty() {
         CreateTerm createTerm = new CreateTerm("termToUndo", "#FF0000", ontologyId, null);
-        HttpCommandResponse<TermResponse> createResponse = termCommandService.createTerm(userId, createTerm)
-                                                               .orElseThrow();
+        HttpCommandResponse<TermResponse> createResponse =
+            termCommandService.createTerm(userId, createTerm, Optional.empty())
+                .orElseThrow();
 
         Long termId = createResponse.data().id();
         UUID insertCommandId = createResponse.command();

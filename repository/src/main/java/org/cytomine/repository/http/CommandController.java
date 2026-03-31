@@ -6,7 +6,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.cytomine.repository.mapper.CommandMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
-import org.cytomine.repository.service.UndoCommandService;
+import org.cytomine.repository.service.ApplyCommandService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,12 +27,12 @@ public class CommandController implements CommandHttpContract {
 
     private final CommandV2Repository commandV2Repository;
     private final CommandMapper commandMapper;
-    private final UndoCommandService undoCommandService;
+    private final ApplyCommandService applyCommandService;
 
     @Override
     @PostMapping("/undo/{commandId}")
     public Optional<Long> undo(UUID commandId, long userId) {
-        return undoCommandService.undoCommand(userId, commandId);
+        return applyCommandService.undoCommand(userId, commandId);
     }
 
     @Override

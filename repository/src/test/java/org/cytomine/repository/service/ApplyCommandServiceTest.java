@@ -27,10 +27,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SpringBootTest(classes = RepositoryApp.class)
 @Import(PostGisTestConfiguration.class)
 @Transactional
-class UndoCommandServiceTest {
+class ApplyCommandServiceTest {
 
     @Autowired
-    private UndoCommandService undoCommandService;
+    private ApplyCommandService applyCommandService;
 
     @Autowired
     private TermCommandService termCommandService;
@@ -63,19 +63,21 @@ class UndoCommandServiceTest {
     @Test
     void undoDeleteTermCommandRestoresTermWithNewId() {
         CreateTerm createTerm = new CreateTerm("termToDelete", "#FF0000", ontologyId, null);
-        HttpCommandResponse<TermResponse> createResponse = termCommandService.createTerm(userId, createTerm)
+        HttpCommandResponse<TermResponse> createResponse =
+            termCommandService.createTerm(userId, createTerm, Optional.empty())
                                                                .orElseThrow();
 
         Long originalTermId = createResponse.data().id();
         assertTrue(termRepository.findById(originalTermId).isPresent());
 
-        HttpCommandResponse<TermResponse> deleteResponse = termCommandService.deleteTerm(originalTermId, userId)
+        HttpCommandResponse<TermResponse> deleteResponse =
+            termCommandService.deleteTerm(originalTermId, userId, Optional.empty())
                                                                .orElseThrow();
         UUID deleteCommandId = deleteResponse.command();
 
         assertTrue(termRepository.findById(originalTermId).isEmpty());
 
-        Optional<Long> undoResult = undoCommandService.undoCommand(userId, deleteCommandId);
+        Optional<Long> undoResult = applyCommandService.undoCommand(userId, deleteCommandId);
 
         assertTrue(undoResult.isPresent());
 
@@ -87,25 +89,27 @@ class UndoCommandServiceTest {
 
     @Test
     void undoCommandWithNonExistentCommandIdReturnsFalse() {
-        Optional<Long> result = undoCommandService.undoCommand(userId, UUID.randomUUID());
+        Optional<Long> result = applyCommandService.undoCommand(userId, UUID.randomUUID());
         assertFalse(result.isPresent());
     }
 
     @Test
     void undoCommandByUserWithoutPermissionReturnsFalse() {
         CreateTerm createTerm = new CreateTerm("termToDelete", "#FF0000", ontologyId, null);
-        HttpCommandResponse<TermResponse> createResponse = termCommandService.createTerm(userId, createTerm)
+        HttpCommandResponse<TermResponse> createResponse =
+            termCommandService.createTerm(userId, createTerm, Optional.empty())
                                                                .orElseThrow();
 
         Long termId = createResponse.data().id();
-        HttpCommandResponse<TermResponse> deleteResponse = termCommandService.deleteTerm(termId, userId)
+        HttpCommandResponse<TermResponse> deleteResponse =
+            termCommandService.deleteTerm(termId, userId, Optional.empty())
                                                                .orElseThrow();
         UUID deleteCommandId = deleteResponse.command();
 
         Long nonAdminUserId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
         jdbcTemplate.update("INSERT INTO sec_user (id, version, username) VALUES (?, 0, 'nonadmin')", nonAdminUserId);
 
-        Optional<Long> result = undoCommandService.undoCommand(nonAdminUserId, deleteCommandId);
+        Optional<Long> result = applyCommandService.undoCommand(nonAdminUserId, deleteCommandId);
 
         assertFalse(result.isPresent());
         assertTrue(termRepository.findById(termId).isEmpty());
@@ -114,14 +118,15 @@ class UndoCommandServiceTest {
     @Test
     void undoInsertTermCommandDeletesCreatedTerm() {
         CreateTerm createTerm = new CreateTerm("termToUndo", "#00FF00", ontologyId, null);
-        HttpCommandResponse<TermResponse> createResponse = termCommandService.createTerm(userId, createTerm)
+        HttpCommandResponse<TermResponse> createResponse =
+            termCommandService.createTerm(userId, createTerm, Optional.empty())
                                                                .orElseThrow();
 
         Long termId = createResponse.data().id();
         UUID insertCommandId = createResponse.command();
         assertTrue(termRepository.findById(termId).isPresent());
 
-        Optional<Long> undoResult = undoCommandService.undoCommand(userId, insertCommandId);
+        Optional<Long> undoResult = applyCommandService.undoCommand(userId, insertCommandId);
 
         assertFalse(undoResult.isPresent());
         assertTrue(termRepository.findById(termId).isEmpty());
@@ -130,7 +135,8 @@ class UndoCommandServiceTest {
     @Test
     void undoUpdateTermCommandRestoresPreviousState() {
         CreateTerm createTerm = new CreateTerm("originalName", "#FF0000", ontologyId, null);
-        HttpCommandResponse<TermResponse> createResponse = termCommandService.createTerm(userId, createTerm)
+        HttpCommandResponse<TermResponse> createResponse =
+            termCommandService.createTerm(userId, createTerm, Optional.empty())
                                                                .orElseThrow();
 
         Long termId = createResponse.data().id();
@@ -144,7 +150,7 @@ class UndoCommandServiceTest {
         assertEquals("updatedName", updatedTerm.getName());
         assertEquals("#00FF00", updatedTerm.getColor());
 
-        Optional<Long> undoResult = undoCommandService.undoCommand(userId, updateCommandId);
+        Optional<Long> undoResult = applyCommandService.undoCommand(userId, updateCommandId);
 
         assertTrue(undoResult.isPresent());
         assertEquals(termId, undoResult.get());

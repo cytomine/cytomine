@@ -17,7 +17,7 @@ import be.cytomine.common.repository.model.command.UpdateTermCommand;
 
 @Component
 @AllArgsConstructor
-public class UndoCommandService {
+public class ApplyCommandService {
     private final CommandV2Repository commandRepository;
     private final ACLService aclService;
     private final TermRepository termRepository;
@@ -52,6 +52,31 @@ public class UndoCommandService {
     }
 
     Optional<Long> undoUpdateTermCommand(UpdateTermCommand dtc) {
+        termRepository.save(ontologyMapper.mapToTermEntity(dtc.before()));
+        return Optional.of(dtc.before().id());
+    }
+
+    public Optional<Long> redoCommand(long userId, UUID undoCommand) {
+        return commandRepository.findById(undoCommand)
+                   .filter(commandEntity -> userCanUndoCommand(userId, commandEntity))
+                   .flatMap(commandEntity -> switch (commandEntity.getData()) {
+                       case DeleteTermCommand dtc -> undoDeleteTermCommand(dtc);
+                       case InsertTermCommand icr -> undoInsertTermCommand(icr);
+                       case UpdateTermCommand ucr -> undoUpdateTermCommand(ucr);
+                   });
+    }
+
+    Optional<Long> redoDeleteTermCommand(DeleteTermCommand dtc) {
+        TermEntity termEntity = ontologyMapper.mapToTermEntityWithoutID(dtc.before());
+        return Optional.of(termRepository.save(termEntity).getId());
+    }
+
+    Optional<Long> redoInsertTermCommand(InsertTermCommand dtc) {
+        termRepository.deleteById(dtc.after().id());
+        return Optional.empty();
+    }
+
+    Optional<Long> redoUpdateTermCommand(UpdateTermCommand dtc) {
         termRepository.save(ontologyMapper.mapToTermEntity(dtc.before()));
         return Optional.of(dtc.before().id());
     }

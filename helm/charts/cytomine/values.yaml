@@ -170,11 +170,11 @@ pims:
   port: 5000
   resources:
     requests:
-      memory: "4Gi"
+      memory: "16Gi"
       cpu: "1000m"
       ephemeral-storage: 1Gi
     limits:
-      memory: "4Gi"
+      memory: "16Gi"
       cpu: "1000m"
       ephemeral-storage: 1Gi
   imageStorage:

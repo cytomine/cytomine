@@ -40,28 +40,23 @@ public class TermCommandService {
     public Optional<HttpCommandResponse<TermResponse>> deleteTerm(Long id, Long userId,
                                                                   Optional<UUID> maybeExistingPreviousCommand) {
         return termRepository.findById(id)
-                   .filter(entity -> aclService.canDeleteOntology(userId, entity.getOntologyId()))
-                   .map(termEntity -> {
-                       DeleteTermCommand deleteCommand =
-                           new DeleteTermCommand(id, ontologyMapper.mapToTermCommandPayload(termEntity),
-                               userId, termEntity.getOntologyId());
-                       ZonedDateTime now = ZonedDateTime.now();
-                       CommandV2Entity commandV2Entity =
-                           commandV2Repository.save(maybeExistingPreviousCommand.map(
-                                   existingPreviousCommand -> commandMapper.mapWithId(deleteCommand,
-                                       now, now, userId, existingPreviousCommand))
-                                                        .orElseGet(() -> commandMapper.map(deleteCommand,
-                                                            now, now, userId)));
-                       TermResponse termResponse = ontologyMapper.map(termEntity);
-                       Callback callback = new Callback(Commands.DELETE_TERM,
-                           Optional.of(termEntity.getId()), Optional.of(termEntity.getOntologyId()), Optional.empty());
-                       termRepository.deleteById(id);
-                       return new HttpCommandResponse<>(callback, true, termResponse, commandV2Entity.getId());
-                   });
+                   .filter(entity -> aclService.canDeleteOntology(userId, entity.getOntologyId())).map(termEntity -> {
+                DeleteTermCommand deleteCommand =
+                    new DeleteTermCommand(id, ontologyMapper.mapToTermCommandPayload(termEntity), userId,
+                        termEntity.getOntologyId());
+                ZonedDateTime now = ZonedDateTime.now();
+                CommandV2Entity commandV2Entity = commandV2Repository.save(maybeExistingPreviousCommand.map(
+                    existingPreviousCommand -> commandMapper.mapWithId(deleteCommand, now, now, userId,
+                        existingPreviousCommand)).orElseGet(() -> commandMapper.map(deleteCommand, now, now, userId)));
+                TermResponse termResponse = ontologyMapper.map(termEntity);
+                Callback callback = new Callback(Commands.DELETE_TERM, Optional.of(termEntity.getId()),
+                    Optional.of(termEntity.getOntologyId()), Optional.empty());
+                termRepository.deleteById(id);
+                return new HttpCommandResponse<>(callback, true, termResponse, commandV2Entity.getId());
+            });
     }
 
-    public Optional<HttpCommandResponse<TermResponse>> createTerm(Long userId,
-                                                                  CreateTerm createTerm,
+    public Optional<HttpCommandResponse<TermResponse>> createTerm(Long userId, CreateTerm createTerm,
                                                                   Optional<UUID> maybeExistingPreviousCommand) {
         if (!aclService.canWriteOntology(userId, createTerm.ontology())) {
             return Optional.empty();
@@ -74,42 +69,34 @@ public class TermCommandService {
         InsertTermCommand insertTermCommand =
             new InsertTermCommand(termCommandPayload, userId, termCommandPayload.ontology());
         ZonedDateTime now = ZonedDateTime.now();
-        CommandV2Entity commandV2Entity = commandV2Repository.save(
-            maybeExistingPreviousCommand
-                .map(existingPreviousCommand -> commandMapper.mapWithId(insertTermCommand,
-                    now, now, userId, existingPreviousCommand))
-                .orElseGet(() -> commandMapper.map(insertTermCommand,
-                    now, now, userId)));
+        CommandV2Entity commandV2Entity = commandV2Repository.save(maybeExistingPreviousCommand.map(
+            existingPreviousCommand -> commandMapper.mapWithId(insertTermCommand, now, now, userId,
+                existingPreviousCommand)).orElseGet(() -> commandMapper.map(insertTermCommand, now, now, userId)));
 
         TermResponse termResponse = ontologyMapper.map(savedEntity);
-        Callback callback = new Callback(Commands.INSERT_TERM,
-            Optional.of(savedEntity.getId()), Optional.of(savedEntity.getOntologyId()), Optional.empty());
-        return Optional.of(new HttpCommandResponse<>(callback, true, termResponse,
-            commandV2Entity.getId()));
+        Callback callback = new Callback(Commands.INSERT_TERM, Optional.of(savedEntity.getId()),
+            Optional.of(savedEntity.getOntologyId()), Optional.empty());
+        return Optional.of(new HttpCommandResponse<>(callback, true, termResponse, commandV2Entity.getId()));
     }
 
     @Transactional
-    public Optional<HttpCommandResponse<TermResponse>> updateTerm(long id, Long userId,
-                                                                  UpdateTerm updateTerm) {
-        return termRepository.findById(id)
-                   .filter(entity -> aclService.canWriteOntology(userId, entity.getOntologyId()))
+    public Optional<HttpCommandResponse<TermResponse>> updateTerm(long id, Long userId, UpdateTerm updateTerm) {
+        return termRepository.findById(id).filter(entity -> aclService.canWriteOntology(userId, entity.getOntologyId()))
                    .map(termEntity -> {
                        TermCommandPayload beforePayload = ontologyMapper.mapToTermCommandPayload(termEntity);
                        updateTerm.name().ifPresent(termEntity::setName);
                        updateTerm.color().ifPresent(termEntity::setColor);
                        TermEntity savedEntity = termRepository.save(termEntity);
                        UpdateTermCommand updateCommand =
-                           new UpdateTermCommand(id, beforePayload,
-                               ontologyMapper.mapToTermCommandPayload(savedEntity),
+                           new UpdateTermCommand(id, beforePayload, ontologyMapper.mapToTermCommandPayload(savedEntity),
                                userId, termEntity.getOntologyId());
                        ZonedDateTime now = ZonedDateTime.now();
-                       CommandV2Entity commandV2Entity = commandV2Repository.save(commandMapper.map(updateCommand,
-                           now, now, userId));
+                       CommandV2Entity commandV2Entity =
+                           commandV2Repository.save(commandMapper.map(updateCommand, now, now, userId));
 
                        TermResponse termResponse = ontologyMapper.map(savedEntity);
-                       Callback callback = new Callback(Commands.UPDATE_TERM,
-                           Optional.of(savedEntity.getId()), Optional.of(savedEntity.getOntologyId()),
-                           Optional.empty());
+                       Callback callback = new Callback(Commands.UPDATE_TERM, Optional.of(savedEntity.getId()),
+                           Optional.of(savedEntity.getOntologyId()), Optional.empty());
                        return new HttpCommandResponse<>(callback, true, termResponse, commandV2Entity.getId());
                    });
     }

@@ -7,8 +7,8 @@ import be.cytomine.common.repository.model.command.payload.term.UpdateTermComman
 
 import static java.lang.String.format;
 
-public record InsertTermCommand(TermCommandPayload after, long userId, long ontologyId)
-    implements InsertCommandRequest<UpdateTermCommandPayload> {
+public record CreateTermCommand(TermCommandPayload after, long userId, long ontologyId)
+    implements CreateCommandRequest<UpdateTermCommandPayload> {
 
     @Override
     public UpdateTermCommandPayload data() {

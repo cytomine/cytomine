@@ -81,9 +81,9 @@ class UndoControllerTest {
         assertTrue(termRepository.findById(termId).isPresent());
 
         mockMvc.perform(post("/commands/undo/{commandId}", insertCommandId).param("userId", userId.toString()))
-            .andExpect(status().isOk()).andExpect(jsonPath("$").doesNotExist());
+            .andExpect(status().isOk()).andExpect(jsonPath("$.data.id").value(termId.intValue()));
 
-        assertTrue(termRepository.findById(termId).isEmpty());
+        assertTrue(now.isBefore(termRepository.findById(termId).get().getDeleted()));
     }
 
     @Test
@@ -106,7 +106,7 @@ class UndoControllerTest {
         assertEquals("#00FF00", updatedTerm.getColor());
 
         mockMvc.perform(post("/commands/undo/{commandId}", updateCommandId).param("userId", userId.toString()))
-            .andExpect(status().isOk()).andExpect(jsonPath("$").value(termId.intValue()));
+            .andExpect(status().isOk()).andExpect(jsonPath("$.data.id").value(termId.intValue()));
 
         TermEntity restoredTerm = termRepository.findById(termId).orElseThrow();
         assertEquals("originalName", restoredTerm.getName());

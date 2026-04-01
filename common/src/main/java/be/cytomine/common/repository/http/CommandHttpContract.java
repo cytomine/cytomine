@@ -10,6 +10,7 @@ import org.springframework.web.service.annotation.HttpExchange;
 import org.springframework.web.service.annotation.PostExchange;
 
 import be.cytomine.common.repository.model.CommandResponse;
+import be.cytomine.common.repository.model.TermResponse;
 import be.cytomine.common.repository.model.command.HttpCommandResponse;
 
 import static be.cytomine.common.repository.http.TermHttpContract.ROOT_PATH;
@@ -19,7 +20,7 @@ public interface CommandHttpContract {
     String ROOT_PATH = "/commands";
 
     @PostExchange("/undo/{commandId}")
-    Optional<Long> undo(@PathVariable UUID commandId, @RequestParam long userId);
+    Optional<HttpCommandResponse<TermResponse>> undo(@PathVariable UUID commandId, @RequestParam long userId);
 
     @PostExchange("/redo/{commandId}")
     Optional<HttpCommandResponse<?>> redo(@PathVariable UUID commandId, @RequestParam long userId);

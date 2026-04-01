@@ -77,11 +77,12 @@ class ApplyCommandServiceTest {
         UUID deleteCommandId = deleteResponse.command();
         entity.get().setDeleted(now);
         assertEquals(termRepository.findById(originalTermId), entity);
-        Optional<Long> undoResult = applyCommandService.undoCommand(userId, deleteCommandId);
+        Optional<HttpCommandResponse<TermResponse>> undoResult =
+            applyCommandService.undoCommand(userId, deleteCommandId);
 
         assertTrue(undoResult.isPresent());
 
-        TermEntity restoredTerm = termRepository.findById(undoResult.get()).orElseThrow();
+        TermEntity restoredTerm = termRepository.findById(entity.get().getId()).orElseThrow();
         assertEquals("termToDelete", restoredTerm.getName());
         assertEquals("#FF0000", restoredTerm.getColor());
         assertEquals(ontologyId, restoredTerm.getOntologyId());
@@ -89,7 +90,7 @@ class ApplyCommandServiceTest {
 
     @Test
     void undoCommandWithNonExistentCommandIdReturnsFalse() {
-        Optional<Long> result = applyCommandService.undoCommand(userId, UUID.randomUUID());
+        Optional<HttpCommandResponse<TermResponse>> result = applyCommandService.undoCommand(userId, UUID.randomUUID());
         assertFalse(result.isPresent());
     }
 
@@ -108,7 +109,8 @@ class ApplyCommandServiceTest {
         Long nonAdminUserId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
         jdbcTemplate.update("INSERT INTO sec_user (id, version, username) VALUES (?, 0, 'nonadmin')", nonAdminUserId);
 
-        Optional<Long> result = applyCommandService.undoCommand(nonAdminUserId, deleteCommandId);
+        Optional<HttpCommandResponse<TermResponse>> result =
+            applyCommandService.undoCommand(nonAdminUserId, deleteCommandId);
 
         assertFalse(result.isPresent());
         assertEquals(termRepository.findById(termId).map(TermEntity::getDeleted), deleteResponse.data().deleted());
@@ -124,10 +126,11 @@ class ApplyCommandServiceTest {
         Long termId = createResponse.data().id();
         UUID insertCommandId = createResponse.command();
         assertTrue(termRepository.findById(termId).isPresent());
-        Optional<Long> undoResult = applyCommandService.undoCommand(userId, insertCommandId);
+        Optional<HttpCommandResponse<TermResponse>> undoResult =
+            applyCommandService.undoCommand(userId, insertCommandId);
 
-        assertFalse(undoResult.isPresent());
-        assertTrue(termRepository.findById(termId).isEmpty());
+        assertEquals(undoResult.get().data().id(), termId);
+        assertTrue(now.isBefore(termRepository.findById(termId).get().getDeleted()));
     }
 
     @Test
@@ -149,10 +152,11 @@ class ApplyCommandServiceTest {
         assertEquals("updatedName", updatedTerm.getName());
         assertEquals("#00FF00", updatedTerm.getColor());
 
-        Optional<Long> undoResult = applyCommandService.undoCommand(userId, updateCommandId);
+        Optional<HttpCommandResponse<TermResponse>> undoResult =
+            applyCommandService.undoCommand(userId, updateCommandId);
 
         assertTrue(undoResult.isPresent());
-        assertEquals(termId, undoResult.get());
+        assertEquals(termId, undoResult.get().data().id());
 
         TermEntity restoredTerm = termRepository.findById(termId).orElseThrow();
         assertEquals("originalName", restoredTerm.getName());

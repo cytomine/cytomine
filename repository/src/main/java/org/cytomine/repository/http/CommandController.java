@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import be.cytomine.common.repository.http.CommandHttpContract;
 import be.cytomine.common.repository.model.CommandResponse;
+import be.cytomine.common.repository.model.TermResponse;
 import be.cytomine.common.repository.model.command.HttpCommandResponse;
 
 import static be.cytomine.common.repository.http.CommandHttpContract.ROOT_PATH;
@@ -31,7 +32,7 @@ public class CommandController implements CommandHttpContract {
 
     @Override
     @PostMapping("/undo/{commandId}")
-    public Optional<Long> undo(UUID commandId, long userId) {
+    public Optional<HttpCommandResponse<TermResponse>> undo(UUID commandId, long userId) {
         return applyCommandService.undoCommand(userId, commandId);
     }
 

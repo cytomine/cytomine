@@ -14,7 +14,7 @@ import org.hibernate.annotations.Generated;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import be.cytomine.common.repository.model.command.CommandV2Request;
+import be.cytomine.common.repository.model.command.request.CommandV2Request;
 
 @Data
 @AllArgsConstructor

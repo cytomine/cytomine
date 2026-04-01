@@ -1,7 +1,8 @@
-package be.cytomine.common.repository.model.command;
+package be.cytomine.common.repository.model.command.request;
 
 import java.util.Optional;
 
+import be.cytomine.common.repository.model.command.DataType;
 import be.cytomine.common.repository.model.command.payload.term.TermCommandPayload;
 import be.cytomine.common.repository.model.command.payload.term.UpdateTermCommandPayload;
 

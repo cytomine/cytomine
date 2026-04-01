@@ -14,16 +14,16 @@ import org.cytomine.repository.persistence.entity.CommandV2Entity;
 import org.cytomine.repository.persistence.entity.TermEntity;
 import org.springframework.stereotype.Component;
 
-import be.cytomine.common.repository.model.CreateTerm;
-import be.cytomine.common.repository.model.TermResponse;
-import be.cytomine.common.repository.model.UpdateTerm;
 import be.cytomine.common.repository.model.command.Callback;
 import be.cytomine.common.repository.model.command.Commands;
-import be.cytomine.common.repository.model.command.CreateTermCommand;
-import be.cytomine.common.repository.model.command.DeleteTermCommand;
 import be.cytomine.common.repository.model.command.HttpCommandResponse;
-import be.cytomine.common.repository.model.command.UpdateTermCommand;
 import be.cytomine.common.repository.model.command.payload.term.TermCommandPayload;
+import be.cytomine.common.repository.model.command.request.CreateTermCommand;
+import be.cytomine.common.repository.model.command.request.DeleteTermCommand;
+import be.cytomine.common.repository.model.command.request.UpdateTermCommand;
+import be.cytomine.common.repository.model.term.payload.CreateTerm;
+import be.cytomine.common.repository.model.term.payload.TermResponse;
+import be.cytomine.common.repository.model.term.payload.UpdateTerm;
 
 @Component
 @AllArgsConstructor

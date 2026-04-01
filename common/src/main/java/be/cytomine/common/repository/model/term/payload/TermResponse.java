@@ -1,4 +1,4 @@
-package be.cytomine.common.repository.model;
+package be.cytomine.common.repository.model.term.payload;
 
 import java.time.LocalDateTime;
 import java.util.Optional;

@@ -6,8 +6,8 @@ import org.cytomine.repository.persistence.entity.CommandV2Entity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import be.cytomine.common.repository.model.CommandResponse;
-import be.cytomine.common.repository.model.command.CommandV2Request;
+import be.cytomine.common.repository.model.command.CommandResponse;
+import be.cytomine.common.repository.model.command.request.CommandV2Request;
 
 @Mapper(componentModel = "spring")
 public interface CommandMapper {

@@ -9,9 +9,9 @@ import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;
 import org.springframework.web.service.annotation.PostExchange;
 
-import be.cytomine.common.repository.model.CommandResponse;
-import be.cytomine.common.repository.model.TermResponse;
+import be.cytomine.common.repository.model.command.CommandResponse;
 import be.cytomine.common.repository.model.command.HttpCommandResponse;
+import be.cytomine.common.repository.model.term.payload.TermResponse;
 
 import static be.cytomine.common.repository.http.TermHttpContract.ROOT_PATH;
 

@@ -1,7 +1,10 @@
-package be.cytomine.common.repository.model.command;
+package be.cytomine.common.repository.model.command.request;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+import be.cytomine.common.repository.model.command.CommandType;
+import be.cytomine.common.repository.model.command.DataType;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "commandType",
     visible = true)

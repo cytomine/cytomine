@@ -1,4 +1,6 @@
-package be.cytomine.common.repository.model.command;
+package be.cytomine.common.repository.model.command.request;
+
+import be.cytomine.common.repository.model.command.CommandType;
 
 import static be.cytomine.common.repository.model.command.CommandType.INSERT_COMMAND;
 

@@ -1,6 +1,6 @@
 package org.cytomine.repository.http;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -249,7 +249,7 @@ class TermControllerTest {
     }
 
     private TermEntity createAndSaveTermEntity(String name, String color) {
-        ZonedDateTime now = ZonedDateTime.now();
+        LocalDateTime now = LocalDateTime.now();
         return termRepository.saveAndFlush(new TermEntity(null, 0, ontologyId, name, color, now, now, null, "",
             null));
     }

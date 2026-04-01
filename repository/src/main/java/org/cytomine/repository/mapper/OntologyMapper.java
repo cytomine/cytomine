@@ -1,6 +1,6 @@
 package org.cytomine.repository.mapper;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Optional;
 
@@ -19,7 +19,7 @@ public interface OntologyMapper {
     TermResponse map(TermEntity termEntity);
 
 
-    default Optional<ZonedDateTime> date(ZonedDateTime zonedDateTime) {
+    default Optional<LocalDateTime> date(LocalDateTime zonedDateTime) {
         return
             Optional.ofNullable(zonedDateTime);
     }

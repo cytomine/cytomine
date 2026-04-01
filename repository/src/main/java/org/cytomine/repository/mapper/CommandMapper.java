@@ -1,6 +1,6 @@
 package org.cytomine.repository.mapper;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 import org.cytomine.repository.persistence.entity.CommandV2Entity;
 import org.mapstruct.Mapper;
@@ -14,7 +14,7 @@ public interface CommandMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "data", source = "commandV2Request")
-    CommandV2Entity map(CommandV2Request<?> commandV2Request, ZonedDateTime created, ZonedDateTime updated,
+    CommandV2Entity map(CommandV2Request<?> commandV2Request, LocalDateTime created, LocalDateTime updated,
                         long userId);
 
     default CommandResponse<?> map(CommandV2Entity commandV2Entity) {

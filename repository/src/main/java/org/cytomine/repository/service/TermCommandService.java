@@ -1,6 +1,6 @@
 package org.cytomine.repository.service;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Optional;
 
@@ -36,7 +36,7 @@ public class TermCommandService {
     private final ACLService aclService;
 
     @Transactional
-    public Optional<HttpCommandResponse<TermResponse>> deleteTerm(Long id, Long userId, ZonedDateTime now) {
+    public Optional<HttpCommandResponse<TermResponse>> deleteTerm(Long id, Long userId, LocalDateTime now) {
         return termRepository.findById(id)
                    .filter(entity -> aclService.canDeleteOntology(userId, entity.getOntologyId())).map(termEntity -> {
                 DeleteTermCommand deleteCommand =
@@ -55,7 +55,7 @@ public class TermCommandService {
     }
 
     public Optional<HttpCommandResponse<TermResponse>> createTerm(Long userId, CreateTerm createTerm,
-                                                                  ZonedDateTime now) {
+                                                                  LocalDateTime now) {
         if (!aclService.canWriteOntology(userId, createTerm.ontology())) {
             return Optional.empty();
         }
@@ -78,7 +78,7 @@ public class TermCommandService {
 
     @Transactional
     public Optional<HttpCommandResponse<TermResponse>> updateTerm(long id, Long userId, UpdateTerm updateTerm,
-                                                                  ZonedDateTime now) {
+                                                                  LocalDateTime now) {
         return termRepository.findById(id).filter(entity -> aclService.canWriteOntology(userId, entity.getOntologyId()))
                    .map(termEntity -> {
                        TermCommandPayload beforePayload = ontologyMapper.mapToTermCommandPayload(termEntity);

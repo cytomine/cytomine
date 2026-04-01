@@ -1,6 +1,6 @@
 package org.cytomine.repository.http;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -72,7 +72,7 @@ class UndoControllerTest {
     @SneakyThrows
     void undoInsertTermCommandDeletesCreatedTerm() {
         CreateTerm createTerm = new CreateTerm("termToUndo", "#00FF00", ontologyId, null);
-        ZonedDateTime now = ZonedDateTime.now();
+        LocalDateTime now = LocalDateTime.now();
         HttpCommandResponse<TermResponse> createResponse =
             termCommandService.createTerm(userId, createTerm, now).orElseThrow();
 
@@ -90,7 +90,7 @@ class UndoControllerTest {
     @SneakyThrows
     void undoUpdateTermCommandRestoresPreviousState() {
         CreateTerm createTerm = new CreateTerm("originalName", "#FF0000", ontologyId, null);
-        ZonedDateTime now = ZonedDateTime.now();
+        LocalDateTime now = LocalDateTime.now();
         HttpCommandResponse<TermResponse> createResponse =
             termCommandService.createTerm(userId, createTerm, now).orElseThrow();
 
@@ -124,7 +124,7 @@ class UndoControllerTest {
     @SneakyThrows
     void undoByUserWithoutPermissionReturnsEmpty() {
         CreateTerm createTerm = new CreateTerm("termToUndo", "#FF0000", ontologyId, null);
-        ZonedDateTime now = ZonedDateTime.now();
+        LocalDateTime now = LocalDateTime.now();
         HttpCommandResponse<TermResponse> createResponse =
             termCommandService.createTerm(userId, createTerm, now).orElseThrow();
 

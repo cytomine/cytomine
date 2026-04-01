@@ -64,15 +64,13 @@ class ApplyCommandServiceTest {
     void undoDeleteTermCommandRestoresTermWithNewId() {
         CreateTerm createTerm = new CreateTerm("termToDelete", "#FF0000", ontologyId, null);
         HttpCommandResponse<TermResponse> createResponse =
-            termCommandService.createTerm(userId, createTerm, Optional.empty())
-                                                               .orElseThrow();
+            termCommandService.createTerm(userId, createTerm).orElseThrow();
 
         Long originalTermId = createResponse.data().id();
         assertTrue(termRepository.findById(originalTermId).isPresent());
 
         HttpCommandResponse<TermResponse> deleteResponse =
-            termCommandService.deleteTerm(originalTermId, userId, Optional.empty())
-                                                               .orElseThrow();
+            termCommandService.deleteTerm(originalTermId, userId).orElseThrow();
         UUID deleteCommandId = deleteResponse.command();
 
         assertTrue(termRepository.findById(originalTermId).isEmpty());
@@ -97,13 +95,11 @@ class ApplyCommandServiceTest {
     void undoCommandByUserWithoutPermissionReturnsFalse() {
         CreateTerm createTerm = new CreateTerm("termToDelete", "#FF0000", ontologyId, null);
         HttpCommandResponse<TermResponse> createResponse =
-            termCommandService.createTerm(userId, createTerm, Optional.empty())
-                                                               .orElseThrow();
+            termCommandService.createTerm(userId, createTerm).orElseThrow();
 
         Long termId = createResponse.data().id();
         HttpCommandResponse<TermResponse> deleteResponse =
-            termCommandService.deleteTerm(termId, userId, Optional.empty())
-                                                               .orElseThrow();
+            termCommandService.deleteTerm(termId, userId).orElseThrow();
         UUID deleteCommandId = deleteResponse.command();
 
         Long nonAdminUserId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
@@ -119,8 +115,7 @@ class ApplyCommandServiceTest {
     void undoInsertTermCommandDeletesCreatedTerm() {
         CreateTerm createTerm = new CreateTerm("termToUndo", "#00FF00", ontologyId, null);
         HttpCommandResponse<TermResponse> createResponse =
-            termCommandService.createTerm(userId, createTerm, Optional.empty())
-                                                               .orElseThrow();
+            termCommandService.createTerm(userId, createTerm).orElseThrow();
 
         Long termId = createResponse.data().id();
         UUID insertCommandId = createResponse.command();
@@ -136,8 +131,7 @@ class ApplyCommandServiceTest {
     void undoUpdateTermCommandRestoresPreviousState() {
         CreateTerm createTerm = new CreateTerm("originalName", "#FF0000", ontologyId, null);
         HttpCommandResponse<TermResponse> createResponse =
-            termCommandService.createTerm(userId, createTerm, Optional.empty())
-                                                               .orElseThrow();
+            termCommandService.createTerm(userId, createTerm).orElseThrow();
 
         Long termId = createResponse.data().id();
 

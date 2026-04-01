@@ -50,7 +50,7 @@ public class TermController implements TermHttpContract {
     @PostMapping
     public Optional<HttpCommandResponse<TermResponse>> create(@RequestParam long userId,
                                                               @RequestBody CreateTerm createTerm) {
-        return termCommandService.createTerm(userId, createTerm, Optional.empty());
+        return termCommandService.createTerm(userId, createTerm);
     }
 
     @Override
@@ -66,7 +66,7 @@ public class TermController implements TermHttpContract {
     @Transactional
     public Optional<HttpCommandResponse<TermResponse>> delete(@PathVariable long id,
                                                               @RequestParam long userId) {
-        return termCommandService.deleteTerm(id, userId, Optional.empty());
+        return termCommandService.deleteTerm(id, userId);
     }
 
     @Override

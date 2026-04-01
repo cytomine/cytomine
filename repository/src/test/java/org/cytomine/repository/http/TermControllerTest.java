@@ -1,6 +1,6 @@
 package org.cytomine.repository.http;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -102,7 +102,8 @@ class TermControllerTest {
 
         TermResponse result = objectMapper.readValue(response, TermResponse.class);
         TermResponse expected =
-            new TermResponse(entity.getId(), "term1", "#FF0000", ontologyId, entity.getCreated(), entity.getUpdated(),
+            new TermResponse(entity.getId(), "term1", "#FF0000", ontologyId, entity.getCreated(), entity.getUpdated()
+                , Optional.empty(),
                 "", null);
         assertEquals(expected, result);
     }
@@ -206,7 +207,8 @@ class TermControllerTest {
 
         assertEquals(1, page.getTotalElements());
         TermResponse expected =
-            new TermResponse(entity.getId(), "term1", "#FF0000", ontologyId, entity.getCreated(), entity.getUpdated(),
+            new TermResponse(entity.getId(), "term1", "#FF0000", ontologyId, entity.getCreated(), entity.getUpdated()
+                , Optional.empty(),
                 "", null);
         assertEquals(List.of(expected), page.getContent());
     }
@@ -224,7 +226,8 @@ class TermControllerTest {
 
         assertEquals(1, page.getTotalElements());
         TermResponse expected =
-            new TermResponse(entity.getId(), "term1", "#FF0000", ontologyId, entity.getCreated(), entity.getUpdated(),
+            new TermResponse(entity.getId(), "term1", "#FF0000", ontologyId, entity.getCreated(), entity.getUpdated()
+                , Optional.empty(),
                 "", null);
         assertEquals(List.of(expected), page.getContent());
     }
@@ -246,7 +249,8 @@ class TermControllerTest {
     }
 
     private TermEntity createAndSaveTermEntity(String name, String color) {
-        Date now = new Date();
-        return termRepository.saveAndFlush(new TermEntity(null, 0, ontologyId, name, color, now, now, "", null));
+        ZonedDateTime now = ZonedDateTime.now();
+        return termRepository.saveAndFlush(new TermEntity(null, 0, ontologyId, name, color, now, now, null, "",
+            null));
     }
 }

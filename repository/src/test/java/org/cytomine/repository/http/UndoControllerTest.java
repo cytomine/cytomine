@@ -72,7 +72,7 @@ class UndoControllerTest {
     void undoInsertTermCommandDeletesCreatedTerm() {
         CreateTerm createTerm = new CreateTerm("termToUndo", "#00FF00", ontologyId, null);
         HttpCommandResponse<TermResponse> createResponse =
-            termCommandService.createTerm(userId, createTerm, Optional.empty())
+            termCommandService.createTerm(userId, createTerm)
                 .orElseThrow();
 
         Long termId = createResponse.data().id();
@@ -92,7 +92,7 @@ class UndoControllerTest {
     void undoUpdateTermCommandRestoresPreviousState() {
         CreateTerm createTerm = new CreateTerm("originalName", "#FF0000", ontologyId, null);
         HttpCommandResponse<TermResponse> createResponse =
-            termCommandService.createTerm(userId, createTerm, Optional.empty())
+            termCommandService.createTerm(userId, createTerm)
                 .orElseThrow();
 
         Long termId = createResponse.data().id();
@@ -130,7 +130,7 @@ class UndoControllerTest {
     void undoByUserWithoutPermissionReturnsEmpty() {
         CreateTerm createTerm = new CreateTerm("termToUndo", "#FF0000", ontologyId, null);
         HttpCommandResponse<TermResponse> createResponse =
-            termCommandService.createTerm(userId, createTerm, Optional.empty())
+            termCommandService.createTerm(userId, createTerm)
                 .orElseThrow();
 
         Long termId = createResponse.data().id();

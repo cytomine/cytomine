@@ -1,5 +1,6 @@
 package org.cytomine.repository.service;
 
+import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -63,18 +64,19 @@ class ApplyCommandServiceTest {
     @Test
     void undoDeleteTermCommandRestoresTermWithNewId() {
         CreateTerm createTerm = new CreateTerm("termToDelete", "#FF0000", ontologyId, null);
+        ZonedDateTime now = ZonedDateTime.now();
         HttpCommandResponse<TermResponse> createResponse =
-            termCommandService.createTerm(userId, createTerm).orElseThrow();
+            termCommandService.createTerm(userId, createTerm, now).orElseThrow();
 
         Long originalTermId = createResponse.data().id();
-        assertTrue(termRepository.findById(originalTermId).isPresent());
+        Optional<TermEntity> entity = termRepository.findById(originalTermId);
+        assertTrue(entity.isPresent());
 
         HttpCommandResponse<TermResponse> deleteResponse =
-            termCommandService.deleteTerm(originalTermId, userId).orElseThrow();
+            termCommandService.deleteTerm(originalTermId, userId, now).orElseThrow();
         UUID deleteCommandId = deleteResponse.command();
-
-        assertTrue(termRepository.findById(originalTermId).isEmpty());
-
+        entity.get().setDeleted(now);
+        assertEquals(termRepository.findById(originalTermId), entity);
         Optional<Long> undoResult = applyCommandService.undoCommand(userId, deleteCommandId);
 
         assertTrue(undoResult.isPresent());
@@ -94,12 +96,13 @@ class ApplyCommandServiceTest {
     @Test
     void undoCommandByUserWithoutPermissionReturnsFalse() {
         CreateTerm createTerm = new CreateTerm("termToDelete", "#FF0000", ontologyId, null);
+        ZonedDateTime now = ZonedDateTime.now();
         HttpCommandResponse<TermResponse> createResponse =
-            termCommandService.createTerm(userId, createTerm).orElseThrow();
+            termCommandService.createTerm(userId, createTerm, now).orElseThrow();
 
         Long termId = createResponse.data().id();
         HttpCommandResponse<TermResponse> deleteResponse =
-            termCommandService.deleteTerm(termId, userId).orElseThrow();
+            termCommandService.deleteTerm(termId, userId, now).orElseThrow();
         UUID deleteCommandId = deleteResponse.command();
 
         Long nonAdminUserId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
@@ -114,13 +117,13 @@ class ApplyCommandServiceTest {
     @Test
     void undoInsertTermCommandDeletesCreatedTerm() {
         CreateTerm createTerm = new CreateTerm("termToUndo", "#00FF00", ontologyId, null);
+        ZonedDateTime now = ZonedDateTime.now();
         HttpCommandResponse<TermResponse> createResponse =
-            termCommandService.createTerm(userId, createTerm).orElseThrow();
+            termCommandService.createTerm(userId, createTerm, now).orElseThrow();
 
         Long termId = createResponse.data().id();
         UUID insertCommandId = createResponse.command();
         assertTrue(termRepository.findById(termId).isPresent());
-
         Optional<Long> undoResult = applyCommandService.undoCommand(userId, insertCommandId);
 
         assertFalse(undoResult.isPresent());
@@ -130,14 +133,16 @@ class ApplyCommandServiceTest {
     @Test
     void undoUpdateTermCommandRestoresPreviousState() {
         CreateTerm createTerm = new CreateTerm("originalName", "#FF0000", ontologyId, null);
+        ZonedDateTime now = ZonedDateTime.now();
         HttpCommandResponse<TermResponse> createResponse =
-            termCommandService.createTerm(userId, createTerm).orElseThrow();
+            termCommandService.createTerm(userId, createTerm, now).orElseThrow();
 
         Long termId = createResponse.data().id();
 
         UpdateTerm updateTerm = new UpdateTerm(Optional.of("updatedName"), Optional.of("#00FF00"));
-        HttpCommandResponse<TermResponse> updateResponse = termCommandService.updateTerm(termId, userId, updateTerm)
-                                                               .orElseThrow();
+        HttpCommandResponse<TermResponse> updateResponse =
+            termCommandService.updateTerm(termId, userId, updateTerm, now)
+                .orElseThrow();
 
         UUID updateCommandId = updateResponse.command();
         TermEntity updatedTerm = termRepository.findById(termId).orElseThrow();

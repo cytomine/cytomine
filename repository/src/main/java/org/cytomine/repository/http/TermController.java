@@ -1,5 +1,6 @@
 package org.cytomine.repository.http;
 
+import java.time.ZonedDateTime;
 import java.util.Optional;
 
 import jakarta.transaction.Transactional;
@@ -50,23 +51,24 @@ public class TermController implements TermHttpContract {
     @PostMapping
     public Optional<HttpCommandResponse<TermResponse>> create(@RequestParam long userId,
                                                               @RequestBody CreateTerm createTerm) {
-        return termCommandService.createTerm(userId, createTerm);
+        ZonedDateTime now = ZonedDateTime.now();
+        return termCommandService.createTerm(userId, createTerm, now);
     }
 
     @Override
     @PutMapping("/{id}")
-    public Optional<HttpCommandResponse<TermResponse>> update(@PathVariable long id,
-                                                              @RequestParam long userId,
+    public Optional<HttpCommandResponse<TermResponse>> update(@PathVariable long id, @RequestParam long userId,
                                                               @RequestBody UpdateTerm updateTerm) {
-        return termCommandService.updateTerm(id, userId, updateTerm);
+        ZonedDateTime now = ZonedDateTime.now();
+        return termCommandService.updateTerm(id, userId, updateTerm, now);
     }
 
     @Override
     @DeleteMapping("/{id}")
     @Transactional
-    public Optional<HttpCommandResponse<TermResponse>> delete(@PathVariable long id,
-                                                              @RequestParam long userId) {
-        return termCommandService.deleteTerm(id, userId);
+    public Optional<HttpCommandResponse<TermResponse>> delete(@PathVariable long id, @RequestParam long userId) {
+        ZonedDateTime now = ZonedDateTime.now();
+        return termCommandService.deleteTerm(id, userId, now);
     }
 
     @Override

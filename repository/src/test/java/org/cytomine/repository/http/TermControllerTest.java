@@ -185,7 +185,7 @@ class TermControllerTest {
             objectMapper.getTypeFactory().constructParametricType(HttpCommandResponse.class, TermResponse.class));
 
         assertEquals("term1", result.data().name());
-        assertTrue(termRepository.findById(entity.getId()).isEmpty());
+        assertEquals(termRepository.findById(entity.getId()), Optional.of(entity));
 
         CommandV2Entity command = commandRepository.findById(result.command()).orElseThrow();
         assertEquals(CommandType.DELETE_COMMAND, command.getData().getCommandType());

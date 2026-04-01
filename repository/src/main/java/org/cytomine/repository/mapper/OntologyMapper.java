@@ -14,14 +14,9 @@ import be.cytomine.common.repository.model.command.payload.term.TermCommandPaylo
 
 @Mapper(componentModel = "spring")
 public interface OntologyMapper {
+
     @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
     TermResponse map(TermEntity termEntity);
-
-
-    default Optional<LocalDateTime> date(LocalDateTime zonedDateTime) {
-        return
-            Optional.ofNullable(zonedDateTime);
-    }
 
     @Mapping(target = "children", ignore = true)
     @Mapping(target = "id", ignore = true)
@@ -39,19 +34,7 @@ public interface OntologyMapper {
     @Mapping(target = "parent", ignore = true)
     TermCommandPayload mapToTermCommandPayload(TermEntity termEntity);
 
-
-    @Mapping(target = "version", ignore = true)
-    @Mapping(target = "ontologyId", source = "ontology")
-    @Mapping(target = "children", ignore = true)
-    @Mapping(target = "deleted", ignore = true)
-    @BeanMapping(ignoreUnmappedSourceProperties = {"parent"})
-    TermEntity mapToTermEntity(TermCommandPayload termCommandPayload);
-
-    @Mapping(target = "version", ignore = true)
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "ontologyId", source = "ontology")
-    @Mapping(target = "children", ignore = true)
-    @BeanMapping(ignoreUnmappedSourceProperties = {"parent", "id"})
-    @Mapping(target = "deleted", ignore = true)
-    TermEntity mapToTermEntityWithoutID(TermCommandPayload termCommandPayload);
+    default Optional<LocalDateTime> date(LocalDateTime zonedDateTime) {
+        return Optional.ofNullable(zonedDateTime);
+    }
 }

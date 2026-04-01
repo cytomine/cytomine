@@ -38,15 +38,16 @@ public class TermCommandService {
     @Transactional
     public Optional<HttpCommandResponse<TermResponse>> deleteTerm(Long id, Long userId, LocalDateTime now) {
         return termRepository.findById(id)
-                   .filter(entity -> aclService.canDeleteOntology(userId, entity.getOntologyId())).map(termEntity -> {
-                DeleteTermCommand deleteCommand =
-                    new DeleteTermCommand(id, ontologyMapper.mapToTermCommandPayload(termEntity), userId,
-                        termEntity.getOntologyId());
-                CommandV2Entity commandV2Entity =
-                    commandV2Repository.save(commandMapper.map(deleteCommand, now, now, userId));
-                termEntity.setDeleted(now);
-                return saveAndBuildResponse(termEntity, Commands.DELETE_TERM, commandV2Entity.getId());
-            });
+                   .filter(entity -> aclService.canDeleteOntology(userId, entity.getOntologyId()))
+                   .map(termEntity -> {
+                       DeleteTermCommand deleteCommand =
+                           new DeleteTermCommand(id, ontologyMapper.mapToTermCommandPayload(termEntity), userId,
+                               termEntity.getOntologyId());
+                       CommandV2Entity commandV2Entity =
+                           commandV2Repository.save(commandMapper.map(deleteCommand, now, now, userId));
+                       termEntity.setDeleted(now);
+                       return saveAndBuildResponse(termEntity, Commands.DELETE_TERM, commandV2Entity.getId());
+                   });
     }
 
     public Optional<HttpCommandResponse<TermResponse>> createTerm(Long userId, CreateTerm createTerm,
@@ -130,8 +131,8 @@ public class TermCommandService {
     }
 
     public Optional<HttpCommandResponse<TermResponse>> redoUpdateTerm(UUID commandId,
-                                                                      UpdateTermCommand updateTermCommand,
-                                                                      Long userId, LocalDateTime now) {
+                                                                      UpdateTermCommand updateTermCommand, Long userId,
+                                                                      LocalDateTime now) {
         if (!aclService.canWriteOntology(userId, updateTermCommand.ontologyId())) {
             return Optional.empty();
         }
@@ -173,12 +174,11 @@ public class TermCommandService {
         });
     }
 
-    private HttpCommandResponse<TermResponse> saveAndBuildResponse(TermEntity entity, String command,
-                                                                   UUID commandId) {
+    private HttpCommandResponse<TermResponse> saveAndBuildResponse(TermEntity entity, String command, UUID commandId) {
         TermEntity saved = termRepository.save(entity);
         TermResponse response = ontologyMapper.map(saved);
-        Callback callback = new Callback(command, Optional.of(saved.getId()), Optional.of(saved.getOntologyId()),
-            Optional.empty());
+        Callback callback =
+            new Callback(command, Optional.of(saved.getId()), Optional.of(saved.getOntologyId()), Optional.empty());
         return new HttpCommandResponse<>(callback, true, response, commandId);
     }
 }

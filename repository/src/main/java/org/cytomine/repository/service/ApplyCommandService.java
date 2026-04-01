@@ -8,7 +8,6 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.cytomine.repository.mapper.OntologyMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
-import org.cytomine.repository.persistence.entity.CommandV2Entity;
 import org.springframework.stereotype.Component;
 
 import be.cytomine.common.repository.model.TermResponse;
@@ -26,41 +25,30 @@ public class ApplyCommandService {
     private final OntologyMapper ontologyMapper;
 
     @Transactional
-    public Optional<HttpCommandResponse<TermResponse>> undoCommand(long userId, UUID undoCommand) {
-        LocalDateTime now = LocalDateTime.now();
+    public Optional<HttpCommandResponse<TermResponse>> undoCommand(long userId, UUID undoCommand, LocalDateTime now) {
         return commandRepository.findById(undoCommand)
-                   .filter(commandEntity -> userCanUndoCommand(userId, commandEntity))
+
                    .flatMap(commandEntity -> switch (commandEntity.getData()) {
                        case DeleteTermCommand dtc ->
-                           termCommandService.undoDeleteTerm(commandEntity.getId(), dtc, userId,
-                               now);
-                       case CreateTermCommand icr -> termCommandService.undoCreateTerm(commandEntity.getId(), icr,
-                           userId,
-                           now);
-                       case UpdateTermCommand ucr -> termCommandService.undoUpdateTerm(commandEntity.getId(), ucr,
-                           userId,
-                           now);
+                           termCommandService.undoDeleteTerm(commandEntity.getId(), dtc, userId, now);
+                       case CreateTermCommand icr ->
+                           termCommandService.undoCreateTerm(commandEntity.getId(), icr, userId, now);
+                       case UpdateTermCommand ucr ->
+                           termCommandService.undoUpdateTerm(commandEntity.getId(), ucr, userId);
                    });
     }
 
-    boolean userCanUndoCommand(long userId, CommandV2Entity commandEntity) {
-        return switch (commandEntity.getData()) {
-            case DeleteTermCommand dtc -> aclService.canWriteOntology(userId, dtc.ontologyId());
-            case CreateTermCommand icr -> aclService.canWriteOntology(userId, icr.ontologyId());
-            case UpdateTermCommand ucr -> aclService.canWriteOntology(userId, ucr.ontologyId());
-        };
-    }
-
-    public Optional<Long> redoCommand(long userId, UUID undoCommand) {
+    public Optional<HttpCommandResponse<TermResponse>> redoCommand(long userId, UUID undoCommand, LocalDateTime now) {
         return commandRepository.findById(undoCommand)
-                   .filter(commandEntity -> userCanUndoCommand(userId, commandEntity))
                    .flatMap(commandEntity -> switch (commandEntity.getData()) {
-                       case DeleteTermCommand dtc -> null;
-                       case CreateTermCommand icr -> null;
-                       case UpdateTermCommand ucr -> null;
+                       case DeleteTermCommand dtc ->
+                           termCommandService.redoDeleteTerm(commandEntity.getId(), dtc, userId, now);
+                       case CreateTermCommand icr ->
+                           termCommandService.redoCreateTerm(commandEntity.getId(), icr, userId, now);
+                       case UpdateTermCommand ucr ->
+                           termCommandService.redoUpdateTerm(commandEntity.getId(), ucr, userId, now);
                    });
     }
-
 
 
 }

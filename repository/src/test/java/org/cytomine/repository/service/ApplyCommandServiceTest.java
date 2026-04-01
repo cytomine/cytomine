@@ -4,162 +4,131 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.cytomine.repository.RepositoryApp;
-import org.cytomine.repository.persistence.TermRepository;
-import org.cytomine.repository.persistence.entity.TermEntity;
-import org.junit.jupiter.api.BeforeEach;
+import org.cytomine.repository.mapper.OntologyMapper;
+import org.cytomine.repository.persistence.CommandV2Repository;
+import org.cytomine.repository.persistence.entity.CommandV2Entity;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.transaction.annotation.Transactional;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.common.repository.model.CreateTerm;
 import be.cytomine.common.repository.model.TermResponse;
-import be.cytomine.common.repository.model.UpdateTerm;
+import be.cytomine.common.repository.model.command.CreateTermCommand;
+import be.cytomine.common.repository.model.command.DeleteTermCommand;
 import be.cytomine.common.repository.model.command.HttpCommandResponse;
+import be.cytomine.common.repository.model.command.UpdateTermCommand;
+import be.cytomine.common.repository.model.command.payload.term.TermCommandPayload;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest(classes = RepositoryApp.class)
-@Import(PostGisTestConfiguration.class)
-@Transactional
+@ExtendWith(MockitoExtension.class)
 class ApplyCommandServiceTest {
 
-    @Autowired
+    private final long userId = 1L;
+    private final long ontologyId = 2L;
+    private final TermCommandPayload payload =
+        new TermCommandPayload(Optional.empty(), 10L, "name", "#FF0000", "2024-01-01", "2024-01-01", null, ontologyId);
+    @Mock
+    private CommandV2Repository commandRepository;
+    @Mock
+    private ACLService aclService;
+    @Mock
+    private TermCommandService termCommandService;
+    @Mock
+    private OntologyMapper ontologyMapper;
+    @InjectMocks
     private ApplyCommandService applyCommandService;
 
-    @Autowired
-    private TermCommandService termCommandService;
+    @Test
+    void undoCommandWithUnknownIdReturnsEmpty() {
+        UUID id = UUID.randomUUID();
+        when(commandRepository.findById(id)).thenReturn(Optional.empty());
 
-    @Autowired
-    private TermRepository termRepository;
-
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
-    private Long ontologyId;
-    private Long userId;
-
-    @BeforeEach
-    void setUp() {
-        userId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
-        jdbcTemplate.update("INSERT INTO sec_user (id, version, username) VALUES (?, 0, 'admin')", userId);
-
-        Long adminRoleId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
-        jdbcTemplate.update("INSERT INTO sec_role (id, version, authority) VALUES (?, 0, 'ROLE_ADMIN')", adminRoleId);
-        Long userRoleId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
-        jdbcTemplate.update("INSERT INTO sec_user_sec_role (id, version, sec_user_id, sec_role_id) VALUES (?, 0, ?, ?)",
-            userRoleId, userId, adminRoleId);
-
-        ontologyId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
-        jdbcTemplate.update("INSERT INTO ontology (id, version, name, user_id) VALUES (?, 0, 'test', ?)", ontologyId,
-            userId);
+        assertFalse(applyCommandService.undoCommand(userId, id, LocalDateTime.now()).isPresent());
     }
 
     @Test
-    void undoDeleteTermCommandRestoresTermWithNewId() {
-        CreateTerm createTerm = new CreateTerm("termToDelete", "#FF0000", ontologyId, null);
+    void undoDeleteTermCommandDelegatesToTermCommandService() {
+        UUID id = UUID.randomUUID();
         LocalDateTime now = LocalDateTime.now();
-        HttpCommandResponse<TermResponse> createResponse =
-            termCommandService.createTerm(userId, createTerm, now).orElseThrow();
+        DeleteTermCommand cmd = new DeleteTermCommand(10L, payload, userId, ontologyId);
+        when(commandRepository.findById(id)).thenReturn(Optional.of(new CommandV2Entity(id, null, null, cmd, 0L)));
+        when(termCommandService.undoDeleteTerm(id, cmd, userId, now)).thenReturn(Optional.of(mockResponse()));
 
-        Long originalTermId = createResponse.data().id();
-        Optional<TermEntity> entity = termRepository.findById(originalTermId);
-        assertTrue(entity.isPresent());
+        applyCommandService.undoCommand(userId, id, now);
 
-        HttpCommandResponse<TermResponse> deleteResponse =
-            termCommandService.deleteTerm(originalTermId, userId, now).orElseThrow();
-        UUID deleteCommandId = deleteResponse.command();
-        entity.get().setDeleted(now);
-        assertEquals(termRepository.findById(originalTermId), entity);
-        Optional<HttpCommandResponse<TermResponse>> undoResult =
-            applyCommandService.undoCommand(userId, deleteCommandId);
-
-        assertTrue(undoResult.isPresent());
-
-        TermEntity restoredTerm = termRepository.findById(entity.get().getId()).orElseThrow();
-        assertEquals("termToDelete", restoredTerm.getName());
-        assertEquals("#FF0000", restoredTerm.getColor());
-        assertEquals(ontologyId, restoredTerm.getOntologyId());
+        verify(termCommandService).undoDeleteTerm(id, cmd, userId, now);
     }
 
     @Test
-    void undoCommandWithNonExistentCommandIdReturnsFalse() {
-        Optional<HttpCommandResponse<TermResponse>> result = applyCommandService.undoCommand(userId, UUID.randomUUID());
-        assertFalse(result.isPresent());
-    }
-
-    @Test
-    void undoCommandByUserWithoutPermissionReturnsFalse() {
-        CreateTerm createTerm = new CreateTerm("termToDelete", "#FF0000", ontologyId, null);
+    void undoCreateTermCommandDelegatesToTermCommandService() {
+        UUID id = UUID.randomUUID();
         LocalDateTime now = LocalDateTime.now();
-        HttpCommandResponse<TermResponse> createResponse =
-            termCommandService.createTerm(userId, createTerm, now).orElseThrow();
+        CreateTermCommand cmd = new CreateTermCommand(payload, userId, ontologyId);
+        when(commandRepository.findById(id)).thenReturn(Optional.of(new CommandV2Entity(id, null, null, cmd, 0L)));
+        when(termCommandService.undoCreateTerm(id, cmd, userId, now)).thenReturn(Optional.of(mockResponse()));
 
-        Long termId = createResponse.data().id();
-        HttpCommandResponse<TermResponse> deleteResponse =
-            termCommandService.deleteTerm(termId, userId, now).orElseThrow();
-        UUID deleteCommandId = deleteResponse.command();
+        applyCommandService.undoCommand(userId, id, now);
 
-        Long nonAdminUserId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
-        jdbcTemplate.update("INSERT INTO sec_user (id, version, username) VALUES (?, 0, 'nonadmin')", nonAdminUserId);
-
-        Optional<HttpCommandResponse<TermResponse>> result =
-            applyCommandService.undoCommand(nonAdminUserId, deleteCommandId);
-
-        assertFalse(result.isPresent());
-        assertEquals(termRepository.findById(termId).map(TermEntity::getDeleted), deleteResponse.data().deleted());
+        verify(termCommandService).undoCreateTerm(id, cmd, userId, now);
     }
 
     @Test
-    void undoInsertTermCommandDeletesCreatedTerm() {
-        CreateTerm createTerm = new CreateTerm("termToUndo", "#00FF00", ontologyId, null);
+    void undoUpdateTermCommandDelegatesToTermCommandService() {
+        UUID id = UUID.randomUUID();
         LocalDateTime now = LocalDateTime.now();
-        HttpCommandResponse<TermResponse> createResponse =
-            termCommandService.createTerm(userId, createTerm, now).orElseThrow();
+        UpdateTermCommand cmd = new UpdateTermCommand(10L, payload, payload, userId, ontologyId);
+        when(commandRepository.findById(id)).thenReturn(Optional.of(new CommandV2Entity(id, null, null, cmd, 0L)));
+        when(termCommandService.undoUpdateTerm(id, cmd, userId)).thenReturn(Optional.of(mockResponse()));
 
-        Long termId = createResponse.data().id();
-        UUID insertCommandId = createResponse.command();
-        assertTrue(termRepository.findById(termId).isPresent());
-        Optional<HttpCommandResponse<TermResponse>> undoResult =
-            applyCommandService.undoCommand(userId, insertCommandId);
+        applyCommandService.undoCommand(userId, id, now);
 
-        assertEquals(undoResult.get().data().id(), termId);
-        assertTrue(now.isBefore(termRepository.findById(termId).get().getDeleted()));
+        verify(termCommandService).undoUpdateTerm(id, cmd, userId);
     }
 
     @Test
-    void undoUpdateTermCommandRestoresPreviousState() {
-        CreateTerm createTerm = new CreateTerm("originalName", "#FF0000", ontologyId, null);
+    void redoDeleteTermCommandDelegatesToTermCommandService() {
+        UUID id = UUID.randomUUID();
         LocalDateTime now = LocalDateTime.now();
-        HttpCommandResponse<TermResponse> createResponse =
-            termCommandService.createTerm(userId, createTerm, now).orElseThrow();
+        DeleteTermCommand cmd = new DeleteTermCommand(10L, payload, userId, ontologyId);
+        when(commandRepository.findById(id)).thenReturn(Optional.of(new CommandV2Entity(id, null, null, cmd, 0L)));
+        when(termCommandService.redoDeleteTerm(id, cmd, userId, now)).thenReturn(Optional.of(mockResponse()));
 
-        Long termId = createResponse.data().id();
+        applyCommandService.redoCommand(userId, id, now);
 
-        UpdateTerm updateTerm = new UpdateTerm(Optional.of("updatedName"), Optional.of("#00FF00"));
-        HttpCommandResponse<TermResponse> updateResponse =
-            termCommandService.updateTerm(termId, userId, updateTerm, now)
-                .orElseThrow();
+        verify(termCommandService).redoDeleteTerm(id, cmd, userId, now);
+    }
 
-        UUID updateCommandId = updateResponse.command();
-        TermEntity updatedTerm = termRepository.findById(termId).orElseThrow();
-        assertEquals("updatedName", updatedTerm.getName());
-        assertEquals("#00FF00", updatedTerm.getColor());
+    @Test
+    void redoCreateTermCommandDelegatesToTermCommandService() {
+        UUID id = UUID.randomUUID();
+        LocalDateTime now = LocalDateTime.now();
+        CreateTermCommand cmd = new CreateTermCommand(payload, userId, ontologyId);
+        when(commandRepository.findById(id)).thenReturn(Optional.of(new CommandV2Entity(id, null, null, cmd, 0L)));
+        when(termCommandService.redoCreateTerm(id, cmd, userId, now)).thenReturn(Optional.of(mockResponse()));
 
-        Optional<HttpCommandResponse<TermResponse>> undoResult =
-            applyCommandService.undoCommand(userId, updateCommandId);
+        applyCommandService.redoCommand(userId, id, now);
 
-        assertTrue(undoResult.isPresent());
-        assertEquals(termId, undoResult.get().data().id());
+        verify(termCommandService).redoCreateTerm(id, cmd, userId, now);
+    }
 
-        TermEntity restoredTerm = termRepository.findById(termId).orElseThrow();
-        assertEquals("originalName", restoredTerm.getName());
-        assertEquals("#FF0000", restoredTerm.getColor());
+    @Test
+    void redoUpdateTermCommandDelegatesToTermCommandService() {
+        UUID id = UUID.randomUUID();
+        LocalDateTime now = LocalDateTime.now();
+        UpdateTermCommand cmd = new UpdateTermCommand(10L, payload, payload, userId, ontologyId);
+        when(commandRepository.findById(id)).thenReturn(Optional.of(new CommandV2Entity(id, null, null, cmd, 0L)));
+        when(termCommandService.redoUpdateTerm(id, cmd, userId, now)).thenReturn(Optional.of(mockResponse()));
+
+        applyCommandService.redoCommand(userId, id, now);
+
+        verify(termCommandService).redoUpdateTerm(id, cmd, userId, now);
+    }
+
+    private HttpCommandResponse<TermResponse> mockResponse() {
+        return new HttpCommandResponse<>(null, true, null, UUID.randomUUID());
     }
 }

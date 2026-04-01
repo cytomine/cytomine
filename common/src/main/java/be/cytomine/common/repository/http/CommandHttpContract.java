@@ -23,7 +23,7 @@ public interface CommandHttpContract {
     Optional<HttpCommandResponse<TermResponse>> undo(@PathVariable UUID commandId, @RequestParam long userId);
 
     @PostExchange("/redo/{commandId}")
-    Optional<HttpCommandResponse<?>> redo(@PathVariable UUID commandId, @RequestParam long userId);
+    Optional<HttpCommandResponse<TermResponse>> redo(@PathVariable UUID commandId, @RequestParam long userId);
 
     @GetExchange("/{commandId}")
     Optional<CommandResponse<?>> get(@PathVariable UUID commandId, @RequestParam long userId);

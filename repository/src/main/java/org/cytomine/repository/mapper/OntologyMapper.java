@@ -1,7 +1,6 @@
 package org.cytomine.repository.mapper;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Optional;
 
 import org.cytomine.repository.persistence.entity.TermEntity;
@@ -33,7 +32,7 @@ public interface OntologyMapper {
     @Mapping(target = "created", source = "creationDate")
     @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "updated", source = "creationDate")
-    TermEntity map(CreateTerm createTerm, Date creationDate);
+    TermEntity map(CreateTerm createTerm, LocalDateTime creationDate);
 
     @BeanMapping(ignoreUnmappedSourceProperties = {"version", "children", "deleted"})
     @Mapping(target = "ontology", source = "ontologyId")

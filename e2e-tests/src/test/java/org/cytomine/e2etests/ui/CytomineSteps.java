@@ -4,6 +4,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -11,8 +12,6 @@ import java.util.UUID;
 import lombok.SneakyThrows;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +22,9 @@ import static java.util.stream.Collectors.toSet;
 
 @Component
 public class CytomineSteps {
+
+    @Autowired
+    AnnotationTools annotationTools;
 
     @Autowired
     WebDriverUtils webDriverUtils;
@@ -36,10 +38,15 @@ public class CytomineSteps {
         webDriverUtils.byIsDisplayed(wait, By.id("app"));
     }
 
+    public void logout(Wait<WebDriver> wait, URL cytomineUrl) {
+        webDriverUtils.goTo(wait, cytomineUrl.toString());
+        webDriverUtils.byClick(wait, By.cssSelector(".navbar-end .navbar-item.has-dropdown"));
+        webDriverUtils.byClick(wait, By.cssSelector(".navbar-item .fa-power-off"));
+        webDriverUtils.byIsDisplayed(wait, By.id("username"));
+    }
 
     @SneakyThrows
-    public String createProject(Wait<WebDriver> wait, WebDriver driver, URL cytomineUrl,
-                                String projectName) {
+    public String createProject(Wait<WebDriver> wait, WebDriver driver, URL cytomineUrl, String projectName) {
         webDriverUtils.goTo(wait, cytomineUrl.toString());
         webDriverUtils.xpathClick(wait, "//a[@href='#/projects']");
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'New project')]");
@@ -53,24 +60,20 @@ public class CytomineSteps {
         webDriverUtils.goTo(wait, projectURL);
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Delete')]");
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Confirm')]");
-        webDriverUtils.byIsDisplayed(wait,
-            By.xpath("//div[contains(text(), 'successfully deleted')]"));
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'successfully deleted')]"));
+        webDriverUtils.waitUntilByEmpty(wait, By.xpath("//div[contains(text(), 'successfully deleted')]"));
     }
 
     public void listProjects(Wait<WebDriver> wait, URL cytomineUrl, Set<String> projectNames) {
         webDriverUtils.goTo(wait, cytomineUrl.toString());
         webDriverUtils.xpathClick(wait, "//a[@href='#/projects']");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//button[contains(text(), 'New project')]"));
-        Set<Boolean> ignored = projectNames.stream()
-                                   .map(name ->
-                                            webDriverUtils.byIsDisplayed(wait,
-                                                By.xpath(format("//a[contains(text(), '%s')]",
-                                                    name))))
-                                   .collect(toSet());
+        projectNames.forEach(
+            name -> webDriverUtils.byIsDisplayed(wait, By.xpath(format("//a[contains(text(), '%s')]", name)))
+        );
     }
 
-    public String createOntology(Wait<WebDriver> wait, WebDriver driver, URL cytomineUrl,
-                                 String ontologyName) {
+    public String createOntology(Wait<WebDriver> wait, WebDriver driver, URL cytomineUrl, String ontologyName) {
         webDriverUtils.goTo(wait, cytomineUrl.toString());
         webDriverUtils.xpathClick(wait, "//a[@href='#/ontology']");
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'New ontology')]");
@@ -85,8 +88,7 @@ public class CytomineSteps {
         webDriverUtils.goTo(wait, ontologyURL);
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Delete')]");
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Confirm')]");
-        webDriverUtils.byIsDisplayed(wait,
-            By.xpath("//div[contains(text(), 'successfully deleted')]"));
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'successfully deleted')]"));
     }
 
     public String getOntologyUrlFromProject(Wait<WebDriver> wait, String projectURL) {
@@ -100,9 +102,10 @@ public class CytomineSteps {
     }
 
     @SneakyThrows
-    public String addImage(Wait<WebDriver> wait, URL cytomineUrl,
-                           Optional<String> maybeProjectName) {
+    public String addImage(Wait<WebDriver> wait, URL cytomineUrl, Optional<String> maybeProjectName) {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/storage");
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//a[contains(., 'Add files')]"));
+
         String imageName = "selenium-" + UUID.randomUUID() + ".png";
         Path tempDir = Files.createTempDirectory("selenium-upload");
         Path copiedFile = tempDir.resolve(imageName);
@@ -111,14 +114,17 @@ public class CytomineSteps {
         }
         maybeProjectName.ifPresent(projectName -> selectProject(wait, projectName));
 
-        webDriverUtils.bySendKeysWait(wait, By.cssSelector("input[type='file']"),
-            copiedFile.toString(), false);
+        webDriverUtils.bySendKeysWait(wait, By.cssSelector("input[type='file']"), copiedFile.toString(), false);
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//button[contains(text(), 'Start upload') and not(@disabled)]"));
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Start upload')]");
-        webDriverUtils.byIsDisplayed(wait, By.xpath(
-            "//div[contains(@class,'uploaded-files-list')]//*[contains(text(),'" + imageName
-                + "')]"));
-        webDriverUtils.byIsDisplayed(wait, By.xpath(
-            "//div[contains(@class,'uploaded-files-list')]//span[@data-status='success']"));
+        webDriverUtils.byIsDisplayed(
+            wait,
+            By.xpath("//div[contains(@class,'uploaded-files-list')]//*[contains(text(),'" + imageName + "')]")
+        );
+        webDriverUtils.byIsDisplayed(
+            wait,
+            By.xpath("//div[contains(@class,'uploaded-files-list')]//span[@data-status='success']")
+        );
         return imageName;
     }
 
@@ -128,9 +134,10 @@ public class CytomineSteps {
     }
 
     @SneakyThrows
-    public void deleteImage(Wait<WebDriver> wait, URL cytomineUrl,
-                            String imageName) {
+    public void deleteImage(Wait<WebDriver> wait, URL cytomineUrl, String imageName) {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/storage");
+        Thread.sleep(5000);
+        webDriverUtils.waitLoading(wait);
         webDriverUtils.byIsDisplayed(wait, By.xpath(
             "//div[contains(@class,'uploaded-files-list')]//span[@data-filename='" + imageName
                 + "']"));
@@ -143,8 +150,7 @@ public class CytomineSteps {
                 + "']"));
     }
 
-    public String addTermToOntology(Wait<WebDriver> wait, WebDriver driver, String ontologyURL,
-                                    String termName) {
+    public String addTermToOntology(Wait<WebDriver> wait, WebDriver driver, String ontologyURL, String termName) {
         webDriverUtils.goTo(wait, ontologyURL);
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Add a term')]");
         webDriverUtils.bySendKeys(wait, By.name("name"), termName);
@@ -165,13 +171,17 @@ public class CytomineSteps {
             "//span[contains(@class, 'ontology-term') and contains(text(), '" + termName + "')]"));
     }
 
-    public void openImageInViewer(Wait<WebDriver> wait, WebDriver driver, String projectURL) {
+    @SneakyThrows
+    public void openImageInViewer(Wait<WebDriver> wait, String projectURL) {
         webDriverUtils.goTo(wait, projectURL);
         webDriverUtils.xpathClick(wait, "//li//a[.//i[contains(@class, 'fa-image')]]");
-        Wait<WebDriver> longWait = new WebDriverWait(driver, Duration.ofSeconds(15));
-        webDriverUtils.byIsDisplayed(longWait, By.xpath("//td//a[contains(@href, '/image/')]"));
+        Thread.sleep(2000);
+        webDriverUtils.waitLoading(wait);
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//td//a[contains(@href, '/image/')]"));
         webDriverUtils.xpathClick(wait, "//td//a[contains(@href, '/image/')]");
-        webDriverUtils.byIsDisplayed(longWait, By.cssSelector(".draw-tools-wrapper"));
+        Thread.sleep(1000);
+        webDriverUtils.waitLoading(wait);
+        webDriverUtils.byIsDisplayed(wait, By.cssSelector(".draw-tools-wrapper"));
     }
 
     public void selectTermForAnnotation(Wait<WebDriver> wait, String termName) {
@@ -187,45 +197,33 @@ public class CytomineSteps {
         webDriverUtils.xpathClick(wait, "//div[contains(@class, 'term-selection')]//button");
     }
 
-    public void drawRectangleAnnotation(Wait<WebDriver> wait, WebDriver driver) {
-        // Click on the rectangle tool and wait for it to be selected
-        webDriverUtils.xpathClick(wait, "//button[.//i[contains(@class, 'fa-square')]]");
-        webDriverUtils.byIsDisplayed(wait, By.xpath(
-            "//button[contains(@class, 'is-selected') and .//i[contains(@class, 'fa-square')]]"));
-
-        WebElement mapCanvas = driver.findElement(By.cssSelector(".ol-viewport canvas"));
-
-        int canvasWidth = mapCanvas.getSize().getWidth();
-        int canvasHeight = mapCanvas.getSize().getHeight();
-        int startX = canvasWidth / 4;
-        int startY = canvasHeight / 4;
-        int endX = canvasWidth * 3 / 4;
-        int endY = canvasHeight * 3 / 4;
-
-        Actions actions = new Actions(driver);
-        actions.moveToElement(mapCanvas, startX - canvasWidth / 2, startY - canvasHeight / 2)
-            .click()
-            .moveToElement(mapCanvas, endX - canvasWidth / 2, endY - canvasHeight / 2)
-            .click()
-            .perform();
-    }
-
-    public void verifyAnnotationCreated(Wait<WebDriver> wait, WebDriver driver) {
-        Wait<WebDriver> longWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        webDriverUtils.byIsDisplayed(longWait, By.cssSelector(".draw-tools-wrapper"));
+    public void verifyAnnotationCreated(Wait<WebDriver> wait) {
+        webDriverUtils.byIsDisplayed(wait, By.cssSelector(".draw-tools-wrapper"));
         webDriverUtils.xpathClick(wait, "//button[.//i[contains(@class, 'fa-mouse-pointer')]]");
         webDriverUtils.byIsDisplayed(wait, By.xpath(
             "//button[contains(@class, 'is-selected') and .//i[contains(@class, "
                 + "'fa-mouse-pointer')]]"));
     }
 
+    public void verifyAnnotationProcessedWithSam(Wait<WebDriver> wait) {
+        verifyAnnotationCreated(wait);
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//*[contains(text(),'Successful SAM Processing !')]"));
+    }
+
+    public void createAnnotationAndSearchAnnotations(Wait<WebDriver> wait, WebDriver driver, int nbAnnotations) {
+        annotationTools.drawRectangleAnnotation(wait, driver);
+        webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Search for similar annotations')]");
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//*[contains(text(), 'Similar annotations')]"));
+        wait.until(d -> d.findElements(By.cssSelector(".similar-annotations-playground .annotation-data")).size() == nbAnnotations);
+    }
+
     @SneakyThrows
-    public void uploadTask(Wait<WebDriver> wait, URL cytomineUrl) {
+    public void uploadTask(Wait<WebDriver> wait, URL cytomineUrl, String zipName) {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/apps");
+        webDriverUtils.byIsDisplayed(wait, By.cssSelector(".upload-icon"));
         String bundleName = "selenium-" + UUID.randomUUID() + ".zip";
         Path tempDir = Files.createTempDirectory("selenium-task");
         Path copiedFile = tempDir.resolve(bundleName);
-        String zipName = "com.cytomine.dummy.identity.geometry-1.0.0.zip";
         try (var in = getClass().getClassLoader().getResourceAsStream(zipName)) {
             Files.copy(in, copiedFile);
         }
@@ -237,17 +235,113 @@ public class CytomineSteps {
 
     public void deleteTask(Wait<WebDriver> wait, URL cytomineUrl, String taskName) {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/apps");
-        webDriverUtils.byIsDisplayed(wait, By.xpath("//p[contains(@class, 'title') and contains(text(), '" + taskName + "')]"));
+        webDriverUtils.byIsDisplayed(wait,
+            By.xpath("//p[contains(@class, 'title') and contains(text(), '" + taskName + "')]"));
         webDriverUtils.xpathClick(wait,
-                "//div[contains(@class, 'card') and .//p[contains(@class, 'title') and contains(text(), '" + taskName + "')]]" +
-                        "//a[contains(text(), 'More')]"
+            "//div[contains(@class, 'card') and .//p[contains(@class, 'title') and contains(text(), '" + taskName
+                + "')]]//a[contains(text(), 'More')]"
         );
 
         webDriverUtils.byIsDisplayed(wait, By.cssSelector(".panel-heading .panel-actions"));
         webDriverUtils.byClick(wait, By.cssSelector(".panel-actions .dropdown .icon"));
 
-        webDriverUtils.xpathClick(wait, "//a[contains(@class, 'dropdown-item') and .//span[contains(text(), 'Delete')]]");
+        webDriverUtils.xpathClick(wait,
+            "//a[contains(@class, 'dropdown-item') and .//span[contains(text(), 'Delete')]]");
 
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Confirm')]");
+
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'App deleted successfully')]"));
+    }
+
+    public void selectTask(Wait<WebDriver> wait, String taskName, String taskVersion) {
+        webDriverUtils.byClick(wait, By.cssSelector(".executor .select select"));
+
+        String optionXpath = format(
+            "//div[contains(@class, 'executor')]//option[contains(text(), '%s') and contains(text(), '%s')]",
+            taskName, taskVersion
+        );
+        webDriverUtils.xpathClick(wait, optionXpath);
+        webDriverUtils.byIsDisplayed(wait, By.xpath(format("//div[contains(@class, 'executor')]//p[contains(text(), '%s') and contains(text(), '%s')]", taskName, taskVersion)));
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//section[contains(@class, 'fields')]//button[.//span[contains(text(), 'Select')]]"));    }
+
+    public void selectAnnotationForGeometryInput(Wait<WebDriver> wait) {
+        webDriverUtils.xpathClick(wait, "//section[contains(@class, 'fields')]//button[.//span[contains(text(), 'Select')]]");
+        webDriverUtils.byIsDisplayed(wait, By.cssSelector(".modal-card .annotation-content"));
+        wait.until(d -> !d.findElements(By.cssSelector(".annotation-content > div")).isEmpty());
+
+        webDriverUtils.byClick(wait, By.cssSelector(".annotation-content > div:first-child"));
+        webDriverUtils.byIsDisplayed(wait, By.cssSelector(".annotation-content > div.selected"));
+
+        webDriverUtils.byIsDisplayed(wait, By.cssSelector(".modal-card .modal-card-foot .is-link"));
+        webDriverUtils.byClick(wait, By.cssSelector(".modal-card .modal-card-foot .is-link"));
+
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(@class, 'annotation-container') and contains(text(), 'Annotation')]"));
+    }
+
+    public void runTask(Wait<WebDriver> wait, WebDriver driver) {
+        webDriverUtils.byIsDisplayed(wait, By.cssSelector(".executor .card-content section:last-child .button.is-primary:last-child"));
+        webDriverUtils.byClick(wait, By.cssSelector(".executor .card-content section:last-child .button.is-primary:last-child"));
+
+        Wait<WebDriver> longWait = new WebDriverWait(driver, Duration.ofSeconds(300));
+        webDriverUtils.byIsDisplayed(longWait, By.cssSelector(".runs .fa-check-circle"));
+    }
+
+    public void addUserToProject(Wait<WebDriver> wait, String projectUrl, String username) {
+        webDriverUtils.goTo(wait, projectUrl);
+        webDriverUtils.byClick(wait, By.xpath("//label[contains(@class,'b-radio') and contains(text(),'Members')]"));
+        webDriverUtils.byClick(wait, By.cssSelector("button.button.is-link.add-member"));
+        By searchInput = By.xpath("//input[@placeholder='Search user...']");
+        webDriverUtils.byClick(wait, searchInput);
+        webDriverUtils.bySendKeys(wait, searchInput, username);
+        webDriverUtils.byHitEnter(wait, searchInput);
+        webDriverUtils.byClick(
+            wait,
+            By.xpath(
+                "//button[contains(@class,'button') "
+                    + "and contains(@class,'is-link') "
+                    + "and normalize-space(text())='Add']"
+            )
+        );
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//*[contains(text(),'" + username + "')]"));
+    }
+
+    public void removeUserFromProject(Wait<WebDriver> wait, String projectUrl, String username) {
+        webDriverUtils.goTo(wait, projectUrl);
+        webDriverUtils.byClick(wait, By.xpath("//label[contains(@class,'b-radio') and contains(text(),'Members')]"));
+        webDriverUtils.byClick(
+            wait,
+            By.xpath("//td[@data-label='Username' and normalize-space(text())='" + username + "']" +
+                "/preceding-sibling::td[contains(@class,'checkbox-cell')]//label[contains(@class,'b-checkbox')]")
+        );
+        webDriverUtils.byClick(
+            wait,
+            By.xpath("//button[contains(@class,'is-danger') and normalize-space(text())='Remove selected members']")
+        );
+        webDriverUtils.byClick(
+            wait,
+            By.xpath("//button[contains(@class,'is-danger') and normalize-space(text())='Confirm']")
+        );
+        webDriverUtils.waitUntilByEmpty(wait, By.xpath("//*[contains(text(),'" + username + "')]"));
+    }
+
+    public void filterProjectByName(
+        Wait<WebDriver> wait,
+        URL cytomineUrl,
+        String projectNameToSearch,
+        List<String> projectNames
+    ) {
+        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/projects");
+        By searchInput = By.cssSelector("div.search-projects input[type='search']");
+        webDriverUtils.byClick(wait, searchInput);
+        webDriverUtils.bySendKeys(wait, searchInput, projectNameToSearch);
+
+        projectNames.forEach(projectName ->
+            webDriverUtils.waitUntilByEmpty(
+                wait,
+                By.xpath("//a[normalize-space(text())='" + projectName + "']")
+            )
+        );
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//a[normalize-space(text())='" + projectNameToSearch + "']"));
+        webDriverUtils.byClear(wait, searchInput);
     }
 }

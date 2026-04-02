@@ -15,26 +15,39 @@ import be.cytomine.utils.Lock;
 @Slf4j
 public abstract class CytomineWebSocketHandler extends TextWebSocketHandler {
 
-    public Map<String, ConcurrentWebSocketSessionDecorator[]> afterConnectionEstablished(WebSocketSession session, Map<String, ConcurrentWebSocketSessionDecorator[]> sessions) {
-        ConcurrentWebSocketSessionDecorator sessionDecorator = new ConcurrentWebSocketSessionDecorator(session, 1000, 8192);
+    public Map<String, ConcurrentWebSocketSessionDecorator[]> afterConnectionEstablished(
+        WebSocketSession session,
+        Map<String, ConcurrentWebSocketSessionDecorator[]> sessions
+    ) {
+        ConcurrentWebSocketSessionDecorator sessionDecorator = new ConcurrentWebSocketSessionDecorator(
+            session,
+            1000,
+            8192
+        );
         String userId = session.getAttributes().get("userId").toString();
 
-        if(Lock.getInstance().lockUsedWsSession(userId)){
-            try{
+        if (Lock.getInstance().lockUsedWsSession(userId)) {
+            try {
                 addSessionToSessionsList(userId, sessionDecorator, sessions);
             } finally {
                 Lock.getInstance().unlockUserWsSession(userId);
             }
         } else {
-            throw new ServerException("Cannot acquire lock for websocket sessions of user " + userId  + " , tryLock return false");
+            throw new ServerException("Cannot acquire lock for websocket sessions of user "
+                + userId
+                + " , tryLock return false");
         }
 
         return sessions;
     }
 
-    protected ConcurrentWebSocketSessionDecorator[] addSession(ConcurrentWebSocketSessionDecorator[] oldSessions, ConcurrentWebSocketSessionDecorator newSession){
-        ConcurrentWebSocketSessionDecorator[] newSessions = new ConcurrentWebSocketSessionDecorator[oldSessions.length + 1];
-        for(int i=0; i < oldSessions.length; i++){
+    protected ConcurrentWebSocketSessionDecorator[] addSession(
+        ConcurrentWebSocketSessionDecorator[] oldSessions,
+        ConcurrentWebSocketSessionDecorator newSession
+    ) {
+        ConcurrentWebSocketSessionDecorator[] newSessions = new ConcurrentWebSocketSessionDecorator[oldSessions.length
+            + 1];
+        for (int i = 0; i < oldSessions.length; i++) {
             newSessions[i] = oldSessions[i];
         }
         newSessions[newSessions.length - 1] = newSession;
@@ -42,7 +55,7 @@ public abstract class CytomineWebSocketHandler extends TextWebSocketHandler {
     }
 
     protected void sendWebSocketMessage(WebSocketSession s, TextMessage message) throws ServerException {
-        if(s.isOpen()){
+        if (s.isOpen()) {
             try {
                 s.sendMessage(message);
                 log.info("Has send WebSocket message to session : " + s.getId());
@@ -52,13 +65,16 @@ public abstract class CytomineWebSocketHandler extends TextWebSocketHandler {
         }
     }
 
-    private void addSessionToSessionsList(String userId, ConcurrentWebSocketSessionDecorator sessionDecorator, Map<String, ConcurrentWebSocketSessionDecorator[]> sessions){
-        if(sessions.containsKey(userId)){
+    private void addSessionToSessionsList(
+        String userId,
+        ConcurrentWebSocketSessionDecorator sessionDecorator,
+        Map<String, ConcurrentWebSocketSessionDecorator[]> sessions
+    ) {
+        if (sessions.containsKey(userId)) {
             ConcurrentWebSocketSessionDecorator[] oldSessions = sessions.get(userId);
             ConcurrentWebSocketSessionDecorator[] newSessions = addSession(oldSessions, sessionDecorator);
             sessions.replace(userId, oldSessions, newSessions);
-        }
-        else{
+        } else {
             ConcurrentWebSocketSessionDecorator[] newSessions = {sessionDecorator};
             sessions.put(userId, newSessions);
         }

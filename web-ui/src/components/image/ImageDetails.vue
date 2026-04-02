@@ -25,7 +25,7 @@
         <td class="prop-label">{{$t('overview')}}</td>
         <td class="prop-content" colspan="3">
           <router-link :to="`/project/${image.project}/image/${image.id}`">
-            <image-thumbnail :image="image" :size="256" :key="`${image.id}-thumb-256`" :extra-parameters="{Authorization: 'Bearer ' + shortTermToken }"/>
+            <image-thumbnail :image="image" :size="256" :key="`${image.id}-thumb-256`" :extra-parameters="{authorization: 'Bearer ' + shortTermToken }"/>
           </router-link>
         </td>
       </tr>
@@ -83,7 +83,7 @@
         <td class="prop-label">{{$t('slide-preview')}}</td>
         <td class="prop-content" colspan="3">
           <a v-if="image.macroURL && !isBlindModeAndContributor" @click="isMetadataModalActive = true">
-            <image-thumbnail :image="image" :macro="true" :size="256" :key="`${image.id}-macro-256`" :extra-parameters="{Authorization: 'Bearer ' + shortTermToken }"/>
+            <image-thumbnail :image="image" :macro="true" :size="256" :key="`${image.id}-macro-256`" :extra-parameters="{authorization: 'Bearer ' + shortTermToken }"/>
           </a>
           <em v-else>
             {{$t('slide-preview-not-available')}}

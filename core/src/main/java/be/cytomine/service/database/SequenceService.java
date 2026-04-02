@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class SequenceService {
 
-    public final static String SEQ_NAME = "hibernate_sequence";
+    public static final String SEQ_NAME = "hibernate_sequence";
 
     @Autowired
     private EntityManager entityManager;
@@ -18,7 +18,7 @@ public class SequenceService {
     /**
      * Get a new id number
      */
-    public Long generateID()  {
+    public Long generateID() {
         try {
             Query query = entityManager.createNativeQuery("select nextval('" + SEQ_NAME + "');");
             return (Long) query.getSingleResult();

@@ -30,7 +30,8 @@ public class RedoStackItem extends CytomineDomain {
     @JoinColumn(name = "transaction_id", nullable = true)
     protected Transaction transaction;
 
-    public RedoStackItem() { }
+    public RedoStackItem() {
+    }
 
     public RedoStackItem(UndoStackItem firstUndoStack) {
         this.command = firstUndoStack.getCommand();

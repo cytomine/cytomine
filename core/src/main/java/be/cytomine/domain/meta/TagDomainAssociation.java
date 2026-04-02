@@ -1,20 +1,20 @@
 package be.cytomine.domain.meta;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
@@ -52,9 +52,9 @@ public class TagDomainAssociation extends CytomineDomain {
     }
 
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
-        TagDomainAssociation tagDomainAssocitation = (TagDomainAssociation)this;
-        tagDomainAssocitation.setId(json.getJSONAttrLong("id",null));
-        tagDomainAssocitation.setDomainIdent(json.getJSONAttrLong("domainIdent",-1l));
+        TagDomainAssociation tagDomainAssocitation = (TagDomainAssociation) this;
+        tagDomainAssocitation.setId(json.getJSONAttrLong("id", null));
+        tagDomainAssocitation.setDomainIdent(json.getJSONAttrLong("domainIdent", -1L));
         tagDomainAssocitation.setDomainClassName(json.getJSONAttrStr("domainClassName"));
         tagDomainAssocitation.setTag((Tag) json.getJSONAttrDomain(entityManager, "tag", new Tag(), true));
         return tagDomainAssocitation;
@@ -62,7 +62,7 @@ public class TagDomainAssociation extends CytomineDomain {
 
     public static JsonObject getDataFromDomain(CytomineDomain domain) {
         JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
-        TagDomainAssociation tagDomainAssocitation = (TagDomainAssociation)domain;
+        TagDomainAssociation tagDomainAssocitation = (TagDomainAssociation) domain;
         returnArray.put("domainIdent", tagDomainAssocitation.getDomainIdent());
         returnArray.put("domainClassName", tagDomainAssocitation.getDomainClassName());
         returnArray.put("tag", tagDomainAssocitation.getTag().getId());

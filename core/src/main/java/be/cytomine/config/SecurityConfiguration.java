@@ -90,9 +90,6 @@ public class SecurityConfiguration {
 
                     // TODO 2024.2 - LAST CONNECTION (IN A PROJECT)
                     .requestMatchers(HttpMethod.GET, "/server/ping").permitAll()
-                    .requestMatchers(HttpMethod.GET, "/server/ping.json").permitAll() // TODO 2024.2
-                    .requestMatchers(HttpMethod.POST, "/server/ping").permitAll() // TODO 2024.2
-                    .requestMatchers(HttpMethod.POST, "/server/ping.json").permitAll() // TODO 2024.2
                     .requestMatchers("/**").permitAll() // TODO IAM: remove ?
             );
         http

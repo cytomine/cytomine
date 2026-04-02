@@ -69,7 +69,7 @@ public class GeometryService {
         return geometry != null && SUPPORTED_TYPES.contains(geometry.getGeometryType());
     }
 
-    public String WKTToGeoJSON(String wkt) {
+    public String wktToGeoJson(String wkt) {
         try {
             WKTReader reader = new WKTReader();
             Geometry geometry = reader.read(wkt);
@@ -80,7 +80,7 @@ public class GeometryService {
         }
     }
 
-    public String GeoJSONToWKT(String geoJSON) {
+    public String geoJsonToWkt(String geoJSON) {
         try {
             GeoJsonReader reader = new GeoJsonReader();
             Geometry geometry = reader.read(geoJSON);

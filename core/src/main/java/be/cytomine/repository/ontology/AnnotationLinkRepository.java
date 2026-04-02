@@ -29,7 +29,8 @@ import be.cytomine.domain.ontology.AnnotationGroup;
 import be.cytomine.domain.ontology.AnnotationLink;
 
 @Repository
-public interface AnnotationLinkRepository extends JpaRepository<AnnotationLink, Long>, JpaSpecificationExecutor<AnnotationLink> {
+public interface AnnotationLinkRepository
+    extends JpaRepository<AnnotationLink, Long>, JpaSpecificationExecutor<AnnotationLink> {
 
     Optional<AnnotationLink> findByAnnotationIdent(Long id);
 

@@ -40,18 +40,18 @@ public class RestRelationTermController extends RestCytomineController {
      */
     @GetMapping("/relation/term/{i}/{id}.json")
     public ResponseEntity<String> listByTerm(
-            @PathVariable Long id,
-            @PathVariable Integer i,
-            @RequestParam Map<String,String> allParams
+        @PathVariable Long id,
+        @PathVariable Integer i,
+        @RequestParam Map<String, String> allParams
     ) {
         log.debug("REST request to list terms");
 
-        if (i!=1 && i!=2) {
+        if (i != 1 && i != 2) {
             throw new ObjectNotFoundException("'i' must be 1 or 2. Current value is " + i);
         }
         return termRepository.findById(id)
-                .map( term -> responseSuccess(relationTermService.list(term, String.valueOf(i))))
-                .orElseThrow(() -> new ObjectNotFoundException("Term", id));
+            .map(term -> responseSuccess(relationTermService.list(term, String.valueOf(i))))
+            .orElseThrow(() -> new ObjectNotFoundException("Term", id));
     }
 
     /**
@@ -59,13 +59,13 @@ public class RestRelationTermController extends RestCytomineController {
      */
     @GetMapping("/relation/term/{id}.json")
     public ResponseEntity<String> listByTermAll(
-            @PathVariable Long id,
-            @RequestParam Map<String,String> allParams
+        @PathVariable Long id,
+        @RequestParam Map<String, String> allParams
     ) {
         log.debug("REST request to list terms");
         return termRepository.findById(id)
-                .map( term -> responseSuccess(relationTermService.list(term)))
-                .orElseThrow(() -> new ObjectNotFoundException("Term", id));
+            .map(term -> responseSuccess(relationTermService.list(term)))
+            .orElseThrow(() -> new ObjectNotFoundException("Term", id));
     }
 
 
@@ -74,31 +74,33 @@ public class RestRelationTermController extends RestCytomineController {
      */
     @GetMapping("/relation/parent/term1/{idTerm1}/term2/{idTerm2}.json")
     public ResponseEntity<String> show(
-            @PathVariable Long idTerm1,
-            @PathVariable Long idTerm2
+        @PathVariable Long idTerm1,
+        @PathVariable Long idTerm2
     ) {
         return show(relationRepository.getParent().getId(), idTerm1, idTerm2);
     }
 
     @GetMapping("/relation/{idRelation}/term1/{idTerm1}/term2/{idTerm2}.json")
     public ResponseEntity<String> show(
-            @PathVariable Long idRelation,
-            @PathVariable Long idTerm1,
-            @PathVariable Long idTerm2
+        @PathVariable Long idRelation,
+        @PathVariable Long idTerm1,
+        @PathVariable Long idTerm2
     ) {
         log.debug("REST request to get relation term {} {} {}", idRelation, idTerm1, idTerm2);
         Relation relation = relationRepository.findById(idRelation)
-                .orElseThrow(() -> new ObjectNotFoundException("Relation", idRelation));;
+            .orElseThrow(() -> new ObjectNotFoundException("Relation", idRelation));
+        ;
         Term term1 = termRepository.findById(idTerm1)
-                .orElseThrow(() -> new ObjectNotFoundException("Term", idTerm1));
-        Term term2 = termRepository.findById(idTerm2).
-                orElseThrow(() -> new ObjectNotFoundException("Term", idTerm2));
+            .orElseThrow(() -> new ObjectNotFoundException("Term", idTerm1));
+        Term term2 = termRepository.findById(idTerm2)
+            .orElseThrow(() -> new ObjectNotFoundException("Term", idTerm2));
 
         return relationTermService.find(relation, term1, term2)
-                .map(this::responseSuccess)
-                .orElseGet(() -> responseNotFound("Relation Term", Map.of("Relation", idRelation, "Term", idTerm1, "Term2", idTerm2)));
+            .map(this::responseSuccess)
+            .orElseGet(() -> responseNotFound(
+                "Relation Term", Map.of("Relation", idRelation, "Term", idTerm1, "Term2", idTerm2)
+            ));
     }
-
 
     /**
      * Add a new relation with two terms
@@ -117,8 +119,8 @@ public class RestRelationTermController extends RestCytomineController {
      */
     @DeleteMapping("/relation/parent/term1/{idTerm1}/term2/{idTerm2}.json")
     public ResponseEntity<String> delete(
-            @PathVariable Long idTerm1,
-            @PathVariable Long idTerm2
+        @PathVariable Long idTerm1,
+        @PathVariable Long idTerm2
     ) {
         return delete(relationRepository.getParent().getId(), idTerm1, idTerm2);
     }
@@ -128,11 +130,15 @@ public class RestRelationTermController extends RestCytomineController {
      */
     @DeleteMapping("/relation/{idRelation}/term1/{idTerm1}/term2/{idTerm2}.json")
     public ResponseEntity<String> delete(
-            @PathVariable Long idRelation,
-            @PathVariable Long idTerm1,
-            @PathVariable Long idTerm2
+        @PathVariable Long idRelation,
+        @PathVariable Long idTerm1,
+        @PathVariable Long idTerm2
     ) {
         log.debug("REST request to delete Relation Term");
-        return delete(relationTermService, JsonObject.of("relation", idRelation, "term1", idTerm1, "term2", idTerm2), null);
+        return delete(
+            relationTermService,
+            JsonObject.of("relation", idRelation, "term1", idTerm1, "term2", idTerm2),
+            null
+        );
     }
 }

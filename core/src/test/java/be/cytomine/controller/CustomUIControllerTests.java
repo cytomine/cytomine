@@ -67,12 +67,11 @@ public class CustomUIControllerTests {
     @Test
     @Transactional
     @WithMockUser(username = "user")
-    public void load_custom_ui_default_config() throws Exception {
+    public void load_custom_ui_default_config() {
         assertThat(applicationProperties.getCustomUI().getProject().get("project-images-tab").get("ADMIN_PROJECT")).isEqualTo(true);
         System.out.println(applicationProperties.getCustomUI().getProject().get("project-annotations-tab"));
         assertThat(applicationProperties.getCustomUI().getProject().get("project-annotations-tab").get("ADMIN_PROJECT")).isEqualTo(true);
     }
-
 
     @Test
     @Transactional
@@ -89,10 +88,8 @@ public class CustomUIControllerTests {
                 .andExpect(jsonPath("$.ontology").value(true))
                 .andExpect(jsonPath("$.project").value(true))
                 .andExpect(jsonPath("$.search").value(true))
-                .andExpect(jsonPath("$.storage").value(true))
-        ;
+                .andExpect(jsonPath("$.storage").value(true));
     }
-
 
     @Test
     @Transactional
@@ -108,8 +105,7 @@ public class CustomUIControllerTests {
                 .andExpect(jsonPath("$.ontology").value(false))
                 .andExpect(jsonPath("$.project").value(true))
                 .andExpect(jsonPath("$.search").value(false))
-                .andExpect(jsonPath("$.storage").value(true))
-        ;
+                .andExpect(jsonPath("$.storage").value(true));
     }
 
     @Test
@@ -121,8 +117,7 @@ public class CustomUIControllerTests {
                     .param("project", project.getId().toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.admin").value(true)) //1 global
-                .andExpect(jsonPath("$.project-images-tab").value(true)) // 1project
-        ;
+                .andExpect(jsonPath("$.project-images-tab").value(true)); // 1project
     }
 
     @Test
@@ -134,8 +129,7 @@ public class CustomUIControllerTests {
         restConfigurationControllerMockMvc.perform(get("/api/custom-ui/config.json")
                         .param("project", project.getId().toString()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.project-jobs-tab").value(false))
-        ;
+                .andExpect(jsonPath("$.project-jobs-tab").value(false));
     }
 
     @Test
@@ -147,8 +141,7 @@ public class CustomUIControllerTests {
         restConfigurationControllerMockMvc.perform(get("/api/custom-ui/config.json")
                         .param("project", project.getId().toString()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.project-jobs-tab").value(false))
-        ;
+                .andExpect(jsonPath("$.project-jobs-tab").value(false));
     }
 
 
@@ -161,8 +154,7 @@ public class CustomUIControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.project-images-tab.ADMIN_PROJECT").value(true))
                 .andExpect(jsonPath("$.project-explore-hide-tools.ADMIN_PROJECT").value(true))
-                .andExpect(jsonPath("$.project-jobs-tab.CONTRIBUTOR_PROJECT").value(false))
-        ;
+                .andExpect(jsonPath("$.project-jobs-tab.CONTRIBUTOR_PROJECT").value(false));
     }
 
 
@@ -480,14 +472,12 @@ public class CustomUIControllerTests {
                 "   }\n" +
                 "}";
 
-
         restConfigurationControllerMockMvc.perform(post("/api/custom-ui/project/{project}.json", project.getId())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(customUI))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.project-users-heatmap-graph.ADMIN_PROJECT").value(true))
-                .andExpect(jsonPath("$.project-users-heatmap-graph.CONTRIBUTOR_PROJECT").value(false))
-        ;
+                .andExpect(jsonPath("$.project-users-heatmap-graph.CONTRIBUTOR_PROJECT").value(false));
 
         // re save
         restConfigurationControllerMockMvc.perform(post("/api/custom-ui/project/{project}.json", project.getId())
@@ -495,7 +485,6 @@ public class CustomUIControllerTests {
                         .content(customUI))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.project-users-heatmap-graph.ADMIN_PROJECT").value(true))
-                .andExpect(jsonPath("$.project-users-heatmap-graph.CONTRIBUTOR_PROJECT").value(false))
-        ;
+                .andExpect(jsonPath("$.project-users-heatmap-graph.CONTRIBUTOR_PROJECT").value(false));
     }
 }

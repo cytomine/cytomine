@@ -27,6 +27,28 @@ spec:
         {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
         ports:
         - containerPort: {{ .Values.cbir.port }}
+        startupProbe:
+          httpGet:
+            path: /health
+            port: {{ .Values.cbir.port }}
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          failureThreshold: 30
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: {{ .Values.cbir.port }}
+          periodSeconds: 10
+          failureThreshold: 3
+          timeoutSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: {{ .Values.cbir.port }}
+          periodSeconds: 10
+          failureThreshold: 6
+          timeoutSeconds: 10
         envFrom:
           - configMapRef:
               name: cbir

@@ -1,20 +1,20 @@
 package be.cytomine.utils.filters;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -50,41 +50,60 @@ public class SpecificationBuilder {
 
             case equals:
                 return (root, query, criteriaBuilder) ->
-                    criteriaBuilder.equal(root.get(input.getProperty()),
-                        castToRequiredType(root.get(input.getProperty()).getJavaType(),
-                            input.getValue()));
+                    criteriaBuilder.equal(
+                        root.get(input.getProperty()),
+                        castToRequiredType(
+                            root.get(input.getProperty()).getJavaType(),
+                            input.getValue()
+                        )
+                    );
             case nequals:
                 return (root, query, criteriaBuilder) ->
-                    criteriaBuilder.notEqual(root.get(input.getProperty()),
-                        castToRequiredType(root.get(input.getProperty()).getJavaType(),
-                            input.getValue()));
+                    criteriaBuilder.notEqual(
+                        root.get(input.getProperty()),
+                        castToRequiredType(
+                            root.get(input.getProperty()).getJavaType(),
+                            input.getValue()
+                        )
+                    );
             case gte:
                 return (root, query, criteriaBuilder) ->
-                    criteriaBuilder.ge(root.get(input.getProperty()),
+                    criteriaBuilder.ge(
+                        root.get(input.getProperty()),
                         (Number) castToRequiredType(
                             root.get(input.getProperty()).getJavaType(),
-                            input.getValue()));
+                            input.getValue()
+                        )
+                    );
             case lte:
                 return (root, query, criteriaBuilder) ->
-                    criteriaBuilder.le(root.get(input.getProperty()),
+                    criteriaBuilder.le(
+                        root.get(input.getProperty()),
                         (Number) castToRequiredType(
                             root.get(input.getProperty()).getJavaType(),
-                            input.getValue()));
+                            input.getValue()
+                        )
+                    );
             case like:
                 return (root, query, criteriaBuilder) ->
-                    criteriaBuilder.like(root.get(input.getProperty()),
-                        "%" + input.getValue() + "%");
+                    criteriaBuilder.like(
+                        root.get(input.getProperty()),
+                        "%" + input.getValue() + "%"
+                    );
 
             case ilike:
                 return (root, query, criteriaBuilder) ->
-                    criteriaBuilder.like(criteriaBuilder.lower(root.get(input.getProperty())),
-                        "%" + input.getValue().toString().toLowerCase() + "%");
+                    criteriaBuilder.like(
+                        criteriaBuilder.lower(root.get(input.getProperty())),
+                        "%" + input.getValue().toString().toLowerCase() + "%"
+                    );
             case in:
                 return (root, query, criteriaBuilder) ->
                     criteriaBuilder.in(root.get(input.getProperty()))
                         .value(castToRequiredType(
                             root.get(input.getProperty()).getJavaType(),
-                            input.getValue()));
+                            input.getValue()
+                        ));
 
             default:
                 throw new RuntimeException("Operation not supported yet");

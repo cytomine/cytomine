@@ -21,7 +21,7 @@ import be.cytomine.appengine.states.TaskRunState;
 @AllArgsConstructor
 public class PodInformer implements ResourceEventHandler<Pod> {
 
-    private static final Map<String, TaskRunState> STATUS = new HashMap<String, TaskRunState>() {
+    private static final Map<String, TaskRunState> STATUS = new HashMap<>() {
         {
             put("Running", TaskRunState.RUNNING);
             put("Succeeded", TaskRunState.RUNNING);

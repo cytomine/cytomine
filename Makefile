@@ -2,7 +2,7 @@
 LOCAL_REGISTRY := 172.16.238.4:5000
 
 # Services to build (from compose.override.yaml)
-SERVICES := web-ui pims iam app-engine core cbir sam repository
+SERVICES := web-ui pims iam app-engine core cbir sam repository e2e-tests
 
 .PHONY: start-dev stop-dev clean build push-local
 

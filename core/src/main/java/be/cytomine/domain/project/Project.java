@@ -1,20 +1,20 @@
 package be.cytomine.domain.project;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 import java.util.Set;
 
@@ -69,18 +69,18 @@ public class Project extends CytomineDomain {
     EditingMode mode = EditingMode.CLASSIC;
 
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
-        Project project = (Project)this;
-        project.id = json.getJSONAttrLong("id",null);
+        Project project = (Project) this;
+        project.id = json.getJSONAttrLong("id", null);
         project.name = json.getJSONAttrStr("name");
         project.ontology = (Ontology) json.getJSONAttrDomain(entityManager, "ontology", new Ontology(), false);
         project.blindMode = json.getJSONAttrBoolean("blindMode", false);
         project.areImagesDownloadable = json.getJSONAttrBoolean("areImagesDownloadable", false);
         project.isClosed = json.getJSONAttrBoolean("isClosed", false);
         project.mode = EditingMode.CLASSIC;
-        if(json.getJSONAttrBoolean("isRestricted", false)) {
+        if (json.getJSONAttrBoolean("isRestricted", false)) {
             project.mode = EditingMode.RESTRICTED;
         }
-        if(json.getJSONAttrBoolean("isReadOnly", false)) {
+        if (json.getJSONAttrBoolean("isReadOnly", false)) {
             project.mode = EditingMode.READ_ONLY;
         }
 
@@ -95,13 +95,16 @@ public class Project extends CytomineDomain {
 
     public static JsonObject getDataFromDomain(CytomineDomain domain) {
         JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
-        Project project = (Project)domain;
+        Project project = (Project) domain;
         returnArray.put("name", project.getName());
-        returnArray.put("ontology", (project.getOntology()!=null ? project.getOntology().getId() : null));
-        returnArray.put("ontologyName", (project.getOntology()!=null ? project.getOntology().getName() : null));
+        returnArray.put("ontology", (project.getOntology() != null ? project.getOntology().getId() : null));
+        returnArray.put("ontologyName", (project.getOntology() != null ? project.getOntology().getName() : null));
 
-        returnArray.put("blindMode", project.getBlindMode()!=null && project.getBlindMode());
-        returnArray.put("areImagesDownloadable", project.getAreImagesDownloadable()!=null && project.getAreImagesDownloadable());
+        returnArray.put("blindMode", project.getBlindMode() != null && project.getBlindMode());
+        returnArray.put(
+            "areImagesDownloadable",
+            project.getAreImagesDownloadable() != null && project.getAreImagesDownloadable()
+        );
 
         returnArray.put("numberOfSlides", 0);
         returnArray.put("numberOfImages", project.countImages);
@@ -110,11 +113,11 @@ public class Project extends CytomineDomain {
         returnArray.put("numberOfReviewedAnnotations", project.countReviewedAnnotations);
         returnArray.put("isClosed", project.isClosed());
         returnArray.put("isReadOnly", false);
-        if (project.getMode()!=null && project.getMode().equals(EditingMode.READ_ONLY)) {
+        if (project.getMode() != null && project.getMode().equals(EditingMode.READ_ONLY)) {
             returnArray.put("isReadOnly", true);
         }
         returnArray.put("isRestricted", false);
-        if (project.getMode()!=null && project.getMode().equals(EditingMode.RESTRICTED)) {
+        if (project.getMode() != null && project.getMode().equals(EditingMode.RESTRICTED)) {
             returnArray.put("isRestricted", true);
         }
 

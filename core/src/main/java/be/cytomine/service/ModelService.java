@@ -173,8 +173,10 @@ public abstract class ModelService<T extends CytomineDomain> {
         return executeCommand(c, domain, json, null);
     }
 
-    public CommandResponse executeCommand(Command c, CytomineDomain domain, JsonObject json,
-                                          Task task) {
+    public CommandResponse executeCommand(
+        Command c, CytomineDomain domain, JsonObject json,
+        Task task
+    ) {
         //bug, cannot do new XXXCommand(domain:domain, json:...) => new XXXCommand(); c.domain =
         // domain; c.json = ...
         c.setDomain(domain);
@@ -238,6 +240,7 @@ public abstract class ModelService<T extends CytomineDomain> {
      * Create domain from JSON object
      *
      * @param json JSON with new domain info
+     *
      * @return new domain
      */
     public abstract CytomineDomain createFromJSON(JsonObject json);
@@ -246,8 +249,9 @@ public abstract class ModelService<T extends CytomineDomain> {
      * Create new domain in database
      *
      * @param json         JSON data for the new domain
-     * @param printMessage Flag to specify if confirmation message must be show in client
-     *                     Usefull when we create a lot of data, just print the root command message
+     * @param printMessage Flag to specify if confirmation message must be show in client Usefull when we create a lot
+     *                     of data, just print the root command message
+     *
      * @return Response structure (status, object data,...)
      */
     CommandResponse create(JsonObject json, boolean printMessage) {
@@ -259,6 +263,7 @@ public abstract class ModelService<T extends CytomineDomain> {
      *
      * @param domain       Domain to store
      * @param printMessage Flag to specify if confirmation message must be show in client
+     *
      * @return Response structure (status, object data,...)
      */
     public CommandResponse create(CytomineDomain domain, boolean printMessage) {
@@ -267,8 +272,10 @@ public abstract class ModelService<T extends CytomineDomain> {
         saveDomain(domain);
 
         CommandResponse response =
-            responseService.createResponseMessage(domain, getStringParamsI18n(domain), printMessage,
-                "Add", domain.getCallBack());
+            responseService.createResponseMessage(
+                domain, getStringParamsI18n(domain), printMessage,
+                "Add", domain.getCallBack()
+            );
         afterAdd(domain, response);
         //Build response message
         return response;
@@ -280,15 +287,19 @@ public abstract class ModelService<T extends CytomineDomain> {
      *
      * @param json         domain data in json
      * @param printMessage Flag to specify if confirmation message must be show in client
+     *
      * @return Response structure (status, object data,...)
      */
     public CommandResponse edit(JsonObject json, boolean printMessage) {
         //Rebuilt previous state of object that was previoulsy edited
         try {
-            return edit(fillDomainWithData(
+            return edit(
+                fillDomainWithData(
                     ((CytomineDomain) currentDomain().getDeclaredConstructor().newInstance()),
-                    json),
-                printMessage);
+                    json
+                ),
+                printMessage
+            );
         } catch (Exception e) {
             throw new ObjectNotFoundException(
                 "Cannot create instance of object: " + json + " " + "Exception " + e);
@@ -300,6 +311,7 @@ public abstract class ModelService<T extends CytomineDomain> {
      *
      * @param domain       Domain to update
      * @param printMessage Flag to specify if confirmation message must be show in client
+     *
      * @return Response structure (status, object data,...)
      */
     public CommandResponse edit(CytomineDomain domain, boolean printMessage) {
@@ -307,8 +319,10 @@ public abstract class ModelService<T extends CytomineDomain> {
         beforeUpdate(domain);
         saveDomain(domain);
         CommandResponse response =
-            responseService.createResponseMessage(domain, getStringParamsI18n(domain), printMessage,
-                "Edit", domain.getCallBack());
+            responseService.createResponseMessage(
+                domain, getStringParamsI18n(domain), printMessage,
+                "Edit", domain.getCallBack()
+            );
         afterUpdate(domain, response);
         return response;
     }
@@ -319,12 +333,15 @@ public abstract class ModelService<T extends CytomineDomain> {
      *
      * @param json         JSON with domain data (to retrieve it)
      * @param printMessage Flag to specify if confirmation message must be show in client
+     *
      * @return Response structure (status, object data,...)
      */
     public CommandResponse destroy(JsonObject json, boolean printMessage) {
         //Get object to delete
-        return destroy((CytomineDomain) entityManager.find(currentDomain(), retrieveLongId(json)),
-            printMessage);
+        return destroy(
+            (CytomineDomain) entityManager.find(currentDomain(), retrieveLongId(json)),
+            printMessage
+        );
     }
 
     /**
@@ -332,13 +349,16 @@ public abstract class ModelService<T extends CytomineDomain> {
      *
      * @param domain       Domain to remove
      * @param printMessage Flag to specify if confirmation message must be show in client
+     *
      * @return Response structure (status, object data,...)
      */
     public CommandResponse destroy(CytomineDomain domain, boolean printMessage) {
         //Build response message
         CommandResponse response =
-            responseService.createResponseMessage(domain, getStringParamsI18n(domain), printMessage,
-                "Delete", domain.getCallBack());
+            responseService.createResponseMessage(
+                domain, getStringParamsI18n(domain), printMessage,
+                "Delete", domain.getCallBack()
+            );
         beforeDelete(domain);
         //Delete object
         removeDomain(domain);
@@ -411,9 +431,8 @@ public abstract class ModelService<T extends CytomineDomain> {
     }
 
     /**
-     * Build callback data for a domain (by default null)
-     * Callback are metadata used by client
-     * You need to override getCallBack() in domain class
+     * Build callback data for a domain (by default null) Callback are metadata used by client You need to override
+     * getCallBack() in domain class
      *
      * @return Callback data
      */
@@ -426,13 +445,17 @@ public abstract class ModelService<T extends CytomineDomain> {
     }
 
 
-    public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData,
-                                  Transaction transaction) {
+    public CommandResponse update(
+        CytomineDomain domain, JsonObject jsonNewData,
+        Transaction transaction
+    ) {
         throw new CytomineMethodNotYetImplementedException("No update method implemented");
     }
 
-    public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData,
-                                  Transaction transaction, Task task) {
+    public CommandResponse update(
+        CytomineDomain domain, JsonObject jsonNewData,
+        Transaction transaction, Task task
+    ) {
         if (task == null) {
             return update(domain, jsonNewData, transaction);
         } else {
@@ -441,42 +464,54 @@ public abstract class ModelService<T extends CytomineDomain> {
         }
     }
 
-    public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task,
-                                  boolean printMessage) {
+    public CommandResponse delete(
+        CytomineDomain domain, Transaction transaction, Task task,
+        boolean printMessage
+    ) {
         throw new CytomineMethodNotYetImplementedException("No delete method implemented");
     }
 
-    protected void deleteDependentMetadata(CytomineDomain domain, Transaction transaction,
-                                           Task task) {
+    protected void deleteDependentMetadata(
+        CytomineDomain domain, Transaction transaction,
+        Task task
+    ) {
         deleteDependentProperty(domain, transaction, task);
         deleteDependentDescription(domain, transaction, task);
         deleteDependentAttachedFile(domain, transaction, task);
         deleteDependentTagDomainAssociation(domain, transaction, task);
     }
 
-    protected void deleteDependentProperty(CytomineDomain domain, Transaction transaction,
-                                           Task task) {
+    protected void deleteDependentProperty(
+        CytomineDomain domain, Transaction transaction,
+        Task task
+    ) {
         for (Property property : propertyService.list(domain)) {
             propertyService.delete(property, transaction, task, false);
         }
     }
 
-    protected void deleteDependentDescription(CytomineDomain domain, Transaction transaction,
-                                              Task task) {
-        descriptionService.findByDomain(domain).ifPresent(description -> {
-            descriptionService.delete(description, transaction, task, false);
-        });
+    protected void deleteDependentDescription(
+        CytomineDomain domain,
+        Transaction transaction,
+        Task task
+    ) {
+        descriptionService.findByDomain(domain)
+            .ifPresent(description -> descriptionService.delete(description, transaction, task, false));
     }
 
-    protected void deleteDependentAttachedFile(CytomineDomain domain, Transaction transaction,
-                                               Task task) {
+    protected void deleteDependentAttachedFile(
+        CytomineDomain domain, Transaction transaction,
+        Task task
+    ) {
         for (AttachedFile attachedFile : attachedFileService.findAllByDomain(domain)) {
             attachedFileService.delete(attachedFile, transaction, task, false);
         }
     }
 
-    protected void deleteDependentTagDomainAssociation(CytomineDomain domain,
-                                                       Transaction transaction, Task task) {
+    protected void deleteDependentTagDomainAssociation(
+        CytomineDomain domain,
+        Transaction transaction, Task task
+    ) {
         for (TagDomainAssociation tagDomainAssociation :
             tagDomainAssociationService.listAllByDomain(
                 domain)) {
@@ -499,8 +534,10 @@ public abstract class ModelService<T extends CytomineDomain> {
 
     public CytomineDomain getCytomineDomain(String domainClassName, Long domainIdent) {
         try {
-            return (CytomineDomain) getEntityManager().find(Class.forName(domainClassName),
-                domainIdent);
+            return (CytomineDomain) getEntityManager().find(
+                Class.forName(domainClassName),
+                domainIdent
+            );
         } catch (ClassNotFoundException e) {
             throw new ObjectNotFoundException(domainClassName, domainIdent);
         }
@@ -512,12 +549,12 @@ public abstract class ModelService<T extends CytomineDomain> {
     }
 
     public JsonObject addMultiple(List<JsonObject> json) {
-        List<JsonObject> result = new ArrayList();
+        List<JsonObject> result = new ArrayList<>();
         List errors = new ArrayList();
         JsonObject resp;
-        for (int i = 0; i < json.size(); i++) {
+        for (JsonObject jsonObject : json) {
             try {
-                CommandResponse commandResponse = addOne(json.get(i));
+                CommandResponse commandResponse = addOne(jsonObject);
 
                 String objectName;
                 if (currentDomain() == UserAnnotation.class) {
@@ -526,12 +563,14 @@ public abstract class ModelService<T extends CytomineDomain> {
                     String[] split = currentDomain().toString().toLowerCase().split("\\.");
                     objectName = split[split.length - 1];
                 }
-                resp = JsonObject.of("domain",
+                resp = JsonObject.of(
+                    "domain",
                     ((Map<String, Object>) commandResponse.getData().get(objectName)).get("id"),
-                    "status", commandResponse.getStatus());
+                    "status", commandResponse.getStatus()
+                );
             } catch (CytomineException e) {
                 log.info(((CytomineException) e).getMessage());
-                errors.add(JsonObject.of("data", json.get(i), "message", e.msg));
+                errors.add(JsonObject.of("data", jsonObject, "message", e.msg));
                 resp = JsonObject.of("message", e.msg, "status", e.code);
             } catch (Exception e) {
                 log.info(e.toString());
@@ -544,34 +583,44 @@ public abstract class ModelService<T extends CytomineDomain> {
         JsonObject response = new JsonObject();
 
         List<JsonObject> succeeded = result.stream()
-                                         .filter(x -> x.getJSONAttrInteger("status") >= 200
-                                                          && x.getJSONAttrInteger("status") <= 300)
-                                         .toList();
+            .filter(x -> x.getJSONAttrInteger("status") >= 200
+                && x.getJSONAttrInteger("status") <= 300)
+            .toList();
 
         if (succeeded.size() == result.size()) {
             String[] split = currentDomain().toString().toLowerCase().split("\\.");
-            response.put("data", JsonObject.of("message",
-                split[split.length - 1] + "s " + succeeded.stream()
-                                                     .map(x -> x.getJSONAttrStr("domain"))
-                                                     .collect(Collectors.joining(",")) + " added"));
+            response.put(
+                "data", JsonObject.of(
+                    "message",
+                    split[split.length - 1] + "s " + succeeded.stream()
+                        .map(x -> x.getJSONAttrStr("domain"))
+                        .collect(Collectors.joining(",")) + " added"
+                )
+            );
             response.put("status", 200);
         } else if (succeeded.size() == 0) {
-            response.put("data",
-                JsonObject.of("success", false, "message", "No entry saved", "errors", errors));
+            response.put(
+                "data",
+                JsonObject.of("success", false, "message", "No entry saved", "errors", errors)
+            );
             response.put("status", 400);
         } else {
             String[] split = currentDomain().toString().toLowerCase().split("\\.");
-            response.put("data",
-                JsonObject.of("success", false, "message",
+            response.put(
+                "data",
+                JsonObject.of(
+                    "success", false, "message",
                     "Only part of the entries (" + split[split.length - 1] + "s "
                         + succeeded.stream()
-                              .map(
-                                  x -> x.getJSONAttrStr(
-                                      "domain"))
-                              .collect(
-                                  Collectors.joining(
-                                      ",")),
-                    "errors", errors));
+                        .map(
+                            x -> x.getJSONAttrStr(
+                                "domain"))
+                        .collect(
+                            Collectors.joining(
+                                ",")),
+                    "errors", errors
+                )
+            );
             response.put("status", 206);
         }
         return response;

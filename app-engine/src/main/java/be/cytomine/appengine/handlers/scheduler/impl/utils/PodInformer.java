@@ -1,17 +1,5 @@
 package be.cytomine.appengine.handlers.scheduler.impl.utils;
 
-import be.cytomine.appengine.models.task.Run;
-import be.cytomine.appengine.repositories.RunRepository;
-import be.cytomine.appengine.states.TaskRunState;
-
-import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.client.informers.ResourceEventHandler;
-
-import jakarta.persistence.OptimisticLockException;
-
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -19,22 +7,32 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.client.informers.ResourceEventHandler;
+import jakarta.persistence.OptimisticLockException;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import be.cytomine.appengine.models.task.Run;
+import be.cytomine.appengine.repositories.RunRepository;
+import be.cytomine.appengine.states.TaskRunState;
+
 @Slf4j
 @AllArgsConstructor
 public class PodInformer implements ResourceEventHandler<Pod> {
 
     private static final Map<String, TaskRunState> STATUS =
-            new HashMap<>() {
-                {
-                    put("Running", TaskRunState.RUNNING);
-                    put("Succeeded", TaskRunState.FINISHED);
-                    put("Failed", TaskRunState.FAILED);
-                    put("Unknown", TaskRunState.FAILED);
-                }
-            };
+        new HashMap<>() {
+            {
+                put("Running", TaskRunState.RUNNING);
+                put("Succeeded", TaskRunState.FINISHED);
+                put("Failed", TaskRunState.FAILED);
+                put("Unknown", TaskRunState.FAILED);
+            }
+        };
 
     private static final Set<TaskRunState> FINAL_STATES =
-            Set.of(TaskRunState.FAILED, TaskRunState.FINISHED);
+        Set.of(TaskRunState.FAILED, TaskRunState.FINISHED);
 
     private final RunRepository runRepository;
 
@@ -103,7 +101,7 @@ public class PodInformer implements ResourceEventHandler<Pod> {
                 }
 
                 run.setState(
-                        STATUS.getOrDefault(newPod.getStatus().getPhase(), TaskRunState.FAILED));
+                    STATUS.getOrDefault(newPod.getStatus().getPhase(), TaskRunState.FAILED));
                 run = runRepository.saveAndFlush(run);
                 log.info("Pod Informer: update Run {} to {}", run.getId(), run.getState());
                 return;

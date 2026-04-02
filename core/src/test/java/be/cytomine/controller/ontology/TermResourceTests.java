@@ -17,6 +17,7 @@ package be.cytomine.controller.ontology;
  */
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -81,7 +82,8 @@ public class TermResourceTests {
         Long userId = builder.given_superadmin().getId();
         when(termHttpContract.findTermByID(eq(term.getId()), eq(userId))).thenReturn(Optional.of(
             new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
-                LocalDateTime.from(term.getCreated().toInstant()), LocalDateTime.from(term.getUpdated().toInstant()),
+                LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()),
+                LocalDateTime.ofInstant(term.getUpdated().toInstant(), ZoneId.systemDefault()),
                 Optional.empty(), term.getComment(), Set.of())));
 
         restTermControllerMockMvc.perform(get("/api/term/{id}.json", term.getId())).andExpect(status().isOk())
@@ -98,7 +100,8 @@ public class TermResourceTests {
         Long wrongUserId = userId + 1;
         when(termHttpContract.findTermByID(eq(term.getId()), eq(userId))).thenReturn(Optional.of(
             new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
-                LocalDateTime.from(term.getCreated().toInstant()), LocalDateTime.from(term.getUpdated().toInstant()),
+                LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()),
+                LocalDateTime.ofInstant(term.getUpdated().toInstant(), ZoneId.systemDefault()),
                 Optional.empty(), term.getComment(), Set.of())));
         when(termHttpContract.findTermByID(eq(term.getId()), eq(wrongUserId))).thenReturn(Optional.empty());
 
@@ -113,7 +116,8 @@ public class TermResourceTests {
         when(termHttpContract.findTermsByOntology(eq(term.getOntology().getId()), eq(userId),
             any(Pageable.class))).thenReturn(new PageImpl<>(List.of(
             new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
-                LocalDateTime.from(term.getCreated().toInstant()), LocalDateTime.from(term.getUpdated().toInstant()),
+                LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()),
+                LocalDateTime.ofInstant(term.getUpdated().toInstant(), ZoneId.systemDefault()),
                 Optional.empty(), term.getComment(), Set.of()))));
 
         restTermControllerMockMvc.perform(get("/api/ontology/{id}/term.json", term.getOntology().getId()))
@@ -143,8 +147,9 @@ public class TermResourceTests {
         when(termHttpContract.findTermsByProject(eq(project.getId()), eq(userId), any(Pageable.class))).thenReturn(
             new PageImpl<>(List.of(
                 new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
-                    LocalDateTime.from(term.getCreated().toInstant()),
-                    LocalDateTime.from(term.getUpdated().toInstant()), Optional.empty(), term.getComment(),
+                    LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()),
+                    LocalDateTime.ofInstant(term.getUpdated().toInstant(), ZoneId.systemDefault()), Optional.empty(),
+                    term.getComment(),
                     Set.of()))));
 
         restTermControllerMockMvc.perform(get("/api/project/{id}/term.json", project.getId()))
@@ -176,7 +181,8 @@ public class TermResourceTests {
             new Callback("be.cytomine.AddTermCommand", Optional.of(term.getId()),
                 Optional.of(term.getOntology().getId()), Optional.empty()), true,
             new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
-                LocalDateTime.from(term.getCreated().toInstant()), LocalDateTime.from(term.getUpdated().toInstant()),
+                LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()),
+                LocalDateTime.ofInstant(term.getUpdated().toInstant(), ZoneId.systemDefault()),
                 Optional.empty(), term.getComment(), Set.of()), commandId)));
 
         String createTermJson =
@@ -218,8 +224,9 @@ public class TermResourceTests {
             new HttpCommandResponse<>(new Callback("be.cytomine.EditTermCommand", Optional.of(term.getId()),
                 Optional.of(term.getOntology().getId()), Optional.empty()), true,
                 new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
-                    LocalDateTime.from(term.getCreated().toInstant()),
-                    LocalDateTime.from(term.getUpdated().toInstant()), Optional.empty(), term.getComment(), Set.of()),
+                    LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()),
+                    LocalDateTime.ofInstant(term.getUpdated().toInstant(), ZoneId.systemDefault()), Optional.empty(),
+                    term.getComment(), Set.of()),
                 commandId)));
 
         String updateTermJson = JsonObject.of("name", term.getName(), "color", term.getColor()).toJsonString();
@@ -257,7 +264,8 @@ public class TermResourceTests {
             new Callback("be.cytomine.DeleteTermCommand", Optional.of(term.getId()),
                 Optional.of(term.getOntology().getId()), Optional.empty()), true,
             new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
-                LocalDateTime.from(term.getCreated().toInstant()), LocalDateTime.from(term.getUpdated().toInstant()),
+                LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()),
+                LocalDateTime.ofInstant(term.getUpdated().toInstant(), ZoneId.systemDefault()),
                 Optional.empty(), term.getComment(), Set.of()), commandId)));
 
         restTermControllerMockMvc.perform(delete("/api/term/{id}.json", term.getId())).andExpect(status().isOk())

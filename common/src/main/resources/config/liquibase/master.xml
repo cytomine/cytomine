@@ -77,4 +77,7 @@
     <include file="/config/liquibase/changelog/2026-03-16-term-id-sequence.sql"
              relativeToChangelogFile="false" />
 
+    <include file="/config/liquibase/changelog/2026-03-30-command-v2.sql"
+             relativeToChangelogFile="false" />
+
 </databaseChangeLog>

@@ -6,16 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import be.cytomine.appengine.dto.handlers.scheduler.CollectionSymlink;
-import be.cytomine.appengine.dto.handlers.scheduler.Schedule;
-import be.cytomine.appengine.dto.handlers.scheduler.Symlink;
-import be.cytomine.appengine.exceptions.SchedulingException;
-import be.cytomine.appengine.handlers.SchedulerHandler;
-import be.cytomine.appengine.handlers.scheduler.impl.utils.PodInformer;
-import be.cytomine.appengine.models.task.Run;
-import be.cytomine.appengine.models.task.Task;
-import be.cytomine.appengine.repositories.RunRepository;
-import be.cytomine.appengine.states.TaskRunState;
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.ContainerBuilder;
 import io.fabric8.kubernetes.api.model.EnvVarBuilder;
@@ -36,6 +26,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import be.cytomine.appengine.dto.handlers.scheduler.CollectionSymlink;
+import be.cytomine.appengine.dto.handlers.scheduler.Schedule;
+import be.cytomine.appengine.dto.handlers.scheduler.Symlink;
+import be.cytomine.appengine.exceptions.SchedulingException;
+import be.cytomine.appengine.handlers.SchedulerHandler;
+import be.cytomine.appengine.handlers.scheduler.impl.utils.PodInformer;
+import be.cytomine.appengine.models.task.Run;
+import be.cytomine.appengine.models.task.Task;
+import be.cytomine.appengine.repositories.RunRepository;
+import be.cytomine.appengine.states.TaskRunState;
 
 @Service
 @Slf4j

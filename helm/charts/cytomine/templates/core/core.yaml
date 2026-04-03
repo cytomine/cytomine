@@ -129,7 +129,7 @@ spec:
         - name: wait-for-mongodb
           image: "{{ .Values.images.curl }}"
           securityContext:
-          { { - include "cytomine.containerSecurityContext" . | nindent 12 } }
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
           command:
             - /bin/sh
             - -c

@@ -6,6 +6,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import be.cytomine.appengine.dto.handlers.scheduler.CollectionSymlink;
+import be.cytomine.appengine.dto.handlers.scheduler.Schedule;
+import be.cytomine.appengine.dto.handlers.scheduler.Symlink;
+import be.cytomine.appengine.exceptions.SchedulingException;
+import be.cytomine.appengine.handlers.SchedulerHandler;
+import be.cytomine.appengine.handlers.scheduler.impl.utils.PodInformer;
+import be.cytomine.appengine.models.task.Run;
+import be.cytomine.appengine.models.task.Task;
+import be.cytomine.appengine.repositories.RunRepository;
+import be.cytomine.appengine.states.TaskRunState;
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.ContainerBuilder;
 import io.fabric8.kubernetes.api.model.EnvVarBuilder;
@@ -26,17 +36,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import be.cytomine.appengine.dto.handlers.scheduler.CollectionSymlink;
-import be.cytomine.appengine.dto.handlers.scheduler.Schedule;
-import be.cytomine.appengine.dto.handlers.scheduler.Symlink;
-import be.cytomine.appengine.exceptions.SchedulingException;
-import be.cytomine.appengine.handlers.SchedulerHandler;
-import be.cytomine.appengine.handlers.scheduler.impl.utils.PodInformer;
-import be.cytomine.appengine.models.task.Run;
-import be.cytomine.appengine.models.task.Task;
-import be.cytomine.appengine.repositories.RunRepository;
-import be.cytomine.appengine.states.TaskRunState;
 
 @Service
 @Slf4j
@@ -87,6 +86,8 @@ public class KubernetesScheduler implements SchedulerHandler {
     @Value("${scheduler.tasks-namespace}")
     private String tasksNamespace;
 
+    @Value("${schedulder.tasks-runner-image")
+    private String taskRunnerImage;
     private String baseInputPath;
 
     private String baseOutputPath;
@@ -95,11 +96,7 @@ public class KubernetesScheduler implements SchedulerHandler {
 
     @PostConstruct
     public void buildTaskRunsUrl() {
-        baseUrl = UriComponentsBuilder
-            .fromUriString(advertisedUrl)
-            .path(apiPrefix)
-            .path(apiVersion)
-            .path("/task-runs/")
+        baseUrl = UriComponentsBuilder.fromUriString(advertisedUrl).path(apiPrefix).path(apiVersion).path("/task-runs/")
             .toUriString();
 
         String basePath = "";
@@ -127,27 +124,25 @@ public class KubernetesScheduler implements SchedulerHandler {
         log.info("Schedule: create task pod...");
 
         // Define helper container resources
-        ResourceRequirementsBuilder helperContainersResourcesBuilder = new ResourceRequirements()
-            .toBuilder()
-            .addToRequests("cpu", new Quantity(helperContainerCpu))
-            .addToRequests("memory", new Quantity(helperContainerRam))
-            .addToLimits("cpu", new Quantity(helperContainerCpu))
-            .addToLimits("memory", new Quantity(helperContainerRam));
+        ResourceRequirementsBuilder helperContainersResourcesBuilder =
+            new ResourceRequirements().toBuilder().addToRequests("cpu", new Quantity(helperContainerCpu))
+                .addToRequests("memory", new Quantity(helperContainerRam))
+                .addToLimits("cpu", new Quantity(helperContainerCpu))
+                .addToLimits("memory", new Quantity(helperContainerRam));
 
         ResourceRequirements helperContainersResources = helperContainersResourcesBuilder.build();
 
         // Define task resources for the task
-        ResourceRequirementsBuilder taskResourcesBuilder = new ResourceRequirements()
-            .toBuilder()
-            .addToRequests("cpu", new Quantity(Integer.toString(task.getCpus())))
-            .addToRequests("memory", new Quantity(task.getRam()))
-            .addToLimits("cpu", new Quantity(Integer.toString(task.getCpus())))
-            .addToLimits("memory", new Quantity(task.getRam()));
+        ResourceRequirementsBuilder taskResourcesBuilder =
+            new ResourceRequirements().toBuilder().addToRequests("cpu", new Quantity(Integer.toString(task.getCpus())))
+                .addToRequests("memory", new Quantity(task.getRam()))
+                .addToLimits("cpu", new Quantity(Integer.toString(task.getCpus())))
+                .addToLimits("memory", new Quantity(task.getRam()));
 
         if (task.getGpus() > 0) {
-            taskResourcesBuilder = taskResourcesBuilder
-                .addToRequests("nvidia.com/gpu", new Quantity(Integer.toString(task.getGpus())))
-                .addToLimits("nvidia.com/gpu", new Quantity(Integer.toString(task.getGpus())));
+            taskResourcesBuilder =
+                taskResourcesBuilder.addToRequests("nvidia.com/gpu", new Quantity(Integer.toString(task.getGpus())))
+                    .addToLimits("nvidia.com/gpu", new Quantity(Integer.toString(task.getGpus())));
         }
 
 
@@ -161,32 +156,15 @@ public class KubernetesScheduler implements SchedulerHandler {
             for (Symlink link : schedule.getLinks()) {
                 if (link instanceof CollectionSymlink collectionSymlink) {
                     int collectionSize = collectionSymlink.getSymlinks().size();
-                    createSymlinks =
-                        new StringBuilder("mkdir -p "
-                            + task.getInputFolder()
-                            + "/"
-                            + collectionSymlink.getParameterName()
-                            + " && ");
-                    for (Map.Entry<String, String> entry :
-                        collectionSymlink.getSymlinks().entrySet()) {
-                        createSymlinks
-                            .append("ln -s ")
-                            .append(entry.getValue())
-                            .append(" ")
-                            .append(task.getInputFolder())
-                            .append("/")
-                            .append(collectionSymlink.getParameterName())
-                            .append("/")
-                            .append(convertBracketsToPath(entry.getKey()))
-                            .append(" && ");
+                    createSymlinks = new StringBuilder(
+                        "mkdir -p " + task.getInputFolder() + "/" + collectionSymlink.getParameterName() + " && ");
+                    for (Map.Entry<String, String> entry : collectionSymlink.getSymlinks().entrySet()) {
+                        createSymlinks.append("ln -s ").append(entry.getValue()).append(" ")
+                            .append(task.getInputFolder()).append("/").append(collectionSymlink.getParameterName())
+                            .append("/").append(convertBracketsToPath(entry.getKey())).append(" && ");
                     }
-                    createSymlinks
-                        .append("echo 'size: ")
-                        .append(collectionSize)
-                        .append("' > ")
-                        .append(task.getInputFolder())
-                        .append("/")
-                        .append(collectionSymlink.getParameterName())
+                    createSymlinks.append("echo 'size: ").append(collectionSize).append("' > ")
+                        .append(task.getInputFolder()).append("/").append(collectionSymlink.getParameterName())
                         .append("/array.yml");
                 }
             }
@@ -197,20 +175,14 @@ public class KubernetesScheduler implements SchedulerHandler {
         String fetchInputs = "curl -L -o inputs.zip " + url + "/inputs.zip";
         String unzipInputs = "time unzip -o inputs.zip -d " + task.getInputFolder();
 
-        Container inputContainer = new ContainerBuilder()
-            .withName("inputs-provisioning")
-            .withImage("cytomineuliege/alpine-task-utils:latest")
-            .withImagePullPolicy("IfNotPresent")
-            .withCommand("/bin/sh", "-c", fetchInputs + and + unzipInputs)
+        Container inputContainer = new ContainerBuilder().withName("inputs-provisioning").withImage(taskRunnerImage)
+            .withImagePullPolicy("IfNotPresent").withCommand("/bin/sh", "-c", fetchInputs + and + unzipInputs)
 
             // request and limit helper container resources
             .withResources(helperContainersResources)
 
             // Mount volume for inputs provisioning
-            .addNewVolumeMount()
-            .withName("inputs")
-            .withMountPath(task.getInputFolder())
-            .endVolumeMount()
+            .addNewVolumeMount().withName("inputs").withMountPath(task.getInputFolder()).endVolumeMount()
 
             .build();
 
@@ -220,15 +192,14 @@ public class KubernetesScheduler implements SchedulerHandler {
         String zipOutputs = "cd " + task.getOutputFolder() + and + "zip -0 -r outputs.zip .";
         String wait = "export TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token); ";
         wait += "while ! curl -vk -H \"Authorization: Bearer $TOKEN\" ";
-        wait += "https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT_HTTPS}/api/v1"
-            + "/namespaces/" + tasksNamespace + "/pods/${POD_NAME}/status ";
+        wait += "https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT_HTTPS}/api/v1" + "/namespaces/" +
+            tasksNamespace + "/pods/${POD_NAME}/status ";
         wait += "| jq '.status | .containerStatuses[] | select(.name == \"task\") | .state ";
         wait += "| keys[0]' | grep -q -F \"terminated\"; do sleep 2; done";
 
         String clusterOutputCommand = wait + and + zipOutputs + and + sendOutputs;
         String updateAPIRequestJson = " '{ \"desired\" : \"FINISHED\" }' ";
-        String requestToUpdateRunStateToFinished
-            = "curl -X POST -H 'Content-Type: application/json' -d";
+        String requestToUpdateRunStateToFinished = "curl -X POST -H 'Content-Type: application/json' -d";
         requestToUpdateRunStateToFinished += updateAPIRequestJson;
         requestToUpdateRunStateToFinished += url + "/" + "state-actions";
         String localOutputCommand = wait + and + requestToUpdateRunStateToFinished;
@@ -241,49 +212,27 @@ public class KubernetesScheduler implements SchedulerHandler {
             command = clusterOutputCommand;
         }
 
-        Container outputContainer = new ContainerBuilder()
-            .withName("outputs-sending")
-            .withImage("cytomineuliege/alpine-task-utils:latest")
-            .withImagePullPolicy("IfNotPresent")
-            .withCommand("/bin/sh", "-c", command)
+        Container outputContainer = new ContainerBuilder().withName("outputs-sending").withImage(taskRunnerImage)
+            .withImagePullPolicy("IfNotPresent").withCommand("/bin/sh", "-c", command)
 
             // request and limit helper container resources
             .withResources(helperContainersResources)
 
-            .addNewVolumeMount()
-            .withName("outputs")
-            .withMountPath(task.getOutputFolder())
-            .endVolumeMount()
+            .addNewVolumeMount().withName("outputs").withMountPath(task.getOutputFolder()).endVolumeMount()
 
-            .withEnv(
-                new EnvVarBuilder()
-                    .withName("POD_NAME")
-                    .withNewValueFrom()
-                    .withNewFieldRef()
-                    .withFieldPath("metadata.name")
-                    .endFieldRef()
-                    .endValueFrom()
-                    .build())
+            .withEnv(new EnvVarBuilder().withName("POD_NAME").withNewValueFrom().withNewFieldRef()
+                .withFieldPath("metadata.name").endFieldRef().endValueFrom().build())
 
             .build();
 
         String permissions = "chmod -R 777 " + task.getInputFolder() + " " + task.getOutputFolder();
-        Container permissionContainer = new ContainerBuilder()
-            .withName("permissions")
-            .withImage("cytomineuliege/alpine-task-utils:latest")
-            .withImagePullPolicy("IfNotPresent")
-            .withCommand("/bin/sh", "-c", permissions)
+        Container permissionContainer = new ContainerBuilder().withName("permissions").withImage(taskRunnerImage)
+            .withImagePullPolicy("IfNotPresent").withCommand("/bin/sh", "-c", permissions)
 
             .withResources(helperContainersResources)
 
-            .addNewVolumeMount()
-            .withName("inputs")
-            .withMountPath(task.getInputFolder())
-            .endVolumeMount()
-            .addNewVolumeMount()
-            .withName("outputs")
-            .withMountPath(task.getOutputFolder())
-            .endVolumeMount()
+            .addNewVolumeMount().withName("inputs").withMountPath(task.getInputFolder()).endVolumeMount()
+            .addNewVolumeMount().withName("outputs").withMountPath(task.getOutputFolder()).endVolumeMount()
 
             .build();
 
@@ -292,21 +241,12 @@ public class KubernetesScheduler implements SchedulerHandler {
         String podName = task.getName().toLowerCase().replaceAll("[^a-zA-Z0-9]", "") + "-" + runId;
         String imageName = registryAdvertisedUrl + "/" + task.getImageName();
 
-        PodBuilder podBuilder = new PodBuilder()
-            .withNewMetadata()
-            .withName(podName)
-            .withNamespace(tasksNamespace)
-            .withLabels(Map.of("runId", runId, "app", "task"))
-            .endMetadata()
-            .withNewSpec()
+        PodBuilder podBuilder = new PodBuilder().withNewMetadata().withName(podName).withNamespace(tasksNamespace)
+            .withLabels(Map.of("runId", runId, "app", "task")).endMetadata().withNewSpec()
 
-            .withHostNetwork(useHostNetwork)
-            .withServiceAccountName("app-engine")
+            .withHostNetwork(useHostNetwork).withServiceAccountName("app-engine")
 
-            .addNewInitContainerLike(permissionContainer)
-            .and()
-            .withRestartPolicy("Never")
-            .endSpec();
+            .addNewInitContainerLike(permissionContainer).and().withRestartPolicy("Never").endSpec();
 
         Pod pod = podBuilder.build();
         PodBuilder newPodBuilder = new PodBuilder(pod);
@@ -319,22 +259,13 @@ public class KubernetesScheduler implements SchedulerHandler {
             initContainers.add(inputContainer);
         }
 
-        Container symlinksCreatorContainer = new ContainerBuilder()
-            .withName("symlinks-creator")
-            .withImage("cytomineuliege/alpine-task-utils:latest")
-            .withImagePullPolicy("IfNotPresent")
-            .withCommand("/bin/sh", "-c", createSymlinks.toString())
-            .withResources(helperContainersResources)
-            .addNewVolumeMount()
-            .withName("inputs")
-            .withMountPath(task.getInputFolder())
-            .endVolumeMount()
-            .addNewVolumeMount()
-            .withName("images-datasets")
-            .withMountPath("/datasets")
-            .withReadOnly(true) // to avoid corrupting the dataset
-            .endVolumeMount()
-            .build();
+        Container symlinksCreatorContainer =
+            new ContainerBuilder().withName("symlinks-creator").withImage(taskRunnerImage)
+                .withImagePullPolicy("IfNotPresent").withCommand("/bin/sh", "-c", createSymlinks.toString())
+                .withResources(helperContainersResources).addNewVolumeMount().withName("inputs")
+                .withMountPath(task.getInputFolder()).endVolumeMount().addNewVolumeMount().withName("images-datasets")
+                .withMountPath("/datasets").withReadOnly(true) // to avoid corrupting the dataset
+                .endVolumeMount().build();
 
         // add symlink creator init container if run mode is local and also the container is used
         if (!isClusterMode && !schedule.getLinks().isEmpty()) {
@@ -342,61 +273,37 @@ public class KubernetesScheduler implements SchedulerHandler {
         }
 
         ResourceRequirements taskResources = taskResourcesBuilder.build();
-        Container taskContainer = new ContainerBuilder()
-            .withName("task")
-            .withImage(imageName)
-            .withImagePullPolicy("IfNotPresent")
-            // request and limit task resources
-            .withResources(taskResources)
-            // Mount volumes for inputs and outputs
-            .addNewVolumeMount()
-            .withName("inputs")
-            .withMountPath(task.getInputFolder())
-            .endVolumeMount()
-            .addNewVolumeMount()
-            .withName("outputs")
-            .withMountPath(task.getOutputFolder())
-            .endVolumeMount()
+        Container taskContainer =
+            new ContainerBuilder().withName("task").withImage(imageName).withImagePullPolicy("IfNotPresent")
+                // request and limit task resources
+                .withResources(taskResources)
+                // Mount volumes for inputs and outputs
+                .addNewVolumeMount().withName("inputs").withMountPath(task.getInputFolder()).endVolumeMount()
+                .addNewVolumeMount().withName("outputs").withMountPath(task.getOutputFolder()).endVolumeMount()
 
-            .build();
+                .build();
 
         // Add taskContainer unconditionally
         containers.add(taskContainer);
         containers.add(outputContainer);
 
         // Add inputs and outputs volumes conditionally
-        volumes.add(new VolumeBuilder()
-            .withName("inputs")
-            .withHostPath(
-                new HostPathVolumeSourceBuilder().withPath(baseInputPath + runId).build())
-            .build());
-        volumes.add(new VolumeBuilder()
-            .withName("outputs")
-            .withHostPath(
-                new HostPathVolumeSourceBuilder().withPath(baseOutputPath + runId).build())
-            .build());
+        volumes.add(new VolumeBuilder().withName("inputs")
+            .withHostPath(new HostPathVolumeSourceBuilder().withPath(baseInputPath + runId).build()).build());
+        volumes.add(new VolumeBuilder().withName("outputs")
+            .withHostPath(new HostPathVolumeSourceBuilder().withPath(baseOutputPath + runId).build()).build());
         // add another host path volume to where the datasets of large images is
-        volumes.add(new VolumeBuilder()
-            .withName("images-datasets")
-            .withHostPath(
-                new HostPathVolumeSourceBuilder().withPath(imagesDatasetsPath).build())
-            .build());
+        volumes.add(new VolumeBuilder().withName("images-datasets")
+            .withHostPath(new HostPathVolumeSourceBuilder().withPath(imagesDatasetsPath).build()).build());
 
-        newPodBuilder = newPodBuilder.editOrNewSpec()
-            .withInitContainers(initContainers)
-            .withContainers(containers)
-            .withVolumes(volumes)
-            .endSpec();
+        newPodBuilder = newPodBuilder.editOrNewSpec().withInitContainers(initContainers).withContainers(containers)
+            .withVolumes(volumes).endSpec();
 
         podBuilder = newPodBuilder;
 
         log.info("Schedule: Task Pod scheduled to run on the cluster");
         try {
-            kubernetesClient
-                .pods()
-                .inNamespace(tasksNamespace)
-                .resource(podBuilder.build())
-                .create();
+            kubernetesClient.pods().inNamespace(tasksNamespace).resource(podBuilder.build()).create();
         } catch (KubernetesClientException e) {
             e.printStackTrace();
             throw new SchedulingException("Task Pod failed to be scheduled on the cluster");
@@ -414,10 +321,7 @@ public class KubernetesScheduler implements SchedulerHandler {
         log.info("Alive: check if the scheduler is up and running");
 
         try {
-            kubernetesClient
-                .pods()
-                .inNamespace(tasksNamespace)
-                .list();
+            kubernetesClient.pods().inNamespace(tasksNamespace).list();
         } catch (KubernetesClientException e) {
             throw new SchedulingException("Scheduler is not alive");
         }
@@ -432,11 +336,7 @@ public class KubernetesScheduler implements SchedulerHandler {
         }
 
         log.info("Monitor: add informer to the cluster");
-        kubernetesClient
-            .pods()
-            .inNamespace(tasksNamespace)
-            .inform(podInformer)
-            .run();
+        kubernetesClient.pods().inNamespace(tasksNamespace).inform(podInformer).run();
         log.info("Monitor: informer added");
     }
 
@@ -448,17 +348,13 @@ public class KubernetesScheduler implements SchedulerHandler {
         log.info("Deleting pod '{}' for run '{}'", podName, run.getId());
 
         try {
-            kubernetesClient
-                    .pods()
-                    .inNamespace(tasksNamespace)
-                    .withName(podName)
-                    .delete();
+            kubernetesClient.pods().inNamespace(tasksNamespace).withName(podName).delete();
 
             log.info("Successfully deleted pod '{}' for run '{}'", podName, run.getId());
         } catch (KubernetesClientException e) {
             log.error("Failed to delete pod '{}' for run '{}'", podName, run.getId(), e);
-            String errorMessage = String.format("Failed to delete pod '%s' for run '%s': %s",
-                    podName, run.getId(), e.getMessage());
+            String errorMessage =
+                String.format("Failed to delete pod '%s' for run '%s': %s", podName, run.getId(), e.getMessage());
             throw new SchedulingException(errorMessage);
         }
     }

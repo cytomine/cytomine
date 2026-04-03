@@ -55,6 +55,7 @@ images:
   cbir: cytomine/cbir:latest
   pims_import: cytomine/python-client:latest
   repository: cytomine/repository:latest
+  tasks_runner_image: cytomine/app-engine-tasks-runner:latest
 
   #
   # External Images
@@ -181,7 +182,6 @@ pims:
 web_ui:
   deploy: true
   port: 9090
-  commercial_version:
   resources:
     requests:
       memory: 256Mi

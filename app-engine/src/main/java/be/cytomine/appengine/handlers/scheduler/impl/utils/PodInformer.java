@@ -60,6 +60,10 @@ public class PodInformer implements ResourceEventHandler<Pod> {
                     return;
                 }
 
+                if (run.getState().equals(TaskRunState.QUEUING)) {
+                    return;
+                }
+
                 run.setState(TaskRunState.PENDING);
                 run = runRepository.saveAndFlush(run);
                 log.info("Pod Informer: set Run {} to {}", run.getId(), run.getState());

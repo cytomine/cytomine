@@ -15,14 +15,8 @@
 
 global:
   domainName:
-  # will be generated as ims.<domainName>
-  imsDomainName:
-  # will be generated as upload.<domainName>
-  urlUpload:
   affinity: {}
   tolerations: {}
-  publicIP: 192.168.49.2/32
-  protocol: TCP
 readOnceStorageClass: ''
 readManyStorageClass:
 # Resource settings
@@ -30,10 +24,6 @@ mongodbStorage: 1Gi
 postgresStorage: 3Gi
 
 # Email settings
-adminEmail: info@cytomine.coop
-emailSender: your.email@gmail.com
-emailReceiver: receiver@XXX.com
-smtpPass:
 smtpHost: mail.smtp
 smtpPort: 587
 
@@ -65,6 +55,7 @@ images:
   cbir: cytomine/cbir:latest
   pims_import: cytomine/python-client:latest
   repository: cytomine/repository:latest
+  tasks_runner_image: cytomine/app-engine-tasks-runner:latest
 
   #
   # External Images
@@ -105,7 +96,6 @@ postgresql:
       cpu: 200m
       ephemeral-storage: 1Gi
   storageClassName:
-  storageAccessMode: ReadWriteOnce
 
 # MongoDB - Secondary database.Stores activity data
 mongodb:
@@ -123,9 +113,7 @@ mongodb:
       memory: 1Gi
       cpu: 200m
       ephemeral-storage: 1Gi
-  mongoStorageHostPath:
   storageClassName:
-  storageAccessMode: ReadWriteOnce
 
 # Redis - Cache for fast image extractor
 pims_cache:
@@ -189,21 +177,6 @@ pims:
   #     path: /data/dataset
   #     type: DirectoryOrCreate
   datasetImportStorage:
-
-# Nginx - Main HTTP proxy dispatching incoming requests
-nginx:
-  deploy: false
-  port: 9000
-  serverID:
-  resources:
-    requests:
-      memory: 256Mi
-      cpu: 100m
-      ephemeral-storage: 32Mi
-    limits:
-      memory: 256Mi
-      cpu: 200m
-      ephemeral-storage: 1Gi
 
 # Web-ui - Cytomine GUI interface
 web_ui:

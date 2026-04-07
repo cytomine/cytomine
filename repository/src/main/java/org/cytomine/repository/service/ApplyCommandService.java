@@ -6,7 +6,6 @@ import java.util.UUID;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
-import org.cytomine.repository.mapper.OntologyMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
 import org.springframework.stereotype.Component;
 
@@ -20,9 +19,7 @@ import be.cytomine.common.repository.model.term.payload.TermResponse;
 @AllArgsConstructor
 public class ApplyCommandService {
     private final CommandV2Repository commandRepository;
-    private final ACLService aclService;
     private final TermCommandService termCommandService;
-    private final OntologyMapper ontologyMapper;
 
     @Transactional
     public Optional<HttpCommandResponse<TermResponse>> undoCommand(long userId, UUID undoCommand, LocalDateTime now) {
@@ -38,8 +35,8 @@ public class ApplyCommandService {
                    });
     }
 
-    public Optional<HttpCommandResponse<TermResponse>> redoCommand(long userId, UUID undoCommand, LocalDateTime now) {
-        return commandRepository.findById(undoCommand)
+    public Optional<HttpCommandResponse<TermResponse>> redoCommand(long userId, UUID redoCommand, LocalDateTime now) {
+        return commandRepository.findById(redoCommand)
                    .flatMap(commandEntity -> switch (commandEntity.getData()) {
                        case DeleteTermCommand dtc ->
                            termCommandService.redoDeleteTerm(commandEntity.getId(), dtc, userId, now);

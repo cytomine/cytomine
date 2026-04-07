@@ -11,7 +11,6 @@ import be.cytomine.common.repository.model.command.DataType;
 @JsonSubTypes({
     @JsonSubTypes.Type(value = CreateTermCommand.class, name = "INSERT_COMMAND"),
     @JsonSubTypes.Type(value = UpdateTermCommand.class, name = "UPDATE_COMMAND"),
-    @JsonSubTypes.Type(value = DeleteTermCommand.class, name = "DELETE_COMMAND"),
     @JsonSubTypes.Type(value = DeleteTermCommand.class, name = "DELETE_COMMAND")})
 public sealed interface CommandV2Request<T> permits DeleteCommandRequest, CreateCommandRequest, UpdateCommandRequest {
     T data();

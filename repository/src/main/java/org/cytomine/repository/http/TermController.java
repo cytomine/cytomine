@@ -51,24 +51,21 @@ public class TermController implements TermHttpContract {
     @PostMapping
     public Optional<HttpCommandResponse<TermResponse>> create(@RequestParam long userId,
                                                               @RequestBody CreateTerm createTerm) {
-        LocalDateTime now = LocalDateTime.now();
-        return termCommandService.createTerm(userId, createTerm, now);
+        return termCommandService.createTerm(userId, createTerm, LocalDateTime.now());
     }
 
     @Override
     @PutMapping("/{id}")
     public Optional<HttpCommandResponse<TermResponse>> update(@PathVariable long id, @RequestParam long userId,
                                                               @RequestBody UpdateTerm updateTerm) {
-        LocalDateTime now = LocalDateTime.now();
-        return termCommandService.updateTerm(id, userId, updateTerm, now);
+        return termCommandService.updateTerm(id, userId, updateTerm, LocalDateTime.now());
     }
 
     @Override
     @DeleteMapping("/{id}")
     @Transactional
     public Optional<HttpCommandResponse<TermResponse>> delete(@PathVariable long id, @RequestParam long userId) {
-        LocalDateTime now = LocalDateTime.now();
-        return termCommandService.deleteTerm(id, userId, now);
+        return termCommandService.deleteTerm(id, userId, LocalDateTime.now());
     }
 
     @Override

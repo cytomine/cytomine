@@ -39,6 +39,7 @@ public class CommandController implements CommandHttpContract {
     }
 
     @Override
+    @PostMapping("/redo/{commandId}")
     public Optional<HttpCommandResponse<TermResponse>> redo(UUID commandId, long userId) {
         LocalDateTime now = LocalDateTime.now();
         return applyCommandService.redoCommand(userId, commandId, now);

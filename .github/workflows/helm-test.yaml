@@ -122,6 +122,10 @@ jobs:
         if: always()
         run: kubectl --namespace=cytomine-${{ github.sha }}-engine-tasks get pods
 
+      - name: Describe task pods
+        if: always()
+        run: kubectl --namespace=cytomine-${{ github.sha }}-engine-tasks describe pods
+
       - name: Export test results
         if: always()
         run: |

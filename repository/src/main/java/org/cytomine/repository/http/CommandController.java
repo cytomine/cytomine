@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import be.cytomine.common.repository.http.CommandHttpContract;
 import be.cytomine.common.repository.model.command.CommandResponse;
 import be.cytomine.common.repository.model.command.HttpCommandResponse;
-import be.cytomine.common.repository.model.term.payload.TermResponse;
 
 import static be.cytomine.common.repository.http.CommandHttpContract.ROOT_PATH;
 
@@ -33,14 +32,14 @@ public class CommandController implements CommandHttpContract {
 
     @Override
     @PostMapping("/undo/{commandId}")
-    public Optional<HttpCommandResponse<TermResponse>> undo(UUID commandId, long userId) {
+    public Optional<HttpCommandResponse> undo(UUID commandId, long userId) {
         LocalDateTime now = LocalDateTime.now();
         return applyCommandService.undoCommand(userId, commandId, now);
     }
 
     @Override
     @PostMapping("/redo/{commandId}")
-    public Optional<HttpCommandResponse<TermResponse>> redo(UUID commandId, long userId) {
+    public Optional<HttpCommandResponse> redo(UUID commandId, long userId) {
         LocalDateTime now = LocalDateTime.now();
         return applyCommandService.redoCommand(userId, commandId, now);
     }

@@ -17,8 +17,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.common.repository.model.command.HttpCommandResponse;
+import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.common.repository.model.term.payload.CreateTerm;
-import be.cytomine.common.repository.model.term.payload.TermResponse;
 import be.cytomine.common.repository.model.term.payload.UpdateTerm;
 import be.cytomine.controller.utils.CollectionResponse;
 import be.cytomine.controller.utils.PageMapper;
@@ -39,7 +39,7 @@ public class TermController {
     private final CurrentUserService currentUserService;
 
     @PostMapping("term.json")
-    public Optional<HttpCommandResponse<TermResponse>> create(@RequestBody CreateTerm createTerm) {
+    public Optional<HttpCommandResponse> create(@RequestBody CreateTerm createTerm) {
         long userId = currentUserService.getCurrentUser().getId();
         return termHttpContract.create(userId, createTerm);
     }
@@ -49,25 +49,22 @@ public class TermController {
         log.debug("REST request to get term {}", id);
         long userId = currentUserService.getCurrentUser().getId();
         return termHttpContract.findTermByID(id, userId)
-                   .orElseThrow(() -> new ResponseStatusException(NOT_FOUND,
-                       format(UNABLE_TO_FIND_TERM, id)));
+            .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_TERM, id)));
     }
 
     @PutMapping("term/{id}.json")
-    public HttpCommandResponse<TermResponse> update(@PathVariable Long id,
-                                                    @RequestBody UpdateTerm updateTerm) {
+    public HttpCommandResponse update(@PathVariable Long id, @RequestBody UpdateTerm updateTerm) {
         long userId = currentUserService.getCurrentUser().getId();
 
-        return termHttpContract.update(id, userId, updateTerm).orElseThrow(() -> new ResponseStatusException(NOT_FOUND,
-            format(UNABLE_TO_FIND_TERM, id)));
+        return termHttpContract.update(id, userId, updateTerm)
+            .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_TERM, id)));
     }
 
     @DeleteMapping("term/{id}.json")
-    public HttpCommandResponse<TermResponse> delete(@PathVariable Long id) {
+    public HttpCommandResponse delete(@PathVariable Long id) {
         log.debug("REST request to delete term {}", id);
         return termHttpContract.delete(id, currentUserService.getCurrentUser().getId())
-                   .orElseThrow(() -> new ResponseStatusException(NOT_FOUND,
-                       format(UNABLE_TO_FIND_TERM, id)));
+            .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_TERM, id)));
     }
 
     @GetMapping("project/{id}/term.json")

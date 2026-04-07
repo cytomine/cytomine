@@ -4,19 +4,25 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.cytomine.repository.persistence.entity.TermEntity;
+import org.cytomine.repository.persistence.entity.TermRelationEntity;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import be.cytomine.common.repository.model.command.payload.term.TermCommandPayload;
+import be.cytomine.common.repository.model.command.payload.request.TermCommandPayload;
+import be.cytomine.common.repository.model.command.payload.request.TermRelationCommandPayload;
+import be.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
+import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.common.repository.model.term.payload.CreateTerm;
-import be.cytomine.common.repository.model.term.payload.TermResponse;
 
 @Mapper(componentModel = "spring")
 public interface OntologyMapper {
 
     @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
     TermResponse map(TermEntity termEntity);
+
+    @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
+    TermRelationResponse mapToTermRelationResponse(TermRelationEntity termRelationEntity);
 
     @Mapping(target = "children", ignore = true)
     @Mapping(target = "id", ignore = true)
@@ -33,6 +39,9 @@ public interface OntologyMapper {
     @Mapping(target = "ontology", source = "ontologyId")
     @Mapping(target = "parent", ignore = true)
     TermCommandPayload mapToTermCommandPayload(TermEntity termEntity);
+
+    @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
+    TermRelationCommandPayload mapToTermRelationCommandPayload(TermRelationEntity termRelationEntity);
 
     default Optional<LocalDateTime> date(LocalDateTime zonedDateTime) {
         return Optional.ofNullable(zonedDateTime);

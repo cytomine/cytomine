@@ -42,7 +42,7 @@ import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.common.repository.model.command.Callback;
 import be.cytomine.common.repository.model.command.HttpCommandResponse;
-import be.cytomine.common.repository.model.term.payload.TermResponse;
+import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.project.Project;
@@ -177,7 +177,7 @@ public class TermResourceTests {
         Term term = builder.given_a_term();
         Long userId = builder.given_superadmin().getId();
         UUID commandId = UUID.randomUUID();
-        when(termHttpContract.create(eq(userId), any())).thenReturn(Optional.of(new HttpCommandResponse<>(
+        when(termHttpContract.create(eq(userId), any())).thenReturn(Optional.of(new HttpCommandResponse(
             new Callback("be.cytomine.AddTermCommand", Optional.of(term.getId()),
                 Optional.of(term.getOntology().getId()), Optional.empty()), true,
             new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
@@ -221,7 +221,7 @@ public class TermResourceTests {
         Long userId = builder.given_superadmin().getId();
         UUID commandId = UUID.randomUUID();
         when(termHttpContract.update(eq(term.getId()), eq(userId), any())).thenReturn(Optional.of(
-            new HttpCommandResponse<>(new Callback("be.cytomine.EditTermCommand", Optional.of(term.getId()),
+            new HttpCommandResponse(new Callback("be.cytomine.EditTermCommand", Optional.of(term.getId()),
                 Optional.of(term.getOntology().getId()), Optional.empty()), true,
                 new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
                     LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()),
@@ -260,7 +260,7 @@ public class TermResourceTests {
         Term term = builder.given_a_term();
         Long userId = builder.given_superadmin().getId();
         UUID commandId = UUID.randomUUID();
-        when(termHttpContract.delete(eq(term.getId()), eq(userId))).thenReturn(Optional.of(new HttpCommandResponse<>(
+        when(termHttpContract.delete(eq(term.getId()), eq(userId))).thenReturn(Optional.of(new HttpCommandResponse(
             new Callback("be.cytomine.DeleteTermCommand", Optional.of(term.getId()),
                 Optional.of(term.getOntology().getId()), Optional.empty()), true,
             new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),

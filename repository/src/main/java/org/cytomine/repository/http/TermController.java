@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.common.repository.model.command.HttpCommandResponse;
 import be.cytomine.common.repository.model.term.payload.CreateTerm;
-import be.cytomine.common.repository.model.term.payload.TermResponse;
+import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.common.repository.model.term.payload.UpdateTerm;
 
 import static be.cytomine.common.repository.http.TermHttpContract.ROOT_PATH;
@@ -49,14 +49,14 @@ public class TermController implements TermHttpContract {
 
     @Override
     @PostMapping
-    public Optional<HttpCommandResponse<TermResponse>> create(@RequestParam long userId,
+    public Optional<HttpCommandResponse> create(@RequestParam long userId,
                                                               @RequestBody CreateTerm createTerm) {
         return termCommandService.createTerm(userId, createTerm, LocalDateTime.now());
     }
 
     @Override
     @PutMapping("/{id}")
-    public Optional<HttpCommandResponse<TermResponse>> update(@PathVariable long id, @RequestParam long userId,
+    public Optional<HttpCommandResponse> update(@PathVariable long id, @RequestParam long userId,
                                                               @RequestBody UpdateTerm updateTerm) {
         return termCommandService.updateTerm(id, userId, updateTerm, LocalDateTime.now());
     }
@@ -64,7 +64,7 @@ public class TermController implements TermHttpContract {
     @Override
     @DeleteMapping("/{id}")
     @Transactional
-    public Optional<HttpCommandResponse<TermResponse>> delete(@PathVariable long id, @RequestParam long userId) {
+    public Optional<HttpCommandResponse> delete(@PathVariable long id, @RequestParam long userId) {
         return termCommandService.deleteTerm(id, userId, LocalDateTime.now());
     }
 

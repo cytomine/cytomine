@@ -28,8 +28,8 @@ import be.cytomine.common.SpringPage;
 import be.cytomine.common.repository.model.command.CommandType;
 import be.cytomine.common.repository.model.command.DataType;
 import be.cytomine.common.repository.model.command.HttpCommandResponse;
+import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.common.repository.model.term.payload.CreateTerm;
-import be.cytomine.common.repository.model.term.payload.TermResponse;
 import be.cytomine.common.repository.model.term.payload.UpdateTerm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -98,13 +98,12 @@ class TermControllerTest {
         TermEntity entity = createAndSaveTermEntity("term1", "#FF0000");
 
         String response = mockMvc.perform(get("/terms/{id}", entity.getId()).param("userId", userId.toString()))
-                              .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
         TermResponse result = objectMapper.readValue(response, TermResponse.class);
         TermResponse expected =
-            new TermResponse(entity.getId(), "term1", "#FF0000", ontologyId, entity.getCreated(), entity.getUpdated()
-                , Optional.empty(),
-                "", null);
+            new TermResponse(entity.getId(), "term1", "#FF0000", ontologyId, entity.getCreated(), entity.getUpdated(),
+                Optional.empty(), "", null);
         assertEquals(expected, result);
     }
 
@@ -123,14 +122,16 @@ class TermControllerTest {
         String response = mockMvc.perform(
                 post("/terms").param("userId", userId.toString()).contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(createTerm))).andExpect(status().isOk()).andReturn()
-                              .getResponse().getContentAsString();
+            .getResponse().getContentAsString();
 
-        HttpCommandResponse<TermResponse> result = objectMapper.readValue(response,
+        HttpCommandResponse result = objectMapper.readValue(response,
             objectMapper.getTypeFactory().constructParametricType(HttpCommandResponse.class, TermResponse.class));
 
-        assertEquals("newTerm", result.data().name());
-        assertEquals("#00FF00", result.data().color());
-        assertEquals(ontologyId, result.data().ontologyId());
+        TermResponse dataResult = (TermResponse) result.data();
+
+        assertEquals("newTerm", dataResult.name());
+        assertEquals("#00FF00", dataResult.color());
+        assertEquals(ontologyId, dataResult.ontologyId());
 
         CommandV2Entity command = commandRepository.findById(result.command()).orElseThrow();
         assertEquals(CommandType.INSERT_COMMAND, command.getData().getCommandType());
@@ -146,15 +147,14 @@ class TermControllerTest {
         UpdateTerm updateTerm = new UpdateTerm(Optional.of("newName"), Optional.of("#00FF00"));
 
         String response = mockMvc.perform(put("/terms/{id}", entity.getId()).param("userId", userId.toString())
-                                              .contentType(MediaType.APPLICATION_JSON)
-                                              .content(objectMapper.writeValueAsString(updateTerm)))
-                              .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+                .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(updateTerm)))
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
-        HttpCommandResponse<TermResponse> result = objectMapper.readValue(response,
+        HttpCommandResponse result = objectMapper.readValue(response,
             objectMapper.getTypeFactory().constructParametricType(HttpCommandResponse.class, TermResponse.class));
-
-        assertEquals("newName", result.data().name());
-        assertEquals("#00FF00", result.data().color());
+        TermResponse dataResult = (TermResponse) result.data();
+        assertEquals("newName", dataResult.name());
+        assertEquals("#00FF00", dataResult.color());
 
         CommandV2Entity command = commandRepository.findById(result.command()).orElseThrow();
         assertEquals(userId, command.getUserId());
@@ -179,12 +179,12 @@ class TermControllerTest {
         TermEntity entity = createAndSaveTermEntity("term1", "#FF0000");
 
         String response = mockMvc.perform(delete("/terms/{id}", entity.getId()).param("userId", userId.toString()))
-                              .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
-        HttpCommandResponse<TermResponse> result = objectMapper.readValue(response,
+        HttpCommandResponse result = objectMapper.readValue(response,
             objectMapper.getTypeFactory().constructParametricType(HttpCommandResponse.class, TermResponse.class));
-
-        assertEquals("term1", result.data().name());
+        TermResponse dataResult = (TermResponse) result.data();
+        assertEquals("term1", dataResult.name());
         assertEquals(termRepository.findById(entity.getId()), Optional.of(entity));
 
         CommandV2Entity command = commandRepository.findById(result.command()).orElseThrow();
@@ -200,16 +200,15 @@ class TermControllerTest {
         TermEntity entity = createAndSaveTermEntity("term1", "#FF0000");
 
         String response = mockMvc.perform(get("/terms/project/{id}", projectId).param("userId", userId.toString()))
-                              .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
         SpringPage<TermResponse> page = objectMapper.readValue(response, new TypeReference<>() {
         });
 
         assertEquals(1, page.getTotalElements());
         TermResponse expected =
-            new TermResponse(entity.getId(), "term1", "#FF0000", ontologyId, entity.getCreated(), entity.getUpdated()
-                , Optional.empty(),
-                "", null);
+            new TermResponse(entity.getId(), "term1", "#FF0000", ontologyId, entity.getCreated(), entity.getUpdated(),
+                Optional.empty(), "", null);
         assertEquals(List.of(expected), page.getContent());
     }
 
@@ -219,16 +218,15 @@ class TermControllerTest {
         TermEntity entity = createAndSaveTermEntity("term1", "#FF0000");
 
         String response = mockMvc.perform(get("/terms/ontology/{id}", ontologyId).param("userId", userId.toString()))
-                              .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
         SpringPage<TermResponse> page = objectMapper.readValue(response, new TypeReference<>() {
         });
 
         assertEquals(1, page.getTotalElements());
         TermResponse expected =
-            new TermResponse(entity.getId(), "term1", "#FF0000", ontologyId, entity.getCreated(), entity.getUpdated()
-                , Optional.empty(),
-                "", null);
+            new TermResponse(entity.getId(), "term1", "#FF0000", ontologyId, entity.getCreated(), entity.getUpdated(),
+                Optional.empty(), "", null);
         assertEquals(List.of(expected), page.getContent());
     }
 
@@ -250,7 +248,6 @@ class TermControllerTest {
 
     private TermEntity createAndSaveTermEntity(String name, String color) {
         LocalDateTime now = LocalDateTime.now();
-        return termRepository.saveAndFlush(new TermEntity(null, 0, ontologyId, name, color, now, now, null, "",
-            null));
+        return termRepository.saveAndFlush(new TermEntity(null, 0, ontologyId, name, color, now, now, null, "", null));
     }
 }

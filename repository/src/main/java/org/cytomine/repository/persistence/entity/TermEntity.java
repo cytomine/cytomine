@@ -1,6 +1,6 @@
 package org.cytomine.repository.persistence.entity;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 import jakarta.persistence.Column;
@@ -34,9 +34,11 @@ public class TermEntity {
     @Column
     private String color;
     @Column
-    private Date created;
+    private LocalDateTime created;
     @Column
-    private Date updated;
+    private LocalDateTime updated;
+    @Column
+    private LocalDateTime deleted;
     @Column
     private String comment;
 

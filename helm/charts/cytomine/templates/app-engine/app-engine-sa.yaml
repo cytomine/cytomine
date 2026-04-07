@@ -6,7 +6,7 @@ metadata:
 imagePullSecrets:
   {{- range .Values.images.imagePullSecretsNames }}
   - name: {{ . }}
-    {{- end }}
+  {{- end }}
 
 ---
 apiVersion: v1

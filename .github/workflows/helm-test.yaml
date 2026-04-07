@@ -60,23 +60,15 @@ jobs:
           pod-security.kubernetes.io/enforce-version=latest pod-security.kubernetes.io/warn=restricted
           pod-security.kubernetes.io/warn-version=latest
 
-      - name: Create Harbor Registry secrets and Service Account
+      - name: Create Harbor Registry secrets
         run: |
-          kubectl create secret docker-registry docker-image-pull-secrets \
-            --namespace=cytomine-${{ github.sha }} \
-            --docker-server=registry.cytomine.org \
-            --docker-username=${{ secrets.REGISTRY_USERNAME }} \
-            --docker-password=${{ secrets.REGISTRY_TOKEN }}
-
-          kubectl patch serviceaccount default \
-            --namespace=cytomine-${{ github.sha }} \
-            -p '{"imagePullSecrets":[{"name":"docker-image-pull-secrets"}]}'
-
-          kubectl create secret docker-registry docker-image-pull-secrets \
-            --namespace=cytomine-${{ github.sha }}-engine-tasks \
-            --docker-server=registry.cytomine.org \
-            --docker-username=${{ secrets.REGISTRY_USERNAME }} \
-            --docker-password=${{ secrets.REGISTRY_TOKEN }}
+          for ns in cytomine-${{ github.sha }} cytomine-${{ github.sha }}-engine-tasks; do
+            kubectl create secret docker-registry docker-image-pull-secrets \
+              --namespace=$ns \
+              --docker-server=registry.cytomine.org \
+              --docker-username=${{ secrets.REGISTRY_USERNAME }} \
+              --docker-password=${{ secrets.REGISTRY_TOKEN }}
+          done
 
       - name: Get ingress IP
         run: |
@@ -115,13 +107,12 @@ jobs:
           EXTRA_ARGS+="--set images.postgis=registry.cytomine.org/docker/postgis/postgis:15-3.5 "
           EXTRA_ARGS+="--set images.selenium=registry.cytomine.org/docker/selenium/standalone-firefox "
           EXTRA_ARGS+="--set images.registry=registry.cytomine.org/docker/library/registry:2.8.3 "
-          EXTRA_ARGS+="--set test.e2eTestCount=1"
+          EXTRA_ARGS+="--set test.e2eTestCount=${{ env.E2E_TEST_COUNT }}"
           ct lint-and-install --target-branch ${{ github.event.repository.default_branch }} \
             --chart-dirs=helm/charts/ --all --namespace=cytomine-${{ github.sha }} \
             --release-name=cytomine-${{ github.sha }} \
             --helm-extra-set-args="$EXTRA_ARGS" \
-            --helm-extra-args="--timeout 20m" \
-            --skip-clean-up
+            --helm-extra-args="--timeout 20m"
 
       - name: Logs e2e tests results - e2e-tests pod
         if: always()
@@ -130,18 +121,6 @@ jobs:
       - name: Logs e2e tests results - selenium pod
         if: always()
         run: kubectl --namespace=cytomine-${{ github.sha }} logs e2e-tests -c selenium
-
-      - name: Logs app-engine service
-        if: always()
-        run: kubectl --namespace=cytomine-${{ github.sha }} logs app-engine-0
-
-      - name: Get task pods
-        if: always()
-        run: kubectl --namespace=cytomine-${{ github.sha }}-engine-tasks get pods
-
-      - name: Describe task pods
-        if: always()
-        run: kubectl --namespace=cytomine-${{ github.sha }}-engine-tasks describe pods
 
       - name: Export test results
         if: always()

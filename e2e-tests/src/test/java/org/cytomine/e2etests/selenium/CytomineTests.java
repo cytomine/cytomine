@@ -84,18 +84,18 @@ public class CytomineTests {
         Files.setPosixFilePermissions(destination, Set.of(OTHERS_READ, OWNER_READ, GROUP_READ));
     }
 
-    //@Test
+    @Test
     void login() {
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
     }
 
-    //@Test
+    @Test
     void logout() {
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
         cytomineSteps.logout(wait, cytomineUrl);
     }
 
-    //@Test
+    @Test
     void createAndDeleteProject() {
         String projectName = "selenium-" + randomUUID();
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
@@ -108,7 +108,7 @@ public class CytomineTests {
         cytomineSteps.logout(wait, cytomineUrl);
     }
 
-    //@Test
+    @Test
     void listProjects() {
         Set<String> projectNames =
             Set.of(
@@ -135,7 +135,7 @@ public class CytomineTests {
         cytomineSteps.logout(wait, cytomineUrl);
     }
 
-    //@Test
+    @Test
     void createAndDeleteOntology() {
         String ontologyName = "selenium-" + randomUUID();
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
@@ -144,7 +144,7 @@ public class CytomineTests {
         cytomineSteps.logout(wait, cytomineUrl);
     }
 
-    //@Test
+    @Test
     void addImageToStorageNoProject() {
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
         String imageName = cytomineSteps.addImage(wait, cytomineUrl, Optional.empty());
@@ -152,7 +152,7 @@ public class CytomineTests {
         cytomineSteps.logout(wait, cytomineUrl);
     }
 
-    //@Test
+    @Test
     void addImageToStorageWithProject() {
         String projectName = "selenium-" + randomUUID();
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
@@ -163,7 +163,7 @@ public class CytomineTests {
         cytomineSteps.logout(wait, cytomineUrl);
     }
 
-    //@Test
+    @Test
     void addTermToOntology() {
         String ontologyName = "selenium-ontology-" + randomUUID();
         String termName = "selenium-term-" + randomUUID();
@@ -175,7 +175,7 @@ public class CytomineTests {
         cytomineSteps.logout(wait, cytomineUrl);
     }
 
-    //@Test
+    @Test
     void addAnnotationWithTools() {
         String projectName = "selenium-" + randomUUID();
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
@@ -209,7 +209,7 @@ public class CytomineTests {
         cytomineSteps.logout(wait, cytomineUrl);
     }
 
-    //@Test
+    @Test
     void addAnnotationWithTerm() {
         String projectName = "selenium-" + randomUUID();
         String termName = "selenium-term-" + randomUUID();
@@ -231,7 +231,7 @@ public class CytomineTests {
         cytomineSteps.logout(wait, cytomineUrl);
     }
 
-    //@Test
+    @Test
     void addAnnotationWithSam() {
         String projectName = "selenium-" + randomUUID();
         String termName = "selenium-term-" + randomUUID();
@@ -253,7 +253,7 @@ public class CytomineTests {
         cytomineSteps.logout(wait, cytomineUrl);
     }
 
-    //@Test
+    @Test
     void uploadAndDeleteTask() {
         String zipName = "com.cytomine.dummy.identity.image-1.0.0.zip";
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
@@ -289,7 +289,7 @@ public class CytomineTests {
         cytomineSteps.logout(wait, cytomineUrl);
     }
 
-    //@Test
+    @Test
     void retrieveSimilarAnnotationWithCbir() {
         String projectName = "selenium-" + randomUUID();
         String termName = "selenium-term-" + randomUUID();
@@ -316,7 +316,7 @@ public class CytomineTests {
         cytomineSteps.logout(wait, cytomineUrl);
     }
 
-    //@Test
+    @Test
     void addUserToProject() {
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
         String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, "selenium-" + randomUUID());
@@ -327,7 +327,7 @@ public class CytomineTests {
         cytomineSteps.logout(wait, cytomineUrl);
     }
 
-    //@Test
+    @Test
     void removeUserFromProject() {
         String username = "ImageServer1";
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
@@ -340,7 +340,7 @@ public class CytomineTests {
         cytomineSteps.logout(wait, cytomineUrl);
     }
 
-    //@Test
+    @Test
     void filterProjectByName() {
         int nbProjects = 3;
         String projectNameToSearch = "search-" + randomUUID();

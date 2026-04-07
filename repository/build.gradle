@@ -10,7 +10,7 @@ version = '0.0.1-SNAPSHOT'
 description = 'Repository layer'
 
 java {
-    sourceCompatibility = '17'
+    sourceCompatibility = '21'
 }
 
 checkstyle {

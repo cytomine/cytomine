@@ -54,14 +54,19 @@ jobs:
           pod-security.kubernetes.io/enforce-version=latest pod-security.kubernetes.io/warn=restricted
           pod-security.kubernetes.io/warn-version=latest
 
-      - name: Create Harbor Registry secrets
-        run: kubectl create secret docker-registry docker-image-pull-secrets --namespace=cytomine-${{ github.sha }}
-          --docker-server=registry.cytomine.org --docker-username=${{ secrets.REGISTRY_USERNAME }}
-          --docker-password=${{ secrets.REGISTRY_TOKEN }}
+      - name: Create Harbor Registry secrets and Service Account
+        run: |
+          for ns in cytomine-${{ github.sha }} cytomine-${{ github.sha }}-engine-tasks; do
+            kubectl create secret docker-registry docker-image-pull-secrets \
+              --namespace=$ns \
+              --docker-server=registry.cytomine.org \
+              --docker-username=${{ secrets.REGISTRY_USERNAME }} \
+              --docker-password=${{ secrets.REGISTRY_TOKEN }}
 
-      - name: Create Service Account
-        run: kubectl patch serviceaccount default --namespace=cytomine-${{ github.sha }}
-          -p '{"imagePullSecrets":[{"name":"docker-image-pull-secrets"}]}'
+            kubectl patch serviceaccount default \
+              --namespace=$ns \
+              -p '{"imagePullSecrets":[{"name":"docker-image-pull-secrets"}]}'
+          done
 
       - name: Get ingress IP
         run: |

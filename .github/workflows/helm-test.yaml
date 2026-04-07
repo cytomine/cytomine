@@ -78,10 +78,6 @@ jobs:
             --docker-username=${{ secrets.REGISTRY_USERNAME }} \
             --docker-password=${{ secrets.REGISTRY_TOKEN }}
 
-          kubectl patch serviceaccount app-engine \
-            --namespace=cytomine-${{ github.sha }}-engine-tasks \
-            -p '{"imagePullSecrets":[{"name":"docker-image-pull-secrets"}]}'
-
       - name: Get ingress IP
         run: |
           INGRESS_IP=$(kubectl get svc -n ingress ingress-nginx-controller -o jsonpath='{.spec.clusterIP}')

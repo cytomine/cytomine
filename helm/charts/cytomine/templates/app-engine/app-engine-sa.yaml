@@ -3,6 +3,10 @@ kind: ServiceAccount
 metadata:
   name: app-engine
   namespace: {{ include "cytomine.appEngineTasksNamespace" . }}
+imagePullSecrets:
+  {{- range .Values.images.imagePullSecretsNames }}
+  - name: {{ . }}
+    {{- end }}
 
 ---
 apiVersion: v1
@@ -15,7 +19,6 @@ metadata:
     kubernetes.io/service-account.name: app-engine
 
 ---
-
 apiVersion: v1
 kind: ServiceAccount
 metadata:

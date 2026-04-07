@@ -21,19 +21,18 @@ import be.cytomine.appengine.states.TaskRunState;
 @AllArgsConstructor
 public class PodInformer implements ResourceEventHandler<Pod> {
 
-    private static final Map<String, TaskRunState> STATUS = new HashMap<>() {
-        {
-            put("Running", TaskRunState.RUNNING);
-            put("Succeeded", TaskRunState.RUNNING);
-            put("Failed", TaskRunState.FAILED);
-            put("Unknown", TaskRunState.FAILED);
-        }
-    };
+    private static final Map<String, TaskRunState> STATUS =
+        new HashMap<>() {
+            {
+                put("Running", TaskRunState.RUNNING);
+                put("Succeeded", TaskRunState.FINISHED);
+                put("Failed", TaskRunState.FAILED);
+                put("Unknown", TaskRunState.FAILED);
+            }
+        };
 
-    private static final Set<TaskRunState> FINAL_STATES = Set.of(
-        TaskRunState.FAILED,
-        TaskRunState.FINISHED
-    );
+    private static final Set<TaskRunState> FINAL_STATES =
+        Set.of(TaskRunState.FAILED, TaskRunState.FINISHED);
 
     private final RunRepository runRepository;
 
@@ -61,6 +60,10 @@ public class PodInformer implements ResourceEventHandler<Pod> {
                     return;
                 }
 
+                if (run.getState().equals(TaskRunState.QUEUING)) {
+                    return;
+                }
+
                 run.setState(TaskRunState.PENDING);
                 run = runRepository.saveAndFlush(run);
                 log.info("Pod Informer: set Run {} to {}", run.getId(), run.getState());
@@ -81,7 +84,6 @@ public class PodInformer implements ResourceEventHandler<Pod> {
 
         // This line should never be reached.
         throw new IllegalStateException("Failed to update run after retries");
-
     }
 
     @Override
@@ -102,8 +104,8 @@ public class PodInformer implements ResourceEventHandler<Pod> {
                     return;
                 }
 
-                run.setState(STATUS
-                    .getOrDefault(newPod.getStatus().getPhase(), TaskRunState.FAILED));
+                run.setState(
+                    STATUS.getOrDefault(newPod.getStatus().getPhase(), TaskRunState.FAILED));
                 run = runRepository.saveAndFlush(run);
                 log.info("Pod Informer: update Run {} to {}", run.getId(), run.getState());
                 return;
@@ -123,7 +125,6 @@ public class PodInformer implements ResourceEventHandler<Pod> {
 
         // This line should never be reached.
         throw new IllegalStateException("Failed to update run after retries");
-
     }
 
     @Override

@@ -33,7 +33,7 @@ public class ApplyCommandService {
                     termCommandService.undoCreateTerm(commandEntity.getId(), icr, userId, now);
                 case UpdateTermCommand ucr -> termCommandService.undoUpdateTerm(commandEntity.getId(), ucr, userId);
                 case DeleteTermRelationCommand deleteTermRelationCommand ->
-                    termRelationCommandService.undoDeleteTerm(commandEntity.getId(), deleteTermRelationCommand, userId,
+                    termRelationCommandService.undoDeleteTermRelation(commandEntity.getId(), deleteTermRelationCommand, userId,
                         now);
             });
     }
@@ -44,7 +44,7 @@ public class ApplyCommandService {
             case CreateTermCommand icr -> termCommandService.redoCreateTerm(commandEntity.getId(), icr, userId, now);
             case UpdateTermCommand ucr -> termCommandService.redoUpdateTerm(commandEntity.getId(), ucr, userId, now);
             case DeleteTermRelationCommand ucr ->
-                termRelationCommandService.redoDeleteTerm(commandEntity.getId(), ucr, userId, now);
+                termRelationCommandService.redoDeleteTermRelation(commandEntity.getId(), ucr, userId, now);
         });
     }
 

@@ -30,7 +30,7 @@ public class TermRelationCommandService {
     private final ACLService aclService;
 
     @Transactional
-    public Optional<HttpCommandResponse> deleteTerm(Long id, Long userId, LocalDateTime now) {
+    public Optional<HttpCommandResponse> deleteTermRelation(Long id, Long userId, LocalDateTime now) {
         return termRepository.findById(id)
             .filter(entity -> aclService.canDeleteOntology(userId, entity.getOntologyId()))
             .map(termEntity -> {
@@ -44,26 +44,26 @@ public class TermRelationCommandService {
             });
     }
 
-    public Optional<HttpCommandResponse> undoDeleteTerm(UUID commandId,
-                                                                      DeleteTermRelationCommand deleteTermCommand, Long userId,
-                                                                      LocalDateTime now) {
+    public Optional<HttpCommandResponse> undoDeleteTermRelation(UUID commandId,
+                                                                DeleteTermRelationCommand deleteTermCommand, Long userId,
+                                                                LocalDateTime now) {
         if (!aclService.canWriteOntology(userId, deleteTermCommand.ontologyId())) {
             return Optional.empty();
         }
-        return restoreTerm(commandId, deleteTermCommand.before().id(), Commands.DELETE_TERM_RELATION, now);
+        return restoreTermRelation(commandId, deleteTermCommand.before().id(), Commands.DELETE_TERM_RELATION, now);
     }
 
-    public Optional<HttpCommandResponse> redoDeleteTerm(UUID commandId,
-                                                                      DeleteTermRelationCommand deleteTermCommand, Long userId,
-                                                                      LocalDateTime now) {
+    public Optional<HttpCommandResponse> redoDeleteTermRelation(UUID commandId,
+                                                                DeleteTermRelationCommand deleteTermCommand, Long userId,
+                                                                LocalDateTime now) {
         if (!aclService.canWriteOntology(userId, deleteTermCommand.ontologyId())) {
             return Optional.empty();
         }
-        return softDeleteTerm(commandId, deleteTermCommand.before().id(), Commands.DELETE_TERM_RELATION, now);
+        return softDeleteTermRelation(commandId, deleteTermCommand.before().id(), Commands.DELETE_TERM_RELATION, now);
     }
 
-    private Optional<HttpCommandResponse> restoreTerm(UUID commandId, Long termId, String command,
-                                                                    LocalDateTime now) {
+    private Optional<HttpCommandResponse> restoreTermRelation(UUID commandId, Long termId, String command,
+                                                              LocalDateTime now) {
         return termRepository.findById(termId).map(entity -> {
             entity.setDeleted(null);
             entity.setUpdated(now);
@@ -71,8 +71,8 @@ public class TermRelationCommandService {
         });
     }
 
-    private Optional<HttpCommandResponse> softDeleteTerm(UUID commandId, Long termId, String command,
-                                                                       LocalDateTime now) {
+    private Optional<HttpCommandResponse> softDeleteTermRelation(UUID commandId, Long termId, String command,
+                                                                 LocalDateTime now) {
         return termRepository.findById(termId).map(entity -> {
             entity.setDeleted(now);
             return saveAndBuildResponse(entity, command, commandId);

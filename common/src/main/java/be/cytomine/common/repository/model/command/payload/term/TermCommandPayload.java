@@ -1,4 +1,4 @@
-package be.cytomine.common.repository.model.command;
+package be.cytomine.common.repository.model.command.payload.term;
 
 import java.util.Optional;
 

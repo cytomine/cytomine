@@ -47,7 +47,9 @@ jobs:
             --wait
 
       - name: Create Namespace
-        run: kubectl create ns cytomine-${{ github.sha }}
+        run: |
+          kubectl create ns cytomine-${{ github.sha }}
+          kubectl create ns cytomine-${{ github.sha }}-engine-tasks
 
       - name: Enforce Restricted Namespace
         run: kubectl label --overwrite ns cytomine-${{ github.sha }} pod-security.kubernetes.io/enforce=restricted

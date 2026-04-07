@@ -264,7 +264,6 @@ public class CytomineTests {
         cytomineSteps.logout(wait, cytomineUrl);
     }
 
-    @Test
     void runTask() {
         String zipName = "com.cytomine.dummy.identity.geometry-1.0.0.zip";
         String projectName = "selenium-" + randomUUID();

@@ -1,6 +1,5 @@
 package be.cytomine;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -15,7 +14,6 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import be.cytomine.common.repository.model.CreateTerm;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.annotation.Annotation;
 import be.cytomine.domain.annotation.AnnotationLayer;
@@ -262,10 +260,6 @@ public class BasicInstanceBuilder {
         return term;
     }
 
-    public CreateTerm given_a_not_persisted_create_term(Ontology ontology, String name) {
-        return new CreateTerm(name, "blue", ontology.getId(),  "");
-    }
-
     public ImageFilterProject given_a_image_filter_project(ImageFilter imageFilter,
                                                            Project project) {
         return persistAndReturn(given_a_not_persisted_image_filter_project(imageFilter, project));
@@ -334,21 +328,8 @@ public class BasicInstanceBuilder {
         permissionService.addPermission(project, username, ADMINISTRATION, this.given_superadmin());
     }
 
-    public void addUserToOntology(Ontology ontology, String username, Permission permission) {
-        permissionService.addPermission(ontology, username, permission);
-    }
-
-    public void addUserToOntology(Ontology ontology, String username) {
-        permissionService.addPermission(ontology, username, ADMINISTRATION,
-            this.given_superadmin());
-    }
-
     public void addUserToStorage(Storage storage, String username, Permission permission) {
         permissionService.addPermission(storage, username, permission);
-    }
-
-    public void addUserToStorage(Storage storage, String username) {
-        permissionService.addPermission(storage, username, ADMINISTRATION, this.given_superadmin());
     }
 
     public <T> T persistAndReturn(T instance) {

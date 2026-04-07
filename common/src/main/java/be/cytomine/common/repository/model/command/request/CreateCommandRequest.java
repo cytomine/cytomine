@@ -7,8 +7,8 @@ import be.cytomine.common.repository.model.command.payload.request.UpdateCommand
 
 import static be.cytomine.common.repository.model.command.CommandType.INSERT_COMMAND;
 
-public sealed interface CreateCommandRequest<T> extends CommandV2Request<UpdateCommandPayload<T>>
-    permits CreateTermCommand {
+public sealed interface CreateCommandRequest<T> extends CommandV2Request<T>
+    permits CreateTermCommand, CreateTermRelationCommand {
     @Override
     default CommandType getCommandType() {
         return INSERT_COMMAND;

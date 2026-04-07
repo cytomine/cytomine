@@ -5,8 +5,8 @@ import be.cytomine.common.repository.model.command.payload.request.TermRelationC
 
 import static java.lang.String.format;
 
-public record DeleteTermRelationCommand(Long id, TermRelationCommandPayload before, long userId, long ontologyId)
-    implements DeleteCommandRequest<TermRelationCommandPayload> {
+public record CreateTermRelationCommand(TermRelationCommandPayload after, long userId, long ontologyId)
+    implements CreateCommandRequest<TermRelationCommandPayload> {
 
     @Override
     public DataType getDataType() {
@@ -15,6 +15,6 @@ public record DeleteTermRelationCommand(Long id, TermRelationCommandPayload befo
 
     @Override
     public String getActionMessage() {
-        return format("Term relation %s deleted in ontology %s", before.id(), ontologyId);
+        return format("Term %s (%s) added in ontology %s", after.id(), after.name(), ontologyId);
     }
 }

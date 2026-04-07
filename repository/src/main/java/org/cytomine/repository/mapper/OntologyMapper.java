@@ -14,6 +14,7 @@ import be.cytomine.common.repository.model.command.payload.request.TermRelationC
 import be.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.common.repository.model.term.payload.CreateTerm;
+import be.cytomine.common.repository.model.termrelation.payload.CreateTermRelation;
 
 @Mapper(componentModel = "spring")
 public interface OntologyMapper {
@@ -34,6 +35,8 @@ public interface OntologyMapper {
     @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "updated", source = "creationDate")
     TermEntity map(CreateTerm createTerm, LocalDateTime creationDate);
+
+    TermRelationEntity mapToTermRelationEntity(CreateTermRelation createTerm, LocalDateTime creationDate);
 
     @BeanMapping(ignoreUnmappedSourceProperties = {"version", "children", "deleted"})
     @Mapping(target = "ontology", source = "ontologyId")

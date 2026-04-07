@@ -1,13 +1,13 @@
 package be.cytomine.common.repository.model.command.request;
 
 import be.cytomine.common.repository.model.command.DataType;
-import be.cytomine.common.repository.model.command.payload.request.TermCommandPayload;
+import be.cytomine.common.repository.model.command.payload.request.TermRelationCommandPayload;
 
 import static java.lang.String.format;
 
-public record UpdateTermCommand(Long id, TermCommandPayload before, TermCommandPayload after, long userId,
-                                Long ontologyId)
-    implements UpdateCommandRequest<TermCommandPayload> {
+public record UpdateTermRelationCommand(Long id, TermRelationCommandPayload before, TermRelationCommandPayload after,
+                                        long userId, Long ontologyId)
+    implements UpdateCommandRequest<TermRelationCommandPayload> {
 
     @Override
     public DataType getDataType() {
@@ -17,6 +17,6 @@ public record UpdateTermCommand(Long id, TermCommandPayload before, TermCommandP
     @Override
     public String getActionMessage() {
         return format("Term %s (%s => %s),color (%s => %s) updated in ontology %s", before.id(), before.name(),
-            after.name(), before.color(), after.color(), ontologyId);
+            after.name(), ontologyId);
     }
 }

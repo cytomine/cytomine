@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import be.cytomine.common.repository.http.TermRelationHttpContract;
 import be.cytomine.common.repository.model.command.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
+import be.cytomine.common.repository.model.termrelation.payload.CreateTermRelation;
+import be.cytomine.common.repository.model.termrelation.payload.UpdateTermRelation;
 
 import static be.cytomine.common.repository.http.TermRelationHttpContract.ROOT_PATH;
 
@@ -33,6 +35,16 @@ public class TermRelationController implements TermRelationHttpContract {
         return termRelationRepository.findById(id)
             .filter(termEntity -> aclService.canReadOntology(userId, termEntity.getOntologyId()))
             .map(ontologyMapper::mapToTermRelationResponse);
+    }
+
+    @Override
+    public Optional<HttpCommandResponse> create(long userId, CreateTermRelation createTermRelation) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<HttpCommandResponse> update(long id, long userId, UpdateTermRelation updateTermRelation) {
+        return Optional.empty();
     }
 
     @Override

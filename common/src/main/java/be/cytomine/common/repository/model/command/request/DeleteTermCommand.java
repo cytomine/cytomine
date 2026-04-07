@@ -1,21 +1,12 @@
 package be.cytomine.common.repository.model.command.request;
 
-import java.util.Optional;
-
 import be.cytomine.common.repository.model.command.DataType;
 import be.cytomine.common.repository.model.command.payload.request.TermCommandPayload;
-import be.cytomine.common.repository.model.command.payload.request.UpdateCommandPayload;
 
 import static java.lang.String.format;
 
 public record DeleteTermCommand(Long id, TermCommandPayload before, long userId, long ontologyId)
-    implements DeleteCommandRequest<UpdateCommandPayload<TermCommandPayload>> {
-
-
-    @Override
-    public UpdateCommandPayload<TermCommandPayload> data() {
-        return new UpdateCommandPayload<>(Optional.of(before), Optional.empty());
-    }
+    implements DeleteCommandRequest<TermCommandPayload> {
 
     @Override
     public DataType getDataType() {

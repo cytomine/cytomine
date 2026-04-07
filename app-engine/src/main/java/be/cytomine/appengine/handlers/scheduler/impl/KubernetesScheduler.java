@@ -87,7 +87,7 @@ public class KubernetesScheduler implements SchedulerHandler {
     @Value("${scheduler.tasks-namespace}")
     private String tasksNamespace;
 
-    @Value("${schedulder.tasks-runner-image")
+    @Value("${scheduler.tasks-runner-image")
     private String taskRunnerImage;
     private String baseInputPath;
 

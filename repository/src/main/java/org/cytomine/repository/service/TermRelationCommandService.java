@@ -16,14 +16,13 @@ import org.cytomine.repository.persistence.entity.TermEntity;
 import org.cytomine.repository.persistence.entity.TermRelationEntity;
 import org.springframework.stereotype.Component;
 
-import be.cytomine.common.repository.model.command.Callback;
 import be.cytomine.common.repository.model.command.Commands;
 import be.cytomine.common.repository.model.command.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.request.TermCommandPayload;
 import be.cytomine.common.repository.model.command.payload.request.TermRelationCommandPayload;
 import be.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
-import be.cytomine.common.repository.model.command.request.CreateTermCommand;
+import be.cytomine.common.repository.model.command.request.CreateTermRelationCommand;
 import be.cytomine.common.repository.model.command.request.DeleteTermRelationCommand;
 import be.cytomine.common.repository.model.command.request.UpdateTermCommand;
 import be.cytomine.common.repository.model.termrelation.payload.CreateTermRelation;
@@ -42,10 +41,10 @@ public class TermRelationCommandService {
     @Transactional
     public Optional<HttpCommandResponse> deleteTermRelation(Long id, Long userId, LocalDateTime now) {
         return termRelationRepository.findById(id)
-            .filter(entity -> aclService.canDeleteOntology(userId, entity.getOntologyId())).map(termEntity -> {
+            .filter(entity -> aclService.canDeleteOntology(userId, entity.getTerm1IdOntologyId())).map(termEntity -> {
                 DeleteTermRelationCommand deleteCommand =
                     new DeleteTermRelationCommand(id, ontologyMapper.mapToTermRelationCommandPayload(termEntity),
-                        userId, termEntity.getOntologyId());
+                        userId, termEntity.getTerm1IdOntologyId());
                 CommandV2Entity commandV2Entity =
                     commandV2Repository.save(commandMapper.map(deleteCommand, now, now, userId));
                 termEntity.setDeleted(now);
@@ -53,35 +52,37 @@ public class TermRelationCommandService {
             });
     }
 
-    public Optional<HttpCommandResponse> createTermRelation(Long userId, CreateTermRelation createTerm, LocalDateTime now) {
-        return termRepository.findById(createTerm.term1Id())
-            .filter(entity -> aclService.canWriteOntology(userId, entity.getOntologyId()))
-            .filter(entity -> aclService.canWriteOntology(userId, entity.getTerm2IdOntologyId()))
+    public Optional<HttpCommandResponse> createTermRelation(Long userId, CreateTermRelation createTermRelation,
+                                                            LocalDateTime now) {
+        return termRepository.findById(createTermRelation.term1Id())
+            .filter(firstTerm -> aclService.canWriteOntology(userId, firstTerm.getOntologyId()))
+            // check that the second term is in the same ontology
+            .filter(firstTerm -> termRepository.findById(createTermRelation.term2Id())
+                .map(secondTerm -> secondTerm.getOntologyId().equals(firstTerm.getOntologyId())).orElse(false)
 
-            .map(termEntity -> {
+            ).map(firstTerm -> {
 
-                TermRelationEntity termEntity = ontologyMapper.mapToTermRelationEntity(createTerm, now);
+                TermRelationEntity termEntity = ontologyMapper.mapToTermRelationEntity(createTermRelation, now);
                 TermRelationEntity savedEntity = termRelationRepository.save(termEntity);
                 TermRelationCommandPayload termCommandPayload =
                     ontologyMapper.mapToTermRelationCommandPayload(savedEntity);
-                CreateTermCommand insertTermCommand =
-                    new CreateTermCommand(termCommandPayload, userId, termCommandPayload.ontologyId());
+                CreateTermRelationCommand insertTermCommand =
+                    new CreateTermRelationCommand(termCommandPayload, userId, termCommandPayload.ontologyId());
 
                 CommandV2Entity commandV2Entity =
                     commandV2Repository.save(commandMapper.map(insertTermCommand, now, now, userId));
 
-                TermResponse termResponse = ontologyMapper.map(savedEntity);
-                Callback callback = new Callback(Commands.CREATE_TERM, Optional.of(savedEntity.getId()),
-                    Optional.of(savedEntity.getOntologyId()), Optional.empty());
-                return Optional.of(new HttpCommandResponse(callback, true, termResponse, commandV2Entity.getId()));
-            }):
+                TermRelationResponse termResponse = ontologyMapper.mapToTermRelationResponse(savedEntity);
+
+                return new HttpCommandResponse(true, termResponse, commandV2Entity.getId());
+            });
     }
 
     @Transactional
     public Optional<HttpCommandResponse> updateTerm(long id, Long userId, UpdateTermRelation updateTerm,
                                                     LocalDateTime now) {
-        return termRelationRepository.findById(id).filter(entity -> aclService.canWriteOntology(userId, entity.getOntologyId()))
-            .map(termEntity -> {
+        return termRelationRepository.findById(id)
+            .filter(entity -> aclService.canWriteOntology(userId, entity.getTerm1IdOntologyId())).map(termEntity -> {
                 TermCommandPayload beforePayload = ontologyMapper.mapToTermCommandPayload(termEntity);
                 updateTerm.name().ifPresent(termEntity::setName);
                 updateTerm.color().ifPresent(termEntity::setColor);
@@ -94,9 +95,7 @@ public class TermRelationCommandService {
                     commandV2Repository.save(commandMapper.map(updateCommand, now, now, userId));
 
                 TermResponse termResponse = ontologyMapper.map(savedEntity);
-                Callback callback = new Callback(Commands.UPDATE_TERM, Optional.of(savedEntity.getId()),
-                    Optional.of(savedEntity.getOntologyId()), Optional.empty());
-                return new HttpCommandResponse(callback, true, termResponse, commandV2Entity.getId());
+                return new HttpCommandResponse(true, termResponse, commandV2Entity.getId());
             });
     }
 
@@ -139,9 +138,7 @@ public class TermRelationCommandService {
     private HttpCommandResponse saveAndBuildResponse(TermRelationEntity entity, String command, UUID commandId) {
         TermRelationEntity saved = termRelationRepository.save(entity);
         TermRelationResponse response = ontologyMapper.mapToTermRelationResponse(saved);
-        Callback callback =
-            new Callback(command, Optional.of(saved.getId()), Optional.of(saved.getOntologyId()), Optional.empty());
-        return new HttpCommandResponse(callback, true, response, commandId);
+        return new HttpCommandResponse(true, response, commandId);
     }
 
 }

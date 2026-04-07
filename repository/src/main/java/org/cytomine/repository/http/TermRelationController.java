@@ -33,7 +33,7 @@ public class TermRelationController implements TermRelationHttpContract {
     @GetMapping("/{id}")
     public Optional<TermRelationResponse> findTermByID(long id, long userId) {
         return termRelationRepository.findById(id)
-            .filter(termEntity -> aclService.canReadOntology(userId, termEntity.getOntologyId()))
+            .filter(termEntity -> aclService.canReadOntology(userId, termEntity.getTerm1IdOntologyId()))
             .map(ontologyMapper::mapToTermRelationResponse);
     }
 

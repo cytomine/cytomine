@@ -63,10 +63,11 @@ jobs:
       - name: Create Harbor Registry secrets and Service Account
         run: |
           kubectl create secret docker-registry docker-image-pull-secrets \
-            --namespace=cytomine-${{ github.sha }}
+            --namespace=cytomine-${{ github.sha }} \
             --docker-server=registry.cytomine.org \
             --docker-username=${{ secrets.REGISTRY_USERNAME }} \
             --docker-password=${{ secrets.REGISTRY_TOKEN }}
+
           kubectl patch serviceaccount default \
             --namespace=cytomine-${{ github.sha }} \
             -p '{"imagePullSecrets":[{"name":"docker-image-pull-secrets"}]}'

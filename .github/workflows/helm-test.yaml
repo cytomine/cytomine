@@ -62,17 +62,24 @@ jobs:
 
       - name: Create Harbor Registry secrets and Service Account
         run: |
-          for ns in cytomine-${{ github.sha }} cytomine-${{ github.sha }}-engine-tasks; do
-            kubectl create secret docker-registry docker-image-pull-secrets \
-              --namespace=$ns \
-              --docker-server=registry.cytomine.org \
-              --docker-username=${{ secrets.REGISTRY_USERNAME }} \
-              --docker-password=${{ secrets.REGISTRY_TOKEN }}
+          kubectl create secret docker-registry docker-image-pull-secrets \
+            --namespace=cytomine-${{ github.sha }}
+            --docker-server=registry.cytomine.org \
+            --docker-username=${{ secrets.REGISTRY_USERNAME }} \
+            --docker-password=${{ secrets.REGISTRY_TOKEN }}
+          kubectl patch serviceaccount default \
+            --namespace=cytomine-${{ github.sha }} \
+            -p '{"imagePullSecrets":[{"name":"docker-image-pull-secrets"}]}'
 
-            kubectl patch serviceaccount default \
-              --namespace=$ns \
-              -p '{"imagePullSecrets":[{"name":"docker-image-pull-secrets"}]}'
-          done
+          kubectl create secret docker-registry docker-image-pull-secrets \
+            --namespace=cytomine-${{ github.sha }}-engine-tasks \
+            --docker-server=registry.cytomine.org \
+            --docker-username=${{ secrets.REGISTRY_USERNAME }} \
+            --docker-password=${{ secrets.REGISTRY_TOKEN }}
+
+          kubectl patch serviceaccount app-engine \
+            --namespace=cytomine-${{ github.sha }}-engine-tasks \
+            -p '{"imagePullSecrets":[{"name":"docker-image-pull-secrets"}]}'
 
       - name: Get ingress IP
         run: |

@@ -114,13 +114,13 @@ jobs:
         if: always()
         run: kubectl --namespace=cytomine-${{ github.sha }} logs e2e-tests -c selenium
 
-      - name: Get pods
-        if: always()
-        run: kubectl --namespace=cytomine-${{ github.sha }} get pods
-
       - name: Logs app-engine service
         if: always()
         run: kubectl --namespace=cytomine-${{ github.sha }} logs app-engine-0
+
+      - name: Get task pods
+        if: always()
+        run: kubectl --namespace=cytomine-${{ github.sha }}-engine-tasks get pods
 
       - name: Export test results
         if: always()

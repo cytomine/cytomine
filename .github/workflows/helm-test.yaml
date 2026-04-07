@@ -103,7 +103,8 @@ jobs:
           ct lint-and-install --target-branch ${{ github.event.repository.default_branch }} \
             --chart-dirs=helm/charts/ --all --namespace=cytomine-${{ github.sha }} \
             --helm-extra-set-args="$EXTRA_ARGS" \
-            --helm-extra-args="--timeout 20m"
+            --helm-extra-args="--timeout 20m" \
+            --skip-clean-up
 
       - name: Logs e2e tests results - e2e-tests pod
         if: always()

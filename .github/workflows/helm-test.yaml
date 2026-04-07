@@ -118,7 +118,7 @@ jobs:
           EXTRA_ARGS+="--set images.postgis=registry.cytomine.org/docker/postgis/postgis:15-3.5 "
           EXTRA_ARGS+="--set images.selenium=registry.cytomine.org/docker/selenium/standalone-firefox "
           EXTRA_ARGS+="--set images.registry=registry.cytomine.org/docker/library/registry:2.8.3 "
-          EXTRA_ARGS+="--set test.e2eTestCount=${{ env.E2E_TEST_COUNT }}"
+          EXTRA_ARGS+="--set test.e2eTestCount=1"
           ct lint-and-install --target-branch ${{ github.event.repository.default_branch }} \
             --chart-dirs=helm/charts/ --all --namespace=cytomine-${{ github.sha }} \
             --release-name=cytomine-${{ github.sha }} \

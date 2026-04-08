@@ -6,7 +6,7 @@ import org.cytomine.repository.persistence.entity.CommandV2Entity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import be.cytomine.common.repository.model.command.CommandResponse;
+import be.cytomine.common.repository.model.command.payload.response.CommandV2Response;
 import be.cytomine.common.repository.model.command.request.CommandV2Request;
 
 @Mapper(componentModel = "spring")
@@ -17,7 +17,7 @@ public interface CommandMapper {
     CommandV2Entity map(CommandV2Request<?> commandV2Request, LocalDateTime created, LocalDateTime updated,
                         long userId);
 
-    default CommandResponse<?> map(CommandV2Entity commandV2Entity) {
-        return new CommandResponse<>(commandV2Entity.getId(), commandV2Entity.getData());
+    default CommandV2Response<?> map(CommandV2Entity commandV2Entity) {
+        return new CommandV2Response<>(commandV2Entity.getId(), commandV2Entity.getData());
     }
 }

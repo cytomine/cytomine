@@ -4,38 +4,34 @@
       <p class="panel-heading">{{ $t('app-dashboard') }}</p>
 
       <section class="panel-block">
-        <b-table :data="data" :current.sync="currentPage" :paginated="true" :per-page="perPage">
+        <b-table :data="taskRuns" :current.sync="currentPage" :paginated="true" :per-page="perPage">
           <template #default="{ row: run }">
             <b-table-column :label="$t('app-name')">
-              <router-link :to="`/apps/${run.namespace}/${run.version}`">
-                {{ run.name }}
+              <router-link :to="`/apps/${run.task.namespace}/${run.task.version}`">
+                {{ run.task.name }} ({{ run.task.version }})
               </router-link>
             </b-table-column>
 
-            <b-table-column :label="$t('launched-by')">
-              {{ run.user }}
-            </b-table-column>
-
             <b-table-column :label="$t('execution-date')">
-              {{ run.date }}
+              {{ formatDate(run.created_at) }}
             </b-table-column>
 
             <b-table-column :label="$t('status')" centered>
-              <span class="tag" :class="statusClass(run.status)">
-                {{ run.status }}
+              <span class="tag" :class="stateClass(run.state)">
+                {{ run.state }}
               </span>
             </b-table-column>
 
             <b-table-column :label="$t('actions')" centered>
               <div class="buttons is-centered">
                 <template
-                  v-if="['created', 'provisioned', 'queuing', 'queued', 'running', 'pending'].includes(run.status.toLowerCase())">
+                  v-if="['created', 'provisioned', 'queuing', 'queued', 'running', 'pending'].includes(run.state.toLowerCase())">
                   <button class="button is-small is-danger is-light" @click="handleCancel(run)">
                     {{ $t('button-cancel') }}
                   </button>
                 </template>
 
-                <template v-else-if="['finished', 'failed'].includes(run.status.toLowerCase())">
+                <template v-else-if="['finished', 'failed'].includes(run.state.toLowerCase())">
                   <button class="button is-small is-info is-light" @click="handleViewLogs(run)">
                     {{ $t('view-logs') }}
                   </button>
@@ -53,26 +49,47 @@
 </template>
 
 <script>
+import Task from '@/utils/appengine/task';
+import TaskRun from '@/utils/appengine/task-run';
+import {get} from '@/utils/store-helpers';
+
 export default {
   name: 'AppDashboardPage',
   data() {
     return {
+      taskRuns: [],
       currentPage: 1,
       perPage: 10,
-      data: [
-        {id: 1, name: 'Stardist (1.0.0)', user: 'John Doe', date: '2016-10-15 13:43:27', status: 'Finished'},
-        {id: 12, name: 'Stardist (1.0.0)', user: 'John Doe', date: '2016-10-15 13:43:28', status: 'Failed'},
-        {id: 3, name: 'Stardist (1.0.0)', user: 'John Doe', date: '2016-10-15 13:43:29', status: 'Running'},
-        {id: 4, name: 'Stardist (1.0.0)', user: 'John Doe', date: '2016-10-15 13:43:30', status: 'Pending'},
-        {id: 5, name: 'Stardist (1.0.0)', user: 'John Doe', date: '2016-10-15 13:43:31', status: 'Queuing'},
-        {id: 6, name: 'Stardist (1.0.0)', user: 'John Doe', date: '2016-10-15 13:43:32', status: 'Queued'},
-        {id: 7, name: 'Stardist (1.0.0)', user: 'John Doe', date: '2016-10-15 13:43:33', status: 'Created'},
-        {id: 8, name: 'Stardist (1.0.0)', user: 'John Doe', date: '2016-10-15 13:43:34', status: 'Provisioned'},
-      ],
     };
   },
+  computed: {
+    currentProject: get('currentProject/project'),
+  },
   methods: {
-    statusClass(status) {
+    async fetchTaskRuns() {
+      let taskRuns = await TaskRun.fetchByProject(this.currentProject.id);
+      taskRuns.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+      this.taskRuns = await Promise.all(
+        taskRuns.map(async ({project, taskRunId}) => {
+          let taskRun = await Task.fetchTaskRunStatus(this.currentProject.id, taskRunId);
+          return new TaskRun({...taskRun, project});
+        })
+      );
+    },
+    formatDate(date) {
+      return new Intl.DateTimeFormat(
+        undefined,
+        {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+        }
+      ).format(new Date(date));
+    },
+    stateClass(state) {
       const map = {
         created: 'is-light',
         provisioned: 'is-info is-light',
@@ -83,7 +100,7 @@ export default {
         failed: 'is-danger',
         finished: 'is-success',
       };
-      return map[status.toLowerCase()] ?? 'is-light';
+      return map[state.toLowerCase()] ?? 'is-light';
     },
     handleCancel(run) {
       this.$buefy.dialog.confirm({
@@ -106,6 +123,9 @@ export default {
         onConfirm: () => {},
       });
     },
+  },
+  async created() {
+    await this.fetchTaskRuns();
   },
 };
 </script>

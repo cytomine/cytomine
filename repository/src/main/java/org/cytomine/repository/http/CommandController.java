@@ -18,8 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import be.cytomine.common.repository.http.CommandHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.CommandV2Response;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import be.cytomine.common.repository.model.command.CommandResponse;
-import be.cytomine.common.repository.model.command.HttpCommandResponse;
 
 import static be.cytomine.common.repository.http.CommandHttpContract.ROOT_PATH;
 

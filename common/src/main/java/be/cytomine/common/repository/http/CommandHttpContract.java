@@ -11,8 +11,6 @@ import org.springframework.web.service.annotation.PostExchange;
 
 import be.cytomine.common.repository.model.command.payload.response.CommandV2Response;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import be.cytomine.common.repository.model.command.CommandResponse;
-import be.cytomine.common.repository.model.command.HttpCommandResponse;
 
 import static be.cytomine.common.repository.http.TermHttpContract.ROOT_PATH;
 

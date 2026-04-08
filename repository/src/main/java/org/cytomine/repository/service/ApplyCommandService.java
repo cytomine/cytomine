@@ -11,9 +11,11 @@ import org.springframework.stereotype.Component;
 
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.request.CreateTermCommand;
+import be.cytomine.common.repository.model.command.request.CreateTermRelationCommand;
 import be.cytomine.common.repository.model.command.request.DeleteTermCommand;
 import be.cytomine.common.repository.model.command.request.DeleteTermRelationCommand;
 import be.cytomine.common.repository.model.command.request.UpdateTermCommand;
+import be.cytomine.common.repository.model.command.request.UpdateTermRelationCommand;
 
 @Component
 @AllArgsConstructor
@@ -26,7 +28,6 @@ public class ApplyCommandService {
     @Transactional
     public Optional<HttpCommandResponse> undoCommand(long userId, UUID undoCommand, LocalDateTime now) {
         return commandRepository.findById(undoCommand)
-
                    .flatMap(commandEntity -> switch (commandEntity.getData()) {
                        case DeleteTermCommand dtc ->
                            termCommandService.undoDeleteTerm(commandEntity.getId(), dtc, userId, now);
@@ -37,6 +38,8 @@ public class ApplyCommandService {
                        case DeleteTermRelationCommand deleteTermRelationCommand ->
                            termRelationCommandService.undoDeleteTermRelation(commandEntity.getId(), deleteTermRelationCommand, userId,
                                now);
+                       case CreateTermRelationCommand createTermRelationCommand -> null;
+                       case UpdateTermRelationCommand updateTermRelationCommand -> null;
                    });
     }
 
@@ -51,6 +54,8 @@ public class ApplyCommandService {
                            termCommandService.redoUpdateTerm(commandEntity.getId(), ucr, userId, now);
                        case DeleteTermRelationCommand ucr ->
                            termRelationCommandService.redoDeleteTermRelation(commandEntity.getId(), ucr, userId, now);
+                       case CreateTermRelationCommand createTermRelationCommand -> null;
+                       case UpdateTermRelationCommand updateTermRelationCommand -> null;
                    });
     }
 

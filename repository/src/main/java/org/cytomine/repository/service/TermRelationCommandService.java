@@ -17,9 +17,9 @@ import org.cytomine.repository.persistence.entity.TermRelationEntity;
 import org.springframework.stereotype.Component;
 
 import be.cytomine.common.repository.model.command.Commands;
-import be.cytomine.common.repository.model.command.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.request.TermCommandPayload;
 import be.cytomine.common.repository.model.command.payload.request.TermRelationCommandPayload;
+import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.common.repository.model.command.request.CreateTermRelationCommand;
@@ -62,7 +62,7 @@ public class TermRelationCommandService {
 
             ).map(firstTerm -> {
 
-                TermRelationEntity termEntity = ontologyMapper.mapToTermRelationEntity(createTermRelation, now);
+                TermRelationEntity termEntity = ontologyMapper.mapToTermRelationEntity(createTermRelation, now, -1);
                 TermRelationEntity savedEntity = termRelationRepository.save(termEntity);
                 TermRelationCommandPayload termCommandPayload =
                     ontologyMapper.mapToTermRelationCommandPayload(savedEntity);

@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:common/src/main/java/be/cytomine/common/repository/model/command/payload/response/TermResponse.java
 package be.cytomine.common.repository.model.command.payload.response;
-========
-package be.cytomine.common.repository.model.term.payload;
->>>>>>>> origin/main:common/src/main/java/be/cytomine/common/repository/model/term/payload/TermResponse.java
 
 import java.time.LocalDateTime;
 import java.util.Optional;

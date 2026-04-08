@@ -13,8 +13,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import be.cytomine.common.repository.model.command.HttpCommandResponse;
+import be.cytomine.common.repository.model.command.Commands;
 import be.cytomine.common.repository.model.command.payload.request.TermCommandPayload;
+import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.request.CreateTermCommand;
 import be.cytomine.common.repository.model.command.request.DeleteTermCommand;
 import be.cytomine.common.repository.model.command.request.UpdateTermCommand;
@@ -128,6 +129,6 @@ class ApplyCommandServiceTest {
     }
 
     private HttpCommandResponse mockResponse() {
-        return new HttpCommandResponse(true, null, UUID.randomUUID());
+        return new HttpCommandResponse(true, null, UUID.randomUUID(), Commands.CREATE_TERM);
     }
 }

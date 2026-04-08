@@ -9,7 +9,7 @@ import lombok.AllArgsConstructor;
 import org.cytomine.repository.persistence.CommandV2Repository;
 import org.springframework.stereotype.Component;
 
-import be.cytomine.common.repository.model.command.HttpCommandResponse;
+import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.request.CreateTermCommand;
 import be.cytomine.common.repository.model.command.request.DeleteTermCommand;
 import be.cytomine.common.repository.model.command.request.UpdateTermCommand;

@@ -40,7 +40,8 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.http.TermHttpContract;
-import be.cytomine.common.repository.model.command.HttpCommandResponse;
+import be.cytomine.common.repository.model.command.Commands;
+import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.ontology.Term;
@@ -179,7 +180,7 @@ public class TermResourceTests {
             new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
                 LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()),
                 LocalDateTime.ofInstant(term.getUpdated().toInstant(), ZoneId.systemDefault()), Optional.empty(),
-                term.getComment(), Set.of()), commandId)));
+                term.getComment(), Set.of()), commandId, Commands.CREATE_TERM)));
 
         String createTermJson =
             JsonObject.of("name", term.getName(), "color", term.getColor(), "ontology", term.getOntology().getId())
@@ -188,7 +189,6 @@ public class TermResourceTests {
         restTermControllerMockMvc.perform(
                 post("/api/term.json").contentType(MediaType.APPLICATION_JSON).content(createTermJson))
             .andExpect(status().isOk()).andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.callback").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.AddTermCommand"))
             .andExpect(jsonPath("$.data.id").value(term.getId()))
             .andExpect(jsonPath("$.data.name").value(term.getName()));
@@ -221,14 +221,13 @@ public class TermResourceTests {
                 new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
                     LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()),
                     LocalDateTime.ofInstant(term.getUpdated().toInstant(), ZoneId.systemDefault()), Optional.empty(),
-                    term.getComment(), Set.of()), commandId)));
+                    term.getComment(), Set.of()), commandId, Commands.CREATE_TERM)));
 
         String updateTermJson = JsonObject.of("name", term.getName(), "color", term.getColor()).toJsonString();
 
         restTermControllerMockMvc.perform(
                 put("/api/term/{id}.json", term.getId()).contentType(MediaType.APPLICATION_JSON).content(updateTermJson))
             .andExpect(status().isOk()).andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.callback").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditTermCommand"))
             .andExpect(jsonPath("$.data.id").value(term.getId()))
             .andExpect(jsonPath("$.data.name").value(term.getName()));
@@ -258,10 +257,10 @@ public class TermResourceTests {
             new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
                 LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()),
                 LocalDateTime.ofInstant(term.getUpdated().toInstant(), ZoneId.systemDefault()), Optional.empty(),
-                term.getComment(), Set.of()), commandId)));
+                term.getComment(), Set.of()), commandId, Commands.CREATE_TERM)));
 
         restTermControllerMockMvc.perform(delete("/api/term/{id}.json", term.getId())).andExpect(status().isOk())
-            .andExpect(jsonPath("$.printMessage").value(true)).andExpect(jsonPath("$.callback").exists())
+            .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteTermCommand"))
             .andExpect(jsonPath("$.data.id").value(term.getId()))
             .andExpect(jsonPath("$.data.name").value(term.getName()));

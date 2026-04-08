@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import be.cytomine.common.repository.http.CommandHttpContract;
-import be.cytomine.common.repository.model.command.CommandResponse;
-import be.cytomine.common.repository.model.command.HttpCommandResponse;
+import be.cytomine.common.repository.model.command.payload.response.CommandV2Response;
+import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 
 import static be.cytomine.common.repository.http.CommandHttpContract.ROOT_PATH;
 
@@ -46,7 +46,7 @@ public class CommandController implements CommandHttpContract {
 
     @Override
     @GetMapping("/{commandId}")
-    public Optional<CommandResponse<?>> get(@PathVariable UUID commandId, @RequestParam long userId) {
+    public Optional<CommandV2Response<?>> get(@PathVariable UUID commandId, @RequestParam long userId) {
         return commandV2Repository.findById(commandId).map(commandMapper::map);
     }
 }

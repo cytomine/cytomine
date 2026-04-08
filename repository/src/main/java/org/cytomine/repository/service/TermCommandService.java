@@ -15,8 +15,8 @@ import org.cytomine.repository.persistence.entity.TermEntity;
 import org.springframework.stereotype.Component;
 
 import be.cytomine.common.repository.model.command.Commands;
-import be.cytomine.common.repository.model.command.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.request.TermCommandPayload;
+import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.common.repository.model.command.request.CreateTermCommand;
 import be.cytomine.common.repository.model.command.request.DeleteTermCommand;
@@ -63,7 +63,7 @@ public class TermCommandService {
             commandV2Repository.save(commandMapper.map(insertTermCommand, now, now, userId));
 
         TermResponse termResponse = ontologyMapper.map(savedEntity);
-        return Optional.of(new HttpCommandResponse(true, termResponse, commandV2Entity.getId()));
+        return Optional.of(new HttpCommandResponse(true, termResponse, commandV2Entity.getId(), Commands.CREATE_TERM));
     }
 
     @Transactional
@@ -83,7 +83,7 @@ public class TermCommandService {
 
                 TermResponse termResponse = ontologyMapper.map(savedEntity);
 
-                return new HttpCommandResponse(true, termResponse, commandV2Entity.getId());
+                return new HttpCommandResponse(true, termResponse, commandV2Entity.getId(), Commands.UPDATE_TERM);
             });
     }
 
@@ -108,7 +108,7 @@ public class TermCommandService {
         if (!aclService.canWriteOntology(userId, createTermCommand.ontologyId())) {
             return Optional.empty();
         }
-        return softDeleteTerm(commandId, createTermCommand.after().id(), Commands.UPDATE_TERM, now);
+        return softDeleteTerm(commandId, createTermCommand.after().id(), Commands.CREATE_TERM, now);
     }
 
     public Optional<HttpCommandResponse> redoDeleteTerm(UUID commandId, DeleteTermCommand deleteTermCommand,
@@ -140,7 +140,7 @@ public class TermCommandService {
         return termRepository.findById(updateTermCommand.after().id()).map(entity -> {
             entity.setColor(updateTermCommand.before().color());
             entity.setName(updateTermCommand.before().name());
-            return saveAndBuildResponse(entity, Commands.CREATE_TERM, commandId);
+            return saveAndBuildResponse(entity, Commands.UPDATE_TERM, commandId);
         });
     }
 
@@ -163,6 +163,6 @@ public class TermCommandService {
     private HttpCommandResponse saveAndBuildResponse(TermEntity entity, String command, UUID commandId) {
         TermEntity saved = termRepository.save(entity);
         TermResponse response = ontologyMapper.map(saved);
-        return new HttpCommandResponse(true, response, commandId);
+        return new HttpCommandResponse(true, response, commandId, command);
     }
 }

@@ -77,7 +77,7 @@ public class TermResourceTests {
 
     @Test
     @Transactional
-    public void get_a_term() throws Exception {
+    public void getATerm() throws Exception {
         Term term = builder.given_a_term();
         Long userId = builder.given_superadmin().getId();
         when(termHttpContract.findTermByID(eq(term.getId()), eq(userId))).thenReturn(Optional.of(
@@ -189,7 +189,7 @@ public class TermResourceTests {
         restTermControllerMockMvc.perform(
                 post("/api/term.json").contentType(MediaType.APPLICATION_JSON).content(createTermJson))
             .andExpect(status().isOk()).andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.callback.method").value("be.cytomine.AddTermCommand"))
+            .andExpect(jsonPath("$.command").value("be.cytomine.AddTermCommand"))
             .andExpect(jsonPath("$.data.id").value(term.getId()))
             .andExpect(jsonPath("$.data.name").value(term.getName()));
     }
@@ -221,14 +221,14 @@ public class TermResourceTests {
                 new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
                     LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()),
                     LocalDateTime.ofInstant(term.getUpdated().toInstant(), ZoneId.systemDefault()), Optional.empty(),
-                    term.getComment(), Set.of()), commandId, Commands.CREATE_TERM)));
+                    term.getComment(), Set.of()), commandId, Commands.UPDATE_TERM)));
 
         String updateTermJson = JsonObject.of("name", term.getName(), "color", term.getColor()).toJsonString();
 
         restTermControllerMockMvc.perform(
                 put("/api/term/{id}.json", term.getId()).contentType(MediaType.APPLICATION_JSON).content(updateTermJson))
             .andExpect(status().isOk()).andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditTermCommand"))
+            .andExpect(jsonPath("$.command").value("be.cytomine.EditTermCommand"))
             .andExpect(jsonPath("$.data.id").value(term.getId()))
             .andExpect(jsonPath("$.data.name").value(term.getName()));
     }
@@ -257,11 +257,11 @@ public class TermResourceTests {
             new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
                 LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()),
                 LocalDateTime.ofInstant(term.getUpdated().toInstant(), ZoneId.systemDefault()), Optional.empty(),
-                term.getComment(), Set.of()), commandId, Commands.CREATE_TERM)));
+                term.getComment(), Set.of()), commandId, Commands.DELETE_TERM)));
 
         restTermControllerMockMvc.perform(delete("/api/term/{id}.json", term.getId())).andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteTermCommand"))
+            .andExpect(jsonPath("$.command").value("be.cytomine.DeleteTermCommand"))
             .andExpect(jsonPath("$.data.id").value(term.getId()))
             .andExpect(jsonPath("$.data.name").value(term.getName()));
     }

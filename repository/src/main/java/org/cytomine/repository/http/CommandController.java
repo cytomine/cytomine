@@ -16,9 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import be.cytomine.common.repository.http.CommandHttpContract;
-import be.cytomine.common.repository.model.command.CommandResponse;
-import be.cytomine.common.repository.model.command.HttpCommandResponse;
-import be.cytomine.common.repository.model.term.payload.TermResponse;
+import be.cytomine.common.repository.model.command.payload.response.CommandV2Response;
+import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 
 import static be.cytomine.common.repository.http.CommandHttpContract.ROOT_PATH;
 
@@ -33,21 +32,19 @@ public class CommandController implements CommandHttpContract {
 
     @Override
     @PostMapping("/undo/{commandId}")
-    public Optional<HttpCommandResponse<TermResponse>> undo(UUID commandId, long userId) {
-        LocalDateTime now = LocalDateTime.now();
-        return applyCommandService.undoCommand(userId, commandId, now);
+    public Optional<HttpCommandResponse> undo(UUID commandId, long userId) {
+        return applyCommandService.undoCommand(userId, commandId, LocalDateTime.now());
     }
 
     @Override
     @PostMapping("/redo/{commandId}")
-    public Optional<HttpCommandResponse<TermResponse>> redo(UUID commandId, long userId) {
-        LocalDateTime now = LocalDateTime.now();
-        return applyCommandService.redoCommand(userId, commandId, now);
+    public Optional<HttpCommandResponse> redo(UUID commandId, long userId) {
+        return applyCommandService.redoCommand(userId, commandId, LocalDateTime.now());
     }
 
     @Override
     @GetMapping("/{commandId}")
-    public Optional<CommandResponse<?>> get(@PathVariable UUID commandId, @RequestParam long userId) {
+    public Optional<CommandV2Response<?>> get(@PathVariable UUID commandId, @RequestParam long userId) {
         return commandV2Repository.findById(commandId).map(commandMapper::map);
     }
 }

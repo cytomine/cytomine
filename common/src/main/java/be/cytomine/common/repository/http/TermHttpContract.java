@@ -14,9 +14,9 @@ import org.springframework.web.service.annotation.HttpExchange;
 import org.springframework.web.service.annotation.PostExchange;
 import org.springframework.web.service.annotation.PutExchange;
 
-import be.cytomine.common.repository.model.command.HttpCommandResponse;
+import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.common.repository.model.term.payload.CreateTerm;
-import be.cytomine.common.repository.model.term.payload.TermResponse;
 import be.cytomine.common.repository.model.term.payload.UpdateTerm;
 
 import static be.cytomine.common.repository.http.TermHttpContract.ROOT_PATH;
@@ -29,16 +29,16 @@ public interface TermHttpContract {
     Optional<TermResponse> findTermByID(@PathVariable long id, @RequestParam long userId);
 
     @PostExchange
-    Optional<HttpCommandResponse<TermResponse>> create(@RequestParam long userId,
+    Optional<HttpCommandResponse> create(@RequestParam long userId,
                                                        @Valid @RequestBody CreateTerm createTerm);
 
     @PutExchange("/{id}")
-    Optional<HttpCommandResponse<TermResponse>> update(@PathVariable long id,
+    Optional<HttpCommandResponse> update(@PathVariable long id,
                                                        @RequestParam long userId,
                                                        @RequestBody UpdateTerm updateTerm);
 
     @DeleteExchange("/{id}")
-    Optional<HttpCommandResponse<TermResponse>> delete(@PathVariable long id,
+    Optional<HttpCommandResponse> delete(@PathVariable long id,
                                                        @RequestParam long userId);
 
     @GetExchange("/project/{id}")

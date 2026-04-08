@@ -13,7 +13,7 @@
             </b-table-column>
 
             <b-table-column :label="$t('execution-date')">
-              {{ formatDate(run.created_at) }}
+              {{ formatDate(run.createdAt) }}
             </b-table-column>
 
             <b-table-column :label="$t('status')" centered>
@@ -68,7 +68,7 @@ export default {
   methods: {
     async fetchTaskRuns() {
       let taskRuns = await TaskRun.fetchByProject(this.currentProject.id);
-      taskRuns.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      taskRuns.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
       this.taskRuns = await Promise.all(
         taskRuns.map(async ({project, taskRunId}) => {

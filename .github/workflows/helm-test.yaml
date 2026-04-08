@@ -50,10 +50,6 @@ jobs:
         run: |
           kubectl create ns cytomine-${{ github.sha }}
           kubectl create ns cytomine-${{ github.sha }}-engine-tasks
-          kubectl label ns cytomine-${{ github.sha }}-engine-tasks app.kubernetes.io/managed-by=Helm
-          kubectl annotate ns cytomine-${{ github.sha }}-engine-tasks \
-            meta.helm.sh/release-name=cytomine-${{ github.sha }} \
-            meta.helm.sh/release-namespace=cytomine-${{ github.sha }}
 
       - name: Enforce Restricted Namespace
         run: kubectl label --overwrite ns cytomine-${{ github.sha }} pod-security.kubernetes.io/enforce=restricted

@@ -22,7 +22,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Helm
-        uses: azure/setup-helm@v4.3.1
+        uses: azure/setup-helm@v5
 
       - uses: actions/setup-python@v6.2.0
         with:
@@ -47,7 +47,9 @@ jobs:
             --wait
 
       - name: Create Namespace
-        run: kubectl create ns cytomine-${{ github.sha }}
+        run: |
+          kubectl create ns cytomine-${{ github.sha }}
+          kubectl create ns cytomine-${{ github.sha }}-engine-tasks
 
       - name: Enforce Restricted Namespace
         run: kubectl label --overwrite ns cytomine-${{ github.sha }} pod-security.kubernetes.io/enforce=restricted
@@ -55,13 +57,18 @@ jobs:
           pod-security.kubernetes.io/warn-version=latest
 
       - name: Create Harbor Registry secrets
-        run: kubectl create secret docker-registry docker-image-pull-secrets --namespace=cytomine-${{ github.sha }}
-          --docker-server=registry.cytomine.org --docker-username=${{ secrets.REGISTRY_USERNAME }}
-          --docker-password=${{ secrets.REGISTRY_TOKEN }}
+        run: |
+          for ns in cytomine-${{ github.sha }} cytomine-${{ github.sha }}-engine-tasks; do
+            kubectl create secret docker-registry docker-image-pull-secrets \
+              --namespace=$ns \
+              --docker-server=registry.cytomine.org \
+              --docker-username=${{ secrets.REGISTRY_USERNAME }} \
+              --docker-password=${{ secrets.REGISTRY_TOKEN }}
+          done
 
-      - name: Create Service Account
-        run: kubectl patch serviceaccount default --namespace=cytomine-${{ github.sha }}
-          -p '{"imagePullSecrets":[{"name":"docker-image-pull-secrets"}]}'
+          kubectl patch serviceaccount default \
+            --namespace=cytomine-${{ github.sha }} \
+            -p '{"imagePullSecrets":[{"name":"docker-image-pull-secrets"}]}'
 
       - name: Get ingress IP
         run: |
@@ -86,6 +93,7 @@ jobs:
           EXTRA_ARGS+="--set images.pims_import=registry.cytomine.org/cytomine/python-client:${{ github.sha }} "
           EXTRA_ARGS+="--set images.repository=registry.cytomine.org/cytomine/repository:${{ github.sha }} "
           EXTRA_ARGS+="--set images.e2e_tests=registry.cytomine.org/cytomine/e2e-tests:${{ github.sha }} "
+          EXTRA_ARGS+="--set images.tasks_runner_image=registry.cytomine.org/cytomine/app-engine-tasks-runner:${{ github.sha }} "
           # External images from registry.cytomine.org/docker/
           EXTRA_ARGS+="--set images.alpine=registry.cytomine.org/docker/library/alpine:3.18 "
           EXTRA_ARGS+="--set images.curl=registry.cytomine.org/docker/curlimages/curl "
@@ -102,6 +110,7 @@ jobs:
           EXTRA_ARGS+="--set test.e2eTestCount=${{ env.E2E_TEST_COUNT }}"
           ct lint-and-install --target-branch ${{ github.event.repository.default_branch }} \
             --chart-dirs=helm/charts/ --all --namespace=cytomine-${{ github.sha }} \
+            --release-name=cytomine-${{ github.sha }} \
             --helm-extra-set-args="$EXTRA_ARGS" \
             --helm-extra-args="--timeout 20m"
 

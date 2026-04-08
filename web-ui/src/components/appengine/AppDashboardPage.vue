@@ -4,7 +4,7 @@
       <p class="panel-heading">{{ $t('app-dashboard') }}</p>
 
       <section class="panel-block">
-        <b-table :data="data">
+        <b-table :data="data" :current.sync="currentPage" :paginated="true" :per-page="perPage">
           <template #default="{ row: run }">
             <b-table-column :label="$t('app-name')">
               <router-link :to="`/apps/${run.namespace}/${run.version}`">
@@ -57,6 +57,8 @@ export default {
   name: 'AppDashboardPage',
   data() {
     return {
+      currentPage: 1,
+      perPage: 10,
       data: [
         {id: 1, name: 'Stardist (1.0.0)', user: 'John Doe', date: '2016-10-15 13:43:27', status: 'Finished'},
         {id: 12, name: 'Stardist (1.0.0)', user: 'John Doe', date: '2016-10-15 13:43:28', status: 'Failed'},

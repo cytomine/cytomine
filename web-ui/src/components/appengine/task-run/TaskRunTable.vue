@@ -64,7 +64,7 @@ export default {
       return (new Date(timestamp)).toLocaleString();
     },
     formatTaskName(row) {
-      return `${row.task.name} (${row.task.version}) - ${this.formattedTime(row.created_at)}`;
+      return `${row.task.name} (${row.task.version}) - ${this.formattedTime(row.createdAt)}`;
     },
     async onDetailsOpen(taskRun) {
       if (!taskRun.inputs) {

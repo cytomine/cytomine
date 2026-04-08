@@ -1,11 +1,19 @@
 package be.cytomine.appengine.unit.services;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+import java.util.UUID;
 import java.util.zip.CRC32;
 
-import be.cytomine.appengine.models.task.*;
-import be.cytomine.appengine.repositories.ChecksumRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -16,10 +24,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
-import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.web.multipart.MultipartFile;
 
 import be.cytomine.appengine.dto.handlers.filestorage.Storage;
 import be.cytomine.appengine.dto.inputs.task.State;
@@ -31,7 +36,15 @@ import be.cytomine.appengine.exceptions.ProvisioningException;
 import be.cytomine.appengine.handlers.SchedulerHandler;
 import be.cytomine.appengine.handlers.StorageData;
 import be.cytomine.appengine.handlers.StorageHandler;
+import be.cytomine.appengine.models.task.Checksum;
+import be.cytomine.appengine.models.task.Parameter;
+import be.cytomine.appengine.models.task.ParameterType;
+import be.cytomine.appengine.models.task.Run;
+import be.cytomine.appengine.models.task.Task;
+import be.cytomine.appengine.models.task.TypePersistence;
+import be.cytomine.appengine.models.task.ValueType;
 import be.cytomine.appengine.models.task.integer.IntegerPersistence;
+import be.cytomine.appengine.repositories.ChecksumRepository;
 import be.cytomine.appengine.repositories.RunRepository;
 import be.cytomine.appengine.repositories.TypePersistenceRepository;
 import be.cytomine.appengine.repositories.file.FilePersistenceRepository;
@@ -45,7 +58,6 @@ import be.cytomine.appengine.utils.TaskUtils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -539,8 +551,8 @@ public class TaskProvisioningServiceTest {
         StateAction result = taskProvisioningService.updateRunState(localRun.getId().toString(), desiredState);
 
         assertEquals("success", result.getStatus());
-        assertEquals(localRun.getId(), result.getResource().getId());
-        assertEquals(TaskRunState.PROVISIONED, result.getResource().getState());
+        assertEquals(localRun.getId(), result.getResource().id());
+        assertEquals(TaskRunState.PROVISIONED, result.getResource().state());
         verify(runRepository, times(1)).findById(localRun.getId());
         verify(runRepository, times(1)).saveAndFlush(any(Run.class));
     }
@@ -561,8 +573,8 @@ public class TaskProvisioningServiceTest {
         StateAction result = taskProvisioningService.updateRunState(localRun.getId().toString(), desiredState);
 
         assertEquals("success", result.getStatus());
-        assertEquals(localRun.getId(), result.getResource().getId());
-        assertEquals(TaskRunState.QUEUING, result.getResource().getState());
+        assertEquals(localRun.getId(), result.getResource().id());
+        assertEquals(TaskRunState.QUEUING, result.getResource().state());
         verify(runRepository, times(1)).findById(localRun.getId());
         verify(runRepository, times(1)).saveAndFlush(any(Run.class));
     }
@@ -591,8 +603,8 @@ public class TaskProvisioningServiceTest {
 
         TaskRunResponse result = taskProvisioningService.retrieveRun(run.getId().toString());
 
-        assertEquals(result.getId(), run.getId());
-        assertEquals(result.getState(), run.getState());
+        assertEquals(result.id(), run.getId());
+        assertEquals(result.state(), run.getState());
     }
 
     @DisplayName("Failed to retrieve a task run and throw 'ProvisioningException'")

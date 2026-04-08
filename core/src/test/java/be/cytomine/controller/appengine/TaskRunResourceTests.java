@@ -259,9 +259,8 @@ public class TaskRunResourceTests {
             "task", task,
             "id", taskRunId.toString(),
             "state", "CREATED",
-            "created_at", "2023-12-20T10:49:21.272Z",
-            "updated_at", "2023-12-20T10:49:21.272Z",
-            "last_state_transition_at", "2023-12-20T10:49:21.272Z"
+            "createdAt", "2023-12-20T10:49:21.272Z",
+            "updatedAt", "2023-12-20T10:49:21.272Z"
         );
 
         try {

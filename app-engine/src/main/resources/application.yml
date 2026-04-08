@@ -61,6 +61,7 @@ scheduler:
   registry-advertised-url: ${SCHEDULER_REGISTRY_ADVERTISED_URL}
   use-host-network: ${SCHEDULER_USE_HOST_NETWORK}
   tasks-namespace: ${SCHEDULER_TASKS_NAMESPACE}
+  tasks-runner-image: ${SCHEDULER_TASKS_RUNNER_IMAGE:cytomine/app-engine-tasks-runner}
 logging:
   level:
     root: ERROR

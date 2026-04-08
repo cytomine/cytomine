@@ -14,11 +14,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import be.cytomine.common.repository.model.command.HttpCommandResponse;
-import be.cytomine.common.repository.model.command.payload.term.TermCommandPayload;
+import be.cytomine.common.repository.model.command.payload.request.TermCommandPayload;
 import be.cytomine.common.repository.model.command.request.CreateTermCommand;
 import be.cytomine.common.repository.model.command.request.DeleteTermCommand;
 import be.cytomine.common.repository.model.command.request.UpdateTermCommand;
-import be.cytomine.common.repository.model.term.payload.TermResponse;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.verify;
@@ -128,7 +127,7 @@ class ApplyCommandServiceTest {
         verify(termCommandService).redoUpdateTerm(id, cmd, userId, now);
     }
 
-    private HttpCommandResponse<TermResponse> mockResponse() {
-        return new HttpCommandResponse<>(null, true, null, UUID.randomUUID());
+    private HttpCommandResponse mockResponse() {
+        return new HttpCommandResponse(true, null, UUID.randomUUID());
     }
 }

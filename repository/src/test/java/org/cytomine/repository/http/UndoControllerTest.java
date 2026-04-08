@@ -21,8 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.model.command.HttpCommandResponse;
+import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.common.repository.model.term.payload.CreateTerm;
-import be.cytomine.common.repository.model.term.payload.TermResponse;
 import be.cytomine.common.repository.model.term.payload.UpdateTerm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -73,10 +73,10 @@ class UndoControllerTest {
     void undoInsertTermCommandDeletesCreatedTerm() {
         CreateTerm createTerm = new CreateTerm("termToUndo", "#00FF00", ontologyId, null);
         LocalDateTime now = LocalDateTime.now();
-        HttpCommandResponse<TermResponse> createResponse =
+        HttpCommandResponse createResponse =
             termCommandService.createTerm(userId, createTerm, now).orElseThrow();
 
-        Long termId = createResponse.data().id();
+        Long termId = ((TermResponse) createResponse.data()).id();
         UUID insertCommandId = createResponse.command();
         assertTrue(termRepository.findById(termId).isPresent());
 
@@ -91,13 +91,13 @@ class UndoControllerTest {
     void undoUpdateTermCommandRestoresPreviousState() {
         CreateTerm createTerm = new CreateTerm("originalName", "#FF0000", ontologyId, null);
         LocalDateTime now = LocalDateTime.now();
-        HttpCommandResponse<TermResponse> createResponse =
+        HttpCommandResponse createResponse =
             termCommandService.createTerm(userId, createTerm, now).orElseThrow();
 
-        Long termId = createResponse.data().id();
+        Long termId = ((TermResponse) createResponse.data()).id();
 
         UpdateTerm updateTerm = new UpdateTerm(Optional.of("updatedName"), Optional.of("#00FF00"));
-        HttpCommandResponse<TermResponse> updateResponse =
+        HttpCommandResponse updateResponse =
             termCommandService.updateTerm(termId, userId, updateTerm, now).orElseThrow();
 
         UUID updateCommandId = updateResponse.command();
@@ -125,10 +125,10 @@ class UndoControllerTest {
     void undoByUserWithoutPermissionReturnsEmpty() {
         CreateTerm createTerm = new CreateTerm("termToUndo", "#FF0000", ontologyId, null);
         LocalDateTime now = LocalDateTime.now();
-        HttpCommandResponse<TermResponse> createResponse =
+        HttpCommandResponse createResponse =
             termCommandService.createTerm(userId, createTerm, now).orElseThrow();
 
-        Long termId = createResponse.data().id();
+        Long termId = ((TermResponse) createResponse.data()).id();
         UUID insertCommandId = createResponse.command();
 
         Long nonAdminUserId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);

@@ -9,6 +9,8 @@ import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;
 import org.springframework.web.service.annotation.PostExchange;
 
+import be.cytomine.common.repository.model.command.payload.response.CommandV2Response;
+import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.CommandResponse;
 import be.cytomine.common.repository.model.command.HttpCommandResponse;
 
@@ -25,5 +27,5 @@ public interface CommandHttpContract {
     Optional<HttpCommandResponse> redo(@PathVariable UUID commandId, @RequestParam long userId);
 
     @GetExchange("/{commandId}")
-    Optional<CommandResponse<?>> get(@PathVariable UUID commandId, @RequestParam long userId);
+    Optional<CommandV2Response<?>> get(@PathVariable UUID commandId, @RequestParam long userId);
 }

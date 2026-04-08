@@ -14,7 +14,8 @@ import org.springframework.web.service.annotation.HttpExchange;
 import org.springframework.web.service.annotation.PostExchange;
 import org.springframework.web.service.annotation.PutExchange;
 
-import be.cytomine.common.repository.model.command.HttpCommandResponse;
+import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.common.repository.model.term.payload.CreateTerm;
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.common.repository.model.term.payload.UpdateTerm;

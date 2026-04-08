@@ -11,6 +11,7 @@ import be.cytomine.common.repository.http.HealthService;
 import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.common.repository.http.TermRelationHttpContract;
 
+
 @Configuration
 public class RepositoryClient {
 

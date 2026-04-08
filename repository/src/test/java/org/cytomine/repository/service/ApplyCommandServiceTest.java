@@ -15,6 +15,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import be.cytomine.common.repository.model.command.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.request.TermCommandPayload;
+import be.cytomine.common.repository.model.command.Commands;
+import be.cytomine.common.repository.model.command.payload.request.TermCommandPayload;
+import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.request.CreateTermCommand;
 import be.cytomine.common.repository.model.command.request.DeleteTermCommand;
 import be.cytomine.common.repository.model.command.request.UpdateTermCommand;
@@ -55,7 +58,8 @@ class ApplyCommandServiceTest {
         LocalDateTime now = LocalDateTime.now();
         DeleteTermCommand cmd = new DeleteTermCommand(10L, payload, userId, ontologyId);
         when(commandRepository.findById(id)).thenReturn(Optional.of(new CommandV2Entity(id, null, null, cmd, 0L)));
-        when(termCommandService.undoDeleteTerm(id, cmd, userId, now)).thenReturn(Optional.of(mockResponse()));
+        when(termCommandService.undoDeleteTerm(id, cmd, userId, now)).thenReturn(
+            Optional.of(mockResponse(Commands.DELETE_TERM)));
 
         applyCommandService.undoCommand(userId, id, now);
 
@@ -68,7 +72,8 @@ class ApplyCommandServiceTest {
         LocalDateTime now = LocalDateTime.now();
         CreateTermCommand cmd = new CreateTermCommand(payload, userId, ontologyId);
         when(commandRepository.findById(id)).thenReturn(Optional.of(new CommandV2Entity(id, null, null, cmd, 0L)));
-        when(termCommandService.undoCreateTerm(id, cmd, userId, now)).thenReturn(Optional.of(mockResponse()));
+        when(termCommandService.undoCreateTerm(id, cmd, userId, now)).thenReturn(
+            Optional.of(mockResponse(Commands.CREATE_TERM)));
 
         applyCommandService.undoCommand(userId, id, now);
 
@@ -81,7 +86,8 @@ class ApplyCommandServiceTest {
         LocalDateTime now = LocalDateTime.now();
         UpdateTermCommand cmd = new UpdateTermCommand(10L, payload, payload, userId, ontologyId);
         when(commandRepository.findById(id)).thenReturn(Optional.of(new CommandV2Entity(id, null, null, cmd, 0L)));
-        when(termCommandService.undoUpdateTerm(id, cmd, userId)).thenReturn(Optional.of(mockResponse()));
+        when(termCommandService.undoUpdateTerm(id, cmd, userId)).thenReturn(
+            Optional.of(mockResponse(Commands.UPDATE_TERM)));
 
         applyCommandService.undoCommand(userId, id, now);
 
@@ -94,7 +100,8 @@ class ApplyCommandServiceTest {
         LocalDateTime now = LocalDateTime.now();
         DeleteTermCommand cmd = new DeleteTermCommand(10L, payload, userId, ontologyId);
         when(commandRepository.findById(id)).thenReturn(Optional.of(new CommandV2Entity(id, null, null, cmd, 0L)));
-        when(termCommandService.redoDeleteTerm(id, cmd, userId, now)).thenReturn(Optional.of(mockResponse()));
+        when(termCommandService.redoDeleteTerm(id, cmd, userId, now)).thenReturn(
+            Optional.of(mockResponse(Commands.DELETE_TERM)));
 
         applyCommandService.redoCommand(userId, id, now);
 
@@ -107,7 +114,8 @@ class ApplyCommandServiceTest {
         LocalDateTime now = LocalDateTime.now();
         CreateTermCommand cmd = new CreateTermCommand(payload, userId, ontologyId);
         when(commandRepository.findById(id)).thenReturn(Optional.of(new CommandV2Entity(id, null, null, cmd, 0L)));
-        when(termCommandService.redoCreateTerm(id, cmd, userId, now)).thenReturn(Optional.of(mockResponse()));
+        when(termCommandService.redoCreateTerm(id, cmd, userId, now)).thenReturn(
+            Optional.of(mockResponse(Commands.CREATE_TERM)));
 
         applyCommandService.redoCommand(userId, id, now);
 
@@ -120,14 +128,15 @@ class ApplyCommandServiceTest {
         LocalDateTime now = LocalDateTime.now();
         UpdateTermCommand cmd = new UpdateTermCommand(10L, payload, payload, userId, ontologyId);
         when(commandRepository.findById(id)).thenReturn(Optional.of(new CommandV2Entity(id, null, null, cmd, 0L)));
-        when(termCommandService.redoUpdateTerm(id, cmd, userId, now)).thenReturn(Optional.of(mockResponse()));
+        when(termCommandService.redoUpdateTerm(id, cmd, userId, now)).thenReturn(
+            Optional.of(mockResponse(Commands.UPDATE_TERM)));
 
         applyCommandService.redoCommand(userId, id, now);
 
         verify(termCommandService).redoUpdateTerm(id, cmd, userId, now);
     }
 
-    private HttpCommandResponse mockResponse() {
-        return new HttpCommandResponse(null, true, null, UUID.randomUUID());
+    private HttpCommandResponse mockResponse(String command) {
+        return new HttpCommandResponse(true, null, UUID.randomUUID(), command);
     }
 }

@@ -8,7 +8,7 @@ import be.cytomine.common.repository.model.command.payload.request.UpdateCommand
 import static be.cytomine.common.repository.model.command.CommandType.UPDATE_COMMAND;
 
 public sealed interface UpdateCommandRequest<T> extends CommandV2Request<T>
-    permits UpdateTermCommand, UpdateTermRelationCommand {
+    permits UpdateTermCommand,UpdateTermRelationCommand {
     @Override
     default CommandType getCommandType() {
         return UPDATE_COMMAND;

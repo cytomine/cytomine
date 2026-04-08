@@ -126,6 +126,20 @@ spec:
                 sleep 2
               done
               echo "postgis is ready!"
+        - name: wait-for-mongodb
+          image: "{{ .Values.images.curl }}"
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Waiting for mongodb to be ready..."
+              until nc -z mongodb.{{ .Release.Namespace }}.svc.cluster.local {{ .Values.mongodb.port }}; do
+                echo "mongodb not ready, retrying in 2s..."
+                sleep 2
+              done
+              echo "mongodb is ready!"
         - name: wait-for-repository
           image: "{{ .Values.images.curl }}"
           securityContext:

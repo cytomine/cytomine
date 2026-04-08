@@ -20,7 +20,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.common.repository.model.command.HttpCommandResponse;
+import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.common.repository.model.term.payload.CreateTerm;
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.common.repository.model.term.payload.UpdateTerm;
@@ -77,7 +78,7 @@ class UndoControllerTest {
             termCommandService.createTerm(userId, createTerm, now).orElseThrow();
 
         Long termId = ((TermResponse) createResponse.data()).id();
-        UUID insertCommandId = createResponse.command();
+        UUID insertCommandId = createResponse.commandId();
         assertTrue(termRepository.findById(termId).isPresent());
 
         mockMvc.perform(post("/commands/undo/{commandId}", insertCommandId).param("userId", userId.toString()))
@@ -100,7 +101,7 @@ class UndoControllerTest {
         HttpCommandResponse updateResponse =
             termCommandService.updateTerm(termId, userId, updateTerm, now).orElseThrow();
 
-        UUID updateCommandId = updateResponse.command();
+        UUID updateCommandId = updateResponse.commandId();
         TermEntity updatedTerm = termRepository.findById(termId).orElseThrow();
         assertEquals("updatedName", updatedTerm.getName());
         assertEquals("#00FF00", updatedTerm.getColor());
@@ -128,8 +129,8 @@ class UndoControllerTest {
         HttpCommandResponse createResponse =
             termCommandService.createTerm(userId, createTerm, now).orElseThrow();
 
-        Long termId =  ((TermResponse) createResponse.data()).id();
-        UUID insertCommandId = createResponse.command();
+        Long termId = ((TermResponse) createResponse.data()).id();
+        UUID insertCommandId = createResponse.commandId();
 
         Long nonAdminUserId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
         jdbcTemplate.update("INSERT INTO sec_user (id, version, username) VALUES (?, 0, 'nonadmin')", nonAdminUserId);

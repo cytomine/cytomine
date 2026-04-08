@@ -22,9 +22,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import be.cytomine.common.repository.http.TermHttpContract;
-import be.cytomine.common.repository.model.command.HttpCommandResponse;
-import be.cytomine.common.repository.model.term.payload.CreateTerm;
+import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
+import be.cytomine.common.repository.model.term.payload.CreateTerm;
 import be.cytomine.common.repository.model.term.payload.UpdateTerm;
 
 import static be.cytomine.common.repository.http.TermHttpContract.ROOT_PATH;
@@ -43,21 +43,20 @@ public class TermController implements TermHttpContract {
     @GetMapping("/{id}")
     public Optional<TermResponse> findTermByID(@PathVariable long id, @RequestParam long userId) {
         return termRepository.findById(id)
-                   .filter(termEntity -> aclService.canReadOntology(userId, termEntity.getOntologyId()))
-                   .map(ontologyMapper::map);
+            .filter(termEntity -> aclService.canReadOntology(userId, termEntity.getOntologyId()))
+            .map(ontologyMapper::map);
     }
 
     @Override
     @PostMapping
-    public Optional<HttpCommandResponse> create(@RequestParam long userId,
-                                                              @RequestBody CreateTerm createTerm) {
+    public Optional<HttpCommandResponse> create(@RequestParam long userId, @RequestBody CreateTerm createTerm) {
         return termCommandService.createTerm(userId, createTerm, LocalDateTime.now());
     }
 
     @Override
     @PutMapping("/{id}")
     public Optional<HttpCommandResponse> update(@PathVariable long id, @RequestParam long userId,
-                                                              @RequestBody UpdateTerm updateTerm) {
+                                                @RequestBody UpdateTerm updateTerm) {
         return termCommandService.updateTerm(id, userId, updateTerm, LocalDateTime.now());
     }
 

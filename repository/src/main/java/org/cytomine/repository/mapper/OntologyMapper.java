@@ -13,6 +13,8 @@ import be.cytomine.common.repository.model.command.payload.request.TermCommandPa
 import be.cytomine.common.repository.model.command.payload.request.TermRelationCommandPayload;
 import be.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
+import be.cytomine.common.repository.model.command.payload.request.TermCommandPayload;
+import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.common.repository.model.term.payload.CreateTerm;
 import be.cytomine.common.repository.model.termrelation.payload.CreateTermRelation;
 

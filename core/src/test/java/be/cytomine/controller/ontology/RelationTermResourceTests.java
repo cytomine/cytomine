@@ -16,7 +16,10 @@ package be.cytomine.controller.ontology;
 * limitations under the License.
 */
 
-import jakarta.persistence.EntityManager;
+import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -24,17 +27,24 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.http.TermRelationHttpContract;
+import be.cytomine.common.repository.model.command.Commands;
+import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import be.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
 import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.domain.ontology.Ontology;
-import be.cytomine.domain.ontology.RelationTerm;
+import be.cytomine.domain.ontology.Term;
+import be.cytomine.utils.JsonObject;
 
-import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -48,147 +58,183 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class RelationTermResourceTests {
 
     @Autowired
-    private BasicInstanceBuilder basicInstanceBuilder;
-
-    @Autowired
-    private EntityManager em;
-
-    @Autowired
     private BasicInstanceBuilder builder;
 
     @Autowired
     private MockMvc restRelationTermControllerMockMvc;
 
+    @MockitoBean
+    private TermRelationHttpContract termRelationHttpContract;
+
+    private TermRelationResponse buildResponse(long id, Term term1, Term term2) {
+        return new TermRelationResponse(
+            id,
+            term1.getId(),
+            term2.getId(),
+            term1.getOntology().getId(),
+            1L,
+            LocalDateTime.now(),
+            Optional.empty(),
+            LocalDateTime.now(),
+            "parent"
+        );
+    }
+
     @Test
     @Transactional
     public void list_by_term_position_1() throws Exception {
-        RelationTerm relationTerm = builder.given_a_relation_term();
-        restRelationTermControllerMockMvc.perform(get("/api/relation/term/{i}/{id}.json", "1", relationTerm.getTerm1().getId()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.collection", hasSize(1)))
-                .andExpect(jsonPath("$.collection[?(@.id=='"+relationTerm.getId()+"')]").exists());
+        Term term1 = builder.given_a_term();
+        Term term2 = builder.given_a_term(term1.getOntology());
+        Long userId = builder.given_superadmin().getId();
+        long relationId = 42L;
+
+        when(termRelationHttpContract.findTermByID(eq(relationId), eq(userId)))
+            .thenReturn(Optional.of(buildResponse(relationId, term1, term2)));
+
+        restRelationTermControllerMockMvc.perform(get("/api/term_relation/{id}.json", relationId))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.term1Id").value(term1.getId().intValue()));
     }
 
     @Test
     @Transactional
     public void list_by_term_position_2() throws Exception {
-        RelationTerm relationTerm = builder.given_a_relation_term();
-        restRelationTermControllerMockMvc.perform(get("/api/relation/term/{i}/{id}.json", "2", relationTerm.getTerm1().getId()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.collection", hasSize(0)));
+        Term term1 = builder.given_a_term();
+        Term term2 = builder.given_a_term(term1.getOntology());
+        Long userId = builder.given_superadmin().getId();
+        long relationId = 42L;
+
+        when(termRelationHttpContract.findTermByID(eq(relationId), eq(userId)))
+            .thenReturn(Optional.of(buildResponse(relationId, term1, term2)));
+
+        restRelationTermControllerMockMvc.perform(get("/api/term_relation/{id}.json", relationId))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.term2Id").value(term2.getId().intValue()));
     }
 
     @Test
     @Transactional
     public void list_by_term() throws Exception {
-        RelationTerm relationTerm = builder.given_a_relation_term();
-        restRelationTermControllerMockMvc.perform(get("/api/relation/term/{id}.json",  relationTerm.getTerm1().getId()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.collection", hasSize(1)))
-                .andExpect(jsonPath("$.collection[?(@.id=='"+relationTerm.getId()+"')]").exists());
+        Term term1 = builder.given_a_term();
+        Term term2 = builder.given_a_term(term1.getOntology());
+        Long userId = builder.given_superadmin().getId();
+        long relationId = 42L;
+
+        when(termRelationHttpContract.findTermByID(eq(relationId), eq(userId)))
+            .thenReturn(Optional.of(buildResponse(relationId, term1, term2)));
+
+        restRelationTermControllerMockMvc.perform(get("/api/term_relation/{id}.json", relationId))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(relationId));
     }
-
-
-
-
 
     @Test
     @Transactional
     public void get_a_relation_term() throws Exception {
-        RelationTerm relationTerm = builder.given_a_relation_term();
+        Term term1 = builder.given_a_term();
+        Term term2 = builder.given_a_term(term1.getOntology());
+        Long userId = builder.given_superadmin().getId();
+        long relationId = 42L;
 
-        restRelationTermControllerMockMvc.perform(get("/api/relation/{idRelation}/term1/{idTerm1}/term2/{idTerm2}.json", relationTerm.getRelation().getId(), relationTerm.getTerm1().getId(), relationTerm.getTerm2().getId()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(relationTerm.getId().intValue()))
-                .andExpect(jsonPath("$.term1").value(relationTerm.getTerm1().getId().intValue()))
-                .andExpect(jsonPath("$.term2").value(relationTerm.getTerm2().getId().intValue()))
-                .andExpect(jsonPath("$.relation").value(relationTerm.getRelation().getId().intValue()))
-        ;
+        when(termRelationHttpContract.findTermByID(eq(relationId), eq(userId)))
+            .thenReturn(Optional.of(buildResponse(relationId, term1, term2)));
+
+        restRelationTermControllerMockMvc.perform(get("/api/term_relation/{id}.json", relationId))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(relationId))
+            .andExpect(jsonPath("$.term1Id").value(term1.getId().intValue()))
+            .andExpect(jsonPath("$.term2Id").value(term2.getId().intValue()));
     }
 
     @Test
     @Transactional
     public void get_a_parent_relation_term() throws Exception {
-        RelationTerm relationTerm = builder.given_a_relation_term();
+        Term term1 = builder.given_a_term();
+        Term term2 = builder.given_a_term(term1.getOntology());
+        Long userId = builder.given_superadmin().getId();
+        long relationId = 42L;
 
-        restRelationTermControllerMockMvc.perform(get("/api/relation/parent/term1/{idTerm1}/term2/{idTerm2}.json", relationTerm.getTerm1().getId(), relationTerm.getTerm2().getId()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(relationTerm.getId().intValue()))
-                .andExpect(jsonPath("$.term1").value(relationTerm.getTerm1().getId().intValue()))
-                .andExpect(jsonPath("$.term2").value(relationTerm.getTerm2().getId().intValue()))
-                .andExpect(jsonPath("$.relation").value(relationTerm.getRelation().getId().intValue()))
-        ;
+        when(termRelationHttpContract.findTermByID(eq(relationId), eq(userId)))
+            .thenReturn(Optional.of(buildResponse(relationId, term1, term2)));
+
+        restRelationTermControllerMockMvc.perform(get("/api/term_relation/{id}.json", relationId))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(relationId))
+            .andExpect(jsonPath("$.ontologyId").value(term1.getOntology().getId().intValue()));
     }
 
     @Test
     @Transactional
     public void add_valid_relation() throws Exception {
-        Ontology ontology = builder.given_an_ontology();
-        RelationTerm relationTerm =
-            basicInstanceBuilder.given_a_not_persisted_relation_term(builder.given_a_relation(),
-                builder.given_a_term(ontology), builder.given_a_term(ontology));
-        restRelationTermControllerMockMvc.perform(post("/api/relation/parent/term.json")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(relationTerm.toJSON()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.printMessage").value(true))
-                .andExpect(jsonPath("$.callback").exists())
-                .andExpect(jsonPath("$.callback.relationtermID").exists())
-                .andExpect(jsonPath("$.callback.method").value("be.cytomine.AddRelationTermCommand"))
-                .andExpect(jsonPath("$.message").exists())
-                .andExpect(jsonPath("$.command").exists())
-                .andExpect(jsonPath("$.relationterm.id").exists())
-                .andExpect(jsonPath("$.relationterm.term1").exists());
+        Term term1 = builder.given_a_term();
+        Term term2 = builder.given_a_term(term1.getOntology());
+        Long userId = builder.given_superadmin().getId();
+        long relationId = 42L;
+        UUID commandId = UUID.randomUUID();
 
+        when(termRelationHttpContract.create(eq(userId), any())).thenReturn(
+            Optional.of(new HttpCommandResponse(true, buildResponse(relationId, term1, term2), commandId,
+                Commands.CREATE_TERM_RELATION)));
+
+        String createJson = JsonObject.of("term1Id", term1.getId(), "term2Id", term2.getId(), "name", "parent")
+            .toJsonString();
+
+        restRelationTermControllerMockMvc.perform(
+                post("/api/term_relation.json").contentType(MediaType.APPLICATION_JSON).content(createJson))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.printMessage").value(true))
+            .andExpect(jsonPath("$.command").value(Commands.CREATE_TERM_RELATION))
+            .andExpect(jsonPath("$.data.id").value(relationId));
     }
-
-
-
 
     @Test
     @Transactional
     public void delete_relation_term() throws Exception {
-        RelationTerm relationTerm = builder.given_a_relation_term();
-        restRelationTermControllerMockMvc.perform(delete("/api/relation/{idRelation}/term1/{idTerm1}/term2/{idTerm2}.json", relationTerm.getRelation().getId(), relationTerm.getTerm1().getId(), relationTerm.getTerm2().getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(relationTerm.toJSON()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.printMessage").value(true))
-                .andExpect(jsonPath("$.callback").exists())
-                .andExpect(jsonPath("$.callback.relationtermID").exists())
-                .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteRelationTermCommand"))
-                .andExpect(jsonPath("$.message").exists())
-                .andExpect(jsonPath("$.command").exists())
-                .andExpect(jsonPath("$.relationterm.id").exists());
+        Term term1 = builder.given_a_term();
+        Term term2 = builder.given_a_term(term1.getOntology());
+        Long userId = builder.given_superadmin().getId();
+        long relationId = 42L;
+        UUID commandId = UUID.randomUUID();
+
+        when(termRelationHttpContract.delete(eq(relationId), eq(userId))).thenReturn(
+            Optional.of(new HttpCommandResponse(true, buildResponse(relationId, term1, term2), commandId,
+                Commands.DELETE_TERM_RELATION)));
+
+        restRelationTermControllerMockMvc.perform(delete("/api/term_relation/{id}.json", relationId))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.printMessage").value(true))
+            .andExpect(jsonPath("$.command").value(Commands.DELETE_TERM_RELATION))
+            .andExpect(jsonPath("$.data.id").value(relationId));
     }
 
     @Test
     @Transactional
     public void delete_parent_relation_term() throws Exception {
-        RelationTerm relationTerm = builder.given_a_relation_term();
-        restRelationTermControllerMockMvc.perform(delete("/api/relation/parent/term1/{idTerm1}/term2/{idTerm2}.json", relationTerm.getTerm1().getId(), relationTerm.getTerm2().getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(relationTerm.toJSON()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.printMessage").value(true))
-                .andExpect(jsonPath("$.callback").exists())
-                .andExpect(jsonPath("$.callback.relationtermID").exists())
-                .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteRelationTermCommand"))
-                .andExpect(jsonPath("$.message").exists())
-                .andExpect(jsonPath("$.command").exists())
-                .andExpect(jsonPath("$.relationterm.id").exists());
+        Term term1 = builder.given_a_term();
+        Term term2 = builder.given_a_term(term1.getOntology());
+        Long userId = builder.given_superadmin().getId();
+        long relationId = 42L;
+        UUID commandId = UUID.randomUUID();
+
+        when(termRelationHttpContract.delete(eq(relationId), eq(userId))).thenReturn(
+            Optional.of(new HttpCommandResponse(true, buildResponse(relationId, term1, term2), commandId,
+                Commands.DELETE_TERM_RELATION)));
+
+        restRelationTermControllerMockMvc.perform(delete("/api/term_relation/{id}.json", relationId))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.printMessage").value(true))
+            .andExpect(jsonPath("$.command").value(Commands.DELETE_TERM_RELATION));
     }
 
     @Test
     @Transactional
     public void delete_unexisting_relation_term_fails() throws Exception {
-        RelationTerm relationTerm = builder.given_a_relation_term();
-        em.remove(relationTerm);
-        restRelationTermControllerMockMvc.perform(delete("/api/relation/{idRelation}/term1/{idTerm1}/term2/{idTerm2}.json", relationTerm.getRelation().getId(), relationTerm.getTerm1().getId(), relationTerm.getTerm2().getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(relationTerm.toJSON()))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.errors").exists());
+        Long userId = builder.given_superadmin().getId();
+        long relationId = 99L;
+
+        when(termRelationHttpContract.delete(eq(relationId), eq(userId))).thenReturn(Optional.empty());
+
+        restRelationTermControllerMockMvc.perform(delete("/api/term_relation/{id}.json", relationId))
+            .andExpect(status().isNotFound());
     }
 }

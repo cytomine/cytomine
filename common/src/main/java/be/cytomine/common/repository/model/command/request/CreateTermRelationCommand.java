@@ -15,6 +15,7 @@ public record CreateTermRelationCommand(TermRelationCommandPayload after, long u
 
     @Override
     public String getActionMessage() {
-        return format("Term %s (%s) added in ontology %s", after.id(), after.name(), ontologyId);
+        return format("Term relation %s (term1: %s, term2: %s) added in ontology %s",
+            after.id(), after.term1Id(), after.term2Id(), ontologyId);
     }
 }

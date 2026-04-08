@@ -27,37 +27,28 @@ public class ApplyCommandService {
 
     @Transactional
     public Optional<HttpCommandResponse> undoCommand(long userId, UUID undoCommand, LocalDateTime now) {
-        return commandRepository.findById(undoCommand)
-                   .flatMap(commandEntity -> switch (commandEntity.getData()) {
-                       case DeleteTermCommand dtc ->
-                           termCommandService.undoDeleteTerm(commandEntity.getId(), dtc, userId, now);
-                       case CreateTermCommand icr ->
-                           termCommandService.undoCreateTerm(commandEntity.getId(), icr, userId, now);
-                       case UpdateTermCommand ucr ->
-                           termCommandService.undoUpdateTerm(commandEntity.getId(), ucr, userId);
-                       case DeleteTermRelationCommand deleteTermRelationCommand ->
-                           termRelationCommandService.undoDeleteTermRelation(commandEntity.getId(),
-                               deleteTermRelationCommand, userId,
-                               now);
-                       case CreateTermRelationCommand createTermRelationCommand -> null;
-                       case UpdateTermRelationCommand updateTermRelationCommand -> null;
-                   });
+        return commandRepository.findById(undoCommand).flatMap(commandEntity -> switch (commandEntity.getData()) {
+            case DeleteTermCommand dtc -> termCommandService.undoDeleteTerm(commandEntity.getId(), dtc, userId, now);
+            case CreateTermCommand icr -> termCommandService.undoCreateTerm(commandEntity.getId(), icr, userId, now);
+            case UpdateTermCommand ucr -> termCommandService.undoUpdateTerm(commandEntity.getId(), ucr, userId);
+            case DeleteTermRelationCommand deleteTermRelationCommand ->
+                termRelationCommandService.undoDeleteTermRelation(commandEntity.getId(), deleteTermRelationCommand,
+                    userId, now);
+            case CreateTermRelationCommand createTermRelationCommand -> null;
+            case UpdateTermRelationCommand updateTermRelationCommand -> null;
+        });
     }
 
     public Optional<HttpCommandResponse> redoCommand(long userId, UUID redoCommand, LocalDateTime now) {
-        return commandRepository.findById(redoCommand)
-                   .flatMap(commandEntity -> switch (commandEntity.getData()) {
-                       case DeleteTermCommand dtc ->
-                           termCommandService.redoDeleteTerm(commandEntity.getId(), dtc, userId, now);
-                       case CreateTermCommand icr ->
-                           termCommandService.redoCreateTerm(commandEntity.getId(), icr, userId, now);
-                       case UpdateTermCommand ucr ->
-                           termCommandService.redoUpdateTerm(commandEntity.getId(), ucr, userId, now);
-                       case DeleteTermRelationCommand ucr ->
-                           termRelationCommandService.redoDeleteTermRelation(commandEntity.getId(), ucr, userId, now);
-                       case CreateTermRelationCommand createTermRelationCommand -> null;
-                       case UpdateTermRelationCommand updateTermRelationCommand -> null;
-                   });
+        return commandRepository.findById(redoCommand).flatMap(commandEntity -> switch (commandEntity.getData()) {
+            case DeleteTermCommand dtc -> termCommandService.redoDeleteTerm(commandEntity.getId(), dtc, userId, now);
+            case CreateTermCommand icr -> termCommandService.redoCreateTerm(commandEntity.getId(), icr, userId, now);
+            case UpdateTermCommand ucr -> termCommandService.redoUpdateTerm(commandEntity.getId(), ucr, userId, now);
+            case DeleteTermRelationCommand ucr ->
+                termRelationCommandService.redoDeleteTermRelation(commandEntity.getId(), ucr, userId, now);
+            case CreateTermRelationCommand createTermRelationCommand -> null;
+            case UpdateTermRelationCommand updateTermRelationCommand -> null;
+        });
     }
 
 

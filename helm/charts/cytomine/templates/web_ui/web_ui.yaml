@@ -54,8 +54,6 @@ spec:
           env:
           - name: URL_CORE
             value: {{ include "core.url" . }}
-          - name: CYTOMINE_COMMERCIAL_VERSION
-            value: {{ .Values.web_ui.commercial_version }}
           - name: APPENGINE_ENABLED
             value: "true"
           volumeMounts:

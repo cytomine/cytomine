@@ -19,6 +19,7 @@ import be.cytomine.common.repository.model.command.payload.response.HttpCommandR
 import be.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
 import be.cytomine.common.repository.model.termrelation.payload.CreateTermRelation;
 import be.cytomine.common.repository.model.termrelation.payload.UpdateTermRelation;
+import be.cytomine.domain.ontology.RelationTerm;
 import be.cytomine.service.CurrentUserService;
 
 import static java.lang.String.format;
@@ -34,13 +35,16 @@ public class TermRelationController {
     private final TermRelationHttpContract termRelationHttpContract;
     private final CurrentUserService currentUserService;
 
-    @PostMapping("term_relation.json")
-    public Optional<HttpCommandResponse> create(@RequestBody CreateTermRelation createTermRelation) {
+    private record CreateTermRelationRequest(long term1Id, long term2Id) {}
+
+    @PostMapping({"relation/term.json", "relation/parent/term.json"})
+    public Optional<HttpCommandResponse> create(@RequestBody CreateTermRelationRequest request) {
         long userId = currentUserService.getCurrentUser().getId();
-        return termRelationHttpContract.create(userId, createTermRelation);
+        return termRelationHttpContract.create(userId,
+            new CreateTermRelation(request.term1Id(), request.term2Id(), RelationTerm.PARENT));
     }
 
-    @GetMapping("term_relation/{id}.json")
+    @GetMapping("relation/term/{id}.json")
     public TermRelationResponse termRelation(@PathVariable long id) {
         log.debug("REST request to get term relation {}", id);
         long userId = currentUserService.getCurrentUser().getId();
@@ -48,14 +52,14 @@ public class TermRelationController {
                    .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_TERM_RELATION, id)));
     }
 
-    @PutMapping("term_relation/{id}.json")
+    @PutMapping("relation/term/{id}.json")
     public HttpCommandResponse update(@PathVariable long id, @RequestBody UpdateTermRelation updateTermRelation) {
         long userId = currentUserService.getCurrentUser().getId();
         return termRelationHttpContract.update(id, userId, updateTermRelation)
                    .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_TERM_RELATION, id)));
     }
 
-    @DeleteMapping("term_relation/{id}.json")
+    @DeleteMapping("relation/term/{id}.json")
     public HttpCommandResponse delete(@PathVariable long id) {
         log.debug("REST request to delete term relation {}", id);
         return termRelationHttpContract.delete(id, currentUserService.getCurrentUser().getId())

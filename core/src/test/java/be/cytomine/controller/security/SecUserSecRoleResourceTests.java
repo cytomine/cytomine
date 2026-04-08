@@ -170,7 +170,7 @@ public class SecUserSecRoleResourceTests {
         when(termRelationHttpContract.delete(eq(relationId), eq(userId))).thenReturn(
             Optional.of(new HttpCommandResponse(true, response, commandId, Commands.DELETE_TERM_RELATION)));
 
-        restSecUserSecRoleControllerMockMvc.perform(delete("/api/term_relation/{id}.json", relationId))
+        restSecUserSecRoleControllerMockMvc.perform(delete("/api/relation/term/{id}.json", relationId))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.command").value(Commands.DELETE_TERM_RELATION))

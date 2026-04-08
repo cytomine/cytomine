@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import org.cytomine.repository.mapper.CommandMapper;
 import org.cytomine.repository.mapper.OntologyMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
+import org.cytomine.repository.persistence.RelationRepository;
 import org.cytomine.repository.persistence.TermRelationRepository;
 import org.cytomine.repository.persistence.TermRepository;
 import org.cytomine.repository.persistence.entity.CommandV2Entity;
@@ -32,6 +33,7 @@ import be.cytomine.common.repository.model.termrelation.payload.UpdateTermRelati
 public class TermRelationCommandService {
     private final TermRepository termRepository;
     private final TermRelationRepository termRelationRepository;
+    private final RelationRepository relationRepository;
     private final OntologyMapper ontologyMapper;
     private final CommandV2Repository commandV2Repository;
     private final CommandMapper commandMapper;
@@ -61,8 +63,17 @@ public class TermRelationCommandService {
                    .filter(firstTerm -> termRepository.findById(createTermRelation.term2Id()).map(
                        secondTerm -> secondTerm.getOntologyId().equals(firstTerm.getOntologyId())).orElse(false))
                    .map(firstTerm -> {
+                       long relationId = relationRepository.findByName(createTermRelation.name())
+                           .orElseThrow(() -> new IllegalArgumentException(
+                               "Relation not found: " + createTermRelation.name()))
+                           .getId();
+                       long term2OntologyId = termRepository.findById(createTermRelation.term2Id())
+                           .map(TermEntity::getOntologyId)
+                           .orElseThrow();
                        TermRelationEntity termEntity =
-                           ontologyMapper.mapToTermRelationEntity(createTermRelation, now, -1);
+                           ontologyMapper.mapToTermRelationEntity(createTermRelation, now, relationId);
+                       termEntity.setTerm1IdOntologyId(firstTerm.getOntologyId());
+                       termEntity.setTerm2IdOntologyId(term2OntologyId);
                        TermRelationEntity savedEntity = termRelationRepository.save(termEntity);
                        TermRelationCommandPayload termCommandPayload =
                            ontologyMapper.mapToTermRelationCommandPayload(savedEntity);

@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,6 +15,7 @@ import lombok.Setter;
 @Setter
 public class TermRelationEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @Column
     private long version;
@@ -20,8 +23,6 @@ public class TermRelationEntity {
     private LocalDateTime created;
     @Column
     private LocalDateTime deleted;
-    @Column
-    private String name;
     @Column
     private LocalDateTime updated;
     @Column

@@ -35,8 +35,10 @@ public interface OntologyMapper {
 
     @BeanMapping(ignoreUnmappedSourceProperties = {"version", "term2IdOntologyId"})
     @Mapping(target = "ontologyId", source = "term1IdOntologyId")
+    @Mapping(target = "name", ignore = true)
     TermRelationResponse mapToTermRelationResponse(TermRelationEntity termRelationEntity);
 
+    @BeanMapping(ignoreUnmappedSourceProperties = {"name"})
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "term1IdOntologyId", ignore = true)
@@ -54,6 +56,7 @@ public interface OntologyMapper {
 
     @BeanMapping(ignoreUnmappedSourceProperties = {"version", "term2IdOntologyId"})
     @Mapping(target = "ontologyId", source = "term1IdOntologyId")
+    @Mapping(target = "name", ignore = true)
     TermRelationCommandPayload mapToTermRelationCommandPayload(TermRelationEntity termRelationEntity);
 
     default Optional<LocalDateTime> date(LocalDateTime zonedDateTime) {

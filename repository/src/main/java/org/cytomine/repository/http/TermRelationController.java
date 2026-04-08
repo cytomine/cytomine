@@ -39,12 +39,12 @@ public class TermRelationController implements TermRelationHttpContract {
 
     @Override
     public Optional<HttpCommandResponse> create(long userId, CreateTermRelation createTermRelation) {
-        return Optional.empty();
+        return termRelationCommandService.createTermRelation(userId, createTermRelation, LocalDateTime.now());
     }
 
     @Override
     public Optional<HttpCommandResponse> update(long id, long userId, UpdateTermRelation updateTermRelation) {
-        return Optional.empty();
+        return termRelationCommandService.updateTerm(id, userId, updateTermRelation, LocalDateTime.now());
     }
 
     @Override

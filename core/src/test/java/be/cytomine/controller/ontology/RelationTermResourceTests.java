@@ -91,7 +91,7 @@ public class RelationTermResourceTests {
         when(termRelationHttpContract.findTermByID(eq(relationId), eq(userId)))
             .thenReturn(Optional.of(buildResponse(relationId, term1, term2)));
 
-        restRelationTermControllerMockMvc.perform(get("/api/term_relation/{id}.json", relationId))
+        restRelationTermControllerMockMvc.perform(get("/api/relation/term/{id}.json", relationId))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.term1Id").value(term1.getId().intValue()));
     }
@@ -107,7 +107,7 @@ public class RelationTermResourceTests {
         when(termRelationHttpContract.findTermByID(eq(relationId), eq(userId)))
             .thenReturn(Optional.of(buildResponse(relationId, term1, term2)));
 
-        restRelationTermControllerMockMvc.perform(get("/api/term_relation/{id}.json", relationId))
+        restRelationTermControllerMockMvc.perform(get("/api/relation/term/{id}.json", relationId))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.term2Id").value(term2.getId().intValue()));
     }
@@ -123,7 +123,7 @@ public class RelationTermResourceTests {
         when(termRelationHttpContract.findTermByID(eq(relationId), eq(userId)))
             .thenReturn(Optional.of(buildResponse(relationId, term1, term2)));
 
-        restRelationTermControllerMockMvc.perform(get("/api/term_relation/{id}.json", relationId))
+        restRelationTermControllerMockMvc.perform(get("/api/relation/term/{id}.json", relationId))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(relationId));
     }
@@ -139,7 +139,7 @@ public class RelationTermResourceTests {
         when(termRelationHttpContract.findTermByID(eq(relationId), eq(userId)))
             .thenReturn(Optional.of(buildResponse(relationId, term1, term2)));
 
-        restRelationTermControllerMockMvc.perform(get("/api/term_relation/{id}.json", relationId))
+        restRelationTermControllerMockMvc.perform(get("/api/relation/term/{id}.json", relationId))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(relationId))
             .andExpect(jsonPath("$.term1Id").value(term1.getId().intValue()))
@@ -157,7 +157,7 @@ public class RelationTermResourceTests {
         when(termRelationHttpContract.findTermByID(eq(relationId), eq(userId)))
             .thenReturn(Optional.of(buildResponse(relationId, term1, term2)));
 
-        restRelationTermControllerMockMvc.perform(get("/api/term_relation/{id}.json", relationId))
+        restRelationTermControllerMockMvc.perform(get("/api/relation/term/{id}.json", relationId))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(relationId))
             .andExpect(jsonPath("$.ontologyId").value(term1.getOntology().getId().intValue()));
@@ -180,7 +180,7 @@ public class RelationTermResourceTests {
             .toJsonString();
 
         restRelationTermControllerMockMvc.perform(
-                post("/api/term_relation.json").contentType(MediaType.APPLICATION_JSON).content(createJson))
+                post("/api/relation/term.json").contentType(MediaType.APPLICATION_JSON).content(createJson))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.command").value(Commands.CREATE_TERM_RELATION))
@@ -200,7 +200,7 @@ public class RelationTermResourceTests {
             Optional.of(new HttpCommandResponse(true, buildResponse(relationId, term1, term2), commandId,
                 Commands.DELETE_TERM_RELATION)));
 
-        restRelationTermControllerMockMvc.perform(delete("/api/term_relation/{id}.json", relationId))
+        restRelationTermControllerMockMvc.perform(delete("/api/relation/term/{id}.json", relationId))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.command").value(Commands.DELETE_TERM_RELATION))
@@ -220,7 +220,7 @@ public class RelationTermResourceTests {
             Optional.of(new HttpCommandResponse(true, buildResponse(relationId, term1, term2), commandId,
                 Commands.DELETE_TERM_RELATION)));
 
-        restRelationTermControllerMockMvc.perform(delete("/api/term_relation/{id}.json", relationId))
+        restRelationTermControllerMockMvc.perform(delete("/api/relation/term/{id}.json", relationId))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.command").value(Commands.DELETE_TERM_RELATION));
@@ -234,7 +234,7 @@ public class RelationTermResourceTests {
 
         when(termRelationHttpContract.delete(eq(relationId), eq(userId))).thenReturn(Optional.empty());
 
-        restRelationTermControllerMockMvc.perform(delete("/api/term_relation/{id}.json", relationId))
+        restRelationTermControllerMockMvc.perform(delete("/api/relation/term/{id}.json", relationId))
             .andExpect(status().isNotFound());
     }
 }

@@ -26,9 +26,21 @@
 
             <b-table-column :label="$t('actions')" centered>
               <div class="buttons is-centered">
-                <button class="button is-small is-danger" @click="handleDelete(run)">
-                  {{ $t('button-delete') }}
-                </button>
+                <template
+                  v-if="['created', 'provisioned', 'queuing', 'queued', 'running', 'pending'].includes(run.status.toLowerCase())">
+                  <button class="button is-small is-danger is-light" @click="handleCancel(run)">
+                    {{ $t('button-cancel') }}
+                  </button>
+                </template>
+
+                <template v-else-if="['finished', 'failed'].includes(run.status.toLowerCase())">
+                  <button class="button is-small is-info is-light" @click="handleViewLogs(run)">
+                    {{ $t('view-logs') }}
+                  </button>
+                  <button class="button is-small is-danger is-light" @click="handleDelete(run)">
+                    <b-icon icon="trash" class="has-text-white" />
+                  </button>
+                </template>
               </div>
             </b-table-column>
           </template>
@@ -68,6 +80,27 @@ export default {
         finished: 'is-success',
       };
       return map[status.toLowerCase()] ?? 'is-light';
+    },
+    handleCancel(run) {
+      this.$buefy.dialog.confirm({
+        title: this.$t('confirm-cancellation'),
+        message: this.$t('confirm-cancel-run'),
+        type: 'is-danger',
+        confirmText: this.$t('button-confirm'),
+        cancelText: this.$t('button-cancel'),
+        onConfirm: () => {},
+      });
+    },
+    handleViewLogs(run) { /* ... */},
+    handleDelete(run) {
+      this.$buefy.dialog.confirm({
+        title: this.$t('confirm-deletion'),
+        message: this.$t('confirm-deletion-run'),
+        type: 'is-danger',
+        confirmText: this.$t('button-confirm'),
+        cancelText: this.$t('button-cancel'),
+        onConfirm: () => {},
+      });
     },
   },
 };

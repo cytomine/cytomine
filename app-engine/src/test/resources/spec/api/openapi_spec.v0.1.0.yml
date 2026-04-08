@@ -1337,16 +1337,12 @@ components:
           description: Parameter App Engine task run UUID
         state:
           $ref: "#/components/schemas/task_run_state"
-        created_at:
+        createdAt:
           description: Creation datetime for the task run
           type: string
           format: date-time
-        updated_at:
+        updatedAt:
           description: Last update datetime for the task run
-          type: string
-          format: date-time
-        last_state_transition_at:
-          description: Last task run state transaction datetime
           type: string
           format: date-time
 

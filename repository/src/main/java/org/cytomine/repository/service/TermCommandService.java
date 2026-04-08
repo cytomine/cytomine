@@ -37,15 +37,16 @@ public class TermCommandService {
     @Transactional
     public Optional<HttpCommandResponse> deleteTerm(Long id, Long userId, LocalDateTime now) {
         return termRepository.findById(id)
-                   .filter(entity -> aclService.canDeleteOntology(userId, entity.getOntologyId())).map(termEntity -> {
-                DeleteTermCommand deleteCommand =
-                    new DeleteTermCommand(id, ontologyMapper.mapToTermCommandPayload(termEntity), userId,
-                        termEntity.getOntologyId());
-                CommandV2Entity commandV2Entity =
-                    commandV2Repository.save(commandMapper.map(deleteCommand, now, now, userId));
-                termEntity.setDeleted(now);
-                return saveAndBuildResponse(termEntity, Commands.DELETE_TERM, commandV2Entity.getId());
-            });
+                   .filter(entity -> aclService.canDeleteOntology(userId, entity.getOntologyId()))
+                   .map(termEntity -> {
+                       DeleteTermCommand deleteCommand =
+                           new DeleteTermCommand(id, ontologyMapper.mapToTermCommandPayload(termEntity), userId,
+                               termEntity.getOntologyId());
+                       CommandV2Entity commandV2Entity =
+                           commandV2Repository.save(commandMapper.map(deleteCommand, now, now, userId));
+                       termEntity.setDeleted(now);
+                       return saveAndBuildResponse(termEntity, Commands.DELETE_TERM, commandV2Entity.getId());
+                   });
     }
 
     public Optional<HttpCommandResponse> createTerm(Long userId, CreateTerm createTerm, LocalDateTime now) {

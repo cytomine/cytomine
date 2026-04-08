@@ -58,26 +58,26 @@ public class TermRelationCommandService {
         return termRepository.findById(createTermRelation.term1Id())
                    .filter(firstTerm -> aclService.canWriteOntology(userId, firstTerm.getOntologyId()))
                    // check that the second term is in the same ontology
-                   .filter(firstTerm -> termRepository.findById(createTermRelation.term2Id()).map(
-                       secondTerm -> secondTerm.getOntologyId().equals(firstTerm.getOntologyId())).orElse(false)
+                   .filter(firstTerm -> termRepository.findById(createTermRelation.term2Id())
+                       .map(secondTerm -> secondTerm.getOntologyId().equals(firstTerm.getOntologyId()))
+                       .orElse(false))
+                   .map(firstTerm -> {
+                       TermRelationEntity termEntity =
+                           ontologyMapper.mapToTermRelationEntity(createTermRelation, now, -1);
+                       TermRelationEntity savedEntity = termRelationRepository.save(termEntity);
+                       TermRelationCommandPayload termCommandPayload =
+                           ontologyMapper.mapToTermRelationCommandPayload(savedEntity);
+                       CreateTermRelationCommand insertTermCommand =
+                           new CreateTermRelationCommand(termCommandPayload, userId, termCommandPayload.ontologyId());
 
-                   ).map(firstTerm -> {
+                       CommandV2Entity commandV2Entity =
+                           commandV2Repository.save(commandMapper.map(insertTermCommand, now, now, userId));
 
-                TermRelationEntity termEntity = ontologyMapper.mapToTermRelationEntity(createTermRelation, now, -1);
-                TermRelationEntity savedEntity = termRelationRepository.save(termEntity);
-                TermRelationCommandPayload termCommandPayload =
-                    ontologyMapper.mapToTermRelationCommandPayload(savedEntity);
-                CreateTermRelationCommand insertTermCommand =
-                    new CreateTermRelationCommand(termCommandPayload, userId, termCommandPayload.ontologyId());
+                       TermRelationResponse termResponse = ontologyMapper.mapToTermRelationResponse(savedEntity);
 
-                CommandV2Entity commandV2Entity =
-                    commandV2Repository.save(commandMapper.map(insertTermCommand, now, now, userId));
-
-                TermRelationResponse termResponse = ontologyMapper.mapToTermRelationResponse(savedEntity);
-
-                return new HttpCommandResponse(true, termResponse, commandV2Entity.getId(),
-                    Commands.CREATE_TERM_RELATION);
-            });
+                       return new HttpCommandResponse(true, termResponse, commandV2Entity.getId(),
+                           Commands.CREATE_TERM_RELATION);
+                   });
     }
 
     @Transactional

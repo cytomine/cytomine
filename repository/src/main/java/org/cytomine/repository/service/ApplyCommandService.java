@@ -36,7 +36,8 @@ public class ApplyCommandService {
                        case UpdateTermCommand ucr ->
                            termCommandService.undoUpdateTerm(commandEntity.getId(), ucr, userId);
                        case DeleteTermRelationCommand deleteTermRelationCommand ->
-                           termRelationCommandService.undoDeleteTermRelation(commandEntity.getId(), deleteTermRelationCommand, userId,
+                           termRelationCommandService.undoDeleteTermRelation(commandEntity.getId(),
+                               deleteTermRelationCommand, userId,
                                now);
                        case CreateTermRelationCommand createTermRelationCommand -> null;
                        case UpdateTermRelationCommand updateTermRelationCommand -> null;

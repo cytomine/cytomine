@@ -13,8 +13,6 @@ import be.cytomine.common.repository.model.command.payload.request.TermCommandPa
 import be.cytomine.common.repository.model.command.payload.request.TermRelationCommandPayload;
 import be.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
-import be.cytomine.common.repository.model.command.payload.request.TermCommandPayload;
-import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.common.repository.model.term.payload.CreateTerm;
 import be.cytomine.common.repository.model.termrelation.payload.CreateTermRelation;
 
@@ -23,10 +21,6 @@ public interface OntologyMapper {
 
     @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
     TermResponse map(TermEntity termEntity);
-
-    @BeanMapping(ignoreUnmappedSourceProperties = {"version", "term2IdOntologyId"})
-    @Mapping(target = "ontologyId", source = "term1IdOntologyId")
-    TermRelationResponse mapToTermRelationResponse(TermRelationEntity termRelationEntity);
 
     @Mapping(target = "children", ignore = true)
     @Mapping(target = "id", ignore = true)
@@ -39,6 +33,10 @@ public interface OntologyMapper {
     @Mapping(target = "updated", source = "creationDate")
     TermEntity map(CreateTerm createTerm, LocalDateTime creationDate);
 
+    @BeanMapping(ignoreUnmappedSourceProperties = {"version", "term2IdOntologyId"})
+    @Mapping(target = "ontologyId", source = "term1IdOntologyId")
+    TermRelationResponse mapToTermRelationResponse(TermRelationEntity termRelationEntity);
+
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "term1IdOntologyId", ignore = true)
@@ -46,14 +44,15 @@ public interface OntologyMapper {
     @Mapping(target = "created", source = "creationDate")
     @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "updated", source = "creationDate")
-    TermRelationEntity mapToTermRelationEntity(CreateTermRelation createTermRelation, LocalDateTime creationDate, long relationId);
+    TermRelationEntity mapToTermRelationEntity(CreateTermRelation createTermRelation, LocalDateTime creationDate,
+                                               long relationId);
 
     @BeanMapping(ignoreUnmappedSourceProperties = {"version", "children", "deleted"})
     @Mapping(target = "ontology", source = "ontologyId")
     @Mapping(target = "parent", ignore = true)
     TermCommandPayload mapToTermCommandPayload(TermEntity termEntity);
 
-    @BeanMapping(ignoreUnmappedSourceProperties = {"version","term2IdOntologyId"})
+    @BeanMapping(ignoreUnmappedSourceProperties = {"version", "term2IdOntologyId"})
     @Mapping(target = "ontologyId", source = "term1IdOntologyId")
     TermRelationCommandPayload mapToTermRelationCommandPayload(TermRelationEntity termRelationEntity);
 

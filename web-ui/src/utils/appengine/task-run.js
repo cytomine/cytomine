@@ -47,11 +47,8 @@ export default class TaskRun extends Model {
     this.project = null;
     this.task = new Task();
     this.state = null;
-    /* eslint-disable */
-    this.created_at = null;
-    this.updated_at = null;
-    this.last_state_transition_at = null;
-    /* eslint-enable */
+    this.createdAt = null;
+    this.updatedAt = null;
   }
 
   static async fetchByProject(projectId) {

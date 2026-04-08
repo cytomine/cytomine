@@ -94,7 +94,7 @@ public class TermResourceTests {
 
     @Test
     @Transactional
-    public void get_a_term_with_wrong_user_returns_not_found() throws Exception {
+    public void getATermWithWrongUserReturnsNotFound() throws Exception {
         Term term = builder.given_a_term();
         Long userId = builder.given_superadmin().getId();
         Long wrongUserId = userId + 1;
@@ -110,7 +110,7 @@ public class TermResourceTests {
 
     @Test
     @Transactional
-    public void list_terms_by_ontology() throws Exception {
+    public void listTermsByOntology() throws Exception {
         Term term = builder.given_a_term();
         Long userId = builder.given_superadmin().getId();
         when(termHttpContract.findTermsByOntology(eq(term.getOntology().getId()), eq(userId),
@@ -128,7 +128,7 @@ public class TermResourceTests {
 
     @Test
     @Transactional
-    public void list_terms_by_ontology_with_wrong_user_returns_empty() throws Exception {
+    public void listTermsByOntologyWithWrongUserReturnsEmpty() throws Exception {
         Term term = builder.given_a_term();
         Long userId = builder.given_superadmin().getId();
         when(termHttpContract.findTermsByOntology(eq(term.getOntology().getId()), eq(userId),
@@ -140,7 +140,7 @@ public class TermResourceTests {
 
     @Test
     @Transactional
-    public void list_terms_by_project() throws Exception {
+    public void listTermsByProject() throws Exception {
         Term term = builder.given_a_term();
         Project project = builder.given_a_project_with_ontology(term.getOntology());
         Long userId = builder.given_superadmin().getId();
@@ -159,7 +159,7 @@ public class TermResourceTests {
 
     @Test
     @Transactional
-    public void list_terms_by_project_with_wrong_user_returns_empty() throws Exception {
+    public void listTermsByProjectWithWrongUserReturnsEmpty() throws Exception {
         Term term = builder.given_a_term();
         Project project = builder.given_a_project_with_ontology(term.getOntology());
         Long userId = builder.given_superadmin().getId();
@@ -172,7 +172,7 @@ public class TermResourceTests {
 
     @Test
     @Transactional
-    public void add_valid_term() throws Exception {
+    public void addValidTerm() throws Exception {
         Term term = builder.given_a_term();
         Long userId = builder.given_superadmin().getId();
         UUID commandId = UUID.randomUUID();
@@ -196,7 +196,7 @@ public class TermResourceTests {
 
     @Test
     @Transactional
-    public void add_term_with_no_write_access_returns_empty() throws Exception {
+    public void addTermWithNoWriteAccessReturnsEmpty() throws Exception {
         Term term = builder.given_a_term();
         Long userId = builder.given_superadmin().getId();
         when(termHttpContract.create(eq(userId), any())).thenReturn(Optional.empty());
@@ -212,7 +212,7 @@ public class TermResourceTests {
 
     @Test
     @Transactional
-    public void edit_valid_term() throws Exception {
+    public void editValidTerm() throws Exception {
         Term term = builder.given_a_term();
         Long userId = builder.given_superadmin().getId();
         UUID commandId = UUID.randomUUID();
@@ -235,7 +235,7 @@ public class TermResourceTests {
 
     @Test
     @Transactional
-    public void edit_term_with_no_write_access_returns_not_found() throws Exception {
+    public void editTermWithNoWriteAccessReturnsNotFound() throws Exception {
         Term term = builder.given_a_term();
         Long userId = builder.given_superadmin().getId();
         when(termHttpContract.update(eq(term.getId()), eq(userId), any())).thenReturn(Optional.empty());
@@ -249,7 +249,7 @@ public class TermResourceTests {
 
     @Test
     @Transactional
-    public void delete_term() throws Exception {
+    public void deleteTerm() throws Exception {
         Term term = builder.given_a_term();
         Long userId = builder.given_superadmin().getId();
         UUID commandId = UUID.randomUUID();
@@ -268,7 +268,7 @@ public class TermResourceTests {
 
     @Test
     @Transactional
-    public void delete_term_with_no_delete_access_returns_not_found() throws Exception {
+    public void deleteTermWithNoDeleteAccessReturnsNotFound() throws Exception {
         Term term = builder.given_a_term();
         Long userId = builder.given_superadmin().getId();
         when(termHttpContract.delete(eq(term.getId()), eq(userId))).thenReturn(Optional.empty());

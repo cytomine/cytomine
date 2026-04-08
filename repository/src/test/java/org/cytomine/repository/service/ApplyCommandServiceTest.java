@@ -13,8 +13,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import be.cytomine.common.repository.model.command.HttpCommandResponse;
-import be.cytomine.common.repository.model.command.payload.request.TermCommandPayload;
 import be.cytomine.common.repository.model.command.Commands;
 import be.cytomine.common.repository.model.command.payload.request.TermCommandPayload;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;

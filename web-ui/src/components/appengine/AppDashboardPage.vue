@@ -7,7 +7,9 @@
         <b-table :data="data">
           <template #default="{ row: run }">
             <b-table-column :label="$t('app-name')">
-              {{ run.name }}
+              <router-link :to="`/apps/${run.namespace}/${run.version}`">
+                {{ run.name }}
+              </router-link>
             </b-table-column>
 
             <b-table-column :label="$t('launched-by')">

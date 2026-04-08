@@ -1,21 +1,13 @@
 package be.cytomine.common.repository.model.command.request;
 
-import java.util.Optional;
-
 import be.cytomine.common.repository.model.command.DataType;
-import be.cytomine.common.repository.model.command.payload.term.TermCommandPayload;
-import be.cytomine.common.repository.model.command.payload.term.UpdateTermCommandPayload;
+import be.cytomine.common.repository.model.command.payload.request.TermCommandPayload;
 
 import static java.lang.String.format;
 
 public record UpdateTermCommand(Long id, TermCommandPayload before, TermCommandPayload after, long userId,
                                 Long ontologyId)
-    implements UpdateCommandRequest<UpdateTermCommandPayload> {
-
-    @Override
-    public UpdateTermCommandPayload data() {
-        return new UpdateTermCommandPayload(Optional.of(before), Optional.of(after));
-    }
+    implements UpdateCommandRequest<TermCommandPayload> {
 
     @Override
     public DataType getDataType() {

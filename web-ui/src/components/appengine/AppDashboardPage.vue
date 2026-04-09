@@ -13,7 +13,7 @@
             </b-table-column>
 
             <b-table-column :label="$t('launched-by')">
-              {{ run.user }}
+              {{ run.user.username }}
             </b-table-column>
 
             <b-table-column :label="$t('execution-date')">

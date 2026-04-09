@@ -2,4 +2,6 @@ package be.cytomine.dto.appengine.task;
 
 import java.util.Date;
 
-public record TaskRunDetail(Long project, Long user, Long image, String taskRunId, Date createdAt) {}
+import be.cytomine.dto.UserSummary;
+
+public record TaskRunDetail(Long project, UserSummary user, Long image, String taskRunId, Date createdAt) {}

@@ -4,7 +4,14 @@
       <p class="panel-heading">{{ $t('app-dashboard') }}</p>
 
       <section class="panel-block">
-        <b-table :current.sync="currentPage" :data="taskRuns" :paginated="true" :per-page="perPage">
+        <b-table
+          :current.sync="currentPage"
+          :data="taskRuns"
+          :paginated="true"
+          :per-page="perPage"
+          detailed
+          @details-open="onDetailsOpen"
+        >
           <template #default="{ row: run }">
             <b-table-column :label="$t('app-name')">
               <router-link :to="`/apps/${run.task.namespace}/${run.task.version}`">
@@ -46,6 +53,21 @@
               </div>
             </b-table-column>
           </template>
+
+          <template #detail="{ row: run }">
+            <div class="columns">
+              <div class="column">
+                <strong>Inputs</strong>
+                <b-loading :is-full-page="false" :active="run.inputs === null" />
+                <task-run-parameters-table :parameters="run.inputs" :project-id="run.project" type="input"/>
+              </div>
+              <div class="column">
+                <strong>Outputs</strong>
+                <b-loading :is-full-page="false" :active="run.outputs === null" />
+                <task-run-parameters-table :parameters="run.outputs" :project-id="run.project" type="outputs"/>
+              </div>
+            </div>
+          </template>
         </b-table>
       </section>
     </div>
@@ -55,10 +77,14 @@
 <script>
 import Task from '@/utils/appengine/task';
 import TaskRun from '@/utils/appengine/task-run';
+import TaskRunParametersTable from '@/components/appengine/task-run/TaskRunParametersTable';
 import {get} from '@/utils/store-helpers';
 
 export default {
   name: 'AppDashboardPage',
+  components: {
+    TaskRunParametersTable,
+  },
   data() {
     return {
       taskRuns: [],
@@ -80,8 +106,15 @@ export default {
           return new TaskRun({...taskRun, project, user});
         })
       );
+    },
+    async onDetailsOpen(taskRun) {
+      if (!taskRun.inputs) {
+        await taskRun.fetchInputs();
+      }
 
-      console.log(this.taskRuns, taskRuns);
+      if (!taskRun.outputs) {
+        await taskRun.fetchOutputs();
+      }
     },
     formatDate(date) {
       return new Intl.DateTimeFormat(

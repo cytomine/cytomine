@@ -35,14 +35,13 @@
 
             <b-table-column :label="$t('actions')" centered>
               <div class="buttons is-centered">
-                <template
-                  v-if="['created', 'provisioned', 'queuing', 'queued', 'running', 'pending'].includes(run.state.toLowerCase())">
+                <template v-if="!run.isTerminalState()">
                   <button class="button is-small is-danger is-light" @click="handleCancel(run)">
                     {{ $t('button-cancel') }}
                   </button>
                 </template>
 
-                <template v-else-if="['finished', 'failed'].includes(run.state.toLowerCase())">
+                <template v-else>
                   <button class="button is-small is-info is-light" @click="handleViewLogs(run)">
                     {{ $t('view-logs') }}
                   </button>

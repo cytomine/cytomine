@@ -158,7 +158,7 @@ export default {
         type: 'is-danger',
         confirmText: this.$t('button-confirm'),
         cancelText: this.$t('button-cancel'),
-        onConfirm: () => {},
+        onConfirm: () => run.delete(),
       });
     },
   },

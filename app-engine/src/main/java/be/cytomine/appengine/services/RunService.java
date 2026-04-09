@@ -1,7 +1,6 @@
 package be.cytomine.appengine.services;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,10 +12,11 @@ import be.cytomine.appengine.dto.responses.errors.ErrorBuilder;
 import be.cytomine.appengine.dto.responses.errors.ErrorCode;
 import be.cytomine.appengine.exceptions.FileStorageException;
 import be.cytomine.appengine.exceptions.RunTaskServiceException;
+import be.cytomine.appengine.exceptions.SchedulingException;
+import be.cytomine.appengine.handlers.SchedulerHandler;
 import be.cytomine.appengine.handlers.StorageHandler;
 import be.cytomine.appengine.models.task.Run;
 import be.cytomine.appengine.repositories.RunRepository;
-import be.cytomine.appengine.states.TaskRunState;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -25,21 +25,14 @@ public class RunService {
 
     private final RunRepository runRepository;
 
-    private final StorageHandler storageHandler;
+    private final SchedulerHandler schedulerHandler;
 
-    public Run findRun(String runid) {
-        return runRepository.findById(UUID.fromString(runid)).orElse(null);
-    }
+    private final StorageHandler storageHandler;
 
     public Run update(Run run) {
         run.setUpdatedAt(LocalDateTime.now());
         run.setLastStateTransitionAt(LocalDateTime.now());
         return runRepository.saveAndFlush(run);
-    }
-
-    public boolean updateRunState(TaskRunState state) {
-        log.info("Updating Run State: update to {}", state);
-        return true;
     }
 
     private void deleteStorage(String storageName) throws RunTaskServiceException {
@@ -60,6 +53,21 @@ public class RunService {
             deleteStorage(storageName);
         } catch (RunTaskServiceException e) {
             log.warn("Failed to delete storage '{}': [{}]. Skipping.", storageName, e.getMessage());
+        }
+    }
+
+    public void deleteRun(Run run) {
+        deleteStorageIfExists("task-run-inputs-" + run.getId());
+        deleteStorageIfExists("task-run-outputs-" + run.getId());
+
+        try {
+            schedulerHandler.deleteRun(run);
+        } catch (SchedulingException exception) {
+            log.warn(
+                "Could not delete run {} in scheduler, continuing deletion. Cause: {}",
+                run.getId(),
+                exception.getMessage()
+            );
         }
     }
 }

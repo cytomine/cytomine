@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -16,6 +17,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import be.cytomine.appengine.dto.inputs.task.State;
 import be.cytomine.appengine.dto.inputs.task.StateAction;
@@ -38,7 +41,12 @@ import be.cytomine.appengine.exceptions.ProvisioningException;
 import be.cytomine.appengine.exceptions.SchedulingException;
 import be.cytomine.appengine.exceptions.TypeValidationException;
 import be.cytomine.appengine.models.task.ParameterType;
+import be.cytomine.appengine.models.task.Run;
+import be.cytomine.appengine.repositories.RunRepository;
+import be.cytomine.appengine.services.RunService;
 import be.cytomine.appengine.services.TaskProvisioningService;
+
+import static java.lang.String.format;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -46,7 +54,23 @@ import be.cytomine.appengine.services.TaskProvisioningService;
 @RequestMapping(path = "${app-engine.api_prefix}${app-engine.api_version}/")
 public class TaskRunController {
 
+    public static final String UNABLE_TO_FIND_RUN = "Unable to find run with id: %s";
+
+    private final RunRepository runRepository;
+
+    private final RunService runService;
+
     private final TaskProvisioningService taskRunService;
+
+    @DeleteMapping("/task-runs/{id}")
+    public void deleteTaskRun(@PathVariable UUID id) {
+        log.info("DELETE /task-runs/{}", id);
+        Run run = runRepository.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, format(UNABLE_TO_FIND_RUN, id)));
+
+        runService.deleteRun(run);
+        log.info("DELETE /task-runs/{} - ENDED", id);
+    }
 
     @PutMapping(
         value = "/task-runs/{run_id}/input-provisions/{param_name}",
@@ -74,7 +98,6 @@ public class TaskRunController {
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     @ResponseStatus(code = HttpStatus.OK)
-    @SuppressWarnings("unchecked")
     public ResponseEntity<?> provisionData(
         @PathVariable("run_id") String runId,
         @PathVariable("param_name") String parameterName,
@@ -90,7 +113,8 @@ public class TaskRunController {
         File uploadedFile = taskRunService.streamToStorage(
             parameterName,
             request,
-            filePath);
+            filePath
+        );
         // validate
         JsonNode provisioned = taskRunService.provisionRunParameter(
             runId,
@@ -327,7 +351,8 @@ public class TaskRunController {
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE); // Or "application/zip"
         response.setHeader(
             HttpHeaders.CONTENT_DISPOSITION,
-            "attachment; filename=\"inputs-" + runId + ".zip\"");
+            "attachment; filename=\"inputs-" + runId + ".zip\""
+        );
 
         taskRunService.retrieveIOZipArchive(runId, ParameterType.INPUT, response.getOutputStream());
         response.flushBuffer();
@@ -443,12 +468,14 @@ public class TaskRunController {
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE); // Or "application/zip"
         response.setHeader(
             HttpHeaders.CONTENT_DISPOSITION,
-            "attachment; filename=\"outputs-" + runId + ".zip\"");
+            "attachment; filename=\"outputs-" + runId + ".zip\""
+        );
 
         taskRunService.retrieveIOZipArchive(
             runId,
             ParameterType.OUTPUT,
-            response.getOutputStream());
+            response.getOutputStream()
+        );
         response.flushBuffer();
 
         log.info("/task-runs/{run_id}/outputs.zip GET Ended");
@@ -466,7 +493,8 @@ public class TaskRunController {
         List<TaskRunParameterValue> taskOutputs = taskRunService.postOutputsZipArchive(
             runId,
             secret,
-            taskRunService.prepareStream(request));
+            taskRunService.prepareStream(request)
+        );
         log.info("/task-runs/{run_id}/outputs.zip POST Ended");
         return new ResponseEntity<>(taskOutputs, HttpStatus.OK);
     }

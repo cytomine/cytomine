@@ -13,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +25,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import be.cytomine.repository.appengine.TaskRunRepository;
+import be.cytomine.service.appengine.AppEngineService;
 import be.cytomine.service.appengine.TaskRunService;
 
 @Slf4j
@@ -31,6 +35,10 @@ import be.cytomine.service.appengine.TaskRunService;
 @RequestMapping("/api/app-engine")
 @RestController
 public class TaskRunController {
+
+    private final AppEngineService appEngineService;
+
+    private final TaskRunRepository taskRunRepository;
 
     private final TaskRunService taskRunService;
 
@@ -59,6 +67,17 @@ public class TaskRunController {
         @PathVariable UUID task
     ) {
         return taskRunService.getTaskRun(project, task);
+    }
+
+    @PreAuthorize("authentication.name == 'admin'")
+    @DeleteMapping("/project/{projectId}/task-runs/{runId}")
+    public void deleteTask(@PathVariable long projectId, @PathVariable UUID runId) {
+        log.info("DELETE /project/{}/task-runs/{}", projectId, runId);
+
+        taskRunRepository.deleteTaskRunByTaskRunId(runId);
+        appEngineService.delete("task-runs/" + runId);
+
+        log.info("DELETE /project/{}/task-runs/{} - ENDED", projectId, runId);
     }
 
     @PutMapping("/project/{project}/task-runs/{task}/input-provisions")

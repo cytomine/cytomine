@@ -65,6 +65,10 @@ export default class TaskRun extends Model {
     return TaskRun.TERMINAL_STATES.has(this.state);
   }
 
+  async delete() {
+    await Cytomine.instance.api.delete(this.uri);
+  }
+
   // Step-2: Provision task / user inputs
   async batchProvisionTask(params) {
     let {data} = await Cytomine.instance.api.put(`${this.uri}/input-provisions`, params);

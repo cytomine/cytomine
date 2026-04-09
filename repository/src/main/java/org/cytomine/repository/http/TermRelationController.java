@@ -8,6 +8,8 @@ import org.cytomine.repository.mapper.OntologyMapper;
 import org.cytomine.repository.persistence.TermRelationRepository;
 import org.cytomine.repository.service.ACLService;
 import org.cytomine.repository.service.TermRelationCommandService;
+import java.util.List;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,6 +31,17 @@ public class TermRelationController implements TermRelationHttpContract {
     private final org.cytomine.repository.persistence.TermRepository termRepository;
     private final TermRelationCommandService termRelationCommandService;
     private final ACLService aclService;
+
+    @Override
+    @GetMapping("/ontology/{ontologyId}")
+    public List<TermRelationResponse> findAllByOntologyId(long ontologyId, long userId) {
+        if (!aclService.canReadOntology(userId, ontologyId)) {
+            return List.of();
+        }
+        return termRelationRepository.findAllByOntologyId(ontologyId).stream()
+            .map(e -> ontologyMapper.mapToTermRelationResponse(e, ontologyId))
+            .toList();
+    }
 
     @Override
     @GetMapping("/{id}")

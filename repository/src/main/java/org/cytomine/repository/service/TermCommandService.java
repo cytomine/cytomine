@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import org.cytomine.repository.mapper.CommandMapper;
 import org.cytomine.repository.mapper.OntologyMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
+import org.cytomine.repository.persistence.TermRelationRepository;
 import org.cytomine.repository.persistence.TermRepository;
 import org.cytomine.repository.persistence.entity.CommandV2Entity;
 import org.cytomine.repository.persistence.entity.TermEntity;
@@ -29,6 +30,7 @@ import be.cytomine.common.repository.model.term.payload.UpdateTerm;
 public class TermCommandService {
 
     private final TermRepository termRepository;
+    private final TermRelationRepository termRelationRepository;
     private final OntologyMapper ontologyMapper;
     private final CommandV2Repository commandV2Repository;
     private final CommandMapper commandMapper;
@@ -44,6 +46,8 @@ public class TermCommandService {
                                termEntity.getOntologyId());
                        CommandV2Entity commandV2Entity =
                            commandV2Repository.save(commandMapper.map(deleteCommand, now, now, userId));
+                       termRelationRepository.findAllByTerm1IdOrTerm2Id(id, id)
+                           .forEach(rel -> rel.setDeleted(now));
                        termEntity.setDeleted(now);
                        return saveAndBuildResponse(termEntity, Commands.DELETE_TERM, commandV2Entity.getId());
                    });

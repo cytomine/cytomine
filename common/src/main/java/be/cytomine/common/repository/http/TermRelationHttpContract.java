@@ -12,6 +12,8 @@ import org.springframework.web.service.annotation.HttpExchange;
 import org.springframework.web.service.annotation.PostExchange;
 import org.springframework.web.service.annotation.PutExchange;
 
+import java.util.List;
+
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
 import be.cytomine.common.repository.model.termrelation.payload.CreateTermRelation;
@@ -25,6 +27,9 @@ public interface TermRelationHttpContract {
 
     @GetExchange("/{id}")
     Optional<TermRelationResponse> findTermByID(@PathVariable long id, @RequestParam long userId);
+
+    @GetExchange("/ontology/{ontologyId}")
+    List<TermRelationResponse> findAllByOntologyId(@PathVariable long ontologyId, @RequestParam long userId);
 
     @PostExchange
     Optional<HttpCommandResponse> create(@RequestParam long userId,

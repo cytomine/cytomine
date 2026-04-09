@@ -4,7 +4,7 @@
       <p class="panel-heading">{{ $t('app-dashboard') }}</p>
 
       <section class="panel-block">
-        <b-table :data="taskRuns" :current.sync="currentPage" :paginated="true" :per-page="perPage">
+        <b-table :current.sync="currentPage" :data="taskRuns" :paginated="true" :per-page="perPage">
           <template #default="{ row: run }">
             <b-table-column :label="$t('app-name')">
               <router-link :to="`/apps/${run.task.namespace}/${run.task.version}`">
@@ -12,15 +12,15 @@
               </router-link>
             </b-table-column>
 
-            <b-table-column :label="$t('launched-by')">
+            <b-table-column :label="$t('launched-by')" field="user.username" sortable>
               {{ run.user.username }}
             </b-table-column>
 
-            <b-table-column :label="$t('execution-date')">
+            <b-table-column :label="$t('execution-date')" field="createdAt" sortable>
               {{ formatDate(run.createdAt) }}
             </b-table-column>
 
-            <b-table-column :label="$t('status')" centered>
+            <b-table-column :label="$t('status')" field="state" centered sortable>
               <span class="tag" :class="stateClass(run.state)">
                 {{ run.state }}
               </span>

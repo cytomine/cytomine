@@ -1,6 +1,6 @@
 package be.cytomine.common.repository.model.command.request;
 
-import be.cytomine.common.repository.model.command.DataType;
+import be.cytomine.common.repository.model.command.CommandType;
 import be.cytomine.common.repository.model.command.payload.request.TermRelationCommandPayload;
 
 import static java.lang.String.format;
@@ -9,8 +9,8 @@ public record CreateTermRelationCommand(TermRelationCommandPayload after, long u
     implements CreateCommandRequest<TermRelationCommandPayload> {
 
     @Override
-    public DataType getDataType() {
-        return DataType.TERM_RELATION;
+    public CommandType getCommandType() {
+        return CommandType.INSERT_TERM_RELATION_COMMAND;
     }
 
     @Override

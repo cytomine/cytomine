@@ -33,16 +33,14 @@ public interface OntologyMapper {
     @Mapping(target = "updated", source = "creationDate")
     TermEntity map(CreateTerm createTerm, LocalDateTime creationDate);
 
-    @BeanMapping(ignoreUnmappedSourceProperties = {"version", "term2IdOntologyId"})
-    @Mapping(target = "ontologyId", source = "term1IdOntologyId")
+    @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
+    @Mapping(target = "ontologyId", source = "ontologyId")
     @Mapping(target = "name", ignore = true)
-    TermRelationResponse mapToTermRelationResponse(TermRelationEntity termRelationEntity);
+    TermRelationResponse mapToTermRelationResponse(TermRelationEntity termRelationEntity, long ontologyId);
 
     @BeanMapping(ignoreUnmappedSourceProperties = {"name"})
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)
-    @Mapping(target = "term1IdOntologyId", ignore = true)
-    @Mapping(target = "term2IdOntologyId", ignore = true)
     @Mapping(target = "created", source = "creationDate")
     @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "updated", source = "creationDate")
@@ -54,10 +52,10 @@ public interface OntologyMapper {
     @Mapping(target = "parent", ignore = true)
     TermCommandPayload mapToTermCommandPayload(TermEntity termEntity);
 
-    @BeanMapping(ignoreUnmappedSourceProperties = {"version", "term2IdOntologyId"})
-    @Mapping(target = "ontologyId", source = "term1IdOntologyId")
+    @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
+    @Mapping(target = "ontologyId", source = "ontologyId")
     @Mapping(target = "name", ignore = true)
-    TermRelationCommandPayload mapToTermRelationCommandPayload(TermRelationEntity termRelationEntity);
+    TermRelationCommandPayload mapToTermRelationCommandPayload(TermRelationEntity termRelationEntity, long ontologyId);
 
     default Optional<LocalDateTime> date(LocalDateTime zonedDateTime) {
         return Optional.ofNullable(zonedDateTime);

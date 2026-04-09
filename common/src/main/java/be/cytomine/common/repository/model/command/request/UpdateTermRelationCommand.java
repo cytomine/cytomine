@@ -1,6 +1,6 @@
 package be.cytomine.common.repository.model.command.request;
 
-import be.cytomine.common.repository.model.command.DataType;
+import be.cytomine.common.repository.model.command.CommandType;
 import be.cytomine.common.repository.model.command.payload.request.TermRelationCommandPayload;
 
 import static java.lang.String.format;
@@ -10,10 +10,10 @@ public record UpdateTermRelationCommand(Long id, TermRelationCommandPayload befo
     implements UpdateCommandRequest<TermRelationCommandPayload> {
 
     @Override
-    public DataType getDataType() {
-        return DataType.TERM_RELATION;
+    public CommandType getCommandType() {
+        return CommandType.UPDATE_TERM_RELATION_COMMAND;
     }
-
+    
     @Override
     public String getActionMessage() {
         return format("Term relation %s (term1: %s => %s, term2: %s => %s) updated in ontology %s",

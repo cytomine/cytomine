@@ -26,6 +26,7 @@ import static be.cytomine.common.repository.http.TermRelationHttpContract.ROOT_P
 public class TermRelationController implements TermRelationHttpContract {
     private final OntologyMapper ontologyMapper;
     private final TermRelationRepository termRelationRepository;
+    private final org.cytomine.repository.persistence.TermRepository termRepository;
     private final TermRelationCommandService termRelationCommandService;
     private final ACLService aclService;
 
@@ -33,8 +34,9 @@ public class TermRelationController implements TermRelationHttpContract {
     @GetMapping("/{id}")
     public Optional<TermRelationResponse> findTermByID(long id, long userId) {
         return termRelationRepository.findById(id)
-            .filter(termEntity -> aclService.canReadOntology(userId, termEntity.getTerm1IdOntologyId()))
-            .map(ontologyMapper::mapToTermRelationResponse);
+            .flatMap(termEntity -> termRepository.findById(termEntity.getTerm1Id())
+                .filter(term1 -> aclService.canReadOntology(userId, term1.getOntologyId()))
+                .map(term1 -> ontologyMapper.mapToTermRelationResponse(termEntity, term1.getOntologyId())));
     }
 
     @Override

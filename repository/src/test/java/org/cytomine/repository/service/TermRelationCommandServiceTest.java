@@ -99,8 +99,6 @@ class TermRelationCommandServiceTest {
         TermRelationEntity saved = termRelationRepository.findById(termRelationId).orElseThrow();
 
         assertNotNull(saved);
-        assertEquals(ontologyId, saved.getTerm1IdOntologyId());
-        assertEquals(ontologyId, saved.getTerm2IdOntologyId());
         assertEquals(term1Id, saved.getTerm1Id());
         assertEquals(term2Id, saved.getTerm2Id());
         assertEquals(relationId, saved.getRelationId());

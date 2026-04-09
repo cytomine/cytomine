@@ -31,9 +31,5 @@ public class TermRelationEntity {
     private long term1Id;
     @Column(name = "term2_id")
     private long term2Id;
-    @Column
-    private long term1IdOntologyId;
-    @Column
-    private long term2IdOntologyId;
 
 }

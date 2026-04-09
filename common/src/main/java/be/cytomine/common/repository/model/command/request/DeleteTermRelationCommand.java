@@ -1,6 +1,6 @@
 package be.cytomine.common.repository.model.command.request;
 
-import be.cytomine.common.repository.model.command.DataType;
+import be.cytomine.common.repository.model.command.CommandType;
 import be.cytomine.common.repository.model.command.payload.request.TermRelationCommandPayload;
 
 import static java.lang.String.format;
@@ -9,13 +9,13 @@ public record DeleteTermRelationCommand(Long id, TermRelationCommandPayload befo
     implements DeleteCommandRequest<TermRelationCommandPayload> {
 
     @Override
-    public DataType getDataType() {
-        return DataType.TERM_RELATION;
+    public CommandType getCommandType() {
+        return CommandType.DELETE_TERM_RELATION_COMMAND;
     }
 
     @Override
     public String getActionMessage() {
-        return format("Term relation %s (term1: %s, term2: %s) deleted in ontology %s",
-            before.id(), before.term1Id(), before.term2Id(), ontologyId);
+        return format("Term relation %s (term1: %s, term2: %s) deleted in ontology %s", before.id(), before.term1Id(),
+            before.term2Id(), ontologyId);
     }
 }

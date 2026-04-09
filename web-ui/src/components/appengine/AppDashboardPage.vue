@@ -57,12 +57,12 @@
           <template #detail="{ row: run }">
             <div class="columns">
               <div class="column">
-                <strong>Inputs</strong>
+                <h2>Inputs</h2>
                 <b-loading :is-full-page="false" :active="run.inputs === null" />
                 <task-run-parameters-table :parameters="run.inputs" :project-id="run.project" type="input"/>
               </div>
               <div class="column">
-                <strong>Outputs</strong>
+                <h2>Outputs</h2>
                 <b-loading :is-full-page="false" :active="run.outputs === null" />
                 <task-run-parameters-table :parameters="run.outputs" :project-id="run.project" type="outputs"/>
               </div>

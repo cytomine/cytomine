@@ -135,7 +135,6 @@ public abstract class Command extends CytomineDomain {
      * Define fields available for JSON response
      *
      * @param domain Domain source for json value
-     *
      * @return Map with fields (keys) and their values
      */
     public static JsonObject getDataFromDomain(CytomineDomain domain) {

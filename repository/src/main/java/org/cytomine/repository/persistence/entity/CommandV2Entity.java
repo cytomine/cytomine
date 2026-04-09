@@ -1,0 +1,41 @@
+package org.cytomine.repository.persistence.entity;
+
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
+import be.cytomine.common.repository.model.command.request.CommandV2Request;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity(name = "command_v2")
+public class CommandV2Entity {
+    @Id
+    @Generated
+    @Column
+    private UUID id;
+
+    @Column
+    private LocalDateTime created;
+
+    @Column
+    private LocalDateTime updated;
+
+    @Column(columnDefinition = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
+    private CommandV2Request<?> data;
+
+    @Column
+    private long userId;
+}

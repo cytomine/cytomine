@@ -1345,10 +1345,6 @@ components:
           description: Last update datetime for the task run
           type: string
           format: date-time
-        last_state_transition_at:
-          description: Last task run state transaction datetime
-          type: string
-          format: date-time
 
     param_name_type:
       type: string

@@ -19,10 +19,8 @@ package be.cytomine.service.ontology;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.stereotype.Service;
 
-import be.cytomine.common.repository.http.TermRelationHttpContract;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;
@@ -38,15 +35,12 @@ import be.cytomine.domain.command.DeleteCommand;
 import be.cytomine.domain.command.EditCommand;
 import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.ontology.Ontology;
-import be.cytomine.domain.ontology.Relation;
-import be.cytomine.domain.ontology.RelationTerm;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.ConstraintException;
 import be.cytomine.repository.ontology.OntologyRepository;
-import be.cytomine.repository.ontology.RelationRepository;
 import be.cytomine.repository.project.ProjectRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.ModelService;
@@ -87,45 +81,14 @@ public class OntologyService extends ModelService {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private RelationRepository relationRepository;
-
-    @Autowired
-    private TermRelationHttpContract termRelationHttpContract;
-
     public Ontology get(Long id) {
         return find(id).orElse(null);
     }
 
     public Optional<Ontology> find(Long id) {
-        Optional<Ontology> optionalOntology = ontologyRepository.findByIdWithTerms(id);
-        optionalOntology.ifPresent(ontology -> {
-            securityACLService.check(ontology, READ);
-            injectRelations(ontology);
-        });
+        Optional<Ontology> optionalOntology = ontologyRepository.findById(id);
+        optionalOntology.ifPresent(ontology -> securityACLService.check(ontology, READ));
         return optionalOntology;
-    }
-
-    private void injectRelations(Ontology ontology) {
-        long userId = currentUserService.getCurrentUser().getId();
-        Map<Long, Term> termMap = ontology.getTerms().stream()
-            .collect(Collectors.toMap(Term::getId, t -> t));
-        Map<String, Relation> relationCache = new java.util.HashMap<>();
-        termRelationHttpContract.findAllByOntologyId(ontology.getId(), userId).forEach(r -> {
-            Term term1 = termMap.get(r.term1Id());
-            Term term2 = termMap.get(r.term2Id());
-            if (term1 == null || term2 == null) {
-                return;
-            }
-            Relation relation = relationCache.computeIfAbsent(r.name(),
-                name -> relationRepository.getByName(name));
-            RelationTerm rt = new RelationTerm();
-            rt.setRelation(relation);
-            rt.setTerm1(term1);
-            rt.setTerm2(term2);
-            term1.getRelationsLeft().add(rt);
-            term2.getRelationsRight().add(rt);
-        });
     }
 
     /**

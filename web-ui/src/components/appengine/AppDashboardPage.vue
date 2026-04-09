@@ -158,7 +158,10 @@ export default {
         type: 'is-danger',
         confirmText: this.$t('button-confirm'),
         cancelText: this.$t('button-cancel'),
-        onConfirm: () => run.delete(),
+        onConfirm: () => {
+          run.delete();
+          this.taskRuns = this.taskRuns.filter(tr => tr.id !== run.id);
+        },
       });
     },
   },

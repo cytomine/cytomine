@@ -45,6 +45,7 @@ export default class TaskRun extends Model {
   _initProperties() {
     super._initProperties();
     this.project = null;
+    this.user = null;
     this.task = new Task();
     this.state = null;
     this.createdAt = null;

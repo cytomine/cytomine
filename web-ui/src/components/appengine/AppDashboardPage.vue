@@ -12,6 +12,10 @@
               </router-link>
             </b-table-column>
 
+            <b-table-column :label="$t('launched-by')">
+              {{ run.user }}
+            </b-table-column>
+
             <b-table-column :label="$t('execution-date')">
               {{ formatDate(run.createdAt) }}
             </b-table-column>
@@ -71,11 +75,13 @@ export default {
       taskRuns.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
       this.taskRuns = await Promise.all(
-        taskRuns.map(async ({project, taskRunId}) => {
+        taskRuns.map(async ({project, taskRunId, user}) => {
           let taskRun = await Task.fetchTaskRunStatus(this.currentProject.id, taskRunId);
-          return new TaskRun({...taskRun, project});
+          return new TaskRun({...taskRun, project, user});
         })
       );
+
+      console.log(this.taskRuns, taskRuns);
     },
     formatDate(date) {
       return new Intl.DateTimeFormat(

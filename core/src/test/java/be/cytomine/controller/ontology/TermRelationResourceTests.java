@@ -146,7 +146,7 @@ public class TermRelationResourceTests {
                 new HttpCommandResponse(true, buildResponse(relationTerm, ontologyId), commandId,
                     Commands.UPDATE_TERM_RELATION)));
 
-        String body = JsonObject.of("term1", relationTerm.getTerm1().getId(), "term2",
+        String body = JsonObject.of("term1Id", relationTerm.getTerm1().getId(), "term2Id",
             relationTerm.getTerm2().getId()).toJsonString();
 
         restTermControllerMockMvc.perform(
@@ -169,7 +169,7 @@ public class TermRelationResourceTests {
         when(termRelationHttpContract.update(eq(relationTerm.getId()), eq(userId), eq(updateTermRelation)))
             .thenReturn(Optional.empty());
 
-        String body = JsonObject.of("term1", relationTerm.getTerm1().getId(), "term2",
+        String body = JsonObject.of("term1Id", relationTerm.getTerm1().getId(), "term2Id",
             relationTerm.getTerm2().getId()).toJsonString();
 
         restTermControllerMockMvc.perform(

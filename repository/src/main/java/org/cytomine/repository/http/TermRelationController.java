@@ -1,6 +1,7 @@
 package org.cytomine.repository.http;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
@@ -8,8 +9,6 @@ import org.cytomine.repository.mapper.OntologyMapper;
 import org.cytomine.repository.persistence.TermRelationRepository;
 import org.cytomine.repository.service.ACLService;
 import org.cytomine.repository.service.TermRelationCommandService;
-import java.util.List;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

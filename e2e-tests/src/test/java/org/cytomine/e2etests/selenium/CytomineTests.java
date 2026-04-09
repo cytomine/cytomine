@@ -176,6 +176,22 @@ public class CytomineTests {
     }
 
     @Test
+    void deleteParentTermRemovesBothFromTree() {
+        String ontologyName = "selenium-ontology-" + randomUUID();
+        String parentTermName = "selenium-parent-" + randomUUID();
+        String childTermName = "selenium-child-" + randomUUID();
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        String ontologyURL = cytomineSteps.createOntology(wait, driver, cytomineUrl, ontologyName);
+        cytomineSteps.addTermToOntology(wait, driver, ontologyURL, parentTermName);
+        cytomineSteps.addTermToOntology(wait, driver, ontologyURL, childTermName);
+        cytomineSteps.makeTermChildOf(wait, driver, ontologyURL, childTermName, parentTermName);
+        cytomineSteps.deleteTermFromOntology(wait, ontologyURL, parentTermName);
+        cytomineSteps.verifyTermsAbsentAfterRefresh(wait, ontologyURL, parentTermName, childTermName);
+        cytomineSteps.deleteOntology(wait, ontologyURL);
+        cytomineSteps.logout(wait, cytomineUrl);
+    }
+
+    @Test
     void addAnnotationWithTools() {
         String projectName = "selenium-" + randomUUID();
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);

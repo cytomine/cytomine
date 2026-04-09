@@ -12,6 +12,7 @@ import java.util.UUID;
 import lombok.SneakyThrows;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -169,6 +170,36 @@ public class CytomineSteps {
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Confirm')]");
         webDriverUtils.waitUntilByEmpty(wait, By.xpath(
             "//span[contains(@class, 'ontology-term') and contains(text(), '" + termName + "')]"));
+    }
+
+    @SneakyThrows
+    public void makeTermChildOf(Wait<WebDriver> wait, WebDriver driver, String ontologyURL,
+                                String childTermName, String parentTermName) {
+        webDriverUtils.goTo(wait, ontologyURL);
+        webDriverUtils.waitLoading(wait);
+        var source = wait.until(d -> d.findElement(By.xpath(
+            "//span[contains(@class, 'ontology-term') and contains(text(), '" + childTermName + "')]")));
+        var target = wait.until(d -> d.findElement(By.xpath(
+            "//span[contains(@class, 'ontology-term') and contains(text(), '" + parentTermName + "')]")));
+        new Actions(driver)
+            .clickAndHold(source)
+            .moveByOffset(1, 1)
+            .moveToElement(target)
+            .release()
+            .perform();
+        Thread.sleep(2000);
+        webDriverUtils.waitLoading(wait);
+        webDriverUtils.byIsDisplayed(wait, By.xpath(
+            "//span[contains(@class, 'ontology-term') and contains(text(), '" + childTermName + "')]"));
+    }
+
+    public void verifyTermsAbsentAfterRefresh(Wait<WebDriver> wait, String ontologyURL, String... termNames) {
+        webDriverUtils.goTo(wait, ontologyURL);
+        webDriverUtils.waitLoading(wait);
+        for (String termName : termNames) {
+            webDriverUtils.waitUntilByEmpty(wait, By.xpath(
+                "//span[contains(@class, 'ontology-term') and contains(text(), '" + termName + "')]"));
+        }
     }
 
     @SneakyThrows

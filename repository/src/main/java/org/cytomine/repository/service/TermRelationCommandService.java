@@ -64,10 +64,10 @@ public class TermRelationCommandService {
             // check that the second term is in the same ontology
             .filter(firstTerm -> termRepository.findById(createTermRelation.term2Id())
                 .map(secondTerm -> secondTerm.getOntologyId().equals(firstTerm.getOntologyId())).orElse(false))
-            // Check that a relation between those terms don't exist before adding a new one. 
-            .filter(
-                i -> termRelationRepository.findByTerm1IdAndTerm2Id(createTermRelation.term1Id(),
-                    createTermRelation.term2Id()).isEmpty()).map(firstTerm -> {
+            // Check that a relation between those terms don't exist before adding a new one.
+            .filter(i -> termRelationRepository.findByTerm1IdAndTerm2Id(createTermRelation.term1Id(),
+                createTermRelation.term2Id()).isEmpty())
+            .map(firstTerm -> {
                 long ontologyId = firstTerm.getOntologyId();
                 long relationId = relationRepository.findByName(createTermRelation.name())
                     .orElseThrow(() -> new IllegalArgumentException("Relation not found: " + createTermRelation.name()))

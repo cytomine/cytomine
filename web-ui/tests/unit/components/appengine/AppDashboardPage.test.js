@@ -4,6 +4,13 @@ import AppDashboardPage from '@/components/appengine/AppDashboardPage.vue';
 import TaskRun from '@/utils/appengine/task-run';
 import {flushPromises} from '../../../utils';
 
+const mockTask = {
+  id: 1,
+  name: 'Test Task',
+  namespace: 'namespace',
+  version: '0.1.0',
+};
+
 const mockTaskRun1 = {
   id: 'c11e717a-d5ac-4655-80c7-06946d266264',
   state: 'FINISHED',
@@ -34,6 +41,10 @@ const makeTaskRun = (overrides = {}) => ({
   delete: jest.fn(),
   ...overrides,
 });
+
+jest.mock('@/utils/appengine/task', () => ({
+  fetchTaskRunStatus: jest.fn(() => Promise.resolve(mockTask))
+}));
 
 jest.mock('@/utils/appengine/task-run', () => {
   const STATES = {
@@ -81,19 +92,44 @@ describe('AppDashboardPage.vue', () => {
       computed: {
         currentProject: () => ({id: '999'}),
       },
+      stubs: {
+        'b-table': true,
+      },
       ...options,
     },
   );
 
-  it('should populate taskRuns when created', async () => {
-    const run = makeTaskRun({state: 'FINISHED'});
-    const taskRuns = [run];
-    TaskRun.fetchByProject.mockResolvedValueOnce(taskRuns);
+  describe('initial data', () => {
+    it('should start with currentPage set to 1', () => {
+      const wrapper = createWrapper();
 
-    const wrapper = createWrapper();
-    await flushPromises();
+      expect(wrapper.vm.currentPage).toBe(1);
+    });
 
-    expect(TaskRun.fetchByProject).toHaveBeenCalledWith(run.project);
-    expect(wrapper.vm.taskRuns).toHaveLength(taskRuns.length);
+    it('should start with perPage set to 10', () => {
+      const wrapper = createWrapper();
+
+      expect(wrapper.vm.perPage).toBe(10);
+    });
+
+    it('should start with empty list of taskRuns', () => {
+      const wrapper = createWrapper();
+
+      expect(wrapper.vm.taskRuns).toStrictEqual([]);
+    });
+  });
+
+  describe('created lifecycle', () => {
+    it('should populate taskRuns when created', async () => {
+      const run = makeTaskRun({state: 'FINISHED'});
+      const taskRuns = [run];
+      TaskRun.fetchByProject.mockResolvedValueOnce(taskRuns);
+
+      const wrapper = createWrapper();
+      await flushPromises();
+
+      expect(TaskRun.fetchByProject).toHaveBeenCalledWith(run.project);
+      expect(wrapper.vm.taskRuns).toHaveLength(taskRuns.length);
+    });
   });
 });

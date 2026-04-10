@@ -2,7 +2,6 @@ package org.cytomine.repository.service;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Optional;
 
 import jakarta.persistence.EntityManager;
 import org.cytomine.repository.RepositoryApp;
@@ -19,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
+import be.cytomine.common.repository.model.term.payload.CreateTerm;
 import be.cytomine.common.repository.model.termrelation.payload.CreateTermRelation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -73,15 +73,11 @@ class TermRelationCommandServiceTest {
 
         be.cytomine.common.repository.model.command.payload.response.TermResponse term1Response =
             (be.cytomine.common.repository.model.command.payload.response.TermResponse)
-                termCommandService.createTerm(userId,
-                    new be.cytomine.common.repository.model.term.payload.CreateTerm("term1", "#FF0000", ontologyId,
-                        null), t0)
+                termCommandService.createTerm(userId, new CreateTerm("term1", "#FF0000", ontologyId, null), t0)
                     .orElseThrow().data();
         be.cytomine.common.repository.model.command.payload.response.TermResponse term2Response =
             (be.cytomine.common.repository.model.command.payload.response.TermResponse)
-                termCommandService.createTerm(userId,
-                    new be.cytomine.common.repository.model.term.payload.CreateTerm("term2", "#00FF00", ontologyId,
-                        null), t0)
+                termCommandService.createTerm(userId, new CreateTerm("term2", "#00FF00", ontologyId, null), t0)
                     .orElseThrow().data();
 
         long term1Id = term1Response.id();

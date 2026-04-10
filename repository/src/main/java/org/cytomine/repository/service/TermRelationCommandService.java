@@ -69,9 +69,7 @@ public class TermRelationCommandService {
                 createTermRelation.term2Id()).isEmpty())
             .map(firstTerm -> {
                 long ontologyId = firstTerm.getOntologyId();
-                long relationId = relationRepository.findByName(createTermRelation.name())
-                    .orElseThrow(() -> new IllegalArgumentException("Relation not found: " + createTermRelation.name()))
-                    .getId();
+                long relationId = relationRepository.findParent().getId();
                 TermRelationEntity termEntity =
                     ontologyMapper.mapToTermRelationEntity(createTermRelation, now, relationId);
                 TermRelationEntity savedEntity = termRelationRepository.save(termEntity);

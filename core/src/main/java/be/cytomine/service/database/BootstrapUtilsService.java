@@ -16,7 +16,6 @@ import be.cytomine.domain.security.SecUserSecRole;
 import be.cytomine.domain.security.User;
 import be.cytomine.repository.image.MimeRepository;
 import be.cytomine.repository.meta.ConfigurationRepository;
-import be.cytomine.repository.ontology.RelationRepository;
 import be.cytomine.repository.processing.ImageFilterRepository;
 import be.cytomine.repository.security.SecRoleRepository;
 import be.cytomine.repository.security.SecUserSecRoleRepository;
@@ -39,9 +38,6 @@ public class BootstrapUtilsService {
 
     @Autowired
     StorageService storageService;
-
-    @Autowired
-    RelationRepository relationRepository;
 
     @Autowired
     ImageFilterRepository imageFilterRepository;
@@ -78,10 +74,6 @@ public class BootstrapUtilsService {
 
             storageService.initUserStorage(user);
         }
-    }
-
-    public void createRelation(String name) {
-        relationRepository.createIfNotExist(name);
     }
 
     public void createFilter(String name, String method, Boolean available) {

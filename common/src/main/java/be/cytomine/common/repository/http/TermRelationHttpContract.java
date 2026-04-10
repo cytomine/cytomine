@@ -42,4 +42,9 @@ public interface TermRelationHttpContract {
     @DeleteExchange("/{id}")
     Optional<HttpCommandResponse> delete(@PathVariable long id,
                                          @RequestParam long userId);
+
+    @DeleteExchange("/term1/{idTerm1}/term2/{idTerm2}")
+    Optional<HttpCommandResponse> deleteByTerms(@PathVariable long idTerm1,
+                                                @PathVariable long idTerm2,
+                                                @RequestParam long userId);
 }

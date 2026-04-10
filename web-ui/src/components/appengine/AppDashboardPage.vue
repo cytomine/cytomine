@@ -5,6 +5,7 @@
 
       <section class="panel-block">
         <b-table
+          ref="table"
           :current.sync="currentPage"
           :data="taskRuns"
           :paginated="true"
@@ -84,6 +85,8 @@
 
               <b-tab-item :label="$t('logs')">
                 <b-loading :is-full-page="false" :active="run.logs === null" />
+                <pre v-if="run.logs !== null" class="logs">{{ run.logs }}</pre>
+                <p v-else>{{ $t('no-log-to-display') }}</p>
               </b-tab-item>
             </b-tabs>
           </template>
@@ -128,12 +131,18 @@ export default {
       );
     },
     async onDetailsOpen(taskRun) {
+      this.$set(taskRun, '_activeTab', taskRun._activeTab ?? 0);
+
       if (!taskRun.inputs) {
         await taskRun.fetchInputs();
       }
 
       if (!taskRun.outputs) {
         await taskRun.fetchOutputs();
+      }
+
+      if (!taskRun.logs) {
+        await taskRun.fetchLogs();
       }
     },
     formatDate(date) {
@@ -171,7 +180,11 @@ export default {
         onConfirm: () => {},
       });
     },
-    handleViewLogs() {},
+    async handleViewLogs(run) {
+      this.$set(run, '_activeTab', 1);
+      await this.onDetailsOpen(run);
+      this.$refs.table.openDetailRow(run);
+    },
     handleDelete(run) {
       this.$buefy.dialog.confirm({
         title: this.$t('confirm-deletion'),
@@ -191,3 +204,14 @@ export default {
   },
 };
 </script>
+
+<style>
+.logs {
+  font-size: 0.75rem;
+  padding: 1rem;
+  border-radius: 4px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+</style>

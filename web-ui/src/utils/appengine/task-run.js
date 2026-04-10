@@ -112,4 +112,15 @@ export default class TaskRun extends Model {
     let {data} = await Cytomine.instance.api.get(`${this.uri}/${type}/${parameterName}`, {responseType: 'arraybuffer'});
     return data;
   }
+
+  async fetchLogs() {
+    if (this.state !== TaskRun.STATES.FINISHED) {
+      return null;
+    }
+
+    const logs = (await Cytomine.instance.api.get(`${this.uri}/logs`)).data;
+    Vue.set(this, 'logs', logs);
+
+    return logs;
+  }
 }

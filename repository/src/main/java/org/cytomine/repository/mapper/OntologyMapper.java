@@ -1,7 +1,6 @@
 package org.cytomine.repository.mapper;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 import org.cytomine.repository.persistence.entity.TermEntity;
 import org.cytomine.repository.persistence.entity.TermRelationEntity;
@@ -57,7 +56,4 @@ public interface OntologyMapper {
     @Mapping(target = "name", ignore = true)
     TermRelationCommandPayload mapToTermRelationCommandPayload(TermRelationEntity termRelationEntity, long ontologyId);
 
-    default Optional<LocalDateTime> date(LocalDateTime zonedDateTime) {
-        return Optional.ofNullable(zonedDateTime);
-    }
 }

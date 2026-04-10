@@ -6,11 +6,15 @@ import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 import org.cytomine.repository.mapper.OntologyMapper;
+import org.cytomine.repository.persistence.RelationRepository;
 import org.cytomine.repository.persistence.TermRelationRepository;
 import org.cytomine.repository.service.ACLService;
 import org.cytomine.repository.service.TermRelationCommandService;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import be.cytomine.common.repository.http.TermRelationHttpContract;
@@ -28,6 +32,7 @@ public class TermRelationController implements TermRelationHttpContract {
     private final OntologyMapper ontologyMapper;
     private final TermRelationRepository termRelationRepository;
     private final org.cytomine.repository.persistence.TermRepository termRepository;
+    private final RelationRepository relationRepository;
     private final TermRelationCommandService termRelationCommandService;
     private final ACLService aclService;
 
@@ -64,5 +69,17 @@ public class TermRelationController implements TermRelationHttpContract {
     @Override
     public Optional<HttpCommandResponse> delete(long id, long userId) {
         return termRelationCommandService.deleteTermRelation(id, userId, LocalDateTime.now());
+    }
+
+    @Override
+    @DeleteMapping("/term1/{idTerm1}/term2/{idTerm2}")
+    public Optional<HttpCommandResponse> deleteByTerms(@PathVariable long idTerm1, @PathVariable long idTerm2,
+                                                       @RequestParam long userId) {
+        long parentRelationId = relationRepository.findByName("parent")
+            .orElseThrow(() -> new IllegalArgumentException("Relation 'parent' not found"))
+            .getId();
+        return termRelationRepository.findByRelationIdAndTerm1IdAndTerm2Id(parentRelationId, idTerm1, idTerm2)
+            .flatMap(
+                entity -> termRelationCommandService.deleteTermRelation(entity.getId(), userId, LocalDateTime.now()));
     }
 }

@@ -12,6 +12,8 @@ public interface TermRelationRepository extends JpaRepository<TermRelationEntity
 
     Optional<TermRelationEntity> findByTerm1IdAndTerm2Id(Long term1Id, Long term2Id);
 
+    Optional<TermRelationEntity> findByRelationIdAndTerm1IdAndTerm2Id(Long relationId, Long term1Id, Long term2Id);
+
     List<TermRelationEntity> findAllByTerm1IdOrTerm2Id(Long term1Id, Long term2Id);
 
     @Query(value = "SELECT tr.* FROM relation_term tr JOIN term t ON t.id = tr.term1_id "

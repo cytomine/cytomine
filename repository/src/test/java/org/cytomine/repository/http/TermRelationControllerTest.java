@@ -83,8 +83,8 @@ class TermRelationControllerTest {
         jdbcTemplate.update("INSERT INTO ontology (id, version, name, user_id) VALUES (?, 0, 'test', ?)", ontologyId,
             userId);
 
-        relationId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
-        jdbcTemplate.update("INSERT INTO relation (id, version, name) VALUES (?, 0, 'parent')", relationId);
+        jdbcTemplate.update("INSERT INTO relation (version, name) VALUES (0, 'parent')");
+        relationId = jdbcTemplate.queryForObject("SELECT id FROM relation WHERE name = 'parent'", Long.class);
     }
 
     @Test

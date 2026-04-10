@@ -82,6 +82,6 @@ public class TermController implements TermHttpContract {
         if (!aclService.canReadOntology(userId, id)) {
             return Page.empty();
         }
-        return termRepository.findAllByOntologyId(id, pageable).map(ontologyMapper::map);
+        return termRepository.findAllByOntologyIdAndDeletedNull(id, pageable).map(ontologyMapper::map);
     }
 }

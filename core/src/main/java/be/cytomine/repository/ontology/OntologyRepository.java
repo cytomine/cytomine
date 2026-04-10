@@ -21,6 +21,8 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.domain.security.User;
@@ -29,6 +31,9 @@ public interface OntologyRepository extends JpaRepository<Ontology, Long>, JpaSp
 
     Optional<Ontology> findByName(String name);
 
-
     List<Ontology> findAllByUser(User user);
+
+    @Query("SELECT DISTINCT o FROM Ontology o LEFT JOIN FETCH o.terms t "
+        + "WHERE o.id = :id AND (t IS NULL OR t.deleted IS NULL)")
+    Optional<Ontology> findByIdWithTerms(@Param("id") Long id);
 }

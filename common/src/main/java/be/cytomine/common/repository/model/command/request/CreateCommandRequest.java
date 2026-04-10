@@ -2,17 +2,10 @@ package be.cytomine.common.repository.model.command.request;
 
 import java.util.Optional;
 
-import be.cytomine.common.repository.model.command.CommandType;
 import be.cytomine.common.repository.model.command.payload.request.UpdateCommandPayload;
 
-import static be.cytomine.common.repository.model.command.CommandType.INSERT_COMMAND;
-
 public sealed interface CreateCommandRequest<T> extends CommandV2Request<T>
-    permits CreateTermCommand {
-    @Override
-    default CommandType getCommandType() {
-        return INSERT_COMMAND;
-    }
+    permits CreateTermCommand, CreateTermRelationCommand {
 
     T after();
 

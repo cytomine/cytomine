@@ -75,9 +75,7 @@ public class TermRelationController implements TermRelationHttpContract {
     @DeleteMapping("/term1/{idTerm1}/term2/{idTerm2}")
     public Optional<HttpCommandResponse> deleteByTerms(@PathVariable long idTerm1, @PathVariable long idTerm2,
                                                        @RequestParam long userId) {
-        long parentRelationId = relationRepository.findByName("parent")
-            .orElseThrow(() -> new IllegalArgumentException("Relation 'parent' not found"))
-            .getId();
+        long parentRelationId = relationRepository.findParent().getId();
         return termRelationRepository.findByRelationIdAndTerm1IdAndTerm2Id(parentRelationId, idTerm1, idTerm2)
             .flatMap(
                 entity -> termRelationCommandService.deleteTermRelation(entity.getId(), userId, LocalDateTime.now()));

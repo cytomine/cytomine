@@ -37,20 +37,12 @@
 
             <b-table-column :label="$t('actions')" centered>
               <div class="buttons is-centered">
-                <template v-if="!run.isTerminalState()">
-                  <button class="button is-small is-danger is-light" @click="handleCancel(run)">
-                    {{ $t('button-cancel') }}
-                  </button>
-                </template>
-
-                <template v-else>
-                  <button class="button is-small is-info is-light" @click="handleViewLogs(run)">
-                    {{ $t('view-logs') }}
-                  </button>
-                  <button v-if="currentUser.username == 'admin'" class="button is-small is-danger is-light" @click="handleDelete(run)">
-                    <b-icon icon="trash" class="has-text-white" />
-                  </button>
-                </template>
+                <button class="button is-small is-info is-light" @click="handleViewLogs(run)">
+                  {{ $t('view-logs') }}
+                </button>
+                <button v-if="currentUser.username == 'admin'" class="button is-small is-danger is-light" @click="handleDelete(run)">
+                  <b-icon icon="trash" class="has-text-white" />
+                </button>
               </div>
             </b-table-column>
           </template>
@@ -169,16 +161,6 @@ export default {
         finished: 'is-success',
       };
       return map[state.toLowerCase()] ?? 'is-light';
-    },
-    handleCancel() {
-      this.$buefy.dialog.confirm({
-        title: this.$t('confirm-cancellation'),
-        message: this.$t('confirm-cancel-run'),
-        type: 'is-danger',
-        confirmText: this.$t('button-confirm'),
-        cancelText: this.$t('button-cancel'),
-        onConfirm: () => {},
-      });
     },
     async handleViewLogs(run) {
       this.$set(run, '_activeTab', 1);

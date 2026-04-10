@@ -190,6 +190,24 @@ describe('AppDashboardPage.vue', () => {
 
       expect(run.fetchOutputs).not.toHaveBeenCalled();
     });
+
+    it('should fetch logs when logs are null on details open', async () => {
+      const run = makeTaskRun({inputs: [], outputs: [], logs: null});
+      const wrapper = createWrapper();
+
+      await wrapper.vm.onDetailsOpen(run);
+
+      expect(run.fetchLogs).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not fetch logs when logs are already loaded on details open', async () => {
+      const run = makeTaskRun({inputs: [], outputs: [], logs: 'Test logs'});
+      const wrapper = createWrapper();
+
+      await wrapper.vm.onDetailsOpen(run);
+
+      expect(run.fetchLogs).not.toHaveBeenCalled();
+    });
   });
 
   describe('formatDate', () => {

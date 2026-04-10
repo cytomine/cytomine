@@ -1,6 +1,6 @@
 package be.cytomine.common.repository.model.command.request;
 
-import be.cytomine.common.repository.model.command.DataType;
+import be.cytomine.common.repository.model.command.CommandType;
 import be.cytomine.common.repository.model.command.payload.request.TermCommandPayload;
 
 import static java.lang.String.format;
@@ -8,9 +8,10 @@ import static java.lang.String.format;
 public record CreateTermCommand(TermCommandPayload after, long userId, long ontologyId)
     implements CreateCommandRequest<TermCommandPayload> {
 
+
     @Override
-    public DataType getDataType() {
-        return DataType.TERM;
+    public CommandType getCommandType() {
+        return CommandType.INSERT_TERM_COMMAND;
     }
 
     @Override

@@ -5,7 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.cytomine.repository.mapper.CommandMapper;
 import org.cytomine.repository.mapper.OntologyMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;

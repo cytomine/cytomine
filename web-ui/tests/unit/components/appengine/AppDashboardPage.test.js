@@ -189,4 +189,17 @@ describe('AppDashboardPage.vue', () => {
       expect(run.fetchOutputs).not.toHaveBeenCalled();
     });
   });
+
+  describe('formatDate', () => {
+    it('should return formatted date string when given valid ISO date', () => {
+      const wrapper = createWrapper();
+      const date = '2026-04-09T08:21:23.90721';
+
+      const result = wrapper.vm.formatDate(date);
+
+      expect(typeof result).toBe('string');
+      expect(result.length).toBeGreaterThan(0);
+      expect(result).toBe('09 Apr 2026, 08:21');
+    });
+  });
 });

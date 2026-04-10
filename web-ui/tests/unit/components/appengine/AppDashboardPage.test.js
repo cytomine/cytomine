@@ -151,4 +151,42 @@ describe('AppDashboardPage.vue', () => {
       expect(ids).toStrictEqual([newer.id, older.id]);
     });
   });
+
+  describe('opening task run detail', () => {
+    it('should fetch inputs when inputs are null on details open', async () => {
+      const run = makeTaskRun({inputs: null, outputs: []});
+      const wrapper = createWrapper();
+
+      await wrapper.vm.onDetailsOpen(run);
+
+      expect(run.fetchInputs).toHaveBeenCalledTimes(1);
+    });
+
+    it('should fetch outputs when outputs are null on details open', async () => {
+      const run = makeTaskRun({inputs: [], outputs: null});
+      const wrapper = createWrapper();
+
+      await wrapper.vm.onDetailsOpen(run);
+
+      expect(run.fetchOutputs).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not fetch inputs when inputs are already loaded on details open', async () => {
+      const run = makeTaskRun({inputs: [{key: 'param1', value: 'val1'}], outputs: null});
+      const wrapper = createWrapper();
+
+      await wrapper.vm.onDetailsOpen(run);
+
+      expect(run.fetchInputs).not.toHaveBeenCalled();
+    });
+
+    it('should not fetch outputs when outputs are already loaded on details open', async () => {
+      const run = makeTaskRun({inputs: null, outputs: [{key: 'result', value: '42'}]});
+      const wrapper = createWrapper();
+
+      await wrapper.vm.onDetailsOpen(run);
+
+      expect(run.fetchOutputs).not.toHaveBeenCalled();
+    });
+  });
 });

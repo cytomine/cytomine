@@ -281,7 +281,7 @@ public class CytomineTests {
     }
 
     @Test
-    void runTask() {
+    void runTaskAndViewResultAndDeleteRun() {
         String zipName = "com.cytomine.dummy.identity.geometry-1.0.0.zip";
         String projectName = "selenium-" + randomUUID();
         String taskName = "identity with geometry";
@@ -298,6 +298,7 @@ public class CytomineTests {
         cytomineSteps.selectTask(wait, taskName, taskVersion);
         cytomineSteps.selectAnnotationForGeometryInput(wait);
         cytomineSteps.runTask(wait, driver);
+        cytomineSteps.deleteTaskRun(wait, projectUrl, taskName);
 
         cytomineSteps.deleteTask(wait, cytomineUrl, taskName);
         cytomineSteps.deleteProject(wait, projectUrl);

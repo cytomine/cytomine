@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import static java.lang.String.format;
-import static java.util.stream.Collectors.toSet;
 
 @Component
 public class CytomineSteps {
@@ -315,6 +314,13 @@ public class CytomineSteps {
 
         Wait<WebDriver> longWait = new WebDriverWait(driver, Duration.ofSeconds(300));
         webDriverUtils.byIsDisplayed(longWait, By.cssSelector(".runs .fa-check-circle"));
+    }
+
+    public void deleteTaskRun(Wait<WebDriver> wait, String projectUrl, String taskName) {
+        webDriverUtils.goTo(wait, projectUrl.replace("configuration", "apps"));
+        webDriverUtils.byClick(wait, By.cssSelector("table tbody tr:first-child button.is-danger"));
+        webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Confirm')]");
+        webDriverUtils.waitUntilByEmpty(wait, By.xpath("//*[contains(text(),'" + taskName + "')]"));
     }
 
     public void addUserToProject(Wait<WebDriver> wait, String projectUrl, String username) {

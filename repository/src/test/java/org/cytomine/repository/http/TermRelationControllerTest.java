@@ -83,7 +83,6 @@ class TermRelationControllerTest {
         jdbcTemplate.update("INSERT INTO ontology (id, version, name, user_id) VALUES (?, 0, 'test', ?)", ontologyId,
             userId);
 
-        jdbcTemplate.update("INSERT INTO relation (version, name) VALUES (0, 'parent')");
         relationId = jdbcTemplate.queryForObject("SELECT id FROM relation WHERE name = 'parent'", Long.class);
     }
 

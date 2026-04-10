@@ -12,7 +12,6 @@ import be.cytomine.domain.meta.ConfigurationReadingRole;
 import be.cytomine.domain.processing.ImageFilter;
 import be.cytomine.repository.processing.ImageFilterRepository;
 
-import static be.cytomine.domain.ontology.RelationTerm.PARENT;
 
 @RequiredArgsConstructor
 @Transactional
@@ -51,8 +50,6 @@ public class BootstrapDataService {
             "Server",
             List.of("ROLE_USER", "ROLE_ADMIN", "ROLE_SUPER_ADMIN")
         );
-
-        bootstrapUtilsService.createRelation(PARENT);
 
         bootstrapUtilsService.createConfigurations(
             "admin_email",

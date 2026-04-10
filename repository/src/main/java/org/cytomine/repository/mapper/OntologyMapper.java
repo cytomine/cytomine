@@ -1,6 +1,7 @@
 package org.cytomine.repository.mapper;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.cytomine.repository.persistence.entity.TermEntity;
 import org.cytomine.repository.persistence.entity.TermRelationEntity;
@@ -20,6 +21,10 @@ public interface OntologyMapper {
 
     @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
     TermResponse map(TermEntity termEntity);
+
+    default <T> Optional<T> map(T t) {
+        return Optional.ofNullable(t);
+    }
 
     @Mapping(target = "children", ignore = true)
     @Mapping(target = "id", ignore = true)

@@ -5,7 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.cytomine.repository.mapper.CommandMapper;
 import org.cytomine.repository.mapper.OntologyMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
@@ -20,11 +20,12 @@ import org.springframework.stereotype.Component;
 
 import be.cytomine.common.repository.model.command.Commands;
 import be.cytomine.common.repository.model.command.payload.request.TermRelationCommandPayload;
-import lombok.RequiredArgsConstructor;
-import org.cytomine.repository.mapper.CommandMapper;
-import org.cytomine.repository.mapper.OntologyMapper;
-import org.cytomine.repository.persistence.CommandV2Repository;
-@@ -29,7 +29,7 @@
+import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import be.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
+import be.cytomine.common.repository.model.command.request.CreateTermRelationCommand;
+import be.cytomine.common.repository.model.command.request.DeleteTermRelationCommand;
+import be.cytomine.common.repository.model.command.request.UpdateTermRelationCommand;
+import be.cytomine.common.repository.model.termrelation.payload.CreateTermRelation;
 import be.cytomine.common.repository.model.termrelation.payload.UpdateTermRelation;
 
 @Component

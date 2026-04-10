@@ -202,4 +202,39 @@ describe('AppDashboardPage.vue', () => {
       expect(result).toBe('09 Apr 2026, 08:21');
     });
   });
+
+  describe('stateClass', () => {
+    it.each([
+      ['is-light', 'created'],
+      ['is-info is-light', 'provisioned'],
+      ['is-warning is-light', 'queuing'],
+      ['is-warning', 'queued'],
+      ['is-primary', 'running'],
+      ['is-warning is-light', 'pending'],
+      ['is-danger', 'failed'],
+      ['is-success', 'finished'],
+    ])('should return "%s" class when state is "%s"', (expectedClass, state) => {
+      const wrapper = createWrapper();
+
+      const result = wrapper.vm.stateClass(state);
+
+      expect(result).toBe(expectedClass);
+    });
+
+    it('should return "is-light" fallback class when state is unknown', () => {
+      const wrapper = createWrapper();
+
+      const result = wrapper.vm.stateClass('unknown-state');
+
+      expect(result).toBe('is-light');
+    });
+
+    it('should handle uppercase state string when computing class', () => {
+      const wrapper = createWrapper();
+
+      const result = wrapper.vm.stateClass('FINISHED');
+
+      expect(result).toBe('is-success');
+    });
+  });
 });

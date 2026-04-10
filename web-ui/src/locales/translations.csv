@@ -65,6 +65,8 @@ annotations,Annotations,Annotations,Anotaciones,Annotaties
 annotations-vs-contributors-chart-info-message,This chart presents the number of annotation created by each project member during the selected period,Ce graphique présente le nombre d'annotations créées par chaque membre durant la période sélectionnée,Este gráfico representa el número de anotaciones creadas por cada miembro del proyecto durante el período seleccionado,Deze grafiek toont het aantal annotaties dat door elk lid tijdens de geselecteerde periode is gemaakt
 annotations-vs-terms-chart-info-message,This chart presents the number of manual annotation associated to each term. Only annotations created during the selected period are taken into account.,Ce graphique présente le nombre d'annotations manuelles associées à chaque terme. Seules les annotations créées durant la période sélectionnée sont prises en compte.,Este cuadro presenta el número de anotaciones manuales asociadas a cada término. Solo se tienen en cuenta las anotaciones creadas durante el período seleccionado.,"Dit diagram toont het aantal handmatige annotaties dat aan elke term is gekoppeld. Alleen annotaties die tijdens de geselecteerde periode zijn gemaakt, worden in aanmerking genomen."
 api-keys,API keys,Clés API,Claves API,API-sleutels
+app-dashboard,App Dashboard,Tableau de bord de l'application,Panel de la aplicación,Applicatiedashboard
+app-name,App Name,app-name,App Name,Nom de l'application,Nombre de la aplicación,App-naam
 app-store,App Store,App Store,App Store,App Store
 appengine-not-enabled-title,App Engine is not enabled,App Engine n'est pas activé,App Engine no está habilitado,App Engine is niet ingeschakeld
 appengine-not-enabled-description,"App Engine is not enabled on your Cytomine instance. Either contact an administrator, or contact sales@cytomine.com for requesting an upgrade of your instance.",App Engine n'est pas activé sur votre instance Cytomine. Contactez un administrateur ou envoyez un e-mail à sales@cytomine.com pour demander une mise à niveau de votre instance.,App Engine no está habilitado en su instancia de Cytomine. Póngase en contacto con un administrador o envíe un correo a sales@cytomine.com para solicitar una actualización de su instancia.,App Engine is niet ingeschakeld op uw Cytomine-instantie. Neem contact op met een beheerder of stuur een e-mail naar sales@cytomine.com om een upgrade van uw instantie aan te vragen.
@@ -211,6 +213,7 @@ confirm-deletion-attached-file,Do you really want to delete attached file {filen
 confirm-deletion-annotation-link,Are you sure you want to delete the links of this annotation?,Êtes-vous sûr de vouloir supprimer les liens de cette annotation ?,¿Está seguro de que desea eliminar los enlaces de esta anotación?,Weet u zeker dat u de links van deze annotatie wilt verwijderen?
 confirm-deletion-file,Are you sure you want to delete this file?,Êtes-vous sûr de vouloir supprimer ce fichier ?,¿Está seguro de que desea eliminar este archivo?,Bent u zeker dat u dit file wilt verwijderen?
 confirm-deletion-ontology,Are you sure you want to delete ontology {name}?,Êtes-vous sûr de vouloir supprimer l'ontologie {name} ?,¿Está seguro de que desea eliminar la ontología {name}?,Bent u zeker dat u de ontologie {name} wilt verwijderen?
+confirm-deletion-run,Are you sure you want to delete this run?,Êtes-vous sûr de vouloir supprimer cette exécution ?,¿Está seguro de que desea eliminar esta ejecución?,Weet u zeker dat u deze run wilt verwijderen?
 confirm-deletion-store,Are you sure you want to delete this store?,Êtes-vous sûr de vouloir supprimer ce magasin ?,¿Está seguro de que desea eliminar esta tienda?,Bent u zeker dat u deze winkel wilt verwijderen?
 confirm-deletion-term,Are you sure you want to delete term {name}?,Êtes-vous sûr de vouloir supprimer le terme {name} ?,¿Seguro que quiere eliminar el término {name}?,Bent u zeker dat u de term {name} wilt verwijderen?
 confirm-deletion-track,Are you sure you want to delete track {name}?,Etes-vous certain de vouloir supprimer la trace {name} ?,,Bent u zeker dat u de {name}-tracering wilt verwijderen?
@@ -466,6 +469,7 @@ last-updated-on,Last updated on,Dernière mise à jour le,Última actualización
 last-week,Last week,Dernière semaine,Última pasada,Vorige week
 last-year,Last year,Dernière année,Último año,Afgelopen jaar
 lastname,Last name,Nom,Apellido,Naam
+launched-by,Launched by,Lancé par,Lanzado por,Geïntroduceerd door
 layer,Layer,Calque,Capa,Laag
 layers-opacity,Layers opacity,Opacité des calques,Opacidad de las capas,Dekking van de lagen
 ldap,LDAP,LDAP,LDAP,LDAP
@@ -489,6 +493,7 @@ live,Live,Live,En Vivo,Live
 log-being-collected,Execution log is being collected,Le log d'exécution est en train d'être collecté,Se está recopilando el registro de ejecución.,Het uitvoeringslogboek wordt verzameld
 logarithmic,Logarithmic,Logarithmic,,Logaritmisch
 logout,Logout,Se déconnecter,Cerrar sesión,Afmelden
+logs,Logs,Journaux,Registros,Logs
 magic-wand,Magic Wand,Baguette magique,Varita mágica,Toverstok
 magnification,Magnification,Grossissement,Aumento,Vergroting
 managed-projects,Managed projects,Projets supervisés,Proyectos administrados,Begeleide projecten
@@ -1108,6 +1113,7 @@ version,Version,Version,Versión,Versie
 view-all-projects,View all projects,Voir tous les projets,Ver todos los proyectos,Alle projecten bekijken
 view,View,Visualisation d'images,Ver,Afbeeldingen bekijken
 view-linked-with,This view is linked with,Cette image est synchronisée avec :,Esta vista está vinculada con,Deze afbeelding is gesynchroniseerd met:
+view-logs,View logs,Voir les journaux,Ver registros,Logs bekijken
 viewer-center-position,viewer center position,centre du visualisateur,posición central del espectador,positie van de kijker in het midden
 viewer-group,Viewer group ({nbImages} images),Groupe d'images ({nbImages} images),Grupo de espectadores ({nbImages} imágenes),Groep afbeeldingen ({nbImages} afbeeldingen)
 viewer-panels,Viewer panels,Visualisateur d'images,Paneles del visor,Afbeeldingsviewer

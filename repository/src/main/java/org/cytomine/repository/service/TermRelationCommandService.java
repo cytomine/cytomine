@@ -29,7 +29,7 @@ import be.cytomine.common.repository.model.termrelation.payload.CreateTermRelati
 import be.cytomine.common.repository.model.termrelation.payload.UpdateTermRelation;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class TermRelationCommandService {
     private final TermRepository termRepository;
     private final TermRelationRepository termRelationRepository;

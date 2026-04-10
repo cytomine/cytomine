@@ -46,7 +46,7 @@
                   <button class="button is-small is-info is-light" @click="handleViewLogs(run)">
                     {{ $t('view-logs') }}
                   </button>
-                  <button class="button is-small is-danger is-light" @click="handleDelete(run)">
+                  <button v-if="currentUser.username == 'admin'" class="button is-small is-danger is-light" @click="handleDelete(run)">
                     <b-icon icon="trash" class="has-text-white" />
                   </button>
                 </template>
@@ -94,6 +94,7 @@ export default {
   },
   computed: {
     currentProject: get('currentProject/project'),
+    currentUser: get('currentUser/user'),
   },
   methods: {
     async fetchTaskRuns() {

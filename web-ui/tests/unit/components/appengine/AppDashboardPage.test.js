@@ -88,6 +88,7 @@ describe('AppDashboardPage.vue', () => {
     AppDashboardPage,
     {
       mocks: {
+        $i18n: {locale: 'en-GB'},
         $t: (key) => key,
       },
       computed: {

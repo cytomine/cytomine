@@ -117,7 +117,7 @@ export default {
     },
     formatDate(date) {
       return new Intl.DateTimeFormat(
-        undefined,
+        this.$i18n.locale,
         {
           day: '2-digit',
           month: 'short',

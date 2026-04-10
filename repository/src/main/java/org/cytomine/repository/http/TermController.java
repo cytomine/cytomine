@@ -73,7 +73,7 @@ public class TermController implements TermHttpContract {
         if (!aclService.canReadProject(userId, id)) {
             return Page.empty();
         }
-        return termRepository.findAllByProjectId(id,  pageable).map(ontologyMapper::map);
+        return termRepository.findAllByProjectId(id, pageable).map(ontologyMapper::map);
     }
 
     @Override

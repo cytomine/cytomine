@@ -83,4 +83,7 @@
     <include file="/config/liquibase/changelog/2026-04-08-term-relation-id-sequence.sql"
              relativeToChangelogFile="false" />
 
+    <include file="/config/liquibase/changelog/2026-04-10-relation-id-sequence.sql"
+             relativeToChangelogFile="false"/>
+
 </databaseChangeLog>

@@ -36,9 +36,7 @@ import be.cytomine.domain.ontology.RelationTerm;
 import be.cytomine.domain.ontology.ReviewedAnnotation;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.project.Project;
-import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.ConstraintException;
-import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.ontology.RelationTermRepository;
 import be.cytomine.repository.ontology.TermRepository;
 import be.cytomine.service.CommandService;
@@ -159,110 +157,6 @@ public class TermServiceTests {
     void list_term_ids_by_project_return_empty_result_if_project_has_no_ontology() {
         Project project = builder.given_a_project_with_ontology(null);
         assertThat(termService.getAllTermId(project)).asList().isEmpty();
-    }
-
-    @Test
-    void add_valid_term_with_success() {
-        Ontology ontology = builder.given_an_ontology();
-        Term term = basicInstanceBuilder.given_a_not_persisted_term(ontology);
-
-        CommandResponse commandResponse = termService.add(term.toJsonObject());
-
-        assertThat(commandResponse).isNotNull();
-        assertThat(commandResponse.getStatus()).isEqualTo(200);
-        assertThat(termService.find(commandResponse.getObject().getId())).isPresent();
-        Term created = termService.find(commandResponse.getObject().getId()).get();
-        assertThat(created.getName()).isEqualTo(term.getName());
-        assertThat(created.getOntology()).isEqualTo(term.getOntology());
-    }
-
-    @Test
-    void add_term_with_null_ontology_fail() {
-        Term term = basicInstanceBuilder.given_a_not_persisted_term(null);
-        Assertions.assertThrows(WrongArgumentException.class, () -> {
-            termService.add(term.toJsonObject());
-        });
-    }
-
-    @Test
-    void add_term_with_null_color_fail() {
-        Term term = basicInstanceBuilder.given_a_not_persisted_term(builder.given_an_ontology());
-        term.setColor(null);
-        Assertions.assertThrows(WrongArgumentException.class, () -> {
-            termService.add(term.toJsonObject());
-        });
-    }
-
-    @Test
-    void undo_redo_term_creation_with_success() {
-        Term term = basicInstanceBuilder.given_a_not_persisted_term(builder.given_an_ontology());
-        CommandResponse commandResponse = termService.add(term.toJsonObject());
-        assertThat(termService.find(commandResponse.getObject().getId())).isPresent();
-        System.out.println("id = " + commandResponse.getObject().getId() + " name = " + term.getName());
-
-        commandService.undo();
-
-        assertThat(termService.find(commandResponse.getObject().getId())).isEmpty();
-
-        commandService.redo();
-
-        assertThat(termService.find(commandResponse.getObject().getId())).isPresent();
-
-    }
-
-    @Test
-    void redo_term_creation_fail_if_term_already_exist() {
-        Term term = basicInstanceBuilder.given_a_not_persisted_term(builder.given_an_ontology());
-        CommandResponse commandResponse = termService.add(term.toJsonObject());
-        assertThat(termService.find(commandResponse.getObject().getId())).isPresent();
-        System.out.println("id = " + commandResponse.getObject().getId() + " name = " + term.getName());
-
-        commandService.undo();
-
-        assertThat(termService.find(commandResponse.getObject().getId())).isEmpty();
-
-        Term termWithSameName = basicInstanceBuilder.given_a_not_persisted_term(term.getOntology());
-        termWithSameName.setName(term.getName());
-        builder.persistAndReturn(termWithSameName);
-
-        // re-create a term with a name that already exist in this ontology
-        Assertions.assertThrows(AlreadyExistException.class, () -> {
-            commandService.redo();
-        });
-    }
-
-    @Test
-    void edit_valid_term_with_success() {
-        Term term = builder.given_a_term();
-
-        CommandResponse commandResponse = termService.update(term, term.toJsonObject().withChange("name", "NEW NAME").withChange("color", "NEW COLOR"));
-
-        assertThat(commandResponse).isNotNull();
-        assertThat(commandResponse.getStatus()).isEqualTo(200);
-        assertThat(termService.find(commandResponse.getObject().getId())).isPresent();
-        Term edited = termService.find(commandResponse.getObject().getId()).get();
-        assertThat(edited.getName()).isEqualTo("NEW NAME");
-        assertThat(edited.getColor()).isEqualTo("NEW COLOR");
-    }
-
-    @Test
-    void undo_redo_term_edition_with_success() {
-        Term term = builder.given_a_term();
-        term.setName("OLD NAME");
-        term = builder.persistAndReturn(term);
-
-        termService.update(term, term.toJsonObject().withChange("name", "NEW NAME"));
-
-        assertThat(termRepository.getById(term.getId()).getName()).isEqualTo("NEW NAME");
-
-        commandService.undo();
-
-        assertThat(termRepository.getById(term.getId()).getName()).isEqualTo("OLD NAME");
-
-        commandService.redo();
-
-        assertThat(termRepository.getById(term.getId()).getName()).isEqualTo("NEW NAME");
-
     }
 
     @Test

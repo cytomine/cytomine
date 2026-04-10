@@ -70,9 +70,6 @@ class TermLifecycleTest {
         ontologyId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
         jdbcTemplate.update("INSERT INTO ontology (id, version, name, user_id) VALUES (?, 0, 'test', ?)", ontologyId,
             userId);
-
-        Long relationId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
-        jdbcTemplate.update("INSERT INTO relation (id, version, name) VALUES (?, 0, 'parent')", relationId);
     }
 
     @Test

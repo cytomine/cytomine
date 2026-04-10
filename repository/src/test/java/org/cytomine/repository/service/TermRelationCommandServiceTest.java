@@ -18,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
+import be.cytomine.common.repository.model.command.payload.response.TermResponse;
+import be.cytomine.common.repository.model.term.payload.CreateTerm;
 import be.cytomine.common.repository.model.termrelation.payload.CreateTermRelation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -69,24 +71,19 @@ class TermRelationCommandServiceTest {
     void createTermRelationPersistsOntologyIds() {
         LocalDateTime t0 = LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
 
-        be.cytomine.common.repository.model.command.payload.response.TermResponse term1Response =
-            (be.cytomine.common.repository.model.command.payload.response.TermResponse)
-                termCommandService.createTerm(userId,
-                    new be.cytomine.common.repository.model.term.payload.CreateTerm("term1", "#FF0000", ontologyId,
-                        null), t0)
-                    .orElseThrow().data();
-        be.cytomine.common.repository.model.command.payload.response.TermResponse term2Response =
-            (be.cytomine.common.repository.model.command.payload.response.TermResponse)
-                termCommandService.createTerm(userId,
-                    new be.cytomine.common.repository.model.term.payload.CreateTerm("term2", "#00FF00", ontologyId,
-                        null), t0)
-                    .orElseThrow().data();
+        TermResponse term1Response =
+            (TermResponse) termCommandService.createTerm(userId, new CreateTerm("term1", "#FF0000", ontologyId, null),
+                t0).orElseThrow().data();
+        TermResponse term2Response =
+            (TermResponse) termCommandService.createTerm(userId, new CreateTerm("term2", "#00FF00", ontologyId, null),
+                t0).orElseThrow().data();
 
         long term1Id = term1Response.id();
         long term2Id = term2Response.id();
 
-        HttpCommandResponse response = termRelationCommandService.createTermRelation(userId,
-            new CreateTermRelation(term1Id, term2Id, "parent"), t0).orElseThrow();
+        HttpCommandResponse response =
+            termRelationCommandService.createTermRelation(userId, new CreateTermRelation(term1Id, term2Id, "parent"),
+                t0).orElseThrow();
 
         TermRelationResponse termRelationResponse = (TermRelationResponse) response.data();
         long termRelationId = termRelationResponse.id();

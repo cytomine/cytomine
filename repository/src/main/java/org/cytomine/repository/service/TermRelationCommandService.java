@@ -20,16 +20,15 @@ import org.springframework.stereotype.Component;
 
 import be.cytomine.common.repository.model.command.Commands;
 import be.cytomine.common.repository.model.command.payload.request.TermRelationCommandPayload;
-import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import be.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
-import be.cytomine.common.repository.model.command.request.CreateTermRelationCommand;
-import be.cytomine.common.repository.model.command.request.DeleteTermRelationCommand;
-import be.cytomine.common.repository.model.command.request.UpdateTermRelationCommand;
-import be.cytomine.common.repository.model.termrelation.payload.CreateTermRelation;
+import lombok.RequiredArgsConstructor;
+import org.cytomine.repository.mapper.CommandMapper;
+import org.cytomine.repository.mapper.OntologyMapper;
+import org.cytomine.repository.persistence.CommandV2Repository;
+@@ -29,7 +29,7 @@
 import be.cytomine.common.repository.model.termrelation.payload.UpdateTermRelation;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class TermRelationCommandService {
     private final TermRepository termRepository;
     private final TermRelationRepository termRelationRepository;

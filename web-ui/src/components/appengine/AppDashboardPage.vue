@@ -9,6 +9,7 @@
           :data="taskRuns"
           :paginated="true"
           :per-page="perPage"
+          pagination-size="is-small"
           detailed
           @details-open="onDetailsOpen"
         >

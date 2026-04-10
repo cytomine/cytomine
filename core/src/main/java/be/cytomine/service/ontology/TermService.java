@@ -28,10 +28,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import be.cytomine.domain.CytomineDomain;
-import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;
 import be.cytomine.domain.command.DeleteCommand;
-import be.cytomine.domain.command.EditCommand;
 import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.domain.ontology.RelationTerm;
@@ -40,7 +38,6 @@ import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.ConstraintException;
-import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.ontology.AnnotationTermRepository;
 import be.cytomine.repository.ontology.ReviewedAnnotationRepository;
 import be.cytomine.repository.ontology.TermRepository;
@@ -53,7 +50,6 @@ import be.cytomine.utils.Task;
 
 import static org.springframework.security.acls.domain.BasePermission.DELETE;
 import static org.springframework.security.acls.domain.BasePermission.READ;
-import static org.springframework.security.acls.domain.BasePermission.WRITE;
 
 @Slf4j
 @Service
@@ -83,22 +79,10 @@ public class TermService extends ModelService {
         return Term.class;
     }
 
-    public Term get(Long id) {
-        return find(id).orElse(null);
-    }
-
     public Optional<Term> find(Long id) {
         Optional<Term> optionalTerm = termRepository.findById(id);
         optionalTerm.ifPresent(term -> securityACLService.check(term.container(), READ));
         return optionalTerm;
-    }
-
-    /**
-     * List all term, Only for admin
-     */
-    public List<Term> list() {
-        securityACLService.checkAdmin(currentUserService.getCurrentUser());
-        return termRepository.findAll();
     }
 
     public List<Term> list(Ontology ontology) {
@@ -126,40 +110,6 @@ public class TermService extends ModelService {
             return this.getAllTermId(project).stream().map(String::valueOf).collect(Collectors.joining(","));
         }
         return terms;
-    }
-
-    /**
-     * Add the new domain with JSON data
-     *
-     * @param jsonObject New domain data
-     *
-     * @return Response structure (created domain data,..)
-     */
-    @Override
-    public CommandResponse add(JsonObject jsonObject) {
-        if (jsonObject.isMissing("ontology")) {
-            throw new WrongArgumentException("Ontology is mandatory for term creation");
-        }
-        User currentUser = currentUserService.getCurrentUser();
-        securityACLService.checkGuest(currentUser);
-        securityACLService.check(jsonObject.getJSONAttrLong("ontology"), Ontology.class, WRITE);
-        return executeCommand(new AddCommand(currentUser), null, jsonObject);
-    }
-
-    /**
-     * Update this domain with new data from json
-     *
-     * @param domain      Domain to update
-     * @param jsonNewData New domain datas
-     *
-     * @return Response structure (new domain data, old domain data..)
-     */
-    @Override
-    public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
-        User currentUser = currentUserService.getCurrentUser();
-        securityACLService.checkUser(currentUser);
-        securityACLService.check(domain.container(), WRITE);
-        return executeCommand(new EditCommand(currentUser, transaction), domain, jsonNewData);
     }
 
     /**

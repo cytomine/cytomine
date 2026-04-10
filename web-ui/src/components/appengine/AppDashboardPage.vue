@@ -140,7 +140,7 @@ export default {
       };
       return map[state.toLowerCase()] ?? 'is-light';
     },
-    handleCancel(run) {
+    handleCancel() {
       this.$buefy.dialog.confirm({
         title: this.$t('confirm-cancellation'),
         message: this.$t('confirm-cancel-run'),
@@ -150,7 +150,7 @@ export default {
         onConfirm: () => {},
       });
     },
-    handleViewLogs(run) { /* ... */},
+    handleViewLogs() {},
     handleDelete(run) {
       this.$buefy.dialog.confirm({
         title: this.$t('confirm-deletion'),

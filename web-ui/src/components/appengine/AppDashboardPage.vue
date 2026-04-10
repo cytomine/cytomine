@@ -55,18 +55,37 @@
           </template>
 
           <template #detail="{ row: run }">
-            <div class="columns">
-              <div class="column">
-                <h2>Inputs</h2>
-                <b-loading :is-full-page="false" :active="run.inputs === null" />
-                <task-run-parameters-table :parameters="run.inputs" :project-id="run.project" type="input"/>
-              </div>
-              <div class="column">
-                <h2>Outputs</h2>
-                <b-loading :is-full-page="false" :active="run.outputs === null" />
-                <task-run-parameters-table :parameters="run.outputs" :project-id="run.project" type="outputs"/>
-              </div>
-            </div>
+            <b-tabs v-model="run._activeTab" type="is-boxed" size="is-small">
+
+              <b-tab-item :label="`${$t('app-engine.inputs.title')} / ${$t('app-engine.outputs.title')}`">
+                <div class="columns">
+                  <div class="column">
+                    <h2>{{ $t('app-engine.inputs.title') }}</h2>
+                    <b-loading :is-full-page="false" :active="run.inputs === null" />
+                    <task-run-parameters-table
+                      v-if="run.inputs !== null"
+                      :parameters="run.inputs"
+                      :project-id="run.project"
+                      type="input"
+                    />
+                  </div>
+                  <div class="column">
+                    <h2>{{ $t('app-engine.outputs.title') }}</h2>
+                    <b-loading :is-full-page="false" :active="run.outputs === null" />
+                    <task-run-parameters-table
+                      v-if="run.outputs !== null"
+                      :parameters="run.outputs"
+                      :project-id="run.project"
+                      type="outputs"
+                    />
+                  </div>
+                </div>
+              </b-tab-item>
+
+              <b-tab-item :label="$t('logs')">
+                <b-loading :is-full-page="false" :active="run.logs === null" />
+              </b-tab-item>
+            </b-tabs>
           </template>
         </b-table>
       </section>

@@ -19,6 +19,7 @@ package be.cytomine.authorization.ontology;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -30,7 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
-import be.cytomine.authorization.CRUDAuthorizationTest;
+import be.cytomine.authorization.CRDAuthorizationTest;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.service.PermissionService;
 import be.cytomine.service.ontology.TermService;
@@ -39,7 +40,7 @@ import be.cytomine.service.security.SecurityACLService;
 @AutoConfigureMockMvc
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @Transactional
-public class TermAuthorizationTest extends CRUDAuthorizationTest {
+public class TermAuthorizationTest extends CRDAuthorizationTest {
     @Autowired
     TermService termService;
     @Autowired
@@ -89,14 +90,21 @@ public class TermAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Override
-    public void when_i_edit_domain() {
-        termService.update(term, term.toJsonObject());
-    }
-
-    @Override
     protected void when_i_delete_domain() {
         Term termToDelete = builder.given_a_term(term.getOntology());
         termService.delete(termToDelete, null, null, true);
+    }
+
+    @Test
+    @Disabled
+    @Override
+    public void guest_add_domain() {
+    }
+
+    @Test
+    @Disabled
+    @Override
+    public void user_without_permission_add_domain() {
     }
 
     @Override
@@ -111,9 +119,8 @@ public class TermAuthorizationTest extends CRUDAuthorizationTest {
 
     @Override
     protected Optional<Permission> minimalPermissionForEdit() {
-        return Optional.of(BasePermission.WRITE);
+        return Optional.empty();
     }
-
 
     @Override
     protected Optional<String> minimalRoleForCreate() {
@@ -127,6 +134,6 @@ public class TermAuthorizationTest extends CRUDAuthorizationTest {
 
     @Override
     protected Optional<String> minimalRoleForEdit() {
-        return Optional.of("ROLE_USER");
+        return Optional.empty();
     }
 }

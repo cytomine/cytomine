@@ -23,7 +23,6 @@ import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.common.repository.model.term.payload.CreateTerm;
-import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.common.repository.model.term.payload.UpdateTerm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

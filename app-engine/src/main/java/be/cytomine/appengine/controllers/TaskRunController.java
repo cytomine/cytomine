@@ -40,6 +40,7 @@ import be.cytomine.appengine.exceptions.FileStorageException;
 import be.cytomine.appengine.exceptions.ProvisioningException;
 import be.cytomine.appengine.exceptions.SchedulingException;
 import be.cytomine.appengine.exceptions.TypeValidationException;
+import be.cytomine.appengine.handlers.SchedulerHandler;
 import be.cytomine.appengine.models.task.ParameterType;
 import be.cytomine.appengine.models.task.Run;
 import be.cytomine.appengine.repositories.RunRepository;
@@ -59,6 +60,8 @@ public class TaskRunController {
     private final RunRepository runRepository;
 
     private final RunService runService;
+
+    private final SchedulerHandler schedulerHandler;
 
     private final TaskProvisioningService taskRunService;
 
@@ -509,5 +512,13 @@ public class TaskRunController {
         StateAction stateAction = taskRunService.updateRunState(runId, state);
         log.info("POST /task-runs/{}/state-actions Ended", runId);
         return new ResponseEntity<>(stateAction, HttpStatus.OK);
+    }
+
+    @GetMapping("/task-runs/{id}/logs")
+    public String getTaskRunLogs(@PathVariable UUID id) throws SchedulingException {
+        log.info("GET /task-runs/{}/logs", id);
+        Run run = runRepository.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, format(UNABLE_TO_FIND_RUN, id)));
+        return schedulerHandler.getRunLogs(run);
     }
 }

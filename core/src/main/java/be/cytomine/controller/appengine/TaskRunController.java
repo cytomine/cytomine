@@ -197,4 +197,10 @@ public class TaskRunController {
             throw new RuntimeException("Error while streaming the output parameter", e);
         }
     }
+
+    @GetMapping("/project/{projectId}/task-runs/{runId}/logs")
+    public String getTaskRunLogs(@PathVariable Long projectId, @PathVariable UUID runId) {
+        log.info("GET /project/{}/task-runs/{}/logs", projectId, runId);
+        return appEngineService.get("task-runs/" + runId + "/logs");
+    }
 }

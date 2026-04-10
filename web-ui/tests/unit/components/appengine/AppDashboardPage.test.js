@@ -39,6 +39,7 @@ const makeTaskRun = (overrides = {}) => ({
   isTerminalState: jest.fn(() => true),
   fetchInputs: jest.fn(),
   fetchOutputs: jest.fn(),
+  fetchLogs: jest.fn(),
   delete: jest.fn(),
   ...overrides,
 });

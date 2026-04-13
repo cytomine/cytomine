@@ -1,8 +1,5 @@
 package org.cytomine.repository.service;
 
-import java.sql.PreparedStatement;
-import java.sql.Statement;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -15,9 +12,6 @@ import org.cytomine.repository.persistence.CommandV2Repository;
 import org.cytomine.repository.persistence.UserAnnotationRepository;
 import org.cytomine.repository.persistence.entity.CommandV2Entity;
 import org.cytomine.repository.persistence.entity.UserAnnotationEntity;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
 import be.cytomine.common.repository.model.command.Commands;
@@ -32,17 +26,11 @@ import be.cytomine.common.repository.model.userannotation.payload.UpdateUserAnno
 @Component
 @AllArgsConstructor
 public class UserAnnotationCommandService {
-    private static final String INSERT_SQL = "INSERT INTO user_annotation "
-        + "(version, created, updated, user_id, image_id, slice_id, project_id, "
-        + "location, wkt_location, geometry_compression, count_reviewed_annotations) "
-        + "VALUES (0, ?, ?, ?, ?, ?, ?, ST_GeomFromText(?, 0), ?, ?, 0)";
-
     private final UserAnnotationRepository userAnnotationRepository;
     private final CommandV2Repository commandV2Repository;
     private final CommandMapper commandMapper;
     private final UserAnnotationMapper userAnnotationMapper;
     private final ACLService aclService;
-    private final JdbcTemplate jdbcTemplate;
 
     @Transactional
     public Optional<HttpCommandResponse> createUserAnnotation(Long userId, CreateUserAnnotation payload,
@@ -50,21 +38,8 @@ public class UserAnnotationCommandService {
         if (!aclService.canReadProject(userId, payload.projectId())) {
             return Optional.empty();
         }
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS);
-            ps.setTimestamp(1, Timestamp.valueOf(now));
-            ps.setTimestamp(2, Timestamp.valueOf(now));
-            ps.setLong(3, payload.userId());
-            ps.setLong(4, payload.imageId());
-            ps.setLong(5, payload.sliceId());
-            ps.setLong(6, payload.projectId());
-            ps.setString(7, payload.wktLocation());
-            ps.setString(8, payload.wktLocation());
-            ps.setDouble(9, payload.geometryCompression());
-            return ps;
-        }, keyHolder);
-        long newId = keyHolder.getKey().longValue();
+        long newId = userAnnotationRepository.insertWithGeometry(now, now, payload.userId(), payload.imageId(),
+            payload.sliceId(), payload.projectId(), payload.wktLocation(), payload.geometryCompression());
         UserAnnotationEntity saved = userAnnotationRepository.findById(newId).orElseThrow();
 
         UserAnnotationCommandPayload commandPayload = userAnnotationMapper.mapToCommandPayload(saved);
@@ -113,26 +88,41 @@ public class UserAnnotationCommandService {
 
     public Optional<HttpCommandResponse> undoCreateUserAnnotation(UUID commandId, CreateUserAnnotationCommand cmd,
                                                                   Long userId, LocalDateTime now) {
+        if (!aclService.canReadProject(userId, cmd.after().projectId())) {
+            return Optional.empty();
+        }
         return softDelete(commandId, cmd.after().id(), Commands.CREATE_USER_ANNOTATION, now);
     }
 
     public Optional<HttpCommandResponse> redoCreateUserAnnotation(UUID commandId, CreateUserAnnotationCommand cmd,
                                                                   Long userId, LocalDateTime now) {
+        if (!aclService.canReadProject(userId, cmd.after().projectId())) {
+            return Optional.empty();
+        }
         return restore(commandId, cmd.after().id(), Commands.CREATE_USER_ANNOTATION, now);
     }
 
     public Optional<HttpCommandResponse> undoDeleteUserAnnotation(UUID commandId, DeleteUserAnnotationCommand cmd,
                                                                   Long userId, LocalDateTime now) {
+        if (!aclService.canReadProject(userId, cmd.before().projectId())) {
+            return Optional.empty();
+        }
         return restore(commandId, cmd.before().id(), Commands.DELETE_USER_ANNOTATION, now);
     }
 
     public Optional<HttpCommandResponse> redoDeleteUserAnnotation(UUID commandId, DeleteUserAnnotationCommand cmd,
                                                                   Long userId, LocalDateTime now) {
+        if (!aclService.canReadProject(userId, cmd.before().projectId())) {
+            return Optional.empty();
+        }
         return softDelete(commandId, cmd.before().id(), Commands.DELETE_USER_ANNOTATION, now);
     }
 
     public Optional<HttpCommandResponse> undoUpdateUserAnnotation(UUID commandId, UpdateUserAnnotationCommand cmd,
                                                                   Long userId, LocalDateTime now) {
+        if (!aclService.canReadProject(userId, cmd.before().projectId())) {
+            return Optional.empty();
+        }
         return userAnnotationRepository.findById(cmd.before().id()).map(entity -> {
             userAnnotationRepository.updateGeometry(entity.getId(), cmd.before().wktLocation(),
                 cmd.before().geometryCompression(), now);
@@ -144,6 +134,9 @@ public class UserAnnotationCommandService {
 
     public Optional<HttpCommandResponse> redoUpdateUserAnnotation(UUID commandId, UpdateUserAnnotationCommand cmd,
                                                                   Long userId, LocalDateTime now) {
+        if (!aclService.canReadProject(userId, cmd.after().projectId())) {
+            return Optional.empty();
+        }
         return userAnnotationRepository.findById(cmd.after().id()).map(entity -> {
             userAnnotationRepository.updateGeometry(entity.getId(), cmd.after().wktLocation(),
                 cmd.after().geometryCompression(), now);

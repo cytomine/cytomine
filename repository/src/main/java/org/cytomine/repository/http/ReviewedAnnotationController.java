@@ -9,7 +9,6 @@ import org.cytomine.repository.mapper.ReviewedAnnotationMapper;
 import org.cytomine.repository.persistence.ReviewedAnnotationRepository;
 import org.cytomine.repository.service.ACLService;
 import org.cytomine.repository.service.ReviewedAnnotationCommandService;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,7 +29,6 @@ public class ReviewedAnnotationController implements ReviewedAnnotationHttpContr
     private final ReviewedAnnotationCommandService reviewedAnnotationCommandService;
     private final ReviewedAnnotationMapper reviewedAnnotationMapper;
     private final ACLService aclService;
-    private final JdbcTemplate jdbcTemplate;
 
     @Override
     @GetMapping("/{id}")
@@ -65,8 +63,6 @@ public class ReviewedAnnotationController implements ReviewedAnnotationHttpContr
     }
 
     private List<Long> getTermIds(long reviewedAnnotationId) {
-        return jdbcTemplate.queryForList(
-            "SELECT terms_id FROM reviewed_annotation_term WHERE reviewed_annotation_terms_id = ?",
-            Long.class, reviewedAnnotationId);
+        return reviewedAnnotationRepository.findTermIds(reviewedAnnotationId);
     }
 }

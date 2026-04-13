@@ -12,10 +12,10 @@ import be.cytomine.common.repository.model.command.payload.response.UserAnnotati
 @Mapper(componentModel = "spring")
 public interface UserAnnotationMapper {
 
-    @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
+    @BeanMapping(ignoreUnmappedSourceProperties = {"version", "countComments"})
     UserAnnotationResponse mapToResponse(UserAnnotationEntity entity);
 
-    @BeanMapping(ignoreUnmappedSourceProperties = {"version", "countReviewedAnnotations"})
+    @BeanMapping(ignoreUnmappedSourceProperties = {"version", "countReviewedAnnotations", "countComments"})
     UserAnnotationCommandPayload mapToCommandPayload(UserAnnotationEntity entity);
 
     default <T> Optional<T> map(T t) {

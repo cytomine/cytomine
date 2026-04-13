@@ -33,7 +33,7 @@ public class ACLService {
         return isAdmin(userId) || hasPermission(userId, ontologyId, ONTOLOGY_CLASS, DELETE_MASK);
     }
 
-    private boolean isAdmin(long userId) {
+    public boolean isAdmin(long userId) {
         String sql = """
             SELECT COUNT(*) > 0
             FROM sec_user_sec_role usr

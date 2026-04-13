@@ -39,4 +39,6 @@ public class UserAnnotationEntity {
     private double geometryCompression;
     @Column(name = "count_reviewed_annotations")
     private int countReviewedAnnotations;
+    @Column(name = "count_comments")
+    private long countComments;
 }

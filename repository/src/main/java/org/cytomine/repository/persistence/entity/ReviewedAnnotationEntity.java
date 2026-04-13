@@ -45,4 +45,6 @@ public class ReviewedAnnotationEntity {
     private String wktLocation;
     @Column(name = "geometry_compression")
     private double geometryCompression;
+    @Column(name = "count_comments")
+    private long countComments;
 }

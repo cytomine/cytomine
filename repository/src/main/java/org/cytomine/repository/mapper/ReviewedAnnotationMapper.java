@@ -14,11 +14,11 @@ import be.cytomine.common.repository.model.command.payload.response.ReviewedAnno
 @Mapper(componentModel = "spring")
 public interface ReviewedAnnotationMapper {
 
-    @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
+    @BeanMapping(ignoreUnmappedSourceProperties = {"version", "countComments"})
     @Mapping(target = "termIds", source = "termIds")
     ReviewedAnnotationResponse mapToResponse(ReviewedAnnotationEntity entity, List<Long> termIds);
 
-    @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
+    @BeanMapping(ignoreUnmappedSourceProperties = {"version", "countComments"})
     @Mapping(target = "termIds", source = "termIds")
     ReviewedAnnotationCommandPayload mapToCommandPayload(ReviewedAnnotationEntity entity, List<Long> termIds);
 

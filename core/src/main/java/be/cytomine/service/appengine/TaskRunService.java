@@ -54,6 +54,7 @@ import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
+import be.cytomine.dto.UserSummary;
 import be.cytomine.dto.appengine.task.TaskRunDetail;
 import be.cytomine.dto.appengine.task.TaskRunOutputResponse;
 import be.cytomine.dto.appengine.task.TaskRunResponse;
@@ -213,7 +214,11 @@ public class TaskRunService {
         return taskRuns.stream()
             .map(taskRun -> new TaskRunDetail(
                 taskRun.getProject().getId(),
-                taskRun.getUser().getId(),
+                new UserSummary(
+                    taskRun.getUser().getId(),
+                    taskRun.getUser().getUsername(),
+                    taskRun.getUser().getName()
+                ),
                 taskRun.getImage().getId(),
                 taskRun.getTaskRunId().toString(),
                 taskRun.getCreated()

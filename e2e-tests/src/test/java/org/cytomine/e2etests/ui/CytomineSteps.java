@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import static java.lang.String.format;
-import static java.util.stream.Collectors.toSet;
 
 @Component
 public class CytomineSteps {
@@ -134,10 +133,8 @@ public class CytomineSteps {
         webDriverUtils.xpathClick(wait, "//span[@data-option='" + projectName + "']");
     }
 
-    @SneakyThrows
     public void deleteImage(Wait<WebDriver> wait, URL cytomineUrl, String imageName) {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/storage");
-        Thread.sleep(5000);
         webDriverUtils.waitLoading(wait);
         webDriverUtils.byIsDisplayed(wait, By.xpath(
             "//div[contains(@class,'uploaded-files-list')]//span[@data-filename='" + imageName
@@ -172,7 +169,6 @@ public class CytomineSteps {
             "//span[contains(@class, 'ontology-term') and contains(text(), '" + termName + "')]"));
     }
 
-    @SneakyThrows
     public void makeTermChildOf(Wait<WebDriver> wait, WebDriver driver, String ontologyURL,
                                 String childTermName, String parentTermName) {
         webDriverUtils.goTo(wait, ontologyURL);
@@ -187,7 +183,6 @@ public class CytomineSteps {
             .moveToElement(target)
             .release()
             .perform();
-        Thread.sleep(2000);
         webDriverUtils.waitLoading(wait);
         webDriverUtils.byIsDisplayed(wait, By.xpath(
             "//span[contains(@class, 'ontology-term') and contains(text(), '" + childTermName + "')]"));
@@ -202,15 +197,12 @@ public class CytomineSteps {
         }
     }
 
-    @SneakyThrows
     public void openImageInViewer(Wait<WebDriver> wait, String projectURL) {
         webDriverUtils.goTo(wait, projectURL);
         webDriverUtils.xpathClick(wait, "//li//a[.//i[contains(@class, 'fa-image')]]");
-        Thread.sleep(2000);
         webDriverUtils.waitLoading(wait);
         webDriverUtils.byIsDisplayed(wait, By.xpath("//td//a[contains(@href, '/image/')]"));
         webDriverUtils.xpathClick(wait, "//td//a[contains(@href, '/image/')]");
-        Thread.sleep(1000);
         webDriverUtils.waitLoading(wait);
         webDriverUtils.byIsDisplayed(wait, By.cssSelector(".draw-tools-wrapper"));
     }
@@ -315,6 +307,13 @@ public class CytomineSteps {
 
         Wait<WebDriver> longWait = new WebDriverWait(driver, Duration.ofSeconds(300));
         webDriverUtils.byIsDisplayed(longWait, By.cssSelector(".runs .fa-check-circle"));
+    }
+
+    public void deleteTaskRun(Wait<WebDriver> wait, String projectUrl, String taskName) {
+        webDriverUtils.goTo(wait, projectUrl.replace("configuration", "apps"));
+        webDriverUtils.byClick(wait, By.cssSelector("table tbody tr:first-child button.is-danger"));
+        webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Confirm')]");
+        webDriverUtils.waitUntilByEmpty(wait, By.xpath("//*[contains(text(),'" + taskName + "')]"));
     }
 
     public void addUserToProject(Wait<WebDriver> wait, String projectUrl, String username) {

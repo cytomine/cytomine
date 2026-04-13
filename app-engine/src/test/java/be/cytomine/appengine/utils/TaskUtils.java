@@ -3,21 +3,17 @@ package be.cytomine.appengine.utils;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.Set;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import be.cytomine.appengine.models.task.Parameter;
-import be.cytomine.appengine.models.task.ParameterType;
-
 import be.cytomine.appengine.handlers.StorageData;
 import be.cytomine.appengine.handlers.StorageDataEntry;
 import be.cytomine.appengine.handlers.StorageDataType;
 import be.cytomine.appengine.models.task.Author;
+import be.cytomine.appengine.models.task.Parameter;
+import be.cytomine.appengine.models.task.ParameterType;
 import be.cytomine.appengine.models.task.Run;
 import be.cytomine.appengine.models.task.Task;
 import be.cytomine.appengine.models.task.Type;
@@ -89,10 +85,12 @@ public class TaskUtils {
         task.setStorageReference("storageReference");
         task.setDescription("Test Task Description");
         task.setAuthors(Set.of(createTestAuthor()));
-        task.setParameters(Set.of(createTestInput("name 1", false),
+        task.setParameters(Set.of(
+            createTestInput("name 1", false),
             createTestInput("name 2", false),
             createTestOutput("out 1", false),
-            createTestOutput("out 2", false)));
+            createTestOutput("out 2", false)
+        ));
 
         return task;
     }

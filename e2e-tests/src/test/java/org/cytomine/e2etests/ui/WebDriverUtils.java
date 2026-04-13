@@ -1,6 +1,6 @@
 package org.cytomine.e2etests.ui;
 
-import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.TimeoutException;
@@ -10,6 +10,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Wait;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class WebDriverUtils {
 
@@ -90,7 +91,8 @@ public class WebDriverUtils {
                 var loadingOverlays = d.findElements(By.cssSelector(".loading-overlay.is-active"));
                 return loadingOverlays.isEmpty();
             });
-        } catch (TimeoutException ignored) {
+        } catch (TimeoutException e) {
+            log.warn("Loading overlay still present after timeout. Continuing test execution.", e);
         }
     }
 

@@ -10,7 +10,6 @@ import org.cytomine.repository.persistence.UserAnnotationRepository;
 import org.cytomine.repository.service.ACLService;
 import org.cytomine.repository.service.UserAnnotationCommandService;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -42,8 +41,8 @@ public class UserAnnotationController implements UserAnnotationHttpContract {
     @Override
     @GetMapping("/user/{userAnnotationUserId}/image/{imageId}")
     public List<UserAnnotationResponse> findAllByUserAndImage(long userAnnotationUserId,
-                                                               long imageId,
-                                                               long userId) {
+                                                              long imageId,
+                                                              long userId) {
         return userAnnotationRepository.findAllByUserIdAndImageId(userAnnotationUserId, imageId).stream()
             .map(userAnnotationMapper::mapToResponse)
             .toList();

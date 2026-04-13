@@ -1,6 +1,5 @@
 package org.cytomine.repository.service;
 
-import java.sql.Array;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.sql.Timestamp;
@@ -52,7 +51,7 @@ public class ReviewedAnnotationCommandService {
 
     @Transactional
     public Optional<HttpCommandResponse> createReviewedAnnotation(Long userId, CreateReviewedAnnotation payload,
-                                                                   LocalDateTime now) {
+                                                                  LocalDateTime now) {
         if (!aclService.canReadProject(userId, payload.projectId())) {
             return Optional.empty();
         }
@@ -94,8 +93,8 @@ public class ReviewedAnnotationCommandService {
 
     @Transactional
     public Optional<HttpCommandResponse> updateReviewedAnnotation(Long id, Long userId,
-                                                                   UpdateReviewedAnnotation payload,
-                                                                   LocalDateTime now) {
+                                                                  UpdateReviewedAnnotation payload,
+                                                                  LocalDateTime now) {
         return reviewedAnnotationRepository.findById(id)
             .filter(e -> aclService.canReadProject(userId, e.getProjectId()))
             .map(entity -> {
@@ -137,32 +136,32 @@ public class ReviewedAnnotationCommandService {
     }
 
     public Optional<HttpCommandResponse> undoCreateReviewedAnnotation(UUID commandId,
-                                                                       CreateReviewedAnnotationCommand cmd,
-                                                                       Long userId, LocalDateTime now) {
+                                                                      CreateReviewedAnnotationCommand cmd,
+                                                                      Long userId, LocalDateTime now) {
         return softDelete(commandId, cmd.after().id(), Commands.CREATE_REVIEWED_ANNOTATION, now);
     }
 
     public Optional<HttpCommandResponse> redoCreateReviewedAnnotation(UUID commandId,
-                                                                       CreateReviewedAnnotationCommand cmd,
-                                                                       Long userId, LocalDateTime now) {
+                                                                      CreateReviewedAnnotationCommand cmd,
+                                                                      Long userId, LocalDateTime now) {
         return restore(commandId, cmd.after().id(), Commands.CREATE_REVIEWED_ANNOTATION, now);
     }
 
     public Optional<HttpCommandResponse> undoDeleteReviewedAnnotation(UUID commandId,
-                                                                       DeleteReviewedAnnotationCommand cmd,
-                                                                       Long userId, LocalDateTime now) {
+                                                                      DeleteReviewedAnnotationCommand cmd,
+                                                                      Long userId, LocalDateTime now) {
         return restore(commandId, cmd.before().id(), Commands.DELETE_REVIEWED_ANNOTATION, now);
     }
 
     public Optional<HttpCommandResponse> redoDeleteReviewedAnnotation(UUID commandId,
-                                                                       DeleteReviewedAnnotationCommand cmd,
-                                                                       Long userId, LocalDateTime now) {
+                                                                      DeleteReviewedAnnotationCommand cmd,
+                                                                      Long userId, LocalDateTime now) {
         return softDelete(commandId, cmd.before().id(), Commands.DELETE_REVIEWED_ANNOTATION, now);
     }
 
     public Optional<HttpCommandResponse> undoUpdateReviewedAnnotation(UUID commandId,
-                                                                       UpdateReviewedAnnotationCommand cmd,
-                                                                       Long userId, LocalDateTime now) {
+                                                                      UpdateReviewedAnnotationCommand cmd,
+                                                                      Long userId, LocalDateTime now) {
         return reviewedAnnotationRepository.findById(cmd.before().id()).map(entity -> {
             jdbcTemplate.update(UPDATE_GEOMETRY_SQL, cmd.before().wktLocation(), cmd.before().wktLocation(),
                 cmd.before().geometryCompression(), Timestamp.valueOf(now), entity.getId());
@@ -174,8 +173,8 @@ public class ReviewedAnnotationCommandService {
     }
 
     public Optional<HttpCommandResponse> redoUpdateReviewedAnnotation(UUID commandId,
-                                                                       UpdateReviewedAnnotationCommand cmd,
-                                                                       Long userId, LocalDateTime now) {
+                                                                      UpdateReviewedAnnotationCommand cmd,
+                                                                      Long userId, LocalDateTime now) {
         return reviewedAnnotationRepository.findById(cmd.after().id()).map(entity -> {
             jdbcTemplate.update(UPDATE_GEOMETRY_SQL, cmd.after().wktLocation(), cmd.after().wktLocation(),
                 cmd.after().geometryCompression(), Timestamp.valueOf(now), entity.getId());
@@ -201,7 +200,7 @@ public class ReviewedAnnotationCommandService {
     }
 
     private Optional<HttpCommandResponse> softDelete(UUID commandId, long entityId, String command,
-                                                      LocalDateTime now) {
+                                                     LocalDateTime now) {
         return reviewedAnnotationRepository.findById(entityId).map(entity -> {
             entity.setDeleted(now);
             reviewedAnnotationRepository.save(entity);
@@ -212,7 +211,7 @@ public class ReviewedAnnotationCommandService {
     }
 
     private Optional<HttpCommandResponse> restore(UUID commandId, long entityId, String command,
-                                                   LocalDateTime now) {
+                                                  LocalDateTime now) {
         return reviewedAnnotationRepository.findById(entityId).map(entity -> {
             entity.setDeleted(null);
             entity.setUpdated(now);

@@ -11,7 +11,6 @@ import org.cytomine.repository.service.ACLService;
 import org.cytomine.repository.service.ReviewedAnnotationCommandService;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -55,7 +54,7 @@ public class ReviewedAnnotationController implements ReviewedAnnotationHttpContr
 
     @Override
     public Optional<HttpCommandResponse> update(long id, long userId,
-                                                 UpdateReviewedAnnotation updateReviewedAnnotation) {
+                                                UpdateReviewedAnnotation updateReviewedAnnotation) {
         return reviewedAnnotationCommandService.updateReviewedAnnotation(id, userId, updateReviewedAnnotation,
             LocalDateTime.now());
     }

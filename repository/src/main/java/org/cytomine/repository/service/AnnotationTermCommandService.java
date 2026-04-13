@@ -67,31 +67,31 @@ public class AnnotationTermCommandService {
     }
 
     public Optional<HttpCommandResponse> undoCreateAnnotationTerm(UUID commandId,
-                                                                   CreateAnnotationTermCommand cmd,
-                                                                   Long userId, LocalDateTime now) {
+                                                                  CreateAnnotationTermCommand cmd,
+                                                                  Long userId, LocalDateTime now) {
         return softDelete(commandId, cmd.after().id(), Commands.CREATE_ANNOTATION_TERM, now);
     }
 
     public Optional<HttpCommandResponse> redoCreateAnnotationTerm(UUID commandId,
-                                                                   CreateAnnotationTermCommand cmd,
-                                                                   Long userId, LocalDateTime now) {
+                                                                  CreateAnnotationTermCommand cmd,
+                                                                  Long userId, LocalDateTime now) {
         return restore(commandId, cmd.after().id(), Commands.CREATE_ANNOTATION_TERM, now);
     }
 
     public Optional<HttpCommandResponse> undoDeleteAnnotationTerm(UUID commandId,
-                                                                   DeleteAnnotationTermCommand cmd,
-                                                                   Long userId, LocalDateTime now) {
+                                                                  DeleteAnnotationTermCommand cmd,
+                                                                  Long userId, LocalDateTime now) {
         return restore(commandId, cmd.before().id(), Commands.DELETE_ANNOTATION_TERM, now);
     }
 
     public Optional<HttpCommandResponse> redoDeleteAnnotationTerm(UUID commandId,
-                                                                   DeleteAnnotationTermCommand cmd,
-                                                                   Long userId, LocalDateTime now) {
+                                                                  DeleteAnnotationTermCommand cmd,
+                                                                  Long userId, LocalDateTime now) {
         return softDelete(commandId, cmd.before().id(), Commands.DELETE_ANNOTATION_TERM, now);
     }
 
     private Optional<HttpCommandResponse> softDelete(UUID commandId, long entityId, String command,
-                                                      LocalDateTime now) {
+                                                     LocalDateTime now) {
         return annotationTermRepository.findById(entityId).map(entity -> {
             entity.setDeleted(now);
             annotationTermRepository.save(entity);
@@ -100,7 +100,7 @@ public class AnnotationTermCommandService {
     }
 
     private Optional<HttpCommandResponse> restore(UUID commandId, long entityId, String command,
-                                                   LocalDateTime now) {
+                                                  LocalDateTime now) {
         return annotationTermRepository.findById(entityId).map(entity -> {
             entity.setDeleted(null);
             entity.setUpdated(now);

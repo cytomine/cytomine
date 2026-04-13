@@ -112,27 +112,27 @@ public class UserAnnotationCommandService {
     }
 
     public Optional<HttpCommandResponse> undoCreateUserAnnotation(UUID commandId, CreateUserAnnotationCommand cmd,
-                                                                   Long userId, LocalDateTime now) {
+                                                                  Long userId, LocalDateTime now) {
         return softDelete(commandId, cmd.after().id(), Commands.CREATE_USER_ANNOTATION, now);
     }
 
     public Optional<HttpCommandResponse> redoCreateUserAnnotation(UUID commandId, CreateUserAnnotationCommand cmd,
-                                                                   Long userId, LocalDateTime now) {
+                                                                  Long userId, LocalDateTime now) {
         return restore(commandId, cmd.after().id(), Commands.CREATE_USER_ANNOTATION, now);
     }
 
     public Optional<HttpCommandResponse> undoDeleteUserAnnotation(UUID commandId, DeleteUserAnnotationCommand cmd,
-                                                                   Long userId, LocalDateTime now) {
+                                                                  Long userId, LocalDateTime now) {
         return restore(commandId, cmd.before().id(), Commands.DELETE_USER_ANNOTATION, now);
     }
 
     public Optional<HttpCommandResponse> redoDeleteUserAnnotation(UUID commandId, DeleteUserAnnotationCommand cmd,
-                                                                   Long userId, LocalDateTime now) {
+                                                                  Long userId, LocalDateTime now) {
         return softDelete(commandId, cmd.before().id(), Commands.DELETE_USER_ANNOTATION, now);
     }
 
     public Optional<HttpCommandResponse> undoUpdateUserAnnotation(UUID commandId, UpdateUserAnnotationCommand cmd,
-                                                                   Long userId, LocalDateTime now) {
+                                                                  Long userId, LocalDateTime now) {
         return userAnnotationRepository.findById(cmd.before().id()).map(entity -> {
             userAnnotationRepository.updateGeometry(entity.getId(), cmd.before().wktLocation(),
                 cmd.before().geometryCompression(), now);
@@ -143,7 +143,7 @@ public class UserAnnotationCommandService {
     }
 
     public Optional<HttpCommandResponse> redoUpdateUserAnnotation(UUID commandId, UpdateUserAnnotationCommand cmd,
-                                                                   Long userId, LocalDateTime now) {
+                                                                  Long userId, LocalDateTime now) {
         return userAnnotationRepository.findById(cmd.after().id()).map(entity -> {
             userAnnotationRepository.updateGeometry(entity.getId(), cmd.after().wktLocation(),
                 cmd.after().geometryCompression(), now);
@@ -154,7 +154,7 @@ public class UserAnnotationCommandService {
     }
 
     private Optional<HttpCommandResponse> softDelete(UUID commandId, long entityId, String command,
-                                                      LocalDateTime now) {
+                                                     LocalDateTime now) {
         return userAnnotationRepository.findById(entityId).map(entity -> {
             entity.setDeleted(now);
             userAnnotationRepository.save(entity);
@@ -163,7 +163,7 @@ public class UserAnnotationCommandService {
     }
 
     private Optional<HttpCommandResponse> restore(UUID commandId, long entityId, String command,
-                                                   LocalDateTime now) {
+                                                  LocalDateTime now) {
         return userAnnotationRepository.findById(entityId).map(entity -> {
             entity.setDeleted(null);
             entity.setUpdated(now);

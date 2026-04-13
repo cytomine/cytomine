@@ -8,14 +8,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.cytomine.registry.client.http.resp.CatalogResp;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.utility.DockerImageName;
-
-import com.cytomine.registry.client.http.resp.CatalogResp;
 
 public class RegistryClientTest {
     private GenericContainer<?> registryContainer;
@@ -24,13 +23,15 @@ public class RegistryClientTest {
     @BeforeEach
     void setUp() throws IOException {
         registryContainer = new GenericContainer<>(DockerImageName.parse(TestConfig.REGISTRY_IMAGE))
-                .withExposedPorts(TestConfig.REGISTRY_PORT)
-                .withEnv("REGISTRY_STORAGE_DELETE_ENABLED", "true");
+            .withExposedPorts(TestConfig.REGISTRY_PORT)
+            .withEnv("REGISTRY_STORAGE_DELETE_ENABLED", "true");
         registryContainer.start();
 
-        registryUrl = String.format("http://%s:%d",
-                registryContainer.getHost(),
-                registryContainer.getMappedPort(TestConfig.REGISTRY_PORT));
+        registryUrl = String.format(
+            "http://%s:%d",
+            registryContainer.getHost(),
+            registryContainer.getMappedPort(TestConfig.REGISTRY_PORT)
+        );
 
         RegistryClient.config(registryUrl);
 

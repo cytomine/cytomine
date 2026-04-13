@@ -23,7 +23,7 @@ jobs:
           gradle-version: ${{ vars.GRADLE_VERSION }}
 
       - name: Check lint
-        run: gradle checkstyleMain --no-daemon --parallel
+        run: gradle checkstyleMain :common:checkstyleTest :e2e-tests:checkstyleTest :registry-client:checkstyleTest :repository:checkstyleTest --no-daemon --parallel
 
       - name: Upload lint reports
         if: ${{ always() }}

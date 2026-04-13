@@ -292,8 +292,10 @@ class UserAnnotationControllerTest {
 
     private void setUpAnnotationInfrastructure() {
         Long uploadedFileId = nextId();
-        jdbcTemplate.update(
-            "INSERT INTO uploaded_file (id, version, user_id, content_type, ext, filename, original_filename, size, status) VALUES (?, 0, ?, 'image/png', 'png', 'test.png', 'test.png', 0, 0)",
+        jdbcTemplate.update("""
+                INSERT INTO uploaded_file
+                (id, version, user_id, content_type, ext, filename, original_filename, size, status)
+                VALUES (?, 0, ?, 'image/png', 'png', 'test.png', 'test.png', 0, 0)""",
             uploadedFileId, userId);
 
         Long abstractImageId = nextId();
@@ -304,13 +306,18 @@ class UserAnnotationControllerTest {
             mimeId);
 
         Long abstractSliceId = nextId();
-        jdbcTemplate.update(
-            "INSERT INTO abstract_slice (id, version, channel, image_id, mime_id, time, uploaded_file_id, z_stack) VALUES (?, 0, 0, ?, ?, 0, ?, 0)",
+        jdbcTemplate.update("""
+                INSERT INTO abstract_slice
+                (id, version, channel, image_id, mime_id, time, uploaded_file_id, z_stack)
+                VALUES (?, 0, 0, ?, ?, 0, ?, 0)""",
             abstractSliceId, abstractImageId, mimeId, uploadedFileId);
 
         imageId = nextId();
-        jdbcTemplate.update(
-            "INSERT INTO image_instance (id, version, base_image_id, count_image_job_annotations, count_image_reviewed_annotations, project_id, user_id, class) VALUES (?, 0, ?, 0, 0, ?, ?, 'be.cytomine.domain.image.ImageInstance')",
+        jdbcTemplate.update("""
+                INSERT INTO image_instance
+                (id, version, base_image_id, count_image_job_annotations,
+                count_image_reviewed_annotations, project_id, user_id, class)
+                VALUES (?, 0, ?, 0, 0, ?, ?, 'be.cytomine.domain.image.ImageInstance')""",
             imageId, abstractImageId, projectId, userId);
 
         sliceId = nextId();

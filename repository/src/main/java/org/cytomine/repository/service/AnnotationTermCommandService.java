@@ -3,6 +3,7 @@ package org.cytomine.repository.service;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -57,7 +58,7 @@ public class AnnotationTermCommandService {
     public Optional<HttpCommandResponse> deleteAnnotationTerm(Long id, Long userId, LocalDateTime now) {
         return annotationTermRepository.findById(id)
             .filter(entity -> userAnnotationRepository.findById(entity.getUserAnnotationId())
-                .map(ua -> aclService.canReadProject(userId, ua.getProjectId()))
+                .map(ua -> aclService.canEditForOwner(userId, ua.getProjectId(), ua.getUserId()))
                 .orElse(false))
             .map(entity -> {
                 AnnotationTermCommandPayload before = annotationTermMapper.mapToCommandPayload(entity);
@@ -74,35 +75,42 @@ public class AnnotationTermCommandService {
     public Optional<HttpCommandResponse> undoCreateAnnotationTerm(UUID commandId,
                                                                   CreateAnnotationTermCommand cmd,
                                                                   Long userId, LocalDateTime now) {
-        return withProjectAccess(userId, cmd.after().userAnnotationId(),
+        return withEditAccess(userId, cmd.after().userAnnotationId(),
             () -> softDelete(commandId, cmd.after().id(), Commands.CREATE_ANNOTATION_TERM, now));
     }
 
     public Optional<HttpCommandResponse> redoCreateAnnotationTerm(UUID commandId,
                                                                   CreateAnnotationTermCommand cmd,
                                                                   Long userId, LocalDateTime now) {
-        return withProjectAccess(userId, cmd.after().userAnnotationId(),
+        return withReadAccess(userId, cmd.after().userAnnotationId(),
             () -> restore(commandId, cmd.after().id(), Commands.CREATE_ANNOTATION_TERM, now));
     }
 
     public Optional<HttpCommandResponse> undoDeleteAnnotationTerm(UUID commandId,
                                                                   DeleteAnnotationTermCommand cmd,
                                                                   Long userId, LocalDateTime now) {
-        return withProjectAccess(userId, cmd.before().userAnnotationId(),
+        return withReadAccess(userId, cmd.before().userAnnotationId(),
             () -> restore(commandId, cmd.before().id(), Commands.DELETE_ANNOTATION_TERM, now));
     }
 
     public Optional<HttpCommandResponse> redoDeleteAnnotationTerm(UUID commandId,
                                                                   DeleteAnnotationTermCommand cmd,
                                                                   Long userId, LocalDateTime now) {
-        return withProjectAccess(userId, cmd.before().userAnnotationId(),
+        return withEditAccess(userId, cmd.before().userAnnotationId(),
             () -> softDelete(commandId, cmd.before().id(), Commands.DELETE_ANNOTATION_TERM, now));
     }
 
-    private Optional<HttpCommandResponse> withProjectAccess(Long userId, long userAnnotationId,
-                                                            java.util.function.Supplier<Optional<HttpCommandResponse>> action) {
+    private Optional<HttpCommandResponse> withReadAccess(Long userId, long userAnnotationId,
+                                                         Supplier<Optional<HttpCommandResponse>> action) {
         return userAnnotationRepository.findById(userAnnotationId)
             .filter(ua -> aclService.canReadProject(userId, ua.getProjectId()))
+            .flatMap(ua -> action.get());
+    }
+
+    private Optional<HttpCommandResponse> withEditAccess(Long userId, long userAnnotationId,
+                                                         Supplier<Optional<HttpCommandResponse>> action) {
+        return userAnnotationRepository.findById(userAnnotationId)
+            .filter(ua -> aclService.canEditForOwner(userId, ua.getProjectId(), ua.getUserId()))
             .flatMap(ua -> action.get());
     }
 

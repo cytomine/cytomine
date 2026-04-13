@@ -54,7 +54,7 @@ public class UserAnnotationCommandService {
     public Optional<HttpCommandResponse> updateUserAnnotation(Long id, Long userId, UpdateUserAnnotation payload,
                                                               LocalDateTime now) {
         return userAnnotationRepository.findById(id)
-            .filter(e -> aclService.canReadProject(userId, e.getProjectId()))
+            .filter(e -> aclService.canEditForOwner(userId, e.getProjectId(), e.getUserId()))
             .map(entity -> {
                 UserAnnotationCommandPayload before = userAnnotationMapper.mapToCommandPayload(entity);
                 String newWkt = payload.wktLocation().orElse(entity.getWktLocation());
@@ -73,7 +73,7 @@ public class UserAnnotationCommandService {
     @Transactional
     public Optional<HttpCommandResponse> deleteUserAnnotation(Long id, Long userId, LocalDateTime now) {
         return userAnnotationRepository.findById(id)
-            .filter(e -> aclService.canReadProject(userId, e.getProjectId()))
+            .filter(e -> aclService.canEditForOwner(userId, e.getProjectId(), e.getUserId()))
             .map(entity -> {
                 UserAnnotationCommandPayload before = userAnnotationMapper.mapToCommandPayload(entity);
                 DeleteUserAnnotationCommand command = new DeleteUserAnnotationCommand(id, before, userId);
@@ -88,7 +88,7 @@ public class UserAnnotationCommandService {
 
     public Optional<HttpCommandResponse> undoCreateUserAnnotation(UUID commandId, CreateUserAnnotationCommand cmd,
                                                                   Long userId, LocalDateTime now) {
-        if (!aclService.canReadProject(userId, cmd.after().projectId())) {
+        if (!aclService.canEditForOwner(userId, cmd.after().projectId(), cmd.after().userId())) {
             return Optional.empty();
         }
         return softDelete(commandId, cmd.after().id(), Commands.CREATE_USER_ANNOTATION, now);
@@ -112,7 +112,7 @@ public class UserAnnotationCommandService {
 
     public Optional<HttpCommandResponse> redoDeleteUserAnnotation(UUID commandId, DeleteUserAnnotationCommand cmd,
                                                                   Long userId, LocalDateTime now) {
-        if (!aclService.canReadProject(userId, cmd.before().projectId())) {
+        if (!aclService.canEditForOwner(userId, cmd.before().projectId(), cmd.before().userId())) {
             return Optional.empty();
         }
         return softDelete(commandId, cmd.before().id(), Commands.DELETE_USER_ANNOTATION, now);
@@ -120,7 +120,7 @@ public class UserAnnotationCommandService {
 
     public Optional<HttpCommandResponse> undoUpdateUserAnnotation(UUID commandId, UpdateUserAnnotationCommand cmd,
                                                                   Long userId, LocalDateTime now) {
-        if (!aclService.canReadProject(userId, cmd.before().projectId())) {
+        if (!aclService.canEditForOwner(userId, cmd.before().projectId(), cmd.before().userId())) {
             return Optional.empty();
         }
         return userAnnotationRepository.findById(cmd.before().id()).map(entity -> {
@@ -134,7 +134,7 @@ public class UserAnnotationCommandService {
 
     public Optional<HttpCommandResponse> redoUpdateUserAnnotation(UUID commandId, UpdateUserAnnotationCommand cmd,
                                                                   Long userId, LocalDateTime now) {
-        if (!aclService.canReadProject(userId, cmd.after().projectId())) {
+        if (!aclService.canEditForOwner(userId, cmd.after().projectId(), cmd.after().userId())) {
             return Optional.empty();
         }
         return userAnnotationRepository.findById(cmd.after().id()).map(entity -> {

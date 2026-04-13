@@ -77,7 +77,7 @@ class TermLifecycleTest {
         LocalDateTime t0 = LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
         LocalDateTime t1 = t0.plusSeconds(1);
         LocalDateTime t2 = t0.plusSeconds(2);
-        LocalDateTime t3 = t0.plusSeconds(3);
+        final LocalDateTime t3 = t0.plusSeconds(3);
 
         // Step 1: create parent and child terms
         TermResponse parentResponse = (TermResponse) termCommandService

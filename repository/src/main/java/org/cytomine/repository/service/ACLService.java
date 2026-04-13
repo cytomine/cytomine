@@ -33,6 +33,22 @@ public class ACLService {
         return isAdmin(userId) || hasPermission(userId, ontologyId, ONTOLOGY_CLASS, DELETE_MASK);
     }
 
+    /**
+     * Mirrors core's checkFullOrRestrictedForOwner: in CLASSIC mode any project member can edit;
+     * in RESTRICTED mode only the owner (or an admin) can edit.
+     */
+    public boolean canEditForOwner(long userId, long projectId, long ownerId) {
+        if (isAdmin(userId)) {
+            return true;
+        }
+        if (!hasPermission(userId, projectId, PROJECT_CLASS, READ_MASK)) {
+            return false;
+        }
+        String mode = jdbcTemplate.queryForObject(
+            "SELECT mode FROM project WHERE id = ?", String.class, projectId);
+        return "CLASSIC".equals(mode) || userId == ownerId;
+    }
+
     public boolean isAdmin(long userId) {
         String sql = """
             SELECT COUNT(*) > 0

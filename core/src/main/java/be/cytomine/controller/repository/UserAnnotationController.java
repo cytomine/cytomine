@@ -1,6 +1,7 @@
 package be.cytomine.controller.repository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import jakarta.validation.Valid;
@@ -55,23 +56,25 @@ public class UserAnnotationController {
     }
 
     @GetMapping("project/{projectId}/userannotation/count.json")
-    public long countByProject(@PathVariable long projectId) {
+    public Map<String, Long> countByProject(@PathVariable long projectId,
+                                            @RequestParam(required = false) Long startDate,
+                                            @RequestParam(required = false) Long endDate) {
         log.debug("REST request to count user annotations for project {}", projectId);
         long userId = currentUserService.getCurrentUser().getId();
-        return userAnnotationHttpContract.countByProject(projectId, userId);
+        return Map.of("total", userAnnotationHttpContract.countByProject(projectId, userId, startDate, endDate));
     }
 
     @GetMapping("user/{userAnnotationUserId}/userannotation/count.json")
-    public long countByUser(@PathVariable long userAnnotationUserId,
-                            @RequestParam(required = false) Long projectId) {
+    public Map<String, Long> countByUser(@PathVariable long userAnnotationUserId,
+                                         @RequestParam(required = false) Long projectId) {
         long userId = currentUserService.getCurrentUser().getId();
         if (projectId != null) {
             log.debug("REST request to count user annotations for user {} and project {}", userAnnotationUserId,
                 projectId);
-            return userAnnotationHttpContract.countByUserAndProject(userAnnotationUserId, projectId, userId);
+            return Map.of("total", userAnnotationHttpContract.countByUserAndProject(userAnnotationUserId, projectId, userId));
         }
         log.debug("REST request to count user annotations for user {}", userAnnotationUserId);
-        return userAnnotationHttpContract.countByUser(userAnnotationUserId, userId);
+        return Map.of("total", userAnnotationHttpContract.countByUser(userAnnotationUserId, userId));
     }
 
     @PostMapping("userannotation.json")

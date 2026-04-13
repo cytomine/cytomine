@@ -33,7 +33,9 @@ public interface UserAnnotationHttpContract {
                                                        @RequestParam long userId);
 
     @GetExchange("/count/project/{projectId}")
-    long countByProject(@PathVariable long projectId, @RequestParam long userId);
+    long countByProject(@PathVariable long projectId, @RequestParam long userId,
+                        @RequestParam(required = false) Long startDate,
+                        @RequestParam(required = false) Long endDate);
 
     @GetExchange("/count/user/{userAnnotationUserId}")
     long countByUser(@PathVariable long userAnnotationUserId, @RequestParam long userId);

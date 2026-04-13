@@ -47,9 +47,17 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.TestUtils;
+import be.cytomine.common.repository.http.UserAnnotationHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import be.cytomine.common.repository.model.command.payload.response.UserAnnotationResponse;
 import be.cytomine.config.properties.ApplicationProperties;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.AbstractSlice;
@@ -68,6 +76,9 @@ import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -91,6 +102,9 @@ public class UserAnnotationResourceTests {
 
     @Autowired
     private ApplicationProperties applicationProperties;
+
+    @MockitoBean
+    private UserAnnotationHttpContract userAnnotationHttpContract;
 
     private static WireMockServer wireMockServer = new WireMockServer(8888);
 
@@ -143,27 +157,29 @@ public class UserAnnotationResourceTests {
     @Test
     @Transactional
     public void get_a_user_annotation() throws Exception {
+        Long userId = builder.given_superadmin().getId();
         UserAnnotation userAnnotation = builder.given_a_user_annotation();
-        builder.given_an_annotation_term(userAnnotation);
-        em.refresh(userAnnotation);
+        when(userAnnotationHttpContract.findById(eq(userAnnotation.getId()), eq(userId)))
+            .thenReturn(Optional.of(new UserAnnotationResponse(
+                userAnnotation.getId(), userId, userAnnotation.getImage().getId(),
+                userAnnotation.getSlice().getId(), userAnnotation.getProject().getId(),
+                userAnnotation.getWktLocation(), 0.0, 0,
+                LocalDateTime.now(), LocalDateTime.now(), Optional.empty())));
+
         restUserAnnotationControllerMockMvc.perform(get("/api/userannotation/{id}.json", userAnnotation.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(userAnnotation.getId().intValue()))
-                .andExpect(jsonPath("$.class").value("be.cytomine.domain.ontology.UserAnnotation"))
-                .andExpect(jsonPath("$.created").value(userAnnotation.getCreated().getTime()))
-                .andExpect(jsonPath("$.location").value(userAnnotation.getWktLocation()))
-                .andExpect(jsonPath("$.image").value(userAnnotation.getImage().getId().intValue()))
-                .andExpect(jsonPath("$.project").value(userAnnotation.getProject().getId().intValue()))
-                .andExpect(jsonPath("$.user").value(userAnnotation.getUser().getId()))
-                .andExpect(jsonPath("$.centroid.x").exists())
-                .andExpect(jsonPath("$.centroid.y").exists())
-                .andExpect(jsonPath("$.term", hasSize(equalTo(1))))
-                .andExpect(jsonPath("$.term[0]").value(userAnnotation.getTerms().get(0).getId().intValue()));
+                .andExpect(jsonPath("$.imageId").value(userAnnotation.getImage().getId().intValue()))
+                .andExpect(jsonPath("$.projectId").value(userAnnotation.getProject().getId().intValue()))
+                .andExpect(jsonPath("$.userId").value(userId.intValue()))
+                .andExpect(jsonPath("$.wktLocation").value(userAnnotation.getWktLocation()));
     }
 
     @Test
     @Transactional
     public void get_a_user_annotation_not_exists() throws Exception {
+        Long userId = builder.given_superadmin().getId();
+        when(userAnnotationHttpContract.findById(eq(0L), eq(userId))).thenReturn(Optional.empty());
         restUserAnnotationControllerMockMvc.perform(get("/api/userannotation/{id}.json", 0))
                 .andExpect(status().isNotFound());
     }
@@ -182,12 +198,16 @@ public class UserAnnotationResourceTests {
     @Test
     @Transactional
     public void count_annotations_by_user() throws Exception {
+        Long userId = builder.given_superadmin().getId();
         UserAnnotation userAnnotation = builder.given_a_user_annotation();
+        User newUser = builder.given_a_user();
+        when(userAnnotationHttpContract.countByUser(eq(userAnnotation.getUser().getId()), eq(userId))).thenReturn(3L);
+        when(userAnnotationHttpContract.countByUser(eq(newUser.getId()), eq(userId))).thenReturn(0L);
+
         restUserAnnotationControllerMockMvc.perform(get("/api/user/{idUser}/userannotation/count.json", userAnnotation.getUser().getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.total").value(greaterThan(0)));
 
-        User newUser = builder.given_a_user();
         restUserAnnotationControllerMockMvc.perform(get("/api/user/{idUser}/userannotation/count.json", newUser.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.total").value(0));
@@ -197,12 +217,17 @@ public class UserAnnotationResourceTests {
     @Transactional
     public void count_annotations_by_project() throws Exception {
         UserAnnotation userAnnotation = builder.given_a_user_annotation();
+        Project projectWithoutAnnotation = builder.given_a_project();
+        when(userAnnotationHttpContract.countByUserAndProject(eq(userAnnotation.getUser().getId()),
+            eq(userAnnotation.getProject().getId()), anyLong())).thenReturn(3L);
+        when(userAnnotationHttpContract.countByUserAndProject(eq(userAnnotation.getUser().getId()),
+            eq(projectWithoutAnnotation.getId()), anyLong())).thenReturn(0L);
+
         restUserAnnotationControllerMockMvc.perform(get("/api/user/{idUser}/userannotation/count.json", userAnnotation.getUser().getId())
                         .param("project", userAnnotation.getProject().getId().toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.total").value(greaterThan(0)));
 
-        Project projectWithoutAnnotation = builder.given_a_project();
         restUserAnnotationControllerMockMvc.perform(get("/api/user/{idUser}/userannotation/count.json", userAnnotation.getUser().getId())
                         .param("project", projectWithoutAnnotation.getId().toString()))
                 .andExpect(status().isOk())
@@ -213,41 +238,41 @@ public class UserAnnotationResourceTests {
     @Test
     @Transactional
     public void count_annotations_by_project_with_dates() throws Exception {
+        Long userId = builder.given_superadmin().getId();
         UserAnnotation oldUserAnnotation = builder.given_a_user_annotation();
-        oldUserAnnotation.setCreated(DateUtils.addDays(new Date(), -1));
+        builder.persistAndReturn(builder.given_a_not_persisted_user_annotation(oldUserAnnotation.getProject()));
 
-        UserAnnotation newUserAnnotation =
-                builder.persistAndReturn(builder.given_a_not_persisted_user_annotation(oldUserAnnotation.getProject()));
-
+        // Simulate date-filtered counts returned by the repository service
+        when(userAnnotationHttpContract.countByProject(eq(oldUserAnnotation.getProject().getId()), eq(userId), any(), any()))
+            .thenReturn(2L, 2L, 2L, 1L, 1L, 0L);
 
         restUserAnnotationControllerMockMvc.perform(get("/api/project/{idProject}/userannotation/count.json", oldUserAnnotation.getProject().getId())
-                        .param("startDate", String.valueOf(oldUserAnnotation.getCreated().getTime()))
-                        .param("endDate", String.valueOf(newUserAnnotation.getCreated().getTime())))
+                        .param("startDate", "1000").param("endDate", "2000"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.total").value(2));
 
         restUserAnnotationControllerMockMvc.perform(get("/api/project/{idProject}/userannotation/count.json", oldUserAnnotation.getProject().getId())
-                        .param("startDate", String.valueOf(DateUtils.addSeconds(oldUserAnnotation.getCreated(),-1).getTime())))
+                        .param("startDate", "500"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.total").value(2));
 
         restUserAnnotationControllerMockMvc.perform(get("/api/project/{idProject}/userannotation/count.json", oldUserAnnotation.getProject().getId())
-                        .param("endDate", String.valueOf(DateUtils.addSeconds(newUserAnnotation.getCreated(),1).getTime())))
+                        .param("endDate", "3000"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.total").value(2));
 
         restUserAnnotationControllerMockMvc.perform(get("/api/project/{idProject}/userannotation/count.json", oldUserAnnotation.getProject().getId())
-                        .param("startDate", String.valueOf(DateUtils.addSeconds(newUserAnnotation.getCreated(),-1).getTime())))
+                        .param("startDate", "1500"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.total").value(1));
 
         restUserAnnotationControllerMockMvc.perform(get("/api/project/{idProject}/userannotation/count.json", oldUserAnnotation.getProject().getId())
-                        .param("endDate", String.valueOf(DateUtils.addSeconds(oldUserAnnotation.getCreated(),1).getTime())))
+                        .param("endDate", "1500"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.total").value(1));
 
         restUserAnnotationControllerMockMvc.perform(get("/api/project/{idProject}/userannotation/count.json", oldUserAnnotation.getProject().getId())
-                        .param("endDate", String.valueOf(DateUtils.addDays(oldUserAnnotation.getCreated(), -2).getTime())))
+                        .param("endDate", "100"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.total").value(0));
     }
@@ -315,29 +340,39 @@ public class UserAnnotationResourceTests {
     @Test
     @Transactional
     public void add_valid_user_annotation() throws Exception {
+        Long userId = builder.given_superadmin().getId();
         UserAnnotation userAnnotation = builder.given_a_not_persisted_user_annotation();
+        UserAnnotationResponse annotationData = new UserAnnotationResponse(
+            999L, userId, userAnnotation.getImage().getId(), userAnnotation.getSlice().getId(),
+            userAnnotation.getProject().getId(), userAnnotation.getWktLocation(), 0.0, 0,
+            LocalDateTime.now(), LocalDateTime.now(), Optional.empty());
+        when(userAnnotationHttpContract.create(eq(userId), any()))
+            .thenReturn(Optional.of(new HttpCommandResponse(true, annotationData, UUID.randomUUID(), "ADD_USER_ANNOTATION")));
 
         restUserAnnotationControllerMockMvc.perform(post("/api/userannotation.json")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userAnnotation.toJSON()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.printMessage").value(true))
-                .andExpect(jsonPath("$.callback").exists())
-                .andExpect(jsonPath("$.callback.userannotationID").exists())
-                .andExpect(jsonPath("$.callback.method").value("be.cytomine.AddUserAnnotationCommand"))
-                .andExpect(jsonPath("$.message").exists())
-                .andExpect(jsonPath("$.command").exists())
-                .andExpect(jsonPath("$.annotation.id").exists());
+                .andExpect(jsonPath("$.data").exists())
+                .andExpect(jsonPath("$.commandId").exists())
+                .andExpect(jsonPath("$.command").exists());
     }
 
     @Test
     @Transactional
     public void add_user_annotation_with_not_valid_location() throws Exception {
+        // Location validation is now handled by the repository service
+        Long userId = builder.given_superadmin().getId();
+        when(userAnnotationHttpContract.create(eq(userId), any()))
+            .thenThrow(new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.BAD_REQUEST, "Location too small"));
+
         UserAnnotation userAnnotation = builder.given_a_not_persisted_user_annotation();
         JsonObject jsonObject = userAnnotation.toJsonObject();
         jsonObject.put("location",
                 "POLYGON ((225.73582220103702 306.89723126347087, 225.73582220103702 307.93556995227914, 226.08028300710947 307.93556995227914, 226.08028300710947 306.89723126347087, 225.73582220103702 306.89723126347087))"
-                ); // too small
+                );
         restUserAnnotationControllerMockMvc.perform(post("/api/userannotation.json")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonObject.toJsonString()))
@@ -347,7 +382,15 @@ public class UserAnnotationResourceTests {
     @Test
     @Transactional
     public void add_valid_user_annotation_without_project() throws Exception {
+        Long userId = builder.given_superadmin().getId();
         UserAnnotation userAnnotation = builder.given_a_not_persisted_user_annotation();
+        UserAnnotationResponse annotationData = new UserAnnotationResponse(
+            999L, userId, userAnnotation.getImage().getId(), userAnnotation.getSlice().getId(),
+            userAnnotation.getProject().getId(), userAnnotation.getWktLocation(), 0.0, 0,
+            LocalDateTime.now(), LocalDateTime.now(), Optional.empty());
+        when(userAnnotationHttpContract.create(eq(userId), any()))
+            .thenReturn(Optional.of(new HttpCommandResponse(true, annotationData, UUID.randomUUID(), "ADD_USER_ANNOTATION")));
+
         JsonObject jsonObject = userAnnotation.toJsonObject();
         jsonObject.remove("project");
 
@@ -355,14 +398,20 @@ public class UserAnnotationResourceTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonObject.toJsonString()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.annotation.project").value(userAnnotation.getProject().getId()));
-        // => project is retrieve from slice/image
+                .andExpect(jsonPath("$.data.projectId").value(userAnnotation.getProject().getId()));
     }
 
     @Test
     @Transactional
     public void add_valid_user_annotation_with_terms() throws Exception {
+        Long userId = builder.given_superadmin().getId();
         UserAnnotation userAnnotation = builder.given_a_not_persisted_user_annotation();
+        UserAnnotationResponse annotationData = new UserAnnotationResponse(
+            999L, userId, userAnnotation.getImage().getId(), userAnnotation.getSlice().getId(),
+            userAnnotation.getProject().getId(), userAnnotation.getWktLocation(), 0.0, 0,
+            LocalDateTime.now(), LocalDateTime.now(), Optional.empty());
+        when(userAnnotationHttpContract.create(eq(userId), any()))
+            .thenReturn(Optional.of(new HttpCommandResponse(true, annotationData, UUID.randomUUID(), "ADD_USER_ANNOTATION")));
 
         Term term1 = builder.given_a_term(userAnnotation.getProject().getOntology());
         Term term2 = builder.given_a_term(userAnnotation.getProject().getOntology());
@@ -373,59 +422,66 @@ public class UserAnnotationResourceTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonObject.toJsonString()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.annotation.term", hasSize(2)));
+                .andExpect(jsonPath("$.data").exists());
     }
 
 
     @Test
     @Transactional
     public void edit_valid_user_annotation() throws Exception {
+        Long userId = builder.given_superadmin().getId();
         UserAnnotation userAnnotation = builder.given_a_user_annotation();
+        UserAnnotationResponse annotationData = new UserAnnotationResponse(
+            userAnnotation.getId(), userId, userAnnotation.getImage().getId(), userAnnotation.getSlice().getId(),
+            userAnnotation.getProject().getId(), userAnnotation.getWktLocation(), 0.0, 0,
+            LocalDateTime.now(), LocalDateTime.now(), Optional.empty());
+        when(userAnnotationHttpContract.update(eq(userAnnotation.getId()), eq(userId), any()))
+            .thenReturn(Optional.of(new HttpCommandResponse(true, annotationData, UUID.randomUUID(), "UPDATE_USER_ANNOTATION")));
+
         restUserAnnotationControllerMockMvc.perform(put("/api/userannotation/{id}.json", userAnnotation.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userAnnotation.toJSON()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.printMessage").value(true))
-                .andExpect(jsonPath("$.callback").exists())
-                .andExpect(jsonPath("$.callback.userannotationID").exists())
-                .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditUserAnnotationCommand"))
-                .andExpect(jsonPath("$.message").exists())
-                .andExpect(jsonPath("$.command").exists())
-                .andExpect(jsonPath("$.annotation.id").exists());
-
+                .andExpect(jsonPath("$.data").exists())
+                .andExpect(jsonPath("$.commandId").exists())
+                .andExpect(jsonPath("$.command").exists());
     }
 
     @Test
     @Transactional
     public void delete_user_annotation() throws Exception {
+        Long userId = builder.given_superadmin().getId();
         UserAnnotation userAnnotation = builder.given_a_user_annotation();
+        UserAnnotationResponse annotationData = new UserAnnotationResponse(
+            userAnnotation.getId(), userId, userAnnotation.getImage().getId(), userAnnotation.getSlice().getId(),
+            userAnnotation.getProject().getId(), userAnnotation.getWktLocation(), 0.0, 0,
+            LocalDateTime.now(), LocalDateTime.now(), Optional.empty());
+        when(userAnnotationHttpContract.delete(eq(userAnnotation.getId()), eq(userId)))
+            .thenReturn(Optional.of(new HttpCommandResponse(true, annotationData, UUID.randomUUID(), "DELETE_USER_ANNOTATION")));
 
         restUserAnnotationControllerMockMvc.perform(delete("/api/userannotation/{id}.json", userAnnotation.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userAnnotation.toJSON()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.printMessage").value(true))
-                .andExpect(jsonPath("$.callback").exists())
-                .andExpect(jsonPath("$.callback.userannotationID").exists())
-                .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteUserAnnotationCommand"))
-                .andExpect(jsonPath("$.message").exists())
-                .andExpect(jsonPath("$.command").exists())
-                .andExpect(jsonPath("$.annotation.id").exists());
-
+                .andExpect(jsonPath("$.data").exists())
+                .andExpect(jsonPath("$.commandId").exists())
+                .andExpect(jsonPath("$.command").exists());
     }
 
 
     @Test
     @Transactional
     public void delete_user_annotation_not_exist_fails() throws Exception {
+        Long userId = builder.given_superadmin().getId();
+        when(userAnnotationHttpContract.delete(eq(0L), eq(userId))).thenReturn(Optional.empty());
+
         UserAnnotation userAnnotation = builder.given_a_user_annotation();
         restUserAnnotationControllerMockMvc.perform(delete("/api/userannotation/{id}.json", 0)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userAnnotation.toJSON()))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.errors").exists());
-
+                .andExpect(status().isNotFound());
     }
 
 

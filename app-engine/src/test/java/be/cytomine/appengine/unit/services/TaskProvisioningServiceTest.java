@@ -116,7 +116,13 @@ public class TaskProvisioningServiceTest {
     @DisplayName("Successfully provision a run parameter with json data")
     @Test
     public void provisionRunParameterWithJsonShouldReturnJsonNode() throws Exception {
-        String name = run.getTask().getParameters().stream().filter(parameter -> parameter.getParameterType().equals(ParameterType.INPUT)).iterator().next().getName();
+        String name = run.getTask()
+            .getParameters()
+            .stream()
+            .filter(parameter -> parameter.getParameterType().equals(ParameterType.INPUT))
+            .iterator()
+            .next()
+            .getName();
         ObjectNode value = new ObjectMapper().createObjectNode();
         value.put("param_name", name);
         value.put("value", 42);
@@ -156,7 +162,13 @@ public class TaskProvisioningServiceTest {
     @Test
     public void provisionRunParameterWithFileShouldReturnJsonNode() throws Exception {
         Run localRun = TaskUtils.createTestRun(true);
-        String name = localRun.getTask().getParameters().stream().filter(parameter -> parameter.getParameterType().equals(ParameterType.INPUT)).iterator().next().getName();
+        String name = localRun.getTask()
+            .getParameters()
+            .stream()
+            .filter(parameter -> parameter.getParameterType().equals(ParameterType.INPUT))
+            .iterator()
+            .next()
+            .getName();
         File value = File.createTempFile("input", null);
         value.deleteOnExit();
 
@@ -173,7 +185,13 @@ public class TaskProvisioningServiceTest {
     @DisplayName("Failed to provision a run parameter and throw 'ProvisioningException'")
     @Test
     public void provisionRunParameterShouldThrowProvisioningException() throws Exception {
-        String name = run.getTask().getParameters().stream().filter(parameter -> parameter.getParameterType().equals(ParameterType.INPUT)).iterator().next().getName();
+        String name = run.getTask()
+            .getParameters()
+            .stream()
+            .filter(parameter -> parameter.getParameterType().equals(ParameterType.INPUT))
+            .iterator()
+            .next()
+            .getName();
         ObjectNode value = new ObjectMapper().createObjectNode().put("unwanted", "value");
 
         when(runRepository.findById(run.getId())).thenReturn(Optional.of(run));
@@ -193,7 +211,12 @@ public class TaskProvisioningServiceTest {
         run.setTask(TaskUtils.createTestTaskWithMultipleIO());
 
         List<JsonNode> values = new ArrayList<>();
-        for (Parameter input : run.getTask().getParameters().stream().filter(parameter -> parameter.getParameterType().equals(ParameterType.INPUT)).toList()) {
+        List<Parameter> parameters = run.getTask()
+            .getParameters()
+            .stream()
+            .filter(parameter -> parameter.getParameterType().equals(ParameterType.INPUT))
+            .toList();
+        for (Parameter input : parameters) {
             ObjectNode value = new ObjectMapper().createObjectNode();
             value.put("param_name", input.getName());
             value.put("value", new Random().nextInt(100));
@@ -216,7 +239,12 @@ public class TaskProvisioningServiceTest {
         run.setTask(TaskUtils.createTestTaskWithMultipleIO());
 
         List<JsonNode> values = new ArrayList<>();
-        for (Parameter input : run.getTask().getParameters().stream().filter(parameter -> parameter.getParameterType().equals(ParameterType.INPUT)).toList()) {
+        List<Parameter> parameters = run.getTask()
+            .getParameters()
+            .stream()
+            .filter(parameter -> parameter.getParameterType().equals(ParameterType.INPUT))
+            .toList();
+        for (Parameter input : parameters) {
             ObjectNode value = new ObjectMapper().createObjectNode();
             value.put("param_name", input.getName());
             value.put("value", new Random().nextInt(100));
@@ -238,10 +266,15 @@ public class TaskProvisioningServiceTest {
     @DisplayName("Successfully retrieve a zip archive")
     @Test
     public void retrieveIOZipArchiveShouldReturnStorageData() throws Exception {
-
         Run run = TaskUtils.createTestRun(false);
 
-        String name = run.getTask().getParameters().stream().filter(parameter -> parameter.getParameterType().equals(ParameterType.INPUT)).iterator().next().getName();
+        String name = run.getTask()
+            .getParameters()
+            .stream()
+            .filter(parameter -> parameter.getParameterType().equals(ParameterType.INPUT))
+            .iterator()
+            .next()
+            .getName();
         String storageId = "inputs-archive-" + run.getId().toString();
         StorageData mockStorageData = TaskUtils.createTestStorageData(name, storageId);
 
@@ -260,16 +293,23 @@ public class TaskProvisioningServiceTest {
         when(typePersistenceRepository.findTypePersistenceByRunIdAndParameterType(run.getId(), ParameterType.INPUT))
             .thenReturn(List.of(persistedProvision));
 
-        Checksum crc32 = new Checksum(UUID.randomUUID(), storageId, calculateFileCRC32(mockStorageData.peek().getData()));
+        Checksum crc32 = new Checksum(
+            UUID.randomUUID(),
+            storageId,
+            calculateFileCRC32(mockStorageData.peek().getData())
+        );
         when(checksumRepository.findByReference(any(String.class))).thenReturn(crc32);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        taskProvisioningService.retrieveIOZipArchive(run.getId().toString(), ParameterType.INPUT,out);
+        taskProvisioningService.retrieveIOZipArchive(run.getId().toString(), ParameterType.INPUT, out);
 
         verify(runRepository, times(1)).findById(run.getId());
         verify(storageHandler, times(1)).readStorageData(any(StorageData.class));
-        verify(typePersistenceRepository, times(1)).findTypePersistenceByRunIdAndParameterType(run.getId(), ParameterType.INPUT);
+        verify(typePersistenceRepository, times(1)).findTypePersistenceByRunIdAndParameterType(
+            run.getId(),
+            ParameterType.INPUT
+        );
     }
 
     @DisplayName("Failed to retrieve a zip archive and throw 'ProvisioningException' when run state is invalid")
@@ -284,8 +324,10 @@ public class TaskProvisioningServiceTest {
 
         ProvisioningException exception = assertThrows(
             ProvisioningException.class,
-            () -> taskProvisioningService.retrieveIOZipArchive(localRun.getId().toString(), ParameterType.INPUT,
-                out)
+            () -> taskProvisioningService.retrieveIOZipArchive(
+                localRun.getId().toString(), ParameterType.INPUT,
+                out
+            )
         );
         assertEquals("run is in invalid state", exception.getMessage());
     }
@@ -304,8 +346,10 @@ public class TaskProvisioningServiceTest {
 
         ProvisioningException exception = assertThrows(
             ProvisioningException.class,
-            () -> taskProvisioningService.retrieveIOZipArchive(run.getId().toString(), ParameterType.INPUT,
-                out)
+            () -> taskProvisioningService.retrieveIOZipArchive(
+                run.getId().toString(), ParameterType.INPUT,
+                out
+            )
         );
         assertEquals("provisions not found", exception.getMessage());
     }
@@ -322,10 +366,18 @@ public class TaskProvisioningServiceTest {
         when(runRepository.findById(localRun.getId())).thenReturn(Optional.of(localRun));
         taskProvisioningService.setBasePath("/tmp/appengine/storage");
 
-        List<TaskRunParameterValue> results = taskProvisioningService.postOutputsZipArchive(localRun.getId().toString(), localRun.getSecret(),
-            new ByteArrayInputStream(TaskUtils.createFakeOutputsZip("out")));
+        List<TaskRunParameterValue> results = taskProvisioningService.postOutputsZipArchive(
+            localRun.getId().toString(), localRun.getSecret(),
+            new ByteArrayInputStream(TaskUtils.createFakeOutputsZip("out"))
+        );
 
-        assertEquals(localRun.getTask().getParameters().stream().filter(parameter -> parameter.getParameterType().equals(ParameterType.INPUT)).toList().size(), results.size());
+        int expectedSize = localRun.getTask()
+            .getParameters()
+            .stream()
+            .filter(parameter -> parameter.getParameterType().equals(ParameterType.INPUT))
+            .toList()
+            .size();
+        assertEquals(expectedSize, results.size());
         verify(runRepository, times(1)).findById(localRun.getId());
         verify(runRepository, times(1)).saveAndFlush(any(Run.class));
     }
@@ -373,8 +425,10 @@ public class TaskProvisioningServiceTest {
 
         ProvisioningException exception = assertThrows(
             ProvisioningException.class,
-            () -> taskProvisioningService.postOutputsZipArchive(localRun.getId().toString(), localRun.getSecret(),
-                new ByteArrayInputStream(TaskUtils.createFakeOutputsZip("out", "invalid")))
+            () -> taskProvisioningService.postOutputsZipArchive(
+                localRun.getId().toString(), localRun.getSecret(),
+                new ByteArrayInputStream(TaskUtils.createFakeOutputsZip("out", "invalid"))
+            )
         );
         assertEquals("unexpected output, did not match an actual task output", exception.getMessage());
         verify(runRepository, times(1)).findById(localRun.getId());
@@ -392,8 +446,10 @@ public class TaskProvisioningServiceTest {
 
         ProvisioningException exception = assertThrows(
             ProvisioningException.class,
-            () -> taskProvisioningService.postOutputsZipArchive(localRun.getId().toString(), localRun.getSecret(),
-                new ByteArrayInputStream(TaskUtils.createFakeOutputsZip("out 1")))
+            () -> taskProvisioningService.postOutputsZipArchive(
+                localRun.getId().toString(), localRun.getSecret(),
+                new ByteArrayInputStream(TaskUtils.createFakeOutputsZip("out 1"))
+            )
         );
         assertEquals("some outputs are missing in the archive", exception.getMessage());
         verify(runRepository, times(1)).findById(localRun.getId());
@@ -405,17 +461,35 @@ public class TaskProvisioningServiceTest {
         Run localRun = TaskUtils.createTestRun(false);
         localRun.setState(TaskRunState.FINISHED);
         IntegerPersistence output = new IntegerPersistence(42);
-        output.setParameterName(localRun.getTask().getParameters().stream().filter(parameter -> parameter.getParameterType().equals(ParameterType.OUTPUT)).iterator().next().getName());
+        output.setParameterName(localRun.getTask()
+            .getParameters()
+            .stream()
+            .filter(parameter -> parameter.getParameterType().equals(ParameterType.OUTPUT))
+            .iterator()
+            .next()
+            .getName()
+        );
 
         when(runRepository.findById(localRun.getId())).thenReturn(Optional.of(localRun));
-        when(typePersistenceRepository.findTypePersistenceByRunIdAndParameterType(localRun.getId(), ParameterType.OUTPUT))
-            .thenReturn(List.of(output));
+        when(typePersistenceRepository.findTypePersistenceByRunIdAndParameterType(
+            localRun.getId(),
+            ParameterType.OUTPUT
+        )).thenReturn(List.of(output));
 
-        List<TaskRunParameterValue> results =  taskProvisioningService.retrieveRunOutputs(localRun.getId().toString());
+        List<TaskRunParameterValue> results = taskProvisioningService.retrieveRunOutputs(localRun.getId().toString());
 
-        assertEquals(localRun.getTask().getParameters().stream().filter(parameter -> parameter.getParameterType().equals(ParameterType.OUTPUT)).toList().size(), results.size());
+        int expectedSize = localRun.getTask()
+            .getParameters()
+            .stream()
+            .filter(parameter -> parameter.getParameterType().equals(ParameterType.OUTPUT))
+            .toList()
+            .size();
+        assertEquals(expectedSize, results.size());
         verify(runRepository, times(1)).findById(localRun.getId());
-        verify(typePersistenceRepository, times(1)).findTypePersistenceByRunIdAndParameterType(localRun.getId(), ParameterType.OUTPUT);
+        verify(typePersistenceRepository, times(1)).findTypePersistenceByRunIdAndParameterType(
+            localRun.getId(),
+            ParameterType.OUTPUT
+        );
     }
 
     @DisplayName("Failed to retrieve the outputs and throw 'ProvisioningException'")
@@ -441,26 +515,30 @@ public class TaskProvisioningServiceTest {
             .getTask()
             .getParameters()
             .stream()
-                .filter(parameter -> parameter.getParameterType().equals(ParameterType.INPUT))
+            .filter(parameter -> parameter.getParameterType().equals(ParameterType.INPUT))
             .iterator()
             .next()
             .getName());
 
         when(runRepository.findById(localRun.getId())).thenReturn(Optional.of(localRun));
-        when(typePersistenceRepository.findTypePersistenceByRunIdAndParameterType(localRun.getId(), ParameterType.INPUT))
-            .thenReturn(List.of(input));
+        when(typePersistenceRepository.findTypePersistenceByRunIdAndParameterType(
+            localRun.getId(), ParameterType.INPUT
+        )).thenReturn(List.of(input));
 
-        List<TaskRunParameterValue> results =  taskProvisioningService.retrieveRunInputs(localRun.getId().toString());
+        List<TaskRunParameterValue> results = taskProvisioningService.retrieveRunInputs(localRun.getId().toString());
 
-        assertEquals(localRun
-            .getTask()
-            .getParameters()
-            .stream()
-            .filter(parameter -> parameter.getParameterType().equals(ParameterType.INPUT))
-            .toList()
-            .size(), results.size());
+        assertEquals(
+            localRun
+                .getTask()
+                .getParameters()
+                .stream()
+                .filter(parameter -> parameter.getParameterType().equals(ParameterType.INPUT))
+                .toList()
+                .size(), results.size()
+        );
         verify(runRepository, times(1)).findById(localRun.getId());
-        verify(typePersistenceRepository, times(1)).findTypePersistenceByRunIdAndParameterType(localRun.getId(), ParameterType.INPUT);
+        verify(typePersistenceRepository, times(1))
+            .findTypePersistenceByRunIdAndParameterType(localRun.getId(), ParameterType.INPUT);
     }
 
     @DisplayName("Failed to retrieve the inputs and throw 'ProvisioningException'")
@@ -483,19 +561,23 @@ public class TaskProvisioningServiceTest {
     @Test
     public void retrieveSingleRunIOShouldReturnSingleIO() throws Exception {
         String storageId = "task-run-inputs-" + run.getId();
-    String parameterName =
-        run.getTask().getParameters().stream()
-            .filter(parameter -> parameter.getParameterType().equals(ParameterType.INPUT))
-            .iterator()
-            .next()
-            .getName();
+        String parameterName =
+            run.getTask().getParameters().stream()
+                .filter(parameter -> parameter.getParameterType().equals(ParameterType.INPUT))
+                .iterator()
+                .next()
+                .getName();
         IntegerPersistence input = new IntegerPersistence(42);
         input.setParameterName(parameterName);
         StorageData mockStorageData = TaskUtils.createTestStorageData(parameterName, storageId);
 
         when(storageHandler.readStorageData(any(StorageData.class))).thenReturn(mockStorageData);
 
-        File result =  taskProvisioningService.retrieveSingleRunIO(run.getId().toString(), input.getParameterName(), ParameterType.INPUT);
+        File result = taskProvisioningService.retrieveSingleRunIO(
+            run.getId().toString(),
+            input.getParameterName(),
+            ParameterType.INPUT
+        );
 
         assertEquals(mockStorageData.peek().getData().getName(), result.getName());
         verify(storageHandler, times(1)).readStorageData(any(StorageData.class));
@@ -513,11 +595,17 @@ public class TaskProvisioningServiceTest {
             .next()
             .getName();
 
-        when(storageHandler.readStorageData(any(StorageData.class))).thenThrow(new FileStorageException("failed to read file from storage service"));
+        when(storageHandler.readStorageData(any(StorageData.class))).thenThrow(
+            new FileStorageException("failed to read file from storage service")
+        );
 
         ProvisioningException exception = assertThrows(
             ProvisioningException.class,
-            () -> taskProvisioningService.retrieveSingleRunIO(run.getId().toString(), parameterName, ParameterType.INPUT)
+            () -> taskProvisioningService.retrieveSingleRunIO(
+                run.getId().toString(),
+                parameterName,
+                ParameterType.INPUT
+            )
         );
         assertEquals("failed to read file from storage service", exception.getMessage());
         verify(storageHandler, times(1)).readStorageData(any(StorageData.class));
@@ -545,7 +633,8 @@ public class TaskProvisioningServiceTest {
             .findTypePersistenceByRunIdAndParameterTypeAndParameterNameIn(
                 localRun.getId(),
                 ParameterType.INPUT,
-                List.of("name")))
+                List.of("name")
+            ))
             .thenReturn(persistenceList);
 
         StateAction result = taskProvisioningService.updateRunState(localRun.getId().toString(), desiredState);

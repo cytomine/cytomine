@@ -228,9 +228,9 @@ public class StorageTest {
         byte[] arrayYmlBytes = arrayYmlContent.getBytes(StandardCharsets.UTF_8);
         File arrayYmlFile = FileHelper.write("array.yml", arrayYmlBytes);
         StorageDataEntry arrayYmlEntry = new StorageDataEntry(
-                arrayYmlFile,
-                "nuclei/array.yml",
-                StorageDataType.FILE
+            arrayYmlFile,
+            "nuclei/array.yml",
+            StorageDataType.FILE
         );
 
         String expectedValue = "{\"type\":\"Polygon\",\"coordinates\":[[[0,0],[0,1],[1,1],[1,0],[0,0]]]}";
@@ -240,7 +240,11 @@ public class StorageTest {
         String subArrayYmlContent = "size: 1";
         byte[] subArrayYmlBytes = subArrayYmlContent.getBytes(StandardCharsets.UTF_8);
         File subArrayYmlFile = FileHelper.write("array.yml", subArrayYmlBytes);
-        StorageDataEntry subArrayYmlEntry = new StorageDataEntry(subArrayYmlFile, "nuclei/0/array.yml", StorageDataType.FILE);
+        StorageDataEntry subArrayYmlEntry = new StorageDataEntry(
+            subArrayYmlFile,
+            "nuclei/0/array.yml",
+            StorageDataType.FILE
+        );
 
         StorageData nestedDirectory = new StorageData();
         nestedDirectory.add(arrayYmlEntry);
@@ -252,12 +256,15 @@ public class StorageTest {
         StorageData emptyFile = new StorageData("nuclei", storage.getIdStorage());
         storageHandler.readStorageData(emptyFile);
 
-        List<String> expectedNames = List.of("nuclei", "nuclei/array.yml", "nuclei/0", "nuclei/0/array.yml", "nuclei/0/0");
+        List<String> expectedNames = List.of(
+            "nuclei",
+            "nuclei/array.yml",
+            "nuclei/0",
+            "nuclei/0/array.yml",
+            "nuclei/0/0"
+        );
         for (StorageDataEntry entry : emptyFile.getEntryList()) {
-            Assertions.assertTrue(
-                    expectedNames.contains(entry.getName()),
-                    "Unexpected entry name: " + entry.getName()
-            );
+            Assertions.assertTrue(expectedNames.contains(entry.getName()), "Unexpected entry name: " + entry.getName());
         }
     }
 
@@ -268,10 +275,12 @@ public class StorageTest {
         storageHandler.createStorage(testStorage);
         String parameterName = UUID.randomUUID().toString();
 
-        FileStorageException exception = Assertions.assertThrows(FileStorageException.class, () -> {
-            StorageData emptyFile = new StorageData(parameterName, testStorage.getIdStorage());
-            storageHandler.readStorageData(emptyFile);
-        });
+        FileStorageException exception = Assertions.assertThrows(
+            FileStorageException.class, () -> {
+                StorageData emptyFile = new StorageData(parameterName, testStorage.getIdStorage());
+                storageHandler.readStorageData(emptyFile);
+            }
+        );
         Assertions.assertEquals("Failed to read file " + parameterName, exception.getMessage());
     }
 

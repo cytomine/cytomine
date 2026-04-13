@@ -99,7 +99,6 @@ public class ReadTaskStepDefinitions {
 
     @Given("a set of valid tasks has been successfully uploaded")
     public void a_set_of_valid_tasks_has_been_successfully_uploaded() {
-        // generate identifiers for two tasks
         taskRepository.save(TestTaskBuilder.buildHardcodedAddInteger());
         taskRepository.save(TestTaskBuilder.buildHardcodedSubtractInteger());
     }
@@ -111,14 +110,12 @@ public class ReadTaskStepDefinitions {
 
     @Then("App Engine retrieves relevant data from the database")
     public void app_engine_retrieves_relevant_data_from_the_database() {
-        // response should contain a list of two task descriptions
         Assertions.assertNotNull(tasks);
-        Assertions.assertEquals(tasks.size(), 2);
+        Assertions.assertEquals(2, tasks.size());
     }
 
     @Then("App Engine sends a {string} OK response with a payload containing the descriptions of the available tasks as a JSON payload \\(see OpenAPI spec)")
     public void app_engine_sends_a_ok_response_with_a_payload_containing_the_descriptions_of_the_available_tasks_as_a_json_payload_see_open_api_spec(String string) {
-        // the response should be OK 200
         for (TaskDescription description : tasks) {
             Assertions.assertNotNull(description.getDescription());
             Assertions.assertNotNull(description.getNamespace());
@@ -129,7 +126,7 @@ public class ReadTaskStepDefinitions {
         }
     }
 
-    private void createDescriptorInStorage(String bundleFilename, Task task) throws FileStorageException, IOException {
+    private void createDescriptorInStorage(String bundleFilename, Task task) throws FileStorageException {
         // save it in file storage service
         Storage storage = new Storage(task.getStorageReference());
         if (!storageHandler.checkStorageExists(storage)) {
@@ -145,7 +142,7 @@ public class ReadTaskStepDefinitions {
     }
 
     @Given("a valid task has a {string}, a {string} has been successfully uploaded")
-    public void a_valid_has_a_a_has_been_successfully_uploaded(String namespace, String version) throws FileStorageException, IOException {
+    public void a_valid_has_a_a_has_been_successfully_uploaded(String namespace, String version) throws FileStorageException {
         taskRepository.deleteAll();
         String bundleFilename = namespace + "-" + version + ".zip";
         persistedTask = TestTaskBuilder.buildTaskFromResource(bundleFilename);
@@ -159,7 +156,7 @@ public class ReadTaskStepDefinitions {
     }
 
     @Given("a valid task has a {string} has been successfully uploaded")
-    public void a_valid_has_a_has_been_successfully_uploaded(String uuid) throws FileStorageException, IOException {
+    public void a_valid_has_a_has_been_successfully_uploaded(String uuid) throws FileStorageException {
         taskRepository.deleteAll();
         String bundleFilename = "com.cytomine.dummy.arithmetic.integer.subtraction-1.0.0.zip";
         persistedTask = TestTaskBuilder.buildTaskFromResource(bundleFilename, UUID.fromString(uuid));
@@ -174,7 +171,7 @@ public class ReadTaskStepDefinitions {
     }
 
     @Given("a valid task has a {string}, a {string} and {string} has been successfully uploaded")
-    public void a_valid_task_with_namespace_and_version_and_uuid_successfully_uploaded(String namespace, String version, String uuid) throws FileStorageException, IOException {
+    public void a_valid_task_with_namespace_and_version_and_uuid_successfully_uploaded(String namespace, String version, String uuid) throws FileStorageException {
         taskRepository.deleteAll();
         String bundleFilename = namespace + "-" + version + ".zip";
         persistedTask = TestTaskBuilder.buildTaskFromResource(bundleFilename, UUID.fromString(uuid));
@@ -293,7 +290,7 @@ public class ReadTaskStepDefinitions {
     }
 
     @Then("App Engine sends a {string} OK response with the descriptor file as a binary payload \\(see OpenAPI spec)")
-    public void app_engine_sends_a_response_with_the_descriptor_file_as_a_binary_payload_see_open_api_spec(String string) throws IOException {
+    public void app_engine_sends_a_response_with_the_descriptor_file_as_a_binary_payload_see_open_api_spec(String string) {
         Assertions.assertNotNull(persistedDescriptor);
         JsonNode descriptorJson = DescriptorHelper.parseDescriptor(persistedDescriptor);
         Assertions.assertTrue(descriptorJson.has("namespace"));
@@ -405,10 +402,8 @@ public class ReadTaskStepDefinitions {
 
     }
 
-
     @And("input {string} with collection item with index {int} is already provisioned")
-    public void inputWithCollectionItemWithIndexIsAlreadyProvisioned(String inputName, int indexes)
-        throws JsonProcessingException {
+    public void inputWithCollectionItemWithIndexIsAlreadyProvisioned(String inputName, int indexes) {
         String uuid = persistedRun.getId().toString();
         apiClient.provisionInputPart(uuid, inputName, "integer", "100", indexes);
     }

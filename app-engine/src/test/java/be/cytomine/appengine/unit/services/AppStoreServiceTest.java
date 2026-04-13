@@ -144,7 +144,10 @@ class AppStoreServiceTest {
         );
 
         assertNotNull(exception);
-        assertEquals(ErrorDefinitions.fromCode(ErrorCode.INTERNAL_INVALID_STORE_DATA).getMessage(), exception.getError().getMessage());
+        assertEquals(
+            ErrorDefinitions.fromCode(ErrorCode.INTERNAL_INVALID_STORE_DATA).getMessage(),
+            exception.getError().getMessage()
+        );
         verify(appStoreRepository, never()).save(any());
     }
 

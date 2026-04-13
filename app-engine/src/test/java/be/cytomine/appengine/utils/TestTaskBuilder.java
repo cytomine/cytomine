@@ -18,6 +18,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 
@@ -30,6 +32,8 @@ import be.cytomine.appengine.models.task.TypeFactory;
 import be.cytomine.appengine.models.task.integer.IntegerType;
 
 public class TestTaskBuilder {
+
+    private static final Logger log = LoggerFactory.getLogger(TestTaskBuilder.class);
 
     @Value("${scheduler.task-resources.ram}")
     private static String defaultRam;
@@ -77,10 +81,10 @@ public class TestTaskBuilder {
         inputa.setName("a");
         inputa.setDisplayName("Operand A");
         inputa.setDescription("First operand");
-        IntegerType inputType1_1 = new IntegerType();
-        inputType1_1.setId("integer");
-        inputType1_1.setCharset("UTF_8");
-        inputa.setType(inputType1_1);
+        IntegerType inputTypeA = new IntegerType();
+        inputTypeA.setId("integer");
+        inputTypeA.setCharset("UTF_8");
+        inputa.setType(inputTypeA);
         inputa.setDefaultValue("0");
         inputa.setParameterType(ParameterType.INPUT);
 
@@ -88,10 +92,10 @@ public class TestTaskBuilder {
         inputb.setName("b");
         inputb.setDisplayName("Operand B");
         inputb.setDescription("Second operand");
-        IntegerType inputType1_2 = new IntegerType();
-        inputType1_2.setId("integer");
-        inputType1_2.setCharset("UTF_8");
-        inputb.setType(inputType1_2);
+        IntegerType inputTypeB = new IntegerType();
+        inputTypeB.setId("integer");
+        inputTypeB.setCharset("UTF_8");
+        inputb.setType(inputTypeB);
         inputb.setDefaultValue("0");
         inputb.setParameterType(ParameterType.INPUT);
 
@@ -162,9 +166,9 @@ public class TestTaskBuilder {
         inputa.setName("a");
         inputa.setDisplayName("Operand A");
         inputa.setDescription("First operand");
-        IntegerType inputType1_1 = new IntegerType();
-        inputType1_1.setId("integer");
-        inputa.setType(inputType1_1);
+        IntegerType inputTypeA = new IntegerType();
+        inputTypeA.setId("integer");
+        inputa.setType(inputTypeA);
         inputa.setDefaultValue("0");
         inputa.setParameterType(ParameterType.INPUT);
 
@@ -172,9 +176,9 @@ public class TestTaskBuilder {
         inputb.setName("b");
         inputb.setDisplayName("Operand B");
         inputb.setDescription("Second operand");
-        IntegerType inputType1_2 = new IntegerType();
-        inputType1_2.setId("integer");
-        inputb.setType(inputType1_2);
+        IntegerType inputTypeB = new IntegerType();
+        inputTypeB.setId("integer");
+        inputb.setType(inputTypeB);
         inputb.setDefaultValue("0");
         inputb.setParameterType(ParameterType.INPUT);
 
@@ -280,7 +284,8 @@ public class TestTaskBuilder {
 
                 }
             }
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            log.warn("Failed to read descriptor from archive input stream", e);
         }
         return null;
     }
@@ -297,7 +302,8 @@ public class TestTaskBuilder {
 
                 }
             }
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            log.warn("Failed to extract descriptor from archive", e);
         }
         return null;
     }

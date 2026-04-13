@@ -305,9 +305,7 @@ public class ApiClient {
         return TaskTestsUtils.convertTo(response);
     }
 
-    public JsonNode provisionInputPart(String uuid, String parameterName, String type, String value, int index)
-        throws JsonProcessingException
-    {
+    public JsonNode provisionInputPart(String uuid, String parameterName, String type, String value, int index) {
         HttpEntity<Object> entity = null;
         if (type.equals("image") || type.equals("file")) {
             HttpHeaders headers = new HttpHeaders();

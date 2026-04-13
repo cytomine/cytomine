@@ -79,8 +79,10 @@ public class CytomineSteps {
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'New ontology')]");
         webDriverUtils.bySendKeys(wait, By.name("name"), ontologyName);
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Save')]");
-        webDriverUtils.byIsDisplayed(wait, By.xpath(
-            "//p[contains(@class, 'panel-heading') and contains(text(), '" + ontologyName + "')]"));
+        webDriverUtils.byIsDisplayed(
+            wait,
+            By.xpath("//p[contains(@class, 'panel-heading') and contains(text(), '" + ontologyName + "')]")
+        );
         return driver.getCurrentUrl();
     }
 
@@ -237,7 +239,8 @@ public class CytomineSteps {
         annotationTools.drawRectangleAnnotation(wait, driver);
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Search for similar annotations')]");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//*[contains(text(), 'Similar annotations')]"));
-        wait.until(d -> d.findElements(By.cssSelector(".similar-annotations-playground .annotation-data")).size() == nbAnnotations);
+        By annotationsSelector = By.cssSelector(".similar-annotations-playground .annotation-data");
+        wait.until(d -> d.findElements(annotationsSelector).size() == nbAnnotations);
     }
 
     @SneakyThrows
@@ -258,9 +261,12 @@ public class CytomineSteps {
 
     public void deleteTask(Wait<WebDriver> wait, URL cytomineUrl, String taskName) {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/apps");
-        webDriverUtils.byIsDisplayed(wait,
-            By.xpath("//p[contains(@class, 'title') and contains(text(), '" + taskName + "')]"));
-        webDriverUtils.xpathClick(wait,
+        webDriverUtils.byIsDisplayed(
+            wait,
+            By.xpath("//p[contains(@class, 'title') and contains(text(), '" + taskName + "')]")
+        );
+        webDriverUtils.xpathClick(
+            wait,
             "//div[contains(@class, 'card') and .//p[contains(@class, 'title') and contains(text(), '" + taskName
                 + "')]]//a[contains(text(), 'More')]"
         );
@@ -268,8 +274,10 @@ public class CytomineSteps {
         webDriverUtils.byIsDisplayed(wait, By.cssSelector(".panel-heading .panel-actions"));
         webDriverUtils.byClick(wait, By.cssSelector(".panel-actions .dropdown .icon"));
 
-        webDriverUtils.xpathClick(wait,
-            "//a[contains(@class, 'dropdown-item') and .//span[contains(text(), 'Delete')]]");
+        webDriverUtils.xpathClick(
+            wait,
+            "//a[contains(@class, 'dropdown-item') and .//span[contains(text(), 'Delete')]]"
+        );
 
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Confirm')]");
 
@@ -284,11 +292,25 @@ public class CytomineSteps {
             taskName, taskVersion
         );
         webDriverUtils.xpathClick(wait, optionXpath);
-        webDriverUtils.byIsDisplayed(wait, By.xpath(format("//div[contains(@class, 'executor')]//p[contains(text(), '%s') and contains(text(), '%s')]", taskName, taskVersion)));
-        webDriverUtils.byIsDisplayed(wait, By.xpath("//section[contains(@class, 'fields')]//button[.//span[contains(text(), 'Select')]]"));    }
+        webDriverUtils.byIsDisplayed(
+            wait,
+            By.xpath(format(
+                "//div[contains(@class, 'executor')]//p[contains(text(), '%s') and contains(text(), '%s')]",
+                taskName,
+                taskVersion
+            ))
+        );
+        webDriverUtils.byIsDisplayed(
+            wait,
+            By.xpath("//section[contains(@class, 'fields')]//button[.//span[contains(text(), 'Select')]]")
+        );
+    }
 
     public void selectAnnotationForGeometryInput(Wait<WebDriver> wait) {
-        webDriverUtils.xpathClick(wait, "//section[contains(@class, 'fields')]//button[.//span[contains(text(), 'Select')]]");
+        webDriverUtils.xpathClick(
+            wait,
+            "//section[contains(@class, 'fields')]//button[.//span[contains(text(), 'Select')]]"
+        );
         webDriverUtils.byIsDisplayed(wait, By.cssSelector(".modal-card .annotation-content"));
         wait.until(d -> !d.findElements(By.cssSelector(".annotation-content > div")).isEmpty());
 
@@ -298,12 +320,21 @@ public class CytomineSteps {
         webDriverUtils.byIsDisplayed(wait, By.cssSelector(".modal-card .modal-card-foot .is-link"));
         webDriverUtils.byClick(wait, By.cssSelector(".modal-card .modal-card-foot .is-link"));
 
-        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(@class, 'annotation-container') and contains(text(), 'Annotation')]"));
+        webDriverUtils.byIsDisplayed(
+            wait,
+            By.xpath("//div[contains(@class, 'annotation-container') and contains(text(), 'Annotation')]")
+        );
     }
 
     public void runTask(Wait<WebDriver> wait, WebDriver driver) {
-        webDriverUtils.byIsDisplayed(wait, By.cssSelector(".executor .card-content section:last-child .button.is-primary:last-child"));
-        webDriverUtils.byClick(wait, By.cssSelector(".executor .card-content section:last-child .button.is-primary:last-child"));
+        webDriverUtils.byIsDisplayed(
+            wait,
+            By.cssSelector(".executor .card-content section:last-child .button.is-primary:last-child")
+        );
+        webDriverUtils.byClick(
+            wait,
+            By.cssSelector(".executor .card-content section:last-child .button.is-primary:last-child")
+        );
 
         Wait<WebDriver> longWait = new WebDriverWait(driver, Duration.ofSeconds(300));
         webDriverUtils.byIsDisplayed(longWait, By.cssSelector(".runs .fa-check-circle"));
@@ -340,8 +371,8 @@ public class CytomineSteps {
         webDriverUtils.byClick(wait, By.xpath("//label[contains(@class,'b-radio') and contains(text(),'Members')]"));
         webDriverUtils.byClick(
             wait,
-            By.xpath("//td[@data-label='Username' and normalize-space(text())='" + username + "']" +
-                "/preceding-sibling::td[contains(@class,'checkbox-cell')]//label[contains(@class,'b-checkbox')]")
+            By.xpath("//td[@data-label='Username' and normalize-space(text())='" + username + "']"
+                + "/preceding-sibling::td[contains(@class,'checkbox-cell')]//label[contains(@class,'b-checkbox')]")
         );
         webDriverUtils.byClick(
             wait,

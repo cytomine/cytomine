@@ -337,6 +337,9 @@ public class ProvisionTaskStepDefinitions {
             case "input":
                 persistedRun.setState(TaskRunState.PROVISIONED);
                 break;
+
+            default:
+                break;
         }
 
         persistedRun = taskRunRepository.save(persistedRun);
@@ -636,6 +639,8 @@ public class ProvisionTaskStepDefinitions {
                 break;
             case "file":
                 provision = filePersistenceRepository.findFilePersistenceByParameterNameAndRunIdAndParameterType(parameterName, persistedRun.getId(), ParameterType.INPUT);
+                break;
+            default:
                 break;
         }
 

@@ -177,7 +177,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
         @RequestBody AnnotationReportParams params
     ) throws IOException {
 
-        boolean reviewed = Boolean.TRUE.equals(params.reviewed());
+
         String users = JsonNodeUtils.csvFromStringList(params.users());
         String reviewUsers = JsonNodeUtils.csvFromStringList(params.reviewUsers());
         String format = (params.format() == null || params.format().isBlank()) ? "pdf" : params.format();
@@ -191,7 +191,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
         bodyMap.put("format", format);
         bodyMap.put("users", users);
         bodyMap.put("reviewUsers", reviewUsers);
-        bodyMap.put("reviewed", reviewed);
+        bodyMap.put("reviewed", params.reviewed());
         bodyMap.put("terms", terms);
         bodyMap.put("images", images);
         bodyMap.put("beforeThan", beforeThan);

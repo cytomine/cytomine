@@ -1,12 +1,13 @@
 package be.cytomine.appengine.integration.cucumber;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
-import be.cytomine.appengine.repositories.RunRepository;
-import be.cytomine.appengine.states.TaskRunState;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,11 +28,16 @@ import org.springframework.web.client.RestClientResponseException;
 import be.cytomine.appengine.AppEngineApplication;
 import be.cytomine.appengine.dto.handlers.filestorage.Storage;
 import be.cytomine.appengine.dto.inputs.task.TaskDescription;
+import be.cytomine.appengine.exceptions.FileStorageException;
 import be.cytomine.appengine.handlers.StorageData;
 import be.cytomine.appengine.handlers.StorageHandler;
-import be.cytomine.appengine.models.task.*;
+import be.cytomine.appengine.models.task.Parameter;
+import be.cytomine.appengine.models.task.ParameterType;
+import be.cytomine.appengine.models.task.Run;
+import be.cytomine.appengine.models.task.Task;
+import be.cytomine.appengine.repositories.RunRepository;
 import be.cytomine.appengine.repositories.TaskRepository;
-import be.cytomine.appengine.exceptions.*;
+import be.cytomine.appengine.states.TaskRunState;
 import be.cytomine.appengine.utils.ApiClient;
 import be.cytomine.appengine.utils.DescriptorHelper;
 import be.cytomine.appengine.utils.TaskTestsUtils;
@@ -168,7 +174,7 @@ public class ReadTaskStepDefinitions {
     }
 
     @Given("a valid task has a {string}, a {string} and {string} has been successfully uploaded")
-    public void a_valid_task_with_namespace_and_version_and_uuid_successfully_uploaded(String namespace, String version, String uuid) throws FileStorageException, IOException  {
+    public void a_valid_task_with_namespace_and_version_and_uuid_successfully_uploaded(String namespace, String version, String uuid) throws FileStorageException, IOException {
         taskRepository.deleteAll();
         String bundleFilename = namespace + "-" + version + ".zip";
         persistedTask = TestTaskBuilder.buildTaskFromResource(bundleFilename, UUID.fromString(uuid));
@@ -402,15 +408,13 @@ public class ReadTaskStepDefinitions {
 
     @And("input {string} with collection item with index {int} is already provisioned")
     public void inputWithCollectionItemWithIndexIsAlreadyProvisioned(String inputName, int indexes)
-        throws JsonProcessingException
-    {
+        throws JsonProcessingException {
         String uuid = persistedRun.getId().toString();
         apiClient.provisionInputPart(uuid, inputName, "integer", "100", indexes);
     }
 
     @Then("App Engine sends a {string} OK response with a payload containing the task input")
-    public void appEngineSendsAOKResponseWithAPayloadContainingTheTaskInput(String code)
-    {
+    public void appEngineSendsAOKResponseWithAPayloadContainingTheTaskInput(String code) {
         Assertions.assertNotNull(resource);
     }
 

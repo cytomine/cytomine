@@ -182,8 +182,10 @@ public class UploadTaskStepDefinitions {
 
     @Then("App Engine creates a unique {string} for referencing the task")
     public void app_engine_creates_a_unique_for_referencing_the(String string) {
-        Task uploaded = taskRepository.findByNamespaceAndVersion(persistedNamespace,
-            persistedVersion);
+        Task uploaded = taskRepository.findByNamespaceAndVersion(
+            persistedNamespace,
+            persistedVersion
+        );
         Assertions.assertEquals(persistedUploadResponse.getId(), uploaded.getIdentifier());
     }
 
@@ -239,8 +241,10 @@ public class UploadTaskStepDefinitions {
         final File multiPartTempFiles = new File("/tmp/appengine/work/Tomcat/localhost/ROOT");
         if (rootFolder.exists() && multiPartTempFiles.exists()) {
             Assertions.assertTrue(multiPartTempFiles.isDirectory());
-            Assertions.assertEquals(0,
-                Objects.requireNonNull(multiPartTempFiles.listFiles()).length);
+            Assertions.assertEquals(
+                0,
+                Objects.requireNonNull(multiPartTempFiles.listFiles()).length
+            );
         }
 
     }
@@ -291,21 +295,27 @@ public class UploadTaskStepDefinitions {
         "exists already")
     public void app_engine_returns_an_http_conflict_error_because_this_version_of_the_task_exists_already(String conflictCode) throws JsonProcessingException {
         // failure
-        Assertions.assertEquals(Integer.parseInt(conflictCode),
-            persistedException.getStatusCode().value());
+        Assertions.assertEquals(
+            Integer.parseInt(conflictCode),
+            persistedException.getStatusCode().value()
+        );
         JsonNode jsonPayLoad =
             new ObjectMapper().readTree(persistedException.getResponseBodyAsString());
         // doesn't reply with parsing failure
-        Assertions.assertEquals(jsonPayLoad.get("error_code").textValue(),
-            ErrorDefinitions.fromCode(ErrorCode.INTERNAL_TASK_EXISTS).code);
+        Assertions.assertEquals(
+            jsonPayLoad.get("error_code").textValue(),
+            ErrorDefinitions.fromCode(ErrorCode.INTERNAL_TASK_EXISTS).code
+        );
     }
 
     @Then("App Engine does not create or overwrite the task and related data in the File storage," +
         " registry and database services")
     public void app_engine_does_not_create_or_overwrite_the_task_and_related_data_in_the_file_storage_registry_and_database_services() throws FileStorageException, IOException {
         // check app engine doesn't override data in database
-        Task uploaded = taskRepository.findByNamespaceAndVersion(persistedNamespace,
-            persistedVersion);
+        Task uploaded = taskRepository.findByNamespaceAndVersion(
+            persistedNamespace,
+            persistedVersion
+        );
         Assertions.assertEquals(uploaded.getNameShort(), persistedTask.getNameShort());
 
         // and storage service
@@ -391,7 +401,9 @@ public class UploadTaskStepDefinitions {
         }
         JsonNode jsonPayLoad =
             new ObjectMapper().readTree(persistedException.getResponseBodyAsString());
-        Assertions.assertEquals(jsonPayLoad.get("error_code").textValue(),
-            ErrorDefinitions.fromCode(code).code);
+        Assertions.assertEquals(
+            jsonPayLoad.get("error_code").textValue(),
+            ErrorDefinitions.fromCode(code).code
+        );
     }
 }

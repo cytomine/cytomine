@@ -1,6 +1,10 @@
 package be.cytomine.appengine.integration.cucumber;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -16,7 +20,6 @@ import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import be.cytomine.appengine.repositories.ChecksumRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -46,14 +49,20 @@ import be.cytomine.appengine.dto.inputs.task.TaskRunParameterValue;
 import be.cytomine.appengine.dto.inputs.task.types.integer.IntegerValue;
 import be.cytomine.appengine.exceptions.FileStorageException;
 import be.cytomine.appengine.exceptions.SchedulingException;
-import be.cytomine.appengine.handlers.StorageData;
 import be.cytomine.appengine.handlers.SchedulerHandler;
+import be.cytomine.appengine.handlers.StorageData;
 import be.cytomine.appengine.handlers.StorageHandler;
-import be.cytomine.appengine.models.task.*;
+import be.cytomine.appengine.models.task.Checksum;
+import be.cytomine.appengine.models.task.Parameter;
+import be.cytomine.appengine.models.task.ParameterType;
+import be.cytomine.appengine.models.task.Run;
+import be.cytomine.appengine.models.task.Task;
+import be.cytomine.appengine.models.task.ValueType;
 import be.cytomine.appengine.models.task.integer.IntegerPersistence;
-import be.cytomine.appengine.repositories.integer.IntegerPersistenceRepository;
+import be.cytomine.appengine.repositories.ChecksumRepository;
 import be.cytomine.appengine.repositories.RunRepository;
 import be.cytomine.appengine.repositories.TaskRepository;
+import be.cytomine.appengine.repositories.integer.IntegerPersistenceRepository;
 import be.cytomine.appengine.services.RunService;
 import be.cytomine.appengine.states.TaskRunState;
 import be.cytomine.appengine.utils.ApiClient;
@@ -141,14 +150,17 @@ public class RunTaskStepDefinitions {
         if (pathContainsWhitespace) {
             String[] pathComponents = absolutePath.split("/");
             for (String component : pathComponents) {
-                if (component.contains(" "))
+                if (component.contains(" ")) {
                     component = "'" + component + "'";
-                if (component.equalsIgnoreCase(""))
+                }
+                if (component.equalsIgnoreCase("")) {
                     formattedPath += component;
-                else
+                } else {
                     formattedPath += "/" + component;
-                if (component.endsWith(".zip"))
+                }
+                if (component.endsWith(".zip")) {
                     formattedPath = formattedPath.replace(".", "s.");
+                }
             }
         }
         return formattedPath;
@@ -194,7 +206,7 @@ public class RunTaskStepDefinitions {
         task = TestTaskBuilder.buildHardcodedAddInteger(UUID.fromString(uuid));
         task = taskRepository.saveAndFlush(task);
         secret = UUID.randomUUID().toString();
-        persistedRun = new Run(UUID.fromString(uuid), null, null , secret);
+        persistedRun = new Run(UUID.fromString(uuid), null, null, secret);
         persistedRun.setTask(task);
         persistedRun = runRepository.save(persistedRun);
 
@@ -230,8 +242,7 @@ public class RunTaskStepDefinitions {
     // successful fetch of task run inputs archive in a launched task run
     @Given("the task run {string} has input parameters: {string} of type {string} with value {string} and {string} of type {string} with value {string}")
     public void the_task_run_has_input_parameters_of_type_with_value_and_of_type_with_value(String runId, String name1, String type1, String value1, String name2, String type2, String value2) throws FileStorageException,
-        JsonProcessingException
-    {
+        JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         List<ObjectNode> provisions = new ArrayList<>();
         provisions.add(mapper.valueToTree(TaskTestsUtils.createProvision(name1, type1, value1)));
@@ -737,8 +748,7 @@ public class RunTaskStepDefinitions {
                 apiClient.provisionInput(persistedRun.getId().toString(), name, type, value);
             } catch (RestClientResponseException e) {
                 Assertions.fail("Provisioning '" + name + "' failed: " + e.getMessage());
-            } catch (JsonProcessingException e)
-            {
+            } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
         }

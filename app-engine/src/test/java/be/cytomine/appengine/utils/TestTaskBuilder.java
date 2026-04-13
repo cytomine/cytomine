@@ -1,7 +1,6 @@
 package be.cytomine.appengine.utils;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -14,11 +13,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
 
-import be.cytomine.appengine.dto.responses.errors.AppEngineError;
-import be.cytomine.appengine.dto.responses.errors.ErrorBuilder;
-import be.cytomine.appengine.dto.responses.errors.ErrorCode;
-import be.cytomine.appengine.exceptions.*;
-import be.cytomine.appengine.models.task.ParameterType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -30,6 +24,7 @@ import org.springframework.core.io.ClassPathResource;
 import be.cytomine.appengine.dto.misc.TaskIdentifiers;
 import be.cytomine.appengine.models.task.Author;
 import be.cytomine.appengine.models.task.Parameter;
+import be.cytomine.appengine.models.task.ParameterType;
 import be.cytomine.appengine.models.task.Task;
 import be.cytomine.appengine.models.task.TypeFactory;
 import be.cytomine.appengine.models.task.integer.IntegerType;
@@ -285,7 +280,8 @@ public class TestTaskBuilder {
 
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
         return null;
     }
 
@@ -301,7 +297,8 @@ public class TestTaskBuilder {
 
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
         return null;
     }
 
@@ -312,7 +309,7 @@ public class TestTaskBuilder {
             Path tempFile = Files.createTempFile("descriptor-", ".yml");
             assert descriptorYmlContent != null;
             Files.writeString(tempFile, descriptorYmlContent, StandardOpenOption.WRITE);
-            return  tempFile.toFile();
+            return tempFile.toFile();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

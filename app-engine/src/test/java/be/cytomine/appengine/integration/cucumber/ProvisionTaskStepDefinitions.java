@@ -2,7 +2,6 @@ package be.cytomine.appengine.integration.cucumber;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.stream.Collectors;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -11,6 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -23,8 +23,8 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.junit.jupiter.api.Assertions;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootContextLoader;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ContextConfiguration;
@@ -41,7 +41,13 @@ import be.cytomine.appengine.exceptions.FileStorageException;
 import be.cytomine.appengine.handlers.StorageData;
 import be.cytomine.appengine.handlers.StorageDataType;
 import be.cytomine.appengine.handlers.StorageHandler;
-import be.cytomine.appengine.models.task.*;
+import be.cytomine.appengine.models.task.Parameter;
+import be.cytomine.appengine.models.task.ParameterType;
+import be.cytomine.appengine.models.task.Run;
+import be.cytomine.appengine.models.task.Task;
+import be.cytomine.appengine.models.task.Type;
+import be.cytomine.appengine.models.task.TypePersistence;
+import be.cytomine.appengine.models.task.ValueType;
 import be.cytomine.appengine.models.task.bool.BooleanPersistence;
 import be.cytomine.appengine.models.task.collection.CollectionPersistence;
 import be.cytomine.appengine.models.task.datetime.DateTimePersistence;
@@ -56,6 +62,8 @@ import be.cytomine.appengine.models.task.number.NumberPersistence;
 import be.cytomine.appengine.models.task.number.NumberType;
 import be.cytomine.appengine.models.task.string.StringPersistence;
 import be.cytomine.appengine.models.task.string.StringType;
+import be.cytomine.appengine.repositories.RunRepository;
+import be.cytomine.appengine.repositories.TaskRepository;
 import be.cytomine.appengine.repositories.TypePersistenceRepository;
 import be.cytomine.appengine.repositories.bool.BooleanPersistenceRepository;
 import be.cytomine.appengine.repositories.collection.CollectionPersistenceRepository;
@@ -67,8 +75,6 @@ import be.cytomine.appengine.repositories.image.ImagePersistenceRepository;
 import be.cytomine.appengine.repositories.integer.IntegerPersistenceRepository;
 import be.cytomine.appengine.repositories.number.NumberPersistenceRepository;
 import be.cytomine.appengine.repositories.string.StringPersistenceRepository;
-import be.cytomine.appengine.repositories.RunRepository;
-import be.cytomine.appengine.repositories.TaskRepository;
 import be.cytomine.appengine.states.TaskRunState;
 import be.cytomine.appengine.utils.ApiClient;
 import be.cytomine.appengine.utils.FileHelper;
@@ -224,8 +230,10 @@ public class ProvisionTaskStepDefinitions {
     public void this_task_has_only_one_input_parameter_of_type(String paramName, String type) {
         persistedTask.getParameters().removeIf(input -> !(input.getType().getId().equals(type) && input.getName().equals(paramName) && input.getParameterType().equals(ParameterType.INPUT)));
         persistedTask = taskRepository.saveAndFlush(persistedTask);
-        Assertions.assertEquals(1,
-            persistedTask.getParameters().stream().filter(parameter -> parameter.getParameterType().equals(ParameterType.INPUT)).toList().size());
+        Assertions.assertEquals(
+            1,
+            persistedTask.getParameters().stream().filter(parameter -> parameter.getParameterType().equals(ParameterType.INPUT)).toList().size()
+        );
     }
 
     @Given("this parameter has no validation rules")
@@ -327,7 +335,7 @@ public class ProvisionTaskStepDefinitions {
                 break;
 
             case "input":
-            persistedRun.setState(TaskRunState.PROVISIONED);
+                persistedRun.setState(TaskRunState.PROVISIONED);
                 break;
         }
 
@@ -342,7 +350,7 @@ public class ProvisionTaskStepDefinitions {
     @Given("this task run has not been provisioned yet and is therefore in state {string}")
     public void this_task_run_has_not_been_provisioned_yet_and_is_therefore_in_state(String state) {
         typePersistenceRepository.deleteAll();
-        List<TypePersistence> provisions = typePersistenceRepository.findTypePersistenceByRunIdAndParameterType(persistedRun.getId() , ParameterType.INPUT);
+        List<TypePersistence> provisions = typePersistenceRepository.findTypePersistenceByRunIdAndParameterType(persistedRun.getId(), ParameterType.INPUT);
         Assertions.assertTrue(provisions.isEmpty());
     }
 
@@ -359,8 +367,7 @@ public class ProvisionTaskStepDefinitions {
             apiClient.provisionInput(persistedRun.getId().toString(), parameterName, input == null ? "" : type, value);
         } catch (RestClientResponseException e) {
             persistedException = e;
-        } catch (JsonProcessingException e)
-        {
+        } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
@@ -386,9 +393,11 @@ public class ProvisionTaskStepDefinitions {
         StorageData descriptorMetaData = new StorageData(fileName, template + "inputs-" + persistedRun.getId().toString());
         StorageData descriptor = storageHandler.readStorageData(descriptorMetaData);
         Assertions.assertNotNull(descriptor);
-        if (content.equalsIgnoreCase("directory")){
-            Assertions.assertEquals(StorageDataType.DIRECTORY,
-                descriptor.peek().getStorageDataType());
+        if (content.equalsIgnoreCase("directory")) {
+            Assertions.assertEquals(
+                StorageDataType.DIRECTORY,
+                descriptor.peek().getStorageDataType()
+            );
             Assertions.assertEquals(4, descriptor.getEntryList().size());
         } else {
             String fileContent = FileHelper.read(descriptor.peek().getData(), StandardCharsets.UTF_8);
@@ -401,7 +410,7 @@ public class ProvisionTaskStepDefinitions {
     public void the_task_run_states_changes_to_because_the_task_is_now_completely_provisioned(String state) {
         Optional<Run> optionalRun = taskRunRepository.findById(persistedRun.getId());
         optionalRun.ifPresent(value -> persistedRun = value);
-        Assertions.assertEquals(state,persistedRun.getState().toString());
+        Assertions.assertEquals(state, persistedRun.getState().toString());
     }
 
     // PROVISIONING OF TWO PARAMETERS
@@ -414,13 +423,13 @@ public class ProvisionTaskStepDefinitions {
     @Given("the first parameter is {string} of type {string} without a validation rule")
     public void the_first_parameter_is_of_type_without_a_validation_rule(String parameterName, String type) {
         Assertions.assertTrue(persistedTask.getParameters().stream()
-          .anyMatch(input -> input.getType().getId().equals(type) && input.getName().equals(parameterName) && input.getParameterType().equals(ParameterType.INPUT)));
+            .anyMatch(input -> input.getType().getId().equals(type) && input.getName().equals(parameterName) && input.getParameterType().equals(ParameterType.INPUT)));
     }
 
     @Given("the second parameter is {string} of type {string} without a validation rule")
     public void the_second_parameter_is_of_type_without_a_validation_rule(String parameterName, String type) {
         Assertions.assertTrue(persistedTask.getParameters().stream()
-          .anyMatch(input -> input.getType().getId().equals(type) && input.getName().equals(parameterName) && input.getParameterType().equals(ParameterType.INPUT)));
+            .anyMatch(input -> input.getType().getId().equals(type) && input.getName().equals(parameterName) && input.getParameterType().equals(ParameterType.INPUT)));
     }
 
     @Given("no validation rules are defined for these parameters")
@@ -460,7 +469,7 @@ public class ProvisionTaskStepDefinitions {
 
     @Then("the value {string} is saved and associated with parameter {string} in the database")
     public void the_value_is_saved_and_associated_with_parameter_in_the_database(String value, String parameterName) {
-        IntegerPersistence provision = integerProvisionRepository.findIntegerPersistenceByParameterNameAndRunIdAndParameterType(parameterName, persistedRun.getId() , ParameterType.INPUT);
+        IntegerPersistence provision = integerProvisionRepository.findIntegerPersistenceByParameterNameAndRunIdAndParameterType(parameterName, persistedRun.getId(), ParameterType.INPUT);
         Assertions.assertNotNull(provision);
         Assertions.assertTrue(provision.getParameterName().equalsIgnoreCase(parameterName));
     }
@@ -481,9 +490,9 @@ public class ProvisionTaskStepDefinitions {
             .getParameters()
             .stream()
             .filter(
-            input -> ((IntegerType)input.getType()).getId().equals(type)
-                && input.getName().equals(parameterName)
-                && input.getParameterType().equals(ParameterType.INPUT))
+                input -> ((IntegerType) input.getType()).getId().equals(type)
+                    && input.getName().equals(parameterName)
+                    && input.getParameterType().equals(ParameterType.INPUT))
             .findFirst();
 
         Assertions.assertTrue(parameterOptional.isPresent());
@@ -499,7 +508,7 @@ public class ProvisionTaskStepDefinitions {
 
     @Then("the value {string} is saved and associated with parameter {string} after passing the validation rule {string}")
     public void the_value_is_saved_and_associated_with_parameter_after_passing_the_validation_rule(String value, String parameterName, String validationRule) {
-        TypePersistence provision = integerProvisionRepository.findIntegerPersistenceByParameterNameAndRunIdAndParameterType(parameterName, persistedRun.getId() , ParameterType.INPUT);
+        TypePersistence provision = integerProvisionRepository.findIntegerPersistenceByParameterNameAndRunIdAndParameterType(parameterName, persistedRun.getId(), ParameterType.INPUT);
         Assertions.assertNotNull(provision);
         Assertions.assertTrue(provision.getParameterName().equalsIgnoreCase(parameterName));
     }
@@ -519,7 +528,7 @@ public class ProvisionTaskStepDefinitions {
 
     @Then("the App Engine does not record {string} nor {string} in file storage or database")
     public void the_app_engine_does_not_record_nor_in_file_storage_or_database(String parameterOneValue, String parameterTwoValue) {
-        List<IntegerPersistence> provisionList = integerProvisionRepository.findIntegerPersistenceByRunIdAndParameterType(persistedRun.getId() , ParameterType.INPUT);
+        List<IntegerPersistence> provisionList = integerProvisionRepository.findIntegerPersistenceByRunIdAndParameterType(persistedRun.getId(), ParameterType.INPUT);
         Assertions.assertTrue(provisionList.isEmpty());
     }
 
@@ -646,8 +655,7 @@ public class ProvisionTaskStepDefinitions {
 
     @When("a user calls the provisioning endpoint with {string} to provision collection {string} with {string} of type {string} in {int}")
     public void aUserCallsTheProvisioningEndpointWithToProvisionCollectionWithOfType(String payload, String parameterName, String value, String type, int index)
-        throws JsonProcessingException
-    {
+        throws JsonProcessingException {
 
         Parameter input = persistedTask
             .getParameters()
@@ -665,8 +673,7 @@ public class ProvisionTaskStepDefinitions {
     }
 
     @Then("the value {string} is saved and associated collection {string} in the database")
-    public void theValueIsSavedAndAssociatedCollectionInTheDatabase(String value, String parameterName)
-    {
+    public void theValueIsSavedAndAssociatedCollectionInTheDatabase(String value, String parameterName) {
 
         Parameter input = persistedTask
             .getParameters()
@@ -686,14 +693,13 @@ public class ProvisionTaskStepDefinitions {
 
     @And("a input file named {string} is created in the task run storage {string}+UUID within {string}")
     public void aInputFileNamedIsCreatedInTheTaskRunStorageUUIDWithinWithContent(String index, String template, String parameterName)
-        throws FileStorageException
-    {
+        throws FileStorageException {
         StorageData descriptorMetaData = new StorageData(parameterName, template + "inputs-" + persistedRun.getId().toString());
         StorageData descriptor = storageHandler.readStorageData(descriptorMetaData);
         Assertions.assertNotNull(descriptor);
         Assertions.assertEquals(StorageDataType.DIRECTORY, descriptor.peek().getStorageDataType());
         Assertions.assertEquals(3, descriptor.getEntryList().size());
-        Assertions.assertTrue(descriptor.getEntryList().stream().anyMatch(entry -> entry.getName().equalsIgnoreCase(parameterName+"/"+index)));
+        Assertions.assertTrue(descriptor.getEntryList().stream().anyMatch(entry -> entry.getName().equalsIgnoreCase(parameterName + "/" + index)));
 
     }
 
@@ -718,9 +724,11 @@ public class ProvisionTaskStepDefinitions {
         );
 
         Type type = input.getType();
-        Boolean hasValidationRules = typeConstraintCheckers.getOrDefault(type.getId(), t -> {
-            throw new RuntimeException("Unknown type: " + t.getId());
-        }).apply(type);
+        Boolean hasValidationRules = typeConstraintCheckers.getOrDefault(
+            type.getId(), t -> {
+                throw new RuntimeException("Unknown type: " + t.getId());
+            }
+        ).apply(type);
 
         Assertions.assertTrue(hasValidationRules);
     }
@@ -742,8 +750,7 @@ public class ProvisionTaskStepDefinitions {
                 apiClient.provisionInput(persistedRun.getId().toString(), name, type, value);
             } catch (RestClientResponseException e) {
                 Assertions.fail("Provisioning '" + name + "' failed: " + e.getMessage());
-            } catch (JsonProcessingException e)
-            {
+            } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
         }

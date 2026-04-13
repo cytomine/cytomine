@@ -111,7 +111,9 @@ public class SimplifyGeometryServiceTests {
         UserAnnotation annotation = builder.given_a_user_annotation();
 
         //add very big geometry
-        annotation.setLocation(new WKTReader().read(TestUtils.getResourceFileAsString("dataset/very_big_annotation.txt")));
+        annotation.setLocation(
+            new WKTReader().read(TestUtils.getResourceFileAsString("dataset/very_big_annotation.txt"))
+        );
 
         assertThat(annotation.getLocation().getNumPoints()).isGreaterThanOrEqualTo(500);
 

@@ -66,14 +66,14 @@ public class SpreadsheetReportServiceTests {
             "6836067"
         },
     };
-    String
-        validDataResult
-        = "ID;Area (microns²);Perimeter (mm);X;Y;Image Filename;View annotation picture;View annotation on image\r\n2;23298.527;0.614768015861511;736;true;6836067;https://...;https://...;0.614768015861511;736;1978.375;6836067\r\n";
+    String validDataResult = "ID;Area (microns²);Perimeter (mm);X;Y;Image Filename;View annotation picture;"
+        + "View annotation on image\r\n2;23298.527;0.614768015861511;736;true;6836067"
+        + ";https://...;https://...;0.614768015861511;736;1978.375;6836067\r\n";
 
-    Object[][] delimiterInData = {{"ID", null, "Perimeter ; (mm)"},};
+    Object[][] delimiterInData = {{"ID", null, "Perimeter ; (mm)"}};
     String delimiterInDataResult = "ID;;\"Perimeter ; (mm)\"\r\n";
 
-    Object[][] nullData = {{"ID", null, "Perimeter (mm)"},};
+    Object[][] nullData = {{"ID", null, "Perimeter (mm)"}};
     String nullCsvDataResult = "ID;;Perimeter (mm)\r\n";
 
     Object[][] emptyData = {{}};

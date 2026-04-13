@@ -100,7 +100,8 @@ public class AnnotationLayerServiceTest {
 
     @Test
     public void findShouldReturnAnnotationLayer() {
-        when(annotationLayerRepository.findById(mockAnnotationLayer.getId())).thenReturn(Optional.of(mockAnnotationLayer));
+        when(annotationLayerRepository.findById(mockAnnotationLayer.getId()))
+            .thenReturn(Optional.of(mockAnnotationLayer));
 
         Optional<AnnotationLayer> result = annotationLayerService.find(mockAnnotationLayer.getId());
 

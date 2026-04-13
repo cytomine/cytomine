@@ -269,14 +269,20 @@ public class ProjectConnectionServiceTests {
 
     @Test
     void find_last_connections_of_users_in_project() {
-        Project projet = builder.given_a_project();
+        Project project = builder.given_a_project();
         User user = builder.given_superadmin();
         User anotherUser = builder.given_a_user();
 
-        given_a_persistent_connection_in_project(user, projet);
+        given_a_persistent_connection_in_project(user, project);
 
-        List<JsonObject> results = projectConnectionService.lastConnectionOfGivenUsersInProject
-            (projet, List.of(user.getId(), anotherUser.getId()), "created", "desc", 0L, 0L);
+        List<JsonObject> results = projectConnectionService.lastConnectionOfGivenUsersInProject(
+            project,
+            List.of(user.getId(), anotherUser.getId()),
+            "created",
+            "desc",
+            0L,
+            0L
+        );
 
         assertThat(results).hasSize(2);
         assertThat(results.stream().map(x -> x.get("user"))).contains(user.getId(), anotherUser.getId());
@@ -636,43 +642,32 @@ public class ProjectConnectionServiceTests {
         Project projet = builder.given_a_project();
         User user = builder.given_superadmin();
 
-        List<JsonObject> results
-            = projectConnectionService.numberOfProjectConnections("day", null, null, projet, user);
+        List<JsonObject> results = projectConnectionService.numberOfProjectConnections("day", null, null, projet, user);
         assertThat(results).isEmpty();
 
         given_a_persistent_connection_in_project(user, projet, simpleDateFormat.parse("2022-01-01T12:00:00"));
         given_a_persistent_connection_in_project(user, projet, simpleDateFormat.parse("2022-01-01T12:05:00"));
         given_a_persistent_connection_in_project(user, projet, simpleDateFormat.parse("2022-01-01T13:30:00"));
 
-        results
-            = projectConnectionService.numberOfProjectConnections("day", null, null, projet, user);
+        results = projectConnectionService.numberOfProjectConnections("day", null, null, projet, user);
         assertThat(results).hasSize(1);
-        //assertThat(results.get(0).get("time")).isEqualTo(simpleDateFormat.parse("2022-01-01T01:00:00"));
         assertThat(results.get(0).get("frequency")).isEqualTo(3);
 
-        results
-            = projectConnectionService.numberOfProjectConnections("hour", null, null, projet, user);
+        results = projectConnectionService.numberOfProjectConnections("hour", null, null, projet, user);
         assertThat(results).hasSize(2);
         Optional<JsonObject> entry = results.stream().filter(x -> x.get("frequency").equals(2)).findFirst();
         assertThat(entry).isPresent();
-        //assertThat(entry.get().get("time")).isEqualTo(simpleDateFormat.parse("2022-01-01T12:00:00"));
         entry = results.stream().filter(x -> x.get("frequency").equals(1)).findFirst();
         assertThat(entry).isPresent();
-        //assertThat(entry.get().get("time")).isEqualTo(simpleDateFormat.parse("2022-01-01T13:00:00"));
-
 
         given_a_persistent_connection_in_project(user, projet, simpleDateFormat.parse("2021-01-20T03:00:00"));
 
-        results
-            = projectConnectionService.numberOfProjectConnections("week", null, null, projet, user);
+        results = projectConnectionService.numberOfProjectConnections("week", null, null, projet, user);
         assertThat(results).hasSize(2);
         entry = results.stream().filter(x -> x.get("frequency").equals(3)).findFirst();
         assertThat(entry).isPresent();
-        //assertThat(entry.get().get("time")).isEqualTo(simpleDateFormat.parse("2021-12-26T01:00:00")); // last sunday before 2021/01/01
         entry = results.stream().filter(x -> x.get("frequency").equals(1)).findFirst();
         assertThat(entry).isPresent();
-        //assertThat(entry.get().get("time")).isEqualTo(simpleDateFormat.parse("2021-01-17T01:00:00")); // idem before 2021-01-20
-
     }
 
     @Test
@@ -759,7 +754,7 @@ public class ProjectConnectionServiceTests {
     }
 
     @Test
-    void get_user_activity_details() throws ParseException {
+    void get_user_activity_details() {
         Project projet = builder.given_a_project();
         User user = builder.given_superadmin();
         ImageInstance imageInstance1 = builder.given_an_image_instance(projet);

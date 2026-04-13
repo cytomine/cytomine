@@ -85,10 +85,9 @@ public class OntologyResourceTests {
             .andExpect(jsonPath("$.collection[?(@.name=='" + ontology.getName() + "')].projects").doesNotExist());
     }
 
-
     @Test
     @Transactional
-    public void get_a_ontology() throws Exception {
+    public void shouldReturnOntology() throws Exception {
         Ontology ontology = builder.given_an_ontology();
         Term parent = builder.given_a_term(ontology);
         Term child1 = builder.given_a_term(ontology);
@@ -127,7 +126,6 @@ public class OntologyResourceTests {
             .andExpect(jsonPath("$.children[?(@.name=='" + parent.getName() + "')].color").value(parent.getColor()))
             .andExpect(jsonPath("$.children[?(@.name=='" + parent.getName() + "')].class").value(
                 "be.cytomine.domain.ontology.Term"))
-//                .andExpect(jsonPath("$.children[?(@.name=='"+parent.getName()+"')].parent").value(nullValue())) // does not work :(
             .andExpect(jsonPath("$.children[?(@.name=='" + parent.getName() + "')].attr.id").value(parent.getId()
                 .intValue()))
             .andExpect(jsonPath("$.children[?(@.name=='" + parent.getName() + "')].attr.type").value(
@@ -182,8 +180,7 @@ public class OntologyResourceTests {
 
             .andExpect(jsonPath("$.children[?(@.name=='" + directChild.getName() + "')]").exists())
             .andExpect(jsonPath("$.children[?(@.name=='" + directChild.getName() + "')].id").value(directChild.getId()
-                .intValue()))
-        ;
+                .intValue()));
     }
 
     @Test
@@ -202,7 +199,6 @@ public class OntologyResourceTests {
             .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.ontology.id").exists())
             .andExpect(jsonPath("$.ontology.name").value(ontology.getName()));
-
     }
 
     @Test

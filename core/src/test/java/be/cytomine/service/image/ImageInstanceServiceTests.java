@@ -215,29 +215,14 @@ public class ImageInstanceServiceTests {
 
         ImageInstanceBounds imageInstanceBounds = imageInstanceService.computeBounds(project);
 
-        //Created cannot be set (auto generated)
-//        assertThat(imageInstanceBounds.getCreated().getMin()).isEqualTo(new GregorianCalendar(2021, Calendar.JANUARY, 1).getTime());
-//        assertThat(imageInstanceBounds.getCreated().getMax()).isEqualTo(new GregorianCalendar(2021, Calendar.DECEMBER, 1).getTime());
-        assertThat(imageInstanceBounds.getReviewStart().getMin()).isEqualTo(new GregorianCalendar(
-            2021,
-            Calendar.JANUARY,
-            1
-        ).getTime());
-        assertThat(imageInstanceBounds.getReviewStart().getMax()).isEqualTo(new GregorianCalendar(
-            2021,
-            Calendar.DECEMBER,
-            1
-        ).getTime());
-        assertThat(imageInstanceBounds.getReviewStop().getMin()).isEqualTo(new GregorianCalendar(
-            2021,
-            Calendar.JANUARY,
-            1
-        ).getTime());
-        assertThat(imageInstanceBounds.getReviewStop().getMax()).isEqualTo(new GregorianCalendar(
-            2021,
-            Calendar.DECEMBER,
-            1
-        ).getTime());
+        assertThat(imageInstanceBounds.getReviewStart().getMin())
+            .isEqualTo(new GregorianCalendar(2021, Calendar.JANUARY, 1).getTime());
+        assertThat(imageInstanceBounds.getReviewStart().getMax())
+            .isEqualTo(new GregorianCalendar(2021, Calendar.DECEMBER, 1).getTime());
+        assertThat(imageInstanceBounds.getReviewStop().getMin())
+            .isEqualTo(new GregorianCalendar(2021, Calendar.JANUARY, 1).getTime());
+        assertThat(imageInstanceBounds.getReviewStop().getMax())
+            .isEqualTo(new GregorianCalendar(2021, Calendar.DECEMBER, 1).getTime());
 
         assertThat(imageInstanceBounds.getMagnification().getMin()).isEqualTo(1);
         assertThat(imageInstanceBounds.getMagnification().getMax()).isEqualTo(3);
@@ -270,7 +255,6 @@ public class ImageInstanceServiceTests {
         assertThat(imageInstanceBounds.getMimeType().getList()).contains("aaa", "zzzz", "AAAA");
         assertThat(imageInstanceBounds.getFormat().getList()).contains("aaa", "zzzz", "AAAA");
     }
-
 
     @Test
     void list_all_image_by_projects() {
@@ -559,19 +543,17 @@ public class ImageInstanceServiceTests {
             .contains(img1.getId(), img2.getId());
 
 
-        List<SearchParameterEntry> searchParameterEntryList =
-            new ArrayList<>(List.of(
-                new SearchParameterEntry("instanceFilename", SearchOperation.ilike, img1.getInstanceFilename())
-            ));
+        List<SearchParameterEntry> searchParameterEntryList = List.of(
+            new SearchParameterEntry("instanceFilename", SearchOperation.ilike, img1.getInstanceFilename())
+        );
         assertThat(imageInstanceService.list(project, searchParameterEntryList).stream().map(x -> x.get("id")))
             .doesNotContain(img1.getId(), img2.getId());
 
         project.setBlindMode(false);
 
-        searchParameterEntryList =
-            new ArrayList<>(List.of(
-                new SearchParameterEntry("instanceFilename", SearchOperation.ilike, img1.getInstanceFilename())
-            ));
+        searchParameterEntryList = List.of(
+            new SearchParameterEntry("instanceFilename", SearchOperation.ilike, img1.getInstanceFilename())
+        );
         assertThat(imageInstanceService.list(project, searchParameterEntryList).stream().map(x -> x.get("id")))
             .contains(img1.getId()).doesNotContain(img2.getId());
 
@@ -607,7 +589,6 @@ public class ImageInstanceServiceTests {
         assertThat(imageInstanceService.listTree(project, 0L, 0L)).isNotNull();
     }
 
-
     @Test
     void get_image_intance_with_success() {
         ImageInstance imageInstance = builder.given_an_image_instance();
@@ -631,19 +612,12 @@ public class ImageInstanceServiceTests {
         AssertionsForClassTypes.assertThat(imageInstanceService.find(0L)).isEmpty();
     }
 
-
     @Test
     void find_next_image_intance_with_success() {
         Project project = builder.given_a_project();
-        ImageInstance imageInstance1 = builder.given_an_image_instance(
-            builder.given_an_abstract_image(), project
-        );
-        ImageInstance imageInstance2 = builder.given_an_image_instance(
-            builder.given_an_abstract_image(), project
-        );
-        ImageInstance imageInstance3 = builder.given_an_image_instance(
-            builder.given_an_abstract_image(), project
-        );
+        ImageInstance imageInstance1 = builder.given_an_image_instance(builder.given_an_abstract_image(), project);
+        ImageInstance imageInstance2 = builder.given_an_image_instance(builder.given_an_abstract_image(), project);
+        ImageInstance imageInstance3 = builder.given_an_image_instance(builder.given_an_abstract_image(), project);
 
         assertThat(imageInstanceService.next(imageInstance1)).isEmpty();
         assertThat(imageInstanceService.next(imageInstance2)).isPresent().hasValue(imageInstance1);
@@ -653,15 +627,9 @@ public class ImageInstanceServiceTests {
     @Test
     void find_previous_image_intance_with_success() {
         Project project = builder.given_a_project();
-        ImageInstance imageInstance1 = builder.given_an_image_instance(
-            builder.given_an_abstract_image(), project
-        );
-        ImageInstance imageInstance2 = builder.given_an_image_instance(
-            builder.given_an_abstract_image(), project
-        );
-        ImageInstance imageInstance3 = builder.given_an_image_instance(
-            builder.given_an_abstract_image(), project
-        );
+        ImageInstance imageInstance1 = builder.given_an_image_instance(builder.given_an_abstract_image(), project);
+        ImageInstance imageInstance2 = builder.given_an_image_instance(builder.given_an_abstract_image(), project);
+        ImageInstance imageInstance3 = builder.given_an_image_instance(builder.given_an_abstract_image(), project);
 
         assertThat(imageInstanceService.previous(imageInstance3)).isEmpty();
         assertThat(imageInstanceService.previous(imageInstance2)).isPresent().hasValue(imageInstance3);
@@ -680,14 +648,12 @@ public class ImageInstanceServiceTests {
         ImageInstance created = imageInstanceService.find(commandResponse.getObject().getId()).get();
     }
 
-
     @Test
     void add_already_existing_image_instance_fails() {
         ImageInstance imageInstance = builder.given_an_image_instance();
         Assertions.assertThrows(
-            AlreadyExistException.class, () -> {
-                imageInstanceService.add(imageInstance.toJsonObject().withChange("id", null));
-            }
+            AlreadyExistException.class,
+            () -> imageInstanceService.add(imageInstance.toJsonObject().withChange("id", null))
         );
     }
 
@@ -695,9 +661,8 @@ public class ImageInstanceServiceTests {
     void add_valid_image_instance_with_unexsting_abstract_image_fails() {
         ImageInstance imageInstance = builder.given_a_not_persisted_image_instance(null, builder.given_a_project());
         Assertions.assertThrows(
-            WrongArgumentException.class, () -> {
-                imageInstanceService.add(imageInstance.toJsonObject());
-            }
+            WrongArgumentException.class,
+            () -> imageInstanceService.add(imageInstance.toJsonObject())
         );
     }
 
@@ -707,7 +672,9 @@ public class ImageInstanceServiceTests {
         Project project2 = builder.given_a_project();
 
         ImageInstance imageInstance = builder.given_a_not_persisted_image_instance(
-            builder.given_an_abstract_image(), project1);
+            builder.given_an_abstract_image(),
+            project1
+        );
         imageInstance = builder.persistAndReturn(imageInstance);
 
         JsonObject jsonObject = imageInstance.toJsonObject();
@@ -777,9 +744,8 @@ public class ImageInstanceServiceTests {
     void edit_image_instance_with_unexsting_abstract_image_fails() {
         ImageInstance imageInstance = builder.given_an_image_instance();
         Assertions.assertThrows(
-            WrongArgumentException.class, () -> {
-                imageInstanceService.add(imageInstance.toJsonObject().withChange("baseImage", null));
-            }
+            WrongArgumentException.class,
+            () -> imageInstanceService.add(imageInstance.toJsonObject().withChange("baseImage", null))
         );
     }
 
@@ -787,9 +753,8 @@ public class ImageInstanceServiceTests {
     void edit_image_instance_with_unexsting_project_fails() {
         ImageInstance imageInstance = builder.given_an_image_instance();
         Assertions.assertThrows(
-            WrongArgumentException.class, () -> {
-                imageInstanceService.add(imageInstance.toJsonObject().withChange("project", null));
-            }
+            WrongArgumentException.class,
+            () -> imageInstanceService.add(imageInstance.toJsonObject().withChange("project", null))
         );
     }
 
@@ -891,9 +856,7 @@ public class ImageInstanceServiceTests {
 
         entityManager.refresh(project);
         assertThat(project.getCountImages()).isEqualTo(0);
-
     }
-
 
     @Test
     void start_image_reviewing() {

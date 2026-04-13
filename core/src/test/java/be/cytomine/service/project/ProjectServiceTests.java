@@ -297,16 +297,6 @@ public class ProjectServiceTests {
 
         ProjectBounds projectBounds = projectService.computeBounds(true);
 
-        //Created cannot be set (auto generated), so we cannot test it
-
-        // same for updated...
-
-//        assertThat(projectBounds.getUpdated().getMin()).isEqualTo(new GregorianCalendar(2021, Calendar.JANUARY, 1).getTime());
-//        assertThat(projectBounds.getUpdated().getMax()).isEqualTo(new GregorianCalendar(2021, Calendar.DECEMBER, 1).getTime());
-//
-//        assertThat(projectBounds.getMode().getMin()).isEqualTo(1);
-//        assertThat(projectBounds.getMode().getMax()).isEqualTo(3);
-
         assertThat(projectBounds.getName().getMin()).isNotNull();
         assertThat(projectBounds.getName().getMax()).isNotNull();
 
@@ -608,11 +598,6 @@ public class ProjectServiceTests {
         );
         assertThat(page.getTotalElements()).isEqualTo(1);
         assertThat(page.getContent().get(0).get("id")).isEqualTo(project2.getId());
-
-//        page = projectService.list(builder.given_superadmin(), projectSearchExtension, new ArrayList<>(List.of(
-//                new SearchParameterEntry("ontology", SearchOperation.in, null)
-//        )), "created", "desc", 0L, 0L);
-//        assertThat(page.getTotalElements()).isEqualTo(2);
     }
 
 

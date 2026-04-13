@@ -89,15 +89,14 @@ public class TrackResourceTests {
 
     @Test
     @Transactional
-    public void get_a_track() throws Exception {
+    public void shouldReturnTrack() throws Exception {
         Track track = builder.given_a_track();
         restTrackControllerMockMvc.perform(get("/api/track/{id}.json", track.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(track.getId().intValue()))
             .andExpect(jsonPath("$.class").value("be.cytomine.domain.ontology.Track"))
             .andExpect(jsonPath("$.color").value(track.getColor()))
-            .andExpect(jsonPath("$.created").isNotEmpty())
-        ;
+            .andExpect(jsonPath("$.created").isNotEmpty());
     }
 
     @Test

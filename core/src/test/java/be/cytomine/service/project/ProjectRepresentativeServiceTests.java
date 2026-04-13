@@ -33,12 +33,6 @@ import be.cytomine.domain.project.ProjectRepresentativeUser;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.exceptions.WrongArgumentException;
-import be.cytomine.repository.project.ProjectRepresentativeUserRepository;
-import be.cytomine.service.CommandService;
-import be.cytomine.service.PermissionService;
-import be.cytomine.service.command.TransactionService;
-import be.cytomine.service.security.SecurityACLService;
-import be.cytomine.service.security.UserService;
 import be.cytomine.utils.CommandResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -59,30 +53,13 @@ public class ProjectRepresentativeServiceTests {
     ProjectRepresentativeUserService projectRepresentativeUserService;
 
     @Autowired
-    ProjectRepresentativeUserRepository projectRepresentativeUserRepository;
-
-    @Autowired
     BasicInstanceBuilder builder;
-
-    @Autowired
-    CommandService commandService;
-
-    @Autowired
-    TransactionService transactionService;
-
-    @Autowired
-    PermissionService permissionService;
-
-    @Autowired
-    SecurityACLService securityACLService;
-
-    @Autowired
-    UserService userService;
 
     @Test
     void get_projectRepresentativeUser_with_success() {
         ProjectRepresentativeUser projectRepresentativeUser = builder.given_a_project_representative_user();
-        assertThat(projectRepresentativeUser).isEqualTo(projectRepresentativeUserService.get(projectRepresentativeUser.getId()));
+        assertThat(projectRepresentativeUser)
+            .isEqualTo(projectRepresentativeUserService.get(projectRepresentativeUser.getId()));
     }
 
     @Test
@@ -94,8 +71,8 @@ public class ProjectRepresentativeServiceTests {
     void find_projectRepresentativeUser_with_success() {
         ProjectRepresentativeUser projectRepresentativeUser = builder.given_a_project_representative_user();
         assertThat(projectRepresentativeUserService.find(projectRepresentativeUser.getId()).isPresent());
-        assertThat(projectRepresentativeUser).isEqualTo(projectRepresentativeUserService.find(projectRepresentativeUser.getId())
-            .get());
+        assertThat(projectRepresentativeUser)
+            .isEqualTo(projectRepresentativeUserService.find(projectRepresentativeUser.getId()).get());
     }
 
     @Test
@@ -135,8 +112,6 @@ public class ProjectRepresentativeServiceTests {
             projectRepresentativeUser.getProject()));
         assertThat(projectRepresentativeUserFromAnotherProject).isNotIn(projectRepresentativeUserService.listByProject(
             projectRepresentativeUser.getProject()));
-
-
     }
 
     @Test

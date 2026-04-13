@@ -403,14 +403,14 @@ public class ImageConsultationServiceTests {
 
         assertThat(results).hasSize(2);
 
-        Optional<JsonObject> user1image1 = results.stream().
-            filter(x -> x.get("user").equals(user1.getId()) && x.get("image").equals(imageInstance1.getId()))
+        Optional<JsonObject> user1image1 = results.stream()
+            .filter(x -> x.get("user").equals(user1.getId()) && x.get("image").equals(imageInstance1.getId()))
             .findFirst();
         assertThat(user1image1).isPresent();
         assertThat(user1image1.get().get("frequency")).isEqualTo(2);
 
-        Optional<JsonObject> user1image2 = results.stream().
-            filter(x -> x.get("user").equals(user1.getId()) && x.get("image").equals(imageInstance2.getId()))
+        Optional<JsonObject> user1image2 = results.stream()
+            .filter(x -> x.get("user").equals(user1.getId()) && x.get("image").equals(imageInstance2.getId()))
             .findFirst();
         assertThat(user1image2).isPresent();
         assertThat(user1image2.get().get("frequency")).isEqualTo(1);

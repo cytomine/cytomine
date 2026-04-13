@@ -35,7 +35,6 @@ import be.cytomine.domain.ontology.AnnotationTerm;
 import be.cytomine.domain.ontology.ReviewedAnnotation;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.ontology.UserAnnotation;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.exceptions.WrongArgumentException;
@@ -75,7 +74,6 @@ public class AnnotationTermServiceTests {
         assertThat(annotationTerm).isEqualTo(result.get());
     }
 
-
     @Test
     void list_annotation_term_for_annotation_with_success() {
         AnnotationTerm annotationTerm = builder.given_an_annotation_term();
@@ -83,7 +81,6 @@ public class AnnotationTermServiceTests {
 
         assertThat(annotationTermService.list(annotationTerm.getUserAnnotation()))
             .contains(annotationTerm).doesNotContain(annotationTermFromAnotherAnnotation);
-
     }
 
     @Test
@@ -93,7 +90,6 @@ public class AnnotationTermServiceTests {
 
         assertThat(annotationTermService.list(annotationTerm.getUserAnnotation().getProject()))
             .contains(annotationTerm).doesNotContain(annotationTermFromAnotherProject);
-
     }
 
     @Test
@@ -102,23 +98,20 @@ public class AnnotationTermServiceTests {
 
         assertThat(annotationTermService.listAnnotationTermNotDefinedByUser(
             annotationTerm.getUserAnnotation(),
-            (User) annotationTerm.getUser()
-        ))
-            .doesNotContain(annotationTerm);
+            annotationTerm.getUser()
+        )).doesNotContain(annotationTerm);
 
         assertThat(annotationTermService.listAnnotationTermNotDefinedByUser(
             annotationTerm.getUserAnnotation(),
             builder.given_a_user()
-        ))
-            .contains(annotationTerm);
+        )).contains(annotationTerm);
     }
-
 
     @Test
     void add_valid_annotation_term_with_success() {
-        AnnotationTerm
-            annotationTerm
-            = builder.given_a_not_persisted_annotation_term(builder.given_a_user_annotation());
+        AnnotationTerm annotationTerm = builder.given_a_not_persisted_annotation_term(
+            builder.given_a_user_annotation()
+        );
         CommandResponse commandResponse = annotationTermService.add(annotationTerm.toJsonObject());
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -142,27 +135,25 @@ public class AnnotationTermServiceTests {
                 annotationTerm.getTerm(),
                 builder.given_superadmin()
             )).isPresent();
-
     }
 
     @Test
     void add_annotation_term_fails_if_already_exists_for_same_user() {
-        AnnotationTerm
-            annotationTerm
-            = builder.given_a_not_persisted_annotation_term(builder.given_a_user_annotation());
+        AnnotationTerm annotationTerm = builder.given_a_not_persisted_annotation_term(
+            builder.given_a_user_annotation()
+        );
         annotationTermService.add(annotationTerm.toJsonObject());
         Assertions.assertThrows(
-            AlreadyExistException.class, () -> {
-                annotationTermService.add(annotationTerm.toJsonObject());
-            }
+            AlreadyExistException.class,
+            () -> annotationTermService.add(annotationTerm.toJsonObject())
         );
     }
 
     @Test
     void add_valid_annotation_term_with_direct_method_success() {
-        AnnotationTerm
-            annotationTerm
-            = builder.given_a_not_persisted_annotation_term(builder.given_a_user_annotation());
+        AnnotationTerm annotationTerm = builder.given_a_not_persisted_annotation_term(
+            builder.given_a_user_annotation()
+        );
         CommandResponse commandResponse = annotationTermService.addAnnotationTerm(
             annotationTerm.getUserAnnotation().getId(),
             annotationTerm.getTerm().getId(),
@@ -177,14 +168,13 @@ public class AnnotationTermServiceTests {
 
     @Test
     void add_annotation_term_fails_if_term_is_from_other_ontology() {
-        AnnotationTerm
-            annotationTerm
-            = builder.given_a_not_persisted_annotation_term(builder.given_a_user_annotation());
+        AnnotationTerm annotationTerm = builder.given_a_not_persisted_annotation_term(
+            builder.given_a_user_annotation()
+        );
         annotationTerm.setTerm(builder.given_a_term(builder.given_an_ontology()));
         Assertions.assertThrows(
-            WrongArgumentException.class, () -> {
-                annotationTermService.add(annotationTerm.toJsonObject());
-            }
+            WrongArgumentException.class,
+            () -> annotationTermService.add(annotationTerm.toJsonObject())
         );
     }
 
@@ -290,38 +280,29 @@ public class AnnotationTermServiceTests {
 
     @Test
     void add_annotation_term_fails_if_annotation_does_not_exists() {
-        AnnotationTerm
-            annotationTerm
-            = builder.given_a_not_persisted_annotation_term(builder.given_a_user_annotation());
+        AnnotationTerm annotationTerm = builder.given_a_not_persisted_annotation_term(
+            builder.given_a_user_annotation()
+        );
         JsonObject jsonObject = annotationTerm.toJsonObject();
         jsonObject.put("userannotation", -1L);
-        Assertions.assertThrows(
-            ObjectNotFoundException.class, () -> {
-                annotationTermService.add(jsonObject);
-            }
-        );
+        Assertions.assertThrows(ObjectNotFoundException.class, () -> annotationTermService.add(jsonObject));
     }
 
     @Test
     void add_annotation_term_fails_if_term_does_not_exists() {
-        AnnotationTerm
-            annotationTerm
-            = builder.given_a_not_persisted_annotation_term(builder.given_a_user_annotation());
+        AnnotationTerm annotationTerm = builder.given_a_not_persisted_annotation_term(
+            builder.given_a_user_annotation()
+        );
         JsonObject jsonObject = annotationTerm.toJsonObject();
         jsonObject.put("term", -1L);
-        Assertions.assertThrows(
-            WrongArgumentException.class, () -> {
-                annotationTermService.add(jsonObject);
-            }
-        );
+        Assertions.assertThrows(WrongArgumentException.class, () -> annotationTermService.add(jsonObject));
     }
 
     @Test
     void delete_annotation_term_with_success() {
         AnnotationTerm annotationTerm = builder.given_an_annotation_term(builder.given_a_user_annotation());
 
-        CommandResponse commandResponse =
-            annotationTermService.delete(annotationTerm, null, null, true);
+        CommandResponse commandResponse = annotationTermService.delete(annotationTerm, null, null, true);
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -339,7 +320,6 @@ public class AnnotationTermServiceTests {
             annotationTerm.getUser()
         )).isPresent();
 
-
         commandService.redo();
 
         assertThat(annotationTermService.find(
@@ -347,7 +327,5 @@ public class AnnotationTermServiceTests {
             annotationTerm.getTerm(),
             annotationTerm.getUser()
         )).isEmpty();
-
     }
-
 }

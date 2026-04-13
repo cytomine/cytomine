@@ -123,7 +123,8 @@ public class TestUtils {
 
         assertThat((long) cells[0].getNumericCellValue()).isEqualTo(annotationDomain.getId());
         assertThat(cells[1].getStringCellValue()).isEqualTo(StringUtils.decimalFormatter(annotationDomain.getArea()));
-        assertThat(cells[2].getStringCellValue()).isEqualTo(StringUtils.decimalFormatter(annotationDomain.getPerimeter()));
+        assertThat(cells[2].getStringCellValue())
+            .isEqualTo(StringUtils.decimalFormatter(annotationDomain.getPerimeter()));
         assertThat(cells[3].getStringCellValue()).isEqualTo(StringUtils.decimalFormatter(annotationDomain.getCentroid()
             .getX()));
         assertThat(cells[4].getStringCellValue()).isEqualTo(StringUtils.decimalFormatter(annotationDomain.getCentroid()

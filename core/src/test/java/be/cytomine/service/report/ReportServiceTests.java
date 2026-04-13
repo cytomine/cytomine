@@ -66,23 +66,21 @@ public class ReportServiceTests {
         mockReportFormatService
     );
 
-
     List<JsonObject> jsonObjectData = new ArrayList<>();
     List<Map<String, Object>> dataMap = List.of(
         Map.of("id", "Hello"),
         Map.of("id", "World")
     );
-    public static List<ReportColumn> columns = new ArrayList<>() {{
-        add(new ReportColumn("id", "ID", (float) 0.05));
-    }};
+    public static final List<ReportColumn> columns = List.of(
+        new ReportColumn("id", "ID", 0.05f)
+    );
     Set<String> terms = new HashSet<>(Arrays.asList("term1", "term2"));
     Set<String> users = new HashSet<>(Arrays.asList("user1", "user2"));
     byte[] returnedReport = {1};
 
     @Test
     public void generate_csv_report_with_connection_history() throws ServerException {
-        when(mockSpreadsheetWriterService.writeSpreadsheet(any()))
-            .thenReturn(returnedReport);
+        when(mockSpreadsheetWriterService.writeSpreadsheet(any())).thenReturn(returnedReport);
         byte[] generatedReport = reportService.generateConnectionHistoryReport(
             "projectName",
             "userName",
@@ -90,15 +88,13 @@ public class ReportServiceTests {
         );
         verify(mockReportFormatService, times(1))
             .formatJsonObjectForReport(ReportService.CONNECTION_HISTORY_REPORT_COLUMNS, jsonObjectData);
-        verify(mockSpreadsheetWriterService, times(1))
-            .writeSpreadsheet(any());
+        verify(mockSpreadsheetWriterService, times(1)).writeSpreadsheet(any());
         assertArrayEquals(returnedReport, generatedReport);
     }
 
     @Test
     public void generate_csv_report_with_image_consultation() throws ServerException {
-        when(mockSpreadsheetWriterService.writeSpreadsheet(any()))
-            .thenReturn(returnedReport);
+        when(mockSpreadsheetWriterService.writeSpreadsheet(any())).thenReturn(returnedReport);
         byte[] generatedReport = reportService.generateImageConsultationReport(
             "projectName",
             "userName",
@@ -106,8 +102,7 @@ public class ReportServiceTests {
         );
         verify(mockReportFormatService, times(1))
             .formatJsonObjectForReport(ReportService.IMAGE_CONSULTATION_COLUMNS, jsonObjectData);
-        verify(mockSpreadsheetWriterService, times(1))
-            .writeSpreadsheet(any());
+        verify(mockSpreadsheetWriterService, times(1)).writeSpreadsheet(any());
         assertArrayEquals(returnedReport, generatedReport);
     }
 

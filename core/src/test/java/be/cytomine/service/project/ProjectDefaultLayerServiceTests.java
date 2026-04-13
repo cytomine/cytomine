@@ -32,11 +32,6 @@ import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.project.ProjectDefaultLayer;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.ObjectNotFoundException;
-import be.cytomine.repository.project.ProjectDefaultLayerRepository;
-import be.cytomine.service.CommandService;
-import be.cytomine.service.PermissionService;
-import be.cytomine.service.command.TransactionService;
-import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.utils.CommandResponse;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -52,22 +47,7 @@ public class ProjectDefaultLayerServiceTests {
     ProjectDefaultLayerService projectDefaultLayerService;
 
     @Autowired
-    ProjectDefaultLayerRepository projectDefaultLayerRepository;
-
-    @Autowired
     BasicInstanceBuilder builder;
-
-    @Autowired
-    CommandService commandService;
-
-    @Autowired
-    TransactionService transactionService;
-
-    @Autowired
-    PermissionService permissionService;
-
-    @Autowired
-    SecurityACLService securityACLService;
 
     @Test
     void get_projectDefaultLayer_with_success() {
@@ -96,7 +76,8 @@ public class ProjectDefaultLayerServiceTests {
     void list_all_projectDefaultLayer_by_project_with_success() {
         ProjectDefaultLayer projectDefaultLayer = builder.given_a_project_default_layer();
         ProjectDefaultLayer projectDefaultLayerFromAnotherProject = builder.given_a_project_default_layer();
-        assertThat(projectDefaultLayer).isIn(projectDefaultLayerService.listByProject(projectDefaultLayer.getProject()));
+        assertThat(projectDefaultLayer)
+            .isIn(projectDefaultLayerService.listByProject(projectDefaultLayer.getProject()));
         assertThat(projectDefaultLayerFromAnotherProject).isNotIn(projectDefaultLayerService.listByProject(
             projectDefaultLayer.getProject()));
     }

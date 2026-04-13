@@ -245,8 +245,10 @@ public class TermResourceTests {
 
         String updateTermJson = JsonObject.of("name", term.getName(), "color", term.getColor()).toJsonString();
 
-        restTermControllerMockMvc.perform(
-                put("/api/term/{id}.json", term.getId()).contentType(MediaType.APPLICATION_JSON).content(updateTermJson))
+        restTermControllerMockMvc.perform(put("/api/term/{id}.json", term.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(updateTermJson)
+            )
             .andExpect(status().isOk()).andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.command").value("be.cytomine.EditTermCommand"))
             .andExpect(jsonPath("$.data.id").value(term.getId()))
@@ -262,8 +264,10 @@ public class TermResourceTests {
 
         String updateTermJson = JsonObject.of("name", term.getName(), "color", term.getColor()).toJsonString();
 
-        restTermControllerMockMvc.perform(
-                put("/api/term/{id}.json", term.getId()).contentType(MediaType.APPLICATION_JSON).content(updateTermJson))
+        restTermControllerMockMvc.perform(put("/api/term/{id}.json", term.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(updateTermJson)
+            )
             .andExpect(status().isNotFound());
     }
 

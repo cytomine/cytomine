@@ -58,7 +58,6 @@ import be.cytomine.repository.ReviewedAnnotationListing;
 import be.cytomine.repository.ontology.ReviewedAnnotationRepository;
 import be.cytomine.repository.ontology.UserAnnotationRepository;
 import be.cytomine.service.CommandService;
-import be.cytomine.service.command.TransactionService;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
@@ -84,9 +83,6 @@ public class ReviewedAnnotationServiceTests {
 
     @Autowired
     CommandService commandService;
-
-    @Autowired
-    TransactionService transactionService;
 
     @Autowired
     EntityManager entityManager;
@@ -160,8 +156,8 @@ public class ReviewedAnnotationServiceTests {
         reviewedAnnotation.getTerms().add(builder.given_a_term(reviewedAnnotationWithTerms.getProject().getOntology()));
 
         assertThat(reviewedAnnotationService.countByProjectAndWithTerms(reviewedAnnotation.getProject())).isEqualTo(0);
-        assertThat(reviewedAnnotationService.countByProjectAndWithTerms(reviewedAnnotationWithTerms.getProject())).isEqualTo(
-            1);
+        assertThat(reviewedAnnotationService.countByProjectAndWithTerms(reviewedAnnotationWithTerms.getProject()))
+            .isEqualTo(1);
     }
 
     @Test
@@ -186,16 +182,15 @@ public class ReviewedAnnotationServiceTests {
         assertThat(first).isEmpty();
     }
 
-
     @Test
     void stats_group_by_user() {
         ReviewedAnnotation reviewedAnnotation = builder.given_a_reviewed_annotation();
         User reviewer = reviewedAnnotation.getReviewUser();
         User anotherUser = builder.given_a_user();
 
-        List<ReviewedAnnotationStatsEntry>
-            results
-            = reviewedAnnotationService.statsGroupByUser(reviewedAnnotation.getImage());
+        List<ReviewedAnnotationStatsEntry> results = reviewedAnnotationService.statsGroupByUser(
+            reviewedAnnotation.getImage()
+        );
 
         Optional<ReviewedAnnotationStatsEntry> resultForUser = results.stream()
             .filter(x -> x.getUser().equals(reviewer.getId()))
@@ -207,7 +202,6 @@ public class ReviewedAnnotationServiceTests {
         resultForUser = results.stream().filter(x -> x.getUser().equals(anotherUser.getId())).findFirst();
         assertThat(resultForUser).isEmpty();
     }
-
 
     static Map<String, String> POLYGONES = Map.of(
         "a", "POLYGON ((1 1, 2 1, 2 2, 1 2, 1 1))",

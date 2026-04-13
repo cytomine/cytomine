@@ -141,11 +141,11 @@ public class PDFReportServiceTests {
     @Test
     public void sum_of_custom_column_width_values_different_from_1_fails() {
         ServerException expectedError = new ServerException(
-            "The sum of a percent array should be equal to 1, actual: 1.10");
+            "The sum of a percent array should be equal to 1, actual: 1.10"
+        );
         ServerException error = assertThrows(
-            ServerException.class, () -> {
-                testData(validData, "title", invalidCustomColumnWidthSum, true, true);
-            }
+            ServerException.class,
+            () -> testData(validData, "title", invalidCustomColumnWidthSum, true, true)
         );
         assertEquals(expectedError.getMessage(), error.getMessage());
     }
@@ -155,9 +155,8 @@ public class PDFReportServiceTests {
         ServerException expectedError = new ServerException(
             "Column width length should be the same than your data rows length");
         ServerException error = assertThrows(
-            ServerException.class, () -> {
-                testData(validData, "title", invalidSizeCustomColumnWidth, true, true);
-            }
+            ServerException.class,
+            () -> testData(validData, "title", invalidSizeCustomColumnWidth, true, true)
         );
         assertEquals(expectedError.getMessage(), error.getMessage());
     }
@@ -166,9 +165,8 @@ public class PDFReportServiceTests {
     public void generate_pdf_with_different_size_of_rows_fails() throws ServerException {
         ServerException expectedError = new ServerException("All data rows should have the same number of cells");
         ServerException error = assertThrows(
-            ServerException.class, () -> {
-                testData(diffSizeOfRowsData, "title", null, true, true);
-            }
+            ServerException.class,
+            () -> testData(diffSizeOfRowsData, "title", null, true, true)
         );
         assertEquals(expectedError.getMessage(), error.getMessage());
     }

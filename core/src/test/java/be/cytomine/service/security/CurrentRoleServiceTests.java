@@ -54,81 +54,81 @@ public class CurrentRoleServiceTests {
     @Test
     @WithMockUser(username = "superadmin")
     public void find_role_for_superadmin() {
-        assertThat(currentRoleService.findRealRole(builder.given_superadmin()))
+        assertThat(currentRoleService.findRealRole(builder.givenSuperAdmin()))
             .contains(secRoleRepository.getSuperAdmin());
 
-        assertThat(currentRoleService.findRealAuthorities(builder.given_superadmin()))
+        assertThat(currentRoleService.findRealAuthorities(builder.givenSuperAdmin()))
             .containsExactlyInAnyOrder("ROLE_USER", "ROLE_ADMIN", "ROLE_SUPER_ADMIN");
-        assertThat(currentRoleService.findCurrentAuthorities(builder.given_superadmin()))
+        assertThat(currentRoleService.findCurrentAuthorities(builder.givenSuperAdmin()))
             .containsExactlyInAnyOrder("ROLE_USER", "ROLE_ADMIN", "ROLE_SUPER_ADMIN");
 
-        assertThat(currentRoleService.isAdminByNow(builder.given_superadmin())).isTrue();
-        assertThat(currentRoleService.isUserByNow(builder.given_superadmin())).isTrue();
-        assertThat(currentRoleService.isGuestByNow(builder.given_superadmin())).isFalse();
-        assertThat(currentRoleService.isAdmin(builder.given_superadmin())).isTrue();
-        assertThat(currentRoleService.isUser(builder.given_superadmin())).isTrue();
-        assertThat(currentRoleService.isGuest(builder.given_superadmin())).isFalse();
-        assertThat(currentRoleService.hasCurrentUserAdminRole(builder.given_superadmin())).isTrue();
+        assertThat(currentRoleService.isAdminByNow(builder.givenSuperAdmin())).isTrue();
+        assertThat(currentRoleService.isUserByNow(builder.givenSuperAdmin())).isTrue();
+        assertThat(currentRoleService.isGuestByNow(builder.givenSuperAdmin())).isFalse();
+        assertThat(currentRoleService.isAdmin(builder.givenSuperAdmin())).isTrue();
+        assertThat(currentRoleService.isUser(builder.givenSuperAdmin())).isTrue();
+        assertThat(currentRoleService.isGuest(builder.givenSuperAdmin())).isFalse();
+        assertThat(currentRoleService.hasCurrentUserAdminRole(builder.givenSuperAdmin())).isTrue();
     }
 
     @Test
     @WithMockUser(username = "admin")
     public void find_role_for_admin() {
-        assertThat(currentRoleService.findRealRole(builder.given_default_admin()))
+        assertThat(currentRoleService.findRealRole(builder.givenDefaultAdmin()))
             .contains(secRoleRepository.getAdmin());
 
-        assertThat(currentRoleService.findRealAuthorities(builder.given_default_admin()))
+        assertThat(currentRoleService.findRealAuthorities(builder.givenDefaultAdmin()))
             .containsExactlyInAnyOrder("ROLE_USER", "ROLE_ADMIN");
-        assertThat(currentRoleService.findCurrentAuthorities(builder.given_default_admin()))
+        assertThat(currentRoleService.findCurrentAuthorities(builder.givenDefaultAdmin()))
             .containsExactlyInAnyOrder("ROLE_USER");
 
-        assertThat(currentRoleService.isAdminByNow(builder.given_default_admin())).isFalse();
-        assertThat(currentRoleService.isUserByNow(builder.given_default_admin())).isTrue();
-        assertThat(currentRoleService.isGuestByNow(builder.given_default_admin())).isFalse();
-        assertThat(currentRoleService.isAdmin(builder.given_default_admin())).isTrue();
-        assertThat(currentRoleService.isUser(builder.given_default_admin())).isTrue();
-        assertThat(currentRoleService.isGuest(builder.given_default_admin())).isFalse();
-        assertThat(currentRoleService.hasCurrentUserAdminRole(builder.given_default_admin())).isTrue();
+        assertThat(currentRoleService.isAdminByNow(builder.givenDefaultAdmin())).isFalse();
+        assertThat(currentRoleService.isUserByNow(builder.givenDefaultAdmin())).isTrue();
+        assertThat(currentRoleService.isGuestByNow(builder.givenDefaultAdmin())).isFalse();
+        assertThat(currentRoleService.isAdmin(builder.givenDefaultAdmin())).isTrue();
+        assertThat(currentRoleService.isUser(builder.givenDefaultAdmin())).isTrue();
+        assertThat(currentRoleService.isGuest(builder.givenDefaultAdmin())).isFalse();
+        assertThat(currentRoleService.hasCurrentUserAdminRole(builder.givenDefaultAdmin())).isTrue();
     }
 
     @Test
     @WithMockUser(username = "user")
     public void find_role_for_user() {
-        assertThat(currentRoleService.findRealRole(builder.given_default_user()))
+        assertThat(currentRoleService.findRealRole(builder.givenDefaultUser()))
             .contains(secRoleRepository.getUser());
 
-        assertThat(currentRoleService.findRealAuthorities(builder.given_default_user()))
+        assertThat(currentRoleService.findRealAuthorities(builder.givenDefaultUser()))
             .containsExactlyInAnyOrder("ROLE_USER");
-        assertThat(currentRoleService.findCurrentAuthorities(builder.given_default_user()))
+        assertThat(currentRoleService.findCurrentAuthorities(builder.givenDefaultUser()))
             .containsExactlyInAnyOrder("ROLE_USER");
 
-        assertThat(currentRoleService.isAdminByNow(builder.given_default_user())).isFalse();
-        assertThat(currentRoleService.isUserByNow(builder.given_default_user())).isTrue();
-        assertThat(currentRoleService.isGuestByNow(builder.given_default_user())).isFalse();
-        assertThat(currentRoleService.isAdmin(builder.given_default_user())).isFalse();
-        assertThat(currentRoleService.isUser(builder.given_default_user())).isTrue();
-        assertThat(currentRoleService.isGuest(builder.given_default_user())).isFalse();
-        assertThat(currentRoleService.hasCurrentUserAdminRole(builder.given_default_user())).isFalse();
+        assertThat(currentRoleService.isAdminByNow(builder.givenDefaultUser())).isFalse();
+        assertThat(currentRoleService.isUserByNow(builder.givenDefaultUser())).isTrue();
+        assertThat(currentRoleService.isGuestByNow(builder.givenDefaultUser())).isFalse();
+        assertThat(currentRoleService.isAdmin(builder.givenDefaultUser())).isFalse();
+        assertThat(currentRoleService.isUser(builder.givenDefaultUser())).isTrue();
+        assertThat(currentRoleService.isGuest(builder.givenDefaultUser())).isFalse();
+        assertThat(currentRoleService.hasCurrentUserAdminRole(builder.givenDefaultUser())).isFalse();
     }
 
     @Test
     @WithMockUser(username = "guest")
     public void find_role_for_guest() {
-        assertThat(currentRoleService.findRealRole(builder.given_a_guest()))
+        assertThat(currentRoleService.findRealRole(builder.givenAGuest()))
             .contains(secRoleRepository.getGuest());
 
-        assertThat(currentRoleService.findRealAuthorities(builder.given_a_guest()))
+        assertThat(currentRoleService.findRealAuthorities(builder.givenAGuest()))
             .containsExactlyInAnyOrder("ROLE_GUEST");
-        assertThat(currentRoleService.findCurrentAuthorities(builder.given_a_guest()))
+        assertThat(currentRoleService.findCurrentAuthorities(builder.givenAGuest()))
             .containsExactlyInAnyOrder("ROLE_GUEST");
 
-        assertThat(currentRoleService.isAdminByNow(builder.given_default_guest())).isFalse();
-        assertThat(currentRoleService.isUserByNow(builder.given_default_guest())).isFalse();
-        assertThat(currentRoleService.isGuestByNow(builder.given_default_guest())).isTrue();
-        assertThat(currentRoleService.isAdmin(builder.given_default_guest())).isFalse();
-        assertThat(currentRoleService.isUser(builder.given_default_guest())).isFalse();
-        assertThat(currentRoleService.isGuest(builder.given_default_guest())).isTrue();
-        assertThat(currentRoleService.hasCurrentUserAdminRole(builder.given_default_guest())).isFalse();
+        assertThat(currentRoleService.isAdminByNow(builder.givenDefaultGuest())).isFalse();
+        assertThat(currentRoleService.isUserByNow(builder.givenDefaultGuest())).isFalse();
+        assertThat(currentRoleService.isGuestByNow(builder.givenDefaultGuest())).isTrue();
+        assertThat(currentRoleService.isAdmin(builder.givenDefaultGuest())).isFalse();
+        assertThat(currentRoleService.isUser(builder.givenDefaultGuest())).isFalse();
+        assertThat(currentRoleService.isGuest(builder.givenDefaultGuest())).isTrue();
+        assertThat(currentRoleService.hasCurrentUserAdminRole(builder.givenDefaultGuest())).isFalse();
     }
 
 
@@ -136,39 +136,39 @@ public class CurrentRoleServiceTests {
     @WithMockUser(username = "admin")
     public void open_close_admin_session_as_admin() {
 
-        assertThat(currentRoleService.findRealRole(builder.given_default_admin()))
+        assertThat(currentRoleService.findRealRole(builder.givenDefaultAdmin()))
             .contains(secRoleRepository.getAdmin());
-        assertThat(currentRoleService.findCurrentAuthorities(builder.given_default_admin()))
+        assertThat(currentRoleService.findCurrentAuthorities(builder.givenDefaultAdmin()))
             .containsExactlyInAnyOrder("ROLE_USER");
 
-        assertThat(currentRoleService.isAdminByNow(builder.given_default_admin())).isFalse();
-        assertThat(currentRoleService.isUserByNow(builder.given_default_admin())).isTrue();
+        assertThat(currentRoleService.isAdminByNow(builder.givenDefaultAdmin())).isFalse();
+        assertThat(currentRoleService.isUserByNow(builder.givenDefaultAdmin())).isTrue();
 
-        currentRoleService.activeAdminSession(builder.given_default_admin());
+        currentRoleService.activeAdminSession(builder.givenDefaultAdmin());
 
-        assertThat(currentRoleService.isAdminByNow(builder.given_default_admin())).isTrue();
-        assertThat(currentRoleService.isUserByNow(builder.given_default_admin())).isTrue();
+        assertThat(currentRoleService.isAdminByNow(builder.givenDefaultAdmin())).isTrue();
+        assertThat(currentRoleService.isUserByNow(builder.givenDefaultAdmin())).isTrue();
 
-        currentRoleService.closeAdminSession(builder.given_default_admin());
+        currentRoleService.closeAdminSession(builder.givenDefaultAdmin());
 
-        assertThat(currentRoleService.isAdminByNow(builder.given_default_admin())).isFalse();
-        assertThat(currentRoleService.isUserByNow(builder.given_default_admin())).isTrue();
+        assertThat(currentRoleService.isAdminByNow(builder.givenDefaultAdmin())).isFalse();
+        assertThat(currentRoleService.isUserByNow(builder.givenDefaultAdmin())).isTrue();
     }
 
     @Test
     @WithMockUser(username = "user")
     public void open_close_admin_session_as_user() {
 
-        assertThat(currentRoleService.isAdminByNow(builder.given_default_user())).isFalse();
-        assertThat(currentRoleService.isUserByNow(builder.given_default_user())).isTrue();
+        assertThat(currentRoleService.isAdminByNow(builder.givenDefaultUser())).isFalse();
+        assertThat(currentRoleService.isUserByNow(builder.givenDefaultUser())).isTrue();
 
         Assertions.assertThrows(
             ForbiddenException.class, () -> {
-                currentRoleService.activeAdminSession(builder.given_default_user());
+                currentRoleService.activeAdminSession(builder.givenDefaultUser());
             }
         );
 
-        assertThat(currentRoleService.isAdminByNow(builder.given_default_user())).isFalse();
-        assertThat(currentRoleService.isUserByNow(builder.given_default_user())).isTrue();
+        assertThat(currentRoleService.isAdminByNow(builder.givenDefaultUser())).isFalse();
+        assertThat(currentRoleService.isUserByNow(builder.givenDefaultUser())).isTrue();
     }
 }

@@ -42,7 +42,7 @@ public class ImageGroupResourceTests {
     @Test
     @Transactional
     public void list_imagegroup_by_project() throws Exception {
-        ImageGroup imageGroup = builder.given_an_imagegroup();
+        ImageGroup imageGroup = builder.givenAnImageGroup();
         restImageGroupControllerMockMvc.perform(get(
                 "/api/project/{id}/imagegroup.json",
                 imageGroup.getProject().getId()
@@ -54,7 +54,7 @@ public class ImageGroupResourceTests {
     @Test
     @Transactional
     public void get_an_imagegroup() throws Exception {
-        ImageGroup imageGroup = builder.given_an_imagegroup();
+        ImageGroup imageGroup = builder.givenAnImageGroup();
         restImageGroupControllerMockMvc.perform(get("/api/imagegroup/{id}.json", imageGroup.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(imageGroup.getId().intValue()))
@@ -76,7 +76,7 @@ public class ImageGroupResourceTests {
     @Test
     @Transactional
     public void add_valid_imagegroup() throws Exception {
-        ImageGroup imageGroup = builder.given_a_not_persisted_imagegroup();
+        ImageGroup imageGroup = builder.givenANotPersistedImagegroup();
         restImageGroupControllerMockMvc.perform(post("/api/imagegroup.json")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(imageGroup.toJSON()))
@@ -92,7 +92,7 @@ public class ImageGroupResourceTests {
     @Test
     @Transactional
     public void edit_valid_imagegroup() throws Exception {
-        ImageGroup imageGroup = builder.given_an_imagegroup();
+        ImageGroup imageGroup = builder.givenAnImageGroup();
         JsonObject jsonObject = imageGroup.toJsonObject();
         String name = UUID.randomUUID().toString();
         jsonObject.put("name", name);
@@ -113,7 +113,7 @@ public class ImageGroupResourceTests {
     @Test
     @Transactional
     public void delete_imagegroup() throws Exception {
-        ImageGroup imageGroup = builder.given_an_imagegroup();
+        ImageGroup imageGroup = builder.givenAnImageGroup();
         restImageGroupControllerMockMvc.perform(delete("/api/imagegroup/{id}.json", imageGroup.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))

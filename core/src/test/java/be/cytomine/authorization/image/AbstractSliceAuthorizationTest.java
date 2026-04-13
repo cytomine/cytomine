@@ -62,7 +62,7 @@ public class AbstractSliceAuthorizationTest extends CRUDAuthorizationTest {
     @BeforeEach
     public void before() throws Exception {
         if (abstractSlice == null) {
-            abstractSlice = builder.given_an_abstract_slice();
+            abstractSlice = builder.givenAnAbstractSlice();
             initACL(abstractSlice.container());
         }
     }
@@ -96,7 +96,7 @@ public class AbstractSliceAuthorizationTest extends CRUDAuthorizationTest {
 
     @Override
     protected void when_i_add_domain() {
-        abstractSliceService.add(builder.given_a_not_persisted_abstract_slice().toJsonObject());
+        abstractSliceService.add(builder.givenANotPersistedAbstractSlice().toJsonObject());
     }
 
     @Override

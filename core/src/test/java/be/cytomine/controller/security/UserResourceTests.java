@@ -206,9 +206,9 @@ public class UserResourceTests {
     @Test
     @Transactional
     public void list_project_admin() throws Exception {
-        User projectAdmin = builder.given_a_user();
-        User projectUser = builder.given_a_user();
-        Project project = builder.given_a_project();
+        User projectAdmin = builder.givenAUser();
+        User projectUser = builder.givenAUser();
+        Project project = builder.givenAProject();
         builder.addUserToProject(project, projectAdmin.getUsername(), ADMINISTRATION);
         builder.addUserToProject(project, projectUser.getUsername(), READ);
 
@@ -225,9 +225,9 @@ public class UserResourceTests {
     @Test
     @Transactional
     public void list_project_admin_as_non_admin_user() throws Exception {
-        User projectAdmin = builder.given_a_user();
-        User projectUser = builder.given_a_user();
-        Project project = builder.given_a_project();
+        User projectAdmin = builder.givenAUser();
+        User projectUser = builder.givenAUser();
+        Project project = builder.givenAProject();
         builder.addUserToProject(project, projectAdmin.getUsername(), ADMINISTRATION);
         builder.addUserToProject(project, projectUser.getUsername(), READ);
 
@@ -246,12 +246,12 @@ public class UserResourceTests {
     @Test
     @Transactional
     public void list_project_representatives() throws Exception {
-        User projectPrepresentative = builder.given_a_user();
-        User projectUser = builder.given_a_user();
-        Project project = builder.given_a_project();
+        User projectPrepresentative = builder.givenAUser();
+        User projectUser = builder.givenAUser();
+        Project project = builder.givenAProject();
         builder.addUserToProject(project, projectPrepresentative.getUsername(), ADMINISTRATION);
         builder.addUserToProject(project, projectUser.getUsername(), READ);
-        builder.given_a_project_representative_user(project, projectPrepresentative);
+        builder.givenAProjectRepresentativeUser(project, projectPrepresentative);
 
         restUserControllerMockMvc.perform(
                 get("/api/project/{id}/users/representative.json", project.getId()))
@@ -267,12 +267,12 @@ public class UserResourceTests {
     @Test
     @Transactional
     public void list_project_creator() throws Exception {
-        User projectCreator = builder.given_superadmin();
-        User projectUser = builder.given_a_user();
-        Project project = builder.given_a_project();
+        User projectCreator = builder.givenSuperAdmin();
+        User projectUser = builder.givenAUser();
+        Project project = builder.givenAProject();
         builder.addUserToProject(project, projectCreator.getUsername(), ADMINISTRATION);
         builder.addUserToProject(project, projectUser.getUsername(), READ);
-        builder.given_a_project_representative_user(project, projectCreator);
+        builder.givenAProjectRepresentativeUser(project, projectCreator);
 
         restUserControllerMockMvc.perform(
                 get("/api/project/{id}/users/representative.json", project.getId()))
@@ -288,11 +288,11 @@ public class UserResourceTests {
     @Test
     @Transactional
     public void list_ontology_user() throws Exception {
-        User projectAdmin = builder.given_a_user();
-        User projectUser = builder.given_a_user();
-        User simpleUser = builder.given_a_user();
-        Ontology ontology = builder.given_an_ontology();
-        Project project = builder.given_a_project_with_ontology(ontology);
+        User projectAdmin = builder.givenAUser();
+        User projectUser = builder.givenAUser();
+        User simpleUser = builder.givenAUser();
+        Ontology ontology = builder.givenAnOntology();
+        Project project = builder.givenAProjectWithOntology(ontology);
         builder.addUserToProject(project, projectAdmin.getUsername(), ADMINISTRATION);
         builder.addUserToProject(project, projectUser.getUsername(), READ);
 
@@ -311,10 +311,10 @@ public class UserResourceTests {
     @Test
     @Transactional
     public void list_storage_user() throws Exception {
-        User storageAdmin = builder.given_a_user();
-        User storageUser = builder.given_a_user();
-        User simpleUser = builder.given_a_user();
-        Storage storage = builder.given_a_storage();
+        User storageAdmin = builder.givenAUser();
+        User storageUser = builder.givenAUser();
+        User simpleUser = builder.givenAUser();
+        Storage storage = builder.givenAStorage();
         builder.addUserToStorage(storage, storageAdmin.getUsername(), ADMINISTRATION);
         builder.addUserToStorage(storage, storageUser.getUsername(), READ);
 
@@ -333,10 +333,10 @@ public class UserResourceTests {
     @Test
     @Transactional
     public void list_project_userlayer() throws Exception {
-        User projectAdmin = builder.given_a_user();
-        User projectUser = builder.given_a_user();
-        User simpleUser = builder.given_a_user();
-        Project project = builder.given_a_project();
+        User projectAdmin = builder.givenAUser();
+        User projectUser = builder.givenAUser();
+        User simpleUser = builder.givenAUser();
+        Project project = builder.givenAProject();
         builder.addUserToProject(project, projectAdmin.getUsername(), ADMINISTRATION);
         builder.addUserToProject(project, projectUser.getUsername(), READ);
 
@@ -354,10 +354,10 @@ public class UserResourceTests {
     @Test
     @Transactional
     public void list_user() throws Exception {
-        User projectAdmin = builder.given_a_user();
-        User projectUser = builder.given_a_user();
-        User simpleUser = builder.given_a_user();
-        Project project = builder.given_a_project();
+        User projectAdmin = builder.givenAUser();
+        User projectUser = builder.givenAUser();
+        User simpleUser = builder.givenAUser();
+        Project project = builder.givenAProject();
         builder.addUserToProject(project, projectAdmin.getUsername(), ADMINISTRATION);
         builder.addUserToProject(project, projectUser.getUsername(), READ);
 
@@ -380,10 +380,10 @@ public class UserResourceTests {
     @Test
     @Transactional
     public void get_user_as_superadmin() throws Exception {
-        User currentUser = builder.given_superadmin();
+        User currentUser = builder.givenSuperAdmin();
 
         restUserControllerMockMvc.perform(
-                get("/api/user/{id}.json", builder.given_superadmin().getId())
+                get("/api/user/{id}.json", builder.givenSuperAdmin().getId())
             )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(currentUser.getId()))
@@ -410,7 +410,7 @@ public class UserResourceTests {
     @Transactional
     @WithMockUser(username = "user")
     public void get_user_as_current_user() throws Exception {
-        User currentUser = builder.given_default_user();
+        User currentUser = builder.givenDefaultUser();
 
 
         restUserControllerMockMvc.perform(get("/api/user/{id}.json", currentUser.getId())
@@ -440,16 +440,16 @@ public class UserResourceTests {
     @Transactional
     @WithMockUser(username = "user")
     public void get_user_as_another_user() throws Exception {
-        User currentUser = builder.given_a_user();
+        User currentUser = builder.givenAUser();
 
         restUserControllerMockMvc.perform(
-                get("/api/user/{id}.json", builder.given_superadmin().getId())
+                get("/api/user/{id}.json", builder.givenSuperAdmin().getId())
             )
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(builder.given_superadmin().getId()))
-            .andExpect(jsonPath("$.username").value(builder.given_superadmin().getUsername()))
-            .andExpect(jsonPath("$.name").value(builder.given_superadmin().getName()))
-            .andExpect(jsonPath("$.fullName").value(builder.given_superadmin().getFullName()))
+            .andExpect(jsonPath("$.id").value(builder.givenSuperAdmin().getId()))
+            .andExpect(jsonPath("$.username").value(builder.givenSuperAdmin().getUsername()))
+            .andExpect(jsonPath("$.name").value(builder.givenSuperAdmin().getName()))
+            .andExpect(jsonPath("$.fullName").value(builder.givenSuperAdmin().getFullName()))
             .andExpect(jsonPath("$.firstname").doesNotExist())
             .andExpect(jsonPath("$.created").doesNotExist())
             .andExpect(jsonPath("$.origin").doesNotExist())
@@ -469,9 +469,9 @@ public class UserResourceTests {
     @Test
     @Transactional
     public void get_user_with_its_username() throws Exception {
-        User currentUser = builder.given_superadmin();
+        User currentUser = builder.givenSuperAdmin();
         restUserControllerMockMvc.perform(
-                get("/api/user/{id}.json", builder.given_superadmin().getUsername())
+                get("/api/user/{id}.json", builder.givenSuperAdmin().getUsername())
             )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.username").value(currentUser.getUsername()));
@@ -480,9 +480,9 @@ public class UserResourceTests {
     @Test
     @Transactional
     public void get_user_with_its_user_key() throws Exception {
-        User currentUser = builder.given_superadmin();
+        User currentUser = builder.givenSuperAdmin();
         restUserControllerMockMvc.perform(
-                get("/api/userkey/{publicKey}/keys.json", builder.given_superadmin().getPublicKey())
+                get("/api/userkey/{publicKey}/keys.json", builder.givenSuperAdmin().getPublicKey())
             )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.privateKey").value(currentUser.getPrivateKey()));
@@ -491,9 +491,9 @@ public class UserResourceTests {
     @Test
     @Transactional
     public void get_user_with_its_user_key_id() throws Exception {
-        User currentUser = builder.given_superadmin();
+        User currentUser = builder.givenSuperAdmin();
         restUserControllerMockMvc.perform(
-                get("/api/user/{id}/keys.json", builder.given_superadmin().getId())
+                get("/api/user/{id}/keys.json", builder.givenSuperAdmin().getId())
             )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.privateKey").value(currentUser.getPrivateKey()));
@@ -503,7 +503,7 @@ public class UserResourceTests {
     @Transactional
     @WithMockUser(username = "user")
     public void get_keys_from_other_user_is_forbidden() throws Exception {
-        User user = builder.given_superadmin();
+        User user = builder.givenSuperAdmin();
         restUserControllerMockMvc.perform(get("/api/user/{id}/keys.json", user.getId()))
             .andExpect(status().isForbidden());
         restUserControllerMockMvc.perform(
@@ -516,7 +516,7 @@ public class UserResourceTests {
     @Transactional
     @WithMockUser(username = "user")
     public void get_signature() throws Exception {
-        User user = builder.given_default_user();
+        User user = builder.givenDefaultUser();
         restUserControllerMockMvc.perform(get("/api/signature.json").param("method", "GET"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.publicKey").value(user.getPublicKey()))
@@ -527,7 +527,7 @@ public class UserResourceTests {
     @Test
     @Transactional
     public void get_current_user_keys() throws Exception {
-        User currentUser = builder.given_superadmin();
+        User currentUser = builder.givenSuperAdmin();
 
         restUserControllerMockMvc.perform(get("/api/user/current/keys")
             )
@@ -539,7 +539,7 @@ public class UserResourceTests {
     @Test
     @Transactional
     public void regenerate_current_user_keys() throws Exception {
-        User currentUser = builder.given_superadmin();
+        User currentUser = builder.givenSuperAdmin();
 
         String oldPrimaryKey = currentUser.getPublicKey();
         String oldSecondaryKey = currentUser.getPrivateKey();
@@ -555,7 +555,7 @@ public class UserResourceTests {
     @Test
     @Transactional
     public void get_current_user() throws Exception {
-        User currentUser = builder.given_superadmin();
+        User currentUser = builder.givenSuperAdmin();
 
         restUserControllerMockMvc.perform(get("/api/user/current.json")
             )
@@ -689,14 +689,14 @@ public class UserResourceTests {
     @Test
     @Transactional
     public void list_project_users_with_role_filter() throws Exception {
-        User projectAdmin = builder.given_a_user();
-        User projectUser = builder.given_a_user();
-        User projectPrepresentative = builder.given_a_user();
-        User simpleUser = builder.given_a_user();
-        Project project = builder.given_a_project();
+        User projectAdmin = builder.givenAUser();
+        User projectUser = builder.givenAUser();
+        User projectPrepresentative = builder.givenAUser();
+        User simpleUser = builder.givenAUser();
+        Project project = builder.givenAProject();
 
         builder.addUserToProject(project, projectPrepresentative.getUsername(), ADMINISTRATION);
-        builder.given_a_project_representative_user(project, projectPrepresentative);
+        builder.givenAProjectRepresentativeUser(project, projectPrepresentative);
         builder.addUserToProject(project, projectAdmin.getUsername(), ADMINISTRATION);
         builder.addUserToProject(project, projectUser.getUsername(), READ);
 
@@ -746,14 +746,14 @@ public class UserResourceTests {
     @Test
     @Transactional
     public void list_project_users_with_pagination() throws Exception {
-        User projectPrepresentative = builder.given_a_user();
-        User projectAdmin = builder.given_a_user();
-        User projectUser = builder.given_a_user();
-        User simpleUser = builder.given_a_user();
-        Project project = builder.given_a_project();
+        User projectPrepresentative = builder.givenAUser();
+        User projectAdmin = builder.givenAUser();
+        User projectUser = builder.givenAUser();
+        User simpleUser = builder.givenAUser();
+        Project project = builder.givenAProject();
 
         builder.addUserToProject(project, projectPrepresentative.getUsername(), ADMINISTRATION);
-        builder.given_a_project_representative_user(project, projectPrepresentative);
+        builder.givenAProjectRepresentativeUser(project, projectPrepresentative);
         builder.addUserToProject(project, projectAdmin.getUsername(), ADMINISTRATION);
         builder.addUserToProject(project, projectUser.getUsername(), READ);
 
@@ -818,8 +818,8 @@ public class UserResourceTests {
     @Transactional
     public void add_user_to_project() throws Exception {
 
-        Project project = builder.given_a_project();
-        User user = builder.given_a_user();
+        Project project = builder.givenAProject();
+        User user = builder.givenAUser();
         restUserControllerMockMvc.perform(
                 post("/api/project/{project}/user/{user}.json", project.getId(), user.getId())
                     .contentType(MediaType.APPLICATION_JSON))
@@ -837,9 +837,9 @@ public class UserResourceTests {
     @Transactional
     public void add_users_to_project() throws Exception {
 
-        Project project = builder.given_a_project();
-        User user1 = builder.given_a_user();
-        User user2 = builder.given_a_user();
+        Project project = builder.givenAProject();
+        User user1 = builder.givenAUser();
+        User user2 = builder.givenAUser();
         restUserControllerMockMvc.perform(post("/api/project/{project}/user.json", project.getId())
                 .param("users", user1.getId() + "," + user2.getId())
                 .contentType(MediaType.APPLICATION_JSON))
@@ -861,8 +861,8 @@ public class UserResourceTests {
     @Transactional
     public void add_users_to_project_works_even_if_a_bad_user_id_is_given() throws Exception {
 
-        Project project = builder.given_a_project();
-        User user1 = builder.given_a_user();
+        Project project = builder.givenAProject();
+        User user1 = builder.givenAUser();
         restUserControllerMockMvc.perform(post("/api/project/{project}/user.json", project.getId())
                 .param(
                     "users",
@@ -883,8 +883,8 @@ public class UserResourceTests {
     @Transactional
     public void delete_user_from_project() throws Exception {
 
-        Project project = builder.given_a_project();
-        User user = builder.given_a_user();
+        Project project = builder.givenAProject();
+        User user = builder.givenAUser();
         builder.addUserToProject(project, user.getUsername(), READ);
         restUserControllerMockMvc.perform(
                 delete("/api/project/{project}/user/{user}.json", project.getId(), user.getId())
@@ -903,9 +903,9 @@ public class UserResourceTests {
     @Transactional
     public void delete_users_from_project() throws Exception {
 
-        Project project = builder.given_a_project();
-        User user1 = builder.given_a_user();
-        User user2 = builder.given_a_user();
+        Project project = builder.givenAProject();
+        User user1 = builder.givenAUser();
+        User user2 = builder.givenAUser();
         builder.addUserToProject(project, user1.getUsername(), READ);
         builder.addUserToProject(project, user2.getUsername(), READ);
         restUserControllerMockMvc.perform(
@@ -932,8 +932,8 @@ public class UserResourceTests {
     @Transactional
     public void delete_users_to_project_works_even_if_a_bad_user_id_is_given() throws Exception {
 
-        Project project = builder.given_a_project();
-        User user1 = builder.given_a_user();
+        Project project = builder.givenAProject();
+        User user1 = builder.givenAUser();
         restUserControllerMockMvc.perform(
                 delete("/api/project/{project}/user.json", project.getId())
                     .param("users", user1.getId() + ",xxxxxx,0") //bad format + bad id
@@ -950,8 +950,8 @@ public class UserResourceTests {
     @Transactional
     public void add_admin_to_project() throws Exception {
 
-        Project project = builder.given_a_project();
-        User user = builder.given_a_user();
+        Project project = builder.givenAProject();
+        User user = builder.givenAUser();
         restUserControllerMockMvc.perform(
                 post("/api/project/{project}/user/{user}/admin.json", project.getId(), user.getId())
                     .contentType(MediaType.APPLICATION_JSON))
@@ -969,8 +969,8 @@ public class UserResourceTests {
     @Transactional
     public void delete_admin_from_project() throws Exception {
 
-        Project project = builder.given_a_project();
-        User user = builder.given_a_user();
+        Project project = builder.givenAProject();
+        User user = builder.givenAUser();
         builder.addUserToProject(project, user.getUsername(), ADMINISTRATION);
         builder.addUserToProject(project, user.getUsername(), READ);
         restUserControllerMockMvc.perform(
@@ -993,8 +993,8 @@ public class UserResourceTests {
     @Transactional
     public void add_user_to_storage() throws Exception {
 
-        Storage storage = builder.given_a_storage();
-        User user = builder.given_a_user();
+        Storage storage = builder.givenAStorage();
+        User user = builder.givenAUser();
         restUserControllerMockMvc.perform(
                 post("/api/storage/{storage}/user/{user}.json", storage.getId(), user.getId())
                     .contentType(MediaType.APPLICATION_JSON))
@@ -1012,8 +1012,8 @@ public class UserResourceTests {
     @Transactional
     public void delete_user_from_storage() throws Exception {
 
-        Storage storage = builder.given_a_storage();
-        User user = builder.given_a_user();
+        Storage storage = builder.givenAStorage();
+        User user = builder.givenAUser();
         builder.addUserToStorage(storage, user.getUsername(), READ);
         restUserControllerMockMvc.perform(
                 delete("/api/storage/{storage}/user/{user}.json", storage.getId(), user.getId())
@@ -1032,14 +1032,14 @@ public class UserResourceTests {
     @Test
     @Transactional
     public void list_friends() throws Exception {
-        User projectPrepresentative = builder.given_a_user();
-        User projectAdmin = builder.given_a_user();
-        User projectUser = builder.given_a_user();
-        User simpleUser = builder.given_a_user();
-        Project project = builder.given_a_project();
+        User projectPrepresentative = builder.givenAUser();
+        User projectAdmin = builder.givenAUser();
+        User projectUser = builder.givenAUser();
+        User simpleUser = builder.givenAUser();
+        Project project = builder.givenAProject();
 
         builder.addUserToProject(project, projectPrepresentative.getUsername(), ADMINISTRATION);
-        builder.given_a_project_representative_user(project, projectPrepresentative);
+        builder.givenAProjectRepresentativeUser(project, projectPrepresentative);
         builder.addUserToProject(project, projectAdmin.getUsername(), ADMINISTRATION);
         builder.addUserToProject(project, projectUser.getUsername(), READ);
 
@@ -1092,12 +1092,12 @@ public class UserResourceTests {
     @Test
     @Transactional
     public void list_online_users() throws Exception {
-        User userOnline = builder.given_default_user();
-        User userOnlineButOnDifferentProject = builder.given_a_user();
-        User userOffline = builder.given_a_user();
+        User userOnline = builder.givenDefaultUser();
+        User userOnlineButOnDifferentProject = builder.givenAUser();
+        User userOffline = builder.givenAUser();
 
-        Project project = builder.given_a_project();
-        Project anotherProject = builder.given_a_project();
+        Project project = builder.givenAProject();
+        Project anotherProject = builder.givenAProject();
 
         given_a_last_connection(userOffline, project.getId(), DateUtils.addDays(new Date(), -15));
         given_a_last_connection(userOnline, project.getId(), DateUtils.addSeconds(new Date(), -15));
@@ -1109,8 +1109,8 @@ public class UserResourceTests {
         PersistentUserPosition persistentUserPosition =
             given_a_persistent_user_position(
                 DateUtils.addSeconds(new Date(), -15), userOnline,
-                builder.given_a_not_persisted_slice_instance(
-                    builder.given_an_image_instance(project), builder.given_an_abstract_slice()),
+                builder.givenANotPersistedSliceInstance(
+                    builder.givenAnImageInstance(project), builder.givenAnAbstractSlice()),
                 UserPositionServiceTests.USER_VIEW
             );
 
@@ -1133,9 +1133,9 @@ public class UserResourceTests {
     @Transactional
     public void list_user_activity() throws Exception {
 
-        User userOnline = builder.given_default_user();
+        User userOnline = builder.givenDefaultUser();
 
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
 
         builder.addUserToProject(project, userOnline.getUsername());
 
@@ -1147,7 +1147,7 @@ public class UserResourceTests {
 
         PersistentImageConsultation consultation = given_a_persistent_image_consultation(
             userOnline,
-            builder.given_an_image_instance(project), new Date()
+            builder.givenAnImageInstance(project), new Date()
         );
 
         restUserControllerMockMvc.perform(
@@ -1167,8 +1167,8 @@ public class UserResourceTests {
 
     @Test
     void get_resume_activity() throws Exception {
-        User userOnline = builder.given_default_user();
-        Project project = builder.given_a_project();
+        User userOnline = builder.givenDefaultUser();
+        Project project = builder.givenAProject();
         builder.addUserToProject(project, userOnline.getUsername());
 
         PersistentProjectConnection firstConnection =
@@ -1183,7 +1183,7 @@ public class UserResourceTests {
             );
 
         given_a_persistent_image_consultation(
-            userOnline, builder.given_an_image_instance(project),
+            userOnline, builder.givenAnImageInstance(project),
             new Date()
         );
 
@@ -1206,8 +1206,8 @@ public class UserResourceTests {
     @Test
     @Transactional
     public void download_user_list_from_project_xls_document() throws Exception {
-        User user = builder.given_a_user("Paul");
-        Project project = builder.given_a_project_with_user(user);
+        User user = builder.givenAUser("Paul");
+        Project project = builder.givenAProjectWithUser(user);
         MvcResult mvcResult = performDownload("xls", project, "application/octet-stream");
         checkXLSResult(mvcResult, user);
     }
@@ -1215,8 +1215,8 @@ public class UserResourceTests {
     @Test
     @Transactional
     public void download_user_list_from_project_csv_document() throws Exception {
-        User user = builder.given_a_user("Paul");
-        Project project = builder.given_a_project_with_user(user);
+        User user = builder.givenAUser("Paul");
+        Project project = builder.givenAProjectWithUser(user);
         MvcResult mvcResult = performDownload("csv", project, "text/csv");
         checkResult(";", mvcResult, user);
     }
@@ -1224,7 +1224,7 @@ public class UserResourceTests {
     @Test
     @Transactional
     public void download_user_list_from_project_pdf_document() throws Exception {
-        Project project = builder.given_a_project_with_user(builder.given_a_user());
+        Project project = builder.givenAProjectWithUser(builder.givenAUser());
         performDownload("pdf", project, "application/pdf");
     }
 

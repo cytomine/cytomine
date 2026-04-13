@@ -228,13 +228,13 @@ public class UserServiceTests {
 
     @Test
     void find_user_with_success() {
-        User user = builder.given_a_user();
+        User user = builder.givenAUser();
         assertThat(userService.findUser(user.getId())).isPresent().contains(user);
     }
 
     @Test
     void find_user_by_username() {
-        User user = builder.given_a_user();
+        User user = builder.givenAUser();
         assertThat(userService.findByUsername(user.getUsername())).isPresent().contains(user);
         assertThat(userService.findByUsername(user.getUsername().toUpperCase(Locale.ROOT))).isPresent().contains(user);
         assertThat(userService.findByUsername(user.getUsername().toLowerCase(Locale.ROOT))).isPresent().contains(user);
@@ -242,13 +242,13 @@ public class UserServiceTests {
 
     @Test
     void find_user_by_public_key() {
-        User user = builder.given_a_user();
+        User user = builder.givenAUser();
         assertThat(userService.findByPublicKey(user.getPublicKey())).isPresent().contains(user);
     }
 
     @Test
     void get_auth_roles_for_user() {
-        User user = builder.given_a_user();
+        User user = builder.givenAUser();
         AuthInformation authInformation = userService.getAuthenticationRoles(user);
         assertThat(authInformation.getAdmin()).isFalse();
         assertThat(authInformation.getUser()).isTrue();
@@ -262,7 +262,7 @@ public class UserServiceTests {
 
     @Test
     void get_auth_roles_for_guest() {
-        User user = builder.given_a_guest();
+        User user = builder.givenAGuest();
         AuthInformation authInformation = userService.getAuthenticationRoles(user);
         assertThat(authInformation.getAdmin()).isFalse();
         assertThat(authInformation.getUser()).isFalse();
@@ -275,7 +275,7 @@ public class UserServiceTests {
 
     @Test
     void get_auth_roles_for_superamdin() {
-        User user = builder.given_superadmin();
+        User user = builder.givenSuperAdmin();
         AuthInformation authInformation = userService.getAuthenticationRoles(user);
         assertThat(authInformation.getAdmin()).isTrue();
         assertThat(authInformation.getUser()).isFalse();
@@ -288,7 +288,7 @@ public class UserServiceTests {
 
     @Test
     void get_auth_roles_for_admin() {
-        User user = builder.given_a_admin();
+        User user = builder.givenAnAdmin();
         AuthInformation authInformation = userService.getAuthenticationRoles(user);
         assertThat(authInformation.getAdmin()).isTrue();
         assertThat(authInformation.getUser()).isFalse();
@@ -306,7 +306,7 @@ public class UserServiceTests {
 
         assertThat(list.getTotalElements()).isGreaterThanOrEqualTo(1);
         assertThat(list.getContent().stream()
-            .map(x -> x.get("id"))).contains(builder.given_superadmin().getId());
+            .map(x -> x.get("id"))).contains(builder.givenSuperAdmin().getId());
 
 
     }
@@ -322,18 +322,18 @@ public class UserServiceTests {
         );
 
         assertThat(list.getContent().stream()
-            .map(x -> x.get("id"))).contains(builder.given_superadmin().getId());
+            .map(x -> x.get("id"))).contains(builder.givenSuperAdmin().getId());
 
         list = userService.list(
             new ArrayList<>(List.of(new SearchParameterEntry(
                 "fullName",
                 SearchOperation.like,
-                builder.given_superadmin().getName()
+                builder.givenSuperAdmin().getName()
             ))), "created", "desc", 0L, 0L
         );
 
         assertThat(list.getContent().stream()
-            .map(x -> x.get("id"))).contains(builder.given_superadmin().getId());
+            .map(x -> x.get("id"))).contains(builder.givenSuperAdmin().getId());
 
         list = userService.list(
             new ArrayList<>(List.of(new SearchParameterEntry("fullName", SearchOperation.like, "johndoe@example.com"))),
@@ -344,14 +344,14 @@ public class UserServiceTests {
         );
 
         assertThat(list.getContent().stream()
-            .map(x -> x.get("id"))).doesNotContain(builder.given_superadmin().getId());
+            .map(x -> x.get("id"))).doesNotContain(builder.givenSuperAdmin().getId());
     }
 
     @Test
     void list_users_with_sort_username() {
 
-        User user1 = builder.given_a_user("list_users_with_sort_username1");
-        User user2 = builder.given_a_user("list_users_with_sort_username2");
+        User user1 = builder.givenAUser("list_users_with_sort_username1");
+        User user2 = builder.givenAUser("list_users_with_sort_username2");
 
         Page<Map<String, Object>> list = userService.list(
             new ArrayList<>(List.of(new SearchParameterEntry(
@@ -379,11 +379,11 @@ public class UserServiceTests {
     @Test
     void list_users_with_page() {
 
-        User user1 = builder.given_a_user("list_users_with_page1");
-        User user2 = builder.given_a_user("list_users_with_page2");
-        User user3 = builder.given_a_user("list_users_with_page3");
-        User user4 = builder.given_a_user("list_users_with_page4");
-        User user5 = builder.given_a_user("list_users_with_page5");
+        User user1 = builder.givenAUser("list_users_with_page1");
+        User user2 = builder.givenAUser("list_users_with_page2");
+        User user3 = builder.givenAUser("list_users_with_page3");
+        User user4 = builder.givenAUser("list_users_with_page4");
+        User user5 = builder.givenAUser("list_users_with_page5");
 
 
         Page<Map<String, Object>> list = userService.list(
@@ -451,18 +451,18 @@ public class UserServiceTests {
 
     @Test
     void list_user_by_project_with_success() {
-        User user = builder.given_superadmin();
+        User user = builder.givenSuperAdmin();
 
-        Project projectWhereUserIsManager = builder.given_a_project();
-        Project projectWhereUserIsContributor = builder.given_a_project();
-        Project projectWhereUserIsMissing = builder.given_a_project();
-        Project projectWithTwoUsers = builder.given_a_project();
+        Project projectWhereUserIsManager = builder.givenAProject();
+        Project projectWhereUserIsContributor = builder.givenAProject();
+        Project projectWhereUserIsMissing = builder.givenAProject();
+        Project projectWithTwoUsers = builder.givenAProject();
 
         builder.addUserToProject(projectWhereUserIsManager, "superadmin", ADMINISTRATION);
         builder.addUserToProject(projectWhereUserIsContributor, "superadmin", WRITE);
         builder.addUserToProject(projectWithTwoUsers, "superadmin", WRITE);
 
-        User anotherUser = builder.given_a_user();
+        User anotherUser = builder.givenAUser();
         builder.addUserToProject(projectWhereUserIsMissing, anotherUser.getUsername(), WRITE);
         builder.addUserToProject(projectWithTwoUsers, anotherUser.getUsername(), WRITE);
 
@@ -521,18 +521,18 @@ public class UserServiceTests {
 
     @Test
     void list_user_extended_with_empty_extension() {
-        User user = builder.given_superadmin();
+        User user = builder.givenSuperAdmin();
 
-        Project projectWhereUserIsManager = builder.given_a_project();
-        Project projectWhereUserIsContributor = builder.given_a_project();
-        Project projectWhereUserIsMissing = builder.given_a_project();
-        Project projectWithTwoUsers = builder.given_a_project();
+        Project projectWhereUserIsManager = builder.givenAProject();
+        Project projectWhereUserIsContributor = builder.givenAProject();
+        Project projectWhereUserIsMissing = builder.givenAProject();
+        Project projectWithTwoUsers = builder.givenAProject();
 
         builder.addUserToProject(projectWhereUserIsManager, "superadmin", ADMINISTRATION);
         builder.addUserToProject(projectWhereUserIsContributor, "superadmin", WRITE);
         builder.addUserToProject(projectWithTwoUsers, "superadmin", WRITE);
 
-        User anotherUser = builder.given_a_user();
+        User anotherUser = builder.givenAUser();
         builder.addUserToProject(projectWhereUserIsMissing, anotherUser.getUsername(), WRITE);
         builder.addUserToProject(projectWithTwoUsers, anotherUser.getUsername(), WRITE);
 
@@ -617,17 +617,17 @@ public class UserServiceTests {
 
     @Test
     void list_user_extended_with_last_image_name() {
-        User userWhoHasOpenImage = builder.given_a_user();
-        User userWhoHasOpenImageAfter = builder.given_a_user();
-        User userNeverOpenImage = builder.given_a_user();
+        User userWhoHasOpenImage = builder.givenAUser();
+        User userWhoHasOpenImageAfter = builder.givenAUser();
+        User userNeverOpenImage = builder.givenAUser();
 
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
 
         builder.addUserToProject(project, userWhoHasOpenImage.getUsername(), READ);
         builder.addUserToProject(project, userWhoHasOpenImageAfter.getUsername(), READ);
         builder.addUserToProject(project, userNeverOpenImage.getUsername(), WRITE);
 
-        ImageInstance imageInstance = builder.given_an_image_instance(project);
+        ImageInstance imageInstance = builder.givenAnImageInstance(project);
         imageInstance.setInstanceFilename(UUID.randomUUID().toString());
 
         given_a_persistent_image_consultation(userNeverOpenImage, imageInstance, DateUtils.addDays(new Date(), -2));
@@ -652,11 +652,11 @@ public class UserServiceTests {
 
     @Test
     void list_user_extended_with_last_connection() {
-        User userWhoHasOpenProject = builder.given_a_user();
-        User userWhoHasOpenProjectAfter = builder.given_a_user();
-        User userNeverOpenProject = builder.given_a_user();
+        User userWhoHasOpenProject = builder.givenAUser();
+        User userWhoHasOpenProjectAfter = builder.givenAUser();
+        User userNeverOpenProject = builder.givenAUser();
 
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
 
         builder.addUserToProject(project, userWhoHasOpenProject.getUsername(), READ);
         builder.addUserToProject(project, userWhoHasOpenProjectAfter.getUsername(), READ);
@@ -707,11 +707,11 @@ public class UserServiceTests {
 
     @Test
     void list_user_extended_with_connection_frequency() {
-        User userWhoHasOpenOnce = builder.given_a_user();
-        User userWhoHasOpenProject11x = builder.given_a_user();
-        User userNeverOpenProject = builder.given_a_user();
+        User userWhoHasOpenOnce = builder.givenAUser();
+        User userWhoHasOpenProject11x = builder.givenAUser();
+        User userNeverOpenProject = builder.givenAUser();
 
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
 
         builder.addUserToProject(project, userWhoHasOpenOnce.getUsername(), READ);
         builder.addUserToProject(project, userWhoHasOpenProject11x.getUsername(), READ);
@@ -756,18 +756,18 @@ public class UserServiceTests {
 
     @Test
     void list_project_admins() {
-        User user = builder.given_superadmin();
+        User user = builder.givenSuperAdmin();
 
-        Project projectWhereUserIsManager = builder.given_a_project();
-        Project projectWhereUserIsContributor = builder.given_a_project();
-        Project projectWhereUserIsMissing = builder.given_a_project();
-        Project projectWithTwoUsers = builder.given_a_project();
+        Project projectWhereUserIsManager = builder.givenAProject();
+        Project projectWhereUserIsContributor = builder.givenAProject();
+        Project projectWhereUserIsMissing = builder.givenAProject();
+        Project projectWithTwoUsers = builder.givenAProject();
 
         builder.addUserToProject(projectWhereUserIsManager, "superadmin", ADMINISTRATION);
         builder.addUserToProject(projectWhereUserIsContributor, "superadmin", WRITE);
         builder.addUserToProject(projectWithTwoUsers, "superadmin", WRITE);
 
-        User anotherUser = builder.given_a_user();
+        User anotherUser = builder.givenAUser();
         builder.addUserToProject(projectWhereUserIsMissing, anotherUser.getUsername(), WRITE);
         builder.addUserToProject(projectWithTwoUsers, anotherUser.getUsername(), WRITE);
 
@@ -779,18 +779,18 @@ public class UserServiceTests {
 
     @Test
     void list_project_users() {
-        User user = builder.given_superadmin();
+        User user = builder.givenSuperAdmin();
 
-        Project projectWhereUserIsManager = builder.given_a_project();
-        Project projectWhereUserIsContributor = builder.given_a_project();
-        Project projectWhereUserIsMissing = builder.given_a_project();
-        Project projectWithTwoUsers = builder.given_a_project();
+        Project projectWhereUserIsManager = builder.givenAProject();
+        Project projectWhereUserIsContributor = builder.givenAProject();
+        Project projectWhereUserIsMissing = builder.givenAProject();
+        Project projectWithTwoUsers = builder.givenAProject();
 
         builder.addUserToProject(projectWhereUserIsManager, "superadmin", ADMINISTRATION);
         builder.addUserToProject(projectWhereUserIsContributor, "superadmin", WRITE);
         builder.addUserToProject(projectWithTwoUsers, "superadmin", WRITE);
 
-        User anotherUser = builder.given_a_user();
+        User anotherUser = builder.givenAUser();
         builder.addUserToProject(projectWhereUserIsMissing, anotherUser.getUsername(), WRITE);
         builder.addUserToProject(projectWithTwoUsers, anotherUser.getUsername(), WRITE);
 
@@ -801,9 +801,9 @@ public class UserServiceTests {
 
     @Test
     void find_project_creator() {
-        User user = builder.given_superadmin();
+        User user = builder.givenSuperAdmin();
 
-        Project projectWhereUserIsManager = builder.given_a_project();
+        Project projectWhereUserIsManager = builder.givenAProject();
         builder.addUserToProject(projectWhereUserIsManager, "superadmin", ADMINISTRATION);
 
         assertThat(userService.findCreator(projectWhereUserIsManager)).contains(user);
@@ -811,10 +811,10 @@ public class UserServiceTests {
 
     @Test
     void list_ontology_users() {
-        User user = builder.given_superadmin();
+        User user = builder.givenSuperAdmin();
 
-        Project projectWhereUserIsManager = builder.given_a_project();
-        Project projectWhereUserIsContributor = builder.given_a_project();
+        Project projectWhereUserIsManager = builder.givenAProject();
+        Project projectWhereUserIsContributor = builder.givenAProject();
 
         builder.addUserToProject(projectWhereUserIsManager, "superadmin", ADMINISTRATION);
         builder.addUserToProject(projectWhereUserIsContributor, "superadmin", WRITE);
@@ -828,18 +828,18 @@ public class UserServiceTests {
 
     @Test
     void list_storage_users() {
-        Storage storage = builder.given_a_storage(builder.given_superadmin());
+        Storage storage = builder.givenAStorage(builder.givenSuperAdmin());
 
         assertThat(userService.listUsers(storage))
-            .contains(builder.given_superadmin());
+            .contains(builder.givenSuperAdmin());
 
     }
 
     @Test
     void list_all_project_users() {
-        User user = builder.given_superadmin();
+        User user = builder.givenSuperAdmin();
 
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
 
         builder.addUserToProject(project, "superadmin", WRITE);
 
@@ -849,16 +849,16 @@ public class UserServiceTests {
 
     @Test
     void list_layers() {
-        User user = builder.given_a_user();
-        User anotherUserInProject = builder.given_a_user();
-        User anotherUserNotInProject = builder.given_a_user();
+        User user = builder.givenAUser();
+        User anotherUserInProject = builder.givenAUser();
+        User anotherUserNotInProject = builder.givenAUser();
 
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
 
         builder.addUserToProject(project, user.getUsername(), WRITE);
         builder.addUserToProject(project, anotherUserInProject.getUsername(), WRITE);
 
-        assertThat(userService.listLayers(project, builder.given_an_image_instance(project))
+        assertThat(userService.listLayers(project, builder.givenAnImageInstance(project))
             .stream()
             .map(x -> x.getJSONAttrLong("id")))
             .contains(user.getId(), anotherUserInProject.getId())
@@ -868,16 +868,16 @@ public class UserServiceTests {
     @WithMockUser("user")
     @Test
     void list_layers_with_project_with_private_admin_layer() {
-        User user = builder.given_default_user();
-        User adminInProject = builder.given_a_user();
+        User user = builder.givenDefaultUser();
+        User adminInProject = builder.givenAUser();
 
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
         project.setHideAdminsLayers(true);
 
         builder.addUserToProject(project, user.getUsername(), WRITE);
         builder.addUserToProject(project, adminInProject.getUsername(), ADMINISTRATION);
 
-        assertThat(userService.listLayers(project, builder.given_an_image_instance(project))
+        assertThat(userService.listLayers(project, builder.givenAnImageInstance(project))
             .stream()
             .map(x -> x.getJSONAttrLong("id")))
             .hasSize(1)
@@ -888,16 +888,16 @@ public class UserServiceTests {
     @WithMockUser("user")
     @Test
     void list_layers_with_project_with_private_user_layer() {
-        User user = builder.given_default_user();
-        User userInProject = builder.given_a_user();
+        User user = builder.givenDefaultUser();
+        User userInProject = builder.givenAUser();
 
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
         project.setHideUsersLayers(true);
 
         builder.addUserToProject(project, user.getUsername(), WRITE);
         builder.addUserToProject(project, userInProject.getUsername(), WRITE);
 
-        assertThat(userService.listLayers(project, builder.given_an_image_instance(project))
+        assertThat(userService.listLayers(project, builder.givenAnImageInstance(project))
             .stream()
             .map(x -> x.getJSONAttrLong("id")))
             .hasSize(1)
@@ -908,16 +908,16 @@ public class UserServiceTests {
     @WithMockUser("user")
     @Test
     void list_layers_with_project_with_private_user_layer_with_project_admin_role() {
-        User user = builder.given_default_user();
-        User userInProject = builder.given_a_user();
+        User user = builder.givenDefaultUser();
+        User userInProject = builder.givenAUser();
 
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
         project.setHideUsersLayers(true);
 
         builder.addUserToProject(project, user.getUsername(), ADMINISTRATION);
         builder.addUserToProject(project, userInProject.getUsername(), WRITE);
 
-        assertThat(userService.listLayers(project, builder.given_an_image_instance(project))
+        assertThat(userService.listLayers(project, builder.givenAnImageInstance(project))
             .stream()
             .map(x -> x.getJSONAttrLong("id")))
             .hasSize(2)
@@ -926,8 +926,8 @@ public class UserServiceTests {
 
     @Test
     void list_online_user() {
-        User userOnline = builder.given_default_user();
-        User userOffline = builder.given_a_user();
+        User userOnline = builder.givenDefaultUser();
+        User userOffline = builder.givenAUser();
 
         assertThat(userService.getAllOnlineUsers()).isEmpty();
         given_a_last_connection(userOnline, null, new Date());
@@ -938,12 +938,12 @@ public class UserServiceTests {
 
     @Test
     void list_online_user_for_project() {
-        User userOnline = builder.given_default_user();
-        User userOnlineButOnDifferentProject = builder.given_a_user();
-        User userOffline = builder.given_a_user();
+        User userOnline = builder.givenDefaultUser();
+        User userOnlineButOnDifferentProject = builder.givenAUser();
+        User userOffline = builder.givenAUser();
 
-        Project project = builder.given_a_project();
-        Project anotherProject = builder.given_a_project();
+        Project project = builder.givenAProject();
+        Project anotherProject = builder.givenAProject();
 
         given_a_last_connection(userOffline, project.getId(), DateUtils.addDays(new Date(), -15));
         given_a_last_connection(userOnline, project.getId(), DateUtils.addSeconds(new Date(), -15));
@@ -963,11 +963,11 @@ public class UserServiceTests {
 
     @Test
     void list_friend_users() {
-        User user = builder.given_default_user();
-        User userFriend = builder.given_a_user();
-        User userNotFriend = builder.given_a_user();
+        User user = builder.givenDefaultUser();
+        User userFriend = builder.givenAUser();
+        User userNotFriend = builder.givenAUser();
 
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
 
         builder.addUserToProject(project, user.getUsername(), READ);
         builder.addUserToProject(project, userFriend.getUsername(), READ);
@@ -978,11 +978,11 @@ public class UserServiceTests {
 
     @Test
     void list_friend_users_offline() {
-        User user = builder.given_default_user();
-        User userFriendOnline = builder.given_a_user();
-        User userFriendOffline = builder.given_a_user();
+        User user = builder.givenDefaultUser();
+        User userFriendOnline = builder.givenAUser();
+        User userFriendOffline = builder.givenAUser();
 
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
 
         builder.addUserToProject(project, user.getUsername(), READ);
         builder.addUserToProject(project, userFriendOnline.getUsername(), READ);
@@ -997,11 +997,11 @@ public class UserServiceTests {
 
     @Test
     void list_friend_users_offline_on_a_project() {
-        User user = builder.given_default_user();
-        User userFriendOnline = builder.given_a_user();
-        User userFriendOnlineButOnAnotherProject = builder.given_a_user();
+        User user = builder.givenDefaultUser();
+        User userFriendOnline = builder.givenAUser();
+        User userFriendOnlineButOnAnotherProject = builder.givenAUser();
 
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
 
         builder.addUserToProject(project, user.getUsername(), READ);
         builder.addUserToProject(project, userFriendOnline.getUsername(), READ);
@@ -1009,7 +1009,7 @@ public class UserServiceTests {
 
         given_a_last_connection(
             userFriendOnlineButOnAnotherProject,
-            builder.given_a_project().getId(),
+            builder.givenAProject().getId(),
             DateUtils.addSeconds(new Date(), -15)
         );
         given_a_last_connection(userFriendOnline, project.getId(), DateUtils.addSeconds(new Date(), -15));
@@ -1020,9 +1020,9 @@ public class UserServiceTests {
 
     @Test
     void list_online_user_for_project_wit_their_activities() {
-        User userOnline = builder.given_default_user();
+        User userOnline = builder.givenDefaultUser();
 
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
 
         builder.addUserToProject(project, userOnline.getUsername());
 
@@ -1034,7 +1034,7 @@ public class UserServiceTests {
 
         PersistentImageConsultation consultation = given_a_persistent_image_consultation(
             userOnline,
-            builder.given_an_image_instance(project),
+            builder.givenAnImageInstance(project),
             new Date()
         );
 
@@ -1050,12 +1050,12 @@ public class UserServiceTests {
 
     @Test
     void list_online_user_for_project_wit_their_position() {
-        User userOnline = builder.given_default_user();
-        User userOnlineButOnDifferentProject = builder.given_a_user();
-        User userOffline = builder.given_a_user();
+        User userOnline = builder.givenDefaultUser();
+        User userOnlineButOnDifferentProject = builder.givenAUser();
+        User userOffline = builder.givenAUser();
 
-        Project project = builder.given_a_project();
-        Project anotherProject = builder.given_a_project();
+        Project project = builder.givenAProject();
+        Project anotherProject = builder.givenAProject();
 
         given_a_last_connection(userOffline, project.getId(), DateUtils.addDays(new Date(), -15));
         given_a_last_connection(userOnline, project.getId(), DateUtils.addSeconds(new Date(), -15));
@@ -1067,9 +1067,9 @@ public class UserServiceTests {
 
         given_a_persistent_user_position(
             DateUtils.addSeconds(new Date(), -15), userOnline,
-            builder.given_a_not_persisted_slice_instance(
-                builder.given_an_image_instance(project),
-                builder.given_an_abstract_slice()
+            builder.givenANotPersistedSliceInstance(
+                builder.givenAnImageInstance(project),
+                builder.givenAnAbstractSlice()
             ), UserPositionServiceTests.USER_VIEW
         );
 
@@ -1108,8 +1108,8 @@ public class UserServiceTests {
 
     @Test
     void list_user_resume_activities() {
-        User userOnline = builder.given_default_user();
-        Project project = builder.given_a_project();
+        User userOnline = builder.givenDefaultUser();
+        Project project = builder.givenAProject();
         builder.addUserToProject(project, userOnline.getUsername());
 
         PersistentProjectConnection firstConnection = given_a_persistent_connection_in_project(
@@ -1123,7 +1123,7 @@ public class UserServiceTests {
             DateUtils.addSeconds(new Date(), -15)
         );
 
-        given_a_persistent_image_consultation(userOnline, builder.given_an_image_instance(project), new Date());
+        given_a_persistent_image_consultation(userOnline, builder.givenAnImageInstance(project), new Date());
 
         JsonObject data = userService.getResumeActivities(project, userOnline);
 
@@ -1140,8 +1140,8 @@ public class UserServiceTests {
 
     @Test
     void add_user_to_project() {
-        User user = builder.given_a_user();
-        Project project = builder.given_a_project();
+        User user = builder.givenAUser();
+        Project project = builder.givenAProject();
 
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), ADMINISTRATION)).isFalse();
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isFalse();
@@ -1159,8 +1159,8 @@ public class UserServiceTests {
 
     @Test
     void remove_user_from_project() {
-        User user = builder.given_a_user();
-        Project project = builder.given_a_project();
+        User user = builder.givenAUser();
+        Project project = builder.givenAProject();
 
         projectMemberService.addUserToProject(user, project, true);
 
@@ -1184,8 +1184,8 @@ public class UserServiceTests {
 
     @Test
     void remove_ontology_right_when_removing_user_from_project() {
-        User user = builder.given_a_user();
-        Project project = builder.given_a_project();
+        User user = builder.givenAUser();
+        Project project = builder.givenAProject();
 
         projectMemberService.addUserToProject(user, project, false);
 
@@ -1201,15 +1201,15 @@ public class UserServiceTests {
 
     @Test
     void remove_ontology_right_when_removing_user_from_project_keep_right_if_user_has_another_project_with_ontology() {
-        User user = builder.given_a_user();
-        Project project = builder.given_a_project();
+        User user = builder.givenAUser();
+        Project project = builder.givenAProject();
 
         projectMemberService.addUserToProject(user, project, false);
 
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isTrue();
         assertThat(permissionService.hasACLPermission(project.getOntology(), user.getUsername(), READ)).isTrue();
 
-        Project projectWithSameOntology = builder.given_a_project();
+        Project projectWithSameOntology = builder.givenAProject();
         projectWithSameOntology.setOntology(project.getOntology());
         projectMemberService.addUserToProject(user, projectWithSameOntology, false);
 
@@ -1222,8 +1222,8 @@ public class UserServiceTests {
 
     @Test
     void add_and_delete_user_to_storage() {
-        User user = builder.given_a_user();
-        Storage storage = builder.given_a_storage();
+        User user = builder.givenAUser();
+        Storage storage = builder.givenAStorage();
 
         assertThat(permissionService.hasACLPermission(storage, user.getUsername(), ADMINISTRATION)).isFalse();
         assertThat(permissionService.hasACLPermission(storage, user.getUsername(), READ)).isFalse();

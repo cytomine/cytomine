@@ -86,7 +86,7 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
     @WithMockUser(username = GUEST)
     public void every_body_cannot_list_user_from_project() {
         expectForbidden(() -> userService.listUsersExtendedByProject(
-            builder.given_a_project(),
+            builder.givenAProject(),
             new UserSearchExtension(),
             new ArrayList<>(),
             "created",
@@ -95,21 +95,21 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
             0L
         ));
         expectForbidden(() -> userService.listUsersByProject(
-            builder.given_a_project(),
+            builder.givenAProject(),
             new ArrayList<>(),
             "created",
             "desc",
             0L,
             0L
         ));
-        expectForbidden(() -> userService.listAdmins(builder.given_a_project()));
-        expectForbidden(() -> userService.listUsers(builder.given_a_project()));
+        expectForbidden(() -> userService.listAdmins(builder.givenAProject()));
+        expectForbidden(() -> userService.listUsers(builder.givenAProject()));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void user_project_can_list_user_from_project() {
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
         builder.addUserToProject(project, USER_ACL_READ);
         expectOK(() -> userService.listUsersExtendedByProject(
             project,
@@ -162,7 +162,7 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
     @Test
     @WithMockUser(username = USER_NO_ACL)
     public void user_cannot_delete_another_user() {
-        User user = builder.given_a_user();
+        User user = builder.givenAUser();
         expectForbidden(() -> userService.delete(user, null, null, false));
     }
 
@@ -176,15 +176,15 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
     @Test
     @WithMockUser(username = SUPERADMIN)
     public void admin_can_delete_another_user() {
-        User user = builder.given_a_user();
+        User user = builder.givenAUser();
         expectOK(() -> userService.delete(user, null, null, false));
     }
 
     @Test
     @WithMockUser(username = SUPERADMIN)
     public void admin_can_add_a_user_to_a_project() {
-        User user = builder.given_a_user();
-        Project project = builder.given_a_project();
+        User user = builder.givenAUser();
+        Project project = builder.givenAProject();
         expectOK(() -> projectMemberService.addUserToProject(user, project, false));
         expectOK(() -> projectMemberService.deleteUserFromProject(user, project, false));
     }
@@ -192,8 +192,8 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
     public void user_with_admin_right_can_add_a_user_to_a_project() {
-        User user = builder.given_a_user();
-        Project project = builder.given_a_project();
+        User user = builder.givenAUser();
+        Project project = builder.givenAProject();
         builder.addUserToProject(project, USER_ACL_ADMIN, ADMINISTRATION);
         expectOK(() -> projectMemberService.addUserToProject(user, project, false));
         expectOK(() -> projectMemberService.deleteUserFromProject(user, project, false));
@@ -202,8 +202,8 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void user_with_read_right_can_add_a_user_to_a_project() {
-        User user = builder.given_a_user();
-        Project project = builder.given_a_project();
+        User user = builder.givenAUser();
+        Project project = builder.givenAProject();
         builder.addUserToProject(project, USER_ACL_READ, READ);
         expectForbidden(() -> projectMemberService.addUserToProject(user, project, false));
         expectForbidden(() -> projectMemberService.deleteUserFromProject(user, project, false));
@@ -212,32 +212,32 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void user_cannot_give_admin_right_to_a_user() {
-        User user = builder.given_a_user();
+        User user = builder.givenAUser();
         expectForbidden(() ->
-            secSecUserSecRoleService.add(builder.given_a_not_persisted_user_role(user, "ROLE_ADMIN").toJsonObject()));
+            secSecUserSecRoleService.add(builder.givenANotPersistedUserRole(user, "ROLE_ADMIN").toJsonObject()));
     }
 
     @Test
     @WithMockUser(username = SUPERADMIN)
     public void user_can_give_admin_right_to_a_user() {
-        User user = builder.given_a_user();
+        User user = builder.givenAUser();
         expectOK(() ->
-            secSecUserSecRoleService.add(builder.given_a_not_persisted_user_role(user, "ROLE_ADMIN").toJsonObject()));
+            secSecUserSecRoleService.add(builder.givenANotPersistedUserRole(user, "ROLE_ADMIN").toJsonObject()));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void user_cannot_remove_right_to_from_a_user() {
-        User user = builder.given_a_user();
+        User user = builder.givenAUser();
         expectForbidden(() ->
-            secSecUserSecRoleService.delete(builder.given_a_user_role(user), null, null, false));
+            secSecUserSecRoleService.delete(builder.givenAUserRole(user), null, null, false));
     }
 
     @Test
     @WithMockUser(username = SUPERADMIN)
     public void admin_can_remove_right_from_a_user() {
-        User user = builder.given_a_user();
+        User user = builder.givenAUser();
         expectOK(() ->
-            secSecUserSecRoleService.delete(builder.given_a_user_role(user), null, null, false));
+            secSecUserSecRoleService.delete(builder.givenAUserRole(user), null, null, false));
     }
 }

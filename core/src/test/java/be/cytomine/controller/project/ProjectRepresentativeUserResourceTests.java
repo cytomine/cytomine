@@ -55,7 +55,7 @@ public class ProjectRepresentativeUserResourceTests {
     @Test
     @Transactional
     public void list_all_project_representative_users() throws Exception {
-        ProjectRepresentativeUser projectRepresentativeUser = builder.given_a_project_representative_user();
+        ProjectRepresentativeUser projectRepresentativeUser = builder.givenAProjectRepresentativeUser();
         restProjectRepresentativeUserControllerMockMvc.perform(get(
                 "/api/project/{id}/representative.json",
                 projectRepresentativeUser.getProject().getId()
@@ -75,7 +75,7 @@ public class ProjectRepresentativeUserResourceTests {
     @Test
     @Transactional
     public void get_a_projectRepresentativeUser() throws Exception {
-        ProjectRepresentativeUser projectRepresentativeUser = builder.given_a_project_representative_user();
+        ProjectRepresentativeUser projectRepresentativeUser = builder.givenAProjectRepresentativeUser();
 
         restProjectRepresentativeUserControllerMockMvc.perform(get(
                 "/api/project/{project}/representative/{id}.json",
@@ -91,7 +91,7 @@ public class ProjectRepresentativeUserResourceTests {
     @Test
     @Transactional
     public void get_a_projectRepresentativeUser_that_does_not_exists() throws Exception {
-        ProjectRepresentativeUser projectRepresentativeUser = builder.given_a_project_representative_user();
+        ProjectRepresentativeUser projectRepresentativeUser = builder.givenAProjectRepresentativeUser();
 
         restProjectRepresentativeUserControllerMockMvc.perform(get(
                 "/api/project/{project}/representative/{id}.json",
@@ -103,7 +103,7 @@ public class ProjectRepresentativeUserResourceTests {
     @Test
     @Transactional
     public void get_a_projectRepresentativeUser_from_project_that_does_not_exists() throws Exception {
-        ProjectRepresentativeUser projectRepresentativeUser = builder.given_a_project_representative_user();
+        ProjectRepresentativeUser projectRepresentativeUser = builder.givenAProjectRepresentativeUser();
 
         restProjectRepresentativeUserControllerMockMvc.perform(get(
                 "/api/project/{project}/representative/{id}.json",
@@ -117,7 +117,7 @@ public class ProjectRepresentativeUserResourceTests {
     public void add_valid_projectRepresentativeUser() throws Exception {
         ProjectRepresentativeUser
             projectRepresentativeUser
-            = builder.given_a_not_persisted_project_representative_user();
+            = builder.givenANotPersistedProjectRepresentativeUser();
         restProjectRepresentativeUserControllerMockMvc.perform(post(
                 "/api/project/{id}/representative.json",
                 projectRepresentativeUser.getProject().getId()
@@ -138,7 +138,7 @@ public class ProjectRepresentativeUserResourceTests {
     public void add_projectRepresentativeUser_refused_if_already_exists() throws Exception {
         ProjectRepresentativeUser
             projectRepresentativeUser
-            = builder.given_a_not_persisted_project_representative_user();
+            = builder.givenANotPersistedProjectRepresentativeUser();
         builder.persistAndReturn(projectRepresentativeUser);
         restProjectRepresentativeUserControllerMockMvc.perform(post(
                 "/api/project/{id}/representative.json",
@@ -153,8 +153,8 @@ public class ProjectRepresentativeUserResourceTests {
     @Test
     @Transactional
     public void delete_projectRepresentativeUser() throws Exception {
-        ProjectRepresentativeUser projectRepresentativeUser = builder.given_a_project_representative_user();
-        ProjectRepresentativeUser projectRepresentativeUser2 = builder.given_a_project_representative_user(
+        ProjectRepresentativeUser projectRepresentativeUser = builder.givenAProjectRepresentativeUser();
+        ProjectRepresentativeUser projectRepresentativeUser2 = builder.givenAProjectRepresentativeUser(
             projectRepresentativeUser.getProject(), projectRepresentativeUser.getUser()
         );
         restProjectRepresentativeUserControllerMockMvc.perform(delete(
@@ -174,9 +174,9 @@ public class ProjectRepresentativeUserResourceTests {
     @Test
     @Transactional
     public void delete_projectRepresentativeUser_with_user_parameter() throws Exception {
-        ProjectRepresentativeUser projectRepresentativeUser = builder.given_a_project_representative_user();
-        ProjectRepresentativeUser projectRepresentativeUser2 = builder.given_a_project_representative_user(
-            projectRepresentativeUser.getProject(), builder.given_a_user()
+        ProjectRepresentativeUser projectRepresentativeUser = builder.givenAProjectRepresentativeUser();
+        ProjectRepresentativeUser projectRepresentativeUser2 = builder.givenAProjectRepresentativeUser(
+            projectRepresentativeUser.getProject(), builder.givenAUser()
         );
         restProjectRepresentativeUserControllerMockMvc.perform(delete(
                 "/api/project/{project}/representative.json",
@@ -210,7 +210,7 @@ public class ProjectRepresentativeUserResourceTests {
     @Transactional
     public void fail_when_delete_projectRepresentativeUser_project_not_exists() throws Exception {
         restProjectRepresentativeUserControllerMockMvc.perform(delete("/api/project/{project}/representative.json", 0)
-                .param("user", builder.given_superadmin().getId().toString())
+                .param("user", builder.givenSuperAdmin().getId().toString())
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.errors").exists());
@@ -221,7 +221,7 @@ public class ProjectRepresentativeUserResourceTests {
     public void fail_when_delete_projectRepresentativeUser_user_not_exists() throws Exception {
         restProjectRepresentativeUserControllerMockMvc.perform(delete(
                 "/api/project/{project}/representative.json",
-                builder.given_a_project().getId()
+                builder.givenAProject().getId()
             )
                 .param("user", "0")
                 .contentType(MediaType.APPLICATION_JSON))

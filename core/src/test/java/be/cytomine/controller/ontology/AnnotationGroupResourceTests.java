@@ -48,7 +48,7 @@ public class AnnotationGroupResourceTests {
 
     @Test
     void find_annotation_group_with_success() {
-        AnnotationGroup annotationGroup = builder.given_an_annotation_group();
+        AnnotationGroup annotationGroup = builder.givenAnAnnotationGroup();
         AssertionsForClassTypes.assertThat(annotationGroupService.find(annotationGroup.getId()).isPresent());
         assertThat(annotationGroup).isEqualTo(annotationGroupService.find(annotationGroup.getId()).get());
     }
@@ -61,7 +61,7 @@ public class AnnotationGroupResourceTests {
     @Test
     @Transactional
     public void add_valid_annotation_group() throws Exception {
-        AnnotationGroup annotationGroup = builder.given_a_not_persisted_annotation_group();
+        AnnotationGroup annotationGroup = builder.givenANotPersistedAnnotationGroup();
         restAnnotationGroupControllerMockMvc.perform(post("/api/annotationgroup.json")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(annotationGroup.toJSON()))
@@ -79,7 +79,7 @@ public class AnnotationGroupResourceTests {
     @Test
     @Transactional
     public void edit_valid_annotation_group() throws Exception {
-        AnnotationGroup annotationGroup = builder.given_an_annotation_group();
+        AnnotationGroup annotationGroup = builder.givenAnAnnotationGroup();
         JsonObject jsonObject = annotationGroup.toJsonObject();
         String type = UUID.randomUUID().toString();
         jsonObject.put("type", type);
@@ -100,7 +100,7 @@ public class AnnotationGroupResourceTests {
     @Test
     @Transactional
     public void delete_annotation_group() throws Exception {
-        AnnotationGroup annotationGroup = builder.given_an_annotation_group();
+        AnnotationGroup annotationGroup = builder.givenAnAnnotationGroup();
         restAnnotationGroupControllerMockMvc.perform(delete("/api/annotationgroup/{id}.json", annotationGroup.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
@@ -115,7 +115,7 @@ public class AnnotationGroupResourceTests {
     @Test
     @Transactional
     public void list_annotation_group_by_project() throws Exception {
-        AnnotationGroup annotationGroup = builder.given_an_annotation_group();
+        AnnotationGroup annotationGroup = builder.givenAnAnnotationGroup();
         restAnnotationGroupControllerMockMvc.perform(get(
                 "/api/project/{id}/annotationgroup.json",
                 annotationGroup.getProject().getId()
@@ -127,7 +127,7 @@ public class AnnotationGroupResourceTests {
     @Test
     @Transactional
     public void list_annotation_group_by_image_group() throws Exception {
-        AnnotationGroup annotationGroup = builder.given_an_annotation_group();
+        AnnotationGroup annotationGroup = builder.givenAnAnnotationGroup();
         restAnnotationGroupControllerMockMvc.perform(get(
                 "/api/imagegroup/{id}/annotationgroup.json",
                 annotationGroup.getImageGroup().getId()
@@ -139,10 +139,10 @@ public class AnnotationGroupResourceTests {
     @Test
     @Transactional
     public void merge_annotation_group_with_success() throws Exception {
-        Project project = builder.given_a_project();
-        ImageGroup imageGroup = builder.given_an_imagegroup(project);
-        AnnotationGroup annotationGroup = builder.given_an_annotation_group(project, imageGroup);
-        AnnotationGroup annotationGroupToMerge = builder.given_an_annotation_group(project, imageGroup);
+        Project project = builder.givenAProject();
+        ImageGroup imageGroup = builder.givenAnImageGroup(project);
+        AnnotationGroup annotationGroup = builder.givenAnAnnotationGroup(project, imageGroup);
+        AnnotationGroup annotationGroupToMerge = builder.givenAnAnnotationGroup(project, imageGroup);
         restAnnotationGroupControllerMockMvc.perform(post(
                 "/api/annotationgroup/{id}/annotationgroup/{mergedId}/merge.json",
                 annotationGroup.getId(),

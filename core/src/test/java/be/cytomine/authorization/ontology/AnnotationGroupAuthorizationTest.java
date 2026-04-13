@@ -37,7 +37,7 @@ public class AnnotationGroupAuthorizationTest extends CRUDAuthorizationTest {
     @BeforeEach
     public void before() throws Exception {
         if (annotationGroup == null) {
-            annotationGroup = builder.given_an_annotation_group();
+            annotationGroup = builder.givenAnAnnotationGroup();
             initACL(annotationGroup.container());
         }
         annotationGroup.getProject().setMode(EditingMode.CLASSIC);
@@ -51,7 +51,7 @@ public class AnnotationGroupAuthorizationTest extends CRUDAuthorizationTest {
 
     @Override
     protected void when_i_add_domain() {
-        annotationGroupService.add(builder.given_a_not_persisted_annotation_group(
+        annotationGroupService.add(builder.givenANotPersistedAnnotationGroup(
             annotationGroup.getProject(), annotationGroup.getImageGroup()).toJsonObject()
         );
     }
@@ -130,7 +130,7 @@ public class AnnotationGroupAuthorizationTest extends CRUDAuthorizationTest {
     @Test
     @WithMockUser(username = SUPERADMIN)
     public void admin_can_update_annotation_group_in_restricted_project() {
-        AnnotationGroup annotationGroup = builder.given_an_annotation_group();
+        AnnotationGroup annotationGroup = builder.givenAnAnnotationGroup();
         annotationGroup.getProject().setMode(EditingMode.RESTRICTED);
         expectOK(() -> { when_i_get_domain(); });
         expectOK(() -> { when_i_add_domain(); });
@@ -140,7 +140,7 @@ public class AnnotationGroupAuthorizationTest extends CRUDAuthorizationTest {
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void user_can_update_annotation_group_in_classic_project() {
-        AnnotationGroup annotationGroup = builder.given_an_annotation_group();
+        AnnotationGroup annotationGroup = builder.givenAnAnnotationGroup();
         annotationGroup.getProject().setMode(EditingMode.CLASSIC);
         expectOK(() -> { when_i_get_domain(); });
         expectOK(() -> { when_i_add_domain(); });

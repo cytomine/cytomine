@@ -59,7 +59,7 @@ public class TrackAuthorizationTest extends CRUDAuthorizationTest {
     @BeforeEach
     public void before() throws Exception {
         if (track == null) {
-            track = builder.given_a_track();
+            track = builder.givenATrack();
             ;
             initACL(track.container());
         }
@@ -86,7 +86,7 @@ public class TrackAuthorizationTest extends CRUDAuthorizationTest {
 
     @Override
     protected void when_i_add_domain() {
-        Track track = builder.given_a_not_persisted_track();
+        Track track = builder.givenANotPersistedTrack();
         track.setProject(this.track.getProject());
         track.setImage(this.track.getImage());
         trackService.add(track.toJsonObject());
@@ -99,7 +99,7 @@ public class TrackAuthorizationTest extends CRUDAuthorizationTest {
 
     @Override
     protected void when_i_delete_domain() {
-        Track trackToDelete = builder.given_a_track();
+        Track trackToDelete = builder.givenATrack();
         trackToDelete.setImage(this.track.getImage());
         trackToDelete.setProject(this.track.getProject());
         builder.persistAndReturn(trackToDelete);

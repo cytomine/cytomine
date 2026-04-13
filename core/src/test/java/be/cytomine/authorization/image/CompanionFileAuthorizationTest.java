@@ -61,7 +61,7 @@ public class CompanionFileAuthorizationTest extends CRUDAuthorizationTest {
     @BeforeEach
     public void before() throws Exception {
         if (companionFile == null) {
-            companionFile = builder.given_a_companion_file(builder.given_an_abstract_image());
+            companionFile = builder.givenACompanionFile(builder.givenAnAbstractImage());
             initACL(companionFile.container());
         }
     }
@@ -70,7 +70,7 @@ public class CompanionFileAuthorizationTest extends CRUDAuthorizationTest {
     @WithMockUser(username = SUPERADMIN)
     public void admin_can_list() {
         assertThat(companionFileService.list(companionFile.getImage())).contains(companionFile);
-        AbstractImage anotherAbstractImage = builder.given_an_abstract_image();
+        AbstractImage anotherAbstractImage = builder.givenAnAbstractImage();
         assertThat(companionFileService.list(companionFile.getUploadedFile())).contains(companionFile);
     }
 
@@ -78,7 +78,7 @@ public class CompanionFileAuthorizationTest extends CRUDAuthorizationTest {
     @WithMockUser(username = USER_ACL_READ)
     public void user_can_list() {
         assertThat(companionFileService.list(companionFile.getImage())).contains(companionFile);
-        AbstractImage anotherAbstractImage = builder.given_an_abstract_image();
+        AbstractImage anotherAbstractImage = builder.givenAnAbstractImage();
         assertThat(companionFileService.list(companionFile.getUploadedFile())).contains(companionFile);
     }
 
@@ -97,9 +97,9 @@ public class CompanionFileAuthorizationTest extends CRUDAuthorizationTest {
 
     @Override
     protected void when_i_add_domain() {
-        AbstractImage abstractImage = builder.given_an_abstract_image();
+        AbstractImage abstractImage = builder.givenAnAbstractImage();
         abstractImage.getUploadedFile().setStorage(companionFile.getImage().getUploadedFile().getStorage());
-        companionFileService.add(builder.given_a_not_persisted_companion_file(abstractImage).toJsonObject());
+        companionFileService.add(builder.givenANotPersistedCompanionFile(abstractImage).toJsonObject());
     }
 
     @Override

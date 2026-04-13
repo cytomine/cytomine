@@ -119,7 +119,7 @@ public class CustomUIControllerTests {
     @Transactional
     @WithMockUser(username = "superadmin")
     public void retrieve_project_custom_ui() throws Exception {
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
         restConfigurationControllerMockMvc.perform(get("/api/custom-ui/config.json")
                 .param("project", project.getId().toString()))
             .andExpect(status().isOk())
@@ -131,7 +131,7 @@ public class CustomUIControllerTests {
     @Transactional
     @WithMockUser(username = "user")
     public void retrieve_project_custom_ui_as_contributor() throws Exception {
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
         builder.addUserToProject(project, "user", READ);
         restConfigurationControllerMockMvc.perform(get("/api/custom-ui/config.json")
                 .param("project", project.getId().toString()))
@@ -143,7 +143,7 @@ public class CustomUIControllerTests {
     @Transactional
     @WithMockUser(username = "user")
     public void retrieve_project_custom_ui_as_manager() throws Exception {
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
         builder.addUserToProject(project, "user", ADMINISTRATION);
         restConfigurationControllerMockMvc.perform(get("/api/custom-ui/config.json")
                 .param("project", project.getId().toString()))
@@ -156,7 +156,7 @@ public class CustomUIControllerTests {
     @Transactional
     @WithMockUser(username = "superadmin")
     public void retrieve_project_custom_ui_as_superadmin() throws Exception {
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
         restConfigurationControllerMockMvc.perform(get("/api/custom-ui/project/{project}.json", project.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.project-images-tab.ADMIN_PROJECT").value(true))
@@ -169,7 +169,7 @@ public class CustomUIControllerTests {
     @Transactional
     @WithMockUser(username = "superadmin")
     public void change_project_custom_ui() throws Exception {
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
 
         String customUI = "" +
             "{\n" +

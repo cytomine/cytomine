@@ -61,7 +61,7 @@ public class RelationTermAuthorizationTest extends CRDAuthorizationTest {
     @BeforeEach
     public void before() throws Exception {
         if (relationTerm == null) {
-            relationTerm = builder.given_a_relation_term();
+            relationTerm = builder.givenARelationTerm();
             ;
             initACL(relationTerm.container());
         }
@@ -98,20 +98,20 @@ public class RelationTermAuthorizationTest extends CRDAuthorizationTest {
     @Override
     protected void when_i_add_domain() {
         relationTermService.add(
-            basicInstanceBuilder.given_a_not_persisted_relation_term(
+            basicInstanceBuilder.givenANotPersistedRelationTerm(
                 relationTerm.getRelation(),
                 relationTerm.getTerm1(),
-                builder.given_a_term(relationTerm.getTerm1().getOntology())
+                builder.givenATerm(relationTerm.getTerm1().getOntology())
             ).toJsonObject()
         );
     }
 
     @Override
     protected void when_i_delete_domain() {
-        RelationTerm termToDelete = builder.given_a_relation_term(
+        RelationTerm termToDelete = builder.givenARelationTerm(
             relationTerm.getRelation(),
             relationTerm.getTerm1(),
-            builder.given_a_term(relationTerm.getTerm1().getOntology())
+            builder.givenATerm(relationTerm.getTerm1().getOntology())
         );
         relationTermService.delete(termToDelete, null, null, true);
     }

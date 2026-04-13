@@ -42,7 +42,7 @@ public class ImageGroupServiceTests {
 
     @Test
     void find_imagegroup_with_success() {
-        ImageGroup imageGroup = builder.given_an_imagegroup();
+        ImageGroup imageGroup = builder.givenAnImageGroup();
         AssertionsForClassTypes.assertThat(imageGroupService.find(imageGroup.getId()).isPresent());
         assertThat(imageGroup).isEqualTo(imageGroupService.find(imageGroup.getId()).get());
     }
@@ -54,12 +54,12 @@ public class ImageGroupServiceTests {
 
     @Test
     void list_imagegroup_by_project() {
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
 
-        ImageGroup imageGroup1 = builder.given_an_imagegroup(project);
-        ImageGroup imageGroup2 = builder.given_an_imagegroup(project);
-        ImageGroup imageGroup3 = builder.given_an_imagegroup(project);
-        ImageGroup imageGroup4 = builder.given_an_imagegroup();
+        ImageGroup imageGroup1 = builder.givenAnImageGroup(project);
+        ImageGroup imageGroup2 = builder.givenAnImageGroup(project);
+        ImageGroup imageGroup3 = builder.givenAnImageGroup(project);
+        ImageGroup imageGroup4 = builder.givenAnImageGroup();
 
         assertThat(imageGroupService.list(project)).containsExactly(imageGroup1, imageGroup2, imageGroup3);
         assertThat(imageGroupService.list(project)).doesNotContain(imageGroup4);
@@ -67,7 +67,7 @@ public class ImageGroupServiceTests {
 
     @Test
     void add_valid_imagegroup_with_success() {
-        ImageGroup imageGroup = builder.given_a_not_persisted_imagegroup();
+        ImageGroup imageGroup = builder.givenANotPersistedImagegroup();
 
         CommandResponse commandResponse = imageGroupService.add(imageGroup.toJsonObject());
 
@@ -78,7 +78,7 @@ public class ImageGroupServiceTests {
 
     @Test
     void add_imagegroup_with_null_project_fails() {
-        ImageGroup imageGroup = builder.given_an_imagegroup();
+        ImageGroup imageGroup = builder.givenAnImageGroup();
         Assertions.assertThrows(
             ObjectNotFoundException.class, () -> {
                 imageGroupService.add(imageGroup.toJsonObject().withChange("project", null));
@@ -88,9 +88,9 @@ public class ImageGroupServiceTests {
 
     @Test
     void edit_imagegroup_with_success() {
-        Project project1 = builder.given_a_project();
-        Project project2 = builder.given_a_project();
-        ImageGroup imageGroup = builder.given_an_imagegroup(project1);
+        Project project1 = builder.givenAProject();
+        Project project2 = builder.givenAProject();
+        ImageGroup imageGroup = builder.givenAnImageGroup(project1);
 
         JsonObject jsonObject = imageGroup.toJsonObject();
         jsonObject.put("project", project2.getId());
@@ -106,7 +106,7 @@ public class ImageGroupServiceTests {
 
     @Test
     void delete_imagegroup_with_success() {
-        ImageGroup imageGroup = builder.given_an_imagegroup();
+        ImageGroup imageGroup = builder.givenAnImageGroup();
 
         CommandResponse commandResponse = imageGroupService.delete(imageGroup, null, null, true);
 

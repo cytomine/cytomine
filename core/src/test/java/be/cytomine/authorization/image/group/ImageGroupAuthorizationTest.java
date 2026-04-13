@@ -37,7 +37,7 @@ public class ImageGroupAuthorizationTest extends CRUDAuthorizationTest {
     @BeforeEach
     public void before() throws Exception {
         if (imageGroup == null) {
-            imageGroup = builder.given_an_imagegroup();
+            imageGroup = builder.givenAnImageGroup();
             initACL(imageGroup.container());
         }
         imageGroup.getProject().setMode(EditingMode.CLASSIC);
@@ -51,7 +51,7 @@ public class ImageGroupAuthorizationTest extends CRUDAuthorizationTest {
 
     @Override
     protected void when_i_add_domain() {
-        imageGroupService.add(builder.given_a_not_persisted_imagegroup(imageGroup.getProject()).toJsonObject());
+        imageGroupService.add(builder.givenANotPersistedImagegroup(imageGroup.getProject()).toJsonObject());
     }
 
     @Override

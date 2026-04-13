@@ -58,7 +58,7 @@ public class NestedImageInstanceResourceTests {
     @Test
     @Transactional
     public void list_nested_image_instance_by_image_instance() throws Exception {
-        NestedImageInstance nestedImageInstance = builder.given_a_nested_image_instance();
+        NestedImageInstance nestedImageInstance = builder.givenANestedImageInstance();
 
         restNestedImageInstanceControllerMockMvc.perform(get(
                 "/api/imageinstance/{imageInstanceId}/nested.json",
@@ -73,7 +73,7 @@ public class NestedImageInstanceResourceTests {
     @Test
     @Transactional
     public void get_an_nested_image_instance() throws Exception {
-        NestedImageInstance image = builder.given_a_nested_image_instance();
+        NestedImageInstance image = builder.givenANestedImageInstance();
 
         restNestedImageInstanceControllerMockMvc.perform(get(
                 "/api/imageinstance/{imageInstanceId}/nested/{id}.json",
@@ -107,10 +107,10 @@ public class NestedImageInstanceResourceTests {
     @Test
     @Transactional
     public void add_valid_nested_image_instance() throws Exception {
-        NestedImageInstance companionFile = builder.given_a_not_persisted_nested_image_instance();
+        NestedImageInstance companionFile = builder.givenANotPersistedNestedImageInstance();
         restNestedImageInstanceControllerMockMvc.perform(post(
                 "/api/imageinstance/{imageInstanceId}/nested.json",
-                builder.given_an_image_instance().getId()
+                builder.givenAnImageInstance().getId()
             )
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(companionFile.toJSON()))
@@ -127,7 +127,7 @@ public class NestedImageInstanceResourceTests {
     @Test
     @Transactional
     public void edit_valid_nested_image_instance() throws Exception {
-        NestedImageInstance nestedImageInstance = builder.given_a_nested_image_instance();
+        NestedImageInstance nestedImageInstance = builder.givenANestedImageInstance();
         JsonObject jsonObject = nestedImageInstance.toJsonObject();
         jsonObject.put("x", "123");
         restNestedImageInstanceControllerMockMvc.perform(put(
@@ -154,7 +154,7 @@ public class NestedImageInstanceResourceTests {
     @Test
     @Transactional
     public void delete_nested_image_instance() throws Exception {
-        NestedImageInstance nestedImageInstance = builder.given_a_nested_image_instance();
+        NestedImageInstance nestedImageInstance = builder.givenANestedImageInstance();
         restNestedImageInstanceControllerMockMvc.perform(delete(
                 "/api/imageinstance/{imageInstanceId}/nested/{id}.json",
                 nestedImageInstance.getParent().getId(),

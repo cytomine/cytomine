@@ -72,8 +72,8 @@ public class ProjectConnectionServiceTests {
 
     @Test
     void creation_and_close() {
-        User user = builder.given_superadmin();
-        Project projet = builder.given_a_project();
+        User user = builder.givenSuperAdmin();
+        Project projet = builder.givenAProject();
         Date before = new Date(new Date().getTime() - 1000);
         PersistentProjectConnection connection = projectConnectionService.add(
             user,
@@ -89,7 +89,7 @@ public class ProjectConnectionServiceTests {
         Optional<PersistentProjectConnection>
             connectionOptional
             = persistentProjectConnectionRepository.findAllByUserAndProjectAndCreatedLessThan(
-            builder.given_superadmin().getId(), projet.getId(), after,
+            builder.givenSuperAdmin().getId(), projet.getId(), after,
             PageRequest.of(0, 1, Sort.Direction.DESC, "created")
         ).stream().findFirst();
         assertThat(connectionOptional).isPresent();
@@ -100,7 +100,7 @@ public class ProjectConnectionServiceTests {
 
 
         connectionOptional = persistentProjectConnectionRepository.findAllByUserAndProjectAndCreatedLessThan(
-            builder.given_superadmin().getId(), projet.getId(), after,
+            builder.givenSuperAdmin().getId(), projet.getId(), after,
             PageRequest.of(0, 1, Sort.Direction.DESC, "created")
         ).stream().findFirst();
         assertThat(connectionOptional).isPresent();
@@ -112,9 +112,9 @@ public class ProjectConnectionServiceTests {
 
     @Test
     void find_last_user_connection_in_project() {
-        Project projet = builder.given_a_project();
-        User user = builder.given_superadmin();
-        User anotherUser = builder.given_a_user();
+        Project projet = builder.givenAProject();
+        User user = builder.givenSuperAdmin();
+        User anotherUser = builder.givenAUser();
 
         Optional<PersistentProjectConnection>
             persistentProjectConnection
@@ -151,9 +151,9 @@ public class ProjectConnectionServiceTests {
     void find_last_users_connection_in_project() {
 
 
-        Project projet = builder.given_a_project();
-        User user = builder.given_superadmin();
-        User anotherUser = builder.given_a_user();
+        Project projet = builder.givenAProject();
+        User user = builder.givenSuperAdmin();
+        User anotherUser = builder.givenAUser();
 
 
         List<JsonObject> maps = projectConnectionService.lastConnectionInProject(
@@ -269,9 +269,9 @@ public class ProjectConnectionServiceTests {
 
     @Test
     void find_last_connections_of_users_in_project() {
-        Project project = builder.given_a_project();
-        User user = builder.given_superadmin();
-        User anotherUser = builder.given_a_user();
+        Project project = builder.givenAProject();
+        User user = builder.givenSuperAdmin();
+        User anotherUser = builder.givenAUser();
 
         given_a_persistent_connection_in_project(user, project);
 
@@ -290,8 +290,8 @@ public class ProjectConnectionServiceTests {
 
     @Test
     void fill_project_connection_update_annotations_counter() {
-        Project projet = builder.given_a_project();
-        User user = builder.given_superadmin();
+        Project projet = builder.givenAProject();
+        User user = builder.givenSuperAdmin();
 
         PersistentProjectConnection connection = given_a_persistent_connection_in_project(
             user,
@@ -300,7 +300,7 @@ public class ProjectConnectionServiceTests {
         );
         assertThat(connection.getCountCreatedAnnotations()).isNull();
 
-        UserAnnotation annotation = builder.given_a_not_persisted_user_annotation(projet);
+        UserAnnotation annotation = builder.givenANotPersistedUserAnnotation(projet);
         builder.persistAndReturn(annotation);
 
 
@@ -327,10 +327,10 @@ public class ProjectConnectionServiceTests {
 
     @Test
     void fill_project_connection_update_image_counter() {
-        Project projet = builder.given_a_project();
-        User user = builder.given_superadmin();
-        ImageInstance imageInstance1 = builder.given_an_image_instance(projet);
-        ImageInstance imageInstance2 = builder.given_an_image_instance(imageInstance1.getProject());
+        Project projet = builder.givenAProject();
+        User user = builder.givenSuperAdmin();
+        ImageInstance imageInstance1 = builder.givenAnImageInstance(projet);
+        ImageInstance imageInstance2 = builder.givenAnImageInstance(imageInstance1.getProject());
 
         PersistentProjectConnection connection = given_a_persistent_connection_in_project(
             user,
@@ -365,9 +365,9 @@ public class ProjectConnectionServiceTests {
 
     @Test
     void get_connection_by_user_and_project() {
-        Project projet = builder.given_a_project();
-        User user = builder.given_superadmin();
-        User anotherUser = builder.given_a_user();
+        Project projet = builder.givenAProject();
+        User user = builder.givenSuperAdmin();
+        User anotherUser = builder.givenAUser();
 
         given_a_persistent_connection_in_project(user, projet);
         given_a_persistent_connection_in_project(user, projet);
@@ -392,9 +392,9 @@ public class ProjectConnectionServiceTests {
 
     @Test
     void number_of_connections_by_project_and_user() {
-        Project projet = builder.given_a_project();
-        User user = builder.given_superadmin();
-        User anotherUser = builder.given_a_user();
+        Project projet = builder.givenAProject();
+        User user = builder.givenSuperAdmin();
+        User anotherUser = builder.givenAUser();
 
         given_a_persistent_connection_in_project(user, projet);
         given_a_persistent_connection_in_project(user, projet);
@@ -403,7 +403,7 @@ public class ProjectConnectionServiceTests {
         assertThat(result.get("user")).isEqualTo(user.getId());
         assertThat(result.get("frequency")).isEqualTo(2L);
 
-        result = projectConnectionService.numberOfConnectionsByProjectAndUser(builder.given_a_project(), user);
+        result = projectConnectionService.numberOfConnectionsByProjectAndUser(builder.givenAProject(), user);
         assertThat(result.get("user")).isEqualTo(user.getId());
         assertThat(result.get("frequency")).isEqualTo(0L);
 
@@ -414,9 +414,9 @@ public class ProjectConnectionServiceTests {
 
     @Test
     void number_of_connections_by_project_and_users() {
-        Project projet = builder.given_a_project();
-        User user = builder.given_superadmin();
-        User anotherUser = builder.given_a_user();
+        Project projet = builder.givenAProject();
+        User user = builder.givenSuperAdmin();
+        User anotherUser = builder.givenAUser();
 
 
         List<JsonObject> results;
@@ -471,9 +471,9 @@ public class ProjectConnectionServiceTests {
 
     @Test
     void number_of_connections_by_project_and_users_fill_empty_users() {
-        Project projet = builder.given_a_project();
-        User user = builder.given_superadmin();
-        User anotherUser = builder.given_a_user();
+        Project projet = builder.givenAProject();
+        User user = builder.givenSuperAdmin();
+        User anotherUser = builder.givenAUser();
 
 
         List<JsonObject> results;
@@ -533,9 +533,9 @@ public class ProjectConnectionServiceTests {
 
     @Test
     void total_number_of_connections_by_project() {
-        Project projet = builder.given_a_project();
-        User user = builder.given_superadmin();
-        User anotherUser = builder.given_a_user();
+        Project projet = builder.givenAProject();
+        User user = builder.givenSuperAdmin();
+        User anotherUser = builder.givenAUser();
 
         List<JsonObject> results;
 
@@ -555,9 +555,9 @@ public class ProjectConnectionServiceTests {
     @Test
     void number_of_connections_by_project_ordered_by_hour_and_days() throws ParseException {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        Project projet = builder.given_a_project();
-        User user = builder.given_superadmin();
-        User anotherUser = builder.given_a_user();
+        Project projet = builder.givenAProject();
+        User user = builder.givenSuperAdmin();
+        User anotherUser = builder.givenAUser();
 
         List<JsonObject> results
             = projectConnectionService.numberOfConnectionsByProjectOrderedByHourAndDays(
@@ -602,9 +602,9 @@ public class ProjectConnectionServiceTests {
 
     @Test
     void total_number_of_connections_by_project_with_dates() {
-        Project projet = builder.given_a_project();
-        User user = builder.given_superadmin();
-        User anotherUser = builder.given_a_user();
+        Project projet = builder.givenAProject();
+        User user = builder.givenSuperAdmin();
+        User anotherUser = builder.givenAUser();
 
         List<JsonObject> results;
 
@@ -639,8 +639,8 @@ public class ProjectConnectionServiceTests {
     void number_of_connections_by_project_ordered_by_period() throws ParseException {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
-        Project projet = builder.given_a_project();
-        User user = builder.given_superadmin();
+        Project projet = builder.givenAProject();
+        User user = builder.givenSuperAdmin();
 
         List<JsonObject> results = projectConnectionService.numberOfProjectConnections("day", null, null, projet, user);
         assertThat(results).isEmpty();
@@ -674,8 +674,8 @@ public class ProjectConnectionServiceTests {
     void average_connections_by_project_ordered_by_period() throws ParseException {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
-        Project projet = builder.given_a_project();
-        User user = builder.given_superadmin();
+        Project projet = builder.givenAProject();
+        User user = builder.givenSuperAdmin();
 
         List<JsonObject> results
             = projectConnectionService.averageOfProjectConnections(
@@ -755,10 +755,10 @@ public class ProjectConnectionServiceTests {
 
     @Test
     void get_user_activity_details() {
-        Project projet = builder.given_a_project();
-        User user = builder.given_superadmin();
-        ImageInstance imageInstance1 = builder.given_an_image_instance(projet);
-        ImageInstance imageInstance2 = builder.given_an_image_instance(imageInstance1.getProject());
+        Project projet = builder.givenAProject();
+        User user = builder.givenSuperAdmin();
+        ImageInstance imageInstance1 = builder.givenAnImageInstance(projet);
+        ImageInstance imageInstance2 = builder.givenAnImageInstance(imageInstance1.getProject());
 
         PersistentProjectConnection connection = given_a_persistent_connection_in_project(
             user,

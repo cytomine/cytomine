@@ -175,29 +175,29 @@ public class AnnotationDomainResourceTests {
     }
 
     void createAnnotationSet() throws ParseException {
-        project = builder.given_a_project();
-        image = builder.given_an_image_instance(project);
-        slice = builder.given_a_slice_instance(image, 0, 0, 0);
-        term = builder.given_a_term(project.getOntology());
+        project = builder.givenAProject();
+        image = builder.givenAnImageInstance(project);
+        slice = builder.givenASliceInstance(image, 0, 0, 0);
+        term = builder.givenATerm(project.getOntology());
 
-        me = builder.given_superadmin();
-        randomUser = builder.given_a_user();
+        me = builder.givenSuperAdmin();
+        randomUser = builder.givenAUser();
         builder.addUserToProject(project, me.getUsername());
         builder.addUserToProject(project, randomUser.getUsername());
 
-        a1 = builder.given_a_user_annotation(slice, "POLYGON((1 1,5 1,5 5,1 5,1 1))", me, term);
-        a2 = builder.given_a_user_annotation(slice, "POLYGON((1 1,5 1,5 5,1 5,1 1))", me, term);
-        a3 = builder.given_a_user_annotation(slice, "POLYGON((1 1,5 1,5 5,1 5,1 1))", me, term);
-        a3 = builder.given_a_user_annotation(slice, "POLYGON((1 1,5 1,5 5,1 5,1 1))", me, term);
-        a4 = builder.given_a_user_annotation(slice, "POLYGON((1 1,5 1,5 5,1 5,1 1))", me, null);
-        a5 = builder.given_a_user_annotation(slice, "POLYGON((1 1,5 1,5 1,1 5,1 1))", randomUser, term);
+        a1 = builder.givenAUserAnnotation(slice, "POLYGON((1 1,5 1,5 5,1 5,1 1))", me, term);
+        a2 = builder.givenAUserAnnotation(slice, "POLYGON((1 1,5 1,5 5,1 5,1 1))", me, term);
+        a3 = builder.givenAUserAnnotation(slice, "POLYGON((1 1,5 1,5 5,1 5,1 1))", me, term);
+        a3 = builder.givenAUserAnnotation(slice, "POLYGON((1 1,5 1,5 5,1 5,1 1))", me, term);
+        a4 = builder.givenAUserAnnotation(slice, "POLYGON((1 1,5 1,5 5,1 5,1 1))", me, null);
+        a5 = builder.givenAUserAnnotation(slice, "POLYGON((1 1,5 1,5 1,1 5,1 1))", randomUser, term);
 
-        r1 = builder.given_a_reviewed_annotation(slice, "POLYGON((1 1,5 1,5 5,1 5,1 1))", me, term);
-        r2 = builder.given_a_reviewed_annotation(slice, "POLYGON((1 1,5 1,5 5,1 5,1 1))", me, term);
-        r3 = builder.given_a_reviewed_annotation(slice, "POLYGON((1 1,5 1,5 5,1 5,1 1))", me, term);
-        r4 = builder.given_a_reviewed_annotation(slice, "POLYGON((1 1,5 1,5 5,1 5,1 1))", me, null);
-        r5 = builder.given_a_reviewed_annotation(slice, "POLYGON((1 1,5 1,5 1,1 5,1 1))", randomUser, null);
-        r6 = builder.given_a_reviewed_annotation(slice, "POLYGON((1 1,5 1,5 1,1 5,1 1))", randomUser, term);
+        r1 = builder.givenAReviewedAnnotation(slice, "POLYGON((1 1,5 1,5 5,1 5,1 1))", me, term);
+        r2 = builder.givenAReviewedAnnotation(slice, "POLYGON((1 1,5 1,5 5,1 5,1 1))", me, term);
+        r3 = builder.givenAReviewedAnnotation(slice, "POLYGON((1 1,5 1,5 5,1 5,1 1))", me, term);
+        r4 = builder.givenAReviewedAnnotation(slice, "POLYGON((1 1,5 1,5 5,1 5,1 1))", me, null);
+        r5 = builder.givenAReviewedAnnotation(slice, "POLYGON((1 1,5 1,5 1,1 5,1 1))", randomUser, null);
+        r6 = builder.givenAReviewedAnnotation(slice, "POLYGON((1 1,5 1,5 1,1 5,1 1))", randomUser, term);
     }
 
     @BeforeEach
@@ -281,7 +281,7 @@ public class AnnotationDomainResourceTests {
     @Test
     @Transactional
     public void list_user_annotation_with_parameters_image() throws Exception {
-        a4.setImage(builder.given_an_image_instance(project));
+        a4.setImage(builder.givenAnImageInstance(project));
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("image", this.image.getId().toString()))
             .andExpect(status().isOk())
@@ -352,8 +352,8 @@ public class AnnotationDomainResourceTests {
     @Transactional
     public void list_annotation_search_by_image_and_user() throws Exception {
 
-        a1.setImage(builder.given_an_image_instance(project));
-        a2.setUser(builder.given_a_user());
+        a1.setImage(builder.givenAnImageInstance(project));
+        a2.setUser(builder.givenAUser());
 
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("image", this.image.getId().toString())
@@ -442,8 +442,8 @@ public class AnnotationDomainResourceTests {
     @Transactional
     public void list_annotation_search_by_image_and_user_and_term() throws Exception {
 
-        a1.setImage(builder.given_an_image_instance(project));
-        a2.setUser(builder.given_a_user());
+        a1.setImage(builder.givenAnImageInstance(project));
+        a2.setUser(builder.givenAUser());
 
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("image", this.image.getId().toString())
@@ -499,7 +499,7 @@ public class AnnotationDomainResourceTests {
             .andExpect(jsonPath("$.collection[?(@.id==" + a4.getId() + ")]").doesNotExist())
             .andReturn();
 
-        UserAnnotation intersectAnnotation = builder.given_a_user_annotation(
+        UserAnnotation intersectAnnotation = builder.givenAUserAnnotation(
             slice,
             polygonIncluding_A1_A2_A3,
             me,
@@ -537,16 +537,16 @@ public class AnnotationDomainResourceTests {
     @Test
     @Transactional
     public void list_user_annotation_with_pagination() throws Exception {
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
 
-        UserAnnotation a1 = builder.given_a_user_annotation(project);
-        UserAnnotation a2 = builder.given_a_user_annotation(project);
-        UserAnnotation a3 = builder.given_a_user_annotation(project);
-        UserAnnotation a4 = builder.given_a_user_annotation(project);
-        UserAnnotation a5 = builder.given_a_user_annotation(project);
-        UserAnnotation a6 = builder.given_a_user_annotation(project);
-        UserAnnotation a7 = builder.given_a_user_annotation(project);
-        UserAnnotation a8 = builder.given_a_user_annotation(project);
+        UserAnnotation a1 = builder.givenAUserAnnotation(project);
+        UserAnnotation a2 = builder.givenAUserAnnotation(project);
+        UserAnnotation a3 = builder.givenAUserAnnotation(project);
+        UserAnnotation a4 = builder.givenAUserAnnotation(project);
+        UserAnnotation a5 = builder.givenAUserAnnotation(project);
+        UserAnnotation a6 = builder.givenAUserAnnotation(project);
+        UserAnnotation a7 = builder.givenAUserAnnotation(project);
+        UserAnnotation a8 = builder.givenAUserAnnotation(project);
 
         assertThat(userAnnotationRepository.countByProject(project)).isEqualTo(8);
 
@@ -620,7 +620,7 @@ public class AnnotationDomainResourceTests {
     @Test
     @Transactional
     public void list_user_annotation_with_multiple_term() throws Exception {
-        builder.given_an_annotation_term(a1);
+        builder.givenAnAnnotationTerm(a1);
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("multipleTerm", "true")
                 .param("user", this.me.getId().toString())
@@ -640,8 +640,8 @@ public class AnnotationDomainResourceTests {
     public void list_user_annotation_with_several_identical_term() throws Exception {
         AnnotationTerm annotationTerm = new AnnotationTerm();
         annotationTerm.setUserAnnotation(a1);
-        annotationTerm.setUser(builder.given_a_user());
-        annotationTerm.setTerm(builder.given_a_term(project.getOntology()));
+        annotationTerm.setUser(builder.givenAUser());
+        annotationTerm.setTerm(builder.givenATerm(project.getOntology()));
         builder.persistAndReturn(annotationTerm);
         em.refresh(a1);
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
@@ -666,7 +666,7 @@ public class AnnotationDomainResourceTests {
     @Test
     @Transactional
     public void list_user_annotation_with_same_request_as_default_viewer() throws Exception {
-        UserAnnotation userAnnotation = builder.given_a_user_annotation();
+        UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         // this is the kind of request that the viewer send (without much configuration)
         JsonObject jsonObject = new JsonObject();
         jsonObject.put("max", 0);
@@ -774,7 +774,7 @@ public class AnnotationDomainResourceTests {
     @Test
     @Transactional
     public void list_reviewed_annotation_with_parameters_image() throws Exception {
-        r4.setImage(builder.given_an_image_instance(project));
+        r4.setImage(builder.givenAnImageInstance(project));
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("reviewed", "true")
                 .param("image", this.image.getId().toString()))
@@ -849,8 +849,8 @@ public class AnnotationDomainResourceTests {
     @Transactional
     public void list_reviewed_annotation_search_by_image_and_user() throws Exception {
 
-        r1.setImage(builder.given_an_image_instance(project));
-        r2.setUser(builder.given_a_user());
+        r1.setImage(builder.givenAnImageInstance(project));
+        r2.setUser(builder.givenAUser());
 
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("reviewed", "true")
@@ -945,8 +945,8 @@ public class AnnotationDomainResourceTests {
     @Transactional
     public void list_reviewed_annotation_search_by_image_and_reviewer_and_term() throws Exception {
 
-        r1.setImage(builder.given_an_image_instance(project));
-        r2.setUser(builder.given_a_user());
+        r1.setImage(builder.givenAnImageInstance(project));
+        r2.setUser(builder.givenAUser());
 
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("reviewed", "true")
@@ -961,9 +961,9 @@ public class AnnotationDomainResourceTests {
             .andExpect(jsonPath("$.collection[?(@.id==" + r4.getId() + ")]").doesNotExist()) //no term
             .andReturn();
 
-        r1.setImage(builder.given_an_image_instance(project));
+        r1.setImage(builder.givenAnImageInstance(project));
         r2.setUser(this.me);
-        r2.setReviewUser(builder.given_a_user());
+        r2.setReviewUser(builder.givenAUser());
 
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("reviewed", "true")
@@ -999,7 +999,7 @@ public class AnnotationDomainResourceTests {
     @Test
     @Transactional
     public void list_reviewed_annotation_with_multiple_term() throws Exception {
-        r1.getTerms().add(builder.given_a_term(r1.getProject().getOntology()));
+        r1.getTerms().add(builder.givenATerm(r1.getProject().getOntology()));
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("reviewed", "true")
                 .param("multipleTerm", "true")
@@ -1019,7 +1019,7 @@ public class AnnotationDomainResourceTests {
     @Test
     @Transactional
     public void list_reviewed_annotation_with_same_request_as_default_viewer() throws Exception {
-        ReviewedAnnotation reviewedAnnotation = builder.given_a_reviewed_annotation();
+        ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
 
         JsonObject jsonObject = new JsonObject();
         jsonObject.put("bbox", "0,0,102400,76288");
@@ -1219,7 +1219,7 @@ public class AnnotationDomainResourceTests {
     @Test
     @Transactional
     public void show_valid_user_annotation() throws Exception {
-        UserAnnotation annotation = builder.given_a_user_annotation();
+        UserAnnotation annotation = builder.givenAUserAnnotation();
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation/{id}.json", annotation.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(annotation.getId()));
@@ -1228,7 +1228,7 @@ public class AnnotationDomainResourceTests {
     @Test
     @Transactional
     public void show_valid_reviewed_annotation() throws Exception {
-        ReviewedAnnotation annotation = builder.given_a_reviewed_annotation();
+        ReviewedAnnotation annotation = builder.givenAReviewedAnnotation();
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation/{id}.json", annotation.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(annotation.getId()));
@@ -1245,7 +1245,7 @@ public class AnnotationDomainResourceTests {
     @Test
     @Transactional
     public void add_valid_user_annotation() throws Exception {
-        UserAnnotation userAnnotation = builder.given_a_not_persisted_user_annotation();
+        UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation();
 
         restAnnotationDomainControllerMockMvc.perform(post("/api/annotation.json")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -1264,9 +1264,9 @@ public class AnnotationDomainResourceTests {
     @Test
     @Transactional
     public void add_multiple_valid_user_annotation() throws Exception {
-        UserAnnotation userAnnotation1 = builder.given_a_not_persisted_user_annotation();
-        UserAnnotation userAnnotation2 = builder.given_a_not_persisted_user_annotation();
-        UserAnnotation userAnnotation3 = builder.given_a_not_persisted_user_annotation();
+        UserAnnotation userAnnotation1 = builder.givenANotPersistedUserAnnotation();
+        UserAnnotation userAnnotation2 = builder.givenANotPersistedUserAnnotation();
+        UserAnnotation userAnnotation3 = builder.givenANotPersistedUserAnnotation();
         restAnnotationDomainControllerMockMvc.perform(post("/api/annotation.json")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonObject.toJsonString(List.of(
@@ -1280,7 +1280,7 @@ public class AnnotationDomainResourceTests {
     @Test
     @org.springframework.transaction.annotation.Transactional
     public void edit_valid_user_annotation() throws Exception {
-        UserAnnotation userAnnotation = builder.given_a_user_annotation();
+        UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         restAnnotationDomainControllerMockMvc.perform(put("/api/annotation/{id}.json", userAnnotation.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(userAnnotation.toJSON()))
@@ -1299,7 +1299,7 @@ public class AnnotationDomainResourceTests {
     @Test
     @org.springframework.transaction.annotation.Transactional
     public void edit_valid_reviewed_annotation() throws Exception {
-        ReviewedAnnotation reviewedAnnotation = builder.given_a_reviewed_annotation();
+        ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         restAnnotationDomainControllerMockMvc.perform(put("/api/annotation/{id}.json", reviewedAnnotation.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(reviewedAnnotation.toJSON()))
@@ -1316,7 +1316,7 @@ public class AnnotationDomainResourceTests {
     @Test
     @org.springframework.transaction.annotation.Transactional
     public void delete_user_annotation() throws Exception {
-        UserAnnotation userAnnotation = builder.given_a_user_annotation();
+        UserAnnotation userAnnotation = builder.givenAUserAnnotation();
 
         restAnnotationDomainControllerMockMvc.perform(delete("/api/annotation/{id}.json", userAnnotation.getId())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -1336,7 +1336,7 @@ public class AnnotationDomainResourceTests {
     @Test
     @org.springframework.transaction.annotation.Transactional
     public void delete_reviewed_annotation() throws Exception {
-        ReviewedAnnotation reviewedAnnotation = builder.given_a_reviewed_annotation();
+        ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         restAnnotationDomainControllerMockMvc.perform(delete(
                 "/api/reviewedannotation/{id}.json",
                 reviewedAnnotation.getId()
@@ -1356,7 +1356,7 @@ public class AnnotationDomainResourceTests {
     @Test
     @Transactional
     public void simplify_annotation_while_creating_it() throws Exception {
-        AnnotationDomain annotation = builder.given_a_not_persisted_user_annotation();
+        AnnotationDomain annotation = builder.givenANotPersistedUserAnnotation();
         annotation.setLocation(new WKTReader().read(TestUtils.getResourceFileAsString("dataset/very_big_annotation.txt")));
         assertThat(annotation.getLocation().getNumPoints()).isGreaterThanOrEqualTo(500);
 
@@ -1405,7 +1405,7 @@ public class AnnotationDomainResourceTests {
     @Transactional
     public void simplify_annotation() throws Exception {
 
-        AnnotationDomain annotation = builder.given_a_user_annotation();
+        AnnotationDomain annotation = builder.givenAUserAnnotation();
         annotation.setLocation(new WKTReader().read(TestUtils.getResourceFileAsString("dataset/very_big_annotation.txt")));
         assertThat(annotation.getLocation().getNumPoints()).isGreaterThanOrEqualTo(500);
         builder.persistAndReturn(annotation);
@@ -1436,7 +1436,7 @@ public class AnnotationDomainResourceTests {
     @Transactional
     public void retrieve_simplify_annotation() throws Exception {
 
-        AnnotationDomain annotation = builder.given_a_not_persisted_user_annotation();
+        AnnotationDomain annotation = builder.givenANotPersistedUserAnnotation();
         annotation.setLocation(new WKTReader().read(TestUtils.getResourceFileAsString("dataset/very_big_annotation.txt")));
         assertThat(annotation.getLocation().getNumPoints()).isGreaterThanOrEqualTo(500);
         builder.persistAndReturn(annotation);
@@ -1471,7 +1471,7 @@ public class AnnotationDomainResourceTests {
         String annotationWithHole =
             "POLYGON ((4980 4980, 5516 4932, 5476 4188, 4956 4204, 4980 4980), (5100 4316, 5100 4804, 5404 4780, 5364 4316, 5100 4316))";
 
-        AnnotationDomain annotation = builder.given_a_not_persisted_user_annotation();
+        AnnotationDomain annotation = builder.givenANotPersistedUserAnnotation();
         annotation.setLocation(new WKTReader().read(annotationWithHole));
         builder.persistAndReturn(annotation);
 
@@ -1491,7 +1491,7 @@ public class AnnotationDomainResourceTests {
         String annotationWithHole =
             "POLYGON ((4980 4980, 5516 4932, 5476 4188, 4956 4204, 4980 4980), (5100 4316, 5100 4804, 5404 4780, 5364 4316, 5100 4316))";
 
-        AnnotationDomain annotation = builder.given_a_reviewed_annotation();
+        AnnotationDomain annotation = builder.givenAReviewedAnnotation();
         annotation.setLocation(new WKTReader().read(annotationWithHole));
 
         MvcResult mvcResult = restAnnotationDomainControllerMockMvc.perform(post(
@@ -1521,7 +1521,7 @@ public class AnnotationDomainResourceTests {
         String multiPolygon = "MULTIPOLYGON(((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2)),((6 3,9 2,9 4,6 3)))";
         String multiPolygonWithoutBlank = "MULTIPOLYGON(((1 1,5 1,5 5,1 5,1 1)),((6 3,9 2,9 4,6 3)))";
 
-        AnnotationDomain annotation = builder.given_a_not_persisted_user_annotation();
+        AnnotationDomain annotation = builder.givenANotPersistedUserAnnotation();
         annotation.setLocation(new WKTReader().read(multiPolygon));
         builder.persistAndReturn(annotation);
 
@@ -1564,7 +1564,7 @@ public class AnnotationDomainResourceTests {
             "     )";
 
 
-        AnnotationDomain annotation = builder.given_a_not_persisted_user_annotation();
+        AnnotationDomain annotation = builder.givenANotPersistedUserAnnotation();
         annotation.setLocation(new WKTReader().read(multiPolygon));
         annotation.getImage().getBaseImage().setWidth(500000);
         annotation.getImage().getBaseImage().setHeight(500000);
@@ -1586,12 +1586,12 @@ public class AnnotationDomainResourceTests {
 
     @Test
     public void testFreehandAnnotationCorrectionUserAdd() throws Exception {
-        doFreeHandAnnotationAdd(builder.given_a_user_annotation(), false);
+        doFreeHandAnnotationAdd(builder.givenAUserAnnotation(), false);
     }
 
     @Test
     public void testFreehandAnnotationCorrectionReviewedAdd() throws Exception {
-        doFreeHandAnnotationAdd(builder.given_a_reviewed_annotation(), true);
+        doFreeHandAnnotationAdd(builder.givenAReviewedAnnotation(), true);
     }
 
 
@@ -1620,7 +1620,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     public void testFreehandAnnotationCorrectionReviewedAddBadGeom() throws Exception {
-        doFreeHandAnnotationAddWithSelfIntersectPolygon(builder.given_a_reviewed_annotation(), true);
+        doFreeHandAnnotationAddWithSelfIntersectPolygon(builder.givenAReviewedAnnotation(), true);
     }
 
 
@@ -1646,12 +1646,12 @@ public class AnnotationDomainResourceTests {
 
     @Test
     public void testFreehandAnnotationCorrectionUserRem() throws Exception {
-        doFreeHandAnnotationRem(builder.given_a_user_annotation(), false);
+        doFreeHandAnnotationRem(builder.givenAUserAnnotation(), false);
     }
 
     @Test
     public void testFreehandAnnotationCorrectionReviewedRem() throws Exception {
-        doFreeHandAnnotationRem(builder.given_a_reviewed_annotation(), true);
+        doFreeHandAnnotationRem(builder.givenAReviewedAnnotation(), true);
     }
 
     private void doFreeHandAnnotationRem(AnnotationDomain annotation, boolean reviewMode) throws Exception {
@@ -1680,8 +1680,8 @@ public class AnnotationDomainResourceTests {
 
     @Test
     public void testFreehandAnnotationCorrectionUserMerge() throws Exception {
-        UserAnnotation annotation1 = builder.given_a_user_annotation();
-        UserAnnotation annotation2 = builder.given_a_user_annotation();
+        UserAnnotation annotation1 = builder.givenAUserAnnotation();
+        UserAnnotation annotation2 = builder.givenAUserAnnotation();
         annotation2.setProject(annotation1.getProject());
         annotation2.setImage(annotation1.getImage());
         doFreehandAnnotationMerge(annotation1, annotation2, false);
@@ -1689,8 +1689,8 @@ public class AnnotationDomainResourceTests {
 
     @Test
     public void testFreehandAnnotationCorrectionReviewedMerge() throws Exception {
-        ReviewedAnnotation annotation1 = builder.given_a_reviewed_annotation();
-        ReviewedAnnotation annotation2 = builder.given_a_reviewed_annotation();
+        ReviewedAnnotation annotation1 = builder.givenAReviewedAnnotation();
+        ReviewedAnnotation annotation2 = builder.givenAReviewedAnnotation();
         annotation2.setProject(annotation1.getProject());
         annotation2.setImage(annotation1.getImage());
         doFreehandAnnotationMerge(annotation1, annotation2, true);

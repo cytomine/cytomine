@@ -109,8 +109,8 @@ public class UserPositionServiceTests {
     void user_position_create_persistent_and_expired_position() {
         PersistentUserPosition persistentUserPosition = given_a_persistent_user_position(
             new Date(),
-            builder.given_superadmin(),
-            builder.given_a_slice_instance()
+            builder.givenSuperAdmin(),
+            builder.givenASliceInstance()
         );
         assertThat(lastUserPositionRepository.count()).isEqualTo(1);
         assertThat(persistentUserPositionRepository.count()).isEqualTo(1);
@@ -119,9 +119,9 @@ public class UserPositionServiceTests {
 
     @Test
     void retrieve_last_position_for_user() {
-        User mainUser = builder.given_superadmin();
-        User anotherUser = builder.given_a_user();
-        SliceInstance sliceInstance = builder.given_a_slice_instance();
+        User mainUser = builder.givenSuperAdmin();
+        User anotherUser = builder.givenAUser();
+        SliceInstance sliceInstance = builder.givenASliceInstance();
 
         PersistentUserPosition persistentUserPosition = given_a_persistent_user_position(
             new Date(),
@@ -131,7 +131,7 @@ public class UserPositionServiceTests {
         PersistentUserPosition persistentUserPositionForAnotherUserSameSlice
             = given_a_persistent_user_position(new Date(), anotherUser, sliceInstance);
         PersistentUserPosition persistentUserPositionForAnotherUserAnotherSlice
-            = given_a_persistent_user_position(new Date(), anotherUser, builder.given_a_slice_instance());
+            = given_a_persistent_user_position(new Date(), anotherUser, builder.givenASliceInstance());
 
         Optional<LastUserPosition> lastUserPosition
             = userPositionService.lastPositionByUser(sliceInstance.getImage(), sliceInstance, mainUser, false);
@@ -148,9 +148,9 @@ public class UserPositionServiceTests {
 
     @Test
     public void list_users_online_on_image() {
-        User mainUser = builder.given_superadmin();
-        User anotherUser = builder.given_a_user();
-        SliceInstance sliceInstance = builder.given_a_slice_instance();
+        User mainUser = builder.givenSuperAdmin();
+        User anotherUser = builder.givenAUser();
+        SliceInstance sliceInstance = builder.givenASliceInstance();
 
         PersistentUserPosition persistentUserPosition = given_a_persistent_user_position(
             new Date(),
@@ -172,9 +172,9 @@ public class UserPositionServiceTests {
 
     @Test
     public void list_users_position() {
-        User mainUser = builder.given_superadmin();
-        User anotherUser = builder.given_a_user();
-        SliceInstance sliceInstance = builder.given_a_slice_instance();
+        User mainUser = builder.givenSuperAdmin();
+        User anotherUser = builder.givenAUser();
+        SliceInstance sliceInstance = builder.givenASliceInstance();
 
 
         Date freshPosition = DateUtils.addSeconds(new Date(), -1);
@@ -264,9 +264,9 @@ public class UserPositionServiceTests {
 
     @Test
     public void summerize() {
-        User mainUser = builder.given_superadmin();
-        User anotherUser = builder.given_a_user();
-        SliceInstance sliceInstance = builder.given_a_slice_instance();
+        User mainUser = builder.givenSuperAdmin();
+        User anotherUser = builder.givenAUser();
+        SliceInstance sliceInstance = builder.givenASliceInstance();
 
 
         Date freshPosition = DateUtils.addSeconds(new Date(), -1);
@@ -293,9 +293,9 @@ public class UserPositionServiceTests {
 
     @Test
     public void summerize_location() {
-        User mainUser = builder.given_superadmin();
-        User anotherUser = builder.given_a_user();
-        SliceInstance sliceInstance = builder.given_a_slice_instance();
+        User mainUser = builder.givenSuperAdmin();
+        User anotherUser = builder.givenAUser();
+        SliceInstance sliceInstance = builder.givenASliceInstance();
 
 
         Date freshPosition = DateUtils.addSeconds(new Date(), -1);
@@ -340,9 +340,9 @@ public class UserPositionServiceTests {
 
     @Test
     public void summerize_after_than() {
-        User mainUser = builder.given_superadmin();
-        User anotherUser = builder.given_a_user();
-        SliceInstance sliceInstance = builder.given_a_slice_instance();
+        User mainUser = builder.givenSuperAdmin();
+        User anotherUser = builder.givenAUser();
+        SliceInstance sliceInstance = builder.givenASliceInstance();
 
         Date freshPosition = DateUtils.addSeconds(new Date(), -1);
         Date oldPosition = DateUtils.addMonths(freshPosition, -1);
@@ -385,9 +385,9 @@ public class UserPositionServiceTests {
 
     @Test
     void adding_a_position_with_new_location() {
-        User user = builder.given_a_user();
-        SliceInstance sliceInstance = builder.given_a_slice_instance();
-        ImageInstance imageInstance = builder.given_an_image_instance();
+        User user = builder.givenAUser();
+        SliceInstance sliceInstance = builder.givenASliceInstance();
+        ImageInstance imageInstance = builder.givenAnImageInstance();
         AreaDTO area = new AreaDTO(
             new Point((double) 0, (double) 0),
             new Point((double) 0, (double) 0),
@@ -406,7 +406,7 @@ public class UserPositionServiceTests {
 
         ConcurrentWebSocketSessionDecorator sessionDecorator = new ConcurrentWebSocketSessionDecorator(session, 0, 0);
 
-        User user = builder.given_a_user();
+        User user = builder.givenAUser();
 
         WebSocketUserPositionHandler.sessionsBroadcast.put(user.getId().toString() + "/514", sessionDecorator);
         WebSocketUserPositionHandler.sessionsTracked.put(
@@ -431,7 +431,7 @@ public class UserPositionServiceTests {
 
         ConcurrentWebSocketSessionDecorator sessionDecorator = new ConcurrentWebSocketSessionDecorator(session, 0, 0);
 
-        User user = builder.given_a_user();
+        User user = builder.givenAUser();
 
         WebSocketUserPositionHandler.sessionsBroadcast.put(user.getId().toString() + "/514", sessionDecorator);
         WebSocketUserPositionHandler.sessionsTracked.put(
@@ -452,17 +452,17 @@ public class UserPositionServiceTests {
 
     @Test
     public void list_followers_for_not_followed_user() {
-        User user = builder.given_a_user();
-        ImageInstance imageInstance = builder.given_an_image_instance();
+        User user = builder.givenAUser();
+        ImageInstance imageInstance = builder.givenAnImageInstance();
         List<String> users = userPositionService.listFollowers(user.getId(), imageInstance.getId());
         assertThat(users.size()).isEqualTo(0);
     }
 
     @Test
     public void adding_users_as_followers() {
-        User broadcaster = builder.given_a_user();
-        User follower = builder.given_a_user();
-        ImageInstance imageInstance = builder.given_an_image_instance();
+        User broadcaster = builder.givenAUser();
+        User follower = builder.givenAUser();
+        ImageInstance imageInstance = builder.givenAnImageInstance();
         String followerAndImageId = follower.getId().toString() + "/" + imageInstance.getId().toString();
 
         Assertions.assertThat(UserPositionService.followers.get(followerAndImageId)).isNull();
@@ -472,9 +472,9 @@ public class UserPositionServiceTests {
 
     @Test
     public void updating_users_followers() {
-        User broadcaster = builder.given_a_user();
-        User follower = builder.given_a_user();
-        ImageInstance imageInstance = builder.given_an_image_instance();
+        User broadcaster = builder.givenAUser();
+        User follower = builder.givenAUser();
+        ImageInstance imageInstance = builder.givenAnImageInstance();
 
         String followerAndImageId = follower.getId().toString() + "/" + imageInstance.getId().toString();
         UserPositionService.followers.put(followerAndImageId, false);
@@ -486,9 +486,9 @@ public class UserPositionServiceTests {
 
     @Test
     public void remove_users_followers_that_did_not_fetch_position() {
-        User broadcaster = builder.given_a_user();
-        User follower = builder.given_a_user();
-        ImageInstance imageInstance = builder.given_an_image_instance();
+        User broadcaster = builder.givenAUser();
+        User follower = builder.givenAUser();
+        ImageInstance imageInstance = builder.givenAnImageInstance();
 
         String followerAndImageId = follower.getId().toString() + "/" + imageInstance.getId().toString();
         String trackerAndImageId = broadcaster.getId().toString() + "/" + imageInstance.getId().toString();

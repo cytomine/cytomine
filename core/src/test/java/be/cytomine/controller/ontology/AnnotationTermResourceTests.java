@@ -65,7 +65,7 @@ public class AnnotationTermResourceTests {
     @Test
     @Transactional
     public void list_by_user_annotation() throws Exception {
-        AnnotationTerm annotationTerm = builder.given_an_annotation_term();
+        AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm();
         restAnnotationTermControllerMockMvc.perform(get(
                 "/api/annotation/{id}/term.json",
                 annotationTerm.getUserAnnotation().getId()
@@ -78,7 +78,7 @@ public class AnnotationTermResourceTests {
     @Test
     @Transactional
     public void list_by_user_annotation_and_user() throws Exception {
-        AnnotationTerm annotationTerm = builder.given_an_annotation_term();
+        AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm();
         restAnnotationTermControllerMockMvc.perform(get(
                 "/api/annotation/{id}/term.json",
                 annotationTerm.getUserAnnotation().getId()
@@ -92,7 +92,7 @@ public class AnnotationTermResourceTests {
                 "/api/annotation/{id}/term.json",
                 annotationTerm.getUserAnnotation().getId()
             )
-                .param("idUser", builder.given_a_user().getId().toString()))
+                .param("idUser", builder.givenAUser().getId().toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(0)));
     }
@@ -101,8 +101,8 @@ public class AnnotationTermResourceTests {
     @Test
     @Transactional
     public void list_by_reviewed_annotation() throws Exception {
-        ReviewedAnnotation reviewedAnnotation = builder.given_a_reviewed_annotation();
-        reviewedAnnotation.getTerms().add(builder.given_a_term(reviewedAnnotation.getProject().getOntology()));
+        ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
+        reviewedAnnotation.getTerms().add(builder.givenATerm(reviewedAnnotation.getProject().getOntology()));
         restAnnotationTermControllerMockMvc.perform(get("/api/annotation/{id}/term.json", reviewedAnnotation.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(1)))
@@ -115,7 +115,7 @@ public class AnnotationTermResourceTests {
     @Test
     @Transactional
     public void list_by_user_annotation_but_with_term_not_defined_by_user() throws Exception {
-        AnnotationTerm annotationTerm = builder.given_an_annotation_term();
+        AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm();
         restAnnotationTermControllerMockMvc.perform(get(
                 "/api/annotation/{idAnnotation}/notuser/{idNotUser}/term.json",
                 annotationTerm.getUserAnnotation().getId(), annotationTerm.getUser().getId().toString()
@@ -125,7 +125,7 @@ public class AnnotationTermResourceTests {
 
         restAnnotationTermControllerMockMvc.perform(get(
                 "/api/annotation/{idAnnotation}/notuser/{idNotUser}/term.json",
-                annotationTerm.getUserAnnotation().getId(), builder.given_a_user().getId()
+                annotationTerm.getUserAnnotation().getId(), builder.givenAUser().getId()
             )) // this user has not defined anything
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(1)))
@@ -136,7 +136,7 @@ public class AnnotationTermResourceTests {
     @Test
     @Transactional
     public void get_a_annotation_term() throws Exception {
-        AnnotationTerm annotationTerm = builder.given_an_annotation_term();
+        AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm();
 
         restAnnotationTermControllerMockMvc.perform(get(
                 "/api/annotation/{idAnnotation}/term/{idTerm}.json",
@@ -154,7 +154,7 @@ public class AnnotationTermResourceTests {
     @Test
     @Transactional
     public void get_a_annotation_term_with_user() throws Exception {
-        AnnotationTerm annotationTerm = builder.given_an_annotation_term();
+        AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm();
         restAnnotationTermControllerMockMvc.perform(get(
                 "/api/annotation/{idAnnotation}/term/{idTerm}/user/{idUser}.json",
                 annotationTerm.getUserAnnotation().getId(),
@@ -170,7 +170,7 @@ public class AnnotationTermResourceTests {
     @Test
     @Transactional
     public void get_a_annotation_term_with_bad_annotation() throws Exception {
-        AnnotationTerm annotationTerm = builder.given_an_annotation_term();
+        AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm();
 
         restAnnotationTermControllerMockMvc.perform(get(
                 "/api/annotation/{idAnnotation}/term/{idTerm}.json",
@@ -187,7 +187,7 @@ public class AnnotationTermResourceTests {
     public void add_valid_annotation_term() throws Exception {
         AnnotationTerm
             annotationTerm
-            = builder.given_a_not_persisted_annotation_term(builder.given_a_user_annotation());
+            = builder.givenANotPersistedAnnotationTerm(builder.givenAUserAnnotation());
         restAnnotationTermControllerMockMvc.perform(post(
                 "/api/annotation/{idAnnotation}/term/{idTerm}.json",
                 annotationTerm.getUserAnnotation().getId(),
@@ -213,8 +213,8 @@ public class AnnotationTermResourceTests {
     public void add_annotation_term_with_term_from_bad_ontology() throws Exception {
         AnnotationTerm
             annotationTerm
-            = builder.given_a_not_persisted_annotation_term(builder.given_a_user_annotation());
-        annotationTerm.setTerm(builder.given_a_term());
+            = builder.givenANotPersistedAnnotationTerm(builder.givenAUserAnnotation());
+        annotationTerm.setTerm(builder.givenATerm());
         restAnnotationTermControllerMockMvc.perform(post(
                 "/api/annotation/{idAnnotation}/term/{idTerm}.json",
                 annotationTerm.getUserAnnotation().getId(),
@@ -231,7 +231,7 @@ public class AnnotationTermResourceTests {
     public void add_annotation_term_with_bad_annotation() throws Exception {
         AnnotationTerm
             annotationTerm
-            = builder.given_a_not_persisted_annotation_term(builder.given_a_user_annotation());
+            = builder.givenANotPersistedAnnotationTerm(builder.givenAUserAnnotation());
         JsonObject jsonObject = annotationTerm.toJsonObject().withChange("userannotation", 0);
         restAnnotationTermControllerMockMvc.perform(post(
                 "/api/annotation/{idAnnotation}/term/{idTerm}.json",
@@ -249,8 +249,8 @@ public class AnnotationTermResourceTests {
     public void add_annotation_term_with_bad_term() throws Exception {
         AnnotationTerm
             annotationTerm
-            = builder.given_a_not_persisted_annotation_term(builder.given_a_user_annotation());
-        annotationTerm.setTerm(builder.given_a_term());
+            = builder.givenANotPersistedAnnotationTerm(builder.givenAUserAnnotation());
+        annotationTerm.setTerm(builder.givenATerm());
         restAnnotationTermControllerMockMvc.perform(post(
                 "/api/annotation/{idAnnotation}/term/{idTerm}.json",
                 annotationTerm.getTerm().getId(),
@@ -267,16 +267,16 @@ public class AnnotationTermResourceTests {
     @Transactional
     public void add_valid_annotation_term_clean_before_for_current_user() throws Exception {
 
-        AnnotationTerm previousAnnotationTerm = builder.given_an_annotation_term();
+        AnnotationTerm previousAnnotationTerm = builder.givenAnAnnotationTerm();
 
         AnnotationTerm
             previousAnnotationTermFromOtherUser
-            = builder.given_an_annotation_term(previousAnnotationTerm.getUserAnnotation());
-        previousAnnotationTermFromOtherUser.setUser(builder.given_a_user());
+            = builder.givenAnAnnotationTerm(previousAnnotationTerm.getUserAnnotation());
+        previousAnnotationTermFromOtherUser.setUser(builder.givenAUser());
 
         AnnotationTerm
             annotationTerm
-            = builder.given_a_not_persisted_annotation_term(previousAnnotationTerm.getUserAnnotation());
+            = builder.givenANotPersistedAnnotationTerm(previousAnnotationTerm.getUserAnnotation());
 
         assertThat(annotationTermService.find(
             previousAnnotationTerm.getUserAnnotation(),
@@ -329,12 +329,12 @@ public class AnnotationTermResourceTests {
     @Transactional
     public void add_valid_annotation_term_clean_before_for_all_user() throws Exception {
 
-        AnnotationTerm previousAnnotationTerm = builder.given_an_annotation_term();
-        previousAnnotationTerm.setUser(builder.given_a_user());
+        AnnotationTerm previousAnnotationTerm = builder.givenAnAnnotationTerm();
+        previousAnnotationTerm.setUser(builder.givenAUser());
 
         AnnotationTerm
             annotationTerm
-            = builder.given_a_not_persisted_annotation_term(previousAnnotationTerm.getUserAnnotation());
+            = builder.givenANotPersistedAnnotationTerm(previousAnnotationTerm.getUserAnnotation());
 
         assertThat(annotationTermService.find(
             previousAnnotationTerm.getUserAnnotation(),
@@ -378,7 +378,7 @@ public class AnnotationTermResourceTests {
     @Test
     @Transactional
     public void delete_annotation_term_with_user() throws Exception {
-        AnnotationTerm annotationTerm = builder.given_an_annotation_term();
+        AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm();
         restAnnotationTermControllerMockMvc.perform(delete(
                 "/api/annotation/{idAnnotation}/term/{idTerm}/user/{idUser}.json",
                 annotationTerm.getUserAnnotation().getId(),
@@ -400,7 +400,7 @@ public class AnnotationTermResourceTests {
     @Test
     @Transactional
     public void delete_annotation_term_for_current_user() throws Exception {
-        AnnotationTerm annotationTerm = builder.given_an_annotation_term();
+        AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm();
         restAnnotationTermControllerMockMvc.perform(delete(
                 "/api/annotation/{idAnnotation}/term/{idTerm}.json",
                 annotationTerm.getUserAnnotation().getId(), annotationTerm.getTerm().getId()

@@ -84,17 +84,17 @@ public class AnnotationIndexResourceTests {
     UserAnnotation a4;
 
     void createAnnotationSet() throws ParseException {
-        project = builder.given_a_project();
-        image = builder.given_an_image_instance(project);
-        slice = builder.given_a_slice_instance(image, 0, 0, 0);
-        me = builder.given_superadmin();
-        term = builder.given_a_term(project.getOntology());
+        project = builder.givenAProject();
+        image = builder.givenAnImageInstance(project);
+        slice = builder.givenASliceInstance(image, 0, 0, 0);
+        me = builder.givenSuperAdmin();
+        term = builder.givenATerm(project.getOntology());
 
-        a1 = builder.given_a_user_annotation(slice, "POLYGON((1 1,5 1,5 5,1 5,1 1))", me, term);
-        a2 = builder.given_a_user_annotation(slice, "POLYGON((1 1,5 1,5 5,1 5,1 1))", me, term);
-        a3 = builder.given_a_user_annotation(slice, "POLYGON((1 1,5 1,5 5,1 5,1 1))", me, term);
+        a1 = builder.givenAUserAnnotation(slice, "POLYGON((1 1,5 1,5 5,1 5,1 1))", me, term);
+        a2 = builder.givenAUserAnnotation(slice, "POLYGON((1 1,5 1,5 5,1 5,1 1))", me, term);
+        a3 = builder.givenAUserAnnotation(slice, "POLYGON((1 1,5 1,5 5,1 5,1 1))", me, term);
 
-        a4 = builder.given_a_user_annotation(slice, "POLYGON((1 1,5 1,5 5,1 5,1 1))", me, null);
+        a4 = builder.givenAUserAnnotation(slice, "POLYGON((1 1,5 1,5 5,1 5,1 1))", me, null);
         em.flush();
     }
 

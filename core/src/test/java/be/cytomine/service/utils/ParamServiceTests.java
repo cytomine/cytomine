@@ -36,10 +36,10 @@ public class ParamServiceTests {
 
     @Test
     public void params_user() {
-        Project project = builder.given_a_project();
-        User userInProject = builder.given_a_user();
+        Project project = builder.givenAProject();
+        User userInProject = builder.givenAUser();
         builder.addUserToProject(project, userInProject.getUsername());
-        User userNotInProject = builder.given_a_user();
+        User userNotInProject = builder.givenAUser();
 
         assertThat(paramsService.getParamsUserList(null, project))
             .contains(userInProject.getId()).doesNotContain(userNotInProject.getId());
@@ -53,9 +53,9 @@ public class ParamServiceTests {
 
     @Test
     public void params_image_instance() {
-        Project project = builder.given_a_project();
-        ImageInstance imageInstanceInProject = builder.given_an_image_instance(project);
-        ImageInstance imageInstanceNotInProject = builder.given_an_image_instance();
+        Project project = builder.givenAProject();
+        ImageInstance imageInstanceInProject = builder.givenAnImageInstance(project);
+        ImageInstance imageInstanceNotInProject = builder.givenAnImageInstance();
 
         assertThat(paramsService.getParamsImageInstanceList(null, project))
             .contains(imageInstanceInProject.getId()).doesNotContain(imageInstanceNotInProject.getId());
@@ -74,9 +74,9 @@ public class ParamServiceTests {
     @Test
     public void params_term() {
 
-        Term termInProject = builder.given_a_term(builder.given_an_ontology());
-        Term termNotInProject = builder.given_a_term();
-        Project project = builder.given_a_project_with_ontology(termInProject.getOntology());
+        Term termInProject = builder.givenATerm(builder.givenAnOntology());
+        Term termNotInProject = builder.givenATerm();
+        Project project = builder.givenAProjectWithOntology(termInProject.getOntology());
 
         assertThat(paramsService.getParamsTermList(null, project))
             .contains(termInProject.getId()).doesNotContain(termNotInProject.getId());

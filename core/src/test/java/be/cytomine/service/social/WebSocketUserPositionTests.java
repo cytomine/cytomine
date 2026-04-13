@@ -95,8 +95,8 @@ public class WebSocketUserPositionTests {
     public void add_track_session_to_not_tracked_user() {
         ConcurrentWebSocketSessionDecorator sessionDecorator = mock(ConcurrentWebSocketSessionDecorator.class);
 
-        String userId = builder.given_a_user().getId().toString();
-        String imageInstanceId = builder.given_an_image_instance().getId().toString();
+        String userId = builder.givenAUser().getId().toString();
+        String imageInstanceId = builder.givenAnImageInstance().getId().toString();
         String userAndImageId = userId + "/" + imageInstanceId;
 
         connectSession(sessionDecorator, userId, imageInstanceId, "true");
@@ -121,8 +121,8 @@ public class WebSocketUserPositionTests {
         ConcurrentWebSocketSessionDecorator followerSession = mock(ConcurrentWebSocketSessionDecorator.class);
         ConcurrentWebSocketSessionDecorator broadcastSession = mock(ConcurrentWebSocketSessionDecorator.class);
 
-        String userId = builder.given_a_user().getId().toString();
-        String imageInstanceId = builder.given_an_image_instance().getId().toString();
+        String userId = builder.givenAUser().getId().toString();
+        String imageInstanceId = builder.givenAnImageInstance().getId().toString();
         String userAndImageId = userId + "/" + imageInstanceId;
 
         connectSession(followerSession, userId, imageInstanceId, "true");
@@ -151,8 +151,8 @@ public class WebSocketUserPositionTests {
         ConcurrentWebSocketSessionDecorator broadcastSession = mock(ConcurrentWebSocketSessionDecorator.class);
         when(followerSession.getId()).thenReturn("5678");
 
-        String userId = builder.given_a_user().getId().toString();
-        String imageInstanceId = builder.given_an_image_instance().getId().toString();
+        String userId = builder.givenAUser().getId().toString();
+        String imageInstanceId = builder.givenAnImageInstance().getId().toString();
         String userAndImageId = userId + "/" + imageInstanceId;
 
         connectSession(followerSession, userId, imageInstanceId, "true");
@@ -181,9 +181,9 @@ public class WebSocketUserPositionTests {
         ConcurrentWebSocketSessionDecorator followerSession3 = mock(ConcurrentWebSocketSessionDecorator.class);
         ConcurrentWebSocketSessionDecorator broadcastSession = mock(ConcurrentWebSocketSessionDecorator.class);
 
-        String userId1 = builder.given_a_user().getId().toString();
-        String userId2 = builder.given_a_user().getId().toString();
-        String imageInstanceId = builder.given_an_image_instance().getId().toString();
+        String userId1 = builder.givenAUser().getId().toString();
+        String userId2 = builder.givenAUser().getId().toString();
+        String imageInstanceId = builder.givenAnImageInstance().getId().toString();
         String userAndImageId = userId1 + "/" + imageInstanceId;
         initFollowingSession(userAndImageId, broadcastSession, followerSession1);
 
@@ -218,8 +218,8 @@ public class WebSocketUserPositionTests {
         ConcurrentWebSocketSessionDecorator followerSession = mock(ConcurrentWebSocketSessionDecorator.class);
         ConcurrentWebSocketSessionDecorator broadcastSession = mock(ConcurrentWebSocketSessionDecorator.class);
 
-        String userId = builder.given_a_user().getId().toString();
-        String imageInstanceId = builder.given_an_image_instance().getId().toString();
+        String userId = builder.givenAUser().getId().toString();
+        String imageInstanceId = builder.givenAnImageInstance().getId().toString();
         String userAndImageId = userId + "/" + imageInstanceId;
 
         connectSession(followerSession, userId, imageInstanceId, "false");
@@ -246,8 +246,8 @@ public class WebSocketUserPositionTests {
         ConcurrentWebSocketSessionDecorator followerSession = mock(ConcurrentWebSocketSessionDecorator.class);
         ConcurrentWebSocketSessionDecorator broadcastSession = mock(ConcurrentWebSocketSessionDecorator.class);
 
-        String userId = builder.given_a_user().getId().toString();
-        String imageInstanceId = builder.given_an_image_instance().getId().toString();
+        String userId = builder.givenAUser().getId().toString();
+        String imageInstanceId = builder.givenAnImageInstance().getId().toString();
         String userAndImageId = userId + "/" + imageInstanceId;
 
         connectSession(followerSession, userId, imageInstanceId, "false");
@@ -272,8 +272,8 @@ public class WebSocketUserPositionTests {
 
     @Test
     public void update_position_of_tracked_user_send_message_works() throws IOException {
-        String userId = builder.given_a_user().getId().toString();
-        String imageInstanceId = builder.given_an_image_instance().getId().toString();
+        String userId = builder.givenAUser().getId().toString();
+        String imageInstanceId = builder.givenAnImageInstance().getId().toString();
 
         WebSocketSession session = mock(WebSocketSession.class);
         connectSession(session, userId, imageInstanceId, "true");
@@ -294,8 +294,8 @@ public class WebSocketUserPositionTests {
 
     @Test
     public void update_position_of_not_tracked_user_do_nothing() {
-        String userId = builder.given_a_user().getId().toString();
-        String imageInstanceId = builder.given_an_image_instance().getId().toString();
+        String userId = builder.givenAUser().getId().toString();
+        String imageInstanceId = builder.givenAnImageInstance().getId().toString();
         assertDoesNotThrow(() -> webSocketUserPositionHandler.sendPositionToFollowers(
             userId,
             imageInstanceId,
@@ -309,7 +309,7 @@ public class WebSocketUserPositionTests {
         ConcurrentWebSocketSessionDecorator followerSession = mock(ConcurrentWebSocketSessionDecorator.class);
         ConcurrentWebSocketSessionDecorator broadcastSession = mock(ConcurrentWebSocketSessionDecorator.class);
 
-        String userId = builder.given_a_user().getId().toString();
+        String userId = builder.givenAUser().getId().toString();
         String userAndImageId = userId + "/imageId";
         connectSession(session, userId, "imageId", "false");
         initFollowingSession(userAndImageId, broadcastSession, followerSession);

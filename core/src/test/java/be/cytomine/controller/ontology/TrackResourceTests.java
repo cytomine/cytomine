@@ -56,7 +56,7 @@ public class TrackResourceTests {
     @Test
     @Transactional
     public void list_tracks_by_imageinstance() throws Exception {
-        Track track = builder.given_a_track();
+        Track track = builder.givenATrack();
         restTrackControllerMockMvc.perform(get("/api/imageinstance/{id}/track.json", track.getImage().getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
@@ -73,7 +73,7 @@ public class TrackResourceTests {
     @Test
     @Transactional
     public void list_tracks_by_project() throws Exception {
-        Track track = builder.given_a_track();
+        Track track = builder.givenATrack();
         restTrackControllerMockMvc.perform(get("/api/project/{id}/track.json", track.getProject().getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
@@ -90,7 +90,7 @@ public class TrackResourceTests {
     @Test
     @Transactional
     public void shouldReturnTrack() throws Exception {
-        Track track = builder.given_a_track();
+        Track track = builder.givenATrack();
         restTrackControllerMockMvc.perform(get("/api/track/{id}.json", track.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(track.getId().intValue()))
@@ -110,7 +110,7 @@ public class TrackResourceTests {
     @Test
     @Transactional
     public void add_valid_track() throws Exception {
-        Track track = builder.given_a_not_persisted_track();
+        Track track = builder.givenANotPersistedTrack();
         restTrackControllerMockMvc.perform(post("/api/track.json")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(track.toJSON()))
@@ -128,7 +128,7 @@ public class TrackResourceTests {
     @Test
     @Transactional
     public void edit_valid_track() throws Exception {
-        Track track = builder.given_a_track();
+        Track track = builder.givenATrack();
         restTrackControllerMockMvc.perform(put("/api/track/{id}.json", track.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(track.toJSON()))
@@ -147,7 +147,7 @@ public class TrackResourceTests {
     @Test
     @Transactional
     public void delete_track() throws Exception {
-        Track track = builder.given_a_track();
+        Track track = builder.givenATrack();
         restTrackControllerMockMvc.perform(delete("/api/track/{id}.json", track.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(track.toJSON()))

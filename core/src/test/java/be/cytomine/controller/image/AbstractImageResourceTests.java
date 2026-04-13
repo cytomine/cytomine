@@ -126,10 +126,10 @@ public class AbstractImageResourceTests {
     @Test
     @Transactional
     public void list_abstract_image_by_width() throws Exception {
-        AbstractImage img500Width = builder.given_an_abstract_image();
+        AbstractImage img500Width = builder.givenAnAbstractImage();
         img500Width.setWidth(500);
         img500Width = builder.persistAndReturn(img500Width);
-        AbstractImage img501Width = builder.given_an_abstract_image();
+        AbstractImage img501Width = builder.givenAnAbstractImage();
         img501Width.setWidth(501);
         img501Width = builder.persistAndReturn(img501Width);
 
@@ -185,18 +185,18 @@ public class AbstractImageResourceTests {
     @Test
     @Transactional
     public void list_abstract_image_by_projects() throws Exception {
-        Project project1 = builder.given_a_project();
-        Project project2 = builder.given_a_project();
-        Project anotherProject = builder.given_a_project();
+        Project project1 = builder.givenAProject();
+        Project project2 = builder.givenAProject();
+        Project anotherProject = builder.givenAProject();
 
-        AbstractImage imageInProject1 = builder.given_an_abstract_image();
-        AbstractImage imageInProject2 = builder.given_an_abstract_image();
-        AbstractImage imageInProject1And2 = builder.given_an_abstract_image();
+        AbstractImage imageInProject1 = builder.givenAnAbstractImage();
+        AbstractImage imageInProject2 = builder.givenAnAbstractImage();
+        AbstractImage imageInProject1And2 = builder.givenAnAbstractImage();
 
-        builder.given_an_image_instance(imageInProject1, project1);
-        builder.given_an_image_instance(imageInProject2, project2);
-        builder.given_an_image_instance(imageInProject1And2, project1);
-        builder.given_an_image_instance(imageInProject1And2, project2);
+        builder.givenAnImageInstance(imageInProject1, project1);
+        builder.givenAnImageInstance(imageInProject2, project2);
+        builder.givenAnImageInstance(imageInProject1And2, project1);
+        builder.givenAnImageInstance(imageInProject1And2, project2);
 
         restAbstractImageControllerMockMvc.perform(get("/api/abstractimage.json"))
             .andExpect(status().isOk())
@@ -239,11 +239,11 @@ public class AbstractImageResourceTests {
     public void list_abstract_image_with_ordering() throws Exception {
         int width = Math.abs(new Random().nextInt());
         // we add width filter to get only the image set defined in this test
-        AbstractImage image1 = builder.given_an_abstract_image();
+        AbstractImage image1 = builder.givenAnAbstractImage();
         image1.setWidth(width);
-        AbstractImage image2 = builder.given_an_abstract_image();
+        AbstractImage image2 = builder.givenAnAbstractImage();
         image2.setWidth(width);
-        AbstractImage image3 = builder.given_an_abstract_image();
+        AbstractImage image3 = builder.givenAnAbstractImage();
         image3.setWidth(width);
 
         restAbstractImageControllerMockMvc.perform(get("/api/abstractimage.json")// default sorting must be created desc
@@ -303,11 +303,11 @@ public class AbstractImageResourceTests {
     public void list_abstract_image_with_pagination() throws Exception {
         int width = Math.abs(new Random().nextInt());
         // we add width filter to get only the image set defined in this test
-        AbstractImage image1 = builder.given_an_abstract_image();
+        AbstractImage image1 = builder.givenAnAbstractImage();
         image1.setWidth(width);
-        AbstractImage image2 = builder.given_an_abstract_image();
+        AbstractImage image2 = builder.givenAnAbstractImage();
         image2.setWidth(width);
-        AbstractImage image3 = builder.given_an_abstract_image();
+        AbstractImage image3 = builder.givenAnAbstractImage();
         image3.setWidth(width);
 
         restAbstractImageControllerMockMvc.perform(get("/api/abstractimage.json")
@@ -403,7 +403,7 @@ public class AbstractImageResourceTests {
     public void get_an_abstract_image() throws Exception {
         AbstractImage image = given_test_abstract_image();
 
-        AbstractSlice slice = builder.given_an_abstract_slice(image, 0, 0, 0);
+        AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
         slice.setUploadedFile(image.getUploadedFile());
         String serverUrl = applicationProperties.getServerURL();
 
@@ -449,7 +449,7 @@ public class AbstractImageResourceTests {
     @Test
     @Transactional
     public void get_an_abstract_image_from_uploaded_file() throws Exception {
-        AbstractImage image = builder.given_an_abstract_image();
+        AbstractImage image = builder.givenAnAbstractImage();
 
         restAbstractImageControllerMockMvc.perform(get(
                 "/api/uploadedfile/{id}/abstractimage.json",
@@ -463,7 +463,7 @@ public class AbstractImageResourceTests {
     @Test
     @Transactional
     public void add_valid_abstract_image() throws Exception {
-        AbstractImage abstractImage = builder.given_a_not_persisted_abstract_image();
+        AbstractImage abstractImage = builder.givenANotPersistedAbstractImage();
         restAbstractImageControllerMockMvc.perform(post("/api/abstractimage.json")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(abstractImage.toJSON()))
@@ -480,7 +480,7 @@ public class AbstractImageResourceTests {
     @Test
     @Transactional
     public void edit_valid_abstract_image() throws Exception {
-        AbstractImage abstractImage = builder.given_an_abstract_image();
+        AbstractImage abstractImage = builder.givenAnAbstractImage();
         JsonObject jsonObject = abstractImage.toJsonObject();
         jsonObject.put("width", 999);
         restAbstractImageControllerMockMvc.perform(put("/api/abstractimage/{id}.json", abstractImage.getId())
@@ -503,7 +503,7 @@ public class AbstractImageResourceTests {
     @Test
     @Transactional
     public void delete_abstract_image() throws Exception {
-        AbstractImage abstractImage = builder.given_an_abstract_image();
+        AbstractImage abstractImage = builder.givenAnAbstractImage();
         restAbstractImageControllerMockMvc.perform(delete("/api/abstractimage/{id}.json", abstractImage.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
@@ -521,8 +521,8 @@ public class AbstractImageResourceTests {
     @Test
     @Transactional
     public void list_unused_abstract_image() throws Exception {
-        AbstractImage imageWithImageInstance = builder.given_an_image_instance().getBaseImage();
-        AbstractImage imageWithoutImageInstance = builder.given_an_abstract_image();
+        AbstractImage imageWithImageInstance = builder.givenAnImageInstance().getBaseImage();
+        AbstractImage imageWithoutImageInstance = builder.givenAnAbstractImage();
 
         restAbstractImageControllerMockMvc.perform(get("/api/abstractimage/unused.json"))
             .andExpect(status().isOk())
@@ -534,11 +534,11 @@ public class AbstractImageResourceTests {
     @Test
     @Transactional
     public void get_abstract_image_uploader() throws Exception {
-        AbstractImage image = builder.given_an_abstract_image();
+        AbstractImage image = builder.givenAnAbstractImage();
 
         restAbstractImageControllerMockMvc.perform(get("/api/abstractimage/{id}/user.json", image.getId()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(builder.given_superadmin().getId()));
+            .andExpect(jsonPath("$.id").value(builder.givenSuperAdmin().getId()));
     }
 
     @Test
@@ -603,7 +603,7 @@ public class AbstractImageResourceTests {
     @Test
     @Transactional
     public void get_abstract_image_thumb() throws Exception {
-        AbstractImage image = builder.given_an_abstract_image();
+        AbstractImage image = builder.givenAnAbstractImage();
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
 
@@ -611,7 +611,7 @@ public class AbstractImageResourceTests {
             .toString()
             .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
 
-        AbstractSlice slice = builder.given_an_abstract_slice(image, 0, 0, 0);
+        AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
         slice.setUploadedFile(image.getUploadedFile());
         configureFor("localhost", 8888);
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
@@ -648,7 +648,7 @@ public class AbstractImageResourceTests {
     @Test
     @Transactional
     public void get_abstract_image_preview() throws Exception {
-        AbstractImage image = builder.given_an_abstract_image();
+        AbstractImage image = builder.givenAnAbstractImage();
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
 
@@ -656,7 +656,7 @@ public class AbstractImageResourceTests {
             .toString()
             .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
 
-        AbstractSlice slice = builder.given_an_abstract_slice(image, 0, 0, 0);
+        AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
         slice.setUploadedFile(image.getUploadedFile());
         configureFor("localhost", 8888);
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
@@ -741,7 +741,7 @@ public class AbstractImageResourceTests {
     public void get_abstract_image_crop() throws Exception {
         AbstractImage image = given_test_abstract_image();
 
-        AbstractSlice slice = builder.given_an_abstract_slice(image, 0, 0, 0);
+        AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
         slice.setUploadedFile(image.getUploadedFile());
 
         configureFor("localhost", 8888);
@@ -785,7 +785,7 @@ public class AbstractImageResourceTests {
     public void get_abstract_image_window() throws Exception {
         AbstractImage image = given_test_abstract_image();
 
-        AbstractSlice slice = builder.given_an_abstract_slice(image, 0, 0, 0);
+        AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
         slice.setUploadedFile(image.getUploadedFile());
 
         byte[] mockResponse = UUID.randomUUID()
@@ -820,7 +820,7 @@ public class AbstractImageResourceTests {
 
 
     private AbstractImage given_test_abstract_image() {
-        AbstractImage image = builder.given_an_abstract_image();
+        AbstractImage image = builder.givenAnAbstractImage();
         image.setWidth(109240);
         image.setHeight(220696);
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");

@@ -130,18 +130,18 @@ public class ImageInstanceResourceTests {
     }
 
     private ImageInstance given_test_image_instance() {
-        AbstractImage image = builder.given_an_abstract_image();
+        AbstractImage image = builder.givenAnAbstractImage();
         image.setWidth(109240);
         image.setHeight(220696);
         image.setOriginalFilename("CMU-2.mrxs");
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setOriginalFilename("CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
-        ImageInstance imageInstance = builder.given_an_image_instance(image, builder.given_a_project());
+        ImageInstance imageInstance = builder.givenAnImageInstance(image, builder.givenAProject());
         imageInstance.setInstanceFilename("CMU-2");
-        AbstractSlice slice = builder.given_an_abstract_slice(image, 0, 0, 0);
+        AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
         slice.setUploadedFile(image.getUploadedFile());
-        SliceInstance sliceInstance = builder.given_a_slice_instance(imageInstance, slice);
+        SliceInstance sliceInstance = builder.givenASliceInstance(imageInstance, slice);
         return imageInstance;
     }
 
@@ -192,7 +192,7 @@ public class ImageInstanceResourceTests {
     public void get_blind_image_instance() throws Exception {
         ImageInstance image = given_test_image_instance();
 
-        User user = builder.given_a_user("get_blind_image_instance");
+        User user = builder.givenAUser("get_blind_image_instance");
         builder.addUserToProject(image.getProject(), user.getUsername(), BasePermission.WRITE); // contributor
 
         image.getProject().setBlindMode(true);
@@ -262,10 +262,10 @@ public class ImageInstanceResourceTests {
     @Test
     @Transactional
     public void list_image_instance_by_user() throws Exception {
-        ImageInstance image = builder.given_an_image_instance();
+        ImageInstance image = builder.givenAnImageInstance();
         image.getBaseImage().setWidth(500);
-        ImageInstance imageFromOtherProjectNotAccessibleForUser = builder.given_an_image_instance();
-        User user = builder.given_a_user("list_image_instance_by_user");
+        ImageInstance imageFromOtherProjectNotAccessibleForUser = builder.givenAnImageInstance();
+        User user = builder.givenAUser("list_image_instance_by_user");
         builder.addUserToProject(image.getProject(), user.getUsername(), BasePermission.WRITE); // contributor
 
         restImageInstanceControllerMockMvc.perform(get("/api/user/{id}/imageinstance.json", user.getId()))
@@ -295,10 +295,10 @@ public class ImageInstanceResourceTests {
     @Test
     @Transactional
     public void list_image_instance_light_by_user() throws Exception {
-        ImageInstance image = builder.given_an_image_instance();
+        ImageInstance image = builder.givenAnImageInstance();
         image.getBaseImage().setWidth(500);
-        ImageInstance imageFromOtherProjectNotAccessibleForUser = builder.given_an_image_instance();
-        User user = builder.given_a_user("list_image_instance_light_by_user");
+        ImageInstance imageFromOtherProjectNotAccessibleForUser = builder.givenAnImageInstance();
+        User user = builder.givenAUser("list_image_instance_light_by_user");
         builder.addUserToProject(image.getProject(), user.getUsername(), BasePermission.WRITE); // contributor
 
 
@@ -315,12 +315,12 @@ public class ImageInstanceResourceTests {
     @Test
     @Transactional
     public void list_image_instance_by_projects() throws Exception {
-        Project project1 = builder.given_a_project();
-        Project anotherProject = builder.given_a_project();
+        Project project1 = builder.givenAProject();
+        Project anotherProject = builder.givenAProject();
 
-        ImageInstance imageInProject1 = builder.given_an_image_instance(builder.given_an_abstract_image(), project1);
-        ImageInstance imageInAnotherProject = builder.given_an_image_instance(
-            builder.given_an_abstract_image(),
+        ImageInstance imageInProject1 = builder.givenAnImageInstance(builder.givenAnAbstractImage(), project1);
+        ImageInstance imageInAnotherProject = builder.givenAnImageInstance(
+            builder.givenAnAbstractImage(),
             anotherProject
         );
 
@@ -343,12 +343,12 @@ public class ImageInstanceResourceTests {
     @Test
     @Transactional
     public void list_image_instance_light() throws Exception {
-        Project project1 = builder.given_a_project();
-        Project anotherProject = builder.given_a_project();
+        Project project1 = builder.givenAProject();
+        Project anotherProject = builder.givenAProject();
 
-        ImageInstance imageInProject1 = builder.given_an_image_instance(builder.given_an_abstract_image(), project1);
-        ImageInstance imageInAnotherProject = builder.given_an_image_instance(
-            builder.given_an_abstract_image(),
+        ImageInstance imageInProject1 = builder.givenAnImageInstance(builder.givenAnAbstractImage(), project1);
+        ImageInstance imageInAnotherProject = builder.givenAnImageInstance(
+            builder.givenAnAbstractImage(),
             anotherProject
         );
 
@@ -367,7 +367,7 @@ public class ImageInstanceResourceTests {
     @Transactional
     @WithMockUser("list_image_instance_by_projects_blind_filenames")
     public void list_image_instance_by_projects_blind_filenames() throws Exception {
-        User user = builder.given_a_user("list_image_instance_by_projects_blind_filenames");
+        User user = builder.givenAUser("list_image_instance_by_projects_blind_filenames");
         ImageInstance image = given_test_image_instance();
 
         builder.addUserToProject(image.getProject(), user.getUsername(), BasePermission.WRITE); // contributor
@@ -387,11 +387,11 @@ public class ImageInstanceResourceTests {
     @Test
     @Transactional
     public void list_image_instance_by_projects_tree() throws Exception {
-        Project project1 = builder.given_a_project();
-        Project anotherProject = builder.given_a_project();
+        Project project1 = builder.givenAProject();
+        Project anotherProject = builder.givenAProject();
 
-        ImageInstance image1InProject1 = builder.given_an_image_instance(builder.given_an_abstract_image(), project1);
-        ImageInstance image2InProject1 = builder.given_an_image_instance(builder.given_an_abstract_image(), project1);
+        ImageInstance image1InProject1 = builder.givenAnImageInstance(builder.givenAnAbstractImage(), project1);
+        ImageInstance image2InProject1 = builder.givenAnImageInstance(builder.givenAnAbstractImage(), project1);
 
 
         restImageInstanceControllerMockMvc.perform(get("/api/project/{id}/imageinstance.json", project1.getId())
@@ -409,11 +409,11 @@ public class ImageInstanceResourceTests {
     @Test
     @Transactional
     public void list_image_instance_by_project_with_annotation_filter() throws Exception {
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
         // we add width filter to get only the image set defined in this test
-        ImageInstance image1 = builder.given_an_image_instance(builder.given_an_abstract_image(), project);
+        ImageInstance image1 = builder.givenAnImageInstance(builder.givenAnAbstractImage(), project);
         image1.setCountImageAnnotations(2L);
-        ImageInstance image2 = builder.given_an_image_instance(builder.given_an_abstract_image(), project);
+        ImageInstance image2 = builder.givenAnImageInstance(builder.givenAnAbstractImage(), project);
         image2.setCountImageAnnotations(4L);
 
         restImageInstanceControllerMockMvc.perform(get("/api/project/{id}/imageinstance.json", project.getId())
@@ -467,14 +467,14 @@ public class ImageInstanceResourceTests {
     @Test
     @Transactional
     public void list_image_instance_by_project_with_pagination() throws Exception {
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
         int width = Math.abs(new Random().nextInt());
         // we add width filter to get only the image set defined in this test
-        ImageInstance image1 = builder.given_an_image_instance(builder.given_an_abstract_image(), project);
+        ImageInstance image1 = builder.givenAnImageInstance(builder.givenAnAbstractImage(), project);
         image1.getBaseImage().setWidth(width);
-        ImageInstance image2 = builder.given_an_image_instance(builder.given_an_abstract_image(), project);
+        ImageInstance image2 = builder.givenAnImageInstance(builder.givenAnAbstractImage(), project);
         image2.getBaseImage().setWidth(width);
-        ImageInstance image3 = builder.given_an_image_instance(builder.given_an_abstract_image(), project);
+        ImageInstance image3 = builder.givenAnImageInstance(builder.givenAnAbstractImage(), project);
         image3.getBaseImage().setWidth(width);
 
         restImageInstanceControllerMockMvc.perform(get("/api/project/{id}/imageinstance.json", project.getId())
@@ -568,12 +568,12 @@ public class ImageInstanceResourceTests {
     @Test
     @Transactional
     public void get_next_image_instance() throws Exception {
-        Project project = builder.given_a_project();
-        ImageInstance imageInstance1 = builder.given_an_image_instance(
-            builder.given_an_abstract_image(), project
+        Project project = builder.givenAProject();
+        ImageInstance imageInstance1 = builder.givenAnImageInstance(
+            builder.givenAnAbstractImage(), project
         );
-        ImageInstance imageInstance2 = builder.given_an_image_instance(
-            builder.given_an_abstract_image(), project
+        ImageInstance imageInstance2 = builder.givenAnImageInstance(
+            builder.givenAnAbstractImage(), project
         );
 
         restImageInstanceControllerMockMvc.perform(get("/api/imageinstance/{id}/next.json", imageInstance2.getId()))
@@ -588,12 +588,12 @@ public class ImageInstanceResourceTests {
     @Test
     @Transactional
     public void get_previous_image_instance() throws Exception {
-        Project project = builder.given_a_project();
-        ImageInstance imageInstance1 = builder.given_an_image_instance(
-            builder.given_an_abstract_image(), project
+        Project project = builder.givenAProject();
+        ImageInstance imageInstance1 = builder.givenAnImageInstance(
+            builder.givenAnAbstractImage(), project
         );
-        ImageInstance imageInstance2 = builder.given_an_image_instance(
-            builder.given_an_abstract_image(), project
+        ImageInstance imageInstance2 = builder.givenAnImageInstance(
+            builder.givenAnAbstractImage(), project
         );
 
         restImageInstanceControllerMockMvc.perform(get("/api/imageinstance/{id}/previous.json", imageInstance1.getId()))
@@ -609,7 +609,7 @@ public class ImageInstanceResourceTests {
     @Test
     @Transactional
     public void add_valid_image_instance() throws Exception {
-        ImageInstance imageInstance = builder.given_a_not_persisted_image_instance();
+        ImageInstance imageInstance = builder.givenANotPersistedImageInstance();
         restImageInstanceControllerMockMvc.perform(post("/api/imageinstance.json")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(imageInstance.toJSON()))
@@ -626,8 +626,8 @@ public class ImageInstanceResourceTests {
     @Test
     @Transactional
     public void edit_valid_image_instance() throws Exception {
-        Project project = builder.given_a_project();
-        ImageInstance imageInstance = builder.given_an_image_instance();
+        Project project = builder.givenAProject();
+        ImageInstance imageInstance = builder.givenAnImageInstance();
         JsonObject jsonObject = imageInstance.toJsonObject();
         jsonObject.put("project", project.getId());
         restImageInstanceControllerMockMvc.perform(put("/api/imageinstance/{id}.json", imageInstance.getId())
@@ -650,7 +650,7 @@ public class ImageInstanceResourceTests {
     @Test
     @Transactional
     public void delete_image_instance() throws Exception {
-        ImageInstance imageInstance = builder.given_an_image_instance();
+        ImageInstance imageInstance = builder.givenAnImageInstance();
         restImageInstanceControllerMockMvc.perform(delete("/api/imageinstance/{id}.json", imageInstance.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
@@ -944,7 +944,7 @@ public class ImageInstanceResourceTests {
     @WithMockUser("download_image_instance_cannot_download")
     @Disabled("Randomly fails")
     public void download_image_instance_cannot_download() throws Exception {
-        User user = builder.given_a_user("download_image_instance_cannot_download");
+        User user = builder.givenAUser("download_image_instance_cannot_download");
 
         ImageInstance image = given_test_image_instance();
         builder.addUserToProject(image.getProject(), user.getUsername(), BasePermission.WRITE);

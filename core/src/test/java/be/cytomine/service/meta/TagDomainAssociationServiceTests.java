@@ -66,9 +66,9 @@ public class TagDomainAssociationServiceTests {
 
     @Test
     public void specification_test() {
-        TagDomainAssociation tagDomainAssociation = builder.given_a_tag_association(
-            builder.given_a_tag(),
-            builder.given_a_project()
+        TagDomainAssociation tagDomainAssociation = builder.givenATagAssociation(
+            builder.givenATag(),
+            builder.givenAProject()
         );
 
         Specification specification =
@@ -84,9 +84,9 @@ public class TagDomainAssociationServiceTests {
 
     @Test
     public void find_by_id() {
-        TagDomainAssociation tagDomainAssociation = builder.given_a_tag_association(
-            builder.given_a_tag(),
-            builder.given_a_project()
+        TagDomainAssociation tagDomainAssociation = builder.givenATagAssociation(
+            builder.givenATag(),
+            builder.givenAProject()
         );
         assertThat(tagDomainAssociationService.find(tagDomainAssociation.getId())).isPresent();
     }
@@ -98,20 +98,20 @@ public class TagDomainAssociationServiceTests {
 
     @Test
     public void get_by_id() {
-        TagDomainAssociation tagDomainAssociation = builder.given_a_tag_association(
-            builder.given_a_tag(),
-            builder.given_a_project()
+        TagDomainAssociation tagDomainAssociation = builder.givenATagAssociation(
+            builder.givenATag(),
+            builder.givenAProject()
         );
         assertThat(tagDomainAssociationService.get(tagDomainAssociation.getId())).isNotNull();
     }
 
     @Test
     public void list_all_for_domain() {
-        Project project = builder.given_a_project();
-        TagDomainAssociation tagDomainAssociation = builder.given_a_tag_association(builder.given_a_tag(), project);
+        Project project = builder.givenAProject();
+        TagDomainAssociation tagDomainAssociation = builder.givenATagAssociation(builder.givenATag(), project);
         TagDomainAssociation
             tagDomainAssociationFromOtherDomain
-            = builder.given_a_tag_association(builder.given_a_tag(), builder.given_a_project());
+            = builder.givenATagAssociation(builder.givenATag(), builder.givenAProject());
         assertThat(tagDomainAssociationService.listAllByDomain(project))
             .contains(tagDomainAssociation)
             .doesNotContain(tagDomainAssociationFromOtherDomain);
@@ -119,12 +119,12 @@ public class TagDomainAssociationServiceTests {
 
     @Test
     public void list_all_for_tag() {
-        Project project = builder.given_a_project();
-        Tag tag = builder.given_a_tag();
-        TagDomainAssociation tagDomainAssociation = builder.given_a_tag_association(tag, project);
-        TagDomainAssociation tagDomainAssociationFromOtherTag = builder.given_a_tag_association(
-            builder.given_a_tag(),
-            builder.given_a_project()
+        Project project = builder.givenAProject();
+        Tag tag = builder.givenATag();
+        TagDomainAssociation tagDomainAssociation = builder.givenATagAssociation(tag, project);
+        TagDomainAssociation tagDomainAssociationFromOtherTag = builder.givenATagAssociation(
+            builder.givenATag(),
+            builder.givenAProject()
         );
         assertThat(tagDomainAssociationService.listAllByTag(tag)).contains(tagDomainAssociation)
             .doesNotContain(tagDomainAssociationFromOtherTag);
@@ -132,15 +132,15 @@ public class TagDomainAssociationServiceTests {
 
     @Test
     public void list_all_for_tag_and_domain() {
-        Project domain1 = builder.given_a_project();
-        UserAnnotation domain2 = builder.given_a_user_annotation();
-        Tag tag1 = builder.given_a_tag();
-        Tag tag2 = builder.given_a_tag();
+        Project domain1 = builder.givenAProject();
+        UserAnnotation domain2 = builder.givenAUserAnnotation();
+        Tag tag1 = builder.givenATag();
+        Tag tag2 = builder.givenATag();
 
-        TagDomainAssociation tag1Domain1 = builder.given_a_tag_association(tag1, domain1);
-        TagDomainAssociation tag2Domain1 = builder.given_a_tag_association(tag2, domain1);
-        TagDomainAssociation tag1Domain2 = builder.given_a_tag_association(tag1, domain2);
-        TagDomainAssociation tag2Domain2 = builder.given_a_tag_association(tag2, domain2);
+        TagDomainAssociation tag1Domain1 = builder.givenATagAssociation(tag1, domain1);
+        TagDomainAssociation tag2Domain1 = builder.givenATagAssociation(tag2, domain1);
+        TagDomainAssociation tag1Domain2 = builder.givenATagAssociation(tag1, domain2);
+        TagDomainAssociation tag2Domain2 = builder.givenATagAssociation(tag2, domain2);
 
         assertThat(tagDomainAssociationService.list(new ArrayList<>(List.of(
             new SearchParameterEntry("tag", SearchOperation.in, List.of(tag1.getId(), tag2.getId())),
@@ -158,7 +158,7 @@ public class TagDomainAssociationServiceTests {
         )))).contains(tag1Domain1).doesNotContain(tag2Domain1);
 
         assertThat(tagDomainAssociationService.list(new ArrayList<>(List.of(
-            new SearchParameterEntry("tag", SearchOperation.in, List.of(builder.given_a_tag().getId())),
+            new SearchParameterEntry("tag", SearchOperation.in, List.of(builder.givenATag().getId())),
             new SearchParameterEntry("domainIdent", SearchOperation.in, List.of(domain1.getId()))
         )))).doesNotContain(tag1Domain1, tag1Domain2, tag2Domain1, tag2Domain2);
     }
@@ -168,9 +168,9 @@ public class TagDomainAssociationServiceTests {
     public void create_tag_association() throws ClassNotFoundException {
         CommandResponse
             add
-            = tagDomainAssociationService.add(builder.given_a_not_persisted_tag_association(
-            builder.given_a_tag(),
-            builder.given_a_project()
+            = tagDomainAssociationService.add(builder.givenANotPersistedTagAssociation(
+            builder.givenATag(),
+            builder.givenAProject()
         ).toJsonObject());
         assertThat(tagDomainAssociationService.listAllByTag(((TagDomainAssociation) add.getObject()).getTag())).hasSize(
             1);
@@ -178,9 +178,9 @@ public class TagDomainAssociationServiceTests {
 
     @Test
     public void delete_tag_association() {
-        TagDomainAssociation tagDomainAssociation = builder.given_a_tag_association(
-            builder.given_a_tag(),
-            builder.given_a_project()
+        TagDomainAssociation tagDomainAssociation = builder.givenATagAssociation(
+            builder.givenATag(),
+            builder.givenAProject()
         );
         CommandResponse delete = tagDomainAssociationService.delete(tagDomainAssociation, null, null, false);
         assertThat(tagDomainAssociationService.listAllByTag(tagDomainAssociation.getTag())).hasSize(0);

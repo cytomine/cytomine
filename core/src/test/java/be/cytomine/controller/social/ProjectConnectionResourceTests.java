@@ -108,8 +108,8 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void add_connection() throws Exception {
-        User user = builder.given_superadmin();
-        Project project = builder.given_a_project();
+        User user = builder.givenSuperAdmin();
+        Project project = builder.givenAProject();
 
         // {"project":"7577928","os":"Linux","browser":"chrome","browserVersion":"97.0.4692"}
         JsonObject jsonObject = new JsonObject();
@@ -133,8 +133,8 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void get_connection_by_user_and_project() throws Exception {
-        User user = builder.given_a_user();
-        Project project1 = builder.given_a_project();
+        User user = builder.givenAUser();
+        Project project1 = builder.givenAProject();
 
         given_a_persistent_connection_in_project(user, project1, DateUtils.addSeconds(new Date(), -3));
         given_a_persistent_connection_in_project(user, project1, DateUtils.addSeconds(new Date(), -2));
@@ -151,9 +151,9 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void get_connection_by_project() throws Exception {
-        User user = builder.given_a_user();
-        User anotherUser = builder.given_a_user();
-        Project project1 = builder.given_a_project();
+        User user = builder.givenAUser();
+        User anotherUser = builder.givenAUser();
+        Project project1 = builder.givenAProject();
 
         given_a_persistent_connection_in_project(user, project1, DateUtils.addSeconds(new Date(), -3));
         given_a_persistent_connection_in_project(anotherUser, project1, DateUtils.addSeconds(new Date(), -2));
@@ -170,8 +170,8 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void get_last_connection_by_project() throws Exception {
-        User user = builder.given_a_user();
-        Project project1 = builder.given_a_project();
+        User user = builder.givenAUser();
+        Project project1 = builder.givenAProject();
 
         given_a_persistent_connection_in_project(user, project1, DateUtils.addSeconds(new Date(), -3));
         given_a_persistent_connection_in_project(user, project1, DateUtils.addSeconds(new Date(), -2));
@@ -188,8 +188,8 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void get_last_connection_by_project_by_user() throws Exception {
-        User user = builder.given_a_user();
-        Project project1 = builder.given_a_project();
+        User user = builder.givenAUser();
+        Project project1 = builder.givenAProject();
 
         given_a_persistent_connection_in_project(user, project1, DateUtils.addSeconds(new Date(), -3));
         given_a_persistent_connection_in_project(user, project1, DateUtils.addSeconds(new Date(), -2));
@@ -207,8 +207,8 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void get_number_connection_by_project() throws Exception {
-        User user = builder.given_a_user();
-        Project project1 = builder.given_a_project();
+        User user = builder.givenAUser();
+        Project project1 = builder.givenAProject();
 
         given_a_persistent_connection_in_project(user, project1, DateUtils.addSeconds(new Date(), -3));
         given_a_persistent_connection_in_project(user, project1, DateUtils.addSeconds(new Date(), -2));
@@ -224,8 +224,8 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void get_number_connection_by_project_heatmap() throws Exception {
-        User user = builder.given_a_user();
-        Project project1 = builder.given_a_project();
+        User user = builder.givenAUser();
+        Project project1 = builder.givenAProject();
 
         given_a_persistent_connection_in_project(user, project1, DateUtils.addSeconds(new Date(), -3));
         given_a_persistent_connection_in_project(user, project1, DateUtils.addSeconds(new Date(), -2));
@@ -241,8 +241,8 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void get_number_connection_by_project_with_period() throws Exception {
-        User user = builder.given_a_user();
-        Project project1 = builder.given_a_project();
+        User user = builder.givenAUser();
+        Project project1 = builder.givenAProject();
 
         given_a_persistent_connection_in_project(user, project1, DateUtils.addSeconds(new Date(), -3));
         given_a_persistent_connection_in_project(user, project1, DateUtils.addSeconds(new Date(), -2));
@@ -259,8 +259,8 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void get_number_connection_frequency_by_user() throws Exception {
-        User user = builder.given_a_user();
-        Project project1 = builder.given_a_project();
+        User user = builder.givenAUser();
+        Project project1 = builder.givenAProject();
 
         given_a_persistent_connection_in_project(user, project1, DateUtils.addSeconds(new Date(), -3));
         given_a_persistent_connection_in_project(user, project1, DateUtils.addSeconds(new Date(), -2));
@@ -276,8 +276,8 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void get_number_connection_frequency_by_user_with_heatmap() throws Exception {
-        User user = builder.given_a_user();
-        Project project1 = builder.given_a_project();
+        User user = builder.givenAUser();
+        Project project1 = builder.givenAProject();
 
         given_a_persistent_connection_in_project(user, project1, DateUtils.addSeconds(new Date(), -3));
         given_a_persistent_connection_in_project(user, project1, DateUtils.addSeconds(new Date(), -2));
@@ -294,8 +294,8 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void get_number_connection_frequency_by_user_with_period() throws Exception {
-        User user = builder.given_a_user();
-        Project project1 = builder.given_a_project();
+        User user = builder.givenAUser();
+        Project project1 = builder.givenAProject();
 
         given_a_persistent_connection_in_project(user, project1, DateUtils.addSeconds(new Date(), -3));
         given_a_persistent_connection_in_project(user, project1, DateUtils.addSeconds(new Date(), -2));
@@ -312,8 +312,8 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void get_connection_frequency() throws Exception {
-        User user = builder.given_a_user();
-        Project project1 = builder.given_a_project();
+        User user = builder.givenAUser();
+        Project project1 = builder.givenAProject();
 
         given_a_persistent_connection_in_project(user, project1, DateUtils.addSeconds(new Date(), -3));
         given_a_persistent_connection_in_project(user, project1, DateUtils.addSeconds(new Date(), -2));
@@ -326,8 +326,8 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void average_econnection() throws Exception {
-        User user = builder.given_a_user();
-        Project project1 = builder.given_a_project();
+        User user = builder.givenAUser();
+        Project project1 = builder.givenAProject();
 
         given_a_persistent_connection_in_project(user, project1, DateUtils.addSeconds(new Date(), -3));
         given_a_persistent_connection_in_project(user, project1, DateUtils.addSeconds(new Date(), -2));
@@ -341,8 +341,8 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void user_connection_count() throws Exception {
-        User user = builder.given_a_user();
-        Project project1 = builder.given_a_project();
+        User user = builder.givenAUser();
+        Project project1 = builder.givenAProject();
 
         given_a_persistent_connection_in_project(user, project1, DateUtils.addSeconds(new Date(), -3));
         given_a_persistent_connection_in_project(user, project1, DateUtils.addSeconds(new Date(), -2));
@@ -357,8 +357,8 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void connection_history() throws Exception {
-        User user = builder.given_a_user();
-        Project project1 = builder.given_a_project();
+        User user = builder.givenAUser();
+        Project project1 = builder.givenAProject();
 
         given_a_persistent_connection_in_project(user, project1, DateUtils.addSeconds(new Date(), -3));
         given_a_persistent_connection_in_project(user, project1, DateUtils.addSeconds(new Date(), -2));
@@ -374,8 +374,8 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void connection_history_with_export_csv() throws Exception {
-        User user = builder.given_a_user();
-        Project project1 = builder.given_a_project();
+        User user = builder.givenAUser();
+        Project project1 = builder.givenAProject();
 
         Date firstDate = DateUtils.addSeconds(new Date(), -3);
         Date secondDate = DateUtils.addSeconds(new Date(), -2);
@@ -420,8 +420,8 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void activity_detail() throws Exception {
-        User user = builder.given_a_user();
-        Project project1 = builder.given_a_project();
+        User user = builder.givenAUser();
+        Project project1 = builder.givenAProject();
 
         PersistentProjectConnection connection = given_a_persistent_connection_in_project(
             user,
@@ -438,8 +438,8 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void activity_detail_with_export_csv() throws Exception {
-        User user = builder.given_a_user();
-        Project project1 = builder.given_a_project();
+        User user = builder.givenAUser();
+        Project project1 = builder.givenAProject();
 
         PersistentProjectConnection connection = given_a_persistent_connection_in_project(
             user,

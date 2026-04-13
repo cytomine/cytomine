@@ -56,7 +56,7 @@ public class DescriptionResourceTests {
     @Test
     @Transactional
     public void list_all_description() throws Exception {
-        Description description = builder.given_a_description(builder.given_a_project());
+        Description description = builder.givenADescription(builder.givenAProject());
         restDescriptionControllerMockMvc.perform(get("/api/description.json"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
@@ -66,7 +66,7 @@ public class DescriptionResourceTests {
     @Test
     @Transactional
     public void get_an_description() throws Exception {
-        Description description = builder.given_a_description(builder.given_a_project());
+        Description description = builder.givenADescription(builder.givenAProject());
         restDescriptionControllerMockMvc.perform(get(
                 "/api/domain/{domainClassName}/{domainIdent}/description.json",
                 description.getDomainClassName(),
@@ -79,7 +79,7 @@ public class DescriptionResourceTests {
     @Test
     @Transactional
     public void get_an_description_does_not_exists() throws Exception {
-        Description description = builder.given_a_not_persisted_description(builder.given_a_project());
+        Description description = builder.givenANotPersistedDescription(builder.givenAProject());
         restDescriptionControllerMockMvc.perform(get(
                 "/api/domain/{domainClassName}/{domainIdent}/description.json",
                 description.getDomainClassName(),
@@ -91,7 +91,7 @@ public class DescriptionResourceTests {
     @Test
     @Transactional
     public void add_valid_description() throws Exception {
-        Description description = builder.given_a_not_persisted_description(builder.given_a_project());
+        Description description = builder.givenANotPersistedDescription(builder.givenAProject());
         restDescriptionControllerMockMvc.perform(post(
                 "/api/domain/{domainClassName}/{domainIdent}/description.json",
                 description.getDomainClassName(),
@@ -112,7 +112,7 @@ public class DescriptionResourceTests {
     @Test
     @Transactional
     public void edit_valid_description() throws Exception {
-        Description description = builder.given_a_not_persisted_description(builder.given_a_project());
+        Description description = builder.givenANotPersistedDescription(builder.givenAProject());
         builder.persistAndReturn(description);
         restDescriptionControllerMockMvc.perform(put(
                 "/api/domain/{domainClassName}/{domainIdent}/description.json",
@@ -135,7 +135,7 @@ public class DescriptionResourceTests {
     @Test
     @Transactional
     public void delete_description() throws Exception {
-        Description description = builder.given_a_not_persisted_description(builder.given_a_project());
+        Description description = builder.givenANotPersistedDescription(builder.givenAProject());
         builder.persistAndReturn(description);
         restDescriptionControllerMockMvc.perform(delete(
                 "/api/domain/{domainClassName}/{domainIdent}/description.json",

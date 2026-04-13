@@ -56,7 +56,7 @@ public class TermAuthorizationTest extends CRDAuthorizationTest {
     @BeforeEach
     public void before() throws Exception {
         if (term == null) {
-            term = builder.given_a_term();
+            term = builder.givenATerm();
             ;
             initACL(term.container());
         }
@@ -86,12 +86,12 @@ public class TermAuthorizationTest extends CRDAuthorizationTest {
     @Override
     protected void when_i_add_domain() {
         termService.add(
-            basicInstanceBuilder.given_a_not_persisted_term(term.getOntology()).toJsonObject());
+            basicInstanceBuilder.givenANotPersistedTerm(term.getOntology()).toJsonObject());
     }
 
     @Override
     protected void when_i_delete_domain() {
-        Term termToDelete = builder.given_a_term(term.getOntology());
+        Term termToDelete = builder.givenATerm(term.getOntology());
         termService.delete(termToDelete, null, null, true);
     }
 

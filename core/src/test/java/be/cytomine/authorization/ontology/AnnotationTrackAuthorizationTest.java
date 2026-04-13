@@ -60,7 +60,7 @@ public class AnnotationTrackAuthorizationTest extends CRDAuthorizationTest {
     @BeforeEach
     public void before() throws Exception {
         if (annotationTrack == null) {
-            annotationTrack = builder.given_a_annotation_track();
+            annotationTrack = builder.givenAnAnnotationTrack();
             ;
             initACL(annotationTrack.container());
         }
@@ -95,12 +95,12 @@ public class AnnotationTrackAuthorizationTest extends CRDAuthorizationTest {
 
     @Override
     protected void when_i_add_domain() {
-        UserAnnotation annotation = builder.given_a_user_annotation();
+        UserAnnotation annotation = builder.givenAUserAnnotation();
         annotation.setImage(annotationTrack.getTrack().getImage());
         annotation.setProject(annotationTrack.getTrack().getProject());
 
         annotationTrackService.add(
-            builder.given_a_not_persisted_annotation_track()
+            builder.givenANotPersistedAnnotationTrack()
                 .toJsonObject()
                 .withChange("annotationIdent", annotation.getId())
                 .withChange("track", this.annotationTrack.getTrack().getId()));
@@ -109,11 +109,11 @@ public class AnnotationTrackAuthorizationTest extends CRDAuthorizationTest {
 
     @Override
     protected void when_i_delete_domain() {
-        UserAnnotation annotation = builder.given_a_user_annotation();
+        UserAnnotation annotation = builder.givenAUserAnnotation();
         annotation.setImage(annotationTrack.getTrack().getImage());
         annotation.setProject(annotationTrack.getTrack().getProject());
 
-        AnnotationTrack annotationTrackToDelete = builder.given_a_annotation_track();
+        AnnotationTrack annotationTrackToDelete = builder.givenAnAnnotationTrack();
         annotationTrackToDelete.setAnnotation(annotation);
         annotationTrackToDelete.setTrack(this.annotationTrack.getTrack());
         annotationTrackService.delete(annotationTrackToDelete, null, null, true);

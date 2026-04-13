@@ -88,9 +88,9 @@ public class RelationTermResourceTests {
     @Test
     @Transactional
     public void getATermRelation() throws Exception {
-        RelationTerm relationTerm = builder.given_a_relation_term();
+        RelationTerm relationTerm = builder.givenARelationTerm();
         long ontologyId = relationTerm.getTerm1().getOntology().getId();
-        long userId = builder.given_superadmin().getId();
+        long userId = builder.givenSuperAdmin().getId();
         TermRelationResponse expected = buildResponse(relationTerm, ontologyId);
         when(termRelationHttpContract.findTermByID(eq(relationTerm.getId()), eq(userId)))
             .thenReturn(Optional.of(expected));
@@ -106,7 +106,7 @@ public class RelationTermResourceTests {
     @Test
     @Transactional
     public void getATermRelationNotFoundReturns404() throws Exception {
-        long userId = builder.given_superadmin().getId();
+        long userId = builder.givenSuperAdmin().getId();
         when(termRelationHttpContract.findTermByID(eq(999L), eq(userId))).thenReturn(Optional.empty());
 
         restRelationTermControllerMockMvc.perform(get("/api/relation/term/{id}.json", 999L))
@@ -116,9 +116,9 @@ public class RelationTermResourceTests {
     @Test
     @Transactional
     public void addTermRelation() throws Exception {
-        RelationTerm relationTerm = builder.given_a_relation_term();
+        RelationTerm relationTerm = builder.givenARelationTerm();
         long ontologyId = relationTerm.getTerm1().getOntology().getId();
-        long userId = builder.given_superadmin().getId();
+        long userId = builder.givenSuperAdmin().getId();
         UUID commandId = UUID.randomUUID();
         CreateTermRelation createTermRelation = new CreateTermRelation(
             relationTerm.getTerm1().getId(),
@@ -145,8 +145,8 @@ public class RelationTermResourceTests {
     @Test
     @Transactional
     public void addTermRelationWithNoWriteAccessReturnsEmpty() throws Exception {
-        RelationTerm relationTerm = builder.given_a_relation_term();
-        long userId = builder.given_superadmin().getId();
+        RelationTerm relationTerm = builder.givenARelationTerm();
+        long userId = builder.givenSuperAdmin().getId();
         CreateTermRelation createTermRelation = new CreateTermRelation(
             relationTerm.getTerm1().getId(),
             relationTerm.getTerm2().getId(), RelationTerm.PARENT
@@ -168,9 +168,9 @@ public class RelationTermResourceTests {
     @Test
     @Transactional
     public void editTermRelation() throws Exception {
-        RelationTerm relationTerm = builder.given_a_relation_term();
+        RelationTerm relationTerm = builder.givenARelationTerm();
         long ontologyId = relationTerm.getTerm1().getOntology().getId();
-        long userId = builder.given_superadmin().getId();
+        long userId = builder.givenSuperAdmin().getId();
         UUID commandId = UUID.randomUUID();
         UpdateTermRelation updateTermRelation = new UpdateTermRelation(
             Optional.of(relationTerm.getTerm1().getId()),
@@ -198,8 +198,8 @@ public class RelationTermResourceTests {
     @Test
     @Transactional
     public void editTermRelationWithNoWriteAccessReturnsNotFound() throws Exception {
-        RelationTerm relationTerm = builder.given_a_relation_term();
-        long userId = builder.given_superadmin().getId();
+        RelationTerm relationTerm = builder.givenARelationTerm();
+        long userId = builder.givenSuperAdmin().getId();
         UpdateTermRelation updateTermRelation = new UpdateTermRelation(
             Optional.of(relationTerm.getTerm1().getId()),
             Optional.of(relationTerm.getTerm2().getId()), Optional.empty()
@@ -219,9 +219,9 @@ public class RelationTermResourceTests {
     @Test
     @Transactional
     public void deleteTermRelation() throws Exception {
-        RelationTerm relationTerm = builder.given_a_relation_term();
+        RelationTerm relationTerm = builder.givenARelationTerm();
         long ontologyId = relationTerm.getTerm1().getOntology().getId();
-        long userId = builder.given_superadmin().getId();
+        long userId = builder.givenSuperAdmin().getId();
         UUID commandId = UUID.randomUUID();
         HttpCommandResponse expected = new HttpCommandResponse(
             true, buildResponse(relationTerm, ontologyId),
@@ -240,8 +240,8 @@ public class RelationTermResourceTests {
     @Test
     @Transactional
     public void deleteTermRelationWithNoDeleteAccessReturnsNotFound() throws Exception {
-        RelationTerm relationTerm = builder.given_a_relation_term();
-        long userId = builder.given_superadmin().getId();
+        RelationTerm relationTerm = builder.givenARelationTerm();
+        long userId = builder.givenSuperAdmin().getId();
         when(termRelationHttpContract.delete(eq(relationTerm.getId()), eq(userId))).thenReturn(Optional.empty());
 
         restRelationTermControllerMockMvc.perform(delete("/api/relation/term/{id}.json", relationTerm.getId()))

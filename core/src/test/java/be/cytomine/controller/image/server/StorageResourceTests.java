@@ -43,8 +43,8 @@ public class StorageResourceTests {
     @Test
     @Transactional
     public void list_user_storages() throws Exception {
-        Storage storage = builder.given_a_storage();
-        Storage otherUserStorage = builder.given_a_storage(builder.given_a_user());
+        Storage storage = builder.givenAStorage();
+        Storage otherUserStorage = builder.givenAStorage(builder.givenAUser());
         restStorageControllerMockMvc.perform(get("/api/storage.json"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
@@ -55,8 +55,8 @@ public class StorageResourceTests {
     @Test
     @Transactional
     public void list_all_storages() throws Exception {
-        Storage storage = builder.given_a_storage();
-        Storage otherUserStorage = builder.given_a_storage(builder.given_a_user());
+        Storage storage = builder.givenAStorage();
+        Storage otherUserStorage = builder.givenAStorage(builder.givenAUser());
         restStorageControllerMockMvc.perform(get("/api/storage.json").param("all", "true"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
@@ -67,7 +67,7 @@ public class StorageResourceTests {
     @Test
     @Transactional
     public void get_a_storage() throws Exception {
-        Storage storage = builder.given_a_storage();
+        Storage storage = builder.givenAStorage();
 
         restStorageControllerMockMvc.perform(get("/api/storage/{id}.json", storage.getId()))
             .andExpect(status().isOk())
@@ -83,7 +83,7 @@ public class StorageResourceTests {
     @Transactional
     public void add_valid_storage() throws Exception {
         Storage storage =
-            basicInstanceBuilder.given_a_not_persisted_storage(builder.given_superadmin());
+            basicInstanceBuilder.givenANotPersistedStorage(builder.givenSuperAdmin());
         restStorageControllerMockMvc.perform(post("/api/storage.json")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(storage.toJSON()))
@@ -102,7 +102,7 @@ public class StorageResourceTests {
     @Transactional
     public void add_storage_refused_if_name_not_set() throws Exception {
         Storage storage =
-            basicInstanceBuilder.given_a_not_persisted_storage(builder.given_superadmin());
+            basicInstanceBuilder.givenANotPersistedStorage(builder.givenSuperAdmin());
         storage.setName(null);
         restStorageControllerMockMvc.perform(post("/api/storage.json")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -114,7 +114,7 @@ public class StorageResourceTests {
     @Test
     @Transactional
     public void edit_valid_storage() throws Exception {
-        Storage storage = builder.given_a_storage();
+        Storage storage = builder.givenAStorage();
         restStorageControllerMockMvc.perform(put("/api/storage/{id}.json", storage.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(storage.toJSON()))
@@ -132,7 +132,7 @@ public class StorageResourceTests {
     @Test
     @Transactional
     public void delete_storage() throws Exception {
-        Storage storage = builder.given_a_storage();
+        Storage storage = builder.givenAStorage();
         restStorageControllerMockMvc.perform(delete("/api/storage/{id}.json", storage.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(storage.toJSON()))

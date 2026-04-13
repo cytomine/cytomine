@@ -60,7 +60,7 @@ public class TagResourceTests {
     @Test
     @Transactional
     public void list_all_tags() throws Exception {
-        Tag tag = builder.given_a_tag();
+        Tag tag = builder.givenATag();
         restTagControllerMockMvc.perform(get("/api/tag.json"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
@@ -70,7 +70,7 @@ public class TagResourceTests {
     @Test
     @Transactional
     public void get_a_tag() throws Exception {
-        Tag tag = builder.given_a_tag();
+        Tag tag = builder.givenATag();
 
         restTagControllerMockMvc.perform(get("/api/tag/{id}.json", tag.getId()))
             .andExpect(status().isOk())
@@ -78,15 +78,15 @@ public class TagResourceTests {
             .andExpect(jsonPath("$.class").value("be.cytomine.domain.meta.Tag"))
             .andExpect(jsonPath("$.created").exists())
             .andExpect(jsonPath("$.name").value(tag.getName()))
-            .andExpect(jsonPath("$.creatorName").value(builder.given_superadmin().getUsername()))
-            .andExpect(jsonPath("$.user").value(builder.given_superadmin().getId()))
+            .andExpect(jsonPath("$.creatorName").value(builder.givenSuperAdmin().getUsername()))
+            .andExpect(jsonPath("$.user").value(builder.givenSuperAdmin().getId()))
         ;
     }
 
     @Test
     @Transactional
     public void add_valid_tag() throws Exception {
-        Tag tag = builder.given_a_not_persisted_tag("xxx");
+        Tag tag = builder.givenANotPersistedTag("xxx");
         restTagControllerMockMvc.perform(post("/api/tag.json")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(tag.toJSON()))
@@ -105,7 +105,7 @@ public class TagResourceTests {
     @Test
     @Transactional
     public void add_tag_refused_if_already_exists() throws Exception {
-        Tag tag = builder.given_a_not_persisted_tag("xxx");
+        Tag tag = builder.givenANotPersistedTag("xxx");
         builder.persistAndReturn(tag);
         restTagControllerMockMvc.perform(post("/api/tag.json")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -117,7 +117,7 @@ public class TagResourceTests {
     @Test
     @Transactional
     public void add_tag_refused_if_name_not_set() throws Exception {
-        Tag tag = builder.given_a_not_persisted_tag(null);
+        Tag tag = builder.givenANotPersistedTag(null);
         restTagControllerMockMvc.perform(post("/api/tag.json")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(tag.toJSON()))
@@ -128,7 +128,7 @@ public class TagResourceTests {
     @Test
     @Transactional
     public void edit_valid_tag() throws Exception {
-        Tag tag = builder.given_a_tag();
+        Tag tag = builder.givenATag();
         restTagControllerMockMvc.perform(put("/api/tag/{id}.json", tag.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(tag.toJsonObject().withChange("name", "new name").toJsonString()))
@@ -148,7 +148,7 @@ public class TagResourceTests {
     @Test
     @Transactional
     public void fail_when_editing_tag_does_not_exists() throws Exception {
-        Tag tag = builder.given_a_tag();
+        Tag tag = builder.givenATag();
         em.remove(tag);
         restTagControllerMockMvc.perform(put("/api/tag/{id}.json", 0)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -162,7 +162,7 @@ public class TagResourceTests {
     @Test
     @Transactional
     public void delete_tag() throws Exception {
-        Tag tag = builder.given_a_tag();
+        Tag tag = builder.givenATag();
         restTagControllerMockMvc.perform(delete("/api/tag/{id}.json", tag.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(tag.toJSON()))

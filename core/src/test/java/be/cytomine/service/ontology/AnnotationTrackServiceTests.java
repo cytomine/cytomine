@@ -65,7 +65,7 @@ public class AnnotationTrackServiceTests {
 
     @Test
     void get_annotationTrack_with_success() {
-        AnnotationTrack annotationTrack = builder.given_a_annotation_track();
+        AnnotationTrack annotationTrack = builder.givenAnAnnotationTrack();
         assertThat(annotationTrack).isEqualTo(annotationTrackService.get(annotationTrack.getId()));
     }
 
@@ -76,7 +76,7 @@ public class AnnotationTrackServiceTests {
 
     @Test
     void find_annotationTrack_with_success() {
-        AnnotationTrack annotationTrack = builder.given_a_annotation_track();
+        AnnotationTrack annotationTrack = builder.givenAnAnnotationTrack();
         assertThat(annotationTrackService.find(annotationTrack.getId()).isPresent());
         assertThat(annotationTrack).isEqualTo(annotationTrackService.find(annotationTrack.getId()).get());
     }
@@ -88,8 +88,8 @@ public class AnnotationTrackServiceTests {
 
     @Test
     void find_annotationTrack_with_annotation_and_track() {
-        AnnotationTrack annotationTrack = builder.given_a_annotation_track();
-        UserAnnotation annotation = builder.given_a_user_annotation();
+        AnnotationTrack annotationTrack = builder.givenAnAnnotationTrack();
+        UserAnnotation annotation = builder.givenAUserAnnotation();
         annotationTrack.setAnnotation(annotation);
         assertThat(annotationTrackService.find(annotation, annotationTrack.getTrack()).isPresent());
     }
@@ -97,23 +97,23 @@ public class AnnotationTrackServiceTests {
 
     @Test
     void list_all_annotationTrack_by_track() {
-        AnnotationTrack annotationTrack = builder.given_a_annotation_track();
+        AnnotationTrack annotationTrack = builder.givenAnAnnotationTrack();
         assertThat(annotationTrack).isIn(annotationTrackService.list(annotationTrack.getTrack()));
-        assertThat(annotationTrackService.list(builder.given_a_track())).isEmpty();
+        assertThat(annotationTrackService.list(builder.givenATrack())).isEmpty();
     }
 
     @Test
     void list_all_annotationTrack_by_annotation() {
-        AnnotationTrack annotationTrack = builder.given_a_annotation_track();
-        UserAnnotation annotation = builder.given_a_user_annotation();
+        AnnotationTrack annotationTrack = builder.givenAnAnnotationTrack();
+        UserAnnotation annotation = builder.givenAUserAnnotation();
         annotationTrack.setAnnotation(annotation);
         assertThat(annotationTrack).isIn(annotationTrackService.list(annotation));
-        assertThat(annotationTrackService.list(builder.given_a_user_annotation())).isEmpty();
+        assertThat(annotationTrackService.list(builder.givenAUserAnnotation())).isEmpty();
     }
 
     @Test
     void add_valid_annotationTrack_with_success() {
-        AnnotationTrack annotationTrack = builder.given_a_not_persisted_annotation_track();
+        AnnotationTrack annotationTrack = builder.givenANotPersistedAnnotationTrack();
 
         CommandResponse commandResponse = annotationTrackService.add(annotationTrack.toJsonObject());
 
@@ -123,7 +123,7 @@ public class AnnotationTrackServiceTests {
 
     @Test
     void add_valid_annotationTrack_already_exists() {
-        AnnotationTrack annotationTrack = builder.given_a_annotation_track();
+        AnnotationTrack annotationTrack = builder.givenAnAnnotationTrack();
 
         Assertions.assertThrows(
             AlreadyExistException.class, () -> {
@@ -135,7 +135,7 @@ public class AnnotationTrackServiceTests {
 
     @Test
     void add_valid_annotationTrack_with_direct_method() {
-        AnnotationTrack annotationTrack = builder.given_a_not_persisted_annotation_track();
+        AnnotationTrack annotationTrack = builder.givenANotPersistedAnnotationTrack();
         CommandResponse commandResponse = annotationTrackService.addAnnotationTrack(
             annotationTrack.getAnnotationClassName(),
             annotationTrack.getAnnotationIdent(),
@@ -149,7 +149,7 @@ public class AnnotationTrackServiceTests {
 
     @Test
     void delete_annotationTrack_with_success() {
-        AnnotationTrack annotationTrack = builder.given_a_annotation_track();
+        AnnotationTrack annotationTrack = builder.givenAnAnnotationTrack();
 
         CommandResponse commandResponse = annotationTrackService.delete(annotationTrack, null, null, true);
 

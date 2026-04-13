@@ -160,8 +160,8 @@ public class UserAnnotationResourceTests {
     @Test
     @Transactional
     public void get_a_user_annotation() throws Exception {
-        UserAnnotation userAnnotation = builder.given_a_user_annotation();
-        builder.given_an_annotation_term(userAnnotation);
+        UserAnnotation userAnnotation = builder.givenAUserAnnotation();
+        builder.givenAnAnnotationTerm(userAnnotation);
         em.refresh(userAnnotation);
         restUserAnnotationControllerMockMvc.perform(get("/api/userannotation/{id}.json", userAnnotation.getId()))
             .andExpect(status().isOk())
@@ -189,7 +189,7 @@ public class UserAnnotationResourceTests {
     @Test
     @Transactional
     public void list_annotations_light() throws Exception {
-        UserAnnotation userAnnotation = builder.given_a_user_annotation();
+        UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         restUserAnnotationControllerMockMvc.perform(get("/api/userannotation.json", userAnnotation.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.id=='" + userAnnotation.getId() + "')]").exists());
@@ -199,7 +199,7 @@ public class UserAnnotationResourceTests {
     @Test
     @Transactional
     public void count_annotations_by_user() throws Exception {
-        UserAnnotation userAnnotation = builder.given_a_user_annotation();
+        UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         restUserAnnotationControllerMockMvc.perform(get(
                 "/api/user/{idUser}/userannotation/count.json",
                 userAnnotation.getUser().getId()
@@ -207,7 +207,7 @@ public class UserAnnotationResourceTests {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.total").value(greaterThan(0)));
 
-        User newUser = builder.given_a_user();
+        User newUser = builder.givenAUser();
         restUserAnnotationControllerMockMvc.perform(get(
                 "/api/user/{idUser}/userannotation/count.json",
                 newUser.getId()
@@ -219,7 +219,7 @@ public class UserAnnotationResourceTests {
     @Test
     @Transactional
     public void count_annotations_by_project() throws Exception {
-        UserAnnotation userAnnotation = builder.given_a_user_annotation();
+        UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         restUserAnnotationControllerMockMvc.perform(get(
                 "/api/user/{idUser}/userannotation/count.json",
                 userAnnotation.getUser().getId()
@@ -228,7 +228,7 @@ public class UserAnnotationResourceTests {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.total").value(greaterThan(0)));
 
-        Project projectWithoutAnnotation = builder.given_a_project();
+        Project projectWithoutAnnotation = builder.givenAProject();
         restUserAnnotationControllerMockMvc.perform(get(
                 "/api/user/{idUser}/userannotation/count.json",
                 userAnnotation.getUser().getId()
@@ -242,11 +242,11 @@ public class UserAnnotationResourceTests {
     @Test
     @Transactional
     public void count_annotations_by_project_with_dates() throws Exception {
-        UserAnnotation oldUserAnnotation = builder.given_a_user_annotation();
+        UserAnnotation oldUserAnnotation = builder.givenAUserAnnotation();
         oldUserAnnotation.setCreated(DateUtils.addDays(new Date(), -1));
 
         UserAnnotation newUserAnnotation =
-            builder.persistAndReturn(builder.given_a_not_persisted_user_annotation(oldUserAnnotation.getProject()));
+            builder.persistAndReturn(builder.givenANotPersistedUserAnnotation(oldUserAnnotation.getProject()));
 
 
         restUserAnnotationControllerMockMvc.perform(get(
@@ -335,12 +335,12 @@ public class UserAnnotationResourceTests {
     }
 
     private void buildDownloadContext() throws ParseException {
-        this.project = builder.given_a_project();
-        this.image = builder.given_an_image_instance(this.project);
-        this.slice = builder.given_a_slice_instance(this.image, 0, 0, 0);
-        this.term = builder.given_a_term(this.project.getOntology());
-        this.me = builder.given_superadmin();
-        this.userAnnotation = builder.given_a_user_annotation(
+        this.project = builder.givenAProject();
+        this.image = builder.givenAnImageInstance(this.project);
+        this.slice = builder.givenASliceInstance(this.image, 0, 0, 0);
+        this.term = builder.givenATerm(this.project.getOntology());
+        this.me = builder.givenSuperAdmin();
+        this.userAnnotation = builder.givenAUserAnnotation(
             this.slice,
             "POLYGON((1 1,5 1,5 5,1 5,1 1))",
             this.me,
@@ -392,7 +392,7 @@ public class UserAnnotationResourceTests {
     @Test
     @Transactional
     public void add_valid_user_annotation() throws Exception {
-        UserAnnotation userAnnotation = builder.given_a_not_persisted_user_annotation();
+        UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation();
 
         restUserAnnotationControllerMockMvc.perform(post("/api/userannotation.json")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -410,7 +410,7 @@ public class UserAnnotationResourceTests {
     @Test
     @Transactional
     public void add_user_annotation_with_not_valid_location() throws Exception {
-        UserAnnotation userAnnotation = builder.given_a_not_persisted_user_annotation();
+        UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation();
         JsonObject jsonObject = userAnnotation.toJsonObject();
         jsonObject.put(
             "location",
@@ -425,7 +425,7 @@ public class UserAnnotationResourceTests {
     @Test
     @Transactional
     public void add_valid_user_annotation_without_project() throws Exception {
-        UserAnnotation userAnnotation = builder.given_a_not_persisted_user_annotation();
+        UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation();
         JsonObject jsonObject = userAnnotation.toJsonObject();
         jsonObject.remove("project");
 
@@ -440,10 +440,10 @@ public class UserAnnotationResourceTests {
     @Test
     @Transactional
     public void add_valid_user_annotation_with_terms() throws Exception {
-        UserAnnotation userAnnotation = builder.given_a_not_persisted_user_annotation();
+        UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation();
 
-        Term term1 = builder.given_a_term(userAnnotation.getProject().getOntology());
-        Term term2 = builder.given_a_term(userAnnotation.getProject().getOntology());
+        Term term1 = builder.givenATerm(userAnnotation.getProject().getOntology());
+        Term term2 = builder.givenATerm(userAnnotation.getProject().getOntology());
         JsonObject jsonObject = userAnnotation.toJsonObject();
         jsonObject.put("term", Arrays.asList(term1.getId(), term2.getId()));
 
@@ -458,7 +458,7 @@ public class UserAnnotationResourceTests {
     @Test
     @Transactional
     public void edit_valid_user_annotation() throws Exception {
-        UserAnnotation userAnnotation = builder.given_a_user_annotation();
+        UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         restUserAnnotationControllerMockMvc.perform(put("/api/userannotation/{id}.json", userAnnotation.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(userAnnotation.toJSON()))
@@ -476,7 +476,7 @@ public class UserAnnotationResourceTests {
     @Test
     @Transactional
     public void delete_user_annotation() throws Exception {
-        UserAnnotation userAnnotation = builder.given_a_user_annotation();
+        UserAnnotation userAnnotation = builder.givenAUserAnnotation();
 
         restUserAnnotationControllerMockMvc.perform(delete("/api/userannotation/{id}.json", userAnnotation.getId())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -496,7 +496,7 @@ public class UserAnnotationResourceTests {
     @Test
     @Transactional
     public void delete_user_annotation_not_exist_fails() throws Exception {
-        UserAnnotation userAnnotation = builder.given_a_user_annotation();
+        UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         restUserAnnotationControllerMockMvc.perform(delete("/api/userannotation/{id}.json", 0)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(userAnnotation.toJSON()))
@@ -623,20 +623,20 @@ public class UserAnnotationResourceTests {
 
     public static UserAnnotation given_a_user_annotation_with_valid_image_server(BasicInstanceBuilder builder)
         throws ParseException {
-        AbstractImage image = builder.given_an_abstract_image();
+        AbstractImage image = builder.givenAnAbstractImage();
         image.setWidth(109240);
         image.setHeight(220696);
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
-        ImageInstance imageInstance = builder.given_an_image_instance(image, builder.given_a_project());
+        ImageInstance imageInstance = builder.givenAnImageInstance(image, builder.givenAProject());
         imageInstance.setInstanceFilename("CMU-2");
-        AbstractSlice slice = builder.given_an_abstract_slice(image, 0, 0, 0);
+        AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
         slice.setUploadedFile(image.getUploadedFile());
-        SliceInstance sliceInstance = builder.given_a_slice_instance(imageInstance, slice);
+        SliceInstance sliceInstance = builder.givenASliceInstance(imageInstance, slice);
         UserAnnotation userAnnotation
-            = builder.given_a_user_annotation(
+            = builder.givenAUserAnnotation(
             sliceInstance,
-            "POLYGON((1 1,50 10,50 50,10 50,1 1))", builder.given_superadmin(), null
+            "POLYGON((1 1,50 10,50 50,10 50,1 1))", builder.givenSuperAdmin(), null
         );
         return userAnnotation;
     }
@@ -644,12 +644,12 @@ public class UserAnnotationResourceTests {
     @Test
     @Transactional
     public void create_comments_for_annotation() throws Exception {
-        SharedAnnotation annotation = builder.given_a_shared_annotation();
+        SharedAnnotation annotation = builder.givenASharedAnnotation();
 
         JsonObject jsonObject = annotation.toJsonObject();
         jsonObject.put("subject", "subject for test mail");
         jsonObject.put("message", "message for test mail");
-        jsonObject.put("users", List.of(builder.given_superadmin().getId()));
+        jsonObject.put("users", List.of(builder.givenSuperAdmin().getId()));
 
         restUserAnnotationControllerMockMvc.perform(post(
                 "/api/userannotation/{id}/comment.json",
@@ -669,8 +669,8 @@ public class UserAnnotationResourceTests {
     @Test
     @Transactional
     public void get_comment_for_annotation() throws Exception {
-        UserAnnotation userAnnotation = builder.given_a_user_annotation();
-        SharedAnnotation comment = builder.given_a_shared_annotation(userAnnotation);
+        UserAnnotation userAnnotation = builder.givenAUserAnnotation();
+        SharedAnnotation comment = builder.givenASharedAnnotation(userAnnotation);
 
         restUserAnnotationControllerMockMvc.perform(get(
                 "/api/userannotation/{annotation}/comment/{id}.json",
@@ -684,8 +684,8 @@ public class UserAnnotationResourceTests {
     @Test
     @Transactional
     public void list_comment_for_annotation() throws Exception {
-        UserAnnotation userAnnotation = builder.given_a_user_annotation();
-        SharedAnnotation comment = builder.given_a_shared_annotation(userAnnotation);
+        UserAnnotation userAnnotation = builder.givenAUserAnnotation();
+        SharedAnnotation comment = builder.givenASharedAnnotation(userAnnotation);
 
         restUserAnnotationControllerMockMvc.perform(get(
                 "/api/userannotation/{annotation}/comment.json",
@@ -698,10 +698,10 @@ public class UserAnnotationResourceTests {
     @Test
     @Transactional
     public void list_comment_for_annotation_with_pagination() throws Exception {
-        UserAnnotation userAnnotation = builder.given_a_user_annotation();
-        builder.given_a_shared_annotation(userAnnotation);
-        builder.given_a_shared_annotation(userAnnotation);
-        builder.given_a_shared_annotation(userAnnotation);
+        UserAnnotation userAnnotation = builder.givenAUserAnnotation();
+        builder.givenASharedAnnotation(userAnnotation);
+        builder.givenASharedAnnotation(userAnnotation);
+        builder.givenASharedAnnotation(userAnnotation);
 
         restUserAnnotationControllerMockMvc.perform(get(
                 "/api/userannotation/{annotation}/comment.json",

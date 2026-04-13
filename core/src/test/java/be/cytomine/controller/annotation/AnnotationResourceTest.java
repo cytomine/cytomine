@@ -31,7 +31,7 @@ public class AnnotationResourceTest {
 
     @Test
     public void getByIdShouldReturnAnnotation() throws Exception {
-        Annotation annotation = builder.given_a_persisted_annotation();
+        Annotation annotation = builder.givenAPersistedAnnotation();
 
         mockMvc.perform(get("/api/annotations/{id}", annotation.getId()))
             .andExpect(status().isOk())

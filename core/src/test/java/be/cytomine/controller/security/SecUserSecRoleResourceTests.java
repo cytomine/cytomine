@@ -84,7 +84,7 @@ public class SecUserSecRoleResourceTests {
 
         restSecUserSecRoleControllerMockMvc.perform(get(
                 "/api/user/{user}/role.json",
-                builder.given_superadmin().getId()
+                builder.givenSuperAdmin().getId()
             ))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThanOrEqualTo(1))))
@@ -97,7 +97,7 @@ public class SecUserSecRoleResourceTests {
 
         restSecUserSecRoleControllerMockMvc.perform(get(
                 "/api/user/{user}/role.json",
-                builder.given_superadmin().getId()
+                builder.givenSuperAdmin().getId()
             )
                 .param("highest", "true"))
             .andExpect(status().isOk())
@@ -110,7 +110,7 @@ public class SecUserSecRoleResourceTests {
     public void get_roles() throws Exception {
         restSecUserSecRoleControllerMockMvc.perform(get(
                 "/api/user/{user}/role/{role}.json",
-                builder.given_superadmin().getId(), secRoleRepository.getSuperAdmin().getId()
+                builder.givenSuperAdmin().getId(), secRoleRepository.getSuperAdmin().getId()
             ))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.authority").value("ROLE_SUPER_ADMIN"));
@@ -121,7 +121,7 @@ public class SecUserSecRoleResourceTests {
     public void get_role_with_unexisting_user() throws Exception {
         restSecUserSecRoleControllerMockMvc.perform(get(
                 "/api/user/{user}/role/{role}.json",
-                builder.given_superadmin().getId(), 0L
+                builder.givenSuperAdmin().getId(), 0L
             ))
             .andExpect(status().isNotFound());
     }
@@ -140,8 +140,8 @@ public class SecUserSecRoleResourceTests {
     @Test
     @Transactional
     public void add_valid_role() throws Exception {
-        User user = builder.given_a_user();
-        SecUserSecRole secSecUserSecRole = builder.given_a_not_persisted_user_role(user, secRoleRepository.getAdmin());
+        User user = builder.givenAUser();
+        SecUserSecRole secSecUserSecRole = builder.givenANotPersistedUserRole(user, secRoleRepository.getAdmin());
         restSecUserSecRoleControllerMockMvc.perform(post("/api/user/{user}/role.json", user.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(secSecUserSecRole.toJSON()))
@@ -156,8 +156,8 @@ public class SecUserSecRoleResourceTests {
     @Test
     @Transactional
     public void delete_user_role() throws Exception {
-        User user = builder.given_a_user();
-        SecUserSecRole secSecUserSecRole = builder.given_a_not_persisted_user_role(user, secRoleRepository.getAdmin());
+        User user = builder.givenAUser();
+        SecUserSecRole secSecUserSecRole = builder.givenANotPersistedUserRole(user, secRoleRepository.getAdmin());
         builder.persistAndReturn(secSecUserSecRole);
         restSecUserSecRoleControllerMockMvc.perform(delete(
                 "/api/user/{user}/role/{role}.json",
@@ -174,9 +174,9 @@ public class SecUserSecRoleResourceTests {
     @Test
     @Transactional
     public void delete_parent_relation_term() throws Exception {
-        Term term1 = builder.given_a_term();
-        Term term2 = builder.given_a_term(term1.getOntology());
-        Long userId = builder.given_superadmin().getId();
+        Term term1 = builder.givenATerm();
+        Term term2 = builder.givenATerm(term1.getOntology());
+        Long userId = builder.givenSuperAdmin().getId();
         long relationId = 42L;
         UUID commandId = UUID.randomUUID();
         TermRelationResponse response = new TermRelationResponse(
@@ -197,7 +197,7 @@ public class SecUserSecRoleResourceTests {
     @Test
     @Transactional
     public void define() throws Exception {
-        User user = builder.given_a_user();
+        User user = builder.givenAUser();
 
         restSecUserSecRoleControllerMockMvc.perform(put(
                 "/api/user/{user}/role/{role}/define.json",

@@ -53,7 +53,7 @@ public class PermissionTests {
 
     @Test
     public void create_permission() {
-        Ontology ontology = builder.given_an_ontology();
+        Ontology ontology = builder.givenAnOntology();
 
         permissionService.addPermission(ontology, "superadmin", BasePermission.ADMINISTRATION);
 
@@ -70,7 +70,7 @@ public class PermissionTests {
 
     @Test
     public void delete_permission() {
-        Ontology ontology = builder.given_an_ontology();
+        Ontology ontology = builder.givenAnOntology();
 
         permissionService.addPermission(ontology, "superadmin", BasePermission.ADMINISTRATION);
 
@@ -89,7 +89,7 @@ public class PermissionTests {
 
     @Test
     public void delete_permission_that_does_not_exist() {
-        Ontology ontology = builder.given_an_ontology();
+        Ontology ontology = builder.givenAnOntology();
 
         permissionService.addPermission(ontology, "superadmin", BasePermission.WRITE);
 

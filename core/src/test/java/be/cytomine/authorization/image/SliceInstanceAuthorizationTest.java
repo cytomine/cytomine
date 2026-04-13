@@ -63,7 +63,7 @@ public class SliceInstanceAuthorizationTest extends CRUDAuthorizationTest {
     @BeforeEach
     public void before() throws Exception {
         if (sliceInstance == null) {
-            sliceInstance = builder.given_a_slice_instance();
+            sliceInstance = builder.givenASliceInstance();
             initACL(sliceInstance.container());
         }
         sliceInstance.getProject().setMode(EditingMode.CLASSIC);
@@ -140,9 +140,9 @@ public class SliceInstanceAuthorizationTest extends CRUDAuthorizationTest {
     @Override
     protected void when_i_add_domain() {
         sliceInstanceService.add(
-            builder.given_a_not_persisted_slice_instance(
-                builder.given_an_image_instance(sliceInstance.getProject()),
-                builder.given_an_abstract_slice()
+            builder.givenANotPersistedSliceInstance(
+                builder.givenAnImageInstance(sliceInstance.getProject()),
+                builder.givenAnAbstractSlice()
             ).toJsonObject());
     }
 

@@ -64,7 +64,7 @@ public class UploadedFileDomainTests {
 
     @Test
     void support_long_array_persistence() {
-        UploadedFile uploadedFile = builder.given_a_not_persisted_uploaded_file();
+        UploadedFile uploadedFile = builder.givenANotPersistedUploadedFile();
         uploadedFile.setProjects(new Long[]{1L, 2L, 3L});
         uploadedFile = uploadedFileRepository.save(uploadedFile);
         entityManager.flush();

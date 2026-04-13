@@ -96,7 +96,7 @@ public class SliceInstanceResourceTests {
     @Test
     @Transactional
     public void list_slice_instance_by_image_instance() throws Exception {
-        SliceInstance sliceInstance = builder.given_a_slice_instance();
+        SliceInstance sliceInstance = builder.givenASliceInstance();
 
         restSliceInstanceControllerMockMvc.perform(get(
                 "/api/imageinstance/{id}/sliceinstance.json",
@@ -155,7 +155,7 @@ public class SliceInstanceResourceTests {
     @Test
     @Transactional
     public void add_valid_slice_instance() throws Exception {
-        SliceInstance sliceInstance = builder.given_a_not_persisted_slice_instance();
+        SliceInstance sliceInstance = builder.givenANotPersistedSliceInstance();
         restSliceInstanceControllerMockMvc.perform(post("/api/sliceinstance.json")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(sliceInstance.toJSON()))
@@ -172,7 +172,7 @@ public class SliceInstanceResourceTests {
     @Test
     @Transactional
     public void edit_valid_slice_instance() throws Exception {
-        SliceInstance sliceInstance = builder.given_a_slice_instance();
+        SliceInstance sliceInstance = builder.givenASliceInstance();
         JsonObject jsonObject = sliceInstance.toJsonObject();
         restSliceInstanceControllerMockMvc.perform(put("/api/sliceinstance/{id}.json", sliceInstance.getId())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -193,7 +193,7 @@ public class SliceInstanceResourceTests {
     @Test
     @Transactional
     public void delete_slice_instance() throws Exception {
-        SliceInstance sliceInstance = builder.given_a_slice_instance();
+        SliceInstance sliceInstance = builder.givenASliceInstance();
         restSliceInstanceControllerMockMvc.perform(delete("/api/sliceinstance/{id}.json", sliceInstance.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
@@ -521,16 +521,16 @@ public class SliceInstanceResourceTests {
     }
 
     private SliceInstance given_test_slice_instance() {
-        AbstractSlice image = builder.given_an_abstract_slice();
-        image.setMime(builder.given_a_mime("openslide/mrxs"));
+        AbstractSlice image = builder.givenAnAbstractSlice();
+        image.setMime(builder.givenAMime("openslide/mrxs"));
         image.getImage().setWidth(109240);
         image.getImage().setHeight(220696);
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
-        SliceInstance sliceInstance = builder.given_a_slice_instance(
-            builder.given_an_image_instance(
+        SliceInstance sliceInstance = builder.givenASliceInstance(
+            builder.givenAnImageInstance(
                 image.getImage(),
-                builder.given_a_project()
+                builder.givenAProject()
             ), image
         );
         return sliceInstance;

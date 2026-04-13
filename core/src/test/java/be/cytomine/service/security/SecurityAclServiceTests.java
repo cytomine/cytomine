@@ -89,8 +89,8 @@ public class SecurityAclServiceTests {
     @WithMockUser(username = "user")
     @Test
     void check_is_user_allowed() {
-        Project project = builder.given_a_project();
-        User user = builder.given_default_user();
+        Project project = builder.givenAProject();
+        User user = builder.givenDefaultUser();
 
         Assertions.assertThrows(
             ForbiddenException.class, () -> {
@@ -127,8 +127,8 @@ public class SecurityAclServiceTests {
     @WithMockUser(username = "user")
     @Test
     void check_if_user_is_container_admin() {
-        Project project = builder.given_a_project();
-        User user = builder.given_default_user();
+        Project project = builder.givenAProject();
+        User user = builder.givenDefaultUser();
 
         Assertions.assertThrows(
             ForbiddenException.class, () -> {
@@ -150,8 +150,8 @@ public class SecurityAclServiceTests {
     @WithMockUser(username = "user")
     @Test
     void has_user_permission() {
-        Project project = builder.given_a_project();
-        User user = builder.given_default_user();
+        Project project = builder.givenAProject();
+        User user = builder.givenDefaultUser();
 
         assertThat(securityACLService.hasPermission(project, READ, false)).isFalse();
         assertThat(securityACLService.hasPermission(project, READ)).isFalse();
@@ -167,9 +167,9 @@ public class SecurityAclServiceTests {
     @WithMockUser(username = "user")
     @Test
     void has_right_to_read_abstract_image() {
-        Project project = builder.given_a_project();
-        ImageInstance imageInstance = builder.given_an_image_instance(project);
-        User user = builder.given_default_user();
+        Project project = builder.givenAProject();
+        ImageInstance imageInstance = builder.givenAnImageInstance(project);
+        User user = builder.givenDefaultUser();
 
         assertThat(securityACLService.hasRightToReadAbstractImageWithProject(imageInstance.getBaseImage())).isFalse();
 
@@ -182,8 +182,8 @@ public class SecurityAclServiceTests {
     @WithMockUser(username = "user")
     @Test
     void list_authorized_storages() {
-        Storage storage = builder.given_a_storage();
-        User user = builder.given_default_user();
+        Storage storage = builder.givenAStorage();
+        User user = builder.givenDefaultUser();
 
         assertThat(securityACLService.getStorageList(user, false)).doesNotContain(storage);
 
@@ -198,8 +198,8 @@ public class SecurityAclServiceTests {
     @WithMockUser(username = "user")
     @Test
     void list_authorized_projects() {
-        Project project = builder.given_a_project();
-        User user = builder.given_default_user();
+        Project project = builder.givenAProject();
+        User user = builder.givenDefaultUser();
 
         assertThat(securityACLService.getProjectList(user, project.getOntology())).doesNotContain(project);
 
@@ -212,8 +212,8 @@ public class SecurityAclServiceTests {
     @WithMockUser(username = "user")
     @Test
     void list_user_from_projects() {
-        Project project = builder.given_a_project();
-        User user = builder.given_default_user();
+        Project project = builder.givenAProject();
+        User user = builder.givenDefaultUser();
 
         assertThat(securityACLService.getProjectUsers(project)).doesNotContain(user.getUsername());
 
@@ -227,8 +227,8 @@ public class SecurityAclServiceTests {
     @WithMockUser(username = "user")
     @Test
     void list_authorized_ontologies() {
-        Ontology ontology = builder.given_an_ontology();
-        User user = builder.given_default_user();
+        Ontology ontology = builder.givenAnOntology();
+        User user = builder.givenDefaultUser();
 
         assertThat(securityACLService.getOntologyList(user)).doesNotContain(ontology);
 
@@ -241,33 +241,33 @@ public class SecurityAclServiceTests {
     @WithMockUser(username = "user")
     @Test
     void check_same_user() {
-        User user = builder.given_default_user();
+        User user = builder.givenDefaultUser();
         Assertions.assertThrows(
             ForbiddenException.class, () -> {
-                securityACLService.checkIsSameUser(builder.given_superadmin(), user);
+                securityACLService.checkIsSameUser(builder.givenSuperAdmin(), user);
             }
         );
         securityACLService.checkIsSameUser(user, user);
-        securityACLService.checkIsSameUser(user, builder.given_superadmin());
+        securityACLService.checkIsSameUser(user, builder.givenSuperAdmin());
     }
 
     @WithMockUser(username = "user")
     @Test
     void check_is_admin() {
-        User user = builder.given_default_user();
+        User user = builder.givenDefaultUser();
         Assertions.assertThrows(
             ForbiddenException.class, () -> {
                 securityACLService.checkAdmin(user);
             }
         );
-        securityACLService.checkAdmin(builder.given_superadmin());
+        securityACLService.checkAdmin(builder.givenSuperAdmin());
     }
 
     @WithMockUser(username = "user")
     @Test
     void check_is_user() {
-        User user = builder.given_default_user();
-        User guest = builder.given_a_guest();
+        User user = builder.givenDefaultUser();
+        User guest = builder.givenAGuest();
 
         Assertions.assertThrows(
             ForbiddenException.class, () -> {
@@ -275,25 +275,25 @@ public class SecurityAclServiceTests {
             }
         );
         securityACLService.checkUser(user);
-        securityACLService.checkUser(builder.given_superadmin());
+        securityACLService.checkUser(builder.givenSuperAdmin());
     }
 
     @WithMockUser(username = "user")
     @Test
     void check_is_guest() {
-        User user = builder.given_default_user();
-        User guest = builder.given_a_guest();
+        User user = builder.givenDefaultUser();
+        User guest = builder.givenAGuest();
 
         securityACLService.checkGuest(guest);
         securityACLService.checkGuest(user);
-        securityACLService.checkGuest(builder.given_superadmin());
+        securityACLService.checkGuest(builder.givenSuperAdmin());
     }
 
     @WithMockUser(username = "user")
     @Test
     void check_not_readonly() {
-        Project project = builder.given_a_project();
-        User user = builder.given_default_user();
+        Project project = builder.givenAProject();
+        User user = builder.givenDefaultUser();
         permissionService.addPermission(project, user.getUsername(), READ);
 
         securityACLService.checkIsNotReadOnly(project);
@@ -314,8 +314,8 @@ public class SecurityAclServiceTests {
     @WithMockUser(username = "superadmin")
     @Test
     void check_is_user_in_project() {
-        Project project = builder.given_a_project();
-        User user = builder.given_a_user();
+        Project project = builder.givenAProject();
+        User user = builder.givenAUser();
         assertThat(securityACLService.isUserInProject(user, project))
             .isFalse();
         builder.addUserToProject(project, user.getUsername());

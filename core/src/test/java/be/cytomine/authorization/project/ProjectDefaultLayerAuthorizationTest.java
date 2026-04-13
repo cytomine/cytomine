@@ -60,7 +60,7 @@ public class ProjectDefaultLayerAuthorizationTest extends CRDAuthorizationTest {
     @BeforeEach
     public void before() throws Exception {
         if (projectDefaultLayer == null) {
-            projectDefaultLayer = builder.given_a_project_default_layer();
+            projectDefaultLayer = builder.givenAProjectDefaultLayer();
             ;
             initACL(projectDefaultLayer.container());
         }
@@ -101,10 +101,10 @@ public class ProjectDefaultLayerAuthorizationTest extends CRDAuthorizationTest {
 
     @Override
     protected void when_i_add_domain() {
-        User user = builder.given_a_user();
+        User user = builder.givenAUser();
         builder.addUserToProject(projectDefaultLayer.getProject(), user.getUsername());
         projectDefaultLayerService.add(
-            builder.given_a_not_persisted_project_representative_user(
+            builder.givenANotPersistedProjectRepresentativeUser(
                 projectDefaultLayer.getProject(), user
             ).toJsonObject()
         );
@@ -114,7 +114,7 @@ public class ProjectDefaultLayerAuthorizationTest extends CRDAuthorizationTest {
     protected void when_i_delete_domain() {
         User user = projectDefaultLayer.getUser();
         builder.addUserToProject(projectDefaultLayer.getProject(), user.getUsername());
-        ProjectDefaultLayer projectDefaultLayerToDelete = builder.given_a_not_persisted_project_default_layer(
+        ProjectDefaultLayer projectDefaultLayerToDelete = builder.givenANotPersistedProjectDefaultLayer(
             projectDefaultLayer.getProject(),
             user
         );

@@ -83,9 +83,9 @@ public class CommandControllerTests {
             .andExpect(
                 jsonPath("$.collection", hasSize(equalTo(initialSizeUploadedFileDeleteCommand))));
 
-        UploadedFile uploadedFile = builder.given_a_uploaded_file();
+        UploadedFile uploadedFile = builder.givenAUploadedFile();
 
-        Command c = new DeleteCommand(builder.given_superadmin(), null);
+        Command c = new DeleteCommand(builder.givenSuperAdmin(), null);
         uploadedFileService.executeCommand(c, uploadedFile, null);
 
         restCommandControllerMockMvc.perform(get("/api/deletecommand.json"))
@@ -117,7 +117,7 @@ public class CommandControllerTests {
     @Transactional
     @WithMockUser(username = "superadmin")
     public void undo_redo() throws Exception {
-        Ontology ontology = basicInstanceBuilder.given_a_not_persisted_ontology();
+        Ontology ontology = basicInstanceBuilder.givenANotPersistedOntology();
         ontology.setName("undo_redo");
         restCommandControllerMockMvc.perform(
                 post("/api/ontology.json").contentType(MediaType.APPLICATION_JSON)
@@ -158,7 +158,7 @@ public class CommandControllerTests {
     @Transactional
     @WithMockUser(username = "superadmin")
     public void undo_redo_with_command_id() throws Exception {
-        Ontology ontology = basicInstanceBuilder.given_a_not_persisted_ontology();
+        Ontology ontology = basicInstanceBuilder.givenANotPersistedOntology();
         ontology.setName("undo_redo");
         restCommandControllerMockMvc.perform(
                 post("/api/ontology.json").contentType(MediaType.APPLICATION_JSON)

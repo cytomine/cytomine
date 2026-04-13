@@ -85,8 +85,8 @@ public class UploadedFileServiceTests {
 
     @Test
     void list_all_uploadedFile_with_success() {
-        UploadedFile uploadedFile1 = builder.given_a_uploaded_file();
-        UploadedFile uploadedFile2 = builder.given_a_uploaded_file();
+        UploadedFile uploadedFile1 = builder.givenAUploadedFile();
+        UploadedFile uploadedFile2 = builder.givenAUploadedFile();
         assertThat(uploadedFile1).isIn(uploadedFileService.list(Pageable.unpaged()));
         assertThat(uploadedFile2).isIn(uploadedFileService.list(Pageable.unpaged()));
 
@@ -96,19 +96,19 @@ public class UploadedFileServiceTests {
 
     @Test
     void list_user_uploadedFile_with_success() {
-        UploadedFile uploadedFile1 = builder.given_a_uploaded_file();
-        UploadedFile uploadedFileNotSameUser = builder.given_a_uploaded_file();
-        uploadedFileNotSameUser.setUser(builder.given_a_user());
+        UploadedFile uploadedFile1 = builder.givenAUploadedFile();
+        UploadedFile uploadedFileNotSameUser = builder.givenAUploadedFile();
+        uploadedFileNotSameUser.setUser(builder.givenAUser());
         builder.persistAndReturn(uploadedFileNotSameUser);
 
         assertThat(uploadedFile1).isIn(uploadedFileService.list(
-            builder.given_superadmin(),
+            builder.givenSuperAdmin(),
             null,
             false,
             Pageable.unpaged()
         ));
         assertThat(uploadedFileNotSameUser).isNotIn(uploadedFileService.list(
-            builder.given_superadmin(),
+            builder.givenSuperAdmin(),
             null,
             false,
             Pageable.unpaged()
@@ -121,17 +121,17 @@ public class UploadedFileServiceTests {
 
     @Test
     void search_uploadedFile_by_user() {
-        UploadedFile uploadedFile1 = builder.given_a_uploaded_file();
-        UploadedFile uploadedFile2 = builder.given_a_uploaded_file();
-        UploadedFile uploadedFileNotSameUser = builder.given_a_uploaded_file();
-        uploadedFileNotSameUser.setUser(builder.given_a_user());
+        UploadedFile uploadedFile1 = builder.givenAUploadedFile();
+        UploadedFile uploadedFile2 = builder.givenAUploadedFile();
+        UploadedFile uploadedFileNotSameUser = builder.givenAUploadedFile();
+        uploadedFileNotSameUser.setUser(builder.givenAUser());
         builder.persistAndReturn(uploadedFileNotSameUser);
 
         List<SearchParameterEntry> searchParameter = new ArrayList<>();
         searchParameter.add(new SearchParameterEntry(
             "user",
             SearchOperation.in,
-            List.of(builder.given_superadmin().getId())
+            List.of(builder.givenSuperAdmin().getId())
         ));
 
         List<Map<String, Object>> list = uploadedFileService.list(searchParameter, "created", "desc", false);
@@ -149,13 +149,13 @@ public class UploadedFileServiceTests {
 
     @Test
     void search_uploadedFile_by_original_file_name() {
-        UploadedFile uploadedFile1 = builder.given_a_uploaded_file();
+        UploadedFile uploadedFile1 = builder.givenAUploadedFile();
         uploadedFile1.setOriginalFilename("redIsDead");
         builder.persistAndReturn(uploadedFile1);
-        UploadedFile uploadedFile2 = builder.given_a_uploaded_file();
+        UploadedFile uploadedFile2 = builder.givenAUploadedFile();
         uploadedFile2.setOriginalFilename("deadline");
         builder.persistAndReturn(uploadedFile2);
-        UploadedFile uploadedFileNoMatch = builder.given_a_uploaded_file();
+        UploadedFile uploadedFileNoMatch = builder.givenAUploadedFile();
         uploadedFileNoMatch.setOriginalFilename("veracruz");
         builder.persistAndReturn(uploadedFileNoMatch);
 
@@ -173,11 +173,11 @@ public class UploadedFileServiceTests {
 
     @Test
     void list_uploaded_file_with_hierarchical_tree() {
-        UploadedFile uploadedFileToAdd = builder.given_a_uploaded_file();
+        UploadedFile uploadedFileToAdd = builder.givenAUploadedFile();
         uploadedFileToAdd.setOriginalFilename("parent");
         builder.persistAndReturn(uploadedFileToAdd);
 
-        UploadedFile uploadedfileChildToAdd = builder.given_a_not_persisted_uploaded_file();
+        UploadedFile uploadedfileChildToAdd = builder.givenANotPersistedUploadedFile();
         uploadedfileChildToAdd.setOriginalFilename("child");
         uploadedfileChildToAdd.setParent(uploadedFileToAdd);
         CommandResponse response = uploadedFileService.add(uploadedfileChildToAdd.toJsonObject());
@@ -185,17 +185,17 @@ public class UploadedFileServiceTests {
         assertThat(uploadedfileChild.getLTree()).isEqualTo(uploadedFileToAdd.getId() + "." + uploadedfileChild.getId());
 
 
-        UploadedFile uploadedfileSubChildToAdd = builder.given_a_uploaded_file();
+        UploadedFile uploadedfileSubChildToAdd = builder.givenAUploadedFile();
         uploadedfileSubChildToAdd.setParent(uploadedfileChild);
         builder.persistAndReturn(uploadedfileSubChildToAdd);
 
 
-        Page<UploadedFile> list = uploadedFileService.list(builder.given_superadmin(), null, true, Pageable.unpaged());
+        Page<UploadedFile> list = uploadedFileService.list(builder.givenSuperAdmin(), null, true, Pageable.unpaged());
         assertThat(list.getContent()).contains(uploadedFileToAdd);
         assertThat(list.getContent()).doesNotContain(uploadedfileChild, uploadedfileSubChildToAdd);
 
         list = uploadedFileService.list(
-            builder.given_superadmin(),
+            builder.givenSuperAdmin(),
             uploadedFileToAdd.getId(),
             false,
             Pageable.unpaged()
@@ -205,7 +205,7 @@ public class UploadedFileServiceTests {
 
 
         List<Map<String, Object>> maps = uploadedFileService.listHierarchicalTree(
-            builder.given_superadmin(),
+            builder.givenSuperAdmin(),
             uploadedFileToAdd.getId()
         );
         assertThat(maps.stream().filter(x -> x.get("id").equals(uploadedFileToAdd.getId()))).hasSize(1);
@@ -216,13 +216,13 @@ public class UploadedFileServiceTests {
 
     @Test
     void search_uploadedFile_with_tree_details() {
-        UploadedFile uploadedFile1 = builder.given_a_uploaded_file();
+        UploadedFile uploadedFile1 = builder.givenAUploadedFile();
         uploadedFile1.setOriginalFilename("redIsDead");
         builder.persistAndReturn(uploadedFile1);
-        UploadedFile uploadedFile2 = builder.given_a_uploaded_file();
+        UploadedFile uploadedFile2 = builder.givenAUploadedFile();
         uploadedFile2.setOriginalFilename("deadline");
         builder.persistAndReturn(uploadedFile2);
-        UploadedFile uploadedFileNoMatch = builder.given_a_uploaded_file();
+        UploadedFile uploadedFileNoMatch = builder.givenAUploadedFile();
         uploadedFileNoMatch.setOriginalFilename("veracruz");
         builder.persistAndReturn(uploadedFileNoMatch);
 
@@ -243,23 +243,23 @@ public class UploadedFileServiceTests {
 
     @Test
     void test_ltree() {
-        UploadedFile uploadedFileToAdd = builder.given_a_uploaded_file();
+        UploadedFile uploadedFileToAdd = builder.givenAUploadedFile();
         uploadedFileToAdd.setOriginalFilename("parent");
         builder.persistAndReturn(uploadedFileToAdd);
 
         entityManager.detach(uploadedFileToAdd);
 
-        UploadedFile uploadedfileChildToAdd = builder.given_a_uploaded_file();
+        UploadedFile uploadedfileChildToAdd = builder.givenAUploadedFile();
         uploadedfileChildToAdd.setOriginalFilename("child");
         uploadedfileChildToAdd.setParent(entityManager.find(UploadedFile.class, uploadedFileToAdd.getId()));
         builder.persistAndReturn(uploadedfileChildToAdd);
 
 
-        UploadedFile uploadedfileSubChildToAdd = builder.given_a_uploaded_file();
+        UploadedFile uploadedfileSubChildToAdd = builder.givenAUploadedFile();
         uploadedfileSubChildToAdd.setParent(uploadedfileChildToAdd);
         builder.persistAndReturn(uploadedfileSubChildToAdd);
 
-        UploadedFile uploadedfileSubSubChildToAdd = builder.given_a_uploaded_file();
+        UploadedFile uploadedfileSubSubChildToAdd = builder.givenAUploadedFile();
         uploadedfileSubSubChildToAdd.setParent(uploadedfileSubChildToAdd);
         builder.persistAndReturn(uploadedfileSubSubChildToAdd);
 
@@ -273,7 +273,7 @@ public class UploadedFileServiceTests {
 
     @Test
     void get_uploaded_file_by_user() {
-        UploadedFile uploadedFile = builder.given_a_uploaded_file();
+        UploadedFile uploadedFile = builder.givenAUploadedFile();
         assertThat(uploadedFile).isEqualTo(uploadedFileService.get(uploadedFile.getId()));
     }
 
@@ -284,7 +284,7 @@ public class UploadedFileServiceTests {
 
     @Test
     void find_uploadedFile_with_success() {
-        UploadedFile uploadedFile = builder.given_a_uploaded_file();
+        UploadedFile uploadedFile = builder.givenAUploadedFile();
         assertThat(uploadedFileService.find(uploadedFile.getId()).isPresent());
         assertThat(uploadedFile).isEqualTo(uploadedFileService.find(uploadedFile.getId()).get());
     }
@@ -296,8 +296,8 @@ public class UploadedFileServiceTests {
 
     @Test
     void add_valid_uploadedFile_with_success() {
-        Ontology ontology = builder.given_an_ontology();
-        UploadedFile uploadedFile = builder.given_a_not_persisted_uploaded_file();
+        Ontology ontology = builder.givenAnOntology();
+        UploadedFile uploadedFile = builder.givenANotPersistedUploadedFile();
 
         CommandResponse commandResponse = uploadedFileService.add(uploadedFile.toJsonObject());
 
@@ -309,7 +309,7 @@ public class UploadedFileServiceTests {
 
     @Test
     void add_uploadedFile_with_null_storage_fail() {
-        UploadedFile uploadedFile = builder.given_a_not_persisted_uploaded_file();
+        UploadedFile uploadedFile = builder.givenANotPersistedUploadedFile();
         uploadedFile.setStorage(null);
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
@@ -321,7 +321,7 @@ public class UploadedFileServiceTests {
 
     @Test
     void edit_valid_uploaded_file_with_success() {
-        UploadedFile uploadedFile = builder.given_a_uploaded_file();
+        UploadedFile uploadedFile = builder.givenAUploadedFile();
 
         CommandResponse commandResponse = uploadedFileService.update(
             uploadedFile,
@@ -337,8 +337,8 @@ public class UploadedFileServiceTests {
 
     @Test
     void edit_valid_uploaded_file_storage_with_success() {
-        UploadedFile uploadedFile = builder.given_a_uploaded_file();
-        Storage storage = builder.given_a_storage();
+        UploadedFile uploadedFile = builder.givenAUploadedFile();
+        Storage storage = builder.givenAStorage();
 
         CommandResponse commandResponse = uploadedFileService.update(
             uploadedFile,
@@ -355,7 +355,7 @@ public class UploadedFileServiceTests {
 
     @Test
     void delete_uploadedFile_with_success() {
-        UploadedFile uploadedFile = builder.given_a_uploaded_file();
+        UploadedFile uploadedFile = builder.givenAUploadedFile();
 
         CommandResponse commandResponse = uploadedFileService.delete(uploadedFile, null, null, true);
 
@@ -366,23 +366,23 @@ public class UploadedFileServiceTests {
 
     @Test
     void delete_uploadedFile_with_dependencies_with_success() {
-        UploadedFile uploadedFile = builder.given_a_uploaded_file();
+        UploadedFile uploadedFile = builder.givenAUploadedFile();
         uploadedFile.setProjects(new Long[]{123L});
         builder.persistAndReturn(uploadedFile);
 
-        UploadedFile uploadedFileChild = builder.given_a_uploaded_file();
+        UploadedFile uploadedFileChild = builder.givenAUploadedFile();
         uploadedFileChild.setOriginalFilename("child");
         uploadedFileChild.setParent(entityManager.find(UploadedFile.class, uploadedFile.getId()));
         builder.persistAndReturn(uploadedFileChild);
 
-        UploadedFile uploadedFileSubChild = builder.given_a_uploaded_file();
+        UploadedFile uploadedFileSubChild = builder.givenAUploadedFile();
         uploadedFileSubChild.setParent(uploadedFileChild);
         builder.persistAndReturn(uploadedFileSubChild);
 
-        AbstractImage abstractImage = builder.given_an_abstract_image();
+        AbstractImage abstractImage = builder.givenAnAbstractImage();
         abstractImage.setUploadedFile(uploadedFileSubChild);
 
-        AbstractSlice abstractSlice = builder.given_an_abstract_slice();
+        AbstractSlice abstractSlice = builder.givenAnAbstractSlice();
         abstractSlice.setUploadedFile(uploadedFileSubChild);
 
         CommandResponse commandResponse = uploadedFileService.delete(uploadedFile, null, null, true);
@@ -397,7 +397,7 @@ public class UploadedFileServiceTests {
 
     @Test
     void delete_uploaded_file_with_image_in_project() {
-        ImageInstance imageInstance = builder.given_an_image_instance();
+        ImageInstance imageInstance = builder.givenAnImageInstance();
         Assertions.assertThrows(
             ForbiddenException.class, () ->
                 uploadedFileService.delete(imageInstance.getBaseImage().getUploadedFile(), null, null, false)
@@ -406,19 +406,19 @@ public class UploadedFileServiceTests {
 
     @Test
     void delete_uploaded_file_child() {
-        UploadedFile uploadedFile = builder.given_a_uploaded_file();
+        UploadedFile uploadedFile = builder.givenAUploadedFile();
         uploadedFile.setOriginalFilename("parent");
         builder.persistAndReturn(uploadedFile);
 
         entityManager.detach(uploadedFile);
 
-        UploadedFile uploadedFileChild = builder.given_a_uploaded_file();
+        UploadedFile uploadedFileChild = builder.givenAUploadedFile();
         uploadedFileChild.setOriginalFilename("child");
         uploadedFileChild.setParent(entityManager.find(UploadedFile.class, uploadedFile.getId()));
         builder.persistAndReturn(uploadedFileChild);
 
 
-        UploadedFile uploadedFileSubChild = builder.given_a_uploaded_file();
+        UploadedFile uploadedFileSubChild = builder.givenAUploadedFile();
         uploadedFileSubChild.setParent(uploadedFileChild);
         builder.persistAndReturn(uploadedFileSubChild);
 

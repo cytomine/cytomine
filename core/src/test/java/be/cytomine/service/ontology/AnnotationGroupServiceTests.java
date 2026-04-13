@@ -39,7 +39,7 @@ public class AnnotationGroupServiceTests {
 
     @Test
     void find_annotation_group_with_success() {
-        AnnotationGroup annotationGroup = builder.given_an_annotation_group();
+        AnnotationGroup annotationGroup = builder.givenAnAnnotationGroup();
         AssertionsForClassTypes.assertThat(annotationGroupService.find(annotationGroup.getId()).isPresent());
         assertThat(annotationGroup).isEqualTo(annotationGroupService.find(annotationGroup.getId()).get());
     }
@@ -56,13 +56,13 @@ public class AnnotationGroupServiceTests {
 
     @Test
     void list_annotation_group_by_project() {
-        Project project = builder.given_a_project();
-        ImageGroup imageGroup = builder.given_an_imagegroup(project);
+        Project project = builder.givenAProject();
+        ImageGroup imageGroup = builder.givenAnImageGroup(project);
 
-        AnnotationGroup annotationGroup1 = builder.given_an_annotation_group(project, imageGroup);
-        AnnotationGroup annotationGroup2 = builder.given_an_annotation_group(project, imageGroup);
-        AnnotationGroup annotationGroup3 = builder.given_an_annotation_group(project, imageGroup);
-        AnnotationGroup annotationGroup4 = builder.given_an_annotation_group();
+        AnnotationGroup annotationGroup1 = builder.givenAnAnnotationGroup(project, imageGroup);
+        AnnotationGroup annotationGroup2 = builder.givenAnAnnotationGroup(project, imageGroup);
+        AnnotationGroup annotationGroup3 = builder.givenAnAnnotationGroup(project, imageGroup);
+        AnnotationGroup annotationGroup4 = builder.givenAnAnnotationGroup();
 
         AssertionsForInterfaceTypes.assertThat(annotationGroupService.list(project))
             .containsExactly(annotationGroup1, annotationGroup2, annotationGroup3);
@@ -71,13 +71,13 @@ public class AnnotationGroupServiceTests {
 
     @Test
     void list_annotation_group_by_image_group() {
-        Project project = builder.given_a_project();
-        ImageGroup imageGroup = builder.given_an_imagegroup(project);
+        Project project = builder.givenAProject();
+        ImageGroup imageGroup = builder.givenAnImageGroup(project);
 
-        AnnotationGroup annotationGroup1 = builder.given_an_annotation_group(project, imageGroup);
-        AnnotationGroup annotationGroup2 = builder.given_an_annotation_group(project, imageGroup);
-        AnnotationGroup annotationGroup3 = builder.given_an_annotation_group(project, imageGroup);
-        AnnotationGroup annotationGroup4 = builder.given_an_annotation_group();
+        AnnotationGroup annotationGroup1 = builder.givenAnAnnotationGroup(project, imageGroup);
+        AnnotationGroup annotationGroup2 = builder.givenAnAnnotationGroup(project, imageGroup);
+        AnnotationGroup annotationGroup3 = builder.givenAnAnnotationGroup(project, imageGroup);
+        AnnotationGroup annotationGroup4 = builder.givenAnAnnotationGroup();
 
         AssertionsForInterfaceTypes.assertThat(annotationGroupService.list(imageGroup))
             .containsExactly(annotationGroup1, annotationGroup2, annotationGroup3);
@@ -87,7 +87,7 @@ public class AnnotationGroupServiceTests {
 
     @Test
     void add_valid_annotation_group_with_success() {
-        AnnotationGroup annotationGroup = builder.given_a_not_persisted_annotation_group();
+        AnnotationGroup annotationGroup = builder.givenANotPersistedAnnotationGroup();
 
         CommandResponse commandResponse = annotationGroupService.add(annotationGroup.toJsonObject());
 
@@ -99,7 +99,7 @@ public class AnnotationGroupServiceTests {
 
     @Test
     void add_annotation_group_with_null_project_fails() {
-        AnnotationGroup annotationGroup = builder.given_an_annotation_group();
+        AnnotationGroup annotationGroup = builder.givenAnAnnotationGroup();
         Assertions.assertThrows(
             ObjectNotFoundException.class,
             () -> annotationGroupService.add(annotationGroup.toJsonObject().withChange("project", null))
@@ -108,10 +108,10 @@ public class AnnotationGroupServiceTests {
 
     @Test
     void edit_annotation_group_with_success() {
-        Project project1 = builder.given_a_project();
-        Project project2 = builder.given_a_project();
-        ImageGroup imageGroup = builder.given_an_imagegroup(project1);
-        AnnotationGroup annotationGroup = builder.given_an_annotation_group(project1, imageGroup);
+        Project project1 = builder.givenAProject();
+        Project project2 = builder.givenAProject();
+        ImageGroup imageGroup = builder.givenAnImageGroup(project1);
+        AnnotationGroup annotationGroup = builder.givenAnAnnotationGroup(project1, imageGroup);
 
         JsonObject jsonObject = annotationGroup.toJsonObject();
         jsonObject.put("project", project2.getId());
@@ -128,7 +128,7 @@ public class AnnotationGroupServiceTests {
 
     @Test
     void delete_annotation_group_with_success() {
-        AnnotationGroup annotationGroup = builder.given_an_annotation_group();
+        AnnotationGroup annotationGroup = builder.givenAnAnnotationGroup();
 
         CommandResponse commandResponse = annotationGroupService.delete(annotationGroup, null, null, true);
 
@@ -139,10 +139,10 @@ public class AnnotationGroupServiceTests {
 
     @Test
     public void merge_annotation_group_with_success() {
-        Project project = builder.given_a_project();
-        ImageGroup imageGroup = builder.given_an_imagegroup(project);
-        AnnotationGroup annotationGroup = builder.given_an_annotation_group(project, imageGroup);
-        AnnotationGroup annotationGroupToMerge = builder.given_an_annotation_group(project, imageGroup);
+        Project project = builder.givenAProject();
+        ImageGroup imageGroup = builder.givenAnImageGroup(project);
+        AnnotationGroup annotationGroup = builder.givenAnAnnotationGroup(project, imageGroup);
+        AnnotationGroup annotationGroupToMerge = builder.givenAnAnnotationGroup(project, imageGroup);
 
         CommandResponse commandResponse = annotationGroupService.merge(
             annotationGroup.getId(),

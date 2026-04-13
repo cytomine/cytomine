@@ -63,7 +63,7 @@ public class OntologyAuthorizationTest extends CRUDAuthorizationTest {
     @BeforeEach
     public void before() throws Exception {
         if (ontology == null) {
-            ontology = builder.given_an_ontology();
+            ontology = builder.givenAnOntology();
             ;
             initACL(ontology);
         }
@@ -110,7 +110,7 @@ public class OntologyAuthorizationTest extends CRUDAuthorizationTest {
 
     @Override
     protected void when_i_add_domain() {
-        ontologyService.add(basicInstanceBuilder.given_a_not_persisted_ontology().toJsonObject());
+        ontologyService.add(basicInstanceBuilder.givenANotPersistedOntology().toJsonObject());
     }
 
     @Override

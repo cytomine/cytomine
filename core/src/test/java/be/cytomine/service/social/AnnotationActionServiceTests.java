@@ -70,8 +70,8 @@ public class AnnotationActionServiceTests {
         assertThat(annotationActionRepository.count()).isEqualTo(0);
         given_a_persistent_annotation_action(
             new Date(),
-            builder.given_a_user_annotation(),
-            builder.given_superadmin(),
+            builder.givenAUserAnnotation(),
+            builder.givenSuperAdmin(),
             "view"
         );
         assertThat(annotationActionRepository.count()).isEqualTo(1);
@@ -79,26 +79,26 @@ public class AnnotationActionServiceTests {
 
     @Test
     public void list_by_slice() {
-        AnnotationDomain annotationDomain = builder.given_a_user_annotation();
+        AnnotationDomain annotationDomain = builder.givenAUserAnnotation();
 
         assertThat(annotationActionService.list(annotationDomain.getSlice(), null, null, null))
             .hasSize(0);
 
-        given_a_persistent_annotation_action(new Date(), annotationDomain, builder.given_superadmin(), "view");
-        given_a_persistent_annotation_action(new Date(), annotationDomain, builder.given_superadmin(), "select");
+        given_a_persistent_annotation_action(new Date(), annotationDomain, builder.givenSuperAdmin(), "view");
+        given_a_persistent_annotation_action(new Date(), annotationDomain, builder.givenSuperAdmin(), "select");
 
         assertThat(annotationActionService.list(annotationDomain.getSlice(), null, null, null))
             .hasSize(2);
 
-        assertThat(annotationActionService.list(annotationDomain.getSlice(), builder.given_superadmin(), null, null))
+        assertThat(annotationActionService.list(annotationDomain.getSlice(), builder.givenSuperAdmin(), null, null))
             .hasSize(2);
 
-        assertThat(annotationActionService.list(annotationDomain.getSlice(), builder.given_a_user(), null, null))
+        assertThat(annotationActionService.list(annotationDomain.getSlice(), builder.givenAUser(), null, null))
             .hasSize(0);
 
         assertThat(annotationActionService.list(
             annotationDomain.getSlice(),
-            builder.given_superadmin(),
+            builder.givenSuperAdmin(),
             null,
             new Date().getTime()
         ))
@@ -106,7 +106,7 @@ public class AnnotationActionServiceTests {
 
         assertThat(annotationActionService.list(
             annotationDomain.getSlice(),
-            builder.given_superadmin(),
+            builder.givenSuperAdmin(),
             new Date().getTime(),
             null
         ))
@@ -115,28 +115,28 @@ public class AnnotationActionServiceTests {
 
     @Test
     public void list_by_image() {
-        AnnotationDomain annotationDomain = builder.given_a_user_annotation();
+        AnnotationDomain annotationDomain = builder.givenAUserAnnotation();
 
         assertThat(annotationActionService.list(annotationDomain.getImage(), null, null, null))
             .hasSize(0);
 
-        given_a_persistent_annotation_action(new Date(), annotationDomain, builder.given_superadmin(), "view");
-        given_a_persistent_annotation_action(new Date(), annotationDomain, builder.given_superadmin(), "select");
+        given_a_persistent_annotation_action(new Date(), annotationDomain, builder.givenSuperAdmin(), "view");
+        given_a_persistent_annotation_action(new Date(), annotationDomain, builder.givenSuperAdmin(), "select");
 
         assertThat(annotationActionRepository.count()).isEqualTo(2);
         System.out.println(annotationActionRepository.findAll());
         assertThat(annotationActionService.list(annotationDomain.getImage(), null, null, null))
             .hasSize(2);
 
-        assertThat(annotationActionService.list(annotationDomain.getImage(), builder.given_superadmin(), null, null))
+        assertThat(annotationActionService.list(annotationDomain.getImage(), builder.givenSuperAdmin(), null, null))
             .hasSize(2);
 
-        assertThat(annotationActionService.list(annotationDomain.getImage(), builder.given_a_user(), null, null))
+        assertThat(annotationActionService.list(annotationDomain.getImage(), builder.givenAUser(), null, null))
             .hasSize(0);
 
         assertThat(annotationActionService.list(
             annotationDomain.getImage(),
-            builder.given_superadmin(),
+            builder.givenSuperAdmin(),
             null,
             new Date().getTime()
         ))
@@ -144,7 +144,7 @@ public class AnnotationActionServiceTests {
 
         assertThat(annotationActionService.list(
             annotationDomain.getImage(),
-            builder.given_superadmin(),
+            builder.givenSuperAdmin(),
             new Date().getTime(),
             null
         ))
@@ -154,8 +154,8 @@ public class AnnotationActionServiceTests {
 
     @Test
     void total_annotation_action_by_project_count() {
-        User user1 = builder.given_superadmin();
-        AnnotationDomain annotationDomain = builder.given_a_user_annotation();
+        User user1 = builder.givenSuperAdmin();
+        AnnotationDomain annotationDomain = builder.givenAUserAnnotation();
 
         Date noConnectionBefore = DateUtils.addDays(new Date(), -100);
         given_a_persistent_annotation_action(DateUtils.addDays(new Date(), -10), annotationDomain, user1, "select");

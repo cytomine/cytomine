@@ -42,7 +42,7 @@ public class AnnotationLayerResourceTest {
 
     @Test
     public void getAnnotationLayersByImageShouldReturnAnnotationLayers() throws Exception {
-        TaskRunLayer taskRunLayer = builder.given_a_persisted_task_run_layer();
+        TaskRunLayer taskRunLayer = builder.givenAPersistedTaskRunLayer();
 
         mockMvc.perform(get("/api/image-instances/{id}/annotation-layers", taskRunLayer.getImage().getId()))
             .andExpect(status().isOk())
@@ -52,10 +52,10 @@ public class AnnotationLayerResourceTest {
 
     @Test
     public void getAnnotationsByLayerShouldReturnAnnotations() throws Exception {
-        AnnotationLayer annotationLayer = builder.given_a_persisted_annotation_layer();
-        Annotation first = builder.given_a_not_persisted_annotation(annotationLayer);
-        Annotation second = builder.given_a_not_persisted_annotation(annotationLayer);
-        Annotation third = builder.given_a_not_persisted_annotation(annotationLayer);
+        AnnotationLayer annotationLayer = builder.givenAPersistedAnnotationLayer();
+        Annotation first = builder.givenANotPersistedAnnotation(annotationLayer);
+        Annotation second = builder.givenANotPersistedAnnotation(annotationLayer);
+        Annotation third = builder.givenANotPersistedAnnotation(annotationLayer);
         manager.persist(first);
         manager.persist(second);
         manager.persist(third);
@@ -82,7 +82,7 @@ public class AnnotationLayerResourceTest {
 
     @Test
     public void findTaskRunLayerShouldReturnTaskRunLayer() throws Exception {
-        TaskRunLayer taskRunLayer = builder.given_a_persisted_task_run_layer();
+        TaskRunLayer taskRunLayer = builder.givenAPersistedTaskRunLayer();
 
         mockMvc.perform(get("/api/annotation-layers/{id}/task-run-layer", taskRunLayer.getAnnotationLayer().getId()))
             .andExpect(status().isOk())

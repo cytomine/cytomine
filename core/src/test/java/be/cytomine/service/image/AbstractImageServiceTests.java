@@ -87,11 +87,11 @@ public class AbstractImageServiceTests {
 
     @Test
     void list_all_image_by_filters() {
-        AbstractImage abstractImage1 = builder.given_an_abstract_image();
+        AbstractImage abstractImage1 = builder.givenAnAbstractImage();
         abstractImage1.setOriginalFilename("karamazov");
         abstractImage1.setWidth(800);
         builder.persistAndReturn(abstractImage1);
-        AbstractImage abstractImage2 = builder.given_an_abstract_image();
+        AbstractImage abstractImage2 = builder.givenAnAbstractImage();
         abstractImage2.setOriginalFilename("deray");
         abstractImage2.setWidth(2048);
         builder.persistAndReturn(abstractImage2);
@@ -147,13 +147,13 @@ public class AbstractImageServiceTests {
 
     @Test
     void list_all_image_by_project() {
-        AbstractImage abstractImageInProject = builder.given_an_abstract_image();
+        AbstractImage abstractImageInProject = builder.givenAnAbstractImage();
         builder.persistAndReturn(abstractImageInProject);
-        AbstractImage abstractImageNotInProject = builder.given_an_abstract_image();
+        AbstractImage abstractImageNotInProject = builder.givenAnAbstractImage();
         builder.persistAndReturn(abstractImageNotInProject);
 
-        Project project = builder.given_a_project();
-        builder.given_an_image_instance(abstractImageInProject, project);
+        Project project = builder.givenAProject();
+        builder.givenAnImageInstance(abstractImageInProject, project);
 
         Page<AbstractImage> images = null;
         images = abstractImageService.list(project, new ArrayList<>(), Pageable.unpaged());
@@ -176,17 +176,17 @@ public class AbstractImageServiceTests {
     @Test
     @WithMockUser(username = "list_all_image_by_user_storage")
     void list_all_image_by_user_storage() {
-        User user = builder.given_a_user("list_all_image_by_user_storage");
-        Storage storage = builder.given_a_storage(user);
-        UploadedFile uploadedFile = builder.given_a_uploaded_file();
+        User user = builder.givenAUser("list_all_image_by_user_storage");
+        Storage storage = builder.givenAStorage(user);
+        UploadedFile uploadedFile = builder.givenAUploadedFile();
         uploadedFile.setStorage(storage);
 
-        AbstractImage abstractImageFromUserStorage = builder.given_an_abstract_image();
+        AbstractImage abstractImageFromUserStorage = builder.givenAnAbstractImage();
         abstractImageFromUserStorage.setOriginalFilename("match");
         abstractImageFromUserStorage.setUploadedFile(uploadedFile);
         builder.persistAndReturn(abstractImageFromUserStorage);
 
-        AbstractImage abstractImageFromAnotherStorage = builder.given_an_abstract_image();
+        AbstractImage abstractImageFromAnotherStorage = builder.givenAnAbstractImage();
         abstractImageFromAnotherStorage.setOriginalFilename("match");
         builder.persistAndReturn(abstractImageFromAnotherStorage);
 
@@ -202,7 +202,7 @@ public class AbstractImageServiceTests {
 
     @Test
     void get_uploaded_file_by_user() {
-        AbstractImage abstractImage = builder.given_an_abstract_image();
+        AbstractImage abstractImage = builder.givenAnAbstractImage();
         assertThat(abstractImage).isEqualTo(abstractImageService.get(abstractImage.getId()));
     }
 
@@ -213,7 +213,7 @@ public class AbstractImageServiceTests {
 
     @Test
     void find_abstractImage_with_success() {
-        AbstractImage abstractImage = builder.given_an_abstract_image();
+        AbstractImage abstractImage = builder.givenAnAbstractImage();
         AssertionsForClassTypes.assertThat(abstractImageService.find(abstractImage.getId()).isPresent());
         assertThat(abstractImage).isEqualTo(abstractImageService.find(abstractImage.getId()).get());
     }
@@ -226,32 +226,32 @@ public class AbstractImageServiceTests {
 
     @Test
     void detect_if_unused_abstract_image_is_unused() {
-        AbstractImage abstractImage = builder.given_an_abstract_image();
+        AbstractImage abstractImage = builder.givenAnAbstractImage();
         assertThat(abstractImageService.isAbstractImageUsed(abstractImage.getId())).isFalse();
     }
 
     @Test
     void detect_if_used_abstract_image_is_used() {
-        ImageInstance imageInstance = builder.given_an_image_instance();
+        ImageInstance imageInstance = builder.givenAnImageInstance();
         assertThat(abstractImageService.isAbstractImageUsed(imageInstance.getBaseImage().getId())).isTrue();
     }
 
     @Test
     void detect_if_unused_abstract_image_is_in_unused_list() {
-        AbstractImage abstractImage = builder.given_an_abstract_image();
+        AbstractImage abstractImage = builder.givenAnAbstractImage();
         assertThat(abstractImageService.listUnused()).contains(abstractImage);
     }
 
     @Test
     void detect_if_used_abstract_image_is_missing_from_unused_list() {
-        ImageInstance imageInstance = builder.given_an_image_instance();
+        ImageInstance imageInstance = builder.givenAnImageInstance();
         assertThat(abstractImageService.listUnused()).doesNotContain(imageInstance.getBaseImage());
     }
 
 
     @Test
     void add_valid_abstract_image_with_success() {
-        AbstractImage abstractImage = builder.given_a_not_persisted_abstract_image();
+        AbstractImage abstractImage = builder.givenANotPersistedAbstractImage();
 
         CommandResponse commandResponse = abstractImageService.add(abstractImage.toJsonObject());
 
@@ -263,7 +263,7 @@ public class AbstractImageServiceTests {
 
     @Test
     void add_valid_abstract_image_with_bad_num_field_width() {
-        AbstractImage abstractImage = builder.given_a_not_persisted_abstract_image();
+        AbstractImage abstractImage = builder.givenANotPersistedAbstractImage();
         abstractImage.setWidth(0);
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
@@ -274,7 +274,7 @@ public class AbstractImageServiceTests {
 
     @Test
     void add_valid_abstract_image_with_bad_num_field_height() {
-        AbstractImage abstractImage = builder.given_a_not_persisted_abstract_image();
+        AbstractImage abstractImage = builder.givenANotPersistedAbstractImage();
         abstractImage.setHeight(0);
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
@@ -285,7 +285,7 @@ public class AbstractImageServiceTests {
 
     @Test
     void add_valid_abstract_image_with_bad_num_field_depth() {
-        AbstractImage abstractImage = builder.given_a_not_persisted_abstract_image();
+        AbstractImage abstractImage = builder.givenANotPersistedAbstractImage();
         abstractImage.setDepth(0);
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
@@ -296,7 +296,7 @@ public class AbstractImageServiceTests {
 
     @Test
     void add_valid_abstract_image_with_bad_num_field_duration() {
-        AbstractImage abstractImage = builder.given_a_not_persisted_abstract_image();
+        AbstractImage abstractImage = builder.givenANotPersistedAbstractImage();
         abstractImage.setDuration(0);
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
@@ -307,7 +307,7 @@ public class AbstractImageServiceTests {
 
     @Test
     void add_valid_abstract_image_with_bad_num_field_channels() {
-        AbstractImage abstractImage = builder.given_a_not_persisted_abstract_image();
+        AbstractImage abstractImage = builder.givenANotPersistedAbstractImage();
         abstractImage.setChannels(0);
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
@@ -318,7 +318,7 @@ public class AbstractImageServiceTests {
 
     @Test
     void edit_abstract_image_with_success() {
-        AbstractImage abstractImage = builder.given_a_not_persisted_abstract_image();
+        AbstractImage abstractImage = builder.givenANotPersistedAbstractImage();
         abstractImage.setHeight(10000);
         abstractImage.setWidth(1000);
         abstractImage.setDuration(1);
@@ -345,7 +345,7 @@ public class AbstractImageServiceTests {
 
     @Test
     void edit_abstract_image_magnification() {
-        ImageInstance imageInstance = builder.given_an_image_instance();
+        ImageInstance imageInstance = builder.givenAnImageInstance();
         AbstractImage abstractImage = imageInstance.getBaseImage();
 
         assertThat(imageInstance.getPhysicalSizeX()).isEqualTo(abstractImage.getPhysicalSizeX());
@@ -396,7 +396,7 @@ public class AbstractImageServiceTests {
 
     @Test
     void delete_abstract_image_with_success() {
-        AbstractImage abstractImage = builder.given_an_abstract_image();
+        AbstractImage abstractImage = builder.givenAnAbstractImage();
 
         CommandResponse commandResponse = abstractImageService.delete(abstractImage, null, null, true);
 
@@ -407,9 +407,9 @@ public class AbstractImageServiceTests {
 
     @Test
     void delete_abstract_image_with_dependencies_with_success() {
-        AbstractImage abstractImage = builder.given_an_abstract_image();
+        AbstractImage abstractImage = builder.givenAnAbstractImage();
 
-        AttachedFile attachedFile = builder.given_a_attached_file(abstractImage);
+        AttachedFile attachedFile = builder.givenAnAttachedFile(abstractImage);
 
         assertThat(entityManager.find(AttachedFile.class, attachedFile.getId())).isNotNull();
 
@@ -423,8 +423,8 @@ public class AbstractImageServiceTests {
 
     @Test
     void delete_abstract_image_with_image_in_project_is_refused() {
-        AbstractImage abstractImage = builder.given_an_abstract_image();
-        ImageInstance imageInstance = builder.given_an_image_instance(abstractImage, builder.given_a_project());
+        AbstractImage abstractImage = builder.givenAnAbstractImage();
+        ImageInstance imageInstance = builder.givenAnImageInstance(abstractImage, builder.givenAProject());
         Assertions.assertThrows(
             ForbiddenException.class, () -> {
                 abstractImageService.delete(abstractImage, null, null, true);

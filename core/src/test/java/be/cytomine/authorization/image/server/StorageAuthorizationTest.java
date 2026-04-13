@@ -63,7 +63,7 @@ public class StorageAuthorizationTest extends CRUDAuthorizationTest {
     @BeforeEach
     public void before() throws Exception {
         if (storage == null) {
-            storage = builder.given_a_storage();
+            storage = builder.givenAStorage();
             ;
             initACL(storage);
         }
@@ -73,7 +73,7 @@ public class StorageAuthorizationTest extends CRUDAuthorizationTest {
     @WithMockUser(username = SUPERADMIN)
     public void admin_can_list_storages() {
         assertThat(storageService.list()).contains(storage);
-        Storage anotherStorage = builder.given_a_storage();
+        Storage anotherStorage = builder.givenAStorage();
         assertThat(storageService.list()).contains(anotherStorage);
     }
 
@@ -81,7 +81,7 @@ public class StorageAuthorizationTest extends CRUDAuthorizationTest {
     @WithMockUser(username = USER_ACL_READ)
     public void user_cannot_list_all_storages() {
         expectOK(() -> storageService.list());
-        Storage anotherStorage = builder.given_a_storage();
+        Storage anotherStorage = builder.givenAStorage();
         assertThat(storageService.list()).doesNotContain(anotherStorage);
     }
 
@@ -93,7 +93,7 @@ public class StorageAuthorizationTest extends CRUDAuthorizationTest {
 
     @Override
     protected void when_i_add_domain() {
-        storageService.add(builder.given_a_not_persisted_storage().toJsonObject());
+        storageService.add(builder.givenANotPersistedStorage().toJsonObject());
     }
 
     @Override

@@ -93,7 +93,7 @@ public class AbstractSliceResourceTests {
     @Test
     @Transactional
     public void list_abstract_slice_by_abstract_image() throws Exception {
-        AbstractSlice abstractSlice = builder.given_an_abstract_slice();
+        AbstractSlice abstractSlice = builder.givenAnAbstractSlice();
 
         restAbstractSliceControllerMockMvc.perform(get(
                 "/api/abstractimage/{id}/abstractslice.json",
@@ -106,7 +106,7 @@ public class AbstractSliceResourceTests {
     @Test
     @Transactional
     public void list_abstract_slice_by_uploaded_file() throws Exception {
-        AbstractSlice abstractSlice = builder.given_an_abstract_slice();
+        AbstractSlice abstractSlice = builder.givenAnAbstractSlice();
 
         restAbstractSliceControllerMockMvc.perform(get(
                 "/api/uploadedfile/{id}/abstractslice.json",
@@ -160,7 +160,7 @@ public class AbstractSliceResourceTests {
     @Test
     @Transactional
     public void add_valid_abstract_slice() throws Exception {
-        AbstractSlice abstractSlice = builder.given_a_not_persisted_abstract_slice();
+        AbstractSlice abstractSlice = builder.givenANotPersistedAbstractSlice();
         restAbstractSliceControllerMockMvc.perform(post("/api/abstractslice.json")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(abstractSlice.toJSON()))
@@ -177,7 +177,7 @@ public class AbstractSliceResourceTests {
     @Test
     @Transactional
     public void edit_valid_abstract_slice() throws Exception {
-        AbstractSlice abstractSlice = builder.given_an_abstract_slice();
+        AbstractSlice abstractSlice = builder.givenAnAbstractSlice();
         JsonObject jsonObject = abstractSlice.toJsonObject();
         jsonObject.put("time", 3);
         restAbstractSliceControllerMockMvc.perform(put("/api/abstractslice/{id}.json", abstractSlice.getId())
@@ -200,7 +200,7 @@ public class AbstractSliceResourceTests {
     @Test
     @Transactional
     public void delete_abstract_slice() throws Exception {
-        AbstractSlice abstractSlice = builder.given_an_abstract_slice();
+        AbstractSlice abstractSlice = builder.givenAnAbstractSlice();
         restAbstractSliceControllerMockMvc.perform(delete("/api/abstractslice/{id}.json", abstractSlice.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
@@ -218,11 +218,11 @@ public class AbstractSliceResourceTests {
     @Test
     @Transactional
     public void get_abstract_slice_uploader() throws Exception {
-        AbstractSlice image = builder.given_an_abstract_slice();
+        AbstractSlice image = builder.givenAnAbstractSlice();
 
         restAbstractSliceControllerMockMvc.perform(get("/api/abstractslice/{id}/user.json", image.getId()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(builder.given_superadmin().getId()));
+            .andExpect(jsonPath("$.id").value(builder.givenSuperAdmin().getId()));
     }
 
     @Test
@@ -391,8 +391,8 @@ public class AbstractSliceResourceTests {
 
 
     private AbstractSlice given_test_abstract_slice() {
-        AbstractSlice image = builder.given_an_abstract_slice();
-        image.setMime(builder.given_a_mime("openslide/mrxs"));
+        AbstractSlice image = builder.givenAnAbstractSlice();
+        image.setMime(builder.givenAMime("openslide/mrxs"));
         image.getImage().setWidth(109240);
         image.getImage().setHeight(220696);
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");

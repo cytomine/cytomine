@@ -184,13 +184,13 @@ public class StatsResourceTests {
 
     @Test
     void stats_term() throws Exception {
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
 
         restStatsControllerMockMvc.perform(get("/api/project/{project}/stats/term.json", project.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(1))));
 
-        AnnotationTerm annotationTerm = builder.given_an_annotation_term(builder.given_a_user_annotation(project));
+        AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm(builder.givenAUserAnnotation(project));
         entityManager.refresh(project.getOntology());
 
         restStatsControllerMockMvc.perform(get("/api/project/{project}/stats/term.json", project.getId()))
@@ -211,20 +211,20 @@ public class StatsResourceTests {
     @Test
     void stats_user() throws Exception {
 
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
         builder.addUserToProject(project, "superadmin");
-        UserAnnotation annotation1 = builder.given_a_user_annotation(project);
+        UserAnnotation annotation1 = builder.givenAUserAnnotation(project);
         annotation1.setCreated(DateUtils.addDays(new Date(), -1));
         builder.persistAndReturn(annotation1);
         entityManager.refresh(annotation1);
-        UserAnnotation annotation2 = builder.given_a_user_annotation(project);
+        UserAnnotation annotation2 = builder.givenAUserAnnotation(project);
         annotation2.setCreated(DateUtils.addDays(new Date(), -1));
         builder.persistAndReturn(annotation2);
 
         restStatsControllerMockMvc.perform(get("/api/project/{project}/stats/user.json", project.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(1))))
-            .andExpect(jsonPath("$.collection[0].id").value(builder.given_superadmin().getId().intValue()))
+            .andExpect(jsonPath("$.collection[0].id").value(builder.givenSuperAdmin().getId().intValue()))
             .andExpect(jsonPath("$.collection[0].value").value(2));
 
 
@@ -236,13 +236,13 @@ public class StatsResourceTests {
 
     @Test
     void stats_term_slide() throws Exception {
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
 
         restStatsControllerMockMvc.perform(get("/api/project/{project}/stats/termslide.json", project.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(1))));
 
-        Term term = builder.given_a_term(project.getOntology());
+        Term term = builder.givenATerm(project.getOntology());
 
         restStatsControllerMockMvc.perform(get("/api/project/{project}/stats/termslide.json", project.getId()))
             .andExpect(status().isOk())
@@ -256,13 +256,13 @@ public class StatsResourceTests {
 
     @Test
     void stat_Per_term_and_image() throws Exception {
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
 
         restStatsControllerMockMvc.perform(get("/api/project/{project}/stats/termimage.json", project.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(0))));
 
-        AnnotationTerm annotationTerm = builder.given_an_annotation_term(builder.given_a_user_annotation(project));
+        AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm(builder.givenAUserAnnotation(project));
         entityManager.refresh(project.getOntology());
 
         restStatsControllerMockMvc.perform(get("/api/project/{project}/stats/termimage.json", project.getId()))
@@ -279,27 +279,27 @@ public class StatsResourceTests {
 
     @Test
     void stats_uder_slide() throws Exception {
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
         builder.addUserToProject(project, "superadmin");
 
         restStatsControllerMockMvc.perform(get("/api/project/{project}/stats/userslide.json", project.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(1))))
-            .andExpect(jsonPath("$.collection[0].id").value(builder.given_superadmin().getId()))
+            .andExpect(jsonPath("$.collection[0].id").value(builder.givenSuperAdmin().getId()))
             .andExpect(jsonPath("$.collection[0].value").value(0));
         ;
 
-        UserAnnotation annotation1 = builder.given_a_user_annotation(project);
+        UserAnnotation annotation1 = builder.givenAUserAnnotation(project);
         annotation1.setCreated(DateUtils.addDays(new Date(), -1));
         builder.persistAndReturn(annotation1);
-        UserAnnotation annotation2 = builder.given_a_user_annotation(project);
+        UserAnnotation annotation2 = builder.givenAUserAnnotation(project);
         annotation2.setCreated(DateUtils.addDays(new Date(), -10));
         builder.persistAndReturn(annotation2);
 
         restStatsControllerMockMvc.perform(get("/api/project/{project}/stats/userslide.json", project.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(1))))
-            .andExpect(jsonPath("$.collection[0].id").value(builder.given_superadmin().getId()))
+            .andExpect(jsonPath("$.collection[0].id").value(builder.givenSuperAdmin().getId()))
             .andExpect(jsonPath("$.collection[0].value").value(2));
         ;
 
@@ -311,16 +311,16 @@ public class StatsResourceTests {
 
     @Test
     void stats_user_annotation() throws Exception {
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
         builder.addUserToProject(project, "superadmin");
-        UserAnnotation annotation1 = builder.given_a_user_annotation(project);
+        UserAnnotation annotation1 = builder.givenAUserAnnotation(project);
         annotation1.setCreated(DateUtils.addDays(new Date(), -1));
-        builder.given_an_annotation_term(annotation1, builder.given_a_term(project.getOntology()));
+        builder.givenAnAnnotationTerm(annotation1, builder.givenATerm(project.getOntology()));
         builder.persistAndReturn(annotation1);
         entityManager.refresh(annotation1);
-        UserAnnotation annotation2 = builder.given_a_user_annotation(project);
+        UserAnnotation annotation2 = builder.givenAUserAnnotation(project);
         annotation2.setCreated(DateUtils.addDays(new Date(), -1));
-        builder.given_an_annotation_term(annotation2, annotation1.getTerms().get(0));
+        builder.givenAnAnnotationTerm(annotation2, annotation1.getTerms().get(0));
         builder.persistAndReturn(annotation2);
         entityManager.refresh(annotation2);
 
@@ -329,7 +329,7 @@ public class StatsResourceTests {
         restStatsControllerMockMvc.perform(get("/api/project/{project}/stats/userannotations.json", project.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(1))))
-            .andExpect(jsonPath("$.collection[0].id").value(builder.given_superadmin().getId()))
+            .andExpect(jsonPath("$.collection[0].id").value(builder.givenSuperAdmin().getId()))
             .andExpect(jsonPath("$.collection[0].terms[0].value").value(2));
 
     }
@@ -337,11 +337,11 @@ public class StatsResourceTests {
 
     @Test
     void stats_user_annotation_evolution() throws Exception {
-        Project project = builder.given_a_project();
-        UserAnnotation annotation1 = builder.given_a_user_annotation(project);
+        Project project = builder.givenAProject();
+        UserAnnotation annotation1 = builder.givenAUserAnnotation(project);
         annotation1.setCreated(DateUtils.addDays(new Date(), -1));
         builder.persistAndReturn(annotation1);
-        UserAnnotation annotation2 = builder.given_a_user_annotation(project);
+        UserAnnotation annotation2 = builder.givenAUserAnnotation(project);
         annotation2.setCreated(DateUtils.addDays(new Date(), -10));
         builder.persistAndReturn(annotation2);
 
@@ -359,11 +359,11 @@ public class StatsResourceTests {
 
     @Test
     void stats_reviewed_annotation_evolution() throws Exception {
-        Project project = builder.given_a_project();
-        ReviewedAnnotation annotation1 = builder.given_a_reviewed_annotation(project);
+        Project project = builder.givenAProject();
+        ReviewedAnnotation annotation1 = builder.givenAReviewedAnnotation(project);
         annotation1.setCreated(DateUtils.addDays(new Date(), -1));
         builder.persistAndReturn(annotation1);
-        ReviewedAnnotation annotation2 = builder.given_a_reviewed_annotation(project);
+        ReviewedAnnotation annotation2 = builder.givenAReviewedAnnotation(project);
         annotation2.setCreated(DateUtils.addDays(new Date(), -10));
         builder.persistAndReturn(annotation2);
 
@@ -384,9 +384,9 @@ public class StatsResourceTests {
 
     @Test
     void stats_annotation_term_by_project() throws Exception {
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
         builder.addUserToProject(project, "superadmin");
-        AnnotationTerm annotationTerm = builder.given_an_annotation_term(builder.given_a_user_annotation(project));
+        AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm(builder.givenAUserAnnotation(project));
         entityManager.refresh(annotationTerm.getUserAnnotation());
 
         restStatsControllerMockMvc.perform(get("/api/term/{id}/project/stat.json", annotationTerm.getTerm().getId()))
@@ -404,7 +404,7 @@ public class StatsResourceTests {
 
     @Test
     void stats_domain_count() throws Exception {
-        UserAnnotation annotation = builder.given_a_user_annotation();
+        UserAnnotation annotation = builder.givenAUserAnnotation();
 
         restStatsControllerMockMvc.perform(get("/api/total/{domain}.json", annotation.getClass().getName()))
             .andExpect(status().isOk());
@@ -424,19 +424,19 @@ public class StatsResourceTests {
 
     @Test
     void stats_connection_evolution() throws Exception {
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
         given_a_persistent_connection_in_project(
-            builder.given_superadmin(),
+            builder.givenSuperAdmin(),
             project,
             DateUtils.addDays(new Date(), -15)
         );
         given_a_persistent_connection_in_project(
-            builder.given_superadmin(),
+            builder.givenSuperAdmin(),
             project,
             DateUtils.addDays(new Date(), -15)
         );
         given_a_persistent_connection_in_project(
-            builder.given_superadmin(),
+            builder.givenSuperAdmin(),
             project,
             DateUtils.addDays(new Date(), -5)
         );
@@ -453,20 +453,20 @@ public class StatsResourceTests {
 
     @Test
     void stats_image_consultation_evolution() throws Exception {
-        Project project = builder.given_a_project();
-        ImageInstance imageInstance = builder.given_an_image_instance(project);
+        Project project = builder.givenAProject();
+        ImageInstance imageInstance = builder.givenAnImageInstance(project);
         given_a_persistent_image_consultation(
-            builder.given_superadmin(),
+            builder.givenSuperAdmin(),
             imageInstance,
             DateUtils.addDays(new Date(), -15)
         );
         given_a_persistent_image_consultation(
-            builder.given_superadmin(),
+            builder.givenSuperAdmin(),
             imageInstance,
             DateUtils.addDays(new Date(), -15)
         );
         given_a_persistent_image_consultation(
-            builder.given_superadmin(),
+            builder.givenSuperAdmin(),
             imageInstance,
             DateUtils.addDays(new Date(), -5)
         );
@@ -483,30 +483,30 @@ public class StatsResourceTests {
 
     @Test
     void stats_annotation_Action_evolution() throws Exception {
-        Project project = builder.given_a_project();
-        AnnotationDomain annotation = builder.given_a_user_annotation(project);
+        Project project = builder.givenAProject();
+        AnnotationDomain annotation = builder.givenAUserAnnotation(project);
         given_a_persistent_annotation_action(
             DateUtils.addDays(new Date(), -15),
             annotation,
-            builder.given_superadmin(),
+            builder.givenSuperAdmin(),
             "select"
         );
         given_a_persistent_annotation_action(
             DateUtils.addDays(new Date(), -15),
             annotation,
-            builder.given_superadmin(),
+            builder.givenSuperAdmin(),
             "move"
         );
         given_a_persistent_annotation_action(
             DateUtils.addDays(new Date(), -15),
             annotation,
-            builder.given_superadmin(),
+            builder.givenSuperAdmin(),
             "select"
         );
         given_a_persistent_annotation_action(
             DateUtils.addDays(new Date(), -5),
             annotation,
-            builder.given_superadmin(),
+            builder.givenSuperAdmin(),
             "select"
         );
 

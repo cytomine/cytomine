@@ -51,7 +51,7 @@ public class ProjectDefaultLayerServiceTests {
 
     @Test
     void get_projectDefaultLayer_with_success() {
-        ProjectDefaultLayer projectDefaultLayer = builder.given_a_project_default_layer();
+        ProjectDefaultLayer projectDefaultLayer = builder.givenAProjectDefaultLayer();
         assertThat(projectDefaultLayer).isEqualTo(projectDefaultLayerService.get(projectDefaultLayer.getId()));
     }
 
@@ -62,7 +62,7 @@ public class ProjectDefaultLayerServiceTests {
 
     @Test
     void find_projectDefaultLayer_with_success() {
-        ProjectDefaultLayer projectDefaultLayer = builder.given_a_project_default_layer();
+        ProjectDefaultLayer projectDefaultLayer = builder.givenAProjectDefaultLayer();
         assertThat(projectDefaultLayerService.find(projectDefaultLayer.getId()).isPresent());
         assertThat(projectDefaultLayer).isEqualTo(projectDefaultLayerService.find(projectDefaultLayer.getId()).get());
     }
@@ -74,8 +74,8 @@ public class ProjectDefaultLayerServiceTests {
 
     @Test
     void list_all_projectDefaultLayer_by_project_with_success() {
-        ProjectDefaultLayer projectDefaultLayer = builder.given_a_project_default_layer();
-        ProjectDefaultLayer projectDefaultLayerFromAnotherProject = builder.given_a_project_default_layer();
+        ProjectDefaultLayer projectDefaultLayer = builder.givenAProjectDefaultLayer();
+        ProjectDefaultLayer projectDefaultLayerFromAnotherProject = builder.givenAProjectDefaultLayer();
         assertThat(projectDefaultLayer)
             .isIn(projectDefaultLayerService.listByProject(projectDefaultLayer.getProject()));
         assertThat(projectDefaultLayerFromAnotherProject).isNotIn(projectDefaultLayerService.listByProject(
@@ -84,7 +84,7 @@ public class ProjectDefaultLayerServiceTests {
 
     @Test
     void add_valid_projectDefaultLayer_with_success() {
-        ProjectDefaultLayer projectDefaultLayer = builder.given_a_not_persisted_project_default_layer();
+        ProjectDefaultLayer projectDefaultLayer = builder.givenANotPersistedProjectDefaultLayer();
 
         CommandResponse commandResponse = projectDefaultLayerService.add(projectDefaultLayer.toJsonObject());
 
@@ -97,7 +97,7 @@ public class ProjectDefaultLayerServiceTests {
 
     @Test
     void add_projectDefaultLayer_with_bad_project() {
-        ProjectDefaultLayer projectDefaultLayer = builder.given_a_not_persisted_project_default_layer();
+        ProjectDefaultLayer projectDefaultLayer = builder.givenANotPersistedProjectDefaultLayer();
         Assertions.assertThrows(
             ObjectNotFoundException.class, () -> {
                 projectDefaultLayerService.add(projectDefaultLayer.toJsonObject().withChange("project", 0L));
@@ -107,7 +107,7 @@ public class ProjectDefaultLayerServiceTests {
 
     @Test
     void add_projectDefaultLayer_with_bad_user() {
-        ProjectDefaultLayer projectDefaultLayer = builder.given_a_not_persisted_project_default_layer();
+        ProjectDefaultLayer projectDefaultLayer = builder.givenANotPersistedProjectDefaultLayer();
         Assertions.assertThrows(
             ObjectNotFoundException.class, () -> {
                 projectDefaultLayerService.add(projectDefaultLayer.toJsonObject().withChange("user", 0L));
@@ -117,7 +117,7 @@ public class ProjectDefaultLayerServiceTests {
 
     @Test
     void add_already_existing_projectDefaultLayer_fails() {
-        ProjectDefaultLayer projectDefaultLayer = builder.given_a_project_default_layer();
+        ProjectDefaultLayer projectDefaultLayer = builder.givenAProjectDefaultLayer();
         Assertions.assertThrows(
             AlreadyExistException.class, () -> {
                 projectDefaultLayerService.add(projectDefaultLayer.toJsonObject().withChange("id", null));
@@ -127,7 +127,7 @@ public class ProjectDefaultLayerServiceTests {
 
     @Test
     void delete_projectDefaultLayer_with_success() {
-        ProjectDefaultLayer projectDefaultLayer = builder.given_a_project_default_layer();
+        ProjectDefaultLayer projectDefaultLayer = builder.givenAProjectDefaultLayer();
 
         CommandResponse commandResponse = projectDefaultLayerService.delete(projectDefaultLayer, null, null, true);
 

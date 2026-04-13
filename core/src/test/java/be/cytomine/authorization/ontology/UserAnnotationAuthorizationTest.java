@@ -98,7 +98,7 @@ public class UserAnnotationAuthorizationTest extends CRUDAuthorizationTest {
     @BeforeEach
     public void before() throws Exception {
         if (userAnnotation == null) {
-            userAnnotation = builder.given_a_user_annotation();
+            userAnnotation = builder.givenAUserAnnotation();
 
             initACL(userAnnotation.container());
         }
@@ -121,7 +121,7 @@ public class UserAnnotationAuthorizationTest extends CRUDAuthorizationTest {
     @Test
     @WithMockUser(username = SUPERADMIN)
     public void admin_can_update_annotation_in_restricted_project() {
-        UserAnnotation userAnnotation = builder.given_a_user_annotation();
+        UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         userAnnotation.setProject(this.userAnnotation.getProject());
         Project project = (Project) userAnnotation.container();
         project.setMode(EditingMode.RESTRICTED);
@@ -134,7 +134,7 @@ public class UserAnnotationAuthorizationTest extends CRUDAuthorizationTest {
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void user_cannot_update_annotation_in_restricted_project() {
-        UserAnnotation userAnnotation = builder.given_a_user_annotation();
+        UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         userAnnotation.setProject(this.userAnnotation.getProject());
         Project project = (Project) userAnnotation.container();
         project.setMode(EditingMode.RESTRICTED);
@@ -153,7 +153,7 @@ public class UserAnnotationAuthorizationTest extends CRUDAuthorizationTest {
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void user_can_delete_its_annotation_even_if_other_users_has_set_terms() {
-        builder.given_an_annotation_term(userAnnotation);
+        builder.givenAnAnnotationTerm(userAnnotation);
         userAnnotationService.delete(userAnnotation, null, null, false);
     }
 
@@ -164,7 +164,7 @@ public class UserAnnotationAuthorizationTest extends CRUDAuthorizationTest {
 
     @Override
     protected void when_i_add_domain() {
-        UserAnnotation annotation = builder.given_a_not_persisted_user_annotation(this.userAnnotation.getProject());
+        UserAnnotation annotation = builder.givenANotPersistedUserAnnotation(this.userAnnotation.getProject());
         userAnnotationService.add(annotation.toJsonObject());
     }
 
@@ -177,7 +177,7 @@ public class UserAnnotationAuthorizationTest extends CRUDAuthorizationTest {
     protected void when_i_delete_domain() {
         UserAnnotation
             annotation
-            = builder.persistAndReturn(builder.given_a_not_persisted_user_annotation(this.userAnnotation.getProject()));
+            = builder.persistAndReturn(builder.givenANotPersistedUserAnnotation(this.userAnnotation.getProject()));
         userAnnotationService.delete(annotation, null, null, true);
     }
 

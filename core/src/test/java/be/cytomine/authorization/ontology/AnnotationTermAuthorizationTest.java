@@ -61,7 +61,7 @@ public class AnnotationTermAuthorizationTest extends CRDAuthorizationTest {
     @BeforeEach
     public void before() throws Exception {
         if (annotationTerm == null) {
-            annotationTerm = builder.given_an_annotation_term();
+            annotationTerm = builder.givenAnAnnotationTerm();
             ;
             initACL(annotationTerm.container());
         }
@@ -94,7 +94,7 @@ public class AnnotationTermAuthorizationTest extends CRDAuthorizationTest {
     @WithMockUser(username = SUPERADMIN)
     public void admin_can_update_annotation_in_restricted_project() {
         AnnotationTerm annotationTerm
-            = builder.given_an_annotation_term(this.annotationTerm.getUserAnnotation());
+            = builder.givenAnAnnotationTerm(this.annotationTerm.getUserAnnotation());
         Project project = (Project) annotationTerm.container();
         project.setMode(EditingMode.RESTRICTED);
         builder.persistAndReturn(project);
@@ -107,7 +107,7 @@ public class AnnotationTermAuthorizationTest extends CRDAuthorizationTest {
     @WithMockUser(username = USER_ACL_READ)
     public void user_can_update_annotation_in_classic_project() {
         AnnotationTerm annotationTerm
-            = builder.given_an_annotation_term(this.annotationTerm.getUserAnnotation());
+            = builder.givenAnAnnotationTerm(this.annotationTerm.getUserAnnotation());
         Project project = (Project) annotationTerm.container();
         project.setMode(EditingMode.CLASSIC);
         builder.persistAndReturn(project);
@@ -121,7 +121,7 @@ public class AnnotationTermAuthorizationTest extends CRDAuthorizationTest {
     @WithMockUser(username = USER_ACL_READ)
     public void user_cannot_update_annotation_in_readonly_project() {
         AnnotationTerm annotationTerm
-            = builder.given_an_annotation_term(this.annotationTerm.getUserAnnotation());
+            = builder.givenAnAnnotationTerm(this.annotationTerm.getUserAnnotation());
         Project project = (Project) annotationTerm.container();
         project.setMode(EditingMode.READ_ONLY);
         builder.persistAndReturn(project);
@@ -134,7 +134,7 @@ public class AnnotationTermAuthorizationTest extends CRDAuthorizationTest {
     @WithMockUser(username = USER_ACL_READ)
     public void user_cannot_update_annotation_in_restricted_project() {
         AnnotationTerm annotationTerm
-            = builder.given_an_annotation_term(this.annotationTerm.getUserAnnotation());
+            = builder.givenAnAnnotationTerm(this.annotationTerm.getUserAnnotation());
         Project project = (Project) annotationTerm.container();
         project.setMode(EditingMode.RESTRICTED);
         builder.persistAndReturn(project);
@@ -153,7 +153,7 @@ public class AnnotationTermAuthorizationTest extends CRDAuthorizationTest {
     @Override
     protected void when_i_add_domain() {
         annotationTermService.add(
-            builder.given_a_not_persisted_annotation_term(
+            builder.givenANotPersistedAnnotationTerm(
                 annotationTerm.getUserAnnotation()).toJsonObject()
         );
     }
@@ -162,7 +162,7 @@ public class AnnotationTermAuthorizationTest extends CRDAuthorizationTest {
     protected void when_i_delete_domain() {
         AnnotationTerm
             annotationTerm
-            = builder.given_a_not_persisted_annotation_term(this.annotationTerm.getUserAnnotation());
+            = builder.givenANotPersistedAnnotationTerm(this.annotationTerm.getUserAnnotation());
         builder.persistAndReturn(annotationTerm);
         annotationTermService.delete(annotationTerm, null, null, true);
     }

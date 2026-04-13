@@ -173,7 +173,7 @@ public class ImageServerServiceTests {
     // TODO
     @Test
     void retrieve_abstract_image_download_uri() throws IOException {
-        AbstractImage image = builder.given_an_abstract_image();
+        AbstractImage image = builder.givenAnAbstractImage();
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setOriginalFilename("CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
@@ -211,7 +211,7 @@ public class ImageServerServiceTests {
 
     @Test
     void retrieve_uploaded_file_download_uri() throws IOException {
-        UploadedFile uploadedFile = builder.given_a_not_persisted_uploaded_file();
+        UploadedFile uploadedFile = builder.givenANotPersistedUploadedFile();
         uploadedFile.setFilename("1636379100999/CMU-2.zip");
         uploadedFile.setOriginalFilename("CMU-2.zip");
         uploadedFile.setContentType("ZIP");
@@ -234,7 +234,7 @@ public class ImageServerServiceTests {
 
     @Test
     void extract_properties_from_abstract_image() throws IOException {
-        AbstractImage image = builder.given_an_abstract_image();
+        AbstractImage image = builder.givenAnAbstractImage();
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
 
@@ -306,7 +306,7 @@ public class ImageServerServiceTests {
 
     @Test
     void get_associated_abstract_image() throws IOException {
-        AbstractImage image = builder.given_an_abstract_image();
+        AbstractImage image = builder.givenAnAbstractImage();
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
         configureFor("localhost", 8888);
@@ -327,7 +327,7 @@ public class ImageServerServiceTests {
 
     @Test
     void get_label_abstract_image_macro() throws IOException {
-        AbstractImage image = builder.given_an_abstract_image();
+        AbstractImage image = builder.givenAnAbstractImage();
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
         configureFor("localhost", 8888);
@@ -356,11 +356,11 @@ public class ImageServerServiceTests {
 
     @Test
     void get_thumb_for_abstract_image() throws IOException {
-        AbstractImage image = builder.given_an_abstract_image();
+        AbstractImage image = builder.givenAnAbstractImage();
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
 
-        AbstractSlice slice = builder.given_an_abstract_slice(image, 0, 0, 0);
+        AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
         slice.setUploadedFile(image.getUploadedFile());
 
         configureFor("localhost", 8888);
@@ -409,11 +409,11 @@ public class ImageServerServiceTests {
 
     @Test
     void get_normalized_tile_for_abstract_image() throws IOException {
-        AbstractImage image = builder.given_an_abstract_image();
+        AbstractImage image = builder.givenAnAbstractImage();
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
 
-        AbstractSlice slice = builder.given_an_abstract_slice(image, 0, 0, 0);
+        AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
         slice.setUploadedFile(image.getUploadedFile());
 
         configureFor("localhost", 8888);
@@ -468,13 +468,13 @@ public class ImageServerServiceTests {
 
     @Test
     void get_crop_for_abstract_image() throws IOException, ParseException {
-        AbstractImage image = builder.given_an_abstract_image();
+        AbstractImage image = builder.givenAnAbstractImage();
         image.setWidth(109240);
         image.setHeight(220696);
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
 
-        AbstractSlice slice = builder.given_an_abstract_slice(image, 0, 0, 0);
+        AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
         slice.setUploadedFile(image.getUploadedFile());
 
         configureFor("localhost", 8888);
@@ -521,13 +521,13 @@ public class ImageServerServiceTests {
     @Test
     void get_window_for_abstract_image() throws UnsupportedEncodingException, ParseException {
 
-        AbstractImage image = builder.given_an_abstract_image();
+        AbstractImage image = builder.givenAnAbstractImage();
         image.setWidth(109240);
         image.setHeight(220696);
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
 
-        AbstractSlice slice = builder.given_an_abstract_slice(image, 0, 0, 0);
+        AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
         slice.setUploadedFile(image.getUploadedFile());
         byte[] mockResponse = UUID.randomUUID()
             .toString()
@@ -562,12 +562,12 @@ public class ImageServerServiceTests {
 
     @Test
     void image_histograms() throws IOException {
-        AbstractImage image = builder.given_an_abstract_image();
+        AbstractImage image = builder.givenAnAbstractImage();
         image.setWidth(109240);
         image.setHeight(220696);
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
-        AbstractSlice slice = builder.given_an_abstract_slice(image, 0, 0, 0);
+        AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
 
 
         configureFor("localhost", 8888);
@@ -617,12 +617,12 @@ public class ImageServerServiceTests {
 
     @Test
     void image_histograms_bounds() throws IOException {
-        AbstractImage image = builder.given_an_abstract_image();
+        AbstractImage image = builder.givenAnAbstractImage();
         image.setWidth(109240);
         image.setHeight(220696);
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
-        AbstractSlice slice = builder.given_an_abstract_slice(image, 0, 0, 0);
+        AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
 
 
         configureFor("localhost", 8888);
@@ -650,12 +650,12 @@ public class ImageServerServiceTests {
 
     @Test
     void plane_histograms() throws IOException {
-        AbstractImage image = builder.given_an_abstract_image();
+        AbstractImage image = builder.givenAnAbstractImage();
         image.setWidth(109240);
         image.setHeight(220696);
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
-        AbstractSlice slice = builder.given_an_abstract_slice(image, 0, 0, 0);
+        AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
 
 
         configureFor("localhost", 8888);
@@ -710,12 +710,12 @@ public class ImageServerServiceTests {
 
     @Test
     void plane_histograms_bounds() throws IOException {
-        AbstractImage image = builder.given_an_abstract_image();
+        AbstractImage image = builder.givenAnAbstractImage();
         image.setWidth(109240);
         image.setHeight(220696);
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
-        AbstractSlice slice = builder.given_an_abstract_slice(image, 0, 0, 0);
+        AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
 
 
         configureFor("localhost", 8888);
@@ -744,12 +744,12 @@ public class ImageServerServiceTests {
 
     @Test
     void channel_histograms() throws IOException {
-        AbstractImage image = builder.given_an_abstract_image();
+        AbstractImage image = builder.givenAnAbstractImage();
         image.setWidth(109240);
         image.setHeight(220696);
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
-        AbstractSlice slice = builder.given_an_abstract_slice(image, 0, 0, 0);
+        AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
 
 
         configureFor("localhost", 8888);
@@ -796,12 +796,12 @@ public class ImageServerServiceTests {
 
     @Test
     void chanel_histograms_bounds() throws IOException {
-        AbstractImage image = builder.given_an_abstract_image();
+        AbstractImage image = builder.givenAnAbstractImage();
         image.setWidth(109240);
         image.setHeight(220696);
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
-        AbstractSlice slice = builder.given_an_abstract_slice(image, 0, 0, 0);
+        AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
 
 
         configureFor("localhost", 8888);

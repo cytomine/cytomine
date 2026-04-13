@@ -55,7 +55,7 @@ public class ImageGroupImageInstanceResourceTests {
     @Test
     @Transactional
     public void list_imagegroup_imageinstance_by_imageinstance() throws Exception {
-        ImageGroupImageInstance igii = builder.given_an_imagegroup_imageinstance();
+        ImageGroupImageInstance igii = builder.givenAnImageGroupImageInstance();
         restImageGroupImageInstanceControllerMockMvc.perform(get(
                 "/api/imageinstance/{id}/imagegroupimageinstance.json",
                 igii.getImage().getId()
@@ -67,7 +67,7 @@ public class ImageGroupImageInstanceResourceTests {
     @Test
     @Transactional
     public void add_valid_imagegroup_imageinstance() throws Exception {
-        ImageGroupImageInstance igii = builder.given_an_imagegroup_imageinstance();
+        ImageGroupImageInstance igii = builder.givenAnImageGroupImageInstance();
         restImageGroupImageInstanceControllerMockMvc.perform(post(
                 "/api/imagegroup/{group}/imageinstance/{image}.json",
                 igii.getGroup().getId(),
@@ -87,7 +87,7 @@ public class ImageGroupImageInstanceResourceTests {
     @Test
     @Transactional
     public void delete_imagegroup_imageinstance() throws Exception {
-        ImageGroupImageInstance igii = builder.given_an_imagegroup_imageinstance();
+        ImageGroupImageInstance igii = builder.givenAnImageGroupImageInstance();
         restImageGroupImageInstanceControllerMockMvc.perform(delete(
                 "/api/imagegroup/{group}/imageinstance/{image}.json",
                 igii.getGroup().getId(),
@@ -106,15 +106,15 @@ public class ImageGroupImageInstanceResourceTests {
     @Test
     @Transactional
     public void get_previous_imagegroup_imageinstance() throws Exception {
-        Project project = builder.given_a_project();
-        ImageGroup group = builder.given_an_imagegroup(project);
-        ImageGroupImageInstance curr_igii = builder.given_an_imagegroup_imageinstance(
+        Project project = builder.givenAProject();
+        ImageGroup group = builder.givenAnImageGroup(project);
+        ImageGroupImageInstance curr_igii = builder.givenAnImageGroupImageInstance(
             group,
-            builder.given_an_image_instance(project)
+            builder.givenAnImageInstance(project)
         );
-        ImageGroupImageInstance prev_igii = builder.given_an_imagegroup_imageinstance(
+        ImageGroupImageInstance prev_igii = builder.givenAnImageGroupImageInstance(
             group,
-            builder.given_an_image_instance(project)
+            builder.givenAnImageInstance(project)
         );
         restImageGroupImageInstanceControllerMockMvc.perform(get(
                 "/api/imagegroup/{group}/imageinstance/{image}/previous.json",
@@ -128,15 +128,15 @@ public class ImageGroupImageInstanceResourceTests {
     @Test
     @Transactional
     public void get_next_imagegroup_imageinstance() throws Exception {
-        Project project = builder.given_a_project();
-        ImageGroup group = builder.given_an_imagegroup(project);
-        ImageGroupImageInstance curr_igii = builder.given_an_imagegroup_imageinstance(
+        Project project = builder.givenAProject();
+        ImageGroup group = builder.givenAnImageGroup(project);
+        ImageGroupImageInstance curr_igii = builder.givenAnImageGroupImageInstance(
             group,
-            builder.given_an_image_instance(project)
+            builder.givenAnImageInstance(project)
         );
-        ImageGroupImageInstance next_igii = builder.given_an_imagegroup_imageinstance(
+        ImageGroupImageInstance next_igii = builder.givenAnImageGroupImageInstance(
             group,
-            builder.given_an_image_instance(project)
+            builder.givenAnImageInstance(project)
         );
         restImageGroupImageInstanceControllerMockMvc.perform(get(
                 "/api/imagegroup/{group}/imageinstance/{image}/next.json",

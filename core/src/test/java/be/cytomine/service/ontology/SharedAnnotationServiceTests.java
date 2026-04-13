@@ -65,13 +65,13 @@ public class SharedAnnotationServiceTests {
 
     @Test
     void list_all_sharedAnnotation_with_success() {
-        SharedAnnotation sharedAnnotation = builder.given_a_shared_annotation();
+        SharedAnnotation sharedAnnotation = builder.givenASharedAnnotation();
         assertThat(sharedAnnotation).isIn(sharedAnnotationService.list());
     }
 
     @Test
     void get_sharedAnnotation_with_success() {
-        SharedAnnotation sharedAnnotation = builder.given_a_shared_annotation();
+        SharedAnnotation sharedAnnotation = builder.givenASharedAnnotation();
         assertThat(sharedAnnotation).isEqualTo(sharedAnnotationService.get(sharedAnnotation.getId()));
     }
 
@@ -82,7 +82,7 @@ public class SharedAnnotationServiceTests {
 
     @Test
     void find_sharedAnnotation_with_success() {
-        SharedAnnotation sharedAnnotation = builder.given_a_shared_annotation();
+        SharedAnnotation sharedAnnotation = builder.givenASharedAnnotation();
         assertThat(sharedAnnotationService.find(sharedAnnotation.getId()).isPresent());
         assertThat(sharedAnnotation).isEqualTo(sharedAnnotationService.find(sharedAnnotation.getId()).get());
     }
@@ -94,21 +94,21 @@ public class SharedAnnotationServiceTests {
 
     @Test
     void list_all_sharedAnnotation_by_annotation() {
-        UserAnnotation annotation = builder.given_a_user_annotation();
-        SharedAnnotation sharedAnnotation = builder.given_a_shared_annotation(annotation);
+        UserAnnotation annotation = builder.givenAUserAnnotation();
+        SharedAnnotation sharedAnnotation = builder.givenASharedAnnotation(annotation);
         assertThat(sharedAnnotation).isIn(sharedAnnotationService.listComments(annotation));
-        assertThat(builder.given_a_shared_annotation()).isNotIn(sharedAnnotationService.listComments(annotation));
+        assertThat(builder.givenASharedAnnotation()).isNotIn(sharedAnnotationService.listComments(annotation));
     }
 
     @Test
     void add_valid_sharedAnnotation_with_success() {
-        AnnotationDomain annotationDomain = builder.given_a_user_annotation();
-        SharedAnnotation sharedAnnotation = builder.given_a_not_persisted_shared_annotation();
+        AnnotationDomain annotationDomain = builder.givenAUserAnnotation();
+        SharedAnnotation sharedAnnotation = builder.givenANotPersistedSharedAnnotation();
         sharedAnnotation.setAnnotation(annotationDomain);
         JsonObject json = sharedAnnotation.toJsonObject();
         json.put("subject", "subject for test mail");
         json.put("message", "message for test mail");
-        json.put("users", List.of(builder.given_superadmin().getId()));
+        json.put("users", List.of(builder.givenSuperAdmin().getId()));
         json.put("annotationIdent", sharedAnnotation.getAnnotationIdent());
         json.put("annotationClassName", sharedAnnotation.getAnnotationClassName());
 
@@ -125,7 +125,7 @@ public class SharedAnnotationServiceTests {
 
     @Test
     void delete_sharedAnnotation_with_success() {
-        SharedAnnotation sharedAnnotation = builder.given_a_shared_annotation();
+        SharedAnnotation sharedAnnotation = builder.givenASharedAnnotation();
 
         CommandResponse commandResponse = sharedAnnotationService.delete(sharedAnnotation, null, null, true);
 

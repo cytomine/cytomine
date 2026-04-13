@@ -91,8 +91,8 @@ public class AnnotationActionResourceTests {
     @Test
     public void add_action_for_annotation() throws Exception {
         AssertionsForClassTypes.assertThat(annotationActionRepository.count()).isEqualTo(0);
-        User user = builder.given_superadmin();
-        AnnotationDomain annotationDomain = builder.given_a_user_annotation();
+        User user = builder.givenSuperAdmin();
+        AnnotationDomain annotationDomain = builder.givenAUserAnnotation();
 
         JsonObject jsonObject = new JsonObject();
         jsonObject.put("annotationIdent", annotationDomain.getId());
@@ -121,9 +121,9 @@ public class AnnotationActionResourceTests {
     @Test
     @Transactional
     public void list_last_user_on_image() throws Exception {
-        User user = builder.given_a_user();
+        User user = builder.givenAUser();
 
-        AnnotationDomain annotationDomain = builder.given_a_user_annotation();
+        AnnotationDomain annotationDomain = builder.givenAUserAnnotation();
         given_a_persistent_annotation_action(new Date(), annotationDomain, user, "select");
 
         restUserPositionControllerMockMvc.perform(get(
@@ -136,7 +136,7 @@ public class AnnotationActionResourceTests {
 
         restUserPositionControllerMockMvc.perform(get(
                 "/api/imageinstance/{image}/annotation_action.json",
-                builder.given_an_image_instance().getId()
+                builder.givenAnImageInstance().getId()
             )
                 .param("user", user.getId().toString()))
             .andExpect(status().isOk())
@@ -146,9 +146,9 @@ public class AnnotationActionResourceTests {
     @Test
     @Transactional
     public void list_last_user_on_slice() throws Exception {
-        User user = builder.given_a_user();
+        User user = builder.givenAUser();
 
-        AnnotationDomain annotationDomain = builder.given_a_user_annotation();
+        AnnotationDomain annotationDomain = builder.givenAUserAnnotation();
         given_a_persistent_annotation_action(new Date(), annotationDomain, user, "select");
 
         restUserPositionControllerMockMvc.perform(get(
@@ -161,7 +161,7 @@ public class AnnotationActionResourceTests {
 
         restUserPositionControllerMockMvc.perform(get(
                 "/api/sliceinstance/{image}/annotation_action.json",
-                builder.given_a_slice_instance().getId()
+                builder.givenASliceInstance().getId()
             )
                 .param("user", user.getId().toString()))
             .andExpect(status().isOk())
@@ -171,8 +171,8 @@ public class AnnotationActionResourceTests {
     @Test
     @Transactional
     public void count_annotation_by_project() throws Exception {
-        User user = builder.given_superadmin();
-        AnnotationDomain annotationDomain = builder.given_a_user_annotation();
+        User user = builder.givenSuperAdmin();
+        AnnotationDomain annotationDomain = builder.givenAUserAnnotation();
         given_a_persistent_annotation_action(DateUtils.addDays(new Date(), -2), annotationDomain, user, "select");
 
         restUserPositionControllerMockMvc.perform(get(

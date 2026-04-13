@@ -40,7 +40,7 @@ public class SimplifyGeometryServiceTests {
     public void simplify_big_annotation() throws ParseException {
 
         //create annotation
-        UserAnnotation annotation = builder.given_a_user_annotation();
+        UserAnnotation annotation = builder.givenAUserAnnotation();
 
         //add very big geometry
         annotation.setLocation(new WKTReader().read(TestUtils.getResourceFileAsString("dataset/big_annotation.txt")));
@@ -108,7 +108,7 @@ public class SimplifyGeometryServiceTests {
     public void simplify_very_big_annotation() throws ParseException {
 
         //create annotation
-        UserAnnotation annotation = builder.given_a_user_annotation();
+        UserAnnotation annotation = builder.givenAUserAnnotation();
 
         //add very big geometry
         annotation.setLocation(
@@ -146,7 +146,7 @@ public class SimplifyGeometryServiceTests {
     public void simplify_annotation_with_empty_space() throws ParseException {
 
         //create annotation
-        UserAnnotation annotation = builder.given_a_user_annotation();
+        UserAnnotation annotation = builder.givenAUserAnnotation();
 
         //add very big geometry
         annotation.setLocation(new WKTReader().read(TestUtils.getResourceFileAsString(

@@ -88,8 +88,8 @@ public class AnnotationListingServiceTests {
 
     @Test
     void search_user_annotation_by_project() {
-        UserAnnotation userAnnotation = builder.given_a_user_annotation();
-        UserAnnotation userAnnotationFromAnotherProject = builder.given_a_user_annotation();
+        UserAnnotation userAnnotation = builder.givenAUserAnnotation();
+        UserAnnotation userAnnotationFromAnotherProject = builder.givenAUserAnnotation();
 
         UserAnnotationListing userAnnotationListing = new UserAnnotationListing(entityManager);
         userAnnotationListing.setProject(userAnnotation.getProject().getId());
@@ -101,8 +101,8 @@ public class AnnotationListingServiceTests {
 
     @Test
     void search_user_annotation_by_image() {
-        UserAnnotation userAnnotation = builder.given_a_user_annotation();
-        UserAnnotation userAnnotationFromAnotherImage = builder.given_a_user_annotation();
+        UserAnnotation userAnnotation = builder.givenAUserAnnotation();
+        UserAnnotation userAnnotationFromAnotherImage = builder.givenAUserAnnotation();
 
         UserAnnotationListing userAnnotationListing = new UserAnnotationListing(entityManager);
         userAnnotationListing.setImage(userAnnotation.getImage().getId());
@@ -114,8 +114,8 @@ public class AnnotationListingServiceTests {
 
     @Test
     void search_user_annotation_by_images() {
-        UserAnnotation userAnnotation = builder.given_a_user_annotation();
-        UserAnnotation userAnnotationFromAnotherImage = builder.given_a_user_annotation();
+        UserAnnotation userAnnotation = builder.givenAUserAnnotation();
+        UserAnnotation userAnnotationFromAnotherImage = builder.givenAUserAnnotation();
         userAnnotationFromAnotherImage.getImage().setProject(userAnnotation.getProject());
 
         UserAnnotationListing userAnnotationListing = new UserAnnotationListing(entityManager);
@@ -135,8 +135,8 @@ public class AnnotationListingServiceTests {
 
     @Test
     void search_user_annotation_by_images_from_different_project_fails() {
-        UserAnnotation userAnnotation = builder.given_a_user_annotation();
-        UserAnnotation userAnnotationFromAnotherImage = builder.given_a_user_annotation();
+        UserAnnotation userAnnotation = builder.givenAUserAnnotation();
+        UserAnnotation userAnnotationFromAnotherImage = builder.givenAUserAnnotation();
 
         UserAnnotationListing userAnnotationListing = new UserAnnotationListing(entityManager);
         userAnnotationListing.setImages(Arrays.asList(
@@ -151,14 +151,14 @@ public class AnnotationListingServiceTests {
 
     @Test
     void search_user_annotation_by_terms() {
-        UserAnnotation userAnnotation = builder.given_an_annotation_term().getUserAnnotation();
+        UserAnnotation userAnnotation = builder.givenAnAnnotationTerm().getUserAnnotation();
         UserAnnotation userAnnotationWithDifferentTerm
-            = builder.given_a_user_annotation();
+            = builder.givenAUserAnnotation();
         userAnnotationWithDifferentTerm.setImage(userAnnotation.getImage());
         userAnnotationWithDifferentTerm.setProject(userAnnotation.getProject());
-        builder.given_an_annotation_term(
+        builder.givenAnAnnotationTerm(
             userAnnotationWithDifferentTerm,
-            builder.given_a_term(userAnnotationWithDifferentTerm.getProject().getOntology())
+            builder.givenATerm(userAnnotationWithDifferentTerm.getProject().getOntology())
         );
 
         entityManager.refresh(userAnnotation);
@@ -184,10 +184,10 @@ public class AnnotationListingServiceTests {
 
     @Test
     void search_user_annotation_with_multiple_terms() {
-        UserAnnotation userAnnotation = builder.given_an_annotation_term().getUserAnnotation();
-        builder.given_an_annotation_term(
+        UserAnnotation userAnnotation = builder.givenAnAnnotationTerm().getUserAnnotation();
+        builder.givenAnAnnotationTerm(
             userAnnotation,
-            builder.given_a_term(userAnnotation.getProject().getOntology())
+            builder.givenATerm(userAnnotation.getProject().getOntology())
         );
 
         entityManager.refresh(userAnnotation);
@@ -214,8 +214,8 @@ public class AnnotationListingServiceTests {
 
     @Test
     void search_reviewed_annotation_by_project() {
-        ReviewedAnnotation reviewedAnnotation = builder.given_a_reviewed_annotation();
-        ReviewedAnnotation reviewedAnnotationFromAnotherProject = builder.given_a_reviewed_annotation();
+        ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
+        ReviewedAnnotation reviewedAnnotationFromAnotherProject = builder.givenAReviewedAnnotation();
 
         ReviewedAnnotationListing reviewedAnnotationListing = new ReviewedAnnotationListing(entityManager);
         reviewedAnnotationListing.setProject(reviewedAnnotation.getProject().getId());
@@ -227,8 +227,8 @@ public class AnnotationListingServiceTests {
 
     @Test
     void search_reviewed_annotation_by_image() {
-        ReviewedAnnotation reviewedAnnotation = builder.given_a_reviewed_annotation();
-        ReviewedAnnotation reviewedAnnotationFromAnotherImage = builder.given_a_reviewed_annotation();
+        ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
+        ReviewedAnnotation reviewedAnnotationFromAnotherImage = builder.givenAReviewedAnnotation();
 
         ReviewedAnnotationListing reviewedAnnotationListing = new ReviewedAnnotationListing(entityManager);
         reviewedAnnotationListing.setImage(reviewedAnnotation.getImage().getId());
@@ -240,9 +240,9 @@ public class AnnotationListingServiceTests {
 
     @Test
     void search_reviewed_annotation_by_images() {
-        ReviewedAnnotation reviewedAnnotation = builder.given_a_reviewed_annotation();
-        ReviewedAnnotation reviewedAnnotationFromAnotherImage = builder.given_a_reviewed_annotation();
-        reviewedAnnotationFromAnotherImage.setImage(builder.given_an_image_instance(reviewedAnnotation.getProject()));
+        ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
+        ReviewedAnnotation reviewedAnnotationFromAnotherImage = builder.givenAReviewedAnnotation();
+        reviewedAnnotationFromAnotherImage.setImage(builder.givenAnImageInstance(reviewedAnnotation.getProject()));
 
         ReviewedAnnotationListing reviewedAnnotationListing = new ReviewedAnnotationListing(entityManager);
         reviewedAnnotationListing.setImages(Arrays.asList(
@@ -257,8 +257,8 @@ public class AnnotationListingServiceTests {
 
     @Test
     void search_reviewed_annotation_by_images_from_different_project_fails() {
-        ReviewedAnnotation reviewedAnnotation = builder.given_a_reviewed_annotation();
-        ReviewedAnnotation reviewedAnnotationFromAnotherImage = builder.given_a_reviewed_annotation();
+        ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
+        ReviewedAnnotation reviewedAnnotationFromAnotherImage = builder.givenAReviewedAnnotation();
 
         ReviewedAnnotationListing reviewedAnnotationListing = new ReviewedAnnotationListing(entityManager);
         reviewedAnnotationListing.setImages(Arrays.asList(
@@ -274,7 +274,7 @@ public class AnnotationListingServiceTests {
 
     @Test
     void search_reviewed_annotation_by_users() {
-        ReviewedAnnotation reviewedAnnotation = builder.given_a_reviewed_annotation();
+        ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
 
         ReviewedAnnotationListing reviewedAnnotationListing = new ReviewedAnnotationListing(entityManager);
         reviewedAnnotationListing.setImages(Arrays.asList(reviewedAnnotation.getImage().getId()));
@@ -285,7 +285,7 @@ public class AnnotationListingServiceTests {
 
         reviewedAnnotationListing = new ReviewedAnnotationListing(entityManager);
         reviewedAnnotationListing.setImages(Arrays.asList(reviewedAnnotation.getImage().getId()));
-        reviewedAnnotationListing.setUser(builder.given_a_user().getId());
+        reviewedAnnotationListing.setUser(builder.givenAUser().getId());
         assertThat(annotationListingService.listGeneric(reviewedAnnotationListing)
             .stream().map(x -> ((AnnotationResult) x).get("id")))
             .doesNotContain(reviewedAnnotation.getId());
@@ -302,17 +302,17 @@ public class AnnotationListingServiceTests {
     @Test
     void search_reviewed_annotation_by_terms() throws ParseException {
 
-        SliceInstance sliceInstance = builder.given_a_slice_instance();
-        User user1 = builder.given_a_user();
-        User user2 = builder.given_a_user();
+        SliceInstance sliceInstance = builder.givenASliceInstance();
+        User user1 = builder.givenAUser();
+        User user2 = builder.givenAUser();
 
-        Term term1 = builder.given_a_term(sliceInstance.getProject().getOntology());
-        Term term2 = builder.given_a_term(sliceInstance.getProject().getOntology());
+        Term term1 = builder.givenATerm(sliceInstance.getProject().getOntology());
+        Term term2 = builder.givenATerm(sliceInstance.getProject().getOntology());
 
-        ReviewedAnnotation a1 = builder.given_a_reviewed_annotation(sliceInstance, POLYGONES.get("a"), user1, term1);
-        ReviewedAnnotation a2 = builder.given_a_reviewed_annotation(sliceInstance, POLYGONES.get("b"), user1, term2);
-        ReviewedAnnotation a3 = builder.given_a_reviewed_annotation(sliceInstance, POLYGONES.get("c"), user2, term1);
-        ReviewedAnnotation a4 = builder.given_a_reviewed_annotation(sliceInstance, POLYGONES.get("d"), user2, term2);
+        ReviewedAnnotation a1 = builder.givenAReviewedAnnotation(sliceInstance, POLYGONES.get("a"), user1, term1);
+        ReviewedAnnotation a2 = builder.givenAReviewedAnnotation(sliceInstance, POLYGONES.get("b"), user1, term2);
+        ReviewedAnnotation a3 = builder.givenAReviewedAnnotation(sliceInstance, POLYGONES.get("c"), user2, term1);
+        ReviewedAnnotation a4 = builder.givenAReviewedAnnotation(sliceInstance, POLYGONES.get("d"), user2, term2);
 
 
         ReviewedAnnotationListing reviewedAnnotationListing = new ReviewedAnnotationListing(entityManager);
@@ -349,17 +349,17 @@ public class AnnotationListingServiceTests {
     @Test
     void search_reviewed_annotation_by_bbox() throws ParseException {
 
-        SliceInstance sliceInstance = builder.given_a_slice_instance();
-        User user1 = builder.given_a_user();
-        User user2 = builder.given_a_user();
+        SliceInstance sliceInstance = builder.givenASliceInstance();
+        User user1 = builder.givenAUser();
+        User user2 = builder.givenAUser();
 
-        Term term1 = builder.given_a_term(sliceInstance.getProject().getOntology());
-        Term term2 = builder.given_a_term(sliceInstance.getProject().getOntology());
+        Term term1 = builder.givenATerm(sliceInstance.getProject().getOntology());
+        Term term2 = builder.givenATerm(sliceInstance.getProject().getOntology());
 
-        ReviewedAnnotation a1 = builder.given_a_reviewed_annotation(sliceInstance, POLYGONES.get("a"), user1, term1);
-        ReviewedAnnotation a2 = builder.given_a_reviewed_annotation(sliceInstance, POLYGONES.get("b"), user1, term2);
-        ReviewedAnnotation a3 = builder.given_a_reviewed_annotation(sliceInstance, POLYGONES.get("c"), user2, term1);
-        ReviewedAnnotation a4 = builder.given_a_reviewed_annotation(sliceInstance, POLYGONES.get("d"), user2, term2);
+        ReviewedAnnotation a1 = builder.givenAReviewedAnnotation(sliceInstance, POLYGONES.get("a"), user1, term1);
+        ReviewedAnnotation a2 = builder.givenAReviewedAnnotation(sliceInstance, POLYGONES.get("b"), user1, term2);
+        ReviewedAnnotation a3 = builder.givenAReviewedAnnotation(sliceInstance, POLYGONES.get("c"), user2, term1);
+        ReviewedAnnotation a4 = builder.givenAReviewedAnnotation(sliceInstance, POLYGONES.get("d"), user2, term2);
 
         ReviewedAnnotationListing reviewedAnnotationListing = new ReviewedAnnotationListing(entityManager);
         reviewedAnnotationListing.setSlice(sliceInstance.getId());
@@ -380,17 +380,17 @@ public class AnnotationListingServiceTests {
     @Test
     void search_reviewed_annotation_by_image_and_review_user() throws ParseException {
 
-        SliceInstance sliceInstance = builder.given_a_slice_instance();
-        User user1 = builder.given_a_user();
-        User user2 = builder.given_a_user();
+        SliceInstance sliceInstance = builder.givenASliceInstance();
+        User user1 = builder.givenAUser();
+        User user2 = builder.givenAUser();
 
-        Term term1 = builder.given_a_term(sliceInstance.getProject().getOntology());
-        Term term2 = builder.given_a_term(sliceInstance.getProject().getOntology());
+        Term term1 = builder.givenATerm(sliceInstance.getProject().getOntology());
+        Term term2 = builder.givenATerm(sliceInstance.getProject().getOntology());
 
-        ReviewedAnnotation a1 = builder.given_a_reviewed_annotation(sliceInstance, POLYGONES.get("a"), user1, term1);
-        ReviewedAnnotation a2 = builder.given_a_reviewed_annotation(sliceInstance, POLYGONES.get("b"), user1, term2);
-        ReviewedAnnotation a3 = builder.given_a_reviewed_annotation(sliceInstance, POLYGONES.get("c"), user2, term1);
-        ReviewedAnnotation a4 = builder.given_a_reviewed_annotation(sliceInstance, POLYGONES.get("d"), user2, term2);
+        ReviewedAnnotation a1 = builder.givenAReviewedAnnotation(sliceInstance, POLYGONES.get("a"), user1, term1);
+        ReviewedAnnotation a2 = builder.givenAReviewedAnnotation(sliceInstance, POLYGONES.get("b"), user1, term2);
+        ReviewedAnnotation a3 = builder.givenAReviewedAnnotation(sliceInstance, POLYGONES.get("c"), user2, term1);
+        ReviewedAnnotation a4 = builder.givenAReviewedAnnotation(sliceInstance, POLYGONES.get("d"), user2, term2);
 
 
         a1.setReviewUser(user1);

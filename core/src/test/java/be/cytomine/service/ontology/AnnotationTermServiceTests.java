@@ -67,7 +67,7 @@ public class AnnotationTermServiceTests {
 
     @Test
     void find_annotation_term_with_success() {
-        AnnotationTerm annotationTerm = builder.given_an_annotation_term();
+        AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm();
         Optional<AnnotationTerm> result = annotationTermService.find
             (annotationTerm.getUserAnnotation(), annotationTerm.getTerm(), annotationTerm.getUser());
         assertThat(result).isPresent();
@@ -76,8 +76,8 @@ public class AnnotationTermServiceTests {
 
     @Test
     void list_annotation_term_for_annotation_with_success() {
-        AnnotationTerm annotationTerm = builder.given_an_annotation_term();
-        AnnotationTerm annotationTermFromAnotherAnnotation = builder.given_an_annotation_term();
+        AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm();
+        AnnotationTerm annotationTermFromAnotherAnnotation = builder.givenAnAnnotationTerm();
 
         assertThat(annotationTermService.list(annotationTerm.getUserAnnotation()))
             .contains(annotationTerm).doesNotContain(annotationTermFromAnotherAnnotation);
@@ -85,8 +85,8 @@ public class AnnotationTermServiceTests {
 
     @Test
     void list_annotation_term_for_project_with_success() {
-        AnnotationTerm annotationTerm = builder.given_an_annotation_term();
-        AnnotationTerm annotationTermFromAnotherProject = builder.given_an_annotation_term();
+        AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm();
+        AnnotationTerm annotationTermFromAnotherProject = builder.givenAnAnnotationTerm();
 
         assertThat(annotationTermService.list(annotationTerm.getUserAnnotation().getProject()))
             .contains(annotationTerm).doesNotContain(annotationTermFromAnotherProject);
@@ -94,7 +94,7 @@ public class AnnotationTermServiceTests {
 
     @Test
     void list_annotation_term_not_defined_by_user() {
-        AnnotationTerm annotationTerm = builder.given_an_annotation_term();
+        AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm();
 
         assertThat(annotationTermService.listAnnotationTermNotDefinedByUser(
             annotationTerm.getUserAnnotation(),
@@ -103,14 +103,14 @@ public class AnnotationTermServiceTests {
 
         assertThat(annotationTermService.listAnnotationTermNotDefinedByUser(
             annotationTerm.getUserAnnotation(),
-            builder.given_a_user()
+            builder.givenAUser()
         )).contains(annotationTerm);
     }
 
     @Test
     void add_valid_annotation_term_with_success() {
-        AnnotationTerm annotationTerm = builder.given_a_not_persisted_annotation_term(
-            builder.given_a_user_annotation()
+        AnnotationTerm annotationTerm = builder.givenANotPersistedAnnotationTerm(
+            builder.givenAUserAnnotation()
         );
         CommandResponse commandResponse = annotationTermService.add(annotationTerm.toJsonObject());
         assertThat(commandResponse).isNotNull();
@@ -119,28 +119,28 @@ public class AnnotationTermServiceTests {
             .findByUserAnnotationAndTermAndUser(
                 annotationTerm.getUserAnnotation(),
                 annotationTerm.getTerm(),
-                builder.given_superadmin()
+                builder.givenSuperAdmin()
             )).isPresent();
         commandService.undo();
         assertThat(annotationTermRepository
             .findByUserAnnotationAndTermAndUser(
                 annotationTerm.getUserAnnotation(),
                 annotationTerm.getTerm(),
-                builder.given_superadmin()
+                builder.givenSuperAdmin()
             )).isEmpty();
         commandService.redo();
         assertThat(annotationTermRepository
             .findByUserAnnotationAndTermAndUser(
                 annotationTerm.getUserAnnotation(),
                 annotationTerm.getTerm(),
-                builder.given_superadmin()
+                builder.givenSuperAdmin()
             )).isPresent();
     }
 
     @Test
     void add_annotation_term_fails_if_already_exists_for_same_user() {
-        AnnotationTerm annotationTerm = builder.given_a_not_persisted_annotation_term(
-            builder.given_a_user_annotation()
+        AnnotationTerm annotationTerm = builder.givenANotPersistedAnnotationTerm(
+            builder.givenAUserAnnotation()
         );
         annotationTermService.add(annotationTerm.toJsonObject());
         Assertions.assertThrows(
@@ -151,8 +151,8 @@ public class AnnotationTermServiceTests {
 
     @Test
     void add_valid_annotation_term_with_direct_method_success() {
-        AnnotationTerm annotationTerm = builder.given_a_not_persisted_annotation_term(
-            builder.given_a_user_annotation()
+        AnnotationTerm annotationTerm = builder.givenANotPersistedAnnotationTerm(
+            builder.givenAUserAnnotation()
         );
         CommandResponse commandResponse = annotationTermService.addAnnotationTerm(
             annotationTerm.getUserAnnotation().getId(),
@@ -168,10 +168,10 @@ public class AnnotationTermServiceTests {
 
     @Test
     void add_annotation_term_fails_if_term_is_from_other_ontology() {
-        AnnotationTerm annotationTerm = builder.given_a_not_persisted_annotation_term(
-            builder.given_a_user_annotation()
+        AnnotationTerm annotationTerm = builder.givenANotPersistedAnnotationTerm(
+            builder.givenAUserAnnotation()
         );
-        annotationTerm.setTerm(builder.given_a_term(builder.given_an_ontology()));
+        annotationTerm.setTerm(builder.givenATerm(builder.givenAnOntology()));
         Assertions.assertThrows(
             WrongArgumentException.class,
             () -> annotationTermService.add(annotationTerm.toJsonObject())
@@ -180,10 +180,10 @@ public class AnnotationTermServiceTests {
 
     @Test
     void add_valid_annotation_term_and_delete_other_terms() {
-        UserAnnotation annotation = builder.given_a_user_annotation();
-        AnnotationTerm annotationTerm = builder.given_an_annotation_term(annotation);
+        UserAnnotation annotation = builder.givenAUserAnnotation();
+        AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm(annotation);
         Term oldTerm = annotationTerm.getTerm();
-        Term newTerm = builder.given_a_term(annotation.getProject().getOntology());
+        Term newTerm = builder.givenATerm(annotation.getProject().getOntology());
 
         CommandResponse commandResponse = annotationTermService.addWithDeletingOldTerm(
             annotationTerm.getUserAnnotation().getId(),
@@ -194,33 +194,33 @@ public class AnnotationTermServiceTests {
         assertThat(commandResponse.getStatus()).isEqualTo(200);
 
         assertThat(annotationTermRepository
-            .findByUserAnnotationAndTermAndUser(annotation, newTerm, builder.given_superadmin())).isPresent();
+            .findByUserAnnotationAndTermAndUser(annotation, newTerm, builder.givenSuperAdmin())).isPresent();
         assertThat(annotationTermRepository
-            .findByUserAnnotationAndTermAndUser(annotation, oldTerm, builder.given_superadmin())).isEmpty();
+            .findByUserAnnotationAndTermAndUser(annotation, oldTerm, builder.givenSuperAdmin())).isEmpty();
 
         commandService.undo();
 
         assertThat(annotationTermRepository
-            .findByUserAnnotationAndTermAndUser(annotation, newTerm, builder.given_superadmin())).isEmpty();
+            .findByUserAnnotationAndTermAndUser(annotation, newTerm, builder.givenSuperAdmin())).isEmpty();
         assertThat(annotationTermRepository
-            .findByUserAnnotationAndTermAndUser(annotation, oldTerm, builder.given_superadmin())).isPresent();
+            .findByUserAnnotationAndTermAndUser(annotation, oldTerm, builder.givenSuperAdmin())).isPresent();
 
         commandService.redo();
 
         assertThat(annotationTermRepository
-            .findByUserAnnotationAndTermAndUser(annotation, newTerm, builder.given_superadmin())).isPresent();
+            .findByUserAnnotationAndTermAndUser(annotation, newTerm, builder.givenSuperAdmin())).isPresent();
         assertThat(annotationTermRepository
-            .findByUserAnnotationAndTermAndUser(annotation, oldTerm, builder.given_superadmin())).isEmpty();
+            .findByUserAnnotationAndTermAndUser(annotation, oldTerm, builder.givenSuperAdmin())).isEmpty();
     }
 
     @Test
     void add_valid_annotation_term_and_delete_other_terms_no_impact_for_terms_added_by_other_user() {
-        UserAnnotation annotation = builder.given_a_user_annotation();
-        AnnotationTerm annotationTerm = builder.given_a_not_persisted_annotation_term(annotation);
-        annotationTerm.setUser(builder.given_a_user());
+        UserAnnotation annotation = builder.givenAUserAnnotation();
+        AnnotationTerm annotationTerm = builder.givenANotPersistedAnnotationTerm(annotation);
+        annotationTerm.setUser(builder.givenAUser());
         builder.persistAndReturn(annotationTerm);
         Term oldTerm = annotationTerm.getTerm();
-        Term newTerm = builder.given_a_term(annotation.getProject().getOntology());
+        Term newTerm = builder.givenATerm(annotation.getProject().getOntology());
 
         CommandResponse commandResponse = annotationTermService.addWithDeletingOldTerm(
             annotationTerm.getUserAnnotation().getId(),
@@ -231,7 +231,7 @@ public class AnnotationTermServiceTests {
         assertThat(commandResponse.getStatus()).isEqualTo(200);
 
         assertThat(annotationTermRepository
-            .findByUserAnnotationAndTermAndUser(annotation, newTerm, builder.given_superadmin())).isPresent();
+            .findByUserAnnotationAndTermAndUser(annotation, newTerm, builder.givenSuperAdmin())).isPresent();
         assertThat(annotationTermRepository
             .findByUserAnnotationAndTermAndUser(annotation, oldTerm, annotationTerm.getUser())).isPresent();
 
@@ -239,11 +239,11 @@ public class AnnotationTermServiceTests {
 
     @Test
     void add_valid_annotation_term_and_delete_other_terms_with_force_for_terms_added_by_other() {
-        UserAnnotation annotation = builder.given_a_user_annotation();
-        AnnotationTerm annotationTerm = builder.given_a_not_persisted_annotation_term(annotation);
-        annotationTerm.setUser(builder.given_a_user());
+        UserAnnotation annotation = builder.givenAUserAnnotation();
+        AnnotationTerm annotationTerm = builder.givenANotPersistedAnnotationTerm(annotation);
+        annotationTerm.setUser(builder.givenAUser());
         Term oldTerm = annotationTerm.getTerm();
-        Term newTerm = builder.given_a_term(annotation.getProject().getOntology());
+        Term newTerm = builder.givenATerm(annotation.getProject().getOntology());
 
         CommandResponse commandResponse = annotationTermService.addWithDeletingOldTerm(
             annotationTerm.getUserAnnotation().getId(),
@@ -254,7 +254,7 @@ public class AnnotationTermServiceTests {
         assertThat(commandResponse.getStatus()).isEqualTo(200);
 
         assertThat(annotationTermRepository
-            .findByUserAnnotationAndTermAndUser(annotation, newTerm, builder.given_superadmin())).isPresent();
+            .findByUserAnnotationAndTermAndUser(annotation, newTerm, builder.givenSuperAdmin())).isPresent();
         assertThat(annotationTermRepository
             .findByUserAnnotationAndTermAndUser(annotation, oldTerm, annotationTerm.getUser())).isEmpty();
 
@@ -263,11 +263,11 @@ public class AnnotationTermServiceTests {
 
     @Test
     void add_valid_annotation_term_and_delete_other_terms_for_reviewed_annotation() {
-        ReviewedAnnotation annotation = builder.given_a_reviewed_annotation();
-        Term oldTerm = builder.given_a_term(annotation.getProject().getOntology());
+        ReviewedAnnotation annotation = builder.givenAReviewedAnnotation();
+        Term oldTerm = builder.givenATerm(annotation.getProject().getOntology());
         annotation.getTerms().add(oldTerm);
         builder.persistAndReturn(annotation);
-        Term newTerm = builder.given_a_term(annotation.getProject().getOntology());
+        Term newTerm = builder.givenATerm(annotation.getProject().getOntology());
 
         CommandResponse commandResponse = annotationTermService.addWithDeletingOldTerm(
             annotation.getId(),
@@ -280,8 +280,8 @@ public class AnnotationTermServiceTests {
 
     @Test
     void add_annotation_term_fails_if_annotation_does_not_exists() {
-        AnnotationTerm annotationTerm = builder.given_a_not_persisted_annotation_term(
-            builder.given_a_user_annotation()
+        AnnotationTerm annotationTerm = builder.givenANotPersistedAnnotationTerm(
+            builder.givenAUserAnnotation()
         );
         JsonObject jsonObject = annotationTerm.toJsonObject();
         jsonObject.put("userannotation", -1L);
@@ -290,8 +290,8 @@ public class AnnotationTermServiceTests {
 
     @Test
     void add_annotation_term_fails_if_term_does_not_exists() {
-        AnnotationTerm annotationTerm = builder.given_a_not_persisted_annotation_term(
-            builder.given_a_user_annotation()
+        AnnotationTerm annotationTerm = builder.givenANotPersistedAnnotationTerm(
+            builder.givenAUserAnnotation()
         );
         JsonObject jsonObject = annotationTerm.toJsonObject();
         jsonObject.put("term", -1L);
@@ -300,7 +300,7 @@ public class AnnotationTermServiceTests {
 
     @Test
     void delete_annotation_term_with_success() {
-        AnnotationTerm annotationTerm = builder.given_an_annotation_term(builder.given_a_user_annotation());
+        AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm(builder.givenAUserAnnotation());
 
         CommandResponse commandResponse = annotationTermService.delete(annotationTerm, null, null, true);
 

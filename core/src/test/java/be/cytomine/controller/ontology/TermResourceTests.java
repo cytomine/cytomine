@@ -78,8 +78,8 @@ public class TermResourceTests {
     @Test
     @Transactional
     public void getATerm() throws Exception {
-        Term term = builder.given_a_term();
-        Long userId = builder.given_superadmin().getId();
+        Term term = builder.givenATerm();
+        Long userId = builder.givenSuperAdmin().getId();
         when(termHttpContract.findTermByID(eq(term.getId()), eq(userId))).thenReturn(Optional.of(
             new TermResponse(
                 term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
@@ -97,8 +97,8 @@ public class TermResourceTests {
     @Test
     @Transactional
     public void getATermWithWrongUserReturnsNotFound() throws Exception {
-        Term term = builder.given_a_term();
-        Long userId = builder.given_superadmin().getId();
+        Term term = builder.givenATerm();
+        Long userId = builder.givenSuperAdmin().getId();
         Long wrongUserId = userId + 1;
         when(termHttpContract.findTermByID(eq(term.getId()), eq(userId))).thenReturn(Optional.of(
             new TermResponse(
@@ -115,8 +115,8 @@ public class TermResourceTests {
     @Test
     @Transactional
     public void listTermsByOntology() throws Exception {
-        Term term = builder.given_a_term();
-        Long userId = builder.given_superadmin().getId();
+        Term term = builder.givenATerm();
+        Long userId = builder.givenSuperAdmin().getId();
         when(termHttpContract.findTermsByOntology(
             eq(term.getOntology().getId()), eq(userId),
             any(Pageable.class)
@@ -137,8 +137,8 @@ public class TermResourceTests {
     @Test
     @Transactional
     public void listTermsByOntologyWithWrongUserReturnsEmpty() throws Exception {
-        Term term = builder.given_a_term();
-        Long userId = builder.given_superadmin().getId();
+        Term term = builder.givenATerm();
+        Long userId = builder.givenSuperAdmin().getId();
         when(termHttpContract.findTermsByOntology(
             eq(term.getOntology().getId()), eq(userId),
             any(Pageable.class)
@@ -151,9 +151,9 @@ public class TermResourceTests {
     @Test
     @Transactional
     public void listTermsByProject() throws Exception {
-        Term term = builder.given_a_term();
-        Project project = builder.given_a_project_with_ontology(term.getOntology());
-        Long userId = builder.given_superadmin().getId();
+        Term term = builder.givenATerm();
+        Project project = builder.givenAProjectWithOntology(term.getOntology());
+        Long userId = builder.givenSuperAdmin().getId();
         when(termHttpContract.findTermsByProject(eq(project.getId()), eq(userId), any(Pageable.class))).thenReturn(
             new PageImpl<>(List.of(
                 new TermResponse(
@@ -172,9 +172,9 @@ public class TermResourceTests {
     @Test
     @Transactional
     public void listTermsByProjectWithWrongUserReturnsEmpty() throws Exception {
-        Term term = builder.given_a_term();
-        Project project = builder.given_a_project_with_ontology(term.getOntology());
-        Long userId = builder.given_superadmin().getId();
+        Term term = builder.givenATerm();
+        Project project = builder.givenAProjectWithOntology(term.getOntology());
+        Long userId = builder.givenSuperAdmin().getId();
         when(termHttpContract.findTermsByProject(eq(project.getId()), eq(userId), any(Pageable.class))).thenReturn(
             new PageImpl<>(List.of()));
 
@@ -185,8 +185,8 @@ public class TermResourceTests {
     @Test
     @Transactional
     public void addValidTerm() throws Exception {
-        Term term = builder.given_a_term();
-        Long userId = builder.given_superadmin().getId();
+        Term term = builder.givenATerm();
+        Long userId = builder.givenSuperAdmin().getId();
         UUID commandId = UUID.randomUUID();
         when(termHttpContract.create(eq(userId), any())).thenReturn(Optional.of(new HttpCommandResponse(
             true,
@@ -213,8 +213,8 @@ public class TermResourceTests {
     @Test
     @Transactional
     public void addTermWithNoWriteAccessReturnsEmpty() throws Exception {
-        Term term = builder.given_a_term();
-        Long userId = builder.given_superadmin().getId();
+        Term term = builder.givenATerm();
+        Long userId = builder.givenSuperAdmin().getId();
         when(termHttpContract.create(eq(userId), any())).thenReturn(Optional.empty());
 
         String createTermJson =
@@ -229,8 +229,8 @@ public class TermResourceTests {
     @Test
     @Transactional
     public void editValidTerm() throws Exception {
-        Term term = builder.given_a_term();
-        Long userId = builder.given_superadmin().getId();
+        Term term = builder.givenATerm();
+        Long userId = builder.givenSuperAdmin().getId();
         UUID commandId = UUID.randomUUID();
         when(termHttpContract.update(eq(term.getId()), eq(userId), any())).thenReturn(Optional.of(
             new HttpCommandResponse(
@@ -258,8 +258,8 @@ public class TermResourceTests {
     @Test
     @Transactional
     public void editTermWithNoWriteAccessReturnsNotFound() throws Exception {
-        Term term = builder.given_a_term();
-        Long userId = builder.given_superadmin().getId();
+        Term term = builder.givenATerm();
+        Long userId = builder.givenSuperAdmin().getId();
         when(termHttpContract.update(eq(term.getId()), eq(userId), any())).thenReturn(Optional.empty());
 
         String updateTermJson = JsonObject.of("name", term.getName(), "color", term.getColor()).toJsonString();
@@ -274,8 +274,8 @@ public class TermResourceTests {
     @Test
     @Transactional
     public void deleteTerm() throws Exception {
-        Term term = builder.given_a_term();
-        Long userId = builder.given_superadmin().getId();
+        Term term = builder.givenATerm();
+        Long userId = builder.givenSuperAdmin().getId();
         UUID commandId = UUID.randomUUID();
         when(termHttpContract.delete(eq(term.getId()), eq(userId))).thenReturn(Optional.of(new HttpCommandResponse(
             true,
@@ -297,8 +297,8 @@ public class TermResourceTests {
     @Test
     @Transactional
     public void deleteTermWithNoDeleteAccessReturnsNotFound() throws Exception {
-        Term term = builder.given_a_term();
-        Long userId = builder.given_superadmin().getId();
+        Term term = builder.givenATerm();
+        Long userId = builder.givenSuperAdmin().getId();
         when(termHttpContract.delete(eq(term.getId()), eq(userId))).thenReturn(Optional.empty());
 
         restTermControllerMockMvc.perform(delete("/api/term/{id}.json", term.getId())).andExpect(status().isNotFound());

@@ -60,7 +60,7 @@ public class NestedImageInstanceAuthorizationTest extends CRUDAuthorizationTest 
     @BeforeEach
     public void before() throws Exception {
         if (nestedImageInstance == null) {
-            nestedImageInstance = builder.given_a_nested_image_instance();
+            nestedImageInstance = builder.givenANestedImageInstance();
             initACL(nestedImageInstance.container());
         }
     }
@@ -91,9 +91,9 @@ public class NestedImageInstanceAuthorizationTest extends CRUDAuthorizationTest 
 
     @Override
     protected void when_i_add_domain() {
-        NestedImageInstance nestedImageInstance = builder.given_a_not_persisted_nested_image_instance();
+        NestedImageInstance nestedImageInstance = builder.givenANotPersistedNestedImageInstance();
         nestedImageInstance.setProject(this.nestedImageInstance.getProject());
-        nestedImageInstance.setBaseImage(builder.given_an_abstract_image());
+        nestedImageInstance.setBaseImage(builder.givenAnAbstractImage());
         nestedImageInstanceService.add(nestedImageInstance.toJsonObject());
     }
 

@@ -89,7 +89,7 @@ public class CompanionFileResourceTests {
     @Test
     @Transactional
     public void list_companion_file_by_abstract_image() throws Exception {
-        CompanionFile companionFile = builder.given_a_companion_file(builder.given_an_abstract_image());
+        CompanionFile companionFile = builder.givenACompanionFile(builder.givenAnAbstractImage());
 
         restCompanionFileControllerMockMvc.perform(get(
                 "/api/abstractimage/{id}/companionfile.json",
@@ -104,7 +104,7 @@ public class CompanionFileResourceTests {
     @Test
     @Transactional
     public void list_companion_file_by_uploaded_file() throws Exception {
-        CompanionFile companionFile = builder.given_a_companion_file(builder.given_an_abstract_image());
+        CompanionFile companionFile = builder.givenACompanionFile(builder.givenAnAbstractImage());
 
         restCompanionFileControllerMockMvc.perform(get(
                 "/api/uploadedfile/{id}/companionfile.json",
@@ -119,7 +119,7 @@ public class CompanionFileResourceTests {
     @Test
     @Transactional
     public void get_an_companion_file() throws Exception {
-        CompanionFile image = builder.given_a_companion_file(builder.given_an_abstract_image());
+        CompanionFile image = builder.givenACompanionFile(builder.givenAnAbstractImage());
 
         restCompanionFileControllerMockMvc.perform(get("/api/companionfile/{id}.json", image.getId()))
             .andExpect(status().isOk())
@@ -144,7 +144,7 @@ public class CompanionFileResourceTests {
     @Transactional
     public void get_an_companion_file_from_uploaded_file() throws Exception {
         CompanionFile image =
-            builder.given_a_companion_file(builder.given_an_abstract_image());
+            builder.givenACompanionFile(builder.givenAnAbstractImage());
 
         restCompanionFileControllerMockMvc.perform(get(
                 "/api/uploadedfile/{id}/companionfile.json",
@@ -159,7 +159,7 @@ public class CompanionFileResourceTests {
     @Test
     @Transactional
     public void add_valid_companion_file() throws Exception {
-        CompanionFile companionFile = builder.given_a_not_persisted_companion_file(builder.given_an_abstract_image());
+        CompanionFile companionFile = builder.givenANotPersistedCompanionFile(builder.givenAnAbstractImage());
         restCompanionFileControllerMockMvc.perform(post("/api/companionfile.json")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(companionFile.toJSON()))
@@ -176,7 +176,7 @@ public class CompanionFileResourceTests {
     @Test
     @Transactional
     public void edit_valid_companion_file() throws Exception {
-        CompanionFile companionFile = builder.given_a_companion_file(builder.given_an_abstract_image());
+        CompanionFile companionFile = builder.givenACompanionFile(builder.givenAnAbstractImage());
         JsonObject jsonObject = companionFile.toJsonObject();
         jsonObject.put("filename", "toto");
         restCompanionFileControllerMockMvc.perform(put("/api/companionfile/{id}.json", companionFile.getId())
@@ -199,7 +199,7 @@ public class CompanionFileResourceTests {
     @Test
     @Transactional
     public void delete_companion_file() throws Exception {
-        CompanionFile companionFile = builder.given_a_companion_file(builder.given_an_abstract_image());
+        CompanionFile companionFile = builder.givenACompanionFile(builder.givenAnAbstractImage());
         restCompanionFileControllerMockMvc.perform(delete("/api/companionfile/{id}.json", companionFile.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
@@ -216,11 +216,11 @@ public class CompanionFileResourceTests {
     @Test
     @Transactional
     public void get_companion_file_uploader() throws Exception {
-        CompanionFile companionFile = builder.given_a_companion_file(builder.given_an_abstract_image());
+        CompanionFile companionFile = builder.givenACompanionFile(builder.givenAnAbstractImage());
 
         restCompanionFileControllerMockMvc.perform(get("/api/companionfile/{id}/user.json", companionFile.getId()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(builder.given_superadmin().getId()));
+            .andExpect(jsonPath("$.id").value(builder.givenSuperAdmin().getId()));
     }
 
     @Test
@@ -233,7 +233,7 @@ public class CompanionFileResourceTests {
 
     @Test
     public void download_companion_file() throws Exception {
-        CompanionFile companionFile = builder.given_a_companion_file(builder.given_an_abstract_image());
+        CompanionFile companionFile = builder.givenACompanionFile(builder.givenAnAbstractImage());
         companionFile.setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         companionFile.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         companionFile.getUploadedFile().setContentType("MRXS");

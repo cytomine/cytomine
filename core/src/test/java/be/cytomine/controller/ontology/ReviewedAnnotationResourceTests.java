@@ -127,8 +127,8 @@ public class ReviewedAnnotationResourceTests {
     @Test
     @Transactional
     public void get_a_reviewed_annotation() throws Exception {
-        ReviewedAnnotation reviewedAnnotation = builder.given_a_reviewed_annotation();
-        reviewedAnnotation.getTerms().add(builder.given_a_term());
+        ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
+        reviewedAnnotation.getTerms().add(builder.givenATerm());
         restReviewedAnnotationControllerMockMvc.perform(get(
                 "/api/reviewedannotation/{id}.json",
                 reviewedAnnotation.getId()
@@ -167,7 +167,7 @@ public class ReviewedAnnotationResourceTests {
     @Test
     @Transactional
     public void stats_annotations() throws Exception {
-        ReviewedAnnotation reviewedAnnotation = builder.given_a_reviewed_annotation();
+        ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         restReviewedAnnotationControllerMockMvc.perform(get(
                 "/api/imageinstance/{image}/reviewedannotation/stats.json",
                 reviewedAnnotation.getImage().getId()
@@ -178,7 +178,7 @@ public class ReviewedAnnotationResourceTests {
     @Test
     @Transactional
     public void count_annotations_by_project() throws Exception {
-        ReviewedAnnotation reviewedAnnotation = builder.given_a_reviewed_annotation();
+        ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         restReviewedAnnotationControllerMockMvc.perform(get(
                 "/api/project/{idUser}/reviewedannotation/count.json",
                 reviewedAnnotation.getProject().getId()
@@ -186,7 +186,7 @@ public class ReviewedAnnotationResourceTests {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.total").value(greaterThan(0)));
 
-        Project projectWithoutAnnotation = builder.given_a_project();
+        Project projectWithoutAnnotation = builder.givenAProject();
         restReviewedAnnotationControllerMockMvc.perform(get(
                 "/api/project/{idUser}/reviewedannotation/count.json",
                 projectWithoutAnnotation.getId()
@@ -199,11 +199,11 @@ public class ReviewedAnnotationResourceTests {
     @Test
     @Transactional
     public void count_annotations_by_project_with_dates() throws Exception {
-        ReviewedAnnotation oldReviewedAnnotation = builder.given_a_reviewed_annotation();
+        ReviewedAnnotation oldReviewedAnnotation = builder.givenAReviewedAnnotation();
         oldReviewedAnnotation.setCreated(DateUtils.addDays(new Date(), -1));
 
         ReviewedAnnotation newReviewedAnnotation =
-            builder.persistAndReturn(builder.given_a_not_persisted_reviewed_annotation(oldReviewedAnnotation.getProject()));
+            builder.persistAndReturn(builder.givenANotPersistedReviewedAnnotation(oldReviewedAnnotation.getProject()));
 
 
         restReviewedAnnotationControllerMockMvc.perform(get(
@@ -291,12 +291,12 @@ public class ReviewedAnnotationResourceTests {
     }
 
     private void buildDownloadContext() throws ParseException {
-        this.project = builder.given_a_project();
-        this.image = builder.given_an_image_instance(this.project);
-        this.slice = builder.given_a_slice_instance(this.image, 0, 0, 0);
-        this.term = builder.given_a_term(this.project.getOntology());
-        this.me = builder.given_superadmin();
-        this.reviewedAnnotation = builder.given_a_reviewed_annotation(
+        this.project = builder.givenAProject();
+        this.image = builder.givenAnImageInstance(this.project);
+        this.slice = builder.givenASliceInstance(this.image, 0, 0, 0);
+        this.term = builder.givenATerm(this.project.getOntology());
+        this.me = builder.givenSuperAdmin();
+        this.reviewedAnnotation = builder.givenAReviewedAnnotation(
             this.slice,
             "POLYGON((1 1,5 1,5 5,1 5,1 1))",
             this.me,
@@ -348,7 +348,7 @@ public class ReviewedAnnotationResourceTests {
     @Test
     @Transactional
     public void add_valid_reviewed_annotation() throws Exception {
-        ReviewedAnnotation reviewedAnnotation = builder.given_a_not_persisted_reviewed_annotation();
+        ReviewedAnnotation reviewedAnnotation = builder.givenANotPersistedReviewedAnnotation();
         restReviewedAnnotationControllerMockMvc.perform(post("/api/reviewedannotation.json")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(reviewedAnnotation.toJSON()))
@@ -365,7 +365,7 @@ public class ReviewedAnnotationResourceTests {
     @Test
     @Transactional
     public void edit_valid_reviewed_annotation() throws Exception {
-        ReviewedAnnotation reviewedAnnotation = builder.given_a_reviewed_annotation();
+        ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         restReviewedAnnotationControllerMockMvc.perform(put(
                 "/api/reviewedannotation/{id}.json",
                 reviewedAnnotation.getId()
@@ -386,7 +386,7 @@ public class ReviewedAnnotationResourceTests {
     @Test
     @Transactional
     public void delete_reviewed_annotation() throws Exception {
-        ReviewedAnnotation reviewedAnnotation = builder.given_a_reviewed_annotation();
+        ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         restReviewedAnnotationControllerMockMvc.perform(delete(
                 "/api/reviewedannotation/{id}.json",
                 reviewedAnnotation.getId()
@@ -407,7 +407,7 @@ public class ReviewedAnnotationResourceTests {
     @Test
     @Transactional
     public void delete_reviewed_annotation_not_exist_fails() throws Exception {
-        ReviewedAnnotation reviewedAnnotation = builder.given_a_reviewed_annotation();
+        ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         restReviewedAnnotationControllerMockMvc.perform(delete("/api/reviewedannotation/{id}.json", 0)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(reviewedAnnotation.toJSON()))
@@ -421,7 +421,7 @@ public class ReviewedAnnotationResourceTests {
     @Test
     @Transactional
     public void start_image_review() throws Exception {
-        ImageInstance imageInstance = builder.given_an_image_instance();
+        ImageInstance imageInstance = builder.givenAnImageInstance();
         assertThat(imageInstance.getReviewStart()).isNull();
         restReviewedAnnotationControllerMockMvc.perform(post(
                 "/api/imageinstance/{image}/review.json",
@@ -437,7 +437,7 @@ public class ReviewedAnnotationResourceTests {
     @Test
     @Transactional
     public void stop_image_review() throws Exception {
-        ImageInstance imageInstance = builder.given_an_image_instance();
+        ImageInstance imageInstance = builder.givenAnImageInstance();
         imageInstance.setReviewStart(new Date());
         imageInstance.setReviewUser(imageInstance.getUser());
         assertThat(imageInstance.getReviewStop()).isNull();
@@ -452,7 +452,7 @@ public class ReviewedAnnotationResourceTests {
     @Test
     @Transactional
     public void cancel_image_review() throws Exception {
-        ImageInstance imageInstance = builder.given_an_image_instance();
+        ImageInstance imageInstance = builder.givenAnImageInstance();
         imageInstance.setReviewStart(new Date());
         imageInstance.setReviewUser(imageInstance.getUser());
         assertThat(imageInstance.getReviewStop()).isNull();
@@ -469,7 +469,7 @@ public class ReviewedAnnotationResourceTests {
     @Test
     @Transactional
     public void stop_image_review_refuse_if_image_not_started_to_review() throws Exception {
-        ImageInstance imageInstance = builder.given_an_image_instance();
+        ImageInstance imageInstance = builder.givenAnImageInstance();
         assertThat(imageInstance.getReviewStart()).isNull();
         restReviewedAnnotationControllerMockMvc.perform(delete(
                 "/api/imageinstance/{image}/review.json",
@@ -482,11 +482,11 @@ public class ReviewedAnnotationResourceTests {
     @Test
     @Transactional
     public void add_annotation_review() throws Exception {
-        UserAnnotation userAnnotation = builder.given_a_user_annotation();
+        UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         userAnnotation.getImage().setReviewStart(new Date());
         userAnnotation.getImage().setReviewUser(userAnnotation.getUser());
 
-        AnnotationTerm annotationTerm = builder.given_an_annotation_term(userAnnotation);
+        AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm(userAnnotation);
         assertThat(reviewedAnnotationRepository.findByParentIdent(userAnnotation.getId())).isEmpty();
         em.refresh(userAnnotation);
         restReviewedAnnotationControllerMockMvc.perform(post(
@@ -508,11 +508,11 @@ public class ReviewedAnnotationResourceTests {
     @Test
     @Transactional
     public void add_annotation_review_with_terms_change() throws Exception {
-        UserAnnotation userAnnotation = builder.given_a_user_annotation();
+        UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         userAnnotation.getImage().setReviewStart(new Date());
         userAnnotation.getImage().setReviewUser(userAnnotation.getUser());
-        AnnotationTerm annotationTerm = builder.given_an_annotation_term(userAnnotation);
-        Term anotherTerm = builder.given_a_term(userAnnotation.getProject().getOntology());
+        AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm(userAnnotation);
+        Term anotherTerm = builder.givenATerm(userAnnotation.getProject().getOntology());
 
         assertThat(reviewedAnnotationRepository.findByParentIdent(userAnnotation.getId())).isEmpty();
 
@@ -535,7 +535,7 @@ public class ReviewedAnnotationResourceTests {
     @Test
     @Transactional
     public void remove_annotation_review() throws Exception {
-        ReviewedAnnotation reviewedAnnotation = builder.given_a_reviewed_annotation();
+        ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
 
         assertThat(reviewedAnnotationRepository.findByParentIdent(reviewedAnnotation.getParentIdent())).isPresent();
 
@@ -554,10 +554,10 @@ public class ReviewedAnnotationResourceTests {
     @Test
     @Transactional
     public void review_full_layer() throws Exception {
-        UserAnnotation userAnnotation = builder.given_a_user_annotation();
+        UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         userAnnotation.getImage().setReviewStart(new Date());
         userAnnotation.getImage().setReviewUser(userAnnotation.getUser());
-        AnnotationTerm annotationTerm = builder.given_an_annotation_term(userAnnotation);
+        AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm(userAnnotation);
         em.refresh(userAnnotation);
 
         assertThat(reviewedAnnotationRepository.findByParentIdent(userAnnotation.getId())).isEmpty();
@@ -578,7 +578,7 @@ public class ReviewedAnnotationResourceTests {
     @Test
     @Transactional
     public void unreview_full_layer() throws Exception {
-        ReviewedAnnotation reviewedAnnotation = builder.given_a_reviewed_annotation();
+        ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         reviewedAnnotation.getImage().setReviewStart(new Date());
         reviewedAnnotation.getImage().setReviewUser(reviewedAnnotation.getUser());
 
@@ -714,20 +714,20 @@ public class ReviewedAnnotationResourceTests {
 
     public static ReviewedAnnotation given_a_reviewed_annotation_with_valid_image_server(BasicInstanceBuilder builder)
         throws ParseException {
-        AbstractImage image = builder.given_an_abstract_image();
+        AbstractImage image = builder.givenAnAbstractImage();
         image.setWidth(109240);
         image.setHeight(220696);
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
-        ImageInstance imageInstance = builder.given_an_image_instance(image, builder.given_a_project());
+        ImageInstance imageInstance = builder.givenAnImageInstance(image, builder.givenAProject());
         imageInstance.setInstanceFilename("CMU-2");
-        AbstractSlice slice = builder.given_an_abstract_slice(image, 0, 0, 0);
+        AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
         slice.setUploadedFile(image.getUploadedFile());
-        SliceInstance sliceInstance = builder.given_a_slice_instance(imageInstance, slice);
+        SliceInstance sliceInstance = builder.givenASliceInstance(imageInstance, slice);
         ReviewedAnnotation reviewedAnnotation
-            = builder.given_a_reviewed_annotation(
+            = builder.givenAReviewedAnnotation(
             sliceInstance,
-            "POLYGON((1 1,50 10,50 50,10 50,1 1))", builder.given_superadmin(), null
+            "POLYGON((1 1,50 10,50 50,10 50,1 1))", builder.givenSuperAdmin(), null
         );
         return reviewedAnnotation;
     }

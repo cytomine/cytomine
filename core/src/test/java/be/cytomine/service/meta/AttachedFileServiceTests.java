@@ -51,14 +51,14 @@ public class AttachedFileServiceTests {
 
     @Test
     public void list_attached_file() {
-        AttachedFile attachedFile = builder.given_a_attached_file(builder.given_a_project());
+        AttachedFile attachedFile = builder.givenAnAttachedFile(builder.givenAProject());
         assertThat(attachedFileService.list()).contains(attachedFile);
     }
 
     @Test
     public void list_attached_file_for_domain() {
-        Project project = builder.given_a_project();
-        AttachedFile attachedFile = builder.given_a_attached_file(project);
+        Project project = builder.givenAProject();
+        AttachedFile attachedFile = builder.givenAnAttachedFile(project);
         assertThat(attachedFileService.findAllByDomain(project)).contains(attachedFile);
     }
 
@@ -73,7 +73,7 @@ public class AttachedFileServiceTests {
 
     @Test
     public void find_by_id() {
-        AttachedFile attachedFile = builder.given_a_attached_file(builder.given_a_project());
+        AttachedFile attachedFile = builder.givenAnAttachedFile(builder.givenAProject());
         assertThat(attachedFileService.findById(attachedFile.getId())).isPresent();
     }
 
@@ -84,7 +84,7 @@ public class AttachedFileServiceTests {
 
     @Test
     public void create_attached_file() throws ClassNotFoundException {
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
         AttachedFile attachedFile =
             attachedFileService.create(
                 "test.txt",
@@ -98,7 +98,7 @@ public class AttachedFileServiceTests {
 
     @Test
     public void delete_attached_file() {
-        AttachedFile attachedFile = builder.given_a_attached_file(builder.given_a_project());
+        AttachedFile attachedFile = builder.givenAnAttachedFile(builder.givenAProject());
         attachedFileService.delete(attachedFile, null, null, false);
         assertThat(attachedFileService.findById(attachedFile.getId())).isEmpty();
     }

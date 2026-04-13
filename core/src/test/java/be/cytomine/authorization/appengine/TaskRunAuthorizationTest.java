@@ -60,7 +60,7 @@ public class TaskRunAuthorizationTest extends CRDAuthorizationTest {
     @BeforeEach
     public void before() throws Exception {
         if (taskRun == null) {
-            taskRun = builder.given_a_task_run();
+            taskRun = builder.givenATaskRun();
             initACL(taskRun.container());
         }
         taskRun.getProject().setMode(EditingMode.CLASSIC);

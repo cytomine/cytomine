@@ -77,13 +77,13 @@ public class AbstractSliceServiceTests {
 
     @Test
     void list_all_image_by_abstract_image() {
-        AbstractImage image1 = builder.given_an_abstract_image();
-        AbstractImage image2 = builder.given_an_abstract_image();
+        AbstractImage image1 = builder.givenAnAbstractImage();
+        AbstractImage image2 = builder.givenAnAbstractImage();
 
-        AbstractSlice abstractSlice1 = builder.given_an_abstract_slice();
+        AbstractSlice abstractSlice1 = builder.givenAnAbstractSlice();
         abstractSlice1.setImage(image1);
         builder.persistAndReturn(abstractSlice1);
-        AbstractSlice abstractSlice2 = builder.given_an_abstract_slice();
+        AbstractSlice abstractSlice2 = builder.givenAnAbstractSlice();
         abstractSlice2.setImage(image2);
         builder.persistAndReturn(abstractSlice2);
 
@@ -93,13 +93,13 @@ public class AbstractSliceServiceTests {
 
     @Test
     void list_all_image_by_uploaded_file() {
-        UploadedFile file1 = builder.given_a_uploaded_file();
-        UploadedFile file2 = builder.given_a_uploaded_file();
+        UploadedFile file1 = builder.givenAUploadedFile();
+        UploadedFile file2 = builder.givenAUploadedFile();
 
-        AbstractSlice abstractSlice1 = builder.given_an_abstract_slice();
+        AbstractSlice abstractSlice1 = builder.givenAnAbstractSlice();
         abstractSlice1.setUploadedFile(file1);
         builder.persistAndReturn(abstractSlice1);
-        AbstractSlice abstractSlice2 = builder.given_an_abstract_slice();
+        AbstractSlice abstractSlice2 = builder.givenAnAbstractSlice();
         abstractSlice2.setUploadedFile(file2);
         builder.persistAndReturn(abstractSlice2);
 
@@ -111,12 +111,12 @@ public class AbstractSliceServiceTests {
     @Test
     void find_abstract_slice_by_image_and_coordinates() {
 
-        AbstractSlice abstractSlice1 = builder.given_an_abstract_slice();
+        AbstractSlice abstractSlice1 = builder.givenAnAbstractSlice();
         abstractSlice1.setChannel(1);
         abstractSlice1.setZStack(2);
         abstractSlice1.setTime(3);
         builder.persistAndReturn(abstractSlice1);
-        AbstractSlice abstractSlice2 = builder.given_an_abstract_slice();
+        AbstractSlice abstractSlice2 = builder.givenAnAbstractSlice();
         abstractSlice2.setImage(abstractSlice1.getImage());
         abstractSlice2.setChannel(1);
         abstractSlice2.setZStack(2);
@@ -131,7 +131,7 @@ public class AbstractSliceServiceTests {
 
     @Test
     void find_abstract_slice_image_uploaded() {
-        AbstractSlice abstractSlice1 = builder.given_an_abstract_slice();
+        AbstractSlice abstractSlice1 = builder.givenAnAbstractSlice();
         assertThat(abstractSliceService.findImageUploaded(abstractSlice1.getId()))
             .isEqualTo(abstractSlice1.getUploadedFile().getUser());
     }
@@ -144,7 +144,7 @@ public class AbstractSliceServiceTests {
 
     @Test
     void find_abstractSlice_with_success() {
-        AbstractSlice abstractSlice = builder.given_an_abstract_slice();
+        AbstractSlice abstractSlice = builder.givenAnAbstractSlice();
         assertThat(abstractSliceService.find(abstractSlice.getId()).isPresent());
         assertThat(abstractSlice).isEqualTo(abstractSliceService.find(abstractSlice.getId()).get());
     }
@@ -156,7 +156,7 @@ public class AbstractSliceServiceTests {
 
     @Test
     void add_valid_abstract_slice_with_success() {
-        AbstractSlice abstractSlice = builder.given_a_not_persisted_abstract_slice();
+        AbstractSlice abstractSlice = builder.givenANotPersistedAbstractSlice();
 
         CommandResponse commandResponse = abstractSliceService.add(abstractSlice.toJsonObject());
 
@@ -168,7 +168,7 @@ public class AbstractSliceServiceTests {
 
     @Test
     void add_already_existing_abstract_slice() {
-        AbstractSlice abstractSlice = builder.given_an_abstract_slice();
+        AbstractSlice abstractSlice = builder.givenAnAbstractSlice();
         Assertions.assertThrows(
             AlreadyExistException.class, () -> {
                 abstractSliceService.add(abstractSlice.toJsonObject().withChange("id", null));
@@ -178,7 +178,7 @@ public class AbstractSliceServiceTests {
 
     @Test
     void add_valid_abstract_slice_with_null_abstract_image_fails() {
-        AbstractSlice abstractSlice = builder.given_a_not_persisted_abstract_slice();
+        AbstractSlice abstractSlice = builder.givenANotPersistedAbstractSlice();
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
                 abstractSliceService.add(abstractSlice.toJsonObject().withChange("image", null));
@@ -188,7 +188,7 @@ public class AbstractSliceServiceTests {
 
     @Test
     void edit_abstract_slice_with_success() {
-        AbstractSlice abstractSlice = builder.given_a_not_persisted_abstract_slice();
+        AbstractSlice abstractSlice = builder.givenANotPersistedAbstractSlice();
         abstractSlice.setChannel(1);
         abstractSlice.setZStack(10);
         abstractSlice.setTime(100);
@@ -212,7 +212,7 @@ public class AbstractSliceServiceTests {
 
     @Test
     void delete_abstract_slice_with_success() {
-        AbstractSlice abstractSlice = builder.given_an_abstract_slice();
+        AbstractSlice abstractSlice = builder.givenAnAbstractSlice();
 
         CommandResponse commandResponse = abstractSliceService.delete(abstractSlice, null, null, true);
 
@@ -223,7 +223,7 @@ public class AbstractSliceServiceTests {
 
     @Test
     void delete_abstract_slice_with_dependencies_with_success() {
-        SliceInstance sliceInstance = builder.given_a_slice_instance();
+        SliceInstance sliceInstance = builder.givenASliceInstance();
         Assertions.assertThrows(
             CytomineException.class, () -> {
                 abstractSliceService.delete(sliceInstance.getBaseSlice(), null, null, false);

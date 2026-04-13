@@ -85,13 +85,13 @@ public class TagServiceTests {
 
     @Test
     void list_all_tag_with_success() {
-        Tag tag = builder.given_a_tag();
+        Tag tag = builder.givenATag();
         assertThat(tag).isIn(tagService.list());
     }
 
     @Test
     void get_tag_with_success() {
-        Tag tag = builder.given_a_tag();
+        Tag tag = builder.givenATag();
         assertThat(tag).isEqualTo(tagService.get(tag.getId()));
     }
 
@@ -102,7 +102,7 @@ public class TagServiceTests {
 
     @Test
     void find_tag_with_success() {
-        Tag tag = builder.given_a_tag();
+        Tag tag = builder.givenATag();
         assertThat(tagService.find(tag.getId()).isPresent());
         assertThat(tag).isEqualTo(tagService.find(tag.getId()).get());
     }
@@ -114,7 +114,7 @@ public class TagServiceTests {
 
     @Test
     void find_tag_by_name_with_success() {
-        Tag tag = builder.given_a_tag();
+        Tag tag = builder.givenATag();
         assertThat(tagService.findByName(tag.getName()).isPresent());
         assertThat(tag).isEqualTo(tagService.find(tag.getId()).get());
     }
@@ -122,7 +122,7 @@ public class TagServiceTests {
 
     @Test
     void add_valid_tag_with_success() {
-        Tag tag = builder.given_a_not_persisted_tag("xxx");
+        Tag tag = builder.givenANotPersistedTag("xxx");
 
         CommandResponse commandResponse = tagService.add(tag.toJsonObject());
 
@@ -135,7 +135,7 @@ public class TagServiceTests {
 
     @Test
     void add_tag_with_null_name_fail() {
-        Tag tag = builder.given_a_not_persisted_tag("");
+        Tag tag = builder.givenANotPersistedTag("");
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
                 tagService.add(tag.toJsonObject());
@@ -145,8 +145,8 @@ public class TagServiceTests {
 
     @Test
     void add_tag_with_already_existing_name() {
-        Tag tagWithSameName = builder.given_a_tag();
-        Tag tag = builder.given_a_not_persisted_tag(tagWithSameName.getName());
+        Tag tagWithSameName = builder.givenATag();
+        Tag tag = builder.givenANotPersistedTag(tagWithSameName.getName());
         Assertions.assertThrows(
             AlreadyExistException.class, () -> {
                 tagService.add(tag.toJsonObject());
@@ -157,7 +157,7 @@ public class TagServiceTests {
 
     @Test
     void edit_valid_tag_with_success() {
-        Tag tag = builder.given_a_tag();
+        Tag tag = builder.givenATag();
 
         CommandResponse commandResponse = tagService.update(tag, tag.toJsonObject().withChange("name", "NEW NAME"));
 
@@ -171,7 +171,7 @@ public class TagServiceTests {
 
     @Test
     void delete_tag_with_success() {
-        Tag tag = builder.given_a_tag();
+        Tag tag = builder.givenATag();
 
         CommandResponse commandResponse = tagService.delete(tag, null, null, true);
 
@@ -182,8 +182,8 @@ public class TagServiceTests {
 
     @Test
     void delete_tag_with_dependencies_with_success() {
-        Tag tag = builder.given_a_tag();
-        TagDomainAssociation tagDomainAssociation = builder.given_a_tag_association(tag, builder.given_a_project());
+        Tag tag = builder.givenATag();
+        TagDomainAssociation tagDomainAssociation = builder.givenATagAssociation(tag, builder.givenAProject());
 
         CommandResponse commandResponse = tagService.delete(tag, null, null, true);
 

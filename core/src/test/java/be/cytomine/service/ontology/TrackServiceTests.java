@@ -65,7 +65,7 @@ public class TrackServiceTests {
 
     @Test
     void get_track_with_success() {
-        Track track = builder.given_a_track();
+        Track track = builder.givenATrack();
         assertThat(track).isEqualTo(trackService.get(track.getId()));
     }
 
@@ -76,7 +76,7 @@ public class TrackServiceTests {
 
     @Test
     void find_track_with_success() {
-        Track track = builder.given_a_track();
+        Track track = builder.givenATrack();
         assertThat(trackService.find(track.getId()).isPresent());
         assertThat(track).isEqualTo(trackService.find(track.getId()).get());
     }
@@ -88,31 +88,31 @@ public class TrackServiceTests {
 
     @Test
     void list_all_track_by_image() {
-        Track track = builder.given_a_track();
+        Track track = builder.givenATrack();
         assertThat(track).isIn(trackService.list(track.getImage()));
-        assertThat(trackService.list(builder.given_an_image_instance()).size()).isEqualTo(0);
+        assertThat(trackService.list(builder.givenAnImageInstance()).size()).isEqualTo(0);
     }
 
     @Test
     void list_all_track_by_project() {
-        Track track = builder.given_a_track();
+        Track track = builder.givenATrack();
         assertThat(track).isIn(trackService.list(track.getProject()));
-        assertThat(trackService.list(builder.given_a_project()).size()).isEqualTo(0);
+        assertThat(trackService.list(builder.givenAProject()).size()).isEqualTo(0);
     }
 
 
     @Test
     void count_by_project() {
-        Track track = builder.given_a_track();
+        Track track = builder.givenATrack();
         assertThat(trackService.countByProject(track.getProject(), null, null))
             .isEqualTo(1);
-        assertThat(trackService.countByProject(builder.given_a_project(), null, null))
+        assertThat(trackService.countByProject(builder.givenAProject(), null, null))
             .isEqualTo(0);
     }
 
     @Test
     void count_by_project_with_date() {
-        Track track = builder.given_a_track();
+        Track track = builder.givenATrack();
 
         assertThat(trackService.countByProject(
             track.getProject(),
@@ -139,7 +139,7 @@ public class TrackServiceTests {
 
     @Test
     void add_valid_track_with_success() {
-        Track track = builder.given_a_not_persisted_track();
+        Track track = builder.givenANotPersistedTrack();
         CommandResponse commandResponse = trackService.add(track.toJsonObject());
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -150,7 +150,7 @@ public class TrackServiceTests {
 
     @Test
     void add_track_with_null_image_fails() {
-        Track track = builder.given_a_not_persisted_track();
+        Track track = builder.givenANotPersistedTrack();
         Assertions.assertThrows(
             ObjectNotFoundException.class, () -> {
                 trackService.add(track.toJsonObject().withChange("image", null));
@@ -160,7 +160,7 @@ public class TrackServiceTests {
 
     @Test
     void add_track_already_exists() {
-        Track track = builder.given_a_track();
+        Track track = builder.givenATrack();
         Assertions.assertThrows(
             AlreadyExistException.class, () -> {
                 trackService.add(track.toJsonObject().withChange("id", null));
@@ -170,7 +170,7 @@ public class TrackServiceTests {
 
     @Test
     void edit_valid_track_with_success() {
-        Track track = builder.given_a_track();
+        Track track = builder.givenATrack();
 
         CommandResponse commandResponse = trackService.update(
             track,
@@ -187,7 +187,7 @@ public class TrackServiceTests {
 
     @Test
     void undo_redo_track_edition_with_success() {
-        Track track = builder.given_a_track();
+        Track track = builder.givenATrack();
         track.setName("OLD NAME");
         track = builder.persistAndReturn(track);
 
@@ -207,7 +207,7 @@ public class TrackServiceTests {
 
     @Test
     void delete_track_with_success() {
-        Track track = builder.given_a_track();
+        Track track = builder.givenATrack();
 
         CommandResponse commandResponse = trackService.delete(track, null, null, true);
 
@@ -218,7 +218,7 @@ public class TrackServiceTests {
 
     @Test
     void delete_track_with_dependencies_with_success() {
-        AnnotationTrack annotationTrack = builder.given_a_annotation_track();
+        AnnotationTrack annotationTrack = builder.givenAnAnnotationTrack();
         CommandResponse commandResponse = trackService.delete(annotationTrack.getTrack(), null, null, true);
 
         assertThat(commandResponse).isNotNull();
@@ -229,7 +229,7 @@ public class TrackServiceTests {
 
     @Test
     void undo_redo_track_deletion_with_success() {
-        Track track = builder.given_a_track();
+        Track track = builder.givenATrack();
 
         trackService.delete(track, null, null, true);
 

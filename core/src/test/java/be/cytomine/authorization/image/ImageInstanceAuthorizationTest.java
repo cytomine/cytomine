@@ -64,7 +64,7 @@ public class ImageInstanceAuthorizationTest extends CRUDAuthorizationTest {
     @BeforeEach
     public void before() throws Exception {
         if (imageInstance == null) {
-            imageInstance = builder.given_an_image_instance();
+            imageInstance = builder.givenAnImageInstance();
             initACL(imageInstance.container());
         }
         imageInstance.getProject().setMode(EditingMode.CLASSIC);
@@ -136,10 +136,10 @@ public class ImageInstanceAuthorizationTest extends CRUDAuthorizationTest {
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
     public void user_cannot_stop_review_started_by_someone_else() {
-        ImageInstance imageInstance = builder.given_an_image_instance();
+        ImageInstance imageInstance = builder.givenAnImageInstance();
         imageInstance.setProject(this.imageInstance.getProject());
         imageInstance.setReviewStart(new Date());
-        imageInstance.setReviewUser(builder.given_superadmin());
+        imageInstance.setReviewUser(builder.givenSuperAdmin());
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
                 imageInstanceService.stopReview(imageInstance, false);
@@ -150,7 +150,7 @@ public class ImageInstanceAuthorizationTest extends CRUDAuthorizationTest {
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
     public void user_can_stop_review_started_by_himself() {
-        ImageInstance imageInstance = builder.given_an_image_instance();
+        ImageInstance imageInstance = builder.givenAnImageInstance();
         imageInstance.setProject(this.imageInstance.getProject());
         imageInstance.setReviewStart(new Date());
         imageInstance.setReviewUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_ADMIN).get());
@@ -164,7 +164,7 @@ public class ImageInstanceAuthorizationTest extends CRUDAuthorizationTest {
 
     @Override
     protected void when_i_add_domain() {
-        imageInstanceService.add(builder.given_a_not_persisted_image_instance(imageInstance.getProject())
+        imageInstanceService.add(builder.givenANotPersistedImageInstance(imageInstance.getProject())
             .toJsonObject());
     }
 

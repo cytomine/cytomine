@@ -58,7 +58,7 @@ public class ImageFilterProjectAuthorizationTest extends CRDAuthorizationTest {
     @BeforeEach
     public void before() throws Exception {
         if (imageFilterProject == null) {
-            imageFilterProject = builder.given_a_image_filter_project();
+            imageFilterProject = builder.givenAnImageFilterProject();
             initACL(imageFilterProject.container());
         }
     }
@@ -107,8 +107,8 @@ public class ImageFilterProjectAuthorizationTest extends CRDAuthorizationTest {
     @Override
     protected void when_i_add_domain() {
         imageFilterProjectService.add(
-            builder.given_a_not_persisted_image_filter_project(
-                builder.given_a_image_filter(),
+            builder.givenANotPersistedImageFilterProject(
+                builder.givenAnImageFilter(),
                 imageFilterProject.getProject()
             ).toJsonObject()
         );
@@ -116,8 +116,8 @@ public class ImageFilterProjectAuthorizationTest extends CRDAuthorizationTest {
 
     @Override
     protected void when_i_delete_domain() {
-        ImageFilterProject imageFilterProjectThatMustBeDeleted = builder.given_a_not_persisted_image_filter_project(
-            builder.given_a_image_filter(),
+        ImageFilterProject imageFilterProjectThatMustBeDeleted = builder.givenANotPersistedImageFilterProject(
+            builder.givenAnImageFilter(),
             imageFilterProject.getProject()
         );
         builder.persistAndReturn(imageFilterProjectThatMustBeDeleted);

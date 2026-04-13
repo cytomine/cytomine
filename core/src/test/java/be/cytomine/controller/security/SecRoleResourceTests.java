@@ -57,7 +57,7 @@ public class SecRoleResourceTests {
     public void get_a_projectDefaultLayer() throws Exception {
         restSecRoleControllerMockMvc.perform(get(
                 "/api/role/{id}.json",
-                builder.given_a_user_role().getSecRole().getId()
+                builder.givenAUserRole().getSecRole().getId()
             ))
             .andExpect(status().isOk());
     }

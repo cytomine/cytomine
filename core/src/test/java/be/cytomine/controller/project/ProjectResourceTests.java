@@ -170,7 +170,7 @@ public class ProjectResourceTests {
     @Test
     @Transactional
     public void list_all_projects() throws Exception {
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
         restProjectControllerMockMvc.perform(get("/api/project.json"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(0)));
@@ -179,8 +179,8 @@ public class ProjectResourceTests {
     @Test
     @Transactional
     public void list_all_projects_with_filters() throws Exception {
-        Project project = builder.given_a_project();
-        builder.addUserToProject(project, builder.given_superadmin().getUsername());
+        Project project = builder.givenAProject();
+        builder.addUserToProject(project, builder.givenSuperAdmin().getUsername());
 
         restProjectControllerMockMvc.perform(get("/api/project.json")
                 .param("max", "1000")
@@ -204,9 +204,9 @@ public class ProjectResourceTests {
     @Test
     @Transactional
     public void list_all_projects_with_extension() throws Exception {
-        Project project = builder.given_a_project();
-        builder.addUserToProject(project, builder.given_superadmin().getUsername());
-        UserAnnotation userAnnotation = builder.given_a_not_persisted_user_annotation(project);
+        Project project = builder.givenAProject();
+        builder.addUserToProject(project, builder.givenSuperAdmin().getUsername());
+        UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation(project);
         userAnnotationService.add(userAnnotation.toJsonObject());
 
         restProjectControllerMockMvc.perform(get("/api/project.json")
@@ -232,13 +232,13 @@ public class ProjectResourceTests {
     @Test
     @Transactional
     public void list_all_projects_with_filters_members() throws Exception {
-        Project projectWithCriteria = builder.given_a_project();
-        Project projectWithoutCriteria = builder.given_a_project();
+        Project projectWithCriteria = builder.givenAProject();
+        Project projectWithoutCriteria = builder.givenAProject();
 
-        builder.addUserToProject(projectWithCriteria, builder.given_superadmin().getUsername());
-        builder.addUserToProject(projectWithCriteria, builder.given_a_user().getUsername());
+        builder.addUserToProject(projectWithCriteria, builder.givenSuperAdmin().getUsername());
+        builder.addUserToProject(projectWithCriteria, builder.givenAUser().getUsername());
 
-        builder.addUserToProject(projectWithoutCriteria, builder.given_superadmin().getUsername());
+        builder.addUserToProject(projectWithoutCriteria, builder.givenSuperAdmin().getUsername());
 
         restProjectControllerMockMvc.perform(get("/api/project.json")
                 .param("withMembersCount", "true")
@@ -253,13 +253,13 @@ public class ProjectResourceTests {
     @Test
     @Transactional
     public void list_all_projects_with_filters_number_of_annotations() throws Exception {
-        Project projectWithCriteria = builder.given_a_project();
+        Project projectWithCriteria = builder.givenAProject();
         projectWithCriteria.setCountAnnotations(500);
         builder.persistAndReturn(projectWithCriteria);
-        Project projectWithoutCriteria = builder.given_a_project();
+        Project projectWithoutCriteria = builder.givenAProject();
 
-        builder.addUserToProject(projectWithCriteria, builder.given_superadmin().getUsername());
-        builder.addUserToProject(projectWithoutCriteria, builder.given_superadmin().getUsername());
+        builder.addUserToProject(projectWithCriteria, builder.givenSuperAdmin().getUsername());
+        builder.addUserToProject(projectWithoutCriteria, builder.givenSuperAdmin().getUsername());
 
         restProjectControllerMockMvc.perform(get("/api/project.json")
                 .param("numberOfAnnotations[gte]", "100")
@@ -274,13 +274,13 @@ public class ProjectResourceTests {
     @Test
     @Transactional
     public void list_all_projects_with_filters_number_of_job_annotations() throws Exception {
-        Project projectWithCriteria = builder.given_a_project();
+        Project projectWithCriteria = builder.givenAProject();
         projectWithCriteria.setCountJobAnnotations(500);
         builder.persistAndReturn(projectWithCriteria);
-        Project projectWithoutCriteria = builder.given_a_project();
+        Project projectWithoutCriteria = builder.givenAProject();
 
-        builder.addUserToProject(projectWithCriteria, builder.given_superadmin().getUsername());
-        builder.addUserToProject(projectWithoutCriteria, builder.given_superadmin().getUsername());
+        builder.addUserToProject(projectWithCriteria, builder.givenSuperAdmin().getUsername());
+        builder.addUserToProject(projectWithoutCriteria, builder.givenSuperAdmin().getUsername());
 
         restProjectControllerMockMvc.perform(get("/api/project.json")
                 .param("numberOfJobAnnotations[gte]", "100")
@@ -294,13 +294,13 @@ public class ProjectResourceTests {
     @Test
     @Transactional
     public void list_all_projects_with_filters_number_of_images() throws Exception {
-        Project projectWithCriteria = builder.given_a_project();
+        Project projectWithCriteria = builder.givenAProject();
         projectWithCriteria.setCountImages(500);
         builder.persistAndReturn(projectWithCriteria);
-        Project projectWithoutCriteria = builder.given_a_project();
+        Project projectWithoutCriteria = builder.givenAProject();
 
-        builder.addUserToProject(projectWithCriteria, builder.given_superadmin().getUsername());
-        builder.addUserToProject(projectWithoutCriteria, builder.given_superadmin().getUsername());
+        builder.addUserToProject(projectWithCriteria, builder.givenSuperAdmin().getUsername());
+        builder.addUserToProject(projectWithoutCriteria, builder.givenSuperAdmin().getUsername());
 
         restProjectControllerMockMvc.perform(get("/api/project.json")
                 .param("numberOfImages[gte]", "100")
@@ -314,12 +314,12 @@ public class ProjectResourceTests {
     @Test
     @Transactional
     public void list_all_projects_with_filters_name() throws Exception {
-        Project projectWithCriteria = builder.given_a_project();
+        Project projectWithCriteria = builder.givenAProject();
         builder.persistAndReturn(projectWithCriteria);
-        Project projectWithoutCriteria = builder.given_a_project();
+        Project projectWithoutCriteria = builder.givenAProject();
 
-        builder.addUserToProject(projectWithCriteria, builder.given_superadmin().getUsername());
-        builder.addUserToProject(projectWithoutCriteria, builder.given_superadmin().getUsername());
+        builder.addUserToProject(projectWithCriteria, builder.givenSuperAdmin().getUsername());
+        builder.addUserToProject(projectWithoutCriteria, builder.givenSuperAdmin().getUsername());
 
         restProjectControllerMockMvc.perform(get("/api/project.json")
                 .param("name[ilike]", projectWithCriteria.getName().substring(5))
@@ -333,12 +333,12 @@ public class ProjectResourceTests {
     @Test
     @Transactional
     public void list_all_projects_with_current_role() throws Exception {
-        Project projectWhereUserIsAdmin = builder.given_a_project();
+        Project projectWhereUserIsAdmin = builder.givenAProject();
         builder.persistAndReturn(projectWhereUserIsAdmin);
-        Project projectWhereUserIsSimpleUser = builder.given_a_project();
+        Project projectWhereUserIsSimpleUser = builder.givenAProject();
 
-        builder.addUserToProject(projectWhereUserIsAdmin, builder.given_superadmin().getUsername(), ADMINISTRATION);
-        builder.addUserToProject(projectWhereUserIsSimpleUser, builder.given_superadmin().getUsername(), READ);
+        builder.addUserToProject(projectWhereUserIsAdmin, builder.givenSuperAdmin().getUsername(), ADMINISTRATION);
+        builder.addUserToProject(projectWhereUserIsSimpleUser, builder.givenSuperAdmin().getUsername(), READ);
 
         restProjectControllerMockMvc.perform(get("/api/project.json")
                 .param("currentUserRole[in]", "contributor,manager")
@@ -373,20 +373,20 @@ public class ProjectResourceTests {
     @Test
     @Transactional
     public void list_all_projects_with_filters_tags() throws Exception {
-        Project projectWithCriteria = builder.given_a_project();
+        Project projectWithCriteria = builder.givenAProject();
         builder.persistAndReturn(projectWithCriteria);
-        TagDomainAssociation tagDomainAssociation1 = builder.given_a_tag_association(
-            builder.given_a_tag(),
+        TagDomainAssociation tagDomainAssociation1 = builder.givenATagAssociation(
+            builder.givenATag(),
             projectWithCriteria
         );
-        TagDomainAssociation tagDomainAssociation2 = builder.given_a_tag_association(
-            builder.given_a_tag(),
+        TagDomainAssociation tagDomainAssociation2 = builder.givenATagAssociation(
+            builder.givenATag(),
             projectWithCriteria
         );
-        Project projectWithoutCriteria = builder.given_a_project();
+        Project projectWithoutCriteria = builder.givenAProject();
 
-        builder.addUserToProject(projectWithCriteria, builder.given_superadmin().getUsername());
-        builder.addUserToProject(projectWithoutCriteria, builder.given_superadmin().getUsername());
+        builder.addUserToProject(projectWithCriteria, builder.givenSuperAdmin().getUsername());
+        builder.addUserToProject(projectWithoutCriteria, builder.givenSuperAdmin().getUsername());
 
         restProjectControllerMockMvc.perform(get("/api/project.json")
                 .param("tag[in]", tagDomainAssociation1.getTag().getId() + "," + tagDomainAssociation2.getTag().getId())
@@ -400,12 +400,12 @@ public class ProjectResourceTests {
     @Test
     @Transactional
     public void list_all_projects_with_filters_ontologies() throws Exception {
-        Project projectWithCriteria = builder.given_a_project();
+        Project projectWithCriteria = builder.givenAProject();
         builder.persistAndReturn(projectWithCriteria);
-        Project projectWithoutCriteria = builder.given_a_project();
-        Project projectWithNoOntology = builder.given_a_project_with_ontology(null);
+        Project projectWithoutCriteria = builder.givenAProject();
+        Project projectWithNoOntology = builder.givenAProjectWithOntology(null);
 
-        builder.addUserToProject(projectWithCriteria, builder.given_superadmin().getUsername());
+        builder.addUserToProject(projectWithCriteria, builder.givenSuperAdmin().getUsername());
 
         restProjectControllerMockMvc.perform(get("/api/project.json")
                 .param("ontology[in]", projectWithCriteria.getOntology().getId().toString())
@@ -437,12 +437,12 @@ public class ProjectResourceTests {
     @Test
     @Transactional
     public void list_all_projects_with_pagination() throws Exception {
-        Project project1 = builder.given_a_project();
-        Project project2 = builder.given_a_project();
-        Project project3 = builder.given_a_project();
-        builder.addUserToProject(project1, builder.given_superadmin().getUsername());
-        builder.addUserToProject(project2, builder.given_superadmin().getUsername());
-        builder.addUserToProject(project3, builder.given_superadmin().getUsername());
+        Project project1 = builder.givenAProject();
+        Project project2 = builder.givenAProject();
+        Project project3 = builder.givenAProject();
+        builder.addUserToProject(project1, builder.givenSuperAdmin().getUsername());
+        builder.addUserToProject(project2, builder.givenSuperAdmin().getUsername());
+        builder.addUserToProject(project3, builder.givenSuperAdmin().getUsername());
 
         restProjectControllerMockMvc.perform(get("/api/project.json")
                 .param("max", "10")
@@ -499,7 +499,7 @@ public class ProjectResourceTests {
     @Test
     @Transactional
     public void get_a_project() throws Exception {
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
 
         restProjectControllerMockMvc.perform(get("/api/project/{id}.json", project.getId()))
             .andExpect(status().isOk())
@@ -538,8 +538,8 @@ public class ProjectResourceTests {
     @Test
     @Transactional
     public void add_valid_project() throws Exception {
-        Project project = basicInstanceBuilder.given_a_not_persisted_project();
-        project.setOntology(builder.given_an_ontology());
+        Project project = basicInstanceBuilder.givenANotPersistedProject();
+        project.setOntology(builder.givenAnOntology());
         project.setName("add_valid_project");
 
         /* Test project creation */
@@ -558,7 +558,7 @@ public class ProjectResourceTests {
             .andExpect(jsonPath("$.project.ontology").value(project.getOntology().getId()));
 
         project = projectRepository.findByName("add_valid_project").get();
-        assertThat(aclRepository.listMaskForUsers(project.getId(), builder.given_superadmin().getUsername()))
+        assertThat(aclRepository.listMaskForUsers(project.getId(), builder.givenSuperAdmin().getUsername()))
             .contains(ADMINISTRATION.getMask());
 
     }
@@ -566,7 +566,7 @@ public class ProjectResourceTests {
     @Test
     @Transactional
     public void add_valid_project_without_ontology() throws Exception {
-        Project project = basicInstanceBuilder.given_a_not_persisted_project();
+        Project project = basicInstanceBuilder.givenANotPersistedProject();
         project.setOntology(null);
 
         /* Test project creation */
@@ -589,11 +589,11 @@ public class ProjectResourceTests {
     @Test
     @Transactional
     public void add_valid_project_with_users_admins() throws Exception {
-        User user = builder.given_a_user();
-        User admin = builder.given_a_user();
+        User user = builder.givenAUser();
+        User admin = builder.givenAUser();
 
-        Project project = basicInstanceBuilder.given_a_not_persisted_project();
-        project.setOntology(builder.given_an_ontology());
+        Project project = basicInstanceBuilder.givenANotPersistedProject();
+        project.setOntology(builder.givenAnOntology());
         project.setName("add_valid_project_with_users_admins");
         restProjectControllerMockMvc.perform(post("/api/project.json")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -616,7 +616,7 @@ public class ProjectResourceTests {
 
         assertThat(permissionService.hasACLPermission(
             projectCreated,
-            builder.given_superadmin().getUsername(),
+            builder.givenSuperAdmin().getUsername(),
             ADMINISTRATION
         )).isTrue();
         assertThat(permissionService.hasACLPermission(projectCreated, user.getUsername(), ADMINISTRATION)).isFalse();
@@ -637,7 +637,7 @@ public class ProjectResourceTests {
     @Transactional
     public void add_project_with_already_existing_name() throws Exception {
         // expected: 409 / {"success":false,"errors":"Project LROLLUS-TEST already exist!"}
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
 
         restProjectControllerMockMvc.perform(post("/api/project.json")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -650,7 +650,7 @@ public class ProjectResourceTests {
     @Test
     @Transactional
     public void edit_valid_project() throws Exception {
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
         restProjectControllerMockMvc.perform(put("/api/project/{id}.json", project.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(project.toJsonObject().withChange("name", "new_name").toJsonString()))
@@ -668,7 +668,7 @@ public class ProjectResourceTests {
     @Test
     @Transactional
     public void fail_when_editing_project_does_not_exists() throws Exception {
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
         em.remove(project);
         restProjectControllerMockMvc.perform(put("/api/project/{id}.json", 0)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -681,10 +681,10 @@ public class ProjectResourceTests {
     @Test
     @Transactional
     public void edit_valid_project_with_users() throws Exception {
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
 
-        User previousUser = builder.given_a_user();
-        User newUser = builder.given_a_user();
+        User previousUser = builder.givenAUser();
+        User newUser = builder.givenAUser();
         builder.addUserToProject(project, previousUser.getUsername(), READ);
 
         restProjectControllerMockMvc.perform(put("/api/project/{id}.json", project.getId())
@@ -706,10 +706,10 @@ public class ProjectResourceTests {
     @Test
     @Transactional
     public void edit_valid_project_with_admins() throws Exception {
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
 
-        User previousUser = builder.given_a_user();
-        User newUser = builder.given_a_user();
+        User previousUser = builder.givenAUser();
+        User newUser = builder.givenAUser();
         builder.addUserToProject(project, previousUser.getUsername(), READ);
 
         restProjectControllerMockMvc.perform(put("/api/project/{id}.json", project.getId())
@@ -733,10 +733,10 @@ public class ProjectResourceTests {
     @Test
     @Transactional
     public void fail_when_editing_project_with_annotation_terms_and_ontology_change() throws Exception {
-        AnnotationTerm annotationTerm = builder.given_an_annotation_term();
+        AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm();
         Project project = annotationTerm.getUserAnnotation().getProject();
 
-        Ontology newOntology = builder.given_an_ontology();
+        Ontology newOntology = builder.givenAnOntology();
         restProjectControllerMockMvc.perform(put("/api/project/{id}.json", project.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(project.toJsonObject().withChange("ontology", List.of(newOntology.getId())).toJsonString()))
@@ -751,7 +751,7 @@ public class ProjectResourceTests {
     @Transactional
     public void delete_project() throws Exception {
 
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
         restProjectControllerMockMvc.perform(delete("/api/project/{id}.json", project.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(project.toJSON()))
@@ -779,9 +779,9 @@ public class ProjectResourceTests {
     @Test
     @Transactional
     public void list_last_action() throws Exception {
-        Project project = builder.given_a_project();
-        builder.addUserToProject(project, builder.given_superadmin().getUsername());
-        UserAnnotation userAnnotation = builder.given_a_not_persisted_user_annotation(project);
+        Project project = builder.givenAProject();
+        builder.addUserToProject(project, builder.givenSuperAdmin().getUsername());
+        UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation(project);
         userAnnotationService.add(userAnnotation.toJsonObject());
 
         restProjectControllerMockMvc.perform(get("/api/project/{id}/last/{max}.json", project.getId(), 10))
@@ -792,10 +792,10 @@ public class ProjectResourceTests {
     @Test
     @Transactional
     public void list_last_opened_with_empty_dataset() throws Exception {
-        Project project = builder.given_a_project();
-        builder.addUserToProject(project, builder.given_superadmin().getUsername());
-        Project projectNotOpened = builder.given_a_project();
-        builder.addUserToProject(projectNotOpened, builder.given_superadmin().getUsername());
+        Project project = builder.givenAProject();
+        builder.addUserToProject(project, builder.givenSuperAdmin().getUsername());
+        Project projectNotOpened = builder.givenAProject();
+        builder.addUserToProject(projectNotOpened, builder.givenSuperAdmin().getUsername());
 
         restProjectControllerMockMvc.perform(get("/api/project/method/lastopened.json"))
             .andExpect(status().isOk())
@@ -806,13 +806,13 @@ public class ProjectResourceTests {
     @Test
     @Transactional
     public void list_last_opened() throws Exception {
-        Project project = builder.given_a_project();
-        builder.addUserToProject(project, builder.given_superadmin().getUsername());
-        Project projectNotOpened = builder.given_a_project();
-        builder.addUserToProject(projectNotOpened, builder.given_superadmin().getUsername());
+        Project project = builder.givenAProject();
+        builder.addUserToProject(project, builder.givenSuperAdmin().getUsername());
+        Project projectNotOpened = builder.givenAProject();
+        builder.addUserToProject(projectNotOpened, builder.givenSuperAdmin().getUsername());
 
         assertThat(persistentProjectConnectionRepository.count()).isEqualTo(0);
-        given_a_persistent_connection_in_project(builder.given_superadmin(), project, new Date());
+        given_a_persistent_connection_in_project(builder.givenSuperAdmin(), project, new Date());
         assertThat(persistentProjectConnectionRepository.count()).isEqualTo(1);
 
         restProjectControllerMockMvc.perform(get("/api/project/method/lastopened.json"))
@@ -831,8 +831,8 @@ public class ProjectResourceTests {
     @Test
     @Transactional
     public void list_by_ontology() throws Exception {
-        Project project = builder.given_a_project();
-        builder.addUserToProject(project, builder.given_superadmin().getUsername());
+        Project project = builder.givenAProject();
+        builder.addUserToProject(project, builder.givenSuperAdmin().getUsername());
 
         restProjectControllerMockMvc.perform(get("/api/ontology/{id}/project.json", project.getOntology().getId()))
             .andExpect(status().isOk())
@@ -843,8 +843,8 @@ public class ProjectResourceTests {
     @Test
     @Transactional
     public void list_by_ontology_that_does_not_exist() throws Exception {
-        Project project = builder.given_a_project();
-        builder.addUserToProject(project, builder.given_superadmin().getUsername());
+        Project project = builder.givenAProject();
+        builder.addUserToProject(project, builder.givenSuperAdmin().getUsername());
         restProjectControllerMockMvc.perform(get("/api/ontology/{id}/project.json", 0L))
             .andExpect(status().isNotFound());
     }
@@ -852,9 +852,9 @@ public class ProjectResourceTests {
     @Test
     @Transactional
     public void list_by_user() throws Exception {
-        Project project = builder.given_a_project();
-        builder.addUserToProject(project, builder.given_superadmin().getUsername());
-        restProjectControllerMockMvc.perform(get("/api/user/{id}/project.json", builder.given_superadmin().getId()))
+        Project project = builder.givenAProject();
+        builder.addUserToProject(project, builder.givenSuperAdmin().getUsername());
+        restProjectControllerMockMvc.perform(get("/api/user/{id}/project.json", builder.givenSuperAdmin().getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[0].id").value(project.getId()));
     }
@@ -869,11 +869,11 @@ public class ProjectResourceTests {
     @Test
     @Transactional
     public void list_by_user_light() throws Exception {
-        Project project = builder.given_a_project();
-        builder.addUserToProject(project, builder.given_superadmin().getUsername());
+        Project project = builder.givenAProject();
+        builder.addUserToProject(project, builder.givenSuperAdmin().getUsername());
         restProjectControllerMockMvc.perform(get(
                 "/api/user/{id}/project/light.json",
-                builder.given_superadmin().getId()
+                builder.givenSuperAdmin().getId()
             ))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.id=='" + project.getId() + "')]").exists());
@@ -882,17 +882,17 @@ public class ProjectResourceTests {
     @Test
     @Transactional
     public void list_by_creator_light() throws Exception {
-        Project project = builder.given_a_project();
-        User creator = builder.given_superadmin();
-        User user = builder.given_a_user();
-        User admin = builder.given_a_user();
+        Project project = builder.givenAProject();
+        User creator = builder.givenSuperAdmin();
+        User user = builder.givenAUser();
+        User admin = builder.givenAUser();
         builder.addUserToProject(project, creator.getUsername());
         builder.addUserToProject(project, user.getUsername(), READ);
         builder.addUserToProject(project, admin.getUsername(), ADMINISTRATION);
 
         restProjectControllerMockMvc.perform(get(
                 "/api/user/{id}/project/light.json",
-                builder.given_superadmin().getId()
+                builder.givenSuperAdmin().getId()
             )
                 .param("creator", "true"))
             .andExpect(status().isOk())
@@ -912,17 +912,17 @@ public class ProjectResourceTests {
     @Test
     @Transactional
     public void list_by_admin_light() throws Exception {
-        Project project = builder.given_a_project();
-        User creator = builder.given_superadmin();
-        User user = builder.given_a_user();
-        User admin = builder.given_a_user();
+        Project project = builder.givenAProject();
+        User creator = builder.givenSuperAdmin();
+        User user = builder.givenAUser();
+        User admin = builder.givenAUser();
         builder.addUserToProject(project, creator.getUsername(), ADMINISTRATION);
         builder.addUserToProject(project, user.getUsername(), READ);
         builder.addUserToProject(project, admin.getUsername(), ADMINISTRATION);
 
         restProjectControllerMockMvc.perform(get(
                 "/api/user/{id}/project/light.json",
-                builder.given_superadmin().getId()
+                builder.givenSuperAdmin().getId()
             )
                 .param("admin", "true"))
             .andExpect(status().isOk())
@@ -943,17 +943,17 @@ public class ProjectResourceTests {
     @Test
     @Transactional
     public void list_by_simple_user_light() throws Exception {
-        Project project = builder.given_a_project();
-        User creator = builder.given_superadmin();
-        User user = builder.given_a_user();
-        User admin = builder.given_a_user();
+        Project project = builder.givenAProject();
+        User creator = builder.givenSuperAdmin();
+        User user = builder.givenAUser();
+        User admin = builder.givenAUser();
         builder.addUserToProject(project, creator.getUsername(), ADMINISTRATION);
         builder.addUserToProject(project, user.getUsername(), READ);
         builder.addUserToProject(project, admin.getUsername(), ADMINISTRATION);
 
         restProjectControllerMockMvc.perform(get(
                 "/api/user/{id}/project/light.json",
-                builder.given_superadmin().getId()
+                builder.givenSuperAdmin().getId()
             )
                 .param("user", "true"))
             .andExpect(status().isOk())
@@ -981,19 +981,19 @@ public class ProjectResourceTests {
     @jakarta.transaction.Transactional
     public void get_project_bounds() throws Exception {
         Date start = DateUtils.addSeconds(new Date(), -5);
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
         project.setName("0001");
         project.setCountImages(10);
         project.setCountAnnotations(20);
         project.setCountJobAnnotations(30);
         project.setCountReviewedAnnotations(40);
-        builder.addUserToProject(project, builder.given_a_user().getUsername());
-        builder.addUserToProject(project, builder.given_superadmin().getUsername());
+        builder.addUserToProject(project, builder.givenAUser().getUsername());
+        builder.addUserToProject(project, builder.givenSuperAdmin().getUsername());
         builder.persistAndReturn(project);
-        Project project2 = builder.given_a_project();
+        Project project2 = builder.givenAProject();
         project2.setName("zzzzz");
         builder.persistAndReturn(project2);
-        builder.addUserToProject(project2, builder.given_superadmin().getUsername());
+        builder.addUserToProject(project2, builder.givenSuperAdmin().getUsername());
 
         Date stop = DateUtils.addSeconds(new Date(), 5);
 
@@ -1023,11 +1023,11 @@ public class ProjectResourceTests {
     @Test
     @Transactional
     public void list_command_history() throws Exception {
-        Project project = builder.given_a_project();
-        User creator = builder.given_superadmin();
+        Project project = builder.givenAProject();
+        User creator = builder.givenSuperAdmin();
         builder.addUserToProject(project, creator.getUsername());
 
-        UserAnnotation userAnnotation = builder.given_a_not_persisted_user_annotation(project);
+        UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation(project);
         userAnnotationService.add(userAnnotation.toJsonObject());
 
         restProjectControllerMockMvc.perform(get("/api/commandhistory.json")
@@ -1036,7 +1036,7 @@ public class ProjectResourceTests {
             .andExpect(jsonPath("$[?(@.project==" + project.getId() + ")]").exists());
 
         restProjectControllerMockMvc.perform(get("/api/project/{id}/commandhistory.json", project.getId())
-                .param("user", builder.given_superadmin().getId().toString()))
+                .param("user", builder.givenSuperAdmin().getId().toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$[?(@.project==" + project.getId() + ")]").exists());
     }
@@ -1044,13 +1044,13 @@ public class ProjectResourceTests {
     @Test
     @Transactional
     public void list_command_history_with_dates() throws Exception {
-        Project project = builder.given_a_project();
-        User creator = builder.given_superadmin();
+        Project project = builder.givenAProject();
+        User creator = builder.givenSuperAdmin();
         builder.addUserToProject(project, creator.getUsername());
 
         Date start = DateUtils.addSeconds(new Date(), -5);
         Date stop = DateUtils.addSeconds(new Date(), 5);
-        UserAnnotation userAnnotation = builder.given_a_not_persisted_user_annotation(project);
+        UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation(project);
         userAnnotationService.add(userAnnotation.toJsonObject());
 
         restProjectControllerMockMvc.perform(get("/api/project/{id}/commandhistory.json", project.getId())

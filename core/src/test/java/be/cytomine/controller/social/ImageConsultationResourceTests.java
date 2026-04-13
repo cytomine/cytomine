@@ -95,8 +95,8 @@ public class ImageConsultationResourceTests {
     @Test
     @Transactional
     public void add_consultation() throws Exception {
-        User user = builder.given_superadmin();
-        SliceInstance sliceInstance = builder.given_a_slice_instance();
+        User user = builder.givenSuperAdmin();
+        SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
 
         JsonObject jsonObject = new JsonObject();
@@ -131,9 +131,9 @@ public class ImageConsultationResourceTests {
     @Test
     @Transactional
     public void list_last_image_of_users_for_a_project() throws Exception {
-        User user = builder.given_a_user();
-        ImageInstance imageInstance1 = builder.given_an_image_instance();
-        ImageInstance imageInstance2 = builder.given_an_image_instance(imageInstance1.getProject());
+        User user = builder.givenAUser();
+        ImageInstance imageInstance1 = builder.givenAnImageInstance();
+        ImageInstance imageInstance2 = builder.givenAnImageInstance(imageInstance1.getProject());
 
         given_a_persistent_image_consultation(user, imageInstance1, DateUtils.addSeconds(new Date(), -3));
         given_a_persistent_image_consultation(user, imageInstance2, DateUtils.addSeconds(new Date(), -2));
@@ -151,9 +151,9 @@ public class ImageConsultationResourceTests {
     @Test
     @Transactional
     public void list_last_user_consultation() throws Exception {
-        User user = builder.given_superadmin();
-        ImageInstance imageInstance1 = builder.given_an_image_instance();
-        ImageInstance imageInstance2 = builder.given_an_image_instance(imageInstance1.getProject());
+        User user = builder.givenSuperAdmin();
+        ImageInstance imageInstance1 = builder.givenAnImageInstance();
+        ImageInstance imageInstance2 = builder.givenAnImageInstance(imageInstance1.getProject());
 
 
         imageConsultationService.add(user, imageInstance1.getId(), "xxx", "mode", DateUtils.addSeconds(new Date(), -3));
@@ -178,9 +178,9 @@ public class ImageConsultationResourceTests {
     @Test
     @Transactional
     public void list_last_user_consultation_no_data() throws Exception {
-        User user = builder.given_superadmin();
-        ImageInstance imageInstance1 = builder.given_an_image_instance();
-        ImageInstance imageInstance2 = builder.given_an_image_instance(imageInstance1.getProject());
+        User user = builder.givenSuperAdmin();
+        ImageInstance imageInstance1 = builder.givenAnImageInstance();
+        ImageInstance imageInstance2 = builder.givenAnImageInstance(imageInstance1.getProject());
 
 
         restImageConsultationControllerMockMvc.perform(get("/api/imageinstance/method/lastopened.json"))
@@ -192,9 +192,9 @@ public class ImageConsultationResourceTests {
     @Test
     @Transactional
     public void list_last_user_consultation_for_a_project_and_user_distinct_image() throws Exception {
-        User user = builder.given_superadmin();
-        ImageInstance imageInstance1 = builder.given_an_image_instance();
-        ImageInstance imageInstance2 = builder.given_an_image_instance(imageInstance1.getProject());
+        User user = builder.givenSuperAdmin();
+        ImageInstance imageInstance1 = builder.givenAnImageInstance();
+        ImageInstance imageInstance2 = builder.givenAnImageInstance(imageInstance1.getProject());
 
         given_a_persistent_image_consultation(user, imageInstance1, DateUtils.addSeconds(new Date(), -3));
         given_a_persistent_image_consultation(user, imageInstance1, DateUtils.addSeconds(new Date(), -3));
@@ -212,7 +212,7 @@ public class ImageConsultationResourceTests {
 
         restImageConsultationControllerMockMvc.perform(get(
                 "/api/project/{project}/user/{user}/imageconsultation.json",
-                imageInstance1.getProject().getId().toString(), builder.given_a_user().getId().toString()
+                imageInstance1.getProject().getId().toString(), builder.givenAUser().getId().toString()
             )
                 .param("distinctImages", "true"))
             .andExpect(status().isOk())
@@ -222,9 +222,9 @@ public class ImageConsultationResourceTests {
     @Test
     @Transactional
     public void resume_by_user_and_project_empty() throws Exception {
-        User user = builder.given_superadmin();
-        ImageInstance imageInstance1 = builder.given_an_image_instance();
-        ImageInstance imageInstance2 = builder.given_an_image_instance(imageInstance1.getProject());
+        User user = builder.givenSuperAdmin();
+        ImageInstance imageInstance1 = builder.givenAnImageInstance();
+        ImageInstance imageInstance2 = builder.givenAnImageInstance(imageInstance1.getProject());
 
         restImageConsultationControllerMockMvc.perform(get("/api/imageconsultation/resume.json")
                 .param("project", imageInstance1.getProject().getId().toString())
@@ -237,9 +237,9 @@ public class ImageConsultationResourceTests {
     @Test
     @Transactional
     public void resume_by_user_and_project() throws Exception {
-        User user = builder.given_superadmin();
-        ImageInstance imageInstance1 = builder.given_an_image_instance();
-        ImageInstance imageInstance2 = builder.given_an_image_instance(imageInstance1.getProject());
+        User user = builder.givenSuperAdmin();
+        ImageInstance imageInstance1 = builder.givenAnImageInstance();
+        ImageInstance imageInstance2 = builder.givenAnImageInstance(imageInstance1.getProject());
 
         given_a_persistent_image_consultation(user, imageInstance1, DateUtils.addSeconds(new Date(), -3));
         given_a_persistent_image_consultation(user, imageInstance1, DateUtils.addSeconds(new Date(), -3));
@@ -257,10 +257,10 @@ public class ImageConsultationResourceTests {
     @Test
     @Transactional
     public void resume_by_user_and_project_export_as_csv() throws Exception {
-        User user = builder.given_superadmin();
-        ImageInstance imageInstance1 = builder.given_an_image_instance();
-        SliceInstance slice = builder.given_a_slice_instance(imageInstance1, 1, 0, 1);
-        builder.given_a_user_annotation(slice);
+        User user = builder.givenSuperAdmin();
+        ImageInstance imageInstance1 = builder.givenAnImageInstance();
+        SliceInstance slice = builder.givenASliceInstance(imageInstance1, 1, 0, 1);
+        builder.givenAUserAnnotation(slice);
 
         Date currentDate = DateUtils.addSeconds(new Date(), -3);
         given_a_persistent_image_consultation(user, imageInstance1, currentDate);
@@ -291,9 +291,9 @@ public class ImageConsultationResourceTests {
     @Test
     @Transactional
     public void count_annotation_by_project() throws Exception {
-        User user = builder.given_superadmin();
-        ImageInstance imageInstance1 = builder.given_an_image_instance();
-        ImageInstance imageInstance2 = builder.given_an_image_instance(imageInstance1.getProject());
+        User user = builder.givenSuperAdmin();
+        ImageInstance imageInstance1 = builder.givenAnImageInstance();
+        ImageInstance imageInstance2 = builder.givenAnImageInstance(imageInstance1.getProject());
 
         given_a_persistent_image_consultation(user, imageInstance2, DateUtils.addDays(new Date(), -2));
 

@@ -56,7 +56,7 @@ public class ConfigurationResourceTests {
     @Test
     @Transactional
     public void list_all_configs() throws Exception {
-        Configuration configuration = builder.given_a_configuration("xxx");
+        Configuration configuration = builder.givenAConfiguration("xxx");
         restConfigurationControllerMockMvc.perform(get("/api/configuration.json"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
@@ -66,7 +66,7 @@ public class ConfigurationResourceTests {
     @Test
     @Transactional
     public void get_a_configuration() throws Exception {
-        Configuration configuration = builder.given_a_configuration("xxx");
+        Configuration configuration = builder.givenAConfiguration("xxx");
 
         restConfigurationControllerMockMvc.perform(get("/api/configuration/key/{key}.json", configuration.getKey()))
             .andExpect(status().isOk())
@@ -83,7 +83,7 @@ public class ConfigurationResourceTests {
     @Test
     @Transactional
     public void add_valid_configuration() throws Exception {
-        Configuration configuration = builder.given_a_not_persisted_configuration("xxx");
+        Configuration configuration = builder.givenANotPersistedConfiguration("xxx");
         restConfigurationControllerMockMvc.perform(post("/api/configuration.json")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(configuration.toJSON()))
@@ -101,7 +101,7 @@ public class ConfigurationResourceTests {
     @Test
     @Transactional
     public void edit_valid_configuration() throws Exception {
-        Configuration configuration = builder.given_a_configuration("xxx");
+        Configuration configuration = builder.givenAConfiguration("xxx");
         restConfigurationControllerMockMvc.perform(put("/api/configuration/key/{key}.json", configuration.getKey())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(configuration.toJSON()))
@@ -119,7 +119,7 @@ public class ConfigurationResourceTests {
     @Test
     @Transactional
     public void delete_configuration() throws Exception {
-        Configuration configuration = builder.given_a_configuration("xxx");
+        Configuration configuration = builder.givenAConfiguration("xxx");
         restConfigurationControllerMockMvc.perform(delete("/api/configuration/key/{key}.json", configuration.getKey())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(configuration.toJSON()))

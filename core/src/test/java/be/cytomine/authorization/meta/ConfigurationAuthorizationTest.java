@@ -65,18 +65,18 @@ public class ConfigurationAuthorizationTest extends AbstractAuthorizationTest {
     public void before() throws Exception {
 
         if (configForAdmin == null) {
-            configForAdmin = builder.given_a_not_persisted_configuration("ADMIN");
+            configForAdmin = builder.givenANotPersistedConfiguration("ADMIN");
             configForAdmin.setReadingRole(ConfigurationReadingRole.ADMIN);
             builder.persistAndReturn(configForAdmin);
             ;
         }
         if (configForUser == null) {
-            configForUser = builder.given_a_not_persisted_configuration("USER");
+            configForUser = builder.givenANotPersistedConfiguration("USER");
             configForUser.setReadingRole(ConfigurationReadingRole.USER);
             builder.persistAndReturn(configForUser);
         }
         if (configForAll == null) {
-            configForAll = builder.given_a_not_persisted_configuration("ALL");
+            configForAll = builder.givenANotPersistedConfiguration("ALL");
             configForAll.setReadingRole(ConfigurationReadingRole.ALL);
             builder.persistAndReturn(configForAll);
         }
@@ -167,14 +167,14 @@ public class ConfigurationAuthorizationTest extends AbstractAuthorizationTest {
     @Test
     @WithMockUser(username = SUPERADMIN)
     public void admin_can_delete_config() {
-        Configuration configuration = builder.given_a_configuration("xxx");
+        Configuration configuration = builder.givenAConfiguration("xxx");
         expectOK(() -> { configurationService.delete(configuration, null, null, false); });
     }
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
     public void user_cannot_delete_config() {
-        Configuration configuration = builder.given_a_configuration("xxx");
+        Configuration configuration = builder.givenAConfiguration("xxx");
         expectForbidden(() -> { configurationService.delete(configuration, null, null, false); });
     }
 

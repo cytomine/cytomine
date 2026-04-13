@@ -69,9 +69,9 @@ public class GenericAnnotationServiceTests {
         String basedLocation = "POLYGON ((0 0, 0 5000, 10000 5000, 10000 0, 0 0))";
         String addedLocation = "POLYGON ((0 5000, 10000 5000, 10000 10000, 0 10000, 0 5000))";
 
-        UserAnnotation annotation = builder.given_a_user_annotation();
+        UserAnnotation annotation = builder.givenAUserAnnotation();
         annotation.setLocation(new WKTReader().read(basedLocation));
-        UserAnnotation anotherAnnotationOutsideTheLocation = builder.given_a_user_annotation();
+        UserAnnotation anotherAnnotationOutsideTheLocation = builder.givenAUserAnnotation();
         anotherAnnotationOutsideTheLocation.setLocation(new WKTReader().read(
             "POLYGON ((20000 50000, 300000 50000, 300000 100000, 20000 100000, 20000 50000))"));
         anotherAnnotationOutsideTheLocation.setImage(annotation.getImage());
@@ -89,9 +89,9 @@ public class GenericAnnotationServiceTests {
         String basedLocation = "POLYGON ((0 0, 0 5000, 10000 5000, 10000 0, 0 0))";
         String addedLocation = "POLYGON ((0 5000, 10000 5000, 10000 10000, 0 10000, 0 5000))";
 
-        ReviewedAnnotation annotation = builder.given_a_reviewed_annotation();
+        ReviewedAnnotation annotation = builder.givenAReviewedAnnotation();
         annotation.setLocation(new WKTReader().read(basedLocation));
-        ReviewedAnnotation anotherAnnotationOutsideTheLocation = builder.given_a_reviewed_annotation();
+        ReviewedAnnotation anotherAnnotationOutsideTheLocation = builder.givenAReviewedAnnotation();
         anotherAnnotationOutsideTheLocation.setLocation(new WKTReader().read(
             "POLYGON ((20000 50000, 300000 50000, 300000 100000, 20000 100000, 20000 50000))"));
         anotherAnnotationOutsideTheLocation.setImage(annotation.getImage());
@@ -106,7 +106,7 @@ public class GenericAnnotationServiceTests {
 
     @Test
     void find_user_annotation_with_terms() {
-        UserAnnotation annotation = builder.given_an_annotation_term().getUserAnnotation();
+        UserAnnotation annotation = builder.givenAnAnnotationTerm().getUserAnnotation();
         assertThat(genericAnnotationService.findUserAnnotationWithTerm(
             List.of(annotation.getId()),
             annotation.termsId()
@@ -116,8 +116,8 @@ public class GenericAnnotationServiceTests {
 
     @Test
     void find_reviewed_annotation_with_terms() {
-        ReviewedAnnotation annotation = builder.given_a_reviewed_annotation();
-        annotation.getTerms().add(builder.given_a_term(annotation.getProject().getOntology()));
+        ReviewedAnnotation annotation = builder.givenAReviewedAnnotation();
+        annotation.getTerms().add(builder.givenATerm(annotation.getProject().getOntology()));
         builder.persistAndReturn(annotation);
 
         assertThat(genericAnnotationService.findReviewedAnnotationWithTerm(

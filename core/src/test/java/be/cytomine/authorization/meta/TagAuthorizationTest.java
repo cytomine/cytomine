@@ -59,7 +59,7 @@ public class TagAuthorizationTest extends AbstractAuthorizationTest {
     @BeforeEach
     public void before() throws Exception {
         if (tag == null) {
-            tag = builder.given_a_tag();
+            tag = builder.givenATag();
             ;
         }
     }
@@ -98,25 +98,25 @@ public class TagAuthorizationTest extends AbstractAuthorizationTest {
     @Test
     @WithMockUser(username = SUPERADMIN)
     public void admin_can_update_tag_even_if_linked_with_associations() {
-        Tag tagToEdit = builder.given_a_tag();
-        TagDomainAssociation association = builder.given_a_tag_association(tagToEdit, builder.given_a_project());
+        Tag tagToEdit = builder.givenATag();
+        TagDomainAssociation association = builder.givenATagAssociation(tagToEdit, builder.givenAProject());
         expectOK(() -> tagService.update(tagToEdit, tagToEdit.toJsonObject()));
     }
 
     @Test
     @WithMockUser(username = CREATOR)
     public void creator_cannot_update_tag_if_linked_with_associations() {
-        Tag tagToEdit = builder.given_a_tag();
+        Tag tagToEdit = builder.givenATag();
         tagToEdit.setUser((User) userRepository.findByUsernameLikeIgnoreCase(CREATOR).get());
         builder.persistAndReturn(tagToEdit);
-        TagDomainAssociation association = builder.given_a_tag_association(tagToEdit, builder.given_a_project());
+        TagDomainAssociation association = builder.givenATagAssociation(tagToEdit, builder.givenAProject());
         expectForbidden(() -> tagService.update(tagToEdit, tagToEdit.toJsonObject()));
     }
 
     @Test
     @WithMockUser(username = CREATOR)
     public void creator_can_update_tag_if_not_linked_with_associations() {
-        Tag tagToEdit = builder.given_a_tag();
+        Tag tagToEdit = builder.givenATag();
         tagToEdit.setUser((User) userRepository.findByUsernameLikeIgnoreCase(CREATOR).get());
         builder.persistAndReturn(tagToEdit);
         expectOK(() -> tagService.update(tagToEdit, tagToEdit.toJsonObject()));
@@ -125,18 +125,18 @@ public class TagAuthorizationTest extends AbstractAuthorizationTest {
     @Test
     @WithMockUser(username = SUPERADMIN)
     public void admin_can_tag_tag() {
-        Tag tagToEdit = builder.given_a_tag();
-        TagDomainAssociation association = builder.given_a_tag_association(tagToEdit, builder.given_a_project());
+        Tag tagToEdit = builder.givenATag();
+        TagDomainAssociation association = builder.givenATagAssociation(tagToEdit, builder.givenAProject());
         expectOK(() -> tagService.delete(tagToEdit, null, null, false));
     }
 
     @Test
     @WithMockUser(username = CREATOR)
     public void creator_cannot_delete_tag_if_linked_with_associations() {
-        Tag tagToDelete = builder.given_a_tag();
+        Tag tagToDelete = builder.givenATag();
         tagToDelete.setUser((User) userRepository.findByUsernameLikeIgnoreCase(CREATOR).get());
         builder.persistAndReturn(tagToDelete);
-        TagDomainAssociation association = builder.given_a_tag_association(tagToDelete, builder.given_a_project());
+        TagDomainAssociation association = builder.givenATagAssociation(tagToDelete, builder.givenAProject());
         expectForbidden(() -> tagService.delete(tagToDelete, null, null, false));
     }
 
@@ -144,7 +144,7 @@ public class TagAuthorizationTest extends AbstractAuthorizationTest {
     @Test
     @WithMockUser(username = CREATOR)
     public void creator_can_delete_tag_if_not_linked_with_associations() {
-        Tag tagToDelete = builder.given_a_tag();
+        Tag tagToDelete = builder.givenATag();
         tagToDelete.setUser((User) userRepository.findByUsernameLikeIgnoreCase(CREATOR).get());
         builder.persistAndReturn(tagToDelete);
         expectOK(() -> tagService.delete(tagToDelete, null, null, false));
@@ -156,7 +156,7 @@ public class TagAuthorizationTest extends AbstractAuthorizationTest {
     }
 
     protected void when_i_add_domain() {
-        tagService.add(builder.given_a_not_persisted_tag("xxx").toJsonObject());
+        tagService.add(builder.givenANotPersistedTag("xxx").toJsonObject());
     }
 
     public void when_i_edit_domain() {

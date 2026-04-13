@@ -59,7 +59,7 @@ public class UploadedFileAuthorizationTest extends CRUDAuthorizationTest {
     @BeforeEach
     public void before() throws Exception {
         if (uploadedFile == null) {
-            uploadedFile = builder.given_a_uploaded_file();
+            uploadedFile = builder.givenAUploadedFile();
             initACL(uploadedFile.container());
         }
     }
@@ -71,7 +71,7 @@ public class UploadedFileAuthorizationTest extends CRUDAuthorizationTest {
 
     @Override
     protected void when_i_add_domain() {
-        UploadedFile uploadedFileToCreate = builder.given_a_not_persisted_uploaded_file();
+        UploadedFile uploadedFileToCreate = builder.givenANotPersistedUploadedFile();
         uploadedFileToCreate.setStorage(uploadedFile.getStorage());
         uploadedFileService.add(uploadedFileToCreate.toJsonObject());
     }

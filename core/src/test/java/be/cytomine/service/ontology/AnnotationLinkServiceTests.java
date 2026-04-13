@@ -37,7 +37,7 @@ public class AnnotationLinkServiceTests {
 
     @Test
     void find_annotation_link_with_success() {
-        AnnotationLink annotationLink = builder.given_an_annotation_link();
+        AnnotationLink annotationLink = builder.givenAnAnnotationLink();
         AssertionsForClassTypes.assertThat(annotationLinkService.find(annotationLink.getId()).isPresent());
         assertThat(annotationLink).isEqualTo(annotationLinkService.find(annotationLink.getId()).get());
     }
@@ -54,29 +54,29 @@ public class AnnotationLinkServiceTests {
 
     @Test
     void list_annotation_link_by_annotation_group() {
-        Project project = builder.given_a_project();
-        AnnotationGroup annotationGroup = builder.given_an_annotation_group(
+        Project project = builder.givenAProject();
+        AnnotationGroup annotationGroup = builder.givenAnAnnotationGroup(
             project,
-            builder.given_an_imagegroup(project)
+            builder.givenAnImageGroup(project)
         );
-        ImageInstance image = builder.given_an_image_instance(project);
+        ImageInstance image = builder.givenAnImageInstance(project);
 
-        AnnotationLink annotationLink1 = builder.given_an_annotation_link(
-            builder.given_a_user_annotation(project),
+        AnnotationLink annotationLink1 = builder.givenAnAnnotationLink(
+            builder.givenAUserAnnotation(project),
             annotationGroup,
             image
         );
-        AnnotationLink annotationLink2 = builder.given_an_annotation_link(
-            builder.given_a_user_annotation(project),
+        AnnotationLink annotationLink2 = builder.givenAnAnnotationLink(
+            builder.givenAUserAnnotation(project),
             annotationGroup,
             image
         );
-        AnnotationLink annotationLink3 = builder.given_an_annotation_link(
-            builder.given_a_user_annotation(project),
+        AnnotationLink annotationLink3 = builder.givenAnAnnotationLink(
+            builder.givenAUserAnnotation(project),
             annotationGroup,
             image
         );
-        AnnotationLink annotationLink4 = builder.given_an_annotation_link();
+        AnnotationLink annotationLink4 = builder.givenAnAnnotationLink();
 
         AssertionsForInterfaceTypes.assertThat(annotationLinkService.list(annotationGroup))
             .containsExactly(annotationLink1, annotationLink2, annotationLink3);
@@ -86,7 +86,7 @@ public class AnnotationLinkServiceTests {
 
     @Test
     void add_valid_annotation_link_with_success() {
-        AnnotationLink annotationLink = builder.given_a_not_persisted_annotation_link();
+        AnnotationLink annotationLink = builder.givenANotPersistedAnnotationLink();
 
         CommandResponse commandResponse = annotationLinkService.add(annotationLink.toJsonObject());
 
@@ -97,7 +97,7 @@ public class AnnotationLinkServiceTests {
 
     @Test
     void delete_annotation_link_with_success() {
-        AnnotationLink annotationLink = builder.given_an_annotation_link();
+        AnnotationLink annotationLink = builder.givenAnAnnotationLink();
 
         CommandResponse commandResponse = annotationLinkService.delete(annotationLink, null, null, true);
 

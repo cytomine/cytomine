@@ -38,7 +38,7 @@ public class ImageGroupImageInstanceAuthorizationTest extends CRDAuthorizationTe
     @BeforeEach
     public void before() throws Exception {
         if (igii == null) {
-            igii = builder.given_an_imagegroup_imageinstance();
+            igii = builder.givenAnImageGroupImageInstance();
             initACL(igii.container());
         }
         ImageGroup imageGroup = igii.getGroup();
@@ -52,7 +52,7 @@ public class ImageGroupImageInstanceAuthorizationTest extends CRDAuthorizationTe
 
     @Override
     protected void when_i_add_domain() {
-        imageGroupImageInstanceService.add(builder.given_a_not_persisted_imagegroup_imageinstance(
+        imageGroupImageInstanceService.add(builder.givenANotPersistedImageGroupImageInstance(
             igii.getGroup(),
             igii.getImage()
         ).toJsonObject());

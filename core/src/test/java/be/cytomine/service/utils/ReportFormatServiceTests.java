@@ -206,8 +206,8 @@ public class ReportFormatServiceTests {
     }
 
     private List<Map<String, Object>> buildAnnotations(boolean isComplete) {
-        Term term1 = builder.given_a_term();
-        Term term2 = builder.given_a_term();
+        Term term1 = builder.givenATerm();
+        Term term2 = builder.givenATerm();
         Point point = new Point(2545454.231212, 2545454.23111);
         expectedDataObject = new Object[][]{
             {
@@ -259,8 +259,8 @@ public class ReportFormatServiceTests {
     }
 
     private List<Map<String, Object>> buildUsers(boolean isComplete) {
-        User user1 = builder.given_a_user();
-        User user2 = builder.given_a_user();
+        User user1 = builder.givenAUser();
+        User user2 = builder.givenAUser();
         expectedDataObject = new Object[][]{
             {"Username", "Name"},
             {user1.getUsername(), user1.getName()},

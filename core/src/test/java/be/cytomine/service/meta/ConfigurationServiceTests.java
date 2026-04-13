@@ -70,13 +70,13 @@ public class ConfigurationServiceTests {
 
     @Test
     void list_all_configuration_with_success() {
-        Configuration configuration = builder.given_a_configuration("xxx");
+        Configuration configuration = builder.givenAConfiguration("xxx");
         assertThat(configuration).isIn(configurationService.list());
     }
 
     @Test
     void find_configuration_with_success() {
-        Configuration configuration = builder.given_a_configuration("xxx");
+        Configuration configuration = builder.givenAConfiguration("xxx");
         assertThat(configurationService.findByKey("xxx")).contains(configuration);
     }
 
@@ -87,7 +87,7 @@ public class ConfigurationServiceTests {
 
     @Test
     void add_valid_configuration_with_success() {
-        Configuration configuration = builder.given_a_not_persisted_configuration("xxx");
+        Configuration configuration = builder.givenANotPersistedConfiguration("xxx");
 
         CommandResponse commandResponse = configurationService.add(configuration.toJsonObject());
 
@@ -97,7 +97,7 @@ public class ConfigurationServiceTests {
 
     @Test
     void add_configuration_with_already_existing_key() {
-        Configuration configuration = builder.given_a_configuration("xxx");
+        Configuration configuration = builder.givenAConfiguration("xxx");
 
         Assertions.assertThrows(
             AlreadyExistException.class, () -> {
@@ -108,7 +108,7 @@ public class ConfigurationServiceTests {
 
     @Test
     void edit_valid_configuration_with_success() {
-        Configuration configuration = builder.given_a_configuration("xxx");
+        Configuration configuration = builder.givenAConfiguration("xxx");
 
         CommandResponse commandResponse = configurationService.update(
             configuration,
@@ -125,7 +125,7 @@ public class ConfigurationServiceTests {
 
     @Test
     void delete_configuration_with_success() {
-        Configuration configuration = builder.given_a_configuration("xxx");
+        Configuration configuration = builder.givenAConfiguration("xxx");
 
         CommandResponse commandResponse = configurationService.delete(configuration, null, null, true);
 

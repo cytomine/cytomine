@@ -141,8 +141,8 @@ public class UserPositionResourceTests {
     @Test
     @Transactional
     public void list_last_user_on_image() throws Exception {
-        User user = builder.given_a_user();
-        SliceInstance sliceInstance = builder.given_a_slice_instance();
+        User user = builder.givenAUser();
+        SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
 
         given_a_persistent_user_position(new Date(), user, sliceInstance, false);
@@ -156,8 +156,8 @@ public class UserPositionResourceTests {
     @Test
     @Transactional
     public void list_last_broadcast_user_on_image() throws Exception {
-        User user = builder.given_a_user();
-        SliceInstance sliceInstance = builder.given_a_slice_instance();
+        User user = builder.givenAUser();
+        SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
 
         given_a_persistent_user_position(new Date(), user, sliceInstance, true);
@@ -173,8 +173,8 @@ public class UserPositionResourceTests {
     @Test
     @Transactional
     public void list_empty_last_broadcast_user_on_image() throws Exception {
-        User user = builder.given_a_user();
-        SliceInstance sliceInstance = builder.given_a_slice_instance();
+        User user = builder.givenAUser();
+        SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
 
         given_a_persistent_user_position(new Date(), user, sliceInstance, false);
@@ -188,8 +188,8 @@ public class UserPositionResourceTests {
     @Test
     @Transactional
     public void list_user_position() throws Exception {
-        User user = builder.given_a_user();
-        SliceInstance sliceInstance = builder.given_a_slice_instance();
+        User user = builder.givenAUser();
+        SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
 
         given_a_persistent_user_position(new Date(), user, sliceInstance, false);
@@ -218,7 +218,7 @@ public class UserPositionResourceTests {
                 imageInstance.getId()
             )
                 .param("showDetails", "true")
-                .param("user", builder.given_a_user().getId().toString()))
+                .param("user", builder.givenAUser().getId().toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(0))));
     }
@@ -227,8 +227,8 @@ public class UserPositionResourceTests {
     @Test
     @Transactional
     public void list_after_than() throws Exception {
-        User user = builder.given_a_user();
-        SliceInstance sliceInstance = builder.given_a_slice_instance();
+        User user = builder.givenAUser();
+        SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
 
         given_a_persistent_user_position(DateUtils.addDays(new Date(), -5), user, sliceInstance, false);
@@ -255,8 +255,8 @@ public class UserPositionResourceTests {
     @Test
     @Transactional
     public void list_before_than() throws Exception {
-        User user = builder.given_a_user();
-        SliceInstance sliceInstance = builder.given_a_slice_instance();
+        User user = builder.givenAUser();
+        SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
 
         given_a_persistent_user_position(DateUtils.addDays(new Date(), -5), user, sliceInstance, false);
@@ -286,10 +286,10 @@ public class UserPositionResourceTests {
         ConcurrentWebSocketSessionDecorator sessionDecoratorA = new ConcurrentWebSocketSessionDecorator(session, 0, 0);
         ConcurrentWebSocketSessionDecorator sessionDecoratorB = new ConcurrentWebSocketSessionDecorator(session, 0, 0);
 
-        User userA = builder.given_a_user();
-        User userB = builder.given_a_user();
+        User userA = builder.givenAUser();
+        User userB = builder.givenAUser();
 
-        ImageInstance imageInstance = builder.given_an_image_instance();
+        ImageInstance imageInstance = builder.givenAnImageInstance();
         Long imageId = imageInstance.getId();
         Long currentUserId = currentUserService.getCurrentUser().getId();
         String currentUserAndImageId = currentUserId.toString() + "/" + imageId.toString();
@@ -317,9 +317,9 @@ public class UserPositionResourceTests {
     @Test
     @Transactional
     public void list_followers_for_forbidden_user() throws Exception {
-        ImageInstance imageInstance = builder.given_an_image_instance();
+        ImageInstance imageInstance = builder.givenAnImageInstance();
         Long imageId = imageInstance.getId();
-        User user = builder.given_a_user();
+        User user = builder.givenAUser();
         restUserPositionControllerMockMvc.perform(get(
                 "/api/imageinstance/{image}/followers/{user}.json",
                 imageId,
@@ -331,8 +331,8 @@ public class UserPositionResourceTests {
     @Test
     @Transactional
     public void summarize() throws Exception {
-        User user = builder.given_a_user();
-        SliceInstance sliceInstance = builder.given_a_slice_instance();
+        User user = builder.givenAUser();
+        SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
 
         given_a_persistent_user_position(DateUtils.addMinutes(new Date(), -5), user, sliceInstance, USER_VIEW, false);
@@ -373,7 +373,7 @@ public class UserPositionResourceTests {
                 "/api/imageinstance/{image}/positions.json",
                 imageInstance.getId()
             )
-                .param("user", builder.given_a_user().getId().toString()))
+                .param("user", builder.givenAUser().getId().toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(0))));
 
@@ -383,8 +383,8 @@ public class UserPositionResourceTests {
     @Test
     @Transactional
     public void add_position() throws Exception {
-        User user = builder.given_superadmin();
-        SliceInstance sliceInstance = builder.given_a_slice_instance();
+        User user = builder.givenSuperAdmin();
+        SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
 
         //{"image":6836067,"zoom":1,"rotation":0,"bottomLeftX":-2344,"bottomLeftY":1032,
@@ -443,8 +443,8 @@ public class UserPositionResourceTests {
     @Test
     @Transactional
     public void add_position_with_slice_instance() throws Exception {
-        User user = builder.given_superadmin();
-        SliceInstance sliceInstance = builder.given_a_slice_instance();
+        User user = builder.givenSuperAdmin();
+        SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
 
         //{"image":6836067,"zoom":1,"rotation":0,"bottomLeftX":-2344,"bottomLeftY":1032,
@@ -475,8 +475,8 @@ public class UserPositionResourceTests {
     @Test
     @Transactional
     public void get_last_user_position_of_not_followed_user() throws Exception {
-        User user = builder.given_superadmin();
-        SliceInstance sliceInstance = builder.given_a_slice_instance();
+        User user = builder.givenSuperAdmin();
+        SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
         String userAndImageId = user.getId().toString() + "/" + imageInstance.getId().toString();
 
@@ -493,9 +493,9 @@ public class UserPositionResourceTests {
     @Test
     @Transactional
     public void get_last_user_position_of_user_already_followed_by_current_user() throws Exception {
-        User admin = builder.given_superadmin();
-        User user = builder.given_a_user();
-        SliceInstance sliceInstance = builder.given_a_slice_instance();
+        User admin = builder.givenSuperAdmin();
+        User user = builder.givenAUser();
+        SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
         String userAndImageId = user.getId().toString() + "/" + imageInstance.getId().toString();
         String followerAndImageId = admin.getId().toString() + "/" + imageInstance.getId().toString();
@@ -515,8 +515,8 @@ public class UserPositionResourceTests {
     @Test
     @Transactional
     public void get_last_user_position_of_user_already_followed_but_not_by_current_user() throws Exception {
-        User user = builder.given_a_user();
-        SliceInstance sliceInstance = builder.given_a_slice_instance();
+        User user = builder.givenAUser();
+        SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
         String userAndImageId = user.getId().toString() + "/" + imageInstance.getId().toString();
 

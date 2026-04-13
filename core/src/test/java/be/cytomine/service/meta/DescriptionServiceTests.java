@@ -53,22 +53,22 @@ public class DescriptionServiceTests {
 
     @Test
     public void list_description() {
-        Description description = builder.given_a_description(builder.given_a_project());
+        Description description = builder.givenADescription(builder.givenAProject());
         assertThat(descriptionService.list()).contains(description);
     }
 
     @Test
     public void find_description_for_domain() {
-        Project project = builder.given_a_project();
-        Description description = builder.given_a_description(project);
+        Project project = builder.givenAProject();
+        Description description = builder.givenADescription(project);
         assertThat(descriptionService.findByDomain(project)).contains(description);
     }
 
 
     @Test
     public void find_description_for_domain_ident() {
-        Project project = builder.given_a_project();
-        Description description = builder.given_a_description(project);
+        Project project = builder.givenAProject();
+        Description description = builder.givenADescription(project);
         assertThat(descriptionService.findByDomain(
             project.getClass().getName(),
             project.getId()
@@ -87,8 +87,8 @@ public class DescriptionServiceTests {
 
     @Test
     public void create_description() {
-        Project project = builder.given_a_project();
-        Description description = builder.given_a_not_persisted_description(project);
+        Project project = builder.givenAProject();
+        Description description = builder.givenANotPersistedDescription(project);
         CommandResponse commandResponse = descriptionService.add(description.toJsonObject());
         assertThat(commandResponse).isNotNull();
         assertThat(descriptionService.findByDomain(project)).isNotNull();
@@ -96,10 +96,10 @@ public class DescriptionServiceTests {
 
     @Test
     public void create_description_already_exists_fail() {
-        Project project = builder.given_a_project();
+        Project project = builder.givenAProject();
         Assertions.assertThrows(
             AlreadyExistException.class, () -> {
-                Description description = builder.given_a_description(project);
+                Description description = builder.givenADescription(project);
                 CommandResponse commandResponse = descriptionService.add(description.toJsonObject()
                     .withChange("id", null));
             }
@@ -109,8 +109,8 @@ public class DescriptionServiceTests {
 
     @Test
     public void edit_description() {
-        Project project = builder.given_a_project();
-        Description description = builder.given_a_description(project);
+        Project project = builder.givenAProject();
+        Description description = builder.givenADescription(project);
         description.setData("v2");
         CommandResponse commandResponse = descriptionService.update(description, description.toJsonObject());
         assertThat(commandResponse).isNotNull();
@@ -119,8 +119,8 @@ public class DescriptionServiceTests {
 
     @Test
     public void delete_description() {
-        Project project = builder.given_a_project();
-        Description description = builder.given_a_description(project);
+        Project project = builder.givenAProject();
+        Description description = builder.givenADescription(project);
         descriptionService.delete(description, null, null, false);
         assertThat(descriptionService.findByDomain(project)).isEmpty();
     }

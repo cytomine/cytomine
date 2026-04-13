@@ -60,7 +60,7 @@ public class ProjectRepresentativeUserAuthorizationTest extends CRDAuthorization
     @BeforeEach
     public void before() throws Exception {
         if (projectRepresentativeUser == null) {
-            projectRepresentativeUser = builder.given_a_project_representative_user();
+            projectRepresentativeUser = builder.givenAProjectRepresentativeUser();
             ;
             initACL(projectRepresentativeUser.container());
         }
@@ -102,10 +102,10 @@ public class ProjectRepresentativeUserAuthorizationTest extends CRDAuthorization
 
     @Override
     protected void when_i_add_domain() {
-        User user = builder.given_a_user();
+        User user = builder.givenAUser();
         builder.addUserToProject(projectRepresentativeUser.getProject(), user.getUsername());
         projectRepresentativeUserService.add(
-            builder.given_a_not_persisted_project_representative_user(
+            builder.givenANotPersistedProjectRepresentativeUser(
                 projectRepresentativeUser.getProject(), user
             ).toJsonObject()
         );
@@ -117,7 +117,7 @@ public class ProjectRepresentativeUserAuthorizationTest extends CRDAuthorization
         builder.addUserToProject(projectRepresentativeUser.getProject(), user.getUsername());
         ProjectRepresentativeUser
             projectRepresentativeUserToDelete
-            = builder.given_a_not_persisted_project_representative_user(
+            = builder.givenANotPersistedProjectRepresentativeUser(
             projectRepresentativeUser.getProject(),
             user
         );

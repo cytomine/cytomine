@@ -73,7 +73,7 @@ public class TaskRunResourceTests {
     @Test
     @Transactional
     public void add_valid_task_run() throws Exception {
-        TaskRun taskRun = builder.given_a_not_persisted_task_run();
+        TaskRun taskRun = builder.givenANotPersistedTaskRun();
         taskRun.setTaskRunId(UUID.randomUUID());
         String taskId = UUID.randomUUID().toString();
         String queryBody = "{\"image\": \"" + taskRun.getImage().getId() + "\"}";
@@ -134,7 +134,7 @@ public class TaskRunResourceTests {
     @Test
     @Transactional
     public void single_param_provision_of_a_task() throws Exception {
-        TaskRun taskRun = builder.given_a_not_persisted_task_run();
+        TaskRun taskRun = builder.givenANotPersistedTaskRun();
         taskRunRepository.saveAndFlush(taskRun);
         UUID taskRunId = taskRun.getTaskRunId();
 
@@ -164,7 +164,7 @@ public class TaskRunResourceTests {
     @Test
     @Transactional
     public void batch_param_provision_of_a_task() throws Exception {
-        TaskRun taskRun = builder.given_a_not_persisted_task_run();
+        TaskRun taskRun = builder.givenANotPersistedTaskRun();
         taskRunRepository.saveAndFlush(taskRun);
         UUID taskRunId = taskRun.getTaskRunId();
 
@@ -201,7 +201,7 @@ public class TaskRunResourceTests {
     @Test
     @Transactional
     public void get_task_run() throws Exception {
-        TaskRun taskRun = builder.given_a_not_persisted_task_run();
+        TaskRun taskRun = builder.givenANotPersistedTaskRun();
         taskRunRepository.saveAndFlush(taskRun);
         UUID taskRunId = taskRun.getTaskRunId();
         String mockResponse = getTaskRunBody(taskRunId);
@@ -223,7 +223,7 @@ public class TaskRunResourceTests {
     @Test
     @Transactional
     public void post_state_action() throws Exception {
-        TaskRun taskRun = builder.given_a_not_persisted_task_run();
+        TaskRun taskRun = builder.givenANotPersistedTaskRun();
         taskRunRepository.saveAndFlush(taskRun);
         UUID taskRunId = taskRun.getTaskRunId();
         String queryBody = "{\"desired\": \"running\"}";

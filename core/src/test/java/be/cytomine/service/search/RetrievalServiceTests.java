@@ -107,7 +107,7 @@ public class RetrievalServiceTests {
 
     @Test
     void delete_index_with_success() {
-        UserAnnotation annotation = builder.given_a_user_annotation();
+        UserAnnotation annotation = builder.givenAUserAnnotation();
 
         /* Simulate call to CBIR */
         String expectedUrlPath = CBIR_API_BASE_PATH + "/images/" + annotation.getId();

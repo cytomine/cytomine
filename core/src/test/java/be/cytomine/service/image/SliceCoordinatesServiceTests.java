@@ -56,7 +56,7 @@ public class SliceCoordinatesServiceTests {
 
     @Test
     public void get_slice_coordinates_are_ordered() {
-        AbstractImage image = builder.given_an_abstract_image();
+        AbstractImage image = builder.givenAnAbstractImage();
 
         List<Integer> channels = new ArrayList<>(Arrays.asList(1, 2, 3));
         List<Integer> zStacks = new ArrayList<>(Arrays.asList(10, 20));
@@ -78,7 +78,7 @@ public class SliceCoordinatesServiceTests {
 
     @Test
     public void get_slice_coordinates_reference() {
-        AbstractImage image = builder.given_an_abstract_image();
+        AbstractImage image = builder.givenAnAbstractImage();
 
         List<Integer> channels = new ArrayList<>(Arrays.asList(1, 2, 3));
         List<Integer> zStacks = new ArrayList<>(Arrays.asList(10, 20));
@@ -96,7 +96,7 @@ public class SliceCoordinatesServiceTests {
 
     @Test
     public void get_reference_slice() {
-        AbstractImage image = builder.given_an_abstract_image();
+        AbstractImage image = builder.givenAnAbstractImage();
 
         List<Integer> channels = new ArrayList<>(Arrays.asList(1, 2, 3));
         List<Integer> zStacks = new ArrayList<>(Arrays.asList(10, 20));
@@ -124,7 +124,7 @@ public class SliceCoordinatesServiceTests {
 
 
     private AbstractSlice buildSlice(AbstractImage image, int c, int z, int t) {
-        AbstractSlice slice = builder.given_an_abstract_slice();
+        AbstractSlice slice = builder.givenAnAbstractSlice();
         slice.setImage(image);
         slice.setChannel(c);
         slice.setZStack(z);

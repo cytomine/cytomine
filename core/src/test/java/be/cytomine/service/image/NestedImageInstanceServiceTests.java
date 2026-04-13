@@ -75,8 +75,8 @@ public class NestedImageInstanceServiceTests {
 
     @Test
     void list_all_nested_image_image_by_image_instance() {
-        NestedImageInstance nestedImageInstance1 = builder.given_a_nested_image_instance();
-        NestedImageInstance nestedImageInstance2 = builder.given_a_nested_image_instance();
+        NestedImageInstance nestedImageInstance1 = builder.givenANestedImageInstance();
+        NestedImageInstance nestedImageInstance2 = builder.givenANestedImageInstance();
 
         List<NestedImageInstance> list = nestedImageInstanceService.list(nestedImageInstance1.getParent());
 
@@ -86,7 +86,7 @@ public class NestedImageInstanceServiceTests {
 
     @Test
     void get_nested_image_intance_with_success() {
-        NestedImageInstance nestedImageInstance = builder.given_a_nested_image_instance();
+        NestedImageInstance nestedImageInstance = builder.givenANestedImageInstance();
         assertThat(nestedImageInstance).isEqualTo(nestedImageInstanceService.get(nestedImageInstance.getId()));
     }
 
@@ -97,7 +97,7 @@ public class NestedImageInstanceServiceTests {
 
     @Test
     void find_nested_image_instance_with_success() {
-        NestedImageInstance nestedImageInstance = builder.given_a_nested_image_instance();
+        NestedImageInstance nestedImageInstance = builder.givenANestedImageInstance();
         AssertionsForClassTypes.assertThat(nestedImageInstanceService.find(nestedImageInstance.getId()).isPresent());
         assertThat(nestedImageInstance).isEqualTo(nestedImageInstanceService.find(nestedImageInstance.getId()).get());
     }
@@ -109,7 +109,7 @@ public class NestedImageInstanceServiceTests {
 
     @Test
     void add_valid_nested_image_instance_with_success() {
-        NestedImageInstance nestedImageInstance = builder.given_a_not_persisted_nested_image_instance();
+        NestedImageInstance nestedImageInstance = builder.givenANotPersistedNestedImageInstance();
 
         CommandResponse commandResponse = nestedImageInstanceService.add(nestedImageInstance.toJsonObject());
 
@@ -123,7 +123,7 @@ public class NestedImageInstanceServiceTests {
 
     @Test
     void add_already_existing_nested_image_instance_fails() {
-        NestedImageInstance nestedImageInstance = builder.given_a_nested_image_instance();
+        NestedImageInstance nestedImageInstance = builder.givenANestedImageInstance();
         Assertions.assertThrows(
             AlreadyExistException.class, () -> {
                 nestedImageInstanceService.add(nestedImageInstance.toJsonObject().withChange("id", null));
@@ -133,7 +133,7 @@ public class NestedImageInstanceServiceTests {
 
     @Test
     void add_valid_nested_image_instance_with_unexsting_abstract_image_fails() {
-        NestedImageInstance nestedImageInstance = builder.given_a_not_persisted_nested_image_instance();
+        NestedImageInstance nestedImageInstance = builder.givenANotPersistedNestedImageInstance();
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
                 nestedImageInstanceService.add(nestedImageInstance.toJsonObject().withChange("baseImage", null));
@@ -143,7 +143,7 @@ public class NestedImageInstanceServiceTests {
 
     @Test
     void add_valid_nested_image_instance_with_unexsting_parent_fails() {
-        NestedImageInstance nestedImageInstance = builder.given_a_not_persisted_nested_image_instance();
+        NestedImageInstance nestedImageInstance = builder.givenANotPersistedNestedImageInstance();
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
                 nestedImageInstanceService.add(nestedImageInstance.toJsonObject().withChange("parent", null));
@@ -153,7 +153,7 @@ public class NestedImageInstanceServiceTests {
 
     @Test
     void add_valid_nested_image_instance_with_unexsting_project_fails() {
-        NestedImageInstance nestedImageInstance = builder.given_a_not_persisted_nested_image_instance();
+        NestedImageInstance nestedImageInstance = builder.givenANotPersistedNestedImageInstance();
         Assertions.assertThrows(
             ObjectNotFoundException.class, () -> {
                 nestedImageInstanceService.add(nestedImageInstance.toJsonObject().withChange("project", null));
@@ -163,10 +163,10 @@ public class NestedImageInstanceServiceTests {
 
     @Test
     void edit_nested_image_instance_with_success() {
-        Project project1 = builder.given_a_project();
-        Project project2 = builder.given_a_project();
+        Project project1 = builder.givenAProject();
+        Project project2 = builder.givenAProject();
 
-        NestedImageInstance nestedImageInstance = builder.given_a_not_persisted_nested_image_instance();
+        NestedImageInstance nestedImageInstance = builder.givenANotPersistedNestedImageInstance();
         nestedImageInstance.setProject(project1);
         nestedImageInstance = builder.persistAndReturn(nestedImageInstance);
 
@@ -185,7 +185,7 @@ public class NestedImageInstanceServiceTests {
 
     @Test
     void delete_nested_image_instance_with_success() {
-        NestedImageInstance nestedImageInstance = builder.given_a_nested_image_instance();
+        NestedImageInstance nestedImageInstance = builder.givenANestedImageInstance();
 
         CommandResponse commandResponse = nestedImageInstanceService.delete(nestedImageInstance, null, null, true);
 

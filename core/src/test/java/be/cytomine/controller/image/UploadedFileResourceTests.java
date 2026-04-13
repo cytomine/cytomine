@@ -166,7 +166,7 @@ public class UploadedFileResourceTests {
     @Test
     @Transactional
     public void list_uploaded() throws Exception {
-        UploadedFile uploadedFile = builder.given_a_uploaded_file();
+        UploadedFile uploadedFile = builder.givenAUploadedFile();
 
         restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile.json"))
             .andExpect(status().isOk())
@@ -176,7 +176,7 @@ public class UploadedFileResourceTests {
     @Test
     @Transactional
     public void list_uploaded_hirerachical_tree() throws Exception {
-        UploadedFile uploadedFile = builder.given_a_uploaded_file();
+        UploadedFile uploadedFile = builder.givenAUploadedFile();
 
         restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile.json").param(
                 "root",
@@ -188,7 +188,7 @@ public class UploadedFileResourceTests {
     @Test
     @Transactional
     public void list_uploaded_with_search() throws Exception {
-        UploadedFile uploadedFile = builder.given_a_uploaded_file();
+        UploadedFile uploadedFile = builder.givenAUploadedFile();
         uploadedFile.setOriginalFilename("abracadabra");
 
         restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile.json")
@@ -209,9 +209,9 @@ public class UploadedFileResourceTests {
     @Transactional
     public void list_uploaded_file_with_pagination() throws Exception {
 
-        UploadedFile image1 = builder.given_a_uploaded_file();
-        UploadedFile image2 = builder.given_a_uploaded_file();
-        UploadedFile image3 = builder.given_a_uploaded_file();
+        UploadedFile image1 = builder.givenAUploadedFile();
+        UploadedFile image2 = builder.givenAUploadedFile();
+        UploadedFile image3 = builder.givenAUploadedFile();
 
         restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile.json")
                 .param("offset", "0")
@@ -308,16 +308,16 @@ public class UploadedFileResourceTests {
     void sort_uploaded_file() throws Exception {
 
         //creation
-        UploadedFile uploadedFile = builder.given_a_uploaded_file();
+        UploadedFile uploadedFile = builder.givenAUploadedFile();
         uploadedFile.setSize(1L);
-        UploadedFile uploadedFileChild1 = builder.given_a_uploaded_file();
+        UploadedFile uploadedFileChild1 = builder.givenAUploadedFile();
         uploadedFileChild1.setParent(uploadedFile);
-        UploadedFile uploadedfileChild2 = builder.given_a_uploaded_file();
+        UploadedFile uploadedfileChild2 = builder.givenAUploadedFile();
         uploadedfileChild2.setParent(uploadedFile);
         uploadedfileChild2.setSize(uploadedFile.getSize() + 200);
         uploadedfileChild2.setOriginalFilename(uploadedFile.getOriginalFilename() + "s");
         uploadedfileChild2.setStatus(9);
-        UploadedFile uploadedFile2 = builder.given_a_uploaded_file();
+        UploadedFile uploadedFile2 = builder.givenAUploadedFile();
         uploadedFile2.setSize(100000L);
 
         List<UploadedFile> uploadedFiles = null;
@@ -458,7 +458,7 @@ public class UploadedFileResourceTests {
     @Test
     @Transactional
     public void get_an_uploaded_file() throws Exception {
-        UploadedFile image = builder.given_a_uploaded_file();
+        UploadedFile image = builder.givenAUploadedFile();
 
 
         restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile/{id}.json", image.getId()))
@@ -489,7 +489,7 @@ public class UploadedFileResourceTests {
     @Test
     @Transactional
     public void add_valid_uploaded_file() throws Exception {
-        UploadedFile uploadedFile = builder.given_a_not_persisted_uploaded_file();
+        UploadedFile uploadedFile = builder.givenANotPersistedUploadedFile();
         restUploadedFileControllerMockMvc.perform(post("/api/uploadedfile.json")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(uploadedFile.toJSON()))
@@ -506,7 +506,7 @@ public class UploadedFileResourceTests {
     @Test
     @Transactional
     public void edit_valid_uploaded_file() throws Exception {
-        UploadedFile uploadedFile = builder.given_a_uploaded_file();
+        UploadedFile uploadedFile = builder.givenAUploadedFile();
         JsonObject jsonObject = uploadedFile.toJsonObject();
         jsonObject.put("filename", "new");
         restUploadedFileControllerMockMvc.perform(put("/api/uploadedfile/{id}.json", uploadedFile.getId())
@@ -529,7 +529,7 @@ public class UploadedFileResourceTests {
     @Test
     @Transactional
     public void delete_uploaded_file() throws Exception {
-        UploadedFile uploadedFile = builder.given_a_uploaded_file();
+        UploadedFile uploadedFile = builder.givenAUploadedFile();
         restUploadedFileControllerMockMvc.perform(delete("/api/uploadedfile/{id}.json", uploadedFile.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
@@ -546,7 +546,7 @@ public class UploadedFileResourceTests {
     @Test
     @Disabled("Randomly fails")
     public void download_uploaded_file() throws Exception {
-        UploadedFile uploadedFile = builder.given_a_uploaded_file();
+        UploadedFile uploadedFile = builder.givenAUploadedFile();
         uploadedFile.setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         uploadedFile.setOriginalFilename("CMU-2.mrxs");
         uploadedFile.setContentType("MRXS");

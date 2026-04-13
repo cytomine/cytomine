@@ -63,7 +63,7 @@ public class AbstractImageAuthorizationTest extends CRUDAuthorizationTest {
     public void before() throws Exception {
         if (abstractImage == null) {
             Long start = System.currentTimeMillis();
-            abstractImage = builder.given_an_abstract_image();
+            abstractImage = builder.givenAnAbstractImage();
             System.out.println("EXECUTION given_an_abstract_image:" + (System.currentTimeMillis() - start));
             start = System.currentTimeMillis();
             System.out.println("EXECUTION initUser:" + (System.currentTimeMillis() - start));
@@ -77,7 +77,7 @@ public class AbstractImageAuthorizationTest extends CRUDAuthorizationTest {
     @WithMockUser(username = SUPERADMIN)
     public void admin_can_list_abstractImages() {
         assertThat(abstractImageService.list()).contains(abstractImage);
-        AbstractImage anotherAbstractImage = builder.given_an_abstract_image();
+        AbstractImage anotherAbstractImage = builder.givenAnAbstractImage();
         assertThat(abstractImageService.list()).contains(anotherAbstractImage);
     }
 
@@ -85,7 +85,7 @@ public class AbstractImageAuthorizationTest extends CRUDAuthorizationTest {
     @WithMockUser(username = USER_ACL_READ)
     public void user_cannot_list_all_abstractImages() {
         expectOK(() -> abstractImageService.list());
-        AbstractImage anotherAbstractImage = builder.given_an_abstract_image();
+        AbstractImage anotherAbstractImage = builder.givenAnAbstractImage();
         assertThat(abstractImageService.list()).doesNotContain(anotherAbstractImage);
     }
 
@@ -97,7 +97,7 @@ public class AbstractImageAuthorizationTest extends CRUDAuthorizationTest {
 
     @Override
     protected void when_i_add_domain() {
-        abstractImageService.add(builder.given_a_not_persisted_abstract_image().toJsonObject());
+        abstractImageService.add(builder.givenANotPersistedAbstractImage().toJsonObject());
     }
 
     @Override

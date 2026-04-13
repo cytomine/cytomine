@@ -55,7 +55,7 @@ public class ImageFilterProjectResourceTests {
     @Test
     @Transactional
     public void list_all() throws Exception {
-        ImageFilterProject imageFilterProject = builder.given_a_image_filter_project();
+        ImageFilterProject imageFilterProject = builder.givenAnImageFilterProject();
         restImageFilterProjectMockMvc.perform(get("/api/imagefilterproject.json"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
@@ -67,7 +67,7 @@ public class ImageFilterProjectResourceTests {
     @Test
     @Transactional
     public void list_by_project() throws Exception {
-        ImageFilterProject imageFilterProject = builder.given_a_image_filter_project();
+        ImageFilterProject imageFilterProject = builder.givenAnImageFilterProject();
         restImageFilterProjectMockMvc.perform(get(
                 "/api/project/{id}/imagefilterproject.json",
                 imageFilterProject.getProject().getId()
@@ -89,9 +89,9 @@ public class ImageFilterProjectResourceTests {
     public void add_valid_imageFilterProject() throws Exception {
         ImageFilterProject
             imageFilterProject
-            = builder.given_a_not_persisted_image_filter_project(
-            builder.given_a_image_filter(),
-            builder.given_a_project()
+            = builder.givenANotPersistedImageFilterProject(
+            builder.givenAnImageFilter(),
+            builder.givenAProject()
         );
         restImageFilterProjectMockMvc.perform(post("/api/imagefilterproject.json")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -107,9 +107,9 @@ public class ImageFilterProjectResourceTests {
     @Test
     @Transactional
     public void delete_valid_imageFilterProject() throws Exception {
-        ImageFilterProject imageFilterProject = builder.given_a_image_filter_project(
-            builder.given_a_image_filter(),
-            builder.given_a_project()
+        ImageFilterProject imageFilterProject = builder.givenAnImageFilterProject(
+            builder.givenAnImageFilter(),
+            builder.givenAProject()
         );
         builder.persistAndReturn(imageFilterProject);
         restImageFilterProjectMockMvc.perform(delete("/api/imagefilterproject/{id}.json", imageFilterProject.getId())

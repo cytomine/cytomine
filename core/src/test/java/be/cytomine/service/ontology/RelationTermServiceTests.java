@@ -64,7 +64,7 @@ public class RelationTermServiceTests {
 
     @Test
     void find_relation_term_with_success() {
-        RelationTerm relationTerm = builder.given_a_relation_term();
+        RelationTerm relationTerm = builder.givenARelationTerm();
         Optional<RelationTerm> result = relationTermService.find(
             relationTerm.getRelation(),
             relationTerm.getTerm1(),
@@ -77,19 +77,19 @@ public class RelationTermServiceTests {
     @Test
     void find_unexisting_relation_term_return_empty() {
         assertThat(relationTermService.find(
-            builder.given_a_relation(),
-            builder.given_a_term(),
-            builder.given_a_term()
+            builder.givenARelation(),
+            builder.givenATerm(),
+            builder.givenATerm()
         )).isEmpty();
     }
 
     @Test
     void list_relation_by_term() {
-        Term parent = builder.given_a_term();
-        Term child1 = builder.given_a_term(parent.getOntology());
-        Term child2 = builder.given_a_term(parent.getOntology());
-        RelationTerm parent1 = builder.given_a_relation_term(parent, child1);
-        RelationTerm parent2 = builder.given_a_relation_term(parent, child2);
+        Term parent = builder.givenATerm();
+        Term child1 = builder.givenATerm(parent.getOntology());
+        Term child2 = builder.givenATerm(parent.getOntology());
+        RelationTerm parent1 = builder.givenARelationTerm(parent, child1);
+        RelationTerm parent2 = builder.givenARelationTerm(parent, child2);
 
         assertThat(relationTermService.list(parent)).asList().containsExactlyInAnyOrder(parent1, parent2);
         assertThat(relationTermService.list(child1)).asList().containsExactly(parent1);
@@ -98,11 +98,11 @@ public class RelationTermServiceTests {
 
     @Test
     void list_relation_by_term_and_position() {
-        Term parent = builder.given_a_term();
-        Term child1 = builder.given_a_term(parent.getOntology());
-        Term child2 = builder.given_a_term(parent.getOntology());
-        RelationTerm parent1 = builder.given_a_relation_term(parent, child1);
-        RelationTerm parent2 = builder.given_a_relation_term(parent, child2);
+        Term parent = builder.givenATerm();
+        Term child1 = builder.givenATerm(parent.getOntology());
+        Term child2 = builder.givenATerm(parent.getOntology());
+        RelationTerm parent1 = builder.givenARelationTerm(parent, child1);
+        RelationTerm parent2 = builder.givenARelationTerm(parent, child2);
 
         assertThat(relationTermService.list(parent, "1")).asList().containsExactlyInAnyOrder(parent1, parent2);
         assertThat(relationTermService.list(child1, "2")).asList().containsExactly(parent1);
@@ -113,11 +113,11 @@ public class RelationTermServiceTests {
 
     @Test
     void add_valid_relation_term_with_success() {
-        Term parent = builder.given_a_term();
-        Term child1 = builder.given_a_term(parent.getOntology());
+        Term parent = builder.givenATerm();
+        Term child1 = builder.givenATerm(parent.getOntology());
         RelationTerm parentRelationTerm =
-            basicInstanceBuilder.given_a_not_persisted_relation_term(
-                builder.given_a_relation(),
+            basicInstanceBuilder.givenANotPersistedRelationTerm(
+                builder.givenARelation(),
                 parent, child1
             );
 
@@ -125,15 +125,15 @@ public class RelationTermServiceTests {
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
-        assertThat(relationTermService.find(builder.given_a_relation(), parent, child1)).isPresent();
+        assertThat(relationTermService.find(builder.givenARelation(), parent, child1)).isPresent();
     }
 
     @Test
     void add_relation_term_with_null_term_fail() {
-        Term parent = builder.given_a_term();
+        Term parent = builder.givenATerm();
         RelationTerm parentRelationTerm =
-            basicInstanceBuilder.given_a_not_persisted_relation_term(
-                builder.given_a_relation(),
+            basicInstanceBuilder.givenANotPersistedRelationTerm(
+                builder.givenARelation(),
                 parent, null
             );
         Assertions.assertThrows(
@@ -145,10 +145,10 @@ public class RelationTermServiceTests {
 
     @Test
     void undo_redo_term_creation_with_success() {
-        Term parent = builder.given_a_term();
-        Term child1 = builder.given_a_term(parent.getOntology());
-        RelationTerm parentRelationTerm = builder.given_a_not_persisted_relation_term(
-            builder.given_a_relation(),
+        Term parent = builder.givenATerm();
+        Term child1 = builder.givenATerm(parent.getOntology());
+        RelationTerm parentRelationTerm = builder.givenANotPersistedRelationTerm(
+            builder.givenARelation(),
             parent,
             child1
         );
@@ -157,44 +157,44 @@ public class RelationTermServiceTests {
 
         commandService.undo();
 
-        assertThat(relationTermService.find(builder.given_a_relation(), parent, child1)).isEmpty();
+        assertThat(relationTermService.find(builder.givenARelation(), parent, child1)).isEmpty();
 
         commandService.redo();
 
-        assertThat(relationTermService.find(builder.given_a_relation(), parent, child1)).isPresent();
+        assertThat(relationTermService.find(builder.givenARelation(), parent, child1)).isPresent();
 
     }
 
     @Test
     void delete_relation_term_with_success() {
-        Term parent = builder.given_a_term();
-        Term child1 = builder.given_a_term(parent.getOntology());
-        RelationTerm parentRelationTerm = builder.given_a_relation_term(parent, child1);
+        Term parent = builder.givenATerm();
+        Term child1 = builder.givenATerm(parent.getOntology());
+        RelationTerm parentRelationTerm = builder.givenARelationTerm(parent, child1);
 
         CommandResponse commandResponse = relationTermService.delete(parentRelationTerm, null, null, true);
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
-        assertThat(relationTermService.find(builder.given_a_relation(), parent, child1)).isEmpty();
+        assertThat(relationTermService.find(builder.givenARelation(), parent, child1)).isEmpty();
     }
 
     @Test
     void undo_redo_term_deletion_with_success() {
-        Term parent = builder.given_a_term();
-        Term child1 = builder.given_a_term(parent.getOntology());
-        RelationTerm parentRelationTerm = builder.given_a_relation_term(parent, child1);
+        Term parent = builder.givenATerm();
+        Term child1 = builder.givenATerm(parent.getOntology());
+        RelationTerm parentRelationTerm = builder.givenARelationTerm(parent, child1);
 
         CommandResponse commandResponse = relationTermService.delete(parentRelationTerm, null, null, true);
 
-        assertThat(relationTermService.find(builder.given_a_relation(), parent, child1)).isEmpty();
+        assertThat(relationTermService.find(builder.givenARelation(), parent, child1)).isEmpty();
 
         commandService.undo();
 
-        assertThat(relationTermService.find(builder.given_a_relation(), parent, child1)).isPresent();
+        assertThat(relationTermService.find(builder.givenARelation(), parent, child1)).isPresent();
 
         commandService.redo();
 
-        assertThat(relationTermService.find(builder.given_a_relation(), parent, child1)).isEmpty();
+        assertThat(relationTermService.find(builder.givenARelation(), parent, child1)).isEmpty();
     }
 
 

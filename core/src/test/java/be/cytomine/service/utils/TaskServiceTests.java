@@ -37,8 +37,8 @@ public class TaskServiceTests {
 
     @Test
     public void task_workflow() {
-        Project project = builder.given_a_project();
-        Task newTask = taskService.createNewTask(project, builder.given_superadmin(), true);
+        Project project = builder.givenAProject();
+        Task newTask = taskService.createNewTask(project, builder.givenSuperAdmin(), true);
         assertThat(newTask).isNotNull();
         assertThat(newTask.getProgress()).isEqualTo(0);
 

@@ -12,8 +12,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
-import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.image.group.ImageGroup;
 import be.cytomine.domain.project.Project;
 import be.cytomine.exceptions.ObjectNotFoundException;
@@ -79,9 +79,11 @@ public class ImageGroupServiceTests {
     @Test
     void add_imagegroup_with_null_project_fails() {
         ImageGroup imageGroup = builder.given_an_imagegroup();
-        Assertions.assertThrows(ObjectNotFoundException.class, () -> {
-            imageGroupService.add(imageGroup.toJsonObject().withChange("project", null));
-        });
+        Assertions.assertThrows(
+            ObjectNotFoundException.class, () -> {
+                imageGroupService.add(imageGroup.toJsonObject().withChange("project", null));
+            }
+        );
     }
 
     @Test

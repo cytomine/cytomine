@@ -1,32 +1,41 @@
 package be.cytomine.service.image;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
-import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.common.PostGisTestConfiguration;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.assertj.core.api.AssertionsForClassTypes;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -37,6 +46,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
+import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.NestedImageInstance;
 import be.cytomine.domain.image.SliceInstance;
@@ -150,13 +161,13 @@ public class ImageInstanceServiceTests {
         Project project = builder.given_a_project();
 
         List<Date> dateChoices = new ArrayList<>(List.of(
-                new GregorianCalendar(2021, Calendar.JANUARY, 1).getTime(),
-                new GregorianCalendar(2021, Calendar.JULY, 1).getTime(),
-                new GregorianCalendar(2021, Calendar.DECEMBER, 1).getTime()
+            new GregorianCalendar(2021, Calendar.JANUARY, 1).getTime(),
+            new GregorianCalendar(2021, Calendar.JULY, 1).getTime(),
+            new GregorianCalendar(2021, Calendar.DECEMBER, 1).getTime()
         ));
         Collections.shuffle(dateChoices);
 
-        List<Integer> intChoices = new ArrayList<>(List.of(1,2,3));
+        List<Integer> intChoices = new ArrayList<>(List.of(1, 2, 3));
         Collections.shuffle(intChoices);
         List<Double> doubleChoices = new ArrayList<>(List.of(0.5, 10.1, 99.99));
         Collections.shuffle(doubleChoices);
@@ -164,7 +175,7 @@ public class ImageInstanceServiceTests {
         Collections.shuffle(stringChoices);
 
 
-        for (int k = 0 ; k < 2 ; k++) { // execute twice the creation of images (6 images)
+        for (int k = 0; k < 2; k++) { // execute twice the creation of images (6 images)
             for (int i = 0; i < 3; i++) {
                 ImageInstance imageInstance = builder.given_an_image_instance(project);
                 imageInstance.setUpdated(dateChoices.get(i));
@@ -179,9 +190,9 @@ public class ImageInstanceServiceTests {
 
                 imageInstance.getBaseImage().getUploadedFile().setContentType(stringChoices.get(i));
 
-                imageInstance.setCountImageAnnotations((long)intChoices.get(i));
-                imageInstance.setCountImageReviewedAnnotations((long)intChoices.get(i));
-                imageInstance.setCountImageJobAnnotations((long)intChoices.get(i));
+                imageInstance.setCountImageAnnotations((long) intChoices.get(i));
+                imageInstance.setCountImageReviewedAnnotations((long) intChoices.get(i));
+                imageInstance.setCountImageJobAnnotations((long) intChoices.get(i));
 
                 imageInstance.getBaseImage().setWidth(intChoices.get(i));
                 imageInstance.getBaseImage().setHeight(intChoices.get(i));
@@ -207,10 +218,26 @@ public class ImageInstanceServiceTests {
         //Created cannot be set (auto generated)
 //        assertThat(imageInstanceBounds.getCreated().getMin()).isEqualTo(new GregorianCalendar(2021, Calendar.JANUARY, 1).getTime());
 //        assertThat(imageInstanceBounds.getCreated().getMax()).isEqualTo(new GregorianCalendar(2021, Calendar.DECEMBER, 1).getTime());
-        assertThat(imageInstanceBounds.getReviewStart().getMin()).isEqualTo(new GregorianCalendar(2021, Calendar.JANUARY, 1).getTime());
-        assertThat(imageInstanceBounds.getReviewStart().getMax()).isEqualTo(new GregorianCalendar(2021, Calendar.DECEMBER, 1).getTime());
-        assertThat(imageInstanceBounds.getReviewStop().getMin()).isEqualTo(new GregorianCalendar(2021, Calendar.JANUARY, 1).getTime());
-        assertThat(imageInstanceBounds.getReviewStop().getMax()).isEqualTo(new GregorianCalendar(2021, Calendar.DECEMBER, 1).getTime());
+        assertThat(imageInstanceBounds.getReviewStart().getMin()).isEqualTo(new GregorianCalendar(
+            2021,
+            Calendar.JANUARY,
+            1
+        ).getTime());
+        assertThat(imageInstanceBounds.getReviewStart().getMax()).isEqualTo(new GregorianCalendar(
+            2021,
+            Calendar.DECEMBER,
+            1
+        ).getTime());
+        assertThat(imageInstanceBounds.getReviewStop().getMin()).isEqualTo(new GregorianCalendar(
+            2021,
+            Calendar.JANUARY,
+            1
+        ).getTime());
+        assertThat(imageInstanceBounds.getReviewStop().getMax()).isEqualTo(new GregorianCalendar(
+            2021,
+            Calendar.DECEMBER,
+            1
+        ).getTime());
 
         assertThat(imageInstanceBounds.getMagnification().getMin()).isEqualTo(1);
         assertThat(imageInstanceBounds.getMagnification().getMax()).isEqualTo(3);
@@ -228,15 +255,18 @@ public class ImageInstanceServiceTests {
         assertThat(imageInstanceBounds.getPhysicalSizeY().getMin()).isEqualTo(0.5);
         assertThat(imageInstanceBounds.getPhysicalSizeY().getMax()).isEqualTo(99.99);
 
-        assertThat(imageInstanceBounds.getCountImageAnnotations().getMin()).isEqualTo(0L); //special case since default value is 0
+        assertThat(imageInstanceBounds.getCountImageAnnotations()
+            .getMin()).isEqualTo(0L); //special case since default value is 0
         assertThat(imageInstanceBounds.getCountImageAnnotations().getMax()).isEqualTo(3L);
-        assertThat(imageInstanceBounds.getCountImageJobAnnotations().getMin()).isEqualTo(0L); //special case since default value is 0
+        assertThat(imageInstanceBounds.getCountImageJobAnnotations()
+            .getMin()).isEqualTo(0L); //special case since default value is 0
         assertThat(imageInstanceBounds.getCountImageJobAnnotations().getMax()).isEqualTo(3L);
-        assertThat(imageInstanceBounds.getCountImageReviewedAnnotations().getMin()).isEqualTo(0L); //special case since default value is 0
+        assertThat(imageInstanceBounds.getCountImageReviewedAnnotations()
+            .getMin()).isEqualTo(0L); //special case since default value is 0
         assertThat(imageInstanceBounds.getCountImageReviewedAnnotations().getMax()).isEqualTo(3L);
 
 
-        assertThat(imageInstanceBounds.getMagnification().getList()).contains(1,2,3);
+        assertThat(imageInstanceBounds.getMagnification().getList()).contains(1, 2, 3);
         assertThat(imageInstanceBounds.getMimeType().getList()).contains("aaa", "zzzz", "AAAA");
         assertThat(imageInstanceBounds.getFormat().getList()).contains("aaa", "zzzz", "AAAA");
     }
@@ -249,11 +279,22 @@ public class ImageInstanceServiceTests {
         ImageInstance imageInstance2 = builder.given_an_image_instance();
         builder.persistAndReturn(imageInstance2);
 
-        Page<Map<String, Object>> page = imageInstanceService.list(imageInstance1.getProject(), new ArrayList<>(), "id", "asc", 0L, 0L, false, false);
+        Page<Map<String, Object>> page = imageInstanceService.list(
+            imageInstance1.getProject(),
+            new ArrayList<>(),
+            "id",
+            "asc",
+            0L,
+            0L,
+            false,
+            false
+        );
 
         assertThat(page.getTotalElements()).isGreaterThanOrEqualTo(1);
-        assertThat(page.getContent().stream().map(x -> x.get("id")).collect(Collectors.toList())).contains(imageInstance1.getId());
-        assertThat(page.getContent().stream().map(x -> x.get("id")).collect(Collectors.toList())).doesNotContain(imageInstance2.getId());
+        assertThat(page.getContent().stream().map(x -> x.get("id")).collect(Collectors.toList())).contains(
+            imageInstance1.getId());
+        assertThat(page.getContent().stream().map(x -> x.get("id")).collect(Collectors.toList())).doesNotContain(
+            imageInstance2.getId());
     }
 
     @Test
@@ -262,11 +303,22 @@ public class ImageInstanceServiceTests {
         NestedImageInstance nestedImageInstance1 = builder.given_a_nested_image_instance();
         nestedImageInstance1.setProject(imageInstance1.getProject());
         builder.persistAndReturn(nestedImageInstance1);
-        Page<Map<String, Object>> page = imageInstanceService.list(imageInstance1.getProject(), new ArrayList<>(), "id", "asc", 0L, 0L, false, false);
+        Page<Map<String, Object>> page = imageInstanceService.list(
+            imageInstance1.getProject(),
+            new ArrayList<>(),
+            "id",
+            "asc",
+            0L,
+            0L,
+            false,
+            false
+        );
 
         assertThat(page.getTotalElements()).isGreaterThanOrEqualTo(1);
-        assertThat(page.getContent().stream().map(x -> x.get("id")).collect(Collectors.toList())).contains(imageInstance1.getId());
-        assertThat(page.getContent().stream().map(x -> x.get("id")).collect(Collectors.toList())).doesNotContain(nestedImageInstance1.getId());
+        assertThat(page.getContent().stream().map(x -> x.get("id")).collect(Collectors.toList())).contains(
+            imageInstance1.getId());
+        assertThat(page.getContent().stream().map(x -> x.get("id")).collect(Collectors.toList())).doesNotContain(
+            nestedImageInstance1.getId());
     }
 
     @Test
@@ -278,7 +330,15 @@ public class ImageInstanceServiceTests {
 
         ImageSearchExtension imageSearchExtension = new ImageSearchExtension();
         imageSearchExtension.setWithLastActivity(true);
-        Page<Map<String, Object>> results = imageInstanceService.listExtended(imageInstance1.getProject(), imageSearchExtension, new ArrayList<>(), "created", "desc", 0L, 0L);
+        Page<Map<String, Object>> results = imageInstanceService.listExtended(
+            imageInstance1.getProject(),
+            imageSearchExtension,
+            new ArrayList<>(),
+            "created",
+            "desc",
+            0L,
+            0L
+        );
 
         assertThat(results.getTotalElements()).isEqualTo(2);
         assertThat(results.getContent().get(0).get("id")).isEqualTo(imageInstance2.getId());
@@ -294,11 +354,22 @@ public class ImageInstanceServiceTests {
         ImageInstance imageInstance2 = builder.given_an_image_instance();
         builder.persistAndReturn(imageInstance2);
 
-        Page<Map<String, Object>> page = imageInstanceService.list(imageInstance1.getProject(), new ArrayList<>(), "id", "asc", 0L, 0L, true, false);
+        Page<Map<String, Object>> page = imageInstanceService.list(
+            imageInstance1.getProject(),
+            new ArrayList<>(),
+            "id",
+            "asc",
+            0L,
+            0L,
+            true,
+            false
+        );
 
         assertThat(page.getTotalElements()).isGreaterThanOrEqualTo(1);
-        assertThat(page.getContent().stream().map(x -> x.get("id")).collect(Collectors.toList())).contains(imageInstance1.getId());
-        assertThat(page.getContent().stream().map(x -> x.get("id")).collect(Collectors.toList())).doesNotContain(imageInstance2.getId());
+        assertThat(page.getContent().stream().map(x -> x.get("id")).collect(Collectors.toList())).contains(
+            imageInstance1.getId());
+        assertThat(page.getContent().stream().map(x -> x.get("id")).collect(Collectors.toList())).doesNotContain(
+            imageInstance2.getId());
     }
 
     @Test
@@ -309,11 +380,22 @@ public class ImageInstanceServiceTests {
         nestedImageInstance1.setProject(imageInstance1.getProject());
         builder.persistAndReturn(nestedImageInstance1);
 
-        Page<Map<String, Object>> page = imageInstanceService.list(imageInstance1.getProject(), new ArrayList<>(), "id", "asc", 0L, 0L, true, false);
+        Page<Map<String, Object>> page = imageInstanceService.list(
+            imageInstance1.getProject(),
+            new ArrayList<>(),
+            "id",
+            "asc",
+            0L,
+            0L,
+            true,
+            false
+        );
 
         assertThat(page.getTotalElements()).isGreaterThanOrEqualTo(1);
-        assertThat(page.getContent().stream().map(x -> x.get("id")).collect(Collectors.toList())).contains(imageInstance1.getId());
-        assertThat(page.getContent().stream().map(x -> x.get("id")).collect(Collectors.toList())).doesNotContain(nestedImageInstance1.getId());
+        assertThat(page.getContent().stream().map(x -> x.get("id")).collect(Collectors.toList())).contains(
+            imageInstance1.getId());
+        assertThat(page.getContent().stream().map(x -> x.get("id")).collect(Collectors.toList())).doesNotContain(
+            nestedImageInstance1.getId());
     }
 
     @Test
@@ -332,60 +414,62 @@ public class ImageInstanceServiceTests {
 
 
         assertThat(imageInstanceService.list(user, new ArrayList<>()).stream().map(x -> x.get("id")))
-                .contains(img1.getId(), img2.getId());
+            .contains(img1.getId(), img2.getId());
 
 
         List<SearchParameterEntry> searchParameterEntryList =
-                new ArrayList<>(List.of(
-                        new SearchParameterEntry("width", SearchOperation.lte, 500),
-                        new SearchParameterEntry("numberOfAnnotations", SearchOperation.lte, 1000))
-                );
+            new ArrayList<>(List.of(
+                new SearchParameterEntry("width", SearchOperation.lte, 500),
+                new SearchParameterEntry("numberOfAnnotations", SearchOperation.lte, 1000)
+            )
+            );
         assertThat(imageInstanceService.list(user, searchParameterEntryList).stream().map(x -> x.get("id")))
-                .contains(img1.getId()).doesNotContain(img2.getId());
+            .contains(img1.getId()).doesNotContain(img2.getId());
 
         searchParameterEntryList =
-                new ArrayList<>(List.of(
-                        new SearchParameterEntry("numberOfAnnotations", SearchOperation.gte, 1))
-                );
+            new ArrayList<>(List.of(
+                new SearchParameterEntry("numberOfAnnotations", SearchOperation.gte, 1))
+            );
         assertThat(imageInstanceService.list(user, searchParameterEntryList).stream().map(x -> x.get("id")))
-                .contains(img1.getId()).doesNotContain(img2.getId());
+            .contains(img1.getId()).doesNotContain(img2.getId());
 
         searchParameterEntryList =
-                new ArrayList<>(List.of(
-                        new SearchParameterEntry("numberOfAnnotations", SearchOperation.gte, 1000L),
-                        new SearchParameterEntry("numberOfAnnotations", SearchOperation.lte, 1000L))
-                );
+            new ArrayList<>(List.of(
+                new SearchParameterEntry("numberOfAnnotations", SearchOperation.gte, 1000L),
+                new SearchParameterEntry("numberOfAnnotations", SearchOperation.lte, 1000L)
+            )
+            );
         assertThat(imageInstanceService.list(user, searchParameterEntryList).stream().map(x -> x.get("id")))
-                .contains(img1.getId()).doesNotContain(img2.getId());
+            .contains(img1.getId()).doesNotContain(img2.getId());
 
 
         searchParameterEntryList =
-                new ArrayList<>(List.of(
-                        new SearchParameterEntry("width", SearchOperation.lte, 1000)
-                ));
+            new ArrayList<>(List.of(
+                new SearchParameterEntry("width", SearchOperation.lte, 1000)
+            ));
         assertThat(imageInstanceService.list(user, searchParameterEntryList).stream().map(x -> x.get("id")))
-                .contains(img1.getId(), img2.getId());
+            .contains(img1.getId(), img2.getId());
 
         searchParameterEntryList =
-                new ArrayList<>(List.of(
-                        new SearchParameterEntry("width", SearchOperation.gte, 1000)
-                ));
+            new ArrayList<>(List.of(
+                new SearchParameterEntry("width", SearchOperation.gte, 1000)
+            ));
         assertThat(imageInstanceService.list(user, searchParameterEntryList).stream().map(x -> x.get("id")))
-                .doesNotContain(img1.getId(), img2.getId());
+            .doesNotContain(img1.getId(), img2.getId());
 
         searchParameterEntryList =
-                new ArrayList<>(List.of(
-                        new SearchParameterEntry("baseImage", SearchOperation.equals, img1.getBaseImage().getId())
-                ));
+            new ArrayList<>(List.of(
+                new SearchParameterEntry("baseImage", SearchOperation.equals, img1.getBaseImage().getId())
+            ));
         assertThat(imageInstanceService.list(user, searchParameterEntryList).stream().map(x -> x.get("id")))
-                .contains(img1.getId()).doesNotContain(img2.getId());
+            .contains(img1.getId()).doesNotContain(img2.getId());
 
         searchParameterEntryList =
-                new ArrayList<>(List.of(
-                        new SearchParameterEntry("name", SearchOperation.ilike, img1.getInstanceFilename())
-                ));
+            new ArrayList<>(List.of(
+                new SearchParameterEntry("name", SearchOperation.ilike, img1.getInstanceFilename())
+            ));
         assertThat(imageInstanceService.list(user, searchParameterEntryList).stream().map(x -> x.get("id")))
-                .contains(img1.getId()).doesNotContain(img2.getId());
+            .contains(img1.getId()).doesNotContain(img2.getId());
     }
 
 
@@ -402,59 +486,60 @@ public class ImageInstanceServiceTests {
         img2.getBaseImage().setWidth(501);
 
         assertThat(imageInstanceService.list(project, new ArrayList<>()).stream().map(x -> x.get("id")))
-                .contains(img1.getId(), img2.getId());
+            .contains(img1.getId(), img2.getId());
 
 
         List<SearchParameterEntry> searchParameterEntryList =
-                new ArrayList<>(List.of(
-                        new SearchParameterEntry("width", SearchOperation.lte, 500),
-                        new SearchParameterEntry("numberOfAnnotations", SearchOperation.lte, 1000))
-                );
+            new ArrayList<>(List.of(
+                new SearchParameterEntry("width", SearchOperation.lte, 500),
+                new SearchParameterEntry("numberOfAnnotations", SearchOperation.lte, 1000)
+            )
+            );
         assertThat(imageInstanceService.list(project, searchParameterEntryList).stream().map(x -> x.get("id")))
-                .contains(img1.getId()).doesNotContain(img2.getId());
+            .contains(img1.getId()).doesNotContain(img2.getId());
 
         searchParameterEntryList =
-                new ArrayList<>(List.of(
-                        new SearchParameterEntry("numberOfAnnotations", SearchOperation.gte, 1))
-                );
+            new ArrayList<>(List.of(
+                new SearchParameterEntry("numberOfAnnotations", SearchOperation.gte, 1))
+            );
         assertThat(imageInstanceService.list(project, searchParameterEntryList).stream().map(x -> x.get("id")))
-                .contains(img1.getId()).doesNotContain(img2.getId());
+            .contains(img1.getId()).doesNotContain(img2.getId());
 
 
         searchParameterEntryList =
-                new ArrayList<>(List.of(
-                        new SearchParameterEntry("width", SearchOperation.lte, 1000)
-                ));
+            new ArrayList<>(List.of(
+                new SearchParameterEntry("width", SearchOperation.lte, 1000)
+            ));
         assertThat(imageInstanceService.list(project, searchParameterEntryList).stream().map(x -> x.get("id")))
-                .contains(img1.getId(), img2.getId());
+            .contains(img1.getId(), img2.getId());
 
         searchParameterEntryList =
-                new ArrayList<>(List.of(
-                        new SearchParameterEntry("width", SearchOperation.gte, 1000)
-                ));
+            new ArrayList<>(List.of(
+                new SearchParameterEntry("width", SearchOperation.gte, 1000)
+            ));
         assertThat(imageInstanceService.list(project, searchParameterEntryList).stream().map(x -> x.get("id")))
-                .doesNotContain(img1.getId(), img2.getId());
+            .doesNotContain(img1.getId(), img2.getId());
 
         searchParameterEntryList =
-                new ArrayList<>(List.of(
-                        new SearchParameterEntry("baseImage", SearchOperation.equals, img1.getBaseImage().getId())
-                ));
+            new ArrayList<>(List.of(
+                new SearchParameterEntry("baseImage", SearchOperation.equals, img1.getBaseImage().getId())
+            ));
         assertThat(imageInstanceService.list(project, searchParameterEntryList).stream().map(x -> x.get("id")))
-                .contains(img1.getId()).doesNotContain(img2.getId());
+            .contains(img1.getId()).doesNotContain(img2.getId());
 
         searchParameterEntryList =
-                new ArrayList<>(List.of(
-                        new SearchParameterEntry("name", SearchOperation.ilike, img1.getInstanceFilename())
-                ));
+            new ArrayList<>(List.of(
+                new SearchParameterEntry("name", SearchOperation.ilike, img1.getInstanceFilename())
+            ));
         assertThat(imageInstanceService.list(project, searchParameterEntryList).stream().map(x -> x.get("id")))
-                .contains(img1.getId()).doesNotContain(img2.getId());
+            .contains(img1.getId()).doesNotContain(img2.getId());
 
         searchParameterEntryList =
-                new ArrayList<>(List.of(
-                        new SearchParameterEntry("tag", SearchOperation.in, List.of(tagForImage1.getTag().getId()))
-                ));
+            new ArrayList<>(List.of(
+                new SearchParameterEntry("tag", SearchOperation.in, List.of(tagForImage1.getTag().getId()))
+            ));
         assertThat(imageInstanceService.list(project, searchParameterEntryList).stream().map(x -> x.get("id")))
-                .contains(img1.getId()).doesNotContain(img2.getId());
+            .contains(img1.getId()).doesNotContain(img2.getId());
     }
 
     @Test
@@ -471,24 +556,24 @@ public class ImageInstanceServiceTests {
         img2.getBaseImage().setWidth(501);
 
         assertThat(imageInstanceService.list(project, new ArrayList<>()).stream().map(x -> x.get("id")))
-                .contains(img1.getId(), img2.getId());
+            .contains(img1.getId(), img2.getId());
 
 
         List<SearchParameterEntry> searchParameterEntryList =
-                new ArrayList<>(List.of(
-                        new SearchParameterEntry("instanceFilename", SearchOperation.ilike, img1.getInstanceFilename())
-                ));
+            new ArrayList<>(List.of(
+                new SearchParameterEntry("instanceFilename", SearchOperation.ilike, img1.getInstanceFilename())
+            ));
         assertThat(imageInstanceService.list(project, searchParameterEntryList).stream().map(x -> x.get("id")))
-                .doesNotContain(img1.getId(), img2.getId());
+            .doesNotContain(img1.getId(), img2.getId());
 
         project.setBlindMode(false);
 
         searchParameterEntryList =
-                new ArrayList<>(List.of(
-                        new SearchParameterEntry("instanceFilename", SearchOperation.ilike, img1.getInstanceFilename())
-                ));
+            new ArrayList<>(List.of(
+                new SearchParameterEntry("instanceFilename", SearchOperation.ilike, img1.getInstanceFilename())
+            ));
         assertThat(imageInstanceService.list(project, searchParameterEntryList).stream().map(x -> x.get("id")))
-                .contains(img1.getId()).doesNotContain(img2.getId());
+            .contains(img1.getId()).doesNotContain(img2.getId());
 
     }
 
@@ -551,13 +636,13 @@ public class ImageInstanceServiceTests {
     void find_next_image_intance_with_success() {
         Project project = builder.given_a_project();
         ImageInstance imageInstance1 = builder.given_an_image_instance(
-                builder.given_an_abstract_image(), project
+            builder.given_an_abstract_image(), project
         );
         ImageInstance imageInstance2 = builder.given_an_image_instance(
-                builder.given_an_abstract_image(), project
+            builder.given_an_abstract_image(), project
         );
         ImageInstance imageInstance3 = builder.given_an_image_instance(
-                builder.given_an_abstract_image(), project
+            builder.given_an_abstract_image(), project
         );
 
         assertThat(imageInstanceService.next(imageInstance1)).isEmpty();
@@ -569,13 +654,13 @@ public class ImageInstanceServiceTests {
     void find_previous_image_intance_with_success() {
         Project project = builder.given_a_project();
         ImageInstance imageInstance1 = builder.given_an_image_instance(
-                builder.given_an_abstract_image(), project
+            builder.given_an_abstract_image(), project
         );
         ImageInstance imageInstance2 = builder.given_an_image_instance(
-                builder.given_an_abstract_image(), project
+            builder.given_an_abstract_image(), project
         );
         ImageInstance imageInstance3 = builder.given_an_image_instance(
-                builder.given_an_abstract_image(), project
+            builder.given_an_abstract_image(), project
         );
 
         assertThat(imageInstanceService.previous(imageInstance3)).isEmpty();
@@ -599,17 +684,21 @@ public class ImageInstanceServiceTests {
     @Test
     void add_already_existing_image_instance_fails() {
         ImageInstance imageInstance = builder.given_an_image_instance();
-        Assertions.assertThrows(AlreadyExistException.class, () -> {
-            imageInstanceService.add(imageInstance.toJsonObject().withChange("id", null));
-        });
+        Assertions.assertThrows(
+            AlreadyExistException.class, () -> {
+                imageInstanceService.add(imageInstance.toJsonObject().withChange("id", null));
+            }
+        );
     }
 
     @Test
     void add_valid_image_instance_with_unexsting_abstract_image_fails() {
         ImageInstance imageInstance = builder.given_a_not_persisted_image_instance(null, builder.given_a_project());
-        Assertions.assertThrows(WrongArgumentException.class, () -> {
-            imageInstanceService.add(imageInstance.toJsonObject());
-        });
+        Assertions.assertThrows(
+            WrongArgumentException.class, () -> {
+                imageInstanceService.add(imageInstance.toJsonObject());
+            }
+        );
     }
 
     @Test
@@ -618,7 +707,7 @@ public class ImageInstanceServiceTests {
         Project project2 = builder.given_a_project();
 
         ImageInstance imageInstance = builder.given_a_not_persisted_image_instance(
-                builder.given_an_abstract_image(), project1);
+            builder.given_an_abstract_image(), project1);
         imageInstance = builder.persistAndReturn(imageInstance);
 
         JsonObject jsonObject = imageInstance.toJsonObject();
@@ -687,17 +776,21 @@ public class ImageInstanceServiceTests {
     @Test
     void edit_image_instance_with_unexsting_abstract_image_fails() {
         ImageInstance imageInstance = builder.given_an_image_instance();
-        Assertions.assertThrows(WrongArgumentException.class, () -> {
-            imageInstanceService.add(imageInstance.toJsonObject().withChange("baseImage", null));
-        });
+        Assertions.assertThrows(
+            WrongArgumentException.class, () -> {
+                imageInstanceService.add(imageInstance.toJsonObject().withChange("baseImage", null));
+            }
+        );
     }
 
     @Test
     void edit_image_instance_with_unexsting_project_fails() {
         ImageInstance imageInstance = builder.given_an_image_instance();
-        Assertions.assertThrows(WrongArgumentException.class, () -> {
-            imageInstanceService.add(imageInstance.toJsonObject().withChange("project", null));
-        });
+        Assertions.assertThrows(
+            WrongArgumentException.class, () -> {
+                imageInstanceService.add(imageInstance.toJsonObject().withChange("project", null));
+            }
+        );
     }
 
 
@@ -725,19 +818,34 @@ public class ImageInstanceServiceTests {
 
         Property property = builder.given_a_property(imageInstance, "mustbedeleted", "value");
         Description description = builder.given_a_description(imageInstance);
-        TagDomainAssociation tagDomainAssociation = builder.given_a_tag_association(builder.given_a_tag(), imageInstance);
+        TagDomainAssociation tagDomainAssociation = builder.given_a_tag_association(
+            builder.given_a_tag(),
+            imageInstance
+        );
         AttachedFile attachedFile = builder.given_a_attached_file(imageInstance);
 
         annotationActionService.add(userAnnotation, builder.given_superadmin(), "view", new Date());
-        userPositionService.add(new Date(), builder.given_superadmin(), sliceInstance, imageInstance, USER_VIEW, 0, 0d, false);
+        userPositionService.add(
+            new Date(),
+            builder.given_superadmin(),
+            sliceInstance,
+            imageInstance,
+            USER_VIEW,
+            0,
+            0d,
+            false
+        );
         imageConsultationService.add(builder.given_superadmin(), imageInstance.getId(), "xxx", "view", new Date());
 
-        AssertionsForClassTypes.assertThat(entityManager.find(ReviewedAnnotation.class, reviewedAnnotation.getId())).isNotNull();
-        AssertionsForClassTypes.assertThat(entityManager.find(UserAnnotation.class, userAnnotation.getId())).isNotNull();
+        AssertionsForClassTypes.assertThat(entityManager.find(ReviewedAnnotation.class, reviewedAnnotation.getId()))
+            .isNotNull();
+        AssertionsForClassTypes.assertThat(entityManager.find(UserAnnotation.class, userAnnotation.getId()))
+            .isNotNull();
         AssertionsForClassTypes.assertThat(entityManager.find(SliceInstance.class, sliceInstance.getId())).isNotNull();
         AssertionsForClassTypes.assertThat(entityManager.find(Property.class, property.getId())).isNotNull();
         AssertionsForClassTypes.assertThat(entityManager.find(Description.class, description.getId())).isNotNull();
-        AssertionsForClassTypes.assertThat(entityManager.find(TagDomainAssociation.class, tagDomainAssociation.getId())).isNotNull();
+        AssertionsForClassTypes.assertThat(entityManager.find(TagDomainAssociation.class, tagDomainAssociation.getId()))
+            .isNotNull();
         AssertionsForClassTypes.assertThat(entityManager.find(AttachedFile.class, attachedFile.getId())).isNotNull();
 
         assertThat(annotationActionRepository.count()).isEqualTo(1);
@@ -750,19 +858,20 @@ public class ImageInstanceServiceTests {
         assertThat(commandResponse.getStatus()).isEqualTo(200);
         AssertionsForClassTypes.assertThat(imageInstanceService.find(imageInstance.getId()).isEmpty());
 
-        AssertionsForClassTypes.assertThat(entityManager.find(ReviewedAnnotation.class, reviewedAnnotation.getId())).isNull();
+        AssertionsForClassTypes.assertThat(entityManager.find(ReviewedAnnotation.class, reviewedAnnotation.getId()))
+            .isNull();
         AssertionsForClassTypes.assertThat(entityManager.find(UserAnnotation.class, userAnnotation.getId())).isNull();
         AssertionsForClassTypes.assertThat(entityManager.find(SliceInstance.class, sliceInstance.getId())).isNull();
         AssertionsForClassTypes.assertThat(entityManager.find(Property.class, property.getId())).isNull();
         AssertionsForClassTypes.assertThat(entityManager.find(Description.class, description.getId())).isNull();
-        AssertionsForClassTypes.assertThat(entityManager.find(TagDomainAssociation.class, tagDomainAssociation.getId())).isNull();
+        AssertionsForClassTypes.assertThat(entityManager.find(TagDomainAssociation.class, tagDomainAssociation.getId()))
+            .isNull();
         AssertionsForClassTypes.assertThat(entityManager.find(AttachedFile.class, attachedFile.getId())).isNull();
 
         assertThat(annotationActionRepository.count()).isEqualTo(0);
         assertThat(persistentImageConsultationRepository.count()).isEqualTo(0);
         assertThat(persistentUserPositionRepository.count()).isEqualTo(0);
     }
-
 
 
     @Test
@@ -784,10 +893,6 @@ public class ImageInstanceServiceTests {
         assertThat(project.getCountImages()).isEqualTo(0);
 
     }
-
-
-
-
 
 
     @Test

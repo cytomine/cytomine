@@ -19,8 +19,8 @@ import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.project.Project;
 import be.cytomine.dto.annotation.AnnotationLayerResponse;
 import be.cytomine.repository.annotation.AnnotationLayerRepository;
-import be.cytomine.repository.appengine.TaskRunRepository;
 import be.cytomine.repository.appengine.TaskRunLayerRepository;
+import be.cytomine.repository.appengine.TaskRunRepository;
 import be.cytomine.service.annotation.AnnotationLayerService;
 import be.cytomine.service.image.ImageInstanceService;
 
@@ -127,7 +127,8 @@ public class AnnotationLayerServiceTest {
         when(taskRunLayerRepository.findAllByImageId(mockImage.getId())).thenReturn(mockTaskRunLayers);
         when(imageInstanceService.get(mockImage.getId())).thenReturn(mockImage);
         when(taskRunLayerRepository.findByTaskRun(mockTaskRun)).thenReturn(Optional.of(mockTaskRunLayer));
-        when(taskRunRepository.findFirstByProjectIdOrderByCreatedDesc(mockProject.getId())).thenReturn(Optional.of(mockTaskRun));
+        when(taskRunRepository.findFirstByProjectIdOrderByCreatedDesc(mockProject.getId())).thenReturn(Optional.of(
+            mockTaskRun));
 
         Set<AnnotationLayerResponse> results = annotationLayerService.findByTaskRunLayer(mockImage.getId());
 

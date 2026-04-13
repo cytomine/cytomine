@@ -21,8 +21,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 
-import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.common.PostGisTestConfiguration;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -45,6 +43,8 @@ import org.springframework.web.context.request.RequestContextHolder;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
+import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.image.server.Storage;
@@ -148,25 +148,32 @@ public class UserResourceTests {
         persistentUserPositionRepository.deleteAll();
     }
 
-    PersistentProjectConnection given_a_persistent_connection_in_project(User user, Project project,
-                                                                         Date created) {
+    PersistentProjectConnection given_a_persistent_connection_in_project(
+        User user, Project project,
+        Date created
+    ) {
         PersistentProjectConnection connection =
             projectConnectionService.add(user, project, "xxx", "linux", "chrome", "123", created);
         return connection;
     }
 
-    PersistentImageConsultation given_a_persistent_image_consultation(User user,
-                                                                      ImageInstance imageInstance,
-                                                                      Date created) {
+    PersistentImageConsultation given_a_persistent_image_consultation(
+        User user,
+        ImageInstance imageInstance,
+        Date created
+    ) {
         return imageConsultationService.add(user, imageInstance.getId(), "xxx", "mode", created);
     }
 
 
-    PersistentUserPosition given_a_persistent_user_position(Date creation, User user,
-                                                            SliceInstance sliceInstance,
-                                                            AreaDTO areaDTO) {
+    PersistentUserPosition given_a_persistent_user_position(
+        Date creation, User user,
+        SliceInstance sliceInstance,
+        AreaDTO areaDTO
+    ) {
         PersistentUserPosition connection =
-            userPositionService.add(creation, user, sliceInstance, sliceInstance.getImage(),
+            userPositionService.add(
+                creation, user, sliceInstance, sliceInstance.getImage(),
                 areaDTO,
                 1,
                 5.0,
@@ -355,8 +362,8 @@ public class UserResourceTests {
         builder.addUserToProject(project, projectUser.getUsername(), READ);
 
         restUserControllerMockMvc.perform(get("/api/user.json")
-                                              .param("sortColumn", "created")
-                                              .param("sortDirection", "desc")
+                .param("sortColumn", "created")
+                .param("sortDirection", "desc")
             )
             .andExpect(status().isOk())
             .andExpect(jsonPath(
@@ -694,12 +701,14 @@ public class UserResourceTests {
         builder.addUserToProject(project, projectUser.getUsername(), READ);
 
         restUserControllerMockMvc.perform(get("/api/project/{id}/user.json", project.getId())
-                                              .param("max", "25")
-                                              .param("offset", "0")
-                                              .param("projectRole[in]",
-                                                  "contributor,manager,representative")
-                                              .param("sort", "")
-                                              .param("order", "")
+                .param("max", "25")
+                .param("offset", "0")
+                .param(
+                    "projectRole[in]",
+                    "contributor,manager,representative"
+                )
+                .param("sort", "")
+                .param("order", "")
             )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
@@ -714,11 +723,11 @@ public class UserResourceTests {
                 "$.collection[?(@.username=='" + simpleUser.getUsername() + "')]").doesNotExist());
 
         restUserControllerMockMvc.perform(get("/api/project/{id}/user.json", project.getId())
-                                              .param("max", "25")
-                                              .param("offset", "0")
-                                              .param("projectRole[in]", "representative")
-                                              .param("sort", "")
-                                              .param("order", "")
+                .param("max", "25")
+                .param("offset", "0")
+                .param("projectRole[in]", "representative")
+                .param("sort", "")
+                .param("order", "")
             )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
@@ -749,12 +758,14 @@ public class UserResourceTests {
         builder.addUserToProject(project, projectUser.getUsername(), READ);
 
         restUserControllerMockMvc.perform(get("/api/project/{id}/user.json", project.getId())
-                                              .param("max", "2")
-                                              .param("offset", "0")
-                                              .param("projectRole[in]",
-                                                  "contributor,manager,representative")
-                                              .param("sortColumn", "created")
-                                              .param("sortDirection", "asc")
+                .param("max", "2")
+                .param("offset", "0")
+                .param(
+                    "projectRole[in]",
+                    "contributor,manager,representative"
+                )
+                .param("sortColumn", "created")
+                .param("sortDirection", "asc")
             )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(2)))
@@ -767,12 +778,14 @@ public class UserResourceTests {
             .andExpect(jsonPath("$.collection[1].username").value(projectAdmin.getUsername()));
 
         restUserControllerMockMvc.perform(get("/api/project/{id}/user.json", project.getId())
-                                              .param("max", "2")
-                                              .param("offset", "2")
-                                              .param("projectRole[in]",
-                                                  "contributor,manager,representative")
-                                              .param("sortColumn", "created")
-                                              .param("sortDirection", "asc")
+                .param("max", "2")
+                .param("offset", "2")
+                .param(
+                    "projectRole[in]",
+                    "contributor,manager,representative"
+                )
+                .param("sortColumn", "created")
+                .param("sortDirection", "asc")
             )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(1)))
@@ -783,12 +796,14 @@ public class UserResourceTests {
             .andExpect(jsonPath("$.collection[0].username").value(projectUser.getUsername()));
 
         restUserControllerMockMvc.perform(get("/api/project/{id}/user.json", project.getId())
-                                              .param("max", "2")
-                                              .param("offset", "4")
-                                              .param("projectRole[in]",
-                                                  "contributor,manager,representative")
-                                              .param("sortColumn", "created")
-                                              .param("sortDirection", "asc")
+                .param("max", "2")
+                .param("offset", "4")
+                .param(
+                    "projectRole[in]",
+                    "contributor,manager,representative"
+                )
+                .param("sortColumn", "created")
+                .param("sortDirection", "asc")
             )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(0)))
@@ -811,8 +826,10 @@ public class UserResourceTests {
             .andExpect(status().isOk());
 
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isTrue();
-        assertThat(permissionService.hasACLPermission(project, user.getUsername(),
-            ADMINISTRATION)).isFalse();
+        assertThat(permissionService.hasACLPermission(
+            project, user.getUsername(),
+            ADMINISTRATION
+        )).isFalse();
 
     }
 
@@ -824,16 +841,20 @@ public class UserResourceTests {
         User user1 = builder.given_a_user();
         User user2 = builder.given_a_user();
         restUserControllerMockMvc.perform(post("/api/project/{project}/user.json", project.getId())
-                                              .param("users", user1.getId() + "," + user2.getId())
-                                              .contentType(MediaType.APPLICATION_JSON))
+                .param("users", user1.getId() + "," + user2.getId())
+                .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk());
 
         assertThat(permissionService.hasACLPermission(project, user1.getUsername(), READ)).isTrue();
-        assertThat(permissionService.hasACLPermission(project, user1.getUsername(),
-            ADMINISTRATION)).isFalse();
+        assertThat(permissionService.hasACLPermission(
+            project, user1.getUsername(),
+            ADMINISTRATION
+        )).isFalse();
         assertThat(permissionService.hasACLPermission(project, user2.getUsername(), READ)).isTrue();
-        assertThat(permissionService.hasACLPermission(project, user2.getUsername(),
-            ADMINISTRATION)).isFalse();
+        assertThat(permissionService.hasACLPermission(
+            project, user2.getUsername(),
+            ADMINISTRATION
+        )).isFalse();
     }
 
     @Test
@@ -843,14 +864,18 @@ public class UserResourceTests {
         Project project = builder.given_a_project();
         User user1 = builder.given_a_user();
         restUserControllerMockMvc.perform(post("/api/project/{project}/user.json", project.getId())
-                                              .param("users",
-                                                  user1.getId() + ",xxxxxx,0") //bad format + bad id
-                                              .contentType(MediaType.APPLICATION_JSON))
+                .param(
+                    "users",
+                    user1.getId() + ",xxxxxx,0"
+                ) //bad format + bad id
+                .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isPartialContent());
 
         assertThat(permissionService.hasACLPermission(project, user1.getUsername(), READ)).isTrue();
-        assertThat(permissionService.hasACLPermission(project, user1.getUsername(),
-            ADMINISTRATION)).isFalse();
+        assertThat(permissionService.hasACLPermission(
+            project, user1.getUsername(),
+            ADMINISTRATION
+        )).isFalse();
     }
 
 
@@ -867,8 +892,10 @@ public class UserResourceTests {
             .andExpect(status().isOk());
 
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isFalse();
-        assertThat(permissionService.hasACLPermission(project, user.getUsername(),
-            ADMINISTRATION)).isFalse();
+        assertThat(permissionService.hasACLPermission(
+            project, user.getUsername(),
+            ADMINISTRATION
+        )).isFalse();
 
     }
 
@@ -889,12 +916,16 @@ public class UserResourceTests {
 
         assertThat(
             permissionService.hasACLPermission(project, user1.getUsername(), READ)).isFalse();
-        assertThat(permissionService.hasACLPermission(project, user1.getUsername(),
-            ADMINISTRATION)).isFalse();
+        assertThat(permissionService.hasACLPermission(
+            project, user1.getUsername(),
+            ADMINISTRATION
+        )).isFalse();
         assertThat(
             permissionService.hasACLPermission(project, user2.getUsername(), READ)).isFalse();
-        assertThat(permissionService.hasACLPermission(project, user2.getUsername(),
-            ADMINISTRATION)).isFalse();
+        assertThat(permissionService.hasACLPermission(
+            project, user2.getUsername(),
+            ADMINISTRATION
+        )).isFalse();
     }
 
     @Test
@@ -927,8 +958,10 @@ public class UserResourceTests {
             .andExpect(status().isOk());
 
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isTrue();
-        assertThat(permissionService.hasACLPermission(project, user.getUsername(),
-            ADMINISTRATION)).isTrue();
+        assertThat(permissionService.hasACLPermission(
+            project, user.getUsername(),
+            ADMINISTRATION
+        )).isTrue();
 
     }
 
@@ -941,14 +974,18 @@ public class UserResourceTests {
         builder.addUserToProject(project, user.getUsername(), ADMINISTRATION);
         builder.addUserToProject(project, user.getUsername(), READ);
         restUserControllerMockMvc.perform(
-                delete("/api/project/{project}/user/{user}/admin.json", project.getId(),
-                    user.getId())
+                delete(
+                    "/api/project/{project}/user/{user}/admin.json", project.getId(),
+                    user.getId()
+                )
                     .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk());
 
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isTrue();
-        assertThat(permissionService.hasACLPermission(project, user.getUsername(),
-            ADMINISTRATION)).isFalse();
+        assertThat(permissionService.hasACLPermission(
+            project, user.getUsername(),
+            ADMINISTRATION
+        )).isFalse();
 
     }
 
@@ -964,8 +1001,10 @@ public class UserResourceTests {
             .andExpect(status().isOk());
 
         assertThat(permissionService.hasACLPermission(storage, user.getUsername(), READ)).isTrue();
-        assertThat(permissionService.hasACLPermission(storage, user.getUsername(),
-            ADMINISTRATION)).isFalse();
+        assertThat(permissionService.hasACLPermission(
+            storage, user.getUsername(),
+            ADMINISTRATION
+        )).isFalse();
 
     }
 
@@ -982,8 +1021,10 @@ public class UserResourceTests {
             .andExpect(status().isOk());
 
         assertThat(permissionService.hasACLPermission(storage, user.getUsername(), READ)).isFalse();
-        assertThat(permissionService.hasACLPermission(storage, user.getUsername(),
-            ADMINISTRATION)).isFalse();
+        assertThat(permissionService.hasACLPermission(
+            storage, user.getUsername(),
+            ADMINISTRATION
+        )).isFalse();
 
     }
 
@@ -1060,14 +1101,18 @@ public class UserResourceTests {
 
         given_a_last_connection(userOffline, project.getId(), DateUtils.addDays(new Date(), -15));
         given_a_last_connection(userOnline, project.getId(), DateUtils.addSeconds(new Date(), -15));
-        given_a_last_connection(userOnlineButOnDifferentProject, anotherProject.getId(),
-            DateUtils.addSeconds(new Date(), -10));
+        given_a_last_connection(
+            userOnlineButOnDifferentProject, anotherProject.getId(),
+            DateUtils.addSeconds(new Date(), -10)
+        );
 
         PersistentUserPosition persistentUserPosition =
-            given_a_persistent_user_position(DateUtils.addSeconds(new Date(), -15), userOnline,
+            given_a_persistent_user_position(
+                DateUtils.addSeconds(new Date(), -15), userOnline,
                 builder.given_a_not_persisted_slice_instance(
                     builder.given_an_image_instance(project), builder.given_an_abstract_slice()),
-                UserPositionServiceTests.USER_VIEW);
+                UserPositionServiceTests.USER_VIEW
+            );
 
 
         restUserControllerMockMvc.perform(get("/api/project/{id}/online/user.json", project.getId())
@@ -1095,11 +1140,15 @@ public class UserResourceTests {
         builder.addUserToProject(project, userOnline.getUsername());
 
         PersistentProjectConnection lastConnection =
-            given_a_persistent_connection_in_project(userOnline, project,
-                DateUtils.addSeconds(new Date(), -15));
+            given_a_persistent_connection_in_project(
+                userOnline, project,
+                DateUtils.addSeconds(new Date(), -15)
+            );
 
-        PersistentImageConsultation consultation = given_a_persistent_image_consultation(userOnline,
-            builder.given_an_image_instance(project), new Date());
+        PersistentImageConsultation consultation = given_a_persistent_image_consultation(
+            userOnline,
+            builder.given_an_image_instance(project), new Date()
+        );
 
         restUserControllerMockMvc.perform(
                 get("/api/project/{id}/usersActivity.json", project.getId()))
@@ -1123,18 +1172,26 @@ public class UserResourceTests {
         builder.addUserToProject(project, userOnline.getUsername());
 
         PersistentProjectConnection firstConnection =
-            given_a_persistent_connection_in_project(userOnline, project,
-                DateUtils.addDays(new Date(), -15));
+            given_a_persistent_connection_in_project(
+                userOnline, project,
+                DateUtils.addDays(new Date(), -15)
+            );
         PersistentProjectConnection lastConnection =
-            given_a_persistent_connection_in_project(userOnline, project,
-                DateUtils.addSeconds(new Date(), -15));
+            given_a_persistent_connection_in_project(
+                userOnline, project,
+                DateUtils.addSeconds(new Date(), -15)
+            );
 
-        given_a_persistent_image_consultation(userOnline, builder.given_an_image_instance(project),
-            new Date());
+        given_a_persistent_image_consultation(
+            userOnline, builder.given_an_image_instance(project),
+            new Date()
+        );
 
         restUserControllerMockMvc.perform(
-                get("/api/project/{id}/resumeActivity/{user}.json", project.getId(),
-                    userOnline.getId())
+                get(
+                    "/api/project/{id}/resumeActivity/{user}.json", project.getId(),
+                    userOnline.getId()
+                )
             )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.firstConnection").value(firstConnection.getCreated().getTime()))
@@ -1208,8 +1265,8 @@ public class UserResourceTests {
         return restUserControllerMockMvc.perform(
                 get("/api/project/{project}/user/download", project.getId())
                     .param("format", format))
-                   .andExpect(status().isOk())
-                   .andExpect(header().string("Content-Type", type))
-                   .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(header().string("Content-Type", type))
+            .andReturn();
     }
 }

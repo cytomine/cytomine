@@ -1,20 +1,20 @@
 package be.cytomine.service.ontology;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 import java.util.Optional;
 
@@ -65,14 +65,22 @@ public class RelationTermServiceTests {
     @Test
     void find_relation_term_with_success() {
         RelationTerm relationTerm = builder.given_a_relation_term();
-        Optional<RelationTerm> result = relationTermService.find(relationTerm.getRelation(), relationTerm.getTerm1(), relationTerm.getTerm2());
+        Optional<RelationTerm> result = relationTermService.find(
+            relationTerm.getRelation(),
+            relationTerm.getTerm1(),
+            relationTerm.getTerm2()
+        );
         assertThat(result).isPresent();
         assertThat(relationTerm).isEqualTo(result.get());
     }
 
     @Test
     void find_unexisting_relation_term_return_empty() {
-        assertThat(relationTermService.find(builder.given_a_relation(), builder.given_a_term(), builder.given_a_term())).isEmpty();
+        assertThat(relationTermService.find(
+            builder.given_a_relation(),
+            builder.given_a_term(),
+            builder.given_a_term()
+        )).isEmpty();
     }
 
     @Test
@@ -108,8 +116,10 @@ public class RelationTermServiceTests {
         Term parent = builder.given_a_term();
         Term child1 = builder.given_a_term(parent.getOntology());
         RelationTerm parentRelationTerm =
-            basicInstanceBuilder.given_a_not_persisted_relation_term(builder.given_a_relation(),
-                parent, child1);
+            basicInstanceBuilder.given_a_not_persisted_relation_term(
+                builder.given_a_relation(),
+                parent, child1
+            );
 
         CommandResponse commandResponse = relationTermService.add(parentRelationTerm.toJsonObject());
 
@@ -122,18 +132,26 @@ public class RelationTermServiceTests {
     void add_relation_term_with_null_term_fail() {
         Term parent = builder.given_a_term();
         RelationTerm parentRelationTerm =
-            basicInstanceBuilder.given_a_not_persisted_relation_term(builder.given_a_relation(),
-                parent, null);
-        Assertions.assertThrows(ObjectNotFoundException.class, () -> {
-            relationTermService.add(parentRelationTerm.toJsonObject());
-        });
+            basicInstanceBuilder.given_a_not_persisted_relation_term(
+                builder.given_a_relation(),
+                parent, null
+            );
+        Assertions.assertThrows(
+            ObjectNotFoundException.class, () -> {
+                relationTermService.add(parentRelationTerm.toJsonObject());
+            }
+        );
     }
 
     @Test
     void undo_redo_term_creation_with_success() {
         Term parent = builder.given_a_term();
         Term child1 = builder.given_a_term(parent.getOntology());
-        RelationTerm parentRelationTerm = builder.given_a_not_persisted_relation_term(builder.given_a_relation(), parent, child1);
+        RelationTerm parentRelationTerm = builder.given_a_not_persisted_relation_term(
+            builder.given_a_relation(),
+            parent,
+            child1
+        );
 
         CommandResponse commandResponse = relationTermService.add(parentRelationTerm.toJsonObject());
 

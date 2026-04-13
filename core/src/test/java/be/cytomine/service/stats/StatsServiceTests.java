@@ -1,37 +1,57 @@
 package be.cytomine.service.stats;
 
-import be.cytomine.BasicInstanceBuilder;
-import be.cytomine.CytomineCoreApplication;
-import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.domain.image.ImageInstance;
-import be.cytomine.domain.ontology.*;
-import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
-import be.cytomine.domain.social.*;
-import be.cytomine.repositorynosql.social.*;
-import be.cytomine.service.social.AnnotationActionService;
-import be.cytomine.service.social.ImageConsultationService;
-import be.cytomine.service.social.ProjectConnectionService;
-import be.cytomine.utils.JsonObject;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.github.tomakehurst.wiremock.WireMockServer;
-import org.locationtech.jts.io.ParseException;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.time.DateUtils;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.locationtech.jts.io.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 
-import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
-
-import java.util.*;
-import java.util.stream.Collectors;
+import be.cytomine.BasicInstanceBuilder;
+import be.cytomine.CytomineCoreApplication;
+import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.domain.image.ImageInstance;
+import be.cytomine.domain.ontology.AnnotationDomain;
+import be.cytomine.domain.ontology.AnnotationTerm;
+import be.cytomine.domain.ontology.ReviewedAnnotation;
+import be.cytomine.domain.ontology.Term;
+import be.cytomine.domain.ontology.UserAnnotation;
+import be.cytomine.domain.project.Project;
+import be.cytomine.domain.security.User;
+import be.cytomine.domain.social.AnnotationAction;
+import be.cytomine.domain.social.PersistentImageConsultation;
+import be.cytomine.domain.social.PersistentProjectConnection;
+import be.cytomine.repositorynosql.social.LastConnectionRepository;
+import be.cytomine.repositorynosql.social.LastUserPositionRepository;
+import be.cytomine.repositorynosql.social.PersistentConnectionRepository;
+import be.cytomine.repositorynosql.social.PersistentImageConsultationRepository;
+import be.cytomine.repositorynosql.social.PersistentProjectConnectionRepository;
+import be.cytomine.repositorynosql.social.PersistentUserPositionRepository;
+import be.cytomine.repositorynosql.social.ProjectConnectionRepository;
+import be.cytomine.service.social.AnnotationActionService;
+import be.cytomine.service.social.ImageConsultationService;
+import be.cytomine.service.social.ProjectConnectionService;
+import be.cytomine.utils.JsonObject;
 
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
@@ -107,22 +127,39 @@ public class StatsServiceTests {
     }
 
     PersistentProjectConnection given_a_persistent_connection_in_project(User user, Project project, Date created) {
-        PersistentProjectConnection connection = projectConnectionService.add(user, project, "xxx", "linux", "chrome", "123", created);
+        PersistentProjectConnection connection = projectConnectionService.add(
+            user,
+            project,
+            "xxx",
+            "linux",
+            "chrome",
+            "123",
+            created
+        );
         return connection;
     }
 
-    PersistentImageConsultation given_a_persistent_image_consultation(User user, ImageInstance imageInstance, Date created) {
+    PersistentImageConsultation given_a_persistent_image_consultation(
+        User user,
+        ImageInstance imageInstance,
+        Date created
+    ) {
         return imageConsultationService.add(user, imageInstance.getId(), "xxx", "mode", created);
     }
 
-    AnnotationAction given_a_persistent_annotation_action(Date creation, AnnotationDomain annotationDomain, User user, String action) {
+    AnnotationAction given_a_persistent_annotation_action(
+        Date creation,
+        AnnotationDomain annotationDomain,
+        User user,
+        String action
+    ) {
         AnnotationAction annotationAction =
-                annotationActionService.add(
-                        annotationDomain,
-                        user,
-                        action,
-                        creation
-                );
+            annotationActionService.add(
+                annotationDomain,
+                user,
+                action,
+                creation
+            );
         return annotationAction;
     }
 
@@ -148,7 +185,9 @@ public class StatsServiceTests {
     void most_active_project_count() {
         Project project = builder.given_a_project();
         given_a_persistent_connection_in_project(builder.given_superadmin(), project, new Date());
-        assertThat(((JsonObject)statsService.mostActiveProjects().get().get("project")).getId()).isEqualTo(project.getId());
+        assertThat(((JsonObject) statsService.mostActiveProjects()
+            .get()
+            .get("project")).getId()).isEqualTo(project.getId());
     }
 
     @Test
@@ -176,12 +215,30 @@ public class StatsServiceTests {
         annotation2.setCreated(DateUtils.addDays(new Date(), -10));
         builder.persistAndReturn(annotation2);
 
-        List<JsonObject> jsonObjects = statsService.statAnnotationEvolution(project, null, 7, DateUtils.addDays(new Date(), -30), DateUtils.addDays(new Date(), 0), true, false);
+        List<JsonObject> jsonObjects = statsService.statAnnotationEvolution(
+            project,
+            null,
+            7,
+            DateUtils.addDays(new Date(), -30),
+            DateUtils.addDays(new Date(), 0),
+            true,
+            false
+        );
 
         assertThat(jsonObjects).hasSize(5);
-        assertThat(jsonObjects.stream().filter(x -> x.getJSONAttrLong("size")==1).collect(Collectors.toList())).hasSize(2);
+        assertThat(jsonObjects.stream()
+            .filter(x -> x.getJSONAttrLong("size") == 1)
+            .collect(Collectors.toList())).hasSize(2);
 
-        statsService.statAnnotationEvolution(project, builder.given_a_term(project.getOntology()), 7, DateUtils.addDays(new Date(), -30), DateUtils.addDays(new Date(), 0), true, false);
+        statsService.statAnnotationEvolution(
+            project,
+            builder.given_a_term(project.getOntology()),
+            7,
+            DateUtils.addDays(new Date(), -30),
+            DateUtils.addDays(new Date(), 0),
+            true,
+            false
+        );
 
     }
 
@@ -195,12 +252,30 @@ public class StatsServiceTests {
         annotation2.setCreated(DateUtils.addDays(new Date(), -10));
         builder.persistAndReturn(annotation2);
 
-        List<JsonObject> jsonObjects = statsService.statReviewedAnnotationEvolution(project, null, 7, DateUtils.addDays(new Date(), -30), DateUtils.addDays(new Date(), 0), true, false);
+        List<JsonObject> jsonObjects = statsService.statReviewedAnnotationEvolution(
+            project,
+            null,
+            7,
+            DateUtils.addDays(new Date(), -30),
+            DateUtils.addDays(new Date(), 0),
+            true,
+            false
+        );
 
         assertThat(jsonObjects).hasSize(5);
-        assertThat(jsonObjects.stream().filter(x -> x.getJSONAttrLong("size")==1).collect(Collectors.toList())).hasSize(2);
+        assertThat(jsonObjects.stream()
+            .filter(x -> x.getJSONAttrLong("size") == 1)
+            .collect(Collectors.toList())).hasSize(2);
 
-        statsService.statReviewedAnnotationEvolution(project, builder.given_a_term(project.getOntology()), 7, DateUtils.addDays(new Date(), -30), DateUtils.addDays(new Date(), 0), true, false);
+        statsService.statReviewedAnnotationEvolution(
+            project,
+            builder.given_a_term(project.getOntology()),
+            7,
+            DateUtils.addDays(new Date(), -30),
+            DateUtils.addDays(new Date(), 0),
+            true,
+            false
+        );
 
 
     }
@@ -235,7 +310,11 @@ public class StatsServiceTests {
 
         assertThat(results).hasSize(2);
 
-        results = statsService.statUserSlide(project, DateUtils.addDays(new Date(), -40), DateUtils.addDays(new Date(), -20));
+        results = statsService.statUserSlide(
+            project,
+            DateUtils.addDays(new Date(), -40),
+            DateUtils.addDays(new Date(), -20)
+        );
 
         assertThat(results).hasSize(2);
         assertThat(results.get(0).get("value")).isEqualTo(0);
@@ -248,13 +327,13 @@ public class StatsServiceTests {
         Project project = builder.given_a_project();
 
         List<JsonObject> results = statsService.statTermSlide(project, null, null);
-        results.removeIf( x-> x.get("id")==null);
+        results.removeIf(x -> x.get("id") == null);
         assertThat(results).hasSize(0);
 
         Term term = builder.given_a_term(project.getOntology());
 
         results = statsService.statTermSlide(project, null, null);
-        results.removeIf( x-> x.get("id")==null);
+        results.removeIf(x -> x.get("id") == null);
         assertThat(results).hasSize(1);
         assertThat(results.get(0).getId()).isEqualTo(term.getId());
         assertThat(results.get(0).get("value")).isEqualTo(0);
@@ -265,7 +344,7 @@ public class StatsServiceTests {
         builder.persistAndReturn(annotation1);
 
         results = statsService.statTermSlide(project, null, null);
-        results.removeIf( x-> x.get("id")==null);
+        results.removeIf(x -> x.get("id") == null);
         assertThat(results).hasSize(1);
         assertThat(results.get(0).getId()).isEqualTo(term.getId());
         assertThat(results.get(0).get("value")).isEqualTo(1L);
@@ -273,11 +352,15 @@ public class StatsServiceTests {
         builder.given_a_term(project.getOntology());
 
         results = statsService.statTermSlide(project, null, null);
-        results.removeIf( x-> x.get("id")==null);
+        results.removeIf(x -> x.get("id") == null);
         assertThat(results).hasSize(2);
 
-        results = statsService.statTermSlide(project, DateUtils.addDays(new Date(), -40), DateUtils.addDays(new Date(), -20));
-        results.removeIf( x-> x.get("id")==null);
+        results = statsService.statTermSlide(
+            project,
+            DateUtils.addDays(new Date(), -40),
+            DateUtils.addDays(new Date(), -20)
+        );
+        results.removeIf(x -> x.get("id") == null);
         assertThat(results).hasSize(2);
         assertThat(results.get(0).get("value")).isEqualTo(0);
         assertThat(results.get(1).get("value")).isEqualTo(0);
@@ -295,7 +378,7 @@ public class StatsServiceTests {
         AnnotationTerm annotationTerm = builder.given_an_annotation_term(builder.given_a_user_annotation(project));
         entityManager.refresh(project.getOntology());
         results = statsService.statTerm(project, null, null, false);
-        results.removeIf( x-> x.get("id")==null);
+        results.removeIf(x -> x.get("id") == null);
         assertThat(results).hasSize(1);
         assertThat(results.get(0).getId()).isEqualTo(annotationTerm.getTerm().getId());
         assertThat(results.get(0).get("value")).isEqualTo(1L);
@@ -306,14 +389,19 @@ public class StatsServiceTests {
         builder.persistAndReturn(annotation1);
 
         results = statsService.statTerm(project, null, null, false);
-        results.removeIf( x-> x.get("id")==null);
+        results.removeIf(x -> x.get("id") == null);
         assertThat(results).hasSize(1);
         assertThat(results.get(0).getId()).isEqualTo(annotationTerm.getTerm().getId());
         assertThat(results.get(0).get("value")).isEqualTo(2L);
 
 
-        results = statsService.statTerm(project, DateUtils.addDays(new Date(), -40), DateUtils.addDays(new Date(), -20), false);
-        results.removeIf( x-> x.get("id")==null);
+        results = statsService.statTerm(
+            project,
+            DateUtils.addDays(new Date(), -40),
+            DateUtils.addDays(new Date(), -20),
+            false
+        );
+        results.removeIf(x -> x.get("id") == null);
         assertThat(results).hasSize(1);
         assertThat(results.get(0).get("value")).isEqualTo(0);
     }
@@ -335,8 +423,11 @@ public class StatsServiceTests {
         assertThat(results.get(0).get("image")).isEqualTo(annotationTerm.getUserAnnotation().getImage().getId());
         assertThat(results.get(0).get("countAnnotations")).isEqualTo(1L);
 
-        AnnotationTerm annotationTermWithSameImageAndSameTerm = builder.given_an_annotation_term(builder.given_a_user_annotation(project));
-        annotationTermWithSameImageAndSameTerm.getUserAnnotation().setImage(annotationTerm.getUserAnnotation().getImage());
+        AnnotationTerm
+            annotationTermWithSameImageAndSameTerm
+            = builder.given_an_annotation_term(builder.given_a_user_annotation(project));
+        annotationTermWithSameImageAndSameTerm.getUserAnnotation()
+            .setImage(annotationTerm.getUserAnnotation().getImage());
         annotationTermWithSameImageAndSameTerm.setTerm(annotationTerm.getTerm());
 
         results = statsService.statPerTermAndImage(project, null, null);
@@ -345,7 +436,8 @@ public class StatsServiceTests {
         assertThat(results.get(0).get("image")).isEqualTo(annotationTerm.getUserAnnotation().getImage().getId());
         assertThat(results.get(0).get("countAnnotations")).isEqualTo(2L);
 
-        AnnotationTerm annotationTermWithSameImage = builder.given_an_annotation_term(builder.given_a_user_annotation(project));
+        AnnotationTerm annotationTermWithSameImage = builder.given_an_annotation_term(builder.given_a_user_annotation(
+            project));
         annotationTermWithSameImage.getUserAnnotation().setImage(annotationTerm.getUserAnnotation().getImage());
 
         results = statsService.statPerTermAndImage(project, null, null);
@@ -358,14 +450,13 @@ public class StatsServiceTests {
         assertThat(results.get(1).get("countAnnotations")).isEqualTo(1L);
 
 
-        results = statsService.statPerTermAndImage(project, DateUtils.addDays(new Date(), -40), DateUtils.addDays(new Date(), -20));
+        results = statsService.statPerTermAndImage(
+            project,
+            DateUtils.addDays(new Date(), -40),
+            DateUtils.addDays(new Date(), -20)
+        );
         assertThat(results).hasSize(0);
     }
-
-
-
-
-
 
 
     @Test
@@ -395,7 +486,6 @@ public class StatsServiceTests {
     }
 
 
-
     @Test
     void stats_user() {
         Project project = builder.given_a_project();
@@ -422,15 +512,16 @@ public class StatsServiceTests {
     void retrieve_storage_spaces() {
         configureFor("localhost", 8888);
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/storage/size.json"))
-                .willReturn(
-                        aResponse().withBody("" + "{\"used\":193396892,\"available\":445132860,\"usedP\":0.302878435,\"hostname\":\"b52416f53249\",\"mount\":\"/data/images\",\"ip\":null}")
-                )
+            .willReturn(
+                aResponse().withBody(""
+                    + "{\"used\":193396892,\"available\":445132860,\"usedP\":0.302878435,\"hostname\":\"b52416f53249\",\"mount\":\"/data/images\",\"ip\":null}")
+            )
         );
 
         JsonObject response = statsService.statUsedStorage();
         assertThat(response).isNotNull();
         // expected to be Greather than or eq because localhost:8888 may not be the only one
-        assertThat(response.getJSONAttrLong("total")).isGreaterThanOrEqualTo(193396892+445132860);
+        assertThat(response.getJSONAttrLong("total")).isGreaterThanOrEqualTo(193396892 + 445132860);
         assertThat(response.getJSONAttrLong("available")).isGreaterThanOrEqualTo(445132860);
         assertThat(response.getJSONAttrLong("used")).isGreaterThanOrEqualTo(193396892);
         assertThat(response.getJSONAttrDouble("usedP")).isGreaterThan(0);
@@ -440,12 +531,30 @@ public class StatsServiceTests {
     @Test
     void stats_connection_evolution() {
         Project project = builder.given_a_project();
-        given_a_persistent_connection_in_project(builder.given_superadmin(), project, DateUtils.addDays(new Date(), -15));
-        given_a_persistent_connection_in_project(builder.given_superadmin(), project, DateUtils.addDays(new Date(), -15));
-        given_a_persistent_connection_in_project(builder.given_superadmin(), project, DateUtils.addDays(new Date(), -5));
+        given_a_persistent_connection_in_project(
+            builder.given_superadmin(),
+            project,
+            DateUtils.addDays(new Date(), -15)
+        );
+        given_a_persistent_connection_in_project(
+            builder.given_superadmin(),
+            project,
+            DateUtils.addDays(new Date(), -15)
+        );
+        given_a_persistent_connection_in_project(
+            builder.given_superadmin(),
+            project,
+            DateUtils.addDays(new Date(), -5)
+        );
 
 
-        List<JsonObject> jsonObjects = statsService.statConnectionsEvolution(project, 7, DateUtils.addDays(new Date(), -18), null, false);
+        List<JsonObject> jsonObjects = statsService.statConnectionsEvolution(
+            project,
+            7,
+            DateUtils.addDays(new Date(), -18),
+            null,
+            false
+        );
         assertThat(jsonObjects).hasSize(3);
         assertThat(jsonObjects.get(0).getJSONAttrLong("size")).isEqualTo(2);
         assertThat(jsonObjects.get(1).getJSONAttrLong("size")).isEqualTo(1);
@@ -458,7 +567,13 @@ public class StatsServiceTests {
         assertThat(jsonObjects.get(2).getJSONAttrLong("size")).isEqualTo(3);
 
 
-        jsonObjects = statsService.statConnectionsEvolution(project, 7, DateUtils.addDays(new Date(), -18), DateUtils.addDays(new Date(), -6), true);
+        jsonObjects = statsService.statConnectionsEvolution(
+            project,
+            7,
+            DateUtils.addDays(new Date(), -18),
+            DateUtils.addDays(new Date(), -6),
+            true
+        );
         assertThat(jsonObjects).hasSize(2);
 
     }
@@ -467,18 +582,42 @@ public class StatsServiceTests {
     void stats_image_consultation_evolution() {
         Project project = builder.given_a_project();
         ImageInstance imageInstance = builder.given_an_image_instance(project);
-        given_a_persistent_image_consultation(builder.given_superadmin(), imageInstance, DateUtils.addDays(new Date(), -15));
-        given_a_persistent_image_consultation(builder.given_superadmin(), imageInstance, DateUtils.addDays(new Date(), -15));
-        given_a_persistent_image_consultation(builder.given_superadmin(), imageInstance, DateUtils.addDays(new Date(), -5));
+        given_a_persistent_image_consultation(
+            builder.given_superadmin(),
+            imageInstance,
+            DateUtils.addDays(new Date(), -15)
+        );
+        given_a_persistent_image_consultation(
+            builder.given_superadmin(),
+            imageInstance,
+            DateUtils.addDays(new Date(), -15)
+        );
+        given_a_persistent_image_consultation(
+            builder.given_superadmin(),
+            imageInstance,
+            DateUtils.addDays(new Date(), -5)
+        );
 
 
-        List<JsonObject> jsonObjects = statsService.statImageConsultationsEvolution(project, 7, DateUtils.addDays(new Date(), -18), null, false);
+        List<JsonObject> jsonObjects = statsService.statImageConsultationsEvolution(
+            project,
+            7,
+            DateUtils.addDays(new Date(), -18),
+            null,
+            false
+        );
         assertThat(jsonObjects).hasSize(3);
         assertThat(jsonObjects.get(0).getJSONAttrLong("size")).isEqualTo(2);
         assertThat(jsonObjects.get(1).getJSONAttrLong("size")).isEqualTo(1);
         assertThat(jsonObjects.get(2).getJSONAttrLong("size")).isEqualTo(0);
 
-        jsonObjects = statsService.statImageConsultationsEvolution(project, 7, DateUtils.addDays(new Date(), -18), null, true);
+        jsonObjects = statsService.statImageConsultationsEvolution(
+            project,
+            7,
+            DateUtils.addDays(new Date(), -18),
+            null,
+            true
+        );
         assertThat(jsonObjects).hasSize(3);
         assertThat(jsonObjects.get(0).getJSONAttrLong("size")).isEqualTo(2);
         assertThat(jsonObjects.get(1).getJSONAttrLong("size")).isEqualTo(3);
@@ -490,18 +629,52 @@ public class StatsServiceTests {
     void stats_annotation_Action_evolution() {
         Project project = builder.given_a_project();
         AnnotationDomain annotation = builder.given_a_user_annotation(project);
-        given_a_persistent_annotation_action(DateUtils.addDays(new Date(), -15), annotation, builder.given_superadmin(), "select");
-        given_a_persistent_annotation_action(DateUtils.addDays(new Date(), -15), annotation, builder.given_superadmin(), "move");
-        given_a_persistent_annotation_action(DateUtils.addDays(new Date(), -15), annotation, builder.given_superadmin(), "select");
-        given_a_persistent_annotation_action(DateUtils.addDays(new Date(), -5), annotation, builder.given_superadmin(), "select");
+        given_a_persistent_annotation_action(
+            DateUtils.addDays(new Date(), -15),
+            annotation,
+            builder.given_superadmin(),
+            "select"
+        );
+        given_a_persistent_annotation_action(
+            DateUtils.addDays(new Date(), -15),
+            annotation,
+            builder.given_superadmin(),
+            "move"
+        );
+        given_a_persistent_annotation_action(
+            DateUtils.addDays(new Date(), -15),
+            annotation,
+            builder.given_superadmin(),
+            "select"
+        );
+        given_a_persistent_annotation_action(
+            DateUtils.addDays(new Date(), -5),
+            annotation,
+            builder.given_superadmin(),
+            "select"
+        );
 
-        List<JsonObject> jsonObjects = statsService.statAnnotationActionsEvolution(project, 7, DateUtils.addDays(new Date(), -18), null, false, "select");
+        List<JsonObject> jsonObjects = statsService.statAnnotationActionsEvolution(
+            project,
+            7,
+            DateUtils.addDays(new Date(), -18),
+            null,
+            false,
+            "select"
+        );
         assertThat(jsonObjects).hasSize(3);
         assertThat(jsonObjects.get(0).getJSONAttrLong("size")).isEqualTo(2);
         assertThat(jsonObjects.get(1).getJSONAttrLong("size")).isEqualTo(1);
         assertThat(jsonObjects.get(2).getJSONAttrLong("size")).isEqualTo(0);
 
-        jsonObjects = statsService.statAnnotationActionsEvolution(project, 7, DateUtils.addDays(new Date(), -18), null, true, "select");
+        jsonObjects = statsService.statAnnotationActionsEvolution(
+            project,
+            7,
+            DateUtils.addDays(new Date(), -18),
+            null,
+            true,
+            "select"
+        );
         assertThat(jsonObjects).hasSize(3);
         assertThat(jsonObjects.get(0).getJSONAttrLong("size")).isEqualTo(2);
         assertThat(jsonObjects.get(1).getJSONAttrLong("size")).isEqualTo(3);

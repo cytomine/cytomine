@@ -20,13 +20,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
 import be.cytomine.CytomineCoreApplication;
-import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.social.LastConnection;
 import be.cytomine.domain.social.LastUserPosition;
 import be.cytomine.domain.social.PersistentConnection;
-import be.cytomine.domain.social.PersistentProjectConnection;
 import be.cytomine.domain.social.PersistentImageConsultation;
+import be.cytomine.domain.social.PersistentProjectConnection;
 import be.cytomine.domain.social.PersistentUserPosition;
 import be.cytomine.dto.image.AreaDTO;
 import be.cytomine.repositorynosql.social.LastConnectionRepository;
@@ -82,17 +82,19 @@ public class MongoDBDomainTests {
     }
 
     private Document retrieveDocument(String collectionName, Long id) {
-        MongoCollection<Document> persistentProjectConnection = mongoClient.getDatabase(mongoDatabaseName).getCollection(collectionName);
+        MongoCollection<Document> persistentProjectConnection = mongoClient.getDatabase(mongoDatabaseName)
+            .getCollection(collectionName);
 
         List<Document> results = persistentProjectConnection.find(eq("_id", id))
-                .into(new ArrayList<>());
+            .into(new ArrayList<>());
 
         assertThat(results).hasSize(1);
         return results.get(0);
     }
 
     private ListIndexesIterable<Document> retrieveIndex(String collectionName) {
-        MongoCollection<Document> persistentProjectConnection = mongoClient.getDatabase(mongoDatabaseName).getCollection(collectionName);
+        MongoCollection<Document> persistentProjectConnection = mongoClient.getDatabase(mongoDatabaseName)
+            .getCollection(collectionName);
         return persistentProjectConnection.listIndexes();
     }
 
@@ -207,10 +209,10 @@ public class MongoDBDomainTests {
         Integer expectedZoom = 5;
 
         List<List<Double>> expectedLocation = new AreaDTO(
-                new be.cytomine.dto.image.Point(-109d, 2548d),
-                new be.cytomine.dto.image.Point(683d, 2548d),
-                new be.cytomine.dto.image.Point(683d, 2028d),
-                new be.cytomine.dto.image.Point(-109d, 2028d)
+            new be.cytomine.dto.image.Point(-109d, 2548d),
+            new be.cytomine.dto.image.Point(683d, 2548d),
+            new be.cytomine.dto.image.Point(683d, 2028d),
+            new be.cytomine.dto.image.Point(-109d, 2028d)
         ).toMongodbLocation().getCoordinates();
 
         LastUserPosition lastPosition = new LastUserPosition();
@@ -429,10 +431,10 @@ public class MongoDBDomainTests {
         Long expectedImage = 3962L;
         String expectedImageName = "CMU-1-Small-Region (1).svs";
         List<List<Double>> expectedLocation = new AreaDTO(
-                new be.cytomine.dto.image.Point(-3338d, 3128d),
-                new be.cytomine.dto.image.Point(5558d, 3128d),
-                new be.cytomine.dto.image.Point(5558d, -160d),
-                new be.cytomine.dto.image.Point(-3338d, -160d)
+            new be.cytomine.dto.image.Point(-3338d, 3128d),
+            new be.cytomine.dto.image.Point(5558d, 3128d),
+            new be.cytomine.dto.image.Point(5558d, -160d),
+            new be.cytomine.dto.image.Point(-3338d, -160d)
         ).toMongodbLocation().getCoordinates();
         Long expectedProject = 3063L;
         Double expectedRotation = 0d;

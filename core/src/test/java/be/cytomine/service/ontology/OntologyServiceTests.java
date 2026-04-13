@@ -104,8 +104,8 @@ public class OntologyServiceTests {
     private static void setupStub() {
         /* Simulate call to CBIR */
         wireMockServer.stubFor(post(urlPathEqualTo(CBIR_API_BASE_PATH + "/storages"))
-                                   .withRequestBody(matching(".*"))
-                                   .willReturn(aResponse().withBody(UUID.randomUUID().toString()))
+            .withRequestBody(matching(".*"))
+            .willReturn(aResponse().withBody(UUID.randomUUID().toString()))
         );
     }
 
@@ -157,8 +157,8 @@ public class OntologyServiceTests {
     void list_light_ontology() {
         Ontology ontology = builder.given_an_ontology();
         assertThat(ontologyService.listLight()
-                       .stream()
-                       .anyMatch(json -> json.get("id").equals(ontology.getId()))).isTrue();
+            .stream()
+            .anyMatch(json -> json.get("id").equals(ontology.getId()))).isTrue();
     }
 
     @Test
@@ -178,9 +178,11 @@ public class OntologyServiceTests {
     void add_ontology_with_null_name_fail() {
         Ontology ontology = basicInstanceBuilder.given_a_not_persisted_ontology();
         ontology.setName("");
-        Assertions.assertThrows(WrongArgumentException.class, () -> {
-            ontologyService.add(ontology.toJsonObject());
-        });
+        Assertions.assertThrows(
+            WrongArgumentException.class, () -> {
+                ontologyService.add(ontology.toJsonObject());
+            }
+        );
     }
 
 
@@ -219,17 +221,21 @@ public class OntologyServiceTests {
         builder.persistAndReturn(ontologyWithSameName);
 
         // re-create a ontology with a name that already exist in this ontology
-        Assertions.assertThrows(AlreadyExistException.class, () -> {
-            commandService.redo();
-        });
+        Assertions.assertThrows(
+            AlreadyExistException.class, () -> {
+                commandService.redo();
+            }
+        );
     }
 
     @Test
     void edit_valid_ontology_with_success() {
         Ontology ontology = builder.given_an_ontology();
 
-        CommandResponse commandResponse = ontologyService.update(ontology,
-            ontology.toJsonObject().withChange("name", "NEW NAME"));
+        CommandResponse commandResponse = ontologyService.update(
+            ontology,
+            ontology.toJsonObject().withChange("name", "NEW NAME")
+        );
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -355,21 +361,33 @@ public class OntologyServiceTests {
         permissionService.addPermission(project, userAdminInProject.getUsername(), ADMINISTRATION);
         permissionService.addPermission(project, userNotAdminInProject.getUsername(), WRITE);
 
-        ontologyService.determineRightsForUsers(ontology,
-            List.of(userAdminInProject, userNotAdminInProject, userNotInProject));
+        ontologyService.determineRightsForUsers(
+            ontology,
+            List.of(userAdminInProject, userNotAdminInProject, userNotInProject)
+        );
 
-        assertThat(permissionService.hasACLPermission(ontology, userAdminInProject.getUsername(),
-            ADMINISTRATION)).isTrue();
+        assertThat(permissionService.hasACLPermission(
+            ontology, userAdminInProject.getUsername(),
+            ADMINISTRATION
+        )).isTrue();
 
-        assertThat(permissionService.hasACLPermission(ontology, userNotAdminInProject.getUsername(),
-            ADMINISTRATION)).isFalse();
-        assertThat(permissionService.hasACLPermission(ontology, userNotAdminInProject.getUsername(),
-            READ)).isTrue();
+        assertThat(permissionService.hasACLPermission(
+            ontology, userNotAdminInProject.getUsername(),
+            ADMINISTRATION
+        )).isFalse();
+        assertThat(permissionService.hasACLPermission(
+            ontology, userNotAdminInProject.getUsername(),
+            READ
+        )).isTrue();
 
-        assertThat(permissionService.hasACLPermission(ontology, userNotInProject.getUsername(),
-            ADMINISTRATION)).isFalse();
-        assertThat(permissionService.hasACLPermission(ontology, userNotInProject.getUsername(),
-            READ)).isFalse();
+        assertThat(permissionService.hasACLPermission(
+            ontology, userNotInProject.getUsername(),
+            ADMINISTRATION
+        )).isFalse();
+        assertThat(permissionService.hasACLPermission(
+            ontology, userNotInProject.getUsername(),
+            READ
+        )).isFalse();
 
     }
 
@@ -400,8 +418,10 @@ public class OntologyServiceTests {
         assertThat(permissionService.hasACLPermission(project, "user", READ)).isTrue();
 
         // change project ontology
-        commandResponse = projectService.update(project, project.toJsonObject()
-                                                             .withChange("ontology", null));
+        commandResponse = projectService.update(
+            project, project.toJsonObject()
+                .withChange("ontology", null)
+        );
 
         // check that use still keep its rights to access ontology
         assertThat(ontology.getUser().getUsername()).isEqualTo("user");

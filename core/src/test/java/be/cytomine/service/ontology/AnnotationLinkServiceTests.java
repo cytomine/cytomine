@@ -12,8 +12,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
-import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.ontology.AnnotationGroup;
 import be.cytomine.domain.ontology.AnnotationLink;
@@ -55,16 +55,33 @@ public class AnnotationLinkServiceTests {
     @Test
     void list_annotation_link_by_annotation_group() {
         Project project = builder.given_a_project();
-        AnnotationGroup annotationGroup = builder.given_an_annotation_group(project, builder.given_an_imagegroup(project));
+        AnnotationGroup annotationGroup = builder.given_an_annotation_group(
+            project,
+            builder.given_an_imagegroup(project)
+        );
         ImageInstance image = builder.given_an_image_instance(project);
 
-        AnnotationLink annotationLink1 = builder.given_an_annotation_link(builder.given_a_user_annotation(project), annotationGroup, image);
-        AnnotationLink annotationLink2 = builder.given_an_annotation_link(builder.given_a_user_annotation(project), annotationGroup, image);
-        AnnotationLink annotationLink3 = builder.given_an_annotation_link(builder.given_a_user_annotation(project), annotationGroup, image);
+        AnnotationLink annotationLink1 = builder.given_an_annotation_link(
+            builder.given_a_user_annotation(project),
+            annotationGroup,
+            image
+        );
+        AnnotationLink annotationLink2 = builder.given_an_annotation_link(
+            builder.given_a_user_annotation(project),
+            annotationGroup,
+            image
+        );
+        AnnotationLink annotationLink3 = builder.given_an_annotation_link(
+            builder.given_a_user_annotation(project),
+            annotationGroup,
+            image
+        );
         AnnotationLink annotationLink4 = builder.given_an_annotation_link();
 
-        AssertionsForInterfaceTypes.assertThat(annotationLinkService.list(annotationGroup)).containsExactly(annotationLink1, annotationLink2, annotationLink3);
-        AssertionsForInterfaceTypes.assertThat(annotationLinkService.list(annotationGroup)).doesNotContain(annotationLink4);
+        AssertionsForInterfaceTypes.assertThat(annotationLinkService.list(annotationGroup))
+            .containsExactly(annotationLink1, annotationLink2, annotationLink3);
+        AssertionsForInterfaceTypes.assertThat(annotationLinkService.list(annotationGroup))
+            .doesNotContain(annotationLink4);
     }
 
     @Test

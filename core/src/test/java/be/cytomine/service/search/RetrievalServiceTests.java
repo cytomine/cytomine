@@ -21,17 +21,17 @@ import org.springframework.security.test.context.support.WithMockUser;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
-import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.controller.ontology.UserAnnotationResourceTests;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.dto.search.SearchResponse;
 
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
 import static be.cytomine.service.search.RetrievalService.CBIR_API_BASE_PATH;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
@@ -74,7 +74,9 @@ public class RetrievalServiceTests {
 
     @Test
     void index_annotation_with_success() throws ParseException {
-        UserAnnotation annotation = UserAnnotationResourceTests.given_a_user_annotation_with_valid_image_server(builder);
+        UserAnnotation
+            annotation
+            = UserAnnotationResourceTests.given_a_user_annotation_with_valid_image_server(builder);
 
         /* Simulate call to CBIR */
         String expectedUrlPath = CBIR_API_BASE_PATH + "/images";
@@ -136,7 +138,9 @@ public class RetrievalServiceTests {
 
     @Test
     void search_similar_images_with_success() throws JsonProcessingException, ParseException {
-        UserAnnotation annotation = UserAnnotationResourceTests.given_a_user_annotation_with_valid_image_server(builder);
+        UserAnnotation
+            annotation
+            = UserAnnotationResourceTests.given_a_user_annotation_with_valid_image_server(builder);
 
         /* Simulate call to CBIR */
         ObjectMapper objectMapper = new ObjectMapper();

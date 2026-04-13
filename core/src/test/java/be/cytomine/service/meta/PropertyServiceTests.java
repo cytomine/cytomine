@@ -1,25 +1,38 @@
 package be.cytomine.service.meta;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import java.util.List;
+import java.util.Map;
+
+import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.Test;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKTReader;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
-import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.meta.Property;
 import be.cytomine.domain.ontology.UserAnnotation;
@@ -27,19 +40,6 @@ import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.GeometryUtils;
-import org.locationtech.jts.io.ParseException;
-import org.locationtech.jts.io.WKTReader;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.security.test.context.support.WithMockUser;
-
-import jakarta.transaction.Transactional;
-
-import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -71,7 +71,6 @@ public class PropertyServiceTests {
     }
 
 
-
     @Test
     public void find_by_id() {
         Property property = builder.given_a_property(builder.given_a_project());
@@ -92,10 +91,17 @@ public class PropertyServiceTests {
     }
 
     @Test
-    public void create_property(){
+    public void create_property() {
         Project project = builder.given_a_project();
         CommandResponse commandResponse =
-                propertyService.addProperty(project.getClass().getName(), project.getId(), "key", "value", builder.given_superadmin(), null);
+            propertyService.addProperty(
+                project.getClass().getName(),
+                project.getId(),
+                "key",
+                "value",
+                builder.given_superadmin(),
+                null
+            );
         assertThat(commandResponse).isNotNull();
         assertThat(propertyService.findByDomainAndKey(project, "key")).isPresent();
     }
@@ -105,7 +111,7 @@ public class PropertyServiceTests {
         Project project = builder.given_a_project();
 
         CommandResponse commandResponse =
-                propertyService.add(builder.given_a_not_persisted_property(project, "key", "value").toJsonObject());
+            propertyService.add(builder.given_a_not_persisted_property(project, "key", "value").toJsonObject());
         assertThat(commandResponse).isNotNull();
         assertThat(propertyService.findByDomainAndKey(project, "key")).isPresent();
     }
@@ -115,13 +121,16 @@ public class PropertyServiceTests {
         Project project = builder.given_a_project();
         Property property = builder.given_a_property(project);
 
-        assertThat(propertyService.findByDomainAndKey(project,"key")).isPresent();
+        assertThat(propertyService.findByDomainAndKey(project, "key")).isPresent();
 
-        CommandResponse commandResponse = propertyService.update(property, property.toJsonObject().withChange("value", "NEW VALUE"));
+        CommandResponse commandResponse = propertyService.update(
+            property,
+            property.toJsonObject().withChange("value", "NEW VALUE")
+        );
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
-        assertThat(propertyService.findByDomainAndKey(project,"key")).isPresent();
+        assertThat(propertyService.findByDomainAndKey(project, "key")).isPresent();
         Property edited = propertyService.findByDomainAndKey(project, "key").get();
         assertThat(edited.getValue()).isEqualTo("NEW VALUE");
     }
@@ -137,26 +146,36 @@ public class PropertyServiceTests {
     @Test
     public void list_keys_for_annotaion() {
         Project project = builder.given_a_project();
-        UserAnnotation userAnnotation = builder.persistAndReturn(builder.given_a_not_persisted_user_annotation(project));
+        UserAnnotation
+            userAnnotation
+            = builder.persistAndReturn(builder.given_a_not_persisted_user_annotation(project));
         Property property = builder.given_a_property(userAnnotation);
         Property projectProperty = builder.given_a_property(project, "projectKey", "value");
 
         List<Map<String, Object>> results = propertyService.listKeysForAnnotation(project, null, false);
 
-        assertThat(results.stream().map(x -> (String)x.get("key"))).containsExactly(property.getKey()).doesNotContain(projectProperty.getKey());
+        assertThat(results.stream().map(x -> (String) x.get("key"))).containsExactly(property.getKey())
+            .doesNotContain(projectProperty.getKey());
     }
 
     @Test
     public void list_keys_for_annotation_by_image_with_user() {
         Project project = builder.given_a_project();
-        UserAnnotation userAnnotation = builder.persistAndReturn(builder.given_a_not_persisted_user_annotation(project));
+        UserAnnotation
+            userAnnotation
+            = builder.persistAndReturn(builder.given_a_not_persisted_user_annotation(project));
         Property property = builder.given_a_property(userAnnotation);
         Property projectProperty = builder.given_a_property(project, "projectKey", "value");
 
-        List<Map<String, Object>> results = propertyService.listKeysForAnnotation(null, userAnnotation.getImage(), true);
+        List<Map<String, Object>> results = propertyService.listKeysForAnnotation(
+            null,
+            userAnnotation.getImage(),
+            true
+        );
 
-        assertThat(results.stream().map(x -> (String)x.get("key"))).containsExactly(property.getKey()).doesNotContain(projectProperty.getKey());
-        assertThat(results.stream().map(x -> (Long)x.get("user"))).containsExactly(builder.given_superadmin().getId());
+        assertThat(results.stream().map(x -> (String) x.get("key"))).containsExactly(property.getKey())
+            .doesNotContain(projectProperty.getKey());
+        assertThat(results.stream().map(x -> (Long) x.get("user"))).containsExactly(builder.given_superadmin().getId());
     }
 
     @Test
@@ -179,9 +198,18 @@ public class PropertyServiceTests {
         UserAnnotation annotation = builder.given_a_user_annotation();
         annotation.setLocation(new WKTReader().read("POLYGON ((0 0, 0 1000, 1000 1000, 1000 0, 0 0))"));
         annotation.setImage(imageInstance);
-        Property property = builder.persistAndReturn(builder.given_a_not_persisted_property(annotation, "TestCytomine", "ValueTestCytomine"));
+        Property property = builder.persistAndReturn(builder.given_a_not_persisted_property(
+            annotation,
+            "TestCytomine",
+            "ValueTestCytomine"
+        ));
 
-        List<Map<String, Object>> results = propertyService.listAnnotationCenterPosition(user, imageInstance, GeometryUtils.createBoundingBox("0,0,1000,1000"), "TestCytomine");
+        List<Map<String, Object>> results = propertyService.listAnnotationCenterPosition(
+            user,
+            imageInstance,
+            GeometryUtils.createBoundingBox("0,0,1000,1000"),
+            "TestCytomine"
+        );
 
         assertThat(results).hasSize(1);
         assertThat(results.get(0).get("idAnnotation")).isEqualTo(annotation.getId());

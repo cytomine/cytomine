@@ -1,20 +1,20 @@
 package be.cytomine.authorization.ontology;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 import java.util.Optional;
 
@@ -70,12 +70,12 @@ public class RelationTermAuthorizationTest extends CRDAuthorizationTest {
     @Test
     @WithMockUser(username = SUPERADMIN)
     public void admin_can_list_relation_terms() {
-        expectOK (() -> { relationTermService.list(relationTerm.getTerm1()); });
+        expectOK(() -> { relationTermService.list(relationTerm.getTerm1()); });
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_with_read_can_list_relation_terms(){
+    public void user_with_read_can_list_relation_terms() {
         expectOK(() -> {
             relationTermService.list(relationTerm.getTerm1());
         });
@@ -83,7 +83,7 @@ public class RelationTermAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
-    public void user_no_acl_cannot_list_relation_terms(){
+    public void user_no_acl_cannot_list_relation_terms() {
         expectForbidden(() -> {
             relationTermService.list(relationTerm.getTerm1());
         });
@@ -98,17 +98,24 @@ public class RelationTermAuthorizationTest extends CRDAuthorizationTest {
     @Override
     protected void when_i_add_domain() {
         relationTermService.add(
-            basicInstanceBuilder.given_a_not_persisted_relation_term(relationTerm.getRelation(),
+            basicInstanceBuilder.given_a_not_persisted_relation_term(
+                relationTerm.getRelation(),
                 relationTerm.getTerm1(),
-                builder.given_a_term(relationTerm.getTerm1().getOntology())).toJsonObject()
+                builder.given_a_term(relationTerm.getTerm1().getOntology())
+            ).toJsonObject()
         );
     }
 
     @Override
     protected void when_i_delete_domain() {
-        RelationTerm termToDelete = builder.given_a_relation_term(relationTerm.getRelation(), relationTerm.getTerm1(), builder.given_a_term(relationTerm.getTerm1().getOntology()));
+        RelationTerm termToDelete = builder.given_a_relation_term(
+            relationTerm.getRelation(),
+            relationTerm.getTerm1(),
+            builder.given_a_term(relationTerm.getTerm1().getOntology())
+        );
         relationTermService.delete(termToDelete, null, null, true);
     }
+
     @Override
     protected Optional<Permission> minimalPermissionForCreate() {
         return Optional.of(BasePermission.WRITE);

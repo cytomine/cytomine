@@ -34,19 +34,19 @@ public class StringUtilsTests {
 
     @Test
     public void parameters_extracted_as_list_of_long() {
-        List<Long> expectedList = new ArrayList<>(Arrays.asList((long)145, (long)146, (long)0, (long)-1));
+        List<Long> expectedList = new ArrayList<>(Arrays.asList((long) 145, (long) 146, (long) 0, (long) -1));
         assertThat(StringUtils.extractListFromParameter("145,146,0,-1")).isEqualTo(expectedList);
     }
 
     @Test
     public void get_local_date_as_string() {
-        List<Long> expectedList = new ArrayList<>(Arrays.asList((long)145, (long)146, (long)0, (long)-1));
+        List<Long> expectedList = new ArrayList<>(Arrays.asList((long) 145, (long) 146, (long) 0, (long) -1));
         assertThat(StringUtils.extractListFromParameter("145,146,0,-1")).isEqualTo(expectedList);
     }
 
     @Test
     public void get_simple_format_local_date_as_string() {
-        List<Long> expectedList = new ArrayList<>(Arrays.asList((long)145, (long)146, (long)0, (long)-1));
+        List<Long> expectedList = new ArrayList<>(Arrays.asList((long) 145, (long) 146, (long) 0, (long) -1));
         assertThat(StringUtils.extractListFromParameter("145,146,0,-1")).isEqualTo(expectedList);
     }
 }

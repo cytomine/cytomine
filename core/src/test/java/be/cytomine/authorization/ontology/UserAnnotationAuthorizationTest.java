@@ -61,7 +61,8 @@ public class UserAnnotationAuthorizationTest extends CRUDAuthorizationTest {
 
     private static void setupStub() {
         /* Simulate call to PIMS */
-        wireMockServer.stubFor(WireMock.post(WireMock.urlPathMatching(IMS_API_BASE_PATH + "/image/.*/annotation/drawing"))
+        wireMockServer.stubFor(WireMock.post(WireMock.urlPathMatching(IMS_API_BASE_PATH
+                + "/image/.*/annotation/drawing"))
             .withRequestBody(WireMock.matching(".*"))
             .willReturn(WireMock.aResponse().withBody(UUID.randomUUID().toString().getBytes()))
         );
@@ -174,7 +175,9 @@ public class UserAnnotationAuthorizationTest extends CRUDAuthorizationTest {
 
     @Override
     protected void when_i_delete_domain() {
-        UserAnnotation annotation = builder.persistAndReturn(builder.given_a_not_persisted_user_annotation(this.userAnnotation.getProject()));
+        UserAnnotation
+            annotation
+            = builder.persistAndReturn(builder.given_a_not_persisted_user_annotation(this.userAnnotation.getProject()));
         userAnnotationService.delete(annotation, null, null, true);
     }
 

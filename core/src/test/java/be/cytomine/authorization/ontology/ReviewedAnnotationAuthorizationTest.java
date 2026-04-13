@@ -1,20 +1,20 @@
 package be.cytomine.authorization.ontology;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 import java.util.Date;
 import java.util.Optional;
@@ -80,13 +80,13 @@ public class ReviewedAnnotationAuthorizationTest extends CRUDAuthorizationTest {
     @WithMockUser(username = USER_ACL_ADMIN)
     public void user_can_review_annotation_if_reviewer() {
         UserAnnotation annotation
-                = builder.given_a_user_annotation();
+            = builder.given_a_user_annotation();
         annotation.setImage(this.reviewedAnnotation.getImage());
         annotation.setProject(this.reviewedAnnotation.getProject());
         annotation.getImage().setReviewStart(new Date());
         annotation.getImage().setReviewUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_ADMIN).get());
 
-        expectOK (() -> {
+        expectOK(() -> {
             reviewedAnnotationService.reviewAnnotation(annotation.getId(), null);
         });
     }
@@ -96,27 +96,29 @@ public class ReviewedAnnotationAuthorizationTest extends CRUDAuthorizationTest {
     @WithMockUser(username = USER_ACL_ADMIN)
     public void user_cannot_review_annotation_if_not_reviewer() {
         UserAnnotation annotation
-                = builder.given_a_user_annotation();
+            = builder.given_a_user_annotation();
         annotation.setImage(this.reviewedAnnotation.getImage());
         annotation.setProject(this.reviewedAnnotation.getProject());
         annotation.getImage().setReviewStart(new Date());
         annotation.getImage().setReviewUser(builder.given_superadmin()); // someone else
-        Assertions.assertThrows(WrongArgumentException.class, () -> {
-            reviewedAnnotationService.reviewAnnotation(annotation.getId(), null);
-        });
+        Assertions.assertThrows(
+            WrongArgumentException.class, () -> {
+                reviewedAnnotationService.reviewAnnotation(annotation.getId(), null);
+            }
+        );
     }
 
     @Test
     @WithMockUser(username = CREATOR)
     public void creator_can_edit_its_annotation() {
         ReviewedAnnotation reviewedAnnotation
-                = builder.given_a_reviewed_annotation();
+            = builder.given_a_reviewed_annotation();
         reviewedAnnotation.setImage(this.reviewedAnnotation.getImage());
         reviewedAnnotation.setProject(this.reviewedAnnotation.getProject());
         reviewedAnnotation.getImage().setReviewStart(new Date());
         reviewedAnnotation.getImage().setReviewUser(builder.given_superadmin());
         reviewedAnnotation.setReviewUser(userRepository.findByUsernameLikeIgnoreCase(CREATOR).get());
-        expectOK (() -> {
+        expectOK(() -> {
             reviewedAnnotationService.update(reviewedAnnotation, reviewedAnnotation.toJsonObject(), null);
         });
     }
@@ -125,13 +127,13 @@ public class ReviewedAnnotationAuthorizationTest extends CRUDAuthorizationTest {
     @WithMockUser(username = CREATOR)
     public void creator_can_delete_its_annotation() {
         ReviewedAnnotation reviewedAnnotation
-                = builder.given_a_reviewed_annotation();
+            = builder.given_a_reviewed_annotation();
         reviewedAnnotation.setImage(this.reviewedAnnotation.getImage());
         reviewedAnnotation.setProject(this.reviewedAnnotation.getProject());
         reviewedAnnotation.getImage().setReviewStart(new Date());
         reviewedAnnotation.getImage().setReviewUser(builder.given_superadmin());
         reviewedAnnotation.setReviewUser(userRepository.findByUsernameLikeIgnoreCase(CREATOR).get());
-        expectOK (() -> {
+        expectOK(() -> {
             reviewedAnnotationService.delete(reviewedAnnotation, null, null, false);
         });
     }
@@ -143,7 +145,8 @@ public class ReviewedAnnotationAuthorizationTest extends CRUDAuthorizationTest {
 
     @Override
     protected void when_i_add_domain() {
-        JsonObject jsonObject = builder.given_a_not_persisted_reviewed_annotation(this.reviewedAnnotation.getProject()).toJsonObject();
+        JsonObject jsonObject = builder.given_a_not_persisted_reviewed_annotation(this.reviewedAnnotation.getProject())
+            .toJsonObject();
         reviewedAnnotationService.add(jsonObject);
     }
 
@@ -154,7 +157,9 @@ public class ReviewedAnnotationAuthorizationTest extends CRUDAuthorizationTest {
 
     @Override
     protected void when_i_delete_domain() {
-        ReviewedAnnotation annotation = builder.persistAndReturn(builder.given_a_not_persisted_reviewed_annotation(this.reviewedAnnotation.getProject()));
+        ReviewedAnnotation
+            annotation
+            = builder.persistAndReturn(builder.given_a_not_persisted_reviewed_annotation(this.reviewedAnnotation.getProject()));
         reviewedAnnotationService.delete(annotation, null, null, true);
     }
 

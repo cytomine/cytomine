@@ -52,7 +52,10 @@ public class ImageGroupImageInstanceAuthorizationTest extends CRDAuthorizationTe
 
     @Override
     protected void when_i_add_domain() {
-        imageGroupImageInstanceService.add(builder.given_a_not_persisted_imagegroup_imageinstance(igii.getGroup(), igii.getImage()).toJsonObject());
+        imageGroupImageInstanceService.add(builder.given_a_not_persisted_imagegroup_imageinstance(
+            igii.getGroup(),
+            igii.getImage()
+        ).toJsonObject());
     }
 
     @Override

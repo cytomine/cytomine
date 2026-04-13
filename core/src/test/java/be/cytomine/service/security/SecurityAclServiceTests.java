@@ -1,25 +1,34 @@
 package be.cytomine.service.security;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
-import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.server.Storage;
 import be.cytomine.domain.ontology.Ontology;
@@ -35,15 +44,6 @@ import be.cytomine.service.command.TransactionService;
 import be.cytomine.service.ontology.UserAnnotationService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.social.ProjectConnectionService;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.security.test.context.support.WithMockUser;
-
-import jakarta.transaction.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
@@ -92,21 +92,29 @@ public class SecurityAclServiceTests {
         Project project = builder.given_a_project();
         User user = builder.given_default_user();
 
-        Assertions.assertThrows(ForbiddenException.class, () -> {
-            securityACLService.check(project.getId(), project.getClass().getName(), READ);
-        });
+        Assertions.assertThrows(
+            ForbiddenException.class, () -> {
+                securityACLService.check(project.getId(), project.getClass().getName(), READ);
+            }
+        );
 
-        Assertions.assertThrows(ForbiddenException.class, () -> {
-            securityACLService.check(project.getId(), project.getClass(), READ);
-        });
+        Assertions.assertThrows(
+            ForbiddenException.class, () -> {
+                securityACLService.check(project.getId(), project.getClass(), READ);
+            }
+        );
 
-        Assertions.assertThrows(ForbiddenException.class, () -> {
-            securityACLService.check(project, READ, user);
-        });
+        Assertions.assertThrows(
+            ForbiddenException.class, () -> {
+                securityACLService.check(project, READ, user);
+            }
+        );
 
-        Assertions.assertThrows(ForbiddenException.class, () -> {
-            securityACLService.check(project, READ);
-        });
+        Assertions.assertThrows(
+            ForbiddenException.class, () -> {
+                securityACLService.check(project, READ);
+            }
+        );
 
         builder.addUserToProject(project, user.getUsername());
 
@@ -122,12 +130,16 @@ public class SecurityAclServiceTests {
         Project project = builder.given_a_project();
         User user = builder.given_default_user();
 
-        Assertions.assertThrows(ForbiddenException.class, () -> {
-            securityACLService.checkIsAdminContainer(project);
-        });
-        Assertions.assertThrows(ForbiddenException.class, () -> {
-            securityACLService.checkIsAdminContainer(project, user);
-        });
+        Assertions.assertThrows(
+            ForbiddenException.class, () -> {
+                securityACLService.checkIsAdminContainer(project);
+            }
+        );
+        Assertions.assertThrows(
+            ForbiddenException.class, () -> {
+                securityACLService.checkIsAdminContainer(project, user);
+            }
+        );
 
         builder.addUserToProject(project, user.getUsername(), ADMINISTRATION);
 
@@ -230,9 +242,11 @@ public class SecurityAclServiceTests {
     @Test
     void check_same_user() {
         User user = builder.given_default_user();
-        Assertions.assertThrows(ForbiddenException.class, () -> {
-            securityACLService.checkIsSameUser(builder.given_superadmin(), user);
-        });
+        Assertions.assertThrows(
+            ForbiddenException.class, () -> {
+                securityACLService.checkIsSameUser(builder.given_superadmin(), user);
+            }
+        );
         securityACLService.checkIsSameUser(user, user);
         securityACLService.checkIsSameUser(user, builder.given_superadmin());
     }
@@ -241,9 +255,11 @@ public class SecurityAclServiceTests {
     @Test
     void check_is_admin() {
         User user = builder.given_default_user();
-        Assertions.assertThrows(ForbiddenException.class, () -> {
-            securityACLService.checkAdmin(user);
-        });
+        Assertions.assertThrows(
+            ForbiddenException.class, () -> {
+                securityACLService.checkAdmin(user);
+            }
+        );
         securityACLService.checkAdmin(builder.given_superadmin());
     }
 
@@ -253,9 +269,11 @@ public class SecurityAclServiceTests {
         User user = builder.given_default_user();
         User guest = builder.given_a_guest();
 
-        Assertions.assertThrows(ForbiddenException.class, () -> {
-            securityACLService.checkAdmin(guest);
-        });
+        Assertions.assertThrows(
+            ForbiddenException.class, () -> {
+                securityACLService.checkAdmin(guest);
+            }
+        );
         securityACLService.checkUser(user);
         securityACLService.checkUser(builder.given_superadmin());
     }
@@ -282,9 +300,11 @@ public class SecurityAclServiceTests {
 
         project.setMode(EditingMode.READ_ONLY);
 
-        Assertions.assertThrows(ForbiddenException.class,() -> {
-            securityACLService.checkIsNotReadOnly(project);
-        });
+        Assertions.assertThrows(
+            ForbiddenException.class, () -> {
+                securityACLService.checkIsNotReadOnly(project);
+            }
+        );
 
         permissionService.addPermission(project, user.getUsername(), ADMINISTRATION);
 
@@ -297,10 +317,10 @@ public class SecurityAclServiceTests {
         Project project = builder.given_a_project();
         User user = builder.given_a_user();
         assertThat(securityACLService.isUserInProject(user, project))
-                .isFalse();
+            .isFalse();
         builder.addUserToProject(project, user.getUsername());
         assertThat(securityACLService.isUserInProject(user, project))
-                .isTrue();
+            .isTrue();
     }
 
 }

@@ -1,26 +1,45 @@
 package be.cytomine.service.image;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
-import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.domain.image.*;
+import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.domain.image.AbstractImage;
+import be.cytomine.domain.image.AbstractSlice;
+import be.cytomine.domain.image.ImageInstance;
+import be.cytomine.domain.image.UploadedFile;
 import be.cytomine.domain.image.server.Storage;
 import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.exceptions.ForbiddenException;
@@ -32,24 +51,7 @@ import be.cytomine.service.command.TransactionService;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.filters.SearchOperation;
 import be.cytomine.utils.filters.SearchParameterEntry;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.test.context.support.WithMockUser;
 
-import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.AssertionsForClassTypes.fail;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 
@@ -99,8 +101,18 @@ public class UploadedFileServiceTests {
         uploadedFileNotSameUser.setUser(builder.given_a_user());
         builder.persistAndReturn(uploadedFileNotSameUser);
 
-        assertThat(uploadedFile1).isIn(uploadedFileService.list(builder.given_superadmin(), null, false, Pageable.unpaged()));
-        assertThat(uploadedFileNotSameUser).isNotIn(uploadedFileService.list(builder.given_superadmin(), null, false, Pageable.unpaged()));
+        assertThat(uploadedFile1).isIn(uploadedFileService.list(
+            builder.given_superadmin(),
+            null,
+            false,
+            Pageable.unpaged()
+        ));
+        assertThat(uploadedFileNotSameUser).isNotIn(uploadedFileService.list(
+            builder.given_superadmin(),
+            null,
+            false,
+            Pageable.unpaged()
+        ));
 
         assertThat(uploadedFileService.list(Pageable.ofSize(1)).getContent()).asList().hasSize(1);
         assertThat(uploadedFileService.list(Pageable.ofSize(2)).getContent()).asList().hasSize(2);
@@ -116,7 +128,11 @@ public class UploadedFileServiceTests {
         builder.persistAndReturn(uploadedFileNotSameUser);
 
         List<SearchParameterEntry> searchParameter = new ArrayList<>();
-        searchParameter.add(new SearchParameterEntry("user", SearchOperation.in, List.of(builder.given_superadmin().getId())));
+        searchParameter.add(new SearchParameterEntry(
+            "user",
+            SearchOperation.in,
+            List.of(builder.given_superadmin().getId())
+        ));
 
         List<Map<String, Object>> list = uploadedFileService.list(searchParameter, "created", "desc", false);
 
@@ -178,12 +194,20 @@ public class UploadedFileServiceTests {
         assertThat(list.getContent()).contains(uploadedFileToAdd);
         assertThat(list.getContent()).doesNotContain(uploadedfileChild, uploadedfileSubChildToAdd);
 
-        list = uploadedFileService.list(builder.given_superadmin(), uploadedFileToAdd.getId(), false, Pageable.unpaged());
+        list = uploadedFileService.list(
+            builder.given_superadmin(),
+            uploadedFileToAdd.getId(),
+            false,
+            Pageable.unpaged()
+        );
         assertThat(list.getContent()).contains(uploadedfileChild);
         assertThat(list.getContent()).doesNotContain(uploadedFileToAdd, uploadedfileSubChildToAdd);
 
 
-        List<Map<String, Object>> maps = uploadedFileService.listHierarchicalTree(builder.given_superadmin(), uploadedFileToAdd.getId());
+        List<Map<String, Object>> maps = uploadedFileService.listHierarchicalTree(
+            builder.given_superadmin(),
+            uploadedFileToAdd.getId()
+        );
         assertThat(maps.stream().filter(x -> x.get("id").equals(uploadedFileToAdd.getId()))).hasSize(1);
         assertThat(maps.stream().filter(x -> x.get("id").equals(uploadedfileChild.getId()))).hasSize(1);
         assertThat(maps.stream().filter(x -> x.get("id").equals(uploadedfileSubChildToAdd.getId()))).hasSize(1);
@@ -287,9 +311,11 @@ public class UploadedFileServiceTests {
     void add_uploadedFile_with_null_storage_fail() {
         UploadedFile uploadedFile = builder.given_a_not_persisted_uploaded_file();
         uploadedFile.setStorage(null);
-        Assertions.assertThrows(WrongArgumentException.class, () -> {
-            uploadedFileService.add(uploadedFile.toJsonObject());
-        });
+        Assertions.assertThrows(
+            WrongArgumentException.class, () -> {
+                uploadedFileService.add(uploadedFile.toJsonObject());
+            }
+        );
     }
 
 
@@ -297,7 +323,10 @@ public class UploadedFileServiceTests {
     void edit_valid_uploaded_file_with_success() {
         UploadedFile uploadedFile = builder.given_a_uploaded_file();
 
-        CommandResponse commandResponse = uploadedFileService.update(uploadedFile, uploadedFile.toJsonObject().withChange("originalFilename", "NEW NAME"));
+        CommandResponse commandResponse = uploadedFileService.update(
+            uploadedFile,
+            uploadedFile.toJsonObject().withChange("originalFilename", "NEW NAME")
+        );
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -311,7 +340,10 @@ public class UploadedFileServiceTests {
         UploadedFile uploadedFile = builder.given_a_uploaded_file();
         Storage storage = builder.given_a_storage();
 
-        CommandResponse commandResponse = uploadedFileService.update(uploadedFile, uploadedFile.toJsonObject().withChange("storage", storage.getId()));
+        CommandResponse commandResponse = uploadedFileService.update(
+            uploadedFile,
+            uploadedFile.toJsonObject().withChange("storage", storage.getId())
+        );
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -335,7 +367,7 @@ public class UploadedFileServiceTests {
     @Test
     void delete_uploadedFile_with_dependencies_with_success() {
         UploadedFile uploadedFile = builder.given_a_uploaded_file();
-        uploadedFile.setProjects(new Long[] {123L});
+        uploadedFile.setProjects(new Long[]{123L});
         builder.persistAndReturn(uploadedFile);
 
         UploadedFile uploadedFileChild = builder.given_a_uploaded_file();
@@ -366,7 +398,8 @@ public class UploadedFileServiceTests {
     @Test
     void delete_uploaded_file_with_image_in_project() {
         ImageInstance imageInstance = builder.given_an_image_instance();
-        Assertions.assertThrows(ForbiddenException.class, () ->
+        Assertions.assertThrows(
+            ForbiddenException.class, () ->
                 uploadedFileService.delete(imageInstance.getBaseImage().getUploadedFile(), null, null, false)
         );
     }
@@ -389,7 +422,9 @@ public class UploadedFileServiceTests {
         uploadedFileSubChild.setParent(uploadedFileChild);
         builder.persistAndReturn(uploadedFileSubChild);
 
-        Assertions.assertThrows(ForbiddenException.class, () ->
-                uploadedFileService.delete(uploadedFileChild, null, null, false));
+        Assertions.assertThrows(
+            ForbiddenException.class, () ->
+                uploadedFileService.delete(uploadedFileChild, null, null, false)
+        );
     }
 }

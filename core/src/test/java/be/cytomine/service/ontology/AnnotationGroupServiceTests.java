@@ -13,8 +13,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
-import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.image.group.ImageGroup;
 import be.cytomine.domain.ontology.AnnotationGroup;
 import be.cytomine.domain.project.Project;
@@ -64,7 +64,8 @@ public class AnnotationGroupServiceTests {
         AnnotationGroup annotationGroup3 = builder.given_an_annotation_group(project, imageGroup);
         AnnotationGroup annotationGroup4 = builder.given_an_annotation_group();
 
-        AssertionsForInterfaceTypes.assertThat(annotationGroupService.list(project)).containsExactly(annotationGroup1, annotationGroup2, annotationGroup3);
+        AssertionsForInterfaceTypes.assertThat(annotationGroupService.list(project))
+            .containsExactly(annotationGroup1, annotationGroup2, annotationGroup3);
         AssertionsForInterfaceTypes.assertThat(annotationGroupService.list(project)).doesNotContain(annotationGroup4);
     }
 
@@ -78,8 +79,10 @@ public class AnnotationGroupServiceTests {
         AnnotationGroup annotationGroup3 = builder.given_an_annotation_group(project, imageGroup);
         AnnotationGroup annotationGroup4 = builder.given_an_annotation_group();
 
-        AssertionsForInterfaceTypes.assertThat(annotationGroupService.list(imageGroup)).containsExactly(annotationGroup1, annotationGroup2, annotationGroup3);
-        AssertionsForInterfaceTypes.assertThat(annotationGroupService.list(imageGroup)).doesNotContain(annotationGroup4);
+        AssertionsForInterfaceTypes.assertThat(annotationGroupService.list(imageGroup))
+            .containsExactly(annotationGroup1, annotationGroup2, annotationGroup3);
+        AssertionsForInterfaceTypes.assertThat(annotationGroupService.list(imageGroup))
+            .doesNotContain(annotationGroup4);
     }
 
     @Test
@@ -90,13 +93,17 @@ public class AnnotationGroupServiceTests {
 
         AssertionsForClassTypes.assertThat(commandResponse).isNotNull();
         AssertionsForClassTypes.assertThat(commandResponse.getStatus()).isEqualTo(200);
-        AssertionsForClassTypes.assertThat(annotationGroupService.find(commandResponse.getObject().getId())).isPresent();
+        AssertionsForClassTypes.assertThat(annotationGroupService.find(commandResponse.getObject().getId()))
+            .isPresent();
     }
 
     @Test
     void add_annotation_group_with_null_project_fails() {
         AnnotationGroup annotationGroup = builder.given_an_annotation_group();
-        Assertions.assertThrows(ObjectNotFoundException.class, () -> annotationGroupService.add(annotationGroup.toJsonObject().withChange("project", null)));
+        Assertions.assertThrows(
+            ObjectNotFoundException.class,
+            () -> annotationGroupService.add(annotationGroup.toJsonObject().withChange("project", null))
+        );
     }
 
     @Test
@@ -112,7 +119,8 @@ public class AnnotationGroupServiceTests {
         CommandResponse commandResponse = annotationGroupService.edit(jsonObject, true);
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
-        AssertionsForClassTypes.assertThat(annotationGroupService.find(commandResponse.getObject().getId())).isPresent();
+        AssertionsForClassTypes.assertThat(annotationGroupService.find(commandResponse.getObject().getId()))
+            .isPresent();
 
         AnnotationGroup updated = annotationGroupService.find(commandResponse.getObject().getId()).get();
         assertThat(updated.getProject()).isEqualTo(project2);
@@ -136,7 +144,10 @@ public class AnnotationGroupServiceTests {
         AnnotationGroup annotationGroup = builder.given_an_annotation_group(project, imageGroup);
         AnnotationGroup annotationGroupToMerge = builder.given_an_annotation_group(project, imageGroup);
 
-        CommandResponse commandResponse = annotationGroupService.merge(annotationGroup.getId(), annotationGroupToMerge.getId());
+        CommandResponse commandResponse = annotationGroupService.merge(
+            annotationGroup.getId(),
+            annotationGroupToMerge.getId()
+        );
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
         AssertionsForClassTypes.assertThat(annotationGroupService.find(annotationGroupToMerge.getId()).isEmpty());

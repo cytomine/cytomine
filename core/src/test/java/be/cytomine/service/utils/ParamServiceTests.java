@@ -10,8 +10,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
-import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.project.Project;
@@ -42,13 +42,13 @@ public class ParamServiceTests {
         User userNotInProject = builder.given_a_user();
 
         assertThat(paramsService.getParamsUserList(null, project))
-                .contains(userInProject.getId()).doesNotContain(userNotInProject.getId());
+            .contains(userInProject.getId()).doesNotContain(userNotInProject.getId());
         assertThat(paramsService.getParamsUserList("null", project))
-                .contains(userInProject.getId()).doesNotContain(userNotInProject.getId());
+            .contains(userInProject.getId()).doesNotContain(userNotInProject.getId());
         assertThat(paramsService.getParamsUserList(userInProject.getId() + "_" + userNotInProject.getId(), project))
-                .contains(userInProject.getId()).doesNotContain(userNotInProject.getId());
+            .contains(userInProject.getId()).doesNotContain(userNotInProject.getId());
         assertThat(paramsService.getParamsUserList(userNotInProject.getId() + "", project))
-                .doesNotContain(userInProject.getId(), userNotInProject.getId());
+            .doesNotContain(userInProject.getId(), userNotInProject.getId());
     }
 
     @Test
@@ -58,13 +58,17 @@ public class ParamServiceTests {
         ImageInstance imageInstanceNotInProject = builder.given_an_image_instance();
 
         assertThat(paramsService.getParamsImageInstanceList(null, project))
-                .contains(imageInstanceInProject.getId()).doesNotContain(imageInstanceNotInProject.getId());
+            .contains(imageInstanceInProject.getId()).doesNotContain(imageInstanceNotInProject.getId());
         assertThat(paramsService.getParamsImageInstanceList("null", project))
-                .contains(imageInstanceInProject.getId()).doesNotContain(imageInstanceNotInProject.getId());
-        assertThat(paramsService.getParamsImageInstanceList(imageInstanceInProject.getId() + "_" + imageInstanceNotInProject.getId(), project))
-                .contains(imageInstanceInProject.getId()).doesNotContain(imageInstanceNotInProject.getId());
+            .contains(imageInstanceInProject.getId()).doesNotContain(imageInstanceNotInProject.getId());
+        assertThat(paramsService.getParamsImageInstanceList(
+            imageInstanceInProject.getId()
+                + "_"
+                + imageInstanceNotInProject.getId(), project
+        ))
+            .contains(imageInstanceInProject.getId()).doesNotContain(imageInstanceNotInProject.getId());
         assertThat(paramsService.getParamsImageInstanceList(imageInstanceNotInProject.getId() + "", project))
-                .doesNotContain(imageInstanceInProject.getId(), imageInstanceNotInProject.getId());
+            .doesNotContain(imageInstanceInProject.getId(), imageInstanceNotInProject.getId());
     }
 
     @Test
@@ -75,24 +79,24 @@ public class ParamServiceTests {
         Project project = builder.given_a_project_with_ontology(termInProject.getOntology());
 
         assertThat(paramsService.getParamsTermList(null, project))
-                .contains(termInProject.getId()).doesNotContain(termNotInProject.getId());
+            .contains(termInProject.getId()).doesNotContain(termNotInProject.getId());
         assertThat(paramsService.getParamsTermList("null", project))
-                .contains(termInProject.getId()).doesNotContain(termNotInProject.getId());
+            .contains(termInProject.getId()).doesNotContain(termNotInProject.getId());
         assertThat(paramsService.getParamsTermList(termInProject.getId() + "_" + termNotInProject.getId(), project))
-                .contains(termInProject.getId()).doesNotContain(termNotInProject.getId());
+            .contains(termInProject.getId()).doesNotContain(termNotInProject.getId());
         assertThat(paramsService.getParamsTermList(termNotInProject.getId() + "", project))
-                .doesNotContain(termInProject.getId(), termNotInProject.getId());
+            .doesNotContain(termInProject.getId(), termNotInProject.getId());
     }
 
     @Test
     public void property_group_to_show() {
         assertThat(paramsService.getPropertyGroupToShow(new JsonObject()))
-                .containsExactlyElementsOf(AnnotationListing.availableColumnsDefault);
+            .containsExactlyElementsOf(AnnotationListing.availableColumnsDefault);
 
         assertThat(paramsService.getPropertyGroupToShow(JsonObject.of("showGIS", true)))
-                .contains("gis");
+            .contains("gis");
 
         assertThat(paramsService.getPropertyGroupToShow(JsonObject.of("hideTerm", true)))
-                .doesNotContain("term");
+            .doesNotContain("term");
     }
 }

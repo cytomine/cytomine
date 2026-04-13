@@ -44,8 +44,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.TestUtils;
-import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.meta.AttachedFile;
 import be.cytomine.domain.meta.Description;
@@ -140,15 +140,15 @@ public class UserAnnotationServiceTests {
 
         /* Simulate call to CBIR */
         wireMockServer.stubFor(WireMock.post(urlPathEqualTo(CBIR_API_BASE_PATH + "/images"))
-                                   .withQueryParam("storage", WireMock.matching(".*"))
-                                   .withQueryParam("index", WireMock.equalTo("annotation"))
-                                   .willReturn(aResponse().withBody(UUID.randomUUID().toString()))
+            .withQueryParam("storage", WireMock.matching(".*"))
+            .withQueryParam("index", WireMock.equalTo("annotation"))
+            .willReturn(aResponse().withBody(UUID.randomUUID().toString()))
         );
 
         wireMockServer.stubFor(WireMock.delete(urlPathMatching(CBIR_API_BASE_PATH + "/images/.*"))
-                                   .withQueryParam("storage", WireMock.matching(".*"))
-                                   .withQueryParam("index", WireMock.equalTo("annotation"))
-                                   .willReturn(aResponse().withBody(UUID.randomUUID().toString()))
+            .withQueryParam("storage", WireMock.matching(".*"))
+            .withQueryParam("index", WireMock.equalTo("annotation"))
+            .willReturn(aResponse().withBody(UUID.randomUUID().toString()))
         );
     }
 
@@ -230,8 +230,10 @@ public class UserAnnotationServiceTests {
         assertThat(ids).doesNotContain(a4.getId());
 
         UserAnnotation a5 =
-            builder.given_a_user_annotation(sliceInstance, "POLYGON ((2 2, 3 2, 3 4, 2 4, 2 2))",
-                builder.given_superadmin(), term2);
+            builder.given_a_user_annotation(
+                sliceInstance, "POLYGON ((2 2, 3 2, 3 4, 2 4, 2 2))",
+                builder.given_superadmin(), term2
+            );
 
         list = userAnnotationService.listIncluded(
             sliceInstance.getImage(),
@@ -265,19 +267,22 @@ public class UserAnnotationServiceTests {
         assertThat(userAnnotationService.countByProject(
             userAnnotation.getProject(),
             DateUtils.addDays(userAnnotation.getCreated(), -30),
-            DateUtils.addDays(userAnnotation.getCreated(), 30)))
+            DateUtils.addDays(userAnnotation.getCreated(), 30)
+        ))
             .isEqualTo(1);
 
         assertThat(userAnnotationService.countByProject(
             userAnnotation.getProject(),
             DateUtils.addDays(userAnnotation.getCreated(), -30),
-            DateUtils.addDays(userAnnotation.getCreated(), -15)))
+            DateUtils.addDays(userAnnotation.getCreated(), -15)
+        ))
             .isEqualTo(0);
 
         assertThat(userAnnotationService.countByProject(
             userAnnotation.getProject(),
             DateUtils.addDays(userAnnotation.getCreated(), 15),
-            DateUtils.addDays(userAnnotation.getCreated(), 30)))
+            DateUtils.addDays(userAnnotation.getCreated(), 30)
+        ))
             .isEqualTo(0);
     }
 
@@ -286,9 +291,9 @@ public class UserAnnotationServiceTests {
         UserAnnotation userAnnotation = builder.given_a_user_annotation();
 
         Optional<AnnotationLight> first = userAnnotationService.listLight()
-                                              .stream()
-                                              .filter(x -> x.getId().equals(userAnnotation.getId()))
-                                              .findFirst();
+            .stream()
+            .filter(x -> x.getId().equals(userAnnotation.getId()))
+            .findFirst();
 
         assertThat(first).isPresent();
         assertThat(first.get().getContainer()).isEqualTo(userAnnotation.getProject().getId());
@@ -357,15 +362,19 @@ public class UserAnnotationServiceTests {
     void add_too_small_user_annotation() throws ParseException {
         UserAnnotation userAnnotation = builder.given_a_not_persisted_user_annotation();
         JsonObject jsonObject = userAnnotation.toJsonObject();
-        jsonObject.put("location",
+        jsonObject.put(
+            "location",
             "POLYGON ((225.73582220103702 306.89723126347087, 225.73582220103702 307"
                 + ".93556995227914, "
                 +
                 "226.08028300710947 307.93556995227914, 226.08028300710947 306.89723126347087, " +
-                "225.73582220103702 306.89723126347087))");
-        Assertions.assertThrows(WrongArgumentException.class, () -> {
-            userAnnotationService.add(jsonObject);
-        });
+                "225.73582220103702 306.89723126347087))"
+        );
+        Assertions.assertThrows(
+            WrongArgumentException.class, () -> {
+                userAnnotationService.add(jsonObject);
+            }
+        );
     }
 
     @Test
@@ -435,30 +444,32 @@ public class UserAnnotationServiceTests {
         UserAnnotation userAnnotation = builder.given_a_not_persisted_user_annotation();
         JsonObject jsonObject = userAnnotation.toJsonObject();
         jsonObject.put("location", "POINT(BAD GEOMETRY)");
-        Assertions.assertThrows(WrongArgumentException.class, () -> {
-            userAnnotationService.add(jsonObject);
-        });
+        Assertions.assertThrows(
+            WrongArgumentException.class, () -> {
+                userAnnotationService.add(jsonObject);
+            }
+        );
     }
 
     @Test
     void add_user_annotation_out_of_bounds() throws ParseException {
         UserAnnotation userAnnotation = builder.given_a_not_persisted_user_annotation();
         userAnnotation.setLocation(new WKTReader().read("" +
-                                                            "POLYGON ((" +
-                                                            "-1 -1," +
-                                                            "-1 " + userAnnotation.getImage()
-                                                                        .getBaseImage()
-                                                                        .getHeight() + "," +
-                                                            userAnnotation.getImage()
-                                                                .getBaseImage()
-                                                                .getWidth() + 5 + " "
-                                                            + userAnnotation.getImage()
-                                                                  .getBaseImage()
-                                                                  .getHeight() + "," +
-                                                            userAnnotation.getImage()
-                                                                .getBaseImage()
-                                                                .getWidth() + " 0," +
-                                                            "-1 -1))"));
+            "POLYGON ((" +
+            "-1 -1," +
+            "-1 " + userAnnotation.getImage()
+            .getBaseImage()
+            .getHeight() + "," +
+            userAnnotation.getImage()
+                .getBaseImage()
+                .getWidth() + 5 + " "
+            + userAnnotation.getImage()
+            .getBaseImage()
+            .getHeight() + "," +
+            userAnnotation.getImage()
+                .getBaseImage()
+                .getWidth() + " 0," +
+            "-1 -1))"));
         JsonObject jsonObject = userAnnotation.toJsonObject();
 
         CommandResponse commandResponse = userAnnotationService.add(jsonObject);
@@ -466,13 +477,13 @@ public class UserAnnotationServiceTests {
 
         assertThat(((UserAnnotation) commandResponse.getObject()).getLocation().toText())
             .isEqualTo("" +
-                           "POLYGON ((" +
-                           "0 " + userAnnotation.getImage().getBaseImage().getHeight() + ", " +
-                           userAnnotation.getImage().getBaseImage().getWidth() + " "
-                           + userAnnotation.getImage().getBaseImage().getHeight() + ", " +
-                           userAnnotation.getImage().getBaseImage().getWidth() + " 0, " +
-                           "0 0, " +
-                           "0 " + userAnnotation.getImage().getBaseImage().getHeight() + "))");
+                "POLYGON ((" +
+                "0 " + userAnnotation.getImage().getBaseImage().getHeight() + ", " +
+                userAnnotation.getImage().getBaseImage().getWidth() + " "
+                + userAnnotation.getImage().getBaseImage().getHeight() + ", " +
+                userAnnotation.getImage().getBaseImage().getWidth() + " 0, " +
+                "0 0, " +
+                "0 " + userAnnotation.getImage().getBaseImage().getHeight() + "))");
     }
 
     @Test
@@ -480,9 +491,11 @@ public class UserAnnotationServiceTests {
         UserAnnotation userAnnotation = builder.given_a_not_persisted_user_annotation();
         JsonObject jsonObject = userAnnotation.toJsonObject();
         jsonObject.put("location", "POLYGON EMPTY");
-        Assertions.assertThrows(WrongArgumentException.class, () -> {
-            userAnnotationService.add(jsonObject);
-        });
+        Assertions.assertThrows(
+            WrongArgumentException.class, () -> {
+                userAnnotationService.add(jsonObject);
+            }
+        );
     }
 
     @Test
@@ -490,9 +503,11 @@ public class UserAnnotationServiceTests {
         UserAnnotation userAnnotation = builder.given_a_not_persisted_user_annotation();
         JsonObject jsonObject = userAnnotation.toJsonObject();
         jsonObject.remove("location");
-        Assertions.assertThrows(WrongArgumentException.class, () -> {
-            userAnnotationService.add(jsonObject);
-        });
+        Assertions.assertThrows(
+            WrongArgumentException.class, () -> {
+                userAnnotationService.add(jsonObject);
+            }
+        );
     }
 
     @Test
@@ -500,9 +515,11 @@ public class UserAnnotationServiceTests {
         UserAnnotation userAnnotation = builder.given_a_not_persisted_user_annotation();
         JsonObject jsonObject = userAnnotation.toJsonObject();
         jsonObject.put("slice", -1);
-        Assertions.assertThrows(ObjectNotFoundException.class, () -> {
-            userAnnotationService.add(jsonObject);
-        });
+        Assertions.assertThrows(
+            ObjectNotFoundException.class, () -> {
+                userAnnotationService.add(jsonObject);
+            }
+        );
     }
 
     @Test
@@ -522,9 +539,11 @@ public class UserAnnotationServiceTests {
         JsonObject jsonObject = userAnnotation.toJsonObject();
         jsonObject.put("slice", null);
         jsonObject.put("image", -1);
-        Assertions.assertThrows(ObjectNotFoundException.class, () -> {
-            userAnnotationService.add(jsonObject);
-        });
+        Assertions.assertThrows(
+            ObjectNotFoundException.class, () -> {
+                userAnnotationService.add(jsonObject);
+            }
+        );
     }
 
     @Test
@@ -535,7 +554,8 @@ public class UserAnnotationServiceTests {
 
         userAnnotation.setLocation(new WKTReader().read(oldLocation));
         builder.persistAndReturn(userAnnotation);
-        CommandResponse commandResponse = userAnnotationService.update(userAnnotation,
+        CommandResponse commandResponse = userAnnotationService.update(
+            userAnnotation,
             userAnnotation.toJsonObject().withChange(
                 "location", newLocation)
         );
@@ -564,34 +584,34 @@ public class UserAnnotationServiceTests {
     void edit_user_annotation_out_of_bounds() throws ParseException {
         UserAnnotation userAnnotation = builder.given_a_user_annotation();
         userAnnotation.setLocation(new WKTReader().read("" +
-                                                            "POLYGON((" +
-                                                            "-1 -1," +
-                                                            "-1 " + userAnnotation.getImage()
-                                                                        .getBaseImage()
-                                                                        .getHeight() + "," +
-                                                            userAnnotation.getImage()
-                                                                .getBaseImage()
-                                                                .getWidth() + 5 + " "
-                                                            + userAnnotation.getImage()
-                                                                  .getBaseImage()
-                                                                  .getHeight() + "," +
-                                                            userAnnotation.getImage()
-                                                                .getBaseImage()
-                                                                .getWidth() + " 0," +
-                                                            "-1 -1))"));
+            "POLYGON((" +
+            "-1 -1," +
+            "-1 " + userAnnotation.getImage()
+            .getBaseImage()
+            .getHeight() + "," +
+            userAnnotation.getImage()
+                .getBaseImage()
+                .getWidth() + 5 + " "
+            + userAnnotation.getImage()
+            .getBaseImage()
+            .getHeight() + "," +
+            userAnnotation.getImage()
+                .getBaseImage()
+                .getWidth() + " 0," +
+            "-1 -1))"));
         JsonObject jsonObject = userAnnotation.toJsonObject();
         CommandResponse commandResponse = userAnnotationService.update(userAnnotation, jsonObject);
         assertThat(commandResponse.getStatus()).isEqualTo(200);
 
         assertThat(((UserAnnotation) commandResponse.getObject()).getLocation().toText())
             .isEqualTo("" +
-                           "POLYGON ((" +
-                           "0 " + userAnnotation.getImage().getBaseImage().getHeight() + ", " +
-                           userAnnotation.getImage().getBaseImage().getWidth() + " "
-                           + userAnnotation.getImage().getBaseImage().getHeight() + ", " +
-                           userAnnotation.getImage().getBaseImage().getWidth() + " 0, " +
-                           "0 0, " +
-                           "0 " + userAnnotation.getImage().getBaseImage().getHeight() + "))");
+                "POLYGON ((" +
+                "0 " + userAnnotation.getImage().getBaseImage().getHeight() + ", " +
+                userAnnotation.getImage().getBaseImage().getWidth() + " "
+                + userAnnotation.getImage().getBaseImage().getHeight() + ", " +
+                userAnnotation.getImage().getBaseImage().getWidth() + " 0, " +
+                "0 0, " +
+                "0 " + userAnnotation.getImage().getBaseImage().getHeight() + "))");
     }
 
     @Test
@@ -599,9 +619,11 @@ public class UserAnnotationServiceTests {
         UserAnnotation userAnnotation = builder.given_a_user_annotation();
         JsonObject jsonObject = userAnnotation.toJsonObject();
         jsonObject.put("location", "POINT (BAD GEOMETRY)");
-        Assertions.assertThrows(WrongArgumentException.class, () -> {
-            userAnnotationService.add(jsonObject);
-        });
+        Assertions.assertThrows(
+            WrongArgumentException.class, () -> {
+                userAnnotationService.add(jsonObject);
+            }
+        );
     }
 
     @Test
@@ -667,8 +689,10 @@ public class UserAnnotationServiceTests {
         assertThat(entityManager.find(AnnotationTrack.class, annotationTrack.getId())).isNotNull();
         assertThat(entityManager.find(Property.class, property.getId())).isNotNull();
         assertThat(entityManager.find(Description.class, description.getId())).isNotNull();
-        assertThat(entityManager.find(TagDomainAssociation.class,
-            tagDomainAssociation.getId())).isNotNull();
+        assertThat(entityManager.find(
+            TagDomainAssociation.class,
+            tagDomainAssociation.getId()
+        )).isNotNull();
         assertThat(entityManager.find(AttachedFile.class, attachedFile.getId())).isNotNull();
 
         CommandResponse commandResponse =
@@ -703,7 +727,8 @@ public class UserAnnotationServiceTests {
 
         userAnnotationService.doCorrectUserAnnotation(
             List.of(based.getId(), anotherAnnotation.getId()),
-            "POLYGON ((0 5000, 10000 5000, 10000 10000, 0 10000, 0 5000))", false);
+            "POLYGON ((0 5000, 10000 5000, 10000 10000, 0 10000, 0 5000))", false
+        );
 
         assertThat(userAnnotationRepository.findById(based.getId())).isPresent();
         assertThat(userAnnotationRepository.findById(based.getId()).get().getLocation()).isEqualTo(
@@ -728,7 +753,8 @@ public class UserAnnotationServiceTests {
 
         userAnnotationService.doCorrectUserAnnotation(
             List.of(based.getId(), anotherAnnotation.getId()),
-            "POLYGON ((0 5000, 2000 5000, 2000 2000, 0 2000, 0 5000))", true);
+            "POLYGON ((0 5000, 2000 5000, 2000 2000, 0 2000, 0 5000))", true
+        );
 
         assertThat(userAnnotationRepository.findById(based.getId())).isPresent();
         assertThat(userAnnotationRepository.findById(based.getId()).get().getLocation()).isEqualTo(
@@ -738,8 +764,8 @@ public class UserAnnotationServiceTests {
 
         assertThat(userAnnotationRepository.findById(anotherAnnotation.getId())).isPresent();
         assertThat(userAnnotationRepository.findById(anotherAnnotation.getId())
-                       .get()
-                       .getLocation()).isEqualTo(new WKTReader().read(
+            .get()
+            .getLocation()).isEqualTo(new WKTReader().read(
             "POLYGON ((10000 10000, 10000 16000, 16000 16000, 16000 10000, 10000 10000))"));
 
     }

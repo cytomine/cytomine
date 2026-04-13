@@ -95,8 +95,10 @@ public class CommandControllerTests {
         restCommandControllerMockMvc.perform(
                 get("/api/deletecommand.json").param("domain", "uploadedFile"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.collection",
-                hasSize(equalTo(initialSizeUploadedFileDeleteCommand + 1))));
+            .andExpect(jsonPath(
+                "$.collection",
+                hasSize(equalTo(initialSizeUploadedFileDeleteCommand + 1))
+            ));
 
         restCommandControllerMockMvc.perform(
                 get("/api/deletecommand.json").param("domain", "uploadedFile")

@@ -1,7 +1,5 @@
 package be.cytomine.controller.annotation;
 
-import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.common.PostGisTestConfiguration;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
@@ -13,13 +11,15 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import be.cytomine.BasicInstanceBuilder;
+import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.annotation.Annotation;
 import be.cytomine.domain.annotation.AnnotationLayer;
 import be.cytomine.domain.appengine.TaskRunLayer;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.everyItem;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -64,11 +64,13 @@ public class AnnotationLayerResourceTest {
         mockMvc.perform(get("/api/annotation-layers/{id}/annotations", annotationLayer.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.length()").value(3))
-            .andExpect(jsonPath("$[*].id", containsInAnyOrder(
+            .andExpect(jsonPath(
+                "$[*].id", containsInAnyOrder(
                     first.getId().intValue(),
                     second.getId().intValue(),
                     third.getId().intValue()
-            )))
+                )
+            ))
             .andExpect(jsonPath("$[*].annotationLayer.id", everyItem(is(annotationLayer.getId().intValue()))));
     }
 

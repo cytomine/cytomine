@@ -1,6 +1,5 @@
 package org.cytomine.e2etests.ui;
 
-import lombok.SneakyThrows;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.TimeoutException;

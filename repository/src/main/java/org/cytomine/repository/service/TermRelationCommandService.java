@@ -5,7 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.cytomine.repository.mapper.CommandMapper;
 import org.cytomine.repository.mapper.OntologyMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
@@ -29,7 +29,7 @@ import be.cytomine.common.repository.model.termrelation.payload.CreateTermRelati
 import be.cytomine.common.repository.model.termrelation.payload.UpdateTermRelation;
 
 @Component
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class TermRelationCommandService {
     private final TermRepository termRepository;
     private final TermRelationRepository termRelationRepository;

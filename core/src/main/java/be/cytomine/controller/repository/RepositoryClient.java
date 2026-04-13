@@ -7,6 +7,7 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
+import be.cytomine.common.repository.http.AnnotationHttpContract;
 import be.cytomine.common.repository.http.AnnotationTermHttpContract;
 import be.cytomine.common.repository.http.HealthService;
 import be.cytomine.common.repository.http.ReviewedAnnotationHttpContract;
@@ -24,6 +25,13 @@ public class RepositoryClient {
     @Bean
     RestClient repositoryRestClient() {
         return RestClient.builder().baseUrl(repositoryURL).build();
+    }
+
+    @Bean
+    AnnotationHttpContract annotationServiceClient(RestClient repositoryRestClient) {
+        RestClientAdapter adapter = RestClientAdapter.create(repositoryRestClient);
+        HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(adapter).build();
+        return factory.createClient(AnnotationHttpContract.class);
     }
 
     @Bean

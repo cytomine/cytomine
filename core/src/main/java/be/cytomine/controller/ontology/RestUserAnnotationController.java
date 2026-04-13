@@ -1,21 +1,16 @@
 package be.cytomine.controller.ontology;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.Optional;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.io.ParseException;
 import org.springframework.cloud.gateway.mvc.ProxyExchange;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -25,23 +20,15 @@ import org.springframework.web.bind.annotation.RestController;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.dto.image.CropParameter;
-import be.cytomine.dto.json.JsonInput;
-import be.cytomine.dto.json.JsonMultipleObject;
-import be.cytomine.dto.json.JsonSingleObject;
 import be.cytomine.exceptions.ObjectNotFoundException;
-import be.cytomine.exceptions.WrongArgumentException;
-import be.cytomine.service.ModelService;
 import be.cytomine.service.middleware.ImageServerService;
 import be.cytomine.service.ontology.SharedAnnotationService;
 import be.cytomine.service.ontology.TermService;
 import be.cytomine.service.ontology.UserAnnotationService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.report.ReportService;
-import be.cytomine.service.security.UserService;
 import be.cytomine.utils.AnnotationListingBuilder;
-import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
 
 @RestController
@@ -53,8 +40,6 @@ public class RestUserAnnotationController extends RestCytomineController {
     private final UserAnnotationService userAnnotationService;
 
     private final ProjectService projectService;
-
-    private final UserService userService;
 
     private final TermService termService;
 
@@ -72,37 +57,6 @@ public class RestUserAnnotationController extends RestCytomineController {
         return responseSuccess(userAnnotationService.listLight());
     }
 
-
-    @GetMapping("/user/{idUser}/userannotation/count.json")
-    public ResponseEntity<String> countByUser(
-        @PathVariable(value = "idUser") Long idUser,
-        @RequestParam(value = "project", required = false) Long idProject
-    ) {
-        log.debug("REST request to count user annotation by user/project");
-        User user = userService.find(idUser)
-            .orElseThrow(() -> new ObjectNotFoundException("User", idUser));
-        Project project = null;
-        if (idProject != null) {
-            project = projectService.find(idProject)
-                .orElseThrow(() -> new ObjectNotFoundException("Project", idProject));
-        }
-        return responseSuccess(JsonObject.of("total", userAnnotationService.count((User) user, project)));
-    }
-
-
-    @GetMapping("/project/{idProject}/userannotation/count.json")
-    public ResponseEntity<String> countByProject(
-        @PathVariable(value = "idProject") Long idProject,
-        @RequestParam(value = "startDate", required = false) Long startDate,
-        @RequestParam(value = "endDate", required = false) Long endDate
-    ) {
-        log.debug("REST request to count user annotation by user/project");
-        Project project = projectService.find(idProject)
-            .orElseThrow(() -> new ObjectNotFoundException("Project", idProject));
-        Date start = (startDate != null ? new Date(startDate) : null);
-        Date end = (endDate != null ? new Date(endDate) : null);
-        return responseSuccess(JsonObject.of("total", userAnnotationService.countByProject(project, start, end)));
-    }
 
     /**
      * Download a report (pdf, xls,...) with user annotation data from a specific project
@@ -170,72 +124,6 @@ public class RestUserAnnotationController extends RestCytomineController {
         UserAnnotation annotation = userAnnotationService.find(annotationId)
             .orElseThrow(() -> new ObjectNotFoundException("Annotation", annotationId));
         return responseSuccess(sharedAnnotationService.listComments(annotation));
-    }
-
-
-    @GetMapping("/userannotation/{id}.json")
-    public ResponseEntity<String> show(
-        @PathVariable Long id
-    ) {
-        log.debug("REST request to get Term : {}", id);
-        return userAnnotationService.find(id)
-            .map(this::responseSuccess)
-            .orElseGet(() -> responseNotFound("UserAnnotation", id));
-    }
-
-
-    /**
-     * Add a new term Use next add relation-term to add relation with another term
-     *
-     * @param json JSON with Term data
-     *
-     * @return Response map with .code = http response code and .data.term = new created Term
-     */
-    @PostMapping("/userannotation.json")
-    public ResponseEntity<String> add(
-        @RequestBody String json,
-        @RequestParam(required = false) Long minPoint,
-        @RequestParam(required = false) Long maxPoint
-    ) {
-        log.debug("REST request to save user annotation");
-        JsonInput data;
-        try {
-            data = new ObjectMapper().readValue(json, JsonMultipleObject.class);
-            for (JsonObject datum : ((JsonMultipleObject) data)) {
-                datum.putIfAbsent("minPoint", minPoint);
-                datum.putIfAbsent("maxPoint", maxPoint);
-            }
-            // If fails to parse as a single object, parse as a list
-        } catch (Exception ex) {
-            try {
-                data = new ObjectMapper().readValue(json, JsonSingleObject.class);
-                ((JsonSingleObject) data).putIfAbsent("minPoint", minPoint);
-                ((JsonSingleObject) data).putIfAbsent("maxPoint", maxPoint);
-            } catch (JsonProcessingException e) {
-                throw new WrongArgumentException("Json not valid");
-            }
-        }
-        return add(userAnnotationService, data);
-    }
-
-    public CommandResponse addOne(ModelService service, JsonObject json) {
-        if (json.isMissing("location")) {
-            throw new WrongArgumentException("Annotation must have a valid geometry:" + json.get("location"));
-        }
-        return service.add(json);
-    }
-
-
-    @PutMapping("/userannotation/{id}.json")
-    public ResponseEntity<String> edit(@PathVariable String id, @RequestBody JsonObject json) {
-        log.debug("REST request to edit user annotation : " + id);
-        return update(userAnnotationService, json);
-    }
-
-    @DeleteMapping("/userannotation/{id}.json")
-    public ResponseEntity<String> delete(@PathVariable String id) {
-        log.debug("REST request to delete an annotation : " + id);
-        return delete(userAnnotationService, JsonObject.of("id", id), null);
     }
 
 

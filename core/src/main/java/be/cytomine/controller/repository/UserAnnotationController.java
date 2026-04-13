@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -21,7 +22,6 @@ import be.cytomine.common.repository.model.command.payload.response.HttpCommandR
 import be.cytomine.common.repository.model.command.payload.response.UserAnnotationResponse;
 import be.cytomine.common.repository.model.userannotation.payload.CreateUserAnnotation;
 import be.cytomine.common.repository.model.userannotation.payload.UpdateUserAnnotation;
-import be.cytomine.controller.utils.PageMapper;
 import be.cytomine.service.CurrentUserService;
 
 import static java.lang.String.format;
@@ -34,10 +34,9 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 public class UserAnnotationController {
 
     private final UserAnnotationHttpContract userAnnotationHttpContract;
-    private final PageMapper pageMapper;
     private final CurrentUserService currentUserService;
 
-    @GetMapping("user_annotation/{id}.json")
+    @GetMapping("userannotation/{id}.json")
     public UserAnnotationResponse get(@PathVariable long id) {
         log.debug("REST request to get user annotation {}", id);
         long userId = currentUserService.getCurrentUser().getId();
@@ -46,7 +45,7 @@ public class UserAnnotationController {
                 format("Unable to find user annotation with id: %s", id)));
     }
 
-    @GetMapping("user_annotation/user/{userAnnotationUserId}/image/{imageId}.json")
+    @GetMapping("userannotation/user/{userAnnotationUserId}/image/{imageId}.json")
     public List<UserAnnotationResponse> listByUserAndImage(
         @PathVariable long userAnnotationUserId,
         @PathVariable long imageId) {
@@ -55,35 +54,34 @@ public class UserAnnotationController {
             userAnnotationUserId, imageId, currentUserService.getCurrentUser().getId());
     }
 
-    @GetMapping("user_annotation/count/project/{projectId}.json")
+    @GetMapping("project/{projectId}/userannotation/count.json")
     public long countByProject(@PathVariable long projectId) {
         log.debug("REST request to count user annotations for project {}", projectId);
         long userId = currentUserService.getCurrentUser().getId();
         return userAnnotationHttpContract.countByProject(projectId, userId);
     }
 
-    @GetMapping("user_annotation/count/user/{userAnnotationUserId}.json")
-    public long countByUser(@PathVariable long userAnnotationUserId) {
-        log.debug("REST request to count user annotations for user {}", userAnnotationUserId);
+    @GetMapping("user/{userAnnotationUserId}/userannotation/count.json")
+    public long countByUser(@PathVariable long userAnnotationUserId,
+                            @RequestParam(required = false) Long projectId) {
         long userId = currentUserService.getCurrentUser().getId();
+        if (projectId != null) {
+            log.debug("REST request to count user annotations for user {} and project {}", userAnnotationUserId,
+                projectId);
+            return userAnnotationHttpContract.countByUserAndProject(userAnnotationUserId, projectId, userId);
+        }
+        log.debug("REST request to count user annotations for user {}", userAnnotationUserId);
         return userAnnotationHttpContract.countByUser(userAnnotationUserId, userId);
     }
 
-    @GetMapping("user_annotation/count/user/{userAnnotationUserId}/project/{projectId}.json")
-    public long countByUserAndProject(@PathVariable long userAnnotationUserId, @PathVariable long projectId) {
-        log.debug("REST request to count user annotations for user {} and project {}", userAnnotationUserId, projectId);
-        long userId = currentUserService.getCurrentUser().getId();
-        return userAnnotationHttpContract.countByUserAndProject(userAnnotationUserId, projectId, userId);
-    }
-
-    @PostMapping("user_annotation.json")
+    @PostMapping("userannotation.json")
     public Optional<HttpCommandResponse> create(@RequestBody @Valid CreateUserAnnotation createUserAnnotation) {
         long userId = currentUserService.getCurrentUser().getId();
         log.debug("REST request to create user annotation for user {}", userId);
         return userAnnotationHttpContract.create(userId, createUserAnnotation);
     }
 
-    @PutMapping("user_annotation/{id}.json")
+    @PutMapping("userannotation/{id}.json")
     public HttpCommandResponse update(@PathVariable long id,
                                       @RequestBody @Valid UpdateUserAnnotation updateUserAnnotation) {
         log.debug("REST request to update user annotation {}", id);
@@ -93,7 +91,7 @@ public class UserAnnotationController {
             format("Unable to find user annotation with id: %d", id)));
     }
 
-    @DeleteMapping("user_annotation/{id}.json")
+    @DeleteMapping("userannotation/{id}.json")
     public HttpCommandResponse delete(@PathVariable long id) {
         log.debug("REST request to delete user annotation {}", id);
         Optional<HttpCommandResponse> result = userAnnotationHttpContract.delete(

@@ -34,7 +34,7 @@ public class ReviewedAnnotationController {
     private final ReviewedAnnotationHttpContract reviewedAnnotationHttpContract;
     private final CurrentUserService currentUserService;
 
-    @GetMapping("reviewed_annotation/{id}.json")
+    @GetMapping("reviewedannotation/{id}.json")
     public ReviewedAnnotationResponse get(@PathVariable long id) {
         log.debug("REST request to get reviewed annotation {}", id);
         long userId = currentUserService.getCurrentUser().getId();
@@ -43,21 +43,21 @@ public class ReviewedAnnotationController {
                 format("Unable to find reviewed annotation with id: %s", id)));
     }
 
-    @GetMapping("reviewed_annotation/count/term/{termId}.json")
+    @GetMapping("reviewedannotation/count/term/{termId}.json")
     public long countByTerm(@PathVariable long termId) {
         log.debug("REST request to count reviewed annotations for term {}", termId);
         long userId = currentUserService.getCurrentUser().getId();
         return reviewedAnnotationHttpContract.countByTerm(termId, userId);
     }
 
-    @PostMapping("reviewed_annotation.json")
+    @PostMapping("reviewedannotation.json")
     public Optional<HttpCommandResponse> create(@RequestBody @Valid CreateReviewedAnnotation createReviewedAnnotation) {
         long userId = currentUserService.getCurrentUser().getId();
         log.debug("REST request to create reviewed annotation for user {}", userId);
         return reviewedAnnotationHttpContract.create(userId, createReviewedAnnotation);
     }
 
-    @PutMapping("reviewed_annotation/{id}.json")
+    @PutMapping("reviewedannotation/{id}.json")
     public HttpCommandResponse update(@PathVariable long id,
                                       @RequestBody @Valid UpdateReviewedAnnotation update) {
         log.debug("REST request to update reviewed annotation {}", id);
@@ -67,7 +67,7 @@ public class ReviewedAnnotationController {
             format("Unable to find reviewed annotation with id: %d", id)));
     }
 
-    @DeleteMapping("reviewed_annotation/{id}.json")
+    @DeleteMapping("reviewedannotation/{id}.json")
     public HttpCommandResponse delete(@PathVariable long id) {
         log.debug("REST request to delete reviewed annotation {}", id);
         Optional<HttpCommandResponse> result = reviewedAnnotationHttpContract.delete(

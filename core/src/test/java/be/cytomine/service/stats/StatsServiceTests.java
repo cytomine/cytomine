@@ -2,10 +2,8 @@ package be.cytomine.service.stats;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import jakarta.persistence.EntityManager;
@@ -497,8 +495,6 @@ public class StatsServiceTests {
         annotation2.setCreated(DateUtils.addDays(new Date(), -1));
         builder.persistAndReturn(annotation2);
 
-        List<JsonObject> terms;
-
         List<JsonObject> results = statsService.statUser(project, null, null);
 
         assertThat(results).hasSize(1);
@@ -506,18 +502,19 @@ public class StatsServiceTests {
         assertThat(results.get(0).getJSONAttrLong("value")).isEqualTo(2);
     }
 
-
     @Test
-    void retrieve_storage_spaces() throws JsonProcessingException {
+    void retrieve_storage_spaces() {
         configureFor("localhost", 8888);
-        String body = objectMapper.writeValueAsString(Map.of(
-            "used", 193396892,
-            "available", 445132860,
-            "usedP", 0.302878435,
-            "hostname", "b52416f53249",
-            "mount", "/data/images",
-            "ip", null
-        ));
+        String body = """
+            {
+              "used": 193396892,
+              "available": 445132860,
+              "usedP": 0.302878435,
+              "hostname": "b52416f53249",
+              "mount": "/data/images",
+              "ip": null
+            }
+            """;
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/storage/size.json")).willReturn(aResponse().withBody(body)));
 
         JsonObject response = statsService.statUsedStorage();
@@ -527,7 +524,6 @@ public class StatsServiceTests {
         assertThat(response.getJSONAttrLong("available")).isGreaterThanOrEqualTo(445132860);
         assertThat(response.getJSONAttrLong("used")).isGreaterThanOrEqualTo(193396892);
         assertThat(response.getJSONAttrDouble("usedP")).isGreaterThan(0);
-
     }
 
     @Test

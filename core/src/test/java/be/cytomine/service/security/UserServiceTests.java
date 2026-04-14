@@ -1,21 +1,5 @@
 package be.cytomine.service.security;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -26,7 +10,6 @@ import java.util.stream.Collectors;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.time.DateUtils;
 import org.junit.jupiter.api.AfterAll;
@@ -137,9 +120,6 @@ public class UserServiceTests {
     private PermissionService permissionService;
 
     @Autowired
-    private EntityManager entityManager;
-
-    @Autowired
     private UserPositionService userPositionService;
 
     private static WireMockServer wireMockServer = new WireMockServer(8888);
@@ -181,8 +161,8 @@ public class UserServiceTests {
         persistentUserPositionRepository.deleteAll();
     }
 
-    PersistentProjectConnection given_a_persistent_connection_in_project(User user, Project project, Date created) {
-        PersistentProjectConnection connection = projectConnectionService.add(
+    PersistentProjectConnection givenAPersistentConnectionInProject(User user, Project project, Date created) {
+        return projectConnectionService.add(
             user,
             project,
             "xxx",
@@ -191,10 +171,9 @@ public class UserServiceTests {
             "123",
             created
         );
-        return connection;
     }
 
-    PersistentImageConsultation given_a_persistent_image_consultation(
+    PersistentImageConsultation givenAPersistentImageConsultation(
         User user,
         ImageInstance imageInstance,
         Date created
@@ -202,7 +181,7 @@ public class UserServiceTests {
         return imageConsultationService.add(user, imageInstance.getId(), "xxx", "mode", created);
     }
 
-    PersistentConnection given_a_last_connection(User user, Long idProject, Date date) {
+    PersistentConnection givenALastConnection(User user, Long idProject, Date date) {
         LastConnection connection = new LastConnection();
         connection.setId(sequenceService.generateID());
         connection.setUser(user.getId());
@@ -299,7 +278,6 @@ public class UserServiceTests {
         assertThat(authInformation.getGuestByNow()).isFalse();
     }
 
-
     @Test
     void list_users_with_no_filters_no_extension() {
         Page<Map<String, Object>> list = userService.list(new ArrayList<>(), "created", "desc", 0L, 0L);
@@ -307,8 +285,6 @@ public class UserServiceTests {
         assertThat(list.getTotalElements()).isGreaterThanOrEqualTo(1);
         assertThat(list.getContent().stream()
             .map(x -> x.get("id"))).contains(builder.givenSuperAdmin().getId());
-
-
     }
 
     @Test
@@ -349,7 +325,6 @@ public class UserServiceTests {
 
     @Test
     void list_users_with_sort_username() {
-
         User user1 = builder.givenAUser("list_users_with_sort_username1");
         User user2 = builder.givenAUser("list_users_with_sort_username2");
 
@@ -378,13 +353,11 @@ public class UserServiceTests {
 
     @Test
     void list_users_with_page() {
-
         User user1 = builder.givenAUser("list_users_with_page1");
         User user2 = builder.givenAUser("list_users_with_page2");
         User user3 = builder.givenAUser("list_users_with_page3");
         User user4 = builder.givenAUser("list_users_with_page4");
         User user5 = builder.givenAUser("list_users_with_page5");
-
 
         Page<Map<String, Object>> list = userService.list(
             new ArrayList<>(List.of(new SearchParameterEntry(
@@ -465,8 +438,6 @@ public class UserServiceTests {
         User anotherUser = builder.givenAUser();
         builder.addUserToProject(projectWhereUserIsMissing, anotherUser.getUsername(), WRITE);
         builder.addUserToProject(projectWithTwoUsers, anotherUser.getUsername(), WRITE);
-
-        List<SearchParameterEntry> searchParameterEntries = new ArrayList<>();
 
         Page<JsonObject> page = userService.listUsersByProject(
             projectWhereUserIsManager,
@@ -630,8 +601,8 @@ public class UserServiceTests {
         ImageInstance imageInstance = builder.givenAnImageInstance(project);
         imageInstance.setInstanceFilename(UUID.randomUUID().toString());
 
-        given_a_persistent_image_consultation(userNeverOpenImage, imageInstance, DateUtils.addDays(new Date(), -2));
-        given_a_persistent_image_consultation(
+        givenAPersistentImageConsultation(userNeverOpenImage, imageInstance, DateUtils.addDays(new Date(), -2));
+        givenAPersistentImageConsultation(
             userWhoHasOpenImageAfter,
             imageInstance,
             DateUtils.addDays(new Date(), -1)
@@ -640,7 +611,14 @@ public class UserServiceTests {
         UserSearchExtension userSearchExtension = new UserSearchExtension();
         userSearchExtension.setWithLastImage(true);
         Page<JsonObject> page = userService.listUsersExtendedByProject(
-            project, userSearchExtension, new ArrayList<>(), "lastImageName", "desc", 0L, 0L);
+            project,
+            userSearchExtension,
+            new ArrayList<>(),
+            "lastImageName",
+            "desc",
+            0L,
+            0L
+        );
         assertThat(page.getTotalElements()).isEqualTo(3);
         assertThat(page.getContent().stream().map(x -> x.getJSONAttrLong("id"))).contains(
             userWhoHasOpenImage.getId(),
@@ -662,12 +640,12 @@ public class UserServiceTests {
         builder.addUserToProject(project, userWhoHasOpenProjectAfter.getUsername(), READ);
         builder.addUserToProject(project, userNeverOpenProject.getUsername(), WRITE);
 
-        PersistentProjectConnection userWhoHasOpenProjectConnection = given_a_persistent_connection_in_project(
+        PersistentProjectConnection userWhoHasOpenProjectConnection = givenAPersistentConnectionInProject(
             userWhoHasOpenProject,
             project,
             DateUtils.addDays(new Date(), -2)
         );
-        PersistentProjectConnection userWhoHasOpenProjectAfterConnection = given_a_persistent_connection_in_project(
+        PersistentProjectConnection userWhoHasOpenProjectAfterConnection = givenAPersistentConnectionInProject(
             userWhoHasOpenProjectAfter,
             project,
             DateUtils.addDays(new Date(), -1)
@@ -677,8 +655,6 @@ public class UserServiceTests {
         userSearchExtension.setWithLastConnection(true);
         Page<JsonObject> page = userService.listUsersExtendedByProject(
             project, userSearchExtension, new ArrayList<>(), "lastConnection", "desc", 0L, 0L);
-        System.out.println(page);
-        System.out.println(page.getContent());
         assertThat(page.getTotalElements()).isEqualTo(3);
         assertThat(page.getContent().get(0).getJSONAttrLong("id")).isEqualTo(userWhoHasOpenProjectAfter.getId());
         assertThat(page.getContent().get(0).getJSONAttrDate("lastConnection")).isEqualTo(
@@ -691,8 +667,14 @@ public class UserServiceTests {
         assertThat(page.getContent().get(2).getJSONAttrStr("lastImage")).isNull();
 
         page = userService.listUsersExtendedByProject(
-            project, userSearchExtension, new ArrayList<>(), "lastConnection", "asc", 0L, 0L);
-        System.out.println(page);
+            project,
+            userSearchExtension,
+            new ArrayList<>(),
+            "lastConnection",
+            "asc",
+            0L,
+            0L
+        );
         assertThat(page.getTotalElements()).isEqualTo(3);
         assertThat(page.getContent().get(0).getJSONAttrLong("id")).isEqualTo(userNeverOpenProject.getId());
         assertThat(page.getContent().get(0).getJSONAttrDate("lastConnection")).isNull();
@@ -717,13 +699,13 @@ public class UserServiceTests {
         builder.addUserToProject(project, userWhoHasOpenProject11x.getUsername(), READ);
         builder.addUserToProject(project, userNeverOpenProject.getUsername(), WRITE);
 
-        PersistentProjectConnection userWhoHasOpenProjectConnection = given_a_persistent_connection_in_project(
+        PersistentProjectConnection userWhoHasOpenProjectConnection = givenAPersistentConnectionInProject(
             userWhoHasOpenOnce,
             project,
             DateUtils.addDays(new Date(), -2)
         );
         for (int i = 0; i < 11; i++) {
-            given_a_persistent_connection_in_project(
+            givenAPersistentConnectionInProject(
                 userWhoHasOpenProject11x,
                 project,
                 DateUtils.addDays(new Date(), -1)
@@ -733,8 +715,14 @@ public class UserServiceTests {
         UserSearchExtension userSearchExtension = new UserSearchExtension();
         userSearchExtension.setWithNumberConnections(true);
         Page<JsonObject> page = userService.listUsersExtendedByProject(
-            project, userSearchExtension, new ArrayList<>(), "frequency", "desc", 0L, 0L);
-        System.out.println(page);
+            project,
+            userSearchExtension,
+            new ArrayList<>(),
+            "frequency",
+            "desc",
+            0L,
+            0L
+        );
         assertThat(page.getTotalElements()).isEqualTo(3);
         assertThat(page.getContent().get(0).getJSONAttrLong("id")).isEqualTo(userWhoHasOpenProject11x.getId());
         assertThat(page.getContent().get(0).getJSONAttrInteger("numberConnections")).isEqualTo(11);
@@ -744,7 +732,14 @@ public class UserServiceTests {
         assertThat(page.getContent().get(2).getJSONAttrInteger("numberConnections")).isEqualTo(0);
 
         page = userService.listUsersExtendedByProject(
-            project, userSearchExtension, new ArrayList<>(), "frequency", "asc", 0L, 0L);
+            project,
+            userSearchExtension,
+            new ArrayList<>(),
+            "frequency",
+            "asc",
+            0L,
+            0L
+        );
         assertThat(page.getTotalElements()).isEqualTo(3);
         assertThat(page.getContent().get(0).getJSONAttrLong("id")).isEqualTo(userNeverOpenProject.getId());
         assertThat(page.getContent().get(0).getJSONAttrInteger("numberConnections")).isEqualTo(0);
@@ -771,10 +766,8 @@ public class UserServiceTests {
         builder.addUserToProject(projectWhereUserIsMissing, anotherUser.getUsername(), WRITE);
         builder.addUserToProject(projectWithTwoUsers, anotherUser.getUsername(), WRITE);
 
-        assertThat(userService.listAdmins(projectWhereUserIsManager))
-            .contains(user).doesNotContain(anotherUser);
-        assertThat(userService.listAdmins(projectWhereUserIsContributor))
-            .doesNotContain(user);
+        assertThat(userService.listAdmins(projectWhereUserIsManager)).contains(user).doesNotContain(anotherUser);
+        assertThat(userService.listAdmins(projectWhereUserIsContributor)).doesNotContain(user);
     }
 
     @Test
@@ -823,16 +816,13 @@ public class UserServiceTests {
             .contains(user);
         assertThat(userService.listUsers(projectWhereUserIsContributor.getOntology()))
             .contains(user);
-
     }
 
     @Test
     void list_storage_users() {
         Storage storage = builder.givenAStorage(builder.givenSuperAdmin());
 
-        assertThat(userService.listUsers(storage))
-            .contains(builder.givenSuperAdmin());
-
+        assertThat(userService.listUsers(storage)).contains(builder.givenSuperAdmin());
     }
 
     @Test
@@ -843,8 +833,7 @@ public class UserServiceTests {
 
         builder.addUserToProject(project, "superadmin", WRITE);
 
-        assertThat(userService.listAll(project))
-            .contains(user);
+        assertThat(userService.listAll(project)).contains(user);
     }
 
     @Test
@@ -930,7 +919,7 @@ public class UserServiceTests {
         User userOffline = builder.givenAUser();
 
         assertThat(userService.getAllOnlineUsers()).isEmpty();
-        given_a_last_connection(userOnline, null, new Date());
+        givenALastConnection(userOnline, null, new Date());
 
         assertThat(userService.getAllOnlineUsers()).contains(userOnline)
             .doesNotContain(userOffline);
@@ -945,9 +934,9 @@ public class UserServiceTests {
         Project project = builder.givenAProject();
         Project anotherProject = builder.givenAProject();
 
-        given_a_last_connection(userOffline, project.getId(), DateUtils.addDays(new Date(), -15));
-        given_a_last_connection(userOnline, project.getId(), DateUtils.addSeconds(new Date(), -15));
-        given_a_last_connection(
+        givenALastConnection(userOffline, project.getId(), DateUtils.addDays(new Date(), -15));
+        givenALastConnection(userOnline, project.getId(), DateUtils.addSeconds(new Date(), -15));
+        givenALastConnection(
             userOnlineButOnDifferentProject,
             anotherProject.getId(),
             DateUtils.addSeconds(new Date(), -10)
@@ -988,15 +977,15 @@ public class UserServiceTests {
         builder.addUserToProject(project, userFriendOnline.getUsername(), READ);
         builder.addUserToProject(project, userFriendOffline.getUsername(), READ);
 
-        given_a_last_connection(userFriendOffline, project.getId(), DateUtils.addDays(new Date(), -15));
-        given_a_last_connection(userFriendOnline, project.getId(), DateUtils.addSeconds(new Date(), -15));
+        givenALastConnection(userFriendOffline, project.getId(), DateUtils.addDays(new Date(), -15));
+        givenALastConnection(userFriendOnline, project.getId(), DateUtils.addSeconds(new Date(), -15));
 
         assertThat(userService.getAllFriendsUsersOnline(user)).contains(userFriendOnline)
             .doesNotContain(userFriendOffline);
     }
 
     @Test
-    void list_friend_users_offline_on_a_project() {
+    void listFriendUsersOfflineOnAProject() {
         User user = builder.givenDefaultUser();
         User userFriendOnline = builder.givenAUser();
         User userFriendOnlineButOnAnotherProject = builder.givenAUser();
@@ -1007,12 +996,12 @@ public class UserServiceTests {
         builder.addUserToProject(project, userFriendOnline.getUsername(), READ);
         builder.addUserToProject(project, userFriendOnlineButOnAnotherProject.getUsername(), READ);
 
-        given_a_last_connection(
+        givenALastConnection(
             userFriendOnlineButOnAnotherProject,
             builder.givenAProject().getId(),
             DateUtils.addSeconds(new Date(), -15)
         );
-        given_a_last_connection(userFriendOnline, project.getId(), DateUtils.addSeconds(new Date(), -15));
+        givenALastConnection(userFriendOnline, project.getId(), DateUtils.addSeconds(new Date(), -15));
 
         assertThat(userService.getAllFriendsUsersOnline(user, project)).contains(userFriendOnline)
             .doesNotContain(userFriendOnlineButOnAnotherProject);
@@ -1026,13 +1015,13 @@ public class UserServiceTests {
 
         builder.addUserToProject(project, userOnline.getUsername());
 
-        PersistentProjectConnection lastConnection = given_a_persistent_connection_in_project(
+        PersistentProjectConnection lastConnection = givenAPersistentConnectionInProject(
             userOnline,
             project,
             DateUtils.addSeconds(new Date(), -15)
         );
 
-        PersistentImageConsultation consultation = given_a_persistent_image_consultation(
+        PersistentImageConsultation consultation = givenAPersistentImageConsultation(
             userOnline,
             builder.givenAnImageInstance(project),
             new Date()
@@ -1057,15 +1046,15 @@ public class UserServiceTests {
         Project project = builder.givenAProject();
         Project anotherProject = builder.givenAProject();
 
-        given_a_last_connection(userOffline, project.getId(), DateUtils.addDays(new Date(), -15));
-        given_a_last_connection(userOnline, project.getId(), DateUtils.addSeconds(new Date(), -15));
-        given_a_last_connection(
+        givenALastConnection(userOffline, project.getId(), DateUtils.addDays(new Date(), -15));
+        givenALastConnection(userOnline, project.getId(), DateUtils.addSeconds(new Date(), -15));
+        givenALastConnection(
             userOnlineButOnDifferentProject,
             anotherProject.getId(),
             DateUtils.addSeconds(new Date(), -10)
         );
 
-        given_a_persistent_user_position(
+        givenAPersistentUserPosition(
             DateUtils.addSeconds(new Date(), -15), userOnline,
             builder.givenANotPersistedSliceInstance(
                 builder.givenAnImageInstance(project),
@@ -1090,20 +1079,22 @@ public class UserServiceTests {
             .findFirst()).isEmpty();
     }
 
-    PersistentUserPosition given_a_persistent_user_position(
+    PersistentUserPosition givenAPersistentUserPosition(
         Date creation,
         User user,
         SliceInstance sliceInstance,
         AreaDTO areaDTO
     ) {
-        PersistentUserPosition connection =
-            userPositionService.add(
-                creation, user, sliceInstance, sliceInstance.getImage(), areaDTO,
-                1,
-                5.0,
-                false
-            );
-        return connection;
+        return userPositionService.add(
+            creation,
+            user,
+            sliceInstance,
+            sliceInstance.getImage(),
+            areaDTO,
+            1,
+            5.0,
+            false
+        );
     }
 
     @Test
@@ -1112,18 +1103,18 @@ public class UserServiceTests {
         Project project = builder.givenAProject();
         builder.addUserToProject(project, userOnline.getUsername());
 
-        PersistentProjectConnection firstConnection = given_a_persistent_connection_in_project(
+        PersistentProjectConnection firstConnection = givenAPersistentConnectionInProject(
             userOnline,
             project,
             DateUtils.addDays(new Date(), -15)
         );
-        PersistentProjectConnection lastConnection = given_a_persistent_connection_in_project(
+        PersistentProjectConnection lastConnection = givenAPersistentConnectionInProject(
             userOnline,
             project,
             DateUtils.addSeconds(new Date(), -15)
         );
 
-        given_a_persistent_image_consultation(userOnline, builder.givenAnImageInstance(project), new Date());
+        givenAPersistentImageConsultation(userOnline, builder.givenAnImageInstance(project), new Date());
 
         JsonObject data = userService.getResumeActivities(project, userOnline);
 
@@ -1133,7 +1124,6 @@ public class UserServiceTests {
         assertThat(data.getJSONAttrInteger("totalConnections")).isEqualTo(2);
         assertThat(data.getJSONAttrInteger("totalConsultations")).isEqualTo(1);
         assertThat(data.getJSONAttrInteger("totalAnnotationSelections")).isEqualTo(0);
-
     }
 
     // TODO: IAM Account
@@ -1179,7 +1169,6 @@ public class UserServiceTests {
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), ADMINISTRATION)).isFalse();
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isFalse();
         assertThat(permissionService.hasACLPermission(project.getOntology(), user.getUsername(), READ)).isFalse();
-
     }
 
     @Test
@@ -1196,7 +1185,6 @@ public class UserServiceTests {
 
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isFalse();
         assertThat(permissionService.hasACLPermission(project.getOntology(), user.getUsername(), READ)).isFalse();
-
     }
 
     @Test
@@ -1217,7 +1205,6 @@ public class UserServiceTests {
 
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isFalse();
         assertThat(permissionService.hasACLPermission(project.getOntology(), user.getUsername(), READ)).isTrue();
-
     }
 
     @Test

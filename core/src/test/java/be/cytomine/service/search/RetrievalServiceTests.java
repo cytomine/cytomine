@@ -76,7 +76,7 @@ public class RetrievalServiceTests {
     void index_annotation_with_success() throws ParseException {
         UserAnnotation
             annotation
-            = UserAnnotationResourceTests.given_a_user_annotation_with_valid_image_server(builder);
+            = UserAnnotationResourceTests.givenAUserAnnotationWithValidImageServer(builder);
 
         /* Simulate call to CBIR */
         String expectedUrlPath = CBIR_API_BASE_PATH + "/images";
@@ -140,7 +140,7 @@ public class RetrievalServiceTests {
     void search_similar_images_with_success() throws JsonProcessingException, ParseException {
         UserAnnotation
             annotation
-            = UserAnnotationResourceTests.given_a_user_annotation_with_valid_image_server(builder);
+            = UserAnnotationResourceTests.givenAUserAnnotationWithValidImageServer(builder);
 
         /* Simulate call to CBIR */
         ObjectMapper objectMapper = new ObjectMapper();

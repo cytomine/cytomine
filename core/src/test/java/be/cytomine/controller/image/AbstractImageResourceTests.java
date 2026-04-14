@@ -1,21 +1,5 @@
 package be.cytomine.controller.image;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
@@ -87,6 +71,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@SuppressWarnings("checkstyle:LineLength")
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(username = "superadmin")
@@ -117,10 +102,7 @@ public class AbstractImageResourceTests {
 
     @AfterAll
     public static void afterAll() {
-        try {
-            wireMockServer.stop();
-        } catch (Exception e) {
-        }
+        wireMockServer.stop();
     }
 
     @Test
@@ -132,7 +114,6 @@ public class AbstractImageResourceTests {
         AbstractImage img501Width = builder.givenAnAbstractImage();
         img501Width.setWidth(501);
         img501Width = builder.persistAndReturn(img501Width);
-
 
         restAbstractImageControllerMockMvc.perform(get("/api/abstractimage.json"))
             .andExpect(status().isOk())
@@ -180,7 +161,6 @@ public class AbstractImageResourceTests {
             .andExpect(jsonPath("$.collection[?(@.id==" + img500Width.getId() + ")]").doesNotExist())
             .andExpect(jsonPath("$.collection[?(@.id==" + img501Width.getId() + ")]").doesNotExist());
     }
-
 
     @Test
     @Transactional
@@ -293,10 +273,7 @@ public class AbstractImageResourceTests {
 
         assertThat(ids.indexOf(image2.getId())).isLessThan(ids.indexOf(image3.getId()));
         assertThat(ids.indexOf(image3.getId())).isLessThan(ids.indexOf(image1.getId()));
-
-
     }
-
 
     @Test
     @Transactional
@@ -401,7 +378,7 @@ public class AbstractImageResourceTests {
     @Test
     @Transactional
     public void get_an_abstract_image() throws Exception {
-        AbstractImage image = given_test_abstract_image();
+        AbstractImage image = givenTestAbstractImage();
 
         AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
         slice.setUploadedFile(image.getUploadedFile());
@@ -682,7 +659,7 @@ public class AbstractImageResourceTests {
     @Test
     @Transactional
     public void get_abstract_image_associeted_label() throws Exception {
-        AbstractImage image = given_test_abstract_image();
+        AbstractImage image = givenTestAbstractImage();
         configureFor("localhost", 8888);
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 image.getPath(),
@@ -703,7 +680,7 @@ public class AbstractImageResourceTests {
     @Test
     @Transactional
     public void get_abstract_image_associeted_label_macro() throws Exception {
-        AbstractImage image = given_test_abstract_image();
+        AbstractImage image = givenTestAbstractImage();
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
         configureFor("localhost", 8888);
@@ -739,7 +716,7 @@ public class AbstractImageResourceTests {
     @Test
     @Transactional
     public void get_abstract_image_crop() throws Exception {
-        AbstractImage image = given_test_abstract_image();
+        AbstractImage image = givenTestAbstractImage();
 
         AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
         slice.setUploadedFile(image.getUploadedFile());
@@ -783,7 +760,7 @@ public class AbstractImageResourceTests {
     @Test
     @Transactional
     public void get_abstract_image_window() throws Exception {
-        AbstractImage image = given_test_abstract_image();
+        AbstractImage image = givenTestAbstractImage();
 
         AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
         slice.setUploadedFile(image.getUploadedFile());
@@ -819,7 +796,7 @@ public class AbstractImageResourceTests {
     }
 
 
-    private AbstractImage given_test_abstract_image() {
+    private AbstractImage givenTestAbstractImage() {
         AbstractImage image = builder.givenAnAbstractImage();
         image.setWidth(109240);
         image.setHeight(220696);
@@ -831,7 +808,7 @@ public class AbstractImageResourceTests {
 
     @Test
     public void download_abstract_image() throws Exception {
-        AbstractImage image = given_test_abstract_image();
+        AbstractImage image = givenTestAbstractImage();
 
         byte[] mockResponse = UUID.randomUUID().toString().getBytes();
         configureFor("localhost", 8888);
@@ -859,7 +836,7 @@ public class AbstractImageResourceTests {
     @Test
     @Transactional
     public void get_abstract_image_metadata() throws Exception {
-        AbstractImage image = given_test_abstract_image();
+        AbstractImage image = givenTestAbstractImage();
         configureFor("localhost", 8888);
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 image.getPath(),
@@ -897,7 +874,7 @@ public class AbstractImageResourceTests {
 
     @Test
     public void regenarate_properties_to_abstract_image() throws Exception {
-        AbstractImage image = given_test_abstract_image();
+        AbstractImage image = givenTestAbstractImage();
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
 

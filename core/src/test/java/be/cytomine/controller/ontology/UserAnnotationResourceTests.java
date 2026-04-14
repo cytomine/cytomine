@@ -1,21 +1,5 @@
 package be.cytomine.controller.ontology;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -87,6 +71,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@SuppressWarnings("checkstyle:LineLength")
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(username = "superadmin")
@@ -151,15 +136,12 @@ public class UserAnnotationResourceTests {
 
     @AfterAll
     public static void afterAll() {
-        try {
-            wireMockServer.stop();
-        } catch (Exception e) {
-        }
+        wireMockServer.stop();
     }
 
     @Test
     @Transactional
-    public void get_a_user_annotation() throws Exception {
+    public void shouldReturnUserAnnotationWithAllExpectedFields() throws Exception {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         builder.givenAnAnnotationTerm(userAnnotation);
         em.refresh(userAnnotation);
@@ -180,11 +162,10 @@ public class UserAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void get_a_user_annotation_not_exists() throws Exception {
+    public void shouldReturnNotFoundWhenUserAnnotationDoesNotExist() throws Exception {
         restUserAnnotationControllerMockMvc.perform(get("/api/userannotation/{id}.json", 0))
             .andExpect(status().isNotFound());
     }
-
 
     @Test
     @Transactional
@@ -511,7 +492,7 @@ public class UserAnnotationResourceTests {
     @Test
     @jakarta.transaction.Transactional
     public void get_user_annotation_crop() throws Exception {
-        UserAnnotation annotation = given_a_user_annotation_with_valid_image_server(builder);
+        UserAnnotation annotation = givenAUserAnnotationWithValidImageServer(builder);
 
         configureFor("localhost", 8888);
 
@@ -548,7 +529,7 @@ public class UserAnnotationResourceTests {
     @Test
     @jakarta.transaction.Transactional
     public void get_user_annotation_crop_mask() throws Exception {
-        UserAnnotation annotation = given_a_user_annotation_with_valid_image_server(builder);
+        UserAnnotation annotation = givenAUserAnnotationWithValidImageServer(builder);
 
         configureFor("localhost", 8888);
 
@@ -586,7 +567,7 @@ public class UserAnnotationResourceTests {
     @Test
     @jakarta.transaction.Transactional
     public void get_user_annotation_alpha_mask() throws Exception {
-        UserAnnotation annotation = given_a_user_annotation_with_valid_image_server(builder);
+        UserAnnotation annotation = givenAUserAnnotationWithValidImageServer(builder);
 
         configureFor("localhost", 8888);
 
@@ -621,7 +602,7 @@ public class UserAnnotationResourceTests {
         AssertionsForClassTypes.assertThat(mvcResult.getResponse().getContentAsByteArray()).isEqualTo(mockResponse);
     }
 
-    public static UserAnnotation given_a_user_annotation_with_valid_image_server(BasicInstanceBuilder builder)
+    public static UserAnnotation givenAUserAnnotationWithValidImageServer(BasicInstanceBuilder builder)
         throws ParseException {
         AbstractImage image = builder.givenAnAbstractImage();
         image.setWidth(109240);
@@ -633,12 +614,11 @@ public class UserAnnotationResourceTests {
         AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
         slice.setUploadedFile(image.getUploadedFile());
         SliceInstance sliceInstance = builder.givenASliceInstance(imageInstance, slice);
-        UserAnnotation userAnnotation
-            = builder.givenAUserAnnotation(
+        return builder.givenAUserAnnotation(
             sliceInstance,
-            "POLYGON((1 1,50 10,50 50,10 50,1 1))", builder.givenSuperAdmin(), null
+            "POLYGON((1 1,50 10,50 50,10 50,1 1))", builder.givenSuperAdmin(),
+            null
         );
-        return userAnnotation;
     }
 
     @Test

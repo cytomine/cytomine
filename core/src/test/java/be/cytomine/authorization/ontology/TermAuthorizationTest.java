@@ -43,13 +43,13 @@ public class TermAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list_terms() {
+    public void adminCanListTerms() {
         expectOK(() -> termService.list());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_list_terms() {
+    public void userCannotListTerms() {
         expectForbidden(() -> termService.list());
     }
 
@@ -73,13 +73,13 @@ public class TermAuthorizationTest extends CRDAuthorizationTest {
     @Test
     @Disabled
     @Override
-    public void guest_add_domain() {
+    public void guestAddDomain() {
     }
 
     @Test
     @Disabled
     @Override
-    public void user_without_permission_add_domain() {
+    public void userWithoutPermissionAddDomain() {
     }
 
     @Override

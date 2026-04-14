@@ -99,7 +99,7 @@ public class MongoDBDomainTests {
     }
 
     @Test
-    void last_connection_indexes() {
+    void lastConnectionIndexes() {
         ListIndexesIterable<Document> indexes = retrieveIndex("lastConnection");
         Document indexId = null;
         Document indexUserDate = null;
@@ -120,7 +120,7 @@ public class MongoDBDomainTests {
     }
 
     @Test
-    void last_connection_domain() throws ParseException {
+    void lastConnectionDomain() throws ParseException {
         Long expectedId = 60657L;
         Long expectedUserId = 58L;
         Date expectedDate = mongoDBFormat.parse("2022-02-02T07:30:23.384Z");
@@ -144,7 +144,7 @@ public class MongoDBDomainTests {
     }
 
     @Test
-    void last_user_position_index() {
+    void lastUserPositionIndex() {
         ListIndexesIterable<Document> indexes = retrieveIndex("lastUserPosition");
         Document indexId = null;
         Document indexUserImageSliceCreated = null;
@@ -196,7 +196,7 @@ public class MongoDBDomainTests {
     }
 
     @Test
-    void last_user_position_domain() throws ParseException {
+    void lastUserPositionDomain() throws ParseException {
         boolean expectedBroadcast = false;
         Long expectedId = 60911L;
         Long expectedImageId = 29240L;
@@ -249,7 +249,7 @@ public class MongoDBDomainTests {
     }
 
     @Test
-    void persistent_connection_indexes() {
+    void persistentConnectionIndexes() {
         ListIndexesIterable<Document> indexes = retrieveIndex("persistentConnection");
 
         Document indexId = null;
@@ -271,7 +271,7 @@ public class MongoDBDomainTests {
     }
 
     @Test
-    void persistent_connection_domain() throws ParseException {
+    void persistentConnectionDomain() throws ParseException {
         Long expectedId = 3073L;
         Date expectedCreated = mongoDBFormat.parse("2021-09-22T09:06:32.472Z");
         String expectedSession = "B7850470EED8CD7570E05C50FD5F02F6";
@@ -292,7 +292,7 @@ public class MongoDBDomainTests {
     }
 
     @Test
-    void persistent_project_connection_domain() throws ParseException {
+    void persistentProjectConnectionDomain() throws ParseException {
         Long expectedId = 3073L;
         String expectedBrowser = "firefox";
         String expectedBrowserVersion = "92.0.0";
@@ -335,7 +335,7 @@ public class MongoDBDomainTests {
     }
 
     @Test
-    void persistent_image_consultation_domain() throws ParseException {
+    void persistentImageConsultationDomain() throws ParseException {
         Long expectedId = 3975L;
         Long expectedUser = 58L;
         Long expectedImage = 3962L;
@@ -381,7 +381,7 @@ public class MongoDBDomainTests {
     }
 
     @Test
-    void persistent_user_position_index() {
+    void persistentUserPositionIndex() {
         ListIndexesIterable<Document> indexes = retrieveIndex("persistentUserPosition");
         Document indexId = null;
         Document indexUserImageSliceCreated = null;
@@ -424,7 +424,7 @@ public class MongoDBDomainTests {
     }
 
     @Test
-    void persistent_user_position_domain() throws ParseException {
+    void persistentUserPositionDomain() throws ParseException {
         Long expectedId = 3977L;
         boolean expectedBroadcast = false;
         Date expectedCreated = mongoDBFormat.parse("2021-09-23T08:55:03.608Z");
@@ -479,7 +479,7 @@ public class MongoDBDomainTests {
     }
 
     @Test
-    void annotation_action_indexes() {
+    void annotationActionIndexes() {
         ListIndexesIterable<Document> indexes = retrieveIndex("annotationAction");
         Document indexId = null;
         Document indexUserDate = null;

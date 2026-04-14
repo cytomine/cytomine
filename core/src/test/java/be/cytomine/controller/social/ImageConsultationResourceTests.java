@@ -93,7 +93,7 @@ public class ImageConsultationResourceTests {
 
     @Test
     @Transactional
-    public void add_consultation() throws Exception {
+    public void addConsultation() throws Exception {
         User user = builder.givenSuperAdmin();
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
@@ -148,7 +148,7 @@ public class ImageConsultationResourceTests {
 
     @Test
     @Transactional
-    public void list_last_user_consultation() throws Exception {
+    public void listLastUserConsultation() throws Exception {
         User user = builder.givenSuperAdmin();
         ImageInstance imageInstance1 = builder.givenAnImageInstance();
         ImageInstance imageInstance2 = builder.givenAnImageInstance(imageInstance1.getProject());
@@ -173,7 +173,7 @@ public class ImageConsultationResourceTests {
 
     @Test
     @Transactional
-    public void list_last_user_consultation_no_data() throws Exception {
+    public void listLastUserConsultationNoData() throws Exception {
         User user = builder.givenSuperAdmin();
         ImageInstance imageInstance1 = builder.givenAnImageInstance();
         ImageInstance imageInstance2 = builder.givenAnImageInstance(imageInstance1.getProject());
@@ -213,7 +213,7 @@ public class ImageConsultationResourceTests {
 
     @Test
     @Transactional
-    public void resume_by_user_and_project_empty() throws Exception {
+    public void resumeByUserAndProjectEmpty() throws Exception {
         User user = builder.givenSuperAdmin();
         ImageInstance imageInstance1 = builder.givenAnImageInstance();
         ImageInstance imageInstance2 = builder.givenAnImageInstance(imageInstance1.getProject());
@@ -227,7 +227,7 @@ public class ImageConsultationResourceTests {
 
     @Test
     @Transactional
-    public void resume_by_user_and_project() throws Exception {
+    public void resumeByUserAndProject() throws Exception {
         User user = builder.givenSuperAdmin();
         ImageInstance imageInstance1 = builder.givenAnImageInstance();
         ImageInstance imageInstance2 = builder.givenAnImageInstance(imageInstance1.getProject());
@@ -245,7 +245,7 @@ public class ImageConsultationResourceTests {
 
     @Test
     @Transactional
-    public void resume_by_user_and_project_export_as_csv() throws Exception {
+    public void resumeByUserAndProjectExportAsCsv() throws Exception {
         User user = builder.givenSuperAdmin();
         ImageInstance imageInstance1 = builder.givenAnImageInstance();
         SliceInstance slice = builder.givenASliceInstance(imageInstance1, 1, 0, 1);
@@ -279,7 +279,7 @@ public class ImageConsultationResourceTests {
 
     @Test
     @Transactional
-    public void count_annotation_by_project() throws Exception {
+    public void countAnnotationByProject() throws Exception {
         User user = builder.givenSuperAdmin();
         ImageInstance imageInstance1 = builder.givenAnImageInstance();
         ImageInstance imageInstance2 = builder.givenAnImageInstance(imageInstance1.getProject());

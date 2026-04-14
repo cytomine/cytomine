@@ -140,14 +140,14 @@ public class ReviewedAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void list_annotations() throws Exception {
+    public void listAnnotations() throws Exception {
         restReviewedAnnotationControllerMockMvc.perform(get("/api/reviewedannotation.json"))
             .andExpect(status().isOk());
     }
 
     @Test
     @Transactional
-    public void stats_annotations() throws Exception {
+    public void statsAnnotations() throws Exception {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         restReviewedAnnotationControllerMockMvc.perform(get(
                 "/api/imageinstance/{image}/reviewedannotation/stats.json",
@@ -158,7 +158,7 @@ public class ReviewedAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void count_annotations_by_project() throws Exception {
+    public void countAnnotationsByProject() throws Exception {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         restReviewedAnnotationControllerMockMvc.perform(get(
                 "/api/project/{idUser}/reviewedannotation/count.json",
@@ -179,7 +179,7 @@ public class ReviewedAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void count_annotations_by_project_with_dates() throws Exception {
+    public void countAnnotationsByProjectWithDates() throws Exception {
         ReviewedAnnotation oldReviewedAnnotation = builder.givenAReviewedAnnotation();
         oldReviewedAnnotation.setCreated(DateUtils.addDays(new Date(), -1));
 
@@ -240,7 +240,7 @@ public class ReviewedAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void download_reviewed_annotation_csv_document() throws Exception {
+    public void downloadReviewedAnnotationCsvDocument() throws Exception {
         buildDownloadContext();
         MvcResult mvcResult = performDownload("csv");
         checkResult(";", mvcResult);
@@ -248,7 +248,7 @@ public class ReviewedAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void download_reviewed_annotation_xls_document() throws Exception {
+    public void downloadReviewedAnnotationXlsDocument() throws Exception {
         buildDownloadContext();
         MvcResult mvcResult = performDownload("xls");
         checkXLSResult(mvcResult);
@@ -256,7 +256,7 @@ public class ReviewedAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void download_reviewed_annotation_pdf_document() throws Exception {
+    public void downloadReviewedAnnotationPdfDocument() throws Exception {
         this.buildDownloadContext();
         restReviewedAnnotationControllerMockMvc.perform(get(
                 "/api/project/{project}/reviewedannotation/download",
@@ -328,7 +328,7 @@ public class ReviewedAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void add_valid_reviewed_annotation() throws Exception {
+    public void addValidReviewedAnnotation() throws Exception {
         ReviewedAnnotation reviewedAnnotation = builder.givenANotPersistedReviewedAnnotation();
         restReviewedAnnotationControllerMockMvc.perform(post("/api/reviewedannotation.json")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -345,7 +345,7 @@ public class ReviewedAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void edit_valid_reviewed_annotation() throws Exception {
+    public void editValidReviewedAnnotation() throws Exception {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         restReviewedAnnotationControllerMockMvc.perform(put(
                 "/api/reviewedannotation/{id}.json",
@@ -366,7 +366,7 @@ public class ReviewedAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void delete_reviewed_annotation() throws Exception {
+    public void deleteReviewedAnnotation() throws Exception {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         restReviewedAnnotationControllerMockMvc.perform(delete(
                 "/api/reviewedannotation/{id}.json",
@@ -387,7 +387,7 @@ public class ReviewedAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void delete_reviewed_annotation_not_exist_fails() throws Exception {
+    public void deleteReviewedAnnotationNotExistFails() throws Exception {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         restReviewedAnnotationControllerMockMvc.perform(delete("/api/reviewedannotation/{id}.json", 0)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -401,7 +401,7 @@ public class ReviewedAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void start_image_review() throws Exception {
+    public void startImageReview() throws Exception {
         ImageInstance imageInstance = builder.givenAnImageInstance();
         assertThat(imageInstance.getReviewStart()).isNull();
         restReviewedAnnotationControllerMockMvc.perform(post(
@@ -417,7 +417,7 @@ public class ReviewedAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void stop_image_review() throws Exception {
+    public void stopImageReview() throws Exception {
         ImageInstance imageInstance = builder.givenAnImageInstance();
         imageInstance.setReviewStart(new Date());
         imageInstance.setReviewUser(imageInstance.getUser());
@@ -432,7 +432,7 @@ public class ReviewedAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void cancel_image_review() throws Exception {
+    public void cancelImageReview() throws Exception {
         ImageInstance imageInstance = builder.givenAnImageInstance();
         imageInstance.setReviewStart(new Date());
         imageInstance.setReviewUser(imageInstance.getUser());
@@ -449,7 +449,7 @@ public class ReviewedAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void stop_image_review_refuse_if_image_not_started_to_review() throws Exception {
+    public void stopImageReviewRefuseIfImageNotStartedToReview() throws Exception {
         ImageInstance imageInstance = builder.givenAnImageInstance();
         assertThat(imageInstance.getReviewStart()).isNull();
         restReviewedAnnotationControllerMockMvc.perform(delete(
@@ -462,7 +462,7 @@ public class ReviewedAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void add_annotation_review() throws Exception {
+    public void addAnnotationReview() throws Exception {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         userAnnotation.getImage().setReviewStart(new Date());
         userAnnotation.getImage().setReviewUser(userAnnotation.getUser());
@@ -488,7 +488,7 @@ public class ReviewedAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void add_annotation_review_with_terms_change() throws Exception {
+    public void addAnnotationReviewWithTermsChange() throws Exception {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         userAnnotation.getImage().setReviewStart(new Date());
         userAnnotation.getImage().setReviewUser(userAnnotation.getUser());
@@ -515,7 +515,7 @@ public class ReviewedAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void remove_annotation_review() throws Exception {
+    public void removeAnnotationReview() throws Exception {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
 
         assertThat(reviewedAnnotationRepository.findByParentIdent(reviewedAnnotation.getParentIdent())).isPresent();
@@ -534,7 +534,7 @@ public class ReviewedAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void review_full_layer() throws Exception {
+    public void reviewFullLayer() throws Exception {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         userAnnotation.getImage().setReviewStart(new Date());
         userAnnotation.getImage().setReviewUser(userAnnotation.getUser());
@@ -558,7 +558,7 @@ public class ReviewedAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void unreview_full_layer() throws Exception {
+    public void unreviewFullLayer() throws Exception {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         reviewedAnnotation.getImage().setReviewStart(new Date());
         reviewedAnnotation.getImage().setReviewUser(reviewedAnnotation.getUser());
@@ -581,7 +581,7 @@ public class ReviewedAnnotationResourceTests {
     @Disabled("Randomly fail with ProxyExchange, need to find a solution")
     @Test
     @jakarta.transaction.Transactional
-    public void get_reviewed_annotation_crop() throws Exception {
+    public void getReviewedAnnotationCrop() throws Exception {
         ReviewedAnnotation annotation = givenAReviewedAnnotationWithValidImageServer(builder);
 
         configureFor("localhost", 8888);
@@ -619,7 +619,7 @@ public class ReviewedAnnotationResourceTests {
     @Disabled("Randomly fail with ProxyExchange, need to find a solution")
     @Test
     @jakarta.transaction.Transactional
-    public void get_reviewed_annotation_crop_mask() throws Exception {
+    public void getReviewedAnnotationCropMask() throws Exception {
         ReviewedAnnotation annotation = givenAReviewedAnnotationWithValidImageServer(builder);
 
         configureFor("localhost", 8888);
@@ -657,7 +657,7 @@ public class ReviewedAnnotationResourceTests {
     @Disabled("Randomly fail with ProxyExchange, need to find a solution")
     @Test
     @jakarta.transaction.Transactional
-    public void get_reviewed_annotation_alpha_mask() throws Exception {
+    public void getReviewedAnnotationAlphaMask() throws Exception {
         ReviewedAnnotation annotation = givenAReviewedAnnotationWithValidImageServer(builder);
 
         byte[] mockResponse = UUID.randomUUID()

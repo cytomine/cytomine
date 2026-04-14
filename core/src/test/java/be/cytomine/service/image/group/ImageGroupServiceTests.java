@@ -36,24 +36,24 @@ public class ImageGroupServiceTests {
     ImageGroupService imageGroupService;
 
     @Test
-    void get_non_existing_imagegroup_return_null() {
+    void getNonExistingImagegroupReturnNull() {
         AssertionsForClassTypes.assertThat(imageGroupService.get(0L)).isNull();
     }
 
     @Test
-    void find_imagegroup_with_success() {
+    void findImagegroupWithSuccess() {
         ImageGroup imageGroup = builder.givenAnImageGroup();
         AssertionsForClassTypes.assertThat(imageGroupService.find(imageGroup.getId()).isPresent());
         assertThat(imageGroup).isEqualTo(imageGroupService.find(imageGroup.getId()).get());
     }
 
     @Test
-    void find_non_existing_imagegroup_return_empty() {
+    void findNonExistingImagegroupReturnEmpty() {
         AssertionsForClassTypes.assertThat(imageGroupService.find(0L)).isEmpty();
     }
 
     @Test
-    void list_imagegroup_by_project() {
+    void listImagegroupByProject() {
         Project project = builder.givenAProject();
 
         ImageGroup imageGroup1 = builder.givenAnImageGroup(project);
@@ -66,7 +66,7 @@ public class ImageGroupServiceTests {
     }
 
     @Test
-    void add_valid_imagegroup_with_success() {
+    void addValidImagegroupWithSuccess() {
         ImageGroup imageGroup = builder.givenANotPersistedImagegroup();
 
         CommandResponse commandResponse = imageGroupService.add(imageGroup.toJsonObject());
@@ -77,7 +77,7 @@ public class ImageGroupServiceTests {
     }
 
     @Test
-    void add_imagegroup_with_null_project_fails() {
+    void addImagegroupWithNullProjectFails() {
         ImageGroup imageGroup = builder.givenAnImageGroup();
         Assertions.assertThrows(
             ObjectNotFoundException.class, () -> {
@@ -87,7 +87,7 @@ public class ImageGroupServiceTests {
     }
 
     @Test
-    void edit_imagegroup_with_success() {
+    void editImagegroupWithSuccess() {
         Project project1 = builder.givenAProject();
         Project project2 = builder.givenAProject();
         ImageGroup imageGroup = builder.givenAnImageGroup(project1);
@@ -105,7 +105,7 @@ public class ImageGroupServiceTests {
     }
 
     @Test
-    void delete_imagegroup_with_success() {
+    void deleteImagegroupWithSuccess() {
         ImageGroup imageGroup = builder.givenAnImageGroup();
 
         CommandResponse commandResponse = imageGroupService.delete(imageGroup, null, null, true);

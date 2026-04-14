@@ -179,7 +179,7 @@ public class UserResourceTests {
 
     @Test
     @Transactional
-    public void list_project_admin() throws Exception {
+    public void listProjectAdmin() throws Exception {
         User projectAdmin = builder.givenAUser();
         User projectUser = builder.givenAUser();
         Project project = builder.givenAProject();
@@ -196,7 +196,7 @@ public class UserResourceTests {
 
     @Test
     @Transactional
-    public void list_project_admin_as_non_admin_user() throws Exception {
+    public void listProjectAdminAsNonAdminUser() throws Exception {
         User projectAdmin = builder.givenAUser();
         User projectUser = builder.givenAUser();
         Project project = builder.givenAProject();
@@ -215,7 +215,7 @@ public class UserResourceTests {
 
     @Test
     @Transactional
-    public void list_project_representatives() throws Exception {
+    public void listProjectRepresentatives() throws Exception {
         User projectPrepresentative = builder.givenAUser();
         User projectUser = builder.givenAUser();
         Project project = builder.givenAProject();
@@ -233,7 +233,7 @@ public class UserResourceTests {
 
     @Test
     @Transactional
-    public void list_project_creator() throws Exception {
+    public void listProjectCreator() throws Exception {
         User projectCreator = builder.givenSuperAdmin();
         User projectUser = builder.givenAUser();
         Project project = builder.givenAProject();
@@ -252,7 +252,7 @@ public class UserResourceTests {
 
     @Test
     @Transactional
-    public void list_ontology_user() throws Exception {
+    public void listOntologyUser() throws Exception {
         User projectAdmin = builder.givenAUser();
         User projectUser = builder.givenAUser();
         User simpleUser = builder.givenAUser();
@@ -272,7 +272,7 @@ public class UserResourceTests {
 
     @Test
     @Transactional
-    public void list_storage_user() throws Exception {
+    public void listStorageUser() throws Exception {
         User storageAdmin = builder.givenAUser();
         User storageUser = builder.givenAUser();
         User simpleUser = builder.givenAUser();
@@ -290,7 +290,7 @@ public class UserResourceTests {
 
     @Test
     @Transactional
-    public void list_project_userlayer() throws Exception {
+    public void listProjectUserlayer() throws Exception {
         User projectAdmin = builder.givenAUser();
         User projectUser = builder.givenAUser();
         User simpleUser = builder.givenAUser();
@@ -307,7 +307,7 @@ public class UserResourceTests {
 
     @Test
     @Transactional
-    public void list_user() throws Exception {
+    public void listUser() throws Exception {
         User projectAdmin = builder.givenAUser();
         User projectUser = builder.givenAUser();
         User simpleUser = builder.givenAUser();
@@ -330,7 +330,7 @@ public class UserResourceTests {
 
     @Test
     @Transactional
-    public void get_user_as_superadmin() throws Exception {
+    public void getUserAsSuperadmin() throws Exception {
         User currentUser = builder.givenSuperAdmin();
 
         restUserControllerMockMvc.perform(get("/api/user/{id}.json", builder.givenSuperAdmin().getId()))
@@ -358,7 +358,7 @@ public class UserResourceTests {
     @Test
     @Transactional
     @WithMockUser(username = "user")
-    public void get_user_as_current_user() throws Exception {
+    public void getUserAsCurrentUser() throws Exception {
         User currentUser = builder.givenDefaultUser();
 
         restUserControllerMockMvc.perform(get("/api/user/{id}.json", currentUser.getId()))
@@ -386,7 +386,7 @@ public class UserResourceTests {
     @Test
     @Transactional
     @WithMockUser(username = "user")
-    public void get_user_as_another_user() throws Exception {
+    public void getUserAsAnotherUser() throws Exception {
         User currentUser = builder.givenAUser();
 
         restUserControllerMockMvc.perform(get("/api/user/{id}.json", builder.givenSuperAdmin().getId()))
@@ -413,7 +413,7 @@ public class UserResourceTests {
 
     @Test
     @Transactional
-    public void get_user_with_its_username() throws Exception {
+    public void getUserWithItsUsername() throws Exception {
         User currentUser = builder.givenSuperAdmin();
         restUserControllerMockMvc.perform(get("/api/user/{id}.json", builder.givenSuperAdmin().getUsername()))
             .andExpect(status().isOk())
@@ -422,7 +422,7 @@ public class UserResourceTests {
 
     @Test
     @Transactional
-    public void get_user_with_its_user_key() throws Exception {
+    public void getUserWithItsUserKey() throws Exception {
         User currentUser = builder.givenSuperAdmin();
         restUserControllerMockMvc.perform(get(
                 "/api/userkey/{publicKey}/keys.json",
@@ -434,7 +434,7 @@ public class UserResourceTests {
 
     @Test
     @Transactional
-    public void get_user_with_its_user_key_id() throws Exception {
+    public void getUserWithItsUserKeyId() throws Exception {
         User currentUser = builder.givenSuperAdmin();
         restUserControllerMockMvc.perform(get("/api/user/{id}/keys.json", builder.givenSuperAdmin().getId()))
             .andExpect(status().isOk())
@@ -444,7 +444,7 @@ public class UserResourceTests {
     @Test
     @Transactional
     @WithMockUser(username = "user")
-    public void get_keys_from_other_user_is_forbidden() throws Exception {
+    public void getKeysFromOtherUserIsForbidden() throws Exception {
         User user = builder.givenSuperAdmin();
         restUserControllerMockMvc.perform(get("/api/user/{id}/keys.json", user.getId()))
             .andExpect(status().isForbidden());
@@ -455,7 +455,7 @@ public class UserResourceTests {
     @Test
     @Transactional
     @WithMockUser(username = "user")
-    public void get_signature() throws Exception {
+    public void getSignature() throws Exception {
         User user = builder.givenDefaultUser();
         restUserControllerMockMvc.perform(get("/api/signature.json").param("method", "GET"))
             .andExpect(status().isOk())
@@ -465,7 +465,7 @@ public class UserResourceTests {
 
     @Test
     @Transactional
-    public void get_current_user_keys() throws Exception {
+    public void getCurrentUserKeys() throws Exception {
         User currentUser = builder.givenSuperAdmin();
 
         restUserControllerMockMvc.perform(get("/api/user/current/keys"))
@@ -476,7 +476,7 @@ public class UserResourceTests {
 
     @Test
     @Transactional
-    public void regenerate_current_user_keys() throws Exception {
+    public void regenerateCurrentUserKeys() throws Exception {
         User currentUser = builder.givenSuperAdmin();
 
         String oldPrimaryKey = currentUser.getPublicKey();
@@ -491,7 +491,7 @@ public class UserResourceTests {
 
     @Test
     @Transactional
-    public void get_current_user() throws Exception {
+    public void getCurrentUser() throws Exception {
         User currentUser = builder.givenSuperAdmin();
 
         restUserControllerMockMvc.perform(get("/api/user/current.json"))
@@ -518,7 +518,7 @@ public class UserResourceTests {
 
     //    @Test
     //    @Transactional
-    //    public void add_valid_user() throws Exception {
+    //    public void addValidUser() throws Exception {
     //
     //        restUserControllerMockMvc.perform(post("/api/user.json")
     //                        .contentType(MediaType.APPLICATION_JSON)
@@ -545,7 +545,7 @@ public class UserResourceTests {
     //
     //    @Test
     //    @Transactional
-    //    public void add_user_refused_if_username_exists() throws Exception {
+    //    public void addUserRefusedIfUsernameExists() throws Exception {
     //        User user = builder.given_a_user();
     //        restUserControllerMockMvc.perform(post("/api/user.json")
     //                        .contentType(MediaType.APPLICATION_JSON)
@@ -557,7 +557,7 @@ public class UserResourceTests {
     //
     //    @Test
     //    @Transactional
-    //    public void add_user_refused_if_username_not_set() throws Exception {
+    //    public void addUserRefusedIfUsernameNotSet() throws Exception {
     //        User user = builder.given_a_user();
     //        restUserControllerMockMvc.perform(post("/api/user.json")
     //                        .contentType(MediaType.APPLICATION_JSON)
@@ -571,7 +571,7 @@ public class UserResourceTests {
     //
     //    @Test
     //    @Transactional
-    //    public void edit_valid_user() throws Exception {
+    //    public void editValidUser() throws Exception {
     //
     //        restUserControllerMockMvc.perform(post("/api/user.json")
     //                        .contentType(MediaType.APPLICATION_JSON)
@@ -604,7 +604,7 @@ public class UserResourceTests {
     //
     //    @Test
     //    @Transactional
-    //    public void delete_user() throws Exception {
+    //    public void deleteUser() throws Exception {
     //        User user = builder.given_a_user();
     //        restUserControllerMockMvc.perform(delete("/api/user/{id}.json", user.getId())
     //                        .contentType(MediaType.APPLICATION_JSON)
@@ -622,7 +622,7 @@ public class UserResourceTests {
 
     @Test
     @Transactional
-    public void list_project_users_with_role_filter() throws Exception {
+    public void listProjectUsersWithRoleFilter() throws Exception {
         User projectAdmin = builder.givenAUser();
         User projectUser = builder.givenAUser();
         User projectPrepresentative = builder.givenAUser();
@@ -665,7 +665,7 @@ public class UserResourceTests {
 
     @Test
     @Transactional
-    public void list_project_users_with_pagination() throws Exception {
+    public void listProjectUsersWithPagination() throws Exception {
         User projectPrepresentative = builder.givenAUser();
         User projectAdmin = builder.givenAUser();
         User projectUser = builder.givenAUser();
@@ -725,7 +725,7 @@ public class UserResourceTests {
 
     @Test
     @Transactional
-    public void add_user_to_project() throws Exception {
+    public void addUserToProject() throws Exception {
 
         Project project = builder.givenAProject();
         User user = builder.givenAUser();
@@ -740,7 +740,7 @@ public class UserResourceTests {
 
     @Test
     @Transactional
-    public void add_users_to_project() throws Exception {
+    public void addUsersToProject() throws Exception {
         Project project = builder.givenAProject();
         User user1 = builder.givenAUser();
         User user2 = builder.givenAUser();
@@ -772,7 +772,7 @@ public class UserResourceTests {
 
     @Test
     @Transactional
-    public void delete_user_from_project() throws Exception {
+    public void deleteUserFromProject() throws Exception {
 
         Project project = builder.givenAProject();
         User user = builder.givenAUser();
@@ -788,7 +788,7 @@ public class UserResourceTests {
 
     @Test
     @Transactional
-    public void delete_users_from_project() throws Exception {
+    public void deleteUsersFromProject() throws Exception {
         Project project = builder.givenAProject();
         User user1 = builder.givenAUser();
         User user2 = builder.givenAUser();
@@ -822,7 +822,7 @@ public class UserResourceTests {
 
     @Test
     @Transactional
-    public void add_admin_to_project() throws Exception {
+    public void addAdminToProject() throws Exception {
 
         Project project = builder.givenAProject();
         User user = builder.givenAUser();
@@ -837,7 +837,7 @@ public class UserResourceTests {
 
     @Test
     @Transactional
-    public void delete_admin_from_project() throws Exception {
+    public void deleteAdminFromProject() throws Exception {
         Project project = builder.givenAProject();
         User user = builder.givenAUser();
         builder.addUserToProject(project, user.getUsername(), ADMINISTRATION);
@@ -856,7 +856,7 @@ public class UserResourceTests {
 
     @Test
     @Transactional
-    public void add_user_to_storage() throws Exception {
+    public void addUserToStorage() throws Exception {
         Storage storage = builder.givenAStorage();
         User user = builder.givenAUser();
         restUserControllerMockMvc.perform(
@@ -870,7 +870,7 @@ public class UserResourceTests {
 
     @Test
     @Transactional
-    public void delete_user_from_storage() throws Exception {
+    public void deleteUserFromStorage() throws Exception {
         Storage storage = builder.givenAStorage();
         User user = builder.givenAUser();
         builder.addUserToStorage(storage, user.getUsername(), READ);
@@ -885,7 +885,7 @@ public class UserResourceTests {
 
     @Test
     @Transactional
-    public void list_friends() throws Exception {
+    public void listFriends() throws Exception {
         User projectPrepresentative = builder.givenAUser();
         User projectAdmin = builder.givenAUser();
         User projectUser = builder.givenAUser();
@@ -936,7 +936,7 @@ public class UserResourceTests {
 
     @Test
     @Transactional
-    public void list_online_users() throws Exception {
+    public void listOnlineUsers() throws Exception {
         User userOnline = builder.givenDefaultUser();
         User userOnlineButOnDifferentProject = builder.givenAUser();
         User userOffline = builder.givenAUser();
@@ -976,7 +976,7 @@ public class UserResourceTests {
 
     @Test
     @Transactional
-    public void list_user_activity() throws Exception {
+    public void listUserActivity() throws Exception {
         User userOnline = builder.givenDefaultUser();
 
         Project project = builder.givenAProject();
@@ -1009,7 +1009,7 @@ public class UserResourceTests {
     }
 
     @Test
-    void get_resume_activity() throws Exception {
+    void getResumeActivity() throws Exception {
         User userOnline = builder.givenDefaultUser();
         Project project = builder.givenAProject();
         builder.addUserToProject(project, userOnline.getUsername());
@@ -1041,7 +1041,7 @@ public class UserResourceTests {
 
     @Test
     @Transactional
-    public void download_user_list_from_project_xls_document() throws Exception {
+    public void downloadUserListFromProjectXlsDocument() throws Exception {
         User user = builder.givenAUser("Paul");
         Project project = builder.givenAProjectWithUser(user);
         MvcResult mvcResult = performDownload("xls", project, "application/octet-stream");
@@ -1050,7 +1050,7 @@ public class UserResourceTests {
 
     @Test
     @Transactional
-    public void download_user_list_from_project_csv_document() throws Exception {
+    public void downloadUserListFromProjectCsvDocument() throws Exception {
         User user = builder.givenAUser("Paul");
         Project project = builder.givenAProjectWithUser(user);
         MvcResult mvcResult = performDownload("csv", project, "text/csv");
@@ -1059,7 +1059,7 @@ public class UserResourceTests {
 
     @Test
     @Transactional
-    public void download_user_list_from_project_pdf_document() throws Exception {
+    public void downloadUserListFromProjectPdfDocument() throws Exception {
         Project project = builder.givenAProjectWithUser(builder.givenAUser());
         performDownload("pdf", project, "application/pdf");
     }

@@ -68,7 +68,7 @@ public class CustomUIControllerTests {
     @Test
     @Transactional
     @WithMockUser(username = "user")
-    public void load_custom_ui_default_config() {
+    public void loadCustomUiDefaultConfig() {
         assertThat(applicationProperties.getCustomUI()
             .getProject()
             .get("project-images-tab")
@@ -83,7 +83,7 @@ public class CustomUIControllerTests {
     @Test
     @Transactional
     @WithMockUser(username = "superadmin")
-    public void retrieve_global_custom_ui_as_superadmin() throws Exception {
+    public void retrieveGlobalCustomUiAsSuperadmin() throws Exception {
         restConfigurationControllerMockMvc.perform(get("/api/custom-ui/config.json"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.activity").value(true))
@@ -101,7 +101,7 @@ public class CustomUIControllerTests {
     @Test
     @Transactional
     @WithMockUser(username = "user")
-    public void retrieve_global_custom_ui_as_user() throws Exception {
+    public void retrieveGlobalCustomUiAsUser() throws Exception {
         restConfigurationControllerMockMvc.perform(get("/api/custom-ui/config.json"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.activity").value(true))
@@ -118,7 +118,7 @@ public class CustomUIControllerTests {
     @Test
     @Transactional
     @WithMockUser(username = "superadmin")
-    public void retrieve_project_custom_ui() throws Exception {
+    public void retrieveProjectCustomUi() throws Exception {
         Project project = builder.givenAProject();
         restConfigurationControllerMockMvc.perform(get("/api/custom-ui/config.json")
                 .param("project", project.getId().toString()))
@@ -130,7 +130,7 @@ public class CustomUIControllerTests {
     @Test
     @Transactional
     @WithMockUser(username = "user")
-    public void retrieve_project_custom_ui_as_contributor() throws Exception {
+    public void retrieveProjectCustomUiAsContributor() throws Exception {
         Project project = builder.givenAProject();
         builder.addUserToProject(project, "user", READ);
         restConfigurationControllerMockMvc.perform(get("/api/custom-ui/config.json")
@@ -142,7 +142,7 @@ public class CustomUIControllerTests {
     @Test
     @Transactional
     @WithMockUser(username = "user")
-    public void retrieve_project_custom_ui_as_manager() throws Exception {
+    public void retrieveProjectCustomUiAsManager() throws Exception {
         Project project = builder.givenAProject();
         builder.addUserToProject(project, "user", ADMINISTRATION);
         restConfigurationControllerMockMvc.perform(get("/api/custom-ui/config.json")
@@ -155,7 +155,7 @@ public class CustomUIControllerTests {
     @Test
     @Transactional
     @WithMockUser(username = "superadmin")
-    public void retrieve_project_custom_ui_as_superadmin() throws Exception {
+    public void retrieveProjectCustomUiAsSuperadmin() throws Exception {
         Project project = builder.givenAProject();
         restConfigurationControllerMockMvc.perform(get("/api/custom-ui/project/{project}.json", project.getId()))
             .andExpect(status().isOk())
@@ -168,7 +168,7 @@ public class CustomUIControllerTests {
     @Test
     @Transactional
     @WithMockUser(username = "superadmin")
-    public void change_project_custom_ui() throws Exception {
+    public void changeProjectCustomUi() throws Exception {
         Project project = builder.givenAProject();
 
         String customUI = """

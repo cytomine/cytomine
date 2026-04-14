@@ -78,7 +78,7 @@ public class ProjectConnectionResourceTests {
 
     @Test
     @Transactional
-    public void add_connection() throws Exception {
+    public void addConnection() throws Exception {
         User user = builder.givenSuperAdmin();
         Project project = builder.givenAProject();
 
@@ -103,7 +103,7 @@ public class ProjectConnectionResourceTests {
 
     @Test
     @Transactional
-    public void get_connection_by_user_and_project() throws Exception {
+    public void getConnectionByUserAndProject() throws Exception {
         User user = builder.givenAUser();
         Project project1 = builder.givenAProject();
 
@@ -121,7 +121,7 @@ public class ProjectConnectionResourceTests {
 
     @Test
     @Transactional
-    public void get_connection_by_project() throws Exception {
+    public void getConnectionByProject() throws Exception {
         User user = builder.givenAUser();
         User anotherUser = builder.givenAUser();
         Project project1 = builder.givenAProject();
@@ -140,7 +140,7 @@ public class ProjectConnectionResourceTests {
 
     @Test
     @Transactional
-    public void get_last_connection_by_project() throws Exception {
+    public void getLastConnectionByProject() throws Exception {
         User user = builder.givenAUser();
         Project project1 = builder.givenAProject();
 
@@ -158,7 +158,7 @@ public class ProjectConnectionResourceTests {
 
     @Test
     @Transactional
-    public void get_last_connection_by_project_by_user() throws Exception {
+    public void getLastConnectionByProjectByUser() throws Exception {
         User user = builder.givenAUser();
         Project project1 = builder.givenAProject();
 
@@ -177,7 +177,7 @@ public class ProjectConnectionResourceTests {
 
     @Test
     @Transactional
-    public void get_number_connection_by_project() throws Exception {
+    public void getNumberConnectionByProject() throws Exception {
         User user = builder.givenAUser();
         Project project1 = builder.givenAProject();
 
@@ -194,7 +194,7 @@ public class ProjectConnectionResourceTests {
 
     @Test
     @Transactional
-    public void get_number_connection_by_project_heatmap() throws Exception {
+    public void getNumberConnectionByProjectHeatmap() throws Exception {
         User user = builder.givenAUser();
         Project project1 = builder.givenAProject();
 
@@ -210,7 +210,7 @@ public class ProjectConnectionResourceTests {
 
     @Test
     @Transactional
-    public void get_number_connection_by_project_with_period() throws Exception {
+    public void getNumberConnectionByProjectWithPeriod() throws Exception {
         User user = builder.givenAUser();
         Project project1 = builder.givenAProject();
 
@@ -227,7 +227,7 @@ public class ProjectConnectionResourceTests {
 
     @Test
     @Transactional
-    public void get_number_connection_frequency_by_user() throws Exception {
+    public void getNumberConnectionFrequencyByUser() throws Exception {
         User user = builder.givenAUser();
         Project project1 = builder.givenAProject();
 
@@ -244,7 +244,7 @@ public class ProjectConnectionResourceTests {
 
     @Test
     @Transactional
-    public void get_number_connection_frequency_by_user_with_heatmap() throws Exception {
+    public void getNumberConnectionFrequencyByUserWithHeatmap() throws Exception {
         User user = builder.givenAUser();
         Project project1 = builder.givenAProject();
 
@@ -261,7 +261,7 @@ public class ProjectConnectionResourceTests {
 
     @Test
     @Transactional
-    public void get_number_connection_frequency_by_user_with_period() throws Exception {
+    public void getNumberConnectionFrequencyByUserWithPeriod() throws Exception {
         User user = builder.givenAUser();
         Project project1 = builder.givenAProject();
 
@@ -278,7 +278,7 @@ public class ProjectConnectionResourceTests {
 
     @Test
     @Transactional
-    public void get_connection_frequency() throws Exception {
+    public void getConnectionFrequency() throws Exception {
         User user = builder.givenAUser();
         Project project1 = builder.givenAProject();
 
@@ -292,7 +292,7 @@ public class ProjectConnectionResourceTests {
 
     @Test
     @Transactional
-    public void average_econnection() throws Exception {
+    public void averageEconnection() throws Exception {
         User user = builder.givenAUser();
         Project project1 = builder.givenAProject();
 
@@ -307,7 +307,7 @@ public class ProjectConnectionResourceTests {
 
     @Test
     @Transactional
-    public void user_connection_count() throws Exception {
+    public void userConnectionCount() throws Exception {
         User user = builder.givenAUser();
         Project project1 = builder.givenAProject();
 
@@ -323,7 +323,7 @@ public class ProjectConnectionResourceTests {
 
     @Test
     @Transactional
-    public void connection_history() throws Exception {
+    public void connectionHistory() throws Exception {
         User user = builder.givenAUser();
         Project project1 = builder.givenAProject();
 
@@ -340,7 +340,7 @@ public class ProjectConnectionResourceTests {
 
     @Test
     @Transactional
-    public void connection_history_with_export_csv() throws Exception {
+    public void connectionHistoryWithExportCsv() throws Exception {
         User user = builder.givenAUser();
         Project project1 = builder.givenAProject();
 
@@ -385,7 +385,7 @@ public class ProjectConnectionResourceTests {
 
     @Test
     @Transactional
-    public void activity_detail() throws Exception {
+    public void activityDetail() throws Exception {
         User user = builder.givenAUser();
         Project project1 = builder.givenAProject();
 
@@ -403,7 +403,7 @@ public class ProjectConnectionResourceTests {
     @Disabled("Disabled until ReportService is up!")
     @Test
     @Transactional
-    public void activity_detail_with_export_csv() throws Exception {
+    public void activityDetailWithExportCsv() throws Exception {
         User user = builder.givenAUser();
         Project project1 = builder.givenAProject();
 

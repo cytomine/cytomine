@@ -44,19 +44,19 @@ public class RelationTermAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list_relation_terms() {
+    public void adminCanListRelationTerms() {
         expectOK(() -> relationTermService.list(relationTerm.getTerm1()));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_with_read_can_list_relation_terms() {
+    public void userWithReadCanListRelationTerms() {
         expectOK(() -> relationTermService.list(relationTerm.getTerm1()));
     }
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
-    public void user_no_acl_cannot_list_relation_terms() {
+    public void userNoAclCannotListRelationTerms() {
         expectForbidden(() -> relationTermService.list(relationTerm.getTerm1()));
     }
 

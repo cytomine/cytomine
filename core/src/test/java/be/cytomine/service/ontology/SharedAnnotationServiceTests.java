@@ -64,36 +64,36 @@ public class SharedAnnotationServiceTests {
     TransactionService transactionService;
 
     @Test
-    void list_all_sharedAnnotation_with_success() {
+    void listAllSharedAnnotationWithSuccess() {
         SharedAnnotation sharedAnnotation = builder.givenASharedAnnotation();
         assertThat(sharedAnnotation).isIn(sharedAnnotationService.list());
     }
 
     @Test
-    void get_sharedAnnotation_with_success() {
+    void getSharedAnnotationWithSuccess() {
         SharedAnnotation sharedAnnotation = builder.givenASharedAnnotation();
         assertThat(sharedAnnotation).isEqualTo(sharedAnnotationService.get(sharedAnnotation.getId()));
     }
 
     @Test
-    void get_unexisting_sharedAnnotation_return_null() {
+    void getUnexistingSharedAnnotationReturnNull() {
         assertThat(sharedAnnotationService.get(0L)).isNull();
     }
 
     @Test
-    void find_sharedAnnotation_with_success() {
+    void findSharedAnnotationWithSuccess() {
         SharedAnnotation sharedAnnotation = builder.givenASharedAnnotation();
         assertThat(sharedAnnotationService.find(sharedAnnotation.getId()).isPresent());
         assertThat(sharedAnnotation).isEqualTo(sharedAnnotationService.find(sharedAnnotation.getId()).get());
     }
 
     @Test
-    void find_unexisting_sharedAnnotation_return_empty() {
+    void findUnexistingSharedAnnotationReturnEmpty() {
         assertThat(sharedAnnotationService.find(0L)).isEmpty();
     }
 
     @Test
-    void list_all_sharedAnnotation_by_annotation() {
+    void listAllSharedAnnotationByAnnotation() {
         UserAnnotation annotation = builder.givenAUserAnnotation();
         SharedAnnotation sharedAnnotation = builder.givenASharedAnnotation(annotation);
         assertThat(sharedAnnotation).isIn(sharedAnnotationService.listComments(annotation));
@@ -101,7 +101,7 @@ public class SharedAnnotationServiceTests {
     }
 
     @Test
-    void add_valid_sharedAnnotation_with_success() {
+    void addValidSharedAnnotationWithSuccess() {
         AnnotationDomain annotationDomain = builder.givenAUserAnnotation();
         SharedAnnotation sharedAnnotation = builder.givenANotPersistedSharedAnnotation();
         sharedAnnotation.setAnnotation(annotationDomain);
@@ -124,7 +124,7 @@ public class SharedAnnotationServiceTests {
 
 
     @Test
-    void delete_sharedAnnotation_with_success() {
+    void deleteSharedAnnotationWithSuccess() {
         SharedAnnotation sharedAnnotation = builder.givenASharedAnnotation();
 
         CommandResponse commandResponse = sharedAnnotationService.delete(sharedAnnotation, null, null, true);

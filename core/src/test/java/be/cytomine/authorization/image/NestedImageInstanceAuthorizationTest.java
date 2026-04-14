@@ -43,19 +43,19 @@ public class NestedImageInstanceAuthorizationTest extends CRUDAuthorizationTest 
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list() {
+    public void adminCanList() {
         assertThat(nestedImageInstanceService.list(nestedImageInstance.getParent())).contains(nestedImageInstance);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_list() {
+    public void userCanList() {
         assertThat(nestedImageInstanceService.list(nestedImageInstance.getParent())).contains(nestedImageInstance);
     }
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
-    public void user_with_no_read_cannot_list() {
+    public void userWithNoReadCannotList() {
         expectForbidden(() -> nestedImageInstanceService.list(nestedImageInstance.getParent()));
     }
 

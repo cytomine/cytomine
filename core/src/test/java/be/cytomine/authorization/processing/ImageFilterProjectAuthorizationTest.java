@@ -41,31 +41,31 @@ public class ImageFilterProjectAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list_all_image_filters() {
+    public void adminCanListAllImageFilters() {
         expectOK(() -> imageFilterProjectService.list());
     }
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
-    public void user_no_acl_cannot_list_project_representative_user() {
+    public void userNoAclCannotListProjectRepresentativeUser() {
         expectForbidden(() -> imageFilterProjectService.list());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void project_admin_can_list_project_image_filters() {
+    public void projectAdminCanListProjectImageFilters() {
         expectOK(() -> imageFilterProjectService.list(imageFilterProject.getProject()));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void contributor_can_list_project_image_filter() {
+    public void contributorCanListProjectImageFilter() {
         expectOK(() -> imageFilterProjectService.list(imageFilterProject.getProject()));
     }
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
-    public void user_not_in_project_cannot_list_project_image_filter() {
+    public void userNotInProjectCannotListProjectImageFilter() {
         expectForbidden(() -> imageFilterProjectService.list(imageFilterProject.getProject()));
     }
 

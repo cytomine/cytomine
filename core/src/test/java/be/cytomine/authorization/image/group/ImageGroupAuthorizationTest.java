@@ -97,19 +97,19 @@ public class ImageGroupAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list_imagegroup() {
+    public void adminCanListImagegroup() {
         assertThat(imageGroupService.list(imageGroup.getProject())).contains(imageGroup);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_list_imagegroup() {
+    public void userCanListImagegroup() {
         assertThat(imageGroupService.list(imageGroup.getProject())).contains(imageGroup);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void user_admin_can_add_in_readonly_mode() {
+    public void userAdminCanAddInReadonlyMode() {
         imageGroup.getProject().setMode(EditingMode.READ_ONLY);
         expectOK(() -> whenIAddDomain());
     }

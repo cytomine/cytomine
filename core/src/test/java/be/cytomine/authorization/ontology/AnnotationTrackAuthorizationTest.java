@@ -42,19 +42,19 @@ public class AnnotationTrackAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list_annotationTracks() {
+    public void adminCanListAnnotationTracks() {
         expectOK(() -> annotationTrackService.list(annotationTrack.getTrack()));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_list_annotationTracks() {
+    public void userCannotListAnnotationTracks() {
         expectOK(() -> annotationTrackService.list(annotationTrack.getTrack()));
     }
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
-    public void user_without_acl_cannot_list_annotationTracks() {
+    public void userWithoutAclCannotListAnnotationTracks() {
         expectForbidden(() -> annotationTrackService.list(annotationTrack.getTrack()));
     }
 

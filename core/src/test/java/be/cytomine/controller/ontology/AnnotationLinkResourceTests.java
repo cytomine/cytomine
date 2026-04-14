@@ -36,7 +36,7 @@ public class AnnotationLinkResourceTests {
 
     @Test
     @Transactional
-    public void add_valid_annotation_link() throws Exception {
+    public void addValidAnnotationLink() throws Exception {
         AnnotationLink annotationLink = builder.givenANotPersistedAnnotationLink();
         restAnnotationLinkControllerMockMvc.perform(post("/api/annotationlink.json")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -54,7 +54,7 @@ public class AnnotationLinkResourceTests {
 
     @Test
     @Transactional
-    public void list_annotation_link_by_annotation_group() throws Exception {
+    public void listAnnotationLinkByAnnotationGroup() throws Exception {
         AnnotationLink annotationLink = builder.givenAnAnnotationLink();
         restAnnotationLinkControllerMockMvc.perform(get(
                 "/api/annotationgroup/{id}/annotationlink.json",
@@ -66,7 +66,7 @@ public class AnnotationLinkResourceTests {
 
     @Test
     @Transactional
-    public void list_annotation_link_by_annotation() throws Exception {
+    public void listAnnotationLinkByAnnotation() throws Exception {
         AnnotationLink annotationLink = builder.givenAnAnnotationLink();
         restAnnotationLinkControllerMockMvc.perform(get(
                 "/api/annotation/{id}/annotationlink.json",
@@ -78,7 +78,7 @@ public class AnnotationLinkResourceTests {
 
     @Test
     @Transactional
-    public void delete_annotation_link() throws Exception {
+    public void deleteAnnotationLink() throws Exception {
         AnnotationLink annotationLink = builder.givenAnAnnotationLink();
         restAnnotationLinkControllerMockMvc.perform(delete(
                 "/api/annotationgroup/{annotationGroup}/annotation/{annotation}.json",

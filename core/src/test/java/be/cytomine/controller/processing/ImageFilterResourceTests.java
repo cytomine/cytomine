@@ -46,7 +46,7 @@ public class ImageFilterResourceTests {
 
     @Test
     @Transactional
-    public void list_all() throws Exception {
+    public void listAll() throws Exception {
         restImageFilterMockMvc.perform(get("/api/imagefilter.json"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))

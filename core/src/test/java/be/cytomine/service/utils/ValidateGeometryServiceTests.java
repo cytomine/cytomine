@@ -25,7 +25,7 @@ public class ValidateGeometryServiceTests {
     ValidateGeometryService validateGeometryService;
 
     @Test
-    public void validate_valid_polygon() {
+    public void validateValidPolygon() {
         assertThat(validateGeometryService.tryToMakeItValidIfNotValid(
             "POLYGON ((2 2, 3 2, 3 4, 2 4, 2 2))"
         )).isEqualTo("POLYGON ((2 2, 3 2, 3 4, 2 4, 2 2))");

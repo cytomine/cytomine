@@ -56,7 +56,7 @@ public class ImagePropertiesServiceTests {
     }
 
     @Test
-    void extract_populated_properties_to_abstract_image() throws IOException, IllegalAccessException {
+    void extractPopulatedPropertiesToAbstractImage() throws IOException, IllegalAccessException {
         AbstractImage image = builder.givenAnAbstractImage();
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");

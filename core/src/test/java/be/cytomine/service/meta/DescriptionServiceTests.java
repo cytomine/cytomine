@@ -52,13 +52,13 @@ public class DescriptionServiceTests {
     BasicInstanceBuilder builder;
 
     @Test
-    public void list_description() {
+    public void listDescription() {
         Description description = builder.givenADescription(builder.givenAProject());
         assertThat(descriptionService.list()).contains(description);
     }
 
     @Test
-    public void find_description_for_domain() {
+    public void findDescriptionForDomain() {
         Project project = builder.givenAProject();
         Description description = builder.givenADescription(project);
         assertThat(descriptionService.findByDomain(project)).contains(description);
@@ -66,7 +66,7 @@ public class DescriptionServiceTests {
 
 
     @Test
-    public void find_description_for_domain_ident() {
+    public void findDescriptionForDomainIdent() {
         Project project = builder.givenAProject();
         Description description = builder.givenADescription(project);
         assertThat(descriptionService.findByDomain(
@@ -76,7 +76,7 @@ public class DescriptionServiceTests {
     }
 
     @Test
-    public void find_description_for_domain_that_do_not_exists() {
+    public void findDescriptionForDomainThatDoNotExists() {
         Assertions.assertThrows(
             ObjectNotFoundException.class, () -> {
                 descriptionService.findByDomain(Project.class.getName(), 0L);
@@ -86,7 +86,7 @@ public class DescriptionServiceTests {
 
 
     @Test
-    public void create_description() {
+    public void createDescription() {
         Project project = builder.givenAProject();
         Description description = builder.givenANotPersistedDescription(project);
         CommandResponse commandResponse = descriptionService.add(description.toJsonObject());
@@ -95,7 +95,7 @@ public class DescriptionServiceTests {
     }
 
     @Test
-    public void create_description_already_exists_fail() {
+    public void createDescriptionAlreadyExistsFail() {
         Project project = builder.givenAProject();
         Assertions.assertThrows(
             AlreadyExistException.class, () -> {
@@ -108,7 +108,7 @@ public class DescriptionServiceTests {
 
 
     @Test
-    public void edit_description() {
+    public void editDescription() {
         Project project = builder.givenAProject();
         Description description = builder.givenADescription(project);
         description.setData("v2");
@@ -118,7 +118,7 @@ public class DescriptionServiceTests {
     }
 
     @Test
-    public void delete_description() {
+    public void deleteDescription() {
         Project project = builder.givenAProject();
         Description description = builder.givenADescription(project);
         descriptionService.delete(description, null, null, false);

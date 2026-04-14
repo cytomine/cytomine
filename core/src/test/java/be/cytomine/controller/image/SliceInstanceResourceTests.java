@@ -77,7 +77,7 @@ public class SliceInstanceResourceTests {
 
     @Test
     @Transactional
-    public void list_slice_instance_by_image_instance() throws Exception {
+    public void listSliceInstanceByImageInstance() throws Exception {
         SliceInstance sliceInstance = builder.givenASliceInstance();
 
         restSliceInstanceControllerMockMvc.perform(get(
@@ -90,7 +90,7 @@ public class SliceInstanceResourceTests {
 
     @Test
     @Transactional
-    public void get_an_slice_instance() throws Exception {
+    public void getAnSliceInstance() throws Exception {
         SliceInstance image = givenTestSliceInstance();
 
         restSliceInstanceControllerMockMvc.perform(get("/api/sliceinstance/{id}.json", image.getId()))
@@ -111,7 +111,7 @@ public class SliceInstanceResourceTests {
 
     @Test
     @Transactional
-    public void get_an_slice_instance_not_exist() throws Exception {
+    public void getAnSliceInstanceNotExist() throws Exception {
         restSliceInstanceControllerMockMvc.perform(get("/api/sliceinstance/{id}.json", 0))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.errors.message").exists());
@@ -119,7 +119,7 @@ public class SliceInstanceResourceTests {
 
     @Test
     @Transactional
-    public void get_an_slice_instance_with_coordinates() throws Exception {
+    public void getAnSliceInstanceWithCoordinates() throws Exception {
         SliceInstance image = givenTestSliceInstance();
 
         restSliceInstanceControllerMockMvc.perform(get(
@@ -135,7 +135,7 @@ public class SliceInstanceResourceTests {
 
     @Test
     @Transactional
-    public void add_valid_slice_instance() throws Exception {
+    public void addValidSliceInstance() throws Exception {
         SliceInstance sliceInstance = builder.givenANotPersistedSliceInstance();
         restSliceInstanceControllerMockMvc.perform(post("/api/sliceinstance.json")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -152,7 +152,7 @@ public class SliceInstanceResourceTests {
 
     @Test
     @Transactional
-    public void edit_valid_slice_instance() throws Exception {
+    public void editValidSliceInstance() throws Exception {
         SliceInstance sliceInstance = builder.givenASliceInstance();
         JsonObject jsonObject = sliceInstance.toJsonObject();
         restSliceInstanceControllerMockMvc.perform(put("/api/sliceinstance/{id}.json", sliceInstance.getId())
@@ -170,7 +170,7 @@ public class SliceInstanceResourceTests {
 
     @Test
     @Transactional
-    public void delete_slice_instance() throws Exception {
+    public void deleteSliceInstance() throws Exception {
         SliceInstance sliceInstance = builder.givenASliceInstance();
         restSliceInstanceControllerMockMvc.perform(delete("/api/sliceinstance/{id}.json", sliceInstance.getId()))
             .andExpect(status().isOk())
@@ -185,7 +185,7 @@ public class SliceInstanceResourceTests {
 
     @Test
     @Transactional
-    public void get_slice_instance_thumb() throws Exception {
+    public void getSliceInstanceThumb() throws Exception {
         SliceInstance image = givenTestSliceInstance();
         byte[] mockResponse = UUID.randomUUID()
             .toString()
@@ -211,7 +211,7 @@ public class SliceInstanceResourceTests {
 
     @Test
     @Transactional
-    public void get_slice_instance_thumb_if_image_not_exist() throws Exception {
+    public void getSliceInstanceThumbIfImageNotExist() throws Exception {
         restSliceInstanceControllerMockMvc.perform(get("/api/sliceinstance/{id}/thumb.png", 0))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.errors").exists());
@@ -219,7 +219,7 @@ public class SliceInstanceResourceTests {
 
     @Test
     @Transactional
-    public void get_slice_instance_tile() throws Exception {
+    public void getSliceInstanceTile() throws Exception {
         SliceInstance image = givenTestSliceInstance();
         byte[] mockResponse = UUID.randomUUID()
             .toString()
@@ -247,7 +247,7 @@ public class SliceInstanceResourceTests {
 
     @Test
     @Transactional
-    public void get_slice_instance_tile_if_image_not_exist() throws Exception {
+    public void getSliceInstanceTileIfImageNotExist() throws Exception {
         restSliceInstanceControllerMockMvc.perform(get(
                 "/api/sliceinstance/{id}/normalized-tile/zoom/{z}/tx/{tx}/ty/{ty}.jpg?filters=binary",
                 0,
@@ -262,7 +262,7 @@ public class SliceInstanceResourceTests {
     @Disabled("Randomly fail with ProxyExchange, need to find a solution")
     @Test
     @Transactional
-    public void get_slice_instance_crop() throws Exception {
+    public void getSliceInstanceCrop() throws Exception {
         SliceInstance image = givenTestSliceInstance();
 
         configureFor("localhost", 8888);
@@ -301,7 +301,7 @@ public class SliceInstanceResourceTests {
     @Disabled("Randomly fail with ProxyExchange, need to find a solution")
     @Test
     @Transactional
-    public void get_slice_instance_window() throws Exception {
+    public void getSliceInstanceWindow() throws Exception {
         SliceInstance image = givenTestSliceInstance();
 
         byte[] mockResponse = UUID.randomUUID()
@@ -391,7 +391,7 @@ public class SliceInstanceResourceTests {
 
     @Test
     @Transactional
-    public void histograms_bounds() throws Exception {
+    public void histogramsBounds() throws Exception {
         SliceInstance image = givenTestSliceInstance();
 
 
@@ -418,7 +418,7 @@ public class SliceInstanceResourceTests {
 
     @Test
     @Transactional
-    public void channel_histograms() throws Exception {
+    public void channelHistograms() throws Exception {
         SliceInstance image = givenTestSliceInstance();
 
         configureFor("localhost", 8888);
@@ -464,7 +464,7 @@ public class SliceInstanceResourceTests {
 
     @Test
     @Transactional
-    public void channel_histograms_bounds() throws Exception {
+    public void channelHistogramsBounds() throws Exception {
         SliceInstance image = givenTestSliceInstance();
 
 

@@ -59,7 +59,7 @@ public class TagResourceTests {
 
     @Test
     @Transactional
-    public void list_all_tags() throws Exception {
+    public void listAllTags() throws Exception {
         Tag tag = builder.givenATag();
         restTagControllerMockMvc.perform(get("/api/tag.json"))
             .andExpect(status().isOk())
@@ -84,7 +84,7 @@ public class TagResourceTests {
 
     @Test
     @Transactional
-    public void add_valid_tag() throws Exception {
+    public void addValidTag() throws Exception {
         Tag tag = builder.givenANotPersistedTag("xxx");
         restTagControllerMockMvc.perform(post("/api/tag.json")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -102,7 +102,7 @@ public class TagResourceTests {
 
     @Test
     @Transactional
-    public void add_tag_refused_if_already_exists() throws Exception {
+    public void addTagRefusedIfAlreadyExists() throws Exception {
         Tag tag = builder.givenANotPersistedTag("xxx");
         builder.persistAndReturn(tag);
         restTagControllerMockMvc.perform(post("/api/tag.json")
@@ -114,7 +114,7 @@ public class TagResourceTests {
 
     @Test
     @Transactional
-    public void add_tag_refused_if_name_not_set() throws Exception {
+    public void addTagRefusedIfNameNotSet() throws Exception {
         Tag tag = builder.givenANotPersistedTag(null);
         restTagControllerMockMvc.perform(post("/api/tag.json")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -125,7 +125,7 @@ public class TagResourceTests {
 
     @Test
     @Transactional
-    public void edit_valid_tag() throws Exception {
+    public void editValidTag() throws Exception {
         Tag tag = builder.givenATag();
         restTagControllerMockMvc.perform(put("/api/tag/{id}.json", tag.getId())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -143,7 +143,7 @@ public class TagResourceTests {
 
     @Test
     @Transactional
-    public void fail_when_editing_tag_does_not_exists() throws Exception {
+    public void failWhenEditingTagDoesNotExists() throws Exception {
         Tag tag = builder.givenATag();
         em.remove(tag);
         restTagControllerMockMvc.perform(put("/api/tag/{id}.json", 0)
@@ -156,7 +156,7 @@ public class TagResourceTests {
 
     @Test
     @Transactional
-    public void delete_tag() throws Exception {
+    public void deleteTag() throws Exception {
         Tag tag = builder.givenATag();
         restTagControllerMockMvc.perform(delete("/api/tag/{id}.json", tag.getId())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -174,7 +174,7 @@ public class TagResourceTests {
 
     @Test
     @Transactional
-    public void fail_when_delete_tag_not_exists() throws Exception {
+    public void failWhenDeleteTagNotExists() throws Exception {
         restTagControllerMockMvc.perform(delete("/api/tag/{id}.json", 0)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isNotFound())

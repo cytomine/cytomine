@@ -44,7 +44,7 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
 
     @Test
     @WithMockUser(username = GUEST)
-    public void every_body_can_read_user() {
+    public void everyBodyCanReadUser() {
         User userNoAcl = userRepository.findByUsernameLikeIgnoreCase(USER_NO_ACL).get();
         assertThat(userService.findUser(userNoAcl.getId())).isPresent();
         assertThat(userService.find(userNoAcl.getId())).isPresent();
@@ -56,13 +56,13 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
 
     @Test
     @WithMockUser(username = GUEST)
-    public void every_body_list_user() {
+    public void everyBodyListUser() {
         userService.list(new ArrayList<>(), "created", "desc", 0L, 0L);
     }
 
     @Test
     @WithMockUser(username = GUEST)
-    public void every_body_cannot_list_user_from_project() {
+    public void everyBodyCannotListUserFromProject() {
         expectForbidden(() -> userService.listUsersExtendedByProject(
             builder.givenAProject(),
             new UserSearchExtension(),
@@ -86,7 +86,7 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_project_can_list_user_from_project() {
+    public void userProjectCanListUserFromProject() {
         Project project = builder.givenAProject();
         builder.addUserToProject(project, USER_ACL_READ);
         expectOK(() -> userService.listUsersExtendedByProject(
@@ -106,14 +106,14 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
     @Disabled
     @Test
     @WithMockUser(username = USER_NO_ACL)
-    public void user_can_add_user() {
+    public void userCanAddUser() {
         User user = builder.givenANotPersistedUser();
         expectOK(() -> userService.add(user.toJsonObject().withChange("password", UUID.randomUUID().toString())));
     }
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
-    public void user_can_modify_himself() {
+    public void userCanModifyHimself() {
         User user = userRepository.findByUsernameLikeIgnoreCase(USER_NO_ACL).get();
         expectOK(() -> userService.update(user, user.toJsonObject().withChange("name", "user_can_modify_himself")));
         assertThat(user.getName()).isEqualTo("user_can_modify_himself");
@@ -129,7 +129,7 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
-    public void user_cannot_modify_another_user() {
+    public void userCannotModifyAnotherUser() {
         User user = userRepository.findByUsernameLikeIgnoreCase(GUEST).get();
         expectForbidden(() -> userService.update(
             user,
@@ -139,21 +139,21 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
-    public void user_cannot_delete_another_user() {
+    public void userCannotDeleteAnotherUser() {
         User user = builder.givenAUser();
         expectForbidden(() -> userService.delete(user, null, null, false));
     }
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
-    public void user_cannot_delete_himself() {
+    public void userCannotDeleteHimself() {
         User user = userRepository.findByUsernameLikeIgnoreCase(USER_NO_ACL).get();
         expectForbidden(() -> userService.delete(user, null, null, false));
     }
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_delete_another_user() {
+    public void adminCanDeleteAnotherUser() {
         User user = builder.givenAUser();
         expectOK(() -> userService.delete(user, null, null, false));
     }

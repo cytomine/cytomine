@@ -87,7 +87,7 @@ public class AnnotationListingServiceTests {
     KmeansGeometryService kmeansGeometryService;
 
     @Test
-    void search_user_annotation_by_project() {
+    void searchUserAnnotationByProject() {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         UserAnnotation userAnnotationFromAnotherProject = builder.givenAUserAnnotation();
 
@@ -100,7 +100,7 @@ public class AnnotationListingServiceTests {
     }
 
     @Test
-    void search_user_annotation_by_image() {
+    void searchUserAnnotationByImage() {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         UserAnnotation userAnnotationFromAnotherImage = builder.givenAUserAnnotation();
 
@@ -113,7 +113,7 @@ public class AnnotationListingServiceTests {
     }
 
     @Test
-    void search_user_annotation_by_images() {
+    void searchUserAnnotationByImages() {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         UserAnnotation userAnnotationFromAnotherImage = builder.givenAUserAnnotation();
         userAnnotationFromAnotherImage.getImage().setProject(userAnnotation.getProject());
@@ -134,7 +134,7 @@ public class AnnotationListingServiceTests {
     }
 
     @Test
-    void search_user_annotation_by_images_from_different_project_fails() {
+    void searchUserAnnotationByImagesFromDifferentProjectFails() {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         UserAnnotation userAnnotationFromAnotherImage = builder.givenAUserAnnotation();
 
@@ -150,7 +150,7 @@ public class AnnotationListingServiceTests {
     }
 
     @Test
-    void search_user_annotation_by_terms() {
+    void searchUserAnnotationByTerms() {
         UserAnnotation userAnnotation = builder.givenAnAnnotationTerm().getUserAnnotation();
         UserAnnotation userAnnotationWithDifferentTerm
             = builder.givenAUserAnnotation();
@@ -183,7 +183,7 @@ public class AnnotationListingServiceTests {
 
 
     @Test
-    void search_user_annotation_with_multiple_terms() {
+    void searchUserAnnotationWithMultipleTerms() {
         UserAnnotation userAnnotation = builder.givenAnAnnotationTerm().getUserAnnotation();
         builder.givenAnAnnotationTerm(
             userAnnotation,
@@ -213,7 +213,7 @@ public class AnnotationListingServiceTests {
 
 
     @Test
-    void search_reviewed_annotation_by_project() {
+    void searchReviewedAnnotationByProject() {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         ReviewedAnnotation reviewedAnnotationFromAnotherProject = builder.givenAReviewedAnnotation();
 
@@ -226,7 +226,7 @@ public class AnnotationListingServiceTests {
     }
 
     @Test
-    void search_reviewed_annotation_by_image() {
+    void searchReviewedAnnotationByImage() {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         ReviewedAnnotation reviewedAnnotationFromAnotherImage = builder.givenAReviewedAnnotation();
 
@@ -239,7 +239,7 @@ public class AnnotationListingServiceTests {
     }
 
     @Test
-    void search_reviewed_annotation_by_images() {
+    void searchReviewedAnnotationByImages() {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         ReviewedAnnotation reviewedAnnotationFromAnotherImage = builder.givenAReviewedAnnotation();
         reviewedAnnotationFromAnotherImage.setImage(builder.givenAnImageInstance(reviewedAnnotation.getProject()));
@@ -256,7 +256,7 @@ public class AnnotationListingServiceTests {
     }
 
     @Test
-    void search_reviewed_annotation_by_images_from_different_project_fails() {
+    void searchReviewedAnnotationByImagesFromDifferentProjectFails() {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         ReviewedAnnotation reviewedAnnotationFromAnotherImage = builder.givenAReviewedAnnotation();
 
@@ -273,7 +273,7 @@ public class AnnotationListingServiceTests {
 
 
     @Test
-    void search_reviewed_annotation_by_users() {
+    void searchReviewedAnnotationByUsers() {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
 
         ReviewedAnnotationListing reviewedAnnotationListing = new ReviewedAnnotationListing(entityManager);
@@ -300,7 +300,7 @@ public class AnnotationListingServiceTests {
     ); //e intersect a,b and c
 
     @Test
-    void search_reviewed_annotation_by_terms() throws ParseException {
+    void searchReviewedAnnotationByTerms() throws ParseException {
 
         SliceInstance sliceInstance = builder.givenASliceInstance();
         User user1 = builder.givenAUser();
@@ -347,7 +347,7 @@ public class AnnotationListingServiceTests {
 
 
     @Test
-    void search_reviewed_annotation_by_bbox() throws ParseException {
+    void searchReviewedAnnotationByBbox() throws ParseException {
 
         SliceInstance sliceInstance = builder.givenASliceInstance();
         User user1 = builder.givenAUser();
@@ -378,7 +378,7 @@ public class AnnotationListingServiceTests {
     }
 
     @Test
-    void search_reviewed_annotation_by_image_and_review_user() throws ParseException {
+    void searchReviewedAnnotationByImageAndReviewUser() throws ParseException {
 
         SliceInstance sliceInstance = builder.givenASliceInstance();
         User user1 = builder.givenAUser();

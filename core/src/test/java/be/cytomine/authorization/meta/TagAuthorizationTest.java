@@ -55,25 +55,25 @@ public class TagAuthorizationTest extends AbstractAuthorizationTest {
 
     @Test
     @WithMockUser(username = GUEST)
-    public void everyone_can_list_tags() {
+    public void everyoneCanListTags() {
         assertThat(tagService.list()).contains(tag);
     }
 
     @Test
     @WithMockUser(username = GUEST)
-    public void guest_cannot_add_tag() {
+    public void guestCannotAddTag() {
         expectForbidden(this::whenIAddDomain);
     }
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
-    public void user_can_add_tag() {
+    public void userCanAddTag() {
         expectOK(this::whenIAddDomain);
     }
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_update_tag_even_if_linked_with_associations() {
+    public void adminCanUpdateTagEvenIfLinkedWithAssociations() {
         Tag tagToEdit = builder.givenATag();
         TagDomainAssociation association = builder.givenATagAssociation(tagToEdit, builder.givenAProject());
         expectOK(() -> tagService.update(tagToEdit, tagToEdit.toJsonObject()));
@@ -81,7 +81,7 @@ public class TagAuthorizationTest extends AbstractAuthorizationTest {
 
     @Test
     @WithMockUser(username = CREATOR)
-    public void creator_cannot_update_tag_if_linked_with_associations() {
+    public void creatorCannotUpdateTagIfLinkedWithAssociations() {
         Tag tagToEdit = builder.givenATag();
         tagToEdit.setUser(userRepository.findByUsernameLikeIgnoreCase(CREATOR).get());
         builder.persistAndReturn(tagToEdit);
@@ -91,7 +91,7 @@ public class TagAuthorizationTest extends AbstractAuthorizationTest {
 
     @Test
     @WithMockUser(username = CREATOR)
-    public void creator_can_update_tag_if_not_linked_with_associations() {
+    public void creatorCanUpdateTagIfNotLinkedWithAssociations() {
         Tag tagToEdit = builder.givenATag();
         tagToEdit.setUser(userRepository.findByUsernameLikeIgnoreCase(CREATOR).get());
         builder.persistAndReturn(tagToEdit);
@@ -100,7 +100,7 @@ public class TagAuthorizationTest extends AbstractAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_tag_tag() {
+    public void adminCanTagTag() {
         Tag tagToEdit = builder.givenATag();
         TagDomainAssociation association = builder.givenATagAssociation(tagToEdit, builder.givenAProject());
         expectOK(() -> tagService.delete(tagToEdit, null, null, false));
@@ -108,7 +108,7 @@ public class TagAuthorizationTest extends AbstractAuthorizationTest {
 
     @Test
     @WithMockUser(username = CREATOR)
-    public void creator_cannot_delete_tag_if_linked_with_associations() {
+    public void creatorCannotDeleteTagIfLinkedWithAssociations() {
         Tag tagToDelete = builder.givenATag();
         tagToDelete.setUser(userRepository.findByUsernameLikeIgnoreCase(CREATOR).get());
         builder.persistAndReturn(tagToDelete);
@@ -118,7 +118,7 @@ public class TagAuthorizationTest extends AbstractAuthorizationTest {
 
     @Test
     @WithMockUser(username = CREATOR)
-    public void creator_can_delete_tag_if_not_linked_with_associations() {
+    public void creatorCanDeleteTagIfNotLinkedWithAssociations() {
         Tag tagToDelete = builder.givenATag();
         tagToDelete.setUser(userRepository.findByUsernameLikeIgnoreCase(CREATOR).get());
         builder.persistAndReturn(tagToDelete);

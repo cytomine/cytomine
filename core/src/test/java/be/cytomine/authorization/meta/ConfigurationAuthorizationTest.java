@@ -57,25 +57,25 @@ public class ConfigurationAuthorizationTest extends AbstractAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list_config() {
+    public void adminCanListConfig() {
         assertThat(configurationService.list()).contains(configForAdmin, configForUser, configForAll);
     }
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
-    public void user_can_list_config() {
+    public void userCanListConfig() {
         assertThat(configurationService.list()).contains(configForUser, configForAll).doesNotContain(configForAdmin);
     }
 
     @Test
     @WithMockUser(username = GUEST)
-    public void guest_can_list_config() {
+    public void guestCanListConfig() {
         assertThat(configurationService.list()).contains(configForAll).doesNotContain(configForUser, configForAdmin);
     }
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_read_config() {
+    public void adminReadConfig() {
         expectOK(() -> configurationService.findByKey(configForAdmin.getKey()));
         expectOK(() -> configurationService.findByKey(configForUser.getKey()));
         expectOK(() -> configurationService.findByKey(configForAll.getKey()));
@@ -83,7 +83,7 @@ public class ConfigurationAuthorizationTest extends AbstractAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
-    public void user_can_read_config() {
+    public void userCanReadConfig() {
         expectForbidden(() -> configurationService.findByKey(configForAdmin.getKey()));
         expectOK(() -> configurationService.findByKey(configForUser.getKey()));
         expectOK(() -> configurationService.findByKey(configForAll.getKey()));
@@ -91,7 +91,7 @@ public class ConfigurationAuthorizationTest extends AbstractAuthorizationTest {
 
     @Test
     @WithMockUser(username = GUEST)
-    public void guest_can_read_config() {
+    public void guestCanReadConfig() {
         expectForbidden(() -> configurationService.findByKey(configForAdmin.getKey()));
         expectForbidden(() -> configurationService.findByKey(configForUser.getKey()));
         expectOK(() -> configurationService.findByKey(configForAll.getKey()));
@@ -99,7 +99,7 @@ public class ConfigurationAuthorizationTest extends AbstractAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_create_config() {
+    public void adminCanCreateConfig() {
         expectOK(() -> configurationService.add(configForUser.toJsonObject()
             .withChange("id", null)
             .withChange("key", UUID.randomUUID().toString())));
@@ -107,7 +107,7 @@ public class ConfigurationAuthorizationTest extends AbstractAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
-    public void user_cannot_create_config() {
+    public void userCannotCreateConfig() {
         expectForbidden(() -> configurationService.add(configForUser.toJsonObject()
             .withChange("id", null)
             .withChange("key", UUID.randomUUID().toString())));
@@ -115,7 +115,7 @@ public class ConfigurationAuthorizationTest extends AbstractAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_edit_config() {
+    public void adminCanEditConfig() {
         expectOK(() -> configurationService.update(
             configForUser,
             configForUser.toJsonObject().withChange("value", "newvalue")
@@ -124,7 +124,7 @@ public class ConfigurationAuthorizationTest extends AbstractAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
-    public void user_cannot_edit_config() {
+    public void userCannotEditConfig() {
         expectForbidden(() -> configurationService.update(
             configForUser,
             configForUser.toJsonObject().withChange("value", "newvalue")
@@ -133,14 +133,14 @@ public class ConfigurationAuthorizationTest extends AbstractAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_delete_config() {
+    public void adminCanDeleteConfig() {
         Configuration configuration = builder.givenAConfiguration("xxx");
         expectOK(() -> configurationService.delete(configuration, null, null, false));
     }
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
-    public void user_cannot_delete_config() {
+    public void userCannotDeleteConfig() {
         Configuration configuration = builder.givenAConfiguration("xxx");
         expectForbidden(() -> configurationService.delete(configuration, null, null, false));
     }

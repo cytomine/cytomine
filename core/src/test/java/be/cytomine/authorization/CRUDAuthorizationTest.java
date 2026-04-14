@@ -12,7 +12,7 @@ public abstract class CRUDAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_edit_domain() {
+    public void adminCanEditDomain() {
         if (minimalRoleForEdit().isPresent() && minimalRoleForEdit().get().equals("CREATOR")) {
             expectOK(this::whenIEditDomain);
         } else if (isPermissionRoleForbidden(minimalRoleForEdit(), "ROLE_SUPERADMIN")) {
@@ -24,7 +24,7 @@ public abstract class CRUDAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void user_with_admin_permission_edit_domain() {
+    public void userWithAdminPermissionEditDomain() {
         if (minimalRoleForEdit().isPresent() && minimalRoleForEdit().get().equals("CREATOR")) {
             expectForbidden(this::whenIEditDomain);
         } else if (isPermissionForbidden(minimalPermissionForEdit(), BasePermission.ADMINISTRATION)) {
@@ -36,7 +36,7 @@ public abstract class CRUDAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_DELETE)
-    public void user_with_delete_permission_edit_domain() {
+    public void userWithDeletePermissionEditDomain() {
         if (minimalRoleForEdit().isPresent() && minimalRoleForEdit().get().equals("CREATOR")) {
             expectForbidden(this::whenIEditDomain);
         } else if (isPermissionForbidden(minimalPermissionForEdit(), BasePermission.DELETE)) {
@@ -48,7 +48,7 @@ public abstract class CRUDAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_CREATE)
-    public void user_with_create_permission_edit_domain() {
+    public void userWithCreatePermissionEditDomain() {
         if (minimalRoleForEdit().isPresent() && minimalRoleForEdit().get().equals("CREATOR")) {
             expectForbidden(this::whenIEditDomain);
         } else if (isPermissionForbidden(minimalPermissionForEdit(), BasePermission.CREATE)) {
@@ -60,7 +60,7 @@ public abstract class CRUDAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_WRITE)
-    public void user_with_write_permission_edit_domain() {
+    public void userWithWritePermissionEditDomain() {
         if (minimalRoleForEdit().isPresent() && minimalRoleForEdit().get().equals("CREATOR")) {
             expectForbidden(this::whenIEditDomain);
         } else if (isPermissionForbidden(minimalPermissionForEdit(), BasePermission.WRITE)) {
@@ -72,7 +72,7 @@ public abstract class CRUDAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_with_read_permission_edit_domain() {
+    public void userWithReadPermissionEditDomain() {
         if (minimalRoleForEdit().isPresent() && minimalRoleForEdit().get().equals("CREATOR")) {
             expectForbidden(this::whenIEditDomain);
         } else if (isPermissionForbidden(minimalPermissionForEdit(), BasePermission.READ)) {
@@ -84,7 +84,7 @@ public abstract class CRUDAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
-    public void user_without_permission_edit_domain() {
+    public void userWithoutPermissionEditDomain() {
         if (minimalRoleForEdit().isPresent() && minimalRoleForEdit().get().equals("CREATOR")) {
             expectForbidden(this::whenIEditDomain);
         } else if (isPermissionForbidden(minimalPermissionForEdit(), null)) {
@@ -96,7 +96,7 @@ public abstract class CRUDAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = GUEST)
-    public void guest_edit_domain() {
+    public void guestEditDomain() {
         if (minimalRoleForEdit().isPresent() && minimalRoleForEdit().get().equals("CREATOR")) {
             expectForbidden(this::whenIEditDomain);
         } else if (isPermissionRoleForbidden(minimalRoleForEdit(), "ROLE_GUEST")) {

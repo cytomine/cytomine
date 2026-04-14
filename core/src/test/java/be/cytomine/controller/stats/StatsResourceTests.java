@@ -161,7 +161,7 @@ public class StatsResourceTests {
     }
 
     @Test
-    void stats_term() throws Exception {
+    void statsTerm() throws Exception {
         Project project = builder.givenAProject();
 
         restStatsControllerMockMvc.perform(get("/api/project/{project}/stats/term.json", project.getId()))
@@ -186,7 +186,7 @@ public class StatsResourceTests {
     }
 
     @Test
-    void stats_user() throws Exception {
+    void statsUser() throws Exception {
         Project project = builder.givenAProject();
         builder.addUserToProject(project, "superadmin");
         UserAnnotation annotation1 = builder.givenAUserAnnotation(project);
@@ -210,7 +210,7 @@ public class StatsResourceTests {
     }
 
     @Test
-    void stats_term_slide() throws Exception {
+    void statsTermSlide() throws Exception {
         Project project = builder.givenAProject();
 
         restStatsControllerMockMvc.perform(get("/api/project/{project}/stats/termslide.json", project.getId()))
@@ -252,7 +252,7 @@ public class StatsResourceTests {
     }
 
     @Test
-    void stats_uder_slide() throws Exception {
+    void statsUderSlide() throws Exception {
         Project project = builder.givenAProject();
         builder.addUserToProject(project, "superadmin");
 
@@ -284,7 +284,7 @@ public class StatsResourceTests {
     }
 
     @Test
-    void stats_user_annotation() throws Exception {
+    void statsUserAnnotation() throws Exception {
         Project project = builder.givenAProject();
         builder.addUserToProject(project, "superadmin");
         UserAnnotation annotation1 = builder.givenAUserAnnotation(project);
@@ -310,7 +310,7 @@ public class StatsResourceTests {
 
 
     @Test
-    void stats_user_annotation_evolution() throws Exception {
+    void statsUserAnnotationEvolution() throws Exception {
         Project project = builder.givenAProject();
         UserAnnotation annotation1 = builder.givenAUserAnnotation(project);
         annotation1.setCreated(DateUtils.addDays(new Date(), -1));
@@ -332,7 +332,7 @@ public class StatsResourceTests {
     }
 
     @Test
-    void stats_reviewed_annotation_evolution() throws Exception {
+    void statsReviewedAnnotationEvolution() throws Exception {
         Project project = builder.givenAProject();
         ReviewedAnnotation annotation1 = builder.givenAReviewedAnnotation(project);
         annotation1.setCreated(DateUtils.addDays(new Date(), -1));
@@ -357,7 +357,7 @@ public class StatsResourceTests {
     }
 
     @Test
-    void stats_annotation_term_by_project() throws Exception {
+    void statsAnnotationTermByProject() throws Exception {
         Project project = builder.givenAProject();
         builder.addUserToProject(project, "superadmin");
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm(builder.givenAUserAnnotation(project));
@@ -371,13 +371,13 @@ public class StatsResourceTests {
     }
 
     @Test
-    void number_of_connections() throws Exception {
+    void numberOfConnections() throws Exception {
         restStatsControllerMockMvc.perform(get("/api/total/project/connections.json"))
             .andExpect(status().isOk());
     }
 
     @Test
-    void stats_domain_count() throws Exception {
+    void statsDomainCount() throws Exception {
         UserAnnotation annotation = builder.givenAUserAnnotation();
 
         restStatsControllerMockMvc.perform(get("/api/total/{domain}.json", annotation.getClass().getName()))
@@ -385,7 +385,7 @@ public class StatsResourceTests {
     }
 
     @Test
-    void current_stats() throws Exception {
+    void currentStats() throws Exception {
         restStatsControllerMockMvc.perform(get("/api/stats/currentStats.json"))
             .andExpect(status().isOk());
     }
@@ -397,7 +397,7 @@ public class StatsResourceTests {
     }
 
     @Test
-    void stats_connection_evolution() throws Exception {
+    void statsConnectionEvolution() throws Exception {
         Project project = builder.givenAProject();
         givenAPersistentConnectionInProject(
             builder.givenSuperAdmin(),
@@ -426,7 +426,7 @@ public class StatsResourceTests {
     }
 
     @Test
-    void stats_image_consultation_evolution() throws Exception {
+    void statsImageConsultationEvolution() throws Exception {
         Project project = builder.givenAProject();
         ImageInstance imageInstance = builder.givenAnImageInstance(project);
         givenAPersistentImageConsultation(

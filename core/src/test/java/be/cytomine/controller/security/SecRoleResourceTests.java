@@ -31,7 +31,7 @@ public class SecRoleResourceTests {
 
     @Test
     @Transactional
-    public void list_all_roles() throws Exception {
+    public void listAllRoles() throws Exception {
         restSecRoleControllerMockMvc.perform(get("/api/role.json"))
             .andExpect(status().isOk());
     }

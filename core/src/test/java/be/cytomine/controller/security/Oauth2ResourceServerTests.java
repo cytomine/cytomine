@@ -116,13 +116,13 @@ public class Oauth2ResourceServerTests {
     }
 
     @Test
-    public void whenNoTokenProvided_thenUnauthorized() throws Exception {
+    public void whenNoTokenProvidedThenUnauthorized() throws Exception {
         allProtectedMockMvc.perform(get("/api/project/45.json"))
             .andExpect(status().isUnauthorized());
     }
 
     @Test
-    public void whenInvalidTokenProvided_thenUnauthorized() throws Exception {
+    public void whenInvalidTokenProvidedThenUnauthorized() throws Exception {
         allProtectedMockMvc.perform(get("/api/project/45.json")
                 .header("Authorization", "Bearer invalid-token"))
             .andExpect(status().isUnauthorized());
@@ -130,7 +130,7 @@ public class Oauth2ResourceServerTests {
 
     @Test
     @Disabled("Randomly fails")
-    public void whenValidTokenProvided_thenNotFoundAsOk() throws Exception {
+    public void whenValidTokenProvidedThenNotFoundAsOk() throws Exception {
         // get a valid cytomine access token using password grant from iam microservice
         allProtectedMockMvc.perform(get("/api/project/45.json")
                 .header("Authorization", "Bearer " + getSignedNotExpiredJwt()))
@@ -138,7 +138,7 @@ public class Oauth2ResourceServerTests {
     }
 
     @Test
-    public void whenExpiredTokenProvided_thenUnauthorized() throws Exception {
+    public void whenExpiredTokenProvidedThenUnauthorized() throws Exception {
         // get a valid cytomine access token using password grant from iam microservice
         allProtectedMockMvc.perform(get("/api/project/45.json")
                 .header("Authorization", "Bearer " + getSignedExpiredJwt()))
@@ -146,7 +146,7 @@ public class Oauth2ResourceServerTests {
     }
 
     @Test
-    public void whenAuthenticationSuccessEventPublished_thenUserAddedIfDoesNotExist() {
+    public void whenAuthenticationSuccessEventPublishedThenUserAddedIfDoesNotExist() {
         // user not already in the database
         String sub = UUID.randomUUID().toString();
         Assertions.assertTrue(userRepository.findByReference(sub).isEmpty());

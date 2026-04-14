@@ -31,12 +31,12 @@ public class TaskServiceTests {
     TaskService taskService;
 
     @Test
-    public void get_task_empty() {
+    public void getTaskEmpty() {
         assertThat(taskService.get(0L)).isNull();
     }
 
     @Test
-    public void task_workflow() {
+    public void taskWorkflow() {
         Project project = builder.givenAProject();
         Task newTask = taskService.createNewTask(project, builder.givenSuperAdmin(), true);
         assertThat(newTask).isNotNull();

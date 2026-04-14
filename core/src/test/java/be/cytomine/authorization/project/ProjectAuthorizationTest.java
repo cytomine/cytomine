@@ -159,7 +159,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list_projects() {
+    public void adminCanListProjects() {
         assertThat(projectService.list(null, new ProjectSearchExtension(), new ArrayList<>(), "created", "desc", 0L, 0L)
             .stream().map(x -> x.get("id")))
             .contains(project.getId());
@@ -167,7 +167,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_with_at_least_read_permission_can_list_projects() {
+    public void userWithAtLeastReadPermissionCanListProjects() {
         assertThat(projectService.list(
                 (User) userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get(),
                 new ProjectSearchExtension(),
@@ -183,7 +183,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
-    public void user_no_acl_cannot_list_projects() {
+    public void userNoAclCannotListProjects() {
         expectForbidden(() -> {
             projectService.list(null, new ProjectSearchExtension(), new ArrayList<>(), "created", "desc", 0L, 0L)
                 .stream()
@@ -193,28 +193,28 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_add_user_to_project() {
+    public void adminCanAddUserToProject() {
         expectOK(() -> projectMemberService.addUserToProject(builder.givenAUser(), project, true));
         expectOK(() -> projectMemberService.addUserToProject(builder.givenAUser(), project, false));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void user_with_admin_rigth_can_manage_user_in_project() {
+    public void userWithAdminRigthCanManageUserInProject() {
         expectOK(() -> projectMemberService.addUserToProject(builder.givenAUser(), project, true));
         expectOK(() -> projectMemberService.addUserToProject(builder.givenAUser(), project, false));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_with_read_acl_cannot_manage_user_in_project() {
+    public void userWithReadAclCannotManageUserInProject() {
         expectForbidden(() -> projectMemberService.addUserToProject(builder.givenAUser(), project, true));
         expectForbidden(() -> projectMemberService.addUserToProject(builder.givenAUser(), project, false));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void classic_project_scenario_for_admin() {
+    public void classicProjectScenarioForAdmin() {
 
         expectOK(this::whenIEditDomain);
 
@@ -259,7 +259,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void classic_project_scenario_for_user() {
+    public void classicProjectScenarioForUser() {
         expectForbidden(this::whenIEditDomain);
 
         User user = builder.givenAUser();
@@ -305,7 +305,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void classic_project_with_image_as_contributor() {
+    public void classicProjectWithImageAsContributor() {
         //Force project to Read and write
         project.setMode(CLASSIC);
         builder.persistAndReturn(project);
@@ -473,7 +473,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void classic_project_with_image_as_project_manager() {
+    public void classicProjectWithImageAsProjectManager() {
         //Force project to Read and write
         project.setMode(CLASSIC);
         builder.persistAndReturn(project);
@@ -641,7 +641,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void restricted_project_scenario_for_admin() {
+    public void restrictedProjectScenarioForAdmin() {
         project.setMode(RESTRICTED);
         builder.persistAndReturn(project);
         expectOK(this::whenIEditDomain);
@@ -687,7 +687,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void restricted_project_scenario_for_user() {
+    public void restrictedProjectScenarioForUser() {
         project.setMode(RESTRICTED);
         builder.persistAndReturn(project);
 
@@ -732,7 +732,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void restricted_project_with_image_as_contributor() {
+    public void restrictedProjectWithImageAsContributor() {
         //Force project to Read and write
         project.setMode(RESTRICTED);
         builder.persistAndReturn(project);
@@ -895,7 +895,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void restricted_project_with_image_as_project_manager() {
+    public void restrictedProjectWithImageAsProjectManager() {
         //Force project to Read and write
         project.setMode(RESTRICTED);
         builder.persistAndReturn(project);
@@ -1063,7 +1063,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void readonly_project_scenario_for_admin() {
+    public void readonlyProjectScenarioForAdmin() {
         project.setMode(READ_ONLY);
         builder.persistAndReturn(project);
         expectOK(this::whenIEditDomain);
@@ -1108,7 +1108,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void readonly_project_scenario_for_user() {
+    public void readonlyProjectScenarioForUser() {
         project.setMode(READ_ONLY);
         builder.persistAndReturn(project);
 
@@ -1153,7 +1153,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void read_only_project_with_image_as_contributor() {
+    public void readOnlyProjectWithImageAsContributor() {
         //Force project to Read and write
         project.setMode(READ_ONLY);
         builder.persistAndReturn(project);
@@ -1322,7 +1322,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void read_only_project_with_image_as_project_manager() {
+    public void readOnlyProjectWithImageAsProjectManager() {
         //Force project to Read and write
         project.setMode(RESTRICTED);
         builder.persistAndReturn(project);
@@ -1585,7 +1585,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
     @Override
     @Test
     @WithMockUser(username = USER_NO_ACL)
-    public void user_without_permission_add_domain() {
+    public void userWithoutPermissionAddDomain() {
         expectOK(this::whenIAddDomain);
         // User with no ACL can create an project
     }
@@ -1593,7 +1593,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
     @Override
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_with_read_permission_add_domain() {
+    public void userWithReadPermissionAddDomain() {
         expectOK(this::whenIAddDomain);
         // User with READ permission can create another project
     }

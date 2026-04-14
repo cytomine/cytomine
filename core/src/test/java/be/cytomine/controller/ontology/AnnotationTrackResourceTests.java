@@ -54,7 +54,7 @@ public class AnnotationTrackResourceTests {
 
     @Test
     @Transactional
-    public void list_all_annotationTracks_by_track() throws Exception {
+    public void listAllAnnotationTracksByTrack() throws Exception {
         AnnotationTrack annotationTrack = builder.givenAnAnnotationTrack();
         restAnnotationTrackControllerMockMvc.perform(get(
                 "/api/track/{id}/annotationtrack.json",
@@ -66,14 +66,14 @@ public class AnnotationTrackResourceTests {
 
     @Test
     @Transactional
-    public void list_all_annotationTracks_by_track_not_exists() throws Exception {
+    public void listAllAnnotationTracksByTrackNotExists() throws Exception {
         restAnnotationTrackControllerMockMvc.perform(get("/api/track/{id}/annotationtrack.json", 0))
             .andExpect(status().isNotFound());
     }
 
     @Test
     @Transactional
-    public void list_all_annotationTracks_by_annotation() throws Exception {
+    public void listAllAnnotationTracksByAnnotation() throws Exception {
         AnnotationTrack annotationTrack = builder.givenAnAnnotationTrack();
         restAnnotationTrackControllerMockMvc.perform(get(
                 "/api/annotation/{id}/annotationtrack.json",
@@ -134,7 +134,7 @@ public class AnnotationTrackResourceTests {
 
     @Test
     @Transactional
-    public void add_valid_annotationTrack() throws Exception {
+    public void addValidAnnotationTrack() throws Exception {
         AnnotationTrack annotationTrack = builder.givenANotPersistedAnnotationTrack();
         restAnnotationTrackControllerMockMvc.perform(post("/api/annotationtrack.json")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -151,7 +151,7 @@ public class AnnotationTrackResourceTests {
 
     @Test
     @Transactional
-    public void delete_annotationTrack() throws Exception {
+    public void deleteAnnotationTrack() throws Exception {
         AnnotationTrack annotationTrack = builder.givenAnAnnotationTrack();
         restAnnotationTrackControllerMockMvc.perform(delete(
                 "/api/annotationtrack/{annotation}/{track}.json",
@@ -172,7 +172,7 @@ public class AnnotationTrackResourceTests {
 
     @Test
     @Transactional
-    public void delete_annotationTrack_not_exist_fails() throws Exception {
+    public void deleteAnnotationTrackNotExistFails() throws Exception {
         AnnotationTrack annotationTrack = builder.givenAnAnnotationTrack();
         restAnnotationTrackControllerMockMvc.perform(delete("/api/annotationtrack/{annotation}/{track}.json", 0, 0)
                 .contentType(MediaType.APPLICATION_JSON)

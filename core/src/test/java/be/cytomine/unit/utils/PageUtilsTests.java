@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class PageUtilsTests {
 
     @Test
-    public void pagination_from_already_limited_results() {
+    public void paginationFromAlreadyLimitedResults() {
         Page page = PageUtils.buildPageFromPageResults(new ArrayList<>(List.of("a", "b", "c", "d", "e")), 0L, 0L, 5L);
         assertThat(page.getContent()).hasSize(5);
         assertThat(page.getTotalElements()).isEqualTo(5);

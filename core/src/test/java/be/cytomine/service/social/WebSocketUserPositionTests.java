@@ -52,7 +52,7 @@ public class WebSocketUserPositionTests {
     }
 
     @Test
-    public void create_session_for_not_connected_user() {
+    public void createSessionForNotConnectedUser() {
         WebSocketSession session = mock(WebSocketSession.class);
         when(session.getAttributes()).thenReturn(sessionAttributes("54", "imageId", "false"));
 
@@ -64,7 +64,7 @@ public class WebSocketUserPositionTests {
     }
 
     @Test
-    public void create_broadcast_session_for_not_connected_user() {
+    public void createBroadcastSessionForNotConnectedUser() {
         WebSocketSession session = mock(WebSocketSession.class);
         when(session.getAttributes()).thenReturn(sessionAttributes("54", "imageId", "true"));
 
@@ -76,7 +76,7 @@ public class WebSocketUserPositionTests {
     }
 
     @Test
-    public void add_session_for_already_connected_user() {
+    public void addSessionForAlreadyConnectedUser() {
         ConcurrentWebSocketSessionDecorator sessionDecorator = mock(ConcurrentWebSocketSessionDecorator.class);
         connectSession(sessionDecorator, "54", "imageId", "false");
         connectSession(sessionDecorator, "89", "imageId", "false");
@@ -92,7 +92,7 @@ public class WebSocketUserPositionTests {
     }
 
     @Test
-    public void add_track_session_to_not_tracked_user() {
+    public void addTrackSessionToNotTrackedUser() {
         ConcurrentWebSocketSessionDecorator sessionDecorator = mock(ConcurrentWebSocketSessionDecorator.class);
 
         String userId = builder.givenAUser().getId().toString();
@@ -117,7 +117,7 @@ public class WebSocketUserPositionTests {
     }
 
     @Test
-    public void add_track_session_to_already_tracked_user() {
+    public void addTrackSessionToAlreadyTrackedUser() {
         ConcurrentWebSocketSessionDecorator followerSession = mock(ConcurrentWebSocketSessionDecorator.class);
         ConcurrentWebSocketSessionDecorator broadcastSession = mock(ConcurrentWebSocketSessionDecorator.class);
 
@@ -146,7 +146,7 @@ public class WebSocketUserPositionTests {
     }
 
     @Test
-    public void add_track_session_who_is_already_tracking() {
+    public void addTrackSessionWhoIsAlreadyTracking() {
         ConcurrentWebSocketSessionDecorator followerSession = mock(ConcurrentWebSocketSessionDecorator.class);
         ConcurrentWebSocketSessionDecorator broadcastSession = mock(ConcurrentWebSocketSessionDecorator.class);
         when(followerSession.getId()).thenReturn("5678");
@@ -175,7 +175,7 @@ public class WebSocketUserPositionTests {
     }
 
     @Test
-    public void add_some_track_sessions_to_already_tracked_user() {
+    public void addSomeTrackSessionsToAlreadyTrackedUser() {
         ConcurrentWebSocketSessionDecorator followerSession1 = mock(ConcurrentWebSocketSessionDecorator.class);
         ConcurrentWebSocketSessionDecorator followerSession2 = mock(ConcurrentWebSocketSessionDecorator.class);
         ConcurrentWebSocketSessionDecorator followerSession3 = mock(ConcurrentWebSocketSessionDecorator.class);
@@ -214,7 +214,7 @@ public class WebSocketUserPositionTests {
     }
 
     @Test
-    public void remove_tracking_sessions_from_tracked_sessions() throws Exception {
+    public void removeTrackingSessionsFromTrackedSessions() throws Exception {
         ConcurrentWebSocketSessionDecorator followerSession = mock(ConcurrentWebSocketSessionDecorator.class);
         ConcurrentWebSocketSessionDecorator broadcastSession = mock(ConcurrentWebSocketSessionDecorator.class);
 
@@ -242,7 +242,7 @@ public class WebSocketUserPositionTests {
     }
 
     @Test
-    public void remove_broadcasting_sessions_from_tracked_sessions() throws Exception {
+    public void removeBroadcastingSessionsFromTrackedSessions() throws Exception {
         ConcurrentWebSocketSessionDecorator followerSession = mock(ConcurrentWebSocketSessionDecorator.class);
         ConcurrentWebSocketSessionDecorator broadcastSession = mock(ConcurrentWebSocketSessionDecorator.class);
 
@@ -271,7 +271,7 @@ public class WebSocketUserPositionTests {
     }
 
     @Test
-    public void update_position_of_tracked_user_send_message_works() throws IOException {
+    public void updatePositionOfTrackedUserSendMessageWorks() throws IOException {
         String userId = builder.givenAUser().getId().toString();
         String imageInstanceId = builder.givenAnImageInstance().getId().toString();
 
@@ -293,7 +293,7 @@ public class WebSocketUserPositionTests {
     }
 
     @Test
-    public void update_position_of_not_tracked_user_do_nothing() {
+    public void updatePositionOfNotTrackedUserDoNothing() {
         String userId = builder.givenAUser().getId().toString();
         String imageInstanceId = builder.givenAnImageInstance().getId().toString();
         assertDoesNotThrow(() -> webSocketUserPositionHandler.sendPositionToFollowers(
@@ -304,7 +304,7 @@ public class WebSocketUserPositionTests {
     }
 
     @Test
-    public void remove_session_if_connection_closed() throws Exception {
+    public void removeSessionIfConnectionClosed() throws Exception {
         WebSocketSession session = mock(WebSocketSession.class);
         ConcurrentWebSocketSessionDecorator followerSession = mock(ConcurrentWebSocketSessionDecorator.class);
         ConcurrentWebSocketSessionDecorator broadcastSession = mock(ConcurrentWebSocketSessionDecorator.class);

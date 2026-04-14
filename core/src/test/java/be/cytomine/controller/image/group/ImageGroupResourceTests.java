@@ -41,7 +41,7 @@ public class ImageGroupResourceTests {
 
     @Test
     @Transactional
-    public void list_imagegroup_by_project() throws Exception {
+    public void listImagegroupByProject() throws Exception {
         ImageGroup imageGroup = builder.givenAnImageGroup();
         restImageGroupControllerMockMvc.perform(get(
                 "/api/project/{id}/imagegroup.json",
@@ -53,7 +53,7 @@ public class ImageGroupResourceTests {
 
     @Test
     @Transactional
-    public void get_an_imagegroup() throws Exception {
+    public void getAnImagegroup() throws Exception {
         ImageGroup imageGroup = builder.givenAnImageGroup();
         restImageGroupControllerMockMvc.perform(get("/api/imagegroup/{id}.json", imageGroup.getId()))
             .andExpect(status().isOk())
@@ -67,7 +67,7 @@ public class ImageGroupResourceTests {
 
     @Test
     @Transactional
-    public void get_an_imagegroup_not_exist() throws Exception {
+    public void getAnImagegroupNotExist() throws Exception {
         restImageGroupControllerMockMvc.perform(get("/api/project/{id}/imagegroup.json", 0))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.errors.message").exists());
@@ -75,7 +75,7 @@ public class ImageGroupResourceTests {
 
     @Test
     @Transactional
-    public void add_valid_imagegroup() throws Exception {
+    public void addValidImagegroup() throws Exception {
         ImageGroup imageGroup = builder.givenANotPersistedImagegroup();
         restImageGroupControllerMockMvc.perform(post("/api/imagegroup.json")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -91,7 +91,7 @@ public class ImageGroupResourceTests {
 
     @Test
     @Transactional
-    public void edit_valid_imagegroup() throws Exception {
+    public void editValidImagegroup() throws Exception {
         ImageGroup imageGroup = builder.givenAnImageGroup();
         JsonObject jsonObject = imageGroup.toJsonObject();
         String name = UUID.randomUUID().toString();
@@ -112,7 +112,7 @@ public class ImageGroupResourceTests {
 
     @Test
     @Transactional
-    public void delete_imagegroup() throws Exception {
+    public void deleteImagegroup() throws Exception {
         ImageGroup imageGroup = builder.givenAnImageGroup();
         restImageGroupControllerMockMvc.perform(delete("/api/imagegroup/{id}.json", imageGroup.getId()))
             .andExpect(status().isOk())

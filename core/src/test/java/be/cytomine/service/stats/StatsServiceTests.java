@@ -162,24 +162,24 @@ public class StatsServiceTests {
     }
 
     @Test
-    void stats_domain_count() {
+    void statsDomainCount() {
         UserAnnotation annotation = builder.givenAUserAnnotation();
         assertThat(statsService.total(annotation.getClass())).isGreaterThanOrEqualTo(1);
         assertThat(statsService.total(annotation.getProject().getClass())).isGreaterThanOrEqualTo(1);
     }
 
     @Test
-    void current_user_count() {
+    void currentUserCount() {
         assertThat(statsService.numberOfCurrentUsers()).isGreaterThanOrEqualTo(0);
     }
 
     @Test
-    void active_projects_count() {
+    void activeProjectsCount() {
         assertThat(statsService.numberOfActiveProjects()).isGreaterThanOrEqualTo(0);
     }
 
     @Test
-    void most_active_project_count() {
+    void mostActiveProjectCount() {
         Project project = builder.givenAProject();
         givenAPersistentConnectionInProject(builder.givenSuperAdmin(), project, new Date());
         assertThat(((JsonObject) statsService.mostActiveProjects()
@@ -188,7 +188,7 @@ public class StatsServiceTests {
     }
 
     @Test
-    void stats_annotation_term_by_project() {
+    void statsAnnotationTermByProject() {
         Project project = builder.givenAProject();
         builder.addUserToProject(project, "superadmin");
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm(builder.givenAUserAnnotation(project));
@@ -203,7 +203,7 @@ public class StatsServiceTests {
 
 
     @Test
-    void stats_user_annotation_evolution() {
+    void statsUserAnnotationEvolution() {
         Project project = builder.givenAProject();
         UserAnnotation annotation1 = builder.givenAUserAnnotation(project);
         annotation1.setCreated(DateUtils.addDays(new Date(), -1));
@@ -240,7 +240,7 @@ public class StatsServiceTests {
     }
 
     @Test
-    void stats_reviewed_annotation_evolution() throws ParseException {
+    void statsReviewedAnnotationEvolution() throws ParseException {
         Project project = builder.givenAProject();
         ReviewedAnnotation annotation1 = builder.givenAReviewedAnnotation(project);
         annotation1.setCreated(DateUtils.addDays(new Date(), -1));
@@ -278,7 +278,7 @@ public class StatsServiceTests {
     }
 
     @Test
-    void stats_uder_slide() {
+    void statsUderSlide() {
         Project project = builder.givenAProject();
         builder.addUserToProject(project, "superadmin");
 
@@ -320,7 +320,7 @@ public class StatsServiceTests {
 
 
     @Test
-    void stats_term_slide() {
+    void statsTermSlide() {
         Project project = builder.givenAProject();
 
         List<JsonObject> results = statsService.statTermSlide(project, null, null);
@@ -365,7 +365,7 @@ public class StatsServiceTests {
 
 
     @Test
-    void stats_term() {
+    void statsTerm() {
         Project project = builder.givenAProject();
 
         List<JsonObject> results = statsService.statTerm(project, null, null, false);
@@ -404,7 +404,7 @@ public class StatsServiceTests {
     }
 
     @Test
-    void stat_per_term_and_image() {
+    void statPerTermAndImage() {
         Project project = builder.givenAProject();
 
         List<JsonObject> results = statsService.statPerTermAndImage(project, null, null);
@@ -457,7 +457,7 @@ public class StatsServiceTests {
 
 
     @Test
-    void stats_user_annotation() {
+    void statsUserAnnotation() {
         Project project = builder.givenAProject();
         builder.addUserToProject(project, "superadmin");
         UserAnnotation annotation1 = builder.givenAUserAnnotation(project);
@@ -484,7 +484,7 @@ public class StatsServiceTests {
 
 
     @Test
-    void stats_user() {
+    void statsUser() {
         Project project = builder.givenAProject();
         builder.addUserToProject(project, "superadmin");
         UserAnnotation annotation1 = builder.givenAUserAnnotation(project);
@@ -503,7 +503,7 @@ public class StatsServiceTests {
     }
 
     @Test
-    void retrieve_storage_spaces() {
+    void retrieveStorageSpaces() {
         configureFor("localhost", 8888);
         String body = """
             {
@@ -527,7 +527,7 @@ public class StatsServiceTests {
     }
 
     @Test
-    void stats_connection_evolution() {
+    void statsConnectionEvolution() {
         Project project = builder.givenAProject();
         givenAPersistentConnectionInProject(
             builder.givenSuperAdmin(),
@@ -577,7 +577,7 @@ public class StatsServiceTests {
     }
 
     @Test
-    void stats_image_consultation_evolution() {
+    void statsImageConsultationEvolution() {
         Project project = builder.givenAProject();
         ImageInstance imageInstance = builder.givenAnImageInstance(project);
         givenAPersistentImageConsultation(

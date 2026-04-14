@@ -73,7 +73,7 @@ public class ImageServerServiceTests {
     }
 
     @Test
-    void retrieve_storage_spaces() throws IOException {
+    void retrieveStorageSpaces() throws IOException {
         configureFor("localhost", 8888);
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/storage/size.json"))
             .willReturn(
@@ -89,7 +89,7 @@ public class ImageServerServiceTests {
     }
 
     @Test
-    void retrieve_formats() {
+    void retrieveFormats() {
         configureFor("localhost", 8888);
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/formats"))
             .willReturn(
@@ -142,7 +142,7 @@ public class ImageServerServiceTests {
 
     // TODO
     @Test
-    void retrieve_abstract_image_download_uri() throws IOException {
+    void retrieveAbstractImageDownloadUri() throws IOException {
         AbstractImage image = builder.givenAnAbstractImage();
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setOriginalFilename("CMU-2.mrxs");
@@ -174,7 +174,7 @@ public class ImageServerServiceTests {
     }
 
     @Test
-    void retrieve_uploaded_file_download_uri() throws IOException {
+    void retrieveUploadedFileDownloadUri() throws IOException {
         UploadedFile uploadedFile = builder.givenANotPersistedUploadedFile();
         uploadedFile.setFilename("1636379100999/CMU-2.zip");
         uploadedFile.setOriginalFilename("CMU-2.zip");
@@ -196,7 +196,7 @@ public class ImageServerServiceTests {
     }
 
     @Test
-    void extract_properties_from_abstract_image() throws IOException {
+    void extractPropertiesFromAbstractImage() throws IOException {
         AbstractImage image = builder.givenAnAbstractImage();
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
@@ -266,7 +266,7 @@ public class ImageServerServiceTests {
     }
 
     @Test
-    void get_associated_abstract_image() throws IOException {
+    void getAssociatedAbstractImage() throws IOException {
         AbstractImage image = builder.givenAnAbstractImage();
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
@@ -285,7 +285,7 @@ public class ImageServerServiceTests {
     }
 
     @Test
-    void get_label_abstract_image_macro() {
+    void getLabelAbstractImageMacro() {
         AbstractImage image = builder.givenAnAbstractImage();
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
@@ -313,7 +313,7 @@ public class ImageServerServiceTests {
     }
 
     @Test
-    void get_thumb_for_abstract_image() {
+    void getThumbForAbstractImage() {
         AbstractImage image = builder.givenAnAbstractImage();
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
@@ -362,7 +362,7 @@ public class ImageServerServiceTests {
     }
 
     @Test
-    void get_normalized_tile_for_abstract_image() {
+    void getNormalizedTileForAbstractImage() {
         AbstractImage image = builder.givenAnAbstractImage();
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
@@ -415,7 +415,7 @@ public class ImageServerServiceTests {
     }
 
     @Test
-    void get_crop_for_abstract_image() throws ParseException {
+    void getCropForAbstractImage() throws ParseException {
         AbstractImage image = builder.givenAnAbstractImage();
         image.setWidth(109240);
         image.setHeight(220696);
@@ -465,7 +465,7 @@ public class ImageServerServiceTests {
 
 
     @Test
-    void get_window_for_abstract_image() throws UnsupportedEncodingException, ParseException {
+    void getWindowForAbstractImage() throws UnsupportedEncodingException, ParseException {
         AbstractImage image = builder.givenAnAbstractImage();
         image.setWidth(109240);
         image.setHeight(220696);
@@ -500,7 +500,7 @@ public class ImageServerServiceTests {
     }
 
     @Test
-    void image_histograms() {
+    void imageHistograms() {
         AbstractImage image = builder.givenAnAbstractImage();
         image.setWidth(109240);
         image.setHeight(220696);
@@ -553,7 +553,7 @@ public class ImageServerServiceTests {
     }
 
     @Test
-    void image_histograms_bounds() {
+    void imageHistogramsBounds() {
         AbstractImage image = builder.givenAnAbstractImage();
         image.setWidth(109240);
         image.setHeight(220696);
@@ -583,7 +583,7 @@ public class ImageServerServiceTests {
     }
 
     @Test
-    void plane_histograms() {
+    void planeHistograms() {
         AbstractImage image = builder.givenAnAbstractImage();
         image.setWidth(109240);
         image.setHeight(220696);
@@ -641,7 +641,7 @@ public class ImageServerServiceTests {
     }
 
     @Test
-    void plane_histograms_bounds() {
+    void planeHistogramsBounds() {
         AbstractImage image = builder.givenAnAbstractImage();
         image.setWidth(109240);
         image.setHeight(220696);
@@ -672,7 +672,7 @@ public class ImageServerServiceTests {
     }
 
     @Test
-    void channel_histograms() {
+    void channelHistograms() {
         AbstractImage image = builder.givenAnAbstractImage();
         image.setWidth(109240);
         image.setHeight(220696);
@@ -722,7 +722,7 @@ public class ImageServerServiceTests {
     }
 
     @Test
-    void chanel_histograms_bounds() {
+    void chanelHistogramsBounds() {
         AbstractImage image = builder.givenAnAbstractImage();
         image.setWidth(109240);
         image.setHeight(220696);

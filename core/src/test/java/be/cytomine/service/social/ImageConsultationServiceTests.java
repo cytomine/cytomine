@@ -97,7 +97,7 @@ public class ImageConsultationServiceTests {
     }
 
     @Test
-    void creation_and_close() {
+    void creationAndClose() {
         User user = builder.givenSuperAdmin();
         ImageInstance imageInstance = builder.givenASliceInstance().getImage();
         PersistentImageConsultation consultation = givenAPersistentImageConsultation(
@@ -125,7 +125,7 @@ public class ImageConsultationServiceTests {
 
 
     @Test
-    void fill_project_connection_update_annotations_counter() {
+    void fillProjectConnectionUpdateAnnotationsCounter() {
         User user = builder.givenSuperAdmin();
         Project projet = builder.givenAProject();
         ImageInstance imageInstance = builder.givenASliceInstance(projet).getImage();
@@ -160,7 +160,7 @@ public class ImageConsultationServiceTests {
     }
 
     @Test
-    void list_image_consultation_by_project_and_user_do_not_distinct_image() {
+    void listImageConsultationByProjectAndUserDoNotDistinctImage() {
         User user = builder.givenSuperAdmin();
         ImageInstance imageInstance = builder.givenASliceInstance().getImage();
 
@@ -178,7 +178,7 @@ public class ImageConsultationServiceTests {
     }
 
     @Test
-    void list_image_consultation_by_project_and_user_with_distinct_image() {
+    void listImageConsultationByProjectAndUserWithDistinctImage() {
         User user = builder.givenSuperAdmin();
         ImageInstance imageInstance1 = builder.givenASliceInstance().getImage();
         ImageInstance imageInstance2 = builder.givenASliceInstance(imageInstance1.getProject()).getImage();
@@ -201,7 +201,7 @@ public class ImageConsultationServiceTests {
     }
 
     @Test
-    void list_image_of_users_by_project() {
+    void listImageOfUsersByProject() {
         User user1 = builder.givenSuperAdmin();
         User user2 = builder.givenAUser();
 
@@ -397,7 +397,7 @@ public class ImageConsultationServiceTests {
     }
 
     @Test
-    void total_number_of_consultation_by_project_with_dates() {
+    void totalNumberOfConsultationByProjectWithDates() {
         Project projet = builder.givenAProject();
         User user1 = builder.givenSuperAdmin();
         User anotherUser = builder.givenAUser();

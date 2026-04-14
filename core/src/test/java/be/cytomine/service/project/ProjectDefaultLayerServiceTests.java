@@ -50,30 +50,30 @@ public class ProjectDefaultLayerServiceTests {
     BasicInstanceBuilder builder;
 
     @Test
-    void get_projectDefaultLayer_with_success() {
+    void getProjectDefaultLayerWithSuccess() {
         ProjectDefaultLayer projectDefaultLayer = builder.givenAProjectDefaultLayer();
         assertThat(projectDefaultLayer).isEqualTo(projectDefaultLayerService.get(projectDefaultLayer.getId()));
     }
 
     @Test
-    void get_unexisting_projectDefaultLayer_return_null() {
+    void getUnexistingProjectDefaultLayerReturnNull() {
         assertThat(projectDefaultLayerService.get(0L)).isNull();
     }
 
     @Test
-    void find_projectDefaultLayer_with_success() {
+    void findProjectDefaultLayerWithSuccess() {
         ProjectDefaultLayer projectDefaultLayer = builder.givenAProjectDefaultLayer();
         assertThat(projectDefaultLayerService.find(projectDefaultLayer.getId()).isPresent());
         assertThat(projectDefaultLayer).isEqualTo(projectDefaultLayerService.find(projectDefaultLayer.getId()).get());
     }
 
     @Test
-    void find_unexisting_projectDefaultLayer_return_empty() {
+    void findUnexistingProjectDefaultLayerReturnEmpty() {
         assertThat(projectDefaultLayerService.find(0L)).isEmpty();
     }
 
     @Test
-    void list_all_projectDefaultLayer_by_project_with_success() {
+    void listAllProjectDefaultLayerByProjectWithSuccess() {
         ProjectDefaultLayer projectDefaultLayer = builder.givenAProjectDefaultLayer();
         ProjectDefaultLayer projectDefaultLayerFromAnotherProject = builder.givenAProjectDefaultLayer();
         assertThat(projectDefaultLayer)
@@ -83,7 +83,7 @@ public class ProjectDefaultLayerServiceTests {
     }
 
     @Test
-    void add_valid_projectDefaultLayer_with_success() {
+    void addValidProjectDefaultLayerWithSuccess() {
         ProjectDefaultLayer projectDefaultLayer = builder.givenANotPersistedProjectDefaultLayer();
 
         CommandResponse commandResponse = projectDefaultLayerService.add(projectDefaultLayer.toJsonObject());
@@ -96,7 +96,7 @@ public class ProjectDefaultLayerServiceTests {
     }
 
     @Test
-    void add_projectDefaultLayer_with_bad_project() {
+    void addProjectDefaultLayerWithBadProject() {
         ProjectDefaultLayer projectDefaultLayer = builder.givenANotPersistedProjectDefaultLayer();
         Assertions.assertThrows(
             ObjectNotFoundException.class, () -> {
@@ -106,7 +106,7 @@ public class ProjectDefaultLayerServiceTests {
     }
 
     @Test
-    void add_projectDefaultLayer_with_bad_user() {
+    void addProjectDefaultLayerWithBadUser() {
         ProjectDefaultLayer projectDefaultLayer = builder.givenANotPersistedProjectDefaultLayer();
         Assertions.assertThrows(
             ObjectNotFoundException.class, () -> {
@@ -116,7 +116,7 @@ public class ProjectDefaultLayerServiceTests {
     }
 
     @Test
-    void add_already_existing_projectDefaultLayer_fails() {
+    void addAlreadyExistingProjectDefaultLayerFails() {
         ProjectDefaultLayer projectDefaultLayer = builder.givenAProjectDefaultLayer();
         Assertions.assertThrows(
             AlreadyExistException.class, () -> {
@@ -126,7 +126,7 @@ public class ProjectDefaultLayerServiceTests {
     }
 
     @Test
-    void delete_projectDefaultLayer_with_success() {
+    void deleteProjectDefaultLayerWithSuccess() {
         ProjectDefaultLayer projectDefaultLayer = builder.givenAProjectDefaultLayer();
 
         CommandResponse commandResponse = projectDefaultLayerService.delete(projectDefaultLayer, null, null, true);

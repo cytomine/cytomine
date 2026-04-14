@@ -71,17 +71,17 @@ public class SpreadsheetReportServiceTests {
     }
 
     @Test
-    public void generate_spreadsheets_with_delimiter_in_data_works() {
+    public void generateSpreadsheetsWithDelimiterInDataWorks() {
         assertEquals(createSpreadsheet(delimiterInData), delimiterInDataResult);
     }
 
     @Test
-    public void null_data_return_empty_string() {
+    public void nullDataReturnEmptyString() {
         assertEquals(createSpreadsheet(nullData), nullCsvDataResult);
     }
 
     @Test
-    public void empty_data_array_return_empty_string() {
+    public void emptyDataArrayReturnEmptyString() {
         assertEquals(createSpreadsheet(emptyData), emptyCsvDataResult);
     }
 

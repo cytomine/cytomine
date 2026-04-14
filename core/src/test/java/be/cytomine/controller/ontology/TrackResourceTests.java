@@ -55,7 +55,7 @@ public class TrackResourceTests {
 
     @Test
     @Transactional
-    public void list_tracks_by_imageinstance() throws Exception {
+    public void listTracksByImageinstance() throws Exception {
         Track track = builder.givenATrack();
         restTrackControllerMockMvc.perform(get("/api/imageinstance/{id}/track.json", track.getImage().getId()))
             .andExpect(status().isOk())
@@ -65,14 +65,14 @@ public class TrackResourceTests {
 
     @Test
     @Transactional
-    public void list_tracks_by_imageinstance_not_exists() throws Exception {
+    public void listTracksByImageinstanceNotExists() throws Exception {
         restTrackControllerMockMvc.perform(get("/api/imageinstance/{id}/track.json", 0))
             .andExpect(status().isNotFound());
     }
 
     @Test
     @Transactional
-    public void list_tracks_by_project() throws Exception {
+    public void listTracksByProject() throws Exception {
         Track track = builder.givenATrack();
         restTrackControllerMockMvc.perform(get("/api/project/{id}/track.json", track.getProject().getId()))
             .andExpect(status().isOk())
@@ -82,7 +82,7 @@ public class TrackResourceTests {
 
     @Test
     @Transactional
-    public void list_tracks_by_project_not_exists() throws Exception {
+    public void listTracksByProjectNotExists() throws Exception {
         restTrackControllerMockMvc.perform(get("/api/project/{id}/track.json", 0))
             .andExpect(status().isNotFound());
     }
@@ -101,7 +101,7 @@ public class TrackResourceTests {
 
     @Test
     @Transactional
-    public void get_an_unexisting_track() throws Exception {
+    public void getAnUnexistingTrack() throws Exception {
         restTrackControllerMockMvc.perform(get("/api/track/{id}.json", 0))
             .andExpect(status().isNotFound());
     }
@@ -109,7 +109,7 @@ public class TrackResourceTests {
 
     @Test
     @Transactional
-    public void add_valid_track() throws Exception {
+    public void addValidTrack() throws Exception {
         Track track = builder.givenANotPersistedTrack();
         restTrackControllerMockMvc.perform(post("/api/track.json")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -127,7 +127,7 @@ public class TrackResourceTests {
 
     @Test
     @Transactional
-    public void edit_valid_track() throws Exception {
+    public void editValidTrack() throws Exception {
         Track track = builder.givenATrack();
         restTrackControllerMockMvc.perform(put("/api/track/{id}.json", track.getId())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -146,7 +146,7 @@ public class TrackResourceTests {
 
     @Test
     @Transactional
-    public void delete_track() throws Exception {
+    public void deleteTrack() throws Exception {
         Track track = builder.givenATrack();
         restTrackControllerMockMvc.perform(delete("/api/track/{id}.json", track.getId())
                 .contentType(MediaType.APPLICATION_JSON)

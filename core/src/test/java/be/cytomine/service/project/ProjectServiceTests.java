@@ -178,30 +178,30 @@ public class ProjectServiceTests {
     }
 
     @Test
-    void get_project_with_success() {
+    void getProjectWithSuccess() {
         Project project = builder.givenAProject();
         assertThat(project).isEqualTo(projectService.get(project.getId()));
     }
 
     @Test
-    void get_unexisting_project_return_null() {
+    void getUnexistingProjectReturnNull() {
         assertThat(projectService.get(0L)).isNull();
     }
 
     @Test
-    void find_project_with_success() {
+    void findProjectWithSuccess() {
         Project project = builder.givenAProject();
         assertThat(projectService.find(project.getId()).isPresent());
         assertThat(project).isEqualTo(projectService.find(project.getId()).get());
     }
 
     @Test
-    void find_unexisting_project_return_empty() {
+    void findUnexistingProjectReturnEmpty() {
         assertThat(projectService.find(0L)).isEmpty();
     }
 
     @Test
-    void read_many_project_from_ids() {
+    void readManyProjectFromIds() {
         Project project1 = builder.givenAProject();
         Project project2 = builder.givenAProject();
 
@@ -214,7 +214,7 @@ public class ProjectServiceTests {
     }
 
     @Test
-    void list_last_opened() {
+    void listLastOpened() {
         User user1 = builder.givenSuperAdmin();
         Project project1 = builder.givenAProjectWithUser(user1);
         Project project2 = builder.givenAProjectWithUser(user1);
@@ -245,7 +245,7 @@ public class ProjectServiceTests {
     }
 
     @Test
-    void list_project_for_current_user() {
+    void listProjectForCurrentUser() {
         User user1 = builder.givenSuperAdmin();
         Project project1 = builder.givenAProjectWithUser(user1);
         Project project2 = builder.givenAProject();
@@ -255,7 +255,7 @@ public class ProjectServiceTests {
     }
 
     @Test
-    void retrieve_project_bounds() {
+    void retrieveProjectBounds() {
 
         List<Date> dateChoices = new ArrayList<>(List.of(
             new GregorianCalendar(2021, Calendar.JANUARY, 1).getTime(),
@@ -314,7 +314,7 @@ public class ProjectServiceTests {
     }
 
     @Test
-    void list_user_project_with_many_filters() {
+    void listUserProjectWithManyFilters() {
         Project project1 = builder.givenAProject();
         Project project2 = builder.givenAProject();
         builder.addUserToProject(project1, builder.givenSuperAdmin().getUsername());
@@ -361,7 +361,7 @@ public class ProjectServiceTests {
     }
 
     @Test
-    void list_command_history_for_project() {
+    void listCommandHistoryForProject() {
         Project project1 = builder.givenAProject();
         Project project2 = builder.givenAProject();
         UserAnnotation userAnnotation1 = builder.givenANotPersistedUserAnnotation(project1);
@@ -432,7 +432,7 @@ public class ProjectServiceTests {
 
 
     @Test
-    void list_user_project_with_annotation_filters() {
+    void listUserProjectWithAnnotationFilters() {
         Project project1 = builder.givenAProject();
         builder.addUserToProject(project1, builder.givenSuperAdmin().getUsername());
 
@@ -551,7 +551,7 @@ public class ProjectServiceTests {
 
 
     @Test
-    void list_user_project_with_name_filter() {
+    void listUserProjectWithNameFilter() {
         Project project1 = builder.givenAProject();
         Project project2 = builder.givenAProject();
         Project project3 = builder.givenAProject();
@@ -581,7 +581,7 @@ public class ProjectServiceTests {
     }
 
     @Test
-    void list_user_project_with_ontology_filter() {
+    void listUserProjectWithOntologyFilter() {
         Project project1 = builder.givenAProject();
         Project project2 = builder.givenAProject();
         builder.addUserToProject(project1, builder.givenSuperAdmin().getUsername());
@@ -602,7 +602,7 @@ public class ProjectServiceTests {
 
 
     @Test
-    void list_user_project_with_pagination() {
+    void listUserProjectWithPagination() {
         Project project1 = builder.givenAProject();
         Project project2 = builder.givenAProjectWithOntology(project1.getOntology());
         Project project3 = builder.givenAProjectWithOntology(project1.getOntology());
@@ -675,7 +675,7 @@ public class ProjectServiceTests {
 
 
     @Test
-    void list_user_project_with_no_user() {
+    void listUserProjectWithNoUser() {
         Project project1 = builder.givenAProject();
         Project projectWhereUserIsMissing = builder.givenAProject();
 
@@ -706,7 +706,7 @@ public class ProjectServiceTests {
     }
 
     @Test
-    void list_user_project_with_no_filter() {
+    void listUserProjectWithNoFilter() {
         Project project1 = builder.givenAProject();
         Project projectWhereUserIsMissing = builder.givenAProject();
 
@@ -738,7 +738,7 @@ public class ProjectServiceTests {
     }
 
     @Test
-    void list_user_project_with_members_count() {
+    void listUserProjectWithMembersCount() {
         Project project1 = builder.givenAProject();
 
         builder.addUserToProject(project1, "superadmin");
@@ -771,7 +771,7 @@ public class ProjectServiceTests {
     }
 
     @Test
-    void list_user_project_with_filters() {
+    void listUserProjectWithFilters() {
         Project project1 = builder.givenAProject();
 
         Project projectWhereUserIsMissing = builder.givenAProject();
@@ -805,7 +805,7 @@ public class ProjectServiceTests {
 
 
     @Test
-    void list_project_by_onotology() {
+    void listProjectByOnotology() {
         Project project1 = builder.givenAProject();
         Project project2 = builder.givenAProject();
         builder.addUserToProject(project1, "superadmin");
@@ -815,7 +815,7 @@ public class ProjectServiceTests {
     }
 
     @Test
-    void list_last_action() {
+    void listLastAction() {
         Project project1 = builder.givenAProject();
 
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation(project1);
@@ -826,7 +826,7 @@ public class ProjectServiceTests {
     }
 
     @Test
-    void list_by_roles() {
+    void listByRoles() {
         Project project1 = builder.givenAProject();
         User creator = builder.givenSuperAdmin();
         User admin = builder.givenAUser();
@@ -847,7 +847,7 @@ public class ProjectServiceTests {
 
 
     @Test
-    void add_project() {
+    void addProject() {
         Project project = basicInstanceBuilder.givenANotPersistedProject();
 
         CommandResponse commandResponse = projectService.add(project.toJsonObject());
@@ -871,7 +871,7 @@ public class ProjectServiceTests {
     }
 
     @Test
-    void add_project_with_users_and_admins() {
+    void addProjectWithUsersAndAdmins() {
         Project project = basicInstanceBuilder.givenANotPersistedProject();
         project.setOntology(builder.givenAnOntology());
         User user = builder.givenAUser();
@@ -908,7 +908,7 @@ public class ProjectServiceTests {
     }
 
     @Test
-    void update_project_name() {
+    void updateProjectName() {
         Project project = builder.givenAProject();
         User user = builder.givenAUser();
         builder.addUserToProject(project, user.getUsername());
@@ -927,7 +927,7 @@ public class ProjectServiceTests {
     }
 
     @Test
-    void update_project_with_another_ontology() {
+    void updateProjectWithAnotherOntology() {
         Project project = builder.givenAProject();
         Ontology anotherOntology = builder.givenAnOntology();
 
@@ -944,7 +944,7 @@ public class ProjectServiceTests {
     }
 
     @Test
-    void update_project_with_another_ontology_with_already_existing_annotations() {
+    void updateProjectWithAnotherOntologyWithAlreadyExistingAnnotations() {
         Project project = builder.givenAProject();
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation(project);
         builder.persistAndReturn(userAnnotation);
@@ -977,7 +977,7 @@ public class ProjectServiceTests {
     }
 
     @Test
-    void update_project_with_other_users() {
+    void updateProjectWithOtherUsers() {
         Project project = builder.givenAProject();
         User previousUser = builder.givenAUser();
         User newUser = builder.givenAUser();
@@ -998,7 +998,7 @@ public class ProjectServiceTests {
     }
 
     @Test
-    void update_project_with_other_admins() {
+    void updateProjectWithOtherAdmins() {
         Project project = builder.givenAProject();
         User previousUser = builder.givenAUser();
         User newUser = builder.givenAUser();
@@ -1028,7 +1028,7 @@ public class ProjectServiceTests {
     }
 
     @Test
-    void update_project_with_other_representatives() {
+    void updateProjectWithOtherRepresentatives() {
         Project project = builder.givenAProject();
         User previousUser = builder.givenAUser();
         User newUser = builder.givenAUser();
@@ -1053,7 +1053,7 @@ public class ProjectServiceTests {
     }
 
     @Test
-    void update_project_with_other_representatives_not_in_project() {
+    void updateProjectWithOtherRepresentativesNotInProject() {
         Project project = builder.givenAProject();
         User userNotInProject = builder.givenAUser();
 
@@ -1067,7 +1067,7 @@ public class ProjectServiceTests {
     }
 
     @Test
-    void list_active_projects() {
+    void listActiveProjects() {
         User user1 = builder.givenSuperAdmin();
         Project project1 = builder.givenAProjectWithUser(user1);
         Project project2 = builder.givenAProjectWithUser(user1);
@@ -1081,7 +1081,7 @@ public class ProjectServiceTests {
     }
 
     @Test
-    void list_active_projects_with_number_of_users() {
+    void listActiveProjectsWithNumberOfUsers() {
         User user1 = builder.givenSuperAdmin();
         Project project1 = builder.givenAProjectWithUser(user1);
         Project project2 = builder.givenAProjectWithUser(user1);
@@ -1114,7 +1114,7 @@ public class ProjectServiceTests {
     }
 
     @Test
-    void delete_project() {
+    void deleteProject() {
         Project project = builder.givenAProject();
 
         CommandResponse commandResponse = projectService.delete(project, null, null, true);
@@ -1126,7 +1126,7 @@ public class ProjectServiceTests {
 
 
     @Test
-    void delete_project_just_beeing_created() {
+    void deleteProjectJustBeeingCreated() {
         Project project = basicInstanceBuilder.givenANotPersistedProject();
 
         CommandResponse commandResponse = projectService.add(project.toJsonObject());
@@ -1144,7 +1144,7 @@ public class ProjectServiceTests {
 
 
     @Test
-    void delete_project_with_dependencies() {
+    void deleteProjectWithDependencies() {
         Project project = builder.givenAProject();
         builder.givenAnImageInstance(project);
         UserAnnotation annotation = builder.givenANotPersistedUserAnnotation(project);

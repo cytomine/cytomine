@@ -48,61 +48,61 @@ public class SliceInstanceAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list_sliceInstances() {
+    public void adminCanListSliceInstances() {
         assertThat(sliceInstanceService.list(sliceInstance.getImage())).contains(sliceInstance);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_list_sliceInstances() {
+    public void userCanListSliceInstances() {
         assertThat(sliceInstanceService.list(sliceInstance.getImage())).contains(sliceInstance);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_delete_in_restricted_mode() {
+    public void userCannotDeleteInRestrictedMode() {
         sliceInstance.getProject().setMode(EditingMode.RESTRICTED);
         expectForbidden(() -> whenIDeleteDomain());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void user_admin_can_add_in_readonly_mode() {
+    public void userAdminCanAddInReadonlyMode() {
         sliceInstance.getProject().setMode(EditingMode.READ_ONLY);
         expectOK(() -> whenIAddDomain());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void user_admin_can_edi_in_readonly_mode() {
+    public void userAdminCanEdiInReadonlyMode() {
         sliceInstance.getProject().setMode(EditingMode.READ_ONLY);
         expectOK(() -> whenIEditDomain());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void user_admin_can_delete_in_readonly_mode() {
+    public void userAdminCanDeleteInReadonlyMode() {
         sliceInstance.getProject().setMode(EditingMode.READ_ONLY);
         expectOK(() -> whenIDeleteDomain());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_add_in_readonly_mode() {
+    public void userCannotAddInReadonlyMode() {
         sliceInstance.getProject().setMode(EditingMode.READ_ONLY);
         expectForbidden(() -> whenIAddDomain());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_edit_in_readonly_mode() {
+    public void userCannotEditInReadonlyMode() {
         sliceInstance.getProject().setMode(EditingMode.READ_ONLY);
         expectForbidden(() -> whenIEditDomain());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_delete_in_readonly_mode() {
+    public void userCannotDeleteInReadonlyMode() {
         sliceInstance.getProject().setMode(EditingMode.READ_ONLY);
         expectForbidden(() -> whenIDeleteDomain());
     }

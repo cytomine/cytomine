@@ -95,25 +95,25 @@ public class ImageGroupImageInstanceAuthorizationTest extends CRDAuthorizationTe
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list_imagegroup_imageinstance_by_imagegroup() {
+    public void adminCanListImagegroupImageinstanceByImagegroup() {
         assertThat(imageGroupImageInstanceService.list(igii.getGroup())).contains(igii);
     }
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list_imagegroup_imageinstance_by_imageinstance() {
+    public void adminCanListImagegroupImageinstanceByImageinstance() {
         assertThat(imageGroupImageInstanceService.list(igii.getImage())).contains(igii);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_list_imagegroup_imageinstance_by_imagegroup() {
+    public void userCanListImagegroupImageinstanceByImagegroup() {
         assertThat(imageGroupImageInstanceService.list(igii.getGroup())).contains(igii);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_list_imagegroup_imageinstance_by_imageinstance() {
+    public void userCanListImagegroupImageinstanceByImageinstance() {
         assertThat(imageGroupImageInstanceService.list(igii.getImage())).contains(igii);
     }
 }

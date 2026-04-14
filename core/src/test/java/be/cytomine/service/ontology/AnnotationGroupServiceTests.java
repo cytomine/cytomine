@@ -38,24 +38,24 @@ public class AnnotationGroupServiceTests {
     AnnotationGroupService annotationGroupService;
 
     @Test
-    void find_annotation_group_with_success() {
+    void findAnnotationGroupWithSuccess() {
         AnnotationGroup annotationGroup = builder.givenAnAnnotationGroup();
         AssertionsForClassTypes.assertThat(annotationGroupService.find(annotationGroup.getId()).isPresent());
         assertThat(annotationGroup).isEqualTo(annotationGroupService.find(annotationGroup.getId()).get());
     }
 
     @Test
-    void find_non_existing_annotation_group_return_empty() {
+    void findNonExistingAnnotationGroupReturnEmpty() {
         AssertionsForClassTypes.assertThat(annotationGroupService.find(0L)).isEmpty();
     }
 
     @Test
-    void get_non_existing_annotation_group_return_null() {
+    void getNonExistingAnnotationGroupReturnNull() {
         AssertionsForClassTypes.assertThat(annotationGroupService.get(0L)).isNull();
     }
 
     @Test
-    void list_annotation_group_by_project() {
+    void listAnnotationGroupByProject() {
         Project project = builder.givenAProject();
         ImageGroup imageGroup = builder.givenAnImageGroup(project);
 
@@ -70,7 +70,7 @@ public class AnnotationGroupServiceTests {
     }
 
     @Test
-    void list_annotation_group_by_image_group() {
+    void listAnnotationGroupByImageGroup() {
         Project project = builder.givenAProject();
         ImageGroup imageGroup = builder.givenAnImageGroup(project);
 
@@ -86,7 +86,7 @@ public class AnnotationGroupServiceTests {
     }
 
     @Test
-    void add_valid_annotation_group_with_success() {
+    void addValidAnnotationGroupWithSuccess() {
         AnnotationGroup annotationGroup = builder.givenANotPersistedAnnotationGroup();
 
         CommandResponse commandResponse = annotationGroupService.add(annotationGroup.toJsonObject());
@@ -98,7 +98,7 @@ public class AnnotationGroupServiceTests {
     }
 
     @Test
-    void add_annotation_group_with_null_project_fails() {
+    void addAnnotationGroupWithNullProjectFails() {
         AnnotationGroup annotationGroup = builder.givenAnAnnotationGroup();
         Assertions.assertThrows(
             ObjectNotFoundException.class,
@@ -107,7 +107,7 @@ public class AnnotationGroupServiceTests {
     }
 
     @Test
-    void edit_annotation_group_with_success() {
+    void editAnnotationGroupWithSuccess() {
         Project project1 = builder.givenAProject();
         Project project2 = builder.givenAProject();
         ImageGroup imageGroup = builder.givenAnImageGroup(project1);
@@ -127,7 +127,7 @@ public class AnnotationGroupServiceTests {
     }
 
     @Test
-    void delete_annotation_group_with_success() {
+    void deleteAnnotationGroupWithSuccess() {
         AnnotationGroup annotationGroup = builder.givenAnAnnotationGroup();
 
         CommandResponse commandResponse = annotationGroupService.delete(annotationGroup, null, null, true);
@@ -138,7 +138,7 @@ public class AnnotationGroupServiceTests {
     }
 
     @Test
-    public void merge_annotation_group_with_success() {
+    public void mergeAnnotationGroupWithSuccess() {
         Project project = builder.givenAProject();
         ImageGroup imageGroup = builder.givenAnImageGroup(project);
         AnnotationGroup annotationGroup = builder.givenAnAnnotationGroup(project, imageGroup);

@@ -37,7 +37,7 @@ public class SimplifyGeometryServiceTests {
     SimplifyGeometryService simplifyGeometryService;
 
     @Test
-    public void simplify_big_annotation() throws ParseException {
+    public void simplifyBigAnnotation() throws ParseException {
 
         //create annotation
         UserAnnotation annotation = builder.givenAUserAnnotation();
@@ -105,7 +105,7 @@ public class SimplifyGeometryServiceTests {
     }
 
     @Test
-    public void simplify_very_big_annotation() throws ParseException {
+    public void simplifyVeryBigAnnotation() throws ParseException {
 
         //create annotation
         UserAnnotation annotation = builder.givenAUserAnnotation();
@@ -143,7 +143,7 @@ public class SimplifyGeometryServiceTests {
     }
 
     @Test
-    public void simplify_annotation_with_empty_space() throws ParseException {
+    public void simplifyAnnotationWithEmptySpace() throws ParseException {
 
         //create annotation
         UserAnnotation annotation = builder.givenAUserAnnotation();
@@ -180,7 +180,7 @@ public class SimplifyGeometryServiceTests {
     }
 
     @Test
-    public void simplify_annotation_with_rate() throws ParseException {
+    public void simplifyAnnotationWithRate() throws ParseException {
 
         Geometry expected = new WKTReader().read("POLYGON ((120 120, 140 199, 160 200, 180 199, 220 120, 120 120))")
             .norm();

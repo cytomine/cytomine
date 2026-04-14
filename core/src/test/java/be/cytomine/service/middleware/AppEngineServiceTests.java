@@ -50,7 +50,7 @@ public class AppEngineServiceTests {
     }
 
     @Test
-    void get_task() {
+    void getTask() {
         configureFor("localhost", 8888);
         stubFor(get(urlEqualTo(apiBasePath + "task"))
             .willReturn(

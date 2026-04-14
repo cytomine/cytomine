@@ -38,7 +38,7 @@ public class ImageGroupImageInstanceServiceTests {
     private ImageGroupImageInstanceService imageGroupImageInstanceService;
 
     @Test
-    void get_non_existing_imagegroup_imageinstance_return_null() {
+    void getNonExistingImagegroupImageinstanceReturnNull() {
         Project project = builder.givenAProject();
         ImageGroup group = builder.givenAnImageGroup(project);
         ImageInstance image = builder.givenAnImageInstance(project);
@@ -46,7 +46,7 @@ public class ImageGroupImageInstanceServiceTests {
     }
 
     @Test
-    void find_imagegroup_imageinstance_with_success() {
+    void findImagegroupImageinstanceWithSuccess() {
         ImageGroupImageInstance igii = builder.givenAnImageGroupImageInstance();
         AssertionsForClassTypes.assertThat(imageGroupImageInstanceService.find(igii.getGroup(), igii.getImage())
             .isPresent());
@@ -54,7 +54,7 @@ public class ImageGroupImageInstanceServiceTests {
     }
 
     @Test
-    void list_imagegroup_imageinstance_by_imageinstance() {
+    void listImagegroupImageinstanceByImageinstance() {
         Project project = builder.givenAProject();
         ImageGroup group = builder.givenAnImageGroup(project);
         ImageInstance image = builder.givenAnImageInstance(project);
@@ -70,7 +70,7 @@ public class ImageGroupImageInstanceServiceTests {
     }
 
     @Test
-    void list_imagegroup_imageinstance_by_imagegroup() {
+    void listImagegroupImageinstanceByImagegroup() {
         Project project = builder.givenAProject();
         ImageGroup group = builder.givenAnImageGroup(project);
         ImageInstance image = builder.givenAnImageInstance(project);
@@ -86,7 +86,7 @@ public class ImageGroupImageInstanceServiceTests {
     }
 
     @Test
-    void add_valid_imagegroup_imageinstance_with_success() {
+    void addValidImagegroupImageinstanceWithSuccess() {
         ImageGroupImageInstance igii = builder.givenANotPersistedImageGroupImageInstance();
 
         CommandResponse commandResponse = imageGroupImageInstanceService.add(igii.toJsonObject());
@@ -101,7 +101,7 @@ public class ImageGroupImageInstanceServiceTests {
     }
 
     @Test
-    void add_imagegroup_imageinstance_with_wrong_group_fails() {
+    void addImagegroupImageinstanceWithWrongGroupFails() {
         ImageGroupImageInstance igii = builder.givenAnImageGroupImageInstance();
         Assertions.assertThrows(
             WrongArgumentException.class,
@@ -111,7 +111,7 @@ public class ImageGroupImageInstanceServiceTests {
     }
 
     @Test
-    void add_imagegroup_imageinstance_with_wrong_image_fails() {
+    void addImagegroupImageinstanceWithWrongImageFails() {
         ImageGroupImageInstance igii = builder.givenAnImageGroupImageInstance();
         Assertions.assertThrows(
             WrongArgumentException.class,
@@ -121,7 +121,7 @@ public class ImageGroupImageInstanceServiceTests {
     }
 
     @Test
-    void delete_imagegroup_imageinstance_with_success() {
+    void deleteImagegroupImageinstanceWithSuccess() {
         ImageGroupImageInstance igii = builder.givenAnImageGroupImageInstance();
 
         CommandResponse commandResponse = imageGroupImageInstanceService.delete(igii, null, null, true);

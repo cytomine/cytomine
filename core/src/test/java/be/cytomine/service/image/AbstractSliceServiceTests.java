@@ -76,7 +76,7 @@ public class AbstractSliceServiceTests {
     ImageInstanceService imageInstanceService;
 
     @Test
-    void list_all_image_by_abstract_image() {
+    void listAllImageByAbstractImage() {
         AbstractImage image1 = builder.givenAnAbstractImage();
         AbstractImage image2 = builder.givenAnAbstractImage();
 
@@ -92,7 +92,7 @@ public class AbstractSliceServiceTests {
     }
 
     @Test
-    void list_all_image_by_uploaded_file() {
+    void listAllImageByUploadedFile() {
         UploadedFile file1 = builder.givenAUploadedFile();
         UploadedFile file2 = builder.givenAUploadedFile();
 
@@ -109,7 +109,7 @@ public class AbstractSliceServiceTests {
 
 
     @Test
-    void find_abstract_slice_by_image_and_coordinates() {
+    void findAbstractSliceByImageAndCoordinates() {
 
         AbstractSlice abstractSlice1 = builder.givenAnAbstractSlice();
         abstractSlice1.setChannel(1);
@@ -130,7 +130,7 @@ public class AbstractSliceServiceTests {
     }
 
     @Test
-    void find_abstract_slice_image_uploaded() {
+    void findAbstractSliceImageUploaded() {
         AbstractSlice abstractSlice1 = builder.givenAnAbstractSlice();
         assertThat(abstractSliceService.findImageUploaded(abstractSlice1.getId()))
             .isEqualTo(abstractSlice1.getUploadedFile().getUser());
@@ -138,24 +138,24 @@ public class AbstractSliceServiceTests {
 
 
     @Test
-    void get_unexisting_abstractSlice_return_null() {
+    void getUnexistingAbstractSliceReturnNull() {
         assertThat(abstractSliceService.get(0L)).isNull();
     }
 
     @Test
-    void find_abstractSlice_with_success() {
+    void findAbstractSliceWithSuccess() {
         AbstractSlice abstractSlice = builder.givenAnAbstractSlice();
         assertThat(abstractSliceService.find(abstractSlice.getId()).isPresent());
         assertThat(abstractSlice).isEqualTo(abstractSliceService.find(abstractSlice.getId()).get());
     }
 
     @Test
-    void find_unexisting_abstractSlice_return_empty() {
+    void findUnexistingAbstractSliceReturnEmpty() {
         assertThat(abstractSliceService.find(0L)).isEmpty();
     }
 
     @Test
-    void add_valid_abstract_slice_with_success() {
+    void addValidAbstractSliceWithSuccess() {
         AbstractSlice abstractSlice = builder.givenANotPersistedAbstractSlice();
 
         CommandResponse commandResponse = abstractSliceService.add(abstractSlice.toJsonObject());
@@ -167,7 +167,7 @@ public class AbstractSliceServiceTests {
     }
 
     @Test
-    void add_already_existing_abstract_slice() {
+    void addAlreadyExistingAbstractSlice() {
         AbstractSlice abstractSlice = builder.givenAnAbstractSlice();
         Assertions.assertThrows(
             AlreadyExistException.class, () -> {
@@ -177,7 +177,7 @@ public class AbstractSliceServiceTests {
     }
 
     @Test
-    void add_valid_abstract_slice_with_null_abstract_image_fails() {
+    void addValidAbstractSliceWithNullAbstractImageFails() {
         AbstractSlice abstractSlice = builder.givenANotPersistedAbstractSlice();
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
@@ -187,7 +187,7 @@ public class AbstractSliceServiceTests {
     }
 
     @Test
-    void edit_abstract_slice_with_success() {
+    void editAbstractSliceWithSuccess() {
         AbstractSlice abstractSlice = builder.givenANotPersistedAbstractSlice();
         abstractSlice.setChannel(1);
         abstractSlice.setZStack(10);
@@ -211,7 +211,7 @@ public class AbstractSliceServiceTests {
     }
 
     @Test
-    void delete_abstract_slice_with_success() {
+    void deleteAbstractSliceWithSuccess() {
         AbstractSlice abstractSlice = builder.givenAnAbstractSlice();
 
         CommandResponse commandResponse = abstractSliceService.delete(abstractSlice, null, null, true);
@@ -222,7 +222,7 @@ public class AbstractSliceServiceTests {
     }
 
     @Test
-    void delete_abstract_slice_with_dependencies_with_success() {
+    void deleteAbstractSliceWithDependenciesWithSuccess() {
         SliceInstance sliceInstance = builder.givenASliceInstance();
         Assertions.assertThrows(
             CytomineException.class, () -> {

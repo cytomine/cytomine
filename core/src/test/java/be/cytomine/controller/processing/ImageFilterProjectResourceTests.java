@@ -54,7 +54,7 @@ public class ImageFilterProjectResourceTests {
 
     @Test
     @Transactional
-    public void list_all() throws Exception {
+    public void listAll() throws Exception {
         ImageFilterProject imageFilterProject = builder.givenAnImageFilterProject();
         restImageFilterProjectMockMvc.perform(get("/api/imagefilterproject.json"))
             .andExpect(status().isOk())
@@ -66,7 +66,7 @@ public class ImageFilterProjectResourceTests {
 
     @Test
     @Transactional
-    public void list_by_project() throws Exception {
+    public void listByProject() throws Exception {
         ImageFilterProject imageFilterProject = builder.givenAnImageFilterProject();
         restImageFilterProjectMockMvc.perform(get(
                 "/api/project/{id}/imagefilterproject.json",
@@ -79,14 +79,14 @@ public class ImageFilterProjectResourceTests {
 
     @Test
     @Transactional
-    public void list_by_unexisting_project() throws Exception {
+    public void listByUnexistingProject() throws Exception {
         restImageFilterProjectMockMvc.perform(get("/api/project/{id}/imagefilterproject.json", 0))
             .andExpect(status().isNotFound());
     }
 
     @Test
     @Transactional
-    public void add_valid_imageFilterProject() throws Exception {
+    public void addValidImageFilterProject() throws Exception {
         ImageFilterProject
             imageFilterProject
             = builder.givenANotPersistedImageFilterProject(
@@ -106,7 +106,7 @@ public class ImageFilterProjectResourceTests {
 
     @Test
     @Transactional
-    public void delete_valid_imageFilterProject() throws Exception {
+    public void deleteValidImageFilterProject() throws Exception {
         ImageFilterProject imageFilterProject = builder.givenAnImageFilterProject(
             builder.givenAnImageFilter(),
             builder.givenAProject()
@@ -119,7 +119,7 @@ public class ImageFilterProjectResourceTests {
 
     @Test
     @Transactional
-    public void delete_unexisting_imageFilterProject() throws Exception {
+    public void deleteUnexistingImageFilterProject() throws Exception {
         restImageFilterProjectMockMvc.perform(delete("/api/imageFilterProject/{id}.json", 0)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isNotFound());

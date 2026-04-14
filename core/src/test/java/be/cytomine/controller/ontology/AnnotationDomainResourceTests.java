@@ -191,7 +191,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @Transactional
-    public void list_user_annotation_property_show() throws Exception {
+    public void listUserAnnotationPropertyShow() throws Exception {
         MvcResult result;
         result = restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("image", this.image.getId().toString()))
@@ -264,7 +264,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @Transactional
-    public void list_user_annotation_with_parameters_image() throws Exception {
+    public void listUserAnnotationWithParametersImage() throws Exception {
         a4.setImage(builder.givenAnImageInstance(project));
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("image", this.image.getId().toString()))
@@ -279,7 +279,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @Transactional
-    public void list_annotation_search_with_no_terms() throws Exception {
+    public void listAnnotationSearchWithNoTerms() throws Exception {
 
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("project", this.project.getId().toString())
@@ -294,7 +294,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @Transactional
-    public void list_annotation_search_by_max_distance() throws Exception {
+    public void listAnnotationSearchByMaxDistance() throws Exception {
         a1.setLocation(new WKTReader().read("POINT(0 0)")); //base point
         a2.setLocation(new WKTReader().read("POINT(-10 0)")); //should be < 11
         a3.setLocation(new WKTReader().read("POLYGON((10 0,15 10,15 15,10 15,10 0))")); //should be < 11
@@ -334,7 +334,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @Transactional
-    public void list_annotation_search_by_image_and_user() throws Exception {
+    public void listAnnotationSearchByImageAndUser() throws Exception {
 
         a1.setImage(builder.givenAnImageInstance(project));
         a2.setUser(builder.givenAUser());
@@ -354,7 +354,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @Transactional
-    public void list_annotation_search_by_image_and_user_and_bbox() throws Exception {
+    public void listAnnotationSearchByImageAndUserAndBbox() throws Exception {
         a1.setLocation(new WKTReader().read("POLYGON ((1 1, 2 1, 2 2, 1 2, 1 1))"));
         a2.setLocation(new WKTReader().read("POLYGON ((1 3, 2 3, 2 5, 1 5, 1 3))"));
         a3.setLocation(new WKTReader().read("POLYGON ((3 1, 5 1,  5 3, 3 3, 3 1))"));
@@ -421,7 +421,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @Transactional
-    public void list_annotation_search_by_image_and_user_and_term() throws Exception {
+    public void listAnnotationSearchByImageAndUserAndTerm() throws Exception {
 
         a1.setImage(builder.givenAnImageInstance(project));
         a2.setUser(builder.givenAUser());
@@ -443,7 +443,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @Transactional
-    public void list_annotation_search_include_filter_user_annotation() throws Exception {
+    public void listAnnotationSearchIncludeFilterUserAnnotation() throws Exception {
         a1.setLocation(new WKTReader().read("POLYGON ((1 1, 2 1, 2 2, 1 2, 1 1))"));
         a2.setLocation(new WKTReader().read("POLYGON ((1 3, 2 3, 2 5, 1 5, 1 3))"));
         a3.setLocation(new WKTReader().read("POLYGON ((3 1, 5 1,  5 3, 3 3, 3 1))"));
@@ -515,7 +515,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @Transactional
-    public void list_user_annotation_with_pagination() throws Exception {
+    public void listUserAnnotationWithPagination() throws Exception {
         Project project = builder.givenAProject();
 
         UserAnnotation a1 = builder.givenAUserAnnotation(project);
@@ -580,7 +580,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @Transactional
-    public void list_user_annotation_without_term() throws Exception {
+    public void listUserAnnotationWithoutTerm() throws Exception {
 
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("noTerm", "true")
@@ -598,7 +598,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @Transactional
-    public void list_user_annotation_with_multiple_term() throws Exception {
+    public void listUserAnnotationWithMultipleTerm() throws Exception {
         builder.givenAnAnnotationTerm(a1);
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("multipleTerm", "true")
@@ -616,7 +616,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @Transactional
-    public void list_user_annotation_with_several_identical_term() throws Exception {
+    public void listUserAnnotationWithSeveralIdenticalTerm() throws Exception {
         AnnotationTerm annotationTerm = new AnnotationTerm();
         annotationTerm.setUserAnnotation(a1);
         annotationTerm.setUser(builder.givenAUser());
@@ -644,7 +644,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @Transactional
-    public void list_user_annotation_with_same_request_as_default_viewer() throws Exception {
+    public void listUserAnnotationWithSameRequestAsDefaultViewer() throws Exception {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         // this is the kind of request that the viewer send (without much configuration)
         JsonObject jsonObject = new JsonObject();
@@ -672,7 +672,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @Transactional
-    public void list_reviewed_annotation_property_show() throws Exception {
+    public void listReviewedAnnotationPropertyShow() throws Exception {
         MvcResult result;
         result = restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("image", this.image.getId().toString())
@@ -752,7 +752,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @Transactional
-    public void list_reviewed_annotation_with_parameters_image() throws Exception {
+    public void listReviewedAnnotationWithParametersImage() throws Exception {
         r4.setImage(builder.givenAnImageInstance(project));
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("reviewed", "true")
@@ -768,7 +768,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @Transactional
-    public void list_reviewed_annotation_search_with_no_terms() throws Exception {
+    public void listReviewedAnnotationSearchWithNoTerms() throws Exception {
 
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("reviewed", "true")
@@ -784,7 +784,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @Transactional
-    public void list_reviewed_annotation_search_by_max_distance() throws Exception {
+    public void listReviewedAnnotationSearchByMaxDistance() throws Exception {
         r1.setLocation(new WKTReader().read("POINT(0 0)")); //base point
         r2.setLocation(new WKTReader().read("POINT(-10 0)")); //should be < 11
         r3.setLocation(new WKTReader().read("POLYGON((10 0,15 10,15 15,10 15,10 0))")); //should be < 11
@@ -826,7 +826,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @Transactional
-    public void list_reviewed_annotation_search_by_image_and_user() throws Exception {
+    public void listReviewedAnnotationSearchByImageAndUser() throws Exception {
 
         r1.setImage(builder.givenAnImageInstance(project));
         r2.setUser(builder.givenAUser());
@@ -847,7 +847,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @Transactional
-    public void list_reviewed_annotation_search_by_image_and_user_and_bbox() throws Exception {
+    public void listReviewedAnnotationSearchByImageAndUserAndBbox() throws Exception {
 
         r1.setLocation(new WKTReader().read("POLYGON ((1 1, 2 1, 2 2, 1 2, 1 1))"));
         r2.setLocation(new WKTReader().read("POLYGON ((1 3, 2 3, 2 5, 1 5, 1 3))"));
@@ -922,7 +922,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @Transactional
-    public void list_reviewed_annotation_search_by_image_and_reviewer_and_term() throws Exception {
+    public void listReviewedAnnotationSearchByImageAndReviewerAndTerm() throws Exception {
 
         r1.setImage(builder.givenAnImageInstance(project));
         r2.setUser(builder.givenAUser());
@@ -958,7 +958,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @Transactional
-    public void list_reviewed_annotation_without_term() throws Exception {
+    public void listReviewedAnnotationWithoutTerm() throws Exception {
 
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("reviewed", "true")
@@ -977,7 +977,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @Transactional
-    public void list_reviewed_annotation_with_multiple_term() throws Exception {
+    public void listReviewedAnnotationWithMultipleTerm() throws Exception {
         r1.getTerms().add(builder.givenATerm(r1.getProject().getOntology()));
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("reviewed", "true")
@@ -997,7 +997,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @Transactional
-    public void list_reviewed_annotation_with_same_request_as_default_viewer() throws Exception {
+    public void listReviewedAnnotationWithSameRequestAsDefaultViewer() throws Exception {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
 
         JsonObject jsonObject = new JsonObject();
@@ -1042,7 +1042,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @Transactional
-    public void download_user_annotation_reports_for_all_users() throws Exception {
+    public void downloadUserAnnotationReportsForAllUsers() throws Exception {
         MvcResult mvcResult = performDownload("csv", "", false)
             .andExpect(status().isOk())
             .andReturn();
@@ -1052,7 +1052,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @Transactional
-    public void download_user_annotation_reports_for_specific_user() throws Exception {
+    public void downloadUserAnnotationReportsForSpecificUser() throws Exception {
         MvcResult mvcResult = performDownload("csv", this.randomUser.getId().toString(), false)
             .andExpect(status().isOk())
             .andReturn();
@@ -1062,7 +1062,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @Transactional
-    public void download_reviewed_annotation() throws Exception {
+    public void downloadReviewedAnnotation() throws Exception {
         MvcResult mvcResult = performDownload("csv", this.randomUser.getId().toString(), true)
             .andExpect(status().isOk())
             .andReturn();
@@ -1072,7 +1072,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @Transactional
-    public void download_csv_reports() throws Exception {
+    public void downloadCsvReports() throws Exception {
         performDownload("csv", "", false)
             .andExpect(status().isOk())
             .andExpect(header().string("Content-Type", "text/csv"))
@@ -1081,7 +1081,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @Transactional
-    public void download_xls_reports() throws Exception {
+    public void downloadXlsReports() throws Exception {
         performDownload("xls", this.me.getId().toString(), false)
             .andExpect(status().isOk())
             .andExpect(header().string("Content-Type", "application/octet-stream"))
@@ -1091,7 +1091,7 @@ public class AnnotationDomainResourceTests {
     @Test
     @Transactional
     @Disabled("This test does not work, the returned entity is a 500, but expectOK() ignores that")
-    public void download_pdf_reports() throws Exception {
+    public void downloadPdfReports() throws Exception {
         performDownload("pdf", this.me.getId().toString(), false)
             .andExpect(status().isOk())
             .andExpect(header().string("Content-Type", "application/pdf"))
@@ -1126,7 +1126,7 @@ public class AnnotationDomainResourceTests {
     @Disabled("Randomly fail with ProxyExchange, need to find a solution")
     @Test
     @Transactional
-    public void get_user_annotation_crop() throws Exception {
+    public void getUserAnnotationCrop() throws Exception {
         UserAnnotation
             annotation
             = UserAnnotationResourceTests.givenAUserAnnotationWithValidImageServer(builder);
@@ -1162,7 +1162,7 @@ public class AnnotationDomainResourceTests {
     @Disabled("Randomly fail with ProxyExchange, need to find a solution")
     @Test
     @jakarta.transaction.Transactional
-    public void get_reviewed_annotation_crop() throws Exception {
+    public void getReviewedAnnotationCrop() throws Exception {
         ReviewedAnnotation
             annotation
             = ReviewedAnnotationResourceTests.givenAReviewedAnnotationWithValidImageServer(builder);
@@ -1197,7 +1197,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @Transactional
-    public void show_valid_user_annotation() throws Exception {
+    public void showValidUserAnnotation() throws Exception {
         UserAnnotation annotation = builder.givenAUserAnnotation();
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation/{id}.json", annotation.getId()))
             .andExpect(status().isOk())
@@ -1206,7 +1206,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @Transactional
-    public void show_valid_reviewed_annotation() throws Exception {
+    public void showValidReviewedAnnotation() throws Exception {
         ReviewedAnnotation annotation = builder.givenAReviewedAnnotation();
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation/{id}.json", annotation.getId()))
             .andExpect(status().isOk())
@@ -1216,14 +1216,14 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @Transactional
-    public void show_an_unexisting_annotation() throws Exception {
+    public void showAnUnexistingAnnotation() throws Exception {
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation/{id}.json", 0))
             .andExpect(status().isNotFound());
     }
 
     @Test
     @Transactional
-    public void add_valid_user_annotation() throws Exception {
+    public void addValidUserAnnotation() throws Exception {
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation();
 
         restAnnotationDomainControllerMockMvc.perform(post("/api/annotation.json")
@@ -1242,7 +1242,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @Transactional
-    public void add_multiple_valid_user_annotation() throws Exception {
+    public void addMultipleValidUserAnnotation() throws Exception {
         UserAnnotation userAnnotation1 = builder.givenANotPersistedUserAnnotation();
         UserAnnotation userAnnotation2 = builder.givenANotPersistedUserAnnotation();
         UserAnnotation userAnnotation3 = builder.givenANotPersistedUserAnnotation();
@@ -1258,7 +1258,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @org.springframework.transaction.annotation.Transactional
-    public void edit_valid_user_annotation() throws Exception {
+    public void editValidUserAnnotation() throws Exception {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         restAnnotationDomainControllerMockMvc.perform(put("/api/annotation/{id}.json", userAnnotation.getId())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -1277,7 +1277,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @org.springframework.transaction.annotation.Transactional
-    public void edit_valid_reviewed_annotation() throws Exception {
+    public void editValidReviewedAnnotation() throws Exception {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         restAnnotationDomainControllerMockMvc.perform(put("/api/annotation/{id}.json", reviewedAnnotation.getId())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -1294,7 +1294,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @org.springframework.transaction.annotation.Transactional
-    public void delete_user_annotation() throws Exception {
+    public void deleteUserAnnotation() throws Exception {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
 
         restAnnotationDomainControllerMockMvc.perform(delete("/api/annotation/{id}.json", userAnnotation.getId())
@@ -1314,7 +1314,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @org.springframework.transaction.annotation.Transactional
-    public void delete_reviewed_annotation() throws Exception {
+    public void deleteReviewedAnnotation() throws Exception {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         restAnnotationDomainControllerMockMvc.perform(delete(
                 "/api/reviewedannotation/{id}.json",
@@ -1334,7 +1334,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @Transactional
-    public void simplify_annotation_while_creating_it() throws Exception {
+    public void simplifyAnnotationWhileCreatingIt() throws Exception {
         AnnotationDomain annotation = builder.givenANotPersistedUserAnnotation();
         annotation.setLocation(new WKTReader().read(TestUtils.getResourceFileAsString("dataset/very_big_annotation.txt")));
         assertThat(annotation.getLocation().getNumPoints()).isGreaterThanOrEqualTo(500);
@@ -1382,7 +1382,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @Transactional
-    public void simplify_annotation() throws Exception {
+    public void simplifyAnnotation() throws Exception {
 
         AnnotationDomain annotation = builder.givenAUserAnnotation();
         annotation.setLocation(new WKTReader().read(TestUtils.getResourceFileAsString("dataset/very_big_annotation.txt")));
@@ -1413,7 +1413,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @Transactional
-    public void retrieve_simplify_annotation() throws Exception {
+    public void retrieveSimplifyAnnotation() throws Exception {
 
         AnnotationDomain annotation = builder.givenANotPersistedUserAnnotation();
         annotation.setLocation(new WKTReader().read(TestUtils.getResourceFileAsString("dataset/very_big_annotation.txt")));
@@ -1446,7 +1446,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @Transactional
-    public void fill_user_annotation() throws Exception {
+    public void fillUserAnnotation() throws Exception {
         String annotationWithHole =
             "POLYGON ((4980 4980, 5516 4932, 5476 4188, 4956 4204, 4980 4980), (5100 4316, 5100 4804, 5404 4780, 5364 4316, 5100 4316))";
 
@@ -1493,7 +1493,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @Transactional
-    public void fill_annotation_with_multipolygon() throws Exception {
+    public void fillAnnotationWithMultipolygon() throws Exception {
         String multiPolygon = "MULTIPOLYGON(((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2)),((6 3,9 2,9 4,6 3)))";
         String multiPolygonWithoutBlank = "MULTIPOLYGON(((1 1,5 1,5 5,1 5,1 1)),((6 3,9 2,9 4,6 3)))";
 
@@ -1514,7 +1514,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     @Transactional
-    public void fill_annotation_with_multipolygon_complex() throws Exception {
+    public void fillAnnotationWithMultipolygonComplex() throws Exception {
         String multiPolygon = """
             MULTIPOLYGON (
                      ((12099.256583509747 16750.418861169917, 12099.043823719125 16751.339457289127, 12099.008051747693 16752.283641756945, 12099.1505450325 16753.21769721943, 12099.466215058877 16754.10826803506, 12099.943789074123 16754.92355142332, 12100.566212643795 16755.634433159707, 12101.311258675076 16756.21552726093, 12102.15232115866 16756.64608253255, 12103.059365284169 16756.91072360568, 12104 16757, 12120 16757, 12121.033369789395 16756.89204935363, 12122.02211840411 16756.572858751348, 12122.923551423319 16756.05621092588, 12123.698744736195 16755.364414863907, 12124.31422529506 16754.52734249825, 12124.743416490253 16753.581138830083, 12132.743416490253 16729.581138830083, 12132.957505083801 16728.650494691818, 12132.990757289455 16727.696122265148, 12132.841960156618 16726.752834477018, 12132.516541402574 16725.855039916725, 12132.02637142403 16725.03548770356, 12131.389330297132 16724.324072887426, 12130.628655560595 16723.74674595824, 12129.772094573098 16723.324566242154, 12128.850892364628 16723.072933714288, 12127.898651902216 16723.001027249218, 12126.950108344521 16723.111469800468, 12126.039861997104 16723.400232722233, 12125.201116186798 16723.856782723513, 12124.464466094067 16724.46446609407, 12120 16728.928932188137, 12115.535533905933 16724.46446609407, 12114.748285726344 16723.82304829255, 12113.84767884134 16723.35391746745, 12112.870860636873 16723.07642388592, 12111.85812199173 16723.002013342277, 12110.851235397264 16723.133755052662, 12109.89173196494 16723.466215058877, 12109.019188390113 16723.985680363203, 12108.269594529698 16724.670724549225, 12107.673868926402 16725.493091558503, 12107.256583509747 16726.418861169917, 12099.256583509747 16750.418861169917)),\s

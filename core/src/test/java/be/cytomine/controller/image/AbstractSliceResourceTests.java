@@ -89,7 +89,7 @@ public class AbstractSliceResourceTests {
 
     @Test
     @Transactional
-    public void list_abstract_slice_by_abstract_image() throws Exception {
+    public void listAbstractSliceByAbstractImage() throws Exception {
         AbstractSlice abstractSlice = builder.givenAnAbstractSlice();
 
         restAbstractSliceControllerMockMvc.perform(get(
@@ -102,7 +102,7 @@ public class AbstractSliceResourceTests {
 
     @Test
     @Transactional
-    public void list_abstract_slice_by_uploaded_file() throws Exception {
+    public void listAbstractSliceByUploadedFile() throws Exception {
         AbstractSlice abstractSlice = builder.givenAnAbstractSlice();
 
         restAbstractSliceControllerMockMvc.perform(get(
@@ -115,7 +115,7 @@ public class AbstractSliceResourceTests {
 
     @Test
     @Transactional
-    public void get_an_abstract_slice() throws Exception {
+    public void getAnAbstractSlice() throws Exception {
         AbstractSlice image = givenTestAbstractSlice();
 
         restAbstractSliceControllerMockMvc.perform(get("/api/abstractslice/{id}.json", image.getId()))
@@ -134,7 +134,7 @@ public class AbstractSliceResourceTests {
 
     @Test
     @Transactional
-    public void get_an_abstract_slice_not_exist() throws Exception {
+    public void getAnAbstractSliceNotExist() throws Exception {
         restAbstractSliceControllerMockMvc.perform(get("/api/abstractslice/{id}.json", 0))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.errors.message").exists());
@@ -142,7 +142,7 @@ public class AbstractSliceResourceTests {
 
     @Test
     @Transactional
-    public void get_an_abstract_slice_with_coordinates() throws Exception {
+    public void getAnAbstractSliceWithCoordinates() throws Exception {
         AbstractSlice image = givenTestAbstractSlice();
 
         restAbstractSliceControllerMockMvc.perform(get(
@@ -155,7 +155,7 @@ public class AbstractSliceResourceTests {
 
     @Test
     @Transactional
-    public void add_valid_abstract_slice() throws Exception {
+    public void addValidAbstractSlice() throws Exception {
         AbstractSlice abstractSlice = builder.givenANotPersistedAbstractSlice();
         restAbstractSliceControllerMockMvc.perform(post("/api/abstractslice.json")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -172,7 +172,7 @@ public class AbstractSliceResourceTests {
 
     @Test
     @Transactional
-    public void edit_valid_abstract_slice() throws Exception {
+    public void editValidAbstractSlice() throws Exception {
         AbstractSlice abstractSlice = builder.givenAnAbstractSlice();
         JsonObject jsonObject = abstractSlice.toJsonObject();
         jsonObject.put("time", 3);
@@ -192,7 +192,7 @@ public class AbstractSliceResourceTests {
 
     @Test
     @Transactional
-    public void delete_abstract_slice() throws Exception {
+    public void deleteAbstractSlice() throws Exception {
         AbstractSlice abstractSlice = builder.givenAnAbstractSlice();
         restAbstractSliceControllerMockMvc.perform(delete("/api/abstractslice/{id}.json", abstractSlice.getId()))
             .andExpect(status().isOk())
@@ -207,7 +207,7 @@ public class AbstractSliceResourceTests {
 
     @Test
     @Transactional
-    public void get_abstract_slice_uploader() throws Exception {
+    public void getAbstractSliceUploader() throws Exception {
         AbstractSlice image = builder.givenAnAbstractSlice();
 
         restAbstractSliceControllerMockMvc.perform(get("/api/abstractslice/{id}/user.json", image.getId()))
@@ -217,14 +217,14 @@ public class AbstractSliceResourceTests {
 
     @Test
     @Transactional
-    public void get_abstract_slice_uploader_when_abstract_slice_does_not_exists() throws Exception {
+    public void getAbstractSliceUploaderWhenAbstractSliceDoesNotExists() throws Exception {
         restAbstractSliceControllerMockMvc.perform(get("/api/abstractslice/{id}/user.json", 0))
             .andExpect(status().isNotFound());
     }
 
     @Test
     @Transactional
-    public void get_abstract_slice_thumb() throws Exception {
+    public void getAbstractSliceThumb() throws Exception {
         AbstractSlice image = givenTestAbstractSlice();
 
         byte[] mockResponse = UUID.randomUUID()
@@ -251,7 +251,7 @@ public class AbstractSliceResourceTests {
 
     @Test
     @Transactional
-    public void get_abstract_slice_thumb_if_image_not_exist() throws Exception {
+    public void getAbstractSliceThumbIfImageNotExist() throws Exception {
         restAbstractSliceControllerMockMvc.perform(get("/api/abstractslice/{id}/thumb.png", 0))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.errors").exists());
@@ -260,7 +260,7 @@ public class AbstractSliceResourceTests {
 
     @Test
     @Transactional
-    public void get_abstract_slice_tile() throws Exception {
+    public void getAbstractSliceTile() throws Exception {
         AbstractSlice image = givenTestAbstractSlice();
         byte[] mockResponse = UUID.randomUUID()
             .toString()
@@ -289,7 +289,7 @@ public class AbstractSliceResourceTests {
 
     @Test
     @Transactional
-    public void get_abstract_slice_tile_if_image_not_exist() throws Exception {
+    public void getAbstractSliceTileIfImageNotExist() throws Exception {
         restAbstractSliceControllerMockMvc.perform(get(
                 "/api/abstractslice/{id}/normalized-tile/zoom/{z}/tx/{tx}/ty/{ty}.jpg?filters=binary",
                 0,
@@ -304,7 +304,7 @@ public class AbstractSliceResourceTests {
     @Disabled("Randomly fail with ProxyExchange, need to find a solution")
     @Test
     @Transactional
-    public void get_abstract_slice_crop() throws Exception {
+    public void getAbstractSliceCrop() throws Exception {
         AbstractSlice image = givenTestAbstractSlice();
 
         configureFor("localhost", 8888);
@@ -337,7 +337,7 @@ public class AbstractSliceResourceTests {
     @Disabled("Randomly fail with ProxyExchange, need to find a solution")
     @Test
     @Transactional
-    public void get_abstract_slice_window() throws Exception {
+    public void getAbstractSliceWindow() throws Exception {
         AbstractSlice image = givenTestAbstractSlice();
 
         byte[] mockResponse = UUID.randomUUID()

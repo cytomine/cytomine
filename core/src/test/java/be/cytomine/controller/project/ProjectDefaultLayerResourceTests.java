@@ -59,7 +59,7 @@ public class ProjectDefaultLayerResourceTests {
 
     @Test
     @Transactional
-    public void list_all_project_default_layers() throws Exception {
+    public void listAllProjectDefaultLayers() throws Exception {
         ProjectDefaultLayer projectDefaultLayer = builder.givenAProjectDefaultLayer();
         restProjectDefaultLayerControllerMockMvc.perform(get(
                 "/api/project/{id}/defaultlayer.json",
@@ -73,7 +73,7 @@ public class ProjectDefaultLayerResourceTests {
 
     @Test
     @Transactional
-    public void list_all_project_default_layers_for_unexisting_project() throws Exception {
+    public void listAllProjectDefaultLayersForUnexistingProject() throws Exception {
         ProjectDefaultLayer projectDefaultLayer = builder.givenAProjectDefaultLayer();
         restProjectDefaultLayerControllerMockMvc.perform(get("/api/project/{id}/defaultlayer.json", 0L))
             .andExpect(status().isNotFound());
@@ -122,7 +122,7 @@ public class ProjectDefaultLayerResourceTests {
 
     @Test
     @Transactional
-    public void add_valid_projectDefaultLayer() throws Exception {
+    public void addValidProjectDefaultLayer() throws Exception {
         ProjectDefaultLayer projectDefaultLayer = builder.givenANotPersistedProjectDefaultLayer();
         restProjectDefaultLayerControllerMockMvc.perform(post(
                 "/api/project/{id}/defaultlayer.json",
@@ -141,7 +141,7 @@ public class ProjectDefaultLayerResourceTests {
 
     @Test
     @Transactional
-    public void add_projectDefaultLayer_refused_if_already_exists() throws Exception {
+    public void addProjectDefaultLayerRefusedIfAlreadyExists() throws Exception {
         ProjectDefaultLayer projectDefaultLayer = builder.givenANotPersistedProjectDefaultLayer();
         builder.persistAndReturn(projectDefaultLayer);
         restProjectDefaultLayerControllerMockMvc.perform(post(
@@ -156,7 +156,7 @@ public class ProjectDefaultLayerResourceTests {
 
     @Test
     @Transactional
-    public void edit_valid_projectDefaultLayer() throws Exception {
+    public void editValidProjectDefaultLayer() throws Exception {
         ProjectDefaultLayer projectDefaultLayer = builder.givenAProjectDefaultLayer();
         restProjectDefaultLayerControllerMockMvc.perform(put(
                 "/api/project/{project}/defaultlayer/{id}.json",
@@ -177,7 +177,7 @@ public class ProjectDefaultLayerResourceTests {
 
     @Test
     @Transactional
-    public void fail_when_editing_projectDefaultLayer_does_not_exists() throws Exception {
+    public void failWhenEditingProjectDefaultLayerDoesNotExists() throws Exception {
         ProjectDefaultLayer projectDefaultLayer = builder.givenAProjectDefaultLayer();
         em.remove(projectDefaultLayer);
         restProjectDefaultLayerControllerMockMvc.perform(put("/api/project/{project}/defaultlayer/{id}.json", 0, 0)
@@ -191,7 +191,7 @@ public class ProjectDefaultLayerResourceTests {
 
     @Test
     @Transactional
-    public void delete_projectDefaultLayer() throws Exception {
+    public void deleteProjectDefaultLayer() throws Exception {
         ProjectDefaultLayer projectDefaultLayer = builder.givenAProjectDefaultLayer();
         restProjectDefaultLayerControllerMockMvc.perform(delete(
                 "/api/project/{project}/defaultlayer/{id}.json",
@@ -210,7 +210,7 @@ public class ProjectDefaultLayerResourceTests {
 
     @Test
     @Transactional
-    public void fail_when_delete_projectDefaultLayer_not_exists() throws Exception {
+    public void failWhenDeleteProjectDefaultLayerNotExists() throws Exception {
         restProjectDefaultLayerControllerMockMvc.perform(delete("/api/project/{project}/defaultlayer/{id}.json", 0, 0)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isNotFound())

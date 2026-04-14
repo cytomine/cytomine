@@ -52,7 +52,7 @@ public class ReviewedAnnotationAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void user_can_review_annotation_if_reviewer() {
+    public void userCanReviewAnnotationIfReviewer() {
         UserAnnotation annotation = builder.givenAUserAnnotation();
         annotation.setImage(this.reviewedAnnotation.getImage());
         annotation.setProject(this.reviewedAnnotation.getProject());
@@ -65,7 +65,7 @@ public class ReviewedAnnotationAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void user_cannot_review_annotation_if_not_reviewer() {
+    public void userCannotReviewAnnotationIfNotReviewer() {
         UserAnnotation annotation = builder.givenAUserAnnotation();
         annotation.setImage(this.reviewedAnnotation.getImage());
         annotation.setProject(this.reviewedAnnotation.getProject());
@@ -79,7 +79,7 @@ public class ReviewedAnnotationAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = CREATOR)
-    public void creator_can_edit_its_annotation() {
+    public void creatorCanEditItsAnnotation() {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         reviewedAnnotation.setImage(this.reviewedAnnotation.getImage());
         reviewedAnnotation.setProject(this.reviewedAnnotation.getProject());
@@ -91,7 +91,7 @@ public class ReviewedAnnotationAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = CREATOR)
-    public void creator_can_delete_its_annotation() {
+    public void creatorCanDeleteItsAnnotation() {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         reviewedAnnotation.setImage(this.reviewedAnnotation.getImage());
         reviewedAnnotation.setProject(this.reviewedAnnotation.getProject());

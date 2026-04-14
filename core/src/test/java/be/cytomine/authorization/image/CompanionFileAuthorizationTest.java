@@ -44,7 +44,7 @@ public class CompanionFileAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list() {
+    public void adminCanList() {
         assertThat(companionFileService.list(companionFile.getImage())).contains(companionFile);
         AbstractImage anotherAbstractImage = builder.givenAnAbstractImage();
         assertThat(companionFileService.list(companionFile.getUploadedFile())).contains(companionFile);
@@ -52,7 +52,7 @@ public class CompanionFileAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_list() {
+    public void userCanList() {
         assertThat(companionFileService.list(companionFile.getImage())).contains(companionFile);
         AbstractImage anotherAbstractImage = builder.givenAnAbstractImage();
         assertThat(companionFileService.list(companionFile.getUploadedFile())).contains(companionFile);
@@ -60,7 +60,7 @@ public class CompanionFileAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
-    public void user_with_no_read_cannot_list() {
+    public void userWithNoReadCannotList() {
         expectForbidden(() -> companionFileService.list(companionFile.getImage()));
         expectForbidden(() -> companionFileService.list(companionFile.getUploadedFile()));
     }

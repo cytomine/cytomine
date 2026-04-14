@@ -74,21 +74,21 @@ public class TagDomainAssociationAuthorizationTest extends CRDAuthorizationTest 
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list() {
+    public void adminCanList() {
         expectOK(() -> tagDomainAssociationService.listAllByDomain(project));
         expectOK(() -> tagDomainAssociationService.listAllByTag(tagDomainAssociationForProject.getTag()));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_list() {
+    public void userCannotList() {
         expectForbidden(() -> tagDomainAssociationService.listAllByTag(tagDomainAssociationForProject.getTag()));
     }
 
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_list_with_filters() {
+    public void userCanListWithFilters() {
         expectOK(() -> tagDomainAssociationService.listAllByDomain(project));
         assertThat(tagDomainAssociationService.list(new ArrayList<>()))
             .contains(
@@ -100,7 +100,7 @@ public class TagDomainAssociationAuthorizationTest extends CRDAuthorizationTest 
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
-    public void user_without_acl_cannot_list_with_filters() {
+    public void userWithoutAclCannotListWithFilters() {
         assertThat(tagDomainAssociationService.list(new ArrayList<>()))
             .doesNotContain(tagDomainAssociationForProject, tagDomainAssociationForAnnotation)
             .contains(tagDomainAssociationForAbstractImage);
@@ -109,28 +109,28 @@ public class TagDomainAssociationAuthorizationTest extends CRDAuthorizationTest 
     // ANNOTATIONS
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_add_in_readonly_mode() {
+    public void userCannotAddInReadonlyMode() {
         project.setMode(EditingMode.READ_ONLY);
         expectForbidden(this::whenIAddDomain);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_add_in_restricted_mode() {
+    public void userCannotAddInRestrictedMode() {
         project.setMode(EditingMode.RESTRICTED);
         expectForbidden(this::whenIAddDomain);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_add_in_restricted_mode_for_annotation() {
+    public void userCannotAddInRestrictedModeForAnnotation() {
         project.setMode(EditingMode.RESTRICTED);
         expectForbidden(this::whenIAddDomain);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_canadd_in_restricted_mode_for_annotation_if_owner() {
+    public void userCanaddInRestrictedModeForAnnotationIfOwner() {
         annotationDomain.getProject().setMode(EditingMode.RESTRICTED);
         ((UserAnnotation) annotationDomain).setUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get());
         expectOK(this::whenIAddDomain);
@@ -164,7 +164,7 @@ public class TagDomainAssociationAuthorizationTest extends CRDAuthorizationTest 
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_add_for_image() {
+    public void userCanAddForImage() {
         ImageInstance imageInstance = builder.givenAnImageInstance(project);
         expectOK(() -> tagDomainAssociationService.add(builder.givenANotPersistedTagAssociation(
             builder.givenATag(),
@@ -174,7 +174,7 @@ public class TagDomainAssociationAuthorizationTest extends CRDAuthorizationTest 
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_add_in_restricted_mode_for_image() {
+    public void userCannotAddInRestrictedModeForImage() {
         ImageInstance imageInstance = builder.givenAnImageInstance(project);
         imageInstance.getProject().setMode(EditingMode.RESTRICTED);
         expectForbidden(() -> tagDomainAssociationService.add(builder.givenANotPersistedTagAssociation(
@@ -185,7 +185,7 @@ public class TagDomainAssociationAuthorizationTest extends CRDAuthorizationTest 
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_add_in_restricted_mode_for_image_if_owner() {
+    public void userCanAddInRestrictedModeForImageIfOwner() {
         ImageInstance imageInstance = builder.givenAnImageInstance(project);
         imageInstance.getProject().setMode(EditingMode.RESTRICTED);
         imageInstance.setUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get());
@@ -197,7 +197,7 @@ public class TagDomainAssociationAuthorizationTest extends CRDAuthorizationTest 
 
     @Test
     @WithMockUser(username = GUEST)
-    public void guest_cannot_add_for_image() {
+    public void guestCannotAddForImage() {
         expectForbidden(() -> tagDomainAssociationService.add(builder.givenANotPersistedTagAssociation(
             builder.givenATag(),
             builder.givenAnImageInstance()
@@ -206,7 +206,7 @@ public class TagDomainAssociationAuthorizationTest extends CRDAuthorizationTest 
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_delete_for_image() {
+    public void userCanDeleteForImage() {
         ImageInstance imageInstance = builder.givenAnImageInstance(project);
         TagDomainAssociation tagDomainAssociation = builder.givenATagAssociation(
             builder.givenATag(),
@@ -217,7 +217,7 @@ public class TagDomainAssociationAuthorizationTest extends CRDAuthorizationTest 
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_delete_in_restricted_mode_for_image() {
+    public void userCannotDeleteInRestrictedModeForImage() {
         ImageInstance imageInstance = builder.givenAnImageInstance(project);
         imageInstance.getProject().setMode(EditingMode.RESTRICTED);
         expectForbidden(() -> tagDomainAssociationService.delete(
@@ -231,7 +231,7 @@ public class TagDomainAssociationAuthorizationTest extends CRDAuthorizationTest 
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_delete_in_restricted_mode_for_image_if_owner() {
+    public void userCanDeleteInRestrictedModeForImageIfOwner() {
         ImageInstance imageInstance = builder.givenAnImageInstance(project);
         imageInstance.getProject().setMode(EditingMode.RESTRICTED);
         imageInstance.setUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get());
@@ -245,7 +245,7 @@ public class TagDomainAssociationAuthorizationTest extends CRDAuthorizationTest 
 
     @Test
     @WithMockUser(username = GUEST)
-    public void guest_cannot_delete_for_image() {
+    public void guestCannotDeleteForImage() {
         expectForbidden(() -> tagDomainAssociationService.delete(
             builder.givenATagAssociation(
                 builder.givenATag(),
@@ -256,7 +256,7 @@ public class TagDomainAssociationAuthorizationTest extends CRDAuthorizationTest 
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_add_for_project() {
+    public void adminCanAddForProject() {
         expectOK(() -> tagDomainAssociationService.add(builder.givenANotPersistedTagAssociation(
             builder.givenATag(),
             project
@@ -265,7 +265,7 @@ public class TagDomainAssociationAuthorizationTest extends CRDAuthorizationTest 
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_with_read_cannot_add_for_project() {
+    public void userWithReadCannotAddForProject() {
         expectForbidden(() -> tagDomainAssociationService.add(builder.givenANotPersistedTagAssociation(
             builder.givenATag(),
             project
@@ -275,7 +275,7 @@ public class TagDomainAssociationAuthorizationTest extends CRDAuthorizationTest 
 
     @Test
     @WithMockUser(username = USER_ACL_WRITE)
-    public void user_with_write_can_add_for_project() {
+    public void userWithWriteCanAddForProject() {
         expectOK(() -> tagDomainAssociationService.add(builder.givenANotPersistedTagAssociation(
             builder.givenATag(),
             project
@@ -284,7 +284,7 @@ public class TagDomainAssociationAuthorizationTest extends CRDAuthorizationTest 
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_delete_for_project() {
+    public void adminCanDeleteForProject() {
         expectOK(() -> tagDomainAssociationService.delete(
             builder.givenATagAssociation(
                 builder.givenATag(),
@@ -295,7 +295,7 @@ public class TagDomainAssociationAuthorizationTest extends CRDAuthorizationTest 
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_with_read_cannot_delete_for_project() {
+    public void userWithReadCannotDeleteForProject() {
         expectForbidden(() -> tagDomainAssociationService.delete(
             builder.givenATagAssociation(
                 builder.givenATag(),
@@ -306,7 +306,7 @@ public class TagDomainAssociationAuthorizationTest extends CRDAuthorizationTest 
 
     @Test
     @WithMockUser(username = USER_ACL_WRITE)
-    public void user_with_write_can_delete_for_project() {
+    public void userWithWriteCanDeleteForProject() {
         expectOK(() -> tagDomainAssociationService.delete(
             builder.givenATagAssociation(
                 builder.givenATag(),

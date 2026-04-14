@@ -145,7 +145,7 @@ public class ImageInstanceResourceTests {
 
     @Test
     @Transactional
-    public void get_an_image_instance() throws Exception {
+    public void getAnImageInstance() throws Exception {
         ImageInstance image = givenTestImageInstance();
         String serverUrl = applicationProperties.getServerURL();
         restImageInstanceControllerMockMvc.perform(get("/api/imageinstance/{id}.json", image.getId()))
@@ -187,7 +187,7 @@ public class ImageInstanceResourceTests {
     @Test
     @Transactional
     @WithMockUser(username = "get_blind_image_instance")
-    public void get_blind_image_instance() throws Exception {
+    public void getBlindImageInstance() throws Exception {
         ImageInstance image = givenTestImageInstance();
 
         User user = builder.givenAUser("get_blind_image_instance");
@@ -208,7 +208,7 @@ public class ImageInstanceResourceTests {
 
     @Test
     @Transactional
-    public void get_an_image_instance_not_exist() throws Exception {
+    public void getAnImageInstanceNotExist() throws Exception {
         restImageInstanceControllerMockMvc.perform(get("/api/imageinstance/{id}.json", 0))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.errors.message").exists());
@@ -217,7 +217,7 @@ public class ImageInstanceResourceTests {
 
     @Test
     @Transactional
-    public void get_slice_instance_reference() throws Exception {
+    public void getSliceInstanceReference() throws Exception {
         ImageInstance image = givenTestImageInstance();
         restImageInstanceControllerMockMvc.perform(get(
                 "/api/imageinstance/{id}/sliceinstance/reference.json",
@@ -229,7 +229,7 @@ public class ImageInstanceResourceTests {
 
     @Test
     @Transactional
-    public void get_image_instance_bounds() throws Exception {
+    public void getImageInstanceBounds() throws Exception {
         ImageInstance image = givenTestImageInstance();
         image.setReviewStart(new Date(1636702044534L));
         image.setMagnification(123);
@@ -259,7 +259,7 @@ public class ImageInstanceResourceTests {
     @WithMockUser(username = "list_image_instance_by_user")
     @Test
     @Transactional
-    public void list_image_instance_by_user() throws Exception {
+    public void listImageInstanceByUser() throws Exception {
         ImageInstance image = builder.givenAnImageInstance();
         image.getBaseImage().setWidth(500);
         ImageInstance imageFromOtherProjectNotAccessibleForUser = builder.givenAnImageInstance();
@@ -292,7 +292,7 @@ public class ImageInstanceResourceTests {
     @WithMockUser(username = "list_image_instance_light_by_user")
     @Test
     @Transactional
-    public void list_image_instance_light_by_user() throws Exception {
+    public void listImageInstanceLightByUser() throws Exception {
         ImageInstance image = builder.givenAnImageInstance();
         image.getBaseImage().setWidth(500);
         ImageInstance imageFromOtherProjectNotAccessibleForUser = builder.givenAnImageInstance();
@@ -312,7 +312,7 @@ public class ImageInstanceResourceTests {
 
     @Test
     @Transactional
-    public void list_image_instance_by_projects() throws Exception {
+    public void listImageInstanceByProjects() throws Exception {
         Project project1 = builder.givenAProject();
         Project anotherProject = builder.givenAProject();
 
@@ -340,7 +340,7 @@ public class ImageInstanceResourceTests {
 
     @Test
     @Transactional
-    public void list_image_instance_light() throws Exception {
+    public void listImageInstanceLight() throws Exception {
         Project project1 = builder.givenAProject();
         Project anotherProject = builder.givenAProject();
 
@@ -364,7 +364,7 @@ public class ImageInstanceResourceTests {
     @Test
     @Transactional
     @WithMockUser("list_image_instance_by_projects_blind_filenames")
-    public void list_image_instance_by_projects_blind_filenames() throws Exception {
+    public void listImageInstanceByProjectsBlindFilenames() throws Exception {
         User user = builder.givenAUser("list_image_instance_by_projects_blind_filenames");
         ImageInstance image = givenTestImageInstance();
 
@@ -384,7 +384,7 @@ public class ImageInstanceResourceTests {
 
     @Test
     @Transactional
-    public void list_image_instance_by_projects_tree() throws Exception {
+    public void listImageInstanceByProjectsTree() throws Exception {
         Project project1 = builder.givenAProject();
         Project anotherProject = builder.givenAProject();
 
@@ -406,7 +406,7 @@ public class ImageInstanceResourceTests {
 
     @Test
     @Transactional
-    public void list_image_instance_by_project_with_annotation_filter() throws Exception {
+    public void listImageInstanceByProjectWithAnnotationFilter() throws Exception {
         Project project = builder.givenAProject();
         // we add width filter to get only the image set defined in this test
         ImageInstance image1 = builder.givenAnImageInstance(builder.givenAnAbstractImage(), project);
@@ -464,7 +464,7 @@ public class ImageInstanceResourceTests {
 
     @Test
     @Transactional
-    public void list_image_instance_by_project_with_pagination() throws Exception {
+    public void listImageInstanceByProjectWithPagination() throws Exception {
         Project project = builder.givenAProject();
         int width = Math.abs(new Random().nextInt());
         // we add width filter to get only the image set defined in this test
@@ -565,7 +565,7 @@ public class ImageInstanceResourceTests {
 
     @Test
     @Transactional
-    public void get_next_image_instance() throws Exception {
+    public void getNextImageInstance() throws Exception {
         Project project = builder.givenAProject();
         ImageInstance imageInstance1 = builder.givenAnImageInstance(
             builder.givenAnAbstractImage(), project
@@ -585,7 +585,7 @@ public class ImageInstanceResourceTests {
 
     @Test
     @Transactional
-    public void get_previous_image_instance() throws Exception {
+    public void getPreviousImageInstance() throws Exception {
         Project project = builder.givenAProject();
         ImageInstance imageInstance1 = builder.givenAnImageInstance(
             builder.givenAnAbstractImage(), project
@@ -606,7 +606,7 @@ public class ImageInstanceResourceTests {
 
     @Test
     @Transactional
-    public void add_valid_image_instance() throws Exception {
+    public void addValidImageInstance() throws Exception {
         ImageInstance imageInstance = builder.givenANotPersistedImageInstance();
         restImageInstanceControllerMockMvc.perform(post("/api/imageinstance.json")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -623,7 +623,7 @@ public class ImageInstanceResourceTests {
 
     @Test
     @Transactional
-    public void edit_valid_image_instance() throws Exception {
+    public void editValidImageInstance() throws Exception {
         Project project = builder.givenAProject();
         ImageInstance imageInstance = builder.givenAnImageInstance();
         JsonObject jsonObject = imageInstance.toJsonObject();
@@ -647,7 +647,7 @@ public class ImageInstanceResourceTests {
 
     @Test
     @Transactional
-    public void delete_image_instance() throws Exception {
+    public void deleteImageInstance() throws Exception {
         ImageInstance imageInstance = builder.givenAnImageInstance();
         restImageInstanceControllerMockMvc.perform(delete("/api/imageinstance/{id}.json", imageInstance.getId()))
             .andExpect(status().isOk())
@@ -666,7 +666,7 @@ public class ImageInstanceResourceTests {
     @Test
     @Transactional
     @Disabled("Randomly fails")
-    public void get_image_instance_thumb() throws Exception {
+    public void getImageInstanceThumb() throws Exception {
         ImageInstance image = givenTestImageInstance();
         configureFor("localhost", 8888);
 
@@ -696,7 +696,7 @@ public class ImageInstanceResourceTests {
     @Test
     @Transactional
     @Disabled("Randomly fails")
-    public void get_image_instance_thumb_if_image_not_exist() throws Exception {
+    public void getImageInstanceThumbIfImageNotExist() throws Exception {
         restImageInstanceControllerMockMvc.perform(get(
                 "/api/imageinstance/{id}/thumb.png?Authorization=Bearer "
                     + getSignedNotExpiredJwt(), 0
@@ -707,7 +707,7 @@ public class ImageInstanceResourceTests {
 
     @Test
     @Transactional
-    public void get_image_instance_preview() throws Exception {
+    public void getImageInstancePreview() throws Exception {
         ImageInstance image = givenTestImageInstance();
         configureFor("localhost", 8888);
 
@@ -738,7 +738,7 @@ public class ImageInstanceResourceTests {
 
     @Test
     @Transactional
-    public void get_image_instance_associeted_label() throws Exception {
+    public void getImageInstanceAssocietedLabel() throws Exception {
         ImageInstance image = givenTestImageInstance();
         configureFor("localhost", 8888);
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
@@ -759,7 +759,7 @@ public class ImageInstanceResourceTests {
 
     @Test
     @Transactional
-    public void get_image_instance_associeted_label_macro() throws Exception {
+    public void getImageInstanceAssocietedLabelMacro() throws Exception {
         ImageInstance image = givenTestImageInstance();
         configureFor("localhost", 8888);
 
@@ -793,7 +793,7 @@ public class ImageInstanceResourceTests {
     @Disabled("Randomly fail with ProxyExchange, need to find a solution")
     @Test
     @Transactional
-    public void get_image_instance_crop() throws Exception {
+    public void getImageInstanceCrop() throws Exception {
         ImageInstance image = givenTestImageInstance();
 
         configureFor("localhost", 8888);
@@ -830,7 +830,7 @@ public class ImageInstanceResourceTests {
     @Disabled("Randomly fail with ProxyExchange, need to find a solution")
     @Test
     @Transactional
-    public void get_image_instance_window() throws Exception {
+    public void getImageInstanceWindow() throws Exception {
         ImageInstance image = givenTestImageInstance();
 
         configureFor("localhost", 8888);
@@ -866,7 +866,7 @@ public class ImageInstanceResourceTests {
 
     @Test
     @Transactional
-    public void get_image_instance_metadata() throws Exception {
+    public void getImageInstanceMetadata() throws Exception {
         ImageInstance image = givenTestImageInstance();
         configureFor("localhost", 8888);
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
@@ -905,7 +905,7 @@ public class ImageInstanceResourceTests {
 
     @Test
     @Disabled("Randomly fails")
-    public void download_image_instance() throws Exception {
+    public void downloadImageInstance() throws Exception {
         ImageInstance image = givenTestImageInstance();
 
         byte[] mockResponse = UUID.randomUUID().toString().getBytes();
@@ -941,7 +941,7 @@ public class ImageInstanceResourceTests {
     @Test
     @WithMockUser("download_image_instance_cannot_download")
     @Disabled("Randomly fails")
-    public void download_image_instance_cannot_download() throws Exception {
+    public void downloadImageInstanceCannotDownload() throws Exception {
         User user = builder.givenAUser("download_image_instance_cannot_download");
 
         ImageInstance image = givenTestImageInstance();
@@ -1023,7 +1023,7 @@ public class ImageInstanceResourceTests {
 
     @Test
     @Transactional
-    public void histograms_bounds() throws Exception {
+    public void histogramsBounds() throws Exception {
         ImageInstance image = givenTestImageInstance();
 
         configureFor("localhost", 8888);
@@ -1048,7 +1048,7 @@ public class ImageInstanceResourceTests {
 
     @Test
     @Transactional
-    public void channel_histograms() throws Exception {
+    public void channelHistograms() throws Exception {
         ImageInstance image = givenTestImageInstance();
 
 
@@ -1077,7 +1077,7 @@ public class ImageInstanceResourceTests {
 
     @Test
     @Transactional
-    public void channel_histograms_bounds() throws Exception {
+    public void channelHistogramsBounds() throws Exception {
         ImageInstance image = givenTestImageInstance();
 
 

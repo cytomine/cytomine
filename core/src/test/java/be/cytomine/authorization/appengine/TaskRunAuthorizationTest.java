@@ -75,7 +75,7 @@ public class TaskRunAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_add_in_readonly_mode() {
+    public void userCannotAddInReadonlyMode() {
         taskRun.getProject().setMode(EditingMode.READ_ONLY);
         expectForbidden(this::whenIAddDomain);
     }
@@ -86,7 +86,7 @@ public class TaskRunAuthorizationTest extends CRDAuthorizationTest {
     }
 
     @Override
-    public void user_without_permission_get_domain() {
+    public void userWithoutPermissionGetDomain() {
         //TODO: to remove when when_i_get_domain is implemented
     }
 
@@ -96,12 +96,12 @@ public class TaskRunAuthorizationTest extends CRDAuthorizationTest {
     }
 
     @Override
-    public void user_without_permission_delete_domain() {
+    public void userWithoutPermissionDeleteDomain() {
         //TODO: to remove when when_i_delete_domain is implemented
     }
 
     @Override
-    public void guest_delete_domain() {
+    public void guestDeleteDomain() {
         //TODO: to remove when when_i_delete_domain is implemented
     }
 

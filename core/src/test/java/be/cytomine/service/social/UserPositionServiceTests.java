@@ -104,7 +104,7 @@ public class UserPositionServiceTests {
     }
 
     @Test
-    void user_position_create_persistent_and_expired_position() {
+    void userPositionCreatePersistentAndExpiredPosition() {
         PersistentUserPosition persistentUserPosition = givenAPersistentUserPosition(
             new Date(),
             builder.givenSuperAdmin(),
@@ -115,7 +115,7 @@ public class UserPositionServiceTests {
     }
 
     @Test
-    void retrieve_last_position_for_user() {
+    void retrieveLastPositionForUser() {
         User mainUser = builder.givenSuperAdmin();
         User anotherUser = builder.givenAUser();
         SliceInstance sliceInstance = builder.givenASliceInstance();
@@ -144,7 +144,7 @@ public class UserPositionServiceTests {
     }
 
     @Test
-    public void list_users_online_on_image() {
+    public void listUsersOnlineOnImage() {
         User mainUser = builder.givenSuperAdmin();
         User anotherUser = builder.givenAUser();
         SliceInstance sliceInstance = builder.givenASliceInstance();
@@ -168,7 +168,7 @@ public class UserPositionServiceTests {
 
 
     @Test
-    public void list_users_position() {
+    public void listUsersPosition() {
         User mainUser = builder.givenSuperAdmin();
         User anotherUser = builder.givenAUser();
         SliceInstance sliceInstance = builder.givenASliceInstance();
@@ -289,7 +289,7 @@ public class UserPositionServiceTests {
     }
 
     @Test
-    public void summerize_location() {
+    public void summerizeLocation() {
         User mainUser = builder.givenSuperAdmin();
         User anotherUser = builder.givenAUser();
         SliceInstance sliceInstance = builder.givenASliceInstance();
@@ -336,7 +336,7 @@ public class UserPositionServiceTests {
 
 
     @Test
-    public void summerize_after_than() {
+    public void summerizeAfterThan() {
         User mainUser = builder.givenSuperAdmin();
         User anotherUser = builder.givenAUser();
         SliceInstance sliceInstance = builder.givenASliceInstance();
@@ -397,7 +397,7 @@ public class UserPositionServiceTests {
     }
 
     @Test
-    public void list_followers() {
+    public void listFollowers() {
         WebSocketSession session = mock(WebSocketSession.class);
         when(session.getId()).thenReturn("1234");
 
@@ -422,7 +422,7 @@ public class UserPositionServiceTests {
     }
 
     @Test
-    public void list_distinct_followers() {
+    public void listDistinctFollowers() {
         WebSocketSession session = mock(WebSocketSession.class);
         when(session.getId()).thenReturn("1234");
 
@@ -448,7 +448,7 @@ public class UserPositionServiceTests {
     }
 
     @Test
-    public void list_followers_for_not_followed_user() {
+    public void listFollowersForNotFollowedUser() {
         User user = builder.givenAUser();
         ImageInstance imageInstance = builder.givenAnImageInstance();
         List<String> users = userPositionService.listFollowers(user.getId(), imageInstance.getId());
@@ -456,7 +456,7 @@ public class UserPositionServiceTests {
     }
 
     @Test
-    public void adding_users_as_followers() {
+    public void addingUsersAsFollowers() {
         User broadcaster = builder.givenAUser();
         User follower = builder.givenAUser();
         ImageInstance imageInstance = builder.givenAnImageInstance();
@@ -468,7 +468,7 @@ public class UserPositionServiceTests {
     }
 
     @Test
-    public void updating_users_followers() {
+    public void updatingUsersFollowers() {
         User broadcaster = builder.givenAUser();
         User follower = builder.givenAUser();
         ImageInstance imageInstance = builder.givenAnImageInstance();
@@ -482,7 +482,7 @@ public class UserPositionServiceTests {
     }
 
     @Test
-    public void remove_users_followers_that_did_not_fetch_position() {
+    public void removeUsersFollowersThatDidNotFetchPosition() {
         User broadcaster = builder.givenAUser();
         User follower = builder.givenAUser();
         ImageInstance imageInstance = builder.givenAnImageInstance();

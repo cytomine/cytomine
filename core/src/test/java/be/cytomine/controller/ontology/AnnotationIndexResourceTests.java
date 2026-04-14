@@ -113,7 +113,7 @@ public class AnnotationIndexResourceTests {
     }
 
     @Test
-    public void list_user_annotation_property_show() throws Exception {
+    public void listUserAnnotationPropertyShow() throws Exception {
         List<AnnotationIndex> all = annotationIndexRepository.findAll();
         List<AnnotationIndexLightDTO> slices = annotationIndexRepository.findAllBySlice(slice);
         List<AnnotationIndexLightDTO> slicesLight = annotationIndexRepository.findAllLightBySliceInstance(

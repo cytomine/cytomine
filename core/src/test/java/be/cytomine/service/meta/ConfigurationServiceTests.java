@@ -69,24 +69,24 @@ public class ConfigurationServiceTests {
     SecurityACLService securityACLService;
 
     @Test
-    void list_all_configuration_with_success() {
+    void listAllConfigurationWithSuccess() {
         Configuration configuration = builder.givenAConfiguration("xxx");
         assertThat(configuration).isIn(configurationService.list());
     }
 
     @Test
-    void find_configuration_with_success() {
+    void findConfigurationWithSuccess() {
         Configuration configuration = builder.givenAConfiguration("xxx");
         assertThat(configurationService.findByKey("xxx")).contains(configuration);
     }
 
     @Test
-    void find_unexisting_configuration_return_empty() {
+    void findUnexistingConfigurationReturnEmpty() {
         assertThat(configurationService.findByKey("empty")).isEmpty();
     }
 
     @Test
-    void add_valid_configuration_with_success() {
+    void addValidConfigurationWithSuccess() {
         Configuration configuration = builder.givenANotPersistedConfiguration("xxx");
 
         CommandResponse commandResponse = configurationService.add(configuration.toJsonObject());
@@ -96,7 +96,7 @@ public class ConfigurationServiceTests {
     }
 
     @Test
-    void add_configuration_with_already_existing_key() {
+    void addConfigurationWithAlreadyExistingKey() {
         Configuration configuration = builder.givenAConfiguration("xxx");
 
         Assertions.assertThrows(
@@ -107,7 +107,7 @@ public class ConfigurationServiceTests {
     }
 
     @Test
-    void edit_valid_configuration_with_success() {
+    void editValidConfigurationWithSuccess() {
         Configuration configuration = builder.givenAConfiguration("xxx");
 
         CommandResponse commandResponse = configurationService.update(
@@ -124,7 +124,7 @@ public class ConfigurationServiceTests {
 
 
     @Test
-    void delete_configuration_with_success() {
+    void deleteConfigurationWithSuccess() {
         Configuration configuration = builder.givenAConfiguration("xxx");
 
         CommandResponse commandResponse = configurationService.delete(configuration, null, null, true);

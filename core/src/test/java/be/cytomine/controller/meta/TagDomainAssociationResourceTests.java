@@ -72,14 +72,14 @@ public class TagDomainAssociationResourceTests {
 
     @Test
     @Transactional
-    public void get_an_tag_domain_association_does_not_exists() throws Exception {
+    public void getAnTagDomainAssociationDoesNotExists() throws Exception {
         restTagDomainAssociationControllerMockMvc.perform(get("/api/tag_domain_association/{id}.json", 0L))
             .andExpect(status().isNotFound());
     }
 
     @Test
     @Transactional
-    public void list_all_tag_domain_association() throws Exception {
+    public void listAllTagDomainAssociation() throws Exception {
         TagDomainAssociation tagDomainAssociation = builder.givenATagAssociation(
             builder.givenATag(),
             builder.givenAProject()
@@ -95,7 +95,7 @@ public class TagDomainAssociationResourceTests {
 
     @Test
     @Transactional
-    public void list_all_tag_domain_association_with_filters() throws Exception {
+    public void listAllTagDomainAssociationWithFilters() throws Exception {
         TagDomainAssociation tagDomainAssociation = builder.givenATagAssociation(
             builder.givenATag(),
             builder.givenAProject()
@@ -137,7 +137,7 @@ public class TagDomainAssociationResourceTests {
 
     @Test
     @Transactional
-    public void list_all_tag_domain_association_with_filters_pagination() throws Exception {
+    public void listAllTagDomainAssociationWithFiltersPagination() throws Exception {
         Tag tag = builder.givenATag();
 
         TagDomainAssociation t1 = builder.givenATagAssociation(tag, builder.givenAProject());
@@ -189,7 +189,7 @@ public class TagDomainAssociationResourceTests {
 
     @Test
     @Transactional
-    public void list_tag_domain_associations_by_domain() throws Exception {
+    public void listTagDomainAssociationsByDomain() throws Exception {
         TagDomainAssociation tagDomainAssociation = builder.givenATagAssociation(
             builder.givenATag(),
             builder.givenAProject()
@@ -206,7 +206,7 @@ public class TagDomainAssociationResourceTests {
 
     @Test
     @Transactional
-    public void list_tag_domain_associations_by_domain_does_not_exists() throws Exception {
+    public void listTagDomainAssociationsByDomainDoesNotExists() throws Exception {
         TagDomainAssociation tagDomainAssociation = builder.givenATagAssociation(
             builder.givenATag(),
             builder.givenAProject()
@@ -222,7 +222,7 @@ public class TagDomainAssociationResourceTests {
 
     @Test
     @Transactional
-    public void add_valid_association() throws Exception {
+    public void addValidAssociation() throws Exception {
         TagDomainAssociation tagDomainAssociation = builder.givenANotPersistedTagAssociation(
             builder.givenATag(),
             builder.givenAProject()
@@ -246,7 +246,7 @@ public class TagDomainAssociationResourceTests {
 
     @Test
     @Transactional
-    public void add_valid_property_other_path() throws Exception {
+    public void addValidPropertyOtherPath() throws Exception {
         TagDomainAssociation tagDomainAssociation = builder.givenANotPersistedTagAssociation(
             builder.givenATag(),
             builder.givenAProject()
@@ -265,7 +265,7 @@ public class TagDomainAssociationResourceTests {
 
     @Test
     @Transactional
-    public void delete_tag_domain_association() throws Exception {
+    public void deleteTagDomainAssociation() throws Exception {
         Project project = builder.givenAProject();
         TagDomainAssociation tagDomainAssociation = builder.givenATagAssociation(builder.givenATag(), project);
         restTagDomainAssociationControllerMockMvc.perform(delete(

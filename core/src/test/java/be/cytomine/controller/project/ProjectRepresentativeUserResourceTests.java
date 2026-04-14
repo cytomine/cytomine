@@ -54,7 +54,7 @@ public class ProjectRepresentativeUserResourceTests {
 
     @Test
     @Transactional
-    public void list_all_project_representative_users() throws Exception {
+    public void listAllProjectRepresentativeUsers() throws Exception {
         ProjectRepresentativeUser projectRepresentativeUser = builder.givenAProjectRepresentativeUser();
         restProjectRepresentativeUserControllerMockMvc.perform(get(
                 "/api/project/{id}/representative.json",
@@ -67,7 +67,7 @@ public class ProjectRepresentativeUserResourceTests {
 
     @Test
     @Transactional
-    public void list_all_project_representative_users_for_unexisting_project() throws Exception {
+    public void listAllProjectRepresentativeUsersForUnexistingProject() throws Exception {
         restProjectRepresentativeUserControllerMockMvc.perform(get("/api/project/{id}/representative.json", 0L))
             .andExpect(status().isNotFound());
     }
@@ -114,7 +114,7 @@ public class ProjectRepresentativeUserResourceTests {
 
     @Test
     @Transactional
-    public void add_valid_projectRepresentativeUser() throws Exception {
+    public void addValidProjectRepresentativeUser() throws Exception {
         ProjectRepresentativeUser
             projectRepresentativeUser
             = builder.givenANotPersistedProjectRepresentativeUser();
@@ -135,7 +135,7 @@ public class ProjectRepresentativeUserResourceTests {
 
     @Test
     @Transactional
-    public void add_projectRepresentativeUser_refused_if_already_exists() throws Exception {
+    public void addProjectRepresentativeUserRefusedIfAlreadyExists() throws Exception {
         ProjectRepresentativeUser
             projectRepresentativeUser
             = builder.givenANotPersistedProjectRepresentativeUser();
@@ -152,7 +152,7 @@ public class ProjectRepresentativeUserResourceTests {
 
     @Test
     @Transactional
-    public void delete_projectRepresentativeUser() throws Exception {
+    public void deleteProjectRepresentativeUser() throws Exception {
         ProjectRepresentativeUser projectRepresentativeUser = builder.givenAProjectRepresentativeUser();
         ProjectRepresentativeUser projectRepresentativeUser2 = builder.givenAProjectRepresentativeUser(
             projectRepresentativeUser.getProject(), projectRepresentativeUser.getUser()
@@ -173,7 +173,7 @@ public class ProjectRepresentativeUserResourceTests {
 
     @Test
     @Transactional
-    public void delete_projectRepresentativeUser_with_user_parameter() throws Exception {
+    public void deleteProjectRepresentativeUserWithUserParameter() throws Exception {
         ProjectRepresentativeUser projectRepresentativeUser = builder.givenAProjectRepresentativeUser();
         ProjectRepresentativeUser projectRepresentativeUser2 = builder.givenAProjectRepresentativeUser(
             projectRepresentativeUser.getProject(), builder.givenAUser()
@@ -195,7 +195,7 @@ public class ProjectRepresentativeUserResourceTests {
 
     @Test
     @Transactional
-    public void fail_when_delete_projectRepresentativeUser_not_exists() throws Exception {
+    public void failWhenDeleteProjectRepresentativeUserNotExists() throws Exception {
         restProjectRepresentativeUserControllerMockMvc.perform(delete(
                 "/api/project/{project}/representative/{id}.json",
                 0,
@@ -208,7 +208,7 @@ public class ProjectRepresentativeUserResourceTests {
 
     @Test
     @Transactional
-    public void fail_when_delete_projectRepresentativeUser_project_not_exists() throws Exception {
+    public void failWhenDeleteProjectRepresentativeUserProjectNotExists() throws Exception {
         restProjectRepresentativeUserControllerMockMvc.perform(delete("/api/project/{project}/representative.json", 0)
                 .param("user", builder.givenSuperAdmin().getId().toString())
                 .contentType(MediaType.APPLICATION_JSON))
@@ -218,7 +218,7 @@ public class ProjectRepresentativeUserResourceTests {
 
     @Test
     @Transactional
-    public void fail_when_delete_projectRepresentativeUser_user_not_exists() throws Exception {
+    public void failWhenDeleteProjectRepresentativeUserUserNotExists() throws Exception {
         restProjectRepresentativeUserControllerMockMvc.perform(delete(
                 "/api/project/{project}/representative.json",
                 builder.givenAProject().getId()

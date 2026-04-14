@@ -72,42 +72,42 @@ public class StorageServiceTests {
     SecurityACLService securityACLService;
 
     @Test
-    void list_all_storage_with_success() {
+    void listAllStorageWithSuccess() {
         Storage storage = builder.givenAStorage();
         assertThat(storage).isIn(storageService.list());
     }
 
     @Test
-    void list_user_storage_with_success() {
+    void listUserStorageWithSuccess() {
         Storage storage = builder.givenAStorage();
         assertThat(storage).isIn(storageService.list(builder.givenSuperAdmin(), null));
     }
 
     @Test
-    void get_storage_with_success() {
+    void getStorageWithSuccess() {
         Storage storage = builder.givenAStorage();
         assertThat(storage).isEqualTo(storageService.get(storage.getId()));
     }
 
     @Test
-    void get_unexisting_storage_return_null() {
+    void getUnexistingStorageReturnNull() {
         assertThat(storageService.get(0L)).isNull();
     }
 
     @Test
-    void find_storage_with_success() {
+    void findStorageWithSuccess() {
         Storage storage = builder.givenAStorage();
         assertThat(storageService.find(storage.getId()).isPresent());
         assertThat(storage).isEqualTo(storageService.find(storage.getId()).get());
     }
 
     @Test
-    void find_unexisting_storage_return_empty() {
+    void findUnexistingStorageReturnEmpty() {
         assertThat(storageService.find(0L)).isEmpty();
     }
 
     @Test
-    void add_valid_storage_with_success() {
+    void addValidStorageWithSuccess() {
         Storage storage = builder.givenANotPersistedStorage();
         CommandResponse commandResponse = storageService.add(storage.toJsonObject());
 
@@ -119,7 +119,7 @@ public class StorageServiceTests {
     }
 
     @Test
-    void add_storage_with_null_name_fail() {
+    void addStorageWithNullNameFail() {
         Storage storage = builder.givenANotPersistedStorage();
         storage.setName("");
         Assertions.assertThrows(
@@ -130,7 +130,7 @@ public class StorageServiceTests {
     }
 
     @Test
-    void add_valid_storage_grant_permission_on_creator() {
+    void addValidStorageGrantPermissionOnCreator() {
         Storage storage = builder.givenANotPersistedStorage();
         CommandResponse commandResponse = storageService.add(storage.toJsonObject());
         Storage createdStorage = storageService.find(commandResponse.getObject().getId()).get();
@@ -141,7 +141,7 @@ public class StorageServiceTests {
 
 
     @Test
-    void edit_valid_storage_with_success() {
+    void editValidStorageWithSuccess() {
         Storage storage = builder.givenAStorage();
 
         CommandResponse commandResponse = storageService.update(
@@ -157,7 +157,7 @@ public class StorageServiceTests {
     }
 
     @Test
-    void delete_storage_with_success() {
+    void deleteStorageWithSuccess() {
         Storage storage = builder.givenAStorage();
 
         CommandResponse commandResponse = storageService.delete(storage, null, null, true);

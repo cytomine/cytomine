@@ -162,7 +162,7 @@ public class UploadedFileResourceTests {
 
     @Test
     @Transactional
-    public void list_uploaded() throws Exception {
+    public void listUploaded() throws Exception {
         UploadedFile uploadedFile = builder.givenAUploadedFile();
 
         restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile.json"))
@@ -172,7 +172,7 @@ public class UploadedFileResourceTests {
 
     @Test
     @Transactional
-    public void list_uploaded_hirerachical_tree() throws Exception {
+    public void listUploadedHirerachicalTree() throws Exception {
         UploadedFile uploadedFile = builder.givenAUploadedFile();
 
         restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile.json").param(
@@ -184,7 +184,7 @@ public class UploadedFileResourceTests {
 
     @Test
     @Transactional
-    public void list_uploaded_with_search() throws Exception {
+    public void listUploadedWithSearch() throws Exception {
         UploadedFile uploadedFile = builder.givenAUploadedFile();
         uploadedFile.setOriginalFilename("abracadabra");
 
@@ -204,7 +204,7 @@ public class UploadedFileResourceTests {
 
     @Test
     @Transactional
-    public void list_uploaded_file_with_pagination() throws Exception {
+    public void listUploadedFileWithPagination() throws Exception {
 
         UploadedFile image1 = builder.givenAUploadedFile();
         UploadedFile image2 = builder.givenAUploadedFile();
@@ -302,7 +302,7 @@ public class UploadedFileResourceTests {
 
     @Test
     @Transactional
-    void sort_uploaded_file() throws Exception {
+    void sortUploadedFile() throws Exception {
         UploadedFile uploadedFile = builder.givenAUploadedFile();
         uploadedFile.setSize(1L);
         UploadedFile uploadedFileChild1 = builder.givenAUploadedFile();
@@ -447,7 +447,7 @@ public class UploadedFileResourceTests {
 
     @Test
     @Transactional
-    public void get_an_uploaded_file() throws Exception {
+    public void getAnUploadedFile() throws Exception {
         UploadedFile image = builder.givenAUploadedFile();
 
         restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile/{id}.json", image.getId()))
@@ -468,7 +468,7 @@ public class UploadedFileResourceTests {
 
     @Test
     @Transactional
-    public void get_an_uploaded_file_not_exist() throws Exception {
+    public void getAnUploadedFileNotExist() throws Exception {
         restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile/{id}.json", 0))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.errors.message").exists());
@@ -476,7 +476,7 @@ public class UploadedFileResourceTests {
 
     @Test
     @Transactional
-    public void add_valid_uploaded_file() throws Exception {
+    public void addValidUploadedFile() throws Exception {
         UploadedFile uploadedFile = builder.givenANotPersistedUploadedFile();
         restUploadedFileControllerMockMvc.perform(post("/api/uploadedfile.json")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -492,7 +492,7 @@ public class UploadedFileResourceTests {
 
     @Test
     @Transactional
-    public void edit_valid_uploaded_file() throws Exception {
+    public void editValidUploadedFile() throws Exception {
         UploadedFile uploadedFile = builder.givenAUploadedFile();
         JsonObject jsonObject = uploadedFile.toJsonObject();
         jsonObject.put("filename", "new");
@@ -512,7 +512,7 @@ public class UploadedFileResourceTests {
 
     @Test
     @Transactional
-    public void delete_uploaded_file() throws Exception {
+    public void deleteUploadedFile() throws Exception {
         UploadedFile uploadedFile = builder.givenAUploadedFile();
         restUploadedFileControllerMockMvc.perform(delete("/api/uploadedfile/{id}.json", uploadedFile.getId()))
             .andExpect(status().isOk())
@@ -527,7 +527,7 @@ public class UploadedFileResourceTests {
 
     @Test
     @Disabled("Randomly fails")
-    public void download_uploaded_file() throws Exception {
+    public void downloadUploadedFile() throws Exception {
         UploadedFile uploadedFile = builder.givenAUploadedFile();
         uploadedFile.setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         uploadedFile.setOriginalFilename("CMU-2.mrxs");

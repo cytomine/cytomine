@@ -77,90 +77,90 @@ public class TermServiceTests {
     EntityManager entityManager;
 
     @Test
-    void list_all_term_with_success() {
+    void listAllTermWithSuccess() {
         Term term = builder.givenATerm();
         assertThat(term).isIn(termService.list());
     }
 
     @Test
-    void get_term_with_success() {
+    void getTermWithSuccess() {
         Term term = builder.givenATerm();
         assertThat(term).isEqualTo(termService.get(term.getId()));
     }
 
     @Test
-    void get_unexisting_term_return_null() {
+    void getUnexistingTermReturnNull() {
         assertThat(termService.get(0L)).isNull();
     }
 
     @Test
-    void find_term_with_success() {
+    void findTermWithSuccess() {
         Term term = builder.givenATerm();
         assertThat(termService.find(term.getId()).isPresent());
         assertThat(term).isEqualTo(termService.find(term.getId()).get());
     }
 
     @Test
-    void find_unexisting_term_return_empty() {
+    void findUnexistingTermReturnEmpty() {
         assertThat(termService.find(0L)).isEmpty();
     }
 
     @Test
-    void list_term_by_ontology_include_term_from_ontology() {
+    void listTermByOntologyIncludeTermFromOntology() {
         Term term = builder.givenATerm();
         assertThat(term).isIn(termService.list(term.getOntology()));
     }
 
     @Test
-    void list_term_by_ontology_do_not_include_term_from_other_ontology() {
+    void listTermByOntologyDoNotIncludeTermFromOtherOntology() {
         Term term = builder.givenATerm();
         Ontology ontology = builder.givenAnOntology();
         assertThat(termService.list(ontology).size()).isEqualTo(0);
     }
 
     @Test
-    void list_term_by_project_include_term_from_project_ontology() {
+    void listTermByProjectIncludeTermFromProjectOntology() {
         Term term = builder.givenATerm();
         Project project = builder.givenAProjectWithOntology(term.getOntology());
         assertThat(term).isIn(termService.list(project));
     }
 
     @Test
-    void list_term_by_project_do_not_include_term_from_other_ontology() {
+    void listTermByProjectDoNotIncludeTermFromOtherOntology() {
         Term term = builder.givenATerm();
         Project project = builder.givenAProjectWithOntology(builder.givenAnOntology());
         assertThat(termService.list(project)).asList().isEmpty();
     }
 
     @Test
-    void list_term_by_project_return_empty_result_if_project_has_no_ontology() {
+    void listTermByProjectReturnEmptyResultIfProjectHasNoOntology() {
         Project project = builder.givenAProjectWithOntology(null);
         assertThat(termService.list(project)).asList().isEmpty();
     }
 
 
     @Test
-    void list_term_ids_by_project_include_term_from_project_ontology() {
+    void listTermIdsByProjectIncludeTermFromProjectOntology() {
         Term term = builder.givenATerm();
         Project project = builder.givenAProjectWithOntology(term.getOntology());
         assertThat(term.getId()).isIn(termService.getAllTermId(project));
     }
 
     @Test
-    void list_term_ids_by_project_do_not_include_term_from_other_ontology() {
+    void listTermIdsByProjectDoNotIncludeTermFromOtherOntology() {
         Term term = builder.givenATerm();
         Project project = builder.givenAProjectWithOntology(builder.givenAnOntology());
         assertThat(termService.getAllTermId(project)).asList().doesNotContain(term.getId());
     }
 
     @Test
-    void list_term_ids_by_project_return_empty_result_if_project_has_no_ontology() {
+    void listTermIdsByProjectReturnEmptyResultIfProjectHasNoOntology() {
         Project project = builder.givenAProjectWithOntology(null);
         assertThat(termService.getAllTermId(project)).asList().isEmpty();
     }
 
     @Test
-    void delete_term_with_success() {
+    void deleteTermWithSuccess() {
         Term term = builder.givenATerm();
 
         CommandResponse commandResponse = termService.delete(term, null, null, true);
@@ -171,7 +171,7 @@ public class TermServiceTests {
     }
 
     @Test
-    void delete_term_with_dependencies_with_success() {
+    void deleteTermWithDependenciesWithSuccess() {
         Term term = builder.givenATerm();
         RelationTerm relationTerm = builder.givenARelationTerm(term, builder.givenATerm(term.getOntology()));
 
@@ -183,7 +183,7 @@ public class TermServiceTests {
     }
 
     @Test
-    void delete_term_with_annotation_term_fails() {
+    void deleteTermWithAnnotationTermFails() {
         Term term = builder.givenATerm();
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm();
         annotationTerm.setTerm(term);
@@ -199,7 +199,7 @@ public class TermServiceTests {
     }
 
     @Test
-    void delete_term_with_reviewed_annotation_term_fails() {
+    void deleteTermWithReviewedAnnotationTermFails() {
         Term term = builder.givenATerm();
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         reviewedAnnotation.getTerms().add(term);
@@ -216,7 +216,7 @@ public class TermServiceTests {
 
 
     @Test
-    void undo_redo_term_deletion_with_success() {
+    void undoRedoTermDeletionWithSuccess() {
         Term term = builder.givenATerm();
 
         termService.delete(term, null, null, true);
@@ -233,7 +233,7 @@ public class TermServiceTests {
     }
 
     @Test
-    void undo_redo_term_deletion_restore_dependencies() {
+    void undoRedoTermDeletionRestoreDependencies() {
         Term term = builder.givenATerm();
         RelationTerm relationTerm = builder.givenARelationTerm(term, builder.givenATerm(term.getOntology()));
         CommandResponse commandResponse = termService.delete(term, transactionService.start(), null, true);

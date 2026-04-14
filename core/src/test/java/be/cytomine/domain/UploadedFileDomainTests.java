@@ -51,7 +51,7 @@ public class UploadedFileDomainTests {
     EntityManager entityManager;
 
     @Test
-    void support_long_array_read() {
+    void supportLongArrayRead() {
         for (UploadedFile uploadedFile : uploadedFileRepository.findAll()) {
             System.out.print(uploadedFile.getId() + " => ");
             if (uploadedFile.getProjects() != null) {
@@ -63,7 +63,7 @@ public class UploadedFileDomainTests {
 
 
     @Test
-    void support_long_array_persistence() {
+    void supportLongArrayPersistence() {
         UploadedFile uploadedFile = builder.givenANotPersistedUploadedFile();
         uploadedFile.setProjects(new Long[]{1L, 2L, 3L});
         uploadedFile = uploadedFileRepository.save(uploadedFile);

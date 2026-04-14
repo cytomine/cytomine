@@ -104,7 +104,7 @@ public class UserAnnotationAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_update_annotation_in_restricted_project() {
+    public void adminCanUpdateAnnotationInRestrictedProject() {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         userAnnotation.setProject(this.userAnnotation.getProject());
         Project project = (Project) userAnnotation.container();
@@ -117,7 +117,7 @@ public class UserAnnotationAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_update_annotation_in_restricted_project() {
+    public void userCannotUpdateAnnotationInRestrictedProject() {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         userAnnotation.setProject(this.userAnnotation.getProject());
         Project project = (Project) userAnnotation.container();
@@ -136,7 +136,7 @@ public class UserAnnotationAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_delete_its_annotation_even_if_other_users_has_set_terms() {
+    public void userCanDeleteItsAnnotationEvenIfOtherUsersHasSetTerms() {
         builder.givenAnAnnotationTerm(userAnnotation);
         userAnnotationService.delete(userAnnotation, null, null, false);
     }

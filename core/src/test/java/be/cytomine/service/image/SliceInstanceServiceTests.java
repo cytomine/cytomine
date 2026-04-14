@@ -76,7 +76,7 @@ public class SliceInstanceServiceTests {
     ImageInstanceService imageInstanceService;
 
     @Test
-    void list_all_slice_by_image_instance() {
+    void listAllSliceByImageInstance() {
         ImageInstance image1 = builder.givenAnImageInstance();
         SliceInstance sliceInstance1 = builder.givenASliceInstance(image1, 10, 100, 1000);
         SliceInstance sliceInstance2 = builder.givenASliceInstance(image1, 1, 200, 500);
@@ -89,7 +89,7 @@ public class SliceInstanceServiceTests {
     }
 
     @Test
-    void find_slice_instance_by_coordinates() {
+    void findSliceInstanceByCoordinates() {
         ImageInstance image1 = builder.givenAnImageInstance();
         SliceInstance sliceInstance1 = builder.givenASliceInstance(image1, 10, 100, 1000);
 
@@ -98,7 +98,7 @@ public class SliceInstanceServiceTests {
 
 
     @Test
-    void find_slice_instance_unexisting_coordinates_return_empty_response() {
+    void findSliceInstanceUnexistingCoordinatesReturnEmptyResponse() {
         ImageInstance image1 = builder.givenAnImageInstance();
         SliceInstance sliceInstance1 = builder.givenASliceInstance(image1, 10, 100, 1000);
 
@@ -106,24 +106,24 @@ public class SliceInstanceServiceTests {
     }
 
     @Test
-    void get_unexisting_slice_instance_return_null() {
+    void getUnexistingSliceInstanceReturnNull() {
         assertThat(sliceInstanceService.get(0L)).isNull();
     }
 
     @Test
-    void find_slice_instance_with_success() {
+    void findSliceInstanceWithSuccess() {
         SliceInstance sliceInstance = builder.givenASliceInstance();
         assertThat(sliceInstanceService.find(sliceInstance.getId()).isPresent());
         assertThat(sliceInstance).isEqualTo(sliceInstanceService.find(sliceInstance.getId()).get());
     }
 
     @Test
-    void find_unexisting_sliceInstance_return_empty() {
+    void findUnexistingSliceInstanceReturnEmpty() {
         assertThat(sliceInstanceService.find(0L)).isEmpty();
     }
 
     @Test
-    void add_valid_slicte_instance_with_success() {
+    void addValidSlicteInstanceWithSuccess() {
         SliceInstance sliceInstance = builder.givenANotPersistedSliceInstance();
 
         CommandResponse commandResponse = sliceInstanceService.add(sliceInstance.toJsonObject());
@@ -136,7 +136,7 @@ public class SliceInstanceServiceTests {
 
 
     @Test
-    void add_already_existing_slice_instance() {
+    void addAlreadyExistingSliceInstance() {
         SliceInstance sliceInstance = builder.givenASliceInstance();
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
@@ -146,7 +146,7 @@ public class SliceInstanceServiceTests {
     }
 
     @Test
-    void add_slice_instance_with_null_image_fails() {
+    void addSliceInstanceWithNullImageFails() {
         SliceInstance sliceInstance = builder.givenANotPersistedSliceInstance();
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
@@ -156,7 +156,7 @@ public class SliceInstanceServiceTests {
     }
 
     @Test
-    void add_slice_instance_with_null_project_fails() {
+    void addSliceInstanceWithNullProjectFails() {
         SliceInstance sliceInstance = builder.givenANotPersistedSliceInstance();
         Assertions.assertThrows(
             ObjectNotFoundException.class, () -> {
@@ -166,7 +166,7 @@ public class SliceInstanceServiceTests {
     }
 
     @Test
-    void edit_slicte_instance_with_success() {
+    void editSlicteInstanceWithSuccess() {
         Project project1 = builder.givenAProject();
         Project project2 = builder.givenAProject();
         SliceInstance sliceInstance = builder.givenANotPersistedSliceInstance();
@@ -186,7 +186,7 @@ public class SliceInstanceServiceTests {
     }
 
     @Test
-    void delete_slicte_instance_with_success() {
+    void deleteSlicteInstanceWithSuccess() {
         SliceInstance sliceInstance = builder.givenASliceInstance();
 
         CommandResponse commandResponse = sliceInstanceService.delete(sliceInstance, null, null, true);
@@ -197,7 +197,7 @@ public class SliceInstanceServiceTests {
     }
 
     @Test
-    void delete_slice_instance_with_dependencies_with_success() {
+    void deleteSliceInstanceWithDependenciesWithSuccess() {
         SliceInstance sliceInstance = builder.givenASliceInstance();
 
         AnnotationTrack annotationTrack = builder.givenAnAnnotationTrack();

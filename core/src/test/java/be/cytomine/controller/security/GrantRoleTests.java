@@ -46,7 +46,7 @@ public class GrantRoleTests {
 
     @Test
     @WithMockUser(username = "admin")
-    public void open_close_admin_session_as_admin() throws Exception {
+    public void openCloseAdminSessionAsAdmin() throws Exception {
         startSession();
 
         restGrandRoleControllerMockMvc.perform(get("/session/admin/info.json")

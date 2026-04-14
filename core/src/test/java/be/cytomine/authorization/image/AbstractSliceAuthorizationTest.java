@@ -45,21 +45,21 @@ public class AbstractSliceAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list_abstract_slices() {
+    public void adminCanListAbstractSlices() {
         assertThat(abstractSliceService.list(abstractSlice.getImage())).contains(abstractSlice);
         assertThat(abstractSliceService.list(abstractSlice.getUploadedFile())).contains(abstractSlice);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_list_all_abstract_slices() {
+    public void userCanListAllAbstractSlices() {
         assertThat(abstractSliceService.list(abstractSlice.getImage())).contains(abstractSlice);
         assertThat(abstractSliceService.list(abstractSlice.getUploadedFile())).contains(abstractSlice);
     }
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
-    public void user_no_acl_cannot_list_all_abstract_slices() {
+    public void userNoAclCannotListAllAbstractSlices() {
         expectForbidden(() -> abstractSliceService.list(abstractSlice.getImage()));
         expectForbidden(() -> abstractSliceService.list(abstractSlice.getUploadedFile()));
     }

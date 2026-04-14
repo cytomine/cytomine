@@ -58,13 +58,13 @@ public class PropertyServiceTests {
     BasicInstanceBuilder builder;
 
     @Test
-    public void list_property() {
+    public void listProperty() {
         Property property = builder.givenAProperty(builder.givenAProject());
         assertThat(propertyService.list()).contains(property);
     }
 
     @Test
-    public void list_property_for_domain() {
+    public void listPropertyForDomain() {
         Project project = builder.givenAProject();
         Property property = builder.givenAProperty(project);
         assertThat(propertyService.list(project)).contains(property);
@@ -72,13 +72,13 @@ public class PropertyServiceTests {
 
 
     @Test
-    public void find_by_id() {
+    public void findById() {
         Property property = builder.givenAProperty(builder.givenAProject());
         assertThat(propertyService.findById(property.getId())).isPresent();
     }
 
     @Test
-    public void find_by_domain_and_key() {
+    public void findByDomainAndKey() {
         Project project = builder.givenAProject();
         Property property = builder.givenAProperty(project);
         assertThat(propertyService.findByDomainAndKey(project, property.getKey())).isPresent();
@@ -86,12 +86,12 @@ public class PropertyServiceTests {
 
 
     @Test
-    public void find_by_id_that_do_not_exists() {
+    public void findByIdThatDoNotExists() {
         assertThat(propertyService.findById(0L)).isEmpty();
     }
 
     @Test
-    public void create_property() {
+    public void createProperty() {
         Project project = builder.givenAProject();
         CommandResponse commandResponse =
             propertyService.addProperty(
@@ -107,7 +107,7 @@ public class PropertyServiceTests {
     }
 
     @Test
-    public void add_property() {
+    public void addProperty() {
         Project project = builder.givenAProject();
 
         CommandResponse commandResponse =
@@ -117,7 +117,7 @@ public class PropertyServiceTests {
     }
 
     @Test
-    void edit_valid_configuration_with_success() {
+    void editValidConfigurationWithSuccess() {
         Project project = builder.givenAProject();
         Property property = builder.givenAProperty(project);
 
@@ -137,14 +137,14 @@ public class PropertyServiceTests {
 
 
     @Test
-    public void delete_property() {
+    public void deleteProperty() {
         Property property = builder.givenAProperty(builder.givenAProject());
         propertyService.delete(property, null, null, false);
         assertThat(propertyService.findById(property.getId())).isEmpty();
     }
 
     @Test
-    public void list_keys_for_annotaion() {
+    public void listKeysForAnnotaion() {
         Project project = builder.givenAProject();
         UserAnnotation
             userAnnotation
@@ -159,7 +159,7 @@ public class PropertyServiceTests {
     }
 
     @Test
-    public void list_keys_for_annotation_by_image_with_user() {
+    public void listKeysForAnnotationByImageWithUser() {
         Project project = builder.givenAProject();
         UserAnnotation
             userAnnotation
@@ -179,7 +179,7 @@ public class PropertyServiceTests {
     }
 
     @Test
-    public void list_keys_for_image_instance() {
+    public void listKeysForImageInstance() {
         Project project = builder.givenAProject();
         ImageInstance imageInstance = builder.givenAnImageInstance(project);
         Property property = builder.givenAProperty(imageInstance);
@@ -191,7 +191,7 @@ public class PropertyServiceTests {
     }
 
     @Test
-    public void select_center_annotation() throws ParseException {
+    public void selectCenterAnnotation() throws ParseException {
         Project project = builder.givenAProject();
         User user = builder.givenSuperAdmin();
         ImageInstance imageInstance = builder.givenAnImageInstance(project);

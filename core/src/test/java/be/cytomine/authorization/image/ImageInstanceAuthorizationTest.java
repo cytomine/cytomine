@@ -49,61 +49,61 @@ public class ImageInstanceAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list_imageInstances() {
+    public void adminCanListImageInstances() {
         assertThat(imageInstanceService.listByProject(imageInstance.getProject())).contains(imageInstance);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_list_imageInstances() {
+    public void userCanListImageInstances() {
         assertThat(imageInstanceService.listByProject(imageInstance.getProject())).contains(imageInstance);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_delete_in_restricted_mode() {
+    public void userCannotDeleteInRestrictedMode() {
         imageInstance.getProject().setMode(EditingMode.RESTRICTED);
         expectForbidden(() -> whenIDeleteDomain());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void user_admin_can_add_in_readonly_mode() {
+    public void userAdminCanAddInReadonlyMode() {
         imageInstance.getProject().setMode(EditingMode.READ_ONLY);
         expectOK(() -> whenIAddDomain());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void user_admin_can_edi_in_readonly_mode() {
+    public void userAdminCanEdiInReadonlyMode() {
         imageInstance.getProject().setMode(EditingMode.READ_ONLY);
         expectOK(() -> whenIEditDomain());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void user_admin_can_delete_in_readonly_mode() {
+    public void userAdminCanDeleteInReadonlyMode() {
         imageInstance.getProject().setMode(EditingMode.READ_ONLY);
         expectOK(() -> whenIDeleteDomain());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_add_in_readonly_mode() {
+    public void userCannotAddInReadonlyMode() {
         imageInstance.getProject().setMode(EditingMode.READ_ONLY);
         expectForbidden(() -> whenIAddDomain());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_edit_in_readonly_mode() {
+    public void userCannotEditInReadonlyMode() {
         imageInstance.getProject().setMode(EditingMode.READ_ONLY);
         expectForbidden(() -> whenIEditDomain());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_delete_in_readonly_mode() {
+    public void userCannotDeleteInReadonlyMode() {
         imageInstance.getProject().setMode(EditingMode.READ_ONLY);
         expectForbidden(() -> whenIDeleteDomain());
     }
@@ -111,7 +111,7 @@ public class ImageInstanceAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void user_cannot_stop_review_started_by_someone_else() {
+    public void userCannotStopReviewStartedBySomeoneElse() {
         ImageInstance imageInstance = builder.givenAnImageInstance();
         imageInstance.setProject(this.imageInstance.getProject());
         imageInstance.setReviewStart(new Date());
@@ -125,7 +125,7 @@ public class ImageInstanceAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void user_can_stop_review_started_by_himself() {
+    public void userCanStopReviewStartedByHimself() {
         ImageInstance imageInstance = builder.givenAnImageInstance();
         imageInstance.setProject(this.imageInstance.getProject());
         imageInstance.setReviewStart(new Date());

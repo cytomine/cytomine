@@ -42,7 +42,7 @@ public class StorageResourceTests {
 
     @Test
     @Transactional
-    public void list_user_storages() throws Exception {
+    public void listUserStorages() throws Exception {
         Storage storage = builder.givenAStorage();
         Storage otherUserStorage = builder.givenAStorage(builder.givenAUser());
         restStorageControllerMockMvc.perform(get("/api/storage.json"))
@@ -54,7 +54,7 @@ public class StorageResourceTests {
 
     @Test
     @Transactional
-    public void list_all_storages() throws Exception {
+    public void listAllStorages() throws Exception {
         Storage storage = builder.givenAStorage();
         Storage otherUserStorage = builder.givenAStorage(builder.givenAUser());
         restStorageControllerMockMvc.perform(get("/api/storage.json").param("all", "true"))
@@ -81,7 +81,7 @@ public class StorageResourceTests {
 
     @Test
     @Transactional
-    public void add_valid_storage() throws Exception {
+    public void addValidStorage() throws Exception {
         Storage storage =
             basicInstanceBuilder.givenANotPersistedStorage(builder.givenSuperAdmin());
         restStorageControllerMockMvc.perform(post("/api/storage.json")
@@ -100,7 +100,7 @@ public class StorageResourceTests {
 
     @Test
     @Transactional
-    public void add_storage_refused_if_name_not_set() throws Exception {
+    public void addStorageRefusedIfNameNotSet() throws Exception {
         Storage storage =
             basicInstanceBuilder.givenANotPersistedStorage(builder.givenSuperAdmin());
         storage.setName(null);
@@ -113,7 +113,7 @@ public class StorageResourceTests {
 
     @Test
     @Transactional
-    public void edit_valid_storage() throws Exception {
+    public void editValidStorage() throws Exception {
         Storage storage = builder.givenAStorage();
         restStorageControllerMockMvc.perform(put("/api/storage/{id}.json", storage.getId())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -131,7 +131,7 @@ public class StorageResourceTests {
 
     @Test
     @Transactional
-    public void delete_storage() throws Exception {
+    public void deleteStorage() throws Exception {
         Storage storage = builder.givenAStorage();
         restStorageControllerMockMvc.perform(delete("/api/storage/{id}.json", storage.getId())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -149,7 +149,7 @@ public class StorageResourceTests {
 
     @Test
     @Transactional
-    public void fail_when_delete_storage_not_exists() throws Exception {
+    public void failWhenDeleteStorageNotExists() throws Exception {
         restStorageControllerMockMvc.perform(delete("/api/storage/{id}.json", 0)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isNotFound())

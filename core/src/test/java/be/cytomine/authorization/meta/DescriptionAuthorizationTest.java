@@ -72,13 +72,13 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list() {
+    public void adminCanList() {
         expectOK(() -> descriptionService.list());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_list() {
+    public void userCannotList() {
         expectForbidden(() -> descriptionService.list());
     }
 
@@ -86,28 +86,28 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
     // ANNOTATIONS
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_add_in_readonly_mode() {
+    public void userCannotAddInReadonlyMode() {
         project.setMode(EditingMode.READ_ONLY);
         expectForbidden(this::whenIAddDomain);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_add_in_restricted_mode() {
+    public void userCannotAddInRestrictedMode() {
         project.setMode(EditingMode.RESTRICTED);
         expectForbidden(this::whenIAddDomain);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_add_in_restricted_mode_for_annotation() {
+    public void userCannotAddInRestrictedModeForAnnotation() {
         project.setMode(EditingMode.RESTRICTED);
         expectForbidden(this::whenIAddDomain);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_canadd_in_restricted_mode_for_annotation_if_owner() {
+    public void userCanaddInRestrictedModeForAnnotationIfOwner() {
         annotationDomain.getProject().setMode(EditingMode.RESTRICTED);
         ((UserAnnotation) annotationDomain).setUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get());
         expectOK(this::whenIAddDomain);
@@ -141,14 +141,14 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_add_for_image() {
+    public void userCanAddForImage() {
         ImageInstance imageInstance = builder.givenAnImageInstance(project);
         expectOK(() -> descriptionService.add(builder.givenANotPersistedDescription(imageInstance).toJsonObject()));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_add_in_restricted_mode_for_image() {
+    public void userCannotAddInRestrictedModeForImage() {
         ImageInstance imageInstance = builder.givenAnImageInstance(project);
         imageInstance.getProject().setMode(EditingMode.RESTRICTED);
         expectForbidden(() -> descriptionService.add(builder.givenANotPersistedDescription(imageInstance)
@@ -157,7 +157,7 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_add_in_restricted_mode_for_image_if_owner() {
+    public void userCanAddInRestrictedModeForImageIfOwner() {
         ImageInstance imageInstance = builder.givenAnImageInstance(project);
         imageInstance.getProject().setMode(EditingMode.RESTRICTED);
         imageInstance.setUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get());
@@ -166,7 +166,7 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = GUEST)
-    public void guest_cannot_add_image() {
+    public void guestCannotAddImage() {
         expectForbidden(() -> descriptionService.add(
             builder.givenANotPersistedDescription(builder.givenAnImageInstance()).toJsonObject())
         );
@@ -174,7 +174,7 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_edit_for_image() {
+    public void userCanEditForImage() {
         expectOK(() -> descriptionService.update(
             descriptionForImageInstance,
             descriptionForImageInstance.toJsonObject(),
@@ -185,7 +185,7 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_edit_in_restricted_mode_for_image() {
+    public void userCannotEditInRestrictedModeForImage() {
         ImageInstance imageInstance = builder.givenAnImageInstance(project);
         imageInstance.getProject().setMode(EditingMode.RESTRICTED);
         expectForbidden(() -> descriptionService.update(
@@ -198,7 +198,7 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_edit_in_restricted_mode_for_image_if_owner() {
+    public void userCanEditInRestrictedModeForImageIfOwner() {
         ImageInstance imageInstance = builder.givenAnImageInstance(project);
         imageInstance.getProject().setMode(EditingMode.RESTRICTED);
         imageInstance.setUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get());
@@ -208,20 +208,20 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = GUEST)
-    public void guest_cannot_edit_image() {
+    public void guestCannotEditImage() {
         Description descriptionForImage = builder.givenADescription(imageInstance);
         expectForbidden(() -> descriptionService.update(descriptionForImage, descriptionForImage.toJsonObject(), null));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_delete_for_image() {
+    public void userCanDeleteForImage() {
         expectOK(() -> descriptionService.delete(descriptionForImageInstance, null, null, true));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_delete_in_restricted_mode_for_image() {
+    public void userCannotDeleteInRestrictedModeForImage() {
         ImageInstance imageInstance = builder.givenAnImageInstance(project);
         imageInstance.getProject().setMode(EditingMode.RESTRICTED);
         expectForbidden(() -> descriptionService.delete(builder.givenADescription(imageInstance), null, null, true));
@@ -229,7 +229,7 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_delete_in_restricted_mode_for_image_if_owner() {
+    public void userCanDeleteInRestrictedModeForImageIfOwner() {
         ImageInstance imageInstance = builder.givenAnImageInstance(project);
         imageInstance.getProject().setMode(EditingMode.RESTRICTED);
         imageInstance.setUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get());
@@ -238,27 +238,27 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = GUEST)
-    public void guest_cannot_delete_for_image() {
+    public void guestCannotDeleteForImage() {
         expectForbidden(() -> descriptionService.delete(descriptionForImageInstance, null, null, true));
     }
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_add_for_project() {
+    public void adminCanAddForProject() {
         expectOK(() -> descriptionService.add(builder.givenANotPersistedDescription(builder.givenAProject())
             .toJsonObject()));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_with_read_cannot_add_for_project() {
+    public void userWithReadCannotAddForProject() {
         expectForbidden(() -> descriptionService.add(builder.givenANotPersistedDescription(builder.givenAProject())
             .toJsonObject()));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_WRITE)
-    public void user_with_write_can_add_for_project() {
+    public void userWithWriteCanAddForProject() {
         Project projectLocal = builder.givenAProject();
         initACL(projectLocal);
         expectOK(() -> descriptionService.add(builder.givenANotPersistedDescription(projectLocal).toJsonObject()));
@@ -266,7 +266,7 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_edit_for_project() {
+    public void adminCanEditForProject() {
         expectOK(() -> descriptionService.update(
             descriptionForProject,
             descriptionForProject.toJsonObject(),
@@ -277,7 +277,7 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_with_read_cannot_edit_for_project() {
+    public void userWithReadCannotEditForProject() {
         expectForbidden(() -> descriptionService.update(
             descriptionForProject,
             descriptionForProject.toJsonObject(),
@@ -288,7 +288,7 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_WRITE)
-    public void user_with_write_can_edit_for_project() {
+    public void userWithWriteCanEditForProject() {
         Project projectLocal = builder.givenAProject();
         initACL(projectLocal);
         Description description = builder.givenADescription(projectLocal);
@@ -297,7 +297,7 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_delete_for_project() {
+    public void adminCanDeleteForProject() {
         expectOK(() -> descriptionService.delete(
             builder.givenADescription(builder.givenAProject()),
             null,
@@ -308,7 +308,7 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_with_read_cannot_delete_for_project() {
+    public void userWithReadCannotDeleteForProject() {
         expectForbidden(() -> descriptionService.delete(
             builder.givenADescription(builder.givenAProject()),
             null,
@@ -319,7 +319,7 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_WRITE)
-    public void user_with_write_can_delete_for_project() {
+    public void userWithWriteCanDeleteForProject() {
         Project projectLocal = builder.givenAProject();
         initACL(projectLocal);
         expectOK(() -> descriptionService.delete(builder.givenADescription(projectLocal), null, null, true));

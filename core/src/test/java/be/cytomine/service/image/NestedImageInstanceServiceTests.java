@@ -74,7 +74,7 @@ public class NestedImageInstanceServiceTests {
 
 
     @Test
-    void list_all_nested_image_image_by_image_instance() {
+    void listAllNestedImageImageByImageInstance() {
         NestedImageInstance nestedImageInstance1 = builder.givenANestedImageInstance();
         NestedImageInstance nestedImageInstance2 = builder.givenANestedImageInstance();
 
@@ -85,30 +85,30 @@ public class NestedImageInstanceServiceTests {
     }
 
     @Test
-    void get_nested_image_intance_with_success() {
+    void getNestedImageIntanceWithSuccess() {
         NestedImageInstance nestedImageInstance = builder.givenANestedImageInstance();
         assertThat(nestedImageInstance).isEqualTo(nestedImageInstanceService.get(nestedImageInstance.getId()));
     }
 
     @Test
-    void get_unexisting_nestedImageInstance_return_null() {
+    void getUnexistingNestedImageInstanceReturnNull() {
         AssertionsForClassTypes.assertThat(nestedImageInstanceService.get(0L)).isNull();
     }
 
     @Test
-    void find_nested_image_instance_with_success() {
+    void findNestedImageInstanceWithSuccess() {
         NestedImageInstance nestedImageInstance = builder.givenANestedImageInstance();
         AssertionsForClassTypes.assertThat(nestedImageInstanceService.find(nestedImageInstance.getId()).isPresent());
         assertThat(nestedImageInstance).isEqualTo(nestedImageInstanceService.find(nestedImageInstance.getId()).get());
     }
 
     @Test
-    void find_unexisting_nested_image_instance_return_empty() {
+    void findUnexistingNestedImageInstanceReturnEmpty() {
         AssertionsForClassTypes.assertThat(nestedImageInstanceService.find(0L)).isEmpty();
     }
 
     @Test
-    void add_valid_nested_image_instance_with_success() {
+    void addValidNestedImageInstanceWithSuccess() {
         NestedImageInstance nestedImageInstance = builder.givenANotPersistedNestedImageInstance();
 
         CommandResponse commandResponse = nestedImageInstanceService.add(nestedImageInstance.toJsonObject());
@@ -122,7 +122,7 @@ public class NestedImageInstanceServiceTests {
 
 
     @Test
-    void add_already_existing_nested_image_instance_fails() {
+    void addAlreadyExistingNestedImageInstanceFails() {
         NestedImageInstance nestedImageInstance = builder.givenANestedImageInstance();
         Assertions.assertThrows(
             AlreadyExistException.class, () -> {
@@ -132,7 +132,7 @@ public class NestedImageInstanceServiceTests {
     }
 
     @Test
-    void add_valid_nested_image_instance_with_unexsting_abstract_image_fails() {
+    void addValidNestedImageInstanceWithUnexstingAbstractImageFails() {
         NestedImageInstance nestedImageInstance = builder.givenANotPersistedNestedImageInstance();
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
@@ -142,7 +142,7 @@ public class NestedImageInstanceServiceTests {
     }
 
     @Test
-    void add_valid_nested_image_instance_with_unexsting_parent_fails() {
+    void addValidNestedImageInstanceWithUnexstingParentFails() {
         NestedImageInstance nestedImageInstance = builder.givenANotPersistedNestedImageInstance();
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
@@ -152,7 +152,7 @@ public class NestedImageInstanceServiceTests {
     }
 
     @Test
-    void add_valid_nested_image_instance_with_unexsting_project_fails() {
+    void addValidNestedImageInstanceWithUnexstingProjectFails() {
         NestedImageInstance nestedImageInstance = builder.givenANotPersistedNestedImageInstance();
         Assertions.assertThrows(
             ObjectNotFoundException.class, () -> {
@@ -162,7 +162,7 @@ public class NestedImageInstanceServiceTests {
     }
 
     @Test
-    void edit_nested_image_instance_with_success() {
+    void editNestedImageInstanceWithSuccess() {
         Project project1 = builder.givenAProject();
         Project project2 = builder.givenAProject();
 
@@ -184,7 +184,7 @@ public class NestedImageInstanceServiceTests {
     }
 
     @Test
-    void delete_nested_image_instance_with_success() {
+    void deleteNestedImageInstanceWithSuccess() {
         NestedImageInstance nestedImageInstance = builder.givenANestedImageInstance();
 
         CommandResponse commandResponse = nestedImageInstanceService.delete(nestedImageInstance, null, null, true);

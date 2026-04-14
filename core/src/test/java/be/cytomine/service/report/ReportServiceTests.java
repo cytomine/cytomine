@@ -79,7 +79,7 @@ public class ReportServiceTests {
     byte[] returnedReport = {1};
 
     @Test
-    public void generate_csv_report_with_connection_history() throws ServerException {
+    public void generateCsvReportWithConnectionHistory() throws ServerException {
         when(mockSpreadsheetWriterService.writeSpreadsheet(any())).thenReturn(returnedReport);
         byte[] generatedReport = reportService.generateConnectionHistoryReport(
             "projectName",
@@ -93,7 +93,7 @@ public class ReportServiceTests {
     }
 
     @Test
-    public void generate_csv_report_with_image_consultation() throws ServerException {
+    public void generateCsvReportWithImageConsultation() throws ServerException {
         when(mockSpreadsheetWriterService.writeSpreadsheet(any())).thenReturn(returnedReport);
         byte[] generatedReport = reportService.generateImageConsultationReport(
             "projectName",
@@ -107,7 +107,7 @@ public class ReportServiceTests {
     }
 
     @Test
-    public void generate_pdf_report_with_annotations() throws ServerException {
+    public void generatePdfReportWithAnnotations() throws ServerException {
         when(mockPdfWriterService.writePDF(any(), any(), any(), anyBoolean(), anyBoolean()))
             .thenReturn(returnedReport);
         byte[] generatedReport = reportService.generateAnnotationsReport("projectName", terms, users, dataMap, "pdf");
@@ -119,7 +119,7 @@ public class ReportServiceTests {
     }
 
     @Test
-    public void generate_csv_report_with_annotations() throws ServerException {
+    public void generateCsvReportWithAnnotations() throws ServerException {
         when(mockSpreadsheetWriterService.writeSpreadsheet(any()))
             .thenReturn(returnedReport);
         byte[] generatedReport = reportService.generateAnnotationsReport("projectName", terms, users, dataMap, "csv");
@@ -131,7 +131,7 @@ public class ReportServiceTests {
     }
 
     @Test
-    public void generate_xls_report_with_annotations() throws ServerException {
+    public void generateXlsReportWithAnnotations() throws ServerException {
         when(mockSpreadsheetWriterService.writeSpreadsheetXLS(any()))
             .thenReturn(returnedReport);
         byte[] generatedReport = reportService.generateAnnotationsReport("projectName", terms, users, dataMap, "xls");
@@ -143,7 +143,7 @@ public class ReportServiceTests {
     }
 
     @Test
-    public void generate_pdf_report_with_users() throws ServerException {
+    public void generatePdfReportWithUsers() throws ServerException {
         when(mockPdfWriterService.writePDF(any(), any(), any(), anyBoolean(), anyBoolean()))
             .thenReturn(returnedReport);
         byte[] generatedReport = reportService.generateUsersReport("projectName", dataMap, "pdf");
@@ -155,7 +155,7 @@ public class ReportServiceTests {
     }
 
     @Test
-    public void generate_csv_report_with_users() throws ServerException {
+    public void generateCsvReportWithUsers() throws ServerException {
         when(mockSpreadsheetWriterService.writeSpreadsheet(any()))
             .thenReturn(returnedReport);
         byte[] generatedReport = reportService.generateUsersReport("projectName", dataMap, "csv");
@@ -167,7 +167,7 @@ public class ReportServiceTests {
     }
 
     @Test
-    public void generate_xls_report_with_users() throws ServerException {
+    public void generateXlsReportWithUsers() throws ServerException {
         when(mockSpreadsheetWriterService.writeSpreadsheetXLS(any()))
             .thenReturn(returnedReport);
         byte[] generatedReport = reportService.generateUsersReport("projectName", dataMap, "xls");
@@ -179,7 +179,7 @@ public class ReportServiceTests {
     }
 
     @Test
-    public void invalid_report_format_return_server_error() {
+    public void invalidReportFormatReturnServerError() {
         ServerException expectedError = new ServerException(
             "Failed to generate report, invalid format. Format should be one of these types: 'pdf', 'csv' or 'xls'."
         );

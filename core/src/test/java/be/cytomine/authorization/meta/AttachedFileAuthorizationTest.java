@@ -54,7 +54,7 @@ public class AttachedFileAuthorizationTest extends CRDAuthorizationTest {
     @Override
     @Test
     @WithMockUser(username = USER_ACL_CREATE)
-    public void user_with_create_permission_delete_domain() {
+    public void userWithCreatePermissionDeleteDomain() {
         expectOK(this::whenIDeleteDomain);
         project.setMode(EditingMode.RESTRICTED);
         expectForbidden(this::whenIDeleteDomain);
@@ -65,7 +65,7 @@ public class AttachedFileAuthorizationTest extends CRDAuthorizationTest {
     @Override
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_with_read_permission_add_domain() {
+    public void userWithReadPermissionAddDomain() {
         expectOK(this::whenIAddDomain);
         project.setMode(EditingMode.RESTRICTED);
         expectForbidden(this::whenIAddDomain);
@@ -76,7 +76,7 @@ public class AttachedFileAuthorizationTest extends CRDAuthorizationTest {
     @Override
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_with_read_permission_delete_domain() {
+    public void userWithReadPermissionDeleteDomain() {
         expectOK(this::whenIDeleteDomain);
         project.setMode(EditingMode.RESTRICTED);
         expectForbidden(this::whenIDeleteDomain);
@@ -87,7 +87,7 @@ public class AttachedFileAuthorizationTest extends CRDAuthorizationTest {
     @Override
     @Test
     @WithMockUser(username = USER_ACL_WRITE)
-    public void user_with_write_permission_delete_domain() {
+    public void userWithWritePermissionDeleteDomain() {
         expectOK(this::whenIDeleteDomain);
         project.setMode(EditingMode.RESTRICTED);
         expectForbidden(this::whenIDeleteDomain);
@@ -97,7 +97,7 @@ public class AttachedFileAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
-    public void user_without_permission_add_domain() {
+    public void userWithoutPermissionAddDomain() {
         expectForbidden(this::whenIAddDomain);
         project.setMode(EditingMode.RESTRICTED);
         expectForbidden(this::whenIAddDomain);
@@ -107,7 +107,7 @@ public class AttachedFileAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list_by_domain() {
+    public void adminCanListByDomain() {
         expectOK(() -> {
             attachedFileService.findAllByDomain(attachedFile.getDomainClassName(), attachedFile.getDomainIdent());
         });
@@ -115,7 +115,7 @@ public class AttachedFileAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_list_by_domain() {
+    public void userCanListByDomain() {
         expectOK(() -> {
             attachedFileService.findAllByDomain(attachedFile.getDomainClassName(), attachedFile.getDomainIdent());
         });
@@ -123,7 +123,7 @@ public class AttachedFileAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
-    public void user_not_acl_cannot_list_by_domain() {
+    public void userNotAclCannotListByDomain() {
         expectForbidden(() -> {
             attachedFileService.findAllByDomain(attachedFile.getDomainClassName(), attachedFile.getDomainIdent());
         });
@@ -160,7 +160,7 @@ public class AttachedFileAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_add_for_image() {
+    public void userCanAddForImage() {
         ImageInstance attachedFileImage = builder.givenAnImageInstance(project);
         expectOK(() -> attachedFileService.create(
             "test",
@@ -173,7 +173,7 @@ public class AttachedFileAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_add_in_restricted_mode_for_image() {
+    public void userCannotAddInRestrictedModeForImage() {
         ImageInstance attachedFileImage = builder.givenAnImageInstance(project);
         attachedFileImage.getProject().setMode(EditingMode.RESTRICTED);
         expectForbidden(() -> attachedFileService.create(
@@ -187,7 +187,7 @@ public class AttachedFileAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_add_in_restricted_mode_for_image_if_owner() {
+    public void userCanAddInRestrictedModeForImageIfOwner() {
         ImageInstance attachedFileImage = builder.givenAnImageInstance(project);
         attachedFileImage.getProject().setMode(EditingMode.RESTRICTED);
         attachedFileImage.setUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get());
@@ -202,7 +202,7 @@ public class AttachedFileAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = GUEST)
-    public void guest_cannot_add_for_image() {
+    public void guestCannotAddForImage() {
         ImageInstance attachedFileImage = builder.givenAnImageInstance(project);
         expectForbidden(() -> attachedFileService.create(
             "test",
@@ -215,7 +215,7 @@ public class AttachedFileAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_delete_for_image() {
+    public void userCanDeleteForImage() {
         ImageInstance attachedFileImage = builder.givenAnImageInstance(project);
         AttachedFile attachedFile = builder.givenAnAttachedFile(attachedFileImage);
         expectOK(() -> attachedFileService.delete(attachedFile, null, null, true));
@@ -223,7 +223,7 @@ public class AttachedFileAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_delete_in_restricted_mode_for_image() {
+    public void userCannotDeleteInRestrictedModeForImage() {
         ImageInstance attachedFileImage = builder.givenAnImageInstance(project);
         attachedFileImage.getProject().setMode(EditingMode.RESTRICTED);
         AttachedFile attachedFile = builder.givenAnAttachedFile(attachedFileImage);
@@ -232,7 +232,7 @@ public class AttachedFileAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_delete_in_restricted_mode_for_image_if_owner() {
+    public void userCanDeleteInRestrictedModeForImageIfOwner() {
         ImageInstance attachedFileImage = builder.givenAnImageInstance(project);
         attachedFileImage.getProject().setMode(EditingMode.RESTRICTED);
         attachedFileImage.setUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get());
@@ -242,7 +242,7 @@ public class AttachedFileAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = GUEST)
-    public void guest_cannot_delete_for_image() {
+    public void guestCannotDeleteForImage() {
         ImageInstance attachedFileImage = builder.givenAnImageInstance(project);
         AttachedFile attachedFile = builder.givenAnAttachedFile(attachedFileImage);
         expectForbidden(() -> attachedFileService.delete(attachedFile, null, null, true));
@@ -251,7 +251,7 @@ public class AttachedFileAuthorizationTest extends CRDAuthorizationTest {
     //PROJECT
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_add_for_project() {
+    public void adminCanAddForProject() {
         expectOK(() -> attachedFileService.create(
             "test",
             "hello".getBytes(),
@@ -263,7 +263,7 @@ public class AttachedFileAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_with_read_cannot_add_for_project() {
+    public void userWithReadCannotAddForProject() {
         expectForbidden(() -> attachedFileService.create(
             "test",
             "hello".getBytes(),
@@ -275,7 +275,7 @@ public class AttachedFileAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_WRITE)
-    public void user_with_write_can_add_for_project() {
+    public void userWithWriteCanAddForProject() {
         expectOK(() -> attachedFileService.create(
             "test",
             "hello".getBytes(),
@@ -287,14 +287,14 @@ public class AttachedFileAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_delete_for_project() {
+    public void adminCanDeleteForProject() {
         AttachedFile attachedFile = builder.givenAnAttachedFile(project);
         expectOK(() -> attachedFileService.delete(attachedFile, null, null, true));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_with_read_cannot_delete_for_project() {
+    public void userWithReadCannotDeleteForProject() {
 
         AttachedFile attachedFile = builder.givenAnAttachedFile(project);
         expectForbidden(() -> attachedFileService.delete(attachedFile, null, null, true));
@@ -302,7 +302,7 @@ public class AttachedFileAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_WRITE)
-    public void user_with_write_can_delete_for_project() {
+    public void userWithWriteCanDeleteForProject() {
         AttachedFile attachedFile = builder.givenAnAttachedFile(project);
         expectOK(() -> attachedFileService.delete(attachedFile, null, null, true));
     }

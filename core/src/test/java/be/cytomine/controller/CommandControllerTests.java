@@ -60,7 +60,7 @@ public class CommandControllerTests {
     @Test
     @Transactional
     @WithMockUser(username = "superadmin")
-    public void list_delete_command() throws Exception {
+    public void listDeleteCommand() throws Exception {
 
         Long start = System.currentTimeMillis();
 
@@ -116,7 +116,7 @@ public class CommandControllerTests {
     @Test
     @Transactional
     @WithMockUser(username = "superadmin")
-    public void undo_redo() throws Exception {
+    public void undoRedo() throws Exception {
         Ontology ontology = basicInstanceBuilder.givenANotPersistedOntology();
         ontology.setName("undo_redo");
         restCommandControllerMockMvc.perform(
@@ -157,7 +157,7 @@ public class CommandControllerTests {
     @Test
     @Transactional
     @WithMockUser(username = "superadmin")
-    public void undo_redo_with_command_id() throws Exception {
+    public void undoRedoWithCommandId() throws Exception {
         Ontology ontology = basicInstanceBuilder.givenANotPersistedOntology();
         ontology.setName("undo_redo");
         restCommandControllerMockMvc.perform(

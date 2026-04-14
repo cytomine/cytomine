@@ -93,17 +93,17 @@ public class PDFReportServiceTests {
     };
 
     @Test
-    public void generate_pdf_with_valid_data_works() throws IOException {
+    public void generatePdfWithValidDataWorks() throws IOException {
         testData(validData, "title", null, true, true);
     }
 
     @Test
-    public void generate_pdf_with_empty_data_fails() throws IOException {
+    public void generatePdfWithEmptyDataFails() throws IOException {
         testData(emptyData, "title", null, true, true);
     }
 
     @Test
-    public void generate_pdf_with_null_data_fails() {
+    public void generatePdfWithNullDataFails() {
         ServerException expectedError = new ServerException(
             "Cannot generate pdf report with null data, expected type: Object[][]."
         );
@@ -116,7 +116,7 @@ public class PDFReportServiceTests {
     }
 
     @Test
-    public void generate_pdf_with_null_title_fails() {
+    public void generatePdfWithNullTitleFails() {
         ServerException expectedError = new ServerException(
             "Cannot generate pdf report with null title, expected type: String."
         );
@@ -129,12 +129,12 @@ public class PDFReportServiceTests {
     }
 
     @Test
-    public void generate_pdf_without_pagination_works() throws IOException {
+    public void generatePdfWithoutPaginationWorks() throws IOException {
         testData(validData, "title", null, false, true);
     }
 
     @Test
-    public void generate_pdf_with_custom_column_width_works() throws IOException {
+    public void generatePdfWithCustomColumnWidthWorks() throws IOException {
         testData(validData, "title", customColumnWidth, false, true);
     }
 
@@ -151,7 +151,7 @@ public class PDFReportServiceTests {
     }
 
     @Test
-    public void custom_column_width_with_different_size_than_data_fails() {
+    public void customColumnWidthWithDifferentSizeThanDataFails() {
         ServerException expectedError = new ServerException(
             "Column width length should be the same than your data rows length");
         ServerException error = assertThrows(
@@ -162,7 +162,7 @@ public class PDFReportServiceTests {
     }
 
     @Test
-    public void generate_pdf_with_different_size_of_rows_fails() throws ServerException {
+    public void generatePdfWithDifferentSizeOfRowsFails() throws ServerException {
         ServerException expectedError = new ServerException("All data rows should have the same number of cells");
         ServerException error = assertThrows(
             ServerException.class,
@@ -172,7 +172,7 @@ public class PDFReportServiceTests {
     }
 
     @Test
-    public void generate_pdf_without_header_works() throws ServerException, IOException {
+    public void generatePdfWithoutHeaderWorks() throws ServerException, IOException {
         testData(validData, "title", null, true, false);
     }
 

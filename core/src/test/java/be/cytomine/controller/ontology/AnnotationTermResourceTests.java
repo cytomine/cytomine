@@ -64,7 +64,7 @@ public class AnnotationTermResourceTests {
 
     @Test
     @Transactional
-    public void list_by_user_annotation() throws Exception {
+    public void listByUserAnnotation() throws Exception {
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm();
         restAnnotationTermControllerMockMvc.perform(get(
                 "/api/annotation/{id}/term.json",
@@ -77,7 +77,7 @@ public class AnnotationTermResourceTests {
 
     @Test
     @Transactional
-    public void list_by_user_annotation_and_user() throws Exception {
+    public void listByUserAnnotationAndUser() throws Exception {
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm();
         restAnnotationTermControllerMockMvc.perform(get(
                 "/api/annotation/{id}/term.json",
@@ -100,7 +100,7 @@ public class AnnotationTermResourceTests {
 
     @Test
     @Transactional
-    public void list_by_reviewed_annotation() throws Exception {
+    public void listByReviewedAnnotation() throws Exception {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         reviewedAnnotation.getTerms().add(builder.givenATerm(reviewedAnnotation.getProject().getOntology()));
         restAnnotationTermControllerMockMvc.perform(get("/api/annotation/{id}/term.json", reviewedAnnotation.getId()))
@@ -114,7 +114,7 @@ public class AnnotationTermResourceTests {
 
     @Test
     @Transactional
-    public void list_by_user_annotation_but_with_term_not_defined_by_user() throws Exception {
+    public void listByUserAnnotationButWithTermNotDefinedByUser() throws Exception {
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm();
         restAnnotationTermControllerMockMvc.perform(get(
                 "/api/annotation/{idAnnotation}/notuser/{idNotUser}/term.json",
@@ -179,7 +179,7 @@ public class AnnotationTermResourceTests {
 
     @Test
     @Transactional
-    public void add_valid_annotation_term() throws Exception {
+    public void addValidAnnotationTerm() throws Exception {
         AnnotationTerm
             annotationTerm
             = builder.givenANotPersistedAnnotationTerm(builder.givenAUserAnnotation());
@@ -205,7 +205,7 @@ public class AnnotationTermResourceTests {
 
     @Test
     @Transactional
-    public void add_annotation_term_with_term_from_bad_ontology() throws Exception {
+    public void addAnnotationTermWithTermFromBadOntology() throws Exception {
         AnnotationTerm
             annotationTerm
             = builder.givenANotPersistedAnnotationTerm(builder.givenAUserAnnotation());
@@ -223,7 +223,7 @@ public class AnnotationTermResourceTests {
 
     @Test
     @Transactional
-    public void add_annotation_term_with_bad_annotation() throws Exception {
+    public void addAnnotationTermWithBadAnnotation() throws Exception {
         AnnotationTerm
             annotationTerm
             = builder.givenANotPersistedAnnotationTerm(builder.givenAUserAnnotation());
@@ -241,7 +241,7 @@ public class AnnotationTermResourceTests {
 
     @Test
     @Transactional
-    public void add_annotation_term_with_bad_term() throws Exception {
+    public void addAnnotationTermWithBadTerm() throws Exception {
         AnnotationTerm
             annotationTerm
             = builder.givenANotPersistedAnnotationTerm(builder.givenAUserAnnotation());
@@ -260,7 +260,7 @@ public class AnnotationTermResourceTests {
 
     @Test
     @Transactional
-    public void add_valid_annotation_term_clean_before_for_current_user() throws Exception {
+    public void addValidAnnotationTermCleanBeforeForCurrentUser() throws Exception {
 
         AnnotationTerm previousAnnotationTerm = builder.givenAnAnnotationTerm();
 
@@ -322,7 +322,7 @@ public class AnnotationTermResourceTests {
 
     @Test
     @Transactional
-    public void add_valid_annotation_term_clean_before_for_all_user() throws Exception {
+    public void addValidAnnotationTermCleanBeforeForAllUser() throws Exception {
 
         AnnotationTerm previousAnnotationTerm = builder.givenAnAnnotationTerm();
         previousAnnotationTerm.setUser(builder.givenAUser());
@@ -372,7 +372,7 @@ public class AnnotationTermResourceTests {
 
     @Test
     @Transactional
-    public void delete_annotation_term_with_user() throws Exception {
+    public void deleteAnnotationTermWithUser() throws Exception {
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm();
         restAnnotationTermControllerMockMvc.perform(delete(
                 "/api/annotation/{idAnnotation}/term/{idTerm}/user/{idUser}.json",
@@ -394,7 +394,7 @@ public class AnnotationTermResourceTests {
 
     @Test
     @Transactional
-    public void delete_annotation_term_for_current_user() throws Exception {
+    public void deleteAnnotationTermForCurrentUser() throws Exception {
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm();
         restAnnotationTermControllerMockMvc.perform(delete(
                 "/api/annotation/{idAnnotation}/term/{idTerm}.json",

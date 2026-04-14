@@ -67,7 +67,7 @@ public class AttachedFileResourceTests {
 
     @Test
     @Transactional
-    public void list_all_attached_file() throws Exception {
+    public void listAllAttachedFile() throws Exception {
         AttachedFile attachedFile = builder.givenAnAttachedFile(builder.givenAProject());
         restTermControllerMockMvc.perform(get("/api/attachedfile.json"))
             .andExpect(status().isOk())
@@ -77,7 +77,7 @@ public class AttachedFileResourceTests {
 
     @Test
     @Transactional
-    public void get_an_attached_file() throws Exception {
+    public void getAnAttachedFile() throws Exception {
         AttachedFile attachedFile = builder.givenAnAttachedFile(builder.givenAProject());
         restTermControllerMockMvc.perform(get("/api/attachedfile/{id}.json", attachedFile.getId()))
             .andExpect(status().isOk())
@@ -86,14 +86,14 @@ public class AttachedFileResourceTests {
 
     @Test
     @Transactional
-    public void get_an_attached_file_does_not_exists() throws Exception {
+    public void getAnAttachedFileDoesNotExists() throws Exception {
         restTermControllerMockMvc.perform(get("/api/attachedfile/{id}.json", 0L))
             .andExpect(status().isNotFound());
     }
 
     @Test
     @Transactional
-    public void list_attached_files_by_domain() throws Exception {
+    public void listAttachedFilesByDomain() throws Exception {
         AttachedFile attachedFile = builder.givenAnAttachedFile(builder.givenAProject());
         restTermControllerMockMvc.perform(get(
                 "/api/domain/{domainClassName}/{domainIdent}/attachedfile.json",
@@ -107,7 +107,7 @@ public class AttachedFileResourceTests {
 
     @Test
     @Transactional
-    public void list_attached_files_by_domain_does_not_exists() throws Exception {
+    public void listAttachedFilesByDomainDoesNotExists() throws Exception {
         AttachedFile attachedFile = builder.givenAnAttachedFile(builder.givenAProject());
         restTermControllerMockMvc.perform(get(
                 "/api/domain/{domainClassName}/{domainIdent}/attachedfile.json",
@@ -119,7 +119,7 @@ public class AttachedFileResourceTests {
 
     @Test
     @Transactional
-    public void download_attached_file() throws Exception {
+    public void downloadAttachedFile() throws Exception {
 
         AttachedFile attachedFile = builder.givenAnAttachedFile(builder.givenAProject());
         attachedFile.setFilename("test.txt");
@@ -135,7 +135,7 @@ public class AttachedFileResourceTests {
 
     @Test
     @Transactional
-    public void upload_attached_file() throws Exception {
+    public void uploadAttachedFile() throws Exception {
 
         Project project = builder.givenAProject();
 
@@ -170,7 +170,7 @@ public class AttachedFileResourceTests {
 
     @Test
     @Transactional
-    public void delete_attached_file() throws Exception {
+    public void deleteAttachedFile() throws Exception {
         Project project = builder.givenAProject();
         AttachedFile attachedFile = builder.givenAnAttachedFile(project);
         restTermControllerMockMvc.perform(delete("/api/attachedfile/{id}.json", attachedFile.getId())

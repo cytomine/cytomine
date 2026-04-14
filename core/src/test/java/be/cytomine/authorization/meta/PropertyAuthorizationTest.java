@@ -69,19 +69,19 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list() {
+    public void adminCanList() {
         expectOK(() -> propertyService.list());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_list() {
+    public void userCannotList() {
         expectForbidden(() -> propertyService.list());
     }
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
-    public void user_without_read_cannot_list_for_domain() {
+    public void userWithoutReadCannotListForDomain() {
         expectForbidden(() -> propertyService.list(abstractImage));
         expectForbidden(() -> propertyService.list(imageInstance));
         expectForbidden(() -> propertyService.list(project));
@@ -90,28 +90,28 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_add_in_readonly_mode() {
+    public void userCannotAddInReadonlyMode() {
         project.setMode(EditingMode.READ_ONLY);
         expectForbidden(this::whenIAddDomain);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_add_in_restricted_mode() {
+    public void userCannotAddInRestrictedMode() {
         project.setMode(EditingMode.RESTRICTED);
         expectForbidden(this::whenIAddDomain);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_add_in_restricted_mode_for_annotation() {
+    public void userCannotAddInRestrictedModeForAnnotation() {
         project.setMode(EditingMode.RESTRICTED);
         expectForbidden(this::whenIAddDomain);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_add_in_restricted_mode_for_annotation_if_owner() {
+    public void userCanAddInRestrictedModeForAnnotationIfOwner() {
         project.setMode(EditingMode.RESTRICTED);
         ((UserAnnotation) annotationDomain).setUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get());
         expectOK(() -> {
@@ -151,7 +151,7 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_add_for_image() {
+    public void userCanAddForImage() {
         ImageInstance imageInstance = builder.givenAnImageInstance(project);
         expectOK(() -> propertyService.add(builder.givenANotPersistedProperty(imageInstance, "key", "value")
             .toJsonObject()));
@@ -159,7 +159,7 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_add_in_restricted_mode_for_image() {
+    public void userCannotAddInRestrictedModeForImage() {
         ImageInstance imageInstance = builder.givenAnImageInstance(project);
         imageInstance.getProject().setMode(EditingMode.RESTRICTED);
         expectForbidden(() -> propertyService.add(builder.givenANotPersistedProperty(imageInstance, "key", "value")
@@ -168,7 +168,7 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_add_in_restricted_mode_for_image_if_owner() {
+    public void userCanAddInRestrictedModeForImageIfOwner() {
         ImageInstance imageInstance = builder.givenAnImageInstance(project);
         imageInstance.getProject().setMode(EditingMode.RESTRICTED);
         imageInstance.setUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get());
@@ -178,7 +178,7 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = GUEST)
-    public void guest_cannot_add_for_image() {
+    public void guestCannotAddForImage() {
         expectForbidden(() -> propertyService.add(builder.givenANotPersistedProperty(
             builder.givenAnImageInstance(),
             "key",
@@ -188,7 +188,7 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_edit_for_image() {
+    public void userCanEditForImage() {
         expectOK(() -> propertyService.update(
             propertyForImageInstance,
             propertyForImageInstance.toJsonObject(),
@@ -199,7 +199,7 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_edit_in_restricted_mode_for_image() {
+    public void userCannotEditInRestrictedModeForImage() {
         ImageInstance imageInstance = builder.givenAnImageInstance(project);
         imageInstance.getProject().setMode(EditingMode.RESTRICTED);
         expectForbidden(() -> propertyService.update(
@@ -212,7 +212,7 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_edit_in_restricted_mode_for_image_if_owner() {
+    public void userCanEditInRestrictedModeForImageIfOwner() {
         ImageInstance imageInstance = builder.givenAnImageInstance(project);
         imageInstance.getProject().setMode(EditingMode.RESTRICTED);
         imageInstance.setUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get());
@@ -222,7 +222,7 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = GUEST)
-    public void guest_cannot_edit_image() {
+    public void guestCannotEditImage() {
         Property propertyForImageInstanceLocal = builder.givenAProperty(imageInstance);
         expectForbidden(() -> propertyService.update(
             propertyForImageInstanceLocal,
@@ -233,13 +233,13 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_delete_for_image() {
+    public void userCanDeleteForImage() {
         expectOK(() -> propertyService.delete(propertyForImageInstance, null, null, true));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_delete_in_restricted_mode_for_image() {
+    public void userCannotDeleteInRestrictedModeForImage() {
         ImageInstance imageInstance = builder.givenAnImageInstance(project);
         imageInstance.getProject().setMode(EditingMode.RESTRICTED);
         expectForbidden(() -> propertyService.delete(builder.givenAProperty(imageInstance), null, null, true));
@@ -247,7 +247,7 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_delete_in_restricted_mode_for_image_if_owner() {
+    public void userCanDeleteInRestrictedModeForImageIfOwner() {
         ImageInstance imageInstance = builder.givenAnImageInstance(project);
         imageInstance.getProject().setMode(EditingMode.RESTRICTED);
         imageInstance.setUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get());
@@ -256,13 +256,13 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = GUEST)
-    public void guest_cannot_delete_for_image() {
+    public void guestCannotDeleteForImage() {
         expectForbidden(() -> propertyService.delete(propertyForImageInstance, null, null, true));
     }
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_add_for_project() {
+    public void adminCanAddForProject() {
         expectOK(() -> propertyService.add(builder.givenANotPersistedProperty(
             builder.givenAProject(),
             "key",
@@ -272,7 +272,7 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_with_read_cannot_add_for_project() {
+    public void userWithReadCannotAddForProject() {
         expectForbidden(() -> propertyService.add(builder.givenANotPersistedProperty(
             builder.givenAProject(),
             "key",
@@ -282,7 +282,7 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_WRITE)
-    public void user_with_write_can_add_for_project() {
+    public void userWithWriteCanAddForProject() {
         Project projectLocal = builder.givenAProject();
         initACL(projectLocal);
         expectOK(() -> propertyService.add(builder.givenANotPersistedProperty(projectLocal, "key", "value")
@@ -291,13 +291,13 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_edit_for_project() {
+    public void adminCanEditForProject() {
         expectOK(() -> propertyService.update(propertyForProject, propertyForProject.toJsonObject(), null, null));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_with_read_cannot_edit_for_project() {
+    public void userWithReadCannotEditForProject() {
         expectForbidden(() -> propertyService.update(
             propertyForProject,
             propertyForProject.toJsonObject(),
@@ -308,7 +308,7 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_WRITE)
-    public void user_with_write_can_edit_for_project() {
+    public void userWithWriteCanEditForProject() {
         Project projectLocal = builder.givenAProject();
         initACL(projectLocal);
         Property property = builder.givenAProperty(projectLocal);
@@ -317,13 +317,13 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_delete_for_project() {
+    public void adminCanDeleteForProject() {
         expectOK(() -> propertyService.delete(builder.givenAProperty(builder.givenAProject()), null, null, true));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_with_read_cannot_delete_for_project() {
+    public void userWithReadCannotDeleteForProject() {
         expectForbidden(() -> propertyService.delete(
             builder.givenAProperty(builder.givenAProject()),
             null,
@@ -334,7 +334,7 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_WRITE)
-    public void user_with_write_can_delete_for_project() {
+    public void userWithWriteCanDeleteForProject() {
         Project projectLocal = builder.givenAProject();
         initACL(projectLocal);
         expectOK(() -> propertyService.delete(builder.givenAProperty(projectLocal), null, null, true));

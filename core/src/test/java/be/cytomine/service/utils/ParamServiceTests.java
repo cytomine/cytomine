@@ -35,7 +35,7 @@ public class ParamServiceTests {
     BasicInstanceBuilder builder;
 
     @Test
-    public void params_user() {
+    public void paramsUser() {
         Project project = builder.givenAProject();
         User userInProject = builder.givenAUser();
         builder.addUserToProject(project, userInProject.getUsername());
@@ -52,7 +52,7 @@ public class ParamServiceTests {
     }
 
     @Test
-    public void params_image_instance() {
+    public void paramsImageInstance() {
         Project project = builder.givenAProject();
         ImageInstance imageInstanceInProject = builder.givenAnImageInstance(project);
         ImageInstance imageInstanceNotInProject = builder.givenAnImageInstance();
@@ -72,7 +72,7 @@ public class ParamServiceTests {
     }
 
     @Test
-    public void params_term() {
+    public void paramsTerm() {
 
         Term termInProject = builder.givenATerm(builder.givenAnOntology());
         Term termNotInProject = builder.givenATerm();
@@ -89,7 +89,7 @@ public class ParamServiceTests {
     }
 
     @Test
-    public void property_group_to_show() {
+    public void propertyGroupToShow() {
         assertThat(paramsService.getPropertyGroupToShow(new JsonObject()))
             .containsExactlyElementsOf(AnnotationListing.availableColumnsDefault);
 

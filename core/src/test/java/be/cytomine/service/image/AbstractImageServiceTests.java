@@ -86,7 +86,7 @@ public class AbstractImageServiceTests {
     ImageInstanceService imageInstanceService;
 
     @Test
-    void list_all_image_by_filters() {
+    void listAllImageByFilters() {
         AbstractImage abstractImage1 = builder.givenAnAbstractImage();
         abstractImage1.setOriginalFilename("karamazov");
         abstractImage1.setWidth(800);
@@ -146,7 +146,7 @@ public class AbstractImageServiceTests {
     }
 
     @Test
-    void list_all_image_by_project() {
+    void listAllImageByProject() {
         AbstractImage abstractImageInProject = builder.givenAnAbstractImage();
         builder.persistAndReturn(abstractImageInProject);
         AbstractImage abstractImageNotInProject = builder.givenAnAbstractImage();
@@ -175,7 +175,7 @@ public class AbstractImageServiceTests {
 
     @Test
     @WithMockUser(username = "list_all_image_by_user_storage")
-    void list_all_image_by_user_storage() {
+    void listAllImageByUserStorage() {
         User user = builder.givenAUser("list_all_image_by_user_storage");
         Storage storage = builder.givenAStorage(user);
         UploadedFile uploadedFile = builder.givenAUploadedFile();
@@ -201,56 +201,56 @@ public class AbstractImageServiceTests {
     }
 
     @Test
-    void get_uploaded_file_by_user() {
+    void getUploadedFileByUser() {
         AbstractImage abstractImage = builder.givenAnAbstractImage();
         assertThat(abstractImage).isEqualTo(abstractImageService.get(abstractImage.getId()));
     }
 
     @Test
-    void get_unexisting_abstractImage_return_null() {
+    void getUnexistingAbstractImageReturnNull() {
         AssertionsForClassTypes.assertThat(abstractImageService.get(0L)).isNull();
     }
 
     @Test
-    void find_abstractImage_with_success() {
+    void findAbstractImageWithSuccess() {
         AbstractImage abstractImage = builder.givenAnAbstractImage();
         AssertionsForClassTypes.assertThat(abstractImageService.find(abstractImage.getId()).isPresent());
         assertThat(abstractImage).isEqualTo(abstractImageService.find(abstractImage.getId()).get());
     }
 
     @Test
-    void find_unexisting_abstractImage_return_empty() {
+    void findUnexistingAbstractImageReturnEmpty() {
         AssertionsForClassTypes.assertThat(abstractImageService.find(0L)).isEmpty();
     }
 
 
     @Test
-    void detect_if_unused_abstract_image_is_unused() {
+    void detectIfUnusedAbstractImageIsUnused() {
         AbstractImage abstractImage = builder.givenAnAbstractImage();
         assertThat(abstractImageService.isAbstractImageUsed(abstractImage.getId())).isFalse();
     }
 
     @Test
-    void detect_if_used_abstract_image_is_used() {
+    void detectIfUsedAbstractImageIsUsed() {
         ImageInstance imageInstance = builder.givenAnImageInstance();
         assertThat(abstractImageService.isAbstractImageUsed(imageInstance.getBaseImage().getId())).isTrue();
     }
 
     @Test
-    void detect_if_unused_abstract_image_is_in_unused_list() {
+    void detectIfUnusedAbstractImageIsInUnusedList() {
         AbstractImage abstractImage = builder.givenAnAbstractImage();
         assertThat(abstractImageService.listUnused()).contains(abstractImage);
     }
 
     @Test
-    void detect_if_used_abstract_image_is_missing_from_unused_list() {
+    void detectIfUsedAbstractImageIsMissingFromUnusedList() {
         ImageInstance imageInstance = builder.givenAnImageInstance();
         assertThat(abstractImageService.listUnused()).doesNotContain(imageInstance.getBaseImage());
     }
 
 
     @Test
-    void add_valid_abstract_image_with_success() {
+    void addValidAbstractImageWithSuccess() {
         AbstractImage abstractImage = builder.givenANotPersistedAbstractImage();
 
         CommandResponse commandResponse = abstractImageService.add(abstractImage.toJsonObject());
@@ -262,7 +262,7 @@ public class AbstractImageServiceTests {
     }
 
     @Test
-    void add_valid_abstract_image_with_bad_num_field_width() {
+    void addValidAbstractImageWithBadNumFieldWidth() {
         AbstractImage abstractImage = builder.givenANotPersistedAbstractImage();
         abstractImage.setWidth(0);
         Assertions.assertThrows(
@@ -273,7 +273,7 @@ public class AbstractImageServiceTests {
     }
 
     @Test
-    void add_valid_abstract_image_with_bad_num_field_height() {
+    void addValidAbstractImageWithBadNumFieldHeight() {
         AbstractImage abstractImage = builder.givenANotPersistedAbstractImage();
         abstractImage.setHeight(0);
         Assertions.assertThrows(
@@ -284,7 +284,7 @@ public class AbstractImageServiceTests {
     }
 
     @Test
-    void add_valid_abstract_image_with_bad_num_field_depth() {
+    void addValidAbstractImageWithBadNumFieldDepth() {
         AbstractImage abstractImage = builder.givenANotPersistedAbstractImage();
         abstractImage.setDepth(0);
         Assertions.assertThrows(
@@ -295,7 +295,7 @@ public class AbstractImageServiceTests {
     }
 
     @Test
-    void add_valid_abstract_image_with_bad_num_field_duration() {
+    void addValidAbstractImageWithBadNumFieldDuration() {
         AbstractImage abstractImage = builder.givenANotPersistedAbstractImage();
         abstractImage.setDuration(0);
         Assertions.assertThrows(
@@ -306,7 +306,7 @@ public class AbstractImageServiceTests {
     }
 
     @Test
-    void add_valid_abstract_image_with_bad_num_field_channels() {
+    void addValidAbstractImageWithBadNumFieldChannels() {
         AbstractImage abstractImage = builder.givenANotPersistedAbstractImage();
         abstractImage.setChannels(0);
         Assertions.assertThrows(
@@ -317,7 +317,7 @@ public class AbstractImageServiceTests {
     }
 
     @Test
-    void edit_abstract_image_with_success() {
+    void editAbstractImageWithSuccess() {
         AbstractImage abstractImage = builder.givenANotPersistedAbstractImage();
         abstractImage.setHeight(10000);
         abstractImage.setWidth(1000);
@@ -344,7 +344,7 @@ public class AbstractImageServiceTests {
     }
 
     @Test
-    void edit_abstract_image_magnification() {
+    void editAbstractImageMagnification() {
         ImageInstance imageInstance = builder.givenAnImageInstance();
         AbstractImage abstractImage = imageInstance.getBaseImage();
 
@@ -395,7 +395,7 @@ public class AbstractImageServiceTests {
     }
 
     @Test
-    void delete_abstract_image_with_success() {
+    void deleteAbstractImageWithSuccess() {
         AbstractImage abstractImage = builder.givenAnAbstractImage();
 
         CommandResponse commandResponse = abstractImageService.delete(abstractImage, null, null, true);
@@ -406,7 +406,7 @@ public class AbstractImageServiceTests {
     }
 
     @Test
-    void delete_abstract_image_with_dependencies_with_success() {
+    void deleteAbstractImageWithDependenciesWithSuccess() {
         AbstractImage abstractImage = builder.givenAnAbstractImage();
 
         AttachedFile attachedFile = builder.givenAnAttachedFile(abstractImage);
@@ -422,7 +422,7 @@ public class AbstractImageServiceTests {
     }
 
     @Test
-    void delete_abstract_image_with_image_in_project_is_refused() {
+    void deleteAbstractImageWithImageInProjectIsRefused() {
         AbstractImage abstractImage = builder.givenAnAbstractImage();
         ImageInstance imageInstance = builder.givenAnImageInstance(abstractImage, builder.givenAProject());
         Assertions.assertThrows(

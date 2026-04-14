@@ -65,7 +65,7 @@ public class OntologyResourceTests {
 
     @Test
     @Transactional
-    public void list_all_ontologies() throws Exception {
+    public void listAllOntologies() throws Exception {
         Ontology ontology = builder.givenAnOntology();
         restOntologyControllerMockMvc.perform(get("/api/ontology.json"))
             .andExpect(status().isOk())
@@ -76,7 +76,7 @@ public class OntologyResourceTests {
 
     @Test
     @Transactional
-    public void list_all_ontologies_light() throws Exception {
+    public void listAllOntologiesLight() throws Exception {
         Ontology ontology = builder.givenAnOntology();
         restOntologyControllerMockMvc.perform(get("/api/ontology.json").param("light", "true"))
             .andExpect(status().isOk())
@@ -185,7 +185,7 @@ public class OntologyResourceTests {
 
     @Test
     @Transactional
-    public void add_valid_ontology() throws Exception {
+    public void addValidOntology() throws Exception {
         Ontology ontology = basicInstanceBuilder.givenANotPersistedOntology();
         restOntologyControllerMockMvc.perform(post("/api/ontology.json")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -203,7 +203,7 @@ public class OntologyResourceTests {
 
     @Test
     @Transactional
-    public void add_ontology_refused_if_already_exists() throws Exception {
+    public void addOntologyRefusedIfAlreadyExists() throws Exception {
         Ontology ontology = basicInstanceBuilder.givenANotPersistedOntology();
         builder.persistAndReturn(ontology);
         restOntologyControllerMockMvc.perform(post("/api/ontology.json")
@@ -215,7 +215,7 @@ public class OntologyResourceTests {
 
     @Test
     @Transactional
-    public void add_ontology_refused_if_name_not_set() throws Exception {
+    public void addOntologyRefusedIfNameNotSet() throws Exception {
         Ontology ontology = basicInstanceBuilder.givenANotPersistedOntology();
         ontology.setName(null);
         restOntologyControllerMockMvc.perform(post("/api/ontology.json")
@@ -227,7 +227,7 @@ public class OntologyResourceTests {
 
     @Test
     @Transactional
-    public void edit_valid_ontology() throws Exception {
+    public void editValidOntology() throws Exception {
         Ontology ontology = builder.givenAnOntology();
         restOntologyControllerMockMvc.perform(put("/api/ontology/{id}.json", ontology.getId())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -247,7 +247,7 @@ public class OntologyResourceTests {
 
     @Test
     @Transactional
-    public void fail_when_editing_ontology_does_not_exists() throws Exception {
+    public void failWhenEditingOntologyDoesNotExists() throws Exception {
         Ontology ontology = builder.givenAnOntology();
         em.remove(ontology);
         restOntologyControllerMockMvc.perform(put("/api/ontology/{id}.json", 0)
@@ -261,7 +261,7 @@ public class OntologyResourceTests {
 
     @Test
     @Transactional
-    public void delete_ontology() throws Exception {
+    public void deleteOntology() throws Exception {
         Ontology ontology = builder.givenAnOntology();
         restOntologyControllerMockMvc.perform(delete("/api/ontology/{id}.json", ontology.getId())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -279,7 +279,7 @@ public class OntologyResourceTests {
 
     @Test
     @Transactional
-    public void fail_when_delete_ontology_not_exists() throws Exception {
+    public void failWhenDeleteOntologyNotExists() throws Exception {
         restOntologyControllerMockMvc.perform(delete("/api/ontology/{id}.json", 0)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isNotFound())

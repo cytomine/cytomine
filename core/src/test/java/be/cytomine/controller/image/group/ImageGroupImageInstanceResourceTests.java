@@ -54,7 +54,7 @@ public class ImageGroupImageInstanceResourceTests {
 
     @Test
     @Transactional
-    public void list_imagegroup_imageinstance_by_imageinstance() throws Exception {
+    public void listImagegroupImageinstanceByImageinstance() throws Exception {
         ImageGroupImageInstance igii = builder.givenAnImageGroupImageInstance();
         restImageGroupImageInstanceControllerMockMvc.perform(get(
                 "/api/imageinstance/{id}/imagegroupimageinstance.json",
@@ -66,7 +66,7 @@ public class ImageGroupImageInstanceResourceTests {
 
     @Test
     @Transactional
-    public void add_valid_imagegroup_imageinstance() throws Exception {
+    public void addValidImagegroupImageinstance() throws Exception {
         ImageGroupImageInstance igii = builder.givenAnImageGroupImageInstance();
         restImageGroupImageInstanceControllerMockMvc.perform(post(
                 "/api/imagegroup/{group}/imageinstance/{image}.json",
@@ -86,7 +86,7 @@ public class ImageGroupImageInstanceResourceTests {
 
     @Test
     @Transactional
-    public void delete_imagegroup_imageinstance() throws Exception {
+    public void deleteImagegroupImageinstance() throws Exception {
         ImageGroupImageInstance igii = builder.givenAnImageGroupImageInstance();
         restImageGroupImageInstanceControllerMockMvc.perform(delete(
                 "/api/imagegroup/{group}/imageinstance/{image}.json",
@@ -105,7 +105,7 @@ public class ImageGroupImageInstanceResourceTests {
 
     @Test
     @Transactional
-    public void get_previous_imagegroup_imageinstance() throws Exception {
+    public void getPreviousImagegroupImageinstance() throws Exception {
         Project project = builder.givenAProject();
         ImageGroup group = builder.givenAnImageGroup(project);
         ImageGroupImageInstance current = builder.givenAnImageGroupImageInstance(
@@ -127,7 +127,7 @@ public class ImageGroupImageInstanceResourceTests {
 
     @Test
     @Transactional
-    public void get_next_imagegroup_imageinstance() throws Exception {
+    public void getNextImagegroupImageinstance() throws Exception {
         Project project = builder.givenAProject();
         ImageGroup group = builder.givenAnImageGroup(project);
         ImageGroupImageInstance current = builder.givenAnImageGroupImageInstance(

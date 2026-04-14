@@ -124,37 +124,37 @@ public class OntologyServiceTests {
     }
 
     @Test
-    void list_all_ontology_with_success() {
+    void listAllOntologyWithSuccess() {
         Ontology ontology = builder.givenAnOntology();
         assertThat(ontology).isIn(ontologyService.list());
     }
 
     @Test
-    void get_ontology_with_success() {
+    void getOntologyWithSuccess() {
         Ontology ontology = builder.givenAnOntology();
         assertThat(ontology).isEqualTo(ontologyService.get(ontology.getId()));
     }
 
     @Test
-    void get_unexisting_ontology_return_null() {
+    void getUnexistingOntologyReturnNull() {
         assertThat(ontologyService.get(0L)).isNull();
     }
 
     @Test
-    void find_ontology_with_success() {
+    void findOntologyWithSuccess() {
         Ontology ontology = builder.givenAnOntology();
         assertThat(ontologyService.find(ontology.getId()).isPresent());
         assertThat(ontology).isEqualTo(ontologyService.find(ontology.getId()).get());
     }
 
     @Test
-    void find_unexisting_ontology_return_empty() {
+    void findUnexistingOntologyReturnEmpty() {
         assertThat(ontologyService.find(0L)).isEmpty();
     }
 
 
     @Test
-    void list_light_ontology() {
+    void listLightOntology() {
         Ontology ontology = builder.givenAnOntology();
         assertThat(ontologyService.listLight()
             .stream()
@@ -162,7 +162,7 @@ public class OntologyServiceTests {
     }
 
     @Test
-    void add_valid_ontology_with_success() {
+    void addValidOntologyWithSuccess() {
         Ontology ontology = basicInstanceBuilder.givenANotPersistedOntology();
 
         CommandResponse commandResponse = ontologyService.add(ontology.toJsonObject());
@@ -175,7 +175,7 @@ public class OntologyServiceTests {
     }
 
     @Test
-    void add_ontology_with_null_name_fail() {
+    void addOntologyWithNullNameFail() {
         Ontology ontology = basicInstanceBuilder.givenANotPersistedOntology();
         ontology.setName("");
         Assertions.assertThrows(
@@ -187,7 +187,7 @@ public class OntologyServiceTests {
 
 
     @Test
-    void undo_redo_ontology_creation_with_success() {
+    void undoRedoOntologyCreationWithSuccess() {
         Ontology ontology = basicInstanceBuilder.givenANotPersistedOntology();
         CommandResponse commandResponse = ontologyService.add(ontology.toJsonObject());
         assertThat(ontologyService.find(commandResponse.getObject().getId())).isPresent();
@@ -205,7 +205,7 @@ public class OntologyServiceTests {
     }
 
     @Test
-    void redo_ontology_creation_fail_if_ontology_already_exist() {
+    void redoOntologyCreationFailIfOntologyAlreadyExist() {
         Ontology ontology = basicInstanceBuilder.givenANotPersistedOntology();
         CommandResponse commandResponse = ontologyService.add(ontology.toJsonObject());
         assertThat(ontologyService.find(commandResponse.getObject().getId())).isPresent();
@@ -229,7 +229,7 @@ public class OntologyServiceTests {
     }
 
     @Test
-    void edit_valid_ontology_with_success() {
+    void editValidOntologyWithSuccess() {
         Ontology ontology = builder.givenAnOntology();
 
         CommandResponse commandResponse = ontologyService.update(
@@ -245,7 +245,7 @@ public class OntologyServiceTests {
     }
 
     @Test
-    void undo_redo_ontology_edition_with_success() {
+    void undoRedoOntologyEditionWithSuccess() {
         Ontology ontology = builder.givenAnOntology();
         ontology.setName("OLD NAME");
         ontology = builder.persistAndReturn(ontology);
@@ -265,7 +265,7 @@ public class OntologyServiceTests {
     }
 
     @Test
-    void delete_ontology_with_success() {
+    void deleteOntologyWithSuccess() {
         Ontology ontology = builder.givenAnOntology();
 
         CommandResponse commandResponse = ontologyService.delete(ontology, null, null, true);
@@ -276,7 +276,7 @@ public class OntologyServiceTests {
     }
 
     @Test
-    void delete_ontology_with_dependencies_with_success() {
+    void deleteOntologyWithDependenciesWithSuccess() {
         Ontology ontology = builder.givenAnOntology();
         Term term1 = builder.givenATerm(ontology);
         Term term2 = builder.givenATerm(ontology);
@@ -291,7 +291,7 @@ public class OntologyServiceTests {
 
 
     @Test
-    void undo_redo_ontology_deletion_with_success() {
+    void undoRedoOntologyDeletionWithSuccess() {
         Ontology ontology = builder.givenAnOntology();
 
         ontologyService.delete(ontology, null, null, true);
@@ -308,7 +308,7 @@ public class OntologyServiceTests {
     }
 
     @Test
-    void undo_redo_ontology_deletion_restore_dependencies() {
+    void undoRedoOntologyDeletionRestoreDependencies() {
         Ontology ontology = builder.givenAnOntology();
         Term term1 = builder.givenATerm(ontology);
         Term term2 = builder.givenATerm(ontology);
@@ -351,7 +351,7 @@ public class OntologyServiceTests {
     }
 
     @Test
-    void determine_rights_for_users_admin_in_project() {
+    void determineRightsForUsersAdminInProject() {
         Ontology ontology = builder.givenAnOntology();
         Project project = builder.givenAProjectWithOntology(ontology);
         User userAdminInProject = builder.givenAUser();
@@ -394,7 +394,7 @@ public class OntologyServiceTests {
 
     @Test
     @WithMockUser("user")
-    void determine_rights_for_users_keep_rights_for_ontology_creator() {
+    void determineRightsForUsersKeepRightsForOntologyCreator() {
 
         // create ontology for user
         Ontology ontology = basicInstanceBuilder.givenANotPersistedOntology();

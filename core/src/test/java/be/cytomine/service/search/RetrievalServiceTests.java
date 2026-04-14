@@ -73,7 +73,7 @@ public class RetrievalServiceTests {
     }
 
     @Test
-    void index_annotation_with_success() throws ParseException {
+    void indexAnnotationWithSuccess() throws ParseException {
         UserAnnotation
             annotation
             = UserAnnotationResourceTests.givenAUserAnnotationWithValidImageServer(builder);
@@ -106,7 +106,7 @@ public class RetrievalServiceTests {
     }
 
     @Test
-    void delete_index_with_success() {
+    void deleteIndexWithSuccess() {
         UserAnnotation annotation = builder.givenAUserAnnotation();
 
         /* Simulate call to CBIR */
@@ -137,7 +137,7 @@ public class RetrievalServiceTests {
     }
 
     @Test
-    void search_similar_images_with_success() throws JsonProcessingException, ParseException {
+    void searchSimilarImagesWithSuccess() throws JsonProcessingException, ParseException {
         UserAnnotation
             annotation
             = UserAnnotationResourceTests.givenAUserAnnotationWithValidImageServer(builder);

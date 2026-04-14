@@ -138,7 +138,7 @@ public class UserPositionResourceTests {
 
     @Test
     @Transactional
-    public void list_last_user_on_image() throws Exception {
+    public void listLastUserOnImage() throws Exception {
         User user = builder.givenAUser();
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
@@ -153,7 +153,7 @@ public class UserPositionResourceTests {
 
     @Test
     @Transactional
-    public void list_last_broadcast_user_on_image() throws Exception {
+    public void listLastBroadcastUserOnImage() throws Exception {
         User user = builder.givenAUser();
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
@@ -169,7 +169,7 @@ public class UserPositionResourceTests {
 
     @Test
     @Transactional
-    public void list_empty_last_broadcast_user_on_image() throws Exception {
+    public void listEmptyLastBroadcastUserOnImage() throws Exception {
         User user = builder.givenAUser();
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
@@ -184,7 +184,7 @@ public class UserPositionResourceTests {
 
     @Test
     @Transactional
-    public void list_user_position() throws Exception {
+    public void listUserPosition() throws Exception {
         User user = builder.givenAUser();
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
@@ -222,7 +222,7 @@ public class UserPositionResourceTests {
 
     @Test
     @Transactional
-    public void list_after_than() throws Exception {
+    public void listAfterThan() throws Exception {
         User user = builder.givenAUser();
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
@@ -246,7 +246,7 @@ public class UserPositionResourceTests {
 
     @Test
     @Transactional
-    public void list_before_than() throws Exception {
+    public void listBeforeThan() throws Exception {
         User user = builder.givenAUser();
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
@@ -270,7 +270,7 @@ public class UserPositionResourceTests {
 
     @Test
     @Transactional
-    public void list_followers() throws Exception {
+    public void listFollowers() throws Exception {
         WebSocketSession session = mock(WebSocketSession.class);
         when(session.getId()).thenReturn("1234");
         ConcurrentWebSocketSessionDecorator sessionDecoratorA = new ConcurrentWebSocketSessionDecorator(session, 0, 0);
@@ -306,7 +306,7 @@ public class UserPositionResourceTests {
 
     @Test
     @Transactional
-    public void list_followers_for_forbidden_user() throws Exception {
+    public void listFollowersForForbiddenUser() throws Exception {
         ImageInstance imageInstance = builder.givenAnImageInstance();
         Long imageId = imageInstance.getId();
         User user = builder.givenAUser();
@@ -367,7 +367,7 @@ public class UserPositionResourceTests {
 
     @Test
     @Transactional
-    public void add_position() throws Exception {
+    public void addPosition() throws Exception {
         User user = builder.givenSuperAdmin();
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
@@ -423,7 +423,7 @@ public class UserPositionResourceTests {
 
     @Test
     @Transactional
-    public void add_position_with_slice_instance() throws Exception {
+    public void addPositionWithSliceInstance() throws Exception {
         User user = builder.givenSuperAdmin();
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
@@ -452,7 +452,7 @@ public class UserPositionResourceTests {
 
     @Test
     @Transactional
-    public void get_last_user_position_of_not_followed_user() throws Exception {
+    public void getLastUserPositionOfNotFollowedUser() throws Exception {
         User user = builder.givenSuperAdmin();
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
@@ -470,7 +470,7 @@ public class UserPositionResourceTests {
 
     @Test
     @Transactional
-    public void get_last_user_position_of_user_already_followed_by_current_user() throws Exception {
+    public void getLastUserPositionOfUserAlreadyFollowedByCurrentUser() throws Exception {
         User admin = builder.givenSuperAdmin();
         User user = builder.givenAUser();
         SliceInstance sliceInstance = builder.givenASliceInstance();
@@ -492,7 +492,7 @@ public class UserPositionResourceTests {
 
     @Test
     @Transactional
-    public void get_last_user_position_of_user_already_followed_but_not_by_current_user() throws Exception {
+    public void getLastUserPositionOfUserAlreadyFollowedButNotByCurrentUser() throws Exception {
         User user = builder.givenAUser();
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();

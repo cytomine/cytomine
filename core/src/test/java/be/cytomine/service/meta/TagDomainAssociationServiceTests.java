@@ -65,7 +65,7 @@ public class TagDomainAssociationServiceTests {
     BasicInstanceBuilder builder;
 
     @Test
-    public void specification_test() {
+    public void specificationTest() {
         TagDomainAssociation tagDomainAssociation = builder.givenATagAssociation(
             builder.givenATag(),
             builder.givenAProject()
@@ -83,7 +83,7 @@ public class TagDomainAssociationServiceTests {
     }
 
     @Test
-    public void find_by_id() {
+    public void findById() {
         TagDomainAssociation tagDomainAssociation = builder.givenATagAssociation(
             builder.givenATag(),
             builder.givenAProject()
@@ -92,12 +92,12 @@ public class TagDomainAssociationServiceTests {
     }
 
     @Test
-    public void find_by_id_that_do_not_exists() {
+    public void findByIdThatDoNotExists() {
         assertThat(tagDomainAssociationService.find(0L)).isEmpty();
     }
 
     @Test
-    public void get_by_id() {
+    public void getById() {
         TagDomainAssociation tagDomainAssociation = builder.givenATagAssociation(
             builder.givenATag(),
             builder.givenAProject()
@@ -106,7 +106,7 @@ public class TagDomainAssociationServiceTests {
     }
 
     @Test
-    public void list_all_for_domain() {
+    public void listAllForDomain() {
         Project project = builder.givenAProject();
         TagDomainAssociation tagDomainAssociation = builder.givenATagAssociation(builder.givenATag(), project);
         TagDomainAssociation
@@ -118,7 +118,7 @@ public class TagDomainAssociationServiceTests {
     }
 
     @Test
-    public void list_all_for_tag() {
+    public void listAllForTag() {
         Project project = builder.givenAProject();
         Tag tag = builder.givenATag();
         TagDomainAssociation tagDomainAssociation = builder.givenATagAssociation(tag, project);
@@ -131,7 +131,7 @@ public class TagDomainAssociationServiceTests {
     }
 
     @Test
-    public void list_all_for_tag_and_domain() {
+    public void listAllForTagAndDomain() {
         Project domain1 = builder.givenAProject();
         UserAnnotation domain2 = builder.givenAUserAnnotation();
         Tag tag1 = builder.givenATag();
@@ -165,7 +165,7 @@ public class TagDomainAssociationServiceTests {
 
 
     @Test
-    public void create_tag_association() throws ClassNotFoundException {
+    public void createTagAssociation() throws ClassNotFoundException {
         CommandResponse
             add
             = tagDomainAssociationService.add(builder.givenANotPersistedTagAssociation(
@@ -177,7 +177,7 @@ public class TagDomainAssociationServiceTests {
     }
 
     @Test
-    public void delete_tag_association() {
+    public void deleteTagAssociation() {
         TagDomainAssociation tagDomainAssociation = builder.givenATagAssociation(
             builder.givenATag(),
             builder.givenAProject()

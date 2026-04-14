@@ -87,7 +87,7 @@ public class AnnotationActionResourceTests {
     }
 
     @Test
-    public void add_action_for_annotation() throws Exception {
+    public void addActionForAnnotation() throws Exception {
         AssertionsForClassTypes.assertThat(annotationActionRepository.count()).isEqualTo(0);
         User user = builder.givenSuperAdmin();
         AnnotationDomain annotationDomain = builder.givenAUserAnnotation();
@@ -118,7 +118,7 @@ public class AnnotationActionResourceTests {
 
     @Test
     @Transactional
-    public void list_last_user_on_image() throws Exception {
+    public void listLastUserOnImage() throws Exception {
         User user = builder.givenAUser();
 
         AnnotationDomain annotationDomain = builder.givenAUserAnnotation();
@@ -143,7 +143,7 @@ public class AnnotationActionResourceTests {
 
     @Test
     @Transactional
-    public void list_last_user_on_slice() throws Exception {
+    public void listLastUserOnSlice() throws Exception {
         User user = builder.givenAUser();
 
         AnnotationDomain annotationDomain = builder.givenAUserAnnotation();
@@ -168,7 +168,7 @@ public class AnnotationActionResourceTests {
 
     @Test
     @Transactional
-    public void count_annotation_by_project() throws Exception {
+    public void countAnnotationByProject() throws Exception {
         User user = builder.givenSuperAdmin();
         AnnotationDomain annotationDomain = builder.givenAUserAnnotation();
         givenAPersistentAnnotationAction(DateUtils.addDays(new Date(), -2), annotationDomain, user, "select");

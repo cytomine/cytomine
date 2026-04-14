@@ -150,14 +150,14 @@ public class ImageInstanceServiceTests {
     }
 
     @Test
-    void retrieve_image_bounds_for_empty_project() {
+    void retrieveImageBoundsForEmptyProject() {
         Project project = builder.givenAProject();
         ImageInstanceBounds imageInstanceBounds = imageInstanceService.computeBounds(project);
         assertThat(imageInstanceBounds).isNotNull();
     }
 
     @Test
-    void retrieve_image_bounds() {
+    void retrieveImageBounds() {
         Project project = builder.givenAProject();
 
         List<Date> dateChoices = new ArrayList<>(List.of(
@@ -257,7 +257,7 @@ public class ImageInstanceServiceTests {
     }
 
     @Test
-    void list_all_image_by_projects() {
+    void listAllImageByProjects() {
         ImageInstance imageInstance1 = builder.givenAnImageInstance();
         builder.persistAndReturn(imageInstance1);
         ImageInstance imageInstance2 = builder.givenAnImageInstance();
@@ -282,7 +282,7 @@ public class ImageInstanceServiceTests {
     }
 
     @Test
-    void list_all_image_by_projects_ignore_nested_image_instance() {
+    void listAllImageByProjectsIgnoreNestedImageInstance() {
         ImageInstance imageInstance1 = builder.givenAnImageInstance();
         NestedImageInstance nestedImageInstance1 = builder.givenANestedImageInstance();
         nestedImageInstance1.setProject(imageInstance1.getProject());
@@ -306,7 +306,7 @@ public class ImageInstanceServiceTests {
     }
 
     @Test
-    void search_images_with_last_activities() {
+    void searchImagesWithLastActivities() {
         Date consultation = new Date();
         ImageInstance imageInstance1 = builder.givenAnImageInstance();
         ImageInstance imageInstance2 = builder.givenAnImageInstance(imageInstance1.getProject());
@@ -332,7 +332,7 @@ public class ImageInstanceServiceTests {
     }
 
     @Test
-    void list_all_image_by_project_light() {
+    void listAllImageByProjectLight() {
         ImageInstance imageInstance1 = builder.givenAnImageInstance();
         builder.persistAndReturn(imageInstance1);
         ImageInstance imageInstance2 = builder.givenAnImageInstance();
@@ -357,7 +357,7 @@ public class ImageInstanceServiceTests {
     }
 
     @Test
-    void list_all_image_by_project_light_ignore_nested_image_instance() {
+    void listAllImageByProjectLightIgnoreNestedImageInstance() {
         ImageInstance imageInstance1 = builder.givenAnImageInstance();
         builder.persistAndReturn(imageInstance1);
         NestedImageInstance nestedImageInstance1 = builder.givenANestedImageInstance();
@@ -384,7 +384,7 @@ public class ImageInstanceServiceTests {
 
     @Test
     @WithMockUser("list_by_user_with_search")
-    void list_by_user_with_search() {
+    void listByUserWithSearch() {
         User user = builder.givenAUser("list_by_user_with_search");
         Project project = builder.givenAProject();
         builder.addUserToProject(project, user.getUsername(), BasePermission.ADMINISTRATION);
@@ -457,7 +457,7 @@ public class ImageInstanceServiceTests {
     }
 
     @Test
-    void list_by_project_with_search() {
+    void listByProjectWithSearch() {
         Project project = builder.givenAProject();
         ImageInstance img1 = builder.givenAnImageInstance(project);
         img1.getBaseImage().setWidth(499);
@@ -517,7 +517,7 @@ public class ImageInstanceServiceTests {
 
     @Test
     @WithMockUser("list_by_project_with_search_with_blind_mode")
-    void list_by_project_with_search_with_blind_mode() {
+    void listByProjectWithSearchWithBlindMode() {
         User user = builder.givenAUser("list_by_project_with_search_with_blind_mode");
         Project project = builder.givenAProject();
         builder.addUserToProject(project, user.getUsername(), BasePermission.WRITE);
@@ -548,7 +548,7 @@ public class ImageInstanceServiceTests {
 
 
     @Test
-    void list_all_image_ids_for_project() {
+    void listAllImageIdsForProject() {
         ImageInstance imageInstance1 = builder.givenAnImageInstance();
         builder.persistAndReturn(imageInstance1);
         ImageInstance imageInstance2 = builder.givenAnImageInstance();
@@ -560,7 +560,7 @@ public class ImageInstanceServiceTests {
     }
 
     @Test
-    void list_all_image_ids_for_project_ignore_nested_image() {
+    void listAllImageIdsForProjectIgnoreNestedImage() {
         ImageInstance imageInstance1 = builder.givenAnImageInstance();
         builder.persistAndReturn(imageInstance1);
         NestedImageInstance nestedImageInstance1 = builder.givenANestedImageInstance();
@@ -573,36 +573,36 @@ public class ImageInstanceServiceTests {
     }
 
     @Test
-    void list_images_with_tree_structure() {
+    void listImagesWithTreeStructure() {
         Project project = builder.givenAProject();
         assertThat(imageInstanceService.listTree(project, 0L, 0L)).isNotNull();
     }
 
     @Test
-    void get_image_intance_with_success() {
+    void getImageIntanceWithSuccess() {
         ImageInstance imageInstance = builder.givenAnImageInstance();
         assertThat(imageInstance).isEqualTo(imageInstanceService.get(imageInstance.getId()));
     }
 
     @Test
-    void get_unexisting_imageInstance_return_null() {
+    void getUnexistingImageInstanceReturnNull() {
         AssertionsForClassTypes.assertThat(imageInstanceService.get(0L)).isNull();
     }
 
     @Test
-    void find_imageInstance_with_success() {
+    void findImageInstanceWithSuccess() {
         ImageInstance imageInstance = builder.givenAnImageInstance();
         AssertionsForClassTypes.assertThat(imageInstanceService.find(imageInstance.getId()).isPresent());
         assertThat(imageInstance).isEqualTo(imageInstanceService.find(imageInstance.getId()).get());
     }
 
     @Test
-    void find_unexisting_imageInstance_return_empty() {
+    void findUnexistingImageInstanceReturnEmpty() {
         AssertionsForClassTypes.assertThat(imageInstanceService.find(0L)).isEmpty();
     }
 
     @Test
-    void find_next_image_intance_with_success() {
+    void findNextImageIntanceWithSuccess() {
         Project project = builder.givenAProject();
         ImageInstance imageInstance1 = builder.givenAnImageInstance(builder.givenAnAbstractImage(), project);
         ImageInstance imageInstance2 = builder.givenAnImageInstance(builder.givenAnAbstractImage(), project);
@@ -614,7 +614,7 @@ public class ImageInstanceServiceTests {
     }
 
     @Test
-    void find_previous_image_intance_with_success() {
+    void findPreviousImageIntanceWithSuccess() {
         Project project = builder.givenAProject();
         ImageInstance imageInstance1 = builder.givenAnImageInstance(builder.givenAnAbstractImage(), project);
         ImageInstance imageInstance2 = builder.givenAnImageInstance(builder.givenAnAbstractImage(), project);
@@ -626,7 +626,7 @@ public class ImageInstanceServiceTests {
     }
 
     @Test
-    void add_valid_image_instance_with_success() {
+    void addValidImageInstanceWithSuccess() {
         ImageInstance imageInstance = builder.givenANotPersistedImageInstance();
 
         CommandResponse commandResponse = imageInstanceService.add(imageInstance.toJsonObject());
@@ -638,7 +638,7 @@ public class ImageInstanceServiceTests {
     }
 
     @Test
-    void add_already_existing_image_instance_fails() {
+    void addAlreadyExistingImageInstanceFails() {
         ImageInstance imageInstance = builder.givenAnImageInstance();
         Assertions.assertThrows(
             AlreadyExistException.class,
@@ -647,7 +647,7 @@ public class ImageInstanceServiceTests {
     }
 
     @Test
-    void add_valid_image_instance_with_unexsting_abstract_image_fails() {
+    void addValidImageInstanceWithUnexstingAbstractImageFails() {
         ImageInstance imageInstance = builder.givenANotPersistedImageInstance(null, builder.givenAProject());
         Assertions.assertThrows(
             WrongArgumentException.class,
@@ -656,7 +656,7 @@ public class ImageInstanceServiceTests {
     }
 
     @Test
-    void edit_image_instance_with_success() {
+    void editImageInstanceWithSuccess() {
         Project project1 = builder.givenAProject();
         Project project2 = builder.givenAProject();
 
@@ -679,7 +679,7 @@ public class ImageInstanceServiceTests {
     }
 
     @Test
-    void edit_image_instance_magnification_no_impact_in_abstract_image() {
+    void editImageInstanceMagnificationNoImpactInAbstractImage() {
         ImageInstance imageInstance = builder.givenAnImageInstance();
         imageInstance.getBaseImage().setMagnification(10);
         builder.persistAndReturn(imageInstance.getBaseImage());
@@ -699,7 +699,7 @@ public class ImageInstanceServiceTests {
     }
 
     @Test
-    void edit_image_instance_resolution_modifies_user_annotation() {
+    void editImageInstanceResolutionModifiesUserAnnotation() {
         ImageInstance imageInstance = builder.givenAnImageInstance();
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         userAnnotation.setImage(imageInstance);
@@ -714,7 +714,7 @@ public class ImageInstanceServiceTests {
     }
 
     @Test
-    void edit_image_instance_resolution_modifies_reviewed_annotation() {
+    void editImageInstanceResolutionModifiesReviewedAnnotation() {
         ImageInstance imageInstance = builder.givenAnImageInstance();
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         reviewedAnnotation.setImage(imageInstance);
@@ -729,7 +729,7 @@ public class ImageInstanceServiceTests {
     }
 
     @Test
-    void edit_image_instance_with_unexsting_abstract_image_fails() {
+    void editImageInstanceWithUnexstingAbstractImageFails() {
         ImageInstance imageInstance = builder.givenAnImageInstance();
         Assertions.assertThrows(
             WrongArgumentException.class,
@@ -738,7 +738,7 @@ public class ImageInstanceServiceTests {
     }
 
     @Test
-    void edit_image_instance_with_unexsting_project_fails() {
+    void editImageInstanceWithUnexstingProjectFails() {
         ImageInstance imageInstance = builder.givenAnImageInstance();
         Assertions.assertThrows(
             WrongArgumentException.class,
@@ -748,7 +748,7 @@ public class ImageInstanceServiceTests {
 
 
     @Test
-    void delete_image_instance_with_success() {
+    void deleteImageInstanceWithSuccess() {
         ImageInstance imageInstance = builder.givenAnImageInstance();
 
         CommandResponse commandResponse = imageInstanceService.delete(imageInstance, null, null, true);
@@ -759,7 +759,7 @@ public class ImageInstanceServiceTests {
     }
 
     @Test
-    void delete_image_instance_with_dependencies_with_success() {
+    void deleteImageInstanceWithDependenciesWithSuccess() {
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
 
@@ -828,7 +828,7 @@ public class ImageInstanceServiceTests {
 
 
     @Test
-    void project_counter() {
+    void projectCounter() {
         Project project = builder.givenAProject();
 
         entityManager.refresh(project);
@@ -847,7 +847,7 @@ public class ImageInstanceServiceTests {
     }
 
     @Test
-    void start_image_reviewing() {
+    void startImageReviewing() {
         ImageInstance imageInstance = builder.givenAnImageInstance();
         assertThat(imageInstance.getReviewStart()).isNull();
         assertThat(imageInstance.getReviewStop()).isNull();
@@ -860,7 +860,7 @@ public class ImageInstanceServiceTests {
     }
 
     @Test
-    void stop_image_reviewing() {
+    void stopImageReviewing() {
         ImageInstance imageInstance = builder.givenAnImageInstance();
         imageInstanceService.startReview(imageInstance);
         imageInstanceService.stopReview(imageInstance, false);
@@ -870,7 +870,7 @@ public class ImageInstanceServiceTests {
     }
 
     @Test
-    void stop_image_reviewing_with_cancel() {
+    void stopImageReviewingWithCancel() {
         ImageInstance imageInstance = builder.givenAnImageInstance();
         imageInstanceService.startReview(imageInstance);
         imageInstanceService.stopReview(imageInstance, true);

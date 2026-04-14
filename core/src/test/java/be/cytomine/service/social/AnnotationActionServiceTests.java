@@ -62,7 +62,7 @@ public class AnnotationActionServiceTests {
     }
 
     @Test
-    public void add_action_for_annotation() {
+    public void addActionForAnnotation() {
         assertThat(annotationActionRepository.count()).isEqualTo(0);
         givenAPersistentAnnotationAction(
             new Date(),
@@ -74,7 +74,7 @@ public class AnnotationActionServiceTests {
     }
 
     @Test
-    public void list_by_slice() {
+    public void listBySlice() {
         AnnotationDomain annotationDomain = builder.givenAUserAnnotation();
 
         assertThat(annotationActionService.list(annotationDomain.getSlice(), null, null, null))
@@ -108,7 +108,7 @@ public class AnnotationActionServiceTests {
     }
 
     @Test
-    public void list_by_image() {
+    public void listByImage() {
         AnnotationDomain annotationDomain = builder.givenAUserAnnotation();
 
         assertThat(annotationActionService.list(annotationDomain.getImage(), null, null, null))
@@ -144,7 +144,7 @@ public class AnnotationActionServiceTests {
     }
 
     @Test
-    void total_annotation_action_by_project_count() {
+    void totalAnnotationActionByProjectCount() {
         User user1 = builder.givenSuperAdmin();
         AnnotationDomain annotationDomain = builder.givenAUserAnnotation();
 

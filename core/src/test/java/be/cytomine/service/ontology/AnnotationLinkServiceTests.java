@@ -36,24 +36,24 @@ public class AnnotationLinkServiceTests {
     AnnotationLinkService annotationLinkService;
 
     @Test
-    void find_annotation_link_with_success() {
+    void findAnnotationLinkWithSuccess() {
         AnnotationLink annotationLink = builder.givenAnAnnotationLink();
         AssertionsForClassTypes.assertThat(annotationLinkService.find(annotationLink.getId()).isPresent());
         assertThat(annotationLink).isEqualTo(annotationLinkService.find(annotationLink.getId()).get());
     }
 
     @Test
-    void find_non_existing_annotation_link_return_empty() {
+    void findNonExistingAnnotationLinkReturnEmpty() {
         AssertionsForClassTypes.assertThat(annotationLinkService.find(0L)).isEmpty();
     }
 
     @Test
-    void get_non_existing_annotation_link_return_null() {
+    void getNonExistingAnnotationLinkReturnNull() {
         AssertionsForClassTypes.assertThat(annotationLinkService.get(0L)).isNull();
     }
 
     @Test
-    void list_annotation_link_by_annotation_group() {
+    void listAnnotationLinkByAnnotationGroup() {
         Project project = builder.givenAProject();
         AnnotationGroup annotationGroup = builder.givenAnAnnotationGroup(
             project,
@@ -85,7 +85,7 @@ public class AnnotationLinkServiceTests {
     }
 
     @Test
-    void add_valid_annotation_link_with_success() {
+    void addValidAnnotationLinkWithSuccess() {
         AnnotationLink annotationLink = builder.givenANotPersistedAnnotationLink();
 
         CommandResponse commandResponse = annotationLinkService.add(annotationLink.toJsonObject());
@@ -96,7 +96,7 @@ public class AnnotationLinkServiceTests {
     }
 
     @Test
-    void delete_annotation_link_with_success() {
+    void deleteAnnotationLinkWithSuccess() {
         AnnotationLink annotationLink = builder.givenAnAnnotationLink();
 
         CommandResponse commandResponse = annotationLinkService.delete(annotationLink, null, null, true);

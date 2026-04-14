@@ -63,7 +63,7 @@ public class RelationTermServiceTests {
     CommandService commandService;
 
     @Test
-    void find_relation_term_with_success() {
+    void findRelationTermWithSuccess() {
         RelationTerm relationTerm = builder.givenARelationTerm();
         Optional<RelationTerm> result = relationTermService.find(
             relationTerm.getRelation(),
@@ -75,7 +75,7 @@ public class RelationTermServiceTests {
     }
 
     @Test
-    void find_unexisting_relation_term_return_empty() {
+    void findUnexistingRelationTermReturnEmpty() {
         assertThat(relationTermService.find(
             builder.givenARelation(),
             builder.givenATerm(),
@@ -84,7 +84,7 @@ public class RelationTermServiceTests {
     }
 
     @Test
-    void list_relation_by_term() {
+    void listRelationByTerm() {
         Term parent = builder.givenATerm();
         Term child1 = builder.givenATerm(parent.getOntology());
         Term child2 = builder.givenATerm(parent.getOntology());
@@ -97,7 +97,7 @@ public class RelationTermServiceTests {
     }
 
     @Test
-    void list_relation_by_term_and_position() {
+    void listRelationByTermAndPosition() {
         Term parent = builder.givenATerm();
         Term child1 = builder.givenATerm(parent.getOntology());
         Term child2 = builder.givenATerm(parent.getOntology());
@@ -112,7 +112,7 @@ public class RelationTermServiceTests {
     }
 
     @Test
-    void add_valid_relation_term_with_success() {
+    void addValidRelationTermWithSuccess() {
         Term parent = builder.givenATerm();
         Term child1 = builder.givenATerm(parent.getOntology());
         RelationTerm parentRelationTerm =
@@ -129,7 +129,7 @@ public class RelationTermServiceTests {
     }
 
     @Test
-    void add_relation_term_with_null_term_fail() {
+    void addRelationTermWithNullTermFail() {
         Term parent = builder.givenATerm();
         RelationTerm parentRelationTerm =
             basicInstanceBuilder.givenANotPersistedRelationTerm(
@@ -144,7 +144,7 @@ public class RelationTermServiceTests {
     }
 
     @Test
-    void undo_redo_term_creation_with_success() {
+    void undoRedoTermCreationWithSuccess() {
         Term parent = builder.givenATerm();
         Term child1 = builder.givenATerm(parent.getOntology());
         RelationTerm parentRelationTerm = builder.givenANotPersistedRelationTerm(
@@ -166,7 +166,7 @@ public class RelationTermServiceTests {
     }
 
     @Test
-    void delete_relation_term_with_success() {
+    void deleteRelationTermWithSuccess() {
         Term parent = builder.givenATerm();
         Term child1 = builder.givenATerm(parent.getOntology());
         RelationTerm parentRelationTerm = builder.givenARelationTerm(parent, child1);
@@ -179,7 +179,7 @@ public class RelationTermServiceTests {
     }
 
     @Test
-    void undo_redo_term_deletion_with_success() {
+    void undoRedoTermDeletionWithSuccess() {
         Term parent = builder.givenATerm();
         Term child1 = builder.givenATerm(parent.getOntology());
         RelationTerm parentRelationTerm = builder.givenARelationTerm(parent, child1);

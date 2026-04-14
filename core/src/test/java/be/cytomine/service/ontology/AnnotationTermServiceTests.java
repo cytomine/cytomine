@@ -66,7 +66,7 @@ public class AnnotationTermServiceTests {
     CommandService commandService;
 
     @Test
-    void find_annotation_term_with_success() {
+    void findAnnotationTermWithSuccess() {
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm();
         Optional<AnnotationTerm> result = annotationTermService.find(
             annotationTerm.getUserAnnotation(),
@@ -78,7 +78,7 @@ public class AnnotationTermServiceTests {
     }
 
     @Test
-    void list_annotation_term_for_annotation_with_success() {
+    void listAnnotationTermForAnnotationWithSuccess() {
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm();
         AnnotationTerm annotationTermFromAnotherAnnotation = builder.givenAnAnnotationTerm();
 
@@ -87,7 +87,7 @@ public class AnnotationTermServiceTests {
     }
 
     @Test
-    void list_annotation_term_for_project_with_success() {
+    void listAnnotationTermForProjectWithSuccess() {
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm();
         AnnotationTerm annotationTermFromAnotherProject = builder.givenAnAnnotationTerm();
 
@@ -96,7 +96,7 @@ public class AnnotationTermServiceTests {
     }
 
     @Test
-    void list_annotation_term_not_defined_by_user() {
+    void listAnnotationTermNotDefinedByUser() {
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm();
 
         assertThat(annotationTermService.listAnnotationTermNotDefinedByUser(
@@ -111,7 +111,7 @@ public class AnnotationTermServiceTests {
     }
 
     @Test
-    void add_valid_annotation_term_with_success() {
+    void addValidAnnotationTermWithSuccess() {
         AnnotationTerm annotationTerm = builder.givenANotPersistedAnnotationTerm(
             builder.givenAUserAnnotation()
         );
@@ -141,7 +141,7 @@ public class AnnotationTermServiceTests {
     }
 
     @Test
-    void add_annotation_term_fails_if_already_exists_for_same_user() {
+    void addAnnotationTermFailsIfAlreadyExistsForSameUser() {
         AnnotationTerm annotationTerm = builder.givenANotPersistedAnnotationTerm(
             builder.givenAUserAnnotation()
         );
@@ -153,7 +153,7 @@ public class AnnotationTermServiceTests {
     }
 
     @Test
-    void add_valid_annotation_term_with_direct_method_success() {
+    void addValidAnnotationTermWithDirectMethodSuccess() {
         AnnotationTerm annotationTerm = builder.givenANotPersistedAnnotationTerm(
             builder.givenAUserAnnotation()
         );
@@ -170,7 +170,7 @@ public class AnnotationTermServiceTests {
     }
 
     @Test
-    void add_annotation_term_fails_if_term_is_from_other_ontology() {
+    void addAnnotationTermFailsIfTermIsFromOtherOntology() {
         AnnotationTerm annotationTerm = builder.givenANotPersistedAnnotationTerm(
             builder.givenAUserAnnotation()
         );
@@ -182,7 +182,7 @@ public class AnnotationTermServiceTests {
     }
 
     @Test
-    void add_valid_annotation_term_and_delete_other_terms() {
+    void addValidAnnotationTermAndDeleteOtherTerms() {
         UserAnnotation annotation = builder.givenAUserAnnotation();
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm(annotation);
         Term oldTerm = annotationTerm.getTerm();
@@ -217,7 +217,7 @@ public class AnnotationTermServiceTests {
     }
 
     @Test
-    void add_valid_annotation_term_and_delete_other_terms_no_impact_for_terms_added_by_other_user() {
+    void addValidAnnotationTermAndDeleteOtherTermsNoImpactForTermsAddedByOtherUser() {
         UserAnnotation annotation = builder.givenAUserAnnotation();
         AnnotationTerm annotationTerm = builder.givenANotPersistedAnnotationTerm(annotation);
         annotationTerm.setUser(builder.givenAUser());
@@ -241,7 +241,7 @@ public class AnnotationTermServiceTests {
     }
 
     @Test
-    void add_valid_annotation_term_and_delete_other_terms_with_force_for_terms_added_by_other() {
+    void addValidAnnotationTermAndDeleteOtherTermsWithForceForTermsAddedByOther() {
         UserAnnotation annotation = builder.givenAUserAnnotation();
         AnnotationTerm annotationTerm = builder.givenANotPersistedAnnotationTerm(annotation);
         annotationTerm.setUser(builder.givenAUser());
@@ -264,7 +264,7 @@ public class AnnotationTermServiceTests {
     }
 
     @Test
-    void add_valid_annotation_term_and_delete_other_terms_for_reviewed_annotation() {
+    void addValidAnnotationTermAndDeleteOtherTermsForReviewedAnnotation() {
         ReviewedAnnotation annotation = builder.givenAReviewedAnnotation();
         Term oldTerm = builder.givenATerm(annotation.getProject().getOntology());
         annotation.getTerms().add(oldTerm);
@@ -281,7 +281,7 @@ public class AnnotationTermServiceTests {
     }
 
     @Test
-    void add_annotation_term_fails_if_annotation_does_not_exists() {
+    void addAnnotationTermFailsIfAnnotationDoesNotExists() {
         AnnotationTerm annotationTerm = builder.givenANotPersistedAnnotationTerm(
             builder.givenAUserAnnotation()
         );
@@ -291,7 +291,7 @@ public class AnnotationTermServiceTests {
     }
 
     @Test
-    void add_annotation_term_fails_if_term_does_not_exists() {
+    void addAnnotationTermFailsIfTermDoesNotExists() {
         AnnotationTerm annotationTerm = builder.givenANotPersistedAnnotationTerm(
             builder.givenAUserAnnotation()
         );
@@ -301,7 +301,7 @@ public class AnnotationTermServiceTests {
     }
 
     @Test
-    void delete_annotation_term_with_success() {
+    void deleteAnnotationTermWithSuccess() {
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm(builder.givenAUserAnnotation());
 
         CommandResponse commandResponse = annotationTermService.delete(annotationTerm, null, null, true);

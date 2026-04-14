@@ -37,27 +37,27 @@ public class ImageFilterProjectServiceTests {
     BasicInstanceBuilder builder;
 
     @Test
-    public void find_image_filter_project_with_success() {
+    public void findImageFilterProjectWithSuccess() {
         ImageFilterProject imageFilterProject = builder.givenAnImageFilterProject();
         assertThat(imageFilterProjectService.find(imageFilterProject.getImageFilter(), imageFilterProject.getProject()))
             .isPresent();
     }
 
     @Test
-    public void find_unexisting_image_filter_project_return_empty() {
+    public void findUnexistingImageFilterProjectReturnEmpty() {
         ImageFilterProject imageFilterProject = builder.givenAnImageFilterProject();
         assertThat(imageFilterProjectService.find(imageFilterProject.getImageFilter(), builder.givenAProject()))
             .isEmpty();
     }
 
     @Test
-    public void list_all_image_filter_project() {
+    public void listAllImageFilterProject() {
         ImageFilterProject imageFilterProject = builder.givenAnImageFilterProject();
         assertThat(imageFilterProjectService.list()).contains(imageFilterProject);
     }
 
     @Test
-    public void list_all_image_filter_project_by_project() {
+    public void listAllImageFilterProjectByProject() {
         ImageFilterProject imageFilterProject = builder.givenAnImageFilterProject();
         ImageFilterProject imageFilterProjectForAnotherProject = builder.givenAnImageFilterProject();
         assertThat(imageFilterProjectService.list(imageFilterProject.getProject()))
@@ -65,7 +65,7 @@ public class ImageFilterProjectServiceTests {
     }
 
     @Test
-    public void add_valid_image_filter_project_with_success() {
+    public void addValidImageFilterProjectWithSuccess() {
         ImageFilterProject imageFilterProject =
             builder.givenANotPersistedImageFilterProject(
                 builder.givenAnImageFilter(),
@@ -78,7 +78,7 @@ public class ImageFilterProjectServiceTests {
 
 
     @Test
-    public void add_already_existing_image_filter_project() {
+    public void addAlreadyExistingImageFilterProject() {
         ImageFilterProject imageFilterProject =
             builder.givenANotPersistedImageFilterProject(
                 builder.givenAnImageFilter(),
@@ -94,7 +94,7 @@ public class ImageFilterProjectServiceTests {
     }
 
     @Test
-    public void add_image_filter_with_unexisting_project_return_error() {
+    public void addImageFilterWithUnexistingProjectReturnError() {
         ImageFilterProject imageFilterProject =
             builder.givenANotPersistedImageFilterProject(
                 builder.givenAnImageFilter(),
@@ -108,7 +108,7 @@ public class ImageFilterProjectServiceTests {
     }
 
     @Test
-    public void add_image_filter_with_unexisting_image_filter_return_error() {
+    public void addImageFilterWithUnexistingImageFilterReturnError() {
         ImageFilterProject imageFilterProject =
             builder.givenANotPersistedImageFilterProject(
                 builder.givenANotPersistedImageFilter(),
@@ -122,7 +122,7 @@ public class ImageFilterProjectServiceTests {
     }
 
     @Test
-    void delete_projectRepresentativeUser_with_success() {
+    void deleteProjectRepresentativeUserWithSuccess() {
         ImageFilterProject imageFilterProject = builder.givenAnImageFilterProject();
         CommandResponse commandResponse = imageFilterProjectService.delete(imageFilterProject, null, null, true);
 

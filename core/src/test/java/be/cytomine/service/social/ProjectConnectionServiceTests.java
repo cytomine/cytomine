@@ -70,7 +70,7 @@ public class ProjectConnectionServiceTests {
     }
 
     @Test
-    void creation_and_close() {
+    void creationAndClose() {
         User user = builder.givenSuperAdmin();
         Project projet = builder.givenAProject();
         Date before = new Date(new Date().getTime() - 1000);
@@ -107,7 +107,7 @@ public class ProjectConnectionServiceTests {
     }
 
     @Test
-    void find_last_user_connection_in_project() {
+    void findLastUserConnectionInProject() {
         Project projet = builder.givenAProject();
         User user = builder.givenSuperAdmin();
         User anotherUser = builder.givenAUser();
@@ -143,7 +143,7 @@ public class ProjectConnectionServiceTests {
     }
 
     @Test
-    void find_last_users_connection_in_project() {
+    void findLastUsersConnectionInProject() {
 
 
         Project projet = builder.givenAProject();
@@ -263,7 +263,7 @@ public class ProjectConnectionServiceTests {
     }
 
     @Test
-    void find_last_connections_of_users_in_project() {
+    void findLastConnectionsOfUsersInProject() {
         Project project = builder.givenAProject();
         User user = builder.givenSuperAdmin();
         User anotherUser = builder.givenAUser();
@@ -284,7 +284,7 @@ public class ProjectConnectionServiceTests {
     }
 
     @Test
-    void fill_project_connection_update_annotations_counter() {
+    void fillProjectConnectionUpdateAnnotationsCounter() {
         Project projet = builder.givenAProject();
         User user = builder.givenSuperAdmin();
 
@@ -321,7 +321,7 @@ public class ProjectConnectionServiceTests {
     }
 
     @Test
-    void fill_project_connection_update_image_counter() {
+    void fillProjectConnectionUpdateImageCounter() {
         Project projet = builder.givenAProject();
         User user = builder.givenSuperAdmin();
         ImageInstance imageInstance1 = builder.givenAnImageInstance(projet);
@@ -359,7 +359,7 @@ public class ProjectConnectionServiceTests {
     }
 
     @Test
-    void get_connection_by_user_and_project() {
+    void getConnectionByUserAndProject() {
         Project projet = builder.givenAProject();
         User user = builder.givenSuperAdmin();
         User anotherUser = builder.givenAUser();
@@ -386,7 +386,7 @@ public class ProjectConnectionServiceTests {
     }
 
     @Test
-    void number_of_connections_by_project_and_user() {
+    void numberOfConnectionsByProjectAndUser() {
         Project projet = builder.givenAProject();
         User user = builder.givenSuperAdmin();
         User anotherUser = builder.givenAUser();
@@ -408,7 +408,7 @@ public class ProjectConnectionServiceTests {
     }
 
     @Test
-    void number_of_connections_by_project_and_users() {
+    void numberOfConnectionsByProjectAndUsers() {
         Project projet = builder.givenAProject();
         User user = builder.givenSuperAdmin();
         User anotherUser = builder.givenAUser();
@@ -465,7 +465,7 @@ public class ProjectConnectionServiceTests {
     }
 
     @Test
-    void number_of_connections_by_project_and_users_fill_empty_users() {
+    void numberOfConnectionsByProjectAndUsersFillEmptyUsers() {
         Project projet = builder.givenAProject();
         User user = builder.givenSuperAdmin();
         User anotherUser = builder.givenAUser();
@@ -527,7 +527,7 @@ public class ProjectConnectionServiceTests {
     }
 
     @Test
-    void total_number_of_connections_by_project() {
+    void totalNumberOfConnectionsByProject() {
         Project projet = builder.givenAProject();
         User user = builder.givenSuperAdmin();
         User anotherUser = builder.givenAUser();
@@ -548,7 +548,7 @@ public class ProjectConnectionServiceTests {
     }
 
     @Test
-    void number_of_connections_by_project_ordered_by_hour_and_days() throws ParseException {
+    void numberOfConnectionsByProjectOrderedByHourAndDays() throws ParseException {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         Project projet = builder.givenAProject();
         User user = builder.givenSuperAdmin();
@@ -596,7 +596,7 @@ public class ProjectConnectionServiceTests {
     }
 
     @Test
-    void total_number_of_connections_by_project_with_dates() {
+    void totalNumberOfConnectionsByProjectWithDates() {
         Project projet = builder.givenAProject();
         User user = builder.givenSuperAdmin();
         User anotherUser = builder.givenAUser();
@@ -631,7 +631,7 @@ public class ProjectConnectionServiceTests {
 
 
     @Test
-    void number_of_connections_by_project_ordered_by_period() throws ParseException {
+    void numberOfConnectionsByProjectOrderedByPeriod() throws ParseException {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
         Project projet = builder.givenAProject();
@@ -666,7 +666,7 @@ public class ProjectConnectionServiceTests {
     }
 
     @Test
-    void average_connections_by_project_ordered_by_period() throws ParseException {
+    void averageConnectionsByProjectOrderedByPeriod() throws ParseException {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
         Project projet = builder.givenAProject();
@@ -749,7 +749,7 @@ public class ProjectConnectionServiceTests {
     }
 
     @Test
-    void get_user_activity_details() {
+    void getUserActivityDetails() {
         Project projet = builder.givenAProject();
         User user = builder.givenSuperAdmin();
         ImageInstance imageInstance1 = builder.givenAnImageInstance(projet);

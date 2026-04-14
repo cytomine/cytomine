@@ -45,7 +45,7 @@ public class StorageAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list_storages() {
+    public void adminCanListStorages() {
         assertThat(storageService.list()).contains(storage);
         Storage anotherStorage = builder.givenAStorage();
         assertThat(storageService.list()).contains(anotherStorage);
@@ -53,7 +53,7 @@ public class StorageAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_list_all_storages() {
+    public void userCannotListAllStorages() {
         expectOK(() -> storageService.list());
         Storage anotherStorage = builder.givenAStorage();
         assertThat(storageService.list()).doesNotContain(anotherStorage);

@@ -169,7 +169,7 @@ public class UserAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void list_annotations_light() throws Exception {
+    public void listAnnotationsLight() throws Exception {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         restUserAnnotationControllerMockMvc.perform(get("/api/userannotation.json", userAnnotation.getId()))
             .andExpect(status().isOk())
@@ -179,7 +179,7 @@ public class UserAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void count_annotations_by_user() throws Exception {
+    public void countAnnotationsByUser() throws Exception {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         restUserAnnotationControllerMockMvc.perform(get(
                 "/api/user/{idUser}/userannotation/count.json",
@@ -199,7 +199,7 @@ public class UserAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void count_annotations_by_project() throws Exception {
+    public void countAnnotationsByProject() throws Exception {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         restUserAnnotationControllerMockMvc.perform(get(
                 "/api/user/{idUser}/userannotation/count.json",
@@ -222,7 +222,7 @@ public class UserAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void count_annotations_by_project_with_dates() throws Exception {
+    public void countAnnotationsByProjectWithDates() throws Exception {
         UserAnnotation oldUserAnnotation = builder.givenAUserAnnotation();
         oldUserAnnotation.setCreated(DateUtils.addDays(new Date(), -1));
 
@@ -283,7 +283,7 @@ public class UserAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void download_user_annotation_csv_document() throws Exception {
+    public void downloadUserAnnotationCsvDocument() throws Exception {
         buildDownloadContext();
         MvcResult mvcResult = performDownload("csv");
         checkResult(";", mvcResult);
@@ -291,7 +291,7 @@ public class UserAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void download_user_annotation_xls_document() throws Exception {
+    public void downloadUserAnnotationXlsDocument() throws Exception {
         buildDownloadContext();
         MvcResult mvcResult = performDownload("xls");
         checkXLSResult(mvcResult);
@@ -299,7 +299,7 @@ public class UserAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void download_user_annotation_pdf_document() throws Exception {
+    public void downloadUserAnnotationPdfDocument() throws Exception {
         buildDownloadContext();
         restAnnotationDomainControllerMockMvc.perform(get(
                 "/api/project/{project}/userannotation/download",
@@ -372,7 +372,7 @@ public class UserAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void add_valid_user_annotation() throws Exception {
+    public void addValidUserAnnotation() throws Exception {
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation();
 
         restUserAnnotationControllerMockMvc.perform(post("/api/userannotation.json")
@@ -390,7 +390,7 @@ public class UserAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void add_user_annotation_with_not_valid_location() throws Exception {
+    public void addUserAnnotationWithNotValidLocation() throws Exception {
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation();
         JsonObject jsonObject = userAnnotation.toJsonObject();
         jsonObject.put(
@@ -405,7 +405,7 @@ public class UserAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void add_valid_user_annotation_without_project() throws Exception {
+    public void addValidUserAnnotationWithoutProject() throws Exception {
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation();
         JsonObject jsonObject = userAnnotation.toJsonObject();
         jsonObject.remove("project");
@@ -420,7 +420,7 @@ public class UserAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void add_valid_user_annotation_with_terms() throws Exception {
+    public void addValidUserAnnotationWithTerms() throws Exception {
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation();
 
         Term term1 = builder.givenATerm(userAnnotation.getProject().getOntology());
@@ -438,7 +438,7 @@ public class UserAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void edit_valid_user_annotation() throws Exception {
+    public void editValidUserAnnotation() throws Exception {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         restUserAnnotationControllerMockMvc.perform(put("/api/userannotation/{id}.json", userAnnotation.getId())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -456,7 +456,7 @@ public class UserAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void delete_user_annotation() throws Exception {
+    public void deleteUserAnnotation() throws Exception {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
 
         restUserAnnotationControllerMockMvc.perform(delete("/api/userannotation/{id}.json", userAnnotation.getId())
@@ -476,7 +476,7 @@ public class UserAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void delete_user_annotation_not_exist_fails() throws Exception {
+    public void deleteUserAnnotationNotExistFails() throws Exception {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         restUserAnnotationControllerMockMvc.perform(delete("/api/userannotation/{id}.json", 0)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -491,7 +491,7 @@ public class UserAnnotationResourceTests {
     @Disabled("Randomly fail with ProxyExchange, need to find a solution")
     @Test
     @jakarta.transaction.Transactional
-    public void get_user_annotation_crop() throws Exception {
+    public void getUserAnnotationCrop() throws Exception {
         UserAnnotation annotation = givenAUserAnnotationWithValidImageServer(builder);
 
         configureFor("localhost", 8888);
@@ -528,7 +528,7 @@ public class UserAnnotationResourceTests {
     @Disabled("Randomly fail with ProxyExchange, need to find a solution")
     @Test
     @jakarta.transaction.Transactional
-    public void get_user_annotation_crop_mask() throws Exception {
+    public void getUserAnnotationCropMask() throws Exception {
         UserAnnotation annotation = givenAUserAnnotationWithValidImageServer(builder);
 
         configureFor("localhost", 8888);
@@ -566,7 +566,7 @@ public class UserAnnotationResourceTests {
     @Disabled("Randomly fail with ProxyExchange, need to find a solution")
     @Test
     @jakarta.transaction.Transactional
-    public void get_user_annotation_alpha_mask() throws Exception {
+    public void getUserAnnotationAlphaMask() throws Exception {
         UserAnnotation annotation = givenAUserAnnotationWithValidImageServer(builder);
 
         configureFor("localhost", 8888);
@@ -623,7 +623,7 @@ public class UserAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void create_comments_for_annotation() throws Exception {
+    public void createCommentsForAnnotation() throws Exception {
         SharedAnnotation annotation = builder.givenASharedAnnotation();
 
         JsonObject jsonObject = annotation.toJsonObject();
@@ -648,7 +648,7 @@ public class UserAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void get_comment_for_annotation() throws Exception {
+    public void getCommentForAnnotation() throws Exception {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         SharedAnnotation comment = builder.givenASharedAnnotation(userAnnotation);
 
@@ -663,7 +663,7 @@ public class UserAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void list_comment_for_annotation() throws Exception {
+    public void listCommentForAnnotation() throws Exception {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         SharedAnnotation comment = builder.givenASharedAnnotation(userAnnotation);
 
@@ -677,7 +677,7 @@ public class UserAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void list_comment_for_annotation_with_pagination() throws Exception {
+    public void listCommentForAnnotationWithPagination() throws Exception {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         builder.givenASharedAnnotation(userAnnotation);
         builder.givenASharedAnnotation(userAnnotation);

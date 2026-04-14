@@ -54,7 +54,7 @@ public class TaskControllerTests {
     @Test
     @Transactional
     @WithMockUser(username = "superadmin")
-    public void task_workflow() throws Exception {
+    public void taskWorkflow() throws Exception {
         Project project = builder.givenAProject();
         MvcResult response = restCommandControllerMockMvc.perform(post("/api/task.json")
                 .contentType(MediaType.APPLICATION_JSON)

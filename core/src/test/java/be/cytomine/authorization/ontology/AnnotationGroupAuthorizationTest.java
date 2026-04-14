@@ -98,38 +98,38 @@ public class AnnotationGroupAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list_annotation_group_by_project() {
+    public void adminCanListAnnotationGroupByProject() {
         assertThat(annotationGroupService.list(annotationGroup.getProject())).contains(annotationGroup);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_list_annotation_group_by_project() {
+    public void userCanListAnnotationGroupByProject() {
         assertThat(annotationGroupService.list(annotationGroup.getProject())).contains(annotationGroup);
     }
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list_annotation_group_by_image_group() {
+    public void adminCanListAnnotationGroupByImageGroup() {
         assertThat(annotationGroupService.list(annotationGroup.getImageGroup())).contains(annotationGroup);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_list_annotation_group_by_image_group() {
+    public void userCanListAnnotationGroupByImageGroup() {
         assertThat(annotationGroupService.list(annotationGroup.getImageGroup())).contains(annotationGroup);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void user_admin_can_add_in_readonly_mode() {
+    public void userAdminCanAddInReadonlyMode() {
         annotationGroup.getProject().setMode(EditingMode.READ_ONLY);
         expectOK(this::whenIAddDomain);
     }
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_update_annotation_group_in_restricted_project() {
+    public void adminCanUpdateAnnotationGroupInRestrictedProject() {
         AnnotationGroup annotationGroup = builder.givenAnAnnotationGroup();
         annotationGroup.getProject().setMode(EditingMode.RESTRICTED);
         expectOK(this::whenIGetDomain);
@@ -139,7 +139,7 @@ public class AnnotationGroupAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_update_annotation_group_in_classic_project() {
+    public void userCanUpdateAnnotationGroupInClassicProject() {
         AnnotationGroup annotationGroup = builder.givenAnAnnotationGroup();
         annotationGroup.getProject().setMode(EditingMode.CLASSIC);
         expectOK(this::whenIGetDomain);
@@ -149,7 +149,7 @@ public class AnnotationGroupAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void user_admin_can_delete_in_readonly_mode() {
+    public void userAdminCanDeleteInReadonlyMode() {
         annotationGroup.getProject().setMode(EditingMode.READ_ONLY);
         expectOK(this::whenIDeleteDomain);
     }

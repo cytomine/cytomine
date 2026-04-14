@@ -55,7 +55,7 @@ public class SliceCoordinatesServiceTests {
     SliceCoordinatesService sliceCoordinatesService;
 
     @Test
-    public void get_slice_coordinates_are_ordered() {
+    public void getSliceCoordinatesAreOrdered() {
         AbstractImage image = builder.givenAnAbstractImage();
 
         List<Integer> channels = new ArrayList<>(Arrays.asList(1, 2, 3));
@@ -77,7 +77,7 @@ public class SliceCoordinatesServiceTests {
 
 
     @Test
-    public void get_slice_coordinates_reference() {
+    public void getSliceCoordinatesReference() {
         AbstractImage image = builder.givenAnAbstractImage();
 
         List<Integer> channels = new ArrayList<>(Arrays.asList(1, 2, 3));
@@ -95,7 +95,7 @@ public class SliceCoordinatesServiceTests {
 
 
     @Test
-    public void get_reference_slice() {
+    public void getReferenceSlice() {
         AbstractImage image = builder.givenAnAbstractImage();
 
         List<Integer> channels = new ArrayList<>(Arrays.asList(1, 2, 3));

@@ -56,19 +56,19 @@ public class ProjectRepresentativeServiceTests {
     BasicInstanceBuilder builder;
 
     @Test
-    void get_projectRepresentativeUser_with_success() {
+    void getProjectRepresentativeUserWithSuccess() {
         ProjectRepresentativeUser projectRepresentativeUser = builder.givenAProjectRepresentativeUser();
         assertThat(projectRepresentativeUser)
             .isEqualTo(projectRepresentativeUserService.get(projectRepresentativeUser.getId()));
     }
 
     @Test
-    void get_unexisting_projectRepresentativeUser_return_null() {
+    void getUnexistingProjectRepresentativeUserReturnNull() {
         assertThat(projectRepresentativeUserService.get(0L)).isNull();
     }
 
     @Test
-    void find_projectRepresentativeUser_with_success() {
+    void findProjectRepresentativeUserWithSuccess() {
         ProjectRepresentativeUser projectRepresentativeUser = builder.givenAProjectRepresentativeUser();
         assertThat(projectRepresentativeUserService.find(projectRepresentativeUser.getId()).isPresent());
         assertThat(projectRepresentativeUser)
@@ -76,12 +76,12 @@ public class ProjectRepresentativeServiceTests {
     }
 
     @Test
-    void find_unexisting_projectRepresentativeUser_return_empty() {
+    void findUnexistingProjectRepresentativeUserReturnEmpty() {
         assertThat(projectRepresentativeUserService.find(0L)).isEmpty();
     }
 
     @Test
-    void find_projectRepresentativeUser_with_project_and_user_with_success() {
+    void findProjectRepresentativeUserWithProjectAndUserWithSuccess() {
         ProjectRepresentativeUser projectRepresentativeUser = builder.givenAProjectRepresentativeUser();
         assertThat(projectRepresentativeUserService.find(
             projectRepresentativeUser.getProject(),
@@ -94,7 +94,7 @@ public class ProjectRepresentativeServiceTests {
     }
 
     @Test
-    void find_unexisting_projectRepresentativeUser_with_project_and_user_return_empty() {
+    void findUnexistingProjectRepresentativeUserWithProjectAndUserReturnEmpty() {
         assertThat(projectRepresentativeUserService.find(
             builder.givenAProject(),
             builder.givenSuperAdmin()
@@ -103,7 +103,7 @@ public class ProjectRepresentativeServiceTests {
 
 
     @Test
-    void list_all_projectRepresentativeUser_by_project_with_success() {
+    void listAllProjectRepresentativeUserByProjectWithSuccess() {
         ProjectRepresentativeUser projectRepresentativeUser = builder.givenAProjectRepresentativeUser();
         ProjectRepresentativeUser
             projectRepresentativeUserFromAnotherProject
@@ -115,7 +115,7 @@ public class ProjectRepresentativeServiceTests {
     }
 
     @Test
-    void add_valid_projectRepresentativeUser_with_success() {
+    void addValidProjectRepresentativeUserWithSuccess() {
         ProjectRepresentativeUser
             projectRepresentativeUser
             = builder.givenANotPersistedProjectRepresentativeUser();
@@ -133,7 +133,7 @@ public class ProjectRepresentativeServiceTests {
     }
 
     @Test
-    void add_projectRepresentativeUser_with_bad_project() {
+    void addProjectRepresentativeUserWithBadProject() {
         ProjectRepresentativeUser
             projectRepresentativeUser
             = builder.givenANotPersistedProjectRepresentativeUser();
@@ -146,7 +146,7 @@ public class ProjectRepresentativeServiceTests {
     }
 
     @Test
-    void add_projectRepresentativeUser_with_bad_user() {
+    void addProjectRepresentativeUserWithBadUser() {
         ProjectRepresentativeUser
             projectRepresentativeUser
             = builder.givenANotPersistedProjectRepresentativeUser();
@@ -158,7 +158,7 @@ public class ProjectRepresentativeServiceTests {
     }
 
     @Test
-    void add_already_existing_projectRepresentativeUser_fails() {
+    void addAlreadyExistingProjectRepresentativeUserFails() {
         ProjectRepresentativeUser projectRepresentativeUser = builder.givenAProjectRepresentativeUser();
         Assertions.assertThrows(
             AlreadyExistException.class, () -> {
@@ -168,7 +168,7 @@ public class ProjectRepresentativeServiceTests {
     }
 
     @Test
-    void delete_projectRepresentativeUser_with_success() {
+    void deleteProjectRepresentativeUserWithSuccess() {
         ProjectRepresentativeUser projectRepresentativeUser1 = builder.givenAProjectRepresentativeUser();
         ProjectRepresentativeUser projectRepresentativeUser2 = builder.givenAProjectRepresentativeUser(
             projectRepresentativeUser1.getProject(),
@@ -187,7 +187,7 @@ public class ProjectRepresentativeServiceTests {
     }
 
     @Test
-    void delete_projectRepresentativeUser_refused_if_only_one_representative() {
+    void deleteProjectRepresentativeUserRefusedIfOnlyOneRepresentative() {
         ProjectRepresentativeUser projectRepresentativeUser = builder.givenAProjectRepresentativeUser();
 
         Assertions.assertThrows(
@@ -198,7 +198,7 @@ public class ProjectRepresentativeServiceTests {
     }
 
     @Test
-    void deleting_last_representative_user_from_project_will_grant_current_user_as_representative() {
+    void deletingLastRepresentativeUserFromProjectWillGrantCurrentUserAsRepresentative() {
         ProjectRepresentativeUser projectRepresentativeUser = builder.givenAProjectRepresentativeUser(
             builder.givenAProject(), builder.givenAUser()
         );

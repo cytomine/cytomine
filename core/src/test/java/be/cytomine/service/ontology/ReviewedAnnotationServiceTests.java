@@ -91,30 +91,30 @@ public class ReviewedAnnotationServiceTests {
     ImageInstanceService imageInstanceService;
 
     @Test
-    void get_reviewedAnnotation_with_success() {
+    void getReviewedAnnotationWithSuccess() {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         assertThat(reviewedAnnotation).isEqualTo(reviewedAnnotationService.get(reviewedAnnotation.getId()));
     }
 
     @Test
-    void get_unexisting_reviewedAnnotation_return_null() {
+    void getUnexistingReviewedAnnotationReturnNull() {
         assertThat(reviewedAnnotationService.get(0L)).isNull();
     }
 
     @Test
-    void find_reviewedAnnotation_with_success() {
+    void findReviewedAnnotationWithSuccess() {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         assertThat(reviewedAnnotationService.find(reviewedAnnotation.getId()).isPresent());
         assertThat(reviewedAnnotation).isEqualTo(reviewedAnnotationService.find(reviewedAnnotation.getId()).get());
     }
 
     @Test
-    void find_unexisting_reviewedAnnotation_return_empty() {
+    void findUnexistingReviewedAnnotationReturnEmpty() {
         assertThat(reviewedAnnotationService.find(0L)).isEmpty();
     }
 
     @Test
-    void count_reviewedAnnotation_with_success() {
+    void countReviewedAnnotationWithSuccess() {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         assertThat(reviewedAnnotationService.count((User) reviewedAnnotation.getUser())).isGreaterThanOrEqualTo(1L);
         assertThat(reviewedAnnotationService.count(builder.givenAUser())).isEqualTo(0);
@@ -122,7 +122,7 @@ public class ReviewedAnnotationServiceTests {
 
 
     @Test
-    void count_by_project_with_date() {
+    void countByProjectWithDate() {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
 
         assertThat(reviewedAnnotationService.countByProject(
@@ -148,7 +148,7 @@ public class ReviewedAnnotationServiceTests {
     }
 
     @Test
-    void count_by_project_with_terms() {
+    void countByProjectWithTerms() {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         reviewedAnnotation.getTerms().clear();
 
@@ -161,7 +161,7 @@ public class ReviewedAnnotationServiceTests {
     }
 
     @Test
-    void list_all_for_project() {
+    void listAllForProject() {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         ReviewedAnnotation reviewedAnnotationFromAnotherProject = builder.givenAReviewedAnnotation();
 
@@ -183,7 +183,7 @@ public class ReviewedAnnotationServiceTests {
     }
 
     @Test
-    void stats_group_by_user() {
+    void statsGroupByUser() {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         User reviewer = reviewedAnnotation.getReviewUser();
         User anotherUser = builder.givenAUser();
@@ -212,7 +212,7 @@ public class ReviewedAnnotationServiceTests {
     ); //e intersect a,b and c
 
     @Test
-    void list_included() throws ParseException {
+    void listIncluded() throws ParseException {
         SliceInstance sliceInstance = builder.givenASliceInstance();
         User user1 = builder.givenAUser();
         User user2 = builder.givenAUser();
@@ -292,7 +292,7 @@ public class ReviewedAnnotationServiceTests {
 
 
     @Test
-    void list_terms_for_reviewed() throws ParseException {
+    void listTermsForReviewed() throws ParseException {
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ReviewedAnnotation reviewedAnnotation
             = builder.givenAReviewedAnnotation(
@@ -311,7 +311,7 @@ public class ReviewedAnnotationServiceTests {
 
 
     @Test
-    void add_valid_reviewed_annotation_with_success() {
+    void addValidReviewedAnnotationWithSuccess() {
         ReviewedAnnotation reviewedAnnotation = builder.givenANotPersistedReviewedAnnotation();
         CommandResponse commandResponse = reviewedAnnotationService.add(reviewedAnnotation.toJsonObject()
             .withChange("term", builder.givenATerm(reviewedAnnotation.getProject().getOntology()).getId()));
@@ -334,7 +334,7 @@ public class ReviewedAnnotationServiceTests {
 
 
     @Test
-    void add_valid_reviewed_annotation_is_refuse_if_already_exists() {
+    void addValidReviewedAnnotationIsRefuseIfAlreadyExists() {
         ReviewedAnnotation reviewedAnnotation = builder.givenANotPersistedReviewedAnnotation();
         builder.persistAndReturn(reviewedAnnotation);
 
@@ -347,7 +347,7 @@ public class ReviewedAnnotationServiceTests {
     }
 
     @Test
-    void add_reviewed_annotation_multiline() throws ParseException {
+    void addReviewedAnnotationMultiline() throws ParseException {
         ReviewedAnnotation reviewedAnnotation = builder.givenANotPersistedReviewedAnnotation();
         reviewedAnnotation.setLocation(new WKTReader().read(
             "LINESTRING( 181.05636403199998 324.87936288, 208.31216076799996 303.464094016)"
@@ -363,7 +363,7 @@ public class ReviewedAnnotationServiceTests {
 
 
     @Test
-    void edit_valid_reviewed_annotation_with_success() throws ParseException {
+    void editValidReviewedAnnotationWithSuccess() throws ParseException {
         ReviewedAnnotation reviewedAnnotation = builder.givenANotPersistedReviewedAnnotation();
         String oldLocation = "POLYGON ((1983 2168, 2107 2160, 2047 2074, 1983 2168))";
         String newLocation = "POLYGON ((2107 2160, 2047 2074, 1983 2168, 2107 2160))";
@@ -397,7 +397,7 @@ public class ReviewedAnnotationServiceTests {
     }
 
     @Test
-    void edit_reviewed_annotation_empty_polygon() throws ParseException {
+    void editReviewedAnnotationEmptyPolygon() throws ParseException {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         JsonObject jsonObject = reviewedAnnotation.toJsonObject();
         jsonObject.put("location", "POINT (BAD GEOMETRY)");
@@ -409,7 +409,7 @@ public class ReviewedAnnotationServiceTests {
     }
 
     @Test
-    void delete_reviewed_annotation_with_success() {
+    void deleteReviewedAnnotationWithSuccess() {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
 
         CommandResponse commandResponse = reviewedAnnotationService.delete(reviewedAnnotation, null, null, true);
@@ -429,7 +429,7 @@ public class ReviewedAnnotationServiceTests {
 
 
     @Test
-    void delete_reviewed_annotation_with_terms() {
+    void deleteReviewedAnnotationWithTerms() {
         ReviewedAnnotation reviewedAnnotation = builder.givenANotPersistedReviewedAnnotation();
         Term term1 = builder.givenATerm(reviewedAnnotation.getProject().getOntology());
         Term term2 = builder.givenATerm(reviewedAnnotation.getProject().getOntology());
@@ -452,7 +452,7 @@ public class ReviewedAnnotationServiceTests {
 
 
     @Test
-    void image_reviewing_with_new_reviewed_annotation() {
+    void imageReviewingWithNewReviewedAnnotation() {
 
         ImageInstance image = builder.givenAnImageInstance();
         imageInstanceService.startReview(image);
@@ -463,7 +463,7 @@ public class ReviewedAnnotationServiceTests {
     }
 
     @Test
-    void lock_image_reviewing_for_other_users() {
+    void lockImageReviewingForOtherUsers() {
 
         ImageInstance image = builder.givenAnImageInstance();
         imageInstanceService.startReview(image);
@@ -481,7 +481,7 @@ public class ReviewedAnnotationServiceTests {
 
 
     @Test
-    void lock_image_reviewing_if_review_stop() {
+    void lockImageReviewingIfReviewStop() {
 
         ImageInstance image = builder.givenAnImageInstance();
         imageInstanceService.startReview(image);
@@ -499,7 +499,7 @@ public class ReviewedAnnotationServiceTests {
 
 
     @Test
-    void lock_image_reviewing_if_review_has_never_been_started() {
+    void lockImageReviewingIfReviewHasNeverBeenStarted() {
 
         ImageInstance image = builder.givenAnImageInstance();
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation(image.getProject());
@@ -515,7 +515,7 @@ public class ReviewedAnnotationServiceTests {
 
 
     @Test
-    void add_review_with_terms() {
+    void addReviewWithTerms() {
 
         ImageInstance image = builder.givenAnImageInstance();
         imageInstanceService.startReview(image);
@@ -534,7 +534,7 @@ public class ReviewedAnnotationServiceTests {
     }
 
     @Test
-    void add_review_with_terms_with_bad_ontology() {
+    void addReviewWithTermsWithBadOntology() {
 
         ImageInstance image = builder.givenAnImageInstance();
         imageInstanceService.startReview(image);
@@ -556,13 +556,13 @@ public class ReviewedAnnotationServiceTests {
     }
 
     @Test
-    public void remove_review_for_annotation() {
+    public void removeReviewForAnnotation() {
         ReviewedAnnotation annotation = builder.givenAReviewedAnnotation();
         reviewedAnnotationService.unReviewAnnotation(annotation.getParentIdent());
     }
 
     @Test
-    public void remove_review_for_unreviewed_annotation_fails() {
+    public void removeReviewForUnreviewedAnnotationFails() {
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation();
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
@@ -573,7 +573,7 @@ public class ReviewedAnnotationServiceTests {
 
 
     @Test
-    public void remove_review_by_another_user_than_reviewer_fails() {
+    public void removeReviewByAnotherUserThanReviewerFails() {
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation();
 
         imageInstanceService.startReview(userAnnotation.getImage());
@@ -587,7 +587,7 @@ public class ReviewedAnnotationServiceTests {
     }
 
     @Test
-    void add_review_and_update_geometry() {
+    void addReviewAndUpdateGeometry() {
 
         ImageInstance image = builder.givenAnImageInstance();
         imageInstanceService.startReview(image);
@@ -609,7 +609,7 @@ public class ReviewedAnnotationServiceTests {
     }
 
     @Test
-    void add_review_delete_parent_and_reject() {
+    void addReviewDeleteParentAndReject() {
 
         ImageInstance image = builder.givenAnImageInstance();
         imageInstanceService.startReview(image);
@@ -626,7 +626,7 @@ public class ReviewedAnnotationServiceTests {
     }
 
     @Test
-    void add_review_already_exists() {
+    void addReviewAlreadyExists() {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
@@ -637,7 +637,7 @@ public class ReviewedAnnotationServiceTests {
 
 
     @Test
-    void review_all_user_layers() {
+    void reviewAllUserLayers() {
         ImageInstance image = builder.givenAnImageInstance();
         imageInstanceService.startReview(image);
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation(image.getProject());
@@ -655,7 +655,7 @@ public class ReviewedAnnotationServiceTests {
 
 
     @Test
-    void review_all_user_layers_not_in_review_mode() {
+    void reviewAllUserLayersNotInReviewMode() {
         ImageInstance image = builder.givenAnImageInstance();
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
@@ -665,7 +665,7 @@ public class ReviewedAnnotationServiceTests {
     }
 
     @Test
-    void review_all_user_layers_user_is_not_reviewer() {
+    void reviewAllUserLayersUserIsNotReviewer() {
         ImageInstance image = builder.givenAnImageInstance();
         imageInstanceService.startReview(image);
         image.setReviewUser(builder.givenAUser());
@@ -683,7 +683,7 @@ public class ReviewedAnnotationServiceTests {
     UserAnnotationRepository userAnnotationRepository;
 
     @Test
-    void annotation_reviewed_counter_for_user_annotation() {
+    void annotationReviewedCounterForUserAnnotation() {
 
         ImageInstance image = builder.givenAnImageInstance();
         imageInstanceService.startReview(image);
@@ -718,7 +718,7 @@ public class ReviewedAnnotationServiceTests {
     }
 
     @Test
-    void do_annotation_corrections() throws ParseException {
+    void doAnnotationCorrections() throws ParseException {
 
         ReviewedAnnotation based = builder.givenAReviewedAnnotation();
         based.setLocation(new WKTReader().read("POLYGON ((0 0, 0 5000, 10000 5000, 10000 0, 0 0))"));
@@ -748,7 +748,7 @@ public class ReviewedAnnotationServiceTests {
 
 
     @Test
-    void do_annotation_corrections_with_remove() throws ParseException {
+    void doAnnotationCorrectionsWithRemove() throws ParseException {
 
         ReviewedAnnotation based = builder.givenAReviewedAnnotation();
         based.setLocation(new WKTReader().read("POLYGON ((0 0, 0 10000, 10000 10000, 10000 0, 0 0))"));

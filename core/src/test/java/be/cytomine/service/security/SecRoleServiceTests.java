@@ -48,19 +48,19 @@ public class SecRoleServiceTests {
     SecRoleService secRoleService;
 
     @Test
-    public void find_role_from_authority() {
+    public void findRoleFromAuthority() {
         assertThat(secRoleService.findByAuthority("ROLE_GUEST")).isPresent();
         assertThat(secRoleService.findByAuthority("ROLE_USER")).isPresent();
         assertThat(secRoleService.findByAuthority("ROLE_ADMIN")).isPresent();
     }
 
     @Test
-    public void find_role_from_id() {
+    public void findRoleFromId() {
         assertThat(secRoleService.find(secRoleService.findByAuthority("ROLE_GUEST").get().getId())).isPresent();
     }
 
     @Test
-    public void list_roles() {
+    public void listRoles() {
         assertThat(secRoleService.list().stream().map(SecRole::getAuthority))
             .contains("ROLE_GUEST", "ROLE_USER", "ROLE_ADMIN");
     }

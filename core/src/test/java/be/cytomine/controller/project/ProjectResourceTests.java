@@ -160,7 +160,7 @@ public class ProjectResourceTests {
 
     @Test
     @Transactional
-    public void list_all_projects() throws Exception {
+    public void listAllProjects() throws Exception {
         Project project = builder.givenAProject();
         restProjectControllerMockMvc.perform(get("/api/project.json"))
             .andExpect(status().isOk())
@@ -169,7 +169,7 @@ public class ProjectResourceTests {
 
     @Test
     @Transactional
-    public void list_all_projects_with_filters() throws Exception {
+    public void listAllProjectsWithFilters() throws Exception {
         Project project = builder.givenAProject();
         builder.addUserToProject(project, builder.givenSuperAdmin().getUsername());
 
@@ -194,7 +194,7 @@ public class ProjectResourceTests {
 
     @Test
     @Transactional
-    public void list_all_projects_with_extension() throws Exception {
+    public void listAllProjectsWithExtension() throws Exception {
         Project project = builder.givenAProject();
         builder.addUserToProject(project, builder.givenSuperAdmin().getUsername());
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation(project);
@@ -222,7 +222,7 @@ public class ProjectResourceTests {
 
     @Test
     @Transactional
-    public void list_all_projects_with_filters_members() throws Exception {
+    public void listAllProjectsWithFiltersMembers() throws Exception {
         Project projectWithCriteria = builder.givenAProject();
         Project projectWithoutCriteria = builder.givenAProject();
 
@@ -243,7 +243,7 @@ public class ProjectResourceTests {
 
     @Test
     @Transactional
-    public void list_all_projects_with_filters_number_of_annotations() throws Exception {
+    public void listAllProjectsWithFiltersNumberOfAnnotations() throws Exception {
         Project projectWithCriteria = builder.givenAProject();
         projectWithCriteria.setCountAnnotations(500);
         builder.persistAndReturn(projectWithCriteria);
@@ -264,7 +264,7 @@ public class ProjectResourceTests {
 
     @Test
     @Transactional
-    public void list_all_projects_with_filters_number_of_job_annotations() throws Exception {
+    public void listAllProjectsWithFiltersNumberOfJobAnnotations() throws Exception {
         Project projectWithCriteria = builder.givenAProject();
         projectWithCriteria.setCountJobAnnotations(500);
         builder.persistAndReturn(projectWithCriteria);
@@ -284,7 +284,7 @@ public class ProjectResourceTests {
 
     @Test
     @Transactional
-    public void list_all_projects_with_filters_number_of_images() throws Exception {
+    public void listAllProjectsWithFiltersNumberOfImages() throws Exception {
         Project projectWithCriteria = builder.givenAProject();
         projectWithCriteria.setCountImages(500);
         builder.persistAndReturn(projectWithCriteria);
@@ -304,7 +304,7 @@ public class ProjectResourceTests {
 
     @Test
     @Transactional
-    public void list_all_projects_with_filters_name() throws Exception {
+    public void listAllProjectsWithFiltersName() throws Exception {
         Project projectWithCriteria = builder.givenAProject();
         builder.persistAndReturn(projectWithCriteria);
         Project projectWithoutCriteria = builder.givenAProject();
@@ -323,7 +323,7 @@ public class ProjectResourceTests {
 
     @Test
     @Transactional
-    public void list_all_projects_with_current_role() throws Exception {
+    public void listAllProjectsWithCurrentRole() throws Exception {
         Project projectWhereUserIsAdmin = builder.givenAProject();
         builder.persistAndReturn(projectWhereUserIsAdmin);
         Project projectWhereUserIsSimpleUser = builder.givenAProject();
@@ -363,7 +363,7 @@ public class ProjectResourceTests {
 
     @Test
     @Transactional
-    public void list_all_projects_with_filters_tags() throws Exception {
+    public void listAllProjectsWithFiltersTags() throws Exception {
         Project projectWithCriteria = builder.givenAProject();
         builder.persistAndReturn(projectWithCriteria);
         TagDomainAssociation tagDomainAssociation1 = builder.givenATagAssociation(
@@ -390,7 +390,7 @@ public class ProjectResourceTests {
 
     @Test
     @Transactional
-    public void list_all_projects_with_filters_ontologies() throws Exception {
+    public void listAllProjectsWithFiltersOntologies() throws Exception {
         Project projectWithCriteria = builder.givenAProject();
         builder.persistAndReturn(projectWithCriteria);
         Project projectWithoutCriteria = builder.givenAProject();
@@ -427,7 +427,7 @@ public class ProjectResourceTests {
 
     @Test
     @Transactional
-    public void list_all_projects_with_pagination() throws Exception {
+    public void listAllProjectsWithPagination() throws Exception {
         Project project1 = builder.givenAProject();
         Project project2 = builder.givenAProject();
         Project project3 = builder.givenAProject();
@@ -524,7 +524,7 @@ public class ProjectResourceTests {
 
     @Test
     @Transactional
-    public void add_valid_project() throws Exception {
+    public void addValidProject() throws Exception {
         Project project = basicInstanceBuilder.givenANotPersistedProject();
         project.setOntology(builder.givenAnOntology());
         project.setName("add_valid_project");
@@ -551,7 +551,7 @@ public class ProjectResourceTests {
 
     @Test
     @Transactional
-    public void add_valid_project_without_ontology() throws Exception {
+    public void addValidProjectWithoutOntology() throws Exception {
         Project project = basicInstanceBuilder.givenANotPersistedProject();
         project.setOntology(null);
 
@@ -574,7 +574,7 @@ public class ProjectResourceTests {
 
     @Test
     @Transactional
-    public void add_valid_project_with_users_admins() throws Exception {
+    public void addValidProjectWithUsersAdmins() throws Exception {
         User user = builder.givenAUser();
         User admin = builder.givenAUser();
 
@@ -621,7 +621,7 @@ public class ProjectResourceTests {
 
     @Test
     @Transactional
-    public void add_project_with_already_existing_name() throws Exception {
+    public void addProjectWithAlreadyExistingName() throws Exception {
         // expected: 409 / {"success":false,"errors":"Project LROLLUS-TEST already exist!"}
         Project project = builder.givenAProject();
 
@@ -635,7 +635,7 @@ public class ProjectResourceTests {
 
     @Test
     @Transactional
-    public void edit_valid_project() throws Exception {
+    public void editValidProject() throws Exception {
         Project project = builder.givenAProject();
         restProjectControllerMockMvc.perform(put("/api/project/{id}.json", project.getId())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -653,7 +653,7 @@ public class ProjectResourceTests {
 
     @Test
     @Transactional
-    public void fail_when_editing_project_does_not_exists() throws Exception {
+    public void failWhenEditingProjectDoesNotExists() throws Exception {
         Project project = builder.givenAProject();
         em.remove(project);
         restProjectControllerMockMvc.perform(put("/api/project/{id}.json", 0)
@@ -666,7 +666,7 @@ public class ProjectResourceTests {
 
     @Test
     @Transactional
-    public void edit_valid_project_with_users() throws Exception {
+    public void editValidProjectWithUsers() throws Exception {
         Project project = builder.givenAProject();
 
         User previousUser = builder.givenAUser();
@@ -691,7 +691,7 @@ public class ProjectResourceTests {
 
     @Test
     @Transactional
-    public void edit_valid_project_with_admins() throws Exception {
+    public void editValidProjectWithAdmins() throws Exception {
         Project project = builder.givenAProject();
 
         User previousUser = builder.givenAUser();
@@ -718,7 +718,7 @@ public class ProjectResourceTests {
 
     @Test
     @Transactional
-    public void fail_when_editing_project_with_annotation_terms_and_ontology_change() throws Exception {
+    public void failWhenEditingProjectWithAnnotationTermsAndOntologyChange() throws Exception {
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm();
         Project project = annotationTerm.getUserAnnotation().getProject();
 
@@ -735,7 +735,7 @@ public class ProjectResourceTests {
 
     @Test
     @Transactional
-    public void delete_project() throws Exception {
+    public void deleteProject() throws Exception {
 
         Project project = builder.givenAProject();
         restProjectControllerMockMvc.perform(delete("/api/project/{id}.json", project.getId())
@@ -754,7 +754,7 @@ public class ProjectResourceTests {
 
     @Test
     @Transactional
-    public void fail_when_delete_project_not_exists() throws Exception {
+    public void failWhenDeleteProjectNotExists() throws Exception {
         restProjectControllerMockMvc.perform(delete("/api/project/{id}.json", 0)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isNotFound())
@@ -764,7 +764,7 @@ public class ProjectResourceTests {
 
     @Test
     @Transactional
-    public void list_last_action() throws Exception {
+    public void listLastAction() throws Exception {
         Project project = builder.givenAProject();
         builder.addUserToProject(project, builder.givenSuperAdmin().getUsername());
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation(project);
@@ -777,7 +777,7 @@ public class ProjectResourceTests {
 
     @Test
     @Transactional
-    public void list_last_opened_with_empty_dataset() throws Exception {
+    public void listLastOpenedWithEmptyDataset() throws Exception {
         Project project = builder.givenAProject();
         builder.addUserToProject(project, builder.givenSuperAdmin().getUsername());
         Project projectNotOpened = builder.givenAProject();
@@ -791,7 +791,7 @@ public class ProjectResourceTests {
 
     @Test
     @Transactional
-    public void list_last_opened() throws Exception {
+    public void listLastOpened() throws Exception {
         Project project = builder.givenAProject();
         builder.addUserToProject(project, builder.givenSuperAdmin().getUsername());
         Project projectNotOpened = builder.givenAProject();
@@ -816,7 +816,7 @@ public class ProjectResourceTests {
 
     @Test
     @Transactional
-    public void list_by_ontology() throws Exception {
+    public void listByOntology() throws Exception {
         Project project = builder.givenAProject();
         builder.addUserToProject(project, builder.givenSuperAdmin().getUsername());
 
@@ -828,7 +828,7 @@ public class ProjectResourceTests {
 
     @Test
     @Transactional
-    public void list_by_ontology_that_does_not_exist() throws Exception {
+    public void listByOntologyThatDoesNotExist() throws Exception {
         Project project = builder.givenAProject();
         builder.addUserToProject(project, builder.givenSuperAdmin().getUsername());
         restProjectControllerMockMvc.perform(get("/api/ontology/{id}/project.json", 0L))
@@ -837,7 +837,7 @@ public class ProjectResourceTests {
 
     @Test
     @Transactional
-    public void list_by_user() throws Exception {
+    public void listByUser() throws Exception {
         Project project = builder.givenAProject();
         builder.addUserToProject(project, builder.givenSuperAdmin().getUsername());
         restProjectControllerMockMvc.perform(get("/api/user/{id}/project.json", builder.givenSuperAdmin().getId()))
@@ -847,14 +847,14 @@ public class ProjectResourceTests {
 
     @Test
     @Transactional
-    public void list_by_user_that_does_not_exist() throws Exception {
+    public void listByUserThatDoesNotExist() throws Exception {
         restProjectControllerMockMvc.perform(get("/api/user/{id}/project.json", 0L))
             .andExpect(status().isNotFound());
     }
 
     @Test
     @Transactional
-    public void list_by_user_light() throws Exception {
+    public void listByUserLight() throws Exception {
         Project project = builder.givenAProject();
         builder.addUserToProject(project, builder.givenSuperAdmin().getUsername());
         restProjectControllerMockMvc.perform(get(
@@ -867,7 +867,7 @@ public class ProjectResourceTests {
 
     @Test
     @Transactional
-    public void list_by_creator_light() throws Exception {
+    public void listByCreatorLight() throws Exception {
         Project project = builder.givenAProject();
         User creator = builder.givenSuperAdmin();
         User user = builder.givenAUser();
@@ -897,7 +897,7 @@ public class ProjectResourceTests {
 
     @Test
     @Transactional
-    public void list_by_admin_light() throws Exception {
+    public void listByAdminLight() throws Exception {
         Project project = builder.givenAProject();
         User creator = builder.givenSuperAdmin();
         User user = builder.givenAUser();
@@ -928,7 +928,7 @@ public class ProjectResourceTests {
 
     @Test
     @Transactional
-    public void list_by_simple_user_light() throws Exception {
+    public void listBySimpleUserLight() throws Exception {
         Project project = builder.givenAProject();
         User creator = builder.givenSuperAdmin();
         User user = builder.givenAUser();
@@ -958,14 +958,14 @@ public class ProjectResourceTests {
 
     @Test
     @Transactional
-    public void list_by_user_light_with_unexisting_user() throws Exception {
+    public void listByUserLightWithUnexistingUser() throws Exception {
         restProjectControllerMockMvc.perform(get("/api/user/{id}/project/light.json", 0L))
             .andExpect(status().isNotFound());
     }
 
     @Test
     @jakarta.transaction.Transactional
-    public void get_project_bounds() throws Exception {
+    public void getProjectBounds() throws Exception {
         Date start = DateUtils.addSeconds(new Date(), -5);
         Project project = builder.givenAProject();
         project.setName("0001");
@@ -1008,7 +1008,7 @@ public class ProjectResourceTests {
 
     @Test
     @Transactional
-    public void list_command_history() throws Exception {
+    public void listCommandHistory() throws Exception {
         Project project = builder.givenAProject();
         User creator = builder.givenSuperAdmin();
         builder.addUserToProject(project, creator.getUsername());
@@ -1029,7 +1029,7 @@ public class ProjectResourceTests {
 
     @Test
     @Transactional
-    public void list_command_history_with_dates() throws Exception {
+    public void listCommandHistoryWithDates() throws Exception {
         Project project = builder.givenAProject();
         User creator = builder.givenSuperAdmin();
         builder.addUserToProject(project, creator.getUsername());

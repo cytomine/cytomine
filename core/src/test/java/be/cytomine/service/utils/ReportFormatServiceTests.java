@@ -46,7 +46,7 @@ public class ReportFormatServiceTests {
     TermService termService;
 
     @Test
-    public void connection_history_to_report_format() {
+    public void connectionHistoryToReportFormat() {
         Object[][] dataObject = reportFormatService.formatJsonObjectForReport(
             ReportService.CONNECTION_HISTORY_REPORT_COLUMNS,
             buildUserConnectionHistory(true)
@@ -55,7 +55,7 @@ public class ReportFormatServiceTests {
     }
 
     @Test
-    public void incomplete_connection_history_to_report_format() {
+    public void incompleteConnectionHistoryToReportFormat() {
         Object[][] dataObject = reportFormatService.formatJsonObjectForReport(
             ReportService.CONNECTION_HISTORY_REPORT_COLUMNS,
             buildUserConnectionHistory(false)
@@ -64,7 +64,7 @@ public class ReportFormatServiceTests {
     }
 
     @Test
-    public void image_consultation_to_report_format() {
+    public void imageConsultationToReportFormat() {
         Object[][] dataObject = reportFormatService.formatJsonObjectForReport(
             ReportService.IMAGE_CONSULTATION_COLUMNS,
             buildUserImageConsultation(true)
@@ -73,7 +73,7 @@ public class ReportFormatServiceTests {
     }
 
     @Test
-    public void incomplete_image_consultation_to_report_format() {
+    public void incompleteImageConsultationToReportFormat() {
         Object[][] dataObject = reportFormatService.formatJsonObjectForReport(
             ReportService.IMAGE_CONSULTATION_COLUMNS,
             buildUserImageConsultation(false)
@@ -82,7 +82,7 @@ public class ReportFormatServiceTests {
     }
 
     @Test
-    public void annotations_to_report_format() {
+    public void annotationsToReportFormat() {
         Object[][] dataObject = reportFormatService.formatAnnotationsForReport(
             ReportService.ANNOTATION_REPORT_COLUMNS,
             buildAnnotations(true)
@@ -91,7 +91,7 @@ public class ReportFormatServiceTests {
     }
 
     @Test
-    public void incomplete_annotations_to_report_format() {
+    public void incompleteAnnotationsToReportFormat() {
         Object[][] dataObject = reportFormatService.formatAnnotationsForReport(
             ReportService.ANNOTATION_REPORT_COLUMNS,
             buildAnnotations(false)
@@ -100,7 +100,7 @@ public class ReportFormatServiceTests {
     }
 
     @Test
-    public void reviewed_annotations_to_report_format() {
+    public void reviewedAnnotationsToReportFormat() {
         Object[][] dataObject = reportFormatService.formatAnnotationsForReport(
             ReportService.ANNOTATION_REPORT_COLUMNS,
             buildAnnotations(true)
@@ -109,7 +109,7 @@ public class ReportFormatServiceTests {
     }
 
     @Test
-    public void incomplete_reviewed_annotations_to_report_format() {
+    public void incompleteReviewedAnnotationsToReportFormat() {
         Object[][] dataObject = reportFormatService.formatAnnotationsForReport(
             ReportService.ANNOTATION_REPORT_COLUMNS,
             buildAnnotations(false)
@@ -118,7 +118,7 @@ public class ReportFormatServiceTests {
     }
 
     @Test
-    public void users_to_report_format() {
+    public void usersToReportFormat() {
         Object[][] dataObject = reportFormatService.formatMapForReport(
             ReportService.USER_REPORT_COLUMNS,
             buildUsers(true)
@@ -127,7 +127,7 @@ public class ReportFormatServiceTests {
     }
 
     @Test
-    public void incomplete_users_to_report_format() {
+    public void incompleteUsersToReportFormat() {
         Object[][] dataObject = reportFormatService.formatMapForReport(
             ReportService.USER_REPORT_COLUMNS,
             buildUsers(false)

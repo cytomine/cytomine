@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class StringUtilsTests {
 
     @Test
-    public void pagination_from_already_limited_results() {
+    public void paginationFromAlreadyLimitedResults() {
         assertThat(StringUtils.obscurify("password", 0)).isEqualTo("********");
         assertThat(StringUtils.obscurify("password", 1)).isEqualTo("p******d");
         assertThat(StringUtils.obscurify("password", 2)).isEqualTo("pa****rd");
@@ -27,25 +27,25 @@ public class StringUtilsTests {
     }
 
     @Test
-    public void null_or_empty_parameters_extracted_as_null() {
+    public void nullOrEmptyParametersExtractedAsNull() {
         assertThat(StringUtils.extractListFromParameter("")).isNull();
         assertThat(StringUtils.extractListFromParameter(null)).isNull();
     }
 
     @Test
-    public void parameters_extracted_as_list_of_long() {
+    public void parametersExtractedAsListOfLong() {
         List<Long> expectedList = new ArrayList<>(Arrays.asList((long) 145, (long) 146, (long) 0, (long) -1));
         assertThat(StringUtils.extractListFromParameter("145,146,0,-1")).isEqualTo(expectedList);
     }
 
     @Test
-    public void get_local_date_as_string() {
+    public void getLocalDateAsString() {
         List<Long> expectedList = new ArrayList<>(Arrays.asList((long) 145, (long) 146, (long) 0, (long) -1));
         assertThat(StringUtils.extractListFromParameter("145,146,0,-1")).isEqualTo(expectedList);
     }
 
     @Test
-    public void get_simple_format_local_date_as_string() {
+    public void getSimpleFormatLocalDateAsString() {
         List<Long> expectedList = new ArrayList<>(Arrays.asList((long) 145, (long) 146, (long) 0, (long) -1));
         assertThat(StringUtils.extractListFromParameter("145,146,0,-1")).isEqualTo(expectedList);
     }

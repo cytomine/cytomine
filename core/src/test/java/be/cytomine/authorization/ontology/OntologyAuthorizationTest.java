@@ -46,26 +46,26 @@ public class OntologyAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list_ontologies() {
+    public void adminCanListOntologies() {
         assertThat(ontologyService.list()).contains(ontology);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_with_at_least_read_permission_can_list_ontologies() {
+    public void userWithAtLeastReadPermissionCanListOntologies() {
         assertThat(ontologyService.list()).contains(ontology);
     }
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
-    public void user_no_acl_cannot_list_ontologies() {
+    public void userNoAclCannotListOntologies() {
         assertThat(ontologyService.list()).doesNotContain(ontology);
     }
 
     @Override
     @Test
     @WithMockUser(username = USER_NO_ACL)
-    public void user_without_permission_add_domain() {
+    public void userWithoutPermissionAddDomain() {
         expectOK(() -> whenIAddDomain());
         // User with no ACL can create an ontology
     }
@@ -73,7 +73,7 @@ public class OntologyAuthorizationTest extends CRUDAuthorizationTest {
     @Override
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_with_read_permission_add_domain() {
+    public void userWithReadPermissionAddDomain() {
         expectOK(() -> whenIAddDomain());
         // User with READ permission can create another ontology
     }

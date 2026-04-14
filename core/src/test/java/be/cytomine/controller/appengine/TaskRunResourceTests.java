@@ -72,7 +72,7 @@ public class TaskRunResourceTests {
 
     @Test
     @Transactional
-    public void add_valid_task_run() throws Exception {
+    public void addValidTaskRun() throws Exception {
         TaskRun taskRun = builder.givenANotPersistedTaskRun();
         taskRun.setTaskRunId(UUID.randomUUID());
         String taskId = UUID.randomUUID().toString();
@@ -200,7 +200,7 @@ public class TaskRunResourceTests {
 
     @Test
     @Transactional
-    public void get_task_run() throws Exception {
+    public void getTaskRun() throws Exception {
         TaskRun taskRun = builder.givenANotPersistedTaskRun();
         taskRunRepository.saveAndFlush(taskRun);
         UUID taskRunId = taskRun.getTaskRunId();
@@ -222,7 +222,7 @@ public class TaskRunResourceTests {
 
     @Test
     @Transactional
-    public void post_state_action() throws Exception {
+    public void postStateAction() throws Exception {
         TaskRun taskRun = builder.givenANotPersistedTaskRun();
         taskRunRepository.saveAndFlush(taskRun);
         UUID taskRunId = taskRun.getTaskRunId();

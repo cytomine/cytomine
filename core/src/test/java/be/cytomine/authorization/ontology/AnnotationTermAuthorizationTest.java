@@ -45,25 +45,25 @@ public class AnnotationTermAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list_relation_terms() {
+    public void adminCanListRelationTerms() {
         expectOK(() -> annotationTermService.list(annotationTerm.getUserAnnotation()));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_with_read_can_list_relation_terms() {
+    public void userWithReadCanListRelationTerms() {
         expectOK(() -> annotationTermService.list(annotationTerm.getUserAnnotation()));
     }
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
-    public void user_no_acl_cannot_list_relation_terms() {
+    public void userNoAclCannotListRelationTerms() {
         expectForbidden(() -> annotationTermService.list(annotationTerm.getUserAnnotation()));
     }
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_update_annotation_in_restricted_project() {
+    public void adminCanUpdateAnnotationInRestrictedProject() {
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm(this.annotationTerm.getUserAnnotation());
         Project project = (Project) annotationTerm.container();
         project.setMode(EditingMode.RESTRICTED);
@@ -75,7 +75,7 @@ public class AnnotationTermAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_update_annotation_in_classic_project() {
+    public void userCanUpdateAnnotationInClassicProject() {
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm(this.annotationTerm.getUserAnnotation());
         Project project = (Project) annotationTerm.container();
         project.setMode(EditingMode.CLASSIC);
@@ -87,7 +87,7 @@ public class AnnotationTermAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_update_annotation_in_readonly_project() {
+    public void userCannotUpdateAnnotationInReadonlyProject() {
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm(this.annotationTerm.getUserAnnotation());
         Project project = (Project) annotationTerm.container();
         project.setMode(EditingMode.READ_ONLY);
@@ -98,7 +98,7 @@ public class AnnotationTermAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_update_annotation_in_restricted_project() {
+    public void userCannotUpdateAnnotationInRestrictedProject() {
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm(this.annotationTerm.getUserAnnotation());
         Project project = (Project) annotationTerm.container();
         project.setMode(EditingMode.RESTRICTED);

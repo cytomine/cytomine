@@ -50,20 +50,20 @@ public class AttachedFileServiceTests {
     BasicInstanceBuilder builder;
 
     @Test
-    public void list_attached_file() {
+    public void listAttachedFile() {
         AttachedFile attachedFile = builder.givenAnAttachedFile(builder.givenAProject());
         assertThat(attachedFileService.list()).contains(attachedFile);
     }
 
     @Test
-    public void list_attached_file_for_domain() {
+    public void listAttachedFileForDomain() {
         Project project = builder.givenAProject();
         AttachedFile attachedFile = builder.givenAnAttachedFile(project);
         assertThat(attachedFileService.findAllByDomain(project)).contains(attachedFile);
     }
 
     @Test
-    public void list_attached_file_for_domain_that_do_not_exists() {
+    public void listAttachedFileForDomainThatDoNotExists() {
         Assertions.assertThrows(
             ObjectNotFoundException.class, () -> {
                 attachedFileService.findAllByDomain(Project.class.getName(), 0L);
@@ -72,18 +72,18 @@ public class AttachedFileServiceTests {
     }
 
     @Test
-    public void find_by_id() {
+    public void findById() {
         AttachedFile attachedFile = builder.givenAnAttachedFile(builder.givenAProject());
         assertThat(attachedFileService.findById(attachedFile.getId())).isPresent();
     }
 
     @Test
-    public void find_by_id_that_do_not_exists() {
+    public void findByIdThatDoNotExists() {
         assertThat(attachedFileService.findById(0L)).isEmpty();
     }
 
     @Test
-    public void create_attached_file() throws ClassNotFoundException {
+    public void createAttachedFile() throws ClassNotFoundException {
         Project project = builder.givenAProject();
         AttachedFile attachedFile =
             attachedFileService.create(
@@ -97,7 +97,7 @@ public class AttachedFileServiceTests {
     }
 
     @Test
-    public void delete_attached_file() {
+    public void deleteAttachedFile() {
         AttachedFile attachedFile = builder.givenAnAttachedFile(builder.givenAProject());
         attachedFileService.delete(attachedFile, null, null, false);
         assertThat(attachedFileService.findById(attachedFile.getId())).isEmpty();

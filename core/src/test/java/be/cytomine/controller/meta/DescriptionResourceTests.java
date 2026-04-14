@@ -55,7 +55,7 @@ public class DescriptionResourceTests {
 
     @Test
     @Transactional
-    public void list_all_description() throws Exception {
+    public void listAllDescription() throws Exception {
         Description description = builder.givenADescription(builder.givenAProject());
         restDescriptionControllerMockMvc.perform(get("/api/description.json"))
             .andExpect(status().isOk())
@@ -65,7 +65,7 @@ public class DescriptionResourceTests {
 
     @Test
     @Transactional
-    public void get_an_description() throws Exception {
+    public void getAnDescription() throws Exception {
         Description description = builder.givenADescription(builder.givenAProject());
         restDescriptionControllerMockMvc.perform(get(
                 "/api/domain/{domainClassName}/{domainIdent}/description.json",
@@ -78,7 +78,7 @@ public class DescriptionResourceTests {
 
     @Test
     @Transactional
-    public void get_an_description_does_not_exists() throws Exception {
+    public void getAnDescriptionDoesNotExists() throws Exception {
         Description description = builder.givenANotPersistedDescription(builder.givenAProject());
         restDescriptionControllerMockMvc.perform(get(
                 "/api/domain/{domainClassName}/{domainIdent}/description.json",
@@ -90,7 +90,7 @@ public class DescriptionResourceTests {
 
     @Test
     @Transactional
-    public void add_valid_description() throws Exception {
+    public void addValidDescription() throws Exception {
         Description description = builder.givenANotPersistedDescription(builder.givenAProject());
         restDescriptionControllerMockMvc.perform(post(
                 "/api/domain/{domainClassName}/{domainIdent}/description.json",
@@ -111,7 +111,7 @@ public class DescriptionResourceTests {
 
     @Test
     @Transactional
-    public void edit_valid_description() throws Exception {
+    public void editValidDescription() throws Exception {
         Description description = builder.givenANotPersistedDescription(builder.givenAProject());
         builder.persistAndReturn(description);
         restDescriptionControllerMockMvc.perform(put(
@@ -134,7 +134,7 @@ public class DescriptionResourceTests {
 
     @Test
     @Transactional
-    public void delete_description() throws Exception {
+    public void deleteDescription() throws Exception {
         Description description = builder.givenANotPersistedDescription(builder.givenAProject());
         builder.persistAndReturn(description);
         restDescriptionControllerMockMvc.perform(delete(

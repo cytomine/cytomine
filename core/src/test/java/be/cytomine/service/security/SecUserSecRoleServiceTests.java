@@ -83,7 +83,7 @@ public class SecUserSecRoleServiceTests {
     EntityManager entityManager;
 
     @Test
-    void get_secSecUserSecRole_with_success() {
+    void getSecSecUserSecRoleWithSuccess() {
         SecUserSecRole secSecUserSecRole = builder.givenAUserRole();
         assertThat(secSecUserSecRoleService.find(
             secSecUserSecRole.getSecUser(),
@@ -92,7 +92,7 @@ public class SecUserSecRoleServiceTests {
     }
 
     @Test
-    void get_unexisting_secSecUserSecRole() {
+    void getUnexistingSecSecUserSecRole() {
         SecUserSecRole secSecUserSecRole = builder.givenANotPersistedUserRole(
             builder.givenAUser(),
             "ROLE_ADMIN"
@@ -118,7 +118,7 @@ public class SecUserSecRoleServiceTests {
     }
 
     @Test
-    void find_highest_role() {
+    void findHighestRole() {
         User user = builder.givenAGuest();
         assertThat(secSecUserSecRoleService.getHighest(user)).isEqualTo(secRoleRepository.getGuest());
 
@@ -168,7 +168,7 @@ public class SecUserSecRoleServiceTests {
 
 
     @Test
-    void add_already_existing_secSecUserSecRole_fails() {
+    void addAlreadyExistingSecSecUserSecRoleFails() {
         SecUserSecRole secSecUserSecRole = builder.givenANotPersistedUserRole(
             builder.givenAUser(),
             secRoleRepository.getAdmin()
@@ -197,7 +197,7 @@ public class SecUserSecRoleServiceTests {
     }
 
     @Test
-    void delete_secSecUserSecRole_with_success() {
+    void deleteSecSecUserSecRoleWithSuccess() {
         SecUserSecRole secSecUserSecRole = builder.givenANotPersistedUserRole(
             builder.givenAUser(),
             secRoleRepository.getAdmin()
@@ -212,7 +212,7 @@ public class SecUserSecRoleServiceTests {
 
     @Test
     @WithMockUser(username = "user")
-    void delete_secSecUserSecRole_with_simple_user_fail() {
+    void deleteSecSecUserSecRoleWithSimpleUserFail() {
         SecUserSecRole secSecUserSecRole = builder.givenANotPersistedUserRole(
             builder.givenDefaultUser(),
             secRoleRepository.getGuest()
@@ -228,7 +228,7 @@ public class SecUserSecRoleServiceTests {
 
     @Test
     @WithMockUser(username = "user")
-    void delete_secSecUserSecRole_to_remove_its_own_role() {
+    void deleteSecSecUserSecRoleToRemoveItsOwnRole() {
         SecUserSecRole secSecUserSecRole = builder.givenANotPersistedUserRole(
             builder.givenDefaultUser(),
             secRoleRepository.getAdmin()
@@ -242,7 +242,7 @@ public class SecUserSecRoleServiceTests {
     }
 
     @Test
-    void re_define_role() {
+    void reDefineRole() {
         User user = builder.givenAGuest();
 
         secSecUserSecRoleService.define(user, secRoleRepository.getGuest());

@@ -65,7 +65,7 @@ public class GenericAnnotationServiceTests {
     EntityManager entityManager;
 
     @Test
-    void find_user_annotation_that_touch_location() throws ParseException {
+    void findUserAnnotationThatTouchLocation() throws ParseException {
         String basedLocation = "POLYGON ((0 0, 0 5000, 10000 5000, 10000 0, 0 0))";
         String addedLocation = "POLYGON ((0 5000, 10000 5000, 10000 10000, 0 10000, 0 5000))";
 
@@ -85,7 +85,7 @@ public class GenericAnnotationServiceTests {
     }
 
     @Test
-    void find_reviewed_annotation_that_touch_location() throws ParseException {
+    void findReviewedAnnotationThatTouchLocation() throws ParseException {
         String basedLocation = "POLYGON ((0 0, 0 5000, 10000 5000, 10000 0, 0 0))";
         String addedLocation = "POLYGON ((0 5000, 10000 5000, 10000 10000, 0 10000, 0 5000))";
 
@@ -105,7 +105,7 @@ public class GenericAnnotationServiceTests {
     }
 
     @Test
-    void find_user_annotation_with_terms() {
+    void findUserAnnotationWithTerms() {
         UserAnnotation annotation = builder.givenAnAnnotationTerm().getUserAnnotation();
         assertThat(genericAnnotationService.findUserAnnotationWithTerm(
             List.of(annotation.getId()),
@@ -115,7 +115,7 @@ public class GenericAnnotationServiceTests {
     }
 
     @Test
-    void find_reviewed_annotation_with_terms() {
+    void findReviewedAnnotationWithTerms() {
         ReviewedAnnotation annotation = builder.givenAReviewedAnnotation();
         annotation.getTerms().add(builder.givenATerm(annotation.getProject().getOntology()));
         builder.persistAndReturn(annotation);

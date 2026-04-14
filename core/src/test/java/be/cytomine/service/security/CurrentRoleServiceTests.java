@@ -53,7 +53,7 @@ public class CurrentRoleServiceTests {
 
     @Test
     @WithMockUser(username = "superadmin")
-    public void find_role_for_superadmin() {
+    public void findRoleForSuperadmin() {
         assertThat(currentRoleService.findRealRole(builder.givenSuperAdmin()))
             .contains(secRoleRepository.getSuperAdmin());
 
@@ -73,7 +73,7 @@ public class CurrentRoleServiceTests {
 
     @Test
     @WithMockUser(username = "admin")
-    public void find_role_for_admin() {
+    public void findRoleForAdmin() {
         assertThat(currentRoleService.findRealRole(builder.givenDefaultAdmin()))
             .contains(secRoleRepository.getAdmin());
 
@@ -93,7 +93,7 @@ public class CurrentRoleServiceTests {
 
     @Test
     @WithMockUser(username = "user")
-    public void find_role_for_user() {
+    public void findRoleForUser() {
         assertThat(currentRoleService.findRealRole(builder.givenDefaultUser()))
             .contains(secRoleRepository.getUser());
 
@@ -113,7 +113,7 @@ public class CurrentRoleServiceTests {
 
     @Test
     @WithMockUser(username = "guest")
-    public void find_role_for_guest() {
+    public void findRoleForGuest() {
         assertThat(currentRoleService.findRealRole(builder.givenAGuest()))
             .contains(secRoleRepository.getGuest());
 
@@ -134,7 +134,7 @@ public class CurrentRoleServiceTests {
 
     @Test
     @WithMockUser(username = "admin")
-    public void open_close_admin_session_as_admin() {
+    public void openCloseAdminSessionAsAdmin() {
 
         assertThat(currentRoleService.findRealRole(builder.givenDefaultAdmin()))
             .contains(secRoleRepository.getAdmin());
@@ -157,7 +157,7 @@ public class CurrentRoleServiceTests {
 
     @Test
     @WithMockUser(username = "user")
-    public void open_close_admin_session_as_user() {
+    public void openCloseAdminSessionAsUser() {
 
         assertThat(currentRoleService.isAdminByNow(builder.givenDefaultUser())).isFalse();
         assertThat(currentRoleService.isUserByNow(builder.givenDefaultUser())).isTrue();

@@ -43,19 +43,19 @@ public class ProjectDefaultLayerAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list_project_representative_user() {
+    public void adminCanListProjectRepresentativeUser() {
         expectOK(() -> projectDefaultLayerService.listByProject(projectDefaultLayer.getProject()));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_with_read_can_list_project_representative_user() {
+    public void userWithReadCanListProjectRepresentativeUser() {
         expectOK(() -> projectDefaultLayerService.listByProject(projectDefaultLayer.getProject()));
     }
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
-    public void user_no_acl_cannot_list_project_representative_user() {
+    public void userNoAclCannotListProjectRepresentativeUser() {
         expectForbidden(() -> projectDefaultLayerService.listByProject(projectDefaultLayer.getProject()));
     }
 

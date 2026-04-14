@@ -55,7 +55,7 @@ public class ConfigurationResourceTests {
 
     @Test
     @Transactional
-    public void list_all_configs() throws Exception {
+    public void listAllConfigs() throws Exception {
         Configuration configuration = builder.givenAConfiguration("xxx");
         restConfigurationControllerMockMvc.perform(get("/api/configuration.json"))
             .andExpect(status().isOk())
@@ -80,7 +80,7 @@ public class ConfigurationResourceTests {
 
     @Test
     @Transactional
-    public void add_valid_configuration() throws Exception {
+    public void addValidConfiguration() throws Exception {
         Configuration configuration = builder.givenANotPersistedConfiguration("xxx");
         restConfigurationControllerMockMvc.perform(post("/api/configuration.json")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -98,7 +98,7 @@ public class ConfigurationResourceTests {
 
     @Test
     @Transactional
-    public void edit_valid_configuration() throws Exception {
+    public void editValidConfiguration() throws Exception {
         Configuration configuration = builder.givenAConfiguration("xxx");
         restConfigurationControllerMockMvc.perform(put("/api/configuration/key/{key}.json", configuration.getKey())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -116,7 +116,7 @@ public class ConfigurationResourceTests {
 
     @Test
     @Transactional
-    public void delete_configuration() throws Exception {
+    public void deleteConfiguration() throws Exception {
         Configuration configuration = builder.givenAConfiguration("xxx");
         restConfigurationControllerMockMvc.perform(delete("/api/configuration/key/{key}.json", configuration.getKey())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -134,7 +134,7 @@ public class ConfigurationResourceTests {
 
     @Test
     @Transactional
-    public void fail_when_delete_configuration_not_exists() throws Exception {
+    public void failWhenDeleteConfigurationNotExists() throws Exception {
         restConfigurationControllerMockMvc.perform(delete("/api/configuration/key/{key}.json", "0")
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isNotFound())

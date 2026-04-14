@@ -97,26 +97,26 @@ public class AnnotationLinkAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list_annotation_group_by_annotation_group() {
+    public void adminCanListAnnotationGroupByAnnotationGroup() {
         assertThat(annotationLinkService.list(annotationLink.getGroup())).contains(annotationLink);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_list_annotation_link_by_annotation_group() {
+    public void userCanListAnnotationLinkByAnnotationGroup() {
         assertThat(annotationLinkService.list(annotationLink.getGroup())).contains(annotationLink);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void user_admin_can_add_in_readonly_mode() {
+    public void userAdminCanAddInReadonlyMode() {
         annotationLink.getImage().getProject().setMode(EditingMode.READ_ONLY);
         expectOK(this::whenIAddDomain);
     }
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_update_annotation_group_in_restricted_project() {
+    public void adminCanUpdateAnnotationGroupInRestrictedProject() {
         AnnotationLink annotationLink = builder.givenAnAnnotationLink();
         annotationLink.getImage().getProject().setMode(EditingMode.RESTRICTED);
         expectOK(this::whenIGetDomain);
@@ -126,7 +126,7 @@ public class AnnotationLinkAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_update_annotation_group_in_classic_project() {
+    public void userCanUpdateAnnotationGroupInClassicProject() {
         AnnotationLink annotationLink = builder.givenAnAnnotationLink();
         annotationLink.getImage().getProject().setMode(EditingMode.CLASSIC);
         expectOK(this::whenIGetDomain);
@@ -136,7 +136,7 @@ public class AnnotationLinkAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void user_admin_can_delete_in_readonly_mode() {
+    public void userAdminCanDeleteInReadonlyMode() {
         annotationLink.getImage().getProject().setMode(EditingMode.READ_ONLY);
         expectOK(this::whenIDeleteDomain);
     }

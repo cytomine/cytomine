@@ -61,7 +61,7 @@ public class PropertyResourceTests {
 
     @Test
     @Transactional
-    public void list_all_property_for_project() throws Exception {
+    public void listAllPropertyForProject() throws Exception {
         Property property = builder.givenAProperty(builder.givenAProject());
         restPropertyControllerMockMvc.perform(get("/api/project/{project}/property.json", property.getDomainIdent()))
             .andExpect(status().isOk())
@@ -71,7 +71,7 @@ public class PropertyResourceTests {
 
     @Test
     @Transactional
-    public void list_all_property_for_project_not_exists() throws Exception {
+    public void listAllPropertyForProjectNotExists() throws Exception {
         Property property = builder.givenAProperty(builder.givenAProject());
         restPropertyControllerMockMvc.perform(get("/api/project/{project}/property.json", 0L))
             .andExpect(status().isNotFound());
@@ -79,7 +79,7 @@ public class PropertyResourceTests {
 
     @Test
     @Transactional
-    public void list_all_property_for_annotation() throws Exception {
+    public void listAllPropertyForAnnotation() throws Exception {
         Property property = builder.givenAProperty(builder.givenAUserAnnotation());
         restPropertyControllerMockMvc.perform(get(
                 "/api/annotation/{annotation}/property.json",
@@ -92,7 +92,7 @@ public class PropertyResourceTests {
 
     @Test
     @Transactional
-    public void list_all_property_for_annotation_not_exists() throws Exception {
+    public void listAllPropertyForAnnotationNotExists() throws Exception {
         Property property = builder.givenAProperty(builder.givenAUserAnnotation());
         restPropertyControllerMockMvc.perform(get("/api/annotation/{annotation}/property.json", 0L))
             .andExpect(status().isNotFound());
@@ -100,7 +100,7 @@ public class PropertyResourceTests {
 
     @Test
     @Transactional
-    public void list_all_property_for_image() throws Exception {
+    public void listAllPropertyForImage() throws Exception {
         Property property = builder.givenAProperty(builder.givenAnImageInstance());
         restPropertyControllerMockMvc.perform(get(
                 "/api/imageinstance/{image}/property.json",
@@ -113,7 +113,7 @@ public class PropertyResourceTests {
 
     @Test
     @Transactional
-    public void list_all_property_for_image_not_exists() throws Exception {
+    public void listAllPropertyForImageNotExists() throws Exception {
         Property property = builder.givenAProperty(builder.givenAnImageInstance());
         restPropertyControllerMockMvc.perform(get("/api/imageinstance/{image}/property.json", 0L))
             .andExpect(status().isNotFound());
@@ -121,7 +121,7 @@ public class PropertyResourceTests {
 
     @Test
     @Transactional
-    public void list_all_property_for_domain() throws Exception {
+    public void listAllPropertyForDomain() throws Exception {
         Property property = builder.givenAProperty(builder.givenAnImageInstance());
         restPropertyControllerMockMvc.perform(get(
                 "/api/domain/{domainClassName}/{domainIdent}/property.json",
@@ -134,7 +134,7 @@ public class PropertyResourceTests {
 
     @Test
     @Transactional
-    public void list_all_property_for_domain_not_exists() throws Exception {
+    public void listAllPropertyForDomainNotExists() throws Exception {
         Property property = builder.givenAProperty(builder.givenAnImageInstance());
         restPropertyControllerMockMvc.perform(get(
                 "/api/domain/{domainClassName}/{domainIdent}/property.json",
@@ -145,7 +145,7 @@ public class PropertyResourceTests {
 
     @Test
     @Transactional
-    public void list_keys_annotation_with_project_filter() throws Exception {
+    public void listKeysAnnotationWithProjectFilter() throws Exception {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         Property property = builder.givenAProperty(userAnnotation);
         restPropertyControllerMockMvc.perform(get("/api/annotation/property/key.json")
@@ -157,7 +157,7 @@ public class PropertyResourceTests {
 
     @Test
     @Transactional
-    public void list_keys_annotation_with_image_filter() throws Exception {
+    public void listKeysAnnotationWithImageFilter() throws Exception {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         Property property = builder.givenAProperty(userAnnotation);
         restPropertyControllerMockMvc.perform(get("/api/annotation/property/key.json")
@@ -169,7 +169,7 @@ public class PropertyResourceTests {
 
     @Test
     @Transactional
-    public void list_keys_annotation_with_image_filter_with_user() throws Exception {
+    public void listKeysAnnotationWithImageFilterWithUser() throws Exception {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         Property property = builder.givenAProperty(userAnnotation);
         restPropertyControllerMockMvc.perform(get("/api/annotation/property/key.json")
@@ -186,7 +186,7 @@ public class PropertyResourceTests {
 
     @Test
     @Transactional
-    public void list_keys_imageinstance_with_project_filter() throws Exception {
+    public void listKeysImageinstanceWithProjectFilter() throws Exception {
         ImageInstance imageInstance = builder.givenAnImageInstance();
         Property property = builder.givenAProperty(imageInstance);
         restPropertyControllerMockMvc.perform(get("/api/imageinstance/property/key.json")
@@ -199,7 +199,7 @@ public class PropertyResourceTests {
 
     @Test
     @Transactional
-    public void list_annotation_position() throws Exception {
+    public void listAnnotationPosition() throws Exception {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         Property property = builder.givenAProperty(userAnnotation);
         restPropertyControllerMockMvc.perform(get(
@@ -214,7 +214,7 @@ public class PropertyResourceTests {
 
     @Test
     @Transactional
-    public void show_property_for_project() throws Exception {
+    public void showPropertyForProject() throws Exception {
         Property property = builder.givenAProperty(builder.givenAProject());
         restPropertyControllerMockMvc.perform(get(
                 "/api/project/{project}/key/{key}/property.json",
@@ -227,7 +227,7 @@ public class PropertyResourceTests {
 
     @Test
     @Transactional
-    public void show_property_for_project_not_exists() throws Exception {
+    public void showPropertyForProjectNotExists() throws Exception {
         Property property = builder.givenAProperty(builder.givenAProject());
         restPropertyControllerMockMvc.perform(get("/api/project/{project}/key/{key}/property.json", 0L, "xxx"))
             .andExpect(status().isNotFound());
@@ -236,7 +236,7 @@ public class PropertyResourceTests {
 
     @Test
     @Transactional
-    public void show_property_for_project_key_not_exists() throws Exception {
+    public void showPropertyForProjectKeyNotExists() throws Exception {
         Property property = builder.givenAProperty(builder.givenAProject());
         restPropertyControllerMockMvc.perform(get(
                 "/api/project/{project}/key/{key}/property.json",
@@ -249,7 +249,7 @@ public class PropertyResourceTests {
 
     @Test
     @Transactional
-    public void show_property_for_annotation() throws Exception {
+    public void showPropertyForAnnotation() throws Exception {
         Property property = builder.givenAProperty(builder.givenAUserAnnotation());
         restPropertyControllerMockMvc.perform(get(
                 "/api/annotation/{annotation}/key/{key}/property.json",
@@ -262,7 +262,7 @@ public class PropertyResourceTests {
 
     @Test
     @Transactional
-    public void show_property_for_annotation_not_exists() throws Exception {
+    public void showPropertyForAnnotationNotExists() throws Exception {
         Property property = builder.givenAProperty(builder.givenAUserAnnotation());
         restPropertyControllerMockMvc.perform(get("/api/annotation/{annotation}/key/{key}/property.json", 0L, "xxx"))
             .andExpect(status().isNotFound());
@@ -271,7 +271,7 @@ public class PropertyResourceTests {
 
     @Test
     @Transactional
-    public void show_property_for_annotation_key_not_exists() throws Exception {
+    public void showPropertyForAnnotationKeyNotExists() throws Exception {
         Property property = builder.givenAProperty(builder.givenAUserAnnotation());
         restPropertyControllerMockMvc.perform(get(
                 "/api/annotation/{annotation}/key/{key}/property.json",
@@ -283,7 +283,7 @@ public class PropertyResourceTests {
 
     @Test
     @Transactional
-    public void show_property_for_image() throws Exception {
+    public void showPropertyForImage() throws Exception {
         Property property = builder.givenAProperty(builder.givenAnImageInstance());
         restPropertyControllerMockMvc.perform(get(
                 "/api/imageinstance/{imageinstance}/key/{key}/property.json",
@@ -296,7 +296,7 @@ public class PropertyResourceTests {
 
     @Test
     @Transactional
-    public void show_property_for_image_not_exists() throws Exception {
+    public void showPropertyForImageNotExists() throws Exception {
         Property property = builder.givenAProperty(builder.givenAnImageInstance());
         restPropertyControllerMockMvc.perform(get(
                 "/api/imageinstance/{imageinstance}/key/{key}/property.json",
@@ -308,7 +308,7 @@ public class PropertyResourceTests {
 
     @Test
     @Transactional
-    public void show_property_for_image_key_not_exists() throws Exception {
+    public void showPropertyForImageKeyNotExists() throws Exception {
         Property property = builder.givenAProperty(builder.givenAnImageInstance());
         restPropertyControllerMockMvc.perform(get(
                 "/api/imageinstance/{imageInstance}/key/{key}/property.json",
@@ -320,7 +320,7 @@ public class PropertyResourceTests {
 
     @Test
     @Transactional
-    public void show_property_for_domain() throws Exception {
+    public void showPropertyForDomain() throws Exception {
         Property property = builder.givenAProperty(builder.givenAnImageInstance());
         restPropertyControllerMockMvc.perform(get(
                 "/api/domain/{domainClassName}/{domainIdent}/key/{key}/property.json",
@@ -332,7 +332,7 @@ public class PropertyResourceTests {
 
     @Test
     @Transactional
-    public void show_property_for_domain_not_exists() throws Exception {
+    public void showPropertyForDomainNotExists() throws Exception {
         Property property = builder.givenAProperty(builder.givenAnImageInstance());
         restPropertyControllerMockMvc.perform(get(
                 "/api/domain/{domainClassName}/{domainIdent}/key/{key}/property.json",
@@ -343,7 +343,7 @@ public class PropertyResourceTests {
 
     @Test
     @Transactional
-    public void show_property_for_domain_key_not_exists() throws Exception {
+    public void showPropertyForDomainKeyNotExists() throws Exception {
         Property property = builder.givenAProperty(builder.givenAnImageInstance());
         restPropertyControllerMockMvc.perform(get(
                 "/api/domain/{domainClassName}/{domainIdent}/key/{key}/property.json",
@@ -355,7 +355,7 @@ public class PropertyResourceTests {
 
     @Test
     @Transactional
-    public void add_valid_property() throws Exception {
+    public void addValidProperty() throws Exception {
         Property property = builder.givenANotPersistedProperty(builder.givenAProject(), "key", "value");
         restPropertyControllerMockMvc.perform(post(
                 "/api/domain/{domainClassName}/{domainIdent}/property.json",
@@ -376,7 +376,7 @@ public class PropertyResourceTests {
 
     @Test
     @Transactional
-    public void add_valid_properties_by_batch() throws Exception {
+    public void addValidPropertiesByBatch() throws Exception {
         Project project = builder.givenAProject();
         Property property1 = builder.givenANotPersistedProperty(project, "key", "value");
         Property property2 = builder.givenANotPersistedProperty(project, "key", "value");
@@ -393,7 +393,7 @@ public class PropertyResourceTests {
 
     @Test
     @Transactional
-    public void add_valid_property_other_path() throws Exception {
+    public void addValidPropertyOtherPath() throws Exception {
         Property property = builder.givenANotPersistedProperty(builder.givenAProject(), "key", "value");
         restPropertyControllerMockMvc.perform(post("/api/property.json")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -411,7 +411,7 @@ public class PropertyResourceTests {
 
     @Test
     @Transactional
-    public void edit_valid_property() throws Exception {
+    public void editValidProperty() throws Exception {
         Property property = builder.givenANotPersistedProperty(builder.givenAProject(), "key", "value");
         builder.persistAndReturn(property);
         restPropertyControllerMockMvc.perform(put(
@@ -436,7 +436,7 @@ public class PropertyResourceTests {
 
     @Test
     @Transactional
-    public void delete_property() throws Exception {
+    public void deleteProperty() throws Exception {
         Property property = builder.givenANotPersistedProperty(builder.givenAProject(), "key", "value");
         builder.persistAndReturn(property);
         restPropertyControllerMockMvc.perform(delete(

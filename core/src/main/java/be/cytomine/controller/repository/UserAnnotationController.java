@@ -71,7 +71,8 @@ public class UserAnnotationController {
         if (projectId != null) {
             log.debug("REST request to count user annotations for user {} and project {}", userAnnotationUserId,
                 projectId);
-            return Map.of("total", userAnnotationHttpContract.countByUserAndProject(userAnnotationUserId, projectId, userId));
+            return Map.of("total",
+                userAnnotationHttpContract.countByUserAndProject(userAnnotationUserId, projectId, userId));
         }
         log.debug("REST request to count user annotations for user {}", userAnnotationUserId);
         return Map.of("total", userAnnotationHttpContract.countByUser(userAnnotationUserId, userId));

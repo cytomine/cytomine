@@ -1,21 +1,5 @@
 package be.cytomine.authorization;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.function.Executable;
@@ -29,8 +13,6 @@ import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ForbiddenException;
-import be.cytomine.repository.security.SecRoleRepository;
-import be.cytomine.repository.security.SecUserSecRoleRepository;
 import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.PermissionService;
@@ -64,12 +46,6 @@ public abstract class AbstractAuthorizationTest {
 
     @Autowired
     protected UserRepository userRepository;
-
-    @Autowired
-    protected SecUserSecRoleRepository secSecUserSecRoleRepository;
-
-    @Autowired
-    protected SecRoleRepository secRoleRepository;
 
     @Autowired
     protected PermissionService permissionService;

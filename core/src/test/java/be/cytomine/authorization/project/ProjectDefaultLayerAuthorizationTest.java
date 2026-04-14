@@ -1,21 +1,5 @@
 package be.cytomine.authorization.project;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -33,9 +17,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.CRDAuthorizationTest;
 import be.cytomine.domain.project.ProjectDefaultLayer;
 import be.cytomine.domain.security.User;
-import be.cytomine.service.PermissionService;
 import be.cytomine.service.project.ProjectDefaultLayerService;
-import be.cytomine.service.security.SecurityACLService;
 
 @AutoConfigureMockMvc
 @SpringBootTest(classes = CytomineCoreApplication.class)
@@ -51,17 +33,10 @@ public class ProjectDefaultLayerAuthorizationTest extends CRDAuthorizationTest {
     @Autowired
     BasicInstanceBuilder builder;
 
-    @Autowired
-    SecurityACLService securityACLService;
-
-    @Autowired
-    PermissionService permissionService;
-
     @BeforeEach
     public void before() throws Exception {
         if (projectDefaultLayer == null) {
             projectDefaultLayer = builder.givenAProjectDefaultLayer();
-            ;
             initACL(projectDefaultLayer.container());
         }
     }
@@ -69,28 +44,19 @@ public class ProjectDefaultLayerAuthorizationTest extends CRDAuthorizationTest {
     @Test
     @WithMockUser(username = SUPERADMIN)
     public void admin_can_list_project_representative_user() {
-        expectOK(() -> {
-            projectDefaultLayerService
-                .listByProject(projectDefaultLayer.getProject());
-        });
+        expectOK(() -> projectDefaultLayerService.listByProject(projectDefaultLayer.getProject()));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void user_with_read_can_list_project_representative_user() {
-        expectOK(() -> {
-            projectDefaultLayerService
-                .listByProject(projectDefaultLayer.getProject());
-        });
+        expectOK(() -> projectDefaultLayerService.listByProject(projectDefaultLayer.getProject()));
     }
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
     public void user_no_acl_cannot_list_project_representative_user() {
-        expectForbidden(() -> {
-            projectDefaultLayerService
-                .listByProject(projectDefaultLayer.getProject());
-        });
+        expectForbidden(() -> projectDefaultLayerService.listByProject(projectDefaultLayer.getProject()));
     }
 
     @Override
@@ -104,9 +70,7 @@ public class ProjectDefaultLayerAuthorizationTest extends CRDAuthorizationTest {
         User user = builder.givenAUser();
         builder.addUserToProject(projectDefaultLayer.getProject(), user.getUsername());
         projectDefaultLayerService.add(
-            builder.givenANotPersistedProjectRepresentativeUser(
-                projectDefaultLayer.getProject(), user
-            ).toJsonObject()
+            builder.givenANotPersistedProjectRepresentativeUser(projectDefaultLayer.getProject(), user).toJsonObject()
         );
     }
 

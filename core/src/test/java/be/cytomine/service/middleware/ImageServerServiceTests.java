@@ -1,21 +1,5 @@
 package be.cytomine.service.middleware;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -26,8 +10,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.client.RequestPatternBuilder;
-import com.github.tomakehurst.wiremock.verification.LoggedRequest;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -44,7 +26,6 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.config.properties.ApplicationProperties;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.AbstractSlice;
 import be.cytomine.domain.image.UploadedFile;
@@ -78,9 +59,6 @@ public class ImageServerServiceTests {
     @Autowired
     ImageServerService imageServerService;
 
-    @Autowired
-    ApplicationProperties applicationProperties;
-
     private static WireMockServer wireMockServer = new WireMockServer(8888);
 
     @BeforeAll
@@ -90,10 +68,7 @@ public class ImageServerServiceTests {
 
     @AfterAll
     public static void afterAll() {
-        try {
-            wireMockServer.stop();
-        } catch (Exception e) {
-        }
+        wireMockServer.stop();
     }
 
     @Test
@@ -101,8 +76,8 @@ public class ImageServerServiceTests {
         configureFor("localhost", 8888);
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/storage/size.json"))
             .willReturn(
-                aResponse().withBody(""
-                    + "{\"used\":193396892,\"available\":445132860,\"usedP\":0.302878435,\"hostname\":\"b52416f53249\",\"mount\":\"/data/images\",\"ip\":null}")
+                aResponse().withBody(
+                    "{\"used\":193396892,\"available\":445132860,\"usedP\":0.302878435,\"hostname\":\"b52416f53249\",\"mount\":\"/data/images\",\"ip\":null}")
             )
         );
 
@@ -110,12 +85,10 @@ public class ImageServerServiceTests {
         assertThat(response).isNotNull();
         assertThat(response.getUsed()).isEqualTo(193396892);
         assertThat(response.getHostname()).isEqualTo("b52416f53249");
-
     }
 
-
     @Test
-    void retrieve_formats() throws IOException {
+    void retrieve_formats() {
         configureFor("localhost", 8888);
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/formats"))
             .willReturn(
@@ -155,7 +128,6 @@ public class ImageServerServiceTests {
         );
 
         List<Map<String, Object>> formats = imageServerService.formats();
-        printLastRequest();
         System.out.println(formats.stream().map(x -> x.get("id")).collect(Collectors.toList()));
 
         assertThat(formats).isNotNull();
@@ -166,9 +138,6 @@ public class ImageServerServiceTests {
             .findFirst()
             .get()).containsAllEntriesOf(Map.of("id", "PNG", "name", "PNG", "plugin", "pims.formats.common"));
     }
-
-
-    //http://localhost-ims/image/download?fif=%2Fdata%2Fimages%2F58%2F1636379100999%2FCMU-2%2FCMU-2.mrxs&mimeType=openslide%2Fmrxs
 
     // TODO
     @Test
@@ -183,14 +152,9 @@ public class ImageServerServiceTests {
         String url = "/image/" + URLEncoder.encode(image.getPath(), StandardCharsets.UTF_8).replace("%2F", "/")
             + "/export?filename=" + URLEncoder.encode(image.getOriginalFilename(), StandardCharsets.UTF_8);
 
-        stubFor(get(urlEqualTo(IMS_API_BASE_PATH + url))
-            .willReturn(
-                aResponse().withBody(mockResponse)
-            )
-        );
+        stubFor(get(urlEqualTo(IMS_API_BASE_PATH + url)).willReturn(aResponse().withBody(mockResponse)));
 
         byte[] data = imageServerService.download(image, null).getBody();
-        printLastRequest();
         assertThat(data).isEqualTo(mockResponse);
 
         url = "/file/" + URLEncoder.encode(image.getPath(), StandardCharsets.UTF_8).replace("%2F", "/")
@@ -205,7 +169,6 @@ public class ImageServerServiceTests {
             )
         );
         data = imageServerService.download(image.getUploadedFile(), null).getBody();
-        printLastRequest();
         assertThat(data).isEqualTo(mockResponse);
     }
 
@@ -228,7 +191,6 @@ public class ImageServerServiceTests {
         );
 
         byte[] data = imageServerService.download(uploadedFile, null).getBody();
-        printLastRequest();
         assertThat(data).isEqualTo(mockResponse);
     }
 
@@ -237,7 +199,6 @@ public class ImageServerServiceTests {
         AbstractImage image = builder.givenAnAbstractImage();
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
-
 
         configureFor("localhost", 8888); //       /image/upload1644425985928451/LUNG1_pyr.tif/info
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
@@ -298,7 +259,6 @@ public class ImageServerServiceTests {
                 )
         );
         assertThat(((Map<String, Object>) imageServerService.properties(image).get("image")).size()).isEqualTo(20);
-        printLastRequest();
         assertThat(((Map<String, Object>) imageServerService.properties(image).get("image")).get("width")).isEqualTo(
             30720);
 
@@ -320,20 +280,18 @@ public class ImageServerServiceTests {
                 )
         );
         int size = imageServerService.associated(image).size();
-        printLastRequest();
         assertThat(size).isEqualTo(3);
-
     }
 
     @Test
-    void get_label_abstract_image_macro() throws IOException {
+    void get_label_abstract_image_macro() {
         AbstractImage image = builder.givenAnAbstractImage();
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
         configureFor("localhost", 8888);
         byte[] mockResponse = UUID.randomUUID()
             .toString()
-            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
+            .getBytes();
 
         String url = "/image/"
             + URLEncoder.encode(image.getPath(), StandardCharsets.UTF_8).replace("%2F", "/")
@@ -350,12 +308,11 @@ public class ImageServerServiceTests {
         labelParameter.setLabel("macro");
         labelParameter.setFormat("png");
         byte[] data = imageServerService.label(image, labelParameter, null, null).getBody();
-        printLastRequest();
         assertThat(data).isEqualTo(mockResponse);
     }
 
     @Test
-    void get_thumb_for_abstract_image() throws IOException {
+    void get_thumb_for_abstract_image() {
         AbstractImage image = builder.givenAnAbstractImage();
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
@@ -367,8 +324,7 @@ public class ImageServerServiceTests {
 
         byte[] mockResponse = UUID.randomUUID()
             .toString()
-            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
-
+            .getBytes();
 
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 image.getPath(),
@@ -383,13 +339,11 @@ public class ImageServerServiceTests {
         imageParameter.setFormat("png");
 
         byte[] data = imageServerService.thumb(slice, imageParameter, null, null).getBody();
-        printLastRequest();
         assertThat(data).isEqualTo(mockResponse);
-
 
         byte[] mockResponse2 = UUID.randomUUID()
             .toString()
-            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
+            .getBytes();
 
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 image.getPath(),
@@ -403,12 +357,11 @@ public class ImageServerServiceTests {
         imageParameter.setMaxSize(512);
         imageParameter.setFormat("png");
         data = imageServerService.thumb(slice, imageParameter, null, null).getBody();
-        printLastRequest();
         assertThat(data).isEqualTo(mockResponse2);
     }
 
     @Test
-    void get_normalized_tile_for_abstract_image() throws IOException {
+    void get_normalized_tile_for_abstract_image() {
         AbstractImage image = builder.givenAnAbstractImage();
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
@@ -420,8 +373,7 @@ public class ImageServerServiceTests {
 
         byte[] mockResponse = UUID.randomUUID()
             .toString()
-            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
-
+            .getBytes();
 
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 image.getPath(),
@@ -439,21 +391,18 @@ public class ImageServerServiceTests {
         tileParameters.setFilters("binary");
 
         byte[] data = imageServerService.normalizedTile(slice, tileParameters, null, null).getBody();
-        printLastRequest();
         assertThat(data).isEqualTo(mockResponse);
-
 
         byte[] mockResponse2 = UUID.randomUUID()
             .toString()
-            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
+            .getBytes();
 
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
-                image.getPath(),
-                StandardCharsets.UTF_8
-            ).replace("%2F", "/") + "/normalized-tile/zoom/2/tx/4/ty/6?channels=1&z_slices=0&timepoints=3&filters=otsu"))
-                .willReturn(
-                    aResponse().withBody(mockResponse2)
-                )
+                    image.getPath(),
+                    StandardCharsets.UTF_8
+                ).replace("%2F", "/")
+                    + "/normalized-tile/zoom/2/tx/4/ty/6?channels=1&z_slices=0&timepoints=3&filters=otsu")
+            ).willReturn(aResponse().withBody(mockResponse2))
         );
 
         tileParameters.setFormat("webp");
@@ -461,13 +410,11 @@ public class ImageServerServiceTests {
         tileParameters.setTimepoints("3");
         tileParameters.setChannels("1");
         data = imageServerService.normalizedTile(slice, tileParameters, null, null).getBody();
-        printLastRequest();
         assertThat(data).isEqualTo(mockResponse2);
     }
 
-
     @Test
-    void get_crop_for_abstract_image() throws IOException, ParseException {
+    void get_crop_for_abstract_image() throws ParseException {
         AbstractImage image = builder.givenAnAbstractImage();
         image.setWidth(109240);
         image.setHeight(220696);
@@ -480,7 +427,7 @@ public class ImageServerServiceTests {
         configureFor("localhost", 8888);
         byte[] mockResponse = UUID.randomUUID()
             .toString()
-            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
+            .getBytes();
 
         String url = "/image/"
             + URLEncoder.encode(image.getPath(), StandardCharsets.UTF_8).replace("%2F", "/")
@@ -512,15 +459,12 @@ public class ImageServerServiceTests {
         } catch (Exception exception) {
             exception.printStackTrace();
         }
-        printLastRequest();
         assertThat(crop).isEqualTo(mockResponse);
-
     }
 
 
     @Test
     void get_window_for_abstract_image() throws UnsupportedEncodingException, ParseException {
-
         AbstractImage image = builder.givenAnAbstractImage();
         image.setWidth(109240);
         image.setHeight(220696);
@@ -531,21 +475,17 @@ public class ImageServerServiceTests {
         slice.setUploadedFile(image.getUploadedFile());
         byte[] mockResponse = UUID.randomUUID()
             .toString()
-            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
+            .getBytes();
 
         configureFor("localhost", 8888);
         String url = "/image/"
             + URLEncoder.encode(image.getPath(), StandardCharsets.UTF_8).replace("%2F", "/")
             + "/window";
-        String
-            body
-            = "{\"level\":0,\"z_slices\":0,\"timepoints\":0,\"region\":{\"left\":10,\"top\":20,\"width\":30,\"height\":40}}";
-        System.out.println(url);
-        System.out.println(body);
+        String region = "{\"left\":10,\"top\":20,\"width\":30,\"height\":40}";
+        String body = "{\"level\":0,\"z_slices\":0,\"timepoints\":0,\"region\":" + region + "}";
+
         stubFor(post(urlEqualTo(IMS_API_BASE_PATH + url)).withRequestBody(equalTo(body))
-            .willReturn(
-                aResponse().withBody(mockResponse)
-            )
+            .willReturn(aResponse().withBody(mockResponse))
         );
 
         WindowParameter windowParameter = new WindowParameter();
@@ -555,20 +495,17 @@ public class ImageServerServiceTests {
         windowParameter.setH(40);
         windowParameter.setFormat("png");
         byte[] crop = imageServerService.window(slice, windowParameter, null, null).getBody();
-        printLastRequest();
         assertThat(crop).isEqualTo(mockResponse);
     }
 
-
     @Test
-    void image_histograms() throws IOException {
+    void image_histograms() {
         AbstractImage image = builder.givenAnAbstractImage();
         image.setWidth(109240);
         image.setHeight(220696);
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
         AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
-
 
         configureFor("localhost", 8888);
         System.out.println("/image/"
@@ -605,25 +542,23 @@ public class ImageServerServiceTests {
                 )
         );
 
-        Map<String, Object> reponse = imageServerService.imageHistogram(image, 256);
-        printLastRequest();
+        Map<String, Object> response = imageServerService.imageHistogram(image, 256);
 
-        assertThat(reponse).isNotNull();
-        assertThat(reponse.get("lastBin")).isEqualTo(255);
-        assertThat(reponse.get("type")).isEqualTo("FAST");
-        assertThat(((List) reponse.get("histogram")).get(0)).isEqualTo(168366);
-        assertThat(((List) reponse.get("histogram")).get(1)).isEqualTo(69327);
+        assertThat(response).isNotNull();
+        assertThat(response.get("lastBin")).isEqualTo(255);
+        assertThat(response.get("type")).isEqualTo("FAST");
+        assertThat(((List) response.get("histogram")).get(0)).isEqualTo(168366);
+        assertThat(((List) response.get("histogram")).get(1)).isEqualTo(69327);
     }
 
     @Test
-    void image_histograms_bounds() throws IOException {
+    void image_histograms_bounds() {
         AbstractImage image = builder.givenAnAbstractImage();
         image.setWidth(109240);
         image.setHeight(220696);
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
         AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
-
 
         configureFor("localhost", 8888);
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
@@ -640,23 +575,20 @@ public class ImageServerServiceTests {
         );
 
         Map<String, Object> response = imageServerService.imageHistogramBounds(image);
-        printLastRequest();
 
         assertThat(response).isNotNull();
         assertThat(response.get("minimum")).isEqualTo(0);
         assertThat(response.get("maximum")).isEqualTo(255);
     }
 
-
     @Test
-    void plane_histograms() throws IOException {
+    void plane_histograms() {
         AbstractImage image = builder.givenAnAbstractImage();
         image.setWidth(109240);
         image.setHeight(220696);
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
         AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
-
 
         configureFor("localhost", 8888);
         System.out.println("/image/"
@@ -697,26 +629,24 @@ public class ImageServerServiceTests {
                 )
         );
 
-        List<Map<String, Object>> reponse = imageServerService.planeHistograms(slice, 256, false);
-        printLastRequest();
+        List<Map<String, Object>> response = imageServerService.planeHistograms(slice, 256, false);
 
-        assertThat(reponse).isNotNull();
-        assertThat(reponse.size()).isEqualTo(1);
-        assertThat(reponse.get(0).get("lastBin")).isEqualTo(255);
-        assertThat(reponse.get(0).get("color")).isEqualTo("#f00");
-        assertThat(((List) reponse.get(0).get("histogram")).get(0)).isEqualTo(900);
-        assertThat(((List) reponse.get(0).get("histogram")).get(1)).isEqualTo(2701);
+        assertThat(response).isNotNull();
+        assertThat(response.size()).isEqualTo(1);
+        assertThat(response.get(0).get("lastBin")).isEqualTo(255);
+        assertThat(response.get(0).get("color")).isEqualTo("#f00");
+        assertThat(((List) response.get(0).get("histogram")).get(0)).isEqualTo(900);
+        assertThat(((List) response.get(0).get("histogram")).get(1)).isEqualTo(2701);
     }
 
     @Test
-    void plane_histograms_bounds() throws IOException {
+    void plane_histograms_bounds() {
         AbstractImage image = builder.givenAnAbstractImage();
         image.setWidth(109240);
         image.setHeight(220696);
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
         AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
-
 
         configureFor("localhost", 8888);
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
@@ -732,25 +662,22 @@ public class ImageServerServiceTests {
                 )
         );
 
-        List<Map<String, Object>> reponse = imageServerService.planeHistogramBounds(slice, false);
-        printLastRequest();
+        List<Map<String, Object>> response = imageServerService.planeHistogramBounds(slice, false);
 
-        assertThat(reponse).isNotNull();
-        assertThat(reponse.size()).isEqualTo(1);
-        assertThat(reponse.get(0).get("channel")).isEqualTo(0);
-        assertThat(reponse.get(0).get("color")).isEqualTo("#f00");
+        assertThat(response).isNotNull();
+        assertThat(response.size()).isEqualTo(1);
+        assertThat(response.get(0).get("channel")).isEqualTo(0);
+        assertThat(response.get(0).get("color")).isEqualTo("#f00");
     }
 
-
     @Test
-    void channel_histograms() throws IOException {
+    void channel_histograms() {
         AbstractImage image = builder.givenAnAbstractImage();
         image.setWidth(109240);
         image.setHeight(220696);
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
         AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
-
 
         configureFor("localhost", 8888);
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
@@ -783,26 +710,24 @@ public class ImageServerServiceTests {
                 )
         );
 
-        List<Map<String, Object>> reponse = imageServerService.planeHistograms(slice, 256, true);
-        printLastRequest();
+        List<Map<String, Object>> response = imageServerService.planeHistograms(slice, 256, true);
 
-        assertThat(reponse).isNotNull();
-        assertThat(reponse.size()).isEqualTo(1);
-        assertThat(reponse.get(0).get("channel")).isEqualTo(0);
-        assertThat(reponse.get(0).get("color")).isEqualTo("#f00");
-        assertThat(((List) reponse.get(0).get("histogram")).get(0)).isEqualTo(900);
-        assertThat(((List) reponse.get(0).get("histogram")).get(1)).isEqualTo(2701);
+        assertThat(response).isNotNull();
+        assertThat(response.size()).isEqualTo(1);
+        assertThat(response.get(0).get("channel")).isEqualTo(0);
+        assertThat(response.get(0).get("color")).isEqualTo("#f00");
+        assertThat(((List) response.get(0).get("histogram")).get(0)).isEqualTo(900);
+        assertThat(((List) response.get(0).get("histogram")).get(1)).isEqualTo(2701);
     }
 
     @Test
-    void chanel_histograms_bounds() throws IOException {
+    void chanel_histograms_bounds() {
         AbstractImage image = builder.givenAnAbstractImage();
         image.setWidth(109240);
         image.setHeight(220696);
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
         AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
-
 
         configureFor("localhost", 8888);
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
@@ -823,7 +748,6 @@ public class ImageServerServiceTests {
         );
 
         List<Map<String, Object>> reponse = imageServerService.planeHistogramBounds(slice, true);
-        printLastRequest();
 
         assertThat(reponse).isNotNull();
         assertThat(reponse.size()).isEqualTo(3);
@@ -836,13 +760,4 @@ public class ImageServerServiceTests {
         assertThat(reponse.get(0).get("minimum")).isEqualTo(6);
         assertThat(reponse.get(0).get("maximum")).isEqualTo(255);
     }
-
-
-    private void printLastRequest() {
-        List<LoggedRequest> all = wireMockServer.findAll(RequestPatternBuilder.allRequests());
-        all.subList(Math.max(all.size() - 3, 0), all.size())
-            .forEach(x -> System.out.println(x.getMethod() + " " + x.getAbsoluteUrl() + " " + x.getBodyAsString()));
-    }
-
-
 }

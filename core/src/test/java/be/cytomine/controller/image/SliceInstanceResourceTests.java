@@ -87,10 +87,7 @@ public class SliceInstanceResourceTests {
 
     @AfterAll
     public static void afterAll() {
-        try {
-            wireMockServer.stop();
-        } catch (Exception e) {
-        }
+        wireMockServer.stop();
     }
 
     @Test
@@ -213,15 +210,14 @@ public class SliceInstanceResourceTests {
         SliceInstance image = given_test_slice_instance();
         byte[] mockResponse = UUID.randomUUID()
             .toString()
-            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
+            .getBytes();
+        // we don't care about the response content, just check that core build a valid ims url and return the content
         configureFor("localhost", 8888);
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 image.getPath(),
                 StandardCharsets.UTF_8
             ).replace("%2F", "/") + "/thumb?z_slices=0&timepoints=0&length=512"))
-                .willReturn(
-                    aResponse().withBody(mockResponse)
-                )
+                .willReturn(aResponse().withBody(mockResponse))
         );
 
         MvcResult mvcResult = restSliceInstanceControllerMockMvc.perform(get(
@@ -248,15 +244,14 @@ public class SliceInstanceResourceTests {
         SliceInstance image = given_test_slice_instance();
         byte[] mockResponse = UUID.randomUUID()
             .toString()
-            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
+            .getBytes();
+        // we don't care about the response content, just check that core build a valid ims url and return the content
         configureFor("localhost", 8888);
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 image.getPath(),
                 StandardCharsets.UTF_8
             ).replace("%2F", "/") + "/normalized-tile/zoom/2/tx/4/ty/6?z_slices=0&timepoints=0&filters=binary"))
-                .willReturn(
-                    aResponse().withBody(mockResponse)
-                )
+                .willReturn(aResponse().withBody(mockResponse))
         );
 
         MvcResult mvcResult = restSliceInstanceControllerMockMvc.perform(get(

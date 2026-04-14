@@ -41,9 +41,12 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import be.cytomine.common.repository.http.AnnotationHttpContract;
+import be.cytomine.common.repository.http.AnnotationTermHttpContract;
 import be.cytomine.common.repository.http.UserAnnotationHttpContract;
+import be.cytomine.common.repository.model.annotationterm.payload.CreateAnnotationTerm;
 import be.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import be.cytomine.common.repository.model.command.payload.response.UserAnnotationResponse;
 import be.cytomine.common.repository.model.userannotation.payload.CreateUserAnnotation;
 import be.cytomine.common.repository.model.userannotation.payload.UpdateUserAnnotation;
 import be.cytomine.controller.RestCytomineController;
@@ -97,6 +100,8 @@ public class RestAnnotationDomainController extends RestCytomineController {
     private final AnnotationHttpContract annotationHttpContract;
 
     private final UserAnnotationHttpContract userAnnotationHttpContract;
+
+    private final AnnotationTermHttpContract annotationTermHttpContract;
 
     private final CurrentUserService currentUserService;
 
@@ -152,18 +157,27 @@ public class RestAnnotationDomainController extends RestCytomineController {
         long userId = currentUserService.getCurrentUser().getId();
         ImageInstance image = imageInstanceService.find(request.image())
             .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", String.valueOf(request.image())));
+        long annotationUserId = request.user() != null ? request.user() : userId;
         CreateUserAnnotation createUserAnnotation = new CreateUserAnnotation(
-            request.user() != null ? request.user() : userId,
+            annotationUserId,
             request.image(),
             request.slice(),
             image.getProject().getId(),
             request.location(),
             0.0
         );
-        return userAnnotationHttpContract.create(userId, createUserAnnotation);
+        Optional<HttpCommandResponse> result = userAnnotationHttpContract.create(userId, createUserAnnotation);
+        result.ifPresent(response -> {
+            if (response.data() instanceof UserAnnotationResponse ua && request.term() != null) {
+                request.term().forEach(termId ->
+                    annotationTermHttpContract.create(userId,
+                        new CreateAnnotationTerm(ua.id(), termId, userId)));
+            }
+        });
+        return result;
     }
 
-    record LegacyAnnotationRequest(Long user, Long image, Long slice, String location) {}
+    record LegacyAnnotationRequest(Long user, Long image, Long slice, String location, List<Long> term) {}
 
     @PutMapping("/annotation/{id}.json")
     public HttpCommandResponse update(@PathVariable long id, @RequestBody UpdateUserAnnotation update) {

@@ -16,9 +16,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.CRUDAuthorizationTest;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.project.EditingMode;
-import be.cytomine.service.PermissionService;
 import be.cytomine.service.image.SliceInstanceService;
-import be.cytomine.service.security.SecurityACLService;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.springframework.security.acls.domain.BasePermission.READ;

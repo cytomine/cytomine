@@ -1,21 +1,5 @@
 package be.cytomine.authorization.ontology;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -33,15 +17,12 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.CRDAuthorizationTest;
 import be.cytomine.domain.ontology.AnnotationTrack;
 import be.cytomine.domain.ontology.UserAnnotation;
-import be.cytomine.service.PermissionService;
 import be.cytomine.service.ontology.AnnotationTrackService;
-import be.cytomine.service.security.SecurityACLService;
 
 @AutoConfigureMockMvc
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @Transactional
 public class AnnotationTrackAuthorizationTest extends CRDAuthorizationTest {
-
 
     private AnnotationTrack annotationTrack = null;
 
@@ -51,17 +32,10 @@ public class AnnotationTrackAuthorizationTest extends CRDAuthorizationTest {
     @Autowired
     BasicInstanceBuilder builder;
 
-    @Autowired
-    SecurityACLService securityACLService;
-
-    @Autowired
-    PermissionService permissionService;
-
     @BeforeEach
     public void before() throws Exception {
         if (annotationTrack == null) {
             annotationTrack = builder.givenAnAnnotationTrack();
-            ;
             initACL(annotationTrack.container());
         }
     }
@@ -69,23 +43,19 @@ public class AnnotationTrackAuthorizationTest extends CRDAuthorizationTest {
     @Test
     @WithMockUser(username = SUPERADMIN)
     public void admin_can_list_annotationTracks() {
-        expectOK(() -> { annotationTrackService.list(annotationTrack.getTrack()); });
+        expectOK(() -> annotationTrackService.list(annotationTrack.getTrack()));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void user_cannot_list_annotationTracks() {
-        expectOK(() -> {
-            annotationTrackService.list(annotationTrack.getTrack());
-        });
+        expectOK(() -> annotationTrackService.list(annotationTrack.getTrack()));
     }
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
     public void user_without_acl_cannot_list_annotationTracks() {
-        expectForbidden(() -> {
-            annotationTrackService.list(annotationTrack.getTrack());
-        });
+        expectForbidden(() -> annotationTrackService.list(annotationTrack.getTrack()));
     }
 
     @Override

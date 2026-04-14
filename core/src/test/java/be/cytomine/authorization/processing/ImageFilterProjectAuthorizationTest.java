@@ -1,21 +1,5 @@
 package be.cytomine.authorization.processing;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -32,28 +16,20 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.CRDAuthorizationTest;
 import be.cytomine.domain.processing.ImageFilterProject;
-import be.cytomine.service.PermissionService;
 import be.cytomine.service.processing.ImageFilterProjectService;
-import be.cytomine.service.security.SecurityACLService;
 
 @AutoConfigureMockMvc
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @Transactional
 public class ImageFilterProjectAuthorizationTest extends CRDAuthorizationTest {
 
-
     private ImageFilterProject imageFilterProject = null;
 
     @Autowired
     ImageFilterProjectService imageFilterProjectService;
+
     @Autowired
     BasicInstanceBuilder builder;
-
-    @Autowired
-    SecurityACLService securityACLService;
-
-    @Autowired
-    PermissionService permissionService;
 
     @BeforeEach
     public void before() throws Exception {
@@ -66,37 +42,31 @@ public class ImageFilterProjectAuthorizationTest extends CRDAuthorizationTest {
     @Test
     @WithMockUser(username = SUPERADMIN)
     public void admin_can_list_all_image_filters() {
-        expectOK(() -> { imageFilterProjectService.list(); });
+        expectOK(() -> imageFilterProjectService.list());
     }
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
     public void user_no_acl_cannot_list_project_representative_user() {
-        expectForbidden(() -> {
-            imageFilterProjectService.list();
-        });
+        expectForbidden(() -> imageFilterProjectService.list());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
     public void project_admin_can_list_project_image_filters() {
-        expectOK(() -> { imageFilterProjectService.list(imageFilterProject.getProject()); });
+        expectOK(() -> imageFilterProjectService.list(imageFilterProject.getProject()));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void contributor_can_list_project_image_filter() {
-        expectOK(() -> {
-            imageFilterProjectService.list(imageFilterProject.getProject());
-        });
+        expectOK(() -> imageFilterProjectService.list(imageFilterProject.getProject()));
     }
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
     public void user_not_in_project_cannot_list_project_image_filter() {
-        expectForbidden(() -> {
-            imageFilterProjectService.list(imageFilterProject.getProject());
-        });
+        expectForbidden(() -> imageFilterProjectService.list(imageFilterProject.getProject()));
     }
 
     @Override
@@ -138,7 +108,6 @@ public class ImageFilterProjectAuthorizationTest extends CRDAuthorizationTest {
     protected Optional<Permission> minimalPermissionForEdit() {
         return Optional.of(BasePermission.ADMINISTRATION);
     }
-
 
     @Override
     protected Optional<String> minimalRoleForCreate() {

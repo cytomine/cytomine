@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import jakarta.persistence.EntityManager;
@@ -44,6 +45,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import be.cytomine.common.repository.http.TermRelationHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
 import be.cytomine.domain.ontology.AnnotationTerm;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.ontology.UserAnnotation;
@@ -53,7 +56,6 @@ import be.cytomine.domain.social.AnnotationAction;
 import be.cytomine.domain.social.PersistentImageConsultation;
 import be.cytomine.domain.social.PersistentProjectConnection;
 import be.cytomine.dto.StorageStats;
-import be.cytomine.repository.ontology.RelationRepository;
 import be.cytomine.repository.ontology.TermRepository;
 import be.cytomine.repository.ontology.UserAnnotationRepository;
 import be.cytomine.service.CurrentUserService;
@@ -86,7 +88,7 @@ public class StatsService {
     TermRepository termRepository;
 
     @Autowired
-    RelationRepository relationRepository;
+    TermRelationHttpContract termRelationHttpContract;
 
     @Autowired
     MongoTemplate mongoTemplate;
@@ -346,9 +348,20 @@ public class StatsService {
     public List<JsonObject> statTerm(Project project, Date startDate, Date endDate, boolean leafsOnly) {
         securityACLService.check(project, READ);
         //Get leaf term (parent term cannot be map with annotation)
-        List<Term> terms = leafsOnly
-            ? termRepository.findAllLeafTerms(project.getOntology(), relationRepository.getParent())
-            : new ArrayList<>(project.getOntology().getTerms());
+        List<Term> terms;
+        if (leafsOnly) {
+            long userId = currentUserService.getCurrentUser().getId();
+            long ontologyId = project.getOntology().getId();
+            Set<Long> nonLeafTermIds = termRelationHttpContract.findAllByOntologyId(ontologyId, userId)
+                .stream()
+                .map(TermRelationResponse::term1Id)
+                .collect(Collectors.toSet());
+            terms = project.getOntology().getTerms().stream()
+                .filter(t -> !nonLeafTermIds.contains(t.getId()))
+                .collect(Collectors.toList());
+        } else {
+            terms = new ArrayList<>(project.getOntology().getTerms());
+        }
 
         JsonObject stats = new JsonObject();
         JsonObject color = new JsonObject();

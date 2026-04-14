@@ -16,23 +16,12 @@ package be.cytomine.controller.stats;
 * limitations under the License.
 */
 
-import be.cytomine.BasicInstanceBuilder;
-import be.cytomine.CytomineCoreApplication;
-import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.domain.image.ImageInstance;
-import be.cytomine.domain.ontology.*;
-import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
-import be.cytomine.domain.social.AnnotationAction;
-import be.cytomine.domain.social.PersistentImageConsultation;
-import be.cytomine.domain.social.PersistentProjectConnection;
-import be.cytomine.repositorynosql.social.*;
-import be.cytomine.service.social.AnnotationActionService;
-import be.cytomine.service.social.ImageConsultationService;
-import be.cytomine.service.social.ProjectConnectionService;
-import be.cytomine.utils.JsonObject;
+import java.util.Date;
+import java.util.List;
+
 import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.client.WireMock;
+import jakarta.persistence.EntityManager;
 import org.apache.commons.lang3.time.DateUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -46,9 +35,32 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.persistence.EntityManager;
-import java.util.Date;
-import java.util.List;
+import be.cytomine.BasicInstanceBuilder;
+import be.cytomine.CytomineCoreApplication;
+import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.domain.image.ImageInstance;
+import be.cytomine.domain.ontology.AnnotationDomain;
+import be.cytomine.domain.ontology.AnnotationTerm;
+import be.cytomine.domain.ontology.ReviewedAnnotation;
+import be.cytomine.domain.ontology.Term;
+import be.cytomine.domain.ontology.UserAnnotation;
+import be.cytomine.domain.project.Project;
+import be.cytomine.domain.security.User;
+import be.cytomine.domain.social.AnnotationAction;
+import be.cytomine.domain.social.PersistentImageConsultation;
+import be.cytomine.domain.social.PersistentProjectConnection;
+import be.cytomine.repositorynosql.social.LastConnectionRepository;
+import be.cytomine.repositorynosql.social.LastUserPositionRepository;
+import be.cytomine.repositorynosql.social.PersistentConnectionRepository;
+import be.cytomine.repositorynosql.social.PersistentImageConsultationRepository;
+import be.cytomine.repositorynosql.social.PersistentProjectConnectionRepository;
+import be.cytomine.repositorynosql.social.PersistentUserPositionRepository;
+import be.cytomine.repositorynosql.social.ProjectConnectionRepository;
+import be.cytomine.service.social.AnnotationActionService;
+import be.cytomine.service.social.ImageConsultationService;
+import be.cytomine.service.social.ProjectConnectionService;
+import be.cytomine.utils.JsonObject;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
@@ -127,6 +139,10 @@ public class StatsResourceTests {
         projectConnectionRepository.deleteAll();
         lastUserPositionRepository.deleteAll();
         persistentUserPositionRepository.deleteAll();
+        wireMockServer.stubFor(WireMock.get(WireMock.urlPathMatching("/term_relations/ontology/.*"))
+            .willReturn(WireMock.aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withBody("[]")));
     }
 
     PersistentProjectConnection given_a_persistent_connection_in_project(User user, Project project, Date created) {

@@ -1,6 +1,6 @@
 package be.cytomine.common.repository.model.command.request;
 
-import be.cytomine.common.repository.model.command.DataType;
+import be.cytomine.common.repository.model.command.CommandType;
 import be.cytomine.common.repository.model.command.payload.request.TermCommandPayload;
 
 import static java.lang.String.format;
@@ -10,8 +10,8 @@ public record UpdateTermCommand(Long id, TermCommandPayload before, TermCommandP
     implements UpdateCommandRequest<TermCommandPayload> {
 
     @Override
-    public DataType getDataType() {
-        return DataType.TERM;
+    public CommandType getCommandType() {
+        return CommandType.UPDATE_TERM_COMMAND;
     }
 
     @Override

@@ -119,7 +119,7 @@ public class Ontology extends CytomineDomain {
     public List<Map<String, Object>> tree() {
         List<Map<String, Object>> rootTerms = new ArrayList<>();
         for (Term term : this.terms()) {
-            if (term.isRoot()) {
+            if (term.getDeleted() == null && term.isRoot()) {
                 rootTerms.add(branch(term));
             }
         }

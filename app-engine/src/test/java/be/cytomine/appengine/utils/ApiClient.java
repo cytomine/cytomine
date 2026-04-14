@@ -58,7 +58,11 @@ public class ApiClient {
         return restTemplate.getForEntity(url, responseType);
     }
 
-    public <T> ResponseEntity<Resource> getData(String url, HttpEntity<Object> entity, Map<String,String> params) {
+    public <T> ResponseEntity<T> get(String url, ParameterizedTypeReference<T> responseType) {
+        return restTemplate.exchange(url, HttpMethod.GET, null, responseType);
+    }
+
+    public <T> ResponseEntity<Resource> getData(String url, HttpEntity<Object> entity, Map<String, String> params) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url);
 
         for (Map.Entry<String, String> entry : params.entrySet()) {
@@ -73,10 +77,6 @@ public class ApiClient {
             Resource.class
         );
 
-    }
-
-    public <T> ResponseEntity<T> get(String url, ParameterizedTypeReference<T> responseType) {
-        return restTemplate.exchange(url, HttpMethod.GET, null, responseType);
     }
 
     public <T> ResponseEntity<T> post(String url, Object body, Class<T> responseType) {
@@ -103,7 +103,20 @@ public class ApiClient {
         return restTemplate.exchange(url, HttpMethod.PUT, entity, responseType);
     }
 
-    public <T> ResponseEntity<T> put(String url, HttpEntity<Object> entity, Class<T> responseType, Map<String, String> params) {
+    public <T> ResponseEntity<T> put(
+        String url,
+        HttpEntity<Object> entity,
+        ParameterizedTypeReference<T> responseType
+    ) {
+        return restTemplate.exchange(url, HttpMethod.PUT, entity, responseType);
+    }
+
+    public <T> ResponseEntity<T> put(
+        String url,
+        HttpEntity<Object> entity,
+        Class<T> responseType,
+        Map<String, String> params
+    ) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url);
 
         for (Map.Entry<String, String> entry : params.entrySet()) {
@@ -114,7 +127,12 @@ public class ApiClient {
         return restTemplate.exchange(finalUrl, HttpMethod.PUT, entity, responseType);
     }
 
-    public <T> ResponseEntity<T> postDataPart(String url, HttpEntity<Object> entity, Class<T> responseType, Map<String, String> params) {
+    public <T> ResponseEntity<T> postDataPart(
+        String url,
+        HttpEntity<Object> entity,
+        Class<T> responseType,
+        Map<String, String> params
+    ) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url);
 
         for (Map.Entry<String, String> entry : params.entrySet()) {
@@ -123,10 +141,6 @@ public class ApiClient {
         String finalUrl = builder.toUriString();
 
         return restTemplate.exchange(finalUrl, HttpMethod.POST, entity, responseType);
-    }
-
-    public <T> ResponseEntity<T> put(String url, HttpEntity<Object> entity, ParameterizedTypeReference<T> responseType) {
-        return restTemplate.exchange(url, HttpMethod.PUT, entity, responseType);
     }
 
     public ResponseEntity<String> checkHealth() {
@@ -225,8 +239,7 @@ public class ApiClient {
     }
 
     public JsonNode provisionInput(String uuid, String parameterName, String type, String value)
-        throws JsonProcessingException
-    {
+        throws JsonProcessingException {
 
         if (type.equals("image") || type.equals("file")) {
 
@@ -239,9 +252,12 @@ public class ApiClient {
             };
             body.add("file", fileResource);
 
-            return postData(baseUrl + "/task-runs/" + uuid + "/input-provisions/" + parameterName, body, JsonNode.class).getBody();
+            return postData(
+                baseUrl + "/task-runs/" + uuid + "/input-provisions/" + parameterName,
+                body,
+                JsonNode.class
+            ).getBody();
         } else {
-            HttpEntity<Object> entity = null;
             ObjectMapper mapper = new ObjectMapper();
             ObjectNode jsonNode = mapper.valueToTree(
                 TaskTestsUtils.createProvision(parameterName, type, value)
@@ -250,8 +266,12 @@ public class ApiClient {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
 
-            entity = new HttpEntity<>(jsonNode, headers);
-            return put(baseUrl + "/task-runs/" + uuid + "/input-provisions/" + parameterName, entity, JsonNode.class).getBody();
+            HttpEntity<Object> entity = new HttpEntity<>(jsonNode, headers);
+            return put(
+                baseUrl + "/task-runs/" + uuid + "/input-provisions/" + parameterName,
+                entity,
+                JsonNode.class
+            ).getBody();
         }
 
     }
@@ -261,7 +281,11 @@ public class ApiClient {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<Object> entity = new HttpEntity<>(body, headers);
 
-        return put(baseUrl + "/task-runs/" + uuid + "/input-provisions", entity, new ParameterizedTypeReference<List<JsonNode>>() {}).getBody();
+        return put(
+            baseUrl + "/task-runs/" + uuid + "/input-provisions",
+            entity,
+            new ParameterizedTypeReference<List<JsonNode>>() {}
+        ).getBody();
     }
 
     public ResponseEntity<StateAction> updateState(String uuid, TaskRunState state) {
@@ -305,9 +329,7 @@ public class ApiClient {
         return TaskTestsUtils.convertTo(response);
     }
 
-    public JsonNode provisionInputPart(String uuid, String parameterName, String type, String value, int index)
-        throws JsonProcessingException
-    {
+    public JsonNode provisionInputPart(String uuid, String parameterName, String type, String value, int index) {
         HttpEntity<Object> entity = null;
         if (type.equals("image") || type.equals("file")) {
             HttpHeaders headers = new HttpHeaders();
@@ -323,9 +345,14 @@ public class ApiClient {
             body.add("file", fileResource);
 
             entity = new HttpEntity<>(body, headers);
-            Map<String,String> params = new HashMap<>();
+            Map<String, String> params = new HashMap<>();
             params.put("value", String.valueOf(index));
-            return postDataPart(baseUrl + "/task-runs/" + uuid + "/input-provisions/" + parameterName + "/indexes", entity, JsonNode.class, params).getBody();
+            return postDataPart(
+                baseUrl + "/task-runs/" + uuid + "/input-provisions/" + parameterName + "/indexes",
+                entity,
+                JsonNode.class,
+                params
+            ).getBody();
         } else {
             ObjectMapper mapper = new ObjectMapper();
             ObjectNode jsonNode = mapper.valueToTree(
@@ -338,15 +365,20 @@ public class ApiClient {
             entity = new HttpEntity<>(jsonNode, headers);
         }
 
-        Map<String,String> params = new HashMap<>();
+        Map<String, String> params = new HashMap<>();
         params.put("value", String.valueOf(index));
 
-        return put(baseUrl + "/task-runs/" + uuid + "/input-provisions/" + parameterName + "/indexes", entity, JsonNode.class, params).getBody();
+        return put(
+            baseUrl + "/task-runs/" + uuid + "/input-provisions/" + parameterName + "/indexes",
+            entity,
+            JsonNode.class,
+            params
+        ).getBody();
     }
 
-    public Resource retrieveInputPart(String uuid, String parameterName, int index)  {
+    public Resource retrieveInputPart(String uuid, String parameterName, int index) {
 
-        Map<String,String> params = new HashMap<>();
+        Map<String, String> params = new HashMap<>();
         params.put("value", String.valueOf(index));
 
         return getData(baseUrl + "/task-runs/" + uuid + "/input/" + parameterName + "/indexes", null, params).getBody();

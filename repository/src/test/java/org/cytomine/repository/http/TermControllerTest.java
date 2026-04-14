@@ -26,7 +26,6 @@ import tools.jackson.databind.ObjectMapper;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.SpringPage;
 import be.cytomine.common.repository.model.command.CommandType;
-import be.cytomine.common.repository.model.command.DataType;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.common.repository.model.term.payload.CreateTerm;
@@ -124,8 +123,8 @@ class TermControllerTest {
                     .content(objectMapper.writeValueAsString(createTerm))).andExpect(status().isOk()).andReturn()
             .getResponse().getContentAsString();
 
-        HttpCommandResponse result = objectMapper.readValue(response,
-            objectMapper.getTypeFactory().constructType(HttpCommandResponse.class));
+        HttpCommandResponse result =
+            objectMapper.readValue(response, objectMapper.getTypeFactory().constructType(HttpCommandResponse.class));
 
         TermResponse dataResult = (TermResponse) result.data();
 
@@ -134,9 +133,9 @@ class TermControllerTest {
         assertEquals(ontologyId, dataResult.ontologyId());
 
         CommandV2Entity command = commandRepository.findById(result.commandId()).orElseThrow();
-        assertEquals(CommandType.INSERT_COMMAND, command.getData().getCommandType());
+        assertEquals(CommandType.INSERT_TERM_COMMAND, command.getData().getCommandType());
         assertEquals(userId, command.getUserId());
-        assertEquals(DataType.TERM, command.getData().getDataType());
+
 
     }
 
@@ -150,15 +149,14 @@ class TermControllerTest {
                 .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(updateTerm)))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
-        HttpCommandResponse result = objectMapper.readValue(response,
-            objectMapper.getTypeFactory().constructType(HttpCommandResponse.class));
+        HttpCommandResponse result =
+            objectMapper.readValue(response, objectMapper.getTypeFactory().constructType(HttpCommandResponse.class));
         TermResponse dataResult = (TermResponse) result.data();
         assertEquals("newName", dataResult.name());
         assertEquals("#00FF00", dataResult.color());
 
         CommandV2Entity command = commandRepository.findById(result.commandId()).orElseThrow();
         assertEquals(userId, command.getUserId());
-        assertEquals(DataType.TERM, command.getData().getDataType());
 
     }
 
@@ -181,16 +179,15 @@ class TermControllerTest {
         String response = mockMvc.perform(delete("/terms/{id}", entity.getId()).param("userId", userId.toString()))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
-        HttpCommandResponse result = objectMapper.readValue(response,
-            objectMapper.getTypeFactory().constructType(HttpCommandResponse.class));
+        HttpCommandResponse result =
+            objectMapper.readValue(response, objectMapper.getTypeFactory().constructType(HttpCommandResponse.class));
         TermResponse dataResult = (TermResponse) result.data();
         assertEquals("term1", dataResult.name());
         assertEquals(termRepository.findById(entity.getId()), Optional.of(entity));
 
         CommandV2Entity command = commandRepository.findById(result.commandId()).orElseThrow();
-        assertEquals(CommandType.DELETE_COMMAND, command.getData().getCommandType());
+        assertEquals(CommandType.DELETE_TERM_COMMAND, command.getData().getCommandType());
         assertEquals(userId, command.getUserId());
-        assertEquals(DataType.TERM, command.getData().getDataType());
 
     }
 

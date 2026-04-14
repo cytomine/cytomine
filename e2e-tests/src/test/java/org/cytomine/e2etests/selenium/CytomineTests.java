@@ -176,6 +176,22 @@ public class CytomineTests {
     }
 
     @Test
+    void deleteParentTermRemovesBothFromTree() {
+        String ontologyName = "selenium-ontology-" + randomUUID();
+        String parentTermName = "selenium-parent-" + randomUUID();
+        String childTermName = "selenium-child-" + randomUUID();
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        String ontologyURL = cytomineSteps.createOntology(wait, driver, cytomineUrl, ontologyName);
+        cytomineSteps.addTermToOntology(wait, driver, ontologyURL, parentTermName);
+        cytomineSteps.addTermToOntology(wait, driver, ontologyURL, childTermName);
+        cytomineSteps.makeTermChildOf(wait, driver, ontologyURL, childTermName, parentTermName);
+        cytomineSteps.deleteTermFromOntology(wait, ontologyURL, parentTermName);
+        cytomineSteps.verifyTermsAbsentAfterRefresh(wait, ontologyURL, parentTermName, childTermName);
+        cytomineSteps.deleteOntology(wait, ontologyURL);
+        cytomineSteps.logout(wait, cytomineUrl);
+    }
+
+    @Test
     void addAnnotationWithTools() {
         String projectName = "selenium-" + randomUUID();
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
@@ -265,7 +281,7 @@ public class CytomineTests {
     }
 
     @Test
-    void runTask() {
+    void runTaskAndDeleteRun() {
         String zipName = "com.cytomine.dummy.identity.geometry-1.0.0.zip";
         String projectName = "selenium-" + randomUUID();
         String taskName = "identity with geometry";
@@ -282,6 +298,7 @@ public class CytomineTests {
         cytomineSteps.selectTask(wait, taskName, taskVersion);
         cytomineSteps.selectAnnotationForGeometryInput(wait);
         cytomineSteps.runTask(wait, driver);
+        cytomineSteps.deleteTaskRun(wait, projectUrl, taskName);
 
         cytomineSteps.deleteTask(wait, cytomineUrl, taskName);
         cytomineSteps.deleteProject(wait, projectUrl);

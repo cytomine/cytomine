@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import org.cytomine.repository.mapper.CommandMapper;
 import org.cytomine.repository.mapper.OntologyMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
+import org.cytomine.repository.persistence.TermRelationRepository;
 import org.cytomine.repository.persistence.TermRepository;
 import org.cytomine.repository.persistence.entity.CommandV2Entity;
 import org.cytomine.repository.persistence.entity.TermEntity;
@@ -29,6 +30,7 @@ import be.cytomine.common.repository.model.term.payload.UpdateTerm;
 public class TermCommandService {
 
     private final TermRepository termRepository;
+    private final TermRelationRepository termRelationRepository;
     private final OntologyMapper ontologyMapper;
     private final CommandV2Repository commandV2Repository;
     private final CommandMapper commandMapper;
@@ -37,15 +39,18 @@ public class TermCommandService {
     @Transactional
     public Optional<HttpCommandResponse> deleteTerm(Long id, Long userId, LocalDateTime now) {
         return termRepository.findById(id)
-            .filter(entity -> aclService.canDeleteOntology(userId, entity.getOntologyId())).map(termEntity -> {
-                DeleteTermCommand deleteCommand =
-                    new DeleteTermCommand(id, ontologyMapper.mapToTermCommandPayload(termEntity), userId,
-                        termEntity.getOntologyId());
-                CommandV2Entity commandV2Entity =
-                    commandV2Repository.save(commandMapper.map(deleteCommand, now, now, userId));
-                termEntity.setDeleted(now);
-                return saveAndBuildResponse(termEntity, Commands.DELETE_TERM, commandV2Entity.getId());
-            });
+                   .filter(entity -> aclService.canDeleteOntology(userId, entity.getOntologyId()))
+                   .map(termEntity -> {
+                       DeleteTermCommand deleteCommand =
+                           new DeleteTermCommand(id, ontologyMapper.mapToTermCommandPayload(termEntity), userId,
+                               termEntity.getOntologyId());
+                       CommandV2Entity commandV2Entity =
+                           commandV2Repository.save(commandMapper.map(deleteCommand, now, now, userId));
+                       termRelationRepository.findAllByTerm1IdOrTerm2Id(id, id)
+                           .forEach(rel -> rel.setDeleted(now));
+                       termEntity.setDeleted(now);
+                       return saveAndBuildResponse(termEntity, Commands.DELETE_TERM, commandV2Entity.getId());
+                   });
     }
 
     public Optional<HttpCommandResponse> createTerm(Long userId, CreateTerm createTerm, LocalDateTime now) {
@@ -69,22 +74,23 @@ public class TermCommandService {
     @Transactional
     public Optional<HttpCommandResponse> updateTerm(long id, Long userId, UpdateTerm updateTerm, LocalDateTime now) {
         return termRepository.findById(id).filter(entity -> aclService.canWriteOntology(userId, entity.getOntologyId()))
-            .map(termEntity -> {
-                TermCommandPayload beforePayload = ontologyMapper.mapToTermCommandPayload(termEntity);
-                updateTerm.name().ifPresent(termEntity::setName);
-                updateTerm.color().ifPresent(termEntity::setColor);
-                TermEntity savedEntity = termRepository.save(termEntity);
-                UpdateTermCommand updateCommand =
-                    new UpdateTermCommand(id, beforePayload, ontologyMapper.mapToTermCommandPayload(savedEntity),
-                        userId, termEntity.getOntologyId());
+                   .map(termEntity -> {
+                       TermCommandPayload beforePayload = ontologyMapper.mapToTermCommandPayload(termEntity);
+                       updateTerm.name().ifPresent(termEntity::setName);
+                       updateTerm.color().ifPresent(termEntity::setColor);
+                       TermEntity savedEntity = termRepository.save(termEntity);
+                       UpdateTermCommand updateCommand =
+                           new UpdateTermCommand(id, beforePayload, ontologyMapper.mapToTermCommandPayload(savedEntity),
+                               userId, termEntity.getOntologyId());
 
-                CommandV2Entity commandV2Entity =
-                    commandV2Repository.save(commandMapper.map(updateCommand, now, now, userId));
+                       CommandV2Entity commandV2Entity =
+                           commandV2Repository.save(commandMapper.map(updateCommand, now, now, userId));
 
-                TermResponse termResponse = ontologyMapper.map(savedEntity);
+                       TermResponse termResponse = ontologyMapper.map(savedEntity);
 
-                return new HttpCommandResponse(true, termResponse, commandV2Entity.getId(), Commands.UPDATE_TERM);
-            });
+                       return new HttpCommandResponse(true, termResponse, commandV2Entity.getId(),
+                           Commands.UPDATE_TERM);
+                   });
     }
 
     public Optional<HttpCommandResponse> undoDeleteTerm(UUID commandId, DeleteTermCommand deleteTermCommand,

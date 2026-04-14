@@ -30,16 +30,16 @@ public interface TermHttpContract {
 
     @PostExchange
     Optional<HttpCommandResponse> create(@RequestParam long userId,
-                                                       @Valid @RequestBody CreateTerm createTerm);
+                                         @Valid @RequestBody CreateTerm createTerm);
 
     @PutExchange("/{id}")
     Optional<HttpCommandResponse> update(@PathVariable long id,
-                                                       @RequestParam long userId,
-                                                       @RequestBody UpdateTerm updateTerm);
+                                         @RequestParam long userId,
+                                         @RequestBody UpdateTerm updateTerm);
 
     @DeleteExchange("/{id}")
     Optional<HttpCommandResponse> delete(@PathVariable long id,
-                                                       @RequestParam long userId);
+                                         @RequestParam long userId);
 
     @GetExchange("/project/{id}")
     Page<TermResponse> findTermsByProject(@PathVariable long id, @RequestParam long userId, Pageable pageable);

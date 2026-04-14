@@ -16,14 +16,10 @@ package be.cytomine.controller.security;
 * limitations under the License.
 */
 
-import be.cytomine.BasicInstanceBuilder;
-import be.cytomine.CytomineCoreApplication;
-import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.domain.ontology.RelationTerm;
-import be.cytomine.domain.security.SecUserSecRole;
-import be.cytomine.domain.security.User;
-import be.cytomine.repository.security.SecRoleRepository;
+import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -31,14 +27,30 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+
+import be.cytomine.BasicInstanceBuilder;
+import be.cytomine.CytomineCoreApplication;
+import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.http.TermRelationHttpContract;
+import be.cytomine.common.repository.model.command.Commands;
+import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import be.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
+import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.domain.ontology.Term;
+import be.cytomine.domain.security.SecUserSecRole;
+import be.cytomine.domain.security.User;
+import be.cytomine.repository.security.SecRoleRepository;
 
 import jakarta.persistence.EntityManager;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -60,6 +72,9 @@ public class SecUserSecRoleResourceTests {
 
     @Autowired
     private SecRoleRepository secRoleRepository;
+
+    @MockitoBean
+    private TermRelationHttpContract termRelationHttpContract;
 
     @Test
     @Transactional
@@ -143,18 +158,23 @@ public class SecUserSecRoleResourceTests {
     @Test
     @Transactional
     public void delete_parent_relation_term() throws Exception {
-        RelationTerm relationTerm = builder.given_a_relation_term();
-        restSecUserSecRoleControllerMockMvc.perform(delete("/api/relation/parent/term1/{idTerm1}/term2/{idTerm2}.json", relationTerm.getTerm1().getId(), relationTerm.getTerm2().getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(relationTerm.toJSON()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.printMessage").value(true))
-                .andExpect(jsonPath("$.callback").exists())
-                .andExpect(jsonPath("$.callback.relationtermID").exists())
-                .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteRelationTermCommand"))
-                .andExpect(jsonPath("$.message").exists())
-                .andExpect(jsonPath("$.command").exists())
-                .andExpect(jsonPath("$.relationterm.id").exists());
+        Term term1 = builder.given_a_term();
+        Term term2 = builder.given_a_term(term1.getOntology());
+        Long userId = builder.given_superadmin().getId();
+        long relationId = 42L;
+        UUID commandId = UUID.randomUUID();
+        TermRelationResponse response = new TermRelationResponse(
+            relationId, term1.getId(), term2.getId(), term1.getOntology().getId(), 1L,
+            LocalDateTime.now(), Optional.empty(), LocalDateTime.now(), "parent");
+
+        when(termRelationHttpContract.delete(eq(relationId), eq(userId))).thenReturn(
+            Optional.of(new HttpCommandResponse(true, response, commandId, Commands.DELETE_TERM_RELATION)));
+
+        restSecUserSecRoleControllerMockMvc.perform(delete("/api/relation/term/{id}.json", relationId))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.printMessage").value(true))
+            .andExpect(jsonPath("$.command").value(Commands.DELETE_TERM_RELATION))
+            .andExpect(jsonPath("$.data.id").value(relationId));
     }
 
     @Test

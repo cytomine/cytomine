@@ -101,7 +101,7 @@ public class ImageInstanceAuthorizationTest extends CRUDAuthorizationTest {
     @WithMockUser(username = USER_ACL_ADMIN)
     public void user_admin_can_edi_in_readonly_mode() {
         imageInstance.getProject().setMode(EditingMode.READ_ONLY);
-        expectOK(() -> when_i_edit_domain());
+        expectOK(() -> whenIEditDomain());
     }
 
     @Test
@@ -122,7 +122,7 @@ public class ImageInstanceAuthorizationTest extends CRUDAuthorizationTest {
     @WithMockUser(username = USER_ACL_READ)
     public void user_cannot_edit_in_readonly_mode() {
         imageInstance.getProject().setMode(EditingMode.READ_ONLY);
-        expectForbidden(() -> when_i_edit_domain());
+        expectForbidden(() -> whenIEditDomain());
     }
 
     @Test
@@ -169,7 +169,7 @@ public class ImageInstanceAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Override
-    public void when_i_edit_domain() {
+    public void whenIEditDomain() {
         imageInstanceService.update(imageInstance, imageInstance.toJsonObject());
     }
 

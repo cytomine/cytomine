@@ -114,7 +114,7 @@ public class ReviewedAnnotationAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Override
-    public void when_i_edit_domain() {
+    public void whenIEditDomain() {
         reviewedAnnotationService.update(reviewedAnnotation, reviewedAnnotation.toJsonObject());
     }
 

@@ -97,7 +97,7 @@ public class StorageAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Override
-    public void when_i_edit_domain() {
+    public void whenIEditDomain() {
         storageService.update(storage, storage.toJsonObject());
     }
 

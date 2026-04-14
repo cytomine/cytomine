@@ -103,7 +103,7 @@ public class CompanionFileAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Override
-    public void when_i_edit_domain() {
+    public void whenIEditDomain() {
         companionFileService.update(companionFile, companionFile.toJsonObject());
     }
 

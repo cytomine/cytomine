@@ -100,7 +100,7 @@ public class AbstractSliceAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Override
-    public void when_i_edit_domain() {
+    public void whenIEditDomain() {
         abstractSliceService.update(abstractSlice, abstractSlice.toJsonObject());
     }
 

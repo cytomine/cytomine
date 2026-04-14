@@ -139,7 +139,7 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Override
-    protected void when_i_edit_domain() {
+    protected void whenIEditDomain() {
         propertyService.update(propertyForAnnotation, propertyForAnnotation.toJsonObject());
     }
 

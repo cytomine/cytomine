@@ -127,7 +127,7 @@ public class UserAnnotationAuthorizationTest extends CRUDAuthorizationTest {
         project.setMode(EditingMode.RESTRICTED);
         builder.persistAndReturn(project);
         expectOK(this::whenIAddDomain);
-        expectOK(this::when_i_edit_domain);
+        expectOK(this::whenIEditDomain);
         expectOK(this::whenIDeleteDomain);
     }
 
@@ -140,13 +140,13 @@ public class UserAnnotationAuthorizationTest extends CRUDAuthorizationTest {
         project.setMode(EditingMode.RESTRICTED);
         builder.persistAndReturn(project);
         expectForbidden(this::whenIAddDomain);
-        expectForbidden(this::when_i_edit_domain);
+        expectForbidden(this::whenIEditDomain);
         expectForbidden(this::whenIDeleteDomain);
 
         project.setMode(EditingMode.CLASSIC);
         builder.persistAndReturn(project);
         expectOK(this::whenIAddDomain);
-        expectOK(this::when_i_edit_domain);
+        expectOK(this::whenIEditDomain);
         expectOK(this::whenIDeleteDomain);
     }
 
@@ -169,7 +169,7 @@ public class UserAnnotationAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Override
-    public void when_i_edit_domain() {
+    public void whenIEditDomain() {
         userAnnotationService.update(userAnnotation, userAnnotation.toJsonObject());
     }
 

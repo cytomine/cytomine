@@ -101,7 +101,7 @@ public class AbstractImageAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Override
-    public void when_i_edit_domain() {
+    public void whenIEditDomain() {
         abstractImageService.update(abstractImage, abstractImage.toJsonObject());
     }
 

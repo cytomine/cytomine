@@ -57,7 +57,7 @@ public class AnnotationGroupAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Override
-    protected void when_i_edit_domain() {
+    protected void whenIEditDomain() {
         annotationGroupService.update(annotationGroup, annotationGroup.toJsonObject());
     }
 

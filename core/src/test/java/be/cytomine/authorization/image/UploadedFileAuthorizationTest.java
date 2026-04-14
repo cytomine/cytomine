@@ -77,7 +77,7 @@ public class UploadedFileAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Override
-    public void when_i_edit_domain() {
+    public void whenIEditDomain() {
         uploadedFileService.update(uploadedFile, uploadedFile.toJsonObject());
     }
 

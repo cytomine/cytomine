@@ -65,7 +65,7 @@ public class TrackAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Override
-    public void when_i_edit_domain() {
+    public void whenIEditDomain() {
         trackService.update(track, track.toJsonObject());
     }
 

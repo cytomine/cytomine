@@ -129,7 +129,7 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Override
-    protected void when_i_edit_domain() {
+    protected void whenIEditDomain() {
         descriptionService.update(descriptionForAnnotation, descriptionForAnnotation.toJsonObject());
     }
 

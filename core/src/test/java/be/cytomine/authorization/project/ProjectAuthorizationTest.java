@@ -215,7 +215,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
     @WithMockUser(username = USER_ACL_ADMIN)
     public void classic_project_scenario_for_admin() {
 
-        expectOK(this::when_i_edit_domain);
+        expectOK(this::whenIEditDomain);
 
         User user = builder.givenAUser();
         expectOK(() -> projectMemberService.addUserToProject(user, project, false));
@@ -259,7 +259,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void classic_project_scenario_for_user() {
-        expectForbidden(this::when_i_edit_domain);
+        expectForbidden(this::whenIEditDomain);
 
         User user = builder.givenAUser();
         expectForbidden(() -> projectMemberService.addUserToProject(user, project, false));
@@ -643,7 +643,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
     public void restricted_project_scenario_for_admin() {
         project.setMode(RESTRICTED);
         builder.persistAndReturn(project);
-        expectOK(this::when_i_edit_domain);
+        expectOK(this::whenIEditDomain);
 
         User user = builder.givenAUser();
         expectOK(() -> projectMemberService.addUserToProject(user, project, false));
@@ -690,7 +690,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         project.setMode(RESTRICTED);
         builder.persistAndReturn(project);
 
-        expectForbidden(this::when_i_edit_domain);
+        expectForbidden(this::whenIEditDomain);
 
         User user = builder.givenAUser();
         expectForbidden(() -> projectMemberService.addUserToProject(user, project, false));
@@ -1065,7 +1065,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
     public void readonly_project_scenario_for_admin() {
         project.setMode(READ_ONLY);
         builder.persistAndReturn(project);
-        expectOK(this::when_i_edit_domain);
+        expectOK(this::whenIEditDomain);
 
         User user = builder.givenAUser();
         expectOK(() -> projectMemberService.addUserToProject(user, project, false));
@@ -1111,7 +1111,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         project.setMode(READ_ONLY);
         builder.persistAndReturn(project);
 
-        expectForbidden(this::when_i_edit_domain);
+        expectForbidden(this::whenIEditDomain);
 
         User user = builder.givenAUser();
         expectForbidden(() -> projectMemberService.addUserToProject(user, project, false));
@@ -1608,7 +1608,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Override
-    public void when_i_edit_domain() {
+    public void whenIEditDomain() {
         projectService.update(project, project.toJsonObject());
     }
 

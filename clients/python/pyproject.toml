@@ -27,7 +27,7 @@ dev = [
   "ruff==0.12.11",
 ]
 test = [
-  "pytest==8.3.5",
+  "pytest==9.0.3",
 ]
 
 [project.urls]

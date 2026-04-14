@@ -1,21 +1,5 @@
 package be.cytomine.authorization.meta;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -38,9 +22,7 @@ import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.EditingMode;
 import be.cytomine.domain.project.Project;
-import be.cytomine.service.PermissionService;
 import be.cytomine.service.meta.DescriptionService;
-import be.cytomine.service.security.SecurityACLService;
 
 @AutoConfigureMockMvc
 @SpringBootTest(classes = CytomineCoreApplication.class)
@@ -67,12 +49,6 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
     @Autowired
     BasicInstanceBuilder builder;
 
-    @Autowired
-    SecurityACLService securityACLService;
-
-    @Autowired
-    PermissionService permissionService;
-
     @BeforeEach
     public void before() throws Exception {
         if (descriptionForProject == null) {
@@ -86,7 +62,6 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
             descriptionForAbstractImage = builder.givenADescription(abstractImage);
             descriptionForImageInstance = builder.givenADescription(imageInstance);
 
-            ;
             initACL(project);
             initACL(annotationDomain.getProject());
             initACL(abstractImage.getUploadedFile().getStorage());
@@ -98,15 +73,13 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
     @Test
     @WithMockUser(username = SUPERADMIN)
     public void admin_can_list() {
-        expectOK(() -> { descriptionService.list(); });
+        expectOK(() -> descriptionService.list());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void user_cannot_list() {
-        expectForbidden(() -> {
-            descriptionService.list();
-        });
+        expectForbidden(() -> descriptionService.list());
     }
 
 
@@ -115,21 +88,21 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
     @WithMockUser(username = USER_ACL_READ)
     public void user_cannot_add_in_readonly_mode() {
         project.setMode(EditingMode.READ_ONLY);
-        expectForbidden(() -> when_i_add_domain());
+        expectForbidden(this::when_i_add_domain);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void user_cannot_add_in_restricted_mode() {
         project.setMode(EditingMode.RESTRICTED);
-        expectForbidden(() -> when_i_add_domain());
+        expectForbidden(this::when_i_add_domain);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void user_cannot_add_in_restricted_mode_for_annotation() {
         project.setMode(EditingMode.RESTRICTED);
-        expectForbidden(() -> when_i_add_domain());
+        expectForbidden(this::when_i_add_domain);
     }
 
     @Test
@@ -137,9 +110,8 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
     public void user_canadd_in_restricted_mode_for_annotation_if_owner() {
         annotationDomain.getProject().setMode(EditingMode.RESTRICTED);
         ((UserAnnotation) annotationDomain).setUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get());
-        expectOK(() -> when_i_add_domain());
+        expectOK(this::when_i_add_domain);
     }
-
 
     @Override
     public void when_i_get_domain() {
@@ -150,8 +122,9 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
 
     @Override
     protected void when_i_add_domain() {
-        AnnotationDomain annotationDomain = builder.persistAndReturn(builder.givenANotPersistedUserAnnotation(
-            project));
+        AnnotationDomain annotationDomain = builder.persistAndReturn(
+            builder.givenANotPersistedUserAnnotation(project)
+        );
         descriptionService.add(builder.givenANotPersistedDescription(annotationDomain).toJsonObject());
     }
 
@@ -160,14 +133,12 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
         descriptionService.update(descriptionForAnnotation, descriptionForAnnotation.toJsonObject());
     }
 
-
     @Override
     protected void when_i_delete_domain() {
         Description description = builder.givenADescription(annotationDomain);
         descriptionService.delete(description, null, null, true);
     }
 
-    //IMAGE
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void user_can_add_for_image() {
@@ -196,10 +167,10 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
     @Test
     @WithMockUser(username = GUEST)
     public void guest_cannot_add_image() {
-        expectForbidden(() -> descriptionService.add(builder.givenANotPersistedDescription(builder.givenAnImageInstance())
-            .toJsonObject()));
+        expectForbidden(() -> descriptionService.add(
+            builder.givenANotPersistedDescription(builder.givenAnImageInstance()).toJsonObject())
+        );
     }
-
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
@@ -271,9 +242,6 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
         expectForbidden(() -> descriptionService.delete(descriptionForImageInstance, null, null, true));
     }
 
-
-    //PROJECT
-
     @Test
     @WithMockUser(username = SUPERADMIN)
     public void admin_can_add_for_project() {
@@ -327,7 +295,6 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
         expectOK(() -> descriptionService.update(description, description.toJsonObject(), null));
     }
 
-
     @Test
     @WithMockUser(username = SUPERADMIN)
     public void admin_can_delete_for_project() {
@@ -338,7 +305,6 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
             true
         ));
     }
-
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
@@ -374,7 +340,6 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
         return Optional.of(BasePermission.READ);
     }
 
-
     @Override
     protected Optional<String> minimalRoleForCreate() {
         return Optional.of("ROLE_GUEST");
@@ -389,6 +354,4 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
     protected Optional<String> minimalRoleForEdit() {
         return Optional.of("ROLE_GUEST");
     }
-
-
 }

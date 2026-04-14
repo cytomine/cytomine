@@ -111,7 +111,7 @@ public class AnnotationLinkAuthorizationTest extends CRDAuthorizationTest {
     @WithMockUser(username = USER_ACL_ADMIN)
     public void user_admin_can_add_in_readonly_mode() {
         annotationLink.getImage().getProject().setMode(EditingMode.READ_ONLY);
-        expectOK(() -> when_i_add_domain());
+        expectOK(this::when_i_add_domain);
     }
 
     @Test
@@ -119,9 +119,9 @@ public class AnnotationLinkAuthorizationTest extends CRDAuthorizationTest {
     public void admin_can_update_annotation_group_in_restricted_project() {
         AnnotationLink annotationLink = builder.givenAnAnnotationLink();
         annotationLink.getImage().getProject().setMode(EditingMode.RESTRICTED);
-        expectOK(() -> { when_i_get_domain(); });
-        expectOK(() -> { when_i_add_domain(); });
-        expectOK(() -> { when_i_delete_domain(); });
+        expectOK(this::when_i_get_domain);
+        expectOK(this::when_i_add_domain);
+        expectOK(this::when_i_delete_domain);
     }
 
     @Test
@@ -129,15 +129,15 @@ public class AnnotationLinkAuthorizationTest extends CRDAuthorizationTest {
     public void user_can_update_annotation_group_in_classic_project() {
         AnnotationLink annotationLink = builder.givenAnAnnotationLink();
         annotationLink.getImage().getProject().setMode(EditingMode.CLASSIC);
-        expectOK(() -> { when_i_get_domain(); });
-        expectOK(() -> { when_i_add_domain(); });
-        expectOK(() -> { when_i_delete_domain(); });
+        expectOK(this::when_i_get_domain);
+        expectOK(this::when_i_add_domain);
+        expectOK(this::when_i_delete_domain);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
     public void user_admin_can_delete_in_readonly_mode() {
         annotationLink.getImage().getProject().setMode(EditingMode.READ_ONLY);
-        expectOK(() -> when_i_delete_domain());
+        expectOK(this::when_i_delete_domain);
     }
 }

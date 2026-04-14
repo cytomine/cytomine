@@ -1,21 +1,5 @@
 package be.cytomine.authorization.meta;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -39,9 +23,7 @@ import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.EditingMode;
 import be.cytomine.domain.project.Project;
-import be.cytomine.service.PermissionService;
 import be.cytomine.service.meta.TagDomainAssociationService;
-import be.cytomine.service.security.SecurityACLService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -65,12 +47,6 @@ public class TagDomainAssociationAuthorizationTest extends CRDAuthorizationTest 
     @Autowired
     BasicInstanceBuilder builder;
 
-    @Autowired
-    SecurityACLService securityACLService;
-
-    @Autowired
-    PermissionService permissionService;
-
     @BeforeEach
     public void before() throws Exception {
         if (tagDomainAssociationForProject == null) {
@@ -88,7 +64,6 @@ public class TagDomainAssociationAuthorizationTest extends CRDAuthorizationTest 
                 abstractImage
             );
 
-            ;
             initACL(project);
             initACL(annotationDomain.getProject());
             initACL(abstractImage.getUploadedFile().getStorage());
@@ -100,21 +75,21 @@ public class TagDomainAssociationAuthorizationTest extends CRDAuthorizationTest 
     @Test
     @WithMockUser(username = SUPERADMIN)
     public void admin_can_list() {
-        expectOK(() -> { tagDomainAssociationService.listAllByDomain(project); });
-        expectOK(() -> { tagDomainAssociationService.listAllByTag(tagDomainAssociationForProject.getTag()); });
+        expectOK(() -> tagDomainAssociationService.listAllByDomain(project));
+        expectOK(() -> tagDomainAssociationService.listAllByTag(tagDomainAssociationForProject.getTag()));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void user_cannot_list() {
-        expectForbidden(() -> { tagDomainAssociationService.listAllByTag(tagDomainAssociationForProject.getTag()); });
+        expectForbidden(() -> tagDomainAssociationService.listAllByTag(tagDomainAssociationForProject.getTag()));
     }
 
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void user_can_list_with_filters() {
-        expectOK(() -> { tagDomainAssociationService.listAllByDomain(project); });
+        expectOK(() -> tagDomainAssociationService.listAllByDomain(project));
         assertThat(tagDomainAssociationService.list(new ArrayList<>()))
             .contains(
                 tagDomainAssociationForProject,
@@ -136,21 +111,21 @@ public class TagDomainAssociationAuthorizationTest extends CRDAuthorizationTest 
     @WithMockUser(username = USER_ACL_READ)
     public void user_cannot_add_in_readonly_mode() {
         project.setMode(EditingMode.READ_ONLY);
-        expectForbidden(() -> when_i_add_domain());
+        expectForbidden(this::when_i_add_domain);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void user_cannot_add_in_restricted_mode() {
         project.setMode(EditingMode.RESTRICTED);
-        expectForbidden(() -> when_i_add_domain());
+        expectForbidden(this::when_i_add_domain);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void user_cannot_add_in_restricted_mode_for_annotation() {
         project.setMode(EditingMode.RESTRICTED);
-        expectForbidden(() -> when_i_add_domain());
+        expectForbidden(this::when_i_add_domain);
     }
 
     @Test
@@ -158,9 +133,8 @@ public class TagDomainAssociationAuthorizationTest extends CRDAuthorizationTest 
     public void user_canadd_in_restricted_mode_for_annotation_if_owner() {
         annotationDomain.getProject().setMode(EditingMode.RESTRICTED);
         ((UserAnnotation) annotationDomain).setUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get());
-        expectOK(() -> when_i_add_domain());
+        expectOK(this::when_i_add_domain);
     }
-
 
     @Override
     public void when_i_get_domain() {
@@ -188,7 +162,6 @@ public class TagDomainAssociationAuthorizationTest extends CRDAuthorizationTest 
         tagDomainAssociationService.delete(tagDomainAssociation, null, null, true);
     }
 
-    //IMAGE
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void user_can_add_for_image() {
@@ -281,8 +254,6 @@ public class TagDomainAssociationAuthorizationTest extends CRDAuthorizationTest 
         ));
     }
 
-//PROJECT
-
     @Test
     @WithMockUser(username = SUPERADMIN)
     public void admin_can_add_for_project() {
@@ -291,7 +262,6 @@ public class TagDomainAssociationAuthorizationTest extends CRDAuthorizationTest 
             project
         ).toJsonObject()));
     }
-
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
@@ -311,7 +281,6 @@ public class TagDomainAssociationAuthorizationTest extends CRDAuthorizationTest 
             project
         ).toJsonObject()));
     }
-
 
     @Test
     @WithMockUser(username = SUPERADMIN)
@@ -333,7 +302,6 @@ public class TagDomainAssociationAuthorizationTest extends CRDAuthorizationTest 
                 project
             ), null, null, true
         ));
-
     }
 
     @Test
@@ -346,7 +314,6 @@ public class TagDomainAssociationAuthorizationTest extends CRDAuthorizationTest 
             ), null, null, true
         ));
     }
-
 
     @Override
     protected Optional<Permission> minimalPermissionForCreate() {
@@ -363,7 +330,6 @@ public class TagDomainAssociationAuthorizationTest extends CRDAuthorizationTest 
         return Optional.of(BasePermission.READ);
     }
 
-
     @Override
     protected Optional<String> minimalRoleForCreate() {
         return Optional.of("ROLE_GUEST");
@@ -378,6 +344,4 @@ public class TagDomainAssociationAuthorizationTest extends CRDAuthorizationTest 
     protected Optional<String> minimalRoleForEdit() {
         return Optional.of("ROLE_GUEST");
     }
-
-
 }

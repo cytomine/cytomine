@@ -124,7 +124,7 @@ public class AnnotationGroupAuthorizationTest extends CRUDAuthorizationTest {
     @WithMockUser(username = USER_ACL_ADMIN)
     public void user_admin_can_add_in_readonly_mode() {
         annotationGroup.getProject().setMode(EditingMode.READ_ONLY);
-        expectOK(() -> when_i_add_domain());
+        expectOK(this::when_i_add_domain);
     }
 
     @Test
@@ -132,9 +132,9 @@ public class AnnotationGroupAuthorizationTest extends CRUDAuthorizationTest {
     public void admin_can_update_annotation_group_in_restricted_project() {
         AnnotationGroup annotationGroup = builder.givenAnAnnotationGroup();
         annotationGroup.getProject().setMode(EditingMode.RESTRICTED);
-        expectOK(() -> { when_i_get_domain(); });
-        expectOK(() -> { when_i_add_domain(); });
-        expectOK(() -> { when_i_delete_domain(); });
+        expectOK(this::when_i_get_domain);
+        expectOK(this::when_i_add_domain);
+        expectOK(this::when_i_delete_domain);
     }
 
     @Test
@@ -142,15 +142,15 @@ public class AnnotationGroupAuthorizationTest extends CRUDAuthorizationTest {
     public void user_can_update_annotation_group_in_classic_project() {
         AnnotationGroup annotationGroup = builder.givenAnAnnotationGroup();
         annotationGroup.getProject().setMode(EditingMode.CLASSIC);
-        expectOK(() -> { when_i_get_domain(); });
-        expectOK(() -> { when_i_add_domain(); });
-        expectOK(() -> { when_i_delete_domain(); });
+        expectOK(this::when_i_get_domain);
+        expectOK(this::when_i_add_domain);
+        expectOK(this::when_i_delete_domain);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
     public void user_admin_can_delete_in_readonly_mode() {
         annotationGroup.getProject().setMode(EditingMode.READ_ONLY);
-        expectOK(() -> when_i_delete_domain());
+        expectOK(this::when_i_delete_domain);
     }
 }

@@ -1,21 +1,5 @@
 package be.cytomine.authorization.meta;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -38,9 +22,7 @@ import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.EditingMode;
 import be.cytomine.domain.project.Project;
-import be.cytomine.service.PermissionService;
 import be.cytomine.service.meta.PropertyService;
-import be.cytomine.service.security.SecurityACLService;
 
 @AutoConfigureMockMvc
 @SpringBootTest(classes = CytomineCoreApplication.class)
@@ -58,18 +40,11 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
     private AbstractImage abstractImage = null;
     private ImageInstance imageInstance = null;
 
-
     @Autowired
     PropertyService propertyService;
 
     @Autowired
     BasicInstanceBuilder builder;
-
-    @Autowired
-    SecurityACLService securityACLService;
-
-    @Autowired
-    PermissionService permissionService;
 
     @BeforeEach
     public void before() throws Exception {
@@ -79,12 +54,10 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
             abstractImage = builder.givenAnAbstractImage();
             imageInstance = builder.givenAnImageInstance(project);
 
-
             propertyForProject = builder.givenAProperty(project);
             propertyForAnnotation = builder.givenAProperty(annotationDomain);
             propertyForAbstractImage = builder.givenAProperty(abstractImage);
             propertyForImageInstance = builder.givenAProperty(imageInstance);
-
 
             initACL(project);
             initACL(annotationDomain.getProject());
@@ -97,56 +70,43 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
     @Test
     @WithMockUser(username = SUPERADMIN)
     public void admin_can_list() {
-        expectOK(() -> { propertyService.list(); });
+        expectOK(() -> propertyService.list());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void user_cannot_list() {
-        expectForbidden(() -> {
-            propertyService.list();
-        });
+        expectForbidden(() -> propertyService.list());
     }
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
     public void user_without_read_cannot_list_for_domain() {
-        expectForbidden(() -> {
-            propertyService.list(abstractImage);
-        });
-        expectForbidden(() -> {
-            propertyService.list(imageInstance);
-        });
-
-        expectForbidden(() -> {
-            propertyService.list(project);
-        });
-        expectForbidden(() -> {
-            propertyService.list(annotationDomain);
-        });
+        expectForbidden(() -> propertyService.list(abstractImage));
+        expectForbidden(() -> propertyService.list(imageInstance));
+        expectForbidden(() -> propertyService.list(project));
+        expectForbidden(() -> propertyService.list(annotationDomain));
     }
 
-
-    //ANNOTATIONS
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void user_cannot_add_in_readonly_mode() {
         project.setMode(EditingMode.READ_ONLY);
-        expectForbidden(() -> when_i_add_domain());
+        expectForbidden(this::when_i_add_domain);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void user_cannot_add_in_restricted_mode() {
         project.setMode(EditingMode.RESTRICTED);
-        expectForbidden(() -> when_i_add_domain());
+        expectForbidden(this::when_i_add_domain);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void user_cannot_add_in_restricted_mode_for_annotation() {
         project.setMode(EditingMode.RESTRICTED);
-        expectForbidden(() -> when_i_add_domain());
+        expectForbidden(this::when_i_add_domain);
     }
 
     @Test
@@ -163,7 +123,6 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
                 .toJsonObject());
         });
     }
-
 
     @Override
     public void when_i_get_domain() {
@@ -184,14 +143,11 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
         propertyService.update(propertyForAnnotation, propertyForAnnotation.toJsonObject());
     }
 
-
     @Override
     protected void when_i_delete_domain() {
         Property property = builder.givenAProperty(annotationDomain);
         propertyService.delete(property, null, null, true);
     }
-
-    //IMAGE
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
@@ -304,8 +260,6 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
         expectForbidden(() -> propertyService.delete(propertyForImageInstance, null, null, true));
     }
 
-    //PROJECT
-
     @Test
     @WithMockUser(username = SUPERADMIN)
     public void admin_can_add_for_project() {
@@ -386,7 +340,6 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
         expectOK(() -> propertyService.delete(builder.givenAProperty(projectLocal), null, null, true));
     }
 
-
     @Override
     protected Optional<Permission> minimalPermissionForCreate() {
         return Optional.of(BasePermission.READ);
@@ -402,7 +355,6 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
         return Optional.of(BasePermission.READ);
     }
 
-
     @Override
     protected Optional<String> minimalRoleForCreate() {
         return Optional.of("ROLE_GUEST");
@@ -417,6 +369,4 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
     protected Optional<String> minimalRoleForEdit() {
         return Optional.of("ROLE_GUEST");
     }
-
-
 }

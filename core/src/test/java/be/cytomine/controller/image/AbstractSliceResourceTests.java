@@ -236,9 +236,7 @@ public class AbstractSliceResourceTests {
                 image.getPath(),
                 StandardCharsets.UTF_8
             ).replace("%2F", "/") + "/thumb?z_slices=0&timepoints=0&length=512"))
-                .willReturn(
-                    aResponse().withBody(mockResponse)
-                )
+                .willReturn(aResponse().withBody(mockResponse))
         );
 
         MvcResult mvcResult = restAbstractSliceControllerMockMvc.perform(get(
@@ -271,10 +269,9 @@ public class AbstractSliceResourceTests {
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 image.getPath(),
                 StandardCharsets.UTF_8
-            ).replace("%2F", "/") + "/normalized-tile/zoom/2/tx/4/ty/6?channels=0&z_slices=0&timepoints=0&filters=binary"))
-                .willReturn(
-                    aResponse().withBody(mockResponse)
-                )
+            ).replace("%2F", "/")
+                + "/normalized-tile/zoom/2/tx/4/ty/6?channels=0&z_slices=0&timepoints=0&filters=binary"))
+                .willReturn(aResponse().withBody(mockResponse))
         );
 
         MvcResult mvcResult = restAbstractSliceControllerMockMvc.perform(get(
@@ -319,25 +316,18 @@ public class AbstractSliceResourceTests {
         String url = "/image/"
             + URLEncoder.encode(image.getPath(), StandardCharsets.UTF_8).replace("%2F", "/")
             + "/annotation/crop";
-        String
-            body
-            = "{\"level\":0,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))\"}],\"timepoints\":0,\"background_transparency\":0}";
-        System.out.println(url);
-        System.out.println(body);
+        String body = "{\"level\":0,\"z_slices\":0,\"annotations\":"
+            + "[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))\"}]"
+            + ",\"timepoints\":0,\"background_transparency\":0}";
 
-        stubFor(WireMock.post(urlEqualTo(IMS_API_BASE_PATH + url)).withRequestBody(equalTo(
-                    body
-                ))
-                .willReturn(
-                    aResponse().withBody(mockResponse)
-                )
+        stubFor(WireMock.post(urlEqualTo(IMS_API_BASE_PATH + url)).withRequestBody(equalTo(body))
+            .willReturn(aResponse().withBody(mockResponse))
         );
 
         MvcResult mvcResult = restAbstractSliceControllerMockMvc.perform(get(
                 "/api/abstractslice/{id}/crop.png",
                 image.getId()
-            )
-                .param("location", "POLYGON((1 1,50 10,50 50,10 50,1 1))"))
+            ).param("location", "POLYGON((1 1,50 10,50 50,10 50,1 1))"))
             .andExpect(status().isOk())
             .andReturn();
         List<LoggedRequest> all = wireMockServer.findAll(RequestPatternBuilder.allRequests());
@@ -358,15 +348,10 @@ public class AbstractSliceResourceTests {
         String url = "/image/"
             + URLEncoder.encode(image.getPath(), StandardCharsets.UTF_8).replace("%2F", "/")
             + "/window";
-        String
-            body
-            = "{\"level\":0,\"z_slices\":0,\"timepoints\":0,\"region\":{\"left\":10,\"top\":20,\"width\":30,\"height\":40}}";
-        System.out.println(url);
-        System.out.println(body);
+        String body = "{\"level\":0,\"z_slices\":0,\"timepoints\":0,\"region\":"
+            + "{\"left\":10,\"top\":20,\"width\":30,\"height\":40}}";
         stubFor(WireMock.post(urlEqualTo(IMS_API_BASE_PATH + url)).withRequestBody(equalTo(body))
-            .willReturn(
-                aResponse().withBody(mockResponse)
-            )
+            .willReturn(aResponse().withBody(mockResponse))
         );
 
         MvcResult mvcResult = restAbstractSliceControllerMockMvc.perform(get(

@@ -1,21 +1,5 @@
 package be.cytomine.controller.middleware;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import com.github.tomakehurst.wiremock.WireMockServer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -44,6 +28,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@SuppressWarnings("checkstyle:LineLength")
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(username = "superadmin")
@@ -62,15 +47,12 @@ public class ImageServerResourceTests {
 
     @AfterAll
     public static void afterAll() {
-        try {
-            wireMockServer.stop();
-        } catch (Exception e) {
-        }
+        wireMockServer.stop();
     }
 
     @Test
     @Transactional
-    public void get_a_imageserver_format() throws Exception {
+    public void shouldReturnImageServerFormatsWithExpectedContent() throws Exception {
         configureFor("localhost", 8888);
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/formats"))
             .willReturn(

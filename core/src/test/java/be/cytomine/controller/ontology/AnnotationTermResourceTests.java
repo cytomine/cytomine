@@ -132,10 +132,9 @@ public class AnnotationTermResourceTests {
             .andExpect(jsonPath("$.collection[?(@.id=='" + annotationTerm.getId() + "')]").exists());
     }
 
-
     @Test
     @Transactional
-    public void get_a_annotation_term() throws Exception {
+    public void shouldReturnAnnotationTermWithCorrectFields() throws Exception {
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm();
 
         restAnnotationTermControllerMockMvc.perform(get(
@@ -146,14 +145,12 @@ public class AnnotationTermResourceTests {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.userannotation").value(annotationTerm.getUserAnnotation().getId().intValue()))
             .andExpect(jsonPath("$.term").value(annotationTerm.getTerm().getId().intValue()))
-            .andExpect(jsonPath("$.user").value(annotationTerm.getUser().getId().intValue()))
-        ;
+            .andExpect(jsonPath("$.user").value(annotationTerm.getUser().getId().intValue()));
     }
-
 
     @Test
     @Transactional
-    public void get_a_annotation_term_with_user() throws Exception {
+    public void shouldReturnAnnotationTermWithUserAndCorrectFields() throws Exception {
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm();
         restAnnotationTermControllerMockMvc.perform(get(
                 "/api/annotation/{idAnnotation}/term/{idTerm}/user/{idUser}.json",
@@ -169,7 +166,7 @@ public class AnnotationTermResourceTests {
 
     @Test
     @Transactional
-    public void get_a_annotation_term_with_bad_annotation() throws Exception {
+    public void shouldReturnClientErrorWhenAnnotationDoesNotExist() throws Exception {
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm();
 
         restAnnotationTermControllerMockMvc.perform(get(
@@ -177,10 +174,8 @@ public class AnnotationTermResourceTests {
                 0,
                 annotationTerm.getTerm().getId()
             ))
-            .andExpect(status().is4xxClientError())
-        ;
+            .andExpect(status().is4xxClientError());
     }
-
 
     @Test
     @Transactional

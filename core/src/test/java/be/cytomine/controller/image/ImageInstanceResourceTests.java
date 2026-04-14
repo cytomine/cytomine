@@ -93,6 +93,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@SuppressWarnings("checkstyle:LineLength")
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(username = "superadmin")
@@ -123,13 +124,10 @@ public class ImageInstanceResourceTests {
 
     @AfterAll
     public static void afterAll() {
-        try {
-            wireMockServer.stop();
-        } catch (Exception e) {
-        }
+        wireMockServer.stop();
     }
 
-    private ImageInstance given_test_image_instance() {
+    private ImageInstance givenTestImageInstance() {
         AbstractImage image = builder.givenAnAbstractImage();
         image.setWidth(109240);
         image.setHeight(220696);
@@ -148,7 +146,7 @@ public class ImageInstanceResourceTests {
     @Test
     @Transactional
     public void get_an_image_instance() throws Exception {
-        ImageInstance image = given_test_image_instance();
+        ImageInstance image = givenTestImageInstance();
         String serverUrl = applicationProperties.getServerURL();
         restImageInstanceControllerMockMvc.perform(get("/api/imageinstance/{id}.json", image.getId()))
             .andExpect(status().isOk())
@@ -190,7 +188,7 @@ public class ImageInstanceResourceTests {
     @Transactional
     @WithMockUser(username = "get_blind_image_instance")
     public void get_blind_image_instance() throws Exception {
-        ImageInstance image = given_test_image_instance();
+        ImageInstance image = givenTestImageInstance();
 
         User user = builder.givenAUser("get_blind_image_instance");
         builder.addUserToProject(image.getProject(), user.getUsername(), BasePermission.WRITE); // contributor
@@ -220,7 +218,7 @@ public class ImageInstanceResourceTests {
     @Test
     @Transactional
     public void get_slice_instance_reference() throws Exception {
-        ImageInstance image = given_test_image_instance();
+        ImageInstance image = givenTestImageInstance();
         restImageInstanceControllerMockMvc.perform(get(
                 "/api/imageinstance/{id}/sliceinstance/reference.json",
                 image.getId()
@@ -232,7 +230,7 @@ public class ImageInstanceResourceTests {
     @Test
     @Transactional
     public void get_image_instance_bounds() throws Exception {
-        ImageInstance image = given_test_image_instance();
+        ImageInstance image = givenTestImageInstance();
         image.setReviewStart(new Date(1636702044534L));
         image.setMagnification(123);
         image.setPhysicalSizeX(null);
@@ -368,7 +366,7 @@ public class ImageInstanceResourceTests {
     @WithMockUser("list_image_instance_by_projects_blind_filenames")
     public void list_image_instance_by_projects_blind_filenames() throws Exception {
         User user = builder.givenAUser("list_image_instance_by_projects_blind_filenames");
-        ImageInstance image = given_test_image_instance();
+        ImageInstance image = givenTestImageInstance();
 
         builder.addUserToProject(image.getProject(), user.getUsername(), BasePermission.WRITE); // contributor
 
@@ -669,7 +667,7 @@ public class ImageInstanceResourceTests {
     @Transactional
     @Disabled("Randomly fails")
     public void get_image_instance_thumb() throws Exception {
-        ImageInstance image = given_test_image_instance();
+        ImageInstance image = givenTestImageInstance();
         configureFor("localhost", 8888);
 
         byte[] mockResponse = UUID.randomUUID()
@@ -710,7 +708,7 @@ public class ImageInstanceResourceTests {
     @Test
     @Transactional
     public void get_image_instance_preview() throws Exception {
-        ImageInstance image = given_test_image_instance();
+        ImageInstance image = givenTestImageInstance();
         configureFor("localhost", 8888);
 
         byte[] mockResponse = UUID.randomUUID()
@@ -741,7 +739,7 @@ public class ImageInstanceResourceTests {
     @Test
     @Transactional
     public void get_image_instance_associeted_label() throws Exception {
-        ImageInstance image = given_test_image_instance();
+        ImageInstance image = givenTestImageInstance();
         configureFor("localhost", 8888);
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 "1636379100999/CMU-2/CMU-2.mrxs",
@@ -762,7 +760,7 @@ public class ImageInstanceResourceTests {
     @Test
     @Transactional
     public void get_image_instance_associeted_label_macro() throws Exception {
-        ImageInstance image = given_test_image_instance();
+        ImageInstance image = givenTestImageInstance();
         configureFor("localhost", 8888);
 
         byte[] mockResponse = UUID.randomUUID()
@@ -796,7 +794,7 @@ public class ImageInstanceResourceTests {
     @Test
     @Transactional
     public void get_image_instance_crop() throws Exception {
-        ImageInstance image = given_test_image_instance();
+        ImageInstance image = givenTestImageInstance();
 
         configureFor("localhost", 8888);
 
@@ -833,7 +831,7 @@ public class ImageInstanceResourceTests {
     @Test
     @Transactional
     public void get_image_instance_window() throws Exception {
-        ImageInstance image = given_test_image_instance();
+        ImageInstance image = givenTestImageInstance();
 
         configureFor("localhost", 8888);
 
@@ -869,7 +867,7 @@ public class ImageInstanceResourceTests {
     @Test
     @Transactional
     public void get_image_instance_metadata() throws Exception {
-        ImageInstance image = given_test_image_instance();
+        ImageInstance image = givenTestImageInstance();
         configureFor("localhost", 8888);
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 image.getBaseImage().getPath(),
@@ -908,7 +906,7 @@ public class ImageInstanceResourceTests {
     @Test
     @Disabled("Randomly fails")
     public void download_image_instance() throws Exception {
-        ImageInstance image = given_test_image_instance();
+        ImageInstance image = givenTestImageInstance();
 
         byte[] mockResponse = UUID.randomUUID().toString().getBytes();
         configureFor("localhost", 8888);
@@ -946,7 +944,7 @@ public class ImageInstanceResourceTests {
     public void download_image_instance_cannot_download() throws Exception {
         User user = builder.givenAUser("download_image_instance_cannot_download");
 
-        ImageInstance image = given_test_image_instance();
+        ImageInstance image = givenTestImageInstance();
         builder.addUserToProject(image.getProject(), user.getUsername(), BasePermission.WRITE);
         image.getProject().setAreImagesDownloadable(true);
 
@@ -982,7 +980,7 @@ public class ImageInstanceResourceTests {
     @Test
     @Transactional
     public void histograms() throws Exception {
-        ImageInstance image = given_test_image_instance();
+        ImageInstance image = givenTestImageInstance();
 
         configureFor("localhost", 8888);
         System.out.println("/image/" + URLEncoder.encode(image.getBaseImage().getPath(), StandardCharsets.UTF_8)
@@ -1026,7 +1024,7 @@ public class ImageInstanceResourceTests {
     @Test
     @Transactional
     public void histograms_bounds() throws Exception {
-        ImageInstance image = given_test_image_instance();
+        ImageInstance image = givenTestImageInstance();
 
         configureFor("localhost", 8888);
 
@@ -1051,7 +1049,7 @@ public class ImageInstanceResourceTests {
     @Test
     @Transactional
     public void channel_histograms() throws Exception {
-        ImageInstance image = given_test_image_instance();
+        ImageInstance image = givenTestImageInstance();
 
 
         configureFor("localhost", 8888);
@@ -1080,7 +1078,7 @@ public class ImageInstanceResourceTests {
     @Test
     @Transactional
     public void channel_histograms_bounds() throws Exception {
-        ImageInstance image = given_test_image_instance();
+        ImageInstance image = givenTestImageInstance();
 
 
         configureFor("localhost", 8888);

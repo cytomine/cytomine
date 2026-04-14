@@ -57,6 +57,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
 
+@SuppressWarnings("checkstyle:VariableDeclarationUsageDistance")
 @AutoConfigureMockMvc
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @Transactional

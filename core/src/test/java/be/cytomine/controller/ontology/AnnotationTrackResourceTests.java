@@ -85,7 +85,7 @@ public class AnnotationTrackResourceTests {
 
     @Test
     @Transactional
-    public void get_a_annotationTrack() throws Exception {
+    public void shouldReturnAnnotationTrackWithCorrectFields() throws Exception {
         AnnotationTrack annotationTrack = builder.givenAnAnnotationTrack();
         restAnnotationTrackControllerMockMvc.perform(get(
                 "/api/annotationtrack/{annotation}/{track}.json",
@@ -98,7 +98,7 @@ public class AnnotationTrackResourceTests {
 
     @Test
     @Transactional
-    public void get_a_annotationTrack_annotation_not_exists() throws Exception {
+    public void shouldReturnNotFoundWhenAnnotationDoesNotExist() throws Exception {
         AnnotationTrack annotationTrack = builder.givenAnAnnotationTrack();
         restAnnotationTrackControllerMockMvc.perform(get(
                 "/api/annotationtrack/{annotation}/{track}.json",
@@ -110,7 +110,7 @@ public class AnnotationTrackResourceTests {
 
     @Test
     @Transactional
-    public void get_a_annotationTrack_track_not_exists() throws Exception {
+    public void shouldReturnNotFoundWhenAnnotationTrackDoesNotExist() throws Exception {
         AnnotationTrack annotationTrack = builder.givenAnAnnotationTrack();
         restAnnotationTrackControllerMockMvc.perform(get(
                 "/api/annotationtrack/{annotation}/{track}.json",
@@ -122,7 +122,7 @@ public class AnnotationTrackResourceTests {
 
     @Test
     @Transactional
-    public void get_a_annotationTrack_not_exists() throws Exception {
+    public void shouldReturnNotFoundWhenAnnotationTrackIsNotPersisted() throws Exception {
         AnnotationTrack annotationTrack = builder.givenANotPersistedAnnotationTrack();
         restAnnotationTrackControllerMockMvc.perform(get(
                 "/api/annotationtrack/{annotation}/{track}.json",

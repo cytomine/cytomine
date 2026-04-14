@@ -1,21 +1,5 @@
 package be.cytomine.controller.stats;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.util.Date;
 import java.util.List;
 
@@ -67,7 +51,6 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
@@ -124,10 +107,7 @@ public class StatsResourceTests {
 
     @AfterAll
     public static void afterAll() {
-        try {
-            wireMockServer.stop();
-        } catch (Exception e) {
-        }
+        wireMockServer.stop();
     }
 
     @BeforeEach
@@ -145,7 +125,7 @@ public class StatsResourceTests {
                 .withBody("[]")));
     }
 
-    PersistentProjectConnection given_a_persistent_connection_in_project(User user, Project project, Date created) {
+    PersistentProjectConnection givenAPersistentConnectionInProject(User user, Project project, Date created) {
         PersistentProjectConnection connection = projectConnectionService.add(
             user,
             project,
@@ -158,7 +138,7 @@ public class StatsResourceTests {
         return connection;
     }
 
-    PersistentImageConsultation given_a_persistent_image_consultation(
+    PersistentImageConsultation givenAPersistentImageConsultation(
         User user,
         ImageInstance imageInstance,
         Date created
@@ -166,20 +146,18 @@ public class StatsResourceTests {
         return imageConsultationService.add(user, imageInstance.getId(), "xxx", "mode", created);
     }
 
-    AnnotationAction given_a_persistent_annotation_action(
+    AnnotationAction givenAPersistentAnnotationAction(
         Date creation,
         AnnotationDomain annotationDomain,
         User user,
         String action
     ) {
-        AnnotationAction annotationAction =
-            annotationActionService.add(
-                annotationDomain,
-                user,
-                action,
-                creation
-            );
-        return annotationAction;
+        return annotationActionService.add(
+            annotationDomain,
+            user,
+            action,
+            creation
+        );
     }
 
     @Test
@@ -207,10 +185,8 @@ public class StatsResourceTests {
             .andExpect(jsonPath("$.collection", hasSize(equalTo(2))));
     }
 
-
     @Test
     void stats_user() throws Exception {
-
         Project project = builder.givenAProject();
         builder.addUserToProject(project, "superadmin");
         UserAnnotation annotation1 = builder.givenAUserAnnotation(project);
@@ -226,7 +202,6 @@ public class StatsResourceTests {
             .andExpect(jsonPath("$.collection", hasSize(equalTo(1))))
             .andExpect(jsonPath("$.collection[0].id").value(builder.givenSuperAdmin().getId().intValue()))
             .andExpect(jsonPath("$.collection[0].value").value(2));
-
 
         restStatsControllerMockMvc.perform(get("/api/project/{project}/stats/user.json", project.getId())
                 .param("startDate", String.valueOf(DateUtils.addDays(new Date(), -20).getTime()))
@@ -255,7 +230,7 @@ public class StatsResourceTests {
     }
 
     @Test
-    void stat_Per_term_and_image() throws Exception {
+    void shouldReturnTermImageStatsPerProject() throws Exception {
         Project project = builder.givenAProject();
 
         restStatsControllerMockMvc.perform(get("/api/project/{project}/stats/termimage.json", project.getId()))
@@ -275,7 +250,6 @@ public class StatsResourceTests {
                 .param("endDate", String.valueOf(DateUtils.addDays(new Date(), -10).getTime())))
             .andExpect(status().isOk());
     }
-
 
     @Test
     void stats_uder_slide() throws Exception {
@@ -425,17 +399,17 @@ public class StatsResourceTests {
     @Test
     void stats_connection_evolution() throws Exception {
         Project project = builder.givenAProject();
-        given_a_persistent_connection_in_project(
+        givenAPersistentConnectionInProject(
             builder.givenSuperAdmin(),
             project,
             DateUtils.addDays(new Date(), -15)
         );
-        given_a_persistent_connection_in_project(
+        givenAPersistentConnectionInProject(
             builder.givenSuperAdmin(),
             project,
             DateUtils.addDays(new Date(), -15)
         );
-        given_a_persistent_connection_in_project(
+        givenAPersistentConnectionInProject(
             builder.givenSuperAdmin(),
             project,
             DateUtils.addDays(new Date(), -5)
@@ -455,17 +429,17 @@ public class StatsResourceTests {
     void stats_image_consultation_evolution() throws Exception {
         Project project = builder.givenAProject();
         ImageInstance imageInstance = builder.givenAnImageInstance(project);
-        given_a_persistent_image_consultation(
+        givenAPersistentImageConsultation(
             builder.givenSuperAdmin(),
             imageInstance,
             DateUtils.addDays(new Date(), -15)
         );
-        given_a_persistent_image_consultation(
+        givenAPersistentImageConsultation(
             builder.givenSuperAdmin(),
             imageInstance,
             DateUtils.addDays(new Date(), -15)
         );
-        given_a_persistent_image_consultation(
+        givenAPersistentImageConsultation(
             builder.givenSuperAdmin(),
             imageInstance,
             DateUtils.addDays(new Date(), -5)
@@ -482,28 +456,28 @@ public class StatsResourceTests {
     }
 
     @Test
-    void stats_annotation_Action_evolution() throws Exception {
+    void shouldReturnAnnotationActionEvolutionStatsForProject() throws Exception {
         Project project = builder.givenAProject();
         AnnotationDomain annotation = builder.givenAUserAnnotation(project);
-        given_a_persistent_annotation_action(
+        givenAPersistentAnnotationAction(
             DateUtils.addDays(new Date(), -15),
             annotation,
             builder.givenSuperAdmin(),
             "select"
         );
-        given_a_persistent_annotation_action(
+        givenAPersistentAnnotationAction(
             DateUtils.addDays(new Date(), -15),
             annotation,
             builder.givenSuperAdmin(),
             "move"
         );
-        given_a_persistent_annotation_action(
+        givenAPersistentAnnotationAction(
             DateUtils.addDays(new Date(), -15),
             annotation,
             builder.givenSuperAdmin(),
             "select"
         );
-        given_a_persistent_annotation_action(
+        givenAPersistentAnnotationAction(
             DateUtils.addDays(new Date(), -5),
             annotation,
             builder.givenSuperAdmin(),

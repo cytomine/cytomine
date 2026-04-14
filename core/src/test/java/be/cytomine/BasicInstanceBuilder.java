@@ -229,6 +229,10 @@ public class BasicInstanceBuilder {
         return persistAndReturn(givenANotPersistedImageFilterProject(givenAnImageFilter(), givenAProject()));
     }
 
+    public ImageFilterProject givenAnImageFilterProject(ImageFilter imageFilter, Project project) {
+        return persistAndReturn(givenANotPersistedImageFilterProject(imageFilter, project));
+    }
+
     public ImageFilter givenANotPersistedImageFilter() {
         ImageFilter imageFilter = new ImageFilter();
         imageFilter.setName(randomString());
@@ -254,10 +258,6 @@ public class BasicInstanceBuilder {
         term.setOntology(ontology);
         term.setColor("blue");
         return term;
-    }
-
-    public ImageFilterProject givenAnImageFilterProject(ImageFilter imageFilter, Project project) {
-        return persistAndReturn(givenANotPersistedImageFilterProject(imageFilter, project));
     }
 
     public RelationTerm givenARelationTerm() {
@@ -398,11 +398,6 @@ public class BasicInstanceBuilder {
         return image;
     }
 
-    public ImageInstance givenAnImageInstance(AbstractImage abstractImage, Project project) {
-        ImageInstance imageInstance = givenANotPersistedImageInstance(abstractImage, project);
-        return persistAndReturn(imageInstance);
-    }
-
     public ImageInstance givenANotPersistedImageInstance(Project project) {
         return givenANotPersistedImageInstance(givenAnAbstractImage(), project);
     }
@@ -417,6 +412,11 @@ public class BasicInstanceBuilder {
         image.setProject(project);
         image.setUser(givenSuperAdmin());
         return image;
+    }
+
+    public ImageInstance givenAnImageInstance(AbstractImage abstractImage, Project project) {
+        ImageInstance imageInstance = givenANotPersistedImageInstance(abstractImage, project);
+        return persistAndReturn(imageInstance);
     }
 
     public ImageInstance givenAnImageInstance(Project project) {
@@ -478,10 +478,6 @@ public class BasicInstanceBuilder {
         return persistAndReturn(givenANotPersistedSliceInstance(imageInstance, abstractSlice));
     }
 
-    public SliceInstance givenANotPersistedSliceInstance() {
-        return givenANotPersistedSliceInstance(givenAnImageInstance(), givenAnAbstractSlice());
-    }
-
     public SliceInstance givenASliceInstance(Project project) {
         AbstractImage image = givenAnAbstractImage();
         SliceInstance sliceInstance = givenASliceInstance(
@@ -497,6 +493,10 @@ public class BasicInstanceBuilder {
         slice.setProject(imageInstance.getProject());
         slice.setBaseSlice(abstractSlice);
         return slice;
+    }
+
+    public SliceInstance givenANotPersistedSliceInstance() {
+        return givenANotPersistedSliceInstance(givenAnImageInstance(), givenAnAbstractSlice());
     }
 
     public Mime givenAMime() {
@@ -563,20 +563,6 @@ public class BasicInstanceBuilder {
         return companionFile;
     }
 
-    public UserAnnotation givenANotPersistedUserAnnotation() {
-        UserAnnotation annotation = new UserAnnotation();
-        annotation.setUser(givenSuperAdmin());
-        try {
-            annotation.setLocation(new WKTReader().read("POLYGON ((1983 2168, 2107 2160, 2047 2074, 1983 2168))"));
-        } catch (ParseException ignored) {
-            // TODO
-        }
-        annotation.setSlice(givenASliceInstance());
-        annotation.setImage(annotation.getSlice().getImage());
-        annotation.setProject(annotation.getImage().getProject());
-        return annotation;
-    }
-
     public UserAnnotation givenANotPersistedGuestAnnotation() {
         UserAnnotation annotation = new UserAnnotation();
         annotation.setUser(givenAGuest());
@@ -591,12 +577,18 @@ public class BasicInstanceBuilder {
         return annotation;
     }
 
-    public UserAnnotation givenAUserAnnotation(Project project) {
-        UserAnnotation annotation = givenANotPersistedUserAnnotation();
-        annotation.getSlice().setProject(project);
-        annotation.getImage().setProject(project);
-        annotation.setProject(project);
-        return persistAndReturn(annotation);
+    public UserAnnotation givenANotPersistedUserAnnotation() {
+        UserAnnotation annotation = new UserAnnotation();
+        annotation.setUser(givenSuperAdmin());
+        try {
+            annotation.setLocation(new WKTReader().read("POLYGON ((1983 2168, 2107 2160, 2047 2074, 1983 2168))"));
+        } catch (ParseException ignored) {
+            // TODO
+        }
+        annotation.setSlice(givenASliceInstance());
+        annotation.setImage(annotation.getSlice().getImage());
+        annotation.setProject(annotation.getImage().getProject());
+        return annotation;
     }
 
     public UserAnnotation givenANotPersistedUserAnnotation(Project project) {
@@ -606,7 +598,6 @@ public class BasicInstanceBuilder {
         annotation.setProject(project);
         return annotation;
     }
-
 
     public UserAnnotation givenANotPersistedUserAnnotation(SliceInstance sliceInstance) {
         UserAnnotation annotation = new UserAnnotation();
@@ -620,6 +611,14 @@ public class BasicInstanceBuilder {
         annotation.setImage(annotation.getSlice().getImage());
         annotation.setProject(annotation.getImage().getProject());
         return annotation;
+    }
+
+    public UserAnnotation givenAUserAnnotation(Project project) {
+        UserAnnotation annotation = givenANotPersistedUserAnnotation();
+        annotation.getSlice().setProject(project);
+        annotation.getImage().setProject(project);
+        annotation.setProject(project);
+        return persistAndReturn(annotation);
     }
 
     public UserAnnotation givenAUserAnnotation(SliceInstance sliceInstance) {

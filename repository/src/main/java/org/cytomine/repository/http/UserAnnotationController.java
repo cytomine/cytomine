@@ -50,7 +50,7 @@ public class UserAnnotationController implements UserAnnotationHttpContract {
 
     @Override
     @GetMapping("/count/project/{projectId}")
-    public long countByProject(long projectId, long userId) {
+    public long countByProject(long projectId, long userId, Long startDate, Long endDate) {
         if (!aclService.canReadProject(userId, projectId)) {
             return 0L;
         }

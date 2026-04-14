@@ -66,7 +66,7 @@ public class UserAnnotationController {
 
     @GetMapping("user/{userAnnotationUserId}/userannotation/count.json")
     public Map<String, Long> countByUser(@PathVariable long userAnnotationUserId,
-                                         @RequestParam(required = false) Long projectId) {
+                                         @RequestParam(name = "project", required = false) Long projectId) {
         long userId = currentUserService.getCurrentUser().getId();
         if (projectId != null) {
             log.debug("REST request to count user annotations for user {} and project {}", userAnnotationUserId,

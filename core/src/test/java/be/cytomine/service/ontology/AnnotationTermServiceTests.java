@@ -68,8 +68,11 @@ public class AnnotationTermServiceTests {
     @Test
     void find_annotation_term_with_success() {
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm();
-        Optional<AnnotationTerm> result = annotationTermService.find
-            (annotationTerm.getUserAnnotation(), annotationTerm.getTerm(), annotationTerm.getUser());
+        Optional<AnnotationTerm> result = annotationTermService.find(
+            annotationTerm.getUserAnnotation(),
+            annotationTerm.getTerm(),
+            annotationTerm.getUser()
+        );
         assertThat(result).isPresent();
         assertThat(annotationTerm).isEqualTo(result.get());
     }
@@ -259,7 +262,6 @@ public class AnnotationTermServiceTests {
             .findByUserAnnotationAndTermAndUser(annotation, oldTerm, annotationTerm.getUser())).isEmpty();
 
     }
-
 
     @Test
     void add_valid_annotation_term_and_delete_other_terms_for_reviewed_annotation() {

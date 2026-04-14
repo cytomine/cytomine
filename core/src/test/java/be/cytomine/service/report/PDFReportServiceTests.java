@@ -139,7 +139,7 @@ public class PDFReportServiceTests {
     }
 
     @Test
-    public void sum_of_custom_column_width_values_different_from_1_fails() {
+    public void shouldFailWhenCustomColumnWidthSumDiffersFrom1() {
         ServerException expectedError = new ServerException(
             "The sum of a percent array should be equal to 1, actual: 1.10"
         );

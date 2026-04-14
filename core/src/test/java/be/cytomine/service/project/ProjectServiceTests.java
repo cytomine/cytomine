@@ -220,11 +220,11 @@ public class ProjectServiceTests {
         Project project2 = builder.givenAProjectWithUser(user1);
         Project project3 = builder.givenAProjectWithUser(user1);
 
-        given_a_persistent_connection_in_project(user1, project1, DateUtils.addDays(new Date(), 1));
-        given_a_persistent_connection_in_project(user1, project2, DateUtils.addDays(new Date(), 2));
+        givenAPersistentConnectionInProject(user1, project1, DateUtils.addDays(new Date(), 1));
+        givenAPersistentConnectionInProject(user1, project2, DateUtils.addDays(new Date(), 2));
 
         // connection from another user
-        given_a_persistent_connection_in_project(builder.givenAUser(), project1, DateUtils.addDays(new Date(), -7));
+        givenAPersistentConnectionInProject(builder.givenAUser(), project1, DateUtils.addDays(new Date(), -7));
 
         List<Map<String, Object>> results = projectService.listLastOpened(user1, 2L);
         assertThat(results.get(0).get("id")).isEqualTo(project2.getId());
@@ -1058,12 +1058,10 @@ public class ProjectServiceTests {
         User userNotInProject = builder.givenAUser();
 
         Assertions.assertThrows(
-            ConstraintException.class, () -> {
-                projectService.update(
-                    project, project.toJsonObject()
-                        .withChange("representatives", List.of(userNotInProject.getId()))
-                );
-            }
+            ConstraintException.class, () -> projectService.update(
+                project,
+                project.toJsonObject().withChange("representatives", List.of(userNotInProject.getId()))
+            )
         );
 
     }
@@ -1075,8 +1073,8 @@ public class ProjectServiceTests {
         Project project2 = builder.givenAProjectWithUser(user1);
         Project project3 = builder.givenAProjectWithUser(user1);
 
-        given_a_persistent_connection_in_project(user1, project1, DateUtils.addSeconds(new Date(), -300));
-        given_a_persistent_connection_in_project(user1, project2, DateUtils.addSeconds(new Date(), -5));
+        givenAPersistentConnectionInProject(user1, project1, DateUtils.addSeconds(new Date(), -300));
+        givenAPersistentConnectionInProject(user1, project2, DateUtils.addSeconds(new Date(), -5));
 
         assertThat(projectService.getActiveProjects()).contains(project2.getId())
             .doesNotContain(project1.getId(), project3.getId());
@@ -1092,12 +1090,12 @@ public class ProjectServiceTests {
         builder.addUserToProject(project2, user1.getUsername());
         builder.addUserToProject(project2, builder.givenSuperAdmin().getUsername());
 
-        given_a_persistent_connection_in_project(
+        givenAPersistentConnectionInProject(
             builder.givenSuperAdmin(),
             project1,
             DateUtils.addSeconds(new Date(), -300)
         );
-        given_a_persistent_connection_in_project(user1, project2, DateUtils.addSeconds(new Date(), -5));
+        givenAPersistentConnectionInProject(user1, project2, DateUtils.addSeconds(new Date(), -5));
 
         assertThat(projectService.getActiveProjectsWithNumberOfUsers()).hasSize(1);
         assertThat(((JsonObject) projectService.getActiveProjectsWithNumberOfUsers()
@@ -1105,12 +1103,12 @@ public class ProjectServiceTests {
             .get("project")).getId()).isEqualTo(project2.getId());
         assertThat(projectService.getActiveProjectsWithNumberOfUsers().get(0).get("users")).isEqualTo(1);
 
-        given_a_persistent_connection_in_project(
+        givenAPersistentConnectionInProject(
             builder.givenSuperAdmin(),
             project1,
             DateUtils.addSeconds(new Date(), -10)
         );
-        given_a_persistent_connection_in_project(user1, project2, DateUtils.addSeconds(new Date(), -5));
+        givenAPersistentConnectionInProject(user1, project2, DateUtils.addSeconds(new Date(), -5));
 
         assertThat(projectService.getActiveProjectsWithNumberOfUsers()).hasSize(2);
     }
@@ -1176,8 +1174,8 @@ public class ProjectServiceTests {
         AssertionsForClassTypes.assertThat(entityManager.find(AttachedFile.class, attachedFile.getId())).isNull();
     }
 
-    PersistentProjectConnection given_a_persistent_connection_in_project(User user, Project project, Date created) {
-        PersistentProjectConnection connection = projectConnectionService.add(
+    PersistentProjectConnection givenAPersistentConnectionInProject(User user, Project project, Date created) {
+        return projectConnectionService.add(
             user,
             project,
             "xxx",
@@ -1186,11 +1184,10 @@ public class ProjectServiceTests {
             "123",
             created
         );
-        return connection;
     }
 
     @Test
-    void list_all_users_id_of_a_project() {
+    void shouldReturnAllUserIdsFromProject() {
         Project project = builder.givenAProject();
         User user1 = builder.givenAUser("Paul");
         User user2 = builder.givenAUser("Bob");

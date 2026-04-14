@@ -72,20 +72,18 @@ public class AnnotationActionResourceTests {
         annotationActionRepository.deleteAll();
     }
 
-    AnnotationAction given_a_persistent_annotation_action(
+    AnnotationAction givenAPersistentAnnotationAction(
         Date creation,
         AnnotationDomain annotationDomain,
         User user,
         String action
     ) {
-        AnnotationAction annotationAction =
-            annotationActionService.add(
-                annotationDomain,
-                user,
-                action,
-                creation
-            );
-        return annotationAction;
+        return annotationActionService.add(
+            annotationDomain,
+            user,
+            action,
+            creation
+        );
     }
 
     @Test
@@ -124,7 +122,7 @@ public class AnnotationActionResourceTests {
         User user = builder.givenAUser();
 
         AnnotationDomain annotationDomain = builder.givenAUserAnnotation();
-        given_a_persistent_annotation_action(new Date(), annotationDomain, user, "select");
+        givenAPersistentAnnotationAction(new Date(), annotationDomain, user, "select");
 
         restUserPositionControllerMockMvc.perform(get(
                 "/api/imageinstance/{image}/annotation_action.json",
@@ -149,7 +147,7 @@ public class AnnotationActionResourceTests {
         User user = builder.givenAUser();
 
         AnnotationDomain annotationDomain = builder.givenAUserAnnotation();
-        given_a_persistent_annotation_action(new Date(), annotationDomain, user, "select");
+        givenAPersistentAnnotationAction(new Date(), annotationDomain, user, "select");
 
         restUserPositionControllerMockMvc.perform(get(
                 "/api/sliceinstance/{image}/annotation_action.json",
@@ -173,7 +171,7 @@ public class AnnotationActionResourceTests {
     public void count_annotation_by_project() throws Exception {
         User user = builder.givenSuperAdmin();
         AnnotationDomain annotationDomain = builder.givenAUserAnnotation();
-        given_a_persistent_annotation_action(DateUtils.addDays(new Date(), -2), annotationDomain, user, "select");
+        givenAPersistentAnnotationAction(DateUtils.addDays(new Date(), -2), annotationDomain, user, "select");
 
         restUserPositionControllerMockMvc.perform(get(
                 "/api/project/{project}/annotation_action/count.json",

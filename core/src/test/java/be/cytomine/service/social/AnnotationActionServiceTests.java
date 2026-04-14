@@ -1,8 +1,6 @@
 package be.cytomine.service.social;
 
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang3.time.DateUtils;
 import org.assertj.core.api.AssertionsForClassTypes;
@@ -48,27 +46,25 @@ public class AnnotationActionServiceTests {
         annotationActionRepository.deleteAll();
     }
 
-
-    AnnotationAction given_a_persistent_annotation_action(
+    AnnotationAction givenAPersistentAnnotationAction(
         Date creation,
         AnnotationDomain annotationDomain,
         User user,
         String action
     ) {
-        AnnotationAction annotationAction =
-            annotationActionService.add(
-                annotationDomain,
-                user,
-                action,
-                creation
-            );
+        AnnotationAction annotationAction = annotationActionService.add(
+            annotationDomain,
+            user,
+            action,
+            creation
+        );
         return annotationAction;
     }
 
     @Test
     public void add_action_for_annotation() {
         assertThat(annotationActionRepository.count()).isEqualTo(0);
-        given_a_persistent_annotation_action(
+        givenAPersistentAnnotationAction(
             new Date(),
             builder.givenAUserAnnotation(),
             builder.givenSuperAdmin(),
@@ -84,8 +80,8 @@ public class AnnotationActionServiceTests {
         assertThat(annotationActionService.list(annotationDomain.getSlice(), null, null, null))
             .hasSize(0);
 
-        given_a_persistent_annotation_action(new Date(), annotationDomain, builder.givenSuperAdmin(), "view");
-        given_a_persistent_annotation_action(new Date(), annotationDomain, builder.givenSuperAdmin(), "select");
+        givenAPersistentAnnotationAction(new Date(), annotationDomain, builder.givenSuperAdmin(), "view");
+        givenAPersistentAnnotationAction(new Date(), annotationDomain, builder.givenSuperAdmin(), "select");
 
         assertThat(annotationActionService.list(annotationDomain.getSlice(), null, null, null))
             .hasSize(2);
@@ -101,16 +97,14 @@ public class AnnotationActionServiceTests {
             builder.givenSuperAdmin(),
             null,
             new Date().getTime()
-        ))
-            .hasSize(2);
+        )).hasSize(2);
 
         assertThat(annotationActionService.list(
             annotationDomain.getSlice(),
             builder.givenSuperAdmin(),
             new Date().getTime(),
             null
-        ))
-            .hasSize(0);
+        )).hasSize(0);
     }
 
     @Test
@@ -120,8 +114,8 @@ public class AnnotationActionServiceTests {
         assertThat(annotationActionService.list(annotationDomain.getImage(), null, null, null))
             .hasSize(0);
 
-        given_a_persistent_annotation_action(new Date(), annotationDomain, builder.givenSuperAdmin(), "view");
-        given_a_persistent_annotation_action(new Date(), annotationDomain, builder.givenSuperAdmin(), "select");
+        givenAPersistentAnnotationAction(new Date(), annotationDomain, builder.givenSuperAdmin(), "view");
+        givenAPersistentAnnotationAction(new Date(), annotationDomain, builder.givenSuperAdmin(), "select");
 
         assertThat(annotationActionRepository.count()).isEqualTo(2);
         System.out.println(annotationActionRepository.findAll());
@@ -139,18 +133,15 @@ public class AnnotationActionServiceTests {
             builder.givenSuperAdmin(),
             null,
             new Date().getTime()
-        ))
-            .hasSize(2);
+        )).hasSize(2);
 
         assertThat(annotationActionService.list(
             annotationDomain.getImage(),
             builder.givenSuperAdmin(),
             new Date().getTime(),
             null
-        ))
-            .hasSize(0);
+        )).hasSize(0);
     }
-
 
     @Test
     void total_annotation_action_by_project_count() {
@@ -158,32 +149,26 @@ public class AnnotationActionServiceTests {
         AnnotationDomain annotationDomain = builder.givenAUserAnnotation();
 
         Date noConnectionBefore = DateUtils.addDays(new Date(), -100);
-        given_a_persistent_annotation_action(DateUtils.addDays(new Date(), -10), annotationDomain, user1, "select");
-        given_a_persistent_annotation_action(DateUtils.addDays(new Date(), -10), annotationDomain, user1, "view");
+        givenAPersistentAnnotationAction(DateUtils.addDays(new Date(), -10), annotationDomain, user1, "select");
+        givenAPersistentAnnotationAction(DateUtils.addDays(new Date(), -10), annotationDomain, user1, "view");
         Date twoConnectionBefore = DateUtils.addDays(new Date(), -5);
-        given_a_persistent_annotation_action(DateUtils.addDays(new Date(), -3), annotationDomain, user1, "select");
+        givenAPersistentAnnotationAction(DateUtils.addDays(new Date(), -3), annotationDomain, user1, "select");
         Date threeConnectionBefore = new Date();
 
-        List<Map<String, Object>> results;
-
         AssertionsForClassTypes.assertThat(annotationActionService.countByProject(
-                annotationDomain.getProject(),
-                null,
-                null
-            ))
-            .isEqualTo(3);
+            annotationDomain.getProject(),
+            null,
+            null
+        )).isEqualTo(3);
         AssertionsForClassTypes.assertThat(annotationActionService.countByProject(
-                annotationDomain.getProject(),
-                noConnectionBefore.getTime(),
-                twoConnectionBefore.getTime()
-            ))
-            .isEqualTo(2);
+            annotationDomain.getProject(),
+            noConnectionBefore.getTime(),
+            twoConnectionBefore.getTime()
+        )).isEqualTo(2);
         AssertionsForClassTypes.assertThat(annotationActionService.countByProject(
-                annotationDomain.getProject(),
-                twoConnectionBefore.getTime(),
-                threeConnectionBefore.getTime()
-            ))
-            .isEqualTo(1);
+            annotationDomain.getProject(),
+            twoConnectionBefore.getTime(),
+            threeConnectionBefore.getTime()
+        )).isEqualTo(1);
     }
-
 }

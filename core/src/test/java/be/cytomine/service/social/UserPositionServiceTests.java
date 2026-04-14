@@ -81,33 +81,31 @@ public class UserPositionServiceTests {
         new be.cytomine.dto.image.Point(3000d, 9000d)
     );
 
-    PersistentUserPosition given_a_persistent_user_position(Date creation, User user, SliceInstance sliceInstance) {
-        return given_a_persistent_user_position(creation, user, sliceInstance, USER_VIEW);
+    PersistentUserPosition givenAPersistentUserPosition(Date creation, User user, SliceInstance sliceInstance) {
+        return givenAPersistentUserPosition(creation, user, sliceInstance, USER_VIEW);
     }
 
-    PersistentUserPosition given_a_persistent_user_position(
+    PersistentUserPosition givenAPersistentUserPosition(
         Date creation,
         User user,
         SliceInstance sliceInstance,
         AreaDTO areaDTO
     ) {
-        PersistentUserPosition connection =
-            userPositionService.add(
-                creation,
-                user,
-                sliceInstance,
-                sliceInstance.getImage(),
-                areaDTO,
-                1,
-                5.0,
-                false
-            );
-        return connection;
+        return userPositionService.add(
+            creation,
+            user,
+            sliceInstance,
+            sliceInstance.getImage(),
+            areaDTO,
+            1,
+            5.0,
+            false
+        );
     }
 
     @Test
     void user_position_create_persistent_and_expired_position() {
-        PersistentUserPosition persistentUserPosition = given_a_persistent_user_position(
+        PersistentUserPosition persistentUserPosition = givenAPersistentUserPosition(
             new Date(),
             builder.givenSuperAdmin(),
             builder.givenASliceInstance()
@@ -116,22 +114,21 @@ public class UserPositionServiceTests {
         assertThat(persistentUserPositionRepository.count()).isEqualTo(1);
     }
 
-
     @Test
     void retrieve_last_position_for_user() {
         User mainUser = builder.givenSuperAdmin();
         User anotherUser = builder.givenAUser();
         SliceInstance sliceInstance = builder.givenASliceInstance();
 
-        PersistentUserPosition persistentUserPosition = given_a_persistent_user_position(
+        PersistentUserPosition persistentUserPosition = givenAPersistentUserPosition(
             new Date(),
             mainUser,
             sliceInstance
         );
         PersistentUserPosition persistentUserPositionForAnotherUserSameSlice
-            = given_a_persistent_user_position(new Date(), anotherUser, sliceInstance);
+            = givenAPersistentUserPosition(new Date(), anotherUser, sliceInstance);
         PersistentUserPosition persistentUserPositionForAnotherUserAnotherSlice
-            = given_a_persistent_user_position(new Date(), anotherUser, builder.givenASliceInstance());
+            = givenAPersistentUserPosition(new Date(), anotherUser, builder.givenASliceInstance());
 
         Optional<LastUserPosition> lastUserPosition
             = userPositionService.lastPositionByUser(sliceInstance.getImage(), sliceInstance, mainUser, false);
@@ -152,7 +149,7 @@ public class UserPositionServiceTests {
         User anotherUser = builder.givenAUser();
         SliceInstance sliceInstance = builder.givenASliceInstance();
 
-        PersistentUserPosition persistentUserPosition = given_a_persistent_user_position(
+        PersistentUserPosition persistentUserPosition = givenAPersistentUserPosition(
             new Date(),
             mainUser,
             sliceInstance
@@ -163,7 +160,7 @@ public class UserPositionServiceTests {
 
         // add a new user
         PersistentUserPosition persistentUserPositionForAnotherUserSameSlice
-            = given_a_persistent_user_position(new Date(), anotherUser, sliceInstance);
+            = givenAPersistentUserPosition(new Date(), anotherUser, sliceInstance);
 
         assertThat(userPositionService.listOnlineUsersByImage(sliceInstance.getImage(), sliceInstance, false))
             .containsExactlyInAnyOrder(mainUser.getId(), anotherUser.getId());
@@ -183,9 +180,9 @@ public class UserPositionServiceTests {
         Date beforeFirstPosition = DateUtils.addSeconds(oldPosition, -1);
         Date afterLastPosition = new Date();
 
-        given_a_persistent_user_position(oldPosition, mainUser, sliceInstance);
-        given_a_persistent_user_position(oldPosition, anotherUser, sliceInstance);
-        given_a_persistent_user_position(freshPosition, mainUser, sliceInstance);
+        givenAPersistentUserPosition(oldPosition, mainUser, sliceInstance);
+        givenAPersistentUserPosition(oldPosition, anotherUser, sliceInstance);
+        givenAPersistentUserPosition(freshPosition, mainUser, sliceInstance);
 
         List<PersistentUserPosition> results;
 
@@ -275,9 +272,9 @@ public class UserPositionServiceTests {
         Date beforeFirstPosition = DateUtils.addSeconds(oldPosition, -1);
         Date afterLastPosition = new Date();
 
-        given_a_persistent_user_position(oldPosition, mainUser, sliceInstance);
-        given_a_persistent_user_position(oldPosition, anotherUser, sliceInstance);
-        given_a_persistent_user_position(freshPosition, mainUser, sliceInstance);
+        givenAPersistentUserPosition(oldPosition, mainUser, sliceInstance);
+        givenAPersistentUserPosition(oldPosition, anotherUser, sliceInstance);
+        givenAPersistentUserPosition(freshPosition, mainUser, sliceInstance);
 
         List<Map<String, Object>> summarize = userPositionService.summarize(
             sliceInstance.getImage(),
@@ -304,10 +301,10 @@ public class UserPositionServiceTests {
         Date beforeFirstPosition = DateUtils.addSeconds(oldPosition, -1);
         Date afterLastPosition = new Date();
 
-        given_a_persistent_user_position(DateUtils.addSeconds(oldPosition, 1), mainUser, sliceInstance, USER_VIEW);
-        given_a_persistent_user_position(DateUtils.addSeconds(oldPosition, 2), mainUser, sliceInstance, USER_VIEW);
-        given_a_persistent_user_position(DateUtils.addSeconds(oldPosition, 3), mainUser, sliceInstance, USER_VIEW);
-        given_a_persistent_user_position(
+        givenAPersistentUserPosition(DateUtils.addSeconds(oldPosition, 1), mainUser, sliceInstance, USER_VIEW);
+        givenAPersistentUserPosition(DateUtils.addSeconds(oldPosition, 2), mainUser, sliceInstance, USER_VIEW);
+        givenAPersistentUserPosition(DateUtils.addSeconds(oldPosition, 3), mainUser, sliceInstance, USER_VIEW);
+        givenAPersistentUserPosition(
             DateUtils.addSeconds(oldPosition, 4),
             mainUser,
             sliceInstance,
@@ -350,10 +347,10 @@ public class UserPositionServiceTests {
         Date beforeFirstPosition = DateUtils.addSeconds(oldPosition, -1);
         Date afterLastPosition = new Date();
 
-        given_a_persistent_user_position(DateUtils.addDays(oldPosition, 1), mainUser, sliceInstance, USER_VIEW);
-        given_a_persistent_user_position(DateUtils.addDays(oldPosition, 3), mainUser, sliceInstance, USER_VIEW);
-        given_a_persistent_user_position(DateUtils.addDays(oldPosition, 5), mainUser, sliceInstance, USER_VIEW);
-        given_a_persistent_user_position(DateUtils.addDays(oldPosition, 7), mainUser, sliceInstance, USER_VIEW);
+        givenAPersistentUserPosition(DateUtils.addDays(oldPosition, 1), mainUser, sliceInstance, USER_VIEW);
+        givenAPersistentUserPosition(DateUtils.addDays(oldPosition, 3), mainUser, sliceInstance, USER_VIEW);
+        givenAPersistentUserPosition(DateUtils.addDays(oldPosition, 5), mainUser, sliceInstance, USER_VIEW);
+        givenAPersistentUserPosition(DateUtils.addDays(oldPosition, 7), mainUser, sliceInstance, USER_VIEW);
 
         List<Map<String, Object>> summarize = userPositionService.summarize(
             sliceInstance.getImage(),
@@ -384,7 +381,7 @@ public class UserPositionServiceTests {
     }
 
     @Test
-    void adding_a_position_with_new_location() {
+    void shouldSuccessfullyAddPositionWithNewLocation() {
         User user = builder.givenAUser();
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = builder.givenAnImageInstance();

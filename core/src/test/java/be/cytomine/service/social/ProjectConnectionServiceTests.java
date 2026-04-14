@@ -69,7 +69,6 @@ public class ProjectConnectionServiceTests {
         lastConnectionRepository.deleteAll();
     }
 
-
     @Test
     void creation_and_close() {
         User user = builder.givenSuperAdmin();
@@ -98,7 +97,6 @@ public class ProjectConnectionServiceTests {
 
         connection = projectConnectionService.add(user, projet, "yyy", "linux", "chrome", "123");
 
-
         connectionOptional = persistentProjectConnectionRepository.findAllByUserAndProjectAndCreatedLessThan(
             builder.givenSuperAdmin().getId(), projet.getId(), after,
             PageRequest.of(0, 1, Sort.Direction.DESC, "created")
@@ -106,9 +104,7 @@ public class ProjectConnectionServiceTests {
         assertThat(connectionOptional).isPresent();
         assertThat(connectionOptional.get().getSession()).isEqualTo("xxx");
         assertThat(connectionOptional.get().getTime()).isEqualTo(0);
-
     }
-
 
     @Test
     void find_last_user_connection_in_project() {
@@ -121,7 +117,7 @@ public class ProjectConnectionServiceTests {
             = projectConnectionService.lastConnectionInProject(projet, user.getId(), "created", "desc");
         assertThat(persistentProjectConnection).isEmpty();
 
-        PersistentProjectConnection connection = given_a_persistent_connection_in_project(anotherUser, projet);
+        PersistentProjectConnection connection = givenAPersistentConnectionInProject(anotherUser, projet);
 
         persistentProjectConnection = projectConnectionService.lastConnectionInProject(
             projet,
@@ -132,7 +128,7 @@ public class ProjectConnectionServiceTests {
         assertThat(persistentProjectConnection).isEmpty();
 
         Date start = new Date();
-        connection = given_a_persistent_connection_in_project(user, projet);
+        connection = givenAPersistentConnectionInProject(user, projet);
         Date stop = new Date();
 
         persistentProjectConnection = projectConnectionService.lastConnectionInProject(
@@ -144,7 +140,6 @@ public class ProjectConnectionServiceTests {
 
         assertThat(persistentProjectConnection).isPresent();
         assertThat(persistentProjectConnection.get().getCreated()).isBetween(start, stop, true, true);
-
     }
 
     @Test
@@ -167,7 +162,7 @@ public class ProjectConnectionServiceTests {
         assertThat(maps).isEmpty();
 
         Date start = new Date();
-        given_a_persistent_connection_in_project(user, projet);
+        givenAPersistentConnectionInProject(user, projet);
         Date stop = new Date();
 
         maps = projectConnectionService.lastConnectionInProject(projet, null, "created", "desc", 0L, 0L);
@@ -222,7 +217,7 @@ public class ProjectConnectionServiceTests {
         assertThat((Date) maps.get(0).get("created")).isBetween(start, stop, true, true);
 
         Date startSecondConnectionForUser = new Date();
-        given_a_persistent_connection_in_project(user, projet);
+        givenAPersistentConnectionInProject(user, projet);
         Date stopSecondConnectionForUser = new Date();
 
         maps = projectConnectionService.lastConnectionInProject(
@@ -238,7 +233,7 @@ public class ProjectConnectionServiceTests {
         assertThat((Date) maps.get(0).get("created")).isBetween(stop, new Date());
 
         Date startConnectionAnotherUser = new Date();
-        given_a_persistent_connection_in_project(anotherUser, projet);
+        givenAPersistentConnectionInProject(anotherUser, projet);
         Date stopConnectionAnotherUser = new Date();
 
         maps = projectConnectionService.lastConnectionInProject(
@@ -273,7 +268,7 @@ public class ProjectConnectionServiceTests {
         User user = builder.givenSuperAdmin();
         User anotherUser = builder.givenAUser();
 
-        given_a_persistent_connection_in_project(user, project);
+        givenAPersistentConnectionInProject(user, project);
 
         List<JsonObject> results = projectConnectionService.lastConnectionOfGivenUsersInProject(
             project,
@@ -293,7 +288,7 @@ public class ProjectConnectionServiceTests {
         Project projet = builder.givenAProject();
         User user = builder.givenSuperAdmin();
 
-        PersistentProjectConnection connection = given_a_persistent_connection_in_project(
+        PersistentProjectConnection connection = givenAPersistentConnectionInProject(
             user,
             projet,
             DateUtils.addSeconds(new Date(), -10)
@@ -304,8 +299,8 @@ public class ProjectConnectionServiceTests {
         builder.persistAndReturn(annotation);
 
 
-        connection = given_a_persistent_connection_in_project(user, projet, DateUtils.addSeconds(new Date(), 1));
-        connection = given_a_persistent_connection_in_project(user, projet, DateUtils.addSeconds(new Date(), 10));
+        connection = givenAPersistentConnectionInProject(user, projet, DateUtils.addSeconds(new Date(), 1));
+        connection = givenAPersistentConnectionInProject(user, projet, DateUtils.addSeconds(new Date(), 10));
         Page<PersistentProjectConnection>
             allByUserAndProject
             = persistentProjectConnectionRepository.findAllByUserAndProject(
@@ -332,19 +327,19 @@ public class ProjectConnectionServiceTests {
         ImageInstance imageInstance1 = builder.givenAnImageInstance(projet);
         ImageInstance imageInstance2 = builder.givenAnImageInstance(imageInstance1.getProject());
 
-        PersistentProjectConnection connection = given_a_persistent_connection_in_project(
+        PersistentProjectConnection connection = givenAPersistentConnectionInProject(
             user,
             projet,
             DateUtils.addSeconds(new Date(), -10)
         );
         assertThat(connection.getCountCreatedAnnotations()).isNull();
 
-        given_a_persistent_image_consultation(user, imageInstance1, DateUtils.addSeconds(new Date(), -3));
-        given_a_persistent_image_consultation(user, imageInstance2, DateUtils.addSeconds(new Date(), -2));
-        given_a_persistent_image_consultation(user, imageInstance1, DateUtils.addSeconds(new Date(), -1));
+        givenAPersistentImageConsultation(user, imageInstance1, DateUtils.addSeconds(new Date(), -3));
+        givenAPersistentImageConsultation(user, imageInstance2, DateUtils.addSeconds(new Date(), -2));
+        givenAPersistentImageConsultation(user, imageInstance1, DateUtils.addSeconds(new Date(), -1));
 
-        connection = given_a_persistent_connection_in_project(user, projet, DateUtils.addSeconds(new Date(), 1));
-        connection = given_a_persistent_connection_in_project(user, projet, DateUtils.addSeconds(new Date(), 10));
+        connection = givenAPersistentConnectionInProject(user, projet, DateUtils.addSeconds(new Date(), 1));
+        connection = givenAPersistentConnectionInProject(user, projet, DateUtils.addSeconds(new Date(), 10));
         Page<PersistentProjectConnection>
             allByUserAndProject
             = persistentProjectConnectionRepository.findAllByUserAndProject(
@@ -369,10 +364,10 @@ public class ProjectConnectionServiceTests {
         User user = builder.givenSuperAdmin();
         User anotherUser = builder.givenAUser();
 
-        given_a_persistent_connection_in_project(user, projet);
-        given_a_persistent_connection_in_project(user, projet);
-        given_a_persistent_connection_in_project(anotherUser, projet);
-        given_a_last_connection(user, projet);
+        givenAPersistentConnectionInProject(user, projet);
+        givenAPersistentConnectionInProject(user, projet);
+        givenAPersistentConnectionInProject(anotherUser, projet);
+        givenALastConnection(user, projet);
 
         Page<PersistentProjectConnection> results = projectConnectionService.getConnectionByUserAndProject(
             user,
@@ -396,8 +391,8 @@ public class ProjectConnectionServiceTests {
         User user = builder.givenSuperAdmin();
         User anotherUser = builder.givenAUser();
 
-        given_a_persistent_connection_in_project(user, projet);
-        given_a_persistent_connection_in_project(user, projet);
+        givenAPersistentConnectionInProject(user, projet);
+        givenAPersistentConnectionInProject(user, projet);
 
         JsonObject result = projectConnectionService.numberOfConnectionsByProjectAndUser(projet, user);
         assertThat(result.get("user")).isEqualTo(user.getId());
@@ -432,8 +427,8 @@ public class ProjectConnectionServiceTests {
             );
         assertThat(results).isEmpty();
 
-        given_a_persistent_connection_in_project(user, projet);
-        given_a_persistent_connection_in_project(user, projet);
+        givenAPersistentConnectionInProject(user, projet);
+        givenAPersistentConnectionInProject(user, projet);
 
 
         results = projectConnectionService
@@ -450,7 +445,7 @@ public class ProjectConnectionServiceTests {
         assertThat(results.get(0).get("frequency")).isEqualTo(2);
 
 
-        given_a_persistent_connection_in_project(anotherUser, projet);
+        givenAPersistentConnectionInProject(anotherUser, projet);
 
         results = projectConnectionService
             .numberOfConnectionsByProjectAndUser(
@@ -493,8 +488,8 @@ public class ProjectConnectionServiceTests {
         assertThat(results.get(0).get("frequency")).isNull();
         assertThat(results.get(1).get("frequency")).isNull();
 
-        given_a_persistent_connection_in_project(user, projet);
-        given_a_persistent_connection_in_project(user, projet);
+        givenAPersistentConnectionInProject(user, projet);
+        givenAPersistentConnectionInProject(user, projet);
 
 
         results = projectConnectionService
@@ -512,7 +507,7 @@ public class ProjectConnectionServiceTests {
         assertThat(results.get(1).get("user")).isEqualTo(anotherUser.getId());
         assertThat(results.get(1).get("frequency")).isNull();
 
-        given_a_persistent_connection_in_project(anotherUser, projet);
+        givenAPersistentConnectionInProject(anotherUser, projet);
 
         results = projectConnectionService
             .numberOfConnectionsOfGivenByProject(
@@ -542,9 +537,9 @@ public class ProjectConnectionServiceTests {
         results = projectConnectionService.totalNumberOfConnectionsByProject();
         assertThat(results).isEmpty();
 
-        given_a_persistent_connection_in_project(user, projet);
-        given_a_persistent_connection_in_project(user, projet);
-        given_a_persistent_connection_in_project(anotherUser, projet);
+        givenAPersistentConnectionInProject(user, projet);
+        givenAPersistentConnectionInProject(user, projet);
+        givenAPersistentConnectionInProject(anotherUser, projet);
 
         results = projectConnectionService.totalNumberOfConnectionsByProject();
         assertThat(results).hasSize(1);
@@ -567,9 +562,9 @@ public class ProjectConnectionServiceTests {
         );
         assertThat(results).isEmpty();
 
-        given_a_persistent_connection_in_project(user, projet, simpleDateFormat.parse("2022-01-01T12:00:00"));
-        given_a_persistent_connection_in_project(user, projet, simpleDateFormat.parse("2022-01-01T12:05:00"));
-        given_a_persistent_connection_in_project(anotherUser, projet, simpleDateFormat.parse("2022-01-01T12:30:00"));
+        givenAPersistentConnectionInProject(user, projet, simpleDateFormat.parse("2022-01-01T12:00:00"));
+        givenAPersistentConnectionInProject(user, projet, simpleDateFormat.parse("2022-01-01T12:05:00"));
+        givenAPersistentConnectionInProject(anotherUser, projet, simpleDateFormat.parse("2022-01-01T12:30:00"));
 
         results
             = projectConnectionService.numberOfConnectionsByProjectOrderedByHourAndDays(projet, null, user);
@@ -578,7 +573,7 @@ public class ProjectConnectionServiceTests {
         assertThat(results.get(0).get("time")).isEqualTo(simpleDateFormat.parse("2022-01-01T12:00:00"));
         assertThat(results.get(0).get("frequency")).isEqualTo(3);
 
-        given_a_persistent_connection_in_project(user, projet, simpleDateFormat.parse("2022-01-20T03:00:00"));
+        givenAPersistentConnectionInProject(user, projet, simpleDateFormat.parse("2022-01-20T03:00:00"));
 
         results
             = projectConnectionService.numberOfConnectionsByProjectOrderedByHourAndDays(projet, null, user);
@@ -612,10 +607,10 @@ public class ProjectConnectionServiceTests {
         assertThat(results).isEmpty();
 
         Date noConnectionBefore = DateUtils.addDays(new Date(), -100);
-        given_a_persistent_connection_in_project(user, projet, DateUtils.addDays(new Date(), -10));
-        given_a_persistent_connection_in_project(user, projet, DateUtils.addDays(new Date(), -10));
+        givenAPersistentConnectionInProject(user, projet, DateUtils.addDays(new Date(), -10));
+        givenAPersistentConnectionInProject(user, projet, DateUtils.addDays(new Date(), -10));
         Date twoConnectionBefore = DateUtils.addDays(new Date(), -5);
-        given_a_persistent_connection_in_project(anotherUser, projet, DateUtils.addDays(new Date(), -1));
+        givenAPersistentConnectionInProject(anotherUser, projet, DateUtils.addDays(new Date(), -1));
         Date threeConnectionBefore = new Date();
 
         assertThat(projectConnectionService.countByProject(projet, null, null))
@@ -645,9 +640,9 @@ public class ProjectConnectionServiceTests {
         List<JsonObject> results = projectConnectionService.numberOfProjectConnections("day", null, null, projet, user);
         assertThat(results).isEmpty();
 
-        given_a_persistent_connection_in_project(user, projet, simpleDateFormat.parse("2022-01-01T12:00:00"));
-        given_a_persistent_connection_in_project(user, projet, simpleDateFormat.parse("2022-01-01T12:05:00"));
-        given_a_persistent_connection_in_project(user, projet, simpleDateFormat.parse("2022-01-01T13:30:00"));
+        givenAPersistentConnectionInProject(user, projet, simpleDateFormat.parse("2022-01-01T12:00:00"));
+        givenAPersistentConnectionInProject(user, projet, simpleDateFormat.parse("2022-01-01T12:05:00"));
+        givenAPersistentConnectionInProject(user, projet, simpleDateFormat.parse("2022-01-01T13:30:00"));
 
         results = projectConnectionService.numberOfProjectConnections("day", null, null, projet, user);
         assertThat(results).hasSize(1);
@@ -660,7 +655,7 @@ public class ProjectConnectionServiceTests {
         entry = results.stream().filter(x -> x.get("frequency").equals(1)).findFirst();
         assertThat(entry).isPresent();
 
-        given_a_persistent_connection_in_project(user, projet, simpleDateFormat.parse("2021-01-20T03:00:00"));
+        givenAPersistentConnectionInProject(user, projet, simpleDateFormat.parse("2021-01-20T03:00:00"));
 
         results = projectConnectionService.numberOfProjectConnections("week", null, null, projet, user);
         assertThat(results).hasSize(2);
@@ -687,9 +682,9 @@ public class ProjectConnectionServiceTests {
         );
         assertThat(results).isEmpty();
 
-        given_a_persistent_connection_in_project(user, projet, simpleDateFormat.parse("2022-01-01T12:00:00"));
-        given_a_persistent_connection_in_project(user, projet, simpleDateFormat.parse("2022-01-01T12:05:00"));
-        given_a_persistent_connection_in_project(user, projet, simpleDateFormat.parse("2022-01-01T13:30:00"));
+        givenAPersistentConnectionInProject(user, projet, simpleDateFormat.parse("2022-01-01T12:00:00"));
+        givenAPersistentConnectionInProject(user, projet, simpleDateFormat.parse("2022-01-01T12:05:00"));
+        givenAPersistentConnectionInProject(user, projet, simpleDateFormat.parse("2022-01-01T13:30:00"));
 
         results
             = projectConnectionService.averageOfProjectConnections(
@@ -730,7 +725,7 @@ public class ProjectConnectionServiceTests {
         //assertThat(entry.get().get("time")).isEqualTo(simpleDateFormat.parse("2022-01-01T13:00:00"));
 
 
-        given_a_persistent_connection_in_project(user, projet, simpleDateFormat.parse("2022-01-20T03:00:00"));
+        givenAPersistentConnectionInProject(user, projet, simpleDateFormat.parse("2022-01-20T03:00:00"));
 
         results
             = projectConnectionService.averageOfProjectConnections(
@@ -760,18 +755,18 @@ public class ProjectConnectionServiceTests {
         ImageInstance imageInstance1 = builder.givenAnImageInstance(projet);
         ImageInstance imageInstance2 = builder.givenAnImageInstance(imageInstance1.getProject());
 
-        PersistentProjectConnection connection = given_a_persistent_connection_in_project(
+        PersistentProjectConnection connection = givenAPersistentConnectionInProject(
             user,
             projet,
             DateUtils.addSeconds(new Date(), -10)
         );
         assertThat(connection.getCountCreatedAnnotations()).isNull();
 
-        given_a_persistent_image_consultation(user, imageInstance1, DateUtils.addSeconds(new Date(), -3));
-        given_a_persistent_image_consultation(user, imageInstance2, DateUtils.addSeconds(new Date(), -2));
-        given_a_persistent_image_consultation(user, imageInstance1, DateUtils.addSeconds(new Date(), -1));
+        givenAPersistentImageConsultation(user, imageInstance1, DateUtils.addSeconds(new Date(), -3));
+        givenAPersistentImageConsultation(user, imageInstance2, DateUtils.addSeconds(new Date(), -2));
+        givenAPersistentImageConsultation(user, imageInstance1, DateUtils.addSeconds(new Date(), -1));
 
-        PersistentProjectConnection secondConnection = given_a_persistent_connection_in_project(
+        PersistentProjectConnection secondConnection = givenAPersistentConnectionInProject(
             user,
             projet,
             DateUtils.addSeconds(new Date(), 1)
@@ -782,8 +777,8 @@ public class ProjectConnectionServiceTests {
         assertThat(userActivityDetails).hasSize(3);
     }
 
-    PersistentProjectConnection given_a_persistent_connection_in_project(User user, Project project) {
-        PersistentProjectConnection connection = projectConnectionService.add(
+    PersistentProjectConnection givenAPersistentConnectionInProject(User user, Project project) {
+        return projectConnectionService.add(
             user,
             project,
             "xxx",
@@ -791,11 +786,10 @@ public class ProjectConnectionServiceTests {
             "chrome",
             "123"
         );
-        return connection;
     }
 
-    PersistentProjectConnection given_a_persistent_connection_in_project(User user, Project project, Date created) {
-        PersistentProjectConnection connection = projectConnectionService.add(
+    PersistentProjectConnection givenAPersistentConnectionInProject(User user, Project project, Date created) {
+        return projectConnectionService.add(
             user,
             project,
             "xxx",
@@ -804,10 +798,9 @@ public class ProjectConnectionServiceTests {
             "123",
             created
         );
-        return connection;
     }
 
-    LastConnection given_a_last_connection(User user, Project project) {
+    LastConnection givenALastConnection(User user, Project project) {
         LastConnection lastConnection = new LastConnection();
         lastConnection.setId(sequenceService.generateID());
         lastConnection.setProject(project.getId());
@@ -815,7 +808,7 @@ public class ProjectConnectionServiceTests {
         return lastConnectionRepository.insert(lastConnection);
     }
 
-    PersistentImageConsultation given_a_persistent_image_consultation(
+    PersistentImageConsultation givenAPersistentImageConsultation(
         User user,
         ImageInstance imageInstance,
         Date created

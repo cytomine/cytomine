@@ -91,7 +91,7 @@ public class SliceInstanceResourceTests {
     @Test
     @Transactional
     public void get_an_slice_instance() throws Exception {
-        SliceInstance image = given_test_slice_instance();
+        SliceInstance image = givenTestSliceInstance();
 
         restSliceInstanceControllerMockMvc.perform(get("/api/sliceinstance/{id}.json", image.getId()))
             .andExpect(status().isOk())
@@ -117,11 +117,10 @@ public class SliceInstanceResourceTests {
             .andExpect(jsonPath("$.errors.message").exists());
     }
 
-
     @Test
     @Transactional
     public void get_an_slice_instance_with_coordinates() throws Exception {
-        SliceInstance image = given_test_slice_instance();
+        SliceInstance image = givenTestSliceInstance();
 
         restSliceInstanceControllerMockMvc.perform(get(
                 "/api/imageinstance/{id}/{channel}/{zStack}/{time}/sliceinstance.json",
@@ -167,10 +166,7 @@ public class SliceInstanceResourceTests {
             .andExpect(jsonPath("$.message").exists())
             .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.sliceinstance.id").exists());
-
-
     }
-
 
     @Test
     @Transactional
@@ -185,18 +181,16 @@ public class SliceInstanceResourceTests {
             .andExpect(jsonPath("$.message").exists())
             .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.sliceinstance.id").exists());
-
-
     }
 
     @Test
     @Transactional
     public void get_slice_instance_thumb() throws Exception {
-        SliceInstance image = given_test_slice_instance();
+        SliceInstance image = givenTestSliceInstance();
         byte[] mockResponse = UUID.randomUUID()
             .toString()
             .getBytes();
-        // we don't care about the response content, just check that core build a valid ims url and return the content
+
         configureFor("localhost", 8888);
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 image.getPath(),
@@ -226,11 +220,10 @@ public class SliceInstanceResourceTests {
     @Test
     @Transactional
     public void get_slice_instance_tile() throws Exception {
-        SliceInstance image = given_test_slice_instance();
+        SliceInstance image = givenTestSliceInstance();
         byte[] mockResponse = UUID.randomUUID()
             .toString()
             .getBytes();
-        // we don't care about the response content, just check that core build a valid ims url and return the content
         configureFor("localhost", 8888);
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 image.getPath(),
@@ -270,7 +263,7 @@ public class SliceInstanceResourceTests {
     @Test
     @Transactional
     public void get_slice_instance_crop() throws Exception {
-        SliceInstance image = given_test_slice_instance();
+        SliceInstance image = givenTestSliceInstance();
 
         configureFor("localhost", 8888);
         byte[] mockResponse = UUID.randomUUID()
@@ -309,7 +302,7 @@ public class SliceInstanceResourceTests {
     @Test
     @Transactional
     public void get_slice_instance_window() throws Exception {
-        SliceInstance image = given_test_slice_instance();
+        SliceInstance image = givenTestSliceInstance();
 
         byte[] mockResponse = UUID.randomUUID()
             .toString()
@@ -346,7 +339,7 @@ public class SliceInstanceResourceTests {
     @Test
     @Transactional
     public void histograms() throws Exception {
-        SliceInstance image = given_test_slice_instance();
+        SliceInstance image = givenTestSliceInstance();
 
         configureFor("localhost", 8888);
         System.out.println("/image/"
@@ -399,7 +392,7 @@ public class SliceInstanceResourceTests {
     @Test
     @Transactional
     public void histograms_bounds() throws Exception {
-        SliceInstance image = given_test_slice_instance();
+        SliceInstance image = givenTestSliceInstance();
 
 
         configureFor("localhost", 8888);
@@ -426,7 +419,7 @@ public class SliceInstanceResourceTests {
     @Test
     @Transactional
     public void channel_histograms() throws Exception {
-        SliceInstance image = given_test_slice_instance();
+        SliceInstance image = givenTestSliceInstance();
 
         configureFor("localhost", 8888);
         System.out.println("/image/"
@@ -472,7 +465,7 @@ public class SliceInstanceResourceTests {
     @Test
     @Transactional
     public void channel_histograms_bounds() throws Exception {
-        SliceInstance image = given_test_slice_instance();
+        SliceInstance image = givenTestSliceInstance();
 
 
         configureFor("localhost", 8888);
@@ -500,20 +493,18 @@ public class SliceInstanceResourceTests {
             .andExpect(jsonPath("$.collection[0].color").value("#f00"));
     }
 
-    private SliceInstance given_test_slice_instance() {
+    private SliceInstance givenTestSliceInstance() {
         AbstractSlice image = builder.givenAnAbstractSlice();
         image.setMime(builder.givenAMime("openslide/mrxs"));
         image.getImage().setWidth(109240);
         image.getImage().setHeight(220696);
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
-        SliceInstance sliceInstance = builder.givenASliceInstance(
+        return builder.givenASliceInstance(
             builder.givenAnImageInstance(
                 image.getImage(),
                 builder.givenAProject()
             ), image
         );
-        return sliceInstance;
     }
-
 }

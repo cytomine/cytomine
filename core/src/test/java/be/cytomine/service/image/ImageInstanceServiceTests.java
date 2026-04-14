@@ -471,40 +471,46 @@ public class ImageInstanceServiceTests {
         assertThat(imageInstanceService.list(project, new ArrayList<>()).stream().map(x -> x.get("id")))
             .contains(img1.getId(), img2.getId());
 
-        List<SearchParameterEntry> searchParameterEntryList = List.of(
+        List<SearchParameterEntry> searchParameterEntryList = new ArrayList<>(List.of(
             new SearchParameterEntry("width", SearchOperation.lte, 500),
             new SearchParameterEntry("numberOfAnnotations", SearchOperation.lte, 1000)
-        );
+        ));
         assertThat(imageInstanceService.list(project, searchParameterEntryList).stream().map(x -> x.get("id")))
             .contains(img1.getId()).doesNotContain(img2.getId());
 
-        searchParameterEntryList = List.of(new SearchParameterEntry("numberOfAnnotations", SearchOperation.gte, 1));
+        searchParameterEntryList = new ArrayList<>(List.of(
+            new SearchParameterEntry("numberOfAnnotations", SearchOperation.gte, 1)
+        ));
         assertThat(imageInstanceService.list(project, searchParameterEntryList).stream().map(x -> x.get("id")))
             .contains(img1.getId()).doesNotContain(img2.getId());
 
-        searchParameterEntryList = List.of(new SearchParameterEntry("width", SearchOperation.lte, 1000));
+        searchParameterEntryList = new ArrayList<>(List.of(
+            new SearchParameterEntry("width", SearchOperation.lte, 1000)
+        ));
         assertThat(imageInstanceService.list(project, searchParameterEntryList).stream().map(x -> x.get("id")))
             .contains(img1.getId(), img2.getId());
 
-        searchParameterEntryList = List.of(new SearchParameterEntry("width", SearchOperation.gte, 1000));
+        searchParameterEntryList = new ArrayList<>(List.of(
+            new SearchParameterEntry("width", SearchOperation.gte, 1000)
+        ));
         assertThat(imageInstanceService.list(project, searchParameterEntryList).stream().map(x -> x.get("id")))
             .doesNotContain(img1.getId(), img2.getId());
 
-        searchParameterEntryList = List.of(
+        searchParameterEntryList = new ArrayList<>(List.of(
             new SearchParameterEntry("baseImage", SearchOperation.equals, img1.getBaseImage().getId())
-        );
+        ));
         assertThat(imageInstanceService.list(project, searchParameterEntryList).stream().map(x -> x.get("id")))
             .contains(img1.getId()).doesNotContain(img2.getId());
 
-        searchParameterEntryList = List.of(
+        searchParameterEntryList = new ArrayList<>(List.of(
             new SearchParameterEntry("name", SearchOperation.ilike, img1.getInstanceFilename())
-        );
+        ));
         assertThat(imageInstanceService.list(project, searchParameterEntryList).stream().map(x -> x.get("id")))
             .contains(img1.getId()).doesNotContain(img2.getId());
 
-        searchParameterEntryList = List.of(
+        searchParameterEntryList = new ArrayList<>(List.of(
             new SearchParameterEntry("tag", SearchOperation.in, List.of(tagForImage1.getTag().getId()))
-        );
+        ));
         assertThat(imageInstanceService.list(project, searchParameterEntryList).stream().map(x -> x.get("id")))
             .contains(img1.getId()).doesNotContain(img2.getId());
     }
@@ -525,17 +531,17 @@ public class ImageInstanceServiceTests {
         assertThat(imageInstanceService.list(project, new ArrayList<>()).stream().map(x -> x.get("id")))
             .contains(img1.getId(), img2.getId());
 
-        List<SearchParameterEntry> searchParameterEntryList = List.of(
+        List<SearchParameterEntry> searchParameterEntryList = new ArrayList<>(List.of(
             new SearchParameterEntry("instanceFilename", SearchOperation.ilike, img1.getInstanceFilename())
-        );
+        ));
         assertThat(imageInstanceService.list(project, searchParameterEntryList).stream().map(x -> x.get("id")))
             .doesNotContain(img1.getId(), img2.getId());
 
         project.setBlindMode(false);
 
-        searchParameterEntryList = List.of(
+        searchParameterEntryList = new ArrayList<>(List.of(
             new SearchParameterEntry("instanceFilename", SearchOperation.ilike, img1.getInstanceFilename())
-        );
+        ));
         assertThat(imageInstanceService.list(project, searchParameterEntryList).stream().map(x -> x.get("id")))
             .contains(img1.getId()).doesNotContain(img2.getId());
     }

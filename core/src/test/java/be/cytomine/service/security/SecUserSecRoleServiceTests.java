@@ -104,17 +104,17 @@ public class SecUserSecRoleServiceTests {
     }
 
     @Test
-    void list_all_role_for_a_user() {
+    void shouldReturnCorrectRolesForEachUserType() {
         assertThat(secSecUserSecRoleService.list(builder.givenSuperAdmin()).stream()
             .map(SecUserSecRole::getSecRole)
             .map(SecRole::getAuthority))
             .contains("ROLE_SUPER_ADMIN");
 
-
         assertThat(secSecUserSecRoleService.list(builder.givenAUser()).stream()
             .map(SecUserSecRole::getSecRole)
             .map(SecRole::getAuthority))
-            .contains("ROLE_USER").doesNotContain("ROLE_ADMIN");
+            .contains("ROLE_USER")
+            .doesNotContain("ROLE_ADMIN");
     }
 
     @Test
@@ -140,7 +140,7 @@ public class SecUserSecRoleServiceTests {
 
 
     @Test
-    void add_valid_secUser_SecRole_with_success() {
+    void shouldSuccessfullyAddValidUserRole() {
         SecUserSecRole secSecUserSecRole = builder.givenANotPersistedUserRole(
             builder.givenAUser(),
             secRoleRepository.getAdmin()
@@ -154,16 +154,15 @@ public class SecUserSecRoleServiceTests {
 
     @Test
     @WithMockUser(username = "user")
-    void add_valid_secUser_SecRole_with_success_with_admin_as_a_user() {
+    void shouldThrowForbiddenExceptionWhenRegularUserAddsAdminRole() {
         SecUserSecRole secSecUserSecRole = builder.givenANotPersistedUserRole(
             builder.givenAUser(),
             secRoleRepository.getAdmin()
         );
 
         Assertions.assertThrows(
-            ForbiddenException.class, () -> {
-                secSecUserSecRoleService.add(secSecUserSecRole.toJsonObject());
-            }
+            ForbiddenException.class,
+            () -> secSecUserSecRoleService.add(secSecUserSecRole.toJsonObject())
         );
     }
 
@@ -185,16 +184,15 @@ public class SecUserSecRoleServiceTests {
 
     @Test
     @WithMockUser(username = "user")
-    void user_cannot_add_user_role_to_a_guest() {
+    void shouldThrowForbiddenExceptionWhenUserAddsRoleToGuest() {
         SecUserSecRole secSecUserSecRole = builder.givenANotPersistedUserRole(
             builder.givenAGuest(),
             secRoleRepository.getUser()
         );
         entityManager.refresh(secSecUserSecRole.getSecUser());
         Assertions.assertThrows(
-            ForbiddenException.class, () -> {
-                secSecUserSecRoleService.add(secSecUserSecRole.toJsonObject().withChange("id", null));
-            }
+            ForbiddenException.class,
+            () -> secSecUserSecRoleService.add(secSecUserSecRole.toJsonObject().withChange("id", null))
         );
     }
 

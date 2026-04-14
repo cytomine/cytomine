@@ -68,7 +68,7 @@ public class TaskRunAuthorizationTest extends CRDAuthorizationTest {
 
     @Disabled("This test does not work, the returned entity is a 500, but expectOK() ignores that")
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void user_admin_can_add_in_readonly_mode() {
+    public void shouldAllowAdminToAddDomainInReadOnlyMode() {
         taskRun.getProject().setMode(EditingMode.READ_ONLY);
         expectOK(this::whenIAddDomain);
     }

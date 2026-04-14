@@ -147,11 +147,23 @@ public class RestAnnotationDomainController extends RestCytomineController {
     }
 
     @PostMapping("/annotation.json")
-    public Optional<HttpCommandResponse> add(@RequestBody CreateUserAnnotation createUserAnnotation) {
+    public Optional<HttpCommandResponse> add(@RequestBody LegacyAnnotationRequest request) {
         log.debug("REST request to create annotation");
         long userId = currentUserService.getCurrentUser().getId();
+        ImageInstance image = imageInstanceService.find(request.image())
+            .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", String.valueOf(request.image())));
+        CreateUserAnnotation createUserAnnotation = new CreateUserAnnotation(
+            request.user() != null ? request.user() : userId,
+            request.image(),
+            request.slice(),
+            image.getProject().getId(),
+            request.location(),
+            0.0
+        );
         return userAnnotationHttpContract.create(userId, createUserAnnotation);
     }
+
+    record LegacyAnnotationRequest(Long user, Long image, Long slice, String location) {}
 
     @PutMapping("/annotation/{id}.json")
     public HttpCommandResponse update(@PathVariable long id, @RequestBody UpdateUserAnnotation update) {

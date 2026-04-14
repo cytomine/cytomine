@@ -91,7 +91,7 @@ This installation procedure is intended for desktop or laptop computers running 
 _This step takes around 10 minutes to download all docker images._
 
    ```bash
-   docker-compose -f ./helm/compose.yaml -d
+   docker-compose -f ./helm/compose.yaml up -d
    helm upgrade --kubeconfig=./.kube/shared/config -f ./helm/charts/cytomine/example/values.yaml cytomine-platform ./helm/charts/cytomine/ -n cytomine-local --install
    ```
 

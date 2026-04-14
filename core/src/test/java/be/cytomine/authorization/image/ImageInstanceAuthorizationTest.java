@@ -87,14 +87,14 @@ public class ImageInstanceAuthorizationTest extends CRUDAuthorizationTest {
     @WithMockUser(username = USER_ACL_READ)
     public void user_cannot_delete_in_restricted_mode() {
         imageInstance.getProject().setMode(EditingMode.RESTRICTED);
-        expectForbidden(() -> when_i_delete_domain());
+        expectForbidden(() -> whenIDeleteDomain());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
     public void user_admin_can_add_in_readonly_mode() {
         imageInstance.getProject().setMode(EditingMode.READ_ONLY);
-        expectOK(() -> when_i_add_domain());
+        expectOK(() -> whenIAddDomain());
     }
 
     @Test
@@ -108,14 +108,14 @@ public class ImageInstanceAuthorizationTest extends CRUDAuthorizationTest {
     @WithMockUser(username = USER_ACL_ADMIN)
     public void user_admin_can_delete_in_readonly_mode() {
         imageInstance.getProject().setMode(EditingMode.READ_ONLY);
-        expectOK(() -> when_i_delete_domain());
+        expectOK(() -> whenIDeleteDomain());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void user_cannot_add_in_readonly_mode() {
         imageInstance.getProject().setMode(EditingMode.READ_ONLY);
-        expectForbidden(() -> when_i_add_domain());
+        expectForbidden(() -> whenIAddDomain());
     }
 
     @Test
@@ -129,7 +129,7 @@ public class ImageInstanceAuthorizationTest extends CRUDAuthorizationTest {
     @WithMockUser(username = USER_ACL_READ)
     public void user_cannot_delete_in_readonly_mode() {
         imageInstance.getProject().setMode(EditingMode.READ_ONLY);
-        expectForbidden(() -> when_i_delete_domain());
+        expectForbidden(() -> whenIDeleteDomain());
     }
 
 
@@ -158,12 +158,12 @@ public class ImageInstanceAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Override
-    public void when_i_get_domain() {
+    public void whenIGetDomain() {
         imageInstanceService.get(imageInstance.getId());
     }
 
     @Override
-    protected void when_i_add_domain() {
+    protected void whenIAddDomain() {
         imageInstanceService.add(builder.givenANotPersistedImageInstance(imageInstance.getProject())
             .toJsonObject());
     }
@@ -174,7 +174,7 @@ public class ImageInstanceAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Override
-    protected void when_i_delete_domain() {
+    protected void whenIDeleteDomain() {
         ImageInstance imageInstanceToDelete = imageInstance;
         imageInstanceService.delete(imageInstanceToDelete, null, null, true);
     }

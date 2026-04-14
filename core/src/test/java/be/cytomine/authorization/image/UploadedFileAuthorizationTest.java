@@ -65,12 +65,12 @@ public class UploadedFileAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Override
-    public void when_i_get_domain() {
+    public void whenIGetDomain() {
         uploadedFileService.get(uploadedFile.getId());
     }
 
     @Override
-    protected void when_i_add_domain() {
+    protected void whenIAddDomain() {
         UploadedFile uploadedFileToCreate = builder.givenANotPersistedUploadedFile();
         uploadedFileToCreate.setStorage(uploadedFile.getStorage());
         uploadedFileService.add(uploadedFileToCreate.toJsonObject());
@@ -82,7 +82,7 @@ public class UploadedFileAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Override
-    protected void when_i_delete_domain() {
+    protected void whenIDeleteDomain() {
         UploadedFile uploadedFileToDelete = uploadedFile;
         uploadedFileService.delete(uploadedFileToDelete, null, null, true);
     }

@@ -126,9 +126,9 @@ public class UserAnnotationAuthorizationTest extends CRUDAuthorizationTest {
         Project project = (Project) userAnnotation.container();
         project.setMode(EditingMode.RESTRICTED);
         builder.persistAndReturn(project);
-        expectOK(this::when_i_add_domain);
+        expectOK(this::whenIAddDomain);
         expectOK(this::when_i_edit_domain);
-        expectOK(this::when_i_delete_domain);
+        expectOK(this::whenIDeleteDomain);
     }
 
     @Test
@@ -139,15 +139,15 @@ public class UserAnnotationAuthorizationTest extends CRUDAuthorizationTest {
         Project project = (Project) userAnnotation.container();
         project.setMode(EditingMode.RESTRICTED);
         builder.persistAndReturn(project);
-        expectForbidden(this::when_i_add_domain);
+        expectForbidden(this::whenIAddDomain);
         expectForbidden(this::when_i_edit_domain);
-        expectForbidden(this::when_i_delete_domain);
+        expectForbidden(this::whenIDeleteDomain);
 
         project.setMode(EditingMode.CLASSIC);
         builder.persistAndReturn(project);
-        expectOK(this::when_i_add_domain);
+        expectOK(this::whenIAddDomain);
         expectOK(this::when_i_edit_domain);
-        expectOK(this::when_i_delete_domain);
+        expectOK(this::whenIDeleteDomain);
     }
 
     @Test
@@ -158,12 +158,12 @@ public class UserAnnotationAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Override
-    public void when_i_get_domain() {
+    public void whenIGetDomain() {
         userAnnotationService.get(userAnnotation.getId());
     }
 
     @Override
-    protected void when_i_add_domain() {
+    protected void whenIAddDomain() {
         UserAnnotation annotation = builder.givenANotPersistedUserAnnotation(this.userAnnotation.getProject());
         userAnnotationService.add(annotation.toJsonObject());
     }
@@ -174,7 +174,7 @@ public class UserAnnotationAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Override
-    protected void when_i_delete_domain() {
+    protected void whenIDeleteDomain() {
         UserAnnotation
             annotation
             = builder.persistAndReturn(builder.givenANotPersistedUserAnnotation(this.userAnnotation.getProject()));

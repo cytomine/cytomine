@@ -59,12 +59,12 @@ public class AnnotationTrackAuthorizationTest extends CRDAuthorizationTest {
     }
 
     @Override
-    public void when_i_get_domain() {
+    public void whenIGetDomain() {
         annotationTrackService.get(annotationTrack.getId());
     }
 
     @Override
-    protected void when_i_add_domain() {
+    protected void whenIAddDomain() {
         UserAnnotation annotation = builder.givenAUserAnnotation();
         annotation.setImage(annotationTrack.getTrack().getImage());
         annotation.setProject(annotationTrack.getTrack().getProject());
@@ -78,7 +78,7 @@ public class AnnotationTrackAuthorizationTest extends CRDAuthorizationTest {
 
 
     @Override
-    protected void when_i_delete_domain() {
+    protected void whenIDeleteDomain() {
         UserAnnotation annotation = builder.givenAUserAnnotation();
         annotation.setImage(annotationTrack.getTrack().getImage());
         annotation.setProject(annotationTrack.getTrack().getProject());

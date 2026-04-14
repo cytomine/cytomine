@@ -90,12 +90,12 @@ public class AbstractSliceAuthorizationTest extends CRUDAuthorizationTest {
 
 
     @Override
-    public void when_i_get_domain() {
+    public void whenIGetDomain() {
         abstractSliceService.get(abstractSlice.getId());
     }
 
     @Override
-    protected void when_i_add_domain() {
+    protected void whenIAddDomain() {
         abstractSliceService.add(builder.givenANotPersistedAbstractSlice().toJsonObject());
     }
 
@@ -105,7 +105,7 @@ public class AbstractSliceAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Override
-    protected void when_i_delete_domain() {
+    protected void whenIDeleteDomain() {
         AbstractSlice abstractSliceToDelete = abstractSlice;
         abstractSliceService.delete(abstractSliceToDelete, null, null, true);
     }

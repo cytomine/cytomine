@@ -79,54 +79,54 @@ public class AttachedFileAuthorizationTest extends CRDAuthorizationTest {
     @Test
     @WithMockUser(username = USER_ACL_CREATE)
     public void user_with_create_permission_delete_domain() {
-        expectOK(this::when_i_delete_domain);
+        expectOK(this::whenIDeleteDomain);
         project.setMode(EditingMode.RESTRICTED);
-        expectForbidden(this::when_i_delete_domain);
+        expectForbidden(this::whenIDeleteDomain);
         project.setMode(EditingMode.READ_ONLY);
-        expectForbidden(this::when_i_delete_domain);
+        expectForbidden(this::whenIDeleteDomain);
     }
 
     @Override
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void user_with_read_permission_add_domain() {
-        expectOK(this::when_i_add_domain);
+        expectOK(this::whenIAddDomain);
         project.setMode(EditingMode.RESTRICTED);
-        expectForbidden(this::when_i_add_domain);
+        expectForbidden(this::whenIAddDomain);
         project.setMode(EditingMode.READ_ONLY);
-        expectForbidden(this::when_i_add_domain);
+        expectForbidden(this::whenIAddDomain);
     }
 
     @Override
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void user_with_read_permission_delete_domain() {
-        expectOK(this::when_i_delete_domain);
+        expectOK(this::whenIDeleteDomain);
         project.setMode(EditingMode.RESTRICTED);
-        expectForbidden(this::when_i_delete_domain);
+        expectForbidden(this::whenIDeleteDomain);
         project.setMode(EditingMode.READ_ONLY);
-        expectForbidden(this::when_i_delete_domain);
+        expectForbidden(this::whenIDeleteDomain);
     }
 
     @Override
     @Test
     @WithMockUser(username = USER_ACL_WRITE)
     public void user_with_write_permission_delete_domain() {
-        expectOK(this::when_i_delete_domain);
+        expectOK(this::whenIDeleteDomain);
         project.setMode(EditingMode.RESTRICTED);
-        expectForbidden(this::when_i_delete_domain);
+        expectForbidden(this::whenIDeleteDomain);
         project.setMode(EditingMode.READ_ONLY);
-        expectForbidden(this::when_i_delete_domain);
+        expectForbidden(this::whenIDeleteDomain);
     }
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
     public void user_without_permission_add_domain() {
-        expectForbidden(this::when_i_add_domain);
+        expectForbidden(this::whenIAddDomain);
         project.setMode(EditingMode.RESTRICTED);
-        expectForbidden(this::when_i_add_domain);
+        expectForbidden(this::whenIAddDomain);
         project.setMode(EditingMode.READ_ONLY);
-        expectForbidden(this::when_i_add_domain);
+        expectForbidden(this::whenIAddDomain);
     }
 
     @Test
@@ -155,12 +155,12 @@ public class AttachedFileAuthorizationTest extends CRDAuthorizationTest {
 
     // ANNOTATIONS
     @Override
-    public void when_i_get_domain() {
+    public void whenIGetDomain() {
         attachedFileService.findById(attachedFile.getId());
     }
 
     @Override
-    protected void when_i_add_domain() {
+    protected void whenIAddDomain() {
         try {
             attachedFileService.create(
                 "test",
@@ -175,7 +175,7 @@ public class AttachedFileAuthorizationTest extends CRDAuthorizationTest {
     }
 
     @Override
-    protected void when_i_delete_domain() {
+    protected void whenIDeleteDomain() {
         AttachedFile attachedFile = builder.givenAnAttachedFile(attachedFileAnnotation);
         attachedFileService.delete(attachedFile, null, null, true);
     }

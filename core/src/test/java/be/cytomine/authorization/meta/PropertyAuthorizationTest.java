@@ -92,21 +92,21 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
     @WithMockUser(username = USER_ACL_READ)
     public void user_cannot_add_in_readonly_mode() {
         project.setMode(EditingMode.READ_ONLY);
-        expectForbidden(this::when_i_add_domain);
+        expectForbidden(this::whenIAddDomain);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void user_cannot_add_in_restricted_mode() {
         project.setMode(EditingMode.RESTRICTED);
-        expectForbidden(this::when_i_add_domain);
+        expectForbidden(this::whenIAddDomain);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void user_cannot_add_in_restricted_mode_for_annotation() {
         project.setMode(EditingMode.RESTRICTED);
-        expectForbidden(this::when_i_add_domain);
+        expectForbidden(this::whenIAddDomain);
     }
 
     @Test
@@ -125,14 +125,14 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Override
-    public void when_i_get_domain() {
+    public void whenIGetDomain() {
         propertyService.findByDomainAndKey(project, "key");
         propertyService.findByDomainAndKey(annotationDomain, "key");
         propertyService.findByDomainAndKey(abstractImage, "key");
     }
 
     @Override
-    protected void when_i_add_domain() {
+    protected void whenIAddDomain() {
         AnnotationDomain annotationDomain = builder.persistAndReturn(builder.givenANotPersistedUserAnnotation(
             project));
         propertyService.add(builder.givenANotPersistedProperty(annotationDomain, "key", "value").toJsonObject());
@@ -144,7 +144,7 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Override
-    protected void when_i_delete_domain() {
+    protected void whenIDeleteDomain() {
         Property property = builder.givenAProperty(annotationDomain);
         propertyService.delete(property, null, null, true);
     }

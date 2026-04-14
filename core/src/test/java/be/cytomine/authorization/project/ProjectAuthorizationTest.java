@@ -1585,7 +1585,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
     @Test
     @WithMockUser(username = USER_NO_ACL)
     public void user_without_permission_add_domain() {
-        expectOK(this::when_i_add_domain);
+        expectOK(this::whenIAddDomain);
         // User with no ACL can create an project
     }
 
@@ -1593,17 +1593,17 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void user_with_read_permission_add_domain() {
-        expectOK(this::when_i_add_domain);
+        expectOK(this::whenIAddDomain);
         // User with READ permission can create another project
     }
 
     @Override
-    public void when_i_get_domain() {
+    public void whenIGetDomain() {
         projectService.get(project.getId());
     }
 
     @Override
-    protected void when_i_add_domain() {
+    protected void whenIAddDomain() {
         projectService.add(basicInstanceBuilder.givenANotPersistedProject().toJsonObject());
     }
 
@@ -1613,7 +1613,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Override
-    protected void when_i_delete_domain() {
+    protected void whenIDeleteDomain() {
         Project projectToDelete = project;
         projectService.delete(projectToDelete, null, null, true);
     }

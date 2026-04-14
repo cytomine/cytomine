@@ -91,12 +91,12 @@ public class CompanionFileAuthorizationTest extends CRUDAuthorizationTest {
 
 
     @Override
-    public void when_i_get_domain() {
+    public void whenIGetDomain() {
         companionFileService.get(companionFile.getId());
     }
 
     @Override
-    protected void when_i_add_domain() {
+    protected void whenIAddDomain() {
         AbstractImage abstractImage = builder.givenAnAbstractImage();
         abstractImage.getUploadedFile().setStorage(companionFile.getImage().getUploadedFile().getStorage());
         companionFileService.add(builder.givenANotPersistedCompanionFile(abstractImage).toJsonObject());
@@ -108,7 +108,7 @@ public class CompanionFileAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Override
-    protected void when_i_delete_domain() {
+    protected void whenIDeleteDomain() {
         CompanionFile companionFileToDelete = companionFile;
         companionFileService.delete(companionFileToDelete, null, null, true);
     }

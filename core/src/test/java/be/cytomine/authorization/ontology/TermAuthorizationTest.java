@@ -79,18 +79,18 @@ public class TermAuthorizationTest extends CRDAuthorizationTest {
     }
 
     @Override
-    public void when_i_get_domain() {
+    public void whenIGetDomain() {
         termService.get(term.getId());
     }
 
     @Override
-    protected void when_i_add_domain() {
+    protected void whenIAddDomain() {
         termService.add(
             basicInstanceBuilder.givenANotPersistedTerm(term.getOntology()).toJsonObject());
     }
 
     @Override
-    protected void when_i_delete_domain() {
+    protected void whenIDeleteDomain() {
         Term termToDelete = builder.givenATerm(term.getOntology());
         termService.delete(termToDelete, null, null, true);
     }

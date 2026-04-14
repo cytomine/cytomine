@@ -91,12 +91,12 @@ public class AbstractImageAuthorizationTest extends CRUDAuthorizationTest {
 
 
     @Override
-    public void when_i_get_domain() {
+    public void whenIGetDomain() {
         abstractImageService.get(abstractImage.getId());
     }
 
     @Override
-    protected void when_i_add_domain() {
+    protected void whenIAddDomain() {
         abstractImageService.add(builder.givenANotPersistedAbstractImage().toJsonObject());
     }
 
@@ -106,7 +106,7 @@ public class AbstractImageAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Override
-    protected void when_i_delete_domain() {
+    protected void whenIDeleteDomain() {
         AbstractImage abstractImageToDelete = abstractImage;
         abstractImageService.delete(abstractImageToDelete, null, null, true);
     }

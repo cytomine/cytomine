@@ -52,12 +52,12 @@ public class TrackAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Override
-    public void when_i_get_domain() {
+    public void whenIGetDomain() {
         trackService.get(track.getId());
     }
 
     @Override
-    protected void when_i_add_domain() {
+    protected void whenIAddDomain() {
         Track track = builder.givenANotPersistedTrack();
         track.setProject(this.track.getProject());
         track.setImage(this.track.getImage());
@@ -70,7 +70,7 @@ public class TrackAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Override
-    protected void when_i_delete_domain() {
+    protected void whenIDeleteDomain() {
         Track trackToDelete = builder.givenATrack();
         trackToDelete.setImage(this.track.getImage());
         trackToDelete.setProject(this.track.getProject());

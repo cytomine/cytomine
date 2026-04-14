@@ -87,12 +87,12 @@ public class StorageAuthorizationTest extends CRUDAuthorizationTest {
 
 
     @Override
-    public void when_i_get_domain() {
+    public void whenIGetDomain() {
         storageService.get(storage.getId());
     }
 
     @Override
-    protected void when_i_add_domain() {
+    protected void whenIAddDomain() {
         storageService.add(builder.givenANotPersistedStorage().toJsonObject());
     }
 
@@ -102,7 +102,7 @@ public class StorageAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Override
-    protected void when_i_delete_domain() {
+    protected void whenIDeleteDomain() {
         Storage storageToDelete = storage;
         storageService.delete(storageToDelete, null, null, true);
     }

@@ -70,12 +70,12 @@ public class ImageFilterProjectAuthorizationTest extends CRDAuthorizationTest {
     }
 
     @Override
-    public void when_i_get_domain() {
+    public void whenIGetDomain() {
         imageFilterProjectService.find(imageFilterProject.getImageFilter(), imageFilterProject.getProject());
     }
 
     @Override
-    protected void when_i_add_domain() {
+    protected void whenIAddDomain() {
         imageFilterProjectService.add(
             builder.givenANotPersistedImageFilterProject(
                 builder.givenAnImageFilter(),
@@ -85,7 +85,7 @@ public class ImageFilterProjectAuthorizationTest extends CRDAuthorizationTest {
     }
 
     @Override
-    protected void when_i_delete_domain() {
+    protected void whenIDeleteDomain() {
         ImageFilterProject imageFilterProjectThatMustBeDeleted = builder.givenANotPersistedImageFilterProject(
             builder.givenAnImageFilter(),
             imageFilterProject.getProject()

@@ -70,18 +70,18 @@ public class TaskRunAuthorizationTest extends CRDAuthorizationTest {
     @WithMockUser(username = USER_ACL_ADMIN)
     public void user_admin_can_add_in_readonly_mode() {
         taskRun.getProject().setMode(EditingMode.READ_ONLY);
-        expectOK(this::when_i_add_domain);
+        expectOK(this::whenIAddDomain);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void user_cannot_add_in_readonly_mode() {
         taskRun.getProject().setMode(EditingMode.READ_ONLY);
-        expectForbidden(this::when_i_add_domain);
+        expectForbidden(this::whenIAddDomain);
     }
 
     @Override
-    public void when_i_get_domain() {
+    public void whenIGetDomain() {
         //TODO: taskRunService.get(taskRun.getId());
     }
 
@@ -91,7 +91,7 @@ public class TaskRunAuthorizationTest extends CRDAuthorizationTest {
     }
 
     @Override
-    protected void when_i_delete_domain() {
+    protected void whenIDeleteDomain() {
         //TODO: taskRunService.delete(taskRunToDelete, null, null, true);
     }
 
@@ -106,7 +106,7 @@ public class TaskRunAuthorizationTest extends CRDAuthorizationTest {
     }
 
     @Override
-    protected void when_i_add_domain() {
+    protected void whenIAddDomain() {
         UUID taskId = taskRun.getTaskRunId();
 
         String mockResponse = """

@@ -46,12 +46,12 @@ public class ImageGroupImageInstanceAuthorizationTest extends CRDAuthorizationTe
     }
 
     @Override
-    protected void when_i_get_domain() {
+    protected void whenIGetDomain() {
         imageGroupImageInstanceService.get(igii.getGroup(), igii.getImage());
     }
 
     @Override
-    protected void when_i_add_domain() {
+    protected void whenIAddDomain() {
         imageGroupImageInstanceService.add(builder.givenANotPersistedImageGroupImageInstance(
             igii.getGroup(),
             igii.getImage()
@@ -59,7 +59,7 @@ public class ImageGroupImageInstanceAuthorizationTest extends CRDAuthorizationTe
     }
 
     @Override
-    protected void when_i_delete_domain() {
+    protected void whenIDeleteDomain() {
         imageGroupImageInstanceService.delete(igii, null, null, true);
     }
 

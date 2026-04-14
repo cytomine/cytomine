@@ -68,9 +68,9 @@ public class AnnotationTermAuthorizationTest extends CRDAuthorizationTest {
         Project project = (Project) annotationTerm.container();
         project.setMode(EditingMode.RESTRICTED);
         builder.persistAndReturn(project);
-        expectOK(this::when_i_get_domain);
-        expectOK(this::when_i_add_domain);
-        expectOK(this::when_i_delete_domain);
+        expectOK(this::whenIGetDomain);
+        expectOK(this::whenIAddDomain);
+        expectOK(this::whenIDeleteDomain);
     }
 
     @Test
@@ -80,9 +80,9 @@ public class AnnotationTermAuthorizationTest extends CRDAuthorizationTest {
         Project project = (Project) annotationTerm.container();
         project.setMode(EditingMode.CLASSIC);
         builder.persistAndReturn(project);
-        expectOK(this::when_i_get_domain);
-        expectOK(this::when_i_add_domain);
-        expectOK(this::when_i_delete_domain);
+        expectOK(this::whenIGetDomain);
+        expectOK(this::whenIAddDomain);
+        expectOK(this::whenIDeleteDomain);
     }
 
     @Test
@@ -92,8 +92,8 @@ public class AnnotationTermAuthorizationTest extends CRDAuthorizationTest {
         Project project = (Project) annotationTerm.container();
         project.setMode(EditingMode.READ_ONLY);
         builder.persistAndReturn(project);
-        expectOK(this::when_i_get_domain);
-        expectForbidden(this::when_i_delete_domain);
+        expectOK(this::whenIGetDomain);
+        expectForbidden(this::whenIDeleteDomain);
     }
 
     @Test
@@ -103,12 +103,12 @@ public class AnnotationTermAuthorizationTest extends CRDAuthorizationTest {
         Project project = (Project) annotationTerm.container();
         project.setMode(EditingMode.RESTRICTED);
         builder.persistAndReturn(project);
-        expectOK(this::when_i_get_domain);
-        expectForbidden(this::when_i_delete_domain);
+        expectOK(this::whenIGetDomain);
+        expectForbidden(this::whenIDeleteDomain);
     }
 
     @Override
-    public void when_i_get_domain() {
+    public void whenIGetDomain() {
         annotationTermService.find(
             annotationTerm.getUserAnnotation(),
             annotationTerm.getTerm(), annotationTerm.getUser()
@@ -116,14 +116,14 @@ public class AnnotationTermAuthorizationTest extends CRDAuthorizationTest {
     }
 
     @Override
-    protected void when_i_add_domain() {
+    protected void whenIAddDomain() {
         annotationTermService.add(
             builder.givenANotPersistedAnnotationTerm(annotationTerm.getUserAnnotation()).toJsonObject()
         );
     }
 
     @Override
-    protected void when_i_delete_domain() {
+    protected void whenIDeleteDomain() {
         AnnotationTerm annotationTerm = builder.givenANotPersistedAnnotationTerm(
             this.annotationTerm.getUserAnnotation()
         );

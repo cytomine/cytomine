@@ -94,14 +94,14 @@ public class ProjectRepresentativeUserAuthorizationTest extends CRDAuthorization
     }
 
     @Override
-    public void when_i_get_domain() {
+    public void whenIGetDomain() {
         projectRepresentativeUserService.get(projectRepresentativeUser.getId());
         projectRepresentativeUserService.find(
             projectRepresentativeUser.getProject(), projectRepresentativeUser.getUser());
     }
 
     @Override
-    protected void when_i_add_domain() {
+    protected void whenIAddDomain() {
         User user = builder.givenAUser();
         builder.addUserToProject(projectRepresentativeUser.getProject(), user.getUsername());
         projectRepresentativeUserService.add(
@@ -112,7 +112,7 @@ public class ProjectRepresentativeUserAuthorizationTest extends CRDAuthorization
     }
 
     @Override
-    protected void when_i_delete_domain() {
+    protected void whenIDeleteDomain() {
         User user = projectRepresentativeUser.getUser();
         builder.addUserToProject(projectRepresentativeUser.getProject(), user.getUsername());
         ProjectRepresentativeUser

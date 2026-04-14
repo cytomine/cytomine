@@ -62,12 +62,12 @@ public class RelationTermAuthorizationTest extends CRDAuthorizationTest {
 
 
     @Override
-    public void when_i_get_domain() {
+    public void whenIGetDomain() {
         relationTermService.find(relationTerm.getRelation(), relationTerm.getTerm1(), relationTerm.getTerm2());
     }
 
     @Override
-    protected void when_i_add_domain() {
+    protected void whenIAddDomain() {
         relationTermService.add(
             basicInstanceBuilder.givenANotPersistedRelationTerm(
                 relationTerm.getRelation(),
@@ -78,7 +78,7 @@ public class RelationTermAuthorizationTest extends CRDAuthorizationTest {
     }
 
     @Override
-    protected void when_i_delete_domain() {
+    protected void whenIDeleteDomain() {
         RelationTerm termToDelete = builder.givenARelationTerm(
             relationTerm.getRelation(),
             relationTerm.getTerm1(),

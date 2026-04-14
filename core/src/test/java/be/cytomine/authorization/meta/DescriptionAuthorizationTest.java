@@ -88,21 +88,21 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
     @WithMockUser(username = USER_ACL_READ)
     public void user_cannot_add_in_readonly_mode() {
         project.setMode(EditingMode.READ_ONLY);
-        expectForbidden(this::when_i_add_domain);
+        expectForbidden(this::whenIAddDomain);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void user_cannot_add_in_restricted_mode() {
         project.setMode(EditingMode.RESTRICTED);
-        expectForbidden(this::when_i_add_domain);
+        expectForbidden(this::whenIAddDomain);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void user_cannot_add_in_restricted_mode_for_annotation() {
         project.setMode(EditingMode.RESTRICTED);
-        expectForbidden(this::when_i_add_domain);
+        expectForbidden(this::whenIAddDomain);
     }
 
     @Test
@@ -110,18 +110,18 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
     public void user_canadd_in_restricted_mode_for_annotation_if_owner() {
         annotationDomain.getProject().setMode(EditingMode.RESTRICTED);
         ((UserAnnotation) annotationDomain).setUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get());
-        expectOK(this::when_i_add_domain);
+        expectOK(this::whenIAddDomain);
     }
 
     @Override
-    public void when_i_get_domain() {
+    public void whenIGetDomain() {
         descriptionService.findByDomain(project);
         descriptionService.findByDomain("AnnotationDomain", annotationDomain.getId());
         descriptionService.findByDomain(abstractImage);
     }
 
     @Override
-    protected void when_i_add_domain() {
+    protected void whenIAddDomain() {
         AnnotationDomain annotationDomain = builder.persistAndReturn(
             builder.givenANotPersistedUserAnnotation(project)
         );
@@ -134,7 +134,7 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Override
-    protected void when_i_delete_domain() {
+    protected void whenIDeleteDomain() {
         Description description = builder.givenADescription(annotationDomain);
         descriptionService.delete(description, null, null, true);
     }

@@ -85,12 +85,12 @@ public class NestedImageInstanceAuthorizationTest extends CRUDAuthorizationTest 
 
 
     @Override
-    public void when_i_get_domain() {
+    public void whenIGetDomain() {
         nestedImageInstanceService.get(nestedImageInstance.getId());
     }
 
     @Override
-    protected void when_i_add_domain() {
+    protected void whenIAddDomain() {
         NestedImageInstance nestedImageInstance = builder.givenANotPersistedNestedImageInstance();
         nestedImageInstance.setProject(this.nestedImageInstance.getProject());
         nestedImageInstance.setBaseImage(builder.givenAnAbstractImage());
@@ -103,7 +103,7 @@ public class NestedImageInstanceAuthorizationTest extends CRUDAuthorizationTest 
     }
 
     @Override
-    protected void when_i_delete_domain() {
+    protected void whenIDeleteDomain() {
         NestedImageInstance nestedImageInstanceToDelete = nestedImageInstance;
         nestedImageInstanceService.delete(nestedImageInstanceToDelete, null, null, true);
     }

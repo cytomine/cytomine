@@ -45,12 +45,12 @@ public class ImageGroupAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Override
-    protected void when_i_get_domain() {
+    protected void whenIGetDomain() {
         imageGroupService.get(imageGroup.getId());
     }
 
     @Override
-    protected void when_i_add_domain() {
+    protected void whenIAddDomain() {
         imageGroupService.add(builder.givenANotPersistedImagegroup(imageGroup.getProject()).toJsonObject());
     }
 
@@ -60,7 +60,7 @@ public class ImageGroupAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Override
-    protected void when_i_delete_domain() {
+    protected void whenIDeleteDomain() {
         ImageGroup imageGroupToDelete = imageGroup;
         imageGroupService.delete(imageGroupToDelete, null, null, true);
     }
@@ -111,6 +111,6 @@ public class ImageGroupAuthorizationTest extends CRUDAuthorizationTest {
     @WithMockUser(username = USER_ACL_ADMIN)
     public void user_admin_can_add_in_readonly_mode() {
         imageGroup.getProject().setMode(EditingMode.READ_ONLY);
-        expectOK(() -> when_i_add_domain());
+        expectOK(() -> whenIAddDomain());
     }
 }

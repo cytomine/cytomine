@@ -94,13 +94,13 @@ public class ProjectDefaultLayerAuthorizationTest extends CRDAuthorizationTest {
     }
 
     @Override
-    public void when_i_get_domain() {
+    public void whenIGetDomain() {
         projectDefaultLayerService.get(projectDefaultLayer.getId());
         projectDefaultLayerService.find(projectDefaultLayer.getId());
     }
 
     @Override
-    protected void when_i_add_domain() {
+    protected void whenIAddDomain() {
         User user = builder.givenAUser();
         builder.addUserToProject(projectDefaultLayer.getProject(), user.getUsername());
         projectDefaultLayerService.add(
@@ -111,7 +111,7 @@ public class ProjectDefaultLayerAuthorizationTest extends CRDAuthorizationTest {
     }
 
     @Override
-    protected void when_i_delete_domain() {
+    protected void whenIDeleteDomain() {
         User user = projectDefaultLayer.getUser();
         builder.addUserToProject(projectDefaultLayer.getProject(), user.getUsername());
         ProjectDefaultLayer projectDefaultLayerToDelete = builder.givenANotPersistedProjectDefaultLayer(

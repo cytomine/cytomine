@@ -91,7 +91,7 @@ public class OntologyAuthorizationTest extends CRUDAuthorizationTest {
     @Test
     @WithMockUser(username = USER_NO_ACL)
     public void user_without_permission_add_domain() {
-        expectOK(() -> when_i_add_domain());
+        expectOK(() -> whenIAddDomain());
         // User with no ACL can create an ontology
     }
 
@@ -99,17 +99,17 @@ public class OntologyAuthorizationTest extends CRUDAuthorizationTest {
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void user_with_read_permission_add_domain() {
-        expectOK(() -> when_i_add_domain());
+        expectOK(() -> whenIAddDomain());
         // User with READ permission can create another ontology
     }
 
     @Override
-    public void when_i_get_domain() {
+    public void whenIGetDomain() {
         ontologyService.get(ontology.getId());
     }
 
     @Override
-    protected void when_i_add_domain() {
+    protected void whenIAddDomain() {
         ontologyService.add(basicInstanceBuilder.givenANotPersistedOntology().toJsonObject());
     }
 
@@ -119,7 +119,7 @@ public class OntologyAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Override
-    protected void when_i_delete_domain() {
+    protected void whenIDeleteDomain() {
         Ontology ontologyToDelete = ontology;
         ontologyService.delete(ontologyToDelete, null, null, true);
     }

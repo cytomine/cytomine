@@ -102,12 +102,12 @@ public class ReviewedAnnotationAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Override
-    public void when_i_get_domain() {
+    public void whenIGetDomain() {
         reviewedAnnotationService.get(reviewedAnnotation.getId());
     }
 
     @Override
-    protected void when_i_add_domain() {
+    protected void whenIAddDomain() {
         JsonObject jsonObject = builder.givenANotPersistedReviewedAnnotation(this.reviewedAnnotation.getProject())
             .toJsonObject();
         reviewedAnnotationService.add(jsonObject);
@@ -119,7 +119,7 @@ public class ReviewedAnnotationAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Override
-    protected void when_i_delete_domain() {
+    protected void whenIDeleteDomain() {
         ReviewedAnnotation annotation = builder.persistAndReturn(
             builder.givenANotPersistedReviewedAnnotation(this.reviewedAnnotation.getProject())
         );

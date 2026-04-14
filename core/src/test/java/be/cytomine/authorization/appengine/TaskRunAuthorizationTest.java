@@ -68,17 +68,16 @@ public class TaskRunAuthorizationTest extends CRDAuthorizationTest {
 
     @Disabled("This test does not work, the returned entity is a 500, but expectOK() ignores that")
     @WithMockUser(username = USER_ACL_ADMIN)
-
     public void user_admin_can_add_in_readonly_mode() {
         taskRun.getProject().setMode(EditingMode.READ_ONLY);
-        expectOK(() -> when_i_add_domain());
+        expectOK(this::when_i_add_domain);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void user_cannot_add_in_readonly_mode() {
         taskRun.getProject().setMode(EditingMode.READ_ONLY);
-        expectForbidden(() -> when_i_add_domain());
+        expectForbidden(this::when_i_add_domain);
     }
 
     @Override
@@ -110,25 +109,26 @@ public class TaskRunAuthorizationTest extends CRDAuthorizationTest {
     protected void when_i_add_domain() {
         UUID taskId = taskRun.getTaskRunId();
 
-        String mockResponse = "{\n" +
-            "  \"task\": {\n" +
-            "    \"name\": \"string\",\n" +
-            "    \"namespace\": \"string\",\n" +
-            "    \"version\": \"string\",\n" +
-            "    \"description\": \"string\",\n" +
-            "    \"authors\": [\n" +
-            "      {\n" +
-            "        \"first_name\": \"string\",\n" +
-            "        \"last_name\": \"string\",\n" +
-            "        \"organization\": \"string\",\n" +
-            "        \"email\": \"string\",\n" +
-            "        \"is_contact\": true\n" +
-            "      }\n" +
-            "    ]\n" +
-            "  },\n" +
-            "  \"id\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\n" +
-            "  \"state\": \"created\"\n" +
-            "}";
+        String mockResponse = """
+            {
+              "task": {
+                "name": "string",
+                "namespace": "string",
+                "version": "string",
+                "description": "string",
+                "authors": [
+                  {
+                    "first_name": "string",
+                    "last_name": "string",
+                    "organization": "string",
+                    "email": "string",
+                    "is_contact": true
+                  }
+                ]
+              },
+              "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+              "state": "created"
+            }""";
 
         configureFor("localhost", 8888);
         stubFor(WireMock.post(urlEqualTo("/api/v1/tasks/" + taskId + "/runs"))
@@ -157,7 +157,6 @@ public class TaskRunAuthorizationTest extends CRDAuthorizationTest {
     protected Optional<Permission> minimalPermissionForEdit() {
         return Optional.of(READ);
     }
-
 
     @Override
     protected Optional<String> minimalRoleForCreate() {

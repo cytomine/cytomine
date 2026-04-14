@@ -79,10 +79,7 @@ public class CompanionFileResourceTests {
 
     @AfterAll
     public static void afterAll() {
-        try {
-            wireMockServer.stop();
-        } catch (Exception e) {
-        }
+        wireMockServer.stop();
     }
 
 
@@ -98,7 +95,6 @@ public class CompanionFileResourceTests {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThanOrEqualTo(1))))
             .andExpect(jsonPath("$.collection[?(@.id==" + companionFile.getId() + ")]").exists());
-
     }
 
     @Test
@@ -113,7 +109,6 @@ public class CompanionFileResourceTests {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThanOrEqualTo(1))))
             .andExpect(jsonPath("$.collection[?(@.id==" + companionFile.getId() + ")]").exists());
-
     }
 
     @Test
@@ -130,7 +125,6 @@ public class CompanionFileResourceTests {
             .andExpect(jsonPath("$.filename").hasJsonPath())
             .andExpect(jsonPath("$.type").hasJsonPath());
     }
-
 
     @Test
     @Transactional
@@ -155,7 +149,6 @@ public class CompanionFileResourceTests {
             .andExpect(jsonPath("$.collection[?(@.id==" + image.getId() + ")]").exists());
     }
 
-
     @Test
     @Transactional
     public void add_valid_companion_file() throws Exception {
@@ -170,7 +163,6 @@ public class CompanionFileResourceTests {
             .andExpect(jsonPath("$.message").exists())
             .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.companionfile.id").exists());
-
     }
 
     @Test
@@ -191,10 +183,7 @@ public class CompanionFileResourceTests {
             .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.companionfile.id").exists())
             .andExpect(jsonPath("$.companionfile.filename").value("toto"));
-
-
     }
-
 
     @Test
     @Transactional
@@ -209,8 +198,6 @@ public class CompanionFileResourceTests {
             .andExpect(jsonPath("$.message").exists())
             .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.companionfile.id").exists());
-
-
     }
 
     @Test
@@ -229,7 +216,6 @@ public class CompanionFileResourceTests {
         restCompanionFileControllerMockMvc.perform(get("/api/companionfile/{id}/user.json", 0))
             .andExpect(status().isNotFound());
     }
-
 
     @Test
     public void download_companion_file() throws Exception {
@@ -258,6 +244,4 @@ public class CompanionFileResourceTests {
             .andReturn();
         assertThat(mvcResult.getResponse().getContentAsByteArray()).isEqualTo(mockResponse);
     }
-
-
 }

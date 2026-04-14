@@ -102,8 +102,6 @@ public class Oauth2ResourceServerTests {
             .willReturn(aResponse()
                 .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
                 .withBody(jwkResponse)));
-
-
     }
 
     @BeforeAll
@@ -114,10 +112,7 @@ public class Oauth2ResourceServerTests {
 
     @AfterAll
     public static void afterAll() {
-        try {
-            wireMockServer.stop();
-        } catch (Exception ignored) {
-        }
+        wireMockServer.stop();
     }
 
     @Test
@@ -149,7 +144,6 @@ public class Oauth2ResourceServerTests {
                 .header("Authorization", "Bearer " + getSignedExpiredJwt()))
             .andExpect(status().isUnauthorized());
     }
-
 
     @Test
     public void whenAuthenticationSuccessEventPublished_thenUserAddedIfDoesNotExist() {

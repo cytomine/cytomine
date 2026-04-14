@@ -57,7 +57,7 @@ public class TagDomainAssociationResourceTests {
 
     @Test
     @Transactional
-    public void get_a_tag_domain_association() throws Exception {
+    public void shouldReturnTagDomainAssociationById() throws Exception {
         TagDomainAssociation tagDomainAssociation = builder.givenATagAssociation(
             builder.givenATag(),
             builder.givenAProject()

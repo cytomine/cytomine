@@ -74,7 +74,7 @@ public class ProjectRepresentativeUserResourceTests {
 
     @Test
     @Transactional
-    public void get_a_projectRepresentativeUser() throws Exception {
+    public void shouldReturnProjectRepresentativeUserWithAllExpectedFields() throws Exception {
         ProjectRepresentativeUser projectRepresentativeUser = builder.givenAProjectRepresentativeUser();
 
         restProjectRepresentativeUserControllerMockMvc.perform(get(
@@ -90,7 +90,7 @@ public class ProjectRepresentativeUserResourceTests {
 
     @Test
     @Transactional
-    public void get_a_projectRepresentativeUser_that_does_not_exists() throws Exception {
+    public void shouldReturnNotFoundWhenProjectRepresentativeUserDoesNotExist() throws Exception {
         ProjectRepresentativeUser projectRepresentativeUser = builder.givenAProjectRepresentativeUser();
 
         restProjectRepresentativeUserControllerMockMvc.perform(get(
@@ -102,7 +102,7 @@ public class ProjectRepresentativeUserResourceTests {
 
     @Test
     @Transactional
-    public void get_a_projectRepresentativeUser_from_project_that_does_not_exists() throws Exception {
+    public void shouldReturnNotFoundWhenProjectDoesNotExist() throws Exception {
         ProjectRepresentativeUser projectRepresentativeUser = builder.givenAProjectRepresentativeUser();
 
         restProjectRepresentativeUserControllerMockMvc.perform(get(

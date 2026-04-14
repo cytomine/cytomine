@@ -115,10 +115,7 @@ public class StatsServiceTests {
 
     @AfterAll
     public static void afterAll() {
-        try {
-            wireMockServer.stop();
-        } catch (Exception e) {
-        }
+        wireMockServer.stop();
     }
 
     @BeforeEach
@@ -132,8 +129,8 @@ public class StatsServiceTests {
         persistentUserPositionRepository.deleteAll();
     }
 
-    PersistentProjectConnection given_a_persistent_connection_in_project(User user, Project project, Date created) {
-        PersistentProjectConnection connection = projectConnectionService.add(
+    PersistentProjectConnection givenAPersistentConnectionInProject(User user, Project project, Date created) {
+        return projectConnectionService.add(
             user,
             project,
             "xxx",
@@ -142,10 +139,9 @@ public class StatsServiceTests {
             "123",
             created
         );
-        return connection;
     }
 
-    PersistentImageConsultation given_a_persistent_image_consultation(
+    PersistentImageConsultation givenAPersistentImageConsultation(
         User user,
         ImageInstance imageInstance,
         Date created
@@ -153,22 +149,19 @@ public class StatsServiceTests {
         return imageConsultationService.add(user, imageInstance.getId(), "xxx", "mode", created);
     }
 
-    AnnotationAction given_a_persistent_annotation_action(
+    AnnotationAction givenAPersistentAnnotationAction(
         Date creation,
         AnnotationDomain annotationDomain,
         User user,
         String action
     ) {
-        AnnotationAction annotationAction =
-            annotationActionService.add(
-                annotationDomain,
-                user,
-                action,
-                creation
-            );
-        return annotationAction;
+        return annotationActionService.add(
+            annotationDomain,
+            user,
+            action,
+            creation
+        );
     }
-
 
     @Test
     void stats_domain_count() {
@@ -190,7 +183,7 @@ public class StatsServiceTests {
     @Test
     void most_active_project_count() {
         Project project = builder.givenAProject();
-        given_a_persistent_connection_in_project(builder.givenSuperAdmin(), project, new Date());
+        givenAPersistentConnectionInProject(builder.givenSuperAdmin(), project, new Date());
         assertThat(((JsonObject) statsService.mostActiveProjects()
             .get()
             .get("project")).getId()).isEqualTo(project.getId());
@@ -540,17 +533,17 @@ public class StatsServiceTests {
     @Test
     void stats_connection_evolution() {
         Project project = builder.givenAProject();
-        given_a_persistent_connection_in_project(
+        givenAPersistentConnectionInProject(
             builder.givenSuperAdmin(),
             project,
             DateUtils.addDays(new Date(), -15)
         );
-        given_a_persistent_connection_in_project(
+        givenAPersistentConnectionInProject(
             builder.givenSuperAdmin(),
             project,
             DateUtils.addDays(new Date(), -15)
         );
-        given_a_persistent_connection_in_project(
+        givenAPersistentConnectionInProject(
             builder.givenSuperAdmin(),
             project,
             DateUtils.addDays(new Date(), -5)
@@ -591,17 +584,17 @@ public class StatsServiceTests {
     void stats_image_consultation_evolution() {
         Project project = builder.givenAProject();
         ImageInstance imageInstance = builder.givenAnImageInstance(project);
-        given_a_persistent_image_consultation(
+        givenAPersistentImageConsultation(
             builder.givenSuperAdmin(),
             imageInstance,
             DateUtils.addDays(new Date(), -15)
         );
-        given_a_persistent_image_consultation(
+        givenAPersistentImageConsultation(
             builder.givenSuperAdmin(),
             imageInstance,
             DateUtils.addDays(new Date(), -15)
         );
-        given_a_persistent_image_consultation(
+        givenAPersistentImageConsultation(
             builder.givenSuperAdmin(),
             imageInstance,
             DateUtils.addDays(new Date(), -5)
@@ -633,30 +626,29 @@ public class StatsServiceTests {
         assertThat(jsonObjects.get(2).getJSONAttrLong("size")).isEqualTo(3);
     }
 
-
     @Test
-    void stats_annotation_Action_evolution() {
+    void shouldReturnAnnotationActionEvolutionStatsOverTime() {
         Project project = builder.givenAProject();
         AnnotationDomain annotation = builder.givenAUserAnnotation(project);
-        given_a_persistent_annotation_action(
+        givenAPersistentAnnotationAction(
             DateUtils.addDays(new Date(), -15),
             annotation,
             builder.givenSuperAdmin(),
             "select"
         );
-        given_a_persistent_annotation_action(
+        givenAPersistentAnnotationAction(
             DateUtils.addDays(new Date(), -15),
             annotation,
             builder.givenSuperAdmin(),
             "move"
         );
-        given_a_persistent_annotation_action(
+        givenAPersistentAnnotationAction(
             DateUtils.addDays(new Date(), -15),
             annotation,
             builder.givenSuperAdmin(),
             "select"
         );
-        given_a_persistent_annotation_action(
+        givenAPersistentAnnotationAction(
             DateUtils.addDays(new Date(), -5),
             annotation,
             builder.givenSuperAdmin(),
@@ -689,6 +681,4 @@ public class StatsServiceTests {
         assertThat(jsonObjects.get(1).getJSONAttrLong("size")).isEqualTo(3);
         assertThat(jsonObjects.get(2).getJSONAttrLong("size")).isEqualTo(3);
     }
-
-
 }

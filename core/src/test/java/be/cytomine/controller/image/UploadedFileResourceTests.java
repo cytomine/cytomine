@@ -110,10 +110,7 @@ public class UploadedFileResourceTests {
 
     @AfterAll
     public static void afterAll() {
-        try {
-            wireMockServer.stop();
-        } catch (Exception e) {
-        }
+        wireMockServer.stop();
     }
 
     public static void configureWireMock(WireMockServer wireMockServer) throws JOSEException {
@@ -306,8 +303,6 @@ public class UploadedFileResourceTests {
     @Test
     @Transactional
     void sort_uploaded_file() throws Exception {
-
-        //creation
         UploadedFile uploadedFile = builder.givenAUploadedFile();
         uploadedFile.setSize(1L);
         UploadedFile uploadedFileChild1 = builder.givenAUploadedFile();
@@ -319,8 +314,6 @@ public class UploadedFileResourceTests {
         uploadedfileChild2.setStatus(9);
         UploadedFile uploadedFile2 = builder.givenAUploadedFile();
         uploadedFile2.setSize(100000L);
-
-        List<UploadedFile> uploadedFiles = null;
 
         MvcResult mvcResult;
         List<Long> ids;
@@ -405,7 +398,9 @@ public class UploadedFileResourceTests {
                 .param("order", "asc"))
             .andExpect(status().isOk()).andReturn();
         ids = retrieveIds(mvcResult);
-        uploadedFiles = ids.stream().map(x -> uploadedFileRepository.getById(x)).collect(Collectors.toList());
+        List<UploadedFile> uploadedFiles = ids.stream()
+            .map(x -> uploadedFileRepository.getById(x))
+            .collect(Collectors.toList());
         assertThat(uploadedFiles.get(0).getSize()).isLessThan(uploadedFiles.get(uploadedFiles.size() - 1).getSize());
 
         mvcResult = restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile.json")
@@ -417,7 +412,6 @@ public class UploadedFileResourceTests {
         uploadedFiles = ids.stream().map(x -> uploadedFileRepository.getById(x)).collect(Collectors.toList());
         assertThat(uploadedFiles.get(0).getSize()).isGreaterThan(uploadedFiles.get(uploadedFiles.size() - 1).getSize());
 
-
         mvcResult = restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile.json")
                 .param("onlyRootsWithDetails", "true")
                 .param("sort", "status")
@@ -425,7 +419,6 @@ public class UploadedFileResourceTests {
             .andExpect(status().isOk()).andReturn();
         ids = retrieveIds(mvcResult);
         first = ids.get(0);
-
 
         mvcResult = restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile.json")
                 .param("onlyRootsWithDetails", "true")
@@ -443,7 +436,6 @@ public class UploadedFileResourceTests {
         ids = retrieveIds(mvcResult);
         first = ids.get(0);
 
-
         mvcResult = restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile.json")
                 .param("onlyRootsWithDetails", "true")
                 .param("sort", "parentFilename")
@@ -451,15 +443,12 @@ public class UploadedFileResourceTests {
             .andExpect(status().isOk()).andReturn();
         ids = retrieveIds(mvcResult);
         assertThat(ids.get(0)).isNotEqualTo(first);
-
     }
-
 
     @Test
     @Transactional
     public void get_an_uploaded_file() throws Exception {
         UploadedFile image = builder.givenAUploadedFile();
-
 
         restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile/{id}.json", image.getId()))
             .andExpect(status().isOk())
@@ -485,7 +474,6 @@ public class UploadedFileResourceTests {
             .andExpect(jsonPath("$.errors.message").exists());
     }
 
-
     @Test
     @Transactional
     public void add_valid_uploaded_file() throws Exception {
@@ -500,7 +488,6 @@ public class UploadedFileResourceTests {
             .andExpect(jsonPath("$.message").exists())
             .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.uploadedfile.id").exists());
-
     }
 
     @Test
@@ -521,10 +508,7 @@ public class UploadedFileResourceTests {
             .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.uploadedfile.id").exists())
             .andExpect(jsonPath("$.uploadedfile.filename").value("new"));
-
-
     }
-
 
     @Test
     @Transactional
@@ -539,8 +523,6 @@ public class UploadedFileResourceTests {
             .andExpect(jsonPath("$.message").exists())
             .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.uploadedfile.id").exists());
-
-
     }
 
     @Test

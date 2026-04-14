@@ -108,21 +108,21 @@ public class ImageGroupImageInstanceResourceTests {
     public void get_previous_imagegroup_imageinstance() throws Exception {
         Project project = builder.givenAProject();
         ImageGroup group = builder.givenAnImageGroup(project);
-        ImageGroupImageInstance curr_igii = builder.givenAnImageGroupImageInstance(
+        ImageGroupImageInstance current = builder.givenAnImageGroupImageInstance(
             group,
             builder.givenAnImageInstance(project)
         );
-        ImageGroupImageInstance prev_igii = builder.givenAnImageGroupImageInstance(
+        ImageGroupImageInstance previous = builder.givenAnImageGroupImageInstance(
             group,
             builder.givenAnImageInstance(project)
         );
         restImageGroupImageInstanceControllerMockMvc.perform(get(
                 "/api/imagegroup/{group}/imageinstance/{image}/previous.json",
-                curr_igii.getGroup().getId(),
-                curr_igii.getImage().getId()
+                current.getGroup().getId(),
+                current.getImage().getId()
             ))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(prev_igii.getImage().getId()));
+            .andExpect(jsonPath("$.id").value(previous.getImage().getId()));
     }
 
     @Test
@@ -130,20 +130,20 @@ public class ImageGroupImageInstanceResourceTests {
     public void get_next_imagegroup_imageinstance() throws Exception {
         Project project = builder.givenAProject();
         ImageGroup group = builder.givenAnImageGroup(project);
-        ImageGroupImageInstance curr_igii = builder.givenAnImageGroupImageInstance(
+        ImageGroupImageInstance current = builder.givenAnImageGroupImageInstance(
             group,
             builder.givenAnImageInstance(project)
         );
-        ImageGroupImageInstance next_igii = builder.givenAnImageGroupImageInstance(
+        ImageGroupImageInstance next = builder.givenAnImageGroupImageInstance(
             group,
             builder.givenAnImageInstance(project)
         );
         restImageGroupImageInstanceControllerMockMvc.perform(get(
                 "/api/imagegroup/{group}/imageinstance/{image}/next.json",
-                curr_igii.getGroup().getId(),
-                curr_igii.getImage().getId()
+                current.getGroup().getId(),
+                current.getImage().getId()
             ))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(next_igii.getImage().getId()));
+            .andExpect(jsonPath("$.id").value(next.getImage().getId()));
     }
 }

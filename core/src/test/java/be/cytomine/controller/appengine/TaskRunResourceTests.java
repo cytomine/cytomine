@@ -57,7 +57,7 @@ public class TaskRunResourceTests {
     @Value("${application.appEngine.apiBasePath}")
     private String apiBasePath;
 
-    private final static WireMockServer wireMockServer = new WireMockServer(8888);
+    private static final WireMockServer wireMockServer = new WireMockServer(8888);
 
     @BeforeAll
     public static void beforeAll() {
@@ -133,7 +133,7 @@ public class TaskRunResourceTests {
 
     @Test
     @Transactional
-    public void single_param_provision_of_a_task() throws Exception {
+    public void shouldProvisionSingleParameterOfTask() throws Exception {
         TaskRun taskRun = builder.givenANotPersistedTaskRun();
         taskRunRepository.saveAndFlush(taskRun);
         UUID taskRunId = taskRun.getTaskRunId();
@@ -163,7 +163,7 @@ public class TaskRunResourceTests {
 
     @Test
     @Transactional
-    public void batch_param_provision_of_a_task() throws Exception {
+    public void shouldProvisionBatchParametersOfTask() throws Exception {
         TaskRun taskRun = builder.givenANotPersistedTaskRun();
         taskRunRepository.saveAndFlush(taskRun);
         UUID taskRunId = taskRun.getTaskRunId();

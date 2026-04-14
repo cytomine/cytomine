@@ -84,10 +84,7 @@ public class AbstractSliceResourceTests {
 
     @AfterAll
     public static void afterAll() {
-        try {
-            wireMockServer.stop();
-        } catch (Exception e) {
-        }
+        wireMockServer.stop();
     }
 
     @Test
@@ -119,7 +116,7 @@ public class AbstractSliceResourceTests {
     @Test
     @Transactional
     public void get_an_abstract_slice() throws Exception {
-        AbstractSlice image = given_test_abstract_slice();
+        AbstractSlice image = givenTestAbstractSlice();
 
         restAbstractSliceControllerMockMvc.perform(get("/api/abstractslice/{id}.json", image.getId()))
             .andExpect(status().isOk())
@@ -143,11 +140,10 @@ public class AbstractSliceResourceTests {
             .andExpect(jsonPath("$.errors.message").exists());
     }
 
-
     @Test
     @Transactional
     public void get_an_abstract_slice_with_coordinates() throws Exception {
-        AbstractSlice image = given_test_abstract_slice();
+        AbstractSlice image = givenTestAbstractSlice();
 
         restAbstractSliceControllerMockMvc.perform(get(
                 "/api/abstractimage/{id}/{channel}/{zStack}/{time}/abstractslice.json",
@@ -192,10 +188,7 @@ public class AbstractSliceResourceTests {
             .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.abstractslice.id").exists())
             .andExpect(jsonPath("$.abstractslice.time").value(3));
-
-
     }
-
 
     @Test
     @Transactional
@@ -210,10 +203,7 @@ public class AbstractSliceResourceTests {
             .andExpect(jsonPath("$.message").exists())
             .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.abstractslice.id").exists());
-
-
     }
-
 
     @Test
     @Transactional
@@ -235,11 +225,11 @@ public class AbstractSliceResourceTests {
     @Test
     @Transactional
     public void get_abstract_slice_thumb() throws Exception {
-        AbstractSlice image = given_test_abstract_slice();
+        AbstractSlice image = givenTestAbstractSlice();
 
         byte[] mockResponse = UUID.randomUUID()
             .toString()
-            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
+            .getBytes();
 
         configureFor("localhost", 8888);
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
@@ -273,10 +263,10 @@ public class AbstractSliceResourceTests {
     @Test
     @Transactional
     public void get_abstract_slice_tile() throws Exception {
-        AbstractSlice image = given_test_abstract_slice();
+        AbstractSlice image = givenTestAbstractSlice();
         byte[] mockResponse = UUID.randomUUID()
             .toString()
-            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
+            .getBytes();
         configureFor("localhost", 8888);
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 image.getPath(),
@@ -318,13 +308,13 @@ public class AbstractSliceResourceTests {
     @Test
     @Transactional
     public void get_abstract_slice_crop() throws Exception {
-        AbstractSlice image = given_test_abstract_slice();
+        AbstractSlice image = givenTestAbstractSlice();
 
         configureFor("localhost", 8888);
 
         byte[] mockResponse = UUID.randomUUID()
             .toString()
-            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
+            .getBytes();
 
         String url = "/image/"
             + URLEncoder.encode(image.getPath(), StandardCharsets.UTF_8).replace("%2F", "/")
@@ -358,11 +348,11 @@ public class AbstractSliceResourceTests {
     @Test
     @Transactional
     public void get_abstract_slice_window() throws Exception {
-        AbstractSlice image = given_test_abstract_slice();
+        AbstractSlice image = givenTestAbstractSlice();
 
         byte[] mockResponse = UUID.randomUUID()
             .toString()
-            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
+            .getBytes();
 
         configureFor("localhost", 8888);
         String url = "/image/"
@@ -389,8 +379,7 @@ public class AbstractSliceResourceTests {
         AssertionsForClassTypes.assertThat(mvcResult.getResponse().getContentAsByteArray()).isEqualTo(mockResponse);
     }
 
-
-    private AbstractSlice given_test_abstract_slice() {
+    private AbstractSlice givenTestAbstractSlice() {
         AbstractSlice image = builder.givenAnAbstractSlice();
         image.setMime(builder.givenAMime("openslide/mrxs"));
         image.getImage().setWidth(109240);
@@ -399,5 +388,4 @@ public class AbstractSliceResourceTests {
         image.getUploadedFile().setContentType("MRXS");
         return image;
     }
-
 }

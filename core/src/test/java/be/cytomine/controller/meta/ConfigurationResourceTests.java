@@ -65,7 +65,7 @@ public class ConfigurationResourceTests {
 
     @Test
     @Transactional
-    public void get_a_configuration() throws Exception {
+    public void shouldReturnConfigurationWithAllExpectedFields() throws Exception {
         Configuration configuration = builder.givenAConfiguration("xxx");
 
         restConfigurationControllerMockMvc.perform(get("/api/configuration/key/{key}.json", configuration.getKey()))
@@ -75,9 +75,7 @@ public class ConfigurationResourceTests {
             .andExpect(jsonPath("$.created").exists())
             .andExpect(jsonPath("$.key").value("xxx"))
             .andExpect(jsonPath("$.value").value(configuration.getValue()))
-            .andExpect(jsonPath("$.readingRole").value("ALL"))
-
-        ;
+            .andExpect(jsonPath("$.readingRole").value("ALL"));
     }
 
     @Test

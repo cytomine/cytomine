@@ -99,7 +99,7 @@ public class AnnotationIndexResourceTests {
     }
 
     @BeforeEach
-    public void BeforeEach() throws ParseException {
+    public void beforeEach() {
         this.transactionTemplate.execute(new TransactionCallbackWithoutResult() {
             @Override
             protected void doInTransactionWithoutResult(TransactionStatus status) {
@@ -114,12 +114,11 @@ public class AnnotationIndexResourceTests {
 
     @Test
     public void list_user_annotation_property_show() throws Exception {
-
         List<AnnotationIndex> all = annotationIndexRepository.findAll();
         List<AnnotationIndexLightDTO> slices = annotationIndexRepository.findAllBySlice(slice);
-        List<AnnotationIndexLightDTO>
-            slicesLight
-            = annotationIndexRepository.findAllLightBySliceInstance(slice.getId());
+        List<AnnotationIndexLightDTO> slicesLight = annotationIndexRepository.findAllLightBySliceInstance(
+            slice.getId()
+        );
         restAnnotationIndexControllerMockMvc.perform(get("/api/sliceinstance/{id}/annotationindex.json", slice.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.user==" + me.getId() + ")]").exists())

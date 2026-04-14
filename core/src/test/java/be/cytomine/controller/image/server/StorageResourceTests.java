@@ -66,7 +66,7 @@ public class StorageResourceTests {
 
     @Test
     @Transactional
-    public void get_a_storage() throws Exception {
+    public void shouldReturnStorageWithAllExpectedFields() throws Exception {
         Storage storage = builder.givenAStorage();
 
         restStorageControllerMockMvc.perform(get("/api/storage/{id}.json", storage.getId()))

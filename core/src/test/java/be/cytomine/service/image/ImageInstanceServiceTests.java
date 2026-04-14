@@ -549,7 +549,8 @@ public class ImageInstanceServiceTests {
         builder.persistAndReturn(imageInstance2);
 
         assertThat(imageInstanceService.getAllImageId(imageInstance1.getProject())).contains(imageInstance1.getId());
-        assertThat(imageInstanceService.getAllImageId(imageInstance1.getProject())).doesNotContain(imageInstance2.getId());
+        assertThat(imageInstanceService.getAllImageId(imageInstance1.getProject()))
+            .doesNotContain(imageInstance2.getId());
     }
 
     @Test
@@ -561,7 +562,8 @@ public class ImageInstanceServiceTests {
         builder.persistAndReturn(nestedImageInstance1);
 
         assertThat(imageInstanceService.getAllImageId(imageInstance1.getProject())).contains(imageInstance1.getId());
-        assertThat(imageInstanceService.getAllImageId(imageInstance1.getProject())).doesNotContain(nestedImageInstance1.getId());
+        assertThat(imageInstanceService.getAllImageId(imageInstance1.getProject()))
+            .doesNotContain(nestedImageInstance1.getId());
     }
 
     @Test

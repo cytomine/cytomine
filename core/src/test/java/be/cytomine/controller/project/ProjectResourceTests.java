@@ -1,21 +1,5 @@
 package be.cytomine.controller.project;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -52,8 +36,6 @@ import be.cytomine.domain.social.PersistentProjectConnection;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.project.ProjectRepository;
 import be.cytomine.repository.security.AclRepository;
-import be.cytomine.repository.security.SecRoleRepository;
-import be.cytomine.repository.security.UserRepository;
 import be.cytomine.repositorynosql.social.PersistentProjectConnectionRepository;
 import be.cytomine.service.PermissionService;
 import be.cytomine.service.ontology.UserAnnotationService;
@@ -106,6 +88,9 @@ public class ProjectResourceTests {
     private AclRepository aclRepository;
 
     @Autowired
+    ProjectConnectionService projectConnectionService;
+
+    @Autowired
     private ProjectRepository projectRepository;
 
     @Autowired
@@ -113,12 +98,6 @@ public class ProjectResourceTests {
 
     @Autowired
     private PersistentProjectConnectionRepository persistentProjectConnectionRepository;
-
-    @Autowired
-    SecRoleRepository secRoleRepository;
-
-    @Autowired
-    UserRepository userRepository;
 
     private static WireMockServer wireMockServer;
 
@@ -146,6 +125,18 @@ public class ProjectResourceTests {
             .withQueryParam("storage", matching(".*"))
             .withQueryParam("index", equalTo("annotation"))
             .willReturn(aResponse().withBody(UUID.randomUUID().toString()))
+        );
+    }
+
+    PersistentProjectConnection givenAPersistentConnectionInProject(User user, Project project, Date created) {
+        return projectConnectionService.add(
+            user,
+            project,
+            "xxx",
+            "linux",
+            "chrome",
+            "123",
+            created
         );
     }
 
@@ -498,7 +489,7 @@ public class ProjectResourceTests {
 
     @Test
     @Transactional
-    public void get_a_project() throws Exception {
+    public void shouldReturnProjectWithAllExpectedFields() throws Exception {
         Project project = builder.givenAProject();
 
         restProjectControllerMockMvc.perform(get("/api/project/{id}.json", project.getId()))
@@ -521,19 +512,15 @@ public class ProjectResourceTests {
             .andExpect(jsonPath("$.isReadOnly").value(false))
             .andExpect(jsonPath("$.isRestricted").value(false))
             .andExpect(jsonPath("$.hideUsersLayers").value(false))
-            .andExpect(jsonPath("$.hideAdminsLayers").value(false))
-        ;
+            .andExpect(jsonPath("$.hideAdminsLayers").value(false));
     }
-
 
     @Test
     @Transactional
-    public void get_a_project_that_does_not_exist() throws Exception {
+    public void shouldReturnNotFoundWhenProjectDoesNotExist() throws Exception {
         restProjectControllerMockMvc.perform(get("/api/project/{id}.json", 0))
-            .andExpect(status().isNotFound())
-        ;
+            .andExpect(status().isNotFound());
     }
-
 
     @Test
     @Transactional
@@ -560,7 +547,6 @@ public class ProjectResourceTests {
         project = projectRepository.findByName("add_valid_project").get();
         assertThat(aclRepository.listMaskForUsers(project.getId(), builder.givenSuperAdmin().getUsername()))
             .contains(ADMINISTRATION.getMask());
-
     }
 
     @Test
@@ -812,7 +798,7 @@ public class ProjectResourceTests {
         builder.addUserToProject(projectNotOpened, builder.givenSuperAdmin().getUsername());
 
         assertThat(persistentProjectConnectionRepository.count()).isEqualTo(0);
-        given_a_persistent_connection_in_project(builder.givenSuperAdmin(), project, new Date());
+        givenAPersistentConnectionInProject(builder.givenSuperAdmin(), project, new Date());
         assertThat(persistentProjectConnectionRepository.count()).isEqualTo(1);
 
         restProjectControllerMockMvc.perform(get("/api/project/method/lastopened.json"))
@@ -1070,21 +1056,5 @@ public class ProjectResourceTests {
                 .param("endDate", DateUtils.addSeconds(start, 5).getTime() + ""))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$[?(@.project==" + project.getId() + ")]").doesNotExist());
-    }
-
-    @Autowired
-    ProjectConnectionService projectConnectionService;
-
-    PersistentProjectConnection given_a_persistent_connection_in_project(User user, Project project, Date created) {
-        PersistentProjectConnection connection = projectConnectionService.add(
-            user,
-            project,
-            "xxx",
-            "linux",
-            "chrome",
-            "123",
-            created
-        );
-        return connection;
     }
 }

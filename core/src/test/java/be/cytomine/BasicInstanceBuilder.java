@@ -148,17 +148,6 @@ public class BasicInstanceBuilder {
         return aGuest;
     }
 
-    public User givenAUser() {
-        return givenAUser(randomString());
-    }
-
-    public User givenAGuest() {
-        return givenAGuest(randomString());
-    }
-
-    public User givenAnAdmin() {
-        return givenAnAdmin(randomString());
-    }
 
     public User givenAUser(String username) {
         User user = persistAndReturn(givenANotPersistedUser());
@@ -166,6 +155,10 @@ public class BasicInstanceBuilder {
         user = persistAndReturn(user);
         addRole(user, ROLE_USER);
         return user;
+    }
+
+    public User givenAUser() {
+        return givenAUser(randomString());
     }
 
     public User givenAGuest(String username) {
@@ -176,12 +169,20 @@ public class BasicInstanceBuilder {
         return user;
     }
 
+    public User givenAGuest() {
+        return givenAGuest(randomString());
+    }
+
     public User givenAnAdmin(String username) {
         User user = givenANotPersistedUser();
         user.setUsername(username);
         user = persistAndReturn(user);
         addRole(user, ROLE_ADMIN);
         return user;
+    }
+
+    public User givenAnAdmin() {
+        return givenAnAdmin(randomString());
     }
 
     public RelationTerm givenANotPersistedRelationTerm(Relation relation, Term term1, Term term2) {
@@ -568,7 +569,7 @@ public class BasicInstanceBuilder {
         try {
             annotation.setLocation(new WKTReader().read("POLYGON ((1983 2168, 2107 2160, 2047 2074, 1983 2168))"));
         } catch (ParseException ignored) {
-
+            // TODO
         }
         annotation.setSlice(givenASliceInstance());
         annotation.setImage(annotation.getSlice().getImage());
@@ -582,7 +583,7 @@ public class BasicInstanceBuilder {
         try {
             annotation.setLocation(new WKTReader().read("POLYGON ((1983 2168, 2107 2160, 2047 2074, 1983 2168))"));
         } catch (ParseException ignored) {
-
+            // TODO
         }
         annotation.setSlice(givenASliceInstance());
         annotation.setImage(annotation.getSlice().getImage());

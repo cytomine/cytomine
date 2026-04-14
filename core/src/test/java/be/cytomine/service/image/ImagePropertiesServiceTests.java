@@ -36,8 +36,6 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.image.AbstractImage;
-import be.cytomine.repository.meta.PropertyRepository;
-import be.cytomine.service.middleware.ImageServerService;
 
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -58,13 +56,7 @@ public class ImagePropertiesServiceTests {
     BasicInstanceBuilder builder;
 
     @Autowired
-    ImageServerService imageServerService;
-
-    @Autowired
     ImagePropertiesService imagePropertiesService;
-
-    @Autowired
-    PropertyRepository propertyRepository;
 
     private static WireMockServer wireMockServer = new WireMockServer(8888);
 
@@ -75,10 +67,7 @@ public class ImagePropertiesServiceTests {
 
     @AfterAll
     public static void afterAll() {
-        try {
-            wireMockServer.stop();
-        } catch (Exception e) {
-        }
+        wireMockServer.stop();
     }
 
     @Test
@@ -86,7 +75,6 @@ public class ImagePropertiesServiceTests {
         AbstractImage image = builder.givenAnAbstractImage();
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
-
 
         image.setWidth(1);
         image.setPhysicalSizeX(2d);
@@ -150,7 +138,6 @@ public class ImagePropertiesServiceTests {
                     )
                 )
         );
-
 
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 image.getPath(),

@@ -69,7 +69,7 @@ public class TagResourceTests {
 
     @Test
     @Transactional
-    public void get_a_tag() throws Exception {
+    public void shouldReturnTagWithAllExpectedFields() throws Exception {
         Tag tag = builder.givenATag();
 
         restTagControllerMockMvc.perform(get("/api/tag/{id}.json", tag.getId()))
@@ -79,8 +79,7 @@ public class TagResourceTests {
             .andExpect(jsonPath("$.created").exists())
             .andExpect(jsonPath("$.name").value(tag.getName()))
             .andExpect(jsonPath("$.creatorName").value(builder.givenSuperAdmin().getUsername()))
-            .andExpect(jsonPath("$.user").value(builder.givenSuperAdmin().getId()))
-        ;
+            .andExpect(jsonPath("$.user").value(builder.givenSuperAdmin().getId()));
     }
 
     @Test
@@ -99,7 +98,6 @@ public class TagResourceTests {
             .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.tag.id").exists())
             .andExpect(jsonPath("$.tag.name").value(tag.getName()));
-
     }
 
     @Test
@@ -141,9 +139,7 @@ public class TagResourceTests {
             .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.tag.id").exists())
             .andExpect(jsonPath("$.tag.name").value("new name"));
-
     }
-
 
     @Test
     @Transactional
@@ -156,7 +152,6 @@ public class TagResourceTests {
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.success").value(false))
             .andExpect(jsonPath("$.errors").exists());
-
     }
 
     @Test
@@ -186,5 +181,4 @@ public class TagResourceTests {
             .andExpect(jsonPath("$.success").value(false))
             .andExpect(jsonPath("$.errors").exists());
     }
-
 }

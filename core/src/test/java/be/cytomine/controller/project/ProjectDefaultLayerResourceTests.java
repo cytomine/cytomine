@@ -81,7 +81,7 @@ public class ProjectDefaultLayerResourceTests {
 
     @Test
     @Transactional
-    public void get_a_projectDefaultLayer() throws Exception {
+    public void shouldReturnProjectDefaultLayerWithCorrectFields() throws Exception {
         ProjectDefaultLayer projectDefaultLayer = builder.givenAProjectDefaultLayer();
 
         restProjectDefaultLayerControllerMockMvc.perform(get(
@@ -93,36 +93,31 @@ public class ProjectDefaultLayerResourceTests {
             .andExpect(jsonPath("$.class").value("be.cytomine.domain.project.ProjectDefaultLayer"))
             .andExpect(jsonPath("$.user").value(projectDefaultLayer.getUser().getId()))
             .andExpect(jsonPath("$.project").value(projectDefaultLayer.getProject().getId()))
-            .andExpect(jsonPath("$.hideByDefault").value(false))
-        ;
+            .andExpect(jsonPath("$.hideByDefault").value(false));
     }
-
 
     @Test
     @Transactional
-    public void get_a_projectDefaultLayer_that_does_not_exists() throws Exception {
+    public void shouldReturnNotFoundWhenProjectDefaultLayerDoesNotExist() throws Exception {
         ProjectDefaultLayer projectDefaultLayer = builder.givenAProjectDefaultLayer();
 
         restProjectDefaultLayerControllerMockMvc.perform(get(
                 "/api/project/{project}/defaultlayer/{id}.json",
                 projectDefaultLayer.getProject().getId(), 0
             ))
-            .andExpect(status().isNotFound())
-        ;
+            .andExpect(status().isNotFound());
     }
-
 
     @Test
     @Transactional
-    public void get_a_projectDefaultLayer_from_project_that_does_not_exists() throws Exception {
+    public void shouldReturnNotFoundWhenProjectDoesNotExist() throws Exception {
         ProjectDefaultLayer projectDefaultLayer = builder.givenAProjectDefaultLayer();
 
         restProjectDefaultLayerControllerMockMvc.perform(get(
                 "/api/project/{project}/defaultlayer/{id}.json",
                 0, projectDefaultLayer.getId()
             ))
-            .andExpect(status().isNotFound())
-        ;
+            .andExpect(status().isNotFound());
     }
 
     @Test
@@ -142,7 +137,6 @@ public class ProjectDefaultLayerResourceTests {
             .andExpect(jsonPath("$.message").exists())
             .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.projectdefaultlayer.id").exists());
-
     }
 
     @Test
@@ -178,7 +172,6 @@ public class ProjectDefaultLayerResourceTests {
             .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.projectdefaultlayer.id").exists())
             .andExpect(jsonPath("$.projectdefaultlayer.hideByDefault").value(true));
-
     }
 
 

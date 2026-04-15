@@ -30,7 +30,7 @@ dev = [
 
 test = [
   "httpx==0.28.1",
-  "pytest==8.4.2",
+  "pytest==9.0.3",
   "testcontainers[redis]==4.13.3",
 ]
 

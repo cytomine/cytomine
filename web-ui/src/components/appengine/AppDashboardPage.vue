@@ -3,7 +3,14 @@
     <div class="panel">
       <div class="panel-heading">
         <p>{{ $t('app-dashboard') }}</p>
-        <b-button class="is-link" icon-pack="fa" icon-left="circle-play">{{ $t('app-engine.ae-run-task') }}</b-button>
+        <b-button
+          class="is-link"
+          icon-pack="fa"
+          icon-left="circle-play"
+          @click="showRunTaskModal = !showRunTaskModal"
+        >
+          {{ $t('app-engine.ae-run-task') }}
+        </b-button>
       </div>
 
       <section class="panel-block">
@@ -88,11 +95,14 @@
         </b-table>
       </section>
     </div>
+
+    <TaskModal :active.sync="showRunTaskModal" />
   </div>
 </template>
 
 <script>
 import Task from '@/utils/appengine/task';
+import TaskModal from '@/components/appengine/forms/TaskModal.vue';
 import TaskRun from '@/utils/appengine/task-run';
 import TaskRunParametersTable from '@/components/appengine/task-run/TaskRunParametersTable';
 import {get} from '@/utils/store-helpers';
@@ -100,6 +110,7 @@ import {get} from '@/utils/store-helpers';
 export default {
   name: 'AppDashboardPage',
   components: {
+    TaskModal,
     TaskRunParametersTable,
   },
   data() {
@@ -107,6 +118,7 @@ export default {
       taskRuns: [],
       currentPage: 1,
       perPage: 10,
+      showRunTaskModal: false,
     };
   },
   computed: {

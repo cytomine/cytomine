@@ -149,7 +149,7 @@ public class AnnotationDomainResourceTests {
     public static void beforeAll() {
         wireMockServer = new WireMockServer(8888);
         wireMockServer.start();
-
+        wireMockServer.resetMappings();
         setupStub();
     }
 

@@ -230,6 +230,16 @@ public class CytomineSteps {
                 + "'fa-mouse-pointer')]]"));
     }
 
+    public void undoAnnotation(Wait<WebDriver> wait) {
+        webDriverUtils.xpathClick(wait, "//button[not(@disabled) and .//i[contains(@class, 'fa-undo')]]");
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//button[@disabled and .//i[contains(@class, 'fa-undo')]]"));
+    }
+
+    public void redoAnnotation(Wait<WebDriver> wait) {
+        webDriverUtils.xpathClick(wait, "//button[not(@disabled) and .//i[contains(@class, 'fa-redo')]]");
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//button[@disabled and .//i[contains(@class, 'fa-redo')]]"));
+    }
+
     public void verifyAnnotationProcessedWithSam(Wait<WebDriver> wait) {
         verifyAnnotationCreated(wait);
         webDriverUtils.byIsDisplayed(wait, By.xpath("//*[contains(text(),'Successful SAM Processing !')]"));

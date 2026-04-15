@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import jakarta.persistence.EntityManager;
@@ -24,9 +25,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -34,8 +37,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import be.cytomine.common.repository.http.AnnotationHttpContract;
+import be.cytomine.common.repository.http.AnnotationTermHttpContract;
+import be.cytomine.common.repository.http.UserAnnotationHttpContract;
+import be.cytomine.common.repository.model.annotationterm.payload.CreateAnnotationTerm;
+import be.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
+import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import be.cytomine.common.repository.model.command.payload.response.UserAnnotationResponse;
+import be.cytomine.common.repository.model.userannotation.payload.CreateUserAnnotation;
+import be.cytomine.common.repository.model.userannotation.payload.UpdateUserAnnotation;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.image.ImageInstance;
@@ -44,12 +57,12 @@ import be.cytomine.domain.security.User;
 import be.cytomine.dto.annotation.AnnotationReportParams;
 import be.cytomine.dto.annotation.SimplifiedAnnotation;
 import be.cytomine.dto.image.CropParameter;
-import be.cytomine.exceptions.CytomineMethodNotYetImplementedException;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.AnnotationListing;
 import be.cytomine.repository.ontology.AnnotationDomainRepository;
 import be.cytomine.service.AnnotationListingService;
+import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.annotation.AnnotationReportService;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.middleware.ImageServerService;
@@ -64,6 +77,9 @@ import be.cytomine.utils.AnnotationListingBuilder;
 import be.cytomine.utils.GeometryUtils;
 import be.cytomine.utils.JsonNodeUtils;
 import be.cytomine.utils.JsonObject;
+
+import static java.lang.String.format;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -81,13 +97,17 @@ public class RestAnnotationDomainController extends RestCytomineController {
 
     private final UserService userService;
 
+    private final AnnotationHttpContract annotationHttpContract;
+
+    private final UserAnnotationHttpContract userAnnotationHttpContract;
+
+    private final AnnotationTermHttpContract annotationTermHttpContract;
+
+    private final CurrentUserService currentUserService;
+
     private final EntityManager entityManager;
 
     private final ParamsService paramsService;
-
-    private final RestUserAnnotationController restUserAnnotationController;
-
-    private final RestReviewedAnnotationController restReviewedAnnotationController;
 
     private final ImageServerService imageServerService;
 
@@ -122,13 +142,68 @@ public class RestAnnotationDomainController extends RestCytomineController {
         return responseSuccess(annotations, params.getJSONAttrLong("offset", 0L), params.getJSONAttrLong("max", 0L));
     }
 
+    @GetMapping("/annotation/{id}.json")
+    public ApplyCommandResponse show(@PathVariable long id) {
+        log.debug("REST request to get annotation {}", id);
+        long userId = currentUserService.getCurrentUser().getId();
+        return annotationHttpContract.findById(id, userId)
+            .orElseThrow(
+                () -> new ResponseStatusException(NOT_FOUND, format("Unable to find annotation with id: %d", id)));
+    }
+
+    @PostMapping("/annotation.json")
+    public Optional<HttpCommandResponse> add(@RequestBody LegacyAnnotationRequest request) {
+        log.debug("REST request to create annotation");
+        long userId = currentUserService.getCurrentUser().getId();
+        ImageInstance image = imageInstanceService.find(request.image())
+            .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", String.valueOf(request.image())));
+        long annotationUserId = request.user() != null ? request.user() : userId;
+        CreateUserAnnotation createUserAnnotation = new CreateUserAnnotation(
+            annotationUserId,
+            request.image(),
+            request.slice(),
+            image.getProject().getId(),
+            request.location(),
+            0.0
+        );
+        Optional<HttpCommandResponse> result = userAnnotationHttpContract.create(userId, createUserAnnotation);
+        result.ifPresent(response -> {
+            if (response.data() instanceof UserAnnotationResponse ua && request.term() != null) {
+                request.term().forEach(termId ->
+                    annotationTermHttpContract.create(userId,
+                        new CreateAnnotationTerm(ua.id(), termId, userId)));
+            }
+        });
+        return result;
+    }
+
+    record LegacyAnnotationRequest(Long user, Long image, Long slice, String location, List<Long> term) {}
+
+    @PutMapping("/annotation/{id}.json")
+    public HttpCommandResponse update(@PathVariable long id, @RequestBody UpdateUserAnnotation update) {
+        log.debug("REST request to update annotation {}", id);
+        long userId = currentUserService.getCurrentUser().getId();
+        return annotationHttpContract.update(id, userId, update)
+            .orElseThrow(
+                () -> new ResponseStatusException(NOT_FOUND, format("Unable to find annotation with id: %d", id)));
+    }
+
+    @DeleteMapping("/annotation/{id}.json")
+    public HttpCommandResponse delete(@PathVariable long id) {
+        log.debug("REST request to delete annotation {}", id);
+        long userId = currentUserService.getCurrentUser().getId();
+        return annotationHttpContract.delete(id, userId)
+            .orElseThrow(
+                () -> new ResponseStatusException(NOT_FOUND, format("Unable to find annotation with id: %d", id)));
+    }
+
     @RequestMapping(value = {"/project/{project}/annotation/download"}, method = {RequestMethod.POST})
     public void download(
         @PathVariable Long project,
         @RequestBody AnnotationReportParams params
     ) throws IOException {
 
-        boolean reviewed = Boolean.TRUE.equals(params.reviewed());
+
         String users = JsonNodeUtils.csvFromStringList(params.users());
         String reviewUsers = JsonNodeUtils.csvFromStringList(params.reviewUsers());
         String format = (params.format() == null || params.format().isBlank()) ? "pdf" : params.format();
@@ -142,7 +217,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
         bodyMap.put("format", format);
         bodyMap.put("users", users);
         bodyMap.put("reviewUsers", reviewUsers);
-        bodyMap.put("reviewed", reviewed);
+        bodyMap.put("reviewed", params.reviewed());
         bodyMap.put("terms", terms);
         bodyMap.put("images", images);
         bodyMap.put("beforeThan", beforeThan);
@@ -266,78 +341,6 @@ public class RestAnnotationDomainController extends RestCytomineController {
         return response;
     }
 
-    /**
-     * Read a specific annotation It's better to avoid the user of this method if we know the correct type of an
-     * annotation id Annotation x => annotation/x.json is slower than userannotation/x.json
-     */
-    @RequestMapping(value = "/annotation/{id}.json", method = {RequestMethod.GET})
-    public ResponseEntity<String> show(@PathVariable Long id) throws IOException {
-        AnnotationDomain annotation = AnnotationDomain.getAnnotationDomain(entityManager, id);
-        if (annotation.isUserAnnotation()) {
-            return restUserAnnotationController.show(id);
-        } else if (annotation.isReviewedAnnotation()) {
-            return restReviewedAnnotationController.show(id);
-        } else {
-            throw new CytomineMethodNotYetImplementedException("ROI annotation not yet implemented");
-        }
-    }
-
-    /**
-     * Add an annotation Redirect to the controller depending on the user type
-     */
-    @RequestMapping(value = "/annotation.json", method = {RequestMethod.POST})
-    public ResponseEntity<String> add(
-        @RequestBody String json,
-        @RequestParam(required = false, defaultValue = "false") Boolean roi,
-        @RequestParam(required = false) Long minPoint,
-        @RequestParam(required = false) Long maxPoint
-    ) throws IOException {
-        log.debug("REST request to create new annotation(s)");
-        ResponseEntity<String> response = restUserAnnotationController.add(json, minPoint, maxPoint);
-        log.debug("REST request to create new annotation(s) finished");
-        return response;
-    }
-
-    /**
-     * Update an annotation Redirect to the good controller with the annotation type
-     */
-    @RequestMapping(value = "/annotation/{id}.json", method = {RequestMethod.PUT})
-    public ResponseEntity<String> update(
-        @PathVariable Long id,
-        @RequestParam(required = false, defaultValue = "false") Boolean fill,
-        @RequestBody JsonObject jsonObject
-
-    ) throws IOException {
-        if (fill) {
-            return fillAnnotation(id);
-        } else {
-            AnnotationDomain annotation = AnnotationDomain.getAnnotationDomain(entityManager, id);
-            if (annotation.isUserAnnotation()) {
-                return restUserAnnotationController.edit(id.toString(), jsonObject);
-            } else if (annotation.isReviewedAnnotation()) {
-                return restReviewedAnnotationController.edit(id.toString(), jsonObject);
-            } else {
-                throw new CytomineMethodNotYetImplementedException("ROI annotation not yet implemented");
-            }
-        }
-    }
-
-    /**
-     * Delete an annotation Redirect to the good controller with the current user type
-     */
-    @RequestMapping(value = "/annotation/{id}.json", method = {RequestMethod.DELETE})
-    public ResponseEntity<String> delete(
-        @PathVariable Long id
-    ) throws IOException {
-        AnnotationDomain annotation = AnnotationDomain.getAnnotationDomain(entityManager, id);
-        if (annotation.isUserAnnotation()) {
-            return restUserAnnotationController.delete(id.toString());
-        } else if (annotation.isReviewedAnnotation()) {
-            return restReviewedAnnotationController.delete(id.toString());
-        } else {
-            throw new CytomineMethodNotYetImplementedException("ROI annotation not yet implemented");
-        }
-    }
 
     @RequestMapping(value = "/annotation/{id}/simplify.json", method = {RequestMethod.PUT})
     public ResponseEntity<String> simplify(

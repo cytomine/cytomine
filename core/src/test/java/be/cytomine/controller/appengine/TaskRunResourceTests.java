@@ -10,7 +10,6 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +19,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
 import be.cytomine.BasicInstanceBuilder;
@@ -30,7 +31,9 @@ import be.cytomine.domain.appengine.TaskRun;
 import be.cytomine.repository.appengine.TaskRunRepository;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -56,11 +59,17 @@ public class TaskRunResourceTests {
     @Value("${application.appEngine.apiBasePath}")
     private String apiBasePath;
 
-    private static final WireMockServer wireMockServer = new WireMockServer(8888);
+    private static final WireMockServer wireMockServer;
 
-    @BeforeAll
-    public static void beforeAll() {
+    static {
+        wireMockServer = new WireMockServer(wireMockConfig().dynamicPort());
         wireMockServer.start();
+        configureFor("localhost", wireMockServer.port());
+    }
+
+    @DynamicPropertySource
+    static void overrideProperties(DynamicPropertyRegistry registry) {
+        registry.add("application.appEngine.apiUrl", () -> "http://localhost:" + wireMockServer.port());
     }
 
     @AfterAll
@@ -181,7 +190,7 @@ public class TaskRunResourceTests {
             + "\"}]";
         String appEngineUriSection = "task-runs/" + taskRunId + "/input-provisions";
         wireMockServer.stubFor(WireMock.put(urlEqualTo(apiBasePath + appEngineUriSection))
-            .willReturn(aResponse().withBody(mockResponse)));
+            .willReturn(aResponse().withStatus(200).withBody(mockResponse)));
 
         mockMvc.perform(put("/api/app-engine/project/" + taskRun.getProject().getId() + "/" + appEngineUriSection)
                 .contentType(MediaType.APPLICATION_JSON)

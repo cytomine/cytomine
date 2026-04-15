@@ -86,7 +86,13 @@
     <include file="/config/liquibase/changelog/2026-04-10-relation-id-sequence.sql"
              relativeToChangelogFile="false"/>
 
-    <include file="/config/liquibase/changelog/2026-04-13-annotation-id-sequence.sql"
+    <include file="/config/liquibase/changelog/2026-04-13-user-annotation-id-sequence.sql"
+             relativeToChangelogFile="false"/>
+
+    <include file="/config/liquibase/changelog/2026-04-14-reviewed-annotation-id-sequence.sql"
+             relativeToChangelogFile="false"/>
+
+    <include file="/config/liquibase/changelog/2026-04-15-annotation-term-id-sequence.sql"
              relativeToChangelogFile="false"/>
 
 </databaseChangeLog>

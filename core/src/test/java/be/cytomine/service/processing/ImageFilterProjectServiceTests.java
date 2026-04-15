@@ -37,37 +37,40 @@ public class ImageFilterProjectServiceTests {
     BasicInstanceBuilder builder;
 
     @Test
-    public void find_image_filter_project_with_success() {
-        ImageFilterProject imageFilterProject = builder.given_a_image_filter_project();
+    public void findImageFilterProjectWithSuccess() {
+        ImageFilterProject imageFilterProject = builder.givenAnImageFilterProject();
         assertThat(imageFilterProjectService.find(imageFilterProject.getImageFilter(), imageFilterProject.getProject()))
-                .isPresent();
+            .isPresent();
     }
 
     @Test
-    public void find_unexisting_image_filter_project_return_empty() {
-        ImageFilterProject imageFilterProject = builder.given_a_image_filter_project();
-        assertThat(imageFilterProjectService.find(imageFilterProject.getImageFilter(), builder.given_a_project()))
-                .isEmpty();
+    public void findUnexistingImageFilterProjectReturnEmpty() {
+        ImageFilterProject imageFilterProject = builder.givenAnImageFilterProject();
+        assertThat(imageFilterProjectService.find(imageFilterProject.getImageFilter(), builder.givenAProject()))
+            .isEmpty();
     }
 
     @Test
-    public void list_all_image_filter_project() {
-        ImageFilterProject imageFilterProject = builder.given_a_image_filter_project();
+    public void listAllImageFilterProject() {
+        ImageFilterProject imageFilterProject = builder.givenAnImageFilterProject();
         assertThat(imageFilterProjectService.list()).contains(imageFilterProject);
     }
 
     @Test
-    public void list_all_image_filter_project_by_project() {
-        ImageFilterProject imageFilterProject = builder.given_a_image_filter_project();
-        ImageFilterProject imageFilterProjectForAnotherProject = builder.given_a_image_filter_project();
+    public void listAllImageFilterProjectByProject() {
+        ImageFilterProject imageFilterProject = builder.givenAnImageFilterProject();
+        ImageFilterProject imageFilterProjectForAnotherProject = builder.givenAnImageFilterProject();
         assertThat(imageFilterProjectService.list(imageFilterProject.getProject()))
-                .contains(imageFilterProject).doesNotContain(imageFilterProjectForAnotherProject);
+            .contains(imageFilterProject).doesNotContain(imageFilterProjectForAnotherProject);
     }
 
     @Test
-    public void add_valid_image_filter_project_with_success() {
+    public void addValidImageFilterProjectWithSuccess() {
         ImageFilterProject imageFilterProject =
-                builder.given_a_not_persisted_image_filter_project(builder.given_a_image_filter(), builder.given_a_project());
+            builder.givenANotPersistedImageFilterProject(
+                builder.givenAnImageFilter(),
+                builder.givenAProject()
+            );
         CommandResponse commandResponse = imageFilterProjectService.add(imageFilterProject.toJsonObject());
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -75,42 +78,57 @@ public class ImageFilterProjectServiceTests {
 
 
     @Test
-    public void add_already_existing_image_filter_project() {
+    public void addAlreadyExistingImageFilterProject() {
         ImageFilterProject imageFilterProject =
-                builder.given_a_not_persisted_image_filter_project(builder.given_a_image_filter(), builder.given_a_project());
+            builder.givenANotPersistedImageFilterProject(
+                builder.givenAnImageFilter(),
+                builder.givenAProject()
+            );
         builder.persistAndReturn(imageFilterProject);
 
-        Assertions.assertThrows(AlreadyExistException.class, () -> {
-            imageFilterProjectService.add(imageFilterProject.toJsonObject());
-        });
+        Assertions.assertThrows(
+            AlreadyExistException.class, () -> {
+                imageFilterProjectService.add(imageFilterProject.toJsonObject());
+            }
+        );
     }
 
     @Test
-    public void add_image_filter_with_unexisting_project_return_error() {
+    public void addImageFilterWithUnexistingProjectReturnError() {
         ImageFilterProject imageFilterProject =
-            builder.given_a_not_persisted_image_filter_project(builder.given_a_image_filter(),
-                basicInstanceBuilder.given_a_not_persisted_project());
-        Assertions.assertThrows(ObjectNotFoundException.class, () -> {
-            imageFilterProjectService.add(imageFilterProject.toJsonObject().withChange("project", 0L));
-        });
+            builder.givenANotPersistedImageFilterProject(
+                builder.givenAnImageFilter(),
+                basicInstanceBuilder.givenANotPersistedProject()
+            );
+        Assertions.assertThrows(
+            ObjectNotFoundException.class, () -> {
+                imageFilterProjectService.add(imageFilterProject.toJsonObject().withChange("project", 0L));
+            }
+        );
     }
 
     @Test
-    public void add_image_filter_with_unexisting_image_filter_return_error() {
+    public void addImageFilterWithUnexistingImageFilterReturnError() {
         ImageFilterProject imageFilterProject =
-                builder.given_a_not_persisted_image_filter_project(builder.given_a_not_persisted_image_filter(), builder.given_a_project());
-        Assertions.assertThrows(ObjectNotFoundException.class, () -> {
-            imageFilterProjectService.add(imageFilterProject.toJsonObject().withChange("imageFilter", 0L));
-        });
+            builder.givenANotPersistedImageFilterProject(
+                builder.givenANotPersistedImageFilter(),
+                builder.givenAProject()
+            );
+        Assertions.assertThrows(
+            ObjectNotFoundException.class, () -> {
+                imageFilterProjectService.add(imageFilterProject.toJsonObject().withChange("imageFilter", 0L));
+            }
+        );
     }
 
     @Test
-    void delete_projectRepresentativeUser_with_success() {
-        ImageFilterProject imageFilterProject = builder.given_a_image_filter_project();
+    void deleteProjectRepresentativeUserWithSuccess() {
+        ImageFilterProject imageFilterProject = builder.givenAnImageFilterProject();
         CommandResponse commandResponse = imageFilterProjectService.delete(imageFilterProject, null, null, true);
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
-        assertThat(imageFilterProjectService.find(imageFilterProject.getImageFilter(), imageFilterProject.getProject()).isEmpty());
+        assertThat(imageFilterProjectService.find(imageFilterProject.getImageFilter(), imageFilterProject.getProject())
+            .isEmpty());
     }
 }

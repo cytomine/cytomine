@@ -1,29 +1,7 @@
 package be.cytomine.authorization.image;
 
-/*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+import java.util.Optional;
 
-import be.cytomine.BasicInstanceBuilder;
-import be.cytomine.CytomineCoreApplication;
-import be.cytomine.authorization.CRUDAuthorizationTest;
-import be.cytomine.domain.image.SliceInstance;
-import be.cytomine.domain.project.EditingMode;
-import be.cytomine.service.PermissionService;
-import be.cytomine.service.image.SliceInstanceService;
-import be.cytomine.service.security.SecurityACLService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +11,12 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import be.cytomine.BasicInstanceBuilder;
+import be.cytomine.CytomineCoreApplication;
+import be.cytomine.authorization.CRUDAuthorizationTest;
+import be.cytomine.domain.image.SliceInstance;
+import be.cytomine.domain.project.EditingMode;
+import be.cytomine.service.image.SliceInstanceService;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.springframework.security.acls.domain.BasePermission.READ;
@@ -53,16 +36,10 @@ public class SliceInstanceAuthorizationTest extends CRUDAuthorizationTest {
     @Autowired
     BasicInstanceBuilder builder;
 
-    @Autowired
-    SecurityACLService securityACLService;
-
-    @Autowired
-    PermissionService permissionService;
-
     @BeforeEach
     public void before() throws Exception {
         if (sliceInstance == null) {
-            sliceInstance = builder.given_a_slice_instance();
+            sliceInstance = builder.givenASliceInstance();
             initACL(sliceInstance.container());
         }
         sliceInstance.getProject().setMode(EditingMode.CLASSIC);
@@ -71,87 +48,87 @@ public class SliceInstanceAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list_sliceInstances() {
+    public void adminCanListSliceInstances() {
         assertThat(sliceInstanceService.list(sliceInstance.getImage())).contains(sliceInstance);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_list_sliceInstances(){
+    public void userCanListSliceInstances() {
         assertThat(sliceInstanceService.list(sliceInstance.getImage())).contains(sliceInstance);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_delete_in_restricted_mode(){
+    public void userCannotDeleteInRestrictedMode() {
         sliceInstance.getProject().setMode(EditingMode.RESTRICTED);
-        expectForbidden(() -> when_i_delete_domain());
+        expectForbidden(() -> whenIDeleteDomain());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void user_admin_can_add_in_readonly_mode(){
+    public void userAdminCanAddInReadonlyMode() {
         sliceInstance.getProject().setMode(EditingMode.READ_ONLY);
-        expectOK(() -> when_i_add_domain());
+        expectOK(() -> whenIAddDomain());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void user_admin_can_edi_in_readonly_mode(){
+    public void userAdminCanEdiInReadonlyMode() {
         sliceInstance.getProject().setMode(EditingMode.READ_ONLY);
-        expectOK(() -> when_i_edit_domain());
+        expectOK(() -> whenIEditDomain());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void user_admin_can_delete_in_readonly_mode(){
+    public void userAdminCanDeleteInReadonlyMode() {
         sliceInstance.getProject().setMode(EditingMode.READ_ONLY);
-        expectOK(() -> when_i_delete_domain());
+        expectOK(() -> whenIDeleteDomain());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_add_in_readonly_mode(){
+    public void userCannotAddInReadonlyMode() {
         sliceInstance.getProject().setMode(EditingMode.READ_ONLY);
-        expectForbidden(() -> when_i_add_domain());
+        expectForbidden(() -> whenIAddDomain());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_edit_in_readonly_mode(){
+    public void userCannotEditInReadonlyMode() {
         sliceInstance.getProject().setMode(EditingMode.READ_ONLY);
-        expectForbidden(() -> when_i_edit_domain());
+        expectForbidden(() -> whenIEditDomain());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_delete_in_readonly_mode(){
+    public void userCannotDeleteInReadonlyMode() {
         sliceInstance.getProject().setMode(EditingMode.READ_ONLY);
-        expectForbidden(() -> when_i_delete_domain());
+        expectForbidden(() -> whenIDeleteDomain());
     }
 
 
     @Override
-    public void when_i_get_domain() {
+    public void whenIGetDomain() {
         sliceInstanceService.get(sliceInstance.getId());
     }
 
     @Override
-    protected void when_i_add_domain() {
+    protected void whenIAddDomain() {
         sliceInstanceService.add(
-                builder.given_a_not_persisted_slice_instance(
-                        builder.given_an_image_instance(sliceInstance.getProject()),
-                        builder.given_an_abstract_slice()
-                ).toJsonObject());
+            builder.givenANotPersistedSliceInstance(
+                builder.givenAnImageInstance(sliceInstance.getProject()),
+                builder.givenAnAbstractSlice()
+            ).toJsonObject());
     }
 
     @Override
-    public void when_i_edit_domain() {
+    public void whenIEditDomain() {
         sliceInstanceService.update(sliceInstance, sliceInstance.toJsonObject());
     }
 
     @Override
-    protected void when_i_delete_domain() {
+    protected void whenIDeleteDomain() {
         SliceInstance sliceInstanceToDelete = sliceInstance;
         sliceInstanceService.delete(sliceInstanceToDelete, null, null, true);
     }

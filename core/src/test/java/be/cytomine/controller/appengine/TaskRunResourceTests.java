@@ -183,11 +183,8 @@ public class TaskRunResourceTests {
             + taskRunId
             + "\"}]";
         String appEngineUriSection = "task-runs/" + taskRunId + "/input-provisions";
-        stubFor(WireMock.put(urlEqualTo(apiBasePath + appEngineUriSection))
-            .willReturn(
-                aResponse().withBody(mockResponse)
-            )
-        );
+        wireMockServer.stubFor(WireMock.put(urlEqualTo(apiBasePath + appEngineUriSection))
+            .willReturn(aResponse().withBody(mockResponse)));
 
         mockMvc.perform(put("/api/app-engine/project/" + taskRun.getProject().getId() + "/" + appEngineUriSection)
                 .contentType(MediaType.APPLICATION_JSON)

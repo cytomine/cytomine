@@ -1,7 +1,10 @@
 <template>
   <div class="content-wrapper">
     <div class="panel">
-      <p class="panel-heading">{{ $t('app-dashboard') }}</p>
+      <div class="panel-heading">
+        <p>{{ $t('app-dashboard') }}</p>
+        <b-button class="is-link" icon-pack="fa" icon-left="circle-play">{{ $t('app-engine.ae-run-task') }}</b-button>
+      </div>
 
       <section class="panel-block">
         <b-table
@@ -195,5 +198,11 @@ export default {
   overflow-y: auto;
   white-space: pre-wrap;
   word-break: break-all;
+}
+
+.panel-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 </style>

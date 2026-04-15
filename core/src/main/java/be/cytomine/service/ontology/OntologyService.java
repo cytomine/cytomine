@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;
@@ -35,7 +36,6 @@ import be.cytomine.domain.command.DeleteCommand;
 import be.cytomine.domain.command.EditCommand;
 import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.ontology.Ontology;
-import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.AlreadyExistException;
@@ -71,6 +71,9 @@ public class OntologyService extends ModelService {
 
     @Autowired
     private ProjectRepository projectRepository;
+
+    @Autowired
+    TermHttpContract termHttpContract;
 
     @Autowired
     private TermService termService;
@@ -182,8 +185,7 @@ public class OntologyService extends ModelService {
     public void checkDoNotAlreadyExist(CytomineDomain domain) {
         Ontology ontology = (Ontology) domain;
         if (ontology != null && ontology.getName() != null) {
-            if (ontologyRepository.findByName(ontology.getName())
-                .stream()
+            if (ontologyRepository.findByName(ontology.getName()).stream()
                 .anyMatch(x -> !Objects.equals(x.getId(), ontology.getId()))) {
                 throw new AlreadyExistException("Ontology " + ontology.getName() + " already exist!");
             }
@@ -202,8 +204,10 @@ public class OntologyService extends ModelService {
     }
 
     private void deleteDependentTerm(Ontology ontology, Transaction transaction, Task task) {
-        for (Term term : termService.list(ontology)) {
-            termService.delete(term, transaction, task, false);
+        Long userId = currentUserService.getCurrentUser().getId();
+        for (long termId : termService.list(ontology)) {
+            termHttpContract.delete(termId, userId);
+
         }
         //otherwise, when you write the json, term cannot be found (because term link is LAZY + term deleted)
         ontology.setTerms(new HashSet<>());

@@ -35,6 +35,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
@@ -68,6 +70,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -119,7 +122,21 @@ public class AnnotationDomainResourceTests {
     ReviewedAnnotation r5;
     ReviewedAnnotation r6;
 
-    private static WireMockServer wireMockServer;
+    private final static WireMockServer wireMockServer;
+
+    static {
+        wireMockServer = new WireMockServer(wireMockConfig().dynamicPort());
+        wireMockServer.start();
+        configureFor("localhost", wireMockServer.port());
+        setupStub();
+    }
+
+    @DynamicPropertySource
+    static void overrideProperties(DynamicPropertyRegistry registry) {
+        registry.add("application.appEngine.apiUrl", () -> "http://localhost:" + wireMockServer.port());
+        registry.add("application.cbirURL", () -> "http://localhost:" + wireMockServer.port());
+        registry.add("application.pimsURL", () -> "http://localhost:" + wireMockServer.port());
+    }
 
     private static void setupStub() {
         /* Simulate call to PIMS */
@@ -137,14 +154,6 @@ public class AnnotationDomainResourceTests {
             .withQueryParam("index", equalTo("annotation"))
             .willReturn(aResponse().withBody(UUID.randomUUID().toString()))
         );
-    }
-
-    @BeforeAll
-    public static void beforeAll() {
-        wireMockServer = new WireMockServer(8888);
-        wireMockServer.start();
-        wireMockServer.resetMappings();
-        setupStub();
     }
 
     @AfterAll
@@ -1121,11 +1130,10 @@ public class AnnotationDomainResourceTests {
     @Test
     @Transactional
     public void getUserAnnotationCrop() throws Exception {
-        UserAnnotation
-            annotation
-            = UserAnnotationResourceTests.givenAUserAnnotationWithValidImageServer(builder);
+        UserAnnotation annotation = UserAnnotationResourceTests.givenAUserAnnotationWithValidImageServer(
+            builder
+        );
 
-        configureFor("localhost", 8888);
         byte[] mockResponse = UUID.randomUUID().toString().getBytes();
 
         String url = "/image/" + URLEncoder.encode("1636379100999/CMU-2/CMU-2.mrxs", StandardCharsets.UTF_8)
@@ -1135,12 +1143,9 @@ public class AnnotationDomainResourceTests {
             = "{\"length\":512,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))\"}],\"timepoints\":0,\"background_transparency\":0}";
         System.out.println(url);
         System.out.println(body);
-        stubFor(WireMock.post(urlEqualTo(IMS_API_BASE_PATH + url)).withRequestBody(WireMock.equalTo(
-                    body
-                ))
-                .willReturn(
-                    aResponse().withBody(mockResponse)
-                )
+        stubFor(WireMock.post(urlEqualTo(IMS_API_BASE_PATH + url))
+            .withRequestBody(WireMock.equalTo(body))
+            .willReturn(aResponse().withBody(mockResponse))
         );
 
         MvcResult mvcResult = restAnnotationDomainControllerMockMvc.perform(get(
@@ -1157,11 +1162,10 @@ public class AnnotationDomainResourceTests {
     @Test
     @jakarta.transaction.Transactional
     public void getReviewedAnnotationCrop() throws Exception {
-        ReviewedAnnotation
-            annotation
-            = ReviewedAnnotationResourceTests.givenAReviewedAnnotationWithValidImageServer(builder);
+        ReviewedAnnotation annotation = ReviewedAnnotationResourceTests.givenAReviewedAnnotationWithValidImageServer(
+            builder
+        );
 
-        configureFor("localhost", 8888);
         byte[] mockResponse = UUID.randomUUID().toString().getBytes();
 
         String url = "/image/" + URLEncoder.encode("1636379100999/CMU-2/CMU-2.mrxs", StandardCharsets.UTF_8)
@@ -1171,12 +1175,9 @@ public class AnnotationDomainResourceTests {
             = "{\"length\":512,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))\"}],\"timepoints\":0,\"background_transparency\":0}";
         System.out.println(url);
         System.out.println(body);
-        stubFor(WireMock.post(urlEqualTo(IMS_API_BASE_PATH + url)).withRequestBody(WireMock.equalTo(
-                    body
-                ))
-                .willReturn(
-                    aResponse().withBody(mockResponse)
-                )
+        stubFor(WireMock.post(urlEqualTo(IMS_API_BASE_PATH + url))
+            .withRequestBody(WireMock.equalTo(body))
+            .willReturn(aResponse().withBody(mockResponse))
         );
 
         MvcResult mvcResult = restAnnotationDomainControllerMockMvc.perform(get(
@@ -1206,7 +1207,6 @@ public class AnnotationDomainResourceTests {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(annotation.getId()));
     }
-
 
     @Test
     @Transactional
@@ -1267,7 +1267,6 @@ public class AnnotationDomainResourceTests {
             .andExpect(jsonPath("$.annotation.id").exists());
 
     }
-
 
     @Test
     @org.springframework.transaction.annotation.Transactional

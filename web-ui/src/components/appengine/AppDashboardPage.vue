@@ -96,7 +96,7 @@
       </section>
     </div>
 
-    <TaskModal :active.sync="showRunTaskModal" />
+    <TaskModal :active.sync="showRunTaskModal" :tasks="tasks" />
   </div>
 </template>
 
@@ -115,6 +115,7 @@ export default {
   },
   data() {
     return {
+      tasks: [],
       taskRuns: [],
       currentPage: 1,
       perPage: 10,
@@ -126,6 +127,9 @@ export default {
     currentUser: get('currentUser/user'),
   },
   methods: {
+    async fetchTasks() {
+      this.tasks = await Task.fetchAll();
+    },
     async fetchTaskRuns() {
       let taskRuns = await TaskRun.fetchByProject(this.currentProject.id);
       taskRuns.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -197,7 +201,10 @@ export default {
     },
   },
   async created() {
-    await this.fetchTaskRuns();
+    await Promise.all([
+      this.fetchTasks(),
+      this.fetchTaskRuns(),
+    ]);
   },
 };
 </script>

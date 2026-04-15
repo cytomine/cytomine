@@ -157,7 +157,7 @@ public class RetrievalService {
             .build()
             .toUri();
 
-        log.debug("Delete index for annotation {}:{}", annotation.getId(), url);
+        log.debug("Delete index for annotation {}", annotation.getId());
         return restTemplate.exchange(
             url,
             HttpMethod.DELETE,

@@ -29,8 +29,6 @@ import be.cytomine.domain.appengine.TaskRun;
 import be.cytomine.repository.appengine.TaskRunRepository;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -62,7 +60,6 @@ public class TaskRunResourceTests {
     @BeforeAll
     public static void beforeAll() {
         wireMockServer.start();
-        configureFor("localhost", 8888);
     }
 
     @AfterAll
@@ -98,10 +95,8 @@ public class TaskRunResourceTests {
         );
         String mockResponse = objectMapper.writeValueAsString(mockResponseMap);
 
-        stubFor(WireMock.post(urlEqualTo(apiBasePath + "tasks/" + taskId + "/runs"))
-            .willReturn(
-                aResponse().withBody(mockResponse).withHeader("Content-Type", "application/json")
-            )
+        wireMockServer.stubFor(WireMock.post(urlEqualTo(apiBasePath + "tasks/" + taskId + "/runs"))
+            .willReturn(aResponse().withBody(mockResponse).withHeader("Content-Type", "application/json"))
         );
 
         mockResponseMap = Map.of(
@@ -116,10 +111,8 @@ public class TaskRunResourceTests {
 
         mockResponse = objectMapper.writeValueAsString(List.of(mockResponseMap));
 
-        stubFor(WireMock.get(urlEqualTo(apiBasePath + "tasks/" + taskId + "/outputs"))
-            .willReturn(
-                aResponse().withBody(mockResponse).withHeader("Content-Type", "application/json")
-            )
+        wireMockServer.stubFor(WireMock.get(urlEqualTo(apiBasePath + "tasks/" + taskId + "/outputs"))
+            .willReturn(aResponse().withBody(mockResponse).withHeader("Content-Type", "application/json"))
         );
 
         mockMvc.perform(post("/api/app-engine/project/" + taskRun.getProject().getId() + "/tasks/" + taskId + "/runs")
@@ -146,10 +139,8 @@ public class TaskRunResourceTests {
             + taskRunId
             + "\"}";
         String appEngineUriSection = "task-runs/" + taskRunId + "/input-provisions/" + paramName;
-        stubFor(WireMock.put(urlEqualTo(apiBasePath + appEngineUriSection))
-            .willReturn(
-                aResponse().withBody(mockResponse)
-            )
+        wireMockServer.stubFor(WireMock.put(urlEqualTo(apiBasePath + appEngineUriSection))
+            .willReturn(aResponse().withBody(mockResponse))
         );
 
         mockMvc.perform(put("/api/app-engine/project/" + taskRun.getProject().getId() + "/" + appEngineUriSection)
@@ -203,10 +194,8 @@ public class TaskRunResourceTests {
         UUID taskRunId = taskRun.getTaskRunId();
         String mockResponse = getTaskRunBody(taskRunId);
         String appEngineUriSection = "task-runs/" + taskRunId;
-        stubFor(WireMock.get(urlEqualTo(apiBasePath + appEngineUriSection))
-            .willReturn(
-                aResponse().withBody(mockResponse)
-            )
+        wireMockServer.stubFor(WireMock.get(urlEqualTo(apiBasePath + appEngineUriSection))
+            .willReturn(aResponse().withBody(mockResponse))
         );
 
         mockMvc.perform(get("/api/app-engine/project/" + taskRun.getProject().getId() + "/" + appEngineUriSection)
@@ -226,10 +215,8 @@ public class TaskRunResourceTests {
         String queryBody = "{\"desired\": \"running\"}";
         String mockResponse = getTaskRunBody(taskRunId);
         String appEngineUriSection = "task-runs/" + taskRunId + "/state-actions";
-        stubFor(WireMock.post(urlEqualTo(apiBasePath + appEngineUriSection))
-            .willReturn(
-                aResponse().withBody(mockResponse)
-            )
+        wireMockServer.stubFor(WireMock.post(urlEqualTo(apiBasePath + appEngineUriSection))
+            .willReturn(aResponse().withBody(mockResponse))
         );
 
         mockMvc.perform(post("/api/app-engine/project/" + taskRun.getProject().getId() + "/" + appEngineUriSection)

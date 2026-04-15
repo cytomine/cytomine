@@ -5,7 +5,7 @@ import java.util.Optional;
 import be.cytomine.common.repository.model.command.payload.request.UpdateCommandPayload;
 
 public sealed interface UpdateCommandRequest<T> extends CommandV2Request<T>
-    permits UpdateTermCommand, UpdateTermRelationCommand {
+    permits UpdateReviewedAnnotationCommand, UpdateTermCommand, UpdateTermRelationCommand {
 
     T before();
 

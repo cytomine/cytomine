@@ -142,7 +142,7 @@ export default class Model {
     if (this.isNew()) {
       let {data} = await Cytomine.instance.api.post(this.uri, this.getPublicProperties());
       this.populate(data.data ?? data[this.callbackIdentifier]);
-      Cytomine.instance.lastCommand = data.command;
+      Cytomine.instance.lastCommand = data.commandId ?? data.command;
       return this;
     } else {
       return this.update();
@@ -161,7 +161,7 @@ export default class Model {
 
     let {data} = await Cytomine.instance.api.put(this.uri, this.getPublicProperties());
     this.populate(data.data ?? data[this.callbackIdentifier]);
-    Cytomine.instance.lastCommand = data.command;
+    Cytomine.instance.lastCommand = data.commandId ?? data.command;
     return this;
   }
 
@@ -183,7 +183,7 @@ export default class Model {
     }
 
     let {data} = await Cytomine.instance.api.delete(this.uri);
-    Cytomine.instance.lastCommand = data.command;
+    Cytomine.instance.lastCommand = data.commandId ?? data.command;
   }
 
   /**

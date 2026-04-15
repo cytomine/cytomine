@@ -19,6 +19,9 @@ package be.cytomine.controller.ontology;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.TestUtils;
+import be.cytomine.common.repository.http.ReviewedAnnotationHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import be.cytomine.common.repository.model.command.payload.response.ReviewedAnnotationResponse;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.properties.ApplicationProperties;
@@ -56,15 +59,22 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -92,6 +102,9 @@ public class ReviewedAnnotationResourceTests {
     @Autowired
     private ApplicationProperties applicationProperties;
 
+    @MockitoBean
+    private ReviewedAnnotationHttpContract reviewedAnnotationHttpContract;
+
     private static WireMockServer wireMockServer = new WireMockServer(8888);
 
     private Project project;
@@ -116,28 +129,32 @@ public class ReviewedAnnotationResourceTests {
     @Test
     @Transactional
     public void get_a_reviewed_annotation() throws Exception {
+        Long userId = builder.given_superadmin().getId();
         ReviewedAnnotation reviewedAnnotation = builder.given_a_reviewed_annotation();
-        reviewedAnnotation.getTerms().add(builder.given_a_term());
+        when(reviewedAnnotationHttpContract.findById(eq(reviewedAnnotation.getId()), eq(userId)))
+            .thenReturn(Optional.of(new ReviewedAnnotationResponse(
+                reviewedAnnotation.getId(), userId, userId,
+                reviewedAnnotation.getImage().getId(), reviewedAnnotation.getSlice().getId(),
+                reviewedAnnotation.getProject().getId(),
+                reviewedAnnotation.getParentIdent(), reviewedAnnotation.getParentClassName(), 0,
+                reviewedAnnotation.getWktLocation(), 0.0,
+                List.of(),
+                LocalDateTime.now(), LocalDateTime.now(), Optional.empty())));
+
         restReviewedAnnotationControllerMockMvc.perform(get("/api/reviewedannotation/{id}.json", reviewedAnnotation.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(reviewedAnnotation.getId().intValue()))
-                .andExpect(jsonPath("$.class").value("be.cytomine.domain.ontology.ReviewedAnnotation"))
-                .andExpect(jsonPath("$.created").value(reviewedAnnotation.getCreated().getTime()))
-                .andExpect(jsonPath("$.location").value(reviewedAnnotation.getWktLocation()))
-                .andExpect(jsonPath("$.image").value(reviewedAnnotation.getImage().getId().intValue()))
-                .andExpect(jsonPath("$.project").value(reviewedAnnotation.getProject().getId().intValue()))
-                .andExpect(jsonPath("$.user").value(reviewedAnnotation.getUser().getId()))
-                .andExpect(jsonPath("$.parentIdent").exists())
-                .andExpect(jsonPath("$.parentClassName").exists())
-                .andExpect(jsonPath("$.centroid.x").exists())
-                .andExpect(jsonPath("$.centroid.y").exists())
-                .andExpect(jsonPath("$.term", hasSize(equalTo(1))))
-                .andExpect(jsonPath("$.term[0]").value(reviewedAnnotation.getTerms().get(0).getId().intValue()));
+                .andExpect(jsonPath("$.imageId").value(reviewedAnnotation.getImage().getId().intValue()))
+                .andExpect(jsonPath("$.projectId").value(reviewedAnnotation.getProject().getId().intValue()))
+                .andExpect(jsonPath("$.userId").value(userId.intValue()))
+                .andExpect(jsonPath("$.wktLocation").value(reviewedAnnotation.getWktLocation()));
     }
 
     @Test
     @Transactional
     public void get_a_reviewed_annotation_not_exists() throws Exception {
+        Long userId = builder.given_superadmin().getId();
+        when(reviewedAnnotationHttpContract.findById(eq(0L), eq(userId))).thenReturn(Optional.empty());
         restReviewedAnnotationControllerMockMvc.perform(get("/api/reviewedannotation/{id}.json", 0))
                 .andExpect(status().isNotFound());
     }
@@ -277,67 +294,94 @@ public class ReviewedAnnotationResourceTests {
     @Test
     @Transactional
     public void add_valid_reviewed_annotation() throws Exception {
+        Long userId = builder.given_superadmin().getId();
         ReviewedAnnotation reviewedAnnotation = builder.given_a_not_persisted_reviewed_annotation();
+        ReviewedAnnotationResponse annotationData = new ReviewedAnnotationResponse(
+            999L, userId, userId,
+            reviewedAnnotation.getImage().getId(), reviewedAnnotation.getSlice().getId(),
+            reviewedAnnotation.getProject().getId(),
+            reviewedAnnotation.getParentIdent(), reviewedAnnotation.getParentClassName(), 0,
+            reviewedAnnotation.getWktLocation(), 0.0,
+            List.of(),
+            LocalDateTime.now(), LocalDateTime.now(), Optional.empty());
+        when(reviewedAnnotationHttpContract.create(eq(userId), any()))
+            .thenReturn(Optional.of(new HttpCommandResponse(true, annotationData, UUID.randomUUID(), "ADD_REVIEWED_ANNOTATION")));
+
         restReviewedAnnotationControllerMockMvc.perform(post("/api/reviewedannotation.json")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(reviewedAnnotation.toJSON()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.printMessage").value(true))
-                .andExpect(jsonPath("$.callback").exists())
-                .andExpect(jsonPath("$.callback.reviewedannotationID").exists())
-                .andExpect(jsonPath("$.callback.method").value("be.cytomine.AddReviewedAnnotationCommand"))
-                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.data").exists())
+                .andExpect(jsonPath("$.commandId").exists())
                 .andExpect(jsonPath("$.command").exists());
-
     }
 
     @Test
     @Transactional
     public void edit_valid_reviewed_annotation() throws Exception {
+        Long userId = builder.given_superadmin().getId();
         ReviewedAnnotation reviewedAnnotation = builder.given_a_reviewed_annotation();
+        ReviewedAnnotationResponse annotationData = new ReviewedAnnotationResponse(
+            reviewedAnnotation.getId(), userId, userId,
+            reviewedAnnotation.getImage().getId(), reviewedAnnotation.getSlice().getId(),
+            reviewedAnnotation.getProject().getId(),
+            reviewedAnnotation.getParentIdent(), reviewedAnnotation.getParentClassName(), 0,
+            reviewedAnnotation.getWktLocation(), 0.0,
+            List.of(),
+            LocalDateTime.now(), LocalDateTime.now(), Optional.empty());
+        when(reviewedAnnotationHttpContract.update(eq(reviewedAnnotation.getId()), eq(userId), any()))
+            .thenReturn(Optional.of(new HttpCommandResponse(true, annotationData, UUID.randomUUID(), "UPDATE_REVIEWED_ANNOTATION")));
+
         restReviewedAnnotationControllerMockMvc.perform(put("/api/reviewedannotation/{id}.json", reviewedAnnotation.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(reviewedAnnotation.toJSON()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.printMessage").value(true))
-                .andExpect(jsonPath("$.callback").exists())
-                .andExpect(jsonPath("$.callback.reviewedannotationID").exists())
-                .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditReviewedAnnotationCommand"))
-                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.data").exists())
+                .andExpect(jsonPath("$.commandId").exists())
                 .andExpect(jsonPath("$.command").exists());
-
     }
 
 
     @Test
     @Transactional
     public void delete_reviewed_annotation() throws Exception {
+        Long userId = builder.given_superadmin().getId();
         ReviewedAnnotation reviewedAnnotation = builder.given_a_reviewed_annotation();
+        ReviewedAnnotationResponse annotationData = new ReviewedAnnotationResponse(
+            reviewedAnnotation.getId(), userId, userId,
+            reviewedAnnotation.getImage().getId(), reviewedAnnotation.getSlice().getId(),
+            reviewedAnnotation.getProject().getId(),
+            reviewedAnnotation.getParentIdent(), reviewedAnnotation.getParentClassName(), 0,
+            reviewedAnnotation.getWktLocation(), 0.0,
+            List.of(),
+            LocalDateTime.now(), LocalDateTime.now(), Optional.empty());
+        when(reviewedAnnotationHttpContract.delete(eq(reviewedAnnotation.getId()), eq(userId)))
+            .thenReturn(Optional.of(new HttpCommandResponse(true, annotationData, UUID.randomUUID(), "DELETE_REVIEWED_ANNOTATION")));
+
         restReviewedAnnotationControllerMockMvc.perform(delete("/api/reviewedannotation/{id}.json", reviewedAnnotation.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(reviewedAnnotation.toJSON()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.printMessage").value(true))
-                .andExpect(jsonPath("$.callback").exists())
-                .andExpect(jsonPath("$.callback.reviewedannotationID").exists())
-                .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteReviewedAnnotationCommand"))
-                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.data").exists())
+                .andExpect(jsonPath("$.commandId").exists())
                 .andExpect(jsonPath("$.command").exists());
-
     }
 
 
     @Test
     @Transactional
     public void delete_reviewed_annotation_not_exist_fails() throws Exception {
+        Long userId = builder.given_superadmin().getId();
+        when(reviewedAnnotationHttpContract.delete(eq(0L), eq(userId))).thenReturn(Optional.empty());
+
         ReviewedAnnotation reviewedAnnotation = builder.given_a_reviewed_annotation();
         restReviewedAnnotationControllerMockMvc.perform(delete("/api/reviewedannotation/{id}.json", 0)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(reviewedAnnotation.toJSON()))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.errors").exists());
-
+                .andExpect(status().isNotFound());
     }
 
 

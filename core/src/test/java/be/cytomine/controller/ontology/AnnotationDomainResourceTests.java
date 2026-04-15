@@ -137,12 +137,6 @@ public class AnnotationDomainResourceTests {
             .withQueryParam("index", equalTo("annotation"))
             .willReturn(aResponse().withBody(UUID.randomUUID().toString()))
         );
-
-        wireMockServer.stubFor(WireMock.delete(urlPathMatching(CBIR_API_BASE_PATH + "/images/.*"))
-            .withQueryParam("storage", matching(".*"))
-            .withQueryParam("index", equalTo("annotation"))
-            .willReturn(aResponse().withBody(UUID.randomUUID().toString()))
-        );
     }
 
     @BeforeAll
@@ -1291,11 +1285,16 @@ public class AnnotationDomainResourceTests {
             .andExpect(jsonPath("$.command").exists());
     }
 
-
     @Test
     @org.springframework.transaction.annotation.Transactional
     public void deleteUserAnnotation() throws Exception {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
+
+        wireMockServer.stubFor(WireMock.delete(urlPathMatching(CBIR_API_BASE_PATH + "/images/.*"))
+            .withQueryParam("storage", equalTo(userAnnotation.getProject().getId().toString()))
+            .withQueryParam("index", equalTo("annotation"))
+            .willReturn(aResponse().withBody(UUID.randomUUID().toString()))
+        );
 
         restAnnotationDomainControllerMockMvc.perform(delete("/api/annotation/{id}.json", userAnnotation.getId())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -1308,9 +1307,7 @@ public class AnnotationDomainResourceTests {
             .andExpect(jsonPath("$.message").exists())
             .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.annotation.id").exists());
-
     }
-
 
     @Test
     @org.springframework.transaction.annotation.Transactional

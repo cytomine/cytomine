@@ -121,7 +121,7 @@ public class AnnotationDomainResourceTests {
     ReviewedAnnotation r5;
     ReviewedAnnotation r6;
 
-    private final static WireMockServer wireMockServer;
+    private static final WireMockServer wireMockServer;
 
     static {
         wireMockServer = new WireMockServer(wireMockConfig().dynamicPort());

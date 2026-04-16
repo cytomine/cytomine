@@ -274,13 +274,13 @@ public class StatsServiceTests {
     void statsTermSlide() {
         Project project = builder.givenAProject();
 
-        List<StatTerm> results = statsService.statTermSlide(project, null, null);
+        List<StatTerm> results = statsService.statTermSlide(project, Optional.empty(), Optional.empty());
         results.removeIf(x -> x.id() == 0);
         assertThat(results).hasSize(0);
 
         Term term = builder.givenATerm(project.getOntology());
 
-        results = statsService.statTermSlide(project, null, null);
+        results = statsService.statTermSlide(project, Optional.empty(), Optional.empty());
         results.removeIf(x -> x.id() == 0);
         assertThat(results).hasSize(1);
         assertThat(results.get(0).id()).isEqualTo(term.getId());
@@ -291,7 +291,7 @@ public class StatsServiceTests {
         builder.givenAnAnnotationTerm(annotation1, term);
         builder.persistAndReturn(annotation1);
 
-        results = statsService.statTermSlide(project, null, null);
+        results = statsService.statTermSlide(project, Optional.empty(), Optional.empty());
         results.removeIf(x -> x.id() == 0);
         assertThat(results).hasSize(1);
         assertThat(results.get(0).id()).isEqualTo(term.getId());
@@ -299,7 +299,7 @@ public class StatsServiceTests {
 
         builder.givenATerm(project.getOntology());
 
-        results = statsService.statTermSlide(project, null, null);
+        results = statsService.statTermSlide(project, Optional.empty(), Optional.empty());
         results.removeIf(x -> x.id() == 0);
         assertThat(results).hasSize(2);
 

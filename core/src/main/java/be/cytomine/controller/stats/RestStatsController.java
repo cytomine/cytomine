@@ -86,7 +86,8 @@ public class RestStatsController extends RestCytomineController {
         Optional<LocalDateTime> startLocalDateTime = startDateLong.map(Instant::ofEpochMilli).map(LocalDateTime::from);
         Optional<LocalDateTime> endLocalDateTime = startDateLong.map(Instant::ofEpochMilli).map(LocalDateTime::from);
 
-        return responseSuccess(statsService.statTermSlide(project, startLocalDateTime, endLocalDateTime));
+        return responseSuccess(
+            statsService.statTermSlide(project, startLocalDateTime, endLocalDateTime));
     }
 
     @GetMapping("/project/{project}/stats/termimage.json")

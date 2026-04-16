@@ -71,6 +71,7 @@ import be.cytomine.service.security.UserService;
 import be.cytomine.utils.JsonObject;
 
 import static be.cytomine.utils.SQLUtils.castToLong;
+import static java.util.stream.Collectors.toSet;
 import static org.springframework.security.acls.domain.BasePermission.READ;
 
 @Service
@@ -252,14 +253,14 @@ public class StatsService {
         return new ArrayList<>(result.values());
     }
 
-    public List<StatTerm> statTermSlide(Project project, Optional<LocalDateTime> startDate, Optional<LocalDateTime> endDate) {
+    public List<StatTerm> statTermSlide(Project project, Optional<LocalDateTime> startDate,
+                                        Optional<LocalDateTime> endDate) {
         securityACLService.check(project, READ);
-        Map<Long, StatTerm> result = pagesClient.callAllPages(
-                page -> statsHttpContract.findTermsByProject(project.getOntology().getId(),
-                    currentUserService.getCurrentUser().getId(),startDate, endDate, page)).stream()
-            .map(statTerm -> Map.entry(statTerm.id(), statTerm))
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-        return new ArrayList<>(result.values());
+        Long userId = currentUserService.getCurrentUser().getId();
+
+        return new ArrayList<>(pagesClient.callAllPages(
+            (page, size) -> statsHttpContract.findTermsByProject(project.getOntology().getId(),
+                userId, startDate, endDate, page, size)));
     }
 
     public List<JsonObject> statPerTermAndImage(Project project, Date startDate, Date endDate) {
@@ -294,7 +295,7 @@ public class StatsService {
             long userId = currentUserService.getCurrentUser().getId();
             long ontologyId = project.getOntology().getId();
             Set<Long> nonLeafTermIds = termRelationHttpContract.findAllByOntologyId(ontologyId, userId).stream()
-                .map(TermRelationResponse::term1Id).collect(Collectors.toSet());
+                .map(TermRelationResponse::term1Id).collect(toSet());
             terms = project.getOntology().getTerms().stream().filter(t -> !nonLeafTermIds.contains(t.getId()))
                 .collect(Collectors.toList());
         } else {

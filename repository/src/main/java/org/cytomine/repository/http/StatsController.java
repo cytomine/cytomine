@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
+import org.cytomine.repository.mapper.StatsMapper;
 import org.cytomine.repository.persistence.TermRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,11 +18,12 @@ import be.cytomine.common.repository.model.stat.payload.StatTerm;
 public class StatsController implements StatsHttpContract {
 
     private final TermRepository termRepository;
+    private final StatsMapper statsMapper;
 
     @Override
     public Page<StatTerm> findTermsByProject(long projectId, long userId, Optional<LocalDateTime> startDate,
                                              Optional<LocalDateTime> endDate, Pageable pageable) {
         return termRepository.findAllByProjectForStats(projectId, startDate.orElse(null), endDate.orElse(null),
-            pageable).map(p -> new StatTerm(p.getId(), p.getKey(), p.getValue(), p.getColor()));
+            pageable).map(statsMapper::map);
     }
 }

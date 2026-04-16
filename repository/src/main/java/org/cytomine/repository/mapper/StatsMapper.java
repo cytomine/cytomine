@@ -5,7 +5,7 @@ import org.mapstruct.Mapper;
 
 import be.cytomine.common.repository.model.stat.payload.StatTerm;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface StatsMapper {
 
     StatTerm map(StatTermProjection statTermProjection);

@@ -20,7 +20,7 @@ import static be.cytomine.common.repository.http.StatsHttpContract.ROOT_PATH;
 public interface StatsHttpContract {
     String ROOT_PATH = "/stats";
 
-    @GetExchange("/ontology/{projectId}")
+    @GetExchange("/project/{projectId}")
     Page<StatTerm> findTermsByProject(@PathVariable long projectId, @RequestParam long userId,
                                       @RequestParam(required = false) Optional<LocalDateTime> startDate,
                                       @RequestParam(required = false) Optional<LocalDateTime> endDate,

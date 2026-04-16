@@ -1,5 +1,8 @@
 package be.cytomine.common.repository.http;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,7 +20,10 @@ import static be.cytomine.common.repository.http.StatsHttpContract.ROOT_PATH;
 public interface StatsHttpContract {
     String ROOT_PATH = "/stats";
 
-    @GetExchange("/ontology/{id}")
-    Page<StatTerm> findTermsByOntology(@PathVariable long id, @RequestParam long userId, Pageable pageable);
+    @GetExchange("/ontology/{projectId}")
+    Page<StatTerm> findTermsByProject(@PathVariable long projectId, @RequestParam long userId,
+                                      @RequestParam(required = false) Optional<LocalDateTime> startDate,
+                                      @RequestParam(required = false) Optional<LocalDateTime> endDate,
+                                      Pageable pageable);
 
 }

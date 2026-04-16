@@ -1,7 +1,9 @@
 package be.cytomine.service.stats;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
@@ -304,8 +306,8 @@ public class StatsServiceTests {
         results.removeIf(x -> x.id() == 0);
         assertThat(results).hasSize(2);
 
-        results =
-            statsService.statTermSlide(project, DateUtils.addDays(new Date(), -40), DateUtils.addDays(new Date(), -20));
+        results = statsService.statTermSlide(project, Optional.of(LocalDateTime.now().minusDays(42)),
+            Optional.of(LocalDateTime.now().minusDays(20)));
         results.removeIf(x -> x.id() == 0);
         assertThat(results).hasSize(2);
         assertThat(results.get(0).value()).isEqualTo(0);

@@ -18,6 +18,7 @@ package be.cytomine.service.stats;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -251,23 +252,15 @@ public class StatsService {
         return new ArrayList<>(result.values());
     }
 
-    public List<StatTerm> statTermSlide(Project project, Date startDate, Date endDate) {
+    public List<StatTerm> statTermSlide(Project project, Optional<LocalDateTime> startDate, Optional<LocalDateTime> endDate) {
         securityACLService.check(project, READ);
         Map<Long, StatTerm> result = pagesClient.callAllPages(
-                page -> statsHttpContract.findTermsByOntology(project.getOntology().getId(),
-                    currentUserService.getCurrentUser().getId(), page)).stream()
+                page -> statsHttpContract.findTermsByProject(project.getOntology().getId(),
+                    currentUserService.getCurrentUser().getId(),startDate, endDate, page)).stream()
             .map(statTerm -> Map.entry(statTerm.id(), statTerm))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
 
-        //add an item for the annotations not associated to any term
-        //  result.put(0L, JsonObject.of("value", 0));
-
-        // Get the number of annotation for each term
-        String request = "SELECT at.term_id, count(DISTINCT ua.image_id) " + "FROM user_annotation ua " +
-            "LEFT JOIN annotation_term at " + "ON at.user_annotation_id = ua.id " + "WHERE ua.project_id = " +
-            project.getId() + " " + (startDate != null ? "AND at.created > '" + startDate + "'" : "") +
-            (endDate != null ? "AND at.created < '" + endDate + "'" : "") + "GROUP BY at.term_id ";
 
 //        List<Tuple> rows = entityManager.createNativeQuery(request, Tuple.class).getResultList();
 

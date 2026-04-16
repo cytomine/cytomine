@@ -21,16 +21,8 @@
 <div v-else class="cytomine-viewer">
   <b-loading :is-full-page="false" :active="loading" />
 
-  <div class="ae-sidebar" :class="{collapsed: !showAppEngineSidebar}">
-    <button
-      class="toggle-ae-sidebar"
-      type="button"
-      :aria-expanded="showAppEngineSidebar"
-      @click="toggleAppEngineSidebar"
-    >
-      <i class="fas" :class="showAppEngineSidebar ? 'fa-chevron-left' : 'fa-chevron-right'"></i>
-    </button>
-    <div class="ae-sidebar-content" v-show="showAppEngineSidebar">
+  <div class="ae-sidebar" :class="{collapsed: appPanelCollapsed}">
+    <div class="ae-sidebar-content" v-show="!appPanelCollapsed">
       <app-engine-sidebar></app-engine-sidebar>
     </div>
   </div>
@@ -88,7 +80,6 @@ export default {
       loading: true,
       reloadInterval: null,
       idViewer: null,
-      showAppEngineSidebar: true
     };
   },
   computed: {
@@ -111,6 +102,17 @@ export default {
     },
     viewer() {
       return this.viewers[this.idViewer];
+    },
+    viewerWrapper() {
+      return this.$store.getters['currentProject/currentViewer'];
+    },
+    appPanelCollapsed: {
+      get() {
+        return this.viewerWrapper?.appPanelCollapsed ?? false;
+      },
+      set(value) {
+        this.$store.commit(this.viewerModule + 'setAppPanelCollapsed', value);
+      }
     },
     indexImages() {
       return this.viewer ? Object.keys(this.viewer.images) : [];
@@ -184,7 +186,7 @@ export default {
     nbImages() {
       this.$eventBus.$emit('updateMapSize');
     },
-    showAppEngineSidebar(newValue, oldValue) {
+    appPanelCollapsed(newValue, oldValue) {
       if (newValue === oldValue) {
         return;
       }
@@ -332,10 +334,6 @@ export default {
     shortkeyEvent(event) {
       this.$eventBus.$emit('shortkeyEvent', event.srcKey);
     },
-
-    toggleAppEngineSidebar() {
-      this.showAppEngineSidebar = !this.showAppEngineSidebar;
-    }
   },
   async created() {
     this.findIdViewer();
@@ -373,8 +371,8 @@ export default {
 }
 
 .ae-sidebar.collapsed {
-  width: 3rem;
-  min-width: 3rem;
+  width: 0rem;
+  min-width: 0rem;
 }
 
 .ae-sidebar-content {

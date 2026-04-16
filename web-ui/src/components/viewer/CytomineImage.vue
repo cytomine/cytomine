@@ -161,6 +161,12 @@
             </a>
             <review-panel class="panel-options" v-show="activePanel === 'review'" :index="index" />
           </li>
+
+          <li>
+            <a @click="appPanelCollapsed = !appPanelCollapsed" :class="{active: activePanel === 'run-task'}">
+              <i class="fas fa-flask"></i>
+            </a>
+          </li>
         </template>
       </ul>
     </div>
@@ -353,7 +359,14 @@ export default {
     maxZoom() {
       return this.$store.getters[this.imageModule + 'maxZoom'];
     },
-
+    appPanelCollapsed: {
+      get() {
+        return this.viewerWrapper.appPanelCollapsed;
+      },
+      set(value) {
+        this.$store.commit(this.viewerModule + 'setAppPanelCollapsed', value);
+      }
+    },
     center: {
       get() {
         return this.imageWrapper.view.center;

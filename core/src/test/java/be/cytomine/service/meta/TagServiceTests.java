@@ -1,25 +1,36 @@
 package be.cytomine.service.meta;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
+import org.assertj.core.api.AssertionsForClassTypes;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
-import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.meta.Tag;
 import be.cytomine.domain.meta.TagDomainAssociation;
 import be.cytomine.exceptions.AlreadyExistException;
@@ -32,17 +43,6 @@ import be.cytomine.service.PermissionService;
 import be.cytomine.service.command.TransactionService;
 import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.utils.CommandResponse;
-import org.assertj.core.api.AssertionsForClassTypes;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.security.test.context.support.WithMockUser;
-
-import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -84,45 +84,45 @@ public class TagServiceTests {
     EntityManager entityManager;
 
     @Test
-    void list_all_tag_with_success() {
-        Tag tag = builder.given_a_tag();
+    void listAllTagWithSuccess() {
+        Tag tag = builder.givenATag();
         assertThat(tag).isIn(tagService.list());
     }
 
     @Test
-    void get_tag_with_success() {
-        Tag tag = builder.given_a_tag();
+    void getTagWithSuccess() {
+        Tag tag = builder.givenATag();
         assertThat(tag).isEqualTo(tagService.get(tag.getId()));
     }
 
     @Test
-    void get_unexisting_tag_return_null() {
+    void getUnexistingTagReturnNull() {
         assertThat(tagService.get(0L)).isNull();
     }
 
     @Test
-    void find_tag_with_success() {
-        Tag tag = builder.given_a_tag();
+    void findTagWithSuccess() {
+        Tag tag = builder.givenATag();
         assertThat(tagService.find(tag.getId()).isPresent());
         assertThat(tag).isEqualTo(tagService.find(tag.getId()).get());
     }
 
     @Test
-    void find_unexisting_tag_return_empty() {
+    void findUnexistingTagReturnEmpty() {
         assertThat(tagService.find(0L)).isEmpty();
     }
 
     @Test
-    void find_tag_by_name_with_success() {
-        Tag tag = builder.given_a_tag();
+    void findTagByNameWithSuccess() {
+        Tag tag = builder.givenATag();
         assertThat(tagService.findByName(tag.getName()).isPresent());
         assertThat(tag).isEqualTo(tagService.find(tag.getId()).get());
     }
 
 
     @Test
-    void add_valid_tag_with_success() {
-        Tag tag = builder.given_a_not_persisted_tag("xxx");
+    void addValidTagWithSuccess() {
+        Tag tag = builder.givenANotPersistedTag("xxx");
 
         CommandResponse commandResponse = tagService.add(tag.toJsonObject());
 
@@ -134,26 +134,30 @@ public class TagServiceTests {
     }
 
     @Test
-    void add_tag_with_null_name_fail() {
-        Tag tag = builder.given_a_not_persisted_tag("");
-        Assertions.assertThrows(WrongArgumentException.class, () -> {
-            tagService.add(tag.toJsonObject());
-        });
+    void addTagWithNullNameFail() {
+        Tag tag = builder.givenANotPersistedTag("");
+        Assertions.assertThrows(
+            WrongArgumentException.class, () -> {
+                tagService.add(tag.toJsonObject());
+            }
+        );
     }
 
     @Test
-    void add_tag_with_already_existing_name() {
-        Tag tagWithSameName = builder.given_a_tag();
-        Tag tag = builder.given_a_not_persisted_tag(tagWithSameName.getName());
-        Assertions.assertThrows(AlreadyExistException.class, () -> {
-            tagService.add(tag.toJsonObject());
-        });
+    void addTagWithAlreadyExistingName() {
+        Tag tagWithSameName = builder.givenATag();
+        Tag tag = builder.givenANotPersistedTag(tagWithSameName.getName());
+        Assertions.assertThrows(
+            AlreadyExistException.class, () -> {
+                tagService.add(tag.toJsonObject());
+            }
+        );
     }
 
 
     @Test
-    void edit_valid_tag_with_success() {
-        Tag tag = builder.given_a_tag();
+    void editValidTagWithSuccess() {
+        Tag tag = builder.givenATag();
 
         CommandResponse commandResponse = tagService.update(tag, tag.toJsonObject().withChange("name", "NEW NAME"));
 
@@ -166,8 +170,8 @@ public class TagServiceTests {
 
 
     @Test
-    void delete_tag_with_success() {
-        Tag tag = builder.given_a_tag();
+    void deleteTagWithSuccess() {
+        Tag tag = builder.givenATag();
 
         CommandResponse commandResponse = tagService.delete(tag, null, null, true);
 
@@ -177,15 +181,16 @@ public class TagServiceTests {
     }
 
     @Test
-    void delete_tag_with_dependencies_with_success() {
-        Tag tag = builder.given_a_tag();
-        TagDomainAssociation tagDomainAssociation = builder.given_a_tag_association(tag, builder.given_a_project());
+    void deleteTagWithDependenciesWithSuccess() {
+        Tag tag = builder.givenATag();
+        TagDomainAssociation tagDomainAssociation = builder.givenATagAssociation(tag, builder.givenAProject());
 
         CommandResponse commandResponse = tagService.delete(tag, null, null, true);
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
         AssertionsForClassTypes.assertThat(entityManager.find(Tag.class, tag.getId())).isNull();
-        AssertionsForClassTypes.assertThat(entityManager.find(TagDomainAssociation.class, tagDomainAssociation.getId())).isNull();
+        AssertionsForClassTypes.assertThat(entityManager.find(TagDomainAssociation.class, tagDomainAssociation.getId()))
+            .isNull();
     }
 }

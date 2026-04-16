@@ -428,7 +428,7 @@ public class UserAnnotationService extends ModelService {
             );
             ((Map<String, Object>) commandResponse.getData().get("annotation")).put(
                 "track",
-                annotationTracks.stream().map(x -> x.getTrack()).collect(Collectors.toList())
+                annotationTracks.stream().map(AnnotationTrack::getTrack).collect(Collectors.toList())
             );
         }
 
@@ -712,8 +712,7 @@ public class UserAnnotationService extends ModelService {
             based.setLocation(oldLocation);
             result = update(based, jsonObject);
 
-            for (int i = 0; i < allAnnotationWithSameTerm.size(); i++) {
-                UserAnnotation other = allAnnotationWithSameTerm.get(i);
+            for (UserAnnotation other : allAnnotationWithSameTerm) {
                 other.setLocation(other.getLocation().difference(newGeometry));
                 update(other, other.toJsonObject());
             }

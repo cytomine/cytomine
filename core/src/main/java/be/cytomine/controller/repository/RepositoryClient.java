@@ -8,6 +8,9 @@ import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
 import be.cytomine.common.repository.http.HealthService;
+import be.cytomine.common.repository.http.TermHttpContract;
+import be.cytomine.common.repository.http.TermRelationHttpContract;
+
 
 @Configuration
 public class RepositoryClient {
@@ -17,16 +20,27 @@ public class RepositoryClient {
 
     @Bean
     RestClient repositoryRestClient() {
-        return RestClient.builder()
-            .baseUrl(repositoryURL)
-            .build();
+        return RestClient.builder().baseUrl(repositoryURL).build();
     }
 
     @Bean
     HealthService healthServiceClient(RestClient repositoryRestClient) {
         RestClientAdapter adapter = RestClientAdapter.create(repositoryRestClient);
-        HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(adapter)
-            .build();
+        HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(adapter).build();
         return factory.createClient(HealthService.class);
+    }
+
+    @Bean
+    TermHttpContract termServiceClient(RestClient repositoryRestClient) {
+        RestClientAdapter adapter = RestClientAdapter.create(repositoryRestClient);
+        HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(adapter).build();
+        return factory.createClient(TermHttpContract.class);
+    }
+
+    @Bean
+    TermRelationHttpContract termRelationServiceClient(RestClient repositoryRestClient) {
+        RestClientAdapter adapter = RestClientAdapter.create(repositoryRestClient);
+        HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(adapter).build();
+        return factory.createClient(TermRelationHttpContract.class);
     }
 }

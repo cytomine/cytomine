@@ -16,6 +16,7 @@ package be.cytomine.domain.ontology;
  * limitations under the License.
  */
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
@@ -63,17 +64,8 @@ public class Term extends CytomineDomain {
 
     private String color;
 
-    public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
-        Term term = this;
-        term.id = json.getJSONAttrLong("id", null);
-        term.name = json.getJSONAttrStr("name", true);
-        term.comment = json.getJSONAttrStr("comment");
-        term.color = json.getJSONAttrStr("color", true);
-        term.ontology = (Ontology) json.getJSONAttrDomain(entityManager, "ontology", new Ontology(), true);
-        term.created = json.getJSONAttrDate("created");
-        term.updated = json.getJSONAttrDate("updated");
-        return term;
-    }
+    @Column
+    private Date deleted;
 
     public static JsonObject getDataFromDomain(CytomineDomain domain) {
         JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
@@ -84,6 +76,18 @@ public class Term extends CytomineDomain {
         returnArray.put("color", term.getColor());
         returnArray.put("parent", term.parent().map(Term::getId).orElse(null));
         return returnArray;
+    }
+
+    public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
+        Term term = this;
+        term.id = json.getJSONAttrLong("id", null);
+        term.name = json.getJSONAttrStr("name", true);
+        term.comment = json.getJSONAttrStr("comment");
+        term.color = json.getJSONAttrStr("color", true);
+        term.ontology = (Ontology) json.getJSONAttrDomain(entityManager, "ontology", new Ontology(), true);
+        term.created = json.getJSONAttrDate("created");
+        term.updated = json.getJSONAttrDate("updated");
+        return term;
     }
 
     public Optional<Term> parent() {
@@ -97,12 +101,13 @@ public class Term extends CytomineDomain {
     }
 
     public Set<Term> children() {
-        if (this.relationsRight == null) {
+        if (this.relationsLeft == null) {
             return Set.of();
         }
         return this.relationsLeft.stream()
             .filter(x -> x.getRelation().name.equals(PARENT))
             .map(RelationTerm::getTerm2)
+            .filter(t -> t.getDeleted() == null)
             .collect(Collectors.toSet());
     }
 

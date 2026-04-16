@@ -324,7 +324,7 @@
         <module name="OverloadMethodsDeclarationOrder" />
         <module name="ConstructorsDeclarationGrouping" />
         <module name="VariableDeclarationUsageDistance">
-            <property name="allowedDistance" value="10" />
+            <property name="allowedDistance" value="20" />
         </module>
         <module name="CustomImportOrder">
             <property name="sortImportsInGroupAlphabetically" value="true" />

@@ -1,7 +1,8 @@
 package org.cytomine.e2etests.ui;
 
-import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -9,6 +10,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Wait;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class WebDriverUtils {
 
@@ -25,6 +27,15 @@ public class WebDriverUtils {
             } catch (Exception e) {
                 return false;
             }
+        });
+    }
+
+    void byClear(Wait<WebDriver> wait, By by) {
+        wait.until(d -> {
+            WebElement el = d.findElement(by);
+            el.sendKeys(Keys.CONTROL + "a");
+            el.sendKeys(Keys.DELETE);
+            return true;
         });
     }
 
@@ -46,6 +57,17 @@ public class WebDriverUtils {
         });
     }
 
+    void byHitEnter(Wait<WebDriver> wait, By by) {
+        wait.until(d -> {
+            try {
+                d.findElement(by).sendKeys(Keys.ENTER);
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        });
+    }
+
     void goTo(Wait<WebDriver> wait, String url) {
         wait.until(
             d -> {
@@ -58,18 +80,9 @@ public class WebDriverUtils {
             });
     }
 
-    @SneakyThrows
-    boolean byIsDisplayed(Wait<WebDriver> wait, By by) {
-        Thread.sleep(500);
+    void byIsDisplayed(Wait<WebDriver> wait, By by) {
         waitLoading(wait);
-        wait.until(d -> {
-            try {
-                return ExpectedConditions.visibilityOfElementLocated(by);
-            } catch (Exception e) {
-                return false;
-            }
-        });
-        return true;
+        wait.until(d -> ExpectedConditions.visibilityOfElementLocated(by).apply(d));
     }
 
     void waitLoading(Wait<WebDriver> wait) {
@@ -78,14 +91,15 @@ public class WebDriverUtils {
                 var loadingOverlays = d.findElements(By.cssSelector(".loading-overlay.is-active"));
                 return loadingOverlays.isEmpty();
             });
-        } catch (TimeoutException ignored) {
+        } catch (TimeoutException e) {
+            log.warn("Loading overlay still present after timeout. Continuing test execution.", e);
         }
     }
 
     void waitUntilByEmpty(Wait<WebDriver> wait, By by) {
         wait.until(d -> {
             try {
-                return d.findElements(by).isEmpty();
+                return d.findElements(by).stream().noneMatch(WebElement::isDisplayed);
             } catch (Exception e) {
                 return false;
             }

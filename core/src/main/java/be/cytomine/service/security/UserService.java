@@ -46,6 +46,7 @@ import be.cytomine.domain.project.ProjectRepresentativeUser;
 import be.cytomine.domain.security.SecUserSecRole;
 import be.cytomine.domain.security.User;
 import be.cytomine.domain.social.LastConnection;
+import be.cytomine.domain.social.PersistentProjectConnection;
 import be.cytomine.dto.auth.AuthInformation;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.ConstraintException;
@@ -791,7 +792,7 @@ public class UserService extends ModelService {
                     user.getId(),
                     project.getId(),
                     PageRequest.of(0, 1, Sort.by(Sort.Direction.ASC, "created"))
-                ).stream().findFirst().map(x -> x.getCreated()).orElse(null)
+                ).stream().findFirst().map(PersistentProjectConnection::getCreated).orElse(null)
         );
         jsonObject.put(
             "lastConnection", persistentProjectConnectionRepository
@@ -799,7 +800,7 @@ public class UserService extends ModelService {
                     user.getId(),
                     project.getId(),
                     PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "created"))
-                ).stream().findFirst().map(x -> x.getCreated()).orElse(null)
+                ).stream().findFirst().map(PersistentProjectConnection::getCreated).orElse(null)
         );
 
         jsonObject.put("totalAnnotations", userAnnotationService.count(user, project));

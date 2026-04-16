@@ -50,7 +50,7 @@ public class StringUtils {
             return "<EMPTY>";
         }
         if (numberOfCharsToKeepOnEachSide * 2 < property.length()) {
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
             for (int i = 0; i < property.length() - (numberOfCharsToKeepOnEachSide * 2); i++) {
                 buffer.append("*");
             }
@@ -85,7 +85,7 @@ public class StringUtils {
     }
 
     public static Map<String, String> splitQuery(URL url) throws UnsupportedEncodingException {
-        Map<String, String> queryPairs = new LinkedHashMap<String, String>();
+        Map<String, String> queryPairs = new LinkedHashMap<>();
         String query = url.getQuery();
         String[] pairs = query.split("&");
         for (String pair : pairs) {

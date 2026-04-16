@@ -15,7 +15,7 @@ classifiers = [
 ]
 dependencies = [
   "cachecontrol==0.14.2",
-  "requests==2.32.4",
+  "requests==2.33.0",
   "requests-toolbelt==1.0.0",
   "shapely==2.0.7",
   "urllib3==2.6.3",
@@ -27,7 +27,7 @@ dev = [
   "ruff==0.12.11",
 ]
 test = [
-  "pytest==8.3.5",
+  "pytest==9.0.3",
 ]
 
 [project.urls]

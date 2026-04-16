@@ -135,7 +135,7 @@ public class FileManager {
         assert manifest != null;
         String manifestContent = IOUtils.readString(manifest.getContent().get(),
             StandardCharsets.UTF_8);
-        List<ManifestFile> manifestFiles = JsonUtil.fromJson(manifestContent, new TypeToken<List<ManifestFile>>() {});
+        List<ManifestFile> manifestFiles = JsonUtil.fromJson(manifestContent, new TypeToken<>() {});
         if (manifestFiles.size() == 0) {
             throw new TarFileErrException("manifest.json error");
         }

@@ -111,9 +111,7 @@ public class RestUploadedFileController extends RestCytomineController {
         UploadedFile uploadedFile = uploadedFileService.find(id, authorization)
             .orElseThrow(() -> new ObjectNotFoundException("UploadedFile", id));
 
-        StreamingResponseBody stream = outputStream -> {
-            imageServerService.streamDownload(uploadedFile, outputStream);
-        };
+        StreamingResponseBody stream = outputStream -> imageServerService.streamDownload(uploadedFile, outputStream);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);

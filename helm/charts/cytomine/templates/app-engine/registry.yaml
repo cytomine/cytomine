@@ -43,6 +43,28 @@ spec:
               mountPath: /data
             - name: temp
               mountPath: /tmp
+          startupProbe:
+            httpGet:
+              path: /v2/
+              port: {{ .Values.app_engine.registry.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 30
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /v2/
+              port: {{ .Values.app_engine.registry.port }}
+            periodSeconds: 5
+            failureThreshold: 3
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /v2/
+              port: {{ .Values.app_engine.registry.port }}
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 5
       volumes:
       - emptyDir: {}
         name: temp

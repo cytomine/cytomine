@@ -353,16 +353,12 @@ public class ProjectConnectionService {
             limit = Integer.MAX_VALUE;
         }
 
-        Page<PersistentProjectConnection>
-            results
-            = persistentProjectConnectionRepository.findAllByUserAndProject(
+        Page<PersistentProjectConnection> results = persistentProjectConnectionRepository.findAllByUserAndProject(
             user.getId(),
             project.getId(),
             PageRequest.of(offset, limit, Sort.Direction.DESC, "created")
         );
-        List<PersistentProjectConnection>
-            connections
-            = new ArrayList<PersistentProjectConnection>(results.getContent());
+        List<PersistentProjectConnection> connections = new ArrayList<>(results.getContent());
         if (connections.size() == 0) {
             return Page.empty();
         }

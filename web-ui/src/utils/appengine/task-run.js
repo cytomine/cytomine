@@ -45,13 +45,11 @@ export default class TaskRun extends Model {
   _initProperties() {
     super._initProperties();
     this.project = null;
+    this.user = null;
     this.task = new Task();
     this.state = null;
-    /* eslint-disable */
-    this.created_at = null;
-    this.updated_at = null;
-    this.last_state_transition_at = null;
-    /* eslint-enable */
+    this.createdAt = null;
+    this.updatedAt = null;
   }
 
   static async fetchByProject(projectId) {
@@ -65,6 +63,10 @@ export default class TaskRun extends Model {
 
   isTerminalState() {
     return TaskRun.TERMINAL_STATES.has(this.state);
+  }
+
+  async delete() {
+    await Cytomine.instance.api.delete(this.uri);
   }
 
   // Step-2: Provision task / user inputs
@@ -109,5 +111,16 @@ export default class TaskRun extends Model {
   async fetchSingleIO(parameterName, type) {
     let {data} = await Cytomine.instance.api.get(`${this.uri}/${type}/${parameterName}`, {responseType: 'arraybuffer'});
     return data;
+  }
+
+  async fetchLogs() {
+    if (this.state !== TaskRun.STATES.FINISHED) {
+      return null;
+    }
+
+    const logs = (await Cytomine.instance.api.get(`${this.uri}/logs`)).data;
+    Vue.set(this, 'logs', logs);
+
+    return logs;
   }
 }

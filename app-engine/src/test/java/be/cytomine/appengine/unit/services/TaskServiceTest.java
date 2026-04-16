@@ -342,7 +342,11 @@ public class TaskServiceTest {
     void createRunForTaskByNamespaceAndVersionShouldThrowRunTaskServiceException() throws Exception {
         when(taskRepository.findByNamespaceAndVersion(task.getNamespace(), task.getVersion())).thenReturn(null);
 
-        String expectedMessage = "task {" + task.getNamespace() + ":" +  task.getVersion() + "} not found to associate with this run";
+        String expectedMessage = String.format(
+            "task {%s:%s} not found to associate with this run",
+            task.getNamespace(),
+            task.getVersion()
+        );
 
         RunTaskServiceException exception = assertThrows(
             RunTaskServiceException.class,

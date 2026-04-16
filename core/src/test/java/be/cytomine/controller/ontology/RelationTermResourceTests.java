@@ -1,20 +1,20 @@
 package be.cytomine.controller.ontology;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -75,27 +75,29 @@ public class RelationTermResourceTests {
     private TermRelationHttpContract termRelationHttpContract;
 
     private TermRelationResponse buildResponse(RelationTerm relationTerm, long ontologyId) {
-        return new TermRelationResponse(relationTerm.getId(), relationTerm.getTerm1().getId(),
+        return new TermRelationResponse(
+            relationTerm.getId(), relationTerm.getTerm1().getId(),
             relationTerm.getTerm2().getId(), ontologyId, relationTerm.getRelation().getId(),
             LocalDateTime.ofInstant(relationTerm.getUpdated().toInstant(), ZoneId.systemDefault()),
             Optional.empty(),
             LocalDateTime.ofInstant(relationTerm.getCreated().toInstant(), ZoneId.systemDefault()),
-            relationTerm.getRelation().getName());
+            relationTerm.getRelation().getName()
+        );
     }
 
     @Test
     @Transactional
     public void getATermRelation() throws Exception {
-        RelationTerm relationTerm = builder.given_a_relation_term();
+        RelationTerm relationTerm = builder.givenARelationTerm();
         long ontologyId = relationTerm.getTerm1().getOntology().getId();
-        long userId = builder.given_superadmin().getId();
+        long userId = builder.givenSuperAdmin().getId();
         TermRelationResponse expected = buildResponse(relationTerm, ontologyId);
         when(termRelationHttpContract.findTermByID(eq(relationTerm.getId()), eq(userId)))
             .thenReturn(Optional.of(expected));
 
         String body =
             restRelationTermControllerMockMvc.perform(get("/api/relation/term/{id}.json", relationTerm.getId()))
-            .andExpect(status().isOk())
+                .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
         assertEquals(expected, objectMapper.readValue(body, TermRelationResponse.class));
@@ -104,7 +106,7 @@ public class RelationTermResourceTests {
     @Test
     @Transactional
     public void getATermRelationNotFoundReturns404() throws Exception {
-        long userId = builder.given_superadmin().getId();
+        long userId = builder.givenSuperAdmin().getId();
         when(termRelationHttpContract.findTermByID(eq(999L), eq(userId))).thenReturn(Optional.empty());
 
         restRelationTermControllerMockMvc.perform(get("/api/relation/term/{id}.json", 999L))
@@ -114,20 +116,26 @@ public class RelationTermResourceTests {
     @Test
     @Transactional
     public void addTermRelation() throws Exception {
-        RelationTerm relationTerm = builder.given_a_relation_term();
+        RelationTerm relationTerm = builder.givenARelationTerm();
         long ontologyId = relationTerm.getTerm1().getOntology().getId();
-        long userId = builder.given_superadmin().getId();
+        long userId = builder.givenSuperAdmin().getId();
         UUID commandId = UUID.randomUUID();
-        CreateTermRelation createTermRelation = new CreateTermRelation(relationTerm.getTerm1().getId(),
-            relationTerm.getTerm2().getId(), RelationTerm.PARENT);
-        HttpCommandResponse expected = new HttpCommandResponse(true, buildResponse(relationTerm, ontologyId),
-            commandId, Commands.CREATE_TERM_RELATION);
+        CreateTermRelation createTermRelation = new CreateTermRelation(
+            relationTerm.getTerm1().getId(),
+            relationTerm.getTerm2().getId(), RelationTerm.PARENT
+        );
+        HttpCommandResponse expected = new HttpCommandResponse(
+            true, buildResponse(relationTerm, ontologyId),
+            commandId, Commands.CREATE_TERM_RELATION
+        );
         when(termRelationHttpContract.create(eq(userId), eq(createTermRelation))).thenReturn(Optional.of(expected));
 
         String body = restRelationTermControllerMockMvc.perform(
                 post("/api/relation/term.json").contentType(MediaType.APPLICATION_JSON)
-                    .content(JsonObject.of("term1", relationTerm.getTerm1().getId(), "term2",
-                        relationTerm.getTerm2().getId()).toJsonString()))
+                    .content(JsonObject.of(
+                        "term1", relationTerm.getTerm1().getId(), "term2",
+                        relationTerm.getTerm2().getId()
+                    ).toJsonString()))
             .andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString();
 
@@ -137,16 +145,20 @@ public class RelationTermResourceTests {
     @Test
     @Transactional
     public void addTermRelationWithNoWriteAccessReturnsEmpty() throws Exception {
-        RelationTerm relationTerm = builder.given_a_relation_term();
-        long userId = builder.given_superadmin().getId();
-        CreateTermRelation createTermRelation = new CreateTermRelation(relationTerm.getTerm1().getId(),
-            relationTerm.getTerm2().getId(), RelationTerm.PARENT);
+        RelationTerm relationTerm = builder.givenARelationTerm();
+        long userId = builder.givenSuperAdmin().getId();
+        CreateTermRelation createTermRelation = new CreateTermRelation(
+            relationTerm.getTerm1().getId(),
+            relationTerm.getTerm2().getId(), RelationTerm.PARENT
+        );
         when(termRelationHttpContract.create(eq(userId), eq(createTermRelation))).thenReturn(Optional.empty());
 
         String body = restRelationTermControllerMockMvc.perform(
                 post("/api/relation/term.json").contentType(MediaType.APPLICATION_JSON)
-                    .content(JsonObject.of("term1", relationTerm.getTerm1().getId(), "term2",
-                        relationTerm.getTerm2().getId()).toJsonString()))
+                    .content(JsonObject.of(
+                        "term1", relationTerm.getTerm1().getId(), "term2",
+                        relationTerm.getTerm2().getId()
+                    ).toJsonString()))
             .andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString();
 
@@ -156,21 +168,27 @@ public class RelationTermResourceTests {
     @Test
     @Transactional
     public void editTermRelation() throws Exception {
-        RelationTerm relationTerm = builder.given_a_relation_term();
+        RelationTerm relationTerm = builder.givenARelationTerm();
         long ontologyId = relationTerm.getTerm1().getOntology().getId();
-        long userId = builder.given_superadmin().getId();
+        long userId = builder.givenSuperAdmin().getId();
         UUID commandId = UUID.randomUUID();
-        UpdateTermRelation updateTermRelation = new UpdateTermRelation(Optional.of(relationTerm.getTerm1().getId()),
-            Optional.of(relationTerm.getTerm2().getId()), Optional.empty());
-        HttpCommandResponse expected = new HttpCommandResponse(true, buildResponse(relationTerm, ontologyId),
-            commandId, Commands.UPDATE_TERM_RELATION);
+        UpdateTermRelation updateTermRelation = new UpdateTermRelation(
+            Optional.of(relationTerm.getTerm1().getId()),
+            Optional.of(relationTerm.getTerm2().getId()), Optional.empty()
+        );
+        HttpCommandResponse expected = new HttpCommandResponse(
+            true, buildResponse(relationTerm, ontologyId),
+            commandId, Commands.UPDATE_TERM_RELATION
+        );
         when(termRelationHttpContract.update(eq(relationTerm.getId()), eq(userId), eq(updateTermRelation)))
             .thenReturn(Optional.of(expected));
 
         String body = restRelationTermControllerMockMvc.perform(
                 put("/api/relation/term/{id}.json", relationTerm.getId()).contentType(MediaType.APPLICATION_JSON)
-                    .content(JsonObject.of("term1Id", relationTerm.getTerm1().getId(), "term2Id",
-                        relationTerm.getTerm2().getId()).toJsonString()))
+                    .content(JsonObject.of(
+                        "term1Id", relationTerm.getTerm1().getId(), "term2Id",
+                        relationTerm.getTerm2().getId()
+                    ).toJsonString()))
             .andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString();
 
@@ -180,34 +198,40 @@ public class RelationTermResourceTests {
     @Test
     @Transactional
     public void editTermRelationWithNoWriteAccessReturnsNotFound() throws Exception {
-        RelationTerm relationTerm = builder.given_a_relation_term();
-        long userId = builder.given_superadmin().getId();
-        UpdateTermRelation updateTermRelation = new UpdateTermRelation(Optional.of(relationTerm.getTerm1().getId()),
-            Optional.of(relationTerm.getTerm2().getId()), Optional.empty());
+        RelationTerm relationTerm = builder.givenARelationTerm();
+        long userId = builder.givenSuperAdmin().getId();
+        UpdateTermRelation updateTermRelation = new UpdateTermRelation(
+            Optional.of(relationTerm.getTerm1().getId()),
+            Optional.of(relationTerm.getTerm2().getId()), Optional.empty()
+        );
         when(termRelationHttpContract.update(eq(relationTerm.getId()), eq(userId), eq(updateTermRelation)))
             .thenReturn(Optional.empty());
 
         restRelationTermControllerMockMvc.perform(
                 put("/api/relation/term/{id}.json", relationTerm.getId()).contentType(MediaType.APPLICATION_JSON)
-                    .content(JsonObject.of("term1Id", relationTerm.getTerm1().getId(), "term2Id",
-                        relationTerm.getTerm2().getId()).toJsonString()))
+                    .content(JsonObject.of(
+                        "term1Id", relationTerm.getTerm1().getId(), "term2Id",
+                        relationTerm.getTerm2().getId()
+                    ).toJsonString()))
             .andExpect(status().isNotFound());
     }
 
     @Test
     @Transactional
     public void deleteTermRelation() throws Exception {
-        RelationTerm relationTerm = builder.given_a_relation_term();
+        RelationTerm relationTerm = builder.givenARelationTerm();
         long ontologyId = relationTerm.getTerm1().getOntology().getId();
-        long userId = builder.given_superadmin().getId();
+        long userId = builder.givenSuperAdmin().getId();
         UUID commandId = UUID.randomUUID();
-        HttpCommandResponse expected = new HttpCommandResponse(true, buildResponse(relationTerm, ontologyId),
-            commandId, Commands.DELETE_TERM_RELATION);
+        HttpCommandResponse expected = new HttpCommandResponse(
+            true, buildResponse(relationTerm, ontologyId),
+            commandId, Commands.DELETE_TERM_RELATION
+        );
         when(termRelationHttpContract.delete(eq(relationTerm.getId()), eq(userId))).thenReturn(Optional.of(expected));
 
         String body =
             restRelationTermControllerMockMvc.perform(delete("/api/relation/term/{id}.json", relationTerm.getId()))
-            .andExpect(status().isOk())
+                .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
         assertEquals(expected, objectMapper.readValue(body, HttpCommandResponse.class));
@@ -216,8 +240,8 @@ public class RelationTermResourceTests {
     @Test
     @Transactional
     public void deleteTermRelationWithNoDeleteAccessReturnsNotFound() throws Exception {
-        RelationTerm relationTerm = builder.given_a_relation_term();
-        long userId = builder.given_superadmin().getId();
+        RelationTerm relationTerm = builder.givenARelationTerm();
+        long userId = builder.givenSuperAdmin().getId();
         when(termRelationHttpContract.delete(eq(relationTerm.getId()), eq(userId))).thenReturn(Optional.empty());
 
         restRelationTermControllerMockMvc.perform(delete("/api/relation/term/{id}.json", relationTerm.getId()))

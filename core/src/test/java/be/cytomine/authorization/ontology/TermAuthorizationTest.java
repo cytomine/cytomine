@@ -1,21 +1,5 @@
 package be.cytomine.authorization.ontology;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -33,9 +17,7 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.CRDAuthorizationTest;
 import be.cytomine.domain.ontology.Term;
-import be.cytomine.service.PermissionService;
 import be.cytomine.service.ontology.TermService;
-import be.cytomine.service.security.SecurityACLService;
 
 @AutoConfigureMockMvc
 @SpringBootTest(classes = CytomineCoreApplication.class)
@@ -43,12 +25,10 @@ import be.cytomine.service.security.SecurityACLService;
 public class TermAuthorizationTest extends CRDAuthorizationTest {
     @Autowired
     TermService termService;
+
     @Autowired
     BasicInstanceBuilder builder;
-    @Autowired
-    SecurityACLService securityACLService;
-    @Autowired
-    PermissionService permissionService;
+
     @Autowired
     private BasicInstanceBuilder basicInstanceBuilder;
     private Term term = null;
@@ -56,55 +36,50 @@ public class TermAuthorizationTest extends CRDAuthorizationTest {
     @BeforeEach
     public void before() throws Exception {
         if (term == null) {
-            term = builder.given_a_term();
-            ;
+            term = builder.givenATerm();
             initACL(term.container());
         }
     }
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list_terms() {
-        expectOK(() -> {
-            termService.list();
-        });
+    public void adminCanListTerms() {
+        expectOK(() -> termService.list());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_list_terms() {
-        expectForbidden(() -> {
-            termService.list();
-        });
+    public void userCannotListTerms() {
+        expectForbidden(() -> termService.list());
     }
 
     @Override
-    public void when_i_get_domain() {
+    public void whenIGetDomain() {
         termService.get(term.getId());
     }
 
     @Override
-    protected void when_i_add_domain() {
+    protected void whenIAddDomain() {
         termService.add(
-            basicInstanceBuilder.given_a_not_persisted_term(term.getOntology()).toJsonObject());
+            basicInstanceBuilder.givenANotPersistedTerm(term.getOntology()).toJsonObject());
     }
 
     @Override
-    protected void when_i_delete_domain() {
-        Term termToDelete = builder.given_a_term(term.getOntology());
+    protected void whenIDeleteDomain() {
+        Term termToDelete = builder.givenATerm(term.getOntology());
         termService.delete(termToDelete, null, null, true);
     }
 
     @Test
     @Disabled
     @Override
-    public void guest_add_domain() {
+    public void guestAddDomain() {
     }
 
     @Test
     @Disabled
     @Override
-    public void user_without_permission_add_domain() {
+    public void userWithoutPermissionAddDomain() {
     }
 
     @Override

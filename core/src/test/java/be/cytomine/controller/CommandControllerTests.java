@@ -60,7 +60,7 @@ public class CommandControllerTests {
     @Test
     @Transactional
     @WithMockUser(username = "superadmin")
-    public void list_delete_command() throws Exception {
+    public void listDeleteCommand() throws Exception {
 
         Long start = System.currentTimeMillis();
 
@@ -83,9 +83,9 @@ public class CommandControllerTests {
             .andExpect(
                 jsonPath("$.collection", hasSize(equalTo(initialSizeUploadedFileDeleteCommand))));
 
-        UploadedFile uploadedFile = builder.given_a_uploaded_file();
+        UploadedFile uploadedFile = builder.givenAUploadedFile();
 
-        Command c = new DeleteCommand(builder.given_superadmin(), null);
+        Command c = new DeleteCommand(builder.givenSuperAdmin(), null);
         uploadedFileService.executeCommand(c, uploadedFile, null);
 
         restCommandControllerMockMvc.perform(get("/api/deletecommand.json"))
@@ -95,8 +95,10 @@ public class CommandControllerTests {
         restCommandControllerMockMvc.perform(
                 get("/api/deletecommand.json").param("domain", "uploadedFile"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.collection",
-                hasSize(equalTo(initialSizeUploadedFileDeleteCommand + 1))));
+            .andExpect(jsonPath(
+                "$.collection",
+                hasSize(equalTo(initialSizeUploadedFileDeleteCommand + 1))
+            ));
 
         restCommandControllerMockMvc.perform(
                 get("/api/deletecommand.json").param("domain", "uploadedFile")
@@ -114,8 +116,8 @@ public class CommandControllerTests {
     @Test
     @Transactional
     @WithMockUser(username = "superadmin")
-    public void undo_redo() throws Exception {
-        Ontology ontology = basicInstanceBuilder.given_a_not_persisted_ontology();
+    public void undoRedo() throws Exception {
+        Ontology ontology = basicInstanceBuilder.givenANotPersistedOntology();
         ontology.setName("undo_redo");
         restCommandControllerMockMvc.perform(
                 post("/api/ontology.json").contentType(MediaType.APPLICATION_JSON)
@@ -155,8 +157,8 @@ public class CommandControllerTests {
     @Test
     @Transactional
     @WithMockUser(username = "superadmin")
-    public void undo_redo_with_command_id() throws Exception {
-        Ontology ontology = basicInstanceBuilder.given_a_not_persisted_ontology();
+    public void undoRedoWithCommandId() throws Exception {
+        Ontology ontology = basicInstanceBuilder.givenANotPersistedOntology();
         ontology.setName("undo_redo");
         restCommandControllerMockMvc.perform(
                 post("/api/ontology.json").contentType(MediaType.APPLICATION_JSON)

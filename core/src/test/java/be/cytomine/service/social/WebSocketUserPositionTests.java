@@ -21,12 +21,15 @@ import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorato
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
-import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MongoTestConfiguration;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
@@ -42,14 +45,14 @@ public class WebSocketUserPositionTests {
     WebSocketUserPositionHandler webSocketUserPositionHandler;
 
     @AfterEach
-    public void cleanSessions(){
+    public void cleanSessions() {
         WebSocketUserPositionHandler.sessions = new ConcurrentHashMap<>();
         WebSocketUserPositionHandler.sessionsTracked = new ConcurrentHashMap<>();
         WebSocketUserPositionHandler.sessionsBroadcast = new ConcurrentHashMap<>();
     }
 
     @Test
-    public void create_session_for_not_connected_user() {
+    public void createSessionForNotConnectedUser() {
         WebSocketSession session = mock(WebSocketSession.class);
         when(session.getAttributes()).thenReturn(sessionAttributes("54", "imageId", "false"));
 
@@ -61,7 +64,7 @@ public class WebSocketUserPositionTests {
     }
 
     @Test
-    public void create_broadcast_session_for_not_connected_user() {
+    public void createBroadcastSessionForNotConnectedUser() {
         WebSocketSession session = mock(WebSocketSession.class);
         when(session.getAttributes()).thenReturn(sessionAttributes("54", "imageId", "true"));
 
@@ -73,7 +76,7 @@ public class WebSocketUserPositionTests {
     }
 
     @Test
-    public void add_session_for_already_connected_user() {
+    public void addSessionForAlreadyConnectedUser() {
         ConcurrentWebSocketSessionDecorator sessionDecorator = mock(ConcurrentWebSocketSessionDecorator.class);
         connectSession(sessionDecorator, "54", "imageId", "false");
         connectSession(sessionDecorator, "89", "imageId", "false");
@@ -89,14 +92,14 @@ public class WebSocketUserPositionTests {
     }
 
     @Test
-    public void add_track_session_to_not_tracked_user() {
+    public void addTrackSessionToNotTrackedUser() {
         ConcurrentWebSocketSessionDecorator sessionDecorator = mock(ConcurrentWebSocketSessionDecorator.class);
 
-        String userId = builder.given_a_user().getId().toString();
-        String imageInstanceId = builder.given_an_image_instance().getId().toString();
-        String userAndImageId = userId+"/"+imageInstanceId;
+        String userId = builder.givenAUser().getId().toString();
+        String imageInstanceId = builder.givenAnImageInstance().getId().toString();
+        String userAndImageId = userId + "/" + imageInstanceId;
 
-        connectSession(sessionDecorator, userId, imageInstanceId,"true");
+        connectSession(sessionDecorator, userId, imageInstanceId, "true");
 
         // Should have created a broadcast session
         assertThat(WebSocketUserPositionHandler.sessionsBroadcast.get(userAndImageId)).isNotNull();
@@ -108,28 +111,30 @@ public class WebSocketUserPositionTests {
         when(sessionDecorator.getId()).thenReturn("1234");
         webSocketUserPositionHandler.handleMessage(session, new TextMessage(userId));
 
-        ConcurrentWebSocketSessionDecorator createdSession = WebSocketUserPositionHandler.sessionsBroadcast.get(userAndImageId);
+        ConcurrentWebSocketSessionDecorator createdSession = WebSocketUserPositionHandler.sessionsBroadcast.get(
+            userAndImageId);
         assertThat(WebSocketUserPositionHandler.sessionsTracked.get(createdSession).length).isEqualTo(1);
     }
 
     @Test
-    public void add_track_session_to_already_tracked_user() {
+    public void addTrackSessionToAlreadyTrackedUser() {
         ConcurrentWebSocketSessionDecorator followerSession = mock(ConcurrentWebSocketSessionDecorator.class);
         ConcurrentWebSocketSessionDecorator broadcastSession = mock(ConcurrentWebSocketSessionDecorator.class);
 
-        String userId = builder.given_a_user().getId().toString();
-        String imageInstanceId = builder.given_an_image_instance().getId().toString();
-        String userAndImageId = userId+"/"+imageInstanceId;
+        String userId = builder.givenAUser().getId().toString();
+        String imageInstanceId = builder.givenAnImageInstance().getId().toString();
+        String userAndImageId = userId + "/" + imageInstanceId;
 
-        connectSession(followerSession, userId, imageInstanceId,"true");
+        connectSession(followerSession, userId, imageInstanceId, "true");
         initFollowingSession(userAndImageId, broadcastSession, followerSession);
 
         //Should have added session to sessions tracked
-        ConcurrentWebSocketSessionDecorator createdSession = WebSocketUserPositionHandler.sessionsBroadcast.get(userAndImageId);
+        ConcurrentWebSocketSessionDecorator createdSession = WebSocketUserPositionHandler.sessionsBroadcast.get(
+            userAndImageId);
         assertThat(WebSocketUserPositionHandler.sessionsTracked.get(createdSession).length).isEqualTo(1);
 
         WebSocketSession session = mock(WebSocketSession.class);
-        connectSession(session, userId, imageInstanceId,"false");
+        connectSession(session, userId, imageInstanceId, "false");
 
         when(session.getId()).thenReturn("1234");
         when(followerSession.getId()).thenReturn("5678");
@@ -141,26 +146,27 @@ public class WebSocketUserPositionTests {
     }
 
     @Test
-    public void add_track_session_who_is_already_tracking() {
+    public void addTrackSessionWhoIsAlreadyTracking() {
         ConcurrentWebSocketSessionDecorator followerSession = mock(ConcurrentWebSocketSessionDecorator.class);
         ConcurrentWebSocketSessionDecorator broadcastSession = mock(ConcurrentWebSocketSessionDecorator.class);
         when(followerSession.getId()).thenReturn("5678");
 
-        String userId = builder.given_a_user().getId().toString();
-        String imageInstanceId = builder.given_an_image_instance().getId().toString();
-        String userAndImageId = userId+"/"+imageInstanceId;
+        String userId = builder.givenAUser().getId().toString();
+        String imageInstanceId = builder.givenAnImageInstance().getId().toString();
+        String userAndImageId = userId + "/" + imageInstanceId;
 
-        connectSession(followerSession, userId, imageInstanceId,"true");
+        connectSession(followerSession, userId, imageInstanceId, "true");
         initFollowingSession(userAndImageId, broadcastSession, followerSession);
 
         WebSocketSession session = mock(WebSocketSession.class);
         when(session.getId()).thenReturn("1234");
-        connectSession(session, userId, imageInstanceId,"false");
+        connectSession(session, userId, imageInstanceId, "false");
 
         // Ask a new follow on the broadcast session
         webSocketUserPositionHandler.handleMessage(session, new TextMessage(userId));
 
-        ConcurrentWebSocketSessionDecorator createdSession = WebSocketUserPositionHandler.sessionsBroadcast.get(userAndImageId);
+        ConcurrentWebSocketSessionDecorator createdSession = WebSocketUserPositionHandler.sessionsBroadcast.get(
+            userAndImageId);
         assertThat(WebSocketUserPositionHandler.sessionsTracked.get(createdSession).length).isEqualTo(2);
 
         // Ask a follow on the broadcast session with already tracking session
@@ -169,25 +175,26 @@ public class WebSocketUserPositionTests {
     }
 
     @Test
-    public void add_some_track_sessions_to_already_tracked_user() {
+    public void addSomeTrackSessionsToAlreadyTrackedUser() {
         ConcurrentWebSocketSessionDecorator followerSession1 = mock(ConcurrentWebSocketSessionDecorator.class);
         ConcurrentWebSocketSessionDecorator followerSession2 = mock(ConcurrentWebSocketSessionDecorator.class);
         ConcurrentWebSocketSessionDecorator followerSession3 = mock(ConcurrentWebSocketSessionDecorator.class);
         ConcurrentWebSocketSessionDecorator broadcastSession = mock(ConcurrentWebSocketSessionDecorator.class);
 
-        String userId1 = builder.given_a_user().getId().toString();
-        String userId2 = builder.given_a_user().getId().toString();
-        String imageInstanceId = builder.given_an_image_instance().getId().toString();
-        String userAndImageId = userId1+"/"+imageInstanceId;
+        String userId1 = builder.givenAUser().getId().toString();
+        String userId2 = builder.givenAUser().getId().toString();
+        String imageInstanceId = builder.givenAnImageInstance().getId().toString();
+        String userAndImageId = userId1 + "/" + imageInstanceId;
         initFollowingSession(userAndImageId, broadcastSession, followerSession1);
 
         //Should have added session to sessions tracked
-        ConcurrentWebSocketSessionDecorator createdSession = WebSocketUserPositionHandler.sessionsBroadcast.get(userAndImageId);
+        ConcurrentWebSocketSessionDecorator createdSession = WebSocketUserPositionHandler.sessionsBroadcast.get(
+            userAndImageId);
         assertThat(WebSocketUserPositionHandler.sessionsTracked.get(createdSession).length).isEqualTo(1);
 
         // Simulate that user is connected to Cytomine with 2 sessions
-        connectSession(followerSession2, userId2, imageInstanceId,"false");
-        connectSession(followerSession3, userId2, imageInstanceId,"false");
+        connectSession(followerSession2, userId2, imageInstanceId, "false");
+        connectSession(followerSession3, userId2, imageInstanceId, "false");
         when(followerSession1.getId()).thenReturn("1");
         when(followerSession2.getId()).thenReturn("2");
         when(followerSession3.getId()).thenReturn("3");
@@ -207,19 +214,20 @@ public class WebSocketUserPositionTests {
     }
 
     @Test
-    public void remove_tracking_sessions_from_tracked_sessions() throws Exception {
+    public void removeTrackingSessionsFromTrackedSessions() throws Exception {
         ConcurrentWebSocketSessionDecorator followerSession = mock(ConcurrentWebSocketSessionDecorator.class);
         ConcurrentWebSocketSessionDecorator broadcastSession = mock(ConcurrentWebSocketSessionDecorator.class);
 
-        String userId = builder.given_a_user().getId().toString();
-        String imageInstanceId = builder.given_an_image_instance().getId().toString();
-        String userAndImageId = userId+"/"+imageInstanceId;
+        String userId = builder.givenAUser().getId().toString();
+        String imageInstanceId = builder.givenAnImageInstance().getId().toString();
+        String userAndImageId = userId + "/" + imageInstanceId;
 
-        connectSession(followerSession, userId,imageInstanceId, "false");
+        connectSession(followerSession, userId, imageInstanceId, "false");
         initFollowingSession(userAndImageId, broadcastSession, followerSession);
 
         // Broadcast session should be followed by follower session
-        ConcurrentWebSocketSessionDecorator createdSession = WebSocketUserPositionHandler.sessionsBroadcast.get(userAndImageId);
+        ConcurrentWebSocketSessionDecorator createdSession = WebSocketUserPositionHandler.sessionsBroadcast.get(
+            userAndImageId);
         assertThat(WebSocketUserPositionHandler.sessionsTracked.get(createdSession).length).isEqualTo(1);
 
         WebSocketSession session = mock(WebSocketSession.class);
@@ -234,18 +242,19 @@ public class WebSocketUserPositionTests {
     }
 
     @Test
-    public void remove_broadcasting_sessions_from_tracked_sessions() throws Exception {
+    public void removeBroadcastingSessionsFromTrackedSessions() throws Exception {
         ConcurrentWebSocketSessionDecorator followerSession = mock(ConcurrentWebSocketSessionDecorator.class);
         ConcurrentWebSocketSessionDecorator broadcastSession = mock(ConcurrentWebSocketSessionDecorator.class);
 
-        String userId = builder.given_a_user().getId().toString();
-        String imageInstanceId = builder.given_an_image_instance().getId().toString();
-        String userAndImageId = userId+"/"+imageInstanceId;
+        String userId = builder.givenAUser().getId().toString();
+        String imageInstanceId = builder.givenAnImageInstance().getId().toString();
+        String userAndImageId = userId + "/" + imageInstanceId;
 
-        connectSession(followerSession, userId, imageInstanceId,"false");
+        connectSession(followerSession, userId, imageInstanceId, "false");
         initFollowingSession(userAndImageId, broadcastSession, followerSession);
 
-        ConcurrentWebSocketSessionDecorator createdSession = WebSocketUserPositionHandler.sessionsBroadcast.get(userAndImageId);
+        ConcurrentWebSocketSessionDecorator createdSession = WebSocketUserPositionHandler.sessionsBroadcast.get(
+            userAndImageId);
         assertThat(WebSocketUserPositionHandler.sessionsTracked.get(createdSession).length).isEqualTo(1);
 
         WebSocketSession session = mock(WebSocketSession.class);
@@ -262,9 +271,9 @@ public class WebSocketUserPositionTests {
     }
 
     @Test
-    public void update_position_of_tracked_user_send_message_works() throws IOException {
-        String userId = builder.given_a_user().getId().toString();
-        String imageInstanceId = builder.given_an_image_instance().getId().toString();
+    public void updatePositionOfTrackedUserSendMessageWorks() throws IOException {
+        String userId = builder.givenAUser().getId().toString();
+        String imageInstanceId = builder.givenAnImageInstance().getId().toString();
 
         WebSocketSession session = mock(WebSocketSession.class);
         connectSession(session, userId, imageInstanceId, "true");
@@ -275,30 +284,39 @@ public class WebSocketUserPositionTests {
 
         when(session.isOpen()).thenReturn(true);
         doNothing().when(session).sendMessage(new TextMessage("position"));
-        assertDoesNotThrow(() -> webSocketUserPositionHandler.sendPositionToFollowers(userId, imageInstanceId, "position"));
+        assertDoesNotThrow(() -> webSocketUserPositionHandler.sendPositionToFollowers(
+            userId,
+            imageInstanceId,
+            "position"
+        ));
         verify(session, Mockito.timeout(2000).times(1)).sendMessage(new TextMessage("position"));
     }
 
     @Test
-    public void update_position_of_not_tracked_user_do_nothing(){
-        String userId = builder.given_a_user().getId().toString();
-        String imageInstanceId = builder.given_an_image_instance().getId().toString();
-        assertDoesNotThrow(() -> webSocketUserPositionHandler.sendPositionToFollowers(userId, imageInstanceId,"position"));
+    public void updatePositionOfNotTrackedUserDoNothing() {
+        String userId = builder.givenAUser().getId().toString();
+        String imageInstanceId = builder.givenAnImageInstance().getId().toString();
+        assertDoesNotThrow(() -> webSocketUserPositionHandler.sendPositionToFollowers(
+            userId,
+            imageInstanceId,
+            "position"
+        ));
     }
 
     @Test
-    public void remove_session_if_connection_closed() throws Exception {
+    public void removeSessionIfConnectionClosed() throws Exception {
         WebSocketSession session = mock(WebSocketSession.class);
         ConcurrentWebSocketSessionDecorator followerSession = mock(ConcurrentWebSocketSessionDecorator.class);
         ConcurrentWebSocketSessionDecorator broadcastSession = mock(ConcurrentWebSocketSessionDecorator.class);
 
-        String userId = builder.given_a_user().getId().toString();
-        String userAndImageId = userId+"/imageId";
+        String userId = builder.givenAUser().getId().toString();
+        String userAndImageId = userId + "/imageId";
         connectSession(session, userId, "imageId", "false");
         initFollowingSession(userAndImageId, broadcastSession, followerSession);
 
         assertThat(WebSocketUserPositionHandler.sessions.get(userId).length).isEqualTo(1);
-        ConcurrentWebSocketSessionDecorator createdSession = WebSocketUserPositionHandler.sessionsBroadcast.get(userAndImageId);
+        ConcurrentWebSocketSessionDecorator createdSession = WebSocketUserPositionHandler.sessionsBroadcast.get(
+            userAndImageId);
         assertThat(WebSocketUserPositionHandler.sessionsTracked.get(createdSession).length).isEqualTo(1);
 
         when(session.getId()).thenReturn("1");
@@ -311,18 +329,25 @@ public class WebSocketUserPositionTests {
     }
 
 
-    private void connectSession(WebSocketSession session, String userId, String imageId, String broadcast){
+    private void connectSession(WebSocketSession session, String userId, String imageId, String broadcast) {
         when(session.getAttributes()).thenReturn(Map.of("userId", userId, "imageId", imageId, "broadcast", broadcast));
         webSocketUserPositionHandler.afterConnectionEstablished(session);
     }
 
-    private void initFollowingSession(String userAndImageId, ConcurrentWebSocketSessionDecorator broadcastSession, ConcurrentWebSocketSessionDecorator followerSession){
+    private void initFollowingSession(
+        String userAndImageId,
+        ConcurrentWebSocketSessionDecorator broadcastSession,
+        ConcurrentWebSocketSessionDecorator followerSession
+    ) {
         WebSocketUserPositionHandler.sessionsBroadcast.put(userAndImageId, broadcastSession);
-        WebSocketUserPositionHandler.sessionsTracked.put(broadcastSession, new ConcurrentWebSocketSessionDecorator[]{followerSession});
+        WebSocketUserPositionHandler.sessionsTracked.put(
+            broadcastSession,
+            new ConcurrentWebSocketSessionDecorator[]{followerSession}
+        );
         assertThat(WebSocketUserPositionHandler.sessionsTracked.get(broadcastSession).length).isEqualTo(1);
     }
 
-    private Map<String, Object> sessionAttributes(String userId, String imageId, String broadcast){
+    private Map<String, Object> sessionAttributes(String userId, String imageId, String broadcast) {
         return Map.of("userId", userId, "imageId", imageId, "broadcast", broadcast);
     }
 }

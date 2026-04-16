@@ -45,6 +45,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import be.cytomine.common.repository.http.StatsHttpContract;
 import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.common.repository.http.TermRelationHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
@@ -95,6 +96,9 @@ public class StatsService {
 
     @Autowired
     TermHttpContract termHttpContract;
+
+    @Autowired
+    StatsHttpContract statsHttpContract;
 
     @Autowired
     MongoTemplate mongoTemplate;
@@ -247,32 +251,32 @@ public class StatsService {
         return new ArrayList<>(result.values());
     }
 
-    public List<JsonObject> statTermSlide(Project project, Date startDate, Date endDate) {
+    public List<StatTerm> statTermSlide(Project project, Date startDate, Date endDate) {
         securityACLService.check(project, READ);
-        Map<Long, JsonObject> result = pagesClient.callAllPages(
-                page -> termHttpContract.findTermsByOntology(project.getOntology().getId(),
+        Map<Long, StatTerm> result = pagesClient.callAllPages(
+                page -> statsHttpContract.findTermsByOntology(project.getOntology().getId(),
                     currentUserService.getCurrentUser().getId(), page)).stream()
-            .map(termResponse -> new StatTerm(termResponse.id(), termResponse.name(), 0, termResponse.color()))
-            .map(statTerm -> Map.entry(statTerm.id(), statTerm));
+            .map(statTerm -> Map.entry(statTerm.id(), statTerm))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
 
         //add an item for the annotations not associated to any term
-        result.put(0L, JsonObject.of("value", 0));
+        //  result.put(0L, JsonObject.of("value", 0));
 
-        //Get the number of annotation for each term
+        // Get the number of annotation for each term
         String request = "SELECT at.term_id, count(DISTINCT ua.image_id) " + "FROM user_annotation ua " +
             "LEFT JOIN annotation_term at " + "ON at.user_annotation_id = ua.id " + "WHERE ua.project_id = " +
             project.getId() + " " + (startDate != null ? "AND at.created > '" + startDate + "'" : "") +
             (endDate != null ? "AND at.created < '" + endDate + "'" : "") + "GROUP BY at.term_id ";
 
-        List<Tuple> rows = entityManager.createNativeQuery(request, Tuple.class).getResultList();
+//        List<Tuple> rows = entityManager.createNativeQuery(request, Tuple.class).getResultList();
 
-        for (Tuple row : rows) {
-            JsonObject value = result.get(row.get(0) == null ? 0L : (Long) row.get(0));
-            if (value != null) {
-                value.put("value", (Long) row.get(1));
-            }
-        }
+//        for (Tuple row : rows) {
+//            JsonObject value = result.get(row.get(0) == null ? 0L : (Long) row.get(0));
+//            if (value != null) {
+//                value.put("value", (Long) row.get(1));
+//            }
+//        }
         return new ArrayList<>(result.values());
     }
 
@@ -363,7 +367,7 @@ public class StatsService {
         Map<Long, JsonObject> result = new HashMap<>();
 
         //Get project terms
-        List<Term> terms = termRepository.findAllByOntology(project.getOntology());
+        List<Term> terms = null;// termRepository.findAllByOntology(project.getOntology());
         if (terms.isEmpty()) {
             return new ArrayList<>();
         }

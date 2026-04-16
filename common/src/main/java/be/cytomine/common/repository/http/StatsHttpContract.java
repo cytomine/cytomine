@@ -24,5 +24,4 @@ public interface StatsHttpContract {
                                       @RequestParam(required = false) Optional<LocalDateTime> startDate,
                                       @RequestParam(required = false) Optional<LocalDateTime> endDate,
                                       @RequestParam int page, @RequestParam int size);
-
 }

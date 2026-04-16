@@ -3,6 +3,7 @@ package org.cytomine.repository.persistence;
 import java.time.LocalDateTime;
 
 import org.cytomine.repository.persistence.entity.TermEntity;
+import org.cytomine.repository.persistence.projection.StatTermProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

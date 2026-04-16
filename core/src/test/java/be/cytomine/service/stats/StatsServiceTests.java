@@ -20,11 +20,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.http.StatsHttpContract;
 import be.cytomine.common.repository.model.stat.payload.StatTerm;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.image.ImageInstance;
@@ -57,6 +60,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
@@ -106,6 +110,9 @@ public class StatsServiceTests {
 
     @Autowired
     ObjectMapper objectMapper;
+
+    @MockitoBean
+    StatsHttpContract statsHttpContract;
 
     private static WireMockServer wireMockServer = new WireMockServer(8888);
 
@@ -273,13 +280,19 @@ public class StatsServiceTests {
     @Test
     void statsTermSlide() {
         Project project = builder.givenAProject();
+        long ontologyId = project.getOntology().getId();
+        long userId = builder.givenSuperAdmin().getId();
 
+        when(statsHttpContract.findTermsByProject(ontologyId, userId, Optional.empty(), Optional.empty(), 0, 20))
+            .thenReturn(new PageImpl<>(List.of()));
         List<StatTerm> results = statsService.statTermSlide(project, Optional.empty(), Optional.empty());
         results.removeIf(x -> x.id() == 0);
         assertThat(results).hasSize(0);
 
         Term term = builder.givenATerm(project.getOntology());
 
+        when(statsHttpContract.findTermsByProject(ontologyId, userId, Optional.empty(), Optional.empty(), 0, 20))
+            .thenReturn(new PageImpl<>(List.of(new StatTerm(term.getId(), term.getName(), 0, term.getColor()))));
         results = statsService.statTermSlide(project, Optional.empty(), Optional.empty());
         results.removeIf(x -> x.id() == 0);
         assertThat(results).hasSize(1);
@@ -291,20 +304,31 @@ public class StatsServiceTests {
         builder.givenAnAnnotationTerm(annotation1, term);
         builder.persistAndReturn(annotation1);
 
+        when(statsHttpContract.findTermsByProject(ontologyId, userId, Optional.empty(), Optional.empty(), 0, 20))
+            .thenReturn(new PageImpl<>(List.of(new StatTerm(term.getId(), term.getName(), 1, term.getColor()))));
         results = statsService.statTermSlide(project, Optional.empty(), Optional.empty());
         results.removeIf(x -> x.id() == 0);
         assertThat(results).hasSize(1);
         assertThat(results.get(0).id()).isEqualTo(term.getId());
         assertThat(results.get(0).value()).isEqualTo(1L);
 
-        builder.givenATerm(project.getOntology());
+        Term term2 = builder.givenATerm(project.getOntology());
 
+        when(statsHttpContract.findTermsByProject(ontologyId, userId, Optional.empty(), Optional.empty(), 0, 20))
+            .thenReturn(new PageImpl<>(List.of(
+                new StatTerm(term.getId(), term.getName(), 1, term.getColor()),
+                new StatTerm(term2.getId(), term2.getName(), 0, term2.getColor()))));
         results = statsService.statTermSlide(project, Optional.empty(), Optional.empty());
         results.removeIf(x -> x.id() == 0);
         assertThat(results).hasSize(2);
 
-        results = statsService.statTermSlide(project, Optional.of(LocalDateTime.now().minusDays(42)),
-            Optional.of(LocalDateTime.now().minusDays(20)));
+        Optional<LocalDateTime> startDate = Optional.of(LocalDateTime.now().minusDays(42));
+        Optional<LocalDateTime> endDate = Optional.of(LocalDateTime.now().minusDays(20));
+        when(statsHttpContract.findTermsByProject(ontologyId, userId, startDate, endDate, 0, 20))
+            .thenReturn(new PageImpl<>(List.of(
+                new StatTerm(term.getId(), term.getName(), 0, term.getColor()),
+                new StatTerm(term2.getId(), term2.getName(), 0, term2.getColor()))));
+        results = statsService.statTermSlide(project, startDate, endDate);
         results.removeIf(x -> x.id() == 0);
         assertThat(results).hasSize(2);
         assertThat(results.get(0).value()).isEqualTo(0);

@@ -1,8 +1,11 @@
-package org.cytomine.repository.persistence;
+package org.cytomine.repository.persistence.projection;
 
 public interface StatTermProjection {
     long getId();
+
     String getKey();
+
     long getValue();
+
     String getColor();
 }

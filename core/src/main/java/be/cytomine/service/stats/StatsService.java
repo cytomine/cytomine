@@ -259,17 +259,6 @@ public class StatsService {
                     currentUserService.getCurrentUser().getId(),startDate, endDate, page)).stream()
             .map(statTerm -> Map.entry(statTerm.id(), statTerm))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-
-
-//        List<Tuple> rows = entityManager.createNativeQuery(request, Tuple.class).getResultList();
-
-//        for (Tuple row : rows) {
-//            JsonObject value = result.get(row.get(0) == null ? 0L : (Long) row.get(0));
-//            if (value != null) {
-//                value.put("value", (Long) row.get(1));
-//            }
-//        }
         return new ArrayList<>(result.values());
     }
 

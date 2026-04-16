@@ -96,7 +96,7 @@
       </section>
     </div>
 
-    <TaskModal :active.sync="showRunTaskModal" :tasks="tasks" />
+    <TaskModal :active.sync="showRunTaskModal" :tasks="tasks" @run-task="taskRuns.push($event)" />
   </div>
 </template>
 

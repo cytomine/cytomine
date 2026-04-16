@@ -11,6 +11,14 @@
             </b-select>
           </b-field>
         </section>
+
+        <section class="content" v-if="selectedTask">
+          <task-io-form
+            v-on:appengine:task:started="handleRunTask"
+            :task="selectedTask"
+            :project-id="currentProject.id"
+          />
+        </section>
       </div>
       <template #footer>
         <b-button @click="close">{{ $t('button-cancel') }}</b-button>
@@ -22,6 +30,9 @@
 
 <script>
 import CytomineModal from '@/components/utils/CytomineModal';
+import TaskIoForm from '@/components/appengine/forms/TaskIoForm';
+import TaskRun from '@/utils/appengine/task-run';
+import {get} from '@/utils/store-helpers';
 
 export default {
   name: 'TaskModal',
@@ -31,17 +42,26 @@ export default {
   },
   components: {
     CytomineModal,
+    TaskIoForm,
   },
   data() {
     return {
       selectedTask: null,
     };
   },
+  computed: {
+    currentProject: get('currentProject/project'),
+  },
   methods: {
     close() {
       this.selectedTask = null;
       this.$emit('update:active', false);
-    }
+    },
+    async handleRunTask(event) {
+      let taskRun = new TaskRun(event.resource);
+      taskRun.project = this.currentProjectId;
+      this.$emit('run-task', taskRun);
+    },
   },
 };
 </script>

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import be.cytomine.common.repository.http.StatsHttpContract;
+import be.cytomine.common.repository.model.stat.payload.FlatStatUserTerm;
 import be.cytomine.common.repository.model.stat.payload.StatTerm;
 
 @Component
@@ -32,5 +33,12 @@ public class StatsController implements StatsHttpContract {
                                              @RequestParam int page, @RequestParam int size) {
         return termRepository.findAllByProjectForStats(projectId, startDate.orElse(null), endDate.orElse(null),
             PageRequest.of(page, size)).map(statsMapper::map);
+    }
+
+    @Override
+    @GetMapping("/per-user/project/{projectId}")
+    public Page<FlatStatUserTerm> findUserTermsByProject(long projectId, long userId, int page, int size) {
+        return termRepository.findAllByUsersByProjectForStats(projectId, PageRequest.of(page, size))
+            .map(statsMapper::map);
     }
 }

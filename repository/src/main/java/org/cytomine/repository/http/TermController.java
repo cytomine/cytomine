@@ -87,12 +87,20 @@ public class TermController implements TermHttpContract {
     }
 
     @Override
-    public Set<Long> findAllTermIdsByOntology(long id, long userId) {
-        return Set.of();
+    @GetMapping("/ontology/{id}/all_terms")
+    public Set<Long> findAllTermIdsByOntology(@PathVariable long id, @RequestParam long userId) {
+        if (!aclService.canReadOntology(userId, id)) {
+            return Set.of();
+        }
+        return termRepository.findAllIdsByOntologyId(id);
     }
 
     @Override
-    public Set<Long> findAllTermIdsByProject(long id, long userId) {
-        return Set.of();
+    @GetMapping("/project/{id}/all_terms")
+    public Set<Long> findAllTermIdsByProject(@PathVariable long id, @RequestParam long userId) {
+        if (!aclService.canReadProject(userId, id)) {
+            return Set.of();
+        }
+        return termRepository.findAllIdsByProjectId(id);
     }
 }

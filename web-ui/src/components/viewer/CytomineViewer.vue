@@ -35,8 +35,7 @@
 
   </div>
 
-  <AppBottomDrawer />
-
+  <AppBottomDrawer v-show="appPanelCollapsed" />
 </div>
 </template>
 

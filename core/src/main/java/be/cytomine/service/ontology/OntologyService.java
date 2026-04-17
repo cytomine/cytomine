@@ -36,6 +36,7 @@ import be.cytomine.domain.command.DeleteCommand;
 import be.cytomine.domain.command.EditCommand;
 import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.ontology.Ontology;
+import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.AlreadyExistException;
@@ -207,7 +208,13 @@ public class OntologyService extends ModelService {
         Long userId = currentUserService.getCurrentUser().getId();
         for (long termId : termService.list(ontology)) {
             termHttpContract.delete(termId, userId);
-
+        }
+        List<Term> terms = getEntityManager()
+            .createQuery("SELECT t FROM Term t WHERE t.ontology = :ontology", Term.class)
+            .setParameter("ontology", ontology)
+            .getResultList();
+        for (Term term : terms) {
+            termService.delete(term, transaction, task, false);
         }
         //otherwise, when you write the json, term cannot be found (because term link is LAZY + term deleted)
         ontology.setTerms(new HashSet<>());

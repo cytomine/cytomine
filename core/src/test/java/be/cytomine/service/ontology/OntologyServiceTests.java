@@ -31,6 +31,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
@@ -94,7 +95,7 @@ public class OntologyServiceTests {
     @Autowired
     TermRepository termRepository;
 
-    @Autowired
+    @MockitoBean
     TermHttpContract termHttpContract;
 
     @Autowired

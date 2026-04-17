@@ -29,6 +29,7 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.http.StatsHttpContract;
+import be.cytomine.common.repository.model.stat.payload.FlatStatUserTerm;
 import be.cytomine.common.repository.model.stat.payload.StatTerm;
 import be.cytomine.common.repository.model.stat.payload.StatUserTerm;
 import be.cytomine.config.MongoTestConfiguration;
@@ -421,6 +422,14 @@ public class StatsServiceTests {
         builder.givenAnAnnotationTerm(annotation2, annotation1.getTerms().get(0));
         builder.persistAndReturn(annotation2);
         entityManager.refresh(annotation2);
+
+        Term term = annotation1.getTerms().get(0);
+        User superAdmin = builder.givenSuperAdmin();
+        when(statsHttpContract.findUserTermsByProject(project.getId(), superAdmin.getId(), 0, 20))
+            .thenReturn(new PageImpl<>(List.of(
+                new FlatStatUserTerm(superAdmin.getId(), superAdmin.getUsername(),
+                    new StatTerm(term.getId(), term.getName(), term.getColor(), 2))
+            )));
 
         Set<StatTerm> terms;
 

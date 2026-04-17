@@ -172,11 +172,11 @@ public class StatsService {
                                                     Date endDate, boolean reverseOrder, boolean accumulate) {
         securityACLService.check(project, READ);
         String request =
-            "SELECT created " + "FROM UserAnnotation " + "WHERE project.userId = " + project.getId() + " " + (
-                term != null ? "AND userId IN (SELECT userAnnotation.userId FROM AnnotationTerm WHERE term.userId = "
-                    + term.getId() + ") " : "") + (startDate != null ?
-                " AND created > cast(date('" + startDate + "') as timestamp)" : "") + (endDate != null ?
-                " AND created < cast(date('" + endDate + "') as timestamp)" : "") + " ORDER BY created ASC";
+            "SELECT created " + "FROM UserAnnotation " + "WHERE project.id = " + project.getId() + " " + (term != null ?
+                "AND id IN (SELECT userAnnotation.id FROM AnnotationTerm WHERE term.id = " + term.getId() + ") " : "")
+                + (startDate != null ? " AND created > cast(date('" + startDate + "') as timestamp)" : "") + (
+                endDate != null ? " AND created < cast(date('" + endDate + "') as timestamp)" : "")
+                + " ORDER BY created ASC";
 
         List<Date> annotationsDates = entityManager.createQuery(request, Date.class).getResultList();
 
@@ -197,7 +197,7 @@ public class StatsService {
         String request =
             "SELECT created " + "FROM reviewed_annotation " + "WHERE project_id = " + project.getId() + " " + (
                 term != null ?
-                    "AND userId IN (SELECT reviewed_annotation_terms_id FROM reviewed_annotation_term WHERE term_id = "
+                    "AND id IN (SELECT reviewed_annotation_terms_id FROM reviewed_annotation_term WHERE term_id = "
                         + term.getId() + ") " : "") + (startDate != null ? "AND created > '" + startDate + "'" : "") + (
                 endDate != null ? "AND created < '" + endDate + "'" : "") + "ORDER BY created ASC";
 
@@ -270,13 +270,11 @@ public class StatsService {
         List<JsonObject> result = new ArrayList<>();
 
         //Get the number of annotation for each term
-        String request = "SELECT ua.image_id, at.term_id, COUNT(ua.id) as count  "
-            + "FROM user_annotation ua "
+        String request = "SELECT ua.image_id, at.term_id, COUNT(ua.id) as count  " + "FROM user_annotation ua "
             + "LEFT JOIN annotation_term at ON at.user_annotation_id = ua.id "
-            + "WHERE ua.deleted is NULL and at.deleted is NULL and ua.project_id = " + project.getId() + " "
-            + (startDate != null ? "AND at.created > '" + startDate + "'" : "")
-            + (endDate != null ? "AND at.created < '" + endDate + "'" : "")
-            + "GROUP BY ua.image_id, at.term_id "
+            + "WHERE ua.deleted is NULL and at.deleted is NULL and ua.project_id = " + project.getId() + " " + (
+            startDate != null ? "AND at.created > '" + startDate + "'" : "") + (endDate != null ?
+            "AND at.created < '" + endDate + "'" : "") + "GROUP BY ua.image_id, at.term_id "
             + "ORDER BY ua.image_id, at.term_id ";
 
         List<Tuple> rows = entityManager.createNativeQuery(request, Tuple.class).getResultList();
@@ -323,14 +321,10 @@ public class StatsService {
         stats.put("0", 0);
 
         //Get the number of annotation for each term
-        String request = "SELECT at.term_id, count(*) "
-            + "FROM user_annotation ua "
-            + "LEFT JOIN annotation_term at "
-            + "ON at.user_annotation_id = ua.id "
-            + "WHERE ua.project_id = " + project.getId() + " "
-            + (startDate != null ? "AND at.created > '" + startDate + "'" : "")
-            + (endDate != null ? "AND at.created < '" + endDate + "'" : "")
-            + "GROUP BY at.term_id ";
+        String request = "SELECT at.term_id, count(*) " + "FROM user_annotation ua " + "LEFT JOIN annotation_term at "
+            + "ON at.user_annotation_id = ua.id " + "WHERE ua.project_id = " + project.getId() + " " + (
+            startDate != null ? "AND at.created > '" + startDate + "'" : "") + (endDate != null ?
+            "AND at.created < '" + endDate + "'" : "") + "GROUP BY at.term_id ";
 
         List<Tuple> rows = entityManager.createNativeQuery(request, Tuple.class).getResultList();
         for (Tuple row : rows) {
@@ -354,8 +348,6 @@ public class StatsService {
     }
 
     public List<StatUserTerm> statUserAnnotations(Project project) {
-        securityACLService.check(project, READ);
-
         securityACLService.check(project, READ);
         Long userId = currentUserService.getCurrentUser().getId();
 

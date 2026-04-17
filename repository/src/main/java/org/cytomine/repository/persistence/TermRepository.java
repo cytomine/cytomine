@@ -22,7 +22,8 @@ public interface TermRepository extends JpaRepository<TermEntity, Long> {
 
     Page<TermEntity> findAllByOntologyIdAndDeletedNull(long id, Pageable pageable);
 
-    @Query("SELECT t.id FROM TermEntity t WHERE t.ontologyId = :ontologyId AND t.deleted IS NULL")
+    @Query(value = "SELECT t.id FROM term t WHERE t.ontology_id = :ontologyId AND t.deleted IS NULL",
+        nativeQuery = true)
     Set<Long> findAllIdsByOntologyId(long ontologyId);
 
     @Query(value = """
@@ -109,6 +110,4 @@ public interface TermRepository extends JpaRepository<TermEntity, Long> {
     Page<StatPerTermAndImageProjection> findAllPerTermAndImageByProjectForStats(long projectId, LocalDateTime startDate,
                                                                                 LocalDateTime endDate,
                                                                                 Pageable pageable);
-
-
 }

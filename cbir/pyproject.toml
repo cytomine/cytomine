@@ -14,7 +14,7 @@ dependencies = [
   "numpy==1.26.4",
   "pillow==12.2.0",
   "pydantic-settings==2.10.1",
-  "python-multipart==0.0.22",
+  "python-multipart==0.0.26",
   "redis==6.4.0",
   "timm==1.0.19",
   "torch==2.8.0",

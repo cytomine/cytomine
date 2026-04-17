@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,6 +30,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.http.StatsHttpContract;
 import be.cytomine.common.repository.model.stat.payload.StatTerm;
+import be.cytomine.common.repository.model.stat.payload.StatUserTerm;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.ontology.AnnotationDomain;
@@ -69,52 +71,37 @@ import static org.mockito.Mockito.when;
 @Transactional
 public class StatsServiceTests {
 
+    private static WireMockServer wireMockServer = new WireMockServer(8888);
     @Autowired
     BasicInstanceBuilder builder;
-
     @Autowired
     EntityManager entityManager;
-
     @Autowired
     StatsService statsService;
-
     @Autowired
     ImageConsultationService imageConsultationService;
-
     @Autowired
     ProjectConnectionService projectConnectionService;
-
     @Autowired
     PersistentConnectionRepository persistentConnectionRepository;
-
     @Autowired
     LastConnectionRepository lastConnectionRepository;
-
     @Autowired
     PersistentImageConsultationRepository persistentImageConsultationRepository;
-
     @Autowired
     PersistentProjectConnectionRepository persistentProjectConnectionRepository;
-
     @Autowired
     ProjectConnectionRepository projectConnectionRepository;
-
     @Autowired
     PersistentUserPositionRepository persistentUserPositionRepository;
-
     @Autowired
     LastUserPositionRepository lastUserPositionRepository;
-
     @Autowired
     AnnotationActionService annotationActionService;
-
     @Autowired
     ObjectMapper objectMapper;
-
     @MockitoBean
     StatsHttpContract statsHttpContract;
-
-    private static WireMockServer wireMockServer = new WireMockServer(8888);
 
     @BeforeAll
     public static void beforeAll() {
@@ -185,7 +172,7 @@ public class StatsServiceTests {
 
         List<JsonObject> jsonObjects = statsService.statAnnotationTermedByProject(annotationTerm.getTerm());
         assertThat(jsonObjects).hasSize(1);
-        assertThat(jsonObjects.get(0).get("key")).isEqualTo(project.getName());
+        assertThat(jsonObjects.get(0).get("username")).isEqualTo(project.getName());
         assertThat(jsonObjects.get(0).get("value")).isEqualTo(1L);
 
     }
@@ -292,12 +279,12 @@ public class StatsServiceTests {
         Term term = builder.givenATerm(project.getOntology());
 
         when(statsHttpContract.findTermsByProject(ontologyId, userId, Optional.empty(), Optional.empty(), 0, 20))
-            .thenReturn(new PageImpl<>(List.of(new StatTerm(term.getId(), term.getName(), 0, term.getColor()))));
+            .thenReturn(new PageImpl<>(List.of(new StatTerm(term.getId(), term.getName(), term.getColor(), 0))));
         results = statsService.statTermSlide(project, Optional.empty(), Optional.empty());
         results.removeIf(x -> x.id() == 0);
         assertThat(results).hasSize(1);
         assertThat(results.get(0).id()).isEqualTo(term.getId());
-        assertThat(results.get(0).value()).isEqualTo(0);
+        assertThat(results.get(0).count()).isEqualTo(0);
 
         UserAnnotation annotation1 = builder.givenAUserAnnotation(project);
         annotation1.setCreated(DateUtils.addDays(new Date(), -1));
@@ -305,19 +292,19 @@ public class StatsServiceTests {
         builder.persistAndReturn(annotation1);
 
         when(statsHttpContract.findTermsByProject(ontologyId, userId, Optional.empty(), Optional.empty(), 0, 20))
-            .thenReturn(new PageImpl<>(List.of(new StatTerm(term.getId(), term.getName(), 1, term.getColor()))));
+            .thenReturn(new PageImpl<>(List.of(new StatTerm(term.getId(), term.getName(), term.getColor(), 1))));
         results = statsService.statTermSlide(project, Optional.empty(), Optional.empty());
         results.removeIf(x -> x.id() == 0);
         assertThat(results).hasSize(1);
         assertThat(results.get(0).id()).isEqualTo(term.getId());
-        assertThat(results.get(0).value()).isEqualTo(1L);
+        assertThat(results.get(0).count()).isEqualTo(1L);
 
         Term term2 = builder.givenATerm(project.getOntology());
 
         when(statsHttpContract.findTermsByProject(ontologyId, userId, Optional.empty(), Optional.empty(), 0, 20))
             .thenReturn(new PageImpl<>(List.of(
-                new StatTerm(term.getId(), term.getName(), 1, term.getColor()),
-                new StatTerm(term2.getId(), term2.getName(), 0, term2.getColor()))));
+                new StatTerm(term.getId(), term.getName(), term.getColor(), 1),
+                new StatTerm(term2.getId(), term2.getName(), term2.getColor(), 0))));
         results = statsService.statTermSlide(project, Optional.empty(), Optional.empty());
         results.removeIf(x -> x.id() == 0);
         assertThat(results).hasSize(2);
@@ -326,13 +313,13 @@ public class StatsServiceTests {
         Optional<LocalDateTime> endDate = Optional.of(LocalDateTime.now().minusDays(20));
         when(statsHttpContract.findTermsByProject(ontologyId, userId, startDate, endDate, 0, 20))
             .thenReturn(new PageImpl<>(List.of(
-                new StatTerm(term.getId(), term.getName(), 0, term.getColor()),
-                new StatTerm(term2.getId(), term2.getName(), 0, term2.getColor()))));
+                new StatTerm(term.getId(), term.getName(), term.getColor(), 0),
+                new StatTerm(term2.getId(), term2.getName(), term2.getColor(), 0))));
         results = statsService.statTermSlide(project, startDate, endDate);
         results.removeIf(x -> x.id() == 0);
         assertThat(results).hasSize(2);
-        assertThat(results.get(0).value()).isEqualTo(0);
-        assertThat(results.get(1).value()).isEqualTo(0);
+        assertThat(results.get(0).count()).isEqualTo(0);
+        assertThat(results.get(1).count()).isEqualTo(0);
     }
 
 
@@ -435,15 +422,15 @@ public class StatsServiceTests {
         builder.persistAndReturn(annotation2);
         entityManager.refresh(annotation2);
 
-        List<JsonObject> terms;
+        Set<StatTerm> terms;
 
-        List<JsonObject> results = statsService.statUserAnnotations(project);
+        List<StatUserTerm> results = statsService.statUserAnnotations(project);
 
         assertThat(results).hasSize(1);
-        assertThat(results.get(0).getId()).isEqualTo(builder.givenSuperAdmin().getId());
-        terms = (List<JsonObject>) results.get(0).get("terms");
+        assertThat(results.get(0).userId()).isEqualTo(builder.givenSuperAdmin().getId());
+        terms = results.get(0).terms();
         assertThat(terms).hasSize(1);
-        assertThat(terms.get(0).getJSONAttrLong("value")).isEqualTo(2);
+        assertThat(terms.stream().findFirst().get().count()).isEqualTo(2);
     }
 
 

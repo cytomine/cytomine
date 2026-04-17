@@ -392,18 +392,7 @@
         </module>
         <module name="MethodName">
             <property name="format" value="^[a-z][a-z0-9][a-zA-Z0-9]*$" />
-            <message key="name.invalidPattern"
-                     value="Method name ''{0}'' must match pattern ''{1}''." />
-        </module>
-        <module name="SuppressionXpathSingleFilter">
-            <property name="checks" value="MethodName" />
-            <property
-                name="query"
-                value="//METHOD_DEF[
-                                     ./MODIFIERS/ANNOTATION//IDENT[contains(@text, 'Test')]
-                                   ]/IDENT" />
-            <property name="message"
-                      value="'[a-z][a-z0-9][a-zA-Z0-9]*(?:_[a-z][a-z0-9][a-zA-Z0-9]*)*'" />
+            <message key="name.invalidPattern" value="Method name ''{0}'' must match pattern ''{1}''." />
         </module>
         <module name="EmptyCatchBlock">
             <property name="exceptionVariableName" value="expected" />

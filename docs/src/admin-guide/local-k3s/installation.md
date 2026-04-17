@@ -198,6 +198,39 @@ To also remove all persistent volumes (destructive — deletes all data):
 docker compose -f ./helm/compose.yaml down -v
 ```
 
+## Required Docker Volumes
+
+`helm/compose.yaml` declares six bind-mounts on the k3s container. All of them are required — the container will not start correctly if they are missing.
+
+```yaml
+volumes:
+  - ../k3s/entrypoint.sh:/entrypoint:ro
+  - ../k3s/serviceaccounts.yaml:/var/lib/rancher/k3s/server/manifests/serviceaccounts.yaml:ro
+  - ../k3s/nginx-ingress.yaml:/var/lib/rancher/k3s/server/manifests/nginx-ingress.yaml:ro
+  - ../k3s/cytomine-local-ns.yaml:/var/lib/rancher/k3s/server/manifests/cytomine-local-ns.yaml:ro
+  - ../.kube/shared:/output/
+  - ../data/dataset:/data/dataset
+```
+
+These paths are relative to `helm/`, so they resolve from the root of the repository as shown below.
+
+| Host path | Container path | Purpose |
+|---|---|---|
+| `k3s/entrypoint.sh` | `/entrypoint` | Custom startup script run instead of the default k3s entrypoint. Sets up Docker DNS forwarding, cgroup v2 fixes, and starts k3s with nginx-ingress instead of Traefik. Must be executable. |
+| `k3s/serviceaccounts.yaml` | `/var/lib/rancher/k3s/server/manifests/serviceaccounts.yaml` | Kubernetes manifest auto-applied at startup. Creates the service accounts needed by Cytomine pods (e.g. App Engine). |
+| `k3s/nginx-ingress.yaml` | `/var/lib/rancher/k3s/server/manifests/nginx-ingress.yaml` | Kubernetes manifest auto-applied at startup. Deploys the nginx ingress controller, which routes external traffic to Cytomine services. |
+| `k3s/cytomine-local-ns.yaml` | `/var/lib/rancher/k3s/server/manifests/cytomine-local-ns.yaml` | Kubernetes manifest auto-applied at startup. Creates the `cytomine-local` and `cytomine-local-engine-tasks` namespaces with the pod security labels required for Cytomine workloads. |
+| `.kube/shared/` | `/output/` | Directory where k3s writes its kubeconfig file (`config`). This file is read by `helm` and `kubectl` on the host to communicate with the cluster. The directory must exist before starting the container. |
+| `data/dataset` | `/data/dataset` | Host directory containing whole-slide images to import. k3s makes this path available on the node so that PIMS pods can access it via a `hostPath` volume. The directory is created automatically by Docker Compose if it does not exist. |
+
+::: tip
+The four files under `k3s/` are tracked in the repository and do not need to be created manually. The `.kube/shared/` directory, however, must exist on the host before running `docker compose up`, otherwise Docker creates it as root and k3s cannot write the kubeconfig:
+
+```bash
+mkdir -p .kube/shared
+```
+:::
+
 ## Differences from the All-in-Docker-Compose Deployment
 
 | Aspect | All-in-Docker-Compose | k3s + Helm |

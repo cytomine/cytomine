@@ -160,7 +160,7 @@ public class StatsServiceTests {
     }
 
     @Test
-    void most_active_project_count() {
+    void mostActiveProjectCount() {
         Project project = builder.givenAProject();
         givenAPersistentConnectionInProject(builder.givenSuperAdmin(), project, new Date());
         assertThat(((JsonObject) statsService.mostActiveProjects().get().get("project")).getId()).isEqualTo(

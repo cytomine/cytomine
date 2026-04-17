@@ -16,6 +16,7 @@ package be.cytomine.service.ontology;
  * limitations under the License.
  */
 
+import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.EntityManager;
@@ -48,6 +49,7 @@ import be.cytomine.service.command.TransactionService;
 import be.cytomine.utils.CommandResponse;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -147,7 +149,7 @@ public class TermServiceTests {
         Project project = builder.givenAProjectWithOntology(builder.givenAnOntology());
         when(termHttpContract.findAllTermIdsByProject(eq(project.getId()), anyLong()))
             .thenReturn(Set.of());
-        assertThat(termService.list(project)).asList().isEmpty();
+        assertEquals(new HashSet<>(), termService.list(project));
     }
 
     @Test
@@ -155,7 +157,7 @@ public class TermServiceTests {
         Project project = builder.givenAProjectWithOntology(null);
         when(termHttpContract.findAllTermIdsByProject(eq(project.getId()), anyLong()))
             .thenReturn(Set.of());
-        assertThat(termService.list(project)).asList().isEmpty();
+        assertEquals(new HashSet<>(), termService.list(project));
     }
 
 

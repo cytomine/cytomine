@@ -1,4 +1,4 @@
 package be.cytomine.common.repository.model.stat.payload;
 
-public record StatPerTermAndImage(long image, long term, long countAnnotations) {
+public record StatPerTermAndImage(long imageId, long termId, long countAnnotations) {
 }

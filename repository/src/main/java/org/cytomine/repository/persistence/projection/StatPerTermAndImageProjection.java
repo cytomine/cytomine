@@ -1,9 +1,9 @@
 package org.cytomine.repository.persistence.projection;
 
 public interface StatPerTermAndImageProjection {
-    long getImage();
+    long getImageId();
 
-    long getTerm();
+    long getTermId();
 
     long getCountAnnotations();
 }

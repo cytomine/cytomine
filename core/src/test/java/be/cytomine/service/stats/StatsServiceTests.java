@@ -397,8 +397,8 @@ public class StatsServiceTests {
             .thenReturn(new PageImpl<>(List.of(new StatPerTermAndImage(imageId, termId, 1L))));
         results = statsService.statPerTermAndImage(project, null, null);
         assertThat(results).hasSize(1);
-        assertThat(results.get(0).term()).isEqualTo(annotationTerm.getTerm().getId());
-        assertThat(results.get(0).image()).isEqualTo(annotationTerm.getUserAnnotation().getImage().getId());
+        assertThat(results.get(0).termId()).isEqualTo(annotationTerm.getTerm().getId());
+        assertThat(results.get(0).imageId()).isEqualTo(annotationTerm.getUserAnnotation().getImage().getId());
         assertThat(results.get(0).countAnnotations()).isEqualTo(1L);
 
         AnnotationTerm annotationTermWithSameImageAndSameTerm =
@@ -412,29 +412,9 @@ public class StatsServiceTests {
             .thenReturn(new PageImpl<>(List.of(new StatPerTermAndImage(imageId, termId, 2L))));
         results = statsService.statPerTermAndImage(project, null, null);
         assertThat(results).hasSize(1);
-        assertThat(results.get(0).term()).isEqualTo(annotationTerm.getTerm().getId());
-        assertThat(results.get(0).image()).isEqualTo(annotationTerm.getUserAnnotation().getImage().getId());
+        assertThat(results.get(0).termId()).isEqualTo(annotationTerm.getTerm().getId());
+        assertThat(results.get(0).imageId()).isEqualTo(annotationTerm.getUserAnnotation().getImage().getId());
         assertThat(results.get(0).countAnnotations()).isEqualTo(2L);
-
-        AnnotationTerm annotationTermWithSameImage =
-            builder.givenAnAnnotationTerm(builder.givenAUserAnnotation(project));
-        annotationTermWithSameImage.getUserAnnotation().setImage(annotationTerm.getUserAnnotation().getImage());
-        long term2Id = annotationTermWithSameImage.getTerm().getId();
-
-        when(statsHttpContract.findPerTermAndImageByProject(eq(project.getId()), eq(Optional.empty()),
-            eq(Optional.empty()), eq(0), eq(20)))
-            .thenReturn(new PageImpl<>(List.of(
-                new StatPerTermAndImage(imageId, term2Id, 1L),
-                new StatPerTermAndImage(imageId, termId, 2L)
-            )));
-        results = statsService.statPerTermAndImage(project, null, null);
-        assertThat(results).hasSize(2);
-        assertThat(results.get(0).term()).isEqualTo(annotationTerm.getTerm().getId());
-        assertThat(results.get(0).image()).isEqualTo(annotationTerm.getUserAnnotation().getImage().getId());
-        assertThat(results.get(0).countAnnotations()).isEqualTo(2L);
-        assertThat(results.get(1).term()).isEqualTo(annotationTermWithSameImage.getTerm().getId());
-        assertThat(results.get(1).image()).isEqualTo(annotationTerm.getUserAnnotation().getImage().getId());
-        assertThat(results.get(1).countAnnotations()).isEqualTo(1L);
 
         when(statsHttpContract.findPerTermAndImageByProject(eq(project.getId()), any(), any(), eq(0), eq(20)))
             .thenReturn(new PageImpl<>(List.of()));

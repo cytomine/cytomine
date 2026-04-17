@@ -35,6 +35,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.domain.ontology.RelationTerm;
@@ -92,6 +93,9 @@ public class OntologyServiceTests {
 
     @Autowired
     TermRepository termRepository;
+
+    @Autowired
+    TermHttpContract termHttpContract;
 
     @Autowired
     PermissionService permissionService;

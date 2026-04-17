@@ -16,6 +16,8 @@ package be.cytomine.service.ontology;
  * limitations under the License.
  */
 
+import java.util.Set;
+
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
@@ -25,10 +27,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.ontology.AnnotationTerm;
 import be.cytomine.domain.ontology.Ontology;
@@ -44,6 +48,9 @@ import be.cytomine.service.command.TransactionService;
 import be.cytomine.utils.CommandResponse;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
@@ -75,6 +82,9 @@ public class TermServiceTests {
 
     @Autowired
     EntityManager entityManager;
+
+    @MockitoBean
+    TermHttpContract termHttpContract;
 
     @Test
     void listAllTermWithSuccess() {
@@ -108,13 +118,17 @@ public class TermServiceTests {
     @Test
     void listTermByOntologyIncludeTermFromOntology() {
         Term term = builder.givenATerm();
-        assertThat(term).isIn(termService.list(term.getOntology()));
+        when(termHttpContract.findAllTermIdsByOntology(eq(term.getOntology().getId()), anyLong()))
+            .thenReturn(Set.of(term.getId()));
+        assertThat(term.getId()).isIn(termService.list(term.getOntology()));
     }
 
     @Test
     void listTermByOntologyDoNotIncludeTermFromOtherOntology() {
         Term term = builder.givenATerm();
         Ontology ontology = builder.givenAnOntology();
+        when(termHttpContract.findAllTermIdsByOntology(eq(ontology.getId()), anyLong()))
+            .thenReturn(Set.of());
         assertThat(termService.list(ontology).size()).isEqualTo(0);
     }
 
@@ -122,19 +136,25 @@ public class TermServiceTests {
     void listTermByProjectIncludeTermFromProjectOntology() {
         Term term = builder.givenATerm();
         Project project = builder.givenAProjectWithOntology(term.getOntology());
-        assertThat(term).isIn(termService.list(project));
+        when(termHttpContract.findAllTermIdsByProject(eq(project.getId()), anyLong()))
+            .thenReturn(Set.of(term.getId()));
+        assertThat(term.getId()).isIn(termService.list(project));
     }
 
     @Test
     void listTermByProjectDoNotIncludeTermFromOtherOntology() {
         Term term = builder.givenATerm();
         Project project = builder.givenAProjectWithOntology(builder.givenAnOntology());
+        when(termHttpContract.findAllTermIdsByProject(eq(project.getId()), anyLong()))
+            .thenReturn(Set.of());
         assertThat(termService.list(project)).asList().isEmpty();
     }
 
     @Test
     void listTermByProjectReturnEmptyResultIfProjectHasNoOntology() {
         Project project = builder.givenAProjectWithOntology(null);
+        when(termHttpContract.findAllTermIdsByProject(eq(project.getId()), anyLong()))
+            .thenReturn(Set.of());
         assertThat(termService.list(project)).asList().isEmpty();
     }
 

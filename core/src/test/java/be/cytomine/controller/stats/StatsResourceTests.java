@@ -27,7 +27,6 @@ import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.ontology.AnnotationTerm;
 import be.cytomine.domain.ontology.ReviewedAnnotation;
-import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
@@ -217,7 +216,7 @@ public class StatsResourceTests {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(1))));
 
-        Term term = builder.givenATerm(project.getOntology());
+        builder.givenATerm(project.getOntology());
 
         restStatsControllerMockMvc.perform(get("/api/project/{project}/stats/termslide.json", project.getId()))
             .andExpect(status().isOk())

@@ -89,8 +89,7 @@ public class RestStatsController extends RestCytomineController {
         Optional<LocalDateTime> endLocalDateTime =
             endDateLong.map(Instant::ofEpochMilli).map(i -> LocalDateTime.ofInstant(i, ZoneId.systemDefault()));
 
-        return responseSuccess(
-            statsService.statTermSlide(project, startLocalDateTime, endLocalDateTime));
+        return responseSuccess(statsService.statTermSlide(project, startLocalDateTime, endLocalDateTime));
     }
 
     @GetMapping("/project/{project}/stats/termimage.json")
@@ -125,18 +124,20 @@ public class RestStatsController extends RestCytomineController {
     }
 
     @GetMapping("/project/{project}/stats/annotationevolution.json")
-    public ResponseEntity<String> statAnnotationEvolution(@PathVariable("project") Long projectId,
-                                                          @RequestParam(required = false, defaultValue = "1")
-                                                          Integer daysRange,
-                                                          @RequestParam(value = "startDate", required = false)
-                                                          Long startDateLong,
-                                                          @RequestParam(value = "endDate", required = false)
-                                                          Long endDateLong,
-                                                          @RequestParam(value = "term", required = false) Long termId,
-                                                          @RequestParam(value = "accumulate", required = false, defaultValue = "true")
-                                                          Boolean accumulate,
-                                                          @RequestParam(value = "reverseOrder", required = false, defaultValue = "true")
-                                                          Boolean reverseOrder) {
+    public ResponseEntity<String> statAnnotationEvolution(
+        @PathVariable("project") Long projectId,
+        @RequestParam(required = false, defaultValue = "1")
+        Integer daysRange,
+        @RequestParam(value = "startDate", required = false)
+        Long startDateLong,
+        @RequestParam(value = "endDate", required = false)
+        Long endDateLong,
+        @RequestParam(value = "term", required = false) Long termId,
+        @RequestParam(value = "accumulate", required = false, defaultValue = "true")
+        Boolean accumulate,
+        @RequestParam(value = "reverseOrder", required = false, defaultValue = "true")
+        Boolean reverseOrder
+    ) {
         Project project =
             projectService.find(projectId).orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
 
@@ -154,19 +155,21 @@ public class RestStatsController extends RestCytomineController {
     }
 
     @GetMapping("/project/{project}/stats/reviewedannotationevolution.json")
-    public ResponseEntity<String> statReviewedAnnotationEvolution(@PathVariable("project") Long projectId,
-                                                                  @RequestParam(required = false, defaultValue = "1")
-                                                                  Integer daysRange,
-                                                                  @RequestParam(value = "startDate", required = false)
-                                                                  Long startDateLong,
-                                                                  @RequestParam(value = "endDate", required = false)
-                                                                  Long endDateLong,
-                                                                  @RequestParam(value = "term", required = false)
-                                                                  Long termId,
-                                                                  @RequestParam(value = "accumulate", required = false, defaultValue = "true")
-                                                                  Boolean accumulate,
-                                                                  @RequestParam(value = "reverseOrder", required = false, defaultValue = "true")
-                                                                  Boolean reverseOrder) {
+    public ResponseEntity<String> statReviewedAnnotationEvolution(
+        @PathVariable("project") Long projectId,
+        @RequestParam(required = false, defaultValue = "1")
+        Integer daysRange,
+        @RequestParam(value = "startDate", required = false)
+        Long startDateLong,
+        @RequestParam(value = "endDate", required = false)
+        Long endDateLong,
+        @RequestParam(value = "term", required = false)
+        Long termId,
+        @RequestParam(value = "accumulate", required = false, defaultValue = "true")
+        Boolean accumulate,
+        @RequestParam(value = "reverseOrder", required = false, defaultValue = "true")
+        Boolean reverseOrder
+    ) {
         Project project =
             projectService.find(projectId).orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
 
@@ -222,15 +225,17 @@ public class RestStatsController extends RestCytomineController {
     }
 
     @GetMapping("/project/{project}/stats/connectionsevolution.json")
-    public ResponseEntity<String> statConnectionsEvolution(@PathVariable(value = "project") Long projectId,
-                                                           @RequestParam(required = false, defaultValue = "1")
-                                                           Integer daysRange,
-                                                           @RequestParam(value = "startDate", required = false)
-                                                           Long startDateLong,
-                                                           @RequestParam(value = "endDate", required = false)
-                                                           Long endDateLong,
-                                                           @RequestParam(value = "accumulate", required = false, defaultValue = "true")
-                                                           Boolean accumulate) {
+    public ResponseEntity<String> statConnectionsEvolution(
+        @PathVariable(value = "project") Long projectId,
+        @RequestParam(required = false, defaultValue = "1")
+        Integer daysRange,
+        @RequestParam(value = "startDate", required = false)
+        Long startDateLong,
+        @RequestParam(value = "endDate", required = false)
+        Long endDateLong,
+        @RequestParam(value = "accumulate", required = false, defaultValue = "true")
+        Boolean accumulate
+    ) {
         Project project =
             projectService.find(projectId).orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
         securityACLService.check(project, READ);
@@ -243,15 +248,17 @@ public class RestStatsController extends RestCytomineController {
     }
 
     @GetMapping("/project/{project}/stats/imageconsultationsevolution.json")
-    public ResponseEntity<String> statImageConsultationsEvolution(@PathVariable(value = "project") Long projectId,
-                                                                  @RequestParam(required = false, defaultValue = "1")
-                                                                  Integer daysRange,
-                                                                  @RequestParam(value = "startDate", required = false)
-                                                                  Long startDateLong,
-                                                                  @RequestParam(value = "endDate", required = false)
-                                                                  Long endDateLong,
-                                                                  @RequestParam(value = "accumulate", required = false, defaultValue = "true")
-                                                                  Boolean accumulate) {
+    public ResponseEntity<String> statImageConsultationsEvolution(
+        @PathVariable(value = "project") Long projectId,
+        @RequestParam(required = false, defaultValue = "1")
+        Integer daysRange,
+        @RequestParam(value = "startDate", required = false)
+        Long startDateLong,
+        @RequestParam(value = "endDate", required = false)
+        Long endDateLong,
+        @RequestParam(value = "accumulate", required = false, defaultValue = "true")
+        Boolean accumulate
+    ) {
         Project project =
             projectService.find(projectId).orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
         securityACLService.check(project, READ);
@@ -264,16 +271,18 @@ public class RestStatsController extends RestCytomineController {
     }
 
     @GetMapping("/project/{project}/stats/annotationactionsevolution.json")
-    public ResponseEntity<String> statAnnotationActionsEvolution(@PathVariable(value = "project") Long projectId,
-                                                                 @RequestParam(required = false, defaultValue = "1")
-                                                                 Integer daysRange,
-                                                                 @RequestParam(value = "startDate", required = false)
-                                                                 Long startDateLong,
-                                                                 @RequestParam(value = "endDate", required = false)
-                                                                 Long endDateLong,
-                                                                 @RequestParam(value = "accumulate", required = false, defaultValue = "true")
-                                                                 Boolean accumulate,
-                                                                 @RequestParam(required = false) String type) {
+    public ResponseEntity<String> statAnnotationActionsEvolution(
+        @PathVariable(value = "project") Long projectId,
+        @RequestParam(required = false, defaultValue = "1")
+        Integer daysRange,
+        @RequestParam(value = "startDate", required = false)
+        Long startDateLong,
+        @RequestParam(value = "endDate", required = false)
+        Long endDateLong,
+        @RequestParam(value = "accumulate", required = false, defaultValue = "true")
+        Boolean accumulate,
+        @RequestParam(required = false) String type
+    ) {
         Project project =
             projectService.find(projectId).orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
         securityACLService.check(project, READ);

@@ -172,8 +172,9 @@ public class StatsService {
                                                     Date endDate, boolean reverseOrder, boolean accumulate) {
         securityACLService.check(project, READ);
         String request =
-            "SELECT created " + "FROM UserAnnotation " + "WHERE project.id = " + project.getId() + " " + (term != null ?
-                "AND id IN (SELECT userAnnotation.id FROM AnnotationTerm WHERE term.id = " + term.getId() + ") " : "")
+            "SELECT created " + "FROM UserAnnotation " + "WHERE project.id = " + project.getId() + " "
+                + (term != null ? "AND id IN (SELECT userAnnotation.id FROM AnnotationTerm"
+                + " WHERE term.id = " + term.getId() + ") " : "")
                 + (startDate != null ? " AND created > cast(date('" + startDate + "') as timestamp)" : "") + (
                 endDate != null ? " AND created < cast(date('" + endDate + "') as timestamp)" : "")
                 + " ORDER BY created ASC";
@@ -195,10 +196,10 @@ public class StatsService {
         securityACLService.check(project, READ);
 
         String request =
-            "SELECT created " + "FROM reviewed_annotation " + "WHERE project_id = " + project.getId() + " " + (
-                term != null ?
-                    "AND id IN (SELECT reviewed_annotation_terms_id FROM reviewed_annotation_term WHERE term_id = "
-                        + term.getId() + ") " : "") + (startDate != null ? "AND created > '" + startDate + "'" : "") + (
+            "SELECT created FROM reviewed_annotation WHERE project_id = " + project.getId() + " "
+                + (term != null ? "AND id IN (SELECT reviewed_annotation_terms_id "
+                + "FROM reviewed_annotation_term WHERE term_id = "
+                + term.getId() + ") " : "") + (startDate != null ? "AND created > '" + startDate + "'" : "") + (
                 endDate != null ? "AND created < '" + endDate + "'" : "") + "ORDER BY created ASC";
 
         List<java.util.Date> annotationsDates = entityManager.createNativeQuery(request).getResultList();
@@ -230,7 +231,8 @@ public class StatsService {
             predicatesList.add(endDatePredicate);
         }
         cq.multiselect(userAnnotationRoot.get("user").get("id"),
-                cb.countDistinct(userAnnotationRoot.get("image").get("id"))).where(predicatesList.toArray(Predicate[]::new))
+                cb.countDistinct(userAnnotationRoot.get("image").get("id")))
+            .where(predicatesList.toArray(Predicate[]::new))
             .groupBy(userAnnotationRoot.get("user").get("id"));
 
         TypedQuery<Tuple> q = entityManager.createQuery(cq);
@@ -267,10 +269,10 @@ public class StatsService {
 
     public List<StatPerTermAndImage> statPerTermAndImage(Project project, Date startDate, Date endDate) {
         securityACLService.check(project, READ);
-        Optional<LocalDateTime> start = Optional.ofNullable(startDate)
-            .map(d -> d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-        Optional<LocalDateTime> end = Optional.ofNullable(endDate)
-            .map(d -> d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+        Optional<LocalDateTime> start =
+            Optional.ofNullable(startDate).map(d -> d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+        Optional<LocalDateTime> end =
+            Optional.ofNullable(endDate).map(d -> d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
 
         return new ArrayList<>(pagesClient.callAllPages(
             (page, size) -> statsHttpContract.findPerTermAndImageByProject(project.getId(), start, end, page, size)));
@@ -280,20 +282,18 @@ public class StatsService {
     public List<JsonObject> statTerm(Project project, Date startDate, Date endDate, boolean leafsOnly) {
         securityACLService.check(project, READ);
         Long userId = currentUserService.getCurrentUser().getId();
-        Optional<LocalDateTime> start = Optional.ofNullable(startDate)
-            .map(d -> d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-        Optional<LocalDateTime> end = Optional.ofNullable(endDate)
-            .map(d -> d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+        Optional<LocalDateTime> start =
+            Optional.ofNullable(startDate).map(d -> d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+        Optional<LocalDateTime> end =
+            Optional.ofNullable(endDate).map(d -> d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
 
-        Set<Long> nonLeafTermIds = leafsOnly
-            ? termRelationHttpContract.findAllByOntologyId(project.getOntology().getId(), userId).stream()
-            .map(TermRelationResponse::term1Id).collect(toSet())
-            : Set.of();
+        Set<Long> nonLeafTermIds =
+            leafsOnly ? termRelationHttpContract.findAllByOntologyId(project.getOntology().getId(), userId).stream()
+                .map(TermRelationResponse::term1Id).collect(toSet()) : Set.of();
 
         return pagesClient.callAllPages(
                 (page, size) -> statsHttpContract.findTermsByProject(project.getId(), userId, start, end, page, size))
-            .stream()
-            .filter(s -> !leafsOnly || !nonLeafTermIds.contains(s.id()))
+            .stream().filter(s -> !leafsOnly || !nonLeafTermIds.contains(s.id()))
             .map(s -> JsonObject.of("id", s.id(), "username", s.name(), "value", s.count(), "color", s.color()))
             .collect(Collectors.toList());
     }

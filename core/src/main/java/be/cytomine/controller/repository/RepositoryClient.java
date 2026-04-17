@@ -19,9 +19,8 @@ public class RepositoryClient {
     @Value("${application.repositoryURL}")
     private String repositoryURL;
 
-
+    // Not sure if it should or not be shared between each client instance.
     @Bean
-        // Not sure if it should or not be shared between each client instance.
     RestClient repositoryRestClient() {
         return RestClient.builder().baseUrl(repositoryURL).build();
     }

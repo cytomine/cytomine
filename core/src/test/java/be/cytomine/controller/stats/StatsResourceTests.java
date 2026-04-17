@@ -3,30 +3,34 @@ package be.cytomine.controller.stats;
 import java.util.Date;
 import java.util.List;
 
-import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.client.WireMock;
 import jakarta.persistence.EntityManager;
 import org.apache.commons.lang3.time.DateUtils;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.http.StatsHttpContract;
+import be.cytomine.common.repository.http.TermRelationHttpContract;
+import be.cytomine.common.repository.model.stat.payload.FlatStatUserTerm;
+import be.cytomine.common.repository.model.stat.payload.StatPerTermAndImage;
+import be.cytomine.common.repository.model.stat.payload.StatTerm;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.ontology.AnnotationTerm;
 import be.cytomine.domain.ontology.ReviewedAnnotation;
+import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
@@ -43,10 +47,12 @@ import be.cytomine.repositorynosql.social.ProjectConnectionRepository;
 import be.cytomine.service.social.AnnotationActionService;
 import be.cytomine.service.social.ImageConsultationService;
 import be.cytomine.service.social.ProjectConnectionService;
-import be.cytomine.utils.JsonObject;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -97,17 +103,11 @@ public class StatsResourceTests {
     @Autowired
     private MockMvc restStatsControllerMockMvc;
 
-    private static WireMockServer wireMockServer = new WireMockServer(8888);
+    @MockitoBean
+    private StatsHttpContract statsHttpContract;
 
-    @BeforeAll
-    public static void beforeAll() {
-        wireMockServer.start();
-    }
-
-    @AfterAll
-    public static void afterAll() {
-        wireMockServer.stop();
-    }
+    @MockitoBean
+    private TermRelationHttpContract termRelationHttpContract;
 
     @BeforeEach
     public void init() {
@@ -118,10 +118,6 @@ public class StatsResourceTests {
         projectConnectionRepository.deleteAll();
         lastUserPositionRepository.deleteAll();
         persistentUserPositionRepository.deleteAll();
-        wireMockServer.stubFor(WireMock.get(WireMock.urlPathMatching("/term_relations/ontology/.*"))
-            .willReturn(WireMock.aResponse()
-                .withHeader("Content-Type", "application/json")
-                .withBody("[]")));
     }
 
     PersistentProjectConnection givenAPersistentConnectionInProject(User user, Project project, Date created) {
@@ -162,6 +158,13 @@ public class StatsResourceTests {
     @Test
     void statsTerm() throws Exception {
         Project project = builder.givenAProject();
+        long userId = builder.givenSuperAdmin().getId();
+        long ontologyId = project.getOntology().getId();
+        long projectId = project.getId();
+
+        when(termRelationHttpContract.findAllByOntologyId(eq(ontologyId), eq(userId))).thenReturn(List.of());
+        when(statsHttpContract.findTermsByProject(eq(projectId), eq(userId), any(), any(), eq(0), eq(20)))
+            .thenReturn(new PageImpl<>(List.of(new StatTerm(0L, "No term", "#fff", 0))));
 
         restStatsControllerMockMvc.perform(get("/api/project/{project}/stats/term.json", project.getId()))
             .andExpect(status().isOk())
@@ -170,12 +173,19 @@ public class StatsResourceTests {
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm(builder.givenAUserAnnotation(project));
         entityManager.refresh(project.getOntology());
 
+        Term term = annotationTerm.getTerm();
+        when(statsHttpContract.findTermsByProject(eq(projectId), eq(userId), any(), any(), eq(0), eq(20)))
+            .thenReturn(new PageImpl<>(List.of(
+                new StatTerm(0L, "No term", "#fff", 0),
+                new StatTerm(term.getId(), term.getName(), term.getColor(), 1)
+            )));
+
         restStatsControllerMockMvc.perform(get("/api/project/{project}/stats/term.json", project.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(2))))
-            .andExpect(jsonPath("$.collection[?(@.key=='" + annotationTerm.getTerm().getName() + "')].id").value(
-                annotationTerm.getTerm().getId().intValue()))
-            .andExpect(jsonPath("$.collection[?(@.key=='" + annotationTerm.getTerm().getName() + "')].value").value(1));
+            .andExpect(jsonPath("$.collection[?(@.username=='" + term.getName() + "')].id").value(
+                term.getId().intValue()))
+            .andExpect(jsonPath("$.collection[?(@.username=='" + term.getName() + "')].value").value(1));
 
         restStatsControllerMockMvc.perform(get("/api/project/{project}/stats/term.json", project.getId())
                 .param("startDate", String.valueOf(DateUtils.addDays(new Date(), -10).getTime()))
@@ -211,12 +221,23 @@ public class StatsResourceTests {
     @Test
     void statsTermSlide() throws Exception {
         Project project = builder.givenAProject();
+        long userId = builder.givenSuperAdmin().getId();
+        long ontologyId = project.getOntology().getId();
+
+        when(statsHttpContract.findTermsByProject(eq(ontologyId), eq(userId), any(), any(), eq(0), eq(20)))
+            .thenReturn(new PageImpl<>(List.of(new StatTerm(0L, "No term", "#fff", 0))));
 
         restStatsControllerMockMvc.perform(get("/api/project/{project}/stats/termslide.json", project.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(1))));
 
-        builder.givenATerm(project.getOntology());
+        Term term = builder.givenATerm(project.getOntology());
+
+        when(statsHttpContract.findTermsByProject(eq(ontologyId), eq(userId), any(), any(), eq(0), eq(20)))
+            .thenReturn(new PageImpl<>(List.of(
+                new StatTerm(0L, "No term", "#fff", 0),
+                new StatTerm(term.getId(), term.getName(), term.getColor(), 0)
+            )));
 
         restStatsControllerMockMvc.perform(get("/api/project/{project}/stats/termslide.json", project.getId()))
             .andExpect(status().isOk())
@@ -232,12 +253,21 @@ public class StatsResourceTests {
     void shouldReturnTermImageStatsPerProject() throws Exception {
         Project project = builder.givenAProject();
 
+        when(statsHttpContract.findPerTermAndImageByProject(eq(project.getId()), any(), any(), eq(0), eq(20)))
+            .thenReturn(new PageImpl<>(List.of()));
+
         restStatsControllerMockMvc.perform(get("/api/project/{project}/stats/termimage.json", project.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(0))));
 
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm(builder.givenAUserAnnotation(project));
         entityManager.refresh(project.getOntology());
+
+        ImageInstance imageInstance = annotationTerm.getUserAnnotation().getImage();
+        when(statsHttpContract.findPerTermAndImageByProject(eq(project.getId()), any(), any(), eq(0), eq(20)))
+            .thenReturn(new PageImpl<>(List.of(
+                new StatPerTermAndImage(imageInstance.getId(), annotationTerm.getTerm().getId(), 1)
+            )));
 
         restStatsControllerMockMvc.perform(get("/api/project/{project}/stats/termimage.json", project.getId()))
             .andExpect(status().isOk())
@@ -288,22 +318,28 @@ public class StatsResourceTests {
         builder.addUserToProject(project, "superadmin");
         UserAnnotation annotation1 = builder.givenAUserAnnotation(project);
         annotation1.setCreated(DateUtils.addDays(new Date(), -1));
-        builder.givenAnAnnotationTerm(annotation1, builder.givenATerm(project.getOntology()));
+        Term sharedTerm = builder.givenATerm(project.getOntology());
+        builder.givenAnAnnotationTerm(annotation1, sharedTerm);
         builder.persistAndReturn(annotation1);
         entityManager.refresh(annotation1);
         UserAnnotation annotation2 = builder.givenAUserAnnotation(project);
         annotation2.setCreated(DateUtils.addDays(new Date(), -1));
-        builder.givenAnAnnotationTerm(annotation2, annotation1.getTerms().get(0));
+        builder.givenAnAnnotationTerm(annotation2, sharedTerm);
         builder.persistAndReturn(annotation2);
         entityManager.refresh(annotation2);
 
-        List<JsonObject> terms;
+        User superAdmin = builder.givenSuperAdmin();
+        when(statsHttpContract.findUserTermsByProject(eq(project.getId()), eq(superAdmin.getId()), eq(0), eq(20)))
+            .thenReturn(new PageImpl<>(List.of(
+                new FlatStatUserTerm(superAdmin.getId(), superAdmin.getUsername(),
+                    new StatTerm(sharedTerm.getId(), sharedTerm.getName(), sharedTerm.getColor(), 2))
+            )));
 
         restStatsControllerMockMvc.perform(get("/api/project/{project}/stats/userannotations.json", project.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(1))))
-            .andExpect(jsonPath("$.collection[0].id").value(builder.givenSuperAdmin().getId()))
-            .andExpect(jsonPath("$.collection[0].terms[0].value").value(2));
+            .andExpect(jsonPath("$.collection[0].userId").value(superAdmin.getId().intValue()))
+            .andExpect(jsonPath("$.collection[0].terms[0].count").value(2));
 
     }
 
@@ -365,7 +401,7 @@ public class StatsResourceTests {
         restStatsControllerMockMvc.perform(get("/api/term/{id}/project/stat.json", annotationTerm.getTerm().getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(1))))
-            .andExpect(jsonPath("$.collection[0].key").value(project.getName()))
+            .andExpect(jsonPath("$.collection[0].username").value(project.getName()))
             .andExpect(jsonPath("$.collection[0].value").value(1L));
     }
 

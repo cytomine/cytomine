@@ -144,6 +144,7 @@ public class User extends CytomineDomain {
         user.id = json.getJSONAttrLong("id", null);
         user.username = json.getJSONAttrStr("username");
         user.name = json.getJSONAttrStr("name");
+        user.reference = json.getJSONAttrStr("reference");
         return user;
     }
 

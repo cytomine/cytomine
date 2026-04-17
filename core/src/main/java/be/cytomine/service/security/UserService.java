@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -14,6 +15,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import be.cytomine.dto.Account;
 import jakarta.persistence.Query;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.TupleElement;
@@ -228,6 +230,9 @@ public class UserService extends ModelService {
     @Autowired
     private StorageRepository storageRepository;
 
+    @Autowired
+    private AccountService accountService;
+
     public Optional<User> find(Long id) {
         securityACLService.checkGuest(currentUserService.getCurrentUser());
         return userRepository.findById(id);
@@ -243,6 +248,10 @@ public class UserService extends ModelService {
         } catch (NumberFormatException ex) {
             return findByUsername(id);
         }
+    }
+
+    public List<User> find(List<String> ids) {
+        return userRepository.findAllByReferenceIn(ids);
     }
 
     public Optional<User> findUser(Long id) {
@@ -314,9 +323,11 @@ public class UserService extends ModelService {
             .filter(x -> x.getProperty().equals("fullName"))
             .findFirst();
 
-        String select = "SELECT u.* ";
-        String from = "FROM sec_user u ";
-        String where = "WHERE true ";
+        String select = "SELECT u.*, r.authority as role ";
+        String from = "FROM sec_user u " +
+            "LEFT JOIN sec_user_sec_role susr ON u.id = susr.sec_user_id " +
+            "LEFT JOIN sec_role r ON susr.sec_role_id = r.id ";
+        String where = "WHERE true " ;
         String search = "";
         String groupBy = "";
         String sort;
@@ -351,7 +362,8 @@ public class UserService extends ModelService {
         for (Map.Entry<String, Object> entry : mapParams.entrySet()) {
             query.setParameter(entry.getKey(), entry.getValue());
         }
-        List<Tuple> resultList = query.getResultList();
+        List<Tuple> resultList = compactUserTuples(query.getResultList());
+        System.out.println("Result List: " + resultList);
         List<Map<String, Object>> results = new ArrayList<>();
         for (Tuple rowResult : resultList) {
             JsonObject result = new JsonObject();
@@ -362,6 +374,7 @@ public class UserService extends ModelService {
             }
 
             JsonObject object = User.getDataFromDomain(new User().buildDomainFromJson(result, getEntityManager()));
+            object.put("role", rowResult.get("role"));
             results.add(object);
         }
         request = "SELECT COUNT(DISTINCT U.id) " + from + where + search;
@@ -374,15 +387,40 @@ public class UserService extends ModelService {
         return PageUtils.buildPageFromPageResults(results, max, offset, count);
     }
 
-    public Page<JsonObject> listUsersExtendedByProject(
-        Project project,
-        UserSearchExtension userSearchExtension,
-        List<SearchParameterEntry> searchParameters,
-        String sortColumn,
-        String sortDirection,
-        Long max,
-        Long offset
-    ) {
+    private List<Tuple> compactUserTuples(List<Tuple> resultList) {
+        Map<Long, Tuple> compactedMap = new LinkedHashMap<>();
+
+        // Define hierarchy weights
+        Map<String, Integer> hierarchy = Map.of(
+            "ROLE_ADMIN", 3,
+            "ROLE_USER", 2,
+            "ROLE_GUEST", 1
+        );
+
+        for (Tuple currentTuple : resultList) {
+            // Extract the user
+            Long userId = ((Number) currentTuple.get("id")).longValue();
+            String currentRole = (String) currentTuple.get("role");
+
+            if (!compactedMap.containsKey(userId)) {
+                compactedMap.put(userId, currentTuple);
+            } else {
+                Tuple existingTuple = compactedMap.get(userId);
+                String existingRole = (String) existingTuple.get("role");
+
+                int existingWeight = hierarchy.getOrDefault(existingRole, 0);
+                int currentWeight = hierarchy.getOrDefault(currentRole, 0);
+
+                if (currentWeight > existingWeight) {
+                    compactedMap.put(userId, currentTuple);
+                }
+            }
+        }
+
+        return new ArrayList<>(compactedMap.values());
+    }
+
+    public Page<JsonObject> listUsersExtendedByProject(Project project, UserSearchExtension userSearchExtension, List<SearchParameterEntry> searchParameters, String sortColumn, String sortDirection, Long max, Long offset) {
 
         if (ReflectionUtils.findField(User.class, sortColumn) == null && !(List.of(
             "projectRole",
@@ -929,6 +967,17 @@ public class UserService extends ModelService {
                 json.put("user", currentUser.getId());
                 json.put("origin", "ADMINISTRATOR");
             }
+            // I think I should put the step to add and update
+            Account account = new Account();
+            account.setFirstName(json.getJSONAttrStr("firstname"));
+            account.setLastName(json.getJSONAttrStr("lastname"));
+            account.setUsername(json.getJSONAttrStr("username"));
+            account.setUserLocale(json.getJSONAttrStr("language").toLowerCase());
+            account.setEmail(json.getJSONAttrStr("email"));
+            account.setEmailVerified(true);
+            account.setPassword(json.getJSONAttrStr("password"));
+            account.setRoles(List.of(json.getJSONAttrStr("role").substring(5)));
+            accountService.createAccount(account);
             CommandResponse response = executeCommand(new AddCommand(currentUser), null, json);
 
             return response;
@@ -947,6 +996,16 @@ public class UserService extends ModelService {
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.checkIsCreator((User) domain, currentUser);
+        Account account = new Account();
+        account.setFirstName(jsonNewData.getJSONAttrStr("firstname"));
+        account.setLastName(jsonNewData.getJSONAttrStr("lastname"));
+        account.setUsername(jsonNewData.getJSONAttrStr("username"));
+        account.setUserLocale(jsonNewData.getJSONAttrStr("language").toLowerCase());
+        account.setEmail(jsonNewData.getJSONAttrStr("email"));
+        account.setEmailVerified(true);
+        account.setPassword(jsonNewData.getJSONAttrStr("password"));
+        account.setRoles(List.of(jsonNewData.getJSONAttrStr("role").substring(5)));
+        accountService.update(account);
         return executeCommand(new EditCommand(currentUser, null), domain, jsonNewData);
     }
 

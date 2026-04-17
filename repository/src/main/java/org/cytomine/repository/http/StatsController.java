@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import be.cytomine.common.repository.http.StatsHttpContract;
 import be.cytomine.common.repository.model.stat.payload.FlatStatUserTerm;
+import be.cytomine.common.repository.model.stat.payload.StatPerTermAndImage;
 import be.cytomine.common.repository.model.stat.payload.StatTerm;
 
 @Component
@@ -40,5 +41,17 @@ public class StatsController implements StatsHttpContract {
     public Page<FlatStatUserTerm> findUserTermsByProject(long projectId, long userId, int page, int size) {
         return termRepository.findAllByUsersByProjectForStats(projectId, PageRequest.of(page, size))
             .map(statsMapper::map);
+    }
+
+    @Override
+    @GetMapping("/per-term-and-image/project/{projectId}")
+    public Page<StatPerTermAndImage> findPerTermAndImageByProject(@PathVariable long projectId,
+                                                                  @RequestParam(required = false)
+                                                                  Optional<LocalDateTime> startDate,
+                                                                  @RequestParam(required = false)
+                                                                  Optional<LocalDateTime> endDate,
+                                                                  @RequestParam int page, @RequestParam int size) {
+        return termRepository.findAllPerTermAndImageByProjectForStats(projectId, startDate.orElse(null),
+            endDate.orElse(null), PageRequest.of(page, size)).map(statsMapper::map);
     }
 }

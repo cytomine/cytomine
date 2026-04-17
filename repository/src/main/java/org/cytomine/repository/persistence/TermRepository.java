@@ -3,6 +3,7 @@ package org.cytomine.repository.persistence;
 import java.time.LocalDateTime;
 
 import org.cytomine.repository.persistence.entity.TermEntity;
+import org.cytomine.repository.persistence.projection.StatPerTermAndImageProjection;
 import org.cytomine.repository.persistence.projection.StatTermProjection;
 import org.cytomine.repository.persistence.projection.StatUserTermProjection;
 import org.springframework.data.domain.Page;
@@ -72,4 +73,33 @@ public interface TermRepository extends JpaRepository<TermEntity, Long> {
         """,
         nativeQuery = true)
     Page<StatUserTermProjection> findAllByUsersByProjectForStats(long projectId, Pageable pageable);
+
+    @Query(value = """
+        SELECT ua.image_id AS image, at.term_id AS term, COUNT(ua.userId) AS countAnnotations
+        FROM user_annotation ua
+        LEFT JOIN annotation_term at ON at.user_annotation_id = ua.userId
+        WHERE ua.deleted IS NULL
+        AND at.deleted IS NULL
+        AND ua.project_id = :projectId
+        AND (:startDate IS NULL OR at.created > :startDate)
+        AND (:endDate IS NULL OR at.created < :endDate)
+        GROUP BY ua.image_id, at.term_id
+        ORDER BY ua.image_id, at.term_id
+        """, countQuery = """
+        SELECT count(*) FROM (
+            SELECT ua.image_id, at.term_id
+            FROM user_annotation ua
+            LEFT JOIN annotation_term at ON at.user_annotation_id = ua.userId
+            WHERE ua.deleted IS NULL
+            AND at.deleted IS NULL
+            AND ua.project_id = :projectId
+            AND (:startDate IS NULL OR at.created > :startDate)
+            AND (:endDate IS NULL OR at.created < :endDate)
+            GROUP BY ua.image_id, at.term_id
+        ) AS _count
+        """, nativeQuery = true)
+    Page<StatPerTermAndImageProjection> findAllPerTermAndImageByProjectForStats(long projectId,
+                                                                                LocalDateTime startDate,
+                                                                                LocalDateTime endDate,
+                                                                                Pageable pageable);
 }

@@ -10,6 +10,7 @@ import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;
 
 import be.cytomine.common.repository.model.stat.payload.FlatStatUserTerm;
+import be.cytomine.common.repository.model.stat.payload.StatPerTermAndImage;
 import be.cytomine.common.repository.model.stat.payload.StatTerm;
 
 import static be.cytomine.common.repository.http.StatsHttpContract.ROOT_PATH;
@@ -29,4 +30,12 @@ public interface StatsHttpContract {
     @GetExchange("/per-user/project/{projectId}")
     Page<FlatStatUserTerm> findUserTermsByProject(@PathVariable long projectId, @RequestParam long userId,
                                                   @RequestParam int page, @RequestParam int size);
+
+    @GetExchange("/per-term-and-image/project/{projectId}")
+    Page<StatPerTermAndImage> findPerTermAndImageByProject(@PathVariable long projectId,
+                                                           @RequestParam(required = false)
+                                                           Optional<LocalDateTime> startDate,
+                                                           @RequestParam(required = false)
+                                                           Optional<LocalDateTime> endDate,
+                                                           @RequestParam int page, @RequestParam int size);
 }

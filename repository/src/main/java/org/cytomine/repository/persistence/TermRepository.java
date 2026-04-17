@@ -26,7 +26,9 @@ public interface TermRepository extends JpaRepository<TermEntity, Long> {
     Set<Long> findAllIdsByOntologyId(long ontologyId);
 
     @Query(value = """
-        SELECT t.id FROM term t JOIN project p ON t.ontology_id = p.ontology_id WHERE p.id = :projectId AND t.deleted IS NULL
+        SELECT t.id FROM term t JOIN project p
+        ON t.ontology_id = p.ontology_id
+        WHERE p.id = :projectId AND t.deleted IS NULL
         """, nativeQuery = true)
     Set<Long> findAllIdsByProjectId(long projectId);
 

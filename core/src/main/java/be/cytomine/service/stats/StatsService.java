@@ -270,11 +270,13 @@ public class StatsService {
         List<JsonObject> result = new ArrayList<>();
 
         //Get the number of annotation for each term
-        String request = "SELECT ua.image_id, at.term_id, COUNT(ua.userId) as count  " + "FROM user_annotation ua "
-            + "LEFT JOIN annotation_term at ON at.user_annotation_id = ua.userId "
-            + "WHERE ua.deleted is NULL and at.deleted is NULL and ua.project_id = " + project.getId() + " " + (
-            startDate != null ? "AND at.created > '" + startDate + "'" : "") + (endDate != null ?
-            "AND at.created < '" + endDate + "'" : "") + "GROUP BY ua.image_id, at.term_id "
+        String request = "SELECT ua.image_id, at.term_id, COUNT(ua.id) as count  "
+            + "FROM user_annotation ua "
+            + "LEFT JOIN annotation_term at ON at.user_annotation_id = ua.id "
+            + "WHERE ua.deleted is NULL and at.deleted is NULL and ua.project_id = " + project.getId() + " "
+            + (startDate != null ? "AND at.created > '" + startDate + "'" : "")
+            + (endDate != null ? "AND at.created < '" + endDate + "'" : "")
+            + "GROUP BY ua.image_id, at.term_id "
             + "ORDER BY ua.image_id, at.term_id ";
 
         List<Tuple> rows = entityManager.createNativeQuery(request, Tuple.class).getResultList();
@@ -321,10 +323,14 @@ public class StatsService {
         stats.put("0", 0);
 
         //Get the number of annotation for each term
-        String request = "SELECT at.term_id, count(*) " + "FROM user_annotation ua " + "LEFT JOIN annotation_term at "
-            + "ON at.user_annotation_id = ua.userId " + "WHERE ua.project_id = " + project.getId() + " " + (
-            startDate != null ? "AND at.created > '" + startDate + "'" : "") + (endDate != null ?
-            "AND at.created < '" + endDate + "'" : "") + "GROUP BY at.term_id ";
+        String request = "SELECT at.term_id, count(*) "
+            + "FROM user_annotation ua "
+            + "LEFT JOIN annotation_term at "
+            + "ON at.user_annotation_id = ua.id "
+            + "WHERE ua.project_id = " + project.getId() + " "
+            + (startDate != null ? "AND at.created > '" + startDate + "'" : "")
+            + (endDate != null ? "AND at.created < '" + endDate + "'" : "")
+            + "GROUP BY at.term_id ";
 
         List<Tuple> rows = entityManager.createNativeQuery(request, Tuple.class).getResultList();
         for (Tuple row : rows) {
@@ -395,7 +401,7 @@ public class StatsService {
         for (JsonObject user : userService.listLayers(project, null)) {
             JsonObject item = new JsonObject();
             item.put("id", user.get("id"));
-            item.put("username", user.get("username"));
+            item.put("key", user.get("username"));
             item.put("username", user.get("username"));
             item.put("value", 0);
             result.put(item.getId(), item);

@@ -15,6 +15,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import be.cytomine.dto.Account;
 import jakarta.persistence.Query;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.TupleElement;
@@ -228,6 +229,9 @@ public class UserService extends ModelService {
 
     @Autowired
     private StorageRepository storageRepository;
+
+    @Autowired
+    private AccountService accountService;
 
     public Optional<User> find(Long id) {
         securityACLService.checkGuest(currentUserService.getCurrentUser());
@@ -963,6 +967,17 @@ public class UserService extends ModelService {
                 json.put("user", currentUser.getId());
                 json.put("origin", "ADMINISTRATOR");
             }
+            // I think I should put the step to add and update
+            Account account = new Account();
+            account.setFirstName(json.getJSONAttrStr("firstname"));
+            account.setLastName(json.getJSONAttrStr("lastname"));
+            account.setUsername(json.getJSONAttrStr("username"));
+            account.setUserLocale(json.getJSONAttrStr("language").toLowerCase());
+            account.setEmail(json.getJSONAttrStr("email"));
+            account.setEmailVerified(true);
+            account.setPassword(json.getJSONAttrStr("password"));
+            account.setRoles(List.of(json.getJSONAttrStr("role").substring(5)));
+            accountService.createAccount(account);
             CommandResponse response = executeCommand(new AddCommand(currentUser), null, json);
 
             return response;
@@ -981,6 +996,16 @@ public class UserService extends ModelService {
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.checkIsCreator((User) domain, currentUser);
+        Account account = new Account();
+        account.setFirstName(jsonNewData.getJSONAttrStr("firstname"));
+        account.setLastName(jsonNewData.getJSONAttrStr("lastname"));
+        account.setUsername(jsonNewData.getJSONAttrStr("username"));
+        account.setUserLocale(jsonNewData.getJSONAttrStr("language").toLowerCase());
+        account.setEmail(jsonNewData.getJSONAttrStr("email"));
+        account.setEmailVerified(true);
+        account.setPassword(jsonNewData.getJSONAttrStr("password"));
+        account.setRoles(List.of(jsonNewData.getJSONAttrStr("role").substring(5)));
+        accountService.update(account);
         return executeCommand(new EditCommand(currentUser, null), domain, jsonNewData);
     }
 

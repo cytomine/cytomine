@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import be.cytomine.service.security.AccountService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -77,6 +78,8 @@ public class RestUserController extends RestCytomineController {
     private final StorageService storageService;
 
     private final ReportService reportService;
+
+    private final AccountService accountService;
 
     @GetMapping("/project/{id}/admin.json")
     public ResponseEntity<String> showAdminByProject(

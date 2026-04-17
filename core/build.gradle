@@ -76,6 +76,11 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.30'
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
 
+    // MapStruct (annotation processor order: Lombok → lombok-mapstruct-binding → MapStruct)
+    implementation 'org.mapstruct:mapstruct:1.6.3'
+    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+
     // Tests
     testImplementation 'com.github.tomakehurst:wiremock:1.58'
     testImplementation 'org.assertj:assertj-core:3.4.1' // TODO: upgrade to 3.23.1
@@ -160,4 +165,11 @@ jacocoTestCoverageVerification {
             }
         }
     }
+}
+
+compileJava {
+    options.compilerArgs += [
+            '-Amapstruct.unmappedTargetPolicy=ERROR',
+            '-Amapstruct.unmappedSourcePolicy=ERROR'
+    ]
 }

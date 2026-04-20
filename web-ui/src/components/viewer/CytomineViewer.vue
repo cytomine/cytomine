@@ -7,6 +7,12 @@
 <div v-else class="cytomine-viewer">
   <b-loading :is-full-page="false" :active="loading" />
 
+  <div class="ae-sidebar" :class="{collapsed: appPanelCollapsed}">
+    <div class="ae-sidebar-content" v-show="!appPanelCollapsed">
+      <app-engine-sidebar></app-engine-sidebar>
+    </div>
+  </div>
+
   <div class="viewer-main">
     <div v-if="!loading" class="maps-wrapper">
       <div class="map-cell"
@@ -29,13 +35,7 @@
       <div class="hidden" v-shortkey.once="shortkeysMapping" @shortkey="shortkeyEvent"></div>
     </div>
 
-    <AppBottomDrawer v-show="appPanelCollapsed" @resize="drawerResized" />
-  </div>
-
-  <div class="ae-sidebar" :class="{collapsed: appPanelCollapsed}">
-    <div class="ae-sidebar-content" v-show="!appPanelCollapsed">
-      <app-engine-sidebar></app-engine-sidebar>
-    </div>
+    <AppBottomDrawer @resize="drawerResized" />
   </div>
 </div>
 </template>

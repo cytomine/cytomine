@@ -4,7 +4,7 @@
       <div class="drawer-handle-bar" />
       <div class="drawer-header">
         <slot name="header">
-          <span class="drawer-title">{{ title }}</span>
+          <span class="drawer-title">{{ $t('app-engine.applications') }}</span>
         </slot>
         <b-button
           icon-pack="fas"
@@ -27,13 +27,12 @@ export default {
   name: 'AppBottomDrawer',
   props: {
     value: {type: Boolean, default: false},
-    title: {type: String, default: 'Drawer'},
     defaultHeight: {type: String, default: '50vh'},
     collapsedHeight: {type: String, default: '60px'},
   },
   data() {
     return {
-      isCollapsed: false,
+      isCollapsed: true,
       isDragging: false,
       dragStartY: 0,
       dragStartHeight: 0,

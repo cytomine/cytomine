@@ -52,7 +52,7 @@ public interface TermHttpContract {
     @GetExchange("/ontology/{id}/all_terms")
     Set<Long> findAllTermIdsByOntology(@PathVariable long id, @RequestParam long userId);
 
-    @GetExchange("/project/{id}/all_terms")
+    @GetExchange("/project/{id}/all-terms")
     Set<Long> findAllTermIdsByProject(@PathVariable long id, @RequestParam long userId);
 
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="drawer" :style="drawerStyle">
+  <div class="drawer" :style="drawerStyle" @transitionend="handleTransitionEnd">
     <div
       class="drawer-handle-area"
       @mousedown="startDrag"
@@ -115,7 +115,15 @@ export default {
     toggleCollapse() {
       this.isCollapsed = !this.isCollapsed;
       this.$emit('collapse', this.isCollapsed);
-      this.$emit('resize');
+      this.$nextTick(() => {
+        this.$emit('resize');
+      });
+    },
+
+    handleTransitionEnd(event) {
+      if (!this.isDragging && event.propertyName === 'height') {
+        this.$emit('resize');
+      }
     },
 
     startDrag(e) {

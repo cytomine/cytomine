@@ -22,7 +22,6 @@ import be.cytomine.service.security.SecUserSecRoleService;
 import be.cytomine.service.security.UserService;
 import be.cytomine.utils.JsonObject;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
 import static org.springframework.security.acls.domain.BasePermission.READ;

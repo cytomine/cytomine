@@ -101,8 +101,6 @@ export default {
   position: relative;
   width: 100%;
   background: #ffffff;
-  border-radius: 20px 20px 0 0;
-  box-shadow: 0 -6px 40px rgba(0, 0, 0, 0.18);
   display: flex;
   flex-direction: column;
   overflow: hidden;

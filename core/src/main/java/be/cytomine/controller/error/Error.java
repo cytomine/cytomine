@@ -1,12 +1,11 @@
 package be.cytomine.controller.error;
 
+import java.util.Map;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.Map;
-
 
 @Setter
 @Getter
@@ -14,11 +13,11 @@ import java.util.Map;
 @NoArgsConstructor
 public class Error {
     private String message;
-    private String error_code;
+    private String errorCode;
     private Map<String, String> details;
 
-    public Error(String error_code, String message) {
-        this.error_code = error_code;
+    public Error(String errorCode, String message) {
+        this.errorCode = errorCode;
         this.message = message;
     }
 }

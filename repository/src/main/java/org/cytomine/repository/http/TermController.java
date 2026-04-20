@@ -87,7 +87,7 @@ public class TermController implements TermHttpContract {
     }
 
     @Override
-    @GetMapping("/ontology/{id}/all_terms")
+    @GetMapping("/ontology/{id}/all-terms")
     public Set<Long> findAllTermIdsByOntology(@PathVariable long id, @RequestParam long userId) {
         if (!aclService.canReadOntology(userId, id)) {
             return Set.of();

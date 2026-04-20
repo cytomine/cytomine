@@ -41,9 +41,9 @@ import be.cytomine.service.command.TransactionService;
 import be.cytomine.service.utils.Validation;
 import be.cytomine.service.utils.ValidationFor;
 
-import static be.cytomine.service.utils.IAM_RepresentationUtil.getAccountRepresentation;
-import static be.cytomine.service.utils.IAM_RepresentationUtil.setCustomAttributes;
-import static be.cytomine.service.utils.IAM_RepresentationUtil.setPermanentPassword;
+import static be.cytomine.service.utils.IamRepresentationUtil.getAccountRepresentation;
+import static be.cytomine.service.utils.IamRepresentationUtil.setCustomAttributes;
+import static be.cytomine.service.utils.IamRepresentationUtil.setPermanentPassword;
 
 
 @Slf4j

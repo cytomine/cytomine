@@ -1,18 +1,19 @@
 package be.cytomine.service.utils;
 
-import be.cytomine.controller.error.ErrorCode;
-import be.cytomine.dto.Account;
-import be.cytomine.exceptions.UserManagementException;
-import lombok.extern.slf4j.Slf4j;
-import org.keycloak.representations.idm.CredentialRepresentation;
-import org.keycloak.representations.idm.UserRepresentation;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
+import org.keycloak.representations.idm.CredentialRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
+
+import be.cytomine.controller.error.ErrorCode;
+import be.cytomine.dto.Account;
+import be.cytomine.exceptions.UserManagementException;
+
 @Slf4j
-public class IAM_RepresentationUtil {
+public class IamRepresentationUtil {
 
 
     public static UserRepresentation getAccountRepresentation(Account account) {
@@ -51,8 +52,10 @@ public class IAM_RepresentationUtil {
         try {
             user.getAttributes().put("isDeveloper", Collections.singletonList(account.isDeveloper() ? "1" : "0"));
             user.getAttributes().put("user_locale", Collections.singletonList(account.getUserLocale()));
-            if(account.getUserId() != null)
-                user.getAttributes().put("user_id", Collections.singletonList(account.getUserId().toString()));
+            if (account.getUserId() != null) {
+                user.getAttributes()
+                    .put("user_id", Collections.singletonList(account.getUserId().toString()));
+            }
         } catch (NullPointerException e) {
             throw new UserManagementException(500, ErrorCode.CORE_CUSTOM_ATTRIBUTES_NOT_SET);
         }

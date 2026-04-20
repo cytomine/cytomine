@@ -420,7 +420,13 @@ public class UserService extends ModelService {
         return new ArrayList<>(compactedMap.values());
     }
 
-    public Page<JsonObject> listUsersExtendedByProject(Project project, UserSearchExtension userSearchExtension, List<SearchParameterEntry> searchParameters, String sortColumn, String sortDirection, Long max, Long offset) {
+    public Page<JsonObject> listUsersExtendedByProject(Project project,
+                                                       UserSearchExtension userSearchExtension,
+                                                       List<SearchParameterEntry> searchParameters,
+                                                       String sortColumn,
+                                                       String sortDirection,
+                                                       Long max,
+                                                       Long offset) {
 
         if (ReflectionUtils.findField(User.class, sortColumn) == null && !(List.of(
             "projectRole",

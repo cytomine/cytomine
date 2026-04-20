@@ -49,7 +49,7 @@ public interface TermHttpContract {
     @GetExchange("/ontology/{id}")
     Page<TermResponse> findTermsByOntology(@PathVariable long id, @RequestParam long userId, Pageable pageable);
 
-    @GetExchange("/ontology/{id}/all_terms")
+    @GetExchange("/ontology/{id}/all-terms")
     Set<Long> findAllTermIdsByOntology(@PathVariable long id, @RequestParam long userId);
 
     @GetExchange("/project/{id}/all-terms")

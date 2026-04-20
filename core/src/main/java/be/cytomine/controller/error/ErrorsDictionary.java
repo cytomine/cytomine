@@ -22,7 +22,8 @@ public class ErrorsDictionary {
         errors.put(ErrorCode.CORE_IAM_UNKNOWN_CREATE_ERROR,
             new Error("CORE-IAM-UNKNOWN-CREATE-ERROR", "unknown error from IAM account not created"));
         errors.put(ErrorCode.CORE_INVALID_ROLES,
-            new Error("CORE-INVALID-ROLES", "invalid roles, check realm [cytomine] client [core] roles in IAM service"));
+            new Error("CORE-INVALID-ROLES",
+                "invalid roles, check realm [cytomine] client [core] roles in IAM service"));
         errors.put(ErrorCode.CORE_INVALID_CLIENT,
             new Error("CORE-INVALID-CLIENT", "invalid client-id, check client-id [core] is configured in core"));
         errors.put(ErrorCode.CORE_ROLES_NOT_ASSIGNED_TO_ACCOUNT,

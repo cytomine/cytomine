@@ -96,7 +96,7 @@ public class TermController implements TermHttpContract {
     }
 
     @Override
-    @GetMapping("/project/{id}/all_terms")
+    @GetMapping("/project/{id}/all-terms")
     public Set<Long> findAllTermIdsByProject(@PathVariable long id, @RequestParam long userId) {
         if (!aclService.canReadProject(userId, id)) {
             return Set.of();

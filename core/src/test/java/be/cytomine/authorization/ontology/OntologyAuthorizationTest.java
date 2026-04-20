@@ -10,11 +10,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.CRUDAuthorizationTest;
+import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.service.ontology.OntologyService;
 
@@ -25,16 +27,15 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 @Transactional
 public class OntologyAuthorizationTest extends CRUDAuthorizationTest {
 
-    @Autowired
-    private BasicInstanceBuilder basicInstanceBuilder;
-
-    private Ontology ontology = null;
-
+    @MockitoBean
+    TermHttpContract termHttpContract;
     @Autowired
     OntologyService ontologyService;
-
     @Autowired
     BasicInstanceBuilder builder;
+    @Autowired
+    private BasicInstanceBuilder basicInstanceBuilder;
+    private Ontology ontology = null;
 
     @BeforeEach
     public void before() throws Exception {

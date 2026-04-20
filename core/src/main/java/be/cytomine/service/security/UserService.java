@@ -15,7 +15,6 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import be.cytomine.dto.Account;
 import jakarta.persistence.Query;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.TupleElement;
@@ -48,6 +47,7 @@ import be.cytomine.domain.security.SecUserSecRole;
 import be.cytomine.domain.security.User;
 import be.cytomine.domain.social.LastConnection;
 import be.cytomine.domain.social.PersistentProjectConnection;
+import be.cytomine.dto.Account;
 import be.cytomine.dto.auth.AuthInformation;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.ConstraintException;

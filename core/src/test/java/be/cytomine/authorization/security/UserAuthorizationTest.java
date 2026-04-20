@@ -134,6 +134,12 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
         User user = userRepository.findByUsernameLikeIgnoreCase(USER_NO_ACL).get();
         JsonObject userJson = user.toJsonObject()
             .withChange("name", "admin_can_modify_a_user")
+            .withChange("firstname", "John")
+            .withChange("lastname", "Doe")
+            .withChange("email", "j@d.com")
+            .withChange("language", "en")
+            .withChange("role", "ROLE_USER")
+            .withChange("password", "secret")
             .withChange("reference", UUID.randomUUID().toString());
         expectOK(() -> userService.update(user, userJson));
         assertThat(user.getName()).isEqualTo("admin_can_modify_a_user");

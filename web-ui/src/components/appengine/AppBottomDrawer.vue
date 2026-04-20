@@ -10,20 +10,11 @@
         <slot name="header">
           <span class="drawer-title">{{ title }}</span>
         </slot>
-        <button
-          class="drawer-chevron-btn"
+        <b-button
+          icon-pack="fas"
+          :icon-left="isCollapsed ? 'chevron-up' : 'chevron-down'"
           @click.stop="toggleCollapse"
-          :aria-label="isCollapsed ? 'Expand' : 'Collapse'"
-        >
-          <svg
-            :style="{ transform: isCollapsed ? 'rotate(0deg)' : 'rotate(180deg)' }"
-            width="20" height="20" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2.5"
-            stroke-linecap="round" stroke-linejoin="round"
-          >
-            <polyline points="6 9 12 15 18 9" />
-          </svg>
-        </button>
+        />
       </div>
     </div>
  

@@ -13,4 +13,6 @@ public interface SchedulerHandler {
     public void monitor() throws SchedulingException;
 
     void deleteRun(Run run) throws SchedulingException;
+
+    String getRunLogs(Run run) throws SchedulingException;
 }

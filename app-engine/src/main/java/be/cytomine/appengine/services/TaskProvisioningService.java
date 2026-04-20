@@ -1130,7 +1130,6 @@ public class TaskProvisioningService {
             description,
             state,
             new Date(),
-            new Date(),
             new Date()
         );
         action.setResource(resource);
@@ -1403,13 +1402,11 @@ public class TaskProvisioningService {
         Run run = getRunIfValid(runId);
         TaskDescription description = taskService.makeTaskDescription(run.getTask());
         log.info("Retrieving Run: retrieved");
-        return new TaskRunResponse(
-            UUID.fromString(runId),
+        return new TaskRunResponse(UUID.fromString(runId),
             description,
             run.getState(),
             run.getCreatedAt(),
-            run.getUpdatedAt(),
-            run.getLastStateTransitionAt()
+            run.getUpdatedAt()
         );
     }
 

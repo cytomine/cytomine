@@ -20,3 +20,9 @@ iam:
   lsaaiClientIdSecretName: lsaai-client-id
   lsaaiClientSecretSecretName: lsaai-client-secret
   lsaaiEndpoint: https://login.aai.lifescience-ri.eu/oidc/.well-known/openid-configuration
+
+images:
+  pullPolicy: IfNotPresent
+
+test:
+  ingressIP: "172.16.238.15"

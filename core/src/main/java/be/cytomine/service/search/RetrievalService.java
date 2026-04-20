@@ -35,7 +35,7 @@ public class RetrievalService {
 
     public static final String CBIR_API_BASE_PATH = "/cbir";
 
-    private final static String INDEX_NAME = "annotation";
+    private static final String INDEX_NAME = "annotation";
 
     private final ImageServerService imageServerService;
 
@@ -119,7 +119,7 @@ public class RetrievalService {
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
         byte[] image = Objects.requireNonNull(getImageAnnotation(annotation));
-        ByteArrayResource resource =  new ByteArrayResource(image) {
+        ByteArrayResource resource = new ByteArrayResource(image) {
             @Override
             public String getFilename() {
                 return annotation.getId().toString();
@@ -180,13 +180,13 @@ public class RetrievalService {
         return percentages;
     }
 
-    public ResponseEntity<SearchResponse> retrieveSimilarImages(AnnotationDomain annotation, Long nrt_neigh) {
+    public ResponseEntity<SearchResponse> retrieveSimilarImages(AnnotationDomain annotation, Long nearestNeighbours) {
         String url = UriComponentsBuilder
             .fromUriString(getInternalCbirURL())
             .path("/search")
             .queryParam("storage", annotation.getProject().getId())
             .queryParam("index", INDEX_NAME)
-            .queryParam("nrt_neigh", nrt_neigh + 1)
+            .queryParam("nrt_neigh", nearestNeighbours + 1)
             .toUriString();
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = createEntity(annotation);

@@ -1,6 +1,5 @@
 package com.cytomine.registry.client.file;
 
-
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,9 +29,12 @@ public class FileUtils {
         try {
             TarArchiveEntry entry = null;
             while ((entry = tarArchiveIs.getNextTarEntry()) != null) {
-                if (entry.isDirectory()) continue;
-                if (!tarArchiveIs.canReadEntryData(entry))
+                if (entry.isDirectory()) {
+                    continue;
+                }
+                if (!tarArchiveIs.canReadEntryData(entry)) {
                     throw new IOException("read tar entry error");
+                }
                 Path itemPath = dst.resolve(FileUtils.replacePathChar(entry.getName()));
                 Files.createDirectories(itemPath.getParent());
                 Sha256HashOutputStream sha256HashOutputStream;

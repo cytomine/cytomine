@@ -1,6 +1,10 @@
 package be.cytomine.appengine.integration.cucumber;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -16,7 +20,6 @@ import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import be.cytomine.appengine.repositories.ChecksumRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,7 +30,6 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import jakarta.validation.constraints.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,14 +48,20 @@ import be.cytomine.appengine.dto.inputs.task.TaskRunParameterValue;
 import be.cytomine.appengine.dto.inputs.task.types.integer.IntegerValue;
 import be.cytomine.appengine.exceptions.FileStorageException;
 import be.cytomine.appengine.exceptions.SchedulingException;
-import be.cytomine.appengine.handlers.StorageData;
 import be.cytomine.appengine.handlers.SchedulerHandler;
+import be.cytomine.appengine.handlers.StorageData;
 import be.cytomine.appengine.handlers.StorageHandler;
-import be.cytomine.appengine.models.task.*;
+import be.cytomine.appengine.models.task.Checksum;
+import be.cytomine.appengine.models.task.Parameter;
+import be.cytomine.appengine.models.task.ParameterType;
+import be.cytomine.appengine.models.task.Run;
+import be.cytomine.appengine.models.task.Task;
+import be.cytomine.appengine.models.task.ValueType;
 import be.cytomine.appengine.models.task.integer.IntegerPersistence;
-import be.cytomine.appengine.repositories.integer.IntegerPersistenceRepository;
+import be.cytomine.appengine.repositories.ChecksumRepository;
 import be.cytomine.appengine.repositories.RunRepository;
 import be.cytomine.appengine.repositories.TaskRepository;
+import be.cytomine.appengine.repositories.integer.IntegerPersistenceRepository;
 import be.cytomine.appengine.services.RunService;
 import be.cytomine.appengine.states.TaskRunState;
 import be.cytomine.appengine.utils.ApiClient;
@@ -132,28 +140,6 @@ public class RunTaskStepDefinitions {
 
     private Task task;
 
-    @NotNull
-    private static String removeWhitespacesFromPath(File file) {
-        String absolutePath = file.getAbsolutePath();
-        // this is just because when there's whitespace in the path it can't be resolved correctly
-        boolean pathContainsWhitespace = absolutePath.contains(" ");
-        String formattedPath = "";
-        if (pathContainsWhitespace) {
-            String[] pathComponents = absolutePath.split("/");
-            for (String component : pathComponents) {
-                if (component.contains(" "))
-                    component = "'" + component + "'";
-                if (component.equalsIgnoreCase(""))
-                    formattedPath += component;
-                else
-                    formattedPath += "/" + component;
-                if (component.endsWith(".zip"))
-                    formattedPath = formattedPath.replace(".", "s.");
-            }
-        }
-        return formattedPath;
-    }
-
     private void createStorage(String uuid) throws FileStorageException {
         Storage inputStorage = new Storage("task-run-inputs-" + uuid);
         if (!storageHandler.checkStorageExists(inputStorage)) {
@@ -184,17 +170,17 @@ public class RunTaskStepDefinitions {
     }
 
     @Given("Scheduler is up and running")
-    public void scheduler_is_up_and_running() throws SchedulingException {
+    public void schedulerIsHealthy() throws SchedulingException {
         schedulerHandler.alive();
     }
 
     @Given("a task run exists with identifier {string}")
-    public void a_task_run_exists_with_identifier(String uuid) throws FileStorageException {
+    public void taskRunExistsWithId(String uuid) throws FileStorageException {
         runRepository.deleteAll();
         task = TestTaskBuilder.buildHardcodedAddInteger(UUID.fromString(uuid));
         task = taskRepository.saveAndFlush(task);
         secret = UUID.randomUUID().toString();
-        persistedRun = new Run(UUID.fromString(uuid), null, null , secret);
+        persistedRun = new Run(UUID.fromString(uuid), null, null, secret);
         persistedRun.setTask(task);
         persistedRun = runRepository.save(persistedRun);
 
@@ -202,36 +188,44 @@ public class RunTaskStepDefinitions {
     }
 
     @Given("the task run is in state {string}")
-    public void the_task_run_is_in_state(String state) {
+    public void taskRunIsInState(String state) {
         persistedRun.setState(TaskRunState.valueOf(state));
         persistedRun = runRepository.saveAndFlush(persistedRun);
     }
 
     @When("user calls the endpoint with {string} HTTP method GET")
-    public void user_calls_the_endpoint_with_http_method_get(String uuid) {
+    public void userCallsEndpointWithGet(String uuid) {
         persistedTaskRun = apiClient.getTaskRun(uuid);
     }
 
     @Then("App Engine sends a {string} OK response with a payload containing task run information \\(see OpenAPI spec)")
-    public void app_engine_sends_a_ok_response_with_a_payload_containing_task_run_information_see_open_api_spec(String string) {
+    public void appEngineReturnsTaskRunAsJson(String string) {
         Assertions.assertNotNull(persistedTaskRun);
     }
 
     @Then("the retrieved task run information matches the expected details")
-    public void the_retrieved_task_run_information_matches_the_expected_details() {
+    public void taskRunInfoMatchesExpected() {
         Assertions.assertEquals(persistedTaskRun.getId(), persistedRun.getId());
     }
 
     @Then("the task run state remains as {string}")
-    public void the_task_run_state_remains_as(String state) {
+    public void taskRunStateRemainsAs(String state) {
         Assertions.assertEquals(persistedTaskRun.getState().toString(), state);
     }
 
     // successful fetch of task run inputs archive in a launched task run
-    @Given("the task run {string} has input parameters: {string} of type {string} with value {string} and {string} of type {string} with value {string}")
-    public void the_task_run_has_input_parameters_of_type_with_value_and_of_type_with_value(String runId, String name1, String type1, String value1, String name2, String type2, String value2) throws FileStorageException,
-        JsonProcessingException
-    {
+    @Given("the task run {string} has input parameters: {string} of type {string} with "
+        + "value {string} and {string} of type {string} with value {string}")
+    public void taskRunHasTwoInputParameters(
+        String runId,
+        String name1,
+        String type1,
+        String value1,
+        String name2,
+        String type2,
+        String value2
+    ) throws FileStorageException,
+        JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         List<ObjectNode> provisions = new ArrayList<>();
         provisions.add(mapper.valueToTree(TaskTestsUtils.createProvision(name1, type1, value1)));
@@ -255,7 +249,7 @@ public class RunTaskStepDefinitions {
     }
 
     @When("user calls the endpoint to fetch inputs archive with {string} HTTP method GET")
-    public void user_calls_the_endpoint_to_fetch_inputs_archive_with_http_method_get(String runId) {
+    public void userFetchesInputsArchive(String runId) {
         try {
             inputsArchive = apiClient.getTaskRunInputsArchive(runId);
         } catch (RestClientResponseException e) {
@@ -264,7 +258,7 @@ public class RunTaskStepDefinitions {
     }
 
     @When("user calls the endpoint to fetch outputs archive with {string} HTTP method GET")
-    public void user_calls_the_endpoint_to_fetch_outputs_archive_with_http_method_get(String runId) {
+    public void userFetchesOutputsArchive(String runId) {
         try {
             outputsArchive = apiClient.getTaskRunOutputsArchive(runId);
         } catch (RestClientResponseException e) {
@@ -273,12 +267,12 @@ public class RunTaskStepDefinitions {
     }
 
     @Then("App Engine sends a {string} response with a payload containing the inputs archive")
-    public void app_engine_sends_a_response_with_a_payload_containing_the_inputs_archive(String string) {
+    public void appEngineReturnsInputsArchive(String string) {
         Assertions.assertNotNull(inputsArchive);
     }
 
     @Then("the archive contains files named {string} and {string}")
-    public void the_archive_contains_files_named_and(String param1, String param2) throws IOException {
+    public void archiveContainsFiles(String param1, String param2) throws IOException {
         try (ZipInputStream zis = new ZipInputStream(new FileInputStream(inputsArchive))) {
             boolean param1Found = false;
             boolean param2Found = false;
@@ -310,7 +304,7 @@ public class RunTaskStepDefinitions {
     }
 
     @Then("the content of file {string} is {string}")
-    public void the_content_of_file_is(String paramName, String paramValue) {
+    public void fileContentMatches(String paramName, String paramValue) {
         int fileValue;
         int testValue;
         if (paramName.equalsIgnoreCase("a")) {
@@ -332,9 +326,13 @@ public class RunTaskStepDefinitions {
     }
 
     // unsuccessful fetch of task run inputs archive in a created task run
-    @Then("App Engine sends a {string} forbidden response with a payload containing the error message \\(see OpenAPI spec) and code {string}")
-    public void app_engine_sends_a_forbidden_response_with_a_payload_containing_the_error_message_see_open_api_spec_and_code(String ResponseCode, String errorCode) throws JsonProcessingException {
-        Assertions.assertEquals(Integer.parseInt(ResponseCode), persistedException.getStatusCode().value());
+    @Then("App Engine sends a {string} forbidden response with a payload containing "
+        + "the error message \\(see OpenAPI spec) and code {string}")
+    public void appEngineReturnsForbiddenWithCode(
+        String responseCode,
+        String errorCode
+    ) throws JsonProcessingException {
+        Assertions.assertEquals(Integer.parseInt(responseCode), persistedException.getStatusCode().value());
         ObjectMapper mapper = new ObjectMapper();
         JsonNode errorJsonNodeFromServer = mapper.readTree(persistedException.getResponseBodyAsString());
         Assertions.assertEquals(errorCode, errorJsonNodeFromServer.get("errorCode").textValue());
@@ -342,7 +340,12 @@ public class RunTaskStepDefinitions {
 
     // successful fetch of task run outputs archive in a finished task run
     @Given("the task run {string} has output parameters: {string} of type {string} with value {int}")
-    public void the_task_run_has_output_parameters_of_type_with_value_and_of_type_with_value(String runId, String name, String type, Integer value) throws FileStorageException, IOException {
+    public void taskRunHasOutputParameterWithValue(
+        String runId,
+        String name,
+        String type,
+        Integer value
+    ) throws FileStorageException, IOException {
         // Outputs
         integerPersistenceRepository.deleteAll();
         checksumRepository.deleteAll();
@@ -371,7 +374,11 @@ public class RunTaskStepDefinitions {
 
             // calculate CRC32
             String reference = "task-run-outputs-" + runId + "-" + name;
-            Checksum crc32 = new Checksum(UUID.randomUUID(), reference, calculateFileCRC32(outputFileData.peek().getData()));
+            Checksum crc32 = new Checksum(
+                UUID.randomUUID(),
+                reference,
+                calculateFileCRC32(outputFileData.peek().getData())
+            );
             checksumRepository.save(crc32);
         }
     }
@@ -393,7 +400,7 @@ public class RunTaskStepDefinitions {
     }
 
     @When("user calls the endpoint to fetch with {string} HTTP method GET")
-    public void user_calls_the_endpoint_to_fetch_with_http_method_get(String runId) {
+    public void userFetchesTaskRun(String runId) {
         try {
             outputsArchive = apiClient.getTaskRunOutputsArchive(runId);
         } catch (RestClientResponseException e) {
@@ -402,12 +409,12 @@ public class RunTaskStepDefinitions {
     }
 
     @Then("App Engine sends a {string} response with a payload containing the outputs archive")
-    public void app_engine_sends_a_response_with_a_payload_containing_the_outputs_archive(String string) {
+    public void appEngineReturnsOutputsArchive(String string) {
         Assertions.assertNotNull(outputsArchive);
     }
 
     @Then("the archive contains files named {string}")
-    public void the_archive_contains_files_named(String outputName) throws IOException {
+    public void archiveContainsFile(String outputName) throws IOException {
         try (ZipInputStream zis = new ZipInputStream(new FileInputStream(outputsArchive))) {
             boolean outputFound = false;
             ZipEntry file;
@@ -428,7 +435,7 @@ public class RunTaskStepDefinitions {
     }
 
     @Then("the content of output file {string} is {string}")
-    public void the_content_of_output_file_is(String outputName, String outputValue) {
+    public void outputFileContentMatches(String outputName, String outputValue) {
         String value = FileHelper.read(outputFileData.peek().getData(), StandardCharsets.UTF_8);
         int fileValue = Integer.parseInt(value);
         int testValue = Integer.parseInt(outputValue);
@@ -439,7 +446,7 @@ public class RunTaskStepDefinitions {
     // successful fetch of task run outputs in JSON format for a finished task run
 
     @When("user calls the endpoint to fetch outputs json with {string} HTTP method GET")
-    public void user_calls_the_endpoint_to_fetch_outputs_json_with_http_method_get(String runId) {
+    public void userFetchesOutputsAsJson(String runId) {
         try {
             outputs = apiClient.getTaskRunOutputs(runId);
         } catch (RestClientResponseException e) {
@@ -448,12 +455,12 @@ public class RunTaskStepDefinitions {
     }
 
     @Then("App Engine sends a {string} response with a payload containing task run outputs in JSON format")
-    public void app_engine_sends_a_response_with_a_payload_containing_task_run_outputs_in_json_format(String string) {
+    public void appEngineReturnsOutputsAsJson(String string) {
         Assertions.assertFalse(outputs.isEmpty());
     }
 
     @Then("the payload contains the output {string} and their corresponding value {int}")
-    public void the_payload_contains_the_output_and_their_corresponding_value(String output, Integer value) {
+    public void payloadContainsOutputWithValue(String output, Integer value) {
         IntegerValue outputParameter = (IntegerValue) outputs.get(0);
         Assertions.assertEquals(outputParameter.getParameterName(), output);
         Assertions.assertEquals(outputParameter.getValue(), value);
@@ -461,7 +468,7 @@ public class RunTaskStepDefinitions {
 
     // unsuccessful run request of a task which has not been provisioned
     @Given("a task run {string} has successfully been created for a task")
-    public void a_task_run_has_successfully_been_created_for_a_task(String runId) {
+    public void taskRunIsCreatedForTask(String runId) {
         runRepository.deleteAll();
         taskRepository.deleteAll();
         Task task = TestTaskBuilder.buildHardcodedAddInteger();
@@ -474,13 +481,13 @@ public class RunTaskStepDefinitions {
     }
 
     @Given("this task run has not been successfully provisioned yet and is therefore in state {string}")
-    public void this_task_run_has_not_been_successfully_provisioned_yet_and_is_therefore_in_state(String state) {
+    public void taskRunIsNotYetProvisioned(String state) {
         persistedRun.setState(TaskRunState.valueOf(state));
         persistedRun = runRepository.saveAndFlush(persistedRun);
     }
 
     @When("When user calls the endpoint to run task with HTTP method POST")
-    public void when_user_calls_the_endpoint_to_run_task_with_http_method_post() {
+    public void userTriggersTaskRun() {
         try {
             persistedRunResponse = apiClient.updateState(persistedRun.getId().toString(), TaskRunState.RUNNING);
         } catch (RestClientResponseException e) {
@@ -488,56 +495,60 @@ public class RunTaskStepDefinitions {
         }
     }
 
-    @Then("App Engine sends a {string} Forbidden response with a payload containing the error message \\(see OpenAPI spec) and code {string}")
-    public void app_engine_sends_a_response_with_a_payload_containing_the_error_message_see_open_api_spec_and_code(String ResponseCode, String errorCode) throws JsonProcessingException {
-        Assertions.assertEquals(Integer.parseInt(ResponseCode), persistedException.getStatusCode().value());
+    @Then("App Engine sends a {string} Forbidden response with a payload containing "
+        + "the error message \\(see OpenAPI spec) and code {string}")
+    public void appEngineReturnsForbiddenWithCode2(
+        String responseCode,
+        String errorCode
+    ) throws JsonProcessingException {
+        Assertions.assertEquals(Integer.parseInt(responseCode), persistedException.getStatusCode().value());
         ObjectMapper mapper = new ObjectMapper();
         JsonNode errorJsonNodeFromServer = mapper.readTree(persistedException.getResponseBodyAsString());
         Assertions.assertEquals(errorCode, errorJsonNodeFromServer.get("errorCode").textValue());
     }
 
     @Then("this task run remains in state {string}")
-    public void this_task_run_remains_in_state(String state) {
+    public void taskRunRemainsInState(String state) {
         Optional<Run> runOptional = runRepository.findById(persistedRun.getId());
         runOptional.ifPresent(value -> persistedRun = value);
         Assertions.assertNotNull(persistedRun);
-        Assertions.assertEquals(persistedRun.getState(), TaskRunState.CREATED);
+        Assertions.assertEquals(TaskRunState.CREATED, persistedRun.getState());
     }
 
     @Then("App Engine does not initiate the process of executing this task run")
-    public void app_engine_does_not_initiate_the_process_of_executing_this_task_run() {
+    public void appEngineDoesNotExecuteTaskRun() {
         // TODO : How?
     }
 
     // unsuccessful run request for a task that was already launched
 
     @Given("App Engine has already received a run request for this task run which is therefore not in state {string}")
-    public void app_engine_has_already_received_a_run_request_for_this_task_run_which_is_therefore_not_in_state(String excludedStates) {
+    public void taskRunAlreadyReceivedRunRequest(String excludedStates) {
         persistedRun.setState(TaskRunState.RUNNING);
         runRepository.saveAndFlush(persistedRun);
     }
 
     @Then("this task run state progress is not affected by the request")
-    public void this_task_run_state_progress_is_not_affected_by_the_request() {
-        Optional<Run> oprionalRun = runRepository.findById(persistedRun.getId());
-        Assertions.assertEquals(TaskRunState.RUNNING, oprionalRun.get().getState());
+    public void taskRunStateIsUnaffected() {
+        Optional<Run> optionalRun = runRepository.findById(persistedRun.getId());
+        Assertions.assertEquals(TaskRunState.RUNNING, optionalRun.get().getState());
     }
 
     @Then("App Engine does not re-initiate the process of executing this task run")
-    public void app_engine_does_not_re_initiate_the_process_of_executing_this_task_run() {
+    public void appEngineDoesNotReExecuteTaskRun() {
         // TODO : How?
     }
 
     // unsuccessful upload of task run outputs as an invalid zip file in running state
     @Given("the task run is in state {string} or {string}")
-    public void the_task_run_is_in_state_or(String state1, String state2) {
+    public void taskRunIsInEitherState(String state1, String state2) {
         persistedRun.setState(TaskRunState.RUNNING);
         persistedRun = runService.update(persistedRun);
         Assertions.assertEquals(persistedRun.getState(), TaskRunState.valueOf(state1));
     }
 
     @Given("the task run has an output parameter {string}")
-    public void the_task_run_has_an_output_parameter(String output) {
+    public void taskRunHasOutputParameter(String output) {
         Set<Parameter> outputs = persistedRun
             .getTask()
             .getParameters()
@@ -555,7 +566,7 @@ public class RunTaskStepDefinitions {
     }
 
     @Given("a zip file is used which does not contain a file named {string}")
-    public void a_zip_file_is_used_which_does_not_contain_a_file_named(String output) throws IOException {
+    public void zipFileMissingExpectedFile(String output) throws IOException {
         ClassPathResource invalidOutputArchiveResource = new ClassPathResource("/artifacts/invalid_output.zip");
         Assertions.assertNotNull(invalidOutputArchiveResource);
         boolean found = false;
@@ -573,7 +584,7 @@ public class RunTaskStepDefinitions {
     }
 
     @When("user calls the endpoint to post outputs with {string} HTTP method POST and the zip file as a binary payload")
-    public void user_calls_the_endpoint_to_post_outputs_with_http_method_post_and_the_zip_file_as_a_binary_payload(String runId) {
+    public void userPostsOutputsZip(String runId) {
         try {
             outputs = apiClient.postTaskRunOutputsArchive(runId, secret, persistedZipFile);
         } catch (RestClientResponseException e) {
@@ -581,15 +592,20 @@ public class RunTaskStepDefinitions {
         }
     }
 
-    @Then("App Engine sends a {string} Bad Request response with a payload containing the error message \\(see OpenAPI spec) and code {string}")
-    public void app_engine_sends_a_bad_request_response_with_a_payload_containing_the_error_message_see_open_api_spec_and_code(String responseCode, String errorCode) throws JsonProcessingException {
+    @Then("App Engine sends a {string} Bad Request response with a payload containing "
+        + "the error message \\(see OpenAPI spec) and code {string}")
+    public void appEngineReturnsBadRequestWithCode(
+        String responseCode,
+        String errorCode
+    ) throws JsonProcessingException {
         Assertions.assertTrue(persistedException.getStatusCode().is4xxClientError());
         ObjectMapper mapper = new ObjectMapper();
         JsonNode errorJsonNodeFromServer = mapper.readTree(persistedException.getResponseBodyAsString());
         Assertions.assertEquals(errorCode, errorJsonNodeFromServer.get("error_code").textValue());
     }
 
-    // unsuccessful upload of task run outputs as a valid zip file in a non-running non-pending non-queuing non-queued state state
+    // unsuccessful upload of task run outputs as a valid zip file in a
+    // non-running non-pending non-queuing non-queued state
     @Given("the task run is not in one of the following state")
     public void checkTaskRunNotInState(DataTable table) {
         List<String> allowedStates = table.asList(String.class);
@@ -597,11 +613,11 @@ public class RunTaskStepDefinitions {
         persistedRun.setState(TaskRunState.PROVISIONED);
         persistedRun = runService.update(persistedRun);
 
-        Assertions.assertTrue(!allowedStates.contains(persistedRun.getState().toString()));
+        Assertions.assertFalse(allowedStates.contains(persistedRun.getState().toString()));
     }
 
     @When("user calls the endpoint to post outputs with {string} HTTP method POST and a valid outputs zip file")
-    public void user_calls_the_endpoint_to_post_outputs_with_http_method_post_and_a_valid_outputs_zip_file(String runId) throws IOException {
+    public void userPostsValidOutputsZip(String runId) throws IOException {
         ClassPathResource validOutputArchiveResource = new ClassPathResource("/artifacts/" + runId + "-sum.zip");
         Assertions.assertNotNull(validOutputArchiveResource);
         persistedZipFile = validOutputArchiveResource.getFile();
@@ -615,24 +631,24 @@ public class RunTaskStepDefinitions {
 
     // successful upload of task run outputs as a valid zip file in running or pending state
     @Given("a valid zip file containing one file named {string} and contains {string}")
-    public void a_valid_zip_file_containing_one_file_named_and_contains(String fileName, String value) {
+    public void validZipContainsFileWithContent(String fileName, String value) {
         // assumed as already satisfied in the archive
     }
 
     @Then("App Engine sends a {string} OK response with a payload containing task run outputs in JSON format")
-    public void app_engine_sends_a_ok_response_with_a_payload_containing_task_run_outputs_in_json_format(String string) {
+    public void appEngineReturnsOutputsAsJson2(String string) {
         Assertions.assertNotNull(outputs);
-        Assertions.assertEquals(outputs.size(), 1);
+        Assertions.assertEquals(1, outputs.size());
     }
 
     @Then("the payload contains the output parameters and their corresponding values")
-    public void the_payload_contains_the_output_parameters_and_their_corresponding_values() {
-        Assertions.assertEquals(outputs.get(0).getParameterName(), "sum");
+    public void payloadContainsAllOutputsWithValues() {
+        Assertions.assertEquals("sum", outputs.get(0).getParameterName());
     }
 
     // successful run request for a provisioned task run
     @Given("this task run has been successfully provisioned and is therefore in state {string}")
-    public void this_task_run_has_been_successfully_provisioned_and_is_therefore_in_state(String provisionedState) throws FileStorageException {
+    public void taskRunIsProvisioned(String provisionedState) throws FileStorageException {
         // save in the database
         integerPersistenceRepository.deleteAll();
         IntegerPersistence provisionInputA = new IntegerPersistence();
@@ -677,12 +693,12 @@ public class RunTaskStepDefinitions {
     }
 
     @Then("App Engine sends a {string} OK response with a payload containing the success message \\(see OpenAPI spec)")
-    public void app_engine_sends_a_ok_response_with_a_payload_containing_the_success_message_see_open_api_spec(String responseCode) {
+    public void appEngineReturnsSuccessMessage(String responseCode) {
         Assertions.assertNotNull(persistedRunResponse);
     }
 
     @Then("App Engine moves the task run to a state different from {string}")
-    public void app_engine_moves_the_task_run_to_a_state_different_from(String states) {
+    public void taskRunAdvancesFromState(String states) {
         String[] stateArray = states.split(",");
         Optional<Run> runOptional = runRepository.findById(persistedRun.getId());
         runOptional.ifPresent(value -> persistedRun = value);
@@ -691,12 +707,12 @@ public class RunTaskStepDefinitions {
     }
 
     @Then("App Engine initiates the process of executing the task run")
-    public void app_engine_initiates_the_process_of_executing_the_task_run() {
+    public void appEngineInitiatesTaskExecution() {
         // TODO : How?
     }
 
     @Given("a task with {string} and {string} has been uploaded")
-    public void uploadTask(String namespace, String version) {
+    public void taskIsUploadedWithNamespaceAndVersion(String namespace, String version) {
         taskRepository.deleteAll();
 
         String bundleFilename = namespace + "-" + version + ".zip";
@@ -737,8 +753,7 @@ public class RunTaskStepDefinitions {
                 apiClient.provisionInput(persistedRun.getId().toString(), name, type, value);
             } catch (RestClientResponseException e) {
                 Assertions.fail("Provisioning '" + name + "' failed: " + e.getMessage());
-            } catch (JsonProcessingException e)
-            {
+            } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -746,7 +761,9 @@ public class RunTaskStepDefinitions {
 
     @Then("the cluster has allocated {string} RAM, {string} CPUs, and {string} GPUs as requested.")
     public void checkResourceAllocation(String ram, String cpus, String gpus) {
-        String uuid = persistedTask.getName().toLowerCase().replaceAll("[^a-zA-Z0-9]", "") + "-" + persistedRun.getId();
+        String uuid = persistedTask.getName()
+            .toLowerCase()
+            .replaceAll("[^a-zA-Z0-9]", "") + "-" + persistedRun.getId();
         Map<String, String> resources = clusterClient.getAllocatedResources(uuid);
 
         Assertions.assertEquals(ram, resources.get("ram"));

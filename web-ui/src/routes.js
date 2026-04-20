@@ -1,6 +1,7 @@
 import VueRouter from 'vue-router';
 
 import AppConfigurationPage from '@/components/appengine/AppConfigurationPage.vue';
+import AppDashboardPage from '@/components/appengine/AppDashboardPage.vue';
 import AppInfoPage from './components/appengine/AppInfoPage.vue';
 import AppLayout from '@/components/appengine/AppLayout.vue';
 import AppLocalPage from '@/components/appengine/AppLocalPage.vue';
@@ -90,6 +91,10 @@ const routes = [
       {
         path: 'annotations',
         component: ListAnnotations
+      },
+      {
+        path: 'apps',
+        component: AppDashboardPage,
       },
       {
         path: 'activity',

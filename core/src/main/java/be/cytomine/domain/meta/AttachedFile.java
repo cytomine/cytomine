@@ -1,14 +1,14 @@
 package be.cytomine.domain.meta;
 
-import be.cytomine.domain.CytomineDomain;
-import be.cytomine.domain.GenericCytomineDomainContainer;
-import be.cytomine.utils.JsonObject;
-import lombok.Getter;
-import lombok.Setter;
-
 import jakarta.persistence.Entity;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
+
+import be.cytomine.domain.CytomineDomain;
+import be.cytomine.domain.GenericCytomineDomainContainer;
+import be.cytomine.utils.JsonObject;
 
 @Entity
 @Getter
@@ -30,8 +30,8 @@ public class AttachedFile extends CytomineDomain {
     private String key;
 
     /**
-     * Set annotation (storing class + id)
-     * With groovy, you can do: this.annotation = ...
+     * Set annotation (storing class + id) With groovy, you can do: this.annotation = ...
+     *
      * @param domain to add
      */
     public void setDomain(CytomineDomain domain) {
@@ -41,10 +41,10 @@ public class AttachedFile extends CytomineDomain {
 
     public static JsonObject getDataFromDomain(CytomineDomain domain) {
         JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
-        AttachedFile property = (AttachedFile)domain;
+        AttachedFile property = (AttachedFile) domain;
         returnArray.put("domainIdent", property.getDomainIdent());
         returnArray.put("domainClassName", property.getDomainClassName());
-        returnArray.put("url", "/api/attachedfile/"+domain.getId()+"/download");
+        returnArray.put("url", "/api/attachedfile/" + domain.getId() + "/download");
         returnArray.put("filename", property.getFilename());
         returnArray.put("key", property.getKey());
         return returnArray;

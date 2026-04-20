@@ -1,7 +1,5 @@
 package be.cytomine.service.utils;
 
-import be.cytomine.dto.annotation.SimplifiedAnnotation;
-import be.cytomine.exceptions.WrongArgumentException;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Polygon;
@@ -14,6 +12,9 @@ import org.locationtech.jts.simplify.TopologyPreservingSimplifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.dto.annotation.SimplifiedAnnotation;
+import be.cytomine.exceptions.WrongArgumentException;
+
 @Service
 public class SimplifyGeometryService {
 
@@ -24,33 +25,34 @@ public class SimplifyGeometryService {
         try {
             return simplifyPolygon(new WKTReader().read(form), minPoint, maxPoint);
         } catch (ParseException e) {
-            throw new WrongArgumentException("Annotation cannot be parsed "+ form);
+            throw new WrongArgumentException("Annotation cannot be parsed " + form);
         }
     }
 
     /**
-     * Simplify form (limit point number)
-     * Return simplify polygon and the rate used for simplification
+     * Simplify form (limit point number) Return simplify polygon and the rate used for simplification
      */
     public SimplifiedAnnotation simplifyPolygon(Geometry geometry, Long minPoint, Long maxPoint) {
         // Fast response for simple geometries
-        if (geometry.getNumPoints() < 100)
+        if (geometry.getNumPoints() < 100) {
             return new SimplifiedAnnotation(geometry, 0.0d);
+        }
 
         int numOfGeometry = 0;
         if (geometry instanceof MultiPolygon) {
             for (int i = 0; i < geometry.getNumGeometries(); i++) {
                 Geometry geom = geometry.getGeometryN(i);
                 int nbInteriorRing = 1;
-                if(geom instanceof Polygon) {
-                    nbInteriorRing = ((Polygon)geom).getNumInteriorRing();
+                if (geom instanceof Polygon) {
+                    nbInteriorRing = ((Polygon) geom).getNumInteriorRing();
                 }
-                numOfGeometry +=  geom.getNumGeometries() * nbInteriorRing;
+                numOfGeometry += geom.getNumGeometries() * nbInteriorRing;
             }
         } else {
             int nbInteriorRing = 1;
-            if(geometry instanceof Polygon)
-                nbInteriorRing = ((Polygon)geometry).getNumInteriorRing();
+            if (geometry instanceof Polygon) {
+                nbInteriorRing = ((Polygon) geometry).getNumInteriorRing();
+            }
             numOfGeometry = geometry.getNumGeometries() * nbInteriorRing;
         }
         numOfGeometry = Math.max(1, numOfGeometry);
@@ -69,7 +71,7 @@ public class SimplifyGeometryService {
 
         /* Maximum number of point that we would have (500/5 (max 150)=max 100 points)*/
         double rateLimitMax;
-        if (maxPoint!=null && maxPoint!=0) {
+        if (maxPoint != null && maxPoint != 0) {
             rateLimitMax = maxPoint * numOfGeometry;
         } else {
             rateLimitMax = Math.max(numberOfPoint / ratioMax, numOfGeometry * maxNumberOfPoint);
@@ -77,7 +79,7 @@ public class SimplifyGeometryService {
 
         /* Minimum number of point that we would have (500/10 (min 10 max 100)=min 50 points)*/
         double rateLimitMin;
-        if (minPoint!=null) {
+        if (minPoint != null) {
             rateLimitMin = minPoint * numOfGeometry;
         } else {
             rateLimitMin = Math.min(Math.max(numberOfPoint / ratioMin, 10), numOfGeometry * minNumberOfPoint);
@@ -91,7 +93,7 @@ public class SimplifyGeometryService {
         /* Max number of loop (prevent infinite loop) */
         int maxLoop = 1000;
 
-        Geometry newGeometry = (Geometry)geometry.clone();
+        Geometry newGeometry = (Geometry) geometry.clone();
         Boolean isPolygonAndNotValid = (geometry instanceof Polygon && !((Polygon) geometry).isValid());
         Boolean isMultiPolygon = (geometry instanceof MultiPolygon);
         while (numberOfPoint > rateLimitMax && maxLoop > 0) {
@@ -102,8 +104,9 @@ public class SimplifyGeometryService {
                 newGeometry = DouglasPeuckerSimplifier.simplify(geometry, rate);
             }
 
-            if (newGeometry.getNumPoints() < rateLimitMin)
+            if (newGeometry.getNumPoints() < rateLimitMin) {
                 break;
+            }
 
             i = i + ((incrThreshold));
             numberOfPoint = newGeometry.getNumPoints();
@@ -117,7 +120,7 @@ public class SimplifyGeometryService {
         try {
             return simplifyPolygon(new WKTReader().read(form), rate);
         } catch (ParseException e) {
-            throw new WrongArgumentException("Annotation cannot be parsed "+ form);
+            throw new WrongArgumentException("Annotation cannot be parsed " + form);
         }
     }
 
@@ -128,7 +131,8 @@ public class SimplifyGeometryService {
         if (isPolygonAndNotValid || isMultiPolygon) {
             newGeometry = TopologyPreservingSimplifier.simplify(geometry, rate);
         } else {
-            newGeometry = DouglasPeuckerSimplifier.simplify(geometry, rate);;
+            newGeometry = DouglasPeuckerSimplifier.simplify(geometry, rate);
+            ;
         }
         return new SimplifiedAnnotation(newGeometry, rate);
     }
@@ -160,6 +164,4 @@ public class SimplifyGeometryService {
         GeometryPrecisionReducer reducer = new GeometryPrecisionReducer(new PrecisionModel(scale));
         return reducer.reduce(geometry).norm();
     }
-
-
 }

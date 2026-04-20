@@ -1,32 +1,8 @@
 package be.cytomine.authorization.image;
 
-/*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+import java.util.Date;
+import java.util.Optional;
 
-import be.cytomine.BasicInstanceBuilder;
-import be.cytomine.CytomineCoreApplication;
-import be.cytomine.authorization.CRUDAuthorizationTest;
-import be.cytomine.domain.image.AbstractImage;
-import be.cytomine.domain.image.ImageInstance;
-import be.cytomine.domain.project.EditingMode;
-import be.cytomine.exceptions.WrongArgumentException;
-import be.cytomine.service.PermissionService;
-import be.cytomine.service.image.AbstractImageService;
-import be.cytomine.service.image.ImageInstanceService;
-import be.cytomine.service.security.SecurityACLService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,12 +13,16 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.Optional;
+import be.cytomine.BasicInstanceBuilder;
+import be.cytomine.CytomineCoreApplication;
+import be.cytomine.authorization.CRUDAuthorizationTest;
+import be.cytomine.domain.image.ImageInstance;
+import be.cytomine.domain.project.EditingMode;
+import be.cytomine.exceptions.WrongArgumentException;
+import be.cytomine.service.image.ImageInstanceService;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.springframework.security.acls.domain.BasePermission.READ;
-import static org.springframework.security.acls.domain.BasePermission.WRITE;
 
 @AutoConfigureMockMvc
 @SpringBootTest(classes = CytomineCoreApplication.class)
@@ -57,16 +37,10 @@ public class ImageInstanceAuthorizationTest extends CRUDAuthorizationTest {
     @Autowired
     BasicInstanceBuilder builder;
 
-    @Autowired
-    SecurityACLService securityACLService;
-
-    @Autowired
-    PermissionService permissionService;
-
     @BeforeEach
     public void before() throws Exception {
         if (imageInstance == null) {
-            imageInstance = builder.given_an_image_instance();
+            imageInstance = builder.givenAnImageInstance();
             initACL(imageInstance.container());
         }
         imageInstance.getProject().setMode(EditingMode.CLASSIC);
@@ -75,82 +49,84 @@ public class ImageInstanceAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list_imageInstances() {
+    public void adminCanListImageInstances() {
         assertThat(imageInstanceService.listByProject(imageInstance.getProject())).contains(imageInstance);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_list_imageInstances(){
+    public void userCanListImageInstances() {
         assertThat(imageInstanceService.listByProject(imageInstance.getProject())).contains(imageInstance);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_delete_in_restricted_mode(){
+    public void userCannotDeleteInRestrictedMode() {
         imageInstance.getProject().setMode(EditingMode.RESTRICTED);
-        expectForbidden(() -> when_i_delete_domain());
+        expectForbidden(() -> whenIDeleteDomain());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void user_admin_can_add_in_readonly_mode(){
+    public void userAdminCanAddInReadonlyMode() {
         imageInstance.getProject().setMode(EditingMode.READ_ONLY);
-        expectOK(() -> when_i_add_domain());
+        expectOK(() -> whenIAddDomain());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void user_admin_can_edi_in_readonly_mode(){
+    public void userAdminCanEdiInReadonlyMode() {
         imageInstance.getProject().setMode(EditingMode.READ_ONLY);
-        expectOK(() -> when_i_edit_domain());
+        expectOK(() -> whenIEditDomain());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void user_admin_can_delete_in_readonly_mode(){
+    public void userAdminCanDeleteInReadonlyMode() {
         imageInstance.getProject().setMode(EditingMode.READ_ONLY);
-        expectOK(() -> when_i_delete_domain());
+        expectOK(() -> whenIDeleteDomain());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_add_in_readonly_mode(){
+    public void userCannotAddInReadonlyMode() {
         imageInstance.getProject().setMode(EditingMode.READ_ONLY);
-        expectForbidden(() -> when_i_add_domain());
+        expectForbidden(() -> whenIAddDomain());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_edit_in_readonly_mode(){
+    public void userCannotEditInReadonlyMode() {
         imageInstance.getProject().setMode(EditingMode.READ_ONLY);
-        expectForbidden(() -> when_i_edit_domain());
+        expectForbidden(() -> whenIEditDomain());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_delete_in_readonly_mode(){
+    public void userCannotDeleteInReadonlyMode() {
         imageInstance.getProject().setMode(EditingMode.READ_ONLY);
-        expectForbidden(() -> when_i_delete_domain());
+        expectForbidden(() -> whenIDeleteDomain());
     }
 
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void user_cannot_stop_review_started_by_someone_else() {
-        ImageInstance imageInstance = builder.given_an_image_instance();
+    public void userCannotStopReviewStartedBySomeoneElse() {
+        ImageInstance imageInstance = builder.givenAnImageInstance();
         imageInstance.setProject(this.imageInstance.getProject());
         imageInstance.setReviewStart(new Date());
-        imageInstance.setReviewUser(builder.given_superadmin());
-        Assertions.assertThrows(WrongArgumentException.class, () -> {
-            imageInstanceService.stopReview(imageInstance, false);
-        });
+        imageInstance.setReviewUser(builder.givenSuperAdmin());
+        Assertions.assertThrows(
+            WrongArgumentException.class, () -> {
+                imageInstanceService.stopReview(imageInstance, false);
+            }
+        );
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void user_can_stop_review_started_by_himself() {
-        ImageInstance imageInstance = builder.given_an_image_instance();
+    public void userCanStopReviewStartedByHimself() {
+        ImageInstance imageInstance = builder.givenAnImageInstance();
         imageInstance.setProject(this.imageInstance.getProject());
         imageInstance.setReviewStart(new Date());
         imageInstance.setReviewUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_ADMIN).get());
@@ -158,22 +134,23 @@ public class ImageInstanceAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Override
-    public void when_i_get_domain() {
+    public void whenIGetDomain() {
         imageInstanceService.get(imageInstance.getId());
     }
 
     @Override
-    protected void when_i_add_domain() {
-        imageInstanceService.add(builder.given_a_not_persisted_image_instance(imageInstance.getProject()).toJsonObject());
+    protected void whenIAddDomain() {
+        imageInstanceService.add(builder.givenANotPersistedImageInstance(imageInstance.getProject())
+            .toJsonObject());
     }
 
     @Override
-    public void when_i_edit_domain() {
+    public void whenIEditDomain() {
         imageInstanceService.update(imageInstance, imageInstance.toJsonObject());
     }
 
     @Override
-    protected void when_i_delete_domain() {
+    protected void whenIDeleteDomain() {
         ImageInstance imageInstanceToDelete = imageInstance;
         imageInstanceService.delete(imageInstanceToDelete, null, null, true);
     }

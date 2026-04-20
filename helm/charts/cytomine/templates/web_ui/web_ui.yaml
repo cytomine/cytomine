@@ -54,8 +54,6 @@ spec:
           env:
           - name: URL_CORE
             value: {{ include "core.url" . }}
-          - name: CYTOMINE_COMMERCIAL_VERSION
-            value: {{ .Values.web_ui.commercial_version }}
           - name: APPENGINE_ENABLED
             value: "true"
           volumeMounts:
@@ -77,6 +75,28 @@ spec:
           ports:
             - name: http
               containerPort: {{ .Values.web_ui.port }}
+          startupProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.web_ui.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 30
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.web_ui.port }}
+            periodSeconds: 5
+            failureThreshold: 3
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.web_ui.port }}
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 5
           resources:
             {{- toYaml .Values.web_ui.resources | nindent 12 }}
       {{- with .Values.global.tolerations }}

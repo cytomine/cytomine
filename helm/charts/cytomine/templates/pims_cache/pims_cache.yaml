@@ -38,24 +38,31 @@ spec:
           ports:
             - name: http
               containerPort: {{ .Values.pims_cache.port }}
-          readinessProbe:
+          startupProbe:
             exec:
               command:
                 - redis-cli
                 - ping
             initialDelaySeconds: 5
-            periodSeconds: 3
-            failureThreshold: 5
-            timeoutSeconds: 2
+            periodSeconds: 5
+            failureThreshold: 30
+            timeoutSeconds: 5
+          readinessProbe:
+            exec:
+              command:
+                - redis-cli
+                - ping
+            periodSeconds: 5
+            failureThreshold: 3
+            timeoutSeconds: 5
           livenessProbe:
             exec:
               command:
                 - redis-cli
                 - ping
-            initialDelaySeconds: 15
             periodSeconds: 10
             failureThreshold: 3
-            timeoutSeconds: 2
+            timeoutSeconds: 5
           resources:
             {{- toYaml .Values.pims_cache.resources | nindent 12 }}
           volumeMounts:

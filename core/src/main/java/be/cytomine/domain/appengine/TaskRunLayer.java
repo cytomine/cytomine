@@ -20,7 +20,6 @@ import lombok.ToString;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.annotation.AnnotationLayer;
 import be.cytomine.domain.image.ImageInstance;
-import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.utils.JsonObject;
 
 @ToString
@@ -74,7 +73,9 @@ public class TaskRunLayer extends CytomineDomain {
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
         TaskRunLayer taskRunLayer = this;
         taskRunLayer.id = json.getJSONAttrLong("id", null);
-        taskRunLayer.annotationLayer = (AnnotationLayer) json.getJSONAttrDomain(entityManager, "annotationLayer", new AnnotationLayer(), true);
+        taskRunLayer.annotationLayer = (AnnotationLayer) json.getJSONAttrDomain(
+            entityManager, "annotationLayer", new AnnotationLayer(), true
+        );
         taskRunLayer.taskRun = (TaskRun) json.getJSONAttrDomain(entityManager, "taskRun", new TaskRun(), true);
         taskRunLayer.image = (ImageInstance) json.getJSONAttrDomain(entityManager, "image", new ImageInstance(), true);
         taskRunLayer.created = json.getJSONAttrDate("created");

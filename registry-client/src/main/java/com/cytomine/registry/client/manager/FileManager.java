@@ -116,7 +116,16 @@ public class FileManager {
         config.setName(config.getDigest().replace(Constants.SHA256_PREFIX, "") + FileConstant.EXTENSION_TAR_GZ);
         layers.forEach(layer ->
             layer.setName(layer.getDigest().replace(Constants.SHA256_PREFIX, "") + FileConstant.EXTENSION_TAR_GZ));
-        return new Context(Reference.parse(indexFile.getManifests().get(0).getAnnotations().getImageRefName()), config, layers);
+        return new Context(
+                Reference.parse(
+                        indexFile.getManifests()
+                                .get(0)
+                                .getAnnotations()
+                                .getImageRefName()
+                ),
+                config,
+                layers
+        );
     }
 
     private Context readManifest(List<Blob> files, Path dir) throws IOException {
@@ -126,10 +135,10 @@ public class FileManager {
         assert manifest != null;
         String manifestContent = IOUtils.readString(manifest.getContent().get(),
             StandardCharsets.UTF_8);
-        List<ManifestFile> manifestFiles = JsonUtil.fromJson(manifestContent,
-            new TypeToken<List<ManifestFile>>() {
-        });
-        if (manifestFiles.size() == 0) throw new TarFileErrException("manifest.json error");
+        List<ManifestFile> manifestFiles = JsonUtil.fromJson(manifestContent, new TypeToken<>() {});
+        if (manifestFiles.size() == 0) {
+            throw new TarFileErrException("manifest.json error");
+        }
         ManifestFile manifestFile = manifestFiles.get(0);
         Blob config = findBlob.apply(manifestFile.getConfig());
         List<Blob> layers =

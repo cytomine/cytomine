@@ -12,13 +12,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
-import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.image.server.Storage;
 
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -29,6 +32,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class StorageResourceTests {
 
     @Autowired
+    private BasicInstanceBuilder basicInstanceBuilder;
+
+    @Autowired
     private BasicInstanceBuilder builder;
 
     @Autowired
@@ -36,116 +42,118 @@ public class StorageResourceTests {
 
     @Test
     @Transactional
-    public void list_user_storages() throws Exception {
-        Storage storage = builder.given_a_storage();
-        Storage otherUserStorage = builder.given_a_storage(builder.given_a_user());
+    public void listUserStorages() throws Exception {
+        Storage storage = builder.givenAStorage();
+        Storage otherUserStorage = builder.givenAStorage(builder.givenAUser());
         restStorageControllerMockMvc.perform(get("/api/storage.json"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
-                .andExpect(jsonPath("$.collection[?(@.name=='"+storage.getName()+"')]").exists())
-                .andExpect(jsonPath("$.collection[?(@.name=='"+otherUserStorage.getName()+"')]").doesNotExist());
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
+            .andExpect(jsonPath("$.collection[?(@.name=='" + storage.getName() + "')]").exists())
+            .andExpect(jsonPath("$.collection[?(@.name=='" + otherUserStorage.getName() + "')]").doesNotExist());
     }
 
     @Test
     @Transactional
-    public void list_all_storages() throws Exception {
-        Storage storage = builder.given_a_storage();
-        Storage otherUserStorage = builder.given_a_storage(builder.given_a_user());
+    public void listAllStorages() throws Exception {
+        Storage storage = builder.givenAStorage();
+        Storage otherUserStorage = builder.givenAStorage(builder.givenAUser());
         restStorageControllerMockMvc.perform(get("/api/storage.json").param("all", "true"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
-                .andExpect(jsonPath("$.collection[?(@.name=='"+storage.getName()+"')]").exists())
-                .andExpect(jsonPath("$.collection[?(@.name=='"+otherUserStorage.getName()+"')]").exists());
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
+            .andExpect(jsonPath("$.collection[?(@.name=='" + storage.getName() + "')]").exists())
+            .andExpect(jsonPath("$.collection[?(@.name=='" + otherUserStorage.getName() + "')]").exists());
     }
 
     @Test
     @Transactional
-    public void get_a_storage() throws Exception {
-        Storage storage = builder.given_a_storage();
+    public void shouldReturnStorageWithAllExpectedFields() throws Exception {
+        Storage storage = builder.givenAStorage();
 
         restStorageControllerMockMvc.perform(get("/api/storage/{id}.json", storage.getId()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(storage.getId().intValue()))
-                .andExpect(jsonPath("$.class").value("be.cytomine.domain.image.server.Storage"))
-                .andExpect(jsonPath("$.created").exists())
-                .andExpect(jsonPath("$.name").value(storage.getName()))
-                .andExpect(jsonPath("$.user").value(storage.getUser().getId().intValue()))
-                .andExpect(jsonPath("$.basePath").doesNotExist()); //since multidim
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(storage.getId().intValue()))
+            .andExpect(jsonPath("$.class").value("be.cytomine.domain.image.server.Storage"))
+            .andExpect(jsonPath("$.created").exists())
+            .andExpect(jsonPath("$.name").value(storage.getName()))
+            .andExpect(jsonPath("$.user").value(storage.getUser().getId().intValue()))
+            .andExpect(jsonPath("$.basePath").doesNotExist()); //since multidim
     }
 
     @Test
     @Transactional
-    public void add_valid_storage() throws Exception {
-        Storage storage = BasicInstanceBuilder.given_a_not_persisted_storage(builder.given_superadmin());
+    public void addValidStorage() throws Exception {
+        Storage storage =
+            basicInstanceBuilder.givenANotPersistedStorage(builder.givenSuperAdmin());
         restStorageControllerMockMvc.perform(post("/api/storage.json")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(storage.toJSON()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.printMessage").value(true))
-                .andExpect(jsonPath("$.callback").exists())
-                .andExpect(jsonPath("$.callback.storageID").exists())
-                .andExpect(jsonPath("$.callback.method").value("be.cytomine.AddStorageCommand"))
-                .andExpect(jsonPath("$.message").exists())
-                .andExpect(jsonPath("$.command").exists())
-                .andExpect(jsonPath("$.storage.id").exists())
-                .andExpect(jsonPath("$.storage.name").value(storage.getName()));
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(storage.toJSON()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.printMessage").value(true))
+            .andExpect(jsonPath("$.callback").exists())
+            .andExpect(jsonPath("$.callback.storageID").exists())
+            .andExpect(jsonPath("$.callback.method").value("be.cytomine.AddStorageCommand"))
+            .andExpect(jsonPath("$.message").exists())
+            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.storage.id").exists())
+            .andExpect(jsonPath("$.storage.name").value(storage.getName()));
     }
 
     @Test
     @Transactional
-    public void add_storage_refused_if_name_not_set() throws Exception {
-        Storage storage = BasicInstanceBuilder.given_a_not_persisted_storage(builder.given_superadmin());
+    public void addStorageRefusedIfNameNotSet() throws Exception {
+        Storage storage =
+            basicInstanceBuilder.givenANotPersistedStorage(builder.givenSuperAdmin());
         storage.setName(null);
         restStorageControllerMockMvc.perform(post("/api/storage.json")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(storage.toJSON()))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.success").value(false));
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(storage.toJSON()))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.success").value(false));
     }
 
     @Test
     @Transactional
-    public void edit_valid_storage() throws Exception {
-        Storage storage = builder.given_a_storage();
+    public void editValidStorage() throws Exception {
+        Storage storage = builder.givenAStorage();
         restStorageControllerMockMvc.perform(put("/api/storage/{id}.json", storage.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(storage.toJSON()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.printMessage").value(true))
-                .andExpect(jsonPath("$.callback").exists())
-                .andExpect(jsonPath("$.callback.storageID").exists())
-                .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditStorageCommand"))
-                .andExpect(jsonPath("$.message").exists())
-                .andExpect(jsonPath("$.command").exists())
-                .andExpect(jsonPath("$.storage.id").exists())
-                .andExpect(jsonPath("$.storage.name").value(storage.getName()));
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(storage.toJSON()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.printMessage").value(true))
+            .andExpect(jsonPath("$.callback").exists())
+            .andExpect(jsonPath("$.callback.storageID").exists())
+            .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditStorageCommand"))
+            .andExpect(jsonPath("$.message").exists())
+            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.storage.id").exists())
+            .andExpect(jsonPath("$.storage.name").value(storage.getName()));
     }
 
     @Test
     @Transactional
-    public void delete_storage() throws Exception {
-        Storage storage = builder.given_a_storage();
+    public void deleteStorage() throws Exception {
+        Storage storage = builder.givenAStorage();
         restStorageControllerMockMvc.perform(delete("/api/storage/{id}.json", storage.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(storage.toJSON()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.printMessage").value(true))
-                .andExpect(jsonPath("$.callback").exists())
-                .andExpect(jsonPath("$.callback.storageID").exists())
-                .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteStorageCommand"))
-                .andExpect(jsonPath("$.message").exists())
-                .andExpect(jsonPath("$.command").exists())
-                .andExpect(jsonPath("$.storage.id").exists())
-                .andExpect(jsonPath("$.storage.name").value(storage.getName()));
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(storage.toJSON()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.printMessage").value(true))
+            .andExpect(jsonPath("$.callback").exists())
+            .andExpect(jsonPath("$.callback.storageID").exists())
+            .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteStorageCommand"))
+            .andExpect(jsonPath("$.message").exists())
+            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.storage.id").exists())
+            .andExpect(jsonPath("$.storage.name").value(storage.getName()));
     }
 
     @Test
     @Transactional
-    public void fail_when_delete_storage_not_exists() throws Exception {
+    public void failWhenDeleteStorageNotExists() throws Exception {
         restStorageControllerMockMvc.perform(delete("/api/storage/{id}.json", 0)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.errors").exists());
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.success").value(false))
+            .andExpect(jsonPath("$.errors").exists());
     }
 }

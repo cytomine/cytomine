@@ -1,15 +1,15 @@
 package be.cytomine.domain.processing;
 
-import be.cytomine.domain.CytomineDomain;
-import be.cytomine.utils.JsonObject;
-import lombok.Getter;
-import lombok.Setter;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
+
+import be.cytomine.domain.CytomineDomain;
+import be.cytomine.utils.JsonObject;
 
 @Entity
 @Getter
@@ -27,8 +27,8 @@ public class ImageFilter extends CytomineDomain {
     Boolean available = true;
 
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
-        ImageFilter processingServer = (ImageFilter)this;
-        processingServer.id = json.getJSONAttrLong("id",null);
+        ImageFilter processingServer = (ImageFilter) this;
+        processingServer.id = json.getJSONAttrLong("id", null);
         processingServer.name = json.getJSONAttrStr("name", true);
         processingServer.method = json.getJSONAttrStr("method", null);
         processingServer.available = json.getJSONAttrBoolean("available", true);
@@ -39,7 +39,7 @@ public class ImageFilter extends CytomineDomain {
 
     public static JsonObject getDataFromDomain(CytomineDomain domain) {
         JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
-        ImageFilter processingServer = (ImageFilter)domain;
+        ImageFilter processingServer = (ImageFilter) domain;
         returnArray.put("name", processingServer.getName());
         returnArray.put("method", processingServer.getMethod());
         returnArray.put("available", processingServer.getAvailable());
@@ -49,7 +49,7 @@ public class ImageFilter extends CytomineDomain {
 
 
     public String getBaseUrl() {
-        return "/filters/"+method+"&url="; // For backwards compatibility
+        return "/filters/" + method + "&url="; // For backwards compatibility
     }
 
     @Override

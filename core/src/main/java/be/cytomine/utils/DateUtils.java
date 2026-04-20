@@ -1,20 +1,20 @@
 package be.cytomine.utils;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -37,16 +37,16 @@ public class DateUtils {
         }
     }
 
-    public static String getLocaleDate(Date date){
-        DateFormat DFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, Locale.getDefault());
-        return DFormat.format(date).replaceAll(
+    public static String getLocaleDate(Date date) {
+        DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, Locale.getDefault());
+        return dateFormat.format(date).replaceAll(
             // This char appears in the Date string but cannot end up in the PDF with
             // our current police used.
             // https://stackoverflow.com/q/77225936
             " ", " ");
     }
 
-    public static String getSimpleFormatLocaleDate(Date date){
+    public static String getSimpleFormatLocaleDate(Date date) {
         return REPORT_FILENAME_FORMAT.format(date);
     }
 
@@ -58,22 +58,25 @@ public class DateUtils {
         return l != null ? l - new Date(0).getTime() : null;
     }
 
-    public static Date computeMillisInDate(long millis) {return new Date(millis);}
+    public static Date computeMillisInDate(long millis) {
+        return new Date(millis);
+    }
 
     public static Comparator<CytomineDomain> descCreatedComparator() {
         return (lhs, rhs) -> {
-            if (lhs==null) {
+            if (lhs == null) {
                 return 1;
             }
-            if (rhs==null) {
+            if (rhs == null) {
                 return -1;
             }
-            if (lhs.getCreated().getTime() < rhs.getCreated().getTime())
+            if (lhs.getCreated().getTime() < rhs.getCreated().getTime()) {
                 return 1;
-            else if (lhs.getCreated().getTime() == rhs.getCreated().getTime())
+            } else if (lhs.getCreated().getTime() == rhs.getCreated().getTime()) {
                 return 0;
-            else
+            } else {
                 return -1;
+            }
         };
     }
 }

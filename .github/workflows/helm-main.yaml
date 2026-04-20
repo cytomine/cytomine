@@ -25,7 +25,7 @@ jobs:
           echo "CHART_VERSION=$(cat ./charts/cytomine/Chart.yaml | grep "version:" | sed -E 's/^version: (.*)$/\1/g')" >> $GITHUB_ENV
 
       - name: Install Helm
-        uses: azure/setup-helm@v4
+        uses: azure/setup-helm@v5
 
       - name: Helm package
         run: helm package ./charts/cytomine

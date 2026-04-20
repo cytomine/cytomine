@@ -1,0 +1,6 @@
+package be.cytomine.common.repository.model.command;
+
+public enum CommandType {
+    DELETE_TERM_COMMAND, INSERT_TERM_COMMAND, UPDATE_TERM_COMMAND, DELETE_TERM_RELATION_COMMAND,
+    INSERT_TERM_RELATION_COMMAND, UPDATE_TERM_RELATION_COMMAND,
+}

@@ -1,6 +1,10 @@
 package be.cytomine.domain.command;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,7 +30,8 @@ public class RedoStackItem extends CytomineDomain {
     @JoinColumn(name = "transaction_id", nullable = true)
     protected Transaction transaction;
 
-    public RedoStackItem() { }
+    public RedoStackItem() {
+    }
 
     public RedoStackItem(UndoStackItem firstUndoStack) {
         this.command = firstUndoStack.getCommand();

@@ -12,7 +12,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import be.cytomine.service.security.AccountService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -47,16 +46,17 @@ import be.cytomine.service.project.ProjectRepresentativeUserService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.report.ReportService;
 import be.cytomine.service.search.UserSearchExtension;
+import be.cytomine.service.security.AccountService;
 import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.service.security.UserService;
 import be.cytomine.utils.JsonObject;
 
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api")
 @Slf4j
-@RequiredArgsConstructor
 public class RestUserController extends RestCytomineController {
 
     private final UserService userService;

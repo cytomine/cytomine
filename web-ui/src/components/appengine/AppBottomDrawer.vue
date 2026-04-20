@@ -115,6 +115,7 @@ export default {
     toggleCollapse() {
       this.isCollapsed = !this.isCollapsed;
       this.$emit('collapse', this.isCollapsed);
+      this.$emit('resize');
     },
 
     startDrag(e) {
@@ -133,8 +134,10 @@ export default {
           window.innerHeight * 0.92
         );
         this.currentHeight = newHeight;
+        this.$emit('resize');
         if (this.isCollapsed && delta > 20) {
           this.isCollapsed = false;
+          this.$emit('collapse', this.isCollapsed);
         }
       };
 

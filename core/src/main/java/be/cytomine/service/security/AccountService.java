@@ -1,18 +1,12 @@
 package be.cytomine.service.security;
 
-import be.cytomine.controller.JsonResponseEntity;
-import be.cytomine.controller.error.ErrorBuilder;
-import be.cytomine.controller.error.ErrorCode;
-import be.cytomine.domain.security.SecUserSecRole;
-import be.cytomine.domain.security.User;
-import be.cytomine.dto.Account;
-import be.cytomine.dto.Accounts;
-import be.cytomine.exceptions.UserManagementException;
-import be.cytomine.repository.security.SecRoleRepository;
-import be.cytomine.repository.security.SecUserSecRoleRepository;
-import be.cytomine.repository.security.UserRepository;
-import be.cytomine.service.command.TransactionService;
-import be.cytomine.service.image.server.StorageService;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 import io.jsonwebtoken.lang.Strings;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
@@ -20,41 +14,47 @@ import jakarta.ws.rs.ServerErrorException;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
-import org.keycloak.admin.client.resource.*;
-import org.keycloak.representations.idm.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.admin.client.resource.UserResource;
+import org.keycloak.admin.client.resource.UsersResource;
+import org.keycloak.representations.idm.ClientRepresentation;
+import org.keycloak.representations.idm.RoleRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import be.cytomine.controller.JsonResponseEntity;
+import be.cytomine.controller.error.ErrorBuilder;
+import be.cytomine.controller.error.ErrorCode;
+import be.cytomine.domain.security.User;
+import be.cytomine.dto.Account;
+import be.cytomine.exceptions.UserManagementException;
+import be.cytomine.repository.security.UserRepository;
+import be.cytomine.service.command.TransactionService;
+import be.cytomine.service.utils.Validation;
+import be.cytomine.service.utils.ValidationFor;
 
-import static be.cytomine.service.utils.IAM_RepresentationUtil.*;
+import static be.cytomine.service.utils.IAM_RepresentationUtil.getAccountRepresentation;
+import static be.cytomine.service.utils.IAM_RepresentationUtil.setCustomAttributes;
+import static be.cytomine.service.utils.IAM_RepresentationUtil.setPermanentPassword;
+
 
 @Slf4j
 @Service
 @Transactional
+@AllArgsConstructor
+@RequiredArgsConstructor
 public class AccountService {
 
-    public final int CREATED = 201;
-    public final int NOT_FOUND = 404;
-    public final int INTERNAL_SERVER_ERROR = 500;
-    public final int CONFLICT = 409;
-    public final int BAD_REQUEST = 400;
-
-    @Autowired
     Keycloak keycloak;
 
-    @Autowired
     private TransactionService transactionService;
 
     @Value("${keycloak-client.target.client-id}")
@@ -63,30 +63,18 @@ public class AccountService {
     @Value("${keycloak-client.target.realm}")
     String realm;
 
-    @Autowired
     private UserRepository userRepository;
 
-    @Autowired
     private UserService userService;
 
-    @Autowired
-    private StorageService storageService;
 
-    @Autowired
-    SecUserSecRoleRepository secSecUserSecRoleRepository;
+    public void createAccount(Account account) throws UserManagementException {
 
-    @Autowired
-    private SecRoleRepository secRoleRepository;
-
-
-    public void createAccount(Account account) throws UserManagementException
-    {
         log.info("Creating account for user {}", account.getUsername());
         // validate account
         Validation validation = validateAccount(account, ValidationFor.CREATE);
-        if (!validation.isOk())
-        {
-            throw new UserManagementException("account data is invalid" , 400);
+        if (!validation.isOk()) {
+            throw new UserManagementException("account data is invalid", 400);
         }
 
         UserRepresentation user = getAccountRepresentation(account);
@@ -95,30 +83,26 @@ public class AccountService {
 
         UsersResource usersResource;
         Response response;
-        try
-        {
+        try {
             usersResource = realmResource.users();
             response = usersResource.create(user);
             log.info("created account for user {} in IAM", account.getUsername());
-        } catch (ServerErrorException e)
-        {
-            throw new UserManagementException(ErrorCode.CORE_IAM_UNKNOWN_CREATE_ERROR.toString() , 500);
+        } catch (ServerErrorException e) {
+            throw new UserManagementException(ErrorCode.CORE_IAM_UNKNOWN_CREATE_ERROR.toString(), 500);
         }
 
         // in case account wasn't successfully created in IAM
-        if (response.getStatus() == NOT_FOUND)
-        {
+        if (response.getStatus() == 404) {
             log.error("Realm {} not found", realm);
-            throw new UserManagementException(ErrorCode.CORE_REALM_NOT_FOUND.toString() , 500);
-        } else if (response.getStatus() == CONFLICT)
-        {
+            throw new UserManagementException(ErrorCode.CORE_REALM_NOT_FOUND.toString(), 500);
+        } else if (response.getStatus() == 409) {
             log.error("Account {} already exists", account.getUsername());
-            throw new UserManagementException(ErrorCode.CORE_ACCOUNT_ALREADY_EXISTS.toString() , HttpStatus.CONFLICT.value());
-        } else if (response.getStatus() != CREATED)
-        {
+            throw new UserManagementException(ErrorCode.CORE_ACCOUNT_ALREADY_EXISTS.toString(),
+                HttpStatus.CONFLICT.value());
+        } else if (response.getStatus() != 201) {
             log.error("Failed to create account {} for [{}] from IAM", account.getUsername(),
                 response.getStatusInfo().getReasonPhrase());
-            throw new UserManagementException(ErrorCode.CORE_IAM_UNKNOWN_CREATE_ERROR.toString() , 500);
+            throw new UserManagementException(ErrorCode.CORE_IAM_UNKNOWN_CREATE_ERROR.toString(), 500);
         }
         // Get client
         ClientRepresentation client = getClientRepresentation(realmResource, usersResource, user);
@@ -127,16 +111,14 @@ public class AccountService {
             getRoleRepresentations(account, realmResource, client, usersResource, user);
 
         // Assign client level roles to user
-        try
-        {
+        try {
             UserResource userResource =
                 usersResource.get(CreatedResponseUtil.getCreatedId(response));
             userResource.roles().clientLevel(client.getId()).add(listOfRoles);
             log.info("assigned roles for user {}", account.getUsername());
-        } catch (WebApplicationException e)
-        {
+        } catch (WebApplicationException e) {
             usersResource.delete(user.getId());
-            throw new UserManagementException(ErrorCode.CORE_ROLES_NOT_ASSIGNED_TO_ACCOUNT.toString() ,
+            throw new UserManagementException(ErrorCode.CORE_ROLES_NOT_ASSIGNED_TO_ACCOUNT.toString(),
                 HttpStatus.INTERNAL_SERVER_ERROR.value());
 
         }
@@ -152,12 +134,10 @@ public class AccountService {
                                                             RealmResource realmResource,
                                                             ClientRepresentation client,
                                                             UsersResource usersResource,
-                                                            UserRepresentation user)
-    {
+                                                            UserRepresentation user) {
         log.info("Retrieving roles for user {}", account.getUsername());
         List<RoleRepresentation> listOfRoles;
-        try
-        {
+        try {
             // Get client level roles (requires view-clients roles in IAM)
             listOfRoles = account.getRoles().stream()
                 .map(role -> realmResource.clients()
@@ -166,12 +146,11 @@ public class AccountService {
                     .get(role)
                     .toRepresentation())
                 .collect(Collectors.toList());
-        } catch (NotFoundException e)
-        {
+        } catch (NotFoundException e) {
             log.error("roles {} not found and deleting partially created account",
                 account.getRoles());
             deletePartiallyCreatedAccount(usersResource, user);
-            throw new UserManagementException(BAD_REQUEST, ErrorCode.CORE_INVALID_ROLES);
+            throw new UserManagementException(400, ErrorCode.CORE_INVALID_ROLES);
         }
         log.info("Retrieved roles for user {}", account.getUsername());
         return listOfRoles;
@@ -179,124 +158,65 @@ public class AccountService {
 
     private ClientRepresentation getClientRepresentation(RealmResource realmResource,
                                                          UsersResource usersResource,
-                                                         UserRepresentation user)
-    {
+                                                         UserRepresentation user) {
         log.info("Retrieving clients");
         ClientRepresentation client;
-        try
-        {
+        try {
             client = realmResource.clients().findByClientId(clientId).get(0);
-        } catch (IndexOutOfBoundsException e)
-        {
+        } catch (IndexOutOfBoundsException e) {
             log.error("client {} not found and deleting partially created account", clientId);
             deletePartiallyCreatedAccount(usersResource, user);
-            throw new UserManagementException(INTERNAL_SERVER_ERROR, ErrorCode.CORE_INVALID_CLIENT);
+            throw new UserManagementException(500, ErrorCode.CORE_INVALID_CLIENT);
         }
         log.info("Retrieved client {}", client.getClientId());
         return client;
     }
 
-    protected User saveSecUser(UserRepresentation userRepresentation, ClientRepresentation client)
-    {
-        log.info("Saving sec user {}", userRepresentation.getUsername());
-        final User savedUser;
-        Optional<User> userFromCache =
-            userService.find(UUID.fromString(userRepresentation.getId()));
-        if (userFromCache.isEmpty())
-        {
-            log.info("Creating user {}", userRepresentation.getUsername());
-            User newUser = new User();
-            newUser.setUsername(userRepresentation.getUsername());
-            newUser.setReference(userRepresentation.getId());
-            newUser.setName(String.format("%s %s", userRepresentation.getFirstName(),
-                userRepresentation.getLastName()));
-            // generate keys for public/private keys authentication
-            newUser.generateKeys();
-            // TODO : use the user service to persist the user + roles + storage
-            //save domain into the database
-            savedUser = userRepository.save(newUser);
-
-            getClientLevelUserRoles(userRepresentation, client).stream()
-                .map(role -> {
-                    SecUserSecRole secSecUserSecRole = new SecUserSecRole();
-                    secSecUserSecRole.setSecRole(
-                        secRoleRepository.getByAuthority("ROLE_" + role.getName()));
-                    secSecUserSecRole.setSecUser(savedUser);
-                    return secSecUserSecRole;
-                })
-                .forEach(secSecUserSecRole -> secSecUserSecRoleRepository.saveAndFlush(
-                    secSecUserSecRole));
-
-            // create storage for the user
-            storageService.initUserStorage(savedUser);
-            return savedUser;
-
-        } else
-        {
-            log.info("Updating sec user {}", userRepresentation.getUsername());
-            User cachedUser = userFromCache.get();
-            cachedUser.setName(String.format("%s %s", userRepresentation.getFirstName(),
-                userRepresentation.getLastName()));
-            //save domain into the database
-            savedUser = userRepository.saveAndFlush(cachedUser);
-
-            getClientLevelUserRoles(userRepresentation, client).stream()
-                .map(role -> {
-                    SecUserSecRole secSecUserSecRole = new SecUserSecRole();
-                    secSecUserSecRole.setSecRole(
-                        secRoleRepository.getByAuthority("ROLE_" + role.getName()));
-                    secSecUserSecRole.setSecUser(savedUser);
-                    return secSecUserSecRole;
-                })
-                .forEach(secSecUserSecRole -> secSecUserSecRoleRepository.saveAndFlush(
-                    secSecUserSecRole));
-
-            log.info("Saved user {} in cache", savedUser);
-            return savedUser;
+    private ClientRepresentation getClientRepresentation() {
+        ClientRepresentation client;
+        try {
+            client = keycloak.realm(realm).clients().findByClientId(clientId).get(0);
+        } catch (IndexOutOfBoundsException e) {
+            log.error("client {} not found and deleting partially created account", clientId);
+            throw new UserManagementException(500, ErrorCode.CORE_INVALID_CLIENT);
         }
+        return client;
     }
 
     private List<RoleRepresentation> getClientLevelUserRoles(UserRepresentation userRepresentation,
-                                                             ClientRepresentation client)
-    {
+                                                             ClientRepresentation client) {
         return keycloak.realm(realm).users().get(userRepresentation.getId()).roles()
             .clientLevel(client.getId()).listAll();
     }
 
     private static void deletePartiallyCreatedAccount(UsersResource usersResource,
-                                                      UserRepresentation user)
-    {
+                                                      UserRepresentation user) {
         UserRepresentation badAccount =
             usersResource.searchByUsername(user.getUsername(), true).get(0);
         usersResource.delete(badAccount.getId());
     }
 
 
-    public ResponseEntity<?> find(String reference)
-    {
+    public ResponseEntity<?> find(String reference) {
         log.info("Retrieving account {}", reference);
         // validate reference is indeed a UUID
         Validation validation = validateReference(reference);
-        if (!validation.isOk())
-        {
+        if (!validation.isOk()) {
             return validation.getResponseEntity();
         }
 
         ClientRepresentation client = getClientRepresentation();
         UserRepresentation userRepresentation = new UserRepresentation();
-        try
-        {
+        try {
             userRepresentation = keycloak.realm(realm).users().get(reference).toRepresentation();
-        } catch (NotFoundException e)
-        {
+        } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ErrorBuilder.build(ErrorCode.CORE_ACCOUNT_NOT_FOUND));
         }
         Account account = setAccount(userRepresentation, client);
 
         Optional<User> userFromCache = userRepository.findByReference(userRepresentation.getId());
-        if (userFromCache.isPresent())
-        {
+        if (userFromCache.isPresent()) {
             User cachedUser = userFromCache.get();
             account.setUserId(cachedUser.getId());
             account.setCreatedAt(userRepresentation.getCreatedTimestamp());
@@ -305,8 +225,7 @@ public class AccountService {
         return ResponseEntity.status(HttpStatus.OK).body(account);
     }
 
-    private Account setAccount(UserRepresentation userRepresentation, ClientRepresentation client)
-    {
+    private Account setAccount(UserRepresentation userRepresentation, ClientRepresentation client) {
         Account account = new Account();
         account.setReference(userRepresentation.getId());
         account.setFirstName(userRepresentation.getFirstName());
@@ -314,10 +233,8 @@ public class AccountService {
         account.setEmail(userRepresentation.getEmail());
         account.setUsername(userRepresentation.getUsername());
         account.setEmailVerified(userRepresentation.isEmailVerified());
-        try
-        {
-            if (Optional.ofNullable(userRepresentation.getAttributes()).isPresent())
-            {
+        try {
+            if (Optional.ofNullable(userRepresentation.getAttributes()).isPresent()) {
                 account.setDeveloper(userRepresentation.getAttributes().get("isDeveloper").get(0)
                     .equalsIgnoreCase("1"));
                 account.setUserLocale(userRepresentation.getAttributes().get("user_locale").get(0));
@@ -325,9 +242,8 @@ public class AccountService {
                     Long.valueOf(userRepresentation.getAttributes().get("user_id").get(0)));
 
             }
-        } catch (NullPointerException e)
-        {
-            throw new UserManagementException(INTERNAL_SERVER_ERROR,
+        } catch (NullPointerException e) {
+            throw new UserManagementException(500,
                 ErrorCode.CORE_CUSTOM_ATTRIBUTES_NOT_SET);
         }
         List<RoleRepresentation> roleRepresentations =
@@ -338,55 +254,36 @@ public class AccountService {
         return account;
     }
 
-    private ClientRepresentation getClientRepresentation()
-    {
-        ClientRepresentation client;
-        try
-        {
-            client = keycloak.realm(realm).clients().findByClientId(clientId).get(0);
-        } catch (IndexOutOfBoundsException e)
-        {
-            log.error("client {} not found and deleting partially created account", clientId);
-            throw new UserManagementException(INTERNAL_SERVER_ERROR, ErrorCode.CORE_INVALID_CLIENT);
-        }
-        return client;
-    }
 
-    public ResponseEntity<?> delete(String reference)
-    {
+
+    public ResponseEntity<?> delete(String reference) {
         log.info("Deleting account {}", reference);
         // validate reference is indeed a UUID
         Validation validation = validateReference(reference);
-        if (!validation.isOk())
-        {
+        if (!validation.isOk()) {
             return validation.getResponseEntity();
         }
 
         // disable user first
         UsersResource users = keycloak.realm(realm).users();
-        try
-        {
+        try {
             disableUserInIAM(users, reference, true);
             log.info("disabled account {} in IAM", reference);
-        } catch (NotFoundException e)
-        {
+        } catch (NotFoundException e) {
             log.error("account {} not found in IAM", reference);
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ErrorBuilder.build(ErrorCode.CORE_ACCOUNT_NOT_FOUND));
         }
 
         // delete user from cache
-        try
-        {
+        try {
             Optional<User> userFromCache = userRepository.findByReference(reference);
-            if (userFromCache.isPresent())
-            {
+            if (userFromCache.isPresent()) {
                 User cachedUser = userFromCache.get();
                 log.info("deleting account {} from user cache", reference);
                 userService.delete(cachedUser, transactionService.start(), null, true);
             }
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             log.error("Error deleting account {} enabling account in IAM", reference, e);
             disableUserInIAM(users, reference, false);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -397,8 +294,7 @@ public class AccountService {
         users = keycloak.realm(realm).users();
         UserRepresentation userRepresentation;
         Account account = new Account();
-        try
-        {
+        try {
             userRepresentation = users.get(reference).toRepresentation();
             account.setReference(userRepresentation.getId());
             account.setFirstName(userRepresentation.getFirstName());
@@ -408,13 +304,11 @@ public class AccountService {
             log.info("removing account {} from IAM", reference);
             users.get(reference).remove();
 
-        } catch (NotFoundException e)
-        {
+        } catch (NotFoundException e) {
             log.error("account {} not found in IAM", reference);
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ErrorBuilder.build(ErrorCode.CORE_ACCOUNT_NOT_FOUND));
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             // disabled ghost IAM account is lingering in IAM service
             log.warn(
                 "Error deleting account {} disabled ghost IAM account is lingering in IAM service ",
@@ -426,8 +320,7 @@ public class AccountService {
         return JsonResponseEntity.status(HttpStatus.NO_CONTENT).body(account);
     }
 
-    private void disableUserInIAM(UsersResource users, String reference, boolean disabled)
-    {
+    private void disableUserInIAM(UsersResource users, String reference, boolean disabled) {
         UserRepresentation userRepresentation;
         userRepresentation = users.get(reference).toRepresentation();
         userRepresentation.setEnabled(disabled);
@@ -436,24 +329,21 @@ public class AccountService {
 
     }
 
-    public void update(Account account)
-    {
+    public void update(Account account) {
         log.info("Updating account {}", account);
         // validate account
         Validation validation = validateAccount(account, ValidationFor.UPDATE);
-        if (!validation.isOk())
-        {
-            throw new UserManagementException("account data is invalid" , 400);
+        if (!validation.isOk()) {
+            throw new UserManagementException("account data is invalid", 400);
         }
 
         UsersResource users = keycloak.realm(realm).users();
         UserRepresentation userRepresentation = null;
         UserRepresentation userRepresentationBeforeUpdate = null;
-        try
-        {
+        try {
             userRepresentation = users.searchByUsername(account.getUsername(), true).get(0);
             userRepresentationBeforeUpdate =
-                userRepresentation; // used to rollback operation in IAM in case of downstream failure
+                userRepresentation; // used to roll back operation in IAM in case of downstream failure
             userRepresentation.setFirstName(account.getFirstName());
             userRepresentation.setLastName(account.getLastName());
             userRepresentation.setEmail(account.getEmail());
@@ -468,83 +358,52 @@ public class AccountService {
             users.get(userRepresentation.getId()).update(userRepresentation);
 
 
-        } catch (NotFoundException e)
-        {
+        } catch (NotFoundException e) {
             // create the account if doesn't exist in IAM
             log.info("account {} not found in IAM", account.getUsername());
-        } catch (BadRequestException e)
-        {
+        } catch (BadRequestException e) {
             log.error("IAM doesn't allow the update of username {}", account.getUsername());
-            throw new UserManagementException(ErrorCode.CORE_USERNAME_UPDATE_NOT_ALLOWED.toString() ,
+            throw new UserManagementException(ErrorCode.CORE_USERNAME_UPDATE_NOT_ALLOWED.toString(),
                 HttpStatus.BAD_REQUEST.value());
         }
 
         ClientRepresentation clientRepresentation = getClientRepresentation();
         updateAccountClientLevelRoles(account, users, clientRepresentation, userRepresentation);
 
-//        // update the user in user cache
-//        try
-//        {
-//            UserRepresentation searchedUserRepresentation =
-//                users.searchByUsername(userRepresentation.getUsername(), true).get(0);
-//            User savedUser = saveSecUser(searchedUserRepresentation, clientRepresentation);
-//
-//            account.setUserId(savedUser.getId());
-//            account.setEmailVerified(searchedUserRepresentation.isEmailVerified());
-//            account.setCreatedAt(searchedUserRepresentation.getCreatedTimestamp());
-//        } catch (Exception e)
-//        {
-//            //rollback if failure is encountered in saving the account in the cache
-//            // restore account in IAM
-//            log.error("error updating account {} in user cache", account.getReference(), e);
-//            log.info("restoring account {} in IAM", account.getReference());
-//            users.get(userRepresentationBeforeUpdate.getId())
-//                .update(userRepresentationBeforeUpdate);
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                .body(ErrorBuilder.build(ErrorCode.CORE_IAM_UNKNOWN_UPDATE_ERROR));
-//
-//        }
         log.info("account updated successfully");
     }
 
 
     private void updateAccountClientLevelRoles(Account account, UsersResource users,
                                                ClientRepresentation client,
-                                               UserRepresentation userRepresentation)
-    {
+                                               UserRepresentation userRepresentation) {
         log.info("updating account client level roles to {}", account.getUsername());
-        try
-        {
+        try {
             UserResource userResource = users.get(userRepresentation.getId());
             List<RoleRepresentation> listOfRoles = getAccountRoleRepresentations(account, client);
             List<RoleRepresentation> allRoles =
                 userResource.roles().clientLevel(client.getId()).listAll();
             userResource.roles().clientLevel(client.getId()).remove(allRoles);
 
-            if (listOfRoles.isEmpty())
-            {
+            if (listOfRoles.isEmpty()) {
                 account.getRoles().clear();
-            } else
-            {
+            } else {
                 userResource.roles().clientLevel(client.getId()).add(listOfRoles);
             }
 
 
-        } catch (WebApplicationException e)
-        {
+        } catch (WebApplicationException e) {
             log.error("failed to assign roles to account {}", account.getReference(), e);
-            throw new UserManagementException(INTERNAL_SERVER_ERROR,
+            throw new UserManagementException(500,
                 ErrorCode.CORE_ROLES_NOT_ASSIGNED_TO_ACCOUNT);
         }
     }
 
     private List<RoleRepresentation> getAccountRoleRepresentations(Account account,
-                                                                   ClientRepresentation client)
-    {
+                                                                   ClientRepresentation client) {
         log.info("getting account client level roles to {}", account.getReference());
         List<RoleRepresentation> listOfRoles;
-        try
-        {
+        try {
             // Get client level roles (requires view-clients roles in IAM)
             listOfRoles = account.getRoles().stream()
                 .map(role -> keycloak.realm(realm).clients()
@@ -553,18 +412,15 @@ public class AccountService {
                     .get(role)
                     .toRepresentation())
                 .collect(Collectors.toList());
-        } catch (NotFoundException e)
-        {
+        } catch (NotFoundException e) {
             log.error("account roles {} not found in IAM", account.getRoles(), e);
-            throw new UserManagementException(BAD_REQUEST, ErrorCode.CORE_INVALID_ROLES);
-
+            throw new UserManagementException(400, ErrorCode.CORE_INVALID_ROLES);
         }
         log.info("account roles retrieved successfully");
         return listOfRoles;
     }
 
-    private Validation validateAccount(Account account, ValidationFor source)
-    {
+    private Validation validateAccount(Account account, ValidationFor source) {
         log.info("Validating account {}", account.toString());
         Validation validation = new Validation();
         validation.setOk(true);
@@ -572,81 +428,65 @@ public class AccountService {
         // validate required properties
         // updating username and password is not allowed but the error will come from IAM as it's
         // impossible to validate the values here
-        if (source.equals(ValidationFor.UPDATE))
-        {
+        if (source.equals(ValidationFor.UPDATE)) {
             log.info("Validating account for update");
-            if (account.getUsername() == null)
-            {
+            if (account.getUsername() == null) {
                 validation.setOk(false);
                 errors.put("username", "this property is required");
-            } else
-            {
+            } else {
                 validation.setOk(true);
                 log.info("Validated account {} successfully", account.getUsername());
                 return validation;
             }
         }
 
-        if (source.equals(ValidationFor.CREATE))
-        {
+        if (source.equals(ValidationFor.CREATE)) {
             log.info("Validating account for create");
-            if (account.getPassword() == null || account.getPassword().isEmpty())
-            {
+            if (account.getPassword() == null || account.getPassword().isEmpty()) {
                 validation.setOk(false);
                 errors.put("password", "this property is required");
             }
-            if (account.getFirstName() == null || account.getFirstName().isEmpty())
-            {
+            if (account.getFirstName() == null || account.getFirstName().isEmpty()) {
                 validation.setOk(false);
                 errors.put("first_name", "this property is required");
             }
-            if (account.getLastName() == null || account.getLastName().isEmpty())
-            {
+            if (account.getLastName() == null || account.getLastName().isEmpty()) {
                 validation.setOk(false);
                 errors.put("last_name", "this property is required");
             }
-            if (account.getUsername() == null || account.getUsername().isEmpty())
-            {
+            if (account.getUsername() == null || account.getUsername().isEmpty()) {
                 validation.setOk(false);
                 errors.put("username", "this property is required");
             }
-            if (account.getEmail() == null || account.getEmail().isEmpty())
-            {
+            if (account.getEmail() == null || account.getEmail().isEmpty()) {
                 validation.setOk(false);
                 errors.put("email", "this property is required");
             }
-            if (account.getUserLocale() == null || account.getUserLocale().isEmpty())
-            {
+            if (account.getUserLocale() == null || account.getUserLocale().isEmpty()) {
                 validation.setOk(false);
                 errors.put("user_locale", "this property is required");
-            } else
-            {
+            } else {
                 List<String> cytomineLocales = List.of("en", "es", "nl", "fr", "no");
-                if (!cytomineLocales.contains(account.getUserLocale()))
-                {
+                if (!cytomineLocales.contains(account.getUserLocale())) {
                     validation.setOk(false);
-                    errors.put("user_locale", "unknown locales [" + account.getUserLocale() +
-                        "] , allowed roles [en, es, nl, fr, no]");
+                    errors.put("user_locale", "unknown locales [" + account.getUserLocale()
+                        + "] , allowed roles [en, es, nl, fr, no]");
                 }
             }
-            if (account.getRoles() == null || account.getRoles().isEmpty())
-            {
+            if (account.getRoles() == null || account.getRoles().isEmpty()) {
                 validation.setOk(false);
                 errors.put("roles", "this property is required");
-            } else
-            {
+            } else {
                 List<String> cytomineRoles = List.of("ADMIN", "USER", "GUEST");
                 List<String> invalidRoles =
                     account.getRoles().stream().filter(role -> !cytomineRoles.contains(role))
                         .toList();
-                if (!invalidRoles.isEmpty())
-                {
+                if (!invalidRoles.isEmpty()) {
                     String unknownRoles = Strings.collectionToCommaDelimitedString(invalidRoles);
                     validation.setOk(false);
-                    errors.put("roles", "unknown roles [" + unknownRoles +
-                        "] , allowed roles [ADMIN, USER, GUEST]");
-                } else
-                {
+                    errors.put("roles", "unknown roles [" + unknownRoles
+                        + "] , allowed roles [ADMIN, USER, GUEST]");
+                } else {
                     validation.setOk(true);
                     log.info("Validated account {} successfully", account.getUsername());
                     return validation;
@@ -659,16 +499,13 @@ public class AccountService {
         return validation;
     }
 
-    private Validation validateReference(String reference)
-    {
+    private Validation validateReference(String reference) {
         log.info("validating account reference {}", reference);
         Validation validation = new Validation();
         validation.setOk(true);
-        try
-        {
+        try {
             UUID.fromString(reference);
-        } catch (IllegalArgumentException ex)
-        {
+        } catch (IllegalArgumentException ex) {
             validation.setOk(false);
             validation.setResponseEntity(ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ErrorBuilder.build(ErrorCode.CORE_INVALID_REFERENCE)));
@@ -677,68 +514,4 @@ public class AccountService {
         log.info("Validated account reference {} successfully", reference);
         return validation;
     }
-
-    public ResponseEntity<?> find(int offset, int limit)
-    {
-        log.info("finding accounts from offset # {} with size {}", offset, limit);
-        if (offset < 0)
-        {
-            offset = 0;
-        }
-
-        int usersCount = keycloak.realm(realm).users().count();
-        int totalPages = (int) Math.ceil((double) usersCount / limit);
-
-        if (offset >= usersCount)
-        {
-            offset = usersCount - 1;
-        }
-
-        int from = offset * limit;
-
-        // get the client
-        ClientRepresentation client = getClientRepresentation();
-
-        List<UserRepresentation> users = keycloak.realm(realm).users().list(offset, limit);
-        Accounts accounts = new Accounts();
-        accounts.setTotal(usersCount);
-        accounts.setNbPages(totalPages);
-        accounts.setLimit(limit);
-        accounts.setItems(new ArrayList<>());
-        accounts.setOffset(offset);
-
-        List<String> ids = users.stream().parallel().map(AbstractUserRepresentation::getId)
-            .collect(Collectors.toList());
-
-        List<User> userIds = userService.find(ids); // get all IDs in one database round trip
-
-        users.stream().parallel().forEach(user -> {
-            Account account = setAccount(user, client);
-            Optional<User> retrievedUserOptional = userIds.stream()
-                .filter(cachedUser -> cachedUser.getReference().equalsIgnoreCase(user.getId()))
-                .toList().stream().findFirst();
-            if (retrievedUserOptional.isPresent())
-            {
-                User retrievedUser = retrievedUserOptional.get();
-                account.setCreatedAt(user.getCreatedTimestamp());
-            }
-            accounts.getItems().add(account);
-        });
-
-        log.info("accounts page {} successfully loaded", from);
-        return JsonResponseEntity.status(HttpStatus.OK).body(accounts);
-    }
-}
-
-@Setter
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor
-class Validation {
-    private boolean ok = true;
-    private ResponseEntity<?> responseEntity;
-}
-
-enum ValidationFor {
-    CREATE, UPDATE
 }

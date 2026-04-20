@@ -30,7 +30,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import be.cytomine.controller.JsonResponseEntity;
 import be.cytomine.controller.error.ErrorBuilder;
 import be.cytomine.controller.error.ErrorCode;
 import be.cytomine.domain.security.User;
@@ -64,9 +63,6 @@ public class AccountService {
     String realm;
 
     private UserRepository userRepository;
-
-    private UserService userService;
-
 
     public void createAccount(Account account) throws UserManagementException {
 
@@ -252,81 +248,6 @@ public class AccountService {
         account.setRoles(roleRepresentations.stream().map(RoleRepresentation::getName)
             .collect(Collectors.toList()));
         return account;
-    }
-
-
-
-    public ResponseEntity<?> delete(String reference) {
-        log.info("Deleting account {}", reference);
-        // validate reference is indeed a UUID
-        Validation validation = validateReference(reference);
-        if (!validation.isOk()) {
-            return validation.getResponseEntity();
-        }
-
-        // disable user first
-        UsersResource users = keycloak.realm(realm).users();
-        try {
-            disableUserInIAM(users, reference, true);
-            log.info("disabled account {} in IAM", reference);
-        } catch (NotFoundException e) {
-            log.error("account {} not found in IAM", reference);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(ErrorBuilder.build(ErrorCode.CORE_ACCOUNT_NOT_FOUND));
-        }
-
-        // delete user from cache
-        try {
-            Optional<User> userFromCache = userRepository.findByReference(reference);
-            if (userFromCache.isPresent()) {
-                User cachedUser = userFromCache.get();
-                log.info("deleting account {} from user cache", reference);
-                userService.delete(cachedUser, transactionService.start(), null, true);
-            }
-        } catch (Exception e) {
-            log.error("Error deleting account {} enabling account in IAM", reference, e);
-            disableUserInIAM(users, reference, false);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ErrorBuilder.build(ErrorCode.CORE_IAM_UNKNOWN_DELETE_ERROR));
-        }
-
-        // remove from IAM
-        users = keycloak.realm(realm).users();
-        UserRepresentation userRepresentation;
-        Account account = new Account();
-        try {
-            userRepresentation = users.get(reference).toRepresentation();
-            account.setReference(userRepresentation.getId());
-            account.setFirstName(userRepresentation.getFirstName());
-            account.setLastName(userRepresentation.getLastName());
-            account.setEmail(userRepresentation.getEmail());
-            account.setUsername(userRepresentation.getUsername());
-            log.info("removing account {} from IAM", reference);
-            users.get(reference).remove();
-
-        } catch (NotFoundException e) {
-            log.error("account {} not found in IAM", reference);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(ErrorBuilder.build(ErrorCode.CORE_ACCOUNT_NOT_FOUND));
-        } catch (Exception e) {
-            // disabled ghost IAM account is lingering in IAM service
-            log.warn(
-                "Error deleting account {} disabled ghost IAM account is lingering in IAM service ",
-                reference);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ErrorBuilder.build(ErrorCode.CORE_IAM_UNKNOWN_DELETE_ERROR));
-        }
-        log.info("deleting account {} from IAM", reference);
-        return JsonResponseEntity.status(HttpStatus.NO_CONTENT).body(account);
-    }
-
-    private void disableUserInIAM(UsersResource users, String reference, boolean disabled) {
-        UserRepresentation userRepresentation;
-        userRepresentation = users.get(reference).toRepresentation();
-        userRepresentation.setEnabled(disabled);
-
-        users.get(reference).update(userRepresentation);
-
     }
 
     public void update(Account account) {

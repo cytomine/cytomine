@@ -1,7 +1,6 @@
 <template>
   <div class="drawer" :style="drawerStyle" @transitionend="handleTransitionEnd">
     <div class="drawer-handle-area">
-      <div class="drawer-handle-bar" />
       <div class="drawer-header">
         <slot name="header">
           <span class="drawer-title">{{ $t('app-engine.applications') }}</span>
@@ -112,14 +111,6 @@ export default {
   flex-shrink: 0;
   user-select: none;
   padding: 10px 20px 0;
-}
-
-.drawer-handle-bar {
-  width: 40px;
-  height: 4px;
-  background: #d1d5db;
-  border-radius: 2px;
-  margin: 0 auto 12px;
 }
 
 .drawer-header {

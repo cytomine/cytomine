@@ -7,35 +7,36 @@
 <div v-else class="cytomine-viewer">
   <b-loading :is-full-page="false" :active="loading" />
 
+  <div class="viewer-main">
+    <div v-if="!loading" class="maps-wrapper">
+      <div class="map-cell"
+        v-for="(cell, i) in cells"
+        :key="i"
+        :style="`height:${elementHeight}%; width:${elementWidth}%;`"
+        :class="{highlighted: cell && cell.highlighted}"
+      >
+        <cytomine-image
+          v-if="cell && cell.image && cell.slices"
+          :index="cell.index"
+          :key="`${cell.index}-${cell.image.id}`"
+          @close="closeMap(cell.index)"
+        />
+      </div>
+
+      <image-selector />
+
+      <!-- Emit event when a hotkey is pressed (to rework once https://github.com/iFgR/vue-shortkey/issues/78 is implemented) -->
+      <div class="hidden" v-shortkey.once="shortkeysMapping" @shortkey="shortkeyEvent"></div>
+    </div>
+
+    <AppBottomDrawer v-show="appPanelCollapsed" />
+  </div>
+
   <div class="ae-sidebar" :class="{collapsed: appPanelCollapsed}">
     <div class="ae-sidebar-content" v-show="!appPanelCollapsed">
       <app-engine-sidebar></app-engine-sidebar>
     </div>
   </div>
-
-  <div v-if="!loading" class="maps-wrapper">
-    <div class="map-cell"
-      v-for="(cell, i) in cells"
-      :key="i"
-      :style="`height:${elementHeight}%; width:${elementWidth}%;`"
-      :class="{highlighted: cell && cell.highlighted}"
-    >
-      <cytomine-image
-        v-if="cell && cell.image && cell.slices"
-        :index="cell.index"
-        :key="`${cell.index}-${cell.image.id}`"
-        @close="closeMap(cell.index)"
-      />
-    </div>
-
-    <image-selector />
-
-    <!-- Emit event when a hotkey is pressed (to rework once https://github.com/iFgR/vue-shortkey/issues/78 is implemented) -->
-    <div class="hidden" v-shortkey.once="shortkeysMapping" @shortkey="shortkeyEvent"></div>
-
-  </div>
-
-  <AppBottomDrawer v-show="appPanelCollapsed" />
 </div>
 </template>
 
@@ -346,6 +347,22 @@ export default {
 .cytomine-viewer {
   display: flex;
   height: 100%;
+}
+
+.viewer-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.maps-wrapper {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-wrap: wrap;
+  position: relative;
+  overflow: hidden;
 }
 
 .ae-sidebar {

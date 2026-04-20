@@ -2,9 +2,7 @@
   <div class="drawer" :style="drawerStyle" @transitionend="handleTransitionEnd">
     <div class="drawer-handle-area">
       <div class="drawer-header">
-        <slot name="header">
-          <span class="drawer-title">{{ $t('app-engine.applications') }}</span>
-        </slot>
+        <span class="drawer-title">{{ $t('app-engine.applications') }}</span>
         <b-button
           icon-pack="fas"
           :icon-left="isCollapsed ? 'chevron-up' : 'chevron-down'"
@@ -15,7 +13,7 @@
  
     <div class="drawer-body" :style="bodyStyle">
       <div class="drawer-body-inner">
-        <slot />
+        body
       </div>
     </div>
   </div>

@@ -324,10 +324,10 @@ public class UserService extends ModelService {
             .findFirst();
 
         String select = "SELECT u.*, r.authority as role ";
-        String from = "FROM sec_user u " +
-            "LEFT JOIN sec_user_sec_role susr ON u.id = susr.sec_user_id " +
-            "LEFT JOIN sec_role r ON susr.sec_role_id = r.id ";
-        String where = "WHERE true " ;
+        String from = "FROM sec_user u "
+            + "LEFT JOIN sec_user_sec_role susr ON u.id = susr.sec_user_id "
+            + "LEFT JOIN sec_role r ON susr.sec_role_id = r.id ";
+        String where = "WHERE true ";
         String search = "";
         String groupBy = "";
         String sort;

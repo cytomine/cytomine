@@ -114,9 +114,6 @@ export default {
   },
   computed: {
     currentProject: get('currentProject/project'),
-    isOpen() {
-      return this.value;
-    },
     drawerHeight() {
       if (this.isCollapsed) {
         return this.collapsedHeight;
@@ -182,14 +179,6 @@ export default {
         })
       );
     },
-    close() {
-      this.$emit('input', false);
-      this.$emit('close');
-    },
-    open() {
-      this.$emit('input', true);
-      this.$emit('open');
-    },
     toggleCollapse() {
       this.isCollapsed = !this.isCollapsed;
       this.$emit('collapse', this.isCollapsed);
@@ -201,9 +190,6 @@ export default {
       if (!this.isDragging && event.propertyName === 'height') {
         this.$eventBus.$emit('updateMapSize');
       }
-    },
-    handleTaskExecution() {
-
     },
     runTask() {
       clearInterval(this.progressTimer);

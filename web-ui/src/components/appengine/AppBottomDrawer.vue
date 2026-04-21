@@ -44,6 +44,8 @@
               :project-id="currentProject.id"
             />
 
+            <TaskInputForm v-if="selectedTask" :task="selectedTask"/>
+
             <b-button
               class="start-button"
               type="is-primary"
@@ -70,6 +72,7 @@
 
 <script>
 import Task from '@/utils/appengine/task';
+import TaskInputForm from '@/components/appengine/forms/TaskInputForm';
 import TaskIoForm from '@/components/appengine/forms/TaskIoForm';
 import TaskRun from '@/utils/appengine/task-run';
 import TaskRunTable from '@/components/appengine/task-run/TaskRunTable';
@@ -77,14 +80,15 @@ import {get} from '@/utils/store-helpers';
 
 export default {
   name: 'AppBottomDrawer',
+  components: {
+    TaskInputForm,
+    TaskIoForm,
+    TaskRunTable,
+  },
   props: {
     value: {type: Boolean, default: false},
     defaultHeight: {type: String, default: '50vh'},
     collapsedHeight: {type: String, default: '60px'},
-  },
-  components: {
-    TaskIoForm,
-    TaskRunTable,
   },
   data() {
     return {

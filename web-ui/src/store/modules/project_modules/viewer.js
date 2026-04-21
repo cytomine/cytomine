@@ -30,7 +30,7 @@ export default {
       indexNextImage: 0,
 
       copiedAnnot: null,
-      copiedAnnotImageInstance: null,
+      copiedAnnotImageInstance: null
     };
   },
 

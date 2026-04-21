@@ -1160,4 +1160,5 @@ app-engine.parameter.name,Name,Nom,Nombre,Naam
 app-engine.parameter.type,Type,Type,Tipo,Type
 app-engine.parameter.value,Value,Valeur,Valor,Waarde
 app-engine.runs.title,Runs,Exécutions,Ejecuciones,Uitvoeringen
+app-engine.see-recent-runs,See recent runs,Voir les exécutions récentes,Ver ejecuciones recientes,Bekijk recente uitvoeringen
 app-engine.task-run.state.title,State,État,Estado,Status

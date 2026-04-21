@@ -62,6 +62,10 @@
             <h3 class="column-title">{{ $t('run-status') }}</h3>
 
             <TaskRunTable :task-runs="allTaskRuns"/>
+
+            <div class="has-text-right mt-3">
+              <b-button type="is-text">{{ $t('app-engine.see-recent-runs') }}</b-button>
+            </div>
           </div>
         </div>
       </div>

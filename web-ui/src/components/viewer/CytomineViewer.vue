@@ -85,9 +85,6 @@ export default {
     viewer() {
       return this.viewers[this.idViewer];
     },
-    viewerWrapper() {
-      return this.$store.getters['currentProject/currentViewer'];
-    },
     indexImages() {
       return this.viewer ? Object.keys(this.viewer.images) : [];
     },

@@ -25,4 +25,4 @@ images:
   pullPolicy: IfNotPresent
 
 test:
-  ingressIP: "172.16.238.15"
+  ingressIP: "172.16.238.100"

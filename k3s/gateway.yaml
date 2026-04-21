@@ -3,6 +3,23 @@ kind: Namespace
 metadata:
   name: gateway-system
 ---
+apiVersion: cilium.io/v2alpha1
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: local-pool
+spec:
+  blocks:
+    - cidr: "172.16.238.100/32"
+---
+apiVersion: cilium.io/v2alpha1
+kind: CiliumL2AnnouncementPolicy
+metadata:
+  name: local-policy
+spec:
+  loadBalancerIPs: true
+  interfaces:
+    - ^eth.*
+---
 apiVersion: helm.cattle.io/v1
 kind: HelmChart
 metadata:
@@ -14,6 +31,8 @@ spec:
   targetNamespace: kube-system
   valuesContent: |-
     gatewayAPI:
+      enabled: true
+    l2announcements:
       enabled: true
     kubeProxyReplacement: true
     k8sServiceHost: localhost

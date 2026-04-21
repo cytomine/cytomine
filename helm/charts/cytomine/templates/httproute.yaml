@@ -12,6 +12,7 @@ spec:
     {{- else }}
     - name: cytomine
       namespace: {{ .Release.Namespace }}
+      sectionName: https
     {{- end }}
   hostnames:
     - {{ .Values.global.domainName }}
@@ -101,3 +102,26 @@ spec:
       backendRefs:
         - name: web-ui
           port: {{ .Values.web_ui.port }}
+{{- if not .Values.gateway.parentRefs }}
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: cytomine-http-redirect
+  labels:
+    {{- include "cytomine.labels" . | nindent 4 }}
+spec:
+  parentRefs:
+    - name: cytomine
+      namespace: {{ .Release.Namespace }}
+      sectionName: http
+  hostnames:
+    - {{ .Values.global.domainName }}
+  rules:
+    - filters:
+        - type: RequestRedirect
+          requestRedirect:
+            scheme: https
+            statusCode: 301
+{{- end }}

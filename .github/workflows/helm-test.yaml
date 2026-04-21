@@ -8,7 +8,7 @@ on:
         required: true
       REGISTRY_TOKEN:
         required: true
-permissions: { }
+permissions: {}
 
 jobs:
   lint-test:
@@ -112,6 +112,7 @@ jobs:
             --chart-dirs=helm/charts/ --all --namespace=cytomine-${{ github.sha }} \
             --release-name=cytomine-${{ github.sha }} \
             --helm-extra-set-args="$EXTRA_ARGS" \
+            --timeout 20m \
             --helm-extra-args="--timeout 20m"
 
       - name: Logs e2e tests results - e2e-tests pod

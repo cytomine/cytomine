@@ -33,7 +33,7 @@ jobs:
         uses: helm/chart-testing-action@v2.8.0
 
       - name: Define deployment name
-        run: echo "DEPLOYMENT_NAME=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+        run: echo "DEPLOYMENT_NAME=${GITHUB_SHA:0:7}" >> $GITHUB_ENV
 
       - name: Login to registry
         run: echo "${{ secrets.REGISTRY_TOKEN }}" | docker login registry.cytomine.org -u "${{ secrets.REGISTRY_USERNAME }}" --password-stdin

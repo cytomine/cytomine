@@ -64,7 +64,9 @@
             <TaskRunTable :task-runs="allTaskRuns"/>
 
             <div class="has-text-right mt-3">
-              <b-button type="is-text">{{ $t('app-engine.see-recent-runs') }}</b-button>
+              <b-button type="is-text" @click="$router.push({ name: 'app-dashboard' })">
+                {{ $t('app-engine.see-recent-runs') }}
+              </b-button>
             </div>
           </div>
         </div>

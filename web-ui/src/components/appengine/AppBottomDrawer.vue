@@ -37,7 +37,14 @@
               <h3 class="column-title">{{ $t('app-engine.inputs.title') }}</h3>
             </div>
 
-            <TaskInputForm v-if="selectedTask" :task="selectedTask"/>
+            <TaskInputForm
+              v-if="selectedTask"
+              :inputs="inputs"
+              :task="selectedTask"
+              @input="inputs = $event"
+            />
+
+            {{ inputs }}
 
             <b-button
               class="start-button"
@@ -93,6 +100,7 @@ export default {
       tasks: [],
       allTaskRuns: [],
       trackedTaskRuns: [],
+      inputs: {},
 
       isRunning: false,
       progress: 0,

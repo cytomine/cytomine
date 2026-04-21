@@ -2,9 +2,10 @@
   <div>
     <AppEngineField
       v-for="input in taskInputs"
-      v-model="inputs[input.name].value"
       :key="input.id"
       :parameter="input"
+      :value="inputs[input.name].value"
+      @input="onInputChange(input.name, $event)"
     />
   </div>
 </template>
@@ -22,12 +23,12 @@ export default {
     AppEngineField,
   },
   props: {
+    inputs: {type: Object, required: true},
     task: {type: Object, required: true},
   },
   data() {
     return {
       taskInputs: [],
-      inputs: {},
       hasBinaryData: false,
     };
   },
@@ -47,7 +48,7 @@ export default {
       this.resetForm();
     },
     resetForm() {
-      this.inputs = {};
+      let inputs = {};
 
       const setDefaultValue = (input) => {
         const value = (() => {
@@ -67,7 +68,7 @@ export default {
           }
         })();
 
-        Vue.set(this.inputs, input.name, {value, type: input.type});
+        Vue.set(inputs, input.name, {value, type: input.type});
       };
 
       for (let input of this.taskInputs) {
@@ -76,7 +77,20 @@ export default {
           this.hasBinaryData = true;
         }
       }
-    }
+
+      this.$emit('input', inputs);
+    },
+    onInputChange(name, value) {
+      const updated = {
+        ...this.inputs,
+        [name]: {
+          ...(this.inputs[name] || {}),
+          value,
+        }
+      };
+
+      this.$emit('input', updated);
+    },
   },
   async created() {
     await this.fetchTaskInputs();

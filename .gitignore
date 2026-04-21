@@ -28,3 +28,4 @@ data/
 **/.settings
 **/bin
 **/.cache/**
+helm/charts/cytomine/charts/*.tgz

@@ -104,19 +104,13 @@ public class TermService extends ModelService {
         return termHttpContract.findAllTermIdsByOntology(ontology.getId(), currentUserService.getCurrentUser().getId());
     }
 
-    public Set<Long> list(Project project) {
+    public Set<Long> getAllTermIds(Project project) {
         return termHttpContract.findAllTermIdsByProject(project.getId(), currentUserService.getCurrentUser().getId());
-
-    }
-
-    public List<Long> getAllTermId(Project project) {
-        return termHttpContract.findAllTermIdsByProject(project.getId(), currentUserService.getCurrentUser().getId())
-            .stream().toList();
     }
 
     public String fillEmptyTermIds(String terms, Project project) {
-        if (terms == null || terms.equals("")) {
-            return this.getAllTermId(project).stream().map(String::valueOf).collect(Collectors.joining(","));
+        if (terms == null || terms.isEmpty()) {
+            return this.getAllTermIds(project).stream().map(String::valueOf).collect(Collectors.joining(","));
         }
         return terms;
     }

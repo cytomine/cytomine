@@ -66,42 +66,70 @@ jobs:
           E2E_TEST_COUNT=$(grep -r "@Test" e2e-tests/src/test/java/org/cytomine/e2etests/selenium/ --include="*.java" | wc -l)
           echo "E2E_TEST_COUNT=$E2E_TEST_COUNT" >> $GITHUB_ENV
 
-      - name: Run chart-testing (lint and install)
+      - name: Lint charts
         run: |
-          # Cytomine images from registry.cytomine.org/cytomine/
-          EXTRA_ARGS="--set gateway.installController=true "
-          EXTRA_ARGS+="--set gateway.className=envoy-gateway "
-          EXTRA_ARGS+="--set gateway-helm.deployment.certgen.image.repository=registry.cytomine.org/docker/envoyproxy/gateway "
-          EXTRA_ARGS+="--set gateway-helm.deployment.envoyGateway.image.repository=registry.cytomine.org/docker/envoyproxy/gateway "
-          EXTRA_ARGS+="--set images.core=registry.cytomine.org/cytomine/core:${{ github.sha }} "
-          EXTRA_ARGS+="--set images.app_engine=registry.cytomine.org/cytomine/app-engine:${{ github.sha }} "
-          EXTRA_ARGS+="--set images.sam=registry.cytomine.org/cytomine/sam:${{ github.sha }} "
-          EXTRA_ARGS+="--set images.web_ui=registry.cytomine.org/cytomine/web-ui:${{ github.sha }} "
-          EXTRA_ARGS+="--set images.cbir=registry.cytomine.org/cytomine/cbir:${{ github.sha }} "
-          EXTRA_ARGS+="--set images.pims=registry.cytomine.org/cytomine/pims:${{ github.sha }} "
-          EXTRA_ARGS+="--set images.pims_import=registry.cytomine.org/cytomine/python-client:${{ github.sha }} "
-          EXTRA_ARGS+="--set images.repository=registry.cytomine.org/cytomine/repository:${{ github.sha }} "
-          EXTRA_ARGS+="--set images.e2e_tests=registry.cytomine.org/cytomine/e2e-tests:${{ github.sha }} "
-          EXTRA_ARGS+="--set images.tasks_runner_image=registry.cytomine.org/cytomine/app-engine-tasks-runner:${{ github.sha }} "
-          # External images from registry.cytomine.org/docker/
-          EXTRA_ARGS+="--set images.alpine=registry.cytomine.org/docker/library/alpine:3.18 "
-          EXTRA_ARGS+="--set images.curl=registry.cytomine.org/docker/curlimages/curl "
-          EXTRA_ARGS+="--set images.eclipse_temurin=registry.cytomine.org/docker/library/eclipse-temurin:8u462-b08-jdk-ubi9-minimal "
-          EXTRA_ARGS+="--set images.mongodb=registry.cytomine.org/docker/library/mongo:5.0-focal "
-          EXTRA_ARGS+="--set images.redis=registry.cytomine.org/docker/library/redis:7 "
-          EXTRA_ARGS+="--set images.pims_cache=registry.cytomine.org/docker/library/redis:7 "
-          EXTRA_ARGS+="--set images.iam=registry.cytomine.org/docker/keycloak/keycloak:26.3 "
-          EXTRA_ARGS+="--set images.postgresql_iam=registry.cytomine.org/docker/library/postgres:14 "
-          EXTRA_ARGS+="--set images.postgresql_app_engine=registry.cytomine.org/docker/library/postgres:14 "
-          EXTRA_ARGS+="--set images.postgis=registry.cytomine.org/docker/postgis/postgis:15-3.5 "
-          EXTRA_ARGS+="--set images.selenium=registry.cytomine.org/docker/selenium/standalone-firefox "
-          EXTRA_ARGS+="--set images.registry=registry.cytomine.org/docker/library/registry:2.8.3 "
-          EXTRA_ARGS+="--set test.e2eTestCount=${{ env.E2E_TEST_COUNT }}"
-          ct lint-and-install --target-branch ${{ github.event.repository.default_branch }} \
-            --chart-dirs=helm/charts/ --all --namespace=cytomine-${{ github.sha }} \
-            --release-name=cytomine-${{ github.sha }} \
-            --helm-extra-set-args="$EXTRA_ARGS" \
-            --helm-extra-args="--timeout 20m"
+          ct lint --target-branch ${{ github.event.repository.default_branch }} \
+            --chart-dirs=helm/charts/ --all
+
+      - name: Build chart dependencies
+        run: helm dependency build helm/charts/cytomine/
+
+      - name: Install chart
+        run: |
+          NS=cytomine-${{ github.sha }}
+          helm install $NS helm/charts/cytomine/ \
+            --namespace=$NS \
+            --set gateway.installController=true \
+            --set gateway.className=envoy-gateway \
+            --set "gateway-helm.deployment.certgen.image.repository=registry.cytomine.org/docker/envoyproxy/gateway" \
+            --set "gateway-helm.deployment.envoyGateway.image.repository=registry.cytomine.org/docker/envoyproxy/gateway" \
+            --set images.core=registry.cytomine.org/cytomine/core:${{ github.sha }} \
+            --set images.app_engine=registry.cytomine.org/cytomine/app-engine:${{ github.sha }} \
+            --set images.sam=registry.cytomine.org/cytomine/sam:${{ github.sha }} \
+            --set images.web_ui=registry.cytomine.org/cytomine/web-ui:${{ github.sha }} \
+            --set images.cbir=registry.cytomine.org/cytomine/cbir:${{ github.sha }} \
+            --set images.pims=registry.cytomine.org/cytomine/pims:${{ github.sha }} \
+            --set images.pims_import=registry.cytomine.org/cytomine/python-client:${{ github.sha }} \
+            --set images.repository=registry.cytomine.org/cytomine/repository:${{ github.sha }} \
+            --set images.e2e_tests=registry.cytomine.org/cytomine/e2e-tests:${{ github.sha }} \
+            --set images.tasks_runner_image=registry.cytomine.org/cytomine/app-engine-tasks-runner:${{ github.sha }} \
+            --set images.alpine=registry.cytomine.org/docker/library/alpine:3.18 \
+            --set images.curl=registry.cytomine.org/docker/curlimages/curl \
+            --set "images.eclipse_temurin=registry.cytomine.org/docker/library/eclipse-temurin:8u462-b08-jdk-ubi9-minimal" \
+            --set images.mongodb=registry.cytomine.org/docker/library/mongo:5.0-focal \
+            --set images.redis=registry.cytomine.org/docker/library/redis:7 \
+            --set images.pims_cache=registry.cytomine.org/docker/library/redis:7 \
+            --set images.iam=registry.cytomine.org/docker/keycloak/keycloak:26.3 \
+            --set images.postgresql_iam=registry.cytomine.org/docker/library/postgres:14 \
+            --set images.postgresql_app_engine=registry.cytomine.org/docker/library/postgres:14 \
+            --set images.postgis=registry.cytomine.org/docker/postgis/postgis:15-3.5 \
+            --set images.selenium=registry.cytomine.org/docker/selenium/standalone-firefox \
+            --set images.registry=registry.cytomine.org/docker/library/registry:2.8.3 \
+            --set test.e2eTestCount=${{ env.E2E_TEST_COUNT }} \
+            --wait --timeout=20m
+
+      - name: Get gateway IP
+        run: |
+          NS=cytomine-${{ github.sha }}
+          GATEWAY_IP=$(kubectl get svc -n $NS \
+            -l "gateway.envoyproxy.io/owning-gateway-name=cytomine,gateway.envoyproxy.io/owning-gateway-namespace=$NS" \
+            -o jsonpath='{.items[0].spec.clusterIP}')
+          echo "GATEWAY_IP=$GATEWAY_IP" >> $GITHUB_ENV
+
+      - name: Inject gateway IP for e2e tests
+        run: |
+          NS=cytomine-${{ github.sha }}
+          helm upgrade $NS helm/charts/cytomine/ \
+            --namespace=$NS \
+            --reuse-values \
+            --set test.ingressIP=${{ env.GATEWAY_IP }} \
+            --wait --timeout=5m
+
+      - name: Run helm tests
+        run: |
+          helm test cytomine-${{ github.sha }} \
+            --namespace=cytomine-${{ github.sha }} \
+            --timeout=20m
 
       - name: Logs e2e tests results - e2e-tests pod
         if: always()

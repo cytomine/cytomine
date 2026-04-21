@@ -231,12 +231,12 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 20px 12px;
+  padding: 0.625rem 1.25rem 0.75rem;
   border-bottom: 1px solid #f0f0f0;
 }
 
 .drawer-title {
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 600;
   color: #111827;
 }
@@ -248,20 +248,20 @@ export default {
 }
 
 .drawer-body-inner {
-  padding: 16px 20px 24px;
+  padding: 1rem 1.25rem 1.5rem;
 }
 
 .analysis-layout {
   display: grid;
-  grid-template-columns: 260px 1fr 320px;
-  gap: 20px;
+  grid-template-columns: 25rem 1fr 35rem;
+  gap: 1.5rem;
   height: 100%;
 }
 
 .analysis-column {
   border: 1px solid #e5e7eb;
   border-radius: 12px;
-  padding: 16px;
+  padding: 1rem;
   background: #fafafa;
   min-height: 0;
 }
@@ -269,20 +269,20 @@ export default {
 .column-title {
   font-size: 15px;
   font-weight: 600;
-  margin-bottom: 16px;
+  margin-bottom: 1rem;
   color: #1f2937;
 }
 
 .selected-app-card {
-  margin-top: 16px;
+  margin-top: 1rem;
   padding: 12px;
-  border-radius: 8px;
+  border-radius: 0.5rem;
   background: #ffffff;
   border: 1px solid #e5e7eb;
 }
 
 .selected-app-card p {
-  margin-top: 8px;
+  margin-top: 0.5rem;
   font-size: 13px;
   color: #6b7280;
 }
@@ -291,7 +291,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 1rem;
 }
 
 .start-button {

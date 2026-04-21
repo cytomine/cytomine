@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.ImageInstance;
@@ -24,7 +25,6 @@ import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
-import be.cytomine.repository.ontology.TermRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.security.SecurityACLService;
@@ -48,7 +48,7 @@ public class RestStatsController extends RestCytomineController {
 
     private final CurrentUserService currentUserService;
 
-    private final TermRepository termRepository;
+    private final TermHttpContract termRepository;
 
     private final ProjectConnectionService projectConnectionService;
 
@@ -132,7 +132,7 @@ public class RestStatsController extends RestCytomineController {
         Long startDateLong,
         @RequestParam(value = "endDate", required = false)
         Long endDateLong,
-        @RequestParam(value = "term", required = false) Long termId,
+        @RequestParam(value = "term", required = false) Optional<Long> termId,
         @RequestParam(value = "accumulate", required = false, defaultValue = "true")
         Boolean accumulate,
         @RequestParam(value = "reverseOrder", required = false, defaultValue = "true")
@@ -141,16 +141,11 @@ public class RestStatsController extends RestCytomineController {
         Project project =
             projectService.find(projectId).orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
 
-        Term term = null;
-        if (termId != null) {
-            term = termRepository.findById(termId).orElseThrow(() -> new ObjectNotFoundException("Term", termId));
-        }
-
         Date startDate = startDateLong != null ? new Date(startDateLong) : null;
         Date endDate = endDateLong != null ? new Date(endDateLong) : null;
 
         return responseSuccess(
-            statsService.statAnnotationEvolution(project, term, daysRange, startDate, endDate, reverseOrder,
+            statsService.statAnnotationEvolution(project, termId, daysRange, startDate, endDate, reverseOrder,
                 accumulate));
     }
 
@@ -164,7 +159,7 @@ public class RestStatsController extends RestCytomineController {
         @RequestParam(value = "endDate", required = false)
         Long endDateLong,
         @RequestParam(value = "term", required = false)
-        Long termId,
+        Optional<Long> termId,
         @RequestParam(value = "accumulate", required = false, defaultValue = "true")
         Boolean accumulate,
         @RequestParam(value = "reverseOrder", required = false, defaultValue = "true")
@@ -173,16 +168,12 @@ public class RestStatsController extends RestCytomineController {
         Project project =
             projectService.find(projectId).orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
 
-        Term term = null;
-        if (termId != null) {
-            term = termRepository.findById(termId).orElseThrow(() -> new ObjectNotFoundException("Term", termId));
-        }
 
         Date startDate = startDateLong != null ? new Date(startDateLong) : null;
         Date endDate = endDateLong != null ? new Date(endDateLong) : null;
 
         return responseSuccess(
-            statsService.statReviewedAnnotationEvolution(project, term, daysRange, startDate, endDate, reverseOrder,
+            statsService.statReviewedAnnotationEvolution(project, termId, daysRange, startDate, endDate, reverseOrder,
                 accumulate));
     }
 

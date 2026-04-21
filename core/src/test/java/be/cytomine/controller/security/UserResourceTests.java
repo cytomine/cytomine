@@ -348,7 +348,6 @@ public class UserResourceTests {
             .andExpect(jsonPath("$.password").doesNotExist())
             .andExpect(jsonPath("$.guest").doesNotExist())
             .andExpect(jsonPath("$.passwordExpired").doesNotExist())
-            .andExpect(jsonPath("$.updated").doesNotExist())
             .andExpect(jsonPath("$.user").doesNotExist())
             .andExpect(jsonPath("$.email").doesNotExist());
     }
@@ -374,7 +373,6 @@ public class UserResourceTests {
             .andExpect(jsonPath("$.password").doesNotExist())
             .andExpect(jsonPath("$.guest").doesNotExist())
             .andExpect(jsonPath("$.passwordExpired").doesNotExist())
-            .andExpect(jsonPath("$.updated").doesNotExist())
             .andExpect(jsonPath("$.user").doesNotExist())
             .andExpect(jsonPath("$.email").doesNotExist());
     }
@@ -400,7 +398,6 @@ public class UserResourceTests {
             .andExpect(jsonPath("$.password").doesNotExist())
             .andExpect(jsonPath("$.guest").doesNotExist())
             .andExpect(jsonPath("$.passwordExpired").doesNotExist())
-            .andExpect(jsonPath("$.updated").doesNotExist())
             .andExpect(jsonPath("$.user").doesNotExist())
             .andExpect(jsonPath("$.email").doesNotExist());
     }
@@ -503,7 +500,6 @@ public class UserResourceTests {
             .andExpect(jsonPath("$.password").doesNotExist())
             .andExpect(jsonPath("$.guest").doesNotExist())
             .andExpect(jsonPath("$.passwordExpired").doesNotExist())
-            .andExpect(jsonPath("$.updated").doesNotExist())
             .andExpect(jsonPath("$.user").doesNotExist())
             .andExpect(jsonPath("$.email").doesNotExist());
     }

@@ -143,13 +143,11 @@ jobs:
 
       - name: Logs e2e tests results - e2e-tests pod
         if: always()
-        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests
-          -c e2e-tests
+        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests -c e2e-tests
 
       - name: Logs e2e tests results - selenium pod
         if: always()
-        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests
-          -c selenium
+        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests -c selenium
 
       - name: Export test results
         if: always()

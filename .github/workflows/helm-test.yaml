@@ -36,8 +36,10 @@ jobs:
         uses: helm/kind-action@v1.14.0
         with:
           node_image: registry.cytomine.org/docker/kindest/node:v1.32.0
+
       - name: Define deployment name
         run: echo "DEPLOYMENT_NAME=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
       - name: Create Namespace
         run: |
           kubectl create ns cytomine-${{ env.DEPLOYMENT_NAME }}
@@ -50,7 +52,7 @@ jobs:
 
       - name: Create Harbor Registry secrets
         run: |
-          for ns in cytomine-${{ env.DEPLOYMENT_NAME }} cytomine-${{ github.sha }}-engine-tasks; do
+          for ns in cytomine-${{ env.DEPLOYMENT_NAME }} cytomine-${{ env.DEPLOYMENT_NAME }}-engine-tasks; do
             kubectl create secret docker-registry docker-image-pull-secrets \
               --namespace=$ns \
               --docker-server=registry.cytomine.org \

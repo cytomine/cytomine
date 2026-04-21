@@ -3,6 +3,7 @@ package be.cytomine.service.security;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -13,7 +14,6 @@ import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.ServerErrorException;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.admin.client.CreatedResponseUtil;
@@ -24,6 +24,7 @@ import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,11 +33,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import be.cytomine.controller.error.ErrorBuilder;
 import be.cytomine.controller.error.ErrorCode;
-import be.cytomine.domain.security.User;
 import be.cytomine.dto.Account;
 import be.cytomine.exceptions.UserManagementException;
 import be.cytomine.repository.security.UserRepository;
-import be.cytomine.service.command.TransactionService;
 import be.cytomine.service.utils.Validation;
 import be.cytomine.service.utils.ValidationFor;
 
@@ -48,13 +47,11 @@ import static be.cytomine.service.utils.IamRepresentationUtil.setPermanentPasswo
 @Slf4j
 @Service
 @Transactional
-@AllArgsConstructor
 @RequiredArgsConstructor
 public class AccountService {
 
+    @Autowired
     Keycloak keycloak;
-
-    private TransactionService transactionService;
 
     @Value("${keycloak-client.target.client-id}")
     String clientId;
@@ -118,11 +115,6 @@ public class AccountService {
                 HttpStatus.INTERNAL_SERVER_ERROR.value());
 
         }
-
-        // save User to user cache
-        UserRepresentation userRepresentation =
-            usersResource.searchByUsername(user.getUsername(), true).get(0);
-
         log.info("Created account for user {} successfully", account.getUsername());
     }
 
@@ -193,33 +185,7 @@ public class AccountService {
     }
 
 
-    public ResponseEntity<?> find(String reference) {
-        log.info("Retrieving account {}", reference);
-        // validate reference is indeed a UUID
-        Validation validation = validateReference(reference);
-        if (!validation.isOk()) {
-            return validation.getResponseEntity();
-        }
 
-        ClientRepresentation client = getClientRepresentation();
-        UserRepresentation userRepresentation = new UserRepresentation();
-        try {
-            userRepresentation = keycloak.realm(realm).users().get(reference).toRepresentation();
-        } catch (NotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(ErrorBuilder.build(ErrorCode.CORE_ACCOUNT_NOT_FOUND));
-        }
-        Account account = setAccount(userRepresentation, client);
-
-        Optional<User> userFromCache = userRepository.findByReference(userRepresentation.getId());
-        if (userFromCache.isPresent()) {
-            User cachedUser = userFromCache.get();
-            account.setUserId(cachedUser.getId());
-            account.setCreatedAt(userRepresentation.getCreatedTimestamp());
-        }
-        log.info("Retrieved account {}", account.getUsername());
-        return ResponseEntity.status(HttpStatus.OK).body(account);
-    }
 
     private Account setAccount(UserRepresentation userRepresentation, ClientRepresentation client) {
         Account account = new Account();
@@ -273,17 +239,21 @@ public class AccountService {
             setCustomAttributes(account, userRepresentation);
 
             // Set password credential
-            userRepresentation.setCredentials(setPermanentPassword(account));
+            if (Objects.nonNull(account.getPassword())) {
+                userRepresentation.setCredentials(setPermanentPassword(account));
+            }
 
             // update account in IAM
             users.get(userRepresentation.getId()).update(userRepresentation);
 
 
         } catch (NotFoundException e) {
-            // create the account if doesn't exist in IAM
+            // create the account if it doesn't exist in IAM
             log.info("account {} not found in IAM", account.getUsername());
         } catch (BadRequestException e) {
-            log.error("IAM doesn't allow the update of username {}", account.getUsername());
+            log.error("IAM doesn't allow the update of username {} with error {}",
+                account.getUsername(),
+                e.getMessage());
             throw new UserManagementException(ErrorCode.CORE_USERNAME_UPDATE_NOT_ALLOWED.toString(),
                 HttpStatus.BAD_REQUEST.value());
         }

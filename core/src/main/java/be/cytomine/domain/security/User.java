@@ -148,6 +148,8 @@ public class User extends CytomineDomain {
         user.email = json.getJSONAttrStr("email");
         user.firstname = json.getJSONAttrStr("firstname");
         user.lastname = json.getJSONAttrStr("lastname");
+        user.created = json.getJSONAttrDate("created");
+        user.updated = json.getJSONAttrDate("updated");
         String languageCode = json.getJSONAttrStr("language");
         if (languageCode == null || languageCode.isBlank()) {
             languageCode = Language.ENGLISH.toString();
@@ -175,6 +177,8 @@ public class User extends CytomineDomain {
         json.put("lastname", user.getLastname());
         json.put("language", Objects.nonNull(user.language) ? user.language.toString() : "EN");
         json.put("isDeveloper", user.isDeveloper);
+        json.put("created", user.getCreated());
+        json.put("updated", user.getUpdated());
         return json;
     }
 

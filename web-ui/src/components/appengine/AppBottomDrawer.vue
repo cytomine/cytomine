@@ -37,13 +37,6 @@
               <h3 class="column-title">{{ $t('app-engine.inputs.title') }}</h3>
             </div>
 
-            <TaskIoForm
-              v-if="selectedTask"
-              v-on:appengine:task:started="handleTaskExecution"
-              :task="selectedTask"
-              :project-id="currentProject.id"
-            />
-
             <TaskInputForm v-if="selectedTask" :task="selectedTask"/>
 
             <b-button
@@ -73,7 +66,6 @@
 <script>
 import Task from '@/utils/appengine/task';
 import TaskInputForm from '@/components/appengine/forms/TaskInputForm';
-import TaskIoForm from '@/components/appengine/forms/TaskIoForm';
 import TaskRun from '@/utils/appengine/task-run';
 import TaskRunTable from '@/components/appengine/task-run/TaskRunTable';
 import {get} from '@/utils/store-helpers';
@@ -82,7 +74,6 @@ export default {
   name: 'AppBottomDrawer',
   components: {
     TaskInputForm,
-    TaskIoForm,
     TaskRunTable,
   },
   props: {

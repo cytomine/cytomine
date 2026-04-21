@@ -2,6 +2,7 @@ package org.cytomine.repository.http;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Set;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -83,5 +84,23 @@ public class TermController implements TermHttpContract {
             return Page.empty();
         }
         return termRepository.findAllByOntologyIdAndDeletedNull(id, pageable).map(ontologyMapper::map);
+    }
+
+    @Override
+    @GetMapping("/ontology/{id}/all-terms")
+    public Set<Long> findAllTermIdsByOntology(@PathVariable long id, @RequestParam long userId) {
+        if (!aclService.canReadOntology(userId, id)) {
+            return Set.of();
+        }
+        return termRepository.findAllIdsByOntologyId(id);
+    }
+
+    @Override
+    @GetMapping("/project/{id}/all-terms")
+    public Set<Long> findAllTermIdsByProject(@PathVariable long id, @RequestParam long userId) {
+        if (!aclService.canReadProject(userId, id)) {
+            return Set.of();
+        }
+        return termRepository.findAllIdsByProjectId(id);
     }
 }

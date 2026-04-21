@@ -29,7 +29,6 @@ import be.cytomine.domain.ontology.Term;
 
 public interface TermRepository extends JpaRepository<Term, Long>, JpaSpecificationExecutor<Term> {
 
-    List<Term> findAllByOntology(Ontology ontology);
 
     @Query(
         value = "SELECT term FROM Term as term WHERE term.ontology = :ontology"

@@ -1,14 +1,12 @@
 <template>
   <div class="drawer" :class="{ collapsed: isCollapsed }" @transitionend="handleTransitionEnd">
-    <div class="drawer-handle-area">
-      <div class="drawer-header">
-        <span class="drawer-title">{{ $t('app-engine.applications') }}</span>
-        <b-button
-          icon-pack="fas"
-          :icon-left="isCollapsed ? 'chevron-up' : 'chevron-down'"
-          @click.stop="toggleCollapse"
-        />
-      </div>
+    <div class="drawer-header">
+      <span class="drawer-title">{{ $t('app-engine.applications') }}</span>
+      <b-button
+        icon-pack="fas"
+        :icon-left="isCollapsed ? 'chevron-up' : 'chevron-down'"
+        @click.stop="toggleCollapse"
+      />
     </div>
 
     <div class="drawer-body">
@@ -229,17 +227,11 @@ export default {
   height: 60px;
 }
 
-.drawer-handle-area {
-  flex-shrink: 0;
-  user-select: none;
-  padding: 10px 20px 0;
-}
-
 .drawer-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-bottom: 12px;
+  padding: 10px 20px 12px;
   border-bottom: 1px solid #f0f0f0;
 }
 

@@ -135,6 +135,7 @@ public class AnnotationDomainResourceTests {
         registry.add("application.appEngine.apiUrl", () -> "http://localhost:" + wireMockServer.port());
         registry.add("application.cbirURL", () -> "http://localhost:" + wireMockServer.port());
         registry.add("application.pimsURL", () -> "http://localhost:" + wireMockServer.port());
+        registry.add("application.repositoryURL", () -> "http://localhost:" + wireMockServer.port());
     }
 
     private static void setupStub() {
@@ -189,6 +190,12 @@ public class AnnotationDomainResourceTests {
     @BeforeEach
     public void beforeEach() throws ParseException {
         createAnnotationSet();
+        wireMockServer.stubFor(WireMock.get(urlPathMatching("/terms/project/" + project.getId() + "/all-terms"))
+            .willReturn(aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withBody("[" + term.getId() + "]")
+            )
+        );
     }
 
     @Test

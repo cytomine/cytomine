@@ -165,6 +165,9 @@ public class TermServiceTests {
     void listTermIdsByProjectIncludeTermFromProjectOntology() {
         Term term = builder.givenATerm();
         Project project = builder.givenAProjectWithOntology(term.getOntology());
+        when(termHttpContract.findAllTermIdsByProject(eq(project.getId()), anyLong()))
+            .thenReturn(Set.of(term.getId()));
+
         assertThat(term.getId()).isIn(termService.getAllTermId(project));
     }
 

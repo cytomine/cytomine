@@ -18,7 +18,6 @@ package be.cytomine.service.ontology;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -38,7 +37,6 @@ import be.cytomine.domain.ontology.RelationTerm;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
-import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.ConstraintException;
 import be.cytomine.repository.ontology.AnnotationTermRepository;
 import be.cytomine.repository.ontology.ReviewedAnnotationRepository;
@@ -112,12 +110,8 @@ public class TermService extends ModelService {
     }
 
     public List<Long> getAllTermId(Project project) {
-        securityACLService.check(project.container(), READ);
-        if (project.getOntology() == null) {
-            return List.of();
-        } else {
-            return termRepository.listAllIds(project.getOntology());
-        }
+        return termHttpContract.findAllTermIdsByProject(project.getId(), currentUserService.getCurrentUser().getId())
+            .stream().toList();
     }
 
     public String fillEmptyTermIds(String terms, Project project) {
@@ -149,16 +143,6 @@ public class TermService extends ModelService {
     @Override
     public CytomineDomain createFromJSON(JsonObject json) {
         return new Term().buildDomainFromJson(json, getEntityManager());
-    }
-
-    public void checkDoNotAlreadyExist(CytomineDomain domain) {
-        Term term = (Term) domain;
-        if (term != null && term.getName() != null) {
-            if (termRepository.findByNameAndOntology(term.getName(), term.getOntology()).stream()
-                .anyMatch(x -> !Objects.equals(x.getId(), term.getId()))) {
-                throw new AlreadyExistException("Term " + term.getName() + " already exist in this ontology!");
-            }
-        }
     }
 
     @Override

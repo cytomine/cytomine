@@ -71,7 +71,7 @@ jobs:
             registry.cytomine.org/docker/envoyproxy/gateway
           )
           for image in "${IMAGES[@]}"; do
-            docker pull "$image"
+            docker pull --platform linux/amd64 "$image"
             kind load docker-image "$image" --name cytomine
           done
 

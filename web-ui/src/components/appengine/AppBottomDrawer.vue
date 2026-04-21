@@ -61,8 +61,6 @@
           <div class="analysis-column">
             <h3 class="column-title">{{ $t('run-status') }}</h3>
 
-            <TaskRunTable :task-runs="allTaskRuns"/>
-
             <div class="has-text-right mt-3">
               <b-button type="is-text" @click="$router.push({ name: 'app-dashboard' })">
                 {{ $t('app-engine.see-recent-runs') }}
@@ -79,14 +77,12 @@
 import Task from '@/utils/appengine/task';
 import TaskInputForm from '@/components/appengine/forms/TaskInputForm';
 import TaskRun from '@/utils/appengine/task-run';
-import TaskRunTable from '@/components/appengine/task-run/TaskRunTable';
 import {get} from '@/utils/store-helpers';
 
 export default {
   name: 'AppBottomDrawer',
   components: {
     TaskInputForm,
-    TaskRunTable,
   },
   data() {
     return {

@@ -1,13 +1,4 @@
-{{- /* Look for Gateway addresses in status - this lookup happens during helm test, after Gateway is created */}}
-{{- $gateway := lookup "gateway.networking.k8s.io/v1" "Gateway" .Release.Namespace "cytomine" }}
-{{- $gatewayIP := "" }}
-{{- if $gateway }}
-  {{- if $gateway.status }}
-    {{- if $gateway.status.addresses }}
-      {{- $gatewayIP = (index $gateway.status.addresses 0).value }}
-    {{- end }}
-  {{- end }}
-{{- end }}
+{{- $gatewayIP := .Values.test.ingressIP | default "" }}
 apiVersion: v1
 kind: Pod
 metadata:

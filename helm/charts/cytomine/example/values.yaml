@@ -18,7 +18,8 @@ app_engine:
   tasks_namespace:
 
 gateway:
-  className: cilium
+  installController: true
+  className: envoy-gateway
 
 iam:
   lsaaiClientIdSecretName: lsaai-client-id

@@ -31,6 +31,9 @@ smtpPort: 587
 # Gateway API - traffic management using Kubernetes Gateway API
 #
 gateway:
+  # Install Envoy Gateway controller as a sub-chart dependency.
+  # Set to false if a gateway controller is already managed externally (e.g. Cilium, shared Envoy Gateway).
+  installController: false
   # Gateway class to use (e.g., cilium, envoy-gateway, nginx)
   className: cilium
   # Parent references for HTTPRoute. If set, the helm chart will NOT create a Gateway

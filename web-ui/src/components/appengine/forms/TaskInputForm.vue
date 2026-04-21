@@ -33,6 +33,11 @@ export default {
     };
   },
   watch: {
+    inputs(value) {
+      if (Object.entries(value).length === 0) {
+        this.resetForm();
+      }
+    },
     async task() {
       await this.fetchTaskInputs();
     }

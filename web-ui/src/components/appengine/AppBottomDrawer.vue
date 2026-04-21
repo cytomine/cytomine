@@ -35,6 +35,9 @@
           <div class="analysis-column">
             <div class="inputs-header">
               <h3 class="column-title">{{ $t('app-engine.inputs.title') }}</h3>
+              <b-button v-if="selectedTask" @click="inputs = {}">
+                {{ $t('button-clear') }}
+              </b-button>
             </div>
 
             <TaskInputForm
@@ -53,9 +56,9 @@
               expanded
               :disabled="!selectedTask || isRunning"
               :loading="isRunning"
-              @click="startAnalysis"
+              @click="runTask"
             >
-              Start analysis
+              {{ $t('app-engine.ae-run-task') }}
             </b-button>
           </div>
 
@@ -202,7 +205,7 @@ export default {
     handleTaskExecution() {
 
     },
-    startAnalysis() {
+    runTask() {
       clearInterval(this.progressTimer);
 
       this.isRunning = true;

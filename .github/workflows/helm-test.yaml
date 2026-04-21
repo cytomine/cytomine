@@ -32,13 +32,48 @@ jobs:
       - name: Set up chart-testing
         uses: helm/chart-testing-action@v2.8.0
 
+      - name: Define deployment name
+        run: echo "DEPLOYMENT_NAME=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+      - name: Login to registry
+        run: echo "${{ secrets.REGISTRY_TOKEN }}" | docker login registry.cytomine.org -u "${{ secrets.REGISTRY_USERNAME }}" --password-stdin
+
       - name: Create kind cluster
         uses: helm/kind-action@v1.14.0
         with:
           node_image: registry.cytomine.org/docker/kindest/node:v1.32.0
+          cluster_name: cytomine
 
-      - name: Define deployment name
-        run: echo "DEPLOYMENT_NAME=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+      - name: Pre-pull and load images into kind
+        run: |
+          SHA=${{ env.DEPLOYMENT_NAME }}
+          IMAGES=(
+            registry.cytomine.org/cytomine/core:$SHA
+            registry.cytomine.org/cytomine/app-engine:$SHA
+            registry.cytomine.org/cytomine/sam:$SHA
+            registry.cytomine.org/cytomine/web-ui:$SHA
+            registry.cytomine.org/cytomine/cbir:$SHA
+            registry.cytomine.org/cytomine/pims:$SHA
+            registry.cytomine.org/cytomine/python-client:$SHA
+            registry.cytomine.org/cytomine/repository:$SHA
+            registry.cytomine.org/cytomine/e2e-tests:$SHA
+            registry.cytomine.org/cytomine/app-engine-tasks-runner:$SHA
+            registry.cytomine.org/docker/library/alpine:3.18
+            registry.cytomine.org/docker/curlimages/curl
+            registry.cytomine.org/docker/library/eclipse-temurin:8u462-b08-jdk-ubi9-minimal
+            registry.cytomine.org/docker/library/mongo:5.0-focal
+            registry.cytomine.org/docker/library/redis:7
+            registry.cytomine.org/docker/keycloak/keycloak:26.3
+            registry.cytomine.org/docker/library/postgres:14
+            registry.cytomine.org/docker/postgis/postgis:15-3.5
+            registry.cytomine.org/docker/selenium/standalone-firefox
+            registry.cytomine.org/docker/library/registry:2.8.3
+            registry.cytomine.org/docker/envoyproxy/gateway
+          )
+          for image in "${IMAGES[@]}"; do
+            docker pull "$image"
+            kind load docker-image "$image" --name cytomine
+          done
 
       - name: Create Namespace
         run: |
@@ -109,6 +144,7 @@ jobs:
             --set images.postgis=registry.cytomine.org/docker/postgis/postgis:15-3.5 \
             --set images.selenium=registry.cytomine.org/docker/selenium/standalone-firefox \
             --set images.registry=registry.cytomine.org/docker/library/registry:2.8.3 \
+            --set images.pullPolicy=IfNotPresent \
             --set test.e2eTestCount=${{ env.E2E_TEST_COUNT }} \
             --wait --timeout=20m
 

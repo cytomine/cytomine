@@ -31,7 +31,6 @@ export default {
 
       copiedAnnot: null,
       copiedAnnotImageInstance: null,
-      appPanelCollapsed: false,
     };
   },
 
@@ -64,10 +63,6 @@ export default {
 
     setLinkMode(state, mode) {
       state.linkMode = mode;
-    },
-
-    setAppPanelCollapsed(state, value) {
-      state.appPanelCollapsed = value;
     },
 
     // ----- View links

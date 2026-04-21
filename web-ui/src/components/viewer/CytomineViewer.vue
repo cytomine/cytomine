@@ -1,43 +1,37 @@
 <template>
-<div v-if="error" class="box error">
-  <h2> {{ $t('error') }} </h2>
-  <p>{{ $t('error-loading-image') }}</p>
-  <p v-if="errorBadImageProject">{{ $t('error-loading-image-bad-project') }}</p>
-</div>
-<div v-else class="cytomine-viewer">
-  <b-loading :is-full-page="false" :active="loading" />
-
-  <div class="ae-sidebar" :class="{collapsed: appPanelCollapsed}">
-    <div class="ae-sidebar-content" v-show="!appPanelCollapsed">
-      <app-engine-sidebar></app-engine-sidebar>
-    </div>
+  <div v-if="error" class="box error">
+    <h2>{{ $t('error') }}</h2>
+    <p>{{ $t('error-loading-image') }}</p>
+    <p v-if="errorBadImageProject">{{ $t('error-loading-image-bad-project') }}</p>
   </div>
+  <div v-else class="cytomine-viewer">
+    <b-loading :is-full-page="false" :active="loading" />
 
-  <div class="viewer-main">
-    <div v-if="!loading" class="maps-wrapper">
-      <div class="map-cell"
-        v-for="(cell, i) in cells"
-        :key="i"
-        :style="`height:${elementHeight}%; width:${elementWidth}%;`"
-        :class="{highlighted: cell && cell.highlighted}"
-      >
-        <cytomine-image
-          v-if="cell && cell.image && cell.slices"
-          :index="cell.index"
-          :key="`${cell.index}-${cell.image.id}`"
-          @close="closeMap(cell.index)"
-        />
+    <div class="viewer-main">
+      <div v-if="!loading" class="maps-wrapper">
+        <div class="map-cell"
+          v-for="(cell, i) in cells"
+          :key="i"
+          :style="`height:${elementHeight}%; width:${elementWidth}%;`"
+          :class="{highlighted: cell && cell.highlighted}"
+        >
+          <CytomineImage
+            v-if="cell && cell.image && cell.slices"
+            :index="cell.index"
+            :key="`${cell.index}-${cell.image.id}`"
+            @close="closeMap(cell.index)"
+          />
+        </div>
+
+        <ImageSelector />
+
+        <!-- Emit event when a hotkey is pressed (to rework once https://github.com/iFgR/vue-shortkey/issues/78 is implemented) -->
+        <div class="hidden" v-shortkey.once="shortkeysMapping" @shortkey="shortkeyEvent"></div>
       </div>
 
-      <image-selector />
-
-      <!-- Emit event when a hotkey is pressed (to rework once https://github.com/iFgR/vue-shortkey/issues/78 is implemented) -->
-      <div class="hidden" v-shortkey.once="shortkeysMapping" @shortkey="shortkeyEvent"></div>
+      <AppBottomDrawer />
     </div>
-
-    <AppBottomDrawer />
   </div>
-</div>
 </template>
 
 <script>
@@ -45,7 +39,6 @@ import {get} from '@/utils/store-helpers';
 
 import CytomineImage from './CytomineImage';
 import ImageSelector from './ImageSelector';
-import AppEngineSidebar from '@/components/appengine/sidebar/AppEngineSidebar';
 import AppBottomDrawer from '@/components/appengine/AppBottomDrawer';
 
 import viewerModuleModel from '@/store/modules/project_modules/viewer';
@@ -61,7 +54,6 @@ export default {
     AppBottomDrawer,
     CytomineImage,
     ImageSelector,
-    AppEngineSidebar
   },
   data() {
     return {
@@ -95,14 +87,6 @@ export default {
     },
     viewerWrapper() {
       return this.$store.getters['currentProject/currentViewer'];
-    },
-    appPanelCollapsed: {
-      get() {
-        return this.viewerWrapper?.appPanelCollapsed ?? false;
-      },
-      set(value) {
-        this.$store.commit(this.viewerModule + 'setAppPanelCollapsed', value);
-      }
     },
     indexImages() {
       return this.viewer ? Object.keys(this.viewer.images) : [];
@@ -176,16 +160,6 @@ export default {
     nbImages() {
       this.$eventBus.$emit('updateMapSize');
     },
-    appPanelCollapsed(newValue, oldValue) {
-      if (newValue === oldValue) {
-        return;
-      }
-      this.$nextTick(() => {
-        const emitUpdate = () => this.$eventBus.$emit('updateMapSize');
-        emitUpdate();
-        setTimeout(emitUpdate, 220);
-      });
-    }
   },
   methods: {
     findIdViewer() {
@@ -363,55 +337,6 @@ export default {
   flex-wrap: wrap;
   position: relative;
   overflow: hidden;
-}
-
-.ae-sidebar {
-  width: 24rem;
-  min-width: 24rem;
-  display: flex;
-  flex-direction: column;
-  border-right: 1px solid #333;
-  overflow: hidden;
-  transition: width 0.2s ease;
-  position: relative;
-}
-
-.ae-sidebar.collapsed {
-  width: 0rem;
-  min-width: 0rem;
-}
-
-.ae-sidebar-content {
-  flex: 1;
-  min-height: 0;
-}
-
-.toggle-ae-sidebar {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  z-index: 2;
-  align-self: flex-end;
-  margin: 0;
-  width: 2.5rem;
-  height: 2.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #d9d9d9;
-  border-radius: 4px;
-  background: #f6f6f6;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.toggle-ae-sidebar:hover {
-  background: #ededed;
-}
-
-.ae-sidebar.collapsed .toggle-ae-sidebar {
-  top: 0.25rem;
-  right: 0.25rem;
 }
 
 .maps-wrapper {

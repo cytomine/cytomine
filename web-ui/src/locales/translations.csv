@@ -904,6 +904,7 @@ reviewers,Reviewers,Validateurs,Revisores,Reviewers
 role,Role,Rôle,Papel,Rol
 rotate,Rotate,Pivoter,Girar,Schommelen
 run-number,Run number,#,Número de ejecución,#
+run-status,Run status,Statut d'exécution,Estado de ejecución,Uitvoeringsstatus
 running,Running,En cours,En ejecución,Bezig
 sample-preview-of,Sample preview of {filename},Aperçu de l'image {filename},Vista previa de muestra de {filename},Afbeeldingsvoorbeeld {filename}
 sample-preview,Sample preview,Aperçu de l'image,Vista previa de muestra,Afbeeldingsvoorbeeld

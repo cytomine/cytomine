@@ -15,7 +15,7 @@
       <div class="drawer-body-inner">
         <div class="analysis-layout">
           <div class="analysis-column selector-column">
-            <h3 class="column-title"><i class="fas fa-cogs"/> {{ $t("app-engine.execute-a-task") }}</h3>
+            <h3 class="column-title">{{ $t("app-engine.execute-a-task") }}</h3>
 
             <b-select v-model="selectedTask" expanded :placeholder="$t('app-engine.form.select-task')">
               <option v-for="task in tasks" :key="`${task.namespace}/${task.version}`" :value="task">
@@ -34,7 +34,7 @@
 
           <div class="analysis-column">
             <div class="inputs-header">
-              <h3 class="column-title">Inputs</h3>
+              <h3 class="column-title">{{ $t('app-engine.inputs.title') }}</h3>
             </div>
 
             <TaskIoForm
@@ -58,7 +58,7 @@
           </div>
 
           <div class="analysis-column">
-            <h3 class="column-title">Run Progress</h3>
+            <h3 class="column-title">{{ $t('run-status') }}</h3>
 
             <TaskRunTable :task-runs="allTaskRuns"/>
           </div>

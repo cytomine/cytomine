@@ -39,7 +39,9 @@ jobs:
 
       - name: Install Envoy Gateway
         run: |
-          helm install eg oci://docker.io/envoyproxy/gateway-helm --version v1.3.0 -n envoy-gateway-system --create-namespace
+          helm install eg oci://docker.io/envoyproxy/gateway-helm --version v1.3.0 -n envoy-gateway-system --create-namespace --timeout 10m \
+            --set deployment.certgen.image.repository=registry.cytomine.org/docker/envoyproxy/gateway \
+            --set deployment.envoyGateway.image.repository=registry.cytomine.org/docker/envoyproxy/gateway
           kubectl wait --timeout=5m -n envoy-gateway-system deployment/envoy-gateway --for=condition=Available
 
       - name: Create GatewayClass

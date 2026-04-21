@@ -15,6 +15,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import be.cytomine.domain.security.Language;
 import jakarta.persistence.Query;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.TupleElement;
@@ -363,7 +364,6 @@ public class UserService extends ModelService {
             query.setParameter(entry.getKey(), entry.getValue());
         }
         List<Tuple> resultList = compactUserTuples(query.getResultList());
-        System.out.println("Result List: " + resultList);
         List<Map<String, Object>> results = new ArrayList<>();
         for (Tuple rowResult : resultList) {
             JsonObject result = new JsonObject();
@@ -372,7 +372,8 @@ public class UserService extends ModelService {
                 String alias = SQLUtils.toCamelCase(element.getAlias());
                 result.put(alias, value);
             }
-
+            result.put("language", Language
+                .findByOrdinal(Integer.parseInt(result.getJSONAttrStr("language", "3"))));
             JsonObject object = User.getDataFromDomain(new User().buildDomainFromJson(result, getEntityManager()));
             object.put("role", rowResult.get("role"));
             results.add(object);

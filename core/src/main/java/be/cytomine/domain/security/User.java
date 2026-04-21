@@ -17,6 +17,7 @@ package be.cytomine.domain.security;
  */
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -144,6 +145,19 @@ public class User extends CytomineDomain {
         user.id = json.getJSONAttrLong("id", null);
         user.username = json.getJSONAttrStr("username");
         user.name = json.getJSONAttrStr("name");
+        user.email = json.getJSONAttrStr("email");
+        user.firstname = json.getJSONAttrStr("firstname");
+        user.lastname = json.getJSONAttrStr("lastname");
+        String languageCode = json.getJSONAttrStr("language");
+        if (languageCode == null || languageCode.isBlank()) {
+            languageCode = Language.ENGLISH.toString();
+        }
+
+        user.language = Language.findByCode(languageCode.toUpperCase());
+        if (user.language == null) {
+            user.language = Language.ENGLISH;
+        }
+        user.setIsDeveloper(json.getJSONAttrBoolean("isDeveloper", false));
         user.reference = json.getJSONAttrStr("reference");
         return user;
     }
@@ -155,7 +169,12 @@ public class User extends CytomineDomain {
         json.put("id", user.getId());
         json.put("username", user.getUsername());
         json.put("name", user.getName());
+        json.put("email", user.getEmail());
         json.put("fullName", user.getFullName());
+        json.put("firstname", user.getFirstname());
+        json.put("lastname", user.getLastname());
+        json.put("language", Objects.nonNull(user.language) ? user.language.toString() : "EN");
+        json.put("isDeveloper", user.isDeveloper);
         return json;
     }
 

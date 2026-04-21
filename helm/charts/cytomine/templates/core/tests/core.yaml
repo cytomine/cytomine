@@ -1,4 +1,14 @@
 {{- $gatewayIP := .Values.test.ingressIP | default "" }}
+{{- if not $gatewayIP }}
+{{- $gw := lookup "gateway.networking.k8s.io/v1" "Gateway" .Release.Namespace "cytomine" }}
+{{- if $gw }}
+{{- range ($gw.status.addresses | default list) }}
+{{- if eq .type "IPAddress" }}
+{{- $gatewayIP = .value }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
 apiVersion: v1
 kind: Pod
 metadata:

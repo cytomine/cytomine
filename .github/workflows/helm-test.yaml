@@ -61,11 +61,6 @@ jobs:
             --namespace=cytomine-${{ github.sha }} \
             -p '{"imagePullSecrets":[{"name":"docker-image-pull-secrets"}]}'
 
-      - name: Get ingress IP
-        run: |
-          INGRESS_IP=$(kubectl get svc -n ingress ingress-nginx-controller -o jsonpath='{.spec.clusterIP}')
-          echo "INGRESS_IP=$INGRESS_IP" >> $GITHUB_ENV
-
       - name: Count e2e tests in selenium folder
         run: |
           E2E_TEST_COUNT=$(grep -r "@Test" e2e-tests/src/test/java/org/cytomine/e2etests/selenium/ --include="*.java" | wc -l)
@@ -74,8 +69,7 @@ jobs:
       - name: Run chart-testing (lint and install)
         run: |
           # Cytomine images from registry.cytomine.org/cytomine/
-          EXTRA_ARGS="--set test.ingressIP=${{ env.INGRESS_IP }} "
-          EXTRA_ARGS+="--set gateway.installController=true "
+          EXTRA_ARGS="--set gateway.installController=true "
           EXTRA_ARGS+="--set gateway.className=envoy-gateway "
           EXTRA_ARGS+="--set gateway-helm.deployment.certgen.image.repository=registry.cytomine.org/docker/envoyproxy/gateway "
           EXTRA_ARGS+="--set gateway-helm.deployment.envoyGateway.image.repository=registry.cytomine.org/docker/envoyproxy/gateway "

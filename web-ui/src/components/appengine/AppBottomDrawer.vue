@@ -26,7 +26,7 @@
               <p v-if="selectedTask.description && selectedTask.description.length > 0">
                 {{ selectedTask.description }}
               </p>
-              <p v-else class="no-description"><em>{{ $t('app-engine.task.no-description') }}</em></p>
+              <p v-else><em>{{ $t('app-engine.task.no-description') }}</em></p>
             </div>
           </div>
 
@@ -61,6 +61,9 @@
           <div class="analysis-column">
             <h3 class="column-title">{{ $t('run-status') }}</h3>
 
+            <p v-if="trackedTaskRun">{{ trackedTaskRun }}</p>
+            <p v-else><em>{{ $t('app-engine.no-active-run') }}</em></p>
+
             <div class="has-text-right mt-3">
               <b-button type="is-text" @click="$router.push({ name: 'app-dashboard' })">
                 {{ $t('app-engine.see-recent-runs') }}
@@ -89,10 +92,9 @@ export default {
       isCollapsed: true,
       selectedTask: null,
       tasks: [],
-      allTaskRuns: [],
-      trackedTaskRuns: [],
       inputs: {},
       isRunning: false,
+      trackedTaskRun: null,
     };
   },
   computed: {
@@ -102,47 +104,9 @@ export default {
       return this.$store.getters['currentProject/currentViewer'].images[index].imageInstance;
     }
   },
-  async created() {
-    await this.fetchTasks();
-    await this.fetchTaskRuns();
-
-    setInterval(async () => {
-      for (let taskRun of this.trackedTaskRuns) {
-        if (!taskRun.isTerminalState()) {
-          await taskRun.fetch();
-        }
-
-        if (taskRun.isTerminalState() && this.getTask(taskRun).hasGeometryOutput()) {
-          await taskRun.fetchOutputs();
-          this.$eventBus.$emit('annotation-layers:refresh');
-        }
-      }
-
-      this.trackedTaskRuns = this.trackedTaskRuns.filter(taskRun => !taskRun.isTerminalState());
-    }, 2000);
-  },
-  mounted() {
-    const parsed = parseInt(this.defaultHeight);
-    if (!isNaN(parsed) && this.defaultHeight.endsWith('px')) {
-      this.currentHeight = parsed;
-    } else {
-      this.currentHeight = window.innerHeight * (parseInt(this.defaultHeight) / 100);
-    }
-  },
   methods: {
     async fetchTasks() {
       this.tasks = await Task.fetchAll();
-    },
-    async fetchTaskRuns() {
-      let taskRuns = await TaskRun.fetchByProject(this.currentProject.id);
-      taskRuns.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-      this.allTaskRuns = await Promise.all(
-        taskRuns.map(async ({project, taskRunId}) => {
-          let taskRun = await Task.fetchTaskRunStatus(this.currentProject.id, taskRunId);
-          return new TaskRun({...taskRun, project});
-        })
-      );
     },
     toggleCollapse() {
       this.isCollapsed = !this.isCollapsed;
@@ -197,8 +161,8 @@ export default {
 
         await Task.runTask(this.currentProject.id, taskRun.id).then(async (event) => {
           this.$buefy.toast.open({message: this.$t('app-engine.run.started'), type: 'is-success'});
+          this.trackedTaskRun = new TaskRun(event.resource);
           this.resetInputs();
-          this.$emit('appengine:task:started', event);
         });
       } catch (e) {
         const serverError = e.response && e.response.data
@@ -209,6 +173,9 @@ export default {
 
       this.isRunning = false;
     },
+  },
+  async created() {
+    await this.fetchTasks();
   },
 };
 </script>

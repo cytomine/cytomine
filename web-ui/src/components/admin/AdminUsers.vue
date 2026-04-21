@@ -80,12 +80,12 @@
               <button class="button is-link is-small" @click="startUserEdition(user)">
                 {{$t('button-edit')}}
               </button>
-              <button v-if="user.enabled" class="button is-danger is-small" @click="lock(user)">
-                {{$t('button-lock')}}
-              </button>
-              <button v-else class="button is-success is-small" @click="unlock(user)">
-                {{$t('button-unlock')}}
-              </button>
+<!--              <button v-if="user.enabled" class="button is-danger is-small" @click="lock(user)">-->
+<!--                {{$t('button-lock')}}-->
+<!--              </button>-->
+<!--              <button v-else class="button is-success is-small" @click="unlock(user)">-->
+<!--                {{$t('button-unlock')}}-->
+<!--              </button>-->
             </div>
           </b-table-column>
         </template>

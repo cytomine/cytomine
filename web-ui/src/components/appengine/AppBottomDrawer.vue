@@ -11,7 +11,7 @@
       </div>
     </div>
 
-    <div class="drawer-body" :style="bodyStyle">
+    <div class="drawer-body">
       <div class="drawer-body-inner">
         <div class="analysis-layout">
           <div class="analysis-column selector-column">
@@ -86,7 +86,7 @@ export default {
   },
   props: {
     value: {type: Boolean, default: false},
-    defaultHeight: {type: String, default: '50vh'},
+    defaultHeight: {type: String, default: '40vh'},
     collapsedHeight: {type: String, default: '60px'},
   },
   data() {
@@ -118,13 +118,6 @@ export default {
       return {
         height: this.drawerHeight,
         width: '100%',
-      };
-    },
-    bodyStyle() {
-      return {
-        flex: 1,
-        minHeight: 0,
-        overflow: 'auto',
       };
     },
     activeImage() {

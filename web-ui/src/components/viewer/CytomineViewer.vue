@@ -333,14 +333,6 @@ export default {
 .maps-wrapper {
   flex: 1;
   min-height: 0;
-  display: flex;
-  flex-wrap: wrap;
-  position: relative;
-  overflow: hidden;
-}
-
-.maps-wrapper {
-  flex: 1;
   height: 100%;
   display: flex;
   flex-wrap: wrap;

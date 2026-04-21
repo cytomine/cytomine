@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;
@@ -43,7 +44,6 @@ import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.ontology.AnnotationTermRepository;
-import be.cytomine.repository.ontology.TermRepository;
 import be.cytomine.repository.ontology.UserAnnotationRepository;
 import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.CurrentUserService;
@@ -74,7 +74,7 @@ public class AnnotationTermService extends ModelService {
     private UserRepository userRepository;
 
     @Autowired
-    private TermRepository termRepository;
+    private TermHttpContract termRepository;
 
     @Autowired
     private UserAnnotationRepository userAnnotationRepository;
@@ -122,7 +122,6 @@ public class AnnotationTermService extends ModelService {
      * Add the new domain with JSON data
      *
      * @param jsonObject New domain data
-     *
      * @return Response structure (created domain data,..)
      */
     @Override
@@ -149,7 +148,6 @@ public class AnnotationTermService extends ModelService {
      * @param transaction  Transaction link with this command
      * @param task         Task for this command
      * @param printMessage Flag if client will print or not confirm message
-     *
      * @return Response structure (code, old domain,..)
      */
     @Override
@@ -292,7 +290,6 @@ public class AnnotationTermService extends ModelService {
      * Retrieve domain thanks to a JSON object
      *
      * @param json JSON with new domain info
-     *
      * @return domain retrieve thanks to json
      */
     @Override

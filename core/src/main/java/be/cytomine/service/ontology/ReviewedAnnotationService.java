@@ -16,6 +16,7 @@ import org.locationtech.jts.io.WKTReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;
@@ -36,7 +37,6 @@ import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.ReviewedAnnotationListing;
 import be.cytomine.repository.image.ImageInstanceRepository;
 import be.cytomine.repository.ontology.ReviewedAnnotationRepository;
-import be.cytomine.repository.ontology.TermRepository;
 import be.cytomine.repository.ontology.UserAnnotationRepository;
 import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.AnnotationListingService;
@@ -82,7 +82,7 @@ public class ReviewedAnnotationService extends ModelService {
     private ValidateGeometryService validateGeometryService;
 
     @Autowired
-    private TermRepository termRepository;
+    private TermHttpContract termRepository;
 
     @Autowired
     private TaskService taskService;
@@ -184,7 +184,6 @@ public class ReviewedAnnotationService extends ModelService {
      * Add the new domain with JSON data
      *
      * @param jsonObject New domain data
-     *
      * @return Response structure (created domain data,..)
      */
     @Override
@@ -224,7 +223,6 @@ public class ReviewedAnnotationService extends ModelService {
      *
      * @param domain      Domain to update
      * @param jsonNewData New domain datas
-     *
      * @return Response structure (new domain data, old domain data..)
      */
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
@@ -242,7 +240,6 @@ public class ReviewedAnnotationService extends ModelService {
      * @param transaction  Transaction link with this command
      * @param task         Task for this command
      * @param printMessage Flag if client will print or not confirm message
-     *
      * @return Response structure (code, old domain,..)
      */
     @Override
@@ -301,7 +298,6 @@ public class ReviewedAnnotationService extends ModelService {
      *
      * @param annotation Annotation to review
      * @param terms      Terms to add to the annotation
-     *
      * @return The reviewed annotation
      */
     private ReviewedAnnotation createReviewAnnotation(AnnotationDomain annotation, List<Long> terms) {
@@ -499,7 +495,6 @@ public class ReviewedAnnotationService extends ModelService {
      * @param coveringAnnotations List of reviewed annotations id that are covering by newLocation geometry
      * @param newLocation         A geometry (wkt format)
      * @param remove              Flag that tell to extend or substract part of geometry from  coveringAnnotations list
-     *
      * @return The first annotation data
      */
     // TODO: could be generic (same logic as for user annotation)

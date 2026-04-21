@@ -35,7 +35,7 @@
           <div class="analysis-column">
             <div class="inputs-header">
               <h3 class="column-title">{{ $t('app-engine.inputs.title') }}</h3>
-              <b-button v-if="selectedTask" @click="inputs = {}">
+              <b-button v-if="selectedTask" @click="resetInputs">
                 {{ $t('button-clear') }}
               </b-button>
             </div>
@@ -46,8 +46,6 @@
               :task="selectedTask"
               @input="inputs = $event"
             />
-
-            {{ inputs }}
 
             <b-button
               class="start-button"
@@ -106,10 +104,6 @@ export default {
       inputs: {},
 
       isRunning: false,
-      progress: 0,
-      runStatus: 'Idle',
-      progressLog: ['Waiting for analysis to start...'],
-      progressTimer: null,
     };
   },
   computed: {
@@ -133,6 +127,10 @@ export default {
         overflow: 'auto',
       };
     },
+    activeImage() {
+      let index = this.$store.getters['currentProject/currentViewer'].activeImage;
+      return this.$store.getters['currentProject/currentViewer'].images[index].imageInstance;
+    }
   },
   async created() {
     await this.fetchTasks();
@@ -161,9 +159,6 @@ export default {
       this.currentHeight = window.innerHeight * (parseInt(this.defaultHeight) / 100);
     }
   },
-  beforeDestroy() {
-    clearInterval(this.progressTimer);
-  },
   methods: {
     async fetchTasks() {
       this.tasks = await Task.fetchAll();
@@ -191,37 +186,58 @@ export default {
         this.$eventBus.$emit('updateMapSize');
       }
     },
-    runTask() {
-      clearInterval(this.progressTimer);
+    resetInputs() {
+      this.inputs = {};
+    },
+    getInputProvisions() {
+      return Object.entries(this.inputs).map(([parameterName, {type, value}]) => ({
+        'param_name': parameterName,
+        type,
+        value,
+      }));
+    },
+    async runTask() {
+      try {
+        this.isRunning = true;
 
-      this.isRunning = true;
-      this.progress = 0;
-      this.runStatus = 'Starting';
-      this.progressLog = [
-        `Launching ${this.selectedAppLabel}...`,
-      ];
+        let taskRun = await Task.createTaskRun(
+          this.currentProject.id,
+          this.selectedTask.namespace,
+          this.selectedTask.version,
+          this.activeImage.id,
+        );
 
-      this.progressTimer = setInterval(() => {
-        if (this.progress >= 100) {
-          clearInterval(this.progressTimer);
-          this.isRunning = false;
-          this.runStatus = 'Completed';
-          this.progressLog.push('Analysis finished successfully.');
-          return;
-        }
-
-        this.progress += 10;
-
-        if (this.progress < 40) {
-          this.runStatus = 'Preparing inputs';
-        } else if (this.progress < 80) {
-          this.runStatus = 'Running analysis';
+        if (this.hasBinaryData) {
+          for (const provision of this.getInputProvisions()) {
+            let body = provision;
+            if (provision.type === 'file') {
+              body = new FormData();
+              body.append('file', provision.value, provision.value.name || 'uploaded-file');
+            }
+            await Task.singleProvisionTask(
+              this.currentProject.id,
+              taskRun.id,
+              provision.param_name,
+              body,
+            );
+          }
         } else {
-          this.runStatus = 'Finalizing';
+          await Task.batchProvisionTask(this.currentProject.id, taskRun.id, this.getInputProvisions());
         }
 
-        this.progressLog.push(`${this.runStatus} (${this.progress}%)`);
-      }, 700);
+        await Task.runTask(this.currentProject.id, taskRun.id).then(async (event) => {
+          this.$buefy.toast.open({message: this.$t('app-engine.run.started'), type: 'is-success'});
+          this.resetInputs();
+          this.$emit('appengine:task:started', event);
+        });
+      } catch (e) {
+        const serverError = e.response && e.response.data
+          ? (e.response.data.message || e.response.data.errorCode)
+          : e.message;
+        this.$buefy.toast.open({message: `Error : ${serverError}`, type: 'is-danger', indefinite: true});
+      }
+
+      this.isRunning = false;
     },
   },
 };

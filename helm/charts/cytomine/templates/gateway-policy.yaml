@@ -15,8 +15,7 @@ spec:
       name: cytomine
   cors:
     allowOrigins:
-      - type: Exact
-        value: {{ include "core.url" . | quote }}
+      - {{ include "core.url" . | quote }}
     allowMethods:
       {{- range .Values.gateway.cors.allowMethods }}
       - {{ . }}

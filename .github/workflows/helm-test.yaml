@@ -79,6 +79,7 @@ jobs:
           NS=cytomine-${{ github.sha }}
           helm install $NS helm/charts/cytomine/ \
             --namespace=$NS \
+            -f helm/charts/cytomine/ci/test-values.yaml \
             --set gateway.installController=true \
             --set gateway.className=envoy-gateway \
             --set "gateway-helm.deployment.certgen.image.repository=registry.cytomine.org/docker/envoyproxy/gateway" \
@@ -121,6 +122,7 @@ jobs:
           NS=cytomine-${{ github.sha }}
           helm upgrade $NS helm/charts/cytomine/ \
             --namespace=$NS \
+            -f helm/charts/cytomine/ci/test-values.yaml \
             --reuse-values \
             --set test.ingressIP=${{ env.GATEWAY_IP }} \
             --wait --timeout=5m

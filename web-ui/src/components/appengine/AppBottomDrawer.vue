@@ -188,12 +188,12 @@ export default {
       this.isCollapsed = !this.isCollapsed;
       this.$emit('collapse', this.isCollapsed);
       this.$nextTick(() => {
-        this.$emit('resize');
+        this.$eventBus.$emit('updateMapSize');
       });
     },
     handleTransitionEnd(event) {
       if (!this.isDragging && event.propertyName === 'height') {
-        this.$emit('resize');
+        this.$eventBus.$emit('updateMapSize');
       }
     },
     handleTaskExecution() {

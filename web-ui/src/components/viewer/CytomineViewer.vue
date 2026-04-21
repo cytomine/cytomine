@@ -35,7 +35,7 @@
       <div class="hidden" v-shortkey.once="shortkeysMapping" @shortkey="shortkeyEvent"></div>
     </div>
 
-    <AppBottomDrawer @resize="drawerResized" />
+    <AppBottomDrawer />
   </div>
 </div>
 </template>
@@ -323,10 +323,6 @@ export default {
 
     shortkeyEvent(event) {
       this.$eventBus.$emit('shortkeyEvent', event.srcKey);
-    },
-
-    drawerResized() {
-      this.$eventBus.$emit('updateMapSize');
     },
   },
   async created() {

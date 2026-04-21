@@ -72,7 +72,8 @@ jobs:
           )
           for image in "${IMAGES[@]}"; do
             docker pull --platform linux/amd64 "$image"
-            kind load docker-image "$image" --name cytomine
+            docker save "$image" | docker exec --privileged -i cytomine-control-plane \
+              ctr --namespace=k8s.io images import --snapshotter=overlayfs -
           done
 
       - name: Create Namespace

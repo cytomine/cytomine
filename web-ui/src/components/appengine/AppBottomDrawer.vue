@@ -1,5 +1,5 @@
 <template>
-  <div class="drawer" :style="drawerStyle" @transitionend="handleTransitionEnd">
+  <div class="drawer" :class="{ collapsed: isCollapsed }" @transitionend="handleTransitionEnd">
     <div class="drawer-handle-area">
       <div class="drawer-header">
         <span class="drawer-title">{{ $t('app-engine.applications') }}</span>
@@ -84,42 +84,19 @@ export default {
     TaskInputForm,
     TaskRunTable,
   },
-  props: {
-    value: {type: Boolean, default: false},
-    defaultHeight: {type: String, default: '40vh'},
-    collapsedHeight: {type: String, default: '60px'},
-  },
   data() {
     return {
       isCollapsed: true,
-      isDragging: false,
-      dragStartY: 0,
-      dragStartHeight: 0,
-      currentHeight: 0,
-
       selectedTask: null,
       tasks: [],
       allTaskRuns: [],
       trackedTaskRuns: [],
       inputs: {},
-
       isRunning: false,
     };
   },
   computed: {
     currentProject: get('currentProject/project'),
-    drawerHeight() {
-      if (this.isCollapsed) {
-        return this.collapsedHeight;
-      }
-      return this.currentHeight ? `${this.currentHeight}px` : this.defaultHeight;
-    },
-    drawerStyle() {
-      return {
-        height: this.drawerHeight,
-        width: '100%',
-      };
-    },
     activeImage() {
       let index = this.$store.getters['currentProject/currentViewer'].activeImage;
       return this.$store.getters['currentProject/currentViewer'].images[index].imageInstance;
@@ -245,7 +222,11 @@ export default {
   flex-direction: column;
   overflow: hidden;
   transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  max-height: 92vh;
+  max-height: 40vh;
+}
+
+.drawer.collapsed {
+  height: 60px;
 }
 
 .drawer-handle-area {

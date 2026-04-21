@@ -37,10 +37,6 @@ jobs:
         with:
           node_image: registry.cytomine.org/docker/kindest/node:v1.32.0
 
-      - name: Install Gateway API CRDs
-        run: |
-          kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.0/standard-install.yaml
-
       - name: Install Envoy Gateway
         run: |
           helm install eg oci://docker.io/envoyproxy/gateway-helm --version v1.3.0 -n envoy-gateway-system --create-namespace

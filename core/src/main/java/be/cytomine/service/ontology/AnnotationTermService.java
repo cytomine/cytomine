@@ -36,7 +36,6 @@ import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.ontology.AnnotationTerm;
 import be.cytomine.domain.ontology.ReviewedAnnotation;
-import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
@@ -88,11 +87,12 @@ public class AnnotationTermService extends ModelService {
     }
 
 
-    public Optional<AnnotationTerm> find(AnnotationDomain annotation, Term term, User user) {
+    public Optional<AnnotationTerm> find(AnnotationDomain annotation, Long termId, User user) {
         securityACLService.check(annotation.container(), READ);
         List<AnnotationTerm> annotationTerms = annotationTermRepository.findAllByUserAnnotationId(annotation.getId());
         return annotationTerms.stream()
-            .filter(x -> x.getTerm() == term && (user == null || x.getUser().getId().equals(user.getId())))
+            .filter(
+                x -> x.getTerm().getId().equals(termId) && (user == null || x.getUser().getId().equals(user.getId())))
             .findFirst();
     }
 
@@ -174,7 +174,7 @@ public class AnnotationTermService extends ModelService {
         User currentUser,
         Transaction transaction
     ) {
-        Term term = termRepository.findById(idTerm)
+        termRepository.findTermByID(idTerm, currentUser.getId())
             .orElseThrow(() -> new ObjectNotFoundException("Term", idExpectedTerm));
         UserAnnotation userAnnotation = userAnnotationRepository.findById(idUserAnnotation)
             .orElseThrow(() -> new ObjectNotFoundException("UserAnnotation", idUserAnnotation));
@@ -223,7 +223,7 @@ public class AnnotationTermService extends ModelService {
             Transaction transaction = transactionService.start();
             ReviewedAnnotation reviewed = (ReviewedAnnotation) annotation;
             reviewed.getTerms().clear();
-            reviewed.getTerms().add(termRepository.getById(idTerm));
+            // reviewed.getTerms().add(termRepository.getById(idTerm));
             getEntityManager().persist(reviewed);
             CommandResponse commandResponse = new CommandResponse();
             commandResponse.setStatus(200);

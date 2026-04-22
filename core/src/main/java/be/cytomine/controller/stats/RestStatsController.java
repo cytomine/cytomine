@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import be.cytomine.common.repository.http.TermHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.ImageInstance;
@@ -179,9 +180,9 @@ public class RestStatsController extends RestCytomineController {
 
     @GetMapping("/term/{id}/project/stat.json")
     public ResponseEntity<String> statAnnotationTermedByProject(@PathVariable Long id) {
-        Term term = termRepository.findById(id).orElseThrow(() -> new ObjectNotFoundException("Term", id));
-        securityACLService.check(term.container(), READ);
-        return responseSuccess(statsService.statAnnotationTermedByProject(term));
+        TermResponse term = termRepository.findTermByID(id, currentUserService.getCurrentUser().getId())
+            .orElseThrow(() -> new ObjectNotFoundException("Term", id));
+        return responseSuccess(statsService.statAnnotationTermedByProject(term.id(), term.ontologyId()));
     }
 
     @GetMapping("/total/project/connections.json")

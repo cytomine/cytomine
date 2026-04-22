@@ -10,7 +10,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.model.Permission;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 
 import be.cytomine.BasicInstanceBuilder;
@@ -39,18 +38,6 @@ public class TermAuthorizationTest extends CRDAuthorizationTest {
             term = builder.givenATerm();
             initACL(term.container());
         }
-    }
-
-    @Test
-    @WithMockUser(username = SUPERADMIN)
-    public void adminCanListTerms() {
-        expectOK(() -> termService.list());
-    }
-
-    @Test
-    @WithMockUser(username = USER_ACL_READ)
-    public void userCannotListTerms() {
-        expectForbidden(() -> termService.list());
     }
 
     @Override

@@ -54,7 +54,6 @@ import be.cytomine.common.repository.model.stat.payload.StatPerTermAndImage;
 import be.cytomine.common.repository.model.stat.payload.StatTerm;
 import be.cytomine.common.repository.model.stat.payload.StatUserTerm;
 import be.cytomine.common.repository.utils.PagesClient;
-import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.social.AnnotationAction;
@@ -132,10 +131,8 @@ public class StatsService {
             .max(Comparator.comparing(x -> x.getJSONAttrLong("users"))).stream().findFirst();
     }
 
-    public List<JsonObject> statAnnotationTermedByProject(Term term) {
-        securityACLService.check(term.container(), READ);
-
-        List<Project> projects = projectService.listByOntology(term.getOntology());
+    public List<JsonObject> statAnnotationTermedByProject(long termId, long ontologyId) {
+        List<Project> projects = projectService.listByOntology(termId);
 
         JsonObject counts = new JsonObject();
         JsonObject percentage = new JsonObject();
@@ -151,7 +148,7 @@ public class StatsService {
                 List<UserAnnotation> annotations =
                     userAnnotationRepository.findAllByProjectAndUserIdIn(project, layers);
                 for (UserAnnotation annotation : annotations) {
-                    if (annotation.getTerms().contains(term)) {
+                    if (annotation.getTerms().stream().anyMatch(t -> t.getId().equals(termId))) {
                         Long currentValue = counts.getJSONAttrLong(project.getName(), 0L);
                         counts.put(project.getName(), currentValue + 1);
                     }

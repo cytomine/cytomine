@@ -111,7 +111,7 @@ public class AnnotationTermAuthorizationTest extends CRDAuthorizationTest {
     public void whenIGetDomain() {
         annotationTermService.find(
             annotationTerm.getUserAnnotation(),
-            annotationTerm.getTerm(), annotationTerm.getUser()
+            annotationTerm.getTerm().getId(), annotationTerm.getUser()
         );
     }
 

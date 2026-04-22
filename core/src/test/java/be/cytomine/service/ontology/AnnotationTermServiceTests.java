@@ -70,7 +70,7 @@ public class AnnotationTermServiceTests {
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm();
         Optional<AnnotationTerm> result = annotationTermService.find(
             annotationTerm.getUserAnnotation(),
-            annotationTerm.getTerm(),
+            annotationTerm.getTerm().getId(),
             annotationTerm.getUser()
         );
         assertThat(result).isPresent();
@@ -310,7 +310,7 @@ public class AnnotationTermServiceTests {
         assertThat(commandResponse.getStatus()).isEqualTo(200);
         assertThat(annotationTermService.find(
             annotationTerm.getUserAnnotation(),
-            annotationTerm.getTerm(),
+            annotationTerm.getTerm().getId(),
             annotationTerm.getUser()
         )).isEmpty();
 
@@ -318,7 +318,7 @@ public class AnnotationTermServiceTests {
 
         assertThat(annotationTermService.find(
             annotationTerm.getUserAnnotation(),
-            annotationTerm.getTerm(),
+            annotationTerm.getTerm().getId(),
             annotationTerm.getUser()
         )).isPresent();
 
@@ -326,7 +326,7 @@ public class AnnotationTermServiceTests {
 
         assertThat(annotationTermService.find(
             annotationTerm.getUserAnnotation(),
-            annotationTerm.getTerm(),
+            annotationTerm.getTerm().getId(),
             annotationTerm.getUser()
         )).isEmpty();
     }

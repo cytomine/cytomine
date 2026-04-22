@@ -641,11 +641,11 @@ public class ProjectService extends ModelService {
         return data;
     }
 
-    public List<Project> listByOntology(Ontology ontology) {
+    public List<Project> listByOntology(Long ontologyId) {
         if (currentRoleService.isAdminByNow(currentUserService.getCurrentUser())) {
-            return projectRepository.findAllByOntology(ontology);
+            return projectRepository.findAllByOntologyId(ontologyId);
         }
-        return projectRepository.findAllProjectForUserByOntology(currentUserService.getCurrentUsername(), ontology);
+        return projectRepository.findAllProjectForUserByOntology(currentUserService.getCurrentUsername(), ontologyId);
     }
 
     public List<CommandHistory> lastAction(Project project, int max) {

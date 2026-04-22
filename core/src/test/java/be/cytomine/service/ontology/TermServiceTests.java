@@ -43,7 +43,6 @@ import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.project.Project;
 import be.cytomine.exceptions.ConstraintException;
 import be.cytomine.repository.ontology.RelationTermRepository;
-import be.cytomine.repository.ontology.TermRepository;
 import be.cytomine.service.CommandService;
 import be.cytomine.service.command.TransactionService;
 import be.cytomine.utils.CommandResponse;
@@ -65,9 +64,6 @@ public class TermServiceTests {
     TermService termService;
 
     @Autowired
-    TermRepository termRepository;
-
-    @Autowired
     BasicInstanceBuilder basicInstanceBuilder;
 
     @Autowired
@@ -87,12 +83,6 @@ public class TermServiceTests {
 
     @MockitoBean
     TermHttpContract termHttpContract;
-
-    @Test
-    void listAllTermWithSuccess() {
-        Term term = builder.givenATerm();
-        assertThat(term).isIn(termService.list());
-    }
 
     @Test
     void getTermWithSuccess() {

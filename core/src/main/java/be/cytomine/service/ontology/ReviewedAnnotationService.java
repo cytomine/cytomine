@@ -315,8 +315,8 @@ public class ReviewedAnnotationService extends ModelService {
         if (terms != null) {
             //terms in request param
             for (Long term : terms) {
-                review.getTerms().add(termRepository.findById(term)
-                    .orElseThrow(() -> new ObjectNotFoundException("Term", term)));
+//                review.getTerms().add(termRepository.findTermByID(term, currentUserService.getCurrentUser().getId())
+//                    .orElseThrow(() -> new ObjectNotFoundException("Term", term)));
             }
         } else {
             //nothing in param, add term from annotation

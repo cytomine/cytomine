@@ -275,12 +275,12 @@ public class AnnotationTermResourceTests {
 
         assertThat(annotationTermService.find(
             previousAnnotationTerm.getUserAnnotation(),
-            previousAnnotationTerm.getTerm(),
+            previousAnnotationTerm.getTerm().getId(),
             previousAnnotationTerm.getUser()
         )).isPresent();
         assertThat(annotationTermService.find(
             previousAnnotationTermFromOtherUser.getUserAnnotation(),
-            previousAnnotationTermFromOtherUser.getTerm(),
+            previousAnnotationTermFromOtherUser.getTerm().getId(),
             previousAnnotationTermFromOtherUser.getUser()
         )).isPresent();
 
@@ -333,7 +333,7 @@ public class AnnotationTermResourceTests {
 
         assertThat(annotationTermService.find(
             previousAnnotationTerm.getUserAnnotation(),
-            previousAnnotationTerm.getTerm(),
+            previousAnnotationTerm.getTerm().getId(),
             previousAnnotationTerm.getUser()
         )).isPresent();
 

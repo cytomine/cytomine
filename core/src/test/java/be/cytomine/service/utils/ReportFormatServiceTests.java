@@ -34,16 +34,13 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 @Transactional
 public class ReportFormatServiceTests {
 
-    private Object[][] expectedDataObject;
-
     @Autowired
     ReportFormatService reportFormatService;
-
     @Autowired
     BasicInstanceBuilder builder;
-
     @Autowired
     TermService termService;
+    private Object[][] expectedDataObject;
 
     @Test
     public void connectionHistoryToReportFormat() {
@@ -137,7 +134,7 @@ public class ReportFormatServiceTests {
 
     private List<JsonObject> buildUserConnectionHistory(boolean isComplete) {
         Date date = new Date();
-        expectedDataObject = new Object[][]{
+        expectedDataObject = new Object[][] {
             {
                 "Date",
                 "Duration (ms)",
@@ -166,7 +163,7 @@ public class ReportFormatServiceTests {
     }
 
     private List<JsonObject> buildUserImageConsultation(boolean isComplete) {
-        expectedDataObject = new Object[][]{
+        expectedDataObject = new Object[][] {
             {
                 "Cumulated duration (ms)",
                 "First consultation",
@@ -209,7 +206,7 @@ public class ReportFormatServiceTests {
         Term term1 = builder.givenATerm();
         Term term2 = builder.givenATerm();
         Point point = new Point(2545454.231212, 2545454.23111);
-        expectedDataObject = new Object[][]{
+        expectedDataObject = new Object[][] {
             {
                 "Id",
                 "Area (microns²)",
@@ -232,9 +229,9 @@ public class ReportFormatServiceTests {
                 "1234567",
                 "Beautiful image",
                 "Paul",
-                termService.find(term1.getId()).get().getName() + "- " + termService.find(term2.getId())
+                termService.find(term1.getId()).get().name() + "- " + termService.find(term2.getId())
                     .get()
-                    .getName(),
+                    .name(),
                 "http://cropURL",
                 "http://imageURL"
             },
@@ -261,7 +258,7 @@ public class ReportFormatServiceTests {
     private List<Map<String, Object>> buildUsers(boolean isComplete) {
         User user1 = builder.givenAUser();
         User user2 = builder.givenAUser();
-        expectedDataObject = new Object[][]{
+        expectedDataObject = new Object[][] {
             {"Username", "Name"},
             {user1.getUsername(), user1.getName()},
             {user2.getUsername(), user2.getName()},

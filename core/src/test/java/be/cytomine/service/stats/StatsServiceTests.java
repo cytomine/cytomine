@@ -174,7 +174,8 @@ public class StatsServiceTests {
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm(builder.givenAUserAnnotation(project));
         entityManager.refresh(annotationTerm.getUserAnnotation());
 
-        List<JsonObject> jsonObjects = statsService.statAnnotationTermedByProject(annotationTerm.getTerm());
+        List<JsonObject> jsonObjects = statsService.statAnnotationTermedByProject(annotationTerm.getTerm().getId(),
+            annotationTerm.getTerm().getOntology().getId());
         assertThat(jsonObjects).hasSize(1);
         assertThat(jsonObjects.get(0).get("username")).isEqualTo(project.getName());
         assertThat(jsonObjects.get(0).get("value")).isEqualTo(1L);
@@ -200,7 +201,7 @@ public class StatsServiceTests {
         assertThat(
             jsonObjects.stream().filter(x -> x.getJSONAttrLong("size") == 1).collect(Collectors.toList())).hasSize(2);
 
-        statsService.statAnnotationEvolution(project, builder.givenATerm(project.getOntology()), 7,
+        statsService.statAnnotationEvolution(project, Optional.of(builder.givenATerm(project.getOntology()).getId()), 7,
             DateUtils.addDays(new Date(), -30), DateUtils.addDays(new Date(), 0), true, false);
 
     }
@@ -223,7 +224,8 @@ public class StatsServiceTests {
         assertThat(
             jsonObjects.stream().filter(x -> x.getJSONAttrLong("size") == 1).collect(Collectors.toList())).hasSize(2);
 
-        statsService.statReviewedAnnotationEvolution(project, builder.givenATerm(project.getOntology()), 7,
+        statsService.statReviewedAnnotationEvolution(project,
+            Optional.of(builder.givenATerm(project.getOntology()).getId()), 7,
             DateUtils.addDays(new Date(), -30), DateUtils.addDays(new Date(), 0), true, false);
 
 

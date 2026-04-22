@@ -15,7 +15,7 @@ jobs:
         id: versions
         uses: ./.github/actions/load-versions
 
-      - name: Set up JDK
+      - name: Set up Java
         uses: actions/setup-java@v5
         with:
           distribution: ${{ steps.versions.outputs.java-distribution }}

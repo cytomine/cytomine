@@ -156,4 +156,4 @@ keycloak-client:
     realm: cytomine
     client-id: core
   client-id: admin-cli
-  url: http://iam:8100/iam
+  url: ${IAM_URL:http://iam:8100}/iam

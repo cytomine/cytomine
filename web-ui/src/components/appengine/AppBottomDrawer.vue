@@ -61,7 +61,10 @@
           <div class="analysis-column">
             <h3 class="column-title">{{ $t('run-status') }}</h3>
 
-            <p v-if="trackedTaskRun">{{ trackedTaskRun }}</p>
+            <div v-if="trackedTaskRun">
+              <TaskRunStateIcon :state="trackedTaskRun.state" />
+              {{ taskRunName }}
+            </div>
             <p v-else><em>{{ $t('app-engine.no-active-run') }}</em></p>
 
             <div class="has-text-right mt-3">
@@ -80,12 +83,15 @@
 import Task from '@/utils/appengine/task';
 import TaskInputForm from '@/components/appengine/forms/TaskInputForm';
 import TaskRun from '@/utils/appengine/task-run';
+import TaskRunStateIcon from '@/components/appengine/task-run/TaskRunStateIcon';
+import {formatTaskName} from '@/utils/app';
 import {get} from '@/utils/store-helpers';
 
 export default {
   name: 'AppBottomDrawer',
   components: {
     TaskInputForm,
+    TaskRunStateIcon,
   },
   data() {
     return {
@@ -95,6 +101,7 @@ export default {
       inputs: {},
       isRunning: false,
       trackedTaskRun: null,
+      pollingInterval: null,
     };
   },
   computed: {
@@ -102,7 +109,10 @@ export default {
     activeImage() {
       let index = this.$store.getters['currentProject/currentViewer'].activeImage;
       return this.$store.getters['currentProject/currentViewer'].images[index].imageInstance;
-    }
+    },
+    taskRunName() {
+      return formatTaskName(this.trackedTaskRun);
+    },
   },
   methods: {
     async fetchTasks() {
@@ -124,6 +134,30 @@ export default {
         type,
         value,
       }));
+    },
+    startPolling() {
+      this.stopPolling();
+      this.pollingInterval = setInterval(async () => {
+        if (!this.trackedTaskRun) {
+          this.stopPolling();
+          return;
+        }
+
+        try {
+          await this.trackedTaskRun.fetch();
+          if (this.trackedTaskRun.isTerminalState()) {
+            this.stopPolling();
+          }
+        } catch (e) {
+          this.stopPolling();
+        }
+      }, 2000);
+    },
+    stopPolling() {
+      if (this.pollingInterval !== null) {
+        clearInterval(this.pollingInterval);
+        this.pollingInterval = null;
+      }
     },
     async runTask() {
       try {
@@ -157,7 +191,9 @@ export default {
         await Task.runTask(this.currentProject.id, taskRun.id).then(async (event) => {
           this.$buefy.toast.open({message: this.$t('app-engine.run.started'), type: 'is-success'});
           this.trackedTaskRun = new TaskRun(event.resource);
+          this.trackedTaskRun.project = this.currentProject.id;
           this.resetInputs();
+          this.startPolling();
         });
       } catch (e) {
         const serverError = e.response && e.response.data
@@ -171,6 +207,9 @@ export default {
   },
   async created() {
     await this.fetchTasks();
+  },
+  beforeDestroy() {
+    this.stopPolling();
   },
 };
 </script>

@@ -379,4 +379,31 @@ public class CytomineTests {
         }
         cytomineSteps.logout(wait, cytomineUrl);
     }
+
+    @Test
+    void createNewUser() {
+        String username = "seluser-" + randomUUID().toString().substring(0, 8);
+        String firstname = "Selenium";
+        String lastname = "User-" + randomUUID().toString().substring(0, 8);
+        String email = username + "@selenium.test";
+        String password = "Selenium1!";
+
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        cytomineSteps.createUser(wait, cytomineUrl, username, firstname, lastname, email, password);
+        cytomineSteps.logout(wait, cytomineUrl);
+    }
+
+    @Test
+    void updateUser() {
+        String username = "seluser-" + randomUUID().toString().substring(0, 8);
+        String firstname = "Selenium";
+        String lastname = "User-" + randomUUID().toString().substring(0, 8);
+        String email = username + "@selenium.test";
+        String password = "Selenium1!";
+
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        cytomineSteps.createUser(wait, cytomineUrl, username, firstname, lastname, email, password);
+        cytomineSteps.updateUser(wait, cytomineUrl, username, "UpdatedFirstname", "UpdatedLastname");
+        cytomineSteps.logout(wait, cytomineUrl);
+    }
 }

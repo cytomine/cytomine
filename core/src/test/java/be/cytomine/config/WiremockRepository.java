@@ -2,12 +2,18 @@ package be.cytomine.config;
 
 import java.util.UUID;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.DynamicPropertyRegistrar;
+
+import be.cytomine.TermMapper;
+import be.cytomine.domain.ontology.Term;
 
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
 import static be.cytomine.service.search.RetrievalService.CBIR_API_BASE_PATH;
@@ -27,6 +33,11 @@ public class WiremockRepository {
         SERVER.start();
         setupStubs();
     }
+
+    @Autowired
+    private ObjectMapper objectMapper;
+    @Autowired
+    private TermMapper termMapper;
 
     public static void setupStubs() {
         SERVER.stubFor(WireMock.post(urlPathMatching(IMS_API_BASE_PATH + "/image/.*/annotation/drawing"))
@@ -48,6 +59,14 @@ public class WiremockRepository {
             .withQueryParam("index", equalTo("annotation"))
             .willReturn(aResponse().withBody(UUID.randomUUID().toString()))
         );
+
+        SERVER.stubFor(WireMock.put(urlPathMatching("/reviewed-annotations/terms/.*"))
+            .willReturn(aResponse()
+                .withStatus(HttpStatus.OK.value())
+                .withHeader("Content-Type", "application/json")
+                .withBody("[]")
+            )
+        );
     }
 
     @Bean
@@ -63,5 +82,15 @@ public class WiremockRepository {
             registry.add("application.pimsURL", () -> "http://localhost:" + SERVER.port());
             registry.add("application.repositoryURL", () -> "http://localhost:" + SERVER.port());
         };
+    }
+
+    @SneakyThrows
+    public void stubTerm(Term term) {
+        SERVER.stubFor(WireMock.get(urlPathMatching("/terms/" + term.getId()))
+            .willReturn(aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withBody(objectMapper.writeValueAsString(termMapper.map(term)))
+            )
+        );
     }
 }

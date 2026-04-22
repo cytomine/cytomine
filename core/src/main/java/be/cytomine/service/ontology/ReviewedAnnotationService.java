@@ -285,10 +285,12 @@ public class ReviewedAnnotationService extends ModelService {
                 terms == null ? Stream.empty() : terms.stream())
             .collect(Collectors.toSet());
 
-        reviewedAnnotationHttpContract.replaceAllTermIds(review.getId(), currentUserService.getCurrentUser().getId(),
-            termsToAdd);
+        CommandResponse commandResponse = this.add(review.toJsonObject());
 
-        return this.add(review.toJsonObject());
+        reviewedAnnotationHttpContract.replaceAllTermIds(commandResponse.getObject().getId(),
+            currentUserService.getCurrentUser().getId(), termsToAdd);
+
+        return commandResponse;
     }
 
     public CommandResponse unReviewAnnotation(Long idAnnotation) {

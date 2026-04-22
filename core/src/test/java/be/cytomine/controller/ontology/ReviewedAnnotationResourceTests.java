@@ -50,6 +50,7 @@ import be.cytomine.repository.ontology.ReviewedAnnotationRepository;
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
@@ -86,6 +87,9 @@ public class ReviewedAnnotationResourceTests {
 
     @Autowired
     private WireMockServer wireMockServer;
+
+    @Autowired
+    private WiremockRepository wiremockRepository;
 
     private Project project;
     private ImageInstance image;
@@ -272,6 +276,7 @@ public class ReviewedAnnotationResourceTests {
             this.term
         );
         builder.addUserToProject(project, this.me.getUsername());
+        wiremockRepository.stubTerm(this.term);
     }
 
     private MvcResult performDownload(String format) throws Exception {
@@ -468,9 +473,8 @@ public class ReviewedAnnotationResourceTests {
 
 
         assertThat(reviewedAnnotationRepository.findByParentIdent(userAnnotation.getId())).isPresent();
-        assertThat(reviewedAnnotationRepository.findByParentIdent(userAnnotation.getId())
-            .get()
-            .getTerms()).containsExactly(annotationTerm.getTerm());
+        wireMockServer.verify(WireMock.putRequestedFor(urlPathMatching("/reviewed-annotations/terms/.*"))
+            .withRequestBody(WireMock.containing(annotationTerm.getTerm().getId().toString())));
     }
 
 
@@ -495,9 +499,8 @@ public class ReviewedAnnotationResourceTests {
 
 
         assertThat(reviewedAnnotationRepository.findByParentIdent(userAnnotation.getId())).isPresent();
-        assertThat(reviewedAnnotationRepository.findByParentIdent(userAnnotation.getId())
-            .get()
-            .getTerms()).containsExactly(anotherTerm);
+        wireMockServer.verify(WireMock.putRequestedFor(urlPathMatching("/reviewed-annotations/terms/.*"))
+            .withRequestBody(WireMock.containing(anotherTerm.getId().toString())));
     }
 
 

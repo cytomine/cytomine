@@ -116,6 +116,9 @@ public class AnnotationDomainResourceTests {
     @Autowired
     private WireMockServer wireMockServer;
 
+    @Autowired
+    private WiremockRepository wiremockRepository;
+
     void createAnnotationSet() throws ParseException {
         project = builder.givenAProject();
         image = builder.givenAnImageInstance(project);
@@ -151,6 +154,7 @@ public class AnnotationDomainResourceTests {
                 .withBody("[" + term.getId() + "]")
             )
         );
+        wiremockRepository.stubTerm(term);
     }
 
     @Test

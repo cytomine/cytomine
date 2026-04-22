@@ -1,0 +1,33 @@
+name: Load Versions
+description: Reads tooling versions from .github/versions.yaml
+
+outputs:
+  java-version:
+    description: Java version
+    value: ${{ steps.read.outputs.java-version }}
+  java-distribution:
+    description: Java distribution
+    value: ${{ steps.read.outputs.java-distribution }}
+  gradle-version:
+    description: Gradle version
+    value: ${{ steps.read.outputs.gradle-version }}
+  node-version:
+    description: Node version
+    value: ${{ steps.read.outputs.node-version }}
+  uv-version:
+    description: uv version
+    value: ${{ steps.read.outputs.uv-version }}
+
+runs:
+  using: composite
+  steps:
+    - name: Read versions
+      id: read
+      shell: bash
+      run: |
+        FILE=".github/versions.yaml"
+        echo "java-version=$(yq '.java.version' $FILE)" >> $GITHUB_OUTPUT
+        echo "java-distribution=$(yq '.java.distribution' $FILE)" >> $GITHUB_OUTPUT
+        echo "gradle-version=$(yq '.gradle.version' $FILE)" >> $GITHUB_OUTPUT
+        echo "node-version=$(yq '.node.version' $FILE)" >> $GITHUB_OUTPUT
+        echo "uv-version=$(yq '.python.uv' $FILE)" >> $GITHUB_OUTPUT

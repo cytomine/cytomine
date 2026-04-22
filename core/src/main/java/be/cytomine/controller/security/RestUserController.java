@@ -246,14 +246,12 @@ public class RestUserController extends RestCytomineController {
         return responseSuccess(currentUserService.getCurrentUser());
     }
 
-    //TODO IAM: refactor so that only ADMIN role can create IAM ACCOUNT
     @PostMapping("/user.json")
     public ResponseEntity<String> createUser(@RequestBody String json) {
         log.debug("REST request to save User : " + json);
         return add(userService, json);
     }
 
-    //TODO IAM: refactor so that only ADMIN role can modify IAM ACCOUNT
     @PutMapping("/user/{id}.json")
     public ResponseEntity<String> updateUser(@PathVariable String id, @RequestBody JsonObject json) {
         log.debug("REST request to update User : {}", id);

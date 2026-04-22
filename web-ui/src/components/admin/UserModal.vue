@@ -101,7 +101,6 @@ const defaultLanguage = {value: 'EN', name:'English'};
 
 import CytomineModal from '@/components/utils/CytomineModal';
 
-// TODO IAM
 export default {
   name: 'user-modal',
   props: {

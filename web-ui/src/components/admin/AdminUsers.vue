@@ -52,7 +52,7 @@
             {{user.fullName}}
           </b-table-column>
 
-          <b-table-column field="role" :label="$t('role')" sortable width="50">
+          <b-table-column field="role" :label="$t('role')" width="50">
             <span class="tag" :class="getRoleData(user).class">{{$t(getRoleData(user).label)}}</span>
           </b-table-column>
 
@@ -115,7 +115,6 @@ import UserModal from './UserModal';
 import UserDetails from './UserDetails';
 import {rolesMapping} from '@/utils/role-utils';
 
-// TODO IAM
 export default {
   name: 'admin-users',
   components: {

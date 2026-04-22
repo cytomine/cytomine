@@ -59,8 +59,6 @@ public class AccountService {
     @Value("${keycloak-client.target.realm}")
     String realm;
 
-    private UserRepository userRepository;
-
     public void createAccount(Account account) throws UserManagementException {
 
         log.info("Creating account for user {}", account.getUsername());
@@ -226,11 +224,9 @@ public class AccountService {
 
         UsersResource users = keycloak.realm(realm).users();
         UserRepresentation userRepresentation = null;
-        UserRepresentation userRepresentationBeforeUpdate = null;
         try {
             userRepresentation = users.searchByUsername(account.getUsername(), true).get(0);
-            userRepresentationBeforeUpdate =
-                userRepresentation; // used to roll back operation in IAM in case of downstream failure
+
             userRepresentation.setFirstName(account.getFirstName());
             userRepresentation.setLastName(account.getLastName());
             userRepresentation.setEmail(account.getEmail());
@@ -316,9 +312,7 @@ public class AccountService {
         Validation validation = new Validation();
         validation.setOk(true);
         Map<String, String> errors = new HashMap<>();
-        // validate required properties
-        // updating username and password is not allowed but the error will come from IAM as it's
-        // impossible to validate the values here
+
         if (source.equals(ValidationFor.UPDATE)) {
             log.info("Validating account for update");
             if (account.getUsername() == null) {
@@ -387,22 +381,6 @@ public class AccountService {
         log.info("Validated account {} with following errors {}", account.getUsername(), errors);
         validation.setResponseEntity(ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(ErrorBuilder.build(ErrorCode.CORE_INVALID_ACCOUNT, errors)));
-        return validation;
-    }
-
-    private Validation validateReference(String reference) {
-        log.info("validating account reference {}", reference);
-        Validation validation = new Validation();
-        validation.setOk(true);
-        try {
-            UUID.fromString(reference);
-        } catch (IllegalArgumentException ex) {
-            validation.setOk(false);
-            validation.setResponseEntity(ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ErrorBuilder.build(ErrorCode.CORE_INVALID_REFERENCE)));
-            return validation;
-        }
-        log.info("Validated account reference {} successfully", reference);
         return validation;
     }
 }

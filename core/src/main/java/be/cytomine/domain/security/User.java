@@ -53,7 +53,7 @@ public class User extends CytomineDomain {
 
     @NotNull
     @Column(nullable = false)
-    protected String reference; //TODO IAM: should be UUID type
+    protected String reference;
 
     @NotNull
     @NotBlank

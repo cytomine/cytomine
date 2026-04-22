@@ -965,7 +965,6 @@ public class UserService extends ModelService {
      *
      * @return Response structure (created domain data,..)
      */
-    // TODO IAM: refactor. ADMIN ROLE can create IAM account (and create the underlying Cytomine user to the cache)
     public CommandResponse add(JsonObject json) {
         synchronized (this.getClass()) {
             User currentUser = currentUserService.getCurrentUser();
@@ -974,16 +973,21 @@ public class UserService extends ModelService {
                 json.put("user", currentUser.getId());
                 json.put("origin", "ADMINISTRATOR");
             }
-            // I think I should put the step to add and update
-            Account account = new Account();
-            account.setFirstName(json.getJSONAttrStr("firstname"));
-            account.setLastName(json.getJSONAttrStr("lastname"));
-            account.setUsername(json.getJSONAttrStr("username"));
-            account.setUserLocale(json.getJSONAttrStr("language").toLowerCase());
-            account.setEmail(json.getJSONAttrStr("email"));
-            account.setEmailVerified(true);
-            account.setPassword(json.getJSONAttrStr("password"));
-            account.setRoles(List.of(json.getJSONAttrStr("role").substring(5)));
+            Account account = new Account(
+                null,
+                null,
+                json.getJSONAttrStr("username"),
+                json.getJSONAttrStr("lastname"),
+                json.getJSONAttrStr("firstname"),
+                json.getJSONAttrStr("password"),
+                json.getJSONAttrStr("email"),
+                true,
+                json.getJSONAttrBoolean("isDeveloper", false),
+                json.getJSONAttrStr("language").toLowerCase(),
+                null,
+                List.of(json.getJSONAttrStr("role").substring(5))
+                );
+
             accountService.createAccount(account);
             CommandResponse response = executeCommand(new AddCommand(currentUser), null, json);
 
@@ -999,19 +1003,23 @@ public class UserService extends ModelService {
      *
      * @return Response structure (new domain data, old domain data..)
      */
-    // TODO IAM: refactor. ADMIN ROLE can update an IAM account (and update the underlying Cytomine user to the cache)
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.checkIsCreator((User) domain, currentUser);
-        Account account = new Account();
-        account.setFirstName(jsonNewData.getJSONAttrStr("firstname"));
-        account.setLastName(jsonNewData.getJSONAttrStr("lastname"));
-        account.setUsername(jsonNewData.getJSONAttrStr("username"));
-        account.setUserLocale(jsonNewData.getJSONAttrStr("language").toLowerCase());
-        account.setEmail(jsonNewData.getJSONAttrStr("email"));
-        account.setEmailVerified(true);
-        account.setPassword(jsonNewData.getJSONAttrStr("password"));
-        account.setRoles(List.of(jsonNewData.getJSONAttrStr("role").substring(5)));
+        Account account = new Account(
+            null,
+            null,
+            jsonNewData.getJSONAttrStr("username"),
+            jsonNewData.getJSONAttrStr("lastname"),
+            jsonNewData.getJSONAttrStr("firstname"),
+            jsonNewData.getJSONAttrStr("password"),
+            jsonNewData.getJSONAttrStr("email"),
+            true,
+            jsonNewData.getJSONAttrBoolean("isDeveloper", false),
+            jsonNewData.getJSONAttrStr("language").toLowerCase(),
+            null,
+            List.of(jsonNewData.getJSONAttrStr("role").substring(5))
+        );
         accountService.update(account);
         return executeCommand(new EditCommand(currentUser, null), domain, jsonNewData);
     }
@@ -1051,7 +1059,6 @@ public class UserService extends ModelService {
         return Arrays.asList(String.valueOf(user.getId()), user.getUsername());
     }
 
-    // TODO IAM: refactor: the unique constraint must be on IAM reference
     public void checkDoNotAlreadyExist(CytomineDomain domain) {
         User user = (User) domain;
         if (user.getUsername() == null) {

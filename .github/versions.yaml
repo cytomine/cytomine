@@ -1,0 +1,6 @@
+java-version: "21"
+java-distribution: "temurin"
+gradle-version: "8.14"
+node-version: "20.19.4"
+python-version: "3.10"
+uv-version: "0.9.30"

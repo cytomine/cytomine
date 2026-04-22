@@ -5,7 +5,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
@@ -16,6 +18,7 @@ import org.locationtech.jts.io.WKTReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.http.ReviewedAnnotationHttpContract;
 import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
@@ -26,7 +29,6 @@ import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.ontology.ReviewedAnnotation;
-import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.dto.ReviewedAnnotationStatsEntry;
@@ -83,6 +85,9 @@ public class ReviewedAnnotationService extends ModelService {
 
     @Autowired
     private TermHttpContract termRepository;
+
+    @Autowired
+    private ReviewedAnnotationHttpContract reviewedAnnotationHttpContract;
 
     @Autowired
     private TaskService taskService;
@@ -273,7 +278,15 @@ public class ReviewedAnnotationService extends ModelService {
             }
         );
 
-        ReviewedAnnotation review = createReviewAnnotation(basedAnnotation, terms);
+        ReviewedAnnotation review = createReviewAnnotation(basedAnnotation);
+
+        Set<Long> termsToAdd = Stream.concat(
+                basedAnnotation.termsForReview().stream().map(CytomineDomain::getId), terms.stream())
+            .collect(Collectors.toSet());
+
+        reviewedAnnotationHttpContract.replaceAllTermIds(review.getId(), currentUserService.getCurrentUser().getId(),
+            termsToAdd);
+
         return this.add(review.toJsonObject());
     }
 
@@ -297,10 +310,9 @@ public class ReviewedAnnotationService extends ModelService {
      * Review annotation with the specified terms
      *
      * @param annotation Annotation to review
-     * @param terms      Terms to add to the annotation
      * @return The reviewed annotation
      */
-    private ReviewedAnnotation createReviewAnnotation(AnnotationDomain annotation, List<Long> terms) {
+    private ReviewedAnnotation createReviewAnnotation(AnnotationDomain annotation) {
         ReviewedAnnotation review = new ReviewedAnnotation();
         review.setParentIdent(annotation.getId());
         review.setParentClassName(annotation.getClass().getName());
@@ -311,20 +323,6 @@ public class ReviewedAnnotationService extends ModelService {
         review.setSlice(annotation.getSlice());
         review.setProject(annotation.getProject());
         review.setGeometryCompression(annotation.getGeometryCompression());
-
-        if (terms != null) {
-            //terms in request param
-            for (Long term : terms) {
-//                review.getTerms().add(termRepository.findTermByID(term, currentUserService.getCurrentUser().getId())
-//                    .orElseThrow(() -> new ObjectNotFoundException("Term", term)));
-            }
-        } else {
-            //nothing in param, add term from annotation
-            for (Term term : annotation.termsForReview()) {
-                review.getTerms().add(term);
-            }
-
-        }
         review.setReviewUser(currentUserService.getCurrentUser());
         return review;
     }

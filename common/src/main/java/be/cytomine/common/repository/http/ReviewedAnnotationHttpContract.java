@@ -14,8 +14,8 @@ import static be.cytomine.common.repository.http.ReviewedAnnotationHttpContract.
 public interface ReviewedAnnotationHttpContract {
     String ROOT_PATH = "/reviewed-annotations";
 
-    @PutExchange("/terms/{id}")
-    Set<Long> replaceAllTermIds(@PathVariable long id, @RequestParam long userId,
+    @PutExchange("/terms/{reviewedAnnotationTermsId}")
+    Set<Long> replaceAllTermIds(@PathVariable long reviewedAnnotationTermsId, @RequestParam long userId,
                                 @RequestBody Set<Long> newLinks);
 
 

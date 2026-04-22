@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import jakarta.transaction.Transactional;
@@ -27,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.http.ReviewedAnnotationHttpContract;
 import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
@@ -74,6 +76,9 @@ public class AnnotationTermService extends ModelService {
 
     @Autowired
     private TermHttpContract termRepository;
+
+    @Autowired
+    private ReviewedAnnotationHttpContract reviewedAnnotationHttpContract;
 
     @Autowired
     private UserAnnotationRepository userAnnotationRepository;
@@ -219,11 +224,7 @@ public class AnnotationTermService extends ModelService {
             //Add annotation term
             return addAnnotationTerm(idAnnotation, idTerm, null, currentUser.getId(), currentUser, transaction);
         } else if (annotation instanceof ReviewedAnnotation) {
-            Transaction transaction = transactionService.start();
-            ReviewedAnnotation reviewed = (ReviewedAnnotation) annotation;
-            reviewed.getTerms().clear();
-            reviewed.getTerms().add(termRepository.getById(idTerm));
-            getEntityManager().persist(reviewed);
+            reviewedAnnotationHttpContract.replaceAllTermIds(idAnnotation, currentUser.getId(), Set.of(idTerm));
             CommandResponse commandResponse = new CommandResponse();
             commandResponse.setStatus(200);
             return commandResponse;

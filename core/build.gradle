@@ -82,6 +82,12 @@ dependencies {
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
 
     // Tests
+    testCompileOnly 'org.projectlombok:lombok:1.18.30'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
+    testImplementation 'org.mapstruct:mapstruct:1.6.3'
+    testAnnotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+    testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+
     testImplementation 'com.github.tomakehurst:wiremock:1.58'
     testImplementation 'org.assertj:assertj-core:3.4.1' // TODO: upgrade to 3.23.1
     testImplementation 'org.junit.jupiter:junit-jupiter'

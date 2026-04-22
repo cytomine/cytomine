@@ -136,6 +136,13 @@ public class TermAuthorizationTest extends CRDAuthorizationTest {
     @Test
     @Disabled
     @Override
+    public void userWithoutPermissionGetDomain() {
+
+    }
+
+    @Test
+    @Disabled
+    @Override
     public void userWithoutPermissionAddDomain() {
     }
 

@@ -122,7 +122,7 @@ public class OntologyServiceTests {
     }
 
     private Optional<TermResponse> getTerm(Long termId) {
-        String request = "select * from term where term_id = :id and deleted = null";
+        String request = "select * from term where id = :id and deleted = null";
         Query query = entityManager.createNativeQuery(request, Tuple.class);
         query.setParameter("id", termId);
         return Optional.ofNullable(query.getResultList().get(0))

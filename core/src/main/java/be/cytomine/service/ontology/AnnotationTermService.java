@@ -207,10 +207,9 @@ public class AnnotationTermService extends ModelService {
             Transaction transaction = transactionService.start();
 
             //Delete all annotation term
-            List<AnnotationTerm>
-                annotationTerms
-                = annotationTermRepository.findAllByUserAnnotationId(annotation.getId())
-                .stream().filter(x -> fromAllUser || x.getUser().equals(currentUser)).collect(Collectors.toList());
+            List<AnnotationTerm> annotationTerms =
+                annotationTermRepository.findAllByUserAnnotationId(annotation.getId()).stream()
+                    .filter(x -> fromAllUser || x.getUser().equals(currentUser)).toList();
 
             log.info("Delete old annotationTerm= " + annotationTerms.size());
             for (AnnotationTerm annotationTerm : annotationTerms) {
@@ -223,7 +222,7 @@ public class AnnotationTermService extends ModelService {
             Transaction transaction = transactionService.start();
             ReviewedAnnotation reviewed = (ReviewedAnnotation) annotation;
             reviewed.getTerms().clear();
-            // reviewed.getTerms().add(termRepository.getById(idTerm));
+            reviewed.getTerms().add(termRepository.getById(idTerm));
             getEntityManager().persist(reviewed);
             CommandResponse commandResponse = new CommandResponse();
             commandResponse.setStatus(200);

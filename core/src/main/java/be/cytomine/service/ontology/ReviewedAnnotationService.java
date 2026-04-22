@@ -281,7 +281,8 @@ public class ReviewedAnnotationService extends ModelService {
         ReviewedAnnotation review = createReviewAnnotation(basedAnnotation);
 
         Set<Long> termsToAdd = Stream.concat(
-                basedAnnotation.termsForReview().stream().map(CytomineDomain::getId), terms.stream())
+                basedAnnotation.termsForReview().stream().map(CytomineDomain::getId),
+                terms == null ? Stream.empty() : terms.stream())
             .collect(Collectors.toSet());
 
         reviewedAnnotationHttpContract.replaceAllTermIds(review.getId(), currentUserService.getCurrentUser().getId(),

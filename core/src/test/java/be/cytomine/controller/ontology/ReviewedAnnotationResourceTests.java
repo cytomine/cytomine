@@ -15,8 +15,6 @@ import com.github.tomakehurst.wiremock.verification.LoggedRequest;
 import jakarta.persistence.EntityManager;
 import org.apache.commons.lang3.time.DateUtils;
 import org.assertj.core.api.AssertionsForClassTypes;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.io.ParseException;
@@ -35,6 +33,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.TestUtils;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.config.properties.ApplicationProperties;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.AbstractSlice;
@@ -50,8 +49,6 @@ import be.cytomine.repository.ontology.ReviewedAnnotationRepository;
 
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -69,7 +66,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 public class ReviewedAnnotationResourceTests {
 
     @Autowired
@@ -87,7 +84,8 @@ public class ReviewedAnnotationResourceTests {
     @Autowired
     private ApplicationProperties applicationProperties;
 
-    private static WireMockServer wireMockServer = new WireMockServer(8888);
+    @Autowired
+    private WireMockServer wireMockServer;
 
     private Project project;
     private ImageInstance image;
@@ -95,16 +93,6 @@ public class ReviewedAnnotationResourceTests {
     private Term term;
     private User me;
     private ReviewedAnnotation reviewedAnnotation;
-
-    @BeforeAll
-    public static void beforeAll() {
-        wireMockServer.start();
-    }
-
-    @AfterAll
-    public static void afterAll() {
-        wireMockServer.stop();
-    }
 
     @Test
     @Transactional
@@ -584,8 +572,6 @@ public class ReviewedAnnotationResourceTests {
     public void getReviewedAnnotationCrop() throws Exception {
         ReviewedAnnotation annotation = givenAReviewedAnnotationWithValidImageServer(builder);
 
-        configureFor("localhost", 8888);
-
         byte[] mockResponse = UUID.randomUUID()
             .toString()
             .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
@@ -597,7 +583,7 @@ public class ReviewedAnnotationResourceTests {
             = "{\"length\":512,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))\"}],\"timepoints\":0,\"background_transparency\":0}";
         System.out.println(url);
         System.out.println(body);
-        stubFor(WireMock.post(urlEqualTo(IMS_API_BASE_PATH + url)).withRequestBody(WireMock.equalTo(
+        wireMockServer.stubFor(WireMock.post(urlEqualTo(IMS_API_BASE_PATH + url)).withRequestBody(WireMock.equalTo(
                     body
                 ))
                 .willReturn(
@@ -622,8 +608,6 @@ public class ReviewedAnnotationResourceTests {
     public void getReviewedAnnotationCropMask() throws Exception {
         ReviewedAnnotation annotation = givenAReviewedAnnotationWithValidImageServer(builder);
 
-        configureFor("localhost", 8888);
-
         byte[] mockResponse = UUID.randomUUID()
             .toString()
             .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
@@ -635,7 +619,7 @@ public class ReviewedAnnotationResourceTests {
             = "{\"level\":0,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))\",\"fill_color\":\"#fff\"}],\"timepoints\":0}";
         System.out.println(url);
         System.out.println(body);
-        stubFor(WireMock.post(urlEqualTo(IMS_API_BASE_PATH + url)).withRequestBody(WireMock.equalTo(
+        wireMockServer.stubFor(WireMock.post(urlEqualTo(IMS_API_BASE_PATH + url)).withRequestBody(WireMock.equalTo(
                     body
                 ))
                 .willReturn(
@@ -665,7 +649,6 @@ public class ReviewedAnnotationResourceTests {
             .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
 
 
-        configureFor("localhost", 8888);
         String url = "/image/" + URLEncoder.encode(
             annotation.getImage().getBaseImage().getPath(),
             StandardCharsets.UTF_8
@@ -675,7 +658,7 @@ public class ReviewedAnnotationResourceTests {
             = "{\"level\":0,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))\"}],\"timepoints\":0,\"background_transparency\":100}";
         System.out.println(url);
         System.out.println(body);
-        stubFor(WireMock.post(urlEqualTo(IMS_API_BASE_PATH + url)).withRequestBody(WireMock.equalTo(
+        wireMockServer.stubFor(WireMock.post(urlEqualTo(IMS_API_BASE_PATH + url)).withRequestBody(WireMock.equalTo(
                     body
                 ))
                 .willReturn(

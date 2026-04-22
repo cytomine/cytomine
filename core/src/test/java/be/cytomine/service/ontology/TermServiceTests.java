@@ -140,7 +140,7 @@ public class TermServiceTests {
         Project project = builder.givenAProjectWithOntology(term.getOntology());
         when(termHttpContract.findAllTermIdsByProject(eq(project.getId()), anyLong()))
             .thenReturn(Set.of(term.getId()));
-        assertThat(term.getId()).isIn(termService.list(project));
+        assertThat(term.getId()).isIn(termService.getAllTermIds(project));
     }
 
     @Test
@@ -149,7 +149,7 @@ public class TermServiceTests {
         Project project = builder.givenAProjectWithOntology(builder.givenAnOntology());
         when(termHttpContract.findAllTermIdsByProject(eq(project.getId()), anyLong()))
             .thenReturn(Set.of());
-        assertEquals(new HashSet<>(), termService.list(project));
+        assertEquals(new HashSet<>(), termService.getAllTermIds(project));
     }
 
     @Test
@@ -157,7 +157,7 @@ public class TermServiceTests {
         Project project = builder.givenAProjectWithOntology(null);
         when(termHttpContract.findAllTermIdsByProject(eq(project.getId()), anyLong()))
             .thenReturn(Set.of());
-        assertEquals(new HashSet<>(), termService.list(project));
+        assertEquals(new HashSet<>(), termService.getAllTermIds(project));
     }
 
 
@@ -165,20 +165,17 @@ public class TermServiceTests {
     void listTermIdsByProjectIncludeTermFromProjectOntology() {
         Term term = builder.givenATerm();
         Project project = builder.givenAProjectWithOntology(term.getOntology());
-        assertThat(term.getId()).isIn(termService.getAllTermId(project));
+        when(termHttpContract.findAllTermIdsByProject(eq(project.getId()), anyLong()))
+            .thenReturn(Set.of(term.getId()));
+
+        assertThat(term.getId()).isIn(termService.getAllTermIds(project));
     }
 
-    @Test
-    void listTermIdsByProjectDoNotIncludeTermFromOtherOntology() {
-        Term term = builder.givenATerm();
-        Project project = builder.givenAProjectWithOntology(builder.givenAnOntology());
-        assertThat(termService.getAllTermId(project)).asList().doesNotContain(term.getId());
-    }
 
     @Test
     void listTermIdsByProjectReturnEmptyResultIfProjectHasNoOntology() {
         Project project = builder.givenAProjectWithOntology(null);
-        assertThat(termService.getAllTermId(project)).asList().isEmpty();
+        assertEquals(new HashSet<>(), termService.getAllTermIds(project));
     }
 
     @Test

@@ -23,7 +23,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             + "from AclObjectIdentity as aclObjectId, AclEntry as aclEntry, AclSid as aclSid, Project as project "
             + "where aclObjectId.objectId = project.id "
             + "and aclEntry.aclObjectIdentity = aclObjectId "
-            + "and project.ontologyId = :ontologyId "
+            + "and project.ontology.id = :ontologyId "
             + "and aclEntry.sid = aclSid and aclSid.sid like :username"
     )
     List<Project> findAllProjectForUserByOntology(String username, Long ontologyId);

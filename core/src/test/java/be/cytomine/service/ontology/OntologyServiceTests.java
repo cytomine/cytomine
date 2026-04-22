@@ -24,7 +24,6 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
-import jakarta.persistence.Tuple;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
@@ -41,7 +40,6 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.http.TermHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.domain.ontology.RelationTerm;
@@ -121,12 +119,12 @@ public class OntologyServiceTests {
         wireMockServer.stop();
     }
 
-    private Optional<TermResponse> getTerm(Long termId) {
-        String request = "select * from term where id = :id and deleted = null";
-        Query query = entityManager.createNativeQuery(request, Tuple.class);
+    private Optional<Long> getTerm(Long termId) {
+        String request = "select count(*) from term where id = :id and deleted is null";
+        Query query = entityManager.createNativeQuery(request);
         query.setParameter("id", termId);
-        return Optional.ofNullable(query.getResultList().get(0))
-            .map(TermResponse.class::cast);
+        long count = ((Number) query.getSingleResult()).longValue();
+        return count > 0 ? Optional.of(termId) : Optional.empty();
     }
 
 

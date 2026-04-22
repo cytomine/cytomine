@@ -1,9 +1,9 @@
 package org.cytomine.repository.persistence.entity.key;
 
-import lombok.Value;
+import lombok.Data;
 
 
-@Value
+@Data
 public class ReviewedAnnotationLinkEntityKey {
 
     long termId;

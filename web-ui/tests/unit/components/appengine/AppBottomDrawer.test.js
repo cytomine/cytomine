@@ -157,11 +157,13 @@ describe('AppBottomDrawer.vue', () => {
 
     expect(wrapper.vm.getInputProvisions()).toEqual([
       {
+        // eslint-disable-next-line camelcase
         param_name: 'threshold',
         type: 'number',
         value: 0.8,
       },
       {
+        // eslint-disable-next-line camelcase
         param_name: 'label',
         type: 'string',
         value: 'tumour',
@@ -214,6 +216,7 @@ describe('AppBottomDrawer.vue', () => {
       123,
       [
         {
+          // eslint-disable-next-line camelcase
           param_name: 'threshold',
           type: 'number',
           value: 0.8,

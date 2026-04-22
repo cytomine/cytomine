@@ -161,14 +161,15 @@ public class StatsService {
 
     }
 
-    public List<JsonObject> statAnnotationEvolution(Project project, Optional<Long> termId, int daysRange,
+    public List<JsonObject> statAnnotationEvolution(Project project, Optional<Long> maybeTermId, int daysRange,
                                                     Date startDate,
                                                     Date endDate, boolean reverseOrder, boolean accumulate) {
         securityACLService.check(project, READ);
         String request =
             "SELECT created " + "FROM UserAnnotation " + "WHERE project.id = " + project.getId() + " "
-                + (termId.isPresent() ? "AND id IN (SELECT userAnnotation.id FROM AnnotationTerm"
-                + " WHERE term.id = " + termId + ") " : "")
+                + (maybeTermId.map(
+                    termId -> "AND id IN (SELECT userAnnotation.id FROM AnnotationTerm" + " WHERE term.id = " + termId + ") ")
+                .orElse(""))
                 + (startDate != null ? " AND created > cast(date('" + startDate + "') as timestamp)" : "") + (
                 endDate != null ? " AND created < cast(date('" + endDate + "') as timestamp)" : "")
                 + " ORDER BY created ASC";
@@ -194,7 +195,7 @@ public class StatsService {
             "SELECT created FROM reviewed_annotation WHERE project_id = " + project.getId() + " "
                 + (termId.isPresent() ? "AND id IN (SELECT reviewed_annotation_terms_id "
                 + "FROM reviewed_annotation_term WHERE term_id = "
-                + termId + ") " : "") + (startDate != null ? "AND created > '" + startDate + "'" : "") + (
+                + termId.get() + ") " : "") + (startDate != null ? "AND created > '" + startDate + "'" : "") + (
                 endDate != null ? "AND created < '" + endDate + "'" : "") + "ORDER BY created ASC";
 
         List<java.util.Date> annotationsDates = entityManager.createNativeQuery(request).getResultList();

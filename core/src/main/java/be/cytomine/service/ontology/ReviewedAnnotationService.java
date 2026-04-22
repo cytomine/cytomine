@@ -285,7 +285,10 @@ public class ReviewedAnnotationService extends ModelService {
                 terms == null ? Stream.empty() : terms.stream())
             .collect(Collectors.toSet());
 
-        CommandResponse commandResponse = this.add(review.toJsonObject());
+        JsonObject reviewJson = review.toJsonObject();
+        reviewJson.put("terms", new ArrayList<>(termsToAdd));
+
+        CommandResponse commandResponse = this.add(reviewJson);
 
         reviewedAnnotationHttpContract.replaceAllTermIds(commandResponse.getObject().getId(),
             currentUserService.getCurrentUser().getId(), termsToAdd);

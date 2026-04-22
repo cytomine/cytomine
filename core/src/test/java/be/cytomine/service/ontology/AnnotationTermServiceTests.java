@@ -31,6 +31,7 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.ontology.AnnotationTerm;
 import be.cytomine.domain.ontology.ReviewedAnnotation;
 import be.cytomine.domain.ontology.Term;
@@ -49,7 +50,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 public class AnnotationTermServiceTests {
 
@@ -64,6 +65,9 @@ public class AnnotationTermServiceTests {
 
     @Autowired
     CommandService commandService;
+
+    @Autowired
+    WiremockRepository wiremockRepository;
 
     @Test
     void findAnnotationTermWithSuccess() {
@@ -157,6 +161,7 @@ public class AnnotationTermServiceTests {
         AnnotationTerm annotationTerm = builder.givenANotPersistedAnnotationTerm(
             builder.givenAUserAnnotation()
         );
+        wiremockRepository.stubTerm(annotationTerm.getTerm());
         CommandResponse commandResponse = annotationTermService.addAnnotationTerm(
             annotationTerm.getUserAnnotation().getId(),
             annotationTerm.getTerm().getId(),
@@ -187,6 +192,7 @@ public class AnnotationTermServiceTests {
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm(annotation);
         Term oldTerm = annotationTerm.getTerm();
         Term newTerm = builder.givenATerm(annotation.getProject().getOntology());
+        wiremockRepository.stubTerm(newTerm);
 
         CommandResponse commandResponse = annotationTermService.addWithDeletingOldTerm(
             annotationTerm.getUserAnnotation().getId(),
@@ -224,6 +230,7 @@ public class AnnotationTermServiceTests {
         builder.persistAndReturn(annotationTerm);
         Term oldTerm = annotationTerm.getTerm();
         Term newTerm = builder.givenATerm(annotation.getProject().getOntology());
+        wiremockRepository.stubTerm(newTerm);
 
         CommandResponse commandResponse = annotationTermService.addWithDeletingOldTerm(
             annotationTerm.getUserAnnotation().getId(),
@@ -247,6 +254,7 @@ public class AnnotationTermServiceTests {
         annotationTerm.setUser(builder.givenAUser());
         Term oldTerm = annotationTerm.getTerm();
         Term newTerm = builder.givenATerm(annotation.getProject().getOntology());
+        wiremockRepository.stubTerm(newTerm);
 
         CommandResponse commandResponse = annotationTermService.addWithDeletingOldTerm(
             annotationTerm.getUserAnnotation().getId(),

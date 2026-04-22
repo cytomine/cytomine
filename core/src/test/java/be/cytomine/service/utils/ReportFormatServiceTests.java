@@ -18,6 +18,7 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.security.User;
 import be.cytomine.dto.image.Point;
@@ -30,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 public class ReportFormatServiceTests {
 
@@ -40,6 +41,8 @@ public class ReportFormatServiceTests {
     BasicInstanceBuilder builder;
     @Autowired
     TermService termService;
+    @Autowired
+    WiremockRepository wiremockRepository;
     private Object[][] expectedDataObject;
 
     @Test
@@ -205,6 +208,8 @@ public class ReportFormatServiceTests {
     private List<Map<String, Object>> buildAnnotations(boolean isComplete) {
         Term term1 = builder.givenATerm();
         Term term2 = builder.givenATerm();
+        wiremockRepository.stubTerm(term1);
+        wiremockRepository.stubTerm(term2);
         Point point = new Point(2545454.231212, 2545454.23111);
         expectedDataObject = new Object[][] {
             {

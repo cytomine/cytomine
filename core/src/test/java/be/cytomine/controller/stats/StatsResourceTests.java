@@ -26,6 +26,7 @@ import be.cytomine.common.repository.model.stat.payload.FlatStatUserTerm;
 import be.cytomine.common.repository.model.stat.payload.StatPerTermAndImage;
 import be.cytomine.common.repository.model.stat.payload.StatTerm;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.ontology.AnnotationTerm;
@@ -60,7 +61,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 public class StatsResourceTests {
 
@@ -102,6 +103,9 @@ public class StatsResourceTests {
 
     @Autowired
     private MockMvc restStatsControllerMockMvc;
+
+    @Autowired
+    private WiremockRepository wiremockRepository;
 
     @MockitoBean
     private StatsHttpContract statsHttpContract;
@@ -397,6 +401,7 @@ public class StatsResourceTests {
         builder.addUserToProject(project, "superadmin");
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm(builder.givenAUserAnnotation(project));
         entityManager.refresh(annotationTerm.getUserAnnotation());
+        wiremockRepository.stubTerm(annotationTerm.getTerm());
 
         restStatsControllerMockMvc.perform(get("/api/term/{id}/project/stat.json", annotationTerm.getTerm().getId()))
             .andExpect(status().isOk())

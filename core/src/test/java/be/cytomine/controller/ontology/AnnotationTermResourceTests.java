@@ -30,6 +30,7 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.ontology.AnnotationTerm;
 import be.cytomine.domain.ontology.ReviewedAnnotation;
 import be.cytomine.repository.ontology.AnnotationTermRepository;
@@ -47,7 +48,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 public class AnnotationTermResourceTests {
 
     @Autowired
@@ -61,6 +62,9 @@ public class AnnotationTermResourceTests {
 
     @Autowired
     private AnnotationTermRepository annotationTermRepository;
+
+    @Autowired
+    private WiremockRepository wiremockRepository;
 
     @Test
     @Transactional
@@ -136,6 +140,7 @@ public class AnnotationTermResourceTests {
     @Transactional
     public void shouldReturnAnnotationTermWithCorrectFields() throws Exception {
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm();
+        wiremockRepository.stubTerm(annotationTerm.getTerm());
 
         restAnnotationTermControllerMockMvc.perform(get(
                 "/api/annotation/{idAnnotation}/term/{idTerm}.json",
@@ -152,6 +157,7 @@ public class AnnotationTermResourceTests {
     @Transactional
     public void shouldReturnAnnotationTermWithUserAndCorrectFields() throws Exception {
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm();
+        wiremockRepository.stubTerm(annotationTerm.getTerm());
         restAnnotationTermControllerMockMvc.perform(get(
                 "/api/annotation/{idAnnotation}/term/{idTerm}/user/{idUser}.json",
                 annotationTerm.getUserAnnotation().getId(),
@@ -272,6 +278,7 @@ public class AnnotationTermResourceTests {
         AnnotationTerm
             annotationTerm
             = builder.givenANotPersistedAnnotationTerm(previousAnnotationTerm.getUserAnnotation());
+        wiremockRepository.stubTerm(annotationTerm.getTerm());
 
         assertThat(annotationTermService.find(
             previousAnnotationTerm.getUserAnnotation(),
@@ -330,6 +337,7 @@ public class AnnotationTermResourceTests {
         AnnotationTerm
             annotationTerm
             = builder.givenANotPersistedAnnotationTerm(previousAnnotationTerm.getUserAnnotation());
+        wiremockRepository.stubTerm(annotationTerm.getTerm());
 
         assertThat(annotationTermService.find(
             previousAnnotationTerm.getUserAnnotation(),
@@ -374,6 +382,7 @@ public class AnnotationTermResourceTests {
     @Transactional
     public void deleteAnnotationTermWithUser() throws Exception {
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm();
+        wiremockRepository.stubTerm(annotationTerm.getTerm());
         restAnnotationTermControllerMockMvc.perform(delete(
                 "/api/annotation/{idAnnotation}/term/{idTerm}/user/{idUser}.json",
                 annotationTerm.getUserAnnotation().getId(),
@@ -396,6 +405,7 @@ public class AnnotationTermResourceTests {
     @Transactional
     public void deleteAnnotationTermForCurrentUser() throws Exception {
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm();
+        wiremockRepository.stubTerm(annotationTerm.getTerm());
         restAnnotationTermControllerMockMvc.perform(delete(
                 "/api/annotation/{idAnnotation}/term/{idTerm}.json",
                 annotationTerm.getUserAnnotation().getId(), annotationTerm.getTerm().getId()

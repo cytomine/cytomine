@@ -132,7 +132,7 @@ public class StatsService {
     }
 
     public List<JsonObject> statAnnotationTermedByProject(long termId, long ontologyId) {
-        List<Project> projects = projectService.listByOntology(termId);
+        List<Project> projects = projectService.listByOntology(ontologyId);
 
         JsonObject counts = new JsonObject();
         JsonObject percentage = new JsonObject();

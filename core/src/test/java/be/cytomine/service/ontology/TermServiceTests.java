@@ -17,6 +17,7 @@ package be.cytomine.service.ontology;
  */
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import jakarta.persistence.EntityManager;
@@ -32,6 +33,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
+import be.cytomine.TermMapper;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.config.MongoTestConfiguration;
@@ -49,6 +51,7 @@ import be.cytomine.utils.CommandResponse;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -81,13 +84,17 @@ public class TermServiceTests {
     @Autowired
     EntityManager entityManager;
 
+    @Autowired
+    TermMapper termMapper;
+
     @MockitoBean
     TermHttpContract termHttpContract;
 
     @Test
     void getTermWithSuccess() {
         Term term = builder.givenATerm();
-        assertThat(term).isEqualTo(termService.get(term.getId()));
+        when(termHttpContract.findTermByID(eq(term.getId()), anyLong())).thenReturn(Optional.of(termMapper.map(term)));
+        assertEquals(term.getId(), termService.get(term.getId()).id());
     }
 
     @Test
@@ -98,8 +105,9 @@ public class TermServiceTests {
     @Test
     void findTermWithSuccess() {
         Term term = builder.givenATerm();
-        assertThat(termService.find(term.getId()).isPresent());
-        assertThat(term).isEqualTo(termService.find(term.getId()).get());
+        when(termHttpContract.findTermByID(eq(term.getId()), anyLong())).thenReturn(Optional.of(termMapper.map(term)));
+        assertTrue(termService.find(term.getId()).isPresent());
+        assertEquals(term.getId(), termService.find(term.getId()).get().id());
     }
 
     @Test

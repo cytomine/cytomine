@@ -1,5 +1,5 @@
 <template>
-  <div class="drawer" :class="{ collapsed: isCollapsed }" @transitionend="handleTransitionEnd">
+  <div class="drawer" :class="{ collapsed: isCollapsed }">
     <div class="drawer-header">
       <span class="drawer-title">{{ $t('app-engine.applications') }}</span>
       <b-button
@@ -114,11 +114,6 @@ export default {
       this.$nextTick(() => {
         this.$eventBus.$emit('updateMapSize');
       });
-    },
-    handleTransitionEnd(event) {
-      if (!this.isDragging && event.propertyName === 'height') {
-        this.$eventBus.$emit('updateMapSize');
-      }
     },
     resetInputs() {
       this.inputs = {};

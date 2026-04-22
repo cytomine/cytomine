@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import io.jsonwebtoken.lang.Strings;
@@ -35,7 +34,6 @@ import be.cytomine.controller.error.ErrorBuilder;
 import be.cytomine.controller.error.ErrorCode;
 import be.cytomine.dto.Account;
 import be.cytomine.exceptions.UserManagementException;
-import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.utils.Validation;
 import be.cytomine.service.utils.ValidationFor;
 

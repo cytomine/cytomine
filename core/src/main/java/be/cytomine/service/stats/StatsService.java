@@ -53,9 +53,6 @@ import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.service.security.UserService;
 import be.cytomine.utils.JsonObject;
 
-import static java.util.stream.Collectors.toSet;
-import static org.springframework.security.acls.domain.BasePermission.READ;
-
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
@@ -70,6 +67,9 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static java.util.stream.Collectors.toSet;
+import static org.springframework.security.acls.domain.BasePermission.READ;
 
 @Service
 @Transactional

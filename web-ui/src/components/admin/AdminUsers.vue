@@ -52,7 +52,7 @@
             {{user.fullName}}
           </b-table-column>
 
-          <b-table-column field="role" :label="$t('role')" sortable width="50">
+          <b-table-column field="role" :label="$t('role')" width="50">
             <span class="tag" :class="getRoleData(user).class">{{$t(getRoleData(user).label)}}</span>
           </b-table-column>
 
@@ -80,12 +80,12 @@
               <button class="button is-link is-small" @click="startUserEdition(user)">
                 {{$t('button-edit')}}
               </button>
-              <button v-if="user.enabled" class="button is-danger is-small" @click="lock(user)">
-                {{$t('button-lock')}}
-              </button>
-              <button v-else class="button is-success is-small" @click="unlock(user)">
-                {{$t('button-unlock')}}
-              </button>
+<!--              <button v-if="user.enabled" class="button is-danger is-small" @click="lock(user)">-->
+<!--                {{$t('button-lock')}}-->
+<!--              </button>-->
+<!--              <button v-else class="button is-success is-small" @click="unlock(user)">-->
+<!--                {{$t('button-unlock')}}-->
+<!--              </button>-->
             </div>
           </b-table-column>
         </template>
@@ -115,7 +115,6 @@ import UserModal from './UserModal';
 import UserDetails from './UserDetails';
 import {rolesMapping} from '@/utils/role-utils';
 
-// TODO IAM
 export default {
   name: 'admin-users',
   components: {

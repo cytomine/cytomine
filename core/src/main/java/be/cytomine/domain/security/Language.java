@@ -48,6 +48,13 @@ public enum Language {
         return map.get(c);
     }
 
+    public static Language findByOrdinal(Integer ordinal) {
+        if (ordinal == null || ordinal < 0 || ordinal >= values().length) {
+            return ENGLISH;
+        }
+        return values()[ordinal];
+    }
+
     @Override
     public String toString() {
         return this.code;

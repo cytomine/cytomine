@@ -681,7 +681,7 @@ public class UserService extends ModelService {
         securityACLService.check(ontology, READ);
         //TODO:: Not optim code a single SQL request will be very faster
         List<User> users = new ArrayList<>();
-        List<Project> projects = projectRepository.findAllByOntology(ontology);
+        List<Project> projects = projectRepository.findAllByOntologyId(ontology.getId());
         for (Project project : projects) {
             users.addAll(listUsers(project));
         }

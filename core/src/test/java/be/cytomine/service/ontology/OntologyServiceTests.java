@@ -17,10 +17,13 @@ package be.cytomine.service.ontology;
  */
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
@@ -47,7 +50,6 @@ import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.ontology.OntologyRepository;
 import be.cytomine.repository.ontology.RelationTermRepository;
-import be.cytomine.repository.ontology.TermRepository;
 import be.cytomine.service.CommandService;
 import be.cytomine.service.PermissionService;
 import be.cytomine.service.command.TransactionService;
@@ -71,40 +73,29 @@ import static org.springframework.security.acls.domain.BasePermission.WRITE;
 @Transactional
 public class OntologyServiceTests {
 
+    private static WireMockServer wireMockServer;
     @Autowired
     OntologyService ontologyService;
-
     @Autowired
     OntologyRepository ontologyRepository;
-
     @Autowired
     BasicInstanceBuilder basicInstanceBuilder;
-
     @Autowired
     BasicInstanceBuilder builder;
-
     @Autowired
     CommandService commandService;
-
     @Autowired
     TransactionService transactionService;
-
     @Autowired
     RelationTermRepository relationTermRepository;
-
-    @Autowired
-    TermRepository termRepository;
-
     @MockitoBean
     TermHttpContract termHttpContract;
-
     @Autowired
     PermissionService permissionService;
-
     @Autowired
     ProjectService projectService;
-
-    private static WireMockServer wireMockServer;
+    @Autowired
+    EntityManager entityManager;
 
     private static void setupStub() {
         /* Simulate call to CBIR */
@@ -127,6 +118,15 @@ public class OntologyServiceTests {
     public static void afterAll() {
         wireMockServer.stop();
     }
+
+    private Optional<Long> getTerm(Long termId) {
+        String request = "select count(*) from term where id = :id and deleted is null";
+        Query query = entityManager.createNativeQuery(request);
+        query.setParameter("id", termId);
+        long count = ((Number) query.getSingleResult()).longValue();
+        return count > 0 ? Optional.of(termId) : Optional.empty();
+    }
+
 
     @Test
     void listAllOntologyWithSuccess() {
@@ -324,35 +324,35 @@ public class OntologyServiceTests {
 
         assertThat(ontologyService.find(ontology.getId()).isEmpty());
         assertThat(relationTermRepository.findById(relationTerm.getId())).isEmpty();
-        assertThat(termRepository.findById(term1.getId())).isEmpty();
-        assertThat(termRepository.findById(term2.getId())).isEmpty();
+        assertThat(getTerm(term1.getId())).isEmpty();
+        assertThat(getTerm(term2.getId())).isEmpty();
         commandService.undo();
 
         assertThat(ontologyService.find(ontology.getId()).isPresent());
         assertThat(relationTermRepository.findById(relationTerm.getId())).isPresent();
-        assertThat(termRepository.findById(term1.getId())).isPresent();
-        assertThat(termRepository.findById(term2.getId())).isPresent();
+        assertThat(getTerm(term1.getId())).isPresent();
+        assertThat(getTerm(term2.getId())).isPresent();
 
         commandService.redo();
 
         assertThat(ontologyService.find(ontology.getId()).isEmpty());
         assertThat(relationTermRepository.findById(relationTerm.getId())).isEmpty();
-        assertThat(termRepository.findById(term1.getId())).isEmpty();
-        assertThat(termRepository.findById(term2.getId())).isEmpty();
+        assertThat(getTerm(term1.getId())).isEmpty();
+        assertThat(getTerm(term2.getId())).isEmpty();
 
         commandService.undo();
 
         assertThat(ontologyService.find(ontology.getId()).isPresent());
         assertThat(relationTermRepository.findById(relationTerm.getId())).isPresent();
-        assertThat(termRepository.findById(term1.getId())).isPresent();
-        assertThat(termRepository.findById(term2.getId())).isPresent();
+        assertThat(getTerm(term1.getId())).isPresent();
+        assertThat(getTerm(term2.getId())).isPresent();
 
         commandService.redo();
 
         assertThat(ontologyService.find(ontology.getId()).isEmpty());
         assertThat(relationTermRepository.findById(relationTerm.getId())).isEmpty();
-        assertThat(termRepository.findById(term1.getId())).isEmpty();
-        assertThat(termRepository.findById(term2.getId())).isEmpty();
+        assertThat(getTerm(term1.getId())).isEmpty();
+        assertThat(getTerm(term2.getId())).isEmpty();
     }
 
     @Test

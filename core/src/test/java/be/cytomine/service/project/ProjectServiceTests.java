@@ -811,7 +811,8 @@ public class ProjectServiceTests {
         builder.addUserToProject(project1, "superadmin");
         builder.addUserToProject(project2, "superadmin");
 
-        assertThat(projectService.listByOntology(project1.getOntology())).contains(project1).doesNotContain(project2);
+        assertThat(projectService.listByOntology(project1.getOntology().getId())).contains(project1)
+            .doesNotContain(project2);
     }
 
     @Test

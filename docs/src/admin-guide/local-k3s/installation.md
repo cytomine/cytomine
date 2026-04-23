@@ -52,19 +52,18 @@ echo "172.16.238.15 cytomine.local" | sudo tee -a /etc/hosts
    cd cytomine
    ```
 
-2. Start the k3s container:
+2. Start the k3s container (and prepare the secrets folder):
 
    ```bash
+   mkdir -p .kube/shared
    docker compose -f ./helm/compose.yaml up -d
    ```
 
-   k3s will start and write its kubeconfig to `.kube/shared/config`. Wait until the file appears and the cluster is ready:
+   k3s will start and write its kubeconfig to `.kube/shared/config`.
+   Wait until this command succeeds:
 
    ```bash
-   # Poll until the kubeconfig is available (usually under a minute)
-   until kubectl --kubeconfig=./.kube/shared/config get nodes 2>/dev/null; do
-     echo "Waiting for k3s to be ready..."; sleep 5
-   done
+   kubectl --kubeconfig=./.kube/shared/config get nodes
    ```
 
    The k3s container:
@@ -101,21 +100,21 @@ kubectl --kubeconfig=./.kube/shared/config get pods -n cytomine-local -w
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│  Host machine                                        │
-│                                                      │
+│  Host machine                                       │
+│                                                     │
 │  ┌──────────────────────────────────────────────┐   │
-│  │  Docker network (172.16.238.0/24)             │   │
-│  │                                               │   │
+│  │  Docker network (172.16.238.0/24)            │   │
+│  │                                              │   │
 │  │  ┌────────────────────────────────────────┐  │   │
-│  │  │  k3s container (172.16.238.15)          │  │   │
-│  │  │                                         │  │   │
-│  │  │  Kubernetes pods (cytomine-local ns):   │  │   │
-│  │  │    core · pims · web-ui · iam           │  │   │
-│  │  │    app-engine · cbir · sam              │  │   │
-│  │  │    postgres · mongodb · redis           │  │   │
-│  │  │    registry · repository                │  │   │
-│  │  │                                         │  │   │
-│  │  │  nginx-ingress → cytomine.local:80      │  │   │
+│  │  │  k3s container (172.16.238.15)         │  │   │
+│  │  │                                        │  │   │
+│  │  │  Kubernetes pods (cytomine-local ns):  │  │   │
+│  │  │    core · pims · web-ui · iam          │  │   │
+│  │  │    app-engine · cbir · sam             │  │   │
+│  │  │    postgres · mongodb · redis          │  │   │
+│  │  │    registry · repository               │  │   │
+│  │  │                                        │  │   │
+│  │  │  nginx-ingress → cytomine.local:80     │  │   │
 │  │  └────────────────────────────────────────┘  │   │
 │  └──────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────┘
@@ -159,23 +158,6 @@ docker compose -f ./helm/compose.yaml \
   -f ./helm/docker/compose.docker-pull.yaml \
   up -d
 ```
-
-## Upgrade Cytomine
-
-1. Pull the latest repository changes:
-
-   ```bash
-   git pull
-   ```
-
-2. Re-run the Helm upgrade:
-
-   ```bash
-   helm upgrade --kubeconfig=./.kube/shared/config \
-     -f ./helm/charts/cytomine/values.yaml \
-     cytomine-platform ./helm/charts/cytomine/ \
-     -n cytomine-local
-   ```
 
 ## Stop Cytomine
 

@@ -10,7 +10,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.dto.DatedCytomineDomain;
@@ -24,10 +23,10 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             + "from AclObjectIdentity as aclObjectId, AclEntry as aclEntry, AclSid as aclSid, Project as project "
             + "where aclObjectId.objectId = project.id "
             + "and aclEntry.aclObjectIdentity = aclObjectId "
-            + "and project.ontology = :ontology "
+            + "and project.ontology.id = :ontologyId "
             + "and aclEntry.sid = aclSid and aclSid.sid like :username"
     )
-    List<Project> findAllProjectForUserByOntology(String username, Ontology ontology);
+    List<Project> findAllProjectForUserByOntology(String username, Long ontologyId);
 
 
     @Query(value =
@@ -85,7 +84,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             .collect(Collectors.toList());
     }
 
-    List<Project> findAllByOntology(Ontology ontology);
+    List<Project> findAllByOntologyId(Long ontologyId);
 
     List<Project> findAllByIdIn(List<Long> project);
 

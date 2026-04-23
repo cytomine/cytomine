@@ -8,12 +8,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.tomakehurst.wiremock.WireMockServer;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.time.DateUtils;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.io.ParseException;
@@ -34,6 +31,7 @@ import be.cytomine.common.repository.model.stat.payload.StatPerTermAndImage;
 import be.cytomine.common.repository.model.stat.payload.StatTerm;
 import be.cytomine.common.repository.model.stat.payload.StatUserTerm;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.ontology.AnnotationTerm;
@@ -71,11 +69,10 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 public class StatsServiceTests {
 
-    private static WireMockServer wireMockServer = new WireMockServer(8888);
     @Autowired
     BasicInstanceBuilder builder;
     @Autowired
@@ -106,16 +103,6 @@ public class StatsServiceTests {
     ObjectMapper objectMapper;
     @MockitoBean
     StatsHttpContract statsHttpContract;
-
-    @BeforeAll
-    public static void beforeAll() {
-        wireMockServer.start();
-    }
-
-    @AfterAll
-    public static void afterAll() {
-        wireMockServer.stop();
-    }
 
     @BeforeEach
     public void init() {
@@ -174,7 +161,8 @@ public class StatsServiceTests {
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm(builder.givenAUserAnnotation(project));
         entityManager.refresh(annotationTerm.getUserAnnotation());
 
-        List<JsonObject> jsonObjects = statsService.statAnnotationTermedByProject(annotationTerm.getTerm());
+        List<JsonObject> jsonObjects = statsService.statAnnotationTermedByProject(annotationTerm.getTerm().getId(),
+            annotationTerm.getTerm().getOntology().getId());
         assertThat(jsonObjects).hasSize(1);
         assertThat(jsonObjects.get(0).get("username")).isEqualTo(project.getName());
         assertThat(jsonObjects.get(0).get("value")).isEqualTo(1L);
@@ -193,14 +181,14 @@ public class StatsServiceTests {
         builder.persistAndReturn(annotation2);
 
         List<JsonObject> jsonObjects =
-            statsService.statAnnotationEvolution(project, null, 7, DateUtils.addDays(new Date(), -30),
+            statsService.statAnnotationEvolution(project, Optional.empty(), 7, DateUtils.addDays(new Date(), -30),
                 DateUtils.addDays(new Date(), 0), true, false);
 
         assertThat(jsonObjects).hasSize(5);
         assertThat(
             jsonObjects.stream().filter(x -> x.getJSONAttrLong("size") == 1).collect(Collectors.toList())).hasSize(2);
 
-        statsService.statAnnotationEvolution(project, builder.givenATerm(project.getOntology()), 7,
+        statsService.statAnnotationEvolution(project, Optional.of(builder.givenATerm(project.getOntology()).getId()), 7,
             DateUtils.addDays(new Date(), -30), DateUtils.addDays(new Date(), 0), true, false);
 
     }
@@ -216,14 +204,16 @@ public class StatsServiceTests {
         builder.persistAndReturn(annotation2);
 
         List<JsonObject> jsonObjects =
-            statsService.statReviewedAnnotationEvolution(project, null, 7, DateUtils.addDays(new Date(), -30),
+            statsService.statReviewedAnnotationEvolution(project, Optional.empty(), 7,
+                DateUtils.addDays(new Date(), -30),
                 DateUtils.addDays(new Date(), 0), true, false);
 
         assertThat(jsonObjects).hasSize(5);
         assertThat(
             jsonObjects.stream().filter(x -> x.getJSONAttrLong("size") == 1).collect(Collectors.toList())).hasSize(2);
 
-        statsService.statReviewedAnnotationEvolution(project, builder.givenATerm(project.getOntology()), 7,
+        statsService.statReviewedAnnotationEvolution(project,
+            Optional.of(builder.givenATerm(project.getOntology()).getId()), 7,
             DateUtils.addDays(new Date(), -30), DateUtils.addDays(new Date(), 0), true, false);
 
 
@@ -480,7 +470,7 @@ public class StatsServiceTests {
 
     @Test
     void retrieveStorageSpaces() {
-        configureFor("localhost", 8888);
+        configureFor("localhost", WiremockRepository.SERVER.port());
         String body = """
             {
               "used": 193396892,

@@ -62,20 +62,15 @@ import static org.springframework.security.acls.domain.BasePermission.WRITE;
 public class OntologyService extends ModelService {
 
     @Autowired
+    TermHttpContract termHttpContract;
+    @Autowired
     private OntologyRepository ontologyRepository;
-
     @Autowired
     private SecurityACLService securityACLService;
-
     @Autowired
     private CurrentUserService currentUserService;
-
     @Autowired
     private ProjectRepository projectRepository;
-
-    @Autowired
-    TermHttpContract termHttpContract;
-
     @Autowired
     private TermService termService;
 
@@ -160,7 +155,7 @@ public class OntologyService extends ModelService {
     }
 
     public void determineRightsForUser(Ontology ontology, User user) {
-        List<Project> projects = projectRepository.findAllByOntology(ontology);
+        List<Project> projects = projectRepository.findAllByOntologyId(ontology.getId());
         if (projects.stream().anyMatch(project -> userService.listAdmins(project).contains(user))) {
             permissionService.addPermission(ontology, user.getUsername(), BasePermission.ADMINISTRATION);
         } else {
@@ -199,7 +194,7 @@ public class OntologyService extends ModelService {
     }
 
     private void deleteDependentProject(Ontology ontology, Transaction transaction, Task task) {
-        if (!projectRepository.findAllByOntology(ontology).isEmpty()) {
+        if (!projectRepository.findAllByOntologyId(ontology.getId()).isEmpty()) {
             throw new ConstraintException("Ontology is linked with project. Cannot delete ontology!");
         }
     }

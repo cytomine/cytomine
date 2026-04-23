@@ -29,6 +29,7 @@ import lombok.AllArgsConstructor;
 import org.locationtech.jts.io.ParseException;
 import org.springframework.stereotype.Component;
 
+import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.dto.annotation.AnnotationResult;
 import be.cytomine.exceptions.WrongArgumentException;
@@ -41,6 +42,8 @@ import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.report.ReportService;
 import be.cytomine.service.security.UserService;
 import be.cytomine.service.utils.ParamsService;
+
+import static java.util.stream.Collectors.toSet;
 
 @AllArgsConstructor
 @Component
@@ -209,13 +212,13 @@ public class AnnotationListingBuilder {
      * From a string representing the list of terms ids, get a set of terms name.
      */
     public Set<String> getTermNames(String terms) {
-        Set<String> termNames = new HashSet<>();
-        for (String termId : terms.split(",")) {
-            if (!termId.equals("0") && !termId.equals("-1") && !termId.isEmpty()) {
-                termNames.add(termService.find(Long.parseLong(termId)).get().getName());
-            }
-        }
-        return termNames;
+        return Arrays.stream(terms.split(","))
+            .filter(termId -> !termId.equals("0"))
+            .filter(termId -> !termId.equals("-1"))
+            .filter(termId -> !termId.isBlank())
+            .flatMap(termId -> termService.find(Long.parseLong(termId)).stream())
+            .map(TermResponse::name)
+            .collect(toSet());
     }
 
     /**

@@ -8,8 +8,6 @@ services:
     restart: unless-stopped
     ports:
       - 27017:27017
-    volumes:
-      - ${DATA_PATH:-./data}/mongo:/data/db
     environment:
       MONGO_INITDB_ROOT_PASSWORD: password
       MONGO_INITDB_ROOT_USERNAME: admin
@@ -23,8 +21,6 @@ services:
     restart: unless-stopped
     ports:
       - 5432:5432
-    volumes:
-      - ${DATA_PATH:-./data}/postgis/data:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: docker
       POSTGRES_PASSWORD: password
@@ -38,8 +34,6 @@ services:
     restart: unless-stopped
     ports:
       - 5000:5000
-    volumes:
-      - ${DATA_PATH:-./data}/registry:/var/lib/registry
     environment:
       REGISTRY_STORAGE_DELETE_ENABLED: true
     networks:
@@ -50,8 +44,6 @@ services:
     image: redis:7.2
     command: --port 6380
     restart: unless-stopped
-    volumes:
-      - ${DATA_PATH:-./data}/redis:/data
     networks:
       host_network:
         ipv4_address: 172.16.238.5
@@ -120,8 +112,6 @@ services:
   iam-db:
     image: postgres:14
     restart: unless-stopped
-    volumes:
-      - ${DATA_PATH:-./data}/iam-db/data:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: iam
       POSTGRES_PASSWORD: password
@@ -170,8 +160,6 @@ services:
     restart: unless-stopped
     ports:
       - 5433:5432
-    volumes:
-      - ${DATA_PATH:-./data}/app-engine-db/data:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: appengine
       POSTGRES_PASSWORD: password

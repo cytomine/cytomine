@@ -425,6 +425,7 @@ public class CytomineSteps {
         webDriverUtils.bySendKeys(wait, By.name("email"), email);
         webDriverUtils.bySendKeys(wait, By.name("password"), password);
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Save')]");
+        // webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'User successfully created')]"));
     }
 
     public void updateUser(
@@ -446,6 +447,7 @@ public class CytomineSteps {
         webDriverUtils.byClear(wait, By.name("lastname"));
         webDriverUtils.bySendKeys(wait, By.name("lastname"), newLastname);
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Save')]");
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'User successfully updated')]"));
     }
 
 

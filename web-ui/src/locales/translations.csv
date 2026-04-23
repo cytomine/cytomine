@@ -78,9 +78,10 @@ app-engine.parameter.name,Name,Nom,Nombre,Naam
 app-engine.parameter.type,Type,Type,Tipo,Type
 app-engine.parameter.value,Value,Valeur,Valor,Waarde
 app-engine.previous-task-runs,Previous task runs,Tâches exécutées précédemment,,
+app-engine.recent-runs,Recent runs,Exécutions récentes,Ejecuciones recientes,Recente uitvoeringen
 app-engine.run.started,Task run launched,Lancement de l'exécution de la tâche,Inicio de ejecución de tarea,Uitvoering van taak gestart
 app-engine.runs.title,Runs,Exécutions,Ejecuciones,Uitvoeringen
-app-engine.see-recent-runs,See recent runs,Voir les exécutions récentes,Ver ejecuciones recientes,Bekijk recente uitvoeringen
+app-engine.see-all-runs,See all runs,Voir toutes les exécutions,Ver todas las ejecuciones,Bekijk alle uitvoeringen
 app-engine.task-run.state.title,State,État,Estado,Status
 app-engine.task.name,Task,Tâche,Tarea,Taak
 app-engine.task.upload,Upload tasks,Téléverser des tâches,Cargar tareas,Taken uploaden
@@ -925,7 +926,6 @@ reviewers,Reviewers,Validateurs,Revisores,Reviewers
 role,Role,Rôle,Papel,Rol
 rotate,Rotate,Pivoter,Girar,Schommelen
 run-number,Run number,#,Número de ejecución,#
-run-status,Run status,Statut d'exécution,Estado de ejecución,Uitvoeringsstatus
 running,Running,En cours,En ejecución,Bezig
 sample-preview-of,Sample preview of {filename},Aperçu de l'image {filename},Vista previa de muestra de {filename},Afbeeldingsvoorbeeld {filename}
 sample-preview,Sample preview,Aperçu de l'image,Vista previa de muestra,Afbeeldingsvoorbeeld

@@ -59,13 +59,13 @@
           </div>
 
           <div class="analysis-column">
-            <h3 class="column-title">{{ $t('run-status') }}</h3>
+            <h3 class="column-title">{{ $t('app-engine.recent-runs') }}</h3>
 
             <TaskRunTable :taskRuns="allTaskRuns" />
 
             <div class="has-text-right mt-3">
               <b-button type="is-text" @click="$router.push({ name: 'app-dashboard' })">
-                {{ $t('app-engine.see-recent-runs') }}
+                {{ $t('app-engine.see-all-runs') }}
               </b-button>
             </div>
           </div>

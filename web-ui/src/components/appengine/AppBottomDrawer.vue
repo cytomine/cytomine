@@ -61,11 +61,7 @@
           <div class="analysis-column">
             <h3 class="column-title">{{ $t('run-status') }}</h3>
 
-            <div v-if="trackedTaskRun">
-              <TaskRunStateIcon :state="trackedTaskRun.state" />
-              {{ taskRunName }}
-            </div>
-            <p v-else><em>{{ $t('app-engine.no-active-run') }}</em></p>
+            <TaskRunTable :taskRuns="allTaskRuns" />
 
             <div class="has-text-right mt-3">
               <b-button type="is-text" @click="$router.push({ name: 'app-dashboard' })">
@@ -83,15 +79,14 @@
 import Task from '@/utils/appengine/task';
 import TaskInputForm from '@/components/appengine/forms/TaskInputForm';
 import TaskRun from '@/utils/appengine/task-run';
-import TaskRunStateIcon from '@/components/appengine/task-run/TaskRunStateIcon';
-import {formatTaskName} from '@/utils/app';
+import TaskRunTable from '@/components/appengine/task-run/TaskRunTable';
 import {get} from '@/utils/store-helpers';
 
 export default {
   name: 'AppBottomDrawer',
   components: {
     TaskInputForm,
-    TaskRunStateIcon,
+    TaskRunTable,
   },
   data() {
     return {
@@ -100,7 +95,8 @@ export default {
       tasks: [],
       inputs: {},
       isRunning: false,
-      trackedTaskRun: null,
+      allTaskRuns: [],
+      trackedTaskRuns: [],
       pollingInterval: null,
     };
   },
@@ -110,13 +106,22 @@ export default {
       let index = this.$store.getters['currentProject/currentViewer'].activeImage;
       return this.$store.getters['currentProject/currentViewer'].images[index].imageInstance;
     },
-    taskRunName() {
-      return formatTaskName(this.trackedTaskRun);
-    },
   },
   methods: {
     async fetchTasks() {
       this.tasks = await Task.fetchAll();
+    },
+    async fetchTaskRuns() {
+      let taskRuns = await TaskRun.fetchByProject(this.currentProject.id);
+      taskRuns.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      taskRuns = taskRuns.slice(0, 5);
+
+      this.allTaskRuns = await Promise.all(
+        taskRuns.map(async ({project, taskRunId}) => {
+          let taskRun = await Task.fetchTaskRunStatus(this.currentProject.id, taskRunId);
+          return new TaskRun({...taskRun, project});
+        })
+      );
     },
     toggleCollapse() {
       this.isCollapsed = !this.isCollapsed;
@@ -190,8 +195,13 @@ export default {
 
         await Task.runTask(this.currentProject.id, taskRun.id).then(async (event) => {
           this.$buefy.toast.open({message: this.$t('app-engine.run.started'), type: 'is-success'});
-          this.trackedTaskRun = new TaskRun(event.resource);
-          this.trackedTaskRun.project = this.currentProject.id;
+
+          let taskRun = new TaskRun(event.resource);
+          taskRun.project = this.currentProject.id;
+
+          this.allTaskRuns = [taskRun, ...this.allTaskRuns.slice(0, -1)];
+          this.trackedTaskRuns = [taskRun, ...this.trackedTaskRuns.slice(0, -1)];
+
           this.resetInputs();
           this.startPolling();
         });
@@ -207,6 +217,7 @@ export default {
   },
   async created() {
     await this.fetchTasks();
+    await this.fetchTaskRuns();
   },
   beforeDestroy() {
     this.stopPolling();

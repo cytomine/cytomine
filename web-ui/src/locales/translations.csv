@@ -73,7 +73,6 @@ app-engine.execute-a-task,Run a task,Lancer une tâche,Ejecutor de tareas,Applic
 app-engine.form.select-task,Select a task,Sélectionnez une tâche,Seleccione una tarea,Selecteer een taak
 app-engine.inputs.title,Inputs,Entrées,Entradas,Ingangen
 app-engine.name,App Engine,App Engine,App Engine,App Engine
-app-engine.no-active-run,No active run,Aucune exécution active,Ninguna ejecución activa,Geen actieve uitvoering
 app-engine.outputs.title,Outputs,Sorties,Salidas,Uitgangen
 app-engine.parameter.name,Name,Nom,Nombre,Naam
 app-engine.parameter.type,Type,Type,Tipo,Type

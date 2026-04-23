@@ -60,11 +60,6 @@ export default {
       currentPage: 1,
     };
   },
-  computed: {
-    taskRunName(taskRun) {
-      return formatTaskName(taskRun);
-    }
-  },
   methods: {
     async onDetailsOpen(taskRun) {
       if (!taskRun.inputs) {
@@ -75,6 +70,9 @@ export default {
         await taskRun.fetchOutputs();
       }
     },
+    taskRunName(taskRun) {
+      return formatTaskName(taskRun);
+    }
   },
 };
 </script>

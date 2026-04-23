@@ -248,6 +248,7 @@ public class CytomineTests {
     }
 
     @Test
+    @SneakyThrows
     void addAnnotationWithSam() {
         String projectName = "selenium-" + randomUUID();
         String termName = "selenium-term-" + randomUUID();
@@ -261,6 +262,7 @@ public class CytomineTests {
         cytomineSteps.selectTermForAnnotation(wait, termName);
 
         annotationTools.drawRectangleAnnotationWithMagicWand(wait, driver);
+        Thread.sleep(2000);
         cytomineSteps.verifyAnnotationProcessedWithSam(wait);
 
         cytomineSteps.deleteProject(wait, projectURL);

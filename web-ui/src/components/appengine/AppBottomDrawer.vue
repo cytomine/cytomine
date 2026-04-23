@@ -123,6 +123,9 @@ export default {
         })
       );
     },
+    getTask(taskRun) {
+      return this.tasks.find(task => task.id === taskRun.task.id);
+    },
     toggleCollapse() {
       this.isCollapsed = !this.isCollapsed;
       this.$emit('collapse', this.isCollapsed);
@@ -139,30 +142,6 @@ export default {
         type,
         value,
       }));
-    },
-    startPolling() {
-      this.stopPolling();
-      this.pollingInterval = setInterval(async () => {
-        if (!this.trackedTaskRun) {
-          this.stopPolling();
-          return;
-        }
-
-        try {
-          await this.trackedTaskRun.fetch();
-          if (this.trackedTaskRun.isTerminalState()) {
-            this.stopPolling();
-          }
-        } catch (e) {
-          this.stopPolling();
-        }
-      }, 2000);
-    },
-    stopPolling() {
-      if (this.pollingInterval !== null) {
-        clearInterval(this.pollingInterval);
-        this.pollingInterval = null;
-      }
     },
     async runTask() {
       try {
@@ -199,11 +178,10 @@ export default {
           let taskRun = new TaskRun(event.resource);
           taskRun.project = this.currentProject.id;
 
-          this.allTaskRuns = [taskRun, ...this.allTaskRuns.slice(0, -1)];
-          this.trackedTaskRuns = [taskRun, ...this.trackedTaskRuns.slice(0, -1)];
+          this.allTaskRuns = [taskRun, ...this.allTaskRuns].slice(0, 5);
+          this.trackedTaskRuns = [taskRun, ...this.trackedTaskRuns].slice(0, 5);
 
           this.resetInputs();
-          this.startPolling();
         });
       } catch (e) {
         const serverError = e.response && e.response.data
@@ -218,9 +196,29 @@ export default {
   async created() {
     await this.fetchTasks();
     await this.fetchTaskRuns();
-  },
-  beforeDestroy() {
-    this.stopPolling();
+
+    setInterval(async () => {
+      for (let taskRun of this.trackedTaskRuns) {
+        console.log(this.trackedTaskRuns);
+        if (taskRun.isTerminalState()) {
+          continue;
+        }
+
+        await taskRun.fetch();
+
+        const idx = this.allTaskRuns.findIndex(r => r.id === taskRun.id);
+        if (idx !== -1) {
+          this.allTaskRuns.splice(idx, 1, taskRun);
+        }
+
+        if (taskRun.isTerminalState() && this.getTask(taskRun).hasGeometryOutput()) {
+          await taskRun.fetchOutputs();
+          this.$eventBus.$emit('annotation-layers:refresh');
+        }
+      }
+
+      this.trackedTaskRuns = this.trackedTaskRuns.filter(taskRun => !taskRun.isTerminalState());
+    }, 2000);
   },
 };
 </script>

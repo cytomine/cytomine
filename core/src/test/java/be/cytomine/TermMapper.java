@@ -15,7 +15,6 @@ import be.cytomine.domain.ontology.Term;
 @Mapper(componentModel = "spring")
 public interface TermMapper {
 
-    //@BeanMapping(ignoreUnmappedSourceProperties = {"children"})
     @Mapping(target = "children", ignore = true)
     @Mapping(target = "ontologyId", source = "ontology.id")
     TermResponse map(Term term);

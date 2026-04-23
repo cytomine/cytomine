@@ -223,7 +223,8 @@ public class StatsService {
             predicatesList.add(endDatePredicate);
         }
         cq.multiselect(userAnnotationRoot.get("user").get("id"),
-                cb.countDistinct(userAnnotationRoot.get("image").get("id"))).where(predicatesList.toArray(Predicate[]::new))
+                cb.countDistinct(userAnnotationRoot.get("image").get("id")))
+            .where(predicatesList.toArray(Predicate[]::new))
             .groupBy(userAnnotationRoot.get("user").get("id"));
 
         TypedQuery<Tuple> q = entityManager.createQuery(cq);
@@ -294,7 +295,8 @@ public class StatsService {
         Long userId = currentUserService.getCurrentUser().getId();
 
         return statsMapper.mapToUserTerms(pagesClient.callAllPages(
-                (page, size) -> statsHttpContract.findUserTermsByProject(project.getId(), userId, page, size))).stream()
+                (page, size) ->
+                    statsHttpContract.findUserTermsByProject(project.getId(), userId, page, size))).stream()
             .toList();
 
     }

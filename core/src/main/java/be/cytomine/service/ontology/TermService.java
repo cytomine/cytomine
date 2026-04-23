@@ -18,8 +18,8 @@ package be.cytomine.service.ontology;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import jakarta.transaction.Transactional;
@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.Command;
 import be.cytomine.domain.command.DeleteCommand;
@@ -36,7 +37,6 @@ import be.cytomine.domain.ontology.RelationTerm;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
-import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.ConstraintException;
 import be.cytomine.repository.ontology.AnnotationTermRepository;
 import be.cytomine.repository.ontology.ReviewedAnnotationRepository;
@@ -72,6 +72,9 @@ public class TermService extends ModelService {
     private AnnotationTermRepository annotationTermRepository;
 
     @Autowired
+    private TermHttpContract termHttpContract;
+
+    @Autowired
     private ReviewedAnnotationRepository reviewedAnnotationRepository;
 
     @Override
@@ -97,29 +100,17 @@ public class TermService extends ModelService {
         return termRepository.findAll();
     }
 
-    public List<Term> list(Ontology ontology) {
-        securityACLService.check(ontology.container(), READ);
-        return termRepository.findAllByOntology(ontology);
+    public Set<Long> list(Ontology ontology) {
+        return termHttpContract.findAllTermIdsByOntology(ontology.getId(), currentUserService.getCurrentUser().getId());
     }
 
-    public List<Term> list(Project project) {
-        securityACLService.check(project, READ);
-        return termRepository.findAllByOntology(project.getOntology());
-    }
-
-
-    public List<Long> getAllTermId(Project project) {
-        securityACLService.check(project.container(), READ);
-        if (project.getOntology() == null) {
-            return List.of();
-        } else {
-            return termRepository.listAllIds(project.getOntology());
-        }
+    public Set<Long> getAllTermIds(Project project) {
+        return termHttpContract.findAllTermIdsByProject(project.getId(), currentUserService.getCurrentUser().getId());
     }
 
     public String fillEmptyTermIds(String terms, Project project) {
-        if (terms == null || terms.equals("")) {
-            return this.getAllTermId(project).stream().map(String::valueOf).collect(Collectors.joining(","));
+        if (terms == null || terms.isEmpty()) {
+            return this.getAllTermIds(project).stream().map(String::valueOf).collect(Collectors.joining(","));
         }
         return terms;
     }
@@ -131,7 +122,6 @@ public class TermService extends ModelService {
      * @param transaction  Transaction link with this command
      * @param task         Task for this command
      * @param printMessage Flag if client will print or not confirm message
-     *
      * @return Response structure (code, old domain,..)
      */
     @Override
@@ -147,17 +137,6 @@ public class TermService extends ModelService {
     @Override
     public CytomineDomain createFromJSON(JsonObject json) {
         return new Term().buildDomainFromJson(json, getEntityManager());
-    }
-
-    public void checkDoNotAlreadyExist(CytomineDomain domain) {
-        Term term = (Term) domain;
-        if (term != null && term.getName() != null) {
-            if (termRepository.findByNameAndOntology(term.getName(), term.getOntology())
-                .stream()
-                .anyMatch(x -> !Objects.equals(x.getId(), term.getId()))) {
-                throw new AlreadyExistException("Term " + term.getName() + " already exist in this ontology!");
-            }
-        }
     }
 
     @Override
@@ -182,18 +161,16 @@ public class TermService extends ModelService {
     public void deleteAnnotationTerm(Term term, Transaction transaction, Task task) {
         long terms = annotationTermRepository.countByTerm(term);
         if (terms != 0) {
-            throw new ConstraintException("Term is still linked with "
-                + (terms)
-                + " annotations created by user. Cannot delete term!");
+            throw new ConstraintException(
+                "Term is still linked with " + (terms) + " annotations created by user. Cannot delete term!");
         }
     }
 
     public void deleteReviewedAnnotationTerm(Term term, Transaction transaction, Task task) {
         long terms = reviewedAnnotationRepository.countAllByTermsContaining(term);
         if (terms != 0) {
-            throw new ConstraintException("Term is still linked with "
-                + (terms)
-                + " reviewed annotations. Cannot delete term!");
+            throw new ConstraintException(
+                "Term is still linked with " + (terms) + " reviewed annotations. Cannot delete term!");
         }
     }
 }

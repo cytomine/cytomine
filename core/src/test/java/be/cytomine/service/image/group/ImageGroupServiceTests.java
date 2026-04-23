@@ -12,8 +12,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
-import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.image.group.ImageGroup;
 import be.cytomine.domain.project.Project;
 import be.cytomine.exceptions.ObjectNotFoundException;
@@ -36,38 +36,38 @@ public class ImageGroupServiceTests {
     ImageGroupService imageGroupService;
 
     @Test
-    void get_non_existing_imagegroup_return_null() {
+    void getNonExistingImagegroupReturnNull() {
         AssertionsForClassTypes.assertThat(imageGroupService.get(0L)).isNull();
     }
 
     @Test
-    void find_imagegroup_with_success() {
-        ImageGroup imageGroup = builder.given_an_imagegroup();
+    void findImagegroupWithSuccess() {
+        ImageGroup imageGroup = builder.givenAnImageGroup();
         AssertionsForClassTypes.assertThat(imageGroupService.find(imageGroup.getId()).isPresent());
         assertThat(imageGroup).isEqualTo(imageGroupService.find(imageGroup.getId()).get());
     }
 
     @Test
-    void find_non_existing_imagegroup_return_empty() {
+    void findNonExistingImagegroupReturnEmpty() {
         AssertionsForClassTypes.assertThat(imageGroupService.find(0L)).isEmpty();
     }
 
     @Test
-    void list_imagegroup_by_project() {
-        Project project = builder.given_a_project();
+    void listImagegroupByProject() {
+        Project project = builder.givenAProject();
 
-        ImageGroup imageGroup1 = builder.given_an_imagegroup(project);
-        ImageGroup imageGroup2 = builder.given_an_imagegroup(project);
-        ImageGroup imageGroup3 = builder.given_an_imagegroup(project);
-        ImageGroup imageGroup4 = builder.given_an_imagegroup();
+        ImageGroup imageGroup1 = builder.givenAnImageGroup(project);
+        ImageGroup imageGroup2 = builder.givenAnImageGroup(project);
+        ImageGroup imageGroup3 = builder.givenAnImageGroup(project);
+        ImageGroup imageGroup4 = builder.givenAnImageGroup();
 
         assertThat(imageGroupService.list(project)).containsExactly(imageGroup1, imageGroup2, imageGroup3);
         assertThat(imageGroupService.list(project)).doesNotContain(imageGroup4);
     }
 
     @Test
-    void add_valid_imagegroup_with_success() {
-        ImageGroup imageGroup = builder.given_a_not_persisted_imagegroup();
+    void addValidImagegroupWithSuccess() {
+        ImageGroup imageGroup = builder.givenANotPersistedImagegroup();
 
         CommandResponse commandResponse = imageGroupService.add(imageGroup.toJsonObject());
 
@@ -77,18 +77,20 @@ public class ImageGroupServiceTests {
     }
 
     @Test
-    void add_imagegroup_with_null_project_fails() {
-        ImageGroup imageGroup = builder.given_an_imagegroup();
-        Assertions.assertThrows(ObjectNotFoundException.class, () -> {
-            imageGroupService.add(imageGroup.toJsonObject().withChange("project", null));
-        });
+    void addImagegroupWithNullProjectFails() {
+        ImageGroup imageGroup = builder.givenAnImageGroup();
+        Assertions.assertThrows(
+            ObjectNotFoundException.class, () -> {
+                imageGroupService.add(imageGroup.toJsonObject().withChange("project", null));
+            }
+        );
     }
 
     @Test
-    void edit_imagegroup_with_success() {
-        Project project1 = builder.given_a_project();
-        Project project2 = builder.given_a_project();
-        ImageGroup imageGroup = builder.given_an_imagegroup(project1);
+    void editImagegroupWithSuccess() {
+        Project project1 = builder.givenAProject();
+        Project project2 = builder.givenAProject();
+        ImageGroup imageGroup = builder.givenAnImageGroup(project1);
 
         JsonObject jsonObject = imageGroup.toJsonObject();
         jsonObject.put("project", project2.getId());
@@ -103,8 +105,8 @@ public class ImageGroupServiceTests {
     }
 
     @Test
-    void delete_imagegroup_with_success() {
-        ImageGroup imageGroup = builder.given_an_imagegroup();
+    void deleteImagegroupWithSuccess() {
+        ImageGroup imageGroup = builder.givenAnImageGroup();
 
         CommandResponse commandResponse = imageGroupService.delete(imageGroup, null, null, true);
 

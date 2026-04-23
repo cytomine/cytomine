@@ -1,6 +1,7 @@
 package be.cytomine.common.repository.http;
 
 import java.util.Optional;
+import java.util.Set;
 
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -41,9 +42,17 @@ public interface TermHttpContract {
     Optional<HttpCommandResponse> delete(@PathVariable long id,
                                          @RequestParam long userId);
 
+
     @GetExchange("/project/{id}")
     Page<TermResponse> findTermsByProject(@PathVariable long id, @RequestParam long userId, Pageable pageable);
 
     @GetExchange("/ontology/{id}")
     Page<TermResponse> findTermsByOntology(@PathVariable long id, @RequestParam long userId, Pageable pageable);
+
+    @GetExchange("/ontology/{id}/all-terms")
+    Set<Long> findAllTermIdsByOntology(@PathVariable long id, @RequestParam long userId);
+
+    @GetExchange("/project/{id}/all-terms")
+    Set<Long> findAllTermIdsByProject(@PathVariable long id, @RequestParam long userId);
+
 }

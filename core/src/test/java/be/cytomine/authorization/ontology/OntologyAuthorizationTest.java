@@ -1,21 +1,5 @@
 package be.cytomine.authorization.ontology;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -26,15 +10,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.CRUDAuthorizationTest;
+import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.domain.ontology.Ontology;
-import be.cytomine.service.PermissionService;
 import be.cytomine.service.ontology.OntologyService;
-import be.cytomine.service.security.SecurityACLService;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
@@ -43,83 +27,75 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 @Transactional
 public class OntologyAuthorizationTest extends CRUDAuthorizationTest {
 
-    @Autowired
-    private BasicInstanceBuilder basicInstanceBuilder;
-
-    private Ontology ontology = null;
-
+    @MockitoBean
+    TermHttpContract termHttpContract;
     @Autowired
     OntologyService ontologyService;
-
     @Autowired
     BasicInstanceBuilder builder;
-
     @Autowired
-    SecurityACLService securityACLService;
-
-    @Autowired
-    PermissionService permissionService;
+    private BasicInstanceBuilder basicInstanceBuilder;
+    private Ontology ontology = null;
 
     @BeforeEach
     public void before() throws Exception {
         if (ontology == null) {
-            ontology = builder.given_an_ontology();
-            ;
+            ontology = builder.givenAnOntology();
             initACL(ontology);
         }
     }
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list_ontologies() {
+    public void adminCanListOntologies() {
         assertThat(ontologyService.list()).contains(ontology);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_with_at_least_read_permission_can_list_ontologies() {
+    public void userWithAtLeastReadPermissionCanListOntologies() {
         assertThat(ontologyService.list()).contains(ontology);
     }
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
-    public void user_no_acl_cannot_list_ontologies() {
+    public void userNoAclCannotListOntologies() {
         assertThat(ontologyService.list()).doesNotContain(ontology);
     }
 
     @Override
     @Test
     @WithMockUser(username = USER_NO_ACL)
-    public void user_without_permission_add_domain() {
-        expectOK(() -> when_i_add_domain());
+    public void userWithoutPermissionAddDomain() {
+        expectOK(() -> whenIAddDomain());
         // User with no ACL can create an ontology
     }
 
     @Override
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_with_read_permission_add_domain() {
-        expectOK(() -> when_i_add_domain());
+    public void userWithReadPermissionAddDomain() {
+        expectOK(() -> whenIAddDomain());
         // User with READ permission can create another ontology
     }
 
     @Override
-    public void when_i_get_domain() {
+    public void whenIGetDomain() {
         ontologyService.get(ontology.getId());
     }
 
     @Override
-    protected void when_i_add_domain() {
-        ontologyService.add(basicInstanceBuilder.given_a_not_persisted_ontology().toJsonObject());
+    protected void whenIAddDomain() {
+        ontologyService.add(basicInstanceBuilder.givenANotPersistedOntology().toJsonObject());
     }
 
     @Override
-    public void when_i_edit_domain() {
+    public void whenIEditDomain() {
         ontologyService.update(ontology, ontology.toJsonObject());
     }
 
     @Override
-    protected void when_i_delete_domain() {
+    protected void whenIDeleteDomain() {
         Ontology ontologyToDelete = ontology;
         ontologyService.delete(ontologyToDelete, null, null, true);
     }

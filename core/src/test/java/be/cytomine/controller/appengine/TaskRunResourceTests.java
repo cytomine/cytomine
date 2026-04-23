@@ -4,15 +4,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.common.PostGisTestConfiguration;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,17 +19,21 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
+import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.appengine.TaskRun;
 import be.cytomine.repository.appengine.TaskRunRepository;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -57,12 +59,17 @@ public class TaskRunResourceTests {
     @Value("${application.appEngine.apiBasePath}")
     private String apiBasePath;
 
-    private final static WireMockServer wireMockServer = new WireMockServer(8888);
+    private static final WireMockServer wireMockServer;
 
-    @BeforeAll
-    public static void beforeAll() {
+    static {
+        wireMockServer = new WireMockServer(wireMockConfig().dynamicPort());
         wireMockServer.start();
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
+    }
+
+    @DynamicPropertySource
+    static void overrideProperties(DynamicPropertyRegistry registry) {
+        registry.add("application.appEngine.apiUrl", () -> "http://localhost:" + wireMockServer.port());
     }
 
     @AfterAll
@@ -70,10 +77,15 @@ public class TaskRunResourceTests {
         wireMockServer.stop();
     }
 
+    @BeforeEach
+    public void beforeEach() {
+        wireMockServer.resetMappings();
+    }
+
     @Test
     @Transactional
-    public void add_valid_task_run() throws Exception {
-        TaskRun taskRun = builder.given_a_not_persisted_task_run();
+    public void addValidTaskRun() throws Exception {
+        TaskRun taskRun = builder.givenANotPersistedTaskRun();
         taskRun.setTaskRunId(UUID.randomUUID());
         String taskId = UUID.randomUUID().toString();
         String queryBody = "{\"image\": \"" + taskRun.getImage().getId() + "\"}";
@@ -98,10 +110,8 @@ public class TaskRunResourceTests {
         );
         String mockResponse = objectMapper.writeValueAsString(mockResponseMap);
 
-        stubFor(WireMock.post(urlEqualTo(apiBasePath + "tasks/" + taskId + "/runs"))
-            .willReturn(
-                aResponse().withBody(mockResponse).withHeader("Content-Type", "application/json")
-            )
+        wireMockServer.stubFor(WireMock.post(urlEqualTo(apiBasePath + "tasks/" + taskId + "/runs"))
+            .willReturn(aResponse().withBody(mockResponse).withHeader("Content-Type", "application/json"))
         );
 
         mockResponseMap = Map.of(
@@ -116,13 +126,11 @@ public class TaskRunResourceTests {
 
         mockResponse = objectMapper.writeValueAsString(List.of(mockResponseMap));
 
-        stubFor(WireMock.get(urlEqualTo(apiBasePath + "tasks/" + taskId + "/outputs"))
-            .willReturn(
-                aResponse().withBody(mockResponse).withHeader("Content-Type", "application/json")
-            )
+        wireMockServer.stubFor(WireMock.get(urlEqualTo(apiBasePath + "tasks/" + taskId + "/outputs"))
+            .willReturn(aResponse().withBody(mockResponse).withHeader("Content-Type", "application/json"))
         );
 
-        mockMvc.perform(post("/api/app-engine/project/" + taskRun.getProject().getId() + "/tasks/"+ taskId + "/runs")
+        mockMvc.perform(post("/api/app-engine/project/" + taskRun.getProject().getId() + "/tasks/" + taskId + "/runs")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(queryBody))
             .andExpect(status().isOk())
@@ -133,34 +141,36 @@ public class TaskRunResourceTests {
 
     @Test
     @Transactional
-    public void single_param_provision_of_a_task() throws Exception {
-        TaskRun taskRun = builder.given_a_not_persisted_task_run();
+    public void shouldProvisionSingleParameterOfTask() throws Exception {
+        TaskRun taskRun = builder.givenANotPersistedTaskRun();
         taskRunRepository.saveAndFlush(taskRun);
         UUID taskRunId = taskRun.getTaskRunId();
 
         String paramName = "my_param";
         String queryBody = "{\"value\": 0, \"param_name\": \"" + paramName + "\", \"type\": { \"id\" : \"integer\"}}";
-        String mockResponse = "{\"value\": 0, \"param_name\": \"" + paramName + "\", \"task_run_id\": \"" + taskRunId + "\"}";
+        String mockResponse = "{\"value\": 0, \"param_name\": \""
+            + paramName
+            + "\", \"task_run_id\": \""
+            + taskRunId
+            + "\"}";
         String appEngineUriSection = "task-runs/" + taskRunId + "/input-provisions/" + paramName;
-        stubFor(WireMock.put(urlEqualTo(apiBasePath + appEngineUriSection))
-            .willReturn(
-                aResponse().withBody(mockResponse)
-            )
+        wireMockServer.stubFor(WireMock.put(urlEqualTo(apiBasePath + appEngineUriSection))
+            .willReturn(aResponse().withBody(mockResponse))
         );
 
         mockMvc.perform(put("/api/app-engine/project/" + taskRun.getProject().getId() + "/" + appEngineUriSection)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(queryBody))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(queryBody))
             .andExpect(status().isOk())
-                .andExpect(jsonPath("$.task_run_id").value(taskRunId.toString()))
-                .andExpect(jsonPath("$.param_name").value(paramName))
-                .andExpect(jsonPath("$.value").value(0));
+            .andExpect(jsonPath("$.task_run_id").value(taskRunId.toString()))
+            .andExpect(jsonPath("$.param_name").value(paramName))
+            .andExpect(jsonPath("$.value").value(0));
     }
 
     @Test
     @Transactional
-    public void batch_param_provision_of_a_task() throws Exception {
-        TaskRun taskRun = builder.given_a_not_persisted_task_run();
+    public void shouldProvisionBatchParametersOfTask() throws Exception {
+        TaskRun taskRun = builder.givenANotPersistedTaskRun();
         taskRunRepository.saveAndFlush(taskRun);
         UUID taskRunId = taskRun.getTaskRunId();
 
@@ -173,67 +183,64 @@ public class TaskRunResourceTests {
          * for provisioning.
          **/
         String queryBody = "[{\"value\": 0, \"param_name\": \"" + paramName + "\", \"type\": { \"id\" : \"integer\"}}]";
-        String mockResponse = "[{\"value\": 0, \"param_name\": \"" + paramName + "\", \"task_run_id\": \"" + taskRunId + "\"}]";
+        String mockResponse = "[{\"value\": 0, \"param_name\": \""
+            + paramName
+            + "\", \"task_run_id\": \""
+            + taskRunId
+            + "\"}]";
         String appEngineUriSection = "task-runs/" + taskRunId + "/input-provisions";
-        stubFor(WireMock.put(urlEqualTo(apiBasePath + appEngineUriSection))
-                .willReturn(
-                        aResponse().withBody(mockResponse)
-                )
-        );
+        wireMockServer.stubFor(WireMock.put(urlEqualTo(apiBasePath + appEngineUriSection))
+            .willReturn(aResponse().withStatus(200).withBody(mockResponse)));
 
         mockMvc.perform(put("/api/app-engine/project/" + taskRun.getProject().getId() + "/" + appEngineUriSection)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(queryBody))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("[0].task_run_id").value(taskRunId.toString()))
-                .andExpect(jsonPath("[0].param_name").value(paramName))
-                .andExpect(jsonPath("[0].value").value(0));
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(queryBody))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("[0].task_run_id").value(taskRunId.toString()))
+            .andExpect(jsonPath("[0].param_name").value(paramName))
+            .andExpect(jsonPath("[0].value").value(0));
     }
 
     @Test
     @Transactional
-    public void get_task_run() throws Exception {
-        TaskRun taskRun = builder.given_a_not_persisted_task_run();
+    public void getTaskRun() throws Exception {
+        TaskRun taskRun = builder.givenANotPersistedTaskRun();
         taskRunRepository.saveAndFlush(taskRun);
         UUID taskRunId = taskRun.getTaskRunId();
         String mockResponse = getTaskRunBody(taskRunId);
         String appEngineUriSection = "task-runs/" + taskRunId;
-        stubFor(WireMock.get(urlEqualTo(apiBasePath + appEngineUriSection))
-                .willReturn(
-                        aResponse().withBody(mockResponse)
-                )
+        wireMockServer.stubFor(WireMock.get(urlEqualTo(apiBasePath + appEngineUriSection))
+            .willReturn(aResponse().withBody(mockResponse))
         );
 
         mockMvc.perform(get("/api/app-engine/project/" + taskRun.getProject().getId() + "/" + appEngineUriSection)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("id").value(taskRunId.toString()))
-                .andExpect(jsonPath("state").value("CREATED"))
-                .andExpect(jsonPath("task").isNotEmpty());
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("id").value(taskRunId.toString()))
+            .andExpect(jsonPath("state").value("CREATED"))
+            .andExpect(jsonPath("task").isNotEmpty());
     }
 
     @Test
     @Transactional
-    public void post_state_action() throws Exception {
-        TaskRun taskRun = builder.given_a_not_persisted_task_run();
+    public void postStateAction() throws Exception {
+        TaskRun taskRun = builder.givenANotPersistedTaskRun();
         taskRunRepository.saveAndFlush(taskRun);
         UUID taskRunId = taskRun.getTaskRunId();
         String queryBody = "{\"desired\": \"running\"}";
         String mockResponse = getTaskRunBody(taskRunId);
         String appEngineUriSection = "task-runs/" + taskRunId + "/state-actions";
-        stubFor(WireMock.post(urlEqualTo(apiBasePath + appEngineUriSection))
-                .willReturn(
-                        aResponse().withBody(mockResponse)
-                )
+        wireMockServer.stubFor(WireMock.post(urlEqualTo(apiBasePath + appEngineUriSection))
+            .willReturn(aResponse().withBody(mockResponse))
         );
 
         mockMvc.perform(post("/api/app-engine/project/" + taskRun.getProject().getId() + "/" + appEngineUriSection)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(queryBody))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("id").value(taskRunId.toString()))
-                .andExpect(jsonPath("state").value("CREATED"))
-                .andExpect(jsonPath("task").isNotEmpty());
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(queryBody))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("id").value(taskRunId.toString()))
+            .andExpect(jsonPath("state").value("CREATED"))
+            .andExpect(jsonPath("task").isNotEmpty());
     }
 
     protected String getTaskRunBody(UUID taskRunId) {

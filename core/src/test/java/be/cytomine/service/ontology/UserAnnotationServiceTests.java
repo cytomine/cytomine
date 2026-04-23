@@ -19,18 +19,13 @@ package be.cytomine.service.ontology;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
-import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.client.WireMock;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.time.DateUtils;
 import org.assertj.core.api.AssertionsForClassTypes;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.io.ParseException;
@@ -46,6 +41,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.TestUtils;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.meta.AttachedFile;
 import be.cytomine.domain.meta.Description;
@@ -65,17 +61,12 @@ import be.cytomine.service.CommandService;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
 
-import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
-import static be.cytomine.service.search.RetrievalService.CBIR_API_BASE_PATH;
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 public class UserAnnotationServiceTests {
 
@@ -94,7 +85,8 @@ public class UserAnnotationServiceTests {
     @Autowired
     EntityManager entityManager;
 
-    private static WireMockServer wireMockServer;
+    @Autowired
+    WiremockRepository wiremockRepository;
 
     static Map<String, String> POLYGONES = Map.of(
         "a", "POLYGON ((1 1, 2 1, 2 2, 1 2, 1 1))",
@@ -105,20 +97,6 @@ public class UserAnnotationServiceTests {
         //e intersect a,b and c
     );
 
-    @BeforeAll
-    public static void beforeAll() {
-        wireMockServer = new WireMockServer(8888);
-        wireMockServer.start();
-        WireMock.configureFor("localhost", wireMockServer.port());
-
-        setupStub();
-    }
-
-    @AfterAll
-    public static void afterAll() {
-        wireMockServer.stop();
-    }
-
     @Test
     void getUserAnnotationWithSuccess() {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
@@ -128,28 +106,6 @@ public class UserAnnotationServiceTests {
     @Test
     void getUnexistingUserAnnotationReturnNull() {
         assertThat(userAnnotationService.get(0L)).isNull();
-    }
-
-    private static void setupStub() {
-        /* Simulate call to PIMS */
-        wireMockServer.stubFor(
-            WireMock.post(urlPathMatching(IMS_API_BASE_PATH + "/image/.*/annotation/drawing"))
-                .withRequestBody(WireMock.matching(".*"))
-                .willReturn(aResponse().withBody(UUID.randomUUID().toString().getBytes()))
-        );
-
-        /* Simulate call to CBIR */
-        wireMockServer.stubFor(WireMock.post(urlPathEqualTo(CBIR_API_BASE_PATH + "/images"))
-            .withQueryParam("storage", WireMock.matching(".*"))
-            .withQueryParam("index", WireMock.equalTo("annotation"))
-            .willReturn(aResponse().withBody(UUID.randomUUID().toString()))
-        );
-
-        wireMockServer.stubFor(WireMock.delete(urlPathMatching(CBIR_API_BASE_PATH + "/images/.*"))
-            .withQueryParam("storage", WireMock.matching(".*"))
-            .withQueryParam("index", WireMock.equalTo("annotation"))
-            .willReturn(aResponse().withBody(UUID.randomUUID().toString()))
-        );
     }
 
     @Test
@@ -385,6 +341,8 @@ public class UserAnnotationServiceTests {
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation();
         Term term1 = builder.givenATerm(userAnnotation.getProject().getOntology());
         Term term2 = builder.givenATerm(userAnnotation.getProject().getOntology());
+        wiremockRepository.stubTerm(term1);
+        wiremockRepository.stubTerm(term2);
 
         JsonObject jsonObject = userAnnotation.toJsonObject();
         jsonObject.put("term", List.of(term1.getId(), term2.getId()));
@@ -571,6 +529,8 @@ public class UserAnnotationServiceTests {
 
         Term term1 = builder.givenATerm(userAnnotation.getProject().getOntology());
         Term term2 = builder.givenATerm(userAnnotation.getProject().getOntology());
+        wiremockRepository.stubTerm(term1);
+        wiremockRepository.stubTerm(term2);
 
         JsonObject jsonObject = userAnnotation.toJsonObject();
         jsonObject.put("term", List.of(term1.getId(), term2.getId()));

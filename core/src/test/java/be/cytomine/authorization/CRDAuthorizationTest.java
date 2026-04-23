@@ -17,7 +17,6 @@ import be.cytomine.config.MongoTestConfiguration;
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
 @Transactional
 public abstract class CRDAuthorizationTest extends AbstractAuthorizationTest {
-
     protected static List<String> rolePerOrder = List.of(
         "ROLE_GUEST",
         "ROLE_USER",
@@ -25,6 +24,7 @@ public abstract class CRDAuthorizationTest extends AbstractAuthorizationTest {
         "ROLE_ADMIN",
         "ROLE_SUPERADMIN"
     );
+
 
     boolean isPermissionForbidden(Optional<Permission> permissionRequired, Permission permission) {
         return permissionRequired.isPresent()

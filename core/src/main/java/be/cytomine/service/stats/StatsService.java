@@ -54,14 +54,12 @@ import be.cytomine.common.repository.model.stat.payload.StatPerTermAndImage;
 import be.cytomine.common.repository.model.stat.payload.StatTerm;
 import be.cytomine.common.repository.model.stat.payload.StatUserTerm;
 import be.cytomine.common.repository.utils.PagesClient;
-import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.social.AnnotationAction;
 import be.cytomine.domain.social.PersistentImageConsultation;
 import be.cytomine.domain.social.PersistentProjectConnection;
 import be.cytomine.dto.StorageStats;
-import be.cytomine.repository.ontology.TermRepository;
 import be.cytomine.repository.ontology.UserAnnotationRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.middleware.ImageServerService;
@@ -88,9 +86,6 @@ public class StatsService {
 
     @Autowired
     UserAnnotationRepository userAnnotationRepository;
-
-    @Autowired
-    TermRepository termRepository;
 
     @Autowired
     TermRelationHttpContract termRelationHttpContract;
@@ -136,10 +131,8 @@ public class StatsService {
             .max(Comparator.comparing(x -> x.getJSONAttrLong("users"))).stream().findFirst();
     }
 
-    public List<JsonObject> statAnnotationTermedByProject(Term term) {
-        securityACLService.check(term.container(), READ);
-
-        List<Project> projects = projectService.listByOntology(term.getOntology());
+    public List<JsonObject> statAnnotationTermedByProject(long termId, long ontologyId) {
+        List<Project> projects = projectService.listByOntology(ontologyId);
 
         JsonObject counts = new JsonObject();
         JsonObject percentage = new JsonObject();
@@ -155,7 +148,7 @@ public class StatsService {
                 List<UserAnnotation> annotations =
                     userAnnotationRepository.findAllByProjectAndUserIdIn(project, layers);
                 for (UserAnnotation annotation : annotations) {
-                    if (annotation.getTerms().contains(term)) {
+                    if (annotation.getTerms().stream().anyMatch(t -> t.getId().equals(termId))) {
                         Long currentValue = counts.getJSONAttrLong(project.getName(), 0L);
                         counts.put(project.getName(), currentValue + 1);
                     }
@@ -168,15 +161,15 @@ public class StatsService {
 
     }
 
-    public List<JsonObject> statAnnotationEvolution(Project project, Term term, int daysRange, Date startDate,
-                                                    Date endDate, boolean reverseOrder, boolean accumulate) {
+    public List<JsonObject> statAnnotationEvolution(Project project, Optional<Long> maybeTermId, int daysRange,
+        Date startDate, Date endDate, boolean reverseOrder, boolean accumulate) {
         securityACLService.check(project, READ);
         String request =
-            "SELECT created " + "FROM UserAnnotation " + "WHERE project.id = " + project.getId() + " "
-                + (term != null ? "AND id IN (SELECT userAnnotation.id FROM AnnotationTerm"
-                + " WHERE term.id = " + term.getId() + ") " : "")
-                + (startDate != null ? " AND created > cast(date('" + startDate + "') as timestamp)" : "") + (
-                endDate != null ? " AND created < cast(date('" + endDate + "') as timestamp)" : "")
+            "SELECT created FROM UserAnnotation WHERE project.id = " + project.getId() + " " + (maybeTermId.map(
+                    termId -> "AND id IN (SELECT userAnnotation.id FROM AnnotationTerm WHERE term.id = "
+                        + termId + ") ")
+                .orElse("")) + (startDate != null ? " AND created > cast(date('" + startDate + "') as timestamp)" : "")
+                + (endDate != null ? " AND created < cast(date('" + endDate + "') as timestamp)" : "")
                 + " ORDER BY created ASC";
 
         List<Date> annotationsDates = entityManager.createQuery(request, Date.class).getResultList();
@@ -191,15 +184,14 @@ public class StatsService {
         return data;
     }
 
-    public List<JsonObject> statReviewedAnnotationEvolution(Project project, Term term, int daysRange, Date startDate,
-                                                            Date endDate, boolean reverseOrder, boolean accumulate) {
+    public List<JsonObject> statReviewedAnnotationEvolution(Project project, Optional<Long> termId, int daysRange,
+        Date startDate, Date endDate, boolean reverseOrder, boolean accumulate) {
         securityACLService.check(project, READ);
 
         String request =
-            "SELECT created FROM reviewed_annotation WHERE project_id = " + project.getId() + " "
-                + (term != null ? "AND id IN (SELECT reviewed_annotation_terms_id "
-                + "FROM reviewed_annotation_term WHERE term_id = "
-                + term.getId() + ") " : "") + (startDate != null ? "AND created > '" + startDate + "'" : "") + (
+            "SELECT created FROM reviewed_annotation WHERE project_id = " + project.getId() + " " + (termId.isPresent()
+                ? "AND id IN (SELECT reviewed_annotation_terms_id " + "FROM reviewed_annotation_term WHERE term_id = "
+                + termId.get() + ") " : "") + (startDate != null ? "AND created > '" + startDate + "'" : "") + (
                 endDate != null ? "AND created < '" + endDate + "'" : "") + "ORDER BY created ASC";
 
         List<java.util.Date> annotationsDates = entityManager.createNativeQuery(request).getResultList();
@@ -258,7 +250,7 @@ public class StatsService {
     }
 
     public List<StatTerm> statTermSlide(Project project, Optional<LocalDateTime> startDate,
-                                        Optional<LocalDateTime> endDate) {
+        Optional<LocalDateTime> endDate) {
         securityACLService.check(project, READ);
         Long userId = currentUserService.getCurrentUser().getId();
 
@@ -303,7 +295,8 @@ public class StatsService {
         Long userId = currentUserService.getCurrentUser().getId();
 
         return statsMapper.mapToUserTerms(pagesClient.callAllPages(
-                (page, size) -> statsHttpContract.findUserTermsByProject(project.getId(), userId, page, size))).stream()
+                (page, size) ->
+                    statsHttpContract.findUserTermsByProject(project.getId(), userId, page, size))).stream()
             .toList();
 
     }
@@ -386,7 +379,7 @@ public class StatsService {
     }
 
     public List<JsonObject> statConnectionsEvolution(Project project, int daysRange, Date startDate, Date endDate,
-                                                     boolean accumulate) {
+        boolean accumulate) {
         securityACLService.check(project, READ);
         Query query = new Query();
         query.addCriteria(org.springframework.data.mongodb.core.query.Criteria.where("project").is(project.getId()));
@@ -410,7 +403,7 @@ public class StatsService {
 
 
     public List<JsonObject> statImageConsultationsEvolution(Project project, int daysRange, Date startDate,
-                                                            Date endDate, boolean accumulate) {
+        Date endDate, boolean accumulate) {
         securityACLService.check(project, READ);
         Query query = new Query();
         query.addCriteria(org.springframework.data.mongodb.core.query.Criteria.where("project").is(project.getId()));
@@ -433,7 +426,7 @@ public class StatsService {
     }
 
     public List<JsonObject> statAnnotationActionsEvolution(Project project, int daysRange, Date startDate, Date endDate,
-                                                           boolean accumulate, String type) {
+        boolean accumulate, String type) {
         securityACLService.check(project, READ);
         Query query = new Query();
         query.addCriteria(org.springframework.data.mongodb.core.query.Criteria.where("project").is(project.getId()));
@@ -458,7 +451,7 @@ public class StatsService {
     }
 
     private List<JsonObject> aggregateByPeriods(List<Date> creationDates, int daysRange, Date startDate, Date endDate,
-                                                boolean accumulate) {
+        boolean accumulate) {
         List<JsonObject> data = new ArrayList<>();
         int nbItems = creationDates.size();
         int count = 0;

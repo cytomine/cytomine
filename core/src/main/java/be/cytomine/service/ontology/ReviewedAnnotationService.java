@@ -5,7 +5,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
@@ -16,6 +18,8 @@ import org.locationtech.jts.io.WKTReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.http.ReviewedAnnotationHttpContract;
+import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;
@@ -25,7 +29,6 @@ import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.ontology.ReviewedAnnotation;
-import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.dto.ReviewedAnnotationStatsEntry;
@@ -36,7 +39,6 @@ import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.ReviewedAnnotationListing;
 import be.cytomine.repository.image.ImageInstanceRepository;
 import be.cytomine.repository.ontology.ReviewedAnnotationRepository;
-import be.cytomine.repository.ontology.TermRepository;
 import be.cytomine.repository.ontology.UserAnnotationRepository;
 import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.AnnotationListingService;
@@ -82,7 +84,10 @@ public class ReviewedAnnotationService extends ModelService {
     private ValidateGeometryService validateGeometryService;
 
     @Autowired
-    private TermRepository termRepository;
+    private TermHttpContract termRepository;
+
+    @Autowired
+    private ReviewedAnnotationHttpContract reviewedAnnotationHttpContract;
 
     @Autowired
     private TaskService taskService;
@@ -184,7 +189,6 @@ public class ReviewedAnnotationService extends ModelService {
      * Add the new domain with JSON data
      *
      * @param jsonObject New domain data
-     *
      * @return Response structure (created domain data,..)
      */
     @Override
@@ -224,7 +228,6 @@ public class ReviewedAnnotationService extends ModelService {
      *
      * @param domain      Domain to update
      * @param jsonNewData New domain datas
-     *
      * @return Response structure (new domain data, old domain data..)
      */
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
@@ -242,7 +245,6 @@ public class ReviewedAnnotationService extends ModelService {
      * @param transaction  Transaction link with this command
      * @param task         Task for this command
      * @param printMessage Flag if client will print or not confirm message
-     *
      * @return Response structure (code, old domain,..)
      */
     @Override
@@ -276,8 +278,22 @@ public class ReviewedAnnotationService extends ModelService {
             }
         );
 
-        ReviewedAnnotation review = createReviewAnnotation(basedAnnotation, terms);
-        return this.add(review.toJsonObject());
+        ReviewedAnnotation review = createReviewAnnotation(basedAnnotation);
+
+        Set<Long> termsToAdd = Stream.concat(
+                basedAnnotation.termsForReview().stream().map(CytomineDomain::getId),
+                terms == null ? Stream.empty() : terms.stream())
+            .collect(Collectors.toSet());
+
+        JsonObject reviewJson = review.toJsonObject();
+        reviewJson.put("terms", new ArrayList<>(termsToAdd));
+
+        CommandResponse commandResponse = this.add(reviewJson);
+
+        reviewedAnnotationHttpContract.replaceAllTermIds(commandResponse.getObject().getId(),
+            currentUserService.getCurrentUser().getId(), termsToAdd);
+
+        return commandResponse;
     }
 
     public CommandResponse unReviewAnnotation(Long idAnnotation) {
@@ -300,11 +316,9 @@ public class ReviewedAnnotationService extends ModelService {
      * Review annotation with the specified terms
      *
      * @param annotation Annotation to review
-     * @param terms      Terms to add to the annotation
-     *
      * @return The reviewed annotation
      */
-    private ReviewedAnnotation createReviewAnnotation(AnnotationDomain annotation, List<Long> terms) {
+    private ReviewedAnnotation createReviewAnnotation(AnnotationDomain annotation) {
         ReviewedAnnotation review = new ReviewedAnnotation();
         review.setParentIdent(annotation.getId());
         review.setParentClassName(annotation.getClass().getName());
@@ -315,20 +329,6 @@ public class ReviewedAnnotationService extends ModelService {
         review.setSlice(annotation.getSlice());
         review.setProject(annotation.getProject());
         review.setGeometryCompression(annotation.getGeometryCompression());
-
-        if (terms != null) {
-            //terms in request param
-            for (Long term : terms) {
-                review.getTerms().add(termRepository.findById(term)
-                    .orElseThrow(() -> new ObjectNotFoundException("Term", term)));
-            }
-        } else {
-            //nothing in param, add term from annotation
-            for (Term term : annotation.termsForReview()) {
-                review.getTerms().add(term);
-            }
-
-        }
         review.setReviewUser(currentUserService.getCurrentUser());
         return review;
     }
@@ -499,7 +499,6 @@ public class ReviewedAnnotationService extends ModelService {
      * @param coveringAnnotations List of reviewed annotations id that are covering by newLocation geometry
      * @param newLocation         A geometry (wkt format)
      * @param remove              Flag that tell to extend or substract part of geometry from  coveringAnnotations list
-     *
      * @return The first annotation data
      */
     // TODO: could be generic (same logic as for user annotation)

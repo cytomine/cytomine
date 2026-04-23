@@ -9,15 +9,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.RequestPatternBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.verification.LoggedRequest;
 import jakarta.persistence.EntityManager;
 import org.apache.commons.lang3.time.DateUtils;
 import org.assertj.core.api.AssertionsForClassTypes;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.io.ParseException;
@@ -25,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -37,6 +33,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.TestUtils;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.config.properties.ApplicationProperties;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.AbstractSlice;
@@ -50,16 +47,10 @@ import be.cytomine.domain.security.User;
 import be.cytomine.utils.JsonObject;
 
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
-import static be.cytomine.service.search.RetrievalService.CBIR_API_BASE_PATH;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.matching;
-import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
@@ -75,7 +66,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 public class UserAnnotationResourceTests {
 
     @Autowired
@@ -93,7 +84,8 @@ public class UserAnnotationResourceTests {
     @Autowired
     private ApplicationProperties applicationProperties;
 
-    private static WireMockServer wireMockServer = new WireMockServer(8888);
+    @Autowired
+    private WiremockRepository wiremockRepository;
 
     private Project project;
     private ImageInstance image;
@@ -101,43 +93,6 @@ public class UserAnnotationResourceTests {
     private Term term;
     private User me;
     private UserAnnotation userAnnotation;
-
-    private static void setupStub() {
-        /* Simulate call to PIMS */
-        wireMockServer.stubFor(WireMock.post(urlPathMatching(IMS_API_BASE_PATH + "/image/.*/annotation/drawing"))
-            .withRequestBody(WireMock.matching(".*"))
-            .willReturn(aResponse()
-                .withStatus(HttpStatus.OK.value())
-                .withBody(UUID.randomUUID().toString().getBytes())
-            )
-        );
-
-        /* Simulate call to CBIR server */
-        wireMockServer.stubFor(WireMock.post(urlPathEqualTo(CBIR_API_BASE_PATH + "/images"))
-            .withQueryParam("storage", matching(".*"))
-            .withQueryParam("index", equalTo("annotation"))
-            .willReturn(aResponse().withBody(UUID.randomUUID().toString()))
-        );
-
-        wireMockServer.stubFor(WireMock.delete(urlPathMatching(CBIR_API_BASE_PATH + "/images/.*"))
-            .withQueryParam("storage", matching(".*"))
-            .withQueryParam("index", equalTo("annotation"))
-            .willReturn(aResponse().withBody(UUID.randomUUID().toString()))
-        );
-    }
-
-    @BeforeAll
-    public static void beforeAll() {
-        wireMockServer = new WireMockServer(8888);
-        wireMockServer.start();
-
-        setupStub();
-    }
-
-    @AfterAll
-    public static void afterAll() {
-        wireMockServer.stop();
-    }
 
     @Test
     @Transactional
@@ -320,6 +275,7 @@ public class UserAnnotationResourceTests {
         this.image = builder.givenAnImageInstance(this.project);
         this.slice = builder.givenASliceInstance(this.image, 0, 0, 0);
         this.term = builder.givenATerm(this.project.getOntology());
+        wiremockRepository.stubTerm(this.term);
         this.me = builder.givenSuperAdmin();
         this.userAnnotation = builder.givenAUserAnnotation(
             this.slice,
@@ -425,6 +381,8 @@ public class UserAnnotationResourceTests {
 
         Term term1 = builder.givenATerm(userAnnotation.getProject().getOntology());
         Term term2 = builder.givenATerm(userAnnotation.getProject().getOntology());
+        wiremockRepository.stubTerm(term1);
+        wiremockRepository.stubTerm(term2);
         JsonObject jsonObject = userAnnotation.toJsonObject();
         jsonObject.put("term", Arrays.asList(term1.getId(), term2.getId()));
 
@@ -494,7 +452,7 @@ public class UserAnnotationResourceTests {
     public void getUserAnnotationCrop() throws Exception {
         UserAnnotation annotation = givenAUserAnnotationWithValidImageServer(builder);
 
-        configureFor("localhost", 8888);
+        configureFor("localhost", WiremockRepository.SERVER.port());
 
         byte[] mockResponse = UUID.randomUUID()
             .toString()
@@ -507,7 +465,7 @@ public class UserAnnotationResourceTests {
             = "{\"length\":512,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))\"}],\"timepoints\":0,\"background_transparency\":0}";
         System.out.println(url);
         System.out.println(body);
-        stubFor(post(urlEqualTo(IMS_API_BASE_PATH + url)).withRequestBody(equalTo(
+        stubFor(WireMock.post(urlEqualTo(IMS_API_BASE_PATH + url)).withRequestBody(WireMock.equalTo(
                     body
                 ))
                 .willReturn(
@@ -521,7 +479,7 @@ public class UserAnnotationResourceTests {
             ))
             .andExpect(status().isOk())
             .andReturn();
-        List<LoggedRequest> all = wireMockServer.findAll(RequestPatternBuilder.allRequests());
+        List<LoggedRequest> all = WiremockRepository.SERVER.findAll(RequestPatternBuilder.allRequests());
         AssertionsForClassTypes.assertThat(mvcResult.getResponse().getContentAsByteArray()).isEqualTo(mockResponse);
     }
 
@@ -531,7 +489,7 @@ public class UserAnnotationResourceTests {
     public void getUserAnnotationCropMask() throws Exception {
         UserAnnotation annotation = givenAUserAnnotationWithValidImageServer(builder);
 
-        configureFor("localhost", 8888);
+        configureFor("localhost", WiremockRepository.SERVER.port());
 
         byte[] mockResponse = UUID.randomUUID()
             .toString()
@@ -544,7 +502,7 @@ public class UserAnnotationResourceTests {
             = "{\"length\":512,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))\",\"fill_color\":\"#fff\"}],\"timepoints\":0}";
         System.out.println(url);
         System.out.println(body);
-        stubFor(post(urlEqualTo(IMS_API_BASE_PATH + url)).withRequestBody(equalTo(
+        stubFor(WireMock.post(urlEqualTo(IMS_API_BASE_PATH + url)).withRequestBody(WireMock.equalTo(
                     body
                 ))
                 .willReturn(
@@ -558,7 +516,7 @@ public class UserAnnotationResourceTests {
             ))
             .andExpect(status().isOk())
             .andReturn();
-        List<LoggedRequest> all = wireMockServer.findAll(RequestPatternBuilder.allRequests());
+        List<LoggedRequest> all = WiremockRepository.SERVER.findAll(RequestPatternBuilder.allRequests());
         AssertionsForClassTypes.assertThat(mvcResult.getResponse().getContentAsByteArray()).isEqualTo(mockResponse);
     }
 
@@ -569,7 +527,7 @@ public class UserAnnotationResourceTests {
     public void getUserAnnotationAlphaMask() throws Exception {
         UserAnnotation annotation = givenAUserAnnotationWithValidImageServer(builder);
 
-        configureFor("localhost", 8888);
+        configureFor("localhost", WiremockRepository.SERVER.port());
 
         byte[] mockResponse = UUID.randomUUID()
             .toString()
@@ -584,7 +542,7 @@ public class UserAnnotationResourceTests {
             = "{\"level\":0,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))\"}],\"timepoints\":0,\"background_transparency\":100}";
         System.out.println(url);
         System.out.println(body);
-        stubFor(WireMock.post(urlEqualTo(IMS_API_BASE_PATH + url)).withRequestBody(equalTo(
+        stubFor(WireMock.post(urlEqualTo(IMS_API_BASE_PATH + url)).withRequestBody(WireMock.equalTo(
                     body
                 ))
                 .willReturn(
@@ -598,7 +556,7 @@ public class UserAnnotationResourceTests {
             ))
             .andExpect(status().isOk())
             .andReturn();
-        List<LoggedRequest> all = wireMockServer.findAll(RequestPatternBuilder.allRequests());
+        List<LoggedRequest> all = WiremockRepository.SERVER.findAll(RequestPatternBuilder.allRequests());
         AssertionsForClassTypes.assertThat(mvcResult.getResponse().getContentAsByteArray()).isEqualTo(mockResponse);
     }
 

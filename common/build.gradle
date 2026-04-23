@@ -11,7 +11,7 @@ version = '0.0.1-SNAPSHOT'
 description = 'Common library for Cytomine microservices'
 
 java {
-    sourceCompatibility = '17'
+    sourceCompatibility = '21'
 }
 
 checkstyle {

@@ -353,7 +353,6 @@ export default {
     maxZoom() {
       return this.$store.getters[this.imageModule + 'maxZoom'];
     },
-
     center: {
       get() {
         return this.imageWrapper.view.center;

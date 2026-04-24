@@ -15,7 +15,7 @@
       </b-table-column>
 
       <b-table-column :label="$t('app-engine.task.name')">
-        {{ formatTaskName(props.row) }}
+        {{ taskRunName(props.row) }}
       </b-table-column>
     </template>
 
@@ -44,6 +44,7 @@
 <script>
 import TaskRunStateIcon from '@/components/appengine/task-run/TaskRunStateIcon';
 import TaskRunParametersTable from '@/components/appengine/task-run/TaskRunParametersTable';
+import {formatTaskName} from '@/utils/app';
 
 export default {
   name: 'TaskRunTable',
@@ -60,12 +61,6 @@ export default {
     };
   },
   methods: {
-    formattedTime(timestamp) {
-      return (new Date(timestamp)).toLocaleString();
-    },
-    formatTaskName(row) {
-      return `${row.task.name} (${row.task.version}) - ${this.formattedTime(row.createdAt)}`;
-    },
     async onDetailsOpen(taskRun) {
       if (!taskRun.inputs) {
         await taskRun.fetchInputs();
@@ -75,6 +70,9 @@ export default {
         await taskRun.fetchOutputs();
       }
     },
+    taskRunName(taskRun) {
+      return formatTaskName(taskRun);
+    }
   },
 };
 </script>

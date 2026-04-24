@@ -61,6 +61,7 @@ import be.cytomine.appengine.handlers.StorageData;
 import be.cytomine.appengine.handlers.StorageDataType;
 import be.cytomine.appengine.handlers.StorageHandler;
 import be.cytomine.appengine.handlers.StorageStringEntry;
+import be.cytomine.appengine.mapper.TaskMapper;
 import be.cytomine.appengine.models.CheckTime;
 import be.cytomine.appengine.models.Match;
 import be.cytomine.appengine.models.task.Author;
@@ -89,6 +90,8 @@ public class TaskService {
     private final StorageHandler fileStorageHandler;
 
     private final RegistryHandler registryHandler;
+
+    private final TaskMapper taskMapper;
 
     private final TaskValidationService taskValidationService;
 
@@ -284,8 +287,7 @@ public class TaskService {
             .textValue());
 
         // resources
-        JsonNode resources =
-            descriptorFileAsJson.get("configuration").get("resources");
+        JsonNode resources = descriptorFileAsJson.get("configuration").get("resources");
 
         if (!Objects.nonNull(resources)) {
             task.setRam(defaultRam);
@@ -596,25 +598,7 @@ public class TaskService {
     }
 
     public TaskDescription makeTaskDescription(Task task) {
-        TaskDescription taskDescription = new TaskDescription(
-            task.getIdentifier(),
-            task.getName(),
-            task.getNamespace(),
-            task.getVersion(),
-            task.getDescription()
-        );
-        taskDescription.setAuthors(
-            task.getAuthors().stream()
-                .map(a -> new TaskAuthor(
-                    a.getFirstName(),
-                    a.getLastName(),
-                    a.getOrganization(),
-                    a.getEmail(),
-                    a.isContact()
-                ))
-                .collect(Collectors.toSet())
-        );
-        return taskDescription;
+        return taskMapper.toTaskDescription(task);
     }
 
     public List<TaskInput> makeTaskInputs(Task task) {

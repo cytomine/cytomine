@@ -283,7 +283,7 @@ public class ReadTaskStepDefinitions {
 
         StorageData emptyFile = new StorageData(tempFile, descriptorFileName);
         emptyFile.peek().setName("descriptor.yml");
-        emptyFile.peek().setStorageId(storage.getIdStorage());
+        emptyFile.peek().setStorageId(storage.id());
         storageHandler.readStorageData(emptyFile);
         Assertions.assertTrue(Files.size(emptyFile.peek().getData().toPath()) > 0);
     }

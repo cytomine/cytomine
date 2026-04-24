@@ -1121,9 +1121,6 @@ public class TaskProvisioningService {
     }
 
     private StateAction createStateAction(Run run, TaskRunState state) {
-        StateAction action = new StateAction();
-        action.setStatus("success");
-
         TaskDescription description = taskService.makeTaskDescription(run.getTask());
         Resource resource = new Resource(
             run.getId(),
@@ -1132,9 +1129,8 @@ public class TaskProvisioningService {
             new Date(),
             new Date()
         );
-        action.setResource(resource);
 
-        return action;
+        return new StateAction("success", resource);
     }
 
     @NotNull
@@ -1508,7 +1504,7 @@ public class TaskProvisioningService {
     ) throws IOException {
         log.info("provisioning streaming: preparing...");
         Storage runStorage = new Storage("task-run-inputs-" + runId);
-        Path filePath = Paths.get(basePath, runStorage.getIdStorage(), parameterName);
+        Path filePath = Paths.get(basePath, runStorage.storageId(), parameterName);
         Files.createDirectories(filePath.getParent());
         return filePath;
     }
@@ -1522,7 +1518,7 @@ public class TaskProvisioningService {
         Storage runStorage = new Storage("task-run-inputs-" + runId);
         Path filePath = Paths.get(
             basePath,
-            runStorage.getIdStorage(),
+            runStorage.storageId(),
             parameterName + "/" + String.join("/",
             indexesArray));
         Files.createDirectories(filePath.getParent());
@@ -1533,7 +1529,7 @@ public class TaskProvisioningService {
             + "/"
             + (arrayYmlPosition.length > 0 ? String.join("/", arrayYmlPosition) + "/" : "")
             + "array.yml";
-        Path arrayYmlPath = Paths.get(basePath, runStorage.getIdStorage(), "/" + arrayYmlFilePath);
+        Path arrayYmlPath = Paths.get(basePath, runStorage.storageId(), "/" + arrayYmlFilePath);
         if (Files.exists(arrayYmlPath)) {
             // update the array.yml metadata file
             log.info("provisioning collection item streaming: updating collection array.yml...");
@@ -1545,7 +1541,7 @@ public class TaskProvisioningService {
             // update CRC32 checksum for it
             long updatedChecksum = calculateFileCRC32(arrayYmlPath.toFile());
             Checksum checksum = checksumRepository.findByReference(
-                runStorage.getIdStorage()
+                runStorage.storageId()
                 + "-"
                 + arrayYmlFilePath);
             checksum.setChecksumCRC32(updatedChecksum);
@@ -1557,7 +1553,7 @@ public class TaskProvisioningService {
             Files.writeString(arrayYmlPath, newContent, Charset.defaultCharset());
             // create CRC32 checksum for it
             setChecksumCRC32(
-                runStorage.getIdStorage(),
+                runStorage.storageId(),
                 calculateFileCRC32(arrayYmlPath.toFile()),
                 arrayYmlFilePath);
         }

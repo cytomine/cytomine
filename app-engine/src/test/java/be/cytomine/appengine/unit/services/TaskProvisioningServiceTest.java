@@ -314,7 +314,7 @@ public class TaskProvisioningServiceTest {
 
     @DisplayName("Failed to retrieve a zip archive and throw 'ProvisioningException' when run state is invalid")
     @Test
-    public void retrieveIOZipArchiveShouldThrowProvisioningExceptionWhenInvalidRunState() throws Exception {
+    public void retrieveIOZipArchiveShouldThrowProvisioningExceptionWhenInvalidRunState() {
         Run localRun = TaskUtils.createTestRun(false);
         localRun.setState(TaskRunState.CREATED);
 
@@ -334,7 +334,7 @@ public class TaskProvisioningServiceTest {
 
     @DisplayName("Failed to retrieve a zip archive and throw 'ProvisioningException' when provisions are empty")
     @Test
-    public void retrieveIOZipArchiveShouldThrowProvisioningExceptionWhenEmptyProvisions() throws Exception {
+    public void retrieveIOZipArchiveShouldThrowProvisioningExceptionWhenEmptyProvisions() {
         Run run = TaskUtils.createTestRun(false);
         run.setState(TaskRunState.PROVISIONED);
 
@@ -384,7 +384,7 @@ public class TaskProvisioningServiceTest {
 
     @DisplayName("Failed to save the outputs archive and throw 'ProvisioningException' when not authenticated")
     @Test
-    public void postOutputsZipArchiveShouldThrowProvisioningExceptionWhenNotAuth() throws Exception {
+    public void postOutputsZipArchiveShouldThrowProvisioningExceptionWhenNotAuth() {
         Run localRun = TaskUtils.createTestRun(false);
         localRun.setState(TaskRunState.RUNNING);
 
@@ -416,7 +416,7 @@ public class TaskProvisioningServiceTest {
 
     @DisplayName("Failed to save the outputs archive and throw 'ProvisioningException' when not in correct output")
     @Test
-    public void postOutputsZipArchiveShouldThrowProvisioningExceptionWhenNotCorrectOutput() throws Exception {
+    public void postOutputsZipArchiveShouldThrowProvisioningExceptionWhenNotCorrectOutput() {
         Run localRun = TaskUtils.createTestRun(false);
         localRun.setState(TaskRunState.RUNNING);
 
@@ -436,7 +436,7 @@ public class TaskProvisioningServiceTest {
 
     @DisplayName("Failed to save the outputs archive and throw 'ProvisioningException' when missing output")
     @Test
-    public void postOutputsZipArchiveShouldThrowProvisioningExceptionWhenMissingOutput() throws Exception {
+    public void postOutputsZipArchiveShouldThrowProvisioningExceptionWhenMissingOutput() {
         Run localRun = TaskUtils.createTestRun(false);
         localRun.setState(TaskRunState.RUNNING);
         localRun.setTask(TaskUtils.createTestTaskWithMultipleIO());
@@ -494,7 +494,7 @@ public class TaskProvisioningServiceTest {
 
     @DisplayName("Failed to retrieve the outputs and throw 'ProvisioningException'")
     @Test
-    public void retrieveRunOutputsShouldThrowProvisioningException() throws Exception {
+    public void retrieveRunOutputsShouldThrowProvisioningException() {
         when(runRepository.findById(run.getId())).thenReturn(Optional.of(run));
 
         ProvisioningException exception = assertThrows(
@@ -543,7 +543,7 @@ public class TaskProvisioningServiceTest {
 
     @DisplayName("Failed to retrieve the inputs and throw 'ProvisioningException'")
     @Test
-    public void retrieveRunInputsShouldThrowProvisioningException() throws Exception {
+    public void retrieveRunInputsShouldThrowProvisioningException() {
         Run localRun = TaskUtils.createTestRun(false);
         localRun.setState(TaskRunState.CREATED);
 
@@ -615,8 +615,7 @@ public class TaskProvisioningServiceTest {
     @Test
     public void updateRunStateShouldUpdateStateToProvisioned() throws Exception {
         Run localRun = TaskUtils.createTestRun(false);
-        State desiredState = new State();
-        desiredState.setDesired(TaskRunState.PROVISIONED);
+        State desiredState = new State(TaskRunState.PROVISIONED);
 
         IntegerPersistence persistedProvision = new IntegerPersistence();
         persistedProvision.setValueType(ValueType.INTEGER);
@@ -639,9 +638,9 @@ public class TaskProvisioningServiceTest {
 
         StateAction result = taskProvisioningService.updateRunState(localRun.getId().toString(), desiredState);
 
-        assertEquals("success", result.getStatus());
-        assertEquals(localRun.getId(), result.getResource().id());
-        assertEquals(TaskRunState.PROVISIONED, result.getResource().state());
+        assertEquals("success", result.status());
+        assertEquals(localRun.getId(), result.resource().id());
+        assertEquals(TaskRunState.PROVISIONED, result.resource().state());
         verify(runRepository, times(1)).findById(localRun.getId());
         verify(runRepository, times(1)).saveAndFlush(any(Run.class));
     }
@@ -654,16 +653,15 @@ public class TaskProvisioningServiceTest {
         Run localRun = TaskUtils.createTestRun(false);
         localRun.setTask(localTask);
         localRun.setState(TaskRunState.PROVISIONED);
-        State desiredState = new State();
-        desiredState.setDesired(TaskRunState.RUNNING);
+        State desiredState = new State(TaskRunState.RUNNING);
 
         when(runRepository.findById(localRun.getId())).thenReturn(Optional.of(localRun));
 
         StateAction result = taskProvisioningService.updateRunState(localRun.getId().toString(), desiredState);
 
-        assertEquals("success", result.getStatus());
-        assertEquals(localRun.getId(), result.getResource().id());
-        assertEquals(TaskRunState.QUEUING, result.getResource().state());
+        assertEquals("success", result.status());
+        assertEquals(localRun.getId(), result.resource().id());
+        assertEquals(TaskRunState.QUEUING, result.resource().state());
         verify(runRepository, times(1)).findById(localRun.getId());
         verify(runRepository, times(1)).saveAndFlush(any(Run.class));
     }
@@ -672,8 +670,7 @@ public class TaskProvisioningServiceTest {
     @Test
     public void updateRunStateShouldThrowProvisioningException() {
         Run localRun = TaskUtils.createTestRun(false);
-        State desiredState = new State();
-        desiredState.setDesired(TaskRunState.PENDING);
+        State desiredState = new State(TaskRunState.PENDING);
 
         when(runRepository.findById(localRun.getId())).thenReturn(Optional.of(localRun));
 
@@ -698,7 +695,7 @@ public class TaskProvisioningServiceTest {
 
     @DisplayName("Failed to retrieve a task run and throw 'ProvisioningException'")
     @Test
-    public void retrieveRunShouldThrowProvisioningException() throws ProvisioningException {
+    public void retrieveRunShouldThrowProvisioningException() {
         when(runRepository.findById(run.getId())).thenReturn(Optional.empty());
 
         ProvisioningException exception = assertThrows(

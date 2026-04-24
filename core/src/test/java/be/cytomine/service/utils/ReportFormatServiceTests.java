@@ -18,6 +18,7 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.security.User;
 import be.cytomine.dto.image.Point;
@@ -30,20 +31,19 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 public class ReportFormatServiceTests {
 
-    private Object[][] expectedDataObject;
-
     @Autowired
     ReportFormatService reportFormatService;
-
     @Autowired
     BasicInstanceBuilder builder;
-
     @Autowired
     TermService termService;
+    @Autowired
+    WiremockRepository wiremockRepository;
+    private Object[][] expectedDataObject;
 
     @Test
     public void connectionHistoryToReportFormat() {
@@ -137,7 +137,7 @@ public class ReportFormatServiceTests {
 
     private List<JsonObject> buildUserConnectionHistory(boolean isComplete) {
         Date date = new Date();
-        expectedDataObject = new Object[][]{
+        expectedDataObject = new Object[][] {
             {
                 "Date",
                 "Duration (ms)",
@@ -166,7 +166,7 @@ public class ReportFormatServiceTests {
     }
 
     private List<JsonObject> buildUserImageConsultation(boolean isComplete) {
-        expectedDataObject = new Object[][]{
+        expectedDataObject = new Object[][] {
             {
                 "Cumulated duration (ms)",
                 "First consultation",
@@ -208,8 +208,10 @@ public class ReportFormatServiceTests {
     private List<Map<String, Object>> buildAnnotations(boolean isComplete) {
         Term term1 = builder.givenATerm();
         Term term2 = builder.givenATerm();
+        wiremockRepository.stubTerm(term1);
+        wiremockRepository.stubTerm(term2);
         Point point = new Point(2545454.231212, 2545454.23111);
-        expectedDataObject = new Object[][]{
+        expectedDataObject = new Object[][] {
             {
                 "Id",
                 "Area (microns²)",
@@ -232,9 +234,9 @@ public class ReportFormatServiceTests {
                 "1234567",
                 "Beautiful image",
                 "Paul",
-                termService.find(term1.getId()).get().getName() + "- " + termService.find(term2.getId())
+                termService.find(term1.getId()).get().name() + "- " + termService.find(term2.getId())
                     .get()
-                    .getName(),
+                    .name(),
                 "http://cropURL",
                 "http://imageURL"
             },
@@ -261,7 +263,7 @@ public class ReportFormatServiceTests {
     private List<Map<String, Object>> buildUsers(boolean isComplete) {
         User user1 = builder.givenAUser();
         User user2 = builder.givenAUser();
-        expectedDataObject = new Object[][]{
+        expectedDataObject = new Object[][] {
             {"Username", "Name"},
             {user1.getUsername(), user1.getName()},
             {user2.getUsername(), user2.getName()},

@@ -2,9 +2,11 @@ import {shallowMount} from '@vue/test-utils';
 
 import AppBottomDrawer from '@/components/appengine/AppBottomDrawer.vue';
 import Task from '@/utils/appengine/task';
+import TaskRun from '@/utils/appengine/task-run';
 
 jest.mock('@/utils/appengine/task', () => ({
   fetchAll: jest.fn(),
+  fetchTaskRunStatus: jest.fn(),
   createTaskRun: jest.fn(),
   batchProvisionTask: jest.fn(),
   singleProvisionTask: jest.fn(),
@@ -12,12 +14,16 @@ jest.mock('@/utils/appengine/task', () => ({
 }));
 
 jest.mock('@/utils/appengine/task-run', () => {
-  return jest.fn().mockImplementation((resource) => ({
+  const mockConstructor = jest.fn().mockImplementation((resource) => ({
     ...resource,
     fetch: jest.fn(),
     isTerminalState: jest.fn(() => false),
     project: null,
   }));
+
+  mockConstructor.fetchByProject = jest.fn();
+
+  return mockConstructor;
 });
 
 jest.mock('@/utils/app', () => ({
@@ -31,6 +37,14 @@ describe('AppBottomDrawer.vue', () => {
       version: '1.0.0',
       name: 'Segmentation Task',
       description: 'Mock task description',
+    },
+  ];
+
+  const mockTaskRuns = [
+    {
+      taskRunId: 1,
+      createdAt: '2024-01-01T10:00:00Z',
+      project: {id: 99},
     },
   ];
 
@@ -87,7 +101,8 @@ describe('AppBottomDrawer.vue', () => {
           tasks: [],
           inputs: {},
           isRunning: false,
-          trackedTaskRun: null,
+          allTaskRuns: [],
+          trackedTaskRuns: [],
           ...data,
         };
       },
@@ -97,6 +112,7 @@ describe('AppBottomDrawer.vue', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     Task.fetchAll.mockResolvedValue(mockTasks);
+    TaskRun.fetchByProject.mockResolvedValue(mockTaskRuns);
   });
 
   it('should fetch tasks on created', async () => {
@@ -200,8 +216,6 @@ describe('AppBottomDrawer.vue', () => {
       writable: true,
     });
 
-    jest.spyOn(wrapper.vm, 'startPolling').mockImplementation(() => {});
-
     await wrapper.vm.runTask();
 
     expect(Task.createTaskRun).toHaveBeenCalledWith(
@@ -225,8 +239,7 @@ describe('AppBottomDrawer.vue', () => {
     );
 
     expect(Task.runTask).toHaveBeenCalledWith(99, 123);
-    expect(wrapper.vm.trackedTaskRun).toBeTruthy();
-    expect(wrapper.vm.startPolling).toHaveBeenCalled();
+    expect(wrapper.vm.trackedTaskRuns.length).toBeTruthy();
     expect(wrapper.vm.inputs).toEqual({});
   });
 
@@ -259,8 +272,6 @@ describe('AppBottomDrawer.vue', () => {
       writable: true,
     });
 
-    jest.spyOn(wrapper.vm, 'startPolling').mockImplementation(() => {});
-
     await wrapper.vm.runTask();
 
     expect(Task.singleProvisionTask).toHaveBeenCalledTimes(1);
@@ -269,29 +280,6 @@ describe('AppBottomDrawer.vue', () => {
     expect(Task.singleProvisionTask.mock.calls[0][2]).toBe('upload');
 
     expect(Task.runTask).toHaveBeenCalledWith(99, 456);
-  });
-
-  it('should stop polling when tracked task run reaches terminal state', async () => {
-    jest.useFakeTimers();
-
-    const wrapper = createWrapper();
-
-    wrapper.vm.trackedTaskRun = {
-      fetch: jest.fn().mockResolvedValue(),
-      isTerminalState: jest.fn(() => true),
-    };
-
-    const stopPollingSpy = jest.spyOn(wrapper.vm, 'stopPolling');
-
-    wrapper.vm.startPolling();
-
-    jest.advanceTimersByTime(2000);
-    await Promise.resolve();
-
-    expect(wrapper.vm.trackedTaskRun.fetch).toHaveBeenCalled();
-    expect(stopPollingSpy).toHaveBeenCalled();
-
-    jest.useRealTimers();
   });
 
   it('should show an error toast when task execution fails', async () => {

@@ -24,13 +24,8 @@ spec:
         - |
           echo "Waiting for Gateway to be programmed..."
           for i in $(seq 1 120); do
-            # Check if Gateway has an address
-            if nslookup cytomine.{{ .Release.Namespace }}.svc.cluster.local 2>/dev/null | grep -q "Address"; then
-              echo "Gateway service is available"
-              exit 0
-            fi
-            # Also check for envoy proxy service
-            if nslookup envoy-{{ .Release.Namespace }}-cytomine-https.{{ .Release.Namespace }}.svc.cluster.local 2>/dev/null | grep -q "Address"; then
+            # Check if the envoy proxy service exists
+            if nslookup envoy-{{ .Release.Namespace }}-cytomine.{{ .Release.Namespace }}.svc.cluster.local 2>/dev/null | grep -q "Address"; then
               echo "Envoy proxy service is available"
               exit 0
             fi

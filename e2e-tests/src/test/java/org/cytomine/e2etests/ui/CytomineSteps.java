@@ -285,31 +285,29 @@ public class CytomineSteps {
     }
 
     public void selectTask(Wait<WebDriver> wait, String taskName, String taskVersion) {
-        webDriverUtils.byClick(wait, By.cssSelector(".executor .select select"));
+        By appButton = By.xpath("//button[contains(@class,'button')][.//i[contains(@class,'fa-chevron-up')]]");
+        webDriverUtils.byClick(wait, appButton);
 
         String optionXpath = format(
-            "//div[contains(@class, 'executor')]//option[contains(text(), '%s') and contains(text(), '%s')]",
-            taskName, taskVersion
+            "//option[contains(text(), '%s') and contains(text(), '%s')]",
+            taskName,
+            taskVersion
         );
         webDriverUtils.xpathClick(wait, optionXpath);
         webDriverUtils.byIsDisplayed(
             wait,
             By.xpath(format(
-                "//div[contains(@class, 'executor')]//p[contains(text(), '%s') and contains(text(), '%s')]",
+                "//div[contains(@class,'selected-app-card')]//strong[contains(text(),'%s') and contains(text(),'%s')]",
                 taskName,
                 taskVersion
             ))
-        );
-        webDriverUtils.byIsDisplayed(
-            wait,
-            By.xpath("//section[contains(@class, 'fields')]//button[.//span[contains(text(), 'Select')]]")
         );
     }
 
     public void selectAnnotationForGeometryInput(Wait<WebDriver> wait) {
         webDriverUtils.xpathClick(
             wait,
-            "//section[contains(@class, 'fields')]//button[.//span[contains(text(), 'Select')]]"
+            "//div[contains(@class,'field')][.//span[.=' input ']]//button[.//span[.=' Select ']]"
         );
         webDriverUtils.byIsDisplayed(wait, By.cssSelector(".modal-card .annotation-content"));
         wait.until(d -> !d.findElements(By.cssSelector(".annotation-content > div")).isEmpty());
@@ -327,17 +325,13 @@ public class CytomineSteps {
     }
 
     public void runTask(Wait<WebDriver> wait, WebDriver driver) {
-        webDriverUtils.byIsDisplayed(
+        webDriverUtils.xpathClick(
             wait,
-            By.cssSelector(".executor .card-content section:last-child .button.is-primary:last-child")
-        );
-        webDriverUtils.byClick(
-            wait,
-            By.cssSelector(".executor .card-content section:last-child .button.is-primary:last-child")
+            "//button[contains(@class,'start-button')][.//span[.=' Run Task ']]"
         );
 
         Wait<WebDriver> longWait = new WebDriverWait(driver, Duration.ofSeconds(300));
-        webDriverUtils.byIsDisplayed(longWait, By.cssSelector(".runs .fa-check-circle"));
+        webDriverUtils.byIsDisplayed(longWait, By.cssSelector(".is-success .fa-check-circle"));
     }
 
     public void deleteTaskRun(Wait<WebDriver> wait, String projectUrl, String taskName) {

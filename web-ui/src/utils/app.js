@@ -57,3 +57,7 @@ export function isGeometry(parameter) {
 
   return false;
 }
+
+export function formatTaskName(taskRun) {
+  return `${taskRun.task.name} (${taskRun.task.version}) - ${(new Date(taskRun.createdAt)).toLocaleString()}`;
+}

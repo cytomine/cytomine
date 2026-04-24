@@ -283,7 +283,7 @@ services:
     ports:
       - 8000:8000
     volumes:
-      - weights:/weights
+      - ${DATA_PATH:-./data}/weights:/weights
     environment:
       API_BASE_PATH: ${SAM_API_BASE_PATH:-/sam}
       WEIGHTS_PATH: /weights

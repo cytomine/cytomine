@@ -32,33 +32,35 @@ jobs:
       - name: Set up chart-testing
         uses: helm/chart-testing-action@v2.8.0
 
+      - name: Define deployment name
+        run: echo "DEPLOYMENT_NAME=${GITHUB_SHA:0:7}" >> $GITHUB_ENV
+
+      - name: Login to registry
+        uses: docker/login-action@v4
+        with:
+          registry: registry.cytomine.org
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_TOKEN }}
+
       - name: Create kind cluster
         uses: helm/kind-action@v1.14.0
         with:
           node_image: registry.cytomine.org/docker/kindest/node:v1.32.0
-
-      - name: Install ingress-nginx
-        run: |
-          helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-          helm install ingress-nginx ingress-nginx/ingress-nginx \
-            --namespace ingress \
-            --create-namespace \
-            --set controller.service.type=ClusterIP \
-            --wait
+          cluster_name: cytomine
 
       - name: Create Namespace
         run: |
-          kubectl create ns cytomine-${{ github.sha }}
-          kubectl create ns cytomine-${{ github.sha }}-engine-tasks
+          kubectl create ns cytomine-${{ env.DEPLOYMENT_NAME }}
+          kubectl create ns cytomine-${{ env.DEPLOYMENT_NAME }}-engine-tasks
 
       - name: Enforce Restricted Namespace
-        run: kubectl label --overwrite ns cytomine-${{ github.sha }} pod-security.kubernetes.io/enforce=restricted
+        run: kubectl label --overwrite ns cytomine-${{ env.DEPLOYMENT_NAME }} pod-security.kubernetes.io/enforce=restricted
           pod-security.kubernetes.io/enforce-version=latest pod-security.kubernetes.io/warn=restricted
           pod-security.kubernetes.io/warn-version=latest
 
       - name: Create Harbor Registry secrets
         run: |
-          for ns in cytomine-${{ github.sha }} cytomine-${{ github.sha }}-engine-tasks; do
+          for ns in cytomine-${{ env.DEPLOYMENT_NAME }} cytomine-${{ env.DEPLOYMENT_NAME }}-engine-tasks; do
             kubectl create secret docker-registry docker-image-pull-secrets \
               --namespace=$ns \
               --docker-server=registry.cytomine.org \
@@ -67,69 +69,98 @@ jobs:
           done
 
           kubectl patch serviceaccount default \
-            --namespace=cytomine-${{ github.sha }} \
+            --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} \
             -p '{"imagePullSecrets":[{"name":"docker-image-pull-secrets"}]}'
-
-      - name: Get ingress IP
-        run: |
-          INGRESS_IP=$(kubectl get svc -n ingress ingress-nginx-controller -o jsonpath='{.spec.clusterIP}')
-          echo "INGRESS_IP=$INGRESS_IP" >> $GITHUB_ENV
 
       - name: Count e2e tests in selenium folder
         run: |
           E2E_TEST_COUNT=$(grep -r "@Test" e2e-tests/src/test/java/org/cytomine/e2etests/selenium/ --include="*.java" | wc -l)
           echo "E2E_TEST_COUNT=$E2E_TEST_COUNT" >> $GITHUB_ENV
 
-      - name: Run chart-testing (lint and install)
+      - name: Lint charts
         run: |
-          # Cytomine images from registry.cytomine.org/cytomine/
-          EXTRA_ARGS="--set test.ingressIP=${{ env.INGRESS_IP }} "
-          EXTRA_ARGS+="--set images.core=registry.cytomine.org/cytomine/core:${{ github.sha }} "
-          EXTRA_ARGS+="--set images.app_engine=registry.cytomine.org/cytomine/app-engine:${{ github.sha }} "
-          EXTRA_ARGS+="--set images.sam=registry.cytomine.org/cytomine/sam:${{ github.sha }} "
-          EXTRA_ARGS+="--set images.web_ui=registry.cytomine.org/cytomine/web-ui:${{ github.sha }} "
-          EXTRA_ARGS+="--set images.cbir=registry.cytomine.org/cytomine/cbir:${{ github.sha }} "
-          EXTRA_ARGS+="--set images.pims=registry.cytomine.org/cytomine/pims:${{ github.sha }} "
-          EXTRA_ARGS+="--set images.pims_import=registry.cytomine.org/cytomine/python-client:${{ github.sha }} "
-          EXTRA_ARGS+="--set images.repository=registry.cytomine.org/cytomine/repository:${{ github.sha }} "
-          EXTRA_ARGS+="--set images.e2e_tests=registry.cytomine.org/cytomine/e2e-tests:${{ github.sha }} "
-          EXTRA_ARGS+="--set images.tasks_runner_image=registry.cytomine.org/cytomine/app-engine-tasks-runner:${{ github.sha }} "
-          # External images from registry.cytomine.org/docker/
-          EXTRA_ARGS+="--set images.alpine=registry.cytomine.org/docker/library/alpine:3.18 "
-          EXTRA_ARGS+="--set images.curl=registry.cytomine.org/docker/curlimages/curl "
-          EXTRA_ARGS+="--set images.eclipse_temurin=registry.cytomine.org/docker/library/eclipse-temurin:8u462-b08-jdk-ubi9-minimal "
-          EXTRA_ARGS+="--set images.mongodb=registry.cytomine.org/docker/library/mongo:5.0-focal "
-          EXTRA_ARGS+="--set images.redis=registry.cytomine.org/docker/library/redis:7 "
-          EXTRA_ARGS+="--set images.pims_cache=registry.cytomine.org/docker/library/redis:7 "
-          EXTRA_ARGS+="--set images.iam=registry.cytomine.org/docker/keycloak/keycloak:26.3 "
-          EXTRA_ARGS+="--set images.postgresql_iam=registry.cytomine.org/docker/library/postgres:14 "
-          EXTRA_ARGS+="--set images.postgresql_app_engine=registry.cytomine.org/docker/library/postgres:14 "
-          EXTRA_ARGS+="--set images.postgis=registry.cytomine.org/docker/postgis/postgis:15-3.5 "
-          EXTRA_ARGS+="--set images.selenium=registry.cytomine.org/docker/selenium/standalone-firefox "
-          EXTRA_ARGS+="--set images.registry=registry.cytomine.org/docker/library/registry:2.8.3 "
-          EXTRA_ARGS+="--set test.e2eTestCount=${{ env.E2E_TEST_COUNT }}"
-          ct lint-and-install --config .github/ct.yaml --target-branch ${{ github.event.repository.default_branch }} \
-            --chart-dirs=helm/charts/ --all --namespace=cytomine-${{ github.sha }} \
-            --release-name=cytomine-${{ github.sha }} \
-            --helm-extra-set-args="$EXTRA_ARGS" \
-            --helm-extra-args="--timeout 20m"
+          ct lint --target-branch ${{ github.event.repository.default_branch }} \
+            --chart-dirs=helm/charts/ --all
+
+      - name: Build chart dependencies
+        run: helm dependency build helm/charts/cytomine/
+
+      - name: Install chart
+        run: |
+          NS=cytomine-${{ env.DEPLOYMENT_NAME }}
+          helm install $NS helm/charts/cytomine/ \
+            --namespace=$NS \
+            -f helm/charts/cytomine/ci/test-values.yaml \
+            --set gateway.installController=true \
+            --set gateway.className=envoy-gateway \
+            --set "gateway-helm.deployment.certgen.image.repository=registry.cytomine.org/docker/envoyproxy/gateway" \
+            --set "gateway-helm.deployment.envoyGateway.image.repository=registry.cytomine.org/docker/envoyproxy/gateway" \
+            --set images.core=registry.cytomine.org/cytomine/core:${{ env.DEPLOYMENT_NAME }} \
+            --set images.app_engine=registry.cytomine.org/cytomine/app-engine:${{ env.DEPLOYMENT_NAME }} \
+            --set images.sam=registry.cytomine.org/cytomine/sam:${{ env.DEPLOYMENT_NAME }} \
+            --set images.web_ui=registry.cytomine.org/cytomine/web-ui:${{ env.DEPLOYMENT_NAME }} \
+            --set images.cbir=registry.cytomine.org/cytomine/cbir:${{ env.DEPLOYMENT_NAME }} \
+            --set images.pims=registry.cytomine.org/cytomine/pims:${{ env.DEPLOYMENT_NAME }} \
+            --set images.pims_import=registry.cytomine.org/cytomine/python-client:${{ env.DEPLOYMENT_NAME }} \
+            --set images.repository=registry.cytomine.org/cytomine/repository:${{ env.DEPLOYMENT_NAME }} \
+            --set images.e2e_tests=registry.cytomine.org/cytomine/e2e-tests:${{ env.DEPLOYMENT_NAME }} \
+            --set images.tasks_runner_image=registry.cytomine.org/cytomine/app-engine-tasks-runner:${{ env.DEPLOYMENT_NAME }} \
+            --set images.alpine=registry.cytomine.org/docker/library/alpine:3.18 \
+            --set images.curl=registry.cytomine.org/docker/curlimages/curl \
+            --set "images.eclipse_temurin=registry.cytomine.org/docker/library/eclipse-temurin:8u462-b08-jdk-ubi9-minimal" \
+            --set images.mongodb=registry.cytomine.org/docker/library/mongo:5.0-focal \
+            --set images.redis=registry.cytomine.org/docker/library/redis:7 \
+            --set images.pims_cache=registry.cytomine.org/docker/library/redis:7 \
+            --set images.iam=registry.cytomine.org/docker/keycloak/keycloak:26.3 \
+            --set images.postgresql_iam=registry.cytomine.org/docker/library/postgres:14 \
+            --set images.postgresql_app_engine=registry.cytomine.org/docker/library/postgres:14 \
+            --set images.postgis=registry.cytomine.org/docker/postgis/postgis:15-3.5 \
+            --set images.selenium=registry.cytomine.org/docker/selenium/standalone-firefox \
+            --set images.registry=registry.cytomine.org/docker/library/registry:2.8.3 \
+            --set images.pullPolicy=Always \
+            --set test.e2eTestCount=${{ env.E2E_TEST_COUNT }} \
+            --wait --timeout=20m
+
+      - name: Get gateway IP
+        run: |
+          NS=cytomine-${{ env.DEPLOYMENT_NAME }}
+          GATEWAY_IP=$(kubectl get svc -n $NS \
+            -l "gateway.envoyproxy.io/owning-gateway-name=cytomine,gateway.envoyproxy.io/owning-gateway-namespace=$NS" \
+            -o jsonpath='{.items[0].spec.clusterIP}')
+          echo "GATEWAY_IP=$GATEWAY_IP" >> $GITHUB_ENV
+
+      - name: Inject gateway IP for e2e tests
+        run: |
+          NS=cytomine-${{ env.DEPLOYMENT_NAME }}
+          helm upgrade $NS helm/charts/cytomine/ \
+            --namespace=$NS \
+            -f helm/charts/cytomine/ci/test-values.yaml \
+            --reuse-values \
+            --set test.ingressIP=${{ env.GATEWAY_IP }} \
+            --wait --timeout=5m
+
+      - name: Run helm tests
+        run: |
+          helm test cytomine-${{ env.DEPLOYMENT_NAME }} \
+            --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} \
+            --timeout=20m
 
       - name: Logs e2e tests results - e2e-tests pod
         if: always()
-        run: kubectl --namespace=cytomine-${{ github.sha }} logs e2e-tests -c e2e-tests
+        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests -c e2e-tests
 
       - name: Logs e2e tests results - selenium pod
         if: always()
-        run: kubectl --namespace=cytomine-${{ github.sha }} logs e2e-tests -c selenium
+        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests -c selenium
 
       - name: Export test results
         if: always()
         run: |
-          kubectl --namespace=cytomine-${{ github.sha }} delete pod e2e-tests --wait=true --timeout=60s
-          kubectl --namespace=cytomine-${{ github.sha }} apply -f .github/workflows/test-reports/export-pod.yaml
-          kubectl --namespace=cytomine-${{ github.sha }} wait --for=jsonpath='{.status.phase}'=Running pod/export-test-results --timeout=60s
-          kubectl --namespace=cytomine-${{ github.sha }} cp export-test-results:/reports/build/reports ./test-results/build/ -c exporter
-          kubectl --namespace=cytomine-${{ github.sha }} cp export-test-results:/reports/e2e-tests/build/reports ./test-results/build/ -c exporter
+          kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} delete pod e2e-tests --wait=true --timeout=60s
+          kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} apply -f .github/workflows/test-reports/export-pod.yaml
+          kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} wait --for=jsonpath='{.status.phase}'=Running pod/export-test-results --timeout=60s
+          kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} cp export-test-results:/reports/build/reports ./test-results/build/ -c exporter
+          kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} cp export-test-results:/reports/e2e-tests/build/reports ./test-results/build/ -c exporter
 
       - name: Upload helm test results
         if: always()

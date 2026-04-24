@@ -1,0 +1,35 @@
+{{- if not .Values.gateway.parentRefs }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: cytomine
+  labels:
+    {{- include "cytomine.labels" . | nindent 4 }}
+  {{- with .Values.gateway.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  gatewayClassName: {{ .Values.gateway.className }}
+  listeners:
+    - name: https
+      protocol: HTTPS
+      port: 443
+      hostname: {{ .Values.global.domainName }}
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            name: gateway-tls
+      allowedRoutes:
+        namespaces:
+          from: Same
+    - name: http
+      protocol: HTTP
+      port: 80
+      hostname: {{ .Values.global.domainName }}
+      allowedRoutes:
+        namespaces:
+          from: Same
+{{- end }}

@@ -94,7 +94,7 @@ services:
     ports:
       - 5001:5000
     volumes:
-      - pims-dataset:/dataset
+      - ${IMPORT_PATH:-./data/dataset}:/dataset
       - pims-images:/data/images
     environment:
       API_BASE_PATH: ${IMS_API_BASE_PATH:-/ims}
@@ -265,7 +265,7 @@ services:
       - 6000:6000
     volumes:
       - cbir-data:/data/cbir
-      - weights:/weights
+      - ${DATA_PATH:-./data}/weights:/weights
     environment:
       API_BASE_PATH: ${CBIR_API_BASE_PATH:-/cbir}
       DATA_PATH: /data/cbir
@@ -341,7 +341,6 @@ volumes:
   postgis-data: {}
   registry-data: {}
   redis-data: {}
-  pims-dataset: {}
   pims-images: {}
   iam-db-data: {}
   app-engine-db-data: {}
@@ -349,7 +348,6 @@ volumes:
   app-engine-shared-inputs: {}
   app-engine-shared-datasets: {}
   cbir-data: {}
-  weights: {}
 
 networks:
   host_network:

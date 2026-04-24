@@ -306,7 +306,7 @@ public class TaskProvisioningService {
                 String filename = current.getName();
                 if (!"descriptor.yml".equalsIgnoreCase(filename)
                     && current.getStorageDataType() != StorageDataType.DIRECTORY) {
-                    setChecksumCRC32(runStorage.storageId(), calculateFileCRC32(current.getData()), filename);
+                    setChecksumCRC32(runStorage.id(), calculateFileCRC32(current.getData()), filename);
                 }
             }
             if (inputProvisionFileData.isReferenced()) {
@@ -884,7 +884,7 @@ public class TaskProvisioningService {
 
         String io = type.equals(ParameterType.INPUT) ? "inputs" : "outputs";
         Storage storage = new Storage("task-run-" + io + "-" + runId);
-        StorageData data = new StorageData(parameterName, storage.storageId());
+        StorageData data = new StorageData(parameterName, storage.id());
 
         log.info("Get IO file from storage: read file " + parameterName + " from storage...");
         try {
@@ -965,7 +965,7 @@ public class TaskProvisioningService {
         String collectionItem = parameterName
             + "/"
             + Arrays.stream(indexes).sequential().collect(Collectors.joining("/"));
-        StorageData data = new StorageData(collectionItem, storage.storageId());
+        StorageData data = new StorageData(collectionItem, storage.id());
 
         log.info("Get IO file from storage: read file " + collectionItem + " from storage...");
         try {
@@ -1438,7 +1438,7 @@ public class TaskProvisioningService {
     public Path prepareStreaming(String runId, String parameterName) throws IOException {
         log.info("provisioning streaming: preparing...");
         Storage runStorage = new Storage("task-run-inputs-" + runId);
-        Path filePath = Paths.get(basePath, runStorage.storageId(), parameterName);
+        Path filePath = Paths.get(basePath, runStorage.id(), parameterName);
         Files.createDirectories(filePath.getParent());
         return filePath;
     }
@@ -1452,7 +1452,7 @@ public class TaskProvisioningService {
         Storage runStorage = new Storage("task-run-inputs-" + runId);
         Path filePath = Paths.get(
             basePath,
-            runStorage.storageId(),
+            runStorage.id(),
             parameterName + "/" + String.join("/",
             indexesArray));
         Files.createDirectories(filePath.getParent());
@@ -1463,7 +1463,7 @@ public class TaskProvisioningService {
             + "/"
             + (arrayYmlPosition.length > 0 ? String.join("/", arrayYmlPosition) + "/" : "")
             + "array.yml";
-        Path arrayYmlPath = Paths.get(basePath, runStorage.storageId(), "/" + arrayYmlFilePath);
+        Path arrayYmlPath = Paths.get(basePath, runStorage.id(), "/" + arrayYmlFilePath);
         if (Files.exists(arrayYmlPath)) {
             // update the array.yml metadata file
             log.info("provisioning collection item streaming: updating collection array.yml...");
@@ -1475,7 +1475,7 @@ public class TaskProvisioningService {
             // update CRC32 checksum for it
             long updatedChecksum = calculateFileCRC32(arrayYmlPath.toFile());
             Checksum checksum = checksumRepository.findByReference(
-                runStorage.storageId()
+                runStorage.id()
                 + "-"
                 + arrayYmlFilePath);
             checksum.setChecksumCRC32(updatedChecksum);
@@ -1487,7 +1487,7 @@ public class TaskProvisioningService {
             Files.writeString(arrayYmlPath, newContent, Charset.defaultCharset());
             // create CRC32 checksum for it
             setChecksumCRC32(
-                runStorage.storageId(),
+                runStorage.id(),
                 calculateFileCRC32(arrayYmlPath.toFile()),
                 arrayYmlFilePath);
         }

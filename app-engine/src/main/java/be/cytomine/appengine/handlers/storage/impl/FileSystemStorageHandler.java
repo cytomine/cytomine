@@ -43,7 +43,7 @@ public class FileSystemStorageHandler implements StorageHandler {
 
         for (StorageDataEntry current : storageData.getEntryList()) {
             String filename = current.getName();
-            String storageId = storage.storageId();
+            String storageId = storage.id();
             // process the node here
             if (current.getStorageDataType() == StorageDataType.FILE) {
                 try {
@@ -74,7 +74,7 @@ public class FileSystemStorageHandler implements StorageHandler {
 
     @Override
     public void createStorage(Storage storage) throws FileStorageException {
-        String storageId = storage.storageId();
+        String storageId = storage.id();
 
         try {
             Path path = Paths.get(basePath, storageId);
@@ -87,7 +87,7 @@ public class FileSystemStorageHandler implements StorageHandler {
 
     @Override
     public void deleteStorage(Storage storage) throws FileStorageException {
-        String storageId = storage.storageId();
+        String storageId = storage.id();
 
         try {
             Path path = Paths.get(basePath, storageId);
@@ -101,7 +101,7 @@ public class FileSystemStorageHandler implements StorageHandler {
 
     @Override
     public boolean checkStorageExists(Storage storage) throws FileStorageException {
-        return Files.exists(Paths.get(basePath, storage.storageId()));
+        return Files.exists(Paths.get(basePath, storage.id()));
     }
 
     @Override

@@ -1053,7 +1053,7 @@ public class TaskProvisioningService {
         log.info("Update State: validating Run...");
         Run run = getRunIfValid(runId);
 
-        return switch (state.getDesired()) {
+        return switch (state.desired()) {
             case PROVISIONED -> updateToProvisioned(run);
             case RUNNING -> run(run);
             case FINISHED -> updateToFinished(run);

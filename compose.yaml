@@ -77,7 +77,7 @@ services:
     environment:
       <<: *version-env
       CORE_URL: http://127.0.0.1:8080/api
-      IAM_URL: http://127.0.0.1:8070/iam/realms/cytomine
+      IAM_URL: http://127.0.0.1:8100/iam/realms/cytomine
       PIMS_URL: http://127.0.0.1:5001/ims
       APPENGINE_URL: http://127.0.0.1:8082
       CBIR_URL: http://127.0.0.1:6000
@@ -136,7 +136,7 @@ services:
     depends_on:
       - iam-db
     ports:
-      - 8070:8100
+      - 8100:8100
     environment:
       KC_ADMIN_EMAIL: mail@mail.com
       KC_DB_PASSWORD: password
@@ -144,8 +144,9 @@ services:
       KC_DB_URL_HOST: iam-db
       KC_DB_URL_PORT: 5432
       KC_DB_USERNAME: iam
-      KC_HOSTNAME: 127.0.0.1:8070
-      KC_HOSTNAME_ADMIN: 127.0.0.1:8070
+      KC_HOSTNAME: 127.0.0.1
+      KC_HOSTNAME_ADMIN: 127.0.0.1
+      KC_HOSTNAME_PORT: 8100
       KC_HOSTNAME_STRICT: false
       KC_HOSTNAME_STRICT_BACKCHANNEL: false
       KC_HOSTNAME_STRICT_HTTPS: false
@@ -229,7 +230,7 @@ services:
       IMAGE_SERVER_PRIVATE_KEY: d70607f5-c478-403c-be11-3dbc1716d1cf
       IMAGE_SERVER_PUBLIC_KEY: 9a8b8369-2446-44cb-b0af-604a74e1dcdb
       IAM_URL: http://iam:8100
-      IAM_EXTERNAL_URL: http://127.0.0.1:8070
+      IAM_EXTERNAL_URL: http://127.0.0.1:8100
       SERVER_URL: http://127.0.0.1:8080
       PIMS_URL: http://pims:5000
       CBIR_URL: http://cbir:6000

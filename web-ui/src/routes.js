@@ -93,6 +93,7 @@ const routes = [
         component: ListAnnotations
       },
       {
+        name: 'app-dashboard',
         path: 'apps',
         component: AppDashboardPage,
       },

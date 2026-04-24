@@ -17,8 +17,9 @@ mongodb:
 app_engine:
   tasks_namespace:
 
-ingress:
-  className: nginx
+gateway:
+  installController: true
+  className: envoy-gateway
 
 iam:
   lsaaiClientIdSecretName: lsaai-client-id

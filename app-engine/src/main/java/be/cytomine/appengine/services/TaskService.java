@@ -37,7 +37,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import be.cytomine.appengine.dto.handlers.filestorage.Storage;
-import be.cytomine.appengine.dto.inputs.task.TaskAuthor;
 import be.cytomine.appengine.dto.inputs.task.TaskDescription;
 import be.cytomine.appengine.dto.inputs.task.TaskInput;
 import be.cytomine.appengine.dto.inputs.task.TaskInputFactory;
@@ -176,8 +175,10 @@ public class TaskService {
                             fileStorageHandler.deleteStorage(storage);
                             log.info("UploadTask: storage deleted");
                         } catch (FileStorageException ex) {
-                            log.error("UploadTask: file storage service is failing [{}]",
-                                ex.getMessage());
+                            log.error(
+                                "UploadTask: file storage service is failing [{}]",
+                                ex.getMessage()
+                            );
                             AppEngineError error = ErrorBuilder
                                 .build(ErrorCode.REGISTRY_PUSHING_TASK_IMAGE_FAILED);
                             throw new TaskServiceException(error);
@@ -197,8 +198,10 @@ public class TaskService {
 
             }
         } catch (IOException e) {
-            log.error("UploadTask: Failed to extract files from archive: "
-                + imageRegistryCompliantName, e);
+            log.error(
+                "UploadTask: Failed to extract files from archive: "
+                    + imageRegistryCompliantName, e
+            );
             throw new BundleArchiveException(
                 ErrorBuilder.build(ErrorCode.INTERNAL_DESCRIPTOR_EXTRACTION_FAILED));
         } catch (ValidationException e) {
@@ -237,14 +240,16 @@ public class TaskService {
             fileStorageHandler.saveStorageData(
                 storage,
                 new StorageData(
-                    new StorageStringEntry(descriptorFileYmlContent, "descriptor.yml",
-                StorageDataType.FILE))
+                    new StorageStringEntry(
+                        descriptorFileYmlContent, "descriptor.yml",
+                        StorageDataType.FILE
+                    ))
             );
             log.info("UploadTask: descriptor.yml is stored in storage");
             if (Objects.nonNull(logoTempFile)) {
                 fileStorageHandler.saveStorageData(
-                        storage,
-                        new StorageData(logoTempFile, "logo.png")
+                    storage,
+                    new StorageData(logoTempFile, "logo.png")
                 );
                 log.info("UploadTask: logo.png is stored in storage");
             }
@@ -277,14 +282,14 @@ public class TaskService {
         task.setVersion(descriptorFileAsJson.get("version").textValue());
         task.setInputFolder(
             descriptorFileAsJson
-            .get("configuration")
-            .get("input_folder")
-            .textValue());
+                .get("configuration")
+                .get("input_folder")
+                .textValue());
         task.setOutputFolder(
             descriptorFileAsJson
-            .get("configuration")
-            .get("output_folder")
-            .textValue());
+                .get("configuration")
+                .get("output_folder")
+                .textValue());
 
         // resources
         JsonNode resources = descriptorFileAsJson.get("configuration").get("resources");
@@ -328,7 +333,8 @@ public class TaskService {
     private void processDependencies(
         JsonNode node,
         Set<Parameter> parameters,
-        List<Match> matches) {
+        List<Match> matches
+    ) {
         if (node != null && node.isObject()) {
             Iterator<String> fieldNames = node.fieldNames();
             while (fieldNames.hasNext()) {
@@ -338,10 +344,11 @@ public class TaskService {
                     .filter(parameter -> parameter.getName().equals(key))
                     .findFirst()
                     .ifPresent(parameter -> processParameterDependencies(
-                    parameter,
-                    value,
-                    parameters,
-                    matches));
+                        parameter,
+                        value,
+                        parameters,
+                        matches
+                    ));
             }
         }
     }
@@ -351,7 +358,8 @@ public class TaskService {
         Parameter param,
         JsonNode value,
         Set<Parameter> parameters,
-        List<Match> matches) {
+        List<Match> matches
+    ) {
         JsonNode dependencies = value.get("dependencies");
         if (dependencies != null && dependencies.isObject()) {
             JsonNode matching = dependencies.get("matching");
@@ -368,8 +376,8 @@ public class TaskService {
 
                     parameters.stream()
                         .filter(p -> p.getName()
-                        .equals(matchingName) && p.getParameterType()
-                        .equals(ParameterType.from(matchingType)))
+                            .equals(matchingName) && p.getParameterType()
+                            .equals(ParameterType.from(matchingType)))
                         .findFirst()
                         .ifPresent(other -> {
                             // set check time relative to execution
@@ -512,9 +520,10 @@ public class TaskService {
             log.info("Storage '{}' successfully deleted", storageName);
         } catch (FileStorageException e) {
             log.error(
-                    "Failed to delete storage '{}': [{}]. Skipping.",
-                    storageName,
-                    e.getMessage());
+                "Failed to delete storage '{}': [{}]. Skipping.",
+                storageName,
+                e.getMessage()
+            );
         }
     }
 
@@ -713,8 +722,10 @@ public class TaskService {
             fileStorageHandler.createStorage(outputStorage);
             log.info("tasks/{namespace}/{version}/runs: Storage is created for task");
         } catch (FileStorageException e) {
-            log.error("tasks/{namespace}/{version}/runs: failed to create storage [{}]",
-                e.getMessage());
+            log.error(
+                "tasks/{namespace}/{version}/runs: failed to create storage [{}]",
+                e.getMessage()
+            );
             throw new RunTaskServiceException(e);
         }
     }
@@ -750,9 +761,11 @@ public class TaskService {
 
             // Validate that the first part is indeed a file and not a simple form field
             if (item.isFormField()) {
-                log.warn("UploadTask streaming: "
-                    + "Expected a file but the first part is a form field: {}",
-                    item.getFieldName());
+                log.warn(
+                    "UploadTask streaming: "
+                        + "Expected a file but the first part is a form field: {}",
+                    item.getFieldName()
+                );
                 AppEngineError error = ErrorBuilder.build(
                     ErrorCode.INTERNAL_NO_FILE_BUT_FORM_FIELD
                 );
@@ -775,7 +788,7 @@ public class TaskService {
     }
 
     public StorageData retrieveLogo(String namespace, String version)
-            throws TaskServiceException, TaskNotFoundException {
+        throws TaskServiceException, TaskNotFoundException {
         log.info("Storage : retrieving logo...");
         Task task = taskRepository.findByNamespaceAndVersion(namespace, version);
         if (task == null) {
@@ -797,11 +810,12 @@ public class TaskService {
         List<Run> runs = runRepository.findAllByTask(task);
 
         return runs.stream()
-                .map(run -> new TaskRun(
-                        run.getId(),
-                        makeTaskDescription(run.getTask()),
-                        run.getState())
+            .map(run -> new TaskRun(
+                    run.getId(),
+                    makeTaskDescription(run.getTask()),
+                    run.getState()
                 )
-                .collect(Collectors.toList());
+            )
+            .collect(Collectors.toList());
     }
 }

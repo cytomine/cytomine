@@ -618,24 +618,19 @@ public class TaskService {
     }
 
     public List<TaskInput> makeTaskInputs(Task task) {
-        List<TaskInput> inputs = new ArrayList<>();
-        task
-            .getParameters()
+        return task.getParameters()
             .stream()
             .filter(parameter -> parameter.getParameterType().equals(ParameterType.INPUT))
-            .forEach(parameter -> inputs.add(TaskInputFactory.createTaskInput(parameter)));
-        return inputs;
+            .map(TaskInputFactory::createTaskInput)
+            .toList();
     }
 
     public List<TaskOutput> makeTaskOutputs(Task task) {
-        List<TaskOutput> outputs = new ArrayList<>();
-        task
-            .getParameters()
+        return task.getParameters()
             .stream()
             .filter(parameter -> parameter.getParameterType().equals(ParameterType.OUTPUT))
-            .forEach(parameter -> outputs.add(TaskOutputFactory.createTaskOutput(parameter)));
-
-        return outputs;
+            .map(TaskOutputFactory::createTaskOutput)
+            .toList();
     }
 
     public List<Task> findAll() {

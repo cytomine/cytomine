@@ -9,7 +9,7 @@ services:
     ports:
       - 27017:27017
     volumes:
-      - ${DATA_PATH:-./data}/mongo:/data/db
+      - mongo-data:/data/db
     environment:
       MONGO_INITDB_ROOT_PASSWORD: password
       MONGO_INITDB_ROOT_USERNAME: admin
@@ -24,7 +24,7 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - ${DATA_PATH:-./data}/postgis/data:/var/lib/postgresql/data
+      - postgis-data:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: docker
       POSTGRES_PASSWORD: password
@@ -39,7 +39,7 @@ services:
     ports:
       - 5000:5000
     volumes:
-      - ${DATA_PATH:-./data}/registry:/var/lib/registry
+      - registry-data:/var/lib/registry
     environment:
       REGISTRY_STORAGE_DELETE_ENABLED: true
     networks:
@@ -51,7 +51,7 @@ services:
     command: --port 6380
     restart: unless-stopped
     volumes:
-      - ${DATA_PATH:-./data}/redis:/data
+      - redis-data:/data
     networks:
       host_network:
         ipv4_address: 172.16.238.5
@@ -121,7 +121,7 @@ services:
     image: postgres:14
     restart: unless-stopped
     volumes:
-      - ${DATA_PATH:-./data}/iam-db/data:/var/lib/postgresql/data
+      - iam-db-data:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: iam
       POSTGRES_PASSWORD: password
@@ -171,7 +171,7 @@ services:
     ports:
       - 5433:5432
     volumes:
-      - ${DATA_PATH:-./data}/app-engine-db/data:/var/lib/postgresql/data
+      - app-engine-db-data:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: appengine
       POSTGRES_PASSWORD: password
@@ -190,10 +190,10 @@ services:
     ports:
       - 8082:8080
     volumes:
-      - ${DATA_PATH:-./data}/app-engine:/data
+      - app-engine-data:/data
       - ${PWD}/.kube/shared:/root/.kube:ro
-      - ${DATA_PATH:-./data}/app-engine-shared-inputs:/app-engine-shared-inputs:rw
-      - ${DATA_PATH:-./data}/app-engine-shared-datasets:/app-engine-shared-datasets:rw
+      - app-engine-shared-inputs:/app-engine-shared-inputs:rw
+      - app-engine-shared-datasets:/app-engine-shared-datasets:rw
     environment:
       API_PREFIX: /app-engine/
       DB_HOST: app-engine-db
@@ -264,7 +264,7 @@ services:
     ports:
       - 6000:6000
     volumes:
-      - ${DATA_PATH:-./data}/cbir:/data/cbir
+      - cbir-data:/data/cbir
       - ${DATA_PATH:-./data}/weights:/weights
     environment:
       API_BASE_PATH: ${CBIR_API_BASE_PATH:-/cbir}
@@ -324,8 +324,8 @@ services:
       - k3s-server:/var/lib/rancher/k3s
       - ./k3s/registries.yaml:/etc/rancher/k3s/registries.yaml:ro
       - ./k3s/serviceaccounts.yaml://var/lib/rancher/k3s/server/manifests/serviceaccounts.yaml:ro
-      - ${DATA_PATH:-./data}/app-engine-shared-inputs:/app-engine-shared-inputs:rw
-      - ${DATA_PATH:-./data}/app-engine-shared-datasets:/app-engine-shared-datasets:ro
+      - app-engine-shared-inputs:/app-engine-shared-inputs:rw
+      - app-engine-shared-datasets:/app-engine-shared-datasets:ro
       # This is just so that we get the kubeconfig file out
       - .kube/shared:/output/
     ports:
@@ -337,6 +337,16 @@ services:
 volumes:
   k3s-server: {}
   k3s-agent: {}
+  mongo-data: {}
+  postgis-data: {}
+  registry-data: {}
+  redis-data: {}
+  iam-db-data: {}
+  app-engine-db-data: {}
+  app-engine-data: {}
+  app-engine-shared-inputs: {}
+  app-engine-shared-datasets: {}
+  cbir-data: {}
 
 networks:
   host_network:

@@ -237,7 +237,7 @@ public class TaskServiceTest {
         Optional<TaskDescription> result = taskService.retrieveTaskDescription(task.getIdentifier().toString());
 
         assertTrue(result.isPresent());
-        assertEquals("Test Task Description", result.get().description());
+        assertEquals(Optional.of("Test Task Description"), result.get().description());
         verify(taskRepository, times(1)).findById(task.getIdentifier());
     }
 
@@ -261,7 +261,7 @@ public class TaskServiceTest {
         Optional<TaskDescription> result = taskService.retrieveTaskDescription(task.getNamespace(), task.getVersion());
 
         assertTrue(result.isPresent());
-        assertEquals("Test Task Description", result.get().description());
+        assertEquals(Optional.of("Test Task Description"), result.get().description());
         verify(taskRepository, times(1)).findByNamespaceAndVersion(task.getNamespace(), task.getVersion());
     }
 
@@ -310,7 +310,7 @@ public class TaskServiceTest {
         assertEquals(task.getIdentifier(), result.id());
         assertEquals(task.getNamespace(), result.namespace());
         assertEquals(task.getVersion(), result.version());
-        assertEquals(task.getDescription(), result.description());
+        assertEquals(Optional.ofNullable(task.getDescription()), result.description());
     }
 
     @DisplayName("Successfully create a task run by ID")
@@ -325,7 +325,7 @@ public class TaskServiceTest {
         assertEquals(task.getIdentifier(), result.task().id());
         assertEquals(task.getNamespace(), result.task().namespace());
         assertEquals(task.getVersion(), result.task().version());
-        assertEquals(task.getDescription(), result.task().description());
+        assertEquals(Optional.ofNullable(task.getDescription()), result.task().description());
         assertEquals(TaskRunState.CREATED, result.state());
         verify(taskRepository, times(1)).findById(task.getIdentifier());
         verify(runRepository, times(1)).saveAndFlush(any(Run.class));
@@ -359,7 +359,7 @@ public class TaskServiceTest {
         assertEquals(task.getIdentifier(), result.task().id());
         assertEquals(task.getNamespace(), result.task().namespace());
         assertEquals(task.getVersion(), result.task().version());
-        assertEquals(task.getDescription(), result.task().description());
+        assertEquals(Optional.ofNullable(task.getDescription()), result.task().description());
         assertEquals(TaskRunState.CREATED, result.state());
         verify(taskRepository, times(1)).findByNamespaceAndVersion(task.getNamespace(), task.getVersion());
         verify(runRepository, times(1)).saveAndFlush(any(Run.class));

@@ -1,13 +1,12 @@
 package be.cytomine.appengine.unit.services;
 
-import java.io.File;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ClassPathResource;
 
 import be.cytomine.appengine.dto.handlers.filestorage.Storage;
+import be.cytomine.appengine.dto.inputs.task.TaskAuthor;
 import be.cytomine.appengine.dto.inputs.task.TaskDescription;
 import be.cytomine.appengine.dto.inputs.task.TaskRun;
 import be.cytomine.appengine.exceptions.FileStorageException;
@@ -30,6 +30,8 @@ import be.cytomine.appengine.handlers.RegistryHandler;
 import be.cytomine.appengine.handlers.SchedulerHandler;
 import be.cytomine.appengine.handlers.StorageData;
 import be.cytomine.appengine.handlers.StorageHandler;
+import be.cytomine.appengine.mapper.TaskMapper;
+import be.cytomine.appengine.models.task.Author;
 import be.cytomine.appengine.models.task.Run;
 import be.cytomine.appengine.models.task.Task;
 import be.cytomine.appengine.repositories.RunRepository;
@@ -38,12 +40,12 @@ import be.cytomine.appengine.services.RunService;
 import be.cytomine.appengine.services.TaskService;
 import be.cytomine.appengine.services.TaskValidationService;
 import be.cytomine.appengine.states.TaskRunState;
-import be.cytomine.appengine.utils.DescriptorHelper;
 import be.cytomine.appengine.utils.TaskUtils;
 import be.cytomine.appengine.utils.TestTaskBuilder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -72,6 +74,9 @@ public class TaskServiceTest {
     private RunService runService;
 
     @Mock
+    private TaskMapper taskMapper;
+
+    @Mock
     private TaskRepository taskRepository;
 
     @Mock
@@ -82,18 +87,35 @@ public class TaskServiceTest {
 
     private static Task task;
 
-    private static JsonNode descriptorFileAsJson;
-
     @BeforeAll
-    public static void setUp() throws Exception {
+    public static void setUp() {
         task = TaskUtils.createTestTask(false);
-        File descriptorFile = new ClassPathResource("artifacts/descriptor.yml").getFile();
-        descriptorFileAsJson = DescriptorHelper.parseDescriptor(descriptorFile);
+    }
+
+    private void stubTaskMapper() {
+        Author author = task.getAuthors().iterator().next();
+        TaskAuthor mappedAuthor = new TaskAuthor(
+            author.getFirstName(),
+            author.getLastName(),
+            author.getOrganization(),
+            author.getEmail(),
+            author.isContact()
+        );
+        TaskDescription expectedTaskDescription = new TaskDescription(
+            task.getIdentifier(),
+            task.getName(),
+            task.getNamespace(),
+            task.getVersion(),
+            Optional.ofNullable(task.getDescription()),
+            Set.of(mappedAuthor)
+        );
+        when(taskMapper.toTaskDescription(any(Task.class))).thenReturn(expectedTaskDescription);
     }
 
     @DisplayName("Successfully upload a task bundle")
     @Test
     public void uploadTaskShouldUploadTaskBundle() throws Exception {
+        stubTaskMapper();
         // Load test ZIP file from resources
         ClassPathResource resource = TestTaskBuilder.buildCustomImageLocationTask();
         InputStream inputStream = resource.getInputStream();
@@ -154,7 +176,7 @@ public class TaskServiceTest {
             TaskServiceException.class,
             () -> taskService.retrieveYmlDescriptor(namespace, version)
         );
-        assertTrue(exception.getCause() instanceof FileStorageException);
+        assertInstanceOf(FileStorageException.class, exception.getCause());
         verify(taskRepository, times(1)).findByNamespaceAndVersion(namespace, version);
         verify(storageHandler, times(1)).readStorageData(any(StorageData.class));
     }
@@ -201,7 +223,7 @@ public class TaskServiceTest {
             TaskServiceException.class,
             () -> taskService.retrieveYmlDescriptor(task.getIdentifier().toString())
         );
-        assertTrue(exception.getCause() instanceof FileStorageException);
+        assertInstanceOf(FileStorageException.class, exception.getCause());
         verify(taskRepository, times(1)).findById(task.getIdentifier());
         verify(storageHandler, times(1)).readStorageData(any(StorageData.class));
     }
@@ -209,12 +231,13 @@ public class TaskServiceTest {
     @DisplayName("Successfully retrieve the task description by ID")
     @Test
     void retrieveTaskDescriptionByIdShouldReturnTaskDescription() {
+        stubTaskMapper();
         when(taskRepository.findById(task.getIdentifier())).thenReturn(Optional.of(task));
 
         Optional<TaskDescription> result = taskService.retrieveTaskDescription(task.getIdentifier().toString());
 
         assertTrue(result.isPresent());
-        assertEquals("Test Task Description", result.get().getDescription());
+        assertEquals(Optional.of("Test Task Description"), result.get().description());
         verify(taskRepository, times(1)).findById(task.getIdentifier());
     }
 
@@ -232,12 +255,13 @@ public class TaskServiceTest {
     @DisplayName("Successfully retrieve the task description by namespace and version")
     @Test
     void retrieveTaskDescriptionByNamespaceAndVersionShouldReturnTaskDescription() {
+        stubTaskMapper();
         when(taskRepository.findByNamespaceAndVersion(task.getNamespace(), task.getVersion())).thenReturn(task);
 
         Optional<TaskDescription> result = taskService.retrieveTaskDescription(task.getNamespace(), task.getVersion());
 
         assertTrue(result.isPresent());
-        assertEquals("Test Task Description", result.get().getDescription());
+        assertEquals(Optional.of("Test Task Description"), result.get().description());
         verify(taskRepository, times(1)).findByNamespaceAndVersion(task.getNamespace(), task.getVersion());
     }
 
@@ -260,7 +284,7 @@ public class TaskServiceTest {
 
         List<TaskDescription> result = taskService.retrieveTaskDescriptions();
 
-        assertTrue(tasks.size() == result.size());
+        assertEquals(tasks.size(), result.size());
         verify(taskRepository, times(1)).findAll();
     }
 
@@ -271,42 +295,45 @@ public class TaskServiceTest {
 
         List<TaskDescription> result = taskService.retrieveTaskDescriptions();
 
-        assertTrue(result.size() == 0);
+        assertEquals(0, result.size());
         verify(taskRepository, times(1)).findAll();
     }
 
     @DisplayName("Successfully create a task description")
     @Test
     void makeTaskDescriptionShouldReturnTaskDescription() {
+        stubTaskMapper();
+
         TaskDescription result = taskService.makeTaskDescription(task);
 
         assertNotNull(result);
-        assertEquals(task.getIdentifier(), result.getId());
-        assertEquals(task.getNamespace(), result.getNamespace());
-        assertEquals(task.getVersion(), result.getVersion());
-        assertEquals(task.getDescription(), result.getDescription());
+        assertEquals(task.getIdentifier(), result.id());
+        assertEquals(task.getNamespace(), result.namespace());
+        assertEquals(task.getVersion(), result.version());
+        assertEquals(Optional.ofNullable(task.getDescription()), result.description());
     }
 
     @DisplayName("Successfully create a task run by ID")
     @Test
     void createRunForTaskByIdShouldReturnTaskRun() throws Exception {
+        stubTaskMapper();
         when(taskRepository.findById(task.getIdentifier())).thenReturn(Optional.of(task));
 
         TaskRun result = taskService.createRunForTask(task.getIdentifier().toString());
 
         assertNotNull(result);
-        assertEquals(task.getIdentifier(), result.getTask().getId());
-        assertEquals(task.getNamespace(), result.getTask().getNamespace());
-        assertEquals(task.getVersion(), result.getTask().getVersion());
-        assertEquals(task.getDescription(), result.getTask().getDescription());
-        assertEquals(TaskRunState.CREATED, result.getState());
+        assertEquals(task.getIdentifier(), result.task().id());
+        assertEquals(task.getNamespace(), result.task().namespace());
+        assertEquals(task.getVersion(), result.task().version());
+        assertEquals(Optional.ofNullable(task.getDescription()), result.task().description());
+        assertEquals(TaskRunState.CREATED, result.state());
         verify(taskRepository, times(1)).findById(task.getIdentifier());
         verify(runRepository, times(1)).saveAndFlush(any(Run.class));
     }
 
     @DisplayName("Fail to create a task run by ID and throw RunTaskServiceException")
     @Test
-    void createRunForTaskByIdShouldThrowRunTaskServiceException() throws Exception {
+    void createRunForTaskByIdShouldThrowRunTaskServiceException() {
         when(taskRepository.findById(task.getIdentifier())).thenReturn(Optional.empty());
 
         String expectedMessage = "task {" + task.getIdentifier() + "} not found to associate with this run";
@@ -323,23 +350,24 @@ public class TaskServiceTest {
     @DisplayName("Successfully create a task run by namespace and version")
     @Test
     void createRunForTaskByNamespaceAndVersionShouldReturnTaskRun() throws Exception {
+        stubTaskMapper();
         when(taskRepository.findByNamespaceAndVersion(task.getNamespace(), task.getVersion())).thenReturn(task);
 
         TaskRun result = taskService.createRunForTask(task.getNamespace(), task.getVersion());
 
         assertNotNull(result);
-        assertEquals(task.getIdentifier(), result.getTask().getId());
-        assertEquals(task.getNamespace(), result.getTask().getNamespace());
-        assertEquals(task.getVersion(), result.getTask().getVersion());
-        assertEquals(task.getDescription(), result.getTask().getDescription());
-        assertEquals(TaskRunState.CREATED, result.getState());
+        assertEquals(task.getIdentifier(), result.task().id());
+        assertEquals(task.getNamespace(), result.task().namespace());
+        assertEquals(task.getVersion(), result.task().version());
+        assertEquals(Optional.ofNullable(task.getDescription()), result.task().description());
+        assertEquals(TaskRunState.CREATED, result.state());
         verify(taskRepository, times(1)).findByNamespaceAndVersion(task.getNamespace(), task.getVersion());
         verify(runRepository, times(1)).saveAndFlush(any(Run.class));
     }
 
     @DisplayName("Fail to create a task run by namespace and version and throw RunTaskServiceException")
     @Test
-    void createRunForTaskByNamespaceAndVersionShouldThrowRunTaskServiceException() throws Exception {
+    void createRunForTaskByNamespaceAndVersionShouldThrowRunTaskServiceException() {
         when(taskRepository.findByNamespaceAndVersion(task.getNamespace(), task.getVersion())).thenReturn(null);
 
         String expectedMessage = String.format(

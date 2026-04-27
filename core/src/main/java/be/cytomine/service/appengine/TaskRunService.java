@@ -364,7 +364,6 @@ public class TaskRunService {
 
         String uri = "task-runs/" + taskRunId + "/input-provisions/" + parameterName;
         String arrayTypeUri = uri + "/indexes";
-        ObjectMapper mapper = new ObjectMapper();
         if (json.get("type").isObject() && json.get("type").get("id").asText().equals("array")) {
             String subtype = json.get("type").get("subType").get("id").asText();
 
@@ -372,10 +371,10 @@ public class TaskRunService {
             if (!json.get("value").isNull()) {
                 String type = value.get("type").asText();
 
-                Long[] itemsArray = mapper.convertValue(value.get("ids"), Long[].class);
+                Long[] itemsArray = objectMapper.convertValue(value.get("ids"), Long[].class);
 
                 if (subtype.equals("image")) {
-                    ArrayNode responseArray = mapper.createArrayNode();
+                    ArrayNode responseArray = objectMapper.createArrayNode();
                     for (int i = 0; i < itemsArray.length; i++) {
                         Long id = itemsArray[i];
                         if (type.equalsIgnoreCase("annotation")) {
@@ -389,7 +388,7 @@ public class TaskRunService {
 
                             String response = provisionCollectionItem(arrayTypeUri, i, body);
                             if (response != null) {
-                                JsonNode itemNode = mapper.readTree(response);
+                                JsonNode itemNode = objectMapper.readTree(response);
                                 responseArray.add(itemNode);
                             }
 
@@ -403,7 +402,7 @@ public class TaskRunService {
 
                             String response = provisionCollectionItem(arrayTypeUri, i, body);
                             if (response != null) {
-                                JsonNode itemNode = mapper.readTree(response);
+                                JsonNode itemNode = objectMapper.readTree(response);
                                 responseArray.add(itemNode);
                             }
                         }
@@ -416,12 +415,12 @@ public class TaskRunService {
                     provision.remove("type");
                     provision.remove("value");
 
-                    ArrayNode valueListNode = mapper.createArrayNode();
+                    ArrayNode valueListNode = objectMapper.createArrayNode();
                     for (int i = 0; i < itemsArray.length; i++) {
                         Long annotationId = itemsArray[i];
                         UserAnnotation annotation = userAnnotationService.get(annotationId);
 
-                        ObjectNode itemJsonObject = mapper.createObjectNode();
+                        ObjectNode itemJsonObject = objectMapper.createObjectNode();
                         itemJsonObject.put("index", i);
                         itemJsonObject.put("value", geometryService.wktToGeoJson(annotation.getWktLocation()));
 

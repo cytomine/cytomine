@@ -22,10 +22,22 @@ jobs:
 
       - name: Get version
         run: |
-          echo "CHART_VERSION=$(cat ./charts/cytomine/Chart.yaml | grep "version:" | sed -E 's/^version: (.*)$/\1/g')" >> $GITHUB_ENV
+          echo "CHART_VERSION=$(cat ./charts/cytomine/Chart.yaml | grep "^version:" | sed -E 's/^version: (.*)$/\1/g')" >> $GITHUB_ENV
 
       - name: Install Helm
         uses: azure/setup-helm@v5
+
+      - name: Helm login to proxy registry
+        run: helm registry login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_TOKEN }} registry.cytomine.org
+
+      - name: Update dependencies to use proxy registry
+        run: sed -i 's|oci://docker.io/|oci://registry.cytomine.org/docker/|g' ./charts/cytomine/Chart.yaml
+
+      - name: Helm dependency update
+        run: helm dependency update ./charts/cytomine
+
+      - name: Restore Chart.yaml
+        run: git checkout -- charts/cytomine/Chart.yaml
 
       - name: Helm package
         run: helm package ./charts/cytomine

@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import jakarta.transaction.Transactional;
@@ -27,6 +28,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.http.ReviewedAnnotationHttpContract;
+import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;
@@ -35,7 +38,6 @@ import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.ontology.AnnotationTerm;
 import be.cytomine.domain.ontology.ReviewedAnnotation;
-import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
@@ -43,7 +45,6 @@ import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.ontology.AnnotationTermRepository;
-import be.cytomine.repository.ontology.TermRepository;
 import be.cytomine.repository.ontology.UserAnnotationRepository;
 import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.CurrentUserService;
@@ -74,7 +75,10 @@ public class AnnotationTermService extends ModelService {
     private UserRepository userRepository;
 
     @Autowired
-    private TermRepository termRepository;
+    private TermHttpContract termRepository;
+
+    @Autowired
+    private ReviewedAnnotationHttpContract reviewedAnnotationHttpContract;
 
     @Autowired
     private UserAnnotationRepository userAnnotationRepository;
@@ -88,11 +92,12 @@ public class AnnotationTermService extends ModelService {
     }
 
 
-    public Optional<AnnotationTerm> find(AnnotationDomain annotation, Term term, User user) {
+    public Optional<AnnotationTerm> find(AnnotationDomain annotation, Long termId, User user) {
         securityACLService.check(annotation.container(), READ);
         List<AnnotationTerm> annotationTerms = annotationTermRepository.findAllByUserAnnotationId(annotation.getId());
         return annotationTerms.stream()
-            .filter(x -> x.getTerm() == term && (user == null || x.getUser().getId().equals(user.getId())))
+            .filter(
+                x -> x.getTerm().getId().equals(termId) && (user == null || x.getUser().getId().equals(user.getId())))
             .findFirst();
     }
 
@@ -122,7 +127,6 @@ public class AnnotationTermService extends ModelService {
      * Add the new domain with JSON data
      *
      * @param jsonObject New domain data
-     *
      * @return Response structure (created domain data,..)
      */
     @Override
@@ -149,7 +153,6 @@ public class AnnotationTermService extends ModelService {
      * @param transaction  Transaction link with this command
      * @param task         Task for this command
      * @param printMessage Flag if client will print or not confirm message
-     *
      * @return Response structure (code, old domain,..)
      */
     @Override
@@ -176,7 +179,7 @@ public class AnnotationTermService extends ModelService {
         User currentUser,
         Transaction transaction
     ) {
-        Term term = termRepository.findById(idTerm)
+        termRepository.findTermByID(idTerm, currentUser.getId())
             .orElseThrow(() -> new ObjectNotFoundException("Term", idExpectedTerm));
         UserAnnotation userAnnotation = userAnnotationRepository.findById(idUserAnnotation)
             .orElseThrow(() -> new ObjectNotFoundException("UserAnnotation", idUserAnnotation));
@@ -209,10 +212,9 @@ public class AnnotationTermService extends ModelService {
             Transaction transaction = transactionService.start();
 
             //Delete all annotation term
-            List<AnnotationTerm>
-                annotationTerms
-                = annotationTermRepository.findAllByUserAnnotationId(annotation.getId())
-                .stream().filter(x -> fromAllUser || x.getUser().equals(currentUser)).collect(Collectors.toList());
+            List<AnnotationTerm> annotationTerms =
+                annotationTermRepository.findAllByUserAnnotationId(annotation.getId()).stream()
+                    .filter(x -> fromAllUser || x.getUser().equals(currentUser)).toList();
 
             log.info("Delete old annotationTerm= " + annotationTerms.size());
             for (AnnotationTerm annotationTerm : annotationTerms) {
@@ -222,11 +224,7 @@ public class AnnotationTermService extends ModelService {
             //Add annotation term
             return addAnnotationTerm(idAnnotation, idTerm, null, currentUser.getId(), currentUser, transaction);
         } else if (annotation instanceof ReviewedAnnotation) {
-            Transaction transaction = transactionService.start();
-            ReviewedAnnotation reviewed = (ReviewedAnnotation) annotation;
-            reviewed.getTerms().clear();
-            reviewed.getTerms().add(termRepository.getById(idTerm));
-            getEntityManager().persist(reviewed);
+            reviewedAnnotationHttpContract.replaceAllTermIds(idAnnotation, currentUser.getId(), Set.of(idTerm));
             CommandResponse commandResponse = new CommandResponse();
             commandResponse.setStatus(200);
             return commandResponse;
@@ -292,7 +290,6 @@ public class AnnotationTermService extends ModelService {
      * Retrieve domain thanks to a JSON object
      *
      * @param json JSON with new domain info
-     *
      * @return domain retrieve thanks to json
      */
     @Override

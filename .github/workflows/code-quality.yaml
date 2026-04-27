@@ -11,16 +11,20 @@ jobs:
       - name: Set up the repository
         uses: actions/checkout@v6.0.2
 
-      - name: Set up JDK ${{ vars.JAVA_VERSION }}
+      - name: Load versions
+        id: versions
+        uses: ./.github/actions/load-versions
+
+      - name: Set up Java
         uses: actions/setup-java@v5
         with:
-          distribution: ${{ vars.JAVA_DIST }}
-          java-version: ${{ vars.JAVA_VERSION }}
+          distribution: ${{ steps.versions.outputs.java-distribution }}
+          java-version: ${{ steps.versions.outputs.java-version }}
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
         with:
-          gradle-version: ${{ vars.GRADLE_VERSION }}
+          gradle-version: ${{ steps.versions.outputs.gradle-version }}
 
       - name: Check lint
         run: gradle checkstyleMain checkstyleTest --no-daemon --parallel
@@ -46,10 +50,14 @@ jobs:
       - name: Checkout the repository
         uses: actions/checkout@v6.0.2
 
+      - name: Load versions
+        id: versions
+        uses: ./.github/actions/load-versions
+
       - name: Install uv
         uses: astral-sh/setup-uv@v7
         with:
-          version: ${{ vars.UV_VERSION }}
+          version: ${{ steps.versions.outputs.uv-version }}
 
       - name: Lint
         run: uvx ruff check .
@@ -61,10 +69,14 @@ jobs:
       - name: Checkout the repository
         uses: actions/checkout@v6.0.2
 
+      - name: Load versions
+        id: versions
+        uses: ./.github/actions/load-versions
+
       - name: Install uv
         uses: astral-sh/setup-uv@v7
         with:
-          version: ${{ vars.UV_VERSION }}
+          version: ${{ steps.versions.outputs.uv-version }}
 
       - name: Type check
         run: |

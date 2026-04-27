@@ -201,11 +201,11 @@ public class SecurityAclServiceTests {
         Project project = builder.givenAProject();
         User user = builder.givenDefaultUser();
 
-        assertThat(securityACLService.getProjectList(user, project.getOntology())).doesNotContain(project);
+        assertThat(securityACLService.getProjectList(user, project.getOntology().getId())).doesNotContain(project);
 
         permissionService.addPermission(project, user.getUsername(), READ);
 
-        assertThat(securityACLService.getProjectList(user, project.getOntology())).contains(project);
+        assertThat(securityACLService.getProjectList(user, project.getOntology().getId())).contains(project);
 
     }
 

@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import be.cytomine.common.repository.http.TermHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.Command;
 import be.cytomine.domain.command.DeleteCommand;
@@ -40,7 +41,6 @@ import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ConstraintException;
 import be.cytomine.repository.ontology.AnnotationTermRepository;
 import be.cytomine.repository.ontology.ReviewedAnnotationRepository;
-import be.cytomine.repository.ontology.TermRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.ModelService;
 import be.cytomine.service.security.SecurityACLService;
@@ -49,15 +49,11 @@ import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.Task;
 
 import static org.springframework.security.acls.domain.BasePermission.DELETE;
-import static org.springframework.security.acls.domain.BasePermission.READ;
 
 @Slf4j
 @Service
 @Transactional
 public class TermService extends ModelService {
-
-    @Autowired
-    private TermRepository termRepository;
 
     @Autowired
     private SecurityACLService securityACLService;
@@ -82,23 +78,14 @@ public class TermService extends ModelService {
         return Term.class;
     }
 
-    public Term get(Long id) {
+    public TermResponse get(Long id) {
         return find(id).orElse(null);
     }
 
-    public Optional<Term> find(Long id) {
-        Optional<Term> optionalTerm = termRepository.findById(id);
-        optionalTerm.ifPresent(term -> securityACLService.check(term.container(), READ));
-        return optionalTerm;
+    public Optional<TermResponse> find(Long id) {
+        return termHttpContract.findTermByID(id, currentUserService.getCurrentUser().getId());
     }
 
-    /**
-     * List all term, Only for admin
-     */
-    public List<Term> list() {
-        securityACLService.checkAdmin(currentUserService.getCurrentUser());
-        return termRepository.findAll();
-    }
 
     public Set<Long> list(Ontology ontology) {
         return termHttpContract.findAllTermIdsByOntology(ontology.getId(), currentUserService.getCurrentUser().getId());

@@ -182,7 +182,7 @@ public class UploadTaskStepDefinitions {
             persistedNamespace,
             persistedVersion
         );
-        Assertions.assertEquals(persistedUploadResponse.getId(), uploaded.getIdentifier());
+        Assertions.assertEquals(persistedUploadResponse.id(), uploaded.getIdentifier());
     }
 
     @Then("App Engine creates a task storage \\(e.g. a bucket reserved for the task) in the File "

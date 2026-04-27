@@ -118,12 +118,12 @@ public class ReadTaskStepDefinitions {
         + "of the available tasks as a JSON payload \\(see OpenAPI spec)")
     public void appEngineReturnsTaskListAsJson(String string) {
         for (TaskDescription description : tasks) {
-            Assertions.assertNotNull(description.getDescription());
-            Assertions.assertNotNull(description.getNamespace());
-            Assertions.assertNotNull(description.getVersion());
-            Assertions.assertNotNull(description.getName());
-            Assertions.assertNotNull(description.getAuthors());
-            Assertions.assertFalse(description.getAuthors().isEmpty());
+            Assertions.assertNotNull(description.description());
+            Assertions.assertNotNull(description.namespace());
+            Assertions.assertNotNull(description.version());
+            Assertions.assertNotNull(description.name());
+            Assertions.assertNotNull(description.authors());
+            Assertions.assertFalse(description.authors().isEmpty());
         }
     }
 
@@ -226,10 +226,10 @@ public class ReadTaskStepDefinitions {
         + "the task description as a JSON payload \\(see OpenAPI spec)")
     public void appEngineReturnsTaskDescriptionAsJson(String string) {
         Assertions.assertNotNull(persistedTaskDescription);
-        Assertions.assertEquals(persistedTaskDescription.getNamespace(), persistedTask.getNamespace());
-        Assertions.assertEquals(persistedTaskDescription.getVersion(), persistedTask.getVersion());
-        Assertions.assertEquals(persistedTaskDescription.getName(), persistedTask.getName());
-        Assertions.assertEquals(persistedTaskDescription.getAuthors().size(), persistedTask.getAuthors().size());
+        Assertions.assertEquals(persistedTaskDescription.namespace(), persistedTask.getNamespace());
+        Assertions.assertEquals(persistedTaskDescription.version(), persistedTask.getVersion());
+        Assertions.assertEquals(persistedTaskDescription.name(), persistedTask.getName());
+        Assertions.assertEquals(persistedTaskDescription.authors().size(), persistedTask.getAuthors().size());
     }
 
     @Then("App Engine sends a {string} OK response with a payload containing "
@@ -283,7 +283,7 @@ public class ReadTaskStepDefinitions {
 
         StorageData emptyFile = new StorageData(tempFile, descriptorFileName);
         emptyFile.peek().setName("descriptor.yml");
-        emptyFile.peek().setStorageId(storage.getIdStorage());
+        emptyFile.peek().setStorageId(storage.id());
         storageHandler.readStorageData(emptyFile);
         Assertions.assertTrue(Files.size(emptyFile.peek().getData().toPath()) > 0);
     }

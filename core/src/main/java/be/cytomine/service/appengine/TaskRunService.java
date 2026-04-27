@@ -634,7 +634,7 @@ public class TaskRunService {
 
         List<TaskRunValue> outputs;
         try {
-            outputs = new ObjectMapper().readValue(response, new TypeReference<>() {});
+            outputs = objectMapper.readValue(response, new TypeReference<>() {});
         } catch (JsonProcessingException e) {
             throw new ObjectNotFoundException("Outputs from", taskRunId);
         }
@@ -645,7 +645,7 @@ public class TaskRunService {
         String taskRunData = appEngineService.get("task-runs/" + taskRunId);
         TaskRunResponse taskRunResponse;
         try {
-            taskRunResponse = new ObjectMapper().readValue(taskRunData, TaskRunResponse.class);
+            taskRunResponse = objectMapper.readValue(taskRunData, TaskRunResponse.class);
         } catch (JsonProcessingException e) {
             throw new ObjectNotFoundException("Task run", taskRunId);
         }
@@ -671,7 +671,7 @@ public class TaskRunService {
 
         for (TaskRunValue geometry : geometries) {
             TaskRunLayer matchedLayer = layersByParameterName.get(geometry.getParameterName());
-            CropOffset offset = matchedLayer.getOffsets().get(0);
+            CropOffset offset = matchedLayer.getOffsets().getFirst();
             String wktGeometry = geometryService.geoJsonToWkt((String) geometry.getValue());
             Geometry parsedGeometry = GeometryService.addOffset(wktGeometry, offset.getX(), offset.getY());
             annotationService.createAnnotation(annotationLayer, parsedGeometry.toString());

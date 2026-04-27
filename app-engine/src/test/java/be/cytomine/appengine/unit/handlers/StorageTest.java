@@ -63,7 +63,7 @@ public class StorageTest {
         Storage dir = new Storage("main");
         storageHandler.createStorage(dir);
 
-        Path filePath = Paths.get(basePath, dir.getIdStorage());
+        Path filePath = Paths.get(basePath, dir.id());
         Assertions.assertTrue(Files.exists(filePath));
     }
 
@@ -80,14 +80,13 @@ public class StorageTest {
         storageHandler.createStorage(dir);
         storageHandler.saveStorageData(dir, integerStorageData);
 
-        Path filePath = Paths.get(basePath, dir.getIdStorage(), "a");
+        Path filePath = Paths.get(basePath, dir.id(), "a");
         Assertions.assertTrue(Files.exists(filePath));
     }
 
     @Test
     @DisplayName("Testing successful nested directory structure")
-    public void successfulNestDirectoriesStorageDataSave()
-        throws IOException, FileStorageException {
+    public void successfulNestDirectoriesStorageDataSave() throws IOException, FileStorageException {
         // Storing nested directories
         int value = 200;
         String valueString = new ObjectMapper().writeValueAsString(value);
@@ -135,8 +134,7 @@ public class StorageTest {
 
     @Test
     @DisplayName("Testing successful nested directory structure merger")
-    public void successfulNestDirectoriesStorageDataMergeSave()
-        throws IOException, FileStorageException {
+    public void successfulNestDirectoriesStorageDataMergeSave() throws IOException, FileStorageException {
         // Storing nested directories
         int value = 200;
         String valueString = new ObjectMapper().writeValueAsString(value);
@@ -211,7 +209,7 @@ public class StorageTest {
         StorageData integerStorageData = new StorageData(FileHelper.write(parameterName, valueBytes), parameterName);
         storageHandler.saveStorageData(testStorage, integerStorageData);
 
-        StorageData emptyFile = new StorageData(parameterName, testStorage.getIdStorage());
+        StorageData emptyFile = new StorageData(parameterName, testStorage.id());
         storageHandler.readStorageData(emptyFile);
         int actualValue = Integer.parseInt(FileHelper.read(emptyFile.peek().getData(), Charset.defaultCharset()));
 
@@ -253,7 +251,7 @@ public class StorageTest {
 
         storageHandler.saveStorageData(storage, nestedDirectory);
 
-        StorageData emptyFile = new StorageData("nuclei", storage.getIdStorage());
+        StorageData emptyFile = new StorageData("nuclei", storage.id());
         storageHandler.readStorageData(emptyFile);
 
         List<String> expectedNames = List.of(
@@ -277,7 +275,7 @@ public class StorageTest {
 
         FileStorageException exception = Assertions.assertThrows(
             FileStorageException.class, () -> {
-                StorageData emptyFile = new StorageData(parameterName, testStorage.getIdStorage());
+                StorageData emptyFile = new StorageData(parameterName, testStorage.id());
                 storageHandler.readStorageData(emptyFile);
             }
         );
@@ -289,7 +287,7 @@ public class StorageTest {
     public void shouldDeleteDirectoryWhenStorageIsDeleted() throws FileStorageException {
         Storage testStorage = new Storage("test-storage");
         storageHandler.createStorage(testStorage);
-        Path filePath = Paths.get(basePath, testStorage.getIdStorage());
+        Path filePath = Paths.get(basePath, testStorage.id());
         Assertions.assertTrue(Files.exists(filePath));
 
         storageHandler.deleteStorage(testStorage);

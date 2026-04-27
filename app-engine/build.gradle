@@ -154,3 +154,10 @@ tasks.register('cucumber') {
         }
     }
 }
+
+compileJava {
+    options.compilerArgs += [
+            '-Amapstruct.unmappedTargetPolicy=ERROR',
+            '-Amapstruct.unmappedSourcePolicy=ERROR'
+    ]
+}

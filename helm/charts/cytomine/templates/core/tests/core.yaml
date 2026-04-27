@@ -1,8 +1,4 @@
-{{- $ingressSvc := lookup "v1" "Service" "ingress" "ingress-nginx-controller" }}
-{{- $ingressIP := .Values.test.ingressIP | default "" }}
-{{- if and (not $ingressIP) $ingressSvc }}
-{{- $ingressIP = $ingressSvc.spec.clusterIP }}
-{{- end }}
+{{- $gatewayIP := .Values.test.ingressIP | default "" }}
 apiVersion: v1
 kind: Pod
 metadata:
@@ -14,9 +10,9 @@ metadata:
 spec:
   securityContext:
   {{- include "cytomine.podSecurityContext" . | nindent 4 }}
-  {{- if $ingressIP }}
+  {{- if $gatewayIP }}
   hostAliases:
-    - ip: "{{ $ingressIP }}"
+    - ip: "{{ $gatewayIP }}"
       hostnames:
         - "{{ .Values.global.domainName }}"
   {{- end }}

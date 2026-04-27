@@ -240,55 +240,59 @@ public class TaskRunService {
         securityACLService.checkIsNotReadOnly(project);
     }
 
-    private List<JsonNode> processProvisions(List<JsonNode> json) {
-        List<JsonNode> requestBody = new ArrayList<>();
-        ObjectMapper mapper = new ObjectMapper();
+    private ObjectNode processProvision(JsonNode provision, Long projectId, UUID taskRunId) {
+        ObjectNode processedProvision = provision.deepCopy();
+        processedProvision.remove("type");
 
-        for (JsonNode provision : json) {
-            ObjectNode processedProvision = provision.deepCopy();
-            processedProvision.remove("type");
+        String typeId = provision.get("type").get("id").asText();
+        String parameterName = provision.get("param_name").asText();
 
-            // Process the input if it is an annotation type
-            if (provision.get("type").get("id").asText().equals("geometry")) {
-                if (!provision.get("value").isNull()) {
-                    Long annotationId = provision.get("value").asLong();
-                    UserAnnotation annotation = userAnnotationService.get(annotationId);
-                    processedProvision.put("value", geometryService.wktToGeoJson(annotation.getWktLocation()));
-                }
-            }
+        if (typeId.equals("geometry") && !provision.get("value").isNull()) {
+            Long annotationId = provision.get("value").asLong();
+            UserAnnotation annotation = userAnnotationService.get(annotationId);
+            processedProvision.put("value", geometryService.wktToGeoJson(annotation.getWktLocation()));
 
-            if (provision.get("type").get("id").asText().equals("array") && provision.get("value").isArray()) {
-                int index = 0;
-                ArrayNode valueListNode = mapper.createArrayNode();
-                boolean subTypeIsGeometry = provision.get("type").get("subType").get("id").asText().equals("geometry");
-                if (!provision.get("value").isNull()) {
-                    for (JsonNode element : provision.get("value")) {
-                        ObjectNode itemJsonObject = mapper.createObjectNode();
-                        itemJsonObject.put("index", index);
+            Envelope bounds = GeometryService.getBounds(annotation.getWktLocation());
+            TaskRun taskRun = taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId)
+                .orElseThrow(() -> new ObjectNotFoundException("TaskRun", taskRunId));
 
-                        if (subTypeIsGeometry) {
-                            Long annotationId = element.asLong();
-                            UserAnnotation annotation = userAnnotationService.get(annotationId);
-                            itemJsonObject.put("value", geometryService.wktToGeoJson(annotation.getWktLocation()));
-                        } else {
-                            itemJsonObject.set("value", element);
-                        }
-                        valueListNode.add(itemJsonObject);
-                        index++;
-                    }
-                }
-                processedProvision.set("value", valueListNode);
-            }
-
-            requestBody.add(processedProvision);
+            saveCropOffset(taskRun, parameterName, bounds);
         }
 
-        return requestBody;
+        if (typeId.equals("array") && provision.get("value").isArray()) {
+            ArrayNode valueListNode = objectMapper.createArrayNode();
+            boolean subTypeIsGeometry = provision.get("type").get("subType").get("id").asText().equals("geometry");
+
+            if (!provision.get("value").isNull()) {
+                int index = 0;
+                for (JsonNode element : provision.get("value")) {
+                    ObjectNode itemJsonObject = objectMapper.createObjectNode();
+                    itemJsonObject.put("index", index);
+
+                    if (subTypeIsGeometry) {
+                        Long annotationId = element.asLong();
+                        UserAnnotation annotation = userAnnotationService.get(annotationId);
+                        itemJsonObject.put("value", geometryService.wktToGeoJson(annotation.getWktLocation()));
+                    } else {
+                        itemJsonObject.set("value", element);
+                    }
+
+                    valueListNode.add(itemJsonObject);
+                    index++;
+                }
+            }
+
+            processedProvision.set("value", valueListNode);
+        }
+
+        return processedProvision;
     }
 
-    public String batchProvisionTaskRun(List<JsonNode> requestBody, Long projectId, UUID taskRunId) {
+    public String batchProvisionTaskRun(List<JsonNode> provisions, Long projectId, UUID taskRunId) {
         checkTaskRun(projectId, taskRunId);
-        List<JsonNode> body = processProvisions(requestBody);
+        List<JsonNode> body = provisions.stream()
+            .map(provision -> processProvision(provision, projectId, taskRunId))
+            .collect(Collectors.toList());
         return appEngineService.put("task-runs/" + taskRunId + "/input-provisions", body, MediaType.APPLICATION_JSON);
     }
 

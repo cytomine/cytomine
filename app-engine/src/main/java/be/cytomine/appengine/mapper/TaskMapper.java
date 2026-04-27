@@ -1,5 +1,7 @@
 package be.cytomine.appengine.mapper;
 
+import java.util.Optional;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -15,4 +17,8 @@ public interface TaskMapper {
 
     @Mapping(source = "contact", target = "isContact")
     TaskAuthor toTaskAuthor(Author author);
+
+    default Optional<String> mapDescription(String description) {
+        return Optional.ofNullable(description);
+    }
 }

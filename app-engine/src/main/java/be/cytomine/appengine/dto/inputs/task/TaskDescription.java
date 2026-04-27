@@ -1,5 +1,6 @@
 package be.cytomine.appengine.dto.inputs.task;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -8,10 +9,6 @@ public record TaskDescription(
     String name,
     String namespace,
     String version,
-    String description,
+    Optional<String> description,
     Set<TaskAuthor> authors
-) {
-    public TaskDescription {
-        description = description == null ? "" : description;
-    }
-}
+) {}

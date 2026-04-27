@@ -133,8 +133,7 @@ public class TaskService {
                     log.info("UploadTask: Descriptor file read into memory");
                     try {
                         log.info("UploadTask: validating descriptor file...");
-                        descriptorFileAsJson = new ObjectMapper(
-                            new YAMLFactory()).readTree(descriptorFileYmlContent);
+                        descriptorFileAsJson = new ObjectMapper(new YAMLFactory()).readTree(descriptorFileYmlContent);
                         taskValidationService.validateDescriptorFile(descriptorFileAsJson);
                         taskValidationService.checkIsNotDuplicate(descriptorFileAsJson);
                         log.info("UploadTask: Descriptor file validated");
@@ -273,12 +272,10 @@ public class TaskService {
         task.setStorageReference(storageIdentifier);
         task.setImageName(imageRegistryCompliantName);
         task.setName(descriptorFileAsJson.get("name").textValue());
-        task.setNameShort(descriptorFileAsJson
-            .get("name_short")
-            .textValue());
-        task.setDescriptorFile(
-            descriptorFileAsJson.get("namespace").textValue());
+        task.setNameShort(descriptorFileAsJson.get("name_short").textValue());
+        task.setDescriptorFile(descriptorFileAsJson.get("namespace").textValue());
         task.setNamespace(descriptorFileAsJson.get("namespace").textValue());
+        task.setDescription(descriptorFileAsJson.path("description").textValue());
         task.setVersion(descriptorFileAsJson.get("version").textValue());
         task.setInputFolder(
             descriptorFileAsJson

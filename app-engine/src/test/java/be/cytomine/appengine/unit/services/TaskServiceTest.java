@@ -106,7 +106,7 @@ public class TaskServiceTest {
             task.getName(),
             task.getNamespace(),
             task.getVersion(),
-            task.getDescription(),
+            Optional.ofNullable(task.getDescription()),
             Set.of(mappedAuthor)
         );
         when(taskMapper.toTaskDescription(any(Task.class))).thenReturn(expectedTaskDescription);

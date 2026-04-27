@@ -33,8 +33,8 @@ jobs:
       - name: Update dependencies to use proxy registry
         run: sed -i 's|oci://docker.io/|oci://registry.cytomine.org/docker/|g' ./charts/cytomine/Chart.yaml
 
-      - name: Helm dependency build
-        run: helm dependency build ./charts/cytomine
+      - name: Helm dependency update
+        run: helm dependency update ./charts/cytomine
 
       - name: Restore Chart.yaml
         run: git checkout -- charts/cytomine/Chart.yaml

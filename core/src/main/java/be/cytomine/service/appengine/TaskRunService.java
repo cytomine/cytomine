@@ -273,6 +273,12 @@ public class TaskRunService {
                         Long annotationId = element.asLong();
                         UserAnnotation annotation = userAnnotationService.get(annotationId);
                         itemJsonObject.put("value", geometryService.wktToGeoJson(annotation.getWktLocation()));
+                        Envelope bounds = GeometryService.getBounds(annotation.getWktLocation());
+
+                        TaskRun taskRun = taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId)
+                            .orElseThrow(() -> new ObjectNotFoundException("TaskRun", taskRunId));
+
+                        saveCropOffset(taskRun, parameterName, bounds);
                     } else {
                         itemJsonObject.set("value", element);
                     }

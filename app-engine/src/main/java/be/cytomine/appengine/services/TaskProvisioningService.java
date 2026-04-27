@@ -121,11 +121,7 @@ public class TaskProvisioningService {
     private String basePath;
 
     @Transactional
-    public JsonNode provisionRunParameter(
-        String runId,
-        String name,
-        Object value
-    ) throws ProvisioningException {
+    public JsonNode provisionRunParameter(String runId, String name, Object value) throws ProvisioningException {
         log.info("ProvisionParameter: finding associated task run...");
         Run run = getRunIfValid(runId);
         log.info("ProvisionParameter: found");
@@ -136,10 +132,7 @@ public class TaskProvisioningService {
         if (value instanceof JsonNode) {
             try {
                 ObjectMapper mapper = new ObjectMapper();
-                genericParameterProvision = mapper.treeToValue(
-                    (JsonNode) value,
-                    GenericParameterProvision.class
-                );
+                genericParameterProvision = mapper.treeToValue((JsonNode) value, GenericParameterProvision.class);
             } catch (JsonProcessingException e) {
                 log.info("ProvisionParameter: provision is not valid");
                 AppEngineError error = ErrorBuilder.build(
@@ -158,10 +151,7 @@ public class TaskProvisioningService {
         try {
             validateProvisionValuesAgainstTaskType(genericParameterProvision, run);
         } catch (TypeValidationException e) {
-            AppEngineError error = ErrorBuilder.build(
-                e.getErrorCode(),
-                new ParameterError(name)
-            );
+            AppEngineError error = ErrorBuilder.build(e.getErrorCode(), new ParameterError(name));
             throw new ProvisioningException(error);
         }
         log.info("ProvisionParameter: provision is valid");
@@ -185,8 +175,7 @@ public class TaskProvisioningService {
 
         changeStateToProvisioned(run);
 
-        return getInputParameterType(name, run)
-            .createInputProvisioningEndpointResponse(provision, run);
+        return getInputParameterType(name, run).createInputProvisioningEndpointResponse(provision, run);
     }
 
     private void changeStateToProvisioned(Run run) {
@@ -211,7 +200,6 @@ public class TaskProvisioningService {
         } else {
             log.info("ProvisionParameter: RUN NOT PROVISIONED");
         }
-
     }
 
     public List<JsonNode> provisionMultipleRunParameters(
@@ -228,10 +216,7 @@ public class TaskProvisioningService {
             GenericParameterProvision genericParameterProvision = new GenericParameterProvision();
             try {
                 ObjectMapper mapper = new ObjectMapper();
-                genericParameterProvision = mapper.treeToValue(
-                    provision,
-                    GenericParameterProvision.class
-                );
+                genericParameterProvision = mapper.treeToValue(provision, GenericParameterProvision.class);
                 genericParameterProvision.setRunId(runId);
                 log.info(
                     "ProvisionMultipleParameter: "
@@ -240,24 +225,14 @@ public class TaskProvisioningService {
 
                 validateProvisionValuesAgainstTaskType(genericParameterProvision, run);
             } catch (TypeValidationException e) {
-                log.info(
-                    "ProvisionMultipleParameter: "
-                    + "provision is invalid value validation failed"
-                );
-                ParameterError parameterError = new ParameterError(
-                    genericParameterProvision.getParameterName()
-                );
+                log.info("ProvisionMultipleParameter: provision is invalid value validation failed");
+                ParameterError parameterError = new ParameterError(genericParameterProvision.getParameterName());
                 AppEngineError error = ErrorBuilder.build(e.getErrorCode(), parameterError);
                 multipleErrors.add(error);
                 continue;
             } catch (JsonProcessingException e) {
-                log.info(
-                    "ProvisionMultipleParameter: "
-                    + "provision is not invalid json processing failed"
-                );
-                ParameterError parameterError = new ParameterError(
-                    genericParameterProvision.getParameterName()
-                );
+                log.info("ProvisionMultipleParameter: provision is not invalid json processing failed");
+                ParameterError parameterError = new ParameterError(genericParameterProvision.getParameterName());
                 AppEngineError error = ErrorBuilder.build(
                     ErrorCode.INTERNAL_JSON_PROCESSING_ERROR,
                     parameterError
@@ -302,13 +277,10 @@ public class TaskProvisioningService {
     }
 
     @NotNull
-    private void saveInDatabase(String parameterName, JsonNode provision, Run run)
-        throws ProvisioningException {
+    private void saveInDatabase(String parameterName, JsonNode provision, Run run) throws ProvisioningException {
         Parameter inputForType = getParameter(parameterName, ParameterType.INPUT, run);
 
-        inputForType
-            .getType()
-            .persistProvision(provision, run.getId());
+        inputForType.getType().persistProvision(provision, run.getId());
     }
 
     private Type getInputParameterType(String parameterName, Run run) {
@@ -334,9 +306,7 @@ public class TaskProvisioningService {
                 String filename = current.getName();
                 if (!"descriptor.yml".equalsIgnoreCase(filename)
                     && current.getStorageDataType() != StorageDataType.DIRECTORY) {
-                    setChecksumCRC32(
-                        runStorage.getIdStorage(),
-                        calculateFileCRC32(current.getData()), filename);
+                    setChecksumCRC32(runStorage.id(), calculateFileCRC32(current.getData()), filename);
                 }
             }
             if (inputProvisionFileData.isReferenced()) {
@@ -473,10 +443,7 @@ public class TaskProvisioningService {
         }
     }
 
-    private Type validateParents(
-        Parameter parameter,
-        String[] indexes)
-        throws TypeValidationException {
+    private Type validateParents(Parameter parameter, String[] indexes) throws TypeValidationException {
         int validationDepth = indexes.length - 1;
         CollectionType type = (CollectionType) parameter.getType();
         for (int i = 0; i <= validationDepth; i++) {
@@ -491,8 +458,7 @@ public class TaskProvisioningService {
             }
             // validate index against
             int index = Integer.parseInt(indexes[i]);
-            if (index > ((CollectionType) type.getParentType()).getMaxSize() - 1
-                || index < 0) {
+            if (index > ((CollectionType) type.getParentType()).getMaxSize() - 1 || index < 0) {
                 throw new TypeValidationException("invalid index [{" + index + "}]");
             }
         }
@@ -528,10 +494,7 @@ public class TaskProvisioningService {
         ZipOutputStream zipOut = new ZipOutputStream(outputStream);
         for (TypePersistence provision : provisions) {
             // check that this type persistence is actually associated with a parameter
-            Parameter parameter = getParameter(
-                provision.getParameterName(),
-                provision.getParameterType(),
-                run);
+            Parameter parameter = getParameter(provision.getParameterName(), provision.getParameterType(), run);
             if (Objects.isNull(parameter)) {
                 continue;
             }
@@ -552,8 +515,7 @@ public class TaskProvisioningService {
                     zipEntry.setMethod(ZipEntry.STORED);
                     zipEntry.setSize(current.getData().length());
                     zipEntry.setCompressedSize(current.getData().length());
-                    zipEntry.setCrc(
-                        getChecksumCRC32("task-run-" + io + "-" + run.getId(), current.getName()));
+                    zipEntry.setCrc(getChecksumCRC32("task-run-" + io + "-" + run.getId(), current.getName()));
                     zipOut.putNextEntry(zipEntry);
                     Files.copy(current.getData().toPath(), zipOut);
                 }
@@ -565,11 +527,9 @@ public class TaskProvisioningService {
         zipOut.close();
 
         log.info("Retrieving IO Archive: zipped...");
-
     }
 
     public long getChecksumCRC32(String identifier, String name) {
-
         String reference = identifier + "-" + name;
         Checksum crc32 = checksumRepository.findByReference(reference);
         return crc32.getChecksumCRC32();
@@ -589,8 +549,7 @@ public class TaskProvisioningService {
         log.info("Posting Outputs Archive: posting...");
         Run run = getRunIfValid(runId);
         if (!run.getSecret().equals(secret)) {
-            AppEngineError error = ErrorBuilder
-                .build(ErrorCode.SCHEDULER_UNAUTHENTICATED_OUTPUT_PROVISIONING);
+            AppEngineError error = ErrorBuilder.build(ErrorCode.SCHEDULER_UNAUTHENTICATED_OUTPUT_PROVISIONING);
             throw new ProvisioningException(error);
         }
         if (notInOneOfSchedulerManagedStates(run)) {
@@ -643,23 +602,14 @@ public class TaskProvisioningService {
                         remainingOutputs.remove(i);
                         StorageData parameterZipEntryStorageData;
                         String outputName = currentOutput.getName();
-                        Path filePath = Path.of(
-                            basePath,
-                            "/",
-                            "task-run-outputs-" + run.getId(),
-                            outputName);
-                        log.info("Posting Outputs Archive: storing {} in storage...",
-                            currentOutput);
+                        Path filePath = Path.of(basePath, "/", "task-run-outputs-" + run.getId(), outputName);
+                        log.info("Posting Outputs Archive: storing {} in storage...", currentOutput);
                         Files.createDirectories(filePath.getParent());
                         Files.copy(zais, filePath, StandardCopyOption.REPLACE_EXISTING);
                         log.info("Posting Outputs Archive: stored ");
-                        parameterZipEntryStorageData = new StorageData(
-                            filePath.toFile(),
-                            outputName);
+                        parameterZipEntryStorageData = new StorageData(filePath.toFile(), outputName);
                         // calculate CRC32 for all storage data entry and save it in the database
-                        log.info("Posting Outputs Archive: "
-                            + "calculating CRC32 checksum for zip entry {}",
-                            ze.getName());
+                        log.info("Posting Outputs Archive: calculating CRC32 checksum for zip entry {}", ze.getName());
                         calculateCRC32Checksum(run, contentsOfZip, parameterZipEntryStorageData);
                         break;
                     }
@@ -669,9 +619,7 @@ public class TaskProvisioningService {
                         if (ze.isDirectory()) {
                             partialParameterZipEntryStorageData = new StorageData(ze.getName());
                             contentsOfZip.add(partialParameterZipEntryStorageData);
-                            log.info("Posting Outputs Archive: "
-                                + "creating directory {} in storage...",
-                                ze.getName());
+                            log.info("Posting Outputs Archive: creating directory {} in storage...", ze.getName());
                             Path directoryPath = Path.of(
                                 basePath,
                                 "/",
@@ -687,8 +635,7 @@ public class TaskProvisioningService {
                                 .getName()
                                 .replace("/", ""));
                             Files.createDirectories(filePath);
-                            log.info("Posting Outputs Archive: storing {} in storage...",
-                                ze.getName());
+                            log.info("Posting Outputs Archive: storing {} in storage...", ze.getName());
                             Files.copy(zais, filePath, StandardCopyOption.REPLACE_EXISTING);
                             log.info("Posting Outputs Archive: stored ");
                             partialParameterZipEntryStorageData = new StorageData(
@@ -702,7 +649,6 @@ public class TaskProvisioningService {
                                 contentsOfZip,
                                 partialParameterZipEntryStorageData);
                         }
-
                         break;
                     }
 
@@ -718,7 +664,6 @@ public class TaskProvisioningService {
                     log.info("Posting Outputs Archive: updated Run state to FAILED");
                     throw new ProvisioningException(error);
                 }
-
             }
 
             // check if remaining outputs are all collections
@@ -727,8 +672,7 @@ public class TaskProvisioningService {
                 .filter(parameter -> parameter.getType() instanceof CollectionType)
                 .toList()
                 .size();
-            remainingOutputsAreCollections = numberOfCollections > 0
-                && numberOfCollections == remainingOutputs.size();
+            remainingOutputsAreCollections = numberOfCollections > 0 && numberOfCollections == remainingOutputs.size();
 
             if (!remainingOutputs.isEmpty() && !remainingOutputsAreCollections) {
                 AppEngineError error = ErrorBuilder.build(ErrorCode.INTERNAL_MISSING_OUTPUTS);
@@ -792,16 +736,14 @@ public class TaskProvisioningService {
                 } catch (TypeValidationException e) {
                     // todo : delete all outputs of the run in case of validation errors
                     log.info(
-                        "ProcessOutputFiles: "
-                        + "output provision is invalid value validation failed"
+                        "ProcessOutputFiles: output provision is invalid value validation failed"
                     );
                     ParameterError parameterError = new ParameterError(outputName);
                     AppEngineError error = ErrorBuilder.build(e.getErrorCode(), parameterError);
                     multipleErrors.add(error);
                     run.setState(TaskRunState.FAILED);
                     runRepository.saveAndFlush(run);
-                    log.info("Posting Outputs Archive: "
-                        + "updated Run state to FAILED because of invalid output");
+                    log.info("Posting Outputs Archive: updated Run state to FAILED because of invalid output");
                     try (Stream<Path> paths = Files.walk(
                         Paths.get(basePath, "/", "task-run-outputs-" + run.getId()))) {
                         paths.sorted(Comparator.reverseOrder()) // Delete children before parent
@@ -942,7 +884,7 @@ public class TaskProvisioningService {
 
         String io = type.equals(ParameterType.INPUT) ? "inputs" : "outputs";
         Storage storage = new Storage("task-run-" + io + "-" + runId);
-        StorageData data = new StorageData(parameterName, storage.getIdStorage());
+        StorageData data = new StorageData(parameterName, storage.id());
 
         log.info("Get IO file from storage: read file " + parameterName + " from storage...");
         try {
@@ -1023,7 +965,7 @@ public class TaskProvisioningService {
         String collectionItem = parameterName
             + "/"
             + Arrays.stream(indexes).sequential().collect(Collectors.joining("/"));
-        StorageData data = new StorageData(collectionItem, storage.getIdStorage());
+        StorageData data = new StorageData(collectionItem, storage.id());
 
         log.info("Get IO file from storage: read file " + collectionItem + " from storage...");
         try {
@@ -1111,7 +1053,7 @@ public class TaskProvisioningService {
         log.info("Update State: validating Run...");
         Run run = getRunIfValid(runId);
 
-        return switch (state.getDesired()) {
+        return switch (state.desired()) {
             case PROVISIONED -> updateToProvisioned(run);
             case RUNNING -> run(run);
             case FINISHED -> updateToFinished(run);
@@ -1121,9 +1063,6 @@ public class TaskProvisioningService {
     }
 
     private StateAction createStateAction(Run run, TaskRunState state) {
-        StateAction action = new StateAction();
-        action.setStatus("success");
-
         TaskDescription description = taskService.makeTaskDescription(run.getTask());
         Resource resource = new Resource(
             run.getId(),
@@ -1132,9 +1071,8 @@ public class TaskProvisioningService {
             new Date(),
             new Date()
         );
-        action.setResource(resource);
 
-        return action;
+        return new StateAction("success", resource);
     }
 
     @NotNull
@@ -1254,8 +1192,7 @@ public class TaskProvisioningService {
                         .endsWith(matchingItemIndex))
                         .toList();
                     if (matchedItemIndexes.size() != 1) {
-                        error = ErrorBuilder
-                            .build(ErrorCode.INTERNAL_NOT_MATCHING_NOT_ALIGNED_INDEXES);
+                        error = ErrorBuilder.build(ErrorCode.INTERNAL_NOT_MATCHING_NOT_ALIGNED_INDEXES);
                         throw new ProvisioningException(error);
                     }
                 }
@@ -1358,7 +1295,7 @@ public class TaskProvisioningService {
             try {
                 validateFiles(run, parameter, provisionFileData);
             } catch (TypeValidationException e) {
-                log.info("Provisioning: output provision is invalid value validation failed: " + e.getMessage());
+                log.info("Provisioning: output provision is invalid value validation failed");
                 ParameterError parameterError = new ParameterError(parameter.getName());
                 AppEngineError error = ErrorBuilder.build(e.getErrorCode(), parameterError);
                 multipleErrors.add(error);
@@ -1410,11 +1347,7 @@ public class TaskProvisioningService {
         );
     }
 
-    public JsonNode provisionCollectionItem(
-        String runId,
-        String name,
-        Object value,
-        String[] indexesArray)
+    public JsonNode provisionCollectionItem(String runId, String name, Object value, String[] indexesArray)
         throws ProvisioningException, TypeValidationException {
         // get run and make sure it is valid
         log.info("ProvisionCollectionItem: finding associated task run...");
@@ -1499,16 +1432,13 @@ public class TaskProvisioningService {
 
         changeStateToProvisioned(run);
 
-        return getInputParameterType(name, run)
-            .createInputProvisioningEndpointResponse(provision, run);
+        return getInputParameterType(name, run).createInputProvisioningEndpointResponse(provision, run);
     }
 
-    public Path prepareStreaming(
-        String runId, String parameterName
-    ) throws IOException {
+    public Path prepareStreaming(String runId, String parameterName) throws IOException {
         log.info("provisioning streaming: preparing...");
         Storage runStorage = new Storage("task-run-inputs-" + runId);
-        Path filePath = Paths.get(basePath, runStorage.getIdStorage(), parameterName);
+        Path filePath = Paths.get(basePath, runStorage.id(), parameterName);
         Files.createDirectories(filePath.getParent());
         return filePath;
     }
@@ -1522,7 +1452,7 @@ public class TaskProvisioningService {
         Storage runStorage = new Storage("task-run-inputs-" + runId);
         Path filePath = Paths.get(
             basePath,
-            runStorage.getIdStorage(),
+            runStorage.id(),
             parameterName + "/" + String.join("/",
             indexesArray));
         Files.createDirectories(filePath.getParent());
@@ -1533,7 +1463,7 @@ public class TaskProvisioningService {
             + "/"
             + (arrayYmlPosition.length > 0 ? String.join("/", arrayYmlPosition) + "/" : "")
             + "array.yml";
-        Path arrayYmlPath = Paths.get(basePath, runStorage.getIdStorage(), "/" + arrayYmlFilePath);
+        Path arrayYmlPath = Paths.get(basePath, runStorage.id(), "/" + arrayYmlFilePath);
         if (Files.exists(arrayYmlPath)) {
             // update the array.yml metadata file
             log.info("provisioning collection item streaming: updating collection array.yml...");
@@ -1545,7 +1475,7 @@ public class TaskProvisioningService {
             // update CRC32 checksum for it
             long updatedChecksum = calculateFileCRC32(arrayYmlPath.toFile());
             Checksum checksum = checksumRepository.findByReference(
-                runStorage.getIdStorage()
+                runStorage.id()
                 + "-"
                 + arrayYmlFilePath);
             checksum.setChecksumCRC32(updatedChecksum);
@@ -1557,7 +1487,7 @@ public class TaskProvisioningService {
             Files.writeString(arrayYmlPath, newContent, Charset.defaultCharset());
             // create CRC32 checksum for it
             setChecksumCRC32(
-                runStorage.getIdStorage(),
+                runStorage.id(),
                 calculateFileCRC32(arrayYmlPath.toFile()),
                 arrayYmlFilePath);
         }
@@ -1599,9 +1529,10 @@ public class TaskProvisioningService {
 
             // Validate that the first part is indeed a file and not a simple form field
             if (item.isFormField()) {
-                log.warn("provisioning streaming: "
-                    + "Expected a file but the first part is a form field: {}",
-                    item.getFieldName());
+                log.warn(
+                    "provisioning streaming: Expected a file but the first part is a form field: {}",
+                    item.getFieldName()
+                );
                 AppEngineError error = ErrorBuilder.build(
                     ErrorCode.INTERNAL_NO_FILE_BUT_FORM_FIELD,
                     new ParameterError(parameterName)
@@ -1673,9 +1604,10 @@ public class TaskProvisioningService {
 
             // Validate that the first part is indeed a file and not a simple form field
             if (item.isFormField()) {
-                log.warn("provisioning streaming: "
-                    + "Expected a file but the first part is a form field: {}",
-                    item.getFieldName());
+                log.warn(
+                    "provisioning streaming: Expected a file but the first part is a form field: {}",
+                    item.getFieldName()
+                );
                 AppEngineError error = ErrorBuilder.build(
                     ErrorCode.INTERNAL_NO_FILE_BUT_FORM_FIELD
                 );

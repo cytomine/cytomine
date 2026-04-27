@@ -240,6 +240,23 @@ public class TaskRunService {
         securityACLService.checkIsNotReadOnly(project);
     }
 
+    private void getAnnotationBounds(
+        Long projectId,
+        UUID taskRunId,
+        String parameterName,
+        ObjectNode itemJsonObject,
+        Long annotationId
+    ) {
+        UserAnnotation annotation = userAnnotationService.get(annotationId);
+        itemJsonObject.put("value", geometryService.wktToGeoJson(annotation.getWktLocation()));
+        Envelope bounds = GeometryService.getBounds(annotation.getWktLocation());
+
+        TaskRun taskRun = taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId)
+            .orElseThrow(() -> new ObjectNotFoundException("TaskRun", taskRunId));
+
+        saveCropOffset(taskRun, parameterName, bounds);
+    }
+
     private ObjectNode processProvision(JsonNode provision, Long projectId, UUID taskRunId) {
         ObjectNode processedProvision = provision.deepCopy();
         processedProvision.remove("type");
@@ -249,14 +266,7 @@ public class TaskRunService {
 
         if (typeId.equals("geometry") && !provision.get("value").isNull()) {
             Long annotationId = provision.get("value").asLong();
-            UserAnnotation annotation = userAnnotationService.get(annotationId);
-            processedProvision.put("value", geometryService.wktToGeoJson(annotation.getWktLocation()));
-
-            Envelope bounds = GeometryService.getBounds(annotation.getWktLocation());
-            TaskRun taskRun = taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId)
-                .orElseThrow(() -> new ObjectNotFoundException("TaskRun", taskRunId));
-
-            saveCropOffset(taskRun, parameterName, bounds);
+            getAnnotationBounds(projectId, taskRunId, parameterName, processedProvision, annotationId);
         }
 
         if (typeId.equals("array") && provision.get("value").isArray()) {
@@ -271,14 +281,7 @@ public class TaskRunService {
 
                     if (subTypeIsGeometry) {
                         Long annotationId = element.asLong();
-                        UserAnnotation annotation = userAnnotationService.get(annotationId);
-                        itemJsonObject.put("value", geometryService.wktToGeoJson(annotation.getWktLocation()));
-                        Envelope bounds = GeometryService.getBounds(annotation.getWktLocation());
-
-                        TaskRun taskRun = taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId)
-                            .orElseThrow(() -> new ObjectNotFoundException("TaskRun", taskRunId));
-
-                        saveCropOffset(taskRun, parameterName, bounds);
+                        getAnnotationBounds(projectId, taskRunId, parameterName, itemJsonObject, annotationId);
                     } else {
                         itemJsonObject.set("value", element);
                     }

@@ -24,6 +24,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -37,6 +38,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.TermMapper;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.http.TermHttpContract;
+import be.cytomine.common.repository.http.TermRelationHttpContract;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.ontology.AnnotationTerm;
@@ -88,6 +90,14 @@ public class TermServiceTests {
 
     @MockitoBean
     TermHttpContract termHttpContract;
+
+    @MockitoBean
+    TermRelationHttpContract termRelationHttpContract;
+
+    @BeforeEach
+    void setUp() {
+        when(termRelationHttpContract.findTermRelationsByTermID(anyLong(), anyLong())).thenReturn(Set.of());
+    }
 
     private Optional<Long> getTermRelation(Long termRelationId) {
         String request = "select count(*) from term_relation where id = :id and deleted is null";
@@ -197,7 +207,6 @@ public class TermServiceTests {
     @Test
     void deleteTermWithDependenciesWithSuccess() {
         Term term = builder.givenATerm();
-        RelationTerm relationTerm = builder.givenARelationTerm(term, builder.givenATerm(term.getOntology()));
 
         CommandResponse commandResponse = termService.delete(term, null, null, true);
 

@@ -41,6 +41,8 @@ public class TermAuthorizationTest extends CRDAuthorizationTest {
     private BasicInstanceBuilder basicInstanceBuilder;
     @Autowired
     private TermMapper termMapper;
+    @Autowired
+    private WiremockRepository wiremockRepository;
     private Term term = null;
 
 
@@ -51,7 +53,7 @@ public class TermAuthorizationTest extends CRDAuthorizationTest {
             term = builder.givenATerm();
             initACL(term.container());
         }
-
+        wiremockRepository.stubTerm(term);
 
     }
 

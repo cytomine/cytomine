@@ -359,11 +359,11 @@ public class TaskRunService {
     }
 
     private void saveCropOffset(TaskRun taskRun, String parameterName, Envelope bounds) {
-        TaskRunLayer taskRunLayer = taskRunLayerRepository
-            .findByTaskRunAndDerivedFrom(taskRun, parameterName)
-            .orElseThrow(() -> new RuntimeException("Task run layer not found for " + parameterName));
-        taskRunLayer.getOffsets().add(new CropOffset((int) bounds.getMinX(), (int) bounds.getMinY()));
-        taskRunLayerRepository.saveAndFlush(taskRunLayer);
+        taskRunLayerRepository.findByTaskRunAndDerivedFrom(taskRun, parameterName)
+            .ifPresent(layer -> {
+                layer.getOffsets().add(new CropOffset((int) bounds.getMinX(), (int) bounds.getMinY()));
+                taskRunLayerRepository.saveAndFlush(layer);
+            });
     }
 
     public String provisionTaskRun(JsonNode json, Long projectId, UUID taskRunId, String parameterName)
@@ -669,8 +669,10 @@ public class TaskRunService {
             .collect(Collectors.toSet());
 
         for (TaskRunValue geometry : geometries) {
-            TaskRunLayer matchedLayer = layersByParameterName.get(geometry.getParameterName());
-            CropOffset offset = matchedLayer.getOffsets().getFirst();
+            CropOffset offset = Optional.ofNullable(layersByParameterName.get(geometry.getParameterName()))
+                .filter(layer -> !layer.getOffsets().isEmpty())
+                .map(layer -> layer.getOffsets().getFirst())
+                .orElseGet(() -> new CropOffset(0, 0));
             String wktGeometry = geometryService.geoJsonToWkt((String) geometry.getValue());
             Geometry parsedGeometry = GeometryService.addOffset(wktGeometry, offset.getX(), offset.getY());
             annotationService.createAnnotation(annotationLayer, parsedGeometry.toString());

@@ -261,7 +261,7 @@ public class TaskRunService {
         processedProvision.remove("type");
 
         String typeId = provision.get("type").get("id").asText();
-        String parameterName = provision.get("param_name").asText();
+        String parameterName = provision.get("parameterName").asText();
 
         if (typeId.equals("geometry") && !provision.get("value").isNull()) {
             Long annotationId = provision.get("value").asLong();
@@ -570,16 +570,16 @@ public class TaskRunService {
         TaskRunLayer taskRunLayer,
         int index
     ) {
-        if (!"ARRAY".equals(value.getType())) {
+        if (!"ARRAY".equals(value.type())) {
             return;
         }
 
-        List<?> items = (List<?>) value.getValue();
+        List<?> items = (List<?>) value.value();
         if (items == null || items.isEmpty()) {
             return;
         }
 
-        if ("GEOMETRY".equals(value.getSubType())) {
+        if ("GEOMETRY".equals(value.subType())) {
             List<CropOffset> offsets = taskRunLayer.getOffsets();
             CropOffset offset = index < offsets.size() ? offsets.get(index) : new CropOffset();
 
@@ -592,7 +592,7 @@ public class TaskRunService {
                     annotationService.createAnnotation(annotationLayer, parsedGeometry.toString());
                 }
             }
-        } else if ("ARRAY".equals(value.getSubType())) {
+        } else if ("ARRAY".equals(value.subType())) {
             List<TaskRunValue> innerValues = objectMapper.convertValue(items, new TypeReference<>() {});
 
             for (int i = 0; i < items.size(); i++) {
@@ -602,17 +602,17 @@ public class TaskRunService {
     }
 
     private boolean hasGeometrySubType(TaskRunValue value) {
-        if (!"ARRAY".equals(value.getType())) {
+        if (!"ARRAY".equals(value.type())) {
             return false;
         }
 
-        String subType = value.getSubType();
+        String subType = value.subType();
         if ("GEOMETRY".equals(subType)) {
             return true;
         }
 
         if ("ARRAY".equals(subType)) {
-            if (!(value.getValue() instanceof List<?> innerList)) {
+            if (!(value.value() instanceof List<?> innerList)) {
                 return false;
             }
 
@@ -665,15 +665,15 @@ public class TaskRunService {
 
         Set<TaskRunValue> geometries = outputs
             .stream()
-            .filter(v -> v.getValue() instanceof String geometry && geometryService.isGeometry(geometry))
+            .filter(v -> v.value() instanceof String geometry && geometryService.isGeometry(geometry))
             .collect(Collectors.toSet());
 
         for (TaskRunValue geometry : geometries) {
-            CropOffset offset = Optional.ofNullable(layersByParameterName.get(geometry.getParameterName()))
+            CropOffset offset = Optional.ofNullable(layersByParameterName.get(geometry.parameterName()))
                 .filter(layer -> !layer.getOffsets().isEmpty())
                 .map(layer -> layer.getOffsets().getFirst())
                 .orElseGet(() -> new CropOffset(0, 0));
-            String wktGeometry = geometryService.geoJsonToWkt((String) geometry.getValue());
+            String wktGeometry = geometryService.geoJsonToWkt((String) geometry.value());
             Geometry parsedGeometry = GeometryService.addOffset(wktGeometry, offset.getX(), offset.getY());
             annotationService.createAnnotation(annotationLayer, parsedGeometry.toString());
         }
@@ -684,7 +684,8 @@ public class TaskRunService {
             .toList();
 
         for (TaskRunValue arrayValue : geometryArrays) {
-            TaskRunLayer matchedLayer = layersByParameterName.get(arrayValue.getParameterName());
+            TaskRunLayer matchedLayer = layersByParameterName.get(arrayValue.parameterName());
+            System.out.println("MATCHED " + matchedLayer + " : " + layersByParameterName);
             processGeometryValue(arrayValue, annotationLayer, matchedLayer, 0);
         }
 

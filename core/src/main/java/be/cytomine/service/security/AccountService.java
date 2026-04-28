@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import io.jsonwebtoken.lang.Strings;
@@ -62,7 +61,7 @@ public class AccountService {
         log.info("Creating account for user {}", account.username());
         // validate account
         Validation validation = validateAccount(account, ValidationFor.CREATE);
-        if (!validation.isOk()) {
+        if (!validation.ok()) {
             throw new UserManagementException("account data is invalid", 400);
         }
 
@@ -184,7 +183,7 @@ public class AccountService {
         log.info("Updating account {}", account);
         // validate account
         Validation validation = validateAccount(account, ValidationFor.UPDATE);
-        if (!validation.isOk()) {
+        if (!validation.ok()) {
             throw new UserManagementException("account data is invalid", 400);
         }
 
@@ -275,17 +274,14 @@ public class AccountService {
 
     private Validation validateAccount(Account account, ValidationFor source) {
         log.info("Validating account {}", account.toString());
-        Validation validation = new Validation();
-        validation.setOk(true);
         Map<String, String> errors = new HashMap<>();
 
         if (source.equals(ValidationFor.UPDATE)) {
             log.info("Validating account for update");
             if (account.username() == null) {
-                validation.setOk(false);
                 errors.put("username", "this property is required");
             } else {
-                validation.setOk(true);
+                Validation validation = new Validation(true, null);
                 log.info("Validated account {} successfully", account.username());
                 return validation;
             }
@@ -294,38 +290,30 @@ public class AccountService {
         if (source.equals(ValidationFor.CREATE)) {
             log.info("Validating account for create");
             if (account.password() == null || account.password().isEmpty()) {
-                validation.setOk(false);
                 errors.put("password", "this property is required");
             }
             if (account.firstName() == null || account.firstName().isEmpty()) {
-                validation.setOk(false);
                 errors.put("first_name", "this property is required");
             }
             if (account.lastName() == null || account.lastName().isEmpty()) {
-                validation.setOk(false);
                 errors.put("last_name", "this property is required");
             }
             if (account.username() == null || account.username().isEmpty()) {
-                validation.setOk(false);
                 errors.put("username", "this property is required");
             }
             if (account.email() == null || account.email().isEmpty()) {
-                validation.setOk(false);
                 errors.put("email", "this property is required");
             }
             if (account.userLocale() == null || account.userLocale().isEmpty()) {
-                validation.setOk(false);
                 errors.put("user_locale", "this property is required");
             } else {
                 List<String> cytomineLocales = List.of("en", "es", "nl", "fr", "no");
                 if (!cytomineLocales.contains(account.userLocale())) {
-                    validation.setOk(false);
                     errors.put("user_locale", "unknown locales [" + account.userLocale()
                         + "] , allowed roles [en, es, nl, fr, no]");
                 }
             }
             if (account.roles() == null || account.roles().isEmpty()) {
-                validation.setOk(false);
                 errors.put("roles", "this property is required");
             } else {
                 List<String> cytomineRoles = List.of("ADMIN", "USER", "GUEST");
@@ -334,19 +322,17 @@ public class AccountService {
                         .toList();
                 if (!invalidRoles.isEmpty()) {
                     String unknownRoles = Strings.collectionToCommaDelimitedString(invalidRoles);
-                    validation.setOk(false);
                     errors.put("roles", "unknown roles [" + unknownRoles
                         + "] , allowed roles [ADMIN, USER, GUEST]");
                 } else {
-                    validation.setOk(true);
+                    Validation validation = new Validation(true, null);
                     log.info("Validated account {} successfully", account.username());
                     return validation;
                 }
             }
         }
         log.info("Validated account {} with following errors {}", account.username(), errors);
-        validation.setResponseEntity(ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        return new Validation(false, ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(ErrorBuilder.build(ErrorCode.CORE_INVALID_ACCOUNT, errors)));
-        return validation;
     }
 }

@@ -685,7 +685,6 @@ public class TaskRunService {
 
         for (TaskRunValue arrayValue : geometryArrays) {
             TaskRunLayer matchedLayer = layersByParameterName.get(arrayValue.parameterName());
-            System.out.println("MATCHED " + matchedLayer + " : " + layersByParameterName);
             processGeometryValue(arrayValue, annotationLayer, matchedLayer, 0);
         }
 

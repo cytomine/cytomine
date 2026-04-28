@@ -36,7 +36,6 @@ import be.cytomine.domain.meta.TagDomainAssociation;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.meta.TagRepository;
-import be.cytomine.repository.ontology.RelationTermRepository;
 import be.cytomine.service.CommandService;
 import be.cytomine.service.PermissionService;
 import be.cytomine.service.command.TransactionService;
@@ -66,9 +65,6 @@ public class TagServiceTests {
 
     @Autowired
     TransactionService transactionService;
-
-    @Autowired
-    RelationTermRepository relationTermRepository;
 
     @Autowired
     PermissionService permissionService;

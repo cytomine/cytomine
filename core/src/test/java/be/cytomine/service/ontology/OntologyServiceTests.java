@@ -34,13 +34,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.domain.ontology.RelationTerm;
 import be.cytomine.domain.ontology.Term;
@@ -49,7 +48,6 @@ import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.ontology.OntologyRepository;
-import be.cytomine.repository.ontology.RelationTermRepository;
 import be.cytomine.service.CommandService;
 import be.cytomine.service.PermissionService;
 import be.cytomine.service.command.TransactionService;
@@ -69,7 +67,7 @@ import static org.springframework.security.acls.domain.BasePermission.WRITE;
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 public class OntologyServiceTests {
 
@@ -86,10 +84,6 @@ public class OntologyServiceTests {
     CommandService commandService;
     @Autowired
     TransactionService transactionService;
-    @Autowired
-    RelationTermRepository relationTermRepository;
-    @MockitoBean
-    TermHttpContract termHttpContract;
     @Autowired
     PermissionService permissionService;
     @Autowired
@@ -125,6 +119,14 @@ public class OntologyServiceTests {
         query.setParameter("id", termId);
         long count = ((Number) query.getSingleResult()).longValue();
         return count > 0 ? Optional.of(termId) : Optional.empty();
+    }
+
+    private Optional<Long> getTermRelation(Long termRelationId) {
+        String request = "select count(*) from term_relation where id = :id and deleted is null";
+        Query query = entityManager.createNativeQuery(request);
+        query.setParameter("id", termRelationId);
+        long count = ((Number) query.getSingleResult()).longValue();
+        return count > 0 ? Optional.of(termRelationId) : Optional.empty();
     }
 
 
@@ -323,34 +325,34 @@ public class OntologyServiceTests {
             ontologyService.delete(ontology, transactionService.start(), null, true);
 
         assertThat(ontologyService.find(ontology.getId()).isEmpty());
-        assertThat(relationTermRepository.findById(relationTerm.getId())).isEmpty();
+        assertThat(getTermRelation(relationTerm.getId())).isEmpty();
         assertThat(getTerm(term1.getId())).isEmpty();
         assertThat(getTerm(term2.getId())).isEmpty();
         commandService.undo();
 
         assertThat(ontologyService.find(ontology.getId()).isPresent());
-        assertThat(relationTermRepository.findById(relationTerm.getId())).isPresent();
+        assertThat(getTermRelation(relationTerm.getId())).isPresent();
         assertThat(getTerm(term1.getId())).isPresent();
         assertThat(getTerm(term2.getId())).isPresent();
 
         commandService.redo();
 
         assertThat(ontologyService.find(ontology.getId()).isEmpty());
-        assertThat(relationTermRepository.findById(relationTerm.getId())).isEmpty();
+        assertThat(getTermRelation(relationTerm.getId())).isEmpty();
         assertThat(getTerm(term1.getId())).isEmpty();
         assertThat(getTerm(term2.getId())).isEmpty();
 
         commandService.undo();
 
         assertThat(ontologyService.find(ontology.getId()).isPresent());
-        assertThat(relationTermRepository.findById(relationTerm.getId())).isPresent();
+        assertThat(getTermRelation(relationTerm.getId())).isPresent();
         assertThat(getTerm(term1.getId())).isPresent();
         assertThat(getTerm(term2.getId())).isPresent();
 
         commandService.redo();
 
         assertThat(ontologyService.find(ontology.getId()).isEmpty());
-        assertThat(relationTermRepository.findById(relationTerm.getId())).isEmpty();
+        assertThat(getTermRelation(relationTerm.getId())).isEmpty();
         assertThat(getTerm(term1.getId())).isEmpty();
         assertThat(getTerm(term2.getId())).isEmpty();
     }

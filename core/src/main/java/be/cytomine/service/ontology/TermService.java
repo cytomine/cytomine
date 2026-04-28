@@ -28,13 +28,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import be.cytomine.common.repository.http.TermHttpContract;
+import be.cytomine.common.repository.http.TermRelationHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.Command;
 import be.cytomine.domain.command.DeleteCommand;
 import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.ontology.Ontology;
-import be.cytomine.domain.ontology.RelationTerm;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
@@ -62,7 +62,7 @@ public class TermService extends ModelService {
     private CurrentUserService currentUserService;
 
     @Autowired
-    private RelationTermService relationTermService;
+    private TermRelationHttpContract relationTermService;
 
     @Autowired
     private AnnotationTermRepository annotationTermRepository;
@@ -134,15 +134,14 @@ public class TermService extends ModelService {
 
     @Override
     public void deleteDependencies(CytomineDomain domain, Transaction transaction, Task task) {
-        deleteDependentRelationTerm((Term) domain, transaction, task);
+        deleteDependentRelationTerm((Term) domain);
         deleteAnnotationTerm((Term) domain, transaction, task);
         deleteReviewedAnnotationTerm((Term) domain, transaction, task);
     }
 
-    public void deleteDependentRelationTerm(Term term, Transaction transaction, Task task) {
-        for (RelationTerm relationTerm : relationTermService.list(term)) {
-            relationTermService.delete(relationTerm, transaction, task, false);
-        }
+    public void deleteDependentRelationTerm(Term term) {
+        relationTermService.findTermRelationsByTermID(term.getId(), currentUserService.getCurrentUser().getId())
+            .forEach(trr -> relationTermService.delete(trr.id(), currentUserService.getCurrentUser().getId()));
     }
 
     public void deleteAnnotationTerm(Term term, Transaction transaction, Task task) {

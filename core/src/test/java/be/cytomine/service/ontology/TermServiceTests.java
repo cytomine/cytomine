@@ -21,6 +21,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -37,6 +38,7 @@ import be.cytomine.TermMapper;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.ontology.AnnotationTerm;
 import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.domain.ontology.RelationTerm;
@@ -44,7 +46,6 @@ import be.cytomine.domain.ontology.ReviewedAnnotation;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.project.Project;
 import be.cytomine.exceptions.ConstraintException;
-import be.cytomine.repository.ontology.RelationTermRepository;
 import be.cytomine.service.CommandService;
 import be.cytomine.service.command.TransactionService;
 import be.cytomine.utils.CommandResponse;
@@ -59,7 +60,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 public class TermServiceTests {
 
@@ -75,8 +76,6 @@ public class TermServiceTests {
     @Autowired
     CommandService commandService;
 
-    @Autowired
-    RelationTermRepository relationTermRepository;
 
     @Autowired
     TransactionService transactionService;
@@ -89,6 +88,14 @@ public class TermServiceTests {
 
     @MockitoBean
     TermHttpContract termHttpContract;
+
+    private Optional<Long> getTermRelation(Long termRelationId) {
+        String request = "select count(*) from term_relation where id = :id and deleted is null";
+        Query query = entityManager.createNativeQuery(request);
+        query.setParameter("id", termRelationId);
+        long count = ((Number) query.getSingleResult()).longValue();
+        return count > 0 ? Optional.of(termRelationId) : Optional.empty();
+    }
 
     @Test
     void getTermWithSuccess() {
@@ -256,26 +263,26 @@ public class TermServiceTests {
         CommandResponse commandResponse = termService.delete(term, transactionService.start(), null, true);
 
         assertThat(termService.find(term.getId()).isEmpty());
-        assertThat(relationTermRepository.findById(relationTerm.getId())).isEmpty();
+        assertThat(getTermRelation(relationTerm.getId())).isEmpty();
 
         commandService.undo();
 
         assertThat(termService.find(term.getId()).isPresent());
-        assertThat(relationTermRepository.findById(relationTerm.getId())).isPresent();
+        assertThat(getTermRelation(relationTerm.getId())).isPresent();
 
         commandService.redo();
 
         assertThat(termService.find(term.getId()).isEmpty());
-        assertThat(relationTermRepository.findById(relationTerm.getId())).isEmpty();
+        assertThat(getTermRelation(relationTerm.getId())).isEmpty();
 
         commandService.undo();
 
         assertThat(termService.find(term.getId()).isPresent());
-        assertThat(relationTermRepository.findById(relationTerm.getId())).isPresent();
+        assertThat(getTermRelation(relationTerm.getId())).isPresent();
 
         commandService.redo();
 
         assertThat(termService.find(term.getId()).isEmpty());
-        assertThat(relationTermRepository.findById(relationTerm.getId())).isEmpty();
+        assertThat(getTermRelation(relationTerm.getId())).isEmpty();
     }
 }

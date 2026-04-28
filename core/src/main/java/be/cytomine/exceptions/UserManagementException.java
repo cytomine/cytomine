@@ -18,9 +18,9 @@ public class UserManagementException extends CytomineException {
     }
 
     public UserManagementException(int code, ErrorCode errorCode) {
-        super(ErrorsDictionary.get(errorCode).getMessage(), code);
+        super(ErrorsDictionary.get(errorCode, null).message(), code);
         this.errorCode = errorCode;
-        log.info(ErrorsDictionary.get(errorCode).getMessage());
+        log.info(ErrorsDictionary.get(errorCode, null).message());
     }
 
     public UserManagementException(String message, int code) {

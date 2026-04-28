@@ -9,8 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class ErrorBuilder {
     public static JsonNode build(ErrorCode code, Map<String, String> details) {
         ObjectMapper mapper = new ObjectMapper();
-        Error error = ErrorsDictionary.get(code);
-        error.setDetails(details);
+        Error error = ErrorsDictionary.get(code, details);
         return mapper.valueToTree(error);
     }
 

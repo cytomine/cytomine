@@ -76,9 +76,9 @@ echo "172.16.238.15 cytomine.local" | sudo tee -a /etc/hosts
 
    ```bash
    helm upgrade --kubeconfig=./.kube/shared/config \
-     -f ./helm/charts/cytomine/values.yaml \
+     -f ./helm/charts/cytomine/example/values.yaml \
      cytomine-platform ./helm/charts/cytomine/ \
-     -n cytomine-local --install
+     -n cytomine-local --install --dependency-update
    ```
 
    _First deployment takes around 10 minutes while Kubernetes pulls all images._

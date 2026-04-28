@@ -67,6 +67,8 @@ COPY ./configs/ ./configs/
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync
 
+RUN python -c "from app.download_weights import download_weights; download_weights()"
+
 LABEL org.opencontainers.image.authors="uliege@cytomine.org" \
       org.opencontainers.image.url="https://uliege.cytomine.org/" \
       org.opencontainers.image.documentation="https://doc.uliege.cytomine.org/" \

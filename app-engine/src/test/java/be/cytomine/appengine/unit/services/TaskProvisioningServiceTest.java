@@ -137,7 +137,7 @@ public class TaskProvisioningServiceTest {
         assertNotNull(result);
         assertEquals(value.get("parameterName"), result.get("parameterName"));
         assertEquals(value.get("value"), result.get("value"));
-        assertEquals(run.getId().toString(), result.get("task_run_id").asText());
+        assertEquals(run.getId().toString(), result.get("taskRunId").asText());
         verify(runRepository, times(1)).findById(run.getId());
         verify(storageHandler, times(1)).saveStorageData(any(Storage.class), any(StorageData.class));
     }

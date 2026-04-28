@@ -47,7 +47,7 @@ export default {
     async download(data, name) {
       const cytomine = Cytomine.instance;
       const token = await updateToken();
-      let url = `${cytomine.host}${cytomine.basePath}app-engine/project/${this.projectId}/task-runs/${data.task_run_id}/${this.type}/${name}?auth=${token}`;
+      let url = `${cytomine.host}${cytomine.basePath}app-engine/project/${this.projectId}/task-runs/${data.taskRunId}/${this.type}/${name}?auth=${token}`;
       let link = document.createElement('a');
       link.href = url;
       link.download = name;

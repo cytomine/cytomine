@@ -152,7 +152,7 @@ public class TaskRunResourceTests {
             + "\", \"type\": { \"id\" : \"integer\"}}";
         String mockResponse = "{\"value\": 0, \"parameterName\": \""
             + parameterName
-            + "\", \"task_run_id\": \""
+            + "\", \"taskRunId\": \""
             + taskRunId
             + "\"}";
         String appEngineUriSection = "task-runs/" + taskRunId + "/input-provisions/" + parameterName;
@@ -164,7 +164,7 @@ public class TaskRunResourceTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(queryBody))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.task_run_id").value(taskRunId.toString()))
+            .andExpect(jsonPath("$.taskRunId").value(taskRunId.toString()))
             .andExpect(jsonPath("$.parameterName").value(parameterName))
             .andExpect(jsonPath("$.value").value(0));
     }
@@ -189,7 +189,7 @@ public class TaskRunResourceTests {
             + "\", \"type\": { \"id\" : \"integer\"}}]";
         String mockResponse = "[{\"value\": 0, \"parameterName\": \""
             + parameterName
-            + "\", \"task_run_id\": \""
+            + "\", \"taskRunId\": \""
             + taskRunId
             + "\"}]";
         String appEngineUriSection = "task-runs/" + taskRunId + "/input-provisions";
@@ -200,7 +200,7 @@ public class TaskRunResourceTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(queryBody))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("[0].task_run_id").value(taskRunId.toString()))
+            .andExpect(jsonPath("[0].taskRunId").value(taskRunId.toString()))
             .andExpect(jsonPath("[0].parameterName").value(parameterName))
             .andExpect(jsonPath("[0].value").value(0));
     }

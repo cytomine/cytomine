@@ -96,7 +96,7 @@ public class StringType extends Type {
     @Override
     public void persistProvision(JsonNode provision, UUID runId) {
         StringPersistenceRepository stringPersistenceRepository = AppEngineApplicationContext.getBean(StringPersistenceRepository.class);
-        String parameterName = provision.get("param_name").asText();
+        String parameterName = provision.get("parameterName").asText();
         String value = provision.get("value").asText();
         StringPersistence persistedProvision = stringPersistenceRepository.findStringPersistenceByParameterNameAndRunIdAndParameterType(parameterName, runId, ParameterType.INPUT);
         if (persistedProvision == null) {
@@ -136,7 +136,7 @@ public class StringType extends Type {
     @Override
     public StorageData mapToStorageFileData(JsonNode provision, Run run) {
         String value = provision.get("value").asText();
-        String parameterName = provision.get("param_name").asText();
+        String parameterName = provision.get("parameterName").asText();
         File data = FileHelper.write(parameterName, value.getBytes(getStorageCharset()));
         StorageDataEntry entry = new StorageDataEntry(data, parameterName, StorageDataType.FILE);
         return new StorageData(entry);
@@ -146,9 +146,9 @@ public class StringType extends Type {
     public JsonNode createInputProvisioningEndpointResponse(JsonNode provision, Run run) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode provisionedParameter = mapper.createObjectNode();
-        provisionedParameter.put("param_name", provision.get("param_name").asText());
+        provisionedParameter.put("parameterName", provision.get("parameterName").asText());
         provisionedParameter.put("value", provision.get("value").asText());
-        provisionedParameter.put("task_run_id", String.valueOf(run.getId()));
+        provisionedParameter.put("taskRunId", String.valueOf(run.getId()));
 
         return provisionedParameter;
     }

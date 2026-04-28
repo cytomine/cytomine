@@ -710,7 +710,7 @@ public class CollectionType extends Type {
 
         CollectionPersistenceRepository collectionRepo =
             AppEngineApplicationContext.getBean(CollectionPersistenceRepository.class);
-        String parameterName = provision.get("param_name").asText();
+        String parameterName = provision.get("parameterName").asText();
 
         CollectionPersistence collectionPersistence = (CollectionPersistence) persistNode(provision,
             runId, parameterName, leafType);
@@ -767,8 +767,8 @@ public class CollectionType extends Type {
 
         if (node.isObject()) {
             String paramName = "";
-            if (Objects.nonNull(node.get("param_name"))) {
-                paramName = node.get("param_name").asText();
+            if (Objects.nonNull(node.get("parameterName"))) {
+                paramName = node.get("parameterName").asText();
             } else {
                 String transformedIndex = transform(node.get("index").asText());
                 if (parameterName.equalsIgnoreCase(transformedIndex)) {
@@ -1203,7 +1203,7 @@ public class CollectionType extends Type {
         if (provision.has("index")) {
             name = provision.get("index").asText();
         } else {
-            name = provision.get("param_name").asText();
+            name = provision.get("parameterName").asText();
         }
 
         if (referenced) {
@@ -1291,8 +1291,8 @@ public class CollectionType extends Type {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode provisionedParameter = mapper.createObjectNode();
         // if json has param_name then it's a collection
-        if (provision.has("param_name")) {
-            provisionedParameter.put("param_name", provision.get("param_name").asText());
+        if (provision.has("parameterName")) {
+            provisionedParameter.put("parameterName", provision.get("parameterName").asText());
         } else {
             provisionedParameter.put("index", provision.get("index").asText());
         }

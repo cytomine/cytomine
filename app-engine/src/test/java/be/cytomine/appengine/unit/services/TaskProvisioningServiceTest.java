@@ -124,7 +124,7 @@ public class TaskProvisioningServiceTest {
             .next()
             .getName();
         ObjectNode value = new ObjectMapper().createObjectNode();
-        value.put("param_name", name);
+        value.put("parameterName", name);
         value.put("value", 42);
 
         when(runRepository.findById(run.getId())).thenReturn(Optional.of(run));
@@ -135,7 +135,7 @@ public class TaskProvisioningServiceTest {
         JsonNode result = taskProvisioningService.provisionRunParameter(run.getId().toString(), name, value);
 
         assertNotNull(result);
-        assertEquals(value.get("param_name"), result.get("param_name"));
+        assertEquals(value.get("parameterName"), result.get("parameterName"));
         assertEquals(value.get("value"), result.get("value"));
         assertEquals(run.getId().toString(), result.get("task_run_id").asText());
         verify(runRepository, times(1)).findById(run.getId());
@@ -177,8 +177,8 @@ public class TaskProvisioningServiceTest {
         JsonNode result = taskProvisioningService.provisionRunParameter(localRun.getId().toString(), name, value);
 
         assertNotNull(result);
-        assertEquals(name, result.get("param_name").asText());
-        assertEquals(localRun.getId().toString(), result.get("task_run_id").asText());
+        assertEquals(name, result.get("parameterName").asText());
+        assertEquals(localRun.getId().toString(), result.get("taskRunId").asText());
         verify(runRepository, times(1)).findById(localRun.getId());
     }
 
@@ -218,7 +218,7 @@ public class TaskProvisioningServiceTest {
             .toList();
         for (Parameter input : parameters) {
             ObjectNode value = new ObjectMapper().createObjectNode();
-            value.put("param_name", input.getName());
+            value.put("parameterName", input.getName());
             value.put("value", new Random().nextInt(100));
             values.add(value);
         }
@@ -246,7 +246,7 @@ public class TaskProvisioningServiceTest {
             .toList();
         for (Parameter input : parameters) {
             ObjectNode value = new ObjectMapper().createObjectNode();
-            value.put("param_name", input.getName());
+            value.put("parameterName", input.getName());
             value.put("value", new Random().nextInt(100));
             value.put("unwanted", "value");
             values.add(value);

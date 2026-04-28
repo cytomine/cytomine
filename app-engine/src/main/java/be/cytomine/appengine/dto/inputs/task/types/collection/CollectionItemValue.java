@@ -14,7 +14,7 @@ import be.cytomine.appengine.dto.inputs.task.TaskRunParameterValue;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonIgnoreProperties({"task_run_id", "type", "param_name"})
+@JsonIgnoreProperties({"task_run_id", "type", "parameterName"})
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CollectionItemValue extends TaskRunParameterValue {
 

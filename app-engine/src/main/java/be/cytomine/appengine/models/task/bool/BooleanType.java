@@ -64,7 +64,7 @@ public class BooleanType extends Type {
     @Override
     public void persistProvision(JsonNode provision, UUID runId) {
         BooleanPersistenceRepository repository = AppEngineApplicationContext.getBean(BooleanPersistenceRepository.class);
-        String parameterName = provision.get("param_name").asText();
+        String parameterName = provision.get("parameterName").asText();
         boolean value = provision.get("value").asBoolean();
         BooleanPersistence persistedProvision = repository.findBooleanPersistenceByParameterNameAndRunIdAndParameterType(parameterName, runId, ParameterType.INPUT);
         if (persistedProvision == null) {
@@ -104,7 +104,7 @@ public class BooleanType extends Type {
     @Override
     public StorageData mapToStorageFileData(JsonNode provision, Run run) {
         String value = provision.get("value").asText();
-        String parameterName = provision.get("param_name").asText();
+        String parameterName = provision.get("parameterName").asText();
         File data = FileHelper.write(parameterName, value.getBytes(getStorageCharset()));
         StorageDataEntry entry = new StorageDataEntry(data, parameterName, StorageDataType.FILE);
         return new StorageData(entry);
@@ -114,9 +114,9 @@ public class BooleanType extends Type {
     public JsonNode createInputProvisioningEndpointResponse(JsonNode provision, Run run) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode provisionedParameter = mapper.createObjectNode();
-        provisionedParameter.put("param_name", provision.get("param_name").asText());
+        provisionedParameter.put("parameterName", provision.get("parameterName").asText());
         provisionedParameter.put("value", provision.get("value").asBoolean());
-        provisionedParameter.put("task_run_id", String.valueOf(run.getId()));
+        provisionedParameter.put("taskRunId", String.valueOf(run.getId()));
 
         return provisionedParameter;
     }

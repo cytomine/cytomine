@@ -17,7 +17,7 @@ import be.cytomine.appengine.models.task.ValueType;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CollectionValue extends TaskRunParameterValue {
-    @JsonIgnoreProperties({"param_name"})
+    @JsonIgnoreProperties({"parameterName"})
     private List<TaskRunParameterValue> value;
     private ValueType subType;
 

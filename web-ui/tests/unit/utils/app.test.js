@@ -1,6 +1,53 @@
-import {formatTaskName, isGeometry} from '@/utils/app';
+import {formatTaskName, hasBinaryType, isGeometry} from '@/utils/app';
 
 describe('app.js', () => {
+  describe('hasBinaryType', () => {
+    it.each([
+      ['image'],
+      ['file'],
+    ])('should return true for binary type "%s"', (typeId) => {
+      const input = {
+        type: {id: typeId},
+      };
+
+      expect(hasBinaryType(input)).toBe(true);
+    });
+
+    it('should return true when type is array of binary subtype', () => {
+      const input = {
+        type: {id: 'array', subType: {id: 'image'}},
+      };
+
+      expect(hasBinaryType(input)).toBe(true);
+    });
+
+    it.each([
+      ['integer'],
+      ['number'],
+      ['string'],
+      ['boolean'],
+    ])('should return false for non-binary type "%s"', (typeId) => {
+      const input = {
+        type: {id: typeId},
+      };
+
+      expect(hasBinaryType(input)).toBe(false);
+    });
+
+    it.each([
+      ['integer'],
+      ['number'],
+      ['string'],
+      ['boolean'],
+    ])('should return false for array with non-binary subtype "%s"', (typeId) => {
+      const input = {
+        type: {id: 'array', subType: {id: typeId}},
+      };
+
+      expect(hasBinaryType(input)).toBe(false);
+    });
+  });
+
   describe('isGeometry', () => {
     it('should return true when type is "geometry"', () => {
       const parameter = {

@@ -95,6 +95,7 @@ jobs:
             --set gateway.className=envoy-gateway \
             --set "gateway-helm.deployment.certgen.image.repository=registry.cytomine.org/docker/envoyproxy/gateway" \
             --set "gateway-helm.deployment.envoyGateway.image.repository=registry.cytomine.org/docker/envoyproxy/gateway" \
+            --set images.envoy_proxy=registry.cytomine.org/docker/envoyproxy/envoy \
             --set images.core=registry.cytomine.org/cytomine/core:${{ env.DEPLOYMENT_NAME }} \
             --set images.app_engine=registry.cytomine.org/cytomine/app-engine:${{ env.DEPLOYMENT_NAME }} \
             --set images.sam=registry.cytomine.org/cytomine/sam:${{ env.DEPLOYMENT_NAME }} \

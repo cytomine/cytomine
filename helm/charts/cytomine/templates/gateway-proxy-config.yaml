@@ -22,4 +22,6 @@ spec:
             capabilities:
               drop: ["ALL"]
             readOnlyRootFilesystem: false
+          image:
+            repository: {{ .Values.images.envoy_proxy }}
 {{- end }}

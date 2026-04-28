@@ -11,30 +11,24 @@ public class KeycloakClient {
     @Value("${keycloak-client.url}")
     String url;
 
-    @Value("${keycloak-client.admin.user}")
-    String adminUser;
+    @Value("${cytomine.admin.username}")
+    String adminUsername;
 
-    @Value("${keycloak-client.admin.password}")
+    @Value("${cytomine.admin.password}")
     String adminPassword;
 
-    @Value("${keycloak-client.admin.realm}")
-    String adminRealm;
-
-    @Value("${keycloak-client.target.realm}")
-    String targetRealm;
-
-    @Value("${keycloak-client.client-id}")
-    String clientId;
+    private static final String REALM = "cytomine";
+    private static final String CLIENT_ID = "admin-cli";
 
     public void deleteUser(String username) {
-        try (Keycloak keycloak = Keycloak.getInstance(url, adminRealm, adminUser, adminPassword, clientId)) {
-            keycloak.realm(targetRealm)
+        try (Keycloak keycloak = Keycloak.getInstance(url, REALM, adminUsername, adminPassword, CLIENT_ID)) {
+            keycloak.realm(REALM)
                 .users()
                 .searchByUsername(username, true)
                 .stream()
                 .findFirst()
                 .map(UserRepresentation::getId)
-                .ifPresent(id -> keycloak.realm(targetRealm).users().delete(id));
+                .ifPresent(id -> keycloak.realm(REALM).users().delete(id));
         }
     }
 }

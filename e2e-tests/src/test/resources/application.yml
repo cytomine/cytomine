@@ -7,10 +7,3 @@ selenium:
   url: ${SELENIUM_URL:}
 keycloak-client:
   url: ${IAM_URL:http://iam:8100}/iam
-  admin:
-    user: ${KEYCLOAK_ADMIN:admin}
-    password: ${KEYCLOAK_ADMIN_PASSWORD:password}
-    realm: master
-  target:
-    realm: cytomine
-  client-id: admin-cli

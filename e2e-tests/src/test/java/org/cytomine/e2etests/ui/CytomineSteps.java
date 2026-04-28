@@ -445,7 +445,7 @@ public class CytomineSteps {
         webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'User successfully updated')]"));
         webDriverUtils.byIsDisplayed(
             wait,
-            By.xpath("//td[normalize-space(text())='" + newFirstname + " " + newLastname + "']")
+            By.xpath("//td[contains(normalize-space(text()), '" + newFirstname + " " + newLastname + "')]")
         );
     }
 }

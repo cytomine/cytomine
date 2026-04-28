@@ -254,7 +254,7 @@ public class AccountService {
 
     private List<RoleRepresentation> getAccountRoleRepresentations(Account account,
                                                                    ClientRepresentation client) {
-        log.info("getting account client level roles to {}", account.reference());
+        log.info("getting account client level roles to {}", account.username());
         List<RoleRepresentation> listOfRoles;
         try {
             // Get client level roles (requires view-clients roles in IAM)

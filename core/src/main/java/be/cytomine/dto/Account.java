@@ -3,7 +3,6 @@ package be.cytomine.dto;
 import java.util.List;
 
 public record Account(
-    String reference,
     String username,
     String lastName,
     String firstName,
@@ -12,7 +11,6 @@ public record Account(
     boolean emailVerified,
     boolean isDeveloper,
     String userLocale,
-    Long createdAt,
     List<String> roles
 ) {
     // Compact constructor to handle default values

@@ -92,7 +92,7 @@ images:
   #
   # External Images
   #
-  envoy_proxy: envoyproxy/envoy
+  envoy_proxy: envoyproxy/envoy:v1.33-latest
   registry: registry:2.8.3
   alpine: alpine:3.18
   curl: curlimages/curl

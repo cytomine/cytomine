@@ -11,14 +11,12 @@ import lombok.NoArgsConstructor;
 import be.cytomine.appengine.dto.inputs.task.TaskRunParameterValue;
 import be.cytomine.appengine.models.task.ValueType;
 
-
+@JsonIgnoreProperties({"parameterName"})
 @EqualsAndHashCode(callSuper = false)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class CollectionValue extends TaskRunParameterValue {
-    @JsonIgnoreProperties({"parameterName"})
     private List<TaskRunParameterValue> value;
     private ValueType subType;
-
 }

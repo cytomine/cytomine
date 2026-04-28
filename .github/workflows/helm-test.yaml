@@ -121,6 +121,10 @@ jobs:
             --set test.e2eTestCount=${{ env.E2E_TEST_COUNT }} \
             --wait --timeout=20m
 
+      - name: Log k8s events
+        if: failure()
+        run: kubectl get events --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} --sort-by='.lastTimestamp'
+
       - name: Get gateway IP
         run: |
           NS=cytomine-${{ env.DEPLOYMENT_NAME }}
@@ -144,6 +148,10 @@ jobs:
           helm test cytomine-${{ env.DEPLOYMENT_NAME }} \
             --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} \
             --timeout=20m
+
+      - name: Log k8s events
+        if: failure()
+        run: kubectl get events --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} --sort-by='.lastTimestamp'
 
       - name: Logs e2e tests results - e2e-tests pod
         if: always()

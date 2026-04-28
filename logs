@@ -1,0 +1,1432 @@
+2026-04-28T14:27:00.6283693Z Current runner version: '2.334.0'
+2026-04-28T14:27:00.6289447Z Runner name: 'runner-high-memory-nxbhc-z5gq6'
+2026-04-28T14:27:00.6290403Z Runner group name: 'default'
+2026-04-28T14:27:00.6291304Z Machine name: 'runner-high-memory-nxbhc-z5gq6'
+2026-04-28T14:27:00.6293954Z ##[group]GITHUB_TOKEN Permissions
+2026-04-28T14:27:00.6296142Z Contents: read
+2026-04-28T14:27:00.6296685Z Metadata: read
+2026-04-28T14:27:00.6297249Z ##[endgroup]
+2026-04-28T14:27:00.6299562Z Secret source: Actions
+2026-04-28T14:27:00.6300573Z Prepare workflow directory
+2026-04-28T14:27:00.6608149Z Prepare all required actions
+2026-04-28T14:27:00.6642433Z Getting action download info
+2026-04-28T14:27:01.9250812Z Download action repository 'actions/checkout@v6.0.2' (SHA:de0fac2e4500dabe0009e67214ff5f5447ce83dd)
+2026-04-28T14:27:03.9431614Z Download action repository 'azure/setup-helm@v5' (SHA:dda3372f752e03dde6b3237bc9431cdc2f7a02a2)
+2026-04-28T14:27:04.5171249Z Download action repository 'actions/setup-python@v6.2.0' (SHA:a309ff8b426b58ec0e2a45f0f869d46889d02405)
+2026-04-28T14:27:05.1624624Z Download action repository 'helm/chart-testing-action@v2.8.0' (SHA:6ec842c01de15ebb84c8627d2744a0c2f2755c9f)
+2026-04-28T14:27:05.8817418Z Download action repository 'docker/login-action@v4' (SHA:4907a6ddec9925e35a0a9e82d7399ccc52663121)
+2026-04-28T14:27:06.5304735Z Download action repository 'helm/kind-action@v1.14.0' (SHA:ef37e7f390d99f746eb8b610417061a60e82a6cc)
+2026-04-28T14:27:06.9881869Z Download action repository 'actions/upload-artifact@v7' (SHA:043fb46d1a93c77aae656e7c1c64a875d1fc6a0a)
+2026-04-28T14:27:07.7072908Z Getting action download info
+2026-04-28T14:27:08.0375656Z Download action repository 'sigstore/cosign-installer@faadad0cce49287aee09b3a48701e75088a2c6ad' (SHA:faadad0cce49287aee09b3a48701e75088a2c6ad)
+2026-04-28T14:27:08.4997896Z Download action repository 'astral-sh/setup-uv@eb1897b8dc4b5d5bfe39a428a8f2304605e0983c' (SHA:eb1897b8dc4b5d5bfe39a428a8f2304605e0983c)
+2026-04-28T14:27:09.3008700Z Uses: cytomine/cytomine/.github/workflows/helm-test.yaml@refs/pull/898/merge (dc2cd9956cf0ca4c1ad48e0ad56bbec2534d2c35)
+2026-04-28T14:27:09.3013415Z Complete job name: helm-tests / lint-test
+2026-04-28T14:27:09.3464463Z A job started hook has been configured by the self-hosted runner ***istrator
+2026-04-28T14:27:09.3575716Z ##[group]Run '/etc/arc/hooks/job-started.sh'
+2026-04-28T14:27:09.3588635Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-04-28T14:27:09.3589263Z ##[endgroup]
+2026-04-28T14:27:09.3765832Z [0;37m2026-04-28 14:27:09.374  DEBUG --- Running ARC Job Started Hooks[0m
+2026-04-28T14:27:09.3787948Z [0;37m2026-04-28 14:27:09.377  DEBUG --- Running hook: /etc/arc/hooks/job-started.d/update-status[0m
+2026-04-28T14:27:09.4118094Z ##[group]Run actions/checkout@v6.0.2
+2026-04-28T14:27:09.4118587Z with:
+2026-04-28T14:27:09.4118894Z   fetch-depth: 0
+2026-04-28T14:27:09.4119192Z   repository: cytomine/cytomine
+2026-04-28T14:27:09.4119684Z   token: ***
+2026-04-28T14:27:09.4120110Z   ssh-strict: true
+2026-04-28T14:27:09.4120395Z   ssh-user: git
+2026-04-28T14:27:09.4120794Z   persist-credentials: true
+2026-04-28T14:27:09.4121157Z   clean: true
+2026-04-28T14:27:09.4121442Z   sparse-checkout-cone-mode: true
+2026-04-28T14:27:09.4121811Z   fetch-tags: false
+2026-04-28T14:27:09.4122145Z   show-progress: true
+2026-04-28T14:27:09.4122445Z   lfs: false
+2026-04-28T14:27:09.4122747Z   submodules: false
+2026-04-28T14:27:09.4123081Z   set-safe-directory: true
+2026-04-28T14:27:09.4123413Z ##[endgroup]
+2026-04-28T14:27:09.5088979Z Syncing repository: cytomine/cytomine
+2026-04-28T14:27:09.5090692Z ##[group]Getting Git version info
+2026-04-28T14:27:09.5091178Z Working directory is '/runner/_work/cytomine/cytomine'
+2026-04-28T14:27:09.5091865Z [command]/usr/bin/git version
+2026-04-28T14:27:09.5092144Z git version 2.54.0
+2026-04-28T14:27:09.5107765Z ##[endgroup]
+2026-04-28T14:27:09.5122325Z Temporarily overriding HOME='/runner/_work/_temp/fc1f5820-5a11-4675-8123-4625b80040db' before making global git config changes
+2026-04-28T14:27:09.5123224Z Adding repository directory to the temporary git global config as a safe directory
+2026-04-28T14:27:09.5127436Z [command]/usr/bin/git config --global --add safe.directory /runner/_work/cytomine/cytomine
+2026-04-28T14:27:09.5179893Z Deleting the contents of '/runner/_work/cytomine/cytomine'
+2026-04-28T14:27:09.5184170Z ##[group]Initializing the repository
+2026-04-28T14:27:09.5187985Z [command]/usr/bin/git init /runner/_work/cytomine/cytomine
+2026-04-28T14:27:09.5249790Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-04-28T14:27:09.5250551Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-04-28T14:27:09.5251161Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-04-28T14:27:09.5251604Z hint: call:
+2026-04-28T14:27:09.5251813Z hint:
+2026-04-28T14:27:09.5252137Z hint: 	git config --global init.defaultBranch <name>
+2026-04-28T14:27:09.5252474Z hint:
+2026-04-28T14:27:09.5252811Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-04-28T14:27:09.5253389Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-04-28T14:27:09.5253856Z hint:
+2026-04-28T14:27:09.5254078Z hint: 	git branch -m <name>
+2026-04-28T14:27:09.5254318Z hint:
+2026-04-28T14:27:09.5254682Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-04-28T14:27:09.5255291Z Initialized empty Git repository in /runner/_work/cytomine/cytomine/.git/
+2026-04-28T14:27:09.5260376Z [command]/usr/bin/git remote add origin https://github.com/cytomine/cytomine
+2026-04-28T14:27:09.5303777Z ##[endgroup]
+2026-04-28T14:27:09.5304224Z ##[group]Disabling automatic garbage collection
+2026-04-28T14:27:09.5307325Z [command]/usr/bin/git config --local gc.auto 0
+2026-04-28T14:27:09.5358907Z ##[endgroup]
+2026-04-28T14:27:09.5359238Z ##[group]Setting up auth
+2026-04-28T14:27:09.5360258Z Removing SSH command configuration
+2026-04-28T14:27:09.5364914Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-04-28T14:27:09.5412496Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-04-28T14:27:09.5775543Z Removing HTTP extra header
+2026-04-28T14:27:09.5776009Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-04-28T14:27:09.5816865Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-04-28T14:27:09.6169283Z Removing includeIf entries pointing to credentials config files
+2026-04-28T14:27:09.6175295Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-04-28T14:27:09.6233258Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-04-28T14:27:09.6577038Z [command]/usr/bin/git config --file /runner/_work/_temp/git-credentials-de1976c4-4f60-45e7-890b-049bb6f060b1.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-04-28T14:27:09.6640941Z [command]/usr/bin/git config --local includeIf.gitdir:/runner/_work/cytomine/cytomine/.git.path /runner/_work/_temp/git-credentials-de1976c4-4f60-45e7-890b-049bb6f060b1.config
+2026-04-28T14:27:09.6692564Z [command]/usr/bin/git config --local includeIf.gitdir:/runner/_work/cytomine/cytomine/.git/worktrees/*.path /runner/_work/_temp/git-credentials-de1976c4-4f60-45e7-890b-049bb6f060b1.config
+2026-04-28T14:27:09.6740126Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-de1976c4-4f60-45e7-890b-049bb6f060b1.config
+2026-04-28T14:27:09.6783034Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-de1976c4-4f60-45e7-890b-049bb6f060b1.config
+2026-04-28T14:27:09.6819535Z ##[endgroup]
+2026-04-28T14:27:09.6819881Z ##[group]Fetching the repository
+2026-04-28T14:27:09.6831196Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/* +dc2cd9956cf0ca4c1ad48e0ad56bbec2534d2c35:refs/remotes/pull/898/merge
+2026-04-28T14:27:19.0537019Z From https://github.com/cytomine/cytomine
+2026-04-28T14:27:19.0539185Z  * [new branch]          608-restore-old-user-***istration-ui   -> origin/608-restore-old-user-***istration-ui
+2026-04-28T14:27:19.0541491Z  * [new branch]          608-restore-old-user-***istration-ui-e2e-tests -> origin/608-restore-old-user-***istration-ui-e2e-tests
+2026-04-28T14:27:19.0543252Z  * [new branch]          633-manage-projects-access-in-keycloak   -> origin/633-manage-projects-access-in-keycloak
+2026-04-28T14:27:19.0544885Z  * [new branch]          chore/checkstyles-java                   -> origin/chore/checkstyles-java
+2026-04-28T14:27:19.0546269Z  * [new branch]          chore/merge-spring-configs               -> origin/chore/merge-spring-configs
+2026-04-28T14:27:19.0547659Z  * [new branch]          chore/prepare-spring-update-1            -> origin/chore/prepare-spring-update-1
+2026-04-28T14:27:19.0549038Z  * [new branch]          chore/sam-model-embedded                 -> origin/chore/sam-model-embedded
+2026-04-28T14:27:19.0550451Z  * [new branch]          chore/upgrade-spring                     -> origin/chore/upgrade-spring
+2026-04-28T14:27:19.0551795Z  * [new branch]          doc/757-document-local-k3s-start         -> origin/doc/757-document-local-k3s-start
+2026-04-28T14:27:19.0553360Z  * [new branch]          feat/733-migrate-annotation-report-sql   -> origin/feat/733-migrate-annotation-report-sql
+2026-04-28T14:27:19.0554856Z  * [new branch]          feat/733-migrate-annotations             -> origin/feat/733-migrate-annotations
+2026-04-28T14:27:19.0556325Z  * [new branch]          feat/733-migrate-reviewed-annotations    -> origin/feat/733-migrate-reviewed-annotations
+2026-04-28T14:27:19.0557951Z  * [new branch]          feat/838-finish-relation-term-migration-2 -> origin/feat/838-finish-relation-term-migration-2
+2026-04-28T14:27:19.0559456Z  * [new branch]          feat/run-task-app-page                   -> origin/feat/run-task-app-page
+2026-04-28T14:27:19.0561024Z  * [new branch]          feature/filter-task-runs-by-image        -> origin/feature/filter-task-runs-by-image
+2026-04-28T14:27:19.0562442Z  * [new branch]          feature/geometry-image-task              -> origin/feature/geometry-image-task
+2026-04-28T14:27:19.0564448Z  * [new branch]          fix/304-items-order-in-task-bundle       -> origin/fix/304-items-order-in-task-bundle
+2026-04-28T14:27:19.0565891Z  * [new branch]          fix/524-export-annotations               -> origin/fix/524-export-annotations
+2026-04-28T14:27:19.0567141Z  * [new branch]          fix/jackson-error                        -> origin/fix/jackson-error
+2026-04-28T14:27:19.0568306Z  * [new branch]          fix/local-helm-cilium                    -> origin/fix/local-helm-cilium
+2026-04-28T14:27:19.0569525Z  * [new branch]          fix/thumbnail-tiff                       -> origin/fix/thumbnail-tiff
+2026-04-28T14:27:19.0570760Z  * [new branch]          main                                     -> origin/main
+2026-04-28T14:27:19.0571973Z  * [new branch]          refactor/parameter-camel-case            -> origin/refactor/parameter-camel-case
+2026-04-28T14:27:19.0573450Z  * [new branch]          remove-custom-sequence-generator         -> origin/remove-custom-sequence-generator
+2026-04-28T14:27:19.0575022Z  * [new branch]          revert-650-test/649-list-all-projects    -> origin/revert-650-test/649-list-all-projects
+2026-04-28T14:27:19.0576345Z  * [new branch]          run-locally                              -> origin/run-locally
+2026-04-28T14:27:19.0577504Z  * [new branch]          test/python-client                       -> origin/test/python-client
+2026-04-28T14:27:19.0578750Z  * [new branch]          tests/adding-throw-in-tests              -> origin/tests/adding-throw-in-tests
+2026-04-28T14:27:19.0580612Z  * [new branch]          tests/try-run                            -> origin/tests/try-run
+2026-04-28T14:27:19.0581784Z  * [new ref]             dc2cd9956cf0ca4c1ad48e0ad56bbec2534d2c35 -> pull/898/merge
+2026-04-28T14:27:19.0663347Z ##[endgroup]
+2026-04-28T14:27:19.0664265Z ##[group]Determining the checkout info
+2026-04-28T14:27:19.0665189Z ##[endgroup]
+2026-04-28T14:27:19.0672739Z [command]/usr/bin/git sparse-checkout disable
+2026-04-28T14:27:19.0733765Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-04-28T14:27:19.0773339Z ##[group]Checking out the ref
+2026-04-28T14:27:19.0777000Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/898/merge
+2026-04-28T14:27:20.0984026Z Updating files:  53% (1162/2184)
+2026-04-28T14:27:20.1001141Z Updating files:  54% (1180/2184)
+2026-04-28T14:27:20.1013921Z Updating files:  55% (1202/2184)
+2026-04-28T14:27:20.1032072Z Updating files:  56% (1224/2184)
+2026-04-28T14:27:20.1049736Z Updating files:  57% (1245/2184)
+2026-04-28T14:27:20.1097396Z Updating files:  58% (1267/2184)
+2026-04-28T14:27:20.1109635Z Updating files:  59% (1289/2184)
+2026-04-28T14:27:20.1119640Z Updating files:  60% (1311/2184)
+2026-04-28T14:27:20.1130902Z Updating files:  61% (1333/2184)
+2026-04-28T14:27:20.1143258Z Updating files:  62% (1355/2184)
+2026-04-28T14:27:20.1156078Z Updating files:  63% (1376/2184)
+2026-04-28T14:27:20.1171061Z Updating files:  64% (1398/2184)
+2026-04-28T14:27:20.1189194Z Updating files:  65% (1420/2184)
+2026-04-28T14:27:20.1206218Z Updating files:  66% (1442/2184)
+2026-04-28T14:27:20.1226217Z Updating files:  67% (1464/2184)
+2026-04-28T14:27:20.1237827Z Updating files:  68% (1486/2184)
+2026-04-28T14:27:20.1250434Z Updating files:  69% (1507/2184)
+2026-04-28T14:27:20.1261022Z Updating files:  70% (1529/2184)
+2026-04-28T14:27:20.1272232Z Updating files:  71% (1551/2184)
+2026-04-28T14:27:20.1486619Z Updating files:  72% (1573/2184)
+2026-04-28T14:27:20.1506200Z Updating files:  73% (1595/2184)
+2026-04-28T14:27:20.1519332Z Updating files:  74% (1617/2184)
+2026-04-28T14:27:20.3206022Z Updating files:  75% (1638/2184)
+2026-04-28T14:27:20.3216422Z Updating files:  76% (1660/2184)
+2026-04-28T14:27:20.3232367Z Updating files:  77% (1682/2184)
+2026-04-28T14:27:20.3252995Z Updating files:  78% (1704/2184)
+2026-04-28T14:27:20.3270915Z Updating files:  79% (1726/2184)
+2026-04-28T14:27:20.3280366Z Updating files:  80% (1748/2184)
+2026-04-28T14:27:20.3290218Z Updating files:  81% (1770/2184)
+2026-04-28T14:27:20.3300826Z Updating files:  82% (1791/2184)
+2026-04-28T14:27:20.3317889Z Updating files:  83% (1813/2184)
+2026-04-28T14:27:20.3334873Z Updating files:  84% (1835/2184)
+2026-04-28T14:27:20.3344821Z Updating files:  85% (1857/2184)
+2026-04-28T14:27:20.3357721Z Updating files:  86% (1879/2184)
+2026-04-28T14:27:20.3371230Z Updating files:  87% (1901/2184)
+2026-04-28T14:27:20.3384043Z Updating files:  88% (1922/2184)
+2026-04-28T14:27:20.3399385Z Updating files:  89% (1944/2184)
+2026-04-28T14:27:20.3414116Z Updating files:  90% (1966/2184)
+2026-04-28T14:27:20.3430669Z Updating files:  91% (1988/2184)
+2026-04-28T14:27:20.3451558Z Updating files:  92% (2010/2184)
+2026-04-28T14:27:20.3464218Z Updating files:  93% (2032/2184)
+2026-04-28T14:27:20.3475322Z Updating files:  94% (2053/2184)
+2026-04-28T14:27:20.3489660Z Updating files:  95% (2075/2184)
+2026-04-28T14:27:20.3500812Z Updating files:  96% (2097/2184)
+2026-04-28T14:27:20.3513123Z Updating files:  97% (2119/2184)
+2026-04-28T14:27:20.3524077Z Updating files:  98% (2141/2184)
+2026-04-28T14:27:20.3537174Z Updating files:  99% (2163/2184)
+2026-04-28T14:27:20.3537958Z Updating files: 100% (2184/2184)
+2026-04-28T14:27:20.3538621Z Updating files: 100% (2184/2184), done.
+2026-04-28T14:27:20.3574644Z Note: switching to 'refs/remotes/pull/898/merge'.
+2026-04-28T14:27:20.3575042Z
+2026-04-28T14:27:20.3575598Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-04-28T14:27:20.3576806Z changes and commit them, and you can discard any commits you make in this
+2026-04-28T14:27:20.3577793Z state without impacting any branches by switching back to a branch.
+2026-04-28T14:27:20.3578455Z
+2026-04-28T14:27:20.3578805Z If you want to create a new branch to retain commits you create, you may
+2026-04-28T14:27:20.3579772Z do so (now or later) by using -c with the switch command. Example:
+2026-04-28T14:27:20.3580307Z
+2026-04-28T14:27:20.3580595Z   git switch -c <new-branch-name>
+2026-04-28T14:27:20.3581092Z
+2026-04-28T14:27:20.3581340Z Or undo this operation with:
+2026-04-28T14:27:20.3581819Z
+2026-04-28T14:27:20.3582061Z   git switch -
+2026-04-28T14:27:20.3582345Z
+2026-04-28T14:27:20.3582901Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-04-28T14:27:20.3583390Z
+2026-04-28T14:27:20.3583937Z HEAD is now at dc2cd9956 Merge 8afc5a60462bc48deb04bdf45ed64e3bdd5b1fa0 into a42884c9d45d5b174b85a0bde2fe97de2ceb4dd7
+2026-04-28T14:27:20.3738725Z ##[endgroup]
+2026-04-28T14:27:20.3814818Z [command]/usr/bin/git log -1 --format=%H
+2026-04-28T14:27:20.3859679Z dc2cd9956cf0ca4c1ad48e0ad56bbec2534d2c35
+2026-04-28T14:27:20.4106354Z ##[group]Run azure/setup-helm@v5
+2026-04-28T14:27:20.4106713Z with:
+2026-04-28T14:27:20.4106995Z   version: latest
+2026-04-28T14:27:20.4107408Z   token: ***
+2026-04-28T14:27:20.4107708Z   downloadBaseURL: https://get.helm.sh
+2026-04-28T14:27:20.4108098Z ##[endgroup]
+2026-04-28T14:27:20.5565856Z ##[group]Installing v4.1.4
+2026-04-28T14:27:20.5573612Z Downloading 'v4.1.4' from 'https://get.helm.sh'
+2026-04-28T14:27:20.7980248Z [command]/usr/bin/tar xz --warning=no-unknown-keyword --overwrite -C /runner/_work/_temp/542ea727-58d3-4f2c-9397-cd90ab6de894 -f /runner/_work/_temp/a66cdd9a-33c0-4848-bac4-7707fabfffcc
+2026-04-28T14:27:21.3875671Z ##[endgroup]
+2026-04-28T14:27:21.3876656Z Helm tool version 'v4.1.4' has been cached at /opt/hostedtoolcache/helm/4.1.4/x64/linux-amd64/helm
+2026-04-28T14:27:21.4103752Z ##[group]Run actions/setup-python@v6.2.0
+2026-04-28T14:27:21.4104031Z with:
+2026-04-28T14:27:21.4104203Z   python-version: 3.x
+2026-04-28T14:27:21.4104394Z   check-latest: true
+2026-04-28T14:27:21.4104653Z   token: ***
+2026-04-28T14:27:21.4104833Z   update-environment: true
+2026-04-28T14:27:21.4105045Z   allow-prereleases: false
+2026-04-28T14:27:21.4105233Z   freethreaded: false
+2026-04-28T14:27:21.4105418Z ##[endgroup]
+2026-04-28T14:27:21.5344024Z ##[group]Installed versions
+2026-04-28T14:27:22.4645962Z Resolved as '3.14.4'
+2026-04-28T14:27:22.4649534Z Version 3.14.4 was not found in the local cache
+2026-04-28T14:27:22.4657380Z Version 3.14.4 is available for downloading
+2026-04-28T14:27:22.4658244Z Download from "https://github.com/actions/python-versions/releases/download/3.14.4-24114161919/python-3.14.4-linux-24.04-x64.tar.gz"
+2026-04-28T14:27:23.1787077Z Extract downloaded archive
+2026-04-28T14:27:23.1966349Z [command]/usr/bin/tar xz --warning=no-unknown-keyword --overwrite -C /runner/_work/_temp/a6a97804-9b0f-42d7-b089-e171248b3ee4 -f /runner/_work/_temp/b15a5446-4a5a-415f-bc57-45b21a4d4e0f
+2026-04-28T14:27:25.2008837Z Execute installation script
+2026-04-28T14:27:25.2226166Z Check if Python hostedtoolcache folder exist...
+2026-04-28T14:27:25.2226546Z Creating Python hostedtoolcache folder...
+2026-04-28T14:27:25.2240852Z Create Python 3.14.4 folder
+2026-04-28T14:27:25.2262706Z Copy Python binaries to hostedtoolcache folder
+2026-04-28T14:27:26.4108602Z Create additional symlinks (Required for the UsePythonVersion Azure Pipelines task and the setup-python GitHub Action)
+2026-04-28T14:27:26.4161885Z Upgrading pip...
+2026-04-28T14:27:28.6061172Z Looking in links: /tmp/tmpv1pxie5j
+2026-04-28T14:27:28.6062467Z Requirement already satisfied: pip in /opt/hostedtoolcache/Python/3.14.4/x64/lib/python3.14/site-packages (26.0.1)
+2026-04-28T14:27:29.7566651Z Collecting pip
+2026-04-28T14:27:29.8244772Z Downloading pip-26.1-py3-none-any.whl.metadata (4.6 kB)
+2026-04-28T14:27:29.8386323Z Downloading pip-26.1-py3-none-any.whl (1.8 MB)
+2026-04-28T14:27:29.9804074Z ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 14.8 MB/s  0:00:00
+2026-04-28T14:27:29.9805099Z
+2026-04-28T14:27:29.9951967Z Installing collected packages: pip
+2026-04-28T14:27:29.9952531Z Attempting uninstall: pip
+2026-04-28T14:27:29.9975234Z Found existing installation: pip 26.0.1
+2026-04-28T14:27:30.0428995Z Uninstalling pip-26.0.1:
+2026-04-28T14:27:30.0498681Z Successfully uninstalled pip-26.0.1
+2026-04-28T14:27:31.1682487Z Successfully installed pip-26.1
+2026-04-28T14:27:31.2187891Z Create complete file
+2026-04-28T14:27:31.2231637Z Successfully set up CPython (3.14.4)
+2026-04-28T14:27:31.2233649Z ##[endgroup]
+2026-04-28T14:27:31.2529356Z ##[group]Run helm/chart-testing-action@v2.8.0
+2026-04-28T14:27:31.2529922Z with:
+2026-04-28T14:27:31.2530429Z   version: 3.14.0
+2026-04-28T14:27:31.2530791Z   yamllint_version: 1.33.0
+2026-04-28T14:27:31.2531215Z   yamale_version: 6.0.0
+2026-04-28T14:27:31.2531600Z env:
+2026-04-28T14:27:31.2532035Z   pythonLocation: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:27:31.2532929Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib/pkgconfig
+2026-04-28T14:27:31.2533692Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:27:31.2534353Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:27:31.2534973Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:27:31.2535627Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib
+2026-04-28T14:27:31.2536189Z ##[endgroup]
+2026-04-28T14:27:31.2857930Z ##[group]Run sigstore/cosign-installer@faadad0cce49287aee09b3a48701e75088a2c6ad
+2026-04-28T14:27:31.2858771Z with:
+2026-04-28T14:27:31.2859092Z   cosign-release: v3.0.2
+2026-04-28T14:27:31.2859502Z   install-dir: $HOME/.cosign
+2026-04-28T14:27:31.2859898Z   use-sudo: false
+2026-04-28T14:27:31.2860318Z env:
+2026-04-28T14:27:31.2860744Z   pythonLocation: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:27:31.2861440Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib/pkgconfig
+2026-04-28T14:27:31.2862164Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:27:31.2862747Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:27:31.2863339Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:27:31.2863938Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib
+2026-04-28T14:27:31.2864440Z ##[endgroup]
+2026-04-28T14:27:31.2911765Z ##[group]Run #!/bin/bash
+2026-04-28T14:27:31.2912549Z [36;1m#!/bin/bash[0m
+2026-04-28T14:27:31.2912740Z [36;1m# cosign install script[0m
+2026-04-28T14:27:31.2912958Z [36;1mshopt -s expand_aliases[0m
+2026-04-28T14:27:31.2913196Z [36;1mif [ -z "$NO_COLOR" ]; then[0m
+2026-04-28T14:27:31.2913469Z [36;1m  alias log_info="echo -e \"\033[1;32mINFO\033[0m:\""[0m
+2026-04-28T14:27:31.2913790Z [36;1m  alias log_error="echo -e \"\033[1;31mERROR\033[0m:\""[0m
+2026-04-28T14:27:31.2914056Z [36;1melse[0m
+2026-04-28T14:27:31.2914240Z [36;1m  alias log_info="echo \"INFO:\""[0m
+2026-04-28T14:27:31.2914480Z [36;1m  alias log_error="echo \"ERROR:\""[0m
+2026-04-28T14:27:31.2914721Z [36;1mfi[0m
+2026-04-28T14:27:31.2914873Z [36;1mset -e[0m
+2026-04-28T14:27:31.2915031Z [36;1m[0m
+2026-04-28T14:27:31.2915206Z [36;1m# This function helps compare versions.[0m
+2026-04-28T14:27:31.2915504Z [36;1m# Returns 0 if version1 >= version2, 1 otherwise.[0m
+2026-04-28T14:27:31.2915801Z [36;1m# Usage: is_version_ge "3.0.0" "$version_num"[0m
+2026-04-28T14:27:31.2916053Z [36;1mis_version_ge() {[0m
+2026-04-28T14:27:31.2916314Z [36;1m    [ "$(printf '%s\n' "$1" "$2" | sort -V | head -n1)" == "$1" ][0m
+2026-04-28T14:27:31.2916611Z [36;1m}[0m
+2026-04-28T14:27:31.2916754Z [36;1m[0m
+2026-04-28T14:27:31.2916991Z [36;1m# Check for unsupported old versions (anything below v2.0.0)[0m
+2026-04-28T14:27:31.2917301Z [36;1mif [[ "v3.0.2" != "main" ]]; then[0m
+2026-04-28T14:27:31.2917579Z [36;1m  # Extract version without 'v' prefix for comparison[0m
+2026-04-28T14:27:31.2917861Z [36;1m  version_num="v3.0.2"[0m
+2026-04-28T14:27:31.2918474Z [36;1m  version_num="${version_num#v}"[0m
+2026-04-28T14:27:31.2918688Z [36;1m[0m
+2026-04-28T14:27:31.2918861Z [36;1m  # Check if version is less than v2.0.0[0m
+2026-04-28T14:27:31.2919143Z [36;1m  if ! is_version_ge "2.0.0" "$version_num"; then[0m
+2026-04-28T14:27:31.2919492Z [36;1m    log_error "cosign versions below v2.0.0 are no longer supported."[0m
+2026-04-28T14:27:31.2919833Z [36;1m    log_error "Requested version: v3.0.2"[0m
+2026-04-28T14:27:31.2920212Z [36;1m    log_error "Please use cosign v2.6.0 or later."[0m
+2026-04-28T14:27:31.2920821Z [36;1m    log_error "See https://github.com/sigstore/cosign/releases for available versions."[0m
+2026-04-28T14:27:31.2921232Z [36;1m    exit 1[0m
+2026-04-28T14:27:31.2921404Z [36;1m  fi[0m
+2026-04-28T14:27:31.2921554Z [36;1mfi[0m
+2026-04-28T14:27:31.2921833Z [36;1m[0m
+2026-04-28T14:27:31.2922048Z [36;1mmkdir -p $HOME/.cosign[0m
+2026-04-28T14:27:31.2922255Z [36;1m[0m
+2026-04-28T14:27:31.2922405Z [36;1mif [[ v3.0.2 == "main" ]]; then[0m
+2026-04-28T14:27:31.2922727Z [36;1m  log_info "installing cosign via 'go install' from its main version"[0m
+2026-04-28T14:27:31.2923062Z [36;1m  GOBIN=$(go env GOPATH)/bin[0m
+2026-04-28T14:27:31.2923341Z [36;1m  go install github.com/sigstore/cosign/v3/cmd/cosign@main[0m
+2026-04-28T14:27:31.2923664Z [36;1m  ln -s $GOBIN/cosign $HOME/.cosign/cosign[0m
+2026-04-28T14:27:31.2923907Z [36;1m  exit 0[0m
+2026-04-28T14:27:31.2924062Z [36;1mfi[0m
+2026-04-28T14:27:31.2924205Z [36;1m[0m
+2026-04-28T14:27:31.2924355Z [36;1mshaprog() {[0m
+2026-04-28T14:27:31.2924529Z [36;1m  case Linux in[0m
+2026-04-28T14:27:31.2924723Z [36;1m    Linux|linux)[0m
+2026-04-28T14:27:31.2924929Z [36;1m      sha256sum $1 | cut -d' ' -f1[0m
+2026-04-28T14:27:31.2925181Z [36;1m      ;;[0m
+2026-04-28T14:27:31.2925342Z [36;1m    macOS|macos)[0m
+2026-04-28T14:27:31.2925543Z [36;1m      shasum -a256 $1 | cut -d' ' -f1[0m
+2026-04-28T14:27:31.2925761Z [36;1m      ;;[0m
+2026-04-28T14:27:31.2925921Z [36;1m    Windows|windows)[0m
+2026-04-28T14:27:31.2926365Z [36;1m      powershell -command "(Get-FileHash $1 -Algorithm SHA256 | Select-Object -ExpandProperty Hash).ToLower()"[0m
+2026-04-28T14:27:31.2926806Z [36;1m      ;;[0m
+2026-04-28T14:27:31.2926956Z [36;1m    *)[0m
+2026-04-28T14:27:31.2927142Z [36;1m      log_error "unsupported OS Linux"[0m
+2026-04-28T14:27:31.2927373Z [36;1m      exit 1[0m
+2026-04-28T14:27:31.2927537Z [36;1m      ;;[0m
+2026-04-28T14:27:31.2927693Z [36;1m  esac[0m
+2026-04-28T14:27:31.2927841Z [36;1m}[0m
+2026-04-28T14:27:31.2927983Z [36;1m[0m
+2026-04-28T14:27:31.2928148Z [36;1mbootstrap_version='v3.0.2'[0m
+2026-04-28T14:27:31.2928552Z [36;1mbootstrap_linux_amd64_sha='46dbdcb5467a3dfec2526923d0b3365e40c8d9dc00ec23d5aca3437449e8cbfd'[0m
+2026-04-28T14:27:31.2929135Z [36;1mbootstrap_linux_arm_sha='067df248315ee0c4af1cedb1cce65ad826f784be11ef88afd8d36e87c07162b6'[0m
+2026-04-28T14:27:31.2929729Z [36;1mbootstrap_linux_arm64_sha='17fd784737ca54d7d8a343c82da6c5d6dbdee971e66644d923d1b057fb97d7ed'[0m
+2026-04-28T14:27:31.2930475Z [36;1mbootstrap_darwin_amd64_sha='0fc2b6f16b900abdfda3153b11fc435a8cbe3830e8e820fe8ad5fe4149a5b472'[0m
+2026-04-28T14:27:31.2931069Z [36;1mbootstrap_darwin_arm64_sha='3823b044de184da21e300bc5e20dd29d3fa9243af3ba70c4a5da1712f3385d46'[0m
+2026-04-28T14:27:31.2931652Z [36;1mbootstrap_windows_amd64_sha='7a137280d8686665ceb4d8565df2a0ac63f28031e014cdcae5d56891a6c8a400'[0m
+2026-04-28T14:27:31.2932070Z [36;1mcosign_executable_name=cosign[0m
+2026-04-28T14:27:31.2932287Z [36;1m[0m
+2026-04-28T14:27:31.2932460Z [36;1mtrap "popd >/dev/null" EXIT[0m
+2026-04-28T14:27:31.2932664Z [36;1m[0m
+2026-04-28T14:27:31.2932829Z [36;1mpushd $HOME/.cosign > /dev/null[0m
+2026-04-28T14:27:31.2933037Z [36;1m[0m
+2026-04-28T14:27:31.2933179Z [36;1mcase Linux in[0m
+2026-04-28T14:27:31.2933369Z [36;1m  Linux|linux)[0m
+2026-04-28T14:27:31.2933555Z [36;1m    case X64 in[0m
+2026-04-28T14:27:31.2933728Z [36;1m      X64|amd64)[0m
+2026-04-28T14:27:31.2933966Z [36;1m        bootstrap_filename='cosign-linux-amd64'[0m
+2026-04-28T14:27:31.2934504Z [36;1m        bootstrap_sha=${bootstrap_linux_amd64_sha}[0m
+2026-04-28T14:27:31.2934808Z [36;1m        desired_cosign_filename='cosign-linux-amd64'[0m
+2026-04-28T14:27:31.2935075Z [36;1m        ;;[0m
+2026-04-28T14:27:31.2935242Z [36;1m[0m
+2026-04-28T14:27:31.2935385Z [36;1m      ARM|arm)[0m
+2026-04-28T14:27:31.2935599Z [36;1m        bootstrap_filename='cosign-linux-arm'[0m
+2026-04-28T14:27:31.2935883Z [36;1m        bootstrap_sha=${bootstrap_linux_arm_sha}[0m
+2026-04-28T14:27:31.2936312Z [36;1m        desired_cosign_filename='cosign-linux-arm'[0m
+2026-04-28T14:27:31.2936572Z [36;1m        ;;[0m
+2026-04-28T14:27:31.2936731Z [36;1m[0m
+2026-04-28T14:27:31.2936872Z [36;1m      ARM64|arm64)[0m
+2026-04-28T14:27:31.2937094Z [36;1m        bootstrap_filename='cosign-linux-arm64'[0m
+2026-04-28T14:27:31.2937380Z [36;1m        bootstrap_sha=${bootstrap_linux_arm64_sha}[0m
+2026-04-28T14:27:31.2937678Z [36;1m        desired_cosign_filename='cosign-linux-arm64'[0m
+2026-04-28T14:27:31.2937934Z [36;1m        ;;[0m
+2026-04-28T14:27:31.2938094Z [36;1m[0m
+2026-04-28T14:27:31.2938233Z [36;1m      *)[0m
+2026-04-28T14:27:31.2938425Z [36;1m        log_error "unsupported architecture X64"[0m
+2026-04-28T14:27:31.2938673Z [36;1m        exit 1[0m
+2026-04-28T14:27:31.2938841Z [36;1m        ;;[0m
+2026-04-28T14:27:31.2938995Z [36;1m    esac[0m
+2026-04-28T14:27:31.2939150Z [36;1m    ;;[0m
+2026-04-28T14:27:31.2939299Z [36;1m[0m
+2026-04-28T14:27:31.2939444Z [36;1m  macOS|macos)[0m
+2026-04-28T14:27:31.2939620Z [36;1m    case X64 in[0m
+2026-04-28T14:27:31.2939810Z [36;1m      X64|amd64)[0m
+2026-04-28T14:27:31.2940114Z [36;1m        bootstrap_filename='cosign-darwin-amd64'[0m
+2026-04-28T14:27:31.2940411Z [36;1m        bootstrap_sha=${bootstrap_darwin_amd64_sha}[0m
+2026-04-28T14:27:31.2940718Z [36;1m        desired_cosign_filename='cosign-darwin-amd64'[0m
+2026-04-28T14:27:31.2940969Z [36;1m        ;;[0m
+2026-04-28T14:27:31.2941146Z [36;1m[0m
+2026-04-28T14:27:31.2941293Z [36;1m      ARM64|arm64)[0m
+2026-04-28T14:27:31.2941512Z [36;1m        bootstrap_filename='cosign-darwin-arm64'[0m
+2026-04-28T14:27:31.2941809Z [36;1m        bootstrap_sha=${bootstrap_darwin_arm64_sha}[0m
+2026-04-28T14:27:31.2942111Z [36;1m        desired_cosign_filename='cosign-darwin-arm64'[0m
+2026-04-28T14:27:31.2942366Z [36;1m        ;;[0m
+2026-04-28T14:27:31.2942515Z [36;1m[0m
+2026-04-28T14:27:31.2942657Z [36;1m      *)[0m
+2026-04-28T14:27:31.2942856Z [36;1m        log_error "unsupported architecture X64"[0m
+2026-04-28T14:27:31.2943100Z [36;1m        exit 1[0m
+2026-04-28T14:27:31.2943269Z [36;1m        ;;[0m
+2026-04-28T14:27:31.2943425Z [36;1m    esac[0m
+2026-04-28T14:27:31.2943570Z [36;1m    ;;[0m
+2026-04-28T14:27:31.2943720Z [36;1m[0m
+2026-04-28T14:27:31.2943870Z [36;1m  Windows|windows)[0m
+2026-04-28T14:27:31.2944053Z [36;1m    case X64 in[0m
+2026-04-28T14:27:31.2944230Z [36;1m      X64|amd64)[0m
+2026-04-28T14:27:31.2944471Z [36;1m        bootstrap_filename='cosign-windows-amd64.exe'[0m
+2026-04-28T14:27:31.2944780Z [36;1m        bootstrap_sha=${bootstrap_windows_amd64_sha}[0m
+2026-04-28T14:27:31.2945103Z [36;1m        desired_cosign_filename='cosign-windows-amd64.exe'[0m
+2026-04-28T14:27:31.2945420Z [36;1m        cosign_executable_name=cosign.exe[0m
+2026-04-28T14:27:31.2945648Z [36;1m        ;;[0m
+2026-04-28T14:27:31.2945811Z [36;1m      *)[0m
+2026-04-28T14:27:31.2946014Z [36;1m        log_error "unsupported architecture X64"[0m
+2026-04-28T14:27:31.2946263Z [36;1m        exit 1[0m
+2026-04-28T14:27:31.2946435Z [36;1m        ;;[0m
+2026-04-28T14:27:31.2946603Z [36;1m    esac[0m
+2026-04-28T14:27:31.2946758Z [36;1m    ;;[0m
+2026-04-28T14:27:31.2946923Z [36;1m  *)[0m
+2026-04-28T14:27:31.2947111Z [36;1m    log_error "unsupported os Linux"[0m
+2026-04-28T14:27:31.2947386Z [36;1m    exit 1[0m
+2026-04-28T14:27:31.2947580Z [36;1m    ;;[0m
+2026-04-28T14:27:31.2947792Z [36;1mesac[0m
+2026-04-28T14:27:31.2947980Z [36;1m[0m
+2026-04-28T14:27:31.2948403Z [36;1mSUDO=[0m
+2026-04-28T14:27:31.2948687Z [36;1mif [[ "false" == "true" ]] && command -v sudo >/dev/null; then[0m
+2026-04-28T14:27:31.2949012Z [36;1m  SUDO=sudo[0m
+2026-04-28T14:27:31.2949214Z [36;1mfi[0m
+2026-04-28T14:27:31.2949420Z [36;1m[0m
+2026-04-28T14:27:31.2949676Z [36;1mexpected_bootstrap_version_digest=${bootstrap_sha}[0m
+2026-04-28T14:27:31.2950717Z [36;1mlog_info "Downloading bootstrap version '${bootstrap_version}' of cosign to verify version to be installed...\n      https://github.com/sigstore/cosign/releases/download/${bootstrap_version}/${bootstrap_filename}"[0m
+2026-04-28T14:27:31.2951892Z [36;1m$SUDO curl -fsL https://github.com/sigstore/cosign/releases/download/${bootstrap_version}/${bootstrap_filename} -o ${cosign_executable_name}[0m
+2026-04-28T14:27:31.2952554Z [36;1mshaBootstrap=$(shaprog ${cosign_executable_name});[0m
+2026-04-28T14:27:31.2952987Z [36;1mif [[ $shaBootstrap != ${expected_bootstrap_version_digest} ]]; then[0m
+2026-04-28T14:27:31.2953421Z [36;1m  log_error "Unable to validate cosign version: 'v3.0.2'"[0m
+2026-04-28T14:27:31.2953757Z [36;1m  exit 1[0m
+2026-04-28T14:27:31.2953977Z [36;1mfi[0m
+2026-04-28T14:27:31.2954196Z [36;1m$SUDO chmod +x ${cosign_executable_name}[0m
+2026-04-28T14:27:31.2954489Z [36;1m[0m
+2026-04-28T14:27:31.2954814Z [36;1m# If the bootstrap and specified `cosign` releases are the same, we're done.[0m
+2026-04-28T14:27:31.2955263Z [36;1mif [[ v3.0.2 == ${bootstrap_version} ]]; then[0m
+2026-04-28T14:27:31.2955814Z [36;1m  log_info "bootstrap version successfully verified and matches requested version so nothing else to do"[0m
+2026-04-28T14:27:31.2956283Z [36;1m  exit 0[0m
+2026-04-28T14:27:31.2956511Z [36;1mfi[0m
+2026-04-28T14:27:31.2956730Z [36;1m[0m
+2026-04-28T14:27:31.2956973Z [36;1msemver='^v([0-9]+\.){0,2}(\*|[0-9]+)(-?r?c?)(\.[0-9]+)$'[0m
+2026-04-28T14:27:31.2957319Z [36;1mif [[ v3.0.2 =~ $semver ]]; then[0m
+2026-04-28T14:27:31.2957664Z [36;1m  log_info "Custom cosign version 'v3.0.2' requested"[0m
+2026-04-28T14:27:31.2958009Z [36;1melse[0m
+2026-04-28T14:27:31.2958298Z [36;1m  log_error "Unable to validate requested cosign version: 'v3.0.2'"[0m
+2026-04-28T14:27:31.2958671Z [36;1m  exit 1[0m
+2026-04-28T14:27:31.2958900Z [36;1mfi[0m
+2026-04-28T14:27:31.2959085Z [36;1m[0m
+2026-04-28T14:27:31.2959316Z [36;1m# Download custom cosign[0m
+2026-04-28T14:27:31.2960069Z [36;1mlog_info "Downloading platform-specific version 'v3.0.2' of cosign...\n      https://github.com/sigstore/cosign/releases/download/v3.0.2/${desired_cosign_filename}"[0m
+2026-04-28T14:27:31.2961012Z [36;1m$SUDO curl -fsL https://github.com/sigstore/cosign/releases/download/v3.0.2/${desired_cosign_filename} -o cosign_v3.0.2[0m
+2026-04-28T14:27:31.2961563Z [36;1mshaCustom=$(shaprog cosign_v3.0.2);[0m
+2026-04-28T14:27:31.2961859Z [36;1m[0m
+2026-04-28T14:27:31.2962107Z [36;1m# same hash means it is the same release[0m
+2026-04-28T14:27:31.2962416Z [36;1mif [[ $shaCustom != $shaBootstrap ]]; then[0m
+2026-04-28T14:27:31.2963072Z [36;1m  log_info "Downloading cosign public key 'v3.0.2' of cosign...\n    https://raw.githubusercontent.com/sigstore/cosign/v3.0.2/release/release-cosign.pub"[0m
+2026-04-28T14:27:31.2963946Z [36;1m  RELEASE_COSIGN_PUB_KEY=https://raw.githubusercontent.com/sigstore/cosign/v3.0.2/release/release-cosign.pub[0m
+2026-04-28T14:27:31.2964652Z [36;1m  RELEASE_COSIGN_PUB_KEY_SHA='f4cea466e5e887a45da5031757fa1d32655d83420639dc1758749b744179f126'[0m
+2026-04-28T14:27:31.2965091Z [36;1m[0m
+2026-04-28T14:27:31.2965361Z [36;1m  log_info "Verifying public key matches expected value"[0m
+2026-04-28T14:27:31.2965757Z [36;1m  $SUDO curl -fsL $RELEASE_COSIGN_PUB_KEY -o public.key[0m
+2026-04-28T14:27:31.2966091Z [36;1m  sha_fetched_key=$(shaprog public.key)[0m
+2026-04-28T14:27:31.2966453Z [36;1m  if [[ $sha_fetched_key != $RELEASE_COSIGN_PUB_KEY_SHA ]]; then[0m
+2026-04-28T14:27:31.2966899Z [36;1m    log_error "Fetched public key does not match expected digest, exiting"[0m
+2026-04-28T14:27:31.2967502Z [36;1m    exit 1[0m
+2026-04-28T14:27:31.2967701Z [36;1m  fi[0m
+2026-04-28T14:27:31.2967899Z [36;1m[0m
+2026-04-28T14:27:31.2968139Z [36;1m  if is_version_ge "3.0.1" "$version_num"; then[0m
+2026-04-28T14:27:31.2968499Z [36;1m    # we're trying to get something greater than or equal to v3.0.1[0m
+2026-04-28T14:27:31.2968937Z [36;1m    keyless_signature_file=${desired_cosign_filename}.sigstore.json[0m
+2026-04-28T14:27:31.2969881Z [36;1m    log_info "Downloading keyless verification bundle for platform-specific 'v3.0.2' of cosign...\n      https://github.com/sigstore/cosign/releases/download/v3.0.2/${keyless_signature_file}"[0m
+2026-04-28T14:27:31.2970921Z [36;1m    $SUDO curl -fsLO https://github.com/sigstore/cosign/releases/download/v3.0.2/${keyless_signature_file}[0m
+2026-04-28T14:27:31.2971377Z [36;1m[0m
+2026-04-28T14:27:31.2971745Z [36;1m    log_info "Using bootstrap cosign to verify keyless signature of desired cosign version"[0m
+2026-04-28T14:27:31.2972713Z [36;1m    ./cosign verify-blob --certificate-identity=keyless@projectsigstore.iam.gserviceaccount.com --certificate-oidc-issuer=https://accounts.google.com --bundle ${keyless_signature_file} cosign_v3.0.2[0m
+2026-04-28T14:27:31.2973523Z [36;1m[0m
+2026-04-28T14:27:31.2973745Z [36;1m    if is_version_ge "3.0.2" "$version_num"; then[0m
+2026-04-28T14:27:31.2974134Z [36;1m      # we're trying to get something greater than or equal to v3.0.2[0m
+2026-04-28T14:27:31.2974586Z [36;1m      kms_signature_file=${desired_cosign_filename}-kms.sigstore.json[0m
+2026-04-28T14:27:31.2975374Z [36;1m      log_info "Downloading KMS verification bundle for platform-specific 'v3.0.2' of cosign...\n      https://github.com/sigstore/cosign/releases/download/v3.0.2/${kms_signature_file}"[0m
+2026-04-28T14:27:31.2976286Z [36;1m      $SUDO curl -fsLO https://github.com/sigstore/cosign/releases/download/v3.0.2/${kms_signature_file}[0m
+2026-04-28T14:27:31.2976762Z [36;1m[0m
+2026-04-28T14:27:31.2977115Z [36;1m      log_info "Using bootstrap cosign to verify signature of desired cosign version"[0m
+2026-04-28T14:27:31.2977666Z [36;1m      ./cosign verify-blob --key public.key --bundle ${kms_signature_file} cosign_v3.0.2[0m
+2026-04-28T14:27:31.2978098Z [36;1m    fi[0m
+2026-04-28T14:27:31.2978324Z [36;1m  else[0m
+2026-04-28T14:27:31.2978568Z [36;1m    signature_file=${desired_cosign_filename}.sig[0m
+2026-04-28T14:27:31.2979297Z [36;1m    log_info "Downloading detached signature for platform-specific 'v3.0.2' of cosign...\n      https://github.com/sigstore/cosign/releases/download/v3.0.2/${signature_file}"[0m
+2026-04-28T14:27:31.2980226Z [36;1m    $SUDO curl -fsLO https://github.com/sigstore/cosign/releases/download/v3.0.2/${signature_file}[0m
+2026-04-28T14:27:31.2980675Z [36;1m[0m
+2026-04-28T14:27:31.2980998Z [36;1m    log_info "Using bootstrap cosign to verify signature of desired cosign version"[0m
+2026-04-28T14:27:31.2981575Z [36;1m    ./cosign verify-blob --key public.key --signature ${signature_file} cosign_v3.0.2[0m
+2026-04-28T14:27:31.2982008Z [36;1m  fi[0m
+2026-04-28T14:27:31.2982230Z [36;1m[0m
+2026-04-28T14:27:31.2982793Z [36;1m  $SUDO rm cosign[0m
+2026-04-28T14:27:31.2983095Z [36;1m  $SUDO mv cosign_v3.0.2 ${cosign_executable_name}[0m
+2026-04-28T14:27:31.2983506Z [36;1m  $SUDO chmod +x ${cosign_executable_name}[0m
+2026-04-28T14:27:31.2983933Z [36;1m  log_info "Installation complete!"[0m
+2026-04-28T14:27:31.2984225Z [36;1mfi[0m
+2026-04-28T14:27:31.2998452Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-04-28T14:27:31.2998827Z env:
+2026-04-28T14:27:31.2999144Z   pythonLocation: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:27:31.2999706Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib/pkgconfig
+2026-04-28T14:27:31.3000238Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:27:31.3000661Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:27:31.3001164Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:27:31.3001698Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib
+2026-04-28T14:27:31.3002071Z ##[endgroup]
+2026-04-28T14:27:31.3158985Z [1;32mINFO[0m: Downloading bootstrap version 'v3.0.2' of cosign to verify version to be installed...
+2026-04-28T14:27:31.3159641Z       https://github.com/sigstore/cosign/releases/download/v3.0.2/cosign-linux-amd64
+2026-04-28T14:27:32.0766538Z [1;32mINFO[0m: bootstrap version successfully verified and matches requested version so nothing else to do
+2026-04-28T14:27:32.0838727Z ##[group]Run echo "$HOME/.cosign" >> $GITHUB_PATH
+2026-04-28T14:27:32.0839769Z [36;1mecho "$HOME/.cosign" >> $GITHUB_PATH[0m
+2026-04-28T14:27:32.0860771Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-04-28T14:27:32.0861197Z env:
+2026-04-28T14:27:32.0861507Z   pythonLocation: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:27:32.0862050Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib/pkgconfig
+2026-04-28T14:27:32.0862575Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:27:32.0863081Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:27:32.0863511Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:27:32.0863974Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib
+2026-04-28T14:27:32.0864370Z ##[endgroup]
+2026-04-28T14:27:32.1044005Z ##[group]Run astral-sh/setup-uv@eb1897b8dc4b5d5bfe39a428a8f2304605e0983c
+2026-04-28T14:27:32.1044706Z with:
+2026-04-28T14:27:32.1045069Z   activate-environment: false
+2026-04-28T14:27:32.1045619Z   working-directory: /runner/_work/cytomine/cytomine
+2026-04-28T14:27:32.1046437Z   github-token: ***
+2026-04-28T14:27:32.1046852Z   enable-cache: auto
+2026-04-28T14:27:32.1047815Z   cache-dependency-glob: **/*requirements*.txt
+**/*requirements*.in
+**/*constraints*.txt
+**/*constraints*.in
+**/pyproject.toml
+**/uv.lock
+**/*.py.lock
+
+2026-04-28T14:27:32.1048891Z   restore-cache: true
+2026-04-28T14:27:32.1049287Z   save-cache: true
+2026-04-28T14:27:32.1049631Z   prune-cache: true
+2026-04-28T14:27:32.1050206Z   ignore-nothing-to-cache: false
+2026-04-28T14:27:32.1050675Z   ignore-empty-workdir: false
+2026-04-28T14:27:32.1051095Z   add-problem-matchers: true
+2026-04-28T14:27:32.1051523Z env:
+2026-04-28T14:27:32.1051966Z   pythonLocation: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:27:32.1052665Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib/pkgconfig
+2026-04-28T14:27:32.1053346Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:27:32.1053978Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:27:32.1054648Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:27:32.1055296Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib
+2026-04-28T14:27:32.1055867Z ##[endgroup]
+2026-04-28T14:27:32.2836159Z (node:454) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-04-28T14:27:32.2836981Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-04-28T14:27:32.2935801Z Trying to find version for uv in: /runner/_work/cytomine/cytomine/uv.toml
+2026-04-28T14:27:32.2936344Z Could not find file: /runner/_work/cytomine/cytomine/uv.toml
+2026-04-28T14:27:32.2936868Z Trying to find version for uv in: /runner/_work/cytomine/cytomine/pyproject.toml
+2026-04-28T14:27:32.2940302Z Could not determine uv version from uv.toml or pyproject.toml. Falling back to latest.
+2026-04-28T14:27:32.2941206Z Getting latest version from GitHub API...
+2026-04-28T14:27:32.6037034Z manifest-file not provided, reading from local file.
+2026-04-28T14:27:32.6108181Z manifest-file does not contain version 0.11.8, arch x86_64, platform unknown-linux-gnu. Falling back to GitHub releases.
+2026-04-28T14:27:32.6110207Z Downloading uv from "https://github.com/astral-sh/uv/releases/download/0.11.8/uv-x86_64-unknown-linux-gnu.tar.gz" ...
+2026-04-28T14:27:33.0136954Z [command]/usr/bin/tar xz --warning=no-unknown-keyword --overwrite -C /runner/_work/_temp/2ab9d361-fb68-49dd-a9dd-fd96d9f5ddd4 -f /runner/_work/_temp/701d0eb0-036c-41fe-bc72-6feae7893c39
+2026-04-28T14:27:33.5894006Z Added /home/runner/.local/bin to the path
+2026-04-28T14:27:33.5900504Z Added /opt/hostedtoolcache/uv/0.11.8/x86_64 to the path
+2026-04-28T14:27:33.5913872Z Successfully installed uv version 0.11.8
+2026-04-28T14:27:33.6218356Z ##[group]Run cd $GITHUB_ACTION_PATH \
+2026-04-28T14:27:33.6218923Z [36;1mcd $GITHUB_ACTION_PATH \[0m
+2026-04-28T14:27:33.6219400Z [36;1m&& ./ct.sh \[0m
+2026-04-28T14:27:33.6219808Z [36;1m    --version 3.14.0 \[0m
+2026-04-28T14:27:33.6220793Z [36;1m    --yamllint-version 1.33.0 \[0m
+2026-04-28T14:27:33.6221337Z [36;1m    --yamale-version 6.0.0[0m
+2026-04-28T14:27:33.6250110Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-04-28T14:27:33.6250817Z env:
+2026-04-28T14:27:33.6251299Z   pythonLocation: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:27:33.6252118Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib/pkgconfig
+2026-04-28T14:27:33.6252948Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:27:33.6253661Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:27:33.6254384Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:27:33.6255103Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib
+2026-04-28T14:27:33.6255796Z ##[endgroup]
+2026-04-28T14:27:33.6389710Z Installing chart-testing v3.14.0...
+2026-04-28T14:27:35.0712913Z Verified OK
+2026-04-28T14:27:35.1811089Z Creating virtual Python environment...
+2026-04-28T14:27:35.2757953Z Using CPython 3.14.4 interpreter at: /opt/hostedtoolcache/Python/3.14.4/x64/bin/python
+2026-04-28T14:27:35.2759029Z Creating virtual environment at: /opt/hostedtoolcache/ct/3.14.0/amd64/venv
+2026-04-28T14:27:35.2768843Z Activate with: source /opt/hostedtoolcache/ct/3.14.0/amd64/venv/bin/activate
+2026-04-28T14:27:35.2801093Z Installing yamllint...
+2026-04-28T14:27:35.3412328Z Using Python 3.14.4 environment at: /opt/hostedtoolcache/ct/3.14.0/amd64/venv
+2026-04-28T14:27:35.4659820Z Resolved 3 packages in 123ms
+2026-04-28T14:27:35.5106878Z Prepared 3 packages in 44ms
+2026-04-28T14:27:35.5269714Z Installed 3 packages in 16ms
+2026-04-28T14:27:35.5270473Z  + pathspec==1.1.1
+2026-04-28T14:27:35.5270983Z  + pyyaml==6.0.3
+2026-04-28T14:27:35.5271477Z  + yamllint==1.33.0
+2026-04-28T14:27:35.5326668Z Installing Yamale...
+2026-04-28T14:27:35.5442929Z Using Python 3.14.4 environment at: /opt/hostedtoolcache/ct/3.14.0/amd64/venv
+2026-04-28T14:27:35.6364756Z Resolved 2 packages in 90ms
+2026-04-28T14:27:35.6639100Z Prepared 1 package in 27ms
+2026-04-28T14:27:35.6972849Z Installed 1 package in 33ms
+2026-04-28T14:27:35.6973323Z  + yamale==6.0.0
+2026-04-28T14:27:35.7037615Z Adding ct directory to PATH...
+2026-04-28T14:27:35.7038516Z Setting CT_CONFIG_DIR...
+2026-04-28T14:27:35.7039854Z Configuring environment variables for virtual environment for subsequent workflow steps...
+2026-04-28T14:27:35.7083473Z Version:	 v3.14.0
+2026-04-28T14:27:35.7083952Z Git commit:	 2651b49048950c5473b1f533c900d17614bc6aa0
+2026-04-28T14:27:35.7084472Z Date:		 2025-10-08T14:12:01Z
+2026-04-28T14:27:35.7084738Z License:	 Apache 2.0
+2026-04-28T14:27:35.7145540Z ##[group]Run echo "DEPLOYMENT_NAME=${GITHUB_SHA:0:7}" >> $GITHUB_ENV
+2026-04-28T14:27:35.7146104Z [36;1mecho "DEPLOYMENT_NAME=${GITHUB_SHA:0:7}" >> $GITHUB_ENV[0m
+2026-04-28T14:27:35.7169157Z shell: /usr/bin/bash -e {0}
+2026-04-28T14:27:35.7169420Z env:
+2026-04-28T14:27:35.7169714Z   pythonLocation: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:27:35.7170277Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib/pkgconfig
+2026-04-28T14:27:35.7170743Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:27:35.7171150Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:27:35.7171554Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:27:35.7171967Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib
+2026-04-28T14:27:35.7172750Z   CT_CONFIG_DIR: /opt/hostedtoolcache/ct/3.14.0/amd64/etc
+2026-04-28T14:27:35.7173136Z   VIRTUAL_ENV: /opt/hostedtoolcache/ct/3.14.0/amd64/venv
+2026-04-28T14:27:35.7173510Z ##[endgroup]
+2026-04-28T14:27:35.7282403Z ##[group]Run docker/login-action@v4
+2026-04-28T14:27:35.7282777Z with:
+2026-04-28T14:27:35.7283027Z   registry: registry.cytomine.org
+2026-04-28T14:27:35.7283534Z   username: ***
+2026-04-28T14:27:35.7283992Z   password: ***
+2026-04-28T14:27:35.7284267Z   logout: true
+2026-04-28T14:27:35.7284499Z env:
+2026-04-28T14:27:35.7284831Z   pythonLocation: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:27:35.7285366Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib/pkgconfig
+2026-04-28T14:27:35.7285859Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:27:35.7286326Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:27:35.7286786Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:27:35.7287257Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib
+2026-04-28T14:27:35.7287745Z   CT_CONFIG_DIR: /opt/hostedtoolcache/ct/3.14.0/amd64/etc
+2026-04-28T14:27:35.7288281Z   VIRTUAL_ENV: /opt/hostedtoolcache/ct/3.14.0/amd64/venv
+2026-04-28T14:27:35.7288671Z   DEPLOYMENT_NAME: dc2cd99
+2026-04-28T14:27:35.7288973Z ##[endgroup]
+2026-04-28T14:27:35.8930297Z Logging into registry.cytomine.org...
+2026-04-28T14:27:36.0388062Z Login Succeeded!
+2026-04-28T14:27:36.0714175Z ##[group]Run helm/kind-action@v1.14.0
+2026-04-28T14:27:36.0714597Z with:
+2026-04-28T14:27:36.0714940Z   node_image: registry.cytomine.org/docker/kindest/node:v1.32.0
+2026-04-28T14:27:36.0715372Z   cluster_name: cytomine
+2026-04-28T14:27:36.0715603Z   version: v0.31.0
+2026-04-28T14:27:36.0715851Z   wait: 60s
+2026-04-28T14:27:36.0716149Z   verbosity: 0
+2026-04-28T14:27:36.0716354Z   kubectl_version: v1.35.0
+2026-04-28T14:27:36.0716602Z   registry: false
+2026-04-28T14:27:36.0716956Z   registry_image: registry:2
+2026-04-28T14:27:36.0717496Z   registry_name: kind-registry
+2026-04-28T14:27:36.0717890Z   registry_port: 5000
+2026-04-28T14:27:36.0718176Z   registry_enable_delete: false
+2026-04-28T14:27:36.0718481Z   install_only: false
+2026-04-28T14:27:36.0718724Z   ignore_failed_clean: false
+2026-04-28T14:27:36.0718997Z   cloud_provider: false
+2026-04-28T14:27:36.0719263Z env:
+2026-04-28T14:27:36.0719551Z   pythonLocation: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:27:36.0720261Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib/pkgconfig
+2026-04-28T14:27:36.0720749Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:27:36.0721216Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:27:36.0721675Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:27:36.0722141Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib
+2026-04-28T14:27:36.0722578Z   CT_CONFIG_DIR: /opt/hostedtoolcache/ct/3.14.0/amd64/etc
+2026-04-28T14:27:36.0722992Z   VIRTUAL_ENV: /opt/hostedtoolcache/ct/3.14.0/amd64/venv
+2026-04-28T14:27:36.0723414Z   DEPLOYMENT_NAME: dc2cd99
+2026-04-28T14:27:36.0723688Z ##[endgroup]
+2026-04-28T14:27:36.1121924Z Installing kind...
+2026-04-28T14:27:36.1142398Z /opt/hostedtoolcache/kind/v0.31.0/amd64/kind/bin /runner/_work/cytomine/cytomine
+2026-04-28T14:27:36.9137332Z kind-linux-amd64: OK
+2026-04-28T14:27:36.9185550Z /runner/_work/cytomine/cytomine
+2026-04-28T14:27:36.9186303Z Adding kind directory to PATH...
+2026-04-28T14:27:36.9186910Z Installing kubectl...
+2026-04-28T14:27:36.9216957Z /opt/hostedtoolcache/kind/v0.31.0/amd64/kubectl/bin /runner/_work/cytomine/cytomine
+2026-04-28T14:27:37.3493650Z kubectl: OK
+2026-04-28T14:27:37.3519834Z /runner/_work/cytomine/cytomine
+2026-04-28T14:27:37.3520648Z Adding kubectl directory to PATH...
+2026-04-28T14:27:37.3565906Z kind v0.31.0 go1.25.5 linux/amd64
+2026-04-28T14:27:37.3986258Z Client Version: v1.35.0
+2026-04-28T14:27:37.3986552Z Kustomize Version: v5.7.1
+2026-04-28T14:27:37.4029630Z Creating kind cluster...
+2026-04-28T14:27:37.5202276Z Creating cluster "cytomine" ...
+2026-04-28T14:27:37.5203870Z  • Ensuring node image (registry.cytomine.org/docker/kindest/node:v1.32.0) 🖼  ...
+2026-04-28T14:27:47.5072301Z  ✓ Ensuring node image (registry.cytomine.org/docker/kindest/node:v1.32.0) 🖼
+2026-04-28T14:27:47.5072877Z  • Preparing nodes 📦   ...
+2026-04-28T14:27:51.7223857Z  ✓ Preparing nodes 📦
+2026-04-28T14:27:51.7664963Z  • Writing configuration 📜  ...
+2026-04-28T14:27:52.0628081Z  ✓ Writing configuration 📜
+2026-04-28T14:27:52.0628442Z  • Starting control-plane 🕹️  ...
+2026-04-28T14:28:01.7345617Z  ✓ Starting control-plane 🕹️
+2026-04-28T14:28:01.7346358Z  • Installing CNI 🔌  ...
+2026-04-28T14:28:02.1993483Z  ✓ Installing CNI 🔌
+2026-04-28T14:28:02.1993869Z  • Installing StorageClass 💾  ...
+2026-04-28T14:28:02.7633161Z  ✓ Installing StorageClass 💾
+2026-04-28T14:28:02.8147787Z  • Waiting ≤ 1m0s for control-plane = Ready ⏳  ...
+2026-04-28T14:28:21.2289562Z  ✓ Waiting ≤ 1m0s for control-plane = Ready ⏳
+2026-04-28T14:28:21.2290342Z  • Ready after 18s 💚
+2026-04-28T14:28:21.4500676Z Set kubectl context to "kind-cytomine"
+2026-04-28T14:28:21.4501086Z You can now use your cluster with:
+2026-04-28T14:28:21.4501252Z
+2026-04-28T14:28:21.4501373Z kubectl cluster-info --context kind-cytomine
+2026-04-28T14:28:21.4501582Z
+2026-04-28T14:28:21.4501981Z Thanks for using kind! 😊
+2026-04-28T14:28:21.4628180Z ##[group]Run kubectl create ns cytomine-dc2cd99
+2026-04-28T14:28:21.4628671Z [36;1mkubectl create ns cytomine-dc2cd99[0m
+2026-04-28T14:28:21.4629076Z [36;1mkubectl create ns cytomine-dc2cd99-engine-tasks[0m
+2026-04-28T14:28:21.4648302Z shell: /usr/bin/bash -e {0}
+2026-04-28T14:28:21.4648602Z env:
+2026-04-28T14:28:21.4648913Z   pythonLocation: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:28:21.4649435Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib/pkgconfig
+2026-04-28T14:28:21.4650075Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:28:21.4650522Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:28:21.4651016Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:28:21.4651488Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib
+2026-04-28T14:28:21.4651955Z   CT_CONFIG_DIR: /opt/hostedtoolcache/ct/3.14.0/amd64/etc
+2026-04-28T14:28:21.4652461Z   VIRTUAL_ENV: /opt/hostedtoolcache/ct/3.14.0/amd64/venv
+2026-04-28T14:28:21.4652844Z   DEPLOYMENT_NAME: dc2cd99
+2026-04-28T14:28:21.4653145Z ##[endgroup]
+2026-04-28T14:28:21.5279302Z namespace/cytomine-dc2cd99 created
+2026-04-28T14:28:21.6293636Z namespace/cytomine-dc2cd99-engine-tasks created
+2026-04-28T14:28:21.6383657Z ##[group]Run kubectl label --overwrite ns cytomine-dc2cd99 pod-security.kubernetes.io/enforce=restricted pod-security.kubernetes.io/enforce-version=latest pod-security.kubernetes.io/warn=restricted pod-security.kubernetes.io/warn-version=latest
+2026-04-28T14:28:21.6385438Z [36;1mkubectl label --overwrite ns cytomine-dc2cd99 pod-security.kubernetes.io/enforce=restricted pod-security.kubernetes.io/enforce-version=latest pod-security.kubernetes.io/warn=restricted pod-security.kubernetes.io/warn-version=latest[0m
+2026-04-28T14:28:21.6404123Z shell: /usr/bin/bash -e {0}
+2026-04-28T14:28:21.6404385Z env:
+2026-04-28T14:28:21.6404706Z   pythonLocation: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:28:21.6405175Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib/pkgconfig
+2026-04-28T14:28:21.6405598Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:28:21.6406011Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:28:21.6406518Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:28:21.6406895Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib
+2026-04-28T14:28:21.6407305Z   CT_CONFIG_DIR: /opt/hostedtoolcache/ct/3.14.0/amd64/etc
+2026-04-28T14:28:21.6407710Z   VIRTUAL_ENV: /opt/hostedtoolcache/ct/3.14.0/amd64/venv
+2026-04-28T14:28:21.6408039Z   DEPLOYMENT_NAME: dc2cd99
+2026-04-28T14:28:21.6408318Z ##[endgroup]
+2026-04-28T14:28:21.7203474Z namespace/cytomine-dc2cd99 labeled
+2026-04-28T14:28:21.7287462Z ##[group]Run for ns in cytomine-dc2cd99 cytomine-dc2cd99-engine-tasks; do
+2026-04-28T14:28:21.7288097Z [36;1mfor ns in cytomine-dc2cd99 cytomine-dc2cd99-engine-tasks; do[0m
+2026-04-28T14:28:21.7288637Z [36;1m  kubectl create secret docker-registry docker-image-pull-secrets \[0m
+2026-04-28T14:28:21.7289095Z [36;1m    --namespace=$ns \[0m
+2026-04-28T14:28:21.7289429Z [36;1m    --docker-server=registry.cytomine.org \[0m
+2026-04-28T14:28:21.7289887Z [36;1m    --docker-username=*** \[0m
+2026-04-28T14:28:21.7290704Z [36;1m    --docker-***
+2026-04-28T14:28:21.7290957Z [36;1mdone[0m
+2026-04-28T14:28:21.7291167Z [36;1m[0m
+2026-04-28T14:28:21.7291404Z [36;1mkubectl patch serviceaccount default \[0m
+2026-04-28T14:28:21.7291766Z [36;1m  --namespace=cytomine-dc2cd99 \[0m
+2026-04-28T14:28:21.7292200Z [36;1m  -p '{"imagePullSecrets":[{"name":"docker-image-pull-secrets"}]}'[0m
+2026-04-28T14:28:21.7309833Z shell: /usr/bin/bash -e {0}
+2026-04-28T14:28:21.7310332Z env:
+2026-04-28T14:28:21.7310668Z   pythonLocation: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:28:21.7311153Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib/pkgconfig
+2026-04-28T14:28:21.7311626Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:28:21.7312042Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:28:21.7312444Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:28:21.7312860Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib
+2026-04-28T14:28:21.7313269Z   CT_CONFIG_DIR: /opt/hostedtoolcache/ct/3.14.0/amd64/etc
+2026-04-28T14:28:21.7313647Z   VIRTUAL_ENV: /opt/hostedtoolcache/ct/3.14.0/amd64/venv
+2026-04-28T14:28:21.7313996Z   DEPLOYMENT_NAME: dc2cd99
+2026-04-28T14:28:21.7314239Z ##[endgroup]
+2026-04-28T14:28:21.7820149Z secret/docker-image-pull-secrets created
+2026-04-28T14:28:21.8365035Z secret/docker-image-pull-secrets created
+2026-04-28T14:28:21.9039349Z serviceaccount/default patched
+2026-04-28T14:28:21.9141853Z ##[group]Run E2E_TEST_COUNT=$(grep -r "@Test" e2e-tests/src/test/java/org/cytomine/e2etests/selenium/ --include="*.java" | wc -l)
+2026-04-28T14:28:21.9143424Z [36;1mE2E_TEST_COUNT=$(grep -r "@Test" e2e-tests/src/test/java/org/cytomine/e2etests/selenium/ --include="*.java" | wc -l)[0m
+2026-04-28T14:28:21.9144448Z [36;1mecho "E2E_TEST_COUNT=$E2E_TEST_COUNT" >> $GITHUB_ENV[0m
+2026-04-28T14:28:21.9167838Z shell: /usr/bin/bash -e {0}
+2026-04-28T14:28:21.9168156Z env:
+2026-04-28T14:28:21.9168529Z   pythonLocation: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:28:21.9169103Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib/pkgconfig
+2026-04-28T14:28:21.9169632Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:28:21.9170250Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:28:21.9170738Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:28:21.9171311Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib
+2026-04-28T14:28:21.9171779Z   CT_CONFIG_DIR: /opt/hostedtoolcache/ct/3.14.0/amd64/etc
+2026-04-28T14:28:21.9172235Z   VIRTUAL_ENV: /opt/hostedtoolcache/ct/3.14.0/amd64/venv
+2026-04-28T14:28:21.9172657Z   DEPLOYMENT_NAME: dc2cd99
+2026-04-28T14:28:21.9172979Z ##[endgroup]
+2026-04-28T14:28:21.9331443Z ##[group]Run ct lint --target-branch main \
+2026-04-28T14:28:21.9332222Z [36;1mct lint --target-branch main \[0m
+2026-04-28T14:28:21.9332855Z [36;1m  --chart-dirs=helm/charts/ --all[0m
+2026-04-28T14:28:21.9362207Z shell: /usr/bin/bash -e {0}
+2026-04-28T14:28:21.9362756Z env:
+2026-04-28T14:28:21.9363344Z   pythonLocation: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:28:21.9364268Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib/pkgconfig
+2026-04-28T14:28:21.9365176Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:28:21.9365963Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:28:21.9366743Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:28:21.9367963Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib
+2026-04-28T14:28:21.9368724Z   CT_CONFIG_DIR: /opt/hostedtoolcache/ct/3.14.0/amd64/etc
+2026-04-28T14:28:21.9369444Z   VIRTUAL_ENV: /opt/hostedtoolcache/ct/3.14.0/amd64/venv
+2026-04-28T14:28:21.9370272Z   DEPLOYMENT_NAME: dc2cd99
+2026-04-28T14:28:21.9370748Z   E2E_TEST_COUNT: 18
+2026-04-28T14:28:21.9371216Z ##[endgroup]
+2026-04-28T14:28:21.9491766Z Linting charts...
+2026-04-28T14:28:21.9495387Z Version increment checking disabled.
+2026-04-28T14:28:22.0044178Z
+2026-04-28T14:28:22.0044568Z ------------------------------------------------------------------------------------------------------------------------
+2026-04-28T14:28:22.0045098Z  Charts to be processed:
+2026-04-28T14:28:22.0045558Z ------------------------------------------------------------------------------------------------------------------------
+2026-04-28T14:28:22.0046099Z  cytomine-helm => (version: "0.1.2", path: "helm/charts/cytomine")
+2026-04-28T14:28:22.0046692Z ------------------------------------------------------------------------------------------------------------------------
+2026-04-28T14:28:22.0047130Z
+2026-04-28T14:28:22.0536005Z Saving 1 charts
+2026-04-28T14:28:22.0536464Z Downloading gateway-helm from repo oci://docker.io/envoyproxy
+2026-04-28T14:28:22.7824727Z Deleting outdated charts
+2026-04-28T14:28:22.7908809Z Pulled: docker.io/envoyproxy/gateway-helm:1.3.0
+2026-04-28T14:28:22.7909779Z Digest: sha256:c75b43549a2712ddeedd0c9ef96e5322ac5952fd8898407dc788bdfb337dff7c
+2026-04-28T14:28:22.7911434Z Linting chart "cytomine-helm => (version: \"0.1.2\", path: \"helm/charts/cytomine\")"
+2026-04-28T14:28:22.9805057Z Validating helm/charts/cytomine/Chart.yaml...
+2026-04-28T14:28:22.9805747Z Validation success! 👍
+2026-04-28T14:28:23.3501708Z Validating maintainers...
+2026-04-28T14:28:24.1143066Z
+2026-04-28T14:28:24.1143860Z Linting chart with values file "helm/charts/cytomine/ci/test-values.yaml"...
+2026-04-28T14:28:24.1144330Z
+2026-04-28T14:28:24.3913038Z ==> Linting helm/charts/cytomine
+2026-04-28T14:28:24.3913409Z
+2026-04-28T14:28:24.3913522Z 1 chart(s) linted, 0 chart(s) failed
+2026-04-28T14:28:24.4003583Z
+2026-04-28T14:28:24.4006126Z ------------------------------------------------------------------------------------------------------------------------
+2026-04-28T14:28:24.4007551Z  ✔︎ cytomine-helm => (version: "0.1.2", path: "helm/charts/cytomine")
+2026-04-28T14:28:24.4008172Z ------------------------------------------------------------------------------------------------------------------------
+2026-04-28T14:28:24.4008689Z All charts linted successfully
+2026-04-28T14:28:24.4072148Z ##[group]Run helm dependency build helm/charts/cytomine/
+2026-04-28T14:28:24.4072609Z [36;1mhelm dependency build helm/charts/cytomine/[0m
+2026-04-28T14:28:24.4091411Z shell: /usr/bin/bash -e {0}
+2026-04-28T14:28:24.4091668Z env:
+2026-04-28T14:28:24.4091954Z   pythonLocation: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:28:24.4092481Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib/pkgconfig
+2026-04-28T14:28:24.4092999Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:28:24.4093408Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:28:24.4093810Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:28:24.4094208Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib
+2026-04-28T14:28:24.4094606Z   CT_CONFIG_DIR: /opt/hostedtoolcache/ct/3.14.0/amd64/etc
+2026-04-28T14:28:24.4094981Z   VIRTUAL_ENV: /opt/hostedtoolcache/ct/3.14.0/amd64/venv
+2026-04-28T14:28:24.4095370Z   DEPLOYMENT_NAME: dc2cd99
+2026-04-28T14:28:24.4095603Z   E2E_TEST_COUNT: 18
+2026-04-28T14:28:24.4095816Z ##[endgroup]
+2026-04-28T14:28:24.4824931Z Saving 1 charts
+2026-04-28T14:28:24.4825426Z Downloading gateway-helm from repo oci://docker.io/envoyproxy
+2026-04-28T14:28:25.2009092Z Pulled: docker.io/envoyproxy/gateway-helm:1.3.0
+2026-04-28T14:28:25.2009747Z Digest: sha256:c75b43549a2712ddeedd0c9ef96e5322ac5952fd8898407dc788bdfb337dff7c
+2026-04-28T14:28:25.2198106Z Deleting outdated charts
+2026-04-28T14:28:25.2385633Z ##[group]Run NS=cytomine-dc2cd99
+2026-04-28T14:28:25.2386183Z [36;1mNS=cytomine-dc2cd99[0m
+2026-04-28T14:28:25.2386550Z [36;1mhelm install $NS helm/charts/cytomine/ \[0m
+2026-04-28T14:28:25.2386957Z [36;1m  --namespace=$NS \[0m
+2026-04-28T14:28:25.2387309Z [36;1m  -f helm/charts/cytomine/ci/test-values.yaml \[0m
+2026-04-28T14:28:25.2387754Z [36;1m  --set gateway.installController=true \[0m
+2026-04-28T14:28:25.2388175Z [36;1m  --set gateway.className=envoy-gateway \[0m
+2026-04-28T14:28:25.2388843Z [36;1m  --set "gateway-helm.deployment.certgen.image.repository=registry.cytomine.org/docker/envoyproxy/gateway" \[0m
+2026-04-28T14:28:25.2389852Z [36;1m  --set "gateway-helm.deployment.envoyGateway.image.repository=registry.cytomine.org/docker/envoyproxy/gateway" \[0m
+2026-04-28T14:28:25.2390905Z [36;1m  --set images.core=registry.cytomine.org/cytomine/core:dc2cd99 \[0m
+2026-04-28T14:28:25.2391784Z [36;1m  --set images.app_engine=registry.cytomine.org/cytomine/app-engine:dc2cd99 \[0m
+2026-04-28T14:28:25.2392419Z [36;1m  --set images.sam=registry.cytomine.org/cytomine/sam:dc2cd99 \[0m
+2026-04-28T14:28:25.2393006Z [36;1m  --set images.web_ui=registry.cytomine.org/cytomine/web-ui:dc2cd99 \[0m
+2026-04-28T14:28:25.2393587Z [36;1m  --set images.cbir=registry.cytomine.org/cytomine/cbir:dc2cd99 \[0m
+2026-04-28T14:28:25.2394141Z [36;1m  --set images.pims=registry.cytomine.org/cytomine/pims:dc2cd99 \[0m
+2026-04-28T14:28:25.2394794Z [36;1m  --set images.pims_import=registry.cytomine.org/cytomine/python-client:dc2cd99 \[0m
+2026-04-28T14:28:25.2395486Z [36;1m  --set images.repository=registry.cytomine.org/cytomine/repository:dc2cd99 \[0m
+2026-04-28T14:28:25.2396121Z [36;1m  --set images.e2e_tests=registry.cytomine.org/cytomine/e2e-tests:dc2cd99 \[0m
+2026-04-28T14:28:25.2396897Z [36;1m  --set images.tasks_runner_image=registry.cytomine.org/cytomine/app-engine-tasks-runner:dc2cd99 \[0m
+2026-04-28T14:28:25.2397690Z [36;1m  --set images.alpine=registry.cytomine.org/docker/library/alpine:3.18 \[0m
+2026-04-28T14:28:25.2398308Z [36;1m  --set images.curl=registry.cytomine.org/docker/curlimages/curl \[0m
+2026-04-28T14:28:25.2399067Z [36;1m  --set "images.eclipse_temurin=registry.cytomine.org/docker/library/eclipse-temurin:8u462-b08-jdk-ubi9-minimal" \[0m
+2026-04-28T14:28:25.2400048Z [36;1m  --set images.mongodb=registry.cytomine.org/docker/library/mongo:5.0-focal \[0m
+2026-04-28T14:28:25.2400698Z [36;1m  --set images.redis=registry.cytomine.org/docker/library/redis:7 \[0m
+2026-04-28T14:28:25.2401298Z [36;1m  --set images.pims_cache=registry.cytomine.org/docker/library/redis:7 \[0m
+2026-04-28T14:28:25.2401898Z [36;1m  --set images.iam=registry.cytomine.org/docker/keycloak/keycloak:26.3 \[0m
+2026-04-28T14:28:25.2402579Z [36;1m  --set images.postgresql_iam=registry.cytomine.org/docker/library/postgres:14 \[0m
+2026-04-28T14:28:25.2403324Z [36;1m  --set images.postgresql_app_engine=registry.cytomine.org/docker/library/postgres:14 \[0m
+2026-04-28T14:28:25.2404091Z [36;1m  --set images.postgis=registry.cytomine.org/docker/postgis/postgis:15-3.5 \[0m
+2026-04-28T14:28:25.2404765Z [36;1m  --set images.selenium=registry.cytomine.org/docker/selenium/standalone-firefox \[0m
+2026-04-28T14:28:25.2405497Z [36;1m  --set images.registry=registry.cytomine.org/docker/library/registry:2.8.3 \[0m
+2026-04-28T14:28:25.2406063Z [36;1m  --set images.pullPolicy=Always \[0m
+2026-04-28T14:28:25.2406441Z [36;1m  --set test.e2eTestCount=18 \[0m
+2026-04-28T14:28:25.2406832Z [36;1m  --wait --timeout=20m[0m
+2026-04-28T14:28:25.2426014Z shell: /usr/bin/bash -e {0}
+2026-04-28T14:28:25.2426326Z env:
+2026-04-28T14:28:25.2426692Z   pythonLocation: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:28:25.2427268Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib/pkgconfig
+2026-04-28T14:28:25.2427764Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:28:25.2428588Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:28:25.2429428Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:28:25.2430107Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib
+2026-04-28T14:28:25.2430550Z   CT_CONFIG_DIR: /opt/hostedtoolcache/ct/3.14.0/amd64/etc
+2026-04-28T14:28:25.2430996Z   VIRTUAL_ENV: /opt/hostedtoolcache/ct/3.14.0/amd64/venv
+2026-04-28T14:28:25.2431396Z   DEPLOYMENT_NAME: dc2cd99
+2026-04-28T14:28:25.2431673Z   E2E_TEST_COUNT: 18
+2026-04-28T14:28:25.2431943Z ##[endgroup]
+2026-04-28T14:48:37.3057121Z Error: INSTALLATION FAILED: resource Deployment/cytomine-dc2cd99/sam not ready. status: InProgress, message: Available: 0/1
+2026-04-28T14:48:37.3062222Z context deadline exceeded
+2026-04-28T14:48:37.3238765Z ##[error]Process completed with exit code 1.
+2026-04-28T14:48:37.3299355Z ##[group]Run kubectl get events --namespace=cytomine-dc2cd99 --sort-by='.lastTimestamp'
+2026-04-28T14:48:37.3300216Z [36;1mkubectl get events --namespace=cytomine-dc2cd99 --sort-by='.lastTimestamp'[0m
+2026-04-28T14:48:37.3318774Z shell: /usr/bin/bash -e {0}
+2026-04-28T14:48:37.3319065Z env:
+2026-04-28T14:48:37.3319390Z   pythonLocation: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:48:37.3319901Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib/pkgconfig
+2026-04-28T14:48:37.3320508Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:48:37.3320963Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:48:37.3321408Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:48:37.3321831Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib
+2026-04-28T14:48:37.3322278Z   CT_CONFIG_DIR: /opt/hostedtoolcache/ct/3.14.0/amd64/etc
+2026-04-28T14:48:37.3322770Z   VIRTUAL_ENV: /opt/hostedtoolcache/ct/3.14.0/amd64/venv
+2026-04-28T14:48:37.3323128Z   DEPLOYMENT_NAME: dc2cd99
+2026-04-28T14:48:37.3323418Z   E2E_TEST_COUNT: 18
+2026-04-28T14:48:37.3323687Z ##[endgroup]
+2026-04-28T14:48:37.4429435Z LAST SEEN   TYPE      REASON              OBJECT                                                           MESSAGE
+2026-04-28T14:48:37.4431378Z 20m         Normal    Scheduled           pod/cytomine-dc2cd99-gateway-helm-certgen-ngxt9                  Successfully assigned cytomine-dc2cd99/cytomine-dc2cd99-gateway-helm-certgen-ngxt9 to cytomine-control-plane
+2026-04-28T14:48:37.4433373Z 20m         Normal    SuccessfulCreate    job/cytomine-dc2cd99-gateway-helm-certgen                        Created pod: cytomine-dc2cd99-gateway-helm-certgen-ngxt9
+2026-04-28T14:48:37.4435560Z 20m         Normal    Pulling             pod/cytomine-dc2cd99-gateway-helm-certgen-ngxt9                  Pulling image "registry.cytomine.org/docker/envoyproxy/gateway:v1.3.0"
+2026-04-28T14:48:37.4437814Z 20m         Normal    Started             pod/cytomine-dc2cd99-gateway-helm-certgen-ngxt9                  Started container envoy-gateway-certgen
+2026-04-28T14:48:37.4439753Z 20m         Normal    Created             pod/cytomine-dc2cd99-gateway-helm-certgen-ngxt9                  Created container: envoy-gateway-certgen
+2026-04-28T14:48:37.4442578Z 20m         Normal    Pulled              pod/cytomine-dc2cd99-gateway-helm-certgen-ngxt9                  Successfully pulled image "registry.cytomine.org/docker/envoyproxy/gateway:v1.3.0" in 2.886s (2.886s including waiting). Image size: 66664871 bytes.
+2026-04-28T14:48:37.4445550Z 20m         Normal    Completed           job/cytomine-dc2cd99-gateway-helm-certgen                        Job completed
+2026-04-28T14:48:37.4447195Z 20m         Normal    Pulling             pod/pims-0                                                       Pulling image "registry.cytomine.org/docker/library/redis:7"
+2026-04-28T14:48:37.4448971Z 20m         Normal    Pulling             pod/mongodb-0                                                    Pulling image "registry.cytomine.org/docker/library/mongo:5.0-focal"
+2026-04-28T14:48:37.4450866Z 20m         Normal    Pulling             pod/postgis-0                                                    Pulling image "registry.cytomine.org/docker/library/alpine:3.18"
+2026-04-28T14:48:37.4453665Z 20m         Normal    ScalingReplicaSet   deployment/web-ui                                                Scaled up replica set web-ui-7d489d696d from 0 to 1
+2026-04-28T14:48:37.4455918Z 20m         Normal    Scheduled           pod/postgis-0                                                    Successfully assigned cytomine-dc2cd99/postgis-0 to cytomine-control-plane
+2026-04-28T14:48:37.4458005Z 20m         Normal    SuccessfulCreate    statefulset/cbir                                                 create Pod cbir-0 in StatefulSet cbir successful
+2026-04-28T14:48:37.4460619Z 20m         Normal    Scheduled           pod/core-556cd9f9cd-kmrdl                                        Successfully assigned cytomine-dc2cd99/core-556cd9f9cd-kmrdl to cytomine-control-plane
+2026-04-28T14:48:37.4462970Z 20m         Normal    Pulling             pod/core-556cd9f9cd-kmrdl                                        Pulling image "registry.cytomine.org/docker/postgis/postgis:15-3.5"
+2026-04-28T14:48:37.4464809Z 20m         Normal    SuccessfulCreate    statefulset/pims                                                 create Pod pims-0 in StatefulSet pims successful
+2026-04-28T14:48:37.4466561Z 20m         Normal    ScalingReplicaSet   deployment/pims-cache                                            Scaled up replica set pims-cache-868895ddcd from 0 to 1
+2026-04-28T14:48:37.4468382Z 20m         Normal    SuccessfulCreate    replicaset/pims-cache-868895ddcd                                 Created pod: pims-cache-868895ddcd-jpnrw
+2026-04-28T14:48:37.4470228Z 20m         Normal    SuccessfulCreate    replicaset/web-ui-7d489d696d                                     Created pod: web-ui-7d489d696d-mdpch
+2026-04-28T14:48:37.4472028Z 20m         Normal    Pulling             pod/pims-cache-868895ddcd-jpnrw                                  Pulling image "registry.cytomine.org/docker/library/redis:7"
+2026-04-28T14:48:37.4474574Z 20m         Normal    Scheduled           pod/pims-cache-868895ddcd-jpnrw                                  Successfully assigned cytomine-dc2cd99/pims-cache-868895ddcd-jpnrw to cytomine-control-plane
+2026-04-28T14:48:37.4477111Z 20m         Normal    Scheduled           pod/postgres-app-engine-0                                        Successfully assigned cytomine-dc2cd99/postgres-app-engine-0 to cytomine-control-plane
+2026-04-28T14:48:37.4479225Z 20m         Normal    Pulling             pod/web-ui-7d489d696d-mdpch                                      Pulling image "registry.cytomine.org/cytomine/web-ui:dc2cd99"
+2026-04-28T14:48:37.4481462Z 20m         Normal    Scheduled           pod/web-ui-7d489d696d-mdpch                                      Successfully assigned cytomine-dc2cd99/web-ui-7d489d696d-mdpch to cytomine-control-plane
+2026-04-28T14:48:37.4483632Z 20m         Normal    ScalingReplicaSet   deployment/sam                                                   Scaled up replica set sam-5cf85bdb75 from 0 to 1
+2026-04-28T14:48:37.4485603Z 20m         Normal    SuccessfulCreate    replicaset/sam-5cf85bdb75                                        Created pod: sam-5cf85bdb75-6j66r
+2026-04-28T14:48:37.4487644Z 20m         Normal    Pulling             pod/postgres-app-engine-0                                        Pulling image "registry.cytomine.org/docker/library/alpine:3.18"
+2026-04-28T14:48:37.4489446Z 20m         Normal    Pulling             pod/sam-5cf85bdb75-6j66r                                         Pulling image "registry.cytomine.org/cytomine/sam:dc2cd99"
+2026-04-28T14:48:37.4491442Z 20m         Normal    Scheduled           pod/sam-5cf85bdb75-6j66r                                         Successfully assigned cytomine-dc2cd99/sam-5cf85bdb75-6j66r to cytomine-control-plane
+2026-04-28T14:48:37.4493379Z 20m         Normal    ScalingReplicaSet   deployment/repository                                            Scaled up replica set repository-6d446d84f7 from 0 to 1
+2026-04-28T14:48:37.4495434Z 20m         Normal    SuccessfulCreate    replicaset/repository-6d446d84f7                                 Created pod: repository-6d446d84f7-t4c5g
+2026-04-28T14:48:37.4497111Z 20m         Normal    SuccessfulCreate    statefulset/postgis                                              create Pod postgis-0 in StatefulSet postgis successful
+2026-04-28T14:48:37.4498902Z 20m         Normal    Scheduled           pod/app-engine-0                                                 Successfully assigned cytomine-dc2cd99/app-engine-0 to cytomine-control-plane
+2026-04-28T14:48:37.4500838Z 20m         Normal    Scheduled           pod/pims-0                                                       Successfully assigned cytomine-dc2cd99/pims-0 to cytomine-control-plane
+2026-04-28T14:48:37.4503006Z 20m         Normal    Pulling             pod/repository-6d446d84f7-t4c5g                                  Pulling image "registry.cytomine.org/docker/postgis/postgis:15-3.5"
+2026-04-28T14:48:37.4505133Z 20m         Normal    Scheduled           pod/repository-6d446d84f7-t4c5g                                  Successfully assigned cytomine-dc2cd99/repository-6d446d84f7-t4c5g to cytomine-control-plane
+2026-04-28T14:48:37.4507191Z 20m         Normal    SuccessfulCreate    statefulset/registry                                             create Pod registry-0 in StatefulSet registry successful
+2026-04-28T14:48:37.4508876Z 20m         Normal    SuccessfulCreate    statefulset/mongodb                                              create Pod mongodb-0 in StatefulSet mongodb successful
+2026-04-28T14:48:37.4510598Z 20m         Normal    SuccessfulCreate    replicaset/core-556cd9f9cd                                       Created pod: core-556cd9f9cd-kmrdl
+2026-04-28T14:48:37.4512159Z 20m         Normal    ScalingReplicaSet   deployment/core                                                  Scaled up replica set core-556cd9f9cd from 0 to 1
+2026-04-28T14:48:37.4513882Z 20m         Normal    Scheduled           pod/mongodb-0                                                    Successfully assigned cytomine-dc2cd99/mongodb-0 to cytomine-control-plane
+2026-04-28T14:48:37.4515604Z 20m         Normal    ScalingReplicaSet   deployment/iam                                                   Scaled up replica set iam-746ffd6b67 from 0 to 1
+2026-04-28T14:48:37.4517131Z 20m         Normal    SuccessfulCreate    replicaset/iam-746ffd6b67                                        Created pod: iam-746ffd6b67-znc5p
+2026-04-28T14:48:37.4518655Z 20m         Normal    Pulling             pod/cbir-0                                                       Pulling image "registry.cytomine.org/cytomine/cbir:dc2cd99"
+2026-04-28T14:48:37.4520404Z 20m         Normal    Scheduled           pod/cbir-0                                                       Successfully assigned cytomine-dc2cd99/cbir-0 to cytomine-control-plane
+2026-04-28T14:48:37.4522204Z 20m         Normal    SuccessfulCreate    statefulset/app-engine                                           create Pod app-engine-0 in StatefulSet app-engine successful
+2026-04-28T14:48:37.4524166Z 20m         Normal    Pulling             pod/app-engine-0                                                 Pulling image "registry.cytomine.org/docker/library/postgres:14"
+2026-04-28T14:48:37.4526101Z 20m         Normal    SuccessfulCreate    statefulset/postgres-app-engine                                  create Pod postgres-app-engine-0 in StatefulSet postgres-app-engine successful
+2026-04-28T14:48:37.4528193Z 20m         Normal    Scheduled           pod/postgres-iam-0                                               Successfully assigned cytomine-dc2cd99/postgres-iam-0 to cytomine-control-plane
+2026-04-28T14:48:37.4530127Z 20m         Normal    Pulling             pod/postgres-iam-0                                               Pulling image "registry.cytomine.org/docker/library/alpine:3.18"
+2026-04-28T14:48:37.4531821Z 20m         Normal    Pulling             pod/registry-0                                                   Pulling image "registry.cytomine.org/docker/library/registry:2.8.3"
+2026-04-28T14:48:37.4533843Z 20m         Normal    Scheduled           pod/registry-0                                                   Successfully assigned cytomine-dc2cd99/registry-0 to cytomine-control-plane
+2026-04-28T14:48:37.4535711Z 20m         Normal    SuccessfulCreate    statefulset/postgres-iam                                         create Pod postgres-iam-0 in StatefulSet postgres-iam successful
+2026-04-28T14:48:37.4537439Z 20m         Normal    SuccessfulCreate    statefulset/redis                                                create Pod redis-0 in StatefulSet redis successful
+2026-04-28T14:48:37.4541316Z 20m         Normal    Pulling             pod/iam-746ffd6b67-znc5p                                         Pulling image "registry.cytomine.org/docker/library/postgres:14"
+2026-04-28T14:48:37.4543279Z 20m         Normal    Scheduled           pod/iam-746ffd6b67-znc5p                                         Successfully assigned cytomine-dc2cd99/iam-746ffd6b67-znc5p to cytomine-control-plane
+2026-04-28T14:48:37.4545251Z 20m         Normal    ScalingReplicaSet   deployment/envoy-gateway                                         Scaled up replica set envoy-gateway-7b4d7997f8 from 0 to 1
+2026-04-28T14:48:37.4546925Z 20m         Normal    Pulling             pod/redis-0                                                      Pulling image "registry.cytomine.org/docker/library/redis:7"
+2026-04-28T14:48:37.4548597Z 20m         Normal    Scheduled           pod/redis-0                                                      Successfully assigned cytomine-dc2cd99/redis-0 to cytomine-control-plane
+2026-04-28T14:48:37.4550482Z 20m         Normal    SuccessfulCreate    replicaset/envoy-gateway-7b4d7997f8                              Created pod: envoy-gateway-7b4d7997f8-7ktxm
+2026-04-28T14:48:37.4552130Z 20m         Normal    Created             pod/envoy-gateway-7b4d7997f8-7ktxm                               Created container: envoy-gateway
+2026-04-28T14:48:37.4554096Z 20m         Normal    Scheduled           pod/envoy-gateway-7b4d7997f8-7ktxm                               Successfully assigned cytomine-dc2cd99/envoy-gateway-7b4d7997f8-7ktxm to cytomine-control-plane
+2026-04-28T14:48:37.4556500Z 20m         Normal    Pulled              pod/envoy-gateway-7b4d7997f8-7ktxm                               Container image "registry.cytomine.org/docker/envoyproxy/gateway:v1.3.0" already present on machine
+2026-04-28T14:48:37.4558982Z 19m         Normal    ScalingReplicaSet   deployment/envoy-cytomine-dc2cd99-cytomine-68856322              Scaled up replica set envoy-cytomine-dc2cd99-cytomine-68856322-799cdb58c9 from 0 to 1
+2026-04-28T14:48:37.4561129Z 19m         Normal    Started             pod/envoy-gateway-7b4d7997f8-7ktxm                               Started container envoy-gateway
+2026-04-28T14:48:37.4563105Z 19m         Normal    SuccessfulCreate    replicaset/envoy-cytomine-dc2cd99-cytomine-68856322-799cdb58c9   Created pod: envoy-cytomine-dc2cd99-cytomine-68856322-799cdb58c9-hjfrc
+2026-04-28T14:48:37.4565450Z 19m         Normal    LeaderElection      lease/5b9825d2.gateway.envoyproxy.io                             envoy-gateway-7b4d7997f8-7ktxm_fad484f2-6877-4576-ac6e-74dc861192e1 became leader
+2026-04-28T14:48:37.4568163Z 19m         Normal    Scheduled           pod/envoy-cytomine-dc2cd99-cytomine-68856322-799cdb58c9-hjfrc    Successfully assigned cytomine-dc2cd99/envoy-cytomine-dc2cd99-cytomine-68856322-799cdb58c9-hjfrc to cytomine-control-plane
+2026-04-28T14:48:37.4570597Z 19m         Normal    Started             pod/repository-6d446d84f7-t4c5g                                  Started container wait-for-postgis
+2026-04-28T14:48:37.4572095Z 19m         Normal    Created             pod/repository-6d446d84f7-t4c5g                                  Created container: wait-for-postgis
+2026-04-28T14:48:37.4574315Z 19m         Normal    Pulled              pod/repository-6d446d84f7-t4c5g                                  Successfully pulled image "registry.cytomine.org/docker/postgis/postgis:15-3.5" in 5.928s (5.928s including waiting). Image size: 214919325 bytes.
+2026-04-28T14:48:37.4577469Z 19m         Normal    Pulled              pod/sam-5cf85bdb75-6j66r                                         Successfully pulled image "registry.cytomine.org/cytomine/sam:dc2cd99" in 15.719s (21.645s including waiting). Image size: 785420742 bytes.
+2026-04-28T14:48:37.4580350Z 19m         Normal    Pulled              pod/web-ui-7d489d696d-mdpch                                      Successfully pulled image "registry.cytomine.org/cytomine/web-ui:dc2cd99" in 1.339s (22.92s including waiting). Image size: 31746191 bytes.
+2026-04-28T14:48:37.4582437Z 19m         Normal    Created             pod/web-ui-7d489d696d-mdpch                                      Created container: web-ui
+2026-04-28T14:48:37.4584341Z 19m         Normal    Started             pod/web-ui-7d489d696d-mdpch                                      Started container web-ui
+2026-04-28T14:48:37.4586592Z 19m         Normal    Pulled              pod/pims-cache-868895ddcd-jpnrw                                  Successfully pulled image "registry.cytomine.org/docker/library/redis:7" in 2.607s (25.333s including waiting). Image size: 45047408 bytes.
+2026-04-28T14:48:37.4588759Z 19m         Normal    Created             pod/pims-cache-868895ddcd-jpnrw                                  Created container: pims-cache
+2026-04-28T14:48:37.4590295Z 19m         Normal    Started             pod/pims-cache-868895ddcd-jpnrw                                  Started container pims-cache
+2026-04-28T14:48:37.4591606Z 19m         Normal    Started             pod/cbir-0                                                       Started container cbir
+2026-04-28T14:48:37.4593522Z 19m         Normal    Pulled              pod/cbir-0                                                       Successfully pulled image "registry.cytomine.org/cytomine/cbir:dc2cd99" in 14.726s (40.059s including waiting). Image size: 525948766 bytes.
+2026-04-28T14:48:37.4595764Z 19m         Normal    Created             pod/cbir-0                                                       Created container: cbir
+2026-04-28T14:48:37.4598083Z 19m         Normal    Pulled              pod/registry-0                                                   Successfully pulled image "registry.cytomine.org/docker/library/registry:2.8.3" in 1.71s (41.769s including waiting). Image size: 10131312 bytes.
+2026-04-28T14:48:37.4600146Z 19m         Normal    Created             pod/registry-0                                                   Created container: registry
+2026-04-28T14:48:37.4601373Z 19m         Normal    Started             pod/registry-0                                                   Started container registry
+2026-04-28T14:48:37.4602591Z 19m         Normal    Created             pod/redis-0                                                      Created container: redis
+2026-04-28T14:48:37.4604153Z 19m         Normal    Created             pod/core-556cd9f9cd-kmrdl                                        Created container: wait-for-postgis
+2026-04-28T14:48:37.4606524Z 19m         Normal    Pulled              pod/core-556cd9f9cd-kmrdl                                        Successfully pulled image "registry.cytomine.org/docker/postgis/postgis:15-3.5" in 550ms (42.887s including waiting). Image size: 214919325 bytes.
+2026-04-28T14:48:37.4609251Z 19m         Normal    Pulled              pod/redis-0                                                      Successfully pulled image "registry.cytomine.org/docker/library/redis:7" in 570ms (42.336s including waiting). Image size: 45047408 bytes.
+2026-04-28T14:48:37.4611240Z 19m         Normal    Started             pod/redis-0                                                      Started container redis
+2026-04-28T14:48:37.4612573Z 19m         Normal    Started             pod/core-556cd9f9cd-kmrdl                                        Started container wait-for-postgis
+2026-04-28T14:48:37.4614005Z 19m         Normal    Started             pod/postgres-app-engine-0                                        Started container postgres-init
+2026-04-28T14:48:37.4615682Z 19m         Normal    Created             pod/postgres-app-engine-0                                        Created container: postgres-init
+2026-04-28T14:48:37.4617841Z 19m         Normal    Pulled              pod/postgres-app-engine-0                                        Successfully pulled image "registry.cytomine.org/docker/library/alpine:3.18" in 1.277s (44.164s including waiting). Image size: 3428098 bytes.
+2026-04-28T14:48:37.4620267Z 19m         Normal    Pulling             pod/postgres-app-engine-0                                        Pulling image "registry.cytomine.org/docker/library/postgres:14"
+2026-04-28T14:48:37.4622814Z 19m         Normal    Pulled              pod/app-engine-0                                                 Successfully pulled image "registry.cytomine.org/docker/library/postgres:14" in 4.597s (48.756s including waiting). Image size: 156986308 bytes.
+2026-04-28T14:48:37.4625092Z 19m         Normal    Started             pod/app-engine-0                                                 Started container wait-for-postgres
+2026-04-28T14:48:37.4626413Z 19m         Normal    Created             pod/app-engine-0                                                 Created container: wait-for-postgres
+2026-04-28T14:48:37.4627777Z 19m         Normal    Created             pod/postgres-iam-0                                               Created container: postgres-init
+2026-04-28T14:48:37.4629226Z 19m         Normal    Started             pod/postgres-iam-0                                               Started container postgres-init
+2026-04-28T14:48:37.4631382Z 19m         Normal    Pulled              pod/postgres-iam-0                                               Successfully pulled image "registry.cytomine.org/docker/library/alpine:3.18" in 574ms (49.327s including waiting). Image size: 3428098 bytes.
+2026-04-28T14:48:37.4634324Z 19m         Normal    Pulled              pod/pims-0                                                       Successfully pulled image "registry.cytomine.org/docker/library/redis:7" in 890ms (50.217s including waiting). Image size: 45047408 bytes.
+2026-04-28T14:48:37.4636631Z 19m         Normal    Created             pod/postgis-0                                                    Created container: postgis-init
+2026-04-28T14:48:37.4638732Z 19m         Normal    Pulled              pod/postgis-0                                                    Successfully pulled image "registry.cytomine.org/docker/library/alpine:3.18" in 587ms (50.802s including waiting). Image size: 3428098 bytes.
+2026-04-28T14:48:37.4640832Z 19m         Normal    Created             pod/pims-0                                                       Created container: wait-for-cache
+2026-04-28T14:48:37.4642088Z 19m         Normal    Started             pod/pims-0                                                       Started container wait-for-cache
+2026-04-28T14:48:37.4643765Z 19m         Normal    Pulling             pod/postgres-iam-0                                               Pulling image "registry.cytomine.org/docker/library/postgres:14"
+2026-04-28T14:48:37.4645563Z 19m         Normal    Started             pod/iam-746ffd6b67-znc5p                                         Started container wait-for-postgres
+2026-04-28T14:48:37.4646979Z 19m         Normal    Created             pod/iam-746ffd6b67-znc5p                                         Created container: wait-for-postgres
+2026-04-28T14:48:37.4649100Z 19m         Normal    Pulled              pod/iam-746ffd6b67-znc5p                                         Successfully pulled image "registry.cytomine.org/docker/library/postgres:14" in 564ms (51.366s including waiting). Image size: 156986308 bytes.
+2026-04-28T14:48:37.4651255Z 19m         Normal    Started             pod/postgis-0                                                    Started container postgis-init
+2026-04-28T14:48:37.4652673Z 19m         Normal    Pulling             pod/pims-0                                                       Pulling image "registry.cytomine.org/cytomine/pims:dc2cd99"
+2026-04-28T14:48:37.4654597Z 19m         Normal    Pulling             pod/postgis-0                                                    Pulling image "registry.cytomine.org/docker/postgis/postgis:15-3.5"
+2026-04-28T14:48:37.4656904Z 19m         Normal    Pulled              pod/mongodb-0                                                    Successfully pulled image "registry.cytomine.org/docker/library/mongo:5.0-focal" in 6.032s (57.393s including waiting). Image size: 287269036 bytes.
+2026-04-28T14:48:37.4658910Z 19m         Normal    Created             pod/mongodb-0                                                    Created container: mongodb
+2026-04-28T14:48:37.4660458Z 19m         Normal    Started             pod/mongodb-0                                                    Started container mongodb
+2026-04-28T14:48:37.4661988Z 18m         Normal    Created             pod/envoy-cytomine-dc2cd99-cytomine-68856322-799cdb58c9-hjfrc    Created container: shutdown-manager
+2026-04-28T14:48:37.4666330Z 18m         Warning   Failed              pod/envoy-cytomine-dc2cd99-cytomine-68856322-799cdb58c9-hjfrc    Failed to pull image "docker.io/envoyproxy/envoy:distroless-v1.33.0": failed to pull and unpack image "docker.io/envoyproxy/envoy:distroless-v1.33.0": failed to copy: httpReadSeeker: failed open: failed to do request: Get "https://registry-1.docker.io/v2/envoyproxy/envoy/manifests/sha256:69c16906fa649d83df125050b33109a6699c085be032fcd30f5f68b98cbe7670": net/http: TLS handshake timeout
+2026-04-28T14:48:37.4670589Z 18m         Warning   Failed              pod/envoy-cytomine-dc2cd99-cytomine-68856322-799cdb58c9-hjfrc    Error: ErrImagePull
+2026-04-28T14:48:37.4672772Z 18m         Normal    Pulled              pod/envoy-cytomine-dc2cd99-cytomine-68856322-799cdb58c9-hjfrc    Container image "registry.cytomine.org/docker/envoyproxy/gateway:v1.3.0" already present on machine
+2026-04-28T14:48:37.4675200Z 18m         Normal    Started             pod/envoy-cytomine-dc2cd99-cytomine-68856322-799cdb58c9-hjfrc    Started container shutdown-manager
+2026-04-28T14:48:37.4677706Z 18m         Normal    Pulled              pod/postgres-app-engine-0                                        Successfully pulled image "registry.cytomine.org/docker/library/postgres:14" in 571ms (29.762s including waiting). Image size: 156986308 bytes.
+2026-04-28T14:48:37.4680089Z 18m         Normal    Started             pod/postgres-app-engine-0                                        Started container postgres
+2026-04-28T14:48:37.4681577Z 18m         Normal    Created             pod/postgres-app-engine-0                                        Created container: postgres
+2026-04-28T14:48:37.4683010Z 18m         Normal    Created             pod/postgres-iam-0                                               Created container: postgres
+2026-04-28T14:48:37.4684382Z 18m         Normal    Started             pod/postgres-iam-0                                               Started container postgres
+2026-04-28T14:48:37.4686541Z 18m         Normal    Pulled              pod/postgres-iam-0                                               Successfully pulled image "registry.cytomine.org/docker/library/postgres:14" in 571ms (25.311s including waiting). Image size: 156986308 bytes.
+2026-04-28T14:48:37.4688892Z 18m         Warning   Failed              pod/envoy-cytomine-dc2cd99-cytomine-68856322-799cdb58c9-hjfrc    Error: ImagePullBackOff
+2026-04-28T14:48:37.4691102Z 18m         Normal    BackOff             pod/envoy-cytomine-dc2cd99-cytomine-68856322-799cdb58c9-hjfrc    Back-off pulling image "docker.io/envoyproxy/envoy:distroless-v1.33.0"
+2026-04-28T14:48:37.4693335Z 18m         Normal    Pulling             pod/iam-746ffd6b67-znc5p                                         Pulling image "registry.cytomine.org/docker/keycloak/keycloak:26.3"
+2026-04-28T14:48:37.4695215Z 18m         Normal    Pulling             pod/app-engine-0                                                 Pulling image "registry.cytomine.org/cytomine/app-engine:dc2cd99"
+2026-04-28T14:48:37.4697030Z 18m         Normal    Created             pod/pims-0                                                       Created container: pims
+2026-04-28T14:48:37.4699077Z 18m         Normal    Pulled              pod/pims-0                                                       Successfully pulled image "registry.cytomine.org/cytomine/pims:dc2cd99" in 17.877s (43.187s including waiting). Image size: 706911230 bytes.
+2026-04-28T14:48:37.4701296Z 18m         Normal    Created             pod/postgis-0                                                    Created container: extensions
+2026-04-28T14:48:37.4742282Z 18m         Normal    Started             pod/postgis-0                                                    Started container extensions
+2026-04-28T14:48:37.4744429Z 18m         Normal    Pulling             pod/envoy-cytomine-dc2cd99-cytomine-68856322-799cdb58c9-hjfrc    Pulling image "docker.io/envoyproxy/envoy:distroless-v1.33.0"
+2026-04-28T14:48:37.4746394Z 18m         Normal    Started             pod/pims-0                                                       Started container pims
+2026-04-28T14:48:37.4748529Z 18m         Normal    Pulled              pod/postgis-0                                                    Successfully pulled image "registry.cytomine.org/docker/postgis/postgis:15-3.5" in 569ms (42.751s including waiting). Image size: 214919325 bytes.
+2026-04-28T14:48:37.4751114Z 18m         Normal    Pulling             pod/postgis-0                                                    Pulling image "registry.cytomine.org/docker/postgis/postgis:15-3.5"
+2026-04-28T14:48:37.4752798Z 18m         Normal    Created             pod/iam-746ffd6b67-znc5p                                         Created container: iam-init
+2026-04-28T14:48:37.4754760Z 18m         Normal    Pulled              pod/iam-746ffd6b67-znc5p                                         Successfully pulled image "registry.cytomine.org/docker/keycloak/keycloak:26.3" in 4.079s (7.683s including waiting). Image size: 245674809 bytes.
+2026-04-28T14:48:37.4756446Z 18m         Normal    Started             pod/iam-746ffd6b67-znc5p                                         Started container iam-init
+2026-04-28T14:48:37.4757529Z 18m         Normal    Created             pod/app-engine-0                                                 Created container: app-engine
+2026-04-28T14:48:37.4758571Z 18m         Normal    Started             pod/app-engine-0                                                 Started container app-engine
+2026-04-28T14:48:37.4760076Z 18m         Normal    Pulling             pod/iam-746ffd6b67-znc5p                                         Pulling image "registry.cytomine.org/docker/library/eclipse-temurin:8u462-b08-jdk-ubi9-minimal"
+2026-04-28T14:48:37.4762124Z 18m         Normal    Pulled              pod/app-engine-0                                                 Successfully pulled image "registry.cytomine.org/cytomine/app-engine:dc2cd99" in 3.546s (9.219s including waiting). Image size: 191099454 bytes.
+2026-04-28T14:48:37.4763872Z 18m         Normal    Started             pod/envoy-cytomine-dc2cd99-cytomine-68856322-799cdb58c9-hjfrc    Started container envoy
+2026-04-28T14:48:37.4765210Z 18m         Normal    Created             pod/envoy-cytomine-dc2cd99-cytomine-68856322-799cdb58c9-hjfrc    Created container: envoy
+2026-04-28T14:48:37.4767183Z 18m         Normal    Pulled              pod/envoy-cytomine-dc2cd99-cytomine-68856322-799cdb58c9-hjfrc    Successfully pulled image "docker.io/envoyproxy/envoy:distroless-v1.33.0" in 11.981s (19.657s including waiting). Image size: 33510570 bytes.
+2026-04-28T14:48:37.4769026Z 18m         Normal    Created             pod/postgis-0                                                    Created container: postgis
+2026-04-28T14:48:37.4770723Z 18m         Normal    Pulled              pod/postgis-0                                                    Successfully pulled image "registry.cytomine.org/docker/postgis/postgis:15-3.5" in 570ms (18.761s including waiting). Image size: 214919325 bytes.
+2026-04-28T14:48:37.4772534Z 18m         Normal    Started             pod/postgis-0                                                    Started container postgis
+2026-04-28T14:48:37.4773621Z 18m         Normal    Created             pod/iam-746ffd6b67-znc5p                                         Created container: certificates-provider
+2026-04-28T14:48:37.4775537Z 18m         Normal    Pulled              pod/iam-746ffd6b67-znc5p                                         Successfully pulled image "registry.cytomine.org/docker/library/eclipse-temurin:8u462-b08-jdk-ubi9-minimal" in 4.263s (16.997s including waiting). Image size: 121937743 bytes.
+2026-04-28T14:48:37.4777662Z 18m         Normal    Started             pod/iam-746ffd6b67-znc5p                                         Started container certificates-provider
+2026-04-28T14:48:37.4778775Z 17m         Normal    Started             pod/iam-746ffd6b67-znc5p                                         Started container iam
+2026-04-28T14:48:37.4779820Z 17m         Normal    Created             pod/iam-746ffd6b67-znc5p                                         Created container: iam
+2026-04-28T14:48:37.4781325Z 17m         Normal    Pulled              pod/iam-746ffd6b67-znc5p                                         Container image "registry.cytomine.org/docker/keycloak/keycloak:26.3" already present on machine
+2026-04-28T14:48:37.4782881Z 17m         Warning   Unhealthy           pod/postgis-0                                                    Startup probe failed: /var/run/postgresql:5432 - no response
+2026-04-28T14:48:37.4784214Z 17m         Normal    Pulling             pod/core-556cd9f9cd-kmrdl                                        Pulling image "registry.cytomine.org/docker/curlimages/curl"
+2026-04-28T14:48:37.4785652Z 17m         Normal    Pulling             pod/repository-6d446d84f7-t4c5g                                  Pulling image "registry.cytomine.org/cytomine/repository:dc2cd99"
+2026-04-28T14:48:37.4787514Z 17m         Normal    Pulled              pod/core-556cd9f9cd-kmrdl                                        Successfully pulled image "registry.cytomine.org/docker/curlimages/curl" in 1.659s (1.659s including waiting). Image size: 10605753 bytes.
+2026-04-28T14:48:37.4789301Z 17m         Normal    Pulling             pod/core-556cd9f9cd-kmrdl                                        Pulling image "registry.cytomine.org/docker/curlimages/curl"
+2026-04-28T14:48:37.4790647Z 17m         Normal    Started             pod/core-556cd9f9cd-kmrdl                                        Started container wait-for-mongodb
+2026-04-28T14:48:37.4791787Z 17m         Normal    Created             pod/core-556cd9f9cd-kmrdl                                        Created container: wait-for-mongodb
+2026-04-28T14:48:37.4792944Z 17m         Normal    Created             pod/repository-6d446d84f7-t4c5g                                  Created container: repository-init
+2026-04-28T14:48:37.4794132Z 17m         Normal    Started             pod/repository-6d446d84f7-t4c5g                                  Started container repository-init
+2026-04-28T14:48:37.4795285Z 17m         Normal    Started             pod/core-556cd9f9cd-kmrdl                                        Started container wait-for-repository
+2026-04-28T14:48:37.4796421Z 17m         Normal    Created             pod/core-556cd9f9cd-kmrdl                                        Created container: wait-for-repository
+2026-04-28T14:48:37.4798098Z 17m         Normal    Pulled              pod/core-556cd9f9cd-kmrdl                                        Successfully pulled image "registry.cytomine.org/docker/curlimages/curl" in 533ms (1.292s including waiting). Image size: 10605753 bytes.
+2026-04-28T14:48:37.4800468Z 17m         Normal    Pulled              pod/repository-6d446d84f7-t4c5g                                  Successfully pulled image "registry.cytomine.org/cytomine/repository:dc2cd99" in 1.112s (1.768s including waiting). Image size: 155229635 bytes.
+2026-04-28T14:48:37.4803057Z 17m         Normal    Pulled              pod/repository-6d446d84f7-t4c5g                                  Successfully pulled image "registry.cytomine.org/cytomine/repository:dc2cd99" in 47ms (47ms including waiting). Image size: 155229635 bytes.
+2026-04-28T14:48:37.4804836Z 17m         Normal    Created             pod/repository-6d446d84f7-t4c5g                                  Created container: repository
+2026-04-28T14:48:37.4805997Z 17m         Normal    Started             pod/repository-6d446d84f7-t4c5g                                  Started container repository
+2026-04-28T14:48:37.4807508Z 17m         Normal    Pulling             pod/repository-6d446d84f7-t4c5g                                  Pulling image "registry.cytomine.org/cytomine/repository:dc2cd99"
+2026-04-28T14:48:37.4809312Z 17m         Warning   Unhealthy           pod/repository-6d446d84f7-t4c5g                                  Startup probe failed: Get "http://10.244.0.7:8081/ping": dial tcp 10.244.0.7:8081: connect: connection refused
+2026-04-28T14:48:37.4811075Z 17m         Normal    Pulling             pod/core-556cd9f9cd-kmrdl                                        Pulling image "registry.cytomine.org/cytomine/core:dc2cd99"
+2026-04-28T14:48:37.4812862Z 17m         Normal    Pulled              pod/core-556cd9f9cd-kmrdl                                        Successfully pulled image "registry.cytomine.org/cytomine/core:dc2cd99" in 1.406s (1.406s including waiting). Image size: 197399937 bytes.
+2026-04-28T14:48:37.4814519Z 17m         Normal    Created             pod/core-556cd9f9cd-kmrdl                                        Created container: core-init
+2026-04-28T14:48:37.4815619Z 17m         Normal    Started             pod/core-556cd9f9cd-kmrdl                                        Started container core-init
+2026-04-28T14:48:37.4816830Z 17m         Normal    Pulling             pod/core-556cd9f9cd-kmrdl                                        Pulling image "registry.cytomine.org/cytomine/core:dc2cd99"
+2026-04-28T14:48:37.4818609Z 17m         Normal    Pulled              pod/core-556cd9f9cd-kmrdl                                        Successfully pulled image "registry.cytomine.org/cytomine/core:dc2cd99" in 30ms (30ms including waiting). Image size: 197399937 bytes.
+2026-04-28T14:48:37.4820305Z 17m         Normal    Created             pod/core-556cd9f9cd-kmrdl                                        Created container: core
+2026-04-28T14:48:37.4821370Z 17m         Normal    Started             pod/core-556cd9f9cd-kmrdl                                        Started container core
+2026-04-28T14:48:37.4823032Z 4m18s       Warning   BackOff             pod/sam-5cf85bdb75-6j66r                                         Back-off restarting failed container sam in pod sam-5cf85bdb75-6j66r_cytomine-dc2cd99(170f089c-90ab-4475-b244-fd5e19db3b2b)
+2026-04-28T14:48:37.4824924Z 3m26s       Normal    Started             pod/sam-5cf85bdb75-6j66r                                         Started container sam
+2026-04-28T14:48:37.4826370Z 3m26s       Normal    Pulled              pod/sam-5cf85bdb75-6j66r                                         Container image "registry.cytomine.org/cytomine/sam:dc2cd99" already present on machine
+2026-04-28T14:48:37.4827739Z 3m26s       Normal    Created             pod/sam-5cf85bdb75-6j66r                                         Created container: sam
+2026-04-28T14:48:37.4885915Z ##[group]Run kubectl get events --namespace=cytomine-dc2cd99 --sort-by='.lastTimestamp'
+2026-04-28T14:48:37.4887177Z [36;1mkubectl get events --namespace=cytomine-dc2cd99 --sort-by='.lastTimestamp'[0m
+2026-04-28T14:48:37.4905462Z shell: /usr/bin/bash -e {0}
+2026-04-28T14:48:37.4905662Z env:
+2026-04-28T14:48:37.4905884Z   pythonLocation: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:48:37.4906268Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib/pkgconfig
+2026-04-28T14:48:37.4906665Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:48:37.4907135Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:48:37.4907453Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:48:37.4907770Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib
+2026-04-28T14:48:37.4908080Z   CT_CONFIG_DIR: /opt/hostedtoolcache/ct/3.14.0/amd64/etc
+2026-04-28T14:48:37.4908403Z   VIRTUAL_ENV: /opt/hostedtoolcache/ct/3.14.0/amd64/venv
+2026-04-28T14:48:37.4908661Z   DEPLOYMENT_NAME: dc2cd99
+2026-04-28T14:48:37.4908853Z   E2E_TEST_COUNT: 18
+2026-04-28T14:48:37.4909023Z ##[endgroup]
+2026-04-28T14:48:37.5828664Z LAST SEEN   TYPE      REASON              OBJECT                                                           MESSAGE
+2026-04-28T14:48:37.5830251Z 20m         Normal    Scheduled           pod/cytomine-dc2cd99-gateway-helm-certgen-ngxt9                  Successfully assigned cytomine-dc2cd99/cytomine-dc2cd99-gateway-helm-certgen-ngxt9 to cytomine-control-plane
+2026-04-28T14:48:37.5832335Z 20m         Normal    SuccessfulCreate    job/cytomine-dc2cd99-gateway-helm-certgen                        Created pod: cytomine-dc2cd99-gateway-helm-certgen-ngxt9
+2026-04-28T14:48:37.5833866Z 20m         Normal    Pulling             pod/cytomine-dc2cd99-gateway-helm-certgen-ngxt9                  Pulling image "registry.cytomine.org/docker/envoyproxy/gateway:v1.3.0"
+2026-04-28T14:48:37.5835246Z 20m         Normal    Started             pod/cytomine-dc2cd99-gateway-helm-certgen-ngxt9                  Started container envoy-gateway-certgen
+2026-04-28T14:48:37.5836289Z 20m         Normal    Created             pod/cytomine-dc2cd99-gateway-helm-certgen-ngxt9                  Created container: envoy-gateway-certgen
+2026-04-28T14:48:37.5838435Z 20m         Normal    Pulled              pod/cytomine-dc2cd99-gateway-helm-certgen-ngxt9                  Successfully pulled image "registry.cytomine.org/docker/envoyproxy/gateway:v1.3.0" in 2.886s (2.886s including waiting). Image size: 66664871 bytes.
+2026-04-28T14:48:37.5841251Z 20m         Normal    Completed           job/cytomine-dc2cd99-gateway-helm-certgen                        Job completed
+2026-04-28T14:48:37.5842794Z 20m         Normal    Pulling             pod/pims-0                                                       Pulling image "registry.cytomine.org/docker/library/redis:7"
+2026-04-28T14:48:37.5844520Z 20m         Normal    Pulling             pod/mongodb-0                                                    Pulling image "registry.cytomine.org/docker/library/mongo:5.0-focal"
+2026-04-28T14:48:37.5845723Z 20m         Normal    Pulling             pod/postgis-0                                                    Pulling image "registry.cytomine.org/docker/library/alpine:3.18"
+2026-04-28T14:48:37.5846706Z 20m         Normal    ScalingReplicaSet   deployment/web-ui                                                Scaled up replica set web-ui-7d489d696d from 0 to 1
+2026-04-28T14:48:37.5847757Z 20m         Normal    Scheduled           pod/postgis-0                                                    Successfully assigned cytomine-dc2cd99/postgis-0 to cytomine-control-plane
+2026-04-28T14:48:37.5848931Z 20m         Normal    SuccessfulCreate    statefulset/cbir                                                 create Pod cbir-0 in StatefulSet cbir successful
+2026-04-28T14:48:37.5850907Z 20m         Normal    Scheduled           pod/core-556cd9f9cd-kmrdl                                        Successfully assigned cytomine-dc2cd99/core-556cd9f9cd-kmrdl to cytomine-control-plane
+2026-04-28T14:48:37.5852193Z 20m         Normal    Pulling             pod/core-556cd9f9cd-kmrdl                                        Pulling image "registry.cytomine.org/docker/postgis/postgis:15-3.5"
+2026-04-28T14:48:37.5853190Z 20m         Normal    SuccessfulCreate    statefulset/pims                                                 create Pod pims-0 in StatefulSet pims successful
+2026-04-28T14:48:37.5854173Z 20m         Normal    ScalingReplicaSet   deployment/pims-cache                                            Scaled up replica set pims-cache-868895ddcd from 0 to 1
+2026-04-28T14:48:37.5855507Z 20m         Normal    SuccessfulCreate    replicaset/pims-cache-868895ddcd                                 Created pod: pims-cache-868895ddcd-jpnrw
+2026-04-28T14:48:37.5856443Z 20m         Normal    SuccessfulCreate    replicaset/web-ui-7d489d696d                                     Created pod: web-ui-7d489d696d-mdpch
+2026-04-28T14:48:37.5857430Z 20m         Normal    Pulling             pod/pims-cache-868895ddcd-jpnrw                                  Pulling image "registry.cytomine.org/docker/library/redis:7"
+2026-04-28T14:48:37.5858714Z 20m         Normal    Scheduled           pod/pims-cache-868895ddcd-jpnrw                                  Successfully assigned cytomine-dc2cd99/pims-cache-868895ddcd-jpnrw to cytomine-control-plane
+2026-04-28T14:48:37.5860199Z 20m         Normal    Scheduled           pod/postgres-app-engine-0                                        Successfully assigned cytomine-dc2cd99/postgres-app-engine-0 to cytomine-control-plane
+2026-04-28T14:48:37.5861420Z 20m         Normal    Pulling             pod/web-ui-7d489d696d-mdpch                                      Pulling image "registry.cytomine.org/cytomine/web-ui:dc2cd99"
+2026-04-28T14:48:37.5862705Z 20m         Normal    Scheduled           pod/web-ui-7d489d696d-mdpch                                      Successfully assigned cytomine-dc2cd99/web-ui-7d489d696d-mdpch to cytomine-control-plane
+2026-04-28T14:48:37.5863901Z 20m         Normal    ScalingReplicaSet   deployment/sam                                                   Scaled up replica set sam-5cf85bdb75 from 0 to 1
+2026-04-28T14:48:37.5864890Z 20m         Normal    SuccessfulCreate    replicaset/sam-5cf85bdb75                                        Created pod: sam-5cf85bdb75-6j66r
+2026-04-28T14:48:37.5865882Z 20m         Normal    Pulling             pod/postgres-app-engine-0                                        Pulling image "registry.cytomine.org/docker/library/alpine:3.18"
+2026-04-28T14:48:37.5867005Z 20m         Normal    Pulling             pod/sam-5cf85bdb75-6j66r                                         Pulling image "registry.cytomine.org/cytomine/sam:dc2cd99"
+2026-04-28T14:48:37.5868168Z 20m         Normal    Scheduled           pod/sam-5cf85bdb75-6j66r                                         Successfully assigned cytomine-dc2cd99/sam-5cf85bdb75-6j66r to cytomine-control-plane
+2026-04-28T14:48:37.5869391Z 20m         Normal    ScalingReplicaSet   deployment/repository                                            Scaled up replica set repository-6d446d84f7 from 0 to 1
+2026-04-28T14:48:37.5870585Z 20m         Normal    SuccessfulCreate    replicaset/repository-6d446d84f7                                 Created pod: repository-6d446d84f7-t4c5g
+2026-04-28T14:48:37.5871641Z 20m         Normal    SuccessfulCreate    statefulset/postgis                                              create Pod postgis-0 in StatefulSet postgis successful
+2026-04-28T14:48:37.5872753Z 20m         Normal    Scheduled           pod/app-engine-0                                                 Successfully assigned cytomine-dc2cd99/app-engine-0 to cytomine-control-plane
+2026-04-28T14:48:37.5873933Z 20m         Normal    Scheduled           pod/pims-0                                                       Successfully assigned cytomine-dc2cd99/pims-0 to cytomine-control-plane
+2026-04-28T14:48:37.5875350Z 20m         Normal    Pulling             pod/repository-6d446d84f7-t4c5g                                  Pulling image "registry.cytomine.org/docker/postgis/postgis:15-3.5"
+2026-04-28T14:48:37.5876639Z 20m         Normal    Scheduled           pod/repository-6d446d84f7-t4c5g                                  Successfully assigned cytomine-dc2cd99/repository-6d446d84f7-t4c5g to cytomine-control-plane
+2026-04-28T14:48:37.5877892Z 20m         Normal    SuccessfulCreate    statefulset/registry                                             create Pod registry-0 in StatefulSet registry successful
+2026-04-28T14:48:37.5879172Z 20m         Normal    SuccessfulCreate    statefulset/mongodb                                              create Pod mongodb-0 in StatefulSet mongodb successful
+2026-04-28T14:48:37.5880592Z 20m         Normal    SuccessfulCreate    replicaset/core-556cd9f9cd                                       Created pod: core-556cd9f9cd-kmrdl
+2026-04-28T14:48:37.5881711Z 20m         Normal    ScalingReplicaSet   deployment/core                                                  Scaled up replica set core-556cd9f9cd from 0 to 1
+2026-04-28T14:48:37.5882761Z 20m         Normal    Scheduled           pod/mongodb-0                                                    Successfully assigned cytomine-dc2cd99/mongodb-0 to cytomine-control-plane
+2026-04-28T14:48:37.5883903Z 20m         Normal    ScalingReplicaSet   deployment/iam                                                   Scaled up replica set iam-746ffd6b67 from 0 to 1
+2026-04-28T14:48:37.5884877Z 20m         Normal    SuccessfulCreate    replicaset/iam-746ffd6b67                                        Created pod: iam-746ffd6b67-znc5p
+2026-04-28T14:48:37.5885888Z 20m         Normal    Pulling             pod/cbir-0                                                       Pulling image "registry.cytomine.org/cytomine/cbir:dc2cd99"
+2026-04-28T14:48:37.5886900Z 20m         Normal    Scheduled           pod/cbir-0                                                       Successfully assigned cytomine-dc2cd99/cbir-0 to cytomine-control-plane
+2026-04-28T14:48:37.5888038Z 20m         Normal    SuccessfulCreate    statefulset/app-engine                                           create Pod app-engine-0 in StatefulSet app-engine successful
+2026-04-28T14:48:37.5889153Z 20m         Normal    Pulling             pod/app-engine-0                                                 Pulling image "registry.cytomine.org/docker/library/postgres:14"
+2026-04-28T14:48:37.5890567Z 20m         Normal    SuccessfulCreate    statefulset/postgres-app-engine                                  create Pod postgres-app-engine-0 in StatefulSet postgres-app-engine successful
+2026-04-28T14:48:37.5891868Z 20m         Normal    Scheduled           pod/postgres-iam-0                                               Successfully assigned cytomine-dc2cd99/postgres-iam-0 to cytomine-control-plane
+2026-04-28T14:48:37.5893013Z 20m         Normal    Pulling             pod/postgres-iam-0                                               Pulling image "registry.cytomine.org/docker/library/alpine:3.18"
+2026-04-28T14:48:37.5894092Z 20m         Normal    Pulling             pod/registry-0                                                   Pulling image "registry.cytomine.org/docker/library/registry:2.8.3"
+2026-04-28T14:48:37.5895201Z 20m         Normal    Scheduled           pod/registry-0                                                   Successfully assigned cytomine-dc2cd99/registry-0 to cytomine-control-plane
+2026-04-28T14:48:37.5896317Z 20m         Normal    SuccessfulCreate    statefulset/postgres-iam                                         create Pod postgres-iam-0 in StatefulSet postgres-iam successful
+2026-04-28T14:48:37.5897368Z 20m         Normal    SuccessfulCreate    statefulset/redis                                                create Pod redis-0 in StatefulSet redis successful
+2026-04-28T14:48:37.5898671Z 20m         Normal    Pulling             pod/iam-746ffd6b67-znc5p                                         Pulling image "registry.cytomine.org/docker/library/postgres:14"
+2026-04-28T14:48:37.5900169Z 20m         Normal    Scheduled           pod/iam-746ffd6b67-znc5p                                         Successfully assigned cytomine-dc2cd99/iam-746ffd6b67-znc5p to cytomine-control-plane
+2026-04-28T14:48:37.5901400Z 20m         Normal    ScalingReplicaSet   deployment/envoy-gateway                                         Scaled up replica set envoy-gateway-7b4d7997f8 from 0 to 1
+2026-04-28T14:48:37.5902475Z 20m         Normal    Pulling             pod/redis-0                                                      Pulling image "registry.cytomine.org/docker/library/redis:7"
+2026-04-28T14:48:37.5903730Z 20m         Normal    Scheduled           pod/redis-0                                                      Successfully assigned cytomine-dc2cd99/redis-0 to cytomine-control-plane
+2026-04-28T14:48:37.5904836Z 20m         Normal    SuccessfulCreate    replicaset/envoy-gateway-7b4d7997f8                              Created pod: envoy-gateway-7b4d7997f8-7ktxm
+2026-04-28T14:48:37.5905923Z 20m         Normal    Created             pod/envoy-gateway-7b4d7997f8-7ktxm                               Created container: envoy-gateway
+2026-04-28T14:48:37.5907151Z 20m         Normal    Scheduled           pod/envoy-gateway-7b4d7997f8-7ktxm                               Successfully assigned cytomine-dc2cd99/envoy-gateway-7b4d7997f8-7ktxm to cytomine-control-plane
+2026-04-28T14:48:37.5908567Z 20m         Normal    Pulled              pod/envoy-gateway-7b4d7997f8-7ktxm                               Container image "registry.cytomine.org/docker/envoyproxy/gateway:v1.3.0" already present on machine
+2026-04-28T14:48:37.5910296Z 19m         Normal    ScalingReplicaSet   deployment/envoy-cytomine-dc2cd99-cytomine-68856322              Scaled up replica set envoy-cytomine-dc2cd99-cytomine-68856322-799cdb58c9 from 0 to 1
+2026-04-28T14:48:37.5911582Z 19m         Normal    Started             pod/envoy-gateway-7b4d7997f8-7ktxm                               Started container envoy-gateway
+2026-04-28T14:48:37.5912813Z 19m         Normal    SuccessfulCreate    replicaset/envoy-cytomine-dc2cd99-cytomine-68856322-799cdb58c9   Created pod: envoy-cytomine-dc2cd99-cytomine-68856322-799cdb58c9-hjfrc
+2026-04-28T14:48:37.5914242Z 19m         Normal    LeaderElection      lease/5b9825d2.gateway.envoyproxy.io                             envoy-gateway-7b4d7997f8-7ktxm_fad484f2-6877-4576-ac6e-74dc861192e1 became leader
+2026-04-28T14:48:37.5915879Z 19m         Normal    Scheduled           pod/envoy-cytomine-dc2cd99-cytomine-68856322-799cdb58c9-hjfrc    Successfully assigned cytomine-dc2cd99/envoy-cytomine-dc2cd99-cytomine-68856322-799cdb58c9-hjfrc to cytomine-control-plane
+2026-04-28T14:48:37.5917444Z 19m         Normal    Started             pod/repository-6d446d84f7-t4c5g                                  Started container wait-for-postgis
+2026-04-28T14:48:37.5918412Z 19m         Normal    Created             pod/repository-6d446d84f7-t4c5g                                  Created container: wait-for-postgis
+2026-04-28T14:48:37.5919749Z 19m         Normal    Pulled              pod/repository-6d446d84f7-t4c5g                                  Successfully pulled image "registry.cytomine.org/docker/postgis/postgis:15-3.5" in 5.928s (5.928s including waiting). Image size: 214919325 bytes.
+2026-04-28T14:48:37.5921637Z 19m         Normal    Pulled              pod/sam-5cf85bdb75-6j66r                                         Successfully pulled image "registry.cytomine.org/cytomine/sam:dc2cd99" in 15.719s (21.645s including waiting). Image size: 785420742 bytes.
+2026-04-28T14:48:37.5923681Z 19m         Normal    Pulled              pod/web-ui-7d489d696d-mdpch                                      Successfully pulled image "registry.cytomine.org/cytomine/web-ui:dc2cd99" in 1.339s (22.92s including waiting). Image size: 31746191 bytes.
+2026-04-28T14:48:37.5925051Z 19m         Normal    Created             pod/web-ui-7d489d696d-mdpch                                      Created container: web-ui
+2026-04-28T14:48:37.5926176Z 19m         Normal    Started             pod/web-ui-7d489d696d-mdpch                                      Started container web-ui
+2026-04-28T14:48:37.5927563Z 19m         Normal    Pulled              pod/pims-cache-868895ddcd-jpnrw                                  Successfully pulled image "registry.cytomine.org/docker/library/redis:7" in 2.607s (25.333s including waiting). Image size: 45047408 bytes.
+2026-04-28T14:48:37.5928949Z 19m         Normal    Created             pod/pims-cache-868895ddcd-jpnrw                                  Created container: pims-cache
+2026-04-28T14:48:37.5930338Z 19m         Normal    Started             pod/pims-cache-868895ddcd-jpnrw                                  Started container pims-cache
+2026-04-28T14:48:37.5931243Z 19m         Normal    Started             pod/cbir-0                                                       Started container cbir
+2026-04-28T14:48:37.5932635Z 19m         Normal    Pulled              pod/cbir-0                                                       Successfully pulled image "registry.cytomine.org/cytomine/cbir:dc2cd99" in 14.726s (40.059s including waiting). Image size: 525948766 bytes.
+2026-04-28T14:48:37.5933932Z 19m         Normal    Created             pod/cbir-0                                                       Created container: cbir
+2026-04-28T14:48:37.5935245Z 19m         Normal    Pulled              pod/registry-0                                                   Successfully pulled image "registry.cytomine.org/docker/library/registry:2.8.3" in 1.71s (41.769s including waiting). Image size: 10131312 bytes.
+2026-04-28T14:48:37.5936548Z 19m         Normal    Created             pod/registry-0                                                   Created container: registry
+2026-04-28T14:48:37.5937431Z 19m         Normal    Started             pod/registry-0                                                   Started container registry
+2026-04-28T14:48:37.5938313Z 19m         Normal    Created             pod/redis-0                                                      Created container: redis
+2026-04-28T14:48:37.5939221Z 19m         Normal    Created             pod/core-556cd9f9cd-kmrdl                                        Created container: wait-for-postgis
+2026-04-28T14:48:37.5940747Z 19m         Normal    Pulled              pod/core-556cd9f9cd-kmrdl                                        Successfully pulled image "registry.cytomine.org/docker/postgis/postgis:15-3.5" in 550ms (42.887s including waiting). Image size: 214919325 bytes.
+2026-04-28T14:48:37.5942562Z 19m         Normal    Pulled              pod/redis-0                                                      Successfully pulled image "registry.cytomine.org/docker/library/redis:7" in 570ms (42.336s including waiting). Image size: 45047408 bytes.
+2026-04-28T14:48:37.5943846Z 19m         Normal    Started             pod/redis-0                                                      Started container redis
+2026-04-28T14:48:37.5944784Z 19m         Normal    Started             pod/core-556cd9f9cd-kmrdl                                        Started container wait-for-postgis
+2026-04-28T14:48:37.5945765Z 19m         Normal    Started             pod/postgres-app-engine-0                                        Started container postgres-init
+2026-04-28T14:48:37.5946689Z 19m         Normal    Created             pod/postgres-app-engine-0                                        Created container: postgres-init
+2026-04-28T14:48:37.5948110Z 19m         Normal    Pulled              pod/postgres-app-engine-0                                        Successfully pulled image "registry.cytomine.org/docker/library/alpine:3.18" in 1.277s (44.164s including waiting). Image size: 3428098 bytes.
+2026-04-28T14:48:37.5949658Z 19m         Normal    Pulling             pod/postgres-app-engine-0                                        Pulling image "registry.cytomine.org/docker/library/postgres:14"
+2026-04-28T14:48:37.5951488Z 19m         Normal    Pulled              pod/app-engine-0                                                 Successfully pulled image "registry.cytomine.org/docker/library/postgres:14" in 4.597s (48.756s including waiting). Image size: 156986308 bytes.
+2026-04-28T14:48:37.5952847Z 19m         Normal    Started             pod/app-engine-0                                                 Started container wait-for-postgres
+2026-04-28T14:48:37.5953736Z 19m         Normal    Created             pod/app-engine-0                                                 Created container: wait-for-postgres
+2026-04-28T14:48:37.5954670Z 19m         Normal    Created             pod/postgres-iam-0                                               Created container: postgres-init
+2026-04-28T14:48:37.5955737Z 19m         Normal    Started             pod/postgres-iam-0                                               Started container postgres-init
+2026-04-28T14:48:37.5957137Z 19m         Normal    Pulled              pod/postgres-iam-0                                               Successfully pulled image "registry.cytomine.org/docker/library/alpine:3.18" in 574ms (49.327s including waiting). Image size: 3428098 bytes.
+2026-04-28T14:48:37.5958840Z 19m         Normal    Pulled              pod/pims-0                                                       Successfully pulled image "registry.cytomine.org/docker/library/redis:7" in 890ms (50.217s including waiting). Image size: 45047408 bytes.
+2026-04-28T14:48:37.5960265Z 19m         Normal    Created             pod/postgis-0                                                    Created container: postgis-init
+2026-04-28T14:48:37.5961600Z 19m         Normal    Pulled              pod/postgis-0                                                    Successfully pulled image "registry.cytomine.org/docker/library/alpine:3.18" in 587ms (50.802s including waiting). Image size: 3428098 bytes.
+2026-04-28T14:48:37.5962887Z 19m         Normal    Created             pod/pims-0                                                       Created container: wait-for-cache
+2026-04-28T14:48:37.5963752Z 19m         Normal    Started             pod/pims-0                                                       Started container wait-for-cache
+2026-04-28T14:48:37.5964746Z 19m         Normal    Pulling             pod/postgres-iam-0                                               Pulling image "registry.cytomine.org/docker/library/postgres:14"
+2026-04-28T14:48:37.5965867Z 19m         Normal    Started             pod/iam-746ffd6b67-znc5p                                         Started container wait-for-postgres
+2026-04-28T14:48:37.5966806Z 19m         Normal    Created             pod/iam-746ffd6b67-znc5p                                         Created container: wait-for-postgres
+2026-04-28T14:48:37.5968214Z 19m         Normal    Pulled              pod/iam-746ffd6b67-znc5p                                         Successfully pulled image "registry.cytomine.org/docker/library/postgres:14" in 564ms (51.366s including waiting). Image size: 156986308 bytes.
+2026-04-28T14:48:37.5969577Z 19m         Normal    Started             pod/postgis-0                                                    Started container postgis-init
+2026-04-28T14:48:37.5970706Z 19m         Normal    Pulling             pod/pims-0                                                       Pulling image "registry.cytomine.org/cytomine/pims:dc2cd99"
+2026-04-28T14:48:37.5971806Z 19m         Normal    Pulling             pod/postgis-0                                                    Pulling image "registry.cytomine.org/docker/postgis/postgis:15-3.5"
+2026-04-28T14:48:37.5973243Z 19m         Normal    Pulled              pod/mongodb-0                                                    Successfully pulled image "registry.cytomine.org/docker/library/mongo:5.0-focal" in 6.032s (57.393s including waiting). Image size: 287269036 bytes.
+2026-04-28T14:48:37.5974518Z 19m         Normal    Created             pod/mongodb-0                                                    Created container: mongodb
+2026-04-28T14:48:37.5978764Z 19m         Normal    Started             pod/mongodb-0                                                    Started container mongodb
+2026-04-28T14:48:37.5979766Z 18m         Normal    Created             pod/envoy-cytomine-dc2cd99-cytomine-68856322-799cdb58c9-hjfrc    Created container: shutdown-manager
+2026-04-28T14:48:37.5982687Z 18m         Warning   Failed              pod/envoy-cytomine-dc2cd99-cytomine-68856322-799cdb58c9-hjfrc    Failed to pull image "docker.io/envoyproxy/envoy:distroless-v1.33.0": failed to pull and unpack image "docker.io/envoyproxy/envoy:distroless-v1.33.0": failed to copy: httpReadSeeker: failed open: failed to do request: Get "https://registry-1.docker.io/v2/envoyproxy/envoy/manifests/sha256:69c16906fa649d83df125050b33109a6699c085be032fcd30f5f68b98cbe7670": net/http: TLS handshake timeout
+2026-04-28T14:48:37.5985488Z 18m         Warning   Failed              pod/envoy-cytomine-dc2cd99-cytomine-68856322-799cdb58c9-hjfrc    Error: ErrImagePull
+2026-04-28T14:48:37.5986873Z 18m         Normal    Pulled              pod/envoy-cytomine-dc2cd99-cytomine-68856322-799cdb58c9-hjfrc    Container image "registry.cytomine.org/docker/envoyproxy/gateway:v1.3.0" already present on machine
+2026-04-28T14:48:37.5988293Z 18m         Normal    Started             pod/envoy-cytomine-dc2cd99-cytomine-68856322-799cdb58c9-hjfrc    Started container shutdown-manager
+2026-04-28T14:48:37.5989777Z 18m         Normal    Pulled              pod/postgres-app-engine-0                                        Successfully pulled image "registry.cytomine.org/docker/library/postgres:14" in 571ms (29.762s including waiting). Image size: 156986308 bytes.
+2026-04-28T14:48:37.5991275Z 18m         Normal    Started             pod/postgres-app-engine-0                                        Started container postgres
+2026-04-28T14:48:37.5992184Z 18m         Normal    Created             pod/postgres-app-engine-0                                        Created container: postgres
+2026-04-28T14:48:37.5993077Z 18m         Normal    Created             pod/postgres-iam-0                                               Created container: postgres
+2026-04-28T14:48:37.5993890Z 18m         Normal    Started             pod/postgres-iam-0                                               Started container postgres
+2026-04-28T14:48:37.5995201Z 18m         Normal    Pulled              pod/postgres-iam-0                                               Successfully pulled image "registry.cytomine.org/docker/library/postgres:14" in 571ms (25.311s including waiting). Image size: 156986308 bytes.
+2026-04-28T14:48:37.5996693Z 18m         Warning   Failed              pod/envoy-cytomine-dc2cd99-cytomine-68856322-799cdb58c9-hjfrc    Error: ImagePullBackOff
+2026-04-28T14:48:37.5998056Z 18m         Normal    BackOff             pod/envoy-cytomine-dc2cd99-cytomine-68856322-799cdb58c9-hjfrc    Back-off pulling image "docker.io/envoyproxy/envoy:distroless-v1.33.0"
+2026-04-28T14:48:37.5999423Z 18m         Normal    Pulling             pod/iam-746ffd6b67-znc5p                                         Pulling image "registry.cytomine.org/docker/keycloak/keycloak:26.3"
+2026-04-28T14:48:37.6001078Z 18m         Normal    Pulling             pod/app-engine-0                                                 Pulling image "registry.cytomine.org/cytomine/app-engine:dc2cd99"
+2026-04-28T14:48:37.6002026Z 18m         Normal    Created             pod/pims-0                                                       Created container: pims
+2026-04-28T14:48:37.6003271Z 18m         Normal    Pulled              pod/pims-0                                                       Successfully pulled image "registry.cytomine.org/cytomine/pims:dc2cd99" in 17.877s (43.187s including waiting). Image size: 706911230 bytes.
+2026-04-28T14:48:37.6004582Z 18m         Normal    Created             pod/postgis-0                                                    Created container: extensions
+2026-04-28T14:48:37.6005624Z 18m         Normal    Started             pod/postgis-0                                                    Started container extensions
+2026-04-28T14:48:37.6006748Z 18m         Normal    Pulling             pod/envoy-cytomine-dc2cd99-cytomine-68856322-799cdb58c9-hjfrc    Pulling image "docker.io/envoyproxy/envoy:distroless-v1.33.0"
+2026-04-28T14:48:37.6007856Z 18m         Normal    Started             pod/pims-0                                                       Started container pims
+2026-04-28T14:48:37.6009151Z 18m         Normal    Pulled              pod/postgis-0                                                    Successfully pulled image "registry.cytomine.org/docker/postgis/postgis:15-3.5" in 569ms (42.751s including waiting). Image size: 214919325 bytes.
+2026-04-28T14:48:37.6010878Z 18m         Normal    Pulling             pod/postgis-0                                                    Pulling image "registry.cytomine.org/docker/postgis/postgis:15-3.5"
+2026-04-28T14:48:37.6011927Z 18m         Normal    Created             pod/iam-746ffd6b67-znc5p                                         Created container: iam-init
+2026-04-28T14:48:37.6013300Z 18m         Normal    Pulled              pod/iam-746ffd6b67-znc5p                                         Successfully pulled image "registry.cytomine.org/docker/keycloak/keycloak:26.3" in 4.079s (7.683s including waiting). Image size: 245674809 bytes.
+2026-04-28T14:48:37.6014651Z 18m         Normal    Started             pod/iam-746ffd6b67-znc5p                                         Started container iam-init
+2026-04-28T14:48:37.6015491Z 18m         Normal    Created             pod/app-engine-0                                                 Created container: app-engine
+2026-04-28T14:48:37.6016364Z 18m         Normal    Started             pod/app-engine-0                                                 Started container app-engine
+2026-04-28T14:48:37.6017474Z 18m         Normal    Pulling             pod/iam-746ffd6b67-znc5p                                         Pulling image "registry.cytomine.org/docker/library/eclipse-temurin:8u462-b08-jdk-ubi9-minimal"
+2026-04-28T14:48:37.6019129Z 18m         Normal    Pulled              pod/app-engine-0                                                 Successfully pulled image "registry.cytomine.org/cytomine/app-engine:dc2cd99" in 3.546s (9.219s including waiting). Image size: 191099454 bytes.
+2026-04-28T14:48:37.6020769Z 18m         Normal    Started             pod/envoy-cytomine-dc2cd99-cytomine-68856322-799cdb58c9-hjfrc    Started container envoy
+2026-04-28T14:48:37.6021881Z 18m         Normal    Created             pod/envoy-cytomine-dc2cd99-cytomine-68856322-799cdb58c9-hjfrc    Created container: envoy
+2026-04-28T14:48:37.6023479Z 18m         Normal    Pulled              pod/envoy-cytomine-dc2cd99-cytomine-68856322-799cdb58c9-hjfrc    Successfully pulled image "docker.io/envoyproxy/envoy:distroless-v1.33.0" in 11.981s (19.657s including waiting). Image size: 33510570 bytes.
+2026-04-28T14:48:37.6025065Z 18m         Normal    Created             pod/postgis-0                                                    Created container: postgis
+2026-04-28T14:48:37.6026872Z 18m         Normal    Pulled              pod/postgis-0                                                    Successfully pulled image "registry.cytomine.org/docker/postgis/postgis:15-3.5" in 570ms (18.761s including waiting). Image size: 214919325 bytes.
+2026-04-28T14:48:37.6028970Z 18m         Normal    Started             pod/postgis-0                                                    Started container postgis
+2026-04-28T14:48:37.6030436Z 18m         Normal    Created             pod/iam-746ffd6b67-znc5p                                         Created container: certificates-provider
+2026-04-28T14:48:37.6032611Z 18m         Normal    Pulled              pod/iam-746ffd6b67-znc5p                                         Successfully pulled image "registry.cytomine.org/docker/library/eclipse-temurin:8u462-b08-jdk-ubi9-minimal" in 4.263s (16.997s including waiting). Image size: 121937743 bytes.
+2026-04-28T14:48:37.6035016Z 18m         Normal    Started             pod/iam-746ffd6b67-znc5p                                         Started container certificates-provider
+2026-04-28T14:48:37.6036388Z 17m         Normal    Started             pod/iam-746ffd6b67-znc5p                                         Started container iam
+2026-04-28T14:48:37.6037639Z 17m         Normal    Created             pod/iam-746ffd6b67-znc5p                                         Created container: iam
+2026-04-28T14:48:37.6039323Z 17m         Normal    Pulled              pod/iam-746ffd6b67-znc5p                                         Container image "registry.cytomine.org/docker/keycloak/keycloak:26.3" already present on machine
+2026-04-28T14:48:37.6041621Z 17m         Warning   Unhealthy           pod/postgis-0                                                    Startup probe failed: /var/run/postgresql:5432 - no response
+2026-04-28T14:48:37.6043286Z 17m         Normal    Pulling             pod/core-556cd9f9cd-kmrdl                                        Pulling image "registry.cytomine.org/docker/curlimages/curl"
+2026-04-28T14:48:37.6044932Z 17m         Normal    Pulling             pod/repository-6d446d84f7-t4c5g                                  Pulling image "registry.cytomine.org/cytomine/repository:dc2cd99"
+2026-04-28T14:48:37.6047186Z 17m         Normal    Pulled              pod/core-556cd9f9cd-kmrdl                                        Successfully pulled image "registry.cytomine.org/docker/curlimages/curl" in 1.659s (1.659s including waiting). Image size: 10605753 bytes.
+2026-04-28T14:48:37.6049310Z 17m         Normal    Pulling             pod/core-556cd9f9cd-kmrdl                                        Pulling image "registry.cytomine.org/docker/curlimages/curl"
+2026-04-28T14:48:37.6050963Z 17m         Normal    Started             pod/core-556cd9f9cd-kmrdl                                        Started container wait-for-mongodb
+2026-04-28T14:48:37.6051952Z 17m         Normal    Created             pod/core-556cd9f9cd-kmrdl                                        Created container: wait-for-mongodb
+2026-04-28T14:48:37.6052936Z 17m         Normal    Created             pod/repository-6d446d84f7-t4c5g                                  Created container: repository-init
+2026-04-28T14:48:37.6053906Z 17m         Normal    Started             pod/repository-6d446d84f7-t4c5g                                  Started container repository-init
+2026-04-28T14:48:37.6054847Z 17m         Normal    Started             pod/core-556cd9f9cd-kmrdl                                        Started container wait-for-repository
+2026-04-28T14:48:37.6055812Z 17m         Normal    Created             pod/core-556cd9f9cd-kmrdl                                        Created container: wait-for-repository
+2026-04-28T14:48:37.6057196Z 17m         Normal    Pulled              pod/core-556cd9f9cd-kmrdl                                        Successfully pulled image "registry.cytomine.org/docker/curlimages/curl" in 533ms (1.292s including waiting). Image size: 10605753 bytes.
+2026-04-28T14:48:37.6059049Z 17m         Normal    Pulled              pod/repository-6d446d84f7-t4c5g                                  Successfully pulled image "registry.cytomine.org/cytomine/repository:dc2cd99" in 1.112s (1.768s including waiting). Image size: 155229635 bytes.
+2026-04-28T14:48:37.6061172Z 17m         Normal    Pulled              pod/repository-6d446d84f7-t4c5g                                  Successfully pulled image "registry.cytomine.org/cytomine/repository:dc2cd99" in 47ms (47ms including waiting). Image size: 155229635 bytes.
+2026-04-28T14:48:37.6062558Z 17m         Normal    Created             pod/repository-6d446d84f7-t4c5g                                  Created container: repository
+2026-04-28T14:48:37.6063538Z 17m         Normal    Started             pod/repository-6d446d84f7-t4c5g                                  Started container repository
+2026-04-28T14:48:37.6064874Z 17m         Normal    Pulling             pod/repository-6d446d84f7-t4c5g                                  Pulling image "registry.cytomine.org/cytomine/repository:dc2cd99"
+2026-04-28T14:48:37.6066318Z 17m         Warning   Unhealthy           pod/repository-6d446d84f7-t4c5g                                  Startup probe failed: Get "http://10.244.0.7:8081/ping": dial tcp 10.244.0.7:8081: connect: connection refused
+2026-04-28T14:48:37.6067629Z 17m         Normal    Pulling             pod/core-556cd9f9cd-kmrdl                                        Pulling image "registry.cytomine.org/cytomine/core:dc2cd99"
+2026-04-28T14:48:37.6069071Z 17m         Normal    Pulled              pod/core-556cd9f9cd-kmrdl                                        Successfully pulled image "registry.cytomine.org/cytomine/core:dc2cd99" in 1.406s (1.406s including waiting). Image size: 197399937 bytes.
+2026-04-28T14:48:37.6070756Z 17m         Normal    Created             pod/core-556cd9f9cd-kmrdl                                        Created container: core-init
+2026-04-28T14:48:37.6071707Z 17m         Normal    Started             pod/core-556cd9f9cd-kmrdl                                        Started container core-init
+2026-04-28T14:48:37.6072715Z 17m         Normal    Pulling             pod/core-556cd9f9cd-kmrdl                                        Pulling image "registry.cytomine.org/cytomine/core:dc2cd99"
+2026-04-28T14:48:37.6074131Z 17m         Normal    Pulled              pod/core-556cd9f9cd-kmrdl                                        Successfully pulled image "registry.cytomine.org/cytomine/core:dc2cd99" in 30ms (30ms including waiting). Image size: 197399937 bytes.
+2026-04-28T14:48:37.6075465Z 17m         Normal    Created             pod/core-556cd9f9cd-kmrdl                                        Created container: core
+2026-04-28T14:48:37.6076345Z 17m         Normal    Started             pod/core-556cd9f9cd-kmrdl                                        Started container core
+2026-04-28T14:48:37.6077619Z 4m18s       Warning   BackOff             pod/sam-5cf85bdb75-6j66r                                         Back-off restarting failed container sam in pod sam-5cf85bdb75-6j66r_cytomine-dc2cd99(170f089c-90ab-4475-b244-fd5e19db3b2b)
+2026-04-28T14:48:37.6078825Z 3m26s       Normal    Started             pod/sam-5cf85bdb75-6j66r                                         Started container sam
+2026-04-28T14:48:37.6080148Z 3m26s       Normal    Pulled              pod/sam-5cf85bdb75-6j66r                                         Container image "registry.cytomine.org/cytomine/sam:dc2cd99" already present on machine
+2026-04-28T14:48:37.6081253Z 3m26s       Normal    Created             pod/sam-5cf85bdb75-6j66r                                         Created container: sam
+2026-04-28T14:48:37.6122858Z ##[group]Run kubectl --namespace=cytomine-dc2cd99 logs e2e-tests -c e2e-tests
+2026-04-28T14:48:37.6123557Z [36;1mkubectl --namespace=cytomine-dc2cd99 logs e2e-tests -c e2e-tests[0m
+2026-04-28T14:48:37.6144314Z shell: /usr/bin/bash -e {0}
+2026-04-28T14:48:37.6144632Z env:
+2026-04-28T14:48:37.6145022Z   pythonLocation: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:48:37.6145581Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib/pkgconfig
+2026-04-28T14:48:37.6146084Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:48:37.6146571Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:48:37.6147066Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:48:37.6147552Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib
+2026-04-28T14:48:37.6147994Z   CT_CONFIG_DIR: /opt/hostedtoolcache/ct/3.14.0/amd64/etc
+2026-04-28T14:48:37.6148458Z   VIRTUAL_ENV: /opt/hostedtoolcache/ct/3.14.0/amd64/venv
+2026-04-28T14:48:37.6148936Z   DEPLOYMENT_NAME: dc2cd99
+2026-04-28T14:48:37.6149203Z   E2E_TEST_COUNT: 18
+2026-04-28T14:48:37.6149482Z ##[endgroup]
+2026-04-28T14:48:37.6798944Z error: error from server (NotFound): pods "e2e-tests" not found in namespace "cytomine-dc2cd99"
+2026-04-28T14:48:37.6863564Z ##[error]Process completed with exit code 1.
+2026-04-28T14:48:37.6902169Z ##[group]Run kubectl --namespace=cytomine-dc2cd99 logs e2e-tests -c selenium
+2026-04-28T14:48:37.6902854Z [36;1mkubectl --namespace=cytomine-dc2cd99 logs e2e-tests -c selenium[0m
+2026-04-28T14:48:37.6923173Z shell: /usr/bin/bash -e {0}
+2026-04-28T14:48:37.6923470Z env:
+2026-04-28T14:48:37.6923794Z   pythonLocation: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:48:37.6924342Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib/pkgconfig
+2026-04-28T14:48:37.6924846Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:48:37.6925296Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:48:37.6926151Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:48:37.6926617Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib
+2026-04-28T14:48:37.6927040Z   CT_CONFIG_DIR: /opt/hostedtoolcache/ct/3.14.0/amd64/etc
+2026-04-28T14:48:37.6927477Z   VIRTUAL_ENV: /opt/hostedtoolcache/ct/3.14.0/amd64/venv
+2026-04-28T14:48:37.6927912Z   DEPLOYMENT_NAME: dc2cd99
+2026-04-28T14:48:37.6928204Z   E2E_TEST_COUNT: 18
+2026-04-28T14:48:37.6928477Z ##[endgroup]
+2026-04-28T14:48:37.7573622Z error: error from server (NotFound): pods "e2e-tests" not found in namespace "cytomine-dc2cd99"
+2026-04-28T14:48:37.7636984Z ##[error]Process completed with exit code 1.
+2026-04-28T14:48:37.7676344Z ##[group]Run kubectl --namespace=cytomine-dc2cd99 delete pod e2e-tests --wait=true --timeout=60s
+2026-04-28T14:48:37.7677250Z [36;1mkubectl --namespace=cytomine-dc2cd99 delete pod e2e-tests --wait=true --timeout=60s[0m
+2026-04-28T14:48:37.7678083Z [36;1mkubectl --namespace=cytomine-dc2cd99 apply -f .github/workflows/test-reports/export-pod.yaml[0m
+2026-04-28T14:48:37.7679064Z [36;1mkubectl --namespace=cytomine-dc2cd99 wait --for=jsonpath='{.status.phase}'=Running pod/export-test-results --timeout=60s[0m
+2026-04-28T14:48:37.7680201Z [36;1mkubectl --namespace=cytomine-dc2cd99 cp export-test-results:/reports/build/reports ./test-results/build/ -c exporter[0m
+2026-04-28T14:48:37.7681300Z [36;1mkubectl --namespace=cytomine-dc2cd99 cp export-test-results:/reports/e2e-tests/build/reports ./test-results/build/ -c exporter[0m
+2026-04-28T14:48:37.7701032Z shell: /usr/bin/bash -e {0}
+2026-04-28T14:48:37.7701338Z env:
+2026-04-28T14:48:37.7701740Z   pythonLocation: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:48:37.7702248Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib/pkgconfig
+2026-04-28T14:48:37.7702774Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:48:37.7703233Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:48:37.7703703Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:48:37.7704185Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib
+2026-04-28T14:48:37.7704647Z   CT_CONFIG_DIR: /opt/hostedtoolcache/ct/3.14.0/amd64/etc
+2026-04-28T14:48:37.7705096Z   VIRTUAL_ENV: /opt/hostedtoolcache/ct/3.14.0/amd64/venv
+2026-04-28T14:48:37.7705454Z   DEPLOYMENT_NAME: dc2cd99
+2026-04-28T14:48:37.7705758Z   E2E_TEST_COUNT: 18
+2026-04-28T14:48:37.7706029Z ##[endgroup]
+2026-04-28T14:48:37.8336905Z Error from server (NotFound): pods "e2e-tests" not found
+2026-04-28T14:48:37.8390830Z ##[error]Process completed with exit code 1.
+2026-04-28T14:48:37.8495789Z ##[group]Run actions/upload-artifact@v7
+2026-04-28T14:48:37.8496112Z with:
+2026-04-28T14:48:37.8496312Z   name: helm-test-results
+2026-04-28T14:48:37.8496561Z   path: ./test-results
+2026-04-28T14:48:37.8496799Z   if-no-files-found: warn
+2026-04-28T14:48:37.8497056Z   compression-level: 6
+2026-04-28T14:48:37.8497287Z   overwrite: false
+2026-04-28T14:48:37.8497542Z   include-hidden-files: false
+2026-04-28T14:48:37.8497793Z   archive: true
+2026-04-28T14:48:37.8497995Z env:
+2026-04-28T14:48:37.8498272Z   pythonLocation: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:48:37.8498738Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib/pkgconfig
+2026-04-28T14:48:37.8499188Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:48:37.8499588Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:48:37.8500079Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.4/x64
+2026-04-28T14:48:37.8500510Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.14.4/x64/lib
+2026-04-28T14:48:37.8500902Z   CT_CONFIG_DIR: /opt/hostedtoolcache/ct/3.14.0/amd64/etc
+2026-04-28T14:48:37.8501284Z   VIRTUAL_ENV: /opt/hostedtoolcache/ct/3.14.0/amd64/venv
+2026-04-28T14:48:37.8501623Z   DEPLOYMENT_NAME: dc2cd99
+2026-04-28T14:48:37.8501863Z   E2E_TEST_COUNT: 18
+2026-04-28T14:48:37.8502078Z ##[endgroup]
+2026-04-28T14:48:37.9919559Z ##[warning]No files were found with the provided path: ./test-results. No artifacts will be uploaded.
+2026-04-28T14:48:38.0080146Z Post job cleanup.
+2026-04-28T14:48:38.0607390Z Error response from daemon: No such container: kind-registry
+2026-04-28T14:48:38.0903642Z Deleting cluster "cytomine" ...
+2026-04-28T14:48:47.7189229Z Deleted nodes: ["cytomine-control-plane"]
+2026-04-28T14:48:47.7305205Z Post job cleanup.
+2026-04-28T14:48:47.8962950Z ##[group]Logout from registry.cytomine.org
+2026-04-28T14:48:47.8999651Z [command]/usr/local/bin/docker logout registry.cytomine.org
+2026-04-28T14:48:47.9224689Z Removing login credentials for registry.cytomine.org
+2026-04-28T14:48:47.9271858Z ##[endgroup]
+2026-04-28T14:48:47.9272440Z ##[group]Post cache
+2026-04-28T14:48:47.9272758Z State not set
+2026-04-28T14:48:47.9273199Z ##[endgroup]
+2026-04-28T14:48:47.9523605Z Post job cleanup.
+2026-04-28T14:48:47.9596114Z Post job cleanup.
+2026-04-28T14:48:48.0392151Z [command]/usr/bin/git version
+2026-04-28T14:48:48.0470244Z git version 2.54.0
+2026-04-28T14:48:48.0506334Z Temporarily overriding HOME='/runner/_work/_temp/7f26e415-bc21-4ab9-ace6-542478d380c3' before making global git config changes
+2026-04-28T14:48:48.0507840Z Adding repository directory to the temporary git global config as a safe directory
+2026-04-28T14:48:48.0510136Z [command]/usr/bin/git config --global --add safe.directory /runner/_work/cytomine/cytomine
+2026-04-28T14:48:48.0553782Z Removing SSH command configuration
+2026-04-28T14:48:48.0559300Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-04-28T14:48:48.0600146Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-04-28T14:48:48.0963050Z Removing HTTP extra header
+2026-04-28T14:48:48.0966891Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-04-28T14:48:48.1002992Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-04-28T14:48:48.1330883Z Removing includeIf entries pointing to credentials config files
+2026-04-28T14:48:48.1335748Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-04-28T14:48:48.1362994Z includeif.gitdir:/runner/_work/cytomine/cytomine/.git.path
+2026-04-28T14:48:48.1363503Z includeif.gitdir:/runner/_work/cytomine/cytomine/.git/worktrees/*.path
+2026-04-28T14:48:48.1363948Z includeif.gitdir:/github/workspace/.git.path
+2026-04-28T14:48:48.1366471Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-04-28T14:48:48.1373001Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/runner/_work/cytomine/cytomine/.git.path
+2026-04-28T14:48:48.1401237Z /runner/_work/_temp/git-credentials-de1976c4-4f60-45e7-890b-049bb6f060b1.config
+2026-04-28T14:48:48.1411787Z [command]/usr/bin/git config --local --unset includeif.gitdir:/runner/_work/cytomine/cytomine/.git.path /runner/_work/_temp/git-credentials-de1976c4-4f60-45e7-890b-049bb6f060b1.config
+2026-04-28T14:48:48.1454153Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/runner/_work/cytomine/cytomine/.git/worktrees/*.path
+2026-04-28T14:48:48.1482956Z /runner/_work/_temp/git-credentials-de1976c4-4f60-45e7-890b-049bb6f060b1.config
+2026-04-28T14:48:48.1493950Z [command]/usr/bin/git config --local --unset includeif.gitdir:/runner/_work/cytomine/cytomine/.git/worktrees/*.path /runner/_work/_temp/git-credentials-de1976c4-4f60-45e7-890b-049bb6f060b1.config
+2026-04-28T14:48:48.1529286Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+2026-04-28T14:48:48.1555299Z /github/runner_temp/git-credentials-de1976c4-4f60-45e7-890b-049bb6f060b1.config
+2026-04-28T14:48:48.1563263Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-de1976c4-4f60-45e7-890b-049bb6f060b1.config
+2026-04-28T14:48:48.1602748Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-04-28T14:48:48.1650322Z /github/runner_temp/git-credentials-de1976c4-4f60-45e7-890b-049bb6f060b1.config
+2026-04-28T14:48:48.1668669Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-de1976c4-4f60-45e7-890b-049bb6f060b1.config
+2026-04-28T14:48:48.1732043Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-04-28T14:48:48.2108723Z Removing credentials config '/runner/_work/_temp/git-credentials-de1976c4-4f60-45e7-890b-049bb6f060b1.config'
+2026-04-28T14:48:48.2331159Z A job completed hook has been configured by the self-hosted runner ***istrator
+2026-04-28T14:48:48.2355226Z ##[group]Run '/etc/arc/hooks/job-completed.sh'
+2026-04-28T14:48:48.2368096Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-04-28T14:48:48.2368473Z ##[endgroup]
+2026-04-28T14:48:48.2440556Z [0;37m2026-04-28 14:48:48.243  DEBUG --- Running ARC Job Completed Hooks[0m
+2026-04-28T14:48:48.2468083Z [0;37m2026-04-28 14:48:48.246  DEBUG --- Running hook: /etc/arc/hooks/job-completed.d/update-status[0m
+2026-04-28T14:48:48.2571051Z Cleaning up orphan processes
+

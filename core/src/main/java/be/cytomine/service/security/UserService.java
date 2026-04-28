@@ -975,7 +975,6 @@ public class UserService extends ModelService {
             }
             Account account = new Account(
                 null,
-                null,
                 json.getJSONAttrStr("username"),
                 json.getJSONAttrStr("lastname"),
                 json.getJSONAttrStr("firstname"),
@@ -1007,7 +1006,6 @@ public class UserService extends ModelService {
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.checkIsCreator((User) domain, currentUser);
         Account account = new Account(
-            null,
             null,
             jsonNewData.getJSONAttrStr("username"),
             jsonNewData.getJSONAttrStr("lastname"),

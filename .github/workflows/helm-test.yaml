@@ -102,6 +102,7 @@ jobs:
             --set images.curl=registry.cytomine.org/docker/curlimages/curl \
             --set images.e2e_tests=registry.cytomine.org/cytomine/e2e-tests:${{ env.DEPLOYMENT_NAME }} \
             --set images.eclipse_temurin=registry.cytomine.org/docker/library/eclipse-temurin:8u462-b08-jdk-ubi9-minimal \
+            --set images.envoy_proxy=registry.cytomine.org/docker/envoyproxy/envoy:v1.33-latest \
             --set images.iam=registry.cytomine.org/docker/keycloak/keycloak:26.3 \
             --set images.mongodb=registry.cytomine.org/docker/library/mongo:5.0-focal \
             --set images.pims=registry.cytomine.org/cytomine/pims:${{ env.DEPLOYMENT_NAME }} \

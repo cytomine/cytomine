@@ -122,13 +122,8 @@ public class RestAnnotationDomainController extends RestCytomineController {
         return responseSuccess(annotations, params.getJSONAttrLong("offset", 0L), params.getJSONAttrLong("max", 0L));
     }
 
-    @RequestMapping(value = {"/project/{project}/annotation/download"}, method = {RequestMethod.POST})
-    public void download(
-        @PathVariable Long project,
-        @RequestBody AnnotationReportParams params
-    ) throws IOException {
-
-        boolean reviewed = Boolean.TRUE.equals(params.reviewed());
+    @PostMapping("/project/{project}/annotation/download")
+    public void download(@PathVariable Long project, @RequestBody AnnotationReportParams params) throws IOException {
         String users = JsonNodeUtils.csvFromStringList(params.users());
         String reviewUsers = JsonNodeUtils.csvFromStringList(params.reviewUsers());
         String format = (params.format() == null || params.format().isBlank()) ? "pdf" : params.format();
@@ -142,7 +137,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
         bodyMap.put("format", format);
         bodyMap.put("users", users);
         bodyMap.put("reviewUsers", reviewUsers);
-        bodyMap.put("reviewed", reviewed);
+        bodyMap.put("reviewed", params.reviewed());
         bodyMap.put("terms", terms);
         bodyMap.put("images", images);
         bodyMap.put("beforeThan", beforeThan);

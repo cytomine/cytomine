@@ -382,6 +382,14 @@ public class CytomineTests {
 
     @Test
     void downloadAnnotationReport() {
+        String projectName = "selenium-" + randomUUID();
 
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
+        String imageName = cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName));
+
+        cytomineSteps.deleteProject(wait, projectUrl);
+        cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
+        cytomineSteps.logout(wait, cytomineUrl);
     }
 }

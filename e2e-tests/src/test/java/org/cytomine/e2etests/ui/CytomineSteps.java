@@ -400,11 +400,11 @@ public class CytomineSteps {
         webDriverUtils.byClear(wait, searchInput);
     }
 
-    public void downloadAnnotationReport(Wait<WebDriver> wait, String projectUrl) {
+    public void downloadAnnotationReport(Wait<WebDriver> wait, String projectUrl, String format) {
         webDriverUtils.goTo(wait, projectUrl.replace("configuration", "annotations"));
         webDriverUtils.byClick(
             wait,
-            By.xpath("//button[normalize-space()='Download PDF']")
+            By.xpath("//button[normalize-space()='Download " + format + "']")
         );
     }
 }

@@ -391,7 +391,9 @@ public class CytomineTests {
         annotationTools.drawRectangleAnnotation(wait, driver);
         cytomineSteps.verifyAnnotationCreated(wait);
 
-        cytomineSteps.downloadAnnotationReport(wait, projectUrl);
+        cytomineSteps.downloadAnnotationReport(wait, projectUrl, "PDF");
+        cytomineSteps.downloadAnnotationReport(wait, projectUrl, "CSV");
+        cytomineSteps.downloadAnnotationReport(wait, projectUrl, "Excel");
 
         cytomineSteps.deleteProject(wait, projectUrl);
         cytomineSteps.deleteImage(wait, cytomineUrl, imageName);

@@ -93,31 +93,30 @@ jobs:
             -f helm/charts/cytomine/ci/test-values.yaml \
             --set gateway.installController=true \
             --set gateway.className=envoy-gateway \
-            --set "gateway-helm.deployment.certgen.image.repository=registry.cytomine.org/docker/envoyproxy/gateway" \
-            --set "gateway-helm.deployment.envoyGateway.image.repository=registry.cytomine.org/docker/envoyproxy/gateway" \
-            --set images.envoy_proxy=registry.cytomine.org/docker/envoyproxy/envoy \
-            --set images.core=registry.cytomine.org/cytomine/core:${{ env.DEPLOYMENT_NAME }} \
-            --set images.app_engine=registry.cytomine.org/cytomine/app-engine:${{ env.DEPLOYMENT_NAME }} \
-            --set images.sam=registry.cytomine.org/cytomine/sam:${{ env.DEPLOYMENT_NAME }} \
-            --set images.web_ui=registry.cytomine.org/cytomine/web-ui:${{ env.DEPLOYMENT_NAME }} \
-            --set images.cbir=registry.cytomine.org/cytomine/cbir:${{ env.DEPLOYMENT_NAME }} \
-            --set images.pims=registry.cytomine.org/cytomine/pims:${{ env.DEPLOYMENT_NAME }} \
-            --set images.pims_import=registry.cytomine.org/cytomine/python-client:${{ env.DEPLOYMENT_NAME }} \
-            --set images.repository=registry.cytomine.org/cytomine/repository:${{ env.DEPLOYMENT_NAME }} \
-            --set images.e2e_tests=registry.cytomine.org/cytomine/e2e-tests:${{ env.DEPLOYMENT_NAME }} \
-            --set images.tasks_runner_image=registry.cytomine.org/cytomine/app-engine-tasks-runner:${{ env.DEPLOYMENT_NAME }} \
+            --set gateway-helm.deployment.certgen.image.repository=registry.cytomine.org/docker/envoyproxy/gateway \
+            --set gateway-helm.deployment.envoyGateway.image.repository=registry.cytomine.org/docker/envoyproxy/gateway \
             --set images.alpine=registry.cytomine.org/docker/library/alpine:3.18 \
+            --set images.app_engine=registry.cytomine.org/cytomine/app-engine:${{ env.DEPLOYMENT_NAME }} \
+            --set images.cbir=registry.cytomine.org/cytomine/cbir:${{ env.DEPLOYMENT_NAME }} \
+            --set images.core=registry.cytomine.org/cytomine/core:${{ env.DEPLOYMENT_NAME }} \
             --set images.curl=registry.cytomine.org/docker/curlimages/curl \
-            --set "images.eclipse_temurin=registry.cytomine.org/docker/library/eclipse-temurin:8u462-b08-jdk-ubi9-minimal" \
-            --set images.mongodb=registry.cytomine.org/docker/library/mongo:5.0-focal \
-            --set images.redis=registry.cytomine.org/docker/library/redis:7 \
-            --set images.pims_cache=registry.cytomine.org/docker/library/redis:7 \
+            --set images.e2e_tests=registry.cytomine.org/cytomine/e2e-tests:${{ env.DEPLOYMENT_NAME }} \
+            --set images.eclipse_temurin=registry.cytomine.org/docker/library/eclipse-temurin:8u462-b08-jdk-ubi9-minimal \
             --set images.iam=registry.cytomine.org/docker/keycloak/keycloak:26.3 \
-            --set images.postgresql_iam=registry.cytomine.org/docker/library/postgres:14 \
-            --set images.postgresql_app_engine=registry.cytomine.org/docker/library/postgres:14 \
+            --set images.mongodb=registry.cytomine.org/docker/library/mongo:5.0-focal \
+            --set images.pims=registry.cytomine.org/cytomine/pims:${{ env.DEPLOYMENT_NAME }} \
+            --set images.pims_cache=registry.cytomine.org/docker/library/redis:7 \
+            --set images.pims_import=registry.cytomine.org/cytomine/python-client:${{ env.DEPLOYMENT_NAME }} \
             --set images.postgis=registry.cytomine.org/docker/postgis/postgis:15-3.5 \
-            --set images.selenium=registry.cytomine.org/docker/selenium/standalone-firefox \
+            --set images.postgresql_app_engine=registry.cytomine.org/docker/library/postgres:14 \
+            --set images.postgresql_iam=registry.cytomine.org/docker/library/postgres:14 \
+            --set images.redis=registry.cytomine.org/docker/library/redis:7 \
             --set images.registry=registry.cytomine.org/docker/library/registry:2.8.3 \
+            --set images.repository=registry.cytomine.org/cytomine/repository:${{ env.DEPLOYMENT_NAME }} \
+            --set images.sam=registry.cytomine.org/cytomine/sam:${{ env.DEPLOYMENT_NAME }} \
+            --set images.selenium=registry.cytomine.org/docker/selenium/standalone-firefox \
+            --set images.tasks_runner_image=registry.cytomine.org/cytomine/app-engine-tasks-runner:${{ env.DEPLOYMENT_NAME }} \
+            --set images.web_ui=registry.cytomine.org/cytomine/web-ui:${{ env.DEPLOYMENT_NAME }} \
             --set images.pullPolicy=Always \
             --set test.e2eTestCount=${{ env.E2E_TEST_COUNT }} \
             --wait --timeout=20m
@@ -156,11 +155,13 @@ jobs:
 
       - name: Logs e2e tests results - e2e-tests pod
         if: always()
-        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests -c e2e-tests
+        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests
+          -c e2e-tests
 
       - name: Logs e2e tests results - selenium pod
         if: always()
-        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests -c selenium
+        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests
+          -c selenium
 
       - name: Export test results
         if: always()

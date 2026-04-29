@@ -387,6 +387,11 @@ public class CytomineTests {
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
         String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
         String imageName = cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName));
+        cytomineSteps.openImageInViewer(wait, projectUrl);
+        annotationTools.drawRectangleAnnotation(wait, driver);
+        cytomineSteps.verifyAnnotationCreated(wait);
+
+        cytomineSteps.downloadAnnotationReport(wait, projectUrl);
 
         cytomineSteps.deleteProject(wait, projectUrl);
         cytomineSteps.deleteImage(wait, cytomineUrl, imageName);

@@ -399,4 +399,12 @@ public class CytomineSteps {
         webDriverUtils.byIsDisplayed(wait, By.xpath("//a[normalize-space(text())='" + projectNameToSearch + "']"));
         webDriverUtils.byClear(wait, searchInput);
     }
+
+    public void downloadAnnotationReport(Wait<WebDriver> wait, String projectUrl) {
+        webDriverUtils.goTo(wait, projectUrl.replace("configuration", "annotations"));
+        webDriverUtils.byClick(
+            wait,
+            By.xpath("//button[normalize-space()='Download PDF']")
+        );
+    }
 }

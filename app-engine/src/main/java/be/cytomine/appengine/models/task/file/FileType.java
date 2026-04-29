@@ -81,7 +81,7 @@ public class FileType extends Type {
 
     @Override
     public void persistProvision(JsonNode provision, UUID runId) {
-        String parameterName = provision.get("param_name").asText();
+        String parameterName = provision.get("parameterName").asText();
         FilePersistenceRepository filePersistenceRepository = AppEngineApplicationContext.getBean(FilePersistenceRepository.class);
         FilePersistence persistedProvision = filePersistenceRepository.findFilePersistenceByParameterNameAndRunIdAndParameterType(parameterName, runId, ParameterType.INPUT);
         if (persistedProvision != null) {
@@ -115,7 +115,7 @@ public class FileType extends Type {
 
     @Override
     public StorageData mapToStorageFileData(JsonNode provision, Run run) {
-        String parameterName = provision.get("param_name").asText();
+        String parameterName = provision.get("parameterName").asText();
         File data = new File(provision.get("value").asText());
         StorageDataEntry entry = new StorageDataEntry(data, parameterName, StorageDataType.FILE);
         return new StorageData(entry);
@@ -125,8 +125,8 @@ public class FileType extends Type {
     public JsonNode createInputProvisioningEndpointResponse(JsonNode provision, Run run) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode provisionedParameter = mapper.createObjectNode();
-        provisionedParameter.put("param_name", provision.get("param_name").asText());
-        provisionedParameter.put("task_run_id", String.valueOf(run.getId()));
+        provisionedParameter.put("parameterName", provision.get("parameterName").asText());
+        provisionedParameter.put("taskRunId", String.valueOf(run.getId()));
         return provisionedParameter;
     }
 

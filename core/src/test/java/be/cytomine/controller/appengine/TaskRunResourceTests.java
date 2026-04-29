@@ -146,14 +146,16 @@ public class TaskRunResourceTests {
         taskRunRepository.saveAndFlush(taskRun);
         UUID taskRunId = taskRun.getTaskRunId();
 
-        String paramName = "my_param";
-        String queryBody = "{\"value\": 0, \"param_name\": \"" + paramName + "\", \"type\": { \"id\" : \"integer\"}}";
-        String mockResponse = "{\"value\": 0, \"param_name\": \""
-            + paramName
-            + "\", \"task_run_id\": \""
+        String parameterName = "my_param";
+        String queryBody = "{\"value\": 0, \"parameterName\": \""
+            + parameterName
+            + "\", \"type\": { \"id\" : \"integer\"}}";
+        String mockResponse = "{\"value\": 0, \"parameterName\": \""
+            + parameterName
+            + "\", \"taskRunId\": \""
             + taskRunId
             + "\"}";
-        String appEngineUriSection = "task-runs/" + taskRunId + "/input-provisions/" + paramName;
+        String appEngineUriSection = "task-runs/" + taskRunId + "/input-provisions/" + parameterName;
         wireMockServer.stubFor(WireMock.put(urlEqualTo(apiBasePath + appEngineUriSection))
             .willReturn(aResponse().withBody(mockResponse))
         );
@@ -162,8 +164,8 @@ public class TaskRunResourceTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(queryBody))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.task_run_id").value(taskRunId.toString()))
-            .andExpect(jsonPath("$.param_name").value(paramName))
+            .andExpect(jsonPath("$.taskRunId").value(taskRunId.toString()))
+            .andExpect(jsonPath("$.parameterName").value(parameterName))
             .andExpect(jsonPath("$.value").value(0));
     }
 
@@ -174,7 +176,7 @@ public class TaskRunResourceTests {
         taskRunRepository.saveAndFlush(taskRun);
         UUID taskRunId = taskRun.getTaskRunId();
 
-        String paramName = "my_param";
+        String parameterName = "my_param";
         /*
          * The queryBody should be an array but it appears that the mock mvc class does not support haveing
          * an array at the root of the json string. Because object is just forwarded to the App Engine
@@ -182,10 +184,12 @@ public class TaskRunResourceTests {
          * error and it should have no consequence unless we start sniffing the json object in the core endpoint
          * for provisioning.
          **/
-        String queryBody = "[{\"value\": 0, \"param_name\": \"" + paramName + "\", \"type\": { \"id\" : \"integer\"}}]";
-        String mockResponse = "[{\"value\": 0, \"param_name\": \""
-            + paramName
-            + "\", \"task_run_id\": \""
+        String queryBody = "[{\"value\": 0, \"parameterName\": \""
+            + parameterName
+            + "\", \"type\": { \"id\" : \"integer\"}}]";
+        String mockResponse = "[{\"value\": 0, \"parameterName\": \""
+            + parameterName
+            + "\", \"taskRunId\": \""
             + taskRunId
             + "\"}]";
         String appEngineUriSection = "task-runs/" + taskRunId + "/input-provisions";
@@ -196,8 +200,8 @@ public class TaskRunResourceTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(queryBody))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("[0].task_run_id").value(taskRunId.toString()))
-            .andExpect(jsonPath("[0].param_name").value(paramName))
+            .andExpect(jsonPath("[0].taskRunId").value(taskRunId.toString()))
+            .andExpect(jsonPath("[0].parameterName").value(parameterName))
             .andExpect(jsonPath("[0].value").value(0));
     }
 

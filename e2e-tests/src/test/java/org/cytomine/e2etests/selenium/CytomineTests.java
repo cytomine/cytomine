@@ -17,6 +17,7 @@ import org.cytomine.e2etests.configuration.SeleniumDriver;
 import org.cytomine.e2etests.ui.AnnotationTools;
 import org.cytomine.e2etests.ui.CytomineSteps;
 import org.cytomine.e2etests.ui.WebDriverUtils;
+import org.cytomine.e2etests.utils.FileType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -70,8 +71,8 @@ public class CytomineTests {
     @AfterEach
     void tearDown(TestInfo testInfo) {
         saveScreenshot("closing-" + testInfo.getTestMethod()
-                                        .map(Method::getName)
-                                        .orElseGet(() -> "no-name-" + randomUUID()));
+            .map(Method::getName)
+            .orElseGet(() -> "no-name-" + randomUUID()));
         driver.quit();
     }
 
@@ -110,11 +111,11 @@ public class CytomineTests {
 
     @Test
     void listProjects() {
-        Set<String> projectNames =
-            Set.of(
-                "selenium-" + randomUUID(),
-                "selenium-" + randomUUID(),
-                "selenium-" + randomUUID());
+        Set<String> projectNames = Set.of(
+            "selenium-" + randomUUID(),
+            "selenium-" + randomUUID(),
+            "selenium-" + randomUUID()
+        );
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
         Set<String> projectUrls =
             projectNames.stream()
@@ -391,9 +392,9 @@ public class CytomineTests {
         annotationTools.drawRectangleAnnotation(wait, driver);
         cytomineSteps.verifyAnnotationCreated(wait);
 
-        cytomineSteps.downloadAnnotationReport(wait, projectUrl, "PDF");
-        cytomineSteps.downloadAnnotationReport(wait, projectUrl, "CSV");
-        cytomineSteps.downloadAnnotationReport(wait, projectUrl, "Excel");
+        cytomineSteps.downloadAnnotationReport(wait, projectUrl, projectName, FileType.PDF);
+        cytomineSteps.downloadAnnotationReport(wait, projectUrl, projectName, FileType.CSV);
+        cytomineSteps.downloadAnnotationReport(wait, projectUrl, projectName, FileType.Excel);
 
         cytomineSteps.deleteProject(wait, projectUrl);
         cytomineSteps.deleteImage(wait, cytomineUrl, imageName);

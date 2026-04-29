@@ -4,12 +4,15 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
 import lombok.SneakyThrows;
+import org.cytomine.e2etests.utils.FileType;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.interactions.Actions;
@@ -400,11 +403,13 @@ public class CytomineSteps {
         webDriverUtils.byClear(wait, searchInput);
     }
 
-    public void downloadAnnotationReport(Wait<WebDriver> wait, String projectUrl, String format) {
+    public void downloadAnnotationReport(Wait<WebDriver> wait, String projectUrl, String projectName, FileType format) {
         webDriverUtils.goTo(wait, projectUrl.replace("configuration", "annotations"));
         webDriverUtils.byClick(
             wait,
             By.xpath("//button[normalize-space()='Download " + format + "']")
         );
+        String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"));
+        String filename = date + "_" + projectName + "_annotations." + format.getLabel();
     }
 }

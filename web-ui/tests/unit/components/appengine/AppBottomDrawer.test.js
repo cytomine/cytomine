@@ -159,62 +159,32 @@ describe('AppBottomDrawer.vue', () => {
     const wrapper = createWrapper({
       data: {
         inputs: {
-          threshold: {
-            type: 'number',
-            value: 0.8,
-          },
-          label: {
-            type: 'string',
-            value: 'tumour',
-          },
+          threshold: {type: 'number', value: 0.8},
+          label: {type: 'string', value: 'tumour'},
         },
       },
     });
 
     expect(wrapper.vm.getInputProvisions()).toEqual([
-      {
-        // eslint-disable-next-line camelcase
-        param_name: 'threshold',
-        type: 'number',
-        value: 0.8,
-      },
-      {
-        // eslint-disable-next-line camelcase
-        param_name: 'label',
-        type: 'string',
-        value: 'tumour',
-      },
+      {parameterName: 'threshold', type: 'number', value: 0.8},
+      {parameterName: 'label', type: 'string', value: 'tumour'},
     ]);
   });
 
   it('should run task with batch provisions when there is no binary data', async () => {
-    Task.createTaskRun.mockResolvedValue({
-      id: 123,
-    });
-
-    Task.runTask.mockResolvedValue({
-      resource: {
-        id: 123,
-        state: 'RUNNING',
-      },
-    });
+    Task.createTaskRun.mockResolvedValue({id: 123});
+    Task.runTask.mockResolvedValue({resource: {id: 123, state: 'RUNNING'}});
 
     const wrapper = createWrapper({
       data: {
         selectedTask: mockTasks[0],
         inputs: {
-          threshold: {
-            type: 'number',
-            value: 0.8,
-          },
+          threshold: {type: 'number', value: 0.8},
         },
       },
     });
 
-    Object.defineProperty(wrapper.vm, 'hasBinaryData', {
-      value: false,
-      writable: true,
-    });
+    Object.defineProperty(wrapper.vm, 'hasBinaryData', {value: false, writable: true});
 
     await wrapper.vm.runTask();
 
@@ -229,12 +199,7 @@ describe('AppBottomDrawer.vue', () => {
       99,
       123,
       [
-        {
-          // eslint-disable-next-line camelcase
-          param_name: 'threshold',
-          type: 'number',
-          value: 0.8,
-        },
+        {parameterName: 'threshold', type: 'number', value: 0.8},
       ],
     );
 
@@ -248,12 +213,7 @@ describe('AppBottomDrawer.vue', () => {
 
     Task.createTaskRun.mockResolvedValue({id: 456});
     Task.singleProvisionTask.mockResolvedValue();
-    Task.runTask.mockResolvedValue({
-      resource: {
-        id: 456,
-        state: 'RUNNING',
-      },
-    });
+    Task.runTask.mockResolvedValue({resource: {id: 456, state: 'RUNNING'}});
 
     const wrapper = createWrapper({
       data: {
@@ -267,10 +227,7 @@ describe('AppBottomDrawer.vue', () => {
       },
     });
 
-    Object.defineProperty(wrapper.vm, 'hasBinaryData', {
-      value: true,
-      writable: true,
-    });
+    Object.defineProperty(wrapper.vm, 'hasBinaryData', {value: true, writable: true});
 
     await wrapper.vm.runTask();
 

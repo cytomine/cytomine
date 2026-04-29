@@ -137,11 +137,7 @@ export default {
       this.inputs = {};
     },
     getInputProvisions() {
-      return Object.entries(this.inputs).map(([parameterName, {type, value}]) => ({
-        'param_name': parameterName,
-        type,
-        value,
-      }));
+      return Object.entries(this.inputs).map(([parameterName, {type, value}]) => ({parameterName, type, value}));
     },
     async runTask() {
       try {
@@ -164,7 +160,7 @@ export default {
             await Task.singleProvisionTask(
               this.currentProject.id,
               taskRun.id,
-              provision.param_name,
+              provision.parameterName,
               body,
             );
           }

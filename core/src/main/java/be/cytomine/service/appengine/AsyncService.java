@@ -47,26 +47,20 @@ public class AsyncService {
 
     private final ImageServerService imageServerService;
 
-
     @Async
-    public void launchImageAdditionJob(
-        List<TaskRunValue> taskRunId, Long projectId,
-        User currentUser
-    ) {
+    public void launchImageAdditionJob(List<TaskRunValue> taskRunId, Long projectId, User currentUser) {
         // get all images and arrays of images
         List<TaskRunValue> outputs = taskRunId
             .stream()
-            .filter(value ->
-                value.getType().equalsIgnoreCase("IMAGE")
-                    || (value.getType().equalsIgnoreCase("ARRAY")
-                    && value.getSubType().equalsIgnoreCase("IMAGE"))
+            .filter(value -> value.type().equalsIgnoreCase("IMAGE")
+                || (value.type().equalsIgnoreCase("ARRAY")
+                && value.subType().equalsIgnoreCase("IMAGE"))
             )
             .toList();
 
         for (TaskRunValue output : outputs) {
-            if (output.getType().equalsIgnoreCase("IMAGE")) {
+            if (output.type().equalsIgnoreCase("IMAGE")) {
                 try {
-
                     handleImage(output, projectId, currentUser);
                 } catch (IOException | NoSuchAlgorithmException | InvalidKeyException e) {
                     throw new RuntimeException(e);
@@ -83,8 +77,7 @@ public class AsyncService {
 
     private void handleImage(TaskRunValue output, Long projectId, User currentUser)
         throws IOException, NoSuchAlgorithmException, InvalidKeyException {
-        String originalFileName =
-            output.getTaskRunId().toString() + "_" + output.getParameterName();
+        String originalFileName = output.taskRunId().toString() + "_" + output.parameterName();
         if (abstractImageService.find(originalFileName).isPresent()) {
             return;
         }
@@ -92,9 +85,8 @@ public class AsyncService {
         File tempFile = Files.createTempFile("image_", ".tmp").toFile();
         try (FileOutputStream tempFileOutputStream = new FileOutputStream(tempFile)) {
             getTaskRunIOParameter(
-                projectId,
-                output.getTaskRunId(),
-                output.getParameterName(),
+                output.taskRunId(),
+                output.parameterName(),
                 "output",
                 tempFileOutputStream
             );
@@ -142,13 +134,7 @@ public class AsyncService {
         tempFile.delete();
     }
 
-    public void getTaskRunIOParameter(
-        Long projectId,
-        UUID taskRunId,
-        String parameterName,
-        String type,
-        OutputStream outputStream
-    ) {
+    public void getTaskRunIOParameter(UUID taskRunId, String parameterName, String type, OutputStream outputStream) {
         appEngineService.getStreamedFile("task-runs/" + taskRunId + "/" + type + "/" + parameterName, outputStream);
     }
 }

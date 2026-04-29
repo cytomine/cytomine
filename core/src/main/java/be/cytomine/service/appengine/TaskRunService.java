@@ -9,7 +9,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -240,55 +239,68 @@ public class TaskRunService {
         securityACLService.checkIsNotReadOnly(project);
     }
 
-    private List<JsonNode> processProvisions(List<JsonNode> json) {
-        List<JsonNode> requestBody = new ArrayList<>();
-        ObjectMapper mapper = new ObjectMapper();
+    private void getAnnotationBounds(
+        Long projectId,
+        UUID taskRunId,
+        String parameterName,
+        ObjectNode itemJsonObject,
+        Long annotationId
+    ) {
+        UserAnnotation annotation = userAnnotationService.get(annotationId);
+        itemJsonObject.put("value", geometryService.wktToGeoJson(annotation.getWktLocation()));
+        Envelope bounds = GeometryService.getBounds(annotation.getWktLocation());
 
-        for (JsonNode provision : json) {
-            ObjectNode processedProvision = provision.deepCopy();
-            processedProvision.remove("type");
+        TaskRun taskRun = taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId)
+            .orElseThrow(() -> new ObjectNotFoundException("TaskRun", taskRunId));
 
-            // Process the input if it is an annotation type
-            if (provision.get("type").get("id").asText().equals("geometry")) {
-                if (!provision.get("value").isNull()) {
-                    Long annotationId = provision.get("value").asLong();
-                    UserAnnotation annotation = userAnnotationService.get(annotationId);
-                    processedProvision.put("value", geometryService.wktToGeoJson(annotation.getWktLocation()));
-                }
-            }
-
-            if (provision.get("type").get("id").asText().equals("array") && provision.get("value").isArray()) {
-                int index = 0;
-                ArrayNode valueListNode = mapper.createArrayNode();
-                boolean subTypeIsGeometry = provision.get("type").get("subType").get("id").asText().equals("geometry");
-                if (!provision.get("value").isNull()) {
-                    for (JsonNode element : provision.get("value")) {
-                        ObjectNode itemJsonObject = mapper.createObjectNode();
-                        itemJsonObject.put("index", index);
-
-                        if (subTypeIsGeometry) {
-                            Long annotationId = element.asLong();
-                            UserAnnotation annotation = userAnnotationService.get(annotationId);
-                            itemJsonObject.put("value", geometryService.wktToGeoJson(annotation.getWktLocation()));
-                        } else {
-                            itemJsonObject.set("value", element);
-                        }
-                        valueListNode.add(itemJsonObject);
-                        index++;
-                    }
-                }
-                processedProvision.set("value", valueListNode);
-            }
-
-            requestBody.add(processedProvision);
-        }
-
-        return requestBody;
+        saveCropOffset(taskRun, parameterName, bounds);
     }
 
-    public String batchProvisionTaskRun(List<JsonNode> requestBody, Long projectId, UUID taskRunId) {
+    private ObjectNode processProvision(JsonNode provision, Long projectId, UUID taskRunId) {
+        ObjectNode processedProvision = provision.deepCopy();
+        processedProvision.remove("type");
+
+        String typeId = provision.get("type").get("id").asText();
+        String parameterName = provision.get("param_name").asText();
+
+        if (typeId.equals("geometry") && !provision.get("value").isNull()) {
+            Long annotationId = provision.get("value").asLong();
+            getAnnotationBounds(projectId, taskRunId, parameterName, processedProvision, annotationId);
+        }
+
+        if (typeId.equals("array") && provision.get("value").isArray()) {
+            ArrayNode valueListNode = objectMapper.createArrayNode();
+            boolean subTypeIsGeometry = provision.get("type").get("subType").get("id").asText().equals("geometry");
+
+            if (!provision.get("value").isNull()) {
+                int index = 0;
+                for (JsonNode element : provision.get("value")) {
+                    ObjectNode itemJsonObject = objectMapper.createObjectNode();
+                    itemJsonObject.put("index", index);
+
+                    if (subTypeIsGeometry) {
+                        Long annotationId = element.asLong();
+                        getAnnotationBounds(projectId, taskRunId, parameterName, itemJsonObject, annotationId);
+                    } else {
+                        itemJsonObject.set("value", element);
+                    }
+
+                    valueListNode.add(itemJsonObject);
+                    index++;
+                }
+            }
+
+            processedProvision.set("value", valueListNode);
+        }
+
+        return processedProvision;
+    }
+
+    public String batchProvisionTaskRun(List<JsonNode> provisions, Long projectId, UUID taskRunId) {
         checkTaskRun(projectId, taskRunId);
-        List<JsonNode> body = processProvisions(requestBody);
+        List<JsonNode> body = provisions.stream()
+            .map(provision -> processProvision(provision, projectId, taskRunId))
+            .collect(Collectors.toList());
         return appEngineService.put("task-runs/" + taskRunId + "/input-provisions", body, MediaType.APPLICATION_JSON);
     }
 
@@ -347,11 +359,11 @@ public class TaskRunService {
     }
 
     private void saveCropOffset(TaskRun taskRun, String parameterName, Envelope bounds) {
-        TaskRunLayer taskRunLayer = taskRunLayerRepository
-            .findByTaskRunAndDerivedFrom(taskRun, parameterName)
-            .orElseThrow(() -> new RuntimeException("Task run layer not found for " + parameterName));
-        taskRunLayer.getOffsets().add(new CropOffset((int) bounds.getMinX(), (int) bounds.getMinY()));
-        taskRunLayerRepository.saveAndFlush(taskRunLayer);
+        taskRunLayerRepository.findByTaskRunAndDerivedFrom(taskRun, parameterName)
+            .ifPresent(layer -> {
+                layer.getOffsets().add(new CropOffset((int) bounds.getMinX(), (int) bounds.getMinY()));
+                taskRunLayerRepository.saveAndFlush(layer);
+            });
     }
 
     public String provisionTaskRun(JsonNode json, Long projectId, UUID taskRunId, String parameterName)
@@ -360,7 +372,6 @@ public class TaskRunService {
 
         String uri = "task-runs/" + taskRunId + "/input-provisions/" + parameterName;
         String arrayTypeUri = uri + "/indexes";
-        ObjectMapper mapper = new ObjectMapper();
         if (json.get("type").isObject() && json.get("type").get("id").asText().equals("array")) {
             String subtype = json.get("type").get("subType").get("id").asText();
 
@@ -368,10 +379,10 @@ public class TaskRunService {
             if (!json.get("value").isNull()) {
                 String type = value.get("type").asText();
 
-                Long[] itemsArray = mapper.convertValue(value.get("ids"), Long[].class);
+                Long[] itemsArray = objectMapper.convertValue(value.get("ids"), Long[].class);
 
                 if (subtype.equals("image")) {
-                    ArrayNode responseArray = mapper.createArrayNode();
+                    ArrayNode responseArray = objectMapper.createArrayNode();
                     for (int i = 0; i < itemsArray.length; i++) {
                         Long id = itemsArray[i];
                         if (type.equalsIgnoreCase("annotation")) {
@@ -385,7 +396,7 @@ public class TaskRunService {
 
                             String response = provisionCollectionItem(arrayTypeUri, i, body);
                             if (response != null) {
-                                JsonNode itemNode = mapper.readTree(response);
+                                JsonNode itemNode = objectMapper.readTree(response);
                                 responseArray.add(itemNode);
                             }
 
@@ -399,7 +410,7 @@ public class TaskRunService {
 
                             String response = provisionCollectionItem(arrayTypeUri, i, body);
                             if (response != null) {
-                                JsonNode itemNode = mapper.readTree(response);
+                                JsonNode itemNode = objectMapper.readTree(response);
                                 responseArray.add(itemNode);
                             }
                         }
@@ -412,12 +423,12 @@ public class TaskRunService {
                     provision.remove("type");
                     provision.remove("value");
 
-                    ArrayNode valueListNode = mapper.createArrayNode();
+                    ArrayNode valueListNode = objectMapper.createArrayNode();
                     for (int i = 0; i < itemsArray.length; i++) {
                         Long annotationId = itemsArray[i];
                         UserAnnotation annotation = userAnnotationService.get(annotationId);
 
-                        ObjectNode itemJsonObject = mapper.createObjectNode();
+                        ObjectNode itemJsonObject = objectMapper.createObjectNode();
                         itemJsonObject.put("index", i);
                         itemJsonObject.put("value", geometryService.wktToGeoJson(annotation.getWktLocation()));
 
@@ -622,7 +633,7 @@ public class TaskRunService {
 
         List<TaskRunValue> outputs;
         try {
-            outputs = new ObjectMapper().readValue(response, new TypeReference<>() {});
+            outputs = objectMapper.readValue(response, new TypeReference<>() {});
         } catch (JsonProcessingException e) {
             throw new ObjectNotFoundException("Outputs from", taskRunId);
         }
@@ -633,7 +644,7 @@ public class TaskRunService {
         String taskRunData = appEngineService.get("task-runs/" + taskRunId);
         TaskRunResponse taskRunResponse;
         try {
-            taskRunResponse = new ObjectMapper().readValue(taskRunData, TaskRunResponse.class);
+            taskRunResponse = objectMapper.readValue(taskRunData, TaskRunResponse.class);
         } catch (JsonProcessingException e) {
             throw new ObjectNotFoundException("Task run", taskRunId);
         }
@@ -658,8 +669,10 @@ public class TaskRunService {
             .collect(Collectors.toSet());
 
         for (TaskRunValue geometry : geometries) {
-            TaskRunLayer matchedLayer = layersByParameterName.get(geometry.getParameterName());
-            CropOffset offset = matchedLayer.getOffsets().get(0);
+            CropOffset offset = Optional.ofNullable(layersByParameterName.get(geometry.getParameterName()))
+                .filter(layer -> !layer.getOffsets().isEmpty())
+                .map(layer -> layer.getOffsets().getFirst())
+                .orElseGet(() -> new CropOffset(0, 0));
             String wktGeometry = geometryService.geoJsonToWkt((String) geometry.getValue());
             Geometry parsedGeometry = GeometryService.addOffset(wktGeometry, offset.getX(), offset.getY());
             annotationService.createAnnotation(annotationLayer, parsedGeometry.toString());

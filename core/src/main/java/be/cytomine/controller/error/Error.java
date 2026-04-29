@@ -2,22 +2,12 @@ package be.cytomine.controller.error;
 
 import java.util.Map;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-@Setter
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor
-public class Error {
-    private String message;
-    private String errorCode;
-    private Map<String, String> details;
-
-    public Error(String errorCode, String message) {
-        this.errorCode = errorCode;
-        this.message = message;
+public record Error(
+    String message,
+    ErrorCode errorCode,
+    Map<String, String> details
+) {
+    public static Error of(ErrorCode code, Map<String, String> details) {
+        return new Error(code.getMessage(), code, details);
     }
 }

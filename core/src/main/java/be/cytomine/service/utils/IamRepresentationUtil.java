@@ -17,22 +17,22 @@ public class IamRepresentationUtil {
 
 
     public static UserRepresentation getAccountRepresentation(Account account) {
-        log.info("Retrieving account {}", account.getUsername());
+        log.info("Retrieving account {}", account.username());
         UserRepresentation user = new UserRepresentation();
-        user.setUsername(account.getUsername());
-        user.setFirstName(account.getFirstName());
-        user.setLastName(account.getLastName());
-        user.setEmail(account.getEmail());
-        user.setEmailVerified(account.isEmailVerified());
+        user.setUsername(account.username());
+        user.setFirstName(account.firstName());
+        user.setLastName(account.lastName());
+        user.setEmail(account.email());
+        user.setEmailVerified(account.emailVerified());
         user.setEnabled(true);
 
         // add custom attributes of user : locale , isDeveloper
         setCustomAttributes(account, user);
-        log.info("set custom attributes for {}", account.getUsername());
+        log.info("set custom attributes for {}", account.username());
 
         // Set password credential
         user.setCredentials(setPermanentPassword(account));
-        log.info("set permanent credentials for {}", account.getUsername());
+        log.info("set permanent credentials for {}", account.username());
         log.info("retrieved account representation for user {}", user.getUsername());
         return user;
     }
@@ -41,7 +41,7 @@ public class IamRepresentationUtil {
         CredentialRepresentation credential = new CredentialRepresentation();
         credential.setType(CredentialRepresentation.PASSWORD);
         credential.setTemporary(false); // permanent password
-        credential.setValue(account.getPassword());
+        credential.setValue(account.password());
         return List.of(credential);
     }
 
@@ -51,11 +51,8 @@ public class IamRepresentationUtil {
         }
         try {
             user.getAttributes().put("isDeveloper", Collections.singletonList(account.isDeveloper() ? "1" : "0"));
-            user.getAttributes().put("user_locale", Collections.singletonList(account.getUserLocale()));
-            if (account.getUserId() != null) {
-                user.getAttributes()
-                    .put("user_id", Collections.singletonList(account.getUserId().toString()));
-            }
+            user.getAttributes().put("user_locale", Collections.singletonList(account.userLocale()));
+
         } catch (NullPointerException e) {
             throw new UserManagementException(500, ErrorCode.CORE_CUSTOM_ATTRIBUTES_NOT_SET);
         }

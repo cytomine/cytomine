@@ -974,8 +974,6 @@ public class UserService extends ModelService {
                 json.put("origin", "ADMINISTRATOR");
             }
             Account account = new Account(
-                null,
-                null,
                 json.getJSONAttrStr("username"),
                 json.getJSONAttrStr("lastname"),
                 json.getJSONAttrStr("firstname"),
@@ -984,7 +982,6 @@ public class UserService extends ModelService {
                 true,
                 json.getJSONAttrBoolean("isDeveloper", false),
                 json.getJSONAttrStr("language").toLowerCase(),
-                null,
                 List.of(json.getJSONAttrStr("role").substring(5))
                 );
 
@@ -1007,8 +1004,6 @@ public class UserService extends ModelService {
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.checkIsCreator((User) domain, currentUser);
         Account account = new Account(
-            null,
-            null,
             jsonNewData.getJSONAttrStr("username"),
             jsonNewData.getJSONAttrStr("lastname"),
             jsonNewData.getJSONAttrStr("firstname"),
@@ -1017,7 +1012,6 @@ public class UserService extends ModelService {
             true,
             jsonNewData.getJSONAttrBoolean("isDeveloper", false),
             jsonNewData.getJSONAttrStr("language").toLowerCase(),
-            null,
             List.of(jsonNewData.getJSONAttrStr("role").substring(5))
         );
         accountService.update(account);

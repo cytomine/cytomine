@@ -2,29 +2,21 @@ package be.cytomine.dto;
 
 import java.util.List;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+public record Account(
+    String username,
+    String lastName,
+    String firstName,
+    String password,
+    String email,
+    boolean emailVerified,
+    boolean isDeveloper,
+    String userLocale,
+    List<String> roles
+) {
+    public Account {
+        if (userLocale == null) {
+            userLocale = "";
+        }
+    }
 
-
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@ToString
-public class Account {
-    private Long userId;
-    private String reference;
-    private String username;
-    private String lastName;
-    private String firstName;
-    private String password;
-    private String email;
-    private boolean emailVerified;
-    private boolean isDeveloper;
-    private String userLocale = "";
-    private Long createdAt;
-    private List<String> roles;
 }

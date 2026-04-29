@@ -3,7 +3,6 @@ package be.cytomine.exceptions;
 import lombok.extern.slf4j.Slf4j;
 
 import be.cytomine.controller.error.ErrorCode;
-import be.cytomine.controller.error.ErrorsDictionary;
 
 
 @Slf4j
@@ -18,9 +17,9 @@ public class UserManagementException extends CytomineException {
     }
 
     public UserManagementException(int code, ErrorCode errorCode) {
-        super(ErrorsDictionary.get(errorCode).getMessage(), code);
+        super(errorCode.getMessage(), code);
         this.errorCode = errorCode;
-        log.info(ErrorsDictionary.get(errorCode).getMessage());
+        log.info(errorCode.getMessage());
     }
 
     public UserManagementException(String message, int code) {

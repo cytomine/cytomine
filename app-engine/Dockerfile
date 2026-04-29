@@ -47,13 +47,12 @@ RUN sed -i -- "s/version: ce-0.0.0/version: ${APP_ENGINE_VERSION}/g" /app/app-en
 
 #######################################################################################
 ## Stage: App-Engine development image
-FROM ${PROXY_CACHE}/gradle:${GRADLE_VERSION}-jammy AS dev-server
+FROM ${PROXY_CACHE}/gradle:${GRADLE_VERSION}-alpine AS dev-server
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-      gettext \
-      openssh-server \
-      rsync
+RUN apk add --no-cache \
+    gettext \
+    openssh \
+    rsync
 
 ENV GRADLE_USER_HOME=/opt/gradle/.gradle
 

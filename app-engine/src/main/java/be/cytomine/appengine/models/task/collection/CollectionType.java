@@ -1243,9 +1243,7 @@ public class CollectionType extends Type {
             }
 
             StorageDataEntry itemFileEntry = null;
-            if (leafType.equalsIgnoreCase("FileType")
-                || leafType.equalsIgnoreCase("ImageType")) {
-
+            if (leafType.equalsIgnoreCase("FileType") || leafType.equalsIgnoreCase("ImageType")) {
                 itemFileEntry = new StorageDataEntry(new File(value.asText()), path, StorageDataType.FILE);
             } else {
                 itemFileEntry = new StorageDataEntry(

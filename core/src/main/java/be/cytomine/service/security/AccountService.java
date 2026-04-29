@@ -29,7 +29,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import be.cytomine.controller.error.ErrorBuilder;
+import be.cytomine.controller.error.Error;
 import be.cytomine.controller.error.ErrorCode;
 import be.cytomine.dto.Account;
 import be.cytomine.exceptions.UserManagementException;
@@ -333,6 +333,6 @@ public class AccountService {
         }
         log.info("Validated account {} with following errors {}", account.username(), errors);
         return new Validation(false, ResponseEntity.status(HttpStatus.BAD_REQUEST)
-            .body(ErrorBuilder.build(ErrorCode.CORE_INVALID_ACCOUNT, errors)));
+            .body(Error.of(ErrorCode.CORE_INVALID_ACCOUNT, errors)));
     }
 }

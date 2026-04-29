@@ -41,7 +41,7 @@ export async function installApp(app, notify, t) {
   }
 }
 
-export async function hasBinaryType(input) {
+export function hasBinaryType(input) {
   const typeId = input.type.id === 'array' ? input.type.subType.id : input.type.id;
   return BINARY_TYPES.includes(typeId);
 }

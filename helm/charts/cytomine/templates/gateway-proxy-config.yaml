@@ -13,7 +13,6 @@ spec:
       envoyDeployment:
         pod:
           securityContext:
-            runAsNonRoot: true
             seccompProfile:
               type: RuntimeDefault
         container:

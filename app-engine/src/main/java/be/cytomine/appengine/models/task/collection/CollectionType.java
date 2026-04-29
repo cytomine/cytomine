@@ -1211,16 +1211,10 @@ public class CollectionType extends Type {
         }
 
         // if provision is full collection
-        return mapNode("/" + name, provision.get("value"),
-            new StorageData(), run);
+        return mapNode("/" + name, provision.get("value"), new StorageData());
     }
 
-    private StorageData mapNode(
-        String path,
-        JsonNode value,
-        StorageData container,
-        Run run)
-        throws FileStorageException {
+    private StorageData mapNode(String path, JsonNode value, StorageData container) throws FileStorageException {
 
         Type currentType = new CollectionType(this);
         while (currentType instanceof CollectionType) {
@@ -1238,7 +1232,7 @@ public class CollectionType extends Type {
                 path + "/" + "array.yml",
                 StorageDataType.FILE));
             for (JsonNode item : value) {
-                container = mapNode(path + "/" + item.get("index").asText(), item.get("value"), container, run);
+                container = mapNode(path + "/" + item.get("index").asText(), item.get("value"), container);
             }
         }
         if (value.isObject() || value.isValueNode()) {

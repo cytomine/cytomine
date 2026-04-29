@@ -379,4 +379,9 @@ public class CytomineTests {
         }
         cytomineSteps.logout(wait, cytomineUrl);
     }
+
+    @Test
+    void downloadAnnotationReport() {
+
+    }
 }

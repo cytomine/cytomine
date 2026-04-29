@@ -13,7 +13,6 @@ public record Account(
     String userLocale,
     List<String> roles
 ) {
-    // Compact constructor to handle default values
     public Account {
         if (userLocale == null) {
             userLocale = "";

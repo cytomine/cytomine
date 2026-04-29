@@ -11,9 +11,6 @@ from sam2.sam2_image_predictor import SAM2ImagePredictor
 from app import __version__
 from app.api import annotation, server
 from app.config import Settings, get_settings
-from app.download_weights import download_weights
-
-
 def load_predictor(settings: Settings) -> SAM2ImagePredictor:
     """Load the weights of the model and creates a new predictor instance."""
     model = build_sam2(
@@ -32,8 +29,6 @@ async def lifespan(local_app: FastAPI) -> AsyncGenerator[None, None]:
     local_app.state.predictor = load_predictor(get_settings())
     yield
 
-
-download_weights()
 
 app = FastAPI(
     title="Cytomine Segment Anything Server",

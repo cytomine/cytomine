@@ -23,6 +23,8 @@ spec:
       volumes:
         - name: temp
           emptyDir: {}
+        - name: sam-cache
+          emptyDir: {}
       containers:
       -   name: sam
           securityContext:
@@ -38,6 +40,8 @@ spec:
           volumeMounts:
             - name: temp
               mountPath: /tmp
+            - name: sam-cache
+              mountPath: /.cache
           startupProbe:
             httpGet:
               path: /

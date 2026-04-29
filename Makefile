@@ -27,6 +27,7 @@ start-k3s:
 
 # Save docker images to k3s
 push-local:
+	@docker build -f ./e2e-tests/Dockerfile . -t cytomine/e2e-tests:latest
 	@for service in $(SERVICES); do \
 		echo "Pushing cytomine/$$service:latest to k3s..."; \
 		docker save cytomine/$$service:latest | docker exec -i helm-k3s-1 ctr -n k8s.io images import -; \

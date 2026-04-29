@@ -1,9 +1,11 @@
 package org.cytomine.e2etests.ui;
 
+import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -22,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import static java.lang.String.format;
+import static org.cytomine.e2etests.configuration.SeleniumDriver.DOWNLOAD_PATH;
 
 @Component
 public class CytomineSteps {
@@ -403,13 +406,39 @@ public class CytomineSteps {
         webDriverUtils.byClear(wait, searchInput);
     }
 
-    public void downloadAnnotationReport(Wait<WebDriver> wait, String projectUrl, String projectName, FileType format) {
+    public Path downloadAnnotationReport(
+        Wait<WebDriver> wait,
+        String projectUrl,
+        String projectName,
+        FileType format
+    ) {
         webDriverUtils.goTo(wait, projectUrl.replace("configuration", "annotations"));
         webDriverUtils.byClick(
             wait,
             By.xpath("//button[normalize-space()='Download " + format + "']")
         );
+
         String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"));
         String filename = date + "_" + projectName + "_annotations." + format.getLabel();
+        Path filePath = Path.of(DOWNLOAD_PATH, filename);
+        Instant end = Instant.now().plus(Duration.ofSeconds(5));
+
+        while (Instant.now().isBefore(end)) {
+            if (Files.exists(filePath) && filePath.toFile().length() > 0) {
+                return filePath;
+            }
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+
+        throw new RuntimeException(filename + " was not found!");
+    }
+
+    @SneakyThrows
+    public void deleteAnnotationReport(Path filePath) {
+        Files.deleteIfExists(filePath);
     }
 }

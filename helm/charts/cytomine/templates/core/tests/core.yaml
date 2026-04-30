@@ -70,8 +70,8 @@ spec:
         privileged: false
         readOnlyRootFilesystem: false
         runAsNonRoot: true
-        runAsUser: {{ .Values.containerSecurity.userID }}
-        runAsGroup: {{ .Values.containerSecurity.groupID }}
+        runAsUser: 1200
+        runAsGroup: 1200
         capabilities:
           drop: [ "ALL" ]
       resources:

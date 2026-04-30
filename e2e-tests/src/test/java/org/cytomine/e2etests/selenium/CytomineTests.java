@@ -392,13 +392,10 @@ public class CytomineTests {
         annotationTools.drawRectangleAnnotation(wait, driver);
         cytomineSteps.verifyAnnotationCreated(wait);
 
-        Path pdfPath = cytomineSteps.downloadAnnotationReport(wait, projectUrl, projectName, FileType.PDF);
-        Path csvPath = cytomineSteps.downloadAnnotationReport(wait, projectUrl, projectName, FileType.CSV);
-        Path excelPath = cytomineSteps.downloadAnnotationReport(wait, projectUrl, projectName, FileType.Excel);
+        cytomineSteps.downloadAnnotationReport(wait, projectUrl, projectName, FileType.PDF);
+        cytomineSteps.downloadAnnotationReport(wait, projectUrl, projectName, FileType.CSV);
+        cytomineSteps.downloadAnnotationReport(wait, projectUrl, projectName, FileType.Excel);
 
-        cytomineSteps.deleteAnnotationReport(pdfPath);
-        cytomineSteps.deleteAnnotationReport(csvPath);
-        cytomineSteps.deleteAnnotationReport(excelPath);
         cytomineSteps.deleteProject(wait, projectUrl);
         cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
         cytomineSteps.logout(wait, cytomineUrl);

@@ -404,7 +404,7 @@ public class CytomineSteps {
         webDriverUtils.byClear(wait, searchInput);
     }
 
-    public Path downloadAnnotationReport(
+    public void downloadAnnotationReport(
         Wait<WebDriver> wait,
         String projectUrl,
         String projectName,
@@ -423,7 +423,7 @@ public class CytomineSteps {
             File directory = new File(DOWNLOAD_PATH);
             File[] matches = directory.listFiles((d, name) -> name.endsWith(filenameSuffix));
             if (matches != null && matches.length > 0 && matches[0].length() > 0) {
-                return matches[0].toPath();
+                return;
             }
             try {
                 Thread.sleep(500);
@@ -433,10 +433,5 @@ public class CytomineSteps {
         }
 
         throw new RuntimeException("File ending with " + filenameSuffix + " was not found!");
-    }
-
-    @SneakyThrows
-    public void deleteAnnotationReport(Path filePath) {
-        Files.deleteIfExists(filePath);
     }
 }

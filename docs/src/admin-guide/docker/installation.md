@@ -92,7 +92,7 @@ If you encounter issues during startup, refer to the [troubleshooting](./trouble
 
 ## Data Persistence
 
-All persistent data (databases, images, registry) is stored under `./data/` by default. Override the location by setting `DATA_PATH` before starting:
+All persistent data is managed through Docker volumes, except for images and model weights, which are stored under ./data/ by default. You can override this location by setting DATA_PATH before starting:
 
 ```bash
 DATA_PATH=/mnt/data docker compose up -d

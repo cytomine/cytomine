@@ -21,8 +21,10 @@ import java.util.Optional;
 import java.util.Set;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -36,18 +38,18 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.TermMapper;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.http.TermHttpContract;
+import be.cytomine.common.repository.http.TermRelationHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.ontology.AnnotationTerm;
 import be.cytomine.domain.ontology.Ontology;
-import be.cytomine.domain.ontology.RelationTerm;
 import be.cytomine.domain.ontology.ReviewedAnnotation;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.project.Project;
 import be.cytomine.exceptions.ConstraintException;
-import be.cytomine.repository.ontology.RelationTermRepository;
 import be.cytomine.service.CommandService;
 import be.cytomine.service.command.TransactionService;
-import be.cytomine.utils.CommandResponse;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -59,7 +61,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 public class TermServiceTests {
 
@@ -75,8 +77,6 @@ public class TermServiceTests {
     @Autowired
     CommandService commandService;
 
-    @Autowired
-    RelationTermRepository relationTermRepository;
 
     @Autowired
     TransactionService transactionService;
@@ -89,6 +89,22 @@ public class TermServiceTests {
 
     @MockitoBean
     TermHttpContract termHttpContract;
+
+    @MockitoBean
+    TermRelationHttpContract termRelationHttpContract;
+
+    @BeforeEach
+    void setUp() {
+        when(termRelationHttpContract.findTermRelationsByTermID(anyLong(), anyLong())).thenReturn(Set.of());
+    }
+
+    private Optional<Long> getTermRelation(Long termRelationId) {
+        String request = "select count(*) from relation_term where id = :id and deleted is null";
+        Query query = entityManager.createNativeQuery(request);
+        query.setParameter("id", termRelationId);
+        long count = ((Number) query.getSingleResult()).longValue();
+        return count > 0 ? Optional.of(termRelationId) : Optional.empty();
+    }
 
     @Test
     void getTermWithSuccess() {
@@ -180,22 +196,19 @@ public class TermServiceTests {
     void deleteTermWithSuccess() {
         Term term = builder.givenATerm();
 
-        CommandResponse commandResponse = termService.delete(term, null, null, true);
+        Optional<HttpCommandResponse> commandResponse = termService.delete(term.getId());
 
         assertThat(commandResponse).isNotNull();
-        assertThat(commandResponse.getStatus()).isEqualTo(200);
         assertThat(termService.find(term.getId()).isEmpty());
     }
 
     @Test
     void deleteTermWithDependenciesWithSuccess() {
         Term term = builder.givenATerm();
-        RelationTerm relationTerm = builder.givenARelationTerm(term, builder.givenATerm(term.getOntology()));
 
-        CommandResponse commandResponse = termService.delete(term, null, null, true);
+        Optional<HttpCommandResponse> commandResponse = termService.delete(term.getId());
 
         assertThat(commandResponse).isNotNull();
-        assertThat(commandResponse.getStatus()).isEqualTo(200);
         assertThat(termService.find(term.getId()).isEmpty());
     }
 
@@ -207,7 +220,7 @@ public class TermServiceTests {
 
         Assertions.assertThrows(
             ConstraintException.class, () -> {
-                termService.delete(term, null, null, true);
+                termService.delete(term.getId());
             }
         );
 
@@ -223,7 +236,7 @@ public class TermServiceTests {
 
         Assertions.assertThrows(
             ConstraintException.class, () -> {
-                termService.delete(term, null, null, true);
+                termService.delete(term.getId());
             }
         );
 
@@ -236,7 +249,7 @@ public class TermServiceTests {
     void undoRedoTermDeletionWithSuccess() {
         Term term = builder.givenATerm();
 
-        termService.delete(term, null, null, true);
+        termService.delete(term.getId());
 
         assertThat(termService.find(term.getId()).isEmpty());
 
@@ -247,35 +260,5 @@ public class TermServiceTests {
         commandService.redo();
 
         assertThat(termService.find(term.getId()).isEmpty());
-    }
-
-    @Test
-    void undoRedoTermDeletionRestoreDependencies() {
-        Term term = builder.givenATerm();
-        RelationTerm relationTerm = builder.givenARelationTerm(term, builder.givenATerm(term.getOntology()));
-        CommandResponse commandResponse = termService.delete(term, transactionService.start(), null, true);
-
-        assertThat(termService.find(term.getId()).isEmpty());
-        assertThat(relationTermRepository.findById(relationTerm.getId())).isEmpty();
-
-        commandService.undo();
-
-        assertThat(termService.find(term.getId()).isPresent());
-        assertThat(relationTermRepository.findById(relationTerm.getId())).isPresent();
-
-        commandService.redo();
-
-        assertThat(termService.find(term.getId()).isEmpty());
-        assertThat(relationTermRepository.findById(relationTerm.getId())).isEmpty();
-
-        commandService.undo();
-
-        assertThat(termService.find(term.getId()).isPresent());
-        assertThat(relationTermRepository.findById(relationTerm.getId())).isPresent();
-
-        commandService.redo();
-
-        assertThat(termService.find(term.getId()).isEmpty());
-        assertThat(relationTermRepository.findById(relationTerm.getId())).isEmpty();
     }
 }

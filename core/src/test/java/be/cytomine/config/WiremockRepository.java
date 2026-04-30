@@ -67,6 +67,29 @@ public class WiremockRepository {
                 .withBody("[]")
             )
         );
+
+        SERVER.stubFor(WireMock.get(urlPathMatching("/terms/ontology/.*/all-terms"))
+            .willReturn(aResponse()
+                .withStatus(HttpStatus.OK.value())
+                .withHeader("Content-Type", "application/json")
+                .withBody("[]")
+            )
+        );
+
+        SERVER.stubFor(WireMock.get(urlPathMatching("/term_relations/term/.*"))
+            .willReturn(aResponse()
+                .withStatus(HttpStatus.OK.value())
+                .withHeader("Content-Type", "application/json")
+                .withBody("[]")
+            )
+        );
+
+        SERVER.stubFor(WireMock.post(urlPathEqualTo(CBIR_API_BASE_PATH + "/storages"))
+            .willReturn(aResponse()
+                .withStatus(HttpStatus.OK.value())
+                .withBody(UUID.randomUUID().toString())
+            )
+        );
     }
 
     @Bean

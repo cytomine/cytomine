@@ -3,6 +3,7 @@ package org.cytomine.repository.http;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import lombok.RequiredArgsConstructor;
 import org.cytomine.repository.mapper.OntologyMapper;
@@ -49,11 +50,16 @@ public class TermRelationController implements TermRelationHttpContract {
 
     @Override
     @GetMapping("/{id}")
-    public Optional<TermRelationResponse> findTermByID(long id, long userId) {
+    public Optional<TermRelationResponse> findTermRelationByID(long id, long userId) {
         return termRelationRepository.findById(id)
             .flatMap(termEntity -> termRepository.findById(termEntity.getTerm1Id())
                 .filter(term1 -> aclService.canReadOntology(userId, term1.getOntologyId()))
                 .map(term1 -> ontologyMapper.mapToTermRelationResponse(termEntity, term1.getOntologyId())));
+    }
+
+    @Override
+    public Set<TermRelationResponse> findTermRelationsByTermID(long termId, long userId) {
+        return Set.of();
     }
 
     @Override

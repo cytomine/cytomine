@@ -36,7 +36,6 @@ import be.cytomine.domain.command.DeleteCommand;
 import be.cytomine.domain.command.EditCommand;
 import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.ontology.Ontology;
-import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.AlreadyExistException;
@@ -71,9 +70,6 @@ public class OntologyService extends ModelService {
     private CurrentUserService currentUserService;
     @Autowired
     private ProjectRepository projectRepository;
-    @Autowired
-    private TermService termService;
-
     @Autowired
     private PermissionService permissionService;
 
@@ -160,7 +156,7 @@ public class OntologyService extends ModelService {
             permissionService.addPermission(ontology, user.getUsername(), BasePermission.ADMINISTRATION);
         } else {
             if (ontology.getUser() != user) {
-                // if user is creator, he keep access to the ontology
+                // if user is creator, he keeps access to the ontology
                 permissionService.deletePermission(ontology, user.getUsername(), BasePermission.ADMINISTRATION);
             }
         }
@@ -168,7 +164,7 @@ public class OntologyService extends ModelService {
             permissionService.addPermission(ontology, user.getUsername(), BasePermission.READ);
         } else {
             if (ontology.getUser() != user) {
-                // if user is creator, he keep access to the ontology
+                // if user is creator, he keeps access to the ontology
                 permissionService.deletePermission(ontology, user.getUsername(), BasePermission.READ);
             }
         }
@@ -190,7 +186,7 @@ public class OntologyService extends ModelService {
 
     public void deleteDependencies(CytomineDomain domain, Transaction transaction, Task task) {
         deleteDependentProject((Ontology) domain, transaction, task);
-        deleteDependentTerm((Ontology) domain, transaction, task);
+        deleteDependentTerms((Ontology) domain);
     }
 
     private void deleteDependentProject(Ontology ontology, Transaction transaction, Task task) {
@@ -199,19 +195,11 @@ public class OntologyService extends ModelService {
         }
     }
 
-    private void deleteDependentTerm(Ontology ontology, Transaction transaction, Task task) {
+    private void deleteDependentTerms(Ontology ontology) {
         Long userId = currentUserService.getCurrentUser().getId();
-        for (long termId : termService.list(ontology)) {
+        for (long termId : termHttpContract.findAllTermIdsByOntology(ontology.getId(), userId)) {
             termHttpContract.delete(termId, userId);
         }
-        List<Term> terms = getEntityManager()
-            .createQuery("SELECT t FROM Term t WHERE t.ontology = :ontology", Term.class)
-            .setParameter("ontology", ontology)
-            .getResultList();
-        for (Term term : terms) {
-            termService.delete(term, transaction, task, false);
-        }
-        //otherwise, when you write the json, term cannot be found (because term link is LAZY + term deleted)
         ontology.setTerms(new HashSet<>());
     }
 }

@@ -2,6 +2,7 @@ package be.cytomine.common.repository.http;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,7 +26,10 @@ public interface TermRelationHttpContract {
     String ROOT_PATH = "/term_relations";
 
     @GetExchange("/{id}")
-    Optional<TermRelationResponse> findTermByID(@PathVariable long id, @RequestParam long userId);
+    Optional<TermRelationResponse> findTermRelationByID(@PathVariable long id, @RequestParam long userId);
+
+    @GetExchange("/term/{termId}")
+    Set<TermRelationResponse> findTermRelationsByTermID(@PathVariable long termId, @RequestParam long userId);
 
     @GetExchange("/ontology/{ontologyId}")
     List<TermRelationResponse> findAllByOntologyId(@PathVariable long ontologyId, @RequestParam long userId);

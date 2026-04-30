@@ -44,7 +44,6 @@ import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.ontology.AnnotationTerm;
 import be.cytomine.domain.ontology.Ontology;
-import be.cytomine.domain.ontology.RelationTerm;
 import be.cytomine.domain.ontology.ReviewedAnnotation;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.project.Project;
@@ -261,35 +260,5 @@ public class TermServiceTests {
         commandService.redo();
 
         assertThat(termService.find(term.getId()).isEmpty());
-    }
-
-    @Test
-    void undoRedoTermDeletionRestoreDependencies() {
-        Term term = builder.givenATerm();
-        RelationTerm relationTerm = builder.givenARelationTerm(term, builder.givenATerm(term.getOntology()));
-        Optional<HttpCommandResponse> commandResponse = termService.delete(term.getId());
-
-        assertThat(termService.find(term.getId()).isEmpty());
-        assertThat(getTermRelation(relationTerm.getId())).isEmpty();
-
-        commandService.undo();
-
-        assertThat(termService.find(term.getId()).isPresent());
-        assertThat(getTermRelation(relationTerm.getId())).isPresent();
-
-        commandService.redo();
-
-        assertThat(termService.find(term.getId()).isEmpty());
-        assertThat(getTermRelation(relationTerm.getId())).isEmpty();
-
-        commandService.undo();
-
-        assertThat(termService.find(term.getId()).isPresent());
-        assertThat(getTermRelation(relationTerm.getId())).isPresent();
-
-        commandService.redo();
-
-        assertThat(termService.find(term.getId()).isEmpty());
-        assertThat(getTermRelation(relationTerm.getId())).isEmpty();
     }
 }

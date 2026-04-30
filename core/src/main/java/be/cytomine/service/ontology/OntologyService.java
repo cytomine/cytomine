@@ -159,7 +159,7 @@ public class OntologyService extends ModelService {
             permissionService.addPermission(ontology, user.getUsername(), BasePermission.ADMINISTRATION);
         } else {
             if (ontology.getUser() != user) {
-                // if user is creator, he keep access to the ontology
+                // if user is creator, he keeps access to the ontology
                 permissionService.deletePermission(ontology, user.getUsername(), BasePermission.ADMINISTRATION);
             }
         }
@@ -167,7 +167,7 @@ public class OntologyService extends ModelService {
             permissionService.addPermission(ontology, user.getUsername(), BasePermission.READ);
         } else {
             if (ontology.getUser() != user) {
-                // if user is creator, he keep access to the ontology
+                // if user is creator, he keeps access to the ontology
                 permissionService.deletePermission(ontology, user.getUsername(), BasePermission.READ);
             }
         }
@@ -189,7 +189,7 @@ public class OntologyService extends ModelService {
 
     public void deleteDependencies(CytomineDomain domain, Transaction transaction, Task task) {
         deleteDependentProject((Ontology) domain, transaction, task);
-        deleteDependentTerm((Ontology) domain, transaction, task);
+        deleteDependentTerms((Ontology) domain);
     }
 
     private void deleteDependentProject(Ontology ontology, Transaction transaction, Task task) {
@@ -198,7 +198,7 @@ public class OntologyService extends ModelService {
         }
     }
 
-    private void deleteDependentTerm(Ontology ontology, Transaction transaction, Task task) {
+    private void deleteDependentTerms(Ontology ontology) {
         Long userId = currentUserService.getCurrentUser().getId();
         for (long termId : termService.list(ontology)) {
             termHttpContract.delete(termId, userId);

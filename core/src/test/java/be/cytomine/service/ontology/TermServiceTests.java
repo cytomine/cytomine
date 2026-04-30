@@ -39,6 +39,7 @@ import be.cytomine.TermMapper;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.common.repository.http.TermRelationHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.ontology.AnnotationTerm;
@@ -50,7 +51,6 @@ import be.cytomine.domain.project.Project;
 import be.cytomine.exceptions.ConstraintException;
 import be.cytomine.service.CommandService;
 import be.cytomine.service.command.TransactionService;
-import be.cytomine.utils.CommandResponse;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -100,7 +100,7 @@ public class TermServiceTests {
     }
 
     private Optional<Long> getTermRelation(Long termRelationId) {
-        String request = "select count(*) from term_relation where id = :id and deleted is null";
+        String request = "select count(*) from relation_term where id = :id and deleted is null";
         Query query = entityManager.createNativeQuery(request);
         query.setParameter("id", termRelationId);
         long count = ((Number) query.getSingleResult()).longValue();
@@ -197,10 +197,9 @@ public class TermServiceTests {
     void deleteTermWithSuccess() {
         Term term = builder.givenATerm();
 
-        CommandResponse commandResponse = termService.delete(term, null, null, true);
+        Optional<HttpCommandResponse> commandResponse = termService.delete(term.getId());
 
         assertThat(commandResponse).isNotNull();
-        assertThat(commandResponse.getStatus()).isEqualTo(200);
         assertThat(termService.find(term.getId()).isEmpty());
     }
 
@@ -208,10 +207,9 @@ public class TermServiceTests {
     void deleteTermWithDependenciesWithSuccess() {
         Term term = builder.givenATerm();
 
-        CommandResponse commandResponse = termService.delete(term, null, null, true);
+        Optional<HttpCommandResponse> commandResponse = termService.delete(term.getId());
 
         assertThat(commandResponse).isNotNull();
-        assertThat(commandResponse.getStatus()).isEqualTo(200);
         assertThat(termService.find(term.getId()).isEmpty());
     }
 
@@ -223,7 +221,7 @@ public class TermServiceTests {
 
         Assertions.assertThrows(
             ConstraintException.class, () -> {
-                termService.delete(term, null, null, true);
+                termService.delete(term.getId());
             }
         );
 
@@ -239,7 +237,7 @@ public class TermServiceTests {
 
         Assertions.assertThrows(
             ConstraintException.class, () -> {
-                termService.delete(term, null, null, true);
+                termService.delete(term.getId());
             }
         );
 
@@ -252,7 +250,7 @@ public class TermServiceTests {
     void undoRedoTermDeletionWithSuccess() {
         Term term = builder.givenATerm();
 
-        termService.delete(term, null, null, true);
+        termService.delete(term.getId());
 
         assertThat(termService.find(term.getId()).isEmpty());
 
@@ -269,7 +267,7 @@ public class TermServiceTests {
     void undoRedoTermDeletionRestoreDependencies() {
         Term term = builder.givenATerm();
         RelationTerm relationTerm = builder.givenARelationTerm(term, builder.givenATerm(term.getOntology()));
-        CommandResponse commandResponse = termService.delete(term, transactionService.start(), null, true);
+        Optional<HttpCommandResponse> commandResponse = termService.delete(term.getId());
 
         assertThat(termService.find(term.getId()).isEmpty());
         assertThat(getTermRelation(relationTerm.getId())).isEmpty();

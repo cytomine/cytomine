@@ -29,31 +29,22 @@ import org.springframework.stereotype.Service;
 
 import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.common.repository.http.TermRelationHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.domain.CytomineDomain;
-import be.cytomine.domain.command.Command;
-import be.cytomine.domain.command.DeleteCommand;
-import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ConstraintException;
 import be.cytomine.repository.ontology.AnnotationTermRepository;
 import be.cytomine.repository.ontology.ReviewedAnnotationRepository;
 import be.cytomine.service.CurrentUserService;
-import be.cytomine.service.ModelService;
 import be.cytomine.service.security.SecurityACLService;
-import be.cytomine.utils.CommandResponse;
-import be.cytomine.utils.JsonObject;
-import be.cytomine.utils.Task;
-
-import static org.springframework.security.acls.domain.BasePermission.DELETE;
 
 @Slf4j
 @Service
 @Transactional
-public class TermService extends ModelService {
+public class TermService {
 
     @Autowired
     private SecurityACLService securityACLService;
@@ -72,11 +63,6 @@ public class TermService extends ModelService {
 
     @Autowired
     private ReviewedAnnotationRepository reviewedAnnotationRepository;
-
-    @Override
-    public Class currentDomain() {
-        return Term.class;
-    }
 
     public TermResponse get(Long id) {
         return find(id).orElse(null);
@@ -102,58 +88,36 @@ public class TermService extends ModelService {
         return terms;
     }
 
-    /**
-     * Delete this domain
-     *
-     * @param domain       Domain to delete
-     * @param transaction  Transaction link with this command
-     * @param task         Task for this command
-     * @param printMessage Flag if client will print or not confirm message
-     * @return Response structure (code, old domain,..)
-     */
-    @Override
-    public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
-        User currentUser = currentUserService.getCurrentUser();
-        securityACLService.checkUser(currentUser);
-        securityACLService.check(domain.container(), DELETE);
-        Command c = new DeleteCommand(currentUser, transaction);
-        return executeCommand(c, domain, null);
+    public Optional<HttpCommandResponse> delete(Long termId) {
+
+        verifyDeleteDependentRelationTerm(termId);
+        verifyDeleteAnnotationTerm(termId);
+        verifyDeleteReviewedAnnotationTerm(termId);
+
+        return termHttpContract.delete(termId, currentUserService.getCurrentUser().getId());
     }
 
 
-    @Override
-    public CytomineDomain createFromJSON(JsonObject json) {
-        return new Term().buildDomainFromJson(json, getEntityManager());
-    }
-
-    @Override
     public List<String> getStringParamsI18n(CytomineDomain domain) {
         Term term = (Term) domain;
         return Arrays.asList(String.valueOf(term.getId()), term.getName(), term.getOntology().getName());
     }
 
-    @Override
-    public void deleteDependencies(CytomineDomain domain, Transaction transaction, Task task) {
-        deleteDependentRelationTerm((Term) domain);
-        deleteAnnotationTerm((Term) domain, transaction, task);
-        deleteReviewedAnnotationTerm((Term) domain, transaction, task);
-    }
-
-    public void deleteDependentRelationTerm(Term term) {
-        relationTermService.findTermRelationsByTermID(term.getId(), currentUserService.getCurrentUser().getId())
+    private void verifyDeleteDependentRelationTerm(Long termId) {
+        relationTermService.findTermRelationsByTermID(termId, currentUserService.getCurrentUser().getId())
             .forEach(trr -> relationTermService.delete(trr.id(), currentUserService.getCurrentUser().getId()));
     }
 
-    public void deleteAnnotationTerm(Term term, Transaction transaction, Task task) {
-        long terms = annotationTermRepository.countByTerm(term);
+    private void verifyDeleteAnnotationTerm(Long termId) {
+        long terms = annotationTermRepository.countByTermId(termId);
         if (terms != 0) {
             throw new ConstraintException(
                 "Term is still linked with " + (terms) + " annotations created by user. Cannot delete term!");
         }
     }
 
-    public void deleteReviewedAnnotationTerm(Term term, Transaction transaction, Task task) {
-        long terms = reviewedAnnotationRepository.countAllByTermsContaining(term);
+    private void verifyDeleteReviewedAnnotationTerm(Long termId) {
+        long terms = reviewedAnnotationRepository.countAllByTermsId(termId);
         if (terms != 0) {
             throw new ConstraintException(
                 "Term is still linked with " + (terms) + " reviewed annotations. Cannot delete term!");

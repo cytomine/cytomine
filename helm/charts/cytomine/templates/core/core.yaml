@@ -58,6 +58,11 @@ spec:
                 secretKeyRef:
                   name: mongodb-secret
                   key: password
+            - name: KEYCLOAK_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: admin-iam-secret
+                  key: password
           envFrom:
             - configMapRef:
                 name: core-env

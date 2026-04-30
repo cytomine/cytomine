@@ -537,17 +537,10 @@ public abstract class RestCytomineController {
     protected void responseReportFile(String name, byte[] array, String format) throws IOException {
         response.setStatus(200);
         switch (format) {
-            case "pdf":
-                response.setHeader("Content-Type", "application/pdf");
-                break;
-            case "csv":
-                response.setHeader("Content-Type", "text/csv");
-                break;
-            case "xls":
-                response.setHeader("Content-Type", "application/octet-stream");
-                break;
-            default:
-                throw new RuntimeException("Unsupported format: " + format);
+            case "pdf" -> response.setHeader("Content-Type", "application/pdf");
+            case "csv" -> response.setHeader("Content-Type", "text/csv");
+            case "xls" -> response.setHeader("Content-Type", "application/octet-stream");
+            default -> throw new RuntimeException("Unsupported format: " + format);
         }
         response.setHeader("Content-disposition", "attachment; filename=" + name);
         try (OutputStream os = response.getOutputStream()) {

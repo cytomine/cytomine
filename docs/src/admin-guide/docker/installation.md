@@ -109,7 +109,7 @@ IMPORT_PATH=/path/to/slides docker compose up -d
 A `compose.override.yaml` file is provided to build Cytomine service images directly from source instead of pulling them from the registry. This is useful for development:
 
 ```bash
-docker compose up -d  # automatically merges compose.override.yaml if present
+docker compose up -d --build  # automatically merges compose.override.yaml if present
 ```
 
 The override file adds build contexts for: `web-ui`, `pims`, `iam`, `app-engine`, `core`, `cbir`, `sam`, and `repository`.

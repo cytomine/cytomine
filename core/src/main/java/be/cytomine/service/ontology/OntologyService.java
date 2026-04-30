@@ -71,9 +71,6 @@ public class OntologyService extends ModelService {
     @Autowired
     private ProjectRepository projectRepository;
     @Autowired
-    private TermService termService;
-
-    @Autowired
     private PermissionService permissionService;
 
     @Autowired
@@ -200,7 +197,7 @@ public class OntologyService extends ModelService {
 
     private void deleteDependentTerms(Ontology ontology) {
         Long userId = currentUserService.getCurrentUser().getId();
-        for (long termId : termService.list(ontology)) {
+        for (long termId : termHttpContract.findAllTermIdsByOntology(ontology.getId(), userId)) {
             termHttpContract.delete(termId, userId);
         }
         ontology.setTerms(new HashSet<>());

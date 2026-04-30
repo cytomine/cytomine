@@ -215,7 +215,7 @@ To provision an input of type `array` and subtype `image` just pass the absolute
 
 ```json
 {
-    "param_name": "input",
+    "parameterName": "input",
     "value": [
     {
         "index": 0,
@@ -228,4 +228,3 @@ To provision an input of type `array` and subtype `image` just pass the absolute
 ]
 }
 ```
-

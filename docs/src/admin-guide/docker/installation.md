@@ -7,130 +7,150 @@ redirectFrom:
   - /admin-guide/ce/installation
 ---
 
-# Installation Guide
+# Local Installation — All in Docker Compose
 
 ::: tip
-If you experiment any issues, please describe your problem precisely [in our ticket system on Github.](https://github.com/cytomine/cytomine/issues)
+If you experience any issues, please describe your problem precisely [in our ticket system on Github.](https://github.com/cytomine/cytomine/issues)
 :::
+
+This guide describes how to run Cytomine locally with **all services deployed as Docker containers** using the root `compose.yaml`. This is the simplest local deployment: no Kubernetes knowledge required, everything is managed by Docker Compose.
+
+A k3s container is included automatically to support App Engine task scheduling; it runs as a sidecar and does not require manual configuration.
 
 ## Prerequisites
 
 ### Hardware
 
-Cytomine is a set of multithreaded tools. A minimum of **8 CPU cores** is required. The number of required cores is proportional to the expected activity. The more you want to support active users, the more you need cores. For a server-setup configuration, we recommend to use at least **16 cores**.
-
-Regarding memory, a minimum of **8 GB** is required, but we recommend at least **16 GB**.
-
-Cytomine installation requires about **15GB**. You need to provide enough space to store your images (depends on their size). If database backup is enabled, extra-space has to be provided.
-
-### Software
-
-- A **Linux** operating system like [Ubuntu](https://ubuntu.com/), [Debian](https://www.debian.org/), etc.
-- [Docker Engine](https://docs.docker.com/get-docker/) (v20.10+ recommended)
-- [Docker Compose](https://docs.docker.com/compose/) (v2.0+ recommended)
-- [Git](https://git-scm.com/) (v2.0+ recommended)
-
-### Running Apps in Cytomine
+- Minimum **8 CPU cores** (16+ recommended for multi-user workloads)
+- Minimum **8 GB RAM** (16 GB recommended)
+- At least **15 GB** of free disk space for images and databases
 
 ::: warning
-Ensure that the disk on which Docker is installed **must not exceed 89% utilisation** to ensure stable and reliable execution of apps in Cytomine. Insufficient available disk space may result in Docker build failures, container startup issues, or unstable runtime behaviour.
+The disk on which Docker is installed **must not exceed 89% utilisation**. Insufficient free space may cause build failures or unstable runtime behaviour.
 
-> By default, the Docker Engine is installed on the root filesystem (`/`). Verify that this filesystem has adequate free space before running containers.
-
-Disk usage can be verified using the following command:
-
+Check disk usage with:
 ```bash
 df -h
 ```
-
-Example output of the command:
-```bash
-some-user:~/cytomine$ df -h
-Filesystem      Size  Used Avail Use% Mounted on
-/dev/sda1       937G  650G  240G  74% /
-tmpfs            32G   20M   32G   1% /dev/shm
-tmpfs           6.3G  5.3M  6.3G   1% /run
-```
-
-In this example, Docker is installed on the root filesystem (`/`), which is 74% utilised and therefore within the acceptable threshold for running Cytomine apps.
 :::
 
-::: danger
-In previous versions, MicroK8s was required for the installation. This is no longer the case.
+### Software
 
-Cytomine now uses K3s, which is deployed automatically via Docker Compose. No manual installation or configuration is required any more.
-
-If you previously installed MicroK8s only for Cytomine, you can safely remove it using the following command:
-```bash
-sudo snap remove microk8s
-```
-:::
+- **Linux** operating system (Ubuntu, Debian, etc.)
+- [Docker Engine](https://docs.docker.com/get-docker/) v20.10+
+- [Docker Compose](https://docs.docker.com/compose/) v2.0+
+- [Git](https://git-scm.com/) v2.0+
 
 ## Installation
 
-This installation procedure is intended for desktop or laptop computers running Debian-based Linux operating systems.
-
-> It is expected to have `root` permissions (sudo privileges in Debian/Ubuntu).
-
-1. Clone the cytomine repository:
+1. Clone the Cytomine repository:
 
    ```bash
    git clone https://github.com/cytomine/cytomine.git
-   ```
-
-2. Go into the cloned folder:
-
-   ```bash
    cd cytomine
    ```
 
-3. Launch cytomine:
+2. Start all services:
 
    ```bash
-   sudo docker compose up -d
+   docker compose up -d
    ```
 
-4. Once all services are up and running, Cytomine is ready to be used:
+   _First startup takes around 10 minutes to pull all Docker images._
 
-   - If you have kept the default values your Cytomine is now available on <http://127.0.0.1/>.
-   - A default `admin` account is created with the password `password`
+3. Cytomine is ready when all containers are healthy. Access the UI at:
+
+   - **Web UI**: <http://127.0.0.1/>
+   - **Core API**: <http://127.0.0.1:8080>
+   - **PIMS (image server)**: <http://127.0.0.1:5001>
+   - **IAM (identity)**: <http://127.0.0.1:8070>
+   - **App Engine**: <http://127.0.0.1:8082>
+
+   Default admin credentials: username `admin`, password `password`.
 
 ::: tip
-If you encounter any issues during installation, refer to the [troubleshooting](./troubleshooting.md) section first.
+If you encounter issues during startup, refer to the [troubleshooting](./troubleshooting.md) guide.
 :::
+
+## Services and Ports
+
+| Service       | Port  | Description                              |
+|---------------|-------|------------------------------------------|
+| `web-ui`      | 80    | Web user interface                       |
+| `core`        | 8080  | Main Cytomine API server                 |
+| `pims`        | 5001  | Image server (PIMS)                      |
+| `iam`         | 8070  | Identity and access management (Keycloak)|
+| `app-engine`  | 8082  | Algorithm / task runner                  |
+| `cbir`        | 6000  | Content-based image retrieval            |
+| `sam`         | 8000  | Segment Anything Model service           |
+| `repository`  | 8081  | Artifact repository                      |
+| `postgis`     | 5432  | Main PostgreSQL database                 |
+| `mongo`       | 27017 | Activity / metadata database             |
+| `app-engine-db` | 5433 | App Engine PostgreSQL database          |
+| `registry`    | 5000  | Docker image registry for tasks          |
+| `k3s`         | 6443  | Kubernetes API (used by App Engine)      |
+
+## Data Persistence
+
+All persistent data is managed through Docker volumes, except for images and model weights, which are stored under ./data/ by default. You can override this location by setting DATA_PATH before starting:
+
+```bash
+DATA_PATH=/mnt/data docker compose up -d
+```
+
+Images to import can be placed in a dataset directory. Override with `IMPORT_PATH`:
+
+```bash
+IMPORT_PATH=/path/to/slides docker compose up -d
+```
+
+## Building Images Locally
+
+A `compose.override.yaml` file is provided to build Cytomine service images directly from source instead of pulling them from the registry. This is useful for development:
+
+```bash
+docker compose up -d --build  # automatically merges compose.override.yaml if present
+```
+
+The override file adds build contexts for: `web-ui`, `pims`, `iam`, `app-engine`, `core`, `cbir`, `sam`, and `repository`.
+
+To pull pre-built images instead (ignoring the override):
+
+```bash
+docker compose -f compose.yaml up -d
+```
 
 ## Upgrade Cytomine
 
-To upgrade Cytomine to the latest version:
-
-1. Fetch the latest changes in the cytomine repository:
+1. Pull the latest repository changes:
 
    ```bash
-   cd cytomine
    git pull
    ```
 
-2. Fetch the latest images of each services in Cytomine:
+2. Pull the latest Docker images:
 
    ```bash
-   sudo docker compose pull
+   docker compose pull
    ```
 
-3. Restart cytomine with the latest version:
+3. Restart with the new images:
 
    ```bash
-   sudo docker compose up -d
+   docker compose up -d
    ```
 
 ## Stop Cytomine
 
-To stop your Cytomine instance:
-
 ```bash
-sudo docker compose down
+docker compose down
 ```
 
-The server will be stopped, but the data, including databases and images, will be preserved.
+Data and databases are preserved. To also remove volumes (destructive — deletes all data):
+
+```bash
+docker compose down -v
+```
 
 ## What's Next?
 

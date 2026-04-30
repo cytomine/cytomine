@@ -164,7 +164,7 @@ public class TaskProvisioningService {
             log.info("ProvisionParameter: stored");
         } else if (value instanceof File) {
             ObjectNode objectNode = (new ObjectMapper()).createObjectNode();
-            objectNode.put("param_name", name);
+            objectNode.put("parameterName", name);
             objectNode.put("value", ((File) value).getAbsolutePath());
             provision = objectNode;
         }
@@ -250,7 +250,7 @@ public class TaskProvisioningService {
         List<JsonNode> response = new ArrayList<>();
         for (JsonNode provision : provisions) {
             log.info("ProvisionMultipleParameter: storing provision to storage...");
-            String parameterName = provision.get("param_name").asText();
+            String parameterName = provision.get("parameterName").asText();
             try {
                 saveProvisionInStorage(parameterName, provision, run);
             } catch (ProvisioningException e) {
@@ -316,7 +316,7 @@ public class TaskProvisioningService {
         } catch (FileStorageException | IOException e) {
             AppEngineError error = ErrorBuilder.buildParamRelatedError(
                 ErrorCode.STORAGE_STORING_INPUT_FAILED,
-                provision.get("param_name").asText(),
+                provision.get("parameterName").asText(),
                 e.getMessage()
             );
             throw new ProvisioningException(error);

@@ -21,7 +21,8 @@ services:
       - ../k3s/entrypoint.sh:/entrypoint:ro
       - ../k3s/serviceaccounts.yaml:/var/lib/rancher/k3s/server/manifests/serviceaccounts.yaml:ro
       - ../k3s/00-gateway-api-crds.yaml:/var/lib/rancher/k3s/server/manifests/00-gateway-api-crds.yaml:ro
-      - ../k3s/gateway.yaml:/var/lib/rancher/k3s/server/manifests/gateway.yaml:ro
+      - ../k3s/01-cilium.yaml:/var/lib/rancher/k3s/server/manifests/01-cilium.yaml:ro
+      - ../k3s/02-cilium-config.yaml:/var/lib/rancher/k3s/server/manifests/02-cilium-config.yaml:ro
       - ../k3s/cytomine-local-ns.yaml:/var/lib/rancher/k3s/server/manifests/cytomine-local-ns.yaml:ro
       # This is just so that we get the kubeconfig file out
       - ../.kube/shared:/output/

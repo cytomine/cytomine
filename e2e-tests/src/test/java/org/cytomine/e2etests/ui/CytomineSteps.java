@@ -1,12 +1,11 @@
 package org.cytomine.e2etests.ui;
 
+import java.io.File;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -417,14 +416,14 @@ public class CytomineSteps {
             By.xpath("//button[normalize-space()='Download " + format + "']")
         );
 
-        String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"));
-        String filename = date + "_" + projectName + "_annotations." + format.getLabel();
-        Path filePath = Path.of(DOWNLOAD_PATH, filename);
+        String filenameSuffix = "_" + projectName + "_annotations." + format.getLabel();
         Instant end = Instant.now().plus(Duration.ofSeconds(5));
 
         while (Instant.now().isBefore(end)) {
-            if (Files.exists(filePath) && filePath.toFile().length() > 0) {
-                return filePath;
+            File directory = new File(DOWNLOAD_PATH);
+            File[] matches = directory.listFiles((d, name) -> name.endsWith(filenameSuffix));
+            if (matches != null && matches.length > 0 && matches[0].length() > 0) {
+                return matches[0].toPath();
             }
             try {
                 Thread.sleep(500);
@@ -433,7 +432,7 @@ public class CytomineSteps {
             }
         }
 
-        throw new RuntimeException(filename + " was not found!");
+        throw new RuntimeException("File ending with " + filenameSuffix + " was not found!");
     }
 
     @SneakyThrows

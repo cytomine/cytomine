@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SeleniumDriver {
 
-    public static final String DOWNLOAD_PATH = "/tmp/selenium/";
+    public static final String DOWNLOAD_PATH = System.getProperty("java.io.tmpdir") + "/selenium/";
 
     @Value("${selenium.url}")
     Optional<URL> seleniumUrl;

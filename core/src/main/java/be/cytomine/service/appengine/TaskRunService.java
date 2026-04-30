@@ -268,26 +268,24 @@ public class TaskRunService {
             getAnnotationBounds(projectId, taskRunId, parameterName, processedProvision, annotationId);
         }
 
-        if (typeId.equals("array") && provision.get("value").isArray()) {
+        if (typeId.equals("array") && provision.get("value").isObject()) {
             ArrayNode valueListNode = objectMapper.createArrayNode();
             boolean subTypeIsGeometry = provision.get("type").get("subType").get("id").asText().equals("geometry");
 
-            if (!provision.get("value").isNull()) {
-                int index = 0;
-                for (JsonNode element : provision.get("value")) {
-                    ObjectNode itemJsonObject = objectMapper.createObjectNode();
-                    itemJsonObject.put("index", index);
+            int index = 0;
+            for (JsonNode element : provision.get("value")) {
+                ObjectNode itemJsonObject = objectMapper.createObjectNode();
+                itemJsonObject.put("index", index);
 
-                    if (subTypeIsGeometry) {
-                        Long annotationId = element.asLong();
-                        getAnnotationBounds(projectId, taskRunId, parameterName, itemJsonObject, annotationId);
-                    } else {
-                        itemJsonObject.set("value", element);
-                    }
-
-                    valueListNode.add(itemJsonObject);
-                    index++;
+                if (subTypeIsGeometry) {
+                    Long annotationId = element.asLong();
+                    getAnnotationBounds(projectId, taskRunId, parameterName, itemJsonObject, annotationId);
+                } else {
+                    itemJsonObject.set("value", element);
                 }
+
+                valueListNode.add(itemJsonObject);
+                index++;
             }
 
             processedProvision.set("value", valueListNode);

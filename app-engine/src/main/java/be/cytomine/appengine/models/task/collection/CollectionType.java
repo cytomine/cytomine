@@ -1198,19 +1198,17 @@ public class CollectionType extends Type {
 
     @Override
     public StorageData mapToStorageFileData(JsonNode provision, Run run) throws FileStorageException {
-        String name = null;
-        // if provision is an item
+        if (referenced) {
+            return new StorageData(true);
+        }
+
+        String name;
         if (provision.has("index")) {
             name = provision.get("index").asText();
         } else {
             name = provision.get("param_name").asText();
         }
 
-        if (referenced) {
-            return new StorageData(true);
-        }
-
-        // if provision is full collection
         return mapNode("/" + name, provision.get("value"), new StorageData());
     }
 

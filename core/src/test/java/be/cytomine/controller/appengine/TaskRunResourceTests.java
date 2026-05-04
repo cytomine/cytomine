@@ -41,7 +41,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @WithMockUser(username = "superadmin")
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
-@Transactional
 public class TaskRunResourceTests {
 
     @Autowired

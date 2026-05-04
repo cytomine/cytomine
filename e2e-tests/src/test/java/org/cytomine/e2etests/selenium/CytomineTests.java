@@ -111,7 +111,6 @@ public class CytomineTests {
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
         cytomineSteps.createUser(wait, cytomineUrl, username, firstname, lastname, email, password);
         cytomineSteps.logout(wait, cytomineUrl);
-        keycloakClient.deleteUser(username);
     }
 
     @Test
@@ -126,7 +125,6 @@ public class CytomineTests {
         cytomineSteps.createUser(wait, cytomineUrl, username, firstname, lastname, email, password);
         cytomineSteps.editUser(wait, cytomineUrl, username, "UpdatedFirst", "UpdatedLast");
         cytomineSteps.logout(wait, cytomineUrl);
-        keycloakClient.deleteUser(username);
     }
 
     @Test

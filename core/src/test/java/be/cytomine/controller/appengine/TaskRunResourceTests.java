@@ -29,12 +29,11 @@ import be.cytomine.dto.appengine.task.TaskRunProvisionedResponse;
 import be.cytomine.repository.appengine.TaskRunRepository;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -62,10 +61,6 @@ public class TaskRunResourceTests {
 
     @Value("${application.appEngine.apiBasePath}")
     private String apiBasePath;
-
-    static {
-        configureFor("localhost", WiremockRepository.SERVER.port());
-    }
 
     @Test
     @Transactional
@@ -184,13 +179,8 @@ public class TaskRunResourceTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(queryBody)))
             .andExpect(status().isOk())
-            .andExpect(result -> {
-                List<TaskRunProvisionedResponse> actual = objectMapper.readValue(
-                    result.getResponse().getContentAsString(),
-                    objectMapper.getTypeFactory().constructCollectionType(List.class, TaskRunProvisionedResponse.class)
-                );
-                assertThat(actual).containsExactlyElementsOf(mockResponses);
-            });
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(content().json(objectMapper.writeValueAsString(mockResponses)));
     }
 
     @Test

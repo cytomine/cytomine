@@ -239,12 +239,13 @@ public class TaskRunService {
         securityACLService.checkIsNotReadOnly(project);
     }
 
-    public List<String> batchProvisionTaskRun(List<JsonNode> provisions, Long projectId, UUID taskRunId) {
+    public List<JsonNode> batchProvisionTaskRun(List<JsonNode> provisions, Long projectId, UUID taskRunId) {
         checkTaskRun(projectId, taskRunId);
         return provisions.stream()
             .map(provision -> {
                 try {
-                    return provisionTaskRun(provision, projectId, taskRunId, provision.get("parameterName").asText());
+                    String json = provisionTaskRun(provision, projectId, taskRunId, provision.get("parameterName").asText());
+                    return objectMapper.readTree(json);
                 } catch (JsonProcessingException e) {
                     throw new RuntimeException(e);
                 }

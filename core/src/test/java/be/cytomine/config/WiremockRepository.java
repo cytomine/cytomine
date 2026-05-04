@@ -14,6 +14,7 @@ import org.springframework.test.context.DynamicPropertyRegistrar;
 
 import be.cytomine.TermMapper;
 import be.cytomine.domain.ontology.Term;
+import be.cytomine.dto.appengine.task.TaskRunProvisionedResponse;
 
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
 import static be.cytomine.service.search.RetrievalService.CBIR_API_BASE_PATH;
@@ -90,6 +91,20 @@ public class WiremockRepository {
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
                 .withBody(objectMapper.writeValueAsString(termMapper.map(term)))
+            )
+        );
+    }
+
+    @SneakyThrows
+    public void stubProvisionParameter(TaskRunProvisionedResponse response) {
+        SERVER.stubFor(WireMock.get(urlPathMatching("/task-runs/"
+                + response.taskRunId()
+                + "/input-provisions/"
+                + response.parameterName()))
+            .willReturn(aResponse()
+                .withStatus(HttpStatus.OK.value())
+                .withHeader("Content-Type", "application/json")
+                .withBody(objectMapper.writeValueAsString(response))
             )
         );
     }

@@ -194,9 +194,6 @@ export default {
           await this.internalUser.defineRole(this.idRole);
           this.internalUser.role = this.selectedRole; // for correct rendering in list
         }
-        if (this.editionMode && this.internalUser.password) {
-          await this.internalUser.savePassword(this.internalUser.password);
-        }
 
         this.internalUser.password = ''; // reinitialize password so that if modal reopened, field empty
         this.$notify({type: 'success', text: this.$t('notif-success-user-' + labelTranslation)});

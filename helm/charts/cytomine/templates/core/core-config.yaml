@@ -187,6 +187,7 @@ data:
   SAM_URL: http://sam.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.sam.port }}
   CBIR_URL: http://cbir.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.cbir.port }}
   SERVER_URL: "{{ include "core.url" . }}"
+  KEYCLOAK_ADMIN: admin
   APPENGINE_ENABLED: "true"
   APPENGINE_API_URL: http://app-engine.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.app_engine.port }}
   APPENGINE_API_BASE_PATH: /app-engine/v1/

@@ -6,11 +6,8 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,9 +16,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
@@ -29,12 +25,12 @@ import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.appengine.TaskRun;
+import be.cytomine.dto.appengine.task.TaskRunProvisionedResponse;
 import be.cytomine.repository.appengine.TaskRunRepository;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -175,15 +171,14 @@ public class TaskRunResourceTests {
         List<Map<String, Object>> queryBody = List.of(
             Map.of("parameterName", parameterName, "value", 0, "type", Map.of("id", "integer"))
         );
-        Map<String, Object> mockResponse = Map.of("parameterName", parameterName, "value", 0, "taskRunId", taskRunId);
-        String appEngineUriSection = "task-runs/" + taskRunId + "/input-provisions";
-        WiremockRepository.SERVER.stubFor(WireMock.put(urlEqualTo(apiBasePath + appEngineUriSection + "/" + parameterName))
-            .willReturn(aResponse().withStatus(200)
-                .withHeader("Content-Type", "application/json")
-                .withBody(objectMapper.writeValueAsString(mockResponse)))
-        );
+        TaskRunProvisionedResponse mockResponse = new TaskRunProvisionedResponse(parameterName, taskRunId, 0);
+        wiremockRepository.stubProvisionParameter(mockResponse);
 
-        mockMvc.perform(put("/api/app-engine/project/" + taskRun.getProject().getId() + "/" + appEngineUriSection)
+        String uri = UriComponentsBuilder.fromPath("/api/app-engine/project/")
+            .pathSegment(taskRun.getProject().getId().toString(), "task-runs", taskRunId.toString(), "input-provisions")
+            .toUriString();
+
+        mockMvc.perform(put(uri)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(queryBody)))
             .andExpect(status().isOk())

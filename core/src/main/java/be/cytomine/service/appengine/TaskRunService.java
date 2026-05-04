@@ -239,67 +239,17 @@ public class TaskRunService {
         securityACLService.checkIsNotReadOnly(project);
     }
 
-    private void getAnnotationBounds(
-        Long projectId,
-        UUID taskRunId,
-        String parameterName,
-        ObjectNode itemJsonObject,
-        Long annotationId
-    ) {
-        UserAnnotation annotation = userAnnotationService.get(annotationId);
-        itemJsonObject.put("value", geometryService.wktToGeoJson(annotation.getWktLocation()));
-        Envelope bounds = GeometryService.getBounds(annotation.getWktLocation());
-
-        TaskRun taskRun = taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId)
-            .orElseThrow(() -> new ObjectNotFoundException("TaskRun", taskRunId));
-
-        saveCropOffset(taskRun, parameterName, bounds);
-    }
-
-    private ObjectNode processProvision(JsonNode provision, Long projectId, UUID taskRunId) {
-        ObjectNode processedProvision = provision.deepCopy();
-        processedProvision.remove("type");
-
-        String typeId = provision.get("type").get("id").asText();
-        String parameterName = provision.get("parameterName").asText();
-
-        if (typeId.equals("geometry") && !provision.get("value").isNull()) {
-            Long annotationId = provision.get("value").asLong();
-            getAnnotationBounds(projectId, taskRunId, parameterName, processedProvision, annotationId);
-        }
-
-        if (typeId.equals("array") && provision.get("value").isObject()) {
-            ArrayNode valueListNode = objectMapper.createArrayNode();
-            boolean subTypeIsGeometry = provision.get("type").get("subType").get("id").asText().equals("geometry");
-
-            int index = 0;
-            for (JsonNode element : provision.get("value")) {
-                ObjectNode itemJsonObject = objectMapper.createObjectNode();
-                itemJsonObject.put("index", index);
-
-                if (subTypeIsGeometry) {
-                    Long annotationId = element.asLong();
-                    getAnnotationBounds(projectId, taskRunId, parameterName, itemJsonObject, annotationId);
-                } else {
-                    itemJsonObject.set("value", element);
-                }
-
-                valueListNode.add(itemJsonObject);
-                index++;
-            }
-
-            processedProvision.set("value", valueListNode);
-        }
-
-        return processedProvision;
-    }
-
-    public String batchProvisionTaskRun(List<JsonNode> provisions, Long projectId, UUID taskRunId) {
+    public List<String> batchProvisionTaskRun(List<JsonNode> provisions, Long projectId, UUID taskRunId) {
         checkTaskRun(projectId, taskRunId);
-        List<JsonNode> body = provisions.stream()
-            .map(provision -> processProvision(provision, projectId, taskRunId))
-            .collect(Collectors.toList());
-        return appEngineService.put("task-runs/" + taskRunId + "/input-provisions", body, MediaType.APPLICATION_JSON);
+        return provisions.stream()
+            .map(provision -> {
+                try {
+                    return provisionTaskRun(provision, projectId, taskRunId, provision.get("parameterName").asText());
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+            })
+            .toList();
     }
 
     private byte[] getImageAnnotation(AnnotationDomain annotation) {

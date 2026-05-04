@@ -81,7 +81,7 @@ public class TaskRunController {
     }
 
     @PutMapping("/project/{projectId}/task-runs/{taskRunId}/input-provisions")
-    public String batchProvision(
+    public List<String> batchProvision(
         @PathVariable Long projectId,
         @PathVariable UUID taskRunId,
         @RequestBody List<JsonNode> body

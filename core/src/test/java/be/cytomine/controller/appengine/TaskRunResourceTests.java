@@ -31,6 +31,7 @@ import be.cytomine.repository.appengine.TaskRunRepository;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -160,19 +161,20 @@ public class TaskRunResourceTests {
         taskRunRepository.saveAndFlush(taskRun);
         UUID taskRunId = taskRun.getTaskRunId();
 
-        String parameterName = "my_param";
-        /*
-         * The queryBody should be an array but it appears that the mock mvc class does not support haveing
-         * an array at the root of the json string. Because object is just forwarded to the App Engine
-         * and we mock the response to be what it should be, I will just pass a single object here to avoid the
-         * error and it should have no consequence unless we start sniffing the json object in the core endpoint
-         * for provisioning.
-         **/
-        List<Map<String, Object>> queryBody = List.of(
-            Map.of("parameterName", parameterName, "value", 0, "type", Map.of("id", "integer"))
+        List<TaskRunProvisionedResponse> mockResponses = List.of(
+            new TaskRunProvisionedResponse("first-parameter", taskRun.getTaskRunId(), 0),
+            new TaskRunProvisionedResponse("second-parameter", taskRun.getTaskRunId(), 2)
         );
-        TaskRunProvisionedResponse mockResponse = new TaskRunProvisionedResponse(parameterName, taskRunId, 0);
-        wiremockRepository.stubProvisionParameter(mockResponse);
+
+        List<Map<String, Object>> queryBody = mockResponses.stream()
+            .map(r -> Map.of(
+                "parameterName", r.parameterName(),
+                "value", r.value(),
+                "type", Map.of("id", "integer")
+            ))
+            .toList();
+
+        mockResponses.forEach(wiremockRepository::stubProvisionParameter);
 
         String uri = UriComponentsBuilder.fromPath("/api/app-engine/project/")
             .pathSegment(taskRun.getProject().getId().toString(), "task-runs", taskRunId.toString(), "input-provisions")
@@ -182,9 +184,13 @@ public class TaskRunResourceTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(queryBody)))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("[0].taskRunId").value(taskRunId.toString()))
-            .andExpect(jsonPath("[0].parameterName").value(parameterName))
-            .andExpect(jsonPath("[0].value").value(0));
+            .andExpect(result -> {
+                List<TaskRunProvisionedResponse> actual = objectMapper.readValue(
+                    result.getResponse().getContentAsString(),
+                    objectMapper.getTypeFactory().constructCollectionType(List.class, TaskRunProvisionedResponse.class)
+                );
+                assertThat(actual).containsExactlyElementsOf(mockResponses);
+            });
     }
 
     @Test

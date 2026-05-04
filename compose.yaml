@@ -159,8 +159,8 @@ services:
       KC_SMTP_PASS: password
       KC_SMTP_PORT: 587
       KC_SMTP_USER: user
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: YMjl7YGabNbQmjVOONxo9AYSiJyvioTnbsMyBwT8/Jg=
+      KEYCLOAK_ADMIN: &KEYCLOAK_ADMIN admin
+      KEYCLOAK_ADMIN_PASSWORD: &KEYCLOAK_ADMIN_PASSWORD YMjl7YGabNbQmjVOONxo9AYSiJyvioTnbsMyBwT8/Jg=
     networks:
       host_network:
         ipv4_address: 172.16.238.9
@@ -252,6 +252,8 @@ services:
       POSTGIS_USER: docker
       STORAGE_PATH: /data/images
       REPOSITORY_URL: http://repository:8081/
+      KEYCLOAK_ADMIN: *KEYCLOAK_ADMIN
+      KEYCLOAK_ADMIN_PASSWORD: *KEYCLOAK_ADMIN_PASSWORD
     networks:
       host_network:
         ipv4_address: 172.16.238.11

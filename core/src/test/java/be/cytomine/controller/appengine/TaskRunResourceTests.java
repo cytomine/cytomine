@@ -6,11 +6,8 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,32 +16,31 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.appengine.TaskRun;
+import be.cytomine.dto.appengine.task.TaskRunProvisionedResponse;
 import be.cytomine.repository.appengine.TaskRunRepository;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
-@Transactional
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 public class TaskRunResourceTests {
 
     @Autowired
@@ -56,31 +52,14 @@ public class TaskRunResourceTests {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    private WiremockRepository wiremockRepository;
+
     @Value("${application.appEngine.apiBasePath}")
     private String apiBasePath;
-
-    private static final WireMockServer wireMockServer;
-
-    static {
-        wireMockServer = new WireMockServer(wireMockConfig().dynamicPort());
-        wireMockServer.start();
-        configureFor("localhost", wireMockServer.port());
-    }
-
-    @DynamicPropertySource
-    static void overrideProperties(DynamicPropertyRegistry registry) {
-        registry.add("application.appEngine.apiUrl", () -> "http://localhost:" + wireMockServer.port());
-    }
-
-    @AfterAll
-    public static void afterAll() {
-        wireMockServer.stop();
-    }
-
-    @BeforeEach
-    public void beforeEach() {
-        wireMockServer.resetMappings();
-    }
 
     @Test
     @Transactional
@@ -110,7 +89,7 @@ public class TaskRunResourceTests {
         );
         String mockResponse = objectMapper.writeValueAsString(mockResponseMap);
 
-        wireMockServer.stubFor(WireMock.post(urlEqualTo(apiBasePath + "tasks/" + taskId + "/runs"))
+        WiremockRepository.SERVER.stubFor(WireMock.post(urlEqualTo(apiBasePath + "tasks/" + taskId + "/runs"))
             .willReturn(aResponse().withBody(mockResponse).withHeader("Content-Type", "application/json"))
         );
 
@@ -126,7 +105,7 @@ public class TaskRunResourceTests {
 
         mockResponse = objectMapper.writeValueAsString(List.of(mockResponseMap));
 
-        wireMockServer.stubFor(WireMock.get(urlEqualTo(apiBasePath + "tasks/" + taskId + "/outputs"))
+        WiremockRepository.SERVER.stubFor(WireMock.get(urlEqualTo(apiBasePath + "tasks/" + taskId + "/outputs"))
             .willReturn(aResponse().withBody(mockResponse).withHeader("Content-Type", "application/json"))
         );
 
@@ -156,7 +135,7 @@ public class TaskRunResourceTests {
             + taskRunId
             + "\"}";
         String appEngineUriSection = "task-runs/" + taskRunId + "/input-provisions/" + parameterName;
-        wireMockServer.stubFor(WireMock.put(urlEqualTo(apiBasePath + appEngineUriSection))
+        WiremockRepository.SERVER.stubFor(WireMock.put(urlEqualTo(apiBasePath + appEngineUriSection))
             .willReturn(aResponse().withBody(mockResponse))
         );
 
@@ -176,33 +155,31 @@ public class TaskRunResourceTests {
         taskRunRepository.saveAndFlush(taskRun);
         UUID taskRunId = taskRun.getTaskRunId();
 
-        String parameterName = "my_param";
-        /*
-         * The queryBody should be an array but it appears that the mock mvc class does not support haveing
-         * an array at the root of the json string. Because object is just forwarded to the App Engine
-         * and we mock the response to be what it should be, I will just pass a single object here to avoid the
-         * error and it should have no consequence unless we start sniffing the json object in the core endpoint
-         * for provisioning.
-         **/
-        String queryBody = "[{\"value\": 0, \"parameterName\": \""
-            + parameterName
-            + "\", \"type\": { \"id\" : \"integer\"}}]";
-        String mockResponse = "[{\"value\": 0, \"parameterName\": \""
-            + parameterName
-            + "\", \"taskRunId\": \""
-            + taskRunId
-            + "\"}]";
-        String appEngineUriSection = "task-runs/" + taskRunId + "/input-provisions";
-        wireMockServer.stubFor(WireMock.put(urlEqualTo(apiBasePath + appEngineUriSection))
-            .willReturn(aResponse().withStatus(200).withBody(mockResponse)));
+        List<TaskRunProvisionedResponse> mockResponses = List.of(
+            new TaskRunProvisionedResponse("first-parameter", taskRun.getTaskRunId(), 0),
+            new TaskRunProvisionedResponse("second-parameter", taskRun.getTaskRunId(), 2)
+        );
 
-        mockMvc.perform(put("/api/app-engine/project/" + taskRun.getProject().getId() + "/" + appEngineUriSection)
+        List<Map<String, Object>> queryBody = mockResponses.stream()
+            .map(r -> Map.of(
+                "parameterName", r.parameterName(),
+                "value", r.value(),
+                "type", Map.of("id", "integer")
+            ))
+            .toList();
+
+        mockResponses.forEach(wiremockRepository::stubProvisionParameter);
+
+        String uri = UriComponentsBuilder.fromPath("/api/app-engine/project/")
+            .pathSegment(taskRun.getProject().getId().toString(), "task-runs", taskRunId.toString(), "input-provisions")
+            .toUriString();
+
+        mockMvc.perform(put(uri)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(queryBody))
+                .content(objectMapper.writeValueAsString(queryBody)))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("[0].taskRunId").value(taskRunId.toString()))
-            .andExpect(jsonPath("[0].parameterName").value(parameterName))
-            .andExpect(jsonPath("[0].value").value(0));
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(content().json(objectMapper.writeValueAsString(mockResponses)));
     }
 
     @Test
@@ -213,7 +190,7 @@ public class TaskRunResourceTests {
         UUID taskRunId = taskRun.getTaskRunId();
         String mockResponse = getTaskRunBody(taskRunId);
         String appEngineUriSection = "task-runs/" + taskRunId;
-        wireMockServer.stubFor(WireMock.get(urlEqualTo(apiBasePath + appEngineUriSection))
+        WiremockRepository.SERVER.stubFor(WireMock.get(urlEqualTo(apiBasePath + appEngineUriSection))
             .willReturn(aResponse().withBody(mockResponse))
         );
 
@@ -234,7 +211,7 @@ public class TaskRunResourceTests {
         String queryBody = "{\"desired\": \"running\"}";
         String mockResponse = getTaskRunBody(taskRunId);
         String appEngineUriSection = "task-runs/" + taskRunId + "/state-actions";
-        wireMockServer.stubFor(WireMock.post(urlEqualTo(apiBasePath + appEngineUriSection))
+        WiremockRepository.SERVER.stubFor(WireMock.post(urlEqualTo(apiBasePath + appEngineUriSection))
             .willReturn(aResponse().withBody(mockResponse))
         );
 
@@ -248,8 +225,6 @@ public class TaskRunResourceTests {
     }
 
     protected String getTaskRunBody(UUID taskRunId) {
-        ObjectMapper objectMapper = new ObjectMapper();
-
         Map<String, Object> task = Map.of(
             "name", "string",
             "namespace", "string",

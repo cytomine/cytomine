@@ -7,13 +7,16 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.DynamicPropertyRegistrar;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import be.cytomine.TermMapper;
 import be.cytomine.domain.ontology.Term;
+import be.cytomine.dto.appengine.task.TaskRunProvisionedResponse;
 
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
 import static be.cytomine.service.search.RetrievalService.CBIR_API_BASE_PATH;
@@ -38,6 +41,9 @@ public class WiremockRepository {
     private ObjectMapper objectMapper;
     @Autowired
     private TermMapper termMapper;
+
+    @Value("${application.appEngine.apiBasePath}")
+    private String apiBasePath;
 
     public static void setupStubs() {
         SERVER.stubFor(WireMock.post(urlPathMatching(IMS_API_BASE_PATH + "/image/.*/annotation/drawing"))
@@ -90,6 +96,21 @@ public class WiremockRepository {
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
                 .withBody(objectMapper.writeValueAsString(termMapper.map(term)))
+            )
+        );
+    }
+
+    @SneakyThrows
+    public void stubProvisionParameter(TaskRunProvisionedResponse response) {
+        String urlPath = UriComponentsBuilder.fromPath(apiBasePath)
+            .pathSegment("task-runs", response.taskRunId().toString(), "input-provisions", response.parameterName())
+            .toUriString();
+
+        SERVER.stubFor(WireMock.put(urlPathEqualTo(urlPath))
+            .willReturn(aResponse()
+                .withStatus(HttpStatus.OK.value())
+                .withHeader("Content-Type", "application/json")
+                .withBody(objectMapper.writeValueAsString(response))
             )
         );
     }

@@ -244,7 +244,8 @@ public class TaskRunService {
         return provisions.stream()
             .map(provision -> {
                 try {
-                    String json = provisionTaskRun(provision, projectId, taskRunId, provision.get("parameterName").asText());
+                    String parameterName = provision.get("parameterName").asText();
+                    String json = provisionTaskRun(provision, projectId, taskRunId, parameterName);
                     return objectMapper.readTree(json);
                 } catch (JsonProcessingException e) {
                     throw new RuntimeException(e);

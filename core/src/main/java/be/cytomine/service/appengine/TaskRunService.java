@@ -496,15 +496,11 @@ public class TaskRunService {
         return appEngineService.put(uri, provision, MediaType.APPLICATION_JSON);
     }
 
-    private String provisionCollectionItem(
-        String arrayTypeUri, int i,
-        MultiValueMap<String, Object> body
-    ) {
+    private String provisionCollectionItem(String arrayTypeUri, int i, MultiValueMap<String, Object> body) {
         Map<String, String> params = new HashMap<>();
         params.put("value", String.valueOf(i));
 
         return appEngineService.postWithParams(arrayTypeUri, body, MediaType.MULTIPART_FORM_DATA, params);
-
     }
 
     public File downloadFile(URI uri, File destinationFile) {

@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,16 +46,17 @@ import be.cytomine.service.project.ProjectRepresentativeUserService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.report.ReportService;
 import be.cytomine.service.search.UserSearchExtension;
+import be.cytomine.service.security.AccountService;
 import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.service.security.UserService;
 import be.cytomine.utils.JsonObject;
 
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api")
 @Slf4j
-@RequiredArgsConstructor
 public class RestUserController extends RestCytomineController {
 
     private final UserService userService;
@@ -75,6 +78,8 @@ public class RestUserController extends RestCytomineController {
     private final StorageService storageService;
 
     private final ReportService reportService;
+
+    private final AccountService accountService;
 
     @GetMapping("/project/{id}/admin.json")
     public ResponseEntity<String> showAdminByProject(
@@ -241,26 +246,24 @@ public class RestUserController extends RestCytomineController {
         return responseSuccess(currentUserService.getCurrentUser());
     }
 
-    //TODO IAM: refactor so that only ADMIN role can create IAM ACCOUNT
-    //    @PostMapping("/user.json")
-    //    public ResponseEntity<String> createUser(@RequestBody String json) {
-    //        log.debug("REST request to save User : " + json);
-    //        return add(userService, json);
-    //    }
+    @PostMapping("/user.json")
+    public ResponseEntity<String> createUser(@RequestBody String json) {
+        log.debug("REST request to save User : " + json);
+        return add(userService, json);
+    }
 
-    //TODO IAM: refactor so that only ADMIN role can modify IAM ACCOUNT
-    //    @PutMapping("/user/{id}.json")
-    //    public ResponseEntity<String> updateUser(@PathVariable String id, @RequestBody JsonObject json) {
-    //        log.debug("REST request to update User : {}", id);
-    //        return update(userService, json);
-    //    }
+    @PutMapping("/user/{id}.json")
+    public ResponseEntity<String> updateUser(@PathVariable String id, @RequestBody JsonObject json) {
+        log.debug("REST request to update User : {}", id);
+        return update(userService, json);
+    }
 
     //TODO IAM: refactor so that only ADMIN role can delete IAM ACCOUNT
-    //    @DeleteMapping("/user/{id}.json")
-    //    public ResponseEntity<String> deleteUser(@PathVariable String id) {
-    //        log.debug("REST request to delete User: {}", id);
-    //        return delete(userService, JsonObject.of("id", Long.parseLong(id)), null);
-    //    }
+    @DeleteMapping("/user/{id}.json")
+    public ResponseEntity<String> deleteUser(@PathVariable String id) {
+        log.debug("REST request to delete User: {}", id);
+        return delete(userService, JsonObject.of("id", Long.parseLong(id)), null);
+    }
 
 
     @GetMapping("/project/{id}/user.json")

@@ -42,6 +42,7 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testImplementation 'org.seleniumhq.selenium:selenium-java'
     implementation 'org.seleniumhq.selenium:selenium-java'
+    implementation group: 'org.keycloak', name: 'keycloak-admin-client', version: '24.0.2'
 }
 
 tasks.named('test') {

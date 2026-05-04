@@ -5,3 +5,5 @@ cytomine:
     password: ${CYTOMINE_ADMIN_PASSWORD}
 selenium:
   url: ${SELENIUM_URL:}
+keycloak-client:
+  url: ${IAM_URL:http://iam:8100}/iam

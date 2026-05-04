@@ -90,29 +90,31 @@ public class TaskRunController {
     }
 
     @PutMapping(
-        value = "/project/{project}/task-runs/{task}/input-provisions/{parameter_name}",
+        value = "/project/{projectId}/task-runs/{taskRunId}/input-provisions/{parameterName}",
         consumes = MediaType.APPLICATION_JSON_VALUE
     )
     public String provision(
-        @PathVariable Long project,
-        @PathVariable UUID task,
-        @PathVariable("parameter_name") String parameterName,
+        @PathVariable Long projectId,
+        @PathVariable UUID taskRunId,
+        @PathVariable String parameterName,
         @RequestBody JsonNode json
     ) throws JsonProcessingException {
-        return taskRunService.provisionTaskRun(json, project, task, parameterName);
+        log.info("PUT JSON /project/{}/task-runs/{}/input-provisions/{}", projectId, taskRunId, parameterName);
+        return taskRunService.provisionTaskRun(json, projectId, taskRunId, parameterName);
     }
 
     @PutMapping(
-        value = "/project/{project}/task-runs/{task}/input-provisions/{parameter_name}",
+        value = "/project/{projectId}/task-runs/{taskRunId}/input-provisions/{parameterName}",
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     public String provision(
-        @PathVariable Long project,
-        @PathVariable UUID task,
-        @PathVariable("parameter_name") String parameterName,
+        @PathVariable Long projectId,
+        @PathVariable UUID taskRunId,
+        @PathVariable String parameterName,
         @RequestParam MultipartFile file
     ) {
-        return taskRunService.provisionBinaryData(file, project, task, parameterName);
+        log.info("PUT DATA /project/{}/task-runs/{}/input-provisions/{}", projectId, taskRunId, parameterName);
+        return taskRunService.provisionBinaryData(file, projectId, taskRunId, parameterName);
     }
 
     @PostMapping("/project/{project}/task-runs/{task}/state-actions")

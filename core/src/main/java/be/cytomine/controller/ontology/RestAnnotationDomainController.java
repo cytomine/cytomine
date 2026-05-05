@@ -161,9 +161,10 @@ public class RestAnnotationDomainController extends RestCytomineController {
             addAnnotationFeature(features, annotation, geoJsonWriter, wktReader);
         }
 
-        Map<String, Object> geoJson = new HashMap<>();
-        geoJson.put("type", "FeatureCollection");
-        geoJson.put("features", features);
+        Map<String, Object> geoJson = Map.of(
+            "type", "FeatureCollection",
+            "features", features
+        );
 
         return ResponseEntity.ok()
             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
@@ -183,7 +184,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
 
         String wkt = location.toString();
         try {
-            org.locationtech.jts.geom.Geometry geometry = wktReader.read(wkt);
+            Geometry geometry = wktReader.read(wkt);
             geometry.setSRID(0);
             Map<String, Object> geometryJson = JsonObject.toMap(geoJsonWriter.write(geometry));
 

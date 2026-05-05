@@ -1,6 +1,5 @@
 package be.cytomine.controller.ontology;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -8,7 +7,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
@@ -1028,22 +1026,39 @@ public class AnnotationDomainResourceTests {
         );
     }
 
-    @Test
-    public void downloadUserAnnotationReportsForAllUsers() throws Exception {
-        MvcResult mvcResult = performDownload(ReportType.CSV, "", false)
-            .andExpect(status().isOk())
-            .andReturn();
-        Object[] users = getUsersFromResult(mvcResult).stream().distinct().toArray();
-        assertThat(users.length).isEqualTo(2);
+    private List<String> getUsersFromCsv(String csvContent) {
+        return Arrays.stream(csvContent.split("\n"))
+            .skip(1) // skip header row
+            .map(row -> row.split(";")[7])
+            .toList();
     }
 
     @Test
-    public void downloadUserAnnotationReportsForSpecificUser() throws Exception {
-        MvcResult mvcResult = performDownload(ReportType.CSV, this.randomUser.getId().toString(), false)
+    public void shouldReturnCsvWithAnnotationsForAllUsers() throws Exception {
+        String csvContent = performDownload(ReportType.CSV, "", false)
             .andExpect(status().isOk())
-            .andReturn();
-        Object[] users = getUsersFromResult(mvcResult).stream().distinct().toArray();
-        assertThat(users.length).isEqualTo(1);
+            .andExpect(content().contentType(MediaType.parseMediaType("text/csv")))
+            .andReturn()
+            .getResponse()
+            .getContentAsString(StandardCharsets.UTF_8);
+
+        List<String> distinctUsers = getUsersFromCsv(csvContent).stream().distinct().toList();
+        assertThat(distinctUsers).hasSize(2);
+        assertThat(distinctUsers).containsExactlyInAnyOrder(me.getUsername(), randomUser.getUsername());
+    }
+
+    @Test
+    public void shouldReturnCsvWithAnnotationsOnlyForRequestedUser() throws Exception {
+        String csvContent = performDownload(ReportType.CSV, randomUser.getId().toString(), false)
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.parseMediaType("text/csv")))
+            .andReturn()
+            .getResponse()
+            .getContentAsString(StandardCharsets.UTF_8);
+
+        List<String> users = getUsersFromCsv(csvContent).stream().distinct().toList();
+        assertThat(users).hasSize(1);
+        assertThat(users.getFirst()).isEqualTo(randomUser.getUsername());
     }
 
     @Test
@@ -1108,11 +1123,6 @@ public class AnnotationDomainResourceTests {
         assertThat(new String(responseBody, 0, 4)).isEqualTo("%PDF");
     }
 
-    private List<String> getUsersFromResult(MvcResult mvcResult) throws UnsupportedEncodingException {
-        String[] rows = mvcResult.getResponse().getContentAsString().split("\n");
-        return Arrays.stream(rows).skip(1).map(x -> x.split(";")[7])
-            .collect(Collectors.toList());
-    }
 
     @Disabled("Randomly fail with ProxyExchange, need to find a solution")
     @Test

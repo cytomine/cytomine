@@ -1047,12 +1047,16 @@ public class AnnotationDomainResourceTests {
     }
 
     @Test
-    public void downloadReviewedAnnotation() throws Exception {
-        MvcResult mvcResult = performDownload(ReportType.CSV, this.randomUser.getId().toString(), true)
+    public void shouldReturnCsvWithOnlyReviewedAnnotations() throws Exception {
+        String csvContent = performDownload(ReportType.CSV, randomUser.getId().toString(), true)
             .andExpect(status().isOk())
-            .andReturn();
-        String[] rows = mvcResult.getResponse().getContentAsString().split("\n");
-        assertThat(rows.length).isEqualTo(2);
+            .andExpect(content().contentType(MediaType.parseMediaType("text/csv")))
+            .andReturn()
+            .getResponse()
+            .getContentAsString(StandardCharsets.UTF_8);
+
+        String[] rows = csvContent.split("\n");
+        assertThat(rows).hasSize(2); // 1 header row + 1 data row
     }
 
     @Test

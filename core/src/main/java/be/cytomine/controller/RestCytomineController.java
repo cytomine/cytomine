@@ -537,20 +537,6 @@ public abstract class RestCytomineController {
         }
     }
 
-    protected ResponseEntity<byte[]> buildFileResponse(String filename, byte[] content, ReportType reportType) {
-        MediaType mediaType = switch (reportType) {
-            case PDF -> MediaType.APPLICATION_PDF;
-            case CSV -> MediaType.parseMediaType("text/csv");
-            case EXCEL -> MediaType.APPLICATION_OCTET_STREAM;
-        };
-
-        return ResponseEntity.ok()
-            .contentType(mediaType)
-            .contentLength(content.length)
-            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
-            .body(content);
-    }
-
     protected void responseReportFile(String name, byte[] array, String format) throws IOException {
         response.setStatus(200);
         switch (format) {

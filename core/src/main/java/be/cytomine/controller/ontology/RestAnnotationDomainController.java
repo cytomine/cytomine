@@ -127,40 +127,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
         return responseSuccess(annotations, params.getJSONAttrLong("offset", 0L), params.getJSONAttrLong("max", 0L));
     }
 
-    @PostMapping("/project/{projectId}/annotation/download")
-    public ResponseEntity<byte[]> download(@PathVariable Long projectId, @RequestBody AnnotationReportParams params)
-        throws IOException {
-        ReportType reportType = ReportType.fromLabel(
-            (params.format() == null || params.format().isBlank()) ? "pdf" : params.format()
-        );
 
-        String users = JsonNodeUtils.csvFromStringList(params.users());
-        String reviewUsers = JsonNodeUtils.csvFromStringList(params.reviewUsers());
-        String terms = JsonNodeUtils.csvFromStringList(params.terms());
-        String images = JsonNodeUtils.csvFromStringList(params.images());
-        Long beforeThan = params.beforeThan();
-        Long afterThan = params.afterThan();
-
-        Project project = projectService.find(projectId)
-            .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
-
-        Map<String, Object> bodyMap = new HashMap<>();
-        bodyMap.put("project", projectId);
-        bodyMap.put("format", reportType.getLabel());
-        bodyMap.put("users", users);
-        bodyMap.put("reviewUsers", reviewUsers);
-        bodyMap.put("reviewed", params.reviewed());
-        bodyMap.put("terms", terms);
-        bodyMap.put("images", images);
-        bodyMap.put("beforeThan", beforeThan);
-        bodyMap.put("afterThan", afterThan);
-
-        JsonObject parameters = new JsonObject(bodyMap);
-        byte[] report = annotationReportService.downloadDocumentByProject(parameters, project);
-        String filename = reportService.getAnnotationReportFileName(reportType.getLabel(), project.getName());
-
-        return buildFileResponse(filename, report, reportType);
-    }
 
     @SuppressWarnings("checkstyle:VariableDeclarationUsageDistance")
     @RequestMapping(value = "/annotation/{id}/crop.{format}", method = {RequestMethod.GET, RequestMethod.POST})

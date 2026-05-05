@@ -18,7 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import be.cytomine.domain.CytomineDomain;
@@ -36,6 +38,7 @@ import be.cytomine.service.command.TransactionService;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.OffsetBasedPageRequest;
+import be.cytomine.utils.ReportType;
 import be.cytomine.utils.RequestParams;
 import be.cytomine.utils.Task;
 import be.cytomine.utils.filters.SearchParameterEntry;
@@ -532,6 +535,20 @@ public abstract class RestCytomineController {
             os.write(array, 0, array.length);
             os.flush();
         }
+    }
+
+    protected ResponseEntity<byte[]> buildReportResponse(String filename, byte[] content, ReportType reportType) {
+        MediaType mediaType = switch (reportType) {
+            case PDF -> MediaType.APPLICATION_PDF;
+            case CSV -> MediaType.parseMediaType("text/csv");
+            case EXCEL -> MediaType.APPLICATION_OCTET_STREAM;
+        };
+
+        return ResponseEntity.ok()
+            .contentType(mediaType)
+            .contentLength(content.length)
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+            .body(content);
     }
 
     protected void responseReportFile(String name, byte[] array, String format) throws IOException {

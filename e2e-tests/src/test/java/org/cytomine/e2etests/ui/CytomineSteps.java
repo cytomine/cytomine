@@ -434,4 +434,53 @@ public class CytomineSteps {
 
         throw new RuntimeException("File ending with " + filenameSuffix + " was not found!");
     }
+
+    public void createUser(
+        Wait<WebDriver> wait,
+        URL cytomineUrl,
+        String username,
+        String firstname,
+        String lastname,
+        String email,
+        String password
+    ) {
+        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/admin?tab=users");
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//button[contains(text(), 'New user')]"));
+        webDriverUtils.xpathClick(wait, "//button[contains(text(), 'New user')]");
+        webDriverUtils.byIsDisplayed(wait, By.name("username"));
+        webDriverUtils.bySendKeys(wait, By.name("username"), username);
+        webDriverUtils.bySendKeys(wait, By.name("firstname"), firstname);
+        webDriverUtils.bySendKeys(wait, By.name("lastname"), lastname);
+        webDriverUtils.bySendKeys(wait, By.name("email"), email);
+        webDriverUtils.bySendKeys(wait, By.name("password"), password);
+        webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Save')]");
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'User successfully created')]"));
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//td[normalize-space(text())='" + username + "']"));
+    }
+
+    public void editUser(
+        Wait<WebDriver> wait,
+        URL cytomineUrl,
+        String username,
+        String newFirstname,
+        String newLastname
+    ) {
+        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/admin?tab=users");
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//button[contains(text(), 'New user')]"));
+        webDriverUtils.xpathClick(
+            wait,
+            "//tr[.//td[normalize-space(text())='" + username + "']]//button[contains(text(), 'Edit')]"
+        );
+        webDriverUtils.byIsDisplayed(wait, By.name("firstname"));
+        webDriverUtils.byClear(wait, By.name("firstname"));
+        webDriverUtils.bySendKeys(wait, By.name("firstname"), newFirstname);
+        webDriverUtils.byClear(wait, By.name("lastname"));
+        webDriverUtils.bySendKeys(wait, By.name("lastname"), newLastname);
+        webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Save')]");
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'User successfully updated')]"));
+        webDriverUtils.byIsDisplayed(
+            wait,
+            By.xpath("//td[contains(normalize-space(text()), '" + newFirstname + " " + newLastname + "')]")
+        );
+    }
 }

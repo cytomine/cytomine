@@ -36,7 +36,7 @@ spec:
         {{ end }}
       containers:
         - name: postgres
-          image: "{{ .Values.images.postgresql_app_engine }}"
+          image: "{{ .Values.images.postgresql }}"
           imagePullPolicy: {{ .Values.images.pullPolicy }}
           securityContext:
           {{- include "cytomine.containerSecurityContext" . | nindent 12 }}

@@ -185,6 +185,10 @@ public class ReportService {
         return LocalDateTime.now().format(DATE_TIME_FORMAT) + "_" + projectName + "_annotations." + format;
     }
 
+    public String getAnnotationGeoJsonFilename(String projectName) {
+        return LocalDateTime.now().format(DATE_TIME_FORMAT) + "_" + projectName + "_annotations.geojson";
+    }
+
     public String getUsersReportFileName(String format, Long projectId) {
         return DateUtils.getSimpleFormatLocaleDate(new Date()) + "_users_project" + projectId + "."
             + format;

@@ -109,8 +109,7 @@ jobs:
             --set images.pims_cache=registry.cytomine.org/docker/library/redis:7 \
             --set images.pims_import=registry.cytomine.org/cytomine/python-client:${{ env.DEPLOYMENT_NAME }} \
             --set images.postgis=registry.cytomine.org/docker/postgis/postgis:15-3.5 \
-            --set images.postgresql_app_engine=registry.cytomine.org/docker/library/postgres:14 \
-            --set images.postgresql_iam=registry.cytomine.org/docker/library/postgres:14 \
+            --set images.postgresql=registry.cytomine.org/docker/library/postgres:15 \
             --set images.redis=registry.cytomine.org/docker/library/redis:7 \
             --set images.registry=registry.cytomine.org/docker/library/registry:2.8.3 \
             --set images.repository=registry.cytomine.org/cytomine/repository:${{ env.DEPLOYMENT_NAME }} \

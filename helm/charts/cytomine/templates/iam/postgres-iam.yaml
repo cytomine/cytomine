@@ -36,7 +36,7 @@ spec:
         {{ end }}
       containers:
         - name: postgres
-          image: "{{ .Values.images.postgresql_iam }}"
+          image: "{{ .Values.images.postgresql }}"
           imagePullPolicy: {{ .Values.images.pullPolicy }}
           volumeMounts:
             - name: postgres-iam-storage

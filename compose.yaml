@@ -1,4 +1,7 @@
 ---
+x-postgres-image: &postgres-image postgres:15
+x-redis-image: &redis-image redis:7.2
+
 x-version-env: &version-env
   VERSIONS_CYTOMINE_COMMERCIAL: 2025.1
 
@@ -47,7 +50,7 @@ services:
         ipv4_address: 172.16.238.4
 
   redis:
-    image: redis:7.2
+    image: *redis-image
     command: --port 6380
     restart: unless-stopped
     volumes:
@@ -57,7 +60,7 @@ services:
         ipv4_address: 172.16.238.5
 
   pims-cache:
-    image: redis:7.2
+    image: *redis-image
     restart: unless-stopped
     networks:
       host_network:
@@ -118,7 +121,7 @@ services:
         ipv4_address: 172.16.238.8
 
   iam-db:
-    image: postgres:14
+    image: *postgres-image
     restart: unless-stopped
     volumes:
       - iam-db-data:/var/lib/postgresql/data
@@ -166,7 +169,7 @@ services:
         ipv4_address: 172.16.238.9
 
   app-engine-db:
-    image: postgres:14
+    image: *postgres-image
     restart: unless-stopped
     ports:
       - 5433:5432

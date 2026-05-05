@@ -127,7 +127,8 @@ public class RestAnnotationDomainController extends RestCytomineController {
     }
 
     @PostMapping("/project/{projectId}/annotation/download")
-    public void download(@PathVariable Long projectId, @RequestBody AnnotationReportParams params) throws IOException {
+    public ResponseEntity<byte[]> download(@PathVariable Long projectId, @RequestBody AnnotationReportParams params)
+        throws IOException {
         String users = JsonNodeUtils.csvFromStringList(params.users());
         String reviewUsers = JsonNodeUtils.csvFromStringList(params.reviewUsers());
         String format = (params.format() == null || params.format().isBlank()) ? "pdf" : params.format();
@@ -150,9 +151,11 @@ public class RestAnnotationDomainController extends RestCytomineController {
         bodyMap.put("beforeThan", beforeThan);
         bodyMap.put("afterThan", afterThan);
 
-        JsonObject body = new JsonObject(bodyMap);
-        byte[] report = annotationReportService.downloadDocumentByProject(body, project);
-        responseReportFile(reportService.getAnnotationReportFileName(format, project.getName()), report, format);
+        JsonObject parameters = new JsonObject(bodyMap);
+        byte[] report = annotationReportService.downloadDocumentByProject(parameters, project);
+        String filename = reportService.getAnnotationReportFileName(format, project.getName());
+
+        return buildFileResponse(filename, report, format);
     }
 
     @SuppressWarnings("checkstyle:VariableDeclarationUsageDistance")

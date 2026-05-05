@@ -18,7 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import be.cytomine.domain.CytomineDomain;
@@ -532,6 +534,21 @@ public abstract class RestCytomineController {
             os.write(array, 0, array.length);
             os.flush();
         }
+    }
+
+    protected ResponseEntity<byte[]> buildFileResponse(String filename, byte[] content, String format) {
+        MediaType mediaType = switch (format) {
+            case "pdf" -> MediaType.APPLICATION_PDF;
+            case "csv" -> MediaType.parseMediaType("text/csv");
+            case "xls" -> MediaType.APPLICATION_OCTET_STREAM;
+            default -> throw new RuntimeException("Unsupported format: " + format);
+        };
+
+        return ResponseEntity.ok()
+            .contentType(mediaType)
+            .contentLength(content.length)
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+            .body(content);
     }
 
     protected void responseReportFile(String name, byte[] array, String format) throws IOException {

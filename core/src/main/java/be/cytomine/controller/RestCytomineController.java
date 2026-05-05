@@ -537,7 +537,7 @@ public abstract class RestCytomineController {
         }
     }
 
-    protected ResponseEntity<byte[]> buildFileResponse(String filename, byte[] content, ReportType reportType) {
+    protected ResponseEntity<byte[]> buildReportResponse(String filename, byte[] content, ReportType reportType) {
         MediaType mediaType = switch (reportType) {
             case PDF -> MediaType.APPLICATION_PDF;
             case CSV -> MediaType.parseMediaType("text/csv");

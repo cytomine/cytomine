@@ -159,7 +159,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
         byte[] report = annotationReportService.downloadDocumentByProject(parameters, project);
         String filename = reportService.getAnnotationReportFileName(reportType.getLabel(), project.getName());
 
-        return buildFileResponse(filename, report, reportType);
+        return buildReportResponse(filename, report, reportType);
     }
 
     @SuppressWarnings("checkstyle:VariableDeclarationUsageDistance")

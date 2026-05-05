@@ -252,6 +252,8 @@ services:
       POSTGIS_USER: docker
       STORAGE_PATH: /data/images
       REPOSITORY_URL: http://repository:8081/
+      MEILISEARCH_URL: http://meilisearch:7700
+      MEILISEARCH_KEY: masterKey
     networks:
       host_network:
         ipv4_address: 172.16.238.11
@@ -302,6 +304,19 @@ services:
       host_network:
         ipv4_address: 172.16.238.18
 
+  meilisearch:
+    image: getmeili/meilisearch:v1.43.0
+    restart: unless-stopped
+    ports:
+      - 7700:7700
+    volumes:
+      - meilisearch-data:/meili_data
+    environment:
+      MEILI_MASTER_KEY: masterKey
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.19
+
   # https://github.com/k3s-io/k3s/blob/3854eb56d4b8a183a1f8261aebd372111378a00f/docker-compose.yml
   k3s:
     image: rancher/k3s:v1.30.14-rc3-k3s3
@@ -347,6 +362,7 @@ volumes:
   app-engine-shared-inputs: {}
   app-engine-shared-datasets: {}
   cbir-data: {}
+  meilisearch-data: {}
 
 networks:
   host_network:

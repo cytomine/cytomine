@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 public enum ReportType {
     PDF("pdf"),
     CSV("csv"),
-    Excel("xls");
+    EXCEL("xls");
 
     private final String label;
 

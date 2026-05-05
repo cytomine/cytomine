@@ -541,7 +541,7 @@ public abstract class RestCytomineController {
         MediaType mediaType = switch (reportType) {
             case PDF -> MediaType.APPLICATION_PDF;
             case CSV -> MediaType.parseMediaType("text/csv");
-            case Excel -> MediaType.APPLICATION_OCTET_STREAM;
+            case EXCEL -> MediaType.APPLICATION_OCTET_STREAM;
         };
 
         return ResponseEntity.ok()

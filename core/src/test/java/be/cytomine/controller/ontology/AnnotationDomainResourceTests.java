@@ -1065,7 +1065,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     public void shouldReturnXlsFileWithCorrectContentType() throws Exception {
-        byte[] responseBody = performDownload(ReportType.Excel, me.getId().toString(), false)
+        byte[] responseBody = performDownload(ReportType.EXCEL, me.getId().toString(), false)
             .andExpect(status().isOk())
             .andExpect(header().string("Content-Disposition", containsString("attachment; filename=")))
             .andExpect(content().contentType(MediaType.APPLICATION_OCTET_STREAM))

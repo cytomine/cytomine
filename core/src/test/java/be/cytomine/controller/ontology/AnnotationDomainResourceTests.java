@@ -1009,30 +1009,6 @@ public class AnnotationDomainResourceTests {
         }
     }
 
-    private ResultActions performDownload(ReportType reportType, String users, boolean reviewed) throws Exception {
-        Map<String, Object> jsonBody = new LinkedHashMap<>();
-        jsonBody.put("format", reportType.getLabel());
-        jsonBody.put("users", List.of(users));
-        jsonBody.put("reviewed", reviewed);
-        jsonBody.put("terms", List.of(term.getId().toString()));
-        jsonBody.put("images", List.of(image.getId().toString()));
-
-        return restAnnotationDomainControllerMockMvc.perform(post(
-                "/api/project/{project}/annotation/download",
-                project.getId()
-            )
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(jsonBody))
-        );
-    }
-
-    private List<String> getUsersFromCsv(String csvContent) {
-        return Arrays.stream(csvContent.split("\n"))
-            .skip(1) // skip header row
-            .map(row -> row.split(";")[7])
-            .toList();
-    }
-
     @Test
     public void shouldReturnCsvWithAnnotationsForAllUsers() throws Exception {
         String csvContent = performDownload(ReportType.CSV, "", false)
@@ -1123,6 +1099,29 @@ public class AnnotationDomainResourceTests {
         assertThat(new String(responseBody, 0, 4)).isEqualTo("%PDF");
     }
 
+    private ResultActions performDownload(ReportType reportType, String users, boolean reviewed) throws Exception {
+        Map<String, Object> jsonBody = new LinkedHashMap<>();
+        jsonBody.put("format", reportType.getLabel());
+        jsonBody.put("users", List.of(users));
+        jsonBody.put("reviewed", reviewed);
+        jsonBody.put("terms", List.of(term.getId().toString()));
+        jsonBody.put("images", List.of(image.getId().toString()));
+
+        return restAnnotationDomainControllerMockMvc.perform(post(
+                "/api/project/{project}/annotation/download",
+                project.getId()
+            )
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(jsonBody))
+        );
+    }
+
+    private List<String> getUsersFromCsv(String csvContent) {
+        return Arrays.stream(csvContent.split("\n"))
+            .skip(1) // skip header row
+            .map(row -> row.split(";")[7])
+            .toList();
+    }
 
     @Disabled("Randomly fail with ProxyExchange, need to find a solution")
     @Test

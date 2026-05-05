@@ -54,6 +54,7 @@ import be.cytomine.domain.security.User;
 import be.cytomine.repository.ontology.AnnotationDomainRepository;
 import be.cytomine.repository.ontology.UserAnnotationRepository;
 import be.cytomine.utils.JsonObject;
+import be.cytomine.utils.ReportType;
 
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
 import static be.cytomine.service.search.RetrievalService.CBIR_API_BASE_PATH;
@@ -64,10 +65,12 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -95,6 +98,15 @@ public class AnnotationDomainResourceTests {
     @Autowired
     private AnnotationDomainRepository annotationDomainRepository;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    private WireMockServer wireMockServer;
+
+    @Autowired
+    private WiremockRepository wiremockRepository;
+
     Project project;
     ImageInstance image;
     SliceInstance slice;
@@ -112,12 +124,6 @@ public class AnnotationDomainResourceTests {
     ReviewedAnnotation r4;
     ReviewedAnnotation r5;
     ReviewedAnnotation r6;
-
-    @Autowired
-    private WireMockServer wireMockServer;
-
-    @Autowired
-    private WiremockRepository wiremockRepository;
 
     void createAnnotationSet() throws ParseException {
         project = builder.givenAProject();
@@ -1011,7 +1017,7 @@ public class AnnotationDomainResourceTests {
     @Test
     @Transactional
     public void downloadUserAnnotationReportsForAllUsers() throws Exception {
-        MvcResult mvcResult = performDownload("csv", "", false)
+        MvcResult mvcResult = performDownload(ReportType.CSV, "", false)
             .andExpect(status().isOk())
             .andReturn();
         Object[] users = getUsersFromResult(mvcResult).stream().distinct().toArray();
@@ -1021,7 +1027,7 @@ public class AnnotationDomainResourceTests {
     @Test
     @Transactional
     public void downloadUserAnnotationReportsForSpecificUser() throws Exception {
-        MvcResult mvcResult = performDownload("csv", this.randomUser.getId().toString(), false)
+        MvcResult mvcResult = performDownload(ReportType.CSV, this.randomUser.getId().toString(), false)
             .andExpect(status().isOk())
             .andReturn();
         Object[] users = getUsersFromResult(mvcResult).stream().distinct().toArray();
@@ -1031,7 +1037,7 @@ public class AnnotationDomainResourceTests {
     @Test
     @Transactional
     public void downloadReviewedAnnotation() throws Exception {
-        MvcResult mvcResult = performDownload("csv", this.randomUser.getId().toString(), true)
+        MvcResult mvcResult = performDownload(ReportType.CSV, this.randomUser.getId().toString(), true)
             .andExpect(status().isOk())
             .andReturn();
         String[] rows = mvcResult.getResponse().getContentAsString().split("\n");
@@ -1041,7 +1047,7 @@ public class AnnotationDomainResourceTests {
     @Test
     @Transactional
     public void downloadCsvReports() throws Exception {
-        performDownload("csv", "", false)
+        performDownload(ReportType.CSV, "", false)
             .andExpect(status().isOk())
             .andExpect(header().string("Content-Type", "text/csv"))
             .andReturn();
@@ -1050,27 +1056,30 @@ public class AnnotationDomainResourceTests {
     @Test
     @Transactional
     public void downloadXlsReports() throws Exception {
-        performDownload("xls", this.me.getId().toString(), false)
+        performDownload(ReportType.Excel, this.me.getId().toString(), false)
             .andExpect(status().isOk())
             .andExpect(header().string("Content-Type", "application/octet-stream"))
             .andReturn();
     }
 
     @Test
-    @Transactional
-    @Disabled("This test does not work, the returned entity is a 500, but expectOK() ignores that")
-    public void downloadPdfReports() throws Exception {
-        performDownload("pdf", this.me.getId().toString(), false)
+    public void shouldReturnPdfFileWithCorrectContentType() throws Exception {
+        byte[] responseBody = performDownload(ReportType.PDF, this.me.getId().toString(), false)
             .andExpect(status().isOk())
-            .andExpect(header().string("Content-Type", "application/pdf"))
-            .andReturn();
+            .andExpect(header().string("Content-Disposition", containsString("attachment; filename=")))
+            .andExpect(content().contentType(MediaType.APPLICATION_PDF))
+            .andReturn()
+            .getResponse()
+            .getContentAsByteArray();
+        String signature = new String(responseBody, 0, 4);
+
+        assertThat(responseBody).isNotEmpty();
+        assertThat(signature).isEqualTo("%PDF");
     }
 
-    private ResultActions performDownload(String format, String users, boolean reviewed) throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
-
+    private ResultActions performDownload(ReportType reportType, String users, boolean reviewed) throws Exception {
         Map<String, Object> jsonBody = new LinkedHashMap<>();
-        jsonBody.put("format", format);
+        jsonBody.put("format", reportType.getLabel());
         jsonBody.put("users", List.of(users));
         jsonBody.put("reviewed", reviewed);
         jsonBody.put("terms", List.of(this.term.getId().toString()));

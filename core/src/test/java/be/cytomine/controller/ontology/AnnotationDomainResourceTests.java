@@ -968,7 +968,6 @@ public class AnnotationDomainResourceTests {
 
     }
 
-
     @Test
     @Transactional
     public void listReviewedAnnotationWithSameRequestAsDefaultViewer() throws Exception {
@@ -996,7 +995,6 @@ public class AnnotationDomainResourceTests {
             .andReturn();
     }
 
-
     private static void checkForProperties(
         String response,
         List<String> expectedProperties,
@@ -1013,9 +1011,24 @@ public class AnnotationDomainResourceTests {
         }
     }
 
+    private ResultActions performDownload(ReportType reportType, String users, boolean reviewed) throws Exception {
+        Map<String, Object> jsonBody = new LinkedHashMap<>();
+        jsonBody.put("format", reportType.getLabel());
+        jsonBody.put("users", List.of(users));
+        jsonBody.put("reviewed", reviewed);
+        jsonBody.put("terms", List.of(term.getId().toString()));
+        jsonBody.put("images", List.of(image.getId().toString()));
+
+        return restAnnotationDomainControllerMockMvc.perform(post(
+                "/api/project/{project}/annotation/download",
+                project.getId()
+            )
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(jsonBody))
+        );
+    }
 
     @Test
-    @Transactional
     public void downloadUserAnnotationReportsForAllUsers() throws Exception {
         MvcResult mvcResult = performDownload(ReportType.CSV, "", false)
             .andExpect(status().isOk())
@@ -1025,7 +1038,6 @@ public class AnnotationDomainResourceTests {
     }
 
     @Test
-    @Transactional
     public void downloadUserAnnotationReportsForSpecificUser() throws Exception {
         MvcResult mvcResult = performDownload(ReportType.CSV, this.randomUser.getId().toString(), false)
             .andExpect(status().isOk())
@@ -1035,7 +1047,6 @@ public class AnnotationDomainResourceTests {
     }
 
     @Test
-    @Transactional
     public void downloadReviewedAnnotation() throws Exception {
         MvcResult mvcResult = performDownload(ReportType.CSV, this.randomUser.getId().toString(), true)
             .andExpect(status().isOk())
@@ -1045,7 +1056,6 @@ public class AnnotationDomainResourceTests {
     }
 
     @Test
-    @Transactional
     public void downloadCsvReports() throws Exception {
         performDownload(ReportType.CSV, "", false)
             .andExpect(status().isOk())
@@ -1054,44 +1064,33 @@ public class AnnotationDomainResourceTests {
     }
 
     @Test
-    @Transactional
-    public void downloadXlsReports() throws Exception {
-        performDownload(ReportType.Excel, this.me.getId().toString(), false)
+    public void shouldReturnXlsFileWithCorrectContentType() throws Exception {
+        byte[] responseBody = performDownload(ReportType.Excel, me.getId().toString(), false)
             .andExpect(status().isOk())
-            .andExpect(header().string("Content-Type", "application/octet-stream"))
-            .andReturn();
+            .andExpect(header().string("Content-Disposition", containsString("attachment; filename=")))
+            .andExpect(content().contentType(MediaType.APPLICATION_OCTET_STREAM))
+            .andReturn()
+            .getResponse()
+            .getContentAsByteArray();
+
+        assertThat(responseBody).isNotEmpty();
+        // XLS files start with the OLE2 compound document magic bytes
+        assertThat(responseBody).startsWith((byte) 0xD0, (byte) 0xCF);
     }
 
     @Test
     public void shouldReturnPdfFileWithCorrectContentType() throws Exception {
-        byte[] responseBody = performDownload(ReportType.PDF, this.me.getId().toString(), false)
+        byte[] responseBody = performDownload(ReportType.PDF, me.getId().toString(), false)
             .andExpect(status().isOk())
             .andExpect(header().string("Content-Disposition", containsString("attachment; filename=")))
             .andExpect(content().contentType(MediaType.APPLICATION_PDF))
             .andReturn()
             .getResponse()
             .getContentAsByteArray();
-        String signature = new String(responseBody, 0, 4);
 
         assertThat(responseBody).isNotEmpty();
-        assertThat(signature).isEqualTo("%PDF");
-    }
-
-    private ResultActions performDownload(ReportType reportType, String users, boolean reviewed) throws Exception {
-        Map<String, Object> jsonBody = new LinkedHashMap<>();
-        jsonBody.put("format", reportType.getLabel());
-        jsonBody.put("users", List.of(users));
-        jsonBody.put("reviewed", reviewed);
-        jsonBody.put("terms", List.of(this.term.getId().toString()));
-        jsonBody.put("images", List.of(this.image.getId().toString()));
-
-        return restAnnotationDomainControllerMockMvc.perform(post(
-                "/api/project/{project}/annotation/download",
-                project.getId()
-            )
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(jsonBody))
-        );
+        // PDF files always start with %PDF magic header
+        assertThat(new String(responseBody, 0, 4)).isEqualTo("%PDF");
     }
 
     private List<String> getUsersFromResult(MvcResult mvcResult) throws UnsupportedEncodingException {

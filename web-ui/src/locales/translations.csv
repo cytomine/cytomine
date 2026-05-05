@@ -375,6 +375,7 @@ execute-command,Execute command,Commande d'exécution,Ejecutar comando,Run-comma
 execution-date,Execution date,Date d'exécution,Fecha de ejecución,Executie datum
 execution-duration,Execution duration,Durée de l'exécution,Duración de la ejecución,Uitvoertijd
 execution-log,Execution log,Log d'exécution,Registro de ejecución,Uitvoeringslogboek
+export-annotations,Export annotations,Exporter les annotations,Exportar anotaciones,Annotaties exporteren
 extracting-data,Extracting data,Extraction des données en cours,,Gegevensextractie wordt uitgevoerd
 failed-fetch-annots,Failed to fetch annotations,Une erreur a empêché le chargement des annotations,Error al recuperar anotaciones,Door een fout konden annotaties niet worden geladen
 failed,Failed,Échoué,Fallido,Failed

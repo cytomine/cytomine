@@ -305,6 +305,7 @@
         <button class="button is-link" type="button" @click="download('pdf')">{{$t('download-PDF')}}</button>
         <button class="button is-link" type="button" @click="download('csv')">{{$t('download-CSV')}}</button>
         <button class="button is-link" type="button" @click="download('xls')">{{$t('download-excel')}}</button>
+        <button class="button is-link" type="button" @click="exportAnnotations()">{{$t('export-annotations')}}</button>
       </div>
     </div>
   </div>
@@ -321,7 +322,7 @@ import OntologyTreeMultiselect from '@/components/ontology/OntologyTreeMultisele
 
 import ListAnnotationsBy from './ListAnnotationsBy';
 
-import {ImageInstanceCollection, UserCollection, AnnotationCollection, TrackCollection, TagCollection, ImageInstance, ImageGroupCollection} from '@/api';
+import {Cytomine, ImageInstanceCollection, UserCollection, AnnotationCollection, TrackCollection, TagCollection, ImageInstance, ImageGroupCollection} from '@/api';
 
 import {defaultColors} from '@/utils/style-utils.js';
 import TrackTreeMultiselect from '@/components/track/TrackTreeMultiselect';
@@ -703,6 +704,57 @@ export default {
     },
     download(format) {
       this.collection.download(format);
+    },
+    async exportAnnotations() {
+      try {
+        const response = await Cytomine.instance.api.get(
+          `/project/${this.project.id}/annotations/export`,
+          {responseType: 'blob'}
+        );
+
+        const filename = this.getFilenameFromContentDisposition(response.headers?.['content-disposition']) ||
+          `project-${this.project.id}-annotations.geojson`;
+        this.triggerBlobDownload(response.data, filename);
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    triggerBlobDownload(blob, filename) {
+      const blobUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(blobUrl);
+    },
+    getFilenameFromContentDisposition(contentDisposition) {
+      if (!contentDisposition) {
+        return null;
+      }
+
+      const starMatch = contentDisposition.match(/filename\*\s*=\s*([^;]+)/i);
+      if (starMatch) {
+        const value = starMatch[1].trim();
+        const unquoted = value.replace(/^"(.*)"$/, '$1');
+        const parts = unquoted.split("''");
+        if (parts.length === 2) {
+          try {
+            return decodeURIComponent(parts[1]);
+          } catch {
+            return parts[1];
+          }
+        }
+        return unquoted;
+      }
+
+      const match = contentDisposition.match(/filename\s*=\s*([^;]+)/i);
+      if (!match) {
+        return null;
+      }
+
+      return match[1].trim().replace(/^"(.*)"$/, '$1');
     },
     addTerm(term) {
       this.terms.push(term);

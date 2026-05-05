@@ -66,6 +66,7 @@ import be.cytomine.utils.AnnotationListingBuilder;
 import be.cytomine.utils.GeometryUtils;
 import be.cytomine.utils.JsonNodeUtils;
 import be.cytomine.utils.JsonObject;
+import be.cytomine.utils.ReportType;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -129,9 +130,12 @@ public class RestAnnotationDomainController extends RestCytomineController {
     @PostMapping("/project/{projectId}/annotation/download")
     public ResponseEntity<byte[]> download(@PathVariable Long projectId, @RequestBody AnnotationReportParams params)
         throws IOException {
+        ReportType reportType = ReportType.fromLabel(
+            (params.format() == null || params.format().isBlank()) ? "pdf" : params.format()
+        );
+
         String users = JsonNodeUtils.csvFromStringList(params.users());
         String reviewUsers = JsonNodeUtils.csvFromStringList(params.reviewUsers());
-        String format = (params.format() == null || params.format().isBlank()) ? "pdf" : params.format();
         String terms = JsonNodeUtils.csvFromStringList(params.terms());
         String images = JsonNodeUtils.csvFromStringList(params.images());
         Long beforeThan = params.beforeThan();
@@ -142,7 +146,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
 
         Map<String, Object> bodyMap = new HashMap<>();
         bodyMap.put("project", projectId);
-        bodyMap.put("format", format);
+        bodyMap.put("format", reportType.getLabel());
         bodyMap.put("users", users);
         bodyMap.put("reviewUsers", reviewUsers);
         bodyMap.put("reviewed", params.reviewed());
@@ -153,9 +157,9 @@ public class RestAnnotationDomainController extends RestCytomineController {
 
         JsonObject parameters = new JsonObject(bodyMap);
         byte[] report = annotationReportService.downloadDocumentByProject(parameters, project);
-        String filename = reportService.getAnnotationReportFileName(format, project.getName());
+        String filename = reportService.getAnnotationReportFileName(reportType.getLabel(), project.getName());
 
-        return buildFileResponse(filename, report, format);
+        return buildFileResponse(filename, report, reportType);
     }
 
     @SuppressWarnings("checkstyle:VariableDeclarationUsageDistance")

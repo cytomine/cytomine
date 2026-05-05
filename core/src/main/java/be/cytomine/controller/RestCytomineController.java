@@ -38,6 +38,7 @@ import be.cytomine.service.command.TransactionService;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.OffsetBasedPageRequest;
+import be.cytomine.utils.ReportType;
 import be.cytomine.utils.RequestParams;
 import be.cytomine.utils.Task;
 import be.cytomine.utils.filters.SearchParameterEntry;
@@ -536,12 +537,11 @@ public abstract class RestCytomineController {
         }
     }
 
-    protected ResponseEntity<byte[]> buildFileResponse(String filename, byte[] content, String format) {
-        MediaType mediaType = switch (format) {
-            case "pdf" -> MediaType.APPLICATION_PDF;
-            case "csv" -> MediaType.parseMediaType("text/csv");
-            case "xls" -> MediaType.APPLICATION_OCTET_STREAM;
-            default -> throw new RuntimeException("Unsupported format: " + format);
+    protected ResponseEntity<byte[]> buildFileResponse(String filename, byte[] content, ReportType reportType) {
+        MediaType mediaType = switch (reportType) {
+            case PDF -> MediaType.APPLICATION_PDF;
+            case CSV -> MediaType.parseMediaType("text/csv");
+            case Excel -> MediaType.APPLICATION_OCTET_STREAM;
         };
 
         return ResponseEntity.ok()

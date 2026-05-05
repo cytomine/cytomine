@@ -1,21 +1,6 @@
 package be.cytomine.service.report;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +14,8 @@ import be.cytomine.exceptions.ServerException;
 import be.cytomine.service.utils.ReportFormatService;
 import be.cytomine.utils.DateUtils;
 import be.cytomine.utils.JsonObject;
+
+import static be.cytomine.utils.DateUtils.DATE_TIME_FORMAT;
 
 @Slf4j
 @Service
@@ -192,6 +179,10 @@ public class ReportService {
     public String getAnnotationReportFileName(String format, Long projectId) {
         return DateUtils.getSimpleFormatLocaleDate(new Date()) + "_annotations_project" + projectId
             + "." + format;
+    }
+
+    public String getAnnotationReportFileName(String format, String projectName) {
+        return LocalDateTime.now().format(DATE_TIME_FORMAT) + "_" + projectName + "_annotations." + format;
     }
 
     public String getUsersReportFileName(String format, Long projectId) {

@@ -40,6 +40,7 @@ import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.ontology.AnnotationDomain;
+import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.dto.annotation.AnnotationReportParams;
 import be.cytomine.dto.annotation.SimplifiedAnnotation;
@@ -56,6 +57,7 @@ import be.cytomine.service.middleware.ImageServerService;
 import be.cytomine.service.ontology.GenericAnnotationService;
 import be.cytomine.service.ontology.ReviewedAnnotationService;
 import be.cytomine.service.ontology.UserAnnotationService;
+import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.report.ReportService;
 import be.cytomine.service.security.UserService;
 import be.cytomine.service.utils.ParamsService;
@@ -84,6 +86,8 @@ public class RestAnnotationDomainController extends RestCytomineController {
     private final EntityManager entityManager;
 
     private final ParamsService paramsService;
+
+    private final ProjectService projectService;
 
     private final RestUserAnnotationController restUserAnnotationController;
 
@@ -122,13 +126,8 @@ public class RestAnnotationDomainController extends RestCytomineController {
         return responseSuccess(annotations, params.getJSONAttrLong("offset", 0L), params.getJSONAttrLong("max", 0L));
     }
 
-    @RequestMapping(value = {"/project/{project}/annotation/download"}, method = {RequestMethod.POST})
-    public void download(
-        @PathVariable Long project,
-        @RequestBody AnnotationReportParams params
-    ) throws IOException {
-
-        boolean reviewed = Boolean.TRUE.equals(params.reviewed());
+    @PostMapping("/project/{projectId}/annotation/download")
+    public void download(@PathVariable Long projectId, @RequestBody AnnotationReportParams params) throws IOException {
         String users = JsonNodeUtils.csvFromStringList(params.users());
         String reviewUsers = JsonNodeUtils.csvFromStringList(params.reviewUsers());
         String format = (params.format() == null || params.format().isBlank()) ? "pdf" : params.format();
@@ -137,20 +136,23 @@ public class RestAnnotationDomainController extends RestCytomineController {
         Long beforeThan = params.beforeThan();
         Long afterThan = params.afterThan();
 
+        Project project = projectService.find(projectId)
+            .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
+
         Map<String, Object> bodyMap = new HashMap<>();
-        bodyMap.put("project", project);
+        bodyMap.put("project", projectId);
         bodyMap.put("format", format);
         bodyMap.put("users", users);
         bodyMap.put("reviewUsers", reviewUsers);
-        bodyMap.put("reviewed", reviewed);
+        bodyMap.put("reviewed", params.reviewed());
         bodyMap.put("terms", terms);
         bodyMap.put("images", images);
         bodyMap.put("beforeThan", beforeThan);
         bodyMap.put("afterThan", afterThan);
 
         JsonObject body = new JsonObject(bodyMap);
-        byte[] report = annotationReportService.downloadDocumentByProject(body);
-        responseReportFile(reportService.getAnnotationReportFileName(format, project), report, format);
+        byte[] report = annotationReportService.downloadDocumentByProject(body, project);
+        responseReportFile(reportService.getAnnotationReportFileName(format, project.getName()), report, format);
     }
 
     @SuppressWarnings("checkstyle:VariableDeclarationUsageDistance")

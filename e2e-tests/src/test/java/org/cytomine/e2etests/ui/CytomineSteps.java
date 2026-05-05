@@ -1,15 +1,18 @@
 package org.cytomine.e2etests.ui;
 
+import java.io.File;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
 import lombok.SneakyThrows;
+import org.cytomine.e2etests.utils.FileType;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.interactions.Actions;
@@ -19,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import static java.lang.String.format;
+import static org.cytomine.e2etests.configuration.SeleniumDriver.DOWNLOAD_PATH;
 
 @Component
 public class CytomineSteps {
@@ -398,5 +402,85 @@ public class CytomineSteps {
         );
         webDriverUtils.byIsDisplayed(wait, By.xpath("//a[normalize-space(text())='" + projectNameToSearch + "']"));
         webDriverUtils.byClear(wait, searchInput);
+    }
+
+    public void downloadAnnotationReport(
+        Wait<WebDriver> wait,
+        String projectUrl,
+        String projectName,
+        FileType format
+    ) {
+        webDriverUtils.goTo(wait, projectUrl.replace("configuration", "annotations"));
+        webDriverUtils.byClick(
+            wait,
+            By.xpath("//button[normalize-space()='Download " + format + "']")
+        );
+
+        String filenameSuffix = "_" + projectName + "_annotations." + format.getLabel();
+        Instant end = Instant.now().plus(Duration.ofSeconds(5));
+
+        while (Instant.now().isBefore(end)) {
+            File directory = new File(DOWNLOAD_PATH);
+            File[] matches = directory.listFiles((d, name) -> name.endsWith(filenameSuffix));
+            if (matches != null && matches.length > 0 && matches[0].length() > 0) {
+                return;
+            }
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+
+        throw new RuntimeException("File ending with " + filenameSuffix + " was not found!");
+    }
+
+    public void createUser(
+        Wait<WebDriver> wait,
+        URL cytomineUrl,
+        String username,
+        String firstname,
+        String lastname,
+        String email,
+        String password
+    ) {
+        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/admin?tab=users");
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//button[contains(text(), 'New user')]"));
+        webDriverUtils.xpathClick(wait, "//button[contains(text(), 'New user')]");
+        webDriverUtils.byIsDisplayed(wait, By.name("username"));
+        webDriverUtils.bySendKeys(wait, By.name("username"), username);
+        webDriverUtils.bySendKeys(wait, By.name("firstname"), firstname);
+        webDriverUtils.bySendKeys(wait, By.name("lastname"), lastname);
+        webDriverUtils.bySendKeys(wait, By.name("email"), email);
+        webDriverUtils.bySendKeys(wait, By.name("password"), password);
+        webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Save')]");
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'User successfully created')]"));
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//td[normalize-space(text())='" + username + "']"));
+    }
+
+    public void editUser(
+        Wait<WebDriver> wait,
+        URL cytomineUrl,
+        String username,
+        String newFirstname,
+        String newLastname
+    ) {
+        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/admin?tab=users");
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//button[contains(text(), 'New user')]"));
+        webDriverUtils.xpathClick(
+            wait,
+            "//tr[.//td[normalize-space(text())='" + username + "']]//button[contains(text(), 'Edit')]"
+        );
+        webDriverUtils.byIsDisplayed(wait, By.name("firstname"));
+        webDriverUtils.byClear(wait, By.name("firstname"));
+        webDriverUtils.bySendKeys(wait, By.name("firstname"), newFirstname);
+        webDriverUtils.byClear(wait, By.name("lastname"));
+        webDriverUtils.bySendKeys(wait, By.name("lastname"), newLastname);
+        webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Save')]");
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'User successfully updated')]"));
+        webDriverUtils.byIsDisplayed(
+            wait,
+            By.xpath("//td[contains(normalize-space(text()), '" + newFirstname + " " + newLastname + "')]")
+        );
     }
 }

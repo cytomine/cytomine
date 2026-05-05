@@ -151,6 +151,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
         List<AnnotationResult> reviewedAnnotations = annotationListingService.listGeneric(reviewedListing);
 
         GeoJsonWriter geoJsonWriter = new GeoJsonWriter();
+        geoJsonWriter.setEncodeCRS(false);
         WKTReader wktReader = new WKTReader();
         List<Map<String, Object>> features = new ArrayList<>();
 
@@ -188,13 +189,9 @@ public class RestAnnotationDomainController extends RestCytomineController {
             geometry.setSRID(0);
             Map<String, Object> geometryJson = JsonObject.toMap(geoJsonWriter.write(geometry));
 
-            Map<String, Object> properties = new HashMap<>(annotation);
-            properties.remove("location");
-
             Map<String, Object> feature = new HashMap<>();
             feature.put("type", "Feature");
             feature.put("geometry", geometryJson);
-            feature.put("properties", properties);
             features.add(feature);
         } catch (org.locationtech.jts.io.ParseException e) {
             log.warn("Unable to parse WKT for annotation {}: {}", annotation.get("id"), e.getMessage());

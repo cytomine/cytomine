@@ -135,7 +135,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
         Project project = projectService.find(projectId)
             .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
 
-        String filename = reportService.getAnnotationGeoJsonFilename(project.getName());
+        String filename = reportService.getAnnotationReportFileName(ReportType.GEOJSON.getLabel(), project.getName());
 
         JsonObject params = JsonObject.of("project", projectId);
         params.put("showDefault", true);

@@ -14,7 +14,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKTReader;
 import org.locationtech.jts.io.geojson.GeoJsonReader;
+import org.locationtech.jts.io.geojson.GeoJsonWriter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.mvc.ProxyExchange;
 import org.springframework.core.io.ByteArrayResource;
@@ -43,6 +45,7 @@ import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.dto.annotation.AnnotationReportParams;
+import be.cytomine.dto.annotation.AnnotationResult;
 import be.cytomine.dto.annotation.SimplifiedAnnotation;
 import be.cytomine.dto.image.CropParameter;
 import be.cytomine.exceptions.CytomineMethodNotYetImplementedException;
@@ -134,9 +137,67 @@ public class RestAnnotationDomainController extends RestCytomineController {
 
         String filename = reportService.getAnnotationGeoJsonFilename(project.getName());
 
+        JsonObject params = JsonObject.of("project", projectId);
+        params.put("showDefault", true);
+        params.put("showWKT", true);
+        params.put("showGIS", true);
+
+        AnnotationListing userListing = annotationListingBuilder.buildAnnotationListing(params);
+        List<AnnotationResult> userAnnotations = annotationListingService.listGeneric(userListing);
+
+        JsonObject reviewedParams = new JsonObject(params);
+        reviewedParams.put("reviewed", true);
+        AnnotationListing reviewedListing = annotationListingBuilder.buildAnnotationListing(reviewedParams);
+        List<AnnotationResult> reviewedAnnotations = annotationListingService.listGeneric(reviewedListing);
+
+        GeoJsonWriter geoJsonWriter = new GeoJsonWriter();
+        WKTReader wktReader = new WKTReader();
+        List<Map<String, Object>> features = new ArrayList<>();
+
+        for (AnnotationResult annotation : userAnnotations) {
+            addAnnotationFeature(features, annotation, geoJsonWriter, wktReader);
+        }
+        for (AnnotationResult annotation : reviewedAnnotations) {
+            addAnnotationFeature(features, annotation, geoJsonWriter, wktReader);
+        }
+
+        Map<String, Object> geoJson = new HashMap<>();
+        geoJson.put("type", "FeatureCollection");
+        geoJson.put("features", features);
+
         return ResponseEntity.ok()
             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
-            .body(Map.of());
+            .body(geoJson);
+    }
+
+    private void addAnnotationFeature(
+        List<Map<String, Object>> features,
+        AnnotationResult annotation,
+        GeoJsonWriter geoJsonWriter,
+        WKTReader wktReader
+    ) {
+        Object location = annotation.get("location");
+        if (location == null) {
+            return;
+        }
+
+        String wkt = location.toString();
+        try {
+            org.locationtech.jts.geom.Geometry geometry = wktReader.read(wkt);
+            geometry.setSRID(0);
+            Map<String, Object> geometryJson = JsonObject.toMap(geoJsonWriter.write(geometry));
+
+            Map<String, Object> properties = new HashMap<>(annotation);
+            properties.remove("location");
+
+            Map<String, Object> feature = new HashMap<>();
+            feature.put("type", "Feature");
+            feature.put("geometry", geometryJson);
+            feature.put("properties", properties);
+            features.add(feature);
+        } catch (org.locationtech.jts.io.ParseException e) {
+            log.warn("Unable to parse WKT for annotation {}: {}", annotation.get("id"), e.getMessage());
+        }
     }
 
     @PostMapping("/project/{projectId}/annotation/download")

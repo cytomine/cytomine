@@ -18,7 +18,7 @@ import org.cytomine.e2etests.configuration.SeleniumDriver;
 import org.cytomine.e2etests.ui.AnnotationTools;
 import org.cytomine.e2etests.ui.CytomineSteps;
 import org.cytomine.e2etests.ui.WebDriverUtils;
-import org.cytomine.e2etests.utils.FileType;
+import org.cytomine.e2etests.utils.ReportType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -423,9 +423,10 @@ public class CytomineTests {
         annotationTools.drawRectangleAnnotation(wait, driver);
         cytomineSteps.verifyAnnotationCreated(wait);
 
-        cytomineSteps.downloadAnnotationReport(wait, projectUrl, projectName, FileType.PDF);
-        cytomineSteps.downloadAnnotationReport(wait, projectUrl, projectName, FileType.CSV);
-        cytomineSteps.downloadAnnotationReport(wait, projectUrl, projectName, FileType.Excel);
+        cytomineSteps.downloadAnnotationReport(wait, projectUrl, projectName, ReportType.PDF);
+        cytomineSteps.downloadAnnotationReport(wait, projectUrl, projectName, ReportType.CSV);
+        cytomineSteps.downloadAnnotationReport(wait, projectUrl, projectName, ReportType.Excel);
+        cytomineSteps.downloadAnnotationReport(wait, projectUrl, projectName, ReportType.GEOJSON);
 
         cytomineSteps.deleteProject(wait, projectUrl);
         cytomineSteps.deleteImage(wait, cytomineUrl, imageName);

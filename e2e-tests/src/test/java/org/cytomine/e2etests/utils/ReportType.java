@@ -5,10 +5,11 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum FileType {
+public enum ReportType {
     PDF("pdf"),
     CSV("csv"),
-    Excel("xls");
+    Excel("xls"),
+    GEOJSON("geojson");
 
     private final String label;
 }

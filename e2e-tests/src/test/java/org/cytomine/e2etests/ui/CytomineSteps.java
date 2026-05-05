@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import lombok.SneakyThrows;
-import org.cytomine.e2etests.utils.FileType;
+import org.cytomine.e2etests.utils.ReportType;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.interactions.Actions;
@@ -408,7 +408,7 @@ public class CytomineSteps {
         Wait<WebDriver> wait,
         String projectUrl,
         String projectName,
-        FileType format
+        ReportType format
     ) {
         webDriverUtils.goTo(wait, projectUrl.replace("configuration", "annotations"));
         webDriverUtils.byClick(

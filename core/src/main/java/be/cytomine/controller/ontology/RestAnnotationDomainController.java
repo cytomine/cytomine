@@ -130,10 +130,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
     @PostMapping("/project/{projectId}/annotation/download")
     public ResponseEntity<byte[]> download(@PathVariable Long projectId, @RequestBody AnnotationReportParams params)
         throws IOException {
-        ReportType reportType = ReportType.fromLabel(
-            (params.format() == null || params.format().isBlank()) ? "pdf" : params.format()
-        );
-
+        ReportType reportType = ReportType.fromLabel(params.format());
         String users = JsonNodeUtils.csvFromStringList(params.users());
         String reviewUsers = JsonNodeUtils.csvFromStringList(params.reviewUsers());
         String terms = JsonNodeUtils.csvFromStringList(params.terms());

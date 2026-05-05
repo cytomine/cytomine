@@ -1056,11 +1056,20 @@ public class AnnotationDomainResourceTests {
     }
 
     @Test
-    public void downloadCsvReports() throws Exception {
-        performDownload(ReportType.CSV, "", false)
+    public void shouldReturnCsvFileWithCorrectContentType() throws Exception {
+        byte[] responseBody = performDownload(ReportType.CSV, me.getId().toString(), false)
             .andExpect(status().isOk())
-            .andExpect(header().string("Content-Type", "text/csv"))
-            .andReturn();
+            .andExpect(header().string("Content-Disposition", containsString("attachment; filename=")))
+            .andExpect(header().string("Content-Disposition", containsString(".csv")))
+            .andExpect(content().contentType(MediaType.parseMediaType("text/csv")))
+            .andReturn()
+            .getResponse()
+            .getContentAsByteArray();
+
+        assertThat(responseBody).isNotEmpty();
+        // CSV is plain text, validate it starts with expected header row
+        String csvContent = new String(responseBody, StandardCharsets.UTF_8);
+        assertThat(csvContent).startsWith("Id;");
     }
 
     @Test
@@ -1068,6 +1077,7 @@ public class AnnotationDomainResourceTests {
         byte[] responseBody = performDownload(ReportType.EXCEL, me.getId().toString(), false)
             .andExpect(status().isOk())
             .andExpect(header().string("Content-Disposition", containsString("attachment; filename=")))
+            .andExpect(header().string("Content-Disposition", containsString(".xls")))
             .andExpect(content().contentType(MediaType.APPLICATION_OCTET_STREAM))
             .andReturn()
             .getResponse()
@@ -1083,6 +1093,7 @@ public class AnnotationDomainResourceTests {
         byte[] responseBody = performDownload(ReportType.PDF, me.getId().toString(), false)
             .andExpect(status().isOk())
             .andExpect(header().string("Content-Disposition", containsString("attachment; filename=")))
+            .andExpect(header().string("Content-Disposition", containsString(".pdf")))
             .andExpect(content().contentType(MediaType.APPLICATION_PDF))
             .andReturn()
             .getResponse()

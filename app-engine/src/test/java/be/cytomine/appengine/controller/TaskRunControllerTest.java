@@ -28,6 +28,10 @@ import be.cytomine.appengine.dto.inputs.task.types.enumeration.EnumerationValue;
 import be.cytomine.appengine.dto.inputs.task.types.integer.IntegerValue;
 import be.cytomine.appengine.dto.inputs.task.types.number.NumberValue;
 import be.cytomine.appengine.dto.inputs.task.types.string.StringValue;
+import be.cytomine.appengine.dto.responses.errors.AppEngineError;
+import be.cytomine.appengine.dto.responses.errors.ErrorBuilder;
+import be.cytomine.appengine.dto.responses.errors.ErrorCode;
+import be.cytomine.appengine.exceptions.ProvisioningException;
 import be.cytomine.appengine.handlers.SchedulerHandler;
 import be.cytomine.appengine.models.task.ValueType;
 import be.cytomine.appengine.repositories.RunRepository;
@@ -36,9 +40,11 @@ import be.cytomine.appengine.services.TaskProvisioningService;
 
 import static java.util.UUID.randomUUID;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(TaskRunController.class)
@@ -118,6 +124,18 @@ class TaskRunControllerTest {
     }
 
     @Test
+    void getRunOutputsShouldReturnOkWithEmptyList() throws Exception {
+        String runId = randomUUID().toString();
+        when(taskProvisioningService.retrieveRunOutputs("run-empty")).thenReturn(List.of());
+
+        mockMvc.perform(get(baseUrl() + "/" + runId + "/outputs"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(content().json(objectMapper.writeValueAsString(List.of()), JsonCompareMode.STRICT))
+            .andExpect(jsonPath("$", hasSize(0)));
+    }
+
+    @Test
     void getRunOutputsShouldReturnOkWithNestedGeometryCollectionOutputs() throws Exception {
         String runId = randomUUID().toString();
 
@@ -194,5 +212,18 @@ class TaskRunControllerTest {
                 assertThat(item.has("value")).isTrue();
             }
         }
+    }
+
+    @Test
+    void getRunOutputsShouldReturnNotFoundWhenRunIdNotFound() throws Exception {
+        AppEngineError error = ErrorBuilder.build(ErrorCode.RUN_NOT_FOUND);
+        ProvisioningException exception = new ProvisioningException(error);
+        when(taskProvisioningService.retrieveRunOutputs("unknown-run")).thenThrow(exception);
+
+        mockMvc.perform(get(baseUrl() + "/unknown-run/outputs").accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.errorCode").value("APPE-internal-run-not-found-error"))
+            .andExpect(jsonPath("$.message").value(error.getMessage()));
     }
 }

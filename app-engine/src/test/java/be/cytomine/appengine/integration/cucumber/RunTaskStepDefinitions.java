@@ -601,7 +601,7 @@ public class RunTaskStepDefinitions {
         Assertions.assertTrue(persistedException.getStatusCode().is4xxClientError());
         ObjectMapper mapper = new ObjectMapper();
         JsonNode errorJsonNodeFromServer = mapper.readTree(persistedException.getResponseBodyAsString());
-        Assertions.assertEquals(errorCode, errorJsonNodeFromServer.get("error_code").textValue());
+        Assertions.assertEquals(errorCode, errorJsonNodeFromServer.get("errorCode").textValue());
     }
 
     // unsuccessful upload of task run outputs as a valid zip file in a

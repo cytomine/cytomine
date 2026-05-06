@@ -412,7 +412,7 @@ public class TaskRunController {
     }
 
     @GetMapping("/task-runs/{runId}/outputs")
-    public ResponseEntity<List<TaskRunParameterValue>> getRunOutputsList(
+    public ResponseEntity<List<TaskRunParameterValue>> getRunOutputs(
         @PathVariable String runId
     ) throws ProvisioningException {
         log.info("GET /task-runs/{}/outputs", runId);

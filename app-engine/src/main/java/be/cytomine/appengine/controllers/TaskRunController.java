@@ -411,15 +411,14 @@ public class TaskRunController {
             .body(new FileSystemResource(input));
     }
 
-    @GetMapping(value = "/task-runs/{run_id}/outputs")
-    @ResponseStatus(code = HttpStatus.OK)
-    public ResponseEntity<?> getRunOutputsList(
-        @PathVariable("run_id") String runId
+    @GetMapping("/task-runs/{runId}/outputs")
+    public ResponseEntity<List<TaskRunParameterValue>> getRunOutputsList(
+        @PathVariable String runId
     ) throws ProvisioningException {
-        log.info("/task-runs/{run_id}/outputs GET");
+        log.info("GET /task-runs/{}/outputs", runId);
         List<TaskRunParameterValue> outputs = taskRunService.retrieveRunOutputs(runId);
-        log.info("/task-runs/{run_id}/outputs GET Ended");
-        return new ResponseEntity<>(outputs, HttpStatus.OK);
+        log.info("GET /task-runs/{}/outputs - Found {} outputs", runId, outputs.size());
+        return ResponseEntity.ok(outputs);
     }
 
     @GetMapping(value = "/task-runs/{run_id}/output/{parameter_name}")

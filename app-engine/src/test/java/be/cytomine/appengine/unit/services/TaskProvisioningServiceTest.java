@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationContext;
 
@@ -88,6 +89,9 @@ public class TaskProvisioningServiceTest {
     @Mock
     private TaskService taskService;
 
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper();
+
     @InjectMocks
     private TaskProvisioningService taskProvisioningService;
 
@@ -123,7 +127,7 @@ public class TaskProvisioningServiceTest {
             .iterator()
             .next()
             .getName();
-        ObjectNode value = new ObjectMapper().createObjectNode();
+        ObjectNode value = objectMapper.createObjectNode();
         value.put("parameterName", name);
         value.put("value", 42);
 
@@ -192,7 +196,7 @@ public class TaskProvisioningServiceTest {
             .iterator()
             .next()
             .getName();
-        ObjectNode value = new ObjectMapper().createObjectNode().put("unwanted", "value");
+        ObjectNode value = objectMapper.createObjectNode().put("unwanted", "value");
 
         when(runRepository.findById(run.getId())).thenReturn(Optional.of(run));
 
@@ -217,7 +221,7 @@ public class TaskProvisioningServiceTest {
             .filter(parameter -> parameter.getParameterType().equals(ParameterType.INPUT))
             .toList();
         for (Parameter input : parameters) {
-            ObjectNode value = new ObjectMapper().createObjectNode();
+            ObjectNode value = objectMapper.createObjectNode();
             value.put("parameterName", input.getName());
             value.put("value", new Random().nextInt(100));
             values.add(value);
@@ -245,7 +249,7 @@ public class TaskProvisioningServiceTest {
             .filter(parameter -> parameter.getParameterType().equals(ParameterType.INPUT))
             .toList();
         for (Parameter input : parameters) {
-            ObjectNode value = new ObjectMapper().createObjectNode();
+            ObjectNode value = objectMapper.createObjectNode();
             value.put("parameterName", input.getName());
             value.put("value", new Random().nextInt(100));
             value.put("unwanted", "value");

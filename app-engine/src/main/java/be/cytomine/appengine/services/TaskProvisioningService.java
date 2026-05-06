@@ -107,8 +107,6 @@ public class TaskProvisioningService {
 
     private final CollectionPersistenceRepository collectionPersistenceRepository;
 
-    private final ObjectMapper objectMapper;
-
     private final RunRepository runRepository;
 
     private final StorageHandler fileStorageHandler;
@@ -133,7 +131,8 @@ public class TaskProvisioningService {
 
         if (value instanceof JsonNode) {
             try {
-                genericParameterProvision = objectMapper.treeToValue((JsonNode) value, GenericParameterProvision.class);
+                ObjectMapper mapper = new ObjectMapper();
+                genericParameterProvision = mapper.treeToValue((JsonNode) value, GenericParameterProvision.class);
             } catch (JsonProcessingException e) {
                 log.info("ProvisionParameter: provision is not valid");
                 AppEngineError error = ErrorBuilder.build(
@@ -164,7 +163,7 @@ public class TaskProvisioningService {
             saveProvisionInStorage(name, provision, run);
             log.info("ProvisionParameter: stored");
         } else if (value instanceof File) {
-            ObjectNode objectNode = objectMapper.createObjectNode();
+            ObjectNode objectNode = (new ObjectMapper()).createObjectNode();
             objectNode.put("parameterName", name);
             objectNode.put("value", ((File) value).getAbsolutePath());
             provision = objectNode;
@@ -216,7 +215,8 @@ public class TaskProvisioningService {
         for (JsonNode provision : provisions) {
             GenericParameterProvision genericParameterProvision = new GenericParameterProvision();
             try {
-                genericParameterProvision = objectMapper.treeToValue(provision, GenericParameterProvision.class);
+                ObjectMapper mapper = new ObjectMapper();
+                genericParameterProvision = mapper.treeToValue(provision, GenericParameterProvision.class);
                 genericParameterProvision.setRunId(runId);
                 log.info(
                     "ProvisionMultipleParameter: "
@@ -1383,7 +1383,8 @@ public class TaskProvisioningService {
 
         if (value instanceof JsonNode) {
             try {
-                genericParameterProvision = objectMapper.treeToValue(
+                ObjectMapper mapper = new ObjectMapper();
+                genericParameterProvision = mapper.treeToValue(
                     (JsonNode) value,
                     GenericParameterCollectionItemProvision.class
                 );
@@ -1411,7 +1412,7 @@ public class TaskProvisioningService {
         JsonNode provision = null;
         if (value instanceof JsonNode) {
             provision = (JsonNode) value;
-            ObjectNode objectNode = objectMapper.createObjectNode();
+            ObjectNode objectNode = (new ObjectMapper()).createObjectNode();
             objectNode.put("index", name + "/" + String.join("/", indexesArray));
             objectNode.set("value", provision.get("value"));
             provision = objectNode;
@@ -1420,7 +1421,7 @@ public class TaskProvisioningService {
             saveProvisionInStorage(name, provision, run);
             log.info("ProvisionCollectionItem: stored");
         } else if (value instanceof File) {
-            ObjectNode objectNode = objectMapper.createObjectNode();
+            ObjectNode objectNode = (new ObjectMapper()).createObjectNode();
             objectNode.put("index", name + "/" + String.join("/", indexesArray));
             objectNode.put("value", ((File) value).getAbsolutePath());
             provision = objectNode;

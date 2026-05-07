@@ -153,23 +153,15 @@ jobs:
         if: failure()
         run: kubectl get events --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} --sort-by='.lastTimestamp'
 
-      - name: Log pods
-        if: always()
-        run: |
-          NS=cytomine-${{ env.DEPLOYMENT_NAME }}
-          CORE=(kubectl get pods -n $NS -o name | grep core | head -n 1)
-          SAM=(kubectl get pods -n $NS -o name | grep sam | head -n 1)
-          kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs cbir-0
-          kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs $CORE
-          kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs $SAM
-
       - name: Logs e2e tests results - e2e-tests pod
         if: always()
-        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests -c e2e-tests
+        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests
+          -c e2e-tests
 
       - name: Logs e2e tests results - selenium pod
         if: always()
-        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests -c selenium
+        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests
+          -c selenium
 
       - name: Export test results
         if: always()

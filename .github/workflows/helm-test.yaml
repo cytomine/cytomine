@@ -157,8 +157,8 @@ jobs:
         if: always()
         run: |
           NS=cytomine-${{ env.DEPLOYMENT_NAME }}
-          CORE=(kubectl get pods -n $NS -o name | grep core | head -n 1)
-          SAM=(kubectl get pods -n $NS -o name | grep sam | head -n 1)
+          CORE=$(kubectl get pods -n $NS -o name | grep core | head -n 1)
+          SAM=$(kubectl get pods -n $NS -o name | grep sam | head -n 1)
           kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs cbir-0
           kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs $CORE
           kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs $SAM

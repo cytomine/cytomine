@@ -237,6 +237,7 @@ public class CytomineSteps {
     public void verifyAnnotationProcessedWithSam(Wait<WebDriver> wait) {
         verifyAnnotationCreated(wait);
         webDriverUtils.byIsDisplayed(wait, By.xpath("//*[contains(text(),'Successful SAM Processing !')]"));
+        webDriverUtils.waitUntilByEmpty(wait, By.xpath("//div[contains(text(), 'Successful SAM Processing !')]"));
     }
 
     public void createAnnotationAndSearchAnnotations(Wait<WebDriver> wait, WebDriver driver, int nbAnnotations) {

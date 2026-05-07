@@ -177,6 +177,8 @@ export default {
     },
 
     async endDraw(drawnFeature) {
+      const isMagicWand = this.activeTool === 'magic-wand';
+
       this.activeLayers.forEach(async (layer, idx) => {
         let annot = new Annotation({
           location: this.getWktLocation(drawnFeature),
@@ -203,10 +205,9 @@ export default {
           this.$notify({type: 'error', text: this.$t('notif-error-annotation-creation')});
         }
 
-        if (this.activeTool === 'magic-wand') {
+        if (isMagicWand) {
           try {
-            const annotationId = annot.id;
-            const annotation = (await Cytomine.instance.api.post(`annotations/${annotationId}/refine`)).data;
+            const annotation = (await Cytomine.instance.api.post(`annotations/${annot.id}/refine`)).data;
 
             this.$eventBus.$emit('editAnnotation', annotation);
             this.$eventBus.$emit('reloadAnnotationCrop', annotation);

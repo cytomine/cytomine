@@ -583,6 +583,7 @@ public class UserAnnotationService extends ModelService {
         securityACLService.check(domain.container(), READ, currentUser);
         //Check if user is admin, the project mode and if is the owner of the annotation
         securityACLService.checkFullOrRestrictedForOwner(domain, ((UserAnnotation) domain).getUser());
+        log.info("Check ACL successful");
 
         try {
             retrievalService.deleteIndex((AnnotationDomain) domain);

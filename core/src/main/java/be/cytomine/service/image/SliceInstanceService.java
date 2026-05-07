@@ -1,28 +1,12 @@
 package be.cytomine.service.image;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import be.cytomine.domain.CytomineDomain;
@@ -51,27 +35,22 @@ import be.cytomine.utils.Task;
 import static org.springframework.security.acls.domain.BasePermission.READ;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 @Transactional
 public class SliceInstanceService extends ModelService {
 
-    @Autowired
-    private CurrentUserService currentUserService;
+    private final AnnotationIndexRepository annotationIndexRepository;
 
-    @Autowired
-    private SecurityACLService securityACLService;
+    private final AnnotationTrackRepository annotationTrackRepository;
 
-    @Autowired
-    private SliceInstanceRepository sliceInstanceRepository;
+    private final AnnotationTrackService annotationTrackService;
 
-    @Autowired
-    private AnnotationTrackService annotationTrackService;
+    private final CurrentUserService currentUserService;
 
-    @Autowired
-    private AnnotationIndexRepository annotationIndexRepository;
+    private final SecurityACLService securityACLService;
 
-    @Autowired
-    private AnnotationTrackRepository annotationTrackRepository;
+    private final SliceInstanceRepository sliceInstanceRepository;
 
     @Override
     public Class currentDomain() {
@@ -104,31 +83,14 @@ public class SliceInstanceService extends ModelService {
         return sliceInstanceRepository.listByImageInstanceOrderedByCZT(image);
     }
 
-
-    /**
-     * Add the new domain with JSON data
-     *
-     * @param json New domain data
-     *
-     * @return Response structure (created domain data,..)
-     */
     public CommandResponse add(JsonObject json) {
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
         securityACLService.check(json.getJSONAttrLong("project"), Project.class, READ);
         securityACLService.checkIsNotReadOnly(json.getJSONAttrLong("project"), Project.class);
         return executeCommand(new AddCommand(currentUser), null, json);
-
     }
 
-    /**
-     * Update this domain with new data from json
-     *
-     * @param domain      Domain to update
-     * @param jsonNewData New domain datas
-     *
-     * @return Response structure (new domain data, old domain data..)
-     */
     @Override
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
         User currentUser = currentUserService.getCurrentUser();
@@ -140,16 +102,6 @@ public class SliceInstanceService extends ModelService {
         return executeCommand(new EditCommand(currentUser, transaction), domain, jsonNewData);
     }
 
-    /**
-     * Delete this domain
-     *
-     * @param domain       Domain to delete
-     * @param transaction  Transaction link with this command
-     * @param task         Task for this command
-     * @param printMessage Flag if client will print or not confirm message
-     *
-     * @return Response structure (code, old domain,..)
-     */
     @Override
     public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
         User currentUser = currentUserService.getCurrentUser();
@@ -166,9 +118,10 @@ public class SliceInstanceService extends ModelService {
     @Override
     public void checkDoNotAlreadyExist(CytomineDomain domain) {
         SliceInstance sliceInstance = (SliceInstance) domain;
-        Optional<SliceInstance>
-            alreadyExist
-            = sliceInstanceRepository.findByBaseSliceAndImage(sliceInstance.getBaseSlice(), sliceInstance.getImage());
+        Optional<SliceInstance> alreadyExist = sliceInstanceRepository.findByBaseSliceAndImage(
+            sliceInstance.getBaseSlice(),
+            sliceInstance.getImage()
+        );
         if (alreadyExist.isPresent() && (!Objects.equals(alreadyExist.get().getId(), domain.getId()))) {
             throw new AlreadyExistException("SliceInstance (C: "
                 + sliceInstance.getBaseSlice().getChannel()
@@ -197,7 +150,6 @@ public class SliceInstanceService extends ModelService {
         annotationIndexRepository.deleteAllBySlice(slice);
     }
 
-
     @Override
     public List<Object> getStringParamsI18n(CytomineDomain domain) {
         return List.of(
@@ -207,5 +159,4 @@ public class SliceInstanceService extends ModelService {
             ((SliceInstance) domain).getBaseSlice().getTime()
         );
     }
-
 }

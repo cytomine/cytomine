@@ -119,7 +119,7 @@ public class RestProjectController extends RestCytomineController {
 
     @DeleteMapping("/project/{id}.json")
     public ResponseEntity<String> delete(@PathVariable String id, @RequestParam(required = false) Long task) {
-        log.debug("REST request to delete Project : " + id);
+        log.debug("DELETE /project/{}.json", id);
         Task existingTask = taskService.get(task);
         return delete(projectService, JsonObject.of("id", id), existingTask);
     }

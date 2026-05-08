@@ -401,7 +401,7 @@ public class ReadTaskStepDefinitions {
 
         // reply with expected error code
         JsonNode jsonPayLoad = new ObjectMapper().readTree(persistedException.getResponseBodyAsString());
-        Assertions.assertTrue(jsonPayLoad.get("error_code").textValue().startsWith(appEngineErrorCode));
+        Assertions.assertTrue(jsonPayLoad.get("errorCode").textValue().startsWith(appEngineErrorCode));
     }
 
     @When("user calls the endpoint {string} with {string} and {int} HTTP method GET")

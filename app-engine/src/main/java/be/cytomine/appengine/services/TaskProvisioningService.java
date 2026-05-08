@@ -990,8 +990,10 @@ public class TaskProvisioningService {
     private List<TaskRunParameterValue> buildTaskRunParameterValues(Run run, ParameterType type)
         throws ProvisioningException {
         List<TaskRunParameterValue> parameterValues = new ArrayList<>();
-        @SuppressWarnings("checkstyle:LineLength")
-        List<TypePersistence> results = typePersistenceRepository.findTypePersistenceByRunIdAndParameterType(run.getId(), type);
+        List<TypePersistence> results = typePersistenceRepository.findTypePersistenceByRunIdAndParameterType(
+            run.getId(),
+            type
+        );
         if (type.equals(ParameterType.INPUT)) {
             Set<Parameter> inputs = run
                 .getTask()

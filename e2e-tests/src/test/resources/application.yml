@@ -6,4 +6,4 @@ cytomine:
 selenium:
   url: ${SELENIUM_URL:}
 keycloak-client:
-  url: ${IAM_URL:http://iam:8100}/iam
+  url: ${IAM_URL}

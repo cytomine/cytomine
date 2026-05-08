@@ -116,6 +116,8 @@ services:
       ROOT: /data/images
       TASK_QUEUE_ENABLED: false
       WEB_CONCURRENCY: ${WEB_CONCURRENCY:-8}
+      MEILISEARCH_URL: &MEILISEARCH_URL http://meilisearch:7700
+      MEILISEARCH_KEY: &MEILI_MASTER_KEY kpnJgyFjMNj4Ljk7_Z0lM009ILFACv93fYJRPluMShk
     networks:
       host_network:
         ipv4_address: 172.16.238.8
@@ -257,8 +259,8 @@ services:
       REPOSITORY_URL: http://repository:8081/
       KEYCLOAK_ADMIN: *KEYCLOAK_ADMIN
       KEYCLOAK_ADMIN_PASSWORD: *KEYCLOAK_ADMIN_PASSWORD
-      MEILISEARCH_URL: http://meilisearch:7700
-      MEILISEARCH_KEY: masterKey
+      MEILISEARCH_URL: *MEILISEARCH_URL
+      MEILISEARCH_KEY: *MEILI_MASTER_KEY
     networks:
       host_network:
         ipv4_address: 172.16.238.11
@@ -317,7 +319,7 @@ services:
     volumes:
       - meilisearch-data:/meili_data
     environment:
-      MEILI_MASTER_KEY: masterKey
+      MEILI_MASTER_KEY: *MEILI_MASTER_KEY
     networks:
       host_network:
         ipv4_address: 172.16.238.19

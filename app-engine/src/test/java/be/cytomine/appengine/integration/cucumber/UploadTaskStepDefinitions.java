@@ -291,7 +291,7 @@ public class UploadTaskStepDefinitions {
         );
         JsonNode jsonPayLoad = new ObjectMapper().readTree(persistedException.getResponseBodyAsString());
         Assertions.assertEquals(
-            jsonPayLoad.get("error_code").textValue(),
+            jsonPayLoad.get("errorCode").textValue(),
             ErrorDefinitions.fromCode(ErrorCode.INTERNAL_TASK_EXISTS).code
         );
     }
@@ -378,7 +378,7 @@ public class UploadTaskStepDefinitions {
         };
         JsonNode jsonPayLoad = new ObjectMapper().readTree(persistedException.getResponseBodyAsString());
         Assertions.assertEquals(
-            jsonPayLoad.get("error_code").textValue(),
+            jsonPayLoad.get("errorCode").textValue(),
             ErrorDefinitions.fromCode(code).code
         );
     }

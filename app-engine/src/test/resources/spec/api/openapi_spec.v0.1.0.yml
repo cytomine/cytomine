@@ -1465,13 +1465,13 @@ components:
     generic_error:
       type: object
       properties:
-        error_code:
+        errorCode:
           type: string
           pattern: ^APPE-[a-zA-Z0-9_-]+$
           description: an error code structured as `{component}-{reason}`
         message:
           type: string
-          description: the human-readable error message associated with the error_code (non-localized, in english)
+          description: the human-readable error message associated with the errorCode (non-localized, in english)
         details:
           type: object
           description: provide a more detailed description of the error, structure and content depends on the error code

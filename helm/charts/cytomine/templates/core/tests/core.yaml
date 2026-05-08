@@ -136,5 +136,5 @@ spec:
         - name: E2E_PARALLEL
           value: "false"
         - name: IAM_URL
-          value: {{ include "cytomine.iamInternalUrl" }}
+          value: {{ include "cytomine.iamInternalUrl" . }}
   restartPolicy: Never

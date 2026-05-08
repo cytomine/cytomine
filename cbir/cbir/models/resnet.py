@@ -32,7 +32,7 @@ class Resnet(Model):
     ) -> None:
         super().__init__(n_features, device=device)
 
-        self.model = resnet50(weights="ResNet50_Weights.DEFAULT")
+        self.model = resnet50()
         self.model.fc = Linear(self.model.fc.in_features, n_features)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:

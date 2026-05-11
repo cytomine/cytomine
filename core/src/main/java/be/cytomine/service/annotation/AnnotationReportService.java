@@ -80,17 +80,11 @@ public class AnnotationReportService {
         AnnotationListing reviewedListing = annotationListingBuilder.buildAnnotationListing(reviewedParams);
         List<AnnotationResult> reviewedAnnotations = annotationListingService.listGeneric(reviewedListing);
 
-        List<Map<String, Object>> features = new ArrayList<>();
-        for (AnnotationResult annotation : userAnnotations) {
-            toGeoJsonFeature(annotation).ifPresent(features::add);
-        }
-        for (AnnotationResult annotation : reviewedAnnotations) {
-            toGeoJsonFeature(annotation).ifPresent(features::add);
-        }
-
         return Map.of(
             "type", "FeatureCollection",
-            "features", features
+            "features", Stream.concat(
+                userAnnotations.stream().map(this::toGeoJsonFeature).flatMap(Optional::stream),
+                reviewedAnnotations.stream().map(this::toGeoJsonFeature).flatMap(Optional::stream))
         );
     }
 

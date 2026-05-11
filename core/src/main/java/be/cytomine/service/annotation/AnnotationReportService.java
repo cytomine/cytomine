@@ -1,10 +1,9 @@
 package be.cytomine.service.annotation;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -80,17 +79,12 @@ public class AnnotationReportService {
         AnnotationListing reviewedListing = annotationListingBuilder.buildAnnotationListing(reviewedParams);
         List<AnnotationResult> reviewedAnnotations = annotationListingService.listGeneric(reviewedListing);
 
-        List<Map<String, Object>> features = new ArrayList<>();
-        for (AnnotationResult annotation : userAnnotations) {
-            toGeoJsonFeature(annotation).ifPresent(features::add);
-        }
-        for (AnnotationResult annotation : reviewedAnnotations) {
-            toGeoJsonFeature(annotation).ifPresent(features::add);
-        }
-
         return Map.of(
             "type", "FeatureCollection",
-            "features", features
+            "features", Stream.concat(
+                userAnnotations.stream().map(this::toGeoJsonFeature).flatMap(Optional::stream),
+                reviewedAnnotations.stream().map(this::toGeoJsonFeature).flatMap(Optional::stream)
+            )
         );
     }
 
@@ -103,13 +97,8 @@ public class AnnotationReportService {
         String wkt = location.toString();
         try {
             Geometry geometry = wktReader.read(wkt);
-            Map<String, Object> geometryJson = JsonObject.toMap(geoJsonWriter.write(geometry));
-
-            Map<String, Object> feature = new HashMap<>();
-            feature.put("type", "Feature");
-            feature.put("geometry", geometryJson);
-
-            return Optional.of(feature);
+            return Optional.ofNullable(JsonObject.toMap(geoJsonWriter.write(geometry)))
+                .map(geometryJson -> Map.of("type", "Feature", "geometry", geometryJson));
         } catch (ParseException e) {
             log.warn("Unable to parse WKT for annotation {}: {}", annotation.get("id"), e.getMessage());
             return Optional.empty();

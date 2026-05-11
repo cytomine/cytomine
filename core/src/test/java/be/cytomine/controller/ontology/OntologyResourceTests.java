@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -291,7 +292,14 @@ public class OntologyResourceTests {
 
     @Test
     public void shouldReturnNotFoundWhenOntologyDoesNotExist() throws Exception {
-        restOntologyControllerMockMvc.perform(get("/api/ontology/{id}/export", "nonexistent-id"))
-            .andExpect(status().isNotFound());
+        Long nonExistentId = 0L;
+
+        restOntologyControllerMockMvc.perform(get("/api/ontology/{id}/export", nonExistentId))
+            .andExpect(status().isNotFound())
+            .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON_VALUE))
+            .andExpect(jsonPath("$.title").value(HttpStatus.NOT_FOUND.getReasonPhrase()))
+            .andExpect(jsonPath("$.status").value(HttpStatus.NOT_FOUND.value()))
+            .andExpect(jsonPath("$.detail").value("Ontology not found with id: " + nonExistentId))
+            .andExpect(jsonPath("$.instance").value("/api/ontology/" + nonExistentId + "/export"));
     }
 }

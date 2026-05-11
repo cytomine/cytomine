@@ -32,6 +32,8 @@ public class AnnotationReportService {
 
     private final AnnotationListingService annotationListingService;
 
+    private final GeoJsonWriter geoJsonWriter;
+
     private final ProjectService projectService;
 
     private final TermService termService;
@@ -76,16 +78,14 @@ public class AnnotationReportService {
         AnnotationListing reviewedListing = annotationListingBuilder.buildAnnotationListing(reviewedParams);
         List<AnnotationResult> reviewedAnnotations = annotationListingService.listGeneric(reviewedListing);
 
-        GeoJsonWriter geoJsonWriter = new GeoJsonWriter();
-        geoJsonWriter.setEncodeCRS(false);
         WKTReader wktReader = new WKTReader();
         List<Map<String, Object>> features = new ArrayList<>();
 
         for (AnnotationResult annotation : userAnnotations) {
-            toGeoJsonFeature(annotation, geoJsonWriter, wktReader).ifPresent(features::add);
+            toGeoJsonFeature(annotation, wktReader).ifPresent(features::add);
         }
         for (AnnotationResult annotation : reviewedAnnotations) {
-            toGeoJsonFeature(annotation, geoJsonWriter, wktReader).ifPresent(features::add);
+            toGeoJsonFeature(annotation, wktReader).ifPresent(features::add);
         }
 
         return Map.of(
@@ -94,11 +94,7 @@ public class AnnotationReportService {
         );
     }
 
-    private Optional<Map<String, Object>> toGeoJsonFeature(
-        AnnotationResult annotation,
-        GeoJsonWriter geoJsonWriter,
-        WKTReader wktReader
-    ) {
+    private Optional<Map<String, Object>> toGeoJsonFeature(AnnotationResult annotation, WKTReader wktReader) {
         Object location = annotation.get("location");
         if (location == null) {
             return Optional.empty();

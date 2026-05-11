@@ -28,11 +28,13 @@ import be.cytomine.utils.JsonObject;
 @Service
 public class AnnotationReportService {
 
+    private final GeoJsonWriter geoJsonWriter;
+
+    private final WKTReader wktReader;
+
     private final AnnotationListingBuilder annotationListingBuilder;
 
     private final AnnotationListingService annotationListingService;
-
-    private final GeoJsonWriter geoJsonWriter;
 
     private final ProjectService projectService;
 
@@ -78,14 +80,12 @@ public class AnnotationReportService {
         AnnotationListing reviewedListing = annotationListingBuilder.buildAnnotationListing(reviewedParams);
         List<AnnotationResult> reviewedAnnotations = annotationListingService.listGeneric(reviewedListing);
 
-        WKTReader wktReader = new WKTReader();
         List<Map<String, Object>> features = new ArrayList<>();
-
         for (AnnotationResult annotation : userAnnotations) {
-            toGeoJsonFeature(annotation, wktReader).ifPresent(features::add);
+            toGeoJsonFeature(annotation).ifPresent(features::add);
         }
         for (AnnotationResult annotation : reviewedAnnotations) {
-            toGeoJsonFeature(annotation, wktReader).ifPresent(features::add);
+            toGeoJsonFeature(annotation).ifPresent(features::add);
         }
 
         return Map.of(
@@ -94,7 +94,7 @@ public class AnnotationReportService {
         );
     }
 
-    private Optional<Map<String, Object>> toGeoJsonFeature(AnnotationResult annotation, WKTReader wktReader) {
+    private Optional<Map<String, Object>> toGeoJsonFeature(AnnotationResult annotation) {
         Object location = annotation.get("location");
         if (location == null) {
             return Optional.empty();
@@ -103,7 +103,6 @@ public class AnnotationReportService {
         String wkt = location.toString();
         try {
             Geometry geometry = wktReader.read(wkt);
-            geometry.setSRID(0);
             Map<String, Object> geometryJson = JsonObject.toMap(geoJsonWriter.write(geometry));
 
             Map<String, Object> feature = new HashMap<>();

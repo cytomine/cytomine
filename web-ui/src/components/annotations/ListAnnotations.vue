@@ -709,11 +709,11 @@ export default {
       try {
         const response = await Cytomine.instance.api.get(
           `/project/${this.project.id}/annotations/export`,
-          {responseType: 'blob'}
+          {responseType: 'blob'},
         );
 
-        const filename = this.getFilenameFromContentDisposition(response.headers?.['content-disposition']) ||
-          `project-${this.project.id}-annotations.geojson`;
+        const defaultFilename = `project-${this.project.id}-annotations.geojson`;
+        const filename = this.getFilename(response.headers?.['content-disposition']) || defaultFilename;
         this.triggerBlobDownload(response.data, filename);
       } catch (error) {
         console.error(error);
@@ -729,32 +729,9 @@ export default {
       a.remove();
       window.URL.revokeObjectURL(blobUrl);
     },
-    getFilenameFromContentDisposition(contentDisposition) {
-      if (!contentDisposition) {
-        return null;
-      }
-
-      const starMatch = contentDisposition.match(/filename\*\s*=\s*([^;]+)/i);
-      if (starMatch) {
-        const value = starMatch[1].trim();
-        const unquoted = value.replace(/^"(.*)"$/, '$1');
-        const parts = unquoted.split("''");
-        if (parts.length === 2) {
-          try {
-            return decodeURIComponent(parts[1]);
-          } catch {
-            return parts[1];
-          }
-        }
-        return unquoted;
-      }
-
-      const match = contentDisposition.match(/filename\s*=\s*([^;]+)/i);
-      if (!match) {
-        return null;
-      }
-
-      return match[1].trim().replace(/^"(.*)"$/, '$1');
+    getFilename(contentDisposition) {
+      const match = contentDisposition?.match(/filename="?([^";]+)"?/i);
+      return match?.[1]?.trim() ?? null;
     },
     addTerm(term) {
       this.terms.push(term);

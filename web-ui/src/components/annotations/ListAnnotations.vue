@@ -326,6 +326,7 @@ import {Cytomine, ImageInstanceCollection, UserCollection, AnnotationCollection,
 
 import {defaultColors} from '@/utils/style-utils.js';
 import TrackTreeMultiselect from '@/components/track/TrackTreeMultiselect';
+import {getFilename, triggerBlobDownload} from '@/utils/download';
 
 import _ from 'lodash';
 
@@ -713,25 +714,11 @@ export default {
         );
 
         const defaultFilename = `project-${this.project.id}-annotations.geojson`;
-        const filename = this.getFilename(response.headers?.['content-disposition']) || defaultFilename;
-        this.triggerBlobDownload(response.data, filename);
+        const filename = getFilename(response.headers?.['content-disposition']) || defaultFilename;
+        triggerBlobDownload(response.data, filename);
       } catch (error) {
         console.error(error);
       }
-    },
-    triggerBlobDownload(blob, filename) {
-      const blobUrl = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = blobUrl;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.URL.revokeObjectURL(blobUrl);
-    },
-    getFilename(contentDisposition) {
-      const match = contentDisposition?.match(/filename="?([^";]+)"?/i);
-      return match?.[1]?.trim() ?? null;
     },
     addTerm(term) {
       this.terms.push(term);

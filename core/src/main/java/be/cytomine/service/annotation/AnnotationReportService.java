@@ -1,10 +1,9 @@
 package be.cytomine.service.annotation;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -84,7 +83,8 @@ public class AnnotationReportService {
             "type", "FeatureCollection",
             "features", Stream.concat(
                 userAnnotations.stream().map(this::toGeoJsonFeature).flatMap(Optional::stream),
-                reviewedAnnotations.stream().map(this::toGeoJsonFeature).flatMap(Optional::stream))
+                reviewedAnnotations.stream().map(this::toGeoJsonFeature).flatMap(Optional::stream)
+            )
         );
     }
 

@@ -129,6 +129,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
 
     @GetMapping(value = "/project/{projectId}/annotations/export", produces = "application/geo+json")
     public ResponseEntity<Map<String, Object>> export(@PathVariable Long projectId) {
+        log.info("GET /project/{}/annotations/export", projectId);
         Project project = projectService.find(projectId)
             .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
 

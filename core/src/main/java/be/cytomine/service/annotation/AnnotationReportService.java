@@ -97,13 +97,8 @@ public class AnnotationReportService {
         String wkt = location.toString();
         try {
             Geometry geometry = wktReader.read(wkt);
-            Map<String, Object> geometryJson = JsonObject.toMap(geoJsonWriter.write(geometry));
-
-            Map<String, Object> feature = new HashMap<>();
-            feature.put("type", "Feature");
-            feature.put("geometry", geometryJson);
-
-            return Optional.of(feature);
+            return Optional.ofNullable(JsonObject.toMap(geoJsonWriter.write(geometry)))
+                .map(geometryJson -> Map.of("type", "Feature", "geometry", geometryJson));
         } catch (ParseException e) {
             log.warn("Unable to parse WKT for annotation {}: {}", annotation.get("id"), e.getMessage());
             return Optional.empty();

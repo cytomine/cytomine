@@ -279,7 +279,7 @@ public class OntologyResourceTests {
     }
 
     @Test
-    public void shouldExportOntologyAsJsonWithCorrectStructure() throws Exception {
+    public void shouldReturnOkWithCorrectStructure() throws Exception {
         Ontology ontology = builder.givenAnOntology();
         restOntologyControllerMockMvc.perform(get("/api/ontology/{id}/export", ontology.getId()))
             .andExpect(status().isOk())
@@ -287,5 +287,11 @@ public class OntologyResourceTests {
             .andExpect(header().string("Content-Disposition", containsString("attachment; filename=")))
             .andExpect(header().string("Content-Disposition", containsString(".json")))
             .andExpect(content().json("{}"));
+    }
+
+    @Test
+    public void shouldReturnNotFoundWhenOntologyDoesNotExist() throws Exception {
+        restOntologyControllerMockMvc.perform(get("/api/ontology/{id}/export", "nonexistent-id"))
+            .andExpect(status().isNotFound());
     }
 }

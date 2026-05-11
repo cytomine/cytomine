@@ -193,7 +193,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
             feature.put("type", "Feature");
             feature.put("geometry", geometryJson);
             features.add(feature);
-        } catch (org.locationtech.jts.io.ParseException e) {
+        } catch (ParseException e) {
             log.warn("Unable to parse WKT for annotation {}: {}", annotation.get("id"), e.getMessage());
         }
     }

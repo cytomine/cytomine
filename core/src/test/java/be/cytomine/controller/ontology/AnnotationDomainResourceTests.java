@@ -1,6 +1,5 @@
 package be.cytomine.controller.ontology;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -8,7 +7,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
@@ -54,6 +52,7 @@ import be.cytomine.domain.security.User;
 import be.cytomine.repository.ontology.AnnotationDomainRepository;
 import be.cytomine.repository.ontology.UserAnnotationRepository;
 import be.cytomine.utils.JsonObject;
+import be.cytomine.utils.ReportType;
 
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
 import static be.cytomine.service.search.RetrievalService.CBIR_API_BASE_PATH;
@@ -64,10 +63,12 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -95,6 +96,15 @@ public class AnnotationDomainResourceTests {
     @Autowired
     private AnnotationDomainRepository annotationDomainRepository;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    private WireMockServer wireMockServer;
+
+    @Autowired
+    private WiremockRepository wiremockRepository;
+
     Project project;
     ImageInstance image;
     SliceInstance slice;
@@ -112,12 +122,6 @@ public class AnnotationDomainResourceTests {
     ReviewedAnnotation r4;
     ReviewedAnnotation r5;
     ReviewedAnnotation r6;
-
-    @Autowired
-    private WireMockServer wireMockServer;
-
-    @Autowired
-    private WiremockRepository wiremockRepository;
 
     void createAnnotationSet() throws ParseException {
         project = builder.givenAProject();
@@ -962,7 +966,6 @@ public class AnnotationDomainResourceTests {
 
     }
 
-
     @Test
     @Transactional
     public void listReviewedAnnotationWithSameRequestAsDefaultViewer() throws Exception {
@@ -990,7 +993,6 @@ public class AnnotationDomainResourceTests {
             .andReturn();
     }
 
-
     private static void checkForProperties(
         String response,
         List<String> expectedProperties,
@@ -1007,74 +1009,103 @@ public class AnnotationDomainResourceTests {
         }
     }
 
-
     @Test
-    @Transactional
-    public void downloadUserAnnotationReportsForAllUsers() throws Exception {
-        MvcResult mvcResult = performDownload("csv", "", false)
+    public void shouldReturnCsvWithAnnotationsForAllUsers() throws Exception {
+        String csvContent = performDownload(ReportType.CSV, "", false)
             .andExpect(status().isOk())
-            .andReturn();
-        Object[] users = getUsersFromResult(mvcResult).stream().distinct().toArray();
-        assertThat(users.length).isEqualTo(2);
+            .andExpect(content().contentType(MediaType.parseMediaType("text/csv")))
+            .andReturn()
+            .getResponse()
+            .getContentAsString(StandardCharsets.UTF_8);
+
+        List<String> distinctUsers = getUsersFromCsv(csvContent).stream().distinct().toList();
+        assertThat(distinctUsers).hasSize(2);
+        assertThat(distinctUsers).containsExactlyInAnyOrder(me.getUsername(), randomUser.getUsername());
     }
 
     @Test
-    @Transactional
-    public void downloadUserAnnotationReportsForSpecificUser() throws Exception {
-        MvcResult mvcResult = performDownload("csv", this.randomUser.getId().toString(), false)
+    public void shouldReturnCsvWithAnnotationsOnlyForRequestedUser() throws Exception {
+        String csvContent = performDownload(ReportType.CSV, randomUser.getId().toString(), false)
             .andExpect(status().isOk())
-            .andReturn();
-        Object[] users = getUsersFromResult(mvcResult).stream().distinct().toArray();
-        assertThat(users.length).isEqualTo(1);
+            .andExpect(content().contentType(MediaType.parseMediaType("text/csv")))
+            .andReturn()
+            .getResponse()
+            .getContentAsString(StandardCharsets.UTF_8);
+
+        List<String> users = getUsersFromCsv(csvContent).stream().distinct().toList();
+        assertThat(users).hasSize(1);
+        assertThat(users.getFirst()).isEqualTo(randomUser.getUsername());
     }
 
     @Test
-    @Transactional
-    public void downloadReviewedAnnotation() throws Exception {
-        MvcResult mvcResult = performDownload("csv", this.randomUser.getId().toString(), true)
+    public void shouldReturnCsvWithOnlyReviewedAnnotations() throws Exception {
+        String csvContent = performDownload(ReportType.CSV, randomUser.getId().toString(), true)
             .andExpect(status().isOk())
-            .andReturn();
-        String[] rows = mvcResult.getResponse().getContentAsString().split("\n");
-        assertThat(rows.length).isEqualTo(2);
+            .andExpect(content().contentType(MediaType.parseMediaType("text/csv")))
+            .andReturn()
+            .getResponse()
+            .getContentAsString(StandardCharsets.UTF_8);
+
+        String[] rows = csvContent.split("\n");
+        assertThat(rows).hasSize(2); // 1 header row + 1 data row
     }
 
     @Test
-    @Transactional
-    public void downloadCsvReports() throws Exception {
-        performDownload("csv", "", false)
+    public void shouldReturnCsvFileWithCorrectContentType() throws Exception {
+        byte[] responseBody = performDownload(ReportType.CSV, me.getId().toString(), false)
             .andExpect(status().isOk())
-            .andExpect(header().string("Content-Type", "text/csv"))
-            .andReturn();
+            .andExpect(header().string("Content-Disposition", containsString("attachment; filename=")))
+            .andExpect(header().string("Content-Disposition", containsString(".csv")))
+            .andExpect(content().contentType(MediaType.parseMediaType("text/csv")))
+            .andReturn()
+            .getResponse()
+            .getContentAsByteArray();
+
+        assertThat(responseBody).isNotEmpty();
+        // CSV is plain text, validate it starts with expected header row
+        String csvContent = new String(responseBody, StandardCharsets.UTF_8);
+        assertThat(csvContent).startsWith("Id;");
     }
 
     @Test
-    @Transactional
-    public void downloadXlsReports() throws Exception {
-        performDownload("xls", this.me.getId().toString(), false)
+    public void shouldReturnXlsFileWithCorrectContentType() throws Exception {
+        byte[] responseBody = performDownload(ReportType.EXCEL, me.getId().toString(), false)
             .andExpect(status().isOk())
-            .andExpect(header().string("Content-Type", "application/octet-stream"))
-            .andReturn();
+            .andExpect(header().string("Content-Disposition", containsString("attachment; filename=")))
+            .andExpect(header().string("Content-Disposition", containsString(".xls")))
+            .andExpect(content().contentType(MediaType.APPLICATION_OCTET_STREAM))
+            .andReturn()
+            .getResponse()
+            .getContentAsByteArray();
+
+        assertThat(responseBody).isNotEmpty();
+        // XLS files start with the OLE2 compound document magic bytes
+        assertThat(responseBody).startsWith((byte) 0xD0, (byte) 0xCF);
     }
 
     @Test
-    @Transactional
-    @Disabled("This test does not work, the returned entity is a 500, but expectOK() ignores that")
-    public void downloadPdfReports() throws Exception {
-        performDownload("pdf", this.me.getId().toString(), false)
+    public void shouldReturnPdfFileWithCorrectContentType() throws Exception {
+        byte[] responseBody = performDownload(ReportType.PDF, me.getId().toString(), false)
             .andExpect(status().isOk())
-            .andExpect(header().string("Content-Type", "application/pdf"))
-            .andReturn();
+            .andExpect(header().string("Content-Disposition", containsString("attachment; filename=")))
+            .andExpect(header().string("Content-Disposition", containsString(".pdf")))
+            .andExpect(content().contentType(MediaType.APPLICATION_PDF))
+            .andReturn()
+            .getResponse()
+            .getContentAsByteArray();
+
+        assertThat(responseBody).isNotEmpty();
+        // PDF files always start with %PDF magic header
+        assertThat(new String(responseBody, 0, 4)).isEqualTo("%PDF");
     }
 
-    private ResultActions performDownload(String format, String users, boolean reviewed) throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
-
+    private ResultActions performDownload(ReportType reportType, String users, boolean reviewed) throws Exception {
         Map<String, Object> jsonBody = new LinkedHashMap<>();
-        jsonBody.put("format", format);
+        jsonBody.put("format", reportType.getLabel());
         jsonBody.put("users", List.of(users));
         jsonBody.put("reviewed", reviewed);
-        jsonBody.put("terms", List.of(this.term.getId().toString()));
-        jsonBody.put("images", List.of(this.image.getId().toString()));
+        jsonBody.put("terms", List.of(term.getId().toString()));
+        jsonBody.put("images", List.of(image.getId().toString()));
 
         return restAnnotationDomainControllerMockMvc.perform(post(
                 "/api/project/{project}/annotation/download",
@@ -1085,10 +1116,11 @@ public class AnnotationDomainResourceTests {
         );
     }
 
-    private List<String> getUsersFromResult(MvcResult mvcResult) throws UnsupportedEncodingException {
-        String[] rows = mvcResult.getResponse().getContentAsString().split("\n");
-        return Arrays.stream(rows).skip(1).map(x -> x.split(";")[7])
-            .collect(Collectors.toList());
+    private List<String> getUsersFromCsv(String csvContent) {
+        return Arrays.stream(csvContent.split("\n"))
+            .skip(1) // skip header row
+            .map(row -> row.split(";")[7])
+            .toList();
     }
 
     @Disabled("Randomly fail with ProxyExchange, need to find a solution")

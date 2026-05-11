@@ -435,6 +435,29 @@ public class CytomineSteps {
         throw new RuntimeException("File ending with " + filenameSuffix + " was not found!");
     }
 
+    public void exportAnnotations(Wait<WebDriver> wait, String projectUrl, String projectName) {
+        webDriverUtils.goTo(wait, projectUrl.replace("configuration", "annotations"));
+        webDriverUtils.byClick(wait, By.xpath("//button[normalize-space()='Export annotations']"));
+
+        String filenameSuffix = "_" + projectName + "_annotations." + ReportType.GEOJSON.getLabel();
+        Instant end = Instant.now().plus(Duration.ofSeconds(5));
+
+        while (Instant.now().isBefore(end)) {
+            File directory = new File(DOWNLOAD_PATH);
+            File[] matches = directory.listFiles((d, name) -> name.endsWith(filenameSuffix));
+            if (matches != null && matches.length > 0 && matches[0].length() > 0) {
+                return;
+            }
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+
+        throw new RuntimeException("File ending with " + filenameSuffix + " was not found!");
+    }
+
     public void createUser(
         Wait<WebDriver> wait,
         URL cytomineUrl,

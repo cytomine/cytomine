@@ -428,7 +428,24 @@ public class CytomineTests {
         cytomineSteps.downloadAnnotationReport(wait, projectUrl, projectName, ReportType.PDF);
         cytomineSteps.downloadAnnotationReport(wait, projectUrl, projectName, ReportType.CSV);
         cytomineSteps.downloadAnnotationReport(wait, projectUrl, projectName, ReportType.Excel);
-        cytomineSteps.downloadAnnotationReport(wait, projectUrl, projectName, ReportType.GEOJSON);
+
+        cytomineSteps.deleteProject(wait, projectUrl);
+        cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
+        cytomineSteps.logout(wait, cytomineUrl);
+    }
+
+    @Test
+    void exportAnnotations() {
+        String projectName = "selenium-" + randomUUID();
+
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
+        String imageName = cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName));
+        cytomineSteps.openImageInViewer(wait, projectUrl);
+        annotationTools.drawRectangleAnnotation(wait, driver);
+        cytomineSteps.verifyAnnotationCreated(wait);
+
+        cytomineSteps.exportAnnotations(wait, projectUrl, projectName);
 
         cytomineSteps.deleteProject(wait, projectUrl);
         cytomineSteps.deleteImage(wait, cytomineUrl, imageName);

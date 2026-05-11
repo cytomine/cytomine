@@ -4,6 +4,8 @@ import java.util.Map;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -66,5 +68,15 @@ public class RestOntologyController extends RestCytomineController {
         log.debug("REST request to delete Ontology : " + id);
         Task existingTask = taskService.get(task);
         return delete(ontologyService, JsonObject.of("id", id), existingTask);
+    }
+
+    @GetMapping(value = "/ontology/{id}/export", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, Object>> export(@PathVariable String id) {
+        log.debug("GET /ontology/{}/export", id);
+
+        String filename = id + ".json";
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+            .body(Map.of());
     }
 }

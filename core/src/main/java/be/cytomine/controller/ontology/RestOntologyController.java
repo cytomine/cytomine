@@ -42,15 +42,12 @@ public class RestOntologyController extends RestCytomineController {
     }
 
     @GetMapping("/ontology/{id}.json")
-    public ResponseEntity<String> show(
-        @PathVariable Long id
-    ) {
+    public ResponseEntity<String> show(@PathVariable Long id) {
         log.debug("REST request to get Ontology : {}", id);
         return ontologyService.find(id)
             .map(this::responseSuccess)
             .orElseGet(() -> responseNotFound("Ontology", id));
     }
-
 
     @PostMapping("/ontology.json")
     public ResponseEntity<String> add(@RequestBody String json) {
@@ -70,5 +67,4 @@ public class RestOntologyController extends RestCytomineController {
         Task existingTask = taskService.get(task);
         return delete(ontologyService, JsonObject.of("id", id), existingTask);
     }
-
 }

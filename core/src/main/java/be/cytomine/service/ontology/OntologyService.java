@@ -19,10 +19,12 @@ package be.cytomine.service.ontology;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.domain.BasePermission;
@@ -57,28 +59,19 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 import static org.springframework.security.acls.domain.BasePermission.WRITE;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 @Transactional
 public class OntologyService extends ModelService {
 
-    @Autowired
-    TermHttpContract termHttpContract;
-    @Autowired
-    private OntologyRepository ontologyRepository;
-    @Autowired
-    private SecurityACLService securityACLService;
-    @Autowired
-    private CurrentUserService currentUserService;
-    @Autowired
-    private ProjectRepository projectRepository;
-    @Autowired
-    private TermService termService;
-
-    @Autowired
-    private PermissionService permissionService;
-
-    @Autowired
-    private UserService userService;
+    private final CurrentUserService currentUserService;
+    private final OntologyRepository ontologyRepository;
+    private final PermissionService permissionService;
+    private final ProjectRepository projectRepository;
+    private final SecurityACLService securityACLService;
+    private final TermHttpContract termHttpContract;
+    private final TermService termService;
+    private final UserService userService;
 
     public Ontology get(Long id) {
         return find(id).orElse(null);
@@ -213,5 +206,9 @@ public class OntologyService extends ModelService {
         }
         //otherwise, when you write the json, term cannot be found (because term link is LAZY + term deleted)
         ontology.setTerms(new HashSet<>());
+    }
+
+    public Map<String, Object> export(Long id) {
+        return Map.of();
     }
 }

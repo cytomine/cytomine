@@ -18,7 +18,7 @@ import org.cytomine.e2etests.configuration.SeleniumDriver;
 import org.cytomine.e2etests.ui.AnnotationTools;
 import org.cytomine.e2etests.ui.CytomineSteps;
 import org.cytomine.e2etests.ui.WebDriverUtils;
-import org.cytomine.e2etests.utils.FileType;
+import org.cytomine.e2etests.utils.ReportType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -425,9 +425,27 @@ public class CytomineTests {
         annotationTools.drawRectangleAnnotation(wait, driver);
         cytomineSteps.verifyAnnotationCreated(wait);
 
-        cytomineSteps.downloadAnnotationReport(wait, projectUrl, projectName, FileType.PDF);
-        cytomineSteps.downloadAnnotationReport(wait, projectUrl, projectName, FileType.CSV);
-        cytomineSteps.downloadAnnotationReport(wait, projectUrl, projectName, FileType.Excel);
+        cytomineSteps.downloadAnnotationReport(wait, projectUrl, projectName, ReportType.PDF);
+        cytomineSteps.downloadAnnotationReport(wait, projectUrl, projectName, ReportType.CSV);
+        cytomineSteps.downloadAnnotationReport(wait, projectUrl, projectName, ReportType.Excel);
+
+        cytomineSteps.deleteProject(wait, projectUrl);
+        cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
+        cytomineSteps.logout(wait, cytomineUrl);
+    }
+
+    @Test
+    void exportAnnotations() {
+        String projectName = "selenium-" + randomUUID();
+
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
+        String imageName = cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName));
+        cytomineSteps.openImageInViewer(wait, projectUrl);
+        annotationTools.drawRectangleAnnotation(wait, driver);
+        cytomineSteps.verifyAnnotationCreated(wait);
+
+        cytomineSteps.exportAnnotations(wait, projectUrl, projectName);
 
         cytomineSteps.deleteProject(wait, projectUrl);
         cytomineSteps.deleteImage(wait, cytomineUrl, imageName);

@@ -180,7 +180,7 @@ export default {
         });
         this.$emit('rename', newName);
       } catch (error) {
-        console.log(error);
+        console.error(error);
         this.$notify({
           type: 'error',
           text: this.$t('notif-error-ontology-rename', {name: oldName})

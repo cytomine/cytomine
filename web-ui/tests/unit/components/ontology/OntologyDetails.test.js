@@ -24,11 +24,12 @@ jest.mock('@/api', () => ({
 }));
 
 describe('OntologyDetails.vue', () => {
-  const defaultOntology = {id: 1, name: 'Test Ontology', user: 10, projects: [1, 2]};
+  const propsOntology = {id: 1};
+  const fullOntology = {id: 1, name: 'Test Ontology', user: 10, projects: [1, 2], save: jest.fn()};
   const defaultProjectCollection = [{id: 1}, {id: 2}];
   const defaultUser = {id: 10, fullName: 'John Doe'};
 
-  const createWrapper = ({ontology = defaultOntology, currentUser} = {}) => {
+  const createWrapper = ({ontology = propsOntology, currentUser} = {}) => {
     const mockStore = {
       state: {
         currentUser: {
@@ -48,6 +49,7 @@ describe('OntologyDetails.vue', () => {
         ontology,
       },
       mocks: {
+        $notify: jest.fn(),
         $store: mockStore,
         $t: (key) => key,
       },
@@ -66,7 +68,7 @@ describe('OntologyDetails.vue', () => {
   });
 
   it('should fetch ontology, projects and creator on created', async () => {
-    Ontology.fetch.mockResolvedValue(defaultOntology);
+    Ontology.fetch.mockResolvedValue(fullOntology);
     ProjectCollection.fetchAll.mockResolvedValue({
       array: defaultProjectCollection
     });
@@ -75,12 +77,12 @@ describe('OntologyDetails.vue', () => {
     const wrapper = createWrapper();
     await flushPromises();
 
-    expect(Ontology.fetch).toHaveBeenCalledWith(defaultOntology.id);
+    expect(Ontology.fetch).toHaveBeenCalledWith(propsOntology.id);
     expect(ProjectCollection.fetchAll).toHaveBeenCalled();
     expect(User.fetch).toHaveBeenCalledWith(defaultUser.id);
 
     expect(wrapper.vm.creator).toEqual(defaultUser);
-    expect(wrapper.vm.fullOntology).toEqual(defaultOntology);
+    expect(wrapper.vm.fullOntology).toEqual(fullOntology);
     expect(wrapper.vm.loading).toEqual(false);
     expect(wrapper.vm.managedProjects).toEqual(defaultProjectCollection);
     expect(wrapper.vm.projects).toEqual(defaultProjectCollection);
@@ -100,5 +102,31 @@ describe('OntologyDetails.vue', () => {
     });
 
     expect(wrapper.vm.canEdit).toBe(false);
+  });
+
+  it('should rename ontology successfully', async () => {
+    const wrapper = createWrapper();
+    await flushPromises();
+
+    await wrapper.vm.rename('New Name');
+
+    expect(wrapper.vm.fullOntology.name).toBe('New Name');
+    expect(wrapper.vm.fullOntology.save).toHaveBeenCalled();
+    expect(wrapper.vm.$notify).toHaveBeenCalledWith(
+      expect.objectContaining({type: 'success'})
+    );
+  });
+
+  it('should handle rename error', async () => {
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+    Ontology.fetch.mockResolvedValue({...fullOntology, save: jest.fn().mockRejectedValue(new Error('fail'))});
+    const wrapper = createWrapper();
+    await flushPromises();
+
+    await wrapper.vm.rename('New Name');
+
+    expect(wrapper.vm.$notify).toHaveBeenCalledWith(
+      expect.objectContaining({type: 'error'})
+    );
   });
 });

@@ -30,18 +30,17 @@ public interface TermHttpContract {
     Optional<TermResponse> findTermByID(@PathVariable long id, @RequestParam long userId);
 
     @PostExchange
-    Optional<HttpCommandResponse> create(@RequestParam long userId,
-                                         @Valid @RequestBody CreateTerm createTerm);
+    Optional<HttpCommandResponse> create(@RequestParam long userId, @Valid @RequestBody CreateTerm createTerm);
 
     @PutExchange("/{id}")
-    Optional<HttpCommandResponse> update(@PathVariable long id,
-                                         @RequestParam long userId,
-                                         @RequestBody UpdateTerm updateTerm);
+    Optional<HttpCommandResponse> update(
+        @PathVariable long id,
+        @RequestParam long userId,
+        @RequestBody UpdateTerm updateTerm
+    );
 
     @DeleteExchange("/{id}")
-    Optional<HttpCommandResponse> delete(@PathVariable long id,
-                                         @RequestParam long userId);
-
+    Optional<HttpCommandResponse> delete(@PathVariable long id, @RequestParam long userId);
 
     @GetExchange("/project/{id}")
     Page<TermResponse> findTermsByProject(@PathVariable long id, @RequestParam long userId, Pageable pageable);
@@ -50,18 +49,8 @@ public interface TermHttpContract {
     Page<TermResponse> findTermsByOntology(
         @PathVariable long id,
         @RequestParam long userId,
-        @RequestParam int page,
-        @RequestParam int size
+        Pageable pageable
     );
-
-    default Page<TermResponse> findTermsByOntology(long id, long userId, Pageable pageable) {
-        return findTermsByOntology(
-            id,
-            userId,
-            pageable.isPaged() ? pageable.getPageNumber() : 0,
-            pageable.isPaged() ? pageable.getPageSize() : Integer.MAX_VALUE
-        );
-    }
 
     @GetExchange("/ontology/{id}/all-terms")
     Set<Long> findAllTermIdsByOntology(@PathVariable long id, @RequestParam long userId);

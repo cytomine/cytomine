@@ -3996,6 +3996,51 @@ paths:
         "404":
           $ref: "#/components/responses/not-found"
 
+  /api/ontology/{id}/export:
+    get:
+      tags:
+        - Ontology
+      summary: Export an ontology as JSON
+      description: Export an ontology and its terms as a JSON file
+      parameters:
+        - $ref: "#/components/parameters/path-ontology-id"
+      responses:
+        "200":
+          headers:
+            Content-Disposition:
+              description: attachment; filename={ontologyName}.json
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OntologyExport"
+              example:
+                name: "my-ontology"
+                terms:
+                  - name: "term-name"
+                    color: "#2C3A59"
+        "404":
+          description: Ontology not found
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                  detail:
+                    type: string
+                  instance:
+                    type: string
+              example:
+                title: "Not Found"
+                status: 404
+                detail: "Ontology not found with id: 123"
+                instance: "/api/ontology/123/export"
+
   /api/ontology/{id}/user.json:
     get:
       tags:
@@ -12094,6 +12139,16 @@ components:
               items:
                 $ref: "#/components/schemas/Ontology"
         - $ref: "#/components/schemas/collection"
+    OntologyExport:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the ontology
+        terms:
+          type: array
+          items:
+            $ref: "#/components/schemas/TermSummary"
     ProjectCollection:
       allOf:
         - type: object
@@ -12211,6 +12266,16 @@ components:
               items:
                 $ref: "#/components/schemas/Term"
         - $ref: "#/components/schemas/collection"
+    TermSummary:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the term
+        color:
+          type: string
+          description: Color of the term in hex format
+          example: "#2C3A59"
     TrackCollection:
       allOf:
         - type: object

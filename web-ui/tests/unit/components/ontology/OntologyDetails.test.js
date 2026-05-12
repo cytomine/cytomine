@@ -49,6 +49,11 @@ describe('OntologyDetails.vue', () => {
         ontology,
       },
       mocks: {
+        $buefy: {
+          dialog: {
+            confirm: jest.fn(({onConfirm}) => onConfirm())
+          }
+        },
         $notify: jest.fn(),
         $store: mockStore,
         $t: (key) => key,
@@ -129,4 +134,14 @@ describe('OntologyDetails.vue', () => {
       expect.objectContaining({type: 'error'})
     );
   });
+
+  it('should emit delete on confirmDeletion', async () => {
+    const wrapper = createWrapper();
+    await flushPromises();
+
+    wrapper.vm.confirmDeletion();
+
+    expect(wrapper.emitted().delete).toBeTruthy();
+  });
+
 });

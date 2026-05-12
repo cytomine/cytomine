@@ -9,7 +9,8 @@ public enum ReportType {
     PDF("pdf"),
     CSV("csv"),
     Excel("xls"),
-    GEOJSON("geojson");
+    GEOJSON("geojson"),
+    JSON("json");
 
     private final String label;
 }

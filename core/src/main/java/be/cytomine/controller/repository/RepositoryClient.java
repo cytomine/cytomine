@@ -2,6 +2,7 @@ package be.cytomine.controller.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -29,6 +30,7 @@ public class RepositoryClient {
     @Bean
     RestClient repositoryRestClient() {
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new Jdk8Module());
         objectMapper.registerModule(new JavaTimeModule());
 
         SimpleModule module = new SimpleModule();

@@ -1,7 +1,10 @@
 package be.cytomine.service.ontology;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
@@ -12,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
@@ -19,6 +24,7 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.http.TermHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.ontology.Ontology;
@@ -26,6 +32,7 @@ import be.cytomine.domain.ontology.RelationTerm;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
+import be.cytomine.dto.ontology.OntologyExport;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.ontology.OntologyRepository;
@@ -36,7 +43,11 @@ import be.cytomine.service.command.TransactionService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.utils.CommandResponse;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
 import static org.springframework.security.acls.domain.BasePermission.READ;
 import static org.springframework.security.acls.domain.BasePermission.WRITE;
@@ -375,5 +386,29 @@ public class OntologyServiceTests {
         assertThat(permissionService.hasACLPermission(ontology, "user", READ)).isTrue();
         assertThat(permissionService.hasACLPermission(project, "user", ADMINISTRATION)).isTrue();
         assertThat(permissionService.hasACLPermission(project, "user", READ)).isTrue();
+    }
+
+    @Test
+    public void exportShouldReturnOntologyExportWithMappedTerms() {
+        Ontology ontology = basicInstanceBuilder.givenAnOntology();
+        Term term = basicInstanceBuilder.givenATerm(ontology);
+        List<TermResponse> termResponses = List.of(
+            new TermResponse(
+                term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
+                LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()),
+                LocalDateTime.ofInstant(term.getUpdated().toInstant(), ZoneId.systemDefault()),
+                Optional.empty(), term.getComment(), Set.of()
+            )
+        );
+
+        when(termHttpContract.findTermsByOntology(eq(ontology.getId()), anyLong(), any(Pageable.class)))
+            .thenReturn(new PageImpl<>(termResponses));
+
+        OntologyExport result = ontologyService.export(ontology);
+
+        assertThat(result.name()).isEqualTo(ontology.getName());
+        assertThat(result.terms()).hasSize(termResponses.size());
+        assertThat(result.terms().getFirst().name()).isEqualTo(term.getName());
+        assertThat(result.terms().getFirst().color()).isEqualTo(term.getColor());
     }
 }

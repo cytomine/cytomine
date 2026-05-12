@@ -1,7 +1,7 @@
 import {shallowMount} from '@vue/test-utils';
 
 import OntologyDetails from '@/components/ontology/OntologyDetails.vue';
-import {Ontology, ProjectCollection, User} from '@/api';
+import {Ontology, ProjectCollection, User, Cytomine} from '@/api';
 import {flushPromises} from '../../../utils';
 
 jest.mock('@/api', () => ({
@@ -28,7 +28,7 @@ describe('OntologyDetails.vue', () => {
   const defaultProjectCollection = [{id: 1}, {id: 2}];
   const defaultUser = {id: 10, fullName: 'John Doe'};
 
-  const createWrapper = ({ontology = defaultOntology} = {}) => {
+  const createWrapper = ({ontology = defaultOntology, currentUser} = {}) => {
     const mockStore = {
       state: {
         currentUser: {
@@ -37,6 +37,7 @@ describe('OntologyDetails.vue', () => {
             id: null,
             adminByNow: false,
             guestByNow: false,
+            ...currentUser,
           },
         },
       },
@@ -83,5 +84,21 @@ describe('OntologyDetails.vue', () => {
     expect(wrapper.vm.loading).toEqual(false);
     expect(wrapper.vm.managedProjects).toEqual(defaultProjectCollection);
     expect(wrapper.vm.projects).toEqual(defaultProjectCollection);
+  });
+
+  it('should allow edit when user is admin', () => {
+    const wrapper = createWrapper({
+      currentUser: {...defaultUser, adminByNow: true},
+    });
+
+    expect(wrapper.vm.canEdit).toBe(true);
+  });
+
+  it('should not allow edit for guest users', () => {
+    const wrapper = createWrapper({
+      currentUser: {...defaultUser, adminByNow: false, guestByNow: true}
+    });
+
+    expect(wrapper.vm.canEdit).toBe(false);
   });
 });

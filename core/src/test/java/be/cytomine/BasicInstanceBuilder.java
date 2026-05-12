@@ -2,6 +2,7 @@ package be.cytomine;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 
 import jakarta.persistence.EntityManager;
@@ -256,7 +257,7 @@ public class BasicInstanceBuilder {
         Term term = new Term();
         term.setName(randomString());
         term.setOntology(ontology);
-        term.setColor("blue");
+        term.setColor(String.format("#%06X", new Random().nextInt(0x1000000)));
         return term;
     }
 

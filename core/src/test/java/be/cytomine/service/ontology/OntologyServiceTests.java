@@ -118,7 +118,6 @@ public class OntologyServiceTests {
         assertThat(ontologyService.find(0L)).isEmpty();
     }
 
-
     @Test
     void listLightOntology() {
         Ontology ontology = builder.givenAnOntology();
@@ -144,11 +143,7 @@ public class OntologyServiceTests {
     void addOntologyWithNullNameFail() {
         Ontology ontology = basicInstanceBuilder.givenANotPersistedOntology();
         ontology.setName("");
-        Assertions.assertThrows(
-            WrongArgumentException.class, () -> {
-                ontologyService.add(ontology.toJsonObject());
-            }
-        );
+        Assertions.assertThrows(WrongArgumentException.class, () -> ontologyService.add(ontology.toJsonObject()));
     }
 
     @Test
@@ -156,8 +151,6 @@ public class OntologyServiceTests {
         Ontology ontology = basicInstanceBuilder.givenANotPersistedOntology();
         CommandResponse commandResponse = ontologyService.add(ontology.toJsonObject());
         assertThat(ontologyService.find(commandResponse.getObject().getId())).isPresent();
-        System.out.println(
-            "id = " + commandResponse.getObject().getId() + " name = " + ontology.getName());
 
         commandService.undo();
 
@@ -174,8 +167,6 @@ public class OntologyServiceTests {
         Ontology ontology = basicInstanceBuilder.givenANotPersistedOntology();
         CommandResponse commandResponse = ontologyService.add(ontology.toJsonObject());
         assertThat(ontologyService.find(commandResponse.getObject().getId())).isPresent();
-        System.out.println(
-            "id = " + commandResponse.getObject().getId() + " name = " + ontology.getName());
 
         commandService.undo();
 
@@ -186,11 +177,7 @@ public class OntologyServiceTests {
         builder.persistAndReturn(ontologyWithSameName);
 
         // re-create a ontology with a name that already exist in this ontology
-        Assertions.assertThrows(
-            AlreadyExistException.class, () -> {
-                commandService.redo();
-            }
-        );
+        Assertions.assertThrows(AlreadyExistException.class, () -> commandService.redo());
     }
 
     @Test
@@ -245,7 +232,7 @@ public class OntologyServiceTests {
         Ontology ontology = builder.givenAnOntology();
         Term term1 = builder.givenATerm(ontology);
         Term term2 = builder.givenATerm(ontology);
-        RelationTerm relationTerm = builder.givenARelationTerm(term1, term2);
+        builder.givenARelationTerm(term1, term2);
 
         CommandResponse commandResponse = ontologyService.delete(ontology, null, null, true);
 
@@ -279,8 +266,7 @@ public class OntologyServiceTests {
         Term term2 = builder.givenATerm(ontology);
         RelationTerm relationTerm = builder.givenARelationTerm(term1, term2);
 
-        CommandResponse commandResponse =
-            ontologyService.delete(ontology, transactionService.start(), null, true);
+        ontologyService.delete(ontology, transactionService.start(), null, true);
 
         assertThat(ontologyService.find(ontology.getId()).isEmpty());
         assertThat(relationTermRepository.findById(relationTerm.getId())).isEmpty();
@@ -332,7 +318,8 @@ public class OntologyServiceTests {
         );
 
         assertThat(permissionService.hasACLPermission(
-            ontology, userAdminInProject.getUsername(),
+            ontology,
+            userAdminInProject.getUsername(),
             ADMINISTRATION
         )).isTrue();
 
@@ -353,14 +340,11 @@ public class OntologyServiceTests {
             ontology, userNotInProject.getUsername(),
             READ
         )).isFalse();
-
     }
-
 
     @Test
     @WithMockUser("user")
     void determineRightsForUsersKeepRightsForOntologyCreator() {
-
         // create ontology for user
         Ontology ontology = basicInstanceBuilder.givenANotPersistedOntology();
         CommandResponse commandResponse = ontologyService.add(ontology.toJsonObject());
@@ -383,10 +367,7 @@ public class OntologyServiceTests {
         assertThat(permissionService.hasACLPermission(project, "user", READ)).isTrue();
 
         // change project ontology
-        commandResponse = projectService.update(
-            project, project.toJsonObject()
-                .withChange("ontology", null)
-        );
+        projectService.update(project, project.toJsonObject().withChange("ontology", null));
 
         // check that use still keep its rights to access ontology
         assertThat(ontology.getUser().getUsername()).isEqualTo("user");

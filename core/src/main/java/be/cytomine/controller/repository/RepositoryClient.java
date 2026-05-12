@@ -1,8 +1,13 @@
 package be.cytomine.controller.repository;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.domain.Page;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
@@ -12,7 +17,7 @@ import be.cytomine.common.repository.http.ReviewedAnnotationHttpContract;
 import be.cytomine.common.repository.http.StatsHttpContract;
 import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.common.repository.http.TermRelationHttpContract;
-
+import be.cytomine.common.repository.utils.SpringPage;
 
 @Configuration
 public class RepositoryClient {
@@ -23,7 +28,17 @@ public class RepositoryClient {
     // Not sure if it should or not be shared between each client instance.
     @Bean
     RestClient repositoryRestClient() {
-        return RestClient.builder().baseUrl(repositoryURL).build();
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+
+        SimpleModule module = new SimpleModule();
+        module.addAbstractTypeMapping(Page.class, SpringPage.class);
+        objectMapper.registerModule(module);
+
+        return RestClient.builder()
+            .baseUrl(repositoryURL)
+            .messageConverters(converters -> converters.addFirst(new MappingJackson2HttpMessageConverter(objectMapper)))
+            .build();
     }
 
     @Bean

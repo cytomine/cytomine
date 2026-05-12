@@ -3,7 +3,6 @@ package be.cytomine.service.ontology;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -27,6 +26,7 @@ import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
+import be.cytomine.dto.ontology.OntologyExport;
 import be.cytomine.dto.ontology.TermSummary;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.ConstraintException;
@@ -195,13 +195,16 @@ public class OntologyService extends ModelService {
         ontology.setTerms(new HashSet<>());
     }
 
-    public Map<String, Object> export(Ontology ontology) {
+    public OntologyExport export(Ontology ontology) {
         User currentUser = currentUserService.getCurrentUser();
         Page<TermResponse> terms = termHttpContract.findTermsByOntology(
             ontology.getId(),
             currentUser.getId(),
             Pageable.unpaged()
         );
-        return Map.of(ontology.getName(), terms.getContent().stream().map(TermSummary::from).toList());
+        return new OntologyExport(
+            ontology.getName(),
+            terms.getContent().stream().map(TermSummary::from).toList()
+        );
     }
 }

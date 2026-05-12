@@ -10,10 +10,13 @@ import java.util.Optional;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.stereotype.Service;
 
 import be.cytomine.common.repository.http.TermHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;
@@ -24,6 +27,7 @@ import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
+import be.cytomine.dto.ontology.TermSummary;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.ConstraintException;
 import be.cytomine.repository.ontology.OntologyRepository;
@@ -191,7 +195,13 @@ public class OntologyService extends ModelService {
         ontology.setTerms(new HashSet<>());
     }
 
-    public Map<String, Object> export(Long id) {
-        return Map.of();
+    public Map<String, Object> export(Ontology ontology) {
+        User currentUser = currentUserService.getCurrentUser();
+        Page<TermResponse> terms = termHttpContract.findTermsByOntology(
+            ontology.getId(),
+            currentUser.getId(),
+            Pageable.unpaged()
+        );
+        return Map.of(ontology.getName(), terms.getContent().stream().map(TermSummary::from).toList());
     }
 }

@@ -80,7 +80,7 @@ public class RestOntologyController extends RestCytomineController {
         Ontology ontology = ontologyService.find(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ontology not found with id: " + id));
 
-        Map<String, Object> ontologyExport = ontologyService.export(id);
+        Map<String, Object> ontologyExport = ontologyService.export(ontology);
 
         String filename = ontology.getName() + ".json";
         return ResponseEntity.ok()

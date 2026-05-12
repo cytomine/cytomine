@@ -1,7 +1,7 @@
 import {shallowMount} from '@vue/test-utils';
 
 import OntologyDetails from '@/components/ontology/OntologyDetails.vue';
-import {Ontology, ProjectCollection, User, Cytomine} from '@/api';
+import {Cytomine, Ontology, ProjectCollection, User} from '@/api';
 import {flushPromises} from '../../../utils';
 
 jest.mock('@/api', () => ({
@@ -144,4 +144,21 @@ describe('OntologyDetails.vue', () => {
     expect(wrapper.emitted().delete).toBeTruthy();
   });
 
+  it('should export ontology as blob', async () => {
+    Cytomine.instance.api.get.mockResolvedValue({
+      data: new Blob(['{}'], {type: 'application/json'}),
+      headers: {
+        'content-disposition': 'attachment; filename="ontology.json"',
+      }
+    });
+    const wrapper = createWrapper();
+    await flushPromises();
+
+    await wrapper.vm.exportOntology();
+
+    expect(Cytomine.instance.api.get).toHaveBeenCalledWith(
+      `/ontology/${propsOntology.id}/export`,
+      expect.any(Object)
+    );
+  });
 });

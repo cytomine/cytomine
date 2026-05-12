@@ -305,7 +305,9 @@ public class OntologyResourceTests {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(header().string("Content-Disposition", containsString("attachment; filename=")))
             .andExpect(header().string("Content-Disposition", containsString(".json")))
-            .andExpect(content().json("{}"));
+            .andExpect(jsonPath("$.name").value(ontology.getName()))
+            .andExpect(jsonPath("$.terms[0].name").value(term.getName()))
+            .andExpect(jsonPath("$.terms[0].color").value(term.getColor()));
     }
 
     @Test

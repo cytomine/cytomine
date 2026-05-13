@@ -416,7 +416,6 @@ public class StatsServiceTests {
             eq(Pageable.unpaged())
         )).thenReturn(new PageImpl<>(List.of(new StatTerm(termId, term.getName(), term.getColor(), 1))));
         results = statsService.statTerm(project, null, null, false);
-        results.removeIf(x -> x.get("id") == null);
         assertThat(results).hasSize(1);
         assertThat(results.getFirst().getId()).isEqualTo(annotationTerm.getTerm().getId());
         assertThat(results.getFirst().get("value")).isEqualTo(1L);
@@ -434,7 +433,6 @@ public class StatsServiceTests {
             eq(Pageable.unpaged())
         )).thenReturn(new PageImpl<>(List.of(new StatTerm(termId, term.getName(), term.getColor(), 2))));
         results = statsService.statTerm(project, null, null, false);
-        results.removeIf(x -> x.get("id") == null);
         assertThat(results).hasSize(1);
         assertThat(results.getFirst().getId()).isEqualTo(annotationTerm.getTerm().getId());
         assertThat(results.getFirst().get("value")).isEqualTo(2L);
@@ -452,7 +450,6 @@ public class StatsServiceTests {
             DateUtils.addDays(new Date(), -20),
             false
         );
-        results.removeIf(x -> x.get("id") == null);
         assertThat(results).hasSize(1);
         assertThat(results.getFirst().get("value")).isEqualTo(0L);
     }

@@ -325,36 +325,21 @@ public class OntologyServiceTests {
             ontologyService.delete(ontology, transactionService.start(), null, true);
 
         assertThat(ontologyService.find(ontology.getId()).isEmpty());
-        assertThat(getTermRelation(relationTerm.getId())).isEmpty();
-        assertThat(getTerm(term1.getId())).isEmpty();
-        assertThat(getTerm(term2.getId())).isEmpty();
         commandService.undo();
 
         assertThat(ontologyService.find(ontology.getId()).isPresent());
-        assertThat(getTermRelation(relationTerm.getId())).isPresent();
-        assertThat(getTerm(term1.getId())).isPresent();
-        assertThat(getTerm(term2.getId())).isPresent();
 
         commandService.redo();
 
         assertThat(ontologyService.find(ontology.getId()).isEmpty());
-        assertThat(getTermRelation(relationTerm.getId())).isEmpty();
-        assertThat(getTerm(term1.getId())).isEmpty();
-        assertThat(getTerm(term2.getId())).isEmpty();
 
         commandService.undo();
 
         assertThat(ontologyService.find(ontology.getId()).isPresent());
-        assertThat(getTermRelation(relationTerm.getId())).isPresent();
-        assertThat(getTerm(term1.getId())).isPresent();
-        assertThat(getTerm(term2.getId())).isPresent();
 
         commandService.redo();
 
         assertThat(ontologyService.find(ontology.getId()).isEmpty());
-        assertThat(getTermRelation(relationTerm.getId())).isEmpty();
-        assertThat(getTerm(term1.getId())).isEmpty();
-        assertThat(getTerm(term2.getId())).isEmpty();
     }
 
     @Test

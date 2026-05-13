@@ -316,7 +316,6 @@ public class StatsServiceTests {
             Pageable.unpaged()
         )).thenReturn(new PageImpl<>(List.of()));
         List<StatTerm> results = statsService.statTermSlide(project, Optional.empty(), Optional.empty());
-        results.removeIf(x -> x.id() == 0);
         assertThat(results).hasSize(0);
 
         Term term = builder.givenATerm(project.getOntology());
@@ -329,7 +328,6 @@ public class StatsServiceTests {
             Pageable.unpaged()
         )).thenReturn(new PageImpl<>(List.of(new StatTerm(term.getId(), term.getName(), term.getColor(), 0))));
         results = statsService.statTermSlide(project, Optional.empty(), Optional.empty());
-        results.removeIf(x -> x.id() == 0);
         assertThat(results).hasSize(1);
         assertThat(results.getFirst().id()).isEqualTo(term.getId());
         assertThat(results.getFirst().count()).isEqualTo(0);
@@ -347,7 +345,6 @@ public class StatsServiceTests {
             Pageable.unpaged()
         )).thenReturn(new PageImpl<>(List.of(new StatTerm(term.getId(), term.getName(), term.getColor(), 1))));
         results = statsService.statTermSlide(project, Optional.empty(), Optional.empty());
-        results.removeIf(x -> x.id() == 0);
         assertThat(results).hasSize(1);
         assertThat(results.getFirst().id()).isEqualTo(term.getId());
         assertThat(results.getFirst().count()).isEqualTo(1L);
@@ -365,7 +362,6 @@ public class StatsServiceTests {
             new StatTerm(term2.getId(), term2.getName(), term2.getColor(), 0)
         )));
         results = statsService.statTermSlide(project, Optional.empty(), Optional.empty());
-        results.removeIf(x -> x.id() == 0);
         assertThat(results).hasSize(2);
 
         Optional<LocalDateTime> startDate = Optional.of(LocalDateTime.now().minusDays(42));
@@ -381,7 +377,6 @@ public class StatsServiceTests {
             new StatTerm(term2.getId(), term2.getName(), term2.getColor(), 0)
         )));
         results = statsService.statTermSlide(project, startDate, endDate);
-        results.removeIf(x -> x.id() == 0);
         assertThat(results).hasSize(2);
         assertThat(results.get(0).count()).isEqualTo(0);
         assertThat(results.get(1).count()).isEqualTo(0);

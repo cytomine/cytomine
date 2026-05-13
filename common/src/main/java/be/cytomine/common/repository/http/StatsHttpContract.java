@@ -32,8 +32,7 @@ public interface StatsHttpContract {
     Page<FlatStatUserTerm> findUserTermsByProject(
         @PathVariable long projectId,
         @RequestParam long userId,
-        @RequestParam int page,
-        @RequestParam int size
+        Pageable pageable
     );
 
     @GetExchange("/per-term-and-image/project/{projectId}")

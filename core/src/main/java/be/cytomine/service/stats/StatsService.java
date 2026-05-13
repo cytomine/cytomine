@@ -287,11 +287,9 @@ public class StatsService {
         securityACLService.check(project, READ);
         Long userId = currentUserService.getCurrentUser().getId();
 
-        return statsMapper.mapToUserTerms(pagesClient.callAllPages(
-                (page, size) ->
-                    statsHttpContract.findUserTermsByProject(project.getId(), userId, page, size))).stream()
-            .toList();
-
+        return statsMapper.mapToUserTerms(
+            statsHttpContract.findUserTermsByProject(project.getId(), userId, Pageable.unpaged()).toSet()
+        ).stream().toList();
     }
 
     public List<JsonObject> statUser(Project project, Date startDate, Date endDate) {

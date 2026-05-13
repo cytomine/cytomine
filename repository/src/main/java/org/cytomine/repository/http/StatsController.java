@@ -46,9 +46,12 @@ public class StatsController implements StatsHttpContract {
 
     @Override
     @GetMapping("/per-user/project/{projectId}")
-    public Page<FlatStatUserTerm> findUserTermsByProject(long projectId, long userId, int page, int size) {
-        return termRepository.findAllByUsersByProjectForStats(projectId, PageRequest.of(page, size))
-            .map(statsMapper::map);
+    public Page<FlatStatUserTerm> findUserTermsByProject(
+        @PathVariable long projectId,
+        @RequestParam long userId,
+        Pageable pageable
+    ) {
+        return termRepository.findAllByUsersByProjectForStats(projectId, pageable).map(statsMapper::map);
     }
 
     @Override

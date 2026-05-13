@@ -48,10 +48,6 @@ public class SecRoleService {
         return secRoleRepository.findByAuthority(authority);
     }
 
-    public Optional<SecRole> findByTokenAuthority(String authority) {
-        return secRoleRepository.findByAuthority(authority);
-    }
-
     public List<SecRole> list() {
         securityACLService.checkGuest();
         return secRoleRepository.findAll();

@@ -557,8 +557,7 @@ public class ProjectConnectionServiceTests {
         List<JsonObject> results
             = projectConnectionService.numberOfConnectionsByProjectOrderedByHourAndDays(
             projet,
-            new Date().getTime(),
-            user
+            new Date().getTime()
         );
         assertThat(results).isEmpty();
 
@@ -567,7 +566,7 @@ public class ProjectConnectionServiceTests {
         givenAPersistentConnectionInProject(anotherUser, projet, simpleDateFormat.parse("2022-01-01T12:30:00"));
 
         results
-            = projectConnectionService.numberOfConnectionsByProjectOrderedByHourAndDays(projet, null, user);
+            = projectConnectionService.numberOfConnectionsByProjectOrderedByHourAndDays(projet, null);
         assertThat(results).hasSize(1);
 
         assertThat(results.get(0).get("time")).isEqualTo(simpleDateFormat.parse("2022-01-01T12:00:00"));
@@ -576,7 +575,7 @@ public class ProjectConnectionServiceTests {
         givenAPersistentConnectionInProject(user, projet, simpleDateFormat.parse("2022-01-20T03:00:00"));
 
         results
-            = projectConnectionService.numberOfConnectionsByProjectOrderedByHourAndDays(projet, null, user);
+            = projectConnectionService.numberOfConnectionsByProjectOrderedByHourAndDays(projet, null);
         assertThat(results).hasSize(2);
         // TODO: fails because no order (no sorting)
         assertThat(results.stream().map(x -> x.get("time"))).contains(simpleDateFormat.parse("2022-01-20T03:00:00"));
@@ -585,8 +584,7 @@ public class ProjectConnectionServiceTests {
         results
             = projectConnectionService.numberOfConnectionsByProjectOrderedByHourAndDays(
             projet,
-            simpleDateFormat.parse("2022-01-05T12:00:00").getTime(),
-            user
+            simpleDateFormat.parse("2022-01-05T12:00:00").getTime()
         );
         assertThat(results).hasSize(1);
 

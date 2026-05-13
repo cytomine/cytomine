@@ -98,7 +98,6 @@ public class WebSocketUserPositionHandler extends CytomineWebSocketHandler {
         boolean isNumeric = StringUtils.isNumeric(message.getPayload().toString());
 
         if (!isNumeric) {
-            Map<String, Object> payloadMap = JsonObject.toMap(payload);
             String userId = session.getAttributes().get("userId").toString();
             sendPositionToFollowers(userId, imageId, message.getPayload().toString());
             return;

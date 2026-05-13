@@ -49,7 +49,6 @@ public class KmeansGeometryService {
 
     public static final int FULL = 3;
     public static final int KMEANSFULL = 2;
-    public static final int KMEANSSOFT = 1;
 
     public static final int ANNOTATIONSIZE1 = 0;
     public static final int ANNOTATIONSIZE2 = 100;

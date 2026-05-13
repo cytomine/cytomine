@@ -90,6 +90,11 @@ services:
         ipv4_address: 172.16.238.7
 
   pims:
+    build:
+      context: ./pims
+      dockerfile: Dockerfile
+      ssh:
+        - default
     image: cytomine/pims:latest
     restart: unless-stopped
     depends_on:

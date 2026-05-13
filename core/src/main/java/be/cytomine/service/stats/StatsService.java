@@ -1,21 +1,5 @@
 package be.cytomine.service.stats;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -40,6 +24,7 @@ import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
@@ -249,14 +234,20 @@ public class StatsService {
         return new ArrayList<>(result.values());
     }
 
-    public List<StatTerm> statTermSlide(Project project, Optional<LocalDateTime> startDate,
-        Optional<LocalDateTime> endDate) {
+    public List<StatTerm> statTermSlide(
+        Project project,
+        Optional<LocalDateTime> startDate,
+        Optional<LocalDateTime> endDate
+    ) {
         securityACLService.check(project, READ);
         Long userId = currentUserService.getCurrentUser().getId();
-
-        return new ArrayList<>(pagesClient.callAllPages(
-            (page, size) -> statsHttpContract.findTermsByProject(project.getOntology().getId(), userId, startDate,
-                endDate, page, size)));
+        return statsHttpContract.findTermsByProject(
+            project.getOntology().getId(),
+            userId,
+            startDate,
+            endDate,
+            Pageable.unpaged()
+        ).stream().toList();
     }
 
     public List<StatPerTermAndImage> statPerTermAndImage(Project project, Date startDate, Date endDate) {
@@ -274,20 +265,22 @@ public class StatsService {
     public List<JsonObject> statTerm(Project project, Date startDate, Date endDate, boolean leafsOnly) {
         securityACLService.check(project, READ);
         Long userId = currentUserService.getCurrentUser().getId();
-        Optional<LocalDateTime> start =
-            Optional.ofNullable(startDate).map(d -> d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-        Optional<LocalDateTime> end =
-            Optional.ofNullable(endDate).map(d -> d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+        Optional<LocalDateTime> start = Optional.ofNullable(startDate)
+            .map(d -> d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+        Optional<LocalDateTime> end = Optional.ofNullable(endDate)
+            .map(d -> d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
 
-        Set<Long> nonLeafTermIds =
-            leafsOnly ? termRelationHttpContract.findAllByOntologyId(project.getOntology().getId(), userId).stream()
-                .map(TermRelationResponse::term1Id).collect(toSet()) : Set.of();
+        Set<Long> nonLeafTermIds = leafsOnly ? termRelationHttpContract.findAllByOntologyId(
+            project.getOntology()
+            .getId(),
+            userId
+        ).stream().map(TermRelationResponse::term1Id).collect(toSet()) : Set.of();
 
-        return pagesClient.callAllPages(
-                (page, size) -> statsHttpContract.findTermsByProject(project.getId(), userId, start, end, page, size))
-            .stream().filter(s -> !leafsOnly || !nonLeafTermIds.contains(s.id()))
+        return statsHttpContract.findTermsByProject(project.getId(), userId, start, end, Pageable.unpaged())
+            .stream()
+            .filter(s -> !leafsOnly || !nonLeafTermIds.contains(s.id()))
             .map(s -> JsonObject.of("id", s.id(), "username", s.name(), "value", s.count(), "color", s.color()))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     public List<StatUserTerm> statUserAnnotations(Project project) {

@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.service.annotation.GetExchange;
@@ -24,7 +25,7 @@ public interface StatsHttpContract {
         @PathVariable long projectId, @RequestParam long userId,
         @RequestParam(required = false) Optional<LocalDateTime> startDate,
         @RequestParam(required = false) Optional<LocalDateTime> endDate,
-        @RequestParam int page, @RequestParam int size
+        Pageable pageable
     );
 
     @GetExchange("/per-user/project/{projectId}")

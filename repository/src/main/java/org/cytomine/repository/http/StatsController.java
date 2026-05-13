@@ -8,6 +8,7 @@ import org.cytomine.repository.mapper.StatsMapper;
 import org.cytomine.repository.persistence.TermRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,14 +34,13 @@ public class StatsController implements StatsHttpContract {
         @RequestParam long userId,
         @RequestParam(required = false) Optional<LocalDateTime> startDate,
         @RequestParam(required = false) Optional<LocalDateTime> endDate,
-        @RequestParam int page,
-        @RequestParam int size
+        Pageable pageable
     ) {
         return termRepository.findAllByProjectForStats(
             projectId,
             startDate.orElse(null),
             endDate.orElse(null),
-            PageRequest.of(page, size)
+            pageable
         ).map(statsMapper::map);
     }
 

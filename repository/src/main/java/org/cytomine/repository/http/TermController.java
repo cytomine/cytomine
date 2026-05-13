@@ -56,11 +56,8 @@ public class TermController implements TermHttpContract {
 
     @Override
     @PutMapping("/{id}")
-    public Optional<HttpCommandResponse> update(
-        @PathVariable long id,
-        @RequestParam long userId,
-        @RequestBody UpdateTerm updateTerm
-    ) {
+    public Optional<HttpCommandResponse> update(@PathVariable long id, @RequestParam long userId,
+                                                @RequestBody UpdateTerm updateTerm) {
         return termCommandService.updateTerm(id, userId, updateTerm, LocalDateTime.now());
     }
 

@@ -505,9 +505,7 @@ public abstract class ModelService<T extends CytomineDomain> {
         return entityManager;
     }
 
-    public void deleteDependencies(CytomineDomain domain, Transaction transaction, Task task) {
-        return;
-    }
+    public void deleteDependencies(CytomineDomain domain, Transaction transaction, Task task) {}
 
     public CytomineDomain getCytomineDomain(String domainClassName, Long domainIdent) {
         try {

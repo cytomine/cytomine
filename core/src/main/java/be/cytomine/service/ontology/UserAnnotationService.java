@@ -634,14 +634,14 @@ public class UserAnnotationService extends ModelService {
     }
 
     public void deleteDependencies(CytomineDomain domain, Transaction transaction, Task task) {
-        deleteDependentAnnotationTerm((UserAnnotation) domain, transaction, task);
+        deleteDependentAnnotationTerm((UserAnnotation) domain, transaction);
         deleteDependentSharedAnnotation((UserAnnotation) domain, transaction, task);
         deleteDependentAnnotationTrack((UserAnnotation) domain, transaction, task);
         deleteDependentMetadata(domain, transaction, task);
     }
 
 
-    public void deleteDependentAnnotationTerm(UserAnnotation ua, Transaction transaction, Task task) {
+    public void deleteDependentAnnotationTerm(UserAnnotation ua, Transaction transaction) {
         for (AnnotationTerm annotationTerm : annotationTermService.list(ua)) {
             try {
                 annotationTermService.delete(annotationTerm, transaction, null, false);

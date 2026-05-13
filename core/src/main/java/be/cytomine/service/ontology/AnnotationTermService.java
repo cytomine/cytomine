@@ -195,10 +195,6 @@ public class AnnotationTermService extends ModelService {
         return executeCommand(new AddCommand(currentUser, transaction), null, jsonObject);
     }
 
-    public CommandResponse addWithDeletingOldTerm(Long idUserAnnotation, Long idTerm) {
-        return addWithDeletingOldTerm(idUserAnnotation, idTerm, false);
-    }
-
     /**
      * Add annotation-term for an annotation and delete all annotation-term that where already map with this annotation
      * by this user
@@ -281,9 +277,7 @@ public class AnnotationTermService extends ModelService {
     }
 
 
-    public void deleteDependencies(CytomineDomain domain, Transaction transaction, Task task) {
-        return;
-    }
+    public void deleteDependencies(CytomineDomain domain, Transaction transaction, Task task) {}
 
 
     /**

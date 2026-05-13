@@ -199,10 +199,10 @@ public class TrackService extends ModelService {
 
     @Override
     public void deleteDependencies(CytomineDomain domain, Transaction transaction, Task task) {
-        deleteDependentAnnotationTrack((Track) domain, transaction, task);
+        deleteDependentAnnotationTrack((Track) domain, transaction);
     }
 
-    public void deleteDependentAnnotationTrack(Track track, Transaction transaction, Task task) {
+    public void deleteDependentAnnotationTrack(Track track, Transaction transaction) {
         for (AnnotationTrack annotationTrack : annotationTrackService.list(track)) {
             annotationTrackService.delete(annotationTrack, transaction, null, false);
         }

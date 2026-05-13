@@ -23,7 +23,7 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -32,13 +32,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import be.cytomine.common.repository.http.StatsHttpContract;
-import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.common.repository.http.TermRelationHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
 import be.cytomine.common.repository.model.stat.payload.StatPerTermAndImage;
 import be.cytomine.common.repository.model.stat.payload.StatTerm;
 import be.cytomine.common.repository.model.stat.payload.StatUserTerm;
-import be.cytomine.common.repository.utils.PagesClient;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.social.AnnotationAction;
@@ -56,48 +54,32 @@ import be.cytomine.utils.JsonObject;
 import static java.util.stream.Collectors.toSet;
 import static org.springframework.security.acls.domain.BasePermission.READ;
 
+@RequiredArgsConstructor
 @Service
 @Transactional
 public class StatsService {
 
-    @Autowired
-    EntityManager entityManager;
+    private final EntityManager entityManager;
 
-    @Autowired
-    UserService userService;
+    private final MongoTemplate mongoTemplate;
 
-    @Autowired
-    ProjectService projectService;
+    private final CurrentUserService currentUserService;
 
-    @Autowired
-    UserAnnotationRepository userAnnotationRepository;
+    private final ImageServerService imageServerService;
 
-    @Autowired
-    TermRelationHttpContract termRelationHttpContract;
+    private final ProjectService projectService;
 
-    @Autowired
-    TermHttpContract termHttpContract;
+    private final SecurityACLService securityACLService;
 
-    @Autowired
-    StatsHttpContract statsHttpContract;
+    private final StatsHttpContract statsHttpContract;
 
-    @Autowired
-    MongoTemplate mongoTemplate;
+    private final StatsMapper statsMapper;
 
-    @Autowired
-    ImageServerService imageServerService;
+    private final TermRelationHttpContract termRelationHttpContract;
 
-    @Autowired
-    SecurityACLService securityACLService;
+    private final UserAnnotationRepository userAnnotationRepository;
 
-    @Autowired
-    PagesClient pagesClient;
-
-    @Autowired
-    private CurrentUserService currentUserService;
-
-    @Autowired
-    private StatsMapper statsMapper;
+    private final UserService userService;
 
     public Long total(Class domain) {
         return entityManager.createQuery("SELECT COUNT(*) FROM " + domain.getName(), Long.class).getSingleResult();

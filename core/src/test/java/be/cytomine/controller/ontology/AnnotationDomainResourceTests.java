@@ -1010,6 +1010,19 @@ public class AnnotationDomainResourceTests {
     }
 
     @Test
+    public void shouldReturnGeoJsonContentType() throws Exception {
+        restAnnotationDomainControllerMockMvc.perform(get(
+                "/api/project/{projectId}/annotations/export",
+                project.getId()
+            ))
+            .andExpect(status().isOk())
+            .andExpect(header().string("Content-Disposition", containsString("attachment; filename=")))
+            .andExpect(header().string("Content-Disposition", containsString(".geojson")))
+            .andExpect(content().contentTypeCompatibleWith("application/geo+json"))
+            .andExpect(content().json("{}"));
+    }
+
+    @Test
     public void shouldReturnCsvWithAnnotationsForAllUsers() throws Exception {
         String csvContent = performDownload(ReportType.CSV, "", false)
             .andExpect(status().isOk())

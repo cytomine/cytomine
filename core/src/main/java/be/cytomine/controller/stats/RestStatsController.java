@@ -77,18 +77,18 @@ public class RestStatsController extends RestCytomineController {
     }
 
     @GetMapping("/project/{project}/stats/termslide.json")
-    public ResponseEntity<String> statTermSlide(@PathVariable("project") Long projectId,
-                                                @RequestParam(value = "startDate", required = false)
-                                                Optional<Long> startDateLong,
-                                                @RequestParam(value = "endDate", required = false)
-                                                Optional<Long> endDateLong) {
-        Project project =
-            projectService.find(projectId).orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
+    public ResponseEntity<String> statTermSlide(
+        @PathVariable("project") Long projectId,
+        @RequestParam(value = "startDate", required = false) Optional<Long> startDateLong,
+        @RequestParam(value = "endDate", required = false) Optional<Long> endDateLong
+    ) {
+        Project project = projectService.find(projectId)
+            .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
 
-        Optional<LocalDateTime> startLocalDateTime =
-            startDateLong.map(Instant::ofEpochMilli).map(i -> LocalDateTime.ofInstant(i, ZoneId.systemDefault()));
-        Optional<LocalDateTime> endLocalDateTime =
-            endDateLong.map(Instant::ofEpochMilli).map(i -> LocalDateTime.ofInstant(i, ZoneId.systemDefault()));
+        Optional<LocalDateTime> startLocalDateTime = startDateLong.map(Instant::ofEpochMilli)
+            .map(i -> LocalDateTime.ofInstant(i, ZoneId.systemDefault()));
+        Optional<LocalDateTime> endLocalDateTime = endDateLong.map(Instant::ofEpochMilli)
+            .map(i -> LocalDateTime.ofInstant(i, ZoneId.systemDefault()));
 
         return responseSuccess(statsService.statTermSlide(project, startLocalDateTime, endLocalDateTime));
     }

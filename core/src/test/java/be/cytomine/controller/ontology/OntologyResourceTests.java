@@ -1,20 +1,10 @@
 package be.cytomine.controller.ontology;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
@@ -22,6 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -32,18 +25,24 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.http.TermHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.ontology.Ontology;
-import be.cytomine.domain.ontology.RelationTerm;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.project.Project;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -54,7 +53,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class OntologyResourceTests {
 
     @MockitoBean
-    TermHttpContract termHttpContract;
+    private TermHttpContract termHttpContract;
 
     @Autowired
     private BasicInstanceBuilder basicInstanceBuilder;
@@ -63,16 +62,13 @@ public class OntologyResourceTests {
     private EntityManager em;
 
     @Autowired
-    private BasicInstanceBuilder builder;
-
-    @Autowired
-    private MockMvc restOntologyControllerMockMvc;
+    private MockMvc mockMvc;
 
     @Test
     @Transactional
     public void listAllOntologies() throws Exception {
-        Ontology ontology = builder.givenAnOntology();
-        restOntologyControllerMockMvc.perform(get("/api/ontology.json"))
+        Ontology ontology = basicInstanceBuilder.givenAnOntology();
+        mockMvc.perform(get("/api/ontology.json"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
             .andExpect(jsonPath("$.collection[?(@.name=='" + ontology.getName() + "')]").exists())
@@ -82,8 +78,8 @@ public class OntologyResourceTests {
     @Test
     @Transactional
     public void listAllOntologiesLight() throws Exception {
-        Ontology ontology = builder.givenAnOntology();
-        restOntologyControllerMockMvc.perform(get("/api/ontology.json").param("light", "true"))
+        Ontology ontology = basicInstanceBuilder.givenAnOntology();
+        mockMvc.perform(get("/api/ontology.json").param("light", "true"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
             .andExpect(jsonPath("$.collection[?(@.name=='" + ontology.getName() + "')]").exists())
@@ -93,14 +89,14 @@ public class OntologyResourceTests {
     @Test
     @Transactional
     public void shouldReturnOntology() throws Exception {
-        Ontology ontology = builder.givenAnOntology();
-        Term parent = builder.givenATerm(ontology);
-        Term child1 = builder.givenATerm(ontology);
-        Term child2 = builder.givenATerm(ontology);
-        Term directChild = builder.givenATerm(ontology);
-        RelationTerm relationTerm1 = builder.givenARelationTerm(parent, child1);
-        RelationTerm relationTerm2 = builder.givenARelationTerm(parent, child2);
-        Project project = builder.givenAProjectWithOntology(ontology);
+        Ontology ontology = basicInstanceBuilder.givenAnOntology();
+        Term parent = basicInstanceBuilder.givenATerm(ontology);
+        Term child1 = basicInstanceBuilder.givenATerm(ontology);
+        Term child2 = basicInstanceBuilder.givenATerm(ontology);
+        Term directChild = basicInstanceBuilder.givenATerm(ontology);
+        basicInstanceBuilder.givenARelationTerm(parent, child1);
+        basicInstanceBuilder.givenARelationTerm(parent, child2);
+        Project project = basicInstanceBuilder.givenAProjectWithOntology(ontology);
 
         em.refresh(ontology);
         em.refresh(parent);
@@ -108,7 +104,7 @@ public class OntologyResourceTests {
         em.refresh(child2);
         em.refresh(directChild);
 
-        restOntologyControllerMockMvc.perform(get("/api/ontology/{id}.json", ontology.getId()))
+        mockMvc.perform(get("/api/ontology/{id}.json", ontology.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(ontology.getId().intValue()))
             .andExpect(jsonPath("$.class").value("be.cytomine.domain.ontology.Ontology"))
@@ -192,7 +188,7 @@ public class OntologyResourceTests {
     @Transactional
     public void addValidOntology() throws Exception {
         Ontology ontology = basicInstanceBuilder.givenANotPersistedOntology();
-        restOntologyControllerMockMvc.perform(post("/api/ontology.json")
+        mockMvc.perform(post("/api/ontology.json")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(ontology.toJSON()))
             .andExpect(status().isOk())
@@ -210,8 +206,8 @@ public class OntologyResourceTests {
     @Transactional
     public void addOntologyRefusedIfAlreadyExists() throws Exception {
         Ontology ontology = basicInstanceBuilder.givenANotPersistedOntology();
-        builder.persistAndReturn(ontology);
-        restOntologyControllerMockMvc.perform(post("/api/ontology.json")
+        basicInstanceBuilder.persistAndReturn(ontology);
+        mockMvc.perform(post("/api/ontology.json")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(ontology.toJSON()))
             .andExpect(status().isConflict())
@@ -223,7 +219,7 @@ public class OntologyResourceTests {
     public void addOntologyRefusedIfNameNotSet() throws Exception {
         Ontology ontology = basicInstanceBuilder.givenANotPersistedOntology();
         ontology.setName(null);
-        restOntologyControllerMockMvc.perform(post("/api/ontology.json")
+        mockMvc.perform(post("/api/ontology.json")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(ontology.toJSON()))
             .andExpect(status().isBadRequest())
@@ -233,8 +229,8 @@ public class OntologyResourceTests {
     @Test
     @Transactional
     public void editValidOntology() throws Exception {
-        Ontology ontology = builder.givenAnOntology();
-        restOntologyControllerMockMvc.perform(put("/api/ontology/{id}.json", ontology.getId())
+        Ontology ontology = basicInstanceBuilder.givenAnOntology();
+        mockMvc.perform(put("/api/ontology/{id}.json", ontology.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(ontology.toJSON()))
             .andExpect(status().isOk())
@@ -246,29 +242,26 @@ public class OntologyResourceTests {
             .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.ontology.id").exists())
             .andExpect(jsonPath("$.ontology.name").value(ontology.getName()));
-
     }
-
 
     @Test
     @Transactional
     public void failWhenEditingOntologyDoesNotExists() throws Exception {
-        Ontology ontology = builder.givenAnOntology();
+        Ontology ontology = basicInstanceBuilder.givenAnOntology();
         em.remove(ontology);
-        restOntologyControllerMockMvc.perform(put("/api/ontology/{id}.json", 0)
+        mockMvc.perform(put("/api/ontology/{id}.json", 0)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(ontology.toJSON()))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.success").value(false))
             .andExpect(jsonPath("$.errors").exists());
-
     }
 
     @Test
     @Transactional
     public void deleteOntology() throws Exception {
-        Ontology ontology = builder.givenAnOntology();
-        restOntologyControllerMockMvc.perform(delete("/api/ontology/{id}.json", ontology.getId())
+        Ontology ontology = basicInstanceBuilder.givenAnOntology();
+        mockMvc.perform(delete("/api/ontology/{id}.json", ontology.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(ontology.toJSON()))
             .andExpect(status().isOk())
@@ -285,10 +278,48 @@ public class OntologyResourceTests {
     @Test
     @Transactional
     public void failWhenDeleteOntologyNotExists() throws Exception {
-        restOntologyControllerMockMvc.perform(delete("/api/ontology/{id}.json", 0)
+        mockMvc.perform(delete("/api/ontology/{id}.json", 0)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.success").value(false))
             .andExpect(jsonPath("$.errors").exists());
+    }
+
+    @Test
+    public void exportShouldReturnOkWithCorrectStructure() throws Exception {
+        Ontology ontology = basicInstanceBuilder.givenAnOntology();
+        Term term = basicInstanceBuilder.givenATerm(ontology);
+        Long userId = basicInstanceBuilder.givenSuperAdmin().getId();
+        when(termHttpContract.findTermsByOntology(eq(ontology.getId()), eq(userId), any(Pageable.class)))
+            .thenReturn(new PageImpl<>(List.of(
+                new TermResponse(
+                    term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
+                    LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()),
+                    LocalDateTime.ofInstant(term.getUpdated().toInstant(), ZoneId.systemDefault()),
+                    Optional.empty(), term.getComment(), Set.of()
+                )))
+            );
+
+        mockMvc.perform(get("/api/ontology/{id}/export", ontology.getId()))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(header().string("Content-Disposition", containsString("attachment; filename=")))
+            .andExpect(header().string("Content-Disposition", containsString(".json")))
+            .andExpect(jsonPath("$.name").value(ontology.getName()))
+            .andExpect(jsonPath("$.terms[0].name").value(term.getName()))
+            .andExpect(jsonPath("$.terms[0].color").value(term.getColor()));
+    }
+
+    @Test
+    public void exportShouldReturnNotFoundWhenOntologyDoesNotExist() throws Exception {
+        Long nonExistentId = 0L;
+
+        mockMvc.perform(get("/api/ontology/{id}/export", nonExistentId))
+            .andExpect(status().isNotFound())
+            .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON_VALUE))
+            .andExpect(jsonPath("$.title").value(HttpStatus.NOT_FOUND.getReasonPhrase()))
+            .andExpect(jsonPath("$.status").value(HttpStatus.NOT_FOUND.value()))
+            .andExpect(jsonPath("$.detail").value("Ontology not found with id: " + nonExistentId))
+            .andExpect(jsonPath("$.instance").value("/api/ontology/" + nonExistentId + "/export"));
     }
 }

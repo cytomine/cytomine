@@ -127,6 +127,20 @@ public class RestAnnotationDomainController extends RestCytomineController {
         return responseSuccess(annotations, params.getJSONAttrLong("offset", 0L), params.getJSONAttrLong("max", 0L));
     }
 
+    @GetMapping(value = "/project/{projectId}/annotations/export", produces = "application/geo+json")
+    public ResponseEntity<Map<String, Object>> export(@PathVariable Long projectId) {
+        log.info("GET /project/{}/annotations/export", projectId);
+        Project project = projectService.find(projectId)
+            .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
+
+        String filename = reportService.getAnnotationReportFileName(ReportType.GEOJSON.getLabel(), project.getName());
+        Map<String, Object> geoJson = annotationReportService.exportAnnotations(projectId);
+
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+            .body(geoJson);
+    }
+
     @PostMapping("/project/{projectId}/annotation/download")
     public ResponseEntity<byte[]> download(@PathVariable Long projectId, @RequestBody AnnotationReportParams params)
         throws IOException {

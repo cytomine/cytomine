@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.cytomine.repository.mapper.StatsMapper;
 import org.cytomine.repository.persistence.TermRepository;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,36 +22,50 @@ import be.cytomine.common.repository.model.stat.payload.StatTerm;
 @RequiredArgsConstructor
 public class StatsController implements StatsHttpContract {
 
-    private final TermRepository termRepository;
     private final StatsMapper statsMapper;
 
+    private final TermRepository termRepository;
 
     @Override
     @GetMapping("/project/{projectId}")
-    public Page<StatTerm> findTermsByProject(@PathVariable long projectId, @RequestParam long userId,
-                                             @RequestParam(required = false) Optional<LocalDateTime> startDate,
-                                             @RequestParam(required = false) Optional<LocalDateTime> endDate,
-                                             @RequestParam int page, @RequestParam int size) {
-        return termRepository.findAllByProjectForStats(projectId, startDate.orElse(null), endDate.orElse(null),
-            PageRequest.of(page, size)).map(statsMapper::map);
+    public Page<StatTerm> findTermsByProject(
+        @PathVariable long projectId,
+        @RequestParam long userId,
+        @RequestParam(required = false) Optional<LocalDateTime> startDate,
+        @RequestParam(required = false) Optional<LocalDateTime> endDate,
+        Pageable pageable
+    ) {
+        return termRepository.findAllByProjectForStats(
+            projectId,
+            startDate.orElse(null),
+            endDate.orElse(null),
+            pageable
+        ).map(statsMapper::map);
     }
 
     @Override
     @GetMapping("/per-user/project/{projectId}")
-    public Page<FlatStatUserTerm> findUserTermsByProject(long projectId, long userId, int page, int size) {
-        return termRepository.findAllByUsersByProjectForStats(projectId, PageRequest.of(page, size))
-            .map(statsMapper::map);
+    public Page<FlatStatUserTerm> findUserTermsByProject(
+        @PathVariable long projectId,
+        @RequestParam long userId,
+        Pageable pageable
+    ) {
+        return termRepository.findAllByUsersByProjectForStats(projectId, pageable).map(statsMapper::map);
     }
 
     @Override
     @GetMapping("/per-term-and-image/project/{projectId}")
-    public Page<StatPerTermAndImage> findPerTermAndImageByProject(@PathVariable long projectId,
-                                                                  @RequestParam(required = false)
-                                                                  Optional<LocalDateTime> startDate,
-                                                                  @RequestParam(required = false)
-                                                                  Optional<LocalDateTime> endDate,
-                                                                  @RequestParam int page, @RequestParam int size) {
-        return termRepository.findAllPerTermAndImageByProjectForStats(projectId, startDate.orElse(null),
-            endDate.orElse(null), PageRequest.of(page, size)).map(statsMapper::map);
+    public Page<StatPerTermAndImage> findPerTermAndImageByProject(
+        @PathVariable long projectId,
+        @RequestParam(required = false) Optional<LocalDateTime> startDate,
+        @RequestParam(required = false) Optional<LocalDateTime> endDate,
+        Pageable pageable
+    ) {
+        return termRepository.findAllPerTermAndImageByProjectForStats(
+            projectId,
+            startDate.orElse(null),
+            endDate.orElse(null),
+            pageable
+        ).map(statsMapper::map);
     }
 }

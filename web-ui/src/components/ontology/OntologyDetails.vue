@@ -1,22 +1,8 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
   <div>
     <b-loading :is-full-page="false" :active="loading" />
     <b-message v-if="error" type="is-danger" has-icon icon-size="is-small">
-      {{$t('unexpected-error-info-message')}}
+      {{ $t('unexpected-error-info-message') }}
     </b-message>
     <div v-else-if="!loading" class="ontology-details-wrapper">
       <table class="table is-fullwidth">
@@ -65,6 +51,7 @@
           <td><strong>{{$t('actions')}}</strong></td>
           <td>
             <div class="buttons">
+              <button class="button" @click="exportOntology">{{$t('export-ontology')}}</button>
               <button class="button" @click="isRenameModalActive = true">
                 {{$t('button-rename')}}
               </button>
@@ -95,9 +82,10 @@
 
 <script>
 import {get} from '@/utils/store-helpers';
-import {Ontology, User, ProjectCollection} from '@/api';
+import {Cytomine, Ontology, User, ProjectCollection} from '@/api';
 import OntologyTree from './OntologyTree';
 import RenameModal from '@/components/utils/RenameModal';
+import {getFilename, triggerBlobDownload} from '@/utils/download';
 
 export default {
   name: 'ontology-details',
@@ -192,7 +180,7 @@ export default {
         });
         this.$emit('rename', newName);
       } catch (error) {
-        console.log(error);
+        console.error(error);
         this.$notify({
           type: 'error',
           text: this.$t('notif-error-ontology-rename', {name: oldName})
@@ -210,7 +198,21 @@ export default {
         cancelText: this.$t('button-cancel'),
         onConfirm: () => this.$emit('delete')
       });
-    }
+    },
+    async exportOntology() {
+      try {
+        const response = await Cytomine.instance.api.get(
+          `/ontology/${this.fullOntology.id}/export`,
+          {responseType: 'blob'},
+        );
+
+        const defaultFilename = `${this.fullOntology.name}.json`;
+        const filename = getFilename(response.headers?.['content-disposition']) || defaultFilename;
+        triggerBlobDownload(response.data, filename);
+      } catch (error) {
+        console.error(error);
+      }
+    },
   },
   created() {
     this.fetchOntology();

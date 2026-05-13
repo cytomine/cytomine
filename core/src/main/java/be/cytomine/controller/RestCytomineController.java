@@ -542,6 +542,7 @@ public abstract class RestCytomineController {
             case PDF -> MediaType.APPLICATION_PDF;
             case CSV -> MediaType.parseMediaType("text/csv");
             case EXCEL -> MediaType.APPLICATION_OCTET_STREAM;
+            case GEOJSON -> MediaType.parseMediaType("application/geo+json");
         };
 
         return ResponseEntity.ok()

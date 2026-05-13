@@ -1,38 +1,22 @@
 package be.cytomine.service.ontology;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+import java.util.Set;
 
-import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.client.WireMock;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
@@ -40,12 +24,15 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.http.TermHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.domain.ontology.RelationTerm;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
+import be.cytomine.dto.ontology.OntologyExport;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.ontology.OntologyRepository;
@@ -56,12 +43,11 @@ import be.cytomine.service.command.TransactionService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.utils.CommandResponse;
 
-import static be.cytomine.service.search.RetrievalService.CBIR_API_BASE_PATH;
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.matching;
-import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
 import static org.springframework.security.acls.domain.BasePermission.READ;
 import static org.springframework.security.acls.domain.BasePermission.WRITE;
@@ -69,55 +55,42 @@ import static org.springframework.security.acls.domain.BasePermission.WRITE;
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 public class OntologyServiceTests {
 
-    private static WireMockServer wireMockServer;
     @Autowired
-    OntologyService ontologyService;
+    private OntologyService ontologyService;
+
     @Autowired
-    OntologyRepository ontologyRepository;
+    private OntologyRepository ontologyRepository;
+
     @Autowired
-    BasicInstanceBuilder basicInstanceBuilder;
+    private BasicInstanceBuilder basicInstanceBuilder;
+
     @Autowired
-    BasicInstanceBuilder builder;
+    private BasicInstanceBuilder builder;
+
     @Autowired
-    CommandService commandService;
+    private CommandService commandService;
+
     @Autowired
-    TransactionService transactionService;
+    private TransactionService transactionService;
+
     @Autowired
-    RelationTermRepository relationTermRepository;
+    private RelationTermRepository relationTermRepository;
+
+    @Autowired
+    private PermissionService permissionService;
+
+    @Autowired
+    private ProjectService projectService;
+
+    @Autowired
+    private EntityManager entityManager;
+
     @MockitoBean
-    TermHttpContract termHttpContract;
-    @Autowired
-    PermissionService permissionService;
-    @Autowired
-    ProjectService projectService;
-    @Autowired
-    EntityManager entityManager;
-
-    private static void setupStub() {
-        /* Simulate call to CBIR */
-        wireMockServer.stubFor(post(urlPathEqualTo(CBIR_API_BASE_PATH + "/storages"))
-            .withRequestBody(matching(".*"))
-            .willReturn(aResponse().withBody(UUID.randomUUID().toString()))
-        );
-    }
-
-    @BeforeAll
-    public static void beforeAll() {
-        wireMockServer = new WireMockServer(8888);
-        wireMockServer.start();
-        WireMock.configureFor("localhost", wireMockServer.port());
-
-        setupStub();
-    }
-
-    @AfterAll
-    public static void afterAll() {
-        wireMockServer.stop();
-    }
+    private TermHttpContract termHttpContract;
 
     private Optional<Long> getTerm(Long termId) {
         String request = "select count(*) from term where id = :id and deleted is null";
@@ -126,7 +99,6 @@ public class OntologyServiceTests {
         long count = ((Number) query.getSingleResult()).longValue();
         return count > 0 ? Optional.of(termId) : Optional.empty();
     }
-
 
     @Test
     void listAllOntologyWithSuccess() {
@@ -157,7 +129,6 @@ public class OntologyServiceTests {
         assertThat(ontologyService.find(0L)).isEmpty();
     }
 
-
     @Test
     void listLightOntology() {
         Ontology ontology = builder.givenAnOntology();
@@ -183,21 +154,14 @@ public class OntologyServiceTests {
     void addOntologyWithNullNameFail() {
         Ontology ontology = basicInstanceBuilder.givenANotPersistedOntology();
         ontology.setName("");
-        Assertions.assertThrows(
-            WrongArgumentException.class, () -> {
-                ontologyService.add(ontology.toJsonObject());
-            }
-        );
+        Assertions.assertThrows(WrongArgumentException.class, () -> ontologyService.add(ontology.toJsonObject()));
     }
-
 
     @Test
     void undoRedoOntologyCreationWithSuccess() {
         Ontology ontology = basicInstanceBuilder.givenANotPersistedOntology();
         CommandResponse commandResponse = ontologyService.add(ontology.toJsonObject());
         assertThat(ontologyService.find(commandResponse.getObject().getId())).isPresent();
-        System.out.println(
-            "id = " + commandResponse.getObject().getId() + " name = " + ontology.getName());
 
         commandService.undo();
 
@@ -214,8 +178,6 @@ public class OntologyServiceTests {
         Ontology ontology = basicInstanceBuilder.givenANotPersistedOntology();
         CommandResponse commandResponse = ontologyService.add(ontology.toJsonObject());
         assertThat(ontologyService.find(commandResponse.getObject().getId())).isPresent();
-        System.out.println(
-            "id = " + commandResponse.getObject().getId() + " name = " + ontology.getName());
 
         commandService.undo();
 
@@ -226,11 +188,7 @@ public class OntologyServiceTests {
         builder.persistAndReturn(ontologyWithSameName);
 
         // re-create a ontology with a name that already exist in this ontology
-        Assertions.assertThrows(
-            AlreadyExistException.class, () -> {
-                commandService.redo();
-            }
-        );
+        Assertions.assertThrows(AlreadyExistException.class, () -> commandService.redo());
     }
 
     @Test
@@ -285,7 +243,7 @@ public class OntologyServiceTests {
         Ontology ontology = builder.givenAnOntology();
         Term term1 = builder.givenATerm(ontology);
         Term term2 = builder.givenATerm(ontology);
-        RelationTerm relationTerm = builder.givenARelationTerm(term1, term2);
+        builder.givenARelationTerm(term1, term2);
 
         CommandResponse commandResponse = ontologyService.delete(ontology, null, null, true);
 
@@ -319,8 +277,7 @@ public class OntologyServiceTests {
         Term term2 = builder.givenATerm(ontology);
         RelationTerm relationTerm = builder.givenARelationTerm(term1, term2);
 
-        CommandResponse commandResponse =
-            ontologyService.delete(ontology, transactionService.start(), null, true);
+        ontologyService.delete(ontology, transactionService.start(), null, true);
 
         assertThat(ontologyService.find(ontology.getId()).isEmpty());
         assertThat(relationTermRepository.findById(relationTerm.getId())).isEmpty();
@@ -372,7 +329,8 @@ public class OntologyServiceTests {
         );
 
         assertThat(permissionService.hasACLPermission(
-            ontology, userAdminInProject.getUsername(),
+            ontology,
+            userAdminInProject.getUsername(),
             ADMINISTRATION
         )).isTrue();
 
@@ -393,14 +351,11 @@ public class OntologyServiceTests {
             ontology, userNotInProject.getUsername(),
             READ
         )).isFalse();
-
     }
-
 
     @Test
     @WithMockUser("user")
     void determineRightsForUsersKeepRightsForOntologyCreator() {
-
         // create ontology for user
         Ontology ontology = basicInstanceBuilder.givenANotPersistedOntology();
         CommandResponse commandResponse = ontologyService.add(ontology.toJsonObject());
@@ -423,10 +378,7 @@ public class OntologyServiceTests {
         assertThat(permissionService.hasACLPermission(project, "user", READ)).isTrue();
 
         // change project ontology
-        commandResponse = projectService.update(
-            project, project.toJsonObject()
-                .withChange("ontology", null)
-        );
+        projectService.update(project, project.toJsonObject().withChange("ontology", null));
 
         // check that use still keep its rights to access ontology
         assertThat(ontology.getUser().getUsername()).isEqualTo("user");
@@ -434,5 +386,29 @@ public class OntologyServiceTests {
         assertThat(permissionService.hasACLPermission(ontology, "user", READ)).isTrue();
         assertThat(permissionService.hasACLPermission(project, "user", ADMINISTRATION)).isTrue();
         assertThat(permissionService.hasACLPermission(project, "user", READ)).isTrue();
+    }
+
+    @Test
+    public void exportShouldReturnOntologyExportWithMappedTerms() {
+        Ontology ontology = basicInstanceBuilder.givenAnOntology();
+        Term term = basicInstanceBuilder.givenATerm(ontology);
+        List<TermResponse> termResponses = List.of(
+            new TermResponse(
+                term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
+                LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()),
+                LocalDateTime.ofInstant(term.getUpdated().toInstant(), ZoneId.systemDefault()),
+                Optional.empty(), term.getComment(), Set.of()
+            )
+        );
+
+        when(termHttpContract.findTermsByOntology(eq(ontology.getId()), anyLong(), any(Pageable.class)))
+            .thenReturn(new PageImpl<>(termResponses));
+
+        OntologyExport result = ontologyService.export(ontology);
+
+        assertThat(result.name()).isEqualTo(ontology.getName());
+        assertThat(result.terms()).hasSize(termResponses.size());
+        assertThat(result.terms().getFirst().name()).isEqualTo(term.getName());
+        assertThat(result.terms().getFirst().color()).isEqualTo(term.getColor());
     }
 }

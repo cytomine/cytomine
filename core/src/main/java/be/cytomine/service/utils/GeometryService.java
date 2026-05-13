@@ -2,7 +2,7 @@ package be.cytomine.service.utils;
 
 import java.util.List;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -15,9 +15,11 @@ import org.springframework.stereotype.Service;
 
 import be.cytomine.exceptions.WrongArgumentException;
 
+@RequiredArgsConstructor
 @Service
-@AllArgsConstructor
 public class GeometryService {
+
+    private final GeoJsonWriter geoJsonWriter;
 
     public static final List<String> SUPPORTED_TYPES = List.of(
         "Point",
@@ -74,7 +76,7 @@ public class GeometryService {
             WKTReader reader = new WKTReader();
             Geometry geometry = reader.read(wkt);
 
-            return new GeoJsonWriter().write(geometry);
+            return geoJsonWriter.write(geometry);
         } catch (ParseException e) {
             throw new WrongArgumentException("WKT cannot be convert to GeoJSON: " + wkt);
         }

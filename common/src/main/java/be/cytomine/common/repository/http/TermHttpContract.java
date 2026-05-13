@@ -54,5 +54,4 @@ public interface TermHttpContract {
 
     @GetExchange("/project/{id}/all-terms")
     Set<Long> findAllTermIdsByProject(@PathVariable long id, @RequestParam long userId);
-
 }

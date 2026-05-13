@@ -458,6 +458,29 @@ public class CytomineSteps {
         throw new RuntimeException("File ending with " + filenameSuffix + " was not found!");
     }
 
+    public void exportOntology(Wait<WebDriver> wait, String ontologyUrl, String ontologyName) {
+        webDriverUtils.goTo(wait, ontologyUrl);
+        webDriverUtils.byClick(wait, By.xpath("//button[normalize-space()='Export ontology']"));
+
+        String filename = ontologyName + "." + ReportType.JSON.getLabel();;
+        Instant end = Instant.now().plus(Duration.ofSeconds(5));
+
+        while (Instant.now().isBefore(end)) {
+            File directory = new File(DOWNLOAD_PATH);
+            File[] matches = directory.listFiles((d, name) -> name.equals(filename));
+            if (matches != null && matches.length > 0 && matches[0].length() > 0) {
+                return;
+            }
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+
+        throw new RuntimeException("Ontology with name " + filename + " was not found!");
+    }
+
     public void createUser(
         Wait<WebDriver> wait,
         URL cytomineUrl,

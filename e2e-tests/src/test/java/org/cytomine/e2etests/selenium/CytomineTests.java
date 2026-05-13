@@ -451,4 +451,19 @@ public class CytomineTests {
         cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
         cytomineSteps.logout(wait, cytomineUrl);
     }
+
+    @Test
+    void exportOntology() {
+        String ontologyName = "selenium-" + randomUUID();
+        String termName = "selenium-term-" + randomUUID();
+
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        String ontologyUrl = cytomineSteps.createOntology(wait, driver, cytomineUrl, ontologyName);
+        cytomineSteps.addTermToOntology(wait, driver, ontologyUrl, termName);
+
+        cytomineSteps.exportOntology(wait, ontologyUrl, ontologyName);
+
+        cytomineSteps.deleteOntology(wait, ontologyUrl);
+        cytomineSteps.logout(wait, cytomineUrl);
+    }
 }

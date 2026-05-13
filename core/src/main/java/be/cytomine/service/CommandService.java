@@ -26,7 +26,6 @@ import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import be.cytomine.domain.command.AddCommand;
@@ -50,8 +49,6 @@ import be.cytomine.utils.JsonObject;
 @Service
 @Transactional
 public class CommandService {
-    @Autowired
-    ApplicationContext applicationContext;
 
     @Autowired
     EntityManager entityManager;

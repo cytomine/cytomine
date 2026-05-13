@@ -44,8 +44,6 @@ import be.cytomine.exceptions.InvalidRequestException;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.exceptions.ServerException;
 import be.cytomine.exceptions.WrongArgumentException;
-import be.cytomine.repository.ontology.UserAnnotationRepository;
-import be.cytomine.service.database.SequenceService;
 import be.cytomine.service.meta.AttachedFileService;
 import be.cytomine.service.meta.DescriptionService;
 import be.cytomine.service.meta.PropertyService;
@@ -77,12 +75,6 @@ public abstract class ModelService<T extends CytomineDomain> {
     CommandService commandService;
 
     @Autowired
-    SequenceService sequenceService;
-
-    @Autowired
-    UserAnnotationRepository userAnnotationRepository;
-
-    @Autowired
     PropertyService propertyService;
 
     @Autowired
@@ -93,10 +85,6 @@ public abstract class ModelService<T extends CytomineDomain> {
 
     @Autowired
     TagDomainAssociationService tagDomainAssociationService;
-
-    public Long generateNextId() {
-        return sequenceService.generateID();
-    }
 
     /**
      * Save a domain on database, throw error if cannot save
@@ -430,20 +418,9 @@ public abstract class ModelService<T extends CytomineDomain> {
             "getStringParamsI18n must be implemented for " + this.getClass().toString());
     }
 
-    /**
-     * Build callback data for a domain (by default null) Callback are metadata used by client You need to override
-     * getCallBack() in domain class
-     *
-     * @return Callback data
-     */
-    public Map<String, Object> getCallBack() {
-        return null;
-    }
-
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData) {
         return update(domain, jsonNewData, null);
     }
-
 
     public CommandResponse update(
         CytomineDomain domain, JsonObject jsonNewData,

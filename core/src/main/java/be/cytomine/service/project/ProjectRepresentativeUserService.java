@@ -40,7 +40,6 @@ import be.cytomine.repository.project.ProjectRepository;
 import be.cytomine.repository.project.ProjectRepresentativeUserRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.ModelService;
-import be.cytomine.service.PermissionService;
 import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.service.security.UserService;
 import be.cytomine.utils.CommandResponse;
@@ -68,11 +67,7 @@ public class ProjectRepresentativeUserService extends ModelService {
     private ProjectRepository projectRepository;
 
     @Autowired
-    private PermissionService permissionService;
-
-    @Autowired
     private UserService userService;
-
 
     @Override
     public Class currentDomain() {

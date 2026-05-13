@@ -25,13 +25,11 @@ import org.springframework.http.ResponseEntity;
 
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.CytomineSocialDomain;
-import be.cytomine.dto.PimsResponse;
 import be.cytomine.dto.json.JsonInput;
 import be.cytomine.dto.json.JsonMultipleObject;
 import be.cytomine.dto.json.JsonSingleObject;
 import be.cytomine.exceptions.CytomineException;
 import be.cytomine.exceptions.CytomineMethodNotYetImplementedException;
-import be.cytomine.exceptions.InvalidRequestException;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.service.ModelService;
 import be.cytomine.service.command.TransactionService;
@@ -309,10 +307,6 @@ public abstract class RestCytomineController {
             .body(buildJsonList(list, offsetParameter, maxParameter).toJsonString());
     }
 
-    protected ResponseEntity<String> buildJson(CytomineDomain response, int code) {
-        return ResponseEntity.status(code).body(response.toJSON());
-    }
-
     protected ResponseEntity<String> buildJson(Map<String, Object> response, int code) {
         return ResponseEntity.status(code).body(convertObjectToJSON(response));
     }
@@ -339,18 +333,6 @@ public abstract class RestCytomineController {
             results.add(cytomineDomain.toJsonObject());
         }
         return results;
-    }
-
-    protected List<JsonObject> convertCommandResponseToJSON(List<? extends CommandResponse> list) {
-        List<JsonObject> results = new ArrayList<>();
-        for (CommandResponse commandResponse : list) {
-            results.add(commandResponse.toJsonObject());
-        }
-        return results;
-    }
-
-    protected String convertListToJSON(List o) {
-        return JsonObject.toJsonString(o);
     }
 
     public ResponseEntity<String> add(ModelService service, JsonInput json) {
@@ -446,18 +428,6 @@ public abstract class RestCytomineController {
         }
     }
 
-    /**
-     * Call add function for this service with the json
-     *
-     * @param service Service for this domain
-     * @param json    JSON data
-     *
-     * @return response
-     */
-    public CommandResponse addOne(ModelService service, JsonObject json) {
-        return service.add(json);
-    }
-
     public CommandResponse addOne(ModelService service, JsonObject json, Task task) {
         if (task == null) {
             return service.add(json);
@@ -515,18 +485,6 @@ public abstract class RestCytomineController {
         return flatMap;
     }
 
-    protected void responseImageByteArray(String contentType, byte[] bytes) throws IOException {
-        response.setContentLength(bytes.length);
-        response.setStatus(200);
-        response.setHeader("Connection", "Keep-Alive");
-        response.setHeader("Accept-Ranges", "bytes");
-        response.setHeader("Content-Type", contentType);
-        try (OutputStream os = response.getOutputStream()) {
-            os.write(bytes, 0, bytes.length);
-            os.flush();
-        }
-    }
-
     protected void responseFile(String name, byte[] array) throws IOException {
         response.setStatus(200);
         response.setHeader("Content-Type", "application/octet-stream");
@@ -564,74 +522,6 @@ public abstract class RestCytomineController {
         try (OutputStream os = response.getOutputStream()) {
             os.write(array, 0, array.length);
             os.flush();
-        }
-    }
-
-    protected void responseString(String contentType, String string) throws IOException {
-        response.setContentType(contentType);
-        response.setStatus(200);
-        response.getWriter().write(string);
-        response.getWriter().flush();
-    }
-
-    protected void responseImage(PimsResponse image) throws IOException {
-        String contentType = image.getHeaders().get("Content-Type");
-        if (request.getMethod().equals("HEAD")) {
-            responseString(contentType, "");
-        } else {
-            for (Map.Entry<String, String> entry : image.getHeaders().entrySet()) {
-                response.setHeader(entry.getKey(), entry.getValue());
-            }
-            response.setContentLength(image.getContent().length);
-            try (OutputStream os = response.getOutputStream()) {
-                os.write(image.getContent(), 0, image.getContent().length);
-                os.flush();
-            }
-        }
-    }
-
-    /**
-     * Response an image as a HTTP response
-     *
-     * @param bytes Image
-     */
-    protected void responseByteArray(byte[] bytes, String expectedFormat) {
-        try {
-            RequestParams params = retrieveRequestParam();
-            String format = expectedFormat;
-            if (params.isTrue("alphaMask") || params.isValue("type", "alphaMask")) {
-                format = "png";
-            }
-
-            if (format.equals("jpg")) {
-                if (request.getMethod().equals("HEAD")) {
-                    responseString("image/jpeg", "");
-                } else {
-                    responseImageByteArray("image/jpeg", bytes);
-                }
-            } else if (format.equals("tiff") || format.equals("tif")) {
-                if (request.getMethod().equals("HEAD")) {
-                    responseString("image/tiff", "");
-                } else {
-                    responseImageByteArray("image/tiff", bytes);
-                }
-            } else if (format.equals("webp")) {
-                if (request.getMethod().equals("HEAD")) {
-                    responseString("image/webp", "");
-                } else {
-                    responseImageByteArray("image/webp", bytes);
-                }
-            } else if (format.equals("png")) {
-                if (request.getMethod().equals("HEAD")) {
-                    responseString("image/png", "");
-                } else {
-                    responseImageByteArray("image/png", bytes);
-                }
-            } else {
-                throw new InvalidRequestException("Format " + format + " is not supported");
-            }
-        } catch (IOException e) {
-            log.error("Cannot response bytes from controller", e);
         }
     }
 }

@@ -135,8 +135,8 @@ public class TermService extends ModelService {
     @Override
     public void deleteDependencies(CytomineDomain domain, Transaction transaction, Task task) {
         deleteDependentRelationTerm((Term) domain, transaction, task);
-        deleteAnnotationTerm((Term) domain, transaction, task);
-        deleteReviewedAnnotationTerm((Term) domain, transaction, task);
+        deleteAnnotationTerm((Term) domain);
+        deleteReviewedAnnotationTerm((Term) domain);
     }
 
     public void deleteDependentRelationTerm(Term term, Transaction transaction, Task task) {
@@ -145,7 +145,7 @@ public class TermService extends ModelService {
         }
     }
 
-    public void deleteAnnotationTerm(Term term, Transaction transaction, Task task) {
+    public void deleteAnnotationTerm(Term term) {
         long terms = annotationTermRepository.countByTerm(term);
         if (terms != 0) {
             throw new ConstraintException(
@@ -153,7 +153,7 @@ public class TermService extends ModelService {
         }
     }
 
-    public void deleteReviewedAnnotationTerm(Term term, Transaction transaction, Task task) {
+    public void deleteReviewedAnnotationTerm(Term term) {
         long terms = reviewedAnnotationRepository.countAllByTermsContaining(term);
         if (terms != 0) {
             throw new ConstraintException(

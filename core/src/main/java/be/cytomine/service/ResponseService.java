@@ -39,15 +39,6 @@ public class ResponseService {
     @Autowired
     MessageSource messageSource;
 
-    public CommandResponse createResponseMessage(
-        CytomineDomain object,
-        List<Object> messageParams,
-        boolean printMessage,
-        String commandType
-    ) {
-        return createResponseMessage(object, messageParams, printMessage, commandType, null);
-    }
-
     /**
      * Create response message structure for a command result E.g. if we try to add a new annotation "object"
      *

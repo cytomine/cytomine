@@ -28,10 +28,6 @@ public class RequestParams extends HashMap<String, String> {
         return get(key) == null;
     }
 
-    public boolean isValue(String key, String value) {
-        return !isNull(key) && get(key).equals(value);
-    }
-
     public boolean getWithImageGroup() {
         return get("withImageGroup").equals("true");
     }

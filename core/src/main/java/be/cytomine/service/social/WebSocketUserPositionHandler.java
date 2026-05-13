@@ -25,7 +25,6 @@ import be.cytomine.exceptions.ServerException;
 import be.cytomine.repository.image.ImageInstanceRepository;
 import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.CytomineWebSocketHandler;
-import be.cytomine.utils.JsonObject;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -98,7 +97,6 @@ public class WebSocketUserPositionHandler extends CytomineWebSocketHandler {
         boolean isNumeric = StringUtils.isNumeric(message.getPayload().toString());
 
         if (!isNumeric) {
-            Map<String, Object> payloadMap = JsonObject.toMap(payload);
             String userId = session.getAttributes().get("userId").toString();
             sendPositionToFollowers(userId, imageId, message.getPayload().toString());
             return;

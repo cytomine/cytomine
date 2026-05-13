@@ -283,18 +283,10 @@ public class SecurityACLService {
         }
     }
 
-    public void checkCurrentUserIsAdmin() {
-        checkAdmin(currentUserService.getCurrentUser());
-    }
-
     public void checkAdmin(User user) {
         if (!currentRoleService.isAdminByNow(user)) {
             throw new ForbiddenException("You don't have the right to perform this action! You must be admin!");
         }
-    }
-
-    public void checkCurrentUserIsUser() {
-        checkUser(currentUserService.getCurrentUser());
     }
 
     public void checkUser(User user) {
@@ -416,7 +408,6 @@ public class SecurityACLService {
                 return;
             }
 
-            CytomineDomain container = retrieveContainer(domain);
             switch (((Project) retrieveContainer(domain)).getMode()) {
                 case CLASSIC:
                     return;

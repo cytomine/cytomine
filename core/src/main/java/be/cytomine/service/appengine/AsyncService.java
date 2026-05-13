@@ -17,7 +17,6 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -124,7 +123,7 @@ public class AsyncService {
         String queryString = "?idStorage=" + userStorage.getId() + "&idProject=" + projectId;
         // Send the request
         String uploadUrl = imageServerService.internalImageServerURL() + "/upload";
-        ResponseEntity<String> response = restTemplate.postForEntity(
+        restTemplate.postForEntity(
             uploadUrl + queryString,
             requestEntity,
             String.class

@@ -40,7 +40,6 @@ public interface StatsHttpContract {
         @PathVariable long projectId,
         @RequestParam(required = false) Optional<LocalDateTime> startDate,
         @RequestParam(required = false) Optional<LocalDateTime> endDate,
-        @RequestParam int page,
-        @RequestParam int size
+        Pageable pageable
     );
 }

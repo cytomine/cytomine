@@ -252,15 +252,15 @@ public class StatsService {
 
     public List<StatPerTermAndImage> statPerTermAndImage(Project project, Date startDate, Date endDate) {
         securityACLService.check(project, READ);
-        Optional<LocalDateTime> start =
-            Optional.ofNullable(startDate).map(d -> d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-        Optional<LocalDateTime> end =
-            Optional.ofNullable(endDate).map(d -> d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+        Optional<LocalDateTime> start = Optional.ofNullable(startDate)
+            .map(d -> d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+        Optional<LocalDateTime> end = Optional.ofNullable(endDate)
+            .map(d -> d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
 
-        return new ArrayList<>(pagesClient.callAllPages(
-            (page, size) -> statsHttpContract.findPerTermAndImageByProject(project.getId(), start, end, page, size)));
+        return statsHttpContract.findPerTermAndImageByProject(project.getId(), start, end, Pageable.unpaged())
+            .stream()
+            .toList();
     }
-
 
     public List<JsonObject> statTerm(Project project, Date startDate, Date endDate, boolean leafsOnly) {
         securityACLService.check(project, READ);

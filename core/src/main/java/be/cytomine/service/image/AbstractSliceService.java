@@ -210,11 +210,10 @@ public class AbstractSliceService extends ModelService {
     }
 
     public void deleteDependencies(CytomineDomain domain, Transaction transaction, Task task) {
-        deleteDependentSliceInstance((AbstractSlice) domain, transaction, task);
+        deleteDependentSliceInstance((AbstractSlice) domain);
     }
 
-
-    private void deleteDependentSliceInstance(AbstractSlice ai, Transaction transaction, Task task) {
+    private void deleteDependentSliceInstance(AbstractSlice ai) {
         List<SliceInstance> images = sliceInstanceRepository.findAllByBaseSlice(ai);
         if (!images.isEmpty()) {
             throw new ConstraintException("This slice "
@@ -225,7 +224,6 @@ public class AbstractSliceService extends ModelService {
                 + images.stream().map(x -> x.getProject().getName()).collect(Collectors.joining(",")));
         }
     }
-
 
     @Override
     public CytomineDomain createFromJSON(JsonObject json) {

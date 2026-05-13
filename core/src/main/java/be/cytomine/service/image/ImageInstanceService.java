@@ -60,7 +60,6 @@ import be.cytomine.repository.image.ImageInstanceRepository;
 import be.cytomine.repository.image.NestedImageInstanceRepository;
 import be.cytomine.repository.image.SliceInstanceRepository;
 import be.cytomine.repository.meta.PropertyRepository;
-import be.cytomine.repository.ontology.AnnotationTrackRepository;
 import be.cytomine.repository.ontology.ReviewedAnnotationRepository;
 import be.cytomine.repository.ontology.UserAnnotationRepository;
 import be.cytomine.repositorynosql.social.AnnotationActionRepository;
@@ -162,9 +161,6 @@ public class ImageInstanceService extends ModelService {
 
     @Autowired
     PropertyRepository propertyRepository;
-
-    @Autowired
-    AnnotationTrackRepository annotationTrackRepository;
 
     @Autowired
     TrackService trackService;
@@ -369,13 +365,15 @@ public class ImageInstanceService extends ModelService {
             sortColumn = "instanceFilename";
         }
 
-        String sortedProperty = ReflectionUtils.findField(ImageInstance.class, sortColumn) != null ? imageInstanceAlias
-            + "."
-            + sortColumn : null;
+        String sortedProperty = ReflectionUtils.findField(ImageInstance.class, sortColumn) != null
+            ? imageInstanceAlias
+              + "."
+              + sortColumn
+            : null;
         if (sortedProperty == null) {
             sortedProperty = ReflectionUtils.findField(AbstractImage.class, sortColumn) != null ? abstractImageAlias
-                + "."
-                + sortColumn : null;
+                                                                                                  + "."
+                                                                                                  + sortColumn : null;
         }
         if (sortedProperty == null) {
             throw new CytomineMethodNotYetImplementedException("ImageInstance list sorted by "
@@ -559,10 +557,8 @@ public class ImageInstanceService extends ModelService {
         for (Map.Entry<String, Object> entry : mapParams.entrySet()) {
             query.setParameter(entry.getKey(), entry.getValue());
         }
-        long count = (Long) query.getResultList().get(0);
-        Page<Map<String, Object>> page = PageUtils.buildPageFromPageResults(results, max, offset, count);
-        return page;
-
+        long count = (Long) query.getResultList().getFirst();
+        return PageUtils.buildPageFromPageResults(results, max, offset, count);
     }
 
     public Page<Map<String, Object>> list(Project project, List<SearchParameterEntry> searchParameters) {
@@ -604,22 +600,24 @@ public class ImageInstanceService extends ModelService {
         }
 
 
-        String sortedProperty = ReflectionUtils.findField(ImageInstance.class, sortColumn) != null ? imageInstanceAlias
-            + "."
-            + sortColumn : null;
+        String sortedProperty = ReflectionUtils.findField(ImageInstance.class, sortColumn) != null
+            ? imageInstanceAlias
+              + "."
+              + sortColumn
+            : null;
         if (sortColumn.equals("blindedName")) {
             sortedProperty = imageInstanceAlias + ".baseImageId";
         }
 
         if (sortedProperty == null) {
             sortedProperty = ReflectionUtils.findField(AbstractImage.class, sortColumn) != null ? abstractImageAlias
-                + "."
-                + sortColumn : null;
+                                                                                                  + "."
+                                                                                                  + sortColumn : null;
         }
         if (sortedProperty == null) {
             sortedProperty = ReflectionUtils.findField(UploadedFile.class, sortColumn) != null ? mimeAlias
-                + "."
-                + sortColumn : null;
+                                                                                                 + "."
+                                                                                                 + sortColumn : null;
         }
         if (sortedProperty == null) {
             throw new CytomineMethodNotYetImplementedException("ImageInstance list sorted by "
@@ -868,9 +866,7 @@ public class ImageInstanceService extends ModelService {
             }
             results = lightResult;
         }
-        Page<Map<String, Object>> page = PageUtils.buildPageFromPageResults(results, max, offset, count);
-        return page;
-
+        return PageUtils.buildPageFromPageResults(results, max, offset, count);
     }
 
 
@@ -1143,15 +1139,15 @@ public class ImageInstanceService extends ModelService {
         ImageInstance imageInstance = (ImageInstance) domain;
         deleteDependentReviewedAnnotation(imageInstance, transaction, task);
         deleteDependentUserAnnotation(imageInstance, transaction, task);
-        deleteDependentAnnotationAction(imageInstance, transaction, task);
-        deleteDependentLastUserPosition(imageInstance, transaction, task);
-        deleteDependentPersistentUserPosition(imageInstance, transaction, task);
-        deleteDependentPersistentImageConsultation(imageInstance, transaction, task);
+        deleteDependentAnnotationAction(imageInstance);
+        deleteDependentLastUserPosition(imageInstance);
+        deleteDependentPersistentUserPosition(imageInstance);
+        deleteDependentPersistentImageConsultation(imageInstance);
         deleteDependentMetadata(imageInstance, transaction, task);
         deleteDependentDescription(imageInstance, transaction, task);
         deleteDependentAttachedFile(imageInstance, transaction, task);
         deleteDependentTagDomainAssociation(imageInstance, transaction, task);
-        deleteDependentNestedImageInstance(imageInstance, transaction, task);
+        deleteDependentNestedImageInstance(imageInstance);
         deleteDependentSliceInstance(imageInstance, transaction, task);
         deleteDependentTrack(imageInstance, transaction, task);
     }
@@ -1171,30 +1167,28 @@ public class ImageInstanceService extends ModelService {
     }
 
 
-    private void deleteDependentAnnotationAction(ImageInstance image, Transaction transaction, Task task) {
+    private void deleteDependentAnnotationAction(ImageInstance image) {
         annotationActionRepository.deleteAllByImage(image.getId());
     }
 
-    private void deleteDependentLastUserPosition(ImageInstance image, Transaction transaction, Task task) {
+    private void deleteDependentLastUserPosition(ImageInstance image) {
         lastUserPositionRepository.deleteAllByImage(image.getId());
     }
 
-    private void deleteDependentPersistentUserPosition(ImageInstance image, Transaction transaction, Task task) {
+    private void deleteDependentPersistentUserPosition(ImageInstance image) {
         persistentUserPositionRepository.deleteAllByImage(image.getId());
     }
 
-    private void deleteDependentPersistentImageConsultation(ImageInstance image, Transaction transaction, Task task) {
+    private void deleteDependentPersistentImageConsultation(ImageInstance image) {
         persistentImageConsultationRepository.deleteAllByImage(image.getId());
     }
 
-
-    private void deleteDependentNestedImageInstance(ImageInstance image, Transaction transaction, Task task) {
+    private void deleteDependentNestedImageInstance(ImageInstance image) {
         List<NestedImageInstance> nestedImageInstances = nestedImageInstanceRepository.findAllByParent(image);
         for (NestedImageInstance nestedImageInstance : nestedImageInstances) {
             nestedImageInstanceRepository.delete(nestedImageInstance);
         }
     }
-
 
     private void deleteDependentSliceInstance(ImageInstance image, Transaction transaction, Task task) {
         List<SliceInstance> slices = sliceInstanceRepository.findAllByImage(image);

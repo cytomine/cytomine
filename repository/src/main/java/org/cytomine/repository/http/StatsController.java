@@ -22,18 +22,26 @@ import be.cytomine.common.repository.model.stat.payload.StatTerm;
 @RequiredArgsConstructor
 public class StatsController implements StatsHttpContract {
 
-    private final TermRepository termRepository;
     private final StatsMapper statsMapper;
 
+    private final TermRepository termRepository;
 
     @Override
     @GetMapping("/project/{projectId}")
-    public Page<StatTerm> findTermsByProject(@PathVariable long projectId, @RequestParam long userId,
-                                             @RequestParam(required = false) Optional<LocalDateTime> startDate,
-                                             @RequestParam(required = false) Optional<LocalDateTime> endDate,
-                                             @RequestParam int page, @RequestParam int size) {
-        return termRepository.findAllByProjectForStats(projectId, startDate.orElse(null), endDate.orElse(null),
-            PageRequest.of(page, size)).map(statsMapper::map);
+    public Page<StatTerm> findTermsByProject(
+        @PathVariable long projectId,
+        @RequestParam long userId,
+        @RequestParam(required = false) Optional<LocalDateTime> startDate,
+        @RequestParam(required = false) Optional<LocalDateTime> endDate,
+        @RequestParam int page,
+        @RequestParam int size
+    ) {
+        return termRepository.findAllByProjectForStats(
+            projectId,
+            startDate.orElse(null),
+            endDate.orElse(null),
+            PageRequest.of(page, size)
+        ).map(statsMapper::map);
     }
 
     @Override
@@ -45,13 +53,18 @@ public class StatsController implements StatsHttpContract {
 
     @Override
     @GetMapping("/per-term-and-image/project/{projectId}")
-    public Page<StatPerTermAndImage> findPerTermAndImageByProject(@PathVariable long projectId,
-                                                                  @RequestParam(required = false)
-                                                                  Optional<LocalDateTime> startDate,
-                                                                  @RequestParam(required = false)
-                                                                  Optional<LocalDateTime> endDate,
-                                                                  @RequestParam int page, @RequestParam int size) {
-        return termRepository.findAllPerTermAndImageByProjectForStats(projectId, startDate.orElse(null),
-            endDate.orElse(null), PageRequest.of(page, size)).map(statsMapper::map);
+    public Page<StatPerTermAndImage> findPerTermAndImageByProject(
+        @PathVariable long projectId,
+        @RequestParam(required = false) Optional<LocalDateTime> startDate,
+        @RequestParam(required = false) Optional<LocalDateTime> endDate,
+        @RequestParam int page,
+        @RequestParam int size
+    ) {
+        return termRepository.findAllPerTermAndImageByProjectForStats(
+            projectId,
+            startDate.orElse(null),
+            endDate.orElse(null),
+            PageRequest.of(page, size)
+        ).map(statsMapper::map);
     }
 }

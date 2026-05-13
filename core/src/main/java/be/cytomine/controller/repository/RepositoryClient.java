@@ -70,7 +70,9 @@ public class RepositoryClient {
 
     private <T> T createClient(RestClient repositoryRestClient, Class<T> repoType) {
         RestClientAdapter adapter = RestClientAdapter.create(repositoryRestClient);
-        HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(adapter).build();
+        HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(adapter)
+            .customArgumentResolver(new PageableHttpServiceArgumentResolver())
+            .build();
         return factory.createClient(repoType);
     }
 }

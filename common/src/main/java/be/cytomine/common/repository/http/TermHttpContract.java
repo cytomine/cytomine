@@ -47,21 +47,7 @@ public interface TermHttpContract {
     Page<TermResponse> findTermsByProject(@PathVariable long id, @RequestParam long userId, Pageable pageable);
 
     @GetExchange("/ontology/{id}")
-    Page<TermResponse> findTermsByOntology(
-        @PathVariable long id,
-        @RequestParam long userId,
-        @RequestParam int page,
-        @RequestParam int size
-    );
-
-    default Page<TermResponse> findTermsByOntology(long id, long userId, Pageable pageable) {
-        return findTermsByOntology(
-            id,
-            userId,
-            pageable.isPaged() ? pageable.getPageNumber() : 0,
-            pageable.isPaged() ? pageable.getPageSize() : Integer.MAX_VALUE
-        );
-    }
+    Page<TermResponse> findTermsByOntology(@PathVariable long id, @RequestParam long userId, Pageable pageable);
 
     @GetExchange("/ontology/{id}/all-terms")
     Set<Long> findAllTermIdsByOntology(@PathVariable long id, @RequestParam long userId);

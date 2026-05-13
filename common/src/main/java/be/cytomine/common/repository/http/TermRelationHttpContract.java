@@ -34,6 +34,10 @@ public interface TermRelationHttpContract {
     @GetExchange("/ontology/{ontologyId}")
     List<TermRelationResponse> findAllByOntologyId(@PathVariable long ontologyId, @RequestParam long userId);
 
+    @GetExchange("/ontology/{ontologyId}/ids")
+    Set<Long> findAllIdsByOntologyId(@PathVariable long ontologyId, @RequestParam long userId);
+
+
     @PostExchange
     Optional<HttpCommandResponse> create(@RequestParam long userId,
                                          @Valid @RequestBody CreateTermRelation createTermRelation);
@@ -46,6 +50,10 @@ public interface TermRelationHttpContract {
     @DeleteExchange("/{id}")
     Optional<HttpCommandResponse> delete(@PathVariable long id,
                                          @RequestParam long userId);
+
+    @DeleteExchange("/{id}")
+    Set<HttpCommandResponse> deleteAll(@RequestParam Set<Long> ids,
+        @RequestParam long userId);
 
     @DeleteExchange("/term1/{idTerm1}/term2/{idTerm2}")
     Optional<HttpCommandResponse> deleteByTerms(@PathVariable long idTerm1,

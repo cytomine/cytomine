@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,7 @@ import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.stereotype.Service;
 
 import be.cytomine.common.repository.http.TermHttpContract;
+import be.cytomine.common.repository.http.TermRelationHttpContract;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;
@@ -62,6 +64,8 @@ public class OntologyService extends ModelService {
 
     @Autowired
     TermHttpContract termHttpContract;
+    @Autowired
+    TermRelationHttpContract termRelationHttpContract;
     @Autowired
     private OntologyRepository ontologyRepository;
     @Autowired
@@ -126,6 +130,14 @@ public class OntologyService extends ModelService {
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.check(domain, DELETE);
         securityACLService.checkUser(currentUser);
+
+        Set<Long> allTermRelationIdsByOntology = termRelationHttpContract.findAllIdsByOntologyId(domain.getId(),
+            currentUser.getId());
+        termRelationHttpContract.deleteAll(allTermRelationIdsByOntology, currentUser.getId());
+
+        Set<Long> allTermIdsByOntology = termHttpContract.findAllTermIdsByOntology(domain.getId(), currentUser.getId());
+        termHttpContract.deleteAll(allTermIdsByOntology, currentUser.getId());
+
         Command c = new DeleteCommand(currentUser, transaction);
         return executeCommand(c, domain, null);
     }

@@ -42,6 +42,9 @@ public interface TermHttpContract {
     Optional<HttpCommandResponse> delete(@PathVariable long id,
                                          @RequestParam long userId);
 
+    @DeleteExchange("/all")
+    Set<HttpCommandResponse> deleteAll(@RequestParam Set<Long> ids,
+        @RequestParam long userId);
 
     @GetExchange("/project/{id}")
     Page<TermResponse> findTermsByProject(@PathVariable long id, @RequestParam long userId, Pageable pageable);

@@ -3,6 +3,7 @@ package org.cytomine.repository.http;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -57,7 +58,7 @@ public class TermController implements TermHttpContract {
     @Override
     @PutMapping("/{id}")
     public Optional<HttpCommandResponse> update(@PathVariable long id, @RequestParam long userId,
-                                                @RequestBody UpdateTerm updateTerm) {
+        @RequestBody UpdateTerm updateTerm) {
         return termCommandService.updateTerm(id, userId, updateTerm, LocalDateTime.now());
     }
 
@@ -66,6 +67,17 @@ public class TermController implements TermHttpContract {
     @Transactional
     public Optional<HttpCommandResponse> delete(@PathVariable long id, @RequestParam long userId) {
         return termCommandService.deleteTerm(id, userId, LocalDateTime.now());
+    }
+
+    @Override
+    @DeleteMapping("/{id}")
+    @Transactional
+    public Set<HttpCommandResponse> deleteAll(Set<Long> ids, long userId) {
+        // Later we may implement it in OntologyHttpContract
+        return ids.stream()
+            .map(id -> termCommandService.deleteTerm(id, userId, LocalDateTime.now()))
+            .flatMap(Optional::stream)
+            .collect(Collectors.toSet());
     }
 
     @Override

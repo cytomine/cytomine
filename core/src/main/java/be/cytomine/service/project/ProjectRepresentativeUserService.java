@@ -7,7 +7,6 @@ import java.util.Optional;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import be.cytomine.domain.CytomineDomain;
@@ -23,10 +22,10 @@ import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.project.ProjectRepository;
 import be.cytomine.repository.project.ProjectRepresentativeUserRepository;
+import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.ModelService;
 import be.cytomine.service.security.SecurityACLService;
-import be.cytomine.service.security.UserService;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.Task;
@@ -48,7 +47,7 @@ public class ProjectRepresentativeUserService extends ModelService {
 
     private final ProjectRepository projectRepository;
 
-    private final UserService userService;
+    private final UserRepository userRepository;
 
     @Override
     public Class currentDomain() {
@@ -91,8 +90,9 @@ public class ProjectRepresentativeUserService extends ModelService {
     public CommandResponse add(JsonObject jsonObject) {
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.check(jsonObject.getJSONAttrLong("project"), Project.class, WRITE);
-        User user = userService.findUser(jsonObject.getJSONAttrLong("user"))
-            .orElseThrow(() -> new ObjectNotFoundException("User", jsonObject.getJSONAttrStr("user")));
+        Long userId = jsonObject.getJSONAttrLong("user");
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new ObjectNotFoundException("User", userId));
         Project project = projectRepository.findById(jsonObject.getJSONAttrLong("project"))
             .orElseThrow(() -> new ObjectNotFoundException("Project", jsonObject.getJSONAttrStr("project")));
 

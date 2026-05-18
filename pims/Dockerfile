@@ -44,7 +44,9 @@ RUN apt-get update && \
         libtiff-dev \
         libvips-dev \
         libvips42 \
-        libwebp-dev
+        libwebp-dev \
+        openssh-client \
+        git # Ensure git is installed for cloning
 
 COPY --from=registry.cytomine.org/github/ghcr.io/astral-sh/uv:0.9.30 /uv /uvx /bin/
 
@@ -68,11 +70,15 @@ RUN python plugins.py \
 # Cleaning. Cannot be done before as plugin prerequisites could use apt-get.
 RUN rm -rf /var/lib/apt/lists/*
 
+# Setup SSH known_hosts for GitHub
+RUN mkdir -p -m 0600 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
+
 COPY ./clients/python /clients/python
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=./pims/uv.lock,target=uv.lock \
     --mount=type=bind,source=./pims/pyproject.toml,target=pyproject.toml \
+    --mount=type=ssh \
     uv sync --frozen --no-install-project
 
 # Add default config
@@ -91,6 +97,7 @@ COPY ./pims/resources/ ./resources/
 
 COPY ./pims/pyproject.toml ./pims/uv.lock ./
 RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=ssh \
     uv sync
 
 RUN python plugins.py \

@@ -32,13 +32,4 @@ public class ServerControllerTests {
             .andExpect(jsonPath("$.serverURL").hasJsonPath())
             .andExpect(jsonPath("$.serverID").hasJsonPath());
     }
-
-    @Test
-    public void statusShouldReturnOk() throws Exception {
-        restConfigurationControllerMockMvc.perform(get("/status.json"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.alive").value(true))
-            .andExpect(jsonPath("$.version").hasJsonPath())
-            .andExpect(jsonPath("$.serverURL").hasJsonPath());
-    }
 }

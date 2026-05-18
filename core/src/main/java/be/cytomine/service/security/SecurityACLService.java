@@ -243,7 +243,7 @@ public class SecurityACLService {
 
     public List<Ontology> getOntologyList(User user) {
         if (currentRoleService.isAdminByNow(user)) {
-            return ontologyRepository.findAll();
+            return ontologyRepository.findAllByDeletedNull();
         }
         Query query = entityManager.createQuery(
             "select distinct ontology "
@@ -252,13 +252,13 @@ public class SecurityACLService {
                 + "AclSid as aclSid, "
                 + "Ontology as ontology "
                 + "where aclObjectId.objectId = ontology.id "
+                + "and ontology.deleted is null "
                 + "and aclEntry.aclObjectIdentity = aclObjectId "
                 + "and aclEntry.sid = aclSid "
                 + "and aclSid.sid like '"
                 + user.getUsername()
                 + "'");
-        List<Ontology> ontologies = query.getResultList();
-        return ontologies;
+        return (List<Ontology>) query.getResultList();
     }
 
     public void checkIsCurrentUserSameUser(Long userId) {

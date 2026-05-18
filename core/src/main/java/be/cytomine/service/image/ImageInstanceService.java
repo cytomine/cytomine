@@ -25,7 +25,6 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.hibernate.Session;
 import org.hibernate.query.NativeQuery;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;

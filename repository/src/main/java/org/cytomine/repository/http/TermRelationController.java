@@ -12,8 +12,6 @@ import org.cytomine.repository.persistence.TermRelationRepository;
 import org.cytomine.repository.persistence.entity.TermRelationEntity;
 import org.cytomine.repository.service.ACLService;
 import org.cytomine.repository.service.TermRelationCommandService;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -40,7 +38,6 @@ public class TermRelationController implements TermRelationHttpContract {
     private final ACLService aclService;
 
     @Override
-    @GetMapping("/ontology/{ontologyId}")
     public List<TermRelationResponse> findAllByOntologyId(long ontologyId, long userId) {
         if (!aclService.canReadOntology(userId, ontologyId)) {
             return List.of();
@@ -59,7 +56,6 @@ public class TermRelationController implements TermRelationHttpContract {
     }
 
     @Override
-    @GetMapping("/{id}")
     public Optional<TermRelationResponse> findTermRelationByID(long id, long userId) {
         return termRelationRepository.findById(id).flatMap(
             termEntity -> termRepository.findById(termEntity.getTerm1Id())
@@ -94,7 +90,6 @@ public class TermRelationController implements TermRelationHttpContract {
     }
 
     @Override
-    @DeleteMapping("/term1/{idTerm1}/term2/{idTerm2}")
     public Optional<HttpCommandResponse> deleteByTerms(@PathVariable long idTerm1, @PathVariable long idTerm2,
         @RequestParam long userId) {
         long parentRelationId = relationRepository.findParent().getId();

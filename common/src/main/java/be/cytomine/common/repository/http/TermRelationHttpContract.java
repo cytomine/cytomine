@@ -51,7 +51,7 @@ public interface TermRelationHttpContract {
     Optional<HttpCommandResponse> delete(@PathVariable long id,
                                          @RequestParam long userId);
 
-    @DeleteExchange("/{id}")
+    @DeleteExchange("/all")
     Set<HttpCommandResponse> deleteAll(@RequestParam Set<Long> ids,
         @RequestParam long userId);
 

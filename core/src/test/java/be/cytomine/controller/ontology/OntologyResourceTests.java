@@ -32,6 +32,7 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.http.TermHttpContract;
+import be.cytomine.common.repository.http.TermRelationHttpContract;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.domain.ontology.RelationTerm;
@@ -55,6 +56,9 @@ public class OntologyResourceTests {
 
     @MockitoBean
     TermHttpContract termHttpContract;
+
+    @MockitoBean
+    TermRelationHttpContract termRelationHttpContract;
 
     @Autowired
     private BasicInstanceBuilder basicInstanceBuilder;

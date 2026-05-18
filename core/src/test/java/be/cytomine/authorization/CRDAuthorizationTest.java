@@ -13,8 +13,9 @@ import org.springframework.security.test.context.support.WithMockUser;
 
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 public abstract class CRDAuthorizationTest extends AbstractAuthorizationTest {
     protected static List<String> rolePerOrder = List.of(

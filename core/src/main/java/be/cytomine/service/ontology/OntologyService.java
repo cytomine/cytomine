@@ -133,10 +133,16 @@ public class OntologyService extends ModelService {
 
         Set<Long> allTermRelationIdsByOntology = termRelationHttpContract.findAllIdsByOntologyId(domain.getId(),
             currentUser.getId());
-        termRelationHttpContract.deleteAll(allTermRelationIdsByOntology, currentUser.getId());
+        if (!allTermRelationIdsByOntology.isEmpty()) {
+            termRelationHttpContract.deleteAll(allTermRelationIdsByOntology, currentUser.getId());
+        }
 
         Set<Long> allTermIdsByOntology = termHttpContract.findAllTermIdsByOntology(domain.getId(), currentUser.getId());
-        termHttpContract.deleteAll(allTermIdsByOntology, currentUser.getId());
+        if (!allTermIdsByOntology.isEmpty()) {
+            termHttpContract.deleteAll(allTermIdsByOntology, currentUser.getId());
+        }
+
+        ((Ontology) domain).setTerms(new HashSet<>());
 
         Command c = new DeleteCommand(currentUser, transaction);
         return executeCommand(c, domain, null);
@@ -198,20 +204,11 @@ public class OntologyService extends ModelService {
 
     public void deleteDependencies(CytomineDomain domain, Transaction transaction, Task task) {
         deleteDependentProject((Ontology) domain, transaction, task);
-        deleteDependentTerms((Ontology) domain);
     }
 
     private void deleteDependentProject(Ontology ontology, Transaction transaction, Task task) {
         if (!projectRepository.findAllByOntologyId(ontology.getId()).isEmpty()) {
             throw new ConstraintException("Ontology is linked with project. Cannot delete ontology!");
         }
-    }
-
-    private void deleteDependentTerms(Ontology ontology) {
-        Long userId = currentUserService.getCurrentUser().getId();
-        for (long termId : termHttpContract.findAllTermIdsByOntology(ontology.getId(), userId)) {
-            termHttpContract.delete(termId, userId);
-        }
-        ontology.setTerms(new HashSet<>());
     }
 }

@@ -90,6 +90,14 @@ public class WiremockRepository {
             )
         );
 
+        SERVER.stubFor(WireMock.get(urlPathMatching("/term_relations/ontology/.*/ids"))
+            .willReturn(aResponse()
+                .withStatus(HttpStatus.OK.value())
+                .withHeader("Content-Type", "application/json")
+                .withBody("[]")
+            )
+        );
+
         SERVER.stubFor(WireMock.post(urlPathEqualTo(CBIR_API_BASE_PATH + "/storages"))
             .willReturn(aResponse()
                 .withStatus(HttpStatus.OK.value())

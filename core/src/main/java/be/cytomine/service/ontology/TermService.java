@@ -23,7 +23,6 @@ import be.cytomine.exceptions.ConstraintException;
 import be.cytomine.repository.ontology.AnnotationTermRepository;
 import be.cytomine.repository.ontology.ReviewedAnnotationRepository;
 import be.cytomine.service.CurrentUserService;
-import be.cytomine.service.security.SecurityACLService;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -35,13 +34,11 @@ public class TermService {
 
     private final CurrentUserService currentUserService;
 
-    private final TermRelationHttpContract relationTermService;
-
     private final ReviewedAnnotationRepository reviewedAnnotationRepository;
 
-    private final SecurityACLService securityACLService;
-
     private final TermHttpContract termHttpContract;
+
+    private final TermRelationHttpContract relationTermService;
 
     public TermResponse get(Long id) {
         return find(id).orElse(null);

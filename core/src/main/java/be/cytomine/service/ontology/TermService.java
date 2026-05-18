@@ -104,8 +104,8 @@ public class TermService {
     }
 
     private void verifyDeleteDependentRelationTerm(Long termId) {
-        relationTermService.findTermRelationsByTermID(termId, currentUserService.getCurrentUser().getId())
-            .forEach(trr -> relationTermService.delete(trr.id(), currentUserService.getCurrentUser().getId()));
+        relationTermService.findTermRelationsIdsByTermId(termId, currentUserService.getCurrentUser().getId())
+            .forEach(trr -> relationTermService.delete(trr, currentUserService.getCurrentUser().getId()));
     }
 
     private void verifyDeleteAnnotationTerm(Long termId) {

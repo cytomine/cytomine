@@ -29,7 +29,7 @@ public interface TermRelationHttpContract {
     Optional<TermRelationResponse> findTermRelationByID(@PathVariable long id, @RequestParam long userId);
 
     @GetExchange("/term/{termId}")
-    Set<TermRelationResponse> findTermRelationsByTermID(@PathVariable long termId, @RequestParam long userId);
+    Set<Long> findTermRelationsIdsByTermId(@PathVariable long termId, @RequestParam long userId);
 
     @GetExchange("/ontology/{ontologyId}")
     List<TermRelationResponse> findAllByOntologyId(@PathVariable long ontologyId, @RequestParam long userId);

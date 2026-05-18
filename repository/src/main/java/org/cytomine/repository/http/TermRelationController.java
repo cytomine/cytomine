@@ -64,8 +64,9 @@ public class TermRelationController implements TermRelationHttpContract {
     }
 
     @Override
-    public Set<TermRelationResponse> findTermRelationsByTermID(long termId, long userId) {
-        return Set.of();
+    public Set<Long> findTermRelationsIdsByTermId(long termId, long userId) {
+        return termRelationRepository.findAllByTerm1IdOrTerm2Id(termId, termId).stream()
+            .map(TermRelationEntity::getId).collect(toSet());
     }
 
     @Override

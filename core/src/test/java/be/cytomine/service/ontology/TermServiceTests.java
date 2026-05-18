@@ -95,7 +95,7 @@ public class TermServiceTests {
 
     @BeforeEach
     void setUp() {
-        when(termRelationHttpContract.findTermRelationsByTermID(anyLong(), anyLong())).thenReturn(Set.of());
+        when(termRelationHttpContract.findTermRelationsIdsByTermId(anyLong(), anyLong())).thenReturn(Set.of());
     }
 
     private Optional<Long> getTermRelation(Long termRelationId) {

@@ -17,7 +17,6 @@ package be.cytomine.service.ontology;
  */
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -141,8 +140,6 @@ public class OntologyService extends ModelService {
         if (!allTermIdsByOntology.isEmpty()) {
             termHttpContract.deleteAll(allTermIdsByOntology, currentUser.getId());
         }
-
-        ((Ontology) domain).setTerms(new HashSet<>());
 
         Command c = new DeleteCommand(currentUser, transaction);
         return executeCommand(c, domain, null);

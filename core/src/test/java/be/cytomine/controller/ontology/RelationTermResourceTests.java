@@ -92,7 +92,7 @@ public class RelationTermResourceTests {
         long ontologyId = relationTerm.getTerm1().getOntology().getId();
         long userId = builder.givenSuperAdmin().getId();
         TermRelationResponse expected = buildResponse(relationTerm, ontologyId);
-        when(termRelationHttpContract.findTermByID(eq(relationTerm.getId()), eq(userId)))
+        when(termRelationHttpContract.findTermRelationByID(eq(relationTerm.getId()), eq(userId)))
             .thenReturn(Optional.of(expected));
 
         String body =
@@ -107,7 +107,7 @@ public class RelationTermResourceTests {
     @Transactional
     public void getATermRelationNotFoundReturns404() throws Exception {
         long userId = builder.givenSuperAdmin().getId();
-        when(termRelationHttpContract.findTermByID(eq(999L), eq(userId))).thenReturn(Optional.empty());
+        when(termRelationHttpContract.findTermRelationByID(eq(999L), eq(userId))).thenReturn(Optional.empty());
 
         restRelationTermControllerMockMvc.perform(get("/api/relation/term/{id}.json", 999L))
             .andExpect(status().isNotFound());

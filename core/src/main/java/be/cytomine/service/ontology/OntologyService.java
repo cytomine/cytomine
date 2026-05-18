@@ -67,7 +67,7 @@ public class OntologyService extends ModelService {
     }
 
     public Optional<Ontology> find(Long id) {
-        Optional<Ontology> optionalOntology = ontologyRepository.findById(id);
+        Optional<Ontology> optionalOntology = ontologyRepository.findByIdAndDeletedNull(id);
         optionalOntology.ifPresent(ontology -> securityACLService.check(ontology, READ));
         return optionalOntology;
     }

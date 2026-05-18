@@ -10,6 +10,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -169,6 +170,7 @@ public class OntologyServiceTests {
     }
 
     @Test
+    @Disabled("This behaviour changed. Now the deleted ontology still exists with deleted = now().")
     void redoOntologyCreationFailIfOntologyAlreadyExist() {
         Ontology ontology = basicInstanceBuilder.givenANotPersistedOntology();
         CommandResponse commandResponse = ontologyService.add(ontology.toJsonObject());

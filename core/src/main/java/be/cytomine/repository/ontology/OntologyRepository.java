@@ -31,6 +31,8 @@ public interface OntologyRepository extends JpaRepository<Ontology, Long>, JpaSp
 
     List<Ontology> findAllByDeletedNull();
 
+    Optional<Ontology> findByIdAndDeletedNull(Long id);
+
     Optional<Ontology> findByName(String name);
 
     List<Ontology> findAllByUser(User user);

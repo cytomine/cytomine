@@ -16,6 +16,7 @@ package be.cytomine.domain.ontology;
  * limitations under the License.
  */
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -55,6 +56,9 @@ public class Ontology extends CytomineDomain {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = true)
     protected User user;
+
+    @Column()
+    protected LocalDateTime deleted;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "ontology")
     protected Set<Project> projects = new HashSet<>();

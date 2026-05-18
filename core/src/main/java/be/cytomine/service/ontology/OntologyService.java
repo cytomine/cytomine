@@ -1,5 +1,6 @@
 package be.cytomine.service.ontology;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -30,6 +31,7 @@ import be.cytomine.dto.ontology.OntologyExport;
 import be.cytomine.dto.ontology.TermSummary;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.ConstraintException;
+import be.cytomine.exceptions.InvalidRequestException;
 import be.cytomine.repository.ontology.OntologyRepository;
 import be.cytomine.repository.project.ProjectRepository;
 import be.cytomine.service.CurrentUserService;
@@ -58,7 +60,6 @@ public class OntologyService extends ModelService {
     private final SecurityACLService securityACLService;
     private final TermHttpContract termHttpContract;
     private final TermRelationHttpContract termRelationHttpContract;
-    private final TermService termService;
     private final UserService userService;
 
     public Ontology get(Long id) {
@@ -112,13 +113,14 @@ public class OntologyService extends ModelService {
         securityACLService.check(domain, DELETE);
         securityACLService.checkUser(currentUser);
 
-        Set<Long> allTermRelationIdsByOntology = termRelationHttpContract.findAllIdsByOntologyId(domain.getId(),
+        Long ontologyId = domain.getId();
+        Set<Long> allTermRelationIdsByOntology = termRelationHttpContract.findAllIdsByOntologyId(ontologyId,
             currentUser.getId());
         if (!allTermRelationIdsByOntology.isEmpty()) {
             termRelationHttpContract.deleteAll(allTermRelationIdsByOntology, currentUser.getId());
         }
 
-        Set<Long> allTermIdsByOntology = termHttpContract.findAllTermIdsByOntology(domain.getId(), currentUser.getId());
+        Set<Long> allTermIdsByOntology = termHttpContract.findAllTermIdsByOntology(ontologyId, currentUser.getId());
         if (!allTermIdsByOntology.isEmpty()) {
             termHttpContract.deleteAll(allTermIdsByOntology, currentUser.getId());
         }
@@ -135,6 +137,19 @@ public class OntologyService extends ModelService {
     @Override
     public CytomineDomain createFromJSON(JsonObject json) {
         return new Ontology().buildDomainFromJson(json, getEntityManager());
+    }
+
+    @Override
+    public void removeDomain(CytomineDomain oldObject) {
+        try {
+            var ontology = (Ontology) oldObject;
+            ontology.setDeleted(LocalDateTime.now());
+            getEntityManager().persist(ontology);
+
+        } catch (Exception e) {
+            log.error(e.toString());
+            throw new InvalidRequestException(e.toString());
+        }
     }
 
     public List<Object> getStringParamsI18n(CytomineDomain domain) {

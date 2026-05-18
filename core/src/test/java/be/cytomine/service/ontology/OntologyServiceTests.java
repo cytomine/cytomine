@@ -236,6 +236,12 @@ public class OntologyServiceTests {
     @Test
     void deleteOntologyWithDependenciesWithSuccess() {
         Ontology ontology = builder.givenAnOntology();
+        Term term1 = builder.givenATerm(ontology);
+        Term term2 = builder.givenATerm(ontology);
+        builder.givenARelationTerm(term1, term2);
+
+
+
         CommandResponse commandResponse = ontologyService.delete(ontology, null, null, true);
 
         assertThat(commandResponse).isNotNull();

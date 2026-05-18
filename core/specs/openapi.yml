@@ -9011,31 +9011,6 @@ paths:
                     type: string
                     example: "5.2.0"
 
-  /status.json:
-    get:
-      summary: Check server health status
-      description: Returns basic server health information.
-      tags:
-        - Health Check
-      operationId: status
-      responses:
-        "200":
-          description: Server is healthy
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  alive:
-                    type: boolean
-                    example: true
-                  serverURL:
-                    type: string
-                    example: "http://127.0.0.1"
-                  version:
-                    type: string
-                    example: "5.2.0"
-
   /user/current/keys:
     get:
       summary: Get key pair for current user

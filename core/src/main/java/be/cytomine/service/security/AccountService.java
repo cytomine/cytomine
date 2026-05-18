@@ -22,7 +22,6 @@ import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,14 +46,13 @@ import static be.cytomine.service.utils.IamRepresentationUtil.setPermanentPasswo
 @RequiredArgsConstructor
 public class AccountService {
 
-    @Autowired
-    Keycloak keycloak;
+    private final Keycloak keycloak;
 
     @Value("${keycloak-client.target.client-id}")
-    String clientId;
+    private String clientId;
 
     @Value("${keycloak-client.target.realm}")
-    String realm;
+    private String realm;
 
     public void createAccount(Account account) throws UserManagementException {
 
@@ -85,11 +83,15 @@ public class AccountService {
             throw new UserManagementException(ErrorCode.CORE_REALM_NOT_FOUND.toString(), 500);
         } else if (response.getStatus() == 409) {
             log.error("Account {} already exists", account.username());
-            throw new UserManagementException(ErrorCode.CORE_ACCOUNT_ALREADY_EXISTS.toString(),
-                HttpStatus.CONFLICT.value());
+            throw new UserManagementException(
+                ErrorCode.CORE_ACCOUNT_ALREADY_EXISTS.toString(),
+                HttpStatus.CONFLICT.value()
+            );
         } else if (response.getStatus() != 201) {
-            log.error("Failed to create account {} for [{}] from IAM", account.username(),
-                response.getStatusInfo().getReasonPhrase());
+            log.error(
+                "Failed to create account {} for [{}] from IAM", account.username(),
+                response.getStatusInfo().getReasonPhrase()
+            );
             throw new UserManagementException(ErrorCode.CORE_IAM_UNKNOWN_CREATE_ERROR.toString(), 500);
         }
         // Get client
@@ -106,18 +108,22 @@ public class AccountService {
             log.info("assigned roles for user {}", account.username());
         } catch (WebApplicationException e) {
             usersResource.delete(user.getId());
-            throw new UserManagementException(ErrorCode.CORE_ROLES_NOT_ASSIGNED_TO_ACCOUNT.toString(),
-                HttpStatus.INTERNAL_SERVER_ERROR.value());
+            throw new UserManagementException(
+                ErrorCode.CORE_ROLES_NOT_ASSIGNED_TO_ACCOUNT.toString(),
+                HttpStatus.INTERNAL_SERVER_ERROR.value()
+            );
 
         }
         log.info("Created account for user {} successfully", account.username());
     }
 
-    private List<RoleRepresentation> getRoleRepresentations(Account account,
-                                                            RealmResource realmResource,
-                                                            ClientRepresentation client,
-                                                            UsersResource usersResource,
-                                                            UserRepresentation user) {
+    private List<RoleRepresentation> getRoleRepresentations(
+        Account account,
+        RealmResource realmResource,
+        ClientRepresentation client,
+        UsersResource usersResource,
+        UserRepresentation user
+    ) {
         log.info("Retrieving roles for user {}", account.username());
         List<RoleRepresentation> listOfRoles;
         try {
@@ -130,8 +136,10 @@ public class AccountService {
                     .toRepresentation())
                 .collect(Collectors.toList());
         } catch (NotFoundException e) {
-            log.error("roles {} not found and deleting partially created account",
-                account.roles());
+            log.error(
+                "roles {} not found and deleting partially created account",
+                account.roles()
+            );
             deletePartiallyCreatedAccount(usersResource, user);
             throw new UserManagementException(400, ErrorCode.CORE_INVALID_ROLES);
         }
@@ -139,9 +147,11 @@ public class AccountService {
         return listOfRoles;
     }
 
-    private ClientRepresentation getClientRepresentation(RealmResource realmResource,
-                                                         UsersResource usersResource,
-                                                         UserRepresentation user) {
+    private ClientRepresentation getClientRepresentation(
+        RealmResource realmResource,
+        UsersResource usersResource,
+        UserRepresentation user
+    ) {
         log.info("Retrieving clients");
         ClientRepresentation client;
         try {
@@ -166,14 +176,18 @@ public class AccountService {
         return client;
     }
 
-    private List<RoleRepresentation> getClientLevelUserRoles(UserRepresentation userRepresentation,
-                                                             ClientRepresentation client) {
+    private List<RoleRepresentation> getClientLevelUserRoles(
+        UserRepresentation userRepresentation,
+        ClientRepresentation client
+    ) {
         return keycloak.realm(realm).users().get(userRepresentation.getId()).roles()
             .clientLevel(client.getId()).listAll();
     }
 
-    private static void deletePartiallyCreatedAccount(UsersResource usersResource,
-                                                      UserRepresentation user) {
+    private static void deletePartiallyCreatedAccount(
+        UsersResource usersResource,
+        UserRepresentation user
+    ) {
         UserRepresentation badAccount =
             usersResource.searchByUsername(user.getUsername(), true).get(0);
         usersResource.delete(badAccount.getId());
@@ -212,11 +226,15 @@ public class AccountService {
             // create the account if it doesn't exist in IAM
             log.info("account {} not found in IAM", account.username());
         } catch (BadRequestException e) {
-            log.error("IAM doesn't allow the update of username {} with error {}",
+            log.error(
+                "IAM doesn't allow the update of username {} with error {}",
                 account.username(),
-                e.getMessage());
-            throw new UserManagementException(ErrorCode.CORE_USERNAME_UPDATE_NOT_ALLOWED.toString(),
-                HttpStatus.BAD_REQUEST.value());
+                e.getMessage()
+            );
+            throw new UserManagementException(
+                ErrorCode.CORE_USERNAME_UPDATE_NOT_ALLOWED.toString(),
+                HttpStatus.BAD_REQUEST.value()
+            );
         }
 
         ClientRepresentation clientRepresentation = getClientRepresentation();
@@ -226,9 +244,11 @@ public class AccountService {
     }
 
 
-    private void updateAccountClientLevelRoles(Account account, UsersResource users,
-                                               ClientRepresentation client,
-                                               UserRepresentation userRepresentation) {
+    private void updateAccountClientLevelRoles(
+        Account account, UsersResource users,
+        ClientRepresentation client,
+        UserRepresentation userRepresentation
+    ) {
         log.info("updating account client level roles to {}", account.username());
         try {
             UserResource userResource = users.get(userRepresentation.getId());
@@ -246,13 +266,17 @@ public class AccountService {
 
         } catch (WebApplicationException e) {
             log.error("failed to assign roles to account {}", account.username(), e);
-            throw new UserManagementException(500,
-                ErrorCode.CORE_ROLES_NOT_ASSIGNED_TO_ACCOUNT);
+            throw new UserManagementException(
+                500,
+                ErrorCode.CORE_ROLES_NOT_ASSIGNED_TO_ACCOUNT
+            );
         }
     }
 
-    private List<RoleRepresentation> getAccountRoleRepresentations(Account account,
-                                                                   ClientRepresentation client) {
+    private List<RoleRepresentation> getAccountRoleRepresentations(
+        Account account,
+        ClientRepresentation client
+    ) {
         log.info("getting account client level roles to {}", account.username());
         List<RoleRepresentation> listOfRoles;
         try {
@@ -309,8 +333,10 @@ public class AccountService {
             } else {
                 List<String> cytomineLocales = List.of("en", "es", "nl", "fr", "no");
                 if (!cytomineLocales.contains(account.userLocale())) {
-                    errors.put("user_locale", "unknown locales [" + account.userLocale()
-                        + "] , allowed roles [en, es, nl, fr, no]");
+                    errors.put(
+                        "user_locale", "unknown locales [" + account.userLocale()
+                            + "] , allowed roles [en, es, nl, fr, no]"
+                    );
                 }
             }
             if (account.roles() == null || account.roles().isEmpty()) {
@@ -322,8 +348,10 @@ public class AccountService {
                         .toList();
                 if (!invalidRoles.isEmpty()) {
                     String unknownRoles = Strings.collectionToCommaDelimitedString(invalidRoles);
-                    errors.put("roles", "unknown roles [" + unknownRoles
-                        + "] , allowed roles [ADMIN, USER, GUEST]");
+                    errors.put(
+                        "roles", "unknown roles [" + unknownRoles
+                            + "] , allowed roles [ADMIN, USER, GUEST]"
+                    );
                 } else {
                     Validation validation = new Validation(true, null);
                     log.info("Validated account {} successfully", account.username());
@@ -332,7 +360,9 @@ public class AccountService {
             }
         }
         log.info("Validated account {} with following errors {}", account.username(), errors);
-        return new Validation(false, ResponseEntity.status(HttpStatus.BAD_REQUEST)
-            .body(Error.of(ErrorCode.CORE_INVALID_ACCOUNT, errors)));
+        return new Validation(
+            false, ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(Error.of(ErrorCode.CORE_INVALID_ACCOUNT, errors))
+        );
     }
 }

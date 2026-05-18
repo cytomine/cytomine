@@ -9,9 +9,9 @@ import java.util.stream.Collectors;
 import jakarta.persistence.Query;
 import jakarta.persistence.Tuple;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Geometry;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import be.cytomine.domain.CytomineDomain;
@@ -37,27 +37,23 @@ import static be.cytomine.utils.SQLUtils.castToLong;
 import static org.springframework.security.acls.domain.BasePermission.READ;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 @Transactional
 public class PropertyService extends ModelService {
 
-    @Autowired
-    private SecurityACLService securityACLService;
+    private final SecurityACLService securityACLService;
 
-    @Autowired
-    private CurrentUserService currentUserService;
+    private final CurrentUserService currentUserService;
 
-    @Autowired
-    private PropertyRepository propertyRepository;
+    private final PropertyRepository propertyRepository;
 
-    @Autowired
-    private AnnotationDomainRepository annotationDomainRepository;
+    private final AnnotationDomainRepository annotationDomainRepository;
 
     @Override
     public Class currentDomain() {
         return Property.class;
     }
-
 
     public List<Property> list() {
         securityACLService.checkAdmin(currentUserService.getCurrentUser());

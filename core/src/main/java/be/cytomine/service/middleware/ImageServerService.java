@@ -40,7 +40,7 @@ import be.cytomine.dto.image.LabelParameter;
 import be.cytomine.dto.image.TileParameters;
 import be.cytomine.dto.image.WindowParameter;
 import be.cytomine.exceptions.WrongArgumentException;
-import be.cytomine.service.image.ImageInstanceService;
+import be.cytomine.service.image.SliceCoordinatesService;
 import be.cytomine.service.utils.SimplifyGeometryService;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.PreparedRequest;
@@ -54,7 +54,7 @@ public class ImageServerService {
     // Internal communication to image server must use this base path as a convention.
     public static final String IMS_API_BASE_PATH = "/ims";
 
-    private final ImageInstanceService imageInstanceService;
+    private final SliceCoordinatesService sliceCoordinatesService;
 
     private final SimplifyGeometryService simplifyGeometryService;
 
@@ -441,7 +441,7 @@ public class ImageServerService {
         ImageInstance image, ImageParameter params, String etag,
         ProxyExchange<byte[]> proxy
     ) {
-        return thumb(imageInstanceService.getReferenceSlice(image), params, etag, proxy);
+        return thumb(sliceCoordinatesService.getReferenceSlice(image), params, etag, proxy);
     }
 
     public ResponseEntity<byte[]> thumb(

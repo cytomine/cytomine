@@ -12,7 +12,7 @@ import jakarta.persistence.Query;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.TupleElement;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import be.cytomine.dto.annotation.AnnotationResult;
@@ -28,18 +28,15 @@ import be.cytomine.utils.JsonObject;
 import static org.springframework.security.acls.domain.BasePermission.READ;
 
 @Transactional
+@RequiredArgsConstructor
 @Service
 public class AnnotationListingService {
 
-    @Autowired
-    private SecurityACLService securityACLService;
+    private final EntityManager entityManager;
 
-    @Autowired
-    private EntityManager entityManager;
+    private final KmeansGeometryService kmeansGeometryService;
 
-    @Autowired
-    private KmeansGeometryService kmeansGeometryService;
-
+    private final SecurityACLService securityACLService;
 
     public List listGeneric(AnnotationListing al) {
         securityACLService.check(al.container(), READ);

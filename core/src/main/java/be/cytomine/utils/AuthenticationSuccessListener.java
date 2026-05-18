@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -25,8 +26,7 @@ import be.cytomine.service.image.server.StorageService;
 @Component
 public class AuthenticationSuccessListener implements ApplicationListener<AuthenticationSuccessEvent> {
 
-    // necessary, otherwise spring will bypass the proxy for transactional
-    private final AuthenticationSuccessListener self;
+    private final ApplicationContext applicationContext;
 
     private final CurrentRoleService currentRoleService;
 
@@ -37,6 +37,10 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
     private final StorageService storageService;
 
     private final UserRepository userRepository;
+
+    private AuthenticationSuccessListener self() {
+        return applicationContext.getBean(AuthenticationSuccessListener.class);
+    }
 
     @Override
     public void onApplicationEvent(AuthenticationSuccessEvent event) {
@@ -56,7 +60,7 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
             user.setReference(sub.toString());
             userRepository.save(user);
 
-            self.updateRolesAndAdminSession(jwtAuthenticationToken, user, rolesFromAuthentication);
+            self().updateRolesAndAdminSession(jwtAuthenticationToken, user, rolesFromAuthentication);
 
         } else if (userByReference.isEmpty()) {
 
@@ -69,7 +73,7 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
 
             //save domain into the database
             User savedUser = userRepository.save(newUser);
-            self.setCumulativeRole(rolesFromAuthentication, savedUser);
+            self().setCumulativeRole(rolesFromAuthentication, savedUser);
             storageService.initUserStorage(savedUser);
 
             savedUser = userRepository.findByReference(sub.toString()).orElse(null);
@@ -80,7 +84,7 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
 
         } else {
             User user = userByReference.get();
-            self.updateRolesAndAdminSession(jwtAuthenticationToken, user, rolesFromAuthentication);
+            self().updateRolesAndAdminSession(jwtAuthenticationToken, user, rolesFromAuthentication);
         }
     }
 
@@ -96,7 +100,7 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
                 .map(SecUserSecRole::getId).toList());
         secSecUserSecRoleRepository.flush();
         // Guest > User > Admin
-        self.setCumulativeRole(rolesFromAuthentication, user);
+        self().setCumulativeRole(rolesFromAuthentication, user);
 
         if (rolesFromAuthentication.contains("ROLE_ADMIN")) {
             if (currentRoleService.hasCurrentUserAdminRole(user)) {

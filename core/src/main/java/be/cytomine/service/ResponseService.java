@@ -1,28 +1,12 @@
 package be.cytomine.service;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
@@ -32,12 +16,12 @@ import be.cytomine.utils.JsonObject;
 
 import static be.cytomine.utils.ClassUtils.getClassName;
 
+@RequiredArgsConstructor
 @Service
 @Transactional()
 public class ResponseService {
 
-    @Autowired
-    MessageSource messageSource;
+    private final MessageSource messageSource;
 
     /**
      * Create response message structure for a command result E.g. if we try to add a new annotation "object"

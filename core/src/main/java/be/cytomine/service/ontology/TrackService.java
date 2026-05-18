@@ -24,10 +24,10 @@ import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.ObjectNotFoundException;
+import be.cytomine.repository.image.ImageInstanceRepository;
 import be.cytomine.repository.ontology.TrackRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.ModelService;
-import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
@@ -45,7 +45,7 @@ public class TrackService extends ModelService {
 
     private final CurrentUserService currentUserService;
 
-    private final ImageInstanceService imageInstanceService;
+    private final ImageInstanceRepository imageInstanceRepository;
 
     private final SecurityACLService securityACLService;
 
@@ -97,8 +97,11 @@ public class TrackService extends ModelService {
      */
     @Override
     public CommandResponse add(JsonObject jsonObject) {
-        ImageInstance imageInstance = imageInstanceService.find(jsonObject.getJSONAttrLong("image", 0L))
-            .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", jsonObject.getJSONAttrStr("image")));
+        Long imageId = jsonObject.getJSONAttrLong("image", 0L);
+        ImageInstance imageInstance = imageInstanceRepository.findById(imageId)
+            .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", String.valueOf(imageId)));
+        securityACLService.check(imageInstance.container(), READ);
+
         jsonObject.put("project", imageInstance.getProject().getId());
 
         securityACLService.check(imageInstance.getProject(), READ);
@@ -125,8 +128,11 @@ public class TrackService extends ModelService {
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
 
-        ImageInstance imageInstance = imageInstanceService.find(jsonNewData.getJSONAttrLong("image", 0L))
-            .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", jsonNewData.getJSONAttrStr("image")));
+        Long imageId = jsonNewData.getJSONAttrLong("image", 0L);
+        ImageInstance imageInstance = imageInstanceRepository.findById(imageId)
+            .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", String.valueOf(imageId)));
+        securityACLService.check(imageInstance.container(), READ);
+
         jsonNewData.put("project", imageInstance.getProject().getId());
 
         return executeCommand(new EditCommand(currentUser, transaction), domain, jsonNewData);

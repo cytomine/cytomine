@@ -91,7 +91,7 @@ public class TermRelationController implements TermRelationHttpContract {
 
     @Override
     public Optional<HttpCommandResponse> deleteByTerms(@PathVariable long idTerm1, @PathVariable long idTerm2,
-        @RequestParam long userId) {
+                                                       @RequestParam long userId) {
         long parentRelationId = relationRepository.findParent().getId();
         return termRelationRepository.findByRelationIdAndTerm1IdAndTerm2Id(parentRelationId, idTerm1, idTerm2).flatMap(
             entity -> termRelationCommandService.deleteTermRelation(entity.getId(), userId, LocalDateTime.now()));

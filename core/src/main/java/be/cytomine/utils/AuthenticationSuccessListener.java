@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationListener;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -21,26 +21,22 @@ import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.image.server.StorageService;
 
+@RequiredArgsConstructor
 @Component
 public class AuthenticationSuccessListener implements ApplicationListener<AuthenticationSuccessEvent> {
 
-    @Autowired
-    private AuthenticationSuccessListener self; // necessary, otherwise spring will bypass the proxy for transactional
+    // necessary, otherwise spring will bypass the proxy for transactional
+    private final AuthenticationSuccessListener self;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final CurrentRoleService currentRoleService;
 
-    @Autowired
-    SecUserSecRoleRepository secSecUserSecRoleRepository;
+    private final SecUserSecRoleRepository secSecUserSecRoleRepository;
 
-    @Autowired
-    private SecRoleRepository secRoleRepository;
+    private final SecRoleRepository secRoleRepository;
 
-    @Autowired
-    private StorageService storageService;
+    private final StorageService storageService;
 
-    @Autowired
-    private CurrentRoleService currentRoleService;
+    private final UserRepository userRepository;
 
     @Override
     public void onApplicationEvent(AuthenticationSuccessEvent event) {
@@ -50,9 +46,7 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
     }
 
     protected void saveUserOfToken(JwtAuthenticationToken jwtAuthenticationToken) {
-
-        Set<String> rolesFromAuthentication =
-            extractRolesFromAuthentication(jwtAuthenticationToken);
+        Set<String> rolesFromAuthentication = extractRolesFromAuthentication(jwtAuthenticationToken);
         Map<String, Object> tokenAttributes = jwtAuthenticationToken.getTokenAttributes();
         UUID sub = UUID.fromString(tokenAttributes.get("sub").toString());
         Optional<User> userByReference = userRepository.findByReference(sub.toString());

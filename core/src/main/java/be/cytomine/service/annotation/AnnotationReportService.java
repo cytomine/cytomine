@@ -1,12 +1,22 @@
 package be.cytomine.service.annotation;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKTReader;
+import org.locationtech.jts.io.geojson.GeoJsonWriter;
 import org.springframework.stereotype.Service;
 
 import be.cytomine.domain.project.Project;
+import be.cytomine.dto.annotation.AnnotationResult;
+import be.cytomine.repository.AnnotationListing;
+import be.cytomine.service.AnnotationListingService;
 import be.cytomine.service.ontology.TermService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.utils.AnnotationListingBuilder;
@@ -17,11 +27,17 @@ import be.cytomine.utils.JsonObject;
 @Service
 public class AnnotationReportService {
 
+    private final GeoJsonWriter geoJsonWriter;
+
+    private final WKTReader wktReader;
+
+    private final AnnotationListingBuilder annotationListingBuilder;
+
+    private final AnnotationListingService annotationListingService;
+
     private final ProjectService projectService;
 
     private final TermService termService;
-
-    private final AnnotationListingBuilder annotationListingBuilder;
 
     public byte[] downloadDocumentByProject(JsonObject params, Project project) {
 
@@ -49,4 +65,43 @@ public class AnnotationReportService {
         return annotationListingBuilder.buildAnnotationReport(idProject, userIds, params, terms, format);
     }
 
+    public Map<String, Object> exportAnnotations(Long projectId) {
+        JsonObject params = JsonObject.of("project", projectId);
+        params.put("showDefault", true);
+        params.put("showWKT", true);
+        params.put("showGIS", true);
+
+        AnnotationListing userListing = annotationListingBuilder.buildAnnotationListing(params);
+        List<AnnotationResult> userAnnotations = annotationListingService.listGeneric(userListing);
+
+        JsonObject reviewedParams = new JsonObject(params);
+        reviewedParams.put("reviewed", true);
+        AnnotationListing reviewedListing = annotationListingBuilder.buildAnnotationListing(reviewedParams);
+        List<AnnotationResult> reviewedAnnotations = annotationListingService.listGeneric(reviewedListing);
+
+        return Map.of(
+            "type", "FeatureCollection",
+            "features", Stream.concat(
+                userAnnotations.stream().map(this::toGeoJsonFeature).flatMap(Optional::stream),
+                reviewedAnnotations.stream().map(this::toGeoJsonFeature).flatMap(Optional::stream)
+            )
+        );
+    }
+
+    private Optional<Map<String, Object>> toGeoJsonFeature(AnnotationResult annotation) {
+        Object location = annotation.get("location");
+        if (location == null) {
+            return Optional.empty();
+        }
+
+        String wkt = location.toString();
+        try {
+            Geometry geometry = wktReader.read(wkt);
+            return Optional.ofNullable(JsonObject.toMap(geoJsonWriter.write(geometry)))
+                .map(geometryJson -> Map.of("type", "Feature", "geometry", geometryJson));
+        } catch (ParseException e) {
+            log.warn("Unable to parse WKT for annotation {}: {}", annotation.get("id"), e.getMessage());
+            return Optional.empty();
+        }
+    }
 }

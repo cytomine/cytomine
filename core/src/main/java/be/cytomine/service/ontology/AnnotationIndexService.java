@@ -18,7 +18,6 @@ package be.cytomine.service.ontology;
 
 import java.util.List;
 
-import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,9 +35,6 @@ public class AnnotationIndexService {
 
     @Autowired
     private AnnotationIndexRepository annotationIndexRepository;
-
-    @Autowired
-    private EntityManager entityManager;
 
     public List<AnnotationIndexLightDTO> list(SliceInstance sliceInstance) {
         return annotationIndexRepository.findAllLightBySliceInstance(sliceInstance.getId());

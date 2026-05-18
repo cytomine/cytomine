@@ -117,7 +117,7 @@ public class RestProjectConnectionController extends RestCytomineController {
 
         if (heatmap) {
             return responseSuccess(projectConnectionService.numberOfConnectionsByProjectOrderedByHourAndDays(
-                project, afterThan, null
+                project, afterThan
             ));
         } else if (period != null) {
             return responseSuccess(projectConnectionService.numberOfProjectConnections(
@@ -145,7 +145,7 @@ public class RestProjectConnectionController extends RestCytomineController {
             .orElseThrow(() -> new ObjectNotFoundException("User", userId));
         if (heatmap) {
             return responseSuccess(projectConnectionService.numberOfConnectionsByProjectOrderedByHourAndDays(
-                project, afterThan, user
+                project, afterThan
             ));
         } else if (period != null) {
             return responseSuccess(projectConnectionService.numberOfProjectConnections(

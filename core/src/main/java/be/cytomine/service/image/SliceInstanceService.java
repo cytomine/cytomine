@@ -184,7 +184,7 @@ public class SliceInstanceService extends ModelService {
     public void deleteDependencies(CytomineDomain domain, Transaction transaction, Task task) {
         SliceInstance sliceInstance = (SliceInstance) domain;
         deleteDependentAnnotationTrack(sliceInstance, transaction, task);
-        deleteDependentAnnotationIndex(sliceInstance, transaction, task);
+        deleteDependentAnnotationIndex(sliceInstance);
     }
 
     private void deleteDependentAnnotationTrack(SliceInstance slice, Transaction transaction, Task task) {
@@ -193,10 +193,9 @@ public class SliceInstanceService extends ModelService {
         }
     }
 
-    private void deleteDependentAnnotationIndex(SliceInstance slice, Transaction transaction, Task task) {
+    private void deleteDependentAnnotationIndex(SliceInstance slice) {
         annotationIndexRepository.deleteAllBySlice(slice);
     }
-
 
     @Override
     public List<Object> getStringParamsI18n(CytomineDomain domain) {

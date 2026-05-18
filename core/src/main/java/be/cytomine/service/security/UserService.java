@@ -1138,7 +1138,7 @@ public class UserService extends ModelService {
 
     public void deleteDependentAnnotationTerm(User user, Transaction transaction, Task task) {
         if (user instanceof User) {
-            for (AnnotationTerm annotationTerm : annotationTermRepository.findAllByUser((User) user)) {
+            for (AnnotationTerm annotationTerm : annotationTermRepository.findAllByUser(user)) {
                 annotationTermService.delete(annotationTerm, transaction, task, false);
             }
         }

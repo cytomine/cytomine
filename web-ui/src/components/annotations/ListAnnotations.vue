@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
 <div class="box error" v-if="!configUI['project-annotations-tab']">
   <h2> {{ $t('access-denied') }} </h2>
@@ -305,6 +291,7 @@
         <button class="button is-link" type="button" @click="download('pdf')">{{$t('download-PDF')}}</button>
         <button class="button is-link" type="button" @click="download('csv')">{{$t('download-CSV')}}</button>
         <button class="button is-link" type="button" @click="download('xls')">{{$t('download-excel')}}</button>
+        <button class="button is-link" type="button" @click="exportAnnotations()">{{$t('export-annotations')}}</button>
       </div>
     </div>
   </div>
@@ -321,10 +308,11 @@ import OntologyTreeMultiselect from '@/components/ontology/OntologyTreeMultisele
 
 import ListAnnotationsBy from './ListAnnotationsBy';
 
-import {ImageInstanceCollection, UserCollection, AnnotationCollection, TrackCollection, TagCollection, ImageInstance, ImageGroupCollection} from '@/api';
+import {Cytomine, ImageInstanceCollection, UserCollection, AnnotationCollection, TrackCollection, TagCollection, ImageInstance, ImageGroupCollection} from '@/api';
 
 import {defaultColors} from '@/utils/style-utils.js';
 import TrackTreeMultiselect from '@/components/track/TrackTreeMultiselect';
+import {getFilename, triggerBlobDownload} from '@/utils/download';
 
 import _ from 'lodash';
 
@@ -704,6 +692,20 @@ export default {
     download(format) {
       this.collection.download(format);
     },
+    async exportAnnotations() {
+      try {
+        const response = await Cytomine.instance.api.get(
+          `/project/${this.project.id}/annotations/export`,
+          {responseType: 'blob'},
+        );
+
+        const defaultFilename = `project-${this.project.id}-annotations.geojson`;
+        const filename = getFilename(response.headers?.['content-disposition']) || defaultFilename;
+        triggerBlobDownload(response.data, filename);
+      } catch (error) {
+        console.error(error);
+      }
+    },
     addTerm(term) {
       this.terms.push(term);
       this.selectedTermsIds.push(term.id);
@@ -781,7 +783,6 @@ export default {
     if (!this.regroup) {
       this.regroup = this.groupBundling[this.groupBundling.length - 1];
     }
-    // ---
 
     try {
       await Promise.all([

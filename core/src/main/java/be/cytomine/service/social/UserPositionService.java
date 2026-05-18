@@ -97,9 +97,6 @@ public class UserPositionService {
         Double rotation,
         Boolean broadcast
     ) {
-
-        Optional<LastUserPosition> lastPosition = lastPositionByUser(imageInstance, sliceInstance, user, broadcast);
-
         //TODO: no ACL???
         LastUserPosition position = new LastUserPosition();
         position.setId(sequenceService.generateID());

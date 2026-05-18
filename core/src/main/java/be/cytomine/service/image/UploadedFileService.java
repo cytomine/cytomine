@@ -495,12 +495,7 @@ public class UploadedFileService extends ModelService {
     /**
      * Delete an uploaded file child.
      */
-    private CommandResponse deleteChild(
-        CytomineDomain domain,
-        Transaction transaction,
-        Task task,
-        boolean printMessage
-    ) {
+    private CommandResponse deleteChild(CytomineDomain domain, Transaction transaction) {
         /* We need another method than `delete()` because
            * uploaded file children have reference to uploaded file parent, thus they are no root.
            * `delete()` signature is standardized for its usage in RestCytomineController,
@@ -514,13 +509,11 @@ public class UploadedFileService extends ModelService {
         return executeCommand(c, domain, null);
     }
 
-
     @Override
     public List<String> getStringParamsI18n(CytomineDomain domain) {
         UploadedFile uploadedFile = (UploadedFile) domain;
         return Arrays.asList(String.valueOf(uploadedFile.getId()), uploadedFile.getFilename());
     }
-
 
     public void deleteDependencies(CytomineDomain domain, Transaction transaction, Task task) {
         deleteDependentAbstractSlice(domain, transaction, task);
@@ -565,9 +558,7 @@ public class UploadedFileService extends ModelService {
 
         // Dependent uploaded files are necessarily children, because only a root can be deleted.
         for (UploadedFile child : uploadedFileRepository.findAllByParent(uploadedFile)) {
-            this.deleteChild(child, transaction, task, false);
+            this.deleteChild(child, transaction);
         }
     }
-
-
 }

@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -167,7 +168,7 @@ public class StatsResourceTests {
         long projectId = project.getId();
 
         when(termRelationHttpContract.findAllByOntologyId(eq(ontologyId), eq(userId))).thenReturn(List.of());
-        when(statsHttpContract.findTermsByProject(eq(projectId), eq(userId), any(), any(), eq(0), eq(20)))
+        when(statsHttpContract.findTermsByProject(eq(projectId), eq(userId), any(), any(), any(Pageable.class)))
             .thenReturn(new PageImpl<>(List.of(new StatTerm(0L, "No term", "#fff", 0))));
 
         restStatsControllerMockMvc.perform(get("/api/project/{project}/stats/term.json", project.getId()))
@@ -178,7 +179,7 @@ public class StatsResourceTests {
         entityManager.refresh(project.getOntology());
 
         Term term = annotationTerm.getTerm();
-        when(statsHttpContract.findTermsByProject(eq(projectId), eq(userId), any(), any(), eq(0), eq(20)))
+        when(statsHttpContract.findTermsByProject(eq(projectId), eq(userId), any(), any(), any(Pageable.class)))
             .thenReturn(new PageImpl<>(List.of(
                 new StatTerm(0L, "No term", "#fff", 0),
                 new StatTerm(term.getId(), term.getName(), term.getColor(), 1)
@@ -228,7 +229,7 @@ public class StatsResourceTests {
         long userId = builder.givenSuperAdmin().getId();
         long ontologyId = project.getOntology().getId();
 
-        when(statsHttpContract.findTermsByProject(eq(ontologyId), eq(userId), any(), any(), eq(0), eq(20)))
+        when(statsHttpContract.findTermsByProject(eq(ontologyId), eq(userId), any(), any(), any(Pageable.class)))
             .thenReturn(new PageImpl<>(List.of(new StatTerm(0L, "No term", "#fff", 0))));
 
         restStatsControllerMockMvc.perform(get("/api/project/{project}/stats/termslide.json", project.getId()))
@@ -237,7 +238,7 @@ public class StatsResourceTests {
 
         Term term = builder.givenATerm(project.getOntology());
 
-        when(statsHttpContract.findTermsByProject(eq(ontologyId), eq(userId), any(), any(), eq(0), eq(20)))
+        when(statsHttpContract.findTermsByProject(eq(ontologyId), eq(userId), any(), any(), any(Pageable.class)))
             .thenReturn(new PageImpl<>(List.of(
                 new StatTerm(0L, "No term", "#fff", 0),
                 new StatTerm(term.getId(), term.getName(), term.getColor(), 0)
@@ -257,7 +258,7 @@ public class StatsResourceTests {
     void shouldReturnTermImageStatsPerProject() throws Exception {
         Project project = builder.givenAProject();
 
-        when(statsHttpContract.findPerTermAndImageByProject(eq(project.getId()), any(), any(), eq(0), eq(20)))
+        when(statsHttpContract.findPerTermAndImageByProject(eq(project.getId()), any(), any(), any(Pageable.class)))
             .thenReturn(new PageImpl<>(List.of()));
 
         restStatsControllerMockMvc.perform(get("/api/project/{project}/stats/termimage.json", project.getId()))
@@ -268,7 +269,7 @@ public class StatsResourceTests {
         entityManager.refresh(project.getOntology());
 
         ImageInstance imageInstance = annotationTerm.getUserAnnotation().getImage();
-        when(statsHttpContract.findPerTermAndImageByProject(eq(project.getId()), any(), any(), eq(0), eq(20)))
+        when(statsHttpContract.findPerTermAndImageByProject(eq(project.getId()), any(), any(), any(Pageable.class)))
             .thenReturn(new PageImpl<>(List.of(
                 new StatPerTermAndImage(imageInstance.getId(), annotationTerm.getTerm().getId(), 1)
             )));
@@ -333,7 +334,7 @@ public class StatsResourceTests {
         entityManager.refresh(annotation2);
 
         User superAdmin = builder.givenSuperAdmin();
-        when(statsHttpContract.findUserTermsByProject(eq(project.getId()), eq(superAdmin.getId()), eq(0), eq(20)))
+        when(statsHttpContract.findUserTermsByProject(eq(project.getId()), eq(superAdmin.getId()), any(Pageable.class)))
             .thenReturn(new PageImpl<>(List.of(
                 new FlatStatUserTerm(superAdmin.getId(), superAdmin.getUsername(),
                     new StatTerm(sharedTerm.getId(), sharedTerm.getName(), sharedTerm.getColor(), 2))

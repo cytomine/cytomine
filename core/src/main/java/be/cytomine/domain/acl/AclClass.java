@@ -52,14 +52,6 @@ public class AclClass implements Serializable {
         this.id = id;
     }
 
-    public String getClassName() {
-        return className;
-    }
-
-    public void setClassName(String className) {
-        this.className = className;
-    }
-
     @Override
     public String toString() {
         return "AclClass [id=" + id + ", className=" + className + "]";

@@ -204,25 +204,6 @@ public class JsonObject extends HashMap<String, Object> implements JsonInput {
         }
     }
 
-    public static List<String> toStringList(String json) {
-        try {
-            return new ObjectMapper().readValue(json, new TypeReference<>() {});
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public static List<Map<String, Object>> toMapList(String json) {
-        try {
-            return new ObjectMapper().readValue(json, new TypeReference<>() {});
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-
     public static JsonObject toJsonObject(String json) {
         try {
             return new ObjectMapper().readValue(json, new TypeReference<>() {});
@@ -475,10 +456,6 @@ public class JsonObject extends HashMap<String, Object> implements JsonInput {
 
     public Long getId() {
         return getJSONAttrLong("id");
-    }
-
-    public List<String> getJSONAttrListString(String attr) {
-        return (List<String>) this.get(attr);
     }
 
     public List<Map<String, Object>> getJSONAttrListMap(String attr) {

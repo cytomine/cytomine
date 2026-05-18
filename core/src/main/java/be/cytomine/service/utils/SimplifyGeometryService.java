@@ -132,7 +132,6 @@ public class SimplifyGeometryService {
             newGeometry = TopologyPreservingSimplifier.simplify(geometry, rate);
         } else {
             newGeometry = DouglasPeuckerSimplifier.simplify(geometry, rate);
-            ;
         }
         return new SimplifiedAnnotation(newGeometry, rate);
     }

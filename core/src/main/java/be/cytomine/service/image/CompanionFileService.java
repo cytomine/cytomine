@@ -39,7 +39,6 @@ import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.repository.image.CompanionFileRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.ModelService;
-import be.cytomine.service.middleware.ImageServerService;
 import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
@@ -61,10 +60,6 @@ public class CompanionFileService extends ModelService {
 
     @Autowired
     private CompanionFileRepository companionFileRepository;
-
-    @Autowired
-    private ImageServerService imageServerService;
-
 
     @Override
     public Class currentDomain() {

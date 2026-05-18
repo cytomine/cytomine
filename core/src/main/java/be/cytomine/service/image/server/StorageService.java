@@ -123,14 +123,12 @@ public class StorageService extends ModelService {
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.check(domain.container(), ADMINISTRATION);
-        CommandResponse commandResponse = executeCommand(
+        return executeCommand(
             new EditCommand(currentUser, transaction),
             domain,
             jsonNewData
         );
-        return commandResponse;
     }
-
 
     /**
      * Delete this domain
@@ -154,7 +152,7 @@ public class StorageService extends ModelService {
         log.info("Initialize storage for {}", user.getUsername());
 
         Storage storage = new Storage();
-        storage.setUser((User) user);
+        storage.setUser(user);
         storage.setName(user.getUsername() + " storage");
         storage = storageRepository.save(storage);
 

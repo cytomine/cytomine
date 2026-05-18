@@ -10,7 +10,8 @@ import lombok.RequiredArgsConstructor;
 public enum ReportType {
     PDF("pdf"),
     CSV("csv"),
-    EXCEL("xls");
+    EXCEL("xls"),
+    GEOJSON("geojson");
 
     private final String label;
 

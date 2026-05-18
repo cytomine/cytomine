@@ -15,8 +15,8 @@ import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.stereotype.Service;
 
 import be.cytomine.common.repository.http.TermHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.common.repository.http.TermRelationHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;
@@ -57,7 +57,7 @@ public class OntologyService extends ModelService {
     private final ProjectRepository projectRepository;
     private final SecurityACLService securityACLService;
     private final TermHttpContract termHttpContract;
-    private final  TermRelationHttpContract termRelationHttpContract;
+    private final TermRelationHttpContract termRelationHttpContract;
     private final TermService termService;
     private final UserService userService;
 

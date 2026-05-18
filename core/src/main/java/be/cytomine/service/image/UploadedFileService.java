@@ -1,21 +1,5 @@
 package be.cytomine.service.image;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,8 +14,8 @@ import jakarta.persistence.Query;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.TupleElement;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -75,40 +59,30 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 import static org.springframework.security.acls.domain.BasePermission.WRITE;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 @Transactional
 public class UploadedFileService extends ModelService {
 
-    @Autowired
-    private CurrentUserService currentUserService;
+    private final CurrentUserService currentUserService;
 
-    @Autowired
-    private SecurityACLService securityACLService;
+    private final SecurityACLService securityACLService;
 
-    @Autowired
-    private UploadedFileRepository uploadedFileRepository;
+    private final UploadedFileRepository uploadedFileRepository;
 
-    @Autowired
-    private AbstractImageRepository abstractImageRepository;
+    private final AbstractImageRepository abstractImageRepository;
 
-    @Autowired
-    private AbstractSliceRepository abstractSliceRepository;
+    private final AbstractSliceRepository abstractSliceRepository;
 
-    @Autowired
-    private AbstractImageService abstractImageService;
+    private final AbstractImageService abstractImageService;
 
-    @Autowired
-    private AbstractSliceService abstractSliceService;
+    private final AbstractSliceService abstractSliceService;
 
-    @Autowired
-    private CompanionFileService companionFileService;
+    private final CompanionFileService companionFileService;
 
-    @Autowired
-    private CompanionFileRepository companionFileRepository;
+    private final CompanionFileRepository companionFileRepository;
 
-    @Autowired
-    private TaskService taskService;
-
+    private final TaskService taskService;
 
     @Override
     public Class currentDomain() {

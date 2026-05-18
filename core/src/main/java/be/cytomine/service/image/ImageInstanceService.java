@@ -19,6 +19,7 @@ import jakarta.persistence.Query;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.TupleElement;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -96,77 +97,56 @@ import static com.mongodb.client.model.Sorts.descending;
 import static org.springframework.security.acls.domain.BasePermission.READ;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 @Transactional
 public class ImageInstanceService extends ModelService {
 
     private static List<String> ABSTRACT_IMAGE_COLUMNS_FOR_SEARCH = List.of("width", "height");
 
-    @Autowired
-    private EntityManager entityManager;
+    private final EntityManager entityManager;
 
-    @Autowired
-    private CurrentUserService currentUserService;
+    private final CurrentUserService currentUserService;
 
-    @Autowired
-    private CurrentRoleService currentRoleService;
+    private final CurrentRoleService currentRoleService;
 
-    @Autowired
-    private SecurityACLService securityACLService;
+    private final SecurityACLService securityACLService;
 
-    @Autowired
-    private ImageInstanceRepository imageInstanceRepository;
+    private final ImageInstanceRepository imageInstanceRepository;
 
-    @Autowired
-    private AbstractSliceRepository abstractSliceRepository;
+    private final AbstractSliceRepository abstractSliceRepository;
 
-    @Autowired
-    private SliceInstanceService sliceInstanceService;
+    private final SliceInstanceService sliceInstanceService;
 
-    @Autowired
-    private NestedImageInstanceRepository nestedImageInstanceRepository;
+    private final NestedImageInstanceRepository nestedImageInstanceRepository;
 
-    @Autowired
-    private SliceInstanceRepository sliceInstanceRepository;
+    private final SliceInstanceRepository sliceInstanceRepository;
 
-    @Autowired
-    private SliceCoordinatesService sliceCoordinatesService;
+    private final SliceCoordinatesService sliceCoordinatesService;
 
-    @Autowired
-    private UserAnnotationRepository userAnnotationRepository;
+    private final UserAnnotationRepository userAnnotationRepository;
 
-    @Autowired
-    private ReviewedAnnotationRepository reviewedAnnotationRepository;
+    private final ReviewedAnnotationRepository reviewedAnnotationRepository;
 
-    @Autowired
-    private UserAnnotationService userAnnotationService;
+    private final UserAnnotationService userAnnotationService;
 
-    @Autowired
-    private ReviewedAnnotationService reviewedAnnotationService;
+    private final ReviewedAnnotationService reviewedAnnotationService;
 
-    @Autowired
-    private AnnotationActionRepository annotationActionRepository;
+    private final AnnotationActionRepository annotationActionRepository;
 
-    @Autowired
-    private PersistentUserPositionRepository persistentUserPositionRepository;
+    private final PersistentUserPositionRepository persistentUserPositionRepository;
 
-    @Autowired
-    private LastUserPositionRepository lastUserPositionRepository;
+    private final LastUserPositionRepository lastUserPositionRepository;
 
-    @Autowired
-    private PersistentImageConsultationRepository persistentImageConsultationRepository;
+    private final PersistentImageConsultationRepository persistentImageConsultationRepository;
 
-    @Autowired
-    PropertyService propertyService;
+    private final PropertyService propertyService;
 
-    @Autowired
-    PropertyRepository propertyRepository;
+    private final PropertyRepository propertyRepository;
 
-    @Autowired
-    TrackService trackService;
+    private final TrackService trackService;
 
-    @Autowired
-    MongoClient mongoClient;
+    private final MongoClient mongoClient;
 
     @Value("${spring.data.mongodb.database}")
     private String mongoDatabaseName;
@@ -180,7 +160,6 @@ public class ImageInstanceService extends ModelService {
     public CytomineDomain createFromJSON(JsonObject json) {
         return new ImageInstance().buildDomainFromJson(json, getEntityManager());
     }
-
 
     public Optional<ImageInstance> find(Long id) {
         Optional<ImageInstance> imageInstance = imageInstanceRepository.findById(id);

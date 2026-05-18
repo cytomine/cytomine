@@ -7,8 +7,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import be.cytomine.domain.image.AbstractImage;
@@ -18,19 +18,17 @@ import be.cytomine.repository.image.AbstractSliceRepository;
 import be.cytomine.service.middleware.ImageServerService;
 import be.cytomine.utils.JsonObject;
 
+@RequiredArgsConstructor
 @Service
 @Transactional
 @Slf4j
 public class ImagePropertiesService {
 
-    @Autowired
-    AbstractImageRepository abstractImageRepository;
+    private final AbstractImageRepository abstractImageRepository;
 
-    @Autowired
-    ImageServerService imageServerService;
+    private final ImageServerService imageServerService;
 
-    @Autowired
-    AbstractSliceRepository abstractSliceRepository;
+    private final AbstractSliceRepository abstractSliceRepository;
 
     public void extractUseful(AbstractImage image) {
         extractUseful(image, false);

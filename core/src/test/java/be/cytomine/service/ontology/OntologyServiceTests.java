@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import com.github.tomakehurst.wiremock.WireMockServer;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
@@ -19,6 +18,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
@@ -28,6 +28,7 @@ import be.cytomine.common.repository.model.command.payload.response.TermResponse
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.ontology.Ontology;
+import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.dto.ontology.OntologyExport;
@@ -45,7 +46,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
 import static org.springframework.security.acls.domain.BasePermission.READ;
 import static org.springframework.security.acls.domain.BasePermission.WRITE;
@@ -58,31 +58,25 @@ import static org.springframework.security.acls.domain.BasePermission.WRITE;
 public class OntologyServiceTests {
 
     @Autowired
+    EntityManager entityManager;
+    @MockitoBean
+    TermHttpContract termHttpContract;
+    @Autowired
     private OntologyService ontologyService;
-
     @Autowired
     private OntologyRepository ontologyRepository;
-
     @Autowired
     private BasicInstanceBuilder basicInstanceBuilder;
-
     @Autowired
     private BasicInstanceBuilder builder;
-
     @Autowired
     private CommandService commandService;
-
     @Autowired
     private TransactionService transactionService;
-
     @Autowired
     private PermissionService permissionService;
-
     @Autowired
     private ProjectService projectService;
-
-    @Autowired
-    EntityManager entityManager;
 
     private Optional<Long> getTerm(Long termId) {
         String request = "select count(*) from term where id = :id and deleted is null";

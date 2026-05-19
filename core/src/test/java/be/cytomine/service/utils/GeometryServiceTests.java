@@ -103,7 +103,7 @@ public class GeometryServiceTests {
     }
 
     @Nested
-    class GetBounds {
+    class GetBoundsTests {
 
         @Test
         void shouldReturnEnvelopeForValidWktPolygon() {
@@ -136,6 +136,54 @@ public class GeometryServiceTests {
         })
         void shouldReturnEmptyForInvalidInput(String invalid) {
             Optional<Envelope> result = geometryService.getBounds(invalid);
+
+            assertThat(result).isEmpty();
+        }
+    }
+
+    @Nested
+    class AddOffsetTests {
+
+        @Test
+        void shouldShiftCoordinatesForPositiveOffset() {
+            String wkt = "POLYGON ((0 0, 1 0, 1 1, 0 1, 0 0))";
+
+            Optional<Geometry> result = geometryService.addOffset(wkt, 10, 20);
+
+            assertThat(result).isPresent();
+            assertThat(result.get().getCoordinates()[0].x).isEqualTo(10.0);
+            assertThat(result.get().getCoordinates()[0].y).isEqualTo(20.0);
+        }
+
+        @Test
+        void shouldShiftCoordinatesForNegativeOffset() {
+            String wkt = "POLYGON ((10 20, 11 20, 11 21, 10 21, 10 20))";
+
+            Optional<Geometry> result = geometryService.addOffset(wkt, -5, -10);
+
+            assertThat(result).isPresent();
+            assertThat(result.get().getCoordinates()[0].x).isEqualTo(5.0);
+            assertThat(result.get().getCoordinates()[0].y).isEqualTo(10.0);
+        }
+
+        @Test
+        void shouldNotChangeCoordinatesForZeroOffset() {
+            String wkt = "POLYGON ((0 0, 1 0, 1 1, 0 1, 0 0))";
+
+            Optional<Geometry> result = geometryService.addOffset(wkt, 0, 0);
+
+            assertThat(result).isPresent();
+            assertThat(result.get().getCoordinates()[0].x).isEqualTo(0.0);
+            assertThat(result.get().getCoordinates()[0].y).isEqualTo(0.0);
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {
+            "not a geometry",
+            ""
+        })
+        void shouldReturnEmptyForInvalidWkt(String invalid) {
+            Optional<Geometry> result = geometryService.addOffset(invalid, 10, 20);
 
             assertThat(result).isEmpty();
         }

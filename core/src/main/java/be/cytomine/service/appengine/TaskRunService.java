@@ -58,6 +58,7 @@ import be.cytomine.dto.appengine.task.TaskRunDetail;
 import be.cytomine.dto.appengine.task.TaskRunOutputResponse;
 import be.cytomine.dto.appengine.task.TaskRunResponse;
 import be.cytomine.dto.appengine.task.TaskRunValue;
+import be.cytomine.dto.appengine.task.output.TaskRunOutput;
 import be.cytomine.dto.appengine.task.type.CollectionType;
 import be.cytomine.dto.appengine.task.type.GeometryType;
 import be.cytomine.dto.appengine.task.type.TaskParameterType;
@@ -578,6 +579,8 @@ public class TaskRunService {
         checkTaskRun(projectId, taskRunId);
 
         String response = appEngineService.get("task-runs/" + taskRunId + "/outputs");
+        List<TaskRunOutput> taskRunOutputs = appEngineService.getTaskRunOutputs(taskRunId);
+
         TaskRun taskRun = taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId)
             .orElseThrow(() -> new ObjectNotFoundException("TaskRun", taskRunId));
 

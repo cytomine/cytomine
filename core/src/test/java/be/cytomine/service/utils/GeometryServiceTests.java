@@ -11,8 +11,10 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.geojson.GeoJsonWriter;
 
 import be.cytomine.domain.annotation.GeometryType;
+import be.cytomine.exceptions.WrongArgumentException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class GeometryServiceTests {
 
@@ -186,6 +188,84 @@ public class GeometryServiceTests {
             Optional<Geometry> result = geometryService.addOffset(invalid, 10, 20);
 
             assertThat(result).isEmpty();
+        }
+    }
+
+    @Nested
+    class WktToGeoJsonTests {
+
+        @Test
+        void shouldConvertWktPolygonToGeojson() {
+            String wkt = "POLYGON ((0 0, 1 0, 1 1, 0 1, 0 0))";
+
+            String result = geometryService.wktToGeoJson(wkt);
+
+            assertThat(result).contains("\"type\":\"Polygon\"");
+            assertThat(result).contains("\"coordinates\"");
+        }
+
+        @Test
+        void shouldConvertWktPointToGeojson() {
+            String wkt = "POINT (4.3517 50.8503)";
+
+            String result = geometryService.wktToGeoJson(wkt);
+
+            assertThat(result).contains("\"type\":\"Point\"");
+            assertThat(result).contains("4.3517");
+            assertThat(result).contains("50.8503");
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {
+            "not a wkt",
+            ""
+        })
+        void shouldThrowWrongArgumentExceptionForInvalidWkt(String invalid) {
+            assertThrows(WrongArgumentException.class, () -> geometryService.wktToGeoJson(invalid));
+        }
+    }
+
+    @Nested
+    class GeoJsonToWktTests {
+
+        @Test
+        void shouldConvertGeojsonPolygonToWkt() {
+            String geoJson = """
+                {
+                  "type": "Polygon",
+                  "coordinates": [[[0,0],[1,0],[1,1],[0,1],[0,0]]]
+                }
+                """;
+
+            String result = geometryService.geoJsonToWkt(geoJson);
+
+            assertThat(result).startsWith("POLYGON");
+            assertThat(result).contains("0 0");
+        }
+
+        @Test
+        void shouldConvertGeojsonPointToWkt() {
+            String geoJson = """
+                {
+                  "type": "Point",
+                  "coordinates": [4.3517, 50.8503]
+                }
+                """;
+
+            String result = geometryService.geoJsonToWkt(geoJson);
+
+            assertThat(result).startsWith("POINT");
+            assertThat(result).contains("4.3517");
+            assertThat(result).contains("50.8503");
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {
+            "not a geojson",
+            ""
+        })
+        void shouldThrowIllegalArgumentExceptionForInvalidGeojson(String invalid) {
+            assertThrows(IllegalArgumentException.class, () -> geometryService.geoJsonToWkt(invalid));
         }
     }
 }

@@ -1,23 +1,23 @@
 package org.cytomine.repository.http;
 
-import java.util.Set;
-import java.util.stream.Collectors;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.cytomine.repository.mapper.ReviewedAnnotationMapper;
 import org.cytomine.repository.persistence.ReviewedAnnotationLinkRepository;
+import org.cytomine.repository.persistence.ReviewedAnnotationRepository;
 import org.cytomine.repository.persistence.TermRepository;
 import org.cytomine.repository.persistence.entity.ReviewedAnnotationLinkEntity;
 import org.cytomine.repository.persistence.entity.TermEntity;
-import org.cytomine.repository.mapper.ReviewedAnnotationMapper;
-import org.cytomine.repository.persistence.ReviewedAnnotationRepository;
 import org.cytomine.repository.service.ACLService;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.cytomine.repository.service.ReviewedAnnotationCommandService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -63,6 +63,7 @@ public class ReviewedAnnotationController implements ReviewedAnnotationHttpContr
                     .toList()).stream().map(ReviewedAnnotationLinkEntity::getTermId).collect(Collectors.toSet());
         }
     }
+
     @Override
     @GetMapping("/{id}")
     public Optional<ReviewedAnnotationResponse> findById(long id, long userId) {

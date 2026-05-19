@@ -2,10 +2,12 @@ package be.cytomine.controller.ontology;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,6 +32,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
@@ -38,6 +41,9 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.TestUtils;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.http.ReviewedAnnotationHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import be.cytomine.common.repository.model.command.payload.response.ReviewedAnnotationResponse;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
@@ -53,23 +59,6 @@ import be.cytomine.repository.ontology.AnnotationDomainRepository;
 import be.cytomine.repository.ontology.UserAnnotationRepository;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.ReportType;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-
-import be.cytomine.common.repository.http.ReviewedAnnotationHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import be.cytomine.common.repository.model.command.payload.response.ReviewedAnnotationResponse;
 
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
 import static be.cytomine.service.search.RetrievalService.CBIR_API_BASE_PATH;
@@ -80,10 +69,10 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
-import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -1235,8 +1224,8 @@ public class AnnotationDomainResourceTests {
     @Test
     @Transactional
     public void showValidReviewedAnnotation() throws Exception {
-        Long userId = builder.given_superadmin().getId();
-        ReviewedAnnotation annotation = builder.given_a_reviewed_annotation();
+        Long userId = builder.givenSuperAdmin().getId();
+        ReviewedAnnotation annotation = builder.givenAReviewedAnnotation();
         when(reviewedAnnotationHttpContract.findById(eq(annotation.getId()), eq(userId)))
             .thenReturn(Optional.of(new ReviewedAnnotationResponse(
                 annotation.getId(), userId, userId,
@@ -1314,8 +1303,8 @@ public class AnnotationDomainResourceTests {
     @Test
     @org.springframework.transaction.annotation.Transactional
     public void editValidReviewedAnnotation() throws Exception {
-        Long userId = builder.given_superadmin().getId();
-        ReviewedAnnotation reviewedAnnotation = builder.given_a_reviewed_annotation();
+        Long userId = builder.givenSuperAdmin().getId();
+        ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         ReviewedAnnotationResponse annotationData = new ReviewedAnnotationResponse(
             reviewedAnnotation.getId(), userId, userId,
             reviewedAnnotation.getImage().getId(), reviewedAnnotation.getSlice().getId(),
@@ -1363,8 +1352,8 @@ public class AnnotationDomainResourceTests {
     @Test
     @org.springframework.transaction.annotation.Transactional
     public void deleteReviewedAnnotation() throws Exception {
-        Long userId = builder.given_superadmin().getId();
-        ReviewedAnnotation reviewedAnnotation = builder.given_a_reviewed_annotation();
+        Long userId = builder.givenSuperAdmin().getId();
+        ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         ReviewedAnnotationResponse annotationData = new ReviewedAnnotationResponse(
             reviewedAnnotation.getId(), userId, userId,
             reviewedAnnotation.getImage().getId(), reviewedAnnotation.getSlice().getId(),

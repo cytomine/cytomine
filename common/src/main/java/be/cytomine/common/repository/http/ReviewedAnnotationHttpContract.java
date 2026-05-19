@@ -1,9 +1,7 @@
 package be.cytomine.common.repository.http;
 
 import java.util.Optional;
-
-import jakarta.validation.Valid;
-import java.util.Optional;
+import java.util.Set;
 
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,17 +9,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.service.annotation.DeleteExchange;
 import org.springframework.web.service.annotation.GetExchange;
-import org.springframework.web.service.annotation.DeleteExchange;
-import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;
 import org.springframework.web.service.annotation.PostExchange;
-import org.springframework.web.service.annotation.PostExchange;
 import org.springframework.web.service.annotation.PutExchange;
-
-import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import be.cytomine.common.repository.model.command.payload.response.ReviewedAnnotationResponse;
-import be.cytomine.common.repository.model.reviewedannotation.payload.CreateReviewedAnnotation;
-import be.cytomine.common.repository.model.reviewedannotation.payload.UpdateReviewedAnnotation;
 
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.ReviewedAnnotationResponse;
@@ -37,6 +27,7 @@ public interface ReviewedAnnotationHttpContract {
     @PutExchange("/terms/{reviewedAnnotationTermsId}")
     Set<Long> replaceAllTermIds(@PathVariable long reviewedAnnotationTermsId, @RequestParam long userId,
                                 @RequestBody Set<Long> newLinks);
+
     @GetExchange("/{id}")
     Optional<ReviewedAnnotationResponse> findById(@PathVariable long id, @RequestParam long userId);
 

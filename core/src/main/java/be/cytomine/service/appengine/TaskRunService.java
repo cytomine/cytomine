@@ -575,7 +575,7 @@ public class TaskRunService {
         return false;
     }
 
-    public String getOutputs(Long projectId, UUID taskRunId) {
+    public List<TaskRunOutput> getOutputs(Long projectId, UUID taskRunId) {
         checkTaskRun(projectId, taskRunId);
 
         String response = appEngineService.get("task-runs/" + taskRunId + "/outputs");
@@ -609,7 +609,7 @@ public class TaskRunService {
         );
         AnnotationLayer annotationLayer = annotationLayerService.createAnnotationLayer(layerName);
         if (!annotationLayer.getAnnotations().isEmpty()) {
-            return response;
+            return taskRunOutputs;
         }
 
         Set<TaskRunLayer> taskRunLayers = taskRunLayerRepository.findAllByTaskRunAndImage(taskRun, taskRun.getImage());
@@ -642,7 +642,7 @@ public class TaskRunService {
             processGeometryValue(arrayValue, annotationLayer, matchedLayer, 0);
         }
 
-        return response;
+        return taskRunOutputs;
     }
 
     public String getInputs(Long projectId, UUID taskRunId) {

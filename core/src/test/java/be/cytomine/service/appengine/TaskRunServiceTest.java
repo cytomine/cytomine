@@ -1,4 +1,4 @@
-package be.cytomine.unit.service.appengine;
+package be.cytomine.service.appengine;
 
 import java.util.List;
 import java.util.Map;
@@ -30,9 +30,6 @@ import be.cytomine.repository.appengine.TaskRunRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.annotation.AnnotationLayerService;
 import be.cytomine.service.annotation.AnnotationService;
-import be.cytomine.service.appengine.AppEngineService;
-import be.cytomine.service.appengine.AsyncService;
-import be.cytomine.service.appengine.TaskRunService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.service.utils.GeometryService;

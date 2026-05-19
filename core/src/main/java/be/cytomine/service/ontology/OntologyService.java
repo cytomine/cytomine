@@ -1,10 +1,11 @@
 package be.cytomine.service.ontology;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.stereotype.Service;
 
 import be.cytomine.common.repository.http.TermHttpContract;
+import be.cytomine.common.repository.http.TermRelationHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
@@ -23,13 +25,13 @@ import be.cytomine.domain.command.DeleteCommand;
 import be.cytomine.domain.command.EditCommand;
 import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.ontology.Ontology;
-import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.dto.ontology.OntologyExport;
 import be.cytomine.dto.ontology.TermSummary;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.ConstraintException;
+import be.cytomine.exceptions.InvalidRequestException;
 import be.cytomine.repository.ontology.OntologyRepository;
 import be.cytomine.repository.project.ProjectRepository;
 import be.cytomine.service.CurrentUserService;
@@ -57,7 +59,7 @@ public class OntologyService extends ModelService {
     private final ProjectRepository projectRepository;
     private final SecurityACLService securityACLService;
     private final TermHttpContract termHttpContract;
-    private final TermService termService;
+    private final TermRelationHttpContract termRelationHttpContract;
     private final UserService userService;
 
     public Ontology get(Long id) {
@@ -65,7 +67,7 @@ public class OntologyService extends ModelService {
     }
 
     public Optional<Ontology> find(Long id) {
-        Optional<Ontology> optionalOntology = ontologyRepository.findById(id);
+        Optional<Ontology> optionalOntology = ontologyRepository.findByIdAndDeletedNull(id);
         optionalOntology.ifPresent(ontology -> securityACLService.check(ontology, READ));
         return optionalOntology;
     }
@@ -110,6 +112,19 @@ public class OntologyService extends ModelService {
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.check(domain, DELETE);
         securityACLService.checkUser(currentUser);
+
+        Long ontologyId = domain.getId();
+        Set<Long> allTermRelationIdsByOntology = termRelationHttpContract.findAllIdsByOntologyId(ontologyId,
+            currentUser.getId());
+        if (!allTermRelationIdsByOntology.isEmpty()) {
+            termRelationHttpContract.deleteAll(allTermRelationIdsByOntology, currentUser.getId());
+        }
+
+        Set<Long> allTermIdsByOntology = termHttpContract.findAllTermIdsByOntology(ontologyId, currentUser.getId());
+        if (!allTermIdsByOntology.isEmpty()) {
+            termHttpContract.deleteAll(allTermIdsByOntology, currentUser.getId());
+        }
+
         Command c = new DeleteCommand(currentUser, transaction);
         return executeCommand(c, domain, null);
     }
@@ -122,6 +137,19 @@ public class OntologyService extends ModelService {
     @Override
     public CytomineDomain createFromJSON(JsonObject json) {
         return new Ontology().buildDomainFromJson(json, getEntityManager());
+    }
+
+    @Override
+    public void removeDomain(CytomineDomain oldObject) {
+        try {
+            var ontology = (Ontology) oldObject;
+            ontology.setDeleted(LocalDateTime.now());
+            getEntityManager().persist(ontology);
+
+        } catch (Exception e) {
+            log.error(e.toString());
+            throw new InvalidRequestException(e.toString());
+        }
     }
 
     public List<Object> getStringParamsI18n(CytomineDomain domain) {
@@ -140,7 +168,7 @@ public class OntologyService extends ModelService {
             permissionService.addPermission(ontology, user.getUsername(), BasePermission.ADMINISTRATION);
         } else {
             if (ontology.getUser() != user) {
-                // if user is creator, he keep access to the ontology
+                // if user is creator, he keeps access to the ontology
                 permissionService.deletePermission(ontology, user.getUsername(), BasePermission.ADMINISTRATION);
             }
         }
@@ -148,7 +176,7 @@ public class OntologyService extends ModelService {
             permissionService.addPermission(ontology, user.getUsername(), BasePermission.READ);
         } else {
             if (ontology.getUser() != user) {
-                // if user is creator, he keep access to the ontology
+                // if user is creator, he keeps access to the ontology
                 permissionService.deletePermission(ontology, user.getUsername(), BasePermission.READ);
             }
         }
@@ -170,29 +198,12 @@ public class OntologyService extends ModelService {
 
     public void deleteDependencies(CytomineDomain domain, Transaction transaction, Task task) {
         deleteDependentProject((Ontology) domain, transaction, task);
-        deleteDependentTerm((Ontology) domain, transaction, task);
     }
 
     private void deleteDependentProject(Ontology ontology, Transaction transaction, Task task) {
         if (!projectRepository.findAllByOntologyId(ontology.getId()).isEmpty()) {
             throw new ConstraintException("Ontology is linked with project. Cannot delete ontology!");
         }
-    }
-
-    private void deleteDependentTerm(Ontology ontology, Transaction transaction, Task task) {
-        Long userId = currentUserService.getCurrentUser().getId();
-        for (long termId : termService.list(ontology)) {
-            termHttpContract.delete(termId, userId);
-        }
-        List<Term> terms = getEntityManager()
-            .createQuery("SELECT t FROM Term t WHERE t.ontology = :ontology", Term.class)
-            .setParameter("ontology", ontology)
-            .getResultList();
-        for (Term term : terms) {
-            termService.delete(term, transaction, task, false);
-        }
-        //otherwise, when you write the json, term cannot be found (because term link is LAZY + term deleted)
-        ontology.setTerms(new HashSet<>());
     }
 
     public OntologyExport export(Ontology ontology) {

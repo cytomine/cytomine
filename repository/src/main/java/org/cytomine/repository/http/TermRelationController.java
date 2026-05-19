@@ -3,15 +3,15 @@ package org.cytomine.repository.http;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import lombok.RequiredArgsConstructor;
 import org.cytomine.repository.mapper.OntologyMapper;
 import org.cytomine.repository.persistence.RelationRepository;
 import org.cytomine.repository.persistence.TermRelationRepository;
+import org.cytomine.repository.persistence.entity.TermRelationEntity;
 import org.cytomine.repository.service.ACLService;
 import org.cytomine.repository.service.TermRelationCommandService;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,6 +24,7 @@ import be.cytomine.common.repository.model.termrelation.payload.CreateTermRelati
 import be.cytomine.common.repository.model.termrelation.payload.UpdateTermRelation;
 
 import static be.cytomine.common.repository.http.TermRelationHttpContract.ROOT_PATH;
+import static java.util.stream.Collectors.toSet;
 
 @RequiredArgsConstructor
 @RestController
@@ -37,23 +38,35 @@ public class TermRelationController implements TermRelationHttpContract {
     private final ACLService aclService;
 
     @Override
-    @GetMapping("/ontology/{ontologyId}")
     public List<TermRelationResponse> findAllByOntologyId(long ontologyId, long userId) {
         if (!aclService.canReadOntology(userId, ontologyId)) {
             return List.of();
         }
         return termRelationRepository.findAllByOntologyId(ontologyId).stream()
-            .map(e -> ontologyMapper.mapToTermRelationResponse(e, ontologyId))
-            .toList();
+            .map(e -> ontologyMapper.mapToTermRelationResponse(e, ontologyId)).toList();
     }
 
     @Override
-    @GetMapping("/{id}")
-    public Optional<TermRelationResponse> findTermByID(long id, long userId) {
-        return termRelationRepository.findById(id)
-            .flatMap(termEntity -> termRepository.findById(termEntity.getTerm1Id())
+    public Set<Long> findAllIdsByOntologyId(long ontologyId, long userId) {
+        if (!aclService.canReadOntology(userId, ontologyId)) {
+            return Set.of();
+        }
+        return termRelationRepository.findAllByOntologyId(ontologyId).stream().map(TermRelationEntity::getId)
+            .collect(toSet());
+    }
+
+    @Override
+    public Optional<TermRelationResponse> findTermRelationByID(long id, long userId) {
+        return termRelationRepository.findById(id).flatMap(
+            termEntity -> termRepository.findById(termEntity.getTerm1Id())
                 .filter(term1 -> aclService.canReadOntology(userId, term1.getOntologyId()))
                 .map(term1 -> ontologyMapper.mapToTermRelationResponse(termEntity, term1.getOntologyId())));
+    }
+
+    @Override
+    public Set<Long> findTermRelationsIdsByTermId(long termId, long userId) {
+        return termRelationRepository.findAllByTerm1IdOrTerm2Id(termId, termId).stream()
+            .map(TermRelationEntity::getId).collect(toSet());
     }
 
     @Override
@@ -72,12 +85,16 @@ public class TermRelationController implements TermRelationHttpContract {
     }
 
     @Override
-    @DeleteMapping("/term1/{idTerm1}/term2/{idTerm2}")
+    public Set<HttpCommandResponse> deleteAll(Set<Long> ids, long userId) {
+        return ids.stream().map(id -> termRelationCommandService.deleteTermRelation(id, userId, LocalDateTime.now()))
+            .flatMap(Optional::stream).collect(toSet());
+    }
+
+    @Override
     public Optional<HttpCommandResponse> deleteByTerms(@PathVariable long idTerm1, @PathVariable long idTerm2,
                                                        @RequestParam long userId) {
         long parentRelationId = relationRepository.findParent().getId();
-        return termRelationRepository.findByRelationIdAndTerm1IdAndTerm2Id(parentRelationId, idTerm1, idTerm2)
-            .flatMap(
-                entity -> termRelationCommandService.deleteTermRelation(entity.getId(), userId, LocalDateTime.now()));
+        return termRelationRepository.findByRelationIdAndTerm1IdAndTerm2Id(parentRelationId, idTerm1, idTerm2).flatMap(
+            entity -> termRelationCommandService.deleteTermRelation(entity.getId(), userId, LocalDateTime.now()));
     }
 }

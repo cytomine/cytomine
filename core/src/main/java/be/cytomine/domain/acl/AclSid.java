@@ -53,20 +53,12 @@ public class AclSid implements Serializable {
         setSid(sid);
     }
 
-    public AclSid flat() {
-        return new AclSid(getId(), getPrincipal(), getSid());
-    }
-
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Boolean getPrincipal() {
-        return principal;
     }
 
     public void setPrincipal(Boolean principal) {

@@ -111,10 +111,4 @@ public class UrlApi {
     ) {
         return serverUrl + "api/reviewedannotation/" + idAnnotation + "/crop." + format + "?maxSize=" + maxSize;
     }
-
-    public static String getAnnotationCropWithAnnotationId(Long idAnnotation, int maxSize, String format) {
-        return serverUrl + "/api/annotation/" + idAnnotation + "/crop." + format + (maxSize != 0
-            ? "?maxSize=" + maxSize
-            : "");
-    }
 }

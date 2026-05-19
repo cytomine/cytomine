@@ -1,7 +1,7 @@
 ARG PROXY_CACHE=registry.cytomine.org/docker
 ARG WEB_UI_VERSION
 ARG WEB_UI_REVISION
-ARG NODE_VERSION=20.19.4
+ARG NODE_VERSION=22.22.3
 ARG NGINX_VERSION=1.22.1
 
 #######################################################################################

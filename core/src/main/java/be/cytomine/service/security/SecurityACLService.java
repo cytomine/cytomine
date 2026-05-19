@@ -249,7 +249,7 @@ public class SecurityACLService {
 
     public List<Ontology> getOntologyList(User user) {
         if (currentRoleService.isAdminByNow(user)) {
-            return ontologyRepository.findAll();
+            return ontologyRepository.findAllByDeletedNull();
         }
         Query query = entityManager.createQuery(
             "select distinct ontology "
@@ -258,13 +258,13 @@ public class SecurityACLService {
                 + "AclSid as aclSid, "
                 + "Ontology as ontology "
                 + "where aclObjectId.objectId = ontology.id "
+                + "and ontology.deleted is null "
                 + "and aclEntry.aclObjectIdentity = aclObjectId "
                 + "and aclEntry.sid = aclSid "
                 + "and aclSid.sid like '"
                 + user.getUsername()
                 + "'");
-        List<Ontology> ontologies = query.getResultList();
-        return ontologies;
+        return (List<Ontology>) query.getResultList();
     }
 
     public void checkIsCurrentUserSameUser(Long userId) {
@@ -283,18 +283,10 @@ public class SecurityACLService {
         }
     }
 
-    public void checkCurrentUserIsAdmin() {
-        checkAdmin(currentUserService.getCurrentUser());
-    }
-
     public void checkAdmin(User user) {
         if (!currentRoleService.isAdminByNow(user)) {
             throw new ForbiddenException("You don't have the right to perform this action! You must be admin!");
         }
-    }
-
-    public void checkCurrentUserIsUser() {
-        checkUser(currentUserService.getCurrentUser());
     }
 
     public void checkUser(User user) {
@@ -416,7 +408,6 @@ public class SecurityACLService {
                 return;
             }
 
-            CytomineDomain container = retrieveContainer(domain);
             switch (((Project) retrieveContainer(domain)).getMode()) {
                 case CLASSIC:
                     return;

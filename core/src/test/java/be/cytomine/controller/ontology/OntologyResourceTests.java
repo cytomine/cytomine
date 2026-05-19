@@ -25,6 +25,7 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.http.TermHttpContract;
+import be.cytomine.common.repository.http.TermRelationHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.ontology.Ontology;
@@ -53,8 +54,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class OntologyResourceTests {
 
     @MockitoBean
+    TermRelationHttpContract termRelationHttpContract;
+    @MockitoBean
     private TermHttpContract termHttpContract;
-
     @Autowired
     private BasicInstanceBuilder basicInstanceBuilder;
 

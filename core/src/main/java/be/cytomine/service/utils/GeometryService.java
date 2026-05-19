@@ -1,7 +1,5 @@
 package be.cytomine.service.utils;
 
-import java.util.List;
-
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
@@ -13,6 +11,7 @@ import org.locationtech.jts.io.geojson.GeoJsonReader;
 import org.locationtech.jts.io.geojson.GeoJsonWriter;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.domain.annotation.GeometryType;
 import be.cytomine.exceptions.WrongArgumentException;
 
 @RequiredArgsConstructor
@@ -20,15 +19,6 @@ import be.cytomine.exceptions.WrongArgumentException;
 public class GeometryService {
 
     private final GeoJsonWriter geoJsonWriter;
-
-    public static final List<String> SUPPORTED_TYPES = List.of(
-        "Point",
-        "MultiPoint",
-        "LineString",
-        "MultiLineString",
-        "Polygon",
-        "MultiPolygon"
-    );
 
     private static Geometry parseWKT(String wkt) {
         try {
@@ -63,12 +53,8 @@ public class GeometryService {
     }
 
     public Boolean isGeometry(String input) {
-        Geometry geometry = parseWKT(input);
-        if (geometry == null) {
-            geometry = parseGeoJSON(input);
-        }
-
-        return geometry != null && SUPPORTED_TYPES.contains(geometry.getGeometryType());
+        Geometry geometry = parseWKT(input) != null ? parseWKT(input) : parseGeoJSON(input);
+        return geometry != null && GeometryType.isSupported(geometry);
     }
 
     public String wktToGeoJson(String wkt) {

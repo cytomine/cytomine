@@ -18,10 +18,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6.0.2
 
+      - name: Load versions
+        id: versions
+        uses: ./.github/actions/load-versions
+
       - name: Set up node
         uses: actions/setup-node@v6
         with:
-          node-version: "16"
+          node-version: ${{ steps.versions.outputs.node-version }}
 
       - name: Install dependencies
         run: >-
@@ -53,5 +57,6 @@ jobs:
         uses: actions/checkout@v6.0.2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Validate OpenAPI specifications
         run: 'redocly lint src/test/resources/spec/api/openapi_spec.v0.1.0.yml'

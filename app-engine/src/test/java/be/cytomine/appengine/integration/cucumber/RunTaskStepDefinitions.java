@@ -205,12 +205,12 @@ public class RunTaskStepDefinitions {
 
     @Then("the retrieved task run information matches the expected details")
     public void taskRunInfoMatchesExpected() {
-        Assertions.assertEquals(persistedTaskRun.getId(), persistedRun.getId());
+        Assertions.assertEquals(persistedTaskRun.id(), persistedRun.getId());
     }
 
     @Then("the task run state remains as {string}")
     public void taskRunStateRemainsAs(String state) {
-        Assertions.assertEquals(persistedTaskRun.getState().toString(), state);
+        Assertions.assertEquals(persistedTaskRun.state().toString(), state);
     }
 
     // successful fetch of task run inputs archive in a launched task run
@@ -601,7 +601,7 @@ public class RunTaskStepDefinitions {
         Assertions.assertTrue(persistedException.getStatusCode().is4xxClientError());
         ObjectMapper mapper = new ObjectMapper();
         JsonNode errorJsonNodeFromServer = mapper.readTree(persistedException.getResponseBodyAsString());
-        Assertions.assertEquals(errorCode, errorJsonNodeFromServer.get("error_code").textValue());
+        Assertions.assertEquals(errorCode, errorJsonNodeFromServer.get("errorCode").textValue());
     }
 
     // unsuccessful upload of task run outputs as a valid zip file in a

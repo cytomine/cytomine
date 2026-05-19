@@ -10,8 +10,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
-import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.project.Project;
 import be.cytomine.utils.Task;
 
@@ -31,14 +31,14 @@ public class TaskServiceTests {
     TaskService taskService;
 
     @Test
-    public void get_task_empty() {
+    public void getTaskEmpty() {
         assertThat(taskService.get(0L)).isNull();
     }
 
     @Test
-    public void task_workflow() {
-        Project project = builder.given_a_project();
-        Task newTask = taskService.createNewTask(project, builder.given_superadmin(), true);
+    public void taskWorkflow() {
+        Project project = builder.givenAProject();
+        Task newTask = taskService.createNewTask(project, builder.givenSuperAdmin(), true);
         assertThat(newTask).isNotNull();
         assertThat(newTask.getProgress()).isEqualTo(0);
 

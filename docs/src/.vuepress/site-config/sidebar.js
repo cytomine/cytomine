@@ -27,7 +27,7 @@ module.exports = {
 
   adminGuide: [
     {
-      title: "Cytomine",
+      title: "Local — All in Docker Compose",
       collapsable: true,
       children: [
         ["/admin-guide/docker/installation", "Installation Guide"],
@@ -38,7 +38,14 @@ module.exports = {
       ],
     },
     {
-      title: "Cytomine on K8s",
+      title: "Local — k3s + Helm",
+      collapsable: true,
+      children: [
+        ["/admin-guide/local-k3s/installation", "Installation Guide"],
+      ],
+    },
+    {
+      title: "Production — Kubernetes",
       collapsable: true,
       children: [
         ["/admin-guide/k8s/installation", "Installation Guide"],

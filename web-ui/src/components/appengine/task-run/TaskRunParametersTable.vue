@@ -2,7 +2,7 @@
   <b-table :data="parameters" narrowed>
     <template #default="props">
       <b-table-column field="name" :label="$t('app-engine.parameter.name')">
-        {{ props.row.param_name }}
+        {{ props.row.parameterName }}
       </b-table-column>
 
       <b-table-column field="type" :label="$t('app-engine.parameter.type')">
@@ -47,7 +47,7 @@ export default {
     async download(data, name) {
       const cytomine = Cytomine.instance;
       const token = await updateToken();
-      let url = `${cytomine.host}${cytomine.basePath}app-engine/project/${this.projectId}/task-runs/${data.task_run_id}/${this.type}/${name}?auth=${token}`;
+      let url = `${cytomine.host}${cytomine.basePath}app-engine/project/${this.projectId}/task-runs/${data.taskRunId}/${this.type}/${name}?auth=${token}`;
       let link = document.createElement('a');
       link.href = url;
       link.download = name;
@@ -59,10 +59,10 @@ export default {
       document.body.removeChild(link);
     },
     downloadFile(output) {
-      this.download(output, output.param_name);
+      this.download(output, output.parameterName);
     },
     downloadGeometry(output) {
-      this.download(output,`${output.param_name}.geojson`);
+      this.download(output,`${output.parameterName}.geojson`);
     },
   },
 };

@@ -154,7 +154,7 @@ public class RestProjectController extends RestCytomineController {
         log.debug("REST request to list project with ontology {}", id);
         Ontology ontology = ontologyRepository.findById(id)
             .orElseThrow(() -> new ObjectNotFoundException("Ontology", id));
-        return responseSuccess(projectService.listByOntology(ontology));
+        return responseSuccess(projectService.listByOntology(ontology.getId()));
     }
 
     /**

@@ -6,7 +6,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import be.cytomine.domain.appengine.CropOffset;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -19,6 +18,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import be.cytomine.domain.annotation.AnnotationLayer;
+import be.cytomine.domain.appengine.CropOffset;
 import be.cytomine.domain.appengine.TaskRun;
 import be.cytomine.domain.appengine.TaskRunLayer;
 import be.cytomine.domain.project.Project;
@@ -93,31 +93,35 @@ public class TaskRunServiceTest {
         String geoJson1 = "{\"type\":\"Point\",\"coordinates\":[1.0,2.0]}";
         String geoJson2 = "{\"type\":\"Point\",\"coordinates\":[3.0,4.0]}";
 
-        TaskRunValue geometryArrayValue = new TaskRunValue();
-        geometryArrayValue.setType("ARRAY");
-        geometryArrayValue.setSubType("GEOMETRY");
-        geometryArrayValue.setValue(List.of(
+        TaskRunValue geometryArrayValue = new TaskRunValue(
+            taskRunId,
+            "input",
+            "ARRAY",
+            List.of(
                 Map.of("value", geoJson1),
                 Map.of("value", geoJson2)
-        ));
+            ),
+            "GEOMETRY"
+        );
 
         List<TaskRunValue> outputs = List.of(geometryArrayValue);
-        String outputsJson = new ObjectMapper().writeValueAsString(outputs);
+        String outputsJson = objectMapper.writeValueAsString(outputs);
 
         String taskRunJson = """
-                    {
-                        "task": {
-                            "name": "test-task",
-                            "version": "1.0"
-                        }
+                {
+                    "task": {
+                        "name": "test-task",
+                        "version": "1.0"
                     }
-                """;
+                }
+            """;
 
         TaskRun taskRun = new TaskRun();
         User currentUser = new User();
         Project project = new Project();
 
         TaskRunLayer taskRunLayer = new TaskRunLayer();
+        taskRunLayer.setParameterName("input");
         CropOffset offset = new CropOffset(0, 0);
         taskRunLayer.getOffsets().add(offset);
 
@@ -156,36 +160,43 @@ public class TaskRunServiceTest {
         String geoJson1 = "{\"type\":\"Point\",\"coordinates\":[1.0,2.0]}";
         String geoJson2 = "{\"type\":\"Point\",\"coordinates\":[3.0,4.0]}";
 
-        TaskRunValue innerGeometryValue = new TaskRunValue();
-        innerGeometryValue.setType("ARRAY");
-        innerGeometryValue.setSubType("GEOMETRY");
-        innerGeometryValue.setValue(List.of(
+        TaskRunValue innerGeometryValue = new TaskRunValue(
+            taskRunId,
+            "inner",
+            "ARRAY",
+            List.of(
                 Map.of("value", geoJson1),
                 Map.of("value", geoJson2)
-        ));
+            ),
+            "GEOMETRY"
+        );
 
-        TaskRunValue outerArrayValue = new TaskRunValue();
-        outerArrayValue.setType("ARRAY");
-        outerArrayValue.setSubType("ARRAY");
-        outerArrayValue.setValue(List.of(innerGeometryValue));
+        TaskRunValue outerArrayValue = new TaskRunValue(
+            taskRunId,
+            "outer",
+            "ARRAY",
+            List.of(innerGeometryValue),
+            "ARRAY"
+        );
 
         List<TaskRunValue> outputs = List.of(outerArrayValue);
         String outputsJson = new ObjectMapper().writeValueAsString(outputs);
 
         String taskRunJson = """
-                    {
-                        "task": {
-                            "name": "my-task",
-                            "version": "1.0"
-                        }
+                {
+                    "task": {
+                        "name": "my-task",
+                        "version": "1.0"
                     }
-                """;
+                }
+            """;
 
         TaskRun taskRun = new TaskRun();
         User currentUser = new User();
         Project project = new Project();
 
         TaskRunLayer taskRunLayer = new TaskRunLayer();
+        taskRunLayer.setParameterName(outerArrayValue.parameterName());
         CropOffset offset = new CropOffset(0, 0);
         taskRunLayer.getOffsets().add(offset);
         AnnotationLayer annotationLayer = new AnnotationLayer();
@@ -212,9 +223,9 @@ public class TaskRunServiceTest {
         assertEquals(outputsJson, result);
         verify(annotationService, times(2)).createAnnotation(eq(annotationLayer), any(String.class));
         verify(asyncService, times(1)).launchImageAdditionJob(
-                ArgumentMatchers.any(),
-                eq(projectId),
-                eq(currentUser)
+            ArgumentMatchers.any(),
+            eq(projectId),
+            eq(currentUser)
         );
     }
 }

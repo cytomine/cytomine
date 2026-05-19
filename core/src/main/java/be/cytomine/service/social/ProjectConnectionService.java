@@ -516,13 +516,7 @@ public class ProjectConnectionService {
         return projectConnections;
     }
 
-
-    public List<JsonObject> numberOfConnectionsByProjectOrderedByHourAndDays(
-        Project project,
-        Long afterThan,
-        User user
-    ) {
-
+    public List<JsonObject> numberOfConnectionsByProjectOrderedByHourAndDays(Project project, Long afterThan) {
         securityACLService.check(project, WRITE);
 
         Bson projection1 = Document.parse(

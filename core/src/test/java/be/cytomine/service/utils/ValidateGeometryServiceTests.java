@@ -9,8 +9,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 
 import be.cytomine.CytomineCoreApplication;
-import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MongoTestConfiguration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -25,9 +25,9 @@ public class ValidateGeometryServiceTests {
     ValidateGeometryService validateGeometryService;
 
     @Test
-    public void validate_valid_polygon() {
+    public void validateValidPolygon() {
         assertThat(validateGeometryService.tryToMakeItValidIfNotValid(
-                "POLYGON ((2 2, 3 2, 3 4, 2 4, 2 2))"
+            "POLYGON ((2 2, 3 2, 3 4, 2 4, 2 2))"
         )).isEqualTo("POLYGON ((2 2, 3 2, 3 4, 2 4, 2 2))");
     }
 }

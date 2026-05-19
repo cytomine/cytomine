@@ -1,13 +1,21 @@
 package org.cytomine.repository.http;
 
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.cytomine.repository.persistence.ReviewedAnnotationLinkRepository;
+import org.cytomine.repository.persistence.TermRepository;
+import org.cytomine.repository.persistence.entity.ReviewedAnnotationLinkEntity;
+import org.cytomine.repository.persistence.entity.TermEntity;
 import org.cytomine.repository.mapper.ReviewedAnnotationMapper;
 import org.cytomine.repository.persistence.ReviewedAnnotationRepository;
 import org.cytomine.repository.service.ACLService;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.cytomine.repository.service.ReviewedAnnotationCommandService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,12 +32,37 @@ import static be.cytomine.common.repository.http.ReviewedAnnotationHttpContract.
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(ROOT_PATH)
+
 public class ReviewedAnnotationController implements ReviewedAnnotationHttpContract {
+    private final ReviewedAnnotationLinkRepository reviewedAnnotationLinkRepository;
     private final ReviewedAnnotationRepository reviewedAnnotationRepository;
     private final ReviewedAnnotationCommandService reviewedAnnotationCommandService;
     private final ReviewedAnnotationMapper reviewedAnnotationMapper;
     private final ACLService aclService;
+    private final TermRepository termRepository;
 
+    @Override
+    @PutMapping("/terms/{reviewedAnnotationTermsId}")
+    @Transactional
+    public Set<Long> replaceAllTermIds(long reviewedAnnotationTermsId, long userId, Set<Long> newLinks) {
+
+        if (!termRepository.findAllById(newLinks).stream().map(TermEntity::getOntologyId).distinct()
+            .allMatch(ontologyId -> aclService.canWriteOntology(userId, ontologyId))) {
+            return Set.of();
+        }
+
+        Set<ReviewedAnnotationLinkEntity> existing =
+            reviewedAnnotationLinkRepository.findAllByReviewedAnnotationTermsId(reviewedAnnotationTermsId);
+        if (existing.stream().map(ReviewedAnnotationLinkEntity::getTermId).collect(Collectors.toSet())
+            .equals(newLinks)) {
+            return existing.stream().map(ReviewedAnnotationLinkEntity::getTermId).collect(Collectors.toSet());
+        } else {
+            reviewedAnnotationLinkRepository.deleteAllByReviewedAnnotationTermsId(reviewedAnnotationTermsId);
+            return reviewedAnnotationLinkRepository.saveAll(
+                newLinks.stream().map(termId -> new ReviewedAnnotationLinkEntity(termId, reviewedAnnotationTermsId))
+                    .toList()).stream().map(ReviewedAnnotationLinkEntity::getTermId).collect(Collectors.toSet());
+        }
+    }
     @Override
     @GetMapping("/{id}")
     public Optional<ReviewedAnnotationResponse> findById(long id, long userId) {

@@ -1,6 +1,11 @@
 ARG PROXY_CACHE=registry.cytomine.org/docker
 ARG PYTHON_VERSION=3.10
 
+FROM ${PROXY_CACHE}/alpine AS weights
+RUN mkdir -p /app/weights && \
+    wget -q -O /app/weights/weights.pt \
+    "https://huggingface.co/TVM13/Cytomine-sam/resolve/main/weights.pt"
+
 FROM ${PROXY_CACHE}/python:${PYTHON_VERSION}-slim-bullseye AS base
 
 ENV PYTHONUNBUFFERED=1 \
@@ -15,7 +20,7 @@ WORKDIR /app
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        build-essential libgl1 libglib2.0-0 \
+        libgl1 libglib2.0-0 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -66,6 +71,8 @@ COPY ./configs/ ./configs/
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync
+
+COPY --from=weights /app/weights ./weights
 
 LABEL org.opencontainers.image.authors="uliege@cytomine.org" \
       org.opencontainers.image.url="https://uliege.cytomine.org/" \

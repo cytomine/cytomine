@@ -24,12 +24,12 @@ import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
 import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.common.SpringPage;
 import be.cytomine.common.repository.model.command.CommandType;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.common.repository.model.term.payload.CreateTerm;
 import be.cytomine.common.repository.model.term.payload.UpdateTerm;
+import be.cytomine.common.repository.utils.SpringPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -199,8 +199,7 @@ class TermControllerTest {
         String response = mockMvc.perform(get("/terms/project/{id}", projectId).param("userId", userId.toString()))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
-        SpringPage<TermResponse> page = objectMapper.readValue(response, new TypeReference<>() {
-        });
+        SpringPage<TermResponse> page = objectMapper.readValue(response, new TypeReference<>() {});
 
         assertEquals(1, page.getTotalElements());
         TermResponse expected =
@@ -217,8 +216,7 @@ class TermControllerTest {
         String response = mockMvc.perform(get("/terms/ontology/{id}", ontologyId).param("userId", userId.toString()))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
-        SpringPage<TermResponse> page = objectMapper.readValue(response, new TypeReference<>() {
-        });
+        SpringPage<TermResponse> page = objectMapper.readValue(response, new TypeReference<>() {});
 
         assertEquals(1, page.getTotalElements());
         TermResponse expected =

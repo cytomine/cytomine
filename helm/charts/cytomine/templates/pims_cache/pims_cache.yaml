@@ -10,6 +10,7 @@ metadata:
     component: {{ .Release.Name }}-pims-cache
     release: {{ .Release.Name }}
 spec:
+  progressDeadlineSeconds: 1200
   replicas: 1
   selector:
     matchLabels:

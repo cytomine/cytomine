@@ -52,8 +52,8 @@ public class TestTaskBuilder {
 
         // store two tasks in the database
         Task task = new Task();
-        task.setIdentifier(taskIdentifiersForTaskOne.getLocalTaskIdentifier());
-        task.setStorageReference(taskIdentifiersForTaskOne.getStorageIdentifier());
+        task.setIdentifier(taskIdentifiersForTaskOne.localTaskIdentifier());
+        task.setStorageReference(taskIdentifiersForTaskOne.storageIdentifier());
         task.setName("Integers addition");
         task.setNameShort("add_integers");
         task.setDescriptorFile("com.cytomine.dummy.arithmetic.integer.addition");
@@ -139,8 +139,8 @@ public class TestTaskBuilder {
 
         // store two tasks in the database
         Task task = new Task();
-        task.setIdentifier(taskIdentifiersForTaskOne.getLocalTaskIdentifier());
-        task.setStorageReference(taskIdentifiersForTaskOne.getStorageIdentifier());
+        task.setIdentifier(taskIdentifiersForTaskOne.localTaskIdentifier());
+        task.setStorageReference(taskIdentifiersForTaskOne.storageIdentifier());
         task.setName("Integers subtraction");
         task.setNameShort("sub_integers");
         task.setDescriptorFile("com.cytomine.dummy.arithmetic.integer.subtraction");

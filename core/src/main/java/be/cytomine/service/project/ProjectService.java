@@ -641,11 +641,11 @@ public class ProjectService extends ModelService {
         return data;
     }
 
-    public List<Project> listByOntology(Ontology ontology) {
+    public List<Project> listByOntology(Long ontologyId) {
         if (currentRoleService.isAdminByNow(currentUserService.getCurrentUser())) {
-            return projectRepository.findAllByOntology(ontology);
+            return projectRepository.findAllByOntologyId(ontologyId);
         }
-        return projectRepository.findAllProjectForUserByOntology(currentUserService.getCurrentUsername(), ontology);
+        return projectRepository.findAllProjectForUserByOntology(currentUserService.getCurrentUsername(), ontologyId);
     }
 
     public List<CommandHistory> lastAction(Project project, int max) {
@@ -1074,11 +1074,11 @@ public class ProjectService extends ModelService {
 
     public void deleteDependencies(CytomineDomain domain, Transaction transaction, Task task) {
         deleteDependentImageInstance((Project) domain, transaction, task);
-        deleteDependentRepresentativeUser((Project) domain, transaction, task);
+        deleteDependentRepresentativeUser((Project) domain);
         deleteDependentMetadata(domain, transaction, task);
     }
 
-    private void deleteDependentRepresentativeUser(Project domain, Transaction transaction, Task task) {
+    private void deleteDependentRepresentativeUser(Project domain) {
         projectRepresentativeUserRepository.deleteAll(projectRepresentativeUserService.listByProject(domain));
     }
 
@@ -1090,7 +1090,6 @@ public class ProjectService extends ModelService {
         for (ImageInstance imageInstance : imageInstanceRepository.findAllByProject(project)) {
             imageInstanceService.delete(imageInstance, transaction, task, false);
         }
-
     }
 
     @Override

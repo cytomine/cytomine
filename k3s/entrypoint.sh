@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# Fix mount propagation for Cilium (BPF, cgroupv2, netns, etc.)
+# Make all mounts shared recursively to support Cilium's eBPF requirements
+mount --make-rshared /
+
 # Part one: forward requests to docker DNS
 # https://github.com/corneliusludmann/k3s-docker-compose-dns/blob/master/entrypoint.sh
 # Add IP tables rules to access Docker's internal DNS 127.0.0.11 from outside

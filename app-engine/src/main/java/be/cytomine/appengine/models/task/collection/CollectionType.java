@@ -710,7 +710,7 @@ public class CollectionType extends Type {
 
         CollectionPersistenceRepository collectionRepo =
             AppEngineApplicationContext.getBean(CollectionPersistenceRepository.class);
-        String parameterName = provision.get("param_name").asText();
+        String parameterName = provision.get("parameterName").asText();
 
         CollectionPersistence collectionPersistence = (CollectionPersistence) persistNode(provision,
             runId, parameterName, leafType);
@@ -767,8 +767,8 @@ public class CollectionType extends Type {
 
         if (node.isObject()) {
             String paramName = "";
-            if (Objects.nonNull(node.get("param_name"))) {
-                paramName = node.get("param_name").asText();
+            if (Objects.nonNull(node.get("parameterName"))) {
+                paramName = node.get("parameterName").asText();
             } else {
                 String transformedIndex = transform(node.get("index").asText());
                 if (parameterName.equalsIgnoreCase(transformedIndex)) {
@@ -1198,29 +1198,21 @@ public class CollectionType extends Type {
 
     @Override
     public StorageData mapToStorageFileData(JsonNode provision, Run run) throws FileStorageException {
-        String name = null;
-        // if provision is an item
-        if (provision.has("index")) {
-            name = provision.get("index").asText();
-        } else {
-            name = provision.get("param_name").asText();
-        }
-
         if (referenced) {
             return new StorageData(true);
         }
 
-        // if provision is full collection
-        return mapNode("/" + name, provision.get("value"),
-            new StorageData(), run);
+        String name;
+        if (provision.has("index")) {
+            name = provision.get("index").asText();
+        } else {
+            name = provision.get("parameterName").asText();
+        }
+
+        return mapNode("/" + name, provision.get("value"), new StorageData());
     }
 
-    private StorageData mapNode(
-        String path,
-        JsonNode value,
-        StorageData container,
-        Run run)
-        throws FileStorageException {
+    private StorageData mapNode(String path, JsonNode value, StorageData container) throws FileStorageException {
 
         Type currentType = new CollectionType(this);
         while (currentType instanceof CollectionType) {
@@ -1238,7 +1230,7 @@ public class CollectionType extends Type {
                 path + "/" + "array.yml",
                 StorageDataType.FILE));
             for (JsonNode item : value) {
-                container = mapNode(path + "/" + item.get("index").asText(), item.get("value"), container, run);
+                container = mapNode(path + "/" + item.get("index").asText(), item.get("value"), container);
             }
         }
         if (value.isObject() || value.isValueNode()) {
@@ -1249,9 +1241,7 @@ public class CollectionType extends Type {
             }
 
             StorageDataEntry itemFileEntry = null;
-            if (leafType.equalsIgnoreCase("FileType")
-                || leafType.equalsIgnoreCase("ImageType")) {
-
+            if (leafType.equalsIgnoreCase("FileType") || leafType.equalsIgnoreCase("ImageType")) {
                 itemFileEntry = new StorageDataEntry(new File(value.asText()), path, StorageDataType.FILE);
             } else {
                 itemFileEntry = new StorageDataEntry(
@@ -1291,8 +1281,8 @@ public class CollectionType extends Type {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode provisionedParameter = mapper.createObjectNode();
         // if json has param_name then it's a collection
-        if (provision.has("param_name")) {
-            provisionedParameter.put("param_name", provision.get("param_name").asText());
+        if (provision.has("parameterName")) {
+            provisionedParameter.put("parameterName", provision.get("parameterName").asText());
         } else {
             provisionedParameter.put("index", provision.get("index").asText());
         }
@@ -1307,7 +1297,7 @@ public class CollectionType extends Type {
             provisionedParameter.set("value", provision.get("value"));
         }
 
-        provisionedParameter.put("task_run_id", String.valueOf(run.getId()));
+        provisionedParameter.put("taskRunId", String.valueOf(run.getId()));
         return provisionedParameter;
     }
 

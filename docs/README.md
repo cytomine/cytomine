@@ -4,7 +4,7 @@ The documentation site is built using VuePress v1.
 
 ## Requirements
 
-- [Node](https://nodejs.org/) (v20.19.4+ recommended)
+- [Node](https://nodejs.org/) (v22.22.3+ recommended)
 
 ## Usage
 

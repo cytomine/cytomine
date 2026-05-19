@@ -23,7 +23,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.mongodb.core.geo.GeoJsonPolygon;
 
 import be.cytomine.domain.social.MongodbLocation;
 
@@ -44,13 +43,6 @@ public class AreaDTO {
 
     public List<Point> toPointList() {
         return List.of(topLeft, topRight, bottomRight, bottomLeftX);
-    }
-
-    public GeoJsonPolygon toGeoJsonPolygon() {
-        return new GeoJsonPolygon(toPointList().stream()
-            .map(point ->
-                new org.springframework.data.geo.Point(point.getX(), point.getY()))
-            .collect(Collectors.toList()));
     }
 
     public MongodbLocation toMongodbLocation() {

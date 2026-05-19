@@ -45,13 +45,12 @@ RUN sed -i -- 's/version: 0.0.0/version: '$CORE_VERSION'/g' /app/core/src/main/r
 
 #######################################################################################
 ## Stage: Cytomine core development image
-FROM ${PROXY_CACHE}/gradle:${GRADLE_VERSION}-jammy AS dev-server
+FROM ${PROXY_CACHE}/gradle:${GRADLE_VERSION}-alpine AS dev-server
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-      gettext=0.21-4ubuntu4 \
-      openssh-server=1:8.9p1-3ubuntu0.13 \
-      rsync=3.2.7-0ubuntu0.22.04.4
+RUN apk add --no-cache \
+    gettext \
+    openssh \
+    rsync
 
 ENV GRADLE_USER_HOME=/opt/gradle/.gradle
 

@@ -1,4 +1,7 @@
 ---
+x-postgres-image: &postgres-image postgres:15
+x-redis-image: &redis-image redis:7.2
+
 x-version-env: &version-env
   VERSIONS_CYTOMINE_COMMERCIAL: 2025.1
 
@@ -9,7 +12,7 @@ services:
     ports:
       - 27017:27017
     volumes:
-      - ${DATA_PATH:-./data}/mongo:/data/db
+      - mongo-data:/data/db
     environment:
       MONGO_INITDB_ROOT_PASSWORD: password
       MONGO_INITDB_ROOT_USERNAME: admin
@@ -24,7 +27,7 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - ${DATA_PATH:-./data}/postgis/data:/var/lib/postgresql/data
+      - postgis-data:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: docker
       POSTGRES_PASSWORD: password
@@ -39,7 +42,7 @@ services:
     ports:
       - 5000:5000
     volumes:
-      - ${DATA_PATH:-./data}/registry:/var/lib/registry
+      - registry-data:/var/lib/registry
     environment:
       REGISTRY_STORAGE_DELETE_ENABLED: true
     networks:
@@ -47,17 +50,17 @@ services:
         ipv4_address: 172.16.238.4
 
   redis:
-    image: redis:7.2
+    image: *redis-image
     command: --port 6380
     restart: unless-stopped
     volumes:
-      - ${DATA_PATH:-./data}/redis:/data
+      - redis-data:/data
     networks:
       host_network:
         ipv4_address: 172.16.238.5
 
   pims-cache:
-    image: redis:7.2
+    image: *redis-image
     restart: unless-stopped
     networks:
       host_network:
@@ -77,7 +80,7 @@ services:
     environment:
       <<: *version-env
       CORE_URL: http://127.0.0.1:8080/api
-      IAM_URL: http://127.0.0.1:8070/iam/realms/cytomine
+      IAM_URL: http://127.0.0.1:8100/iam/realms/cytomine
       PIMS_URL: http://127.0.0.1:5001/ims
       APPENGINE_URL: http://127.0.0.1:8082
       CBIR_URL: http://127.0.0.1:6000
@@ -118,10 +121,10 @@ services:
         ipv4_address: 172.16.238.8
 
   iam-db:
-    image: postgres:14
+    image: *postgres-image
     restart: unless-stopped
     volumes:
-      - ${DATA_PATH:-./data}/iam-db/data:/var/lib/postgresql/data
+      - iam-db-data:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: iam
       POSTGRES_PASSWORD: password
@@ -136,7 +139,7 @@ services:
     depends_on:
       - iam-db
     ports:
-      - 8070:8100
+      - 8100:8100
     environment:
       KC_ADMIN_EMAIL: mail@mail.com
       KC_DB_PASSWORD: password
@@ -144,8 +147,9 @@ services:
       KC_DB_URL_HOST: iam-db
       KC_DB_URL_PORT: 5432
       KC_DB_USERNAME: iam
-      KC_HOSTNAME: 127.0.0.1:8070
-      KC_HOSTNAME_ADMIN: 127.0.0.1:8070
+      KC_HOSTNAME: 127.0.0.1
+      KC_HOSTNAME_ADMIN: 127.0.0.1
+      KC_HOSTNAME_PORT: 8100
       KC_HOSTNAME_STRICT: false
       KC_HOSTNAME_STRICT_BACKCHANNEL: false
       KC_HOSTNAME_STRICT_HTTPS: false
@@ -158,19 +162,19 @@ services:
       KC_SMTP_PASS: password
       KC_SMTP_PORT: 587
       KC_SMTP_USER: user
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: YMjl7YGabNbQmjVOONxo9AYSiJyvioTnbsMyBwT8/Jg=
+      KEYCLOAK_ADMIN: &KEYCLOAK_ADMIN admin
+      KEYCLOAK_ADMIN_PASSWORD: &KEYCLOAK_ADMIN_PASSWORD YMjl7YGabNbQmjVOONxo9AYSiJyvioTnbsMyBwT8/Jg=
     networks:
       host_network:
         ipv4_address: 172.16.238.9
 
   app-engine-db:
-    image: postgres:14
+    image: *postgres-image
     restart: unless-stopped
     ports:
       - 5433:5432
     volumes:
-      - ${DATA_PATH:-./data}/app-engine-db/data:/var/lib/postgresql/data
+      - app-engine-db-data:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: appengine
       POSTGRES_PASSWORD: password
@@ -189,10 +193,10 @@ services:
     ports:
       - 8082:8080
     volumes:
-      - ${DATA_PATH:-./data}/app-engine:/data
+      - app-engine-data:/data
       - ${PWD}/.kube/shared:/root/.kube:ro
-      - ${DATA_PATH:-./data}/app-engine-shared-inputs:/app-engine-shared-inputs:rw
-      - ${DATA_PATH:-./data}/app-engine-shared-datasets:/app-engine-shared-datasets:rw
+      - app-engine-shared-inputs:/app-engine-shared-inputs:rw
+      - app-engine-shared-datasets:/app-engine-shared-datasets:rw
     environment:
       API_PREFIX: /app-engine/
       DB_HOST: app-engine-db
@@ -229,7 +233,7 @@ services:
       IMAGE_SERVER_PRIVATE_KEY: d70607f5-c478-403c-be11-3dbc1716d1cf
       IMAGE_SERVER_PUBLIC_KEY: 9a8b8369-2446-44cb-b0af-604a74e1dcdb
       IAM_URL: http://iam:8100
-      IAM_EXTERNAL_URL: http://127.0.0.1:8070
+      IAM_EXTERNAL_URL: http://127.0.0.1:8100
       SERVER_URL: http://127.0.0.1:8080
       PIMS_URL: http://pims:5000
       CBIR_URL: http://cbir:6000
@@ -251,6 +255,8 @@ services:
       POSTGIS_USER: docker
       STORAGE_PATH: /data/images
       REPOSITORY_URL: http://repository:8081/
+      KEYCLOAK_ADMIN: *KEYCLOAK_ADMIN
+      KEYCLOAK_ADMIN_PASSWORD: *KEYCLOAK_ADMIN_PASSWORD
     networks:
       host_network:
         ipv4_address: 172.16.238.11
@@ -263,7 +269,7 @@ services:
     ports:
       - 6000:6000
     volumes:
-      - ${DATA_PATH:-./data}/cbir:/data/cbir
+      - cbir-data:/data/cbir
       - ${DATA_PATH:-./data}/weights:/weights
     environment:
       API_BASE_PATH: ${CBIR_API_BASE_PATH:-/cbir}
@@ -323,8 +329,8 @@ services:
       - k3s-server:/var/lib/rancher/k3s
       - ./k3s/registries.yaml:/etc/rancher/k3s/registries.yaml:ro
       - ./k3s/serviceaccounts.yaml://var/lib/rancher/k3s/server/manifests/serviceaccounts.yaml:ro
-      - ${DATA_PATH:-./data}/app-engine-shared-inputs:/app-engine-shared-inputs:rw
-      - ${DATA_PATH:-./data}/app-engine-shared-datasets:/app-engine-shared-datasets:ro
+      - app-engine-shared-inputs:/app-engine-shared-inputs:rw
+      - app-engine-shared-datasets:/app-engine-shared-datasets:ro
       # This is just so that we get the kubeconfig file out
       - .kube/shared:/output/
     ports:
@@ -336,6 +342,16 @@ services:
 volumes:
   k3s-server: {}
   k3s-agent: {}
+  mongo-data: {}
+  postgis-data: {}
+  registry-data: {}
+  redis-data: {}
+  iam-db-data: {}
+  app-engine-db-data: {}
+  app-engine-data: {}
+  app-engine-shared-inputs: {}
+  app-engine-shared-datasets: {}
+  cbir-data: {}
 
 networks:
   host_network:

@@ -16,11 +16,23 @@ import org.springframework.stereotype.Component;
 @Component
 public class SeleniumDriver {
 
+    public static final String DOWNLOAD_PATH = System.getProperty("java.io.tmpdir") + "/selenium/";
+
     @Value("${selenium.url}")
     Optional<URL> seleniumUrl;
 
     public WebDriver driver() {
         FirefoxOptions options = new FirefoxOptions();
+        options.addPreference("browser.download.folderList", 2);
+        options.addPreference("browser.download.dir", DOWNLOAD_PATH);
+        options.addPreference("browser.download.useDownloadDir", true);
+        options.addPreference(
+            "browser.helperApps.neverAsk.saveToDisk",
+            "application/pdf,application/octet-stream,text/csv,application/zip"
+        );
+        options.addPreference("browser.download.manager.showWhenStarting", false);
+        options.addPreference("pdfjs.disabled", true);
+
         WebDriver webDriver = seleniumUrl.map(url -> {
             log.info("Instantiated RemoteWebDriver with url: {}", url);
             options.addArguments("--headless");

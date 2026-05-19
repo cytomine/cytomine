@@ -5,6 +5,7 @@ metadata:
   labels:
     app: iam
 spec:
+  progressDeadlineSeconds: 1200
   replicas: 1
   selector:
     matchLabels:
@@ -28,7 +29,7 @@ spec:
         emptyDir: {}
       initContainers:
       - name: wait-for-postgres
-        image: "{{ .Values.images.postgresql_iam }}"
+        image: "{{ .Values.images.postgresql }}"
         securityContext:
         {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
         env:

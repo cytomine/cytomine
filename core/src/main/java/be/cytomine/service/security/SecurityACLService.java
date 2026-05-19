@@ -67,6 +67,24 @@ public class SecurityACLService {
     @Autowired
     private AclRepository aclRepository;
 
+    private static List<Field> getAllFields(Object obj) {
+        List<Field> fields = new ArrayList<>();
+        getAllFieldsRecursive(fields, obj.getClass());
+        return fields;
+    }
+
+    private static List<Field> getAllFieldsRecursive(List<Field> fields, Class<?> type) {
+        for (Field field : type.getDeclaredFields()) {
+            fields.add(field);
+        }
+
+        if (type.getSuperclass() != null) {
+            fields = getAllFieldsRecursive(fields, type.getSuperclass());
+        }
+
+        return fields;
+    }
+
     public void check(Long id, String className, Permission permission) {
         try {
             check(id, Class.forName(className), permission);
@@ -140,7 +158,6 @@ public class SecurityACLService {
      * Check if user has permission on the curret domain
      *
      * @param permission Permission to check (READ,...)
-     *
      * @return true if user has this permission on current domain
      */
     public boolean hasPermission(CytomineDomain domain, Permission permission, boolean isAdmin) {
@@ -196,10 +213,10 @@ public class SecurityACLService {
         return (List<Storage>) query.getResultList();
     }
 
-    public List<Project> getProjectList(User user, Ontology ontology) {
+    public List<Project> getProjectList(User user, Long ontologyId) {
         //faster method
         if (currentRoleService.isAdminByNow(user)) {
-            return projectRepository.findAllByOntology(ontology);
+            return projectRepository.findAllByOntologyId(ontologyId);
         } else {
             Query query = entityManager.createQuery(
                 "select distinct project "
@@ -209,7 +226,7 @@ public class SecurityACLService {
                     + "Project as project "
                     + "where aclObjectId.objectId = project.id "
                     + "and aclEntry.aclObjectIdentity = aclObjectId "
-                    + (ontology != null ? "and project.ontology.id = " + ontology.getId() : " ")
+                    + (ontologyId != null ? "and project.ontology.id = " + ontologyId : " ")
                     + "and aclEntry.sid = aclSid and aclSid.sid like '"
                     + user.getUsername()
                     + "'");
@@ -232,7 +249,7 @@ public class SecurityACLService {
 
     public List<Ontology> getOntologyList(User user) {
         if (currentRoleService.isAdminByNow(user)) {
-            return ontologyRepository.findAll();
+            return ontologyRepository.findAllByDeletedNull();
         }
         Query query = entityManager.createQuery(
             "select distinct ontology "
@@ -241,13 +258,13 @@ public class SecurityACLService {
                 + "AclSid as aclSid, "
                 + "Ontology as ontology "
                 + "where aclObjectId.objectId = ontology.id "
+                + "and ontology.deleted is null "
                 + "and aclEntry.aclObjectIdentity = aclObjectId "
                 + "and aclEntry.sid = aclSid "
                 + "and aclSid.sid like '"
                 + user.getUsername()
                 + "'");
-        List<Ontology> ontologies = query.getResultList();
-        return ontologies;
+        return (List<Ontology>) query.getResultList();
     }
 
     public void checkIsCurrentUserSameUser(Long userId) {
@@ -266,18 +283,10 @@ public class SecurityACLService {
         }
     }
 
-    public void checkCurrentUserIsAdmin() {
-        checkAdmin(currentUserService.getCurrentUser());
-    }
-
     public void checkAdmin(User user) {
         if (!currentRoleService.isAdminByNow(user)) {
             throw new ForbiddenException("You don't have the right to perform this action! You must be admin!");
         }
-    }
-
-    public void checkCurrentUserIsUser() {
-        checkUser(currentUserService.getCurrentUser());
     }
 
     public void checkUser(User user) {
@@ -320,7 +329,6 @@ public class SecurityACLService {
 
     }
 
-
     //check if the container (e.g. Project) is not in readonly. If in readonly, only admins can edit this.
     public void checkIsNotReadOnly(CytomineDomain domain) {
         if (domain != null) {
@@ -337,7 +345,6 @@ public class SecurityACLService {
             throw new ObjectNotFoundException("ACL error: domain is null! Unable to process project auth checking");
         }
     }
-
 
     public void checkIsSameUserOrAdminContainer(CytomineDomain domain, User user, User currentUser) {
         boolean isNotSameUser = (!currentRoleService.isAdminByNow(currentUser) && (!Objects.equals(
@@ -361,11 +368,9 @@ public class SecurityACLService {
 
     }
 
-
     public void checkFullOrRestrictedForOwner(Long id, Class className, String owner) {
         checkFullOrRestrictedForOwner(id, className.getName(), owner);
     }
-
 
     public void checkFullOrRestrictedForOwner(Long id, String className, String owner) {
         try {
@@ -403,7 +408,6 @@ public class SecurityACLService {
                 return;
             }
 
-            CytomineDomain container = retrieveContainer(domain);
             switch (((Project) retrieveContainer(domain)).getMode()) {
                 case CLASSIC:
                     return;
@@ -446,7 +450,6 @@ public class SecurityACLService {
 
     }
 
-
     private Boolean objectHasProperty(Object obj, String propertyName) {
         List<Field> properties = getAllFields(obj);
         for (Field field : properties) {
@@ -455,24 +458,6 @@ public class SecurityACLService {
             }
         }
         return false;
-    }
-
-    private static List<Field> getAllFields(Object obj) {
-        List<Field> fields = new ArrayList<>();
-        getAllFieldsRecursive(fields, obj.getClass());
-        return fields;
-    }
-
-    private static List<Field> getAllFieldsRecursive(List<Field> fields, Class<?> type) {
-        for (Field field : type.getDeclaredFields()) {
-            fields.add(field);
-        }
-
-        if (type.getSuperclass() != null) {
-            fields = getAllFieldsRecursive(fields, type.getSuperclass());
-        }
-
-        return fields;
     }
 
     public void checkIsCreator(CytomineDomain domain, User currentUser) {

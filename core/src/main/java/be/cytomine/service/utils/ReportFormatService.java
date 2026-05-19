@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.dto.image.Point;
 import be.cytomine.service.ontology.TermService;
 import be.cytomine.service.report.ReportColumn;
@@ -22,6 +24,25 @@ public class ReportFormatService {
     private final TermService termService;
 
     private Map<Long, String> termNameCache;
+
+    /**
+     * Get report column headers from a list of ReportColumn
+     *
+     * @param columns list of ReportColumn
+     * @return ReportColumn headers
+     */
+    public static Object[] getColumnHeaders(List<ReportColumn> columns) {
+        return columns.stream().map(reportColumn -> reportColumn.property).toArray();
+    }
+
+    /**
+     * Convert data headers (actually property values of columns list) to columns titles.
+     */
+    private static void headerPropertyToTitle(List<ReportColumn> columns, Object[][] data) {
+        for (int i = 0; i < data[0].length; i++) {
+            data[0][i] = columns.get(i).title;
+        }
+    }
 
     /**
      * Transforms a {@link List} of {@link JsonObject} into an {@code Object[][]} with headers in the first row
@@ -140,7 +161,6 @@ public class ReportFormatService {
 
     /**
      * @param value Object representing the list of term ids
-     *
      * @return String[] terms name
      */
     public String[] getTermsName(Object value) {
@@ -153,12 +173,12 @@ public class ReportFormatService {
         if (!termsId[0].trim().isEmpty()) {
             int k = 0;
             for (String termId : termsId) {
-                termNames[k] = getTermName(Long.parseLong(termId.trim()));
+                termNames[k] = getTermName(Long.parseLong(termId.trim())).orElse(null);
                 k++;
             }
         }
         if (termsId[0].trim().isEmpty()) {
-            return new String[]{""};
+            return new String[] {""};
         } else {
             return termNames;
         }
@@ -168,7 +188,6 @@ public class ReportFormatService {
      * Get column width from a list of ReportColumn
      *
      * @param columns list of ReportColumn
-     *
      * @return ReportColumn width
      */
     public float[] getColumnWidth(List<ReportColumn> columns) {
@@ -180,38 +199,19 @@ public class ReportFormatService {
     }
 
     /**
-     * Get report column headers from a list of ReportColumn
-     *
-     * @param columns list of ReportColumn
-     *
-     * @return ReportColumn headers
-     */
-    public static Object[] getColumnHeaders(List<ReportColumn> columns) {
-        return columns.stream().map(reportColumn -> reportColumn.property).toArray();
-    }
-
-    /**
-     * Convert data headers (actually property values of columns list) to columns titles.
-     */
-    private static void headerPropertyToTitle(List<ReportColumn> columns, Object[][] data) {
-        for (int i = 0; i < data[0].length; i++) {
-            data[0][i] = columns.get(i).title;
-        }
-    }
-
-    /**
      * Check if term is already in cache. If yes return term name, if not add it.
      *
      * @return String term name
      */
-    private String getTermName(Long termId) {
-        if (termNameCache.containsKey(termId)) {
-            return termNameCache.get(termId);
-        } else {
-            String termName = termService.find(termId).get().getName();
-            termNameCache.put(termId, termName);
-            return termName;
-        }
+    private Optional<String> getTermName(Long termId) {
+        return Optional.ofNullable(termNameCache.get(termId))
+            .or(() -> termService.find(termId)
+                .map(TermResponse::name))
+            .map(term -> {
+                termNameCache.put(termId, term);
+                return term;
+            });
+
     }
 
     private Object[][] initReport(List<Map<String, Object>> data, Object[] headers) {

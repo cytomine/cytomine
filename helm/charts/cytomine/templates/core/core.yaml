@@ -11,6 +11,7 @@ metadata:
     component: {{ .Release.Name }}-core
     release: {{ .Release.Name }}
 spec:
+  progressDeadlineSeconds: 1200
   replicas: 1
   selector:
     matchLabels:
@@ -56,6 +57,11 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: mongodb-secret
+                  key: password
+            - name: KEYCLOAK_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: admin-iam-secret
                   key: password
           envFrom:
             - configMapRef:

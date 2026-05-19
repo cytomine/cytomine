@@ -16,7 +16,6 @@ import be.cytomine.repository.AnnotationListing;
 import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.ontology.TermService;
-import be.cytomine.service.security.UserService;
 import be.cytomine.utils.JsonObject;
 
 /**
@@ -27,8 +26,6 @@ import be.cytomine.utils.JsonObject;
 @Transactional
 @AllArgsConstructor
 public class ParamsService {
-
-    private final UserService userService;
 
     private final UserRepository userRepository;
 
@@ -93,7 +90,7 @@ public class ParamsService {
                 List<Long> termsIdsFromParams = Arrays.stream(paramsTerms.split(paramsTerms.contains("_") ? "_" : ","))
                     .map(Long::parseLong)
                     .collect(Collectors.toList());
-                return termService.getAllTermId(project)
+                return termService.getAllTermIds(project)
                     .stream()
                     .distinct()
                     .filter(termsIdsFromParams::contains)
@@ -102,7 +99,7 @@ public class ParamsService {
                 return new ArrayList<>();
             }
         } else {
-            return termService.getAllTermId(project);
+            return termService.getAllTermIds(project).stream().toList();
         }
     }
 

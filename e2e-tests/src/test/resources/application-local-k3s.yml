@@ -3,3 +3,5 @@ cytomine:
   admin:
     username: admin
     password:
+keycloak-client:
+  url: http://cytomine.local/iam

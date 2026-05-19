@@ -1,20 +1,20 @@
 package be.cytomine.domain;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 import java.util.Date;
 import java.util.UUID;
@@ -54,17 +54,17 @@ public class CytomineDomainTests {
     EntityManager em;
 
     @Test
-    void assign_id_automatically() {
-        Ontology ontology = basicInstanceBuilder.given_a_not_persisted_ontology();
+    void assignIdAutomatically() {
+        Ontology ontology = basicInstanceBuilder.givenANotPersistedOntology();
         assertThat(ontology.getId()).isNull();
         ontology = builder.persistAndReturn(ontology);
         assertThat(ontology.getId()).isPositive();
     }
 
     @Test
-    void assign_created_date() {
+    void assignCreatedDate() {
         Date beforeCreate = new Date();
-        Ontology ontology = basicInstanceBuilder.given_a_not_persisted_ontology();
+        Ontology ontology = basicInstanceBuilder.givenANotPersistedOntology();
         assertThat(ontology.getCreated()).isNull();
         ontology = builder.persistAndReturn(ontology);
         Date afterCreate = new Date();
@@ -72,9 +72,9 @@ public class CytomineDomainTests {
     }
 
     @Test
-    void assign_updated_date() {
+    void assignUpdatedDate() {
         Date beforeCreate = new Date();
-        Ontology ontology = basicInstanceBuilder.given_a_not_persisted_ontology();
+        Ontology ontology = basicInstanceBuilder.givenANotPersistedOntology();
         assertThat(ontology.getUpdated()).isNull();
         ontology = builder.persistAndReturn(ontology);
         Date afterCreate = new Date();
@@ -89,9 +89,9 @@ public class CytomineDomainTests {
     }
 
     @Test
-    void preserve_preassigned_id() {
+    void preservePreassignedId() {
         Long preassignedId = 999999999L;
-        Ontology ontology = basicInstanceBuilder.given_a_not_persisted_ontology();
+        Ontology ontology = basicInstanceBuilder.givenANotPersistedOntology();
         ontology.setId(preassignedId);
         assertThat(ontology.getId()).isEqualTo(preassignedId);
         ontology = builder.persistAndReturn(ontology);
@@ -105,7 +105,7 @@ public class CytomineDomainTests {
     }
 
     @Test
-    void custom_identifier_generator_allows_assigned_identifiers() {
+    void customIdentifierGeneratorAllowsAssignedIdentifiers() {
         CustomIdentifierGenerator generator = new CustomIdentifierGenerator();
         assertThat(generator.allowAssignedIdentifiers()).isTrue();
     }

@@ -48,7 +48,7 @@ public class TermRelationController {
     public TermRelationResponse termRelation(@PathVariable long id) {
         log.debug("REST request to get term relation {}", id);
         long userId = currentUserService.getCurrentUser().getId();
-        return termRelationHttpContract.findTermByID(id, userId)
+        return termRelationHttpContract.findTermRelationByID(id, userId)
                    .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_TERM_RELATION, id)));
     }
 

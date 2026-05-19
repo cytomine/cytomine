@@ -1,9 +1,5 @@
 package be.cytomine.service.middleware;
 
-import be.cytomine.CytomineCoreApplication;
-import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.service.appengine.AppEngineService;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterAll;
@@ -16,7 +12,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import be.cytomine.CytomineCoreApplication;
+import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.service.appengine.AppEngineService;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
@@ -45,7 +50,7 @@ public class AppEngineServiceTests {
     }
 
     @Test
-    void get_task() {
+    void getTask() {
         configureFor("localhost", 8888);
         stubFor(get(urlEqualTo(apiBasePath + "task"))
             .willReturn(

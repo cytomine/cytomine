@@ -2,6 +2,7 @@ package be.cytomine.common.repository.http;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,10 +26,17 @@ public interface TermRelationHttpContract {
     String ROOT_PATH = "/term_relations";
 
     @GetExchange("/{id}")
-    Optional<TermRelationResponse> findTermByID(@PathVariable long id, @RequestParam long userId);
+    Optional<TermRelationResponse> findTermRelationByID(@PathVariable long id, @RequestParam long userId);
+
+    @GetExchange("/term/{termId}")
+    Set<Long> findTermRelationsIdsByTermId(@PathVariable long termId, @RequestParam long userId);
 
     @GetExchange("/ontology/{ontologyId}")
     List<TermRelationResponse> findAllByOntologyId(@PathVariable long ontologyId, @RequestParam long userId);
+
+    @GetExchange("/ontology/{ontologyId}/ids")
+    Set<Long> findAllIdsByOntologyId(@PathVariable long ontologyId, @RequestParam long userId);
+
 
     @PostExchange
     Optional<HttpCommandResponse> create(@RequestParam long userId,
@@ -42,6 +50,10 @@ public interface TermRelationHttpContract {
     @DeleteExchange("/{id}")
     Optional<HttpCommandResponse> delete(@PathVariable long id,
                                          @RequestParam long userId);
+
+    @DeleteExchange("/all")
+    Set<HttpCommandResponse> deleteAll(@RequestParam Set<Long> ids,
+        @RequestParam long userId);
 
     @DeleteExchange("/term1/{idTerm1}/term2/{idTerm2}")
     Optional<HttpCommandResponse> deleteByTerms(@PathVariable long idTerm1,

@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class PreparedRequestUtilsTests {
 
     @Test
-    public void set_url() {
+    public void setUrl() {
         PreparedRequest pr = new PreparedRequest();
         pr.setUrl("http://domain.com");
         assertThat(pr.getScheme()).isEqualTo("http");
@@ -32,7 +32,7 @@ public class PreparedRequestUtilsTests {
     }
 
     @Test
-    public void build_path() {
+    public void buildPath() {
         PreparedRequest pr = new PreparedRequest();
         pr.addPathFragment("a");
         pr.addPathFragment("/b/");
@@ -45,7 +45,7 @@ public class PreparedRequestUtilsTests {
     }
 
     @Test
-    public void build_query() {
+    public void buildQuery() {
         PreparedRequest pr = new PreparedRequest();
         pr.addQueryParameter("a", "1");
         pr.addQueryParameter("b", "");
@@ -58,7 +58,7 @@ public class PreparedRequestUtilsTests {
     }
 
     @Test
-    public void build_uri() {
+    public void buildUri() {
         PreparedRequest pr = new PreparedRequest();
         pr.setUrl("https://domain.com:10900/basepath");
         pr.addPathFragment("/b/");

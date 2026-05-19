@@ -42,6 +42,7 @@ import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.ontology.AnnotationDomain;
+import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.dto.annotation.AnnotationReportParams;
 import be.cytomine.dto.annotation.SimplifiedAnnotation;
@@ -59,6 +60,7 @@ import be.cytomine.service.middleware.ImageServerService;
 import be.cytomine.service.ontology.GenericAnnotationService;
 import be.cytomine.service.ontology.ReviewedAnnotationService;
 import be.cytomine.service.ontology.UserAnnotationService;
+import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.report.ReportService;
 import be.cytomine.service.security.UserService;
 import be.cytomine.service.utils.ParamsService;
@@ -67,6 +69,7 @@ import be.cytomine.utils.AnnotationListingBuilder;
 import be.cytomine.utils.GeometryUtils;
 import be.cytomine.utils.JsonNodeUtils;
 import be.cytomine.utils.JsonObject;
+import be.cytomine.utils.ReportType;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -87,6 +90,8 @@ public class RestAnnotationDomainController extends RestCytomineController {
     private final EntityManager entityManager;
 
     private final ParamsService paramsService;
+
+    private final ProjectService projectService;
 
     private final RestUserAnnotationController restUserAnnotationController;
 
@@ -127,35 +132,50 @@ public class RestAnnotationDomainController extends RestCytomineController {
         return responseSuccess(annotations, params.getJSONAttrLong("offset", 0L), params.getJSONAttrLong("max", 0L));
     }
 
-    @RequestMapping(value = {"/project/{project}/annotation/download"}, method = {RequestMethod.POST})
-    public void download(
-        @PathVariable Long project,
-        @RequestBody AnnotationReportParams params
-    ) throws IOException {
+    @GetMapping(value = "/project/{projectId}/annotations/export", produces = "application/geo+json")
+    public ResponseEntity<Map<String, Object>> export(@PathVariable Long projectId) {
+        log.info("GET /project/{}/annotations/export", projectId);
+        Project project = projectService.find(projectId)
+            .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
 
-        boolean reviewed = Boolean.TRUE.equals(params.reviewed());
+        String filename = reportService.getAnnotationReportFileName(ReportType.GEOJSON.getLabel(), project.getName());
+        Map<String, Object> geoJson = annotationReportService.exportAnnotations(projectId);
+
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+            .body(geoJson);
+    }
+
+    @PostMapping("/project/{projectId}/annotation/download")
+    public ResponseEntity<byte[]> download(@PathVariable Long projectId, @RequestBody AnnotationReportParams params)
+        throws IOException {
+        ReportType reportType = ReportType.fromLabel(params.format());
         String users = JsonNodeUtils.csvFromStringList(params.users());
         String reviewUsers = JsonNodeUtils.csvFromStringList(params.reviewUsers());
-        String format = (params.format() == null || params.format().isBlank()) ? "pdf" : params.format();
         String terms = JsonNodeUtils.csvFromStringList(params.terms());
         String images = JsonNodeUtils.csvFromStringList(params.images());
         Long beforeThan = params.beforeThan();
         Long afterThan = params.afterThan();
 
+        Project project = projectService.find(projectId)
+            .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
+
         Map<String, Object> bodyMap = new HashMap<>();
-        bodyMap.put("project", project);
-        bodyMap.put("format", format);
+        bodyMap.put("project", projectId);
+        bodyMap.put("format", reportType.getLabel());
         bodyMap.put("users", users);
         bodyMap.put("reviewUsers", reviewUsers);
-        bodyMap.put("reviewed", reviewed);
+        bodyMap.put("reviewed", params.reviewed());
         bodyMap.put("terms", terms);
         bodyMap.put("images", images);
         bodyMap.put("beforeThan", beforeThan);
         bodyMap.put("afterThan", afterThan);
 
-        JsonObject body = new JsonObject(bodyMap);
-        byte[] report = annotationReportService.downloadDocumentByProject(body);
-        responseReportFile(reportService.getAnnotationReportFileName(format, project), report, format);
+        JsonObject parameters = new JsonObject(bodyMap);
+        byte[] report = annotationReportService.downloadDocumentByProject(parameters, project);
+        String filename = reportService.getAnnotationReportFileName(reportType.getLabel(), project.getName());
+
+        return buildReportResponse(filename, report, reportType);
     }
 
     @SuppressWarnings("checkstyle:VariableDeclarationUsageDistance")

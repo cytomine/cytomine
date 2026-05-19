@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -35,21 +34,13 @@ import org.springframework.stereotype.Service;
 import be.cytomine.domain.security.SecRole;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ForbiddenException;
-import be.cytomine.repository.security.SecUserSecRoleRepository;
 import be.cytomine.utils.WeakConcurrentHashMap;
 
 // TODO IAM - ADMIN SESSION ADAPT IF NEEDED
 @Service
 public class CurrentRoleService {
 
-    @Autowired
-    private SecUserSecRoleRepository secSecUserSecRoleRepository;
-
     public Map<String, Date> currentAdmins = new WeakConcurrentHashMap<>(120 * 60 * 1000); //admin session = 120 min max
-
-    public void clearAllAdminSession() {
-        currentAdmins.clear();
-    }
 
     /**
      * Active an admin session for a user (by default user with ROLE_ADMIN are connected as ROLE_USER)

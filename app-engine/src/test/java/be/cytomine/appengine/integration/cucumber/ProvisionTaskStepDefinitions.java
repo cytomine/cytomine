@@ -475,7 +475,7 @@ public class ProvisionTaskStepDefinitions {
 
         List<ObjectNode> provisions = new ArrayList<>();
         for (JsonNode parameter : payload) {
-            String parameterName = parameter.get("param_name").textValue();
+            String parameterName = parameter.get("parameterName").textValue();
             Parameter input = persistedTask
                 .getParameters()
                 .stream()

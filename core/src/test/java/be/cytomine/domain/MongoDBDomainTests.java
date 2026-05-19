@@ -20,13 +20,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
 import be.cytomine.CytomineCoreApplication;
-import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.social.LastConnection;
 import be.cytomine.domain.social.LastUserPosition;
 import be.cytomine.domain.social.PersistentConnection;
-import be.cytomine.domain.social.PersistentProjectConnection;
 import be.cytomine.domain.social.PersistentImageConsultation;
+import be.cytomine.domain.social.PersistentProjectConnection;
 import be.cytomine.domain.social.PersistentUserPosition;
 import be.cytomine.dto.image.AreaDTO;
 import be.cytomine.repositorynosql.social.LastConnectionRepository;
@@ -82,22 +82,24 @@ public class MongoDBDomainTests {
     }
 
     private Document retrieveDocument(String collectionName, Long id) {
-        MongoCollection<Document> persistentProjectConnection = mongoClient.getDatabase(mongoDatabaseName).getCollection(collectionName);
+        MongoCollection<Document> persistentProjectConnection = mongoClient.getDatabase(mongoDatabaseName)
+            .getCollection(collectionName);
 
         List<Document> results = persistentProjectConnection.find(eq("_id", id))
-                .into(new ArrayList<>());
+            .into(new ArrayList<>());
 
         assertThat(results).hasSize(1);
         return results.get(0);
     }
 
     private ListIndexesIterable<Document> retrieveIndex(String collectionName) {
-        MongoCollection<Document> persistentProjectConnection = mongoClient.getDatabase(mongoDatabaseName).getCollection(collectionName);
+        MongoCollection<Document> persistentProjectConnection = mongoClient.getDatabase(mongoDatabaseName)
+            .getCollection(collectionName);
         return persistentProjectConnection.listIndexes();
     }
 
     @Test
-    void last_connection_indexes() {
+    void lastConnectionIndexes() {
         ListIndexesIterable<Document> indexes = retrieveIndex("lastConnection");
         Document indexId = null;
         Document indexUserDate = null;
@@ -118,7 +120,7 @@ public class MongoDBDomainTests {
     }
 
     @Test
-    void last_connection_domain() throws ParseException {
+    void lastConnectionDomain() throws ParseException {
         Long expectedId = 60657L;
         Long expectedUserId = 58L;
         Date expectedDate = mongoDBFormat.parse("2022-02-02T07:30:23.384Z");
@@ -142,7 +144,7 @@ public class MongoDBDomainTests {
     }
 
     @Test
-    void last_user_position_index() {
+    void lastUserPositionIndex() {
         ListIndexesIterable<Document> indexes = retrieveIndex("lastUserPosition");
         Document indexId = null;
         Document indexUserImageSliceCreated = null;
@@ -194,7 +196,7 @@ public class MongoDBDomainTests {
     }
 
     @Test
-    void last_user_position_domain() throws ParseException {
+    void lastUserPositionDomain() throws ParseException {
         boolean expectedBroadcast = false;
         Long expectedId = 60911L;
         Long expectedImageId = 29240L;
@@ -207,10 +209,10 @@ public class MongoDBDomainTests {
         Integer expectedZoom = 5;
 
         List<List<Double>> expectedLocation = new AreaDTO(
-                new be.cytomine.dto.image.Point(-109d, 2548d),
-                new be.cytomine.dto.image.Point(683d, 2548d),
-                new be.cytomine.dto.image.Point(683d, 2028d),
-                new be.cytomine.dto.image.Point(-109d, 2028d)
+            new be.cytomine.dto.image.Point(-109d, 2548d),
+            new be.cytomine.dto.image.Point(683d, 2548d),
+            new be.cytomine.dto.image.Point(683d, 2028d),
+            new be.cytomine.dto.image.Point(-109d, 2028d)
         ).toMongodbLocation().getCoordinates();
 
         LastUserPosition lastPosition = new LastUserPosition();
@@ -247,7 +249,7 @@ public class MongoDBDomainTests {
     }
 
     @Test
-    void persistent_connection_indexes() {
+    void persistentConnectionIndexes() {
         ListIndexesIterable<Document> indexes = retrieveIndex("persistentConnection");
 
         Document indexId = null;
@@ -269,7 +271,7 @@ public class MongoDBDomainTests {
     }
 
     @Test
-    void persistent_connection_domain() throws ParseException {
+    void persistentConnectionDomain() throws ParseException {
         Long expectedId = 3073L;
         Date expectedCreated = mongoDBFormat.parse("2021-09-22T09:06:32.472Z");
         String expectedSession = "B7850470EED8CD7570E05C50FD5F02F6";
@@ -290,7 +292,7 @@ public class MongoDBDomainTests {
     }
 
     @Test
-    void persistent_project_connection_domain() throws ParseException {
+    void persistentProjectConnectionDomain() throws ParseException {
         Long expectedId = 3073L;
         String expectedBrowser = "firefox";
         String expectedBrowserVersion = "92.0.0";
@@ -333,7 +335,7 @@ public class MongoDBDomainTests {
     }
 
     @Test
-    void persistent_image_consultation_domain() throws ParseException {
+    void persistentImageConsultationDomain() throws ParseException {
         Long expectedId = 3975L;
         Long expectedUser = 58L;
         Long expectedImage = 3962L;
@@ -379,7 +381,7 @@ public class MongoDBDomainTests {
     }
 
     @Test
-    void persistent_user_position_index() {
+    void persistentUserPositionIndex() {
         ListIndexesIterable<Document> indexes = retrieveIndex("persistentUserPosition");
         Document indexId = null;
         Document indexUserImageSliceCreated = null;
@@ -422,17 +424,17 @@ public class MongoDBDomainTests {
     }
 
     @Test
-    void persistent_user_position_domain() throws ParseException {
+    void persistentUserPositionDomain() throws ParseException {
         Long expectedId = 3977L;
         boolean expectedBroadcast = false;
         Date expectedCreated = mongoDBFormat.parse("2021-09-23T08:55:03.608Z");
         Long expectedImage = 3962L;
         String expectedImageName = "CMU-1-Small-Region (1).svs";
         List<List<Double>> expectedLocation = new AreaDTO(
-                new be.cytomine.dto.image.Point(-3338d, 3128d),
-                new be.cytomine.dto.image.Point(5558d, 3128d),
-                new be.cytomine.dto.image.Point(5558d, -160d),
-                new be.cytomine.dto.image.Point(-3338d, -160d)
+            new be.cytomine.dto.image.Point(-3338d, 3128d),
+            new be.cytomine.dto.image.Point(5558d, 3128d),
+            new be.cytomine.dto.image.Point(5558d, -160d),
+            new be.cytomine.dto.image.Point(-3338d, -160d)
         ).toMongodbLocation().getCoordinates();
         Long expectedProject = 3063L;
         Double expectedRotation = 0d;
@@ -477,7 +479,7 @@ public class MongoDBDomainTests {
     }
 
     @Test
-    void annotation_action_indexes() {
+    void annotationActionIndexes() {
         ListIndexesIterable<Document> indexes = retrieveIndex("annotationAction");
         Document indexId = null;
         Document indexUserDate = null;

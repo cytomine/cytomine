@@ -138,7 +138,7 @@ public class ProjectMemberService {
 
     private void removeOntologyRightIfNecessary(Project project, User user, boolean admin) {
         // we remove the right ONLY if user has no other project with this ontology
-        List<Project> projects = securityACLService.getProjectList(user, project.getOntology());
+        List<Project> projects = securityACLService.getProjectList(user, project.getOntology().getId());
         List<Project> otherProjects = new ArrayList<>(projects);
         otherProjects.remove(project);
 

@@ -1,33 +1,22 @@
 package be.cytomine.service.image.server;
 
 /*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2009-2022. Authors: see NOTICE file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import be.cytomine.BasicInstanceBuilder;
-import be.cytomine.CytomineCoreApplication;
-import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.domain.image.server.Storage;
-import be.cytomine.exceptions.WrongArgumentException;
-import be.cytomine.repository.image.server.StorageRepository;
-import be.cytomine.service.CommandService;
-import be.cytomine.service.PermissionService;
-import be.cytomine.service.command.TransactionService;
-import be.cytomine.service.security.SecurityACLService;
-import be.cytomine.utils.CommandResponse;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,10 +25,23 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 
-import jakarta.transaction.Transactional;
+import be.cytomine.BasicInstanceBuilder;
+import be.cytomine.CytomineCoreApplication;
+import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.domain.image.server.Storage;
+import be.cytomine.exceptions.WrongArgumentException;
+import be.cytomine.repository.image.server.StorageRepository;
+import be.cytomine.service.CommandService;
+import be.cytomine.service.PermissionService;
+import be.cytomine.service.command.TransactionService;
+import be.cytomine.service.security.SecurityACLService;
+import be.cytomine.utils.CommandResponse;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.springframework.security.acls.domain.BasePermission.*;
+import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
+import static org.springframework.security.acls.domain.BasePermission.READ;
+import static org.springframework.security.acls.domain.BasePermission.WRITE;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
@@ -70,43 +72,43 @@ public class StorageServiceTests {
     SecurityACLService securityACLService;
 
     @Test
-    void list_all_storage_with_success() {
-        Storage storage = builder.given_a_storage();
+    void listAllStorageWithSuccess() {
+        Storage storage = builder.givenAStorage();
         assertThat(storage).isIn(storageService.list());
     }
 
     @Test
-    void list_user_storage_with_success() {
-        Storage storage = builder.given_a_storage();
-        assertThat(storage).isIn(storageService.list(builder.given_superadmin(), null));
+    void listUserStorageWithSuccess() {
+        Storage storage = builder.givenAStorage();
+        assertThat(storage).isIn(storageService.list(builder.givenSuperAdmin(), null));
     }
 
     @Test
-    void get_storage_with_success() {
-        Storage storage = builder.given_a_storage();
+    void getStorageWithSuccess() {
+        Storage storage = builder.givenAStorage();
         assertThat(storage).isEqualTo(storageService.get(storage.getId()));
     }
 
     @Test
-    void get_unexisting_storage_return_null() {
+    void getUnexistingStorageReturnNull() {
         assertThat(storageService.get(0L)).isNull();
     }
 
     @Test
-    void find_storage_with_success() {
-        Storage storage = builder.given_a_storage();
+    void findStorageWithSuccess() {
+        Storage storage = builder.givenAStorage();
         assertThat(storageService.find(storage.getId()).isPresent());
         assertThat(storage).isEqualTo(storageService.find(storage.getId()).get());
     }
 
     @Test
-    void find_unexisting_storage_return_empty() {
+    void findUnexistingStorageReturnEmpty() {
         assertThat(storageService.find(0L)).isEmpty();
     }
 
     @Test
-    void add_valid_storage_with_success() {
-        Storage storage = builder.given_a_not_persisted_storage();
+    void addValidStorageWithSuccess() {
+        Storage storage = builder.givenANotPersistedStorage();
         CommandResponse commandResponse = storageService.add(storage.toJsonObject());
 
         assertThat(commandResponse).isNotNull();
@@ -117,17 +119,19 @@ public class StorageServiceTests {
     }
 
     @Test
-    void add_storage_with_null_name_fail() {
-        Storage storage = builder.given_a_not_persisted_storage();
+    void addStorageWithNullNameFail() {
+        Storage storage = builder.givenANotPersistedStorage();
         storage.setName("");
-        Assertions.assertThrows(WrongArgumentException.class, () -> {
-            storageService.add(storage.toJsonObject());
-        });
+        Assertions.assertThrows(
+            WrongArgumentException.class, () -> {
+                storageService.add(storage.toJsonObject());
+            }
+        );
     }
 
     @Test
-    void add_valid_storage_grant_permission_on_creator() {
-        Storage storage = builder.given_a_not_persisted_storage();
+    void addValidStorageGrantPermissionOnCreator() {
+        Storage storage = builder.givenANotPersistedStorage();
         CommandResponse commandResponse = storageService.add(storage.toJsonObject());
         Storage createdStorage = storageService.find(commandResponse.getObject().getId()).get();
         assertThat(permissionService.hasACLPermission(createdStorage, "superadmin", READ)).isTrue();
@@ -137,10 +141,13 @@ public class StorageServiceTests {
 
 
     @Test
-    void edit_valid_storage_with_success() {
-        Storage storage = builder.given_a_storage();
+    void editValidStorageWithSuccess() {
+        Storage storage = builder.givenAStorage();
 
-        CommandResponse commandResponse = storageService.update(storage, storage.toJsonObject().withChange("name", "NEW NAME"));
+        CommandResponse commandResponse = storageService.update(
+            storage,
+            storage.toJsonObject().withChange("name", "NEW NAME")
+        );
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -150,8 +157,8 @@ public class StorageServiceTests {
     }
 
     @Test
-    void delete_storage_with_success() {
-        Storage storage = builder.given_a_storage();
+    void deleteStorageWithSuccess() {
+        Storage storage = builder.givenAStorage();
 
         CommandResponse commandResponse = storageService.delete(storage, null, null, true);
 

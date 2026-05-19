@@ -1,6 +1,53 @@
-import {isGeometry} from '@/utils/app';
+import {formatTaskName, hasBinaryType, isGeometry} from '@/utils/app';
 
 describe('app.js', () => {
+  describe('hasBinaryType', () => {
+    it.each([
+      ['image'],
+      ['file'],
+    ])('should return true for binary type "%s"', (typeId) => {
+      const input = {
+        type: {id: typeId},
+      };
+
+      expect(hasBinaryType(input)).toBe(true);
+    });
+
+    it('should return true when type is array of binary subtype', () => {
+      const input = {
+        type: {id: 'array', subType: {id: 'image'}},
+      };
+
+      expect(hasBinaryType(input)).toBe(true);
+    });
+
+    it.each([
+      ['integer'],
+      ['number'],
+      ['string'],
+      ['boolean'],
+    ])('should return false for non-binary type "%s"', (typeId) => {
+      const input = {
+        type: {id: typeId},
+      };
+
+      expect(hasBinaryType(input)).toBe(false);
+    });
+
+    it.each([
+      ['integer'],
+      ['number'],
+      ['string'],
+      ['boolean'],
+    ])('should return false for array with non-binary subtype "%s"', (typeId) => {
+      const input = {
+        type: {id: 'array', subType: {id: typeId}},
+      };
+
+      expect(hasBinaryType(input)).toBe(false);
+    });
+  });
+
   describe('isGeometry', () => {
     it('should return true when type is "geometry"', () => {
       const parameter = {
@@ -54,6 +101,33 @@ describe('app.js', () => {
       };
 
       expect(isGeometry(parameter)).toBe(false);
+    });
+  });
+
+  describe('formatTaskName', () => {
+    it('should format task name with version and date', () => {
+      const taskRun = {
+        createdAt: '2026-04-28T10:30:00Z',
+        task: {name: 'Nuclei Segmentation', version: '1.2.3'},
+      };
+
+      const result = formatTaskName(taskRun);
+
+      expect(result).toContain(`${taskRun.task.name} (${taskRun.task.version})`);
+      expect(result).toContain(new Date(taskRun.createdAt).toLocaleString());
+    });
+
+    it('should handle different dates correctly', () => {
+      const taskRun = {
+        createdAt: '2023-06-01T08:00:00Z',
+        task: {name: 'Object Detection', version: '0.9.0'},
+      };
+
+      const result = formatTaskName(taskRun);
+
+      const formattedDate = (new Date(taskRun.createdAt)).toLocaleString();
+      const expectedName = `${taskRun.task.name} (${taskRun.task.version}) - ${formattedDate}`;
+      expect(result).toBe(expectedName);
     });
   });
 });

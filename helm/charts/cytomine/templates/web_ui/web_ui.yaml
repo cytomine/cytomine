@@ -11,6 +11,7 @@ metadata:
     component: {{ .Release.Name }}-web-ui
     release: {{ .Release.Name }}
 spec:
+  progressDeadlineSeconds: 1200
   replicas: {{ .Values.web_ui.replicas }}
   selector:
     matchLabels:

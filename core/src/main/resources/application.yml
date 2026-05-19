@@ -83,9 +83,6 @@ spring:
           starttls:
             enable: ${SMTP_STARTTLS:true}
 
-  jackson:
-    property-naming-strategy: SNAKE_CASE
-
 server:
   port: ${PORT:8080}
 
@@ -145,3 +142,15 @@ jwt:
     converter:
       resource-id: core
       principle-attribute: preferred_username
+
+# admin of the master realm not cytomine realm
+keycloak-client:
+  admin:
+    user: ${KEYCLOAK_ADMIN:admin}
+    password: ${KEYCLOAK_ADMIN_PASSWORD:password}
+    realm: master
+  target:
+    realm: cytomine
+    client-id: core
+  client-id: admin-cli
+  url: ${IAM_URL:http://iam:8100}/iam

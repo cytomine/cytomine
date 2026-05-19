@@ -1,21 +1,5 @@
 package be.cytomine.service.ontology;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -23,8 +7,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import be.cytomine.domain.CytomineDomain;
@@ -40,10 +24,10 @@ import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.ObjectNotFoundException;
+import be.cytomine.repository.image.ImageInstanceRepository;
 import be.cytomine.repository.ontology.TrackRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.ModelService;
-import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
@@ -52,24 +36,20 @@ import be.cytomine.utils.Task;
 import static org.springframework.security.acls.domain.BasePermission.READ;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 @Transactional
 public class TrackService extends ModelService {
 
-    @Autowired
-    private TrackRepository trackRepository;
+    private final AnnotationTrackService annotationTrackService;
 
-    @Autowired
-    private SecurityACLService securityACLService;
+    private final CurrentUserService currentUserService;
 
-    @Autowired
-    private CurrentUserService currentUserService;
+    private final ImageInstanceRepository imageInstanceRepository;
 
-    @Autowired
-    private ImageInstanceService imageInstanceService;
+    private final SecurityACLService securityACLService;
 
-    @Autowired
-    private AnnotationTrackService annotationTrackService;
+    private final TrackRepository trackRepository;
 
     @Override
     public Class currentDomain() {
@@ -117,8 +97,11 @@ public class TrackService extends ModelService {
      */
     @Override
     public CommandResponse add(JsonObject jsonObject) {
-        ImageInstance imageInstance = imageInstanceService.find(jsonObject.getJSONAttrLong("image", 0L))
-            .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", jsonObject.getJSONAttrStr("image")));
+        Long imageId = jsonObject.getJSONAttrLong("image", 0L);
+        ImageInstance imageInstance = imageInstanceRepository.findById(imageId)
+            .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", String.valueOf(imageId)));
+        securityACLService.check(imageInstance.container(), READ);
+
         jsonObject.put("project", imageInstance.getProject().getId());
 
         securityACLService.check(imageInstance.getProject(), READ);
@@ -145,8 +128,11 @@ public class TrackService extends ModelService {
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
 
-        ImageInstance imageInstance = imageInstanceService.find(jsonNewData.getJSONAttrLong("image", 0L))
-            .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", jsonNewData.getJSONAttrStr("image")));
+        Long imageId = jsonNewData.getJSONAttrLong("image", 0L);
+        ImageInstance imageInstance = imageInstanceRepository.findById(imageId)
+            .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", String.valueOf(imageId)));
+        securityACLService.check(imageInstance.container(), READ);
+
         jsonNewData.put("project", imageInstance.getProject().getId());
 
         return executeCommand(new EditCommand(currentUser, transaction), domain, jsonNewData);

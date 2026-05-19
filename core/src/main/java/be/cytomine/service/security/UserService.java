@@ -18,9 +18,9 @@ import java.util.stream.Collectors;
 import jakarta.persistence.Query;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.TupleElement;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -107,132 +107,92 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 import static org.springframework.security.acls.domain.BasePermission.WRITE;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 @Transactional
 public class UserService extends ModelService {
 
-    @Autowired
-    private UserPositionService userPositionService;
+    private final AccountService accountService;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final AclRepository aclRepository;
 
-    @Autowired
-    private SecurityACLService securityACLService;
+    private final AnnotationActionRepository annotationActionRepository;
 
-    @Autowired
-    private CurrentUserService currentUserService;
+    private final AnnotationIndexRepository annotationIndexRepository;
 
-    @Autowired
-    private CurrentRoleService currentRoleService;
+    private final AnnotationTermRepository annotationTermRepository;
 
-    @Autowired
-    private PermissionService permissionService;
+    private final AnnotationTermService annotationTermService;
 
-    @Autowired
-    private ImageConsultationService imageConsultationService;
+    private final CommandHistoryRepository commandHistoryRepository;
 
-    @Autowired
-    private ProjectConnectionService projectConnectionService;
+    private final CommandRepository commandRepository;
 
-    @Autowired
-    private ProjectRepresentativeUserService projectRepresentativeUserService;
+    private final CurrentRoleService currentRoleService;
 
-    @Autowired
-    private ProjectRepository projectRepository;
+    private final CurrentUserService currentUserService;
 
-    @Autowired
-    private LastConnectionRepository lastConnectionRepository;
+    private final ImageConsultationService imageConsultationService;
 
-    @Autowired
-    private CommandHistoryRepository commandHistoryRepository;
+    private final ImageInstanceRepository imageInstanceRepository;
 
-    @Autowired
-    private CommandRepository commandRepository;
+    private final ImageInstanceService imageInstanceService;
 
-    @Autowired
-    private RedoStackItemRepository redoStackItemRepository;
+    private final LastConnectionRepository lastConnectionRepository;
 
-    @Autowired
-    private UndoStackItemRepository undoStackItemRepository;
+    private final NestedImageInstanceRepository nestedImageInstanceRepository;
 
-    @Autowired
-    private SecUserSecRoleService secSecUserSecRoleService;
+    private final OntologyRepository ontologyRepository;
 
-    @Autowired
-    private UserAnnotationService userAnnotationService;
+    private final OntologyService ontologyService;
 
-    @Autowired
-    private UserAnnotationRepository userAnnotationRepository;
+    private final PermissionService permissionService;
 
-    @Autowired
-    private ReviewedAnnotationService reviewedAnnotationService;
+    private final PersistentImageConsultationRepository persistentImageConsultationRepository;
 
-    @Autowired
-    private ReviewedAnnotationRepository reviewedAnnotationRepository;
+    private final PersistentProjectConnectionRepository persistentProjectConnectionRepository;
 
-    @Autowired
-    private AnnotationTermService annotationTermService;
+    private final ProjectConnectionService projectConnectionService;
 
-    @Autowired
-    private AnnotationTermRepository annotationTermRepository;
+    private final ProjectDefaultLayerRepository projectDefaultLayerRepository;
 
-    @Autowired
-    private ImageInstanceRepository imageInstanceRepository;
+    private final ProjectDefaultLayerService projectDefaultLayerService;
 
-    @Autowired
-    private ImageInstanceService imageInstanceService;
+    private final ProjectRepository projectRepository;
 
-    @Autowired
-    private OntologyRepository ontologyRepository;
+    private final ProjectRepresentativeUserRepository projectRepresentativeUserRepository;
 
-    @Autowired
-    private OntologyService ontologyService;
+    private final ProjectRepresentativeUserService projectRepresentativeUserService;
 
-    @Autowired
-    private UploadedFileRepository uploadedFileRepository;
+    private final RedoStackItemRepository redoStackItemRepository;
 
-    @Autowired
-    private AnnotationIndexRepository annotationIndexRepository;
+    private final ReviewedAnnotationRepository reviewedAnnotationRepository;
 
-    @Autowired
-    private NestedImageInstanceRepository nestedImageInstanceRepository;
+    private final ReviewedAnnotationService reviewedAnnotationService;
 
-    @Autowired
-    private ProjectDefaultLayerService projectDefaultLayerService;
+    private final SecRoleRepository secRoleRepository;
 
-    @Autowired
-    private ProjectDefaultLayerRepository projectDefaultLayerRepository;
+    private final SecUserSecRoleRepository secSecUserSecRoleRepository;
 
-    @Autowired
-    private ProjectRepresentativeUserRepository projectRepresentativeUserRepository;
+    private final SecUserSecRoleService secSecUserSecRoleService;
 
-    @Autowired
-    private SecUserSecRoleRepository secSecUserSecRoleRepository;
+    private final SecurityACLService securityACLService;
 
-    @Autowired
-    private SecRoleRepository secRoleRepository;
+    private final StorageRepository storageRepository;
 
-    @Autowired
-    private StorageService storageService;
+    private final StorageService storageService;
 
-    @Autowired
-    private AclRepository aclRepository;
+    private final UndoStackItemRepository undoStackItemRepository;
 
-    @Autowired
-    private PersistentProjectConnectionRepository persistentProjectConnectionRepository;
+    private final UploadedFileRepository uploadedFileRepository;
 
-    @Autowired
-    private PersistentImageConsultationRepository persistentImageConsultationRepository;
+    private final UserAnnotationRepository userAnnotationRepository;
 
-    @Autowired
-    private AnnotationActionRepository annotationActionRepository;
+    private final UserAnnotationService userAnnotationService;
 
-    @Autowired
-    private StorageRepository storageRepository;
+    private final UserPositionService userPositionService;
 
-    @Autowired
-    private AccountService accountService;
+    private final UserRepository userRepository;
 
     public Optional<User> find(Long id) {
         securityACLService.checkGuest(currentUserService.getCurrentUser());
@@ -372,8 +332,10 @@ public class UserService extends ModelService {
                 String alias = SQLUtils.toCamelCase(element.getAlias());
                 result.put(alias, value);
             }
-            result.put("language", Language
-                .findByOrdinal(Integer.parseInt(result.getJSONAttrStr("language", "3"))));
+            result.put(
+                "language", Language
+                    .findByOrdinal(Integer.parseInt(result.getJSONAttrStr("language", "3")))
+            );
             JsonObject object = User.getDataFromDomain(new User().buildDomainFromJson(result, getEntityManager()));
             object.put("role", rowResult.get("role"));
             results.add(object);
@@ -421,13 +383,15 @@ public class UserService extends ModelService {
         return new ArrayList<>(compactedMap.values());
     }
 
-    public Page<JsonObject> listUsersExtendedByProject(Project project,
-                                                       UserSearchExtension userSearchExtension,
-                                                       List<SearchParameterEntry> searchParameters,
-                                                       String sortColumn,
-                                                       String sortDirection,
-                                                       Long max,
-                                                       Long offset) {
+    public Page<JsonObject> listUsersExtendedByProject(
+        Project project,
+        UserSearchExtension userSearchExtension,
+        List<SearchParameterEntry> searchParameters,
+        String sortColumn,
+        String sortDirection,
+        Long max,
+        Long offset
+    ) {
 
         if (ReflectionUtils.findField(User.class, sortColumn) == null && !(List.of(
             "projectRole",
@@ -983,7 +947,7 @@ public class UserService extends ModelService {
                 json.getJSONAttrBoolean("isDeveloper", false),
                 json.getJSONAttrStr("language").toLowerCase(),
                 List.of(json.getJSONAttrStr("role").substring(5))
-                );
+            );
 
             accountService.createAccount(account);
             CommandResponse response = executeCommand(new AddCommand(currentUser), null, json);

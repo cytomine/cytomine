@@ -34,11 +34,11 @@ import be.cytomine.exceptions.ConstraintException;
 import be.cytomine.exceptions.InvalidRequestException;
 import be.cytomine.repository.ontology.OntologyRepository;
 import be.cytomine.repository.project.ProjectRepository;
+import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.ModelService;
 import be.cytomine.service.PermissionService;
 import be.cytomine.service.security.SecurityACLService;
-import be.cytomine.service.security.UserService;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.Task;
@@ -60,7 +60,7 @@ public class OntologyService extends ModelService {
     private final SecurityACLService securityACLService;
     private final TermHttpContract termHttpContract;
     private final TermRelationHttpContract termRelationHttpContract;
-    private final UserService userService;
+    private final UserRepository userRepository;
 
     public Ontology get(Long id) {
         return find(id).orElse(null);
@@ -164,7 +164,12 @@ public class OntologyService extends ModelService {
 
     public void determineRightsForUser(Ontology ontology, User user) {
         List<Project> projects = projectRepository.findAllByOntologyId(ontology.getId());
-        if (projects.stream().anyMatch(project -> userService.listAdmins(project).contains(user))) {
+        boolean isAdminInAnyProject = projects.stream()
+            .anyMatch(project -> userRepository.findAllAdminsByProjectId(project.getId()).contains(user));
+        boolean isUserInAnyProject = projects.stream()
+            .anyMatch(project -> userRepository.findAllUsersByProjectId(project.getId()).contains(user));
+
+        if (isAdminInAnyProject) {
             permissionService.addPermission(ontology, user.getUsername(), BasePermission.ADMINISTRATION);
         } else {
             if (ontology.getUser() != user) {
@@ -172,7 +177,8 @@ public class OntologyService extends ModelService {
                 permissionService.deletePermission(ontology, user.getUsername(), BasePermission.ADMINISTRATION);
             }
         }
-        if (projects.stream().anyMatch(project -> userService.listUsers(project).contains(user))) {
+
+        if (isUserInAnyProject) {
             permissionService.addPermission(ontology, user.getUsername(), BasePermission.READ);
         } else {
             if (ontology.getUser() != user) {

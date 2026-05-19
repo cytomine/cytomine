@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import be.cytomine.domain.CytomineDomain;
@@ -32,24 +32,20 @@ import be.cytomine.utils.Task;
 import static org.springframework.security.acls.domain.BasePermission.READ;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 @Transactional
 public class AnnotationGroupService extends ModelService {
 
-    @Autowired
-    private CurrentUserService currentUserService;
+    private final AnnotationGroupRepository annotationGroupRepository;
 
-    @Autowired
-    private SecurityACLService securityACLService;
+    private final AnnotationLinkRepository annotationLinkRepository;
 
-    @Autowired
-    private TransactionService transactionService;
+    private final CurrentUserService currentUserService;
 
-    @Autowired
-    private AnnotationGroupRepository annotationGroupRepository;
+    private final SecurityACLService securityACLService;
 
-    @Autowired
-    AnnotationLinkRepository annotationLinkRepository;
+    private final TransactionService transactionService;
 
     @Override
     public Class currentDomain() {

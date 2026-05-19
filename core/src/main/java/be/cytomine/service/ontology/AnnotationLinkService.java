@@ -5,8 +5,8 @@ import java.util.Optional;
 
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import be.cytomine.domain.CytomineDomain;
@@ -30,27 +30,22 @@ import be.cytomine.utils.Task;
 import static org.springframework.security.acls.domain.BasePermission.READ;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 @Transactional
 public class AnnotationLinkService extends ModelService {
 
-    @Autowired
-    private EntityManager entityManager;
+    private final EntityManager entityManager;
 
-    @Autowired
-    private AnnotationGroupService annotationGroupService;
+    private final AnnotationGroupService annotationGroupService;
 
-    @Autowired
-    private CurrentUserService currentUserService;
+    private final AnnotationLinkRepository annotationLinkRepository;
 
-    @Autowired
-    private SecurityACLService securityACLService;
+    private final CurrentUserService currentUserService;
 
-    @Autowired
-    private TransactionService transactionService;
+    private final SecurityACLService securityACLService;
 
-    @Autowired
-    private AnnotationLinkRepository annotationLinkRepository;
+    private final TransactionService transactionService;
 
     @Override
     public Class currentDomain() {

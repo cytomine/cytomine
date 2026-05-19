@@ -58,6 +58,7 @@ import be.cytomine.dto.appengine.task.TaskRunDetail;
 import be.cytomine.dto.appengine.task.TaskRunOutputResponse;
 import be.cytomine.dto.appengine.task.TaskRunResponse;
 import be.cytomine.dto.appengine.task.TaskRunValue;
+import be.cytomine.dto.appengine.task.output.GeometryOutput;
 import be.cytomine.dto.appengine.task.output.TaskRunOutput;
 import be.cytomine.dto.appengine.task.type.CollectionType;
 import be.cytomine.dto.appengine.task.type.GeometryType;
@@ -575,7 +576,7 @@ public class TaskRunService {
         return false;
     }
 
-    public List<TaskRunOutput> getOutputs(Long projectId, UUID taskRunId) {
+    public String getOutputs(Long projectId, UUID taskRunId) {
         checkTaskRun(projectId, taskRunId);
 
         String response = appEngineService.get("task-runs/" + taskRunId + "/outputs");
@@ -609,25 +610,24 @@ public class TaskRunService {
         );
         AnnotationLayer annotationLayer = annotationLayerService.createAnnotationLayer(layerName);
         if (!annotationLayer.getAnnotations().isEmpty()) {
-            return taskRunOutputs;
+            return response;
         }
 
         Set<TaskRunLayer> taskRunLayers = taskRunLayerRepository.findAllByTaskRunAndImage(taskRun, taskRun.getImage());
         Map<String, TaskRunLayer> layersByParameterName = taskRunLayers.stream()
             .collect(Collectors.toMap(TaskRunLayer::getParameterName, Function.identity()));
 
-        Set<TaskRunValue> geometries = outputs
-            .stream()
-            .filter(v -> v.value() instanceof String geometry && geometryService.isGeometry(geometry))
+        Set<GeometryOutput> geometries = taskRunOutputs.stream()
+            .filter(GeometryOutput.class::isInstance)
+            .map(GeometryOutput.class::cast)
             .collect(Collectors.toSet());
 
-        for (TaskRunValue geometry : geometries) {
+        for (GeometryOutput geometry : geometries) {
             CropOffset offset = Optional.ofNullable(layersByParameterName.get(geometry.parameterName()))
                 .filter(layer -> !layer.getOffsets().isEmpty())
                 .map(layer -> layer.getOffsets().getFirst())
                 .orElseGet(() -> new CropOffset(0, 0));
-            String wktGeometry = geometryService.geoJsonToWkt((String) geometry.value());
-            Geometry parsedGeometry = geometryService.addOffset(wktGeometry, offset.getX(), offset.getY())
+            Geometry parsedGeometry = geometryService.addOffset(geometry.value().toText(), offset.getX(), offset.getY())
                 .orElseThrow(() -> new IllegalStateException("Invalid WKT geometry"));
             annotationService.createAnnotation(annotationLayer, parsedGeometry.toString());
         }
@@ -642,7 +642,7 @@ public class TaskRunService {
             processGeometryValue(arrayValue, annotationLayer, matchedLayer, 0);
         }
 
-        return taskRunOutputs;
+        return response;
     }
 
     public String getInputs(Long projectId, UUID taskRunId) {

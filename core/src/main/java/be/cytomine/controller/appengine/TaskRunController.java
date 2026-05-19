@@ -166,7 +166,7 @@ public class TaskRunController {
     }
 
     @GetMapping("/project/{project}/task-runs/{task}/outputs")
-    public List<TaskRunOutput> getOutputs(@PathVariable Long project, @PathVariable UUID task) {
+    public String getOutputs(@PathVariable Long project, @PathVariable UUID task) {
         log.info("GET /project/{}/task-runs/{}/outputs", project, task);
         return taskRunService.getOutputs(project, task);
     }

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.geojson.GeoJsonWriter;
 
@@ -98,6 +99,45 @@ public class GeometryServiceTests {
             boolean result = geometryService.isGeometry(invalid);
 
             assertThat(result).isFalse();
+        }
+    }
+
+    @Nested
+    class GetBounds {
+
+        @Test
+        void shouldReturnEnvelopeForValidWktPolygon() {
+            String wkt = "POLYGON ((0 0, 4 0, 4 3, 0 3, 0 0))";
+
+            Optional<Envelope> result = geometryService.getBounds(wkt);
+
+            assertThat(result).isPresent();
+            assertThat(result.get().getMinX()).isEqualTo(0.0);
+            assertThat(result.get().getMinY()).isEqualTo(0.0);
+            assertThat(result.get().getMaxX()).isEqualTo(4.0);
+            assertThat(result.get().getMaxY()).isEqualTo(3.0);
+        }
+
+        @Test
+        void shouldReturnEnvelopeForValidWktPoint() {
+            String wkt = "POINT (4.3517 50.8503)";
+
+            Optional<Envelope> result = geometryService.getBounds(wkt);
+
+            assertThat(result).isPresent();
+            assertThat(result.get().getMinX()).isEqualTo(4.3517);
+            assertThat(result.get().getMinY()).isEqualTo(50.8503);
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {
+            "not a geometry",
+            ""
+        })
+        void shouldReturnEmptyForInvalidInput(String invalid) {
+            Optional<Envelope> result = geometryService.getBounds(invalid);
+
+            assertThat(result).isEmpty();
         }
     }
 }

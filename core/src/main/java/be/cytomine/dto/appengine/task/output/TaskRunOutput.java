@@ -1,5 +1,11 @@
 package be.cytomine.dto.appengine.task.output;
 
 public sealed interface TaskRunOutput permits
-    IntegerOutput {
+    BooleanOutput,
+    DateTimeOutput,
+    EnumerationOutput,
+    GeometryOutput,
+    IntegerOutput,
+    NumberOutput,
+    StringOutput {
 }

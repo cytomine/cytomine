@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type", visible = true)
 @JsonSubTypes({
     @JsonSubTypes.Type(value = BooleanOutput.class, name = "BOOLEAN"),
+    @JsonSubTypes.Type(value = CollectionOutput.class, name = "ARRAY"),
     @JsonSubTypes.Type(value = DateTimeOutput.class, name = "DATETIME"),
     @JsonSubTypes.Type(value = EnumerationOutput.class, name = "ENUMERATION"),
     @JsonSubTypes.Type(value = GeometryOutput.class, name = "GEOMETRY"),

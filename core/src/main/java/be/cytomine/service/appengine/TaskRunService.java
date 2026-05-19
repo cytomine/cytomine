@@ -285,7 +285,8 @@ public class TaskRunService {
 
         int xOffset = (int) -bounds.getMinX();
         int yOffset = (int) -bounds.getMinY();
-        Geometry shifted = GeometryService.addOffset(annotation.getWktLocation(), xOffset, yOffset);
+        Geometry shifted = geometryService.addOffset(annotation.getWktLocation(), xOffset, yOffset)
+            .orElseThrow(() -> new IllegalStateException("Invalid WKT geometry"));
         String geometry = geometryService.wktToGeoJson(shifted.toText());
 
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
@@ -337,7 +338,8 @@ public class TaskRunService {
                         Long id = itemsArray[i];
                         if (type.equalsIgnoreCase("annotation")) {
                             UserAnnotation annotation = userAnnotationService.get(id);
-                            Envelope bounds = GeometryService.getBounds(annotation.getWktLocation());
+                            Envelope bounds = geometryService.getBounds(annotation.getWktLocation())
+                                .orElseThrow(() -> new IllegalStateException("Invalid WKT in annotation"));
 
                             TaskRun taskRun = taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId)
                                 .orElseThrow(() -> new ObjectNotFoundException("TaskRun", taskRunId));
@@ -406,7 +408,8 @@ public class TaskRunService {
             switch (type) {
                 case "annotation" -> {
                     UserAnnotation annotation = userAnnotationService.get(id);
-                    Envelope bounds = GeometryService.getBounds(annotation.getWktLocation());
+                    Envelope bounds = geometryService.getBounds(annotation.getWktLocation())
+                        .orElseThrow(() -> new IllegalStateException("Invalid WKT in annotation"));
 
                     TaskRun taskRun = taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId)
                         .orElseThrow(() -> new ObjectNotFoundException("TaskRun", taskRunId));
@@ -534,7 +537,8 @@ public class TaskRunService {
                 String geoJson = item.get("value").asText();
                 if (geometryService.isGeometry(geoJson)) {
                     String wktGeometry = geometryService.geoJsonToWkt(geoJson);
-                    Geometry parsedGeometry = GeometryService.addOffset(wktGeometry, offset.getX(), offset.getY());
+                    Geometry parsedGeometry = geometryService.addOffset(wktGeometry, offset.getX(), offset.getY())
+                        .orElseThrow(() -> new IllegalStateException("Invalid WKT geometry"));
                     annotationService.createAnnotation(annotationLayer, parsedGeometry.toString());
                 }
             }
@@ -620,7 +624,8 @@ public class TaskRunService {
                 .map(layer -> layer.getOffsets().getFirst())
                 .orElseGet(() -> new CropOffset(0, 0));
             String wktGeometry = geometryService.geoJsonToWkt((String) geometry.value());
-            Geometry parsedGeometry = GeometryService.addOffset(wktGeometry, offset.getX(), offset.getY());
+            Geometry parsedGeometry = geometryService.addOffset(wktGeometry, offset.getX(), offset.getY())
+                .orElseThrow(() -> new IllegalStateException("Invalid WKT geometry"));
             annotationService.createAnnotation(annotationLayer, parsedGeometry.toString());
         }
 

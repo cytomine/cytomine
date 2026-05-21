@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import be.cytomine.dto.appengine.task.output.TaskRunOutput;
 import be.cytomine.repository.appengine.TaskRunRepository;
 import be.cytomine.service.appengine.AppEngineService;
 import be.cytomine.service.appengine.TaskRunService;

@@ -12,9 +12,9 @@ public class GeometryDeserializer extends JsonDeserializer<Geometry> {
     private final GeoJsonReader reader = new GeoJsonReader();
 
     @Override
-    public Geometry deserialize(JsonParser p, DeserializationContext ctx) throws IOException {
+    public Geometry deserialize(JsonParser parser, DeserializationContext context) throws IOException {
         try {
-            return reader.read(p.getText());
+            return reader.read(parser.getText());
         } catch (Exception e) {
             throw new IOException("Failed to deserialize GeoJSON geometry", e);
         }

@@ -12,7 +12,7 @@ public class GeometrySerializer extends JsonSerializer<Geometry> {
     private final GeoJsonWriter writer = new GeoJsonWriter();
 
     @Override
-    public void serialize(Geometry geometry, JsonGenerator gen, SerializerProvider provider) throws IOException {
-        gen.writeRawValue(writer.write(geometry));
+    public void serialize(Geometry geometry, JsonGenerator generator, SerializerProvider provider) throws IOException {
+        generator.writeRawValue(writer.write(geometry));
     }
 }

@@ -77,7 +77,7 @@ public class CytomineSteps {
         );
     }
 
-    public void listImagesInProject(Wait<WebDriver> wait, String projectUrl, Set<String> imageNames) {
+    public void listImagesInProject(Wait<WebDriver> wait, String projectUrl, List<String> imageNames) {
         webDriverUtils.goTo(wait, projectUrl.replace("configuration", "images"));
         imageNames.forEach(
             name -> webDriverUtils.byIsDisplayed(wait, By.xpath(format("//a[span[contains(text(), '%s')]]", name)))

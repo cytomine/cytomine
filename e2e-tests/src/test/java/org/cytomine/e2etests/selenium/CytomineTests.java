@@ -175,12 +175,11 @@ public class CytomineTests {
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
         String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
         String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
-        Set<String> imageNames = Set.of(
-            cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName)),
-            cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName)),
-            cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName))
-        );
+        List<String> imageNames = new ArrayList<>();
 
+        imageNames.add(cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName)));
+        imageNames.add(cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName)));
+        imageNames.add(cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName)));
         cytomineSteps.listImagesInProject(wait, projectUrl, imageNames);
 
         cytomineSteps.deleteProject(wait, projectUrl);

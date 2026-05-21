@@ -170,6 +170,28 @@ public class CytomineTests {
     }
 
     @Test
+    public void listImagesInProject() {
+        String projectName = "selenium-" + randomUUID();
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
+        String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
+        Set<String> imageNames = Set.of(
+            cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName)),
+            cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName)),
+            cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName))
+        );
+
+        cytomineSteps.listImagesInProject(wait, projectUrl, imageNames);
+
+        cytomineSteps.deleteProject(wait, projectUrl);
+        cytomineSteps.deleteOntology(wait, ontologyUrl);
+        imageNames.forEach(imageName ->
+            cytomineSteps.deleteImage(wait, cytomineUrl, imageName)
+        );
+        cytomineSteps.logout(wait, cytomineUrl);
+    }
+
+    @Test
     void createAndDeleteOntology() {
         String ontologyName = "selenium-" + randomUUID();
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);

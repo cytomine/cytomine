@@ -77,6 +77,13 @@ public class CytomineSteps {
         );
     }
 
+    public void listImagesInProject(Wait<WebDriver> wait, String projectUrl, Set<String> imageNames) {
+        webDriverUtils.goTo(wait, projectUrl.replace("configuration", "images"));
+        imageNames.forEach(
+            name -> webDriverUtils.byIsDisplayed(wait, By.xpath(format("//a[span[contains(text(), '%s')]]", name)))
+        );
+    }
+
     public String createOntology(Wait<WebDriver> wait, WebDriver driver, URL cytomineUrl, String ontologyName) {
         webDriverUtils.goTo(wait, cytomineUrl.toString());
         webDriverUtils.xpathClick(wait, "//a[@href='#/ontology']");

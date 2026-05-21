@@ -41,8 +41,7 @@ public class CommandController extends RestCytomineController {
     private final CommandService commandService;
 
     @GetMapping({"/command/undo.json", "/command/{id}/undo.json"})
-    public ResponseEntity<String> undo(@PathVariable(required = false) String rawId) {
-        Long id = parseNumericId(rawId);
+    public ResponseEntity<String> undo(@PathVariable(required = false) Long id) {
         log.debug("REST request to undo command {}", id);
         User user = currentUserService.getCurrentUser();
         Command command = null;
@@ -132,18 +131,6 @@ public class CommandController extends RestCytomineController {
             response.setStatus(200);
         }
         return responseSuccess(results.stream().map(CommandResponse::getData).toList());
-    }
-
-    private static Long parseNumericId(String rawId) {
-        if (rawId == null) {
-            return null;
-        }
-        try {
-            return Long.parseLong(rawId);
-        } catch (NumberFormatException e) {
-            log.debug("Command id '{}' is not a numeric ID, treating as no specific command", rawId);
-            return null;
-        }
     }
 
     @GetMapping({"/deletecommand.json", "/deletecommand"}) // without json for backward compatibility

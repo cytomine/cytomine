@@ -1283,7 +1283,7 @@ public class AnnotationDomainResourceTests {
     }
 
     @Test
-    @org.springframework.transaction.annotation.Transactional
+    @Transactional
     public void editValidUserAnnotation() throws Exception {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         restAnnotationDomainControllerMockMvc.perform(put("/api/annotation/{id}.json", userAnnotation.getId())
@@ -1301,7 +1301,7 @@ public class AnnotationDomainResourceTests {
     }
 
     @Test
-    @org.springframework.transaction.annotation.Transactional
+    @Transactional
     public void editValidReviewedAnnotation() throws Exception {
         Long userId = builder.givenSuperAdmin().getId();
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
@@ -1326,7 +1326,7 @@ public class AnnotationDomainResourceTests {
     }
 
     @Test
-    @org.springframework.transaction.annotation.Transactional
+    @Transactional
     public void deleteUserAnnotation() throws Exception {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
 
@@ -1350,7 +1350,7 @@ public class AnnotationDomainResourceTests {
     }
 
     @Test
-    @org.springframework.transaction.annotation.Transactional
+    @Transactional
     public void deleteReviewedAnnotation() throws Exception {
         Long userId = builder.givenSuperAdmin().getId();
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();

@@ -144,8 +144,6 @@ public class TaskRunServiceTest {
         Geometry mockedGeometry2 = mock(Geometry.class);
         when(geometryService.addOffset(eq("POINT (1 2)"), anyInt(), anyInt())).thenReturn(Optional.of(mockedGeometry1));
         when(geometryService.addOffset(eq("POINT (3 4)"), anyInt(), anyInt())).thenReturn(Optional.of(mockedGeometry2));
-        when(geometryService.isGeometry(geoJson1)).thenReturn(true);
-        when(geometryService.isGeometry(geoJson2)).thenReturn(true);
         when(geometryService.geoJsonToWkt(geoJson1)).thenReturn("POINT (1 2)");
         when(geometryService.geoJsonToWkt(geoJson2)).thenReturn("POINT (3 4)");
 
@@ -223,8 +221,6 @@ public class TaskRunServiceTest {
         Geometry mockedGeometry2 = mock(Geometry.class);
         when(geometryService.addOffset(eq("POINT (1 2)"), anyInt(), anyInt())).thenReturn(Optional.of(mockedGeometry1));
         when(geometryService.addOffset(eq("POINT (3 4)"), anyInt(), anyInt())).thenReturn(Optional.of(mockedGeometry2));
-        when(geometryService.isGeometry(geoJson1)).thenReturn(true);
-        when(geometryService.isGeometry(geoJson2)).thenReturn(true);
         when(geometryService.geoJsonToWkt(geoJson1)).thenReturn("POINT (1 2)");
         when(geometryService.geoJsonToWkt(geoJson2)).thenReturn("POINT (3 4)");
 

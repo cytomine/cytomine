@@ -13,7 +13,6 @@ import org.locationtech.jts.io.geojson.GeoJsonReader;
 import org.locationtech.jts.io.geojson.GeoJsonWriter;
 import org.springframework.stereotype.Service;
 
-import be.cytomine.domain.annotation.GeometryType;
 import be.cytomine.exceptions.WrongArgumentException;
 
 @RequiredArgsConstructor
@@ -64,12 +63,6 @@ public class GeometryService {
         });
         geometry.geometryChanged();
         return Optional.of(geometry);
-    }
-
-    public boolean isGeometry(String input) {
-        return parse(input)
-            .map(GeometryType::isSupported)
-            .orElse(false);
     }
 
     public String wktToGeoJson(String wkt) {

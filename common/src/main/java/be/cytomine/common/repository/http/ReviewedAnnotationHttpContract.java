@@ -26,7 +26,7 @@ public interface ReviewedAnnotationHttpContract {
 
     @PutExchange("/terms/{reviewedAnnotationTermsId}")
     Set<Long> replaceAllTermIds(@PathVariable long reviewedAnnotationTermsId, @RequestParam long userId,
-                                @RequestBody Set<Long> newLinks);
+        @RequestBody Set<Long> newLinks);
 
     @GetExchange("/{id}")
     Optional<ReviewedAnnotationResponse> findById(@PathVariable long id, @RequestParam long userId);
@@ -36,14 +36,12 @@ public interface ReviewedAnnotationHttpContract {
 
     @PostExchange
     Optional<HttpCommandResponse> create(@RequestParam long userId,
-                                         @Valid @RequestBody CreateReviewedAnnotation createReviewedAnnotation);
+        @Valid @RequestBody CreateReviewedAnnotation createReviewedAnnotation);
 
     @PutExchange("/{id}")
-    Optional<HttpCommandResponse> update(@PathVariable long id,
-                                         @RequestParam long userId,
-                                         @RequestBody UpdateReviewedAnnotation updateReviewedAnnotation);
+    Optional<HttpCommandResponse> update(@PathVariable long id, @RequestParam long userId,
+        @RequestBody UpdateReviewedAnnotation updateReviewedAnnotation);
 
     @DeleteExchange("/{id}")
     Optional<HttpCommandResponse> delete(@PathVariable long id, @RequestParam long userId);
-
 }

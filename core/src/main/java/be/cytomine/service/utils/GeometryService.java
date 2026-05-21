@@ -57,6 +57,15 @@ public class GeometryService {
         });
     }
 
+    public Optional<Geometry> addOffset(Geometry geometry, Integer xOffset, Integer yOffset) {
+        geometry.apply((Coordinate c) -> {
+            c.x += xOffset;
+            c.y += yOffset;
+        });
+        geometry.geometryChanged();
+        return Optional.of(geometry);
+    }
+
     public boolean isGeometry(String input) {
         return parse(input)
             .map(GeometryType::isSupported)

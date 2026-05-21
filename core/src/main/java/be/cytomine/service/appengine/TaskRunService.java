@@ -535,7 +535,7 @@ public class TaskRunService {
                 for (CollectionOutput.IndexedTaskRunOutput item : items) {
                     if (item.value() instanceof GeometryOutput geometryOutput) {
                         Geometry parsedGeometry = geometryService.addOffset(
-                                geometryOutput.value().toString(),
+                                geometryOutput.value(),
                                 offset.getX(),
                                 offset.getY()
                             )
@@ -620,7 +620,7 @@ public class TaskRunService {
                 .filter(layer -> !layer.getOffsets().isEmpty())
                 .map(layer -> layer.getOffsets().getFirst())
                 .orElseGet(() -> new CropOffset(0, 0));
-            Geometry parsedGeometry = geometryService.addOffset(geometry.value().toText(), offset.getX(), offset.getY())
+            Geometry parsedGeometry = geometryService.addOffset(geometry.value(), offset.getX(), offset.getY())
                 .orElseThrow(() -> new IllegalStateException("Invalid WKT geometry"));
             annotationService.createAnnotation(annotationLayer, parsedGeometry.toString());
         }

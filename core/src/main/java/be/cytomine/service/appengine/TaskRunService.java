@@ -555,7 +555,7 @@ public class TaskRunService {
         }
     }
 
-    private boolean hasGeometrySubType(Object output) {
+    private boolean hasGeometrySubType(TaskRunOutput output) {
         if (!(output instanceof CollectionOutput collectionOutput)) {
             return false;
         }

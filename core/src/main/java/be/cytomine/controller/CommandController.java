@@ -46,8 +46,7 @@ public class CommandController extends RestCytomineController {
         User user = currentUserService.getCurrentUser();
         Command command = null;
         if (id != null) {
-            command = commandRepository.findById(id)
-                .orElseThrow(() -> new ObjectNotFoundException("Command", id));
+            command = commandRepository.findById(id).orElseThrow(() -> new ObjectNotFoundException("Command", id));
         }
 
         //Get the last command list with max 1 command
@@ -63,15 +62,7 @@ public class CommandController extends RestCytomineController {
         if (lastCommand.isEmpty()) {
             String message = messageSource.getMessage("be.cytomine.UndoCommand", new Object[0], Locale.ENGLISH);
             return responseSuccess(
-                List.of(
-                    JsonObject.of(
-                        "success", true,
-                        "message", message,
-                        "callback", null,
-                        "printMessage", true
-                    )
-                )
-            );
+                List.of(JsonObject.of("success", true, "message", message, "callback", null, "printMessage", true)));
         }
 
         //Last command done
@@ -87,14 +78,12 @@ public class CommandController extends RestCytomineController {
     }
 
     @GetMapping({"/command/redo.json", "/command/{id}/redo.json"})
-    public ResponseEntity<String> redo(@PathVariable(required = false) String rawId) {
-        Long id = parseNumericId(rawId);
+    public ResponseEntity<String> redo(@PathVariable(required = false) Long id) {
         log.debug("REST request to redo command {}", id);
         User user = currentUserService.getCurrentUser();
         Command command = null;
         if (id != null) {
-            command = commandRepository.findById(id)
-                .orElseThrow(() -> new ObjectNotFoundException("Command", id));
+            command = commandRepository.findById(id).orElseThrow(() -> new ObjectNotFoundException("Command", id));
         }
 
         //Get the last command list with max 1 command
@@ -110,15 +99,7 @@ public class CommandController extends RestCytomineController {
         if (lastCommand.isEmpty()) {
             String message = messageSource.getMessage("be.cytomine.RedoCommand", new Object[0], Locale.ENGLISH);
             return responseSuccess(
-                List.of(
-                    JsonObject.of(
-                        "success", true,
-                        "message", message,
-                        "callback", null,
-                        "printMessage", true
-                    )
-                )
-            );
+                List.of(JsonObject.of("success", true, "message", message, "callback", null, "printMessage", true)));
         }
 
         //Last command done
@@ -134,10 +115,8 @@ public class CommandController extends RestCytomineController {
     }
 
     @GetMapping({"/deletecommand.json", "/deletecommand"}) // without json for backward compatibility
-    public ResponseEntity<String> listDelete(
-        @RequestParam(required = false) String domain,
-        @RequestParam(required = false, value = "after") Long afterThan
-    ) {
+    public ResponseEntity<String> listDelete(@RequestParam(required = false) String domain,
+        @RequestParam(required = false, value = "after") Long afterThan) {
         return responseSuccess(commandService.list(domain, DeleteCommand.class, afterThan));
     }
 }

@@ -3,6 +3,11 @@ package be.cytomine.dto.appengine.task.output;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+import be.cytomine.jackson.CollectionOutputDeserializer;
+
+@JsonDeserialize(using = CollectionOutputDeserializer.class)
 public record CollectionOutput(
     UUID taskRunId,
     String parameterName,
@@ -10,5 +15,5 @@ public record CollectionOutput(
     List<IndexedTaskRunOutput> value,
     String subType
 ) implements TaskRunOutput {
-    public record IndexedTaskRunOutput(Object value, int index) {}
+    public record IndexedTaskRunOutput(TaskRunOutput value, int index) {}
 }

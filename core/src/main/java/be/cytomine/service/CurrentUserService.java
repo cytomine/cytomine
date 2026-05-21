@@ -2,8 +2,8 @@ package be.cytomine.service;
 
 import java.util.Optional;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,11 +21,11 @@ import be.cytomine.security.current.PartialCurrentUser;
 
 // TODO IAM: adapt to get the Cytomine user from IAM reference
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class CurrentUserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     public String getCurrentUsername() {
         CurrentUser currentUser = getSecurityCurrentUser().orElseThrow(() -> new ServerException(

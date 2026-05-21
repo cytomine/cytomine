@@ -1,21 +1,5 @@
 package be.cytomine.service.ontology;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -24,8 +8,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import be.cytomine.common.repository.http.ReviewedAnnotationHttpContract;
@@ -58,39 +42,31 @@ import be.cytomine.utils.Task;
 import static org.springframework.security.acls.domain.BasePermission.READ;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 @Transactional
 public class AnnotationTermService extends ModelService {
 
-    @Autowired
-    private AnnotationTermRepository annotationTermRepository;
+    private final AnnotationTermRepository annotationTermRepository;
 
-    @Autowired
-    private SecurityACLService securityACLService;
+    private final CurrentUserService currentUserService;
 
-    @Autowired
-    private CurrentUserService currentUserService;
+    private final ReviewedAnnotationHttpContract reviewedAnnotationHttpContract;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final SecurityACLService securityACLService;
 
-    @Autowired
-    private TermHttpContract termRepository;
+    private final TermHttpContract termRepository;
 
-    @Autowired
-    private ReviewedAnnotationHttpContract reviewedAnnotationHttpContract;
+    private final TransactionService transactionService;
 
-    @Autowired
-    private UserAnnotationRepository userAnnotationRepository;
+    private final UserAnnotationRepository userAnnotationRepository;
 
-    @Autowired
-    private TransactionService transactionService;
+    private final UserRepository userRepository;
 
     @Override
     public Class currentDomain() {
         return AnnotationTerm.class;
     }
-
 
     public Optional<AnnotationTerm> find(AnnotationDomain annotation, Long termId, User user) {
         securityACLService.check(annotation.container(), READ);
@@ -127,6 +103,7 @@ public class AnnotationTermService extends ModelService {
      * Add the new domain with JSON data
      *
      * @param jsonObject New domain data
+     *
      * @return Response structure (created domain data,..)
      */
     @Override
@@ -153,6 +130,7 @@ public class AnnotationTermService extends ModelService {
      * @param transaction  Transaction link with this command
      * @param task         Task for this command
      * @param printMessage Flag if client will print or not confirm message
+     *
      * @return Response structure (code, old domain,..)
      */
     @Override
@@ -277,13 +255,15 @@ public class AnnotationTermService extends ModelService {
     }
 
 
-    public void deleteDependencies(CytomineDomain domain, Transaction transaction, Task task) {}
+    public void deleteDependencies(CytomineDomain domain, Transaction transaction, Task task) {
+    }
 
 
     /**
      * Retrieve domain thanks to a JSON object
      *
      * @param json JSON with new domain info
+     *
      * @return domain retrieve thanks to json
      */
     @Override

@@ -3,8 +3,8 @@ package be.cytomine.service.database;
 import java.util.List;
 import java.util.UUID;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,32 +22,25 @@ import be.cytomine.repository.security.SecUserSecRoleRepository;
 import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.image.server.StorageService;
 
+@RequiredArgsConstructor
 @Service
 @Slf4j
 @Transactional
 public class BootstrapUtilsService {
 
-    @Autowired
-    SecRoleRepository secRoleRepository;
+    private final SecRoleRepository secRoleRepository;
 
-    @Autowired
-    SecUserSecRoleRepository secSecUserSecRoleRepository;
+    private final SecUserSecRoleRepository secSecUserSecRoleRepository;
 
-    @Autowired
-    UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    StorageService storageService;
+    private final StorageService storageService;
 
-    @Autowired
-    ImageFilterRepository imageFilterRepository;
+    private final ImageFilterRepository imageFilterRepository;
 
-    @Autowired
-    MimeRepository mimeRepository;
+    private final MimeRepository mimeRepository;
 
-    @Autowired
-    ConfigurationRepository configurationRepository;
-
+    private final ConfigurationRepository configurationRepository;
 
     public void createRole(String role) {
         secRoleRepository.createIfNotExist(role);

@@ -1,6 +1,6 @@
 package be.cytomine.service.utils;
 
-import java.util.List;
+import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Coordinate;
@@ -13,6 +13,7 @@ import org.locationtech.jts.io.geojson.GeoJsonReader;
 import org.locationtech.jts.io.geojson.GeoJsonWriter;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.domain.annotation.GeometryType;
 import be.cytomine.exceptions.WrongArgumentException;
 
 @RequiredArgsConstructor
@@ -21,54 +22,45 @@ public class GeometryService {
 
     private final GeoJsonWriter geoJsonWriter;
 
-    public static final List<String> SUPPORTED_TYPES = List.of(
-        "Point",
-        "MultiPoint",
-        "LineString",
-        "MultiLineString",
-        "Polygon",
-        "MultiPolygon"
-    );
-
-    private static Geometry parseWKT(String wkt) {
+    private Optional<Geometry> parseWKT(String wkt) {
         try {
-            return new WKTReader().read(wkt);
+            return Optional.of(new WKTReader().read(wkt));
         } catch (ParseException ignored) {
-            return null;
+            return Optional.empty();
         }
     }
 
-    private static Geometry parseGeoJSON(String geojson) {
+    private Optional<Geometry> parseGeoJSON(String geojson) {
         try {
-            return new GeoJsonReader().read(geojson);
+            return Optional.of(new GeoJsonReader().read(geojson));
         } catch (ParseException ignored) {
-            return null;
+            return Optional.empty();
         }
     }
 
-    public static Envelope getBounds(String wkt) {
-        Geometry geometry = parseWKT(wkt);
-        return geometry.getEnvelopeInternal();
+    public Optional<Geometry> parse(String input) {
+        return parseWKT(input).or(() -> parseGeoJSON(input));
     }
 
-    public static Geometry addOffset(String geom, Integer xOffset, Integer yOffset) {
-        Geometry geometry = parseWKT(geom);
+    public Optional<Envelope> getBounds(String input) {
+        return parse(input).map(Geometry::getEnvelopeInternal);
+    }
 
-        geometry.apply((Coordinate c) -> {
-            c.x += xOffset;
-            c.y += yOffset;
+    public Optional<Geometry> addOffset(String input, Integer xOffset, Integer yOffset) {
+        return parseWKT(input).map(g -> {
+            g.apply((Coordinate c) -> {
+                c.x += xOffset;
+                c.y += yOffset;
+            });
+            g.geometryChanged();
+            return g;
         });
-        geometry.geometryChanged();
-        return geometry;
     }
 
-    public Boolean isGeometry(String input) {
-        Geometry geometry = parseWKT(input);
-        if (geometry == null) {
-            geometry = parseGeoJSON(input);
-        }
-
-        return geometry != null && SUPPORTED_TYPES.contains(geometry.getGeometryType());
+    public boolean isGeometry(String input) {
+        return parse(input)
+            .map(GeometryType::isSupported)
+            .orElse(false);
     }
 
     public String wktToGeoJson(String wkt) {

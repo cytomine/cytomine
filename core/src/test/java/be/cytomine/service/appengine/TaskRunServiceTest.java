@@ -1,4 +1,4 @@
-package be.cytomine.unit.service.appengine;
+package be.cytomine.service.appengine;
 
 import java.util.List;
 import java.util.Map;
@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.locationtech.jts.geom.Geometry;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -29,17 +30,16 @@ import be.cytomine.repository.appengine.TaskRunRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.annotation.AnnotationLayerService;
 import be.cytomine.service.annotation.AnnotationService;
-import be.cytomine.service.appengine.AppEngineService;
-import be.cytomine.service.appengine.AsyncService;
-import be.cytomine.service.appengine.TaskRunService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.service.utils.GeometryService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -139,6 +139,11 @@ public class TaskRunServiceTest {
         when(annotationLayerService.createLayerName(any(), any(), any())).thenReturn("layer-name");
         when(annotationLayerService.createAnnotationLayer("layer-name")).thenReturn(annotationLayer);
         when(taskRunLayerRepository.findAllByTaskRunAndImage(any(), any())).thenReturn(Set.of(taskRunLayer));
+
+        Geometry mockedGeometry1 = mock(Geometry.class);
+        Geometry mockedGeometry2 = mock(Geometry.class);
+        when(geometryService.addOffset(eq("POINT (1 2)"), anyInt(), anyInt())).thenReturn(Optional.of(mockedGeometry1));
+        when(geometryService.addOffset(eq("POINT (3 4)"), anyInt(), anyInt())).thenReturn(Optional.of(mockedGeometry2));
         when(geometryService.isGeometry(geoJson1)).thenReturn(true);
         when(geometryService.isGeometry(geoJson2)).thenReturn(true);
         when(geometryService.geoJsonToWkt(geoJson1)).thenReturn("POINT (1 2)");
@@ -213,6 +218,11 @@ public class TaskRunServiceTest {
         when(annotationLayerService.createLayerName(any(), any(), any())).thenReturn("layer-name");
         when(annotationLayerService.createAnnotationLayer("layer-name")).thenReturn(annotationLayer);
         when(taskRunLayerRepository.findAllByTaskRunAndImage(any(), any())).thenReturn(Set.of(taskRunLayer));
+
+        Geometry mockedGeometry1 = mock(Geometry.class);
+        Geometry mockedGeometry2 = mock(Geometry.class);
+        when(geometryService.addOffset(eq("POINT (1 2)"), anyInt(), anyInt())).thenReturn(Optional.of(mockedGeometry1));
+        when(geometryService.addOffset(eq("POINT (3 4)"), anyInt(), anyInt())).thenReturn(Optional.of(mockedGeometry2));
         when(geometryService.isGeometry(geoJson1)).thenReturn(true);
         when(geometryService.isGeometry(geoJson2)).thenReturn(true);
         when(geometryService.geoJsonToWkt(geoJson1)).thenReturn("POINT (1 2)");

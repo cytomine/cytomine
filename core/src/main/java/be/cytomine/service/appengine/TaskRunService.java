@@ -58,6 +58,9 @@ import be.cytomine.dto.appengine.task.TaskRunDetail;
 import be.cytomine.dto.appengine.task.TaskRunOutputResponse;
 import be.cytomine.dto.appengine.task.TaskRunResponse;
 import be.cytomine.dto.appengine.task.TaskRunValue;
+import be.cytomine.dto.appengine.task.output.CollectionOutput;
+import be.cytomine.dto.appengine.task.output.GeometryOutput;
+import be.cytomine.dto.appengine.task.output.TaskRunOutput;
 import be.cytomine.dto.appengine.task.type.CollectionType;
 import be.cytomine.dto.appengine.task.type.GeometryType;
 import be.cytomine.dto.appengine.task.type.TaskParameterType;
@@ -514,70 +517,64 @@ public class TaskRunService {
     }
 
     private void processGeometryValue(
-        TaskRunValue value,
+        CollectionOutput collection,
         AnnotationLayer annotationLayer,
         TaskRunLayer taskRunLayer,
         int index
     ) {
-        if (!"ARRAY".equals(value.type())) {
-            return;
-        }
-
-        List<?> items = (List<?>) value.value();
+        List<CollectionOutput.IndexedTaskRunOutput> items = collection.value();
         if (items == null || items.isEmpty()) {
             return;
         }
 
-        if ("GEOMETRY".equals(value.subType())) {
-            List<CropOffset> offsets = taskRunLayer.getOffsets();
-            CropOffset offset = index < offsets.size() ? offsets.get(index) : new CropOffset();
+        switch (collection.subType()) {
+            case "GEOMETRY" -> {
+                List<CropOffset> offsets = taskRunLayer.getOffsets();
+                CropOffset offset = index < offsets.size() ? offsets.get(index) : new CropOffset();
 
-            JsonNode jsonItems = objectMapper.convertValue(items, JsonNode.class);
-            for (JsonNode item : jsonItems) {
-                String geoJson = item.get("value").asText();
-                if (geometryService.isGeometry(geoJson)) {
-                    String wktGeometry = geometryService.geoJsonToWkt(geoJson);
-                    Geometry parsedGeometry = geometryService.addOffset(wktGeometry, offset.getX(), offset.getY())
-                        .orElseThrow(() -> new IllegalStateException("Invalid WKT geometry"));
-                    annotationService.createAnnotation(annotationLayer, parsedGeometry.toString());
+                for (CollectionOutput.IndexedTaskRunOutput item : items) {
+                    if (item.value() instanceof GeometryOutput geometryOutput) {
+                        Geometry parsedGeometry = geometryService.addOffset(
+                                geometryOutput.value(),
+                                offset.getX(),
+                                offset.getY()
+                            )
+                            .orElseThrow(() -> new IllegalStateException("Invalid WKT geometry"));
+                        annotationService.createAnnotation(annotationLayer, parsedGeometry.toString());
+                    }
                 }
             }
-        } else if ("ARRAY".equals(value.subType())) {
-            List<TaskRunValue> innerValues = objectMapper.convertValue(items, new TypeReference<>() {});
-
-            for (int i = 0; i < items.size(); i++) {
-                processGeometryValue(innerValues.get(i), annotationLayer, taskRunLayer, i);
+            case "ARRAY" -> {
+                for (int i = 0; i < items.size(); i++) {
+                    if (items.get(i).value() instanceof CollectionOutput nestedCollection) {
+                        processGeometryValue(nestedCollection, annotationLayer, taskRunLayer, i);
+                    }
+                }
             }
+            default -> throw new IllegalArgumentException("Unsupported collection subtype: " + collection.subType());
         }
     }
 
-    private boolean hasGeometrySubType(TaskRunValue value) {
-        if (!"ARRAY".equals(value.type())) {
+    private boolean hasGeometrySubType(TaskRunOutput output) {
+        if (!(output instanceof CollectionOutput collectionOutput)) {
             return false;
         }
 
-        String subType = value.subType();
-        if ("GEOMETRY".equals(subType)) {
-            return true;
-        }
-
-        if ("ARRAY".equals(subType)) {
-            if (!(value.value() instanceof List<?> innerList)) {
-                return false;
-            }
-
-            return innerList.stream()
-                .map(item -> objectMapper.convertValue(item, TaskRunValue.class))
+        return switch (collectionOutput.subType()) {
+            case "GEOMETRY" -> true;
+            case "ARRAY" -> collectionOutput.value().stream()
+                .map(CollectionOutput.IndexedTaskRunOutput::value)
                 .anyMatch(this::hasGeometrySubType);
-        }
-
-        return false;
+            default -> false;
+        };
     }
 
     public String getOutputs(Long projectId, UUID taskRunId) {
         checkTaskRun(projectId, taskRunId);
 
         String response = appEngineService.get("task-runs/" + taskRunId + "/outputs");
+        List<TaskRunOutput> taskRunOutputs = appEngineService.getTaskRunOutputs(taskRunId);
+
         TaskRun taskRun = taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId)
             .orElseThrow(() -> new ObjectNotFoundException("TaskRun", taskRunId));
 
@@ -613,30 +610,29 @@ public class TaskRunService {
         Map<String, TaskRunLayer> layersByParameterName = taskRunLayers.stream()
             .collect(Collectors.toMap(TaskRunLayer::getParameterName, Function.identity()));
 
-        Set<TaskRunValue> geometries = outputs
-            .stream()
-            .filter(v -> v.value() instanceof String geometry && geometryService.isGeometry(geometry))
+        Set<GeometryOutput> geometries = taskRunOutputs.stream()
+            .filter(GeometryOutput.class::isInstance)
+            .map(GeometryOutput.class::cast)
             .collect(Collectors.toSet());
 
-        for (TaskRunValue geometry : geometries) {
+        for (GeometryOutput geometry : geometries) {
             CropOffset offset = Optional.ofNullable(layersByParameterName.get(geometry.parameterName()))
                 .filter(layer -> !layer.getOffsets().isEmpty())
                 .map(layer -> layer.getOffsets().getFirst())
                 .orElseGet(() -> new CropOffset(0, 0));
-            String wktGeometry = geometryService.geoJsonToWkt((String) geometry.value());
-            Geometry parsedGeometry = geometryService.addOffset(wktGeometry, offset.getX(), offset.getY())
+            Geometry parsedGeometry = geometryService.addOffset(geometry.value(), offset.getX(), offset.getY())
                 .orElseThrow(() -> new IllegalStateException("Invalid WKT geometry"));
             annotationService.createAnnotation(annotationLayer, parsedGeometry.toString());
         }
 
-        List<TaskRunValue> geometryArrays = outputs
-            .stream()
+        List<CollectionOutput> arrays = taskRunOutputs.stream()
             .filter(this::hasGeometrySubType)
+            .map(CollectionOutput.class::cast)
             .toList();
 
-        for (TaskRunValue arrayValue : geometryArrays) {
-            TaskRunLayer matchedLayer = layersByParameterName.get(arrayValue.parameterName());
-            processGeometryValue(arrayValue, annotationLayer, matchedLayer, 0);
+        for (CollectionOutput geometryCollection : arrays) {
+            TaskRunLayer matchedLayer = layersByParameterName.get(geometryCollection.parameterName());
+            processGeometryValue(geometryCollection, annotationLayer, matchedLayer, 0);
         }
 
         return response;

@@ -136,7 +136,10 @@ public class CytomineSteps {
         );
         webDriverUtils.byIsDisplayed(
             wait,
-            By.xpath("//div[contains(@class,'uploaded-files-list')]//span[@data-status='success']")
+            By.xpath(
+                "//tr[.//td[@data-label='Filename']//span[normalize-space(.)='" + imageName + "']]"
+                    + "//td[@data-label='Status']//span[@data-status='success']"
+            )
         );
         return imageName;
     }

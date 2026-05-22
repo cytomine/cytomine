@@ -77,7 +77,7 @@ public class CytomineSteps {
         );
     }
 
-    public void listImagesInProject(Wait<WebDriver> wait, String projectUrl, List<String> imageNames) {
+    public void listImagesInProject(Wait<WebDriver> wait, String projectUrl, Set<String> imageNames) {
         webDriverUtils.goTo(wait, projectUrl.replace("configuration", "images"));
         imageNames.forEach(
             name -> webDriverUtils.byIsDisplayed(wait, By.xpath(format("//a[span[contains(text(), '%s')]]", name)))
@@ -115,11 +115,10 @@ public class CytomineSteps {
     }
 
     @SneakyThrows
-    public String addImage(Wait<WebDriver> wait, URL cytomineUrl, Optional<String> maybeProjectName) {
+    public void addImage(Wait<WebDriver> wait, URL cytomineUrl, String imageName, Optional<String> maybeProjectName) {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/storage");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//a[contains(., 'Add files')]"));
 
-        String imageName = "selenium-" + UUID.randomUUID() + ".png";
         Path tempDir = Files.createTempDirectory("selenium-upload");
         Path copiedFile = tempDir.resolve(imageName);
         try (var in = getClass().getClassLoader().getResourceAsStream("cat.png")) {
@@ -141,7 +140,6 @@ public class CytomineSteps {
                     + "//td[@data-label='Status']//span[@data-status='success']"
             )
         );
-        return imageName;
     }
 
     private void selectProject(Wait<WebDriver> wait, String projectName) {

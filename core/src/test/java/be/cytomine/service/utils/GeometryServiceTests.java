@@ -10,11 +10,11 @@ import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.geojson.GeoJsonWriter;
 
-import be.cytomine.domain.annotation.GeometryType;
 import be.cytomine.exceptions.WrongArgumentException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.locationtech.jts.geom.Geometry.TYPENAME_POLYGON;
 
 public class GeometryServiceTests {
 
@@ -30,7 +30,7 @@ public class GeometryServiceTests {
             Optional<Geometry> result = geometryService.parse(wkt);
 
             assertThat(result).isPresent();
-            assertThat(result.get().getGeometryType()).isEqualTo(GeometryType.POLYGON.getLabel());
+            assertThat(result.get().getGeometryType()).isEqualTo(TYPENAME_POLYGON);
         }
 
         @Test
@@ -45,7 +45,7 @@ public class GeometryServiceTests {
             Optional<Geometry> result = geometryService.parse(geoJson);
 
             assertThat(result).isPresent();
-            assertThat(result.get().getGeometryType()).isEqualTo(GeometryType.POLYGON.getLabel());
+            assertThat(result.get().getGeometryType()).isEqualTo(TYPENAME_POLYGON);
         }
 
         @ParameterizedTest
@@ -57,50 +57,6 @@ public class GeometryServiceTests {
             Optional<Geometry> result = geometryService.parse(invalid);
 
             assertThat(result).isEmpty();
-        }
-    }
-
-    @Nested
-    class IsGeometryTests {
-
-        @ParameterizedTest
-        @ValueSource(strings = {
-            "POINT (4.3517 50.8503)",
-            "MULTIPOINT (1 1, 2 2)",
-            "LINESTRING (0 0, 1 1)",
-            "MULTILINESTRING ((0 0, 1 1), (1 1, 2 2))",
-            "POLYGON ((0 0, 1 0, 1 1, 0 1, 0 0))",
-            "MULTIPOLYGON (((0 0, 1 0, 1 1, 0 1, 0 0)), ((2 2, 3 2, 3 3, 2 3, 2 2)))"
-        })
-        void shouldReturnTrueForValidWkt(String input) {
-            boolean result = geometryService.isGeometry(input);
-
-            assertThat(result).isTrue();
-        }
-
-        @Test
-        void shouldReturnTrueForValidGeojsonPolygon() {
-            String geoJson = """
-                {
-                  "type": "Polygon",
-                  "coordinates": [[[0,0],[1,0],[1,1],[0,1],[0,0]]]
-                }
-                """;
-
-            boolean result = geometryService.isGeometry(geoJson);
-
-            assertThat(result).isTrue();
-        }
-
-        @ParameterizedTest
-        @ValueSource(strings = {
-            "not a geometry",
-            ""
-        })
-        void shouldReturnFalseForInvalidInput(String invalid) {
-            boolean result = geometryService.isGeometry(invalid);
-
-            assertThat(result).isFalse();
         }
     }
 

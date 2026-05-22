@@ -451,6 +451,7 @@ export default {
     },
   },
   activated() {
+    this.dropFiles = this.dropFiles.filter(wrapper => wrapper.uploading);
     this.fetchStorages();
     this.fetchProjects();
     this.fetchFormatInfos();

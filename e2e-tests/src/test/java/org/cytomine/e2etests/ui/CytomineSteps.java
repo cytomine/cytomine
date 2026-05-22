@@ -140,6 +140,8 @@ public class CytomineSteps {
                     + "//td[@data-label='Status']//span[@data-status='success']"
             )
         );
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//button[contains(text(), 'Hide successful uploads')]"));
+        webDriverUtils.byClick(wait, By.xpath("//button[contains(text(), 'Hide successful uploads')]"));
     }
 
     private void selectProject(Wait<WebDriver> wait, String projectName) {

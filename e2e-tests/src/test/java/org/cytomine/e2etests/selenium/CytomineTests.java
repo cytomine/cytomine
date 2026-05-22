@@ -183,9 +183,7 @@ public class CytomineTests {
 
         cytomineSteps.deleteProject(wait, projectUrl);
         cytomineSteps.deleteOntology(wait, ontologyUrl);
-        imageNames.forEach(imageName ->
-            cytomineSteps.deleteImage(wait, cytomineUrl, imageName)
-        );
+        imageNames.forEach(imageName -> cytomineSteps.deleteImage(wait, cytomineUrl, imageName));
         cytomineSteps.logout(wait, cytomineUrl);
     }
 

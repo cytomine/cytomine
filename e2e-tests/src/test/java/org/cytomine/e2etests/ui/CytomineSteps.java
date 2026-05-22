@@ -150,16 +150,23 @@ public class CytomineSteps {
     public void deleteImage(Wait<WebDriver> wait, URL cytomineUrl, String imageName) {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/storage");
         webDriverUtils.waitLoading(wait);
-        webDriverUtils.byIsDisplayed(wait, By.xpath(
-            "//div[contains(@class,'uploaded-files-list')]//span[@data-filename='" + imageName
-                + "']"));
-        webDriverUtils.byClick(wait, By.xpath(
-            "//div[contains(@class,'uploaded-files-list')]//button[@data-filename='" + imageName
-                + "']"));
-        webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Confirm')]");
-        webDriverUtils.waitUntilByEmpty(wait, By.xpath(
-            "//div[contains(@class,'uploaded-files-list')]//span[@data-filename='" + imageName
-                + "']"));
+        webDriverUtils.byIsDisplayed(
+            wait,
+            By.xpath("//div[contains(@class,'uploaded-files-list')]//span[@data-filename='" + imageName + "']")
+        );
+        webDriverUtils.byClick(
+            wait,
+            By.xpath("//div[contains(@class,'uploaded-files-list')]//button[@data-filename='" + imageName + "']")
+        );
+        By confirmButton = By.xpath(
+            "//footer[contains(@class,'modal-card-foot')]"
+                + "//button[contains(@class,'is-danger') and normalize-space()='Confirm']"
+        );
+        webDriverUtils.byClick(wait, confirmButton);
+        webDriverUtils.waitUntilByEmpty(
+            wait,
+            By.xpath("//div[contains(@class,'uploaded-files-list')]//span[@data-filename='" + imageName + "']")
+        );
     }
 
     public String addTermToOntology(Wait<WebDriver> wait, WebDriver driver, String ontologyURL, String termName) {

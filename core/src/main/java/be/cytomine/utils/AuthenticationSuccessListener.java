@@ -1,6 +1,8 @@
 package be.cytomine.utils;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -15,7 +17,6 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.stereotype.Component;
 
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.SecRole;
 import be.cytomine.domain.security.SecUserSecRole;
 import be.cytomine.domain.security.User;
 import be.cytomine.repository.project.ProjectRepository;
@@ -25,16 +26,7 @@ import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.image.server.StorageService;
 import be.cytomine.service.project.ProjectMemberService;
-import jakarta.transaction.Transactional;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
-import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.stereotype.Component;
 
-import java.util.*;
-@Slf4j
 @RequiredArgsConstructor
 @Component
 public class AuthenticationSuccessListener implements ApplicationListener<AuthenticationSuccessEvent> {
@@ -51,15 +43,13 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
 
     private final UserRepository userRepository;
 
+    private final ProjectRepository projectRepository;
+
+    private final ProjectMemberService projectMemberService;
+
     private AuthenticationSuccessListener self() {
         return applicationContext.getBean(AuthenticationSuccessListener.class);
     }
-
-    @Autowired
-    private ProjectRepository projectRepository;
-
-    @Autowired
-    private ProjectMemberService projectMemberService;
 
     @Override
     public void onApplicationEvent(AuthenticationSuccessEvent event) {
@@ -81,7 +71,7 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
             userRepository.save(user);
 
             self().updateRolesAndAdminSession(jwtAuthenticationToken, user, rolesFromAuthentication);
-            self.updateProjectsMembership(projects, user);
+            self().updateProjectsMembership(projects, user);
 
         } else if (userByReference.isEmpty()) {
 
@@ -97,7 +87,7 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
             self().setCumulativeRole(rolesFromAuthentication, savedUser);
             storageService.initUserStorage(savedUser);
 
-            self.updateProjectsMembership(projects, savedUser);
+            self().updateProjectsMembership(projects, savedUser);
 
             savedUser = userRepository.findByReference(sub.toString()).orElse(null);
             if (currentRoleService.hasCurrentUserAdminRole(savedUser)) {
@@ -107,7 +97,7 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
         } else {
             User user = userByReference.get();
             self().updateRolesAndAdminSession(jwtAuthenticationToken, user, rolesFromAuthentication);
-            self.updateProjectsMembership(projects, user);
+            self().updateProjectsMembership(projects, user);
         }
     }
 

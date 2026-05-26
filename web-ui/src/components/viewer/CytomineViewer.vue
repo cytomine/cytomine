@@ -1,63 +1,37 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
-<div v-if="error" class="box error">
-  <h2> {{ $t('error') }} </h2>
-  <p>{{ $t('error-loading-image') }}</p>
-  <p v-if="errorBadImageProject">{{ $t('error-loading-image-bad-project') }}</p>
-</div>
-<div v-else class="cytomine-viewer">
-  <b-loading :is-full-page="false" :active="loading" />
+  <div v-if="error" class="box error">
+    <h2>{{ $t('error') }}</h2>
+    <p>{{ $t('error-loading-image') }}</p>
+    <p v-if="errorBadImageProject">{{ $t('error-loading-image-bad-project') }}</p>
+  </div>
+  <div v-else class="cytomine-viewer">
+    <b-loading :is-full-page="false" :active="loading" />
 
-  <div class="ae-sidebar" :class="{collapsed: !showAppEngineSidebar}">
-    <button
-      class="toggle-ae-sidebar"
-      type="button"
-      :aria-expanded="showAppEngineSidebar"
-      @click="toggleAppEngineSidebar"
-    >
-      <i class="fas" :class="showAppEngineSidebar ? 'fa-chevron-left' : 'fa-chevron-right'"></i>
-    </button>
-    <div class="ae-sidebar-content" v-show="showAppEngineSidebar">
-      <app-engine-sidebar></app-engine-sidebar>
+    <div class="viewer-main">
+      <div v-if="!loading" class="maps-wrapper">
+        <div class="map-cell"
+          v-for="(cell, i) in cells"
+          :key="i"
+          :style="`height:${elementHeight}%; width:${elementWidth}%;`"
+          :class="{highlighted: cell && cell.highlighted}"
+        >
+          <CytomineImage
+            v-if="cell && cell.image && cell.slices"
+            :index="cell.index"
+            :key="`${cell.index}-${cell.image.id}`"
+            @close="closeMap(cell.index)"
+          />
+        </div>
+
+        <ImageSelector />
+
+        <!-- Emit event when a hotkey is pressed (to rework once https://github.com/iFgR/vue-shortkey/issues/78 is implemented) -->
+        <div class="hidden" v-shortkey.once="shortkeysMapping" @shortkey="shortkeyEvent"></div>
+      </div>
+
+      <AppBottomDrawer />
     </div>
   </div>
-
-  <div v-if="!loading" class="maps-wrapper">
-    <div class="map-cell"
-      v-for="(cell, i) in cells"
-      :key="i"
-      :style="`height:${elementHeight}%; width:${elementWidth}%;`"
-      :class="{highlighted: cell && cell.highlighted}"
-    >
-      <cytomine-image
-        v-if="cell && cell.image && cell.slices"
-        :index="cell.index"
-        :key="`${cell.index}-${cell.image.id}`"
-        @close="closeMap(cell.index)"
-      />
-    </div>
-
-    <image-selector />
-
-    <!-- Emit event when a hotkey is pressed (to rework once https://github.com/iFgR/vue-shortkey/issues/78 is implemented) -->
-    <div class="hidden" v-shortkey.once="shortkeysMapping" @shortkey="shortkeyEvent"></div>
-
-  </div>
-
-</div>
 </template>
 
 <script>
@@ -65,7 +39,7 @@ import {get} from '@/utils/store-helpers';
 
 import CytomineImage from './CytomineImage';
 import ImageSelector from './ImageSelector';
-import AppEngineSidebar from '@/components/appengine/sidebar/AppEngineSidebar';
+import AppBottomDrawer from '@/components/appengine/AppBottomDrawer';
 
 import viewerModuleModel from '@/store/modules/project_modules/viewer';
 
@@ -77,9 +51,9 @@ import {ImageInstance, SliceInstance, Annotation} from '@/api';
 export default {
   name: 'cytomine-viewer',
   components: {
+    AppBottomDrawer,
     CytomineImage,
     ImageSelector,
-    AppEngineSidebar
   },
   data() {
     return {
@@ -88,7 +62,6 @@ export default {
       loading: true,
       reloadInterval: null,
       idViewer: null,
-      showAppEngineSidebar: true
     };
   },
   computed: {
@@ -184,16 +157,6 @@ export default {
     nbImages() {
       this.$eventBus.$emit('updateMapSize');
     },
-    showAppEngineSidebar(newValue, oldValue) {
-      if (newValue === oldValue) {
-        return;
-      }
-      this.$nextTick(() => {
-        const emitUpdate = () => this.$eventBus.$emit('updateMapSize');
-        emitUpdate();
-        setTimeout(emitUpdate, 220);
-      });
-    }
   },
   methods: {
     findIdViewer() {
@@ -332,10 +295,6 @@ export default {
     shortkeyEvent(event) {
       this.$eventBus.$emit('shortkeyEvent', event.srcKey);
     },
-
-    toggleAppEngineSidebar() {
-      this.showAppEngineSidebar = !this.showAppEngineSidebar;
-    }
   },
   async created() {
     this.findIdViewer();
@@ -361,57 +320,16 @@ export default {
   height: 100%;
 }
 
-.ae-sidebar {
-  width: 24rem;
-  min-width: 24rem;
+.viewer-main {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  border-right: 1px solid #333;
-  overflow: hidden;
-  transition: width 0.2s ease;
-  position: relative;
-}
-
-.ae-sidebar.collapsed {
-  width: 3rem;
-  min-width: 3rem;
-}
-
-.ae-sidebar-content {
-  flex: 1;
   min-height: 0;
-}
-
-.toggle-ae-sidebar {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  z-index: 2;
-  align-self: flex-end;
-  margin: 0;
-  width: 2.5rem;
-  height: 2.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #d9d9d9;
-  border-radius: 4px;
-  background: #f6f6f6;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.toggle-ae-sidebar:hover {
-  background: #ededed;
-}
-
-.ae-sidebar.collapsed .toggle-ae-sidebar {
-  top: 0.25rem;
-  right: 0.25rem;
 }
 
 .maps-wrapper {
   flex: 1;
+  min-height: 0;
   height: 100%;
   display: flex;
   flex-wrap: wrap;

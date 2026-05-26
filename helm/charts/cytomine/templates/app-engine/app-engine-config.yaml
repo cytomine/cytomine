@@ -14,3 +14,4 @@ data:
   SCHEDULER_USE_HOST_NETWORK: "false"
   SCHEDULER_RUN_MODE: "cluster"
   SCHEDULER_TASKS_NAMESPACE: {{ include "cytomine.appEngineTasksNamespace" . }}
+  SCHEDULER_TASKS_RUNNER_IMAGE: {{ .Values.images.tasks_runner_image }}

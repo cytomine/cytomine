@@ -1,0 +1,5 @@
+---
+services:
+  k3s:
+    volumes:
+      - ../.kube/secrets/docker-image-pull-secrets.yaml:/var/lib/rancher/k3s/server/manifests/docker-image-pull-secrets.yaml:ro

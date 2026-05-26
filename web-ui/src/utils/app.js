@@ -41,7 +41,7 @@ export async function installApp(app, notify, t) {
   }
 }
 
-export async function hasBinaryType(input) {
+export function hasBinaryType(input) {
   const typeId = input.type.id === 'array' ? input.type.subType.id : input.type.id;
   return BINARY_TYPES.includes(typeId);
 }
@@ -56,4 +56,8 @@ export function isGeometry(parameter) {
   }
 
   return false;
+}
+
+export function formatTaskName(taskRun) {
+  return `${taskRun.task.name} (${taskRun.task.version}) - ${(new Date(taskRun.createdAt)).toLocaleString()}`;
 }

@@ -76,6 +76,7 @@ logging:
     org.springframework.data.mongodb.core.MongoTemplate: DEBUG
 
 application:
+  version: 0.0.0
   serverId: default
   serverURL: http://localhost:8080
   adminPassword: password
@@ -93,6 +94,7 @@ application:
   pimsURL: http://localhost:8888
   samURL: http://localhost:8888
   cbirURL: http://localhost:8888
+  repositoryURL: http://localhost:8888
 
   appEngine:
     enabled: ${APPENGINE_ENABLED:true}
@@ -353,3 +355,15 @@ jwt:
     converter:
       resource-id: core
       principle-attribute: preferred_username
+
+# admin of the master realm not cytomine realm
+keycloak-client:
+  admin:
+    user: ${KEYCLOAK_ADMIN:admin}
+    password: ${KEYCLOAK_ADMIN_PASSWORD:password}
+    realm: master
+  target:
+    realm: cytomine
+    client-id: core
+  client-id: admin-cli
+  url: ${IAM_URL:http://iam:8100}/iam

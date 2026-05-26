@@ -1,5 +1,19 @@
 package be.cytomine.utils;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationListener;
+import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.stereotype.Component;
+
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.SecRole;
 import be.cytomine.domain.security.SecUserSecRole;
@@ -21,26 +35,25 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 @Slf4j
+@RequiredArgsConstructor
 @Component
 public class AuthenticationSuccessListener implements ApplicationListener<AuthenticationSuccessEvent> {
 
-    @Autowired
-    private AuthenticationSuccessListener self; // necessary, otherwise spring will bypass the proxy for transactional
+    private final ApplicationContext applicationContext;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final CurrentRoleService currentRoleService;
 
-    @Autowired
-    SecUserSecRoleRepository secSecUserSecRoleRepository;
+    private final SecUserSecRoleRepository secSecUserSecRoleRepository;
 
-    @Autowired
-    private SecRoleRepository secRoleRepository;
+    private final SecRoleRepository secRoleRepository;
 
-    @Autowired
-    private StorageService storageService;
+    private final StorageService storageService;
 
-    @Autowired
-    private CurrentRoleService currentRoleService;
+    private final UserRepository userRepository;
+
+    private AuthenticationSuccessListener self() {
+        return applicationContext.getBean(AuthenticationSuccessListener.class);
+    }
 
     @Autowired
     private ProjectRepository projectRepository;
@@ -50,16 +63,13 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
 
     @Override
     public void onApplicationEvent(AuthenticationSuccessEvent event) {
-
-        if (event.getAuthentication() instanceof JwtAuthenticationToken jwtAuthenticationToken)
+        if (event.getAuthentication() instanceof JwtAuthenticationToken jwtAuthenticationToken) {
             saveUserOfToken(jwtAuthenticationToken);
-
+        }
     }
 
     protected void saveUserOfToken(JwtAuthenticationToken jwtAuthenticationToken) {
-
-        Set<String> rolesFromAuthentication =
-            extractRolesFromAuthentication(jwtAuthenticationToken);
+        Set<String> rolesFromAuthentication = extractRolesFromAuthentication(jwtAuthenticationToken);
         Map<String, Object> tokenAttributes = jwtAuthenticationToken.getTokenAttributes();
         List<String> projects = (List<String>) tokenAttributes.getOrDefault("projects", Collections.emptyList());
         UUID sub = UUID.fromString(tokenAttributes.get("sub").toString());
@@ -70,7 +80,7 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
             user.setReference(sub.toString());
             userRepository.save(user);
 
-            self.updateRolesAndAdminSession(jwtAuthenticationToken, user, rolesFromAuthentication);
+            self().updateRolesAndAdminSession(jwtAuthenticationToken, user, rolesFromAuthentication);
             self.updateProjectsMembership(projects, user);
 
         } else if (userByReference.isEmpty()) {
@@ -84,7 +94,7 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
 
             //save domain into the database
             User savedUser = userRepository.save(newUser);
-            self.setCumulativeRole(rolesFromAuthentication, savedUser);
+            self().setCumulativeRole(rolesFromAuthentication, savedUser);
             storageService.initUserStorage(savedUser);
 
             self.updateProjectsMembership(projects, savedUser);
@@ -96,22 +106,24 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
 
         } else {
             User user = userByReference.get();
-            self.updateRolesAndAdminSession(jwtAuthenticationToken, user, rolesFromAuthentication);
+            self().updateRolesAndAdminSession(jwtAuthenticationToken, user, rolesFromAuthentication);
             self.updateProjectsMembership(projects, user);
         }
     }
 
     @Transactional
-    protected void updateRolesAndAdminSession(JwtAuthenticationToken jwtAuthenticationToken,
-                                              User user,
-                                              Set<String> rolesFromAuthentication) {
+    protected void updateRolesAndAdminSession(
+        JwtAuthenticationToken jwtAuthenticationToken,
+        User user,
+        Set<String> rolesFromAuthentication
+    ) {
 
         secSecUserSecRoleRepository.deleteAllByIdInBatch(
             secSecUserSecRoleRepository.findAllBySecUser(user).stream()
                 .map(SecUserSecRole::getId).toList());
         secSecUserSecRoleRepository.flush();
         // Guest > User > Admin
-        self.setCumulativeRole(rolesFromAuthentication, user);
+        self().setCumulativeRole(rolesFromAuthentication, user);
 
         if (rolesFromAuthentication.contains("ROLE_ADMIN")) {
             if (currentRoleService.hasCurrentUserAdminRole(user)) {
@@ -167,7 +179,9 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
     private static Set<String> extractRolesFromAuthentication(JwtAuthenticationToken jwtAuthenticationToken) {
         Set<String> rolesFromAuthentication = new HashSet<>();
         jwtAuthenticationToken.getAuthorities().forEach((authority) -> {
-            if (authority.getAuthority().equals("ROLE_USER") || authority.getAuthority().equals("ROLE_ADMIN") || authority.getAuthority().equals("ROLE_GUEST")) {
+            if (authority.getAuthority().equals("ROLE_USER")
+                || authority.getAuthority().equals("ROLE_ADMIN")
+                || authority.getAuthority().equals("ROLE_GUEST")) {
                 rolesFromAuthentication.add(authority.getAuthority());
             }
         });

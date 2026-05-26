@@ -179,7 +179,7 @@
           <template #default="{row: consultation}">
             <b-table-column :label="$t('overview')" field="created">
               <router-link :to="`/project/${project.id}/image/${consultation.image}`">
-                <image-thumbnail :url="consultation.imageThumb" :size="128" :key="consultation.imageThumb" :extra-parameters="{Authorization: 'Bearer ' + shortTermToken }"/>
+                <image-thumbnail :url="consultation.imageThumb" :size="128" :key="consultation.imageThumb" :extra-parameters="{authorization: 'Bearer ' + shortTermToken }"/>
               </router-link>
             </b-table-column>
 

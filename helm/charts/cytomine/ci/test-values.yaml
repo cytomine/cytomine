@@ -14,8 +14,8 @@ mongodb:
 app_engine:
   tasks_namespace:
 
-ingress:
-  className: nginx
+gateway:
+  className: envoy-gateway
 
 iam:
   lsaaiClientIdSecretName:
@@ -23,4 +23,4 @@ iam:
   lsaaiEndpoint:
 
 images:
-  imagePullSecretsNames: [docker-images-pull-secret]
+  imagePullSecretsNames: [docker-image-pull-secrets]

@@ -47,7 +47,6 @@ public class ImageInstanceBounds extends AbstractBounds {
     private MinMax<String> instanceFilename = new MinMax<>();
 
     public void submit(ImageInstance imageInstance) {
-        AbstractImage abstractImage = imageInstance.getBaseImage();
         updateMinMax(created, imageInstance.getCreated());
         updateMinMax(updated, imageInstance.getUpdated());
         updateMinMax(reviewStart, imageInstance.getReviewStart());
@@ -63,6 +62,7 @@ public class ImageInstanceBounds extends AbstractBounds {
         updateMinMax(physicalSizeZ, imageInstance.getPhysicalSizeZ());
         updateMinMax(fps, imageInstance.getFps());
 
+        AbstractImage abstractImage = imageInstance.getBaseImage();
         updateChoices(mimeType, abstractImage.getContentType());
         updateChoices(format, abstractImage.getContentType());
 

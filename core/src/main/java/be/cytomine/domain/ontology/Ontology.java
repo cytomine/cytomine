@@ -16,6 +16,7 @@ package be.cytomine.domain.ontology;
  * limitations under the License.
  */
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -56,10 +57,13 @@ public class Ontology extends CytomineDomain {
     @JoinColumn(name = "user_id", nullable = true)
     protected User user;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy="ontology")
+    @Column()
+    protected LocalDateTime deleted;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "ontology")
     protected Set<Project> projects = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy="ontology")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "ontology")
     protected Set<Term> terms = new HashSet<>();
 
     public static JsonObject getDataFromDomain(CytomineDomain domain) {
@@ -75,8 +79,10 @@ public class Ontology extends CytomineDomain {
         returnArray.put("hideCheckbox", true);
 
         returnArray.put("state", "open");
-        returnArray.put("projects",
-            ontology.projects.stream().map(Project::getDataFromDomain).collect(Collectors.toSet()));
+        returnArray.put(
+            "projects",
+            ontology.projects.stream().map(Project::getDataFromDomain).collect(Collectors.toSet())
+        );
         if (domain.getVersion() != null) {
             returnArray.put("children", ontology.tree());
         } else {
@@ -117,7 +123,7 @@ public class Ontology extends CytomineDomain {
     public List<Map<String, Object>> tree() {
         List<Map<String, Object>> rootTerms = new ArrayList<>();
         for (Term term : this.terms()) {
-            if (term.isRoot()) {
+            if (term.getDeleted() == null && term.isRoot()) {
                 rootTerms.add(branch(term));
             }
         }
@@ -128,6 +134,7 @@ public class Ontology extends CytomineDomain {
      * Get the term branch
      *
      * @param term Root term
+     *
      * @return Branch with all term children as tree
      */
     Map<String, Object> branch(Term term) {
@@ -151,8 +158,8 @@ public class Ontology extends CytomineDomain {
             children.add(childTree);
         }
         children = children.stream()
-                       .sorted(Comparator.comparing(a -> ((String) a.get("name"))))
-                       .collect(Collectors.toList());
+            .sorted(Comparator.comparing(a -> ((String) a.get("name"))))
+            .collect(Collectors.toList());
         t.put("children", children);
 
         t.put("isFolder", isFolder);
@@ -182,9 +189,9 @@ public class Ontology extends CytomineDomain {
 
     @Override
     public String toString() {
-        return "Ontology{" +
-                   "id=" + id +
-                   ", name='" + name + '\'' +
-                   '}';
+        return "Ontology{"
+            + "id=" + id
+            + ", name='" + name + '\''
+            + '}';
     }
 }

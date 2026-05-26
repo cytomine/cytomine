@@ -12,7 +12,7 @@ dependencies = [
   "geojson>=3.2.0",
   "numpy>=2.1.2",
   "opencv-python-headless>=4.11.0.86",
-  "pillow>=11.0.0",
+  "pillow>=12.2.0",
   "pydantic>=2.10.6",
   "pydantic-settings>=2.8.1",
   "sam2>=1.1.0",
@@ -25,7 +25,7 @@ dependencies = [
 dev = [
   "httpx>=0.28.1",
   "mypy>=1.17.1",
-  "pytest>=8.4.1",
+  "pytest>=9.0.3",
   "ruff>=0.12.10",
 ]
 
@@ -37,9 +37,6 @@ explicit = true
 [tool.uv.sources]
 torch = [{ index = "pytorch-cpu" }]
 torchvision = [{ index = "pytorch-cpu" }]
-
-[tool.mypy]
-ignore_missing_imports = true
 
 [tool.setuptools.packages]
 find = { include = ["app"] }

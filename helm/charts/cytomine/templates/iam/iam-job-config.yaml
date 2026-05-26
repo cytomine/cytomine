@@ -128,6 +128,16 @@ spec:
         securityContext:
         {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
 
+      - name: add-realm-management-roles
+        image: "{{ .Values.images.iam }}"
+        command: ["/bin/sh", "-c"]
+        args: ["/opt/keycloak/bin/kcadm.sh add-roles -r cytomine --server {{ include "cytomine.iamInternalUrl" . }} --config /opt/keycloak-auth/kcadm.config --uusername admin --cclientid realm-management --rolename view-users --rolename manage-users --rolename query-users || true"]
+        volumeMounts:
+        - name: kc-auth
+          mountPath: "/opt/keycloak-auth"
+        securityContext:
+        {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
+
 {{ if and (.Values.iam.lsaaiClientIdSecretName) (and .Values.iam.lsaaiClientSecretSecretName .Values.iam.lsaaiEndpoint) }}
       # https://stackoverflow.com/a/75794013
       - name: fetch-auth-config

@@ -24,7 +24,7 @@ public class ProvisionTaskApiExceptionHandler {
     public final ResponseEntity<AppEngineError> handleRunProcessingException(Exception e) {
         AppEngineError error = ErrorBuilder.build(ErrorCode.INTERNAL_TASK_NOT_FOUND);
         log.info("bad request 404 error [{}]", e.getMessage());
-        return new ResponseEntity<AppEngineError>(error, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler({ ProvisioningException.class })
@@ -39,7 +39,7 @@ public class ProvisionTaskApiExceptionHandler {
             || e.getError().getErrorCode().equalsIgnoreCase(parameterNotFoundErrorMessage)
         ) {
             log.info("not found 404 error [{}]", e.getMessage());
-            return new ResponseEntity<AppEngineError>(e.getError(), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(e.getError(), HttpStatus.NOT_FOUND);
 
         }
 
@@ -56,11 +56,11 @@ public class ProvisionTaskApiExceptionHandler {
             root.put("errorCode", e.getError().getErrorCode());
             root.put("message", e.getError().getMessage());
 
-            return new ResponseEntity<String>(root.toString(), HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(root.toString(), HttpStatus.FORBIDDEN);
         }
 
         log.info("bad request 400 error [{}]", e.getMessage());
-        return new ResponseEntity<AppEngineError>(e.getError(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(e.getError(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler({ HttpMessageNotReadableException.class })
@@ -69,6 +69,6 @@ public class ProvisionTaskApiExceptionHandler {
     ) {
         AppEngineError error = ErrorBuilder.build(ErrorCode.UNKNOWN_STATE);
         log.info("bad request 400 error [{}]", e.getMessage());
-        return new ResponseEntity<AppEngineError>(error, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 }

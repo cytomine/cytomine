@@ -18,15 +18,17 @@ import static java.util.function.Predicate.not;
 public class TokenFromParameterFilter extends OncePerRequestFilter {
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-                                    FilterChain filterChain)
+    protected void doFilterInternal(
+        HttpServletRequest request, HttpServletResponse response,
+        FilterChain filterChain
+    )
         throws ServletException, IOException {
 
         Optional<String> authToken =
             Optional.ofNullable(request.getParameter("auth"))
                 .filter(not(String::isBlank))
                 .or(() -> Optional.ofNullable(request.getParameter("Authorization"))
-                              .filter(not(String::isBlank)))
+                    .filter(not(String::isBlank)))
                 .map(token -> token.startsWith("Bearer") ? token : "Bearer " + token);
 
         if (authToken.isPresent() && request.getHeader("Authorization") == null) {

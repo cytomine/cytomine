@@ -1,31 +1,30 @@
 package be.cytomine.utils;
 
-import org.apache.commons.text.CaseUtils;
-
 import java.math.BigInteger;
+
+import org.apache.commons.text.CaseUtils;
 
 public class SQLUtils {
 
-    public static String toCamelCase( String text) {
+    public static String toCamelCase(String text) {
         return toCamelCase(text, false);
     }
 
-    public static String toCamelCase( String text, boolean capitalized ) {
+    public static String toCamelCase(String text, boolean capitalized) {
         return CaseUtils.toCamelCase(text, capitalized, new char[]{'_'});
     }
 
     public static Long castToLong(Object o) {
-        if (o==null) {
+        if (o == null) {
             return null;
         } else if (o instanceof BigInteger) {
-            return ((BigInteger)o).longValue();
+            return ((BigInteger) o).longValue();
         } else {
             return Long.parseLong(o.toString());
         }
     }
 
-    public static String toSnakeCase(String str)
-    {
+    public static String toSnakeCase(String str) {
 
         // Empty String
         String result = "";
@@ -47,13 +46,11 @@ public class SQLUtils {
             if (Character.isUpperCase(ch)) {
                 result = result + '_';
                 result
-                        = result
-                        + Character.toLowerCase(ch);
-            }
-
-            // If the character is lower case then
-            // add such character into result string
-            else {
+                    = result
+                    + Character.toLowerCase(ch);
+            } else {
+                // If the character is lower case then
+                // add such character into result string
                 result = result + ch;
             }
         }

@@ -234,34 +234,34 @@
                      value="Type name ''{0}'' must match pattern ''{1}''." />
         </module>
         <module name="MemberName">
-            <property name="format" value="^[a-z][a-z0-9][a-zA-Z0-9]*$" />
+            <property name="format" value="^[a-z][a-zA-Z0-9]*$" />
             <message
                 key="name.invalidPattern"
                 value="Member name ''{0}'' must match pattern ''{1}''."
             />
         </module>
         <module name="ParameterName">
-            <property name="format" value="^[a-z]([a-z0-9][a-zA-Z0-9]*)?$" />
+            <property name="format" value="^[a-z][a-zA-Z0-9]*$" />
             <message key="name.invalidPattern"
                      value="Parameter name ''{0}'' must match pattern ''{1}''." />
         </module>
         <module name="LambdaParameterName">
-            <property name="format" value="^[a-z]([a-z0-9][a-zA-Z0-9]*)?$" />
+            <property name="format" value="^[a-z][a-zA-Z0-9]*$" />
             <message key="name.invalidPattern"
                      value="Lambda parameter name ''{0}'' must match pattern ''{1}''." />
         </module>
         <module name="CatchParameterName">
-            <property name="format" value="^[a-z]([a-z0-9][a-zA-Z0-9]*)?$" />
+            <property name="format" value="^[a-z][a-zA-Z0-9]*$" />
             <message key="name.invalidPattern"
                      value="Catch parameter name ''{0}'' must match pattern ''{1}''." />
         </module>
         <module name="LocalVariableName">
-            <property name="format" value="^[a-z]([a-z0-9][a-zA-Z0-9]*)?$" />
+            <property name="format" value="^[a-z][a-zA-Z0-9]*$" />
             <message key="name.invalidPattern"
                      value="Local variable name ''{0}'' must match pattern ''{1}''." />
         </module>
         <module name="PatternVariableName">
-            <property name="format" value="^[a-z]([a-z0-9][a-zA-Z0-9]*)?$" />
+            <property name="format" value="^[a-z][a-zA-Z0-9]*$" />
             <message key="name.invalidPattern"
                      value="Pattern variable name ''{0}'' must match pattern ''{1}''." />
         </module>
@@ -313,6 +313,7 @@
                                    | //SLIST[not(parent::CASE_GROUP)]/SLIST/RCURLY" />
         </module>
         <module name="AbbreviationAsWordInName">
+            <property name="allowedAbbreviationLength" value="5"/>
             <property name="ignoreFinal" value="false" />
             <property name="tokens"
                       value="CLASS_DEF, INTERFACE_DEF, ENUM_DEF, ANNOTATION_DEF, ANNOTATION_FIELD_DEF,
@@ -323,7 +324,7 @@
         <module name="OverloadMethodsDeclarationOrder" />
         <module name="ConstructorsDeclarationGrouping" />
         <module name="VariableDeclarationUsageDistance">
-            <property name="allowedDistance" value="10" />
+            <property name="allowedDistance" value="20" />
         </module>
         <module name="CustomImportOrder">
             <property name="sortImportsInGroupAlphabetically" value="true" />
@@ -391,18 +392,7 @@
         </module>
         <module name="MethodName">
             <property name="format" value="^[a-z][a-z0-9][a-zA-Z0-9]*$" />
-            <message key="name.invalidPattern"
-                     value="Method name ''{0}'' must match pattern ''{1}''." />
-        </module>
-        <module name="SuppressionXpathSingleFilter">
-            <property name="checks" value="MethodName" />
-            <property
-                name="query"
-                value="//METHOD_DEF[
-                                     ./MODIFIERS/ANNOTATION//IDENT[contains(@text, 'Test')]
-                                   ]/IDENT" />
-            <property name="message"
-                      value="'[a-z][a-z0-9][a-zA-Z0-9]*(?:_[a-z][a-z0-9][a-zA-Z0-9]*)*'" />
+            <message key="name.invalidPattern" value="Method name ''{0}'' must match pattern ''{1}''." />
         </module>
         <module name="EmptyCatchBlock">
             <property name="exceptionVariableName" value="expected" />

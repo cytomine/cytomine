@@ -7,15 +7,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import be.cytomine.appengine.dto.inputs.task.GenericParameterCollectionItemProvision;
-import be.cytomine.appengine.dto.inputs.task.ParameterType;
-import be.cytomine.appengine.models.task.number.NumberType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import be.cytomine.appengine.dto.inputs.task.GenericParameterCollectionItemProvision;
 import be.cytomine.appengine.dto.inputs.task.GenericParameterProvision;
+import be.cytomine.appengine.dto.inputs.task.ParameterType;
 import be.cytomine.appengine.dto.inputs.task.TaskRunParameterValue;
 import be.cytomine.appengine.dto.inputs.task.types.bool.BooleanValue;
 import be.cytomine.appengine.dto.inputs.task.types.datetime.DateTimeValue;
@@ -26,20 +25,21 @@ import be.cytomine.appengine.dto.inputs.task.types.image.ImageValue;
 import be.cytomine.appengine.dto.inputs.task.types.integer.IntegerValue;
 import be.cytomine.appengine.dto.inputs.task.types.string.StringValue;
 import be.cytomine.appengine.models.BaseEntity;
+import be.cytomine.appengine.models.task.number.NumberType;
 
 public class TaskTestsUtils {
 
     private static <E extends BaseEntity> List<String> getName(List<E> entities) {
         return entities
-                .stream()
-                .map(entity -> {
-                    try {
-                        return (String) entity.getClass().getMethod("getName").invoke(entity);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .toList();
+            .stream()
+            .map(entity -> {
+                try {
+                    return (String) entity.getClass().getMethod("getName").invoke(entity);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            })
+            .toList();
     }
 
     public static <E extends BaseEntity> boolean areSetEquals(Set<E> expected, List<E> actual) {
@@ -57,8 +57,7 @@ public class TaskTestsUtils {
         ObjectMapper objectMapper = new ObjectMapper();
         List<Map<String, Object>> values = new ArrayList<>();
         try {
-            values = objectMapper.readValue(body, new TypeReference<List<Map<String, Object>>>() {
-            });
+            values = objectMapper.readValue(body, new TypeReference<>() {});
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -69,67 +68,70 @@ public class TaskTestsUtils {
             switch (value.getClass().getSimpleName().toLowerCase()) {
                 case "boolean":
                     BooleanValue booleanValue = new BooleanValue();
-                    booleanValue.setParameterName((String) entity.get("param_name"));
-                    booleanValue.setTaskRunId(UUID.fromString((String) entity.get("task_run_id")));
+                    booleanValue.setParameterName((String) entity.get("parameterName"));
+                    booleanValue.setTaskRunId(UUID.fromString((String) entity.get("taskRunId")));
                     booleanValue.setValue((boolean) entity.get("value"));
                     parameterValues.add(booleanValue);
                     break;
 
                 case "integer":
                     IntegerValue integerValue = new IntegerValue();
-                    integerValue.setParameterName((String) entity.get("param_name"));
-                    integerValue.setTaskRunId(UUID.fromString((String) entity.get("task_run_id")));
+                    integerValue.setParameterName((String) entity.get("parameterName"));
+                    integerValue.setTaskRunId(UUID.fromString((String) entity.get("taskRunId")));
                     integerValue.setValue((int) entity.get("value"));
                     parameterValues.add(integerValue);
                     break;
 
                 case "string":
                     StringValue stringValue = new StringValue();
-                    stringValue.setParameterName((String) entity.get("param_name"));
-                    stringValue.setTaskRunId(UUID.fromString((String) entity.get("task_run_id")));
+                    stringValue.setParameterName((String) entity.get("parameterName"));
+                    stringValue.setTaskRunId(UUID.fromString((String) entity.get("taskRunId")));
                     stringValue.setValue((String) entity.get("value"));
                     parameterValues.add(stringValue);
                     break;
 
                 case "enumeration":
                     EnumerationValue enumerationValue = new EnumerationValue();
-                    enumerationValue.setParameterName((String) entity.get("param_name"));
-                    enumerationValue.setTaskRunId(UUID.fromString((String) entity.get("task_run_id")));
+                    enumerationValue.setParameterName((String) entity.get("parameterName"));
+                    enumerationValue.setTaskRunId(UUID.fromString((String) entity.get("taskRunId")));
                     enumerationValue.setValue((String) entity.get("value"));
                     parameterValues.add(enumerationValue);
                     break;
 
                 case "datetime":
                     DateTimeValue datetimeValue = new DateTimeValue();
-                    datetimeValue.setParameterName((String) entity.get("param_name"));
-                    datetimeValue.setTaskRunId(UUID.fromString((String) entity.get("task_run_id")));
+                    datetimeValue.setParameterName((String) entity.get("parameterName"));
+                    datetimeValue.setTaskRunId(UUID.fromString((String) entity.get("taskRunId")));
                     datetimeValue.setValue(Instant.parse((String) entity.get("value")));
                     parameterValues.add(datetimeValue);
                     break;
 
                 case "geometry":
                     GeometryValue geometryValue = new GeometryValue();
-                    geometryValue.setParameterName((String) entity.get("param_name"));
-                    geometryValue.setTaskRunId(UUID.fromString((String) entity.get("task_run_id")));
+                    geometryValue.setParameterName((String) entity.get("parameterName"));
+                    geometryValue.setTaskRunId(UUID.fromString((String) entity.get("taskRunId")));
                     geometryValue.setValue((String) entity.get("value"));
                     parameterValues.add(geometryValue);
                     break;
 
                 case "image":
                     ImageValue imageValue = new ImageValue();
-                    imageValue.setParameterName((String) entity.get("param_name"));
-                    imageValue.setTaskRunId(UUID.fromString((String) entity.get("task_run_id")));
+                    imageValue.setParameterName((String) entity.get("parameterName"));
+                    imageValue.setTaskRunId(UUID.fromString((String) entity.get("taskRunId")));
                     imageValue.setValue(((String) entity.get("value")).getBytes());
                     parameterValues.add(imageValue);
                     break;
 
                 case "file":
                     FileValue fileValue = new FileValue();
-                    fileValue.setParameterName((String) entity.get("param_name"));
-                    fileValue.setTaskRunId(UUID.fromString((String) entity.get("task_run_id")));
+                    fileValue.setParameterName((String) entity.get("parameterName"));
+                    fileValue.setTaskRunId(UUID.fromString((String) entity.get("taskRunId")));
                     fileValue.setValue(((String) entity.get("value")).getBytes());
                     parameterValues.add(fileValue);
                     break;
+
+                default:
+                    throw new RuntimeException("Unknown class: " + value.getClass().getSimpleName().toLowerCase());
             }
         }
 
@@ -137,8 +139,7 @@ public class TaskTestsUtils {
     }
 
     public static GenericParameterProvision createProvision(String parameterName, String type, String value)
-        throws JsonProcessingException
-    {
+        throws JsonProcessingException {
         GenericParameterProvision provision = new GenericParameterProvision();
         provision.setParameterName(parameterName);
         if (type.isEmpty()) {
@@ -196,9 +197,12 @@ public class TaskTestsUtils {
         return provision;
     }
 
-    public static GenericParameterCollectionItemProvision createProvisionPart(String parameterName, String type, String value, int index)
-        throws JsonProcessingException
-    {
+    public static GenericParameterCollectionItemProvision createProvisionPart(
+        String parameterName,
+        String type,
+        String value,
+        int index
+    ) {
         GenericParameterCollectionItemProvision provision = new GenericParameterCollectionItemProvision();
         provision.setParameterName(parameterName);
         provision.setIndex(String.valueOf(index));

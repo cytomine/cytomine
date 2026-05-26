@@ -1,15 +1,19 @@
 package be.cytomine.domain.processing;
 
-import be.cytomine.domain.CytomineDomain;
-import be.cytomine.domain.project.Project;
-import be.cytomine.utils.JsonObject;
+import java.util.Optional;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-
-import java.util.Optional;
+import be.cytomine.domain.CytomineDomain;
+import be.cytomine.domain.project.Project;
+import be.cytomine.utils.JsonObject;
 
 @Entity
 @Getter
@@ -29,15 +33,22 @@ public class ImageFilterProject extends CytomineDomain {
 
 
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
-        ImageFilterProject processingServer = (ImageFilterProject)this;
+        ImageFilterProject processingServer = (ImageFilterProject) this;
 
         try {
-            processingServer.id = json.getJSONAttrLong("id",null);
-            processingServer.imageFilter = (ImageFilter) json.getJSONAttrDomain(entityManager, "imageFilter", new ImageFilter(), false);
+            processingServer.id = json.getJSONAttrLong("id", null);
+            processingServer.imageFilter = (ImageFilter) json.getJSONAttrDomain(
+                entityManager,
+                "imageFilter",
+                new ImageFilter(),
+                false
+            );
             processingServer.project = (Project) json.getJSONAttrDomain(entityManager, "project", new Project(), false);
         } catch (Exception e) {
-            processingServer.imageFilter = (ImageFilter) json.getJSONObject("imageFilter").getJSONAttrDomain(entityManager, "id", new ImageFilter(), false);
-            processingServer.project = (Project) json.getJSONObject("project").getJSONAttrDomain(entityManager, "id", new Project(), false);
+            processingServer.imageFilter = (ImageFilter) json.getJSONObject("imageFilter")
+                .getJSONAttrDomain(entityManager, "id", new ImageFilter(), false);
+            processingServer.project = (Project) json.getJSONObject("project")
+                .getJSONAttrDomain(entityManager, "id", new Project(), false);
         }
 
         processingServer.created = json.getJSONAttrDate("created");
@@ -47,15 +58,33 @@ public class ImageFilterProject extends CytomineDomain {
 
     public static JsonObject getDataFromDomain(CytomineDomain domain) {
         JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
-        ImageFilterProject processingServer = (ImageFilterProject)domain;
+        ImageFilterProject processingServer = (ImageFilterProject) domain;
 
-        returnArray.put("imageFilter", Optional.ofNullable(processingServer.getImageFilter()).map(CytomineDomain::getId).orElse(null));
-        returnArray.put("project", Optional.ofNullable(processingServer.getProject()).map(CytomineDomain::getId).orElse(null));
+        returnArray.put(
+            "imageFilter",
+            Optional.ofNullable(processingServer.getImageFilter()).map(CytomineDomain::getId).orElse(null)
+        );
+        returnArray.put(
+            "project",
+            Optional.ofNullable(processingServer.getProject()).map(CytomineDomain::getId).orElse(null)
+        );
 
-        returnArray.put("baseUrl", Optional.ofNullable(processingServer.getImageFilter()).map(ImageFilter::getBaseUrl).orElse(null));
-        returnArray.put("name", Optional.ofNullable(processingServer.getImageFilter()).map(ImageFilter::getName).orElse(null));
-        returnArray.put("method", Optional.ofNullable(processingServer.getImageFilter()).map(ImageFilter::getMethod).orElse(null));
-        returnArray.put("available", Optional.ofNullable(processingServer.getImageFilter()).map(ImageFilter::getAvailable).orElse(null));
+        returnArray.put(
+            "baseUrl",
+            Optional.ofNullable(processingServer.getImageFilter()).map(ImageFilter::getBaseUrl).orElse(null)
+        );
+        returnArray.put(
+            "name",
+            Optional.ofNullable(processingServer.getImageFilter()).map(ImageFilter::getName).orElse(null)
+        );
+        returnArray.put(
+            "method",
+            Optional.ofNullable(processingServer.getImageFilter()).map(ImageFilter::getMethod).orElse(null)
+        );
+        returnArray.put(
+            "available",
+            Optional.ofNullable(processingServer.getImageFilter()).map(ImageFilter::getAvailable).orElse(null)
+        );
 
         return returnArray;
     }

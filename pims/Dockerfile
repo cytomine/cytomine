@@ -46,7 +46,7 @@ RUN apt-get update && \
         libvips42 \
         libwebp-dev
 
-COPY --from=registry.cytomine.org/github/ghcr.io/astral-sh/uv:0.8.13 /uv /uvx /bin/
+COPY --from=registry.cytomine.org/github/ghcr.io/astral-sh/uv:0.9.30 /uv /uvx /bin/
 
 # Download plugins
 WORKDIR /app

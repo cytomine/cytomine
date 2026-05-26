@@ -5,6 +5,7 @@ metadata:
   labels:
     app: sam
 spec:
+  progressDeadlineSeconds: 1200
   replicas: 1
   selector:
     matchLabels:
@@ -22,6 +23,8 @@ spec:
       volumes:
         - name: temp
           emptyDir: {}
+        - name: sam-cache
+          emptyDir: {}
       containers:
       -   name: sam
           securityContext:
@@ -37,3 +40,27 @@ spec:
           volumeMounts:
             - name: temp
               mountPath: /tmp
+            - name: sam-cache
+              mountPath: /.cache
+          startupProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.sam.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 30
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.sam.port }}
+            periodSeconds: 5
+            failureThreshold: 3
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.sam.port }}
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 5

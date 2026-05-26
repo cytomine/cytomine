@@ -62,22 +62,24 @@ export default class AnnotationCollection extends Collection {
     if (!this.project) {
       throw new Error('Cannot construct download if no project ID is provided.');
     }
-    let paramsBody = {format: format};
-    let paramFields = ['format', 'reviewed', 'terms', 'users', 'reviewUsers', 'images', 'noTerm', 'multipleTerms', 'afterThan', 'beforeThan'];
+
+    let paramsBody = {format};
+    const paramFields = ['reviewed', 'terms', 'users', 'reviewUsers', 'images', 'noTerm', 'multipleTerms', 'afterThan', 'beforeThan'];
     paramFields.forEach(param => {
       if (this[param] !== null) {
         paramsBody[param] = this[param];
       }
     });
-    // from this collection create a json
-    let uri = `project/${this.project}/annotation/download`;
-    Cytomine.instance.api.post(uri, paramsBody, {
-      responseType: 'blob',
-    }).then(response => {
+
+    Cytomine.instance.api.post(
+      `project/${this.project}/annotation/download`,
+      paramsBody,
+      {responseType: 'blob'}
+    ).then(response => {
       const cd = response.headers?.['content-disposition'];
       const filename = this.getFilenameFromContentDisposition(cd);
       this.triggerBlobDownload(response.data, filename);
-    }) ;
+    });
   }
 
   triggerBlobDownload(blob, filename) {
@@ -93,7 +95,6 @@ export default class AnnotationCollection extends Collection {
   }
 
   getFilenameFromContentDisposition(contentDisposition) {
-
     const starMatch = contentDisposition.match(/filename\*\s*=\s*([^;]+)/i);
     if (starMatch) {
       const value = starMatch[1].trim();

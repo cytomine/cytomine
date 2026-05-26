@@ -1,5 +1,22 @@
 package be.cytomine.controller.stats;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.Optional;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import be.cytomine.common.repository.http.TermHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.ImageInstance;
@@ -9,19 +26,12 @@ import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
-import be.cytomine.repository.ontology.TermRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.service.social.ProjectConnectionService;
 import be.cytomine.service.stats.StatsService;
 import be.cytomine.utils.JsonObject;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.Date;
 
 import static org.springframework.security.acls.domain.BasePermission.READ;
 
@@ -39,32 +49,28 @@ public class RestStatsController extends RestCytomineController {
 
     private final CurrentUserService currentUserService;
 
-    private final TermRepository termRepository;
+    private final TermHttpContract termRepository;
 
     private final ProjectConnectionService projectConnectionService;
 
     @GetMapping("/project/{project}/stats/term.json")
-    public ResponseEntity<String> statTerm(
-            @PathVariable("project") Long projectId,
-            @RequestParam(value = "startDate", required = false) Long startDateLong,
-            @RequestParam(value = "endDate", required = false) Long endDateLong,
-            @RequestParam(required = false, defaultValue = "true") Boolean leafOnly
-    ) {
-        Project project = projectService.find(projectId)
-                .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
+    public ResponseEntity<String> statTerm(@PathVariable("project") Long projectId,
+                                           @RequestParam(value = "startDate", required = false) Long startDateLong,
+                                           @RequestParam(value = "endDate", required = false) Long endDateLong,
+                                           @RequestParam(required = false, defaultValue = "true") Boolean leafOnly) {
+        Project project =
+            projectService.find(projectId).orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
         Date startDate = startDateLong != null ? new Date(startDateLong) : null;
         Date endDate = endDateLong != null ? new Date(endDateLong) : null;
         return responseSuccess(statsService.statTerm(project, startDate, endDate, leafOnly));
     }
 
     @GetMapping("/project/{project}/stats/user.json")
-    public ResponseEntity<String> statUser(
-            @PathVariable("project") Long projectId,
-            @RequestParam(value = "startDate", required = false) Long startDateLong,
-            @RequestParam(value = "endDate", required = false) Long endDateLong
-    ) {
-        Project project = projectService.find(projectId)
-                .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
+    public ResponseEntity<String> statUser(@PathVariable("project") Long projectId,
+                                           @RequestParam(value = "startDate", required = false) Long startDateLong,
+                                           @RequestParam(value = "endDate", required = false) Long endDateLong) {
+        Project project =
+            projectService.find(projectId).orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
         Date startDate = startDateLong != null ? new Date(startDateLong) : null;
         Date endDate = endDateLong != null ? new Date(endDateLong) : null;
         return responseSuccess(statsService.statUser(project, startDate, endDate));
@@ -72,108 +78,111 @@ public class RestStatsController extends RestCytomineController {
 
     @GetMapping("/project/{project}/stats/termslide.json")
     public ResponseEntity<String> statTermSlide(
-            @PathVariable("project") Long projectId,
-            @RequestParam(value = "startDate", required = false) Long startDateLong,
-            @RequestParam(value = "endDate", required = false) Long endDateLong
+        @PathVariable("project") Long projectId,
+        @RequestParam(value = "startDate", required = false) Optional<Long> startDateLong,
+        @RequestParam(value = "endDate", required = false) Optional<Long> endDateLong
     ) {
         Project project = projectService.find(projectId)
-                .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
-        Date startDate = startDateLong != null ? new Date(startDateLong) : null;
-        Date endDate = endDateLong != null ? new Date(endDateLong) : null;
-        return responseSuccess(statsService.statTermSlide(project, startDate, endDate));
+            .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
+
+        Optional<LocalDateTime> startLocalDateTime = startDateLong.map(Instant::ofEpochMilli)
+            .map(i -> LocalDateTime.ofInstant(i, ZoneId.systemDefault()));
+        Optional<LocalDateTime> endLocalDateTime = endDateLong.map(Instant::ofEpochMilli)
+            .map(i -> LocalDateTime.ofInstant(i, ZoneId.systemDefault()));
+
+        return responseSuccess(statsService.statTermSlide(project, startLocalDateTime, endLocalDateTime));
     }
 
     @GetMapping("/project/{project}/stats/termimage.json")
-    public ResponseEntity<String> statPerTermAndImage(
-            @PathVariable("project") Long projectId,
-            @RequestParam(value = "startDate", required = false) Long startDateLong,
-            @RequestParam(value = "endDate", required = false) Long endDateLong
-    ) {
-        Project project = projectService.find(projectId)
-                .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
+    public ResponseEntity<String> statPerTermAndImage(@PathVariable("project") Long projectId,
+                                                      @RequestParam(value = "startDate", required = false)
+                                                      Long startDateLong,
+                                                      @RequestParam(value = "endDate", required = false)
+                                                      Long endDateLong) {
+        Project project =
+            projectService.find(projectId).orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
         Date startDate = startDateLong != null ? new Date(startDateLong) : null;
         Date endDate = endDateLong != null ? new Date(endDateLong) : null;
         return responseSuccess(statsService.statPerTermAndImage(project, startDate, endDate));
     }
 
     @GetMapping("/project/{project}/stats/userslide.json")
-    public ResponseEntity<String> statUserSlide(
-            @PathVariable("project") Long projectId,
-            @RequestParam(value = "startDate", required = false) Long startDateLong,
-            @RequestParam(value = "endDate", required = false) Long endDateLong
-    ) {
-        Project project = projectService.find(projectId)
-                .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
+    public ResponseEntity<String> statUserSlide(@PathVariable("project") Long projectId,
+                                                @RequestParam(value = "startDate", required = false) Long startDateLong,
+                                                @RequestParam(value = "endDate", required = false) Long endDateLong) {
+        Project project =
+            projectService.find(projectId).orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
         Date startDate = startDateLong != null ? new Date(startDateLong) : null;
         Date endDate = endDateLong != null ? new Date(endDateLong) : null;
         return responseSuccess(statsService.statUserSlide(project, startDate, endDate));
     }
 
     @GetMapping("/project/{project}/stats/userannotations.json")
-    public ResponseEntity<String> statUserAnnotations(
-            @PathVariable("project") Long projectId
-    ) {
-        Project project = projectService.find(projectId)
-                .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
+    public ResponseEntity<String> statUserAnnotations(@PathVariable("project") Long projectId) {
+        Project project =
+            projectService.find(projectId).orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
         return responseSuccess(statsService.statUserAnnotations(project));
     }
 
     @GetMapping("/project/{project}/stats/annotationevolution.json")
     public ResponseEntity<String> statAnnotationEvolution(
-            @PathVariable("project") Long projectId,
-            @RequestParam(required = false, defaultValue = "1") Integer daysRange,
-            @RequestParam(value = "startDate", required = false) Long startDateLong,
-            @RequestParam(value = "endDate", required = false) Long endDateLong,
-            @RequestParam(value = "term", required = false) Long termId,
-            @RequestParam(value = "accumulate", required = false, defaultValue = "true") Boolean accumulate,
-            @RequestParam(value = "reverseOrder", required = false, defaultValue = "true") Boolean reverseOrder
+        @PathVariable("project") Long projectId,
+        @RequestParam(required = false, defaultValue = "1")
+        Integer daysRange,
+        @RequestParam(value = "startDate", required = false)
+        Long startDateLong,
+        @RequestParam(value = "endDate", required = false)
+        Long endDateLong,
+        @RequestParam(value = "term", required = false) Optional<Long> termId,
+        @RequestParam(value = "accumulate", required = false, defaultValue = "true")
+        Boolean accumulate,
+        @RequestParam(value = "reverseOrder", required = false, defaultValue = "true")
+        Boolean reverseOrder
     ) {
-        Project project = projectService.find(projectId)
-                .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
-
-        Term term = null;
-        if (termId !=null) {
-            term = termRepository.findById(termId)
-                    .orElseThrow(() -> new ObjectNotFoundException("Term", termId));
-        }
+        Project project =
+            projectService.find(projectId).orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
 
         Date startDate = startDateLong != null ? new Date(startDateLong) : null;
         Date endDate = endDateLong != null ? new Date(endDateLong) : null;
 
-        return responseSuccess(statsService.statAnnotationEvolution(project, term, daysRange, startDate, endDate, reverseOrder, accumulate));
+        return responseSuccess(
+            statsService.statAnnotationEvolution(project, termId, daysRange, startDate, endDate, reverseOrder,
+                accumulate));
     }
 
     @GetMapping("/project/{project}/stats/reviewedannotationevolution.json")
     public ResponseEntity<String> statReviewedAnnotationEvolution(
-            @PathVariable("project") Long projectId,
-            @RequestParam(required = false, defaultValue = "1") Integer daysRange,
-            @RequestParam(value = "startDate", required = false) Long startDateLong,
-            @RequestParam(value = "endDate", required = false) Long endDateLong,
-            @RequestParam(value = "term", required = false) Long termId,
-            @RequestParam(value = "accumulate", required = false, defaultValue = "true") Boolean accumulate,
-            @RequestParam(value = "reverseOrder", required = false, defaultValue = "true") Boolean reverseOrder
+        @PathVariable("project") Long projectId,
+        @RequestParam(required = false, defaultValue = "1")
+        Integer daysRange,
+        @RequestParam(value = "startDate", required = false)
+        Long startDateLong,
+        @RequestParam(value = "endDate", required = false)
+        Long endDateLong,
+        @RequestParam(value = "term", required = false)
+        Optional<Long> termId,
+        @RequestParam(value = "accumulate", required = false, defaultValue = "true")
+        Boolean accumulate,
+        @RequestParam(value = "reverseOrder", required = false, defaultValue = "true")
+        Boolean reverseOrder
     ) {
-        Project project = projectService.find(projectId)
-                .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
+        Project project =
+            projectService.find(projectId).orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
 
-        Term term = null;
-        if (termId !=null) {
-            term = termRepository.findById(termId)
-                    .orElseThrow(() -> new ObjectNotFoundException("Term", termId));
-        }
 
         Date startDate = startDateLong != null ? new Date(startDateLong) : null;
         Date endDate = endDateLong != null ? new Date(endDateLong) : null;
 
-        return responseSuccess(statsService.statReviewedAnnotationEvolution(project, term, daysRange, startDate, endDate, reverseOrder, accumulate));
+        return responseSuccess(
+            statsService.statReviewedAnnotationEvolution(project, termId, daysRange, startDate, endDate, reverseOrder,
+                accumulate));
     }
 
     @GetMapping("/term/{id}/project/stat.json")
     public ResponseEntity<String> statAnnotationTermedByProject(@PathVariable Long id) {
-        Term term = termRepository.findById(id)
-                    .orElseThrow(() -> new ObjectNotFoundException("Term", id));
-        securityACLService.check(term.container(),READ);
-        return responseSuccess(statsService.statAnnotationTermedByProject(term));
+        TermResponse term = termRepository.findTermByID(id, currentUserService.getCurrentUser().getId())
+            .orElseThrow(() -> new ObjectNotFoundException("Term", id));
+        return responseSuccess(statsService.statAnnotationTermedByProject(term.id(), term.ontologyId()));
     }
 
     @GetMapping("/total/project/connections.json")
@@ -209,57 +218,72 @@ public class RestStatsController extends RestCytomineController {
 
     @GetMapping("/project/{project}/stats/connectionsevolution.json")
     public ResponseEntity<String> statConnectionsEvolution(
-            @PathVariable(value = "project") Long projectId,
-            @RequestParam(required = false, defaultValue = "1") Integer daysRange,
-            @RequestParam(value = "startDate", required = false) Long startDateLong,
-            @RequestParam(value = "endDate", required = false) Long endDateLong,
-            @RequestParam(value = "accumulate", required = false, defaultValue = "true") Boolean accumulate
+        @PathVariable(value = "project") Long projectId,
+        @RequestParam(required = false, defaultValue = "1")
+        Integer daysRange,
+        @RequestParam(value = "startDate", required = false)
+        Long startDateLong,
+        @RequestParam(value = "endDate", required = false)
+        Long endDateLong,
+        @RequestParam(value = "accumulate", required = false, defaultValue = "true")
+        Boolean accumulate
     ) {
-        Project project = projectService.find(projectId)
-                .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
+        Project project =
+            projectService.find(projectId).orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
         securityACLService.check(project, READ);
 
         Date startDate = startDateLong != null ? new Date(startDateLong) : null;
         Date endDate = endDateLong != null ? new Date(endDateLong) : null;
 
-        return responseSuccess(statsService.statConnectionsEvolution(project, daysRange, startDate, endDate, accumulate));
+        return responseSuccess(
+            statsService.statConnectionsEvolution(project, daysRange, startDate, endDate, accumulate));
     }
 
     @GetMapping("/project/{project}/stats/imageconsultationsevolution.json")
     public ResponseEntity<String> statImageConsultationsEvolution(
-            @PathVariable(value = "project") Long projectId,
-            @RequestParam(required = false, defaultValue = "1") Integer daysRange,
-            @RequestParam(value = "startDate", required = false) Long startDateLong,
-            @RequestParam(value = "endDate", required = false) Long endDateLong,
-            @RequestParam(value = "accumulate", required = false, defaultValue = "true") Boolean accumulate
+        @PathVariable(value = "project") Long projectId,
+        @RequestParam(required = false, defaultValue = "1")
+        Integer daysRange,
+        @RequestParam(value = "startDate", required = false)
+        Long startDateLong,
+        @RequestParam(value = "endDate", required = false)
+        Long endDateLong,
+        @RequestParam(value = "accumulate", required = false, defaultValue = "true")
+        Boolean accumulate
     ) {
-        Project project = projectService.find(projectId)
-                .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
+        Project project =
+            projectService.find(projectId).orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
         securityACLService.check(project, READ);
 
         Date startDate = startDateLong != null ? new Date(startDateLong) : null;
         Date endDate = endDateLong != null ? new Date(endDateLong) : null;
 
-        return responseSuccess(statsService.statImageConsultationsEvolution(project, daysRange, startDate, endDate, accumulate));
+        return responseSuccess(
+            statsService.statImageConsultationsEvolution(project, daysRange, startDate, endDate, accumulate));
     }
 
     @GetMapping("/project/{project}/stats/annotationactionsevolution.json")
     public ResponseEntity<String> statAnnotationActionsEvolution(
-            @PathVariable(value = "project") Long projectId,
-            @RequestParam(required = false, defaultValue = "1") Integer daysRange,
-            @RequestParam(value = "startDate", required = false) Long startDateLong,
-            @RequestParam(value = "endDate", required = false) Long endDateLong,
-            @RequestParam(value = "accumulate", required = false, defaultValue = "true") Boolean accumulate,
-            @RequestParam(required = false) String type
+        @PathVariable(value = "project") Long projectId,
+        @RequestParam(required = false, defaultValue = "1")
+        Integer daysRange,
+        @RequestParam(value = "startDate", required = false)
+        Long startDateLong,
+        @RequestParam(value = "endDate", required = false)
+        Long endDateLong,
+        @RequestParam(value = "accumulate", required = false, defaultValue = "true")
+        Boolean accumulate,
+        @RequestParam(required = false) String type
     ) {
-        Project project = projectService.find(projectId)
-                .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
+        Project project =
+            projectService.find(projectId).orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
         securityACLService.check(project, READ);
 
         Date startDate = startDateLong != null ? new Date(startDateLong) : null;
         Date endDate = endDateLong != null ? new Date(endDateLong) : null;
 
-        return responseSuccess(statsService.statAnnotationActionsEvolution(project, daysRange, startDate, endDate, accumulate, type));
+        return responseSuccess(
+            statsService.statAnnotationActionsEvolution(project, daysRange, startDate, endDate, accumulate, type));
     }
 
     @GetMapping("/stats/all.json")

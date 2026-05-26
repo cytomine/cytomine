@@ -1,18 +1,27 @@
 package be.cytomine.service.appengine;
 
-import be.cytomine.exceptions.AppEngineException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Map;
+import be.cytomine.dto.appengine.task.output.TaskRunOutput;
+import be.cytomine.exceptions.AppEngineException;
 
 @Slf4j
 @Service
@@ -35,17 +44,28 @@ public class AppEngineService {
         return restTemplate.exchange(buildFullUrl(uri), HttpMethod.GET, null, String.class).getBody();
     }
 
+    public List<TaskRunOutput> getTaskRunOutputs(UUID taskRunId) {
+        return restTemplate.exchange(
+            buildFullUrl("task-runs/" + taskRunId + "/outputs"),
+            HttpMethod.GET,
+            null,
+            new ParameterizedTypeReference<List<TaskRunOutput>>() {}
+        ).getBody();
+    }
+
     public void delete(String uri) {
         restTemplate.exchange(buildFullUrl(uri), HttpMethod.DELETE, null, Void.class);
     }
 
     public void getStreamedFile(String uri, OutputStream outputStream) {
-        restTemplate.execute(buildFullUrl(uri), HttpMethod.GET, null, response -> {
-            try (InputStream in = response.getBody()) {
-                in.transferTo(outputStream);
-                return null;
+        restTemplate.execute(
+            buildFullUrl(uri), HttpMethod.GET, null, response -> {
+                try (InputStream in = response.getBody()) {
+                    in.transferTo(outputStream);
+                    return null;
+                }
             }
-        });
+        );
 
     }
 
@@ -57,7 +77,11 @@ public class AppEngineService {
             ResponseEntity<String> result = restTemplate.exchange(buildFullUrl(uri), method, request, String.class);
             return result.getBody();
         } catch (HttpStatusCodeException e) {
-            throw new AppEngineException("error from appengine", e.getStatusCode().value(), e.getResponseBodyAsString());
+            throw new AppEngineException(
+                "error from appengine",
+                e.getStatusCode().value(),
+                e.getResponseBodyAsString()
+            );
         }
     }
 
@@ -70,7 +94,7 @@ public class AppEngineService {
     }
 
     public <B> String postWithParams(String uri, B body, MediaType contentType, Map<String, String> queryParams) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(apiUrl + apiBasePath + uri);
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(apiUrl + apiBasePath + uri);
         if (queryParams != null) {
             queryParams.forEach(builder::queryParam);
         }
@@ -83,7 +107,11 @@ public class AppEngineService {
             return restTemplate.exchange(finalUrl, HttpMethod.POST, requestEntity, String.class)
                 .getBody();
         } catch (HttpStatusCodeException e) {
-            throw new AppEngineException("error from appengine", e.getStatusCode().value(), e.getResponseBodyAsString());
+            throw new AppEngineException(
+                "error from appengine",
+                e.getStatusCode().value(),
+                e.getResponseBodyAsString()
+            );
         }
     }
 }

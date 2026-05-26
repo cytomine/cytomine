@@ -35,7 +35,7 @@ public class RetrievalService {
 
     public static final String CBIR_API_BASE_PATH = "/cbir";
 
-    private final static String INDEX_NAME = "annotation";
+    private static final String INDEX_NAME = "annotation";
 
     private final ImageServerService imageServerService;
 
@@ -50,7 +50,7 @@ public class RetrievalService {
 
     public void createStorage(String projectId) {
         URI url = UriComponentsBuilder
-            .fromHttpUrl(getInternalCbirURL())
+            .fromUriString(getInternalCbirURL())
             .path("/storages")
             .build()
             .toUri();
@@ -78,7 +78,7 @@ public class RetrievalService {
 
     public void deleteStorage(String projectId) {
         URI url = UriComponentsBuilder
-            .fromHttpUrl(getInternalCbirURL())
+            .fromUriString(getInternalCbirURL())
             .pathSegment("storages", projectId)
             .build()
             .toUri();
@@ -119,7 +119,7 @@ public class RetrievalService {
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
         byte[] image = Objects.requireNonNull(getImageAnnotation(annotation));
-        ByteArrayResource resource =  new ByteArrayResource(image) {
+        ByteArrayResource resource = new ByteArrayResource(image) {
             @Override
             public String getFilename() {
                 return annotation.getId().toString();
@@ -135,7 +135,7 @@ public class RetrievalService {
     public ResponseEntity<String> indexAnnotation(AnnotationDomain annotation) {
         String storageName = annotation.getProject().getId().toString();
         URI url = UriComponentsBuilder
-            .fromHttpUrl(getInternalCbirURL())
+            .fromUriString(getInternalCbirURL())
             .path("/images")
             .queryParam("storage", storageName)
             .queryParam("index", INDEX_NAME)
@@ -150,7 +150,7 @@ public class RetrievalService {
 
     public ResponseEntity<String> deleteIndex(AnnotationDomain annotation) {
         URI url = UriComponentsBuilder
-            .fromHttpUrl(getInternalCbirURL())
+            .fromUriString(getInternalCbirURL())
             .pathSegment("images", annotation.getId().toString())
             .queryParam("storage", annotation.getProject().getId())
             .queryParam("index", INDEX_NAME)
@@ -180,13 +180,13 @@ public class RetrievalService {
         return percentages;
     }
 
-    public ResponseEntity<SearchResponse> retrieveSimilarImages(AnnotationDomain annotation, Long nrt_neigh) {
+    public ResponseEntity<SearchResponse> retrieveSimilarImages(AnnotationDomain annotation, Long nearestNeighbours) {
         String url = UriComponentsBuilder
-            .fromHttpUrl(getInternalCbirURL())
+            .fromUriString(getInternalCbirURL())
             .path("/search")
             .queryParam("storage", annotation.getProject().getId())
             .queryParam("index", INDEX_NAME)
-            .queryParam("nrt_neigh", nrt_neigh + 1)
+            .queryParam("nrt_neigh", nearestNeighbours + 1)
             .toUriString();
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = createEntity(annotation);

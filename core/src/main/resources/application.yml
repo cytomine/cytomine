@@ -33,14 +33,14 @@ spring:
             jwk-set-uri: ${IAM_URL}/iam/realms/cytomine/.well-known/openid-configuration
       resourceserver:
         jwt:
-          issuer-uri: ${SERVER_URL:http://127.0.0.1}/iam/realms/cytomine
+          issuer-uri: ${IAM_EXTERNAL_URL:http://127.0.0.1:8070}/iam/realms/cytomine
           jws-algorithms: RS256
           jwk-set-uri: ${IAM_URL}/iam/realms/cytomine/protocol/openid-connect/certs
 
 
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:postgresql://${POSTGIS_HOST:localhost}:${POSTGIS_PORT:5432}/${POSTGIS_DB_NAME:docker}
+    url: jdbc:postgresql://${POSTGIS_HOST:127.0.0.1}:${POSTGIS_PORT:5432}/${POSTGIS_DB_NAME:docker}
     username: ${POSTGIS_USER:docker}
     password: ${POSTGIS_PASS:password}
     hikari:
@@ -65,7 +65,7 @@ spring:
   data:
     mongodb:
       authentication-database: admin
-      username: ${MONGO_USER:mongoadmin}
+      username: ${MONGO_USER:admin}
       password: ${MONGO_PASS:password}
       database: ${MONGO_DB_NAME:cytomine}
       port: ${MONGO_PORT:27017}
@@ -82,9 +82,6 @@ spring:
           auth: ${SMTP_AUTH:true}
           starttls:
             enable: ${SMTP_STARTTLS:true}
-
-  jackson:
-    property-naming-strategy: SNAKE_CASE
 
 server:
   port: ${PORT:8080}
@@ -108,8 +105,8 @@ application:
   adminPrivateKey: ${ADMIN_PRIVATE_KEY:adminPrivateKey}
   superAdminPublicKey: ${SUPER_ADMIN_PUBLIC_KEY:superAdminPublicKey}
   superAdminPrivateKey: ${SUPER_ADMIN_PRIVATE_KEY:superAdminPrivateKey}
-  ImageServerPublicKey: ${IMAGE_SERVER_PUBLIC_KEY:imageServerPublicKey}
-  ImageServerPrivateKey: ${IMAGE_SERVER_PRIVATE_KEY:imageServerPrivateKey}
+  imageServerPublicKey: ${IMAGE_SERVER_PUBLIC_KEY:imageServerPublicKey}
+  imageServerPrivateKey: ${IMAGE_SERVER_PRIVATE_KEY:imageServerPrivateKey}
   instanceHostWebsite: ${INSTANCE_HOST_WEBSITE_URL:#{'https://www.cytomine.com'}}
   instanceHostSupportMail: ${INSTANCE_HOST_SUPPORT_MAIL:support@cytomine.com}
   instanceHostPhoneNumber: ${INSTANCE_HOST_PHONE_NUMBER:+320/000.00.00}
@@ -130,6 +127,7 @@ application:
   pimsURL: ${PIMS_URL}
   samURL: ${SAM_URL}
   cbirURL: ${CBIR_URL}
+  repositoryURL: ${REPOSITORY_URL}
 
   annotation:
     maxNumberOfPoint: ${ANNOTATION_MAX_POINTS:200}
@@ -144,3 +142,15 @@ jwt:
     converter:
       resource-id: core
       principle-attribute: preferred_username
+
+# admin of the master realm not cytomine realm
+keycloak-client:
+  admin:
+    user: ${KEYCLOAK_ADMIN:admin}
+    password: ${KEYCLOAK_ADMIN_PASSWORD:password}
+    realm: master
+  target:
+    realm: cytomine
+    client-id: core
+  client-id: admin-cli
+  url: ${IAM_URL:http://iam:8100}/iam

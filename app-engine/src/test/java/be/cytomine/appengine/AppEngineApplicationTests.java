@@ -12,7 +12,7 @@ import be.cytomine.appengine.config.PostgresConfiguration;
 @SpringBootTest(
     properties = {
         "spring.datasource.driver-class-name=org.testcontainers.jdbc.ContainerDatabaseDriver",
-        "spring.datasource.url=jdbc:tc:postgresql:14:///appengine"
+        "spring.datasource.url=jdbc:tc:postgresql:15:///appengine"
     }
 )
 @ActiveProfiles("test")

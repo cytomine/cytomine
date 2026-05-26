@@ -10,7 +10,7 @@ public interface StorageHandler {
 
     boolean checkStorageExists(Storage storage) throws FileStorageException;
 
-    boolean checkStorageExists(String idStorage) throws FileStorageException;
+    boolean checkStorageExists(String storageId) throws FileStorageException;
 
     void deleteStorageData(StorageData file) throws FileStorageException;
 

@@ -116,22 +116,28 @@ spec:
           ports:
             - name: http
               containerPort: {{ .Values.pims.port }}
-          readinessProbe:
+          startupProbe:
             httpGet:
               path: /ims/disk-usage
               port: {{ .Values.pims.port }}
             initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 30
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /ims/disk-usage
+              port: {{ .Values.pims.port }}
             periodSeconds: 5
-            failureThreshold: 12
+            failureThreshold: 3
             timeoutSeconds: 5
           livenessProbe:
             httpGet:
               path: /ims/disk-usage
               port: {{ .Values.pims.port }}
-            initialDelaySeconds: 60
-            periodSeconds: 30
+            periodSeconds: 10
             failureThreshold: 3
-            timeoutSeconds: 10
+            timeoutSeconds: 5
           securityContext:
           {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
           resources:

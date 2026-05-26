@@ -7,7 +7,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(prefix = "application", ignoreUnknownFields = true)
+@ConfigurationProperties(prefix = "application")
 @Getter
 @Setter
 public class ApplicationProperties {
@@ -17,8 +17,6 @@ public class ApplicationProperties {
     private String version;
 
     private String serverURL;
-
-//    private NotificationProperties notification;
 
     private String storagePath;
 
@@ -58,32 +56,19 @@ public class ApplicationProperties {
     @NotBlank
     private String superAdminPublicKey;
 
-    private String ImageServerPrivateKey;
+    private String imageServerPrivateKey;
 
-    private String ImageServerPublicKey;
+    private String imageServerPublicKey;
 
     private String defaultLanguage;
 
     private Annotation annotation;
 
-    public Annotation getAnnotation() {
-        return annotation;
-    }
+    @ToString
+    @Getter
+    @Setter
+    public static class Annotation {
+        int maxNumberOfPoint;
 
-    public void setAnnotation(Annotation annotation) {
-        this.annotation = annotation;
-    }
-}
-
-@ToString
-class Annotation {
-    int maxNumberOfPoint;
-
-    public int getMaxNumberOfPoint() {
-        return maxNumberOfPoint;
-    }
-
-    public void setMaxNumberOfPoint(int maxNumberOfPoint) {
-        this.maxNumberOfPoint = maxNumberOfPoint;
     }
 }

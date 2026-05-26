@@ -1,5 +1,17 @@
 package be.cytomine.appengine.unit.services;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.util.Optional;
+import java.util.UUID;
+
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
+
 import be.cytomine.appengine.dto.responses.errors.ErrorCode;
 import be.cytomine.appengine.dto.responses.errors.ErrorDefinitions;
 import be.cytomine.appengine.exceptions.AppStoreNotFoundException;
@@ -8,22 +20,18 @@ import be.cytomine.appengine.exceptions.ValidationException;
 import be.cytomine.appengine.models.store.AppStore;
 import be.cytomine.appengine.repositories.AppStoreRepository;
 import be.cytomine.appengine.services.AppStoreService;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Optional;
-import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.isNull;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class AppStoreServiceTest {
 
@@ -136,7 +144,10 @@ class AppStoreServiceTest {
         );
 
         assertNotNull(exception);
-        assertEquals(ErrorDefinitions.fromCode(ErrorCode.INTERNAL_INVALID_STORE_DATA).getMessage(), exception.getError().getMessage());
+        assertEquals(
+            ErrorDefinitions.fromCode(ErrorCode.INTERNAL_INVALID_STORE_DATA).getMessage(),
+            exception.getError().getMessage()
+        );
         verify(appStoreRepository, never()).save(any());
     }
 
@@ -152,8 +163,9 @@ class AppStoreServiceTest {
 
         assertNotNull(exception);
         assertEquals(
-            ErrorDefinitions.fromCode(ErrorCode.INTERNAL_INVALID_STORE_DATA).getMessage(), 
-            exception.getError().getMessage());
+            ErrorDefinitions.fromCode(ErrorCode.INTERNAL_INVALID_STORE_DATA).getMessage(),
+            exception.getError().getMessage()
+        );
         verify(appStoreRepository, never()).save(any());
     }
 
@@ -173,8 +185,9 @@ class AppStoreServiceTest {
 
         assertNotNull(exception);
         assertEquals(
-            ErrorDefinitions.fromCode(ErrorCode.INTERNAL_INVALID_STORE_ALREADY_EXISTS).getMessage(), 
-            exception.getError().getMessage());
+            ErrorDefinitions.fromCode(ErrorCode.INTERNAL_INVALID_STORE_ALREADY_EXISTS).getMessage(),
+            exception.getError().getMessage()
+        );
         verify(appStoreRepository, never()).save(any());
     }
 
@@ -192,13 +205,14 @@ class AppStoreServiceTest {
         Path tempPath = Path.of("bundle-" + UUID.randomUUID() + ".zip");
         when(appStoreService.findDefault()).thenReturn(Optional.of(defaultStore));
         when(restTemplate.execute(
-                eq(defaultStore.getHost() + "/api/v1/tasks/" + namespace + "/" + version + "/bundle.zip"),
-                eq(org.springframework.http.HttpMethod.GET),
-                isNull(),
-                any(),
-                eq(namespace),
-                eq(version)))
-                .thenReturn(null);
+            eq(defaultStore.getHost() + "/api/v1/tasks/" + namespace + "/" + version + "/bundle.zip"),
+            eq(org.springframework.http.HttpMethod.GET),
+            isNull(),
+            any(),
+            eq(namespace),
+            eq(version)
+        ))
+            .thenReturn(null);
 
         File downloadedFile = appStoreService.downloadTask(namespace, version);
 
@@ -213,8 +227,8 @@ class AppStoreServiceTest {
         String version = "1.0.0";
 
         AppStoreServiceException exception = assertThrows(
-                AppStoreServiceException.class,
-                () -> appStoreService.downloadTask(namespace, version)
+            AppStoreServiceException.class,
+            () -> appStoreService.downloadTask(namespace, version)
         );
 
         assertNotNull(exception);
@@ -233,17 +247,18 @@ class AppStoreServiceTest {
 
         when(appStoreService.findDefault()).thenReturn(Optional.of(defaultStore));
         when(restTemplate.execute(
-                eq(defaultStore.getHost() + "/api/v1/tasks/{namespace}/{version}/bundle.zip"),
-                eq(org.springframework.http.HttpMethod.GET),
-                isNull(),
-                any(),
-                eq(namespace),
-                eq(version)))
-                .thenThrow(new RestClientException("Download failed"));
+            eq(defaultStore.getHost() + "/api/v1/tasks/{namespace}/{version}/bundle.zip"),
+            eq(org.springframework.http.HttpMethod.GET),
+            isNull(),
+            any(),
+            eq(namespace),
+            eq(version)
+        ))
+            .thenThrow(new RestClientException("Download failed"));
 
         RestClientException exception = assertThrows(
-                RestClientException.class,
-                () -> appStoreService.downloadTask(namespace, version)
+            RestClientException.class,
+            () -> appStoreService.downloadTask(namespace, version)
         );
 
         assertNotNull(exception);

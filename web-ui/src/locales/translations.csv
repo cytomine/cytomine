@@ -65,6 +65,30 @@ annotations,Annotations,Annotations,Anotaciones,Annotaties
 annotations-vs-contributors-chart-info-message,This chart presents the number of annotation created by each project member during the selected period,Ce graphique présente le nombre d'annotations créées par chaque membre durant la période sélectionnée,Este gráfico representa el número de anotaciones creadas por cada miembro del proyecto durante el período seleccionado,Deze grafiek toont het aantal annotaties dat door elk lid tijdens de geselecteerde periode is gemaakt
 annotations-vs-terms-chart-info-message,This chart presents the number of manual annotation associated to each term. Only annotations created during the selected period are taken into account.,Ce graphique présente le nombre d'annotations manuelles associées à chaque terme. Seules les annotations créées durant la période sélectionnée sont prises en compte.,Este cuadro presenta el número de anotaciones manuales asociadas a cada término. Solo se tienen en cuenta las anotaciones creadas durante el período seleccionado.,"Dit diagram toont het aantal handmatige annotaties dat aan elke term is gekoppeld. Alleen annotaties die tijdens de geselecteerde periode zijn gemaakt, worden in aanmerking genomen."
 api-keys,API keys,Clés API,Claves API,API-sleutels
+app-dashboard,App Dashboard,Tableau de bord de l'application,Panel de la aplicación,Applicatiedashboard
+app-engine.ae-history,Tasks History,Historique des tâches,Historial de tareas,Eerdere taken
+app-engine.ae-run-task,Run Task,Exécuter la tâche,Ejecutar la tarea,Voer taak uit
+app-engine.applications,Applications,Applications,Aplicaciones,Toepassingen
+app-engine.execute-a-task,Run a task,Lancer une tâche,Ejecutor de tareas,Applicatie-uitvoerder
+app-engine.form.select-task,Select a task,Sélectionnez une tâche,Seleccione una tarea,Selecteer een taak
+app-engine.inputs.title,Inputs,Entrées,Entradas,Ingangen
+app-engine.name,App Engine,App Engine,App Engine,App Engine
+app-engine.outputs.title,Outputs,Sorties,Salidas,Uitgangen
+app-engine.parameter.name,Name,Nom,Nombre,Naam
+app-engine.parameter.type,Type,Type,Tipo,Type
+app-engine.parameter.value,Value,Valeur,Valor,Waarde
+app-engine.previous-task-runs,Previous task runs,Tâches exécutées précédemment,,
+app-engine.recent-runs,Recent runs,Exécutions récentes,Ejecuciones recientes,Recente uitvoeringen
+app-engine.run.started,Task run launched,Lancement de l'exécution de la tâche,Inicio de ejecución de tarea,Uitvoering van taak gestart
+app-engine.runs.title,Runs,Exécutions,Ejecuciones,Uitvoeringen
+app-engine.see-all-runs,See all runs,Voir toutes les exécutions,Ver todas las ejecuciones,Bekijk alle uitvoeringen
+app-engine.task-run.state.title,State,État,Estado,Status
+app-engine.task.name,Task,Tâche,Tarea,Taak
+app-engine.task.upload,Upload tasks,Téléverser des tâches,Cargar tareas,Taken uploaden
+app-engine.task.no-description,No description,Pas de description,Sin descripción,Geen beschrijving
+app-engine.tasks.installed,Installed Tasks,Tâches installées,Tareas instaladas,Geïnstalleerde taken
+app-engine.tasks.name,Tasks,Tâches,Tareas,Taken
+app-name,App Name,app-name,App Name,Nom de l'application,Nombre de la aplicación,App-naam
 app-store,App Store,App Store,App Store,App Store
 appengine-not-enabled-title,App Engine is not enabled,App Engine n'est pas activé,App Engine no está habilitado,App Engine is niet ingeschakeld
 appengine-not-enabled-description,"App Engine is not enabled on your Cytomine instance. Either contact an administrator, or contact sales@cytomine.com for requesting an upgrade of your instance.",App Engine n'est pas activé sur votre instance Cytomine. Contactez un administrateur ou envoyez un e-mail à sales@cytomine.com pour demander une mise à niveau de votre instance.,App Engine no está habilitado en su instancia de Cytomine. Póngase en contacto con un administrador o envíe un correo a sales@cytomine.com para solicitar una actualización de su instancia.,App Engine is niet ingeschakeld op uw Cytomine-instantie. Neem contact op met een beheerder of stuur een e-mail naar sales@cytomine.com om een upgrade van uw instantie aan te vragen.
@@ -211,6 +235,7 @@ confirm-deletion-attached-file,Do you really want to delete attached file {filen
 confirm-deletion-annotation-link,Are you sure you want to delete the links of this annotation?,Êtes-vous sûr de vouloir supprimer les liens de cette annotation ?,¿Está seguro de que desea eliminar los enlaces de esta anotación?,Weet u zeker dat u de links van deze annotatie wilt verwijderen?
 confirm-deletion-file,Are you sure you want to delete this file?,Êtes-vous sûr de vouloir supprimer ce fichier ?,¿Está seguro de que desea eliminar este archivo?,Bent u zeker dat u dit file wilt verwijderen?
 confirm-deletion-ontology,Are you sure you want to delete ontology {name}?,Êtes-vous sûr de vouloir supprimer l'ontologie {name} ?,¿Está seguro de que desea eliminar la ontología {name}?,Bent u zeker dat u de ontologie {name} wilt verwijderen?
+confirm-deletion-run,Are you sure you want to delete this run?,Êtes-vous sûr de vouloir supprimer cette exécution ?,¿Está seguro de que desea eliminar esta ejecución?,Weet u zeker dat u deze run wilt verwijderen?
 confirm-deletion-store,Are you sure you want to delete this store?,Êtes-vous sûr de vouloir supprimer ce magasin ?,¿Está seguro de que desea eliminar esta tienda?,Bent u zeker dat u deze winkel wilt verwijderen?
 confirm-deletion-term,Are you sure you want to delete term {name}?,Êtes-vous sûr de vouloir supprimer le terme {name} ?,¿Seguro que quiere eliminar el término {name}?,Bent u zeker dat u de term {name} wilt verwijderen?
 confirm-deletion-track,Are you sure you want to delete track {name}?,Etes-vous certain de vouloir supprimer la trace {name} ?,,Bent u zeker dat u de {name}-tracering wilt verwijderen?
@@ -350,6 +375,8 @@ execute-command,Execute command,Commande d'exécution,Ejecutar comando,Run-comma
 execution-date,Execution date,Date d'exécution,Fecha de ejecución,Executie datum
 execution-duration,Execution duration,Durée de l'exécution,Duración de la ejecución,Uitvoertijd
 execution-log,Execution log,Log d'exécution,Registro de ejecución,Uitvoeringslogboek
+export-annotations,Export annotations,Exporter les annotations,Exportar anotaciones,Annotaties exporteren
+export-ontology,Export ontology,Exporter l'ontologie,Exportar ontología,Ontologie exporteren
 extracting-data,Extracting data,Extraction des données en cours,,Gegevensextractie wordt uitgevoerd
 failed-fetch-annots,Failed to fetch annotations,Une erreur a empêché le chargement des annotations,Error al recuperar anotaciones,Door een fout konden annotaties niet worden geladen
 failed,Failed,Échoué,Fallido,Failed
@@ -466,6 +493,7 @@ last-updated-on,Last updated on,Dernière mise à jour le,Última actualización
 last-week,Last week,Dernière semaine,Última pasada,Vorige week
 last-year,Last year,Dernière année,Último año,Afgelopen jaar
 lastname,Last name,Nom,Apellido,Naam
+launched-by,Launched by,Lancé par,Lanzado por,Geïntroduceerd door
 layer,Layer,Calque,Capa,Laag
 layers-opacity,Layers opacity,Opacité des calques,Opacidad de las capas,Dekking van de lagen
 ldap,LDAP,LDAP,LDAP,LDAP
@@ -489,6 +517,7 @@ live,Live,Live,En Vivo,Live
 log-being-collected,Execution log is being collected,Le log d'exécution est en train d'être collecté,Se está recopilando el registro de ejecución.,Het uitvoeringslogboek wordt verzameld
 logarithmic,Logarithmic,Logarithmic,,Logaritmisch
 logout,Logout,Se déconnecter,Cerrar sesión,Afmelden
+logs,Logs,Journaux,Registros,Logs
 magic-wand,Magic Wand,Baguette magique,Varita mágica,Toverstok
 magnification,Magnification,Grossissement,Aumento,Vergroting
 managed-projects,Managed projects,Projets supervisés,Proyectos administrados,Begeleide projecten
@@ -1108,6 +1137,7 @@ version,Version,Version,Versión,Versie
 view-all-projects,View all projects,Voir tous les projets,Ver todos los proyectos,Alle projecten bekijken
 view,View,Visualisation d'images,Ver,Afbeeldingen bekijken
 view-linked-with,This view is linked with,Cette image est synchronisée avec :,Esta vista está vinculada con,Deze afbeelding is gesynchroniseerd met:
+view-logs,View logs,Voir les journaux,Ver registros,Logs bekijken
 viewer-center-position,viewer center position,centre du visualisateur,posición central del espectador,positie van de kijker in het midden
 viewer-group,Viewer group ({nbImages} images),Groupe d'images ({nbImages} images),Grupo de espectadores ({nbImages} imágenes),Groep afbeeldingen ({nbImages} afbeeldingen)
 viewer-panels,Viewer panels,Visualisateur d'images,Paneles del visor,Afbeeldingsviewer
@@ -1133,24 +1163,3 @@ you-are-reviewing-image-since,You are reviewing this image since {date},Cette im
 you-have-validated-image-on,You have validated this image on {date},Vous avez validé cette image le {date},Usted ha validado esta imagen el {fecha},U hebt deze afbeelding gevalideerd op {date}
 z-resolution,Z resolution,Résolution Z,,Z-resolutie
 zip-upload-info,A ZIP file containing multiple image is allowed (except for VMS and MRXS),Il est possible d'uploader un ZIP contenant plusieurs images (à l'exception des images VMS et MRXS).,Se permite que un archivo ZIP contanga múltiples imágenes (excepto para VMS y MRXS),Het is mogelijk om een ??ZIP met meerdere afbeeldingen te uploaden (met uitzondering van VMS- en MRXS-afbeeldingen).
-app-engine.name,App Engine,App Engine,App Engine,App Engine
-app-engine.tasks.installed,Installed Tasks,Tâches installées,Tareas instaladas,Geïnstalleerde taken
-app-engine.tasks.name,Tasks,Tâches,Tareas,Taken
-app-engine.task.name,Task,Tâche,Tarea,Taak
-app-engine.task.upload,Upload tasks,Téléverser des tâches,Cargar tareas,Taken uploaden
-app-engine.applications,Applications,Applications,Aplicaciones,Toepassingen
-app-engine.execute-a-task,Run a task,Lancer une tâche,Ejecutor de tareas,Applicatie-uitvoerder
-app-engine.previous-task-runs,Previous task runs,Tâches exécutées précédemment,,
-app-engine.ae-current-status,Current Status,Statut actuel,Estado actual,Huidige status
-app-engine.ae-history,Tasks History,Historique des tâches,Historial de tareas,Eerdere taken
-app-engine.form.select-task,Select a task,Sélectionnez une tâche,Seleccione una tarea,Selecteer een taak
-app-engine.ae-run-task,Run Task,Exécuter la tâche,Ejecutar la tarea,Voer taak uit
-app-engine.task.no-description,No description,Pas de description,Sin descripción,Geen beschrijving
-app-engine.run.started,Task run launched,Lancement de l'exécution de la tâche,Inicio de ejecución de tarea,Uitvoering van taak gestart
-app-engine.inputs.title,Inputs,Entrées,Entradas,Ingangen
-app-engine.outputs.title,Outputs,Sorties,Salidas,Uitgangen
-app-engine.parameter.name,Name,Nom,Nombre,Naam
-app-engine.parameter.type,Type,Type,Tipo,Type
-app-engine.parameter.value,Value,Valeur,Valor,Waarde
-app-engine.runs.title,Runs,Exécutions,Ejecuciones,Uitvoeringen
-app-engine.task-run.state.title,State,État,Estado,Status

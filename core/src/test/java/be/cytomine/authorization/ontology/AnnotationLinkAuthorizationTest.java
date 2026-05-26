@@ -38,30 +38,30 @@ public class AnnotationLinkAuthorizationTest extends CRDAuthorizationTest {
     @BeforeEach
     public void before() throws Exception {
         if (annotationLink == null) {
-            annotationLink = builder.given_an_annotation_link();
+            annotationLink = builder.givenAnAnnotationLink();
             initACL(annotationLink.container());
         }
         annotationLink.getGroup().getProject().setMode(EditingMode.CLASSIC);
     }
 
     @Override
-    protected void when_i_get_domain() {
+    protected void whenIGetDomain() {
         annotationLinkService.get(annotationLink.getId());
     }
 
     @Override
-    protected void when_i_add_domain() {
-        UserAnnotation annotation = builder.given_a_user_annotation();
+    protected void whenIAddDomain() {
+        UserAnnotation annotation = builder.givenAUserAnnotation();
         annotation.setImage(annotationLink.getImage());
         annotation.setProject(annotationLink.getImage().getProject());
 
-        annotationLinkService.add(builder.given_a_not_persisted_annotation_link(
-                annotation, annotationLink.getGroup(), annotation.getImage()
+        annotationLinkService.add(builder.givenANotPersistedAnnotationLink(
+            annotation, annotationLink.getGroup(), annotation.getImage()
         ).toJsonObject());
     }
 
     @Override
-    protected void when_i_delete_domain() {
+    protected void whenIDeleteDomain() {
         annotationLinkService.delete(annotationLink, null, null, true);
     }
 
@@ -97,47 +97,47 @@ public class AnnotationLinkAuthorizationTest extends CRDAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list_annotation_group_by_annotation_group() {
+    public void adminCanListAnnotationGroupByAnnotationGroup() {
         assertThat(annotationLinkService.list(annotationLink.getGroup())).contains(annotationLink);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_list_annotation_link_by_annotation_group() {
+    public void userCanListAnnotationLinkByAnnotationGroup() {
         assertThat(annotationLinkService.list(annotationLink.getGroup())).contains(annotationLink);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void user_admin_can_add_in_readonly_mode(){
+    public void userAdminCanAddInReadonlyMode() {
         annotationLink.getImage().getProject().setMode(EditingMode.READ_ONLY);
-        expectOK(() -> when_i_add_domain());
+        expectOK(this::whenIAddDomain);
     }
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_update_annotation_group_in_restricted_project() {
-        AnnotationLink annotationLink = builder.given_an_annotation_link();
+    public void adminCanUpdateAnnotationGroupInRestrictedProject() {
+        AnnotationLink annotationLink = builder.givenAnAnnotationLink();
         annotationLink.getImage().getProject().setMode(EditingMode.RESTRICTED);
-        expectOK (() -> { when_i_get_domain(); });
-        expectOK (() -> { when_i_add_domain(); });
-        expectOK (() -> { when_i_delete_domain(); });
+        expectOK(this::whenIGetDomain);
+        expectOK(this::whenIAddDomain);
+        expectOK(this::whenIDeleteDomain);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_update_annotation_group_in_classic_project() {
-        AnnotationLink annotationLink = builder.given_an_annotation_link();
+    public void userCanUpdateAnnotationGroupInClassicProject() {
+        AnnotationLink annotationLink = builder.givenAnAnnotationLink();
         annotationLink.getImage().getProject().setMode(EditingMode.CLASSIC);
-        expectOK (() -> { when_i_get_domain(); });
-        expectOK (() -> { when_i_add_domain(); });
-        expectOK (() -> { when_i_delete_domain(); });
+        expectOK(this::whenIGetDomain);
+        expectOK(this::whenIAddDomain);
+        expectOK(this::whenIDeleteDomain);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void user_admin_can_delete_in_readonly_mode(){
+    public void userAdminCanDeleteInReadonlyMode() {
         annotationLink.getImage().getProject().setMode(EditingMode.READ_ONLY);
-        expectOK(() -> when_i_delete_domain());
+        expectOK(this::whenIDeleteDomain);
     }
 }

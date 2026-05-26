@@ -4,9 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * A task provide info about a command.
- * The main info is the progress status
- * THIS CLASS CANNOT BE A DOMAIN! Because it cannot works with hibernate transaction.
+ * A task provide info about a command. The main info is the progress status THIS CLASS CANNOT BE A DOMAIN! Because it
+ * cannot works with hibernate transaction.
  */
 @Getter
 @Setter

@@ -34,6 +34,14 @@ app = FastAPI(
         "url": "https://www.apache.org/licenses/LICENSE-2.0.html",
     },
 )
+
+
+@app.get("/health")
+async def health() -> dict[str, str]:
+    """Health check endpoint."""
+    return {"status": "ok"}
+
+
 app.include_router(router=images.router, prefix=PREFIX)
 app.include_router(router=searches.router, prefix=PREFIX)
 app.include_router(router=storages.router, prefix=PREFIX)

@@ -7,28 +7,16 @@ permissions:
   contents: read
 
 jobs:
-  lint:
-    runs-on: self-hosted
-
-    steps:
-      - name: Checkout the repository
-        uses: actions/checkout@v6.0.2
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v7
-        with:
-          python-version: ${{ vars.PYTHON_VERSION }}
-          version: ${{ vars.UV_VERSION }}
-
-      - name: Lint
-        run: uv --directory ./pims run ruff check
-
   tests:
     runs-on: self-hosted
 
     steps:
       - name: Set up the repository
         uses: actions/checkout@v6.0.2
+
+      - name: Load versions
+        id: versions
+        uses: ./.github/actions/load-versions
 
       - name: Install system dependencies
         run: |
@@ -43,8 +31,8 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v7
         with:
-          python-version: ${{ vars.PYTHON_VERSION }}
-          version: ${{ vars.UV_VERSION }}
+          python-version: ${{ steps.versions.outputs.python-version }}
+          version: ${{ steps.versions.outputs.uv-version }}
 
       - name: Run tests
         run: uv --directory ./pims run pytest tests

@@ -24,7 +24,8 @@ services:
   core:
     image: cytomine/core:latest
     build:
-      context: ./core/
+      context: ./
+      dockerfile: ./core/Dockerfile
 
   cbir:
     image: cytomine/cbir:latest
@@ -36,7 +37,8 @@ services:
     build:
       context: ./sam/
 
-  nginx:
-    image: cytomine/nginx:latest
+  repository:
+    image: cytomine/repository:latest
     build:
-      context: ./nginx/
+      context: ./
+      dockerfile: ./repository/Dockerfile

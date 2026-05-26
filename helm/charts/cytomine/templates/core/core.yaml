@@ -11,6 +11,7 @@ metadata:
     component: {{ .Release.Name }}-core
     release: {{ .Release.Name }}
 spec:
+  progressDeadlineSeconds: 1200
   replicas: 1
   selector:
     matchLabels:
@@ -57,6 +58,11 @@ spec:
                 secretKeyRef:
                   name: mongodb-secret
                   key: password
+            - name: KEYCLOAK_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: admin-iam-secret
+                  key: password
           envFrom:
             - configMapRef:
                 name: core-env
@@ -83,18 +89,26 @@ spec:
               containerPort: {{ .Values.core.port }}
           resources:
             {{- toYaml .Values.core.resources | nindent 12 }}
+          startupProbe:
+            httpGet:
+              path: /server/ping
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            failureThreshold: 30
+            timeoutSeconds: 5
           livenessProbe:
             httpGet:
               path: /server/ping
               port: 8080
-            initialDelaySeconds: 120
+            initialDelaySeconds: 20
             failureThreshold: 40
             timeoutSeconds: 5
           readinessProbe:
             httpGet:
               path: /server/ping
               port: 8080
-            initialDelaySeconds: 120
+            initialDelaySeconds: 20
             failureThreshold: 40
             timeoutSeconds: 5
       initContainers:
@@ -118,6 +132,34 @@ spec:
                 sleep 2
               done
               echo "postgis is ready!"
+        - name: wait-for-mongodb
+          image: "{{ .Values.images.curl }}"
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Waiting for mongodb to be ready..."
+              until nc -z mongodb.{{ .Release.Namespace }}.svc.cluster.local {{ .Values.mongodb.port }}; do
+                echo "mongodb not ready, retrying in 2s..."
+                sleep 2
+              done
+              echo "mongodb is ready!"
+        - name: wait-for-repository
+          image: "{{ .Values.images.curl }}"
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Waiting for repository to be ready..."
+              until curl -sf http://repository.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.repository.port }}/ping; do
+                echo "repository not ready, retrying in 2s..."
+                sleep 2
+              done
+              echo "repository is ready!"
         - name: core-init
           image: "{{ .Values.images.core }}"
           imagePullPolicy: {{ .Values.images.pullPolicy }}

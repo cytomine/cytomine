@@ -46,7 +46,7 @@
               <strong class="app-title">{{ task.name }}</strong>
               <br>
               <small v-for="(author, index) in task.authors" :key="index">
-                {{ `- ${author.first_name} ${author.last_name}` }}
+                {{ `- ${author.firstName} ${author.lastName}` }}
               </small>
             </div>
           </div>

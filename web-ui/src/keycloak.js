@@ -1,29 +1,44 @@
 import Keycloak from 'keycloak-js';
 import constants from './utils/constants';
 
-const initOptions = {
-  url: constants.IAM_URL ? constants.IAM_URL : `${window.location.origin}/iam`,
-  realm: 'cytomine',
-  clientId: 'core',
-  enableLogging: true
-};
+let _keycloak = null;
 
-const _keycloak = new Keycloak(initOptions);
+function getKeycloak() {
+  if (!_keycloak) {
+    // Strip /realms/cytomine if present, as Keycloak JS adds it automatically
+    let url = constants.IAM_URL;
+    if (url.endsWith('/')) {
+      url = url.slice(0, -1);
+    }
+    if (url.endsWith('/realms/cytomine')) {
+      url = url.slice(0, -'/realms/cytomine'.length);
+    }
+    const initOptions = {
+      url: url,
+      realm: 'cytomine',
+      clientId: 'core',
+      enableLogging: true
+    };
+    _keycloak = new Keycloak(initOptions);
+  }
+  return _keycloak;
+}
 
 const plugin = {
   install: Vue => {
-    Vue.$keycloak = _keycloak;
-  },
-};
-plugin.install = Vue => {
-  Vue.$keycloak = _keycloak;
-  Object.defineProperties(Vue.prototype, {
-    $keycloak: {
+    Object.defineProperty(Vue, '$keycloak', {
       get() {
-        return _keycloak;
+        return getKeycloak();
+      }
+    });
+    Object.defineProperties(Vue.prototype, {
+      $keycloak: {
+        get() {
+          return getKeycloak();
+        },
       },
-    },
-  });
+    });
+  },
 };
 
 export default plugin;

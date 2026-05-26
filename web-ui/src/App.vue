@@ -146,8 +146,8 @@ export default {
       return config;
     };
     new Cytomine(
-      window.location.origin,
-      '/api/', `/iam/realms/${this.$keycloak.realm}`,
+      constants.CORE_URL,
+      constants.IAM_URL,
       authorizationHeaderInterceptor
     );
 

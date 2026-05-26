@@ -1,0 +1,5 @@
+---
+services:
+  k3s:
+    volumes:
+      - ../.kube/secrets/registries.yaml:/etc/rancher/k3s/registries.yaml:ro

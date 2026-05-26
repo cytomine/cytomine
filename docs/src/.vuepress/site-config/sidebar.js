@@ -27,18 +27,25 @@ module.exports = {
 
   adminGuide: [
     {
-      title: "Cytomine",
+      title: "Local — All in Docker Compose",
       collapsable: true,
       children: [
-        ["/admin-guide/ce/installation", "Installation Guide"],
-        ["/admin-guide/ce/configuration", "Configuration"],
-        ["/admin-guide/ce/backup", "Backup and restore"],
-        ["/admin-guide/ce/troubleshooting", "Troubleshooting"],
-        ["/admin-guide/ce/uninstallation", "Uninstallation"],
+        ["/admin-guide/docker/installation", "Installation Guide"],
+        ["/admin-guide/docker/configuration", "Configuration"],
+        ["/admin-guide/docker/backup", "Backup and restore"],
+        ["/admin-guide/docker/troubleshooting", "Troubleshooting"],
+        ["/admin-guide/docker/uninstallation", "Uninstallation"],
       ],
     },
     {
-      title: "Cytomine on K8s",
+      title: "Local — k3s + Helm",
+      collapsable: true,
+      children: [
+        ["/admin-guide/local-k3s/installation", "Installation Guide"],
+      ],
+    },
+    {
+      title: "Production — Kubernetes",
       collapsable: true,
       children: [
         ["/admin-guide/k8s/installation", "Installation Guide"],

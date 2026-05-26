@@ -30,7 +30,7 @@
       >
         <template #default="{row: image}">
           <b-table-column :label="$t('overview')">
-            <image-thumbnail :image="image" :size="128" :key="`${image.id}-thumb-128`" :extra-parameters="{Authorization: 'Bearer ' + shortTermToken }"/>
+            <image-thumbnail :image="image" :size="128" :key="`${image.id}-thumb-128`" :extra-parameters="{authorization: 'Bearer ' + shortTermToken }"/>
           </b-table-column>
 
           <b-table-column field="originalFilename" :label="$t('name')" sortable>

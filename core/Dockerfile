@@ -17,9 +17,11 @@ RUN mkdir -p /opt/gradle/.gradle
 ENV GRADLE_USER_HOME=/opt/gradle/.gradle
 
 WORKDIR /app
-COPY ./build.gradle /app/build.gradle
+COPY ./settings.gradle /app/settings.gradle
+COPY ./common/build.gradle /app/common/build.gradle
+COPY ./core/build.gradle /app/core/build.gradle
 
-RUN gradle clean build --no-daemon --console=verbose
+RUN gradle :core:dependencies --no-daemon --console=verbose
 
 #######################################################################################
 ## Stage: building the core jar file
@@ -29,24 +31,26 @@ ENV GRADLE_USER_HOME=/opt/gradle/.gradle
 COPY --from=deps-downloader /opt/gradle/.gradle /opt/gradle/.gradle
 
 WORKDIR /app
-COPY ./src /app/src
-COPY ./build.gradle /app/build.gradle
+COPY ./settings.gradle /app/settings.gradle
+COPY ./common/build.gradle /app/common/build.gradle
+COPY ./common/src /app/common/src
+COPY ./core/src /app/core/src
+COPY ./core/build.gradle /app/core/build.gradle
 
 ARG CORE_VERSION
 ENV CORE_VERSION=$CORE_VERSION
 
-RUN sed -i -- 's/version: 0.0.0/version: '$CORE_VERSION'/g' /app/src/main/resources/application.yml && \
-    gradle bootJar --console=verbose
+RUN sed -i -- 's/version: 0.0.0/version: '$CORE_VERSION'/g' /app/core/src/main/resources/application.yml && \
+    gradle :core:bootJar --console=verbose
 
 #######################################################################################
 ## Stage: Cytomine core development image
-FROM ${PROXY_CACHE}/gradle:${GRADLE_VERSION}-jammy AS dev-server
+FROM ${PROXY_CACHE}/gradle:${GRADLE_VERSION}-alpine AS dev-server
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-      gettext=0.21-4ubuntu4 \
-      openssh-server=1:8.9p1-3ubuntu0.13 \
-      rsync=3.2.7-0ubuntu0.22.04.4
+RUN apk add --no-cache \
+    gettext \
+    openssh \
+    rsync
 
 ENV GRADLE_USER_HOME=/opt/gradle/.gradle
 
@@ -77,7 +81,7 @@ LABEL org.opencontainers.image.authors="uliege@cytomine.org" \
 ENV DEBIAN_FRONTEND=noninteractive
 ENV LANG=C.UTF-8
 
-COPY --from=jar-builder /app/build/libs/cytomine.jar /app/cytomine.jar
+COPY --from=jar-builder /app/core/build/libs/cytomine.jar /app/cytomine.jar
 
 WORKDIR /app
 

@@ -154,15 +154,11 @@ public class CytomineTests {
             .map(name -> cytomineSteps.createProject(wait, driver, cytomineUrl, name))
             .collect(toSet());
         cytomineSteps.listProjects(wait, cytomineUrl, projectNames);
-        Set<String> ignored = projectUrls.stream()
-            .peek(projectURL -> {
-                String ontologyURL = cytomineSteps.getOntologyUrlFromProject(wait, projectURL);
-                cytomineSteps.deleteProject(wait, projectURL);
-                if (ontologyURL != null) {
-                    cytomineSteps.deleteOntology(wait, ontologyURL);
-                }
-            })
-            .collect(toSet());
+        projectUrls.forEach(projectUrl -> {
+            String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
+            cytomineSteps.deleteProject(wait, projectUrl);
+            cytomineSteps.deleteOntology(wait, ontologyUrl);
+        });
         cytomineSteps.logout(wait, cytomineUrl);
     }
 

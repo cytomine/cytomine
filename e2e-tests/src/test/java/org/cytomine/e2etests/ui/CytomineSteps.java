@@ -110,7 +110,7 @@ public class CytomineSteps {
         webDriverUtils.byIsDisplayed(wait, By.xpath("//td[contains(text(), 'Ontology')]"));
         return wait.until(d -> {
             var elements = d.findElements(By.xpath("//a[contains(@href, '/ontology/')]"));
-            return elements.get(0).getAttribute("href");
+            return elements.getFirst().getAttribute("href");
         });
     }
 
@@ -424,6 +424,37 @@ public class CytomineSteps {
         webDriverUtils.byClear(wait, searchInput);
     }
 
+    public void filterAnnotationsByTerm(Wait<WebDriver> wait, String projectUrl, String termName) {
+        webDriverUtils.goTo(wait, projectUrl.replace("configuration", "annotations"));
+
+        By termsMultiselect = By.xpath(
+            "//div[contains(@class,'filter')]"
+                + "[.//div[contains(@class,'filter-label') and normalize-space()='Terms']]"
+                + "/div[contains(@class,'filter-body')]"
+                + "//div[contains(@class,'multiselect__select')]"
+        );
+        webDriverUtils.byClick(wait, termsMultiselect);
+
+        By selectAll = By.xpath(
+            "//div[contains(@class,'filter')]"
+                + "[.//div[contains(@class,'filter-label') and normalize-space()='Terms']]"
+                + "//li[contains(@class,'multiselect__select-all')]"
+        );
+        webDriverUtils.byClick(wait, selectAll);
+
+        By testTerm = By.xpath(
+            "//span[contains(@class,'ontology-term') and normalize-space()='" + termName + "']"
+        );
+        webDriverUtils.byClick(wait, testTerm);
+
+        webDriverUtils.byIsDisplayed(
+            wait,
+            By.xpath("//h2[span[normalize-space(text())='" + termName + "'] and contains(., '(1)')]")
+        );
+        webDriverUtils.waitUntilByEmpty(wait, By.xpath("//div[contains(text(), 'NO TERM')]"));
+        webDriverUtils.waitUntilByEmpty(wait, By.xpath("//div[contains(text(), 'MULTIPLE TERMS')]"));
+    }
+
     public void downloadAnnotationReport(
         Wait<WebDriver> wait,
         String projectUrl,
@@ -482,7 +513,7 @@ public class CytomineSteps {
         webDriverUtils.goTo(wait, ontologyUrl);
         webDriverUtils.byClick(wait, By.xpath("//button[normalize-space()='Export ontology']"));
 
-        String filename = ontologyName + "." + ReportType.JSON.getLabel();;
+        String filename = ontologyName + "." + ReportType.JSON.getLabel();
         Instant end = Instant.now().plus(Duration.ofSeconds(5));
 
         while (Instant.now().isBefore(end)) {

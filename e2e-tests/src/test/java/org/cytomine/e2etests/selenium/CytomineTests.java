@@ -525,7 +525,8 @@ public class CytomineTests {
         String projectName = "selenium-" + randomUUID();
         String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
         String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
-        String imageName = cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName));
+        String imageName = "selenium-" + randomUUID() + ".png";
+        cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
         cytomineSteps.openImageInViewer(wait, projectUrl);
 
         cytomineSteps.checkRecentlyViewedProjects(wait, cytomineUrl, projectName, imageName);

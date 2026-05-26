@@ -1,5 +1,7 @@
 package org.cytomine.e2etests.ui;
 
+import java.util.List;
+
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -123,6 +125,19 @@ public class WebDriverUtils {
             } catch (Exception e) {
                 return null;
             }
+        });
+    }
+
+    void waitForPngTexts(Wait<WebDriver> wait, int number) {
+        waitLoading(wait);
+        wait.until(d -> {
+            List<WebElement> pngElements = d.findElements(
+                By.xpath("//*[contains(text(), '.png')]")
+            );
+            long visibleCount = pngElements.stream()
+                .filter(WebElement::isDisplayed)
+                .count();
+            return visibleCount == number;
         });
     }
 }

@@ -26,7 +26,6 @@ import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.ModelService;
 import be.cytomine.service.security.SecurityACLService;
-import be.cytomine.service.security.UserService;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.Task;
@@ -49,8 +48,6 @@ public class ProjectRepresentativeUserService extends ModelService {
     private final ProjectRepository projectRepository;
 
     private final UserRepository userRepository;
-
-    private final UserService userService;
 
     @Override
     public Class currentDomain() {
@@ -110,7 +107,7 @@ public class ProjectRepresentativeUserService extends ModelService {
 
     public CommandResponse add(JsonObject jsonObject, User adminAsCurrent) {
         securityACLService.check(jsonObject.getJSONAttrLong("project"), Project.class, WRITE);
-        User user = userService.findUser(jsonObject.getJSONAttrLong("user"))
+        User user = userRepository.findById(jsonObject.getJSONAttrLong("user"))
             .orElseThrow(() -> new ObjectNotFoundException("User", jsonObject.getJSONAttrStr("user")));
         Project project = projectRepository.findById(jsonObject.getJSONAttrLong("project"))
             .orElseThrow(() -> new ObjectNotFoundException("Project", jsonObject.getJSONAttrStr("project")));

@@ -179,6 +179,8 @@ public class CytomineTests {
         String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
         imageNames.forEach(name -> cytomineSteps.addImage(wait, cytomineUrl, name, Optional.of(projectName)));
 
+        saveScreenshot("listImagesInProject-storage");
+
         cytomineSteps.listImagesInProject(wait, projectUrl, imageNames);
 
         cytomineSteps.deleteProject(wait, projectUrl);

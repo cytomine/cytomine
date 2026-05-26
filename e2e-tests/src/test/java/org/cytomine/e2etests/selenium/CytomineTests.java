@@ -442,12 +442,13 @@ public class CytomineTests {
     @Test
     void filterAnnotationsByTermInProject() {
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        String imageName = "selenium-" + randomUUID() + ".png";
         String projectName = "selenium-" + randomUUID();
         String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
         String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
         String termName = "selenium-term-" + randomUUID();
         cytomineSteps.addTermToOntology(wait, driver, ontologyUrl, termName);
-        String imageName = cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName));
+        cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
         cytomineSteps.openImageInViewer(wait, projectUrl);
 
         annotationTools.drawRectangleAnnotation(wait, driver);

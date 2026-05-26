@@ -1,4 +1,4 @@
-package be.cytomine.unit.service.appengine;
+package be.cytomine.service.appengine;
 
 import java.util.List;
 import java.util.Map;
@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.locationtech.jts.geom.Geometry;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -24,22 +25,23 @@ import be.cytomine.domain.appengine.TaskRunLayer;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.dto.appengine.task.TaskRunValue;
+import be.cytomine.dto.appengine.task.output.CollectionOutput;
+import be.cytomine.dto.appengine.task.output.GeometryOutput;
 import be.cytomine.repository.appengine.TaskRunLayerRepository;
 import be.cytomine.repository.appengine.TaskRunRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.annotation.AnnotationLayerService;
 import be.cytomine.service.annotation.AnnotationService;
-import be.cytomine.service.appengine.AppEngineService;
-import be.cytomine.service.appengine.AsyncService;
-import be.cytomine.service.appengine.TaskRunService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.service.utils.GeometryService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -93,6 +95,50 @@ public class TaskRunServiceTest {
         String geoJson1 = "{\"type\":\"Point\",\"coordinates\":[1.0,2.0]}";
         String geoJson2 = "{\"type\":\"Point\",\"coordinates\":[3.0,4.0]}";
 
+        Geometry inputGeometry1 = mock(Geometry.class);
+        Geometry inputGeometry2 = mock(Geometry.class);
+
+        CollectionOutput.IndexedTaskRunOutput geoItem1 = new CollectionOutput.IndexedTaskRunOutput(
+            new GeometryOutput(null, null, null, inputGeometry1),
+            0
+        );
+        CollectionOutput.IndexedTaskRunOutput geoItem2 = new CollectionOutput.IndexedTaskRunOutput(
+            new GeometryOutput(null, null, null, inputGeometry2),
+            1
+        );
+
+        CollectionOutput nestedGeo1 = new CollectionOutput(
+            taskRunId,
+            "input",
+            "ARRAY",
+            List.of(geoItem1),
+            "GEOMETRY"
+        );
+        CollectionOutput nestedGeo2 = new CollectionOutput(
+            taskRunId,
+            "input",
+            "ARRAY",
+            List.of(geoItem2),
+            "GEOMETRY"
+        );
+
+        CollectionOutput.IndexedTaskRunOutput arrayItem1 = new CollectionOutput.IndexedTaskRunOutput(
+            nestedGeo1,
+            0
+        );
+        CollectionOutput.IndexedTaskRunOutput arrayItem2 = new CollectionOutput.IndexedTaskRunOutput(
+            nestedGeo2,
+            1
+        );
+
+        CollectionOutput collectionOutput = new CollectionOutput(
+            taskRunId,
+            "input",
+            "ARRAY",
+            List.of(arrayItem1, arrayItem2),
+            "ARRAY"
+        );
+
         TaskRunValue geometryArrayValue = new TaskRunValue(
             taskRunId,
             "input",
@@ -119,30 +165,28 @@ public class TaskRunServiceTest {
         TaskRun taskRun = new TaskRun();
         User currentUser = new User();
         Project project = new Project();
-
         TaskRunLayer taskRunLayer = new TaskRunLayer();
         taskRunLayer.setParameterName("input");
-        CropOffset offset = new CropOffset(0, 0);
-        taskRunLayer.getOffsets().add(offset);
-
+        taskRunLayer.setOffsets(List.of(new CropOffset(0, 0)));
         AnnotationLayer annotationLayer = new AnnotationLayer();
 
-        when(taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId)).thenReturn(Optional.of(taskRun));
-        when(currentUserService.getCurrentUser()).thenReturn(currentUser);
-        when(projectService.get(projectId)).thenReturn(project);
         doNothing().when(securityACLService).checkUser(currentUser);
         doNothing().when(securityACLService).check(project, READ);
         doNothing().when(securityACLService).checkIsNotReadOnly(project);
-
-        when(appEngineService.get("task-runs/" + taskRunId + "/outputs")).thenReturn(outputsJson);
-        when(appEngineService.get("task-runs/" + taskRunId)).thenReturn(taskRunJson);
         when(annotationLayerService.createLayerName(any(), any(), any())).thenReturn("layer-name");
         when(annotationLayerService.createAnnotationLayer("layer-name")).thenReturn(annotationLayer);
+        when(appEngineService.get("task-runs/" + taskRunId + "/outputs")).thenReturn(outputsJson);
+        when(appEngineService.get("task-runs/" + taskRunId)).thenReturn(taskRunJson);
+        when(appEngineService.getTaskRunOutputs(taskRunId)).thenReturn(List.of(collectionOutput));
+        when(currentUserService.getCurrentUser()).thenReturn(currentUser);
+        when(geometryService.addOffset(
+            any(Geometry.class),
+            anyInt(),
+            anyInt()
+        )).thenReturn(Optional.of(mock(Geometry.class)));
+        when(projectService.get(projectId)).thenReturn(project);
+        when(taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId)).thenReturn(Optional.of(taskRun));
         when(taskRunLayerRepository.findAllByTaskRunAndImage(any(), any())).thenReturn(Set.of(taskRunLayer));
-        when(geometryService.isGeometry(geoJson1)).thenReturn(true);
-        when(geometryService.isGeometry(geoJson2)).thenReturn(true);
-        when(geometryService.geoJsonToWkt(geoJson1)).thenReturn("POINT (1 2)");
-        when(geometryService.geoJsonToWkt(geoJson2)).thenReturn("POINT (3 4)");
 
         String result = taskRunService.getOutputs(projectId, taskRunId);
 
@@ -160,27 +204,59 @@ public class TaskRunServiceTest {
         String geoJson1 = "{\"type\":\"Point\",\"coordinates\":[1.0,2.0]}";
         String geoJson2 = "{\"type\":\"Point\",\"coordinates\":[3.0,4.0]}";
 
-        TaskRunValue innerGeometryValue = new TaskRunValue(
-            taskRunId,
-            "inner",
-            "ARRAY",
-            List.of(
-                Map.of("value", geoJson1),
-                Map.of("value", geoJson2)
-            ),
+        Geometry inputGeometry1 = mock(Geometry.class);
+        Geometry inputGeometry2 = mock(Geometry.class);
+
+        CollectionOutput nestedGeo1 = new CollectionOutput(
+            taskRunId, "inner", "ARRAY",
+            List.of(new CollectionOutput.IndexedTaskRunOutput(
+                new GeometryOutput(taskRunId, "inner", "GEOMETRY", inputGeometry1),
+                0
+
+            )),
             "GEOMETRY"
+        );
+        CollectionOutput nestedGeo2 = new CollectionOutput(
+            taskRunId, "inner", "ARRAY",
+            List.of(new CollectionOutput.IndexedTaskRunOutput(
+                new GeometryOutput(taskRunId, "inner", "GEOMETRY", inputGeometry2),
+                1
+            )),
+            "GEOMETRY"
+        );
+
+        CollectionOutput innerArray = new CollectionOutput(
+            taskRunId, "inner", "ARRAY",
+            List.of(
+                new CollectionOutput.IndexedTaskRunOutput(nestedGeo1, 0),
+                new CollectionOutput.IndexedTaskRunOutput(nestedGeo2, 1)
+            ),
+            "ARRAY"
+        );
+
+        CollectionOutput outerArray = new CollectionOutput(
+            taskRunId, "outer", "ARRAY",
+            List.of(new CollectionOutput.IndexedTaskRunOutput(innerArray, 0)),
+            "ARRAY"
         );
 
         TaskRunValue outerArrayValue = new TaskRunValue(
             taskRunId,
             "outer",
             "ARRAY",
-            List.of(innerGeometryValue),
+            List.of(new TaskRunValue(
+                taskRunId, "inner", "ARRAY",
+                List.of(
+                    Map.of("value", geoJson1),
+                    Map.of("value", geoJson2)
+                ),
+                "GEOMETRY"
+            )),
             "ARRAY"
         );
 
         List<TaskRunValue> outputs = List.of(outerArrayValue);
-        String outputsJson = new ObjectMapper().writeValueAsString(outputs);
+        String outputsJson = objectMapper.writeValueAsString(outputs);
 
         String taskRunJson = """
                 {
@@ -196,36 +272,36 @@ public class TaskRunServiceTest {
         Project project = new Project();
 
         TaskRunLayer taskRunLayer = new TaskRunLayer();
-        taskRunLayer.setParameterName(outerArrayValue.parameterName());
-        CropOffset offset = new CropOffset(0, 0);
-        taskRunLayer.getOffsets().add(offset);
+        taskRunLayer.setParameterName("outer");
+        taskRunLayer.getOffsets().add(new CropOffset(0, 0));
+
         AnnotationLayer annotationLayer = new AnnotationLayer();
 
-        when(taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId)).thenReturn(Optional.of(taskRun));
-        when(currentUserService.getCurrentUser()).thenReturn(currentUser);
-        when(projectService.get(projectId)).thenReturn(project);
         doNothing().when(securityACLService).checkUser(currentUser);
         doNothing().when(securityACLService).check(project, READ);
         doNothing().when(securityACLService).checkIsNotReadOnly(project);
-
-        when(appEngineService.get("task-runs/" + taskRunId + "/outputs")).thenReturn(outputsJson);
-        when(appEngineService.get("task-runs/" + taskRunId)).thenReturn(taskRunJson);
+        when(currentUserService.getCurrentUser()).thenReturn(currentUser);
         when(annotationLayerService.createLayerName(any(), any(), any())).thenReturn("layer-name");
         when(annotationLayerService.createAnnotationLayer("layer-name")).thenReturn(annotationLayer);
+        when(appEngineService.get("task-runs/" + taskRunId + "/outputs")).thenReturn(outputsJson);
+        when(appEngineService.get("task-runs/" + taskRunId)).thenReturn(taskRunJson);
+        when(appEngineService.getTaskRunOutputs(taskRunId)).thenReturn(List.of(outerArray));
+        when(projectService.get(projectId)).thenReturn(project);
         when(taskRunLayerRepository.findAllByTaskRunAndImage(any(), any())).thenReturn(Set.of(taskRunLayer));
-        when(geometryService.isGeometry(geoJson1)).thenReturn(true);
-        when(geometryService.isGeometry(geoJson2)).thenReturn(true);
-        when(geometryService.geoJsonToWkt(geoJson1)).thenReturn("POINT (1 2)");
-        when(geometryService.geoJsonToWkt(geoJson2)).thenReturn("POINT (3 4)");
+        when(taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId)).thenReturn(Optional.of(taskRun));
+
+        Geometry outputGeometry1 = mock(Geometry.class);
+        Geometry outputGeometry2 = mock(Geometry.class);
+        when(geometryService.addOffset(any(Geometry.class), eq(0), eq(0)))
+            .thenReturn(Optional.of(outputGeometry1))
+            .thenReturn(Optional.of(outputGeometry2));
 
         String result = taskRunService.getOutputs(projectId, taskRunId);
 
         assertEquals(outputsJson, result);
         verify(annotationService, times(2)).createAnnotation(eq(annotationLayer), any(String.class));
         verify(asyncService, times(1)).launchImageAdditionJob(
-            ArgumentMatchers.any(),
-            eq(projectId),
-            eq(currentUser)
+            ArgumentMatchers.any(), eq(projectId), eq(currentUser)
         );
     }
 }

@@ -2,11 +2,14 @@ package be.cytomine.service.appengine;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -17,6 +20,7 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import be.cytomine.dto.appengine.task.output.TaskRunOutput;
 import be.cytomine.exceptions.AppEngineException;
 
 @Slf4j
@@ -38,6 +42,15 @@ public class AppEngineService {
 
     public String get(String uri) {
         return restTemplate.exchange(buildFullUrl(uri), HttpMethod.GET, null, String.class).getBody();
+    }
+
+    public List<TaskRunOutput> getTaskRunOutputs(UUID taskRunId) {
+        return restTemplate.exchange(
+            buildFullUrl("task-runs/" + taskRunId + "/outputs"),
+            HttpMethod.GET,
+            null,
+            new ParameterizedTypeReference<List<TaskRunOutput>>() {}
+        ).getBody();
     }
 
     public void delete(String uri) {

@@ -8,7 +8,6 @@ import java.util.List;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.core.annotation.Order;
@@ -47,26 +46,21 @@ import static be.cytomine.service.database.BootstrapTestsDataService.USER_NO_ACL
 @Transactional
 class ApplicationBootstrap {
 
-    @Autowired
-    private final UserRepository userRepository;
-
     private final ApplicationProperties applicationProperties;
 
     private final Environment environment;
 
-    @Autowired
-    BootstrapDataService bootstrapDataService;
+    private final BootstrapDataService bootstrapDataService;
 
-    @Autowired
-    BootstrapUtilsService bootstrapUtilDataService;
+    private final BootstrapTestsDataService bootstrapTestsDataService;
 
-    private final InitialMongodbSetupMigration initialSetupMigration;
+    private final BootstrapUtilsService bootstrapUtilDataService;
 
     private final Dataset dataset;
 
-    @Autowired
-    BootstrapTestsDataService bootstrapTestsDataService;
+    private final InitialMongodbSetupMigration initialSetupMigration;
 
+    private final UserRepository userRepository;
 
     @PostConstruct
     public void init() {
@@ -77,7 +71,7 @@ class ApplicationBootstrap {
         log.info("#############################################################################");
         log.info("#############################################################################");
         String cytomineWelcomeMessage = """
-
+            
                                _____      _                  _
                               / ____|    | |                (_)
                              | |    _   _| |_ ___  _ __ ___  _ _ __   ___

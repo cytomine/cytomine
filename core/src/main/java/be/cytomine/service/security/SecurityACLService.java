@@ -9,8 +9,8 @@ import java.util.stream.Collectors;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Service;
 
@@ -40,32 +40,25 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 import static org.springframework.security.acls.domain.BasePermission.WRITE;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class SecurityACLService {
 
-    @Autowired
-    private EntityManager entityManager;
+    private final EntityManager entityManager;
 
-    @Autowired
-    private CurrentUserService currentUserService;
+    private final AclRepository aclRepository;
 
-    @Autowired
-    private CurrentRoleService currentRoleService;
+    private final CurrentUserService currentUserService;
 
-    @Autowired
-    private OntologyRepository ontologyRepository;
+    private final CurrentRoleService currentRoleService;
 
-    @Autowired
-    private PermissionService permissionService;
+    private final ImageInstanceRepository imageInstanceRepository;
 
-    @Autowired
-    private ImageInstanceRepository imageInstanceRepository;
+    private final OntologyRepository ontologyRepository;
 
-    @Autowired
-    private ProjectRepository projectRepository;
+    private final PermissionService permissionService;
 
-    @Autowired
-    private AclRepository aclRepository;
+    private final ProjectRepository projectRepository;
 
     private static List<Field> getAllFields(Object obj) {
         List<Field> fields = new ArrayList<>();
@@ -158,6 +151,7 @@ public class SecurityACLService {
      * Check if user has permission on the curret domain
      *
      * @param permission Permission to check (READ,...)
+     *
      * @return true if user has this permission on current domain
      */
     public boolean hasPermission(CytomineDomain domain, Permission permission, boolean isAdmin) {
@@ -206,8 +200,8 @@ public class SecurityACLService {
                     + user.getUsername()
                     + "'"
                     + (StringUtils.isNotBlank(searchString) ? " and lower(storage.name) like '%"
-                    + searchString.toLowerCase()
-                    + "%'" : ""));
+                                                              + searchString.toLowerCase()
+                                                              + "%'" : ""));
 
         }
         return (List<Storage>) query.getResultList();

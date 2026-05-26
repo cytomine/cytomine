@@ -1,28 +1,12 @@
 package be.cytomine.service.meta;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import be.cytomine.domain.CytomineDomain;
@@ -45,24 +29,20 @@ import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.Task;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 @Transactional
 public class TagService extends ModelService {
 
-    @Autowired
-    private TagRepository tagRepository;
+    private final TagRepository tagRepository;
 
-    @Autowired
-    private TagDomainAssociationRepository tagDomainAssocitationRepository;
+    private final TagDomainAssociationRepository tagDomainAssociationRepository;
 
-    @Autowired
-    private SecurityACLService securityACLService;
+    private final SecurityACLService securityACLService;
 
-    @Autowired
-    private CurrentUserService currentUserService;
+    private final CurrentUserService currentUserService;
 
-    @Autowired
-    private TagDomainAssociationService tagDomainAssociationService;
+    private final TagDomainAssociationService tagDomainAssociationService;
 
     @Override
     public Class currentDomain() {
@@ -98,7 +78,7 @@ public class TagService extends ModelService {
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.checkIsCreator(domain, currentUser);
-        if (tagDomainAssocitationRepository.countByTag((Tag) domain) > 0) {
+        if (tagDomainAssociationRepository.countByTag((Tag) domain) > 0) {
             //if not admin then check if there is no association
             securityACLService.checkAdmin(currentUser);
         }
@@ -139,7 +119,7 @@ public class TagService extends ModelService {
     }
 
     private void deleteDependentTagDomainAssociation(Tag tag, Transaction transaction, Task task) {
-        for (TagDomainAssociation tagDomainAssociation : tagDomainAssocitationRepository.findAllByTag(tag)) {
+        for (TagDomainAssociation tagDomainAssociation : tagDomainAssociationRepository.findAllByTag(tag)) {
             tagDomainAssociationService.delete(tagDomainAssociation, transaction, task, false);
         }
     }

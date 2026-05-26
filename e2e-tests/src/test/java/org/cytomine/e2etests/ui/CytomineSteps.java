@@ -185,8 +185,10 @@ public class CytomineSteps {
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Add a term')]");
         webDriverUtils.bySendKeys(wait, By.name("name"), termName);
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Save')]");
-        webDriverUtils.byIsDisplayed(wait, By.xpath(
-            "//span[contains(@class, 'ontology-term') and contains(text(), '" + termName + "')]"));
+        webDriverUtils.byIsDisplayed(
+            wait,
+            By.xpath("//span[contains(@class, 'ontology-term') and contains(text(), '" + termName + "')]")
+        );
         return driver.getCurrentUrl();
     }
 

@@ -77,19 +77,7 @@ public class CytomineSteps {
         );
     }
 
-    public void listImagesInProject(
-        Wait<WebDriver> wait,
-        URL cytomineUrl,
-        String projectUrl,
-        String projectName,
-        Set<String> imageNames
-    ) {
-        int expectedCount = 1;
-        for (String name : imageNames) {
-            addImage(wait, cytomineUrl, name, Optional.of(projectName));
-            webDriverUtils.waitForPngTexts(wait, expectedCount);
-            expectedCount++;
-        }
+    public void listImagesInProject(Wait<WebDriver> wait, String projectUrl, Set<String> imageNames) {
         webDriverUtils.goTo(wait, projectUrl.replace("configuration", "images"));
         imageNames.forEach(
             name -> webDriverUtils.byIsDisplayed(wait, By.xpath(format("//a[span[contains(text(), '%s')]]", name)))

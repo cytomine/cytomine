@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import be.cytomine.service.security.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,6 +49,8 @@ public class ProjectRepresentativeUserService extends ModelService {
     private final ProjectRepository projectRepository;
 
     private final UserRepository userRepository;
+
+    private final UserService userService;
 
     @Override
     public Class currentDomain() {

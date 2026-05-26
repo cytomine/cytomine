@@ -155,6 +155,7 @@ public class CytomineSteps {
                     + "//*[normalize-space(text())='" + projectName + "' or normalize-space(text())='All']"
             )
         );
+        webDriverUtils.waitUntilByEmpty(wait, By.xpath("//div[contains(text(), 'Select options')]"));
     }
 
     public void deleteImage(Wait<WebDriver> wait, URL cytomineUrl, String imageName) {

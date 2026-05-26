@@ -218,8 +218,10 @@ public class CytomineSteps {
         webDriverUtils.goTo(wait, ontologyURL);
         webDriverUtils.waitLoading(wait);
         for (String termName : termNames) {
-            webDriverUtils.waitUntilByEmpty(wait, By.xpath(
-                "//span[contains(@class, 'ontology-term') and contains(text(), '" + termName + "')]"));
+            webDriverUtils.waitUntilByEmpty(
+                wait,
+                By.xpath("//span[contains(@class, 'ontology-term') and contains(text(), '" + termName + "')]")
+            );
         }
     }
 
@@ -579,5 +581,18 @@ public class CytomineSteps {
             wait,
             By.xpath("//td[contains(normalize-space(text()), '" + newFirstname + " " + newLastname + "')]")
         );
+    }
+
+    public void checkRecentlyViewedProjects(
+        Wait<WebDriver> wait,
+        URL cytomineUrl,
+        String projectName,
+        String imageName
+    ) {
+        webDriverUtils.goTo(wait, cytomineUrl.toString());
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), " + projectName + ")]"));
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), " + imageName + ")]"));
+        webDriverUtils.waitUntilByEmpty(wait, By.xpath("//div[contains(text(), 'No project recently opened')]"));
+        webDriverUtils.waitUntilByEmpty(wait, By.xpath("//div[contains(text(), 'No image recently opened')]"));
     }
 }

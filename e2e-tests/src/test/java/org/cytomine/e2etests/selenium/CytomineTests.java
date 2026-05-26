@@ -490,7 +490,19 @@ public class CytomineTests {
     }
 
     @Test
-    void seeRecentlyViewedProjects() {
+    void seeRecentlyViewedProjectsInDashboard() {
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        String projectName = "selenium-" + randomUUID();
+        String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
+        String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
+        String imageName = cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName));
+        cytomineSteps.openImageInViewer(wait, projectUrl);
 
+        cytomineSteps.checkRecentlyViewedProjects(wait, cytomineUrl, projectName, imageName);
+
+        cytomineSteps.deleteProject(wait, projectUrl);
+        cytomineSteps.deleteOntology(wait, ontologyUrl);
+        cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
+        cytomineSteps.logout(wait, cytomineUrl);
     }
 }

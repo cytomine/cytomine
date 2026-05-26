@@ -156,10 +156,13 @@ public class CytomineSteps {
             By.xpath(
                 "//div[contains(@class,'project-select')]"
                     + "//div[contains(@class,'multiselect__tags-wrap')]"
-                    + "//*[normalize-space(text())='" + projectName + "' or normalize-space(text())='All']"
+                    + "//span[contains(normalize-space(.), '" + projectName + "')]"
             )
         );
-        webDriverUtils.waitUntilByEmpty(wait, By.xpath("//div[contains(text(), 'Select options')]"));
+        webDriverUtils.waitUntilByEmpty(
+            wait,
+            By.xpath("//div[contains(@class,'project-select')]//input[@placeholder='Select options']")
+        );
     }
 
     public void deleteImage(Wait<WebDriver> wait, URL cytomineUrl, String imageName) {

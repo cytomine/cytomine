@@ -238,7 +238,7 @@ export default class Project extends Model {
    * Fetch all users of a project with their last activity
    *
    * @returns {UserCollection}    The collection of project users. The following attributes are set for each user:
-   *                              id, username, firstname, lastname, email, LDAP, lastImageId, lastImageName,
+   *                              id, username, firstname, lastname, email, lastImageId, lastImageName,
    *                              lastConnection, frequency
    */
   async fetchUsersActivity() {

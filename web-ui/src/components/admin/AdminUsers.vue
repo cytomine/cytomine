@@ -61,7 +61,7 @@
           </b-table-column>
 
           <b-table-column field="origin" :label="$t('source')" centered sortable width="50">
-            <span :class="['tag', user.LDAP ? 'is-link' : 'is-grey']">
+            <span :class="['tag', 'is-grey']">
               {{displayMemberOrigin(user)}}
             </span>
           </b-table-column>
@@ -157,9 +157,6 @@ export default {
   methods: {
     displayMemberOrigin(member) {
       let key;
-      if (member.origin === 'LDAP') {
-        key = 'LDAP';
-      }
       if (member.origin === 'BOOTSTRAP') {
         key = 'system';
       } else {

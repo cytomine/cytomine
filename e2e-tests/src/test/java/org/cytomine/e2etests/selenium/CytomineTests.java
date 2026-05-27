@@ -150,22 +150,15 @@ public class CytomineTests {
             "selenium-" + randomUUID()
         );
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
-        Set<String> projectUrls =
-            projectNames.stream()
-                .map(name -> cytomineSteps.createProject(wait, driver, cytomineUrl, name))
-                .collect(toSet());
+        Set<String> projectUrls = projectNames.stream()
+            .map(name -> cytomineSteps.createProject(wait, driver, cytomineUrl, name))
+            .collect(toSet());
         cytomineSteps.listProjects(wait, cytomineUrl, projectNames);
-        Set<String> ignored =
-            projectUrls.stream()
-                .map(projectURL -> {
-                    String ontologyURL = cytomineSteps.getOntologyUrlFromProject(wait, projectURL);
-                    cytomineSteps.deleteProject(wait, projectURL);
-                    if (ontologyURL != null) {
-                        cytomineSteps.deleteOntology(wait, ontologyURL);
-                    }
-                    return projectURL;
-                })
-                .collect(toSet());
+        projectUrls.forEach(projectUrl -> {
+            String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
+            cytomineSteps.deleteProject(wait, projectUrl);
+            cytomineSteps.deleteOntology(wait, ontologyUrl);
+        });
         cytomineSteps.logout(wait, cytomineUrl);
     }
 
@@ -489,6 +482,23 @@ public class CytomineTests {
         cytomineSteps.exportOntology(wait, ontologyUrl, ontologyName);
 
         cytomineSteps.deleteOntology(wait, ontologyUrl);
+        cytomineSteps.logout(wait, cytomineUrl);
+    }
+
+    @Test
+    void seeRecentlyViewedProjectsInDashboard() {
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        String projectName = "selenium-" + randomUUID();
+        String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
+        String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
+        String imageName = cytomineSteps.addImage(wait, cytomineUrl, Optional.of(projectName));
+        cytomineSteps.openImageInViewer(wait, projectUrl);
+
+        cytomineSteps.checkRecentlyViewedProjects(wait, cytomineUrl, projectName, imageName);
+
+        cytomineSteps.deleteProject(wait, projectUrl);
+        cytomineSteps.deleteOntology(wait, ontologyUrl);
+        cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
         cytomineSteps.logout(wait, cytomineUrl);
     }
 }

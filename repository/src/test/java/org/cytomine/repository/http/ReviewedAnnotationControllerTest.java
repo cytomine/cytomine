@@ -2,6 +2,7 @@ package org.cytomine.repository.http;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -371,10 +372,10 @@ class ReviewedAnnotationControllerTest {
     }
 
     private MvcResult performDownload(String format) throws Exception {
-        return restReviewedAnnotationControllerMockMvc.perform(
-            get("/api/project/{project}/reviewedannotation/download", this.project.getId()).param("format", format)
-                .param("reviewUsers", "").param("terms", this.term.getId().toString())
-                .param("images", this.image.getId().toString())).andExpect(status().isOk()).andReturn();
+        return mockMvc.perform(
+            get("/api/project/{project}/reviewedannotation/download", this.projectId).param("format", format)
+                .param("reviewUsers", "").param("terms", this.termId.toString())
+                .param("images", this.imageId.toString())).andExpect(status().isOk()).andReturn();
     }
 
     private void checkResult(String delimiter, MvcResult result) throws UnsupportedEncodingException {

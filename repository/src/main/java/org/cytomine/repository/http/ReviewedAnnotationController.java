@@ -1,7 +1,6 @@
 package org.cytomine.repository.http;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -40,9 +39,6 @@ public class ReviewedAnnotationController implements ReviewedAnnotationHttpContr
     private final ReviewedAnnotationMapper reviewedAnnotationMapper;
     private final ACLService aclService;
     private final TermRepository termRepository;
-    private final ReviewedAnnotationRepository reviewedAnnotationRepository;
-    private final ReviewedAnnotationCommandService reviewedAnnotationCommandService;
-    private final ReviewedAnnotationMapper reviewedAnnotationMapper;
 
     @Override
     @GetMapping("/{id}")
@@ -97,41 +93,5 @@ public class ReviewedAnnotationController implements ReviewedAnnotationHttpContr
                 newLinks.stream().map(termId -> new ReviewedAnnotationLinkEntity(termId, reviewedAnnotationTermsId))
                     .toList()).stream().map(ReviewedAnnotationLinkEntity::getTermId).collect(Collectors.toSet());
         }
-    }
-
-    @Override
-    @GetMapping("/{id}")
-    public Optional<ReviewedAnnotationResponse> findById(long id, long userId) {
-        return reviewedAnnotationRepository.findById(id)
-            .filter(e -> aclService.canReadProject(userId, e.getProjectId()))
-            .map(e -> reviewedAnnotationMapper.mapToResponse(e, getTermIds(e.getId())));
-    }
-
-    @Override
-    @GetMapping("/term/{termId}/count")
-    public long countByTerm(long termId, long userId) {
-        return reviewedAnnotationRepository.countByTermId(termId);
-    }
-
-    @Override
-    public Optional<HttpCommandResponse> create(long userId, CreateReviewedAnnotation createReviewedAnnotation) {
-        return reviewedAnnotationCommandService.createReviewedAnnotation(userId, createReviewedAnnotation,
-            LocalDateTime.now());
-    }
-
-    @Override
-    public Optional<HttpCommandResponse> update(long id, long userId,
-        UpdateReviewedAnnotation updateReviewedAnnotation) {
-        return reviewedAnnotationCommandService.updateReviewedAnnotation(id, userId, updateReviewedAnnotation,
-            LocalDateTime.now());
-    }
-
-    @Override
-    public Optional<HttpCommandResponse> delete(long id, long userId) {
-        return reviewedAnnotationCommandService.deleteReviewedAnnotation(id, userId, LocalDateTime.now());
-    }
-
-    private List<Long> getTermIds(long reviewedAnnotationId) {
-        return reviewedAnnotationRepository.findTermIds(reviewedAnnotationId);
     }
 }

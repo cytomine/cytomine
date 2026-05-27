@@ -21,19 +21,21 @@
             pkgs.stdenv.cc.cc.lib
             pkgs.zlib
           ];
+          JAVA_HOME = pkgs.lib.strings.makeLibraryPath [ pkgs.jdk24 ];
           buildInputs = with pkgs; [
             chart-testing
+            age
             fluxcd
+            jdk24
             kubectl
             kubernetes-helm
             kustomize
+            nodejs
             openssl
             postgresql
             python3
-            uv
-            age
             sops
-            nodejs
+            uv
           ];
           shellHook = ''
             export KUBECONFIG=./.kube/config

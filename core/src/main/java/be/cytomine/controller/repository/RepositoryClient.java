@@ -15,7 +15,6 @@ import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
 import be.cytomine.common.repository.http.HealthService;
 import be.cytomine.common.repository.http.ReviewedAnnotationHttpContract;
-import be.cytomine.common.repository.http.ReviewedAnnotationHttpContract;
 import be.cytomine.common.repository.http.StatsHttpContract;
 import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.common.repository.http.TermRelationHttpContract;
@@ -75,12 +74,5 @@ public class RepositoryClient {
             .customArgumentResolver(new PageableHttpServiceArgumentResolver())
             .build();
         return factory.createClient(repoType);
-    }
-
-    @Bean
-    ReviewedAnnotationHttpContract reviewedAnnotationServiceClient(RestClient repositoryRestClient) {
-        RestClientAdapter adapter = RestClientAdapter.create(repositoryRestClient);
-        HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(adapter).build();
-        return factory.createClient(ReviewedAnnotationHttpContract.class);
     }
 }

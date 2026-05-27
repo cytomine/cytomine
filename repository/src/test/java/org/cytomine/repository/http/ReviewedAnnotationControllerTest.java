@@ -112,10 +112,9 @@ class ReviewedAnnotationControllerTest {
     void findByIdWhenExistsReturnsReviewedAnnotation() {
         long reviewedAnnotationId = saveReviewedAnnotation();
 
-        String response = mockMvc.perform(get("/reviewed_annotations/{id}", reviewedAnnotationId)
-                .param("userId", userId.toString()))
-            .andExpect(status().isOk())
-            .andReturn().getResponse().getContentAsString();
+        String response =
+            mockMvc.perform(get("/reviewed_annotations/{id}", reviewedAnnotationId).param("userId", userId.toString()))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
         ReviewedAnnotationResponse result = objectMapper.readValue(response, ReviewedAnnotationResponse.class);
         assertEquals(reviewedAnnotationId, result.id());
@@ -126,10 +125,8 @@ class ReviewedAnnotationControllerTest {
     @Test
     @SneakyThrows
     void findByIdWhenNotExistsReturnsEmpty() {
-        String response = mockMvc.perform(get("/reviewed_annotations/{id}", 999L)
-                .param("userId", userId.toString()))
-            .andExpect(status().isOk())
-            .andReturn().getResponse().getContentAsString();
+        String response = mockMvc.perform(get("/reviewed_annotations/{id}", 999L).param("userId", userId.toString()))
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
         assertNull(objectMapper.readValue(response, ReviewedAnnotationResponse.class));
     }
@@ -141,10 +138,9 @@ class ReviewedAnnotationControllerTest {
         Long nonAdminUserId = nextId();
         jdbcTemplate.update("INSERT INTO sec_user (id, version, username) VALUES (?, 0, 'nonadmin')", nonAdminUserId);
 
-        String response = mockMvc.perform(get("/reviewed_annotations/{id}", reviewedAnnotationId)
-                .param("userId", nonAdminUserId.toString()))
-            .andExpect(status().isOk())
-            .andReturn().getResponse().getContentAsString();
+        String response = mockMvc.perform(
+                get("/reviewed_annotations/{id}", reviewedAnnotationId).param("userId", nonAdminUserId.toString()))
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
         assertNull(objectMapper.readValue(response, ReviewedAnnotationResponse.class));
     }
@@ -157,10 +153,9 @@ class ReviewedAnnotationControllerTest {
             "INSERT INTO reviewed_annotation_term (reviewed_annotation_terms_id, term_id) VALUES (?, ?)",
             reviewedAnnotationId, termId);
 
-        String response = mockMvc.perform(get("/reviewed_annotations/term/{termId}/count", termId)
-                .param("userId", userId.toString()))
-            .andExpect(status().isOk())
-            .andReturn().getResponse().getContentAsString();
+        String response =
+            mockMvc.perform(get("/reviewed_annotations/term/{termId}/count", termId).param("userId", userId.toString()))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
         assertEquals(1L, Long.parseLong(response));
     }
@@ -168,19 +163,17 @@ class ReviewedAnnotationControllerTest {
     @Test
     @SneakyThrows
     void createSavesAndReturnsReviewedAnnotation() {
-        CreateReviewedAnnotation payload = new CreateReviewedAnnotation(userId, userId, imageId, sliceId, projectId,
-            parentAnnotationId, "be.cytomine.domain.ontology.UserAnnotation", 0,
-            "POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))", 0.0, null);
+        CreateReviewedAnnotation payload =
+            new CreateReviewedAnnotation(userId, userId, imageId, sliceId, projectId, parentAnnotationId,
+                "be.cytomine.domain.ontology.UserAnnotation", 0, "POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))", 0.0, null);
 
-        String response = mockMvc.perform(post("/reviewed_annotations")
-                .param("userId", userId.toString())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(payload)))
-            .andExpect(status().isOk())
-            .andReturn().getResponse().getContentAsString();
+        String response = mockMvc.perform(
+                post("/reviewed_annotations").param("userId", userId.toString()).contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(payload))).andExpect(status().isOk()).andReturn().getResponse()
+            .getContentAsString();
 
-        HttpCommandResponse result = objectMapper.readValue(response,
-            objectMapper.getTypeFactory().constructType(HttpCommandResponse.class));
+        HttpCommandResponse result =
+            objectMapper.readValue(response, objectMapper.getTypeFactory().constructType(HttpCommandResponse.class));
         ReviewedAnnotationResponse data = (ReviewedAnnotationResponse) result.data();
 
         assertEquals(projectId, data.projectId());
@@ -195,16 +188,13 @@ class ReviewedAnnotationControllerTest {
         Long nonAdminUserId = nextId();
         jdbcTemplate.update("INSERT INTO sec_user (id, version, username) VALUES (?, 0, 'nonadmin')", nonAdminUserId);
 
-        CreateReviewedAnnotation payload = new CreateReviewedAnnotation(userId, userId, imageId, sliceId, projectId,
-            parentAnnotationId, "be.cytomine.domain.ontology.UserAnnotation", 0,
-            "POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))", 0.0, null);
+        CreateReviewedAnnotation payload =
+            new CreateReviewedAnnotation(userId, userId, imageId, sliceId, projectId, parentAnnotationId,
+                "be.cytomine.domain.ontology.UserAnnotation", 0, "POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))", 0.0, null);
 
-        String response = mockMvc.perform(post("/reviewed_annotations")
-                .param("userId", nonAdminUserId.toString())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(payload)))
-            .andExpect(status().isOk())
-            .andReturn().getResponse().getContentAsString();
+        String response = mockMvc.perform(post("/reviewed_annotations").param("userId", nonAdminUserId.toString())
+                .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(payload)))
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
         assertNull(objectMapper.readValue(response, HttpCommandResponse.class));
     }
@@ -213,18 +203,16 @@ class ReviewedAnnotationControllerTest {
     @SneakyThrows
     void updateWhenExistsUpdatesAndReturnsReviewedAnnotation() {
         long reviewedAnnotationId = saveReviewedAnnotation();
-        UpdateReviewedAnnotation payload = new UpdateReviewedAnnotation(
-            Optional.of("POLYGON((0 0, 2 0, 2 2, 0 2, 0 0))"), Optional.empty());
+        UpdateReviewedAnnotation payload =
+            new UpdateReviewedAnnotation(Optional.of("POLYGON((0 0, 2 0, 2 2, 0 2, 0 0))"), Optional.empty());
 
-        String response = mockMvc.perform(put("/reviewed_annotations/{id}", reviewedAnnotationId)
-                .param("userId", userId.toString())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(payload)))
-            .andExpect(status().isOk())
-            .andReturn().getResponse().getContentAsString();
+        String response = mockMvc.perform(
+                put("/reviewed_annotations/{id}", reviewedAnnotationId).param("userId", userId.toString())
+                    .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(payload)))
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
-        HttpCommandResponse result = objectMapper.readValue(response,
-            objectMapper.getTypeFactory().constructType(HttpCommandResponse.class));
+        HttpCommandResponse result =
+            objectMapper.readValue(response, objectMapper.getTypeFactory().constructType(HttpCommandResponse.class));
         ReviewedAnnotationResponse data = (ReviewedAnnotationResponse) result.data();
 
         assertEquals(reviewedAnnotationId, data.id());
@@ -241,15 +229,13 @@ class ReviewedAnnotationControllerTest {
         jdbcTemplate.update("INSERT INTO sec_user (id, version, username) VALUES (?, 0, 'nonreviewer')",
             nonReviewerUserId);
         grantProjectReadAccess(nonReviewerUserId, "nonreviewer");
-        UpdateReviewedAnnotation payload = new UpdateReviewedAnnotation(
-            Optional.of("POLYGON((0 0, 2 0, 2 2, 0 2, 0 0))"), Optional.empty());
+        UpdateReviewedAnnotation payload =
+            new UpdateReviewedAnnotation(Optional.of("POLYGON((0 0, 2 0, 2 2, 0 2, 0 0))"), Optional.empty());
 
-        String response = mockMvc.perform(put("/reviewed_annotations/{id}", reviewedAnnotationId)
-                .param("userId", nonReviewerUserId.toString())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(payload)))
-            .andExpect(status().isOk())
-            .andReturn().getResponse().getContentAsString();
+        String response = mockMvc.perform(
+                put("/reviewed_annotations/{id}", reviewedAnnotationId).param("userId", nonReviewerUserId.toString())
+                    .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(payload)))
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
         assertNull(objectMapper.readValue(response, HttpCommandResponse.class));
     }
@@ -259,12 +245,9 @@ class ReviewedAnnotationControllerTest {
     void updateWhenNotExistsReturnsEmpty() {
         UpdateReviewedAnnotation payload = new UpdateReviewedAnnotation(Optional.empty(), Optional.empty());
 
-        String response = mockMvc.perform(put("/reviewed_annotations/{id}", 999L)
-                .param("userId", userId.toString())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(payload)))
-            .andExpect(status().isOk())
-            .andReturn().getResponse().getContentAsString();
+        String response = mockMvc.perform(put("/reviewed_annotations/{id}", 999L).param("userId", userId.toString())
+                .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(payload)))
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
         assertNull(objectMapper.readValue(response, HttpCommandResponse.class));
     }
@@ -274,13 +257,12 @@ class ReviewedAnnotationControllerTest {
     void deleteWhenExistsDeletesAndReturnsReviewedAnnotation() {
         long reviewedAnnotationId = saveReviewedAnnotation();
 
-        String response = mockMvc.perform(delete("/reviewed_annotations/{id}", reviewedAnnotationId)
-                .param("userId", userId.toString()))
-            .andExpect(status().isOk())
-            .andReturn().getResponse().getContentAsString();
+        String response = mockMvc.perform(
+                delete("/reviewed_annotations/{id}", reviewedAnnotationId).param("userId", userId.toString()))
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
-        HttpCommandResponse result = objectMapper.readValue(response,
-            objectMapper.getTypeFactory().constructType(HttpCommandResponse.class));
+        HttpCommandResponse result =
+            objectMapper.readValue(response, objectMapper.getTypeFactory().constructType(HttpCommandResponse.class));
         ReviewedAnnotationResponse data = (ReviewedAnnotationResponse) result.data();
 
         assertEquals(reviewedAnnotationId, data.id());
@@ -298,10 +280,9 @@ class ReviewedAnnotationControllerTest {
             nonReviewerUserId);
         grantProjectReadAccess(nonReviewerUserId, "nonreviewer2");
 
-        String response = mockMvc.perform(delete("/reviewed_annotations/{id}", reviewedAnnotationId)
-                .param("userId", nonReviewerUserId.toString()))
-            .andExpect(status().isOk())
-            .andReturn().getResponse().getContentAsString();
+        String response = mockMvc.perform(
+                delete("/reviewed_annotations/{id}", reviewedAnnotationId).param("userId", nonReviewerUserId.toString()))
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
         assertNull(objectMapper.readValue(response, HttpCommandResponse.class));
     }
@@ -309,10 +290,8 @@ class ReviewedAnnotationControllerTest {
     @Test
     @SneakyThrows
     void deleteWhenNotExistsReturnsEmpty() {
-        String response = mockMvc.perform(delete("/reviewed_annotations/{id}", 999L)
-                .param("userId", userId.toString()))
-            .andExpect(status().isOk())
-            .andReturn().getResponse().getContentAsString();
+        String response = mockMvc.perform(delete("/reviewed_annotations/{id}", 999L).param("userId", userId.toString()))
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
         assertNull(objectMapper.readValue(response, HttpCommandResponse.class));
     }
@@ -320,10 +299,9 @@ class ReviewedAnnotationControllerTest {
     private void setUpAnnotationInfrastructure() {
         Long uploadedFileId = nextId();
         jdbcTemplate.update("""
-                INSERT INTO uploaded_file
-                (id, version, user_id, content_type, ext, filename, original_filename, size, status)
-                VALUES (?, 0, ?, 'image/png', 'png', 'test.png', 'test.png', 0, 0)""",
-            uploadedFileId, userId);
+            INSERT INTO uploaded_file
+            (id, version, user_id, content_type, ext, filename, original_filename, size, status)
+            VALUES (?, 0, ?, 'image/png', 'png', 'test.png', 'test.png', 0, 0)""", uploadedFileId, userId);
 
         Long abstractImageId = nextId();
         jdbcTemplate.update("INSERT INTO abstract_image (id, version) VALUES (?, 0)", abstractImageId);
@@ -334,18 +312,17 @@ class ReviewedAnnotationControllerTest {
 
         Long abstractSliceId = nextId();
         jdbcTemplate.update("""
-                INSERT INTO abstract_slice
-                (id, version, channel, image_id, mime_id, time, uploaded_file_id, z_stack)
-                VALUES (?, 0, 0, ?, ?, 0, ?, 0)""",
-            abstractSliceId, abstractImageId, mimeId, uploadedFileId);
+            INSERT INTO abstract_slice
+            (id, version, channel, image_id, mime_id, time, uploaded_file_id, z_stack)
+            VALUES (?, 0, 0, ?, ?, 0, ?, 0)""", abstractSliceId, abstractImageId, mimeId, uploadedFileId);
 
         imageId = nextId();
         jdbcTemplate.update("""
                 INSERT INTO image_instance
                 (id, version, base_image_id, count_image_job_annotations,
                 count_image_reviewed_annotations, project_id, user_id, class)
-                VALUES (?, 0, ?, 0, 0, ?, ?, 'be.cytomine.domain.image.ImageInstance')""",
-            imageId, abstractImageId, projectId, userId);
+                VALUES (?, 0, ?, 0, 0, ?, ?, 'be.cytomine.domain.image.ImageInstance')""", imageId, abstractImageId,
+            projectId, userId);
 
         sliceId = nextId();
         jdbcTemplate.update(
@@ -368,8 +345,8 @@ class ReviewedAnnotationControllerTest {
     private long saveReviewedAnnotation() {
         LocalDateTime now = LocalDateTime.now();
         return reviewedAnnotationRepository.insertWithGeometry(now, now, userId, userId, imageId, sliceId, projectId,
-            parentAnnotationId, "be.cytomine.domain.ontology.UserAnnotation", 0,
-            "POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))", 0.0);
+            parentAnnotationId, "be.cytomine.domain.ontology.UserAnnotation", 0, "POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))",
+            0.0);
     }
 
     private void grantProjectReadAccess(Long targetUserId, String username) {
@@ -380,70 +357,44 @@ class ReviewedAnnotationControllerTest {
         jdbcTemplate.update("INSERT INTO acl_sid (id, principal, sid) VALUES (?, true, ?)", aclSidId, username);
         Long aclOiId = nextId();
         jdbcTemplate.update("""
-                INSERT INTO acl_object_identity
-                (id, object_id_class, object_id_identity, entries_inheriting)
-                VALUES (?, ?, ?, false)""",
-            aclOiId, aclClassId, projectId);
+            INSERT INTO acl_object_identity
+            (id, object_id_class, object_id_identity, entries_inheriting)
+            VALUES (?, ?, ?, false)""", aclOiId, aclClassId, projectId);
         jdbcTemplate.update("""
-                INSERT INTO acl_entry
-                (id, acl_object_identity, ace_order, sid, mask, granting, audit_success, audit_failure)
-                VALUES (?, ?, 0, ?, 1, true, false, false)""",
-            nextId(), aclOiId, aclSidId);
+            INSERT INTO acl_entry
+            (id, acl_object_identity, ace_order, sid, mask, granting, audit_success, audit_failure)
+            VALUES (?, ?, 0, ?, 1, true, false, false)""", nextId(), aclOiId, aclSidId);
     }
 
     private Long nextId() {
         return jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
     }
+
     private MvcResult performDownload(String format) throws Exception {
-        return restReviewedAnnotationControllerMockMvc.perform(get(
-                "/api/project/{project}/reviewedannotation/download",
-                this.project.getId()
-            )
-                .param("format", format)
-                .param("reviewUsers", "")
-                .param("terms", this.term.getId().toString())
-                .param("images", this.image.getId().toString()))
-            .andExpect(status().isOk())
-            .andReturn();
+        return restReviewedAnnotationControllerMockMvc.perform(
+            get("/api/project/{project}/reviewedannotation/download", this.project.getId()).param("format", format)
+                .param("reviewUsers", "").param("terms", this.term.getId().toString())
+                .param("images", this.image.getId().toString())).andExpect(status().isOk()).andReturn();
     }
 
     private void checkResult(String delimiter, MvcResult result) throws UnsupportedEncodingException {
-        TestUtils.checkSpreadsheetAnnotationResult(
-            delimiter,
-            result,
-            this.reviewedAnnotation,
-            this.project,
-            this.image,
-            this.me,
-            this.term,
-            "reviewedannotation",
-            applicationProperties.getServerURL()
-        );
+        TestUtils.checkSpreadsheetAnnotationResult(delimiter, result, this.reviewedAnnotation, this.project, this.image,
+            this.me, this.term, "reviewedannotation", applicationProperties.getServerURL());
     }
 
     private void checkXLSResult(MvcResult result) throws IOException {
-        TestUtils.checkSpreadsheetXLSAnnotationResult(
-            result,
-            this.reviewedAnnotation,
-            this.project,
-            this.image,
-            this.me,
-            this.term,
-            "reviewedannotation",
-            applicationProperties.getServerURL()
-        );
+        TestUtils.checkSpreadsheetXLSAnnotationResult(result, this.reviewedAnnotation, this.project, this.image,
+            this.me, this.term, "reviewedannotation", applicationProperties.getServerURL());
     }
+
     private void buildDownloadContext() throws ParseException {
         this.project = builder.givenAProject();
         this.image = builder.givenAnImageInstance(this.project);
         SliceInstance slice = builder.givenASliceInstance(this.image, 0, 0, 0);
         this.term = builder.givenATerm(this.project.getOntology());
         this.me = builder.givenSuperAdmin();
-        this.reviewedAnnotation = builder.givenAReviewedAnnotation(slice,
-            "POLYGON((1 1,5 1,5 5,1 5,1 1))",
-            this.me,
-            this.term
-        );
+        this.reviewedAnnotation =
+            builder.givenAReviewedAnnotation(slice, "POLYGON((1 1,5 1,5 5,1 5,1 1))", this.me, this.term);
         builder.addUserToProject(project, this.me.getUsername());
         //     wiremockRepository.stubTerm(this.term);
     }
@@ -468,16 +419,10 @@ class ReviewedAnnotationControllerTest {
     @Transactional
     public void downloadReviewedAnnotationPdfDocument() throws Exception {
         this.buildDownloadContext();
-        restReviewedAnnotationControllerMockMvc.perform(get(
-                "/api/project/{project}/reviewedannotation/download",
-                this.project.getId()
-            )
-                .param("format", "pdf")
-                .param("reviewUsers", "")
-                .param("terms", this.term.getId().toString())
-                .param("images", this.image.getId().toString()))
-            .andExpect(status().isOk())
-            .andExpect(header().string("Content-Type", "application/pdf"))
-            .andReturn();
+        mockMvc.perform(
+                get("/api/project/{project}/reviewedannotation/download", this.project.getId()).param("format", "pdf")
+                    .param("reviewUsers", "").param("terms", this.term.getId().toString())
+                    .param("images", this.image.getId().toString())).andExpect(status().isOk())
+            .andExpect(header().string("Content-Type", "application/pdf")).andReturn();
     }
 }

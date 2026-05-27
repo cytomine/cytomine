@@ -32,7 +32,6 @@ import be.cytomine.common.repository.model.command.payload.response.HttpCommandR
 import be.cytomine.common.repository.model.command.payload.response.ReviewedAnnotationResponse;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
-import be.cytomine.config.properties.ApplicationProperties;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.AbstractSlice;
 import be.cytomine.domain.image.ImageInstance;
@@ -42,7 +41,6 @@ import be.cytomine.domain.ontology.ReviewedAnnotation;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.repository.ontology.ReviewedAnnotationRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -76,16 +74,9 @@ public class ReviewedAnnotationResourceTests {
     @Autowired
     private ReviewedAnnotationRepository reviewedAnnotationRepository;
 
-    @Autowired
-    private ApplicationProperties applicationProperties;
     @MockitoBean
     private ReviewedAnnotationHttpContract reviewedAnnotationHttpContract;
 
-    private Project project;
-    private ImageInstance image;
-    private Term term;
-    private User me;
-    private ReviewedAnnotation reviewedAnnotation;
 
     public static ReviewedAnnotation givenAReviewedAnnotationWithValidImageServer(BasicInstanceBuilder builder)
         throws ParseException {
@@ -422,7 +413,7 @@ public class ReviewedAnnotationResourceTests {
 
     @Disabled("Randomly fail with ProxyExchange, need to find a solution")
     @Test
-    @jakarta.transaction.Transactional
+    @Transactional
     public void getReviewedAnnotationCrop() throws Exception {
         ReviewedAnnotation annotation = givenAReviewedAnnotationWithValidImageServer(builder);
 
@@ -454,7 +445,7 @@ public class ReviewedAnnotationResourceTests {
 
     @Disabled("Randomly fail with ProxyExchange, need to find a solution")
     @Test
-    @jakarta.transaction.Transactional
+    @Transactional
     public void getReviewedAnnotationCropMask() throws Exception {
         ReviewedAnnotation annotation = givenAReviewedAnnotationWithValidImageServer(builder);
 
@@ -485,7 +476,7 @@ public class ReviewedAnnotationResourceTests {
 
     @Disabled("Randomly fail with ProxyExchange, need to find a solution")
     @Test
-    @jakarta.transaction.Transactional
+    @Transactional
     public void getReviewedAnnotationAlphaMask() throws Exception {
         ReviewedAnnotation annotation = givenAReviewedAnnotationWithValidImageServer(builder);
 

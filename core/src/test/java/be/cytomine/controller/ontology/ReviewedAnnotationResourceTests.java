@@ -1,7 +1,5 @@
 package be.cytomine.controller.ontology;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -28,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
-import be.cytomine.TestUtils;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.http.ReviewedAnnotationHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
@@ -57,7 +54,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -87,7 +83,6 @@ public class ReviewedAnnotationResourceTests {
 
     private Project project;
     private ImageInstance image;
-    private SliceInstance slice;
     private Term term;
     private User me;
     private ReviewedAnnotation reviewedAnnotation;
@@ -104,11 +99,8 @@ public class ReviewedAnnotationResourceTests {
         AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
         slice.setUploadedFile(image.getUploadedFile());
         SliceInstance sliceInstance = builder.givenASliceInstance(imageInstance, slice);
-        return builder.givenAReviewedAnnotation(
-            sliceInstance,
-            "POLYGON((1 1,50 10,50 50,10 50,1 1))", builder.givenSuperAdmin(),
-            null
-        );
+        return builder.givenAReviewedAnnotation(sliceInstance, "POLYGON((1 1,50 10,50 50,10 50,1 1))",
+            builder.givenSuperAdmin(), null);
     }
 
     @Test
@@ -116,19 +108,15 @@ public class ReviewedAnnotationResourceTests {
     public void getAReviewedAnnotation() throws Exception {
         Long userId = builder.givenSuperAdmin().getId();
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
-        when(reviewedAnnotationHttpContract.findById(eq(reviewedAnnotation.getId()), eq(userId)))
-            .thenReturn(Optional.of(new ReviewedAnnotationResponse(
-                reviewedAnnotation.getId(), userId, userId,
+        when(reviewedAnnotationHttpContract.findById(eq(reviewedAnnotation.getId()), eq(userId))).thenReturn(
+            Optional.of(new ReviewedAnnotationResponse(reviewedAnnotation.getId(), userId, userId,
                 reviewedAnnotation.getImage().getId(), reviewedAnnotation.getSlice().getId(),
-                reviewedAnnotation.getProject().getId(),
-                reviewedAnnotation.getParentIdent(), reviewedAnnotation.getParentClassName(), 0,
-                reviewedAnnotation.getWktLocation(), 0.0,
-                List.of(),
+                reviewedAnnotation.getProject().getId(), reviewedAnnotation.getParentIdent(),
+                reviewedAnnotation.getParentClassName(), 0, reviewedAnnotation.getWktLocation(), 0.0, List.of(),
                 LocalDateTime.now(), LocalDateTime.now(), Optional.empty())));
 
         restReviewedAnnotationControllerMockMvc.perform(
-                get("/api/reviewedannotation/{id}.json", reviewedAnnotation.getId()))
-            .andExpect(status().isOk())
+                get("/api/reviewedannotation/{id}.json", reviewedAnnotation.getId())).andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(reviewedAnnotation.getId().intValue()))
             .andExpect(jsonPath("$.imageId").value(reviewedAnnotation.getImage().getId().intValue()))
             .andExpect(jsonPath("$.projectId").value(reviewedAnnotation.getProject().getId().intValue()))
@@ -148,18 +136,15 @@ public class ReviewedAnnotationResourceTests {
     @Test
     @Transactional
     public void listAnnotations() throws Exception {
-        restReviewedAnnotationControllerMockMvc.perform(get("/api/reviewedannotation.json"))
-            .andExpect(status().isOk());
+        restReviewedAnnotationControllerMockMvc.perform(get("/api/reviewedannotation.json")).andExpect(status().isOk());
     }
 
     @Test
     @Transactional
     public void statsAnnotations() throws Exception {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
-        restReviewedAnnotationControllerMockMvc.perform(get(
-                "/api/imageinstance/{image}/reviewedannotation/stats.json",
-                reviewedAnnotation.getImage().getId()
-            ))
+        restReviewedAnnotationControllerMockMvc.perform(
+                get("/api/imageinstance/{image}/reviewedannotation/stats.json", reviewedAnnotation.getImage().getId()))
             .andExpect(status().isOk());
     }
 
@@ -167,20 +152,14 @@ public class ReviewedAnnotationResourceTests {
     @Transactional
     public void countAnnotationsByProject() throws Exception {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
-        restReviewedAnnotationControllerMockMvc.perform(get(
-                "/api/project/{idUser}/reviewedannotation/count.json",
-                reviewedAnnotation.getProject().getId()
-            ))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.total").value(greaterThan(0)));
+        restReviewedAnnotationControllerMockMvc.perform(
+                get("/api/project/{idUser}/reviewedannotation/count.json", reviewedAnnotation.getProject().getId()))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.total").value(greaterThan(0)));
 
         Project projectWithoutAnnotation = builder.givenAProject();
-        restReviewedAnnotationControllerMockMvc.perform(get(
-                "/api/project/{idUser}/reviewedannotation/count.json",
-                projectWithoutAnnotation.getId()
-            ))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.total").value(0));
+        restReviewedAnnotationControllerMockMvc.perform(
+                get("/api/project/{idUser}/reviewedannotation/count.json", projectWithoutAnnotation.getId()))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.total").value(0));
     }
 
     @Test
@@ -193,170 +172,58 @@ public class ReviewedAnnotationResourceTests {
             builder.persistAndReturn(builder.givenANotPersistedReviewedAnnotation(oldReviewedAnnotation.getProject()));
 
 
-        restReviewedAnnotationControllerMockMvc.perform(get(
-                "/api/project/{idProject}/reviewedannotation/count.json",
-                oldReviewedAnnotation.getProject().getId()
-            )
-                .param("startDate", String.valueOf(oldReviewedAnnotation.getCreated().getTime()))
-                .param("endDate", String.valueOf(newReviewedAnnotation.getCreated().getTime())))
-            .andExpect(status().isOk())
+        restReviewedAnnotationControllerMockMvc.perform(get("/api/project/{idProject}/reviewedannotation/count.json",
+                oldReviewedAnnotation.getProject().getId()).param("startDate",
+                    String.valueOf(oldReviewedAnnotation.getCreated().getTime()))
+                .param("endDate", String.valueOf(newReviewedAnnotation.getCreated().getTime()))).andExpect(status().isOk())
             .andExpect(jsonPath("$.total").value(2));
 
-        restReviewedAnnotationControllerMockMvc.perform(get(
-                "/api/project/{idProject}/reviewedannotation/count.json",
-                oldReviewedAnnotation.getProject().getId()
-            )
-                .param("startDate", String.valueOf(DateUtils.addSeconds(oldReviewedAnnotation.getCreated(), -1).getTime())))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.total").value(2));
+        restReviewedAnnotationControllerMockMvc.perform(get("/api/project/{idProject}/reviewedannotation/count.json",
+                oldReviewedAnnotation.getProject().getId()).param("startDate",
+                String.valueOf(DateUtils.addSeconds(oldReviewedAnnotation.getCreated(), -1).getTime())))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.total").value(2));
 
-        restReviewedAnnotationControllerMockMvc.perform(get(
-                "/api/project/{idProject}/reviewedannotation/count.json",
-                oldReviewedAnnotation.getProject().getId()
-            )
-                .param("endDate", String.valueOf(DateUtils.addSeconds(newReviewedAnnotation.getCreated(), 1).getTime())))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.total").value(2));
+        restReviewedAnnotationControllerMockMvc.perform(get("/api/project/{idProject}/reviewedannotation/count.json",
+                oldReviewedAnnotation.getProject().getId()).param("endDate",
+                String.valueOf(DateUtils.addSeconds(newReviewedAnnotation.getCreated(), 1).getTime())))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.total").value(2));
 
-        restReviewedAnnotationControllerMockMvc.perform(get(
-                "/api/project/{idProject}/reviewedannotation/count.json",
-                oldReviewedAnnotation.getProject().getId()
-            )
-                .param("startDate", String.valueOf(DateUtils.addSeconds(newReviewedAnnotation.getCreated(), -1).getTime())))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.total").value(1));
+        restReviewedAnnotationControllerMockMvc.perform(get("/api/project/{idProject}/reviewedannotation/count.json",
+                oldReviewedAnnotation.getProject().getId()).param("startDate",
+                String.valueOf(DateUtils.addSeconds(newReviewedAnnotation.getCreated(), -1).getTime())))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.total").value(1));
 
-        restReviewedAnnotationControllerMockMvc.perform(get(
-                "/api/project/{idProject}/reviewedannotation/count.json",
-                oldReviewedAnnotation.getProject().getId()
-            )
-                .param("endDate", String.valueOf(DateUtils.addSeconds(oldReviewedAnnotation.getCreated(), 1).getTime())))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.total").value(1));
+        restReviewedAnnotationControllerMockMvc.perform(get("/api/project/{idProject}/reviewedannotation/count.json",
+                oldReviewedAnnotation.getProject().getId()).param("endDate",
+                String.valueOf(DateUtils.addSeconds(oldReviewedAnnotation.getCreated(), 1).getTime())))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.total").value(1));
 
-        restReviewedAnnotationControllerMockMvc.perform(get(
-                "/api/project/{idProject}/reviewedannotation/count.json",
-                oldReviewedAnnotation.getProject().getId()
-            )
-                .param("endDate", String.valueOf(DateUtils.addDays(oldReviewedAnnotation.getCreated(), -2).getTime())))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.total").value(0));
+        restReviewedAnnotationControllerMockMvc.perform(get("/api/project/{idProject}/reviewedannotation/count.json",
+                oldReviewedAnnotation.getProject().getId()).param("endDate",
+                String.valueOf(DateUtils.addDays(oldReviewedAnnotation.getCreated(), -2).getTime())))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.total").value(0));
     }
 
-    @Test
-    @Transactional
-    public void downloadReviewedAnnotationCsvDocument() throws Exception {
-        buildDownloadContext();
-        MvcResult mvcResult = performDownload("csv");
-        checkResult(";", mvcResult);
-    }
-
-    @Test
-    @Transactional
-    public void downloadReviewedAnnotationXlsDocument() throws Exception {
-        buildDownloadContext();
-        MvcResult mvcResult = performDownload("xls");
-        checkXLSResult(mvcResult);
-    }
-
-    @Test
-    @Transactional
-    public void downloadReviewedAnnotationPdfDocument() throws Exception {
-        this.buildDownloadContext();
-        restReviewedAnnotationControllerMockMvc.perform(get(
-                "/api/project/{project}/reviewedannotation/download",
-                this.project.getId()
-            )
-                .param("format", "pdf")
-                .param("reviewUsers", "")
-                .param("terms", this.term.getId().toString())
-                .param("images", this.image.getId().toString()))
-            .andExpect(status().isOk())
-            .andExpect(header().string("Content-Type", "application/pdf"))
-            .andReturn();
-    }
-
-    private void buildDownloadContext() throws ParseException {
-        this.project = builder.givenAProject();
-        this.image = builder.givenAnImageInstance(this.project);
-        this.slice = builder.givenASliceInstance(this.image, 0, 0, 0);
-        this.term = builder.givenATerm(this.project.getOntology());
-        this.me = builder.givenSuperAdmin();
-        this.reviewedAnnotation = builder.givenAReviewedAnnotation(
-            this.slice,
-            "POLYGON((1 1,5 1,5 5,1 5,1 1))",
-            this.me,
-            this.term
-        );
-        builder.addUserToProject(project, this.me.getUsername());
-        //     wiremockRepository.stubTerm(this.term);
-    }
-
-    private MvcResult performDownload(String format) throws Exception {
-        return restReviewedAnnotationControllerMockMvc.perform(get(
-                "/api/project/{project}/reviewedannotation/download",
-                this.project.getId()
-            )
-                .param("format", format)
-                .param("reviewUsers", "")
-                .param("terms", this.term.getId().toString())
-                .param("images", this.image.getId().toString()))
-            .andExpect(status().isOk())
-            .andReturn();
-    }
-
-    private void checkResult(String delimiter, MvcResult result) throws UnsupportedEncodingException {
-        TestUtils.checkSpreadsheetAnnotationResult(
-            delimiter,
-            result,
-            this.reviewedAnnotation,
-            this.project,
-            this.image,
-            this.me,
-            this.term,
-            "reviewedannotation",
-            applicationProperties.getServerURL()
-        );
-    }
-
-    private void checkXLSResult(MvcResult result) throws IOException {
-        TestUtils.checkSpreadsheetXLSAnnotationResult(
-            result,
-            this.reviewedAnnotation,
-            this.project,
-            this.image,
-            this.me,
-            this.term,
-            "reviewedannotation",
-            applicationProperties.getServerURL()
-        );
-    }
 
     @Test
     @Transactional
     public void addValidReviewedAnnotation() throws Exception {
         Long userId = builder.givenSuperAdmin().getId();
         ReviewedAnnotation reviewedAnnotation = builder.givenANotPersistedReviewedAnnotation();
-        ReviewedAnnotationResponse annotationData = new ReviewedAnnotationResponse(
-            999L, userId, userId,
-            reviewedAnnotation.getImage().getId(), reviewedAnnotation.getSlice().getId(),
-            reviewedAnnotation.getProject().getId(),
-            reviewedAnnotation.getParentIdent(), reviewedAnnotation.getParentClassName(), 0,
-            reviewedAnnotation.getWktLocation(), 0.0,
-            List.of(),
-            LocalDateTime.now(), LocalDateTime.now(), Optional.empty());
-        when(reviewedAnnotationHttpContract.create(eq(userId), any()))
-            .thenReturn(Optional.of(
-                new HttpCommandResponse(true, annotationData, UUID.randomUUID(), "ADD_REVIEWED_ANNOTATION")));
+        ReviewedAnnotationResponse annotationData =
+            new ReviewedAnnotationResponse(999L, userId, userId, reviewedAnnotation.getImage().getId(),
+                reviewedAnnotation.getSlice().getId(), reviewedAnnotation.getProject().getId(),
+                reviewedAnnotation.getParentIdent(), reviewedAnnotation.getParentClassName(), 0,
+                reviewedAnnotation.getWktLocation(), 0.0, List.of(), LocalDateTime.now(), LocalDateTime.now(),
+                Optional.empty());
+        when(reviewedAnnotationHttpContract.create(eq(userId), any())).thenReturn(
+            Optional.of(new HttpCommandResponse(true, annotationData, UUID.randomUUID(), "ADD_REVIEWED_ANNOTATION")));
 
-        restReviewedAnnotationControllerMockMvc.perform(post("/api/reviewedannotation.json")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(reviewedAnnotation.toJSON()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.data").exists())
-            .andExpect(jsonPath("$.commandId").exists())
-            .andExpect(jsonPath("$.command").exists());
+        restReviewedAnnotationControllerMockMvc.perform(
+                post("/api/reviewedannotation.json").contentType(MediaType.APPLICATION_JSON)
+                    .content(reviewedAnnotation.toJSON())).andExpect(status().isOk())
+            .andExpect(jsonPath("$.printMessage").value(true)).andExpect(jsonPath("$.data").exists())
+            .andExpect(jsonPath("$.commandId").exists()).andExpect(jsonPath("$.command").exists());
     }
 
     @Test
@@ -364,27 +231,21 @@ public class ReviewedAnnotationResourceTests {
     public void editValidReviewedAnnotation() throws Exception {
         Long userId = builder.givenSuperAdmin().getId();
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
-        ReviewedAnnotationResponse annotationData = new ReviewedAnnotationResponse(
-            reviewedAnnotation.getId(), userId, userId,
-            reviewedAnnotation.getImage().getId(), reviewedAnnotation.getSlice().getId(),
-            reviewedAnnotation.getProject().getId(),
-            reviewedAnnotation.getParentIdent(), reviewedAnnotation.getParentClassName(), 0,
-            reviewedAnnotation.getWktLocation(), 0.0,
-            List.of(),
-            LocalDateTime.now(), LocalDateTime.now(), Optional.empty());
-        when(reviewedAnnotationHttpContract.update(eq(reviewedAnnotation.getId()), eq(userId), any()))
-            .thenReturn(Optional.of(
+        ReviewedAnnotationResponse annotationData =
+            new ReviewedAnnotationResponse(reviewedAnnotation.getId(), userId, userId,
+                reviewedAnnotation.getImage().getId(), reviewedAnnotation.getSlice().getId(),
+                reviewedAnnotation.getProject().getId(), reviewedAnnotation.getParentIdent(),
+                reviewedAnnotation.getParentClassName(), 0, reviewedAnnotation.getWktLocation(), 0.0, List.of(),
+                LocalDateTime.now(), LocalDateTime.now(), Optional.empty());
+        when(reviewedAnnotationHttpContract.update(eq(reviewedAnnotation.getId()), eq(userId), any())).thenReturn(
+            Optional.of(
                 new HttpCommandResponse(true, annotationData, UUID.randomUUID(), "UPDATE_REVIEWED_ANNOTATION")));
 
         restReviewedAnnotationControllerMockMvc.perform(
-                put("/api/reviewedannotation/{id}.json", reviewedAnnotation.getId())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(reviewedAnnotation.toJSON()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.data").exists())
-            .andExpect(jsonPath("$.commandId").exists())
-            .andExpect(jsonPath("$.command").exists());
+                put("/api/reviewedannotation/{id}.json", reviewedAnnotation.getId()).contentType(MediaType.APPLICATION_JSON)
+                    .content(reviewedAnnotation.toJSON())).andExpect(status().isOk())
+            .andExpect(jsonPath("$.printMessage").value(true)).andExpect(jsonPath("$.data").exists())
+            .andExpect(jsonPath("$.commandId").exists()).andExpect(jsonPath("$.command").exists());
     }
 
     @Test
@@ -392,27 +253,20 @@ public class ReviewedAnnotationResourceTests {
     public void deleteReviewedAnnotation() throws Exception {
         Long userId = builder.givenSuperAdmin().getId();
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
-        ReviewedAnnotationResponse annotationData = new ReviewedAnnotationResponse(
-            reviewedAnnotation.getId(), userId, userId,
-            reviewedAnnotation.getImage().getId(), reviewedAnnotation.getSlice().getId(),
-            reviewedAnnotation.getProject().getId(),
-            reviewedAnnotation.getParentIdent(), reviewedAnnotation.getParentClassName(), 0,
-            reviewedAnnotation.getWktLocation(), 0.0,
-            List.of(),
-            LocalDateTime.now(), LocalDateTime.now(), Optional.empty());
-        when(reviewedAnnotationHttpContract.delete(eq(reviewedAnnotation.getId()), eq(userId)))
-            .thenReturn(Optional.of(
-                new HttpCommandResponse(true, annotationData, UUID.randomUUID(), "DELETE_REVIEWED_ANNOTATION")));
+        ReviewedAnnotationResponse annotationData =
+            new ReviewedAnnotationResponse(reviewedAnnotation.getId(), userId, userId,
+                reviewedAnnotation.getImage().getId(), reviewedAnnotation.getSlice().getId(),
+                reviewedAnnotation.getProject().getId(), reviewedAnnotation.getParentIdent(),
+                reviewedAnnotation.getParentClassName(), 0, reviewedAnnotation.getWktLocation(), 0.0, List.of(),
+                LocalDateTime.now(), LocalDateTime.now(), Optional.empty());
+        when(reviewedAnnotationHttpContract.delete(eq(reviewedAnnotation.getId()), eq(userId))).thenReturn(Optional.of(
+            new HttpCommandResponse(true, annotationData, UUID.randomUUID(), "DELETE_REVIEWED_ANNOTATION")));
 
         restReviewedAnnotationControllerMockMvc.perform(
-                delete("/api/reviewedannotation/{id}.json", reviewedAnnotation.getId())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(reviewedAnnotation.toJSON()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.data").exists())
-            .andExpect(jsonPath("$.commandId").exists())
-            .andExpect(jsonPath("$.command").exists());
+                delete("/api/reviewedannotation/{id}.json", reviewedAnnotation.getId()).contentType(
+                    MediaType.APPLICATION_JSON).content(reviewedAnnotation.toJSON())).andExpect(status().isOk())
+            .andExpect(jsonPath("$.printMessage").value(true)).andExpect(jsonPath("$.data").exists())
+            .andExpect(jsonPath("$.commandId").exists()).andExpect(jsonPath("$.command").exists());
     }
 
     @Test
@@ -422,10 +276,9 @@ public class ReviewedAnnotationResourceTests {
         when(reviewedAnnotationHttpContract.delete(eq(0L), eq(userId))).thenReturn(Optional.empty());
 
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
-        restReviewedAnnotationControllerMockMvc.perform(delete("/api/reviewedannotation/{id}.json", 0)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(reviewedAnnotation.toJSON()))
-            .andExpect(status().isNotFound());
+        restReviewedAnnotationControllerMockMvc.perform(
+            delete("/api/reviewedannotation/{id}.json", 0).contentType(MediaType.APPLICATION_JSON)
+                .content(reviewedAnnotation.toJSON())).andExpect(status().isNotFound());
     }
 
     @Test
@@ -433,13 +286,9 @@ public class ReviewedAnnotationResourceTests {
     public void startImageReview() throws Exception {
         ImageInstance imageInstance = builder.givenAnImageInstance();
         assertThat(imageInstance.getReviewStart()).isNull();
-        restReviewedAnnotationControllerMockMvc.perform(post(
-                "/api/imageinstance/{image}/review.json",
-                imageInstance.getId()
-            )
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(""))
-            .andExpect(status().isOk());
+        restReviewedAnnotationControllerMockMvc.perform(
+            post("/api/imageinstance/{image}/review.json", imageInstance.getId()).contentType(
+                MediaType.APPLICATION_JSON).content("")).andExpect(status().isOk());
         assertThat(imageInstance.getReviewStart()).isNotNull();
     }
 
@@ -450,11 +299,8 @@ public class ReviewedAnnotationResourceTests {
         imageInstance.setReviewStart(new Date());
         imageInstance.setReviewUser(imageInstance.getUser());
         assertThat(imageInstance.getReviewStop()).isNull();
-        restReviewedAnnotationControllerMockMvc.perform(delete(
-                "/api/imageinstance/{image}/review.json",
-                imageInstance.getId()
-            ))
-            .andExpect(status().isOk());
+        restReviewedAnnotationControllerMockMvc.perform(
+            delete("/api/imageinstance/{image}/review.json", imageInstance.getId())).andExpect(status().isOk());
         assertThat(imageInstance.getReviewStop()).isNotNull();
     }
 
@@ -465,11 +311,8 @@ public class ReviewedAnnotationResourceTests {
         imageInstance.setReviewStart(new Date());
         imageInstance.setReviewUser(imageInstance.getUser());
         assertThat(imageInstance.getReviewStop()).isNull();
-        restReviewedAnnotationControllerMockMvc.perform(delete(
-                "/api/imageinstance/{image}/review.json",
-                imageInstance.getId()
-            )
-                .param("cancel", "true"))
+        restReviewedAnnotationControllerMockMvc.perform(
+                delete("/api/imageinstance/{image}/review.json", imageInstance.getId()).param("cancel", "true"))
             .andExpect(status().isOk());
         assertThat(imageInstance.getReviewStart()).isNull();
         assertThat(imageInstance.getReviewStop()).isNull();
@@ -480,11 +323,8 @@ public class ReviewedAnnotationResourceTests {
     public void stopImageReviewRefuseIfImageNotStartedToReview() throws Exception {
         ImageInstance imageInstance = builder.givenAnImageInstance();
         assertThat(imageInstance.getReviewStart()).isNull();
-        restReviewedAnnotationControllerMockMvc.perform(delete(
-                "/api/imageinstance/{image}/review.json",
-                imageInstance.getId()
-            ))
-            .andExpect(status().isBadRequest());
+        restReviewedAnnotationControllerMockMvc.perform(
+            delete("/api/imageinstance/{image}/review.json", imageInstance.getId())).andExpect(status().isBadRequest());
     }
 
     @Test
@@ -497,13 +337,9 @@ public class ReviewedAnnotationResourceTests {
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm(userAnnotation);
         assertThat(reviewedAnnotationRepository.findByParentIdent(userAnnotation.getId())).isEmpty();
         em.refresh(userAnnotation);
-        restReviewedAnnotationControllerMockMvc.perform(post(
-                "/api/annotation/{annotation}/review.json",
-                userAnnotation.getId()
-            )
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(""))
-            .andExpect(status().isOk());
+        restReviewedAnnotationControllerMockMvc.perform(
+            post("/api/annotation/{annotation}/review.json", userAnnotation.getId()).contentType(
+                MediaType.APPLICATION_JSON).content("")).andExpect(status().isOk());
 
 
         assertThat(reviewedAnnotationRepository.findByParentIdent(userAnnotation.getId())).isPresent();
@@ -522,12 +358,9 @@ public class ReviewedAnnotationResourceTests {
 
         assertThat(reviewedAnnotationRepository.findByParentIdent(userAnnotation.getId())).isEmpty();
 
-        restReviewedAnnotationControllerMockMvc.perform(post(
-                "/api/annotation/{annotation}/review.json",
-                userAnnotation.getId()
-            )
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("").param("terms", anotherTerm.getId().toString()))
+        restReviewedAnnotationControllerMockMvc.perform(
+                post("/api/annotation/{annotation}/review.json", userAnnotation.getId()).contentType(
+                    MediaType.APPLICATION_JSON).content("").param("terms", anotherTerm.getId().toString()))
             .andExpect(status().isOk());
 
 
@@ -543,13 +376,9 @@ public class ReviewedAnnotationResourceTests {
 
         assertThat(reviewedAnnotationRepository.findByParentIdent(reviewedAnnotation.getParentIdent())).isPresent();
 
-        restReviewedAnnotationControllerMockMvc.perform(delete(
-                "/api/annotation/{annotation}/review.json",
-                reviewedAnnotation.getParentIdent()
-            )
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(""))
-            .andExpect(status().isOk());
+        restReviewedAnnotationControllerMockMvc.perform(
+            delete("/api/annotation/{annotation}/review.json", reviewedAnnotation.getParentIdent()).contentType(
+                MediaType.APPLICATION_JSON).content("")).andExpect(status().isOk());
 
         assertThat(reviewedAnnotationRepository.findByParentIdent(reviewedAnnotation.getParentIdent())).isEmpty();
     }
@@ -565,12 +394,9 @@ public class ReviewedAnnotationResourceTests {
 
         assertThat(reviewedAnnotationRepository.findByParentIdent(userAnnotation.getId())).isEmpty();
 
-        restReviewedAnnotationControllerMockMvc.perform(post(
-                "/api/imageinstance/{image}/annotation/review.json",
-                userAnnotation.getImage().getId()
-            )
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("").param("users", userAnnotation.getUser().getId().toString()))
+        restReviewedAnnotationControllerMockMvc.perform(
+                post("/api/imageinstance/{image}/annotation/review.json", userAnnotation.getImage().getId()).contentType(
+                    MediaType.APPLICATION_JSON).content("").param("users", userAnnotation.getUser().getId().toString()))
             .andExpect(status().isOk());
 
 
@@ -586,13 +412,9 @@ public class ReviewedAnnotationResourceTests {
 
         assertThat(reviewedAnnotationRepository.findByParentIdent(reviewedAnnotation.getParentIdent())).isPresent();
 
-        restReviewedAnnotationControllerMockMvc.perform(delete(
-                "/api/imageinstance/{image}/annotation/review.json",
-                reviewedAnnotation.getImage().getId()
-            )
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("").param("users", reviewedAnnotation.getUser().getId().toString()))
-            .andExpect(status().isOk());
+        restReviewedAnnotationControllerMockMvc.perform(delete("/api/imageinstance/{image}/annotation/review.json",
+            reviewedAnnotation.getImage().getId()).contentType(MediaType.APPLICATION_JSON).content("")
+            .param("users", reviewedAnnotation.getUser().getId().toString())).andExpect(status().isOk());
 
 
         assertThat(reviewedAnnotationRepository.findByParentIdent(reviewedAnnotation.getParentIdent())).isEmpty();
@@ -604,15 +426,13 @@ public class ReviewedAnnotationResourceTests {
     public void getReviewedAnnotationCrop() throws Exception {
         ReviewedAnnotation annotation = givenAReviewedAnnotationWithValidImageServer(builder);
 
-        byte[] mockResponse = UUID.randomUUID()
-            .toString()
+        byte[] mockResponse = UUID.randomUUID().toString()
             .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
 
-        String url = "/image/" + URLEncoder.encode("1636379100999/CMU-2/CMU-2.mrxs", StandardCharsets.UTF_8)
-            .replace("%2F", "/") + "/annotation/crop";
-        String
-            body
-            =
+        String url =
+            "/image/" + URLEncoder.encode("1636379100999/CMU-2/CMU-2.mrxs", StandardCharsets.UTF_8).replace("%2F", "/")
+                + "/annotation/crop";
+        String body =
             "{\"length\":512,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))\"}],\"timepoints\":0,\"background_transparency\":0}";
         System.out.println(url);
         System.out.println(body);
@@ -625,11 +445,8 @@ public class ReviewedAnnotationResourceTests {
 //        );
 
 
-        MvcResult mvcResult = restReviewedAnnotationControllerMockMvc.perform(get(
-                "/api/reviewedannotation/{id}/crop.png?maxSize=512",
-                annotation.getId()
-            ))
-            .andExpect(status().isOk())
+        MvcResult mvcResult = restReviewedAnnotationControllerMockMvc.perform(
+                get("/api/reviewedannotation/{id}/crop.png?maxSize=512", annotation.getId())).andExpect(status().isOk())
             .andReturn();
 //        List<LoggedRequest> all = wireMockServer.findAll(RequestPatternBuilder.allRequests());
 //        AssertionsForClassTypes.assertThat(mvcResult.getResponse().getContentAsByteArray()).isEqualTo(mockResponse);
@@ -641,15 +458,13 @@ public class ReviewedAnnotationResourceTests {
     public void getReviewedAnnotationCropMask() throws Exception {
         ReviewedAnnotation annotation = givenAReviewedAnnotationWithValidImageServer(builder);
 
-        byte[] mockResponse = UUID.randomUUID()
-            .toString()
+        byte[] mockResponse = UUID.randomUUID().toString()
             .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
 
-        String url = "/image/" + URLEncoder.encode("1636379100999/CMU-2/CMU-2.mrxs", StandardCharsets.UTF_8)
-            .replace("%2F", "/") + "/annotation/mask";
-        String
-            body
-            =
+        String url =
+            "/image/" + URLEncoder.encode("1636379100999/CMU-2/CMU-2.mrxs", StandardCharsets.UTF_8).replace("%2F", "/")
+                + "/annotation/mask";
+        String body =
             "{\"level\":0,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))\",\"fill_color\":\"#fff\"}],\"timepoints\":0}";
         System.out.println(url);
         System.out.println(body);
@@ -662,12 +477,8 @@ public class ReviewedAnnotationResourceTests {
 //        );
 
 
-        MvcResult mvcResult = restReviewedAnnotationControllerMockMvc.perform(get(
-                "/api/reviewedannotation/{id}/mask.png",
-                annotation.getId()
-            ))
-            .andExpect(status().isOk())
-            .andReturn();
+        MvcResult mvcResult = restReviewedAnnotationControllerMockMvc.perform(
+            get("/api/reviewedannotation/{id}/mask.png", annotation.getId())).andExpect(status().isOk()).andReturn();
 //        List<LoggedRequest> all = wireMockServer.findAll(RequestPatternBuilder.allRequests());
 //        AssertionsForClassTypes.assertThat(mvcResult.getResponse().getContentAsByteArray()).isEqualTo(mockResponse);
     }
@@ -678,18 +489,14 @@ public class ReviewedAnnotationResourceTests {
     public void getReviewedAnnotationAlphaMask() throws Exception {
         ReviewedAnnotation annotation = givenAReviewedAnnotationWithValidImageServer(builder);
 
-        byte[] mockResponse = UUID.randomUUID()
-            .toString()
+        byte[] mockResponse = UUID.randomUUID().toString()
             .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
 
 
-        String url = "/image/" + URLEncoder.encode(
-            annotation.getImage().getBaseImage().getPath(),
-            StandardCharsets.UTF_8
-        ).replace("%2F", "/") + "/annotation/crop";
-        String
-            body
-            =
+        String url =
+            "/image/" + URLEncoder.encode(annotation.getImage().getBaseImage().getPath(), StandardCharsets.UTF_8)
+                .replace("%2F", "/") + "/annotation/crop";
+        String body =
             "{\"level\":0,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))\"}],\"timepoints\":0,\"background_transparency\":100}";
         System.out.println(url);
         System.out.println(body);
@@ -701,11 +508,8 @@ public class ReviewedAnnotationResourceTests {
 //                )
 //        );
 
-        MvcResult mvcResult = restReviewedAnnotationControllerMockMvc.perform(get(
-                "/api/reviewedannotation/{id}/alphamask.png",
-                annotation.getId()
-            ))
-            .andExpect(status().isOk())
+        MvcResult mvcResult = restReviewedAnnotationControllerMockMvc.perform(
+                get("/api/reviewedannotation/{id}/alphamask.png", annotation.getId())).andExpect(status().isOk())
             .andReturn();
 //        List<LoggedRequest> all = wireMockServer.findAll(RequestPatternBuilder.allRequests());
 //        AssertionsForClassTypes.assertThat(mvcResult.getResponse().getContentAsByteArray()).isEqualTo(mockResponse);

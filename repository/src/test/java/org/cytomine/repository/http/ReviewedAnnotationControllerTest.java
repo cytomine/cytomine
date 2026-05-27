@@ -1,5 +1,7 @@
 package org.cytomine.repository.http;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -18,6 +20,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.ObjectMapper;
 
@@ -35,6 +38,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = RepositoryApp.class)
@@ -389,5 +393,91 @@ class ReviewedAnnotationControllerTest {
 
     private Long nextId() {
         return jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
+    }
+    private MvcResult performDownload(String format) throws Exception {
+        return restReviewedAnnotationControllerMockMvc.perform(get(
+                "/api/project/{project}/reviewedannotation/download",
+                this.project.getId()
+            )
+                .param("format", format)
+                .param("reviewUsers", "")
+                .param("terms", this.term.getId().toString())
+                .param("images", this.image.getId().toString()))
+            .andExpect(status().isOk())
+            .andReturn();
+    }
+
+    private void checkResult(String delimiter, MvcResult result) throws UnsupportedEncodingException {
+        TestUtils.checkSpreadsheetAnnotationResult(
+            delimiter,
+            result,
+            this.reviewedAnnotation,
+            this.project,
+            this.image,
+            this.me,
+            this.term,
+            "reviewedannotation",
+            applicationProperties.getServerURL()
+        );
+    }
+
+    private void checkXLSResult(MvcResult result) throws IOException {
+        TestUtils.checkSpreadsheetXLSAnnotationResult(
+            result,
+            this.reviewedAnnotation,
+            this.project,
+            this.image,
+            this.me,
+            this.term,
+            "reviewedannotation",
+            applicationProperties.getServerURL()
+        );
+    }
+    private void buildDownloadContext() throws ParseException {
+        this.project = builder.givenAProject();
+        this.image = builder.givenAnImageInstance(this.project);
+        SliceInstance slice = builder.givenASliceInstance(this.image, 0, 0, 0);
+        this.term = builder.givenATerm(this.project.getOntology());
+        this.me = builder.givenSuperAdmin();
+        this.reviewedAnnotation = builder.givenAReviewedAnnotation(slice,
+            "POLYGON((1 1,5 1,5 5,1 5,1 1))",
+            this.me,
+            this.term
+        );
+        builder.addUserToProject(project, this.me.getUsername());
+        //     wiremockRepository.stubTerm(this.term);
+    }
+
+    @Test
+    @Transactional
+    public void downloadReviewedAnnotationCsvDocument() throws Exception {
+        buildDownloadContext();
+        MvcResult mvcResult = performDownload("csv");
+        checkResult(";", mvcResult);
+    }
+
+    @Test
+    @Transactional
+    public void downloadReviewedAnnotationXlsDocument() throws Exception {
+        buildDownloadContext();
+        MvcResult mvcResult = performDownload("xls");
+        checkXLSResult(mvcResult);
+    }
+
+    @Test
+    @Transactional
+    public void downloadReviewedAnnotationPdfDocument() throws Exception {
+        this.buildDownloadContext();
+        restReviewedAnnotationControllerMockMvc.perform(get(
+                "/api/project/{project}/reviewedannotation/download",
+                this.project.getId()
+            )
+                .param("format", "pdf")
+                .param("reviewUsers", "")
+                .param("terms", this.term.getId().toString())
+                .param("images", this.image.getId().toString()))
+            .andExpect(status().isOk())
+            .andExpect(header().string("Content-Type", "application/pdf"))
+            .andReturn();
     }
 }

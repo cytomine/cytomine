@@ -149,19 +149,15 @@ public class CytomineSteps {
         webDriverUtils.xpathClick(wait, "//span[@data-option='" + projectName + "']");
         webDriverUtils.waitUntilByEmpty(
             wait,
-            By.cssSelector(".project-select .multiselect__content-wrapper")
+            By.xpath("//div[contains(@class,'project-select')]//input[@placeholder='Select options']")
         );
         webDriverUtils.byIsDisplayed(
             wait,
             By.xpath(
                 "//div[contains(@class,'project-select')]"
-                    + "//div[contains(@class,'multiselect__tags-wrap')]"
-                    + "//span[contains(normalize-space(.), '" + projectName + "')]"
+                    + "//div[@class='multiselect__tags-wrap']"
+                    + "//span[normalize-space()='" + projectName + "']"
             )
-        );
-        webDriverUtils.waitUntilByEmpty(
-            wait,
-            By.xpath("//div[contains(@class,'project-select')]//input[@placeholder='Select options']")
         );
     }
 

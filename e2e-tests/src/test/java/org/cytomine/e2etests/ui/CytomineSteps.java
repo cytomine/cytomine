@@ -146,7 +146,18 @@ public class CytomineSteps {
 
     private void selectProject(Wait<WebDriver> wait, String projectName) {
         webDriverUtils.byClick(wait, By.cssSelector(".project-select .multiselect__tags"));
-        webDriverUtils.xpathClick(wait, "//span[@data-option='" + projectName + "']");
+
+        By selectedOption = By.xpath(
+            "//div[contains(@class,'project-select')]"
+                + "//span[contains(@class,'multiselect__option--selected')]"
+                + "/span[@data-option='" + projectName + "']"
+        );
+        if (webDriverUtils.isAbsent(wait, selectedOption)) {
+            webDriverUtils.xpathClick(wait, "//span[@data-option='" + projectName + "']");
+        } else {
+            webDriverUtils.byClick(wait, By.cssSelector(".project-select .multiselect__select"));
+        }
+
         webDriverUtils.waitUntilByEmpty(
             wait,
             By.xpath("//div[contains(@class,'project-select')]//input[@placeholder='Select options']")

@@ -156,7 +156,7 @@ public class CytomineSteps {
             By.xpath(
                 "//div[contains(@class,'project-select')]"
                     + "//div[@class='multiselect__tags-wrap']"
-                    + "//span[normalize-space()='" + projectName + "']"
+                    + "[.//strong[normalize-space()='All'] or .//span[normalize-space()='" + projectName + "']]"
             )
         );
     }

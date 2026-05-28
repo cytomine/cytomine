@@ -118,7 +118,7 @@ spec:
               containerPort: {{ .Values.pims.port }}
           startupProbe:
             httpGet:
-              path: /ims/disk-usage
+              path: /ims/ping
               port: {{ .Values.pims.port }}
             initialDelaySeconds: 10
             periodSeconds: 10
@@ -133,7 +133,7 @@ spec:
             timeoutSeconds: 5
           livenessProbe:
             httpGet:
-              path: /ims/disk-usage
+              path: /ims/ping
               port: {{ .Values.pims.port }}
             periodSeconds: 10
             failureThreshold: 3

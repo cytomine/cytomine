@@ -312,10 +312,6 @@ export default {
   font-weight: 600;
 }
 
-.tag.ldap {
-  background-color: #A0C0E6;
-}
-
 .legend {
   margin-top: 0.8rem;
   margin-bottom: 1rem;

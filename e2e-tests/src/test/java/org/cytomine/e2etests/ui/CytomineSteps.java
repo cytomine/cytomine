@@ -77,6 +77,13 @@ public class CytomineSteps {
         );
     }
 
+    public void listImagesInProject(Wait<WebDriver> wait, String projectUrl, Set<String> imageNames) {
+        webDriverUtils.goTo(wait, projectUrl.replace("configuration", "images"));
+        imageNames.forEach(
+            name -> webDriverUtils.byIsDisplayed(wait, By.xpath(format("//a[span[contains(text(), '%s')]]", name)))
+        );
+    }
+
     public String createOntology(Wait<WebDriver> wait, WebDriver driver, URL cytomineUrl, String ontologyName) {
         webDriverUtils.goTo(wait, cytomineUrl.toString());
         webDriverUtils.xpathClick(wait, "//a[@href='#/ontology']");
@@ -108,11 +115,10 @@ public class CytomineSteps {
     }
 
     @SneakyThrows
-    public String addImage(Wait<WebDriver> wait, URL cytomineUrl, Optional<String> maybeProjectName) {
+    public void addImage(Wait<WebDriver> wait, URL cytomineUrl, String imageName, Optional<String> maybeProjectName) {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/storage");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//a[contains(., 'Add files')]"));
 
-        String imageName = "selenium-" + UUID.randomUUID() + ".png";
         Path tempDir = Files.createTempDirectory("selenium-upload");
         Path copiedFile = tempDir.resolve(imageName);
         try (var in = getClass().getClassLoader().getResourceAsStream("cat.png")) {
@@ -129,29 +135,63 @@ public class CytomineSteps {
         );
         webDriverUtils.byIsDisplayed(
             wait,
-            By.xpath("//div[contains(@class,'uploaded-files-list')]//span[@data-status='success']")
+            By.xpath(
+                "//tr[.//td[@data-label='Filename']//span[normalize-space(.)='" + imageName + "']]"
+                    + "//td[@data-label='Status']//span[@data-status='success']"
+            )
         );
-        return imageName;
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//button[contains(text(), 'Hide successful uploads')]"));
+        webDriverUtils.byClick(wait, By.xpath("//button[contains(text(), 'Hide successful uploads')]"));
     }
 
     private void selectProject(Wait<WebDriver> wait, String projectName) {
         webDriverUtils.byClick(wait, By.cssSelector(".project-select .multiselect__tags"));
-        webDriverUtils.xpathClick(wait, "//span[@data-option='" + projectName + "']");
+
+        By selectedOption = By.xpath(
+            "//div[contains(@class,'project-select')]"
+                + "//span[contains(@class,'multiselect__option--selected')]"
+                + "/span[@data-option='" + projectName + "']"
+        );
+        if (webDriverUtils.isAbsent(wait, selectedOption)) {
+            webDriverUtils.xpathClick(wait, "//span[@data-option='" + projectName + "']");
+        } else {
+            webDriverUtils.byClick(wait, By.cssSelector(".project-select .multiselect__select"));
+        }
+
+        webDriverUtils.waitUntilByEmpty(
+            wait,
+            By.xpath("//div[contains(@class,'project-select')]//input[@placeholder='Select options']")
+        );
+        webDriverUtils.byIsDisplayed(
+            wait,
+            By.xpath(
+                "//div[contains(@class,'project-select')]"
+                    + "//div[@class='multiselect__tags-wrap']"
+                    + "[.//strong[normalize-space()='All'] or .//span[normalize-space()='" + projectName + "']]"
+            )
+        );
     }
 
     public void deleteImage(Wait<WebDriver> wait, URL cytomineUrl, String imageName) {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/storage");
         webDriverUtils.waitLoading(wait);
-        webDriverUtils.byIsDisplayed(wait, By.xpath(
-            "//div[contains(@class,'uploaded-files-list')]//span[@data-filename='" + imageName
-                + "']"));
-        webDriverUtils.byClick(wait, By.xpath(
-            "//div[contains(@class,'uploaded-files-list')]//button[@data-filename='" + imageName
-                + "']"));
-        webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Confirm')]");
-        webDriverUtils.waitUntilByEmpty(wait, By.xpath(
-            "//div[contains(@class,'uploaded-files-list')]//span[@data-filename='" + imageName
-                + "']"));
+        webDriverUtils.byIsDisplayed(
+            wait,
+            By.xpath("//div[contains(@class,'uploaded-files-list')]//span[@data-filename='" + imageName + "']")
+        );
+        webDriverUtils.byClick(
+            wait,
+            By.xpath("//div[contains(@class,'uploaded-files-list')]//button[@data-filename='" + imageName + "']")
+        );
+        By confirmButton = By.xpath(
+            "//footer[contains(@class,'modal-card-foot')]"
+                + "//button[contains(@class,'is-danger') and normalize-space()='Confirm']"
+        );
+        webDriverUtils.byClick(wait, confirmButton);
+        webDriverUtils.waitUntilByEmpty(
+            wait,
+            By.xpath("//div[contains(@class,'uploaded-files-list')]//span[@data-filename='" + imageName + "']")
+        );
     }
 
     public String addTermToOntology(Wait<WebDriver> wait, WebDriver driver, String ontologyURL, String termName) {
@@ -159,8 +199,10 @@ public class CytomineSteps {
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Add a term')]");
         webDriverUtils.bySendKeys(wait, By.name("name"), termName);
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Save')]");
-        webDriverUtils.byIsDisplayed(wait, By.xpath(
-            "//span[contains(@class, 'ontology-term') and contains(text(), '" + termName + "')]"));
+        webDriverUtils.byIsDisplayed(
+            wait,
+            By.xpath("//span[contains(@class, 'ontology-term') and contains(text(), '" + termName + "')]")
+        );
         return driver.getCurrentUrl();
     }
 
@@ -198,8 +240,10 @@ public class CytomineSteps {
         webDriverUtils.goTo(wait, ontologyURL);
         webDriverUtils.waitLoading(wait);
         for (String termName : termNames) {
-            webDriverUtils.waitUntilByEmpty(wait, By.xpath(
-                "//span[contains(@class, 'ontology-term') and contains(text(), '" + termName + "')]"));
+            webDriverUtils.waitUntilByEmpty(
+                wait,
+                By.xpath("//span[contains(@class, 'ontology-term') and contains(text(), '" + termName + "')]")
+            );
         }
     }
 
@@ -559,5 +603,18 @@ public class CytomineSteps {
             wait,
             By.xpath("//td[contains(normalize-space(text()), '" + newFirstname + " " + newLastname + "')]")
         );
+    }
+
+    public void checkRecentlyViewedProjects(
+        Wait<WebDriver> wait,
+        URL cytomineUrl,
+        String projectName,
+        String imageName
+    ) {
+        webDriverUtils.goTo(wait, cytomineUrl.toString());
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), " + projectName + ")]"));
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), " + imageName + ")]"));
+        webDriverUtils.waitUntilByEmpty(wait, By.xpath("//div[contains(text(), 'No project recently opened')]"));
+        webDriverUtils.waitUntilByEmpty(wait, By.xpath("//div[contains(text(), 'No image recently opened')]"));
     }
 }

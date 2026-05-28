@@ -50,8 +50,9 @@ jobs:
 
       - name: Copy images for tests to kind node
         run: |
-          docker exec cytomine-control-plane mkdir -p /data/dataset/dataset-id/test-project/IMAGES
+          docker exec cytomine-control-plane mkdir -p /data/dataset/dataset-id/test-project/IMAGES /data/dataset/dataset-id/test-project/METADATA
           docker cp e2e-tests/src/test/resources/cat.png cytomine-control-plane:/data/dataset/dataset-id/test-project/IMAGES/cat.png
+          docker cp e2e-tests/src/test/resources/dataset.xml cytomine-control-plane:/data/dataset/dataset-id/test-project/METADATA/dataset.xml
 
       - name: Create Namespace
         run: |

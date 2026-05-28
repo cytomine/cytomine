@@ -617,4 +617,16 @@ public class CytomineSteps {
         webDriverUtils.waitUntilByEmpty(wait, By.xpath("//div[contains(text(), 'No project recently opened')]"));
         webDriverUtils.waitUntilByEmpty(wait, By.xpath("//div[contains(text(), 'No image recently opened')]"));
     }
+
+    public void checkPimsImportProject(
+        Wait<WebDriver> wait,
+        URL cytomineUrl,
+        String projectName,
+        String imageName
+    ) {
+        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/projects");
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), " + projectName + ")]"));
+        webDriverUtils.xpathClick(wait, "//a[contains(text(), '" + projectName +"')]");
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), " + imageName + ")]"));
+    }
 }

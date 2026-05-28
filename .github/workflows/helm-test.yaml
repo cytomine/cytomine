@@ -48,6 +48,11 @@ jobs:
           node_image: registry.cytomine.org/docker/kindest/node:v1.32.0
           cluster_name: cytomine
 
+      - name: Copy images for tests to kind node
+        run: |
+          docker exec cytomine-control-plane mkdir -p /data/dataset/dataset-id/test-project/IMAGES
+          docker cp e2e-tests/src/test/resources/cat.png cytomine-control-plane:/data/dataset/dataset-id/test-project/IMAGES/cat.png
+
       - name: Create Namespace
         run: |
           kubectl create ns cytomine-${{ env.DEPLOYMENT_NAME }}
@@ -161,13 +166,11 @@ jobs:
 
       - name: Logs e2e tests results - e2e-tests pod
         if: always()
-        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests
-          -c e2e-tests
+        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests -c e2e-tests
 
       - name: Logs e2e tests results - selenium pod
         if: always()
-        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests
-          -c selenium
+        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests -c selenium
 
       - name: Export test results
         if: always()

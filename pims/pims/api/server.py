@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 from pims import __version__
 from pims.config import ReadableSettings, get_settings
 
-router = APIRouter(prefix=get_settings().api_base_path)
+router = APIRouter(prefix=get_settings().api_base_path, tags=["Server"])
 
 
 class ServerInfo(BaseModel):
@@ -12,7 +12,12 @@ class ServerInfo(BaseModel):
     settings: ReadableSettings
 
 
-@router.get("/info", tags=["Server"])
+@router.get("/ping")
+def ping() -> dict:
+    return {"ping": "pong"}
+
+
+@router.get("/info")
 async def show_status() -> ServerInfo:
     """
     PIMS Server status.

@@ -11,9 +11,7 @@ pims:
     storageClassName:
   datasetImportFolder: /data/dataset
   datasetImportStorage:
-    hostPath:
-      path: /data/dataset
-      type: DirectoryOrCreate
+    emptyDir: {}
 mongodb:
   storageClassName:
 app_engine:

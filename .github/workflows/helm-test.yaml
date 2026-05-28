@@ -48,12 +48,6 @@ jobs:
           node_image: registry.cytomine.org/docker/kindest/node:v1.32.0
           cluster_name: cytomine
 
-      - name: Copy images for tests to kind node
-        run: |
-          docker exec cytomine-control-plane mkdir -p /data/dataset/dataset-id/test-project/IMAGES /data/dataset/dataset-id/test-project/METADATA
-          docker cp e2e-tests/src/test/resources/cat.png cytomine-control-plane:/data/dataset/dataset-id/test-project/IMAGES/cat.png
-          docker cp e2e-tests/src/test/resources/dataset.xml cytomine-control-plane:/data/dataset/dataset-id/test-project/METADATA/dataset.xml
-
       - name: Create Namespace
         run: |
           kubectl create ns cytomine-${{ env.DEPLOYMENT_NAME }}
@@ -148,6 +142,13 @@ jobs:
             --reuse-values \
             --set test.ingressIP=${{ env.GATEWAY_IP }} \
             --wait --timeout=5m
+
+      - name: Copy images for tests to pims pod
+        run: |
+          NS=cytomine-${{ env.DEPLOYMENT_NAME }}
+          kubectl exec -n $NS pims-0 -- mkdir -p /data/dataset/dataset-id/test-project/IMAGES /data/dataset/dataset-id/test-project/METADATA
+          kubectl cp e2e-tests/src/test/resources/cat.png $NS/pims-0:/data/dataset/dataset-id/test-project/IMAGES/cat.png
+          kubectl cp e2e-tests/src/test/resources/dataset.xml $NS/pims-0:/data/dataset/dataset-id/test-project/METADATA/dataset.xml
 
       - name: Trigger pims import cron job
         run: |

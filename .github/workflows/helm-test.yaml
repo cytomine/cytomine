@@ -143,6 +143,12 @@ jobs:
             --set test.ingressIP=${{ env.GATEWAY_IP }} \
             --wait --timeout=5m
 
+      - name: Trigger pims import cron job
+        run: |
+          NS=cytomine-${{ env.DEPLOYMENT_NAME }}
+          kubectl create job --from=cronjob/pims-import pims-import-ci -n $NS
+          kubectl wait --for=condition=complete job/pims-import-ci --timeout=120s -n $NS
+
       - name: Run helm tests
         run: |
           helm test cytomine-${{ env.DEPLOYMENT_NAME }} \

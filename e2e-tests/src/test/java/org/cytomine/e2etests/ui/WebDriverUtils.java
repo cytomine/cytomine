@@ -14,6 +14,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class WebDriverUtils {
 
+    boolean isAbsent(Wait<WebDriver> wait, By by) {
+        return wait.until(d -> d.findElements(by)).isEmpty();
+    }
+
     void xpathClick(Wait<WebDriver> wait, String xpath) {
         byClick(wait, By.xpath(xpath));
     }

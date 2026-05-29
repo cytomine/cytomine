@@ -8,6 +8,7 @@ on:
         required: true
       REGISTRY_TOKEN:
         required: true
+
 permissions: {}
 
 jobs:
@@ -285,7 +286,7 @@ jobs:
         if: always()
         run: |
           kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} delete pod e2e-tests --wait=true --timeout=60s
-          kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} apply -f .github/workflows/test-reports/export-pod.yaml
+          kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} apply -f .github/workflows/tests/export-pod.yaml
           kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} wait --for=jsonpath='{.status.phase}'=Running pod/export-test-results --timeout=60s
           kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} cp export-test-results:/reports/build/reports ./test-results/build/ -c exporter
           kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} cp export-test-results:/reports/e2e-tests/build/reports ./test-results/build/ -c exporter

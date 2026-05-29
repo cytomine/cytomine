@@ -5,7 +5,7 @@ import java.util.Optional;
 import be.cytomine.common.repository.model.command.payload.request.UpdateCommandPayload;
 
 public sealed interface CreateCommandRequest<T> extends CommandV2Request<T>
-    permits CreateTermCommand, CreateTermRelationCommand {
+    permits CreateOntologyCommand, CreateTermCommand, CreateTermRelationCommand {
 
     T after();
 

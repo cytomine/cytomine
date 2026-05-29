@@ -1,0 +1,17 @@
+package be.cytomine.common.repository.model.command.request;
+
+import be.cytomine.common.repository.model.command.CommandType;
+import be.cytomine.common.repository.model.command.payload.request.OntologyCommandPayload;
+
+public record UpdateOntologyCommand(Long id, OntologyCommandPayload before, OntologyCommandPayload after, long userId)
+    implements DeleteCommandRequest<OntologyCommandPayload> {
+    @Override
+    public CommandType getCommandType() {
+        return CommandType.DELETE_ONTOLOGY_COMMAND;
+    }
+
+    @Override
+    public String getActionMessage() {
+        return "";
+    }
+}

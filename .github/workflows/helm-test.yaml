@@ -85,6 +85,16 @@ jobs:
       - name: Build chart dependencies
         run: helm dependency build helm/charts/cytomine/
 
+      - name: Create test dataset ConfigMaps
+        run: |
+          NS=cytomine-${{ env.DEPLOYMENT_NAME }}
+          kubectl create configmap test-dataset-images \
+            --from-file=cat.png=e2e-tests/src/test/resources/cat.png \
+            --namespace=$NS
+          kubectl create configmap test-dataset-metadata \
+            --from-file=dataset.xml=e2e-tests/src/test/resources/dataset.xml \
+            --namespace=$NS
+
       - name: Install chart
         run: |
           NS=cytomine-${{ env.DEPLOYMENT_NAME }}
@@ -142,13 +152,6 @@ jobs:
             --reuse-values \
             --set test.ingressIP=${{ env.GATEWAY_IP }} \
             --wait --timeout=5m
-
-      - name: Copy images for tests to pims pod
-        run: |
-          NS=cytomine-${{ env.DEPLOYMENT_NAME }}
-          kubectl exec -n $NS pims-0 -- mkdir -p /data/dataset/dataset-id/test-project/IMAGES /data/dataset/dataset-id/test-project/METADATA
-          kubectl cp e2e-tests/src/test/resources/cat.png $NS/pims-0:/data/dataset/dataset-id/test-project/IMAGES/cat.png
-          kubectl cp e2e-tests/src/test/resources/dataset.xml $NS/pims-0:/data/dataset/dataset-id/test-project/METADATA/dataset.xml
 
       - name: Trigger pims import cron job
         run: |

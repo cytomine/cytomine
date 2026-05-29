@@ -9,7 +9,6 @@ pims:
     storageClassName:
   tempImageStorage:
     storageClassName:
-  datasetImportFolder: /data/dataset
   datasetImportStorage:
     persistentVolumeClaim:
       claimName: test-dataset-pvc

@@ -29,7 +29,3 @@ iam:
 images:
   imagePullSecretsNames:
     - docker-image-pull-secrets
-
-test:
-  dataset:
-    enabled: true

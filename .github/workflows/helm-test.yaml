@@ -119,9 +119,22 @@ jobs:
             template:
               spec:
                 restartPolicy: Never
+                securityContext:
+                  runAsNonRoot: true
+                  runAsUser: 20000
+                  runAsGroup: 20000
+                  fsGroup: 20000
+                  seccompProfile:
+                    type: RuntimeDefault
                 initContainers:
                   - name: wait-for-image
                     image: registry.cytomine.org/docker/library/alpine:3.18
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                      privileged: false
+                      readOnlyRootFilesystem: true
+                      capabilities:
+                        drop: ["ALL"]
                     command:
                       - sh
                       - -c
@@ -135,6 +148,12 @@ jobs:
                 containers:
                   - name: loader
                     image: registry.cytomine.org/docker/library/alpine:3.18
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                      privileged: false
+                      readOnlyRootFilesystem: true
+                      capabilities:
+                        drop: ["ALL"]
                     command:
                       - sh
                       - -c
@@ -143,7 +162,6 @@ jobs:
                         mkdir -p /data/dataset-id/test-project/METADATA
                         cp /tmp/metadata/dataset.xml /data/dataset-id/test-project/METADATA/dataset.xml
                         cp /tmp/images/cat.png /data/dataset-id/test-project/IMAGES/cat.png
-                        chmod -R 444 /data
                     volumeMounts:
                       - mountPath: /data
                         name: dataset-pvc
@@ -162,9 +180,13 @@ jobs:
                     emptyDir: {}
           EOF
 
+          # Wait for pod to be created before querying it
+          kubectl wait -n $NS --for=condition=initialized \
+            pod -l job-name=test-dataset-loader --timeout=60s
+
           POD=$(kubectl get pod -n $NS -l job-name=test-dataset-loader \
             -o jsonpath='{.items[0].metadata.name}')
-          kubectl wait -n $NS --for=condition=ready pod/$POD --timeout=60s
+
           kubectl cp e2e-tests/src/test/resources/cat.png \
             $NS/$POD:/tmp/images/cat.png -c wait-for-image
 

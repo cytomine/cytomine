@@ -262,7 +262,7 @@ public class ReviewedAnnotationResourceTests {
 
     @Test
     @Transactional
-    public void delete_reviewed_annotation_not_exist_fails() throws Exception {
+    public void deleteReviewedAnnotationNotExistFails() throws Exception {
         Long userId = builder.givenSuperAdmin().getId();
         when(reviewedAnnotationHttpContract.delete(eq(0L), eq(userId))).thenReturn(Optional.empty());
 
@@ -334,8 +334,6 @@ public class ReviewedAnnotationResourceTests {
 
 
         assertThat(reviewedAnnotationRepository.findByParentIdent(userAnnotation.getId())).isPresent();
-//        wireMockServer.verify(WireMock.putRequestedFor(urlPathMatching("/reviewed-annotations/terms/.*"))
-//            .withRequestBody(WireMock.containing(annotationTerm.getTerm().getId().toString())));
     }
 
     @Test
@@ -356,8 +354,6 @@ public class ReviewedAnnotationResourceTests {
 
 
         assertThat(reviewedAnnotationRepository.findByParentIdent(userAnnotation.getId())).isPresent();
-//        wireMockServer.verify(WireMock.putRequestedFor(urlPathMatching("/reviewed-annotations/terms/.*"))
-//            .withRequestBody(WireMock.containing(anotherTerm.getId().toString())));
     }
 
     @Test
@@ -427,20 +423,9 @@ public class ReviewedAnnotationResourceTests {
             "{\"length\":512,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))\"}],\"timepoints\":0,\"background_transparency\":0}";
         System.out.println(url);
         System.out.println(body);
-//        wireMockServer.stubFor(WireMock.post(urlEqualTo(IMS_API_BASE_PATH + url)).withRequestBody(WireMock.equalTo(
-//                    body
-//                ))
-//                .willReturn(
-//                    aResponse().withBody(mockResponse)
-//                )
-//        );
-
-
         MvcResult mvcResult = restReviewedAnnotationControllerMockMvc.perform(
                 get("/api/reviewedannotation/{id}/crop.png?maxSize=512", annotation.getId())).andExpect(status().isOk())
             .andReturn();
-//        List<LoggedRequest> all = wireMockServer.findAll(RequestPatternBuilder.allRequests());
-//        AssertionsForClassTypes.assertThat(mvcResult.getResponse().getContentAsByteArray()).isEqualTo(mockResponse);
     }
 
     @Disabled("Randomly fail with ProxyExchange, need to find a solution")
@@ -459,19 +444,9 @@ public class ReviewedAnnotationResourceTests {
             "{\"level\":0,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))\",\"fill_color\":\"#fff\"}],\"timepoints\":0}";
         System.out.println(url);
         System.out.println(body);
-//        wireMockServer.stubFor(WireMock.post(urlEqualTo(IMS_API_BASE_PATH + url)).withRequestBody(WireMock.equalTo(
-//                    body
-//                ))
-//                .willReturn(
-//                    aResponse().withBody(mockResponse)
-//                )
-//        );
-
 
         MvcResult mvcResult = restReviewedAnnotationControllerMockMvc.perform(
             get("/api/reviewedannotation/{id}/mask.png", annotation.getId())).andExpect(status().isOk()).andReturn();
-//        List<LoggedRequest> all = wireMockServer.findAll(RequestPatternBuilder.allRequests());
-//        AssertionsForClassTypes.assertThat(mvcResult.getResponse().getContentAsByteArray()).isEqualTo(mockResponse);
     }
 
     @Disabled("Randomly fail with ProxyExchange, need to find a solution")
@@ -491,18 +466,8 @@ public class ReviewedAnnotationResourceTests {
             "{\"level\":0,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))\"}],\"timepoints\":0,\"background_transparency\":100}";
         System.out.println(url);
         System.out.println(body);
-//        wireMockServer.stubFor(WireMock.post(urlEqualTo(IMS_API_BASE_PATH + url)).withRequestBody(WireMock.equalTo(
-//                    body
-//                ))
-//                .willReturn(
-//                    aResponse().withBody(mockResponse)
-//                )
-//        );
-
         MvcResult mvcResult = restReviewedAnnotationControllerMockMvc.perform(
                 get("/api/reviewedannotation/{id}/alphamask.png", annotation.getId())).andExpect(status().isOk())
             .andReturn();
-//        List<LoggedRequest> all = wireMockServer.findAll(RequestPatternBuilder.allRequests());
-//        AssertionsForClassTypes.assertThat(mvcResult.getResponse().getContentAsByteArray()).isEqualTo(mockResponse);
     }
 }

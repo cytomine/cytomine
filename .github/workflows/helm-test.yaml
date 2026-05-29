@@ -90,115 +90,29 @@ jobs:
         run: |
           NS=cytomine-${{ env.DEPLOYMENT_NAME }}
 
-          kubectl apply -n $NS -f - <<EOF
-          apiVersion: v1
-          kind: PersistentVolumeClaim
-          metadata:
-            name: test-dataset-pvc
-          spec:
-            accessModes:
-              - ReadWriteOnce
-            resources:
-              requests:
-                storage: 1Gi
-          EOF
-
-          kubectl create configmap test-dataset-metadata \
-            --from-file=dataset.xml=e2e-tests/src/test/resources/dataset.xml \
-            --namespace=$NS
+          kubectl -n $NS apply -f .github/workflows/tests/test-dataset-pvc.yaml
+          kubectl -n $NS create configmap test-dataset-metadata --from-file=dataset.xml=e2e-tests/src/test/resources/dataset.xml
 
       - name: Populate test dataset PVC with real image
         run: |
           NS=cytomine-${{ env.DEPLOYMENT_NAME }}
 
-          kubectl apply -n $NS -f - <<EOF
-          apiVersion: batch/v1
-          kind: Job
-          metadata:
-            name: test-dataset-loader
-          spec:
-            template:
-              spec:
-                restartPolicy: Never
-                securityContext:
-                  runAsNonRoot: true
-                  runAsUser: 20000
-                  runAsGroup: 20000
-                  fsGroup: 20000
-                  seccompProfile:
-                    type: RuntimeDefault
-                initContainers:
-                  - name: wait-for-image
-                    image: registry.cytomine.org/docker/library/alpine:3.18
-                    securityContext:
-                      allowPrivilegeEscalation: false
-                      privileged: false
-                      readOnlyRootFilesystem: true
-                      capabilities:
-                        drop: ["ALL"]
-                    command:
-                      - sh
-                      - -c
-                      - |
-                        echo "Waiting for cat.png..."
-                        until [ -f /tmp/images/cat.png ]; do sleep 2; done
-                        echo "cat.png found!"
-                    volumeMounts:
-                      - mountPath: /tmp/images
-                        name: image-staging
-                containers:
-                  - name: loader
-                    image: registry.cytomine.org/docker/library/alpine:3.18
-                    securityContext:
-                      allowPrivilegeEscalation: false
-                      privileged: false
-                      readOnlyRootFilesystem: true
-                      capabilities:
-                        drop: ["ALL"]
-                    command:
-                      - sh
-                      - -c
-                      - |
-                        mkdir -p /data/dataset-id/test-project/IMAGES
-                        mkdir -p /data/dataset-id/test-project/METADATA
-                        cp /tmp/metadata/dataset.xml /data/dataset-id/test-project/METADATA/dataset.xml
-                        cp /tmp/images/cat.png /data/dataset-id/test-project/IMAGES/cat.png
-                    volumeMounts:
-                      - mountPath: /data
-                        name: dataset-pvc
-                      - mountPath: /tmp/metadata
-                        name: dataset-metadata
-                      - mountPath: /tmp/images
-                        name: image-staging
-                volumes:
-                  - name: dataset-pvc
-                    persistentVolumeClaim:
-                      claimName: test-dataset-pvc
-                  - name: dataset-metadata
-                    configMap:
-                      name: test-dataset-metadata
-                  - name: image-staging
-                    emptyDir: {}
-          EOF
+          kubectl -n $NS apply -f .github/workflows/tests/test-dataset-job.yaml
 
-          until kubectl get pod -n $NS -l job-name=test-dataset-loader \
-            -o jsonpath='{.items[0].metadata.name}' 2>/dev/null | grep -q .; do
+          until kubectl -n $NS get pod -l job-name=test-dataset-loader -o jsonpath='{.items[0].metadata.name}' 2>/dev/null | grep -q .; do
             echo "Waiting for pod to be created..."
             sleep 2
           done
 
-          POD=$(kubectl get pod -n $NS -l job-name=test-dataset-loader -o jsonpath='{.items[0].metadata.name}')
+          POD=$(kubectl -n $NS get pod  -l job-name=test-dataset-loader -o jsonpath='{.items[0].metadata.name}')
 
-          until kubectl get pod -n $NS $POD \
-            -o jsonpath='{.status.initContainerStatuses[0].state.running.startedAt}' \
-            2>/dev/null | grep -q .; do
+          until kubectl -n $NS get pod $POD -o jsonpath='{.status.initContainerStatuses[0].state.running.startedAt}' 2>/dev/null | grep -q .; do
             echo "Waiting for init container to be running..."
             sleep 2
           done
 
           kubectl cp e2e-tests/src/test/resources/cat.png $NS/$POD:/tmp/images/cat.png -c wait-for-image
-
-          kubectl wait -n $NS --for=condition=complete job/test-dataset-loader --timeout=120s
+          kubectl -n $NS wait --for=condition=complete job/test-dataset-loader --timeout=120s
 
       - name: Install chart
         run: |

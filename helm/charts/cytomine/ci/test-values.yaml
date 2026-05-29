@@ -11,7 +11,8 @@ pims:
     storageClassName:
   datasetImportFolder: /data/dataset
   datasetImportStorage:
-    emptyDir: {}
+    persistentVolumeClaim:
+      claimName: test-dataset-pvc
 mongodb:
   storageClassName:
 app_engine:

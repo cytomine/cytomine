@@ -85,15 +85,91 @@ jobs:
       - name: Build chart dependencies
         run: helm dependency build helm/charts/cytomine/
 
-      - name: Create test dataset ConfigMaps
+      - name: Create test dataset PVC and ConfigMap
         run: |
           NS=cytomine-${{ env.DEPLOYMENT_NAME }}
-          kubectl create configmap test-dataset-images \
-            --from-file=cat.png=e2e-tests/src/test/resources/cat.png \
-            --namespace=$NS
+
+          kubectl apply -n $NS -f - <<EOF
+          apiVersion: v1
+          kind: PersistentVolumeClaim
+          metadata:
+            name: test-dataset-pvc
+          spec:
+            accessModes:
+              - ReadWriteOnce
+            resources:
+              requests:
+                storage: 1Gi
+          EOF
+
           kubectl create configmap test-dataset-metadata \
             --from-file=dataset.xml=e2e-tests/src/test/resources/dataset.xml \
             --namespace=$NS
+
+      - name: Populate test dataset PVC with real image
+        run: |
+          NS=cytomine-${{ env.DEPLOYMENT_NAME }}
+
+          kubectl apply -n $NS -f - <<EOF
+          apiVersion: batch/v1
+          kind: Job
+          metadata:
+            name: test-dataset-loader
+          spec:
+            template:
+              spec:
+                restartPolicy: Never
+                initContainers:
+                  - name: wait-for-image
+                    image: registry.cytomine.org/docker/library/alpine:3.18
+                    command:
+                      - sh
+                      - -c
+                      - |
+                        echo "Waiting for cat.png..."
+                        until [ -f /tmp/images/cat.png ]; do sleep 2; done
+                        echo "cat.png found!"
+                    volumeMounts:
+                      - mountPath: /tmp/images
+                        name: image-staging
+                containers:
+                  - name: loader
+                    image: registry.cytomine.org/docker/library/alpine:3.18
+                    command:
+                      - sh
+                      - -c
+                      - |
+                        mkdir -p /data/dataset-id/test-project/IMAGES
+                        mkdir -p /data/dataset-id/test-project/METADATA
+                        cp /tmp/metadata/dataset.xml /data/dataset-id/test-project/METADATA/dataset.xml
+                        cp /tmp/images/cat.png /data/dataset-id/test-project/IMAGES/cat.png
+                        chmod -R 444 /data
+                    volumeMounts:
+                      - mountPath: /data
+                        name: dataset-pvc
+                      - mountPath: /tmp/metadata
+                        name: dataset-metadata
+                      - mountPath: /tmp/images
+                        name: image-staging
+                volumes:
+                  - name: dataset-pvc
+                    persistentVolumeClaim:
+                      claimName: test-dataset-pvc
+                  - name: dataset-metadata
+                    configMap:
+                      name: test-dataset-metadata
+                  - name: image-staging
+                    emptyDir: {}
+          EOF
+
+          POD=$(kubectl get pod -n $NS -l job-name=test-dataset-loader \
+            -o jsonpath='{.items[0].metadata.name}')
+          kubectl wait -n $NS --for=condition=ready pod/$POD --timeout=60s
+          kubectl cp e2e-tests/src/test/resources/cat.png \
+            $NS/$POD:/tmp/images/cat.png -c wait-for-image
+
+          kubectl wait -n $NS --for=condition=complete \
+            job/test-dataset-loader --timeout=120s
 
       - name: Install chart
         run: |

@@ -42,14 +42,6 @@ spec:
         - name: import-folder
           {{- .Values.pims.datasetImportStorage | toYaml | nindent 10 }}
         {{- end }}
-        {{- if .Values.test.dataset.enabled }}
-        - name: dataset-images
-          configMap:
-            name: test-dataset-images
-        - name: dataset-metadata
-          configMap:
-            name: test-dataset-metadata
-        {{- end }}
         {{ if not .Values.pims.imageStorage.storageClassName -}}
         - emptyDir: {}
           name: images
@@ -73,28 +65,6 @@ spec:
                 sleep 2
               done
               echo "pims-cache is ready!"
-        {{- if .Values.test.dataset.enabled }}
-        - name: test-dataset-init
-          image: {{ .Values.images.alpine }}
-          securityContext:
-          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
-          command:
-            - sh
-            - -c
-            - |
-              mkdir -p /data/dataset/dataset-id/test-project/IMAGES
-              mkdir -p /data/dataset/dataset-id/test-project/METADATA
-              cp /tmp/images/cat.png /data/dataset/dataset-id/test-project/IMAGES/cat.png
-              cp /tmp/metadata/dataset.xml /data/dataset/dataset-id/test-project/METADATA/dataset.xml
-              chmod -R 444 /data/dataset
-          volumeMounts:
-            - mountPath: /data/dataset
-              name: import-folder
-            - mountPath: /tmp/images
-              name: dataset-images
-            - mountPath: /tmp/metadata
-              name: dataset-metadata
-        {{- end }}
       containers:
         - name: pims
           image: "{{ .Values.images.pims }}"

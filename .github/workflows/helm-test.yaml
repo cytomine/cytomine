@@ -180,18 +180,24 @@ jobs:
                     emptyDir: {}
           EOF
 
-          # Wait for pod to be created before querying it
-          kubectl wait -n $NS --for=condition=initialized \
-            pod -l job-name=test-dataset-loader --timeout=60s
+          until kubectl get pod -n $NS -l job-name=test-dataset-loader \
+            -o jsonpath='{.items[0].metadata.name}' 2>/dev/null | grep -q .; do
+            echo "Waiting for pod to be created..."
+            sleep 2
+          done
 
-          POD=$(kubectl get pod -n $NS -l job-name=test-dataset-loader \
-            -o jsonpath='{.items[0].metadata.name}')
+          POD=$(kubectl get pod -n $NS -l job-name=test-dataset-loader -o jsonpath='{.items[0].metadata.name}')
 
-          kubectl cp e2e-tests/src/test/resources/cat.png \
-            $NS/$POD:/tmp/images/cat.png -c wait-for-image
+          until kubectl get pod -n $NS $POD \
+            -o jsonpath='{.status.initContainerStatuses[0].state.running.startedAt}' \
+            2>/dev/null | grep -q .; do
+            echo "Waiting for init container to be running..."
+            sleep 2
+          done
 
-          kubectl wait -n $NS --for=condition=complete \
-            job/test-dataset-loader --timeout=120s
+          kubectl cp e2e-tests/src/test/resources/cat.png $NS/$POD:/tmp/images/cat.png -c wait-for-image
+
+          kubectl wait -n $NS --for=condition=complete job/test-dataset-loader --timeout=120s
 
       - name: Install chart
         run: |

@@ -1,6 +1,29 @@
-[tool.mypy]
-ignore_missing_imports = true
+[project]
+name = "cytomine"
+version = "2026.1.0"
+description = "A web platform for collaborative analysis of very large bio-medical images"
+maintainers = [
+  { name = "Cytomine ULiège", email = "uliege@cytomine.org" },
+]
+readme = "README.md"
+requires-python = ">=3.10,<3.11"
+license = "Apache-2.0"
+
+[dependency-groups]
+dev = [
+  "pyrefly==1.0.0",
+  "ruff==0.15.15",
+]
 
 [tool.ruff.lint]
 select = ["FAST001", "FAST003"]
 ignore = ["E402"]
+
+[tool.pyrefly]
+preset = "legacy"
+ignore-missing-imports = ["*"]
+project-includes = [
+  "cbir/**/*.py",
+  "clients/python/**/*.py",
+  "sam/**/*.py",
+]

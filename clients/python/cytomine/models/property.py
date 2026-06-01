@@ -85,6 +85,8 @@ class Property(DomainModel):
 
 
 class PropertyCollection(DomainCollection):
+    _domainClassName: Optional[str]
+
     def __init__(
         self,
         object: Model,

@@ -11,9 +11,11 @@ import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity(name = "ontology")
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class OntologyEntity {

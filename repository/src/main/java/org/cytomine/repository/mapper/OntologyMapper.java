@@ -3,6 +3,7 @@ package org.cytomine.repository.mapper;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import org.cytomine.repository.persistence.entity.OntologyEntity;
 import org.cytomine.repository.persistence.entity.RelationEntity;
 import org.cytomine.repository.persistence.entity.TermEntity;
 import org.cytomine.repository.persistence.entity.TermRelationEntity;
@@ -12,6 +13,7 @@ import org.mapstruct.Mapping;
 
 import be.cytomine.common.repository.model.command.payload.request.TermCommandPayload;
 import be.cytomine.common.repository.model.command.payload.request.TermRelationCommandPayload;
+import be.cytomine.common.repository.model.command.payload.response.OntologyResponse;
 import be.cytomine.common.repository.model.command.payload.response.RelationResponse;
 import be.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
@@ -65,4 +67,7 @@ public interface OntologyMapper {
 
     @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
     RelationResponse mapRelationResponse(RelationEntity relationEntity);
+
+    @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
+    OntologyResponse mapOntologyResponse(OntologyEntity ontologyEntity);
 }

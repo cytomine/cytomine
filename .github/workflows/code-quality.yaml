@@ -60,7 +60,7 @@ jobs:
           version: ${{ steps.versions.outputs.uv-version }}
 
       - name: Lint
-        run: uvx ruff check .
+        run: uv run ruff check .
 
   python-type-check:
     runs-on: self-hosted

@@ -41,7 +41,7 @@ from pims.importer.dataset import run_import_datasets
 from pims.importer.importer import run_import
 from pims.importer.listeners import CytomineListener
 from pims.schemas.auth import ApiCredentials, CytomineAuth
-from pims.schemas.operations import ImportResponse
+from pims.schemas.operations import JobResponse
 from pims.tasks.queue import Task, send_task
 from pims.utils.iterables import ensure_list
 from pims.utils.strings import unique_name_generator
@@ -58,9 +58,10 @@ INTERNAL_URL_CORE = get_settings().internal_url_core
 @router.post("/import", tags=["Import"])
 def import_datasets(
     request: Request,
+    background_tasks: BackgroundTasks,
     config: Annotated[Settings, Depends(get_settings)],
     storage_id: int = Query(..., description="The storage where to import the datasets"),
-) -> ImportResponse:
+) -> JobResponse:
     """
     Import datasets from a predefined folder without moving the data.
     """
@@ -84,7 +85,8 @@ def import_datasets(
         signature=signature,
     )
 
-    return run_import_datasets(cytomine_auth, api_credentials, storage_id)
+    background_tasks.add_task(run_import_datasets, cytomine_auth, api_credentials, storage_id)
+    return JobResponse(status="running")
 
 
 @router.post('/upload', tags=['Import'])

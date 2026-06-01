@@ -73,8 +73,10 @@ jobs:
         id: versions
         uses: ./.github/actions/load-versions
 
-      - name: Type check
-        uses: facebook/pyrefly@main
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
         with:
-          version: "1.0.0"
-          python-version: ${{ steps.versions.outputs.python-version }}
+          version: ${{ steps.versions.outputs.uv-version }}
+
+      - name: Type check
+        run: uv run pyrefly check

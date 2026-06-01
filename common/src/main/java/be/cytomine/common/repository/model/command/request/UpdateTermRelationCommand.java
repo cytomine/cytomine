@@ -1,11 +1,12 @@
 package be.cytomine.common.repository.model.command.request;
 
 import be.cytomine.common.repository.model.command.CommandType;
+import be.cytomine.common.repository.model.command.Commands;
 import be.cytomine.common.repository.model.command.payload.request.TermRelationCommandPayload;
 
 import static java.lang.String.format;
 
-public record UpdateTermRelationCommand(Long id, TermRelationCommandPayload before, TermRelationCommandPayload after,
+public record UpdateTermRelationCommand(long id, TermRelationCommandPayload before, TermRelationCommandPayload after,
                                         long userId, Long ontologyId)
     implements UpdateCommandRequest<TermRelationCommandPayload> {
 
@@ -18,5 +19,10 @@ public record UpdateTermRelationCommand(Long id, TermRelationCommandPayload befo
     public String getActionMessage() {
         return format("Term relation %s (term1: %s => %s, term2: %s => %s) updated in ontology %s",
             before.id(), before.term1Id(), after.term1Id(), before.term2Id(), after.term2Id(), ontologyId);
+    }
+
+    @Override
+    public String getCommand() {
+        return Commands.UPDATE_TERM_RELATION;
     }
 }

@@ -74,7 +74,7 @@ class UndoControllerTest {
         CreateTerm createTerm = new CreateTerm("termToUndo", "#00FF00", ontologyId, null);
         LocalDateTime now = LocalDateTime.now();
         HttpCommandResponse createResponse =
-            termCommandService.createTerm(userId, createTerm, now).orElseThrow();
+            termCommandService.create(userId, createTerm, now).orElseThrow();
 
         Long termId = ((TermResponse) createResponse.data()).id();
         UUID insertCommandId = createResponse.commandId();
@@ -92,13 +92,13 @@ class UndoControllerTest {
         CreateTerm createTerm = new CreateTerm("originalName", "#FF0000", ontologyId, null);
         LocalDateTime now = LocalDateTime.now();
         HttpCommandResponse createResponse =
-            termCommandService.createTerm(userId, createTerm, now).orElseThrow();
+            termCommandService.create(userId, createTerm, now).orElseThrow();
 
         Long termId = ((TermResponse) createResponse.data()).id();
 
         UpdateTerm updateTerm = new UpdateTerm(Optional.of("updatedName"), Optional.of("#00FF00"));
         HttpCommandResponse updateResponse =
-            termCommandService.updateTerm(termId, userId, updateTerm, now).orElseThrow();
+            termCommandService.update(termId, userId, updateTerm, now).orElseThrow();
 
         UUID updateCommandId = updateResponse.commandId();
         TermEntity updatedTerm = termRepository.findById(termId).orElseThrow();
@@ -126,7 +126,7 @@ class UndoControllerTest {
         CreateTerm createTerm = new CreateTerm("termToUndo", "#FF0000", ontologyId, null);
         LocalDateTime now = LocalDateTime.now();
         HttpCommandResponse createResponse =
-            termCommandService.createTerm(userId, createTerm, now).orElseThrow();
+            termCommandService.create(userId, createTerm, now).orElseThrow();
 
         Long termId = ((TermResponse) createResponse.data()).id();
         UUID insertCommandId = createResponse.commandId();

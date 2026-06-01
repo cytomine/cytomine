@@ -78,7 +78,7 @@ class TermCommandServiceTest {
 
 
         HttpCommandResponse createResponse =
-            termCommandService.createTerm(userId, new CreateTerm("term1", "#FF0000", ontologyId, null), t0)
+            termCommandService.create(userId, new CreateTerm("term1", "#FF0000", ontologyId, null), t0)
                 .orElseThrow();
         TermResponse dataResult = (TermResponse) createResponse.data();
         long termId = dataResult.id();
@@ -91,7 +91,7 @@ class TermCommandServiceTest {
         assertEquals(new TermEntity(termId, 0, ontologyId, "term1", "#FF0000", t0, t0, null, null, Set.of()),
             termRepository.findById(termId).orElseThrow());
 
-        HttpCommandResponse deleteResponse = termCommandService.deleteTerm(termId, userId, t1).orElseThrow();
+        HttpCommandResponse deleteResponse = termCommandService.delete(termId, userId, t1).orElseThrow();
         UUID deleteCommandId = deleteResponse.commandId();
         DeleteTermCommand deleteCmd =
             (DeleteTermCommand) commandV2Repository.findById(deleteCommandId).orElseThrow().getData();
@@ -135,7 +135,7 @@ class TermCommandServiceTest {
 
 
         HttpCommandResponse createResponse =
-            termCommandService.createTerm(userId, new CreateTerm("original", "#FF0000", ontologyId, null), t0)
+            termCommandService.create(userId, new CreateTerm("original", "#FF0000", ontologyId, null), t0)
                 .orElseThrow();
         TermResponse dataResult = (TermResponse) createResponse.data();
         long termId = dataResult.id();
@@ -148,7 +148,7 @@ class TermCommandServiceTest {
         assertEquals(new TermEntity(termId, 0, ontologyId, "original", "#FF0000", t0, t0, null, null, Set.of()),
             termRepository.findById(termId).orElseThrow());
 
-        HttpCommandResponse updateResponse = termCommandService.updateTerm(termId, userId,
+        HttpCommandResponse updateResponse = termCommandService.update(termId, userId,
             new UpdateTerm(Optional.of("updated"), Optional.of("#00FF00")), t1).orElseThrow();
         UUID updateCommandId = updateResponse.commandId();
         UpdateTermCommand updateCmd =
@@ -193,7 +193,7 @@ class TermCommandServiceTest {
         LocalDateTime t2 = t0.plusSeconds(2);
 
         HttpCommandResponse createResponse =
-            termCommandService.createTerm(userId, new CreateTerm("term1", "#FF0000", ontologyId, null), t0)
+            termCommandService.create(userId, new CreateTerm("term1", "#FF0000", ontologyId, null), t0)
                 .orElseThrow();
         TermResponse dataResult = (TermResponse) createResponse.data();
         long termId = dataResult.id();

@@ -1,6 +1,7 @@
 package be.cytomine.common.repository.model.command.request;
 
 import be.cytomine.common.repository.model.command.CommandType;
+import be.cytomine.common.repository.model.command.Commands;
 import be.cytomine.common.repository.model.command.payload.request.TermRelationCommandPayload;
 
 import static java.lang.String.format;
@@ -17,5 +18,10 @@ public record CreateTermRelationCommand(TermRelationCommandPayload after, long u
     public String getActionMessage() {
         return format("Term relation %s (term1: %s, term2: %s) added in ontology %s",
             after.id(), after.term1Id(), after.term2Id(), ontologyId);
+    }
+
+    @Override
+    public String getCommand() {
+        return Commands.CREATE_TERM_RELATION;
     }
 }

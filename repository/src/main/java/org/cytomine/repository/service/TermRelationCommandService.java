@@ -30,7 +30,8 @@ import be.cytomine.common.repository.model.termrelation.payload.UpdateTermRelati
 
 @Component
 @RequiredArgsConstructor
-public class TermRelationCommandService {
+public class TermRelationCommandService
+    implements CRUDCommandService<CreateTermRelation, UpdateTermRelation, TermRelationCommandPayload> {
     private final TermRepository termRepository;
     private final TermRelationRepository termRelationRepository;
     private final RelationRepository relationRepository;
@@ -39,8 +40,9 @@ public class TermRelationCommandService {
     private final CommandMapper commandMapper;
     private final ACLService aclService;
 
+    @Override
     @Transactional
-    public Optional<HttpCommandResponse> deleteTermRelation(Long id, Long userId, LocalDateTime now) {
+    public Optional<HttpCommandResponse> delete(long userId, long id, LocalDateTime now) {
         return termRelationRepository.findById(id)
             .flatMap(entity -> termRepository.findById(entity.getTerm1Id()).map(term1 -> Pair.of(entity, term1)))
             .filter(pair -> aclService.canWriteOntology(userId, pair.getSecond().getOntologyId())).map(pair -> {
@@ -56,9 +58,9 @@ public class TermRelationCommandService {
             });
     }
 
+    @Override
     @Transactional
-    public Optional<HttpCommandResponse> createTermRelation(Long userId, CreateTermRelation createTermRelation,
-                                                            LocalDateTime now) {
+    public Optional<HttpCommandResponse> create(long userId, CreateTermRelation createTermRelation, LocalDateTime now) {
         return termRepository.findById(createTermRelation.term1Id())
             .filter(firstTerm -> aclService.canWriteOntology(userId, firstTerm.getOntologyId()))
             // check that the second term is in the same ontology
@@ -66,8 +68,7 @@ public class TermRelationCommandService {
                 .map(secondTerm -> secondTerm.getOntologyId().equals(firstTerm.getOntologyId())).orElse(false))
             // Check that a relation between those terms don't exist before adding a new one.
             .filter(i -> termRelationRepository.findByTerm1IdAndTerm2Id(createTermRelation.term1Id(),
-                createTermRelation.term2Id()).isEmpty())
-            .map(firstTerm -> {
+                createTermRelation.term2Id()).isEmpty()).map(firstTerm -> {
                 long ontologyId = firstTerm.getOntologyId();
                 long relationId = relationRepository.findParent().getId();
                 TermRelationEntity termEntity =
@@ -88,9 +89,10 @@ public class TermRelationCommandService {
             });
     }
 
+    @Override
     @Transactional
-    public Optional<HttpCommandResponse> updateTerm(long id, Long userId, UpdateTermRelation updateTerm,
-                                                    LocalDateTime now) {
+    public Optional<HttpCommandResponse> update(long userId, long id, UpdateTermRelation updateTerm,
+        LocalDateTime now) {
         return termRelationRepository.findById(id).flatMap(
                 termRelationEntity -> termRepository.findById(termRelationEntity.getTerm1Id())
                     .map(termEntity -> Pair.of(termRelationEntity, termEntity)))
@@ -119,10 +121,40 @@ public class TermRelationCommandService {
             });
     }
 
+    @Override
+    public Optional<HttpCommandResponse> updateWithExistingCommand(long userId, UUID commandId,
+        TermRelationCommandPayload payload, LocalDateTime now) {
+
+        return termRelationRepository.findById(payload.id()).map(entity -> {
+            entity.setTerm1Id(payload.term1Id());
+            entity.setTerm2Id(payload.term2Id());
+            return saveAndBuildResponse(entity, Commands.UPDATE_TERM_RELATION, commandId, payload.ontologyId());
+        });
+    }
+
+    @Override
+    public Optional<HttpCommandResponse> logicalDelete(UUID commandId, long id, String command, LocalDateTime now) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<HttpCommandResponse> restore(UUID commandId, long id, String command, LocalDateTime now) {
+        return Optional.empty();
+    }
+
+    @Override
+    public boolean canWrite(long userId, long id) {
+        return aclService.canWriteOntology(userId, id);
+    }
+
+    @Override
+    public boolean canDelete(long userId, long id) {
+        return aclService.canDeleteOntology(userId, id);
+    }
+
 
     public Optional<HttpCommandResponse> undoDeleteTermRelation(UUID commandId,
-                                                                DeleteTermRelationCommand deleteTermCommand,
-                                                                Long userId, LocalDateTime now) {
+        DeleteTermRelationCommand deleteTermCommand, long userId, LocalDateTime now) {
         if (!aclService.canWriteOntology(userId, deleteTermCommand.ontologyId())) {
             return Optional.empty();
         }
@@ -131,8 +163,7 @@ public class TermRelationCommandService {
     }
 
     public Optional<HttpCommandResponse> redoDeleteTermRelation(UUID commandId,
-                                                                DeleteTermRelationCommand deleteTermCommand,
-                                                                Long userId, LocalDateTime now) {
+        DeleteTermRelationCommand deleteTermCommand, long userId, LocalDateTime now) {
         if (!aclService.canWriteOntology(userId, deleteTermCommand.ontologyId())) {
             return Optional.empty();
         }
@@ -141,8 +172,7 @@ public class TermRelationCommandService {
     }
 
     public Optional<HttpCommandResponse> undoCreateTermRelation(UUID commandId,
-                                                                CreateTermRelationCommand createTermCommand,
-                                                                Long userId, LocalDateTime now) {
+        CreateTermRelationCommand createTermCommand, long userId, LocalDateTime now) {
         if (!aclService.canWriteOntology(userId, createTermCommand.ontologyId())) {
             return Optional.empty();
         }
@@ -151,8 +181,7 @@ public class TermRelationCommandService {
     }
 
     public Optional<HttpCommandResponse> redoCreateTermRelation(UUID commandId,
-                                                                CreateTermRelationCommand createTermCommand,
-                                                                Long userId, LocalDateTime now) {
+        CreateTermRelationCommand createTermCommand, long userId, LocalDateTime now) {
         if (!aclService.canWriteOntology(userId, createTermCommand.ontologyId())) {
             return Optional.empty();
         }
@@ -161,8 +190,7 @@ public class TermRelationCommandService {
     }
 
     public Optional<HttpCommandResponse> undoUpdateTermRelation(UUID commandId,
-                                                                UpdateTermRelationCommand updateTermCommand,
-                                                                Long userId) {
+        UpdateTermRelationCommand updateTermCommand, long userId) {
         if (!aclService.canWriteOntology(userId, updateTermCommand.ontologyId())) {
             return Optional.empty();
         }
@@ -175,8 +203,7 @@ public class TermRelationCommandService {
     }
 
     public Optional<HttpCommandResponse> redoUpdateTermRelation(UUID commandId,
-                                                                UpdateTermRelationCommand updateTermCommand,
-                                                                Long userId, LocalDateTime now) {
+        UpdateTermRelationCommand updateTermCommand, long userId, LocalDateTime now) {
         if (!aclService.canWriteOntology(userId, updateTermCommand.ontologyId())) {
             return Optional.empty();
         }
@@ -190,7 +217,7 @@ public class TermRelationCommandService {
     }
 
     private Optional<HttpCommandResponse> restoreTermRelation(UUID commandId, Long termId, String command,
-                                                              LocalDateTime now, long ontologyId) {
+        LocalDateTime now, long ontologyId) {
         return termRelationRepository.findById(termId).map(entity -> {
             entity.setDeleted(null);
             entity.setUpdated(now);
@@ -199,7 +226,7 @@ public class TermRelationCommandService {
     }
 
     private Optional<HttpCommandResponse> softDeleteTermRelation(UUID commandId, Long termId, String command,
-                                                                 LocalDateTime now, long ontologyId) {
+        LocalDateTime now, long ontologyId) {
         return termRelationRepository.findById(termId).map(entity -> {
             entity.setDeleted(now);
             return saveAndBuildResponse(entity, command, commandId, ontologyId);
@@ -207,7 +234,7 @@ public class TermRelationCommandService {
     }
 
     private HttpCommandResponse saveAndBuildResponse(TermRelationEntity entity, String command, UUID commandId,
-                                                     long ontologyId) {
+        long ontologyId) {
         TermRelationEntity saved = termRelationRepository.save(entity);
         TermRelationResponse response = ontologyMapper.mapToTermRelationResponse(saved, ontologyId);
         return new HttpCommandResponse(true, response, commandId, command);

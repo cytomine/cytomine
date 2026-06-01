@@ -10,10 +10,13 @@ import org.cytomine.repository.persistence.CommandV2Repository;
 import org.springframework.stereotype.Component;
 
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import be.cytomine.common.repository.model.command.request.CreateOntologyCommand;
 import be.cytomine.common.repository.model.command.request.CreateTermCommand;
 import be.cytomine.common.repository.model.command.request.CreateTermRelationCommand;
+import be.cytomine.common.repository.model.command.request.DeleteOntologyCommand;
 import be.cytomine.common.repository.model.command.request.DeleteTermCommand;
 import be.cytomine.common.repository.model.command.request.DeleteTermRelationCommand;
+import be.cytomine.common.repository.model.command.request.UpdateOntologyCommand;
 import be.cytomine.common.repository.model.command.request.UpdateTermCommand;
 import be.cytomine.common.repository.model.command.request.UpdateTermRelationCommand;
 
@@ -28,30 +31,35 @@ public class ApplyCommandService {
     @Transactional
     public Optional<HttpCommandResponse> undoCommand(long userId, UUID undoCommand, LocalDateTime now) {
         return commandRepository.findById(undoCommand).flatMap(commandEntity -> switch (commandEntity.getData()) {
-            case DeleteTermCommand dtc -> termCommandService.undoDeleteTerm(commandEntity.getId(), dtc, userId, now);
-            case CreateTermCommand icr -> termCommandService.undoCreateTerm(commandEntity.getId(), icr, userId, now);
-            case UpdateTermCommand ucr -> termCommandService.undoUpdateTerm(commandEntity.getId(), ucr, userId);
+            case DeleteTermCommand dtc -> termCommandService.undoDelete(commandEntity.getId(), dtc, userId, now);
+            case CreateTermCommand icr -> termCommandService.undoCreate(commandEntity.getId(), icr, userId, now);
+            case UpdateTermCommand ucr -> termCommandService.undoUpdate(commandEntity.getId(), ucr, userId, now);
             case DeleteTermRelationCommand deleteTermRelationCommand ->
-                termRelationCommandService.undoDeleteTermRelation(commandEntity.getId(), deleteTermRelationCommand,
-                    userId, now);
+                termRelationCommandService.undoDelete(commandEntity.getId(), deleteTermRelationCommand, userId, now);
             case CreateTermRelationCommand ctrc ->
-                termRelationCommandService.undoCreateTermRelation(commandEntity.getId(), ctrc, userId, now);
+                termRelationCommandService.undoCreate(commandEntity.getId(), ctrc, userId, now);
             case UpdateTermRelationCommand utrc ->
-                termRelationCommandService.undoUpdateTermRelation(commandEntity.getId(), utrc, userId);
+                termRelationCommandService.undoUpdate(commandEntity.getId(), utrc, userId, now);
+            case CreateOntologyCommand createOntologyCommand -> null;
+            case DeleteOntologyCommand deleteOntologyCommand -> null;
+            case UpdateOntologyCommand updateOntologyCommand -> null;
         });
     }
 
     public Optional<HttpCommandResponse> redoCommand(long userId, UUID redoCommand, LocalDateTime now) {
         return commandRepository.findById(redoCommand).flatMap(commandEntity -> switch (commandEntity.getData()) {
-            case DeleteTermCommand dtc -> termCommandService.redoDeleteTerm(commandEntity.getId(), dtc, userId, now);
-            case CreateTermCommand icr -> termCommandService.redoCreateTerm(commandEntity.getId(), icr, userId, now);
-            case UpdateTermCommand ucr -> termCommandService.redoUpdateTerm(commandEntity.getId(), ucr, userId, now);
+            case DeleteTermCommand dtc -> termCommandService.redoDelete(commandEntity.getId(), dtc, userId, now);
+            case CreateTermCommand icr -> termCommandService.redoCreate(commandEntity.getId(), icr, userId, now);
+            case UpdateTermCommand ucr -> termCommandService.redoUpdate(commandEntity.getId(), ucr, userId, now);
             case DeleteTermRelationCommand ucr ->
-                termRelationCommandService.redoDeleteTermRelation(commandEntity.getId(), ucr, userId, now);
+                termRelationCommandService.redoDelete(commandEntity.getId(), ucr, userId, now);
             case CreateTermRelationCommand ctrc ->
-                termRelationCommandService.redoCreateTermRelation(commandEntity.getId(), ctrc, userId, now);
+                termRelationCommandService.redoCreate(commandEntity.getId(), ctrc, userId, now);
             case UpdateTermRelationCommand utrc ->
-                termRelationCommandService.redoUpdateTermRelation(commandEntity.getId(), utrc, userId, now);
+                termRelationCommandService.redoUpdate(commandEntity.getId(), utrc, userId, now);
+            case CreateOntologyCommand createOntologyCommand -> null;
+            case DeleteOntologyCommand deleteOntologyCommand -> null;
+            case UpdateOntologyCommand updateOntologyCommand -> null;
         });
     }
 

@@ -52,9 +52,8 @@ class ApplyCommandServiceTest {
     @BeforeEach
     void setUp() {
         LocalDateTime now = LocalDateTime.now();
-        termPayload =
-            new TermCommandPayload(Optional.empty(), 10L, "name", "#FF0000", now, now,
-                Optional.empty(), null, ontologyId);
+        termPayload = new TermCommandPayload(Optional.empty(), 10L, "name", "#FF0000", now, now, Optional.empty(), null,
+            ontologyId);
         relationPayload =
             new TermRelationCommandPayload(20L, 1L, 2L, ontologyId, 3L, null, Optional.empty(), null, "parent");
 
@@ -82,12 +81,12 @@ class ApplyCommandServiceTest {
         LocalDateTime now = LocalDateTime.now();
         DeleteTermCommand cmd = new DeleteTermCommand(10L, termPayload, userId, ontologyId);
         when(commandRepository.findById(id)).thenReturn(Optional.of(new CommandV2Entity(id, null, null, cmd, 0L)));
-        when(termCommandService.undoDeleteTerm(id, cmd, userId, now)).thenReturn(
+        when(termCommandService.undoDelete(id, cmd, userId, now)).thenReturn(
             Optional.of(mockResponse(Commands.DELETE_TERM)));
 
         applyCommandService.undoCommand(userId, id, now);
 
-        verify(termCommandService).undoDeleteTerm(id, cmd, userId, now);
+        verify(termCommandService).undoDelete(id, cmd, userId, now);
     }
 
     @Test
@@ -96,12 +95,12 @@ class ApplyCommandServiceTest {
         LocalDateTime now = LocalDateTime.now();
         CreateTermCommand cmd = new CreateTermCommand(termPayload, userId, ontologyId);
         when(commandRepository.findById(id)).thenReturn(Optional.of(new CommandV2Entity(id, null, null, cmd, 0L)));
-        when(termCommandService.undoCreateTerm(id, cmd, userId, now)).thenReturn(
+        when(termCommandService.undoCreate(id, cmd, userId, now)).thenReturn(
             Optional.of(mockResponse(Commands.CREATE_TERM)));
 
         applyCommandService.undoCommand(userId, id, now);
 
-        verify(termCommandService).undoCreateTerm(id, cmd, userId, now);
+        verify(termCommandService).undoCreate(id, cmd, userId, now);
     }
 
     @Test
@@ -110,12 +109,12 @@ class ApplyCommandServiceTest {
         LocalDateTime now = LocalDateTime.now();
         UpdateTermCommand cmd = new UpdateTermCommand(10L, termPayload, termPayload, userId, ontologyId);
         when(commandRepository.findById(id)).thenReturn(Optional.of(new CommandV2Entity(id, null, null, cmd, 0L)));
-        when(termCommandService.undoUpdateTerm(id, cmd, userId)).thenReturn(
+        when(termCommandService.undoUpdate(id, cmd, userId, now)).thenReturn(
             Optional.of(mockResponse(Commands.UPDATE_TERM)));
 
         applyCommandService.undoCommand(userId, id, now);
 
-        verify(termCommandService).undoUpdateTerm(id, cmd, userId);
+        verify(termCommandService).undoUpdate(id, cmd, userId, now);
     }
 
     @Test
@@ -124,12 +123,12 @@ class ApplyCommandServiceTest {
         LocalDateTime now = LocalDateTime.now();
         DeleteTermCommand cmd = new DeleteTermCommand(10L, termPayload, userId, ontologyId);
         when(commandRepository.findById(id)).thenReturn(Optional.of(new CommandV2Entity(id, null, null, cmd, 0L)));
-        when(termCommandService.redoDeleteTerm(id, cmd, userId, now)).thenReturn(
+        when(termCommandService.redoDelete(id, cmd, userId, now)).thenReturn(
             Optional.of(mockResponse(Commands.DELETE_TERM)));
 
         applyCommandService.redoCommand(userId, id, now);
 
-        verify(termCommandService).redoDeleteTerm(id, cmd, userId, now);
+        verify(termCommandService).redoDelete(id, cmd, userId, now);
     }
 
     @Test
@@ -138,12 +137,12 @@ class ApplyCommandServiceTest {
         LocalDateTime now = LocalDateTime.now();
         CreateTermCommand cmd = new CreateTermCommand(termPayload, userId, ontologyId);
         when(commandRepository.findById(id)).thenReturn(Optional.of(new CommandV2Entity(id, null, null, cmd, 0L)));
-        when(termCommandService.redoCreateTerm(id, cmd, userId, now)).thenReturn(
+        when(termCommandService.redoCreate(id, cmd, userId, now)).thenReturn(
             Optional.of(mockResponse(Commands.CREATE_TERM)));
 
         applyCommandService.redoCommand(userId, id, now);
 
-        verify(termCommandService).redoCreateTerm(id, cmd, userId, now);
+        verify(termCommandService).redoCreate(id, cmd, userId, now);
     }
 
     @Test
@@ -152,12 +151,12 @@ class ApplyCommandServiceTest {
         LocalDateTime now = LocalDateTime.now();
         UpdateTermCommand cmd = new UpdateTermCommand(10L, termPayload, termPayload, userId, ontologyId);
         when(commandRepository.findById(id)).thenReturn(Optional.of(new CommandV2Entity(id, null, null, cmd, 0L)));
-        when(termCommandService.redoUpdateTerm(id, cmd, userId, now)).thenReturn(
+        when(termCommandService.redoUpdate(id, cmd, userId, now)).thenReturn(
             Optional.of(mockResponse(Commands.UPDATE_TERM)));
 
         applyCommandService.redoCommand(userId, id, now);
 
-        verify(termCommandService).redoUpdateTerm(id, cmd, userId, now);
+        verify(termCommandService).redoUpdate(id, cmd, userId, now);
     }
 
     @Test
@@ -166,7 +165,7 @@ class ApplyCommandServiceTest {
         LocalDateTime now = LocalDateTime.now();
         DeleteTermRelationCommand cmd = new DeleteTermRelationCommand(20L, relationPayload, userId, ontologyId);
         when(commandRepository.findById(id)).thenReturn(Optional.of(new CommandV2Entity(id, null, null, cmd, 0L)));
-        when(termRelationCommandService.undoDeleteTermRelation(id, cmd, userId, now)).thenReturn(
+        when(termRelationCommandService.undoDelete(id, cmd, userId, now)).thenReturn(
             Optional.of(mockResponse(Commands.DELETE_TERM_RELATION)));
 
         applyCommandService.undoCommand(userId, id, now);

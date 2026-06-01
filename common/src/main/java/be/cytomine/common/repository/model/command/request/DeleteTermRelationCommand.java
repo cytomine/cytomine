@@ -1,11 +1,12 @@
 package be.cytomine.common.repository.model.command.request;
 
 import be.cytomine.common.repository.model.command.CommandType;
+import be.cytomine.common.repository.model.command.Commands;
 import be.cytomine.common.repository.model.command.payload.request.TermRelationCommandPayload;
 
 import static java.lang.String.format;
 
-public record DeleteTermRelationCommand(Long id, TermRelationCommandPayload before, long userId, long ontologyId)
+public record DeleteTermRelationCommand(long id, TermRelationCommandPayload before, long userId, long ontologyId)
     implements DeleteCommandRequest<TermRelationCommandPayload> {
 
     @Override
@@ -17,5 +18,10 @@ public record DeleteTermRelationCommand(Long id, TermRelationCommandPayload befo
     public String getActionMessage() {
         return format("Term relation %s (term1: %s, term2: %s) deleted in ontology %s", before.id(), before.term1Id(),
             before.term2Id(), ontologyId);
+    }
+
+    @Override
+    public String getCommand() {
+        return Commands.DELETE_TERM_RELATION;
     }
 }

@@ -26,7 +26,7 @@ public class ApplyCommandService {
     private final CommandV2Repository commandRepository;
     private final TermCommandService termCommandService;
     private final TermRelationCommandService termRelationCommandService;
-
+    private final OntologyCommandService ontologyCommandService;
 
     @Transactional
     public Optional<HttpCommandResponse> undoCommand(long userId, UUID undoCommand, LocalDateTime now) {
@@ -40,9 +40,12 @@ public class ApplyCommandService {
                 termRelationCommandService.undoCreate(commandEntity.getId(), ctrc, userId, now);
             case UpdateTermRelationCommand utrc ->
                 termRelationCommandService.undoUpdate(commandEntity.getId(), utrc, userId, now);
-            case CreateOntologyCommand createOntologyCommand -> null;
-            case DeleteOntologyCommand deleteOntologyCommand -> null;
-            case UpdateOntologyCommand updateOntologyCommand -> null;
+            case CreateOntologyCommand createOntologyCommand ->
+                ontologyCommandService.undoCreate(commandEntity.getId(), createOntologyCommand, userId, now);
+            case DeleteOntologyCommand deleteOntologyCommand ->
+                ontologyCommandService.undoDelete(commandEntity.getId(), deleteOntologyCommand, userId, now);
+            case UpdateOntologyCommand updateOntologyCommand ->
+                ontologyCommandService.undoUpdate(commandEntity.getId(), updateOntologyCommand, userId, now);
         });
     }
 
@@ -57,9 +60,12 @@ public class ApplyCommandService {
                 termRelationCommandService.redoCreate(commandEntity.getId(), ctrc, userId, now);
             case UpdateTermRelationCommand utrc ->
                 termRelationCommandService.redoUpdate(commandEntity.getId(), utrc, userId, now);
-            case CreateOntologyCommand createOntologyCommand -> null;
-            case DeleteOntologyCommand deleteOntologyCommand -> null;
-            case UpdateOntologyCommand updateOntologyCommand -> null;
+            case CreateOntologyCommand createOntologyCommand ->
+                ontologyCommandService.redoCreate(commandEntity.getId(), createOntologyCommand, userId, now);
+            case DeleteOntologyCommand deleteOntologyCommand ->
+                ontologyCommandService.redoDelete(commandEntity.getId(), deleteOntologyCommand, userId, now);
+            case UpdateOntologyCommand updateOntologyCommand ->
+                ontologyCommandService.redoUpdate(commandEntity.getId(), updateOntologyCommand, userId, now);
         });
     }
 

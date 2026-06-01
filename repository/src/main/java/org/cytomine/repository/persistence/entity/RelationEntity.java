@@ -1,6 +1,6 @@
 package org.cytomine.repository.persistence.entity;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -18,11 +18,12 @@ public class RelationEntity {
     @Column
     private long version;
     @Column
-    private Date created;
+    private LocalDateTime created;
     @Column
-    private Date deleted;
+    private LocalDateTime updated;
+    @Column
+    private LocalDateTime deleted;
     @Column
     private String name;
-    @Column
-    private Date updated;
+
 }

@@ -11,12 +11,14 @@ import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import be.cytomine.common.repository.model.command.payload.request.OntologyCommandPayload;
 import be.cytomine.common.repository.model.command.payload.request.TermCommandPayload;
 import be.cytomine.common.repository.model.command.payload.request.TermRelationCommandPayload;
 import be.cytomine.common.repository.model.command.payload.response.OntologyResponse;
 import be.cytomine.common.repository.model.command.payload.response.RelationResponse;
 import be.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
+import be.cytomine.common.repository.model.ontology.payload.CreateOntology;
 import be.cytomine.common.repository.model.term.payload.CreateTerm;
 import be.cytomine.common.repository.model.termrelation.payload.CreateTermRelation;
 
@@ -69,5 +71,10 @@ public interface OntologyMapper {
     RelationResponse mapRelationResponse(RelationEntity relationEntity);
 
     @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
-    OntologyResponse mapOntologyResponse(OntologyEntity ontologyEntity);
+    OntologyResponse mapToOntologyResponse(OntologyEntity ontologyEntity);
+
+    OntologyEntity mapToOntologyEntity(CreateOntology createOntology);
+    OntologyCommandPayload mapToOntologyCommandPayload(OntologyEntity ontologyEntity);
+
+
 }

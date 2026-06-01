@@ -10,30 +10,25 @@ import org.testcontainers.utility.DockerImageName;
 public class K3sConfiguration {
     @Bean
     K3sContainer k3s() {
-        K3sContainer k3sContainer =
-            new K3sContainer(DockerImageName.parse("rancher/k3s:v1.21.3-k3s1"))
-                .withCommand("server", "--disable", "metrics-server");
+        K3sContainer k3sContainer = new K3sContainer(DockerImageName.parse("rancher/k3s:v1.30.14-rc3-k3s3"))
+            .withCommand("server", "--disable", "metrics-server");
 
         // don't normally need to start the container in these @Bean methods but can't get the
         // config unless its started
         k3sContainer.start();
 
         String kubeConfigYaml = k3sContainer.getKubeConfigYaml();
-        Config config = Config.fromKubeconfig(
-            kubeConfigYaml);  // requires io.fabric8:kubernetes-client:5.11.0 or higher
+        // requires io.fabric8:kubernetes-client:5.11.0 or higher
+        Config config = Config.fromKubeconfig(kubeConfigYaml);
 
         // in the absence of @ServiceConnection integration for this testcontainer, Jack the test
         // container URL into properties so it's picked up when I create a client in main app
         System.setProperty(Config.KUBERNETES_MASTER_SYSTEM_PROPERTY, config.getMasterUrl());
-        System.setProperty(Config.KUBERNETES_CA_CERTIFICATE_DATA_SYSTEM_PROPERTY,
-            config.getCaCertData());
-        System.setProperty(Config.KUBERNETES_CLIENT_CERTIFICATE_DATA_SYSTEM_PROPERTY,
-            config.getClientCertData());
-        System.setProperty(Config.KUBERNETES_CLIENT_KEY_DATA_SYSTEM_PROPERTY,
-            config.getClientKeyData());
+        System.setProperty(Config.KUBERNETES_CA_CERTIFICATE_DATA_SYSTEM_PROPERTY, config.getCaCertData());
+        System.setProperty(Config.KUBERNETES_CLIENT_CERTIFICATE_DATA_SYSTEM_PROPERTY, config.getClientCertData());
+        System.setProperty(Config.KUBERNETES_CLIENT_KEY_DATA_SYSTEM_PROPERTY, config.getClientKeyData());
         System.setProperty(Config.KUBERNETES_TRUST_CERT_SYSTEM_PROPERTY, "true");
 
         return k3sContainer;
     }
-
 }

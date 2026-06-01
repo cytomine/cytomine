@@ -533,4 +533,15 @@ public class CytomineTests {
         cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
         cytomineSteps.logout(wait, cytomineUrl);
     }
+
+    @Test
+    void checkProjectAfterPimsImport() {
+        String projectName = "test-project";
+        String imageName = "cat.png";
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+
+        cytomineSteps.checkPimsImportProject(wait, cytomineUrl, projectName, imageName);
+
+        cytomineSteps.logout(wait, cytomineUrl);
+    }
 }

@@ -48,7 +48,7 @@ RUN apt-get update && \
         openssh-client \
         git # Ensure git is installed for cloning
 
-COPY --from=registry.cytomine.org/github/ghcr.io/astral-sh/uv:0.9.30 /uv /uvx /bin/
+COPY --from=registry.cytomine.org/github/ghcr.io/astral-sh/uv:0.10.12 /uv /uvx /bin/
 
 # Download plugins
 WORKDIR /app

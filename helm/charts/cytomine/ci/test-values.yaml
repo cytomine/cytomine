@@ -9,6 +9,9 @@ pims:
     storageClassName:
   tempImageStorage:
     storageClassName:
+  datasetImportStorage:
+    persistentVolumeClaim:
+      claimName: test-dataset-pvc
 mongodb:
   storageClassName:
 app_engine:
@@ -23,4 +26,5 @@ iam:
   lsaaiEndpoint:
 
 images:
-  imagePullSecretsNames: [docker-image-pull-secrets]
+  imagePullSecretsNames:
+    - docker-image-pull-secrets

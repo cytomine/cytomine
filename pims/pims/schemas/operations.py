@@ -18,3 +18,7 @@ class ImportSummary(BaseModel):
 class ImportResponse(BaseModel):
     image_summary: ImportSummary
     annotation_summary: dict[str, ImportSummary]
+
+
+class JobResponse(BaseModel):
+    status: str

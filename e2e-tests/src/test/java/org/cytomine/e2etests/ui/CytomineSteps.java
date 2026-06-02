@@ -629,4 +629,8 @@ public class CytomineSteps {
         webDriverUtils.xpathClick(wait, "//a[contains(text(), '" + projectName + "')]");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), " + imageName + ")]"));
     }
+
+    public void reviewAnnotations(Wait<WebDriver> wait) {
+
+    }
 }

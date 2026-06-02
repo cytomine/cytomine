@@ -2,7 +2,7 @@
 ARG APP_ENGINE_VERSION
 ARG APP_ENGINE_REVISION
 ARG JAVA_VERSION=21-jre
-ARG GRADLE_VERSION=8.14-jdk21
+ARG GRADLE_VERSION=9.5.1-jdk21
 ARG PROXY_CACHE=registry.cytomine.org/docker
 
 #######################################################################################
@@ -17,10 +17,18 @@ RUN mkdir -p /opt/gradle/.gradle
 ENV GRADLE_USER_HOME=/opt/gradle/.gradle
 
 WORKDIR /app
-COPY ./app-engine/src /app/app-engine/src
 COPY ./app-engine/build.gradle /app/app-engine/build.gradle
-
-COPY ./registry-client /app/registry-client
+COPY ./app-engine/src /app/app-engine/src
+COPY ./common/build.gradle /app/common/build.gradle
+COPY ./common/src /app/common/src
+COPY ./core/build.gradle /app/core/build.gradle
+COPY ./core/src /app/core/src
+COPY ./e2e-tests/build.gradle /app/e2e-tests/build.gradle
+COPY ./e2e-tests/src /app/e2e-tests/src
+COPY ./registry-client/build.gradle /app/registry-client/build.gradle
+COPY ./registry-client/src /app/registry-client/src
+COPY ./repository/build.gradle /app/repository/build.gradle
+COPY ./repository/src /app/repository/src
 COPY ./settings.gradle /app/settings.gradle
 
 RUN gradle :app-engine:clean :app-engine:compileJava --no-daemon --console=verbose
@@ -33,9 +41,18 @@ ENV GRADLE_USER_HOME=/opt/gradle/.gradle
 COPY --from=deps-downloader /opt/gradle/.gradle /opt/gradle/.gradle
 
 WORKDIR /app
-COPY ./registry-client /app/registry-client
-COPY ./app-engine/src /app/app-engine/src
 COPY ./app-engine/build.gradle /app/app-engine/build.gradle
+COPY ./app-engine/src /app/app-engine/src
+COPY ./common/build.gradle /app/common/build.gradle
+COPY ./common/src /app/common/src
+COPY ./core/build.gradle /app/core/build.gradle
+COPY ./core/src /app/core/src
+COPY ./e2e-tests/build.gradle /app/e2e-tests/build.gradle
+COPY ./e2e-tests/src /app/e2e-tests/src
+COPY ./registry-client/build.gradle /app/registry-client/build.gradle
+COPY ./registry-client/src /app/registry-client/src
+COPY ./repository/build.gradle /app/repository/build.gradle
+COPY ./repository/src /app/repository/src
 COPY ./settings.gradle /app/settings.gradle
 
 ARG APP_ENGINE_VERSION

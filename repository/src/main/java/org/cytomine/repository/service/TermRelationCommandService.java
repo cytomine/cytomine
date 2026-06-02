@@ -53,8 +53,7 @@ public class TermRelationCommandService
                 CommandV2Entity commandV2Entity =
                     commandV2Repository.save(commandMapper.map(deleteCommand, now, now, userId));
                 termEntity.setDeleted(now);
-                return saveAndBuildResponse(termEntity, Commands.DELETE_TERM_RELATION, commandV2Entity.getId(),
-                    ontologyId);
+                return saveAndBuildResponse(termEntity, Commands.DELETE_TERM_RELATION, commandV2Entity.getId());
             });
     }
 
@@ -82,7 +81,7 @@ public class TermRelationCommandService
                 CommandV2Entity commandV2Entity =
                     commandV2Repository.save(commandMapper.map(insertTermCommand, now, now, userId));
 
-                TermRelationResponse termResponse = ontologyMapper.mapToTermRelationResponse(savedEntity, ontologyId);
+                TermRelationResponse termResponse = ontologyMapper.mapToTermRelationResponse(savedEntity);
 
                 return new HttpCommandResponse(true, termResponse, commandV2Entity.getId(),
                     Commands.CREATE_TERM_RELATION);
@@ -115,7 +114,7 @@ public class TermRelationCommandService
                 CommandV2Entity commandV2Entity =
                     commandV2Repository.save(commandMapper.map(updateCommand, now, now, userId));
 
-                TermRelationResponse termResponse = ontologyMapper.mapToTermRelationResponse(savedEntity, ontologyId);
+                TermRelationResponse termResponse = ontologyMapper.mapToTermRelationResponse(savedEntity);
                 return new HttpCommandResponse(true, termResponse, commandV2Entity.getId(),
                     Commands.UPDATE_TERM_RELATION);
             });
@@ -128,18 +127,25 @@ public class TermRelationCommandService
         return termRelationRepository.findById(payload.id()).map(entity -> {
             entity.setTerm1Id(payload.term1Id());
             entity.setTerm2Id(payload.term2Id());
-            return saveAndBuildResponse(entity, Commands.UPDATE_TERM_RELATION, commandId, payload.ontologyId());
+            return saveAndBuildResponse(entity, Commands.UPDATE_TERM_RELATION, commandId);
         });
     }
 
     @Override
     public Optional<HttpCommandResponse> logicalDelete(UUID commandId, long id, String command, LocalDateTime now) {
-        return Optional.empty();
+        return termRelationRepository.findById(id).map(entity -> {
+            entity.setDeleted(now);
+            return saveAndBuildResponse(entity, command, commandId);
+        });
     }
 
     @Override
     public Optional<HttpCommandResponse> restore(UUID commandId, long id, String command, LocalDateTime now) {
-        return Optional.empty();
+        return termRelationRepository.findById(id).map(entity -> {
+            entity.setDeleted(null);
+            entity.setUpdated(now);
+            return saveAndBuildResponse(entity, command, commandId);
+        });
     }
 
     @Override
@@ -152,91 +158,9 @@ public class TermRelationCommandService
         return aclService.canDeleteOntology(userId, id);
     }
 
-
-    public Optional<HttpCommandResponse> undoDeleteTermRelation(UUID commandId,
-        DeleteTermRelationCommand deleteTermCommand, long userId, LocalDateTime now) {
-        if (!aclService.canWriteOntology(userId, deleteTermCommand.ontologyId())) {
-            return Optional.empty();
-        }
-        return restoreTermRelation(commandId, deleteTermCommand.before().id(), Commands.DELETE_TERM_RELATION, now,
-            deleteTermCommand.before().ontologyId());
-    }
-
-    public Optional<HttpCommandResponse> redoDeleteTermRelation(UUID commandId,
-        DeleteTermRelationCommand deleteTermCommand, long userId, LocalDateTime now) {
-        if (!aclService.canWriteOntology(userId, deleteTermCommand.ontologyId())) {
-            return Optional.empty();
-        }
-        return softDeleteTermRelation(commandId, deleteTermCommand.before().id(), Commands.DELETE_TERM_RELATION, now,
-            deleteTermCommand.before().ontologyId());
-    }
-
-    public Optional<HttpCommandResponse> undoCreateTermRelation(UUID commandId,
-        CreateTermRelationCommand createTermCommand, long userId, LocalDateTime now) {
-        if (!aclService.canWriteOntology(userId, createTermCommand.ontologyId())) {
-            return Optional.empty();
-        }
-        return softDeleteTermRelation(commandId, createTermCommand.after().id(), Commands.CREATE_TERM_RELATION, now,
-            createTermCommand.after().ontologyId());
-    }
-
-    public Optional<HttpCommandResponse> redoCreateTermRelation(UUID commandId,
-        CreateTermRelationCommand createTermCommand, long userId, LocalDateTime now) {
-        if (!aclService.canWriteOntology(userId, createTermCommand.ontologyId())) {
-            return Optional.empty();
-        }
-        return restoreTermRelation(commandId, createTermCommand.after().id(), Commands.CREATE_TERM_RELATION, now,
-            createTermCommand.after().ontologyId());
-    }
-
-    public Optional<HttpCommandResponse> undoUpdateTermRelation(UUID commandId,
-        UpdateTermRelationCommand updateTermCommand, long userId) {
-        if (!aclService.canWriteOntology(userId, updateTermCommand.ontologyId())) {
-            return Optional.empty();
-        }
-        return termRelationRepository.findById(updateTermCommand.before().id()).map(entity -> {
-            entity.setTerm1Id(updateTermCommand.before().term1Id());
-            entity.setTerm2Id(updateTermCommand.before().term2Id());
-            return saveAndBuildResponse(entity, Commands.UPDATE_TERM_RELATION, commandId,
-                updateTermCommand.before().ontologyId());
-        });
-    }
-
-    public Optional<HttpCommandResponse> redoUpdateTermRelation(UUID commandId,
-        UpdateTermRelationCommand updateTermCommand, long userId, LocalDateTime now) {
-        if (!aclService.canWriteOntology(userId, updateTermCommand.ontologyId())) {
-            return Optional.empty();
-        }
-        return termRelationRepository.findById(updateTermCommand.after().id()).map(entity -> {
-            entity.setTerm1Id(updateTermCommand.after().term1Id());
-            entity.setTerm2Id(updateTermCommand.after().term2Id());
-            entity.setUpdated(now);
-            return saveAndBuildResponse(entity, Commands.UPDATE_TERM_RELATION, commandId,
-                updateTermCommand.after().ontologyId());
-        });
-    }
-
-    private Optional<HttpCommandResponse> restoreTermRelation(UUID commandId, Long termId, String command,
-        LocalDateTime now, long ontologyId) {
-        return termRelationRepository.findById(termId).map(entity -> {
-            entity.setDeleted(null);
-            entity.setUpdated(now);
-            return saveAndBuildResponse(entity, command, commandId, ontologyId);
-        });
-    }
-
-    private Optional<HttpCommandResponse> softDeleteTermRelation(UUID commandId, Long termId, String command,
-        LocalDateTime now, long ontologyId) {
-        return termRelationRepository.findById(termId).map(entity -> {
-            entity.setDeleted(now);
-            return saveAndBuildResponse(entity, command, commandId, ontologyId);
-        });
-    }
-
-    private HttpCommandResponse saveAndBuildResponse(TermRelationEntity entity, String command, UUID commandId,
-        long ontologyId) {
+    private HttpCommandResponse saveAndBuildResponse(TermRelationEntity entity, String command, UUID commandId) {
         TermRelationEntity saved = termRelationRepository.save(entity);
-        TermRelationResponse response = ontologyMapper.mapToTermRelationResponse(saved, ontologyId);
+        TermRelationResponse response = ontologyMapper.mapToTermRelationResponse(saved);
         return new HttpCommandResponse(true, response, commandId, command);
     }
 

@@ -170,7 +170,7 @@ class ApplyCommandServiceTest {
 
         applyCommandService.undoCommand(userId, id, now);
 
-        verify(termRelationCommandService).undoDeleteTermRelation(id, cmd, userId, now);
+        verify(termRelationCommandService).undoDelete(id, cmd, userId, now);
     }
 
     @Test
@@ -179,12 +179,12 @@ class ApplyCommandServiceTest {
         LocalDateTime now = LocalDateTime.now();
         CreateTermRelationCommand cmd = new CreateTermRelationCommand(relationPayload, userId, ontologyId);
         when(commandRepository.findById(id)).thenReturn(Optional.of(new CommandV2Entity(id, null, null, cmd, 0L)));
-        when(termRelationCommandService.undoCreateTermRelation(id, cmd, userId, now)).thenReturn(
+        when(termRelationCommandService.undoCreate(id, cmd, userId, now)).thenReturn(
             Optional.of(mockResponse(Commands.CREATE_TERM_RELATION)));
 
         applyCommandService.undoCommand(userId, id, now);
 
-        verify(termRelationCommandService).undoCreateTermRelation(id, cmd, userId, now);
+        verify(termRelationCommandService).undoCreate(id, cmd, userId, now);
     }
 
     @Test
@@ -194,12 +194,12 @@ class ApplyCommandServiceTest {
         UpdateTermRelationCommand cmd =
             new UpdateTermRelationCommand(20L, relationPayload, relationPayload, userId, ontologyId);
         when(commandRepository.findById(id)).thenReturn(Optional.of(new CommandV2Entity(id, null, null, cmd, 0L)));
-        when(termRelationCommandService.undoUpdateTermRelation(id, cmd, userId)).thenReturn(
+        when(termRelationCommandService.undoUpdate(id, cmd, userId, now)).thenReturn(
             Optional.of(mockResponse(Commands.UPDATE_TERM_RELATION)));
 
         applyCommandService.undoCommand(userId, id, now);
 
-        verify(termRelationCommandService).undoUpdateTermRelation(id, cmd, userId);
+        verify(termRelationCommandService).undoUpdate(id, cmd, userId, now);
     }
 
     @Test
@@ -208,12 +208,12 @@ class ApplyCommandServiceTest {
         LocalDateTime now = LocalDateTime.now();
         DeleteTermRelationCommand cmd = new DeleteTermRelationCommand(20L, relationPayload, userId, ontologyId);
         when(commandRepository.findById(id)).thenReturn(Optional.of(new CommandV2Entity(id, null, null, cmd, 0L)));
-        when(termRelationCommandService.redoDeleteTermRelation(id, cmd, userId, now)).thenReturn(
+        when(termRelationCommandService.redoDelete(id, cmd, userId, now)).thenReturn(
             Optional.of(mockResponse(Commands.DELETE_TERM_RELATION)));
 
         applyCommandService.redoCommand(userId, id, now);
 
-        verify(termRelationCommandService).redoDeleteTermRelation(id, cmd, userId, now);
+        verify(termRelationCommandService).redoDelete(id, cmd, userId, now);
     }
 
     @Test
@@ -222,12 +222,12 @@ class ApplyCommandServiceTest {
         LocalDateTime now = LocalDateTime.now();
         CreateTermRelationCommand cmd = new CreateTermRelationCommand(relationPayload, userId, ontologyId);
         when(commandRepository.findById(id)).thenReturn(Optional.of(new CommandV2Entity(id, null, null, cmd, 0L)));
-        when(termRelationCommandService.redoCreateTermRelation(id, cmd, userId, now)).thenReturn(
+        when(termRelationCommandService.redoCreate(id, cmd, userId, now)).thenReturn(
             Optional.of(mockResponse(Commands.CREATE_TERM_RELATION)));
 
         applyCommandService.redoCommand(userId, id, now);
 
-        verify(termRelationCommandService).redoCreateTermRelation(id, cmd, userId, now);
+        verify(termRelationCommandService).redoCreate(id, cmd, userId, now);
     }
 
     @Test
@@ -237,12 +237,12 @@ class ApplyCommandServiceTest {
         UpdateTermRelationCommand cmd =
             new UpdateTermRelationCommand(20L, relationPayload, relationPayload, userId, ontologyId);
         when(commandRepository.findById(id)).thenReturn(Optional.of(new CommandV2Entity(id, null, null, cmd, 0L)));
-        when(termRelationCommandService.redoUpdateTermRelation(id, cmd, userId, now)).thenReturn(
+        when(termRelationCommandService.redoUpdate(id, cmd, userId, now)).thenReturn(
             Optional.of(mockResponse(Commands.UPDATE_TERM_RELATION)));
 
         applyCommandService.redoCommand(userId, id, now);
 
-        verify(termRelationCommandService).redoUpdateTermRelation(id, cmd, userId, now);
+        verify(termRelationCommandService).redoUpdate(id, cmd, userId, now);
     }
 
     private HttpCommandResponse mockResponse(String command) {

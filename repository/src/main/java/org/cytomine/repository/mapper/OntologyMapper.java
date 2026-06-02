@@ -44,9 +44,8 @@ public interface OntologyMapper {
     TermEntity map(CreateTerm createTerm, LocalDateTime creationDate);
 
     @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
-    @Mapping(target = "ontologyId", source = "ontologyId")
     @Mapping(target = "name", ignore = true)
-    TermRelationResponse mapToTermRelationResponse(TermRelationEntity termRelationEntity, long ontologyId);
+    TermRelationResponse mapToTermRelationResponse(TermRelationEntity termRelationEntity);
 
     @BeanMapping(ignoreUnmappedSourceProperties = {"name"})
     @Mapping(target = "id", ignore = true)
@@ -55,7 +54,7 @@ public interface OntologyMapper {
     @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "updated", source = "creationDate")
     TermRelationEntity mapToTermRelationEntity(CreateTermRelation createTermRelation, LocalDateTime creationDate,
-                                               long relationId);
+        long relationId);
 
     @BeanMapping(ignoreUnmappedSourceProperties = {"version", "children", "deleted"})
     @Mapping(target = "ontology", source = "ontologyId")
@@ -70,10 +69,18 @@ public interface OntologyMapper {
     @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
     RelationResponse mapRelationResponse(RelationEntity relationEntity);
 
-    @BeanMapping(ignoreUnmappedSourceProperties = {"version","userId"})
+    @BeanMapping(ignoreUnmappedSourceProperties = {"version", "userId"})
     OntologyResponse mapToOntologyResponse(OntologyEntity ontologyEntity);
 
-    OntologyEntity mapToOntologyEntity(CreateOntology createOntology);
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "created", source = "creationDate")
+    @Mapping(target = "deleted", ignore = true)
+    @Mapping(target = "updated", source = "creationDate")
+    @Mapping(target = "terms", ignore = true)
+    OntologyEntity mapToOntologyEntity(CreateOntology createOntology, long userId, LocalDateTime creationDate);
+
+    @BeanMapping(ignoreUnmappedSourceProperties = {"version", "userId", "terms"})
     OntologyCommandPayload mapToOntologyCommandPayload(OntologyEntity ontologyEntity);
 
 

@@ -43,7 +43,7 @@ public class TermRelationController implements TermRelationHttpContract {
             return List.of();
         }
         return termRelationRepository.findAllByOntologyId(ontologyId).stream()
-            .map(e -> ontologyMapper.mapToTermRelationResponse(e, ontologyId)).toList();
+            .map(ontologyMapper::mapToTermRelationResponse).toList();
     }
 
     @Override
@@ -60,13 +60,13 @@ public class TermRelationController implements TermRelationHttpContract {
         return termRelationRepository.findById(id).flatMap(
             termEntity -> termRepository.findById(termEntity.getTerm1Id())
                 .filter(term1 -> aclService.canReadOntology(userId, term1.getOntologyId()))
-                .map(term1 -> ontologyMapper.mapToTermRelationResponse(termEntity, term1.getOntologyId())));
+                .map(term1 -> ontologyMapper.mapToTermRelationResponse(termEntity)));
     }
 
     @Override
     public Set<Long> findTermRelationsIdsByTermId(long termId, long userId) {
-        return termRelationRepository.findAllByTerm1IdOrTerm2Id(termId, termId).stream()
-            .map(TermRelationEntity::getId).collect(toSet());
+        return termRelationRepository.findAllByTerm1IdOrTerm2Id(termId, termId).stream().map(TermRelationEntity::getId)
+            .collect(toSet());
     }
 
     @Override
@@ -92,9 +92,9 @@ public class TermRelationController implements TermRelationHttpContract {
 
     @Override
     public Optional<HttpCommandResponse> deleteByTerms(@PathVariable long idTerm1, @PathVariable long idTerm2,
-                                                       @RequestParam long userId) {
+        @RequestParam long userId) {
         long parentRelationId = relationRepository.findParent().getId();
-        return termRelationRepository.findByRelationIdAndTerm1IdAndTerm2Id(parentRelationId, idTerm1, idTerm2).flatMap(
-            entity -> termRelationCommandService.delete(entity.getId(), userId, LocalDateTime.now()));
+        return termRelationRepository.findByRelationIdAndTerm1IdAndTerm2Id(parentRelationId, idTerm1, idTerm2)
+            .flatMap(entity -> termRelationCommandService.delete(entity.getId(), userId, LocalDateTime.now()));
     }
 }

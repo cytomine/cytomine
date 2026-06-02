@@ -39,7 +39,7 @@ public class OntologyCommandService
         // well who can write ontology any way?
         // if(!canWrite(userId, ???))
 
-        OntologyEntity ontologyEntity = ontologyMapper.mapToOntologyEntity(createPayload);
+        OntologyEntity ontologyEntity = ontologyMapper.mapToOntologyEntity(createPayload,userId,now);
         OntologyEntity savedEntity = ontologyRepository.save(ontologyEntity);
         OntologyCommandPayload ontologyCommandPayload = ontologyMapper.mapToOntologyCommandPayload(savedEntity);
         CreateOntologyCommand createOntologyCommand = new CreateOntologyCommand(ontologyCommandPayload, userId);

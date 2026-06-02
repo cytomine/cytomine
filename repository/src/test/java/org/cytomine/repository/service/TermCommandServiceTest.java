@@ -78,8 +78,7 @@ class TermCommandServiceTest {
 
 
         HttpCommandResponse createResponse =
-            termCommandService.create(userId, new CreateTerm("term1", "#FF0000", ontologyId, null), t0)
-                .orElseThrow();
+            termCommandService.create(userId, new CreateTerm("term1", "#FF0000", ontologyId, null), t0).orElseThrow();
         TermResponse dataResult = (TermResponse) createResponse.data();
         long termId = dataResult.id();
 
@@ -105,7 +104,7 @@ class TermCommandServiceTest {
             termRepository.findById(termId).orElseThrow());
 
         HttpCommandResponse undoResponse =
-            termCommandService.undoDeleteTerm(deleteCommandId, deleteCmd, userId, t2).orElseThrow();
+            termCommandService.undoDelete(deleteCommandId, deleteCmd, userId, t2).orElseThrow();
 
         assertEquals(new HttpCommandResponse(true,
             new TermResponse(termId, "term1", "#FF0000", ontologyId, t0, t2, Optional.empty(), null, Set.of()),
@@ -117,7 +116,7 @@ class TermCommandServiceTest {
 
         LocalDateTime t3 = t0.plusSeconds(3);
         HttpCommandResponse redoResponse =
-            termCommandService.redoDeleteTerm(deleteCommandId, deleteCmd, userId, t3).orElseThrow();
+            termCommandService.redoDelete(deleteCommandId, deleteCmd, userId, t3).orElseThrow();
 
         assertEquals(new HttpCommandResponse(true,
             new TermResponse(termId, "term1", "#FF0000", ontologyId, t0, t2, Optional.of(t3), null, Set.of()),
@@ -148,8 +147,9 @@ class TermCommandServiceTest {
         assertEquals(new TermEntity(termId, 0, ontologyId, "original", "#FF0000", t0, t0, null, null, Set.of()),
             termRepository.findById(termId).orElseThrow());
 
-        HttpCommandResponse updateResponse = termCommandService.update(termId, userId,
-            new UpdateTerm(Optional.of("updated"), Optional.of("#00FF00")), t1).orElseThrow();
+        HttpCommandResponse updateResponse =
+            termCommandService.update(termId, userId, new UpdateTerm(Optional.of("updated"), Optional.of("#00FF00")),
+                t1).orElseThrow();
         UUID updateCommandId = updateResponse.commandId();
         UpdateTermCommand updateCmd =
             (UpdateTermCommand) commandV2Repository.findById(updateCommandId).orElseThrow().getData();
@@ -163,7 +163,7 @@ class TermCommandServiceTest {
             termRepository.findById(termId).orElseThrow());
 
         HttpCommandResponse undoResponse =
-            termCommandService.undoUpdateTerm(updateCommandId, updateCmd, userId).orElseThrow();
+            termCommandService.undoUpdate(updateCommandId, updateCmd, userId, t0).orElseThrow();
 
         assertEquals(new HttpCommandResponse(true,
             new TermResponse(termId, "original", "#FF0000", ontologyId, t0, t0, Optional.empty(), null, Set.of()),
@@ -175,7 +175,7 @@ class TermCommandServiceTest {
 
         LocalDateTime t2 = t0.plusSeconds(2);
         HttpCommandResponse redoResponse =
-            termCommandService.redoUpdateTerm(updateCommandId, updateCmd, userId, t2).orElseThrow();
+            termCommandService.redoUpdate(updateCommandId, updateCmd, userId, t2).orElseThrow();
 
         assertEquals(new HttpCommandResponse(true,
             new TermResponse(termId, "updated", "#00FF00", ontologyId, t0, t2, Optional.empty(), null, Set.of()),
@@ -193,8 +193,7 @@ class TermCommandServiceTest {
         LocalDateTime t2 = t0.plusSeconds(2);
 
         HttpCommandResponse createResponse =
-            termCommandService.create(userId, new CreateTerm("term1", "#FF0000", ontologyId, null), t0)
-                .orElseThrow();
+            termCommandService.create(userId, new CreateTerm("term1", "#FF0000", ontologyId, null), t0).orElseThrow();
         TermResponse dataResult = (TermResponse) createResponse.data();
         long termId = dataResult.id();
         UUID createCommandId = createResponse.commandId();
@@ -210,7 +209,7 @@ class TermCommandServiceTest {
             termRepository.findById(termId).orElseThrow());
 
         HttpCommandResponse undoResponse =
-            termCommandService.undoCreateTerm(createCommandId, createCmd, userId, t1).orElseThrow();
+            termCommandService.undoCreate(createCommandId, createCmd, userId, t1).orElseThrow();
 
         assertEquals(new HttpCommandResponse(true,
             new TermResponse(termId, "term1", "#FF0000", ontologyId, t0, t0, Optional.of(t1), null, Set.of()),
@@ -221,7 +220,7 @@ class TermCommandServiceTest {
             termRepository.findById(termId).orElseThrow());
 
         HttpCommandResponse redoResponse =
-            termCommandService.redoCreateTerm(createCommandId, createCmd, userId, t2).orElseThrow();
+            termCommandService.redoCreate(createCommandId, createCmd, userId, t2).orElseThrow();
 
         assertEquals(new HttpCommandResponse(true,
             new TermResponse(termId, "term1", "#FF0000", ontologyId, t0, t2, Optional.empty(), null, Set.of()),

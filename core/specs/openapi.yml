@@ -1345,32 +1345,6 @@ paths:
         "404":
           $ref: "#/components/responses/not-found"
 
-  /api/annotation/method/download:
-    get:
-      tags:
-        - Annotation
-      description: Download an annotation search report
-      parameters:
-        - name: format
-          in: query
-          description: "(Optional) Output file format (pdf, xls,...)"
-          required: true
-          schema:
-            type: string
-        - $ref: "#/components/parameters/pagination-max"
-        - $ref: "#/components/parameters/pagination-offset"
-      responses:
-        "200":
-          description: file
-        "400":
-          $ref: "#/components/responses/bad-request"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/not-found"
-
   /api/annotation/search.json:
     post:
       tags:
@@ -3678,59 +3652,6 @@ paths:
                               type: string
                               description: Image thumb URL
                   - $ref: "#/components/schemas/collection"
-          description: ""
-        "400":
-          $ref: "#/components/responses/bad-request"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/not-found"
-
-  /api/imageserver.json:
-    get:
-      tags:
-        - Image | Image server
-      description: List image servers
-      parameters:
-        - $ref: "#/components/parameters/pagination-max"
-        - $ref: "#/components/parameters/pagination-offset"
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ImageServerCollection"
-          description: ""
-        "400":
-          $ref: "#/components/responses/bad-request"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/not-found"
-
-  /api/imageserver/{id}.json:
-    get:
-      tags:
-        - Image | Image server
-      description: Get an image server
-      parameters:
-        - name: id
-          in: path
-          description: The image server id
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/ImageServer"
           description: ""
         "400":
           $ref: "#/components/responses/bad-request"
@@ -7661,41 +7582,6 @@ paths:
         "404":
           $ref: "#/components/responses/not-found"
 
-  /api/user/security_check.json:
-    post:
-      tags:
-        - user
-      description: Check a user password for the current user
-      parameters:
-        - name: password
-          in: query
-          description: The password
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/user"
-          description: ""
-        "400":
-          $ref: "#/components/responses/bad-request"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/not-found"
-        "409":
-          $ref: "#/components/responses/conflict"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              "$ref": "#/components/schemas/user"
-
   /api/user/{id}.json:
     get:
       tags:
@@ -7904,48 +7790,6 @@ paths:
           $ref: "#/components/responses/forbidden"
         "404":
           $ref: "#/components/responses/not-found"
-
-  /api/user/{id}/password.json:
-    put:
-      tags:
-        - user
-      description: Change a user password for a user
-      parameters:
-        - name: id
-          in: path
-          description: The user id
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: password
-          in: query
-          description: The new password
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/user"
-          description: ""
-        "400":
-          $ref: "#/components/responses/bad-request"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/not-found"
-        "409":
-          $ref: "#/components/responses/conflict"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              "$ref": "#/components/schemas/user"
 
   /api/user/{user}/project.json:
     get:
@@ -9643,10 +9487,6 @@ components:
           type: integer
           description: The underlying file for the slice
           format: int64
-        imageServerUrl:
-          type: string
-          description: URL of the server with tiles
-          readOnly: true
         path:
           type: string
           description: The internal path of the file
@@ -10269,36 +10109,6 @@ components:
       required:
         - image
         - imageGroup
-    ImageServer:
-      description: An image server (IMS) instance
-      type: object
-      properties:
-        class:
-          $ref: "#/components/schemas/attribute-class"
-        id:
-          $ref: "#/components/schemas/attribute-id"
-        created:
-          $ref: "#/components/schemas/attribute-created"
-        updated:
-          $ref: "#/components/schemas/attribute-updated"
-        deleted:
-          $ref: "#/components/schemas/attribute-deleted"
-        name:
-          type: string
-          description: A user friendly name for the image server
-        url:
-          type: string
-          description: The URL of the image server instance
-        basePath:
-          type: string
-          description: The base path used by the image server
-        available:
-          type: boolean
-          description: Whether the server is available or not
-      required:
-        - url
-        - basePath
-        - available
     LastConnection:
       description: A Connection is recorded all long the user is connected.
       type: object
@@ -11310,10 +11120,6 @@ components:
           description: The underlying file for the slice
           format: int64
           readOnly: true
-        imageServerUrl:
-          type: string
-          description: URL of the server with tiles
-          readOnly: true
         path:
           type: string
           description: The internal path of the file
@@ -11536,10 +11342,6 @@ components:
           type: integer
           description: The parent uploaded file in the hierarchy
           format: int64
-        imageServer:
-          type: integer
-          description: The image server managing the file
-          format: int64
         storage:
           type: integer
           description: The virtual storage where the file is uploaded
@@ -11585,7 +11387,6 @@ components:
       required:
         - user
         - parent
-        - imageServer
         - storage
         - originalFilename
         - filename
@@ -12026,15 +11827,6 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/ImageInstance"
-        - $ref: "#/components/schemas/collection"
-    ImageServerCollection:
-      allOf:
-        - type: object
-          properties:
-            collection:
-              type: array
-              items:
-                $ref: "#/components/schemas/ImageServer"
         - $ref: "#/components/schemas/collection"
     OntologyCollection:
       allOf:

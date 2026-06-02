@@ -27,35 +27,6 @@ from cytomine.models.model import Model
 from ._utilities import generic_image_dump
 
 
-class ImageServer(Model):
-    def __init__(
-        self,
-        name: Optional[str] = None,
-        url: Optional[str] = None,
-        available: bool = False,
-        base_path: Optional[str] = None,
-        **attributes: Any,
-    ) -> None:
-        super().__init__()
-        self.name = name
-        self.url = url
-        self.available = available
-        self.base_path = base_path
-
-
-class ImageServerCollection(Collection):
-    def __init__(
-        self,
-        filters: Optional[Dict[str, Any]] = None,
-        max: int = 0,
-        offset: int = 0,
-        **parameters: Any,
-    ) -> None:
-        super().__init__(ImageServer, filters, max, offset)
-        self._allowed_filters = [None]
-        self.set_parameters(parameters)
-
-
 class AbstractImage(Model):
     def __init__(
         self,
@@ -90,16 +61,6 @@ class AbstractImage(Model):
         self.preview = None
 
         self.populate(attributes)
-        self._image_servers: Optional[List[ImageServer]] = None
-
-    @deprecated
-    def image_servers(self) -> Optional[List[ImageServer]]:
-        if not self._image_servers:
-            uri = f"{self.callback_identifier}/{self.id}/imageservers.json"
-            data = Cytomine.get_instance().get(uri)
-            self._image_servers = data["imageServersURLs"]  # type: ignore
-
-        return self._image_servers
 
     def download(
         self,
@@ -234,22 +195,12 @@ class ImageInstance(Model):
         self.numberOfReviewedAnnotations = None
         self.reviewed = None
         self.populate(attributes)
-        self._image_servers = None
         self._reference_slice: Optional[SliceInstance] = None
 
         self.x: Optional[int] = None
         self.y: Optional[int] = None
         self.w: Optional[int] = None
         self.h: Optional[int] = None
-
-    @deprecated
-    def image_servers(self) -> Any:
-        if not self._image_servers:
-            data = Cytomine.get_instance().get(
-                f"abstractimage/{self.baseImage}/imageservers.json"
-            )
-            self._image_servers = data["imageServersURLs"]  # type: ignore
-        return self._image_servers
 
     def reference_slice(self) -> Optional[Union[bool, "SliceInstance"]]:
         if self.id is None:
@@ -549,7 +500,6 @@ class SliceInstance(Model):
         self.project = id_project
         self.image = id_image
         self.baseSlice = id_base_slice
-        self.imageServerUrl = None
         self.mime = None
         self.channel = None
         self.zStack = None

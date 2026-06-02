@@ -27,7 +27,6 @@ from cytomine.models import (
     AbstractSlice,
     Annotation,
     ImageInstance,
-    ImageServerCollection,
     Ontology,
     Project,
     Storage,
@@ -79,7 +78,6 @@ def dataset(request: pytest.FixtureRequest) -> Dict[str, Any]:
 
     data["project"] = Project(random_string(), data["ontology"].id).save()
     data["storage"] = Storage(random_string(), data["user"].id).save()
-    data["image_servers"] = ImageServerCollection().fetch()
     data["uploaded_file"] = UploadedFile(
         originalFilename=random_string(),
         filename=random_string(),
@@ -89,7 +87,6 @@ def dataset(request: pytest.FixtureRequest) -> Dict[str, Any]:
         id_projects=data["project"].id,
         id_storage=data["storage"].id,
         id_user=data["user"].id,
-        id_image_server=data["image_servers"][0].id,
     ).save()
     data["uploaded_file2"] = UploadedFile(
         originalFilename=random_string(),
@@ -100,7 +97,6 @@ def dataset(request: pytest.FixtureRequest) -> Dict[str, Any]:
         id_projects=data["project"].id,
         id_storage=data["storage"].id,
         id_user=data["user"].id,
-        id_image_server=data["image_servers"][0].id,
     ).save()
     data["uploaded_file3"] = UploadedFile(
         originalFilename=random_string(),
@@ -111,7 +107,6 @@ def dataset(request: pytest.FixtureRequest) -> Dict[str, Any]:
         id_projects=data["project"].id,
         id_storage=data["storage"].id,
         id_user=data["user"].id,
-        id_image_server=data["image_servers"][0].id,
     ).save()
 
     data["abstract_image"] = AbstractImage(

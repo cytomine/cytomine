@@ -309,7 +309,6 @@ class CytomineListener(ImportListener):
             uf.storage = parent.storage
             uf.user = parent.user
             uf.parent = None if delete_zip else parent.id
-            uf.imageServer = parent.imageServer
             uf.save()
             self.path_uf_mapping[str(unpacked_path)] = uf
             if delete_zip:
@@ -328,7 +327,6 @@ class CytomineListener(ImportListener):
         uf.storage = parent.storage
         uf.user = parent.user
         uf.parent = None if delete_zip else parent.id
-        uf.imageServer = parent.imageServer
         uf.save()
         self.path_uf_mapping[str(path)] = uf
 
@@ -365,7 +363,6 @@ class CytomineListener(ImportListener):
         uf.storage = parent.storage
         uf.user = parent.user
         uf.parent = parent.id
-        uf.imageServer = parent.imageServer
         uf.save()
         self.path_uf_mapping[str(path)] = uf
 

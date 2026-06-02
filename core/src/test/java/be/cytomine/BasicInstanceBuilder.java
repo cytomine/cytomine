@@ -386,8 +386,7 @@ public class BasicInstanceBuilder {
     }
 
     public AbstractImage givenAnAbstractImage() {
-        AbstractImage imageServer = givenANotPersistedAbstractImage();
-        return persistAndReturn(imageServer);
+        return persistAndReturn(givenANotPersistedAbstractImage());
     }
 
     public AbstractImage givenANotPersistedAbstractImage() {

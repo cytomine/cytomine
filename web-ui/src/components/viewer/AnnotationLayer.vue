@@ -293,7 +293,9 @@ export default {
 
       let arrayAnnots;
       try {
-        if (Object.prototype.hasOwnProperty.call(this.layer, 'username')) {
+        const isUserAnnotation = Object.prototype.hasOwnProperty.call(this.layer, 'username');
+        const isReviewedAnnotation = Object.prototype.hasOwnProperty.call(this.layer, 'isReview');
+        if (isUserAnnotation || isReviewedAnnotation) {
           arrayAnnots = await this.fetchAnnots(extent);
           // Order by size, so bigger ones are always sent to back
           arrayAnnots.sort(

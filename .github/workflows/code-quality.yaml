@@ -60,7 +60,7 @@ jobs:
           version: ${{ steps.versions.outputs.uv-version }}
 
       - name: Lint
-        run: uvx ruff check .
+        run: uv run ruff check .
 
   python-type-check:
     runs-on: self-hosted
@@ -79,7 +79,4 @@ jobs:
           version: ${{ steps.versions.outputs.uv-version }}
 
       - name: Type check
-        run: |
-          uvx mypy cbir
-          uvx mypy clients/python/cytomine clients/python/tests
-          uvx mypy sam
+        run: uv run pyrefly check

@@ -24,9 +24,7 @@ dependencies = [
 [dependency-groups]
 dev = [
   "httpx>=0.28.1",
-  "mypy>=1.17.1",
   "pytest>=9.0.3",
-  "ruff>=0.12.10",
 ]
 
 [[tool.uv.index]]

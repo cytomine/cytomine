@@ -14,9 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -121,39 +118,6 @@ public class RestReviewedAnnotationController extends RestCytomineController {
         ImageInstance imageInstance = imageInstanceService.find(idImage)
             .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", idImage));
         return responseSuccess(reviewedAnnotationService.statsGroupByUser(imageInstance));
-    }
-
-
-    @GetMapping("/reviewedannotation/{id}.json")
-    public ResponseEntity<String> show(
-        @PathVariable Long id
-    ) {
-        log.debug("REST request to get reviewed annotation : {}", id);
-        return reviewedAnnotationService.find(id)
-            .map(this::responseSuccess)
-            .orElseGet(() -> responseNotFound("ReviewedAnnotation", id));
-    }
-
-    /**
-     * Add reviewed annotation Only use to create a reviewed annotation with all json data. Its better to use
-     * 'addAnnotationReview' that needs only the annotation id and a list of term
-     */
-    @PostMapping("/reviewedannotation.json")
-    public ResponseEntity<String> add(@RequestBody String json) {
-        log.debug("REST request to save reviewed annotation");
-        return add(reviewedAnnotationService, json);
-    }
-
-    @PutMapping("/reviewedannotation/{id}.json")
-    public ResponseEntity<String> edit(@PathVariable String id, @RequestBody JsonObject json) {
-        log.debug("REST request to edit reviewed annotation : " + id);
-        return update(reviewedAnnotationService, json);
-    }
-
-    @DeleteMapping("/reviewedannotation/{id}.json")
-    public ResponseEntity<String> delete(@PathVariable String id) {
-        log.debug("REST request to delete an annotation : " + id);
-        return delete(reviewedAnnotationService, JsonObject.of("id", id), null);
     }
 
 

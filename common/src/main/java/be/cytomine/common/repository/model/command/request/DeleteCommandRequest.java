@@ -5,7 +5,7 @@ import java.util.Optional;
 import be.cytomine.common.repository.model.command.payload.request.UpdateCommandPayload;
 
 public sealed interface DeleteCommandRequest<T> extends CommandV2Request<T>
-    permits DeleteTermCommand, DeleteTermRelationCommand {
+    permits DeleteReviewedAnnotationCommand, DeleteTermCommand, DeleteTermRelationCommand {
 
     T before();
 

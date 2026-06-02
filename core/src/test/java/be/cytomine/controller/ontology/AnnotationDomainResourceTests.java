@@ -2,10 +2,12 @@ package be.cytomine.controller.ontology;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,6 +32,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
@@ -38,6 +41,9 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.TestUtils;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.http.ReviewedAnnotationHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import be.cytomine.common.repository.model.command.payload.response.ReviewedAnnotationResponse;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
@@ -64,6 +70,9 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -104,6 +113,9 @@ public class AnnotationDomainResourceTests {
 
     @Autowired
     private WiremockRepository wiremockRepository;
+
+    @MockitoBean
+    private ReviewedAnnotationHttpContract reviewedAnnotationHttpContract;
 
     Project project;
     ImageInstance image;
@@ -1212,7 +1224,17 @@ public class AnnotationDomainResourceTests {
     @Test
     @Transactional
     public void showValidReviewedAnnotation() throws Exception {
+        Long userId = builder.givenSuperAdmin().getId();
         ReviewedAnnotation annotation = builder.givenAReviewedAnnotation();
+        when(reviewedAnnotationHttpContract.findById(eq(annotation.getId()), eq(userId)))
+            .thenReturn(Optional.of(new ReviewedAnnotationResponse(
+                annotation.getId(), userId, userId,
+                annotation.getImage().getId(), annotation.getSlice().getId(),
+                annotation.getProject().getId(),
+                annotation.getParentIdent(), annotation.getParentClassName(), 0,
+                annotation.getWktLocation(), 0.0,
+                List.of(),
+                LocalDateTime.now(), LocalDateTime.now(), Optional.empty())));
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation/{id}.json", annotation.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(annotation.getId()));
@@ -1261,7 +1283,7 @@ public class AnnotationDomainResourceTests {
     }
 
     @Test
-    @org.springframework.transaction.annotation.Transactional
+    @Transactional
     public void editValidUserAnnotation() throws Exception {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         restAnnotationDomainControllerMockMvc.perform(put("/api/annotation/{id}.json", userAnnotation.getId())
@@ -1279,23 +1301,32 @@ public class AnnotationDomainResourceTests {
     }
 
     @Test
-    @org.springframework.transaction.annotation.Transactional
+    @Transactional
     public void editValidReviewedAnnotation() throws Exception {
+        Long userId = builder.givenSuperAdmin().getId();
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
+        ReviewedAnnotationResponse annotationData = new ReviewedAnnotationResponse(
+            reviewedAnnotation.getId(), userId, userId,
+            reviewedAnnotation.getImage().getId(), reviewedAnnotation.getSlice().getId(),
+            reviewedAnnotation.getProject().getId(),
+            reviewedAnnotation.getParentIdent(), reviewedAnnotation.getParentClassName(), 0,
+            reviewedAnnotation.getWktLocation(), 0.0,
+            List.of(),
+            LocalDateTime.now(), LocalDateTime.now(), Optional.empty());
+        when(reviewedAnnotationHttpContract.update(eq(reviewedAnnotation.getId()), eq(userId), any()))
+            .thenReturn(Optional.of(new HttpCommandResponse(true, annotationData, UUID.randomUUID(), "UPDATE_REVIEWED_ANNOTATION")));
         restAnnotationDomainControllerMockMvc.perform(put("/api/annotation/{id}.json", reviewedAnnotation.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(reviewedAnnotation.toJSON()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.callback").exists())
-            .andExpect(jsonPath("$.callback.reviewedannotationID").exists())
-            .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditReviewedAnnotationCommand"))
-            .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists());
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(reviewedAnnotation.toJSON()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.printMessage").value(true))
+                .andExpect(jsonPath("$.data").exists())
+                .andExpect(jsonPath("$.commandId").exists())
+                .andExpect(jsonPath("$.command").exists());
     }
 
     @Test
-    @org.springframework.transaction.annotation.Transactional
+    @Transactional
     public void deleteUserAnnotation() throws Exception {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
 
@@ -1319,23 +1350,28 @@ public class AnnotationDomainResourceTests {
     }
 
     @Test
-    @org.springframework.transaction.annotation.Transactional
+    @Transactional
     public void deleteReviewedAnnotation() throws Exception {
+        Long userId = builder.givenSuperAdmin().getId();
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
-        restAnnotationDomainControllerMockMvc.perform(delete(
-                "/api/reviewedannotation/{id}.json",
-                reviewedAnnotation.getId()
-            )
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(reviewedAnnotation.toJSON()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.callback").exists())
-            .andExpect(jsonPath("$.callback.reviewedannotationID").exists())
-            .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteReviewedAnnotationCommand"))
-            .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists());
-
+        ReviewedAnnotationResponse annotationData = new ReviewedAnnotationResponse(
+            reviewedAnnotation.getId(), userId, userId,
+            reviewedAnnotation.getImage().getId(), reviewedAnnotation.getSlice().getId(),
+            reviewedAnnotation.getProject().getId(),
+            reviewedAnnotation.getParentIdent(), reviewedAnnotation.getParentClassName(), 0,
+            reviewedAnnotation.getWktLocation(), 0.0,
+            List.of(),
+            LocalDateTime.now(), LocalDateTime.now(), Optional.empty());
+        when(reviewedAnnotationHttpContract.delete(eq(reviewedAnnotation.getId()), eq(userId)))
+            .thenReturn(Optional.of(new HttpCommandResponse(true, annotationData, UUID.randomUUID(), "DELETE_REVIEWED_ANNOTATION")));
+        restAnnotationDomainControllerMockMvc.perform(delete("/api/reviewedannotation/{id}.json", reviewedAnnotation.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(reviewedAnnotation.toJSON()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.printMessage").value(true))
+                .andExpect(jsonPath("$.data").exists())
+                .andExpect(jsonPath("$.commandId").exists())
+                .andExpect(jsonPath("$.command").exists());
     }
 
     @Test

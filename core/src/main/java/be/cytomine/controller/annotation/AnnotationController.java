@@ -26,7 +26,7 @@ public class AnnotationController {
     private final RestAnnotationDomainController annotationDomainController;
 
     @GetMapping("/annotations/{id}")
-    public ResponseEntity<String> getById(@PathVariable Long id) throws IOException {
+    public ResponseEntity<?> getById(@PathVariable Long id) throws IOException {
         log.info("Retrieve annotation {}", id);
 
         Optional<Annotation> annotation = annotationService.find(id);

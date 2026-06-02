@@ -10,6 +10,7 @@ import org.cytomine.repository.persistence.CommandV2Repository;
 import org.cytomine.repository.persistence.TermRepository;
 import org.cytomine.repository.persistence.entity.CommandV2Entity;
 import org.cytomine.repository.persistence.entity.TermEntity;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
@@ -43,7 +43,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = RepositoryApp.class)
 @AutoConfigureMockMvc
 @Import(PostGisTestConfiguration.class)
-@Transactional
 class TermControllerTest {
 
     @Autowired
@@ -64,6 +63,7 @@ class TermControllerTest {
     private Long ontologyId;
     private Long projectId;
     private Long userId;
+    private Long adminRoleId;
 
     @BeforeEach
     void setUp() {
@@ -71,7 +71,7 @@ class TermControllerTest {
         jdbcTemplate.update("INSERT INTO sec_user (id, version, username) VALUES (?, 0, 'admin')", userId);
 
         // Make user an admin
-        Long adminRoleId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
+         adminRoleId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
         jdbcTemplate.update("INSERT INTO sec_role (id, version, authority) VALUES (?, 0, 'ROLE_ADMIN')", adminRoleId);
         Long userRoleId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
         jdbcTemplate.update("INSERT INTO sec_user_sec_role (id, version, sec_user_id, sec_role_id) VALUES (?, 0, ?, ?)",
@@ -89,6 +89,17 @@ class TermControllerTest {
                 hide_users_layers, is_closed)
             VALUES (?, 0, 'test', ?, 'CLASSIC', false, false, 0, 0, 0, 0, false, false, false)
             """, projectId, ontologyId);
+    }
+
+    @AfterEach
+    void tearDown() {
+        commandRepository.deleteAll();
+        jdbcTemplate.update("DELETE FROM sec_user_sec_role WHERE sec_user_id = ?", userId);
+        jdbcTemplate.update("DELETE FROM sec_role WHERE id = ?", adminRoleId);  // make it a field
+        jdbcTemplate.update("DELETE FROM term WHERE ontology_id = ?", ontologyId);
+        jdbcTemplate.update("DELETE FROM project WHERE id = ?", projectId);
+        jdbcTemplate.update("DELETE FROM ontology WHERE id = ?", ontologyId);
+        jdbcTemplate.update("DELETE FROM sec_user WHERE id = ?", userId);
     }
 
     @Test

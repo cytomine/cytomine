@@ -5,10 +5,6 @@ title: REST API reference
 sidebarDepth: 0
 ---
 
-::: warning
-This API reference is under construction. Some endpoint specifications could be incorrect.
-:::
-
 All interactions with the Cytomine server are performed through an HTTP API. It makes the link between the server side and a Cytomine client, such as the graphical web interface or a program using one of our API client libraries (for [Python](/dev-guide/clients/python/usage.md)).
 
 This API reference provides the specification for all endpoints available in Cytomine. The different endpoints are grouped into services in the left sidebar. For a more in-depth introduction, see [Interact with Cytomine](/dev-guide/api/README.md).
@@ -31,7 +27,6 @@ It is possible to retrieve a list of resources with the same domain using a `GET
 | --------------------------------- | --------------------------------------------------------- |
 | Image \| Image instance           | Manage images in a project                                |
 | Image \| Slice instance           | Manage slices of an image in a project                    |
-| Image \| Image server             | Manage image servers (IMS)                                |
 | Image \| Abstract image           | Manage images in a storage                                |
 | Image \| Abstract slice           | Manage slices of an image in a storage                    |
 | Image \| Companion file           | Manage companion files of an image in a storage           |

@@ -83,7 +83,6 @@ class UploadedFile(Model):
         id_projects: Optional[List[int]] = None,
         id_storage: Optional[int] = None,
         id_user: Optional[int] = None,
-        id_image_server: Optional[int] = None,
         status: Optional[int] = None,
         id_parent: Optional[int] = None,
         **attributes: Any,
@@ -97,7 +96,6 @@ class UploadedFile(Model):
         self.contentType = content_type
         self.projects = id_projects
         self.storage = id_storage
-        self.imageServer = id_image_server
         self.user = id_user
         self.status = status
         self.statusText = None

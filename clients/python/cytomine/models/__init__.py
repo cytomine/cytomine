@@ -31,8 +31,6 @@ from .image import (
     AbstractSliceCollection,
     ImageInstance,
     ImageInstanceCollection,
-    ImageServer,
-    ImageServerCollection,
     SliceInstance,
     SliceInstanceCollection,
 )
@@ -113,8 +111,6 @@ __all__ = [
     "ImageGroupImageInstanceCollection",
     "ImageInstance",
     "ImageInstanceCollection",
-    "ImageServer",
-    "ImageServerCollection",
     "Model",
     "Ontology",
     "OntologyCollection",

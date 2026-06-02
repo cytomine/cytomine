@@ -256,7 +256,6 @@ export default {
       let isFeatureSelected = indexSelectedFeature !== -1;
 
       if (!annot) {
-        console.log(`Removing annot ${feature.getId()} in layer ${this.layer.id} (external action)`);
         this.$refs.olSource.removeFeature(feature);
         if (isFeatureSelected) {
           this.$store.commit(this.imageModule + 'clearSelectedFeatures');
@@ -273,17 +272,14 @@ export default {
       if (isFeatureSelected) {
         if (this.ongoingEdit) {
           // if feature is selected and under modification, updating it may lead to conflict
-          console.log(`Skipping update of selected annot ${annot.id} in layer ${this.layer.id} (ongoing edit)`);
           return;
         }
-        console.log(`Updating selected annot ${annot.id} in layer ${this.layer.id} (external action)`);
         this.$store.commit(this.imageModule + 'changeAnnotSelectedFeature', {
           indexFeature: indexSelectedFeature,
           annot
         });
       }
 
-      console.log(`Updating annot ${annot.id} in layer ${this.layer.id} (external action)`);
       feature.set('annot', annot);
       feature.setGeometry(this.format.readGeometry(annot.location));
     },

@@ -70,7 +70,7 @@ public interface OntologyMapper {
     @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
     RelationResponse mapRelationResponse(RelationEntity relationEntity);
 
-    @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
+    @BeanMapping(ignoreUnmappedSourceProperties = {"version","userId"})
     OntologyResponse mapToOntologyResponse(OntologyEntity ontologyEntity);
 
     OntologyEntity mapToOntologyEntity(CreateOntology createOntology);

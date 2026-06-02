@@ -554,6 +554,7 @@ public class CytomineTests {
         String imageName = "selenium-" + randomUUID() + ".png";
         cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
         cytomineSteps.openImageInViewer(wait, projectUrl);
+        annotationTools.drawRectangleAnnotation(wait, driver);
 
         cytomineSteps.reviewAnnotations(wait);
 

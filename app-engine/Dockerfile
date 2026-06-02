@@ -2,7 +2,7 @@
 ARG APP_ENGINE_VERSION
 ARG APP_ENGINE_REVISION
 ARG JAVA_VERSION=21-jre
-ARG GRADLE_VERSION=8.14-jdk21
+ARG GRADLE_VERSION=8.14.5-jdk21
 ARG PROXY_CACHE=registry.cytomine.org/docker
 
 #######################################################################################

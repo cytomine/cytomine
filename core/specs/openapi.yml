@@ -40,8 +40,6 @@ tags:
     description: Manage images in a project
   - name: Image | Slice instance
     description: Manage slices of an image in a project
-  - name: Image | Image server
-    description: Manage image servers (IMS)
   - name: Legacy user keys
     description: Legacy user keys management
   - name: Metadata | Property

@@ -1,5 +1,6 @@
 package org.cytomine.repository.http;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -99,8 +100,8 @@ class TermRelationControllerTest {
 
         TermRelationResponse result = objectMapper.readValue(response, TermRelationResponse.class);
         TermRelationResponse expected =
-            new TermRelationResponse(entity.getId(), term1.getId(), term2.getId(), relationId, entity.getUpdated(),
-                Optional.empty(), entity.getCreated(), null);
+            new TermRelationResponse(entity.getId(), term1.getId(), term2.getId(), relationId, entity.getUpdated().toLocalDateTime(),
+                Optional.empty(), entity.getCreated().toLocalDateTime(), null);
         assertEquals(expected, result);
     }
 
@@ -144,8 +145,8 @@ class TermRelationControllerTest {
         List<TermRelationResponse> result = objectMapper.readValue(response, new TypeReference<>() {
         });
         TermRelationResponse expected =
-            new TermRelationResponse(entity.getId(), term1.getId(), term2.getId(), relationId, entity.getUpdated(),
-                Optional.empty(), entity.getCreated(), null);
+            new TermRelationResponse(entity.getId(), term1.getId(), term2.getId(), relationId, entity.getUpdated().toLocalDateTime(),
+                Optional.empty(), entity.getCreated().toLocalDateTime(), null);
         assertEquals(List.of(expected), result);
     }
 
@@ -311,12 +312,13 @@ class TermRelationControllerTest {
     }
 
     private TermEntity createAndSaveTermEntity(String name, String color) {
-        LocalDateTime now = LocalDateTime.now();
-        return termRepository.saveAndFlush(new TermEntity(null, 0, ontologyId, name, color, now, now, null, "", null));
+        Timestamp now = Timestamp.valueOf(LocalDateTime.now());
+        return termRepository.saveAndFlush(new TermEntity(null, 0, ontologyId, name, color, now, now, null, "",
+            null));
     }
 
     private TermRelationEntity createAndSaveTermRelationEntity(long term1Id, long term2Id) {
-        LocalDateTime now = LocalDateTime.now();
+        Timestamp now = Timestamp.valueOf(LocalDateTime.now());
         TermRelationEntity entity = new TermRelationEntity();
         entity.setTerm1Id(term1Id);
         entity.setTerm2Id(term2Id);

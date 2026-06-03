@@ -1,5 +1,6 @@
 package org.cytomine.repository.service;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -52,7 +53,7 @@ public class TermRelationCommandService
                     ontologyMapper.mapToTermRelationCommandPayload(termEntity, ontologyId), userId, ontologyId);
                 CommandV2Entity commandV2Entity =
                     commandV2Repository.save(commandMapper.map(deleteCommand, now, now, userId));
-                termEntity.setDeleted(now);
+                termEntity.setDeleted(Timestamp.valueOf(now));
                 return saveAndBuildResponse(termEntity, Commands.DELETE_TERM_RELATION, commandV2Entity.getId());
             });
     }
@@ -134,7 +135,7 @@ public class TermRelationCommandService
     @Override
     public Optional<HttpCommandResponse> logicalDelete(UUID commandId, long id, String command, LocalDateTime now) {
         return termRelationRepository.findById(id).map(entity -> {
-            entity.setDeleted(now);
+            entity.setDeleted(Timestamp.valueOf(now));
             return saveAndBuildResponse(entity, command, commandId);
         });
     }
@@ -143,7 +144,7 @@ public class TermRelationCommandService
     public Optional<HttpCommandResponse> restore(UUID commandId, long id, String command, LocalDateTime now) {
         return termRelationRepository.findById(id).map(entity -> {
             entity.setDeleted(null);
-            entity.setUpdated(now);
+            entity.setUpdated(Timestamp.valueOf(now));
             return saveAndBuildResponse(entity, command, commandId);
         });
     }

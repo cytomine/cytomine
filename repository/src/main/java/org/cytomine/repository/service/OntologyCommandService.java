@@ -1,5 +1,6 @@
 package org.cytomine.repository.service;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -59,7 +60,7 @@ public class OntologyCommandService
                     );
             CommandV2Entity commandV2Entity =
                 commandV2Repository.save(commandMapper.map(deleteCommand, now, now, userId));
-            entity.setDeleted(now);
+            entity.setDeleted(Timestamp.valueOf(now));
             return saveAndBuildResponse(entity, Commands.DELETE_TERM, commandV2Entity.getId());
         });
     }
@@ -88,7 +89,7 @@ public class OntologyCommandService
         OntologyCommandPayload payload, LocalDateTime now) {
         return ontologyRepository.findById(payload.id()).map(entity -> {
             entity.setName(payload.name());
-            entity.setUpdated(now);
+            entity.setUpdated(Timestamp.valueOf(now));
             return saveAndBuildResponse(entity, Commands.UPDATE_ONTOLOGY, commandId);
         });
     }
@@ -96,7 +97,7 @@ public class OntologyCommandService
     @Override
     public Optional<HttpCommandResponse> logicalDelete(UUID commandId, long id, String command, LocalDateTime now) {
         return ontologyRepository.findById(id).map(entity -> {
-            entity.setDeleted(now);
+            entity.setDeleted(Timestamp.valueOf(now));
             return saveAndBuildResponse(entity, command, commandId);
         });
     }
@@ -105,7 +106,7 @@ public class OntologyCommandService
     public Optional<HttpCommandResponse> restore(UUID commandId, long id, String command, LocalDateTime now) {
         return ontologyRepository.findById(id).map(entity -> {
             entity.setDeleted(null);
-            entity.setUpdated(now);
+            entity.setUpdated(Timestamp.valueOf(now));
             return saveAndBuildResponse(entity, command, commandId);
         });
     }

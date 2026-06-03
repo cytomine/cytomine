@@ -1,6 +1,7 @@
 package org.cytomine.repository.persistence;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.Set;
 
 import org.cytomine.repository.persistence.entity.TermEntity;
@@ -110,4 +111,6 @@ public interface TermRepository extends JpaRepository<TermEntity, Long> {
     Page<StatPerTermAndImageProjection> findAllPerTermAndImageByProjectForStats(long projectId, LocalDateTime startDate,
                                                                                 LocalDateTime endDate,
                                                                                 Pageable pageable);
+
+    Optional<TermEntity> findByIdAndDeletedNull(long id);
 }

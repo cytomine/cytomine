@@ -1,6 +1,6 @@
 package org.cytomine.repository.persistence.entity;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 import java.util.Set;
 
 import jakarta.persistence.Column;
@@ -34,11 +34,11 @@ public class TermEntity {
     @Column
     private String color;
     @Column
-    private LocalDateTime created;
+    private Timestamp created;
     @Column
-    private LocalDateTime updated;
+    private Timestamp updated;
     @Column
-    private LocalDateTime deleted;
+    private Timestamp deleted;
     @Column
     private String comment;
 
@@ -46,4 +46,16 @@ public class TermEntity {
     @JoinTable(name = "relation_term", joinColumns = @JoinColumn(name = "term1_id"),
         inverseJoinColumns = @JoinColumn(name = "term2_id"))
     private Set<TermEntity> children;
+
+//    public LocalDateTime getCreated() {
+//        return created.truncatedTo(MICROS);
+//    }
+//
+//    public LocalDateTime getUpdated() {
+//        return updated.truncatedTo(MICROS);
+//    }
+//
+//    public LocalDateTime getDeleted() {
+//        return Optional.ofNullable(deleted).map(a -> a.truncatedTo(MICROS)).orElse(null);
+//    }
 }

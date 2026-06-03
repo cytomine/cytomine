@@ -1,6 +1,5 @@
 package org.cytomine.repository.http;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,7 +8,6 @@ import org.cytomine.repository.RepositoryApp;
 import org.cytomine.repository.persistence.CommandV2Repository;
 import org.cytomine.repository.persistence.TermRepository;
 import org.cytomine.repository.persistence.entity.CommandV2Entity;
-import org.cytomine.repository.persistence.entity.TermEntity;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -93,7 +91,7 @@ class TermControllerTest {
 
     @AfterEach
     void tearDown() {
-        commandRepository.deleteAll();
+        jdbcTemplate.update("DELETE FROM command_v2");
         jdbcTemplate.update("DELETE FROM sec_user_sec_role WHERE sec_user_id = ?", userId);
         jdbcTemplate.update("DELETE FROM sec_role WHERE id = ?", adminRoleId);  // make it a field
         jdbcTemplate.update("DELETE FROM term WHERE ontology_id = ?", ontologyId);
@@ -105,15 +103,15 @@ class TermControllerTest {
     @Test
     @SneakyThrows
     void findTermByIdWhenExistsReturnsTerm() {
-        TermEntity entity = createAndSaveTermEntity("term1", "#FF0000");
+        TermResponse entity = createAndSaveTermEntity("term1", "#FF0000");
 
-        String response = mockMvc.perform(get("/terms/{id}", entity.getId()).param("userId", userId.toString()))
+        String response = mockMvc.perform(get("/terms/{id}", entity.id()).param("userId", userId.toString()))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
         TermResponse result = objectMapper.readValue(response, TermResponse.class);
         TermResponse expected =
-            new TermResponse(entity.getId(), "term1", "#FF0000", ontologyId, entity.getCreated(), entity.getUpdated(),
-                Optional.empty(), "", null);
+            new TermResponse(entity.id(), "term1", "#FF0000", ontologyId, entity.created(), entity.updated(),
+                Optional.empty(), Optional.empty(), null);
         assertEquals(expected, result);
     }
 
@@ -134,8 +132,7 @@ class TermControllerTest {
                     .content(objectMapper.writeValueAsString(createTerm))).andExpect(status().isOk()).andReturn()
             .getResponse().getContentAsString();
 
-        HttpCommandResponse result =
-            objectMapper.readValue(response, objectMapper.getTypeFactory().constructType(HttpCommandResponse.class));
+        HttpCommandResponse result = objectMapper.readValue(response, HttpCommandResponse.class);
 
         TermResponse dataResult = (TermResponse) result.data();
 
@@ -153,15 +150,21 @@ class TermControllerTest {
     @Test
     @SneakyThrows
     void updateWhenExistsUpdatesAndReturnsTerm() {
-        TermEntity entity = createAndSaveTermEntity("oldName", "#FF0000");
+        CreateTerm createTerm = new CreateTerm("newTerm", "#00FF00", ontologyId, null);
+        String createResponse = mockMvc.perform(
+                post("/terms").param("userId", userId.toString()).contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(createTerm))).andExpect(status().isOk()).andReturn()
+            .getResponse().getContentAsString();
+        Long resultId = ((TermResponse) objectMapper.readValue(createResponse, HttpCommandResponse.class).data()).id();
+
         UpdateTerm updateTerm = new UpdateTerm(Optional.of("newName"), Optional.of("#00FF00"));
 
-        String response = mockMvc.perform(put("/terms/{id}", entity.getId()).param("userId", userId.toString())
-                .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(updateTerm)))
-            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        String response = mockMvc.perform(
+                put("/terms/{id}", resultId).param("userId", userId.toString()).contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(updateTerm))).andExpect(status().isOk()).andReturn()
+            .getResponse().getContentAsString();
 
-        HttpCommandResponse result =
-            objectMapper.readValue(response, objectMapper.getTypeFactory().constructType(HttpCommandResponse.class));
+        HttpCommandResponse result = objectMapper.readValue(response, HttpCommandResponse.class);
         TermResponse dataResult = (TermResponse) result.data();
         assertEquals("newName", dataResult.name());
         assertEquals("#00FF00", dataResult.color());
@@ -185,16 +188,17 @@ class TermControllerTest {
     @Test
     @SneakyThrows
     void deleteWhenExistsDeletesAndReturnsTerm() {
-        TermEntity entity = createAndSaveTermEntity("term1", "#FF0000");
+        TermResponse entity = createAndSaveTermEntity("term1", "#FF0000");
 
-        String response = mockMvc.perform(delete("/terms/{id}", entity.getId()).param("userId", userId.toString()))
+        assertTrue(termRepository.findByIdAndDeletedNull(entity.id()).isPresent());
+
+        String response = mockMvc.perform(delete("/terms/{id}", entity.id()).param("userId", userId.toString()))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
-        HttpCommandResponse result =
-            objectMapper.readValue(response, objectMapper.getTypeFactory().constructType(HttpCommandResponse.class));
+        HttpCommandResponse result = objectMapper.readValue(response, HttpCommandResponse.class);
         TermResponse dataResult = (TermResponse) result.data();
         assertEquals("term1", dataResult.name());
-        assertEquals(termRepository.findById(entity.getId()), Optional.of(entity));
+        assertTrue(termRepository.findByIdAndDeletedNull(entity.id()).isEmpty());
 
         CommandV2Entity command = commandRepository.findById(result.commandId()).orElseThrow();
         assertEquals(CommandType.DELETE_TERM_COMMAND, command.getData().getCommandType());
@@ -205,7 +209,7 @@ class TermControllerTest {
     @Test
     @SneakyThrows
     void findTermsByProjectReturnsPageOfTerms() {
-        TermEntity entity = createAndSaveTermEntity("term1", "#FF0000");
+        TermResponse entity = createAndSaveTermEntity("term1", "#FF0000");
 
         String response = mockMvc.perform(get("/terms/project/{id}", projectId).param("userId", userId.toString()))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
@@ -215,15 +219,15 @@ class TermControllerTest {
 
         assertEquals(1, page.getTotalElements());
         TermResponse expected =
-            new TermResponse(entity.getId(), "term1", "#FF0000", ontologyId, entity.getCreated(), entity.getUpdated(),
-                Optional.empty(), "", null);
+            new TermResponse(entity.id(), "term1", "#FF0000", ontologyId, entity.created(), entity.updated(),
+                Optional.empty(), Optional.empty(), null);
         assertEquals(List.of(expected), page.getContent());
     }
 
     @Test
     @SneakyThrows
     void findTermsByOntologyReturnsPageOfTerms() {
-        TermEntity entity = createAndSaveTermEntity("term1", "#FF0000");
+        TermResponse entity = createAndSaveTermEntity("term1", "#FF0000");
 
         String response = mockMvc.perform(get("/terms/ontology/{id}", ontologyId).param("userId", userId.toString()))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
@@ -233,8 +237,8 @@ class TermControllerTest {
 
         assertEquals(1, page.getTotalElements());
         TermResponse expected =
-            new TermResponse(entity.getId(), "term1", "#FF0000", ontologyId, entity.getCreated(), entity.getUpdated(),
-                Optional.empty(), "", null);
+            new TermResponse(entity.id(), "term1", "#FF0000", ontologyId, entity.created(), entity.updated(),
+                Optional.empty(), Optional.empty(), null);
         assertEquals(List.of(expected), page.getContent());
     }
 
@@ -254,8 +258,15 @@ class TermControllerTest {
         assertTrue(termRepository.findAll().isEmpty());
     }
 
-    private TermEntity createAndSaveTermEntity(String name, String color) {
-        LocalDateTime now = LocalDateTime.now();
-        return termRepository.saveAndFlush(new TermEntity(null, 0, ontologyId, name, color, now, now, null, "", null));
+    @SneakyThrows
+    private TermResponse createAndSaveTermEntity(String name, String color) {
+
+        CreateTerm createTerm = new CreateTerm(name, color, ontologyId, Optional.empty());
+
+        String createResponse = mockMvc.perform(
+                post("/terms").param("userId", userId.toString()).contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(createTerm))).andExpect(status().isOk()).andReturn()
+            .getResponse().getContentAsString();
+        return (TermResponse) objectMapper.readValue(createResponse, HttpCommandResponse.class).data();
     }
 }

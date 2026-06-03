@@ -1,5 +1,6 @@
 package org.cytomine.repository.service;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -46,8 +47,8 @@ public class TermCommandService implements CRUDCommandService<CreateTerm, Update
                         termEntity.getOntologyId());
                 CommandV2Entity commandV2Entity =
                     commandV2Repository.save(commandMapper.map(deleteCommand, now, now, userId));
-                termRelationRepository.findAllByTerm1IdOrTerm2Id(id, id).forEach(rel -> rel.setDeleted(now));
-                termEntity.setDeleted(now);
+                termRelationRepository.findAllByTerm1IdOrTerm2Id(id, id).forEach(rel -> rel.setDeleted(Timestamp.valueOf(now)));
+                termEntity.setDeleted(Timestamp.valueOf(now));
                 return saveAndBuildResponse(termEntity, Commands.DELETE_TERM, commandV2Entity.getId());
             });
     }
@@ -99,7 +100,7 @@ public class TermCommandService implements CRUDCommandService<CreateTerm, Update
         return termRepository.findById(payload.id()).map(entity -> {
             entity.setColor(payload.color());
             entity.setName(payload.name());
-            entity.setUpdated(now);
+            entity.setUpdated(Timestamp.valueOf(now));
             return saveAndBuildResponse(entity, Commands.UPDATE_TERM, commandId);
         });
     }
@@ -108,7 +109,7 @@ public class TermCommandService implements CRUDCommandService<CreateTerm, Update
     public Optional<HttpCommandResponse> restore(UUID commandId, long id, String command, LocalDateTime now) {
         return termRepository.findById(id).map(entity -> {
             entity.setDeleted(null);
-            entity.setUpdated(now);
+            entity.setUpdated(Timestamp.valueOf(now));
             return saveAndBuildResponse(entity, command, commandId);
         });
     }
@@ -126,7 +127,7 @@ public class TermCommandService implements CRUDCommandService<CreateTerm, Update
     @Override
     public Optional<HttpCommandResponse> logicalDelete(UUID commandId, long id, String command, LocalDateTime now) {
         return termRepository.findById(id).map(entity -> {
-            entity.setDeleted(now);
+            entity.setDeleted(Timestamp.valueOf(now));
             return saveAndBuildResponse(entity, command, commandId);
         });
     }

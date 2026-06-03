@@ -1,5 +1,6 @@
 package org.cytomine.repository.service;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
@@ -87,7 +88,7 @@ class TermCommandServiceTest {
             createResponse.commandId(), Commands.CREATE_TERM), createResponse);
         entityManager.flush();
         entityManager.clear();
-        assertEquals(new TermEntity(termId, 0, ontologyId, "term1", "#FF0000", t0, t0, null, null, Set.of()),
+        assertEquals(new TermEntity(termId, 0, ontologyId, "term1", "#FF0000", Timestamp.valueOf(t0), Timestamp.valueOf(t0), null, null, Set.of()),
             termRepository.findById(termId).orElseThrow());
 
         HttpCommandResponse deleteResponse = termCommandService.delete(termId, userId, t1).orElseThrow();
@@ -100,7 +101,7 @@ class TermCommandServiceTest {
             deleteCommandId, Commands.DELETE_TERM), deleteResponse);
         entityManager.flush();
         entityManager.clear();
-        assertEquals(new TermEntity(termId, 1, ontologyId, "term1", "#FF0000", t0, t0, t1, null, Set.of()),
+        assertEquals(new TermEntity(termId, 1, ontologyId, "term1", "#FF0000", Timestamp.valueOf(t0), Timestamp.valueOf(t0), Timestamp.valueOf(t1), null, Set.of()),
             termRepository.findById(termId).orElseThrow());
 
         HttpCommandResponse undoResponse =
@@ -111,7 +112,7 @@ class TermCommandServiceTest {
             deleteCommandId, Commands.DELETE_TERM), undoResponse);
         entityManager.flush();
         entityManager.clear();
-        assertEquals(new TermEntity(termId, 2, ontologyId, "term1", "#FF0000", t0, t2, null, null, Set.of()),
+        assertEquals(new TermEntity(termId, 2, ontologyId, "term1", "#FF0000", Timestamp.valueOf(t0), Timestamp.valueOf(t2), null, null, Set.of()),
             termRepository.findById(termId).orElseThrow());
 
         LocalDateTime t3 = t0.plusSeconds(3);
@@ -123,7 +124,7 @@ class TermCommandServiceTest {
             deleteCommandId, Commands.DELETE_TERM), redoResponse);
         entityManager.flush();
         entityManager.clear();
-        assertEquals(new TermEntity(termId, 3, ontologyId, "term1", "#FF0000", t0, t2, t3, null, Set.of()),
+        assertEquals(new TermEntity(termId, 3, ontologyId, "term1", "#FF0000", Timestamp.valueOf(t0), Timestamp.valueOf(t2), Timestamp.valueOf(t3), null, Set.of()),
             termRepository.findById(termId).orElseThrow());
     }
 
@@ -144,7 +145,7 @@ class TermCommandServiceTest {
             createResponse.commandId(), Commands.CREATE_TERM), createResponse);
         entityManager.flush();
         entityManager.clear();
-        assertEquals(new TermEntity(termId, 0, ontologyId, "original", "#FF0000", t0, t0, null, null, Set.of()),
+        assertEquals(new TermEntity(termId, 0, ontologyId, "original", "#FF0000", Timestamp.valueOf(t0), Timestamp.valueOf(t0), null, null, Set.of()),
             termRepository.findById(termId).orElseThrow());
 
         HttpCommandResponse updateResponse =
@@ -159,7 +160,7 @@ class TermCommandServiceTest {
             updateCommandId, Commands.UPDATE_TERM), updateResponse);
         entityManager.flush();
         entityManager.clear();
-        assertEquals(new TermEntity(termId, 1, ontologyId, "updated", "#00FF00", t0, t0, null, null, Set.of()),
+        assertEquals(new TermEntity(termId, 1, ontologyId, "updated", "#00FF00", Timestamp.valueOf(t0), Timestamp.valueOf(t0), null, null, Set.of()),
             termRepository.findById(termId).orElseThrow());
 
         HttpCommandResponse undoResponse =
@@ -170,7 +171,7 @@ class TermCommandServiceTest {
             updateCommandId, Commands.UPDATE_TERM), undoResponse);
         entityManager.flush();
         entityManager.clear();
-        assertEquals(new TermEntity(termId, 2, ontologyId, "original", "#FF0000", t0, t0, null, null, Set.of()),
+        assertEquals(new TermEntity(termId, 2, ontologyId, "original", "#FF0000", Timestamp.valueOf(t0), Timestamp.valueOf(t0), null, null, Set.of()),
             termRepository.findById(termId).orElseThrow());
 
         LocalDateTime t2 = t0.plusSeconds(2);
@@ -182,7 +183,7 @@ class TermCommandServiceTest {
             updateCommandId, Commands.UPDATE_TERM), redoResponse);
         entityManager.flush();
         entityManager.clear();
-        assertEquals(new TermEntity(termId, 3, ontologyId, "updated", "#00FF00", t0, t2, null, null, Set.of()),
+        assertEquals(new TermEntity(termId, 3, ontologyId, "updated", "#00FF00", Timestamp.valueOf(t0), Timestamp.valueOf(t2), null, null, Set.of()),
             termRepository.findById(termId).orElseThrow());
     }
 
@@ -205,7 +206,7 @@ class TermCommandServiceTest {
             createCommandId, Commands.CREATE_TERM), createResponse);
         entityManager.flush();
         entityManager.clear();
-        assertEquals(new TermEntity(termId, 0, ontologyId, "term1", "#FF0000", t0, t0, null, null, Set.of()),
+        assertEquals(new TermEntity(termId, 0, ontologyId, "term1", "#FF0000", Timestamp.valueOf(t0), Timestamp.valueOf(t0), null, null, Set.of()),
             termRepository.findById(termId).orElseThrow());
 
         HttpCommandResponse undoResponse =
@@ -216,7 +217,7 @@ class TermCommandServiceTest {
             createCommandId, Commands.CREATE_TERM), undoResponse);
         entityManager.flush();
         entityManager.clear();
-        assertEquals(new TermEntity(termId, 1, ontologyId, "term1", "#FF0000", t0, t0, t1, null, Set.of()),
+        assertEquals(new TermEntity(termId, 1, ontologyId, "term1", "#FF0000", Timestamp.valueOf(t0), Timestamp.valueOf(t0), Timestamp.valueOf(t1), null, Set.of()),
             termRepository.findById(termId).orElseThrow());
 
         HttpCommandResponse redoResponse =
@@ -227,7 +228,7 @@ class TermCommandServiceTest {
             createCommandId, Commands.CREATE_TERM), redoResponse);
         entityManager.flush();
         entityManager.clear();
-        assertEquals(new TermEntity(termId, 2, ontologyId, "term1", "#FF0000", t0, t2, null, null, Set.of()),
+        assertEquals(new TermEntity(termId, 2, ontologyId, "term1", "#FF0000", Timestamp.valueOf(t0), Timestamp.valueOf(t2), null, null, Set.of()),
             termRepository.findById(termId).orElseThrow());
     }
 }

@@ -1,6 +1,6 @@
 package org.cytomine.repository.persistence.entity;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 import java.util.Set;
 
 import jakarta.persistence.Column;
@@ -31,11 +31,11 @@ public class OntologyEntity {
     private long userId;
 
     @Column
-    private LocalDateTime created;
+    private Timestamp created;
     @Column
-    private LocalDateTime updated;
+    private Timestamp updated;
     @Column
-    private LocalDateTime deleted;
+    private Timestamp deleted;
 
     @OneToMany(mappedBy = "ontologyId")
     private Set<TermEntity> terms;

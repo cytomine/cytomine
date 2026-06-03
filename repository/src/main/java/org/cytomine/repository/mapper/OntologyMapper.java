@@ -1,5 +1,7 @@
 package org.cytomine.repository.mapper;
 
+
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -22,6 +24,8 @@ import be.cytomine.common.repository.model.ontology.payload.CreateOntology;
 import be.cytomine.common.repository.model.term.payload.CreateTerm;
 import be.cytomine.common.repository.model.termrelation.payload.CreateTermRelation;
 
+import static java.time.ZoneOffset.UTC;
+
 @Mapper(componentModel = "spring")
 public interface OntologyMapper {
 
@@ -30,6 +34,22 @@ public interface OntologyMapper {
 
     default <T> Optional<T> map(T t) {
         return Optional.ofNullable(t);
+    }
+
+    default LocalDateTime mapTimestamp(Timestamp value) {
+        return value.toInstant().atZone(UTC).toLocalDateTime();
+    }
+
+    default Optional<LocalDateTime> mapToLocalDateTime(Timestamp value) {
+        return Optional.of(mapTimestamp(value));
+    }
+
+    default Timestamp map(LocalDateTime value) {
+        return Timestamp.valueOf(value);
+    }
+
+    default <T> T map(Optional<T> t) {
+        return t.orElse(null);
     }
 
     @Mapping(target = "children", ignore = true)

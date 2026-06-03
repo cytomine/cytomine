@@ -83,7 +83,7 @@ class UndoControllerTest {
         mockMvc.perform(post("/commands/undo/{commandId}", insertCommandId).param("userId", userId.toString()))
             .andExpect(status().isOk()).andExpect(jsonPath("$.data.id").value(termId.intValue()));
 
-        assertTrue(now.isBefore(termRepository.findById(termId).get().getDeleted()));
+        assertTrue(now.isBefore(termRepository.findById(termId).get().getDeleted().toLocalDateTime()));
     }
 
     @Test

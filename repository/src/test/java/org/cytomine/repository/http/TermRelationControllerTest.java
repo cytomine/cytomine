@@ -101,7 +101,7 @@ class TermRelationControllerTest {
         TermRelationResponse result = objectMapper.readValue(response, TermRelationResponse.class);
         TermRelationResponse expected =
             new TermRelationResponse(entity.getId(), term1.getId(), term2.getId(), relationId, entity.getUpdated().toLocalDateTime(),
-                Optional.empty(), entity.getCreated().toLocalDateTime(), null);
+                Optional.empty(), entity.getCreated().toLocalDateTime(), "name");
         assertEquals(expected, result);
     }
 

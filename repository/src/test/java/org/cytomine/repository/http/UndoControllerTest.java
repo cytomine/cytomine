@@ -71,10 +71,9 @@ class UndoControllerTest {
     @Test
     @SneakyThrows
     void undoInsertTermCommandDeletesCreatedTerm() {
-        CreateTerm createTerm = new CreateTerm("termToUndo", "#00FF00", ontologyId, null);
+        CreateTerm createTerm = new CreateTerm("termToUndo", "#00FF00", ontologyId, Optional.empty());
         LocalDateTime now = LocalDateTime.now();
-        HttpCommandResponse createResponse =
-            termCommandService.create(userId, createTerm, now).orElseThrow();
+        HttpCommandResponse createResponse = termCommandService.create(userId, createTerm, now).orElseThrow();
 
         Long termId = ((TermResponse) createResponse.data()).id();
         UUID insertCommandId = createResponse.commandId();
@@ -89,16 +88,14 @@ class UndoControllerTest {
     @Test
     @SneakyThrows
     void undoUpdateTermCommandRestoresPreviousState() {
-        CreateTerm createTerm = new CreateTerm("originalName", "#FF0000", ontologyId, null);
+        CreateTerm createTerm = new CreateTerm("originalName", "#FF0000", ontologyId, Optional.empty());
         LocalDateTime now = LocalDateTime.now();
-        HttpCommandResponse createResponse =
-            termCommandService.create(userId, createTerm, now).orElseThrow();
+        HttpCommandResponse createResponse = termCommandService.create(userId, createTerm, now).orElseThrow();
 
         Long termId = ((TermResponse) createResponse.data()).id();
 
         UpdateTerm updateTerm = new UpdateTerm(Optional.of("updatedName"), Optional.of("#00FF00"));
-        HttpCommandResponse updateResponse =
-            termCommandService.update(termId, userId, updateTerm, now).orElseThrow();
+        HttpCommandResponse updateResponse = termCommandService.update(termId, userId, updateTerm, now).orElseThrow();
 
         UUID updateCommandId = updateResponse.commandId();
         TermEntity updatedTerm = termRepository.findById(termId).orElseThrow();
@@ -123,10 +120,9 @@ class UndoControllerTest {
     @Test
     @SneakyThrows
     void undoByUserWithoutPermissionReturnsEmpty() {
-        CreateTerm createTerm = new CreateTerm("termToUndo", "#FF0000", ontologyId, null);
+        CreateTerm createTerm = new CreateTerm("termToUndo", "#FF0000", ontologyId, Optional.empty());
         LocalDateTime now = LocalDateTime.now();
-        HttpCommandResponse createResponse =
-            termCommandService.create(userId, createTerm, now).orElseThrow();
+        HttpCommandResponse createResponse = termCommandService.create(userId, createTerm, now).orElseThrow();
 
         Long termId = ((TermResponse) createResponse.data()).id();
         UUID insertCommandId = createResponse.commandId();

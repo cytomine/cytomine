@@ -1,21 +1,8 @@
-#  * Copyright (c) 2020-2021. Authors: see NOTICE file.
-#  *
-#  * Licensed under the Apache License, Version 2.0 (the "License");
-#  * you may not use this file except in compliance with the License.
-#  * You may obtain a copy of the License at
-#  *
-#  *      http://www.apache.org/licenses/LICENSE-2.0
-#  *
-#  * Unless required by applicable law or agreed to in writing, software
-#  * distributed under the License is distributed on an "AS IS" BASIS,
-#  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  * See the License for the specific language governing permissions and
-#  * limitations under the License.
 from typing import Any, Dict, Iterable, List, Optional, Sized, TypeVar, Union
 
 from pims.api.exceptions import BadRequestException
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 def split_tuple(tuple_: Any, index: int) -> Any:
@@ -68,14 +55,18 @@ def ensure_list(value: Union[List[T], T]) -> List[T]:
     transformed
         The value converted as a list if it is not already the case.
     """
+    if isinstance(value, list):
+        return value
     if value is not None:
-        return value if type(value) is list else [value]
+        return [value]
     return []
 
 
 def check_array_size(
-    iterable: Optional[Sized], allowed: List[int], nullable: bool = True,
-    name: Optional[str] = None
+    iterable: Optional[Sized],
+    allowed: List[int],
+    nullable: bool = True,
+    name: Optional[str] = None,
 ):
     """
     Verify an iterable has an allowed size or, optionally, is empty.
@@ -100,28 +91,30 @@ def check_array_size(
     """
     if iterable is None:
         if not nullable:
-            name = 'A parameter' if not name else name
-            raise BadRequestException(detail=f"{name} is unset while it is not allowed.")
+            name = "A parameter" if not name else name
+            raise BadRequestException(
+                detail=f"{name} is unset while it is not allowed."
+            )
         return
 
     if len(iterable) not in allowed:
-        name = 'A parameter' if not name else name
-        allowed_str = ', '.join([str(i) for i in set(allowed)])
+        name = "A parameter" if not name else name
+        allowed_str = ", ".join([str(i) for i in set(allowed)])
         raise BadRequestException(
-            f'{name} has a size of {len(iterable)} '
-            f'while only these sizes are allowed: {allowed_str}'
+            f"{name} has a size of {len(iterable)} "
+            f"while only these sizes are allowed: {allowed_str}"
         )
 
 
 def check_array_size_parameters(
-    parameter_names: Iterable[str], parameters: Dict, allowed: List[int],
-    nullable: bool = True
+    parameter_names: Iterable[str],
+    parameters: Dict,
+    allowed: List[int],
+    nullable: bool = True,
 ):
     for name in parameter_names:
         value = parameters.get(name)
-        check_array_size(
-            value, allowed=allowed, nullable=nullable, name=name
-        )
+        check_array_size(value, allowed=allowed, nullable=nullable, name=name)
 
 
 def flatten(t):

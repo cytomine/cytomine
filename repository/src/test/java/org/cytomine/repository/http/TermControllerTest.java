@@ -38,7 +38,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(classes = RepositoryApp.class, properties = "spring.datasource.url: jdbc:tc:postgres")
+@SpringBootTest(classes = RepositoryApp.class)
 @AutoConfigureMockMvc
 @Import(PostGisTestConfiguration.class)
 class TermControllerTest {

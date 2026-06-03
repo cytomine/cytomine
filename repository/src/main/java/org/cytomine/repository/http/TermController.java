@@ -1,6 +1,7 @@
 package org.cytomine.repository.http;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -46,19 +47,19 @@ public class TermController implements TermHttpContract {
 
     @Override
     public Optional<HttpCommandResponse> create(@RequestParam long userId, @RequestBody CreateTerm createTerm) {
-        return termCommandService.create(userId, createTerm, LocalDateTime.now());
+        return termCommandService.create(userId, createTerm, LocalDateTime.now().truncatedTo(ChronoUnit.MICROS));
     }
 
     @Override
     public Optional<HttpCommandResponse> update(@PathVariable long id, @RequestParam long userId,
                                                 @RequestBody UpdateTerm updateTerm) {
-        return termCommandService.update(id, userId, updateTerm, LocalDateTime.now());
+        return termCommandService.update(id, userId, updateTerm, LocalDateTime.now().truncatedTo(ChronoUnit.MICROS));
     }
 
     @Override
     @Transactional
     public Optional<HttpCommandResponse> delete(@PathVariable long id, @RequestParam long userId) {
-        return termCommandService.delete(id, userId, LocalDateTime.now());
+        return termCommandService.delete(id, userId, LocalDateTime.now().truncatedTo(ChronoUnit.MICROS));
     }
 
     @Override

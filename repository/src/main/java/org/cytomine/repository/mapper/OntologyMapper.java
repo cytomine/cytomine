@@ -41,7 +41,7 @@ public interface OntologyMapper {
     }
 
     default Optional<LocalDateTime> mapToLocalDateTime(Timestamp value) {
-        return Optional.of(mapTimestamp(value));
+        return Optional.ofNullable(value).map(this::mapTimestamp);
     }
 
     default Timestamp map(LocalDateTime value) {

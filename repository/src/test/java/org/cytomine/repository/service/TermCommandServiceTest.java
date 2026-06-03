@@ -194,7 +194,7 @@ class TermCommandServiceTest {
         LocalDateTime t2 = t0.plusSeconds(2);
 
         HttpCommandResponse createResponse =
-            termCommandService.create(userId, new CreateTerm("term1", "#FF0000", ontologyId, null), t0).orElseThrow();
+            termCommandService.create(userId, new CreateTerm("term1", "#FF0000", ontologyId, Optional.empty()), t0).orElseThrow();
         TermResponse dataResult = (TermResponse) createResponse.data();
         long termId = dataResult.id();
         UUID createCommandId = createResponse.commandId();

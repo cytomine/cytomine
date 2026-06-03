@@ -101,7 +101,7 @@ class TermRelationControllerTest {
         TermRelationResponse result = objectMapper.readValue(response, TermRelationResponse.class);
         TermRelationResponse expected =
             new TermRelationResponse(entity.getId(), term1.getId(), term2.getId(), relationId, entity.getUpdated().toLocalDateTime(),
-                Optional.empty(), entity.getCreated().toLocalDateTime(), "name");
+                Optional.empty(), entity.getCreated().toLocalDateTime(), "comment");
         assertEquals(expected, result);
     }
 
@@ -313,7 +313,7 @@ class TermRelationControllerTest {
 
     private TermEntity createAndSaveTermEntity(String name, String color) {
         Timestamp now = Timestamp.valueOf(LocalDateTime.now());
-        return termRepository.saveAndFlush(new TermEntity(null, 0, ontologyId, name, color, now, now, null, "",
+        return termRepository.saveAndFlush(new TermEntity(null, 0, ontologyId, name, color, now, now, null, "comment",
             null));
     }
 

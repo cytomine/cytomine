@@ -40,7 +40,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(classes = RepositoryApp.class)
+@SpringBootTest(classes = RepositoryApp.class, properties = "spring.datasource.url: jdbc:tc:postgres")
 @AutoConfigureMockMvc
 @Import(PostGisTestConfiguration.class)
 class TermControllerTest {
@@ -71,7 +71,7 @@ class TermControllerTest {
         jdbcTemplate.update("INSERT INTO sec_user (id, version, username) VALUES (?, 0, 'admin')", userId);
 
         // Make user an admin
-         adminRoleId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
+        adminRoleId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
         jdbcTemplate.update("INSERT INTO sec_role (id, version, authority) VALUES (?, 0, 'ROLE_ADMIN')", adminRoleId);
         Long userRoleId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
         jdbcTemplate.update("INSERT INTO sec_user_sec_role (id, version, sec_user_id, sec_role_id) VALUES (?, 0, ?, ?)",
@@ -210,7 +210,8 @@ class TermControllerTest {
         String response = mockMvc.perform(get("/terms/project/{id}", projectId).param("userId", userId.toString()))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
-        SpringPage<TermResponse> page = objectMapper.readValue(response, new TypeReference<>() {});
+        SpringPage<TermResponse> page = objectMapper.readValue(response, new TypeReference<>() {
+        });
 
         assertEquals(1, page.getTotalElements());
         TermResponse expected =
@@ -227,7 +228,8 @@ class TermControllerTest {
         String response = mockMvc.perform(get("/terms/ontology/{id}", ontologyId).param("userId", userId.toString()))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
-        SpringPage<TermResponse> page = objectMapper.readValue(response, new TypeReference<>() {});
+        SpringPage<TermResponse> page = objectMapper.readValue(response, new TypeReference<>() {
+        });
 
         assertEquals(1, page.getTotalElements());
         TermResponse expected =

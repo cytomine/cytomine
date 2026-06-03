@@ -1,25 +1,12 @@
-#  * Copyright (c) 2020-2021. Authors: see NOTICE file.
-#  *
-#  * Licensed under the Apache License, Version 2.0 (the "License");
-#  * you may not use this file except in compliance with the License.
-#  * You may obtain a copy of the License at
-#  *
-#  *      http://www.apache.org/licenses/LICENSE-2.0
-#  *
-#  * Unless required by applicable law or agreed to in writing, software
-#  * distributed under the License is distributed on an "AS IS" BASIS,
-#  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  * See the License for the specific language governing permissions and
-#  * limitations under the License.
-
-from typing import List, Optional, Union
+from typing import List, Optional, Sequence, Union
 
 import numpy as np
-from pydantic.color import (
-    RGBA, float_to_255, ints_to_rgba, parse_str, parse_tuple
-)
+from pydantic.color import RGBA, float_to_255, ints_to_rgba, parse_str, parse_tuple
 from pydantic_core import PydanticCustomError
-from pydantic_extra_types.color import Color as PydanticColor, ColorType as PydanticColorType
+from pydantic_extra_types.color import (
+    Color as PydanticColor,
+    ColorType as PydanticColorType,
+)
 
 ColorType = Union[PydanticColorType, int]
 
@@ -39,8 +26,8 @@ class Color(PydanticColor):
             value = value._original
         else:
             raise PydanticCustomError(
-                'color_error',
-                'value is not a valid color: value must be a tuple, list or string',
+                "color_error",
+                "value is not a valid color: value must be a tuple, list or string",
             )
 
         # if we've got here value must be a valid color
@@ -180,8 +167,10 @@ def is_rgb(colors: List[Color]) -> bool:
 
 
 def infer_channel_color(
-    color_name: Optional[ColorType], index: int, n_channels: Optional[int] = None,
-    channel_color_list: List[Color] = None
+    color_name: Optional[ColorType],
+    index: int,
+    n_channels: Optional[int] = None,
+    channel_color_list: Optional[Sequence[str]] = None,
 ) -> Union[Color, None]:
     """
     Try to infer a color for an image channel.
@@ -201,19 +190,19 @@ def infer_channel_color(
     inferred_color
     """
 
-    name_convertor = dict(R="red", G="lime", B="blue")
-    color_name = name_convertor.get(color_name, color_name)
+    name_convertor = {"R": "red", "G": "lime", "B": "blue"}
+    if isinstance(color_name, str):
+        color_name = name_convertor.get(color_name, color_name)
 
-    try:
-        return Color(color_name)
-    except PydanticCustomError:
-        pass
+    if color_name is not None:
+        try:
+            return Color(color_name)
+        except PydanticCustomError:
+            pass
 
     if channel_color_list is None:
         # True green is called 'lime' in CSS
-        channel_color_list = (
-            "red", "lime", "blue", "cyan", "magenta", "yellow"
-        )
+        channel_color_list = ("red", "lime", "blue", "cyan", "magenta", "yellow")
 
     if n_channels is not None:
         # To improve: knowing n_channels can help to infer channel color

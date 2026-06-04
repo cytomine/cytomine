@@ -544,4 +544,23 @@ public class CytomineTests {
 
         cytomineSteps.logout(wait, cytomineUrl);
     }
+
+    @Test
+    void reviewAnnotationsInProject() {
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        String projectName = "selenium-" + randomUUID();
+        String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
+        String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
+        String imageName = "selenium-" + randomUUID() + ".png";
+        cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
+        cytomineSteps.openImageInViewer(wait, projectUrl);
+        annotationTools.drawRectangleAnnotation(wait, driver);
+
+        cytomineSteps.reviewAnnotations(wait);
+
+        cytomineSteps.deleteProject(wait, projectUrl);
+        cytomineSteps.deleteOntology(wait, ontologyUrl);
+        cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
+        cytomineSteps.logout(wait, cytomineUrl);
+    }
 }

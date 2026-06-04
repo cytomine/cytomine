@@ -22,10 +22,6 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = [
-  "mypy==1.14.1",
-  "ruff==0.12.11",
-]
 test = [
   "pytest==9.0.3",
 ]

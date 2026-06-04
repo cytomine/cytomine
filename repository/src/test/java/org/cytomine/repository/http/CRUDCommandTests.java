@@ -1,0 +1,74 @@
+package org.cytomine.repository.http;
+
+import lombok.SneakyThrows;
+import org.junit.jupiter.api.Test;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.web.servlet.MockMvc;
+import tools.jackson.databind.ObjectMapper;
+
+import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+public interface CRUDCommandTests<C, R> {
+    MockMvc getMockMvc();
+
+    ObjectMapper getObjectMapper();
+
+    String getApiURL();
+
+    C getCreatePayload();
+
+    JdbcTemplate getJdbcTemplate();
+
+
+    default String createUser() {
+        Long userId = getJdbcTemplate().queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
+        getJdbcTemplate().update("INSERT INTO sec_user (id, version, username) VALUES (?, 0, 'admin')", userId);
+        Long adminRoleId = getJdbcTemplate().queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
+        getJdbcTemplate().update("INSERT INTO sec_role (id, version, authority) VALUES (?, 0, 'ROLE_ADMIN')",
+            adminRoleId);
+        Long userRoleId = getJdbcTemplate().queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
+        getJdbcTemplate().update(
+            "INSERT INTO sec_user_sec_role (id, version, sec_user_id, sec_role_id) VALUES (?, 0, ?, ?)", userRoleId,
+            userId, adminRoleId);
+        return userId.toString();
+    }
+
+    default void testGet() {
+
+
+    }
+
+    @Test
+    @SneakyThrows
+    default void testPost() {
+        String userId = createUser();
+        String response = getMockMvc().perform(post(getApiURL()).param("userId", userId).contentType(APPLICATION_JSON)
+                .content(getObjectMapper().writeValueAsString(getCreatePayload()))).andExpect(status().isOk()).andReturn()
+            .getResponse().getContentAsString();
+
+        HttpCommandResponse result = getObjectMapper().readValue(response, HttpCommandResponse.class);
+
+        R dataResult = (R) result.data();
+
+        String get = getMockMvc().perform(
+                get(getApiURL() + '/' + result.data().id()).param("userId", userId).contentType(APPLICATION_JSON))
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+
+
+        assertEquals(dataResult, getObjectMapper().readValue(get, R.class.getClass));
+    }
+
+    default void testPut() {
+    }
+
+    default void testDelete() {
+    }
+
+
+}

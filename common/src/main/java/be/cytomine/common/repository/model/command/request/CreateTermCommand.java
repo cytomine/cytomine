@@ -6,7 +6,7 @@ import be.cytomine.common.repository.model.command.payload.request.TermCommandPa
 
 import static java.lang.String.format;
 
-public record CreateTermCommand(TermCommandPayload after, long userId, long ontologyId)
+public record CreateTermCommand(TermCommandPayload after, long userId)
     implements CreateCommandRequest<TermCommandPayload> {
 
 
@@ -17,7 +17,7 @@ public record CreateTermCommand(TermCommandPayload after, long userId, long onto
 
     @Override
     public String getActionMessage() {
-        return format("Term %s (%s) added in ontology %s", after.id(), after.name(), ontologyId);
+        return format("Term %s (%s) added in ontology %s", after.id(), after.name(), after.ontology());
     }
 
     @Override

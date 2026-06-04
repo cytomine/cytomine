@@ -16,11 +16,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import be.cytomine.common.repository.model.HasDeleted;
+import be.cytomine.common.repository.model.HasUpdated;
+
 @Entity(name = "term")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TermEntity {
+public class TermEntity implements HasDeleted, HasUpdated {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -1,7 +1,6 @@
 package org.cytomine.repository.service;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 import lombok.Getter;
@@ -41,21 +40,6 @@ public class OntologyCommandService implements
     }
 
     @Override
-    public OntologyCommandPayload map(OntologyEntity entity) {
-        return ontologyMapper.mapToOntologyCommandPayload(entity);
-    }
-
-    @Override
-    public OntologyResponse mapToResponse(OntologyEntity entity) {
-        return ontologyMapper.mapToOntologyResponse(entity);
-    }
-
-    @Override
-    public OntologyEntity mapCreateToEntity(CreateOntology createPayload, long userId, LocalDateTime creationDate) {
-        return ontologyMapper.mapToOntologyEntity(createPayload, userId, creationDate);
-    }
-
-    @Override
     public UpdateCommandRequest<OntologyCommandPayload> mapUpdateCommand(long userId, OntologyCommandPayload before,
         OntologyCommandPayload after) {
         return new UpdateOntologyCommand(before, after, userId);
@@ -63,7 +47,7 @@ public class OntologyCommandService implements
 
     @Override
     public CreateCommandRequest<OntologyCommandPayload> mapCreateCommand(long userId, OntologyCommandPayload after) {
-        return new CreateOntologyCommand( after, userId);
+        return new CreateOntologyCommand(after, userId);
     }
 
     @Override
@@ -82,8 +66,23 @@ public class OntologyCommandService implements
     }
 
     @Override
-    public OntologyEntity updateWithPayload(OntologyEntity entity, OntologyCommandPayload payload, LocalDateTime now) {
-        return null;
+    public OntologyEntity updateWithPayload(OntologyEntity entity, OntologyCommandPayload payload, Timestamp now) {
+        return ontologyMapper.updateWithPayload(entity, payload, now);
+    }
+
+    @Override
+    public OntologyResponse mapToResponse(OntologyEntity entity) {
+        return ontologyMapper.mapToOntologyResponse(entity);
+    }
+
+    @Override
+    public OntologyEntity mapCreateToEntity(CreateOntology createPayload, long userId, Timestamp creationDate) {
+        return ontologyMapper.mapToOntologyEntity(createPayload, userId, creationDate);
+    }
+
+    @Override
+    public OntologyCommandPayload map(OntologyEntity entity) {
+        return ontologyMapper.mapToOntologyCommandPayload(entity);
     }
 
     @Override

@@ -6,7 +6,7 @@ import be.cytomine.common.repository.model.command.payload.request.TermCommandPa
 
 import static java.lang.String.format;
 
-public record DeleteTermCommand( TermCommandPayload before, long userId, long ontologyId)
+public record DeleteTermCommand( TermCommandPayload before, long userId)
     implements DeleteCommandRequest<TermCommandPayload> {
 
     @Override
@@ -16,7 +16,7 @@ public record DeleteTermCommand( TermCommandPayload before, long userId, long on
 
     @Override
     public String getActionMessage() {
-        return format("Term %s (%s) deleted in ontology %s", before.id(), before.name(), ontologyId);
+        return format("Term %s (%s) deleted in ontology %s", before.id(), before.name(), before.ontology());
     }
 
     @Override

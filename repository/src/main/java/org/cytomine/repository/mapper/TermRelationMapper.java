@@ -1,0 +1,47 @@
+package org.cytomine.repository.mapper;
+
+import java.sql.Timestamp;
+
+import org.cytomine.repository.persistence.entity.TermRelationEntity;
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+
+import be.cytomine.common.repository.model.command.payload.request.TermRelationCommandPayload;
+import be.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
+import be.cytomine.common.repository.model.termrelation.payload.CreateTermRelation;
+
+@Mapper(componentModel = "spring")
+public interface TermRelationMapper {
+
+
+    @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
+    @Mapping(target = "name", ignore = true)
+    TermRelationResponse mapToTermRelationResponse(TermRelationEntity termRelationEntity);
+
+
+    @BeanMapping(ignoreUnmappedSourceProperties = {"name"})
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "created", source = "creationDate")
+    @Mapping(target = "deleted", ignore = true)
+    @Mapping(target = "updated", source = "creationDate")
+    TermRelationEntity mapToTermRelationEntity(CreateTermRelation createTermRelation, Timestamp creationDate,
+        long relationId);
+
+
+    @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
+    @Mapping(target = "ontologyId", source = "ontologyId")
+    @Mapping(target = "name", ignore = true)
+    TermRelationCommandPayload mapToTermRelationCommandPayload(TermRelationEntity termRelationEntity, long ontologyId);
+
+    @Mapping(target = "updated", source = "now")
+    @Mapping(target = "term1Id", source = "newTerm1Id")
+    @Mapping(target = "term2Id", source = "newTerm2Id")
+    TermRelationEntity update(TermRelationEntity entity, long newTerm1Id, long newTerm2Id, Timestamp now);
+
+    @Mapping(target = "name", source = "replace.name")
+    @Mapping(target = "updated", source = "now")
+    TermRelationEntity updateTermRelationWithPayload(TermRelationEntity entity, TermRelationCommandPayload replace,
+        Timestamp now);
+}

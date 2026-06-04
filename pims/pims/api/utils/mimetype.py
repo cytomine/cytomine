@@ -194,9 +194,10 @@ def get_output_format(
     else:
         response_mimetype = None
 
-    output_format = supported.get(response_mimetype)
-    if output_format:
-        return output_format, response_mimetype
+    if response_mimetype:
+        output_format = supported.get(response_mimetype)
+        if output_format:
+            return output_format, response_mimetype
 
     raise NoAcceptableResponseMimetypeProblem(str(), list(supported.keys()))
 

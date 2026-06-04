@@ -145,7 +145,7 @@ def get_channel_indexes(image: Image, planes: List[Union[int, str]]) -> List[int
     return parse_planes(planes, image.n_channels, default, 'channels')
 
 
-def get_zslice_indexes(image: Image, planes: List[int]) -> List[int]:
+def get_zslice_indexes(image: Image, planes: List[Union[int, str]]) -> List[int]:
     """
     Image focal planes used to render the response.
     This parameter is interpreted as a set such that duplicates are ignored.
@@ -155,7 +155,7 @@ def get_zslice_indexes(image: Image, planes: List[int]) -> List[int]:
     return parse_planes(planes, image.depth, default, 'z_slices')
 
 
-def get_timepoint_indexes(image: Image, planes: List[int]) -> List[int]:
+def get_timepoint_indexes(image: Image, planes: List[Union[int, str]]) -> List[int]:
     """
     Image timepoints used to render the response.
     This parameter is interpreted as a set such that duplicates are ignored.

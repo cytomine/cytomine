@@ -187,7 +187,7 @@ class TifffileParser(AbstractParser):
             rational = physical_size
         if rational[0] <= 0 or rational[1] <= 0:
             return None
-        if type(unit) is not str:
+        if not isinstance(unit, str):
             unit = unit.name.lower()
         return rational[1] / rational[0] * UNIT_REGISTRY(unit)
 

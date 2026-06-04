@@ -85,7 +85,7 @@ def request_params_to_args(
             if isinstance(field_info, params.Query) and not query_explode:
                 value = received_params.get(field.alias)
                 if value is not None:
-                    delimiter = query_style_to_delimiter.get(query_style)
+                    delimiter = query_style_to_delimiter.get(query_style, ",")
                     value = list(csv.reader([value], delimiter=delimiter))[0]
             else:
                 value = received_params.getlist(field.alias) or field.default

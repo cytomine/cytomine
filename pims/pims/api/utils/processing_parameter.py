@@ -116,7 +116,17 @@ def parse_intensity_bounds(
             channel, intensity, max_allowed_intensity, "maximum"
         )
 
-    return min_intensities, max_intensities
+    parsed_mins = [
+        parse_intensity(channel, intensity, 0, "minimum")
+        for channel, intensity in zip(out_channels, min_intensities)
+    ]
+
+    parsed_maxs = [
+        parse_intensity(channel, intensity, max_allowed_intensity, "maximum")
+        for channel, intensity in zip(out_channels, max_intensities)
+    ]
+
+    return parsed_mins, parsed_maxs
 
 
 def parse_bitdepth(in_image: Image, bits: Union[int, BitDepthEnum]) -> int:

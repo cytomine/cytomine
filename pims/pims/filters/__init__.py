@@ -64,7 +64,7 @@ class AbstractFilter(ABC):
 
         if type(obj) not in self.implementations:
             obj = self.implementation_adapters.get(
-                (type(obj), self.implementations[0])
+                (type(obj), self.implementations[0]), lambda x: x
             )(obj)
 
         processed = self._impl[type(obj)](obj, *args, **kwargs)

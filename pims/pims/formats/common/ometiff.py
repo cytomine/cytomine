@@ -91,7 +91,7 @@ def clean_ome_dict(d: dict) -> dict:
                     new_v[f'[{idx}]'] = item
             if len(new_v) == 0:
                 new_v = v
-            cleaned[k] = clean_ome_dict(new_v)
+            cleaned[k] = clean_ome_dict(new_v)  # pyrefly: ignore
         else:
             cleaned[k] = v
 

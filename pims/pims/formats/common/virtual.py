@@ -94,7 +94,7 @@ class VirtualStackParser(AbstractParser):
         imd.pixel_type = np.dtype(metadata.get("pixel_type"))
         imd.significant_bits = dtype_to_bits(imd.pixel_type)
 
-        for i, channel in enumerate(image.get("channels")):
+        for i, channel in enumerate(image.get("channels", [])):
             imd.set_channel(
                 ImageChannel(index=i, color=channel.get("color"))
             )
@@ -119,7 +119,7 @@ class VirtualStackParser(AbstractParser):
         imd.physical_size_z = metadata.get("physical_size_z")
         imd.frame_rate = metadata.get("frame_rate")
 
-        for parsed_channel, channel in zip(imd.channels, image.get("channels")):
+        for parsed_channel, channel in zip(imd.channels, image.get("channels", [])):
             parsed_channel.suggested_name = channel.get("suggested_name")
             parsed_channel.emission_wavelength = channel.get("emission_wavelength")
             parsed_channel.excitation_wavelength = channel.get("excitation_wavelength")
@@ -143,6 +143,9 @@ class VirtualStackParser(AbstractParser):
 
         image = cached_json(self.format)
         planes = image.get("planes")
+        if planes is None:
+            return pi
+
         for c in range(imd.n_concrete_channels):
             for z in range(imd.depth):
                 for t in range(imd.duration):
@@ -162,7 +165,7 @@ class VirtualStackReader(AbstractReader):
             Path(FILE_ROOT_PATH, filepath).get_spatial()
         )
 
-    def read_thumb(self, out_width: int, out_height: int, precomputed: bool = None,
+    def read_thumb(self, out_width: int, out_height: int, precomputed: bool = False,
                    c: Optional[Union[int, List[int]]] = None, z: Optional[int] = None,
                    t: Optional[int] = None) -> RawImagePixels:
         bands = list()

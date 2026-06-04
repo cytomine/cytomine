@@ -12,7 +12,7 @@
 #  * See the License for the specific language governing permissions and
 #  * limitations under the License.
 import logging
-from typing import Optional
+from typing import Optional, Union
 
 from pint import Quantity
 
@@ -88,7 +88,7 @@ class PNGParser(VipsParser):
     def parse_physical_size(
         physical_size: Optional[str], unit: Optional[str], inverse: bool
     ) -> Optional[Quantity]:
-        supported_units = {1: "meter", 2: "inch"}
+        supported_units: dict[Union[str, int], str] = {1: "meter", 2: "inch"}
         if isinstance(unit, str):
             supported_units = {"meters": "meter", "inches": "inch"}
         if physical_size is not None and unit in supported_units.keys():
@@ -97,7 +97,8 @@ class PNGParser(VipsParser):
                 return None
             if inverse:
                 physical_size = 1 / physical_size
-            return physical_size * UNIT_REGISTRY(supported_units[unit])
+            unit_name = supported_units.get(unit, "meter") if unit is not None else "meter"
+            return physical_size * UNIT_REGISTRY(unit_name)
         return None
 
 

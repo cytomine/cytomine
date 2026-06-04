@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.cytomine.repository.mapper.CommandMapper;
 import org.cytomine.repository.mapper.OntologyMapper;
@@ -20,14 +21,16 @@ import be.cytomine.common.repository.model.command.payload.response.HttpCommandR
 import be.cytomine.common.repository.model.command.payload.response.OntologyResponse;
 import be.cytomine.common.repository.model.command.request.CreateOntologyCommand;
 import be.cytomine.common.repository.model.command.request.DeleteOntologyCommand;
+import be.cytomine.common.repository.model.command.request.UpdateCommandRequest;
 import be.cytomine.common.repository.model.command.request.UpdateOntologyCommand;
 import be.cytomine.common.repository.model.ontology.payload.CreateOntology;
 import be.cytomine.common.repository.model.ontology.payload.UpdateOntology;
 
 @RequiredArgsConstructor
 @Component
+@Getter
 public class OntologyCommandService
-    implements CRUDCommandService<CreateOntology, UpdateOntology, OntologyCommandPayload> {
+    implements CRUDCommandService<CreateOntology, UpdateOntology, OntologyCommandPayload, OntologyEntity,OntologyResponse> {
     private final OntologyRepository ontologyRepository;
     private final ACLService aclService;
     private final OntologyMapper ontologyMapper;
@@ -35,12 +38,38 @@ public class OntologyCommandService
     private final CommandMapper commandMapper;
 
     @Override
+    public OntologyEntity save(OntologyEntity entity) {
+        return null;
+    }
+
+    @Override
+    public OntologyCommandPayload map(OntologyEntity entity) {
+        return null;
+    }
+
+    @Override
+    public OntologyResponse mapToResponse(OntologyEntity entity) {
+        return null;
+    }
+
+    @Override
+    public UpdateCommandRequest<?> mapUpdateCommand(long userId, long id, OntologyCommandPayload before,
+                                                    OntologyCommandPayload after) {
+        return null;
+    }
+
+    @Override
+    public Optional<OntologyEntity> get(long userId, long id) {
+        return Optional.empty();
+    }
+
+    @Override
     public Optional<HttpCommandResponse> create(long userId, CreateOntology createPayload, LocalDateTime now) {
 
         // well who can write ontology any way?
         // if(!canWrite(userId, ???))
 
-        OntologyEntity ontologyEntity = ontologyMapper.mapToOntologyEntity(createPayload,userId,now);
+        OntologyEntity ontologyEntity = ontologyMapper.mapToOntologyEntity(createPayload, userId, now);
         OntologyEntity savedEntity = ontologyRepository.save(ontologyEntity);
         OntologyCommandPayload ontologyCommandPayload = ontologyMapper.mapToOntologyCommandPayload(savedEntity);
         CreateOntologyCommand createOntologyCommand = new CreateOntologyCommand(ontologyCommandPayload, userId);
@@ -57,7 +86,7 @@ public class OntologyCommandService
         return ontologyRepository.findById(id).filter(entity -> canDelete(userId, id)).map(entity -> {
             DeleteOntologyCommand deleteCommand =
                 new DeleteOntologyCommand(id, ontologyMapper.mapToOntologyCommandPayload(entity), userId
-                    );
+                );
             CommandV2Entity commandV2Entity =
                 commandV2Repository.save(commandMapper.map(deleteCommand, now, now, userId));
             entity.setDeleted(Timestamp.valueOf(now));
@@ -69,8 +98,8 @@ public class OntologyCommandService
     public Optional<HttpCommandResponse> update(long userId, long id, UpdateOntology updatePayload, LocalDateTime now) {
         return ontologyRepository.findById(id).filter(entity -> canWrite(userId, entity.getId())).map(entity -> {
             OntologyCommandPayload beforePayload = ontologyMapper.mapToOntologyCommandPayload(entity);
-            updatePayload.name().ifPresent(entity::setName);
-            OntologyEntity savedEntity = ontologyRepository.save(entity);
+            OntologyEntity update = update(entity, updatePayload);
+            OntologyEntity savedEntity = ontologyRepository.save(update);
             UpdateOntologyCommand updateCommand =
                 new UpdateOntologyCommand(id, beforePayload, ontologyMapper.mapToOntologyCommandPayload(savedEntity),
                     userId);
@@ -86,7 +115,7 @@ public class OntologyCommandService
 
     @Override
     public Optional<HttpCommandResponse> updateWithExistingCommand(long userId, UUID commandId,
-        OntologyCommandPayload payload, LocalDateTime now) {
+                                                                   OntologyCommandPayload payload, LocalDateTime now) {
         return ontologyRepository.findById(payload.id()).map(entity -> {
             entity.setName(payload.name());
             entity.setUpdated(Timestamp.valueOf(now));
@@ -109,6 +138,11 @@ public class OntologyCommandService
             entity.setUpdated(Timestamp.valueOf(now));
             return saveAndBuildResponse(entity, command, commandId);
         });
+    }
+
+    @Override
+    public OntologyEntity update(OntologyEntity entity, UpdateOntology updatePayload) {
+        return ontologyMapper.update(entity, updatePayload.name().orElse(entity.getName()));
     }
 
     @Override

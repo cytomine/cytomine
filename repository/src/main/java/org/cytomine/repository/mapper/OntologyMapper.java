@@ -102,5 +102,8 @@ public interface OntologyMapper {
     @BeanMapping(ignoreUnmappedSourceProperties = {"version", "userId", "terms"})
     OntologyCommandPayload mapToOntologyCommandPayload(OntologyEntity ontologyEntity);
 
+    @Mapping(target = "name", source = "newName")
+    OntologyEntity update(OntologyEntity entity, String newName);
+
 
 }

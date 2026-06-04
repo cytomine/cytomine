@@ -13,12 +13,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import be.cytomine.common.repository.model.HasDeleted;
+import be.cytomine.common.repository.model.HasUpdated;
+
 @Entity(name = "ontology")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class OntologyEntity {
+public class OntologyEntity implements HasDeleted, HasUpdated {
     @Id
     private long id;
     @Column

@@ -6,7 +6,7 @@ import be.cytomine.common.repository.model.command.payload.request.TermRelationC
 
 import static java.lang.String.format;
 
-public record CreateTermRelationCommand(TermRelationCommandPayload after, long userId, long ontologyId)
+public record CreateTermRelationCommand(TermRelationCommandPayload after, long userId)
     implements CreateCommandRequest<TermRelationCommandPayload> {
 
     @Override
@@ -16,8 +16,8 @@ public record CreateTermRelationCommand(TermRelationCommandPayload after, long u
 
     @Override
     public String getActionMessage() {
-        return format("Term relation %s (term1: %s, term2: %s) added in ontology %s",
-            after.id(), after.term1Id(), after.term2Id(), ontologyId);
+        return format("Term relation %s (term1: %s, term2: %s) added in ontology %s", after.id(), after.term1Id(),
+            after.term2Id(), after.ontologyId());
     }
 
     @Override

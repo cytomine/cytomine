@@ -10,10 +10,13 @@ import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 
+import be.cytomine.common.repository.model.HasDeleted;
+import be.cytomine.common.repository.model.HasUpdated;
+
 @Entity(name = "relation_term")
 @Getter
 @Setter
-public class TermRelationEntity {
+public class TermRelationEntity implements HasDeleted, HasUpdated {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -31,5 +34,4 @@ public class TermRelationEntity {
     private long term1Id;
     @Column(name = "term2_id")
     private long term2Id;
-
 }

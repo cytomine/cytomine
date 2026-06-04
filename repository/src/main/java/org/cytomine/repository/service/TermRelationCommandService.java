@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import jakarta.transaction.Transactional;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.cytomine.repository.mapper.CommandMapper;
 import org.cytomine.repository.mapper.OntologyMapper;
@@ -23,16 +24,20 @@ import be.cytomine.common.repository.model.command.Commands;
 import be.cytomine.common.repository.model.command.payload.request.TermRelationCommandPayload;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
+import be.cytomine.common.repository.model.command.request.CreateCommandRequest;
 import be.cytomine.common.repository.model.command.request.CreateTermRelationCommand;
+import be.cytomine.common.repository.model.command.request.DeleteCommandRequest;
 import be.cytomine.common.repository.model.command.request.DeleteTermRelationCommand;
+import be.cytomine.common.repository.model.command.request.UpdateCommandRequest;
 import be.cytomine.common.repository.model.command.request.UpdateTermRelationCommand;
 import be.cytomine.common.repository.model.termrelation.payload.CreateTermRelation;
 import be.cytomine.common.repository.model.termrelation.payload.UpdateTermRelation;
 
 @Component
 @RequiredArgsConstructor
-public class TermRelationCommandService
-    implements CRUDCommandService<CreateTermRelation, UpdateTermRelation, TermRelationCommandPayload> {
+@Getter
+public class TermRelationCommandService implements
+    CRUDCommandService<CreateTermRelation, UpdateTermRelation, TermRelationCommandPayload, TermRelationEntity, TermRelationResponse> {
     private final TermRepository termRepository;
     private final TermRelationRepository termRelationRepository;
     private final RelationRepository relationRepository;
@@ -42,6 +47,52 @@ public class TermRelationCommandService
     private final ACLService aclService;
 
     @Override
+    public TermRelationEntity save(TermRelationEntity entity) {
+        return termRelationRepository.save(entity);
+    }
+
+    @Override
+    public TermRelationCommandPayload map(TermRelationEntity entity) {
+        long ontologyId = termRepository.findById(entity.getTerm1Id()).orElseThrow().getOntologyId();
+        return ontologyMapper.mapToTermRelationCommandPayload(entity,ontologyId);
+    }
+
+    @Override
+    public TermRelationResponse mapToResponse(TermRelationEntity entity) {
+        return ontologyMapper.mapToTermRelationResponse(entity);
+    }
+
+    @Override
+    public TermRelationEntity mapCreateToEntity(CreateTermRelation createPayload, long userId,
+        LocalDateTime creationDate) {
+        long parentId = relationRepository.findParent().getId();
+        return ontologyMapper.mapToTermRelationEntity(createPayload,creationDate,parentId);
+    }
+
+    @Override
+    public UpdateCommandRequest<TermRelationCommandPayload> mapUpdateCommand(long userId,
+        TermRelationCommandPayload before, TermRelationCommandPayload after) {
+        return new UpdateTermRelationCommand(before, after, userId);
+    }
+
+    @Override
+    public CreateCommandRequest<TermRelationCommandPayload> mapCreateCommand(long userId,
+        TermRelationCommandPayload after) {
+        return new CreateTermRelationCommand(after, userId);
+    }
+
+    @Override
+    public DeleteCommandRequest<TermRelationCommandPayload> mapDeleteCommand(long userId,
+        TermRelationCommandPayload before) {
+        return new DeleteTermRelationCommand(before,userId);
+    }
+
+    @Override
+    public Optional<TermRelationEntity> get(long id) {
+        return termRelationRepository.findById(id);
+    }
+
+    @Override
     @Transactional
     public Optional<HttpCommandResponse> delete(long userId, long id, LocalDateTime now) {
         return termRelationRepository.findById(id)
@@ -49,8 +100,8 @@ public class TermRelationCommandService
             .filter(pair -> aclService.canWriteOntology(userId, pair.getSecond().getOntologyId())).map(pair -> {
                 TermRelationEntity termEntity = pair.getFirst();
                 long ontologyId = pair.getSecond().getOntologyId();
-                DeleteTermRelationCommand deleteCommand = new DeleteTermRelationCommand(id,
-                    ontologyMapper.mapToTermRelationCommandPayload(termEntity, ontologyId), userId, ontologyId);
+                DeleteTermRelationCommand deleteCommand = new DeleteTermRelationCommand(
+                    ontologyMapper.mapToTermRelationCommandPayload(termEntity, ontologyId), userId);
                 CommandV2Entity commandV2Entity =
                     commandV2Repository.save(commandMapper.map(deleteCommand, now, now, userId));
                 termEntity.setDeleted(Timestamp.valueOf(now));
@@ -77,7 +128,7 @@ public class TermRelationCommandService
                 TermRelationCommandPayload termCommandPayload =
                     ontologyMapper.mapToTermRelationCommandPayload(savedEntity, ontologyId);
                 CreateTermRelationCommand insertTermCommand =
-                    new CreateTermRelationCommand(termCommandPayload, userId, termCommandPayload.ontologyId());
+                    new CreateTermRelationCommand(termCommandPayload, userId);
 
                 CommandV2Entity commandV2Entity =
                     commandV2Repository.save(commandMapper.map(insertTermCommand, now, now, userId));
@@ -109,8 +160,8 @@ public class TermRelationCommandService
                 updateTerm.term1Id().ifPresent(termRelationEntity::setTerm1Id);
                 updateTerm.term2Id().ifPresent(termRelationEntity::setTerm2Id);
                 TermRelationEntity savedEntity = termRelationRepository.save(termRelationEntity);
-                UpdateTermRelationCommand updateCommand = new UpdateTermRelationCommand(id, beforePayload,
-                    ontologyMapper.mapToTermRelationCommandPayload(savedEntity, ontologyId), userId, ontologyId);
+                UpdateTermRelationCommand updateCommand = new UpdateTermRelationCommand(beforePayload,
+                    ontologyMapper.mapToTermRelationCommandPayload(savedEntity, ontologyId), userId);
 
                 CommandV2Entity commandV2Entity =
                     commandV2Repository.save(commandMapper.map(updateCommand, now, now, userId));
@@ -121,7 +172,7 @@ public class TermRelationCommandService
             });
     }
 
-    @Override
+
     public Optional<HttpCommandResponse> updateWithExistingCommand(long userId, UUID commandId,
         TermRelationCommandPayload payload, LocalDateTime now) {
 
@@ -132,7 +183,7 @@ public class TermRelationCommandService
         });
     }
 
-    @Override
+
     public Optional<HttpCommandResponse> logicalDelete(UUID commandId, long id, String command, LocalDateTime now) {
         return termRelationRepository.findById(id).map(entity -> {
             entity.setDeleted(Timestamp.valueOf(now));
@@ -140,7 +191,7 @@ public class TermRelationCommandService
         });
     }
 
-    @Override
+
     public Optional<HttpCommandResponse> restore(UUID commandId, long id, String command, LocalDateTime now) {
         return termRelationRepository.findById(id).map(entity -> {
             entity.setDeleted(null);
@@ -151,6 +202,9 @@ public class TermRelationCommandService
 
     @Override
     public boolean canWrite(long userId, long id) {
+
+
+
         return aclService.canWriteOntology(userId, id);
     }
 
@@ -159,10 +213,15 @@ public class TermRelationCommandService
         return aclService.canDeleteOntology(userId, id);
     }
 
-    private HttpCommandResponse saveAndBuildResponse(TermRelationEntity entity, String command, UUID commandId) {
-        TermRelationEntity saved = termRelationRepository.save(entity);
-        TermRelationResponse response = ontologyMapper.mapToTermRelationResponse(saved);
-        return new HttpCommandResponse(true, response, commandId, command);
+    @Override
+    public TermRelationEntity update(TermRelationEntity entity, UpdateTermRelation updatePayload, Timestamp now) {
+        return null;
+    }
+
+    @Override
+    public TermRelationEntity updateWithPayload(TermRelationEntity entity, TermRelationCommandPayload payload,
+        LocalDateTime now) {
+        return null;
     }
 
 }

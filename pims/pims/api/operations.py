@@ -346,11 +346,11 @@ def connexion_to_core(
                 raise CytomineProblem(f"Project {pid} not found")
             projects.append(project)
 
-        keys = keys.split(',') if keys is not None else []
-        values = values.split(',') if values is not None else []
-        if len(keys) != len(values):
-            raise CytomineProblem(f"Keys {keys} and values {values} have varying size.")
-        user_properties = zip(keys, values)
+        property_keys = keys.split(',') if keys is not None else []
+        property_values = values.split(',') if values is not None else []
+        if len(property_keys) != len(property_values):
+            raise CytomineProblem(f"Keys {property_keys} and values {property_values} have varying size.")
+        user_properties = zip(property_keys, property_values)
 
         root = UploadedFile(
             upload_name, upload_path, upload_size, "", "",

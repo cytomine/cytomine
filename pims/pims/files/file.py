@@ -116,7 +116,7 @@ class FileType(str, Enum):
 PlatformPath = type(_Path())
 
 
-class Path(PlatformPath, _Path, SafelyCopiable):
+class Path(PlatformPath, _Path, SafelyCopiable):  # pyrefly: ignore
     f"""
     Extends `Path` from `pathlib` for PIMS.
     
@@ -310,9 +310,12 @@ class Path(PlatformPath, _Path, SafelyCopiable):
             return Image(f"{stem_path}.{decoded.get_identifier()}", format=decoded)
 
         image = await self.get_representation(representation)
-        await PIMSCache.get_backend().set(
-            cache_key, PickleCodec.encode(image.format.serialize()), namespace=CACHE_KEY_NAMESPACE_IMAGE_FORMAT_METADATA
-        )
+        if isinstance(image, Image):
+            await PIMSCache.get_backend().set(
+                cache_key,
+                PickleCodec.encode(image.format.serialize()),
+                namespace=CACHE_KEY_NAMESPACE_IMAGE_FORMAT_METADATA,
+            )
         return image
 
     def get_original(self) -> Union[Image, None]:
@@ -382,7 +385,7 @@ class Path(PlatformPath, _Path, SafelyCopiable):
         else:
             return None
 
-    def get_extracted_children(self, stop_recursion_cond: Callable = None):
+    def get_extracted_children(self, stop_recursion_cond: Callable | None = None):
         if not self.is_collection():
             return []
 
@@ -926,7 +929,7 @@ class Image(Path):
 
 
 class Histogram(Path, HistogramReaderInterface):
-    def __init__(self, *pathsegments, format: Type[HistogramFormat] = None):
+    def __init__(self, *pathsegments, format: Type[HistogramFormat] | None = None):
         super().__init__(*pathsegments)
 
         _format = None

@@ -206,7 +206,7 @@ async def _show_window(
         )
 
     affine = None
-    if annotations:
+    if annotations and isinstance(annotations, ParsedAnnotations):
         affine = annotation_crop_affine_matrix(annotations.region, region, *out_size)
 
     if annotations and annotation_style and \

@@ -12,7 +12,7 @@
 #  * See the License for the specific language governing permissions and
 #  * limitations under the License.
 import logging
-from typing import Any, Optional
+from typing import Any, Mapping, Optional
 
 import orjson
 from cytomine.models import Model as CytomineModel
@@ -87,9 +87,9 @@ class FastJsonResponse(ORJSONResponse):
         self,
         content: Any = None,
         status_code: int = 200,
-        headers: dict = None,
-        media_type: str = None,
-        background: BackgroundTask = None,
+        headers: Mapping[str, str] | None = None,
+        media_type: str | None = None,
+        background: BackgroundTask | None = None,
         include: Optional[IncEx]  = None,
         exclude: Optional[IncEx] = None,
         by_alias: bool = True,

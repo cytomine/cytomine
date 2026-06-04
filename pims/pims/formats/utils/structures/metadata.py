@@ -125,7 +125,7 @@ class MetadataStore:
     def _split_namespaced_key(namespaced_key: str) -> Tuple[str, str]:
         """Split namespace and the rest from a key"""
         split = namespaced_key.split('.', 1)
-        return ("", namespaced_key) if len(split) < 2 else split
+        return ("", namespaced_key) if len(split) < 2 else (split[0], split[1])
 
     def set(self, namespaced_key: str, value: Any, namespace: Optional[str] = None) -> None:
         """
@@ -290,7 +290,7 @@ class ImageChannel(_MetadataStorable):
         self._color = value
 
     @property
-    def hex_color(self) -> str:
+    def hex_color(self) -> Optional[str]:
         c = self.color
         return c.as_hex() if c else None
 

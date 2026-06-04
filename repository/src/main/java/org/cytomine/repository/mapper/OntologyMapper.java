@@ -103,7 +103,8 @@ public interface OntologyMapper {
     OntologyCommandPayload mapToOntologyCommandPayload(OntologyEntity ontologyEntity);
 
     @Mapping(target = "name", source = "newName")
-    OntologyEntity update(OntologyEntity entity, String newName);
+    @Mapping(target = "updated", source = "now")
+    OntologyEntity update(OntologyEntity entity, String newName, Timestamp now);
 
 
 }

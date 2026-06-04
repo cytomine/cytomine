@@ -24,6 +24,8 @@ from pims.importer.utils import get_project
 from pims.schemas.auth import ApiCredentials, CytomineAuth
 from pims.schemas.operations import ImportResponse, ImportSummary
 
+from bigpicture_metadata_interface import BPInterface
+
 logger = logging.getLogger("pims.app")
 
 DATASET_ROOT = Path(get_settings().dataset_path)
@@ -145,6 +147,9 @@ def run_import_datasets(
             except Exception as e:
                 logger.error(f"Failed to process bucket {bucket}: {e}", exc_info=True)
                 continue
+
+        for bucket in buckets:
+            metadata = BPInterface.parse_xml_files(bucket / "METADATA")
 
         return ImportResponse(
             image_summary=image_summary,

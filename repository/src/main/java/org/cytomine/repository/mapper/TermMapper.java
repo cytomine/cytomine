@@ -11,13 +11,18 @@ import be.cytomine.common.repository.model.command.payload.request.TermCommandPa
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.common.repository.model.term.payload.CreateTerm;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring",uses = {BaseMapper.class})
 public interface TermMapper {
 
     @Mapping(target = "name", source = "replace.name")
     @Mapping(target = "updated", source = "now")
     @Mapping(target = "id", source = "entity.id")
+    @Mapping(target = "created", source = "entity.created")
+    @Mapping(target = "deleted", source = "replace.deleted")
     @Mapping(target = "color", source = "replace.color")
+    @Mapping(target = "comment", source = "replace.comment")
+    @Mapping(target = "ontology", source = "replace.ontology")
+    @BeanMapping(ignoreUnmappedSourceProperties = {"updated", "parent"})
     TermEntity updateWithPayload(TermEntity entity, TermCommandPayload replace, Timestamp now);
 
     @Mapping(target = "name", source = "newName")
@@ -34,8 +39,6 @@ public interface TermMapper {
     @Mapping(target = "name", ignore = true)
     TermResponse mapToTermResponse(TermEntity termEntity);
 
-    @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
-    TermResponse map(TermEntity termEntity);
 
     @Mapping(target = "children", ignore = true)
     @Mapping(target = "id", ignore = true)

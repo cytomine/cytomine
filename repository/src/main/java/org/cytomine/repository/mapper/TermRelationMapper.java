@@ -11,7 +11,7 @@ import be.cytomine.common.repository.model.command.payload.request.TermRelationC
 import be.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
 import be.cytomine.common.repository.model.termrelation.payload.CreateTermRelation;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring",uses = BaseMapper.class)
 public interface TermRelationMapper {
 
 
@@ -38,10 +38,13 @@ public interface TermRelationMapper {
     @Mapping(target = "updated", source = "now")
     @Mapping(target = "term1Id", source = "newTerm1Id")
     @Mapping(target = "term2Id", source = "newTerm2Id")
+    @BeanMapping(ignoreUnmappedSourceProperties = {"term1Id","term2Id","updated"})
     TermRelationEntity update(TermRelationEntity entity, long newTerm1Id, long newTerm2Id, Timestamp now);
 
-    @Mapping(target = "name", source = "replace.name")
+
     @Mapping(target = "updated", source = "now")
+    @Mapping(target = "id", source = "entity.id")
+    @Mapping(target = "created", source = "entity.created")
     TermRelationEntity updateTermRelationWithPayload(TermRelationEntity entity, TermRelationCommandPayload replace,
         Timestamp now);
 }

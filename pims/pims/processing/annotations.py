@@ -32,7 +32,7 @@ class ParsedAnnotation:
 
     def __init__(
         self, geometry: BaseGeometry, fill_color: Optional[Color] = None,
-        stroke_color: Optional[Color] = None, stroke_width: int = None,
+        stroke_color: Optional[Color] = None, stroke_width: Optional[int] = None,
         point_envelope_length: float = 1
     ):
         self.geometry = geometry

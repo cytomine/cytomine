@@ -1,5 +1,6 @@
 package org.cytomine.repository.http;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import lombok.Getter;
@@ -16,12 +17,13 @@ import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.http.OntologyHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.OntologyResponse;
 import be.cytomine.common.repository.model.ontology.payload.CreateOntology;
+import be.cytomine.common.repository.model.ontology.payload.UpdateOntology;
 
 @SpringBootTest(classes = RepositoryApp.class)
 @AutoConfigureMockMvc
 @Import(PostGisTestConfiguration.class)
 @Getter
-public class OntologyControllerTest implements CRUDCommandTests<CreateOntology, OntologyResponse> {
+public class OntologyControllerTest implements CRUDCommandTests<CreateOntology, OntologyResponse, UpdateOntology> {
     @Autowired
     MockMvc mockMvc;
     @Autowired
@@ -30,4 +32,6 @@ public class OntologyControllerTest implements CRUDCommandTests<CreateOntology, 
     JdbcTemplate jdbcTemplate;
     String apiURL = OntologyHttpContract.ROOT_PATH;
     CreateOntology createPayload = new CreateOntology(UUID.randomUUID().toString());
+    UpdateOntology updatePayload = new UpdateOntology(Optional.of(UUID.randomUUID().toString()));
+
 }

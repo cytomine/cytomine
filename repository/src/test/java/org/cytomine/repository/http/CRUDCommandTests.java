@@ -9,12 +9,14 @@ import tools.jackson.databind.ObjectMapper;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public interface CRUDCommandTests<C, R> {
+public interface CRUDCommandTests<C, R, U> {
     MockMvc getMockMvc();
 
     ObjectMapper getObjectMapper();
@@ -22,6 +24,8 @@ public interface CRUDCommandTests<C, R> {
     String getApiURL();
 
     C getCreatePayload();
+
+    U getUpdatePayload();
 
     JdbcTemplate getJdbcTemplate();
 
@@ -46,28 +50,31 @@ public interface CRUDCommandTests<C, R> {
 
     @Test
     @SneakyThrows
-    default void testPost() {
+    default void baseTest() {
         String userId = createUser();
         String response = getMockMvc().perform(post(getApiURL()).param("userId", userId).contentType(APPLICATION_JSON)
                 .content(getObjectMapper().writeValueAsString(getCreatePayload()))).andExpect(status().isOk()).andReturn()
             .getResponse().getContentAsString();
 
         HttpCommandResponse result = getObjectMapper().readValue(response, HttpCommandResponse.class);
-
+        assertTrue(result.data() != null);
         R dataResult = (R) result.data();
 
         String get = getMockMvc().perform(
-                get(getApiURL() + '/' + result.data().id()).param("userId", userId).contentType(APPLICATION_JSON))
+                get(getApiURL() + "/" + result.data().id()).param("userId", userId).contentType(APPLICATION_JSON))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
+        assertEquals(dataResult, getObjectMapper().readValue(get, dataResult.getClass()));
 
-        assertEquals(dataResult, getObjectMapper().readValue(get, R.class.getClass));
-    }
+        String update = getMockMvc().perform(
+                put(getApiURL() + "/" + result.data().id()).param("userId", userId).contentType(APPLICATION_JSON)
+                    .content(getObjectMapper().writeValueAsString(getUpdatePayload()))).andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString();
 
-    default void testPut() {
-    }
+        HttpCommandResponse updateResult = getObjectMapper().readValue(update, HttpCommandResponse.class);
+        R updateDataResult = (R) updateResult.data();
 
-    default void testDelete() {
+        assertEquals(dataResult, updateDataResult);
     }
 
 

@@ -102,9 +102,11 @@ class VipsReader(AbstractReader):
 
     @staticmethod
     def _extract_channels(im: VIPSImage, c: Optional[Union[int, List[int]]]) -> VIPSImage:
-        if c is None or im.bands == len(c):
+        if c is None or isinstance(c, list) and im.bands == len(c):
             return im
-        elif type(c) is int or len(c) == 1:
+        elif isinstance(c, int):
+            return im.extract_band(c)
+        elif isinstance(c, list) or len(c) == 1:
             if len(c) == 1:
                 c = c[0]
             return im.extract_band(c)

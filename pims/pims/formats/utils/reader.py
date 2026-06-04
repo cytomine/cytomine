@@ -35,7 +35,7 @@ class AbstractReader(ABC):
 
     @abstractmethod
     def read_thumb(
-        self, out_width: int, out_height: int, precomputed: bool = None,
+        self, out_width: int, out_height: int, precomputed: bool = False,
         c: Optional[Union[int, List[int]]] = None, z: Optional[int] = None, t: Optional[int] = None
     ) -> RawImagePixels:
         """

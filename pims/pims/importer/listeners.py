@@ -210,8 +210,8 @@ class CytomineListener(ImportListener):
                     root = UploadedFile().fetch(root.parent)
 
         self.abstract_images = []
-        self.projects = projects
-        self.user_properties = user_properties
+        self.projects = projects or ProjectCollection()
+        self.user_properties = user_properties or iter([])
         self.images = []
 
     def new_listener_from_registered_child(self, child: Path):
@@ -229,7 +229,7 @@ class CytomineListener(ImportListener):
 
     def get_uf(self, path: Union[str, Path]) -> UploadedFile:
         uf = self.path_uf_mapping.get(str(path))
-        if not uf:
+        if not uf and isinstance(path, Path):
             path = path.readlink()
             uf = self.path_uf_mapping.get(str(path))
             if not uf:

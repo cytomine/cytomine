@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 from math import ceil
-from typing import List, Tuple, Union
+from typing import List, Optional, Tuple, Union
 
 from pims.api.utils.models import TierIndexType
 from pims.processing.region import Region, Tile
@@ -29,14 +29,14 @@ class PyramidTier:
     def __init__(
         self, width: int, height: int, tile_size: Union[Tuple[int, int], int],
         pyramid: Pyramid,
-        data: dict = None
+        data: Optional[dict] = None
     ):
         self.width = width
         self.height = height
         self.tile_width = split_tuple(tile_size, 0)
         self.tile_height = split_tuple(tile_size, 1)
         self.pyramid = pyramid
-        self.data = data if type(data) is dict else dict()
+        self.data = data if isinstance(data, dict) else {}
 
     @property
     def n_pixels(self) -> int:
@@ -158,7 +158,9 @@ class Pyramid:
         """
         Get base tier (always the image at full resolution).
         """
-        return self._tiers[0] if self.n_levels > 0 else None
+        if self.n_levels == 0:
+            raise ValueError("Cannot get the base tier of an empty pyramid.")
+        return self._tiers[0]
 
     def zoom_to_level(self, zoom: int) -> int:
         return self.max_zoom - zoom if self.max_zoom > 0 else 0

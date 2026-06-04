@@ -17,7 +17,7 @@ import logging
 import re
 from abc import ABC
 from copy import deepcopy
-from typing import Any, Dict, List, Optional, TYPE_CHECKING, Type
+from typing import Any, ClassVar, Dict, List, Optional, TYPE_CHECKING, Type
 
 from pims.cache import SimpleDataCache, cached_property
 from pims.formats.utils.checker import AbstractChecker
@@ -57,14 +57,14 @@ class AbstractFormat(ABC, SimpleDataCache):
     """
     Base format. All image formats must extend this class.
     """
-    checker_class: Type[AbstractChecker] = None
-    parser_class: Type[AbstractParser] = None
-    reader_class: Type[AbstractReader] = None
-    convertor_class: Type[AbstractConvertor] = None
+    checker_class: ClassVar[Type[AbstractChecker]]
+    parser_class: ClassVar[Type[AbstractParser]]
+    reader_class: ClassVar[Type[AbstractReader]]
+    convertor_class: ClassVar[Type[AbstractConvertor]]
 
-    histogram_reader_class: Type[AbstractHistogramReader] = None
+    histogram_reader_class: ClassVar[Type[AbstractHistogramReader]]
 
-    def __init__(self, path: Path, existing_cache: Dict[str, Any] = None):
+    def __init__(self, path: Path, existing_cache: Dict[str, Any] | None = None):
         """
         Initialize an image in this format. It does nothing until some
         parsing or reading methods are called.

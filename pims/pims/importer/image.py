@@ -24,7 +24,7 @@ class ImageImporter:
         self.user = user
         self.storage_id = storage_id
 
-    def get_images(self) -> None:
+    def get_images(self) -> list[str]:
         dataset_xml_path = self.base_path / "METADATA" / "dataset.xml"
         tree = etree.parse(dataset_xml_path)
         root = tree.getroot()
@@ -56,7 +56,7 @@ class ImageImporter:
         uploadedFile = UploadedFile(
             original_filename=image_path.name,
             filename=str(tmp_path),
-            size=image_path.size,
+            size=image_path.stat().st_size,
             ext="",
             content_type="",
             id_projects=[],

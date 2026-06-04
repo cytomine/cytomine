@@ -204,7 +204,7 @@ class ProcessedView(MultidimImageResponse, ABC):
         lut
             Stacked LUTs (n_channels, 2**img.bitdepth, 1)
         """
-        if not self.math_processing:
+        if not self.math_processing or not self.in_image:
             return None
 
         n_channels = len(self.channels)
@@ -234,7 +234,7 @@ class ProcessedView(MultidimImageResponse, ABC):
             lut = np.log1p(lut) * 1. / np.log1p(1)
 
         if self.threshold_processing:
-            lut[lut < self.threshold] = 0.0
+            lut[lut < self.threshold] = 0.0  # pyrefly: ignore
 
         lut *= self.max_intensity
         lut = np.rint(lut)
@@ -422,6 +422,9 @@ class ProcessedView(MultidimImageResponse, ABC):
         Process image histogram from in/out parameters, so that if can be
         used by histogram filters on processed images.
         """
+        if self.in_image is None:
+            raise ValueError("in_image is not set")
+
         hist = self.in_image.histogram.plane_histogram(*self.raw_view_planes())
         hist = np.atleast_2d(hist)
 
@@ -455,6 +458,9 @@ class ThumbnailResponse(ProcessedView):
         self.use_precomputed = use_precomputed
 
     def raw_view(self, c: Union[int, List[int]], z: int, t: int) -> RawImagePixels:
+        if self.in_image is None:
+            raise ValueError("in_image is not set")
+
         return self.in_image.thumbnail(
             self.out_width, self.out_height, c=c, z=z, t=t,
             precomputed=self.use_precomputed
@@ -480,6 +486,9 @@ class ResizedResponse(ProcessedView):
         )
 
     def raw_view(self, c: Union[int, List[int]], z: int, t: int) -> RawImagePixels:
+        if self.in_image is None:
+            raise ValueError("in_image is not set")
+
         return self.in_image.thumbnail(
             self.out_width, self.out_height, c=c, z=z, t=t, precomputed=False
         )
@@ -517,6 +526,9 @@ class WindowResponse(ProcessedView):
 
     @property
     def colorspace_processing(self) -> bool:
+        if not self.annotations:
+            return False
+
         if (self.colorspace == Colorspace.AUTO
                 and self.annotation_mode == AnnotationStyleMode.DRAWING
                 and len(self.channels) == 1
@@ -526,6 +538,9 @@ class WindowResponse(ProcessedView):
 
     @property
     def new_colorspace(self) -> Colorspace:
+        if not self.annotations:
+            return False
+
         if (self.colorspace == Colorspace.AUTO
                 and self.annotation_mode == AnnotationStyleMode.DRAWING
                 and len(self.channels) == 1
@@ -566,6 +581,9 @@ class WindowResponse(ProcessedView):
         return pixels
 
     def raw_view(self, c: Union[int, List[int]], z: int, t: int) -> RawImagePixels:
+        if self.in_image is None:
+            raise ValueError("in_image is not set")
+
         return self.in_image.window(
             self.region, self.out_width, self.out_height, c=c, z=z, t=t
         )
@@ -593,6 +611,9 @@ class TileResponse(ProcessedView):
         self.tile_region = tile_region
 
     def raw_view(self, c: Union[int, List[int]], z: int, t: int) -> RawImagePixels:
+        if self.in_image is None:
+            raise ValueError("in_image is not set")
+
         return self.in_image.tile(self.tile_region, c=c, z=z, t=t)
 
 
@@ -605,6 +626,9 @@ class AssociatedResponse(ImageResponse):
         self.associated_key = associated_key
 
     def associated_image(self) -> RawImagePixels:
+        if self.in_image is None:
+            raise ValueError("in_image is not set")
+
         if self.associated_key == AssociatedName.macro:
             associated = self.in_image.macro(self.out_width, self.out_height)
         elif self.associated_key == AssociatedName.label:

@@ -21,9 +21,7 @@ from pyvips import Image as VIPSImage
 from pyvips.vimage import FORMAT_TO_TYPESTR
 
 
-def numpy_to_vips(
-    np_array: np.ndarray,
-) -> VIPSImage:
+def numpy_to_vips(np_array: np.ndarray) -> VIPSImage:
     """
     Convert a Numpy array to a VIPS image.
 
@@ -176,4 +174,4 @@ def convert_to(
     converted
         The image (pixels) in the new type
     """
-    return imglib_adapters.get((type(image), new_image_type))(image)
+    return imglib_adapters.get((type(image), new_image_type), identity)(image)

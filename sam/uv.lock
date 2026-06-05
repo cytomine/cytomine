@@ -1292,7 +1292,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "fastapi", extras = ["standard"], specifier = ">=0.116.1" },
+    { name = "fastapi", extras = ["standard"], specifier = "==0.136.3" },
     { name = "geojson", specifier = ">=3.2.0" },
     { name = "numpy", specifier = ">=2.1.2" },
     { name = "opencv-python-headless", specifier = ">=4.11.0.86" },

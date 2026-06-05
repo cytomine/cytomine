@@ -6,7 +6,7 @@ import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.cytomine.repository.mapper.CommandMapper;
-import org.cytomine.repository.mapper.OntologyMapper;
+import org.cytomine.repository.mapper.TermMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
 import org.cytomine.repository.persistence.TermRelationRepository;
 import org.cytomine.repository.persistence.TermRepository;
@@ -32,35 +32,35 @@ public class TermCommandService
 
     private final TermRepository termRepository;
     private final TermRelationRepository termRelationRepository;
-    private final OntologyMapper ontologyMapper;
+    private final TermMapper termMapper;
     private final CommandV2Repository commandV2Repository;
     private final CommandMapper commandMapper;
     private final ACLService aclService;
 
     @Override
     public TermEntity update(TermEntity entity, UpdateTerm payload, Timestamp now) {
-        return ontologyMapper.update(entity, payload.name().orElse(entity.getName()),
+        return termMapper.update(entity, payload.name().orElse(entity.getName()),
             payload.color().orElse(entity.getColor()), now);
     }
 
     @Override
     public TermEntity updateWithPayload(TermEntity entity, TermCommandPayload payload, Timestamp now) {
-        return ontologyMapper.updateWithPayload(entity, payload, now);
+        return termMapper.updateWithPayload(entity, payload, now);
     }
 
     @Override
     public TermResponse mapToResponse(TermEntity entity) {
-        return ontologyMapper.mapToTermResponse(entity);
+        return termMapper.mapToTermResponse(entity);
     }
 
     @Override
     public TermEntity mapCreateToEntity(CreateTerm createPayload, long userId, Timestamp creationDate) {
-        return ontologyMapper.map(createPayload, creationDate);
+        return termMapper.map(createPayload, creationDate);
     }
 
     @Override
     public TermCommandPayload map(TermEntity entity) {
-        return ontologyMapper.mapToTermCommandPayload(entity);
+        return termMapper.mapToTermCommandPayload(entity);
     }
 
     @Override

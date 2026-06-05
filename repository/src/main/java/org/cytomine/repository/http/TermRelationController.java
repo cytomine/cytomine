@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import lombok.RequiredArgsConstructor;
-import org.cytomine.repository.mapper.OntologyMapper;
+import org.cytomine.repository.mapper.TermRelationMapper;
 import org.cytomine.repository.persistence.RelationRepository;
 import org.cytomine.repository.persistence.TermRelationRepository;
 import org.cytomine.repository.persistence.entity.TermRelationEntity;
@@ -30,7 +30,7 @@ import static java.util.stream.Collectors.toSet;
 @RestController
 @RequestMapping(ROOT_PATH)
 public class TermRelationController implements TermRelationHttpContract {
-    private final OntologyMapper ontologyMapper;
+    private final TermRelationMapper termRelationMapper;
     private final TermRelationRepository termRelationRepository;
     private final org.cytomine.repository.persistence.TermRepository termRepository;
     private final RelationRepository relationRepository;
@@ -43,7 +43,7 @@ public class TermRelationController implements TermRelationHttpContract {
             return List.of();
         }
         return termRelationRepository.findAllByOntologyId(ontologyId).stream()
-            .map(ontologyMapper::mapToTermRelationResponse).toList();
+            .map(termRelationMapper::mapToTermRelationResponse).toList();
     }
 
     @Override
@@ -60,7 +60,7 @@ public class TermRelationController implements TermRelationHttpContract {
         return termRelationRepository.findById(id).flatMap(
             termEntity -> termRepository.findById(termEntity.getTerm1Id())
                 .filter(term1 -> aclService.canReadOntology(userId, term1.getOntologyId()))
-                .map(term1 -> ontologyMapper.mapToTermRelationResponse(termEntity)));
+                .map(term1 -> termRelationMapper.mapToTermRelationResponse(termEntity)));
     }
 
     @Override

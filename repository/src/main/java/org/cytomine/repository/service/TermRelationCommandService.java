@@ -6,7 +6,7 @@ import java.util.Optional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.cytomine.repository.mapper.CommandMapper;
-import org.cytomine.repository.mapper.OntologyMapper;
+import org.cytomine.repository.mapper.TermRelationMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
 import org.cytomine.repository.persistence.RelationRepository;
 import org.cytomine.repository.persistence.TermRelationRepository;
@@ -34,7 +34,7 @@ public class TermRelationCommandService implements
     private final TermRepository termRepository;
     private final TermRelationRepository termRelationRepository;
     private final RelationRepository relationRepository;
-    private final OntologyMapper ontologyMapper;
+    private final TermRelationMapper termRelationMapper;
     private final CommandV2Repository commandV2Repository;
     private final CommandMapper commandMapper;
     private final ACLService aclService;
@@ -47,25 +47,25 @@ public class TermRelationCommandService implements
     @Override
     public TermRelationCommandPayload map(TermRelationEntity entity) {
         long ontologyId = termRepository.findById(entity.getTerm1Id()).orElseThrow().getOntologyId();
-        return ontologyMapper.mapToTermRelationCommandPayload(entity, ontologyId);
+        return termRelationMapper.mapToTermRelationCommandPayload(entity, ontologyId);
     }
 
 
     @Override
     public TermRelationEntity updateWithPayload(TermRelationEntity entity, TermRelationCommandPayload payload,
         Timestamp now) {
-        return ontologyMapper.updateTermRelationWithPayload(entity, payload, now);
+        return termRelationMapper.updateTermRelationWithPayload(entity, payload, now);
     }
 
     @Override
     public TermRelationResponse mapToResponse(TermRelationEntity entity) {
-        return ontologyMapper.mapToTermRelationResponse(entity);
+        return termRelationMapper.mapToTermRelationResponse(entity);
     }
 
     @Override
     public TermRelationEntity mapCreateToEntity(CreateTermRelation createPayload, long userId, Timestamp creationDate) {
         long parentId = relationRepository.findParent().getId();
-        return ontologyMapper.mapToTermRelationEntity(createPayload, creationDate, parentId);
+        return termRelationMapper.mapToTermRelationEntity(createPayload, creationDate, parentId);
     }
 
     @Override
@@ -105,7 +105,7 @@ public class TermRelationCommandService implements
 
     @Override
     public TermRelationEntity update(TermRelationEntity entity, UpdateTermRelation updatePayload, Timestamp now) {
-        return ontologyMapper.update(entity, updatePayload.term1Id().orElse(entity.getTerm1Id()),
+        return termRelationMapper.update(entity, updatePayload.term1Id().orElse(entity.getTerm1Id()),
             updatePayload.term1Id().orElse(entity.getTerm2Id()), now);
     }
 

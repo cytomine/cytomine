@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.cytomine.repository.mapper.OntologyMapper;
+import org.cytomine.repository.mapper.TermMapper;
 import org.cytomine.repository.persistence.TermRepository;
 import org.cytomine.repository.service.ACLService;
 import org.cytomine.repository.service.TermCommandService;
@@ -33,7 +33,7 @@ import static be.cytomine.common.repository.http.TermHttpContract.ROOT_PATH;
 @RestController
 @RequestMapping(ROOT_PATH)
 public class TermController implements TermHttpContract {
-    private final OntologyMapper ontologyMapper;
+    private final TermMapper termMapper;
     private final TermRepository termRepository;
     private final TermCommandService termCommandService;
     private final ACLService aclService;
@@ -42,7 +42,7 @@ public class TermController implements TermHttpContract {
     public Optional<TermResponse> findTermByID(@PathVariable long id, @RequestParam long userId) {
         return termRepository.findById(id)
             .filter(termEntity -> aclService.canReadOntology(userId, termEntity.getOntologyId()))
-            .map(ontologyMapper::map);
+            .map(termMapper::mapToTermResponse);
     }
 
     @Override
@@ -77,7 +77,7 @@ public class TermController implements TermHttpContract {
         if (!aclService.canReadProject(userId, id)) {
             return Page.empty();
         }
-        return termRepository.findAllByProjectId(id, pageable).map(ontologyMapper::map);
+        return termRepository.findAllByProjectId(id, pageable).map(termMapper::mapToTermResponse);
     }
 
     @Override
@@ -85,7 +85,7 @@ public class TermController implements TermHttpContract {
         if (!aclService.canReadOntology(userId, id)) {
             return Page.empty();
         }
-        return termRepository.findAllByOntologyIdAndDeletedNull(id, pageable).map(ontologyMapper::map);
+        return termRepository.findAllByOntologyIdAndDeletedNull(id, pageable).map(termMapper::mapToTermResponse);
     }
 
     @Override

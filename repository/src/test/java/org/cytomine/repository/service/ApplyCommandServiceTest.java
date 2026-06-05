@@ -79,7 +79,7 @@ class ApplyCommandServiceTest {
     void undoDeleteTermCommandDelegatesToTermCommandService() {
         UUID id = UUID.randomUUID();
         LocalDateTime now = LocalDateTime.now();
-        DeleteTermCommand cmd = new DeleteTermCommand(10L, termPayload, userId, ontologyId);
+        DeleteTermCommand cmd = new DeleteTermCommand(termPayload, userId);
         when(commandRepository.findById(id)).thenReturn(Optional.of(new CommandV2Entity(id, null, null, cmd, 0L)));
         when(termCommandService.undoDelete(id, cmd, userId, now)).thenReturn(
             Optional.of(mockResponse(Commands.DELETE_TERM)));
@@ -93,7 +93,7 @@ class ApplyCommandServiceTest {
     void undoCreateTermCommandDelegatesToTermCommandService() {
         UUID id = UUID.randomUUID();
         LocalDateTime now = LocalDateTime.now();
-        CreateTermCommand cmd = new CreateTermCommand(termPayload, userId, ontologyId);
+        CreateTermCommand cmd = new CreateTermCommand(termPayload, userId);
         when(commandRepository.findById(id)).thenReturn(Optional.of(new CommandV2Entity(id, null, null, cmd, 0L)));
         when(termCommandService.undoCreate(id, cmd, userId, now)).thenReturn(
             Optional.of(mockResponse(Commands.CREATE_TERM)));
@@ -107,7 +107,7 @@ class ApplyCommandServiceTest {
     void undoUpdateTermCommandDelegatesToTermCommandService() {
         UUID id = UUID.randomUUID();
         LocalDateTime now = LocalDateTime.now();
-        UpdateTermCommand cmd = new UpdateTermCommand(10L, termPayload, termPayload, userId, ontologyId);
+        UpdateTermCommand cmd = new UpdateTermCommand(termPayload, termPayload, userId);
         when(commandRepository.findById(id)).thenReturn(Optional.of(new CommandV2Entity(id, null, null, cmd, 0L)));
         when(termCommandService.undoUpdate(id, cmd, userId, now)).thenReturn(
             Optional.of(mockResponse(Commands.UPDATE_TERM)));
@@ -121,7 +121,7 @@ class ApplyCommandServiceTest {
     void redoDeleteTermCommandDelegatesToTermCommandService() {
         UUID id = UUID.randomUUID();
         LocalDateTime now = LocalDateTime.now();
-        DeleteTermCommand cmd = new DeleteTermCommand(10L, termPayload, userId, ontologyId);
+        DeleteTermCommand cmd = new DeleteTermCommand(termPayload, userId);
         when(commandRepository.findById(id)).thenReturn(Optional.of(new CommandV2Entity(id, null, null, cmd, 0L)));
         when(termCommandService.redoDelete(id, cmd, userId, now)).thenReturn(
             Optional.of(mockResponse(Commands.DELETE_TERM)));
@@ -135,7 +135,7 @@ class ApplyCommandServiceTest {
     void redoCreateTermCommandDelegatesToTermCommandService() {
         UUID id = UUID.randomUUID();
         LocalDateTime now = LocalDateTime.now();
-        CreateTermCommand cmd = new CreateTermCommand(termPayload, userId, ontologyId);
+        CreateTermCommand cmd = new CreateTermCommand(termPayload, userId);
         when(commandRepository.findById(id)).thenReturn(Optional.of(new CommandV2Entity(id, null, null, cmd, 0L)));
         when(termCommandService.redoCreate(id, cmd, userId, now)).thenReturn(
             Optional.of(mockResponse(Commands.CREATE_TERM)));
@@ -149,7 +149,7 @@ class ApplyCommandServiceTest {
     void redoUpdateTermCommandDelegatesToTermCommandService() {
         UUID id = UUID.randomUUID();
         LocalDateTime now = LocalDateTime.now();
-        UpdateTermCommand cmd = new UpdateTermCommand(10L, termPayload, termPayload, userId, ontologyId);
+        UpdateTermCommand cmd = new UpdateTermCommand(termPayload, termPayload, userId);
         when(commandRepository.findById(id)).thenReturn(Optional.of(new CommandV2Entity(id, null, null, cmd, 0L)));
         when(termCommandService.redoUpdate(id, cmd, userId, now)).thenReturn(
             Optional.of(mockResponse(Commands.UPDATE_TERM)));
@@ -163,7 +163,7 @@ class ApplyCommandServiceTest {
     void undoDeleteTermRelationCommandDelegatesToTermRelationCommandService() {
         UUID id = UUID.randomUUID();
         LocalDateTime now = LocalDateTime.now();
-        DeleteTermRelationCommand cmd = new DeleteTermRelationCommand(20L, relationPayload, userId, ontologyId);
+        DeleteTermRelationCommand cmd = new DeleteTermRelationCommand(relationPayload, userId);
         when(commandRepository.findById(id)).thenReturn(Optional.of(new CommandV2Entity(id, null, null, cmd, 0L)));
         when(termRelationCommandService.undoDelete(id, cmd, userId, now)).thenReturn(
             Optional.of(mockResponse(Commands.DELETE_TERM_RELATION)));
@@ -177,7 +177,7 @@ class ApplyCommandServiceTest {
     void undoCreateTermRelationCommandDelegatesToTermRelationCommandService() {
         UUID id = UUID.randomUUID();
         LocalDateTime now = LocalDateTime.now();
-        CreateTermRelationCommand cmd = new CreateTermRelationCommand(relationPayload, userId, ontologyId);
+        CreateTermRelationCommand cmd = new CreateTermRelationCommand(relationPayload, userId);
         when(commandRepository.findById(id)).thenReturn(Optional.of(new CommandV2Entity(id, null, null, cmd, 0L)));
         when(termRelationCommandService.undoCreate(id, cmd, userId, now)).thenReturn(
             Optional.of(mockResponse(Commands.CREATE_TERM_RELATION)));
@@ -192,7 +192,7 @@ class ApplyCommandServiceTest {
         UUID id = UUID.randomUUID();
         LocalDateTime now = LocalDateTime.now();
         UpdateTermRelationCommand cmd =
-            new UpdateTermRelationCommand(20L, relationPayload, relationPayload, userId, ontologyId);
+            new UpdateTermRelationCommand(relationPayload, relationPayload, userId);
         when(commandRepository.findById(id)).thenReturn(Optional.of(new CommandV2Entity(id, null, null, cmd, 0L)));
         when(termRelationCommandService.undoUpdate(id, cmd, userId, now)).thenReturn(
             Optional.of(mockResponse(Commands.UPDATE_TERM_RELATION)));
@@ -206,7 +206,7 @@ class ApplyCommandServiceTest {
     void redoDeleteTermRelationCommandDelegatesToTermRelationCommandService() {
         UUID id = UUID.randomUUID();
         LocalDateTime now = LocalDateTime.now();
-        DeleteTermRelationCommand cmd = new DeleteTermRelationCommand(20L, relationPayload, userId, ontologyId);
+        DeleteTermRelationCommand cmd = new DeleteTermRelationCommand(relationPayload, userId);
         when(commandRepository.findById(id)).thenReturn(Optional.of(new CommandV2Entity(id, null, null, cmd, 0L)));
         when(termRelationCommandService.redoDelete(id, cmd, userId, now)).thenReturn(
             Optional.of(mockResponse(Commands.DELETE_TERM_RELATION)));
@@ -220,7 +220,7 @@ class ApplyCommandServiceTest {
     void redoCreateTermRelationCommandDelegatesToTermRelationCommandService() {
         UUID id = UUID.randomUUID();
         LocalDateTime now = LocalDateTime.now();
-        CreateTermRelationCommand cmd = new CreateTermRelationCommand(relationPayload, userId, ontologyId);
+        CreateTermRelationCommand cmd = new CreateTermRelationCommand(relationPayload, userId);
         when(commandRepository.findById(id)).thenReturn(Optional.of(new CommandV2Entity(id, null, null, cmd, 0L)));
         when(termRelationCommandService.redoCreate(id, cmd, userId, now)).thenReturn(
             Optional.of(mockResponse(Commands.CREATE_TERM_RELATION)));
@@ -235,7 +235,7 @@ class ApplyCommandServiceTest {
         UUID id = UUID.randomUUID();
         LocalDateTime now = LocalDateTime.now();
         UpdateTermRelationCommand cmd =
-            new UpdateTermRelationCommand(20L, relationPayload, relationPayload, userId, ontologyId);
+            new UpdateTermRelationCommand(relationPayload, relationPayload, userId);
         when(commandRepository.findById(id)).thenReturn(Optional.of(new CommandV2Entity(id, null, null, cmd, 0L)));
         when(termRelationCommandService.redoUpdate(id, cmd, userId, now)).thenReturn(
             Optional.of(mockResponse(Commands.UPDATE_TERM_RELATION)));

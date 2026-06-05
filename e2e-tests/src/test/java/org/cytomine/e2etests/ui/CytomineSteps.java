@@ -629,4 +629,39 @@ public class CytomineSteps {
         webDriverUtils.xpathClick(wait, "//a[contains(text(), '" + projectName + "')]");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), " + imageName + ")]"));
     }
+
+    public void reviewAnnotations(Wait<WebDriver> wait) {
+        By validateButton = By.xpath(
+            "//div[contains(@class,'buttons') and contains(@class,'has-addons')]"
+                + "//button[contains(@class,'is-success')][.//i[contains(@class,'fa-check')]]"
+        );
+        By rejectButton = By.xpath(
+            "//div[contains(@class,'buttons') and contains(@class,'has-addons')]"
+                + "//button[@disabled][.//i[contains(@class,'fa-minus')]]"
+        );
+        webDriverUtils.waitUntilByEmpty(wait, validateButton);
+        webDriverUtils.waitUntilByEmpty(wait, rejectButton);
+
+        webDriverUtils.byClick(wait, By.cssSelector(".fa-check-circle"));
+        webDriverUtils.byIsDisplayed(
+            wait,
+            By.xpath("//a[contains(@class,'active')][.//i[contains(@class,'fa-check-circle')]]")
+        );
+
+        webDriverUtils.xpathClick(wait, "//button[.//span[normalize-space()='Start review']]");
+        webDriverUtils.byIsDisplayed(wait, validateButton);
+        webDriverUtils.byIsDisplayed(wait, rejectButton);
+
+        webDriverUtils.xpathClick(wait, "//button[.//span[normalize-space()='Accept all']]");
+        webDriverUtils.xpathClick(wait, "//button[.//span[normalize-space()='Reject all']]");
+        webDriverUtils.xpathClick(wait, "//button[.//span[normalize-space()='Continue my review later']]");
+        webDriverUtils.xpathClick(wait, "//button[.//span[normalize-space()='Continue review']]");
+
+        webDriverUtils.xpathClick(wait, "//button[.//span[normalize-space()='Cancel my review']]");
+
+        webDriverUtils.xpathClick(wait, "//button[.//span[normalize-space()='Start review']]");
+        webDriverUtils.xpathClick(wait, "//button[.//span[normalize-space()='Validate my review']]");
+
+        webDriverUtils.xpathClick(wait, "//button[.//span[normalize-space()='Unvalidate and continue my review']]");
+    }
 }
